@@ -19,18 +19,24 @@ function(x, col="lightsteelblue", border="black", col.bg="snow1",
 					upper = as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", labs) ))
 		bin.min <- min(bins)
 		bin.max <- max(bins)
-		if (length(x[which(x<bin.min)])>0 || length(x[which(x>bin.max)]>0)) {
-			cat("Range of the data: ", min(x), " to ", max(x), "\n", sep="")
+		n.under <- length(x[which(x<bin.min)])
+		n.over <- length(x[which(x>bin.max)])
+		if (n.under+n.over > 0) {
+			cat("\nRange of the data: ", min(x), " to ", max(x), "\n", sep="")
 			if (length(breaks) > 3)
 				cat("Bin Cutpoints: ", bin.min, breaks[2], "...", breaks[length(breaks)-1],
 					bin.max, "\n\n")
 		else
 			cat("Range of the bins: ", bin.min, " to ", bin.max, "\n", sep="")
-			cat("Data values too small to fit in the bins: ", x[which(x<bin.min)], "\n")
-			cat("Data values too large to fit in the bins: ", x[which(x>bin.max)], "\n")
+			if (n.under > 0) 
+			  cat("Data values too small to fit in the bins: ", x[which(x<bin.min)], "\n")
+			if (n.over > 0)
+			  cat("Data values too large to fit in the bins: ", x[which(x>bin.max)], "\n")
 			cat("\n")
-			txt <- "Each data value must be in a bin, so extend bin range beyond "
-			stop(txt, bin.min, " to ", bin.max, ".\n", call. = FALSE)
+			cat("Each data value must be in a bin.\n")
+			if (n.under > 0) cat("Extend bin range below ", bin.min, ".\n", sep="")
+			if (n.over > 0 ) cat("Extend bin range above ", bin.max, ".\n", sep="")
+			stop("Try again with an extended bin range", ".\n\n", call. = FALSE)
 		}	
 	}
 
@@ -39,14 +45,15 @@ function(x, col="lightsteelblue", border="black", col.bg="snow1",
 	h <- suppressWarnings(hist(x, plot=FALSE, breaks, ...))
 	
 	# summarize data
+  cat("\n")
 	cat("-------------------------------------------------", "\n")
 	cat("Data Summary", "\n")
 	cat("-------------------------------------------------", "\n")
 	cat("Size   :  n =", length(x), "\n")
 	cat("Min    :  min =", format(signif(range(x)[1],digits), scientific=FALSE), "\n")
 	cat("Max    :  max =", format(signif(range(x)[2],digits), scientific=FALSE), "\n")
-  	cat("Mean   :  m =", format(signif(mean(x),digits), scientific=FALSE), "\n")
-  	cat("Std Dev:  s =", format(signif(sd(x),digits), scientific=FALSE), "\n\n")
+  cat("Mean   :  m =", format(signif(mean(x),digits), scientific=FALSE), "\n")
+  cat("Std Dev:  s =", format(signif(sd(x),digits), scientific=FALSE), "\n\n")
 
 	cat("Number of Bins:", length(h$breaks)-1, "\n")
 	
@@ -83,14 +90,14 @@ function(x, col="lightsteelblue", border="black", col.bg="snow1",
 	if (over.grid == TRUE) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
 
   # frequency table
-  # j<19 condition is to stop the 0.99999... problem
+  # j<17 condition is to stop the 0.99999... problem
   cum.c <- cumsum(h$counts)
   prop <- round(h$counts/length(x),2)
   cum.p <- cumsum(prop)
   max.dg <- 0
   for (i in 1:length(h$breaks)) {
     j <- nchar(as.character(h$breaks[i]))
-    if (j>max.dg && j<19) max.dg <- j
+    if (j>max.dg && j<17) max.dg <- j
   }
   max.dg.mid <- 0
   for (i in 1:length(h$mids)) {
@@ -110,6 +117,8 @@ function(x, col="lightsteelblue", border="black", col.bg="snow1",
   cat("------------------------------------------------------------------","\n")
   for (i in 2:length(h$breaks)-1)
     cat(sprintf("beyond %s to %s %s %6.0f %6.2f %6.0f %6.2f", x.breaks[i], 
-      x.breaks[i+1], x.mids[i], h$counts[i], prop[i], cum.c[i], cum.p[i]), "\n")
+      x.breaks[i+1], x.mids[i], h$counts[i], prop[i], cum.c[i], cum.p[i]), "\n") 
+  cat("------------------------------------------------------------------","\n")
+	cat("\n")
 	
 }

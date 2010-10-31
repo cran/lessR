@@ -67,7 +67,7 @@ function(x, col.nrm="darkblue", col.gen="blue", col.bg="snow1",
 	if (type == "general" || type == "both") {
 	  lines(d.gen, col=col.gen)
  	  polygon(d.gen, col=col.fill.gen)
-	  cat("Density bandwidth for general curve: ", round(d.gen$bw,4), sep="", "\n")
+	  cat("\nDensity bandwidth for general curve: ", round(d.gen$bw,4), sep="", "\n")
 	}
-
+  cat("\n")
 }

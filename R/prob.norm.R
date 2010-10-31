@@ -1,5 +1,5 @@
-prob.normal <- 
-function(mu=0, sigma=1, lo=NULL, hi=NULL, col.nrm="black", 
+prob.norm <- 
+function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black", 
          col.fill.nrm="grey85", col.fill.int="steelblue3") { 
 
 	if (is.null(lo)) {

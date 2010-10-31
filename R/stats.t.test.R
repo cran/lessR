@@ -8,6 +8,7 @@ function(n1 = NULL, n2 = NULL,  m1 = NULL, m2 = NULL, s1 = NULL, s2 = NULL,
 	if (is.null(m1) | is.null(m2)) stop("Specify a mean for each group.")
 	if (is.null(s1) | is.null(s2)) stop("Specify a standard deviation for each group.")
 	
+  cat("\n")
 	cat("------------------------------------------------------------\n")
 	cat("Compare", Ynm, "across", Xnm, "levels", X1nm, "and", X2nm, "\n")
 	cat("------------------------------------------------------------\n\n")
@@ -115,5 +116,6 @@ function(n1 = NULL, n2 = NULL,  m1 = NULL, m2 = NULL, s1 = NULL, s2 = NULL,
 		cat(">>> To get the MBESS package, run one time only: install.packages('MBESS')", "\n")
 		cat(">>> IGNORE resulting 'Error in eval' error message below.", "\n")
 	}
+  cat("\n")
 
 }

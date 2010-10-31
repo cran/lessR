@@ -324,6 +324,7 @@ function(YA, YB) {
 	mtext(bquote(paste(.(round(sw,2)))), side=3, line=.2, at=(mlow+(last.coord.x))/2, col="gray40")
 
 }
+  cat("\n")
 
 	if ( (length(x) < 2) | (length(y) < 2) ) 
 	  stop("Need at least two observations per sample.")
@@ -340,5 +341,7 @@ function(YA, YB) {
 		X1nm <- Xtmp
 		ODDSMD(y, x)
 	}
+	cat("\n")
+
 
 }
