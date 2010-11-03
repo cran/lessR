@@ -1,5 +1,5 @@
-\name{prob.normal}
-\alias{prob.normal}
+\name{prob.norm}
+\alias{prob.norm}
 
 \title{Compute and Plot Normal Curve Probabilities over an Interval}
 
@@ -8,16 +8,16 @@ Calculate the probability of an interval for a normal distribution with specifie
 }
 
 \usage{
-prob.normal(mu=0, sigma=1, lo=NULL, hi=NULL, col.nrm="black", 
+prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black", 
          col.fill.nrm="grey85", col.fill.int="steelblue3")
 }
 
 
 \arguments{
-  \item{mu}{Population mean of normal distribution.}
-  \item{sigma}{Population standard deviation of normal distribution.}
   \item{lo}{Lowest value in the interval for which to compute probability.}
   \item{hi}{Highest value in the interval for which to compute probability.}
+  \item{mu}{Population mean of normal distribution.}
+  \item{sigma}{Population standard deviation of normal distribution.}
   \item{col.nrm}{Color of the border of the normal curve.}
   \item{col.fill.nrm}{Fill color of the normal curve.}
   \item{col.fill.int}{Fill color of the interval for which the probability is computed.}
@@ -38,17 +38,17 @@ Calculate the normal curve probability for the specified interval and normal cur
 
 
 \examples{
-# Mu=0, Sigma=1: # Normal probability for values between 0 and 2
-prob.normal(lo=0, hi=2)
+# Mu=0, Sigma=1: Standard normal prob, values between 0 and 2
+prob.norm(0,2)
 
-# Mu=0, Sigma=1: # Normal probability for values lower than 2
-prob.normal(hi=2)
+# Mu=0, Sigma=1: Standard normal prob, values lower than 2
+prob.norm(hi=2)
 
-# Mu=0, Sigma=1: # Normal probability for values larger than 2
-prob.normal(lo=2)
+# Mu=0, Sigma=1: Standard normal prob, values larger than 2
+prob.norm(lo=2)
 
-# Mu=100, Sigma=15: change default fill of plotted interval
-prob.normal(m=100, s=15, lo=115, hi=125, col.fill.int="plum")
+# Mu=100, Sigma=15: Change default fill color of plotted interval
+prob.norm(lo=115, hi=125, mu=100, sigma=15, col.fill.int="plum")
 }
 
 
