@@ -60,7 +60,7 @@ The purpose of \code{reg} is to combine these function calls into one, and provi
 X1 <- rnorm(20)
 X2 <- rnorm(20)
 Y <- .7*X1 + .2*X2 + .6*rnorm(20)
-mydata <- data.frame(cbind(X1, X2, Y))
+mydata <- data.frame(X1, X2, Y)
 attach(mydata)
 
 # Call reg for a one-predictor regression

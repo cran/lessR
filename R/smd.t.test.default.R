@@ -230,14 +230,17 @@ function(YA, YB) {
   # vertical line for mean
   lines(c(m1,m1), c(0,ytop), lty="solid", lwd=2, col=col.1)
 	lines(c(m2,m2), c(0,ytop), lty="twodash", lwd=2, col=col.2)
+	
   # curve area
   polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1t, border=NA, 
     density=10, angle=45)
 	polygon(c(min(dYB$x),dYB$x,max(dYB$x)), c(0,dYB$y,0), col=col.2t, border=NA, 
 	  density=10, angle=-45)
+	  
   # bottom border of density curve	
   segments(min(dYA$x), 0, max(dYA$x), 0, col=col.1)
 	segments(min(dYB$x), 0, max(dYB$x), 0, col=col.2)
+	
   # density curve
   lines(dYA, col=col.1t, lty="solid", lwd=1.5)
 	lines(dYB, col=col.2t, lty="twodash", lwd=1.5)
@@ -324,9 +327,10 @@ function(YA, YB) {
 	mtext(bquote(paste(.(round(sw,2)))), side=3, line=.2, at=(mlow+(last.coord.x))/2, col="gray40")
 
 }
+
   cat("\n")
 
-	if ( (length(x) < 2) | (length(y) < 2) ) 
+	if ( (length(x) < 2) || (length(y) < 2) ) 
 	  stop("Need at least two observations per sample.")
 	
 	if ( !is.null(mmd) && !is.null(msmd) )

@@ -37,7 +37,7 @@ The name of the file, as well as the name of the working directory into which th
 n <- 12
 X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
 Y <- rnorm(n=n, mean=50, sd=10)
-mydata <- data.frame(cbind(X,Y))
+mydata <- data.frame(X,Y)
 
 # write the contents of a data frame called mydata
 #   into a csv file called "mydata.csv" in the working directory

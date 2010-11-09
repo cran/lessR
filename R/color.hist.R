@@ -1,5 +1,5 @@
 color.hist <- 
-function(x, col="lightsteelblue", border="black", col.bg="snow1",
+function(x, col="lightsteelblue", border="black", col.bg="seashell",
          col.grid="grey90", breaks="Sturges", over.grid=FALSE,
          show.values=FALSE, prop=FALSE, cumul=c("off", "on", "both"), 
          col.reg="seashell2", digits=5, xlab=NULL, main=NULL, ...) {
@@ -34,8 +34,9 @@ function(x, col="lightsteelblue", border="black", col.bg="snow1",
 			  cat("Data values too large to fit in the bins: ", x[which(x>bin.max)], "\n")
 			cat("\n")
 			cat("Each data value must be in a bin.\n")
-			if (n.under > 0) cat("Extend bin range below ", bin.min, ".\n", sep="")
-			if (n.over > 0 ) cat("Extend bin range above ", bin.max, ".\n", sep="")
+			txt <- "To fix this problem, extend the bin range "
+			if (n.under > 0) cat(txt, "below ", bin.min, ".\n", sep="")
+			if (n.over > 0) cat(txt, "above ", bin.max, ".\n", sep="")
 			stop("Try again with an extended bin range", ".\n\n", call. = FALSE)
 		}	
 	}
@@ -45,15 +46,15 @@ function(x, col="lightsteelblue", border="black", col.bg="snow1",
 	h <- suppressWarnings(hist(x, plot=FALSE, breaks, ...))
 	
 	# summarize data
-  cat("\n")
+	cat("\n")
 	cat("-------------------------------------------------", "\n")
 	cat("Data Summary", "\n")
 	cat("-------------------------------------------------", "\n")
 	cat("Size   :  n =", length(x), "\n")
 	cat("Min    :  min =", format(signif(range(x)[1],digits), scientific=FALSE), "\n")
 	cat("Max    :  max =", format(signif(range(x)[2],digits), scientific=FALSE), "\n")
-  cat("Mean   :  m =", format(signif(mean(x),digits), scientific=FALSE), "\n")
-  cat("Std Dev:  s =", format(signif(sd(x),digits), scientific=FALSE), "\n\n")
+	cat("Mean   :  m =", format(signif(mean(x),digits), scientific=FALSE), "\n")
+	cat("Std Dev:  s =", format(signif(sd(x),digits), scientific=FALSE), "\n\n")
 
 	cat("Number of Bins:", length(h$breaks)-1, "\n")
 	

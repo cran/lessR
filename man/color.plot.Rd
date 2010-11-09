@@ -10,7 +10,7 @@ Plots individual points, such as for a scatterplot, or plots connected line segm
 \usage{
 color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,  
            col.point="darkblue", col.fill=NULL, col.grid="grey90", 
-           col.bg="snow1", col.box="black", xy.ticks=TRUE, 
+           col.bg="seashell", col.box="black", xy.ticks=TRUE, 
            xlab=NULL, ylab=NULL, pch=NULL, cex=NULL, center.line=NULL,
            x.start=NULL, x.by=NULL, x.reverse=FALSE, \ldots)
 }

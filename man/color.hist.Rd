@@ -8,7 +8,7 @@ Using the standard R function \code{\link{hist}}, plots a frequency histogram wi
 }
 
 \usage{
-color.hist(x, col="lightsteelblue", border="black", col.bg="snow1",
+color.hist(x, col="lightsteelblue", border="black", col.bg="seashell",
          col.grid="grey90", breaks="Sturges", over.grid=FALSE,
          show.values=FALSE, prop=FALSE, cumul=c("off", "on", "both"), 
          col.reg="seashell2", digits=5, xlab=NULL, main=NULL, \ldots)
