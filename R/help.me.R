@@ -449,22 +449,28 @@ help.more("color.plot", 9)
 else if (topic == "stats") {
 t0 <- "Descriptive Statistics"
 
-f1 <- bquote(paste(bold("length"), "  sample size, i.e., count"))
-f2 <- bquote(paste(bold("mean"), "  mean, including trimmed mean with trim option"))
-f3 <- bquote(paste(bold("sd"), "  standard deviation"))
-f4 <- bquote(paste(bold("median"), "  median"))
-f5 <- bquote(paste(bold("min"), "  minimum"))
-f6 <- bquote(paste(bold("max"), "  maximum"))
+f1 <- bquote(paste(bold("describe"), "  summarize all variables in specified data table"))
+f2 <- bquote(paste(bold("length"), "  sample size, i.e., count"))
+f3 <- bquote(paste(bold("mean"), "  mean, including trimmed mean with trim option"))
+f4 <- bquote(paste(bold("sd"), "  standard deviation"))
+f5 <- bquote(paste(bold("median"), "  median"))
+f6 <- bquote(paste(bold("min"), "  minimum", "       ", bold("max"), "  maximum"))
 f7 <- bquote(paste(bold("range"), "  range"))
 f8 <- bquote(paste(bold("quantile"), "  min, 1st quartile, median, 3rd quartile, max"))
 f9 <- bquote(paste(bold("scale"), "  standardize"))
 
 t1 <-
-"Each of these functions applies to the analysis of single variable. 
-
-For example, calculate the mean of variable called Y.
+"Each of these functions, except for describe, applies to the analysis of single variable, 
+such as for the mean of variable called Y.
     > mean(Y)
 
+Or summarize all numerical and non-numerical variables in the data frame.
+    > describe(mydata)
+    
+Or, can apply the describe function to a single variable, Y, with an optional grouping
+variable, X, to summarize the numerical variable at each level of the other variable.
+    > describe(Y ~ X)
+    
 R provides many summary statistics. Enter the following to see the entire list, 
     > library(help=\"stats\")."
 
@@ -479,10 +485,9 @@ text(0,74, label=f6, adj=0)
 text(0,70, label=f7, adj=0)
 text(0,66, label=f8, adj=0)
 text(0,62, label=f9, adj=0)
-lines(c(5,90), c(58,58), col=col.line)
-text(0,44, label=t1, adj=0)
-
-help.more("mean", 30)
+lines(c(5,90), c(57,57), col=col.line)
+text(0,33, label=t1, adj=0)
+help.more("describe", 9)
 }
 
 

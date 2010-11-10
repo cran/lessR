@@ -3,6 +3,7 @@ function (formula, data, ...) {
 
 	if ((length(formula) != 3) || (length(attr(terms(formula[-2]),"term.labels")) !=1)) 
 			stop("'Formula' missing or incorrect.")
+
 	m <- match.call(expand.dots = FALSE)
 	if (is.matrix(eval(m$data, parent.frame()))) 
 			m$data <- as.data.frame(data)
