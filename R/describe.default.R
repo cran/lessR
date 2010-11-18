@@ -1,5 +1,5 @@
 describe.default <-
-function(x, digits=NULL, lbl=NULL, ...) {
+function(x, digits.d=NULL, lbl=NULL, ...) {
   
   dashes <- function(ndash) { for (i in 1:(ndash)) cat("-"); cat("\n") }
   
@@ -16,55 +16,57 @@ function(x, digits=NULL, lbl=NULL, ...) {
      
     max.dd <- 0
     for (i in 1:length(x))
-      if (n.dec(x[i]) > max.dd) max.dd <- n.dec(x[i])   
+      if (!is.na(x[i])) if (n.dec(x[i]) > max.dd ) max.dd <- n.dec(x[i])   
     return(max.dd)
   }
   
+  
   cat("\n")
 
-  if (is.null(digits)) digits <- max.dd(x)
-  if (digits > 10  && is.null(digits)) {
-    cat("\nThese data contain", digits, "significant digits.\n")
+  if (is.null(digits.d)) digits.d <- max.dd(x) + 1
+  if (digits.d > 10) {
+    cat("\nThese data contain", digits.d, "significant digits.\n")
     cat("Consider specifying a smaller number to display with the  digits  parameter.\n")
     cat("Example for Variables Y and X:  describe2(Y ~ X, digits=3)\n\n")
   }
   
-  od <- digits + 1  #  out digits
   # width of mean field
-  w.m <- 0
-  m <- round(mean(x), od)
-  n.char <- nchar(format(sprintf("%.*f", od, m)))
-  if (n.char > w.m) w.m <- n.char
-    
+  n.char <- nchar(format(sprintf("%.*f", digits.d, round(mean(x), digits.d))))
+  w.m <- n.char + 2    
   
   if (is.null(lbl)) lbl <- deparse(substitute(x)) 
   dashes(nchar(lbl))
   cat(lbl, "\n")
   dashes(nchar(lbl))
   
-  cat("\n")
   if (w.m < 6) w.m <- 6
-  for (i in 1:3) cat(" ")
+  for (i in 1:4) cat(" ")
+  cat("n"); for (i in 1:3) cat(" ")
+  cat("Miss"); for (i in 1:3) cat(" ")
   cat("Mean"); for (i in 1:10) cat(" ")
   cat("SD"); for (i in 1:10) cat(" ")
   cat("Min"); for (i in 1:8) cat(" ")
   cat("Median"); for (i in 1:9) cat(" ")
   cat("Max");
   cat("\n")
-  dashes(65)
-    m <- round(mean(x), od)
-    s <- round(sd(x), od)
-    mn <- round(min(x), od)
-    md <- round(median(x), od)
-    mx <- round(max(x), od) 
-    p.m <- format(sprintf("%.*f", od, m), width=w.m, justify="right")
-    p.s <- format(sprintf("%.*f", od, s), width=12, justify="right")
-    p.mn <- format(sprintf("%.*f", od, mn), width=12, justify="right")
-    p.md <- format(sprintf("%.*f", od, md), width=12, justify="right")
-    p.mx <- format(sprintf("%.*f", od, mx), width=12, justify="right")
-    cat(p.m, p.s, p.mn, p.md, p.mx, "\n")
-  dashes(65)
+  dashes(75)
+  n.miss <- sum(is.na(x))
+  n <- length(x) - n.miss
+  m <- round(mean(x, na.rm=TRUE), digits.d)
+  s <- round(sd(x, na.rm=TRUE), digits.d)
+  mn <- round(min(x, na.rm=TRUE), digits.d)
+  md <- round(median(x, na.rm=TRUE), digits.d)
+  mx <- round(max(x, na.rm=TRUE), digits.d)
+  p.n <- format(sprintf("%i", n), width=5, justify="right")
+  p.n.miss <- format(sprintf("%i", n.miss), width=5, justify="right")
+  p.m <- format(sprintf("%.*f", digits.d, m), width=w.m, justify="right")
+  p.s <- format(sprintf("%.*f", digits.d, s), width=12, justify="right")
+  p.mn <- format(sprintf("%.*f", digits.d, mn), width=12, justify="right")
+  p.md <- format(sprintf("%.*f", digits.d, md), width=12, justify="right")
+  p.mx <- format(sprintf("%.*f", digits.d, mx), width=12, justify="right")
+  cat(p.n, p.n.miss, p.m, p.s, p.mn, p.md, p.mx, "\n")
+  dashes(75)
 
-	cat("\n")
+  cat("\n")
 
 }

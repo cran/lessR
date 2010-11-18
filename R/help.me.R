@@ -369,25 +369,23 @@ else if (topic == "bar.chart") {
 t0 <- "bar.chart"
 
 f1 <- bquote(paste(bold("table"), "  Count the values of one or more categorical variables."))
-f2 <- bquote(paste(bold("barplot"), "  Produce a bar chart."))
+f2 <- bquote(paste(bold("color.barchart"), "  Produce a bar chart."))
 f3 <- bquote(paste(bold("pareto.chart"), "  Produce a Pareto chart."))
 
 t1 <-
-"The generic variable in the examples below is a categorical variable Y, called a 
-factor. Replace with the actual name of the variable in a specific analysis. 
+"The generic variable in the examples below is generally a categorical variable Y, 
+called a factor. Replace with the actual name of the variable in a specific analysis. 
 
-The key is to first use the table function to provide the counts of each value or 
-level of Y. Then construct the bar chart or Pareto chart from the table.
-
-First use table function to get counts.
-    > Ycount <- table(Y) 
-
-Default bar chart plus a color.
-    > barplot(Ycount, count=\"plum\")
-
+Default bar chart including color.
+    > color.barchart(Y)
+    
+The table function obtains the counts of each value.
+    > Ycount <- table(Y)
+    > Ycount
+    
 The pareto.chart function is part of the external library called gcc. To view an 
 explanation of dealing with libraries, enter help.me(\"libraries\"). Default input 
-Pareto chart follows.
+Pareto chart follows, which works from the counts. 
     > library(gcc)
     > pareto.chart(Ycount)
 "
@@ -398,9 +396,9 @@ text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 text(0,86, label=f3, adj=0)
 lines(c(5,90), c(81,81), col=col.line)
-text(0,49, label=t1, adj=0)
+text(0,50, label=t1, adj=0)
 
-help.more("barplot", 19)
+help.more("color.barchart", 22)
 }
 
 

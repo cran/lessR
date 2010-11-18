@@ -10,7 +10,7 @@ Performs the independent-groups t-test for the comparison of means from the six 
 \usage{
 stats.t.test(n1 = NULL, n2 = NULL,  m1 = NULL, m2 = NULL, s1 = NULL, 
     s2 = NULL, Ynm = "Y", Xnm = "X", X1nm = "Group1", X2nm = "Group2", 
-    conf.level = 0.95, digits = 2, \dots)
+    conf.level = 0.95, digits.d = 2, \dots)
 }
 
 \arguments{
@@ -26,7 +26,7 @@ stats.t.test(n1 = NULL, n2 = NULL,  m1 = NULL, m2 = NULL, s1 = NULL,
   \item{X1nm}{Value of grouping variable, the level that defines the first group.}
   \item{X2nm}{Value of grouping variable, the level that defines the second group.}
   \item{conf.level}{Confidence level of the interval, expressed as a proportion.}
-  \item{digits}{Number of decimal places for which to display numeric values. 
+  \item{digits.d}{Number of decimal digits for which to display numeric values. 
       Suggestion only.}
   \item{\dots}{Further arguments to be passed to or from methods.}
 }
@@ -46,7 +46,7 @@ This version of \code{stats.t.test} assumes homogeneity of variance in the compu
 \examples{
 stats.t.test(n1=19, n2=15, m1=9.5, m2=8, s1=1.4, s2=1.5, 
            Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", 
-           conf.level=0.95, digits=2)
+           conf.level=0.95, digits.d=2)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

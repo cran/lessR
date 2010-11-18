@@ -14,7 +14,7 @@ smd.t.test(x, \ldots)
 
 \method{smd.t.test}{default}(x, y, Ynm = "Y", Xnm = "X", 
        X1nm = "Group1", X2nm = "Group2", conf.level = 0.95, 
-       mmd = NULL, msmd = NULL, digits = 2, 
+       mmd = NULL, msmd = NULL, digits.d = 2, 
        bw1 = "nrd", bw2 = "nrd", \dots)
 
 \method{smd.t.test}{formula}(formula, data, \dots)
@@ -26,7 +26,7 @@ smd.t.test(x, \ldots)
   \item{data}{An optional matrix or data frame containing the variables in 
         the formula. By default the variables are taken from environment (formula).}
   \item{conf.level}{Confidence level of the interval, expressed as a proportion.}
-  \item{digits}{Number of decimal places for which to display numeric values. Suggestion only.}
+  \item{digits.d}{Number of decimal places for which to display numeric values. Suggestion only.}
   \item{x}{Values of response variable for first group.}
   \item{y}{Values of response variable for second group.}
   \item{Ynm}{Name of response variable.}
