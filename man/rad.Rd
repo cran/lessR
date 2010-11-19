@@ -57,9 +57,10 @@ directed to the console.  Also listed are the R statements invoked by \code{rad}
 # rad()
 
 # same as above, but include standard read.csv options to indicate 
-#  no variable names in first row of the csv data file and then 
-#  provide the names
-# rad(header=FALSE, col.names=c("X", "Y"))
+#  no variable names in first row of the csv data file 
+#   and then provide the names
+# also indicate that the first column is an ID field
+# rad(header=FALSE, col.names=c("X", "Y"), row.names=1)
 
 # read a csv data file from the web
 # then attach and list variable names and some values

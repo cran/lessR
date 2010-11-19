@@ -1,94 +1,114 @@
 color.hist <- 
 function(x, col="lightsteelblue", border="black", col.bg="seashell",
-         col.grid="grey90", breaks="Sturges", over.grid=FALSE,
-         show.values=FALSE, prop=FALSE, cumul=c("off", "on", "both"), 
-         col.reg="seashell2", digits=5, xlab=NULL, main=NULL, ...) {
-		
-	# produce actual argument, such as from an abbreviation, and flag if not exist
-	cumul <- match.arg(cumul)
+         col.grid="grey90",  over.grid=FALSE,
+         breaks="Sturges", bin.start=NULL, bin.width=NULL,
+         show.values=FALSE, prop=FALSE, cumul=c("off", "on", "both"),
+         col.reg="snow2", digits.d=5, xlab=NULL, main=NULL, ...) {
+    
+  if (is.numeric(breaks) && !is.null(bin.start))
+    stop("Either specify start value with  breaks  option, or  bin.start  option\n")
 
-	# set the labels	
-	if (is.null(xlab)) x.lbl <- deparse(substitute(x)) else x.lbl <- xlab
-	if (is.null(main)) main.lbl <- "" else main.lbl <- main
-	
-	# For user supplied bins, make sure entire data range is spanned
-	if (is.numeric(breaks)) {
-		cc <- cut(x, breaks, ...)	 # replace each data value with its bin
-		labs <- levels(cc)  # get list of unique bins, ordered
-		bins <- cbind(lower = as.numeric( sub("\\((.+),.*", "\\1", labs) ),
-					upper = as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", labs) ))
-		bin.min <- min(bins)
-		bin.max <- max(bins)
-		n.under <- length(x[which(x<bin.min)])
-		n.over <- length(x[which(x>bin.max)])
-		if (n.under+n.over > 0) {
-			cat("\nRange of the data: ", min(x), " to ", max(x), "\n", sep="")
-			if (length(breaks) > 3)
-				cat("Bin Cutpoints: ", bin.min, breaks[2], "...", breaks[length(breaks)-1],
-					bin.max, "\n\n")
-		else
-			cat("Range of the bins: ", bin.min, " to ", bin.max, "\n", sep="")
-			if (n.under > 0) 
-			  cat("Data values too small to fit in the bins: ", x[which(x<bin.min)], "\n")
-			if (n.over > 0)
-			  cat("Data values too large to fit in the bins: ", x[which(x>bin.max)], "\n")
-			cat("\n")
-			cat("Each data value must be in a bin.\n")
-			txt <- "To fix this problem, extend the bin range "
-			if (n.under > 0) cat(txt, "below ", bin.min, ".\n", sep="")
-			if (n.over > 0) cat(txt, "above ", bin.max, ".\n", sep="")
-			stop("Try again with an extended bin range", ".\n\n", call. = FALSE)
-		}	
-	}
+  # produce actual argument, such as from an abbreviation, and flag if not exist
+  cumul <- match.arg(cumul)
+
+  # set the labels  
+  if (is.null(xlab)) x.lbl <- deparse(substitute(x)) else x.lbl <- xlab
+  if (is.null(main)) main.lbl <- "" else main.lbl <- main
+    
+  # get breaks from user supplied bin width and/or supplied start value
+  if (!is.null(bin.width)  || !is.null(bin.start)) {
+    if (is.null(bin.start)) bin.start <- pretty(min(x):max(x))[1]
+    if (is.null(bin.width)) {
+      h <- hist(x, plot=FALSE, breaks="Sturges")
+      bin.width <- h$breaks[2]-h$breaks[1]
+    }
+    seq.end <- max(x)
+    breaks <- seq(bin.start,seq.end,bin.width)
+    while (max(breaks) < max(x)) {
+      seq.end <- seq.end + bin.width
+      breaks <- seq(bin.start,seq.end,bin.width)
+    }
+  }
+  
+  # for user supplied bins, from seq function or bin.start, 
+  #  make sure entire data range is spanned
+  if (is.numeric(breaks)) {
+    cc <- cut(x, breaks, ...)   # replace each data value with its bin
+    labs <- levels(cc)  # get list of unique bins, ordered
+    bins <- cbind(lower = as.numeric( sub("\\((.+),.*", "\\1", labs) ),
+          upper = as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", labs) ))
+    bin.min <- min(bins)
+    bin.max <- max(bins)
+    n.under <- length(x[which(x<bin.min)])
+    n.over <- length(x[which(x>bin.max)])
+    if (n.under+n.over > 0) {
+      cat("\nRange of the data: ", min(x), " to ", max(x), "\n", sep="")
+      if (length(breaks) > 3)
+        cat("Specified bin cutpoints: ", bin.min, breaks[2], "...", 
+          breaks[length(breaks)-1], bin.max, "\n\n")
+    else
+      cat("Range of the specified bins: ", bin.min, " to ", bin.max, "\n", sep="")
+      if (n.under > 0) 
+        cat("Data values too small to fit in the bins: ", x[which(x<bin.min)], "\n")
+      if (n.over > 0)
+        cat("Data values too large to fit in the bins: ", x[which(x>bin.max)], "\n")
+      cat("\n")
+      cat("Each data value must be in a bin.\n")
+      txt <- "To fix this problem, extend the bin range "
+      if (n.under > 0) cat(txt, "below ", bin.min, ".\n", sep="")
+      if (n.over > 0) cat(txt, "above ", bin.max, ".\n", sep="")
+      stop("Extend the bin range and rerun.\n\n", call. = FALSE)
+    }  
+  }
 
   # calculate but do not plot the histogram
   # stop warnings about any unused parameters due to not plotting 
-	h <- suppressWarnings(hist(x, plot=FALSE, breaks, ...))
-	
-	# summarize data
-	cat("\n")
-	cat("-------------------------------------------------", "\n")
-	cat("Data Summary", "\n")
-	cat("-------------------------------------------------", "\n")
-	cat("Size   :  n =", length(x), "\n")
-	cat("Min    :  min =", format(signif(range(x)[1],digits), scientific=FALSE), "\n")
-	cat("Max    :  max =", format(signif(range(x)[2],digits), scientific=FALSE), "\n")
-	cat("Mean   :  m =", format(signif(mean(x),digits), scientific=FALSE), "\n")
-	cat("Std Dev:  s =", format(signif(sd(x),digits), scientific=FALSE), "\n\n")
+  h <- suppressWarnings(hist(x, plot=FALSE, breaks, ...))
+  
+  # summarize data
+  cat("\n")
+  cat("-------------------------------------------------", "\n")
+  cat("Data Summary", "\n")
+  cat("-------------------------------------------------", "\n")
+  n.miss <- sum(is.na(x))
+  n <- length(x) - n.miss
+  cat("Size   :  n =", n, "\n")
+  cat("Missing:  miss =", n.miss, "\n")
+  cat("Min    :  min =", format(signif(range(x, na.rm=TRUE)[1],digits.d), scientific=FALSE), "\n")
+  cat("Max    :  max =", format(signif(range(x, na.rm=TRUE)[2],digits.d), scientific=FALSE), "\n")
+  cat("Mean   :  m =", format(signif(mean(x, na.rm=TRUE),digits.d), scientific=FALSE), "\n")
+  cat("Std Dev:  s =", format(signif(sd(x, na.rm=TRUE),digits.d), scientific=FALSE), "\n\n")
 
-	cat("Number of Bins:", length(h$breaks)-1, "\n")
-	
-	# relative frequency histogram option
-	if (prop == TRUE) h$counts <- h$counts/length(x)
-		
-	# cumulative histogram option
-	if (cumul != "off") {
-	  old.counts <- h$counts
-	  h$counts <- cumsum(h$counts)
-	}
-	
-	# set up plot area
-	if (prop == FALSE)
-	  plot(h, border="transparent", xlab=x.lbl, main=main.lbl, freq=TRUE, ...)
-	else
-	  plot(h, border="transparent", xlab=x.lbl, ylab="Proportions", main=main.lbl, 
-	    freq=TRUE, ...)
-	
-	# colored background for plotting area
-	usr <- par("usr")
-	rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
-	
-	# grid lines computation
-	vy <- pretty(h$counts)
+  cat("Number of Bins:", length(h$breaks)-1, "\n")
+  
+  # relative frequency histogram option
+  if (prop) h$counts <- h$counts/length(x)
+    
+  # cumulative histogram option
+  if (cumul != "off") {
+    old.counts <- h$counts
+    h$counts <- cumsum(h$counts)
+  }
+  
+  # set up plot area
+  if (!prop) ylab <- "Frequency" else ylab <- "Proportion"
+  plot(h, border="transparent", xlab=x.lbl, ylab=ylab, main=main.lbl, freq=TRUE, ...)
+  
+  # colored background for plotting area
+  usr <- par("usr")
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+  
+  # grid lines computation
+  vy <- pretty(h$counts)
 
-	# plot the histogram and grid lines
-	if (over.grid == FALSE) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
-	plot(h, add=TRUE, col=col, border=border, labels=show.values, freq=TRUE, ...)
-	if (cumul == "both") {
-    	h$counts <- old.counts
-   	 plot(h, add=TRUE, col=col.reg, freq=TRUE)
-	}
-	if (over.grid == TRUE) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
+  # plot the histogram and grid lines
+  if (!over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
+  plot(h, add=TRUE, col=col, border=border, labels=show.values, freq=TRUE, ...)
+  if (cumul == "both") {
+    h$counts <- old.counts
+     plot(h, add=TRUE, col=col.reg, freq=TRUE)
+  }
+  if (over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
 
   # frequency table
   # j<17 condition is to stop the 0.99999... problem
@@ -120,6 +140,6 @@ function(x, col="lightsteelblue", border="black", col.bg="seashell",
     cat(sprintf("beyond %s to %s %s %6.0f %6.2f %6.0f %6.2f", x.breaks[i], 
       x.breaks[i+1], x.mids[i], h$counts[i], prop[i], cum.c[i], cum.p[i]), "\n") 
   cat("------------------------------------------------------------------","\n")
-	cat("\n")
-	
+  cat("\n")
+  
 }
