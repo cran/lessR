@@ -3,11 +3,14 @@ function(x, col.nrm="darkblue", col.gen="blue", col.bg="seashell",
          col.grid="grey90", col.hist="grey86",
          col.fill.nrm=rgb(80,150,200, alpha=70, max=255), 
          col.fill.gen=rgb(250,210,230, alpha=70, max=255),
-         type=c("both", "general", "normal"),
+         type=c("both", "general", "normal"), x.pt=NULL,
          xlab=NULL, main=NULL, ...) {
 
   # produce actual argument, such as from an abbreviation, and flag if not exist
   type <- match.arg(type)
+  
+  if (type != "general"  &&  !is.null(x.pt))
+    stop("x.pt only valid for one general curve\n")
 
   # set the labels  
   if (is.null(xlab)) x.lbl <- deparse(substitute(x)) else x.lbl <- xlab
@@ -56,7 +59,7 @@ function(x, col.nrm="darkblue", col.gen="blue", col.bg="seashell",
 
   # plot the histogram
   plot(h, add=TRUE, freq=FALSE, col=col.hist, border=col.hist)
-  
+
   # plot the normal curve
   if (type == "normal" || type == "both") {
     lines(xx, d.nrm, type="l", col=col.nrm)
@@ -66,8 +69,26 @@ function(x, col.nrm="darkblue", col.gen="blue", col.bg="seashell",
   # plot the general curve
   if (type == "general" || type == "both") {
     lines(d.gen, col=col.gen)
-     polygon(d.gen, col=col.fill.gen)
+    polygon(d.gen, col=col.fill.gen)
     cat("\nDensity bandwidth for general curve: ", round(d.gen$bw,4), sep="", "\n")
   }
+  
+  # plot the optional bar about a chosen point for general curve only
+  if (!is.null(x.pt)  &&  type == "general") {
+    d <- d.gen 
+    y.pt <- d$y[which.min(abs(x.pt-d$x))]
+    xbeg <- x.pt - 0.5
+    xend <- x.pt + 0.5
+    xsub <- d$x[d$x > xbeg & d$x < xend]
+    ysub <- d$y[d$x > xbeg & d$x < xend]
+    txt.ypt <- toString(round(y.pt, 3))
+    txt <- paste("Density =", txt.ypt, "at x =", toString(round(x.pt, 2)))
+    title(main=txt)
+    polygon(c(xbeg, xsub, xend), c(0, ysub, 0), col="lightsteelblue")
+    if (min(x) > 0) left <- -2*min(x) else left <- 2*min(x) 
+    lines(c(left,x.pt), c(y.pt,y.pt), col="darkblue", lwd = 0.5)
+    lines(c(x.pt,x.pt), c(0,y.pt), col="darkblue", lwd = 0.5)
+  }
+
   cat("\n")
 }

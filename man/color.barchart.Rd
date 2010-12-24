@@ -1,19 +1,30 @@
 \name{color.barchart}
 \alias{color.barchart}
+\alias{color.barchart.default}
+\alias{color.barchart.data.frame}
 
 \title{Bar Chart of One or Two Variables with Color}
 
 \description{
-Using the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}, plots a bar chart of one or two variables with default colors, including background color and gridlines in addition to the bars. Also displays the frequency table for one or two variables and provides the corresponding chi-square inferential analysis. Unlike \code{\link{barplot}}, the variable(s) can be entered directly into the function call without first converting to a table.  If two variables are plotted, a legend is automatically provided.
-}
+Using the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}, plots a bar chart of one or two variables with default colors, including background color and gridlines in addition to the bars. Also displays the frequency table for one or two variables and optionally provides the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies.
+
+For the analysis of a single variable, the cell proportions are also provided.  For the analysis of two variables, also provided are the proportions within each cell, within each column and within each row.   
+
+Unlike \code{\link{barplot}}, the variable(s) can be entered directly into the function call without first converting to a table.  If two variables are plotted, a legend is automatically provided.
+
+If the provided object for which to calculate the bar chart is a data frame, then a bar chart is calculated for each non-numeric variable in the data frame and the results written to a pdf file in the current working directory.  The name of this file and its path are specified in the output.}
 
 \usage{
-color.barchart(x, y=NULL, col.bars=NULL, border="black", 
+color.barchart(x=NULL, \ldots)
+
+\method{color.barchart}{data.frame}(x, \dots)
+
+\method{color.barchart}{default}(x, y=NULL, col.bars=NULL, border="black", 
          col.bg="seashell", col.grid="grey90", beside=TRUE, 
-         over.grid=FALSE, xlab=NULL, legend.title=NULL, 
+         over.grid=FALSE, prop=FALSE, xlab=NULL, legend.title=NULL, 
          legend.loc=NULL, legend.labels=NULL, legend.horiz=FALSE, 
-         vivid=FALSE, random.col=FALSE, col.low="mistyrose", 
-         col.hi="darkred", addtop=1, horiz=FALSE, \ldots)
+         vivid=FALSE, random.col=FALSE, col.low="slategray2", 
+         col.hi="slategray4", addtop=1, horiz=FALSE, chisq=FALSE, \ldots)
 }
 
 \arguments{
@@ -27,6 +38,8 @@ color.barchart(x, y=NULL, col.bars=NULL, border="black",
   \item{beside}{When plotting two variables, set to true for the levels fo the first 
         variable to be plotted as adjacent bars instead of stacked on each other. Unlike the standard R function,\code{\link{barplot}}, the default is TRUE. }
   \item{over.grid}{If true, plot the grid lines over the histogram.}
+  \item{prop}{Specify proportions or relative frequencies on the vertical axis. Default
+       is \code{FALSE}. Only valid for the analysis of a single variable.}
   \item{xlab}{Label for x-axis. Defaults to variable name.}
   \item{legend.title}{Title of the legend, which is usually set by default except when
         raw counts are entered as a matrix.  Then a title must be specified to generate a legend.}
@@ -48,6 +61,7 @@ color.barchart(x, y=NULL, col.bars=NULL, border="black",
   \item{addtop}{In the same scale as the vertical axis, puts more space between the bars 
         and the top of the plot area, usually to accomodate the legend when plotting two 
         variables.}
+  \item{chisq}{Provide a chi-square analysis. Default is \code{FALSE}.}
   \item{\dots}{Other parameter values for graphics as defined 
       by \code{\link{barplot}}, \code{\link{legend}}, and  \code{\link{par}} including \code{space} for one variable only,
       and \code{cex.lab}, \code{col.main}, etc.}
@@ -60,7 +74,7 @@ Plot a bar chart with default colors for one or two variables, presumably with a
 
 A frequency bar is produced for each level of the first and perhaps only variable. When two variables are plotted, the bar for each level of the first variable is replaced with a group of bars, one for each level of the second variable.
 
-The form of the entered data, the first variable x and optionally a second variable, y, is flexible.  The data may be entered as factors, numeric values, characters, a matrix or even as a table as with the standard R \code{\link{barplot}} function. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  However, the most natural type of data to enter, when entering the variables, is to enter factors.  Plus, the bar colors for a second variable which is an ordered factor are also ordered in a corresponding progression.
+The form of the entered data, the first variable x and optionally a second variable, y, is flexible.  The data may be entered as factors, numeric values, characters, a matrix or even as a table as with the standard R \code{\link{barplot}} function. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.  Plus, the bar colors for a second variable which is an ordered factor are also ordered in a corresponding progression.
 
 COLORS\cr
 There are three ways to override the default colors.\cr
@@ -75,9 +89,9 @@ barplot(rep(1,7), names=clr, col=clr, border=NA, space=.1)\cr
 clr <- c("coral3", "seagreen3", "maroon3", "dodgerblue3", "purple3", "turquoise3", "yellow3")\cr
 barplot(rep(1,7), names=clr, col=clr, border=NA, space=.1)
 
-When plotting one ordered factor, or when plotting two variables , and the second variable is an ordered factor, then neither of the two standard color palettes are used.  Instead, the resulting bar colors for each level of the ordered factor are also ordered in a progression of colors. The default progression is from light to dark shades of red, but this can be changed with the \code{col.low} and \code{col.hi} options, or individually specify the color of each bar with the \code{col.bars} option. A specified palette can, for example, be from light to dark of the same hue, or from a light color of one hue to a dark color of another hue. Each color value can be specified with a color name, or with a specification with the \code{\link{rgb}} function.  See the examples below.  
+When plotting one ordered factor, or when plotting two variables, and the second variable is an ordered factor, then neither of the two standard color palettes are used.  Instead, the resulting bar colors for each level of the ordered factor are also ordered in a progression of colors. The default progression is from light to dark shades of red, but this can be changed with the \code{col.low} and \code{col.hi} options, or individually specify the color of each bar with the \code{col.bars} option. A specified palette can, for example, be from light to dark of the same hue, or from a light color of one hue to a dark color of another hue. Each color value can be specified with a color name, or with a specification with the \code{\link{rgb}} function.  See the examples below.  
 
-Use the \code{\link{color.show}} function in this package to get, for each color:  name,  sample color swatch, and corresponding rgb specification.  For a very small number of levels, such as two, it is may be desirable to specify the low and high values to not be at opposite ends of the light-dark continuum.
+Use the \code{\link{color.show}} function in this package to get, for each color:  name,  sample color swatch, and corresponding rgb specification.  For a very small number of levels, such as two, it is may be desirable to specify the low and high values to not be closer to each other than the default values.
 
 LEGEND\cr
 When two variables are plotted, a legend is produced, with values for each level of the second variable.  By default, the location is top center. This position can be changed with the \code{legend.loc} option, which accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend. Sometimes bars from the graph may intrude into the legend. One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{addtop} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend.horiz} option.
@@ -86,7 +100,7 @@ ENTER COUNTS DIRECTLY\cr
 Instead of calculating the counts from the data, the counts can be entered directly.  For two variables, enter the counts as a matrix and include the \code{xlab} option to label the horizontal axis, such as with the name of the variable.  Also include the \code{legend.title} option to provide a legend.  See the examples below.
 
 STATISTICS\cr
-In addition to the barchart, descriptive and inferential statistics are also presented.  First, the frequency table for one variable or the joint frequency table for two variables is displayed. Second, the corresponding chi-square test is also displayed.
+In addition to the barchart, descriptive and optional inferential statistics are also presented.  First, the frequency table for one variable or the joint frequency table for two variables is displayed. Second, the corresponding chi-square test is also displayed if the \code{chisq} option is set to \code{TRUE}.
 }
 
 
@@ -98,9 +112,9 @@ In addition to the barchart, descriptive and inferential statistics are also pre
 
 
 \examples{
-# ----------------------
-# barchart from the data
-# ----------------------
+# --------------------------------------------
+# barchart from the data for a single variable
+# --------------------------------------------
 
 # generate some random data values for two variables
 # Pain is an ordered factor, Gender is an unordered factor
@@ -117,26 +131,32 @@ color.barchart(Pain)
 color.barchart(Gender)
 
 # specify a unique bar color for each of the two bars
-# also display narrower bars, the default space is .2
+# also display narrower bars, the default space between is .2
 color.barchart(Gender, col.bars=c("rosybrown","tan"), space=.6)
 
-# for each level of Pain, display the frequencies at each level of Gender
-color.barchart(Pain, Gender)
 
-# for each level of Pain, display the frequencies at each level of Gender
-# display more vivid colors, randomize from the palette the bar colors chosen
+# ----------------------------------------
+# barchart from the data for two variables
+# ----------------------------------------
+
+# at each level of Pain, show the frequencies of the Gender levels
+color.barchart(Pain, Gender, chisq=TRUE)
+
+# at each level of Pain, show the frequencies of the Gender levels
+# display more vivid colors, randomize from the palette the bar colors
 color.barchart(Pain, Gender, vivid=TRUE, random.col=TRUE)
 
-# for each level of Gender, display the frequencies at each level of Pain
+# at each level of Gender, show the frequencies of the Pain levels
 # Pain levels are ordered, so the corresponding colors are also ordered 
 color.barchart(Gender, Pain)
 
 # specify an ordered blue palette of colors for the ordered levels of Pain
 # only works when the variable is an ordered factor
-color.barchart(Gender, Pain, col.low="lightblue", col.hi=rgb(100,110,200,max=255))
+# colors can be named or customized with rgb function
+color.barchart(Gender, Pain, col.low="azure", col.hi=rgb(100,110,200,max=255))
 
-# define custom colors bar by bar within each group of bars
-# works for ordered or unordered factors
+# define custom color gradient within each group of bars
+# applies to both ordered and unordered factors
 color.barchart(Gender, Pain, col.bars=c("thistle1","thistle2","thistle3","thistle4"))
 
 # display only two stacked bars, Female and Male
@@ -175,9 +195,27 @@ color.barchart(Travel)
 color.barchart(table(Pain), xlab="Pain")
 
 
-# -----------------------------
-# barchart directly from counts
-# -----------------------------
+# ---------------------------------------------
+# multiple bar charts across multiple variables
+# ---------------------------------------------
+
+# read data into data frame called mydata
+rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
+
+# bar charts for all non-numeric variables in the data frame called mydata
+color.barchart()
+
+# bar charts for all numeric variables in the data frame called mydata
+#  written to the file indicated on output
+color.barchart(col.box="palegreen1", col.point="plum")
+
+# Use the subset function to specify a variable list
+color.barchart(subset(mydata, select=c(Gender,Dept)))
+
+
+# ------------------------------
+# bar chart directly from counts
+# ------------------------------
 
 # barchart of one variable with three levels
 # enter counts as a vector with the combine function, c
@@ -186,15 +224,18 @@ City <- c(206, 94, 382)
 names(City) <- c("LA","Chicago","NY")
 color.barchart(City, main="Employees in Each City")
 
-# barchart of two variables: two Quality levels, three Supplier levels
-# enter counts as a matrix, defined by binding the rows of counts with rbind
-# must supply the level names and variable names
-Pass <- c(19, 16, 23) 
-Defective <- c(6, 6, 8) 
-mymat <- rbind(Pass, Defective)
-rownames(mymat) <- c("Pass","Defective")
-colnames(mymat) <- c("Acme, Inc","Nuts, Inc","Bolts, Inc")
-color.barchart(mymat, xlab="Supplier", legend.title="Quality")
+# barchart of two variables
+# two Quality levels, the rows
+# three Supplier levels, the columns
+# enter counts row by row, then form the table with rbind function
+# must supply the level (value) names and variable names
+# chart is Row Variable, analyzed at each level of Column Variable
+row1 <- c(19, 16, 23) 
+row2 <- c(6, 6, 8) 
+mytable <- rbind(row1, row2)
+rownames(mytable) <- c("Pass", "Defective")
+colnames(mytable) <- c("Acme, Inc", "Nuts, Inc", "Bolts, Inc")
+color.barchart(mytable, xlab="Supplier", legend.title="Quality")
 }
 
 

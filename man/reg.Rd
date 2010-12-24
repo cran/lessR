@@ -4,7 +4,7 @@
 \title{Regression Analysis}
 
 \description{
-Automatically provides a comprehensive regression analysis by a single, simple function call with default settings in place.  By default the data should be attached as a dataframe called \code{mydata}, such as provided by the \code{\link{rad}} function included in this package for reading and processing data in preparation for analysis.  
+Automatically provides a comprehensive regression analysis by a single, simple function call with default settings in place.  By default the data should exist as a dataframe called \code{mydata}, such as provided by the \code{\link{rad}} function included in this package for reading and processing data in preparation for analysis.  
 
 The default analysis provides the model's parameter estimates and corresponding inferential analyses, goodness of fit, the ANOVA table, correlation matrix of the model's variables, analysis of residuals, and confidence and prediction intervals.  By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual and Cook's distance, with the first 25 observations listed and sorted by Cook's distance. The output for the confidence and prediction intervals also provides the data and fitted value for each observations, as well as the lower and upper bounds for each of the two intervals.  The observations are sorted by the lower bound of each prediction interval.  Also, for models with a single predictor variable, a scatterplot of the data is produced, along with the regression line and corresponding confidence and prediction intervals.    
 
@@ -40,7 +40,7 @@ reg(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
 
 
 \details{
-Regression analysis automatically provides a variety of regression analyses. The basic analysis successively invokes three standard R functions \code{\link{lm}}, \code{\link{summary}} and \code{\link{confint}}. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}}.  The option for prediction intervals calls the standard R function \code{\link{predict}}, once with the argument interval="confidence" and once with interval="prediction".   If there is only one predictor variable in the model, a scatterplot of the data with regression line is produced, along with the plotted confidence and prediction intervals. 
+Regression analysis automatically provides a variety of regression analyses. The basic analysis successively invokes three standard R functions \code{\link{lm}}, \code{\link{summary}} and \code{\link{confint}}. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}}.  The option for prediction intervals calls the standard R function \code{\link{predict}}, once with the argument interval="confidence" and once with interval="prediction". If there is only one predictor variable in the model, a scatterplot of the data with regression line is produced, along with the plotted confidence and prediction intervals. 
 
 The output for the residual analysis displays by default just the first 25 observations with the largest values of Cook's distance, sorted by this criterion.  The output of the prediction intervals is re-organized so that each row's computed fitted value and prediction interval are listed adjacent to the corresponding values of the predictor variables and response variable. Each row of information, the data and corresponding intervals, is by default sorted by the lower bound of the prediction interval.
 
@@ -56,12 +56,11 @@ The purpose of \code{reg} is to combine these function calls into one, and provi
 }
 
 \examples{
-# Generate random data
+# Generate random data, place in dataframe mydata
 X1 <- rnorm(20)
 X2 <- rnorm(20)
 Y <- .7*X1 + .2*X2 + .6*rnorm(20)
 mydata <- data.frame(X1, X2, Y)
-attach(mydata)
 
 # Call reg for a one-predictor regression
 # Provide all default analyses including scatterplot etc.

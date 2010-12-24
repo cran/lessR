@@ -4,7 +4,11 @@
 \title{Scatter-Plot, Function Plot, or Run Chart with Optional Dates in Color}
 
 \description{
-Plots individual points, such as for a scatterplot, or plots connected line segments for the plot of a function or a run chart, including an option for adding dates to the horizontal axis for a time series chart. One enhancement over the usual \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, gridlines, and border can each be explicitly specified, with default colors provided.  Also provided, when applicable, is a center line, for the generation of a run chart, plotting the values of a variable in order of occurrence over time.  Also, the defaults change for each of the types of plots.  The intent is to rely on the default values for a relatively sophisticated plot, particularly when compared to the default values of the standard R \code{\link{plot}} function.
+Plots individual points, such as for a scatterplot, or plots connected line segments for the plot of a function or a run chart, including an option for adding dates to the horizontal axis for a time series chart. One enhancement over the usual \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, gridlines, and border can each be explicitly specified, with default colors provided.  
+
+For data exhibiting little trend, the the center line is provided for the generation of a run chart, plotting the values of a variable in order of occurrence over time.  When the center line, the median by default, is plotted, the analyses of the number and composition of the individual runs, number of consecutive values above or below the center line, is also displayed.  Also, the defaults change for each of the types of plots.  The intent is to rely on the default values for a relatively sophisticated plot, particularly when compared to the default values of the standard R \code{\link{plot}} function.
+
+If a scatterplot is displayed, then the corresponding correlation coefficient as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function R \code{\link{cor.test}} function are generated, though in a more readable format.
 }
 
 \usage{
@@ -18,13 +22,13 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
 
 \arguments{
   \item{x}{If both x and y are specified, then the x values are plotted on the
-      horizontal axis.  If x is not sorted, a scatter plot is produced.  If x is sorted, then a function is plotted with a smooth line.  If only x is specified with no y, then these x values are plotted as a run chart, which adds a centerline, the mean, to the chart by default if the data do not exhibit obvious trend.}
+      horizontal axis.  If x is not sorted, a scatter plot is produced.  If x is sorted, then a function is plotted with a smooth line.  If only x is specified with no y, then these x values are plotted as a run chart, which adds a centerline, the mean, to the chart by default if the data do not exhibit obvious trend. The time-oriented data for a run chart should be ordered with the first data record representing the earliest point in time.  Otherwise, use the \code{x.reverse} option.}
   \item{y}{Coordinates of points in the plot on the vertical axis.}
   \item{type}{Character string that indicates the type of plot, either \code{"p"} for 
         points, \code{"l"} for line, or \code{"b"} for both.  If x and y are provided and x is sorted so that a function is plotted, the default is \code{"l"}, or, when x is not sorted, the default is \code{"p"} for point, yielding a scatter plot.  If only the values of x are provided, then a run chart is produced with the default type of \code{"b"} for both points and lines.}
   \item{col.line}{Color of any plotted line segments, with a default of \code{"darkblue"}.}
   \item{col.area}{Color of area under the plotted line segments.  To have a border
-        at the bottom and right of a run chart but retain the property of no area color, specify a color of \code{"transparent"}.}
+        at the bottom and right of a run chart but retain the property of no area color, specify a color of \code{"transparent"}. If the values exhibit a trend and dates are specified with \code{x.start}, the default area color is \code{slategray3}, otherwise there is no default color. }
   \item{col.point}{Color of the border of the plotted points.}
   \item{col.fill}{For plotted points, the interior color of the point.  For a
         scatterplot the default value is transparent.  For a run chart the default value is the color of the point's border, \code{col.point}.}
@@ -42,12 +46,13 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
        default value is 21, a circle with both a border and filled area, specified here as \code{col.point} and \code{col.fill}.  For a scatterplot, \code{col.fill} defaults to transparent.  For a run chart, \code{col.fill} defaults to \code{col.point}.}
   \item{cex}{Magnification factor for any displayed points, with default of cex=1.0.}
   \item{center.line}{Plots a dashed line through the middle of a run chart.  The two
-      possible values are \code{"mean"} and \code{"median"}.  Provides a centerline for the \code{"mean"} by default when the values randomly vary about the mean.}
+      possible values are \code{"mean"} and \code{"median"}.  Provides a centerline for the \code{"median"} by default when the values randomly vary about the mean.}
   \item{x.start}{Optional starting date for first data value. Format must be 
-       "\%Y-\%m-\%d" or "\%Y/\%m/\%d".}
+       "\%Y-\%m-\%d" or "\%Y/\%m/\%d". If using with \code{x.reverse}, the first date is after the data are reverse sorted.}
   \item{x.by}{Accompanies the \code{x.start} specification, the interval to increment the
       date for each sequential data value. A character string, containing one of \code{"day"}, \code{"week"}, \code{"month"} or \code{"year"}. This string can optionally be preceded by a positive or negative integer and a space, or followed by "s", as specified in \code{\link{seq.Date}}.}
-  \item{x.reverse}{Reverse the ordering of the dates. Accompanies the \code{x.start}
+  \item{x.reverse}{Reverse the ordering of the dates, particularly when the data are
+      listed such that first row of data is the newest. Accompanies the \code{x.start}
       specification.}
   \item{\dots}{Other parameter values for graphics as defined by and then processed 
       by \code{\link{plot}} and \code{\link{par}}, including \code{xlim}, \code{ylim}, \code{lwd}, and \code{cex.lab.}}
@@ -78,7 +83,7 @@ Commonly used graphical parameters in standard R graphics functions are generall
 \author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
 
 \seealso{
-\code{\link{plot}}, \code{\link{title}}, \code{\link{par}}.
+\code{\link{plot}}, \code{\link{title}}, \code{\link{par}}, \code{\link{cor.test}}.
 }
 
 \examples{
@@ -105,7 +110,7 @@ y <- rnorm(25)
 color.plot(y)
 # customize run chart, pch=24: filled triangle point-up,
 color.plot(y, lwd=2, col.point="sienna3", pch=24, 
-  col.bg="mintcream", ylim=c(-3,3), center.line="median")
+  col.bg="mintcream", ylim=c(-3.5,3.5), center.line="median")
   
 # generate steadily increasing values
 y <- sort(rexp(50))
@@ -115,8 +120,7 @@ color.plot(y)
 color.plot(y, col.area="transparent")
 # time series chart, i.e., with dates, and filled area
 # with option label for the x-axis
-color.plot(y, x.start="2005/09/01", x.by="month", col.area="khaki", 
-  xlab="Year")
+color.plot(y, x.start="2005/09/01", x.by="month")
 
 # modern art
 n <- sample(2:30, size=1)
