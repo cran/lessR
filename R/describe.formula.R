@@ -49,7 +49,8 @@ function (formula, data=mydata, ...) {
   
   g <- factor(mf[[-response]])   
   cg <- as.character(g)
-  for (i in 1:length(cg)) if (cg[i] == "") cg[i] <- "Blank"
+  for (i in 1:length(cg)) if (cg[i] == "") cg[i] <- "Null"
+  for (i in 1:length(cg)) if (cg[i] == " ") cg[i] <- "Blank"
   rm(g)
   g <- factor(cg)
 
@@ -91,7 +92,7 @@ function (formula, data=mydata, ...) {
     lv <- levels(gu)[i]
     x <- DATA[[i]]
     n.miss <- sum(is.na(x))
-    n <- length(x) - n.miss
+    n <- sum(!is.na(x))
     m <- round(mean(x, na.rm=TRUE), digits.d)
     s <- round(sd(x, na.rm=TRUE), digits.d)
     mn <- round(min(x, na.rm=TRUE), digits.d)

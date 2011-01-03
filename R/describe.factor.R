@@ -15,5 +15,5 @@ function(x, lbl=NULL, ...)  {
   }
   else cat("\n Appears to contain unique Names or IDs", "\n")
   cat("\n")
-
+  
 }

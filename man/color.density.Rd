@@ -12,12 +12,12 @@ color.density(x, col.nrm="darkblue", col.gen="blue", col.bg="seashell",
          col.grid="grey90", col.hist="grey86",
          col.fill.nrm=rgb(80,150,200, alpha=70, max=255), 
          col.fill.gen=rgb(250,210,230, alpha=70, max=255),
-         type=c("both", "general", "normal"),
+         type=c("both", "general", "normal"), x.pt=NULL,
          xlab=NULL, main=NULL, \ldots)
 }
 
 \arguments{
-  \item{x}{Variable for which to construct the histogram.}
+  \item{x}{Variable for which to construct the histogram and density plots.}
   \item{col.nrm}{Color of the normal curve.}
   \item{col.gen}{Color of the general density curve.}
   \item{col.bg}{Color of the plot background.}
@@ -30,6 +30,8 @@ color.density(x, col.nrm="darkblue", col.gen="blue", col.bg="seashell",
        light red as the default.}
   \item{type}{Type of density curve plotted.  By default, both the general
        density and the normal density are plotted.}
+  \item{x.pt}{Value of the point on the x-axis for which to draw a unit interval
+        around illustrating the corresponding area under the general density curve.  Only applies when requesting \code{type=general}.}
   \item{xlab}{Label for x-axis.}
   \item{main}{Title of graph.}
   \item{\dots}{Other parameter values for graphics as defined processed 
@@ -76,6 +78,10 @@ color.density(y, col.fill.nrm="darkgreen", col.fill.gen="plum")
 # specify the bandwidth for the general density curve,
 #  use the standard bw option for the density function
 color.density(y, type="general", bw=.6)
+
+# disply only the general estimated density and a corresponding
+#  interval of unit width around x.pt
+color.density(y, type="general", x.pt=2)
 }
 
 

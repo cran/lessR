@@ -2,7 +2,7 @@ out <-
 function(myfile="mydata.csv") {
 
   if (!exists("mydata")) 
-    stop("First need to have a data frame called mydata.")
+    stop("First need to have a data frame called mydata or specify one.")
   
   pre <- ">"
   line <- "------------------------------------------------------------\n"
@@ -13,8 +13,8 @@ function(myfile="mydata.csv") {
   
   write.csv(mydata, file=myfile, row.names=FALSE)
   
-  if (getwd() =="/")
-    workdir <- "top level of your file system"
+  if (getwd() == "/")
+    workdir <- "top level (root) of your file system"
   else
     workdir <- getwd()
   cat("csv file of mydata contents written at current working directory.\n")

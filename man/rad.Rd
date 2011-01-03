@@ -8,13 +8,15 @@ Reads the contents of the specified csv data file into an R dataframe called \co
 }
 
 \usage{
-rad(ref=NULL, ...)
+rad(ref=NULL, display=TRUE, ...)
 }
 
 
 \arguments{
   \item{ref}{File reference, either null to specify the default of 
        code{file.choose()} to browse for the csv data file, or a full path name or web URL, included in quotes.  A URL begins with \code{http://}.}
+  \item{display}{The output of each step is displayed at the console, but this option can
+        be turned off.}
   \item{...}{Other parameter values consistent with the usual \code{read.csv}
        function, such as row.names and header.}
 }

@@ -3,23 +3,7 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
          res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
          pred=TRUE, pred.sort=c("predint", "off"), sig.digits=NULL) {
          
-  send.to.console <-
-  function (...) {
-    args <- substitute(list(...))[-1L]
-    sink(stdout())
-    on.exit(sink())
-    pf <- parent.frame()
-    evalVis <- function(expr) withVisible(eval(expr, pf))
-      for (i in seq_along(args)) {
-        expr <- args[[i]]
-        tmp <- switch(mode(expr), expression = lapply(expr, evalVis), 
-          call = , name = list(evalVis(expr)), stop("bad argument"))
-        for (item in tmp) if (item$visible) print(item$value)
-      }
-    on.exit()
-  }
-
-  mydframe <- deparse(substitute(dframe))  # get name of dataframe before sorting
+  mydframe <- deparse(substitute(dframe))  # get dataframe name for cor before sort
   
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
@@ -69,13 +53,13 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   cat( "\n\n\n", "  BASIC ANALYSIS", "\n")
   
   cat(line, pre, "summary(model)", "\n", line, sep="")
-  send.to.console(summary(lm.out))
+  print(summary(lm.out))
   
   cat("\n", line, pre, "confint(model)", "\n", line, "\n", sep="")
-  send.to.console(confint(lm.out))
+  print(confint(lm.out))
   
   cat("\n\n", line, pre, "anova(model)", "\n", line, "\n", sep="")
-  send.to.console(anova(lm.out))
+  print(anova(lm.out))
   
 
   # correlations
