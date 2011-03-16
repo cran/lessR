@@ -20,7 +20,7 @@ color.barchart(x=NULL, \ldots)
 \method{color.barchart}{data.frame}(x, \dots)
 
 \method{color.barchart}{default}(x, y=NULL, col.bars=NULL, border="black", 
-         col.bg="seashell", col.grid="grey90", beside=TRUE, 
+         col.bg="ghostwhite", col.grid="grey90", beside=TRUE, 
          over.grid=FALSE, prop=FALSE, xlab=NULL, legend.title=NULL, 
          legend.loc=NULL, legend.labels=NULL, legend.horiz=FALSE, 
          vivid=FALSE, random.col=FALSE, col.low="slategray2", 

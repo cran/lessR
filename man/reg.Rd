@@ -14,7 +14,8 @@ Overriding the default settings can turn off features and reduce the number of p
 \usage{
 reg(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
-    pred=TRUE, pred.sort=c("predint", "off"), sig.digits=NULL)
+    pred=TRUE, pred.sort=c("predint", "off"), sig.digits=NULL,
+    show.R=FALSE)
 }
 
 
@@ -36,6 +37,8 @@ reg(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
        intervals by the lower bound of each prediction interval.  Turn off this sort by specifying a value of \code{"off"}.}
   \item{sig.digits}{Provides the same functionality as the standard \code{\link{options}}
        function regarding the digits option. The distinction is that this value applies selectively to portions of the output, the different type of residuals and the confidence and prediction intervals.}
+  \item{show.R}{Display the R instructions that yielded the lessR output, albeit without
+        the lessR formatting.}
 }
 
 

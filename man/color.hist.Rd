@@ -17,11 +17,11 @@ color.hist(x=NULL, \ldots)
 
 \method{color.hist}{data.frame}(x, \ldots) 
 
-\method{color.hist}{default}(x, col="lightsteelblue", border="black", col.bg="seashell",
-         col.grid="grey90",  over.grid=FALSE,
+\method{color.hist}{default}(x, col="lightsteelblue", border="black",
+         col.bg="ghostwhite", col.grid="grey90",  over.grid=FALSE,
          breaks="Sturges", bin.start=NULL, bin.width=NULL,
          show.values=FALSE, prop=FALSE, cumul=c("off", "on", "both"),
-         col.reg="snow2", digits.d=5, xlab=NULL, main=NULL, \ldots)
+         col.reg="snow2", digits.d=5, xlab=NULL, ylab=NULL, main=NULL, \ldots)
 }
 
 \arguments{
@@ -45,6 +45,7 @@ color.hist(x=NULL, \ldots)
         cumulative histogram, with default of \code{"off"}. The value of \code{"both"} superimposes the regular histogram.}
   \item{col.reg}{The color of the superimposed, regular histogram when \code{cumul="both"}.}
   \item{xlab}{Label for x-axis. Defaults to variable name.}
+  \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.}
   \item{digits.d}{Number of significant digits for each of the displayed summary statistics.}
   \item{main}{Title of graph.}
   \item{\dots}{Other parameter values for graphics as defined processed 

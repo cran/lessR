@@ -1,7 +1,7 @@
 color.plot <-
 function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,  
            col.point="darkblue", col.fill=NULL, col.grid="grey90", 
-           col.bg="seashell", col.box="black", xy.ticks=TRUE, 
+           col.bg="ghostwhite", col.box="black", xy.ticks=TRUE, 
            xlab=NULL, ylab=NULL, pch=NULL, cex=NULL, center.line=NULL,
            x.start=NULL, x.by=NULL, x.reverse=FALSE, ...) {
            
@@ -29,13 +29,17 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
 # Preliminaries
 # -------------------------
   
-  if (!is.null(type)) if (type != "p" && type != "l" && type != "b") 
-    stop("Option 'type' can only be \"p\" for points, \"l\" for line 
-      or \"b\" for both.")
-    
+  if (!is.null(type)) if (type != "p" && type != "l" && type != "b") { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+       "Option 'type' can only be \"p\" for points,\n",
+       "  \"l\" for line or \"b\" for both.\n\n")
+      }
+
   if (!is.null(center.line))
-    if (center.line != "mean" && center.line != "median"&& center.line != "off") 
-      stop ("Values of option 'center.line' are \"mean\", \"median\", or \"off\".")
+    if (center.line != "mean" && center.line != "median"&& center.line != "off") { 
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Option 'center.line' can only be \"mean\", \"median\", or \"off\".\n\n")
+      }
       
   if (!is.null(y)) {
     txt <- "ignored when two variables are specified.\n"
@@ -100,7 +104,9 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
     if (is.null(col.area)) col.area <- "transparent"
     
     if (is.null(type)) {  # when x values are sorted, plot a function
-      if (sum(diff(x)>0) == length(x)-1) type <- "l" else type <- "p"
+      if ( sum(diff(diff(x))) == 0 ) equal.int <- TRUE else equal.int <- FALSE
+      cat(sum(diff(diff(x))),"\n")
+      if (!is.unsorted(x) && equal.int) type <- "l" else type <- "p"
     }
     
     if (xy.ticks) {  # assign axes labels with variable names as default
@@ -135,8 +141,8 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
   # grid lines
   vx <- pretty(c(usr[1],usr[2]))
   vy <- pretty(c(usr[3],usr[4]))
-  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid)
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
+  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
 
   # fill area under curve
   if (type != "p") col.border <- col.line else col.border <- "transparent"

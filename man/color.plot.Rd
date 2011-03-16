@@ -14,7 +14,7 @@ If a scatterplot is displayed, then the corresponding correlation coefficient as
 \usage{
 color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,  
            col.point="darkblue", col.fill=NULL, col.grid="grey90", 
-           col.bg="seashell", col.box="black", xy.ticks=TRUE, 
+           col.bg="ghostwhite", col.box="black", xy.ticks=TRUE, 
            xlab=NULL, ylab=NULL, pch=NULL, cex=NULL, center.line=NULL,
            x.start=NULL, x.by=NULL, x.reverse=FALSE, \ldots)
 }
@@ -33,7 +33,7 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
   \item{col.fill}{For plotted points, the interior color of the point.  For a
         scatterplot the default value is transparent.  For a run chart the default value is the color of the point's border, \code{col.point}.}
   \item{col.grid}{Color of the grid lines, with a default of \code{"grey90"}.}
-  \item{col.bg}{Color of the plot background, with a default of \code{"snow1"}.}
+  \item{col.bg}{Color of the plot background.}
   \item{col.box}{Color of border around the plot background, the box, that encloses 
       the plot, with a default of \code{"black"}.}
   \item{xy.ticks}{Flag that indicates if tick marks and associated values on the 
@@ -65,6 +65,8 @@ Results are based on the standard \code{\link{plot}} and related graphic functio
 When two variables are specified to plot, if the values of the first variable, \code{x} are unsorted, a scatterplot is produced, that is, a plot with \code{type="p"} for points. By default the points of a scatterplot are not filled. Sorted values of the first of the two specified variables yield a function plot, that is, a plot with \code{type="l"} for a smooth plotted line or curve.
 
 Specifying one variable leads to a run chart, with the values on the horizontal axis automatically generated.  The default is the Index variable, the ordinal position of each data value.  Or, dates on the horizontal axis can be specified from the specified starting date given by \code{x.start} and the accompanying increment as given by \code{x.by}.  If the data values randomly vary about the mean, the default is to plot the mean as the center line of the graph, otherwise the default is to ignore the center line.  The default plot type for the run chart is \code{type="b"}, for both points and the corresponding connected line segments.  The size of the points is automatically reduced according to the number of points of points plotted, and the \code{cex} option can override the computed default.  If the area below the plotted values is specified to be filled in with color, then the default line type changes to \code{type="l"}.
+
+The default background color of \code{col.bg=ghostwhite} provides a very mild cool tone with a slight emphasis on blue. To provide a warmer tone by slightly enhancing red, try \code{col.bg=snow}. Obtain a very light gray with \code{col.bg=gray99}.  To darken the background gray, try \code{col.bg=gray97} or lower numbers. See the \code{\link{color.show}} function in this package the provides an example of all available named colors.
 
 Commonly used graphical parameters in standard R graphics functions are generally available to \code{color.plot}, such as:
 

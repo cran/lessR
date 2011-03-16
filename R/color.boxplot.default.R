@@ -2,7 +2,7 @@ color.boxplot.default <-
 function(x, col.box="bisque2", col.point=NULL, 
          horizontal=TRUE, xlab=NULL, digits.d=10, ...) {        
 
-  dashes <- function(ndash) { for (i in 1:(ndash)) cat("-"); cat("\n") }
+  dash <- function(n.dash) { for (i in 1:(n.dash)) cat("-"); cat("\n") }
   
   if (is.null(xlab)) x.lbl <- deparse(substitute(x)) else x.lbl <- xlab
   
@@ -13,9 +13,9 @@ function(x, col.box="bisque2", col.point=NULL,
   
   # summarize data
   cat("\n")
-  dashes(30)
+  dash(30)
   cat("Data Summary:", x.lbl, "\n")
-  dashes(30)
+  dash(30)
   cat("\n")
   cat("Present:", sum(!is.na(x)), "\n")
   cat("Missing:", sum(is.na(x)), "\n")
