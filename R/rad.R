@@ -1,6 +1,6 @@
 # read, attach, display
 rad <- 
-function(ref=NULL, display=TRUE, ...) {
+function(ref=NULL, display=TRUE, show.R=FALSE, ...) {
   
   if (display) {
   
@@ -8,39 +8,48 @@ function(ref=NULL, display=TRUE, ...) {
     line <- "------------------------------------------------------------\n"
    
     cat("\n")
-    if (is.null(ref)) {
-      cat(line, pre, " mydata <- read.csv(file.choose())", "\n", sep="")
-      ref <- file.choose()
-      cat("\nFile: ", ref, "\n")
-    }
-    else {
-      cat(line, pre, " mydata <- read.csv(file=\"",ref,"\")", "\n", sep="")
+    if(show.R) {
+      if (is.null(ref)) {
+        cat(line, pre, " mydata <- read.csv(file.choose())", "\n", sep="")
+        ref <- file.choose()
+        cat("\nFile: ", ref, "\n")
+      }
+      else {
+        cat(line, pre, " mydata <- read.csv(file=\"",ref,"\")", "\n", sep="")
+      }
     }
     mydata <<- read.csv(file=ref, ...)
     
-    cat(pre, " attach(mydata)", "\n", line, sep="")
+    if (show.R) cat(pre, " attach(mydata)", "\n", line, sep="")
     attach(mydata, warn.conflicts=FALSE)
     
     if (nargs() > 1) cat("Plus the optional arguments that were entered in rad.", "\n")
     cat("\n")
     cat("Name of data frame that contains the data:   mydata ", "\n")
-    cat("Number of Variables in mydata:    ", ncol(mydata), "\n")
+    cat("Number of Columns in mydata:    ", ncol(mydata), "\n")
     cat("Number of Rows of Data in mydata: ", nrow(mydata), "\n")
     
     cat("\n\n")
-    cat(line, pre, " head(mydata, n=3)   # First three rows", "\n", line, sep="", "\n")
-    print(head(mydata, n=3))
-    
+    cat(line)
+    cat("Variable names, first and last three rows of data\n")
+    cat(line, "\n")
+    if (show.R) 
+      cat(line, pre, " head(mydata, n=3)   # First three rows", "\n", line, sep="", "\n")
+    print(head(mydata, n=3))   
     cat("\n\n")
-    cat(line, pre, " tail(mydata, n=3)   # Last three rows", "\n", sep="", line, "\n")
+    if (show.R) 
+      cat(line, pre, " tail(mydata, n=3)   # Last three rows", "\n", sep="", line, "\n")
     print(tail(mydata, n=3))
     
     cat("\n\n")
-    cat(line, pre, " str(mydata, digits.d=15)   # Types of variables", "\n", sep="")
+    if (show.R) 
+      cat(line, pre, " str(mydata, digits.d=15)   # Types of variables", "\n", sep="")
     cat(line)
-    cat("Factor: Variable with non-numeric categories or levels, stored as an integer.\n")
-    cat("int: Numeric variable limited to integer values.\n")
-    cat("num: Numeric variable that may have decimal digits.\n")
+    cat("Data type of each variable\n")
+    cat(line)
+    cat("Factor: Variable with non-numeric values, stored as an integer\n")
+    cat("int: Numeric variable limited to integer values\n")
+    cat("num: Numeric variable that may have decimal digits\n")
     cat(line, "\n")
     print(str(mydata, digits.d=15))
     
@@ -54,7 +63,7 @@ function(ref=NULL, display=TRUE, ...) {
     cat("\n")
   }
   
-  else {
+  else {  # display=FALSE
     mydata <<- read.csv(file=ref, ...)    
     attach(mydata, warn.conflicts=FALSE)
   }

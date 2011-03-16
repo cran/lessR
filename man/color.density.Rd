@@ -8,10 +8,11 @@ Plots a normal density curve and/or a general density curve superimposed over a 
 }
 
 \usage{
-color.density(x, col.nrm="darkblue", col.gen="blue", col.bg="seashell",  
+color.density(x, col.nrm="darkblue", col.gen="blue", col.bg="ghostwhite",  
          col.grid="grey90", col.hist="grey86",
          col.fill.nrm=rgb(80,150,200, alpha=70, max=255), 
          col.fill.gen=rgb(250,210,230, alpha=70, max=255),
+         bin.start=NULL, bin.width=NULL,
          type=c("both", "general", "normal"), x.pt=NULL,
          xlab=NULL, main=NULL, \ldots)
 }
@@ -28,6 +29,9 @@ color.density(x, col.nrm="darkblue", col.gen="blue", col.bg="seashell",
        the default.}
   \item{col.fill.gen}{Fill color for the estimated general density curve, with a transparent 
        light red as the default.}
+  \item{bin.start}{Optional specified starting value of the bins.}
+  \item{bin.width}{Optional specified bin width, which can be specified with or without 
+        a \code{bin.start} value.}
   \item{type}{Type of density curve plotted.  By default, both the general
        density and the normal density are plotted.}
   \item{x.pt}{Value of the point on the x-axis for which to draw a unit interval
@@ -44,7 +48,7 @@ Results are based on the standard \code{\link{dnorm}} function and \code{\link{d
 
 By default, the histogram is displayed in a light gray, as a background for the normal and/or general estimated density curves, though this color can be changed. Using the \code{alpha} option for the \code{\link{rgb}} function, the density curves are by default plotted with transparent colors to facilitate comparison to the background histogram. 
 
-No user-supplied values are passed to the \code{\link{hist}} function itself, so only default values are permitted, such as the default bins as calculated by the default for the \code{\link{hist}} function.  Use the \code{\link{color.hist}} function in this package for control over the parameters of the histogram.
+The default histogram is the same as the default provided by the \code{\link{hist}} function itself. The default can be modified with the \code{bin.start} and \code{bin.width} options.  Use the \code{\link{color.hist}} function in this package for more control over the parameters of the histogram.
 
 The limits for the axes are automatically calculated so as to provide sufficient space for the  density curves and histogram, and should generally not require user intervention.  Also, the curves are centered over the plot window so that the resulting density curves are symmetric even if the underlying histogram is not.  The estimated normal curve is based on the corresponding sample mean and standard deviation.
 }

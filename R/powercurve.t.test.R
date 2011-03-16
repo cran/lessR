@@ -4,33 +4,52 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
       
   cat("\n")
   
+  # for all null arguments, pick up values from previous smd.t.test
   if (sum(sapply(list(s, n1, n2), is.null)) == 3) {  # all are NULL
     if (exists("n1", 1, inherits=FALSE) && exists("n2", 1, inherits=FALSE)) {
       n1 <- get("n1", 1, inherits=FALSE)
       n2 <- get("n2", 1, inherits=FALSE)
     } 
     else {
-      if (is.null(n)) stop("Need to specify sample size.")
+      if (is.null(n)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Need to specify sample size, either n or n1 and n2.\n\n")
+      }
     }
     if (exists("sw", 1, inherits=FALSE))
       s <- sw
     else
-      if (is.null(s1) && is.null(s2))
-        stop("Need to specify sample standard deviation.")
-  }
+      if (is.null(s1) && is.null(s2)) { 
+            cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "Need to specify a sample standard deviation, s,\n",
+            "or two standard deviations, s1 and s2.\n\n")
+      }
+    }
   
-  if ( (is.null(n)) && (is.null(n1)) && (is.null(n2)) ) 
-    stop("Need to specify either a common sample size for both groups, n,
-     or specify both group sample sizes, n1 and n2, from which 
-     the within-group or pooled standard deviation, sw, is computed.")
-  if ( (is.null(s)) && (is.null(s1)) && (is.null(s2)) ) 
-    stop("Need to specify either a within-group standard deviation, sw,
-     or specify both group standard deviations, s1 and s2, and a
-     common sample size n or individual sample sizes n1 and n2, from which 
-     sw is computed.")
-  if ( (mdp < 0)  && (mdp > 1) ) stop("mdp must be between 0 and 1.")	
-  if ( !is.null(mmd) && !is.null(msmd) )
-     stop("Specify only one of mmd and msmd as one implies the other.")
+  if ( (is.null(n)) && (is.null(n1)) && (is.null(n2)) ) { 
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Need to specify either a common sample size for both groups, n,\n",
+        "or specify both group sample sizes, n1 and n2, from which\n",
+        "the within-group or pooled standard deviation, sw, is computed.\n\n")
+  }
+
+  if ( (is.null(s)) && (is.null(s1)) && (is.null(s2)) ) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Need to specify either a single standard deviation, s, \n",
+        "or specify two group standard deviations, s1 and s2, plus a\n",
+        "common sample size n or individual sample sizes n1 and n2, from which\n",
+        "the within-group standard deviation is computed.\n\n")
+  }
+
+  if ( (mdp < 0)  || (mdp > 1) ) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Minimum desired power, mdp, must be between 0 and 1.\n\n")
+  }
+
+  if ( !is.null(mmd) && !is.null(msmd) ) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Specify only one of mmd and msmd as one implies the other.\n\n")
+  }
   
   
   cat("------------------------------------------------------------\n")
@@ -155,8 +174,8 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
     d.lo <- H0 - mmd
     pp <- power.t.test(n=n, sd=s, delta=mmd, type=mytype)
     rect(d.lo, 0, d.hi, pp$power, lwd=.25, col=colmmd, density=-10, border=colbrd)
-    lines(c(d.hi, d.hi), c(0, 1.05), lwd=1, col=coltrv, lty="longdash")
-    lines(c(d.lo, d.lo), c(0, 1.05), lwd=1, col=coltrv, lty="longdash")
+    lines(c(d.hi, d.hi), c(0, 1.05), lwd=.5, col=coltrv, lty="longdash")
+    lines(c(d.lo, d.lo), c(0, 1.05), lwd=.5, col=coltrv, lty="longdash")
     if (d.hi < xmax) {
       arrows(d.hi, 1.05, xmax, 1.05, lwd=.5, col=coltrv, length=.15, angle=20, lty=5)
       arrows(d.lo, 1.05, xmin, 1.05, lwd=.5, col=coltrv, length=.15, angle=20, lty=5)
@@ -171,10 +190,12 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
     if (mdp != 0) {
       del.hi.out <- round(del.hi,3)
       if (del.hi > mmd+H0) {
+        cat("------------------------------------------------------------\n")
         mytitle <- "Warning: Meaningful differences, from "
         cat(mytitle, d.hi, " to ", del.hi.out, ", have Power < ", mdp, "\n", sep="")
       }
       else {
+        cat("------------------------------------------------------------\n")
         mytitle <- "Warning: Trivial differences, from "
         cat(mytitle, del.hi.out, " to ", mmd+H0, ", have Power > ", mdp, ".\n", sep="")
         cat("Note: All meaningful differences have Power > ", mdp, "\n", sep="")

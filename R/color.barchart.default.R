@@ -1,16 +1,22 @@
 color.barchart.default <- 
 function(x, y=NULL, col.bars=NULL, border="black", 
-         col.bg="seashell", col.grid="grey90", beside=TRUE, 
+         col.bg="ghostwhite", col.grid="grey90", beside=TRUE, 
          over.grid=FALSE, prop=FALSE, xlab=NULL, legend.title=NULL, 
          legend.loc=NULL, legend.labels=NULL, legend.horiz=FALSE, 
          vivid=FALSE, random.col=FALSE, col.low="slategray2", 
          col.hi="slategray4", addtop=1, horiz=FALSE, chisq=FALSE, ...) {
          
   dash <- function(n.dash) { for (i in 1:(n.dash)) cat("-"); cat("\n") }
-
-         
-  if (chisq && prop) stop("\nChi-square analysis here not valid for proportions.\n\n")
-  if (!is.null(y) && prop) stop("\nAnalysis of proportions not valid for two variables.\n\n")
+    
+  if (chisq && prop) { 
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Chi-square analysis here not valid for proportions.\n\n")
+  }
+    
+  if (!is.null(y) && prop) { 
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Analysis of proportions not valid for two variables.\n\n")
+  }
 
   # variable labels
   if (is.null(xlab)) x.lbl <- deparse(substitute(x)) else x.lbl <- xlab
@@ -76,9 +82,9 @@ function(x, y=NULL, col.bars=NULL, border="black",
   if (max.y > 1) vy <- pretty(0:max.y) else vy <- pretty(1:100*max.y)/100
   
   # bar plot, grid lines and legend
-  if (!over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
+  if (!over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz, xlab=x.lbl, ...)
-  if (over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
+  if (over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   if ((!is.null(y) || is.matrix(x)) && !is.null(legend.loc)) 
     legend(legend.loc, legend=legend.labels, title=y.lbl, fill=col, horiz=legend.horiz)
   
@@ -88,12 +94,12 @@ function(x, y=NULL, col.bars=NULL, border="black",
       print(addmargins(x))
     cat("\n"); dash(30); cat("Cell Proportions and Marginals\n"); dash(30); 
       print(round(addmargins(prop.table(x)),3))
-      cat("\n"); dash(29); cat("Propotions within Each Column\n"); dash(29);
+      cat("\n"); dash(30); cat("Proportions within Each Column\n"); dash(30);
       x.col <- prop.table(x, margin=2)
       Sum <- double(ncol(x.col))
       for (i in 1:ncol(x.col)) Sum[i] <- sum(x.col[,i])
       print(round(rbind(x.col,Sum),3))
-    cat("\n"); dash(26); cat("Propotions within Each Row\n"); dash(26); 
+    cat("\n"); dash(27); cat("Proportions within Each Row\n"); dash(27); 
       x.row <- prop.table(x, margin=1)
       Sum <- double(nrow(x.row))
       for (i in 1:nrow(x.row)) Sum[i] <- sum(x.row[i,])

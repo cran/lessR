@@ -21,7 +21,7 @@ powercurve.t.test(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
   \item{s1}{Sample standard deviation for Group 1.}
   \item{s2}{Sample standard deviation for Group 2.}
   \item{mmd}{Minimum Mean Difference of practical importance, the difference of the
-       response variable between two group means. The concept is optional, and only one of mmd and msmd is provided.}
+       response variable between two group means. The concept is optional, and only one of \code{mmd} and \code{msmd} is provided.}
   \item{msmd}{For the Standardized Mean Difference, Cohen's \code{d}, the Minimum value of
        practical importance. The concept is optional, and only one of \code{mmd} and \code{msmd} is provided.}
   \item{mdp}{Minimum Desired Power, the smallest value of power considered to provide

@@ -1,7 +1,8 @@
 reg <-
 function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
          res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
-         pred=TRUE, pred.sort=c("predint", "off"), sig.digits=NULL) {
+         pred=TRUE, pred.sort=c("predint", "off"), sig.digits=NULL,
+         show.R=FALSE) {
          
   mydframe <- deparse(substitute(dframe))  # get dataframe name for cor before sort
   
@@ -35,51 +36,77 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   
   cat( "\n\n\n", "  THE MODEL", "\n")
 
-  cv <- paste(nm[1]," ~ ", sep="")
-  cv <- paste(cv, nm[2], sep="")
-  if (n.vars > 2) for (i in 3:n.vars) cv <- paste(cv, " + ", nm[i], "", sep="")
-  cat(line, pre, "model <- lm(", cv, ")", "\n", line,"\n", sep="")
+  if(show.R) {
+    cv <- paste(nm[1]," ~ ", sep="")
+    cv <- paste(cv, nm[2], sep="")
+    if (n.vars > 2) for (i in 3:n.vars) cv <- paste(cv, " + ", nm[i], "", sep="")
+    cat(line, pre, "model <- lm(", cv, ")", "\n", line, sep="")
+  }
+  cat("\n")
   
   cat("Response Variable:  ", nm[1], "\n")
   for (i in 2:n.vars) {
-    if (n.vars >2) txt <- paste("Predictor Variable ", toString(i-1), ": ", sep="")
+    if (n.vars > 2) txt <- paste("Predictor Variable ", toString(i-1), ": ", sep="")
       else txt <- "Predictor Variable: "
     cat(txt, nm[i], "\n")
   }
   
   cat("\nNumber of observations (rows) of data: ", n.obs, "\n")
+
   
     
   cat( "\n\n\n", "  BASIC ANALYSIS", "\n")
   
-  cat(line, pre, "summary(model)", "\n", line, sep="")
-  print(summary(lm.out))
-  
-  cat("\n", line, pre, "confint(model)", "\n", line, "\n", sep="")
+  if (show.R) cat(line, pre, "summary(model)", "\n", line, sep="")
+  sm <- summary(lm.out)
+  cat("\n")
+  cat("Estimated model coefficients, the b's, y-intercept and slope coefficients\n")
+  cat("Standard error and hypothesis test of each b, with null hypothesis Beta=0\n")
+  cat("\n")
+  print(sm$coefficients)
+  cat("\n\n")
+  if (show.R) cat("\n",line,pre,"confint(model)","\n",line,"\n",sep="") else cat("\n")
+  cat("Confidence interval for each model coefficient\n")
+  cat("\n")
   print(confint(lm.out))
-  
-  cat("\n\n", line, pre, "anova(model)", "\n", line, "\n", sep="")
+  cat("\n\n\n")
+  cat("Fit of the model\n")
+  cat("\n")
+  cat("Standard deviation of residuals: ", round(sm$sigma,4),
+    "for", sm$df[2], "degrees of freedom", "\n")
+  cat("R-squared: ", round(sm$r.squared,4), 
+    "    Adjusted R-squared: ", round(sm$adj.r.squared,4), "\n")
+  cat("\n")
+  cat("F-statistic for hypothesis test of population R-squared=0: ", 
+    round(sm$fstatistic[1],4), "\n") 
+  cat("Degrees of freedom: ", sm$fstatistic[2], "and", sm$fstatistic[3],"\n")
+  cat("p-value: ",
+    round(1-pf(sm$fstatistic[1],sm$fstatistic[2],sm$fstatistic[3]),4),"\n")
+  cat("\n\n")
+  if (show.R) cat("\n\n",line, pre,"anova(model)","\n",line,"\n",sep="") else cat("\n")
   print(anova(lm.out))
+    
   
+  # check for all numeric vars
+  do.cor <- TRUE
+  for (i in 1:n.vars) {
+    if (!is.numeric(dframe[1,which(names(mydata) == nm[i])])) {
+      cat("No correlations reported,", nm[i], "is not numeric.\n")
+      do.cor <- FALSE
+    }
+  }
 
   # correlations
-  if (cor == TRUE) {
-      cat( "\n\n\n", "  CORRELATIONS", "\n")
+  if (cor) {
+    cat( "\n\n\n", "  CORRELATIONS", "\n")
   
-    # check for all numeric vars
-    do.cor <- TRUE
-    for (i in 1:n.vars) {
-      if (!is.numeric(dframe[1,which(names(mydata) == nm[i])])) {
-        cat("No correlations reported,", nm[i], "is not numeric.\n")
-        do.cor <- FALSE
+    if (do.cor) {
+      if (show.R) {
+        cv <- paste("\"",nm[1],"\"", sep="")
+        for (i in 2:n.vars) cv <- paste(cv, ",\"", nm[i], "\"", sep="")
+        cat(line, pre, "cor(", mydframe, "[c(", cv, ")])", "\n", line, "\n", sep="")
       }
-    }
-      
-    if (do.cor == TRUE) {
-      cv <- paste("\"",nm[1],"\"", sep="")
-      for (i in 2:n.vars) cv <- paste(cv, ",\"", nm[i], "\"", sep="")
-      cat(line, pre, "cor(", mydframe, "[c(", cv, ")])", "\n", line, "\n", sep="")
-
+      else cat("\n")
       print(cor(dframe[c(nm)]), digits=2)
     }
   }
@@ -90,12 +117,15 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   
     cat( "\n\n\n", "  ANALYSIS OF RESIDUALS", "\n")
   
-    cat(line, sep="")
-    cat(pre, "fitted(model)", sep="", "\n")
-    cat(pre, "resid(model)", sep="", "\n")
-    cat(pre, "rstudent(model)", sep="", "\n")
-    cat(pre, "cooks.distance(model)", sep="", "\n")
-    cat(line, "\n")
+    if (show.R) {
+      cat(line, sep="")
+      cat(pre, "fitted(model)", sep="", "\n")
+      cat(pre, "resid(model)", sep="", "\n")
+      cat(pre, "rstudent(model)", sep="", "\n")
+      cat(pre, "cooks.distance(model)", sep="", "\n")
+      cat(line, "\n")
+    }
+    else cat("\n")
     
     cat("Data, Fitted, Residuals, Studentized Residuals, Cook's Distances\n")
     if (res.sort == "cooks") cat("   [sorted by Cook's Distance]\n")
@@ -109,8 +139,10 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     if (!is.null(sig.digits)) out <- signif(out, sig.digits)
     out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],out)
     out <- data.frame(out)
-    names(out)[n.vars+1] <- "fitted"; names(out)[n.vars+2] <- "residual";
-    names(out)[n.vars+3] <- "rstudent"; names(out)[n.vars+4] <- "cooks";
+    names(out)[n.vars+1] <- "fitted"
+    names(out)[n.vars+2] <- "residual"
+    names(out)[n.vars+3] <- "rstudent"
+    names(out)[n.vars+4] <- "cooks"
     if (res.sort != "off") {
       if (res.sort == "cooks") o <- order(out$cooks, decreasing=TRUE)
       if (res.sort == "rstudent")  o <- order(abs(rstudent(lm.out)), decreasing=TRUE)
@@ -122,15 +154,19 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   
 
   # prediction intervals
-  if (pred == TRUE) {
+  if (pred) {
       
     cat( "\n\n\n", "  FORECASTING ERROR", "\n")
 
-    txt <- "predict(model, interval=\"prediction\")"
-    cat(line, pre, txt, sep="", "\n")
-    txt <- "predict(model, interval=\"confidence\")"
-    cat(pre, txt, sep="", "\n")
-    cat(line, "\n")
+    if (show.R) {
+      txt <- "predict(model, interval=\"prediction\")"
+      cat(line, pre, txt, sep="", "\n")
+      txt <- "predict(model, interval=\"confidence\")"
+      cat(pre, txt, sep="", "\n")
+      cat(line, "\n")
+    }
+    else cat("\n")
+    
     cat("Data, Fitted Values, Confidence and Prediction Intervals\n")
     cat(line)
     
@@ -147,8 +183,10 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
       out <- out[o,]
     }
     names(out)[n.vars+1] <- "fitted"
-    names(out)[n.vars+2] <- "ci:lwr"; names(out)[n.vars+3] <- "ci:upr";
-    names(out)[n.vars+4] <- "pi:lwr"; names(out)[n.vars+5] <- "pi:upr";
+    names(out)[n.vars+2] <- "ci:lwr"
+    names(out)[n.vars+3] <- "ci:upr"
+    names(out)[n.vars+4] <- "pi:lwr"
+    names(out)[n.vars+5] <- "pi:upr";
     print(out)
     cat(line, "\n")
     cat("Note: Predictions from current data, from which the model is estimated,\n")
@@ -169,6 +207,17 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
       lines(lm.out$model[,nm[2]], pi$lwr, col="darksalmon", lwd=2)
       lines(lm.out$model[,nm[2]], pi$upr, col="darksalmon", lwd=2)
     }
+  }
+  else {
+    # check for all numeric vars
+    do.cor <- TRUE
+    for (i in 1:n.vars) {
+      if (!is.numeric(dframe[1,which(names(mydata) == nm[i])])) {
+        cat("No scatterplot matrix,", nm[i], "is not numeric.\n")
+        do.cor <- FALSE
+      }
+    }
+    if (do.cor) pairs(dframe[c(nm)])
   }
   
   cat("\n")

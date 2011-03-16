@@ -1,18 +1,32 @@
 color.hist.default <- 
-function(x, col="lightsteelblue", border="black", col.bg="seashell",
-         col.grid="grey90",  over.grid=FALSE,
+function(x, col="lightsteelblue", border="black", col.bg="ghostwhite",
+         col.grid="grey90", over.grid=FALSE,
          breaks="Sturges", bin.start=NULL, bin.width=NULL,
          show.values=FALSE, prop=FALSE, cumul=c("off", "on", "both"),
-         col.reg="snow2", digits.d=5, xlab=NULL, main=NULL, ...) {
+         col.reg="snow2", digits.d=5, xlab=NULL, ylab=NULL, main=NULL, ...) {
+
+  dash <- function(n.dash) { for (i in 1:(n.dash)) cat("-"); cat("\n") }
     
-  if (is.numeric(breaks) && !is.null(bin.start))
-    stop("Either specify start value with  breaks  option, or  bin.start  option\n")
+  if (!is.numeric(x)) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "A histogram is only computed from a numeric variable.\n",
+      deparse(substitute(x)), " is not a numeric variable.\n",
+      "For the analysis of a categorical variable use color.barhchart.\n\n")
+  }
+        
+  if (is.numeric(breaks) && !is.null(bin.start)) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Choose only one option to specify a start value.\n",
+      "Either choose the option  breaks  or the option  bin.start.\n\n")
+  }
 
   # produce actual argument, such as from an abbreviation, and flag if not exist
   cumul <- match.arg(cumul)
 
   # set the labels  
   if (is.null(xlab)) x.lbl <- deparse(substitute(x)) else x.lbl <- xlab
+  if (is.null(ylab)) if (!prop) y.lbl <- "Frequency" else y.lbl <- "Proportion"
+    else y.lbl <- ylab
   if (is.null(main)) main.lbl <- "" else main.lbl <- main
     
   # get breaks from user supplied bin width and/or supplied start value
@@ -68,12 +82,12 @@ function(x, col="lightsteelblue", border="black", col.bg="seashell",
   
   # summarize data
   cat("\n")
-  cat("-------------------------------------------------", "\n")
+  dash(49)
   cat("Data Summary:", x.lbl, "\n")
-  cat("-------------------------------------------------", "\n")
+  dash(49)
   cat("\n")
   cat("Present:", sum(!is.na(x)), "\n")
-  cat("Missing:", sum(is.na(x)), "\n")
+  cat("Missing:", sum(is.na(x)), "\n")  # hist automatically deals with missing data
   cat("Total  :", length(x), "\n")
   cat("\n")
   cat("Mean   :", format(signif(mean(x, na.rm=TRUE),digits.d), scientific=FALSE), "\n")
@@ -99,8 +113,7 @@ function(x, col="lightsteelblue", border="black", col.bg="seashell",
   }
   
   # set up plot area
-  if (!prop) ylab <- "Frequency" else ylab <- "Proportion"
-  plot(h, border="transparent", xlab=x.lbl, ylab=ylab, main=main.lbl, font.main=1, 
+  plot(h, border="transparent", xlab=x.lbl, ylab=y.lbl, main=main.lbl, font.main=1, 
     freq=TRUE, ...)
   
   # colored background for plotting area
@@ -111,13 +124,13 @@ function(x, col="lightsteelblue", border="black", col.bg="seashell",
   vy <- pretty(h$counts)
 
   # plot the histogram and grid lines
-  if (!over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
+  if (!over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   plot(h, add=TRUE, col=col, border=border, labels=show.values, freq=TRUE, ...)
   if (cumul == "both") {
     h$counts <- old.counts
      plot(h, add=TRUE, col=col.reg, freq=TRUE)
   }
-  if (over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
+  if (over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
 
   # frequency table
   # j<17 condition is to stop the 0.99999... problem
@@ -142,13 +155,13 @@ function(x, col="lightsteelblue", border="black", col.bg="seashell",
   strt <- 9 + 2*max.dg
   my.width <- strt-(nchar(buf1)+nchar("Bin"))-7
   buf2 <- format(" ", width=my.width)
-  cat("------------------------------------------------------------------","\n")
+  dash(66)
   cat(buf1,"Bin",buf2,"  Midpoint","  Count","  Prop","  Cumul.c"," Cumul.p",sep="","\n")
-  cat("------------------------------------------------------------------","\n")
+  dash(66)
   for (i in 2:length(h$breaks)-1)
     cat(sprintf("%s > %s %s %6.0f %6.2f %6.0f %6.2f", x.breaks[i], 
       x.breaks[i+1], x.mids[i], h$counts[i], prop[i], cum.c[i], cum.p[i]), "\n") 
-  cat("------------------------------------------------------------------","\n")
+  dash(66)
   cat("\n")
   
 }

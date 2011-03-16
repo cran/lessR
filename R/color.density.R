@@ -1,23 +1,45 @@
 color.density <- 
-function(x, col.nrm="darkblue", col.gen="blue", col.bg="seashell",  
-         col.grid="grey90", col.hist="grey86",
+function(x, col.nrm="darkblue", col.gen="blue", col.bg="ghostwhite",  
+         col.grid="grey90", col.hist="grey86", 
          col.fill.nrm=rgb(80,150,200, alpha=70, max=255), 
          col.fill.gen=rgb(250,210,230, alpha=70, max=255),
+         bin.start=NULL, bin.width=NULL,
          type=c("both", "general", "normal"), x.pt=NULL,
          xlab=NULL, main=NULL, ...) {
 
   # produce actual argument, such as from an abbreviation, and flag if not exist
   type <- match.arg(type)
   
-  if (type != "general"  &&  !is.null(x.pt))
-    stop("x.pt only valid for one general curve\n")
+  if (type != "general"  &&  !is.null(x.pt)) { 
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "x.pt only valid when type is equal to \"general\".\n\n")
+  }
 
   # set the labels  
   if (is.null(xlab)) x.lbl <- deparse(substitute(x)) else x.lbl <- xlab
   if (is.null(main)) main.lbl <- "" else main.lbl <- main
-  
+      
+  # get breaks from user supplied bin width and/or supplied start value
+  # otherwise, breaks="Sturges by default
+  # copied from color.hist
+  if (!is.null(bin.width)  || !is.null(bin.start)) {
+    if (is.null(bin.start)) bin.start <- pretty(min(x):max(x))[1]
+    if (is.null(bin.width)) {
+      h <- hist(x, plot=FALSE, breaks="Sturges")
+      bin.width <- h$breaks[2]-h$breaks[1]
+    }
+    seq.end <- max(x)
+    breaks <- seq(bin.start,seq.end,bin.width)
+    while (max(breaks) < max(x)) {
+      seq.end <- seq.end + bin.width
+      breaks <- seq(bin.start,seq.end,bin.width)
+    }
+  }
+  else breaks="Sturges"
+  cat(breaks, "\n")
+
   # histogram calculations, no plot
-  h <- hist(x, plot=FALSE)
+  h <- hist(x, plot=FALSE, breaks)
   
   # general density curve, no plot
   # suppress warnings about possible graphic parameters
@@ -55,7 +77,7 @@ function(x, col.nrm="darkblue", col.gen="blue", col.bg="seashell",
   
   # grid lines computation and print
   vy <- pretty(h$density)
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid)
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
 
   # plot the histogram
   plot(h, add=TRUE, freq=FALSE, col=col.hist, border=col.hist)
