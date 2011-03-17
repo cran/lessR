@@ -6,16 +6,16 @@
 \description{
 Automatically provides a comprehensive regression analysis by a single, simple function call with default settings in place.  By default the data should exist as a dataframe called \code{mydata}, such as provided by the \code{\link{rad}} function included in this package for reading and processing data in preparation for analysis.  
 
-The default analysis provides the model's parameter estimates and corresponding inferential analyses, goodness of fit, the ANOVA table, correlation matrix of the model's variables, analysis of residuals, and confidence and prediction intervals.  By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual and Cook's distance, with the first 25 observations listed and sorted by Cook's distance. The output for the confidence and prediction intervals also provides the data and fitted value for each observations, as well as the lower and upper bounds for each of the two intervals.  The observations are sorted by the lower bound of each prediction interval.  Also, for models with a single predictor variable, a scatterplot of the data is produced, along with the regression line and corresponding confidence and prediction intervals.    
+The default analysis provides the model's parameter estimates and corresponding inferential analyses, goodness of fit, the ANOVA table, correlation matrix of the model's variables, analysis of residuals, and confidence and prediction intervals.  By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual and Cook's distance, with the first 25 observations listed and sorted by Cook's distance. The output for the confidence and prediction intervals also provides the data and fitted value for each observations, as well as the lower and upper bounds for each of the two intervals.  The observations are sorted by the lower bound of each prediction interval.  Also, for models with a single predictor variable, a scatterplot of the data is produced, along with the regression line and corresponding confidence and prediction intervals. For multiple regression models, a scatterplot matrix of the variables in the model is produced, as well as an analysis of the adjusted R-squared for models defined by all possible subsets of the predictor variables.    
 
 Overriding the default settings can turn off features and reduce the number of provided analyses.
 }
 
 \usage{
 reg(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
-    res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
-    pred=TRUE, pred.sort=c("predint", "off"), sig.digits=NULL,
-    show.R=FALSE)
+         res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
+         pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
+         subsets=TRUE, collinear=TRUE, sig.digits=4, show.R=FALSE)
 }
 
 
@@ -33,8 +33,14 @@ reg(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
        criterion for the display of the rows of data and associated residuals. Other values are \code{"rstudent"} for Studentized residuals, and \code{"off"} to not provide the analysis.}
   \item{pred}{Default is \code{TRUE}, which, produces confidence and prediction intervals 
        for each row of data.}
+  \item{pred.all}{Default is \code{FALSE}, which, produces prediction intervals only for the first,
+       middle and last five rows of data.}
   \item{pred.sort}{Default is \code{"predint"}, which sorts the rows of data and associated
        intervals by the lower bound of each prediction interval.  Turn off this sort by specifying a value of \code{"off"}.}
+  \item{subsets}{Default is \code{TRUE}, for producing an analysis from the \code{leaps} package
+       for the adjusted R-squared of all possible models from the set of predictor variables.}
+  \item{collinear}{Default is \code{TRUE}, for producing a collinearity analysis from the \code{car}
+       package.}
   \item{sig.digits}{Provides the same functionality as the standard \code{\link{options}}
        function regarding the digits option. The distinction is that this value applies selectively to portions of the output, the different type of residuals and the confidence and prediction intervals.}
   \item{show.R}{Display the R instructions that yielded the lessR output, albeit without
@@ -49,7 +55,7 @@ The output for the residual analysis displays by default just the first 25 obser
 
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE) and to turn off scientific notation for the output (scipen=30).
 
-The purpose of \code{reg} is to combine these function calls into one, and provide ancillary analyses such as sorting where appropriate to assist in interpretation.
+The purpose of \code{reg} is to combine these function calls into one, and provide ancillary analyses such as sorting where appropriate to assist in interpretation, and the analysis of the adjusted R-squared for the models defined by all possible subsets of the predictor variables.
 }
 
 \author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
