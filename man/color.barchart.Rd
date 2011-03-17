@@ -205,10 +205,6 @@ rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
 # bar charts for all non-numeric variables in the data frame called mydata
 color.barchart()
 
-# bar charts for all numeric variables in the data frame called mydata
-#  written to the file indicated on output
-color.barchart(col.box="palegreen1", col.point="plum")
-
 # Use the subset function to specify a variable list
 color.barchart(subset(mydata, select=c(Gender,Dept)))
 

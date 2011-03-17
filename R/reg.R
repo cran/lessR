@@ -1,8 +1,8 @@
 reg <-
 function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
          res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
-         pred=TRUE, pred.sort=c("predint", "off"), sig.digits=NULL,
-         show.R=FALSE) {
+         pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
+         subsets=TRUE, collinear=TRUE, sig.digits=4, show.R=FALSE) {
          
   mydframe <- deparse(substitute(dframe))  # get dataframe name for cor before sort
   
@@ -63,36 +63,38 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   cat("Estimated model coefficients, the b's, y-intercept and slope coefficients\n")
   cat("Standard error and hypothesis test of each b, with null hypothesis Beta=0\n")
   cat("\n")
-  print(sm$coefficients)
+  print(sm$coefficients, digits=sig.digits)
   cat("\n\n")
   if (show.R) cat("\n",line,pre,"confint(model)","\n",line,"\n",sep="") else cat("\n")
   cat("Confidence interval for each model coefficient\n")
   cat("\n")
-  print(confint(lm.out))
+  print(confint(lm.out), digits=sig.digits)
   cat("\n\n\n")
   cat("Fit of the model\n")
   cat("\n")
-  cat("Standard deviation of residuals: ", round(sm$sigma,4),
+  cat("Standard deviation of residuals: ", signif(sm$sigma,4),
     "for", sm$df[2], "degrees of freedom", "\n")
-  cat("R-squared: ", round(sm$r.squared,4), 
-    "    Adjusted R-squared: ", round(sm$adj.r.squared,4), "\n")
+  cat("If normal, range of residuals about each fitted value is 4*", signif(sm$sigma,4), 
+    " or ", signif(4*sm$sigma,4), sep="", "\n\n")
+  cat("R-squared: ", signif(sm$r.squared,3), 
+    "    Adjusted R-squared: ", signif(sm$adj.r.squared,3), "\n")
   cat("\n")
   cat("F-statistic for hypothesis test of population R-squared=0: ", 
-    round(sm$fstatistic[1],4), "\n") 
+    signif(sm$fstatistic[1],4), "\n") 
   cat("Degrees of freedom: ", sm$fstatistic[2], "and", sm$fstatistic[3],"\n")
   cat("p-value: ",
-    round(1-pf(sm$fstatistic[1],sm$fstatistic[2],sm$fstatistic[3]),4),"\n")
+    signif(1-pf(sm$fstatistic[1],sm$fstatistic[2],sm$fstatistic[3]),6),"\n")
   cat("\n\n")
   if (show.R) cat("\n\n",line, pre,"anova(model)","\n",line,"\n",sep="") else cat("\n")
   print(anova(lm.out))
     
   
   # check for all numeric vars
-  do.cor <- TRUE
+  numeric.all <- TRUE
   for (i in 1:n.vars) {
     if (!is.numeric(dframe[1,which(names(mydata) == nm[i])])) {
-      cat("No correlations reported,", nm[i], "is not numeric.\n")
-      do.cor <- FALSE
+      cat("\n\n\n>>>> Note: ", nm[i], "is not a numeric variable.\n")
+      numeric.all <- FALSE
     }
   }
 
@@ -100,22 +102,44 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   if (cor) {
     cat( "\n\n\n", "  CORRELATIONS", "\n")
   
-    if (do.cor) {
+    if (numeric.all) {
       if (show.R) {
         cv <- paste("\"",nm[1],"\"", sep="")
         for (i in 2:n.vars) cv <- paste(cv, ",\"", nm[i], "\"", sep="")
         cat(line, pre, "cor(", mydframe, "[c(", cv, ")])", "\n", line, "\n", sep="")
       }
-      else cat("\n")
+      else cat("\n") 
       print(cor(dframe[c(nm)]), digits=2)
     }
+    else cat("\n>>> No correlations reported because not all variables are numeric.\n")
   }
+  
+  
+  # collinearity    
+  if (collinear && n.vars>2) {
+    cat( "\n\n\n", "  COLLINEARITY OF PREDICTOR VARIABLES", "\n\n")
+    if (numeric.all) {
+      check.car <- suppressWarnings(require(car, quietly=TRUE))
+      if (check.car) {
+        cat("Tolerances\n\n")
+        print(1/(vif(lm.out)), digits=3)
+        cat("\n\nVariance Inflation Factors\n\n")
+        print(vif(lm.out), digits=4)
+      }
+      else {
+        cat("\n>>> Obtaining the collinearity analysis requires package car.", "\n")
+        cat(">>> This analysis is not provided here, but all other output is unaffected.", "\n")
+        cat(">>> To get the car package, run one time only: install.packages('car')", "\n")
+      }
+     }
+     else cat("\n>>> No collinearity analysis reported because not all variables are numeric.\n")
+   }
 
 
   # residual analysis
   if (res.rows > 0) {
   
-    cat( "\n\n\n", "  ANALYSIS OF RESIDUALS", "\n")
+    cat( "\n\n\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
   
     if (show.R) {
       cat(line, sep="")
@@ -136,7 +160,6 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     cat(line)
     
     out <- cbind(fitted(lm.out),resid(lm.out),rstudent(lm.out),cooks.distance(lm.out))
-    if (!is.null(sig.digits)) out <- signif(out, sig.digits)
     out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],out)
     out <- data.frame(out)
     names(out)[n.vars+1] <- "fitted"
@@ -148,7 +171,7 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
       if (res.sort == "rstudent")  o <- order(abs(rstudent(lm.out)), decreasing=TRUE)
       out <- out[o,]
     }
-    print(out[1:res.rows,])
+    print(out[1:res.rows,], digits=sig.digits)
     rm(out)
   }
   
@@ -168,14 +191,13 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     else cat("\n")
     
     cat("Data, Fitted Values, Confidence and Prediction Intervals\n")
+    cat("   [sorted by lower bound of prediction interval]\n")
+    if (n.obs > 50 && pred.all == FALSE) 
+      cat("   [to save space only some intervals printed, do pred.all=TRUE to see all]\n")
     cat(line)
     
     ci <- data.frame(predict(lm.out, interval="confidence"))
     pi <- suppressWarnings(data.frame(predict(lm.out, interval="prediction")))
-    if (!is.null(sig.digits)) {
-      ci <- signif(ci, sig.digits)
-      pi <- signif(pi, sig.digits)
-    }
     out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],ci,pi$lwr,pi$upr)
     out <- data.frame(out)
     if (pred.sort == "predint") {
@@ -186,8 +208,17 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     names(out)[n.vars+2] <- "ci:lwr"
     names(out)[n.vars+3] <- "ci:upr"
     names(out)[n.vars+4] <- "pi:lwr"
-    names(out)[n.vars+5] <- "pi:upr";
-    print(out)
+    names(out)[n.vars+5] <- "pi:upr"
+    if (n.obs < 50  || pred.all == TRUE)
+      print(out, digits=sig.digits)
+    else {
+      print(out[1:5,], digits=sig.digits)
+      cat("\n... for the middle 5 rows of sorted data ...\n\n")
+      n.mid <- round(n.obs/2)
+      print(out[(n.mid-2):(n.mid+2),], digits=sig.digits)
+      cat("\n... for the last 5 rows of sorted data ...\n\n")
+      print(out[(n.obs-4):n.obs,], digits=sig.digits)
+    }
     cat(line, "\n")
     cat("Note: Predictions from current data, from which the model is estimated,\n")
     cat("      refer to _future_ responses based on the collection of new data.\n")
@@ -196,10 +227,18 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   
   # scatterplot, if one predictor variable
   if (n.vars == 2) {
-    if (pred == FALSE) ctitle <- "Scatterplot and Regression Line"
-      else ctitle <- "Regression Line, Confidence and Prediction Intervals"
+    if (pred == FALSE) {
+      ctitle <- "Scatterplot and Regression Line"
+      y.min <- min(lm.out$model[,nm[1]])
+      y.max <- max(lm.out$model[,nm[1]])
+    }
+    else {
+      ctitle <- "Regression Line, Confidence and Prediction Intervals"
+      y.min <- min(pi$lwr)
+      y.max <- max(pi$upr)
+    }
     plot(lm.out$model[,nm[2]], lm.out$model[,nm[1]], pch=19, cex=.8, col="gray70", 
-      xlab=nm[2], ylab=nm[1], main=ctitle)
+      xlab=nm[2], ylab=nm[1], ylim=c(y.min,y.max), main=ctitle)
     abline(lm.out$coef)
     if (pred == TRUE) {
       lines(lm.out$model[,nm[2]], ci$lwr, col="lightsteelblue", lwd=2)
@@ -208,16 +247,35 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
       lines(lm.out$model[,nm[2]], pi$upr, col="darksalmon", lwd=2)
     }
   }
-  else {
-    # check for all numeric vars
-    do.cor <- TRUE
-    for (i in 1:n.vars) {
-      if (!is.numeric(dframe[1,which(names(mydata) == nm[i])])) {
-        cat("No scatterplot matrix,", nm[i], "is not numeric.\n")
-        do.cor <- FALSE
+  else   # scatterplot matrix for multiple regression
+    if (numeric.all) pairs(dframe[c(nm)])
+     else cat("\n>>> No scatterplot matrix created because not all variables are numeric.\n")
+  
+
+  # all possible subsets of predictor variables    
+  if (subsets && n.vars>2) {
+    cat( "\n\n\n", "  ALL SUBSETS OF PREDICTOR VARIABLES", "\n\n")
+    cat("Warning: This analysis only describes these data, so does not literally\n")
+    cat("         generalize to the population. Only use as a descriptive heuristic.\n\n")
+    cat("A 1 means the predictor variable is in the model, a 0 means it is out.\n\n")
+    if (numeric.all) {
+      check.leaps <- suppressWarnings(require(leaps, quietly=TRUE))
+      if (check.leaps) {
+        X <- data.frame(lm.out$model[nm[seq(2,n.vars)]])
+        Y <- numeric(length=n.obs)  # convert response to an atomic vector for leaps
+        for (i in 1:n.obs) Y[i] <- lm.out$model[nm[1]][i,1]
+        leaps.out <- leaps(X, Y, method="adjr2")
+        models <- data.frame(cbind(leaps.out$which,leaps.out$adjr2), row.names=NULL)
+        names(models) <- c(names(X),"R2adj")
+        print(models[order(models$R2adj, decreasing=TRUE),], digits=3)
+      }
+      else {
+        cat("\n>>> Obtaining the subsets of predictor variables requires package leaps.", "\n")
+        cat(">>> This analysis is not provided here, but all other output is unaffected.", "\n")
+        cat(">>> To get the leaps package, run one time only: install.packages('leaps')", "\n")
       }
     }
-    if (do.cor) pairs(dframe[c(nm)])
+    else cat("\n>>> No subset analysis reported because not all variables are numeric.\n")
   }
   
   cat("\n")

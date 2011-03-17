@@ -1,27 +1,26 @@
 # read, attach, display
 rad <- 
-function(ref=NULL, display=TRUE, show.R=FALSE, ...) {
+function(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, ...) {  
   
-  if (display) {
-  
-    pre <- ">"
-    line <- "------------------------------------------------------------\n"
+  pre <- ">"
+  line <- "------------------------------------------------------------\n"
    
-    cat("\n")
-    if(show.R) {
-      if (is.null(ref)) {
-        cat(line, pre, " mydata <- read.csv(file.choose())", "\n", sep="")
-        ref <- file.choose()
-        cat("\nFile: ", ref, "\n")
-      }
-      else {
-        cat(line, pre, " mydata <- read.csv(file=\"",ref,"\")", "\n", sep="")
-      }
-    }
-    mydata <<- read.csv(file=ref, ...)
-    
-    if (show.R) cat(pre, " attach(mydata)", "\n", line, sep="")
-    attach(mydata, warn.conflicts=FALSE)
+  cat("\n")
+  if (is.null(ref)) ref <- file.choose()
+  
+  mydata <<- read.csv(file=ref, ...)
+  if (!no.attach) attach(mydata, warn.conflicts=FALSE)
+  
+  if(show.R) {
+    if(ref == "file.choose()") {
+      cat(line, pre, " mydata <- read.csv(file.choose())", "\n", sep="")
+      cat("\nFile: ", ref, "\n")
+     }
+     else cat(line, pre, " mydata <- read.csv(file=\"",ref,"\")", "\n", sep="")
+     cat(pre, " attach(mydata)", "\n", line, sep="")
+  }
+
+  if (display) {
     
     if (nargs() > 1) cat("Plus the optional arguments that were entered in rad.", "\n")
     cat("\n")
@@ -61,11 +60,6 @@ function(ref=NULL, display=TRUE, show.R=FALSE, ...) {
     cat("help.me(): List of topics for analysis with related R/lessR functions\n")
     cat(line, sep="")
     cat("\n")
-  }
-  
-  else {  # display=FALSE
-    mydata <<- read.csv(file=ref, ...)    
-    attach(mydata, warn.conflicts=FALSE)
   }
 
 }

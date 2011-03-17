@@ -8,7 +8,7 @@ Reads the contents of the specified csv data file into an R dataframe called \co
 }
 
 \usage{
-rad(ref=NULL, display=TRUE, show.R=FALSE, ...)
+rad(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, ...)
 }
 
 
@@ -19,6 +19,8 @@ rad(ref=NULL, display=TRUE, show.R=FALSE, ...)
         be turned off.}
   \item{show.R}{Display the R instructions that yielded the lessR output, albeit without
         the lessR formatting.}
+  \item{no.attach}{Off by default, but if \code{TRUE} then do not attach the R data frame, 
+        \code{mydata} by default.}
   \item{...}{Other parameter values consistent with the usual \code{read.csv}
        function, such as row.names and header.}
 }
