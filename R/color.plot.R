@@ -55,7 +55,6 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
   nrows <- length(x)
   if (is.null(cex)) pt.size <- 1 else pt.size <- cex
   
-
 # -------------------------
 # y only, so create x index
 # -------------------------
@@ -105,7 +104,6 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
     
     if (is.null(type)) {  # when x values are sorted, plot a function
       if ( sum(diff(diff(x))) == 0 ) equal.int <- TRUE else equal.int <- FALSE
-      cat(sum(diff(diff(x))),"\n")
       if (!is.unsorted(x) && equal.int) type <- "l" else type <- "p"
     }
     
@@ -119,7 +117,6 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
     }
     
   }
-  
   digits.d <- max.dd(y) + 1
 
 # -------------------------

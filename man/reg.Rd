@@ -4,9 +4,9 @@
 \title{Regression Analysis}
 
 \description{
-Automatically provides a comprehensive regression analysis by a single, simple function call with default settings in place.  By default the data should exist as a dataframe called \code{mydata}, such as provided by the \code{\link{rad}} function included in this package for reading and processing data in preparation for analysis.  
+Automatically provides a comprehensive regression analysis from a single, simple function call with many default settings.  By default the data should exist as a dataframe called \code{mydata}, such as provided by the \code{\link{rad}} function included in this package for reading and processing data in preparation for analysis.  
 
-The default analysis provides the model's parameter estimates and corresponding inferential analyses, goodness of fit, the ANOVA table, correlation matrix of the model's variables, analysis of residuals, and confidence and prediction intervals.  By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual and Cook's distance, with the first 25 observations listed and sorted by Cook's distance. The output for the confidence and prediction intervals also provides the data and fitted value for each observations, as well as the lower and upper bounds for each of the two intervals.  The observations are sorted by the lower bound of each prediction interval.  Also, for models with a single predictor variable, a scatterplot of the data is produced, along with the regression line and corresponding confidence and prediction intervals. For multiple regression models, a scatterplot matrix of the variables in the model is produced, as well as an analysis of the adjusted R-squared for models defined by all possible subsets of the predictor variables.    
+The default analysis provides the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, correlation matrix of the model's variables, collinearity analysis of the predictor variables, adjusted R-squared for the corresponding models defined by each possible subset of the predictor variables, and, for each observation in the model, analysis of residuals and influence as well as the confidence and prediction intervals.  By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual and Cook's distance, with the first 25 observations listed and sorted by Cook's distance. The output for the confidence and prediction intervals also provides the data and fitted value for each observations, as well as the lower and upper bounds for each of the two intervals.  The observations are sorted by the lower bound of each prediction interval.  Also, for models with a single predictor variable, a scatterplot of the data is produced, along with the regression line and corresponding confidence and prediction intervals. For multiple regression models, a scatterplot matrix of the variables in the model is produced.    
 
 Overriding the default settings can turn off features and reduce the number of provided analyses.
 }
@@ -42,9 +42,10 @@ reg(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   \item{collinear}{Default is \code{TRUE}, for producing a collinearity analysis from the \code{car}
        package.}
   \item{sig.digits}{Provides the same functionality as the standard \code{\link{options}}
-       function regarding the digits option. The distinction is that this value applies selectively to portions of the output, the different type of residuals and the confidence and prediction intervals.}
+       function regarding the digits option. The distinction is that this value applies selectively to portions of the output, 
+       the different type of residuals and the confidence and prediction intervals.}
   \item{show.R}{Display the R instructions that yielded the lessR output, albeit without
-        the lessR formatting.}
+        the additional lessR formatting.}
 }
 
 
