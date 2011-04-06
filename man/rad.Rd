@@ -70,7 +70,7 @@ directed to the console.  Also listed are the R statements invoked by \code{rad}
 
 # read a csv data file from the web
 # then attach and list variable names and some values
-rad("http://web.pdx.edu/~gerbing/data/twogroup.csv")
+#rad("http://web.pdx.edu/~gerbing/data/twogroup.csv")
 }
 
 

@@ -31,14 +31,16 @@ function(x, col="lightsteelblue", border="black", col.bg="ghostwhite",
     
   # get breaks from user supplied bin width and/or supplied start value
   if (!is.null(bin.width)  || !is.null(bin.start)) {
-    if (is.null(bin.start)) bin.start <- pretty(min(x):max(x))[1]
+    if (is.null(bin.start)) 
+      bin.start <- pretty(min(x, na.rm = TRUE):max(x, na.rm = TRUE))[1]
     if (is.null(bin.width)) {
       h <- hist(x, plot=FALSE, breaks="Sturges")
       bin.width <- h$breaks[2]-h$breaks[1]
     }
-    seq.end <- max(x)
+    max.x <- max(x, na.rm = TRUE)
+    seq.end <- max.x
     breaks <- seq(bin.start,seq.end,bin.width)
-    while (max(breaks) < max(x)) {
+    while (max(breaks) < max.x) {
       seq.end <- seq.end + bin.width
       breaks <- seq(bin.start,seq.end,bin.width)
     }

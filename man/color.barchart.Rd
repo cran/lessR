@@ -6,13 +6,14 @@
 \title{Bar Chart of One or Two Variables with Color}
 
 \description{
-Using the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}, plots a bar chart of one or two variables with default colors, including background color and gridlines in addition to the bars. Also displays the frequency table for one or two variables and optionally provides the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies.
+Plots a bar chart of one or two variables with default colors, including background color and gridlines. Also displays the frequency table for one or two variables and optionally provides the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies.
 
 For the analysis of a single variable, the cell proportions are also provided.  For the analysis of two variables, also provided are the proportions within each cell, within each column and within each row.   
 
-Unlike \code{\link{barplot}}, the variable(s) can be entered directly into the function call without first converting to a table.  If two variables are plotted, a legend is automatically provided.
+Unlike the standard R function, \code{\link{barplot}}, the variable(s) can be entered directly into the function call without first converting to a table.  If two variables are plotted, a legend is automatically provided.
 
-If the provided object for which to calculate the bar chart is a data frame, then a bar chart is calculated for each non-numeric variable in the data frame and the results written to a pdf file in the current working directory.  The name of this file and its path are specified in the output.}
+If the provided object for which to calculate the bar chart is a data frame, then a bar chart is calculated for each non-numeric variable in the data frame and the results written to a pdf file in the current working directory.  The name of this file and its path are specified in the output.
+}
 
 \usage{
 color.barchart(x=NULL, \ldots)
@@ -20,7 +21,7 @@ color.barchart(x=NULL, \ldots)
 \method{color.barchart}{data.frame}(x, \dots)
 
 \method{color.barchart}{default}(x, y=NULL, col.bars=NULL, border="black", 
-         col.bg="ghostwhite", col.grid="grey90", beside=TRUE, 
+         col.bg="ghostwhite", col.grid="grey90", gap=NULL, beside=TRUE, 
          over.grid=FALSE, prop=FALSE, xlab=NULL, legend.title=NULL, 
          legend.loc=NULL, legend.labels=NULL, legend.horiz=FALSE, 
          vivid=FALSE, random.col=FALSE, col.low="slategray2", 
@@ -35,6 +36,9 @@ color.barchart(x=NULL, \ldots)
   \item{border}{Color of the border of the bars.}
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines.}
+  \item{gap}{Gap between bars.  Provides the value of the \code{space} option from the
+        standard R \code{\link{barplot}} function with a default of 0.2 unless two variables
+        are plotted and beside=TRUE, in which case the default is c(.1,1).}
   \item{beside}{When plotting two variables, set to true for the levels fo the first 
         variable to be plotted as adjacent bars instead of stacked on each other. Unlike the standard R function,\code{\link{barplot}}, the default is TRUE. }
   \item{over.grid}{If true, plot the grid lines over the histogram.}
@@ -70,7 +74,7 @@ color.barchart(x=NULL, \ldots)
 
 \details{
 OVERVIEW\cr
-Plot a bar chart with default colors for one or two variables, presumably with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and gridlines, all of which can be customized.
+Plot a bar chart with default colors for one or two variables, presumably with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and gridlines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}.
 
 A frequency bar is produced for each level of the first and perhaps only variable. When two variables are plotted, the bar for each level of the first variable is replaced with a group of bars, one for each level of the second variable.
 
@@ -82,7 +86,7 @@ There are three ways to override the default colors.\cr
 2. The order of the colors within the chosen palette can be randomized with the \code{random.col="TRUE"} option. For example, when this option is activated each of the seven colors in a palette has a 1/7 chance of appearing as the first color, the only color used in the plot of a single variable, and the color used for the first bar in each group for a plot of two variables.\cr
 3. The desired colors can be explicitly specified with the \code{col.bars} option, which overrides any other bar color options. When plotting one variable, include one color in this color list, the color used for all of the bars.  When plotting two variables, usually the list of colors includes the same number of elements as the number of levels for the second variable.  As always with R, if the list includes more than once color, the \code{c} function must be used to generate the list, as in \code{col.bars=c("coral3","seagreen3")} for a second variable with two levels. When two variables are plotted, if there are fewer specified colors than the levels of the second variable, the remaining colors are selected from the remaining colors in the activated palette.
 
-The colors in one of the two provided color palettes can be viewed, in the order in which the are by default displayed, by running the corresponding two lines of R code, first for the default colors and second for the vivid colors:\cr\cr
+The default colors in one of the two provided color palettes can be viewed, in the order in which they are displayed, by running the corresponding two lines of R code, first for the default colors and second for the vivid colors:\cr\cr
 clr <- c("slategray3", "bisque3", "darksalmon", "darkolivegreen3", "thistle", "azure3", "moccasin")\cr
 barplot(rep(1,7), names=clr, col=clr, border=NA, space=.1)\cr
 \cr
@@ -131,8 +135,8 @@ color.barchart(Pain)
 color.barchart(Gender)
 
 # specify a unique bar color for each of the two bars
-# also display narrower bars, the default space between is .2
-color.barchart(Gender, col.bars=c("rosybrown","tan"), space=.6)
+# also display narrower bars, the default gap between bars is .2
+color.barchart(Gender, col.bars=c("rosybrown","tan"), gap=.75)
 
 
 # ----------------------------------------
@@ -200,13 +204,13 @@ color.barchart(table(Pain), xlab="Pain")
 # ---------------------------------------------
 
 # read data into data frame called mydata
-rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
+#rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
 
 # bar charts for all non-numeric variables in the data frame called mydata
-color.barchart()
+#color.barchart()
 
 # Use the subset function to specify a variable list
-color.barchart(subset(mydata, select=c(Gender,Dept)))
+#color.barchart(subset(mydata, select=c(Gender,Dept)))
 
 
 # ------------------------------

@@ -73,17 +73,17 @@ color.boxplot(y, col.point="red", xlab="My Variable")
 # ----------------------------------
 
 # read data into data frame called mydata
-rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
+#rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
 
 # boxplots for all numeric variables in data frame called mydata
-color.boxplot()
+#color.boxplot()
 
 # boxplots for all numeric variables in data frame called mydata
 #  with specified options
-color.boxplot(col.box="palegreen1", col.point="plum", show.values=TRUE)
+#color.boxplot(col.box="palegreen1", col.point="plum", show.values=TRUE)
 
 # Use the subset function to specify a variable list
-color.boxplot(subset(mydata, select=c(Age,HealthPlan)))
+#color.boxplot(subset(mydata, select=c(Age,HealthPlan)))
 }
 
 

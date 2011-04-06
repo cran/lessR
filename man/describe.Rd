@@ -80,12 +80,12 @@ describe(Y ~ X, digits.d=2)
 # Read data into mydata data frame with the rad function 
 # Optionally display the data frame by listing its name
 # Analyze all variables in the data table with describe()
-rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
-mydata
-describe()
+#rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
+#mydata
+#describe()
 
 # Use the subset function to specify a variable list
-describe(subset(mydata, select=c(Age:Dept,HealthPlan)))
+#describe(subset(mydata, select=c(Age:Dept,HealthPlan)))
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

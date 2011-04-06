@@ -58,7 +58,8 @@ Results are based on the standard \code{\link{hist}} function for calculating an
 
 A somewhat common error by beginning users of the base R \code{\link{hist}} function may encounter is to manually specify a sequence of bins with the \code{seq} function that does not fully span the range of specified data values. The result is a rather cryptic error message and program termination.  Here, \code{color.hist} detects this problem before attempting to generate the histogram with \code{\link{hist}}, and then informs the user of the problem with a more detailed and explanatory error message. Moreover, the entire range of bins need not be specified to customize the bins.  Instead, just a bin width need be specified, \code{bin.width}, and/or a value that begins the first bin, \code{bin.start}.  If a starting value is specified without a bin width, the default Sturges method provides the bin width.
 
-The \code{freq} option from the traditional \code{\link{hist}} function has no effect as it is always off in each internal call to \code{\link{hist}}.  To plot densities, which correspond to setting  \code{freq} to \code{FALSE}, use the \code{\link{color.density}} function in this package.
+The \code{freq} option from the t
+itional \code{\link{hist}} function has no effect as it is always off in each internal call to \code{\link{hist}}.  To plot densities, which correspond to setting  \code{freq} to \code{FALSE}, use the \code{\link{color.density}} function in this package.
 }
 
 
@@ -120,17 +121,17 @@ color.hist(y, cumul="both", breaks=seq(-4,4,.25), prop=TRUE,
 # ---------------------------------
 
 # read data into data frame called mydata
-rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
+#rad("http://web.pdx.edu/~gerbing/data/employees2.csv")
 
 # histograms for all numeric variables in data frame called mydata
-color.hist()
+#color.hist()
 
 # histograms for all numeric variables in data frame called mydata
 #  with specified options
-color.hist(col="palegreen1", col.bg="ivory", show.values=TRUE)
+#color.hist(col="palegreen1", col.bg="ivory", show.values=TRUE)
 
 # Use the subset function to specify a variable list
-color.hist(subset(mydata, select=c(Age,HealthPlan)))
+#color.hist(subset(mydata, select=c(Age,HealthPlan)))
 
 }
 
