@@ -4,7 +4,7 @@
 \title{Scatter-Plot, Function Plot, or Run Chart with Optional Dates in Color}
 
 \description{
-Plots individual points, such as for a scatterplot, or plots connected line segments for the plot of a function or a run chart, including an option for adding dates to the horizontal axis for a time series chart. One enhancement over the usual \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, gridlines, and border can each be explicitly specified, with default colors provided.  
+Plots individual points, such as for a scatterplot, or plots connected line segments for the plot of a function or a run chart, including an option for adding dates to the horizontal axis for a time series chart. One enhancement over the usual \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, gridlines, and border can each be explicitly specified, with default colors provided.  For Likert style response data, so that each value has less than 10 unique integer values, the points in the plot are transformed into a bubble plot with the size of each bubble, i.e., point, determined by the corresponding joint frequency.
 
 For data exhibiting little trend, the the center line is provided for the generation of a run chart, plotting the values of a variable in order of occurrence over time.  When the center line, the median by default, is plotted, the analyses of the number and composition of the individual runs, number of consecutive values above or below the center line, is also displayed.  Also, the defaults change for each of the types of plots.  The intent is to rely on the default values for a relatively sophisticated plot, particularly when compared to the default values of the standard R \code{\link{plot}} function.
 
@@ -16,7 +16,11 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            col.point="darkblue", col.fill=NULL, col.grid="grey90", 
            col.bg="ghostwhite", col.box="black", xy.ticks=TRUE, 
            xlab=NULL, ylab=NULL, pch=NULL, cex=NULL, center.line=NULL,
-           x.start=NULL, x.by=NULL, x.reverse=FALSE, \ldots)
+           kind=c("regular", "bubble.freq", "sunflower.freq"),
+           x.start=NULL, x.end=NULL, size=.25, 
+           fit.line=c("none", "lowess", "ls"), col.fit.line="grey55", 
+           col.bubble="lightsteelblue", col.flower="steelblue",
+           time.start=NULL, time.by=NULL, time.reverse=FALSE, \ldots)
 }
 
 
@@ -39,23 +43,47 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
   \item{xy.ticks}{Flag that indicates if tick marks and associated values on the 
       axes are to be displayed.}
   \item{xlab}{Label for x-axis. For two variables specified, x and y, if \code{xlab} not
-      specified, then the label becomes the name of the corresponding variable. If \code{xy.ticks} is FALSE, then no label is displayed. If no y variable is specified, then \code{xlab} is set to Index unless \code{xlab} has been specified.}
+      specified, then the label becomes the name of the corresponding variable. If 
+      \code{xy.ticks} is FALSE, then no label is displayed. If no y variable is specified, 
+      then \code{xlab} is set to Index unless \code{xlab} has been specified.}
   \item{ylab}{Label for y-axis. If not specified, then the label becomes the name of
       the corresponding variable. If \code{xy.ticks} is \code{FALSE}, then no label displayed.}
   \item{pch}{The standard plot character, with values defined in help(points). The
-       default value is 21, a circle with both a border and filled area, specified here as \code{col.point} and \code{col.fill}.  For a scatterplot, \code{col.fill} defaults to transparent.  For a run chart, \code{col.fill} defaults to \code{col.point}.}
+       default value is 21, a circle with both a border and filled area, specified here as
+       \code{col.point} and \code{col.fill}.  For a scatterplot, \code{col.fill} defaults to
+       transparent.  For a run chart, \code{col.fill} defaults to \code{col.point}.}
   \item{cex}{Magnification factor for any displayed points, with default of cex=1.0.}
   \item{center.line}{Plots a dashed line through the middle of a run chart.  The two
-      possible values are \code{"mean"} and \code{"median"}.  Provides a centerline for the \code{"median"} by default when the values randomly vary about the mean.}
-  \item{x.start}{Optional starting date for first data value. Format must be 
-       "\%Y-\%m-\%d" or "\%Y/\%m/\%d". If using with \code{x.reverse}, the first date is after the data are reverse sorted.}
-  \item{x.by}{Accompanies the \code{x.start} specification, the interval to increment the
-      date for each sequential data value. A character string, containing one of \code{"day"}, \code{"week"}, \code{"month"} or \code{"year"}. This string can optionally be preceded by a positive or negative integer and a space, or followed by "s", as specified in \code{\link{seq.Date}}.}
-  \item{x.reverse}{Reverse the ordering of the dates, particularly when the data are
+      possible values are \code{"mean"} and \code{"median"}.  Provides a centerline for the
+     \code{"median"} by default when the values randomly vary about the mean.}
+  \item{kind}{Default is \code{"regular"}.  If Likert style response data is plotted, that is, 
+      each variable has less than 10 integer values, then by default a bubble plot is plotted
+      with the corresponding joint frequency determining the size of the bubble.  A sunflower
+      plot can also be requested.}
+  \item{x.start}{For Likert style response data, the starting integer value of each axis. Useful
+      if the actual data do not include all possible values.}
+  \item{x.end}{For Likert style response data, the ending integer value of each axis. Useful
+      if the actual data do not include all possible values.}
+  \item{size}{Size of the bubbles in a bubble plot of Likert style data.}
+  \item{fit.line}{The best fitting line.  Default value is \code{"none"}, with options for 
+      \code{"lowess"} and \code{"ls"}.}
+  \item{col.fit.line}{Color of the best fitting line, if the \code{fit.line} option is invoked.}
+  \item{col.bubble}{Color of the bubbles if a bubble plot of the frequencies is plotted.}
+  \item{col.flower}{Color of the flowers if a sunflower plot of the frequencies is plotted.}
+  \item{time.start}{Optional starting date for first data value. Format must be 
+       "\%Y-\%m-\%d" or "\%Y/\%m/\%d". If using with \code{x.reverse}, the first date is after 
+       the data are reverse sorted.}
+  \item{time.by}{Accompanies the \code{x.start} specification, the interval to increment the
+      date for each sequential data value. A character string, containing one of \code{"day"}, 
+      \code{"week"}, \code{"month"} or \code{"year"}. This string can optionally be preceded by 
+      a positive or negative integer and a space, or followed by "s", as specified in 
+      \code{\link{seq.Date}}.}
+  \item{time.reverse}{Reverse the ordering of the dates, particularly when the data are
       listed such that first row of data is the newest. Accompanies the \code{x.start}
       specification.}
   \item{\dots}{Other parameter values for graphics as defined by and then processed 
-      by \code{\link{plot}} and \code{\link{par}}, including \code{xlim}, \code{ylim}, \code{lwd}, and \code{cex.lab.}}
+      by \code{\link{plot}} and \code{\link{par}}, including \code{xlim}, \code{ylim}, \code{lwd}, 
+      and \code{cex.lab.}}
 }
 
 
@@ -65,6 +93,8 @@ Results are based on the standard \code{\link{plot}} and related graphic functio
 When two variables are specified to plot, if the values of the first variable, \code{x} are unsorted, a scatterplot is produced, that is, a plot with \code{type="p"} for points. By default the points of a scatterplot are not filled. Sorted values of the first of the two specified variables yield a function plot, that is, a plot with \code{type="l"} for a smooth plotted line or curve.
 
 Specifying one variable leads to a run chart, with the values on the horizontal axis automatically generated.  The default is the Index variable, the ordinal position of each data value.  Or, dates on the horizontal axis can be specified from the specified starting date given by \code{x.start} and the accompanying increment as given by \code{x.by}.  If the data values randomly vary about the mean, the default is to plot the mean as the center line of the graph, otherwise the default is to ignore the center line.  The default plot type for the run chart is \code{type="b"}, for both points and the corresponding connected line segments.  The size of the points is automatically reduced according to the number of points of points plotted, and the \code{cex} option can override the computed default.  If the area below the plotted values is specified to be filled in with color, then the default line type changes to \code{type="l"}.
+
+A scatterplot of Likert type data is problematic because there are so few possiblities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 25 possible paired values to plot, so most of the plotted points overlap with others.  In this situation, that is, when there are less than 10 values for each of the two variables, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values.  A sunflower plot can be requested in lieu of the bubble plot.
 
 The default background color of \code{col.bg=ghostwhite} provides a very mild cool tone with a slight emphasis on blue. To provide a warmer tone by slightly enhancing red, try \code{col.bg=snow}. Obtain a very light gray with \code{col.bg=gray99}.  To darken the background gray, try \code{col.bg=gray97} or lower numbers. See the \code{\link{color.show}} function in this package the provides an example of all available named colors.
 
@@ -92,8 +122,10 @@ Commonly used graphical parameters in standard R graphics functions are generall
 # scatter plot
 x <- rnorm(25)
 y <- rnorm(25)
-# default scatterplot, x is not sorted so type set to "p"
+# default scatterplot, x is not sorted so type is set to "p"
 color.plot(x, y)
+# scatterplot, with lowess line added
+color.plot(x, y, fit.line="lowess")
 # custom scatter plot
 color.plot(x, y, col.point="darkred", col.fill="plum")
 
@@ -122,7 +154,15 @@ color.plot(y)
 color.plot(y, col.area="transparent")
 # time series chart, i.e., with dates, and filled area
 # with option label for the x-axis
-color.plot(y, x.start="2005/09/01", x.by="month")
+color.plot(y, time.start="2005/09/01", time.by="month")
+
+# plot Likert data, 1 to 7 scale, and get bubble plot
+# size of each plotted point depends on the frequency
+x1 <- sample(1:7, size=1000, replace=TRUE)
+x2 <- sample(1:7, size=1000, replace=TRUE)
+color.plot(x1,x2)
+# plot Likert data and get sunflower plot with lowess line
+color.plot(x1,x2, kind="sunflower.freq", fit.line="lowess")
 
 # modern art
 n <- sample(2:30, size=1)
