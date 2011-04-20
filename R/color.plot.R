@@ -3,7 +3,7 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            col.point="darkblue", col.fill=NULL, col.grid="grey90", 
            col.bg="ghostwhite", col.box="black", xy.ticks=TRUE, 
            xlab=NULL, ylab=NULL, pch=NULL, cex=NULL, center.line=NULL,
-           kind=c("regular", "bubble.freq", "sunflower.freq"),
+           kind=c("default", "regular", "bubble.freq", "sunflower.freq"),
            x.start=NULL, x.end=NULL, size=.25, 
            fit.line=c("none", "lowess", "ls"), col.fit.line="grey55", 
            col.bubble="lightsteelblue", col.flower="steelblue",
@@ -65,6 +65,12 @@ if (!is.null(y)) {
   if (!is.null(time.by)) cat("Warning: Option 'time.by'", txt)
   if ((time.reverse)) cat("Warning: Option 'time.reverse'", txt)
 }
+
+if (!is.null(time.start) && is.null(time.by)) {
+   cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specified  time.start  so also need  time.by.\n\n")
+  
+}
     
 #  pch=21 is a filled circle
 if (is.null(pch)) point.type <- 21 else point.type <- pch
@@ -120,19 +126,24 @@ else {
   if (is.null(col.fill)) col.fill <- "transparent"
   if (is.null(col.area)) col.area <- "transparent"
   
-  if (is.null(type)) {  # when x values are sorted with equal intervals, plot a function
-    if ( sum(diff(diff(x))) == 0 ) equal.int <- TRUE else equal.int <- FALSE
-    if (!is.unsorted(x) && equal.int) type <- "l" else type <- "p"
+  if (!is.factor(x)) {
+    if (is.null(type)) {  # if x is sorted with equal intervals, plot a line chart
+      if ( sum(diff(diff(x))) == 0 ) equal.int <- TRUE else equal.int <- FALSE
+      if (!is.unsorted(x) && equal.int) type <- "l" else type <- "p"
+    }
+  if (kind == "default")  # set default
+    if ( length(unique(x))<10 && length(unique(y))<10 ) kind <- "bubble.freq"
+    else kind <- "regular"
+  }
+  else {  # x is a factor
+    type <- "p"
+    kind <- "xcat"
   }
 
-  if (kind == "regular")
-    if ( length(unique(x))<10 && length(unique(y))<10 ) kind <- "bubble.freq"
-
-  if (kind != "regular") {  # x.start and x.min are for Likert style bubble plot
-    if (is.null(x.start)) x.start=min(x)
+  if ((kind == "bubble.freq") || (kind == "sunflower.freq")) {  
+    if (is.null(x.start)) x.start=min(x)  # x.start and x.min for Likert bubble plot
     if (is.null(x.end)) x.end=max(x)
   }
-
 
   if (xy.ticks) {  # assign axes labels with variable names as default
     if (is.null(xlab)) x.lbl <- deparse(substitute(x)) else x.lbl <- xlab
@@ -150,13 +161,19 @@ digits.d <- max.dd(y) + 1
 # -------------------------
 # Plot
 # -------------------------
-if (kind == "regular") { # plot setup
+# plot setup
+if (kind == "regular") { 
   plot(x, y, type="n", axes=FALSE, xlab=x.lbl, ylab=y.lbl, ...)
   if (xy.ticks){
     if (is.null(time.start)) axis(1, ...)
       else axis.Date(1, at=seq(min(date.seq), max(date.seq), length.out=20), ...)
     axis(2, ...) 
   }
+}
+else if (kind == "xcat") {
+  plot.default(y ~ x, xlim=c(.5,nlevels(x)+.5), type="n", axes=FALSE, xlab=x.lbl, ylab=y.lbl)
+  axis(2)
+  axis(1,labels=levels(x), at=1:nlevels(x))
 }
 else { # bubble or sunflower plot, requires integer values of x and y
   mytbl <- table(x, y)  # get the counts
@@ -198,18 +215,25 @@ if (type != "p") col.border <- col.line else col.border <- "transparent"
     polygon(c(x[1],x,x[length(x)]), c(min(y),y,min(y)), col=col.area, 
       border=col.border)
 
+# the plot
 if (kind == "regular") {  # plot lines and/or points
-  if (type == "l"| type == "b") {
+  if (type == "l" | type == "b") {
     lines(as.numeric(x),y, col=col.line, ...)
   }
   if (type == "p" | type == "b") {
     points(x,y, col=col.point, pch=point.type, bg=col.fill, cex=pt.size, ...)
   }
 }
+else if (kind == "xcat") {
+  for (i in (1:nlevels(x))) {
+    points(rep(i,length(y[x==levels(x)[i]])), y[x==levels(x)[i]], col="darkblue")
+    points(i, mean(y[x==levels(x)[i]]), pch=23, bg="steelblue")
+  }
+}
 else if (kind == "bubble.freq") {
   symbols(cords$xx, cords$yy, circles=cords$count, bg=col.bubble, inches=size, add=TRUE, ...)
   zeros <- cords[cords$count==0, ] # 0 plots to a single pixel, so remove
- # points(zeros$xx, zeros$yy, col=col.bg, bg=col.bg, pch=21, cex=.5)
+  points(zeros$xx, zeros$yy, col=col.bg, bg=col.bg, pch=21, cex=.5)
 }
 else if (kind == "sunflower.freq") {
   sunflowerplot(cords$xx, cords$yy, number=cords$count, 
@@ -280,7 +304,7 @@ if (!is.null(center.line) && center.line != "off") {
 # -------------------------
 # correlation analysis
 # -------------------------
-if (!is.null(y)  &&  type == "p") {
+if (!is.null(y)  &&  !is.factor(x)  &&  type == "p") {
   ct <- cor.test(x,y) 
   cat("\n")
   dashes(55)

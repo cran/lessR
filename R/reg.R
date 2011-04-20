@@ -98,9 +98,12 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     }
   }
 
+
+    cat( "\n\n\n", "  RELATION AMONG VARIABLES", "\n")
+
   # correlations
   if (cor) {
-    cat( "\n\n\n", "  CORRELATIONS", "\n")
+    cat( "\nCorrelations\n")
   
     if (numeric.all) {
       if (show.R) {
@@ -117,7 +120,7 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   
   # collinearity    
   if (collinear && n.vars>2) {
-    cat( "\n\n\n", "  COLLINEARITY OF PREDICTOR VARIABLES", "\n\n")
+    cat( "\n\n", "  Collinearity", "\n\n")
     if (numeric.all) {
       check.car <- suppressWarnings(require(car, quietly=TRUE))
       if (check.car) {
@@ -134,6 +137,32 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
      }
      else cat("\n>>> No collinearity analysis reported because not all variables are numeric.\n")
    }
+
+  # all possible subsets of predictor variables    
+  if (subsets && n.vars>2) {
+    cat( "\n\n", "  Predictor Variable Subsets", "\n\n")
+    cat("Warning: This analysis only describes the data, so does not literally\n")
+    cat("         generalize to the population. Only use as a descriptive heuristic.\n\n")
+    cat("A 1 means the predictor variable is in the model, a 0 means it is out.\n\n")
+    if (numeric.all) {
+      check.leaps <- suppressWarnings(require(leaps, quietly=TRUE))
+      if (check.leaps) {
+        X <- data.frame(lm.out$model[nm[seq(2,n.vars)]])
+        Y <- numeric(length=n.obs)  # convert response to an atomic vector for leaps
+        for (i in 1:n.obs) Y[i] <- lm.out$model[nm[1]][i,1]
+        leaps.out <- leaps(X, Y, method="adjr2")
+        models <- data.frame(cbind(leaps.out$which,leaps.out$adjr2), row.names=NULL)
+        names(models) <- c(names(X),"R2adj")
+        print(models[order(models$R2adj, decreasing=TRUE),], digits=3)
+      }
+      else {
+        cat("\n>>> Obtaining the subsets of predictor variables requires package leaps.", "\n")
+        cat(">>> This analysis is not provided here, but all other output is unaffected.", "\n")
+        cat(">>> To get the leaps package, run one time only: install.packages('leaps')", "\n")
+      }
+    }
+    else cat("\n>>> No subset analysis reported because not all variables are numeric.\n")
+  }
 
 
   # residual analysis
@@ -251,32 +280,6 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     if (numeric.all) pairs(dframe[c(nm)])
      else cat("\n>>> No scatterplot matrix created because not all variables are numeric.\n")
   
-
-  # all possible subsets of predictor variables    
-  if (subsets && n.vars>2) {
-    cat( "\n\n\n", "  ALL SUBSETS OF PREDICTOR VARIABLES", "\n\n")
-    cat("Warning: This analysis only describes these data, so does not literally\n")
-    cat("         generalize to the population. Only use as a descriptive heuristic.\n\n")
-    cat("A 1 means the predictor variable is in the model, a 0 means it is out.\n\n")
-    if (numeric.all) {
-      check.leaps <- suppressWarnings(require(leaps, quietly=TRUE))
-      if (check.leaps) {
-        X <- data.frame(lm.out$model[nm[seq(2,n.vars)]])
-        Y <- numeric(length=n.obs)  # convert response to an atomic vector for leaps
-        for (i in 1:n.obs) Y[i] <- lm.out$model[nm[1]][i,1]
-        leaps.out <- leaps(X, Y, method="adjr2")
-        models <- data.frame(cbind(leaps.out$which,leaps.out$adjr2), row.names=NULL)
-        names(models) <- c(names(X),"R2adj")
-        print(models[order(models$R2adj, decreasing=TRUE),], digits=3)
-      }
-      else {
-        cat("\n>>> Obtaining the subsets of predictor variables requires package leaps.", "\n")
-        cat(">>> This analysis is not provided here, but all other output is unaffected.", "\n")
-        cat(">>> To get the leaps package, run one time only: install.packages('leaps')", "\n")
-      }
-    }
-    else cat("\n>>> No subset analysis reported because not all variables are numeric.\n")
-  }
   
   cat("\n")
 

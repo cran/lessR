@@ -63,7 +63,7 @@ color.barchart(x=NULL, \ldots)
         of the factor in the resulting ordered progression of colors.}
   \item{horiz}{By default bars are vertical, but can set this option to TRUE.}
   \item{addtop}{In the same scale as the vertical axis, puts more space between the bars 
-        and the top of the plot area, usually to accomodate the legend when plotting two 
+        and the top of the plot area, usually to accommodate the legend when plotting two 
         variables.}
   \item{chisq}{Provide a chi-square analysis. Default is \code{FALSE}.}
   \item{\dots}{Other parameter values for graphics as defined 
