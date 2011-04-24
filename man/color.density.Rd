@@ -83,7 +83,7 @@ color.density(y, col.fill.nrm="darkgreen", col.fill.gen="plum")
 #  use the standard bw option for the density function
 color.density(y, type="general", bw=.6)
 
-# disply only the general estimated density and a corresponding
+# display only the general estimated density and a corresponding
 #  interval of unit width around x.pt
 color.density(y, type="general", x.pt=2)
 }

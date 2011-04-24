@@ -39,7 +39,7 @@ Unlike the standard R boxplot function, \code{\link{boxplot}}, the default here 
 
 Other graphic parameters are available to format the display, such as \code{main} for the title, and other parameters found in \code{\link{boxplot}} and \code{\link{par}}.
 
-To minimize white space around the boxplot, may wish to resize the graphics window before or after creating the boxplot.
+To minimize white space around the boxplot, may wish to re-size the graphics window before or after creating the boxplot.
 }
 
 \author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}

@@ -1,14 +1,14 @@
 \name{color.plot}
 \alias{color.plot}
 
-\title{Scatter-Plot, Function Plot, or Run Chart with Optional Dates in Color}
+\title{Color Scatter-Plot, Function Plot, or Run Chart with Optional Dates}
 
 \description{
-Plots individual points, such as for a scatterplot, or plots connected line segments for the plot of a function or a run chart, including an option for adding dates to the horizontal axis for a time series chart. One enhancement over the usual \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, gridlines, and border can each be explicitly specified, with default colors provided.  For Likert style response data, so that each value has less than 10 unique integer values, the points in the plot are transformed into a bubble plot with the size of each bubble, i.e., point, determined by the corresponding joint frequency.
+Plots individual points, such as for a scatterplot, or plots connected line segments for the plot of a function or a run chart, including an option for adding dates to the horizontal axis for a time series chart. One enhancement over the usual \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, gridlines, and border can each be explicitly specified, with default colors provided.  For Likert style response data, so that each value has less than 10 unique integer values, the points in the plot are transformed into a bubble plot with the size of each bubble, i.e., point, determined by the corresponding joint frequency.  The x-variable, the variable plotted on the horizontal axis, can be numerical or a factor.
 
 For data exhibiting little trend, the the center line is provided for the generation of a run chart, plotting the values of a variable in order of occurrence over time.  When the center line, the median by default, is plotted, the analyses of the number and composition of the individual runs, number of consecutive values above or below the center line, is also displayed.  Also, the defaults change for each of the types of plots.  The intent is to rely on the default values for a relatively sophisticated plot, particularly when compared to the default values of the standard R \code{\link{plot}} function.
 
-If a scatterplot is displayed, then the corresponding correlation coefficient as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function R \code{\link{cor.test}} function are generated, though in a more readable format.
+If a scatterplot of two numeric variables is displayed, then the corresponding correlation coefficient as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function R \code{\link{cor.test}} function are generated, though in a more readable format.
 }
 
 \usage{
@@ -16,7 +16,7 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            col.point="darkblue", col.fill=NULL, col.grid="grey90", 
            col.bg="ghostwhite", col.box="black", xy.ticks=TRUE, 
            xlab=NULL, ylab=NULL, pch=NULL, cex=NULL, center.line=NULL,
-           kind=c("regular", "bubble.freq", "sunflower.freq"),
+           kind=c("default", "regular", "bubble.freq", "sunflower.freq"),
            x.start=NULL, x.end=NULL, size=.25, 
            fit.line=c("none", "lowess", "ls"), col.fit.line="grey55", 
            col.bubble="lightsteelblue", col.flower="steelblue",
@@ -56,8 +56,9 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
   \item{center.line}{Plots a dashed line through the middle of a run chart.  The two
       possible values are \code{"mean"} and \code{"median"}.  Provides a centerline for the
      \code{"median"} by default when the values randomly vary about the mean.}
-  \item{kind}{Default is \code{"regular"}.  If Likert style response data is plotted, that is, 
-      each variable has less than 10 integer values, then by default a bubble plot is plotted
+  \item{kind}{Default is \code{"default"}, which becomes a \code{"regular"} scatterplot for 
+      most data.  If Likert style response data is plotted, that is, 
+      each variable has less than 10 integer values, then instead by default a bubble plot is plotted
       with the corresponding joint frequency determining the size of the bubble.  A sunflower
       plot can also be requested.}
   \item{x.start}{For Likert style response data, the starting integer value of each axis. Useful
@@ -94,7 +95,7 @@ When two variables are specified to plot, if the values of the first variable, \
 
 Specifying one variable leads to a run chart, with the values on the horizontal axis automatically generated.  The default is the Index variable, the ordinal position of each data value.  Or, dates on the horizontal axis can be specified from the specified starting date given by \code{x.start} and the accompanying increment as given by \code{x.by}.  If the data values randomly vary about the mean, the default is to plot the mean as the center line of the graph, otherwise the default is to ignore the center line.  The default plot type for the run chart is \code{type="b"}, for both points and the corresponding connected line segments.  The size of the points is automatically reduced according to the number of points of points plotted, and the \code{cex} option can override the computed default.  If the area below the plotted values is specified to be filled in with color, then the default line type changes to \code{type="l"}.
 
-A scatterplot of Likert type data is problematic because there are so few possiblities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 25 possible paired values to plot, so most of the plotted points overlap with others.  In this situation, that is, when there are less than 10 values for each of the two variables, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values.  A sunflower plot can be requested in lieu of the bubble plot.
+A scatterplot of Likert type data is problematic because there are so few possibilities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 25 possible paired values to plot, so most of the plotted points overlap with others.  In this situation, that is, when there are less than 10 values for each of the two variables, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values.  A sunflower plot can be requested in lieu of the bubble plot.
 
 The default background color of \code{col.bg=ghostwhite} provides a very mild cool tone with a slight emphasis on blue. To provide a warmer tone by slightly enhancing red, try \code{col.bg=snow}. Obtain a very light gray with \code{col.bg=gray99}.  To darken the background gray, try \code{col.bg=gray97} or lower numbers. See the \code{\link{color.show}} function in this package the provides an example of all available named colors.
 
@@ -129,14 +130,31 @@ color.plot(x, y, fit.line="lowess")
 # custom scatter plot
 color.plot(x, y, col.point="darkred", col.fill="plum")
 
-# function curve
+# scatterplot of Likert data, 1 to 7 scale, and get bubble plot
+# size of each plotted point (bubble) depends on its joint frequency
+# triggered by default when  < 10 unique values for each variable
+x1 <- sample(1:7, size=100, replace=TRUE)
+x2 <- sample(1:7, size=100, replace=TRUE)
+color.plot(x1,x2)
+# compare to usual scatterplot of Likert data
+color.plot(x1,x2, kind="regular")
+# plot Likert data and get sunflower plot with lowess line
+color.plot(x1,x2, kind="sunflower.freq", fit.line="lowess")
+
+# scatterplot of continuous Y against categorical X, a factor
+Pain <- sample(c("None", "Some", "Much", "Massive"), size=25, replace=TRUE)
+Pain <- factor(Pain, levels=c("None", "Some", "Much", "Massive"), ordered=TRUE)
+Cost <- round(rnorm(25,1000,100),2)
+color.plot(Pain, Cost)
+
+# function curve, i.e., line chart
 x <- seq(10,500,by=1) 
 y <- 18/sqrt(x)
-# default function plot,  x is sorted so type set to "l"
+# x is sorted with equal intervals so type set to "l" for line
 color.plot(x, y)
 # custom function plot
-color.plot(x, y, ylab="My Y", , xlab="My X", col.line="blue", 
-  col.bg="snow", col.area="slategray2", col.grid="lightsalmon")
+color.plot(x, y, ylab="My Y", xlab="My X", col.line="blue", 
+  col.bg="snow", col.area="lightsteelblue", col.grid="lightsalmon")
   
 # generate data randomly varying about a constant mean
 y <- rnorm(25)
@@ -148,21 +166,13 @@ color.plot(y, lwd=2, col.point="sienna3", pch=24,
   
 # generate steadily increasing values
 y <- sort(rexp(50))
-# default run chart
+# default line chart
 color.plot(y)
-# run chart with border around plotted values
+# line chart with border around plotted values
 color.plot(y, col.area="transparent")
 # time series chart, i.e., with dates, and filled area
 # with option label for the x-axis
 color.plot(y, time.start="2005/09/01", time.by="month")
-
-# plot Likert data, 1 to 7 scale, and get bubble plot
-# size of each plotted point depends on the frequency
-x1 <- sample(1:7, size=1000, replace=TRUE)
-x2 <- sample(1:7, size=1000, replace=TRUE)
-color.plot(x1,x2)
-# plot Likert data and get sunflower plot with lowess line
-color.plot(x1,x2, kind="sunflower.freq", fit.line="lowess")
 
 # modern art
 n <- sample(2:30, size=1)
@@ -173,7 +183,7 @@ color1 <- clr[sample(1:length(clr), size=1)]
 color2 <- clr[sample(1:length(clr), size=1)]
 color.plot(x, y, type="l", lty="dashed", lwd=3, col.area=color1, 
    col.line=color2, xy.ticks=FALSE, main="Modern Art", 
-   cex.main=2, col.main="lightsteelblue")
+   cex.main=2, col.main="lightsteelblue", kind="regular")
 }
 
 
