@@ -4,9 +4,9 @@
 \title{Compute a Power Curve with Colors}
 
 \description{
-From one or two sample sizes, and either the within-cell (pooled) standard deviation, or two separate group standard deviations, generate and  calibrate a power curve for either the independent-groups t-test or one-sample t-test, as well as ancillary statistics.  Uses the standard R function \code{power.t.test} to calculate power and then the \code{\link{color.plot}} function in this package to automatically display the power curve with colors.
+From one or two sample sizes, and either the within-cell (pooled) standard deviation, or one or two separate group standard deviations, generate and calibrate a power curve for either the one-sample t-test or the independent-groups t-test, as well as ancillary statistics.  Uses the standard R function \code{power.t.test} to calculate power and then the \code{\link{color.plot}} function in this package to automatically display the annotated power curve with colors.
 
-For both the one and two-group t-tests, power is calculated from a single sample size and single standard deviation. For the two-sample test,  the within-group standard deviation is automatically calculated from the two separate group standard deviations if not provided directly. Similarly, the harmonic mean of two separate sample sizes is calculated if two separate sample sizes are provided.
+For both the one and two-group t-tests, power is calculated from a single sample size and single standard deviation. For the two-sample test, the within-group standard deviation is automatically calculated from the two separate group standard deviations if not provided directly. Similarly, the harmonic mean of two separate sample sizes is calculated if two separate sample sizes are provided.
 }
 
 \usage{

@@ -2,6 +2,8 @@ powercurve.t.test <-
 function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL, 
          mmd=NULL, msmd=NULL, mdp=.8, mu0=NULL, ...) {
       
+  dashes <- function(ndash) { for (i in 1:(ndash)) cat("-"); cat("\n") }
+
   cat("\n")
   
   # for all null arguments, pick up values from previous smd.t.test
@@ -153,7 +155,7 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
   if (mytype == "one.sample") mytitle <- "\nDifference of mu from mu0 "
   cat(mytitle, "to achieve power of ", mdp, ": Diff = ", del.diff.out, sep="", "\n\n")
   rm(pp)
-  cat("------------------------------------------------------------\n")
+  dashes(70)
   }
   
   # for when the minimum meaningful difference, mmd, is provided
@@ -161,9 +163,9 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
     if (mytype == "two.sample") mytitle <- "the two means"
     if (mytype == "one.sample") mytitle <- "mu and mu0"
     cat("Minimum meaningful difference of ", mytitle, ": mmd\n", sep="")
-    cat("------------------------------------------------------------\n")
+    dashes(70)
     
-    if (!is.null(msmd))
+    if (mytype == "two.sample" && !is.null(msmd))
       cat("Provided standardized value is msmd = ", msmd, "\n")
   
     colmmd <- rgb(112,128,144,40, max=255)  # slategray base
@@ -185,34 +187,40 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
     text(d.lo, 1.08, labels="Meaningful    ", col=coltrv, cex=.85, adj=1)
     
     p.out <- round(pp$power,3)
-    mytitle <- "Given n1, n2 and sw, power for mmd of "
+    txt <- ", for mmd of "
+    if (mytype == "two.sample") 
+      mytitle <- paste("Given n = ", n, " and sw = ", signif(s), txt, sep="")
+    if (mytype == "one.sample")
+      mytitle <- paste("Given n = ", n, " and s = ", s, txt, sep="")
     cat(mytitle, mmd, ": Power = ", p.out, sep="", "\n")
     if (mdp != 0) {
       del.hi.out <- round(del.hi,3)
       if (del.hi > mmd+H0) {
-        cat("------------------------------------------------------------\n")
+        dashes(70)
         mytitle <- "Warning: Meaningful differences, from "
         cat(mytitle, d.hi, " to ", del.hi.out, ", have Power < ", mdp, "\n", sep="")
       }
       else {
-        cat("------------------------------------------------------------\n")
+        dashes(70)
         mytitle <- "Warning: Trivial differences, from "
         cat(mytitle, del.hi.out, " to ", mmd+H0, ", have Power > ", mdp, ".\n", sep="")
         cat("Note: All meaningful differences have Power > ", mdp, "\n", sep="")
       }
-      cat("------------------------------------------------------------\n")
+      dashes(70)
       rm(pp)
     
       # n needed to achieve a power of mdp=0.8 for mmd
       pp <- power.t.test(sd=s, delta=mmd, power=mdp, type=mytype)
       n.out <- ceiling(pp$n)
-      mytitle <- "Given sw, needed n to achieve power= "
+      txt <- ", needed n to achieve power= "
+      if (mytype == "two.sample") mytitle <- paste("Given sw = ", signif(s), txt, sep="")
+      if (mytype == "one.sample") mytitle <- paste("Given s = ", s, txt, sep="")
       cat(mytitle, mdp, " for mmd of ", mmd, ": n = ", n.out, sep="", "\n")
       if (mytype == "two.sample") cat("Sample size n applies to *each* group", "\n")
       rm(pp)
     }
     
-    cat("------------------------------------------------------------\n")
+    dashes(70)
     cat("\n")
     
   }

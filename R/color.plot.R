@@ -98,7 +98,7 @@ if (is.null(cex)) pt.size <- 1 else pt.size <- cex
     date.seq <- seq(as.Date(time.start), by=time.by, length.out=nrows)
     x <- date.seq  # dates on x-axis
   }
-  
+
   if (is.null(center.line)) {  # by default display center.line only if many runs
     m <- mean(y)
     n.change <- 0
@@ -226,6 +226,7 @@ if (kind == "regular") {  # plot lines and/or points
 }
 else if (kind == "xcat") {
   for (i in (1:nlevels(x))) {
+    abline(h=mean(y[x==levels(x)[i]]), col="gray80")
     points(rep(i,length(y[x==levels(x)[i]])), y[x==levels(x)[i]], col="darkblue")
     points(i, mean(y[x==levels(x)[i]]), pch=23, bg="steelblue")
   }
