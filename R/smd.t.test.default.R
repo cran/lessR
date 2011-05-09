@@ -160,7 +160,7 @@ function(YA, YB) {
   cat(clpct," Confidence Interval for Mean Difference:  ", lb, " to ", ub, 
       sep="", "\n\n")
 
-  # smd confidence interval  
+  # smd confidence interval
   check.MBESS <- suppressWarnings(require(MBESS, quietly=TRUE))
   if (check.MBESS) {
     cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf.level=conf.level)
@@ -172,7 +172,7 @@ function(YA, YB) {
     cat(">>> The confidence interval for smd requires package MBESS.", "\n")
     cat(">>> Confidence interval for smd not provided here, but all other output unaffected.", "\n")
     cat(">>> To get the MBESS package, run one time only: install.packages('MBESS')", "\n")
-    cat(">>> IGNORE resulting 'Error in eval' error message below.", "\n")
+    cat(">>> If present, IGNORE resulting 'Error in eval' error message below.", "\n")
     deltaL <- NULL
     deltaU <- NULL
   }
@@ -321,10 +321,12 @@ function(YA, YB) {
   mtext(paste("Compare",Ynm,"for",Xnm,X1nm,"and",X2nm), side=3, line=5.6, font=3)
   mtext(bquote(paste("    Classic t-test of 0 mean diff:   t = ", .(tvalue), 
     ",  df = ", .(df), ",   p-value = ", .(pvalue))), side=3, line=4.4, cex=1.08, adj=0)
-  mtext(bquote(paste("    ",.(clpct), " Confidence Interval for Mean Difference: ",
+  mtext(bquote(paste("    ",.(clpct), " Confidence Interval for Mean Difference:  ",
     .(lb), " to ", .(ub))), side=3, line=3.3, cex=1.08, adj=0)
-  mtext(bquote(paste("    ",.(clpct), " Confidence Interval for Stnd Mean Diff:   ", 
-    .(deltaL), " to ", .(deltaU))), side=3, line=2.1, cex=1.08, adj=0)
+  if (check.MBESS) {
+    mtext(bquote(paste("    ",.(clpct), " Confidence Interval for Stnd Mean Diff:   ", 
+      .(deltaL), " to ", .(deltaU))), side=3, line=2.1, cex=1.08, adj=0)
+  }
   mtext(bquote(paste("s-within")), side=3, line=.9, at=(mlow+(last.coord.x))/2, col="gray40")
   mtext(bquote(paste(.(round(sw,2)))), side=3, line=.2, at=(mlow+(last.coord.x))/2, col="gray40")
 
