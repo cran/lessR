@@ -12,7 +12,7 @@ color.density(x, col.nrm="darkblue", col.gen="blue", col.bg="ghostwhite",
          col.grid="grey90", col.hist="grey86",
          col.fill.nrm=rgb(80,150,200, alpha=70, max=255), 
          col.fill.gen=rgb(250,210,230, alpha=70, max=255),
-         bin.start=NULL, bin.width=NULL,
+         bin.start=NULL, bin.width=NULL, text.out=TRUE,
          type=c("both", "general", "normal"), x.pt=NULL,
          xlab=NULL, main=NULL, \ldots)
 }
@@ -32,6 +32,7 @@ color.density(x, col.nrm="darkblue", col.gen="blue", col.bg="ghostwhite",
   \item{bin.start}{Optional specified starting value of the bins.}
   \item{bin.width}{Optional specified bin width, which can be specified with or without 
         a \code{bin.start} value.}
+  \item{text.out}{If TRUE, then display text output in console.}
   \item{type}{Type of density curve plotted.  By default, both the general
        density and the normal density are plotted.}
   \item{x.pt}{Value of the point on the x-axis for which to draw a unit interval

@@ -17,7 +17,7 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            col.bg="ghostwhite", col.box="black", xy.ticks=TRUE, 
            xlab=NULL, ylab=NULL, pch=NULL, cex=NULL, center.line=NULL,
            kind=c("default", "regular", "bubble.freq", "sunflower.freq"),
-           x.start=NULL, x.end=NULL, size=.25, 
+           x.start=NULL, x.end=NULL, size=.25, text.out=TRUE,
            fit.line=c("none", "lowess", "ls"), col.fit.line="grey55", 
            col.bubble="lightsteelblue", col.flower="steelblue",
            time.start=NULL, time.by=NULL, time.reverse=FALSE, \ldots)
@@ -66,6 +66,7 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
   \item{x.end}{For Likert style response data, the ending integer value of each axis. Useful
       if the actual data do not include all possible values.}
   \item{size}{Size of the bubbles in a bubble plot of Likert style data.}
+  \item{text.out}{If TRUE, then display text output in console.}
   \item{fit.line}{The best fitting line.  Default value is \code{"none"}, with options for 
       \code{"lowess"} and \code{"ls"}.}
   \item{col.fit.line}{Color of the best fitting line, if the \code{fit.line} option is invoked.}
