@@ -1,8 +1,9 @@
 reg <-
-function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
+function(my.formula, dframe=mydata, cor=TRUE,
          res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
          pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
-         subsets=TRUE, collinear=TRUE, sig.digits=4, show.R=FALSE) {
+         subsets=TRUE, collinear=TRUE, sig.digits=4, cook.cut=1,
+         show.R=FALSE) {
          
   mydframe <- deparse(substitute(dframe))  # get dataframe name for cor before sort
   
@@ -22,14 +23,21 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   if (is.null(res.rows)) if (n.obs < 25) res.rows <- n.obs else res.rows <- 25 
   if (res.rows == "all") res.rows <- n.obs  # turn off resids with res.rows=0 call
   
-  if (n.vars > 2) graph <- FALSE
-  
-  if (graph == TRUE) {
+  if (n.vars == 2) { # order values of the one predictor variable for scatterplot
     o <- order(dframe[,nm[2]], decreasing=FALSE)
     dframe <- dframe[o,]
   }
+
+  in.data.frame <- TRUE
+  for (i in 1:n.vars) {
+    if (!(nm[i] %in% names(dframe))) {
+        cat("\n\n\n>>>> Note: ", nm[i], "is not in the data frame.\n")
+        in.data.frame <- FALSE
+      }
+  }
   
-  
+  graphics.off()  # start graphics with clean start
+
   # reg analysis, all analysis done on data in model construct lm.out$model
   #   this model construct contains only model vars, with Y listed first
   lm.out <<- lm(my.formula, data=dframe)
@@ -89,23 +97,25 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
   print(anova(lm.out))
     
   
-  # check for all numeric vars
+  # check for all numeric vars  in.data.frame <- TRUE
   numeric.all <- TRUE
   for (i in 1:n.vars) {
-    if (!is.numeric(dframe[1,which(names(mydata) == nm[i])])) {
-      cat("\n\n\n>>>> Note: ", nm[i], "is not a numeric variable.\n")
-      numeric.all <- FALSE
+      if (in.data.frame && !is.numeric(dframe[1,which(names(dframe) == nm[i])])) {
+        cat("\n\n\n>>>> Note: ", nm[i], "is not a numeric variable.\n")
+        numeric.all <- FALSE
+      }
     }
-  }
 
 
-    cat( "\n\n\n", "  RELATION AMONG VARIABLES", "\n")
+
+
+  cat( "\n\n\n", "  RELATION AMONG VARIABLES", "\n")
 
   # correlations
   if (cor) {
     cat( "\nCorrelations\n")
   
-    if (numeric.all) {
+    if (numeric.all && in.data.frame) {
       if (show.R) {
         cv <- paste("\"",nm[1],"\"", sep="")
         for (i in 2:n.vars) cv <- paste(cv, ",\"", nm[i], "\"", sep="")
@@ -114,25 +124,29 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
       else cat("\n") 
       print(cor(dframe[c(nm)]), digits=2)
     }
-    else cat("\n>>> No correlations reported because not all variables are numeric.\n")
+    else {
+      cat("\n>>> No correlations reported because not all variables are ")
+      if (!in.data.frame) cat("in the data frame.\n")
+      if (!numeric.all) cat("numeric.\n")
+    }
   }
   
-  
+
   # collinearity    
   if (collinear && n.vars>2) {
     cat( "\n\n", "  Collinearity", "\n\n")
     if (numeric.all) {
       check.car <- suppressWarnings(require(car, quietly=TRUE))
       if (check.car) {
-        cat("Tolerances\n\n")
+        cat("Tolerances, which generally should be > approximately 0.20 or so\n\n")
         print(1/(vif(lm.out)), digits=3)
-        cat("\n\nVariance Inflation Factors\n\n")
+        cat("\n\nVariance Inflation Factors, which generally should be < approximately 5 or so\n\n")
         print(vif(lm.out), digits=4)
       }
       else {
         cat("\n>>> Obtaining the collinearity analysis requires package car.", "\n")
         cat(">>> This analysis is not provided here, but all other output is unaffected.", "\n")
-        cat(">>> To get the car package, run one time only: install.packages('car')", "\n")
+        cat(">>> To obtain the car package, run one time only: install.packages('car')", "\n")
       }
      }
      else cat("\n>>> No collinearity analysis reported because not all variables are numeric.\n")
@@ -163,6 +177,8 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     }
     else cat("\n>>> No subset analysis reported because not all variables are numeric.\n")
   }
+
+
 
 
   # residual analysis
@@ -204,9 +220,35 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     rm(out)
   }
   
+  # plot of residuals, residuals vs fitted
+  res <- residuals(lm.out)
+  color.density(res, main="Evaluate Normality of Residuals", xlab="Residuals", text.out=FALSE)
+
+  fit <- fitted(lm.out)
+  cook <- cooks.distance(lm.out)
+  max.cook <- max(cook)
+  if (max.cook < cook.cut) {
+    cook.cut <- floor(max.cook*100)/100
+    txt <- paste("The point with the largest Cook's Distance, ", round(max.cook,2), 
+      ", is displayed in red", sep="")
+  }
+  else
+    txt <- paste("Points with Cook's Distance >", cook.cut, "are displayed in red")
+  dev.new()
+  color.plot(fit, res, fit.line="lowess", text.out=FALSE,
+    main="Plot of Residuals vs Fitted Values", xlab="Fitted Values", ylab="Residuals", sub=txt)
+  abline(h=0, lty="dotted", col="gray70")
+  res.c <- res[which(cook>=cook.cut)]
+  fit.c <- fit[which(cook>=cook.cut)]
+  if (length(fit.c) > 0) {
+    points(fit.c, res.c, col="red")
+    text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
+  }
+
+  rm(fit, res, cook, res.c, fit.c)
 
   # prediction intervals
-  if (pred) {
+   if (pred) {
       
     cat( "\n\n\n", "  FORECASTING ERROR", "\n")
 
@@ -253,7 +295,7 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     cat("      refer to _future_ responses based on the collection of new data.\n")
   }
   
-  
+  dev.new() 
   # scatterplot, if one predictor variable
   if (n.vars == 2) {
     if (pred == FALSE) {
@@ -266,10 +308,10 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
       y.min <- min(pi$lwr)
       y.max <- max(pi$upr)
     }
-    plot(lm.out$model[,nm[2]], lm.out$model[,nm[1]], pch=19, cex=.8, col="gray70", 
-      xlab=nm[2], ylab=nm[1], ylim=c(y.min,y.max), main=ctitle)
-    abline(lm.out$coef)
-    if (pred == TRUE) {
+    if (!is.factor(lm.out$model[,nm[2]])) fl <- "ls" else fl <- "none"
+    color.plot(lm.out$model[,nm[2]], lm.out$model[,nm[1]], cex=.8, fit.line=fl,
+      xlab=nm[2], ylab=nm[1], ylim=c(y.min,y.max), main=ctitle, text.out=FALSE)
+    if (pred == TRUE  && !is.factor(lm.out$model[,nm[2]])) {
       lines(lm.out$model[,nm[2]], ci$lwr, col="lightsteelblue", lwd=2)
       lines(lm.out$model[,nm[2]], ci$upr, col="lightsteelblue", lwd=2)
       lines(lm.out$model[,nm[2]], pi$lwr, col="darksalmon", lwd=2)
@@ -277,9 +319,14 @@ function(my.formula, dframe=mydata, graph=TRUE, cor=TRUE,
     }
   }
   else   # scatterplot matrix for multiple regression
-    if (numeric.all) pairs(dframe[c(nm)])
-     else cat("\n>>> No scatterplot matrix created because not all variables are numeric.\n")
-  
+    if (numeric.all && in.data.frame)
+      pairs(dframe[c(nm)])
+    else {
+      cat("\n\n>>> No scatterplot matrix reported because not all variables are ")
+      if (!in.data.frame) cat("in the data frame.\n")
+      if (!numeric.all) cat("numeric.\n")
+    }
+
   
   cat("\n")
 

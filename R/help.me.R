@@ -758,7 +758,7 @@ t3 <- "lessR"
 t4 <- "David W. Gerbing"
 t5 <- "School of Business Administration"
 t6 <- "Portland State University"
-t7 <- "Version 1.4"
+t7 <- "Version 1.8.8"
 set.up.plot()
 text(50,84, label=t1)
 text(50,80, label=t2)

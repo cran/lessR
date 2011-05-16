@@ -3,7 +3,7 @@ function(x, col.nrm="darkblue", col.gen="blue", col.bg="ghostwhite",
          col.grid="grey90", col.hist="grey86", 
          col.fill.nrm=rgb(80,150,200, alpha=70, max=255), 
          col.fill.gen=rgb(250,210,230, alpha=70, max=255),
-         bin.start=NULL, bin.width=NULL,
+         bin.start=NULL, bin.width=NULL, text.out=TRUE,
          type=c("both", "general", "normal"), x.pt=NULL,
          xlab=NULL, main=NULL, ...) {
 
@@ -36,7 +36,6 @@ function(x, col.nrm="darkblue", col.gen="blue", col.bg="ghostwhite",
     }
   }
   else breaks="Sturges"
-  cat(breaks, "\n")
 
   # histogram calculations, no plot
   h <- hist(x, plot=FALSE, breaks)
@@ -92,7 +91,8 @@ function(x, col.nrm="darkblue", col.gen="blue", col.bg="ghostwhite",
   if (type == "general" || type == "both") {
     lines(d.gen, col=col.gen)
     polygon(d.gen, col=col.fill.gen)
-    cat("\nDensity bandwidth for general curve: ", round(d.gen$bw,4), sep="", "\n")
+    if (text.out)
+      cat("\nDensity bandwidth for general curve: ", round(d.gen$bw,4), sep="", "\n")
   }
   
   # plot the optional bar about a chosen point for general curve only

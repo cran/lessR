@@ -65,7 +65,7 @@ powercurve.t.test(n=20, s=5, mmd=2)
 # power curve from both group standard deviations and sample sizes
 # also provide the minimum standardized mean difference of 
 #   practical importance to obtain corresponding power
-powercurve.t.test(n1=15, n2=25, s1=4, s2=6, msmd=.5)
+powercurve.t.test(n1=14, n2=27, s1=4, s2=6, msmd=.5)
   
 # power curve from both group standard deviations but common sample size
 # color and display options from plot and color.plot functions

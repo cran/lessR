@@ -4,7 +4,7 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            col.bg="ghostwhite", col.box="black", xy.ticks=TRUE, 
            xlab=NULL, ylab=NULL, pch=NULL, cex=NULL, center.line=NULL,
            kind=c("default", "regular", "bubble.freq", "sunflower.freq"),
-           x.start=NULL, x.end=NULL, size=.25, 
+           x.start=NULL, x.end=NULL, size=.25, text.out=TRUE,
            fit.line=c("none", "lowess", "ls"), col.fit.line="grey55", 
            col.bubble="lightsteelblue", col.flower="steelblue",
            time.start=NULL, time.by=NULL, time.reverse=FALSE, ...) {
@@ -128,11 +128,14 @@ else {
   
   if (!is.factor(x)) {
     if (is.null(type)) {  # if x is sorted with equal intervals, plot a line chart
-      if ( sum(diff(diff(x))) == 0 ) equal.int <- TRUE else equal.int <- FALSE
+      equal.int <- TRUE
+      diff.x <- diff(x)
+      for (i in 2:(length(x)-1)) if (diff.x[i-1] != diff.x[i]) equal.int=FALSE
       if (!is.unsorted(x) && equal.int) type <- "l" else type <- "p"
     }
   if (kind == "default")  # set default
-    if ( length(unique(x))<10 && length(unique(y))<10 ) kind <- "bubble.freq"
+    if ( length(x)>10 && length(y)>10 && length(unique(x))<10 && length(unique(y))<10 )
+      kind <- "bubble.freq"
     else kind <- "regular"
   }
   else {  # x is a factor
@@ -162,7 +165,7 @@ digits.d <- max.dd(y) + 1
 # Plot
 # -------------------------
 # plot setup
-if (kind == "regular") { 
+if (kind == "regular") {
   plot(x, y, type="n", axes=FALSE, xlab=x.lbl, ylab=y.lbl, ...)
   if (xy.ticks){
     if (is.null(time.start)) axis(1, ...)
@@ -195,8 +198,8 @@ else { # bubble or sunflower plot, requires integer values of x and y
   }
   cords <- data.frame(xx, yy, count)
 
-  if (kind == "bubble.freq")   # bubble plot
-    plot(x,y, type="n", xlab=x.lbl, ylab=y.lbl, xlim=c(x.lo,x.hi), ylim=c(x.lo,x.hi))
+  if (kind == "bubble.freq")   # bubble plot, convert to factor if x is numeric
+    plot(as.factor(x),y, type="n", xlab=x.lbl, ylab=y.lbl, xlim=c(x.lo,x.hi), ylim=c(x.lo,x.hi))
 }
 
 # colored plotting area
@@ -247,8 +250,11 @@ if (fit.line != "none") {  # fit line option
   if (any(ok)) 
     if (fit.line == "lowess") lines(lowess(x[ok], y[ok]), col=col.fit.line)
     if (fit.line == "ls") {
-      model <- lm(y[ok] ~ x[ok])
-      abline(model$coef, col=col.fit.line)
+      if(!is.factor(x)) {
+        model <- lm(y[ok] ~ x[ok])
+        abline(model$coef, col=col.fit.line)
+      }
+      else cat("\nLeast squares line not permitted for a factor.\n")
     }
 }
 
@@ -305,7 +311,7 @@ if (!is.null(center.line) && center.line != "off") {
 # -------------------------
 # correlation analysis
 # -------------------------
-if (!is.null(y)  &&  !is.factor(x)  &&  type == "p") {
+if (text.out && !is.null(y)  &&  !is.factor(x)  &&  type == "p") {
   ct <- cor.test(x,y) 
   cat("\n")
   dashes(55)

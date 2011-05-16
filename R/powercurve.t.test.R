@@ -189,7 +189,7 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
     p.out <- round(pp$power,3)
     txt <- ", for mmd of "
     if (mytype == "two.sample") 
-      mytitle <- paste("Given n = ", n, " and sw = ", signif(s), txt, sep="")
+      mytitle <- paste("Given n = ", round(n,3), " and sw = ", signif(s), txt, sep="")
     if (mytype == "one.sample")
       mytitle <- paste("Given n = ", n, " and s = ", s, txt, sep="")
     cat(mytitle, mmd, ": Power = ", p.out, sep="", "\n")
