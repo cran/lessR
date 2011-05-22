@@ -18,7 +18,7 @@ reg(my.formula, dframe=mydata, cor=TRUE,
          res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
          pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
          subsets=TRUE, collinear=TRUE, sig.digits=4, cook.cut=1,
-         show.R=FALSE)
+         results=c("full", "brief"), show.R=FALSE)
 }
 
 
@@ -46,6 +46,7 @@ reg(my.formula, dframe=mydata, cor=TRUE,
        function regarding the digits option. The distinction is that this value applies selectively to portions of the output, 
        the different type of residuals and the confidence and prediction intervals.}
   \item{cook.cut}{Cutoff value of Cook's Distance at which observations with a larger value are flagged in red and labeled in the resulting scatterplot of Residuals and Fitted Values.}
+  \item{results}{Verbosity of displayed results.  Default is \code{"full"}.}
   \item{show.R}{Display the R instructions that yielded the lessR output, albeit without
         the additional lessR formatting.}
 }
@@ -81,6 +82,8 @@ reg(Y ~ X1)
 # Call reg according to a multiple regression model
 # Provide the full range of default analyses
 reg(Y ~ X1 + X2)
+# Provide only the brief analysis
+reg(Y ~ X1 + X2, results="brief")
 
 # Call reg and modify the default settings as specified
 reg(Y ~ X1 + X2, res.row=8, res.sort="rstudent", sig.digits=8, pred=FALSE)
