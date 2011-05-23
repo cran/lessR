@@ -3,13 +3,22 @@ function(my.formula, dframe=mydata, cor=TRUE,
          res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
          pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
          subsets=TRUE, collinear=TRUE, sig.digits=4, cook.cut=1,
-         show.R=FALSE) {
+         results=c("full", "brief"), show.R=FALSE) {
          
   mydframe <- deparse(substitute(dframe))  # get dataframe name for cor before sort
   
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
   pred.sort <- match.arg(pred.sort)
+  results <- match.arg(results)
+
+  if (results == "brief") {
+    res.rows <- 0
+    pred <- FALSE
+    subsets <- FALSE
+    collinear <- FALSE
+    show.R <- FALSE
+   }
     
   options(show.signif.stars=FALSE, scipen=30)
       
@@ -204,7 +213,8 @@ function(my.formula, dframe=mydata, cor=TRUE,
     cat("   [res.rows = ", res.rows, " out of ", n.obs, " ", txt, sep="", "\n")
     cat(line)
     
-    out <- cbind(fitted(lm.out),resid(lm.out),rstudent(lm.out),cooks.distance(lm.out))
+    out <- cbind(fitted(lm.out),resid(lm.out),rstudent(lm.out),
+      cooks.distance(lm.out))
     out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],out)
     out <- data.frame(out)
     names(out)[n.vars+1] <- "fitted"
@@ -213,39 +223,46 @@ function(my.formula, dframe=mydata, cor=TRUE,
     names(out)[n.vars+4] <- "cooks"
     if (res.sort != "off") {
       if (res.sort == "cooks") o <- order(out$cooks, decreasing=TRUE)
-      if (res.sort == "rstudent")  o <- order(abs(rstudent(lm.out)), decreasing=TRUE)
+      if (res.sort == "rstudent") o <- order(abs(rstudent(lm.out)),
+        decreasing=TRUE)
       out <- out[o,]
     }
     print(out[1:res.rows,], digits=sig.digits)
     rm(out)
-  }
   
-  # plot of residuals, residuals vs fitted
-  res <- residuals(lm.out)
-  color.density(res, main="Evaluate Normality of Residuals", xlab="Residuals", text.out=FALSE)
+  
+    # plot of residuals, residuals vs fitted
+    res <- residuals(lm.out)
+    color.density(res, main="Evaluate Normality of Residuals", 
+      xlab="Residuals", text.out=FALSE)
 
-  fit <- fitted(lm.out)
-  cook <- cooks.distance(lm.out)
-  max.cook <- max(cook)
-  if (max.cook < cook.cut) {
-    cook.cut <- floor(max.cook*100)/100
-    txt <- paste("The point with the largest Cook's Distance, ", round(max.cook,2), 
-      ", is displayed in red", sep="")
-  }
-  else
-    txt <- paste("Points with Cook's Distance >", cook.cut, "are displayed in red")
-  dev.new()
-  color.plot(fit, res, fit.line="lowess", text.out=FALSE,
-    main="Plot of Residuals vs Fitted Values", xlab="Fitted Values", ylab="Residuals", sub=txt)
-  abline(h=0, lty="dotted", col="gray70")
-  res.c <- res[which(cook>=cook.cut)]
-  fit.c <- fit[which(cook>=cook.cut)]
-  if (length(fit.c) > 0) {
-    points(fit.c, res.c, col="red")
-    text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
+    fit <- fitted(lm.out)
+    cook <- cooks.distance(lm.out)
+    max.cook <- max(cook)
+    if (max.cook < cook.cut) {
+      cook.cut <- floor(max.cook*100)/100
+      txt <- paste("The point with the largest Cook's Distance, ", round(max.cook,2), 
+        ", is displayed in red", sep="")
+    }
+    else
+      txt <- paste("Points with Cook's Distance >", cook.cut, "are displayed in red")
+    dev.new()
+    color.plot(fit, res, fit.line="lowess", text.out=FALSE,
+      main="Plot of Residuals vs Fitted Values", xlab="Fitted Values",
+        ylab="Residuals", sub=txt)
+    abline(h=0, lty="dotted", col="gray70")
+    res.c <- res[which(cook>=cook.cut)]
+    fit.c <- fit[which(cook>=cook.cut)]
+    if (length(fit.c) > 0) {
+      points(fit.c, res.c, col="red")
+      text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
+    }
+
+    rm(fit, res, cook, res.c, fit.c)
+    
   }
 
-  rm(fit, res, cook, res.c, fit.c)
+
 
   # prediction intervals
    if (pred) {
@@ -306,7 +323,7 @@ function(my.formula, dframe=mydata, cor=TRUE,
     else {
       ctitle <- "Regression Line, Confidence and Prediction Intervals"
       y.min <- min(pi$lwr)
-      y.max <- max(pi$upr)
+      y.max <- max( max(pi$upr),  max(lm.out$model[,nm[1]]) )
     }
     if (!is.factor(lm.out$model[,nm[2]])) fl <- "ls" else fl <- "none"
     color.plot(lm.out$model[,nm[2]], lm.out$model[,nm[1]], cex=.8, fit.line=fl,
