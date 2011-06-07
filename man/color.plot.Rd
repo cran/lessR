@@ -8,7 +8,7 @@ Plots individual points, such as for a scatterplot, or plots connected line segm
 
 For data exhibiting little trend, the the center line is provided for the generation of a run chart, plotting the values of a variable in order of occurrence over time.  When the center line, the median by default, is plotted, the analyses of the number and composition of the individual runs, number of consecutive values above or below the center line, is also displayed.  Also, the defaults change for each of the types of plots.  The intent is to rely on the default values for a relatively sophisticated plot, particularly when compared to the default values of the standard R \code{\link{plot}} function.
 
-If a scatterplot of two numeric variables is displayed, then the corresponding correlation coefficient as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function R \code{\link{cor.test}} function are generated, though in a more readable format.
+If a scatterplot of two numeric variables is displayed, then the corresponding correlation coefficient as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function \code{\link{cor.test}} function are generated, though in a more readable format.  Also, an option for the .95 data ellipse from the car package can enclose the points of the scatterplot.
 }
 
 \usage{
@@ -20,7 +20,9 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            x.start=NULL, x.end=NULL, size=.25, text.out=TRUE,
            fit.line=c("none", "lowess", "ls"), col.fit.line="grey55", 
            col.bubble="lightsteelblue", col.flower="steelblue",
-           time.start=NULL, time.by=NULL, time.reverse=FALSE, \ldots)
+           time.start=NULL, time.by=NULL, time.reverse=FALSE,
+           ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
+           \ldots)
 }
 
 
@@ -66,7 +68,7 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
   \item{x.end}{For Likert style response data, the ending integer value of each axis. Useful
       if the actual data do not include all possible values.}
   \item{size}{Size of the bubbles in a bubble plot of Likert style data.}
-  \item{text.out}{If TRUE, then display text output in console.}
+  \item{text.out}{If \code{TRUE}, then display text output in console.}
   \item{fit.line}{The best fitting line.  Default value is \code{"none"}, with options for 
       \code{"lowess"} and \code{"ls"}.}
   \item{col.fit.line}{Color of the best fitting line, if the \code{fit.line} option is invoked.}
@@ -83,6 +85,9 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
   \item{time.reverse}{Reverse the ordering of the dates, particularly when the data are
       listed such that first row of data is the newest. Accompanies the \code{x.start}
       specification.}
+  \item{ellipse}{If \code{TRUE}, enclose a scatterplot with the .95 data ellipse from the car package.}
+  \item{col.ellipse}{Color of the ellipse.}
+  \item{fill.ellipse}{If \code{TRUE}, fill the ellipse with a translucent shade of \code{col.ellipse}.}
   \item{\dots}{Other parameter values for graphics as defined by and then processed 
       by \code{\link{plot}} and \code{\link{par}}, including \code{xlim}, \code{ylim}, \code{lwd}, 
       and \code{cex.lab.}}
@@ -93,6 +98,8 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
 Results are based on the standard \code{\link{plot}} and related graphic functions, with the additional provided color capabilities and other options including a center line.  The plotting procedure utilizes ``adaptive graphics'', such that different default values are chosen for different circumstances of the specified plot and data values. The goal is to produce a desired graph from simply relying upon the default values, both of the \code{color.plot} function itself, as well as the base R functions called by \code{color.plot}, such as \code{\link{plot}}. Familiarity with the options permits complete control over the computed defaults, but this familiarity becomes optional if the default values are accepted.
 
 When two variables are specified to plot, if the values of the first variable, \code{x} are unsorted, a scatterplot is produced, that is, a plot with \code{type="p"} for points. By default the points of a scatterplot are not filled. Sorted values of the first of the two specified variables yield a function plot, that is, a plot with \code{type="l"} for a smooth plotted line or curve.
+
+For a scatterplot of two numeric variables, the \code{ellipse=TRUE} option draws the .95 data ellipse as computed by the \code{dataEllipse} function, written by Georges Monette and John Fox, from the \code{car} package. Usually the minimum and maximum values of the axes should be manually extended beyond their default to accomodate the entire ellipse. To accomplish this extension, use the \code{xlim} and \code{ylim} options, such as \code{xlim=c(30,350)}.  Obtaining the desired axes limits may involve multiple runs of the \code{color.plot} function. To provide more control over the display of the data ellipse beyond the provided \code{col.ellipse} and \code{fill.ellipse} options, run the \code{dataEllipse} function directly with the \code{plot.points=FALSE} option following \code{color.plot} with \code{ellipse=FALSE}, the default.
 
 Specifying one variable leads to a run chart, with the values on the horizontal axis automatically generated.  The default is the Index variable, the ordinal position of each data value.  Or, dates on the horizontal axis can be specified from the specified starting date given by \code{x.start} and the accompanying increment as given by \code{x.by}.  If the data values randomly vary about the mean, the default is to plot the mean as the center line of the graph, otherwise the default is to ignore the center line.  The default plot type for the run chart is \code{type="b"}, for both points and the corresponding connected line segments.  The size of the points is automatically reduced according to the number of points of points plotted, and the \code{cex} option can override the computed default.  If the area below the plotted values is specified to be filled in with color, then the default line type changes to \code{type="l"}.
 
@@ -114,11 +121,16 @@ Commonly used graphical parameters in standard R graphics functions are generall
 
 }
 
+\references{
+Monette, G. and Fox, J., \code{dataEllipse} function from the \code{car} package.
+}
+
 \author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
 
 \seealso{
 \code{\link{plot}}, \code{\link{title}}, \code{\link{par}}, \code{\link{cor.test}}.
 }
+
 
 \examples{
 # scatter plot
@@ -126,6 +138,10 @@ x <- rnorm(25)
 y <- rnorm(25)
 # default scatterplot, x is not sorted so type is set to "p"
 color.plot(x, y)
+# compare to standard R plot
+plot(x, y)
+# scatterplot, with ellipse and extended axes to accomodate the ellipse
+color.plot(x, y, ellipse=TRUE, xlim=c(-3,3), ylim=c(-3,3))
 # scatterplot, with lowess line added
 color.plot(x, y, fit.line="lowess")
 # custom scatter plot
@@ -147,6 +163,8 @@ Pain <- sample(c("None", "Some", "Much", "Massive"), size=25, replace=TRUE)
 Pain <- factor(Pain, levels=c("None", "Some", "Much", "Massive"), ordered=TRUE)
 Cost <- round(rnorm(25,1000,100),2)
 color.plot(Pain, Cost)
+# for this purpose, improved version of standard R stripchart
+stripchart(Cost ~ Pain, vertical=TRUE)
 
 # function curve, i.e., line chart
 x <- seq(10,500,by=1) 
@@ -161,6 +179,8 @@ color.plot(x, y, ylab="My Y", xlab="My X", col.line="blue",
 y <- rnorm(25)
 # default run chart
 color.plot(y)
+# compare to standard R plot
+plot(y, type="l")
 # customize run chart, pch=24: filled triangle point-up,
 color.plot(y, lwd=2, col.point="sienna3", pch=24, 
   col.bg="mintcream", ylim=c(-3.5,3.5), center.line="median")

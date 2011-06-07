@@ -81,6 +81,8 @@ y <- round(rnorm(100),3)
 
 # histogram with all defaults
 color.hist(y)
+# compare to standard R function hist
+hist(y)
 
 # histogram with specified bin width
 color.hist(y, bin.width=.25)

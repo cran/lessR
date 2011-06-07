@@ -9,7 +9,7 @@ Calculate the probability of an interval for a normal distribution with specifie
 
 \usage{
 prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black", 
-         col.fill.nrm="grey85", col.fill.int="steelblue3")
+         col.fill.nrm="grey91", col.fill.int="slategray3", \ldots)
 }
 
 
@@ -21,8 +21,8 @@ prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black",
   \item{col.nrm}{Color of the border of the normal curve.}
   \item{col.fill.nrm}{Fill color of the normal curve.}
   \item{col.fill.int}{Fill color of the interval for which the probability is computed.}
+  \item{\ldots}{Other parameter values for graphics.}
 }
-
 
 \details{
 Calculate the normal curve probability for the specified interval and normal curve. If there is no upper value of the interval provided, \code{hi}, then the upper tail probability is provided, that is, from the specified value until positive infinity.  If there is no lower value, \code{lo}, then the lower tail probability is provided.  The probability is calculated with \code{\link{pnorm}}.

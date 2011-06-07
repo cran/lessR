@@ -24,7 +24,12 @@ function(x, y=NULL, col.bars=NULL, border="black",
     else if (!is.null(y)) y.lbl <- deparse(substitute(y)) else y.lbl=NULL
   
   # entered counts typically integers as entered but stored as type double
-  if (!is.integer(x) && is.double(x)) entered <- TRUE else entered <- FALSE
+  # if names(x) or rownames(x) is null, likely data from sample and c functions
+  entered.pre <- FALSE
+  if (!is.matrix(x) && !is.null(names(x))) entered.pre <- TRUE
+  if (is.matrix(x) && !is.null(rownames(x))) entered.pre <- TRUE
+  if (!is.integer(x) && is.double(x) && entered.pre) 
+    entered <- TRUE else entered <- FALSE
   
   # save ordered status before converting x to a table
   if (is.ordered(x) && is.null(y)) order.x <- TRUE else order.x <- FALSE
@@ -48,8 +53,8 @@ function(x, y=NULL, col.bars=NULL, border="black",
   }
   else {
     if (!vivid)
-      clr <- c("slategray3", "bisque3", "darksalmon", "darkolivegreen3", 
-        "thistle", "azure3", "moccasin")
+      clr <- c("slategray", "peachpuff2", "darksalmon", "darkseagreen1", 
+        "thistle4", "azure3", "mistyrose")
     else {
       clr <- c("coral3", "seagreen3", "maroon3", "dodgerblue3", "purple3", 
         "turquoise3", "yellow3")

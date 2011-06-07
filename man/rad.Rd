@@ -8,7 +8,8 @@ Reads the contents of the specified csv data file into an R dataframe called \co
 }
 
 \usage{
-rad(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, ...)
+rad(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, 
+         format=c("csv", "SPSS"), \dots)
 }
 
 
@@ -21,15 +22,16 @@ rad(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, ...)
         the lessR formatting.}
   \item{no.attach}{Off by default, but if \code{TRUE} then do not attach the R data frame, 
         \code{mydata} by default.}
+  \item{format}{Format of the data in the file.}
   \item{...}{Other parameter values consistent with the usual \code{read.csv}
        function, such as row.names and header.}
 }
 
 
 \details{
-One way to create a csv data file is with MS Excel or other worksheet application.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
+By default \code{rad} reads \code{csv} data files. One way to create a csv data file is with MS Excel, LibreOffice Calc or other worksheet application.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
 
-All numeric data should be displayed in the General format, so that the only non-digit character for a numeric data value is a decimal point.  The General format removes all dollar signs and commas, for example, leaving only the pure number, stripped of these extra characters which R will not properly read as part of a numeric data value.
+All numeric data in the worksheet should be displayed in the General format, so that the only non-digit character for a numeric data value is a decimal point.  The General format removes all dollar signs and commas, for example, leaving only the pure number, stripped of these extra characters which R will not properly read as part of a numeric data value.
 
 To create the csv file from a worksheet, under the File option, do a Save As and choose the csv format.
 
@@ -48,6 +50,11 @@ to invoke:
 Then, \code{rad} invokes the subsequent R statements: \code{attach(mydata, warn.conflicts=FALSE)}, 
 \code{head(mydata, n=3)} and \code{tail(mydata, n=3)}. Output of these statements is 
 directed to the console.  Also listed are the R statements invoked by \code{rad}.
+
+---
+
+To read data in the SPSS \code{.sav} format, the \code{read.spss} function from the \code{foreign} package is used. To invoke this option, specify the \code{format="SPSS"}.
+
 }
 
 \author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}

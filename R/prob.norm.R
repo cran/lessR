@@ -1,7 +1,13 @@
 prob.norm <- 
 function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black", 
-         col.fill.nrm="grey85", col.fill.int="steelblue3") { 
+         col.fill.nrm="grey91", col.fill.int="slategray3", ...) { 
 
+    
+  if (sigma <= 0) { 
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Sigma, the population standard deviation, must be larger than zero.\n\n")
+  }
+  
   if (is.null(lo)) {
     lo <- mu-sigma*10
     lo.lbl <- "..."
@@ -18,7 +24,7 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black",
   max.x <- mu+4*sigma
   x <- seq(min.x, max.x, length=200)
   d.nrm <- dnorm(x,mu,sigma)
-  plot(x, d.nrm, type="l", col=col.nrm, xlab="Y", ylab="Normal Density")
+  plot(x, d.nrm, type="l", col=col.nrm, xlab="Y", ylab="Normal Density", ...)
   polygon(c(min.x,x,max.x), c(0,d.nrm,0), col=col.fill.nrm)
 
   # plot an interval
@@ -34,7 +40,7 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black",
   # decorate
   lbl1 <- paste(" Prob =", toString(signif(prob, 4)))
   lbl2 <- paste(" for Y from", lo.lbl, "to", hi.lbl)
-  title(main=paste(lbl1,lbl2))
+  title(main=paste(lbl1,lbl2), ...)
   lbl3 <- bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma)))
-  title(sub=lbl3)
+  title(sub=lbl3, ...)
 }
