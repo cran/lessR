@@ -7,7 +7,8 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            x.start=NULL, x.end=NULL, size=.25, text.out=TRUE,
            fit.line=c("none", "lowess", "ls"), col.fit.line="grey55", 
            col.bubble="lightsteelblue", col.flower="steelblue",
-           time.start=NULL, time.by=NULL, time.reverse=FALSE, ...) {
+           time.start=NULL, time.by=NULL, time.reverse=FALSE,
+           ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, ...) {
            
 max.dd <- function(x) {
 
@@ -70,6 +71,15 @@ if (!is.null(time.start) && is.null(time.by)) {
    cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specified  time.start  so also need  time.by.\n\n")
   
+}
+
+if (ellipse) {
+  check.car <- suppressWarnings(require(car, quietly=TRUE))
+  if (!check.car) {
+    cat(">>> Placing an ellipse around the scatterplot requires package car.", "\n")
+    cat(">>> The ellipse is not provided here, but all other output unaffected.", "\n")
+    cat(">>> To get the car package, run one time only: install.packages('car')", "\n")
+  }
 }
     
 #  pch=21 is a filled circle
@@ -215,8 +225,7 @@ abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
 # fill area under curve
 if (type != "p") col.border <- col.line else col.border <- "transparent"
   if (!is.null(col.area)) 
-    polygon(c(x[1],x,x[length(x)]), c(min(y),y,min(y)), col=col.area, 
-      border=col.border)
+    polygon(c(x[1],x,x[length(x)]), c(min(y),y,min(y)), col=col.area, border=col.border)
 
 # the plot
 if (kind == "regular") {  # plot lines and/or points
@@ -225,6 +234,10 @@ if (kind == "regular") {  # plot lines and/or points
   }
   if (type == "p" | type == "b") {
     points(x,y, col=col.point, pch=point.type, bg=col.fill, cex=pt.size, ...)
+    if (ellipse && check.car) {
+      dataEllipse(x, y, col=col.ellipse, levels=.95, lwd=1.5, fill=fill.ellipse, 
+        fill.alpha=.06, center.cex=0, segments=100, plot.points=FALSE)
+    }
   }
 }
 else if (kind == "xcat") {
@@ -238,6 +251,10 @@ else if (kind == "bubble.freq") {
   symbols(cords$xx, cords$yy, circles=cords$count, bg=col.bubble, inches=size, add=TRUE, ...)
   zeros <- cords[cords$count==0, ] # 0 plots to a single pixel, so remove
   points(zeros$xx, zeros$yy, col=col.bg, bg=col.bg, pch=21, cex=.5)
+  if (ellipse && check.car) {
+    dataEllipse(x, y, col=col.ellipse, levels=.95, lwd=1.5, fill=fill.ellipse, 
+      fill.alpha=.06, center.cex=0, segments=100, plot.points=FALSE)
+  }
 }
 else if (kind == "sunflower.freq") {
   sunflowerplot(cords$xx, cords$yy, number=cords$count, 

@@ -1,6 +1,9 @@
 # read, attach, display
 rad <- 
-function(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, ...) {  
+function(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, 
+         format=c("csv", "SPSS"), ...) {
+         
+  format <- match.arg(format)
   
   pre <- ">"
   line <- "------------------------------------------------------------\n"
@@ -8,7 +11,9 @@ function(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, ...) {
   cat("\n")
   if (is.null(ref)) ref <- file.choose()
   
-  mydata <<- read.csv(file=ref, ...)
+  if (format == "csv") mydata <<- read.csv(file=ref, ...)
+  if (format == "SPSS") mydata <<- read.spss(file=ref, to.data.frame = TRUE, ...)
+  
   if (!no.attach) attach(mydata, warn.conflicts=FALSE)
   
   if(show.R) {
@@ -40,17 +45,19 @@ function(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, ...) {
       cat(line, pre, " tail(mydata, n=3)   # Last three rows", "\n", sep="", line, "\n")
     print(tail(mydata, n=3))
     
-    cat("\n\n")
-    if (show.R) 
-      cat(line, pre, " str(mydata, digits.d=15)   # Types of variables", "\n", sep="")
-    cat(line)
-    cat("Data type of each variable\n")
-    cat(line)
-    cat("Factor: Variable with non-numeric values, stored as an integer\n")
-    cat("int: Numeric variable limited to integer values\n")
-    cat("num: Numeric variable that may have decimal digits\n")
-    cat(line, "\n")
-    print(str(mydata, digits.d=15))
+    if (format == "csv") {
+      cat("\n\n")
+      if (show.R) 
+        cat(line, pre, " str(mydata, digits.d=15)   # Types of variables", "\n", sep="")
+      cat(line)
+      cat("Data type of each variable\n")
+      cat(line)
+      cat("Factor: Variable with non-numeric values, stored as an integer\n")
+      cat("int: Numeric variable limited to integer values\n")
+      cat("num: Numeric variable that may have decimal digits\n")
+      cat(line, "\n")
+      print(str(mydata, digits.d=15))
+    }
     
     cat("\n\n")
     cat(line, "What is next? Try one of the following.", "\n", sep="", line)

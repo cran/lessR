@@ -6,7 +6,7 @@
 \title{Bar Chart of One or Two Variables with Color}
 
 \description{
-Plots a bar chart of one or two variables with default colors, including background color and gridlines. Also displays the frequency table for one or two variables and optionally provides the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies.
+Plots a bar chart of one or two variables with default colors, including background color and gridlines, from a variety of different types of data. Also displays the frequency table for one or two variables and optionally provides the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies.
 
 For the analysis of a single variable, the cell proportions are also provided.  For the analysis of two variables, also provided are the proportions within each cell, within each column and within each row.   
 
@@ -130,6 +130,8 @@ Gender <- factor(Gender)
 # for each level of Pain, display the frequencies
 # Pain is an ordered factor, so the bar colors are ordered
 color.barchart(Pain)
+# compare to standard R bar plot
+barplot(table(Pain))
 
 # Gender is unordered, so one color used for all the bars
 color.barchart(Gender)
@@ -145,6 +147,8 @@ color.barchart(Gender, col.bars=c("rosybrown","tan"), gap=.75)
 
 # at each level of Pain, show the frequencies of the Gender levels
 color.barchart(Pain, Gender, chisq=TRUE)
+# compare to standard R bar plot for two variables
+barplot(table(Gender,Pain), beside=TRUE)
 
 # at each level of Pain, show the frequencies of the Gender levels
 # display more vivid colors, randomize from the palette the bar colors
@@ -184,8 +188,14 @@ color.barchart(Pain, Gender, col.bars=c("coral3","seagreen3"),
 # ----------------------------
 
 # generate and enter integer data
-X1 <- sample(4, size=100, replace=TRUE)
-X2 <- sample(4, size=100, replace=TRUE)
+X1 <- sample(1:4, size=100, replace=TRUE)
+X2 <- sample(1:4, size=100, replace=TRUE)
+color.barchart(X1)
+color.barchart(X1,X2)
+
+# generate and enter type double data
+X1 <- sample(c(1,2,3,4), size=100, replace=TRUE)
+X2 <- sample(c(1,2,3,4), size=100, replace=TRUE)
 color.barchart(X1)
 color.barchart(X1,X2)
 
@@ -228,8 +238,8 @@ color.barchart(City, main="Employees in Each City")
 # two Quality levels, the rows
 # three Supplier levels, the columns
 # enter counts row by row, then form the table with rbind function
-# must supply the level (value) names and variable names
-# chart is Row Variable, analyzed at each level of Column Variable
+# must supply the level (value) names and the variable names
+# chart presented as Row Variable, analyzed at each level of Column Variable
 row1 <- c(19, 16, 23) 
 row2 <- c(6, 6, 8) 
 mytable <- rbind(row1, row2)

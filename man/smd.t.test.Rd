@@ -54,11 +54,19 @@ The bandwidth parameter controls the smoothness of the estimated density curve. 
 
 For the output, the two groups are automatically arranged so that the group with the larger mean is listed as the first group.  The result is that the resulting mean difference, as well as the standardized mean difference, is always non-negative.
 
+The confidence interval of the standardized mean difference is computed by the \code{ci.smd} function, written by Ken Kelley, from the \code{MBESS} package.
+
 The practical importance of the size of the mean difference is addressed when one of two parameter values are supplied, the minimum mean difference of practical importance, mmd, or the corresponding standardized version, msmd.  The  remaining value is calculated and both values are added to the graph and the console output.
 
 After running \code{smd.t.test}, the following statistics are available for further analysis: sample sizes \code{n1} and \code{n2}, sample means \code{m1} and \code{m2}, sample standard deviations, \code{s1} and \code{s2}, plus the within-group or pooled standard deviation, \code{sw}. For example, if the t-test does not achieve significance, then perhaps a power curve is of interest.  Then \code{n1}, \code{n2} and \code{sw} can be used to construct a power curve without re-entering their values,  \cr
 \code{\link{powercurve.t.test}()}.  
 }
+
+
+\references{
+Kelley, K., \code{smd} function from the \code{MBESS} package.
+}
+
 
 \author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
 
@@ -68,34 +76,36 @@ After running \code{smd.t.test}, the following statistics are available for furt
 
 \examples{
 # ----------------------------------------------------------
-# Data simulated, call smd.t.test with a formula
+# data simulated, call smd.t.test with a formula
 # ----------------------------------------------------------
 
-# Create simulated data, no population mean difference
+# create simulated data, no population mean difference
 # X has two values only, Y is numeric
 n <- 12
 X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
 Y <- rnorm(n=n, mean=50, sd=10)
 
-# Analyze data with formula version
-# Variable names and levels of X are automatically obtained from data
+# analyze data with formula version
+# variable names and levels of X are automatically obtained from data
 smd.t.test(Y ~ X)
+# Compare to standard R function t.test
+t.test(Y ~ X, var.equal=TRUE)
 
-# Consider the practical importance of the difference
+# consider the practical importance of the difference
 smd.t.test(Y ~ X, msmd=.5)
 
 
 # -------------------------------------------------------
-# Data stored in two vectors, call smd.t.test accordingly
+# data stored in two vectors, call smd.t.test accordingly
 # -------------------------------------------------------
 
-# Create two separate vectors of response variable Y
+# create two separate vectors of response variable Y
 n <- 10
 Y1 <- rnorm(n=n/2, mean=50, sd=10)
 Y2 <- rnorm(n=n/2, mean=60, sd=10)
 
-# Analyze the two vectors directly
-# Usually explicitly specify variable names and levels of X
+# analyze the two vectors directly
+# usually explicitly specify variable names and levels of X
 #   to enhance the readability of the output
 smd.t.test(Y1, Y2, Ynm="MyY", Xnm="MyX", X1nm="Group1", X2nm="Group2")
 }

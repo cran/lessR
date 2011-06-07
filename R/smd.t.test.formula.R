@@ -16,15 +16,21 @@ function (formula, data, ...) {
   names(mf) <- NULL
   
   response <- attr(attr(mf, "terms"), "response")
-  if (!is.numeric(mf[[response]])) 
-    stop("Response variable ", Ynm, " must be numeric")
+  if (!is.numeric(mf[[response]])) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    "You specified ", Ynm, " as the response variable, the 1st variable listed.\n",
+    "The response variable must have only numeric values.\n",
+    "The first value of ", Ynm, " is ", mf[[response]][1], ".\n",
+    "Perhaps you have the order of the variables reversed.\n\n")
+  }
 
   g <- factor(mf[[-response]])      
   gu <- unique(g)
   if (length(gu) != 2) {
-    cat("Values of the grouping variable: ", levels(g), "\n")
-    cat("Number of unique values: ", length(gu), "\n\n")
-    stop("The grouping variable for a t-test must have exactly two unique values.")
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    "Values of the grouping variable: ", levels(g), "\n",
+    "Number of unique values: ", length(gu), "\n",
+    "The grouping variable for a t-test must have exactly two unique values.\n\n")
   }
 
   DATA <- split(mf[[response]], g)

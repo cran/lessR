@@ -1,8 +1,8 @@
 Package: lessR
 Type: Package
 Title: Less Code, More Results
-Version: 1.9.0
-Date: 2011-5-22
+Version: 1.9.6
+Date: 2011-6-07
 Author: David W. Gerbing, School of Business Administration, Portland
         State University
 Maintainer: David W. Gerbing <davidg@sba.pdx.edu>
@@ -23,8 +23,8 @@ Description: Each function accomplishes the work of several or more
         and the reading and display of csv formatted data. The function
         help.me provides a help system that suggests specific analyses
         and functions.
-License: GPL-2
+License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2011-05-23 02:49:43 UTC; david
+Packaged: 2011-06-07 09:19:29 UTC; David
 Repository: CRAN
-Date/Publication: 2011-05-23 07:06:52
+Date/Publication: 2011-06-07 09:51:30

@@ -1,9 +1,11 @@
 reg <-
-function(my.formula, dframe=mydata, cor=TRUE,
+function(my.formula, dframe=mydata, sig.digits=4,
          res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
          pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
-         subsets=TRUE, collinear=TRUE, sig.digits=4, cook.cut=1,
-         results=c("full", "brief"), show.R=FALSE) {
+         cor=TRUE, subsets=TRUE, collinear=TRUE, relations=TRUE,
+         cook.cut=1, results=c("full", "brief"),  
+         X1.pred=NULL, X2.pred=NULL, X3.pred=NULL, X4.pred=NULL, 
+         X5.pred=NULL, show.R=FALSE) {
          
   mydframe <- deparse(substitute(dframe))  # get dataframe name for cor before sort
   
@@ -11,9 +13,15 @@ function(my.formula, dframe=mydata, cor=TRUE,
   res.sort <- match.arg(res.sort)
   pred.sort <- match.arg(pred.sort)
   results <- match.arg(results)
+    
+  if (relations) 
+    { cor <- TRUE; subsets <- TRUE; collinear <- TRUE }
+  else 
+    { cor <- FALSE; subsets <- FALSE; collinear <- FALSE }
+  if (!cor & !subsets & !collinear) relations <- FALSE
 
   if (results == "brief") {
-    res.rows <- 0
+    if (is.null(res.rows)) res.rows <- 0
     pred <- FALSE
     subsets <- FALSE
     collinear <- FALSE
@@ -28,6 +36,20 @@ function(my.formula, dframe=mydata, cor=TRUE,
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
   n.obs <- nrow(dframe)
+  
+  new.data <- FALSE
+  for (i in 1:(n.vars-1)) {
+    pp <- eval(parse(text=paste("X", toString(i),".pred",sep="")))
+    if (!is.null(pp)) new.data <- TRUE
+  }
+  if (new.data) for (i in 1:(n.vars-1)) {
+    pp <- eval(parse(text=paste("X", toString(i),".pred",sep="")))
+    if (is.null(pp)) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Specified new data values for one predictor variable, so do for all.\n\n")
+    }
+  }
+
     
   if (is.null(res.rows)) if (n.obs < 25) res.rows <- n.obs else res.rows <- 25 
   if (res.rows == "all") res.rows <- n.obs  # turn off resids with res.rows=0 call
@@ -51,7 +73,7 @@ function(my.formula, dframe=mydata, cor=TRUE,
   #   this model construct contains only model vars, with Y listed first
   lm.out <<- lm(my.formula, data=dframe)
   
-  cat( "\n\n\n", "  THE MODEL", "\n")
+  cat( "\n\n\n", "  BACKGROUND", "\n")
 
   if(show.R) {
     cv <- paste(nm[1]," ~ ", sep="")
@@ -87,7 +109,7 @@ function(my.formula, dframe=mydata, cor=TRUE,
   cat("\n")
   print(confint(lm.out), digits=sig.digits)
   cat("\n\n\n")
-  cat("Fit of the model\n")
+  cat("Model fit\n")
   cat("\n")
   cat("Standard deviation of residuals: ", signif(sm$sigma,4),
     "for", sm$df[2], "degrees of freedom", "\n")
@@ -117,8 +139,7 @@ function(my.formula, dframe=mydata, cor=TRUE,
 
 
 
-
-  cat( "\n\n\n", "  RELATION AMONG VARIABLES", "\n")
+  if (relations) cat( "\n\n\n", "  RELATION AMONG VARIABLES", "\n")
 
   # correlations
   if (cor) {
@@ -147,9 +168,9 @@ function(my.formula, dframe=mydata, cor=TRUE,
     if (numeric.all) {
       check.car <- suppressWarnings(require(car, quietly=TRUE))
       if (check.car) {
-        cat("Tolerances, which generally should be > approximately 0.20 or so\n\n")
+        cat("Tolerances, usually should be > approximately 0.20 or so\n\n")
         print(1/(vif(lm.out)), digits=3)
-        cat("\n\nVariance Inflation Factors, which generally should be < approximately 5 or so\n\n")
+        cat("\n\nVariance Inflation Factors, usually should be < approximately 5\n\n")
         print(vif(lm.out), digits=4)
       }
       else {
@@ -158,7 +179,7 @@ function(my.formula, dframe=mydata, cor=TRUE,
         cat(">>> To obtain the car package, run one time only: install.packages('car')", "\n")
       }
      }
-     else cat("\n>>> No collinearity analysis reported because not all variables are numeric.\n")
+     else cat("\n>>> No collinearity analysis because not all variables are numeric.\n")
    }
 
   # all possible subsets of predictor variables    
@@ -179,9 +200,9 @@ function(my.formula, dframe=mydata, cor=TRUE,
         print(models[order(models$R2adj, decreasing=TRUE),], digits=3)
       }
       else {
-        cat("\n>>> Obtaining the subsets of predictor variables requires package leaps.", "\n")
-        cat(">>> This analysis is not provided here, but all other output is unaffected.", "\n")
-        cat(">>> To get the leaps package, run one time only: install.packages('leaps')", "\n")
+        cat("\n>>> Analyzing subsets of predictor variables requires package leaps.", "\n")
+        cat(">>> This analysis is not provided, but all other output is unaffected.", "\n")
+        cat(">>> To get the leaps package, run once only: install.packages('leaps')", "\n")
       }
     }
     else cat("\n>>> No subset analysis reported because not all variables are numeric.\n")
@@ -280,13 +301,31 @@ function(my.formula, dframe=mydata, cor=TRUE,
     
     cat("Data, Fitted Values, Confidence and Prediction Intervals\n")
     cat("   [sorted by lower bound of prediction interval]\n")
-    if (n.obs > 50 && pred.all == FALSE) 
+    if (n.obs > 50 && pred.all == FALSE && !new.data) 
       cat("   [to save space only some intervals printed, do pred.all=TRUE to see all]\n")
     cat(line)
     
-    ci <- data.frame(predict(lm.out, interval="confidence"))
-    pi <- suppressWarnings(data.frame(predict(lm.out, interval="prediction")))
-    out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],ci,pi$lwr,pi$upr)
+    if (!new.data) {
+      c.int <- data.frame(predict(lm.out, interval="confidence"))
+      p.int <- suppressWarnings(data.frame(predict(lm.out, interval="prediction")))
+      out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],c.int,p.int$lwr,p.int$upr)
+    }
+    else {
+      Xnew.val <- list(X1.pred)
+      if (n.vars > 2) for (i in 2:(n.vars-1)) {
+        pp <- eval(parse(text=paste("X", toString(i),".pred",sep="")))
+        Xnew.val <- c(Xnew.val, list(pp))
+      }
+      Xnew <- expand.grid(Xnew.val)
+      for (i in 1:(n.vars-1)) names(Xnew)[i] <- nm[i+1]
+      c.int <- data.frame(predict(lm.out, interval="confidence", newdata=Xnew))
+      p.int <- suppressWarnings(data.frame(predict(lm.out, interval="prediction", newdata=Xnew)))
+      Ynew <- character(length = nrow(Xnew))
+      Ynew <- ""
+      out <- cbind(Xnew, Ynew, c.int, p.int$lwr, p.int$upr)
+      names(out)[n.vars] <- nm[1]
+    }
+    
     out <- data.frame(out)
     if (pred.sort == "predint") {
       o <- order(out[,n.vars+4])  # lower bound of prediction interval
@@ -297,7 +336,7 @@ function(my.formula, dframe=mydata, cor=TRUE,
     names(out)[n.vars+3] <- "ci:upr"
     names(out)[n.vars+4] <- "pi:lwr"
     names(out)[n.vars+5] <- "pi:upr"
-    if (n.obs < 50  || pred.all == TRUE)
+    if (n.obs < 50  || pred.all == TRUE || new.data)
       print(out, digits=sig.digits)
     else {
       print(out[1:5,], digits=sig.digits)
@@ -309,30 +348,35 @@ function(my.formula, dframe=mydata, cor=TRUE,
     }
     cat(line, "\n")
     cat("Note: Predictions from current data, from which the model is estimated,\n")
-    cat("      refer to _future_ responses based on the collection of new data.\n")
+    cat("      refer to future responses from the collection of new data.\n")
   }
   
-  dev.new() 
+  
+  
+  
   # scatterplot, if one predictor variable
+  dev.new() 
   if (n.vars == 2) {
-    if (pred == FALSE) {
+    if ( (pred==FALSE) || is.factor(lm.out$model[,nm[2]]) || !is.null(X1.pred) ) do.int <- FALSE
+      else do.int <- TRUE
+    if (!do.int) {
       ctitle <- "Scatterplot and Regression Line"
       y.min <- min(lm.out$model[,nm[1]])
       y.max <- max(lm.out$model[,nm[1]])
     }
     else {
       ctitle <- "Regression Line, Confidence and Prediction Intervals"
-      y.min <- min(pi$lwr)
-      y.max <- max( max(pi$upr),  max(lm.out$model[,nm[1]]) )
+      y.min <- min(p.int$lwr)
+      y.max <- max( max(p.int$upr),  max(lm.out$model[,nm[1]]) )
     }
     if (!is.factor(lm.out$model[,nm[2]])) fl <- "ls" else fl <- "none"
     color.plot(lm.out$model[,nm[2]], lm.out$model[,nm[1]], cex=.8, fit.line=fl,
       xlab=nm[2], ylab=nm[1], ylim=c(y.min,y.max), main=ctitle, text.out=FALSE)
-    if (pred == TRUE  && !is.factor(lm.out$model[,nm[2]])) {
-      lines(lm.out$model[,nm[2]], ci$lwr, col="lightsteelblue", lwd=2)
-      lines(lm.out$model[,nm[2]], ci$upr, col="lightsteelblue", lwd=2)
-      lines(lm.out$model[,nm[2]], pi$lwr, col="darksalmon", lwd=2)
-      lines(lm.out$model[,nm[2]], pi$upr, col="darksalmon", lwd=2)
+    if (do.int) {
+      lines(lm.out$model[,nm[2]], c.int$lwr, col="lightsteelblue", lwd=2)
+      lines(lm.out$model[,nm[2]], c.int$upr, col="lightsteelblue", lwd=2)
+      lines(lm.out$model[,nm[2]], p.int$lwr, col="darksalmon", lwd=2)
+      lines(lm.out$model[,nm[2]], p.int$upr, col="darksalmon", lwd=2)
     }
   }
   else   # scatterplot matrix for multiple regression
