@@ -25,7 +25,6 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            \ldots)
 }
 
-
 \arguments{
   \item{x}{If both x and y are specified, then the x values are plotted on the
       horizontal axis.  If x is not sorted, a scatter plot is produced.  If x is sorted, then a function is plotted with a smooth line.  If only x is specified with no y, then these x values are plotted as a run chart, which adds a centerline, the mean, to the chart by default if the data do not exhibit obvious trend. The time-oriented data for a run chart should be ordered with the first data record representing the earliest point in time.  Otherwise, use the \code{x.reverse} option.}
@@ -82,8 +81,8 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
       \code{"week"}, \code{"month"} or \code{"year"}. This string can optionally be preceded by 
       a positive or negative integer and a space, or followed by "s", as specified in 
       \code{\link{seq.Date}}.}
-  \item{time.reverse}{Reverse the ordering of the dates, particularly when the data are
-      listed such that first row of data is the newest. Accompanies the \code{x.start}
+  \item{time.reverse}{When \code{TRUE}, reverse the ordering of the dates, particularly when the data are
+      listed such that first row of data is the newest. Accompanies the \code{time.start}
       specification.}
   \item{ellipse}{If \code{TRUE}, enclose a scatterplot with the .95 data ellipse from the car package.}
   \item{col.ellipse}{Color of the ellipse.}
@@ -95,19 +94,26 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
 
 
 \details{
-Results are based on the standard \code{\link{plot}} and related graphic functions, with the additional provided color capabilities and other options including a center line.  The plotting procedure utilizes ``adaptive graphics'', such that different default values are chosen for different circumstances of the specified plot and data values. The goal is to produce a desired graph from simply relying upon the default values, both of the \code{color.plot} function itself, as well as the base R functions called by \code{color.plot}, such as \code{\link{plot}}. Familiarity with the options permits complete control over the computed defaults, but this familiarity becomes optional if the default values are accepted.
+ADAPTIVE GRAPHICS\cr
+Results are based on the standard \code{\link{plot}} and related graphic functions, with the additional provided color capabilities and other options including a center line.  The plotting procedure utilizes ``adaptive graphics'', such that \code{color.plot} chooses different default values for different characteristics of the specified plot and data values. The goal is to produce a desired graph from simply relying upon the default values, both of the \code{color.plot} function itself, as well as the base R functions called by \code{color.plot}, such as \code{\link{plot}}. Familiarity with the options permits complete control over the computed defaults, but this familiarity is intended to be optional for most situations.
 
-When two variables are specified to plot, if the values of the first variable, \code{x} are unsorted, a scatterplot is produced, that is, a plot with \code{type="p"} for points. By default the points of a scatterplot are not filled. Sorted values of the first of the two specified variables yield a function plot, that is, a plot with \code{type="l"} for a smooth plotted line or curve.
+TWO VARIABLE PLOT\cr
+When two variables are specified to plot, by default if the values of the first variable, \code{x}, are unsorted, or if there are unequal intervals between adjacent values, or if there is missing data for either variable, a scatterplot is produced, that is, a call to the standard R \code{\link{plot}} function with \code{type="p"} for points. By default, sorted values with equal intervals between adjacent values of the first of the two specified variables yields a function plot if there is no missing data for either variable, that is, a call to the standard R \code{\link{plot}} function with \code{type="l"}, which connects each adjacent pair of points with a line segment.
 
+SCATTERPLOT ELLIPSE\cr
 For a scatterplot of two numeric variables, the \code{ellipse=TRUE} option draws the .95 data ellipse as computed by the \code{dataEllipse} function, written by Georges Monette and John Fox, from the \code{car} package. Usually the minimum and maximum values of the axes should be manually extended beyond their default to accomodate the entire ellipse. To accomplish this extension, use the \code{xlim} and \code{ylim} options, such as \code{xlim=c(30,350)}.  Obtaining the desired axes limits may involve multiple runs of the \code{color.plot} function. To provide more control over the display of the data ellipse beyond the provided \code{col.ellipse} and \code{fill.ellipse} options, run the \code{dataEllipse} function directly with the \code{plot.points=FALSE} option following \code{color.plot} with \code{ellipse=FALSE}, the default.
 
+ONE VARIABLE PLOT\cr
 Specifying one variable leads to a run chart, with the values on the horizontal axis automatically generated.  The default is the Index variable, the ordinal position of each data value.  Or, dates on the horizontal axis can be specified from the specified starting date given by \code{x.start} and the accompanying increment as given by \code{x.by}.  If the data values randomly vary about the mean, the default is to plot the mean as the center line of the graph, otherwise the default is to ignore the center line.  The default plot type for the run chart is \code{type="b"}, for both points and the corresponding connected line segments.  The size of the points is automatically reduced according to the number of points of points plotted, and the \code{cex} option can override the computed default.  If the area below the plotted values is specified to be filled in with color, then the default line type changes to \code{type="l"}.
 
+LIKERT DATA\cr
 A scatterplot of Likert type data is problematic because there are so few possibilities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 25 possible paired values to plot, so most of the plotted points overlap with others.  In this situation, that is, when there are less than 10 values for each of the two variables, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values.  A sunflower plot can be requested in lieu of the bubble plot.
 
+BACKGROUND COLOR\cr
 The default background color of \code{col.bg=ghostwhite} provides a very mild cool tone with a slight emphasis on blue. To provide a warmer tone by slightly enhancing red, try \code{col.bg=snow}. Obtain a very light gray with \code{col.bg=gray99}.  To darken the background gray, try \code{col.bg=gray97} or lower numbers. See the \code{\link{color.show}} function in this package the provides an example of all available named colors.
 
-Commonly used graphical parameters in standard R graphics functions are generally available to \code{color.plot}, such as:
+ADDITIONAL OPTIONS\cr
+Commonly used graphical parameters that are available to the standard R function \code{color.plot} are generally available to \code{color.plot}, such as:
 
 \describe{
 \item{pch}{Vector of plotting characters or symbols for the individual points, see \code{\link{points}}.}
@@ -166,7 +172,7 @@ color.plot(Pain, Cost)
 # for this purpose, improved version of standard R stripchart
 stripchart(Cost ~ Pain, vertical=TRUE)
 
-# function curve, i.e., line chart
+# function curve
 x <- seq(10,500,by=1) 
 y <- 18/sqrt(x)
 # x is sorted with equal intervals so type set to "l" for line
