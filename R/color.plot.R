@@ -138,10 +138,15 @@ else {
   
   if (!is.factor(x)) {
     if (is.null(type)) {  # if x is sorted with equal intervals, plot a line chart
-      equal.int <- TRUE
-      diff.x <- diff(x)
-      for (i in 2:(length(x)-1)) if (diff.x[i-1] != diff.x[i]) equal.int=FALSE
-      if (!is.unsorted(x) && equal.int) type <- "l" else type <- "p"
+      if (sum(is.na(x)) > 0) equal.int <- FALSE  # missing data in x present
+      else {
+        diff.x <- diff(x)
+        for (i in 2:(length(x)-1)) 
+          if (diff.x[i-1] != diff.x[i]) equal.int <- FALSE else equal.int <- TRUE
+        rm(diff.x)
+      }
+      if (!is.unsorted(x) && equal.int  && sum(is.na(y))==0)  # also no y missing 
+        type <- "l" else type <- "p"
     }
   if (kind == "default")  # set default
     if ( length(x)>10 && length(y)>10 && length(unique(x))<10 && length(unique(y))<10 )
@@ -290,50 +295,56 @@ if (!is.null(center.line) && center.line != "off") {
   }
   abline(h=m.y, col="gray50", lty="dashed")
   mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
-  dashes(20); cat(lbl.cat, round(m.y,digits.d), "\n"); dashes(20)
-      
-  dashes(12); cat("Run Analysis\n"); for (i in 1:12) cat("-")
-  run <- integer(length=200)  # length of ith run in run[i]
-  n.runs <- 1  # total number of runs
-  run[n.runs] <- 1
-  line.out <- "    1"
-  cat("\n")
-  for (i in 2:length(y)) {
-    if (y[i] != m.y) {  # throw out values that equal m.y
-      if (sign(y[i]-m.y) != sign(y[i-1]-m.y)) {  # new run
-        if (n.runs < 10) buf <- "  " else buf <- " "
-        cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out, "\n", sep="")
-        line.out <- ""
-        n.runs <- n.runs + 1
-        run[n.runs] <- 0
+  
+  if (text.out) {
+    dashes(20); cat(lbl.cat, round(m.y,digits.d), "\n"); dashes(20)
+    dashes(12); cat("Run Analysis\n"); for (i in 1:12) cat("-")
+    run <- integer(length=200)  # length of ith run in run[i]
+    n.runs <- 1  # total number of runs
+    run[n.runs] <- 1
+    line.out <- "    1"
+    cat("\n")
+    for (i in 2:length(y)) {
+      if (y[i] != m.y) {  # throw out values that equal m.y
+        if (sign(y[i]-m.y) != sign(y[i-1]-m.y)) {  # new run
+          if (n.runs < 10) buf <- "  " else buf <- " "
+          cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out, "\n", sep="")
+          line.out <- ""
+          n.runs <- n.runs + 1
+          run[n.runs] <- 0
+        }
+        run[n.runs] <- run[n.runs] + 1
+        if (i < 10) buf <- "  " else buf <- " "
+        line.out <- paste(line.out, buf, i)
       }
-      run[n.runs] <- run[n.runs] + 1
-      if (i < 10) buf <- "  " else buf <- " "
-      line.out <- paste(line.out, buf, i)
     }
+    cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out, "\n", sep="")
+    eq.ctr <- which(y==m.y)
+    cat("\nTotal number of runs:", n.runs, "\n")
+    txt <- "Total number of values that do not equal the "
+    cat(txt, lbl.cat, " ", length(y)-length(eq.ctr), "\n", sep="")
+    if (length(eq.ctr) != 0) {
+      cat("\nValues ignored that equal the", lbl.cat, eq.ctr, "\n")
+      cat("Total number of values ignored:", length(eq.ctr), "\n")
+    }
+    else 
+      cat("Total number of values ignored that equal the", lbl.cat, length(eq.ctr), "\n")
   }
-  cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out, "\n", sep="")
-  eq.ctr <- which(y==m.y)
-  cat("\nTotal number of runs:", n.runs, "\n")
-  txt <- "Total number of values that do not equal the "
-  cat(txt, lbl.cat, " ", length(y)-length(eq.ctr), "\n", sep="")
-  if (length(eq.ctr) != 0) {
-    cat("\nValues ignored that equal the", lbl.cat, eq.ctr, "\n")
-    cat("Total number of values ignored:", length(eq.ctr), "\n")
-  }
-  else 
-    cat("Total number of values ignored that equal the", lbl.cat, length(eq.ctr), "\n") 
 }
 
 # -------------------------
 # correlation analysis
 # -------------------------
 if (text.out && !is.null(y)  &&  !is.factor(x)  &&  type == "p") {
-  ct <- cor.test(x,y) 
+  n.pair <- sum(!is.na(x - y))  # number of points after pairwise deletion
+  n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
+  ct <- cor.test(x,y)
   cat("\n")
   dashes(55)
   cat("Correlation Analysis for Variables", ct$data.name, "\n")
   dashes(55);  cat("\n")
+  cat("Number of paired values with neither missing:  n =", n.pair, "\n")
+  cat("Number of observations (rows of data) deleted: n =", n.del, "\n\n")
   cat("Sample Estimate: r =", round(ct$estimate,3), "\n\n")
   cat("Hypothesis Test that Population Correlation is Zero", "\n")
   cat("  t-value: ", round(ct$statistic,4), ",  df: ", ct$parameter, sep="") 

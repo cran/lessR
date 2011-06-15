@@ -4,24 +4,29 @@
 \title{Read, Attach and Display Contents of a csv File}
 
 \description{
-Reads the contents of the specified csv data file into an R dataframe called \code{mydata}.  Identifies the file by either browsing for the file on the local computer system, or as indicated by a path name or a web URL.  Then attaches and lists the first and last three rows of data as well as the variable names and the dimensions of the resulting data frame.  The purpose of \code{rad} is to save some keyboard entry, speeding up the process of reading a csv data file and reducing entry mistakes.
+Reads the contents of the specified csv data file into an R dataframe called \code{mydata}.  Identifies the file by either browsing for the file on the local computer system with \code{rad()}, or as indicated by a path name or a web URL.  Then attaches and lists the first and last three rows of data as well as the variable names and the dimensions of the resulting data frame.  In addition, perform an analysis of missing data, listing the number of missing values for each variable and for each observation.
 }
 
 \usage{
 rad(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, 
+         miss.zero=TRUE, miss.matrix=FALSE, 
          format=c("csv", "SPSS"), \dots)
 }
 
 
 \arguments{
   \item{ref}{File reference, either null to specify the default of 
-       code{file.choose()} to browse for the csv data file, or a full path name or web URL, included in quotes.  A URL begins with \code{http://}.}
+       \code{file.choose()} to browse for the csv data file, or a full path name or web URL, included in quotes.  A URL begins with \code{http://}.}
   \item{display}{The output of each step is displayed at the console, but this option can
         be turned off.}
   \item{show.R}{Display the R instructions that yielded the lessR output, albeit without
         the lessR formatting.}
   \item{no.attach}{Off by default, but if \code{TRUE} then do not attach the R data frame, 
         \code{mydata} by default.}
+  \item{miss.zero}{For the missing value analysis, list the variable name or the row name
+        even for values of 0.}
+  \item{miss.matrix}{For the missing value analysis, if there is any missing data, 
+        list a version of the complete data table with a 0 for a non-missing value and a 1 for a missing value.}
   \item{format}{Format of the data in the file.}
   \item{...}{Other parameter values consistent with the usual \code{read.csv}
        function, such as row.names and header.}
@@ -29,14 +34,14 @@ rad(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE,
 
 
 \details{
-By default \code{rad} reads \code{csv} data files. One way to create a csv data file is with MS Excel, LibreOffice Calc or other worksheet application.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
+CREATE csv FILE\cr
+By default \code{rad} reads \code{csv} data files. One way to create a csv data file is by entering the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
 
 All numeric data in the worksheet should be displayed in the General format, so that the only non-digit character for a numeric data value is a decimal point.  The General format removes all dollar signs and commas, for example, leaving only the pure number, stripped of these extra characters which R will not properly read as part of a numeric data value.
 
-To create the csv file from a worksheet, under the File option, do a Save As and choose the csv format.
+To create the csv file from Excel, under the File option, do a Save As and choose the csv format.
 
----
-
+MECHANICS\cr
 Given a csv data file, read the data into an R data frame called \code{mydata} with \code{rad}, which first invokes one of two R statements. 
 Call with no arguments, as in \code{rad()}, to invoke:
 
@@ -51,10 +56,15 @@ Then, \code{rad} invokes the subsequent R statements: \code{attach(mydata, warn.
 \code{head(mydata, n=3)} and \code{tail(mydata, n=3)}. Output of these statements is 
 directed to the console.  Also listed are the R statements invoked by \code{rad}.
 
----
+Because \code{rad} calls the standard R function \code{\link{read.csv}}, which just provides a wrapper for \code{\link{read.table}}, the usual options that work with \code{\link{read.table}}, such as \code{row.names} also can be passed through \code{rad}. 
 
-To read data in the SPSS \code{.sav} format, the \code{read.spss} function from the \code{foreign} package is used. To invoke this option, specify the \code{format="SPSS"}.
+SPSS DATA\cr
+To read data in the SPSS \code{.sav} format, \code{rad} calls the \code{read.spss} function from the \code{foreign} package. To invoke this option, specify \code{format="SPSS"}.
 
+MISSING DATA\cr
+By default, \code{rad} provides a list of each variable and each row with the display of the number of associated missing values, indicated by the standard R missing value code NA. When reading the data, R automatically sets any empty numeric and logical values as missing.  Null character string values are left as null, unless the R \code{na.strings=""} option is invoked. Of course any other valid value can be set to missing as well. 
+
+To not list the variable name or row name of variables or rows without missing data, invoke the \code{miss.zero=FALSE} option, which can appreciably reduce the amount of output for large data sets. To view the entire data table in terms of 0's and 1's for non-missing and missing data, respectively, invoke the \code{miss.matrix=TRUE} option. 
 }
 
 \author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}

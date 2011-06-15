@@ -6,7 +6,7 @@
 \title{Histogram with Color}
 
 \description{
-Using the standard R function \code{\link{hist}}, plots a frequency histogram with default colors, including background color and gridlines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
+Accessing the standard R function \code{\link{hist}}, plots a frequency histogram with default colors, including background color and gridlines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
 
 If the provided object for which to calculate the histogram is a data frame, then a histogram is calculated for each numeric variable in the data frame and the results written to a pdf file in the current working directory.  The name of this file and its path are specified in the output.
 }
@@ -58,8 +58,7 @@ Results are based on the standard \code{\link{hist}} function for calculating an
 
 A somewhat common error by beginning users of the base R \code{\link{hist}} function may encounter is to manually specify a sequence of bins with the \code{seq} function that does not fully span the range of specified data values. The result is a rather cryptic error message and program termination.  Here, \code{color.hist} detects this problem before attempting to generate the histogram with \code{\link{hist}}, and then informs the user of the problem with a more detailed and explanatory error message. Moreover, the entire range of bins need not be specified to customize the bins.  Instead, just a bin width need be specified, \code{bin.width}, and/or a value that begins the first bin, \code{bin.start}.  If a starting value is specified without a bin width, the default Sturges method provides the bin width.
 
-The \code{freq} option from the t
-itional \code{\link{hist}} function has no effect as it is always off in each internal call to \code{\link{hist}}.  To plot densities, which correspond to setting  \code{freq} to \code{FALSE}, use the \code{\link{color.density}} function in this package.
+The \code{freq} option from the the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}.  To plot densities, which correspond to setting  \code{freq} to \code{FALSE}, use the \code{\link{color.density}} function in this package.
 }
 
 
