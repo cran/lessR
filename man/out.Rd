@@ -43,7 +43,7 @@ mydata <- data.frame(X,Y)
 #   into a csv file called "mydata.csv" in the working directory
 # out()
 
-# same as above, but specify the file name
+# same as above, but specify the name of the output file name
 out("mybestdata.csv")
 }
 

@@ -127,7 +127,7 @@ function(YA, YB) {
   cat(Ynm, ", i.e., homogeneous.", sep="", "\n")
 
   cat("Variance Ratio test:  F = ", vr, " = ", v.out, ",  df = ", df.num, ";", 
-      df.den, ",  p-value = ",       pv.out, sep="", "\n")
+      df.den, ",  p-value = ",  pv.out, sep="", "\n")
 
   # Levene
   YAm <- abs(YA - median(YA))

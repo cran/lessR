@@ -5,19 +5,19 @@ function (formula, data=mydata, ...) {
   
   max.dd <- function(x) {
   
-    n.dec <-function(x) {
-      xc <- as.character(x)
-      nchar(xc)
-      ipos <- 0
-      for (i in 1:nchar(xc)) if (substr(xc,i,i)==".") ipos <- i
-      if (ipos > 0) n.dec <- nchar(xc)-ipos else n.dec <- 0
-      return(n.dec)
-    }
-     
-    max.dd <- 0
-    for (i in 1:length(x))
-      if (!is.na(x[i])) if (n.dec(x[i]) > max.dd ) max.dd <- n.dec(x[i])   
-    return(max.dd)
+      n.dec <-function(x) {
+        xc <- as.character(x)
+        nchar(xc)
+        ipos <- 0
+        for (i in 1:nchar(xc)) if (substr(xc,i,i)==".") ipos <- i
+        if (ipos > 0) n.dec <- nchar(xc)-ipos else n.dec <- 0
+        return(n.dec)
+      }
+       
+      max.dd <- 0
+      for (i in 1:length(x))
+        if (!is.na(x[i])) if (n.dec(x[i]) > max.dd ) max.dd <- n.dec(x[i])   
+      return(max.dd)
   }
   
 
@@ -40,7 +40,7 @@ function (formula, data=mydata, ...) {
   response <- attr(attr(mf, "terms"), "response")
   if (!is.numeric(mf[[response]])) 
     stop("Response variable ", Ynm, " must be numeric")
-  if (is.null(set.digits)) digits.d <- max.dd(mf[[response]]) else digits.d <- set.digits
+  if (is.null(set.digits)) digits.d <- max.dd(mf[[response]])+1 else digits.d <- set.digits
   if (digits.d > 10  && is.null(set.digits)) {
     cat("\nThese data contain", digits.d, "significant digits.\n")
     cat("Consider specifying a smaller number to display with the  digits  parameter.\n")

@@ -1,12 +1,12 @@
 Package: lessR
 Type: Package
 Title: Less Code, More Results
-Version: 1.9.7
-Date: 2011-6-09
+Version: 1.9.8
+Date: 2011-6-29
 Author: David W. Gerbing, School of Business Administration, Portland
         State University
 Maintainer: David W. Gerbing <davidg@sba.pdx.edu>
-Suggests: MBESS, leaps, car
+Suggests: MBESS, leaps, car, foreign
 Description: Each function accomplishes the work of several or more
         standard R functions.  For example, two function calls, rad()
         and full(), together read the csv data and generate descriptive
@@ -25,6 +25,6 @@ Description: Each function accomplishes the work of several or more
         and functions.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2011-06-09 16:52:29 UTC; David
+Packaged: 2011-06-30 03:40:47 UTC; david
 Repository: CRAN
-Date/Publication: 2011-06-15 18:02:33
+Date/Publication: 2011-06-30 17:01:37

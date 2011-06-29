@@ -3,9 +3,9 @@ function(my.formula, dframe=mydata, sig.digits=4,
          res.rows=NULL, res.sort=c("cooks","rstudent","off"), 
          pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
          cor=TRUE, subsets=TRUE, collinear=TRUE, relations=TRUE,
-         cook.cut=1, results=c("full", "brief"),  
-         X1.pred=NULL, X2.pred=NULL, X3.pred=NULL, X4.pred=NULL, 
-         X5.pred=NULL, show.R=FALSE) {
+         cook.cut=1, results=c("full", "brief"), scatter.cor=FALSE,
+         X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
+         X5.new=NULL, show.R=FALSE) {
          
   mydframe <- deparse(substitute(dframe))  # get dataframe name for cor before sort
   
@@ -36,17 +36,23 @@ function(my.formula, dframe=mydata, sig.digits=4,
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
   n.obs <- nrow(dframe)
-  
-  new.data <- FALSE
-  for (i in 1:(n.vars-1)) {
-    pp <- eval(parse(text=paste("X", toString(i),".pred",sep="")))
-    if (!is.null(pp)) new.data <- TRUE
-  }
-  if (new.data) for (i in 1:(n.vars-1)) {
-    pp <- eval(parse(text=paste("X", toString(i),".pred",sep="")))
-    if (is.null(pp)) {
+
+  if ( !is.null(X1.new) && (n.vars-1)>5 ) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Specified new data values for one predictor variable, so do for all.\n\n")
+        "Cannot have new data if more than 5 predictor variables.\n\n")
+  }
+  new.data <- FALSE
+  if ( (n.vars-1) <= 5 ) { 
+    for (i in 1:(n.vars-1)) {
+      pp <- eval(parse(text=paste("X", toString(i),".new",sep="")))
+      if (!is.null(pp)) new.data <- TRUE
+    }
+    if (new.data) for (i in 1:(n.vars-1)) {
+      pp <- eval(parse(text=paste("X", toString(i),".new",sep="")))
+      if (is.null(pp)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Specified new data values for one predictor variable, so do for all.\n\n")
+      }
     }
   }
 
@@ -82,6 +88,8 @@ function(my.formula, dframe=mydata, sig.digits=4,
     cat(line, pre, "model <- lm(", cv, ")", "\n", line, sep="")
   }
   cat("\n")
+
+  cat("Data Frame: ", mydframe, "\n\n")
   
   cat("Response Variable:  ", nm[1], "\n")
   for (i in 2:n.vars) {
@@ -93,19 +101,22 @@ function(my.formula, dframe=mydata, sig.digits=4,
   cat("\nNumber of observations (rows) of data: ", n.obs, "\n")
 
   
+  
     
   cat( "\n\n\n", "  BASIC ANALYSIS", "\n")
   
   if (show.R) cat(line, pre, "summary(model)", "\n", line, sep="")
   sm <- summary(lm.out)
   cat("\n")
-  cat("Estimated model coefficients, the b's, y-intercept and slope coefficients\n")
-  cat("Standard error and hypothesis test of each b, with null hypothesis Beta=0\n")
+  cat("Estimate: Model coefficients, y-intercept or a slope coefficient\n")
+  cat("Hypothesis Test:\n")
+  cat("    Standard error, t-value and p-value of each estimate\n")
+  cat("    Null hypothesis is corresponding population coefficient is 0\n")
   cat("\n")
   print(sm$coefficients, digits=sig.digits)
   cat("\n\n")
   if (show.R) cat("\n",line,pre,"confint(model)","\n",line,"\n",sep="") else cat("\n")
-  cat("Confidence interval for each model coefficient\n")
+  cat("Confidence Interval: About each model coefficient\n")
   cat("\n")
   print(confint(lm.out), digits=sig.digits)
   cat("\n\n\n")
@@ -113,7 +124,8 @@ function(my.formula, dframe=mydata, sig.digits=4,
   cat("\n")
   cat("Standard deviation of residuals: ", signif(sm$sigma,4),
     "for", sm$df[2], "degrees of freedom", "\n")
-  cat("If normal, range of residuals about each fitted value is 4*", signif(sm$sigma,4), 
+  cat("If normal, approximate 95% range of residuals about\n")
+  cat("  each fitted value is 4*", signif(sm$sigma,4), 
     " or ", signif(4*sm$sigma,4), sep="", "\n\n")
   cat("R-squared: ", signif(sm$r.squared,3), 
     "    Adjusted R-squared: ", signif(sm$adj.r.squared,3), "\n")
@@ -268,7 +280,7 @@ function(my.formula, dframe=mydata, sig.digits=4,
     else
       txt <- paste("Points with Cook's Distance >", cook.cut, "are displayed in red")
     dev.new()
-    color.plot(fit, res, fit.line="lowess", text.out=FALSE,
+    color.plot(fit, res, type="p", fit.line="lowess", text.out=FALSE,
       main="Plot of Residuals vs Fitted Values", xlab="Fitted Values",
         ylab="Residuals", sub=txt)
     abline(h=0, lty="dotted", col="gray70")
@@ -311,9 +323,9 @@ function(my.formula, dframe=mydata, sig.digits=4,
       out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],c.int,p.int$lwr,p.int$upr)
     }
     else {
-      Xnew.val <- list(X1.pred)
+      Xnew.val <- list(X1.new)
       if (n.vars > 2) for (i in 2:(n.vars-1)) {
-        pp <- eval(parse(text=paste("X", toString(i),".pred",sep="")))
+        pp <- eval(parse(text=paste("X", toString(i),".new",sep="")))
         Xnew.val <- c(Xnew.val, list(pp))
       }
       Xnew <- expand.grid(Xnew.val)
@@ -357,8 +369,9 @@ function(my.formula, dframe=mydata, sig.digits=4,
   # scatterplot, if one predictor variable
   dev.new() 
   if (n.vars == 2) {
-    if ( (pred==FALSE) || is.factor(lm.out$model[,nm[2]]) || !is.null(X1.pred) ) do.int <- FALSE
-      else do.int <- TRUE
+    if ( (pred==FALSE) || is.factor(lm.out$model[,nm[2]]) || !is.null(X1.new) ) 
+     do.int <- FALSE
+    else do.int <- TRUE
     if (!do.int) {
       ctitle <- "Scatterplot and Regression Line"
       y.min <- min(lm.out$model[,nm[1]])
@@ -370,8 +383,9 @@ function(my.formula, dframe=mydata, sig.digits=4,
       y.max <- max( max(p.int$upr),  max(lm.out$model[,nm[1]]) )
     }
     if (!is.factor(lm.out$model[,nm[2]])) fl <- "ls" else fl <- "none"
-    color.plot(lm.out$model[,nm[2]], lm.out$model[,nm[1]], cex=.8, fit.line=fl,
-      xlab=nm[2], ylab=nm[1], ylim=c(y.min,y.max), main=ctitle, text.out=FALSE)
+    color.plot(lm.out$model[,nm[2]], lm.out$model[,nm[1]], type="p", 
+      cex=.8, fit.line=fl, xlab=nm[2], ylab=nm[1],
+      ylim=c(y.min,y.max), main=ctitle, text.out=FALSE)
     if (do.int) {
       lines(lm.out$model[,nm[2]], c.int$lwr, col="lightsteelblue", lwd=2)
       lines(lm.out$model[,nm[2]], c.int$upr, col="lightsteelblue", lwd=2)
@@ -380,8 +394,24 @@ function(my.formula, dframe=mydata, sig.digits=4,
     }
   }
   else   # scatterplot matrix for multiple regression
-    if (numeric.all && in.data.frame)
-      pairs(dframe[c(nm)])
+    if (numeric.all && in.data.frame) {
+      if (scatter.cor) {
+        panel.cor <- function(x, y, digits=2, prefix="", cex.cor, ...) {
+          usr <- par("usr"); on.exit(par(usr))
+          par(usr = c(0, 1, 0, 1))
+  #        r <- abs(cor(x, y))
+          r <- cor(x, y)
+          txt <- format(c(r, 0.123456789), digits=digits)[1]
+          txt <- paste(prefix, txt, sep="")
+          if(missing(cex.cor)) cex.cor <- .9/strwidth(txt)
+  #        text(0.5, 0.5, txt, cex = cex.cor * r)
+          text(0.5, 0.5, txt, cex=2)
+        }
+        suppressWarnings(pairs(dframe[c(nm)], 
+          lower.panel=panel.smooth, col.smooth="grey50", upper.panel=panel.cor))
+      }
+      else suppressWarnings(pairs(dframe[c(nm)], panel=panel.smooth, col.smooth="grey50"))
+    }
     else {
       cat("\n\n>>> No scatterplot matrix reported because not all variables are ")
       if (!in.data.frame) cat("in the data frame.\n")
