@@ -13,7 +13,18 @@ cat("\n")
 if (is.null(ref)) ref <- file.choose()
 
 if (format == "csv") mydata <<- read.csv(file=ref, ...)
-if (format == "SPSS") mydata <<- read.spss(file=ref, to.data.frame = TRUE, ...)
+if (format == "SPSS") {
+  check.foreign <- suppressWarnings(require(foreign, quietly=TRUE))
+  if (check.foreign) {
+    mydata <<- read.spss(file=ref, to.data.frame = TRUE, ...)
+  }
+  else {
+  cat("\n"); stop(call.=FALSE, "\n","------\n",
+      ">>> Reading a SPPS .sav data file requires package:  foreign\n",
+      ">>> To obtain the foreign package, run one time only: ",
+      "install.packages('foreign')\n\n")
+  }
+}
 
 if (!no.attach) attach(mydata, warn.conflicts=FALSE)
 

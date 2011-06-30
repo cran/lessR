@@ -9,7 +9,7 @@ function(x, lbl=NULL, ...)  {
   cat(lbl, "\n")
   dashes(nchar(lbl)); cat("\n")
   if (nlevels(x) < length(x)) { 
-    x.table <- table(x); 
+    x.table <- table(x, ...); 
     names(x.table)[0]=" ";  # get rid of variable label
     print(x.table) 
   }

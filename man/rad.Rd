@@ -27,7 +27,7 @@ rad(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE,
         even for values of 0.}
   \item{miss.matrix}{For the missing value analysis, if there is any missing data, 
         list a version of the complete data table with a 0 for a non-missing value and a 1 for a missing value.}
-  \item{format}{Format of the data in the file.}
+  \item{format}{Format of the data in the file, which by default is a \code{csv} file, and as option can be an SPSS \code{sav} file.}
   \item{...}{Other parameter values consistent with the usual \code{read.csv}
        function, such as row.names and header.}
 }
