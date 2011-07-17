@@ -37,7 +37,7 @@ This function parallels the \code{\link{smd.t.test}} function included in this p
 This version of \code{stats.t.test} assumes homogeneity of variance in the computation of the standard error of the mean difference. Also, only a two-sided test is provided.  The null hypothesis is a population mean difference of 0.
 }
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{smd.t.test}}, \code{\link{t.test}}.

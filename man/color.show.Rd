@@ -22,7 +22,7 @@ color.show(file="colors.pdf", color=NULL)
 Every color name is defined in terms of a red, green and blue components. This function lists the rgb definitions for the specified colors, as well as the name and a display of each color. The output should be routed to an external pdf file for storage. The directory and file name of the output file are displayed.}
 
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 
 \examples{

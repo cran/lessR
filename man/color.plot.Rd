@@ -4,7 +4,7 @@
 \title{Color Scatter-Plot, Function Plot, or Run Chart with Optional Dates}
 
 \description{
-Plots individual points, such as for a scatterplot, or plots connected line segments for the plot of a function or a run chart, including an option for adding dates to the horizontal axis for a time series chart. One enhancement over the usual \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, gridlines, and border can each be explicitly specified, with default colors provided.  For Likert style response data, so that each value has less than 10 unique integer values, the points in the plot are transformed into a bubble plot with the size of each bubble, i.e., point, determined by the corresponding joint frequency.  The x-variable, the variable plotted on the horizontal axis, can be numerical or a factor.
+Plots individual points, such as for a scatterplot, or plots connected line segments for the plot of a function or a run chart, including an option for adding dates to the horizontal axis for a time series chart. One enhancement over the usual \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, grid lines, and border can each be explicitly specified, with default colors provided.  For Likert style response data, so that each value has less than 10 unique integer values, the points in the plot are transformed into a bubble plot with the size of each bubble, i.e., point, determined by the corresponding joint frequency.  The x-variable, the variable plotted on the horizontal axis, can be numerical or a factor.
 
 For data exhibiting little trend, the the center line is provided for the generation of a run chart, plotting the values of a variable in order of occurrence over time.  When the center line, the median by default, is plotted, the analyses of the number and composition of the individual runs, number of consecutive values above or below the center line, is also displayed.  Also, the defaults change for each of the types of plots.  The intent is to rely on the default values for a relatively sophisticated plot, particularly when compared to the default values of the standard R \code{\link{plot}} function.
 
@@ -21,8 +21,8 @@ color.plot(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            fit.line=c("none", "lowess", "ls"), col.fit.line="grey55", 
            col.bubble="lightsteelblue", col.flower="steelblue",
            time.start=NULL, time.by=NULL, time.reverse=FALSE,
-           ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
-           \ldots)
+           ellipse=FALSE, col.ellipse="lightslategray", 
+           fill.ellipse=TRUE, \ldots)
 }
 
 \arguments{
@@ -113,7 +113,7 @@ BACKGROUND COLOR\cr
 The default background color of \code{col.bg=ghostwhite} provides a very mild cool tone with a slight emphasis on blue. To provide a warmer tone by slightly enhancing red, try \code{col.bg=snow}. Obtain a very light gray with \code{col.bg=gray99}.  To darken the background gray, try \code{col.bg=gray97} or lower numbers. See the \code{\link{color.show}} function in this package the provides an example of all available named colors.
 
 ADDITIONAL OPTIONS\cr
-Commonly used graphical parameters that are available to the standard R function \code{color.plot} are generally available to \code{color.plot}, such as:
+Commonly used graphical parameters that are available to the standard R function \code{\link{plot}} are also generally available to \code{\link{color.plot}}, such as:
 
 \describe{
 \item{pch}{Vector of plotting characters or symbols for the individual points, see \code{\link{points}}.}
@@ -131,7 +131,7 @@ Commonly used graphical parameters that are available to the standard R function
 Monette, G. and Fox, J., \code{dataEllipse} function from the \code{car} package.
 }
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{plot}}, \code{\link{title}}, \code{\link{par}}, \code{\link{cor.test}}.

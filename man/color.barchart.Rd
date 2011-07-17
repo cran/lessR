@@ -21,7 +21,7 @@ color.barchart(x=NULL, \ldots)
 \method{color.barchart}{data.frame}(x, \dots)
 
 \method{color.barchart}{default}(x, y=NULL, col.bars=NULL, border="black", 
-         col.bg="ghostwhite", col.grid="grey90", gap=NULL, beside=TRUE, 
+         col.bg="ghostwhite", col.grid="grey86", gap=NULL, beside=TRUE, 
          over.grid=FALSE, prop=FALSE, xlab=NULL, legend.title=NULL, 
          legend.loc=NULL, legend.labels=NULL, legend.horiz=FALSE, 
          vivid=FALSE, random.col=FALSE, col.low="slategray2", 
@@ -108,7 +108,7 @@ In addition to the barchart, descriptive and optional inferential statistics are
 }
 
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{barplot}}, \code{\link{legend}}.
@@ -182,6 +182,14 @@ color.barchart(Pain, Gender, col.bars=c("coral3","seagreen3"),
   col.bg="wheat1", col.grid="wheat3", col.main="wheat4", 
   col.axis="wheat4", col.lab="wheat4", cex.lab=1.2)
   
+# get a wider vertical left margin by using R par function with mar option
+# particularly useful for horizontal bar charts with horizontal labels (las=1)
+# move from default 4 lines to 7 lines, second arg of mar option
+par(mar=c(5, 7, 4, 2) + 0.1)
+color.barchart(Pain, horiz=TRUE, las=1)
+# go back to the default settings for subsequent graphs
+par(mar=c(5, 4, 4, 2) + 0.1)
+
 
 # ----------------------------
 # can enter many types of data

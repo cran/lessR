@@ -42,7 +42,7 @@ Other graphic parameters are available to format the display, such as \code{main
 To minimize white space around the boxplot, may wish to re-size the graphics window before or after creating the boxplot.
 }
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{boxplot}}, \code{\link{par}}.

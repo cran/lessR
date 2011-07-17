@@ -1,6 +1,6 @@
 color.barchart.default <- 
 function(x, y=NULL, col.bars=NULL, border="black", 
-         col.bg="ghostwhite", col.grid="grey90", gap=NULL, beside=TRUE, 
+         col.bg="ghostwhite", col.grid="grey86", gap=NULL, beside=TRUE, 
          over.grid=FALSE, prop=FALSE, xlab=NULL, legend.title=NULL, 
          legend.loc=NULL, legend.labels=NULL, legend.horiz=FALSE, 
          vivid=FALSE, random.col=FALSE, col.low="slategray2", 
@@ -79,19 +79,25 @@ function(x, y=NULL, col.bars=NULL, border="black",
   if (is.null(gap)) if (is.matrix(x) && beside) gap <- c(0.1,1) else gap <- 0.2
   
   # set up plot area, color background, grid lines
-  if (!horiz) 
-   barplot(x, col="transparent", border=NA, ylim=c(0,max.y), beside=beside, 
-    space=gap, axisnames=FALSE, ...)
+  if (!horiz)
+    barplot(x, col="transparent", border=NA, ylim=c(0,max.y), beside=beside, 
+     space=gap, axisnames=FALSE, ...)
   else
-   barplot(x, col="transparent", border=NA, beside=beside, space=gap,
-     axisnames=FALSE, horiz=TRUE, font.main=1, ...)
+    barplot(x, col="transparent", border=NA, beside=beside, space=gap,
+      axisnames=FALSE, horiz=TRUE, font.main=1, ...)
   usr <- par("usr");  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
   if (max.y > 1) vy <- pretty(0:max.y) else vy <- pretty(1:100*max.y)/100
   
   # bar plot, grid lines and legend
-  if (!over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+  if (!over.grid) {
+    if (!horiz) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+    else abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+  }
   barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz, space=gap, xlab=x.lbl, ...)
-  if (over.grid) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+  if (over.grid) {
+    if (!horiz) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+    else abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+  }
   if ((!is.null(y) || is.matrix(x)) && !is.null(legend.loc)) 
     legend(legend.loc, legend=legend.labels, title=y.lbl, fill=col, horiz=legend.horiz)
   

@@ -62,7 +62,7 @@ The \code{freq} option from the the standard R \code{\link{hist}} function has n
 }
 
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{hist}}, \code{\link{plot}}, \code{\link{par}}.
