@@ -68,7 +68,7 @@ Kelley, K., \code{smd} function from the \code{MBESS} package.
 }
 
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{t.test}}, \code{\link{density}}, \code{\link{plot.density}}, \code{\link{powercurve.t.test}}, \code{\link{formula}}.

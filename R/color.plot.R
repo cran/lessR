@@ -8,7 +8,8 @@ function(x, y=NULL, type=NULL, col.line="darkblue", col.area=NULL,
            fit.line=c("none", "lowess", "ls"), col.fit.line="grey55", 
            col.bubble="lightsteelblue", col.flower="steelblue",
            time.start=NULL, time.by=NULL, time.reverse=FALSE,
-           ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, ...) {
+           ellipse=FALSE, col.ellipse="lightslategray", 
+           fill.ellipse=TRUE, ...) {
            
 max.dd <- function(x) {
 

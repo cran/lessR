@@ -8,8 +8,8 @@ Plots a normal density curve and/or a general density curve superimposed over a 
 }
 
 \usage{
-color.density(x, col.nrm="darkblue", col.gen="blue", col.bg="ghostwhite",  
-         col.grid="grey90", col.hist="grey86",
+color.density(x, col.nrm="darkblue", col.gen="blue",  
+         col.bg="ghostwhite", col.grid="grey90", col.hist="grey86",
          col.fill.nrm=rgb(80,150,200, alpha=70, max=255), 
          col.fill.gen=rgb(250,210,230, alpha=70, max=255),
          bin.start=NULL, bin.width=NULL, text.out=TRUE,
@@ -55,7 +55,7 @@ The limits for the axes are automatically calculated so as to provide sufficient
 }
 
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{dnorm}}, \code{\link{density}}, \code{\link{hist}}, \code{\link{plot}}, \code{\link{rgb}}.

@@ -29,7 +29,7 @@ Calculate the normal curve probability for the specified interval and normal cur
 }
 
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 
 \seealso{

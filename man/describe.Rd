@@ -50,7 +50,7 @@ The \code{digits.d} parameter specifies the number of decimal digits in the outp
 The function \code{\link{rad}} in this package reads the data from an external csv file into the data frame called mydata.  To describe all of the variables in this data frame, invoke describe(mydata), or just describe(), which then defaults to the former.
 }
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{summary}},  \code{\link{formula}}.

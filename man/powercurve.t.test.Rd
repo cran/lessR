@@ -49,7 +49,7 @@ The  effect size that achieves a power of 0.8 is displayed. If a minimal meaning
 If the function is called with no parameter values, that is, as \code{powercurve.t.test()}, then the values of \code{n1}, \code{n2} and sw must already exist before the function call.  If they do, these values are used in the power computations.  These three values can be set manually, or they are automatically computed and set by \code{\link{smd.t.test}}.
 }
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{color.plot}}, \code{\link{plot}}, \code{\link{power.t.test}}.

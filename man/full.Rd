@@ -20,7 +20,7 @@ full(x=NULL)
 \code{full} is designed to work in conjunction with the function \code{\link{rad}} from this package, which reads a csv file into the data frame \code{mydata}.
 }
 
-\author{David W. Gerbing (Portland State University; \email{davidg@sba.pdx.edu})}
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{describe}}, \code{\link{color.hist}}, \code{\link{color.barchart}}.
