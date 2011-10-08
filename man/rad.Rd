@@ -9,7 +9,7 @@ Reads the contents of the specified csv data file into an R dataframe called \co
 
 \usage{
 rad(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, 
-         miss.zero=TRUE, miss.matrix=FALSE, 
+         n.cut=1, miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
          format=c("csv", "SPSS"), \dots)
 }
 
@@ -23,8 +23,12 @@ rad(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE,
         the lessR formatting.}
   \item{no.attach}{Off by default, but if \code{TRUE} then do not attach the R data frame, 
         \code{mydata} by default.}
+  \item{n.cut}{For the missing value analysis, list the row name and number of missing values
+        if the number of missing exceeds or equals this cutoff.}
+  \item{miss.show}{For the missing value analysis, the number of rows, one row per observation,
+        that has as many or missing values as \code{n.cut}.}
   \item{miss.zero}{For the missing value analysis, list the variable name or the row name
-        even for values of 0.}
+        even for values of 0. By default only variables and rows with missing data are listed.}
   \item{miss.matrix}{For the missing value analysis, if there is any missing data, 
         list a version of the complete data table with a 0 for a non-missing value and a 1 for a missing value.}
   \item{format}{Format of the data in the file, which by default is a \code{csv} file, and as option can be an SPSS \code{sav} file.}
@@ -87,7 +91,7 @@ To not list the variable name or row name of variables or rows without missing d
 
 # read a csv data file from the web
 # then attach and list variable names and some values
-#rad("http://web.pdx.edu/~gerbing/data/twogroup.csv")
+# rad("http://web.pdx.edu/~gerbing/data/twogroup.csv")
 }
 
 

@@ -1,7 +1,7 @@
 # read, attach, display
 rad <- 
 function(ref=NULL, display=TRUE, show.R=FALSE, no.attach=FALSE, 
-         miss.zero=TRUE, miss.matrix=FALSE, 
+         n.cut=1, miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
          format=c("csv", "SPSS"), ...) {
          
 format <- match.arg(format)
@@ -67,8 +67,8 @@ if (display) {
     cat("Data type of each variable\n")
     cat(line)
     cat("Factor: Variable with non-numeric values, stored as an integer\n")
-    cat("num: Numeric variable that may have decimal digits\n")
-    cat("int: Numeric variable limited to integer values\n")
+    cat("num: Variable with numeric values that may have decimal digits\n")
+    cat("int: Variable with numeric values limited to integer values\n")
     cat(line, "\n")
     cat(str(mydata, digits.d=15))
   }
@@ -78,43 +78,59 @@ if (display) {
   cat("Missing Data Analysis\n")
   cat(line, "\n")
 
-  n.miss.tot <- 0
-  for (i in 1:n.var) n.miss.tot <- n.miss.tot + sum(is.na((mydata)[, i]))
+  n.miss.tot <- sum(is.na(mydata))
   
   if (n.miss.tot > 0) {
-    cat("Miss", "Variable\n")
+  
+    cat("n.miss ", "Variable\n")
     for (i in 1:n.var) {
       n.miss <- sum(is.na((mydata)[, i]))
-      if (n.miss > 0 || miss.zero) cat(n.miss, " ", names((mydata)[i]),  "\n")
+      if (n.miss > 0 || miss.zero) cat(n.miss, "    ", names((mydata)[i]),  "\n")
     }
     
-    cat("\nMiss", "Observation\n")
-    for (i in 1:n.obs) {
+    cat("\nn.miss ", "Observation\n")
+    n.lines <- 0
+    i <- 0
+    while ( i<n.obs && n.lines>=0 ) {
+      i <- i + 1
       n.miss <- sum(is.na((mydata)[i, ]))
-      if (n.miss > 0 || miss.zero) cat(n.miss, " ", row.names((mydata)[i, ]),  "\n")
+      if ( (n.miss >= n.cut  || miss.zero) && (n.lines < miss.show) ) {
+        n.lines <- n.lines + 1
+        cat(n.miss, "     ", row.names((mydata)[i, ]), "\n")
+      }
+      if (n.lines == miss.show) {
+        n.lines <- -1
+        cat("\nToo many data rows have at least this many missing values: ", n.cut, "\n",
+          "No more lines displayed to conserve space.\n",
+          "Specify n.cut=2 to see just those lines with 2 missing values, etc,",
+          "or use a higher number.\n",
+          "Or increase the default value of miss.show=30 to show more lines.")
+      }
     }
-  cat("\n\n")
-  }
+    cat("\n\n")
+
+    cat("Total number of cells in data table: ", n.var*n.obs,"\n\n")
+    cat("Total number of cells with the value missing: ", n.miss.tot,"\n")
   
-  cat("Total number of cells in data table: ", n.var*n.obs,"\n\n")
-  cat("Total number of cells with the value missing: ", n.miss.tot,"\n")
-  
-  if (miss.matrix && n.miss.tot>0) {
-    cat("\n\nTable of Missing Values, 1 means missing\n\n")
-    print(matrix(as.numeric(is.na(mydata)), nrow=n.obs, ncol=n.var,
+    if (miss.matrix && n.miss.tot>0) {
+      cat("\n\nTable of Missing Values, 1 means missing\n\n")
+      print(matrix(as.numeric(is.na(mydata)), nrow=n.obs, ncol=n.var,
       dimnames = list(row.names(mydata), as.character(1:n.var)) ))
+    }
+
+    cat("\n\n")
+    cat(line, "What is next? Try one of the following.", "\n", sep="", line)
+    cat("mydata: List all rows (observations) of data, or just enter the\n")
+    cat("        variable name to see the data just for that variable\n")
+    cat("full(): A data summary and graph for each variable in the data table, mydata\n")
+    cat("help.me(): List of topics for analysis with related R/lessR functions\n")
+    cat(line, sep="")
+    cat("\n")
+	  
+   }
+
+   else cat("No missing data\n\n")
+
   }
-
-
-  cat("\n\n")
-  cat(line, "What is next? Try one of the following.", "\n", sep="", line)
-  cat("mydata: List all rows (observations) of data, or just enter the\n")
-  cat("        variable name to see the data just for that variable\n")
-  cat("full(): A data summary and graph for each variable in the data table, mydata\n")
-  cat("help.me(): List of topics for analysis with related R/lessR functions\n")
-  cat(line, sep="")
-  cat("\n")
-  
-}
 
 }
