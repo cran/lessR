@@ -14,7 +14,7 @@ If the provided object for which to calculate the box plot is a data frame, then
 \usage{
 color.boxplot(x=NULL, \ldots)
 
-\method{color.boxplot}{default}(x, col.box="bisque2", col.point=NULL, 
+\method{color.boxplot}{default}(x, col.box="lightsteelblue", col.point=NULL, 
          horizontal=TRUE, xlab=NULL, digits.d=10, \ldots)
 
 \method{color.boxplot}{data.frame}(x, \ldots) 

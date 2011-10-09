@@ -642,4 +642,3 @@ function(my.formula, dframe=mydata, sig.digits=4,
   options(op)  # restore options going into reg
 
 }
-

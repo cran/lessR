@@ -1,5 +1,5 @@
 color.boxplot.default <-
-function(x, col.box="bisque2", col.point=NULL, 
+function(x, col.box="lightsteelblue", col.point=NULL, 
          horizontal=TRUE, xlab=NULL, digits.d=10, ...) {        
 
   dash <- function(n.dash) { for (i in 1:(n.dash)) cat("-"); cat("\n") }
