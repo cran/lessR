@@ -1,4 +1,5 @@
-a68d8a247057ad72e83acb8380a037a6 *DESCRIPTION
+2efbd60eee03f30a9b6880b19b3af181 *DESCRIPTION
+9fdfeb11f7ddba6f3aab9aaa6b1ac5dd *NAMESPACE
 7cda08d0b64d83a4cc563b0555199e0e *R/all.R
 7ab65f21267d223870fb41e549c0953c *R/allNoBlanks.R
 0d7f1d81aba929b0f6fada34d9924787 *R/color.barchart.R
@@ -25,8 +26,8 @@ a55d31cbd721c8d1b6ce2ed4f27dc11e *R/help.me.R
 d0b432a039ecaf7f8b09b921d3b547f7 *R/out.R
 c4a4bd35f8d80e83a50fb2cce87353a5 *R/powercurve.t.test.R
 044b6bc4ef8cf9ec259524029c39407e *R/prob.norm.R
-17eaf21f594d479d56b658727e4e0015 *R/rad.R
-c8e71fb718a707ec902f0f6fd69a2e64 *R/reg.R
+3347086224db4f3e6ea9cd9ded57ba67 *R/rad.R
+5266782a909b81f3032b336eded48463 *R/reg.R
 ed6b507182a269cbab8480a42fba441e *R/smd.t.test.R
 596e24024bb4d56cbb04d364ea213b8d *R/smd.t.test.default.R
 9d2591542ecdbf7e8cf817fdde670466 *R/smd.t.test.formula.R
@@ -44,6 +45,6 @@ db47215f1cb04dbb809ef3e68cab347e *man/help.me.Rd
 0d44eb0104235e05ce811de08e29327e *man/powercurve.t.test.Rd
 e624c2abec7558dea220bcdd050be9f6 *man/prob.norm.Rd
 bfd562d502c09efc393429e4371a4f8e *man/rad.Rd
-87cdcac6452b611a0b734d321b86a750 *man/reg.Rd
+6b61c9695852f84e1a4d3547a99db991 *man/reg.Rd
 e22454a22ed29fc5517c7e6ab7bd4ae4 *man/smd.t.test.Rd
 2acf934cd88cef5ff3c9ac6f772ec2a9 *man/stats.t.test.Rd

@@ -12,6 +12,11 @@ line <- "------------------------------------------------------------\n"
 cat("\n")
 if (is.null(ref)) ref <- file.choose()
 
+cat(line)
+cat("Data file: \n")
+cat("   ", ref, "\n")
+cat(line)
+
 if (format == "csv") mydata <<- read.csv(file=ref, ...)
 if (format == "SPSS") {
   check.foreign <- suppressWarnings(require(foreign, quietly=TRUE))
@@ -20,7 +25,7 @@ if (format == "SPSS") {
   }
   else {
   cat("\n"); stop(call.=FALSE, "\n","------\n",
-      ">>> Reading a SPPS .sav data file requires package:  foreign\n",
+      ">>> Reading a SPPS .sav dedta file requires package:  foreign\n",
       ">>> To obtain the foreign package, run one time only: ",
       "install.packages('foreign')\n\n")
   }
