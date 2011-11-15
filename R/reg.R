@@ -10,7 +10,7 @@ function(my.formula, dframe=mydata, sig.digits=4,
   dash <- function(n.dash) { for (i in 1:(n.dash)) cat("-"); cat("\n") }
   
   mydframe <- deparse(substitute(dframe))  # get dataframe name for cor before sort
-  
+ 
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
   pred.sort <- match.arg(pred.sort)
@@ -84,8 +84,10 @@ function(my.formula, dframe=mydata, sig.digits=4,
     
   if (is.null(res.rows)) if (n.obs < 25) res.rows <- n.obs else res.rows <- 25 
   if (res.rows == "all") res.rows <- n.obs  # turn off resids with res.rows=0 call
-  
-  if (n.vars == 2) { # order values of the one predictor variable for scatterplot
+ 
+  # order values of the one predictor variable for scatterplot
+  #   so that the prediction/confidence intervals can be drawn
+  if (n.vars == 2) { 
     o <- order(dframe[,nm[2]], decreasing=FALSE)
     dframe <- dframe[o,]
   }
@@ -147,14 +149,14 @@ function(my.formula, dframe=mydata, sig.digits=4,
     dash(68)
     cat("Estimates\n",
         "  Intercept: Fitted value of response variable, ", nm[1], ", when the\n",
-        "             predictor variable", sep="")
+        "             values of the predictor variable", sep="")
     if (n.pred == 1) cat(" is ") else cat("s are ")
     cat("set to zero.\n")
     cat("  Slope Coefficient: Average change in the value of response variable,\n",
         "             ", nm[1], ", for a one-unit increase in the value of the\n",
         "             corresponding predictor variable", sep="")
     if (n.pred == 1) cat(".\n") 
-    else cat(", with the value of all\n",
+    else cat(", with the values of all\n",
              "             remaining predictor variables held constant.\n", sep="")
     cat("\n")
     cat("Hypothesis Tests\n")
@@ -557,28 +559,8 @@ function(my.formula, dframe=mydata, sig.digits=4,
 # Scatterplots
 # ------------
 
-  if (scatter.3d) {  # 3d scatterplot option
-    check.3d <- suppressWarnings(require(scatterplot3d, quietly=TRUE))
-    if (check.3d) {
-      if (!graphics.save) dev.new()
-      text <- paste("Scatter about the Best-Fit Regression Plane: \n", nm[1], "= ")
-      text <- paste(text, toString(signif(lm.out$coefficients[2],3)), "*", nm[2],
-                " + ", toString(signif(lm.out$coefficients[3],3)), "*", nm[3], sep="")
-      s3d <- scatterplot3d(lm.out$model[,nm[2]], lm.out$model[,nm[3]], main=text, 
-               lm.out$model[,nm[1]], type="h", color="darkslateblue", box=FALSE,
-               angle=55, scale.y=0.7, pch=16, xlab=nm[2], ylab=nm[3], zlab=nm[1])
-      s3d$plane3d(lm.out, lty.box="solid", col="gray70")
-    }
-    else {
-      cat("\n>>> Creating a 3d scatterplot requires package scatterplot3d.", "\n")
-      cat(">>> This analysis is not provided, but all other output is unaffected.", "\n")
-      cat(">>> To get this package, run once only: install.packages('scatterplot3d')", "\n")
-    }
-  }
-  
- 
   if (!graphics.save) dev.new() 
-  if (n.vars == 2) {  # scatterplot, if one predictor variable
+  if (n.pred == 1) {  # scatterplot, if one predictor variable
     if ( (pred==FALSE) || is.factor(lm.out$model[,nm[2]]) || !is.null(X1.new) ) 
      do.int <- FALSE
     else do.int <- TRUE
@@ -626,6 +608,27 @@ function(my.formula, dframe=mydata, sig.digits=4,
       if (!numeric.all) cat("numeric.\n")
     }
 
+  if (scatter.3d) {  # 3d scatterplot option for 2-predictor models
+    check1.3d <- suppressWarnings(require(car, quietly=TRUE))
+    check2.3d <- suppressWarnings(require(rgl, quietly=TRUE))
+    if (check1.3d && check2.3d) 
+      scatter3d(my.formula, id.method="identify", data=dframe)
+    else {
+      if (!check1.3d) {
+        cat("\n>>> Creating a 3d scatterplot requires package car.", "\n")
+        cat(">>> This analysis is not provided, but other output is unaffected.", "\n")
+        cat(">>> To get this package, run once only:", "\n")
+        cat("      install.packages('car')", "\n")
+      }
+      if (!check2.3d) {
+        cat("\n>>> Creating a 3d scatterplot requires package rgl.", "\n")
+        cat(">>> This analysis is not provided, but other output is unaffected.", "\n")
+        cat(">>> To get this package, run once only:", "\n")
+        cat("      install.packages('rgl')", "\n")
+      }
+    }
+  }
+  
 
   if (graphics.save) {
     cat("\n\n")
