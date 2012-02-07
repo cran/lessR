@@ -1,12 +1,20 @@
 color.hist <-
-function(x=NULL, ...)  {
+function(...) {
 
-  if (is.null(x)) {
-    if (!exists("mydata")) 
-      stop("Need to specify an existing data frame or data frame mydata must exist.")
-    color.hist(mydata, ...) 
-  }
-  else UseMethod("color.hist")
-	
+  cat("\n"); cat( # stop(call.=FALSE, "\n","------\n",
+    ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n",
+    " The lessR project is now much more than just about color.\n",
+    " Accordingly, the function  color.hist has been renamed.\n\n",
+    " Now use  hst   instead of  color.hist.\n",
+    "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n", sep="")
+
+  hst(...)
+
+  cat("\n"); cat( # stop(call.=FALSE, "\n","------\n",
+    ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n",
+    " The lessR project is now much more than just about color.\n",
+    " Accordingly, the function  color.hist has been renamed.\n\n",
+    " Now use  hst   instead of  color.hist.\n",
+    "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n", sep="")
+
 }
-

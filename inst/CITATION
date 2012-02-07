@@ -1,0 +1,19 @@
+citHeader("To cite package 'lessR' in publications use:")
+
+if(!exists("meta") || is.null(meta)) meta <- packageDescription("lessR") 
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date) 
+vers <- paste("R package version", meta$Version)
+
+citEntry(entry="Manual", 
+         title = "lessR: Less Code, More Results", 
+         author = personList(as.person("David W. Gerbing")),
+         year = year, 
+         note = vers,
+         url = "http://cran.r-project.org/web/packages/lessR/index.html",
+         textVersion = paste("David W. Gerbing, (", 
+           year, 
+           "). lessR: Less Code, More Results. ", 
+           vers, 
+           ", http://cran.r-project.org/web/packages/lessR/index.html",
+           ".", sep="")
+        )

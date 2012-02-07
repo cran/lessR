@@ -4,11 +4,11 @@
 \title{Full Descriptive Analysis of all Variables in the Data Frame}
 
 \description{
-Call the following functions in this package:  \code{\link{describe}}, \code{\link{color.hist}} and \code{\link{color.barchart}}. The result is set of summary statistics for every variable in the data frame, by default called mydata, a histogram for each numerical variable and a bar chart for each non-numerical variable.
+Call the following functions in this package:  \code{\link{ss}}, \code{\link{hst}} and \code{\link{bc}}. The result is set of summary statistics for every variable in the data frame, by default called mydata, a histogram for each numerical variable and a bar chart for each non-numerical variable.
 }
 
 \usage{
-full(x=NULL)
+full(x=mydata)
 }
 
 \arguments{
@@ -23,7 +23,7 @@ full(x=NULL)
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{describe}}, \code{\link{color.hist}}, \code{\link{color.barchart}}.
+\code{\link{ss}}, \code{\link{hst}}, \code{\link{bc}}.
 }
 
 \examples{
@@ -32,9 +32,10 @@ n <- 12
 X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
 Y <- rnorm(n=n, mean=50, sd=10)
 mydata <- data.frame(X,Y)
+rm(X); rm(Y);
 
 # full descriptive analysis of mydata
-# full()
+full()
 }
 
 

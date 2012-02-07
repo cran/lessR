@@ -1,12 +1,20 @@
 color.boxplot <-
-function(x=NULL, ...)  {
+function(...) {
 
-  if (is.null(x)) {
-    if (!exists("mydata")) 
-      stop("Need to specify an existing data frame or data frame mydata must exist.")
-    color.boxplot(mydata, ...) 
-  }
-  else UseMethod("color.boxplot")
-	
+  cat("\n"); cat( # stop(call.=FALSE, "\n","------\n",
+    ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n",
+    " The lessR project is now much more than just about color.\n",
+      "Accordingly, the function  color.boxplot has been renamed.\n\n",
+      "Now use  bx  instead of  color.boxplot.\n",
+    "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n", sep="")
+
+  bx(...)
+
+  cat("\n"); cat( # stop(call.=FALSE, "\n","------\n",
+    ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n",
+    " The lessR project is now much more than just about color.\n",
+      "Accordingly, the function  color.boxplot has been renamed.\n\n",
+      "Now use  bx  instead of  color.boxplot.\n",
+    "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n", sep="")
+
 }
-

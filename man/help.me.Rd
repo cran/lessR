@@ -1,5 +1,6 @@
 \name{help.me}
 \alias{help.me}
+\alias{help.me}
 
 \title{Help System for Statistics by Topic that Suggests Related Functions}
 
@@ -14,8 +15,8 @@ help.me(topic=NULL)
 
 \arguments{
   \item{topic}{Message reference, either null to specify a list of available topics or a specific argument to reference a specific help message.}
+  \item{\dots}{Other parameter values to be passed to help.me.}
 }
-
 
 \details{
 \code{help.me()} displays a list of help topics, listed below.

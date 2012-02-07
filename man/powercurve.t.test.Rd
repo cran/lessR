@@ -46,7 +46,7 @@ For power analysis of the two-sample t-test, the null hypothesis is a zero popul
 
 The  effect size that achieves a power of 0.8 is displayed. If a minimal meaningful difference, \code{mmd}, is provided, then the  associated power is also displayed, as well as the needed sample size to achieve a power of 0.8.
 
-If the function is called with no parameter values, that is, as \code{powercurve.t.test()}, then the values of \code{n1}, \code{n2} and sw must already exist before the function call.  If they do, these values are used in the power computations.  These three values can be set manually, or they are automatically computed and set by \code{\link{smd.t.test}}.
+If the function is called with no parameter values, that is, as \code{powercurve.t.test()}, then the values of \code{n1}, \code{n2} and sw must already exist before the function call.  If they do, these values are used in the power computations.  These three values can be set manually, or they are automatically computed and set by \code{\link{ttest}}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -76,7 +76,7 @@ powercurve.t.test(n=20, s1=4, s2=6, lwd=2, col.line="darkred",
 powercurve.t.test(n=20, s=5, mu0=30, mmd=2)
 
 # power curve for previously specified values of n1, n2 and sw,
-#  such as computed by smd.t.test, or specify manually, as done here
+#  such as computed by ttest, or specify manually, as done here
 n1 <- 20;  n2 <- 25;  sw <- 5
 powercurve.t.test()
 }
