@@ -339,20 +339,20 @@ else if (topic == "histogram") {
 t0 <- "Histogram"
 
 f1 <- bquote(paste(bold("hist"), "  Histogram function."))
-f2 <- bquote(paste(bold("color.hist"), "  An enhanced version of hist."))
+f2 <- bquote(paste(bold("hst"), "  An enhanced version of hist."))
 
 t1 <-
 "The generic variable in the examples below is Y. Replace with the actual name of 
 the variable in a specific analysis.
 
 An enhanced histogram, including color by default, is produced from
-    > color.hist(Y)
+    > hst(Y)
 
 In this histogram, specify a title, labels for the x and y axes, and a color.
-    > color.hist(Y, main=\"My Title\", xlab=\"Y (mm)\", ylab=\"Counts\", col=\"seagreen3\")
+    > hst(Y, main=\"My Title\", xlab=\"Y (mm)\", ylab=\"Counts\", col=\"seagreen3\")
 
-Here, manually specify bins, starting at 60, going to 100, with bin width of 10.
-    > color.hist(Y, breaks=seq(60,100,10))"
+Here, manually specify bins, starting at 60 with a bin width of 10.
+    > hst(Y, bin.start=60, bin.width=10)"
 
 set.up.plot()
 text(50,100, label=t0, font=4)
@@ -361,7 +361,7 @@ text(0,90, label=f2, adj=0)
 lines(c(5,90), c(86,86), col=col.line)
 text(0,66, label=t1, adj=0)
 
-help.more("hist", 46)
+help.more("hst", 46)
 }
 
 
@@ -369,7 +369,7 @@ else if (topic == "bar.chart") {
 t0 <- "bar.chart"
 
 f1 <- bquote(paste(bold("table"), "  Count the values of one or more categorical variables."))
-f2 <- bquote(paste(bold("color.barchart"), "  Produce a bar chart."))
+f2 <- bquote(paste(bold("bc"), "  Produce a bar chart."))
 f3 <- bquote(paste(bold("pareto.chart"), "  Produce a Pareto chart."))
 
 t1 <-
@@ -377,7 +377,7 @@ t1 <-
 called a factor. Replace with the actual name of the variable in a specific analysis. 
 
 Default bar chart including color.
-    > color.barchart(Y)
+    > bc(Y)
     
 The table function obtains the counts of each value.
     > Ycount <- table(Y)
@@ -398,7 +398,7 @@ text(0,86, label=f3, adj=0)
 lines(c(5,90), c(81,81), col=col.line)
 text(0,50, label=t1, adj=0)
 
-help.more("color.barchart", 22)
+help.more("bc", 22)
 }
 
 
@@ -407,12 +407,12 @@ t0 <- "Plot"
 
 f1 <- bquote(paste(bold("plot"), "  Plot values of one or two variables."))
 f2 <- bquote(paste(bold("color.plot"), "  Enhances some of the capabilities of the plot function."))
-f3 <- bquote(paste(bold("color.density"), "  Plot normal and general densities over the histogram."))
+f3 <- bquote(paste(bold("smoothed"), "  Plot normal and general densities over the histogram."))
 
 t1 <-
 "The function, plot, can produce a wide range of plots. The function, color.plot, 
 provides easier access to color enhancement. Either function plots run charts, 
-scatter plots and the values of a function. The function, color.density, estimates the 
+scatter plots and the values of a function. The function, smoothed, estimates the 
 smooth normal curve or general density function from the data, and then displays 
 over the histogram.
 
@@ -447,7 +447,7 @@ help.more("color.plot", 9)
 else if (topic == "stats") {
 t0 <- "Descriptive Statistics"
 
-f1 <- bquote(paste(bold("describe"), "  summarize all variables in specified data table"))
+f1 <- bquote(paste(bold("ss"), "  summarize all variables in specified data table"))
 f2 <- bquote(paste(bold("length"), "  sample size, i.e., count"))
 f3 <- bquote(paste(bold("mean"), "  mean, including trimmed mean with trim option"))
 f4 <- bquote(paste(bold("sd"), "  standard deviation"))
@@ -458,16 +458,16 @@ f8 <- bquote(paste(bold("quantile"), "  min, 1st quartile, median, 3rd quartile,
 f9 <- bquote(paste(bold("scale"), "  standardize"))
 
 t1 <-
-"Each of these functions, except for describe, applies to the analysis of single variable, 
+"Each of these functions, except for ss, applies to the analysis of single variable, 
 such as for the mean of variable called Y.
     > mean(Y)
 
-Or summarize all numerical and non-numerical variables in the data frame.
-    > describe(mydata)
+Or summarize all numerical and non-numerical variables in the data frame mydata.
+    > ss()
     
 Or, can apply the describe function to a single variable, Y, with an optional grouping
 variable, X, to summarize the numerical variable at each level of the other variable.
-    > describe(Y ~ X)
+    > ss(Y ~ X)
     
 R provides many summary statistics. Enter the following to see the entire list, 
     > library(help=\"stats\")."
@@ -485,7 +485,7 @@ text(0,66, label=f8, adj=0)
 text(0,62, label=f9, adj=0)
 lines(c(5,90), c(57,57), col=col.line)
 text(0,33, label=t1, adj=0)
-help.more("describe", 9)
+help.more("ss", 9)
 }
 
 
@@ -527,7 +527,7 @@ else if (topic == "two.samples") {
 t0 <- "Compare Two Group Means"
 
 f1 <- bquote(paste(bold("t.test"), "  The standard R function to compare two group means with a t-test."))
-f2 <- bquote(paste(bold("smd.t.test"), "  An enhanced version of t.test to compare two group means."))
+f2 <- bquote(paste(bold("ttest"), "  An enhanced version of t.test to compare two group means."))
 
 t1 <-
 "When responses to a variable are organized into two or more groups, compare
@@ -536,7 +536,7 @@ Salary and the grouping variable is Gender, with two values, M and F.
 
 Here the numerical response variable is named Y and the grouping variable, 
 also called a factor, is named X, which must have exactly two values.
-    >  smd.t.test(Y ~ X)
+    >  ttest(Y ~ X)
 When the tilde, ~, expresses the relationship between two or more variables, 
 R refers to this expression as a formula, read as: Y is described by X.
 
@@ -544,13 +544,13 @@ To do a separate analysis of Y for each group, use the [...] notation to define 
 vector that contains just the Y responses for one group.  In this example, one 
 of the two values of X is Group1.
     > Y1 <- Y[X==\"Group1\"]
-    > hist(Y1)
+    > hst(Y1)
 Create a new variable for each group.
 
 Sometimes the data for a t-test are arranged so that the responses, Y, for 
 each group already are in separate columns called vectors. Here calculate 
 the t-test directly from two vectors called Y1 and Y2.
-    > smd.t.test(Y1, Y2)"
+    > ttest(Y1, Y2)"
 
 set.up.plot()
 text(50,100, label=t0, font=4)
@@ -559,7 +559,7 @@ text(0,90, label=f2, adj=0)
 lines(c(5,90), c(86,86), col=col.line)
 text(0,50, label=t1, adj=0)
 
-help.more("smd.t.test", 13)
+help.more("ttest", 13)
 }
 
 
@@ -640,7 +640,7 @@ else if (topic == "power") {
 t0 <- "Power"
 
 f1 <- bquote(paste(bold("power.t.test"), "  The standard R function for the power analysis of the t-test."))
-f2 <- bquote(paste(bold("smd.t.test"), "  Enhanced power function, also provides power curve."))
+f2 <- bquote(paste(bold("smd.t"), "  Enhanced power function, also provides power curve."))
 
 t1 <-
 "The function, powercurve.t.test, uses the standard R function, power.t.test, to 
@@ -758,7 +758,7 @@ t3 <- "lessR"
 t4 <- "David W. Gerbing"
 t5 <- "School of Business Administration"
 t6 <- "Portland State University"
-t7 <- "Version 1.8.8"
+t7 <- "Version 2.1"
 set.up.plot()
 text(50,84, label=t1)
 text(50,80, label=t2)

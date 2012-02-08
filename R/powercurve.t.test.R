@@ -6,7 +6,7 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
 
   cat("\n")
   
-  # for all null arguments, pick up values from previous smd.t.test
+  # for all null arguments, pick up values from previous smd.t
   if (sum(sapply(list(s, n1, n2), is.null)) == 3) {  # all are NULL
     if (exists("n1", 1, inherits=FALSE) && exists("n2", 1, inherits=FALSE)) {
       n1 <- get("n1", 1, inherits=FALSE)
@@ -130,7 +130,9 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
   # power curve
   mypower <- power.t.test(n=n, sd=s, delta=mydeltas, type=mytype)
   s.out <- toString(round(s,4))
-  color.plot(H0+mydeltas, mypower$power, type="l", xlab=myxlab, ylab="Power",
+  x.values <- H0+mydeltas
+  y.values <- mypower$power
+  plt(x.values, y.values, type="l", xlab=myxlab, ylab="Power",
     ylim=c(0,1.1), ...)
   abline(h=0, lwd=.5, col="gray50")
   mtext(mytitle, side=3, line=2.5, cex=1.1, font=2)

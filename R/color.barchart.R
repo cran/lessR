@@ -1,12 +1,16 @@
 color.barchart <-
-function(x=NULL, ...)  {
+function(...) {
 
-  if (is.null(x)) {
-    if (!exists("mydata")) 
-      stop("Need to specify an existing data frame or data frame mydata must exist.")
-    color.barchart(mydata, ...) 
-  }
-  else UseMethod("color.barchart")
-	
+    cat("\n"); cat( # stop(call.=FALSE, "\n","------\n",
+      "The lessR project is now much more than just about color.\n",
+      "Accordingly, the function  color.barchart has been renamed.\n\n",
+      "Now use  bc  instead of  color.barchart.\n\n")
+
+    bc(...)
+
+    cat("\n"); cat( # stop(call.=FALSE, "\n","------\n",
+      "The lessR project is now much more than just about color.\n",
+      "Accordingly, the function  color.barchart has been renamed.\n\n",
+      "Now use  bc  instead of  color.barchart.\n\n")
+
 }
-
