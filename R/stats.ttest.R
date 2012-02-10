@@ -1,4 +1,4 @@
-stats.t.test <-
+stats.ttest <-
 function(n = NULL, m = NULL, s = NULL, mu0 = NULL, 
          n1 = NULL, n2 = NULL,  m1 = NULL, m2 = NULL, s1 = NULL, s2 = NULL, 
          Ynm = "Y", Xnm = "X", X1nm = "Group1", X2nm = "Group2", 
@@ -32,15 +32,13 @@ cat("\n")
 two.group = FALSE
 if (is.null(n) && !is.null(n1)) two.group = TRUE
 
-
-# error conditions
 if (!two.group) {
   if (is.null(mu0)) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "For one-sample analysis of a mean, specify mu0. \n\n")
+    cat("\nNo value for mu0, specified, so only do confidence interval. \n")
   }
 }
 
+# error conditions
 if (is.null(n)) {
   if (is.null(n1) | is.null(n2)) {
   cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -187,7 +185,9 @@ else {  # one-group
 
   cat("\n")
   cat("------------------------------------------------------------\n")
-  cat("Analyze", Ynm, "for Hypothesized Value H0: mu =", mu0, "\n")
+  cat("Analyze", Ynm) 
+  if (!is.null(mu0)) cat(" for Hypothesized Value H0: mu =", mu0)
+  cat("\n")
   cat("------------------------------------------------------------\n\n")
 
   cat("------ Description ------\n\n")
@@ -196,12 +196,14 @@ else {  # one-group
 
   m.out <- round(m,digits.d)
   s.out <- round(s,digits.d)
-  cat(Ynm,  ":  n = ", n, ",   mean = ", m.out, ",   sd = ", s.out, sep="", "\n\n")
+  cat(Ynm,  ":  n = ", n, ",   mean = ", m.out, ",   sd = ", s.out, sep="", "\n")
 
   # distance of mean from hypothesized value
-  m.dist <- m - mu0
-  m.dist.out <- round(m.dist,digits.d)
-  cat("Distance of Sample Mean from Hypothesized Value: ", m.dist.out, sep="", "\n")
+  if (!is.null(mu0)) {
+    m.dist <- m - mu0
+    m.dist.out <- round(m.dist,digits.d)
+    cat("\nDistance of Sample Mean from Hypothesized Value: ", m.dist.out, sep="", "\n")
+  }
 
   cat("\n\n------ Inference ------\n\n")
 
@@ -212,15 +214,19 @@ else {  # one-group
   E <- t.cut * sterr
   lb <- m - E
   ub <- m + E
-  t.value <- m.dist/sterr
-  p.value <- round(2 * pt(t.value, df=df, lower.tail=FALSE), min(4,(digits.d+1)))
-  
-  t.value <- round(t.value, min(2,digits.d+1))
+  if (!is.null(mu0)) {
+    t.value <- m.dist/sterr
+    p.value <- round(2 * pt(t.value, df=df, lower.tail=FALSE), min(4,(digits.d+1)))
+  }
+ 
   cat("Standard Error of Mean: SE = ", round(sterr,digits.d), "\n\n")
-  txt <- "Hypothesis Test of Mean:  t-value = "
-  cat(txt, t.value, ",  df = ", df, ",  p-value = ", p.value, sep="", "\n\n")
+  if (!is.null(mu0)) {
+    t.value <- round(t.value, min(2,digits.d+1))
+    txt <- "Hypothesis Test of Mean:  t-value = "
+    cat(txt, t.value, ",  df = ", df, ",  p-value = ", p.value, sep="", "\n\n")
+  }
   cat("Margin of Error for ", clpct, " Confidence Level:  ", round(E,digits.d), sep="", "\n")
-  txt <- " Confidence Interval for Mean Difference:  "
+  txt <- " Confidence Interval for Mean:  "
   cat(clpct, txt, round(lb,digits.d), " to ", round(ub,digits.d), sep="", "\n\n")
 
 }  # end one-group
