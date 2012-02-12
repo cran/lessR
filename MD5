@@ -1,4 +1,4 @@
-08d2fa36de3e234a7d2d615acbabc5b3 *DESCRIPTION
+f11182fed18a02d80a69d43a820e17cd *DESCRIPTION
 9fdfeb11f7ddba6f3aab9aaa6b1ac5dd *NAMESPACE
 1d26a91d200cfeef9c6b877c2b42180e *R/bc.R
 2cb48511719f3ebeb50aa0fe5e61ce25 *R/bc.data.frame.R
@@ -33,13 +33,16 @@ cba981bce9369cf08451a7db465488c1 *R/rad.labels.R
 dacbef744395f4aed9a14ae397b3d6e0 *R/reg.R
 98c4a49712d0cadb860326ab01b4a097 *R/reg.brief.R
 4b397b6461e04adbf835620fef95023e *R/reg.explain.R
+8f624088433d874ee4a38b959194137d *R/sim.CImean.R
+7c9596229fc9652af49c380ca378329d *R/sim.binomial.R
+6816827057d84ab9c6d75dacbbc8fd17 *R/sim.mean.R
 1cf9fb4c7d9c3debd7b487bd6e085c2e *R/ss.R
 25eeffe14cb280d56936463455bae2a3 *R/ss.character.R
 d3609795cd9577dc2b5d7c0fbb8c4684 *R/ss.data.frame.R
 3d8d08b17546b32060009841b55b14d4 *R/ss.default.R
 208924fe9d7ff413f27d7f976519a1bb *R/ss.factor.R
 64f70465333a49eb80e9cb3129069fff *R/ss.numeric.R
-aad5d8bc3a99de3095af5b1533ee05f8 *R/stats.t.test.R
+e9aa3d417ed56698d069909e6cda4f73 *R/stats.ttest.R
 b506c448235f6fe44da59a3738d8c519 *R/ttest.R
 2922e5020bff09d0a6d42a1b36263ed6 *R/ttest.brief.R
 f66076f067195aac1b499293697d3d38 *R/ttest.default.R
@@ -62,7 +65,10 @@ ea11107a224b3bb59927447c3a2ad01d *man/full.Rd
 e624c2abec7558dea220bcdd050be9f6 *man/prob.norm.Rd
 3df814e4479cec8dd968dcedd7b140f5 *man/rad.Rd
 27527b61c51cd1beeaffcf1d60602628 *man/reg.Rd
+38cd77910fcc3f94520186be1bcdd016 *man/sim.CImean.Rd
+3c2058e38fa312e663623ab4d4c8eb66 *man/sim.binomial.Rd
+acdc77a8146d01e08f4e7400894126c6 *man/sim.mean.Rd
 fb0ff36f0af4aeb9751a1d21c07c7f5c *man/ss.Rd
-d4b7ea45ba2778afb1f2779a064df9d3 *man/stats.t.test.Rd
+d5f3370b2699925998f8990382ad4a5e *man/stats.ttest.Rd
 9c9d977a4ad3fdd05166d17fffb488b6 *man/ttest.Rd
 5b50fe5a115b6e36939d0a6ee4921ca5 *man/values.Rd

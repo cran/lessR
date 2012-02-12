@@ -1,8 +1,8 @@
 Package: lessR
 Type: Package
 Title: Less Code, More Results
-Version: 2.1
-Date: 2012-02-07
+Version: 2.1.1
+Date: 2012-02-10
 Author: David W. Gerbing, School of Business Administration, Portland
         State University
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
@@ -25,6 +25,6 @@ Description: Each function accomplishes the work of several or more
         and functions. Variable labels are also available.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2012-02-08 00:45:57 UTC; gerbing
+Packaged: 2012-02-11 06:58:39 UTC; gerbing
 Repository: CRAN
-Date/Publication: 2012-02-08 07:17:25
+Date/Publication: 2012-02-12 10:30:10
