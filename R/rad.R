@@ -24,8 +24,9 @@ if (labels && !data)
 else if (labels && data) {
   mylabels <- read.csv(file=ref, nrows=1, ...)
   var.names <- names(mylabels)
-  mylabels <<- data.frame(t(mylabels))
-  names(mylabels) <<- "label"
+  mylabels <- data.frame(t(mylabels))
+  names(mylabels) <- "label"
+  mylabels <<- mylabels # version stored
   mydata <<- read.csv(file=ref, skip=1, na.strings=missing, ...)
   names(mydata) <<- var.names
 }

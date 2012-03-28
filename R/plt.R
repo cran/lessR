@@ -3,7 +3,7 @@ function(x, y=NULL, dframe=mydata, type=NULL,
          col.line="darkblue", col.area=NULL,  
          col.point="darkblue", col.fill=NULL, col.grid="grey90", 
          col.bg="ghostwhite", col.box="black", xy.ticks=TRUE, 
-         xlab=NULL, ylab=NULL, main=NULL,
+         xlab=NULL, ylab=NULL, main=NULL, mag.axis=.85,
          pch=NULL, cex=NULL, center.line=NULL,
          kind=c("default", "regular", "bubble.freq", "sunflower.freq"),
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
@@ -220,18 +220,19 @@ digits.d <- max.dd(y) + 1
 # plot setup
 if (kind == "regular") {
   suppressWarnings(plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
-                        main=main.lbl, ...))
+           main=main.lbl, ...))
   if (xy.ticks){
-    if (is.null(time.start) && class(x)!="ts") suppressWarnings(axis(1, ...))
-      else axis.Date(1, x, ...)
-    suppressWarnings(axis(2, ...))
+    if (is.null(time.start) && class(x)!="ts") 
+      suppressWarnings(axis(1, cex.axis=mag.axis, ...))
+    else axis.Date(1, x, cex.axis=mag.axis, ...)
+    suppressWarnings(axis(2, cex.axis=mag.axis, ...))
   }
 }
 else if (kind == "xcat") {
   plot.default(y ~ x, xlim=c(.5,nlevels(x)+.5), type="n", axes=FALSE, 
                main=main.lbl, xlab=x.lab, ylab=y.lab)
-  axis(2)
-  axis(1,labels=levels(x), at=1:nlevels(x))
+  axis(2, cex.axis=mag.axis)
+  axis(1, labels=levels(x), at=1:nlevels(x), cex.axis=mag.axis)
 }
 else { # bubble or sunflower plot, requires integer values of x and y
   mytbl <- table(x, y)  # get the counts
@@ -256,7 +257,7 @@ else { # bubble or sunflower plot, requires integer values of x and y
   cords <- data.frame(xx, yy, count)
   if (kind == "bubble.freq")   # bubble plot, convert to factor if x is numeric
     plot(as.factor(x),y, type="n", xlab=x.lab, ylab=y.lab, main=main.lbl,
-         xlim=c(x.lo,x.hi), ylim=c(y.lo,y.hi))
+         xlim=c(x.lo,x.hi), ylim=c(y.lo,y.hi), cex.axis=mag.axis)
 }
 
 # colored plotting area
@@ -306,7 +307,7 @@ else if (kind == "bubble.freq") {
 }
 else if (kind == "sunflower.freq") {
   sunflowerplot(cords$xx, cords$yy, number=cords$count, 
-    seg.col=col.flower, col=col.flower,
+    seg.col=col.flower, col=col.flower, cex.axis=mag.axis,
     xlab=x.lab, ylab=y.lab, xlim=c(x.lo,x.hi), ylim=c(x.lo,x.hi))
 }
 
@@ -389,6 +390,7 @@ if (text.out && !is.null(y)  &&  !is.factor(x)  &&  type == "p") {
   n.pair <- sum(!is.na(x - y))  # number of points after pairwise deletion
   n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
   ct <- cor.test(x,y)
+  covr <- cov(x, y, use="pairwise.complete.obs")
   cat("\n")
   dashes(55)
   cat("Correlation Analysis for Variables", x.name, "and", y.name, "\n")
@@ -400,7 +402,8 @@ if (text.out && !is.null(y)  &&  !is.factor(x)  &&  type == "p") {
   }
   cat("Number of paired values with neither missing:  n =", n.pair, "\n")
   cat("Number of observations (rows of data) deleted: n =", n.del, "\n\n")
-  cat("Sample Estimate: r =", round(ct$estimate,3), "\n\n")
+  cat("Sample Covariance: cov =", round(covr,3), "\n\n")
+  cat("Sample Correlation: r =", round(ct$estimate,3), "\n\n")
   cat("Hypothesis Test that Population Correlation is Zero", "\n")
   cat("  t-value: ", round(ct$statistic,4), ",  df: ", ct$parameter, sep="") 
   cat(",  p-value: ", round(ct$p.value,4), sep="", "\n\n")
@@ -515,7 +518,7 @@ if ( (kind == "bubble.freq") || (kind == "sunflower.freq") ) {
 if (missing(y)) plt.main(x.call, ...)
 else plt.main(x.call, y.call, ...)
 
-rm(x.name, envir=.GlobalEnv)
-if (!missing(y)) rm(y.name, envir=.GlobalEnv)
+  if (exists("x.name", where=.GlobalEnv)) rm(x.name, envir=.GlobalEnv)
+  if (exists("y.name", where=.GlobalEnv)) rm(y.name, envir=.GlobalEnv)
 
 }

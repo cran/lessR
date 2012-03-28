@@ -183,7 +183,7 @@ function(my.formula, dframe=mydata,
     cat("    Null hypothesis: Corresponding population coefficient is 0\n")
     dash(68)
    }
-  else cat("Estimates, Hypothesis Tests\n")
+  else cat("The Model, Hypothesis Tests\n")
 
   smc <- sm$coefficients
   buf <- 0 
@@ -220,7 +220,7 @@ function(my.formula, dframe=mydata,
     dash(68)
     cat("95% Confidence Intervals\n",
         "    Each interval is constructed about the\n",
-        "      corresponding estimated model coefficient.\n",
+        "      corresponding estimated intercept or slope coefficient.\n",
         "    The margin of error is half the width of the interval.\n")
     dash(68)
   }
@@ -268,6 +268,7 @@ function(my.formula, dframe=mydata,
   cat("  each fitted value is 4*", signif(sm$sigma,4), 
     " or ", signif(4*sm$sigma,4), sep="", "\n\n")
   if (explain) {
+    cat("\n")
     dash(68)
     cat("R-squared: Proportion of the overall variability of response variable\n",
         nm[1], " that is accounted for by the model. The unexplained\n",
@@ -284,7 +285,7 @@ function(my.formula, dframe=mydata,
   cat("R-squared: ", signif(sm$r.squared,3), 
     "    Adjusted R-squared: ", signif(sm$adj.r.squared,3), "\n")
   cat("\n")
-  cat("F-statistic for hypothesis test of population R-squared=0: ", 
+  cat("F-statistic for null hypothesis that population R-squared=0: ", 
     signif(sm$fstatistic[1],4), "\n") 
   cat("Degrees of freedom: ", sm$fstatistic[2], "and", sm$fstatistic[3],"\n")
   pvl <- 1-pf(sm$fstatistic[1],sm$fstatistic[2],sm$fstatistic[3])
@@ -301,7 +302,8 @@ function(my.formula, dframe=mydata,
         "variation. \n",
         "\n",
         "The sum of the squared residuals, the value minimized by the OLS\n",
-        "estimation procedure, is ", smc$'Sum Sq'[n.vars], ".\n", sep="")
+        "estimation procedure by the choice of estimated coefficients, is ",
+        smc$'Sum Sq'[n.vars], ".\n", sep="")
     dash(68)
     cat("\n")
   }
@@ -538,7 +540,7 @@ function(my.formula, dframe=mydata,
       xlab="Residuals", text.out=FALSE)
 
     # plot of residuals vs fitted
-    max.cook <- max(cook)
+    max.cook <- max(cook, na.rm=TRUE)
     if (max.cook < cooks.cut) {
       cooks.cut <- floor(max.cook*100)/100
       txt <- paste("The point with the largest Cook's Distance, ", round(max.cook,2), 

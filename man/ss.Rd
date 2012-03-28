@@ -5,6 +5,7 @@
 \alias{ss.data.frame}
 \alias{ss.character}
 \alias{ss.default}
+\alias{ss.brief}
 
 \title{Summary Statistics with an Option for Each Level of Another Variable}
 
@@ -16,7 +17,7 @@ Descriptive or summary statistics for a numeric variable or a factor, one at a t
 ss(x=NULL, by=NULL, dframe=mydata, ncut=4, \ldots)
 
 \method{ss}{numeric}(x, by=NULL, dframe=mydata, 
-                  digits.d=NULL, brief=TRUE, \dots)
+                  digits.d=NULL, brief=FALSE, \dots)
 
 \method{ss}{factor}(x, by=NULL, \dots)
 
@@ -25,6 +26,8 @@ ss(x=NULL, by=NULL, dframe=mydata, ncut=4, \ldots)
 \method{ss}{character}(x, by=NULL, \dots)
 
 \method{ss}{default}(x, \dots)
+
+\method{ss}{brief}(\dots, brief=TRUE)
 }
 
 \arguments{

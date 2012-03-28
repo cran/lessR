@@ -1,6 +1,4 @@
 reg.explain <-
-function(my.formula, dframe=mydata, explain=TRUE, ...) {
+function(my.formula, explain=TRUE, ...)
 
-  reg(my.formula, dframe, explain=TRUE, ...)
-
-}
+reg(my.formula, explain=TRUE, ...)

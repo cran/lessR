@@ -13,10 +13,11 @@ dens(x, dframe=mydata,
          bw="nrd0", type=c("both", "general", "normal"),
          col.bg="ghostwhite", col.grid="grey90", col.bars="grey86",
          col.nrm="black", col.gen="black",
-         col.fill.nrm=rgb(80,150,200, alpha=70, max=255), 
-         col.fill.gen=rgb(250,210,230, alpha=70, max=255),
+         col.fill.nrm=rgb(80,150,200, alpha=70, maxColorValue=255), 
+         col.fill.gen=rgb(250,210,230, alpha=70, maxColorValue=255),
          bin.start=NULL, bin.width=NULL, text.out=TRUE,
-         x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, \ldots)
+         x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
+         x.min=NULL, x.max=NULL, \ldots)
 
 color.density(\ldots)
 }
@@ -46,6 +47,8 @@ color.density(\ldots)
   \item{xlab}{Label for x-axis.}
   \item{main}{Title of graph.}
   \item{y.axis}{Specifies is the y-axis, the density axis, should be included.}
+  \item{x.min}{Smallest value of the variable x plotted on the x-axis.}
+  \item{x.max}{Largest value of the variable x plotted on the x-axis.}
   \item{\dots}{Other parameter values for graphics as defined processed 
       by \code{\link{plot}}, including \code{xlim}, \code{ylim}, \code{lwd} and \code{cex.lab}, \code{col.main}, \code{density}, and, for the general density calculations, can set bandwidth with the standard \code{bw}, etc.}
 }

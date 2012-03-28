@@ -15,7 +15,8 @@ text(0,yline-10, label=h2, adj=0)
 # set up plot window
 set.up.plot <- 
 function() {
-par(mar=c(.5,1,.5,.5), bg=rgb(255,253,250,max=255), fg=rgb(20,15,15,max=255))
+par(mar=c(.5,1,.5,.5), bg=rgb(255,253,250,maxColorValue=255),
+                       fg=rgb(20,15,15,maxColorValue=255))
 plot.new()
 plot.window(xlim=c(0,100), ylim=c(0,100))
 }
@@ -126,8 +127,8 @@ Or, specify the file to be read. The file can be a path name to a data file
 available on the local computer system, or to a file on the web.
     > rad(\"http://web.pdx.edu/~gerbing/data/twogroup.csv\")
 
-The function, rad, which stands for Read, Attach and Display, sequentially 
-invokes four different, standard R functions: read.csv, attach, head and tail.
+The function, rad, based on the word, read, sequentially 
+invokes different, standard R functions.
 
 To see how to create a csv data file, enter: help.me(\"create.data.file\")
 
@@ -281,7 +282,7 @@ This generated data can be stored for further analysis.  Here, generate 100
 values from a normal distribution with a mean of 50 and a standard deviation 
 of 10, store in the vector Y, and then display the resulting histogram.
     > Y <- rnorm(100, mean=50, sd=10)
-    > hist(Y)
+    > hst(Y)
     
 The binomial distribution describes the process of a binary outcome over 
 many different trials, such as flipping a coin.  In this example, flip a fair 
@@ -406,22 +407,22 @@ else if (topic == "plot") {
 t0 <- "Plot"
 
 f1 <- bquote(paste(bold("plot"), "  Plot values of one or two variables."))
-f2 <- bquote(paste(bold("color.plot"), "  Enhances some of the capabilities of the plot function."))
+f2 <- bquote(paste(bold("plt"), "  Enhances some of the capabilities of the plot function."))
 f3 <- bquote(paste(bold("smoothed"), "  Plot normal and general densities over the histogram."))
 
 t1 <-
-"The function, plot, can produce a wide range of plots. The function, color.plot, 
+"The function, plot, can produce a wide range of plots. The function, plt, 
 provides easier access to color enhancement. Either function plots run charts, 
 scatter plots and the values of a function. The function, smoothed, estimates the 
 smooth normal curve or general density function from the data, and then displays 
 over the histogram.
 
 This example is the default scatterplot, in color, for variables named X and Y.
-    > color.plot(X,Y)
+    > plt(X,Y)
 
 Here a run chart is generated, in color, for a variable named Y. If the data do not 
 have a pronounced trend, an added centerline is automatically provided.
-    > color.plot(Y)
+    > plt(Y)
 
 These graphic functions can access a wide range of graphics parameters, such 
 as the size of the margins, the annotations, the line width, etc. These additional 
@@ -429,7 +430,7 @@ options are explained in the help files for functions par, title, points and lin
 
 This scatter plot has dark red points and the #19 point character, pch, which 
 is a filled circle.
-    > color.plot(X, Y, col.point=\"darkred\", pch=19)
+    > plt(X, Y, col.point=\"darkred\", pch=19)
 The help for the function, points, shows the different options for pch."
 
 set.up.plot()
@@ -440,7 +441,7 @@ text(0,86, label=f3, adj=0)
 lines(c(5,88), c(81,81), col=col.line)
 text(0,45, label=t1, adj=0)
 
-help.more("color.plot", 9)
+help.more("plt", 9)
 }
 
 
@@ -492,7 +493,7 @@ help.more("ss", 9)
 else if (topic == "one.sample") {
 t0 <- "Inference for a Single Variable"
 
-f1 <- bquote(paste(bold("t.test"), "  Inference for a mean."))
+f1 <- bquote(paste(bold("tt"), "  Inference for a mean."))
 f2 <- bquote(paste(bold("binom.test"), "  Inference for a proportion from exact binomial probability."))
 f3 <- bquote(paste(bold("prop.test"), "  Inference for a proportion from approximate normal probability."))
 
@@ -502,7 +503,7 @@ of a value of a categorical variable. These tests provide a hypothesis test
 and a confidence interval.
 
 This example is for a variable named Y and a null hypothesis of mu=100.
-    > t.test(Y, mu=100)
+    > tt(Y, mu0=100)
     
 These examples are for testing for a fair coin after getting 53 out of 100 Heads.
     > binom.test(53,100, p=.5)
@@ -519,7 +520,7 @@ text(0,86, label=f3, adj=0)
 lines(c(5,90), c(82,82), col=col.line)
 text(0,58, label=t1, adj=0)
 
-help.more("t.test", 33)
+help.more("tt", 33)
 }
 
 
@@ -527,7 +528,7 @@ else if (topic == "two.samples") {
 t0 <- "Compare Two Group Means"
 
 f1 <- bquote(paste(bold("t.test"), "  The standard R function to compare two group means with a t-test."))
-f2 <- bquote(paste(bold("ttest"), "  An enhanced version of t.test to compare two group means."))
+f2 <- bquote(paste(bold("tt"), "  An enhanced version of t.test to compare two group means."))
 
 t1 <-
 "When responses to a variable are organized into two or more groups, compare
@@ -536,7 +537,7 @@ Salary and the grouping variable is Gender, with two values, M and F.
 
 Here the numerical response variable is named Y and the grouping variable, 
 also called a factor, is named X, which must have exactly two values.
-    >  ttest(Y ~ X)
+    >  tt(Y ~ X)
 When the tilde, ~, expresses the relationship between two or more variables, 
 R refers to this expression as a formula, read as: Y is described by X.
 
@@ -550,7 +551,7 @@ Create a new variable for each group.
 Sometimes the data for a t-test are arranged so that the responses, Y, for 
 each group already are in separate columns called vectors. Here calculate 
 the t-test directly from two vectors called Y1 and Y2.
-    > ttest(Y1, Y2)"
+    > tt(Y1, Y2)"
 
 set.up.plot()
 text(50,100, label=t0, font=4)
@@ -559,7 +560,7 @@ text(0,90, label=f2, adj=0)
 lines(c(5,90), c(86,86), col=col.line)
 text(0,50, label=t1, adj=0)
 
-help.more("ttest", 13)
+help.more("tt", 13)
 }
 
 
@@ -640,7 +641,7 @@ else if (topic == "power") {
 t0 <- "Power"
 
 f1 <- bquote(paste(bold("power.t.test"), "  The standard R function for the power analysis of the t-test."))
-f2 <- bquote(paste(bold("smd.t"), "  Enhanced power function, also provides power curve."))
+f2 <- bquote(paste(bold("ttp"), "  Enhanced power function, also provides power curve."))
 
 t1 <-
 "The function, powercurve.t.test, uses the standard R function, power.t.test, to 
@@ -656,7 +657,7 @@ The enhanced function, powercurve.t.test, does all of this automatically for one
 or two sample t-tests, and also plots the power curve in color. This example is 
 for the default power curve plotted in color for a sample size of 20 in each group 
 and a within-group or pooled standard deviation of 5.
-    > powercurve.t.test(n=20, s=5)
+    > ttp(n=20, s=5)
 Related analysis is also provided."
 
 set.up.plot()
@@ -666,7 +667,7 @@ text(0,90, label=f2, adj=0)
 lines(c(5,90), c(85,85), col=col.line)
 text(0,58, label=t1, adj=0)
 
-help.more("powercurve.t.test", 30)
+help.more("ttp", 30)
 }
 
 
@@ -676,7 +677,7 @@ t0 <- "Correlation and Related Graphics"
 f1 <- bquote(paste(bold("cor"), "  Correlation coefficient(s) between two or more variables."))
 f2 <- bquote(paste(bold("cor.test"), "  Correlation coefficient with statistical inference."))
 f3 <- bquote(paste(bold("plot"), "  Graphics, generate a scatterplot for two variables."))
-f4 <- bquote(paste(bold("color.plot"), "  Graphics, enhances some of the capabilities of the plot function."))
+f4 <- bquote(paste(bold("plt"), "  Graphics, enhances some of the capabilities of the plot function."))
 f5 <- bquote(paste(bold("pairs"), "  Generate a matrix of all possible scatter plots of many variables."))
 
 t1 <-
@@ -685,14 +686,14 @@ cor(X,Y), or for all numeric variables in the data frame, such as cor(mydata),
 for a data frame named mydata. The cor.test function applies only to a single pair 
 of variables, and provides output similar to the t.test and related functions.
 
-The graphic functions, color.plot and plot, display a scatterplot for two variables. 
+The graphic functions, plt and plot, display a scatterplot for two variables. 
 The graphic function, pairs, generates a scatterplot matrix for all numeric 
 variables in an entire data frame, or a subset of variables from the data frame.
 
 This example is for the correlation coefficient, inference and scatterplot for two 
 numerical variables, X and Y.
     > cor.test(X,Y)
-    > color.plot(X,Y)
+    > plt(X,Y)
 
 This example of functions cor and pairs applies to Variables Y, X1, X2 and X3 in 
 the data frame called mydata.
@@ -709,7 +710,7 @@ text(0,78, label=f5, adj=0)
 lines(c(5,90), c(73,73), col=col.line)
 text(0,41, label=t1, adj=0)
 
-help.more("color.plot", 9)
+help.more("plt", 9)
 }
 
 

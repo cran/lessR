@@ -19,7 +19,7 @@ bx(x=NULL, dframe=mydata, \ldots)
 
 \method{bx}{default}(x, col.box="lightsteelblue", col.pts=NULL, 
         col.bg="ghostwhite", col.grid="grey85",
-        horiz=TRUE, dotplot=FALSE,
+        horiz=TRUE, dotplot=FALSE, mag.axis=.85,
         xlab=NULL, main=NULL, digits.d=10, \ldots)
 
 color.boxplot(\ldots)
@@ -38,6 +38,8 @@ color.boxplot(\ldots)
   \item{col.grid}{Color of the grid lines.}
   \item{horiz}{Orientation of the boxplot. Set \code{FALSE} for vertical.}
   \item{dotplot}{If \code{TRUE}, then place a dot plot (i.e., stipchart) over the box plot.}
+  \item{mag.axis}{Scale magnification factor, which by defaults displays the axis values to be smaller than
+        the axis labels.}
   \item{xlab}{Label for the value axis, which defaults to the variable's name.}
   \item{main}{Title of graph.}
   \item{digits.d}{Number of decimal digits displayed in the listing of the summary statistics.}

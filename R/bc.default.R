@@ -6,20 +6,22 @@ function(x, by=NULL,
          colors=c("relaxed", "vivid", "gray", "rainbow", "terrain", "heat"),
 
          horiz=FALSE, over.grid=FALSE, addtop=1,
-         gap=NULL, brief=TRUE, prop=FALSE,
+         gap=NULL, brief=FALSE, prop=FALSE,
          
-         xlab=NULL, ylab=NULL, main=NULL,
+         xlab=NULL, ylab=NULL, main=NULL, mag.axis=.85,
 
-         beside=FALSE, col.low=NULL, col.hi=NULL,
+         beside=FALSE, col.low=NULL, col.hi=NULL, count.names=NULL,
 
          legend.title=NULL, legend.loc=NULL, legend.labels=NULL,
          legend.horiz=FALSE,
          
-         chisq=TRUE, graph=TRUE, ...) {
+         chisq=NULL, graph=TRUE, ...) {
  
   dash <- function(n.dash) { for (i in 1:(n.dash)) cat("-"); cat("\n") }
 
   colors <- match.arg(colors)
+
+  if (is.null(chisq)) if (brief || prop) chisq <- FALSE else chisq <- TRUE
 
   if (chisq && prop) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -36,6 +38,8 @@ function(x, by=NULL,
     "addtop  only works for a vertical bar plot.\n\n")
   }
 
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))
 
   # use variable label if it exists
   x.lbl <- ""
@@ -67,11 +71,17 @@ function(x, by=NULL,
 
   # entered counts typically integers as entered but stored as type double
   # if names(x) or rownames(x) is null, likely data from sample and c functions
+  # count.names is getting counts directly from a data frame with counts entered
   entered.pre <- FALSE
   if (!is.matrix(x) && !is.null(names(x))) entered.pre <- TRUE
   if (is.matrix(x) && !is.null(rownames(x))) entered.pre <- TRUE
   if (!is.integer(x) && is.double(x) && entered.pre) 
     entered <- TRUE else entered <- FALSE
+  if (!is.null(count.names)) {
+    x <- as.numeric(x)
+    names(x) <- count.names
+    entered <- TRUE
+  }
 
   if (is.null(by) && beside && !entered) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -163,35 +173,63 @@ function(x, by=NULL,
     }
 
     if (is.null(gap)) if (is.matrix(x) && beside) gap <- c(0.1,1) else gap <- 0.2
-    
+
+     # get max label size
+    the.names <- integer(length=0)
+    if (length(dim(x)) == 0) the.names <- names(x) else the.names <- rownames(x)
+    max.nm <- 0
+    for (i in (1:length(the.names))) {
+      li <- nchar(the.names[i])
+      if (li > max.nm) max.nm <- li
+    }
+
+    # extend the left margin to accommodate horizontal labels
+    extend <- FALSE
+    if (horiz && max.nm>5) {
+      add.left <- max.nm/2.0
+      if (y.lab != "") add.left <- add.left + 1.5
+      extend <- TRUE
+      par(mar=c(5, add.left, 4, 2) + 0.1)
+    } 
+
     # set up plot area, color background, grid lines
-    if (horiz) { temp <- x.lab; x.lab <- y.lab; y.lab <- temp }
+    if(is.null(count.names))  if (horiz) { temp <- x.lab; x.lab <- y.lab; y.lab <- temp }
  
     if (class(x) == "numeric"  &&  entered) x <- as.table(x)
     rescale <- 0
     if (is.null(by)) if (nrow(x) <=4) rescale <- nrow(x)
     if (!is.null(by) && !beside) if (ncol(x) <=4) rescale <- ncol(x)
     if (class(x) == "matrix" && entered) rescale <- 0  # turned off for now
+
+    # set rescale to control bar width for small number of bars:w
     if (rescale == 0) {
       if (!horiz)
         barplot(x, col="transparent", ylim=c(0,max.y), axisnames=FALSE,
-          beside=beside, space=gap, ...)
+          beside=beside, space=gap, axes=FALSE, ...)
       else
-        barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE, font.main=1,
-          beside=beside, space=gap, ...)
+        barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
+          beside=beside, space=gap, axes=FALSE, ...)
     }
     else {
-      if (rescale == 4) bar.width <- .17
-      if (rescale == 3) bar.width <- .22
-      if (rescale == 2) bar.width <- .30
-      gap <- 0.246 + 0.687*bar.width
+      if (rescale == 4) width.bars <- .17
+      if (rescale == 3) width.bars <- .22
+      if (rescale == 2) width.bars <- .28
+      gap <- 0.246 + 0.687*width.bars
       if (!horiz)
         barplot(x, col="transparent", ylim=c(0,max.y), axisnames=FALSE,
-          beside=beside, space=gap, width=bar.width, xlim=c(0,1), ...)
+          beside=beside, space=gap, width=width.bars, xlim=c(0,1), axes=FALSE, ...)
       else
-        barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE, font.main=1,
-          beside=beside, space=gap, width=bar.width, ylim=c(0,1), ...)
+        barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
+          beside=beside, space=gap, width=width.bars, ylim=c(0,1), axes=FALSE, ...)
     }
+
+    if (extend) {
+      mtext(y.lab, side=2, line=add.left-1)
+      y.lab <- ""
+      las.value <- 1
+    }
+    else las.value <- 0
+
     usr <- par("usr")
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
     if (max.y > 1) vy <- pretty(0:max.y) else vy <- pretty(1:100*max.y)/100
@@ -201,21 +239,26 @@ function(x, by=NULL,
       if (!horiz) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
       else abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
     }
-    if (horiz) { temp <- x.lab; x.lab <- y.lab; y.lab <- temp }
-    if (rescale == 0)
+
+    if (rescale == 0) {
+       #width.bars <- .8
+       #gap <- .6*width.bars
        barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz, xlab=x.lab,
-            ylab=y.lab, main=main.lbl, border=col.border, 
-            space=gap, ...)
+            ylab=y.lab, main=main.lbl, border=col.border, las=las.value, 
+            space=gap, cex.axis=mag.axis, cex.names=mag.axis, ...)
+    }
     else
        barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz, xlab=x.lab,
-            ylab=y.lab, main=main.lbl, border=col.border, 
-            space=gap, width=bar.width, xlim=c(0,1), ...)
+            ylab=y.lab, main=main.lbl, border=col.border, las=las.value, 
+            space=gap, width=width.bars, xlim=c(0,1), 
+            cex.axis=mag.axis, cex.names=mag.axis, ...)
     if (over.grid) {
       if (!horiz) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
       else abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
     }
     if ((!is.null(by) || is.matrix(x)) && !is.null(legend.loc)) 
-      legend(legend.loc, legend=legend.labels, title=l.lab, fill=col, horiz=legend.horiz)
+      legend(legend.loc, legend=legend.labels, title=l.lab, fill=col, 
+             horiz=legend.horiz, cex=.7, bty="n")
 
   } # end graph  
 

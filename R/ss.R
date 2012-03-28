@@ -13,6 +13,7 @@ function(x, by=NULL, ...) {
   else UseMethod("ss")
 }
 
+
 x.name <<- ""  # in case x is missing, i.e., data frame mydata
 if (!missing(x)) {
   # get actual variable name before potential call of dframe$x
@@ -60,47 +61,47 @@ if (!missing(x)) {
           "or in the data frame ", dframe.name, txt, "\n\n")
     }
   }
-  if (in.global)
-     x.call <- x else x.call <- eval(substitute(dframe$x))
+  if (in.global) x.call <- x else x.call <- eval(substitute(dframe$x))
 
-# evaluate y
-#-----------
-if (!missing(by)) {
+  # evaluate y
+  #-----------
+  if (!missing(by)) {
 
-  y.name <<- deparse(substitute(by)) 
+    y.name <<- deparse(substitute(by)) 
 
-  # see if y exists in the Global Environment
-  if (exists(y.name, where=.GlobalEnv)) in.global <- TRUE else in.global <- FALSE
+    # see if y exists in the Global Environment
+    if (exists(y.name, where=.GlobalEnv)) in.global <- TRUE else in.global <- FALSE
 
-  # see if y exists from a function call
-  # indicate a function call with sys.frame returns larger than 1 
-  if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
-    in.call <- TRUE else in.call <- FALSE
-  if (!in.global && !in.call) {
-  # see if y exists in the data frame, if y not in Global Env or function call 
-    if (!exists(y.name, where=dframe)) { 
-      if (dframe.name == "mydata") {
-        txt1 <- ", the default name \n\n"
-        txt2 <- "So either make sure you are using the correct variable name, or\n"
-        txt3 <- "  specify the actual data frame with the parameter: dframe\n"
-        txt <- paste(txt1, txt2, txt3, sep="")
+    # see if y exists from a function call
+    # indicate a function call with sys.frame returns larger than 1 
+    if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
+      in.call <- TRUE else in.call <- FALSE
+    if (!in.global && !in.call) {
+    # see if y exists in the data frame, if y not in Global Env or function call 
+      if (!exists(y.name, where=dframe)) { 
+        if (dframe.name == "mydata") {
+          txt1 <- ", the default name \n\n"
+          txt2 <- "So either make sure you are using the correct variable name, or\n"
+          txt3 <- "  specify the actual data frame with the parameter: dframe\n"
+          txt <- paste(txt1, txt2, txt3, sep="")
+        }
+        else txt <- " "
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "Variable ", y.name, " does not exist either by itself ",
+            "or in the data frame ", dframe.name, txt, "\n\n")
       }
-      else txt <- " "
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Variable ", y.name, " does not exist either by itself ",
-          "or in the data frame ", dframe.name, txt, "\n\n")
     }
+
+    if (in.global)
+       y.call <- by else y.call <- eval(substitute(dframe$by))
   }
 
-  if (in.global)
-     y.call <- by else y.call <- eval(substitute(dframe$by))
-}
+  if (!missing(x)) 
+    if (missing(by)) ss.main(x.call, ...)
+    else ss.main(x.call, y.call, ...)
 
-if (!missing(x)) 
-  if (missing(by)) ss.main(x.call, ...)
-  else ss.main(x.call, y.call, ...)
-  }
-}
+  }  # x not data frame
+}  # x not missing
 
 
 if (missing(x) || is.df) {
