@@ -1,10 +1,10 @@
 \name{dots}
 \alias{dots}
 
-\title{Data Based Density Curves with Color and Histogram}
+\title{Dot or Strip Chart}
 
 \description{
-Plots a dots, also called a stip chart, and identifies outliers.
+Plots a dot chart, also called a strip chart, and identifies outliers.
 }
 
 \usage{

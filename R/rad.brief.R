@@ -1,6 +1,4 @@
 rad.brief <-
-function(ref=NULL, brief=TRUE, ...) {
+function(ref=NULL, brief=TRUE, ...)
 
-  rad(ref, brief, ...)
-
-}
+rad(ref, brief=TRUE, ...)

@@ -1,4 +1,4 @@
-ttest.formula <-
+tt.formula <-
 function (my.formula, y=NULL, dframe=mydata, ...) {
 
 # data frame existence check
@@ -65,8 +65,14 @@ function (my.formula, y=NULL, dframe=mydata, ...) {
 
   vectors <- split(dframe[,nm[1]], dframe[,nm[2]])
 
+# save split variables in global environment
+# g1 <- paste(nm[1], ".x", sep="") 
+  group1 <<- vectors[[1]]
+  group2 <<- vectors[[2]]
+
+
 # now that Y has been broken into two separate vectors, go back and re-call  
-  ttest(vectors[[1]], vectors[[2]], Ynm=nm[1], Xnm=nm[2], 
+  tt.default(vectors[[1]], vectors[[2]], Ynm=nm[1], Xnm=nm[2], 
              X1nm=names(vectors)[1], X2nm=names(vectors)[2], ...)
 
 }

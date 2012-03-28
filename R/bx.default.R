@@ -1,7 +1,7 @@
 bx.default <-
 function(x, col.box="lightsteelblue", col.pts=NULL, 
         col.bg="ghostwhite", col.grid="grey85",
-        horiz=TRUE, dotplot=FALSE,
+        horiz=TRUE, dotplot=FALSE, mag.axis=.85,
         xlab=NULL, main=NULL, digits.d=10, ...) {        
 
   
@@ -27,7 +27,8 @@ function(x, col.box="lightsteelblue", col.pts=NULL,
   op <- options()  # save current options to reset later
   options(scipen=30) # turn off scientific notation
   bv <- (boxplot(x, col="transparent", bg="transparent",
-     horizontal=horiz, xlab=x.lab, ylab=y.lab, main=main.lbl, ...))
+     horizontal=horiz, xlab=x.lab, ylab=y.lab, main=main.lbl, 
+     cex.axis=mag.axis, ...))
   options(op)
   
   # colored background for plotting area

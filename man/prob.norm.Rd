@@ -9,7 +9,8 @@ Calculate the probability of an interval for a normal distribution with specifie
 
 \usage{
 prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black", 
-         col.fill.nrm="grey91", col.fill.int="slategray3", \ldots)
+         col.fill.nrm="grey91", col.fill.int="slategray3", 
+         ylab="", y.axis=FALSE, z=TRUE, mag=.9, \ldots)
 }
 
 
@@ -21,6 +22,10 @@ prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black",
   \item{col.nrm}{Color of the border of the normal curve.}
   \item{col.fill.nrm}{Fill color of the normal curve.}
   \item{col.fill.int}{Fill color of the interval for which the probability is computed.}
+  \item{ylab}{Label for the optional vertical axis.}
+  \item{y.axis}{If \code{TRUE}, then a vertical axis is included.}
+  \item{z}{If \code{TRUE}, then include z-values on the horizontal-axis. Set to \code{FALSE} if \code{mu=0} and \code{sigma=1}.}
+  \item{mag}{Magnification factor for the axis labels, the value of \code{cex.axis}.}
   \item{\ldots}{Other parameter values for graphics.}
 }
 

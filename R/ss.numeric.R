@@ -1,13 +1,13 @@
 ss.numeric <-
 function(x, by=NULL, dframe=mydata, 
-         digits.d=NULL, brief=TRUE, ...) {
+         digits.d=NULL, brief=FALSE, ...) {
 
   dash <- function(ndash) { for (i in 1:(ndash)) cat("-"); cat("\n") }
   
   max.dd <- function(x) {
   
-    n.dec <-function(x) {
-      xc <- as.character(x)
+    n.dec <-function(xn) {
+      xc <- as.character(xn)
       nchar(xc)
       ipos <- 0
       for (i in 1:nchar(xc)) if (substr(xc,i,i)==".") ipos <- i
@@ -17,7 +17,7 @@ function(x, by=NULL, dframe=mydata,
      
     max.dd <- 0
     for (i in 1:length(x))
-      if (!is.na(x[i])) if (n.dec(x[i]) > max.dd ) max.dd <- n.dec(x[i])   
+      if (!is.na(x[i])) if (n.dec(x[i]) > max.dd) max.dd <- n.dec(x[i])   
     return(max.dd)
   }
  
@@ -124,7 +124,7 @@ function(x, by=NULL, dframe=mydata,
     for (j in 1:n) sk.sum <- sk.sum + (( (xx[j]-m) / s)^3) 
     sk <- sk.coef * sk.sum
     # kurtosis
-    kt.coef1 <- (n*(n+1)) /  ((n-1)*(n-2)*(n-3))
+    kt.coef1 <- (n*(n+1)) / ((n-1)*(n-2)*(n-3))
     kt.coef2 <- 3 * ( ((n-1)^2) / ((n-2)*(n-3)) )
     kt.sum <- 0
     for (j in 1:n) kt.sum <- kt.sum + ( (xx[j]-m)^4 )

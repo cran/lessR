@@ -4,22 +4,22 @@
 \title{Pedagogical Simulation for the Confidence Interval of the Mean}
 
 \description{
-Show a sequence of confidence intervals, all simulated from the same normal population and show which ones contain the true population mean.
+Show a sequence of confidence intervals, all calculated from repeated samples of simulated data from the same normal population, and show which intervals contain the true population mean.
 }
 
 \usage{
-sim.CImean(nrep, n, mu=0, sigma=1, cl=0.95, 
+sim.CImean(ns, n, mu=0, sigma=1, cl=0.95, 
          ylim.bound=NULL, show.data=FALSE, show.title=TRUE, 
          miss.only=FALSE, col.hit="gray40", col.miss="red",
-         col.grid="grey90", pdf.out=FALSE, pause=FALSE)
+         col.grid="grey90", pause=FALSE)
 }
 
 
 \arguments{
-  \item{nrep}{Number of samples, that is, repetitions of the experiment.}
+  \item{ns}{Number of samples, that is, repetitions of the experiment.}
   \item{n}{Size of each sample.}
   \item{mu}{Population mean.}
-  \item{sigma}{Population standar deviation.}
+  \item{sigma}{Population standard deviation.}
   \item{cl}{Confidence level.}
   \item{ylim.bound}{Specify the maximum deviation of the mean in either direction for the extent of the vertical axis.}
   \item{show.data}{Plot the data for each sample as well as the confidence interval.}
@@ -28,7 +28,6 @@ sim.CImean(nrep, n, mu=0, sigma=1, cl=0.95,
   \item{col.hit}{Color of the confidence intervals that contains the mean.}
   \item{col.miss}{Color of the confidence intervals that miss the mean.}
   \item{col.grid}{Color of the grid lines.}
-  \item{pdf.out}{Generate a pdf file with an appropriate title.}
   \item{pause}{Build the graph and the text output confidence interval by confidence interval.}
 }
 

@@ -9,7 +9,7 @@ Plots individual points. For two variables a scatterplot is produced.  The first
 
 For data exhibiting little trend, the center line is provided for the generation of a run chart, plotting the values of a variable in order of occurrence over time.  When the center line, the median by default, is plotted, the analyses of the number and composition of the individual runs, number of consecutive values above or below the center line, is also displayed.  Also, the defaults change for each of the types of plots.  The intent is to rely on the default values for a relatively sophisticated plot, particularly when compared to the default values of the standard R \code{\link{plot}} function.
 
-If a scatterplot of two numeric variables is displayed, then the corresponding correlation coefficient as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function \code{\link{cor.test}} function are generated, though in a more readable format.  Also, an option for the .95 data ellipse from the car package can enclose the points of the scatterplot.
+If a scatterplot of two numeric variables is displayed, then the corresponding covariance and correlation coefficients as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function \code{\link{cor.test}} function are generated, though in a more readable format.  Also, an option for the .95 data ellipse from John Fox's \code{car} package can enclose the points of the scatterplot.
 }
 
 \usage{
@@ -17,7 +17,7 @@ plt(x, y=NULL, dframe=mydata, type=NULL,
          col.line="darkblue", col.area=NULL,  
          col.point="darkblue", col.fill=NULL, col.grid="grey90", 
          col.bg="ghostwhite", col.box="black", xy.ticks=TRUE, 
-         xlab=NULL, ylab=NULL, main=NULL,
+         xlab=NULL, ylab=NULL, main=NULL, mag.axis=.85,
          pch=NULL, cex=NULL, center.line=NULL,
          kind=c("default", "regular", "bubble.freq", "sunflower.freq"),
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
@@ -72,6 +72,8 @@ color.plot(\ldots)
   \item{main}{Label for the title of the graph.  If the corresponding variable labels exist 
       in the data frame \code{mylabels}, then the title is set by default from the corresponding 
       variable labels.}
+  \item{mag.axis}{Scale magnification factor, which by defaults displays the axis values to be smaller than
+        the axis labels.}
   \item{pch}{The standard plot character, with values defined in help(points). The
        default value is 21, a circle with both a border and filled area, specified here as
        \code{col.point} and \code{col.fill}.  For a scatterplot, \code{col.fill} defaults to

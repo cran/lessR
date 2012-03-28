@@ -2,7 +2,7 @@ hst.default <-
 function(x, col.bars="lightsteelblue", col.border="black", 
          col.bg="ghostwhite", col.grid="grey90", over.grid=FALSE,
          breaks="Sturges", bin.start=NULL, bin.width=NULL,
-         prop=FALSE, cumul=c("off", "on", "both"),
+         prop=FALSE, cumul=c("off", "on", "both"), mag.axis=.85,
          col.reg="snow2", digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL, ...) {
 
   dash <- function(n.dash) { for (i in 1:(n.dash)) cat("-"); cat("\n") }
@@ -106,7 +106,7 @@ function(x, col.bars="lightsteelblue", col.border="black",
   op <- options()  # save current options to reset later
   options(scipen=30) # turn off scientific notation
   plot(h, border="transparent", xlab=x.lbl, ylab=y.lbl, main=main.lbl, font.main=1, 
-    freq=TRUE, ...)
+    freq=TRUE, cex.axis=mag.axis, ...)
  
   # colored background for plotting area
   usr <- par("usr")

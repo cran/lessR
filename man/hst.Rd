@@ -21,7 +21,7 @@ hst(x=NULL, dframe=mydata, ncut=4, \ldots)
 \method{hst}{default}(x, col.bars="lightsteelblue", col.border="black",
          col.bg="ghostwhite", col.grid="grey90", over.grid=FALSE,
          breaks="Sturges", bin.start=NULL, bin.width=NULL,
-         prop=FALSE, cumul=c("off", "on", "both"),
+         prop=FALSE, cumul=c("off", "on", "both"), mag.axis=.85,
          col.reg="snow2", digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL, \ldots)
 
 color.hist(\ldots)
@@ -46,6 +46,8 @@ color.hist(\ldots)
         a \code{bin.start} value.}
   \item{prop}{Specify proportions or relative frequencies on the vertical axis. Default
        is \code{FALSE}.}
+  \item{mag.axis}{Scale magnification factor, which by defaults displays the axis values to be smaller than
+        the axis labels. Provides the functionality of, and can be replaced by, the standard R \code{cex.axis.}}
   \item{cumul}{Specify a cumulative histogram. The value of \code{"on"} displays the 
         cumulative histogram, with default of \code{"off"}. The value of \code{"both"} 
         superimposes the regular histogram.}

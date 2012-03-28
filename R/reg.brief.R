@@ -1,6 +1,5 @@
 reg.brief <-
-function(my.formula, dframe=mydata, brief=TRUE, ...) {
+function(my.formula, brief=TRUE, ...)
 
-  reg(my.formula, dframe, brief=TRUE, ...)
+reg(my.formula, brief=TRUE, ...)
 
-}

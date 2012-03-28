@@ -1,5 +1,6 @@
 \name{bc}
 \alias{bc}
+\alias{bc.brief}
 \alias{bc.default}
 \alias{bc.data.frame}
 \alias{color.barchart}
@@ -21,6 +22,8 @@ bc(x=NULL, by=NULL, dframe=mydata, ncut=4, \ldots)
 
 \method{bc}{data.frame}(x, ncut, \dots)
 
+\method{bc}{brief}(\ldots, brief=TRUE)
+
 \method{bc}{default}(x, by=NULL,
 
          col.bars=NULL, col.border="black", col.bg="ghostwhite",
@@ -28,16 +31,16 @@ bc(x=NULL, by=NULL, dframe=mydata, ncut=4, \ldots)
          colors=c("relaxed", "vivid", "gray", "rainbow", "terrain", "heat"),
 
          horiz=FALSE, over.grid=FALSE, addtop=1,
-         gap=NULL, brief=TRUE, prop=FALSE,
+         gap=NULL, brief=FALSE, prop=FALSE,
          
-         xlab=NULL, ylab=NULL, main=NULL,
+         xlab=NULL, ylab=NULL, main=NULL, mag.axis =.85,
 
-         beside=FALSE, col.low=NULL, col.hi=NULL,
+         beside=FALSE, col.low=NULL, col.hi=NULL, count.names=NULL,
 
          legend.title=NULL, legend.loc=NULL, legend.labels=NULL,
          legend.horiz=FALSE,
          
-         chisq=TRUE, graph=TRUE, \ldots)
+         chisq=NULL, graph=TRUE, \ldots)
 
 color.barchart(\ldots)
 }
@@ -48,7 +51,9 @@ color.barchart(\ldots)
            level of this second variable, y.}
   \item{dframe}{Optional data frame that contains the variable(s) of interest, default is 
         \code{mydata}.}
-  \item{ncut}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be anlayzed as a categorical. Set to 0 to turn off.}
+  \item{ncut}{When analyzing all the variables in a data frame, specifies the largest number
+        of unique values of variable of a numeric data type for which the variable will
+        be anlayzed as a categorical. Set to 0 to turn off.}
   \item{col.bars}{Specified bar colors.}
   \item{col.border}{Color of the border of the bars. Specify NA to remove the border}
   \item{col.bg}{Color of the plot background.}
@@ -67,18 +72,26 @@ color.barchart(\ldots)
   \item{gap}{Gap between bars.  Provides the value of the \code{space} option from the
         standard R \code{\link{barplot}} function with a default of 0.2 unless two variables
         are plotted and beside=\code{TRUE}, in which case the default is c(.1,1).}
-  \item{brief}{If \code{FALSE}, then the tables of conditional proportions are displayed.}
+  \item{brief}{If \code{FALSE}, then the tables of conditional proportions and chi-square test 
+        are displayed.}
   \item{prop}{Display proportions instead raw frequencies.}
   \item{xlab}{Label for x-axis, more generally the label for the values which could be on 
         the vertical axis for a two variable plot if \code{horiz=TRUE}. Defaults to variable name.}
   \item{ylab}{Label for y-axis, more generally the frequency axis. Defaults to Frequency.}
   \item{main}{Title of graph.}
+  \item{mag.axis}{Scale magnification factor, which by defaults displays the axis values to be smaller than
+        the axis labels. Use in place of the standard R \code{cex.axis} and \code{cex.names}.}
   \item{beside}{When plotting two variables, set to \code{TRUE} for the levels fo the first 
         variable to be plotted as adjacent bars instead of stacked on each other.}
   \item{col.low}{Only when the variable is an ordered factor, sets the color for the lowest level 
         of the factor in the resulting ordered progression of colors.}
   \item{col.hi}{Only when the variable is an ordered factor, sets the color for the highest level 
         of the factor in the resulting ordered progression of colors.}
+  \item{count.names}{If the name of a variable, this signals that the primary variable \code{x}
+        has values that are counts, already tabulated, and the specified variable here contains
+        the names of the levels of x. Currently the name of the specified variable for \code{count.names}
+        must be preceded by the data frame name and a \$, such as, for variable Candidate in data frame
+        \code{mydata}, \code{mydata\$Candidate.}}
   \item{legend.title}{Title of the legend, which is usually set by default except when
         raw counts are entered as a matrix.  Then a title must be specified to generate a legend.}
   \item{legend.loc}{When plotting two variables, location of the legend. For vertical bars, 
@@ -90,14 +103,14 @@ color.barchart(\ldots)
   \item{chisq}{Provide a chi-square analysis.}
   \item{graph}{Provide a graph. Default is \code{TRUE}.}
   \item{\dots}{Other parameter values for graphics as defined 
-      by \code{\link{barplot}}, \code{\link{legend}}, and  \code{\link{par}} including \code{space} for one variable only,
-      and \code{cex.lab}, \code{col.main}, etc.}
+      by \code{\link{barplot}}, \code{\link{legend}}, and  \code{\link{par}} including \code{space} 
+      for one variable only, and \code{cex.lab}, \code{col.main}, etc.}
 }
 
 
 \details{
 OVERVIEW\cr
-Plot a bar chart with default colors for one or two variables, presumably with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and gridlines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}.
+Plot a bar chart with default colors for one or two variables, presumably with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and gridlines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accomodate both the value labels and the variable lable.
 
 A frequency bar is produced for each level of the first and perhaps only variable. When two variables are plotted, the bar for each level of the first variable is replaced with a group of bars, one for each level of the second variable.
 
@@ -128,6 +141,8 @@ When two variables are plotted, a legend is produced, with values for each level
 
 ENTER COUNTS DIRECTLY\cr
 Instead of calculating the counts from the data, the counts can be entered directly.  For two variables, enter the counts as a matrix and include the \code{xlab} option to label the horizontal axis, such as with the name of the variable.  Also include the \code{legend.title} option to provide a legend.  See the examples below.
+
+Or, include the tabulated counts as the data which is read into R. If \code{count.names} is not \code{NULL}, then it is presumed to be a valid variable name.  As such, it indicates that the primary variable, \code{x} consists of values already tabulated, that is, counts, and is ready to be plotted directly.  The value for \code{count.names} specifies the label for each level of \code{x}.
 
 STATISTICS\cr
 In addition to the barchart, descriptive and optional inferential statistics are also presented.  First, the frequency table for one variable or the joint frequency table for two variables is displayed. Second, the corresponding chi-square test is also displayed by default. If \code{brief=FALSE}, then the cell proportions are displayed, as well as based on row sums and column sums.
@@ -175,6 +190,9 @@ bc(Gender)
 # specify a unique bar color for each of the two bars
 bc(Gender, col.bars=c("pink","lightblue"))
 
+# automatically provide horizontal value labels 
+#   and adjust left margin as needed
+bc(Pain, horiz=TRUE)
 
 # ----------------------------------------
 # barchart from the data for two variables
@@ -205,23 +223,15 @@ bc(Gender, by=Pain, col.bars=c("thistle1","thistle2","thistle3","thistle4"))
 bc(Gender, by=Pain, beside=TRUE, legend.horiz=TRUE)
 
 # horizontal bar chart of two variables
-bc(Gender, by=Pain, horiz=TRUE, legend.loc="bottomright")
+bc(Gender, by=Pain, horiz=TRUE, legend.loc="top")
 
 # many options, including those from par: col.main, col.axis, col.lab, cex.lab
 # for more info on these graphic options, enter:  help(par)
 bc(Pain, by=Gender, col.bars=c("coral3","seagreen3"), 
-  legend.loc="topleft", legend.labels=c("The Girls", "The Boys"), 
+  legend.loc="topleft", legend.labels=c("Girls", "Boys"), 
   xlab="Pain Level", main="Gender for Different Pain Levels", 
   col.bg="wheat1", col.grid="wheat3", col.main="wheat4", 
   col.axis="wheat4", col.lab="wheat4", cex.lab=1.2)
-  
-# get a wider vertical left margin by using R par function with mar option
-# particularly useful for horizontal bar charts with horizontal labels (las=1)
-# move from default 4 lines to 7 lines, second arg of mar option
-par(mar=c(5, 7, 4, 2) + 0.1)
-bc(Pain, horiz=TRUE, las=1)
-# go back to the default settings for subsequent graphs
-par(mar=c(5, 4, 4, 2) + 0.1)
 
 
 # ---------------------------------------------
@@ -259,8 +269,8 @@ bc(X1, by=X2)
 
 # generate and enter character string data
 # that is, without first converting to a factor
-Travel <- sample(c("Bike", "Bus", "Drive", "Walk"), size=25, replace=TRUE)
-bc(Travel)
+Travel <- sample(c("Bike", "Bus", "Car", "Motorcycle"), size=25, replace=TRUE)
+bc(Travel, horiz=TRUE)
 
 
 # ------------------------------

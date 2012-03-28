@@ -3,17 +3,18 @@ function(x, dframe=mydata,
          bw="nrd0", type=c("both", "general", "normal"),
          col.bg="ghostwhite", col.grid="grey90", col.bars="grey86",
          col.nrm="black", col.gen="black",
-         col.fill.nrm=rgb(80,150,200, alpha=70, max=255), 
-         col.fill.gen=rgb(250,210,230, alpha=70, max=255),
+         col.fill.nrm=rgb(80,150,200, alpha=70, maxColorValue=255), 
+         col.fill.gen=rgb(250,210,230, alpha=70, maxColorValue=255),
          bin.start=NULL, bin.width=NULL, text.out=TRUE,
-         x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, ...) {
+         x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
+         x.min=NULL, x.max=NULL, ...) {
 
 
 dens.main <- 
 function(x, ...) {
 
   if (!is.null(x.pt)) {
-    y.axis=TRUE
+   y.axis=TRUE
    type <- "general"
   }
 
@@ -67,16 +68,16 @@ function(x, ...) {
   min.dev.x <- min(d.gen$x) - mx
   max.dev.x <- max(d.gen$x) - mx
   if (abs(min.dev.x) > abs(max.dev.x)) {
-    min.x <- min(d.gen$x)
-    max.x <- mx + abs(min.dev.x)
+    if (is.null(x.min)) x.min <- min(d.gen$x)
+    if (is.null(x.max)) x.max <- mx + abs(min.dev.x)
   }
   if (abs(max.dev.x) > abs(min.dev.x)) {
-    min.x <- mx - abs(max.dev.x)
-    max.x <- max(d.gen$x)
+    if (is.null(x.min)) x.min <- mx - abs(max.dev.x)
+    if (is.null(x.max)) x.max <- max(d.gen$x)
   }
   
   # normal density curve, no plot
-  xx <- seq(min.x, max.x, length=200)
+  xx <- seq(x.min, x.max, length=200)
   d.nrm <- dnorm(xx,mean(x),sd(x))
 
   # max y coordinate for graph
@@ -86,12 +87,12 @@ function(x, ...) {
   # bw if specified also gets passed to plot, so suppress warning
   if (!y.axis) y.lab="" else y.lab="Density"
   suppressWarnings(plot(h, border="transparent", freq=FALSE, xlab=x.lbl,
-     ylab=y.lab, main=main.lbl, xlim=c(min.x,max.x), ylim=c(0,max.y), 
+     ylab=y.lab, main=main.lbl, xlim=c(x.min,x.max), ylim=c(0,max.y), 
      axes=FALSE, ...))
   op <- options()  # save current options to reset later
   options(scipen=30) # turn off scientific notation
-  axis(1, ...)
-  if (y.axis) axis(2, ...)
+  suppressWarnings(axis(1, ...))
+  if (y.axis) suppressWarnings(axis(2, ...))
   options(op)
   
   # colored background for plotting area
@@ -107,7 +108,7 @@ function(x, ...) {
 
   # plot the normal curve
   if (type == "normal" || type == "both") 
-    polygon(c(min.x,xx,max.x), c(0,d.nrm,0), col=col.fill.nrm, border=col.nrm)
+    polygon(c(x.min,xx,x.max), c(0,d.nrm,0), col=col.fill.nrm, border=col.nrm)
   
   # plot the general curve
   if (type == "general" || type == "both")

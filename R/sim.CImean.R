@@ -1,23 +1,26 @@
 sim.CImean <- 
-function(nrep, n, mu=0, sigma=1, cl=0.95, 
+function(ns, n, mu=0, sigma=1, cl=0.95, 
          ylim.bound=NULL, show.data=FALSE, show.title=TRUE, 
          miss.only=FALSE, col.hit="gray40", col.miss="red",
-         col.grid="grey90", pdf.out=FALSE, pause=FALSE) {
+         col.grid="grey90", pause=FALSE) {
 
 if (sigma < 0) { 
   cat("\n"); stop(call.=FALSE, "\n","------\n",
     "Standard deviation, sigma, cannot be negative.\n\n")
 }
-        
+
+orig.params <- par(no.readonly=TRUE)
+on.exit(par(orig.params))        
+
 alpha <- 1-cl
 tcut <- qt(1-alpha/2, df=n-1)
 clpct <- round((cl)*100, 2)
 
 # data generation
-data.raw <- rnorm(nrep*n, mu, sigma)
+data.raw <- rnorm(ns*n, mu, sigma)
 max.Y <- max(data.raw)
 min.Y <- min(data.raw)
-data.byrep <- matrix(data.raw, nrep, n)
+data.byrep <- matrix(data.raw, ns, n)
 
 # summary stats
 Ymean <- apply(data.byrep, 1, mean)
@@ -30,7 +33,7 @@ ub <- Ymean + E
 
 # performance
 miss <- sum((lb > mu) + (ub < mu))
-missrate <- round((miss/nrep)*100, 2)
+missrate <- round((miss/ns)*100, 2)
 
 # keep mu centered with symmetric upper and lower limits on y-axis
 if (is.null(ylim.bound)) {
@@ -52,12 +55,8 @@ else {
 }
 
 
-if (pdf.out)
-  pdf(file=paste("CImeanSim",toString(round(100*(1-alpha),0)),".pdf",sep=""))
-
 # plot setup
-orig.params <- par(no.readonly=TRUE)
-par(mar=c(2,2,1.5,2), mgp=c(1,.5,0))
+par(mar=c(2,2,1.75,2), mgp=c(1,.5,0))
 
 plot(lb, type = "n", ylim = c(l,u), xlab = "", ylab = "", cex.main=.95, cex.axis=.8)
 if (show.title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma), "  ",
@@ -81,7 +80,7 @@ cat("\nSample", "  Mean", " StdDev", " StdErr", "  Error", "     LB", "     UB",
 abline(h=mu, col="darkslateblue", lwd=1.5) # horizontal centerline at mu
 dig.dec <- 3
 max.ln <- 8
-for (i in 1:nrep) {
+for (i in 1:ns) {
   if (pause) invisible(readline())
   if ( (mu>lb[i] && mu<ub[i]) ) linecol <- col.hit else linecol = col.miss
   if (show.data) points(rep(i,n), data.byrep[i,], pch=21, col="gray75", cex=.3)
@@ -105,12 +104,10 @@ for (i in 1:nrep) {
 }
 if (pause) cat("\n")
 
-if (pdf.out) dev.off()
-
 cat("\nStructure\n")
 cat("Population mean, mu :", mu, "\n")
 cat("Pop std dev, sigma  :", sigma, "\n")
-cat("Number of samples   :", nrep, "\n")
+cat("Number of samples   :", ns, "\n")
 cat("Size of each sample :", n, "\n")
 cat("Confidence level    :", cl, "\n")
 
@@ -126,5 +123,4 @@ cat("Std Dev:", format(sprintf("%.*f", dig.dec, sd(Ymean)), width=max.ln, justif
 
 cat("\n")
 
-par(orig.params)
 }
