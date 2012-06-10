@@ -6,23 +6,25 @@ function(prefix, until, from=1, same.size=TRUE) {
        "The value of  until  must be greater than the value of  from .\n\n")
   }
 
-  if (same.size) {
-    nc <- nchar(as.character(until))
+  cstr <- character(length=0)
+  for (ichar in (from:until)) {
 
-    cstr <- ""
-    for (ichar in (from:until)) { 
-      cc <- format(sprintf("%s", ichar), width=nc, justify="right")
-      cc <- as.character(.fmtc(cc), w=nc)
-      for (i in 1:nchar(cc)) if (substr(cc,i,i) == " ") substr(cc,i,i) <- "0"
-      cc <- paste(prefix, cc, sep="")
-      cstr <- paste(cstr, cc)
-    }
+    if (same.size) inum <- until else inum <- ichar
+    nc <- nchar(as.character(inum))
 
-    substr(cstr,1,1) <- ""
-    cstr <- strsplit(cstr, " ")[[1]]
+    cc <- as.character(.fmtc(ichar, w=nc))
+    for (i in 1:nchar(cc)) if (substr(cc,i,i) == " ") substr(cc,i,i) <- "0"
+    cc <- paste(prefix, cc, sep="")
+    cstr <- paste(cstr, cc)
   }
-  else cstr <- paste(prefix, from:until, sep="")
 
-  return(cstr)
+  print(cstr)
+  nc <- nchar(cstr)
+  cstr2 <- character(length=0)
+  for (i in 2:nc) cstr2 <- paste(cstr2, substr(cstr,i,i), sep="")
+  cstr2 <- strsplit(cstr2, " ")[[1]]
+
+  return(cstr2)
 
 }
+
