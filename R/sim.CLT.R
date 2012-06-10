@@ -6,7 +6,10 @@ function(ns, n, p1=0, p2=1,
 
 type <- match.arg(type)
 
-if (graphics.screen) graphics.off()
+if (graphics.screen) {
+  .graphwin(2)
+  dev.set(which=3)
+}
 
 dig.dec <- 3
 max.ln <- 8
@@ -74,12 +77,6 @@ if (type == "lognormal") {
 }
 
 if (type == "antinormal") {
-  check.triangle <- suppressWarnings(require(triangle, quietly=TRUE))
-  if (!check.triangle) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Simulations from the anti-normal distribution require package triangle.", "\n",
-      "To get the triangle package, run once only: install.packages('triangle')", "\n")
-  }
 
   if (p1 != 0) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -98,7 +95,7 @@ if (type == "antinormal") {
 
   if (pop) {
     x1 <- seq(0, x.max/2, length=250)
-    y1 <- dtriangle(x1, a=0, b=x.max/2, c=0+.01)
+    y1 <- dtriangle(x1, a=0, b=x.max/2, c=0+.01)  # triangle function
     plot(0, type="n", axes=FALSE, xlim=c(0-.5, x.max+.5), ylim=c(0,max(y1)+.1), xlab="", ylab="")
     axis(1)
     usr <- par("usr")
@@ -139,17 +136,28 @@ data.byrep <- matrix(data.raw, nrow=ns, ncol=n)
 Ymean <- apply(data.byrep, 1, mean)
 Ysd <- apply(data.byrep, 1, sd)
 
-if (graphics.screen) dev.new()
-dens(Ymean, type="normal", xlab="", col.fill.nrm="transparent", col.bars=col.fill, 
-     col.grid="transparent", text.out=FALSE, ...)
+if (!is.null(getOption("colors"))) colors <- getOption("colors")
+else colors="blue"
+
+if (graphics.screen) dev.set(which=4)
+.den.main(Ymean, type="normal", xlab="", 
+       col.fill.nrm="transparent", col.bars=col.fill, 
+       col.grid="transparent", text.out=FALSE,
+       bw="nrd0", colors=colors, 
+       bin.start=NULL, bin.width=NULL,
+       col.bg=NULL, col.nrm="black", col.gen="black",
+       col.fill.gen=NULL,
+       cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+       x.pt=NULL, y.axis=FALSE, main=NULL, 
+       x.min=NULL, x.max=NULL, band=FALSE)
 if (subtitle) 
   txt <- paste(toString(sprintf("%i", ns)), "samples, each of size", toString(n), "from", type)
 else txt=""
 title(xlab="Sample Mean", sub=txt)
 
 cat("\nAnalysis of Sample Means\n")
-cat("   Mean:", format(sprintf("%.*f", dig.dec, mean(Ymean)), width=max.ln, justify="right", sep=""), "\n")
-cat("Std Dev:", format(sprintf("%.*f", dig.dec, sd(Ymean)), width=max.ln, justify="right", sep=""), "\n")
+cat("   Mean:", .fmt(mean(Ymean), dig.dec, w=max.ln), "\n")
+cat("Std Dev:", .fmt(sd(Ymean), dig.dec, w=max.ln), "\n")
 cat("\n")
 cat("Observed 95% range of Sample Mean\n", 
     "   Original Units:",  quantile(Ymean, prob=c(.025,.975)),"\n")
@@ -162,7 +170,7 @@ if (n.display > 0)
   for(i in 1:n.display) 
     cat("\nSample", toString(i), "\n",
         "Mean:", sprintf("%.*f", dig.dec, Ymean[i]), "\n",
-        "Rounded Data Values:", sprintf("%.*f", dig.dec, data.byrep[i,]), "\n")
+        "Rounded Data Values:", .fmt(data.byrep[i,], dig.dec), "\n")
 
 cat("\n")
 

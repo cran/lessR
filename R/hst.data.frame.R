@@ -1,6 +1,7 @@
 hst.data.frame <-
 function(x, ncut, ...)  {
 
+
   fname <- paste("Hist.", format(Sys.time(), "%d_%H_%M_%S"), ".pdf",sep="")
   pdf(file=fname)
 
@@ -8,7 +9,8 @@ function(x, ncut, ...)  {
 
     nu <- length(unique(na.omit(x[,i])))
 
-    x.name <<- names(x)[i]
+    x.name <- names(x)[i]
+    options(xname = x.name)
 
     if (is.numeric(x[,i]) && nu > ncut) {
       tlbl <- paste("Histogram for", names(x)[i])
@@ -26,11 +28,5 @@ function(x, ncut, ...)  {
   
   dev.off()
   
-  if (getwd() == "/")
-    workdir <- "top level (root) of your file system"
-  else
-    workdir <- getwd()
-  cat("\n\npdf file of histograms:",  fname, "\n")
-  cat("\nWritten at current working directory:", workdir, "\n\n")
-
+  .showfile(fname, "histograms")
 }

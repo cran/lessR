@@ -3,6 +3,7 @@ function(n, prob=.5, show.title=TRUE,
          show.flips=TRUE, col.grid="grey90", pause=FALSE) {
 
 options(scipen=10)  # avoid scientific notation
+.graphwin()
 
 # plot the individual flips and the running mean
 orig.params <- par(no.readonly=TRUE)

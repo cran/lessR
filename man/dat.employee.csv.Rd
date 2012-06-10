@@ -1,7 +1,7 @@
 \name{dat.employee}
 \docType{data}
 \alias{dat.employee}
-\title{Employee Data}
+\title{Data: Employees}
 \description{Some human resource data on 37 employees with 6 variables. The following is the contents of the corresponding file of variable labels that would be read from an external \code{csv} file with \code{\link{rad.labels}}.\cr\cr
 Years,"Years Employed in the Company"\cr
 Gender,"Male or Female"\cr

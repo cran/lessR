@@ -1,4 +1,4 @@
 reg.explain <-
 function(my.formula, explain=TRUE, ...)
 
-reg(my.formula, explain=TRUE, ...)
+  Regression(my.formula, explain=TRUE, ...)

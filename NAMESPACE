@@ -1,5 +1,51 @@
-# Default NAMESPACE created by R
-# Remove the previous line if you edit this file
+importFrom("car", vif, scatter3d, dataEllipse)
+importFrom("leaps", leaps)
+importFrom("MBESS", ci.smd)
+importFrom("foreign", read.spss)
+importFrom("triangle", dtriangle, rtriangle)
 
+# Export all names except those that begin with .
+#exportPattern("^[^\\.]")
+#
 # Export all names
-exportPattern(".")
+#exportPattern(".")
+
+
+export (
+
+  ANOVA, av, av.brief,
+  BarChart, bc, color.barchart,
+  BoxPlot, bx, color.boxplot,
+  Correlation, cr, cr.brief,
+  CountAll, ca,
+  Density, den, color.density,
+  Help, hlp,
+  Histogram, hst, color.hist,
+  label,
+  Model, model, model.brief,
+  PieChart, pc,
+  Plot, plt,
+  prob.norm, prob.znorm, qnt.t,
+  Read, rad, rad.brief, rad.labels, rad.both, rad2,
+  Regression, reg, reg.brief, reg.explain,
+  RunChart, rc,
+  set, showColors,
+  sim.CImean, sim.CLT, sim.flips, sim.means,
+  SummaryStats, ss, ss.brief,
+  to,
+  ttest, tt, tt.brief, smd.t.test,
+  ttestPower, ttp,
+  values, 
+  Write, wrt, wrt.r,
+  .First
+
+)
+
+S3method(bc, default)
+S3method(bc, data.frame)
+S3method(bx, default)
+S3method(bx, data.frame)
+S3method(cr, default)
+S3method(cr, data.frame)
+S3method(hst, default)
+S3method(hst, data.frame)

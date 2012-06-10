@@ -33,7 +33,7 @@ prob.znorm(mu=0, sigma=1, col.border="gray10",
 }
 
 \details{
-Provide a normal curve with shading of each interval defined by the number of standard deviations from the mean.  The layers are written with transparency, and over-written so that the middle interval is the darkest and the most extreme intervals, beyond three standard deviations from the mean, are the lightest.  Specfify \code{a=0} to turn off the colors.  Higher values of the alpha channel, as specified by \code{a}, yield darker colors. Specify \code{a=1} for the same solid color for all intervals. 
+Provide a normal curve with shading of each interval defined by the number of standard deviations from the mean.  The layers are written with transparency, and over-written so that the middle interval is the darkest and the most extreme intervals, beyond three standard deviations from the mean, are the lightest.  Specify \code{a=0} to turn off the colors.  Higher values of the alpha channel, as specified by \code{a}, yield darker colors. Specify \code{a=1} for the same solid color for all intervals. 
 
 The normal densities are calculated with \code{\link{dnorm}} and plotted with \code{\link{plot}}.
 }
@@ -62,3 +62,5 @@ prob.znorm(65.5, 2.5, r=.9, xlab="Height of American Women")
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ probability }
+
+

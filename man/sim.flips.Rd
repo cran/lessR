@@ -1,7 +1,7 @@
 \name{sim.flips}
 \alias{sim.flips}
 
-\title{Pedagogical Binomail Simulation, Coin flips}
+\title{Pedagogical Binomial Simulation, Coin flips}
 
 \description{
 Simulate a sequence of coin flips.
@@ -39,3 +39,5 @@ sim.flips(10, .5)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ binomial process }
+
+

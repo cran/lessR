@@ -4,7 +4,7 @@
 \title{Get a Variable Label for Display on Output}
 
 \description{
-Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  Generally applies to standard R functions as \code{lessR} functions automatically provide varible labels on the output when the labels are present in the \code{mylabels} data frame.
+Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  Generally applies to standard R functions as \code{lessR} functions automatically provide variable labels on the output when the labels are present in the \code{mylabels} data frame.
 }
 
 \usage{
@@ -19,17 +19,24 @@ label(x, dframe=mylabels)
 
 
 \details{
-Standard R does not provide for variable labels, but \code{lessR} provides for a data frame called \code{mylabels} which stores variable labels.  Read the labels into this data frame with a version of the \code{\link{rad}} function.  The variable labels can either be in a separate file by themselves, \code{\link{rad.labels}}, or in the second row of the data file, \code{\link{rad.both}}. Each row of the file that contains the labels, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format. Not all variables need have a label, and the variables with their corresponding labels can be listed in any order.
+Standard R does not provide for variable labels, but \code{lessR} provides for a data frame called \code{mylabels} which stores variable labels.  Read the labels into this data frame with the \code{\link{Read}} function and setting \code{labels=TRUE}. This setting can be accommplished with the short name for the \code{\link{Read}} function, \code{\link{rad}}.  The variable labels can either be read from a separate file by themselves, \code{\link{rad.labels}}, or from the second row of the data file, \code{\link{rad.both}}. 
 
-The \code{\link{rad}} function automatically creates the \code{mylabels} data frame. The structure of the data frame consists of the variable names which serve as the row names.  The labels themselves are a variable named \code{label}, but this information is only necessary if constructing the labels data frame manually, such as is done in the examples.
+Each row of the file that contains the labels, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format. Here is an example of this file for the \code{dat.employee} data file included in this \code{lessR} package.\cr
+Years,"Years Employed in the Company"\cr
+Gender,"Male or Female"\cr
+Dept,"Department Employed"\cr
+Salary,"Annual Salary (USD)"\cr
+Satisfaction,"Satisfaction with Work Environment"\cr
+HealthPlan,"1=GoodHealth, 2=YellowCross, 3=BestCare"\cr
+Not all variables need have a label, and the variables with their corresponding labels can be listed in any order.
 
-This function is automatically accessed by the \code{lessR} functions that provide data analysis, such as automatically providing the title of a graph as the corresponding variable label.  This function can also be added to standard R function calls as well, such as an argument for \code{main} in graphics output, where \code{main} is the title of the graph.
+The \code{label} function is automatically accessed by the \code{lessR} functions that provide data analysis, such as automatically providing the title of a graph as the corresponding variable label.  This function can also be added to standard R function calls as well, such as an argument for \code{main} in graphics output, where \code{main} is the title of the graph.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{rad}}, \code{\link{plot}}.
+\code{\link{Read}}.
 }
 
 \examples{
@@ -41,15 +48,21 @@ mydata <- data.frame(X,Y)
 rm(X); rm(Y);
 
 # create data frame mylabels (usually read from a file with rad)
-vname <- character(length=2);  vname[1] <- "X";  vname[2] <- "Y"
+# The labels themselves are a variable named \code{label}, but 
+#   this information is only necessary if constructing the 
+#   labels data frame manually, such as is done here.
+vname <- character(length=2)
+vname[1] <- "X"
+vname[2] <- "Y"
 label <- character(length=2)
-label[1] <- "Grouping Variable"
-label[2] <- "Response Variable"
+label[1] <- "Group"
+label[2] <- "Response"
 mylabels <- data.frame(label)
 row.names(mylabels) <- vname
 
 # variable label as the title of a graph from a standard R function
-# the data are not attached, so identify using the with function
+# the data are not attached, so for standard R functions, must
+#   identify the relevant data frame, such as with function: with
 with(mydata, barplot(table(X), main=label(X)))
 with(mydata, hist(Y, main=label(Y)))
 }
@@ -59,3 +72,5 @@ with(mydata, hist(Y, main=label(Y)))
 % R documentation directory.
 \keyword{ labels }
 \keyword{ csv }
+
+

@@ -1,30 +1,27 @@
 Package: lessR
 Type: Package
 Title: Less Code, More Results
-Version: 2.2
-Date: 2012-03-28
+Version: 2.3
+Date: 2012-06-10
 Author: David W. Gerbing, School of Business Administration, Portland
         State University
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
-Suggests: MBESS, leaps, car, foreign, rgl, triangle
+Imports: car, leaps, foreign, MBESS, triangle
+Suggests: rgl
 Description: Each function accomplishes the work of several or more
-        standard R functions.  For example, two function calls, rad()
-        and full(), together read the csv data and generate descriptive
+        standard R functions.  For example, two function calls, Read()
+        and CountAll(), read the data and generate descriptive
         statistics for all variables in the data frame, plus histograms
-        and bar charts as appropriate. The t-test function, tt,
-        analyzes one or two groups from data or summary statistics and
-        introduces the ODDSMD plot, which displays the Overlapping
-        Density Distributions of two independent groups as well as a
-        visual display of the mean difference and standardized mean
-        difference. Other functions provide for descriptive statistics,
-        a comprehensive regression analysis, color plotting, color bar
-        chart, color histogram, color box plot, color density curves, a
-        calibrated power curve, and the reading and display of csv
-        formatted data. The function help.me provides a help system
-        that suggests specific analyses and functions. Variable labels
-        are also available.
+        and bar charts as appropriate.  Other functions provide for
+        descriptive statistics, a comprehensive regression analysis,
+        anova and t-test, color plotting, color bar chart, color
+        histogram, color box plot, color density curves, a calibrated
+        power curve, and the reading and display of csv and other
+        formatted data. The function Help provides a help system that
+        suggests specific analyses and functions. Variable labels, and
+        color themes with the set function, are also available.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2012-03-28 11:18:06 UTC; gerbing
+Packaged: 2012-06-10 22:44:33 UTC; gerbing
 Repository: CRAN
-Date/Publication: 2012-03-28 18:13:13
+Date/Publication: 2012-06-11 04:48:52

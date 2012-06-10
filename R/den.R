@@ -1,0 +1,5 @@
+den <-
+function(...)
+
+  Density(...)
+
