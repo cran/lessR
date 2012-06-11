@@ -23,6 +23,7 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black",
 
   
   # normal density curve
+  .graphwin()
   min.x <- mu-4*sigma
   max.x <- mu+4*sigma
   cuts <- seq(min.x,max.x,sigma)
@@ -55,5 +56,7 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black",
   title(main=paste(lbl1,lbl2), ...)
   lbl3 <- bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma)))
   if (z) title(sub=lbl3, line=4, ...) else title(sub=lbl3, ...)
+
+  return(prob)
 
 }

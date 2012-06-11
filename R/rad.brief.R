@@ -1,4 +1,4 @@
 rad.brief <-
 function(ref=NULL, brief=TRUE, ...)
 
-rad(ref, brief=TRUE, ...)
+  Read(ref, brief=TRUE, ...)

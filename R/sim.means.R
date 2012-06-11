@@ -57,7 +57,7 @@ else {
 
 
 # plot 
-
+.graphwin()
 orig.params <- par(no.readonly=TRUE)
 par(mar=c(3,3,1.75,2), mgp=c(1.75,.5,0))
 

@@ -25,6 +25,7 @@ col.sig <- rgb(r, g, b, a)
 x <- seq(xmin, xmax, length=200)
 y <- dnorm(x ,mean=mu ,sd=sigma)
 
+if (sys.nframe() == 1) .graphwin()  # do not open up new window if called from sim.CLT
 plot(x,y, type="l", lwd=2, col=col.border, axes=FALSE, xlab="", ylab="", main=main)
 if (z) title(xlab=xlab, line=3.5) else title(xlab=xlab)
 

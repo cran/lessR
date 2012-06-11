@@ -56,6 +56,7 @@ else {
 
 
 # plot setup
+.graphwin()
 par(mar=c(2,2,1.75,2), mgp=c(1,.5,0))
 
 plot(lb, type = "n", ylim = c(l,u), xlab = "", ylab = "", cex.main=.95, cex.axis=.8)
@@ -88,12 +89,12 @@ for (i in 1:ns) {
     se <- Ysd[i]/sqrt(n)
     e <- tcut * se
     cat(format(i, width=5, justify="right", sep=""))
-    cat(format(sprintf("%.*f", dig.dec, Ymean[i]), width=max.ln, justify="right", sep=""))
-    cat(format(sprintf("%.*f", dig.dec, Ysd[i]), width=max.ln, justify="right", sep=""))
-    cat(format(sprintf("%.*f", dig.dec, se), width=max.ln, justify="right", sep=""))
-    cat(format(sprintf("%.*f", dig.dec, E[i]), width=max.ln, justify="right", sep=""))
-    cat(format(sprintf("%.*f", dig.dec, lb[i]), width=max.ln, justify="right", sep=""))
-    cat(format(sprintf("%.*f", dig.dec, ub[i]), width=max.ln, justify="right", sep=""))
+    cat(.fmt(Ymean[i], dig.dec, w=max.ln))
+    cat(.fmt(Ysd[i], dig.dec, w=max.ln))
+    cat(.fmt(se, dig.dec, w=max.ln))
+    cat(.fmt(E[i], dig.dec, w=max.ln))
+    cat(.fmt(lb[i], dig.dec, w=max.ln))
+    cat(.fmt(ub[i], dig.dec, w=max.ln))
     if (linecol == "red")  cat("  *** MISS ***")
     if (!pause) cat("\n")
   }

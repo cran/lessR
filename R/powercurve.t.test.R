@@ -7,7 +7,7 @@ function(...) {
     " Now use  ttp   instead of  powercurve.t.test.\n",
     "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n", sep="")
 
-  power.ttest(...)
+  ttp(...)
 
   cat("\n"); cat( # stop(call.=FALSE, "\n","------\n",
     ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n",

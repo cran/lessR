@@ -1,0 +1,400 @@
+NEWS
+
+Update History for Package 'lessR'
+
+
+
+
+>>>>>> Changes for lessR version 2.3 (2012-06-10)} <<<<<<
+
+
+------------
+Overview 2.3
+------------
+
+Naming Conventions
+------------------
+All data analysis functions now have two names, a longer, more descriptive name, that
+involves uppercase letters, such as Summary Stats, and a short abbreviation, here ss.
+Either version is equivalent. The purpose of the uppercase letters is to distinguish
+lessR functions from the standard R functions with similar names.  When appropriate,
+functions can also have an abbreviation such as brief to indicate a briefer form of
+output, here ss.brief.
+
+Color Themes
+------------
+Using the new set function, the colors options sets the system wide color theme.
+The default is "blue" and several other colors are available, including gray scale 
+with "gray". The colors option may also applied to any one specific graphic
+function call to set the color theme just for that one resulting graph.
+
+Transparency for plotting individual points with Plot is also available with the 
+trans.pts option, from 0 to 1, with a 0 being opaque and a 1 being fully 
+transparent. The trans.pts option may be set with the set function for all
+subsequent analyses, or it may be set for any one specific call to Plot.
+
+Direct Reference of Variable Names (from 2.2)
+----------------------------------
+lessR defaults the name of the data frame with data read from the Read or rad 
+function with mydata. Now this convention is leveraged by dropping the need for the
+R attach function, or by having to include the data frame name and a $ in front of
+the variable name, or using the with function. Instead, for each specified variable
+name, lessR searches the user's workspace, the global environment, as well as the
+data frame mydata, or the specified data frame name, for the relevant variable.
+
+Variable Labels (from 2.2)
+---------------
+lessR functions now can access variable labels, which will replace the variable 
+names on the axis labels for graphic output, and be displayed adjacent to the 
+variable names on text output.  Use the labels function to access the variable
+labels for standard R functions.  See help(Read) for directions on how to enter
+the variable labels.
+
+Improved Appearance of Graphs
+-----------------------------
+In addition to the new color themes, the appearance of the graphs has been changed
+to print the values along each scale of an axis is a smaller font and a shade of
+gray instead of black.
+
+
+-----------------
+New Functions 2.3
+-----------------
+
+Model, model
+  Function for a linear analysis, which automatically calls the relevant function -- 
+    ttest, ANOVA or Regression -- and therefore replaces those functions from the
+    user's perspective.
+
+set
+  Created as a wrapper for options(colors="xxx") added for graphics routines to 
+   specify a color theme.
+      
+to
+  Created to generate variable name lists with sequential numbers when reading
+    data into R such as from a csv data file.
+
+
+-----------
+Updates 2.3
+-----------
+Help, hlp
+  updated help window opens when lessR is loaded
+
+Read, rad
+  Add option for reading native R data files
+  SuppressWarnings to avoid warning message on read.csv for Excel csv files with no
+    last <cr>
+  SuppressWarnings on SPSS files to avoid "Unrecognized record type 7"
+
+Write, wrt
+  Add option for writing native R data files
+  Automatically add a file type, either .csv or .rda
+
+ttest, tt
+  Also do analysis of not assuming equal variances.
+  Set extra decimal digit for analysis from stats (already set from data)
+  By default, at least two decimal digits
+  Added consistent formatting to numerical output according to digits.d
+  Two-group density graph has density scaling removed from y-axis
+  Two-group density graph has smaller font sizes and margin adjustment
+
+BarChart, bc
+  Brief stat output now the default, bc.brief removed
+  Add error condition of not having col.bars and colors both activated
+  Add colors="gray" option and bc.gray
+  Display tick marks and tick labels in dark gray
+
+Histogram, hst
+  Add vertical grid in addition to existing horizontal grid
+  Add colors="gray" option and hst.gray
+  Display tick marks and tick labels in dark gray
+
+DotPlot, dp
+  Add colors="gray" option and dots.gray
+  Display tick marks and tick labels in dark gray
+
+Density, dens
+  Remove horizontal grid, leaving no grid
+  Add colors="gray" option and dens.gray
+  Display tick marks and tick labels in dark gray
+
+Plot, plt
+  Add colors="gray" option and plt.gray expression
+  Display tick marks and tick labels in dark gray
+  Add ncut to treat x as a factor if too few unique data values
+  When x is a factor, now do summary stats of y by each level of x
+  Run chart now lists n and n.missing
+  Scatterplot matrix and correlation matrix added for a data frame
+
+Regression, reg
+  3D scatterplot optional for two predictor variables instead of required
+  The colors setting applies to reg graphs
+
+BoxPlot, bx
+  Consistent formatting of text output with default decimal digits
+
+Correlation, cr
+  Correlation routine pulled from plt and made its own function
+  The version cr.brief added
+  Correlation matrix of a data frame added
+
+RunChart, rc
+  old access was Plot with one variable, which now produces a dot plot
+
+prob.norm
+  now returns the probability in the console like R pnorm function
+
+qnt.t
+  renamed from prob.t as it is the quantile that is returned
+  now returns the quantile in the console like R qt function
+
+
+-------------
+Bug Fixes 2.3
+-------------
+
+system wide
+  a variable named with the name of an R function is now permissible
+
+ttest, tt
+  bug fix: Analysis from summary statistics does not need a mydata data frame 
+           to exist prior to the function call
+  bug fix: Variable labels no longer switched on response and grouping variables
+  bug fix: Labels now work with one group analysis
+  bug fix: Properly align group1 and group2 output to the user's workspace
+           with the correct group
+
+Plot, plt
+  bug fix: Run plot failed if missing data
+  bug fix: Plot with factor on x-axis failed plot of means if missing data
+  bug fix: If missing data, do not try ellipse which fails
+  bug fix: For bubble plot, x-axis now has proper scale
+
+Summary Statistics, ss
+  bug fix: The null graphic window no longer opened
+
+BoxPlot, bx
+  bug fix: When doing a dot plot, colors did not transfer from bx
+
+
+
+
+
+
+>>>>>> Changes for lessR version 2.2 (2012-03-28)} <<<<<<
+
+
+-----------------
+New Functions 2.2
+-----------------
+
+
+sim.CLT 
+  Simulation for Central Limit Theorem
+
+sim.flips 
+  Simulation of coin flips
+
+sim.CImean
+  Simulation of confidence interval
+
+sim.means 
+  Simulation of repeated sampling of means
+
+prob.t 
+  Probabilities of t-distribution
+
+
+-----------
+Updates 2.2
+-----------
+
+Note:  The following long form names are not valid as function calls until Version 2.3.
+
+graphics routines
+  Font for scale values along each axis smaller and in a dark gray
+
+ttest, tt
+  Rewrite to allow one or two groups, data or summary stats
+  Allow missing data
+  Restore graphic parameters so top margin of graphics window not too large
+  tt.brief option added
+
+BarChart, bc
+  Count.names option for reading counts directly from a data file with counts
+  Smaller font for legend and no legend border to better display
+  Smaller font for axis values
+  For horizontal plots, horizontal labels and accommodate space in left margin
+  bc.brief added, brief=FALSE is new default for bc
+
+Histogram, hst
+  Smaller font for scale
+
+Plot, plt
+  Smaller font for legend and no legend border for 2 variables to better display
+  Provide covariance coefficient
+
+Summary Statistics, ss
+  ss.brief added
+
+Correlation, cr
+  Provide covariance coefficient
+
+Density, dens [now den in 2.3]
+  Provide densities on vertical axis as an option instead of a requirement
+
+Read, rad 
+  Read spss (.sav) files in addition to csv data files
+  For rad.both, have labels display correctly
+
+prob.norm [normal curve probabilities]
+  Only give normal densities on vertical axis as an option
+  Add second x axis, z-scores
+  Make vertical, density, axis as an option
+  Scale axis labels to .9, add mag option
+
+prob.znorm [normal curve display with z-scores]
+  Default y-axis to null, add as an option
+  Add z-values as a default
+  Scale x-axis according to standard deviations
+  Scale axis labels to .9, add mag (magnify) option
+
+stats.t.test
+  Removed, incorporated into ttest which now processes data from 
+    summary statistics or the data
+
+
+-------------
+Bug Fixes 2.2
+-------------
+
+Regression, reg
+  bug fix:  If residual is 0, Nan's lead to missing data no longer causes 
+           Cook's distance function, and therefore the entire function, to fail
+
+
+
+
+
+
+>>>>>> Changes for lessR version 2.1 (2012-02-08)} <<<<<<
+
+
+-----------------
+New Functions 2.1
+-----------------
+
+dots  [in 2.3 rename to DotPlot, dp]
+  created the function
+
+pieplot [in 2.3 rename to PieChart, pc]
+  created the function
+
+
+-----------
+Updates 2.1 
+-----------
+
+package
+  add citation
+  all lessR functions that read data have attach requirement removed
+  relevant lessR functions have automatic use of variable labels
+  variable labels function label
+
+rad   [in 2.3 also named Read]
+  display name of file read at the beginning of the output only if rad()
+  default is now to not attach mydata
+  add read labels options with rad.labels and rad.both
+  add max.lines options and display full data/labels when applicable
+  convert display option to brief option, add function
+
+reg  [in 2.3 also named Regression]
+  add error check for no data frame, which is required
+  for Background, specify number of obs retained for analysis
+  add references
+  add variable labels to Background section where variables are listed
+  add reg.brief and reg.explain methods
+  reformat Basic Analysis output to print all values individually
+  if a non-numeric variable in model, then do not attempt scatterplot matrix
+  if a non-numeric variable in model, then no scatter.3d plot
+
+plt  [in 2.3 also named Plot]
+  in title, use actual variable names instead of "x and y"
+  loess fit line replaces lowess, along with access to loess span parameter
+  use dates from an existing time series
+  add missing data count
+  put error traps for calling with the wrong data types
+
+barchart  [in 2.3 rename to BarChart, bc]
+  reformat output to much more compact
+  for UseMethod, evaluate class of 1st attribute only to avoid a warning
+  add a y-axis label
+  get border option to work and change name to col.border
+  properly switch axis labels if horiz=TRUE
+  add warning message for beside option off with only a single variable
+  add warning message if addtop set for a horizontal bar graph
+  make chisq the default, and reformat output
+  put the variable names on the tables for row and column proportions
+  re-scale bar width for 2, 3 or 4 bars, from 1 var or stacked 2 var
+  get vivid option to work for gradient applied to ordinal data
+  for vertical graphs of two vars, make legend horizontal with addtop room
+  for data frame, numeric data types of few unique values treated as categorical
+  for data frame, add dev.off() when finished with graphs
+  enhanced the color palettes with R palettes of rainbow, heat and terrain
+  make stacked chart for two variables the default
+
+smooth  [in 2.3 rename to Density, den]
+  add bw parameter
+  make no density axis the default, but add y.axis to include if desired
+  add normality test
+  allow for missing data
+  change col.hist to col.bars
+  get color of the plotted curves working
+
+histogram  [in 2.3 rename to Histogram, hst] 
+  move Number of Bins output next to freq dist, add Bin Width
+  summary statistics and label now with describe.numeric
+  scientific notation turned off for histogram plot
+  col and border options renamed to col.bars and col.border
+  summary stats now provided
+  for data frame, numeric data types of few unique values treated as categorical
+  for error message regarding bin range, turn off scientific notation
+
+boxp   [in 2.3 rename to BoxPlot, bp] 
+  add values of outliers to text output
+  adjust axis labels for vertical box plot
+  provide for default colored background and grid lines
+
+describe [in 2.3 rename to SummaryStats, ss]
+  formula input changed to by= option
+  output reformatted to much more compact, and extended
+  outlier detection added to description of numerical variables
+  if too many values, then just report counts
+  if all values unique, just report the values and a note as an ID field
+  for numeric, if digits.d > 10, output size changed to 4 with prompt to override
+  for data frame, numeric data types of few unique values treated as categorical
+  add skewness, kurtosis
+  add a brief=TRUE option, which works for both numeric and categorical variables
+
+smd.t.test  [in 2.3 rename ttest,tt]
+  add brief option and function
+
+stats.t.test [in 2.3 incorporated into ttest]
+  add one-sample option
+  by default resolve number of digits from precision of entered stats
+
+help.me  [in 2.3 now named Help, hlp]
+  update color.hist [in 2.3 Histogram, hst] description
+
+
+-------------
+Bug Fixes 2.1
+-------------
+
+plt  [in 2.3 also named Plot]
+  bug fix: missing data caused an error in bubble plot
+
+reg  [in 2.3 also named Regression]
+  bug fix:  allow missing data
+
