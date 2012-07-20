@@ -1,9 +1,6 @@
 hst.data.frame <-
-function(x, ncut, ...)  {
+function(x, n.cat, text.out, ...)  {
 
-
-  fname <- paste("Hist.", format(Sys.time(), "%d_%H_%M_%S"), ".pdf",sep="")
-  pdf(file=fname)
 
   for (i in 1:ncol(x)) {
 
@@ -12,21 +9,19 @@ function(x, ncut, ...)  {
     x.name <- names(x)[i]
     options(xname = x.name)
 
-    if (is.numeric(x[,i]) && nu > ncut) {
-      tlbl <- paste("Histogram for", names(x)[i])
-      hst.default(x[,i], xlab=names(x)[i], main=tlbl, ...)
+    if (is.numeric(x[,i]) && nu > n.cat) {
+      fname <- paste("Hist_", x.name, ".pdf", sep="")
+      hst.default(x[,i], text.out=text.out, pdf.file=fname, ...)
     }
 
-    if (is.numeric(x[,i]) && nu <= ncut)
-      cat("\n>>> ", x.name,  "is numeric, but only has", nu, "<= ncut =", ncut, "levels,",
+    if (is.numeric(x[,i]) && nu <= n.cat)
+      cat("\n>>> ", x.name,  "is numeric,",
+          "but only has", nu, "<= n.cat =", n.cat, "levels,",
           "so treat as a categorical variable.\n",
-          "   To obtain the histogram decrease  ncut  to specify a",
+          "   To obtain the histogram decrease  n.cat  to specify a",
           "lower number of unique values.\n",
           "   Suggest making this variable a factor with R factor function.\n")
 
   }
   
-  dev.off()
-  
-  .showfile(fname, "histograms")
 }

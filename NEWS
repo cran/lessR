@@ -5,8 +5,137 @@ Update History for Package 'lessR'
 
 
 
->>>>>> Changes for lessR version 2.3 (2012-06-10)} <<<<<<
+>>>>>> Changes for lessR version 2.4 (2012-??-??)} <<<<<<
 
+
+-------------------
+New Functions 2.4
+-------------------
+
+Recode
+  recode individual values of an integer or factor variable
+
+The following new functions work with a correlation matrix, named
+mycor by default, instead of the data matrix from which the correlations 
+are computed. Each function that outputs correlations also generates a
+heat map of the output matrix.
+
+crCFA
+  confirmatory factor analysis and item analysis for multiple indicator
+  measurement models from an input correlation matrix
+
+crEFA
+  exploratory factor analysis based on R factanal function, though also
+  provides for a multiple indicator measurement model based on the
+  exploratory analysis and the crCFA code for which to analyze the model
+
+crList
+  list the ordinal position of each variable in the input correlation matrix
+  to facilitate using the other correlational routines
+
+crProp
+  calculate proportionality coefficients from an input correlation matrix,
+  used to identify items that are indicators of the same factor
+
+crRead
+  read an input correlation, or other square, matrix
+
+crReflect
+  reflect specified variables in an input correlation matrix
+
+crReorder
+  re-order the specified variables in the input correlation matrix
+
+crScree
+  eigenvalue plot and plot of differences of successive eigenvalues to help
+  determine the number of factors
+
+
+-------------
+Updates 2.4
+-------------
+
+System wide
+  Variable labels when applied to axis labels on a graph are now truncated
+    to 50 characters for y-axis and 45 characters for x-axis to fit
+  All graphic files can now be saved from the call to the graphic function
+    as preceding the function call with an R pdf statement does not work
+    due to the customized graphics system that allows the Help window
+    to persist across analyses
+  Cutoff value to interpret a numeric variable as categorical now called
+    n.cat instead of ncut, and is implemented system wide with the 
+    set function
+
+Correlation
+  minimum default number of digits in output correlation matrix is 2
+  computed correlation matrix automatically written to mycor
+  missing data choices made explicit with parameter miss, pairwise is default
+  cell-wise sample size reported for pairwise deletion
+  effective sample size for all cells reported for listwise deletion
+  heat map added when a correlation matrix is computed
+
+Plot
+  provide for a by variable, a grouping variable, for which the points
+    are plotted in a different color and/or shape for each value of by
+
+SummaryStats
+  IQR added to full version
+
+BarChart
+  legend placement option for right margin added to the standard R legend
+    locations and is now the default, legend.loc="right.margin"
+  legend in right margin accommodates variable labels
+  for displayed cross-tabulation table, variable names instead of 
+     variable labels used
+  for count.names option, no longer needed to place the data frame name
+    and a $ in front of the specified variable name
+  text.out option added so can be set to FALSE
+  when applied to a data frame, individual graphs written to individual files
+
+Histogram
+  text.out option added so can be set to FALSE
+  when applied to a data frame, individual graphs written to individual files
+
+BoxPlot
+  text.out option added so can be set to FALSE
+  when applied to a data frame, individual graphs written to individual files
+
+ttest
+  graph option added, if FALSE then no graph is produced for two groups
+
+LineChart
+  changed name from RunChart to better reflect its more general meaning
+
+Deprecated function names removed
+  color.barchart, color.boxplot, color.density, color.hist
+
+Deprecated function names renamed
+  sim.CLT to simCLT, sim.CImean to simCImean,
+  sim.flips to simFlips, sim.means to simMeans
+
+
+---------------
+Bug Fixes 2.4
+---------------
+
+Summary Statistics
+  labels for the two variables in a cross-tab no longer switched
+
+to
+  remove debug print statement
+
+ttest
+  extra null graphic window no longer generated for two groups analysis
+
+BarChart
+  left margin on horizontal bar chart was sometimes too large
+  color theme for a single variable now properly displays
+
+
+
+
+
+>>>>>> Changes for lessR version 2.3 (2012-06-10)} <<<<<<
 
 ------------
 Overview 2.3
@@ -67,7 +196,7 @@ Model, model
     user's perspective.
 
 set
-  Created as a wrapper for options(colors="xxx") added for graphics routines to 
+  Created as a wrapper for options(colors="xxx") added for graphics routines to
    specify a color theme.
       
 to
@@ -158,24 +287,24 @@ system wide
   a variable named with the name of an R function is now permissible
 
 ttest, tt
-  bug fix: Analysis from summary statistics does not need a mydata data frame 
+  Analysis from summary statistics does not need a mydata data frame 
            to exist prior to the function call
-  bug fix: Variable labels no longer switched on response and grouping variables
-  bug fix: Labels now work with one group analysis
-  bug fix: Properly align group1 and group2 output to the user's workspace
+  Variable labels no longer switched on response and grouping variables
+  Labels now work with one group analysis
+  Properly align group1 and group2 output to the user's workspace
            with the correct group
 
 Plot, plt
-  bug fix: Run plot failed if missing data
-  bug fix: Plot with factor on x-axis failed plot of means if missing data
-  bug fix: If missing data, do not try ellipse which fails
-  bug fix: For bubble plot, x-axis now has proper scale
+  Run plot failed if missing data
+  Plot with factor on x-axis failed plot of means if missing data
+  If missing data, do not try ellipse which fails
+  For bubble plot, x-axis now has proper scale
 
 Summary Statistics, ss
-  bug fix: The null graphic window no longer opened
+  The null graphic window no longer opened
 
 BoxPlot, bx
-  bug fix: When doing a dot plot, colors did not transfer from bx
+  When doing a dot plot, colors did not transfer from bx
 
 
 
@@ -270,8 +399,8 @@ Bug Fixes 2.2
 -------------
 
 Regression, reg
-  bug fix:  If residual is 0, Nan's lead to missing data no longer causes 
-           Cook's distance function, and therefore the entire function, to fail
+   If residual is 0, Nan's lead to missing data no longer causes 
+     Cook's distance function, and therefore the entire function, to fail
 
 
 
@@ -393,8 +522,8 @@ Bug Fixes 2.1
 -------------
 
 plt  [in 2.3 also named Plot]
-  bug fix: missing data caused an error in bubble plot
+  missing data caused an error in bubble plot
 
 reg  [in 2.3 also named Regression]
-  bug fix:  allow missing data
+   allow missing data
 

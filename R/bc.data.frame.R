@@ -1,25 +1,23 @@
 bc.data.frame <-
-function(x, ncut, ...)  {
+function(x, n.cat, text.out, ...)  {
 
-
-  fname <- paste("Barcharts.", format(Sys.time(), "%d_%H_%M_%S"), ".pdf",sep="")
-  pdf(file=fname)
 
   for (i in 1:ncol(x)) {
 
     nu <- length(unique(na.omit(x[,i])))
-    if (!is.numeric(x[,i]) || nu <= ncut) {
-      tlbl <- paste("Bar Chart for", names(x)[i])
+    if (!is.numeric(x[,i]) || nu <= n.cat) {
  
       if (nlevels(factor(x[,i])) < length(x[,i])) {
         x.name <- names(x)[i]
         options(xname = x.name)
-        bc.default(x[,i], xlab=names(x)[i], main=tlbl, font.main=1, ...)
+        fname <- paste("BarChart_", x.name, ".pdf", sep="")
+        bc.default(x[,i], text.out=text.out, 
+                   pdf.file=fname, font.main=1, ...)
 
-      if (is.numeric(x[,i]) && nu <= ncut)
-        cat(">>> Variable is numeric, but only has", nu, "<= ncut =", ncut, "levels,",
+      if (is.numeric(x[,i]) && nu <= n.cat)
+        cat(">>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
             "so treat as a categorical variable.\n",
-            "   To obtain the numeric summary, decrease  ncut  to specify a",
+            "   To obtain the numeric summary, decrease  n.cat  to specify a",
             "lower number of unique values.\n",
             "   Suggest making this variable a factor with R factor function.\n")
       }
@@ -27,9 +25,5 @@ function(x, ncut, ...)  {
     }
 
   }
-
-  dev.off()
-  
-  .showfile(fname, "bar charts")
 
 }

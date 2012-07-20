@@ -18,7 +18,6 @@ function(prefix, until, from=1, same.size=TRUE) {
     cstr <- paste(cstr, cc)
   }
 
-  print(cstr)
   nc <- nchar(cstr)
   cstr2 <- character(length=0)
   for (i in 2:nc) cstr2 <- paste(cstr2, substr(cstr,i,i), sep="")

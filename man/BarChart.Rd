@@ -3,26 +3,26 @@
 \alias{bc}
 \alias{bc.default}
 \alias{bc.data.frame}
-\alias{color.barchart}
 
 \title{Bar Chart of One or Two Variables}
 
 \description{
 Abbreviation: \code{bc}
 
-Plots a bar chart of one or two variables with default colors, including background color and grid lines, from a variety of different types of data. Also displays the frequency table for one or two variables and optionally provides the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. If the specified argument is a data frame, then a bar chart of all categorical variables in the data frame is obtained.
+Plots a bar chart of one or two variables with default colors, including background color and grid lines, from a variety of different types of data. Also displays the frequency table for one or two variables and optionally provides the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. 
 
-For the analysis of a single variable, the cell proportions are also provided unless there are more than 10 unique values  If all values are unique, then only the value names are listed.  For the analysis of two variables, also provided are the proportions within each cell, within each column and within each row.   
+For the analysis of a single variable, the cell proportions are also provided unless there are more than 10 unique values.  If all values are unique, then only the value names are listed.  For the analysis of two variables, also provided are the proportions within each cell, within each column and within each row.   
 
-Unlike the standard R function, \code{\link{barplot}}, the variable(s) can be entered directly into the function call without first converting to a table.  If two variables are plotted, a legend is automatically provided.
+Unlike the standard R function, \code{\link{barplot}}, the variable(s) can be entered directly into the function call without first converting to a table.  If two variables are plotted, a legend is automatically provided in the right margin.
 
 If the provided object for which to calculate the bar chart is a data frame, then a bar chart is calculated for each non-numeric variable in the data frame and the results written to a pdf file in the current working directory.  The name of this file and its path are specified in the output.
 }
 
 \usage{
-BarChart(x=NULL, by=NULL, dframe=mydata, ncut=4, \ldots)
+BarChart(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"),
+         count.names=NULL, text.out=TRUE, \ldots)
 
-\method{bc}{data.frame}(x, ncut, \dots)
+\method{bc}{data.frame}(x, n.cat, text.out, \dots)
 
 \method{bc}{default}(x, by=NULL, 
 
@@ -39,72 +39,80 @@ BarChart(x=NULL, by=NULL, dframe=mydata, ncut=4, \ldots)
 
          beside=FALSE, col.low=NULL, col.hi=NULL, count.names=NULL,
 
-         legend.title=NULL, legend.loc=NULL, legend.labels=NULL,
-         legend.horiz=FALSE, \ldots)
+         legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
+         legend.horiz=FALSE, 
+
+         text.out=TRUE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+
 
 bc(\ldots)
-
-color.barchart(\ldots)
 }
 
 \arguments{
   \item{x}{For each level of this variable, x, display the frequencies.}
   \item{by}{For each level of the first variable, x, display the frequencies at each 
-           level of this second variable, y.}
-  \item{dframe}{Optional data frame that contains the variables of interest, default is 
-        \code{mydata}.}
-  \item{ncut}{When analyzing all the variables in a data frame, specifies the largest number
-        of unique values of variable of a numeric data type for which the variable will
-        be analyzed as a categorical. Set to 0 to turn off.}
+       level of this second variable, y.}
+  \item{dframe}{Optional data frame that contains the variables of interest, default
+       is \code{mydata}.}
+  \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest
+       number of unique values of variable of a numeric data type for which the
+       variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{col.bars}{Specified bar colors.}
   \item{col.border}{Color of the border of the bars. Specify NA to remove the border}
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines.}
   \item{colors}{Sets the intensity of the color palette.}
-  \item{random.col}{When \code{TRUE}, randomizes the order of the colors within the chosen 
-        color palette, when the second variable is not ordered, otherwise is ignored. 
-        Each analysis generally yields different colors of the bars.}
+  \item{random.col}{When \code{TRUE}, randomizes the order of the colors within the
+       chosen color palette, when the second variable is not ordered, otherwise is
+       ignored. Each analysis generally yields different colors of the bars.}
   \item{horiz}{By default bars are vertical, but can set this option to \code{TRUE}.}
   \item{over.grid}{If \code{TRUE}, plot the grid lines over the histogram.}
-  \item{addtop}{When \code{horiz=FALSE}, in the same scale as the vertical axis, puts more space 
-        between the bars and the top of the plot area, usually to accommodate the legend when 
-        plotting two variables.}
-  \item{gap}{Gap between bars.  Provides the value of the \code{space} option from the
-        standard R \code{\link{barplot}} function with a default of 0.2 unless two variables
-        are plotted and beside=\code{TRUE}, in which case the default is c(.1,1).}
+  \item{addtop}{When \code{horiz=FALSE}, in the same scale as the vertical axis, puts
+       more space between the bars and the top of the plot area, usually to
+       accommodate the legend when plotting two variables.}
+  \item{gap}{Gap between bars.  Provides the value of the \code{space} option from
+       the standard R \code{\link{barplot}} function with a default of 0.2 unless two
+       variables are plotted and beside=\code{TRUE}, in which case the default is
+       c(.1,1).}
   \item{brief}{If \code{FALSE}, then the tables of conditional proportions and chi-square test 
         are displayed.}
   \item{prop}{Display proportions instead raw frequencies.}
   \item{xlab}{Label for x-axis, more generally the label for the values which could be on 
-        the vertical axis for a two variable plot if \code{horiz=TRUE}. Defaults to variable name.}
+        the vertical axis for a two variable plot if \code{horiz=TRUE}. Defaults to variable
+        name.}
   \item{ylab}{Label for y-axis, more generally the frequency axis. Defaults to Frequency.}
   \item{main}{Title of graph.}
   \item{cex.axis}{Scale magnification factor, which by default displays the axis values to be
         smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
   \item{col.ticks}{Color of the ticks used to label the axis values.}
-  \item{beside}{When plotting two variables, set to \code{TRUE} for the levels fo the first 
-        variable to be plotted as adjacent bars instead of stacked on each other.}
-  \item{col.low}{Only when the variable is an ordered factor, sets the color for the lowest level 
-        of the factor in the resulting ordered progression of colors.}
-  \item{col.hi}{Only when the variable is an ordered factor, sets the color for the highest level 
-        of the factor in the resulting ordered progression of colors.}
-  \item{count.names}{If the name of a variable, this signals that the primary variable \code{x}
-        has values that are counts, already tabulated, and the specified variable here contains
-        the names of the levels of x. Currently the name of the specified variable for \code{count.names}
-        must be preceded by the data frame name and a \$, such as, for variable Candidate in data frame
-        \code{mydata}, \code{mydata\$Candidate.}}
+  \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
+       first variable to be plotted as adjacent bars instead of stacked on each other.}
+  \item{col.low}{Only when the variable is an ordered factor, sets the color for the
+       lowest level of the factor in the resulting ordered progression of colors.}
+  \item{col.hi}{Only when the variable is an ordered factor, sets the color for the
+       highest level of the factor in the resulting ordered progression of colors.}
+  \item{count.names}{If the name of a variable, this signals that the primary
+       variable \code{x} has values that are counts, already tabulated, and that the
+       specified variable here contains the names of the levels of x.}
   \item{legend.title}{Title of the legend, which is usually set by default except when
-        raw counts are entered as a matrix.  Then a title must be specified to generate a legend.}
-  \item{legend.loc}{When plotting two variables, location of the legend. For vertical bars, 
-        usually choose from among "topleft", "top", and "topright". See help for \code{\link{legend}} 
-        function for more options.}
-  \item{legend.labels}{When plotting two variables, labels for the legend, which by default
-        are the levels for the second or \code{by} variable.}
-  \item{legend.horiz}{By default the legend is vertical, but can be changed to horizontal.}
+        raw counts are entered as a matrix.  Then a title must be specified to
+        generate a legend.}
+  \item{legend.loc}{When plotting two variables, location of the legend, with the
+        default in the right margin. Additional options from standard R are
+        "topleft", "top", "topright" and others as shown in the help for the
+        \code{\link{legend}} function.}
+  \item{legend.labels}{When plotting two variables, labels for the legend, which by
+       default are the levels for the second or \code{by} variable.}
+  \item{legend.horiz}{By default the legend is vertical, but can be changed to
+       horizontal.}
+  \item{text.out}{If \code{TRUE}, then display text output in console.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.width}{Width of the pdf file in inches.}
+  \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for graphics as defined 
-      by \code{\link{barplot}}, \code{\link{legend}}, and  \code{\link{par}} including \code{space} 
-      for one variable only, and \code{cex.lab}, \code{col.main}, etc.}
+      by \code{\link{barplot}}, \code{\link{legend}}, and  \code{\link{par}} including
+      \code{space} for one variable only, and \code{cex.lab}, \code{col.main}, etc.}
 }
 
 
@@ -134,7 +142,11 @@ When plotting one ordered factor, or when plotting two variables, and the second
 Use the \code{\link{showColors}} function in this package to get, for each color:  name,  sample color swatch, and corresponding rgb specification.  For a very small number of levels, such as two, it is may be desirable to specify the low and high values to not be closer to each other than the default values.
 
 LEGEND\cr
-When two variables are plotted, a legend is produced, with values for each level of the second variable.  By default, the location is top center. This position can be changed with the \code{legend.loc} option, which accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend. Sometimes bars from the graph may intrude into the legend. One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{addtop} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend.horiz} option.
+When two variables are plotted, a legend is produced, with values for each level of the second variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend.loc} option, which, in addition to the \code{lessR} option of \code{right.margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend. 
+
+If the default right margin is retained, variable labels are also accommodated for the legend title.  To conserve horizontal space, the variable label is listed in multiple lines if needed. The legend title is constructed by forming lines of maximum length of 12 characters, with multiple words per line if possible. Any single word in the label of more than 12 characters is abbreviated to 12 characters with the R \code{\link{abbreviate}} function. Also, any value labels are abbreviated to a maximum of 6 characters.
+
+If the legend is not in the right margin, sometimes bars from the graph may intrude into the legend. One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{addtop} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend.horiz} option.
 
 ENTER COUNTS DIRECTLY\cr
 Instead of calculating the counts from the data, the counts can be entered directly.  For two variables, enter the counts as a matrix and include the \code{xlab} option to label the horizontal axis, such as with the name of the variable.  Also include the \code{legend.title} option to provide a legend.  See the examples below.
@@ -146,6 +158,9 @@ In addition to the barchart, descriptive and optional inferential statistics are
 
 VARIABLE LABELS\cr
 A labels data frame named \code{mylabels}, obtained from the \code{\link{rad}} function, can provide the label for some or all of the variables in the data frame that contains the data for the analysis.  If this labels data frame exists, then the corresponding variable label is listed as the label for the horizontal axis unless xlab is specified in the function call. If there are two variables to plot, the title of the resulting plot is based on the two variable labels, unless a specific title is listed with the \code{main} option. The variable label is also listed in the text output, next to the variable name. If the analysis is for two variables, then labels for both variables are included. 
+
+PDF OUTPUT\cr
+Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 }
 
 
@@ -224,7 +239,7 @@ BarChart(Gender, by=Pain, col.bars=c("thistle1","thistle2","thistle3","thistle4"
 # the levels of Pain are included within each respective bar
 BarChart(Gender, by=Pain, beside=TRUE, legend.horiz=TRUE)
 
-# horizontal bar chart of two variables
+# horizontal bar chart of two variables, put legend on the top
 BarChart(Gender, by=Pain, horiz=TRUE, legend.loc="top")
 
 # many options, including those from par: col.main, col.axis, col.lab, cex.lab
@@ -241,12 +256,13 @@ BarChart(Pain, by=Gender, col.bars=c("coral3","seagreen3"),
 # ---------------------------------------------
 
 # bar charts for all non-numeric variables in the data frame called mydata
-#   and all numeric variables with a small number of values, < ncut
+#   and all numeric variables with a small number of values, < n.cat
 BarChart()
 
 # bar chart of all relevant variables with a color randomly chosen
 #  from the default color palette of eight colors
-BarChart(random.col=TRUE)
+#  no frequency summary, just the graphs
+BarChart(random.col=TRUE, text.out=FALSE)
 
 # Use the subset function to specify a variable list
 mysub <- subset(mydata, select=c(Pain))
@@ -298,6 +314,17 @@ mytable <- rbind(row1, row2)
 rownames(mytable) <- c("Pass", "Defective")
 colnames(mytable) <- c("Acme, Inc", "Nuts, Inc", "Bolts, Inc")
 BarChart(mytable, xlab="Supplier", legend.title="Quality")
+
+# counts are in the data file to be read directly
+mydata <- read.csv(text="
+Dept, Count
+ACCT,5
+ADMN,6
+FINC,4
+MKTG,6
+SALE,15", header=TRUE)
+# use count.names to indicate the label for each corresponding count
+bc(Count, count.names=Dept)
 }
 
 

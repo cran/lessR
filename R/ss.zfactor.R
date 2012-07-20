@@ -1,9 +1,9 @@
 .ss.factor <-
-function(x, by=NULL, brief=FALSE, ncut=4, digits.d=NULL, ...)  {
+function(x, by=NULL, brief=FALSE, n.cat=getOption("n.cat"), digits.d=NULL, ...)  {
 
   # get variable labels if exist
   gl <- .getlabels()
-  x.name <- gl$xn; x.lbl <- gl$xl;
+  x.name <- gl$xn; x.lbl <- gl$xl
   y.name <- gl$yn; y.lbl <- gl$yl
   
   # save ordered status before converting x to a table
@@ -13,7 +13,7 @@ function(x, by=NULL, brief=FALSE, ncut=4, digits.d=NULL, ...)  {
   # convert to table, with variable names, if needed
   if (!is.table(x) && !is.matrix(x)) {  # bc yields a table or matrix
     if (!is.null(by)) 
-      x <- table(by,x, dnn=c(x.name,y.name)) 
+      x <- table(by,x, dnn=c(y.name,x.name)) 
     else x <- table(x, dnn=NULL)
   }
 
@@ -80,21 +80,16 @@ function(x, by=NULL, brief=FALSE, ncut=4, digits.d=NULL, ...)  {
       }
       cat("             ")
       w <- nchar(as.character(sum(x)))
-      for (i in 1:length(x)) 
-        cat(format(names(x[i]), width=max.ln[i], justify="right", sep=""))
-      cat(format("Total", width=w+6, justify="right", sep=""))
+      for (i in 1:length(x)) cat(.fmtc(names(x[i]), w=max.ln[i]))
+      cat(.fmtc("Total", w=w+6))
       cat("\n")
       cat("Frequencies: ")
-      for (i in 1:length(x))
-        cat(format(sprintf("%i", x[i]), width=max.ln[i], justify="right"))
-      cat(format(sum(x), width=w+6, justify="right", sep=""))
+      for (i in 1:length(x)) cat(.fmti(x[i], w=max.ln[i]))
+      cat(.fmti(sum(x), w=w+6))
       cat("\n")
       cat("Proportions: ")
-      for (i in 1:length(x)) {
-        xdiv <- sum(x)
-        cat(format(sprintf("%*.3f",max.ln[i], round(x[i]/xdiv,3)), justify="right"))
-      }
-      cat(format("1.000", width=w+6, justify="right", sep=""))
+      for (i in 1:length(x)) cat(.fmt(x[i]/sum(x), 3, max.ln[i]))
+      cat(.fmtc("1.000", w=w+6))
       cat("\n")
       if (!brief) {
         ch <- suppressWarnings(chisq.test(x))

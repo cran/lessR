@@ -12,7 +12,7 @@ Descriptive or summary statistics for a numeric variable or a factor, one at a t
 }
 
 \usage{
-SummaryStats(x=NULL, by=NULL, dframe=mydata, ncut=4, 
+SummaryStats(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"), 
          digits.d=NULL, brief=FALSE, \ldots)
 
 ss.brief(\dots, brief=TRUE)
@@ -25,7 +25,7 @@ ss(\dots)
           mydata becomes the default value.}
   \item{dframe}{Optional data frame that contains the variable of interest, default is \code{mydata}.}
   \item{by}{Applies to an analysis of a numeric variable, which is then analyzed at each level of the \code{by} variable. The variable is coerced to a factor.}
-  \item{ncut}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
+  \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
   \item{brief}{If \code{TRUE}, then only sample size information, mean, standard deviation,
         minimum, median and maximum are reported for a numeric variable. For a categorical
@@ -34,8 +34,7 @@ ss(\dots)
 }
 
 \details{
-If the variable of interest is in a data frame, the input data frame has the assumed name of mydata.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation. If no variable is specified, then all numeric variables in the entire data frame are analyzed and the results written to a pdf file.
-
+OVERVIEW\cr
 The \code{by} option specifies a categorical variable or factor, with a relatively few number of values called levels. The variable of interest is analyzed at each level of the factor. 
 
 The \code{digits.d} parameter specifies the number of decimal digits in the output.  It must follow the formula specification when used with the formula version. By default the number of decimal digits displayed for the analysis of a variable is one more than the largest number of decimal digits in the data for that variable.
@@ -46,7 +45,24 @@ The \code{lessR} function \code{\link{Read}} reads the data from an external csv
 
 In the analysis of a categorical variable, if there are more than 10 levels then an abbreviated analysis is performed, only reporting the values and the associated frequencies. If all the values are unique, then the user is prompted with a note that perhaps this is actually an ID field which should be specified using the \code{row.names} option when reading the data.
 
-Although not a formal parameter of \code{SummaryStats}, use \code{brief=FALSE} to print the three tables of proportions, for overall and rows and columns, for contingency tables with two dimensions. For numeric variables, adds to the reported statistics the skew and kurtosis and also the first and third quartiles.
+
+DATA\cr
+If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
+
+To analyze each variable in the \code{mydata} data frame, use \code{SummaryStats()}.  Or, for a data frame with a different name, insert the name between the parentheses.
+
+VARIABLE LABELS\cr
+Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
+
+ONLY VARIABLES ARE REFERENCED\cr
+The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+
+\code{    > SummaryStats(rnorm(50))   # does NOT work}
+
+Instead, do the following:
+\preformatted{    > Y <- rnorm(50)   # create vector Y in user workspace
+    > SummaryStats(Y)     # directly reference Y}
+
 
 }
 
@@ -102,7 +118,7 @@ SummaryStats()
 # Analyze all variables in data frame mydata at once
 # Any variables with a numeric data type and 7 or less
 #  unique values will be analyzed as a categorical variable
-SummaryStats(ncut=7)
+SummaryStats(n.cat=7)
 
 
 # ----------------------------------------

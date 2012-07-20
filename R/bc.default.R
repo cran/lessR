@@ -14,20 +14,36 @@ function(x, by=NULL,
 
          beside=FALSE, col.low=NULL, col.hi=NULL, count.names=NULL,
 
-         legend.title=NULL, legend.loc=NULL, legend.labels=NULL,
-         legend.horiz=FALSE, ...) {
+         legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
+         legend.horiz=FALSE, 
+
+         text.out=TRUE, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
-  if (missing(colors)) no.colors <- TRUE else no.colors <- FALSE
-  colors <- match.arg(colors)
-  if (no.colors && !is.null(getOption("colors"))) colors <- getOption("colors")
+  if (missing(colors)) 
+    colors <- getOption("colors")
+  else
+    colors <- match.arg(colors)
 
+  # set up graphics system
+  .opendev(pdf.file, pdf.width, pdf.height)
+
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))
+
+  if (!is.null(pdf.file)) on.exit(dev.off(), add=TRUE)
 
   .bc.default(x, by, 
          col.bars, col.border, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, brief, prop, xlab, ylab, main,
          cex.axis, col.axis, col.ticks, beside, col.low, col.hi, count.names,
-         legend.title, legend.loc, legend.labels, legend.horiz, ...)
+         legend.title, legend.loc, legend.labels, legend.horiz, text.out, ...)
+
+  # terminate pdf graphics system
+  if (!is.null(pdf.file)) {
+    dev.off()
+    .showfile(pdf.file, "bar chart")
+  }
 
 
 }

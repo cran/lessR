@@ -1,11 +1,8 @@
 .reg3Residual <-
 function(nm, mydframe,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         res.sort, res.rows, cooks.cut, colors, graphics.save) {
-
-# -----------------
-# residual analysis
-# -----------------
+         res.sort, res.rows, cooks.cut, colors,
+         pdf, pdf.width, pdf.height) {
   
     cat( "\n\n\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
   
@@ -74,9 +71,17 @@ function(nm, mydframe,
     print(out[1:res.rows,], digits=digits.d)
     rm(out)
   
+
+    if (!pdf) {
+      .graphwin(3)  # set up graphics system
+      dev.set(which=3)
+    }
+    else { 
+      pdf.file <- "RegResiduals.pdf"
+      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    }
   
     # frequency distribution of residuals
-    dev.set(which=3)
     .den.main(res, main="Evaluate Normality of Residuals", 
        xlab="Residuals", text.out=FALSE, colors=colors,
        bw="nrd0", type="both",
@@ -88,32 +93,45 @@ function(nm, mydframe,
        x.pt=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE)
 
+    if (pdf) {
+      dev.off()
+      .showfile(pdf.file, "residuals plot")
+    }
+
+
     # plot of residuals vs fitted
     max.cook <- max(cook, na.rm=TRUE)
     if (max.cook < cooks.cut) {
       cooks.cut <- floor(max.cook*100)/100
-      txt <- paste("The point with the largest Cook's Distance, ", round(max.cook,2), 
+      txt <- paste("Largest Cook's Distance, ", .fmt(max.cook,2), 
         ", is highlighted", sep="")
     }
     else
       txt <- paste("Points with Cook's Distance >", cooks.cut, "are highlighted")
-    dev.set(which=4)
+
+    if (!pdf) 
+      dev.set(which=4) 
+    else { 
+      pdf.file <- "RegResidFitted.pdf"
+      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    }
+
     ord <- order(fit)
     fit.ord <- fit[ord]
     res.ord <- res[ord]
-    .plt.main(fit.ord, res.ord, type="p", text.out=FALSE,
+    .plt.main(fit.ord, res.ord, by=NULL, type="p", text.out=FALSE,
         main="Residuals vs Fitted Values", xlab="Fitted Values",
         ylab="Residuals", sub=txt, cex.sub=.8, colors=colors,
-         col.line=NULL, col.area=NULL, col.box="black",
-         col.pts=NULL, col.fill=NULL, trans.pts=NULL,
-         pch=NULL, col.grid=NULL, col.bg=NULL,
-         cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE,
-         fit.line="none", center.line=NULL, cex=NULL, 
-         time.start=NULL, time.by=NULL, time.reverse=FALSE,
-         col.bubble=NULL, bubble.size=.25, col.flower=NULL,
-         ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
-         ncut=4, kind="default")
+        col.line=NULL, col.area=NULL, col.box="black",
+        col.pts=NULL, col.fill=NULL, trans.pts=NULL,
+        shape.pts=21, col.grid=NULL, col.bg=NULL,
+        cex.axis=.85, col.axis="gray30",
+        col.ticks="gray30", xy.ticks=TRUE,
+        fit.line="none", center.line=NULL, cex=NULL, 
+        time.start=NULL, time.by=NULL, time.reverse=FALSE,
+        col.bubble=NULL, bubble.size=.25, col.flower=NULL,
+        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
+        n.cat=getOption("n.cat"), kind="default")
     abline(h=0, lty="dotted", col="gray70")
     if (colors == "gray") col.ftln <- "gray30" else col.ftln <- "plum"
     lines(lowess(fit.ord, res.ord, f=.9), col=col.ftln)
@@ -123,6 +141,11 @@ function(nm, mydframe,
       if (colors == "gray") col.out <- "black" else col.out <- "red"
       points(fit.c, res.c, col=col.out, pch=19)
       text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
+    }
+
+    if (pdf) {
+      dev.off()
+      .showfile(pdf.file, "residuals vs. fitted plot")
     }
 
     rm(fit, res, cook, res.c, fit.c, fit.ord, res.ord)

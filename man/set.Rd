@@ -1,15 +1,15 @@
 \name{set}
 \alias{set}
 
-\title{Set the Default Color Palette}
+\title{Set the Default Color Theme and Other System Settings}
 
 \description{
-Each graph is based on a default color theme. The original default is "blue", but \code{set} allows other color palettes to be set as default as well.
+Each graph is based on a default color theme. The original default is "blue", but \code{set} allows other color palettes to be set as default as well. Other system settings are also available.
 }
 
 \usage{
 set(colors=c("blue", "gray", "rose", "green", "gold", "red"),
-         trans.pts=NULL)
+         trans.pts=NULL, n.cat=4, width=120)
 }
 
 
@@ -17,6 +17,11 @@ set(colors=c("blue", "gray", "rose", "green", "gold", "red"),
   \item{colors}{The specified color scheme.}
   \item{trans.pts}{Specified level of transparency for plotted points, from 0 for
         no transparency to 1 for total transparency.}
+  \item{n.cat}{Specifies the largest number of unique values of variable of a
+        numeric data type for which the variable will be analyzed as categorical.
+        Set to 0 to turn off.}
+  \item{width}{Maximum width of each line displayed at the console, just accesses
+        the standard R options function for width.}
 }
 
 

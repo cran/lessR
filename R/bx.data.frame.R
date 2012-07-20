@@ -1,22 +1,27 @@
 bx.data.frame <-
-function(x, ...)  {
+function(x, n.cat, text.out, ...)  {
 
-  fname <- paste("Boxplots.", format(Sys.time(), "%d_%H_%M_%S"), ".pdf",sep="")
-  pdf(file=fname)
 
-  for (i in 1:ncol(x))
-    if (is.numeric(x[,i])) {
-      tlbl <- paste("Boxplot for", names(x)[i])
-      bx.default(x[,i], xlab=names(x)[i], main=tlbl, ...)
+  for (i in 1:ncol(x)) {
+
+    nu <- length(unique(na.omit(x[,i])))
+
+    x.name <- names(x)[i]
+    options(xname = x.name)
+
+    if (is.numeric(x[,i]) && nu > n.cat) {
+      fname <- paste("BoxPlot_", x.name, ".pdf", sep="")
+      bx.default(x[,i], text.out=text.out, pdf.file=fname, ...)
     }
-  
-  dev.off()
-  
-  if (getwd() == "/")
-    workdir <- "top level (root) of your file system"
-  else
-    workdir <- getwd()
-  cat("\n\npdf file of histograms:",  fname, "\n")
-  cat("\nWritten at current working directory:", workdir, "\n\n")
 
+    if (is.numeric(x[,i]) && nu <= n.cat)
+      cat("\n>>> ", x.name,  "is numeric,",
+          "but only has", nu, "<= n.cat =", n.cat, "levels,",
+          "so treat as a categorical variable.\n",
+          "   To obtain the boxplot decrease  n.cat  to specify a",
+          "lower number of unique values.\n",
+          "   Suggest making this variable a factor with R factor function.\n")
+
+  }
+  
 }

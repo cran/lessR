@@ -16,7 +16,8 @@ PieChart(x, dframe=mydata,
          col.slices=NULL, col.low=NULL, col.hi=NULL,
          colors=c("blue", "gray", "rose", "green", "gold", "red",
                   "rainbow", "terrain", "heat"),
-         text.out=TRUE, main=NULL, \ldots)
+         text.out=TRUE, main=NULL, 
+         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 pc(\ldots)
 }
@@ -36,6 +37,9 @@ pc(\ldots)
   \item{colors}{Set the color palette.}
   \item{text.out}{If \code{TRUE}, then display frequency table, chi-square analysis and sample size information.}
   \item{main}{Title of graph.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.width}{Width of the pdf file in inches.}
+  \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for graphics as defined 
       by \code{\link{pie}} and  \code{\link{par}} including \code{col.main}, etc.}
 }
@@ -63,10 +67,19 @@ When plotting ordered factor then neither of the two standard color palettes are
 Use the \code{\link{showColors}} function in this package to get, for each color:  name,  sample color swatch, and corresponding rgb specification.  For a very small number of levels, such as two, it is may be desirable to specify the low and high values to not be closer to each other than the default values.
 
 STATISTICS\cr
-In addition to the pc, descriptive and optional inferential statistics are also presented.  First, the frequency table with proportions is displayed. Second, the corresponding chi-square test is also displayed.
+In addition to the pie chart, descriptive and optional inferential statistics are also presented.  First, the frequency table with proportions is displayed. Second, the corresponding chi-square test is also displayed.
 
-VARIABLE LABELS\cr
-A labels data frame named \code{mylabels}, obtained from the \code{\link{Read}} function, can provide the label for some or all of the variables in the data frame that contains the data for the analysis.  If this labels data frame exists, then the corresponding variable label is listed as the label for the horizontal axis unless xlab is specified in the function call. If there are two variables to plot, the title of the resulting plot is based on the two variable labels, unless a specific title is listed with the \code{main} option. The variable label is also listed in the text output, next to the variable name. If the analysis is for two variables, then labels for both variables are included. 
+PDF OUTPUT\cr
+Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+
+ONLY VARIABLES ARE REFERENCED\cr
+The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+
+\code{    > PieChart(rnorm(50))   # does NOT work}
+
+Instead, do the following:
+\preformatted{    > Y <- rnorm(50)   # create vector Y in user workspace
+    > PieChart(Y)     # directly reference Y}
 }
 
 

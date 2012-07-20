@@ -1,5 +1,5 @@
 SummaryStats <-
-function(x=NULL, by=NULL, dframe=mydata, ncut=4, 
+function(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"), 
          digits.d=NULL, brief=FALSE, ...)  {
 
 
@@ -77,18 +77,18 @@ function(x=NULL, by=NULL, dframe=mydata, ncut=4,
   }  # x not data frame
 
 
-  if (is.df) .ss.data.frame(dframe, ncut, ...) 
+  if (is.df) .ss.data.frame(dframe, n.cat, ...) 
 
   else if (is.numeric(x.call)  ||  is.integer(x.call))
      .ss.numeric(x.call, y.call, dframe, digits.d, brief, ...)
 
   # ordered factors have two attributes, "ordered" and "factor"
   else if (is.factor(x.call))
-     .ss.factor(x.call, y.call, brief, ncut, digits.d, ...)
+     .ss.factor(x.call, y.call, brief, n.cat, digits.d, ...)
 
   else if (is.character(x.call))
     if (nlevels(factor(x.call)) < length(x.call)) 
-       .ss.factor(factor(x.call), by, brief, ncut, digits.d, ...)
+       .ss.factor(factor(x.call), by, brief, n.cat, digits.d, ...)
     else cat("\n Appears to contain unique Names or IDs", "\n")
 
   else {

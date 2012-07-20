@@ -1,5 +1,5 @@
 BoxPlot <-
-function(x=NULL, dframe=mydata, ...)  {
+function(x=NULL, dframe=mydata, n.cat=getOption("n.cat"), text.out=TRUE, ...)  {
 
 
   is.df <- FALSE  # is data frame
@@ -39,11 +39,10 @@ function(x=NULL, dframe=mydata, ...)  {
   }  # x not data frame
 
 
-  if (is.df) bx.data.frame(dframe, ...) 
+  if (is.df) bx.data.frame(dframe, n.cat, text.out, ...) 
 
   else {
-    .graphwin()
-    bx.default(x.call, ...)
+    bx.default(x.call, text.out=text.out, ...)
   }
 
 }

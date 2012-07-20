@@ -25,9 +25,7 @@ hlp(\ldots)
 \details{
 \code{Help()} displays a list of help topics, listed below.
 
-\code{Help("topic")} generally displays the available functions relevant for the specified topic.
-
-\code{Help("help.to.pdf")} generates a pdf file of the full contents of all the help topics.
+\code{Help("topic")} generally displays the available functions relevant for the specified topic. If the name of the topic is a \code{lessR} statistical function, the abbreviated form of the name can also be invoked.
 
 \code{Help("lessR")} calls up the link to the lessR manual and news, which includes current updates.
 
@@ -40,6 +38,10 @@ hlp(\ldots)
 \code{Write}: Write the contents of mydata to a data file in csv format.
 
 \code{library}: Many libraries of functions developed by others can be added to R.
+
+\code{transform}: Edit and create new variables from existing variables.
+
+\code{system}: System level settings, such as a color theme for graphics.
 
 ---
 
@@ -67,6 +69,8 @@ hlp(\ldots)
 
 \code{Regression}: Regression analysis.
 
+\code{factor.analysis}: Confirmatory or exploratory factor analysis.
+
 ---
 
 \code{prob}: Probabilities for Normal and t-distributions.
@@ -90,7 +94,10 @@ Help()
 hlp()
 
 # specific help message regarding summary statistics
-Help("stats")
+Help("SummaryStats")
+
+# abbreviated form of function name
+Help("ss")
 }
 
 

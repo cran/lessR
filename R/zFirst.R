@@ -1,6 +1,0 @@
-.First <-
-function() {
-
-  Help()
-
-}

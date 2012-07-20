@@ -13,7 +13,7 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
     var.type[i] <- ""
     if (is.factor(dframe[,nm[i]])) var.type[i] <- "cat"
     n.unique[i] <- length(unique(dframe[,nm[i]]))
-    #if (n.unique[i] < ncut) var.type[i] <- "cat" 
+    #if (n.unique[i] < n.cat) var.type[i] <- "cat" 
     #else 
     if (is.numeric(dframe[,nm[i]])) var.type[i] <- "num"
   }
@@ -32,7 +32,7 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
           ".  \n", sep="")
       .dash(60)
       cat("\n")
-      Regression(my.formula, dframe, ...)
+      Regression(my.formula, dframe, pdf.file=NULL, ...)
     }
 
     else if (all.preds.cat) {
@@ -55,13 +55,13 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
 
         if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
           .TwoGroup(x, y, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
-           Ynm, Xnm, X1nm, X2nm, brief, digits.d, ...)
+            from.data=TRUE, Ynm, Xnm, X1nm, X2nm, brief, digits.d, ...)
         else {  # switch
           Xtmp <- X2nm
           X2nm <- X1nm
           X1nm <- Xtmp
           .TwoGroup(y, x, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
-           Ynm, Xnm, X1nm, X2nm, brief, digits.d, ...)
+            from.data=TRUE, Ynm, Xnm, X1nm, X2nm, brief, digits.d, ...)
         }
       }
 

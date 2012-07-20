@@ -78,22 +78,12 @@ function(x,
 
   # plot the pie chart
   if (!is.table(x)) x <- table(x)
-  pie(x, col=col, main=main.lbl, ...)
+  pie(x, col=col, main=main.lbl)  # putting ... makes chart a rectangle
 
 # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
 
   # text output
-  if (text.out) {
-
-    .ss.factor(x, brief=TRUE) 
-
-    n <- sum(!is.na(x))
-    n.miss <- sum(is.na(x))
-
-    cat("Sample Size: ", n, "\n")
-    cat("Missing Values: ", n.miss, "\n")
-
-  }
+  if (text.out) .ss.factor(x, brief=TRUE) 
 
   cat("\n")
 

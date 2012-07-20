@@ -1,7 +1,7 @@
 \name{values}
 \alias{values}
 
-\title{List the values of a Variable}
+\title{List the Values of a Variable}
 
 \description{
 List the values of a variable from the global environment or a data frame.

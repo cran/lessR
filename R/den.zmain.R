@@ -1,5 +1,5 @@
 .den.main <- 
-function(x, dframe=mydata, 
+function(x, dframe, 
          bw, type, bin.start, bin.width, text.out,
          col.bg, col.grid, col.bars, col.nrm, col.gen,
          col.fill.nrm, col.fill.gen, colors, 
@@ -7,7 +7,7 @@ function(x, dframe=mydata,
          x.pt, xlab, main, y.axis, x.min, x.max, band, ...)  {
 
   if (!is.null(x.pt)) {
-    y.axis=TRUE
+    y.axis <- TRUE
     type <- "general"
   }
 
@@ -48,6 +48,7 @@ function(x, dframe=mydata,
   }
   else breaks="Sturges"
 
+
   # histogram calculations, no plot
   h <- hist(x, plot=FALSE, breaks)
 
@@ -87,13 +88,10 @@ function(x, dframe=mydata,
   suppressWarnings(plot(h, border="transparent", freq=FALSE, xlab=x.lab,
      ylab=y.lab, main=main.lab, xlim=c(x.min,x.max), ylim=c(0,max.y), 
      axes=FALSE, ...))
-  op <- options()  # save current options to reset later
-  options(scipen=30) # turn off scientific notation
   suppressWarnings(axis(1,
        cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...))
   if (y.axis) suppressWarnings(axis(2,
        cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...))
-  options(op)
   
   # colored background for plotting area
   usr <- par("usr")
@@ -125,8 +123,7 @@ function(x, dframe=mydata,
     xend <- x.pt + 0.5
     xsub <- d$x[d$x > xbeg & d$x < xend]
     ysub <- d$y[d$x > xbeg & d$x < xend]
-    txt.ypt <- toString(round(y.pt, 3))
-    txt <- paste("Density =", txt.ypt, "at x =", toString(round(x.pt, 2)))
+    txt <- paste("Density =", .fmt(y.pt,3), "at x =", .fmt(x.pt, 2))
     title(main=txt)
     polygon(c(xbeg, xsub, xend), c(0, ysub, 0), col="lightsteelblue")
     if (min(x) > 0) left <- -2*min(x) else left <- 2*min(x) 
@@ -137,7 +134,7 @@ function(x, dframe=mydata,
   # text output
   if (text.out) {
 
-    cat("\nDensity bandwidth for general curve: ", round(d.gen$bw,4), sep="", "\n")
+    cat("\nDensity bandwidth for general curve: ", .fmt(d.gen$bw,4), sep="", "\n")
     cat("For a smoother curve, increase bandwidth with option: bw\n")
 
     cat("\nSample Size: ", n, "\n")
@@ -146,8 +143,8 @@ function(x, dframe=mydata,
     digits.d <- 3
     if (n > 2 && n < 5000) {
       nrm <- shapiro.test(x)
-      W <- round(nrm$statistic,min(4,digits.d+1))
-      p.val <- round(nrm$p.value,min(4,digits.d+1))
+      W <- .fmt(nrm$statistic,min(4,digits.d+1))
+      p.val <- .fmt(nrm$p.value,min(4,digits.d+1))
       cat("\nNull hypothesis is a normal population\n")
       cat(nrm$method, ":  W = ", W, ",  p-value = ", p.val, sep="", "\n")
     }

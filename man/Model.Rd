@@ -66,6 +66,9 @@ model(Y ~ X1)
 # Provide all default analyses, including interactive 3d scatterplot
 Model(Y ~ X1 + X2)
 
+# t-test
+Model(breaks ~ wool, dframe=warpbreaks)
+
 # ANOVA analysis
 # from another data frame other than the default \code{mydata}
 # breaks is numerical, wool and tension are categorical

@@ -1,6 +1,6 @@
 set <-
 function(colors=c("blue", "gray", "rose", "green", "gold", "red"),
-         trans.pts=NULL) {
+         trans.pts=NULL, n.cat=4, width=120) {
 
   if (!is.null(trans.pts)) {
     if ( trans.pts<0 || trans.pts>1 ) {
@@ -15,5 +15,9 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red"),
   }
 
   if (!missing(trans.pts)) options(trans=trans.pts)
+
+  if (!missing(n.cat)) options(n.cat=n.cat)
+
+  if (!missing(width)) options(width=width)
 
 }

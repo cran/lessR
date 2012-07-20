@@ -1,5 +1,5 @@
 Histogram <-
-function(x=NULL, dframe=mydata, ncut=4, ...)  {
+function(x=NULL, dframe=mydata, n.cat=getOption("n.cat"), text.out=TRUE, ...)  {
 
   # produce actual argument, such as from an abbreviation, and flag if not exist
 
@@ -29,12 +29,6 @@ function(x=NULL, dframe=mydata, ncut=4, ...)  {
     is.frml <- xs$ifr
     in.global <- xs$ig 
 
-    # warn user that old formula mode no longer works
-    if (is.frml) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Instead, of 'Y ~ X', now use the by option, 'Y, by=X' \n\n")
-    }
-
     # see if the variable exists in data frame, if x not in Global Env 
     if (!in.global) .xcheck(x.name, dframe.name, dframe)
 
@@ -47,11 +41,10 @@ function(x=NULL, dframe=mydata, ncut=4, ...)  {
   }  # x not data frame
 
 
-  if (is.df) hst.data.frame(dframe, ncut, ...) 
+  if (is.df) hst.data.frame(dframe, n.cat, text.out, ...) 
 
   else {
-    .graphwin()
-    hst.default(x.call, ...)
+    hst.default(x.call, text.out=text.out, ...)
   }   
 
 }

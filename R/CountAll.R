@@ -1,10 +1,15 @@
 CountAll <-
 function(x=mydata)  {
 
+
+  dframe.name <- deparse(substitute(x))
+  
   if (is.null(x))
-    if (!exists("mydata")) 
-      stop("Need to specify an existing data frame or data frame mydata must exist.")
-      
+    if (!exists(dframe.name, where=.GlobalEnv)) {
+      stop("Need to specify an existing data frame,\n",
+           "or data frame mydata must exist.", sep="")
+  }
+    
   cat("\n")
   .dash(25,"-")
   cat(format(Sys.time(), "%a %b %d, %Y at %H:%M"), "\n")

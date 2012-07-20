@@ -11,7 +11,9 @@
 \description{
 Abbreviation: \code{rad}, \code{rad.brief}, \code{rad.labels}, \code{rad.both}, \code{rad2}
 
-Reads the contents of the specified data file and/or variable labels into an R data frame. The format of the file can be standard \code{csv} data file, a fixed width formatted data file, or native SPSS or R data files.  The data are read into a data frame called \code{mydata}.  Any optional variable labels are read into a data frame called \code{mylabels}.  Identify the file by either browsing for the file on the local computer system with \code{rad()}, or as indicated by an argument as a character string in the form of a path name or a web URL.  The function also lists the first and last three rows of data as well as the variable names and the dimensions of the resulting data frame and the data type for each variable.  In addition, perform an analysis of missing data, listing the number of missing values for each variable and for each observation.
+Reads the contents of the specified data file and/or variable labels into an R data frame. The format of the file can be standard \code{csv} data file, a fixed width formatted data file, or native SPSS or R data file.  The data are read into a data frame called \code{mydata}.  Any optional variable labels are read into a data frame called \code{mylabels}.  Identify the file by either browsing for the file on the local computer system with \code{rad()}, or as indicated by an argument as a character string in the form of a path name or a web URL.  The function also lists the first and last three rows of data as well as the variable names and the dimensions of the resulting data frame and the data type for each variable.  In addition, perform an analysis of missing data, listing the number of missing values for each variable and for each observation.
+
+Also see the \code{lessR} function \code{\link{corRead}} and its alternate form \code{\link{rad.cor}} to read a correlation matrix.
 }
 
 \usage{
@@ -33,12 +35,11 @@ rad2(ref=NULL, sep=";", dec=",", \ldots)
 
 
 \arguments{
-  \item{ref}{File reference, either null to specify the default of 
-       \code{file.choose()} to browse for the csv data file, or a full path name or web URL, 
+  \item{ref}{File reference, either omitted to browse for the data file, or a full path name or web URL, 
        included in quotes.  A URL begins with \code{http://}.}
   \item{brief}{Extent of the results.}
-  \item{show.R}{Display the R instructions that yielded the lessR output, albeit without
-        the lessR formatting.}
+  \item{show.R}{Display the R instructions that yielded the \code{lessR} output, albeit without
+        the \code{lessR} formatting.}
   \item{attach}{Do not attach data set by default, \code{mydata} by default.}
   \item{n.mcut}{For the missing value analysis, list the row name and number of missing values
         if the number of missing exceeds or equals this cutoff.}
@@ -78,7 +79,6 @@ To create the csv file from a standard worksheet application such as Microsoft E
 Invoke the \code{sep=""} option to read tab-delimited data. Do \code{help(read.table)} to view the other options that can also be implemented from \code{Read}.
 
 MECHANICS\cr
-
 Specify the file as with the \code{\link{Read}} function for reading the data into a data frame.  If no arguments are passed to the function, then interactively browse for the file.  Or, enclose within quotes a full path name or a URL for reading the labels on the web.
 
 Given a csv data file, read the data into an R data frame called \code{mydata} with \code{Read}. Because \code{Read} calls the standard R function \code{\link{read.csv}}, which just provides a wrapper for \code{\link{read.table}}, the usual options that work with \code{\link{read.table}}, such as \code{row.names} also can be passed through \code{Read}. 
@@ -102,7 +102,7 @@ Standard R does not provide for variable labels, but \code{lessR} provides for a
 
 The \code{lessR} functions that provide analysis, such as \code{\link{hst}} for a histogram, automatically include the variable labels in their output, such as the title of a graph.  Standard R functions can also use these variable labels by invoking the \code{\link{label}} function, such as setting \code{main=label(I4)} to put the variable label for a variable named I4 in the title of a graph.  
 
-For a file that contains only labels, each row of the file, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format such as obtained with the \code{csv} optiion from a standard worksheet application such as Microsoft Excel or LibreOffice Calc. Not all variables in the data frame that contains the data, mydata, need have a label, and the variables with their corresponding labels can be listed in any order. An example follows.
+For a file that contains only labels, each row of the file, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format such as obtained with the \code{csv} optiion from a standard worksheet application such as Microsoft Excel or LibreOffice Calc. Not all variables in the data frame that contains the data, \code{mydata} by default, need have a label, and the variables with their corresponding labels can be listed in any order. An example follows.
 
 I2,"This instructor presents material in a clear and organized manner."\cr
 I4,"Overall, this instructor was highly effective in this class."\cr
@@ -116,7 +116,8 @@ The quotes here are not needed because there are no commas in the enclosed chara
 
 \seealso{
 \code{\link{read.csv}},\code{\link{read.spss}},\code{\link{read.fwf}}, 
-\code{\link{attach}}, \code{\link{head}}, \code{\link{tail}}, \code{\link{str}}.
+\code{\link{attach}}, \code{\link{head}}, \code{\link{tail}}, \code{\link{str}},
+\code{\link{corRead}}.
 }
 
 \examples{

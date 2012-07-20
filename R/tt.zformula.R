@@ -1,5 +1,5 @@
 .tt.formula <-
-function (my.formula, y=NULL, dframe=mydata,  ...) {
+function (my.formula, y=NULL, dframe, ...) {
 
 # data frame existence check
   dframe.name <- deparse(substitute(dframe))
@@ -68,12 +68,12 @@ function (my.formula, y=NULL, dframe=mydata,  ...) {
 # save split variables in global environment
 # g1 <- paste(nm[1], ".x", sep="") 
   if (mean(vectors[[1]], na.rm=TRUE) > mean(vectors[[2]], na.rm=TRUE)) {
-    group1 <<- vectors[[1]]
-    group2 <<- vectors[[2]]
+    assign("group1", vectors[[1]], pos=.GlobalEnv)
+    assign("group2", vectors[[2]], pos=.GlobalEnv)
   }
   else {
-    group2 <<- vectors[[1]]
-    group1 <<- vectors[[2]]
+    assign("group2", vectors[[1]], pos=.GlobalEnv)
+    assign("group1", vectors[[2]], pos=.GlobalEnv)
   }
 
 # now that Y has been broken into two separate vectors, do the analysis  
