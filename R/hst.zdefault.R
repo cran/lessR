@@ -3,7 +3,7 @@ function(x, col.bars, col.border, col.bg,
          col.grid, col.reg, over.grid,
          colors, cex.axis, col.axis, col.ticks,
          breaks, bin.start, bin.width,
-         prop, cumul, digits.d, xlab, ylab, main, ...) {
+         prop, cumul, digits.d, xlab, ylab, main, text.out, ...) {
 
   if (!is.numeric(x)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -60,8 +60,6 @@ function(x, col.bars, col.border, col.bg,
     n.under <- length(x[which(x<bin.min)])
     n.over <- length(x[which(x>bin.max)])
     if (n.under+n.over > 0) {
-      op <- options()  # save current options to reset later
-      options(scipen=30) # turn off scientific notation
       cat("\nRange of the data: ", min(x), " to ", max(x), "\n", sep="")
       if (length(breaks) > 3)
         cat("Specified bin cutpoints: ", bin.min, breaks[2], "...", 
@@ -78,14 +76,13 @@ function(x, col.bars, col.border, col.bg,
       if (n.under > 0) cat(txt, "below ", bin.min, ".\n", sep="")
       if (n.over > 0) cat(txt, "above ", bin.max, ".\n", sep="")
       stop("Extend the bin range and rerun.\n\n", call. = FALSE)
-      options(op)  # restore options
     }  
   }
+
 
   # calculate but do not plot the histogram
   # block warnings about any unused parameters due to not plotting 
   h <- suppressWarnings(hist(x, plot=FALSE, breaks, ...))
-
   
   # relative frequency histogram option
   if (prop) h$counts <- h$counts/length(x)
@@ -97,8 +94,6 @@ function(x, col.bars, col.border, col.bg,
   }
   
   # set up plot area
-  op <- options()  # save current options to reset later
-  options(scipen=30) # turn off scientific notation
   suppressWarnings(plot(h, border="transparent", xlab=x.lab, ylab=y.lab,
         main=main.lab, font.main=1, freq=TRUE, cex.axis=cex.axis,
         col.axis=col.axis, col.ticks=col.ticks, ...))
@@ -117,7 +112,6 @@ function(x, col.bars, col.border, col.bg,
     abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
   suppressWarnings(plot(h, add=TRUE, col=col.bars, border=col.border, freq=TRUE, ...))
-  options(op)
   if (cumul == "both") {
     h$counts <- old.counts
     suppressWarnings(plot(h, add=TRUE, col=col.reg, freq=TRUE))
@@ -131,43 +125,45 @@ function(x, col.bars, col.border, col.bg,
 #------------
 # text output
 #------------
+  if (text.out) {
  
-  # summarize data
-  .ss.numeric(x, digits.d=digits.d, brief=TRUE)
+    # summarize data
+    .ss.numeric(x, digits.d=digits.d, brief=TRUE)
 
-  # frequency table
-  # j<17 condition is to stop the 0.99999... problem
-  cum.c <- cumsum(h$counts)
-  prop <- round(h$counts/length(x),2)
-  cum.p <- cumsum(prop)
-  max.dg <- 0
-  for (i in 1:length(h$breaks)) {
-    j <- nchar(as.character(h$breaks[i]))
-    if (j>max.dg && j<17) max.dg <- j
+    # frequency table
+    # j<17 condition is to stop the 0.99999... problem
+    cum.c <- cumsum(h$counts)
+    prop <- round(h$counts/length(x),2)
+    cum.p <- cumsum(prop)
+    max.dg <- 0
+    for (i in 1:length(h$breaks)) {
+      j <- nchar(as.character(h$breaks[i]))
+      if (j>max.dg && j<17) max.dg <- j
+    }
+    max.dg.mid <- 0
+    for (i in 1:length(h$mids)) {
+      j <- nchar(as.character(h$mids[i]))
+      if (j>max.dg.mid && j<19) max.dg.mid <- j
+    }
+    x.breaks <- format(h$breaks, width=max.dg, justify="right", scientific=FALSE)
+    x.mids <- format(h$mids, width=max.dg.mid+3, justify="right", scientific=FALSE)
+    
+    cat("\nBin Width:", h$breaks[2]-h$breaks[1], "\n")
+    cat("Number of Bins:", length(h$breaks)-1, "\n")
+    cat("\n")
+    buf1 <- format("", width=max.dg+1)
+    strt <- 9 + 2*max.dg
+    my.width <- strt-(nchar(buf1)+nchar("Bin"))-7
+    buf2 <- format(" ", width=my.width)
+    .dash(56)
+    cat(buf1,"Bin",buf2,"  Midpoint","  Count","  Prop","  Cumul.c"," Cumul.p",sep="","\n")
+    .dash(56)
+    for (i in 2:length(h$breaks)-1)
+      cat(sprintf("%s > %s %s %6.0f %6.2f %6.0f %6.2f", x.breaks[i], 
+        x.breaks[i+1], x.mids[i], h$counts[i], prop[i], cum.c[i], cum.p[i]), "\n") 
+    .dash(56)
   }
-  max.dg.mid <- 0
-  for (i in 1:length(h$mids)) {
-    j <- nchar(as.character(h$mids[i]))
-    if (j>max.dg.mid && j<19) max.dg.mid <- j
-  }
-  x.breaks <- format(h$breaks, width=max.dg, justify="right", scientific=FALSE)
-  x.mids <- format(h$mids, width=max.dg.mid+3, justify="right", scientific=FALSE)
-  
-  cat("\nBin Width:", h$breaks[2]-h$breaks[1], "\n")
-  cat("Number of Bins:", length(h$breaks)-1, "\n")
-  cat("\n")
-  buf1 <- format("", width=max.dg+1)
-  strt <- 9 + 2*max.dg
-  my.width <- strt-(nchar(buf1)+nchar("Bin"))-7
-  buf2 <- format(" ", width=my.width)
-  .dash(56)
-  cat(buf1,"Bin",buf2,"  Midpoint","  Count","  Prop","  Cumul.c"," Cumul.p",sep="","\n")
-  .dash(56)
-  for (i in 2:length(h$breaks)-1)
-    cat(sprintf("%s > %s %s %6.0f %6.2f %6.0f %6.2f", x.breaks[i], 
-      x.breaks[i+1], x.mids[i], h$counts[i], prop[i], cum.c[i], cum.p[i]), "\n") 
-  .dash(56)
+
   cat("\n")
 
 }
-

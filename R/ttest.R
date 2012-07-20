@@ -1,11 +1,11 @@
 ttest <-
 function(x=NULL, y=NULL, dframe=mydata,
-         n = NULL, m = NULL, s = NULL, mu0 = NULL, 
-         n1 = NULL, n2 = NULL,  m1 = NULL, m2 = NULL, s1 = NULL, s2 = NULL, 
-         Ynm = "Y", Xnm = "X", X1nm = "Group1", X2nm = "Group2", 
-         brief=FALSE, digits.d = NULL, 
-         conf.level = 0.95, mmd = NULL, msmd = NULL, 
-         bw1 = "nrd", bw2 = "nrd", ...)  {
+         n=NULL, m=NULL, s=NULL, mu0=NULL, 
+         n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
+         Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", 
+         brief=FALSE, digits.d=NULL, graph=TRUE, 
+         conf.level=0.95, mmd=NULL, msmd=NULL, 
+         bw1="nrd", bw2="nrd", ...)  {
 
 
 tt.default <-
@@ -50,36 +50,28 @@ function(x, y=NULL, ...) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
          "Specify only one of mmd and msmd as one implies the other.\n\n")
       }
-      orig.params <- par(no.readonly=TRUE)
-      on.exit(par(orig.params))
 
       # Always put the group with the largest mean first
       if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
-        .TwoGroup(x, y, n1, n2, m1, m2, s1, s2,
-         Ynm, Xnm, X1nm, X2nm, 
-         brief, digits.d, 
-         conf.level, mmd, msmd, 
-         bw1, bw2, from.data)
+        .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
+         Ynm, Xnm, X1nm, X2nm, brief, digits.d, graph, 
+         conf.level, mmd, msmd, bw1, bw2)
       else {  # switch
         Xtmp <- X2nm
         X2nm <- X1nm
         X1nm <- Xtmp
-        .TwoGroup(y, x, n1, n2, m1, m2, s1, s2,
-         Ynm, Xnm, X1nm, X2nm, 
-         brief, digits.d, 
-         conf.level, mmd, msmd, 
-         bw1, bw2, from.data)
+        .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
+         Ynm, Xnm, X1nm, X2nm, brief, digits.d, graph, 
+         conf.level, mmd, msmd, bw1, bw2)
       }
 
     }
 
     else {  # from stats
       .TwoGroup(y, x,
-         n1, n2, m1, m2, s1, s2,
-         Ynm, Xnm, X1nm, X2nm, 
-         brief, digits.d, 
-         conf.level, mmd, msmd, 
-         bw1, bw2, from.data)
+         n1, n2, m1, m2, s1, s2, from.data,
+         Ynm, Xnm, X1nm, X2nm, brief, digits.d, graph, 
+         conf.level, mmd, msmd, bw1, bw2)
     }
 
   }  # end two.gp 
@@ -89,11 +81,11 @@ function(x, y=NULL, ...) {
       Ynm <- x.name
       options(yname = x.name)
       .OneGroup(x, Ynm, mu0, brief=brief,
-                from.data=from.data, conf.level=conf.level, digits.d=digits.d)
+           from.data=from.data, conf.level=conf.level, digits.d=digits.d)
     }
     else
       .OneGroup(x, Ynm, mu0, n, m, s, brief=brief,
-                from.data=from.data, conf.level=conf.level, digits.d=digits.d, ...)
+           from.data=from.data, conf.level=conf.level, digits.d=digits.d, ...)
   }
 
   cat("\n")

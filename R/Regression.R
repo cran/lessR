@@ -1,6 +1,5 @@
 Regression <-
-function(my.formula, dframe=mydata,
-         digits.d=4, text.width=120, graphics.save=FALSE, 
+function(my.formula, dframe=mydata, digits.d=4, text.width=120, 
          brief=FALSE, explain=FALSE, show.R=FALSE,
          colors=c("blue", "gray", "rose", "green", "gold", "red"), 
 
@@ -11,11 +10,15 @@ function(my.formula, dframe=mydata,
          scatter.coef=FALSE, scatter.3d=FALSE,
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
-         X5.new=NULL, ...) {
+         X5.new=NULL,
 
-  if (missing(colors)) col.default <- TRUE else col.default <- FALSE
-  colors <- match.arg(colors)
-  if (col.default && !is.null(getOption("colors"))) colors <- getOption("colors")
+         pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
+ 
+ 
+  if (missing(colors)) 
+    colors <- getOption("colors")
+  else
+    colors <- match.arg(colors)
   
   mydframe <- deparse(substitute(dframe))  # get data frame name for cor before sort
  
@@ -23,8 +26,10 @@ function(my.formula, dframe=mydata,
   res.sort <- match.arg(res.sort)
   pred.sort <- match.arg(pred.sort)
 
-  op <- options()  # save current options to reset at end of reg
-  options(show.signif.stars=FALSE, scipen=30, width=text.width)
+  old.opt <- options()
+  on.exit(options(old.opt))
+
+  options(width=text.width)
 
   # output
   cor <- TRUE
@@ -109,7 +114,7 @@ function(my.formula, dframe=mydata,
   # reg analysis
   #   all analysis done on data in model construct lm.out$model
   #   this model construct contains only model vars, with Y listed first
-  lm.out <<- lm(my.formula, data=dframe)
+  assign("lm.out", lm(my.formula, data=dframe), pos=.GlobalEnv)
 
   n.keep <- nrow(lm.out$model)
     
@@ -133,19 +138,27 @@ function(my.formula, dframe=mydata,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          cor, collinear, subsets, numeric.all, in.data.frame)
   
-  if(graphics.save) pdf("regOut.pdf") 
-  else 
-    if (res.rows > 0) .graphwin(3) else .graphwin()
-  if (res.rows > 0) .reg3Residual(nm, mydframe,
+
+  if (res.rows > 0)  # two plots here
+    .reg3Residual(nm, mydframe,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         res.sort, res.rows, cooks.cut, colors, graphics.save)
-   
-  # separate pred from graphics inside of .reg4 
-  .reg4PredGraph(nm, mydframe, my.formula, brief, res.rows,
+         res.sort, res.rows, cooks.cut, colors,
+         pdf, pdf.width, pdf.height)
+ 
+
+  if (pred)
+    prd <- .reg4Pred(nm, mydframe, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
-         numeric.all, in.data.frame, colors, graphics.save, X1.new, 
+         numeric.all, in.data.frame, colors, X1.new, 
          X2.new, X3.new, X4.new, X5.new)
+   
+  .reg5Plot(nm, mydframe, my.formula, brief, res.rows,
+         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
+         new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
+         numeric.all, in.data.frame, colors, X1.new, 
+         X2.new, X3.new, X4.new, X5.new, prd$cint, prd$pint,
+         pdf, pdf.width, pdf.height)
 
 
 # ----------
@@ -172,16 +185,4 @@ function(my.formula, dframe=mydata,
     cat("\n")
   }
   
-
-# ----------
-
-  if (graphics.save) {
-    cat("\n\n")
-    .dash(68)
-    .showfile("regOut.pf", "regression graphics")
-    dev.off()
-  }
-
-  options(op)  # restore options going into reg
-
 }

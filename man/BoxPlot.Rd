@@ -3,7 +3,6 @@
 \alias{bx}
 \alias{bx.default}
 \alias{bx.data.frame}
-\alias{color.boxplot}
 
 \title{Boxplot}
 
@@ -16,65 +15,92 @@ If the provided object for which to calculate the box plot is a data frame, then
 }
 
 \usage{
-BoxPlot(x=NULL, dframe=mydata, \ldots)
+BoxPlot(x=NULL, dframe=mydata, n.cat=getOption("n.cat"), text.out=TRUE, \ldots)
 
-\method{bx}{data.frame}(x, \ldots) 
+\method{bx}{data.frame}(x, n.cat, text.out, \ldots) 
 
 \method{bx}{default}(x, col.box=NULL, col.pts=NULL, 
         col.bg=NULL, col.grid=NULL,
         colors=c("blue", "gray", "rose", "green", "gold", "red"), 
         cex.axis=.85, col.axis="gray30", col.ticks="gray30",
         horiz=TRUE, dotplot=FALSE,
-        xlab=NULL, main=NULL, digits.d=NULL, \ldots)
+        xlab=NULL, main=NULL, digits.d=NULL, text.out=TRUE,
+        pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 bx(\ldots)
-
-color.boxplot(\ldots)
 }
 
 
 \arguments{
-  \item{x}{Variable for which to construct the histogram.  Can be a data frame.  If not
-      specified with \code{dframe}, that is, no variable specified, then the data frame \code{mydata}
-      is assumed.}
-  \item{dframe}{Optional data frame that contains the variables of interest, default is \code{mydata}.}
+  \item{x}{Variable for which to construct the histogram.  Can be a data frame.  If
+       not specified with \code{dframe}, that is, no variable specified, then the
+       data frame \code{mydata} is assumed.}
+  \item{dframe}{Optional data frame that contains the variables of interest, default
+       is \code{mydata}.}
+  \item{n.cat}{When analyzing all the variables in a data frame, specifies the
+       largest number of unique values of variable of a numeric data type for 
+       which the variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{col.box}{Color of the box.}
-  \item{col.pts}{Color of any points that designate outliers. By default this is the same
-        color as the box.}
+  \item{col.pts}{Color of any points that designate outliers. By default this is the 
+       same color as the box.}
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines.}
   \item{colors}{Sets the color palette.}
-  \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be smaller than
-        the axis labels. Provides the functionality of, and can be replaced by, the standard R \code{cex.axis.}}
+  \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
+       values to be smaller than the axis labels. Provides the functionality of, and
+       can be replaced by, the standard R \code{cex.axis.}}
   \item{col.axis}{Color of the font used to label the axis values.}
   \item{col.ticks}{Color of the ticks used to label the axis values.}
   \item{horiz}{Orientation of the boxplot. Set \code{FALSE} for vertical.}
-  \item{dotplot}{If \code{TRUE}, then place a dot plot (i.e., stripchart) over the box plot.}
+  \item{dotplot}{If \code{TRUE}, then place a dot plot (i.e., stripchart) over the
+       box plot.}
   \item{xlab}{Label for the value axis, which defaults to the variable's name.}
   \item{main}{Title of graph.}
-  \item{digits.d}{Number of decimal digits displayed in the listing of the summary statistics.}
+  \item{digits.d}{Number of decimal digits displayed in the listing of the summary
+       statistics.}
+  \item{text.out}{If \code{TRUE}, then display text output in console.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.width}{Width of the pdf file in inches.}
+  \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for graphics as defined processed 
-       by \code{\link{boxplot}} and \code{\link{par}}, including \code{ylim} to set the limits of the 
-       value axis, \code{lwd} for the line width, \code{cex.lab} for the size of the label, and 
-       \code{col.main} for the title, etc.}
+       by \code{\link{boxplot}} and \code{\link{par}}, including \code{ylim} to set
+       the limits of the value axis, \code{lwd} for the line width, \code{cex.lab}
+       for the size of the label, and \code{col.main} for the title, etc.}
 }
 
 
 \details{
+OVERVIEW\cr
 Unlike the standard R boxplot function, \code{\link{boxplot}}, the default here is for a horizontal boxplot.  Also, \code{BoxPlot} does not currently process in formula mode, so use the standard R \code{\link{boxplot}} function to process a formula in which a boxplot is displayed for a variable at each level of a second, usually categorical, variable.
+
+Other graphic parameters are available to format the display, such as \code{main} for the title, and other parameters found in \code{\link{boxplot}} and \code{\link{par}}. To minimize white space around the boxplot, re-size the graphics window before or after creating the boxplot.
+\code{\link{den}}.
+
+DATA\cr
+If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation. 
 
 To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.
 
-If the variable is in a data frame, the input data frame has the assumed name of mydata.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the mydata$name notation. If no variable is specified, then all numeric variables in the entire data frame are analyzed and the results written to a pdf file.
+COLOR THEME\cr
+Individual colors in the plot can be manipulated with options such as \code{col.box} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}. 
 
-Other graphic parameters are available to format the display, such as \code{main} for the title, and other parameters found in \code{\link{boxplot}} and \code{\link{par}}.
+VARIABLE LABELS\cr
+Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
-A labels data frame named \code{mylabels}, obtained from the \code{lessR} \code{\link{Read}} function, can list the label for some or all of the variables in the data frame that contains the data for the analysis.  If this labels data frame exists, then the corresponding variable label is listed as the title of the resulting plot, unless a specific label is listed with the \code{main} option. The variable label is also listed in the text output, next to the variable name. 
+PDF OUTPUT\cr
+Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
-To minimize white space around the boxplot, re-size the graphics window before or after creating the boxplot.
+ONLY VARIABLES ARE REFERENCED\cr
+The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
-The default background color of \code{col.bg=ghostwhite} provides a very mild cool tone with a slight emphasis on blue. The entire color theme can be specified at the system level with the \code{lessR} function \code{\link{set}} using the \code{colors} option.  Or, use the same option for \code{BoxPlot} to set the color theme just for one box plot. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in the \code{\link{help}} function for \code{\link{set}}. 
+\code{    > BoxPlot(rnorm(50))   # does NOT work}
+
+Instead, do the following:
+\preformatted{    > Y <- rnorm(50)   # create vector Y in user workspace
+    > BoxPlot(Y)     # directly reference Y}
+
 }
+
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
@@ -97,6 +123,9 @@ BoxPlot(y)
 
 # short name
 bx(y)
+
+# save the box plot to a pdf file
+BoxPlot(y, pdf.file="MyBoxPlot.pdf")
 
 # vertical boxplot with plum color
 BoxPlot(y, horiz=FALSE, col.box="plum")

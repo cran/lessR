@@ -65,8 +65,8 @@ av(Y ~ X)
 # variable of interest is in a data frame which is not the default mydata
 # access the data frame in the lessR dat.twogroup data set
 # although data not attached, access the variables directly by their name
-data(dat.twogroup)
-ANOVA(ShipTime ~ Supplier, dframe=dat.twogroup)
+data(datTwoGroup)
+ANOVA(ShipTime ~ Supplier, dframe=datTwoGroup)
 
 # two-factor ANOVA with replications and interaction
 ANOVA(breaks ~ wool * tension, dframe=warpbreaks)

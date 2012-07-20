@@ -1,7 +1,7 @@
 \name{label}
 \alias{label}
 
-\title{Get a Variable Label for Display on Output}
+\title{Apply a Variable Label to a non-lessR Function}
 
 \description{
 Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  Generally applies to standard R functions as \code{lessR} functions automatically provide variable labels on the output when the labels are present in the \code{mylabels} data frame.
@@ -19,9 +19,10 @@ label(x, dframe=mylabels)
 
 
 \details{
-Standard R does not provide for variable labels, but \code{lessR} provides for a data frame called \code{mylabels} which stores variable labels.  Read the labels into this data frame with the \code{\link{Read}} function and setting \code{labels=TRUE}. This setting can be accommplished with the short name for the \code{\link{Read}} function, \code{\link{rad}}.  The variable labels can either be read from a separate file by themselves, \code{\link{rad.labels}}, or from the second row of the data file, \code{\link{rad.both}}. 
+Standard R does not provide for variable labels, but \code{lessR} provides for a data frame called \code{mylabels} which stores variable labels.  Read the labels into this data frame with the \code{\link{Read}} function and setting \code{labels=TRUE}. This setting can be accomplished with the short name for the \code{\link{Read}} function, \code{\link{rad}}.  The variable labels can either be read from a separate file by themselves, \code{\link{rad.labels}}, or from the second row of the data file, \code{\link{rad.both}}. 
 
-Each row of the file that contains the labels, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format. Here is an example of this file for the \code{dat.employee} data file included in this \code{lessR} package.\cr
+Each row of the file that contains the labels, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format such as obtained with the \code{csv} option from a standard worksheet application such as Microsoft Excel or LibreOffice Calc. Not all variables in the data frame that contains the data, \code{mydata} by default, need have a label, and the variables with their corresponding labels can be listed in any order. Here is an example of this file for the \code{dat.employee} data file included in this \code{lessR} package.\cr
+
 Years,"Years Employed in the Company"\cr
 Gender,"Male or Female"\cr
 Dept,"Department Employed"\cr
@@ -72,5 +73,7 @@ with(mydata, hist(Y, main=label(Y)))
 % R documentation directory.
 \keyword{ labels }
 \keyword{ csv }
+
+
 
 

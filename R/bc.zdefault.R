@@ -3,9 +3,9 @@ function(x, by=NULL,
          col.bars, col.border, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, brief, prop, xlab, ylab, main,
          cex.axis, col.axis, col.ticks, beside, col.low, col.hi, count.names,
-         legend.title, legend.loc, legend.labels, legend.horiz, ...) {
+         legend.title, legend.loc, legend.labels, legend.horiz, text.out, ...) {
  
-  if (!is.null(by) && prop) { 
+ if (!is.null(by) && prop) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
     "Analysis of proportions not valid for two variables.\n\n")
   }
@@ -15,26 +15,14 @@ function(x, by=NULL,
     "addtop  only works for a vertical bar plot.\n\n")
   }
 
-  orig.params <- par(no.readonly=TRUE)
-  on.exit(par(orig.params))
-
   # get variable labels if exist plus axes labels
   if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- "Proportion"
   gl <- .getlabels(xlab, ylab, main)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
-  y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb;
+  y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
   main.lab <- gl$mb
 
-  #get variable labels if exist
-  #gl <- .getlabels()
-  #x.name <- gl$xn; y.name <- gl$yn; x.lbl <- gl$xl; y.lbl <- gl$yl
-
-  #axis and legend labels
-  #if (!is.null(xlab)) x.lab <- xlab 
-    #else if (length(x.lbl) == 0) x.lab <- x.name else x.lab <- x.lbl
-  #if (is.null(ylab)) if (!prop) y.lab <- "Frequency" else y.lab <- "Proportion"
-    #else y.lab <- ylab
-
+  # get legend title, l.lab
   if (!is.null(legend.title)) l.lab <- legend.title 
   else if (!is.null(by)) if (exists("y.lbl"))
     if (length(y.lbl) == 0) l.lab <- y.name else l.lab <- y.lbl
@@ -62,7 +50,7 @@ function(x, by=NULL,
 
   # convert to table, with variable names, if needed
   if (!entered && !is.table(x))
-    if (!is.null(by)) x <- table(by,x, dnn=c(l.lab,x.lab)) 
+    if (!is.null(by)) x <- table(by,x, dnn=c(y.name, x.name)) 
     else {  
       x <- table(x, dnn=NULL)
       if (prop) x <- x/sum(x)
@@ -73,6 +61,9 @@ function(x, by=NULL,
     "beside=TRUE  is not valid for analysis of only one variable.\n\n")
   }
 
+
+  # ----------------------------------------------------------------------------
+  # colors
 
   # get number of colors
   if (is.null(by) && !order.x && !is.matrix(x)) ncolors <- 1 else ncolors <- nrow(x)
@@ -97,12 +88,16 @@ function(x, by=NULL,
       if (is.null(col.hi)) col.hi <- "slategray4"
     }
     else if (colors == "gray") {
-      if (is.null(col.low)) col.low <- "gray90"
-      if (is.null(col.hi)) col.hi <- "gray30"
+      if (is.null(col.low)) col.low <- "gray70"
+      if (is.null(col.hi)) col.hi <- "gray25"
+      col.grid <- "white"
+      col.bg <- "gray90"
     }
     else if (colors == "rose") {
       if (is.null(col.low)) col.low <- "mistyrose1"
       if (is.null(col.hi)) col.hi <- "mistyrose4"
+      col.grid <- "snow2"
+      col.bg <- "snow1"
     }
     else if (colors == "green") {
       if (is.null(col.low)) col.low <- "darkseagreen1"
@@ -119,21 +114,36 @@ function(x, by=NULL,
     color.palette <- colorRampPalette(c(col.low, col.hi))
     clr <- color.palette(ncolors)
   }
-  else {
-    if (colors == "gray") {
-      color.palette <- colorRampPalette(c("gray28","gray92"))
-      clr <- color.palette(nrow(x))
-      col.grid <- "white"
-      col.bg <- "gray90"
-    }
+  else if (colors == "gray") {
+    cp <- .clr(colors)
+    color.palette <- colorRampPalette(c("gray30","gray80"))
+    clr <- color.palette(nrow(x))
+    col.grid <- cp[3]
+    col.bg <- cp[4]
+  }
+  else if ((colors=="blue" || colors=="rose" || colors=="green" 
+          || colors=="gold" || colors=="red") && (is.null(by) && !is.matrix(x))) {
+    cp <- .clr(colors)
+    color.palette <- colorRampPalette(cp[1])
+    clr <- color.palette(nrow(x))
+    col.grid <- cp[3]
+    col.bg <- cp[4]
+  }
     else if (colors == "rainbow") clr <- rainbow(ncolors)
     else if (colors == "terrain") clr <- terrain.colors(ncolors)
     else if (colors == "heat") clr <- heat.colors(ncolors)
-    else  # mono color range does not make sense here 
+    else  {  # mono color range does not make sense here 
       clr <- c("slategray", "peachpuff2", "darksalmon", "darkseagreen1", 
         "thistle4", "azure3", "mistyrose")
+      cat("\n>>> Note: For two variables, the color theme only applies to\n",
+          "          the levels of an ordered factor, except for the \"gray\"\n",
+          "          color theme. However, other choices are available\n",
+          "          for BarChart:  \"rainbow\", \"terrain\" and \"heat\". \n\n", 
+          sep="")
+    }
+
     if (random.col) clr <- clr[sample(length(clr))]
-  }
+
   if (!is.null(col.bars)) {
     for (i in 1:(min(length(col.bars),length(clr)))) clr[i] <- col.bars[i]
     ncolors <- min(length(col.bars),length(clr))
@@ -141,17 +151,20 @@ function(x, by=NULL,
   palette(clr)
   col <- 1:ncolors 
 
+
+  # ----------------------------------------------------------------------------
+  # preliminaries
  
   if (is.matrix(x) && !beside) max.y <- max(colSums(x)) else max.y <- max(x)
   if (prop) addtop <- .01
   max.y <- max.y + addtop
 
   if (is.null(legend.labels)) legend.labels <- row.names(x)
-  if (!is.null(legend.labels)) if (is.null(legend.loc)) legend.loc <- "topleft"
+# if (!is.null(legend.labels)) if (is.null(legend.loc)) legend.loc <- "topleft"
   if (beside) legend.horiz <- FALSE
   if ((!is.null(by) || is.matrix(x)) && !beside) {
     legend.horiz <- TRUE
-    if (is.null(legend.loc)) legend.loc <- "top"
+#   if (is.null(legend.loc)) legend.loc <- "top"
     max.y <- max.y + .18*max.y
   }
 
@@ -159,7 +172,10 @@ function(x, by=NULL,
 
   # get max label size
   the.names <- integer(length=0)
-  if (length(dim(x)) == 0) the.names <- names(x) else the.names <- rownames(x)
+  if (length(dim(x)) == 0)
+    the.names <- names(x)
+  else 
+   if (is.null(by)) the.names <- rownames(x) else the.names <- colnames(x)
   max.nm <- 0
   for (i in (1:length(the.names))) {
     li <- nchar(the.names[i])
@@ -172,11 +188,20 @@ function(x, by=NULL,
     add.left <- max.nm/2.0
     if (y.lab != "") add.left <- add.left + 1.5
     extend <- TRUE
-    par(mar=c(5, add.left, 4, 2) + 0.1)
   } 
 
+
+  # ----------------------------------------------------------------------------
   # set up plot area, color background, grid lines
-  if(is.null(count.names))  if (horiz) { temp <- x.lab; x.lab <- y.lab; y.lab <- temp }
+
+  if (extend) par(mar=c(5, add.left, 4, 2) + 0.1)
+
+  if (legend.loc == "right.margin"  &&  (!is.null(by) || is.matrix(x)))
+    par(oma=c(0,0,0,3))
+
+  if(is.null(count.names)) if (horiz) { 
+    temp <- x.lab; x.lab <- y.lab; y.lab <- temp 
+  }
 
   if (class(x) == "numeric"  &&  entered) x <- as.table(x)
   rescale <- 0
@@ -213,38 +238,139 @@ function(x, by=NULL,
   }
   else las.value <- 0
 
+
+  # ----------------------------------------------------------------------------
+  # bar plot, grid lines
+
   usr <- par("usr")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
   if (max.y > 1) vy <- pretty(0:max.y) else vy <- pretty(1:100*max.y)/100
  
-  # bar plot, grid lines and legend
   if (!over.grid) {
-    if (!horiz) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
-    else abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+    if (!horiz)
+      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+    else
+      abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
   if (rescale == 0) {
      # width.bars <- .8   gap <- .6*width.bars
-     suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+    p1<-suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
           xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.border, las=las.value, 
           space=gap, cex.axis=cex.axis, cex.names=cex.axis, 
           col.axis=col.axis, col.ticks=col.ticks, ...))
   }
   else
-     suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+    p1<-suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
           xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.border, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), 
           cex.axis=cex.axis, cex.names=cex.axis,
           col.axis=col.axis, col.ticks=col.ticks, ...))
   if (over.grid) {
-    if (!horiz) abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
-    else abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+    if (!horiz)
+      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+    else
+      abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
-  if ((!is.null(by) || is.matrix(x)) && !is.null(legend.loc)) 
-    legend(legend.loc, legend=legend.labels, title=l.lab, fill=col, 
-           horiz=legend.horiz, cex=.7, bty="n")
 
 
-  if (is.null(by)) .ss.factor(x, brief=brief) else .ss.factor(x, by, brief=brief)
+  # ----------------------------------------------------------------------------
+  # legend for two variable plot including variable labels
+  if ((!is.null(by) || is.matrix(x)) && !is.null(legend.loc))  {
+
+    # default right.margin option
+    if (legend.loc == "right.margin") {
+
+      par(xpd=NA)  # allow drawing outside of plot region
+
+      # split string into separate words
+      wordlist <- as.vector(strsplit(l.lab, " "))
+      n.words <- length(wordlist[[1]])
+
+      # put elements of word list into words for ease of programming
+      words <- character(length=0)
+      for (i in 1:n.words) words[i] <- abbreviate(wordlist[[1]][i],12)
+
+      # combine words into lines of max length 13
+      lines <- integer(length=0)
+      j <- 0
+      iword1 <- 1
+      while (iword1 <= n.words) {
+        j <- j + 1
+        lines[j] <- words[iword1]
+        trial <- ""
+        iword <- 0
+        while (nchar(trial) < 13  &&  iword1 <= n.words) {
+          trial <- paste(trial, words[iword1+iword]) 
+          if (nchar(trial) <= 13) {
+            lines[j] <- trial
+            iword1 <- iword1 + 1
+          }
+        }
+      }
+      n.lines <- length(lines)
+
+      # remove leading blank in each line
+      for (i in 1:n.lines) lines[i] <- substr(lines[i], 2, nchar(lines[i]))
+
+      # get max word in terms of user coordinates
+      max.wlen <- 0
+      for (i in 1:n.lines) {
+        wl <- strwidth(lines[i])
+        if (wl > max.wlen) {
+          max.wlen <- wl
+          max.word <- lines[i]
+        }
+      }
+
+      # attach a line break at the end of all but the last line
+      if (n.lines > 1)
+        for (i in 1:(n.lines-1)) lines[i] <- paste(lines[i], "\n", sep="")
+
+      # construct the legend title as a single character string
+      l.lab2 <- ""
+      for (i in 1:n.lines) l.lab2 <- paste(l.lab2, lines[i], sep="")
+
+      # construct vertical buffer for legend for additional legend title lines
+      axis.vert <- usr[4] - usr[3]
+      vbuffer <- (n.lines-1)*(0.056*axis.vert)  # usr[4] is top axis coordinate
+
+      # legend function blind to multiple line titles, 
+      # so pass largest word to get the proper width of the legend
+      # also get height of legend with only one title line
+      legend.labels <- abbreviate(legend.labels, 6)
+      ll <- legend(0,0, legend=legend.labels, title=max.word, cex=.7,
+                   fill=col, plot=FALSE)
+
+      # horizontal placement
+      size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
+      epsilon <- (size[1] - ll$rect$w) / 2
+
+      # legend box
+      xleft <- usr[2] + epsilon   # usr[2] is the user coordinate of right axis
+      xright <- xleft + ll$rect$w
+      lgnd.vhalf <- (vbuffer + ll$rect$h) / 2
+      axis.cntr <- axis.vert / 2  + usr[3]
+      ytop <- axis.cntr + lgnd.vhalf
+      ybottom <- axis.cntr - lgnd.vhalf
+      rect(xleft, ybottom, xright, ytop, lwd=.5, border="gray30", col=col.bg)
+
+      # legend not multiple title lines aware, so start at last title line
+      legend(x=xleft, y=ytop-vbuffer, legend=legend.labels, title=l.lab2,
+             fill=col, horiz=FALSE, cex=.7, bty="n", box.lwd=.5,
+             box.col="gray30")
+
+    }  # right margin
+
+    else
+      legend(legend.loc, legend=legend.labels, title=l.lab, fill=col, 
+             horiz=legend.horiz, cex=.7, bty="n")
+  }
+
+
+  # ----------------------------------------------------------------------------
+  # text output
+  if (text.out) 
+    if (is.null(by)) .ss.factor(x, brief=brief) else .ss.factor(x, by, brief=brief)
 
   cat("\n")
 

@@ -15,7 +15,8 @@ For both the one and two-group t-tests, power is calculated from a single sample
 
 \usage{
 ttestPower(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL, 
-                  mmd=NULL, msmd=NULL, mdp=.8, mu0=NULL, \ldots)
+         mmd=NULL, msmd=NULL, mdp=.8, mu0=NULL, 
+         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 ttp(\ldots)
 
@@ -38,6 +39,9 @@ powercurve.t.test(\ldots)
        sufficient power. Default is 0.8. If changed to 0 then the concept is dropped from the analysis.}
   \item{mu0}{Hypothesized mean, of which a provided value triggers a one-sample 
        analysis.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.width}{Width of the pdf file in inches.}
+  \item{pdf.height}{Height of the pdf file in inches.}
   \item{\ldots}{Other parameter values, such as \code{lwd} and \code{cex.lab} from \code{\link{plot}}
         and \code{col.line} and \code{col.bg} from \code{\link{plt}}.}
 }

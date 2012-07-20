@@ -1,7 +1,7 @@
 \name{to}
 \alias{to}
 
-\title{Create a sequence of variable names numbered sequentially}
+\title{Create a Sequence of Numbered Variable Names with a Common Prefix}
 
 \description{
 Generates sequentially numbered variable names, all starting with the same prefix, usually in conjunction with reading data values into R.
@@ -22,7 +22,7 @@ to(prefix, until, from=1, same.size=TRUE)
 
 
 \details{
-Some data sets, particularly those from surveys, have sequentially numbered variable names, each beginning with the same prefix, such as the first later of the name of a set of related attitude items. This function generates the string of such variable names, generally intended for use in a \code{read} statement for reading the data and then naming the variables, or for a subsquent assignment of the names with a \code{\link{names}}. Relies upon the R \code{\link{paste}} function.
+Some data sets, particularly those from surveys, have sequentially numbered variable names, each beginning with the same prefix, such as the first later of the name of a set of related attitude items. This function generates the string of such variable names, generally intended for use in a \code{read} statement for reading the data and then naming the variables, or for a subsequent assignment of the names with a \code{\link{names}}. Relies upon the R \code{\link{paste}} function.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

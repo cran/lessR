@@ -1,0 +1,5 @@
+cfa <-
+function(...)
+
+  corCFA(...)
+

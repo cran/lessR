@@ -20,39 +20,41 @@ if (is.null(ref)) {
 }
 # do the read
 if (!is.null(widths)) {
-  mydata <<- read.fwf(file=ref, widths=widths, ...)
+  assign("mydata", read.fwf(file=ref, widths=widths, ...), pos=.GlobalEnv)
 }
 else {
 
   if (labels && !data)
-    mylabels <<- read.csv(file=ref, row.names=1, col.names=c("","label"),
-                          header=FALSE)
+    assign("mylabels", read.csv(file=ref, row.names=1, col.names=c("","label"),
+                          header=FALSE), pos=.GlobalEnv)
   else if (labels && data) {
     mylabels <- read.csv(file=ref, nrows=1, ...)
     var.names <- names(mylabels)
     mylabels <- data.frame(t(mylabels))
     names(mylabels) <- "label"
-    mylabels <<- mylabels # version stored
-    mydata <<- suppressWarnings(read.csv(file=ref, skip=1, 
-                                na.strings=missing, ...))
-    names(mydata) <<- var.names
+    assign("mylabels", mylabels, pos=.GlobalEnv) # version stored
+    assign("mydata", suppressWarnings(read.csv(file=ref, skip=1, 
+                        na.strings=missing, ...)), pos=.GlobalEnv)
+    assign("names(mydata)", var.names, pos=.GlobalEnv)
   }
   else if (!labels && data) {
     if (grepl(".sav$", ref)) format <- "SPSS" 
     if (grepl(".rda$", ref)) format <- "R" 
-    if (format == "csv") mydata <<- suppressWarnings(read.csv(file=ref, 
-        na.strings=missing, ...))
+    if (format == "csv") 
+      assign("mydata", suppressWarnings(read.csv(file=ref, 
+        na.strings=missing, ...)), pos=.GlobalEnv)
     else if (format == "SPSS") {
-      mydata <<- suppressWarnings(read.spss(file=ref, to.data.frame = TRUE, ...))
+      assign("mydata", suppressWarnings(read.spss(file=ref, 
+            to.data.frame = TRUE, ...)), pos=.GlobalEnv)
       if (!is.null(attr(mydata, which="variable.labels"))) {
         mylabels <- matrix(nrow=ncol(mydata), ncol=2)
         for (i in 1:ncol(mydata)) {
           mylabels[i,1] <- attr(mydata, which="names")[i]
-          mylabels[i,2] <- attr(mydata, which="variable.laabels")[i]
+          mylabels[i,2] <- attr(mydata, which="variable.labels")[i]
         }
         mylabels <- data.frame(mylabels, row.names=1)
         names(mylabels) <- c("label")      
-        mylabels <<- mylabels
+        assign("mylabels", mylabels, pos=.GlobalEnv)
       }
       if (attach) attach(mydata, warn.conflicts=FALSE)
     }
@@ -134,9 +136,10 @@ if (data) {
       cat(line)
       cat("Data type of each variable\n")
       cat(line)
-      cat("Factor: Variable with non-numeric values, stored as an integer\n")
-      cat("num: Variable with numeric values that may have decimal digits\n")
-      cat("int: Variable with numeric values limited to integer values\n")
+      cat("Factor: Variable with non-numeric categories or levels,\n",
+          "        with values stored as integers\n")
+      cat("int: Variable with numeric values which are integers\n")
+      cat("num: Variable with numeric values with decimal digits\n")
       cat(line, "\n")
       cat(str(mydata, digits.d=15))
     }

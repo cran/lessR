@@ -1,15 +1,18 @@
 .dp.main <- 
-function(x, 
-         col.pts, col.fill, trans.pts, col.bg, col.grid, colors,
-         cex.axis, col.axis, col.ticks, xlab, main, 
+function(x, by,
+         col.pts, col.fill, trans.pts, shape.pts,
+         col.bg, col.grid, colors,
+         cex.axis, col.axis, col.ticks, xlab, main, cex,
          pt.reg, pt.out, 
          col.out30, col.out15, text.out, new, ...) {
 
-  old.opt <- options()
-  on.exit(options(old.opt))
 
-  if (!is.null(trans.pts)) options(trans=trans.pts)
-  else if (is.null(getOption("trans"))) options(trans=0.66)  # default
+  if (is.null(cex)) pt.size <- 0.8 else pt.size <- cex
+
+  if (is.factor(x)) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "The variable cannot be an R factor (categorical).\n")
+  }
 
   # color palette based on color theme colors
   cp <- .clr(colors)
@@ -27,6 +30,7 @@ function(x,
   gl <- .getlabels(xlab, main=main)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   main.lab <- gl$mb
+  by.name <- getOption("byname")
 
   # text output (before remove missing)
   if (text.out && new) .ss.numeric(x, brief=TRUE)
@@ -36,15 +40,14 @@ function(x,
   if (n.miss > 0) x <- na.omit(x)
  
   if (new) {
-    
     # set up plot area
+
+    if (!is.null(by)) par(omi=c(0,0,0,0.6))  # legend in right margin
+
     suppressWarnings(stripchart(x, col="transparent", xlab=x.lab,
        main=main.lab, axes=FALSE, ...))
-    op <- options()  # save current options to reset later
-    options(scipen=30) # turn off scientific notation
     suppressWarnings(axis(1,
        cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...))
-    options(op)
     
     # colored background for plotting area
     usr <- par("usr")
@@ -68,8 +71,43 @@ function(x,
   stripchart(x[x>up30], add=TRUE, method="stack", col=col.out30, pch=pt.out, ...)
 
   # dp for regular points
-  suppressWarnings(stripchart(x[x>lo15 & x<up15], add=TRUE, method="stack",
-                   col=col.pts, pch=pt.reg, bg=col.fill, ...))
+  if (is.null(by)) 
+
+    suppressWarnings(stripchart(x[x>lo15 & x<up15], add=TRUE, method="stack",
+                     col=col.pts, pch=pt.reg, bg=col.fill, ...))
+
+    else {  # by grouping variable
+      n.levels <- nlevels(by)
+
+      clr <- character(length(n.levels))
+      if (length(col.pts) == 1) 
+        for (i in 1:n.levels) clr[i] <- col.pts
+      else
+        clr <- col.pts
+      clr.tr <- clr
+
+      shp <- integer(length(n.levels))
+      if (length(shape.pts) == 1)
+        for (i in 1:n.levels) shp[i] <- shape.pts
+      else
+         shp <- shape.pts
+      shape.dft <- c(21,23,22,24,25,7:14)  # shape defaults
+      if (length(col.pts)==1 && length(shape.pts)==1)  # both shape and color default
+        for (i in 1:n.levels) shp[i] <- shape.dft[i]  # fill with default shapes
+
+      for (i in 1:n.levels) {
+        clr.tr[i] <- .maketrans(clr.tr[i], trans.pts)
+        x.lv <- subset(x, by==levels(by)[i])
+        stripchart(x.lv, pch=shp[i], col=clr[i], bg=clr.tr[i], 
+               cex=pt.size, lwd=0.75, add=TRUE, ...)
+      }
+      cat("\nTransparency level for plotted points: ", trans.pts, "\n")
+
+      .plt.legend(levels(by), col.pts, clr, clr.tr, shp, trans.pts, col.bg, usr)
+
+    }  # end by group
+
+
 
   cat("\n")
 

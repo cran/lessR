@@ -10,12 +10,15 @@ function(x, dframe=mydata,
 
          cex.axis=.85, col.axis="gray30", col.ticks="gray30",
          x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
-         x.min=NULL, x.max=NULL, band=FALSE, ...) {
+         x.min=NULL, x.max=NULL, band=FALSE, 
+
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
-  if (missing(colors)) col.default <- TRUE else col.default <- FALSE
-  colors <- match.arg(colors)
-  if (col.default && !is.null(getOption("colors"))) colors <- getOption("colors")
+  if (missing(colors)) 
+    colors <- getOption("colors")
+  else
+    colors <- match.arg(colors)
 
   # get actual variable name before potential call of dframe$x
   x.name <- deparse(substitute(x)) 
@@ -37,12 +40,23 @@ function(x, dframe=mydata,
     if (is.function(x)) x.call <- eval(substitute(dframe$x))
   }
 
-  .graphwin()
+  # set up graphics system
+  .opendev(pdf.file, pdf.width, pdf.height)
+
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))
+
   .den.main(x.call, dframe=mydata, 
             bw, type, bin.start, bin.width, text.out,
             col.bg, col.grid, col.bars, col.nrm, col.gen,
             col.fill.nrm, col.fill.gen, colors, 
             cex.axis, col.axis, col.ticks,
             x.pt, xlab, main, y.axis, x.min, x.max, band, ...)
+
+  # terminate pdf graphics system
+  if (!is.null(pdf.file)) {
+    dev.off()
+    .showfile(pdf.file, "density plot")
+  }
 
 }

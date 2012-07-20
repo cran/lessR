@@ -106,11 +106,12 @@ function(x, by=NULL, dframe, digits.d=NULL, brief, ...) {
     md <- median(xx)
     q3 <- quantile(xx, probs=0.75)
     mx <- max(xx)
+    qr <- IQR(xx)
     # print
     if (!brief) {
-      out <- c(n, n.miss, m, s, sk, kt, mn, q1, md, q3, mx)
+      out <- c(n, n.miss, m, s, sk, kt, mn, q1, md, q3, mx, qr)
       names(out) <- c("n", "miss", "mean", "sd", "skew", "krts",
-                      "min", "Qrt1", "mdn", "Qrt3", "max")
+                      "min", "Qrt1", "mdn", "Qrt3", "max", "IQR")
     }
     else {
       out <- c(n, n.miss, m, s, mn, md, mx)

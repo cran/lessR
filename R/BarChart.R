@@ -1,5 +1,6 @@
 BarChart <-
-function(x=NULL, by=NULL, dframe=mydata, ncut=4, ...)  {
+function(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"), 
+         count.names=NULL, text.out=TRUE, ...)  {
 
 
   is.df <- FALSE  # is data frame
@@ -75,13 +76,40 @@ function(x=NULL, by=NULL, dframe=mydata, ncut=4, ...)  {
     }
     else y.call <- NULL
 
+
+  # evaluate count.names
+  #---------------------
+  if (!missing(count.names)) {
+
+    # get actual variable name before potential call of dframe$x
+    count.names.name <- deparse(substitute(count.names)) 
+    options(count.namesname = count.names.name)
+
+    # get conditions and check for dframe existing
+    xs <- .xstatus(count.names.name, dframe.name)
+    in.global <- xs$ig 
+
+    # see if var exists in data frame, if x not in Global Env or function call 
+    if (!missing(x) && !in.global)
+      .xcheck(count.names.name, dframe.name, dframe)
+
+    if (!in.global) count.names.call <- eval(substitute(dframe$count.names))
+    else {  # vars that are function names get assigned to global
+      count.names.call <- count.names
+      if (is.function(count.names.call)) 
+        count.names.call <- eval(substitute(dframe$count.names))
+    }
+  }
+  else
+   count.names.call <- NULL
+
   }  # x not data frame
 
-  if (is.df) bc.data.frame(dframe, ncut, ...)
+  if (is.df) bc.data.frame(dframe, n.cat, text.out, ...)
 
   else {
-    .graphwin()
-    bc.default(x.call, y.call, ...)
+    bc.default(x.call, y.call, count.names=count.names.call, 
+               text.out=text.out, ...)
   }
 
 }

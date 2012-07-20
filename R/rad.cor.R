@@ -1,0 +1,5 @@
+rad.cor <-
+function(...)
+
+  corRead(...)
+

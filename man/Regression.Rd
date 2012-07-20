@@ -14,11 +14,12 @@ Automatically provides a comprehensive regression analysis with graphics from a 
 Default output includes the inferential analysis of the estimated coefficients and model, correlation matrix, sorted residuals and Cook's Distance, and sorted prediction intervals for existing data or new data.  For multiple regression models, also included is an analysis of the fit of all possible model subsets and an analysis of collinearity. The default output also includes three graphs beginning with a histogram of the residuals with superimposed normal and general density curves.  The second graph is a scatterplot of the fitted values with the residuals and the corresponding \code{\link{lowess}} curve. The point corresponding to the largest value of Cook's Distance is labeled accordingly. Also provided, for a model with one predictor variable, is a scatterplot of the data with regression line and confidence and prediction intervals.  For multiple regression models the graph is the scatterplot matrix of the model variables with the \code{\link{lowess}} curve displayed for each constituent scatterplot.  If the model has exactly two predictor variables, a 3D scatterplot about the regression plane is optionally produced.
 
 Can also be called from the more general \code{\link{model}} function.
+
+The resulting scatterplot or scatterplot matrix, when written to a pdf file according to \code{pdf=TRUE}, is named RegScatterplot.pdf or RegScatterMatrix.pdf. If residuals are reported, then the two additional pdf files are named RegResiduals.pdf and RegResidFitted.pdf. Their names and the directory to which they are written are povided as part the console output.
 }
 
 \usage{
-Regression(my.formula, dframe=mydata,
-         digits.d=4, text.width=120, graphics.save=FALSE, 
+Regression(my.formula, dframe=mydata, digits.d=4, text.width=120, 
          brief=FALSE, explain=FALSE, show.R=FALSE,
          colors=c("blue", "gray", "rose", "green", "gold", "red"), 
 
@@ -29,7 +30,9 @@ Regression(my.formula, dframe=mydata,
          scatter.coef=FALSE, scatter.3d=FALSE,
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
-         X5.new=NULL, \ldots)
+         X5.new=NULL,
+
+         pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
 
 reg(my.formula, \ldots) 
 
@@ -48,12 +51,10 @@ reg.explain(my.formula, explain=TRUE, \ldots)
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
   \item{text.width}{Width of the text output at the console.}
-  \item{graphics.save}{If \code{TRUE}, save graphics output as a pdf file, otherwise, by
-        default, write graphics to the standard graphics output window.}
   \item{brief}{Extent of displayed results.}
   \item{explain}{Off by default, but if set to \code{TRUE} then brief labels of different
         sections of output are replaced by more complete explanations of the output.}
-  \item{show.R}{Display the R instructions that yielded the lessR output, albeit without
+  \item{show.R}{Display the R instructions that yielded the \code{lessR} output, albeit without
         the additional formatting of the results such as combining output of different 
         functions into a table.}
   \item{colors}{Sets the color palette for the resulting graphics.}
@@ -92,6 +93,9 @@ reg.explain(my.formula, explain=TRUE, \ldots)
         and corresponding prediction intervals are calculated.}
   \item{X5.new}{Values of the fifth listed predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
+  \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
+  \item{pdf.width}{Width of the pdf file in inches.}
+  \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 
 }
 
@@ -106,7 +110,7 @@ The basic analysis successively invokes several standard R functions beginning w
 The default analysis provides the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, correlation matrix of the model's variables, analysis of residuals and influence as well as the confidence and prediction intervals for each observation in the model. Also provided, for multiple regression models, collinearity analysis of the predictor variables and adjusted R-squared for the corresponding models defined by each possible subset of the predictor variables. Because the results of the initial call to the linear model function, \code{\link{lm}}, are available after \code{reg} has completed in the R object \code{lm.out}.
 
 DATA FRAME\cr
-The name \code{mydata} is by default provided by the \code{\link{rad}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{dframe} option if the name is not the default \code{mydata}.
+The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{dframe} option if the name is not the default \code{mydata}.
 
 GRAPHICS\cr
 At least three default graphs are provided, and a fourth graph is provided for models with two predictor variables. By default the graphs are written to separate graphics windows (which may overlap each other completely, in which case move the top graphics windows). Or, the \code{graphics.save} option may be invoked to save the graphs to a single pdf file called \code{regOut.pdf}. The directory to which the file is written is displayed on the console text output.
@@ -136,9 +140,11 @@ The text output is organized to provide the most relevant information while at t
 INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{reg} is finished with a normal termination, the options are re-set to their values before the \code{reg} function began executing.
 
+COLOR THEME\cr
+A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}. 
+
 VARIABLE LABELS\cr
-A labels data frame named \code{mylabels}, obtained from the \code{\link{rad}} function, can list the label for some or all of the variables in the data frame that contains the data for the analysis.  If this labels data frame exists, then the corresponding variable labels are listed next to the variable name at the beginning of the output.
-}
+Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.}
 
 \references{
 Fox, J., & Weisberg, S. (2011). An R companion to applied regression (Second ed.). Thousand Oaks CA: Sage.
@@ -180,6 +186,8 @@ Regression(Y ~ X1, res.row=8, res.sort="rstudent", digits.d=8, pred=FALSE)
 # Multiple regression model
 # Provide all default analyses
 Regression(Y ~ X1 + X2)
+# Save the three plots as pdf files 4 inches square
+Regression(Y ~ X1, pdf=TRUE, pdf.width=4, pdf.height=4)
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values and the corresponding prediction intervals

@@ -1,7 +1,6 @@
 \name{Density}
 \alias{Density}
 \alias{den}
-\alias{color.density}
 
 \title{Density Curves from Data plus Histogram}
 
@@ -23,11 +22,10 @@ Density(x, dframe=mydata,
 
          cex.axis=.85, col.axis="gray30", col.ticks="gray30",
          x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
-         x.min=NULL, x.max=NULL, band=FALSE, \ldots)
+         x.min=NULL, x.max=NULL, band=FALSE,
+         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 den(\ldots)
-
-color.density(\ldots)
 }
 
 \arguments{
@@ -65,6 +63,9 @@ color.density(\ldots)
   \item{x.max}{Largest value of the variable x plotted on the x-axis.}
   \item{band}{If \code{TRUE}, add a rug plot, a direct display of density in the form of a
         narrow band beneath the density curve}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.width}{Width of the pdf file in inches.}
+  \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for graphics as defined processed 
       by \code{\link{plot}}, including \code{xlim}, \code{ylim}, \code{lwd} and \code{cex.lab}, 
       \code{col.main}, \code{density}, and, for the general density calculations, can set 
@@ -73,21 +74,35 @@ color.density(\ldots)
 
 
 \details{
+OVERVIEW\cr
 Results are based on the standard \code{\link{dnorm}} function and \code{\link{density}} R functions for estimating densities from data, as well as the \code{\link{hist}} function for calculating a histogram.  Colors are provided by default and can also be specified.
 
-The input data frame has the assumed name of mydata.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name without having to invoke the mydata$name notation. Any missing data values are removed and the effective sample size and number of missing values reported.
-
-By default, the histogram is displayed in a light gray, as a background for the normal and/or general estimated density curves, though this color can be changed. Using the \code{alpha} option for the \code{\link{rgb}} function, the density curves are by default plotted with transparent colors to facilitate comparison to the background histogram. 
-
-The default histogram is the same as the default provided by the \code{\link{hist}} function itself. The default can be modified with the \code{bin.start} and \code{bin.width} options.  Use the \code{\link{Histogram}} function in this package for more control over the parameters of the histogram.
+The default histogram can be modified with the \code{bin.start} and \code{bin.width} options.  Use the \code{\link{Histogram}} function in this package for more control over the parameters of the histogram.
 
 The limits for the axes are automatically calculated so as to provide sufficient space for the  density curves and histogram, and should generally not require user intervention.  Also, the curves are centered over the plot window so that the resulting density curves are symmetric even if the underlying histogram is not.  The estimated normal curve is based on the corresponding sample mean and standard deviation.
 
 If \code{x.pt} is specified, then \code{type} is set to general and \code{y.axis} set to \code{TRUE}.
 
-A labels data frame named \code{mylabels}, obtained from the \code{\link{Read}} function, can list the label for some or all of the variables in the data frame that contains the data for the analysis.  If this labels data frame exists, then the corresponding variable label is listed as the title of the resulting plot, unless a specific label is listed with the \code{main} option. 
+DATA\cr
+If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
 
-The default background color of \code{col.bg=ghostwhite} provides a very mild cool tone with a slight emphasis on blue. The entire color theme can be specified at the system level with the \code{lessR} function \code{\link{set}} using the \code{colors} option.  Or, use the same option for \code{Plot} to set the color theme just for one scatterplot. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in the \code{\link{help}} function for \code{\link{set}}. 
+COLOR THEME\cr
+Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}. 
+
+VARIABLE LABELS\cr
+Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
+
+PDF OUTPUT\cr
+Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+
+ONLY VARIABLES ARE REFERENCED\cr
+The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+
+\code{    > Density(rnorm(50))   # does NOT work}
+
+Instead, do the following:
+\preformatted{    > Y <- rnorm(50)   # create vector Y in user workspace
+    > Density(Y)     # directly reference Y}
 }
 
 
@@ -108,6 +123,9 @@ Density(y)
 
 # short name
 den(y)
+
+# save the density plot to a pdf file
+Density(y, pdf.file="MyDensityPlot.pdf")
 
 # suppress the histogram, leaving only the density curves
 # specify x-axis label per the xlab option for the plot function

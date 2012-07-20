@@ -52,7 +52,7 @@ function(my.formula, dframe=mydata,
   # ANOVA
   #   all analysis done on data in model construct av.out$model
   #   this model construct contains only model vars, with Y listed first
-  av.out <<- aov(my.formula, data=dframe)
+  assign("av.out", aov(my.formula, data=dframe), pos=.GlobalEnv)
 
   n.keep <- nrow(av.out$model)
     

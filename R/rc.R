@@ -1,5 +1,0 @@
-rc <-
-function(...)
-
-  RunChart(...)
-

@@ -1,25 +1,37 @@
 Correlation <-
-function(x, y, dframe=mydata, ...) {
+function(x, y, dframe=mydata,
+         miss=c("pairwise", "listwise", "everything"),
+         show.n=NULL, brief=FALSE, n.cat=getOption("n.cat"), digits.d=NULL,
+         colors=c("blue", "gray", "rose", "green", "gold", "red"),
+         heat.map=TRUE, main=NULL, bottom=3, right=3,
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+# x can be a data frame, or x can be a variable in a specified data frame
 
+  miss <- match.arg(miss)
 
-  is.df <- FALSE  # is data frame
+  if (missing(colors)) 
+    colors <- getOption("colors")
+  else
+    colors <- match.arg(colors)
+
+  is.dtfrm <- FALSE  # is data frame
 
   if (missing(x)) {
     x.name <- ""  # in case x is missing, i.e., data frame mydata
-    is.df <- TRUE
+    is.dtfrm <- TRUE
     dframe <- eval(substitute(mydata))
   }
   else {
-    # get actual variable name before potential call of dframe$x
+    # get actual variable name or get data frame name
     x.name <- deparse(substitute(x)) 
     options(xname = x.name)
     if (exists(x.name, where=1)) if (is.data.frame(x)) {
-       is.df <- TRUE
+       is.dtfrm <- TRUE
        dframe <- x
     }
   }
 
-  if (!is.df) {
+  if (!is.dtfrm) {
 
     dframe.name <- deparse(substitute(dframe))
 
@@ -58,13 +70,19 @@ function(x, y, dframe=mydata, ...) {
       if (in.global) y.call <- y 
       else y.call <- eval(substitute(dframe$y))
     }
-    else y.call <- NULL
+    else {
+      y.call <- NULL
+      if (is.null(show.n))
+        if (nrow(dframe) <= 15) show.n <- TRUE else show.n <- FALSE
+    }
 
   }  # x not data frame
 
+  if (is.dtfrm) 
+      .cr.data.frame(dframe, miss, show.n=show.n, n.cat, digits.d,
+                     heat.map, colors, main, bottom, right, 
+                     pdf.file, pdf.width, pdf.height, ...) 
 
-  if (is.df) cr.data.frame(dframe, ...) 
-
-  else cr.default(x.call, y.call, ...) 
+  else .cr.default(x.call, y.call, brief, ...) 
 
 }

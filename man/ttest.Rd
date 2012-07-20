@@ -9,7 +9,7 @@
 \description{
 Abbreviation: \code{tt}, \code{tt.brief}
 
-Provides enhanced output from the standard \code{\link{t.test}} function applied to the analysis of the mean of a single variable or the independent groups analysis of the mean difference, from either data or summary statistics. The data can be in the form of a data frame or two separate vectors of data, one for each group. This output includes the basic descriptive statistics, analysis of assumptions and the hypothesis test and confidence interval. For two groups the output also includes the pooled or within-group standard deviation, and the standardized mean difference or Cohen's \emph{d} and its confidence interval. The output also includes the inferential analysis based on the Welch test which does not assume equal variances. The output from data for two groups introduces the \acronym{ODDSMD} plot, which displays the Overlapping Density Distributions of the two groups as well as the means, mean difference and Standardized Mean Difference. The plot also includes the results of the descriptive and inferential analyses.
+Provides enhanced output from the standard \code{\link{t.test}} function applied to the analysis of the mean of a single variable or the independent groups analysis of the mean difference, from either data or summary statistics. The data can be in the form of a data frame or two separate vectors of data, one for each group. This output includes the basic descriptive statistics, analysis of assumptions and the hypothesis test and confidence interval. For two groups the output also includes the analysis for both with and without the assumption of homogeneous variances, the pooled or within-group standard deviation, and the standardized mean difference or Cohen's \emph{d} and its confidence interval. The output from data for two groups introduces the \acronym{ODDSMD} plot, which displays the Overlapping Density Distributions of the two groups as well as the means, mean difference and Standardized Mean Difference. The plot also includes the results of the descriptive and inferential analyses.
 
 Can also be called from the more general \code{\link{model}} function.
 }
@@ -19,7 +19,7 @@ ttest(x=NULL, y=NULL, dframe=mydata,
          n = NULL, m = NULL, s = NULL, mu0 = NULL, 
          n1 = NULL, n2 = NULL,  m1 = NULL, m2 = NULL, s1 = NULL, s2 = NULL, 
          Ynm = "Y", Xnm = "X", X1nm = "Group1", X2nm = "Group2", 
-         brief=FALSE, digits.d = NULL, 
+         brief=FALSE, digits.d = NULL, graph=TRUE,
          conf.level = 0.95, mmd = NULL, msmd = NULL, 
          bw1 = "nrd", bw2 = "nrd", \ldots)
 
@@ -55,6 +55,7 @@ smd.t.test(\ldots)
   \item{X2nm}{Value of grouping variable, the level that defines the second group.}
   \item{brief}{Extent of displayed results.}
   \item{digits.d}{Number of decimal places for which to display numeric values. Suggestion only.}
+  \item{graph}{If \code{TRUE}, then display the graph of the overlapping density distributions.}
   \item{conf.level}{Confidence level of the interval, expressed as a proportion.}
   \item{mmd}{Minimum Mean Difference of practical importance, the difference of the
        response variable between two group means. The concept is optional, and only one of mmd
@@ -67,15 +68,15 @@ smd.t.test(\ldots)
 }
 
 \details{
-If \code{n} or \code{n1} are set to values, then the analysis proceeds from the summary statistics, the sample size and mean and standard deviation of each group. Missing data are counted and then removed for further analysis of the non-missing data values.  Otherwise the analysis proceeds from the data, which can be in a data frame with a grouping variable and response variable, or in two data vectors, one for each group.
+If \code{n} or \code{n1} are set to numeric values, then the analysis proceeds from the summary statistics, the sample size and mean and standard deviation of each group. Missing data are counted and then removed for further analysis of the non-missing data values.  Otherwise the analysis proceeds from data, which can be in a data frame, by default named \code{mydata}, with a grouping variable and response variable, or in two data vectors, one for each group.
 
-Following the format and syntax of the standard \code{\link{t.test}} function, the methods for the generic function \code{tt} include formula and default.  The formula method is invoked when the data include a variable that has exactly two values, a grouping variable or factor generically referred to as X, and a numerical response variable, generically referred to as Y. The formula is of the form Y ~ X, with the names Y and X replaced by the actual variable names specific to a particular analysis.  The formula method automatically retrieves the names of the variables and data values for display on the resulting output.
+Following the format and syntax of the standard \code{\link{t.test}} function, the methods for the  \code{ttest} function include formula and default.  The formula method is invoked when the data include a variable that has exactly two values, a grouping variable or factor generically referred to as X, and a numerical response variable, generically referred to as Y. The formula is of the form Y ~ X, with the names Y and X replaced by the actual variable names specific to a particular analysis.  The formula method automatically retrieves the names of the variables and data values for display on the resulting output.
 
-The default method is invoked when the values of the response variable Y are organized into two vectors, the values of Y for each group in the corresponding vector. The vectors must be defined in the user workspace as they are generally of unequal length and so generally not conformable to a data frame. When submitting data in this form, the output is enhanced if the actual names of the variables referred to generically as X and Y, as well as the names of the levels of the factor X, are explicitly provided. 
+The default method is invoked when the values of the response variable Y are organized into two vectors, the values of Y for each group in its corresponding vector. The vectors must be defined in the user workspace as they are generally of unequal length and so generally not conformable to a data frame. When submitting data in this form, the output is enhanced if the actual names of the variables referred to generically as X and Y, as well as the names of the levels of the factor X, are explicitly provided. 
 
-The formula version assumes the data are in a data frame. The input data frame has the assumed name of mydata.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name without having to invoke the mydata$name notation.  The split version of the response variable, that is, its values organized into two vectors, one for each group, are saved in the global environment under the names \code{group1} and \code{group2} for further analysis if desired.
+If the input data frame is named something different than \code{mydata}, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name without having to invoke the mydata$name notation.  The split version of the response variable, that is, its values organized into two vectors, one for each group, are saved in the global environment, the user's workspace, under the names \code{group1} and \code{group2} for further analysis if desired.
 
-This version of \code{tt} provides the inferential analysis for both homogeneity of variance and the Welch test which does not assume homogeneity of variance. Only a two-sided test is provided.  The null hypothesis is a population mean difference of 0.
+The inferential analysis in the full version provides both homogeneity of variance and the Welch test which does not assume homogeneity of variance. Only a two-sided test is provided.  The null hypothesis is a population mean difference of 0.
 
 If computed from the data, the bandwidth parameter controls the smoothness of the estimated density curve.  To obtain a smoother curve, increase the bandwidth from the default value.
 
@@ -85,11 +86,9 @@ The confidence interval of the standardized mean difference is computed by the \
 
 The practical importance of the size of the mean difference is addressed when one of two parameter values are supplied, the minimum mean difference of practical importance, mmd, or the corresponding standardized version, msmd.  The  remaining value is calculated and both values are added to the graph and the console output.
 
-After running \code{tt}, the following statistics are available for further analysis: sample sizes \code{n1} and \code{n2}, sample means \code{m1} and \code{m2}, sample standard deviations, \code{s1} and \code{s2}, plus the within-group or pooled standard deviation, \code{sw}. For example, if the t-test does not achieve significance, then perhaps a power curve is of interest, obtained with the \code{lessR} function \code{\link{ttp}}.  
-
 The number of decimal digits is determined by default from the largest number of decimal digits of the entered descriptive statistics.  The number of decimal digits is then set at that value, plus one more with a minimum of two decimal digits by default.  Or, override the default with the \code{digits.d} parameter.
 
-A labels data frame named \code{mylabels}, obtained from the \code{\link{Read}} function, can list the label for some or all of the variables in the data frame that contains the data for the analysis.  If this labels data frame exists, then the varible label for the response variable and the grouping variable is listed in the text output. 
+A labels data frame named \code{mylabels}, obtained from the \code{lessR} \code{\link{Read}} function, can list the label for some or all of the variables in the data frame that contains the data for the analysis.  If this labels data frame exists, then the varible label for the response variable and the grouping variable is listed in the text output. 
 }
 
 
@@ -134,8 +133,8 @@ ttest(Y ~ X, msmd=.5)
 # variable of interest is in a data frame which is not the default mydata
 # access the data frame in the lessR dat.twogroup data set
 # although data not attached, access the variables directly by their name
-data(dat.twogroup)
-ttest(ShipTime ~ Supplier, dframe=dat.twogroup)
+data(datTwoGroup)
+ttest(ShipTime ~ Supplier, dframe=datTwoGroup)
 
 
 # -------------------------------------------------------
