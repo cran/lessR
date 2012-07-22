@@ -1,4 +1,5 @@
-utils::globalVariables(c("mydata", "mylabels", "mycor", "lm.out", "av.out"))
+if(getRversion() >= "2.15.1") 
+  globalVariables(c("mydata", "mylabels", "mycor", "lm.out", "av.out"))
 
 
 .onAttach <-
