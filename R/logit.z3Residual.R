@@ -1,42 +1,10 @@
-.reg3Residual <-
+.logit3Residual <-
 function(nm, mydframe,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
+         n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          res.sort, res.rows, cooks.cut, colors,
          pdf, pdf.width, pdf.height) {
   
     cat( "\n\n\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
-  
-    if (show.R) {
-      cat(line, sep="")
-      cat(pre, "fitted(model)", sep="", "\n")
-      cat(pre, "resid(model)", sep="", "\n")
-      cat(pre, "rstudent(model)", sep="", "\n")
-      cat(pre, "dffits(model)", sep="", "\n")
-      cat(pre, "cooks.distance(model)", sep="", "\n")
-      cat(line, "\n")
-    }
-    else cat("\n")
-    
-    if (explain) {
-      .dash(68)
-      cat("The identification of observations that have a large residual\n",
-          "and/or undue influence on the estimation of the model helps\n",
-          "detect potential outliers.  Each of the following statistics is\n",
-          "calculated for a single observation (row of data).\n",
-         "\n",          
-          "residual: Value of the response variable ", nm[1], " minus its\n",
-          "    fitted value.\n",
-          "\n",
-          "rstudent: Studentized residual, standardized value of the residual\n",
-          "    from a model estimated without the observation present.\n",
-          "\n",
-          "dffits: The influence of an observation on its own fitted value.\n",
-         "\n",
-          "cooks: Cook's Distance, the aggregate influence of the observation\n",
-          "    on the estimation of the model coefficients.\n", sep="")
-      .dash(68)
-      cat("\n")
-    }
 
     cat("Data, Fitted, Residual, Studentized Residual, Dffits, Cook's Distance\n")
     if (res.sort == "cooks") cat("   [sorted by Cook's Distance]\n")
@@ -49,7 +17,7 @@ function(nm, mydframe,
     .dash(68)
 
     fit <- fitted(lm.out)
-    res <- residuals(lm.out)
+    res <- residuals(lm.out, type="response")
     cook <- cooks.distance(lm.out)
     
     out <- cbind(fit, res, rstudent(lm.out), dffits(lm.out), cook)
@@ -70,17 +38,16 @@ function(nm, mydframe,
     }
     print(out[1:res.rows,], digits=digits.d)
     rm(out)
-  
 
     # frequency distribution of residuals
     if (!pdf) 
       dev.set(which=3)
     else {
-      pdf.file <- "RegResiduals.pdf"
+      pdf.file <- "LogitResiduals.pdf"
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
     }
 
-     .den.main(res, main="Evaluate Normality of Residuals", 
+    .den.main(res, main="Evaluate Normality of Residuals", 
        xlab="Residuals", text.out=FALSE, colors=colors,
        bw="nrd0", type="both",
        bin.start=NULL, bin.width=NULL,
@@ -110,7 +77,7 @@ function(nm, mydframe,
     if (!pdf) 
       dev.set(which=4) 
     else { 
-      pdf.file <- "RegResidFitted.pdf"
+      pdf.file <- "LogitResidFitted.pdf"
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
     }
 

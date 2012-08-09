@@ -51,7 +51,7 @@ function (x=mycor, n.fact, rotate=c("promax", "varimax"), min.load=.2) {
   cat("Copy and paste the following lessR instructions to analyze\n",
       "the model with a confirmatory factor analysis.\n\n", sep="")
 
-  cat("crCFA(\n")
+  cat("corCFA(\n")
   Fac <- integer(length=n.fact)
   n.Fact <- integer(length=n.fact)
   for (i.fact in 1:n.fact) {
@@ -65,7 +65,7 @@ function (x=mycor, n.fact, rotate=c("promax", "varimax"), min.load=.2) {
     cat(paste("  F", as.character(i.fact), "=c(", sep=""))
     if (n.Fact[i.fact] > 0) {
       for (i in 1:n.Fact[i.fact]) {
-        cat(Fac[i], sep="")
+        cat(colnames(x)[Fac[i]], sep="")
         if (i < n.Fact[i.fact]) cat(",")
       }
     }
@@ -86,7 +86,7 @@ function (x=mycor, n.fact, rotate=c("promax", "varimax"), min.load=.2) {
         "from the exploratory factor analysis less than min.load = ", 
         min.load, "\n", "is deleted.\n\n", sep="")
     cat("Deleted items: ")
-    for (i.item in 1:del.count) cat(deleted[i.item], " ", sep="")
+    for (i.item in 1:del.count) cat(colnames(x)[deleted[i.item]], " ", sep="")
     cat("\n")
   }
 

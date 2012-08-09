@@ -13,13 +13,18 @@ function (x=mycor, vars,
       "Or read the correlation matrix with: corRead\n\n")
   }
 
+  # translate variable names into column positions
+  vars.all <- as.list(seq_along(as.data.frame(x)))
+  names(vars.all) <- names(as.data.frame(x))
+  vars.num <- eval(substitute(vars), vars.all, parent.frame())
+
   NVOld <- as.integer(nrow(x))
-  NVC <- as.integer(length(vars))
+  NVC <- as.integer(length(vars.num))
 
   # re-order R matrix
   out <- .Fortran("rflt",
                   R=as.double(as.matrix(x)),
-                  Label=as.integer(as.vector(vars)),
+                  Label=as.integer(as.vector(vars.num)),
                   NVC=NVC,
                   NVOld=NVOld)
 

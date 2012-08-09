@@ -1,6 +1,6 @@
 .cr.data.frame <-
-function(x, miss, show.n, n.cat, digits.d, heat.map, colors,
-         main, bottom, right, 
+function(x, miss, show.n, n.cat, digits.d,
+         heat.map, colors, main, bottom, right, 
          pdf.file, pdf.width, pdf.height, ...)  {
 
   if (!is.null(digits.d) && digits.d<1) {
@@ -16,26 +16,30 @@ function(x, miss, show.n, n.cat, digits.d, heat.map, colors,
   dig.warning <- FALSE
 
   # check for valid numeric variables and get largest decimal digits
+  not.num <- integer(length=ncol(x))
+  i.not <- 0
   for (i in 1:ncol(x)) {
-
-    nu <- length(unique(na.omit(x[,i])))
 
     x.name <- names(x)[i]
     options(xname = x.name)
 
+    nu <- length(unique(na.omit(x[,i])))
     if (is.numeric(x[,i]) && nu <= n.cat) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "\n>>> ", x.name,  " is numeric, but only has ", nu, "<= n.cat =", n.cat,
-          " levels, so treat as a categorical variable.\n",
-          "   To obtain the correlations decrease  n.cat  to specify a ",
-          "lower number of unique values.\n",
-          "   Suggest making this variable a factor with R factor function.\n")
-
+      i.not <- i.not + 1
+      not.num[i.not] <- i
+      cat("\n")
+      cat("\n>>> Note:", x.name,  "is technically numeric, but only has ", 
+          nu, "<= n.cat =", n.cat, " levels,\n",
+         "      so treat as a categorical variable.\n",
+         "    To obtain the correlations decrease  n.cat  to specify a",
+         "lower number\n",
+         "      of unique values, such as with the function: set.\n",
+         "    Perhaps make this variable a factor with R factor function.\n")
     }
 
     if (!is.numeric(x[,i])) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n", 
-          "\n>>> ", x.name,  " is not numeric, so cannot correlate.\n")
+      i.not <- i.not + 1
+      not.num[i.not] <- i
     }
 
     if (is.null(digits.d)) {
@@ -51,6 +55,18 @@ function(x, miss, show.n, n.cat, digits.d, heat.map, colors,
         dig.warning <- TRUE
         max.digits <- 4
       }
+    }
+  }
+
+  if (i.not > 0) {
+    cat("\n>>> Note: The following variables are not numeric and are deleted",
+        "from the analysis.\n\n")
+    for (i in 1:i.not) cat(i, ". ", names(x)[not.num[i]], "\n", sep="")
+    cat("\n")
+    x <- x[, -not.num[1:i.not]]
+    if (is.null(dim(x))) { 
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "A correlation matrix requires at least 2 variables.\n\n")
     }
   }
   
@@ -87,8 +103,8 @@ function(x, miss, show.n, n.cat, digits.d, heat.map, colors,
       if (n.vars <=15) 
         print(n)
       else
-        cat("To view the sample size for each correlation, re-run analysis\n",
-            "with show.n=TRUE\n", sep="")
+        cat("To view the sample size for each correlation coefficient, re-run the\n",
+            "analysis with show.n=TRUE\n", sep="")
       cat("\n")
     }
   }
@@ -98,9 +114,13 @@ function(x, miss, show.n, n.cat, digits.d, heat.map, colors,
     print(myc)
     cat("\n")
   }
-  else cat("\nTo view the correlation matrix enter:  mycor\n\n")
+  else {
+    cat("\nVariables in the correlation matrix:\n")
+    cat(names(x))
+    cat("\n\nTo view the correlation matrix, enter:  mycor\n\n")
+  }
 
-  if (heat.map) {
+  if (heat.map  && ncol(x)>3) {
     if (is.null(main)) main <- "Correlations"
    .corcolors(mycor, n.vars, colors, main, bottom, right, diag=0,
               pdf.file, pdf.width, pdf.height)

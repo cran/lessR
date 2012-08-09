@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{hlp}
 
-R works by entering function names and arguments.  R provides extensive help for each available function based on a function's name, but these names are not apparent to someone who has not memorized them or has access to their definitions.  To alleviate this problem, this help system suggests and briefly explains various function calls regarding a requested topic for statistical analysis.
+R works by entering function names and arguments.  R provides extensive help for each available function based on a function's name, but these names are not apparent to someone who has not memorized the names.  To alleviate this problem, this help system suggests and briefly explains various function calls regarding a requested topic for statistical analysis. The primary call is \code{Help()}, which displays the main help menu in a persistent graphics window, that is, which remains until explicitly closed by the user regardless of additional graphics analyses. Each specific Help window can be called with any of the function names, or their abbreviations displayed on that specific page.
 }
 
 \usage{
@@ -69,6 +69,8 @@ hlp(\ldots)
 
 \code{Regression}: Regression analysis.
 
+\code{Logistic}: Logistic regression analysis.
+
 \code{factor.analysis}: Confirmatory or exploratory factor analysis.
 
 ---
@@ -78,6 +80,10 @@ hlp(\ldots)
 \code{random}: Random number generation.
 
 \code{sample}: Generate random samples.
+
+---
+
+\code{lessR}: lessR manual and list of updates to current version
 }
 
 

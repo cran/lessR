@@ -1,5 +1,0 @@
-listvars <-
-function(...)
-
-  corListVars(...)
-

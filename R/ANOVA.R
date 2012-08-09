@@ -132,7 +132,7 @@ function(my.formula, dframe=mydata,
     cat("\n")
     print(HSD[[1]])
     if (!brief) {
-      .graphwin()
+      .graphwin(1)
       orig.params <- par(no.readonly=TRUE)
       on.exit(par(orig.params))
       par(mar=c(5.1,6.1,4.1,1.5))
@@ -143,7 +143,7 @@ function(my.formula, dframe=mydata,
   }
 
   if (n.pred == 2  &&  !brief) {
-  .graphwin()
+  .graphwin(1)
   interaction.plot(av.out$model[,nm[2]], av.out$model[,nm[3]], 
            av.out$model[,nm[1]],
            xlab=nm[2], ylab=nm[1], trace.label=nm[3])

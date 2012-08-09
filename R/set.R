@@ -14,7 +14,7 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red"),
     options(colors=colors)
   }
 
-  if (!missing(trans.pts)) options(trans=trans.pts)
+  if (!missing(trans.pts)) options(trans.pts=trans.pts)
 
   if (!missing(n.cat)) options(n.cat=n.cat)
 

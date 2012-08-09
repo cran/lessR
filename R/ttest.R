@@ -13,10 +13,17 @@ function(x, y=NULL, ...) {
 
 
   cat("\n")
-  if (missing(y))  no.y <- TRUE
-  else if (is.null(y)) no.y <- TRUE else no.y  <- FALSE
+  if (missing(y))
+    no.y <- TRUE
+  else 
+    if (is.null(y)) no.y <- TRUE else no.y  <- FALSE
   if (is.null(n1) && no.y) two.gp <- FALSE else two.gp <- TRUE
   if (is.null(n) && is.null(n1)) from.data <- TRUE else from.data <- FALSE
+
+  #if (!two.gp) if (is.function(x)) {
+    #cat("\nGot a function here\n")
+#print(eval(substitute(dframe$x)))
+  #}
 
   if (is.null(digits.d)) {
     if (from.data) digits.d <- .max.dd(x)
@@ -35,7 +42,7 @@ function(x, y=NULL, ...) {
   options(digits.d=digits.d)
   if (digits.d > 10) {
     cat("\nThese data contain", digits.d, "significant digits.\n")
-    cat("Perhaps specify less digits to display with the  digits.d  parameter.\n")
+    cat("Perhaps specify less digits to display with the  digits.d  parameter.\n\n")
   }
 
   if (two.gp) {
@@ -112,15 +119,20 @@ function(x, y=NULL, ...) {
   if (from.data && !in.global && !is.frml) .xcheck(x.name, dframe.name, dframe)
     
   # do analysis with tt.default
-  if (in.global) tt.default(x, y, ...)  # two vector form must come from global
-  else
-    if (is.frml) {
-      f <- .tt.formula(x, y, dframe, ...)  # formula
-      x <- f$x;  y <- f$y;  Ynm <- f$Ynm;  Xnm <- f$Xnm;  X1nm <- f$X1nm;  X2nm <- f$X2nm 
-      tt.default(x, y, ...)
-    }
-  else 
-    if (from.data) tt.default(eval(substitute(dframe$x)), Ynm=x.name, ...)  # 1-group
+  if (in.global) {
+    if (is.function(x))  # var names that are R functions get assigned to global 
+      tt.default(eval(substitute(dframe$x)), Ynm=x.name, ...)  # 1-group
+    else 
+      tt.default(x, y, ...)  # two vector form must come from global
+  }
+  else if (is.frml) {
+    f <- .tt.formula(x, y, dframe, ...)  # formula
+    x <- f$x;  y <- f$y;  Ynm <- f$Ynm;  Xnm <- f$Xnm
+    X1nm <- f$X1nm;  X2nm <- f$X2nm 
+    tt.default(x, y, ...)
+  }
+  else if (from.data)
+    tt.default(eval(substitute(dframe$x)), Ynm=x.name, ...)  # 1-group
   else
     tt.default(...)  # analysis from stats
 

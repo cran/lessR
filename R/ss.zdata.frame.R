@@ -13,11 +13,11 @@ function(x, n.cat, ...)  {
     else if (is.factor(x[,i]) || nu <= n.cat) {
       .ss.factor(x[,i], ...)
       if (is.numeric(x[,i]) && nu <= n.cat)
-        cat(">>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
-            "so treat as a categorical variable.\n",
-            "   To obtain the numeric summary, decrease  n.cat  to specify a",
-            "lower number of unique values.\n",
-            "   Suggest making this variable a factor with R factor function.\n")
+    cat("\n>>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
+      "so treat as categorical.\n",
+      "   To obtain the numeric summary, decrease  n.cat  to indicate a lower\n",
+      "   number of unique values such as with function: set.\n", 
+      "   Perhaps make this variable a factor with R factor function.\n")
     }
     else if (is.character(x[,i])) .ss.factor(factor(x[,i]), ...)
     else cat("\n>>> The following type of variable not processed: ", 

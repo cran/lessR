@@ -8,7 +8,7 @@
 \description{
 Abbreviation: \code{ttp}
 
-From one or two sample sizes, and either the within-cell (pooled) standard deviation, or one or two separate group standard deviations, generate and calibrate a power curve for either the one-sample t-test or the independent-groups t-test, as well as ancillary statistics.  Uses the standard R function \code{power.t.test} to calculate power and then the \code{\link{plt}} function in this package to automatically display the annotated power curve with colors.
+From one or two sample sizes, and either the within-cell (pooled) standard deviation, or one or two separate group standard deviations, generate and calibrate a power curve for either the one-sample t-test or the independent-groups t-test, as well as ancillary statistics.  Uses the standard R function \code{power.t.test} to calculate power and then the \code{\link{ScatterPlot}} function in this package to automatically display the annotated power curve with colors.
 
 For both the one and two-group t-tests, power is calculated from a single sample size and single standard deviation. For the two-sample test, the within-group standard deviation is automatically calculated from the two separate group standard deviations if not provided directly. Similarly, the harmonic mean of two separate sample sizes is calculated if two separate sample sizes are provided.
 }
@@ -43,7 +43,7 @@ powercurve.t.test(\ldots)
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\ldots}{Other parameter values, such as \code{lwd} and \code{cex.lab} from \code{\link{plot}}
-        and \code{col.line} and \code{col.bg} from \code{\link{plt}}.}
+        and \code{col.line} and \code{col.bg} from \code{\link{ScatterPlot}}.}
 }
 
 

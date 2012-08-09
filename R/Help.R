@@ -36,7 +36,7 @@ col.rect <- rgb(246, 250, 254, maxColorValue=255)
 
 if (is.null(topic)) {
 
-t0 <- "Help Topics for lessR v2.4"
+t0 <- "Help Topics for lessR v2.5"
 
 fcsv <- bquote(paste(bold("Help(\"data\")"), "  Create a data file from Excel or similar application."))
 frw <- bquote(paste(bold("Help(\"Read\")"), " and ", bold("Help(\"Write\")"), "  Read or write data to or from a file."))
@@ -47,7 +47,7 @@ fsys <- bquote(paste(bold("Help(\"system\")"), "  System level settings, such as
 fhist <- bquote(paste(bold("Help(\"Histogram\")"), "  Histogram, box plot, dot plot, density curve."))
 fbar <- bquote(paste(bold("Help(\"BarChart\")"), "  Bar chart, pie chart."))
 fline <- bquote(paste(bold("Help(\"LineChart\")"), "  Line chart, such as a run chart or time series chart."))
-fplot <- bquote(paste(bold("Help(\"Plot\")"), "  Scatterplot for one or two variables, including a function plot."))
+fplot <- bquote(paste(bold("Help(\"ScatterPlot\")"), "  Scatterplot for one or two variables, a function plot."))
 
 fstat <- bquote(paste(bold("Help(\"SummaryStats\")"), "  Summary statistics for one or two variables."))
 fone <- bquote(paste(bold("Help(\"one.sample\")"), "  Analysis of a single sample of data."))
@@ -55,7 +55,7 @@ fmean <- bquote(paste(bold("Help(\"ttest\")"), "  Compare two groups by their me
 faov <- bquote(paste(bold("Help(\"ANOVA\")"), "  Compare mean differences for many groups."))
 fpwr <- bquote(paste(bold("Help(\"power\")"), "  Power analysis for the t-test."))
 fcor <- bquote(paste(bold("Help(\"Correlation\")"), "  Correlation analysis."))
-freg <- bquote(paste(bold("Help(\"Regression\")"), "  Regression analysis."))
+freg <- bquote(paste(bold("Help(\"Regression\")"), " and ", bold("Help(\"Logit\")"), " Regression analysis, logit analysis."))
 ffac <- bquote(paste(bold("Help(\"factor.analysis\")"), "  Confirmatory and exploratory factor analysis."))
 
 fprob <- bquote(paste(bold("Help(\"prob\")"), "  Probabilities for normal and t-distributions."))
@@ -65,7 +65,7 @@ fpdf <- bquote(paste(bold("Help(\"help.to.pdf\")"), "  Obtain a printable pdf of
 fpck <- bquote(paste(bold("Help(\"lessR\")"), "  lessR manual and list of updates to current version."))
 
 set.up.plot()
-pos1 <- 93; pos2 <- 69; pos3 <- 49; pos4 <- 14; pos5 <- 8
+pos1 <- 93; pos2 <- 69; pos3 <- 49; pos4 <- 14; pos5 <- 7
 text(50,100, label=t0, font=4)
 text(0,pos1, label=fcsv, adj=0)
 text(0,pos1-4, label=frw, adj=0)
@@ -206,7 +206,7 @@ help.more("Read", 34)
 }
 
 
-else if (topic == "library") {
+else if (topic == "library"  ||  topic == "package") {
 t0 <- "Contributed Packages"
 
 f1 <- bquote(paste(bold("install.packages"), "  Download a contributed package."))
@@ -336,18 +336,18 @@ help.more("set", 9)
 }
 
 
-else if (topic == "Histogram"  || topic == "hst") {
+else if (topic %in% c("Histogram", "hst", "BoxPlot", "bx", "DotPlot", "dp", "Density", "dens")) {
 t0 <- "Histogram, etc."
 
 f1 <- bquote(paste(bold("Histogram, hst"), "  Histogram."))
 f2 <- bquote(paste(bold("Density, dens"), "  Density curve over histogram."))
 f3 <- bquote(paste(bold("BoxPlot, bx"), "  Box plot."))
-f4 <- bquote(paste(bold("Plot, plt"), "  Dot plot."))
+f4 <- bquote(paste(bold("DotPlot, dp"), "  Dot plot."))
 
 t1 <-
 "Replace Y in these examples with the actual variable name.
 
-An enhanced histogram, including the default color scheme of \"blue\".
+An enhanced histogram, including the default color theme of \"blue\".
     > Histogram(Y)
 
 Specify a title, labels for the x axis, and the gray scale color scheme.
@@ -362,23 +362,24 @@ Density curve superimposed on the underlying histogram.
 Box plot.
     > BoxPlot(Y)
 
-Dot plot, a scatterplot for one variable.
-    > Plot(Y)"
+Dot plot, a scatterplot of one variable.
+    > DotPlot(Y)
+"
 
-set.up.plot()
+set.up.plot(4)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 text(0,86, label=f3, adj=0)
 text(0,82, label=f4, adj=0)
-lines(c(5,90), c(78,78), col=col.line)
+#lines(c(5,90), c(78,78), col=col.line)
 text(0,45, label=t1, adj=0)
 
 help.more("Histogram", 12)
 }
 
 
-else if (topic == "BarChart"  || topic == "bc") {
+else if (topic %in% c("BarChart", "bc", "PieChart", "pc", "Pareto")) {
 t0 <- "BarChart, PieChart and Pareto Chart"
 
 f1 <- bquote(paste(bold("BarChart, bc"), "  Bar chart of the values of one or more categorical variables."))
@@ -418,7 +419,7 @@ help.more("BarChart", 20)
 }
 
 
-else if (topic == "LineChart"  || topic == "lc") {
+else if (topic %in% c("LineChart", "lc", "linechart")) {
 t0 <- "Line Chart"
 
 f1 <- bquote(paste(bold("LineChart, lc"), "  A line chart, such as a run chart or time series chart."))
@@ -439,7 +440,7 @@ as the size of the margins, the annotations, the line width, etc. These addition
 options are explained in the help files for the R functions par, title, points 
 and lines. 
 
-Also, color themes are available with the colors option, which can be invoked
+Color themes are available with the colors option, which can be invoked
 from a specific call to LineChart or system wide for all graphics output with the 
 function set. In this example, all subsequent graphics output is in gray scale.
     > set(colors=\"gray\")
@@ -456,35 +457,35 @@ help.more("LineChart", 19)
 }
 
 
-else if (topic == "Plot"  || topic == "plt") {
+else if  (topic %in% c("ScatterPlot", "sp", "Plot", "plot", "scatter")) {
 t0 <- "Scatterplot"
 
-f1 <- bquote(paste(bold("Plot, plt"), "  A dot plot for one variable and",
-                                      "  A scatterplot for two variables."))
+f1 <- bquote(paste(bold("ScatterPlot, sp"), "  A scatterplot for one or two variables."))
 
 t1 <-
-"Plot, or plt, can produce a wide range of plots, with access to color
-enhancement. Choices include dot plots, scatter plots and line plots. 
+"ScatterPlot, or sp, generates a scatter plot, for either one or two variables.
+The points have a default transparency, which can be set from completely
+transparent to oblique.  The plot is also with a specific color theme.
 
-This example is the default scatterplot, in color, for variables named X and Y.
-    > Plot(X,Y)
+This example is the default scatterplot for variables named X and Y.
+    > ScatterPlot(X, Y)
 If the values of X are sorted, a function plot is generated instead so that the
 points are not individually displayed and are connected by line segments.
 
-Here a one dimensional scatterplot, that is, a dot chart, is generated, in 
-color, for a variable named Y. 
-    > Plot(Y)
+Here a one dimensional scatterplot, that is, a dot plot, is generated for a
+variable named Y. 
+    > ScatterPlot(Y)
+Can also generate the same plot with the function name of DotPlot or dp.
 
-These graphic functions can access a wide range of graphics parameters, such 
-as the size of the margins, the annotations, the line width, etc. These additional 
-options are explained in the help files for the R functions par, title, points and
-lines. 
+ScatterPlot can also provide a for plotting two variables with different
+symbols and/or colors for each level of a third variable.
+    > ScatterPlot(X, Y, by=Z)
 
-Also, color themes are available with the colors option, which can be invoked
-from a specific call to Plot or system wide for all graphics output with the 
-function set. In this example, all subsequent graphics output is in gray scale.
-    > set(colors=\"gray\")
-    > Plot(X, Y)"
+Color themes are available with the colors option, from a specific call to 
+ScatterPlot or system wide for all graphics output with the function set. In this 
+example, all subsequent graphics output is in gray scale, with no transparency.
+    > set(colors=\"gray\", trans.pts=0)
+    > ScatterPlot(X, Y)"
 
 set.up.plot(1)
 text(50,100, label=t0, font=4)
@@ -492,11 +493,11 @@ text(0,94, label=f1, adj=0)
 #lines(c(5,90), c(90,90), col=col.line)
 text(0,53, label=t1, adj=0)
 
-help.more("Plot", 14)
+help.more("Plot", 12)
 }
 
 
-else if (topic == "SummaryStats"  || topic == "ss") {
+else if  (topic %in% c("SummaryStats", "ss", "standard score", "z-score", "scale")) {
 t0 <- "Summary Statistics"
 
 f1 <- bquote(paste(bold("SummaryStats, ss"), "  Summarize the values of a variable."))
@@ -533,7 +534,7 @@ help.more("SummaryStats", 20)
 }
 
 
-else if (topic == "one.sample") {
+else if (topic %in% c("one.sample", "one sample", "proportion", "prop")) {
 t0 <- "Inference for a Single Variable"
 
 f1 <- bquote(paste(bold("ttest, tt"), "  Inference for a mean."))
@@ -571,7 +572,7 @@ help.more("ttest", 23)
 }
 
 
-else if (topic == "ttest"  || topic == "tt") {
+else if (topic %in% c("ttest", "t-test", "tt")) {
 t0 <- "Compare Two Group Means"
 
 f1 <- bquote(paste(bold("ttest, tt"), "  An enhanced version of t.test to compare two group means."))
@@ -609,18 +610,18 @@ text(0,51, label=t1, adj=0)
 help.more("ttest", 14)
 }
 
-else if (topic == "ANOVA"  || topic == "av") {
+else if (topic %in% c("ANOVA", "anova", "av")) {
 t0 <- "Compare Means of Two or More Groups"
 
 f1 <- bquote(paste(bold("ANOVA, av"), "  Analysis of variance to compare two or more group means."))
 f2 <- bquote(paste(bold("Model, model"), "  ANOVA if explanatory variables are categorical."))
 t1 <-
 "When responses to a variable are organized into exactly two groups, either the 
-t-test function or the lessR analysis of variance function, ANOVA, or simply av,
-can compare the group means. With more than two groups, ANOVA is required. The
-function ANOVA works only in formula mode. Here the numerical response variable
-is named Y and the grouping variable, or factor, is X, which may have more than
-two discrete values.
+t-test function, ttest, or the lessR analysis of variance function, ANOVA, or simply
+av, can compare the group means. With more than two groups, ANOVA is required.
+The function ANOVA works only in formula mode. Here the numerical response
+variable is named Y and the grouping variable, or factor, is X, which may have
+more than two discrete values.
     > ANOVA(Y ~ X)
 or
     > Model(Y ~ X)
@@ -677,7 +678,7 @@ help.more("ttp", 33)
 }
 
 
-else if (topic == "Correlation"  || topic == "cr") {
+else if (topic %in% c("Correlation", "cr", "cor")) {
 t0 <- "Correlation and Related Graphics"
 
 f1 <- bquote(paste(bold("Correlation, cr"), "  Correlations between two or more variables."))
@@ -719,7 +720,7 @@ help.more("Plot", 12)
 }
 
 
-else if (topic == "Regression"  || topic == "reg") {
+else if (topic %in% c("Regression", "regression", "reg")) {
 t0 <- "Linear Models and Regression"
 
 f1 <- bquote(paste(bold("Regression, reg"), "  Regression analysis."))
@@ -761,7 +762,43 @@ help.more("Regression", 9)
 }
 
 
-else if (topic == "factor.analysis") {
+else if (topic %in% c("Logit", "logit", "lgt")) {
+t0 <- "Logit Regression Analysis"
+
+f1 <- bquote(paste(bold("Logit, lgt"), "  Logit regression analysis."))
+f2 <- bquote(paste(bold("Model, model"), "  Logit analysis if a binary response variable."))
+
+t1 <-
+"The function Logit preforms a logit analysis and stores the results in
+in an R object called lm.out, which is available for further analysis. 
+This example specifies a multiple regression model with a response variable
+named Y, with values 0 and 1, and two predictor variables, X1 and X2.
+    > Logit(Y ~ X1 + X2)
+The standard R formula function specifies the model, which uses the tilde, ~,
+to mean 'depends on', and then the plus sign, +, to separate terms.
+
+If the response variable has values of 0 and 1, and all the predictor variables
+are numerical, then Model will, in turn, call the Logit function.
+    > Model(Y ~ X1 + X2)
+The Model function also applies to the analysis of other linear models.
+
+The abbreviated form of the function is lgt, such as
+     > lgt(Y ~ X1 + X2)
+"
+
+set.up.plot(2)
+text(50,100, label=t0, font=4)
+text(0,94, label=f1, adj=0)
+text(0,90, label=f2, adj=0)
+#lines(c(5,90), c(87,87), col=col.line)
+text(0,56, label=t1, adj=0)
+
+help.more("Logit", 30)
+}
+
+
+else if (topic %in% c("factor.analysis", "factor", "corCFA", "cfa", "corEFA", 
+                     "efa", "corScree", "scree")) {
 t0 <- "Confirmatory and Exploratory Factor Analysis"
 
 f1 <- bquote(paste(bold("corCFA, cfa"), "  Confirmatory factor analysis."))
@@ -807,7 +844,7 @@ help.more("cfa", 8)
 }
 
 
-else if (topic == "prob") {
+else if (topic %in% c("prob", "norm", "pt", "qnorm", "qnt.t")) {
 t0 <- "Probabilities for Normal and t-distributions"
 
 f1 <- bquote(paste(bold("prob.norm"), "  Normal distribution probability over a range of values."))
@@ -831,7 +868,7 @@ The quantile functions are the inverse of the probability functions. For a given
 probability or area under the curve, the corresponding quantile is the 
 corresponding value of the distribution, Y or t.
 
-The lessR qnt.t also provides a graph of the cuttoff t-value. Here for  df=24.
+The lessR qnt.t also provides a graph of the cutoff t-value. Here for  df=24.
     > qnt.t(df=24)
     
 Value from the standard normal distribution that cuts off the top 2.5% of the 
@@ -852,7 +889,7 @@ help.more("prob.norm", 11)
 }
 
 
-else if (topic == "random") {
+else if (topic %in% c("random", "rnorm", "rbinom")) {
 t0 <- "Normal and Binomial Random Values"
 
 f1 <- bquote(paste(bold("rnorm"), "  Generate randomly sampled values from a normal distribution."))

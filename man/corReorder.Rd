@@ -39,7 +39,8 @@ reord(\ldots)
 \details{
 Reorder and/or delete variables in the input correlation matrix.  
 
-Explicitly specify the ordering of the specified variables, the items, with a listing of each variable in terms of the ordinal position in the correlation matrix to be analyzed. For convenience, a list of this ordering is obtained from \code{\link{corListVars}}. For the listing of the variables, commas separate consecutive variables and the entire list is specified with the R combine or \code{\link{c}} function, preceded by \code{vars} and an equals sign. For example, if the re-ordered correlation matrix consists of the second, fifth and twenty-first variables in the input correlation matrix, then in the \code{corReorder} function call specify \code{vars=c(2,5,21)}. 
+Define the constituent variables, the items, with a listing of each variable by its name in the correlation matrix. If the specified variables are in consecutive order in the input correlation matrix, the list can be specified by listing the first variable, a colon, and then the last variable.  To specify multiple variables, a single variable or a list, separate each by a comma, then invoke the R combine or \code{\link{c}} function. For example, if the list of variables in the input correlation matrix is from m02 through m05, and the variable Anxiety, then define the list in the \code{corReorder} function call according to \code{vars=c(m02:m05,Anxiety)}. 
+
 
 Or, define the ordering of the variables according to the following algorithm. If no variable list is specified then the variables are re-ordered such that the first variable is that which has the largest sum of squared correlations of all the variables, then the variable that has the highest correlation with the first variable, and so forth.
 
@@ -69,14 +70,14 @@ rownames(mycor) <- colnames(mycor)
 
 # leave only the 3 indicators of the second factor
 #  in reverse order
-corReorder(vars=c(6,5,4))
+corReorder(vars=c(V6,V5,V4))
 
 # reorder the variables according to the ordering algorithm
 corReorder()
 
 # abbreviated form
 # retain only the first three variables
-reord(vars=c(1:3))
+reord(vars=c(V1:V3))
 
 # reorder the variables according to the ordering algorithm
 #  with the 4th variable listed first
