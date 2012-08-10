@@ -76,15 +76,25 @@ function(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"),
 
   }  # x not data frame
 
+  if (!is.df) nu <- length(unique(na.omit(x.call)))
 
   if (is.df) .ss.data.frame(dframe, n.cat, ...) 
 
-  else if (is.numeric(x.call)  ||  is.integer(x.call))
+  else if (is.numeric(x.call)  &&  nu > n.cat)
      .ss.numeric(x.call, y.call, dframe, digits.d, brief, ...)
+
+  else if (is.numeric(x.call) && nu <= n.cat) {
+    cat("\n>>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
+      "so treat as categorical.\n",
+      "   To obtain the numeric summary, decrease  n.cat  to indicate a lower\n",
+      "   number of unique values such as with function: set.\n", 
+      "   Perhaps make this variable a factor with R factor function.\n")
+   .ss.factor(x.call, y.call, brief, digits.d, ...)
+  }
 
   # ordered factors have two attributes, "ordered" and "factor"
   else if (is.factor(x.call))
-     .ss.factor(x.call, y.call, brief, n.cat, digits.d, ...)
+     .ss.factor(x.call, y.call, brief, digits.d, ...)
 
   else if (is.character(x.call))
     if (nlevels(factor(x.call)) < length(x.call)) 
@@ -92,9 +102,10 @@ function(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"),
     else cat("\n Appears to contain unique Names or IDs", "\n")
 
   else {
-    cat("The variable to be analyzed must be numeric or a factor, or have\n")
-    cat("character values that can be converted to a factor, or logical values\n")
-    cat("that can be converted to numerical 0 and 1.\n")
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "The variable to be analyzed must be numeric or a factor, or have\n",
+        "character values that can be converted to a factor, or logical values\n",
+        "that can be converted to numerical 0 and 1.\n")
   }
 
 }

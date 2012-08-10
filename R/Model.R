@@ -26,13 +26,35 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
   if (var.type[1] == "num") {
 
     if (all.preds.num) {  # regression
-      cat("\n")
-      .dash(60)
-      cat("Run Regression analysis to account for response variable ", nm[1], 
-          ".  \n", sep="")
-      .dash(60)
-      cat("\n")
-      Regression(my.formula, dframe, pdf.file=NULL, ...)
+
+      is.bin <- TRUE
+      for (i in 1:n.obs) if (dframe[i,nm[1]]!=0 && dframe[i,nm[1]]!=1) is.bin <- FALSE
+
+      if (is.bin) {
+        cat("\n")
+        .dash(44)
+        cat("Run Logit Regression analysis to account for\n",
+            "binary response variable ", nm[1], ".  \n", sep="")
+        .dash(44)
+        cat("\n")
+        Logit(my.formula, dframe, ...)
+      }
+
+      else if (length(unique(dframe[,nm[1]])) == 2) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "The response variable ", nm[1], " is binary, but can only have values of 0 or 1.\n\n",
+          "Use Recode to transform the existing values to 0's and 1's.\n\n")
+      }
+
+      else {
+        cat("\n")
+        .dash(60)
+        cat("Run Regression analysis to account for response variable ", nm[1], 
+            ".  \n", sep="")
+        .dash(60)
+        cat("\n")
+        Regression(my.formula, dframe, ...)
+      }
     }
 
     else if (all.preds.cat) {
@@ -74,6 +96,8 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
         ANOVA(my.formula, dframe, brief, ...)
       }
     }  # all preds are categorical
+
+    else cat("\nModels with numerical and categorical predictors not currently supported.\n")
 
   }  # dv is numerical
 

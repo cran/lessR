@@ -28,7 +28,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, digits.d, brief,
     col.2t <- rgb(.49,.56,.69, alpha=.5)
 
 # plot: set up coordinate system
-    .graphwin()
+    .graphwin(1)
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
     par(mar=c(3,1.5,8,.4), mgp=c(2,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)

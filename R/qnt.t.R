@@ -9,7 +9,7 @@ if (df < 2) {
       "The parameter  df  must be 2 or larger.\n\n")
 }
 
-.graphwin()
+.graphwin(1)
 orig.params <- par(no.readonly=TRUE)
 on.exit(par(orig.params))
 

@@ -23,7 +23,7 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black",
 
   
   # normal density curve
-  .graphwin()
+  .graphwin(1)
   min.x <- mu-4*sigma
   max.x <- mu+4*sigma
   cuts <- seq(min.x,max.x,sigma)

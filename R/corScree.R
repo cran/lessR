@@ -70,6 +70,10 @@ function (x=mycor,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
          center.line="off", text.out=FALSE, ...)
+   n.dregs <- ceiling(length(ev.diff)/1.35)  # get bottom sequence of ev differences
+   dregs <- numeric(length=n.dregs)
+   for (i in 1:n.dregs) dregs[i] <- ev.diff[length(ev.diff)-(i-1)] 
+   abline(h=mean(dregs), col="gray50", lwd=2)
 
   if (pdf) {
     dev.off()
@@ -77,8 +81,16 @@ function (x=mycor,
     cat("\n\n")
   }
 
-  cat("Eigenvalues of", deparse(substitute(x)), "\n\n")
-  return(round(ev,3))
+  cat("Eigenvalues of", deparse(substitute(x)), "\n")
+  .dash(20)
+  print(round(ev,3))
+
+  cat("\n")
+  cat("Differences of Successive Eigenvalues of", deparse(substitute(x)), "\n")
+  .dash(46)
+  print(round(ev.diff,3))
+
+
 
 }
 

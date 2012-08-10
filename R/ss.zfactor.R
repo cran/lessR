@@ -1,5 +1,5 @@
 .ss.factor <-
-function(x, by=NULL, brief=FALSE, n.cat=getOption("n.cat"), digits.d=NULL, ...)  {
+function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
 
   # get variable labels if exist
   gl <- .getlabels()

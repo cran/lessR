@@ -10,7 +10,7 @@ function(nm, mydframe, my.formula, brief, res.rows,
     if (res.rows > 0) 
       dev.set(which=5) 
     else {
-      .graphwin()  #  just do a scatterplot
+      .graphwin(1)  #  just do a scatterplot
       dev.set(which=3)
   }
   else { 

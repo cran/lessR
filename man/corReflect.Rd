@@ -40,8 +40,8 @@ reflect(\ldots)
 Reflects the specified variables by multiplying each correlation of the variable by -1.
 The original data from which the correlations are computed is unmodified unless the output of the function is written into the input correlation matrix, by default \code{mycor}.
 
-Specify which variables, the items, are to be reflected with a listing of each variable in terms of the ordinal position in the correlation matrix to be analyzed.
-For convenience, a list of this ordering is obtained from \code{\link{corListVars}}.  For the listing of the variables, commas separate consecutive variables and the entire list is specified with the R combine or \code{\link{c}} function, preceded by \code{vars} and an equals sign. For example, if the variables to be reflected consist of the second, fifth and twenty-first variables in the input correlation matrix, then in the \code{corReflect} function call specify \code{vars=c(2,5,21)}. 
+Define the constituent variables, the items, with a listing of each variable by its name in the correlation matrix. If the specified variables are in consecutive order in the input correlation matrix, the list can be specified by listing the first variable, a colon, and then the last variable.  To specify multiple variables, a single variable or a list, separate each by a comma, then invoke the R combine or \code{\link{c}} function. For example, if the list of variables in the input correlation matrix is from m02 through m05, and the variable Anxiety, then define the list in the \code{corReflect} function call according to \code{vars=c(m02:m05,Anxiety)}. 
+
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -65,10 +65,10 @@ colnames(mycor) <- c("V1", "V2", "V3", "V4", "V5", "V6")
 rownames(mycor) <- colnames(mycor) 
 
 # reflect all 3 indicators of the second factor
-corReflect(vars=c(4,5,6))
+corReflect(vars=c(V4,V5,V6))
 
 # abbreviated form
-reflect(vars=c(4,5,6))
+reflect(vars=c(V4,V5,V6))
 }
 
 

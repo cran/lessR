@@ -1,0 +1,5 @@
+sp <-
+function(...)
+
+  ScatterPlot(...)
+

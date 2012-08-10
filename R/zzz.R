@@ -144,7 +144,7 @@ function(...) {
 .opendev <- function(pdf.file, pdf.width, pdf.height) {
 
   if (is.null(pdf.file)) 
-    .graphwin()
+    .graphwin(1)
   else 
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
 
@@ -330,7 +330,7 @@ function(...) {
     palette[4] <- "snow1"
     palette[5] <- "coral3"
     palette[6] <- .maketrans("coral3", trans)
-    palette[7] <- "lightsteelblue"
+    palette[7] <- "coral3"
     palette[8] <- "transparent"
     palette[9] <- "mistyrose1"
   }
@@ -341,7 +341,7 @@ function(...) {
     palette[4] <- rgb(255,250,245, maxColorValue=mc)
     palette[5] <- "goldenrod4"
     palette[6] <- .maketrans("goldenrod4", trans)
-    palette[7] <- "lightsteelblue"
+    palette[7] <- "goldenrod4"
     palette[8] <- "transparent"
     palette[9] <- "moccasin"
   }
@@ -352,7 +352,7 @@ function(...) {
     palette[4] <- rgb(246,255,246, maxColorValue=mc)
     palette[5] <- "darkgreen"
     palette[6] <- .maketrans("darkgreen", trans)
-    palette[7] <- "lightsteelblue"
+    palette[7] <- "darkseagreen4"
     palette[8] <- "transparent"
     palette[9] <- "darkseagreen3"
   }

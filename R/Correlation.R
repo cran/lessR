@@ -1,37 +1,60 @@
 Correlation <-
-function(x, y, dframe=mydata,
+function(x, y, dframe=mydata, # x can be a data frame, or variables in a specified data frame
          miss=c("pairwise", "listwise", "everything"),
          show.n=NULL, brief=FALSE, n.cat=getOption("n.cat"), digits.d=NULL,
          colors=c("blue", "gray", "rose", "green", "gold", "red"),
          heat.map=TRUE, main=NULL, bottom=3, right=3,
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
-# x can be a data frame, or x can be a variable in a specified data frame
 
   miss <- match.arg(miss)
+
+  xx <- deparse(substitute(x))
 
   if (missing(colors)) 
     colors <- getOption("colors")
   else
     colors <- match.arg(colors)
 
-  is.dtfrm <- FALSE  # is data frame
+  is.dframe <- FALSE  # is data frame
 
   if (missing(x)) {
     x.name <- ""  # in case x is missing, i.e., data frame mydata
-    is.dtfrm <- TRUE
+    is.dframe <- TRUE
     dframe <- eval(substitute(mydata))
   }
+
+  else
+    if ( (!grepl(":", xx) && !grepl(",", xx)) && missing(y) ) {   # not a variable(s)
+      if (is.data.frame(x)) {
+      x.name <- deparse(substitute(x)) 
+      options(xname = x.name)
+
+      if (exists(x.name, where=.GlobalEnv)) {
+        dframe <- x
+        is.dframe <- TRUE
+      }
+    }
+  } 
+
   else {
-    # get actual variable name or get data frame name
+
+    # get actual variable name or names
     x.name <- deparse(substitute(x)) 
     options(xname = x.name)
-    if (exists(x.name, where=1)) if (is.data.frame(x)) {
-       is.dtfrm <- TRUE
-       dframe <- x
+
+    all.vars <- as.list(seq_along(dframe))
+    names(all.vars) <- names(dframe)
+    x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
+
+    # if x is a variable list, create subset data frame
+    if (length(x.col) > 1) {
+      dframe <- dframe[, x.col]
+      is.dframe <- TRUE
     }
   }
 
-  if (!is.dtfrm) {
+
+  if (!is.dframe) {
 
     dframe.name <- deparse(substitute(dframe))
 
@@ -78,11 +101,11 @@ function(x, y, dframe=mydata,
 
   }  # x not data frame
 
-  if (is.dtfrm) 
-      .cr.data.frame(dframe, miss, show.n=show.n, n.cat, digits.d,
-                     heat.map, colors, main, bottom, right, 
-                     pdf.file, pdf.width, pdf.height, ...) 
-
-  else .cr.default(x.call, y.call, brief, ...) 
+  if (is.dframe) 
+    .cr.data.frame(dframe, miss, show.n=show.n, n.cat, digits.d,
+                   heat.map, colors, main, bottom, right, 
+                   pdf.file, pdf.width, pdf.height, ...) 
+  else
+    .cr.default(x.call, y.call, brief, ...) 
 
 }

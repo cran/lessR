@@ -1,13 +1,9 @@
-Regression <-
+Logit <-
 function(my.formula, dframe=mydata, digits.d=4, text.width=120, 
-         brief=FALSE, explain=FALSE, show.R=FALSE,
          colors=c("blue", "gray", "rose", "green", "gold", "red"), 
 
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
-         pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
-         subsets=TRUE, cooks.cut=1, 
-
-         scatter.coef=FALSE, scatter.3d=FALSE,
+         pred=TRUE, pred.all=FALSE, pred.sort=TRUE, cooks.cut=1, 
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL,
@@ -24,7 +20,10 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
  
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
-  pred.sort <- match.arg(pred.sort)
+
+  brief <- FALSE
+  show.R <- FALSE
+  explain <- FALSE
 
   old.opt <- options()
   on.exit(options(old.opt))
@@ -63,16 +62,16 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
   
   if(n.pred > 1) {
     collinear <- TRUE
-    subsets <- TRUE
   }
   else {
     collinear <- FALSE
-    subsets <- FALSE
   }
 
-  if ( scatter.3d && (n.pred)!=2 ) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-       "Can have a 3d scatterplot only with exactly two predictor variables.\n\n")
+  is.bin <- TRUE
+  for (i in 1:n.obs) if (dframe[i,nm[1]]!=0 && dframe[i,nm[1]]!=1) is.bin <- FALSE
+  if (!is.bin) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "The response variable ", nm[1], " can only have values of 0 or 1.\n\n")
   }
   
   if ( !is.null(X1.new) && (n.pred)>5 ) {
@@ -111,82 +110,89 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
     }
   }
 
-  # reg analysis
+  # logit analysis
   #   all analysis done on data in model construct lm.out$model
   #   this model construct contains only model vars, with Y listed first
-  assign("lm.out", lm(my.formula, data=dframe), pos=.GlobalEnv)
+  assign("lm.out", glm(my.formula, data=dframe, family="binomial"),
+         pos=.GlobalEnv)
 
   n.keep <- nrow(lm.out$model)
     
   if (is.null(res.rows)) if (n.keep < 20) res.rows <- n.keep else res.rows <- 20 
   if (res.rows == "all") res.rows <- n.keep  # turn off resids with res.rows=0 call
 
+  
+  cat("\n")
+  if (sys.nframe() == 1) {  # only accurate if not called from model
+    cat("Data Frame: ", mydframe, "\n\n")
+  }
 
-  .reg1Basic(nm, mydframe,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line)
+  for (i in 1:n.vars) {
+    ind <- i
+    .varlist(n.pred, ind, nm[i])
+  }
+  
+  cat("\nNumber of observations (rows) of data: ", n.obs, "\n")
+  cat("Number of observations retained for analysis: ", n.keep, "\n")
+  
+  cat( "\n\n\n", "  BASIC ANALYSIS", "\n\n")
+
+  sm <- summary(lm.out)
+  cat("The Model, Hypothesis Tests\n")
+  print(sm)
+
+  # CIs using profiled log-likelihood
+  ci <- suppressMessages(confint(lm.out))
+  cat("\n\nConfidence intervals from profiled log-likelihoods\n\n")
+  print(ci)
+
+  # CIs using standard errors
+  ci.se <- confint.default(lm.out)
+  cat("\n\nConfidence intervals from standard errors\n\n")
+  print(ci.se)
+
+  # ANOVA
+  av <- anova(lm.out)
+  cat("\n\n")
+  print(av)
+
+  # odds ratios and 95% CI
+  orci <- exp(cbind(OR = coef(lm.out), ci))
+  cat("\n\nOdds ratios and confidence intervals\n\n")
+  print(orci)
   
   # check for all numeric vars  in.data.frame <- TRUE
   numeric.all <- TRUE
   for (i in 1:n.vars) {
-      if (in.data.frame && !is.numeric(dframe[1,which(names(dframe) == nm[i])])) {
-        cat("\n\n\n>>> Note: ", nm[i], "is not a numeric variable.\n")
-        numeric.all <- FALSE
-      }
+    if (in.data.frame && !is.numeric(dframe[1,which(names(dframe) == nm[i])])) {
+      cat("\n\n\n>>> Note: ", nm[i], "is not a numeric variable.\n")
+      numeric.all <- FALSE
     }
-
-  if (relate) .reg2Relations(nm, mydframe,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         cor, collinear, subsets, numeric.all, in.data.frame)
+  }
   
 
   if (res.rows > 0) {  # two plots here
 
     if (!pdf) .graphwin(3)  # set up graphics system
 
-    .reg3Residual(nm, mydframe,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
+    .logit3Residual(nm, mydframe,
+         n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          res.sort, res.rows, cooks.cut, colors,
          pdf, pdf.width, pdf.height)
-   }
- 
-
-  if (pred)
-    prd <- .reg4Pred(nm, mydframe, my.formula, brief, res.rows,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
-         numeric.all, in.data.frame, colors, X1.new, 
-         X2.new, X3.new, X4.new, X5.new)
-   
-  .reg5Plot(nm, mydframe, my.formula, brief, res.rows,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
-         numeric.all, in.data.frame, colors, X1.new, 
-         X2.new, X3.new, X4.new, X5.new, prd$cint, prd$pint,
-         pdf, pdf.width, pdf.height)
-
-
-# ----------
-# References
-# ----------
-
-  if (!brief) {
-    cat( "\n\n", "  REFERENCES", "\n")
-
-    cat("\n",
-        "Function Regression is from David Gerbing's lessR package.\n",
-        "  To obtain the reference: Enter citation(\"lessR\")\n")
-    cat("\n",
-        "Collinearity analysis and 3d scatterplot are from the vif and scatter3d\n",
-        "functions in John Fox's car package.\n",
-        "  To obtain the reference: Enter citation(\"car\")\n")
-    cat("\n",
-        "Best model subset analysis is from Thomas Lumley's leaps function\n",
-        "in his package leaps.\n",
-        "  To obtain the reference: Enter citation(\"leaps\")\n")
-    cat("\n",
-        "All analyses based on R.\n",
-        "  To obtain the reference: Enter citation()\n")
-    cat("\n")
   }
-  
+ 
+  if (pred) {
+
+    if (res.rows == 0) .graphwin(1)
+
+    .logit4Pred(nm, mydframe, my.formula, brief, res.rows,
+         n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
+         new.data, pred.sort, pred, pred.all, 
+         numeric.all, in.data.frame, colors, X1.new, 
+         X2.new, X3.new, X4.new, X5.new,
+         pdf, pdf.width, pdf.height)
+  }
+
+  if (pdf) dev.off()
+
 }

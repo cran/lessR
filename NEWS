@@ -1,11 +1,93 @@
 NEWS
 
 Update History for Package 'lessR'
+-------------------------------------------------------------------------
+
+
+
+>>>>>> Changes for lessR version 2.5 (2012-08-09)} <<<<<<
+
+
+-------------------
+New Functions 2.5
+-------------------
+
+Sort
+  sorts the rows of a data frame by the values of specified variables for
+    both numeric variables as well as factors
+
+Transform
+  a modified version of the standard R transform function, but by default
+    saves the revised data frame to the input data frame and provides
+    feedback and information regarding the transformation(s)
+
+Subset
+  a modified version of the standard R subset function, but by default
+    saves the revised data frame to the input data frame and provides
+    feedback and information regarding the changes to the data frame
+
+Logit
+  logit analysis, a wrapper for the standard R glm function with
+    family=binomial plus related functions such as summary and predict
+
+
+-------------
+Updates 2.5
+-------------
+
+corCFA, corReflect, corReorder
+  variables are now specified by their names instead of by their ordinal
+    position in the correlation matrix
+
+corEFA
+  to match the change in specifying variables in corCFA, the derived
+    confirmatory model is now written in terms of variable names
+
+corScree
+  on the graph of the differences of successive eigenvalues, a horizontal
+    line is drawn to better highlight the "scree"
+
+Correlation
+  now can provide a list of variables from the input data frame instead
+    of having to first separately create the subset data frame 
+  now non-numeric variables are now automatically deleted from a submitted
+    data frame or variable list with the analysis proceeding
+
+Recode
+  a list of variables instead of just one variable may now be recoded
+  missing data entries may now be recoded to valid values
+  specified valid values may now be recoded to missing values
+
+Scatterplot
+  original function Plot, abbreviated plt, was based on R function plot, 
+    which did a scatter plot of two variables and also also did a line chart
+    for one variable, now only 1 and 2 dimensional scatter plots are done, 
+    so function renamed accordingly, where a 1-D scatter plot is a dot plot
+
+Help
+  each help page can now be invoked with a variety of key words, which
+    usually include the full and abbreviated names of each function
+    described on that help page
+
+
+---------------
+Bug Fixes 2.5
+---------------
+
+SummaryStats
+  now recognizes n.cat to treat numeric variables as categorical if the
+    number of unique values is less than or equal to n.cat
+
+corCFA
+  when default sort option on, sometimes items were not sorted properly
+
+set
+  the transparency level of plotted points in ScatterPlot now works
 
 
 
 
->>>>>> Changes for lessR version 2.4 (2012-??-??)} <<<<<<
+>>>>>> Changes for lessR version 2.4 (2012-07-21)} <<<<<<
 
 
 -------------------
@@ -20,33 +102,33 @@ mycor by default, instead of the data matrix from which the correlations
 are computed. Each function that outputs correlations also generates a
 heat map of the output matrix.
 
-crCFA
+corCFA
   confirmatory factor analysis and item analysis for multiple indicator
   measurement models from an input correlation matrix
 
-crEFA
+corEFA
   exploratory factor analysis based on R factanal function, though also
   provides for a multiple indicator measurement model based on the
-  exploratory analysis and the crCFA code for which to analyze the model
+  exploratory analysis and the corCFA code for which to analyze the model
 
-crList
+corList
   list the ordinal position of each variable in the input correlation matrix
   to facilitate using the other correlational routines
 
-crProp
+corProp
   calculate proportionality coefficients from an input correlation matrix,
   used to identify items that are indicators of the same factor
 
-crRead
+corRead
   read an input correlation, or other square, matrix
 
-crReflect
+corReflect
   reflect specified variables in an input correlation matrix
 
-crReorder
+corReorder
   re-order the specified variables in the input correlation matrix
 
-crScree
+corScree
   eigenvalue plot and plot of differences of successive eigenvalues to help
   determine the number of factors
 
@@ -63,7 +145,7 @@ System wide
     due to the customized graphics system that allows the Help window
     to persist across analyses
   Cutoff value to interpret a numeric variable as categorical now called
-    n.cat instead of ncut, and is implemented system wide with the 
+    n.cat instead of n.cut, and is implemented system wide with the 
     set function
 
 Correlation

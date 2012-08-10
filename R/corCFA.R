@@ -1,8 +1,11 @@
 corCFA <- 
 function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
+
          main=NULL, heat.map=TRUE, bottom=3, right=3, 
          colors=c("blue", "gray", "rose", "green", "gold", "red"),
+
          pdf.file=NULL, pdf.width=5, pdf.height=5,
+
          F1=NULL, F2=NULL, F3=NULL, F4=NULL, F5=NULL,
          F6=NULL, F7=NULL, F8=NULL, F9=NULL, F10=NULL,
          F11=NULL, F12=NULL) {
@@ -16,16 +19,31 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
   }
 
   NVOld <- as.integer(nrow(x))
-
   NFmax <- 12
 
-  # set Label equal to the item Labels in the analysis
-  Label <- c(F1,F2,F3,F4,F5,F6,F7,F8,F9,F10,F11,F12)
+  # translate variable names into column positions
+  vars.all <- as.list(seq_along(as.data.frame(x)))
+  names(vars.all) <- names(as.data.frame(x))
+
+  F1n <- eval(substitute(F1), vars.all, parent.frame())
+  F2n <- eval(substitute(F2), vars.all, parent.frame())
+  F3n <- eval(substitute(F3), vars.all, parent.frame())
+  F4n <- eval(substitute(F4), vars.all, parent.frame())
+  F5n <- eval(substitute(F5), vars.all, parent.frame())
+  F6n <- eval(substitute(F6), vars.all, parent.frame())
+  F7n <- eval(substitute(F7), vars.all, parent.frame())
+  F8n <- eval(substitute(F8), vars.all, parent.frame())
+  F9n <- eval(substitute(F9), vars.all, parent.frame())
+  F10n <- eval(substitute(F10), vars.all, parent.frame())
+  F11n <- eval(substitute(F11), vars.all, parent.frame())
+  F12n <- eval(substitute(F12), vars.all, parent.frame())
+
+  Label <- c(F1n,F2n,F3n,F4n,F5n,F6n,F7n,F8n,F9n,F10n,F11n,F12n)
 
   # get NF, number of factors
   NF <- 0
   for (i in 1:NFmax) {
-    fnum <- eval(parse(text=paste("F", toString(i),sep="")))
+    fnum <- eval(parse(text=paste("F", toString(i), "n", sep="")))
     if (!is.null(fnum)) NF <- NF + 1
   }
 
@@ -35,7 +53,7 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
   NItems <- 0
   for (i in 1:NF) {
     LblCut[i,1] <- NItems + 1
-    cFac <- eval(parse(text=paste("F", toString(i),sep="")))
+    cFac <- eval(parse(text=paste("F", toString(i), "n", sep="")))
     if (length(cFac) == 0) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Factor Number ", i, " has no items.\n",
@@ -154,13 +172,19 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
   # --------------------------------------------------------
   # Sort within each group by the group factor loading
   if (sort) {
-    srt <- .Fortran("srt",
-                    R=as.double(as.matrix(out$R)),
-                    Label=as.integer(as.vector(Label)),
-                    LblCut=as.integer(as.matrix(LblCut)),
-                    NItems=as.integer(NItems),
-                    NF=as.integer(NF))
-    Label <- srt$Label
+
+    # get new ordering, factor by factor
+    pt <- numeric(length=NItems)
+    newLabel <- numeric(length=NItems)
+    for (ifac in 1:NF) {
+      n1 <- LblCut[ifac,1]
+      n2 <- LblCut[ifac,2]
+      irow <- NItems + ifac
+      for (j in n1:n2) pt[j] <- out$R[irow, j]
+      o <- order(pt[n1:n2], decreasing=TRUE)
+      for (i in 1:(n2-n1+1)) newLabel[n1-1+i] <- Label[n1-1+o[i]]
+    }
+    Label <- newLabel
 
     # re-order R matrix
     out <- .Fortran("rrdr",
@@ -235,10 +259,10 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
 
   cat('Indicator Analysis\n')
   .dash(75)
-  cat(' Fac', ' Indi', '  Pat', '   Unique',
-     '  Factors with which an indicator correlates too\n')
-  cat(' tor', ' cator', ' tern', '   ness',
-      '   highly, and other indicator diagnostics.\n')
+  cat('Fac', ' Indi', '  Pat', '   Unique',
+     ' Factors with which an indicator correlates too\n')
+  cat('tor', ' cator', ' tern', '   ness',
+      '  highly, and other indicator diagnostics.\n')
   .dash(75)
 
   for (IFac in 1:NF) {
@@ -258,21 +282,21 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
           }
         }
         if (NBad > MaxBad) NBad <- MaxBad
-        cat(.fmtc(Fnm,3), .fmti(Label[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8))
+        cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8))
         cat("    ")
         if (NBad > 0) for (IBad in 1:NBad) cat(paste("F",Bad[IBad]," ",sep=""))
       }
 
       else if (Lam <= 0)
-        cat(.fmtc(Fnm,3), .fmti(Label[Item],4), .fmt(Lam,3,8), '   xxxx ',
+        cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), '   xxxx ',
          '   ** Negative Loading on Own Factor **')
 
       else if (Unique <= 0) {
         if (LblCut[IFac,2]-LblCut[IFac,1] > 0)
-          cat(.fmtc(Fnm,3), .fmti(Label[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
+          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
            '   ** Improper Loading **')
         else
-          cat(.fmtc(Fnm,3), .fmti(Label[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
+          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
            '   ** Factor Defined by Only One Item **')
       }
 
@@ -287,7 +311,9 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
   # --------------------------------------------------------
   # Solution
   if (iter > 0) {
-    cat('Latent Variable (factor) / Observed Variable (item) Correlations\n')
+    cat('Latent Variable (factor) ')
+    if (item.cor) cat('/ Observed Variable (item) ')
+    cat('Correlations\n')
     .dash(69)
     if (item.cor)
       cat('Item Correlation, correlation of two items with each other\n',

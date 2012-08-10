@@ -14,9 +14,12 @@ Corresponding scale reliabilities are provided, as well as the residuals, the di
 
 \usage{
 corCFA(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
+
          main=NULL, heat.map=TRUE, bottom=3, right=3, 
          colors=c("blue", "gray", "rose", "green", "gold", "red"),
+
          pdf.file=NULL, pdf.width=5, pdf.height=5,
+
          F1=NULL, F2=NULL, F3=NULL, F4=NULL, F5=NULL,
          F6=NULL, F7=NULL, F8=NULL, F9=NULL, F10=NULL,
          F11=NULL, F12=NULL)
@@ -63,7 +66,8 @@ A multiple indicator measurement model defines one or more latent variables, cal
 INPUT\cr
 The analysis requires the correlation matrix of the items and the specification of the groups of items, each of which defines a factor in the multiple indicator measurement model.  The default name for the item correlation matrix is \code{mycor}, which is also the default name of the matrix produced by the \code{lessR} function \code{\link{Correlation}} that computes the correlations from the data, as well as the name of the matrix read by the \code{lessR} function \code{\link{corRead}} that reads the already computed correlation matrix from an external file.
 
-Define the constituent variables, the items, of each factor with a listing of each variable in terms of the ordinal position in the correlation matrix to be analyzed. For convenience, a list of this ordering is obtained from \code{\link{corListVars}}. Each of the up to 12 factors is named F1, F2, etc. For the listing of the variables that define each factor, commas separate consecutive variables and the entire list is specified with the R combine or \code{\link{c}} function, preceded by the factor's name and an equals sign. For example, if the first factor is defined by the second, fifth and twenty-first variables in the input correlation matrix, then define the factor in the \code{corCFA} function call according to \code{F1=c(2,5,21)}. 
+Define the constituent variables, the items, of each factor with a listing of each variable by its name in the correlation matrix. Each of the up to 12 factors is named F1, F2, etc. If the specified variables of a factor are in consecutive order in the input correlation matrix, the list can be specified by listing the first variable, a colon, and then the last variable.  To specify multiple variables, a single variable or a list, separate each by a comma, then invoke the R combine or \code{\link{c}} function, preceded by the factor's name and an equals sign. For example, if the first factor is defined by variables in the input correlation matrix from m02 through m05, and the variable Anxiety, then define the factor in the \code{corCFA} function call according to \code{F1=c(m02:m05,Anxiety)}. 
+ 
 
 OUTPUT\cr
 The result of the analysis is the correlation matrix of the observed variables and resulting factors, plus the reliability analysis of the observed total scores or scale that corresponds to each factor.  Each scale is defined as an unweighted composite.
@@ -89,6 +93,8 @@ The function returns the last correlation matrix specified. If the default \code
 \references{
 Gerbing, D. W., & Hamilton, J. G. (1994). The surprising viability of a simple alternate estimation procedure for the construction of large-scale structural equation measurement models. Structural Equation Modeling: A Multidisciplinary Journal, 1, 103-115.
 
+Hunter, J. E., Gerbing, D. W., & Boster, F. J. (1982). Machiavellian beliefs and personality: The construct invalidity of the Machiavellian dimension. Journal of Personality and Social Psychology, 43, 1293-1305.
+
 Hunter, John. (1970). PACKAGE. Michigan State University.
 }
 
@@ -97,9 +103,10 @@ Hunter, John. (1970). PACKAGE. Michigan State University.
 }
 
 \examples{
-# input correlation matrix of perfect two-factor model
-# Factor Pattern of the 3 items for each Factor: 0.8, 0.6, 0.4
-# Factor-Factor correlation: 0.3
+# perfect input correlation matrix for two-factor model
+# Population Factor Pattern of the 3 items for each respective
+#   Factor: 0.8, 0.6, 0.4
+# Population Factor-Factor correlation: 0.3
 mycor <- matrix(nrow=6, ncol=6, byrow=TRUE,
 c(1.000,0.480,0.320,0.192,0.144,0.096,
   0.480,1.000,0.240,0.144,0.108,0.072,
@@ -113,16 +120,17 @@ rownames(mycor) <- colnames(mycor)
 # the confirmatory factor analysis
 # first three variables with first factor, last three with second
 # default correlation matrix is mycor
-corCFA(F1=c(1:3), F2=c(4:6))
+# two ways to specify the items, with a colon and with commas
+corCFA(F1=V1:V3, F2=c(V6,V5,V4))
 
 # abbreviated form
-cfa(F1=c(1:3), F2=c(4:6))
+cfa(F1=V1:V3, F2=V4:V6)
 
 # produce a gray scale heat map of the item correlations
 #   with communalities in the diagonal
 # all subsequent graphics are in gray scale until changed
 set(colors="gray")
-corCFA(F1=c(1:3), F2=c(4:6))
+corCFA(F1=V1:V3, F2=V4:V6)
 
 # access the lessR data set called datMach4
 data(datMach4)
@@ -132,11 +140,15 @@ mach <- subset(datMach4, select=c(m01:m20))
 cr(mach)
 
 # confirmatory factor analysis of 4-factor solution of Mach IV scale
-corCFA(F1=c(6,7,9,10), F2=c(15,2), F3=c(4,11,16), F4=c(1,5,12,13))
+# Hunter, Gerbing and Boster, 1982
+corCFA(F1=c(m06,m07,m09,m10), F2=c(m15,m02),
+       F3=c(m04,m11,m16), F4=c(m01,m05,m12,m13))
+
 
 # bad model to illustrate indicator diagnostics
-mycor <- corReflect(vars=c(20))
-corCFA(F1=c(6,9,19), F2=c(7), F3=c(4,11,16), F4=c(20,18,12,15))
+mycor <- corReflect(vars=c(m20))
+corCFA(F1=c(m06,m09,m19), F2=c(m07),
+       F3=c(m04,m11,m16), F4=c(m20,m18,m12,m15))
 }
 
 

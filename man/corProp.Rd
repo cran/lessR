@@ -35,8 +35,6 @@ prop(\ldots)
 
 \details{
 Proportionality coefficients indicate the extent of proportionality between two variables.  Perfect proportionality of two variables is consistent with both variables being indicators of the same latent variable or factor and indicators of no other factor.
-
-Define the constituent variables, the items, of each factor with a listing of each variable in terms of the ordinal position in the correlation matrix to be analyzed. For convenience, a list of this ordering is obtained from \code{\link{corListVars}}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

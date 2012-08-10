@@ -8,7 +8,7 @@
 \description{
 Abbreviation: \code{cr, cr.brief}
 
-Correlation coefficient with hypothesis test and confidence interval for two variables, or the correlation matrix for a data frame with more than two variables. The computed coefficient(s) are the standard Pearson's product-moment correlation. For the default missing data technique of pairwise deletion, an analysis of missing data for each computed correlation coefficient is provided, and also a statistical summary of the missing data across all cells. 
+Correlation coefficient with hypothesis test and confidence interval for two variables, or the correlation matrix for a data frame or list of variables from a data frame, generally with more than two variables. The computed coefficient(s) are the standard Pearson's product-moment correlation. For the default missing data technique of pairwise deletion, an analysis of missing data for each computed correlation coefficient is provided, and also a statistical summary of the missing data across all cells. 
 }
 
 \usage{
@@ -51,9 +51,9 @@ cr(\ldots)
 
 
 \details{
-Correlation coefficient with hypothesis test, for a null hypothesis of 0, and confidence interval. Also displays the sample covariance. Based on R functions \code{\link{cor}}, \code{\link{cor.test}}, \code{\link{cov}}.
+When two variables are specified, both x and y, the output is the correlation coefficient with hypothesis test, for a null hypothesis of 0, and confidence interval. Also displays the sample covariance. Based on R functions \code{\link{cor}}, \code{\link{cor.test}}, \code{\link{cov}}.
 
-In place of two variables x and y, x can be a complete data frame. All the variables in the data frame must be numeric. If not, then an appropriate error message is displayed.  Given such a data frame, the correlation matrix of all the variables in the data frame is displayed.
+In place of two variables x and y, x can be a complete data frame, either specified with the name of a data frame, or blank to rely upon the default data frame \code{mydata}. Or, x can be a list of variables from the input data frame. In these situations \code{y} is missing. Any non-numeric variables in the data frame or specified variable list are automatically deleted from the analysis. 
 
 The computed coefficient(s) are the standard Pearson's product-moment correlation. Use the standard R functions \code{\link{cor}} and \code{\link{cor.test}} to obtain Spearman and Kendall correlation coefficients.
 
@@ -72,28 +72,33 @@ Text output to the console provides feedback, and the correlation matrix itself 
 # data
 n <- 12
 f <- sample(c("Group1","Group2"), size=n, replace=TRUE)
-x <- round(rnorm(n=n, mean=50, sd=10), 2)
-y <- round(rnorm(n=n, mean=50, sd=10), 2)
-z <- round(rnorm(n=n, mean=50, sd=10), 2)
-mydata <- data.frame(f,x,y,z)
-rm(f); rm(x); rm(y); rm(z)
+x1 <- round(rnorm(n=n, mean=50, sd=10), 2)
+x2 <- round(rnorm(n=n, mean=50, sd=10), 2)
+x3 <- round(rnorm(n=n, mean=50, sd=10), 2)
+x4 <- round(rnorm(n=n, mean=50, sd=10), 2)
+mydata <- data.frame(f,x1, x2, x3, x4)
+rm(f); rm(x1); rm(x2); rm(x3); rm(x4)
 
 # correlation and covariance
-Correlation(x,y)
+Correlation(x1, x2)
 # short name
-cr(x,y)
+cr(x1, x2)
 # brief form of output
-cr.brief(x,y)
+cr.brief(x1, x2)
 
-# correlation matrix
-# first remove the categorical variable f from mydata
-mydata <- subset(mydata, select=c(x:z))
-# now analyze remaining variables x, y and z
-Correlation(mydata)
+# correlation matrix of the numerical variables in mydata
+Correlation()
+
+# correlation matrix of specified variables in mydata
+Correlation(x1:x3)
 
 # analysis with data not from data frame mydata
 data(attitude)
 Correlation(rating, learning, dframe=attitude)
+
+# analysis of entire data frame that is not mydata
+data(attitude)
+Correlation(attitude)
 }
 
 

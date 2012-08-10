@@ -13,37 +13,42 @@ function (x=mycor, vars=NULL, first=0,
       "Or read the correlation matrix with: corRead\n\n")
   }
 
+  # translate variable names into column positions
+  vars.all <- as.list(seq_along(as.data.frame(x)))
+  names(vars.all) <- names(as.data.frame(x))
+  vars.num <- eval(substitute(vars), vars.all, parent.frame())
+
   NVOld <- as.integer(nrow(x))
 
-  if (is.null(vars)) {
+  if (is.null(vars.num)) {
     out <- .Fortran("ordr",
                     R=as.double(as.matrix(x)),
                     Label=integer(length=NVOld),
                     NVC=as.integer(NVOld),
                     IFirst=as.integer(first))
-    vars <- out$Label
+    vars.num <- out$Label
   }
 
-  NVC <- as.integer(length(vars))
+  NVC <- as.integer(length(vars.num))
 
   # re-order R matrix
   out <- .Fortran("rrdr",
                   R=as.double(as.matrix(x)),
-                  Label=as.integer(as.vector(vars)),
+                  Label=as.integer(as.vector(vars.num)),
                   NVC=NVC,
                   NVOld=as.integer(NVOld))
 
-  # construct full R matrix, with all the original vars
+  # construct full R matrix, with all the original variables
   out$R <- matrix(out$R, nrow=NVOld, ncol=NVOld, byrow=TRUE)
 
-  # if some vars deleted, take just 1st NVC vars
+  # if some variables deleted, take just 1st NVC variables
   if (NVC < NVOld) out$R <- out$R[1:NVC,1:NVC]
 
   # assign names
   nm <- character(length=NVOld)
   nm.new <- character(length=NVC)
   nm <- dimnames(x)[[1]]
-  for (i in 1:NVC) nm.new[i] <- nm[vars[i]]
+  for (i in 1:NVC) nm.new[i] <- nm[vars.num[i]]
   dimnames(out$R) <- list(nm.new, nm.new)
 
   if (heat.map) {
