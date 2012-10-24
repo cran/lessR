@@ -157,12 +157,15 @@ else {
 }
 
 .den.main(Ymean, type="normal", xlab="", 
-       col.fill.nrm="transparent", col.bars=col.fill, 
-       col.grid="transparent", text.out=FALSE,
-       bw="nrd0", colors=colors, 
+       col.fill=col.fill, 
+       col.bg=getOption("col.bg"),
+       col.grid="transparent",
+       text.out=FALSE,
+       bw="nrd0", 
        bin.start=NULL, bin.width=NULL,
-       col.bg=NULL, col.nrm="black", col.gen="black",
-       col.fill.gen=NULL,
+       col.nrm="black", col.gen="black",
+       col.fill.nrm="transparent",
+       col.fill.gen="transparent",
        cex.axis=.85, col.axis="gray30", col.ticks="gray30",
        x.pt=NULL, y.axis=FALSE, main=NULL, 
        x.min=NULL, x.max=NULL, band=FALSE, pdf.file=NULL)

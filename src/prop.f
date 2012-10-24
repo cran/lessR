@@ -50,7 +50,7 @@
       ENDDO
 
 * Normalize cross products, i.e., obtain the proportionality coefs
-*   excluding the diagonal.  If the diagonal is ignored, then
+*   excluding the diagonal.  If the diagonal is ignored, Diagon=0, then
 *   correspondingly reduce the appropriate sums of squares and
 *   cross-products.
 

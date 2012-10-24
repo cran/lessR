@@ -1,20 +1,41 @@
 Write <- 
-function(file="mydata", type=c("csv", "R")) {
+function(ref=NULL, type=c("csv", "R"), dframe=mydata, ...) {
 
   type <- match.arg(type)
 
-  if (!exists("mydata")) 
-    stop("First need to have a data frame called mydata or specify one.")
-  
+  dname <- deparse(substitute(dframe))
+
+  if (!exists(dname, where=.GlobalEnv)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Data frame ", dname, " does not exist\n\n")
+  }
+
   if (type == "csv") {
-    file <- paste(file, ".csv", sep="")
-    write.csv(mydata, file=file, row.names=FALSE)
+    if (is.null(ref))
+      file.dframe <- paste(dname, ".csv", sep="")
+    else {
+       if (grepl(ref, ".csv")) 
+         txt <- ""
+       else
+         txt <- ".csv"
+       file.dframe <- paste(ref, txt, sep="")
+    }
+    write.csv(dframe, file=file.dframe, ...)
   }
+
   else if (type == "R") {
-    file <- paste(file, ".rda", sep="")
-    save(mydata, file=file)
+    if (is.null(ref))
+      file.dframe <- paste(dname, ".rda", sep="")
+    else {
+      if (grepl(ref, ".rda")) 
+        txt <- ""
+      else
+        txt <- ".rda"
+      file.dframe <- paste(ref, txt, sep="")
+    }
+    save(list=dname, file=file.dframe, ...)
   }
   
-  .showfile(file, "mydata contents")
+  .showfile(file.dframe, c(dname, " data frame contents"))
 
 }

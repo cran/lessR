@@ -1,5 +1,5 @@
 # Plot quantiles, tails of normal and t for specified alpha
-qnt.t <- 
+prob.tcut <- 
 function(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
          col.fill="aliceblue", col.tail="palevioletred4",
          col.nrm=gray(.7), col.t=gray(.08), ...) {

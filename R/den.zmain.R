@@ -1,8 +1,8 @@
 .den.main <- 
 function(x, dframe, 
          bw, type, bin.start, bin.width, text.out,
-         col.bg, col.grid, col.bars, col.nrm, col.gen,
-         col.fill.nrm, col.fill.gen, colors, 
+         col.fill, col.bg, col.grid, col.nrm, col.gen,
+         col.fill.nrm, col.fill.gen,
          cex.axis, col.axis, col.ticks,
          x.pt, xlab, main, y.axis, x.min, x.max, band, ...)  {
 
@@ -11,18 +11,14 @@ function(x, dframe,
     type <- "general"
   }
 
-  # color palette based on color theme colors
-  cp <- .clr(colors)
-  if (is.null(col.bars)) col.bars <- cp[9]
-  if (is.null(col.fill.nrm)) col.fill.nrm <- cp[8]
-  if (is.null(col.fill.gen)) col.fill.gen <- cp[8]
-  if (is.null(col.grid)) col.grid <- cp[3]
-  if (is.null(col.bg)) col.bg <- cp[4]
-
-  if (colors == "blue") {
-    col.bars <- "gray86"
+  if (getOption("colors") == "blue") {
+    if (col.fill == getOption("col.fill.pt")) col.fill <- "gray86"
     col.fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
     col.fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
+  }
+  if (getOption("colors") == "orange") {
+    if (col.nrm == "black") col.nrm <- "whitesmoke"
+    if (col.gen == "black") col.gen <- "whitesmoke"
   }
 
   # get variable labels if exist plus axes labels
@@ -98,18 +94,18 @@ function(x, dframe,
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
   
   # plot the histogram
-  plot(h, add=TRUE, freq=FALSE, col=col.bars, border=col.bars)
+  plot(h, add=TRUE, freq=FALSE, col=col.fill, border="transparent")
 
   # plot the normal curve
   if (type == "normal" || type == "both") {
-    if (col.fill.nrm == "transparent") lw <- 1.25 else lw <- 1
+    if (col.fill.nrm == "transparent") lw <- 1.35 else lw <- 1
     polygon(c(x.min,xx,x.max), c(0,d.nrm,0), col=col.fill.nrm, 
             border=col.nrm, lwd=lw)
   }
 
   # plot the general curve
   if (type == "general" || type == "both") {
-    if (col.fill.gen == "transparent") lw <- 1.25 else lw <- 1
+    if (col.fill.gen == "transparent") lw <- 1.35 else lw <- 1
     polygon(d.gen, col=col.fill.gen, border=col.gen, lwd=lw)
   }
 

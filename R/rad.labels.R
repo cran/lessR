@@ -1,6 +1,6 @@
 rad.labels <- 
-function(ref=NULL, data=FALSE, labels=TRUE, ...) {
+function(..., data=FALSE, labels=TRUE)
          
-  Read(ref, data=FALSE, labels=TRUE, ...)
+  Read(..., data=FALSE, labels=TRUE)
 
-}
+

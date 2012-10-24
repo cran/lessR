@@ -1,19 +1,13 @@
 Correlation <-
-function(x, y, dframe=mydata, # x can be a data frame, or variables in a specified data frame
+function(x, y, dframe=mydata, # x can be a data frame, or variables in a data frame
          miss=c("pairwise", "listwise", "everything"),
-         show.n=NULL, brief=FALSE, n.cat=getOption("n.cat"), digits.d=NULL,
-         colors=c("blue", "gray", "rose", "green", "gold", "red"),
-         heat.map=TRUE, main=NULL, bottom=3, right=3,
+         show.n=NULL, brief=FALSE, n.cat=getOption("n.cat"),
+         digits.d=NULL, heat.map=TRUE, main=NULL, bottom=3, right=3,
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
   miss <- match.arg(miss)
 
   xx <- deparse(substitute(x))
-
-  if (missing(colors)) 
-    colors <- getOption("colors")
-  else
-    colors <- match.arg(colors)
 
   is.dframe <- FALSE  # is data frame
 
@@ -102,8 +96,8 @@ function(x, y, dframe=mydata, # x can be a data frame, or variables in a specifi
   }  # x not data frame
 
   if (is.dframe) 
-    .cr.data.frame(dframe, miss, show.n=show.n, n.cat, digits.d,
-                   heat.map, colors, main, bottom, right, 
+    .cr.data.frame(dframe, miss, show.n, n.cat, digits.d,
+                   heat.map, main, bottom, right, 
                    pdf.file, pdf.width, pdf.height, ...) 
   else
     .cr.default(x.call, y.call, brief, ...) 

@@ -1,5 +1,6 @@
 .rec.main <-
-function(x, x.name, new.vars, old, new, ivar, dframe, dframe.name, brief) {
+function(x, x.name, new.var, old, new, ivar, dframe, dframe.name,
+         brief, keep) {
 
   n.values <- length(old)
   n.obs <- nrow(dframe)
@@ -27,24 +28,26 @@ function(x, x.name, new.vars, old, new, ivar, dframe, dframe.name, brief) {
     cat("\nRecoding Specification\n")
     .dash(22)
     for (i in 1:n.values) cat("  ", old[i], "-->", new[i], "\n")
+    cat("\n")
     if (miss.new)
-      cat("\nR represents missing data with a NA for 'not assigned'.\n")
+      cat("\nR represents missing data with a NA for 'not assigned'.\n\n")
+    cat("Number of observations (rows) to recode:", n.obs, "\n")
+    if (is.null(new.var))
+      cat("\nReplace existing values of each specified variable",
+          ", no value for option: new.var\n", sep="")
   }
   cat("\n")
 
   if (!brief) {
     old.unique <- sort(unique(x))
     n.unique <- length(old.unique)
-    cat("\n")
-    cat("---  Recode:", x.name, "---\n")
-    cat("\n")
+    cat("---  Recode:", x.name, "---------------------------------\n")
 
     if (class(x) == "numeric")
       cat("Unique values of", x.name, "in the data:", old.unique, "\n")
     else if (class(x) == "factor")
       cat("Unique values of", x.name, "in the data:", levels(x), "\n")
     cat("Number of unique values of", x.name, "in the data:", n.unique, "\n")
-    cat("\n")
 
     # check to ensure that all values to recode exist in the data
     for (i in 1:n.values) {
@@ -58,15 +61,8 @@ function(x, x.name, new.vars, old, new, ivar, dframe, dframe.name, brief) {
     }
 
     cat("Number of values of", x.name, "to recode:", n.values, "\n")
-    cat("Number of observations (rows) to recode:", n.obs, "\n")
 
-    if (is.null(new.vars))
-      cat("\nReplace existing values of ", x.name,
-          ", no value for option: new.vars\n", sep="")
-    else
-      cat("Recode to variable:", new.vars, "\n")
-
-    cat("\n")
+    if (!is.null(new.var)) cat("Recode to variable:", new.var, "\n")
   } 
 
   if (class(x) == "factor") x <- as.character(x)
@@ -87,14 +83,14 @@ function(x, x.name, new.vars, old, new, ivar, dframe, dframe.name, brief) {
 
   # insert transformation into dframe
   nm <- names(dframe)
-  if (is.null(new.vars))
+  if (is.null(new.var))
     dframe[, which(nm == x.name)] <- new.x
   else {
     dframe <- cbind(dframe, new.x)
-    names(dframe) <- c(nm, new.vars)
+    names(dframe) <- c(nm, new.var)
   }
 
   # write the new data frame
-  assign(dframe.name, dframe, pos=.GlobalEnv)
+  if (keep) assign(dframe.name, dframe, pos=.GlobalEnv)
  
 }

@@ -30,39 +30,55 @@ function(nlines) {
   options(old.opt)
 }
 
+if (missing(topic))
+  topic <- NULL
+else {
+  ischar <- tryCatch(is.character(topic) && length(topic) == 1L, error = identity)
+  if (inherits(ischar, "error")) ischar <- FALSE
+  if (!ischar) {
+    stopic <- deparse(substitute(topic))
+    topic <- stopic
+  }  # else already is a character, i.e., argument entered within quotes
+}
+
+# convert topic to all lowercase letters
+if (!is.null(topic)) for (i in 1:nchar(topic)) {
+  xc <- substr(topic,i,i)
+  if (xc %in% LETTERS) substr(topic,i,i) <- letters[which(LETTERS==xc)] 
+}
 
 col.line <- "lightsteelblue"
 col.rect <- rgb(246, 250, 254, maxColorValue=255)
 
 if (is.null(topic)) {
 
-t0 <- "Help Topics for lessR v2.5"
+t0 <- "Help Topics for lessR v2.6"
 
-fcsv <- bquote(paste(bold("Help(\"data\")"), "  Create a data file from Excel or similar application."))
-frw <- bquote(paste(bold("Help(\"Read\")"), " and ", bold("Help(\"Write\")"), "  Read or write data to or from a file."))
-flib <- bquote(paste(bold("Help(\"library\")"), "  Access libraries of functions called packages."))
-ftrans <- bquote(paste(bold("Help(\"edit\")"), "  Edit data and create new variables from existing variables."))
-fsys <- bquote(paste(bold("Help(\"system\")"), "  System level settings, such as a color theme for graphics."))
+fcsv <- bquote(paste(bold("Help(data)"), "  Create a data file from Excel or similar application."))
+frw <- bquote(paste(bold("Help(Read)"), " and ", bold("Help(Write)"), "  Read or write data to or from a file."))
+flib <- bquote(paste(bold("Help(library)"), "  Access libraries of functions called packages."))
+ftrans <- bquote(paste(bold("Help(edit)"), "  Edit data and create new variables from existing variables."))
+fsys <- bquote(paste(bold("Help(system)"), "  System level settings, such as a color theme for graphics."))
 
-fhist <- bquote(paste(bold("Help(\"Histogram\")"), "  Histogram, box plot, dot plot, density curve."))
-fbar <- bquote(paste(bold("Help(\"BarChart\")"), "  Bar chart, pie chart."))
-fline <- bquote(paste(bold("Help(\"LineChart\")"), "  Line chart, such as a run chart or time series chart."))
-fplot <- bquote(paste(bold("Help(\"ScatterPlot\")"), "  Scatterplot for one or two variables, a function plot."))
+fhist <- bquote(paste(bold("Help(Histogram)"), "  Histogram, box plot, dot plot, density curve."))
+fbar <- bquote(paste(bold("Help(BarChart)"), "  Bar chart, pie chart."))
+fline <- bquote(paste(bold("Help(LineChart)"), "  Line chart, such as a run chart or time series chart."))
+fplot <- bquote(paste(bold("Help(ScatterPlot)"), "  Scatterplot for one or two variables, a function plot."))
 
-fstat <- bquote(paste(bold("Help(\"SummaryStats\")"), "  Summary statistics for one or two variables."))
-fone <- bquote(paste(bold("Help(\"one.sample\")"), "  Analysis of a single sample of data."))
-fmean <- bquote(paste(bold("Help(\"ttest\")"), "  Compare two groups by their mean difference."))
-faov <- bquote(paste(bold("Help(\"ANOVA\")"), "  Compare mean differences for many groups."))
-fpwr <- bquote(paste(bold("Help(\"power\")"), "  Power analysis for the t-test."))
-fcor <- bquote(paste(bold("Help(\"Correlation\")"), "  Correlation analysis."))
-freg <- bquote(paste(bold("Help(\"Regression\")"), " and ", bold("Help(\"Logit\")"), " Regression analysis, logit analysis."))
-ffac <- bquote(paste(bold("Help(\"factor.analysis\")"), "  Confirmatory and exploratory factor analysis."))
+fstat <- bquote(paste(bold("Help(SummaryStats)"), "  Summary statistics for one or two variables."))
+fone <- bquote(paste(bold("Help(one.sample)"), "  Analysis of a single sample of data."))
+fmean <- bquote(paste(bold("Help(ttest)"), "  Compare two groups by their mean difference."))
+faov <- bquote(paste(bold("Help(ANOVA)"), "  Compare mean differences for many groups."))
+fpwr <- bquote(paste(bold("Help(power)"), "  Power analysis for the t-test."))
+fcor <- bquote(paste(bold("Help(Correlation)"), "  Correlation analysis."))
+freg <- bquote(paste(bold("Help(Regression)"), " and ", bold("Help(Logit)"), " Regression analysis, logit analysis."))
+ffac <- bquote(paste(bold("Help(factor.analysis)"), "  Confirmatory and exploratory factor analysis."))
 
-fprob <- bquote(paste(bold("Help(\"prob\")"), "  Probabilities for normal and t-distributions."))
-frnsm <- bquote(paste(bold("Help(\"random\")"), " and ", bold("Help(\"sample\")"), "  Create random numbers or samples."))
+fprob <- bquote(paste(bold("Help(prob)"), "  Probabilities for normal and t-distributions."))
+frnsm <- bquote(paste(bold("Help(random)"), " and ", bold("Help(sample)"), "  Create random numbers or samples."))
 
-fpdf <- bquote(paste(bold("Help(\"help.to.pdf\")"), "  Obtain a printable pdf of all of the contents."))
-fpck <- bquote(paste(bold("Help(\"lessR\")"), "  lessR manual and list of updates to current version."))
+fpdf <- bquote(paste(bold("Help(help.to.pdf)"), "  Obtain a printable pdf of all of the contents."))
+fpck <- bquote(paste(bold("Help(lessR)"), "  lessR manual and list of updates to current version."))
 
 set.up.plot()
 pos1 <- 93; pos2 <- 69; pos3 <- 49; pos4 <- 14; pos5 <- 7
@@ -102,11 +118,11 @@ t0 <- "Data Files"
 
 t1 <-
 "R can read data files in many formats, including the csv format, or
-\"comma separated values\", text files with commas that separate adjacent 
-values in each row. Usually the variable names are in the first row and 
-each remaining row contains the data for one observation, such as one 
-person or one company, etc. Each column contains the data for the 
-corresponding variable.
+\"comma separated values\". A csv file is a text file with commas that
+separate adjacent values in each row. Usually the variable names are in
+the first row and each remaining row contains the data for one observation, 
+such as one person or one company, etc. Each column contains the data
+for the corresponding variable.
 
 MS Excel or other worksheet application can save data to a csv file. 
 All numeric data should be displayed in the General format, so that
@@ -117,11 +133,11 @@ which R will not properly read by default as a numeric data value.
 
 To create the csv file from Excel, under the File option, do a Save As
 and choose the csv format. With the free, open source LibreOffice Calc,
-after the File and then Save As, click the arrow in the left margin
+after the File option and then Save As, click the arrow in the left margin
 towards the bottom labeled File type. From the available options, choose
 Text CSV. Then click the Save button and then the OK button.
 
-Next, read the csv data file into R, [see Help(\"read\")]. However, using a
+Next, read the csv data file into R, [see Help(Read)]. However, using a
 worksheet such as Excel and R are complementary procedures.  R can do 
 extensive data transformations, such as sorting and much else, but so can 
 a worksheet.  Given the simplicity of transferring data from Excel to R, 
@@ -136,7 +152,7 @@ help.more("Read", 10)
 }
 
 
-else if (topic == "Read") {
+else if (topic == "read") {
 t0 <- "Read Data into R and Prepare for Analysis"
 
 f1 <- bquote(paste(bold("Read, rad"), "  Read a data file into an R data frame called mydata, and more."))
@@ -145,8 +161,8 @@ t1 <-
 "Browse for a csv, native R or SPSS data file available on the local computer 
 system.
     > Read()
-Native R files are recognized with a file type of .rda, and SPSS files have the
-.sav file type.
+Native R files have the default file type of .rda, and SPSS files have the
+.sav file type by default.
 
 Or, browse using the short form.
     > rad()
@@ -156,7 +172,7 @@ available on the local computer system, or to a file on the web.
     > rad(\"http://web.pdx.edu/~gerbing/data/twogroup.csv\")
 For web files, include the  http://.
 
-To see how to create a csv data file, enter: Help(\"create.data.file\")
+To see how to create a csv data file, enter: Help(data)
 
 The name of the entire rectangular matrix of data, called a data frame in R, is 
 specifically named \"mydata\" within R when created by the function Read. Make 
@@ -173,7 +189,7 @@ help.more("Read", 22)
 }
 
 
-else if (topic == "Write") {
+else if (topic == "write") {
 t0 <- "Write Contents of Data Frame mydata into a Data File"
 
 f1 <- bquote(paste(bold("Write, wrt"), "  Write a data file into an R data frame called mydata, and more."))
@@ -206,7 +222,7 @@ help.more("Read", 34)
 }
 
 
-else if (topic == "library"  ||  topic == "package") {
+else if (topic %in% c("library", "package", "install", "update"))  {
 t0 <- "Contributed Packages"
 
 f1 <- bquote(paste(bold("install.packages"), "  Download a contributed package."))
@@ -248,21 +264,22 @@ help.more("install.packages", 12)
 }
 
 
-else if (topic == "edit") {
+else if (topic %in% c("edit", "transform", "trans", "factor", "recode", "rec", 
+                      "subset", "subs"))  {
 t0 <- "Edit Data"
 
 f1 <- bquote(paste(bold("fix"), "  Use a graphical interface to edit data values, add or delete variables."))
-f2 <- bquote(paste(bold("transform"), "  Transform the values of a variable with a formula."))
+f2 <- bquote(paste(bold("Transform"), "  Transform the values of a variable with a formula."))
 f3 <- bquote(paste(bold("Recode"), "  Recode the values of a variable by specifying the new values."))
 f4 <- bquote(paste(bold("factor"), "  Explicitly define the values of a categorical variable."))
-f5 <- bquote(paste(bold("subset"), "  Extract a subset of data, variables (columns) and/or rows."))
+f5 <- bquote(paste(bold("Subset"), "  Extract a subset of data, variables (columns) and/or rows."))
 
 t1 <-
 "The R function fix provides a graphical/mouse interface for editing data.
     > fix(mydata)
 
-R function transform creates a new variable, each value of Salary divided by 1000.
-    > mydata <- transform(mydata, SalaryDiv=Salary/1000)
+The lessR function Transform creates a new variable or rewrites over existing.
+    >Transform(SalaryDiv=Salary/1000)
 
 The lessR function Recode, or just rec, changes individual values. Here change
 the values of variable Scores from 1 to 4 to 10, 15, 20, and 25, respectively.
@@ -270,14 +287,14 @@ the values of variable Scores from 1 to 4 to 10, 15, 20, and 25, respectively.
 
 Use the R function factor to create a new variable with non-numeric categories.
 Severity was encoded with a 1 for Mild, 2 for Moderate and 3 for Severe.
-    > mydata <- transform(mydata,
-       Severity.f=factor(Severity, labels=c(\"Mild\", \"Mod\", \"Severe\"), ordered=TRUE))
+    > Transform(ordered=TRUE, Severity.f= 
+             factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
 Here the values of the new variable are also ordered, from Mild to Severe. 
 
-Extract subsets of data from a data frame with the R subset function.
-    > male.data <- subset(mydata, Gender==\"M\", select=c(Years, Salary))
-The new data frame, male.data, is created from mydata, and consists only
-of data for Males limited to the variables Years and Salary.
+Extract subsets of data from a data frame with the lessR Subset function.
+    > Subset(rows=Gender==\"M\", columns=c(Years, Salary))
+The default data frame, mydata, now consists only of data for Males limited to
+the variables Years and Salary. To just display a subset, use function:  locate.
 "
 
 set.up.plot(5)
@@ -297,31 +314,31 @@ help.more("Recode", 7)
 else if (topic == "system") {
 t0 <- "System Level Settings"
 
-f1 <- bquote(paste(bold("set"), "  lessR function to access to some system settings such as a color theme."))
+f1 <- bquote(paste(bold("set"), "  lessR function to access to lessR system settings such as a color theme."))
 f2 <- bquote(paste(bold("options"), "  Standard R function to access system settings."))
 
 t1 <-
 "The lessR function set provides system settings for the lessR system, as well
-as well as some of the more commonly used general R settings. One option is to 
-set the color theme for the graphics functions. Aspects of these plots can be
-customized individually, but the color theme does provides a set of related 
-colors for a graph.  The default color is colors=\"blue\".  Here all
-subsequent graphics are done in gray scale.
+as some of the more commonly used general R settings. One option is to set
+the color theme for the graphics functions. Aspects of these plots can be
+customized individually, but the color theme provides a theme of related colors 
+for a graph.  The default color theme is colors=\"blue\", with other possibilities
+of \"gray\", \"green\",  \"gold\",  \"rose\",  \"red\",  \"dodgerblue\", \"purple\" and \"orange\".
+Here all subsequent graphics are done in gray scale.
     > set(colors=\"gray\") 
-The transparency level of plotted points is set with the trans.pts option.
+The transparency level of bars and plotted points is set with the trans.fill.bar and 
+trans.fill.pt options. Set ghost=\"TRUE\" to get transparent bars against a black
+background with no grid lines.
 
-In data analysis levels of a categorical variable may be encoded with numerical 
-digits, such as 0 for Male and 1 for Female. R is obliged to interpret
-numerical variables as numeric.  One option is to redefine these variables as
-factors (see Help(\"transform\"). Another option is the lessR option n.cat.
+Levels of a categorical variable may be encoded with numerical digits, such 
+as 0 for Male and 1 for Female. R is obliged to interpret numerical variables 
+as numeric.  One option is to redefine these variables as factors [see Help(edit)].
+Another option is the value of the lessR option n.cat.
     > set(n.cat=3)
-Here any variable with just 3 levels or less is interpreted as a categorical
-variable.  The default is 4.
+Here any variable with just 3 unique values or less is interpreted as a categorical
+variable.  The default value of n.cat is 4.
 
-In general, the R options functions provides all system options. For example,
-to turn off the default scientific notation, use the following.
-    > options(scipen=30)
-To see all available options, enter the following.
+To see all available standard R options, enter the following.
     > options()
 "
 
@@ -336,7 +353,8 @@ help.more("set", 9)
 }
 
 
-else if (topic %in% c("Histogram", "hst", "BoxPlot", "bx", "DotPlot", "dp", "Density", "dens")) {
+else if (topic %in% c("histogram", "hst", "hist", "boxplot", "box", "bx", 
+  "dotplot", "dp", "dot", "density", "dens")) {
 t0 <- "Histogram, etc."
 
 f1 <- bquote(paste(bold("Histogram, hst"), "  Histogram."))
@@ -345,24 +363,25 @@ f3 <- bquote(paste(bold("BoxPlot, bx"), "  Box plot."))
 f4 <- bquote(paste(bold("DotPlot, dp"), "  Dot plot."))
 
 t1 <-
-"Replace Y in these examples with the actual variable name.
+"These functions graph a distribution of data values for a continuous variable
+such as Time. Replace Y in these examples with the actual variable name.
 
-An enhanced histogram, including the default color theme of \"blue\".
+An histogram, or hst, based on the current color theme, such as the default \"blue\".
     > Histogram(Y)
 
-Specify a title, labels for the x axis, and the gray scale color scheme.
+Specify a title, a label for the x axis, and the gray scale color theme.
     > Histogram(Y, main=\"My Title\", xlab=\"Y (mm)\", colors=\"gray\")
 
 Specify bins, starting at 60 with a bin width of 10.
     > Histogram(Y, bin.start=60, bin.width=10)
 
-Density curve superimposed on the underlying histogram.
+Density curve superimposed on the underlying histogram, abbreviated den.
     > Density(Y)
 
-Box plot.
+Box plot, abbreviated bx.
     > BoxPlot(Y)
 
-Dot plot, a scatterplot of one variable.
+Dot plot, a scatterplot of one variable, abbreviated dp.
     > DotPlot(Y)
 "
 
@@ -373,13 +392,13 @@ text(0,90, label=f2, adj=0)
 text(0,86, label=f3, adj=0)
 text(0,82, label=f4, adj=0)
 #lines(c(5,90), c(78,78), col=col.line)
-text(0,45, label=t1, adj=0)
+text(0,43, label=t1, adj=0)
 
-help.more("Histogram", 12)
+help.more("Histogram",10)
 }
 
 
-else if (topic %in% c("BarChart", "bc", "PieChart", "pc", "Pareto")) {
+else if (topic %in% c("barchart", "bc", "piechart", "pc", "pareto")) {
 t0 <- "BarChart, PieChart and Pareto Chart"
 
 f1 <- bquote(paste(bold("BarChart, bc"), "  Bar chart of the values of one or more categorical variables."))
@@ -419,7 +438,7 @@ help.more("BarChart", 20)
 }
 
 
-else if (topic %in% c("LineChart", "lc", "linechart")) {
+else if (topic %in% c("linechart", "lc")) {
 t0 <- "Line Chart"
 
 f1 <- bquote(paste(bold("LineChart, lc"), "  A line chart, such as a run chart or time series chart."))
@@ -457,7 +476,7 @@ help.more("LineChart", 19)
 }
 
 
-else if  (topic %in% c("ScatterPlot", "sp", "Plot", "plot", "scatter")) {
+else if  (topic %in% c("scatterplot", "sp", "plot", "scatter")) {
 t0 <- "Scatterplot"
 
 f1 <- bquote(paste(bold("ScatterPlot, sp"), "  A scatterplot for one or two variables."))
@@ -497,7 +516,7 @@ help.more("Plot", 12)
 }
 
 
-else if  (topic %in% c("SummaryStats", "ss", "standard score", "z-score", "scale")) {
+else if  (topic %in% c("summarystats", "ss", "standard score", "z-score", "scale")) {
 t0 <- "Summary Statistics"
 
 f1 <- bquote(paste(bold("SummaryStats, ss"), "  Summarize the values of a variable."))
@@ -610,7 +629,7 @@ text(0,51, label=t1, adj=0)
 help.more("ttest", 14)
 }
 
-else if (topic %in% c("ANOVA", "anova", "av")) {
+else if (topic %in% c("anova", "av")) {
 t0 <- "Compare Means of Two or More Groups"
 
 f1 <- bquote(paste(bold("ANOVA, av"), "  Analysis of variance to compare two or more group means."))
@@ -678,22 +697,22 @@ help.more("ttp", 33)
 }
 
 
-else if (topic %in% c("Correlation", "cr", "cor")) {
+else if (topic %in% c("correlation", "cr", "cor", "corr")) {
 t0 <- "Correlation and Related Graphics"
 
 f1 <- bquote(paste(bold("Correlation, cr"), "  Correlations between two or more variables."))
-f3 <- bquote(paste(bold("Plot, plt"), "  Graphics, generate a scatterplot for two or more variables."))
+f3 <- bquote(paste(bold("ScatterPlot, sp"), "  Graphics, generate a scatterplot for two or more variables."))
 
 t1 <-
 "The lessR function Correlation, or just cr, can compute correlations for a pair 
 of variables. Or for a data frame with all numeric variables, mydata by default, 
 the correlation matrix is computed, with pairwise deletion of missing data by
 default. A heat map of the matrix is also generated. The matrix is displayed 
-and also is stored as mycor such as with a subsequent factor analysis. 
+and also is stored as mycor such as for a subsequent factor analysis. 
 
-The lessR function, Plot, or just plt, displays a scatterplot for two variables
-or a scatterplot matrix for a data frame. Plot for two variables also provides
-the correlation.
+The lessR function, ScatterPlot, or just sp, displays a scatterplot for two variables
+or a scatterplot matrix for a data frame. The corresponding correlation
+or correlation matrix is also displayed.
 
 This example is for the correlation coefficient, inference and scatterplot for two 
 numerical variables, X and Y, both the correlational analysis by itself, and also
@@ -716,11 +735,11 @@ text(0,90, label=f3, adj=0)
 #lines(c(5,90), c(83,83), col=col.line)
 text(0,48, label=t1, adj=0)
 
-help.more("Plot", 12)
+help.more("Correlation", 12)
 }
 
 
-else if (topic %in% c("Regression", "regression", "reg")) {
+else if (topic %in% c("regression", "reg")) {
 t0 <- "Linear Models and Regression"
 
 f1 <- bquote(paste(bold("Regression, reg"), "  Regression analysis."))
@@ -731,13 +750,13 @@ t1 <-
 results in an R object called lm.out, which is available for further analysis. 
 This example specifies a multiple regression model with a response variable
 named Y and two predictor variables, X1 and X2.
-    > Regression(Y ~ X1 + X2)
+     > Regression(Y ~ X1 + X2)
 The standard R formula function specifies the model, which uses the tilde, ~,
 to mean 'depends on', and then the plus sign, +, to separate terms.
 
-If all the variables in the model are numerical, then a call to the function
-Model will, in turn, call the Regression function.
-    > Model(Y ~ X1 + X2)
+If all the variables in the model are numerical, then a call to the general
+function Model will, in turn, call the Regression function.
+     > Model(Y ~ X1 + X2)
 The Model function also applies to the analysis of other linear models.
 
 The output of Regression is comprehensive, including a predictor subset
@@ -762,7 +781,7 @@ help.more("Regression", 9)
 }
 
 
-else if (topic %in% c("Logit", "logit", "lgt")) {
+else if (topic %in% c("logit", "lgt")) {
 t0 <- "Logit Regression Analysis"
 
 f1 <- bquote(paste(bold("Logit, lgt"), "  Logit regression analysis."))
@@ -797,7 +816,7 @@ help.more("Logit", 30)
 }
 
 
-else if (topic %in% c("factor.analysis", "factor", "corCFA", "cfa", "corEFA", 
+else if (topic %in% c("factor.analysis", "fa", "factors", "corcfa", "cfa", "corefa", 
                      "efa", "corScree", "scree")) {
 t0 <- "Confirmatory and Exploratory Factor Analysis"
 
@@ -808,23 +827,22 @@ f4 <- bquote(paste(bold("corScree, scree"), "  Scree plot of eigenvalues of the 
 f5 <- bquote(paste(bold("corReorder, reord"), "  Reorder the variables in the correlation matrix."))
 
 t1 <-
-"Several lessR functions apply to data in the form of a correlation matrix, by
+"Several lessR functions analyze data in the form of a correlation matrix, by
 default called: mycor.  Read mycor with corRead, often with the lessR function,
-to, used to name a string of sequential variables with the same prefix.
+to, used to name a string of sequential variables (items) with the same prefix.
     > corRead(names=to(\"m\",20))
 Here browse for the file that contains the matrix and name the 20 variables
 from m01, m02 to m20. Can also compute mycor with the Correlation function.
 
 The function corCFA, or just cfa, does a confirmatory factor analysis of a
 multiple indicator measurement model. Specify each group of items by listing
-the items according to their sequential position in the matrix, with items
-separated by commas and a sequence specified with a colon.
-    > cfa(F1=c(1:3), F2=c(4,5,6))
-Here the first and last three variables in mycor define two respective factors.
+the factor name, Fn for the nth factor, and the corresponding variable names, 
+with items separated by commas and a sequence specified with a colon.
+    > cfa(F1=V1:V3, F2=V4:V6)
 
-Accomplish exploratory factor analysis with CorEFA, or just efa, which is just a
-call to the standard R function factanal with the matrix mycor. Here extract two
-factors extracted from mycor.  
+Accomplish exploratory factor analysis with CorEFA, or just efa, which relies
+upon a call to the standard R function factanal with the matrix mycor. Here 
+extract two factors from mycor.  
     > efa(n.fact=2)
 The output includes a specification of the multiple indicator measurement model
 derived from the analysis, plus the associated corCFA code to analyze.
@@ -844,13 +862,13 @@ help.more("cfa", 8)
 }
 
 
-else if (topic %in% c("prob", "norm", "pt", "qnorm", "qnt.t")) {
+else if (topic %in% c("prob", "norm", "pt", "qnorm", "prob.tcut")) {
 t0 <- "Probabilities for Normal and t-distributions"
 
 f1 <- bquote(paste(bold("prob.norm"), "  Normal distribution probability over a range of values."))
 f2 <- bquote(paste(bold("pt"), "  Probability for a t-distribution related to a specified t-value."))
 f3 <- bquote(paste(bold("qnorm"), "  Quantile for a normal distribution."))
-f4 <- bquote(paste(bold("qnt.t"), "  Quantile for a t-distribution."))
+f4 <- bquote(paste(bold("prob.tcut"), "  Cutoff values for a t-distribution based on corresponding quantiles."))
 
 
 t1 <-
@@ -866,10 +884,10 @@ Probability and curve for a value between 80 and 120 for, mu=100, sigma=15:
 
 The quantile functions are the inverse of the probability functions. For a given 
 probability or area under the curve, the corresponding quantile is the 
-corresponding value of the distribution, Y or t.
+corresponding value of the distribution, Y or t. Usually for t, get the cutoff value.
 
-The lessR qnt.t also provides a graph of the cutoff t-value. Here for  df=24.
-    > qnt.t(df=24)
+The lessR prob.tcut also provides a graph of the cutoff t-value. Here for  df=24.
+    > prob.tcut(df=24)
     
 Value from the standard normal distribution that cuts off the top 2.5% of the 
 distribution.  Without specifying mu and sigma, the respective defaults are 0 and 1.
@@ -1018,7 +1036,7 @@ cat("   R_help.pdf at: ", workdir, "\n")
 
 
 
-else if (topic == "lessR") {
+else if (topic == "lessr") {
 
   help(package="lessR")
 

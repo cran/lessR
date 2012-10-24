@@ -5,7 +5,7 @@
 \title{Reorder Variables in a Correlation Matrix}
 
 \description{
-Abbreviation: \code{reorder}
+Abbreviation: \code{reord}
 
 Re-arranges the order of the variables in the input correlation matrix.  If no variable list is specified then the variables are re-ordered according to first providing the variable with the largest sum of squared correlations of all the variables, then the variable that has the highest correlation with the first variable, and so forth.
 }
@@ -13,7 +13,6 @@ Re-arranges the order of the variables in the input correlation matrix.  If no v
 \usage{
 corReorder(x=mycor, vars=NULL, first=0,
           heat.map=TRUE, main=NULL, bottom=3,right=3,
-          colors=c("blue", "gray", "rose", "green", "gold", "red"),
           pdf.file=NULL, pdf.width=5, pdf.height=5)
 
 reord(\ldots)
@@ -29,7 +28,6 @@ reord(\ldots)
         correlations with item communalities in the diagonal.}
   \item{bottom}{Number of lines of bottom margin.}
   \item{right}{Number of lines of right margin.}
-  \item{colors}{Sets the color palette.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}

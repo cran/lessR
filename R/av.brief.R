@@ -1,5 +1,5 @@
 av.brief <-
-function(my.formula, brief=TRUE, ...)
+function(..., brief=TRUE)
 
-  ANOVA(my.formula, brief=TRUE, ...)
+  ANOVA(..., brief=TRUE)
 

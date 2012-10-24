@@ -24,11 +24,8 @@ function(nm, mydframe,
 
   for (i in 1:n.vars) {
     ind <- i
-    .varlist(n.pred, ind, nm[i])
+    .varlist(n.pred, ind, nm[i], "Predictor", n.obs, n.keep)
   }
-  
-  cat("\nNumber of observations (rows) of data: ", n.obs, "\n")
-  cat("Number of observations retained for analysis: ", n.keep, "\n")
 
 
 
@@ -160,11 +157,11 @@ function(nm, mydframe,
     .dash(68)
     cat("\n")
   }
-  cat("R-squared: ", signif(sm$r.squared,3), 
-    "    Adjusted R-squared: ", signif(sm$adj.r.squared,3), "\n")
+  cat("R-squared: ", .fmt(sm$r.squared,3), 
+    "    Adjusted R-squared: ", .fmt(sm$adj.r.squared,3), "\n")
   cat("\n")
   cat("F-statistic for null hypothesis that population R-squared=0: ", 
-    signif(sm$fstatistic[1],4), "\n") 
+    .fmt(sm$fstatistic[1],4), "\n") 
   cat("Degrees of freedom: ", sm$fstatistic[2], "and", sm$fstatistic[3],"\n")
   pvl <- 1-pf(sm$fstatistic[1],sm$fstatistic[2],sm$fstatistic[3])
   cat("p-value:",

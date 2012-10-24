@@ -14,7 +14,6 @@ Usually a prelude to a factor analysis, such as provided by \code{\link{corCFA}}
 \usage{
 corReflect(x=mycor, vars,
           main=NULL, heat.map=TRUE, bottom=3,right=3, 
-          colors=c("blue", "gray", "rose", "green", "gold", "red"),
           pdf.file=NULL, pdf.width=5, pdf.height=5)
 
 reflect(\ldots)
@@ -29,7 +28,6 @@ reflect(\ldots)
         correlations with item communalities in the diagonal.}
   \item{bottom}{Number of lines of bottom margin.}
   \item{right}{Number of lines of right margin.}
-  \item{colors}{Sets the color palette.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}

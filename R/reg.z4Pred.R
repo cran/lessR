@@ -2,7 +2,7 @@
 function(nm, mydframe, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
-         numeric.all, in.data.frame, colors, X1.new, 
+         numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new) {
 
 # --------------------
@@ -43,14 +43,17 @@ function(nm, mydframe, my.formula, brief, res.rows,
 
   cat("Data, Fitted Values, Confidence and Prediction Intervals\n")
   cat("   [sorted by lower bound of prediction interval]\n")
-  if (n.keep > 50 && pred.all == FALSE && !new.data) 
+  cat("   [pi:wdh is the width of the corresponding prediction interval]\n")
+  if (n.keep > 30 && pred.all == FALSE && !new.data) 
     cat("   [to save space only some intervals printed, do pred.all=TRUE to see all]\n")
   .dash(68)
   
   if (!new.data) {
     c.int <- data.frame(predict(lm.out, interval="confidence"))
     p.int <- suppressWarnings(data.frame(predict(lm.out, interval="prediction")))
-    out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],c.int,p.int$lwr,p.int$upr)
+    p.width <- p.int$upr - p.int$lwr
+    out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],
+                 c.int, p.int$lwr, p.int$upr, p.width)
   }
   else {
     Xnew.val <- list(X1.new)
@@ -63,9 +66,10 @@ function(nm, mydframe, my.formula, brief, res.rows,
     c.int <- data.frame(predict(lm.out, interval="confidence", newdata=Xnew))
     p.int <- suppressWarnings(data.frame(predict(lm.out,
                               interval="prediction", newdata=Xnew)))
+    p.width <- p.int$upr - p.int$lwr
     Ynew <- character(length = nrow(Xnew))
     Ynew <- ""
-    out <- cbind(Xnew, Ynew, c.int, p.int$lwr, p.int$upr)
+    out <- cbind(Xnew, Ynew, c.int, p.int$lwr, p.int$upr, p.width)
     names(out)[n.vars] <- nm[1]
   }
   
@@ -79,17 +83,24 @@ function(nm, mydframe, my.formula, brief, res.rows,
   names(out)[n.vars+3] <- "ci:upr"
   names(out)[n.vars+4] <- "pi:lwr"
   names(out)[n.vars+5] <- "pi:upr"
-  if (n.keep < 50  || pred.all == TRUE || new.data)
-    print(out, digits=digits.d)
-  else {
-    print(out[1:5,], digits=digits.d)
-    cat("\n... for the middle 5 rows of sorted data ...\n\n")
-    n.mid <- round(n.keep/2)
-    print(out[(n.mid-2):(n.mid+2),], digits=digits.d)
-    cat("\n... for the last 5 rows of sorted data ...\n\n")
-    print(out[(n.keep-4):n.keep,], digits=digits.d)
+  names(out)[n.vars+6] <- "pi:wdh"
+
+  if (!new.data) {
+    if (n.keep < 50  || pred.all == TRUE || new.data)
+      print(round(out, digits=digits.d))
+    else {
+      print(round(out[1:5,], digits=digits.d))
+      cat("\n... for the middle 5 rows of sorted data ...\n\n")
+      n.mid <- round(n.keep/2)
+      print(round(out[(n.mid-2):(n.mid+2),], digits=digits.d))
+      cat("\n... for the last 5 rows of sorted data ...\n\n")
+      print(round(out[(n.keep-4):n.keep,], digits=digits.d))
+    }
   }
+  else 
+    print(out, digits=digits.d)
+
   .dash(68)
 
-return(list(cint=c.int, pint=p.int))  # need these in 5Plot next
+  return(list(cint=c.int, pint=p.int))  # need these in 5Plot next
 }

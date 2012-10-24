@@ -1,6 +1,5 @@
 Logit <-
 function(my.formula, dframe=mydata, digits.d=4, text.width=120, 
-         colors=c("blue", "gray", "rose", "green", "gold", "red"), 
 
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
          pred=TRUE, pred.all=FALSE, pred.sort=TRUE, cooks.cut=1, 
@@ -10,11 +9,6 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
 
          pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
  
- 
-  if (missing(colors)) 
-    colors <- getOption("colors")
-  else
-    colors <- match.arg(colors)
   
   mydframe <- deparse(substitute(dframe))  # get data frame name for cor before sort
  
@@ -129,11 +123,9 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
 
   for (i in 1:n.vars) {
     ind <- i
-    .varlist(n.pred, ind, nm[i])
+    .varlist(n.pred, ind, nm[i], "Predictor", n.obs, n.keep)
   }
   
-  cat("\nNumber of observations (rows) of data: ", n.obs, "\n")
-  cat("Number of observations retained for analysis: ", n.keep, "\n")
   
   cat( "\n\n\n", "  BASIC ANALYSIS", "\n\n")
 
@@ -177,7 +169,7 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
 
     .logit3Residual(nm, mydframe,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
-         res.sort, res.rows, cooks.cut, colors,
+         res.sort, res.rows, cooks.cut, 
          pdf, pdf.width, pdf.height)
   }
  
@@ -188,7 +180,7 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
     .logit4Pred(nm, mydframe, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          new.data, pred.sort, pred, pred.all, 
-         numeric.all, in.data.frame, colors, X1.new, 
+         numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new,
          pdf, pdf.width, pdf.height)
   }

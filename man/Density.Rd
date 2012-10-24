@@ -1,30 +1,34 @@
 \name{Density}
 \alias{Density}
+\alias{dn}
 \alias{den}
 
 \title{Density Curves from Data plus Histogram}
 
 \description{
-Abbreviation: \code{den}
+Abbreviation: \code{dn}
 
 Plots a normal density curve and/or a general density curve superimposed over a histogram, all estimated from the data. Also reports the Shapiro-Wilk normality test.
 }
 
 \usage{
 Density(x, dframe=mydata, 
-         bw="nrd0", type=c("both", "general", "normal"),
-         bin.start=NULL, bin.width=NULL, text.out=TRUE,
+       bw="nrd0", type=c("both", "general", "normal"),
+       bin.start=NULL, bin.width=NULL, text.out=TRUE,
 
-         col.bg=NULL, col.grid=NULL, col.bars=NULL,
-         col.nrm="black", col.gen="black",
-         col.fill.nrm=NULL, col.fill.gen=NULL,
-         colors=c("blue", "gray", "rose", "green", "gold", "red"), 
+       col.fill=getOption("col.fill.pt"),
+       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
 
-         cex.axis=.85, col.axis="gray30", col.ticks="gray30",
-         x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
-         x.min=NULL, x.max=NULL, band=FALSE,
-         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+       col.nrm="black", col.gen="black",
+       col.fill.nrm="transparent", col.fill.gen="transparent",
 
+       cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+       x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
+       x.min=NULL, x.max=NULL, band=FALSE, 
+
+       pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+
+dn(\ldots)
 den(\ldots)
 }
 
@@ -38,17 +42,17 @@ den(\ldots)
   \item{bin.width}{Optional specified bin width, which can be specified with or without 
         a \code{bin.start} value.}
   \item{text.out}{If \code{TRUE}, then display text output in console.}
+  \item{col.fill}{Default (for default color theme of \code{"blue"}) is to
+       display the histogram in a light gray.  To suppress, the histogram,
+       specify a color of \code{"transparent"}.}
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines.}
-  \item{col.bars}{Default is to display the histogram in a light gray.  To suppress,
-       the histogram, specify a color of \code{"transparent"}.}
   \item{col.nrm}{Color of the normal curve.}
   \item{col.gen}{Color of the general density curve.}
   \item{col.fill.nrm}{Fill color for the estimated normal curve, with a transparent blue as
        the default.}
   \item{col.fill.gen}{Fill color for the estimated general density curve, with a transparent 
        light red as the default.}
-  \item{colors}{Sets the intensity of the color palette.}
   \item{cex.axis}{Scale magnification factor, which by default displays the axis values to be 
         smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
@@ -87,7 +91,7 @@ DATA\cr
 If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
 
 COLOR THEME\cr
-Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}. 
+Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black backgound, no gridlines and partial transaparency of plotted colors. 
 
 VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -122,7 +126,7 @@ y <- rnorm(100)
 Density(y)
 
 # short name
-den(y)
+dn(y)
 
 # save the density plot to a pdf file
 Density(y, pdf.file="MyDensityPlot.pdf")

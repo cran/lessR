@@ -1,46 +1,44 @@
 \name{Read}
 \alias{Read}
 \alias{rad}
+\alias{rad2}
 \alias{rad.brief}
 \alias{rad.labels}
 \alias{rad.both}
-\alias{rad2}
 
 \title{Read and Display Contents of a Data File and Optional Variable Labels}
 
 \description{
-Abbreviation: \code{rad}, \code{rad.brief}, \code{rad.labels}, \code{rad.both}, \code{rad2}
+Abbreviation: \code{rad}, \code{rad2}, \code{rad.brief}, \code{rad.labels}, \code{rad.both}
 
-Reads the contents of the specified data file and/or variable labels into an R data frame. The format of the file can be standard \code{csv} data file, a fixed width formatted data file, or native SPSS or R data file.  The data are read into a data frame called \code{mydata}.  Any optional variable labels are read into a data frame called \code{mylabels}.  Identify the file by either browsing for the file on the local computer system with \code{rad()}, or as indicated by an argument as a character string in the form of a path name or a web URL.  The function also lists the first and last three rows of data as well as the variable names and the dimensions of the resulting data frame and the data type for each variable.  In addition, perform an analysis of missing data, listing the number of missing values for each variable and for each observation.
+Reads the contents of the specified data file and/or variable labels into an R data frame, by default \code{mydata}. The format of the file can be standard \code{csv} data file, a fixed width formatted data file, or native SPSS or R data file.  Any optional variable labels are read into a data frame called \code{mylabels}.  Identify the file by either browsing for the file on the local computer system with \code{Read()}, or as indicated by an argument as a character string in the form of a path name or a web URL.  The function also lists the first and last three rows of data as well as the variable names and the dimensions of the resulting data frame and the data type for each variable.  In addition, perform an analysis of missing data, listing the number of missing values for each variable and for each observation.
 
 Also see the \code{lessR} function \code{\link{corRead}} and its alternate form \code{\link{rad.cor}} to read a correlation matrix.
 }
 
 \usage{
-Read(ref=NULL, brief=FALSE, show.R=FALSE, attach=FALSE,
-         n.mcut=1, miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
+Read(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
+         miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
          format=c("csv", "SPSS", "R"), data=TRUE, labels=FALSE, 
-         missing="", max.lines=30, widths=NULL, \dots)
+         missing="", max.lines=30, widths=NULL, dframe=mydata, \dots)
+
+rad2(\ldots, sep=";", dec=",")
 
 rad(\ldots) 
 
-rad.brief(ref=NULL, brief=TRUE, \ldots) 
+rad.brief(\ldots, brief=TRUE) 
 
-rad.labels(ref=NULL, data=FALSE, labels=TRUE, \ldots) 
+rad.labels(\ldots, data=FALSE, labels=TRUE) 
 
-rad.both(ref=NULL, data=TRUE, labels=TRUE, \ldots) 
-
-rad2(ref=NULL, sep=";", dec=",", \ldots)
+rad.both(\ldots, data=TRUE, labels=TRUE) 
 }
 
 
 \arguments{
   \item{ref}{File reference, either omitted to browse for the data file, or a full path name or web URL, 
        included in quotes.  A URL begins with \code{http://}.}
+  \item{lessR.data}{The name of the data set included with lessR.}
   \item{brief}{Extent of the results.}
-  \item{show.R}{Display the R instructions that yielded the \code{lessR} output, albeit without
-        the \code{lessR} formatting.}
-  \item{attach}{Do not attach data set by default, \code{mydata} by default.}
   \item{n.mcut}{For the missing value analysis, list the row name and number of missing values
         if the number of missing exceeds or equals this cutoff.}
   \item{miss.show}{For the missing value analysis, the number of rows, one row per observation,
@@ -51,8 +49,8 @@ rad2(ref=NULL, sep=";", dec=",", \ldots)
         list a version of the complete data table with a 0 for a non-missing value and a 1 for 
         a missing value.}
   \item{format}{Format of the data in the file, which by default is a \code{csv} file, and as 
-        option can be an SPSS \code{sav} file, which also reads the variable labels if present.
-        Also set to \code{TRUE} if the file to be read has a file type of \code{.sav}.}
+        an option can be an SPSS \code{.sav} file, which also reads the variable labels if present,
+        or a native R data file with a file type of \code{.rda}.}
   \item{data}{If \code{TRUE}, then read data, otherwise only variable labels are read.}
   \item{labels}{If \code{TRUE}, then the second row of information of a \code{csv} data file,
         after the variable names in the first row, consists of the variable labels. Data begins
@@ -63,6 +61,8 @@ rad2(ref=NULL, sep=";", dec=",", \ldots)
         data table.}
   \item{max.lines}{Maximum number of lines to list of the data and labels.}
   \item{widths}{Specifies the width of the successive columns for fixed width formatted data.}
+  \item{dframe}{The name of the data frame that will contain the data read from the 
+       external data file.}
   \item{...}{Other parameter values consistent with the usual \code{\link{read.table}}
        function, such as sep, row.names and header.}
 }
@@ -70,7 +70,7 @@ rad2(ref=NULL, sep=";", dec=",", \ldots)
 
 \details{
 CREATE csv FILE\cr
-By default \code{Read} reads \code{csv} data files. One way to create a csv data file is by entering the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
+By default \code{Read} reads \code{csv} data files, native R files with file type of \code{.rda} and native SPSS files with file type \code{.sav}. One way to create a csv data file is by entering the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
 
 All numeric data in the worksheet should be displayed in the General format, so that the only non-digit character for a numeric data value is a decimal point.  The General format removes all dollar signs and commas, for example, leaving only the pure number, stripped of these extra characters which R will not properly read as part of a numeric data value.
 
@@ -87,7 +87,12 @@ SPSS DATA\cr
 To read data in the SPSS \code{.sav} format, \code{Read} calls the \code{\link{read.spss}} function from the \code{foreign} package.  If the file has a file type of \code{.sav}, that is, the file specification ends in \code{.sav}, then the \code{format} is automatically set to \code{"SPSS"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="SPSS"}.
 
 R DATA\cr
-By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{mydata}, with the \code{lessR} function \code{\link{Write}}. When read back into a working R session, the data is restored as the complete data frame of the same name from which it was saved.
+By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{mydata}, with the \code{lessR} function \code{\link{Write}}. 
+
+When read back into a working R session, the data is restored as the complete data frame of the same name from which it was saved. However, if the data frame that was saved was not \code{mydata}, then the \code{dframe} option must be invoked to inform \code{Read} where the name of the data frame. Without this information, the data frame will still be created, but the program will terminate early without providing user feedback.
+
+lessR DATA\cr
+\code{lessR} has some data sets included with the package.  \code{Read} will read each such data set by specifying its name with the \code{lessR.data} parameter. Also, each included data set begins with the prefix \code{dat}, which can be deleted when specifying the name of the data set. This option is a replacement for the standard R \code{\link{data}} function, offering the added information provided by \code{Read} and the automatic creation of the \code{mydata} data frame consistent with the other uses of \code{Read}.
 
 FIXED WIDTH FORMATTED DATA\cr
 Sometimes the width of the columns are the same for all the data values of a variable, such as a data file of Likert scale responses from 1 to 5 on a 50 survey items such that the data consist of 50 columns with no spaces or other delimiter to separate adjacent data values. To read this data, based upon the R function \code{\link{read.fwf}}, invoke the \code{widths} option of that function.  
@@ -116,7 +121,6 @@ The quotes here are not needed because there are no commas in the enclosed chara
 
 \seealso{
 \code{\link{read.csv}},\code{\link{read.spss}},\code{\link{read.fwf}}, 
-\code{\link{attach}}, \code{\link{head}}, \code{\link{tail}}, \code{\link{str}},
 \code{\link{corRead}}.
 }
 
@@ -148,6 +152,12 @@ The quotes here are not needed because there are no commas in the enclosed chara
 # read tab-delimited (or any other white-space) data
 # Read(sep="")
 
+# read into a data frame called good.data instead of mydata
+# Read(dframe=good.data)
+
+# read the built-in data set datEmployee
+Read(lessR.data="Employee")
+
 # read variable labels only, no data 
 # Read.labels()
 
@@ -158,7 +168,7 @@ The quotes here are not needed because there are no commas in the enclosed chara
 #   5 column ID field, 2 column Age field
 #   and 75 single columns of data, no spaces between columns
 #   name the variables with lessR function: to
-#   the variable names are Q01, Q02, ... Q74, Q75
+#   the variable names are Q01, Q02, ..., Q74, Q75
 # Read(widths=c(5,2,rep(1,75)), col.names=c("ID", "Age", to("Q", 75)))
 }
 

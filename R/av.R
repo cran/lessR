@@ -1,5 +1,5 @@
 av <-
-function(my.formula, ...)
+function(...)
 
-  ANOVA(my.formula, ...)
+  ANOVA(...)
 

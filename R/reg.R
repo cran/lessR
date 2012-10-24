@@ -1,5 +1,5 @@
 reg <-
-function(my.formula, ...)
+function(...)
 
-  Regression(my.formula, ...)
+  Regression(...)
 

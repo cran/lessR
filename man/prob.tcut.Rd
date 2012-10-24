@@ -1,21 +1,21 @@
-\name{qnt.t}
-\alias{qnt.t}
+\name{prob.tcut}
+\alias{prob.tcut}
 
-\title{Plot t-distribution Curve and Corresponding Normal Curve with Tail Cutoffs}
+\title{Plot t-distribution Curve and Specified Cutoffs with Normal Curve}
 
 \description{
 Plot a specified t-distribution against the standardized normal curve with the corresponding upper and lower tail cutoffs.
 }
 
 \usage{
-qnt.t(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
+prob.tcut(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
          col.fill="aliceblue", col.tail="palevioletred4",
          col.nrm=gray(.7), col.t=gray(.08), \ldots)
 }
 
 
 \arguments{
-  \item{df}{Degrees of freedome for t-distribution, must be 2 or larger.}
+  \item{df}{Degrees of freedom for t-distribution, must be 2 or larger.}
   \item{alpha}{Alpha to define the tail cutoff area.}
   \item{dig.dec}{Number of decimal digits in the output.}
   \item{y.axis}{If \code{FALSE}, then the y axis is not displayed.}
@@ -27,7 +27,7 @@ qnt.t(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
 }
 
 \details{
-Replaces a t-table by providing the corresponding t-cutoff, the quantile or critical value, as well as a plot that illustrates the tail probabilities and also compared to the standardized normal curve.
+Replaces a t-table by providing the corresponding t-cutoff, the critical value based on the corresponding quantile, as well as a plot that illustrates the tail probabilities. Also compare to the standardized normal curve.
 }
 
 
@@ -35,18 +35,18 @@ Replaces a t-table by providing the corresponding t-cutoff, the quantile or crit
 
 
 \seealso{
-\code{\link{pnorm}}, \code{\link{plot}}.
+\code{\link{qt}}, \code{\link{pnorm}}.
 }
 
 
 \examples{
 # t-distribution with 0.025 cutoffs for degrees of freedom of 15
-qnt.t(15)
+prob.tcut(15)
 }
 
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ probability }
-\keyword{ quantile }
+\keyword{ t-cutoff }
 \keyword{ t-distribution }

@@ -14,8 +14,7 @@ Plots a pie chart with default colors from a variety of different types of data.
 PieChart(x, dframe=mydata, 
          random.col=FALSE,
          col.slices=NULL, col.low=NULL, col.hi=NULL,
-         colors=c("blue", "gray", "rose", "green", "gold", "red",
-                  "rainbow", "terrain", "heat"),
+         colors=c("rainbow", "terrain", "heat"),
          text.out=TRUE, main=NULL, 
          pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
@@ -34,7 +33,7 @@ pc(\ldots)
         of the factor in the resulting ordered progression of colors.}
   \item{col.hi}{Only when the variable is an ordered factor, sets the color for the highest level 
         of the factor in the resulting ordered progression of colors.}
-  \item{colors}{Set the color palette.}
+  \item{colors}{Optional palettes that provide more options.}
   \item{text.out}{If \code{TRUE}, then display frequency table, chi-square analysis and sample size information.}
   \item{main}{Title of graph.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}

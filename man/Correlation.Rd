@@ -12,11 +12,10 @@ Correlation coefficient with hypothesis test and confidence interval for two var
 }
 
 \usage{
-Correlation(x, y, dframe=mydata,
+Correlation(x, y, dframe=mydata, 
          miss=c("pairwise", "listwise", "everything"),
-         show.n=NULL, brief=FALSE, n.cat=getOption("n.cat"), digits.d=NULL,
-         colors=c("blue", "gray", "rose", "green", "gold", "red"),
-         heat.map=TRUE, main=NULL, bottom=3, right=3,
+         show.n=NULL, brief=FALSE, n.cat=getOption("n.cat"),
+         digits.d=NULL, heat.map=TRUE, main=NULL, bottom=3, right=3,
          pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 cr.brief(\ldots, brief=TRUE) 
@@ -37,7 +36,6 @@ cr(\ldots)
        and missing observations are displayed.}
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
-  \item{colors}{Sets the color palette for the heat map.}
   \item{heat.map}{If \code{TRUE} and a matrix analyzed, displays a heat map of the
        matrix of correlation coefficients.}
   \item{main}{Graph title of heat map. Set to \code{main=""} to turn off.}

@@ -1,13 +1,15 @@
 LineChart <-
 function(y, dframe=mydata, type=NULL, 
 
-         col.line=NULL, col.area=NULL, col.box="black",
-         col.pts=NULL, col.fill=NULL, trans.pts=getOption("trans.pts"),
-         shape.pts=21, col.grid=NULL, col.bg=NULL,
-         colors=c("blue", "gray", "rose", "green", "gold", "red"),
+         col.line=getOption("col.stroke.pt"),
+         col.area=NULL, col.box="black",
+         col.stroke=getOption("col.stroke.pt"), 
+         col.fill=getOption("col.fill.bar"),
+         col.grid=getOption("col.grid"),
+         col.bg=getOption("col.bg"),
 
-         cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE,
+         shape.pts=21, cex.axis=.85, col.axis="gray30",
+         col.ticks="gray30", xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
@@ -16,11 +18,6 @@ function(y, dframe=mydata, type=NULL,
 
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
-
-  if (missing(colors)) 
-    colors <- getOption("colors")
-  else
-    colors <- match.arg(colors)
 
   center.line <- match.arg(center.line)
 
@@ -47,9 +44,10 @@ function(y, dframe=mydata, type=NULL,
   .opendev(pdf.file, pdf.width, pdf.height)
 
   .lc.main(y.call, type,
-       col.line, col.area, col.box, col.pts, col.fill, trans.pts, shape.pts,
-       col.grid, col.bg, colors, cex.axis, col.axis, col.ticks, xy.ticks,
-       xlab, ylab, main, cex, x.start, x.end, y.start, y.end,
+       col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
+       col.grid, col.bg, cex.axis, col.axis, col.ticks, xy.ticks,
+       line.width, xlab, ylab, main, cex, x.start, x.end,
+       y.start, y.end,
        time.start, time.by, time.reverse, 
        center.line, text.out, ...)
 

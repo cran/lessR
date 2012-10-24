@@ -1,11 +1,11 @@
-\name{datEmployee}
+\name{dataEmployee}
 \docType{data}
-\alias{datEmployee}
+\alias{dataEmployee}
 \title{Data: Employees}
 
 \description{Some human resource data on 37 employees with 6 variables.}
 
-\usage{data(datEmployee)}
+\usage{data(dataEmployee)}
 \format{A data table with 37 observations.
 
 Years,"Years Employed in the Company"\cr

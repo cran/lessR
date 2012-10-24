@@ -3,10 +3,11 @@ function(x, dframe=mydata,
          bw="nrd0", type=c("both", "general", "normal"),
          bin.start=NULL, bin.width=NULL, text.out=TRUE,
 
-         col.bg=NULL, col.grid=NULL, col.bars=NULL,
+         col.fill=getOption("col.fill.pt"),
+         col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+
          col.nrm="black", col.gen="black",
-         col.fill.nrm=NULL, col.fill.gen=NULL,
-         colors=c("blue", "gray", "rose", "green", "gold", "red"), 
+         col.fill.nrm="transparent", col.fill.gen="transparent",
 
          cex.axis=.85, col.axis="gray30", col.ticks="gray30",
          x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
@@ -14,11 +15,6 @@ function(x, dframe=mydata,
 
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
-
-  if (missing(colors)) 
-    colors <- getOption("colors")
-  else
-    colors <- match.arg(colors)
 
   # get actual variable name before potential call of dframe$x
   x.name <- deparse(substitute(x)) 
@@ -32,7 +28,7 @@ function(x, dframe=mydata,
   in.global <- xs$ig 
 
   # see if variable exists in data frame, if x not in Global Env or function call 
-  if (!missing(x) && !in.global)  .xcheck(x.name, dframe.name, dframe)
+  if (!missing(x) && !in.global) .xcheck(x.name, dframe.name, dframe)
 
   if (!in.global) x.call <- eval(substitute(dframe$x))
   else {
@@ -48,8 +44,8 @@ function(x, dframe=mydata,
 
   .den.main(x.call, dframe=mydata, 
             bw, type, bin.start, bin.width, text.out,
-            col.bg, col.grid, col.bars, col.nrm, col.gen,
-            col.fill.nrm, col.fill.gen, colors, 
+            col.fill, col.bg, col.grid, col.nrm, col.gen,
+            col.fill.nrm, col.fill.gen, 
             cex.axis, col.axis, col.ticks,
             x.pt, xlab, main, y.axis, x.min, x.max, band, ...)
 

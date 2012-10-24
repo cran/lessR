@@ -7,21 +7,27 @@
 \description{
 Abbreviation: \code{efa}
 
-An exploratory factor analysis, provided by the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis. Then constructs the corresponding multiple indicator measurement model (MIMM) suggested by the exploratory factor analysis loadings, and the \code{lessR} to run the confirmatory analysis of the model.
+An maximum likelihood exploratory factor analysis, provided by the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis. Then constructs the corresponding multiple indicator measurement model (MIMM) suggested by the exploratory factor analysis loadings, and the \code{lessR} to run the confirmatory analysis of the model.
 }
 
 \usage{
-corEFA(x=mycor, n.fact, rotate=c("promax", "varimax"), min.load=.2)
+corEFA(x=mycor, n.factors, rotate=c("promax", "varimax"), 
+          min.loading=.2, show.initial=FALSE, sort=TRUE, \ldots)
 
 efa(\ldots)
 }
 
 \arguments{
   \item{x}{Correlation matrix.}
-  \item{n.fact}{Number of factors.}
+  \item{n.factors}{Number of factors.}
   \item{rotate}{Rotation method.}
-  \item{min.load}{Minimum loading to include in suggested factor for
-        confirmatory analysis. To ignore, set to NA.}
+  \item{min.loading}{Minimum loading to include in suggested factor for
+        confirmatory analysis and for the display of the loadings for the
+        exploratory analysis. To ignore, set to NA.}
+  \item{show.initial}{If \code{TRUE}, then display initial factor extraction
+       before rotation.}
+  \item{sort}{Sort the input variables by their highest factor loadings (but only
+        first just list those items with loadings larger than 0.5).}
   \item{\dots}{Parameter values.}
 }
 
@@ -48,15 +54,17 @@ c(1.000,0.480,0.320,0.192,0.144,0.096,
   0.192,0.144,0.096,1.000,0.480,0.320,
   0.144,0.108,0.072,0.480,1.000,0.240,
   0.096,0.072,0.048,0.320,0.240,1.000))
-colnames(mycor) <- c("V1", "V2", "V3", "V4", "V5", "V6")
+colnames(mycor) <- c("X1", "X2", "X3", "X4", "X5", "X6")
 rownames(mycor) <- colnames(mycor) 
 
-# reflect all 3 indicators of the second factor
-corEFA(n.fact=2)
+# default factor analysis of default correlation matrix mycor
+#   with two factors extracted
+corEFA(n.factors=2)
 
 # abbreviated form
 # use all items to construct the MIMM, regardless of their loadings
-efa(n.fact=2, min.load=NA)
+# show the initial factor extraction
+efa(n.factors=2, min.loading=NA, show.initial=TRUE)
 }
 
 

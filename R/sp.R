@@ -1,5 +1,6 @@
 sp <-
-function(...)
+function(...) {
 
   ScatterPlot(...)
 
+}

@@ -13,22 +13,21 @@ Default output includes the inferential analysis of the estimated coefficients a
 
 Can also be called from the more general \code{\link{model}} function.
         
-The resulting scatterplot, when written to a pdf file according to \code{pdf=TRUE}, is named RegScatterplot.pdf. If residuals are reported, then the two additional pdf files are named RegResiduals.pdf and RegResidFitted.pdf. Their names and the directory to which they are written are povided as part the console output.
+The resulting scatterplot, when written to a pdf file according to \code{pdf=TRUE}, is named RegScatterplot.pdf. If residuals are reported, then the two additional pdf files are named RegResiduals.pdf and RegResidFitted.pdf. Their names and the directory to which they are written are provided as part the console output.
 }
 
 \usage{
 Logit(my.formula, dframe=mydata, digits.d=4, text.width=120, 
-         colors=c("blue", "gray", "rose", "green", "gold", "red"), 
 
-         res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
-         pred=TRUE, pred.all=FALSE, pred.sort=TRUE, cooks.cut=1, 
+     res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
+     pred=TRUE, pred.all=FALSE, pred.sort=TRUE, cooks.cut=1, 
 
-         X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
-         X5.new=NULL,
+     X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
+     X5.new=NULL,
 
-         pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
+     pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
 
-lgt(my.formula, \ldots) 
+lgt(\ldots) 
 }
 
 
@@ -41,7 +40,6 @@ lgt(my.formula, \ldots)
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
   \item{text.width}{Width of the text output at the console.}
-  \item{colors}{Sets the color palette for the resulting graphics.}
   \item{res.rows}{Default is 25, which lists the first 25 rows of data sorted by the
        specified sort criterion.  To turn this option off, specify a value of 0.  To see 
        the output for all observations, specify a value of \code{"all"}.}
@@ -102,8 +100,8 @@ By default the residual analysis lists the data and fitted value for each observ
 INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{reg} is finished with a normal termination, the options are re-set to their values before the \code{reg} function began executing.
 
-COLOR THEME\cr
-A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}. 
+COLORS\cr
+Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black backgound, no gridlines and partial transaparency of plotted colors. 
 
 VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.}
@@ -115,50 +113,37 @@ Although standard R does not provide for variable labels, \code{lessR} can store
 }
 
 \examples{
-# Generate random data, place in data frame mydata
-n <- 20
-X1 <- rnorm(n)
-X2 <- rnorm(n)
-Y <- .7*X1 + .2*X2 + .6*rnorm(n)
-# Y is binary, 0 or 1
-Y <- cut(Y, breaks=2, labels=FALSE)
-#  instead, if read data with the rad function
-#   then the result is the data frame called mydata 
-mydata <- data.frame(X1, X2, Y)
-rm(Y); rm(X1); rm(X2)
-Recode(Y, old=c(1,2), new=c(0,1))
+# obtain numeric 0,1 values from character data
+# Gender has values of "M" and "F"
+Read(lessR.data="Employee")
+# convert factor to integer, values 1 and 2
+# Female is 1 and Male is 2 (alphabetical)
+Transform(Gender=as.numeric(Gender))
+# so create a new variable with numeric 0 and 1
+# Male is 0, Female is 1
+Recode(Gender, old=c(1,2), new=c(1,0))
+# proceed with the logit regression
+Logit(Gender ~ Years)
 
-# One-predictor logistic regression
-# Provide all default analyses including scatterplot etc.
-Logit(Y ~ X1)
 # short name
-lgt(Y ~ X1)
+lgt(Gender ~ Years)
 
 # Modify the default settings as specified
-Logit(Y ~ X1, res.row=8, res.sort="rstudent", digits.d=8, pred=FALSE)
+Logit(Gender ~ Years, res.row=8, res.sort="rstudent", digits.d=8, pred=FALSE)
 
 # Multiple logistic regression model
 # Provide all default analyses
-Logit(Y ~ X1 + X2)
+Logit(Gender ~ Years + Salary)
+
 # Save the three plots as pdf files 4 inches square, gray scale
-Logit(Y ~ X1, pdf=TRUE, pdf.width=4, pdf.height=4, colors="gray")
+Logit(Gender ~ Years, pdf=TRUE, pdf.width=4, pdf.height=4, colors="gray")
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values
-# Specify an input data frame other than mydata, see help(mtcars)
-Logit(am ~ hp + wt + disp, dframe=mtcars,
-  X1.new=seq(50,350,50), X2.new=c(2,3), X3.new=c(100,300))
-
-# obtain numeric 0,1 values from character data
-data(datEmployee)
-# Gender has values of "M" and "F"
-# convert to 0 and 1, but the variable Gender now is non-numeric
-Recode(Gender, old=c("M", "F"), new=c(0,1), dframe=datEmployee)
-# so create a new variable from the "0" and "1" values that has
-#  true numeric values with R function as.numeric
-Transform(Gender.num=as.numeric(Gender), dframe=datEmployee)
-# proceed with the logit regression
-Logit(Gender.num ~ Years, dframe=datEmployee)
+# Specify an input data frame other than mydata
+Read(lessR.data="Cars93", dframe=cars)
+Logit(Source ~ HP + MidPrice, dframe=cars,
+      X1.new=seq(100,250,50), X2.new=c(10,60,10))
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

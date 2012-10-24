@@ -2,7 +2,7 @@
 function(nm, mydframe, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          new.data, pred.sort, pred, pred.all, 
-         numeric.all, in.data.frame, colors, X1.new, 
+         numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new,
          pdf, pdf.width, pdf.height) {
 
@@ -58,6 +58,8 @@ function(nm, mydframe, my.formula, brief, res.rows,
   }
   .dash(68)
 
+    col.pts <- getOption("col.stroke.pt")
+    col.line <- getOption("col.stroke.bar")
 
   if (pred && n.pred==1 && !is.factor(lm.out$model[,nm[2]]) && is.null(X1.new)) {
 
@@ -72,11 +74,12 @@ function(nm, mydframe, my.formula, brief, res.rows,
     x.values <- lm.out$model[,nm[2]]
     y.values <- lm.out$model[,nm[1]] 
     .plt.main(x.values, y.values, by=NULL, type="p", n.cat=getOption("n.cat"),
-       col.line=NULL, col.area=NULL, col.box="black",
-       col.pts=NULL, col.fill=NULL, trans.pts=NULL,
-       shape.pts=21, col.grid=NULL, col.bg=NULL,
-       colors=colors, 
-       cex.axis=.85, col.axis="gray30",
+       col.line=col.line, col.area=NULL, col.box="black",
+       col.pts=col.pts, 
+       col.fill=getOption("col.fill.pt"),
+       col.stroke=getOption("col.stroke.pt"),
+       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+       shape.pts=21, cex.axis=.85, col.axis="gray30",
        col.ticks="gray30", xy.ticks=TRUE,
        xlab=nm[2], ylab=nm[1], main="Scatterplot and Fitted Values",
        cex=.8,    
@@ -87,12 +90,29 @@ function(nm, mydframe, my.formula, brief, res.rows,
        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
        text.out=FALSE, ylim=c(0,1))
 
-    # color palette based on color theme colors
-    trans.pts=getOption("trans.pts")
-    cp <- .clr(colors, trans.pts)
-    col.line <- cp[7]
-
-    lines(lm.out$model[,nm[2]], p.int$fit, col=col.line, lwd=2)
+    lines(lm.out$model[,nm[2]], p.int$fit, col=col.pts, lwd=2)
   }
+
+  else {  # scatterplot matrix for multiple regression
+    if (numeric.all && in.data.frame) {
+
+     if (!pdf) 
+      if (res.rows > 0) dev.set(which=5) else dev.set(which=3)
+    else { 
+      pdf.file <- "LogitScatter.pdf"
+      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    }
+
+      suppressWarnings(pairs(lm.out$model[c(nm)], 
+                            panel=panel.smooth, col=col.pts, col.smooth=col.line))
+    }
+    else {
+      cat("\n\n>>> No scatterplot matrix reported because not all variables are ")
+      if (!in.data.frame) cat("in the data frame.\n")
+      if (!numeric.all) cat("numeric.\n")
+      dev.off()
+    }
+  }
+
 
 }

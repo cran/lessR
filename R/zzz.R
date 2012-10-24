@@ -5,10 +5,20 @@ if(getRversion() >= "2.15.1")
 .onAttach <-
 function(...) {
 
-  packageStartupMessage("\nTo get help, enter, after the >,  Help()\n")
+  packageStartupMessage("\nFor help, enter, after the >,  Help()\n")
 
   options(colors="blue")
-  options(trans.pts=.66)
+  options(trans.fill.bar=0.00)
+  options(trans.fill.pt=0.66)
+  options(col.fill.bar="lightsteelblue")
+  options(col.fill.pt="lightsteelblue")
+  options(col.stroke.bar="slategray")
+  options(col.stroke.pt="steelblue4")
+  options(col.bg="ghostwhite")
+  options(col.grid="gray90")
+  options(col.ghost=FALSE)
+  options(col.heat = "darkblue")
+
   options(n.cat=4)
 
   options(show.signif.stars=FALSE)
@@ -29,9 +39,16 @@ function(...) {
   }
 
   max.dd <- 0
-    for (i in 1:length(x))
-      if (!is.na(x[i])) if (n.dec(x[i]) > max.dd) max.dd <- n.dec(x[i])
+  for (i in 1:length(x))
+    if (!is.na(x[i])) if (n.dec(x[i]) > max.dd) max.dd <- n.dec(x[i])
+
   return(max.dd)
+}
+
+.getdigits <- function(x, min.digits) {
+    digits.d <- .max.dd(x) + 1
+    if (digits.d < min.digits) digits.d <- min.digits
+    return(digits.d)
 }
 
 
@@ -151,8 +168,7 @@ function(...) {
 }
 
 
-.corcolors <- function(R, NItems, colors, main,
-                       bm=3, rm=3, diag=NULL,
+.corcolors <- function(R, NItems, main, bm=3, rm=3, diag=NULL,
                        pdf.file, pdf.width, pdf.height) {
 
     if (!is.null(diag)) {
@@ -162,13 +178,7 @@ function(...) {
           "      computing the heat map are set to 0.\n", sep="")
     }
 
-    if (colors == "blue") max.color <- "darkblue"
-    else if (colors == "gray") max.color <- "gray5"
-    else if (colors == "rose") max.color <- "rosybrown4"
-    else if (colors == "green") max.color <- "darkgreen"
-    else if (colors == "gold") max.color <- "goldenrod4"
-    else if (colors == "red") max.color <- "darkred"
-
+    max.color <- getOption("col.heat")
     hmcols <- colorRampPalette(c("white",max.color))(256)
     
     .opendev(pdf.file, pdf.width, pdf.height)  # set up graphics
@@ -224,11 +234,11 @@ function(...) {
 }
 
 
-.varlist <- function(n.pred, i, var.name, lvls=NULL) {
-  
+.varlist <- function(n.pred, i, var.name, pred.lbl, n.obs, n.keep, lvls=NULL) {
+
   if (i == 1) txt <- "Response Variable:  "
   else 
-    if (n.pred > 1) txt <- paste("\nPredictor Variable ", 
+    if (n.pred > 1) txt <- paste("\n", pred.lbl, " ", 
       toString(i-1), ": ", sep="")
     else txt <- "\nPredictor Variable: "
   cat(txt, var.name)
@@ -236,9 +246,16 @@ function(...) {
   if (exists("mylabels")) {  # use variable label if it exists
     lbl <- mylabels[which(row.names(mylabels)==var.name), "label"]
     if (!is.null(lbl)) cat(", ", as.character(lbl))
-    if (!is.null(lvls)) if (i > 1) cat("\n  Levels:", lvls)
   }
+
+  if (!is.null(lvls)) if (i > 1) cat("\n  Levels:", lvls)
   cat("\n")
+
+  if (i == n.pred+1) {
+    cat("\n")
+    cat("Number of observations (rows) of data: ", n.obs, "\n")
+    cat("Number of observations retained for analysis: ", n.keep, "\n")
+  }
 }
 
 
@@ -277,97 +294,13 @@ function(...) {
 }
 
 
-.maketrans <- function(col.name, trans.pts) {
+.maketrans <- function(col.name, trans.level) {
   r.tr <- col2rgb(col.name)[1]
   g.tr <- col2rgb(col.name)[2]
   b.tr <- col2rgb(col.name)[3]
 
-  mc <- 256
-  trans.pts <- (1-trans.pts) * mc
+  #trans.level <- (1-trans.level) * 256
+  col.trans <- rgb(r.tr, g.tr, b.tr, alpha=trans.level, maxColorValue=256)
 
-  col.trans <- rgb(r.tr, g.tr, b.tr, alpha=trans.pts, maxColorValue=mc)
   return(col.trans)
-}
-
-
-.clr <- function(theme, trans.pts=NULL) {
-
-  palette <- character(length=9)
-
-  mc <- 256
-  if (is.null(trans.pts)) trans.pts <- getOption("trans.pts")
-
-  trans <- trans.pts  # before transformation
-
-  trans.pts <- (1-trans.pts) * mc
-
-  if (theme == "blue") {
-    palette[1] <- "lightsteelblue"
-    palette[2] <- "lightsteelblue4"
-    palette[3] <- "gray90"
-    palette[4] <- "ghostwhite"
-    palette[5] <-  "darkblue"
-    palette[6] <- .maketrans("darkblue", trans) 
-    palette[7] <- "steelblue"
-    palette[8] <- "plum"
-    palette[9] <- "lightsteelblue"
-  }
-  if (theme == "gray") {
-    palette[1] <- "gray30"
-    palette[2] <- "white"
-    palette[3] <- "white"
-    palette[4] <- "gray90"
-    palette[5] <- "gray15"
-    palette[6] <- .maketrans("gray15", trans)
-    palette[7] <- "gray15"
-    palette[8] <- "transparent"
-    palette[9] <- "gray60"
-  }
-  if (theme == "rose") {
-    palette[1] <- rgb(245,213,210, maxColorValue=mc)
-    palette[2] <- "mistyrose4"
-    palette[3] <- "snow2"
-    palette[4] <- "snow1"
-    palette[5] <- "coral3"
-    palette[6] <- .maketrans("coral3", trans)
-    palette[7] <- "coral3"
-    palette[8] <- "transparent"
-    palette[9] <- "mistyrose1"
-  }
-  if (theme == "gold") {
-    palette[1] <- "goldenrod2"
-    palette[2] <- "goldenrod4"
-    palette[3] <- rgb(220,222,200, maxColorValue=mc)
-    palette[4] <- rgb(255,250,245, maxColorValue=mc)
-    palette[5] <- "goldenrod4"
-    palette[6] <- .maketrans("goldenrod4", trans)
-    palette[7] <- "goldenrod4"
-    palette[8] <- "transparent"
-    palette[9] <- "moccasin"
-  }
-  if (theme == "green") {
-    palette[1] <- "darkseagreen3"
-    palette[2] <- "darkseagreen4"
-    palette[3] <- "darkseagreen1"
-    palette[4] <- rgb(246,255,246, maxColorValue=mc)
-    palette[5] <- "darkgreen"
-    palette[6] <- .maketrans("darkgreen", trans)
-    palette[7] <- "darkseagreen4"
-    palette[8] <- "transparent"
-    palette[9] <- "darkseagreen3"
-  }
-  if (theme == "red") {
-    palette[1] <- "firebrick2"
-    palette[2] <- "firebrick4"
-    palette[3] <- "lightpink"
-    palette[4] <- rgb(255,251,251, maxColorValue=mc)
-    palette[5] <- "darkred"
-    palette[6] <- .maketrans("darkred", trans)
-    palette[7] <- "lightgoldenrod2"
-    palette[8] <- "transparent"
-    palette[9] <- "lightpink"
-  }
-
-  return(palette)
-
 }

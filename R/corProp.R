@@ -1,7 +1,6 @@
 corProp <- 
 function (x=mycor, 
-          main=NULL, heat.map=TRUE, bottom=3,right=3, 
-          colors=c("blue", "gray", "rose", "green", "gold", "red"),
+          main=NULL, heat.map=TRUE, bottom=3, right=3, 
           pdf.file=NULL, pdf.width=5, pdf.height=5) {
 
 
@@ -32,13 +31,8 @@ function (x=mycor,
 
   if (heat.map) {
 
-    if (missing(colors)) 
-      colors <- getOption("colors")
-    else
-      colors <- match.arg(colors)
-
     if (is.null(main)) main <- "Item Proportionalities"
-   .corcolors(out$R, NVOld, colors, main, bottom, right, diag=0,
+   .corcolors(out$R, NVOld, main, bottom, right, diag=0,
               pdf.file, pdf.width, pdf.height)
   }
 

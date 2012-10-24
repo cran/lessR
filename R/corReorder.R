@@ -1,7 +1,6 @@
 corReorder <-
 function (x=mycor, vars=NULL, first=0,
           heat.map=TRUE, main=NULL, bottom=3,right=3,
-          colors=c("blue", "gray", "rose", "green", "gold", "red"),
           pdf.file=NULL, pdf.width=5, pdf.height=5) {
 
 
@@ -53,13 +52,8 @@ function (x=mycor, vars=NULL, first=0,
 
   if (heat.map) {
 
-    if (missing(colors)) 
-      colors <- getOption("colors")
-    else
-      colors <- match.arg(colors)
-
    if (is.null(main)) main <- "Reordered Item Coefficients"
-   .corcolors(out$R, NVC, colors, main, bottom, right, diag=0,
+   .corcolors(out$R, NVC, main, bottom, right, diag=0,
               pdf.file, pdf.width, pdf.height)
   }
 

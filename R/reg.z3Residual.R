@@ -1,7 +1,7 @@
 .reg3Residual <-
 function(nm, mydframe,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         res.sort, res.rows, cooks.cut, colors,
+         res.sort, res.rows, cooks.cut,
          pdf, pdf.width, pdf.height) {
   
     cat( "\n\n\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
@@ -42,7 +42,7 @@ function(nm, mydframe,
     if (res.sort == "cooks") cat("   [sorted by Cook's Distance]\n")
     if (res.sort == "rstudent")  
       cat("   [sorted by Studentized Residual, ignoring + or - sign]\n")
-   if (res.sort == "dffits")  
+    if (res.sort == "dffits")  
       cat("   [sorted by dffits, ignoring + or - sign]\n")
     txt <- "observations (rows) of data]"
     cat("   [res.rows = ", res.rows, " out of ", n.keep, " ", txt, sep="", "\n")
@@ -53,7 +53,7 @@ function(nm, mydframe,
     cook <- cooks.distance(lm.out)
     
     out <- cbind(fit, res, rstudent(lm.out), dffits(lm.out), cook)
-    out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],out)
+    out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])], out)
     out <- data.frame(out)
     names(out)[n.vars+1] <- "fitted"
     names(out)[n.vars+2] <- "residual"
@@ -68,7 +68,8 @@ function(nm, mydframe,
         decreasing=TRUE)
       out <- out[o,]
     }
-    print(out[1:res.rows,], digits=digits.d)
+    print(round(out[1:res.rows,], digits=digits.d))
+    .dash(68)
     rm(out)
   
 
@@ -81,12 +82,13 @@ function(nm, mydframe,
     }
 
      .den.main(res, main="Evaluate Normality of Residuals", 
-       xlab="Residuals", text.out=FALSE, colors=colors,
+       xlab="Residuals", text.out=FALSE,
        bw="nrd0", type="both",
        bin.start=NULL, bin.width=NULL,
-       col.bg=NULL, col.grid=NULL, col.bars=NULL,
+       col.fill=getOption("col.fill.pt"),
+       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
        col.nrm="black", col.gen="black",
-       col.fill.nrm=NULL, col.fill.gen=NULL,
+       col.fill.nrm="transparent", col.fill.gen="transparent",
        cex.axis=.85, col.axis="gray30", col.ticks="gray30",
        x.pt=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE)
@@ -119,11 +121,12 @@ function(nm, mydframe,
     res.ord <- res[ord]
     .plt.main(fit.ord, res.ord, by=NULL, type="p", text.out=FALSE,
         main="Residuals vs Fitted Values", xlab="Fitted Values",
-        ylab="Residuals", sub=txt, cex.sub=.8, colors=colors,
-        col.line=NULL, col.area=NULL, col.box="black",
-        col.pts=NULL, col.fill=NULL, trans.pts=NULL,
-        shape.pts=21, col.grid=NULL, col.bg=NULL,
-        cex.axis=.85, col.axis="gray30",
+        ylab="Residuals", sub=txt, cex.sub=.8,
+        col.area=NULL, col.box="black",
+        col.fill=getOption("col.fill.pt"),
+        col.stroke=getOption("col.stroke.pt"),
+        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+        shape.pts=21, cex.axis=.85, col.axis="gray30",
         col.ticks="gray30", xy.ticks=TRUE,
         fit.line="none", center.line=NULL, cex=NULL, 
         time.start=NULL, time.by=NULL, time.reverse=FALSE,
@@ -131,12 +134,12 @@ function(nm, mydframe,
         ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
         n.cat=getOption("n.cat"), kind="default")
     abline(h=0, lty="dotted", col="gray70")
-    if (colors == "gray") col.ftln <- "gray30" else col.ftln <- "plum"
+    if (getOption("colors") == "gray") col.ftln <- "gray30" else col.ftln <- "plum"
     lines(lowess(fit.ord, res.ord, f=.9), col=col.ftln)
     res.c <- res[which(cook>=cooks.cut)]
     fit.c <- fit[which(cook>=cooks.cut)]
     if (length(fit.c) > 0) {
-      if (colors == "gray") col.out <- "black" else col.out <- "red"
+      if (getOption("colors") == "gray") col.out <- "black" else col.out <- "red"
       points(fit.c, res.c, col=col.out, pch=19)
       text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
     }

@@ -1,7 +1,6 @@
 Regression <-
-function(my.formula, dframe=mydata, digits.d=4, text.width=120, 
+function(my.formula, dframe=mydata, digits.d=NULL, text.width=120, 
          brief=FALSE, explain=FALSE, show.R=FALSE,
-         colors=c("blue", "gray", "rose", "green", "gold", "red"), 
 
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
          pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
@@ -14,11 +13,6 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
 
          pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
  
- 
-  if (missing(colors)) 
-    colors <- getOption("colors")
-  else
-    colors <- match.arg(colors)
   
   mydframe <- deparse(substitute(dframe))  # get data frame name for cor before sort
  
@@ -121,6 +115,7 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
   if (is.null(res.rows)) if (n.keep < 20) res.rows <- n.keep else res.rows <- 20 
   if (res.rows == "all") res.rows <- n.keep  # turn off resids with res.rows=0 call
 
+  if (is.null(digits.d)) digits.d <- .getdigits(dframe[,nm[1]], 3)
 
   .reg1Basic(nm, mydframe,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line)
@@ -145,7 +140,7 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
 
     .reg3Residual(nm, mydframe,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         res.sort, res.rows, cooks.cut, colors,
+         res.sort, res.rows, cooks.cut,
          pdf, pdf.width, pdf.height)
    }
  
@@ -154,13 +149,13 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
     prd <- .reg4Pred(nm, mydframe, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
-         numeric.all, in.data.frame, colors, X1.new, 
+         numeric.all, in.data.frame,  X1.new, 
          X2.new, X3.new, X4.new, X5.new)
    
   .reg5Plot(nm, mydframe, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
-         numeric.all, in.data.frame, colors, X1.new, 
+         numeric.all, in.data.frame,  X1.new, 
          X2.new, X3.new, X4.new, X5.new, prd$cint, prd$pint,
          pdf, pdf.width, pdf.height)
 
@@ -176,8 +171,8 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
         "Function Regression is from David Gerbing's lessR package.\n",
         "  To obtain the reference: Enter citation(\"lessR\")\n")
     cat("\n",
-        "Collinearity analysis and 3d scatterplot are from the vif and scatter3d\n",
-        "functions in John Fox's car package.\n",
+        "Collinearity analysis is from the vif function in\n",
+        "John Fox's car package.\n",
         "  To obtain the reference: Enter citation(\"car\")\n")
     cat("\n",
         "Best model subset analysis is from Thomas Lumley's leaps function\n",

@@ -1,19 +1,20 @@
 Sort <-
-function(by, direction=NULL, dframe=mydata, ...) {
+function(by, direction=NULL, brief=FALSE, keep=TRUE, dframe=mydata, ...) {
+
+  dname <- deparse(substitute(dframe))
 
   n.obs <- nrow(dframe)
 
   all.vars <- as.list(seq_along(dframe))
   names(all.vars) <- names(dframe)
 
-  by.col <- eval(substitute(by), envir=all.vars, enclos=parent.frame())
-  n.sort <- length(by.col)
+  if (!brief) {
+    cat("\nSort Specification\n")
+    .dash(31)
+  }
 
-  cat("\nSort Specification\n")
-  .dash(31)
-
-  if (length(by.col) == 1  &&  by.col[1] == "row.names") {
-    ord <- "order(row.names(dframe))"
+  if (deparse(substitute(by)) == "row.names") {
+    ord <- "order(row.names(dframe)"
     cat(" ", "row.names", "-->")
     if (!is.null(direction)) {
       if (direction[1] == "+") txt <- "ascending"
@@ -24,11 +25,24 @@ function(by, direction=NULL, dframe=mydata, ...) {
         "Only permissible values are + for ascending and - for descending.\n\n")
       }
     }
-    else txt <- "+"
+    else 
+      txt <- "ascending"
+    ord.txt <- "decreasing=FALSE"
+    if (txt =="descending") ord.txt <- "decreasing=TRUE"
+    ord <- paste(ord, ",", ord.txt, ",...)", sep="")
     cat(" ", txt, "\n") 
   }
 
-  else {
+  else if (deparse(substitute(by)) == "random") {
+    cat(" ", "random\n")
+    rand.rows <- sample(1:n.obs, size=n.obs, replace=FALSE)
+    ord <- paste("order(", "rand.rows", ", ...)", sep="")
+  }
+
+  else {  # sort variable(s)
+
+    by.col <- eval(substitute(by), envir=all.vars, enclos=parent.frame())
+    n.sort <- length(by.col)
 
     if (!is.null(direction)) {
       if (n.sort != length(direction)) { 
@@ -43,16 +57,18 @@ function(by, direction=NULL, dframe=mydata, ...) {
     else for (i in 1:n.sort) direction[i] <- "+"
 
     # console output
-    for (i in 1:n.sort) {
-      cat(" ", names(dframe)[by.col[i]], "-->")
-      if (direction[i] == "+") txt <- "ascending"
-      else if (direction[i] == "-") txt <- "descending"
-      else {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Value of direction, the sort direction specification: ", direction[i], "\n\n",
-        "Only permissible values are + for ascending and - for descending.\n\n")
+    if (!brief) {
+      for (i in 1:n.sort) {
+        cat(" ", names(dframe)[by.col[i]], "-->")
+        if (direction[i] == "+") txt <- "ascending"
+        else if (direction[i] == "-") txt <- "descending"
+        else {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Value of direction, the sort direction specification: ", direction[i], "\n\n",
+          "Only permissible values are + for ascending and - for descending.\n\n")
+        }
+        cat(" ", txt, "\n") 
       }
-      cat(" ", txt, "\n") 
     }
 
     fvar <- matrix(nrow=n.obs, ncol=n.sort)  # max num of factors is n.sort
@@ -78,12 +94,31 @@ function(by, direction=NULL, dframe=mydata, ...) {
     ord <- paste("order(", ord, "...)", sep="")
   }
 
+
   # finish the console output
   .dash(31)
   cat("\n")
 
-  # do the sort and return
+  # do the sort
   o <- eval(parse(text=ord))
-  return(dframe[o, ])
+  dframe <- dframe[o, ]
+
+  if (!brief) {
+    cat("\n")
+    .dash(68)
+    cat("After the Sort, first five rows of data ")
+    if (keep) cat("for data frame:", dname)
+    cat( "\n")
+    .dash(68)
+    print(head(dframe, n=5))
+    cat("\n")
+  }
+
+  if (keep) 
+    assign(dname, dframe, pos=.GlobalEnv)
+  else
+    return(dframe)
+
+
 
 }

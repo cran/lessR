@@ -1,18 +1,18 @@
-\name{datMach4}
+\name{dataMach4}
 \docType{data}
-\alias{datMach4}
+\alias{dataMach4}
 \title{Data: Machiavellianism Data}
 \description{Likert data responses to Christie and Giess's Mach4 scale.
 
 All Likert items assessed on a 6-point scale from 0: Strongly Disagree to 5: Strongly Agree.
 }
 
-\usage{data(datMach4)}
+\usage{data(dataMach4)}
 
 \format{A data table with 351 observations.
 
+Gender, 1 column, 0:Male, 1:Female\cr
 Mach IV, 20 Likert items, named m01, m02, \ldots, m20 \cr
-Gender, 1 column, 0:Male, 1:Female.\cr
 
 Christie and Geiss Mach IV Scale\cr
 -------------------------------------------\cr

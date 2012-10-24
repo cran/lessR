@@ -28,10 +28,11 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   y.values <- mypower$power
 
   .plt.main(x.values, y.values, by=NULL, type="l", xlab=myxlab, ylab="Power",
-         col.line=NULL, col.area=NULL, col.box="black",
-         col.pts=NULL, col.fill=NULL, trans.pts=NULL,
-         shape.pts=21, col.grid=NULL, col.bg=NULL,
-         colors=colors, cex.axis=.85, col.axis="gray30",
+         col.area=NULL, col.box="black",
+         col.fill=getOption("col.fill.pt"),
+         col.stroke=getOption("col.stoke.pt"),
+         col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+         shape.pts=21, cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xy.ticks=TRUE, main=NULL, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          kind="default", fit.line="none", col.fit.line="grey55",

@@ -15,9 +15,9 @@ Automatically selects and then provides an analysis of a linear model: OLS regre
 \usage{
 Model(my.formula, dframe=mydata, brief=FALSE, \ldots)
 
-model.brief(my.formula, brief=TRUE, \ldots) 
+model.brief(\ldots, brief=TRUE) 
 
-model(my.formula, \ldots) 
+model(\ldots) 
 }
 
 
@@ -55,7 +55,7 @@ Y <- .7*X1 + .2*X2 + .6*rnorm(n)
 Ybin <- cut(Y, breaks=2, labels=FALSE)
 #  instead, if read data with the rad function
 #   then the result is the data frame called mydata 
-mydata <- data.frame(X1, X2, Y, Ybin)
+mydata <- round(data.frame(X1, X2, Y, Ybin),2)
 rm(Y); rm(Ybin); rm(X1); rm(X2)
 
 # One-predictor regression

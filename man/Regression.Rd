@@ -15,13 +15,12 @@ Default output includes the inferential analysis of the estimated coefficients a
 
 Can also be called from the more general \code{\link{model}} function.
 
-The resulting scatterplot or scatterplot matrix, when written to a pdf file according to \code{pdf=TRUE}, is named RegScatterplot.pdf or RegScatterMatrix.pdf. If residuals are reported, then the two additional pdf files are named RegResiduals.pdf and RegResidFitted.pdf. Their names and the directory to which they are written are povided as part the console output.
+The resulting scatterplot or scatterplot matrix, when written to a pdf file according to \code{pdf=TRUE}, is named RegScatterplot.pdf or RegScatterMatrix.pdf. If residuals are reported, then the two additional pdf files are named RegResiduals.pdf and RegResidFitted.pdf. Their names and the directory to which they are written are provided as part the console output.
 }
 
 \usage{
-Regression(my.formula, dframe=mydata, digits.d=4, text.width=120, 
+Regression(my.formula, dframe=mydata, digits.d=NULL, text.width=120, 
          brief=FALSE, explain=FALSE, show.R=FALSE,
-         colors=c("blue", "gray", "rose", "green", "gold", "red"), 
 
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
          pred=TRUE, pred.all=FALSE, pred.sort=c("predint", "off"),
@@ -34,11 +33,11 @@ Regression(my.formula, dframe=mydata, digits.d=4, text.width=120,
 
          pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
 
-reg(my.formula, \ldots) 
+reg(\ldots) 
 
-reg.brief(my.formula, brief=TRUE, \ldots) 
+reg.brief(\ldots, brief=TRUE) 
 
-reg.explain(my.formula, explain=TRUE, \ldots) 
+reg.explain(\ldots, explain=TRUE) 
 }
 
 
@@ -48,8 +47,9 @@ reg.explain(my.formula, explain=TRUE, \ldots)
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
   \item{dframe}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
-  \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
-        For the rest of the output, it is a suggestion only.}
+  \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits,
+        set by default to at least 3 or the largest number of digits in the values 
+        of the response variable plus 1.}
   \item{text.width}{Width of the text output at the console.}
   \item{brief}{Extent of displayed results.}
   \item{explain}{Off by default, but if set to \code{TRUE} then brief labels of different
@@ -57,7 +57,6 @@ reg.explain(my.formula, explain=TRUE, \ldots)
   \item{show.R}{Display the R instructions that yielded the \code{lessR} output, albeit without
         the additional formatting of the results such as combining output of different 
         functions into a table.}
-  \item{colors}{Sets the color palette for the resulting graphics.}
   \item{res.rows}{Default is 25, which lists the first 25 rows of data sorted by the
        specified sort criterion.  To turn this option off, specify a value of 0.  To see 
        the output for all observations, specify a value of \code{"all"}.}
@@ -112,6 +111,9 @@ The default analysis provides the model's parameter estimates and corresponding 
 DATA FRAME\cr
 The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{dframe} option if the name is not the default \code{mydata}.
 
+DECIMAL DIGITS\cr
+The number of decimal digits displayed on the output is, by default, the maximum number of decimal digits for all the data values of the response variable. Or, this value can be explicitly specified with the \code{digits.d} parameter.
+
 GRAPHICS\cr
 Three default graphs are provided. By default the graphs are written to separate graphics windows (which may overlap each other completely, in which case move the top graphics windows). Or, the \code{graphics.save} option may be invoked to save the graphs to a single pdf file called \code{regOut.pdf}. The directory to which the file is written is displayed on the console text output.
 
@@ -125,15 +127,15 @@ RESIDUAL ANALYSIS\cr
 By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual, Cook's distance and dffits, with the first 20 observations listed and sorted by Cook's distance.  The \code{res.sort} option provides for sorting by the Studentized residuals or not sorting at all.  The \code{res.rows} option provides for listing these rows of data and computed statistics statistics for any specified number of observations (rows).  To turn off the analysis of residuals, specify \code{res.rows=0}.
 
 PREDICTION INTERVALS\cr
-The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, as well as the lower and upper bounds for the confidence interval and the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are more than 50 observations then the information for only the first five, the middle five and the last five observations is displayed. To turn off the analysis of prediction intervals, specify \code{pred=FALSE}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
+The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, the lower and upper bounds for the confidence interval and the prediction interval, and the wide of the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are more than 50 observations then the information for only the first five, the middle five and the last five observations is displayed. To turn off the analysis of prediction intervals, specify \code{pred=FALSE}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
 
 The data for the default analysis of the prediction intervals is for the values of the predictor variables for each observation, that is, for each row of the data. New values of the predictor variables can be specified for the calculation of the prediction intervals by providing values for the options \code{X1.new} for the values of the first listed predictor variable in the model, \code{X2.new} for the second listed predictor variable, and so forth for up to five predictor variables. To provide these values, use functions such as \code{\link{seq}} for specifying a sequence of values and \code{\link{c}} for specifying a vector of values. For multiple regression models, all combinations of the specified new values for all of the predictor variables are analyzed.
 
 RELATIONS AMONG THE VARIABLES\cr
-By default the correlation matrix of all the variables in the model is displayed, and, for multiple regression models, collinearity analysis is provided with the \code{vif} function from the Fox and Weisberg (2011) \code{car} package as well as the adjusted R squared of each possible model from an analysis of all possible subsets of the predictor variables.  This all subsets analysis requires the \code{leaps} function from the \code{leaps} package. These contributed packages are automatically loaded if available.  If not available, an appropriate warning is provided to the user with instructions to install the corresponding package with the \code{\link{install.packages}} function, and the analysis continues without the output that would have been provided by invoking that package.  To turn off the all possible sets option, set \code{subsets=FALSE}.
+By default the correlation matrix of all the variables in the model is displayed, and, for multiple regression models, collinearity analysis is provided with the \code{vif} function from the Fox and Weisberg (2011) \code{car} package as well as the adjusted R squared of each possible model from an analysis of all possible subsets of the predictor variables.  This all subsets analysis requires the \code{leaps} function from the \code{leaps} package. These contributed packages are automatically loaded if available.  To turn off the all possible sets option, set \code{subsets=FALSE}.
 
 OUTPUT\cr
-The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values. Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg.brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit. An explanation of each section of the output can be obtained by setting the \code{explain} option to \code{TRUE}, or run \code{reg.explain}.  Much of the underlying relevant R code run by \code{reg} is obtained by setting the \code{show.R} option to \code{TRUE}.
+The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values. Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg.brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit. An explanation of each section of the output can be obtained by setting the \code{explain} option to \code{TRUE}, or run \code{reg.explain}.  Much of the underlying relevant R code run by \code{Regression} is obtained by setting the \code{show.R} option to \code{TRUE}.
 
 INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{reg} is finished with a normal termination, the options are re-set to their values before the \code{reg} function began executing.
@@ -163,7 +165,7 @@ X2 <- rnorm(20)
 Y <- .7*X1 + .2*X2 + .6*rnorm(20)
 #  instead, if read data with the rad function
 #   then the result is the data frame called mydata 
-mydata <- data.frame(X1, X2, Y)
+mydata <- round(data.frame(X1, X2, Y),2)
 rm(Y); rm(X1); rm(X2)
 
 # One-predictor regression
@@ -190,7 +192,7 @@ Regression(Y ~ X1, pdf=TRUE, pdf.width=4, pdf.height=4)
 # Specify new values of the predictor variables to calculate
 #  forecasted values and the corresponding prediction intervals
 # Specify an input data frame other than mydata, see help(mtcars)
-Regression(mpg ~ hp + wt + disp, dframe=mtcars,
+Regression(mpg ~ hp + wt + disp, dframe=mtcars, 
   X1.new=seq(50,350,50), X2.new=c(2,3), X3.new=c(100,300))
 }
 
