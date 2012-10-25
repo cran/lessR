@@ -1,9 +1,7 @@
 .hst.default <- 
-function(x, col.bars, col.border, col.bg, 
-         col.grid, col.reg, over.grid,
-         colors, cex.axis, col.axis, col.ticks,
-         breaks, bin.start, bin.width,
-         prop, cumul, digits.d, xlab, ylab, main, text.out, ...) {
+function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
+       over.grid, cex.axis, col.axis, col.ticks, breaks, bin.start, bin.width,
+       prop, cumul, digits.d, xlab, ylab, main, text.out, ...) {
 
   if (!is.numeric(x)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -16,13 +14,6 @@ function(x, col.bars, col.border, col.bg,
       "Choose only one option to specify a start value.\n",
       "Either choose the option  breaks  or the option  bin.start.\n\n")
   }
-
-  # color palette based on color theme colors
-  cp <- .clr(colors)
-  if (is.null(col.bars)) col.bars <- cp[1]
-  if (is.null(col.border)) col.border <- cp[2]
-  if (is.null(col.grid)) col.grid <- cp[3]
-  if (is.null(col.bg)) col.bg <- cp[4]
 
   # get variable labels if exist plus axes labels
   if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- "Proportion"
@@ -111,7 +102,9 @@ function(x, col.bars, col.border, col.bg,
     abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
     abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
-  suppressWarnings(plot(h, add=TRUE, col=col.bars, border=col.border, freq=TRUE, ...))
+
+  suppressWarnings(plot(h, add=TRUE, col=col.fill,
+                   border=col.stroke, freq=TRUE, ...))
   if (cumul == "both") {
     h$counts <- old.counts
     suppressWarnings(plot(h, add=TRUE, col=col.reg, freq=TRUE))

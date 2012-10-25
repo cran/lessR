@@ -1,8 +1,7 @@
 corCFA <- 
-function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
+function(x=mycor, iter=25, resid=TRUE, item.cor=TRUE, sort=TRUE,
 
          main=NULL, heat.map=TRUE, bottom=3, right=3, 
-         colors=c("blue", "gray", "rose", "green", "gold", "red"),
 
          pdf.file=NULL, pdf.width=5, pdf.height=5,
 
@@ -45,6 +44,13 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
   for (i in 1:NFmax) {
     fnum <- eval(parse(text=paste("F", toString(i), "n", sep="")))
     if (!is.null(fnum)) NF <- NF + 1
+  }
+
+  if (NF == 0) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Number of Factors: ", NF, "\n",
+      "Need to specify some factors.", "\n\n",
+      "For example, F1=c(...), F2=c(...), etc.\n\n")
   }
 
   # get the ordinal position of the first and last vars in Group i
@@ -156,16 +162,27 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
   cat('Reliability Analysis\n',
       '---------------------------------------------------------------------\n',
       'Reliability of the composite, unweighted total score, for each scale.\n',
-      'Alpha assumes equal item reliabilities. The more generally preferred\n', 
-      'Omega uses each item\'s communality as a reliability estimate.\n',
-      '---------------------------------------------------------------------\n\n',
+      sep="")
+  if (iter > 0)
+    cat('Alpha assumes equal item reliabilities. The more generally preferred\n', 
+        'Omega uses each item\'s communality in the computation of reliability.\n',
+        sep="")
+  cat('---------------------------------------------------------------------\n\n',
       sep="")
 
-  cat(' Scale  Alpha   Omega\n',
-      '--------------------\n')
-  for (i in 1:NF)
-    cat("  ", nmF[i], " ", .fmt(out$Alpha[i],3), 
-                      " ", .fmt(out$Omega[i],3), "\n")
+  if (iter > 0) 
+    cat(' Scale  Alpha  Omega\n',
+        ' -------------------\n', sep="")
+  else
+    cat(' Scale  Alpha\n',
+        ' ------------\n', sep="")
+  for (i in 1:NF) {
+    cat("  ", nmF[i], " ", .fmt(out$Alpha[i],3)) 
+    if (iter > 0)
+      cat(                  " ", .fmt(out$Omega[i],3), "\n")
+    else
+      cat("\n")
+  }
   cat("\n\n")
 
 
@@ -240,72 +257,69 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
   # --------------------------------------------------------
   if (heat.map) {
 
-    if (missing(colors)) 
-      colors <- getOption("colors")
-    else
-      colors <- match.arg(colors)
-
     if (is.null(main)) main <- "Item Correlations/Communalities"
-   .corcolors(out$R, NItems, colors, main, bottom, right, diag=NULL,
+   .corcolors(out$R, NItems, main, bottom, right, diag=NULL,
               pdf.file, pdf.width, pdf.height)
   }
 
 
   # --------------------------------------------------------
   # Indicator analysis
-  MaxBad <- 25
-  MaxLbl <- NItems
-  Bad <- integer(length=NItems)
+  if (iter > 0 ) {
+    MaxBad <- 25
+    MaxLbl <- NItems
+    Bad <- integer(length=NItems)
 
-  cat('Indicator Analysis\n')
-  .dash(75)
-  cat('Fac', ' Indi', '  Pat', '   Unique',
-     ' Factors with which an indicator correlates too\n')
-  cat('tor', ' cator', ' tern', '   ness',
-      '  highly, and other indicator diagnostics.\n')
-  .dash(75)
+    cat('Indicator Analysis\n')
+    .dash(75)
+    cat('Fac', ' Indi', '  Pat', '   Unique',
+       ' Factors with which an indicator correlates too\n')
+    cat('tor', ' cator', ' tern', '   ness',
+        '  highly, and other indicator diagnostics.\n')
+    .dash(75)
 
-  for (IFac in 1:NF) {
-    cat("\n")
-    Fnm <- paste("F", as.character(IFac), sep="")
-
-    for (Item in LblCut[IFac,1]:LblCut[IFac,2]) {
-      Lam <- out$R[NItems+IFac,Item]
-      Unique <- 1 - Lam**2
-
-      if (Lam>0 && Unique>0) {
-        NBad <- 0
-        for (I in 1:NF) {
-          if (abs(out$R[NItems+I,Item]) > Lam) {
-            NBad <- NBad + 1
-            if (NBad <= MaxBad) Bad[NBad] <- I
-          }
-        }
-        if (NBad > MaxBad) NBad <- MaxBad
-        cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8))
-        cat("    ")
-        if (NBad > 0) for (IBad in 1:NBad) cat(paste("F",Bad[IBad]," ",sep=""))
-      }
-
-      else if (Lam <= 0)
-        cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), '   xxxx ',
-         '   ** Negative Loading on Own Factor **')
-
-      else if (Unique <= 0) {
-        if (LblCut[IFac,2]-LblCut[IFac,1] > 0)
-          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
-           '   ** Improper Loading **')
-        else
-          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
-           '   ** Factor Defined by Only One Item **')
-      }
-
+    for (IFac in 1:NF) {
       cat("\n")
-      Bad <- rep(0, NItems)
-    }  # each item within a factor
+      Fnm <- paste("F", as.character(IFac), sep="")
 
-  }  # each factor
-  cat("\n\n")
+      for (Item in LblCut[IFac,1]:LblCut[IFac,2]) {
+        Lam <- out$R[NItems+IFac,Item]
+        Unique <- 1 - Lam**2
+
+        if (Lam>0 && Unique>0) {
+          NBad <- 0
+          for (I in 1:NF) {
+            if (abs(out$R[NItems+I,Item]) > Lam) {
+              NBad <- NBad + 1
+              if (NBad <= MaxBad) Bad[NBad] <- I
+            }
+          }
+          if (NBad > MaxBad) NBad <- MaxBad
+          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8))
+          cat("    ")
+          if (NBad > 0) for (IBad in 1:NBad) cat(paste("F",Bad[IBad]," ",sep=""))
+        }
+
+        else if (Lam <= 0)
+          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), '   xxxx ',
+           '   ** Negative Loading on Own Factor **')
+
+        else if (Unique <= 0) {
+          if (LblCut[IFac,2]-LblCut[IFac,1] > 0)
+            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
+             '   ** Improper Loading **')
+          else
+            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
+             '   ** Factor Defined by Only One Item **')
+        }
+
+        cat("\n")
+        Bad <- rep(0, NItems)
+      }  # each item within a factor
+
+    }  # each factor
+    cat("\n\n")
+  }
 
 
   # --------------------------------------------------------
@@ -319,12 +333,17 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
       cat('Item Correlation, correlation of two items with each other\n',
           'Communalities in the diagonal of the item correlations, each the\n',
           '  variance of an item due to the common factor\n', sep="")
-    cat('Factor Loading, correlations of an item with a factor\n',
+    cat('Factor Loading, correlation of an item with a factor\n',
         'Pattern Coefficient, regression coefficient of its factor on an item,\n',
         '  a special case of a factor loading\n',
         'Factor Correlation, correlation of two factors with each other\n', sep="")
     .dash(69)
     cat("\n")
+  }
+
+  else {
+    cat("Item-Scale and Scale-Scale Correlations\n",
+        "---------------------------------------\n", sep="")
   }
 
 
@@ -361,16 +380,46 @@ function(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
         'indicator measurement model.\n',
         '--------------------------------------------------------------\n\n',
         sep="")
+
+    # sum of squares, sum of abs
+    cat("Residual summaries\n",
+        "------------------\n\n", sep="")
+
+    cat("     Sum of    Average", "\n",
+        "     Squares   Abs Value", "\n",
+        "     -------   ---------", "\n", sep="")
+    cc <- as.character(dimnames(out$R)[[1]])
+    ssq.tot <- 0
+    abv.tot <- 0
+    abv.all <- 0
+    for (i in 1:NItems) {
+      ssq <- 0
+      abv <- 0
+      for (j in 1:NItems) {
+        ssq <- ssq + out$R[i,j]^2
+        abv <- abv + abs(out$R[i,j])
+        abv.all <- abv.all + abs(out$R[i,j])
+      }
+      ssq.tot <- ssq.tot + ssq
+      abv.avg <- abv / (NItems - 1)
+      cat(cc[i], "  ", .fmt(ssq,3), "  ", .fmt(abv.avg,3), "\n")
+    }
+    abv.all.tot <- abv.all / (NItems^2 - NItems)
+    cat("\n")
+    cat("Total sum of squares for all items:", .fmt(ssq.tot,3), "\n")
+    cat("Average absolute residual w/o the diagonal:", .fmt(abv.all.tot,3), "\n\n\n")
+
+    cat("Item residuals\n",
+        "--------------\n\n", sep="")
+
+    return(round(out$R,2))
   }
 
-
-  # --------------------------------------------------------
-    if (!resid)
-      if (item.cor)
-        return(round(out$R,2))
-      else
-        return(round(out$R[1:NVTot,(NItems+1):NVTot],2))
-    else
+  else {  # not resid
+    if (item.cor)
       return(round(out$R,2))
+    else
+      return(round(out$R[1:NVTot,(NItems+1):NVTot],2))
+  }
 
 }

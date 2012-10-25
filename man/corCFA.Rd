@@ -1,22 +1,24 @@
 \name{corCFA}
 \alias{corCFA}
 \alias{cfa}
+\alias{scales}
 
 \title{Confirmatory Factor Analysis of Multiple Indicator Measurement Models}
 
 \description{
-Abbreviation: \code{cfa}
+Abbreviation: \code{cfa}, \code{scales}
 
-A multiple indicator measurement model partitions a set of observed variables, such as items, into mutually exclusive groups with one common factor per group of items. From the input correlation matrix of the observed variables, this procedure uses iterated centroid estimation to estimate the coefficients of the model, the factor pattern and factor-factor correlations, as well as the correlations of each factor with each item. The analysis is provided by Fortran code, adapted from John Hunter's (1970) program PACKAGE.
+A multiple indicator measurement model partitions a set of observed variables, such as items, into mutually exclusive groups with one common factor per group of items. From the input correlation matrix of the observed variables, this procedure uses iterated centroid estimation to estimate the coefficients of the model, the factor pattern and factor-factor correlations, as well as the correlations of each factor with each item. The analysis is provided by Fortran code, adapted from John Hunter's (1969) program PACKAGE (Hunter and Cohen, 1969).
 
 Corresponding scale reliabilities are provided, as well as the residuals, the difference between the observed item correlations and those predicted by the model.  To visualize the relationships, a heat map of the re-ordered correlation matrix is also provided, with item communalities in the diagonal. To understand the meaning of each factor, the corresponding item content is displayed for each factor if the items have been read as variable labels.
+
+The \code{scales} abbreviation provides scale reliabilities and observed item-scale and scale-scale correlations.
 }
 
 \usage{
-corCFA(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
+corCFA(x=mycor, iter=25, resid=TRUE, item.cor=TRUE, sort=TRUE,
 
          main=NULL, heat.map=TRUE, bottom=3, right=3, 
-         colors=c("blue", "gray", "rose", "green", "gold", "red"),
 
          pdf.file=NULL, pdf.width=5, pdf.height=5,
 
@@ -25,6 +27,8 @@ corCFA(x=mycor, iter=15, resid=TRUE, item.cor=TRUE, sort=TRUE,
          F11=NULL, F12=NULL)
 
 cfa(\ldots)
+
+scales(\ldots, iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE, heat.map=FALSE)
 }
 
 \arguments{
@@ -40,7 +44,6 @@ cfa(\ldots)
         correlations with item communalities in the diagonal.}
   \item{bottom}{Number of lines of bottom margin of heat map.}
   \item{right}{Number of lines of right margin of heat map.}
-  \item{colors}{Sets the color palette for the heat map.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -79,7 +82,7 @@ HEAT MAP\cr
 To help visualize the overall pattering of the correlations, the corresponding heat map of the item correlation matrix with communalities is produced when \code{heat.map=TRUE}, the default. As is true of the output correlation matrix, the correlations illustrated in the heat map are also sorted by their ordering within each factor. The corresponding color scheme is dictated by the system setting, according to the \code{lessR} function \code{\link{set}}.  The default color scheme is \code{blue}.
 
 ESTIMATION PROCEDURE\cr
-The estimation procedure is centroid factor analysis, which defines each factor, parallel to the definition of each scale score, as the unweighted composite of the corresponding items for that scale.  The latent variables are obtained by replacing the 1's in the diagonal of the observed variable correlation matrix with communality estimates.  These estimates are obtained by iterating the solution to the specified number of iterations according to \code{iter}, which defaults to 15.
+The estimation procedure is centroid factor analysis, which defines each factor, parallel to the definition of each scale score, as the unweighted composite of the corresponding items for that scale.  The latent variables are obtained by replacing the 1's in the diagonal of the observed variable correlation matrix with communality estimates.  These estimates are obtained by iterating the solution to the specified number of iterations according to \code{iter}, which defaults to 25.
 
 A communality is the percentage of the item's correlation attributable to, in this situation of a multiple indicator measurement model, its one underlying factor.  As such, the communality is comparable to the item correlations for items within the same factor, which are also due only to the influence of the one common, underlying factor. A value of 0 for \code{iter} implies that the 1's remain in the observed variable correlation matrix, which then means that there are no latent factors defined.  Instead the resulting correlation matrix is of the observed scale scores and the component items.
 }
@@ -95,7 +98,7 @@ Gerbing, D. W., & Hamilton, J. G. (1994). The surprising viability of a simple a
 
 Hunter, J. E., Gerbing, D. W., & Boster, F. J. (1982). Machiavellian beliefs and personality: The construct invalidity of the Machiavellian dimension. Journal of Personality and Social Psychology, 43, 1293-1305.
 
-Hunter, John. (1970). PACKAGE. Michigan State University.
+Hunter, J. and Cohen, J. (1969). PACKAGE: A system of computer routines for the analysis of correlational data. Educational and Psychological Measurement, 1969, 29, 697-700.
 }
 
 \seealso{
@@ -114,31 +117,33 @@ c(1.000,0.480,0.320,0.192,0.144,0.096,
   0.192,0.144,0.096,1.000,0.480,0.320,
   0.144,0.108,0.072,0.480,1.000,0.240,
   0.096,0.072,0.048,0.320,0.240,1.000))
-colnames(mycor) <- c("V1", "V2", "V3", "V4", "V5", "V6")
+colnames(mycor) <- c("X1", "X2", "X3", "X4", "X5", "X6")
 rownames(mycor) <- colnames(mycor)
 
 # the confirmatory factor analysis
 # first three variables with first factor, last three with second
 # default correlation matrix is mycor
 # two ways to specify the items, with a colon and with commas
-corCFA(F1=V1:V3, F2=c(V6,V5,V4))
+corCFA(F1=X1:X3, F2=c(X4,X5,X6))
 
 # abbreviated form
-cfa(F1=V1:V3, F2=V4:V6)
+cfa(F1=X1:X3, F2=X4:X6)
+
+# component analysis, show observed scale correlations
+scales(F1=X1:X3, F2=X4:X6)
 
 # produce a gray scale heat map of the item correlations
 #   with communalities in the diagonal
 # all subsequent graphics are in gray scale until changed
 set(colors="gray")
-corCFA(F1=V1:V3, F2=V4:V6)
+corCFA(F1=X1:X3, F2=X4:X6)
 
 # access the lessR data set called datMach4
-data(datMach4)
-# select the subset of the data that just contains Mach items
-mach <- subset(datMach4, select=c(m01:m20))
+Read(lessR.data="Mach4")
+# reverse score the reflected variables
+Recode(c(m03,m04,m06,m07,m09,m10,m11,m14,m16,m17,m19), old=0:5, new=5:0)
 # calculate the correlations and store in mycor
-cr(mach)
-
+cr(m01:m20)
 # confirmatory factor analysis of 4-factor solution of Mach IV scale
 # Hunter, Gerbing and Boster, 1982
 corCFA(F1=c(m06,m07,m09,m10), F2=c(m15,m02),

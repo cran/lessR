@@ -1,7 +1,6 @@
 corReflect <- 
 function (x=mycor, vars,
           main=NULL, heat.map=TRUE, bottom=3,right=3, 
-          colors=c("blue", "gray", "rose", "green", "gold", "red"),
           pdf.file=NULL, pdf.width=5, pdf.height=5) {
 
 
@@ -38,13 +37,8 @@ function (x=mycor, vars,
 
   if (heat.map) {
 
-    if (missing(colors)) 
-      colors <- getOption("colors")
-    else
-      colors <- match.arg(colors)
-
     if (is.null(main)) main <- "With Reflected Item Coefficients"
-   .corcolors(out$R, NVOld, colors, main, bottom, right, diag=0,
+   .corcolors(out$R, NVOld, main, bottom, right, diag=0,
               pdf.file, pdf.width, pdf.height)
   }
 

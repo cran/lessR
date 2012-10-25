@@ -1,7 +1,7 @@
 .logit3Residual <-
 function(nm, mydframe,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
-         res.sort, res.rows, cooks.cut, colors,
+         res.sort, res.rows, cooks.cut,
          pdf, pdf.width, pdf.height) {
   
     cat( "\n\n\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
@@ -48,12 +48,13 @@ function(nm, mydframe,
     }
 
     .den.main(res, main="Evaluate Normality of Residuals", 
-       xlab="Residuals", text.out=FALSE, colors=colors,
+       xlab="Residuals", text.out=FALSE, 
        bw="nrd0", type="both",
        bin.start=NULL, bin.width=NULL,
-       col.bg=NULL, col.grid=NULL, col.bars=NULL,
+       col.fill=getOption("col.fill.pt"),
+       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
        col.nrm="black", col.gen="black",
-       col.fill.nrm=NULL, col.fill.gen=NULL,
+       col.fill.nrm="transparent", col.fill.gen="transparent",
        cex.axis=.85, col.axis="gray30", col.ticks="gray30",
        x.pt=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE)
@@ -86,10 +87,12 @@ function(nm, mydframe,
     res.ord <- res[ord]
     .plt.main(fit.ord, res.ord, by=NULL, type="p", text.out=FALSE,
         main="Residuals vs Fitted Values", xlab="Fitted Values",
-        ylab="Residuals", sub=txt, cex.sub=.8, colors=colors,
-        col.line=NULL, col.area=NULL, col.box="black",
-        col.pts=NULL, col.fill=NULL, trans.pts=NULL,
-        shape.pts=21, col.grid=NULL, col.bg=NULL,
+        ylab="Residuals", sub=txt, cex.sub=.8,
+        col.area=NULL, col.box="black",
+        col.stroke=getOption("col.stroke.pt"), 
+        col.fill=getOption("col.fill.pt"),
+        shape.pts=21, col.bg=getOption("col.bg"),
+        col.grid=getOption("col.grid"),
         cex.axis=.85, col.axis="gray30",
         col.ticks="gray30", xy.ticks=TRUE,
         fit.line="none", center.line=NULL, cex=NULL, 
@@ -98,12 +101,12 @@ function(nm, mydframe,
         ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
         n.cat=getOption("n.cat"), kind="default")
     abline(h=0, lty="dotted", col="gray70")
-    if (colors == "gray") col.ftln <- "gray30" else col.ftln <- "plum"
+    if (getOption("colors") == "gray") col.ftln <- "gray30" else col.ftln <- "plum"
     lines(lowess(fit.ord, res.ord, f=.9), col=col.ftln)
     res.c <- res[which(cook>=cooks.cut)]
     fit.c <- fit[which(cook>=cooks.cut)]
     if (length(fit.c) > 0) {
-      if (colors == "gray") col.out <- "black" else col.out <- "red"
+      if (getOption("colors") == "gray") col.out <- "black" else col.out <- "red"
       points(fit.c, res.c, col=col.out, pch=19)
       text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
     }

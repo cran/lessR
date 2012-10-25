@@ -16,12 +16,17 @@ Can also be called from the more general \code{\link{model}} function.
 
 \usage{
 ttest(x=NULL, y=NULL, dframe=mydata,
-         n = NULL, m = NULL, s = NULL, mu0 = NULL, 
-         n1 = NULL, n2 = NULL,  m1 = NULL, m2 = NULL, s1 = NULL, s2 = NULL, 
-         Ynm = "Y", Xnm = "X", X1nm = "Group1", X2nm = "Group2", 
-         brief=FALSE, digits.d = NULL, graph=TRUE,
-         conf.level = 0.95, mmd = NULL, msmd = NULL, 
-         bw1 = "nrd", bw2 = "nrd", \ldots)
+
+     n=NULL, m=NULL, s=NULL, mu0=NULL, 
+     n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
+
+     Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", 
+
+     brief=FALSE, digits.d=NULL, 
+     conf.level=0.95, mmd=NULL, msmd=NULL, 
+
+     bw1="nrd", bw2="nrd", graph=TRUE, show.title=TRUE,
+     pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 tt.brief(\ldots, brief=TRUE)
 
@@ -32,10 +37,11 @@ smd.t.test(\ldots)
 
 \arguments{
   \item{x}{A \code{\link{formula}} of the form Y ~ X, where Y is the 
-        numeric response variable compared across the two groups, and X is a]
-        grouping variable (factor) with two levels that define the corresponding groups,
-        or the values of response variable for first group.}
-  \item{y}{If \code{x} is not a formula, values of response variable for second group,
+        numeric response variable compared across the two groups, and X is a
+        grouping variable with two levels that define the corresponding groups,
+        or, if the data are submitted in the form of two vectors, the responses
+        for the first group.}
+  \item{y}{If \code{x} is not a formula, the responses for the second group,
         otherwise \code{NULL}.}
   \item{n}{Sample size for one group.}
   \item{m}{Sample size for one group.}
@@ -55,7 +61,6 @@ smd.t.test(\ldots)
   \item{X2nm}{Value of grouping variable, the level that defines the second group.}
   \item{brief}{Extent of displayed results.}
   \item{digits.d}{Number of decimal places for which to display numeric values. Suggestion only.}
-  \item{graph}{If \code{TRUE}, then display the graph of the overlapping density distributions.}
   \item{conf.level}{Confidence level of the interval, expressed as a proportion.}
   \item{mmd}{Minimum Mean Difference of practical importance, the difference of the
        response variable between two group means. The concept is optional, and only one of mmd
@@ -64,31 +69,44 @@ smd.t.test(\ldots)
        practical importance. The concept is optional, and only one of mmd and msmd is provided.}
   \item{bw1}{Bandwidth for the computation of the densities for the first group.}
   \item{bw2}{Bandwidth for the computation of the densities for the second group.}
+  \item{graph}{If \code{TRUE}, then display the graph of the overlapping density distributions.}
+  \item{show.title}{Show the title on the graph of the density functions for two groups.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.width}{Width of the pdf file in inches.}
+  \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Further arguments to be passed to or from methods.}
 }
 
 \details{
+OVERVIEW\cr
 If \code{n} or \code{n1} are set to numeric values, then the analysis proceeds from the summary statistics, the sample size and mean and standard deviation of each group. Missing data are counted and then removed for further analysis of the non-missing data values.  Otherwise the analysis proceeds from data, which can be in a data frame, by default named \code{mydata}, with a grouping variable and response variable, or in two data vectors, one for each group.
 
 Following the format and syntax of the standard \code{\link{t.test}} function, the methods for the  \code{ttest} function include formula and default.  The formula method is invoked when the data include a variable that has exactly two values, a grouping variable or factor generically referred to as X, and a numerical response variable, generically referred to as Y. The formula is of the form Y ~ X, with the names Y and X replaced by the actual variable names specific to a particular analysis.  The formula method automatically retrieves the names of the variables and data values for display on the resulting output.
 
 The default method is invoked when the values of the response variable Y are organized into two vectors, the values of Y for each group in its corresponding vector. The vectors must be defined in the user workspace as they are generally of unequal length and so generally not conformable to a data frame. When submitting data in this form, the output is enhanced if the actual names of the variables referred to generically as X and Y, as well as the names of the levels of the factor X, are explicitly provided. 
 
-If the input data frame is named something different than \code{mydata}, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name without having to invoke the mydata$name notation.  The split version of the response variable, that is, its values organized into two vectors, one for each group, are saved in the global environment, the user's workspace, under the names \code{group1} and \code{group2} for further analysis if desired.
+For the output, when computed from the data the two groups are automatically arranged so that the group with the larger mean is listed as the first group.  The result is that the resulting mean difference, as well as the standardized mean difference, is always non-negative.
 
 The inferential analysis in the full version provides both homogeneity of variance and the Welch test which does not assume homogeneity of variance. Only a two-sided test is provided.  The null hypothesis is a population mean difference of 0.
 
 If computed from the data, the bandwidth parameter controls the smoothness of the estimated density curve.  To obtain a smoother curve, increase the bandwidth from the default value.
 
-For the output, when computed from the data the two groups are automatically arranged so that the group with the larger mean is listed as the first group.  The result is that the resulting mean difference, as well as the standardized mean difference, is always non-negative.
-
 The confidence interval of the standardized mean difference is computed by the \code{ci.smd} function, written by Ken Kelley, from the \code{MBESS} package.
 
+DATA\cr
+If the input data frame is named something different than \code{mydata}, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name without having to invoke the mydata$name notation.  The split version of the response variable, that is, its values organized into two vectors, one for each group, are saved in the global environment, the user's workspace, under the names \code{group1} and \code{group2} for further analysis if desired.
+
+PRACTICAL IMPORTANCE\cr
 The practical importance of the size of the mean difference is addressed when one of two parameter values are supplied, the minimum mean difference of practical importance, mmd, or the corresponding standardized version, msmd.  The  remaining value is calculated and both values are added to the graph and the console output.
 
+DECIMAL DIGITS\cr
 The number of decimal digits is determined by default from the largest number of decimal digits of the entered descriptive statistics.  The number of decimal digits is then set at that value, plus one more with a minimum of two decimal digits by default.  Or, override the default with the \code{digits.d} parameter.
 
-A labels data frame named \code{mylabels}, obtained from the \code{lessR} \code{\link{Read}} function, can list the label for some or all of the variables in the data frame that contains the data for the analysis.  If this labels data frame exists, then the varible label for the response variable and the grouping variable is listed in the text output. 
+VARIABLE LABELS\cr
+Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
+
+PDF OUTPUT\cr
+Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 }
 
 
@@ -113,8 +131,9 @@ Kelley, K., \code{smd} function from the \code{MBESS} package.
 # put into a data frame, required for formula version
 n <- 12
 X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
-Y <- rnorm(n=n, mean=50, sd=10)
+Y <- round(rnorm(n=n, mean=50, sd=10),2)
 mydata <- data.frame(X,Y)
+rm(X); rm(Y)
 
 # analyze data with formula version
 # variable names and levels of X are automatically obtained from data
@@ -125,7 +144,7 @@ tt(Y ~ X)
 # brief version of results
 tt.brief(Y ~ X)
 # Compare to standard R function t.test
-t.test(Y ~ X, var.equal=TRUE)
+t.test(mydata$Y ~ mydata$X, var.equal=TRUE)
 
 # consider the practical importance of the difference
 ttest(Y ~ X, msmd=.5)
@@ -133,8 +152,8 @@ ttest(Y ~ X, msmd=.5)
 # variable of interest is in a data frame which is not the default mydata
 # access the data frame in the lessR dat.twogroup data set
 # although data not attached, access the variables directly by their name
-data(datTwoGroup)
-ttest(ShipTime ~ Supplier, dframe=datTwoGroup)
+data(dataGroups2)
+ttest(ShipTime ~ Supplier, dframe=dataGroups2)
 
 
 # -------------------------------------------------------
@@ -144,9 +163,8 @@ ttest(ShipTime ~ Supplier, dframe=datTwoGroup)
 # create two separate vectors of response variable Y
 # the vectors exist are not in a data frame
 #   their lengths need not be equal
-n <- 10
-Y1 <- rnorm(n=n/2, mean=50, sd=10)
-Y2 <- rnorm(n=n/2, mean=60, sd=10)
+Y1 <- round(rnorm(n=10, mean=50, sd=10),2)
+Y2 <- round(rnorm(n=8, mean=60, sd=10),2)
 
 # analyze the two vectors directly
 # usually explicitly specify variable names and levels of X

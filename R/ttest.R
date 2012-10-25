@@ -1,14 +1,19 @@
 ttest <-
 function(x=NULL, y=NULL, dframe=mydata,
+
          n=NULL, m=NULL, s=NULL, mu0=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
+
          Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", 
-         brief=FALSE, digits.d=NULL, graph=TRUE, 
+
+         brief=FALSE, digits.d=NULL, 
          conf.level=0.95, mmd=NULL, msmd=NULL, 
-         bw1="nrd", bw2="nrd", ...)  {
+
+         bw1="nrd", bw2="nrd", graph=TRUE, show.title=TRUE,
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {       
 
 
-tt.default <-
+tt.setup <-
 function(x, y=NULL, ...) {
 
 
@@ -19,11 +24,6 @@ function(x, y=NULL, ...) {
     if (is.null(y)) no.y <- TRUE else no.y  <- FALSE
   if (is.null(n1) && no.y) two.gp <- FALSE else two.gp <- TRUE
   if (is.null(n) && is.null(n1)) from.data <- TRUE else from.data <- FALSE
-
-  #if (!two.gp) if (is.function(x)) {
-    #cat("\nGot a function here\n")
-#print(eval(substitute(dframe$x)))
-  #}
 
   if (is.null(digits.d)) {
     if (from.data) digits.d <- .max.dd(x)
@@ -61,15 +61,17 @@ function(x, y=NULL, ...) {
       # Always put the group with the largest mean first
       if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
         .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
-         Ynm, Xnm, X1nm, X2nm, brief, digits.d, graph, 
-         conf.level, mmd, msmd, bw1, bw2)
+          Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
+          conf.level, mmd, msmd, bw1, bw2, graph,
+          show.title, pdf.file, pdf.width, pdf.height)
       else {  # switch
         Xtmp <- X2nm
         X2nm <- X1nm
         X1nm <- Xtmp
         .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
-         Ynm, Xnm, X1nm, X2nm, brief, digits.d, graph, 
-         conf.level, mmd, msmd, bw1, bw2)
+          Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
+          conf.level, mmd, msmd, bw1, bw2, graph,
+          show.title, pdf.file, pdf.width, pdf.height)
       }
 
     }
@@ -77,8 +79,8 @@ function(x, y=NULL, ...) {
     else {  # from stats
       .TwoGroup(y, x,
          n1, n2, m1, m2, s1, s2, from.data,
-         Ynm, Xnm, X1nm, X2nm, brief, digits.d, graph, 
-         conf.level, mmd, msmd, bw1, bw2)
+         Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
+         conf.level, mmd, msmd, bw1, bw2, graph=FALSE)
     }
 
   }  # end two.gp 
@@ -87,18 +89,24 @@ function(x, y=NULL, ...) {
     if (from.data) {
       Ynm <- x.name
       options(yname = x.name)
-      .OneGroup(x, Ynm, mu0, brief=brief,
-           from.data=from.data, conf.level=conf.level, digits.d=digits.d)
+      .OneGroup(x, Ynm, mu0, brief=brief, bw1=bw1,
+           from.data=from.data, conf.level=conf.level, digits.d=digits.d,
+           mmd=mmd, msmd=msmd,
+           graph=graph, show.title=show.title, pdf.file=pdf.file,
+           pdf.width=pdf.width, pdf.height=pdf.height)
     }
     else
-      .OneGroup(x, Ynm, mu0, n, m, s, brief=brief,
-           from.data=from.data, conf.level=conf.level, digits.d=digits.d, ...)
+      .OneGroup(x, Ynm, mu0, n, m, s, brief=brief, bw1=bw1,
+           from.data=from.data, conf.level=conf.level, digits.d=digits.d,
+           mmd=mmd, msmd=msmd,
+           graph=graph, show.title=show.title, pdf.file=pdf.file,
+           pdf.width=pdf.width, pdf.height=pdf.height, ...)
   }
 
   cat("\n")
 
 
-}  # end tt.default
+}  # end tt.setup
 
 
 #-----------------------------------
@@ -118,22 +126,22 @@ function(x, y=NULL, ...) {
   # see if the variable exists in the data frame
   if (from.data && !in.global && !is.frml) .xcheck(x.name, dframe.name, dframe)
     
-  # do analysis with tt.default
+  # do analysis with tt.setup
   if (in.global) {
     if (is.function(x))  # var names that are R functions get assigned to global 
-      tt.default(eval(substitute(dframe$x)), Ynm=x.name, ...)  # 1-group
+      tt.setup(eval(substitute(dframe$x)), Ynm=x.name, ...)  # 1-group
     else 
-      tt.default(x, y, ...)  # two vector form must come from global
+      tt.setup(x, y, ...)  # two vector form must come from global
   }
   else if (is.frml) {
     f <- .tt.formula(x, y, dframe, ...)  # formula
     x <- f$x;  y <- f$y;  Ynm <- f$Ynm;  Xnm <- f$Xnm
     X1nm <- f$X1nm;  X2nm <- f$X2nm 
-    tt.default(x, y, ...)
+    tt.setup(x, y, ...)
   }
   else if (from.data)
-    tt.default(eval(substitute(dframe$x)), Ynm=x.name, ...)  # 1-group
+    tt.setup(eval(substitute(dframe$x)), Ynm=x.name, ...)  # 1-group
   else
-    tt.default(...)  # analysis from stats
+    tt.setup(...)  # analysis from stats
 
 }

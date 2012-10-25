@@ -1,8 +1,8 @@
 Package: lessR
 Type: Package
 Title: Less Code, More Results
-Version: 2.5
-Date: 2012-08-09
+Version: 2.6
+Date: 2012-10-24
 Author: David W. Gerbing, School of Business Administration, Portland
         State University
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
@@ -26,6 +26,6 @@ Description: Each function accomplishes the work of several or more
         data simulation such as for the Central Limit Theorem.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2012-08-10 05:27:48 UTC; gerbing
+Packaged: 2012-10-25 04:27:20 UTC; gerbing
 Repository: CRAN
-Date/Publication: 2012-08-10 05:54:32
+Date/Publication: 2012-10-25 06:14:23

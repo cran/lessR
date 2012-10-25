@@ -1,6 +1,6 @@
 .bc.default <- 
 function(x, by=NULL, 
-         col.bars, col.border, col.bg, col.grid, random.col, colors,
+         col.fill, col.stroke, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, brief, prop, xlab, ylab, main,
          cex.axis, col.axis, col.ticks, beside, col.low, col.hi, count.names,
          legend.title, legend.loc, legend.labels, legend.horiz, text.out, ...) {
@@ -53,7 +53,10 @@ function(x, by=NULL,
     if (!is.null(by)) x <- table(by,x, dnn=c(y.name, x.name)) 
     else {  
       x <- table(x, dnn=NULL)
-      if (prop) x <- x/sum(x)
+      if (prop) {
+        x.temp <- x
+        x <- x/sum(x)
+      }
     }
 
   if (is.null(by) && beside && !entered) { 
@@ -76,8 +79,7 @@ function(x, by=NULL,
     if (is.ordered(by)) nogo <- TRUE
     if (nogo) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Can only do an R color range when there is more than one color. Choose a\n",
-      "built-in lessR range for colors. See help(set) for available colors.\n\n")
+      "Can only do an R color range when there is more than one color. \n\n")
     }
   }
 
@@ -93,15 +95,16 @@ function(x, by=NULL,
       col.grid <- "white"
       col.bg <- "gray90"
     }
+    else if (colors == "green") {
+      if (is.null(col.low)) col.low <- "darkseagreen1"
+      if (is.null(col.hi)) col.hi <- "darkseagreen4"
+      col.bg <- rgb(230,220,143, maxColorValue=256)
+    }
     else if (colors == "rose") {
       if (is.null(col.low)) col.low <- "mistyrose1"
       if (is.null(col.hi)) col.hi <- "mistyrose4"
       col.grid <- "snow2"
       col.bg <- "snow1"
-    }
-    else if (colors == "green") {
-      if (is.null(col.low)) col.low <- "darkseagreen1"
-      if (is.null(col.hi)) col.hi <- "darkseagreen4"
     }
     else if (colors == "gold") {
       if (is.null(col.low)) col.low <- "goldenrod1"
@@ -111,23 +114,29 @@ function(x, by=NULL,
       if (is.null(col.low)) col.low <- "coral1"
       if (is.null(col.hi)) col.hi <- "coral4"
     }
+    else if (colors == "orange") { 
+      if (is.null(col.low))
+        col.low <- rgb(255,173,91, maxColorValue=256)
+      if (is.null(col.hi))
+        col.hi <- rgb(169,66,2, maxColorValue=256)
+      col.bg <- rgb(4,4,4, maxColorValue=256)
+    }
     color.palette <- colorRampPalette(c(col.low, col.hi))
     clr <- color.palette(ncolors)
   }
   else if (colors == "gray") {
-    cp <- .clr(colors)
     color.palette <- colorRampPalette(c("gray30","gray80"))
     clr <- color.palette(nrow(x))
-    col.grid <- cp[3]
-    col.bg <- cp[4]
+    if (col.grid == "grey86") col.grid <- getOption("col.grid")
+    if (col.bg == "ghostwhite") col.bg <- getOption("col.bg")
   }
   else if ((colors=="blue" || colors=="rose" || colors=="green" 
-          || colors=="gold" || colors=="red") && (is.null(by) && !is.matrix(x))) {
-    cp <- .clr(colors)
-    color.palette <- colorRampPalette(cp[1])
+          || colors=="gold" || colors=="red" || colors=="orange")
+          && (is.null(by) && !is.matrix(x))) {
+    color.palette <- colorRampPalette(getOption("col.fill.bar"))
     clr <- color.palette(nrow(x))
-    col.grid <- cp[3]
-    col.bg <- cp[4]
+    col.grid <- getOption("col.grid")
+    col.bg <- getOption("col.bg")
   }
     else if (colors == "rainbow") clr <- rainbow(ncolors)
     else if (colors == "terrain") clr <- terrain.colors(ncolors)
@@ -136,17 +145,17 @@ function(x, by=NULL,
       clr <- c("slategray", "peachpuff2", "darksalmon", "darkseagreen1", 
         "thistle4", "azure3", "mistyrose")
       cat("\n>>> Note: For two variables, the color theme only applies to\n",
-          "          the levels of an ordered factor, except for the \"gray\"\n",
-          "          color theme. However, other choices are available\n",
-          "          for BarChart:  \"rainbow\", \"terrain\" and \"heat\". \n\n", 
+          "        the levels of an ordered factor, except for the \"gray\"\n",
+          "        color theme. However, other choices are available for\n",
+          "        the colors option:  \"rainbow\", \"terrain\" and \"heat\". \n\n", 
           sep="")
     }
 
     if (random.col) clr <- clr[sample(length(clr))]
 
-  if (!is.null(col.bars)) {
-    for (i in 1:(min(length(col.bars),length(clr)))) clr[i] <- col.bars[i]
-    ncolors <- min(length(col.bars),length(clr))
+  if (!is.null(col.fill)) {
+    for (i in 1:(min(length(col.fill),length(clr)))) clr[i] <- col.fill[i]
+    ncolors <- min(length(col.fill),length(clr))
   }
   palette(clr)
   col <- 1:ncolors 
@@ -255,13 +264,13 @@ function(x, by=NULL,
   if (rescale == 0) {
      # width.bars <- .8   gap <- .6*width.bars
     p1<-suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
-          xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.border, las=las.value, 
+          xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
           space=gap, cex.axis=cex.axis, cex.names=cex.axis, 
           col.axis=col.axis, col.ticks=col.ticks, ...))
   }
   else
     p1<-suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
-          xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.border, las=las.value, 
+          xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), 
           cex.axis=cex.axis, cex.names=cex.axis,
           col.axis=col.axis, col.ticks=col.ticks, ...))
@@ -276,6 +285,11 @@ function(x, by=NULL,
   # ----------------------------------------------------------------------------
   # legend for two variable plot including variable labels
   if ((!is.null(by) || is.matrix(x)) && !is.null(legend.loc))  {
+
+    if (col.bg != "black")
+      col.txt <- "black"
+    else
+      col.txt <- "white"
 
     # default right.margin option
     if (legend.loc == "right.margin") {
@@ -357,18 +371,19 @@ function(x, by=NULL,
       # legend not multiple title lines aware, so start at last title line
       legend(x=xleft, y=ytop-vbuffer, legend=legend.labels, title=l.lab2,
              fill=col, horiz=FALSE, cex=.7, bty="n", box.lwd=.5,
-             box.col="gray30")
+             box.col="gray30", text.col=col.txt)
 
     }  # right margin
 
     else
       legend(legend.loc, legend=legend.labels, title=l.lab, fill=col, 
-             horiz=legend.horiz, cex=.7, bty="n")
+             horiz=legend.horiz, cex=.7, bty="n", text.col=col.txt)
   }
 
 
   # ----------------------------------------------------------------------------
   # text output
+  if (prop) x  <- x.temp
   if (text.out) 
     if (is.null(by)) .ss.factor(x, brief=brief) else .ss.factor(x, by, brief=brief)
 

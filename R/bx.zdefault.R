@@ -1,15 +1,9 @@
 .bx.default <-
-function(x, col.box, col.pts, col.bg, col.grid,
-        colors, cex.axis, col.axis, col.ticks,
-        horiz, dotplot, xlab, main, digits.d, text.out, ...) {      
-
-  # color palette based on color theme colors
-  cp <- .clr(colors)
-  if (is.null(col.box)) col.box <- cp[9]
-  if (is.null(col.grid)) col.grid <- cp[3]
-  if (is.null(col.bg)) col.bg <- cp[4]
+function(x, col.fill, col.stroke, col.bg, col.grid,
+          cex.axis, col.axis, col.ticks,
+          horiz, add.points, xlab, main, digits.d, text.out, ...) {      
   
-  if (is.null(col.pts)) col.pts <- col.box
+  if (is.null(col.stroke)) col.stroke <- col.fill
 
   # get variable label if exists
   gl <- .getlabels(xlab, main=main)
@@ -40,13 +34,13 @@ function(x, col.box, col.pts, col.bg, col.grid,
     abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
   # box plot
-  boxplot(x, add=TRUE, col=col.box, bg=col.pts, pch=21, horizontal=horiz, axes=FALSE)
+  boxplot(x, add=TRUE, col=col.fill, bg=col.stroke, pch=21,
+          horizontal=horiz, axes=FALSE, border=col.stroke)
 
   # dots
-  if (dotplot) 
+  if (add.points) 
       .dp.main(x, by=NULL,
-         col.pts=NULL, col.fill=NULL, trans.pts=NULL, shape.pts=NULL,
-         col.bg=NULL, col.grid=NULL, colors=colors,
+         col.fill, col.stroke, col.bg, col.grid, shape.pts=NULL,
          cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xlab=NULL, main=NULL, cex=NULL,
          pt.reg=21, pt.out=19, 
@@ -92,3 +86,4 @@ function(x, col.box, col.pts, col.bg, col.grid,
   cat("\n")
 
 }
+

@@ -2,13 +2,15 @@ PieChart <-
 function(x, dframe=mydata, 
          random.col=FALSE,
          col.slices=NULL, col.low=NULL, col.hi=NULL,
-         colors=c("blue", "gray", "rose", "green", "gold", "red",
-                  "rainbow", "terrain", "heat"),
+         colors=c("rainbow", "terrain", "heat"),
          text.out=TRUE, main=NULL,
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
-  colors <- match.arg(colors)
+  if (missing(colors)) 
+    colors <- getOption("colors")
+  else
+    colors <- match.arg(colors)
 
   x.name <- deparse(substitute(x)) 
   options(xname = x.name)

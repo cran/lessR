@@ -5,6 +5,162 @@ Update History for Package 'lessR'
 
 
 
+>>>>>> Changes for lessR version 2.6 (2012-10-24)} <<<<<<
+
+
+-------------
+Updates 2.6
+-------------
+
+Graphics procedures
+  Color themes were enhanced and the terminology for modifying individual
+    colors in a specific graph or system-wide with the set function was
+    standardized.  'fill' refers to the color of an interior region,
+    either of a bar or a circle.  'stroke' refers to a line or outline,
+    such as the border of a histogram bar or a plotted point. Also, to
+    change a color theme is now only available with function set, as
+    are references to transparent colors with trans.fill.bar and 
+    trans.fill.pt.
+
+set
+  added an orange color theme, which has a black background instead
+    of the usual light background, also added dodgerblue and purple
+  revised green color theme
+  added option ghost to provide transparent bars against a black background
+    with no grid lines, which works well with colors such as orange and red
+  colors option was getting too complex and was cluttering the options lists
+    for the graphics functions, so color theme and transparency only
+    available from the set function, but with more extensive options
+
+Read
+  default text output to console that describes the data is redesigned
+  new parameter lessRdata allows direct reading of built-in data sets
+  can read directly from built-in data sets with lessR.data= option
+
+Write
+  write any specified data frame, not just the default mydata
+  specify any file name or rely upon the default
+  by default write row IDs as part of the written csv file
+  the dframe option moved to the end of the parameter list to be
+    consistent with Read
+
+Subset
+  abbreviation locate added to emphasize locating cases without creating
+    a new data frame, where save.dframe is automatically set to FALSE
+  can subset on row.names
+  criterion for selecting rows, rows, can be an integer or proportion,
+    to indicate the number of rows to randomly extract and also to create
+    a hold out sample
+
+Recode
+  just data for the variables to be recoded are shown before the recode, 
+    and just the recoded and any new variables shown after the recode
+  a recode is not allowed to be applied to a factor because doing so
+    converts the factor to character strings (use factor function instead)
+
+Transform
+  transformed data is shown only for variables that have been transformed
+
+Sort
+  default saves the sorted data frame written over the input data frame
+    without needing to explicitly assign the result to a data frame
+  the keep=FALSE option allows the sorted data frame to be written to
+    another data frame with the R assignment statement
+  random option added to randomly shuffle the rows of data
+
+Help
+  the argument for a specific help page no longer needs to be enclosed
+    in quotes  
+  capitalization of the argument for a specific help page is irrelevant
+
+ANOVA
+  randomized block design supported (in addition to one and two factor
+    between groups designs)
+  fitted plot and data plotted for randomized block design
+  residuals provided 
+  effect sizes provided
+  graphs may be saved to pdf files with pdf=TRUE
+  one-way cell mean plot works with current color theme
+  HSD analysis for two-way models, between groups and randomized blocks
+  marginal means provided for two-way models
+
+Regression
+  scatterplot matrix incorporates the color theme
+  display of prediction intervals includes interval width
+  decimal digits uniformly applied across the text output
+
+Logit
+  scatterplot matrix added when there are multiple predictor variables
+
+ttest
+  option for saving the graphic of the two density curves to a pdf,
+    consistent with other lessR functions for graphics
+  add a show.title option to suppress the title over the graph
+  Cohen's d effect size index added to one-group t-test
+  density plot with Cohen's d, mean and hypothesized mean
+
+ScatterPlot
+  for one variable, dot plot, gray scale outliers displayed in squares
+    and diamonds, for potential and actual outliers, respectively
+
+Histogram
+  trans.bars option available, analogous to trans.pts for scatter plots
+
+LineChart
+  option col.border added to specify the border color of the filled
+    polygon under the plotted lines, including the value of "transparent"
+
+BoxPlot
+  dotplot option changed to add.points to be consistent with the call
+    to the ScatterPlot function for one variable, i.e., a 1-D scatter plot
+
+corCFA
+  sum of squares and average residual for each item and total available
+  the number of default iterations for communality estimates increased
+    from 15 to 25
+  an abbreviation called scales added to retain 1's in the diagonal for
+    component analysis, that is, the observed scale scores
+
+corEFA
+  items by default sorted by their highest factor loading, with an
+    option provided to not do this
+  min.load option changed to min.loading and this applies to the
+    output of the EFA as well as the constructed model for the CFA
+  n.fact argument changed to n.factors
+
+data files
+  the name of each included data file begins with "data" instead of "dat"
+
+prob.tcut
+  renamed from qnt.t, t-cutoff probability function with t and normal curves
+
+
+
+---------------
+Bug Fixes 2.6
+---------------
+
+Subset, Transform, Sort
+  when dframe not saved because save.dframe set to FALSE, dframe 
+    properly is assigned to a new data frame via an assignment statement
+
+PieChart
+  colors option works correctly
+
+BarChart
+  changes to background color and grid with colors="gray" work correctly
+  frequency table displayed when prop=TRUE
+
+LineChart
+  color theme now applied to fill color under plotted polygon
+
+ttest
+  standard deviation on graph for second group reported correctly
+
+
+
+
+
 >>>>>> Changes for lessR version 2.5 (2012-08-09)} <<<<<<
 
 
@@ -58,11 +214,12 @@ Recode
   missing data entries may now be recoded to valid values
   specified valid values may now be recoded to missing values
 
-Scatterplot
+ScatterPlot
   original function Plot, abbreviated plt, was based on R function plot, 
     which did a scatter plot of two variables and also also did a line chart
     for one variable, now only 1 and 2 dimensional scatter plots are done, 
-    so function renamed accordingly, where a 1-D scatter plot is a dot plot
+    so function renamed accordingly, where a 1-D scatter plot is a dot plot,
+    though Plot is still available as a name
 
 Help
   each help page can now be invoked with a variety of key words, which
@@ -83,6 +240,7 @@ corCFA
 
 set
   the transparency level of plotted points in ScatterPlot now works
+
 
 
 

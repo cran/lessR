@@ -1,9 +1,9 @@
 Transform <-
-function (dframe=mydata, brief=FALSE, save.dframe=TRUE, ...) {
+function (dframe=mydata, brief=FALSE, keep=TRUE, ...) {
 
   dname <- deparse(substitute(dframe))
 
-  # vector of transformation(s), e[1] the first trans, etc.
+  # transformations done here into vector e, e[1] the first trans, etc.
   e <- eval(substitute(list(...)), dframe, parent.frame())
 
   n.tvars <- length(e)
@@ -15,12 +15,11 @@ function (dframe=mydata, brief=FALSE, save.dframe=TRUE, ...) {
     cat("Number of observations (rows) of ", dname, ": ", n.obs, "\n", sep="")
 
     cat("\n")
-    .dash(68)
-    cat("Before Transformation, First six rows of data for",
+    .dash(69)
+    cat("Before Transformation, First five rows of data for",
         "data frame:", dname, "\n")
-    .dash(68)
-    cat("\n")
-    print(head(get(dname, pos=.GlobalEnv)))
+    .dash(69)
+    print(head(get(dname, pos=.GlobalEnv), n=5))
     cat("\n")
 
     trs.all <- deparse(substitute(list(...)))[[1]]
@@ -40,8 +39,10 @@ function (dframe=mydata, brief=FALSE, save.dframe=TRUE, ...) {
   inx <- match(names(e), names(dframe))
 
   if (!brief) {
-    cat("\nTransformation Summary\n")
-    .dash(38)
+    cat("\n")
+    .dash(22)
+    cat("Transformation Summary\n")
+    .dash(22)
     if (!no.break || n.tvars==1) {
       for (i in 1:n.tvars) {
         if (!is.na(inx[i])) txt <- "rewrite existing" else txt <- "      create new"
@@ -61,23 +62,28 @@ function (dframe=mydata, brief=FALSE, save.dframe=TRUE, ...) {
 
   # inx[existing], e[existing] gives only positions of existing vars in dframe
   # corresponding FALSE values of existing are deleted
+  # add existing var transformations to dframe
   if (any(existing))   # at least one existing var transformed
     dframe[inx[existing]] <- e[existing]
 
+  # add new var transformations to dframe
   if (!all(existing))  # at least one new var created
     dframe <- do.call("data.frame", c(list(dframe), e[!existing]))
 
-  if (save.dframe) assign(dname, dframe, pos=.GlobalEnv)
-
   if (!brief) {
     cat("\n\n")
-    .dash(67)
-    cat("After Transformation, First six rows of data for",
-        "data frame:", dname, "\n")
-    .dash(67)
-    cat("\n")
-    print(head(get(dname, pos=.GlobalEnv)))
+    .dash(65)
+    cat("After, First five rows of transformed data ")
+    if (keep) cat("for data frame:", dname)
+    cat( "\n")
+    .dash(65)
+    print(head(dframe[, names(e), drop=FALSE], n=5))
     cat("\n")
   }
+
+  if (keep) 
+    assign(dname, dframe, pos=.GlobalEnv)
+  else
+    return(dframe)
  
 }

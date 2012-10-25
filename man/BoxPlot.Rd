@@ -19,13 +19,16 @@ BoxPlot(x=NULL, dframe=mydata, n.cat=getOption("n.cat"), text.out=TRUE, \ldots)
 
 \method{bx}{data.frame}(x, n.cat, text.out, \ldots) 
 
-\method{bx}{default}(x, col.box=NULL, col.pts=NULL, 
-        col.bg=NULL, col.grid=NULL,
-        colors=c("blue", "gray", "rose", "green", "gold", "red"), 
-        cex.axis=.85, col.axis="gray30", col.ticks="gray30",
-        horiz=TRUE, dotplot=FALSE,
-        xlab=NULL, main=NULL, digits.d=NULL, text.out=TRUE,
-        pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+\method{bx}{default}(x,
+      col.fill=getOption("col.fill.pt"),
+      col.stroke=getOption("col.stroke.pt"), 
+      col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+
+      cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+      xlab=NULL, main=NULL, digits.d=NULL, text.out=TRUE,
+
+      horiz=TRUE, add.points=FALSE,
+      pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 bx(\ldots)
 }
@@ -40,25 +43,24 @@ bx(\ldots)
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the
        largest number of unique values of variable of a numeric data type for 
        which the variable will be analyzed as a categorical. Set to 0 to turn off.}
-  \item{col.box}{Color of the box.}
-  \item{col.pts}{Color of any points that designate outliers. By default this is the 
+  \item{col.fill}{Color of the box.}
+  \item{col.stroke}{Color of any points that designate outliers. By default this is the 
        same color as the box.}
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines.}
-  \item{colors}{Sets the color palette.}
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
        values to be smaller than the axis labels. Provides the functionality of, and
        can be replaced by, the standard R \code{cex.axis.}}
   \item{col.axis}{Color of the font used to label the axis values.}
   \item{col.ticks}{Color of the ticks used to label the axis values.}
-  \item{horiz}{Orientation of the boxplot. Set \code{FALSE} for vertical.}
-  \item{dotplot}{If \code{TRUE}, then place a dot plot (i.e., stripchart) over the
-       box plot.}
   \item{xlab}{Label for the value axis, which defaults to the variable's name.}
   \item{main}{Title of graph.}
   \item{digits.d}{Number of decimal digits displayed in the listing of the summary
        statistics.}
   \item{text.out}{If \code{TRUE}, then display text output in console.}
+  \item{horiz}{Orientation of the boxplot. Set \code{FALSE} for vertical.}
+  \item{add.points}{If \code{TRUE}, then place a dot plot (i.e., stripchart) over the
+       box plot.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -81,8 +83,8 @@ If the variable is in a data frame, the input data frame has the assumed name of
 
 To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.
 
-COLOR THEME\cr
-Individual colors in the plot can be manipulated with options such as \code{col.box} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}. 
+COLORS\cr
+Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black backgound, no gridlines and partial transaparency of plotted colors.  
 
 VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -128,10 +130,10 @@ bx(y)
 BoxPlot(y, pdf.file="MyBoxPlot.pdf")
 
 # vertical boxplot with plum color
-BoxPlot(y, horiz=FALSE, col.box="plum")
+BoxPlot(y, horiz=FALSE, col.fill="plum")
 
 # boxplot with outliers more strongly highlighted
-BoxPlot(y, col.pts="red", xlab="My Variable")
+BoxPlot(y, col.stroke="red", xlab="My Variable")
 
 
 # -----------------------------------------------
@@ -154,7 +156,7 @@ BoxPlot()
 
 # boxplots for all numeric variables in data frame called mydata
 #  with specified options
-BoxPlot(col.box="palegreen1", col.pts="plum")
+BoxPlot(col.fill="palegreen1", col.stroke="plum")
 
 # Use the subset function to specify a variable list
 mysub <- subset(mydata, select=c(X,Y))

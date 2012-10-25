@@ -1,5 +1,5 @@
 reg.brief <-
-function(my.formula, brief=TRUE, ...)
+function(..., brief=TRUE)
 
-  Regression(my.formula, brief=TRUE, ...)
+  Regression(..., brief=TRUE)
 

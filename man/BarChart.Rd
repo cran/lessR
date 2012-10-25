@@ -26,10 +26,9 @@ BarChart(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"),
 
 \method{bc}{default}(x, by=NULL, 
 
-         col.bars=NULL, col.border="black", col.bg="ghostwhite",
-         col.grid="grey86", random.col=FALSE,
-         colors=c("blue", "gray", "rose", "green", "gold", "red",
-                  "rainbow", "terrain", "heat"),
+         col.fill=NULL, col.stroke="black", col.bg=getOption("col.bg"),
+         col.grid=getOption("col.grid"), random.col=FALSE,
+         colors=c("rainbow", "terrain", "heat"),
 
          horiz=FALSE, over.grid=FALSE, addtop=1,
          gap=NULL, brief=TRUE, prop=FALSE,
@@ -57,14 +56,15 @@ bc(\ldots)
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest
        number of unique values of variable of a numeric data type for which the
        variable will be analyzed as a categorical. Set to 0 to turn off.}
-  \item{col.bars}{Specified bar colors.}
-  \item{col.border}{Color of the border of the bars. Specify NA to remove the border}
+  \item{col.fill}{Specified bar colors.}
+  \item{col.stroke}{Color of the border of the bars. Specify NA to remove the border}
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines.}
-  \item{colors}{Sets the intensity of the color palette.}
-  \item{random.col}{When \code{TRUE}, randomizes the order of the colors within the
-       chosen color palette, when the second variable is not ordered, otherwise is
-       ignored. Each analysis generally yields different colors of the bars.}
+  \item{colors}{Optional palettes that provide more options.}
+  \item{random.col}{For two variable plots, when \code{TRUE}, randomizes the order
+       of the colors within the chosen color palette, when the second variable is
+       not ordered, otherwise is ignored. Each analysis generally yields different
+       colors of the bars.}
   \item{horiz}{By default bars are vertical, but can set this option to \code{TRUE}.}
   \item{over.grid}{If \code{TRUE}, plot the grid lines over the histogram.}
   \item{addtop}{When \code{horiz=FALSE}, in the same scale as the vertical axis, puts
@@ -120,16 +120,15 @@ bc(\ldots)
 OVERVIEW\cr
 Plot a bar chart with default colors for one or two variables, presumably with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accommodate both the value labels and the variable label.
 
-A frequency bar is produced for each level of the first and perhaps only variable. When two variables are plotted, the bar for each level of the first variable is replaced with a group of bars, one for each level of the second variable.
-
 The form of the entered data, the first variable x and optionally a second variable, y, is flexible.  The data may be entered as factors, numeric values, characters, or a matrix. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.  Plus, the bar colors for a second variable which is an ordered factor are also ordered in a corresponding progression.
 
 DATA FRAME ACCESS\cr
 If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment. 
 
 COLORS\cr
+For a one variable plot, the color of the bars is set by the current color theme according to the function set. When two variables are plotted, a set of arbitrary colors represent the various levels of the second variable. Currently transparency effects are not incorporated.\cr
 There are three ways to override the default colors.\cr
-1. There are two pre-defined color palettes, each with 7 colors.  The default palette provides lighter, more pastel colors. A second color palette, set by \code{colors="gray"}, provides an ordered gray scale.  Three more built-in R color palettes are also available by setting \code{colors} to one of \code{"rainbow"}, \code{"heat"} and \code{"terrain"}.  The most vivid of all the palettes is \code{"rainbow"}.\cr
+1. There are two pre-defined color palettes, each with 7 colors.  Three more built-in R color palettes are also available by setting \code{colors} to one of \code{"rainbow"}, \code{"heat"} and \code{"terrain"}.  The most vivid of all the palettes is \code{"rainbow"}.\cr
 2. The order of the colors within the chosen palette can be randomized with the \code{random.col="TRUE"} option. For example, when this option is activated each of the seven colors in a palette has a 1/7 chance of appearing as the first color, the only color used in the plot of a single variable, and the color used for the first bar in each group for a plot of two variables. When invoked for a  \code{color="gray"}, the order from light to dark will generally be lost, which may be desirable if the categories do not represent an ordered factor.\cr
 3. The desired colors can be explicitly specified with the \code{col.bars} option, which overrides any other bar color options. When plotting one variable, include one color in this color list, the color used for all of the bars.  When plotting two variables, usually the list of colors includes the same number of elements as the number of levels for the second variable.  As always with R, if the list includes more than once color, the \code{c} function must be used to generate the list, as in\cr \code{col.bars=c("coral3","seagreen3")} for a second variable with two levels. When two variables are plotted, if there are fewer specified colors than the levels of the second variable, the remaining colors are selected from the remaining colors in the activated palette.
 
@@ -139,7 +138,7 @@ barplot(rep(1,7), names=clr, col=clr, border=NA, space=.1)
 
 When plotting one ordered factor, or when plotting two variables, and the second variable is an ordered factor, then neither of the two standard color palettes are used.  Instead, the resulting bar colors for each level of the ordered factor are also ordered in a progression of colors. The default progression is based on the first color of either the regular or gray color palettes, but this can be changed with the \code{col.low} and \code{col.hi} options, or individually specify the color of each bar with the \code{col.bars} option. A specified palette can, for example, be from light to dark of the same hue, or from a light color of one hue to a dark color of another hue. Each color value can be specified with a color name, or with a specification with the \code{\link{rgb}} function.  See the examples below.  
 
-Use the \code{\link{showColors}} function in this package to get, for each color:  name,  sample color swatch, and corresponding rgb specification.  For a very small number of levels, such as two, it is may be desirable to specify the low and high values to not be closer to each other than the default values.
+Use the \code{\link{showColors}} function in this package to get, for each color:  name, sample color swatch, and corresponding rgb specification.  For a very small number of levels, such as two, it is may be desirable to specify the low and high values to not be closer to each other than the default values.
 
 LEGEND\cr
 When two variables are plotted, a legend is produced, with values for each level of the second variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend.loc} option, which, in addition to the \code{lessR} option of \code{right.margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend. 
@@ -202,7 +201,7 @@ barplot(table(mydata$Pain))
 BarChart(Gender)
 
 # specify a unique bar color for each of the two bars
-BarChart(Gender, col.bars=c("pink","lightblue"))
+BarChart(Gender, col.fill=c("pink","lightblue"))
 
 # automatically provide horizontal value labels 
 #   and adjust left margin as needed
@@ -217,13 +216,14 @@ BarChart(Pain, horiz=TRUE)
 BarChart(Pain, by=Gender)
 
 # at each level of Pain, show the frequencies of the Gender levels
-# display more gray colors
-BarChart(Pain, by=Gender, colors="gray")
-# or set for all subsequent analyses for all lessR graphic functions
+# set for all subsequent analyses for all lessR graphic functions
 set(colors="gray")
+BarChart(Pain, by=Gender)
 
 # at each level of Gender, show the frequencies of the Pain levels
 # Pain levels are ordered, so the corresponding colors are also ordered 
+# color theme set to red with ghost effects
+set(colors="red", ghost=TRUE)
 BarChart(Gender, by=Pain)
 
 # specify an ordered blue palette of colors for the ordered levels of Pain
@@ -233,7 +233,7 @@ BarChart(Gender, by=Pain, col.low="azure", col.hi=rgb(100,110,200,max=255))
 
 # define custom color gradient within each group of bars
 # applies to both ordered and unordered factors
-BarChart(Gender, by=Pain, col.bars=c("thistle1","thistle2","thistle3","thistle4"))
+BarChart(Gender, by=Pain, col.fill=c("thistle1","thistle2","thistle3","thistle4"))
 
 # display bars beside each other instead of stacked, Female and Male
 # the levels of Pain are included within each respective bar
@@ -244,7 +244,7 @@ BarChart(Gender, by=Pain, horiz=TRUE, legend.loc="top")
 
 # many options, including those from par: col.main, col.axis, col.lab, cex.lab
 # for more info on these graphic options, enter:  help(par)
-BarChart(Pain, by=Gender, col.bars=c("coral3","seagreen3"), 
+BarChart(Pain, by=Gender, col.fill=c("coral3","seagreen3"), 
   legend.loc="topleft", legend.labels=c("Girls", "Boys"), 
   xlab="Pain Level", main="Gender for Different Pain Levels", 
   col.bg="wheat1", col.grid="wheat3", col.main="wheat4", 
@@ -258,11 +258,6 @@ BarChart(Pain, by=Gender, col.bars=c("coral3","seagreen3"),
 # bar charts for all non-numeric variables in the data frame called mydata
 #   and all numeric variables with a small number of values, < n.cat
 BarChart()
-
-# bar chart of all relevant variables with a color randomly chosen
-#  from the default color palette of eight colors
-#  no frequency summary, just the graphs
-BarChart(random.col=TRUE, text.out=FALSE)
 
 # Use the subset function to specify a variable list
 mysub <- subset(mydata, select=c(Pain))

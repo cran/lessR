@@ -2,10 +2,10 @@
 \alias{LineChart}
 \alias{lc}
 
-\title{Run Chart or Time-Series Chart}
+\title{Line Chart such as a Run Chart or Time-Series Chart}
 
 \description{
-Abbreviation: \code{rc}
+Abbreviation: \code{lc}
 
 Plots a line chart, the values of the variable ordered according to their order in the data frame.  Usually this ordering would be an ordering according to time, which yields a run chart. The default run chart provides the index, that is, sequential position, of each value of the variable from 1 to the last value.  Optionally dates can be provided so that a time-series plot is produced. 
 
@@ -16,13 +16,15 @@ For data of one variable exhibiting little trend, the center line is provided fo
 \usage{
 LineChart(y, dframe=mydata, type=NULL, 
 
-         col.line=NULL, col.area=NULL, col.box="black",
-         col.pts=NULL, col.fill=NULL, trans.pts=getOption("trans.pts"),
-         shape.pts=21, col.grid=NULL, col.bg=NULL,
-         colors=c("blue", "gray", "rose", "green", "gold", "red"),
+         col.line=getOption("col.stroke.pt"),
+         col.area=NULL, col.box="black",
+         col.stroke=getOption("col.stroke.pt"), 
+         col.fill=getOption("col.fill.bar"),
+         col.grid=getOption("col.grid"),
+         col.bg=getOption("col.bg"),
 
-         cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE,
+         shape.pts=21, cex.axis=.85, col.axis="gray30",
+         col.ticks="gray30", xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
@@ -51,25 +53,24 @@ lc(\ldots)
         otherwise there is no default color. }
   \item{col.box}{Color of border around the plot background, the box, that encloses 
         the plot, with a default of \code{"black"}.}
-  \item{col.pts}{Color of the border of the plotted points.}
+  \item{col.stroke}{Color of the border of the plotted points.}
   \item{col.fill}{For plotted points, the interior color of the point.  For a
         scatterplot the default value is transparent.  For a run chart the default value is 
-        the color of the point's border, \code{col.pts}.}
-  \item{trans.pts}{Transparency of the plotted points, from opaque at 0 to perfectly 
-        transparent at 1. Default is 0.6}
-  \item{shape.pts}{The standard plot character, with values defined in help(points). The
-       default value is 21, a circle with both a border and filled area, specified here as
-       \code{col.pts} and \code{col.fill}.  For a scatterplot, \code{col.fill} defaults to
-       transparent.  For a run chart, \code{col.fill} defaults to \code{col.pts}.}
+        the color of the point's border, \code{col.stroke}.}
   \item{col.grid}{Color of the grid lines, with a default of \code{"grey90"}.}
   \item{col.bg}{Color of the plot background.}
-  \item{colors}{Sets the color palette.}
+  \item{shape.pts}{The standard plot character, with values defined in help(points). The
+       default value is 21, a circle with both a border and filled area, specified here as
+       \code{col.stroke} and \code{col.fill}.  For a scatterplot, \code{col.fill}
+       defaults to transparent.  For a run chart, \code{col.fill} defaults to
+       \code{col.stroke}.}
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be 
         smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
   \item{col.ticks}{Color of the ticks used to label the axis values.}
   \item{xy.ticks}{Flag that indicates if tick marks and associated values on the 
         axes are to be displayed.}
+  \item{line.width}{Width of the density lines.}
   \item{xlab}{Label for x-axis. For two variables specified, x and y, if \code{xlab} not
        specified, then the label becomes the name of the corresponding variable. If 
        \code{xy.ticks} is \code{FALSE}, then no label is displayed. If no y variable is specified, 
@@ -122,8 +123,8 @@ If the data values randomly vary about the mean, the default is to plot the mean
 DATA\cr
 If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
 
-COLOR THEME\cr
-Individual colors in the plot can be manipulated with options such as \code{col.pts} for the color of the plotted points. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}. 
+COLORS\cr
+Individual colors in the plot can be manipulated with options such as \code{col.stroke} for the color of the border of the plotted points. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black backgound, no gridlines and partial transaparency of plotted colors.  
 
 VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -163,12 +164,15 @@ plot(y, type="l")
 # save run chart to a pdf file
 LineChart(y, pdf.file="MyLineChart.pdf")
 
-# LineChart in gray scale
-LineChart(y, colors="gray")
+# LineChart in gray scale, then back to default "blue"
+set(colors="gray")
+LineChart(y)
+set(colors="blue")
   
 # customize run chart, pch=24: filled triangle point-up,
-LineChart(y, lwd=2, col.pts="sienna3", shape.pts=24, 
-  col.bg="mintcream", ylim=c(-3.5,3.5), center.line="median")
+LineChart(y, line.width=2, col.stroke="sienna3", shape.pts=24,
+  col.area="slategray3", col.bg="mintcream", ylim=c(-3.5,3.5),
+  center.line="median")
   
 # generate steadily increasing values
 y <- sort(rexp(50))

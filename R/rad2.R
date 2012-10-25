@@ -1,6 +1,4 @@
 rad2 <- 
-function(ref=NULL, sep=";", dec=",", ...) {
+function(..., sep=";", dec=",") 
          
-  Read(ref, sep=";", dec=",", ...)
-
-}
+  Read(..., sep=";", dec=",")

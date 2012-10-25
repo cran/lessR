@@ -1,10 +1,9 @@
 bc.default <-
 function(x, by=NULL, 
 
-         col.bars=NULL, col.border="black", col.bg="ghostwhite",
-         col.grid="grey86", random.col=FALSE,
-         colors=c("blue", "gray", "rose", "green", "gold", "red",
-                  "rainbow", "terrain", "heat"),
+         col.fill=NULL, col.stroke="black", col.bg=getOption("col.bg"),
+         col.grid=getOption("col.grid"), random.col=FALSE,
+         colors=c("rainbow", "terrain", "heat"),
 
          horiz=FALSE, over.grid=FALSE, addtop=1,
          gap=NULL, brief=TRUE, prop=FALSE,
@@ -34,7 +33,7 @@ function(x, by=NULL,
   if (!is.null(pdf.file)) on.exit(dev.off(), add=TRUE)
 
   .bc.default(x, by, 
-         col.bars, col.border, col.bg, col.grid, random.col, colors,
+         col.fill, col.stroke, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, brief, prop, xlab, ylab, main,
          cex.axis, col.axis, col.ticks, beside, col.low, col.hi, count.names,
          legend.title, legend.loc, legend.labels, legend.horiz, text.out, ...)

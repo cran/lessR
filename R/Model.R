@@ -77,13 +77,21 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
 
         if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
           .TwoGroup(x, y, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
-            from.data=TRUE, Ynm, Xnm, X1nm, X2nm, brief, digits.d, ...)
+            from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
+            brief=FALSE, digits.d, 
+            conf.level=0.95, mmd=NULL, msmd=NULL, 
+            bw1="nrd", bw2="nrd", graph=TRUE, show.title=TRUE,
+            pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
         else {  # switch
           Xtmp <- X2nm
           X2nm <- X1nm
           X1nm <- Xtmp
-          .TwoGroup(y, x, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
-            from.data=TRUE, Ynm, Xnm, X1nm, X2nm, brief, digits.d, ...)
+          .TwoGroup(x, y, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
+            from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
+            brief=FALSE, digits.d, 
+            conf.level=0.95, mmd=NULL, msmd=NULL, 
+            bw1="nrd", bw2="nrd", graph=TRUE, show.title=TRUE,
+            pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
         }
       }
 

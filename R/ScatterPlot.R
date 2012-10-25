@@ -1,12 +1,11 @@
 ScatterPlot <-
 function(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
 
-         col.pts=NULL, col.fill=NULL, trans.pts=getOption("trans.pts"),
-         shape.pts="circle", 
+         col.fill=getOption("col.fill.pt"),
+         col.stroke=getOption("col.stroke.pt"),
+         col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
 
-         col.line=NULL, col.area=NULL, col.box="black",
-         col.grid=NULL, col.bg=NULL,
-         colors=c("blue", "gray", "rose", "green", "gold", "red"),
+         shape.pts="circle", col.area=NULL, col.box="black",
 
          cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xy.ticks=TRUE,
@@ -18,7 +17,7 @@ function(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
 
          fit.line=c("none", "loess", "ls"), col.fit.line="grey55",
 
-         col.bubble=NULL, bubble.size=.25, col.flower=NULL,
+         bubble.size=.25,
 
          ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
 
@@ -29,11 +28,6 @@ function(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
 
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
-
-  if (missing(colors)) 
-    colors <- getOption("colors")
-  else
-    colors <- match.arg(colors)
 
   fit.line <- match.arg(fit.line)
   kind <- match.arg(kind)
@@ -152,9 +146,6 @@ function(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
   else
    by.call <- NULL
 
-  orig.params <- par(no.readonly=TRUE)
-  on.exit(par(orig.params))
-
   # set up graphics system
   if (is.null(pdf.file))  {
     if (missing(by)) 
@@ -164,6 +155,9 @@ function(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
   }
   else 
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))
 
 
   if (class(x.call)[1] == "data.frame") {
@@ -177,20 +171,18 @@ function(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
 
     if (!missing(y)) {
       .plt.main(x.call, y.call, by.call, dframe, type, n.cat,
-         col.line, col.area, col.box, col.pts, col.fill,
-         trans.pts, shape.pts, col.grid, col.bg, colors, 
+         col.fill, col.stroke, col.bg, col.grid,
+         shape.pts, col.area, col.box, 
          cex.axis, col.axis, col.ticks, 
          xy.ticks, xlab, ylab, main, cex,
          x.start, x.end, y.start, y.end, kind,
-         fit.line, col.fit.line, 
-         col.bubble, bubble.size, col.flower,
+         fit.line, col.fit.line, bubble.size,
          ellipse, col.ellipse, fill.ellipse, text.out, ...)
     }
 
     else
       .dp.main(x.call, by.call,
-         col.pts, col.fill, trans.pts, shape.pts,
-         col.bg, col.grid, colors,
+         col.fill, col.stroke, col.bg, col.grid, shape.pts,
          cex.axis, col.axis, col.ticks, xlab, main, cex, 
          pt.reg, pt.out, 
          col.out30, col.out15, text.out, new, ...)

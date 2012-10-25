@@ -2,7 +2,7 @@
 function(nm, mydframe, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
-         numeric.all, in.data.frame, colors, X1.new, 
+         numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new, c.int, p.int,
          pdf, pdf.width, pdf.height) {
 
@@ -39,11 +39,11 @@ function(nm, mydframe, my.formula, brief, res.rows,
     x.values <- lm.out$model[,nm[2]]
     y.values <- lm.out$model[,nm[1]] 
     .plt.main(x.values, y.values, by=NULL, type="p", n.cat=getOption("n.cat"),
-       col.line=NULL, col.area=NULL, col.box="black",
-       col.pts=NULL, col.fill=NULL, trans.pts=NULL,
-       shape.pts=21, col.grid=NULL, col.bg=NULL,
-       colors=colors, 
-       cex.axis=.85, col.axis="gray30",
+       col.area=NULL, col.box="black",
+       col.fill=getOption("col.fill.pt"),
+       col.stroke=getOption("col.stroke.pt"),
+       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+       shape.pts=21, cex.axis=.85, col.axis="gray30",
        col.ticks="gray30", xy.ticks=TRUE,
        xlab=nm[2], ylab=nm[1], main=ctitle,
        cex=.8,    
@@ -55,7 +55,7 @@ function(nm, mydframe, my.formula, brief, res.rows,
        text.out=FALSE, ylim=c(y.min,y.max))
 
     if (do.int) {
-      if (colors == "gray") {
+      if (getOption("colors") == "gray") {
         col.ci <- "gray60"
         col.pi <- "gray30"
       }
@@ -69,8 +69,11 @@ function(nm, mydframe, my.formula, brief, res.rows,
       lines(lm.out$model[,nm[2]], p.int$upr, col=col.pi, lwd=2)
     }
   }
+
   else {  # scatterplot matrix for multiple regression
     if (numeric.all && in.data.frame) {
+      col.pts <- getOption("col.stroke.pt")
+      col.line <- getOption("col.stroke.bar")
       if (scatter.coef) {
         panel.cor <- function(x, y, digits=2, prefix="", cex.cor, ...) {
           usr <- par("usr"); on.exit(par(usr))
@@ -78,14 +81,15 @@ function(nm, mydframe, my.formula, brief, res.rows,
           r <- cor(x, y)
           txt <- format(c(r, 0.123456789), digits=digits)[1]
           txt <- paste(prefix, txt, sep="")
-          if(missing(cex.cor)) cex.cor <- .9/strwidth(txt)
-          text(0.5, 0.5, txt, cex=2)  # or cex = cex.cor * r
+          if (missing(cex.cor)) cex.cor <- .9/strwidth(txt)
+          text(0.5, 0.5, txt, cex=2, col=col.pts)  # or cex = cex.cor * r
         }
         suppressWarnings(pairs(lm.out$model[c(nm)], 
-          lower.panel=panel.smooth, col.smooth="grey50", upper.panel=panel.cor))
+          lower.panel=panel.smooth, upper.panel=panel.cor,
+          col=col.pts, col.smooth=col.line))
       }
       else suppressWarnings(pairs(lm.out$model[c(nm)], 
-                            panel=panel.smooth, col.smooth="grey50"))
+                            panel=panel.smooth, col=col.pts, col.smooth=col.line))
     }
     else {
       cat("\n\n>>> No scatterplot matrix reported because not all variables are ")

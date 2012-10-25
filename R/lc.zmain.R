@@ -1,11 +1,11 @@
 .lc.main <- 
 function(y, type,
-       col.line, col.area, col.box, col.pts, col.fill, trans.pts, shape.pts,
-       col.grid, col.bg, colors, cex.axis, col.axis, col.ticks, xy.ticks,
-       xlab, ylab, main, cex, x.start, x.end, y.start, y.end,
+       col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
+       col.grid, col.bg, cex.axis, col.axis, col.ticks, xy.ticks,
+       line.width, xlab, ylab, main, cex, x.start, x.end,
+       y.start, y.end,
        time.start, time.by, time.reverse, 
        center.line, text.out, ...) {
-
 
   if (!is.numeric(y)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -25,16 +25,6 @@ function(y, type,
 
   nrows <- length(y)
   if (is.null(cex)) pt.size <- 0.8 else pt.size <- cex
-
-  # color palette based on color theme colors
-  cp <- .clr(colors, trans.pts)
-  if (is.null(col.pts)) col.pts <- cp[5]
-  if (is.null(col.fill)) col.fill <- cp[6] else col.fill <- cp[7]
-  if (is.null(col.line)) col.line <- cp[5]
-  if (is.null(col.grid)) col.grid <- cp[3]
-  if (is.null(col.bg)) col.bg <- cp[4]
-  col.symbol <- cp[2]
- 
 
   # get variable label and axis labels if they exist
   gl <- .getlabels(ylab=ylab, main=main)
@@ -81,13 +71,15 @@ function(y, type,
   }
 
   # fill ts chart 
-  if (!is.null(time.start) && is.null(col.area)) col.area <- "slategray3"  
+  if (!is.null(time.start) && is.null(col.area)) col.area <- "slategray3"
 
   if (is.null(type)) 
     if (is.null(col.area) || col.area == "transparent") type <- "b" 
     else type <- "l"
-    
-  if (type == "b" && is.null(cex))  # set point size      
+
+
+  # set point size       
+  if (type == "b" && is.null(cex))  
     if (nrows < 50) pt.size <- 0.8 else pt.size <- .9 - 0.002*nrows
   if (pt.size < 0) pt.size <- 0
   
@@ -118,17 +110,22 @@ function(y, type,
   abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
 
   # fill area under curve
-  if (type != "p") col.border <- col.line else col.border <- "transparent"
+  if (!is.null(col.area)  && !is.null(col.stroke)) {
+    if (col.area=="transparent"  &&  col.stroke=="transparent")
+      col.area <- NULL
+    else if (type != "p"  &&  is.null(col.stroke))
+      col.stroke <- col.line
+  }
     if (!is.null(col.area)) 
       polygon(c(x[1],x,x[length(x)]), c(min(y),y,min(y)),
-              col=col.area, border=col.border)
+              col=col.area, border=col.stroke)
 
   # the plot
-  if (type == "l" | type == "b") {
-    lines(as.numeric(x),y, col=col.line, ...)
+  if (type == "l" || type == "b") {
+    lines(as.numeric(x),y, col=col.line, lwd=line.width, ...)
   }
-  if (type == "p" | type == "b") {
-    suppressWarnings(points(x,y, col=col.pts, pch=shape.pts, bg=col.fill, 
+  if (type == "p" || type == "b") {
+    suppressWarnings(points(x,y, col=col.stroke, pch=shape.pts, bg=col.fill, 
                      cex=pt.size, ...))
   }
 

@@ -21,7 +21,7 @@ function(x, by=NULL, dframe, digits.d=NULL, brief, ...) {
      }
     else {  # dframe only needed if a by variable exists
       vectors <- split(dframe[,x.name], dframe[,y.name])
-}
+    }
   }
 
   if (is.null(digits.d)) dig.dec <- .max.dd(x) + 1 else dig.dec <- digits.d
@@ -74,6 +74,7 @@ function(x, by=NULL, dframe, digits.d=NULL, brief, ...) {
   if (max.ln < 5) max.ln <- max.ln + 1
   if (max.ln < 10) max.ln <- max.ln + 1
 
+  # the stats
   for (i in 1:n.lines) {
     if (n.lines == 1) {
       xx <- x
@@ -107,6 +108,7 @@ function(x, by=NULL, dframe, digits.d=NULL, brief, ...) {
     q3 <- quantile(xx, probs=0.75)
     mx <- max(xx)
     qr <- IQR(xx)
+
     # print
     if (!brief) {
       out <- c(n, n.miss, m, s, sk, kt, mn, q1, md, q3, mx, qr)
@@ -117,7 +119,8 @@ function(x, by=NULL, dframe, digits.d=NULL, brief, ...) {
       out <- c(n, n.miss, m, s, mn, md, mx)
       names(out) <- c("n", "miss", "mean", "sd", "min", "mdn", "max")
     }
-    if (i == 1) {  # write names
+    # write names
+    if (i == 1) { 
       if (max.ln < 4) max.ln <- max.ln + 2
       if (max.ln < 8) max.ln <- max.ln + 1
       if (n.lines == 1) nbuf <- 1 else nbuf <- 2
@@ -130,6 +133,7 @@ function(x, by=NULL, dframe, digits.d=NULL, brief, ...) {
          cat(format(names(out[i]), width=max.ln, justify="right", sep=""))
       cat("\n")
     }
+    # write values
     cat(format(p.lv, width=max.lv, justify="right", sep=""))
     cat(format(out[1], width=max.n+1, justify="right", sep=""))
     cat(format(out[2], width=max.nm+5, justify="right", sep=""))

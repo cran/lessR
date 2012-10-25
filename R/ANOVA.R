@@ -1,7 +1,7 @@
 ANOVA <-
-function(my.formula, dframe=mydata, 
-         brief=FALSE, digits.d=4, ...) {
-  
+function(my.formula, dframe=mydata, brief=FALSE, digits.d=NULL, 
+         rb.points=TRUE, pdf=FALSE, pdf.width=5, pdf.height=5, ...) {  
+
   mydframe <- deparse(substitute(dframe))  # get data frame name for cor before sort
  
   op <- options()  # save current options to reset at end
@@ -23,28 +23,18 @@ function(my.formula, dframe=mydata,
   n.pred <- n.vars - 1
   n.obs <- nrow(dframe)
 
-  options(xname = nm[1])
-  options(yname = nm[2])
-  
-  # sort values of the one predictor variable for scatterplot
-  #   so that the prediction/confidence intervals can be drawn
-  if (n.pred == 1) { 
-    o <- order(dframe[,nm[2]], decreasing=FALSE)
-    dframe <- dframe[o,]
-  }
-
   in.data.frame <- TRUE
   for (i in 1:n.vars) {
     if (!(nm[i] %in% names(dframe))) {
-        cat("\n\n\n>>> Note: ", nm[i], "is not in the data frame.\n")
-        in.data.frame <- FALSE
-      }
+      cat("\n\n\n>>> Note: ", nm[i], "is not in the data frame.\n")
+      in.data.frame <- FALSE
+    }
   }
 
   for (i in 2:n.vars) {
-      if (in.data.frame && !is.factor(dframe[ ,which(names(dframe) == nm[i])])) {
+      nms <-  which(names(dframe) == nm[i])
+      if (in.data.frame && !is.factor(dframe[ , nms])) {
         cat("\n>>> Note: Converting", nm[i], "to a factor for this analysis only.\n")
-        nms <-  which(names(dframe) == nm[i])
         dframe[ ,nms] <- as.factor(dframe[ ,nms])
       }
     }  
@@ -55,13 +45,16 @@ function(my.formula, dframe=mydata,
   assign("av.out", aov(my.formula, data=dframe), pos=.GlobalEnv)
 
   n.keep <- nrow(av.out$model)
+
+  if (is.null(digits.d)) digits.d <- .getdigits(dframe[,nm[1]], 2)
     
 
 # ----------
 # Background
 # ----------
 
-  cat( "\n\n\n", "  BACKGROUND", "\n")
+  cat( "\n\n", "Background", "\n", sep="")
+  .dash(10)
 
   cat("\n")
   if (sys.nframe() == 1) {  # only accurate if not called from model
@@ -70,83 +63,46 @@ function(my.formula, dframe=mydata,
   
   for (i in 1:n.vars) {
     ind <- i
-    .varlist(n.pred, ind, nm[i], levels(dframe[,nm[i]]))
+    .varlist(n.pred, ind, nm[i], "Factor", n.obs, n.keep, levels(dframe[,nm[i]]))
   }
-  
-  cat("\nNumber of observations (rows) of data: ", n.obs, "\n")
-  cat("Number of observations retained for analysis: ", n.keep, "\n")
 
 
-# --------------
-# Basic Analysis
-# --------------
+# --------
+# Analysis
+# --------
+
+  if (n.pred == 1) 
+    .ANOVAz1(av.out$model[,nm[1]],av.out$model[,nm[2]], nm, n.obs, digits.d, brief,
+      pdf=FALSE, pdf.width=5, pdf.height)
+
+  if (n.pred == 2) {
+    if (!is.list(replications(my.formula, data=dframe)))
+      cat("\nThe design is balanced\n")
+    else {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "The design is not balanced. The results would be invalid.\n",
+        "Consider function  lmer  in the  lme4  package.\n\n")
+    }
+    .ANOVAz2(av.out$model[,nm[1]],av.out$model[,nm[2]], av.out$model[,nm[3]],
+      nm, digits.d, brief, as.character(my.formula)[3], rb.points,
+      pdf, pdf.width, pdf.height)
+  }
+
+
+  # residuals
   if (!brief) {
-    cat( "\n\n\n", "  BASIC ANALYSIS", "\n")
-
-    if (n.pred == 1) {
-      x.values <- av.out$model[,nm[2]]
-      y.values <- av.out$model[,nm[1]] 
-      .ss.numeric(y.values, by=x.values, dframe=dframe, digits.d=digits.d, brief=TRUE)
-    }
-
-    if (n.pred == 2) {
-      cat("\nTable of Cell Sample Sizes\n")
-      .dash(26)
-      l <-  tapply(av.out$model[,nm[1]], 
-            list(av.out$model[,nm[2]], av.out$model[,nm[3]] ), length)
-      l <- as.table(l)
-      names(dimnames(l)) <- c(nm[2], nm[3])
-      print(t(l))  # first treatment horizontal dimension
-
-      cat("\nTable of Cell Means\n")
-      .dash(19)
-      m <-  tapply(av.out$model[,nm[1]], 
-            list(av.out$model[,nm[2]], av.out$model[,nm[3]] ), mean, na.rm=TRUE)
-      m <- as.table(m)
-      names(dimnames(m)) <- c(nm[2], nm[3])
-      print(t(m))  # first treatment horizontal dimension
-
-      cat("\nTable of Cell Standard Deviations\n")
-      .dash(33)
-      s <-  tapply(av.out$model[,nm[1]], 
-            list(av.out$model[,nm[2]], av.out$model[,nm[3]] ), sd, na.rm=TRUE)
-      s <- as.table(s)
-      names(dimnames(s)) <- c(nm[2], nm[3])
-      print(round(t(s), digits.d))
-
-    }
-  }
-
-  cat("\n\n")
-  cat("ANOVA\n")
-  .dash(5)
-  sm <- summary(av.out)
-  print(sm)
-
-  if (n.pred== 1) {
-    cat("\n\n")
-    HSD <- TukeyHSD(av.out, which=nm[2])
-    cat("Tukey Multiple Comparisons of Means\n")
-    cat("Familywise Confidence Level:", attr(HSD, which="conf.level"), "\n")
-    .dash(35)
-    cat("\n")
-    print(HSD[[1]])
-    if (!brief) {
-      .graphwin(1)
-      orig.params <- par(no.readonly=TRUE)
-      on.exit(par(orig.params))
-      par(mar=c(5.1,6.1,4.1,1.5))
-      cex.axis <- .8; col.axis <- "gray30"; col.ticks <- "gray30"
-      suppressWarnings(plot(HSD, 
-        cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, las=1))
-    }
-  }
-
-  if (n.pred == 2  &&  !brief) {
-  .graphwin(1)
-  interaction.plot(av.out$model[,nm[2]], av.out$model[,nm[3]], 
-           av.out$model[,nm[1]],
-           xlab=nm[2], ylab=nm[1], trace.label=nm[3])
+    cat("\n\n\n")
+    cat("Fitted Values, Residuals, Standardized Residuals\n")
+    .dash(48)
+    fit <- .fmt(av.out$fitted, digits.d)
+    res <- .fmt(av.out$residuals, digits.d)
+    sres <- .fmt(rstandard(av.out), digits.d)
+    out <- cbind(av.out$model[c(nm[seq(2,n.vars)],nm[1])], fit, res, sres)
+    out <- data.frame(out)
+    names(out)[n.vars+1] <- "fitted"
+    names(out)[n.vars+2] <- "residual"
+    names(out)[n.vars+3] <- "z-resid"
+    print(out, digits=digits.d)
   }
 
 # pairwise.t.test(mydata$Steady, mydata$TrtA)

@@ -12,7 +12,6 @@ Plots the successive eigenvalues of an input correlation matrix. Also plots the 
 
 \usage{
 corScree(x=mycor, 
-          colors=c("blue", "gray", "rose", "green", "gold", "red"),
           main=NULL, pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
 
 scree(\ldots)
@@ -20,7 +19,6 @@ scree(\ldots)
 
 \arguments{
   \item{x}{Correlation matrix.}
-  \item{colors}{Sets the color palette.}
   \item{main}{Graph title, which is blank by default.}
   \item{pdf}{Indicator as to if the graphic files should be saved as pdf files
        instead of directed to the standard graphics windows.}

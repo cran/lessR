@@ -1,5 +1,5 @@
 lgt <-
-function(my.formula, ...)
+function(...)
 
-  Logit(my.formula, ...)
+  Logit(...)
 

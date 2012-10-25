@@ -1,6 +1,7 @@
 .OneGroup  <-
 function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, 
-         brief, from.data, conf.level, digits.d) { 
+         brief, bw1, from.data, conf.level, digits.d, mmd, msmd,
+         graph, show.title, pdf.file, pdf.width, pdf.height) { 
 
   # get variable label if exists
   gl <- .getlabels()
@@ -27,15 +28,13 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL,
 
   clpct <- paste(toString(round((conf.level)*100, 2)), "%", sep="")
 
-  m.out <- round(m,digits.d)
-  s.out <- round(s,digits.d)
   if (Ynm != "Y") cat(Ynm,  ": ", sep="")
   if (from.data) cat(" n.miss = ", n.miss, ",  ", sep="") 
-  cat("n = ", n, ",   mean = ", m.out, ",   sd = ", s.out, sep="", "\n")
+  cat("n = ", n, ",   mean = ", .fmt(m, digits.d), 
+      ",  sd = ", .fmt(s, digits.d), sep="", "\n")
+
   if (brief) cat("\n")
-
-  if (!brief) {
-
+  else  {
     if (from.data) {
 
       cat("\n\n------ Normality Assumption ------\n\n")
@@ -94,15 +93,38 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL,
   }
   if (!is.null(mu0)) {
     cat("Hypothesized Value H0: mu =", mu0, "\n")
-    if (!brief)
-      cat("Distance of Sample Mean from Hypothesized: ", .fmt(m.dist), sep="", "\n")
     txt <- "Hypothesis Test of Mean:  t-value = "
     cat(txt, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3), sep="", "\n\n")
   }
   if (!brief)
     cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="", "\n")
   txt <- " Confidence Interval for Mean:  "
-  cat(clpct, txt, .fmt(lb), " to ", .fmt(ub), sep="", "\n\n")
+  cat(clpct, txt, .fmt(lb), " to ", .fmt(ub), sep="", "\n")
+
+  # mean difference from mu0 and standardized mean difference
+  if (!is.null(mu0)) {
+    mdiff <- m - mu0
+    smd <- abs(mdiff/s)
+    if (!brief) cat("\n\n------ Effect Size ------\n\n") else cat("\n")
+    cat("Distance of sample mean from hypothesized:  " , .fmt(mdiff), "\n",
+        "Standardized Distance, Cohen's d:  ", .fmt(smd),
+        sep="", "\n")
+  }
+  # densities
+  if (from.data && graph && !is.null(mu0)) {
+
+    .opendev(pdf.file, pdf.width, pdf.height)
+
+    .OneGraph(Y, bw1, Ynm, digits.d, brief,
+         n, m, mu0, mdiff, s, smd, mmd, msmd,
+         clpct, tvalue, pvalue, ub, lb,
+         show.title, pdf.file, pdf.width, pdf.height)
+
+    if (!is.null(pdf.file)) {
+      dev.off()
+      .showfile(pdf.file, "graph of both groups")
+    }
+  }
 
 }  # End One Group
 

@@ -1,5 +1,5 @@
 model <-
-function(my.formula, ...)
+function(...)
 
-  Model(my.formula, ...)
+  Model(...)
 

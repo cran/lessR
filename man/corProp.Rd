@@ -7,13 +7,12 @@
 \description{
 Abbreviation: \code{prop}
 
-Each graph is based on a default color theme. The original default is "blue", but \code{corProp} allows other color palettes to be corProp as default as well.
+In the population, indicators of the same factor or latent variable have parallel corrlelations with all other variables. Of course, in the presence of sampling error, this parallelism will only be approximate. To assess this parallelism, proportionality coefficients are computed for each pair of variables in the input correlation matrix.  Also output is a heat map of the resulting matrix of proportionality coefficients. Each graph is based on a default color theme. The original default is "blue", but other color palettes can be generated as well.
 }
 
 \usage{
 corProp(x=mycor, 
-          main=NULL, heat.map=TRUE, bottom=3,right=3, 
-          colors=c("blue", "gray", "rose", "green", "gold", "red"),
+          main=NULL, heat.map=TRUE, bottom=3, right=3, 
           pdf.file=NULL, pdf.width=5, pdf.height=5)
 
 prop(\ldots)
@@ -23,10 +22,9 @@ prop(\ldots)
   \item{x}{Correlation matrix.}
   \item{main}{Graph title. Set to \code{main=""} to turn off.}
   \item{heat.map}{If \code{TRUE}, display a heat map of the item
-        correlations with item communalities in the diagonal.}
+        correlations with the diagonal ignored.}
   \item{bottom}{Number of lines of bottom margin.}
   \item{right}{Number of lines of right margin.}
-  \item{colors}{Sets the color palette.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -35,6 +33,8 @@ prop(\ldots)
 
 \details{
 Proportionality coefficients indicate the extent of proportionality between two variables.  Perfect proportionality of two variables is consistent with both variables being indicators of the same latent variable or factor and indicators of no other factor.
+
+In the current version the diagonal of the input correlation matix is ignored.  To maintain parallelism, the diagonal element of 1.00 would need to be replaced the corersponding communalities, which first requres a factor analysis.  
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -55,7 +55,7 @@ c(1.000,0.480,0.320,0.192,0.144,0.096,
   0.192,0.144,0.096,1.000,0.480,0.320,
   0.144,0.108,0.072,0.480,1.000,0.240,
   0.096,0.072,0.048,0.320,0.240,1.000))
-colnames(mycor) <- c("V1", "V2", "V3", "V4", "V5", "V6")
+colnames(mycor) <- c("X1", "X2", "X3", "X4", "X5", "X6")
 rownames(mycor) <- colnames(mycor)
 
 # proportionality coefficients of correlation matrix mycor

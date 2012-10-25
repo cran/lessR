@@ -1,6 +1,6 @@
 .cr.data.frame <-
 function(x, miss, show.n, n.cat, digits.d,
-         heat.map, colors, main, bottom, right, 
+         heat.map, main, bottom, right, 
          pdf.file, pdf.width, pdf.height, ...)  {
 
   if (!is.null(digits.d) && digits.d<1) {
@@ -122,7 +122,7 @@ function(x, miss, show.n, n.cat, digits.d,
 
   if (heat.map  && ncol(x)>3) {
     if (is.null(main)) main <- "Correlations"
-   .corcolors(mycor, n.vars, colors, main, bottom, right, diag=0,
+   .corcolors(mycor, n.vars, main, bottom, right, diag=0,
               pdf.file, pdf.width, pdf.height)
   }
   
