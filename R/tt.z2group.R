@@ -1,7 +1,7 @@
 .TwoGroup <-
 function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits.d,
-         conf.level, mmd, msmd, bw1, bw2, graph,
+         conf.level, alternative, mmd, msmd, bw1, bw2, graph,
          show.title, pdf.file, pdf.width, pdf.height, ...)  {        
  
   if ( brief  &&  (!is.null(mmd) || !is.null(msmd)) ) { 
@@ -25,6 +25,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     cat("Grouping Variable:  ", Xnm, ", ", as.character(x.lbl), sep="", "\n")
     cat("\n")
   }
+  if (is.null(y.lbl)) y.lbl <- Ynm
 
   if (!brief) cat("\n------ Description ------\n\n")
 
@@ -47,34 +48,33 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     v2 <- s2^2
   }
 
+  if (from.data)
+    dig.smr.d  <- digits.d
+  else
+    dig.smr.d  <- digits.d - 1
+
   clpct <- paste(toString(round((conf.level)*100, 2)), "%", sep="")
   Xnmval <- paste(Xnm, X1nm)
   cat(Ynm, " for ", Xnmval, ":  ", sep="")
   if (from.data) cat("n.miss = ", n1.miss, ",  ", sep="")
-  cat("n1 = ", n1, sep="")
-  cat(",  mean = ", .fmt(m1,digits.d), ",  sd = ", .fmt(s1,digits.d), sep="", "\n")
+  cat("n = ", n1, sep="")
+  cat(",  mean = ", .fmt(m1,dig.smr.d), ",  sd = ", .fmt(s1,dig.smr.d), sep="", "\n")
   Xnmval <- paste(Xnm, X2nm)
   cat(Ynm, " for ", Xnmval, ":  ", sep="")
   if (from.data) cat("n.miss = ", n2.miss, ",  ", sep="")
-  cat("n2 = ", n2, sep="")
-  cat(",  mean = ", .fmt(m2,digits.d), ",  sd = ", .fmt(s2,digits.d), sep="", "\n")
-  cat("\n")
+  cat("n = ", n2, sep="")
+  cat(",  mean = ", .fmt(m2,dig.smr.d), ",  sd = ", .fmt(s2,dig.smr.d), sep="", "\n")
+  if (!brief) cat("\n")
 
 # sw
   df1 <- n1 - 1
   df2 <- n2 - 1
   swsq <- (df1*v1 + df2*v2) / (df1 + df2)
   sw <- sqrt(swsq)
-  if (!brief) cat("Equal Group Variances Assumed, Within-group",
-      "Standard Deviation:  ", .fmt(sw), "\n")
+  if (!brief) cat("Within-group Standard Deviation:  ", .fmt(sw), "\n")
 
-  # mean difference and standardized mean difference
+  # sample mean difference
   mdiff <- m1 - m2
-  smd <- mdiff/sw
-  if (!brief) cat("\n\n------ Effect Size ------\n\n")
-  cat("Sample Mean Difference of ", Ynm, ":  " , .fmt(mdiff), sep="", "\n")
-  cat("Standardized Mean Difference of ", Ynm, ", ",
-      "Cohen's d:  ", .fmt(smd), sep="", "\n")
 
 
   if (!brief) {
@@ -167,9 +167,15 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   # t-test
   sterr <- sw * sqrt(1/n1 + 1/n2)
   df <- df1 + df2
-  tcut <- qt((1-conf.level)/2, df=df, lower.tail=FALSE)
+  if (alternative == "two.sided")
+    tcut <- qt((1-conf.level)/2, df=df, lower.tail=FALSE)
+  else if (alternative == "less")
+    tcut <- qt(1-conf.level, df=df, lower.tail=FALSE)
+  else if (alternative == "greater")
+    tcut <- qt(1-conf.level, df=df, lower.tail=TRUE)
   if (from.data) {
-    ttest <- t.test(YA, YB, var.equal=TRUE, conf.level=conf.level)
+    ttest <- t.test(YA, YB, var.equal=TRUE, conf.level=conf.level,
+                    alternative=alternative)
     lb <- ttest$conf[1]
     ub <- ttest$conf[2]
     E <- (ub-lb) / 2
@@ -182,7 +188,12 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     lb <- mdiff-E
     ub <- mdiff+E
     tvalue <- mdiff/sterr
-    pvalue <- 2 * pt(abs(tvalue), df=df, lower.tail=FALSE)
+    if (alternative == "two.sided")
+      pvalue <- 2 * pt(abs(tvalue), df=df, lower.tail=FALSE)
+    else if (alternative == "less")
+      pvalue <- pt(abs(tvalue), df=df, lower.tail=FALSE)
+    else if (alternative == "greater")
+      pvalue <- pt(abs(tvalue), df=df, lower.tail=TRUE)
   }
 
   if (!brief) {
@@ -197,21 +208,21 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb), " to ", .fmt(ub), 
       sep="", "\n\n")
 
-  cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf.level=conf.level)  # MBESS function
-  deltaL <-cid$Lower.Conf.Limit.smd
-  deltaU <- cid$Upper.Conf.Limit.smd
-  cat(clpct," Confidence Interval for smd:  ",
-      .fmt(deltaL), " to ", .fmt(deltaU), sep="", "\n")
-
   if (!brief) {
     k1 <- v1/n1
     k2 <- v2/n2
     df.ne <- ((k1 + k2)^2) / ((k1^2)/(n1-1) + (k2^2)/(n2-1))
-    tcut.ne <- qt((1-conf.level)/2, df=df.ne, lower.tail=FALSE)
     sterr.ne <- sqrt(k1 + k2)
+    if (alternative == "two.sided")
+      tcut.ne <- qt((1-conf.level)/2, df=df.ne, lower.tail=FALSE)
+    else if (alternative == "less")
+      tcut.ne <- qt(1-conf.level, df=df.ne, lower.tail=FALSE)
+    else if (alternative == "greater")
+      tcut.ne <- qt(1-conf.level, df=df.ne, lower.tail=TRUE)
 
     if (from.data) {
-      ttne <- t.test(YA, YB, var.equal=FALSE, conf.level=conf.level)
+      ttne <- t.test(YA, YB, var.equal=FALSE, conf.level=conf.level,
+                     alternative=alternative)
       df.ne <- ttne$parameter
       lb.ne <- ttne$conf[1]
       ub.ne <- ttne$conf[2]
@@ -224,7 +235,12 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       lb.ne <- mdiff-E.ne
       ub.ne <- mdiff+E.ne
       tvalue.ne <- mdiff / sterr.ne
+    if (alternative == "two.sided")
       pvalue.ne <- 2 * pt(abs(tvalue.ne), df=df.ne, lower.tail=FALSE)
+    else if (alternative == "less")
+      pvalue.ne <- pt(abs(tvalue.ne), df=df.ne, lower.tail=FALSE)
+    else if (alternative == "greater")
+      pvalue.ne <- pt(abs(tvalue.ne), df=df.ne, lower.tail=TRUE)
     }
 
     cat("\n--- Do not assume equal population variances of", Ynm, "for each", Xnm, "\n\n")
@@ -237,6 +253,26 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb.ne), " to ",
         .fmt(ub.ne), sep="", "\n")
 
+  }
+
+  # mean difference and standardized mean difference
+  smd <- mdiff/sw
+  if (!brief) {
+    cat("\n\n------ Effect Size ------\n\n")
+    cat("--- Assume equal population variances of", Ynm, "for each", Xnm, "\n\n")
+  }
+  cat("Sample Mean Difference of ", Ynm, ":  " , .fmt(mdiff), sep="", "\n")
+  cat("Standardized Mean Difference of ", Ynm, ", ",
+      "Cohen's d:  ", .fmt(smd), sep="", "\n")
+
+  cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf.level=conf.level)  # MBESS function
+  deltaL <-cid$Lower.Conf.Limit.smd
+  deltaU <- cid$Upper.Conf.Limit.smd
+  if (!brief) cat("\n")
+  cat(clpct," Confidence Interval for smd:  ",
+      .fmt(deltaL), " to ", .fmt(deltaU), sep="", "\n")
+
+  if (!brief) {
     cat("\n\n------ Practical Importance ------\n\n")
     cat("Minimum Mean Difference of practical importance: mmd\n")
     if ( !is.null(mmd) | !is.null(msmd) ) {
@@ -256,7 +292,6 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       cat("Minimum Standardized Mean Difference of practical importance: msmd\n")
       cat("Neither value specified, so no analysis\n")
     }
-
   }
 
   # densities
@@ -264,8 +299,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
     .opendev(pdf.file, pdf.width, pdf.height)
 
-    .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, digits.d, brief,
-              n1, m1, s1, n2, m2, s2, mdiff, sw, smd, mmd, msmd,
+    .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
+              n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
               clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title)
 
     if (!is.null(pdf.file)) {

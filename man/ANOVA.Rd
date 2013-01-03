@@ -12,7 +12,7 @@ Analysis of variance from the R \code{\link{aov}} function plus graphics and eff
 }
 
 \usage{
-ANOVA(my.formula, dframe=mydata, brief=FALSE, digits.d=NULL, 
+ANOVA(my.formula, data=mydata, brief=FALSE, digits.d=NULL, 
          rb.points=TRUE, pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
 
 av(\ldots)
@@ -23,7 +23,7 @@ av.brief(\ldots, brief=TRUE)
 
 \arguments{
   \item{my.formula}{Standard R \code{\link{formula}} for specifying a model.}
-  \item{dframe}{The default name of the data frame that contains the data for analysis 
+  \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
   \item{brief}{Extent of displayed results.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
@@ -82,14 +82,14 @@ av(Y ~ X)
 # variable of interest is in a data frame which is not the default mydata
 # access the data frame in the lessR dat.twogroup data set
 # although data not attached, access the variables directly by their name
-data(dataGroups2)
-ANOVA(ShipTime ~ Supplier, dframe=dataGroups2)
+data(dataLearn)
+ANOVA(Score ~ StudyType, data=dataLearn)
 
 # two-factor between-groups ANOVA with replications and interaction
-ANOVA(breaks ~ wool * tension, dframe=warpbreaks)
+ANOVA(breaks ~ wool * tension, data=warpbreaks)
 
 # randomized blocks design with the second term the blocking factor
-ANOVA(breaks ~ wool + tension, dframe=warpbreaks)
+ANOVA(breaks ~ wool + tension, data=warpbreaks)
 }
 
 

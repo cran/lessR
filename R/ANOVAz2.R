@@ -1,5 +1,5 @@
 .ANOVAz2 <- 
-function(y.values, x1.values, x2.values, nm, digits.d, brief,
+function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
          delim, rb.points, pdf, pdf.width, pdf.height) {
 
   if (grepl("*", delim, fixed=TRUE)) bet.grp  <- TRUE else bet.grp <- FALSE
@@ -27,16 +27,13 @@ function(y.values, x1.values, x2.values, nm, digits.d, brief,
 
   if (bet.grp) {
     l <-  tapply(y.values, 
-          list(x1.values, x2.values ), length)
+          list(x1.values, x2.values), length)
     l <- as.table(l)
 
     if (!brief) {
-      cat("\n")
-      cat("\nCell Sample Sizes\n")
-      .dash(17)
-      names(dimnames(l)) <- c(nm[2], nm[3])
-      print(t(l))  # first treatment horizontal dimension
+      cat("\nCell Sample Size:", l[1,1], "\n")
 
+      cat("\n\n")
       cat("\nCell Means\n")
       .dash(10)
       m <-  tapply(y.values, 
@@ -44,30 +41,33 @@ function(y.values, x1.values, x2.values, nm, digits.d, brief,
       m <- as.table(m)
       names(dimnames(m)) <- c(nm[2], nm[3])
       print(round(t(m), digits.d))  # first treatment horizontal dimension
-
-      cat("\nMarginal Means\n")
-      .dash(14)
-      cat(nm[2], "\n")
-      m1 <-  tapply(y.values, x1.values, mean, na.rm=TRUE)
-      print(round(m1, digits.d))  # first treatment horizontal dimension
-      cat("\n")
-      cat(nm[3], "\n")
-      m2 <-  tapply(y.values, x2.values, mean, na.rm=TRUE)
-      print(round(m2, digits.d))  # first treatment horizontal dimension
-
-      cat("\nGrand Mean\n")
-      .dash(10)
-      mg <-  mean(y.values, na.rm=TRUE)
-      cat(round(mg, digits.d+1), "\n")
-
-      cat("\nCell Standard Deviations\n")
-      .dash(24)
-      s <-  tapply(y.values, 
-            list(x1.values, x2.values ), sd, na.rm=TRUE)
-      s <- as.table(s)
-      names(dimnames(s)) <- c(nm[2], nm[3])
-      print(round(t(s), digits.d))
     }
+  }
+
+    cat("\n\nMarginal Means\n")
+    .dash(14)
+    cat(nm[2], "\n")
+    m1 <-  tapply(y.values, x1.values, mean, na.rm=TRUE)
+    print(round(m1, digits.d))  # first treatment horizontal dimension
+    cat("\n")
+    cat(nm[3], "\n")
+    m2 <-  tapply(y.values, x2.values, mean, na.rm=TRUE)
+    print(round(m2, digits.d))  # first treatment horizontal dimension
+
+    cat("\nGrand Mean\n")
+    .dash(10)
+    mg <-  mean(y.values, na.rm=TRUE)
+    cat(round(mg, digits.d+1), "\n")
+
+  if (bet.grp) {
+    cat("\n")
+    cat("\nCell Standard Deviations\n")
+    .dash(24)
+    s <-  tapply(y.values, 
+          list(x1.values, x2.values ), sd, na.rm=TRUE)
+    s <- as.table(s)
+    names(dimnames(s)) <- c(nm[2], nm[3])
+    print(round(t(s), digits.d))
   }  # end between groups
 
 
@@ -162,9 +162,8 @@ function(y.values, x1.values, x2.values, nm, digits.d, brief,
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
   }
 
-  interaction.plot(x1.values, x2.values, 
-           y.values, main="Interaction Plot",
-           xlab=nm[2], ylab=nm[1], trace.label=nm[3])
+  interaction.plot(x1.values, x2.values, y.values,
+                   xlab=nm[2], ylab=nm[1], trace.label=nm[3])
 
   # terminate pdf graphics system
   if (!is.null(pdf.file)) {

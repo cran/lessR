@@ -1,5 +1,5 @@
 .ss.numeric <-
-function(x, by=NULL, dframe, digits.d=NULL, brief, ...) {
+function(x, by=NULL, data, digits.d=NULL, brief, ...) {
 
   # get variable labels if exist
   gl <- .getlabels()
@@ -19,8 +19,8 @@ function(x, by=NULL, dframe, digits.d=NULL, brief, ...) {
       vectors <- split(df$x, df$by)
       rm(df)
      }
-    else {  # dframe only needed if a by variable exists
-      vectors <- split(dframe[,x.name], dframe[,y.name])
+    else {  # data only needed if a by variable exists
+      vectors <- split(data[,x.name], data[,y.name])
     }
   }
 
@@ -30,7 +30,7 @@ function(x, by=NULL, dframe, digits.d=NULL, brief, ...) {
     cat("\nThese data values contain ", dig.dec, " decimal digits. To enhance\n",
         "the readability of the output, only 4 decimal digits are\n",
         "displayed.  To customize this setting, use the digits.d  parameter.\n",
-        "Example for Variables Y and X:  > ss(Y, by=X, digits.d=3)\n\n",
+        "Example for Variables Y and X:  > ss(Y, by=X, digits.d=3)\n",
         sep="")
     dig.dec <- 4
   }

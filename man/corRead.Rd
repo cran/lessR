@@ -1,5 +1,6 @@
 \name{corRead}
 \alias{corRead}
+\alias{rd.cor}
 \alias{rad.cor}
 
 \title{Read Specified Correlation Matrix into an R Matrix Named mycor}
@@ -13,6 +14,7 @@ Read a correlation matrix into R. The resulting matrix is named \code{mycor}. Al
 \usage{
 corRead(ref=NULL, names=NULL)
 
+rd.cor(\ldots)
 rad.cor(\ldots)
 }
 
@@ -31,13 +33,13 @@ The standard R function used to read the matrix is \code{\link{read.table}}.
 
 By default the variables are named V1, V2, etc.  If the \code{names} option is invoked, then the specified names are attached to the respective rows and columns of the matrix.  Here it may be convenient to name the variables with the \code{lessR} function \code{\link{to}}.
 
-The alternative is to calculate the correlations from the data, such as with the \code{lessR} function \code{\link{cr}} or the standard R function \code{\link{cor}}.
+The alternative is to calculate the correlations from the data, such as with the \code{lessR} function \code{\link{Correlation}} or the standard R function \code{\link{cor}}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{cr}}, \code{\link{read.table}}.
+\code{\link{Correlation}}, \code{\link{read.table}}.
 }
 
 \examples{
@@ -47,7 +49,7 @@ The alternative is to calculate the correlations from the data, such as with the
 
 # abbreviated form
 # read a matrix with 4 variables and specify the names
-# rad.cor(names=c("m06","m07","m09","m10"))
+# rd.cor(names=c("m06","m07","m09","m10"))
 }
 
 

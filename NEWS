@@ -3,6 +3,186 @@ NEWS
 Update History for Package 'lessR'
 -------------------------------------------------------------------------
 
+>>>>>> Changes for lessR version 2.8 (2013-02-01)} <<<<<<
+
+The keepers of CRAN have changed the rules. They no longer
+allow a function to automatically direct output to a data table.
+Code that works just fine is now judged as not acceptable because
+the keepers do not like that style. They have decided that users
+should always explicitly specify the destination of the output file.
+
+What that means for lessR is that any function that outputs a
+data table now cannot automatically write that data table to
+mydata or other chosen name. Instead you must now explicitly
+assign the output data table name when reading or modifying data,
+usually use  mydata  or  mycor. To do this, use the R assign
+notation, <- , which assigns anything on the right side to whatever
+is on the left side of the expression.
+    > mydata <- Read()
+    > mydata <- Transform(Y=X/12)     also Subset, Merge, Recode, Sort
+    > mycor <- Correlation()
+If you do not make this explicit assignment, the function still
+works, but the output is dumped at the console instead of sent
+to a stored data frame such as mydata to be available for later analysis.
+
+
+Other generic changes:
+
+To be consistent with R functions, the data frame option has been changed from dframe to data.  Usually this is not used as the default mydata is relied upon, but now specify other names with the data option.
+
+Previously the brief option was used inconsistently.  For some functions it lead to a brief output, and for others it suppressed output.  It remains for functions that primarily send output to the console.  For graphics functions and data modification functions, now completely suppress output with quiet=TRUE.
+
+
+-------------------
+New Functions 2.8
+-------------------
+
+Merge
+  merges two data frames either horizontally or vertically
+
+
+-------------
+Updates 2.8
+-------------
+
+default system setting
+  n.cat, the maximum number of unique values of a variable to be treated as 
+    a categorical variable by default, changed to 0, turned off by default
+
+Recode, Sort, Subset, Transform
+  now precede the function call with, for example:   mydata <-
+
+Read
+  now precede the function call with, for example:   mydata <-
+  variable labels now incorporated directly into the data frame and
+    are now read with the labels option
+  rd is the abbreviation, though the older rad is still available
+  lessR.data option re-specified as format="lessR"
+  quiet option replaces brief
+
+Subset
+  holdout sample can no longer be created from with the function given the
+    rule change from CRAN, but holdout=TRUE creates the code to copy and
+    paste back into R to create the holdout sample
+
+ttest
+  for two group analysis from a formula, the separate data vectors
+    are returned for later analysis (see the examples)
+  graph for two group analysis now in gray scale for colors="gray"
+  when input is summary stats, reported summary stats are to the 
+    same level of precision as to what was input
+  variable label, if present, appears on density graph
+  standard R alternative option available for one-tailed tests
+  paired=TRUE option available for dependent-groups t-test
+
+ttestPower
+  powercurve.t.test name removed in favor of ttestPower
+
+ANOVA
+  randomized blocks analysis displays the marginal and grand means
+  two-way between groups analysis displays the cells size once instead of
+    the same number for all cells
+
+Regression
+  standardization option available
+  rgl package bug apparently fixed, so scatter.3d=TRUE is again available
+    for models with two predictor variables
+  singularity check added and solution terminated if so
+  residuals vs fitted Values plot plotted with current color theme
+  scatterplot of prediction intervals with current color theme
+
+Correlation
+  can use method="kendall" and method="spearman"
+  graphics=TRUE to create a scatter plot matrix and heat map
+  pdf=TRUE to create and write scatter plot matrix and heat map to pdf files
+
+Density
+  summary statistics reported by default
+  quiet=FALSE replaces text.out=TRUE
+
+Histogram
+  quiet=FALSE replaces text.out=TRUE  
+
+ScatterPlot
+  one variable, method="jitter" option from R stripchart possible
+  missing data removed to enable ellipse from car package
+  the by variable need no longer be a factor
+  fit.line applies to each level of a by variable
+  for a by variable, width of plot adjusted for legend when saving to a pdf
+  quiet=FALSE replaces text.out=TRUE
+
+BoxPlot
+  color of the box more vivid
+  quiet=FALSE replaces text.out=TRUE
+
+Logistic
+  abbreviation is lr instead of older lgt
+
+set
+  default colors="blue" bar fill is lightsteelblue3 from lightsteelblue
+  colors="sienna" and "gray.black" color themes added
+  colors="dodgerblue" given a light gray background
+
+BarChart
+  reports the corresponding chi-square test
+  count.names option name changed to the more meaningful count.levels
+  quiet=FALSE replaces text.out=TRUE
+
+PieChart
+  for consistency with other functions, col.pieces changed to col.fill,
+    the specified color of the regions of the pie chart
+  quiet=FALSE replaces text.out=TRUE
+
+SummaryStats
+  only report summary statistics (chi-square test moved to BarChart)
+
+
+---------------
+Bug Fixes 2.8
+---------------
+
+ANOVA
+  pdf=TRUE properly writes the graphs to the working directory
+
+ttest
+  graph for two group analysis shows the degrees of freedom in the title
+  if missing a grouping variable data value, analysis still proceeds
+
+BarChart
+  ordered progressions of color with purple, sienna and dodgerblue work
+
+Histogram
+  col.ticks warning addressed and no longer generated
+  text.out can now be set to FALSE
+
+Density
+  a perfectly symmetrical distribution properly plots as a density function
+
+LineChart
+  default area under the plotted line segments now fills to proper
+    color according to the current color theme
+
+ScatterPlot
+  transparency for one and two variable plots correctly provided by default
+  ellipse works correctly for non-regular plots such as bubble plots
+  for kind option, bubble and sunflower can be now specified as documented
+  sunflower plot has background and grid colors according to color theme
+  show.n=TRUE works correctly for pairwise deletion for correlation matrix
+
+Correlation
+  properly accept variables in global environment
+
+Regression
+  prints residuals and forecasting errors when there is a factor predictor
+  for categorical variables the results for all levels are displayed
+
+set
+  n.cat no longer set to 4 when set function called
+
+Write
+  if suffix .csv or .rda already exists, not added again to file name
+
+
 
 
 >>>>>> Changes for lessR version 2.6 (2012-10-24)} <<<<<<

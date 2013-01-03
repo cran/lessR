@@ -27,33 +27,23 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
       { .dash(30); cat("Joint and Marginal Frequencies\n"); .dash(30) }
     print(addmargins(x))
     if (!brief) { 
-      cat("\n"); .dash(19); cat("Chi-square Analysis\n"); .dash(19); 
-      ch <- (summary(as.table(x)))
-      pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
-      cat("Number of observations (cases) in analysis:", ch$n.cases, "\n")
-      cat("Number of variables:", ch$n.vars, "\n")
-      cat("Test of independence: ", 
-          "  Chisq = ", ch$statistic, ", df = ", ch$parameter, ", p-value = ", 
-          pvalue, sep="", "\n")
-    if (!ch$approx.ok) 
-      cat(">>> Low cell expected frequencies,",
-          "so chi-squared approximation may not be accurate", "\n")
-      cat("\n\n"); .dash(30); cat("Cell Proportions and Marginals\n"); .dash(30); 
-        print(round(addmargins(prop.table(x)),3))
-        cat("\n"); .dash(30); cat("Proportions within Each Column\n"); .dash(30);
-        x.col <- prop.table(x, margin=2)
-        Sum <- numeric(ncol(x.col))
-        for (i in 1:ncol(x.col)) Sum[i] <- sum(x.col[,i])
-        x.col2 <- round(rbind(x.col,Sum),3)
-        names(dimnames(x.col2)) <- names(dimnames(x.col))
-        print(x.col2)
-      cat("\n"); .dash(27); cat("Proportions within Each Row\n"); .dash(27); 
-        x.row <- prop.table(x, margin=1)
-        Sum <- numeric(nrow(x.row))
-        for (i in 1:nrow(x.row)) Sum[i] <- sum(x.row[i,])
-        x.row2 <- round(cbind(x.row,Sum),3)
-        names(dimnames(x.row2)) <- names(dimnames(x.row))
-        print(x.row2)
+
+    cat("\n\n"); .dash(30); cat("Cell Proportions and Marginals\n"); .dash(30); 
+      print(round(addmargins(prop.table(x)),3))
+      cat("\n"); .dash(30); cat("Proportions within Each Column\n"); .dash(30);
+      x.col <- prop.table(x, margin=2)
+      Sum <- numeric(ncol(x.col))
+      for (i in 1:ncol(x.col)) Sum[i] <- sum(x.col[,i])
+      x.col2 <- round(rbind(x.col,Sum),3)
+      names(dimnames(x.col2)) <- names(dimnames(x.col))
+      print(x.col2)
+    cat("\n"); .dash(27); cat("Proportions within Each Row\n"); .dash(27); 
+      x.row <- prop.table(x, margin=1)
+      Sum <- numeric(nrow(x.row))
+      for (i in 1:nrow(x.row)) Sum[i] <- sum(x.row[i,])
+      x.row2 <- round(cbind(x.row,Sum),3)
+      names(dimnames(x.row2)) <- names(dimnames(x.row))
+      print(x.row2)
     }
   }
   else {  # one variable
@@ -91,16 +81,6 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
       for (i in 1:length(x)) cat(.fmt(x[i]/sum(x), 3, max.ln[i]))
       cat(.fmtc("1.000", w=w+6))
       cat("\n")
-      if (!brief) {
-        ch <- suppressWarnings(chisq.test(x))
-        pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
-        cat("\nChi-squared test of null hypothesis of equal probabilities\n")
-        cat("  Chisq = ", ch$statistic, ",  df = ", ch$parameter, ",  p-value = ", 
-          pvalue, sep="", "\n")
-        if (any(ch$expected < 5)) 
-          cat(">>> Low cell expected frequencies,",
-              "so chi-squared approximation may not be accurate", "\n")
-      }
     }
   }
 

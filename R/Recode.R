@@ -1,8 +1,8 @@
 Recode <-
-function(old.vars, new.vars=NULL, old, new, brief=FALSE, keep=TRUE, dframe=mydata) {
+function(old.vars, new.vars=NULL, old, new, data=mydata, quiet=FALSE) {
 
-  all.vars <- as.list(seq_along(dframe))
-  names(all.vars) <- names(dframe)
+  all.vars <- as.list(seq_along(data))
+  names(all.vars) <- names(data)
   vars <- eval(substitute(old.vars), envir=all.vars, enclos=parent.frame())
 
   if (!is.null(new.vars)) {
@@ -20,9 +20,9 @@ function(old.vars, new.vars=NULL, old, new, brief=FALSE, keep=TRUE, dframe=mydat
   }
 
   for (ivar in 1:length(vars)) {
-    if (is.factor(dframe[,vars[ivar]])) { 
+    if (is.factor(data[,vars[ivar]])) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Variable to recode is a factor: ", names(dframe)[vars[ivar]], "\n",
+        "Variable to recode is a factor: ", names(data)[vars[ivar]], "\n",
         "Doing this recode would remove the factor attribute.\n\n",
         "Instead, recode with the levels argument of the function: factor.\n",
         "Enter  ?Recode  and see last example to illustrate.\n\n")
@@ -30,56 +30,68 @@ function(old.vars, new.vars=NULL, old, new, brief=FALSE, keep=TRUE, dframe=mydat
   }
 
   # get data frame name
-  dframe.name <- deparse(substitute(dframe))
+  dname <- deparse(substitute(data))
 
-  if (!brief) {
+  if (!quiet) {
     cat("\n")
     .dash(56)
-    cat("First five rows of data to recode for data frame:", dframe.name, "\n")
+    cat("First five rows of data to recode for data frame:", dname, "\n")
     .dash(56)
-    print(head(dframe[, vars, drop=FALSE], n=5))
+    print(head(data[, vars, drop=FALSE], n=5))
     cat("\n")
   } 
 
   for (ivar in 1:length(vars)) {
-    # get actual variable name before potential call of dframe$x
+    # get actual variable name before potential call of data$x
     x.name <- names(all.vars)[vars[ivar]]
     options(xname = x.name)
 
-    # get conditions and check for dframe existing
-    xs <- .xstatus(x.name, dframe.name)
+    # get conditions and check for data existing
+    xs <- .xstatus(x.name, dname)
     in.global <- xs$ig 
 
     if (in.global)
       if (is.function(old.vars)) 
-        x.call <- as.vector(eval(substitute(dframe[,vars[ivar]])))
+        x.call <- as.vector(eval(substitute(data[,vars[ivar]])))
       else {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
             "Only variables in a data frame are processed.\n\n")
     }
 
     # see if variable exists in data frame, if x not in Global Env or function call 
-    .xcheck(x.name, dframe.name, dframe)
+    .xcheck(x.name, dname, data)
 
-    x.call <- as.vector(eval(substitute(dframe[,vars[ivar]])))
+    x.call <- as.vector(eval(substitute(data[,vars[ivar]])))
 
-    .rec.main(x.call, x.name, new.vars[ivar], old, new, ivar,
-             get(dframe.name, pos=.GlobalEnv), dframe.name, brief, keep )
+    n.obs <- nrow(data)
+    new.var <- new.vars[ivar]
+    new.x <- .rec.main(x.call, x.name, new.vars[ivar], old, new, ivar,
+                        n.obs, dname, quiet)
 
-  }
+    # insert transformation into data
+    nm <- names(data)
+    if (is.null(new.var))
+      data[, which(nm == x.name)] <- new.x
+    else {
+      data <- cbind(data, new.x)
+      names(data) <- c(nm, new.var)
+    }
 
-  if (!brief) {
+  }  # recode loop
+
+  if (!quiet) {
     nn <- length(new.vars)
     new.index <- integer(length=nn)
     if (nn > 0) for (i in 1:nn)
-      new.index[i] <- which(names(get(dframe.name, pos=.GlobalEnv))==new.vars[i])
+      new.index[i] <- which(names(data)==new.vars[i])
     cat("\n\n")
-    .dash(54)
-    cat("First five rows of recoded data for data frame:", dframe.name, "\n")
-    .dash(37+nchar(dframe.name))
-    print(head(get(dframe.name, pos=.GlobalEnv)[, c(vars, new.index),
-               drop=FALSE], n=5))
+    .dash(48)
+    cat("First five rows of recoded data\n")
+    .dash(48)
+    print(head(data[, c(vars, new.index), drop=FALSE], n=5))
     cat("\n")
   } 
+
+  return(data)
 
 }

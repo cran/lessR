@@ -1,32 +1,30 @@
 ScatterPlot <-
-function(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
+function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
 
          col.fill=getOption("col.fill.pt"),
          col.stroke=getOption("col.stroke.pt"),
-         col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+         col.bg=getOption("col.bg"),
+         col.grid=getOption("col.grid"),
 
-         shape.pts="circle", col.area=NULL, col.box="black",
+         col.area=NULL, col.box="black",
 
-         cex.axis=.85, col.axis="gray30",
+         shape.pts="circle", cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-         time.start=NULL, time.by=NULL, time.reverse=FALSE,
 
          kind=c("default", "regular", "bubble", "sunflower"),
 
          fit.line=c("none", "loess", "ls"), col.fit.line="grey55",
 
-         bubble.size=.25,
+         bubble.size=.25, plot.method="stack",
 
          ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
 
          pt.reg="circle", pt.out="circle", 
          col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
 
-         text.out=TRUE, 
-
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
   fit.line <- match.arg(fit.line)
@@ -68,56 +66,47 @@ function(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
   }
   # ------
 
-  if ( (kind == "bubble") || (kind == "sunflower") ) {
-    if (is.null(y))  {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Option 'bubble' or 'sunflower' are only used in scatterplots.\n\n")
-    }
-    if ( (!is.integer(x)) || !is.integer(y)) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Option 'bubble' or 'sunflower' can only be used with integer data.\n\n")
-    }
-  }
-
-  # get actual variable name before potential call of dframe$x
+  # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x)) 
   options(xname = x.name)
-  # get data frame name
-  dframe.name <- deparse(substitute(dframe))
 
-  # get conditions and check for dframe existing
-  xs <- .xstatus(x.name, dframe.name)
+  # get data frame name
+  dname <- deparse(substitute(data))
+  options(dname = dname)
+
+  # get conditions and check for data existing
+  xs <- .xstatus(x.name, dname)
   in.global <- xs$ig 
 
   # see if variable exists in data frame, if x not in Global Env or function call 
-  if (!missing(x) && !in.global)  .xcheck(x.name, dframe.name, dframe)
+  if (!missing(x) && !in.global)  .xcheck(x.name, dname, data)
 
-  if (!in.global) x.call <- eval(substitute(dframe$x))
+  if (!in.global) x.call <- eval(substitute(data$x))
   else {  # vars that are function names get assigned to global
     x.call <- x
-    if (is.function(x.call)) x.call <- eval(substitute(dframe$x))
+    if (is.function(x.call)) x.call <- eval(substitute(data$x))
   }
 
   # evaluate y
   #-----------
   if (!missing(y)) {
 
-    # get actual variable name before potential call of dframe$x
+    # get actual variable name before potential call of data$x
     y.name <- deparse(substitute(y)) 
     options(yname = y.name)
 
-    # get conditions and check for dframe existing
-    xs <- .xstatus(y.name, dframe.name)
+    # get conditions and check for data existing
+    xs <- .xstatus(y.name, dname)
     in.global <- xs$ig 
 
     # see if var exists in data frame, if x not in Global Env or function call 
     if (!missing(x) && !in.global)
-      .xcheck(y.name, dframe.name, dframe)
+      .xcheck(y.name, dname, data)
 
-    if (!in.global) y.call <- eval(substitute(dframe$y))
+    if (!in.global) y.call <- eval(substitute(data$y))
     else {  # vars that are function names get assigned to global
       y.call <- y
-      if (is.function(y.call)) y.call <- eval(substitute(dframe$y))
+      if (is.function(y.call)) y.call <- eval(substitute(data$y))
     }
   }
 
@@ -125,67 +114,82 @@ function(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
   #-----------
   if (!missing(by)) {
 
-    # get actual variable name before potential call of dframe$x
+    # get actual variable name before potential call of data$x
     by.name <- deparse(substitute(by)) 
     options(byname = by.name)
 
-    # get conditions and check for dframe existing
-    xs <- .xstatus(by.name, dframe.name)
+    # get conditions and check for data existing
+    xs <- .xstatus(by.name, dname)
     in.global <- xs$ig 
 
     # see if var exists in data frame, if x not in Global Env or function call 
     if (!missing(x) && !in.global)
-      .xcheck(by.name, dframe.name, dframe)
+      .xcheck(by.name, dname, data)
 
-    if (!in.global) by.call <- eval(substitute(dframe$by))
+    if (!in.global) by.call <- eval(substitute(data$by))
     else {  # vars that are function names get assigned to global
       by.call <- by
-      if (is.function(by.call)) by.call <- eval(substitute(dframe$by))
+      if (is.function(by.call)) by.call <- eval(substitute(data$by))
     }
+
+    if (!is.factor(by.call)) by.call <- factor(by.call)
   }
   else
    by.call <- NULL
+
+  if ( (kind == "bubble") || (kind == "sunflower") ) {
+    if (missing(y))  {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Option 'bubble' or 'sunflower' are only used in scatterplots.\n\n")
+    }
+    if ( (!is.integer(x.call)) || !is.integer(y.call)) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Option 'bubble' or 'sunflower' can only be used with integer data.\n\n")
+    }
+  }
 
   # set up graphics system
   if (is.null(pdf.file))  {
     if (missing(by)) 
       .graphwin(1) 
     else
-      .graphwin(d.w=5.1)  # add .6 in width to default of 4.5 for legend
+      .graphwin(d.w=pdf.width)  # add width to default of 4.5 for legend
   }
-  else 
+  else  {
+    if (!missing(by)) pdf.width <- pdf.width + 0.6
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+  }
 
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
 
 
   if (class(x.call)[1] == "data.frame") {
-    pairs(x)  # x is a data frame
+#   pairs(x)  # x is a data frame
     .cr.data.frame(x, miss="pairwise", show.n=FALSE, n.cat, digits.d=2,
                    heat.map=FALSE, colors=NULL,
-                   main=NULL, bottom=NULL, right=NULL,...)
+                   main=NULL, bottom=NULL, right=NULL, ...)
   }
 
   else {
 
     if (!missing(y)) {
-      .plt.main(x.call, y.call, by.call, dframe, type, n.cat,
+      .plt.main(x.call, y.call, by.call, data, type, n.cat,
          col.fill, col.stroke, col.bg, col.grid,
          shape.pts, col.area, col.box, 
          cex.axis, col.axis, col.ticks, 
          xy.ticks, xlab, ylab, main, cex,
          x.start, x.end, y.start, y.end, kind,
          fit.line, col.fit.line, bubble.size,
-         ellipse, col.ellipse, fill.ellipse, text.out, ...)
+         ellipse, col.ellipse, fill.ellipse, quiet, ...)
     }
 
     else
       .dp.main(x.call, by.call,
          col.fill, col.stroke, col.bg, col.grid, shape.pts,
          cex.axis, col.axis, col.ticks, xlab, main, cex, 
-         pt.reg, pt.out, 
-         col.out30, col.out15, text.out, new, ...)
+         plot.method, pt.reg, pt.out, 
+         col.out30, col.out15, quiet, new, ...)
   }
 
   # terminate pdf graphics system

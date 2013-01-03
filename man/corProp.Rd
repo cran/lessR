@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{prop}
 
-In the population, indicators of the same factor or latent variable have parallel corrlelations with all other variables. Of course, in the presence of sampling error, this parallelism will only be approximate. To assess this parallelism, proportionality coefficients are computed for each pair of variables in the input correlation matrix.  Also output is a heat map of the resulting matrix of proportionality coefficients. Each graph is based on a default color theme. The original default is "blue", but other color palettes can be generated as well.
+In the population, indicators of the same factor or latent variable have parallel correlations with all other variables. Of course, in the presence of sampling error, this parallelism will only be approximate. To assess this parallelism, proportionality coefficients are computed for each pair of variables in the input correlation matrix.  Also output is a heat map of the resulting matrix of proportionality coefficients. Each graph is based on a default color theme. The original default is "blue", but other color palettes can be generated as well.
 }
 
 \usage{
@@ -34,14 +34,14 @@ prop(\ldots)
 \details{
 Proportionality coefficients indicate the extent of proportionality between two variables.  Perfect proportionality of two variables is consistent with both variables being indicators of the same latent variable or factor and indicators of no other factor.
 
-In the current version the diagonal of the input correlation matix is ignored.  To maintain parallelism, the diagonal element of 1.00 would need to be replaced the corersponding communalities, which first requres a factor analysis.  
+In the current version the diagonal of the input correlation matrix is ignored.  To maintain parallelism, the diagonal element of 1.00 would need to be replaced the corresponding communalities, which first requires a factor analysis.  
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 
 \seealso{
-\code{\link{cr}}.
+\code{\link{Correlation}}.
 }
 
 \examples{
@@ -75,6 +75,6 @@ corReorder(myprop)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ correlation }
-\keyword{ factor analysis }
+\keyword{ proportionality }
 
 

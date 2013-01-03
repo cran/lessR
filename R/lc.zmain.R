@@ -2,10 +2,9 @@
 function(y, type,
        col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
        col.grid, col.bg, cex.axis, col.axis, col.ticks, xy.ticks,
-       line.width, xlab, ylab, main, cex, x.start, x.end,
-       y.start, y.end,
+       line.width, xlab, ylab, main, cex,
        time.start, time.by, time.reverse, 
-       center.line, text.out, ...) {
+       center.line, quiet, ...) {
 
   if (!is.numeric(y)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -52,11 +51,12 @@ function(y, type,
       time.start <- paste(start(y)[1], "/", start(y)[2], "/01", sep="") 
       frq <- frequency(y)
       if (frq == 1) time.by <- "year"
+      if (frq == 4) time.by <- "3 months"
       if (frq == 12) time.by <- "month"
       if (frq == 52) time.by <- "week"
       if (frq == 365) time.by <- "year"
     }
-    date.seq <- seq(as.Date(time.start), by=time.by, length.out=nrows)
+    date.seq <- seq.Date(as.Date(time.start), by=time.by, length.out=nrows)
     x <- date.seq  # dates on x-axis
   }
 
@@ -71,7 +71,8 @@ function(y, type,
   }
 
   # fill ts chart 
-  if (!is.null(time.start) && is.null(col.area)) col.area <- "slategray3"
+  if (!is.null(time.start) && is.null(col.area))
+    col.area <- getOption("col.fill.bar")
 
   if (is.null(type)) 
     if (is.null(col.area) || col.area == "transparent") type <- "b" 
@@ -88,15 +89,13 @@ function(y, type,
 
 
   # plot setup
-  suppressWarnings(plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
-           main=main.lab, ...))
+  plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, main=main.lab, ...)
   if (xy.ticks){
     if (is.null(time.start) && class(x)!="ts") 
-      suppressWarnings(axis(1, cex.axis=cex.axis, col.axis=col.axis, 
-                       col.ticks=col.ticks, ...))
-    else axis.Date(1, x, cex.axis=cex.axis, col.axis=col.axis, ...)
-    suppressWarnings(axis(2, cex.axis=cex.axis, col.axis=col.axis, 
-                     col.ticks=col.ticks, ...))
+      axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...)
+    else
+      axis.Date(1, x, cex.axis=cex.axis, col.axis=col.axis, ...)
+    axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...)
   }
 
   # colored plotting area
@@ -125,11 +124,10 @@ function(y, type,
     lines(as.numeric(x),y, col=col.line, lwd=line.width, ...)
   }
   if (type == "p" || type == "b") {
-    suppressWarnings(points(x,y, col=col.stroke, pch=shape.pts, bg=col.fill, 
-                     cex=pt.size, ...))
+    points(x,y, col=col.stroke, pch=shape.pts, bg=col.fill, cex=pt.size, ...)
   }
 
-  # plot center line, analyze runs
+  # plot center line
   if (center.line != "off") {
     if (center.line == "mean") {
       m.y <- mean(y)
@@ -144,7 +142,8 @@ function(y, type,
     abline(h=m.y, col="gray50", lty="dashed")
     mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
     
-    if (text.out) {
+    # analyze runs
+    if (!quiet) {
       cat("\n")
       cat("n:", n, "\n")
       cat("missing:", n.miss, "\n")
@@ -178,7 +177,9 @@ function(y, type,
       txt <- "Total number of values that do not equal the "
       cat(txt, lbl.cat, " ", length(y)-length(eq.ctr), "\n", sep="")
       if (length(eq.ctr) != 0) {
-        cat("\nValues ignored that equal the", lbl.cat, eq.ctr, "\n")
+        cat("\nValues ignored that equal the", lbl.cat, "\n")
+        for (i in 1:length(eq.ctr))
+          cat("    #", eq.ctr[i], " ", y[eq.ctr[i]], sep="", "\n")
         cat("Total number of values ignored:", length(eq.ctr), "\n")
       }
       else 

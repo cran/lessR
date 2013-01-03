@@ -1,7 +1,6 @@
 \name{ttestPower}
 \alias{ttestPower}
 \alias{ttp}
-\alias{powercurve.t.test}
 
 \title{Compute a Power Curve for a One or Two Group t-test}
 
@@ -19,8 +18,6 @@ ttestPower(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
          pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 ttp(\ldots)
-
-powercurve.t.test(\ldots)
 }
 
 

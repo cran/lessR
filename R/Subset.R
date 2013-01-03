@@ -1,62 +1,52 @@
 Subset <-
-function (rows, columns, brief=FALSE, keep=TRUE,
-          dframe=mydata, validate=NULL, ...) {
+function(rows, columns, data=mydata, holdout=FALSE, quiet=FALSE, ...) {
 
-  dname <- deparse(substitute(dframe))
+  dname <- deparse(substitute(data))
 
-  n.vars <- ncol(dframe)
-  n.obs <- nrow(dframe)
+  n.vars <- ncol(data)
+  n.obs <- nrow(data)
 
-  if (!brief && keep) {
+  if (!quiet) {
     cat("\n")
     .dash(17)
     cat("Before the subset\n")
     .dash(17)
     cat("\n")
     cat("Number of variables in ", dname, ": ", n.vars, "\n", sep="")
-    cat("Number of observations (rows) in ", dname, ": ", n.obs, "\n\n", sep="")
+    cat("Number of cases (rows) in ", dname, ": ", n.obs, "\n\n", sep="")
     cat("First five rows of data for data frame:", dname, "\n")
     .dash(68)
-    print(head(dframe, n=5))
+    print(head(data, n=5))
     cat("\n")
   }
 
-  if (missing(rows)) {
+  if (missing(rows))
     r <- TRUE
-    validate <- FALSE
-  }
-
   else {
-    r <- eval(substitute(rows), envir=dframe, enclos=parent.frame())
+    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
 
-    if (!is.null(validate)) if (!is.numeric(r) && validate) {
+    if (!is.numeric(r) && holdout) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Cannot have a hold out sample unless rows is numeric.\n\n")
     }
 
-    if (is.logical(r)) {
+    if (is.logical(r))
       r <- r & !is.na(r)  # set missing for a row to FALSE
-      validate <- FALSE
-    }
 
     else if (is.numeric(r)) {
-      if (is.null(validate)) validate <- TRUE
       if (rows>1)
         n.obs.new <- round(rows,0)
       else
         n.obs.new <- round(r*n.obs,0)
-      cat("\n")
-      cat("Rows of data randomly extracted\n")
-      .dash(42)
-      if (rows <= 1) cat("Proportion of randomly retained rows: ", rows, "\n")
-      cat("Number of randomly retained rows: ", n.obs.new, "\n")
+      if (!quiet) {
+        cat("\n")
+        cat("Rows of data randomly extracted\n")
+        .dash(42)
+        if (rows <= 1) cat("Proportion of randomly retained rows: ", rows, "\n")
+        cat("Number of randomly retained rows: ", n.obs.new, "\n")
+      }
       rand.rows <- sample(1:n.obs, size=n.obs.new, replace=FALSE)
       rand.rows <- sort(rand.rows)
-      if (n.obs.new < 1000) {
-        cat("\nRows retained\n")
-        .dash(13)
-        cat(rand.rows, "\n")
-      }
       r <- logical(length=n.obs)  # initial default is FALSE
       j <- 1
       for (i in 1:n.obs) {
@@ -76,54 +66,45 @@ function (rows, columns, brief=FALSE, keep=TRUE,
   if (missing(columns)) 
     vars <- TRUE
   else {
-    all.vars <- as.list(seq_along(dframe))
-    names(all.vars) <- names(dframe)
+    all.vars <- as.list(seq_along(data))
+    names(all.vars) <- names(data)
     vars <- eval(substitute(columns), envir=all.vars, parent.frame())
  }
 
-  if (!is.null(validate)) if (validate) 
-    hold.dframe <- dframe[!r, vars, drop=FALSE]
-  dframe <- dframe[r, vars, drop=FALSE]
+  data.sub <- data[r, vars, drop=FALSE]
 
-  n.vars <- ncol(dframe)
-  n.obs <- nrow(dframe)
-
-  if (!brief) {
+  if (!quiet) {
     cat("\n\n")
     .dash(16)
     cat("After the subset\n")
     .dash(16)
     cat("\n")
-    if (keep)
-      txt <- paste("in", dname)
-    else
-      txt <- ""
-    cat("Number of variables ", txt, ": ", n.vars, "\n", sep="")
-    cat("Number of observations (rows) ", txt, ": ", n.obs, "\n\n", sep="")
-    if (keep) {
-      cat( "\n")
-      cat("First five rows of data ")
-      cat("for data frame:", dname)
-      cat( "\n")
-      .dash(68)
-      print(head(dframe, n=5))
-    }
+    cat("Number of variables ", ": ", ncol(data.sub), "\n", sep="")
+    cat("Number of cases (rows) ", ": ", nrow(data.sub), "\n\n", sep="")
+    cat( "\n")
+    cat("First five rows of data ")
+    cat( "\n")
+    .dash(68)
+    print(head(data.sub, n=5))
+    cat( "\n")
   }
 
-  if (keep) { 
-    assign(dname, dframe, pos=.GlobalEnv) 
-    if (!is.null(validate)) if (validate)  {
-      hold.dname <- paste(dname,".hold",sep="")
-      assign(hold.dname, hold.dframe, pos=.GlobalEnv)
-      cat("\n\n")
-      cat("Hold out validation sample created\n")
-      .dash(38)
-      cat("Name of validation sample: ", hold.dname, "\n",
-          "Number of randomly retained rows: ", nrow(hold.dframe),
-          "\n\n", sep="")
+  if (holdout)  {
+    data.hold <- data[!r, vars, drop=FALSE]
+    cat("\n\n")
+    cat("Holdout Sample\n")
+    .dash(70)
+    cat("Deleted Rows:", nrow(data.hold), "\n")
+    cat("Copy and paste this code into R to create the hold out sample\n",
+        "from the original, unmodified data frame:", dname, "\n\n")
+    cat(paste(dname,".hold", sep=""), "<- Subset(\n")
+    for (i in 1:nrow(data.hold)) {
+      if (i > 1) cat ("| ") else cat("  ")
+      cat("row.names(", dname, ")==\"", row.names(data.hold)[i], "\"\n", sep="")
     }
+    cat(")\n")
   }
-  else 
-    return(dframe)
+
+  return(data.sub)
 
 }

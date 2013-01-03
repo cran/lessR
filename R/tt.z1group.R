@@ -1,6 +1,6 @@
 .OneGroup  <-
-function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, 
-         brief, bw1, from.data, conf.level, digits.d, mmd, msmd,
+function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
+         from.data, conf.level, alternative, digits.d, mmd, msmd,
          graph, show.title, pdf.file, pdf.width, pdf.height) { 
 
   # get variable label if exists
@@ -11,6 +11,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL,
     cat("Response Variable:  ", Ynm, ", ", as.character(y.lbl), sep="", "\n")
     cat("\n")
   }
+  else y.lbl <- Ynm
 
   if (!brief) cat("\n------ Description ------\n\n")
 
@@ -28,10 +29,16 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL,
 
   clpct <- paste(toString(round((conf.level)*100, 2)), "%", sep="")
 
+  if (from.data)
+    dig.smr.d  <- digits.d
+  else
+    dig.smr.d  <- digits.d - 1
+    
+
   if (Ynm != "Y") cat(Ynm,  ": ", sep="")
   if (from.data) cat(" n.miss = ", n.miss, ",  ", sep="") 
-  cat("n = ", n, ",   mean = ", .fmt(m, digits.d), 
-      ",  sd = ", .fmt(s, digits.d), sep="", "\n")
+  cat("n = ", n, ",   mean = ", .fmt(m, dig.smr.d), 
+      ",  sd = ", .fmt(s, dig.smr.d), sep="", "\n")
 
   if (brief) cat("\n")
   else  {
@@ -63,11 +70,16 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL,
   # t-test
   if (!is.null(mu0)) m.dist <- m - mu0
   df <- n - 1
-  tcut <- qt((1-conf.level)/2, df=df, lower.tail=FALSE)
   sterr <- s * sqrt(1/n)
+  if (alternative == "two.sided")
+    tcut <- qt((1-conf.level)/2, df=df, lower.tail=FALSE)
+  else if (alternative == "less")
+    tcut <- qt(1-conf.level, df=df, lower.tail=FALSE)
+  else if (alternative == "greater")
+    tcut <- qt(1-conf.level, df=df, lower.tail=TRUE)
   if (from.data) {
     if (!is.null(mu0)) mu.null <- mu0 else mu.null <- 0
-    ttest <- t.test(Y, conf.level=conf.level, mu=mu.null)
+    ttest <- t.test(Y, conf.level=conf.level, alternative=alternative, mu=mu.null)
     df <- ttest$parameter
     lb <- ttest$conf[1]
     ub <- ttest$conf[2]
@@ -83,7 +95,12 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL,
     ub <- m + E
     if (!is.null(mu0)) {
       tvalue <- m.dist/sterr
-      pvalue <- 2 * pt(abs(tvalue), df=df, lower.tail=FALSE)
+      if (alternative == "two.sided")
+        pvalue <- 2 * pt(abs(tvalue), df=df, lower.tail=FALSE)
+      else if (alternative == "less")
+        pvalue <- pt(abs(tvalue), df=df, lower.tail=FALSE)
+      else if (alternative == "greater")
+        pvalue <- pt(abs(tvalue), df=df, lower.tail=TRUE)
     }
   }     
 
@@ -110,12 +127,13 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL,
         "Standardized Distance, Cohen's d:  ", .fmt(smd),
         sep="", "\n")
   }
+
   # densities
   if (from.data && graph && !is.null(mu0)) {
 
     .opendev(pdf.file, pdf.width, pdf.height)
 
-    .OneGraph(Y, bw1, Ynm, digits.d, brief,
+    .OneGraph(Y, bw1, Ynm, y.lbl, digits.d, brief,
          n, m, mu0, mdiff, s, smd, mmd, msmd,
          clpct, tvalue, pvalue, ub, lb,
          show.title, pdf.file, pdf.width, pdf.height)

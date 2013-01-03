@@ -18,7 +18,7 @@ function(file="colors.pdf", color=NULL) {
     barplot(h, col=clr[i], main=clr[i], sub=toString(col2rgb(clr[i])), 
        cex.main=.95, axes=FALSE, border=NA)
   
-  .showfile(file, "R colors")
+  .showfile(file, "file  of R colors")
   
   dev.off()
 

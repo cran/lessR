@@ -1,7 +1,7 @@
 .reg5Plot <-
-function(nm, mydframe, my.formula, brief, res.rows,
+function(lm.out, nm, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
+         new.data, pred.rows, scatter.3D, scatter.coef,
          numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new, c.int, p.int,
          pdf, pdf.width, pdf.height) {
@@ -21,7 +21,7 @@ function(nm, mydframe, my.formula, brief, res.rows,
 
 
   if (n.pred == 1) {  # scatterplot, if one predictor variable
-    if ( (pred==FALSE) || is.factor(lm.out$model[,nm[2]]) || !is.null(X1.new) ) 
+    if ( (pred.rows==0) || is.factor(lm.out$model[,nm[2]]) || !is.null(X1.new) ) 
       do.int <- FALSE
     else 
       do.int <- TRUE
@@ -46,27 +46,20 @@ function(nm, mydframe, my.formula, brief, res.rows,
        shape.pts=21, cex.axis=.85, col.axis="gray30",
        col.ticks="gray30", xy.ticks=TRUE,
        xlab=nm[2], ylab=nm[1], main=ctitle,
-       cex=.8,    
+       cex=.8, kind="default", 
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-       time.start=NULL, time.by=NULL, time.reverse=FALSE, kind="default",
        fit.line=fl, col.fit.line="grey55", center.line=NULL,
        col.bubble=NULL, bubble.size=.25, col.flower=NULL,
        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
-       text.out=FALSE, ylim=c(y.min,y.max))
+       quiet=TRUE, ylim=c(y.min,y.max))
 
     if (do.int) {
-      if (getOption("colors") == "gray") {
-        col.ci <- "gray60"
-        col.pi <- "gray30"
-      }
-      else {
-        col.ci <- "lightsteelblue"
-        col.pi <- "darksalmon"
-      }
-      lines(lm.out$model[,nm[2]], c.int$lwr, col=col.ci, lwd=2)
-      lines(lm.out$model[,nm[2]], c.int$upr, col=col.ci, lwd=2)
-      lines(lm.out$model[,nm[2]], p.int$lwr, col=col.pi, lwd=2)
-      lines(lm.out$model[,nm[2]], p.int$upr, col=col.pi, lwd=2)
+      col.ci <- getOption("col.stroke.pt")
+      col.pi <- "gray30"
+      lines(lm.out$model[,nm[2]], c.int$lwr, col=col.ci, lwd=0.75)
+      lines(lm.out$model[,nm[2]], c.int$upr, col=col.ci, lwd=0.75)
+      lines(lm.out$model[,nm[2]], p.int$lwr, col=col.pi, lwd=1.5)
+      lines(lm.out$model[,nm[2]], p.int$upr, col=col.pi, lwd=1.5)
     }
   }
 
@@ -108,20 +101,18 @@ function(nm, mydframe, my.formula, brief, res.rows,
     cat("\n\n")
   }
 
-  if (scatter.3d) {  # 3d scatterplot option for 2-predictor models
+  if (scatter.3D) {  # 3d scatterplot option for 2-predictor models
     if (is.numeric(lm.out$model[,nm[2]]) && is.numeric(lm.out$model[,nm[3]]))
        proceed.3d <- TRUE
     else {
       proceed.3d <- FALSE
-      cat("\n>>> No 3d scatterplot because both predictor variables must be numeric.\n")
+      cat("\n>>> No 3D scatterplot because both predictor variables must be numeric.\n")
     }
-    cat("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n", 
-          "Note: As of May 2012 there is a bug in the Mac OS X implementation of the rgl\n",
-           "package needed to generate this scatterplot.  So it is disabled for now.\n",
-           "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n", sep="")
-    proceed.3d <- FALSE
     if (proceed.3d) { 
-      cat("1. Click and drag to rotate plot.\n",
+      cat("\n\n\n",
+          "Directions for 3D scatterplot from the car package\n",
+          "--------------------------------------------------\n",
+          "1. Re-size window, click and drag to rotate plot.\n",
           "2. Press the right mouse button and drag a rectangle around any points to be\n",
           "   identified, and then release. Repeat for each set of points to be identified.\n",
           "3. To exit, right-click in a blank area of the 3d-scatterplot.\n", sep="")

@@ -38,8 +38,8 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
          kind="default", fit.line="none", col.fit.line="grey55",
          center.line=NULL, col.bubble=NULL, bubble.size=.25, 
          col.flower=NULL, ellipse=FALSE, col.ellipse="lightslategray", 
-         fill.ellipse=TRUE, text.out=TRUE, n.cat=getOption("n.cat"),
-         ylim=c(0,1.1), ...)
+         fill.ellipse=TRUE, quiet=TRUE, n.cat=getOption("n.cat"),
+         ylim=c(0,1.1))
   abline(h=0, lwd=.5, col="gray50")
   mtext(mytitle, side=3, line=2.5, cex=1.1, font=2)
   mtext(paste("n=", .fmt(n,3), ", s=", .fmt(s,4), sep=""), side=3, line=1, font=3)

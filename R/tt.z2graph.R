@@ -1,6 +1,6 @@
 .TwoGraph <-
-function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, digits.d, brief,
-         n1, m1, s1, n2, m2, s2, mdiff, sw, smd, mmd, msmd,
+function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
+         n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
          clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title) {
 
   dYA <- density(YA, bw1)
@@ -22,19 +22,28 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, digits.d, brief,
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
   # colors
-  col.1 <- rgb(.63,.46,.15)
-  col.1t <- rgb(.63,.46,.15, alpha=.5)
-  col.2 <- rgb(.49,.56,.69)
-  col.2t <- rgb(.49,.56,.69, alpha=.5)
+  if (getOption("colors") != "gray") {
+    col.1 <- rgb(.63,.46,.15)
+    col.1t <- rgb(.63,.46,.15, alpha=.5)
+    col.2 <- rgb(.49,.56,.69)
+    col.2t <- rgb(.49,.56,.69, alpha=.5)
+  }
+  else {
+    col.1 <- rgb(.40,.40,.40)
+    col.1t <- rgb(.40,.40,.40, alpha=.6)
+    col.2 <- rgb(.20,.20,.20)
+    col.2t <- rgb(.20,.20,.20, alpha=.6)
+  }
 
   # plot: set up coordinate system
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  par(mar=c(3,1.5,8,.4), mgp=c(2,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
+  par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
   plot.new()
   plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
   axis(1); box()
-  title(xlab=Ynm)
+  if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
+  title(xlab=y.lbl)
 
   xleft <- par("usr")[1]  # left side of graph
   xright <- par("usr")[2]  # right side of graph
@@ -88,6 +97,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, digits.d, brief,
   col.L <- col.2
   aL <- -45
 
+  # legends
   col.lgnd <- "gray25"
   cex.lgnd <- .9
 
@@ -96,9 +106,9 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, digits.d, brief,
       text.col=col.lgnd, cex=cex.lgnd)
   text(radj, ytop-.10*max.y, label=bquote(paste("n = ", .(nL))),
       adj=0, col=col.lgnd, cex=cex.lgnd)
-  text(radj, ytop-.14*max.y, label=bquote(paste("m = ", .(.fmtc(mL,digits.d)))),
+  text(radj, ytop-.145*max.y, label=bquote(paste("m = ", .(.fmtc(mL,digits.d)))),
       adj=0, col=col.lgnd, cex=cex.lgnd)
-  text(radj, ytop-.18*max.y, label=bquote(paste("s = ", .(.fmtc(sL,digits.d)))),
+  text(radj, ytop-.19*max.y, label=bquote(paste("s = ", .(.fmtc(sL,digits.d)))),
       adj=0, col=col.lgnd, cex=cex.lgnd)
 
   ladj <- xright - .02*(xright-xleft)
@@ -106,9 +116,9 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, digits.d, brief,
       text.col=col.lgnd, cex=cex.lgnd)
   text(ladj, ytop-.10*max.y, label=bquote(paste("n = ", .(nR))),
       adj=1, col=col.lgnd, cex=cex.lgnd)
-  text(ladj, ytop-.14*max.y, label=bquote(paste("m = ", .(.fmtc(mR,digits.d)))),
+  text(ladj, ytop-.145*max.y, label=bquote(paste("m = ", .(.fmtc(mR,digits.d)))),
       adj=1, col=col.lgnd, cex=cex.lgnd)
-  text(ladj, ytop-.18*max.y, label=bquote(paste("s = ", .(.fmtc(sR,digits.d)))),
+  text(ladj, ytop-.19*max.y, label=bquote(paste("s = ", .(.fmtc(sR,digits.d)))),
       adj=1, col=col.lgnd, cex=cex.lgnd)
 
   # scale for s-pooled, d, mdiff at top of graph
@@ -139,7 +149,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, digits.d, brief,
   text((m1+m2)/2, ytop-.11*max.y, label="smd")
 
   # print mdiff value towards bottom  
-  text((m1+m2)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d-1))
+  text((m1+m2)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d))
   # horiz bar connects means
   segments(mlow, ybot+.09*max.y, mhi, ybot+.09*max.y, col=col.d.unit, lwd=2)
   # print diff towards bottom

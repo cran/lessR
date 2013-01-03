@@ -13,7 +13,7 @@ Automatically selects and then provides an analysis of a linear model: OLS regre
 }
 
 \usage{
-Model(my.formula, dframe=mydata, brief=FALSE, \ldots)
+Model(my.formula, data=mydata, brief=FALSE, \ldots)
 
 model.brief(\ldots, brief=TRUE) 
 
@@ -25,7 +25,7 @@ model(\ldots)
   \item{my.formula}{Standard R \code{\link{formula}} for specifying a model.  For
        example, for a response variable named Y and two predictor variables, X1 and 
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
-  \item{dframe}{The default name of the data frame that contains the data for analysis 
+  \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
   \item{brief}{Reduced output.}
   \item{\dots}{Other parameter values for R functions such as \code{\link{lm}} which provide the core computations.} 
@@ -53,7 +53,7 @@ X1 <- rnorm(n)
 X2 <- rnorm(n)
 Y <- .7*X1 + .2*X2 + .6*rnorm(n)
 Ybin <- cut(Y, breaks=2, labels=FALSE)
-#  instead, if read data with the rad function
+#  instead, if read data with the Read function
 #   then the result is the data frame called mydata 
 mydata <- round(data.frame(X1, X2, Y, Ybin),2)
 rm(Y); rm(Ybin); rm(X1); rm(X2)
@@ -65,21 +65,21 @@ Model(Y ~ X1)
 model(Y ~ X1)
 
 # Multiple regression model
-# Provide all default analyses, including interactive 3d scatterplot
+# Provide all default analyses
 Model(Y ~ X1 + X2)
 
 # Logit analysis
 # Y is binary, 0 or 1
-Recode(Ybin, old=c(1,2), new=c(0,1))
+mydata <- Recode(Ybin, old=c(1,2), new=c(0,1), quiet=TRUE)
 Model(Ybin ~ X1)
 
 # t-test
-Model(breaks ~ wool, dframe=warpbreaks)
+Model(breaks ~ wool, data=warpbreaks)
 
 # ANOVA analysis
 # from another data frame other than the default \code{mydata}
 # breaks is numerical, wool and tension are categorical
-Model(breaks ~ wool + tension, dframe=warpbreaks)
+Model(breaks ~ wool + tension, data=warpbreaks)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

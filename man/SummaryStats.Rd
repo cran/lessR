@@ -12,7 +12,7 @@ Descriptive or summary statistics for a numeric variable or a factor, one at a t
 }
 
 \usage{
-SummaryStats(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"), 
+SummaryStats(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
          digits.d=NULL, brief=FALSE, \ldots)
 
 ss.brief(\dots, brief=TRUE)
@@ -23,7 +23,7 @@ ss(\dots)
 \arguments{
  \item{x}{Values of response variable for first group.  If ignored, then the data frame
           mydata becomes the default value.}
-  \item{dframe}{Optional data frame that contains the variable of interest, default is \code{mydata}.}
+  \item{data}{Optional data frame that contains the variable of interest, default is \code{mydata}.}
   \item{by}{Applies to an analysis of a numeric variable, which is then analyzed at each level of the \code{by} variable. The variable is coerced to a factor.}
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
@@ -47,17 +47,17 @@ In the analysis of a categorical variable, if there are more than 10 levels then
 
 
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
+If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
 
 To analyze each variable in the \code{mydata} data frame, use \code{SummaryStats()}.  Or, for a data frame with a different name, insert the name between the parentheses.
 
 VARIABLE LABELS\cr
-Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
+If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 ONLY VARIABLES ARE REFERENCED\cr
 The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
-\code{    > SummaryStats(rnorm(50))   # does NOT work}
+\code{> SummaryStats(rnorm(50))   # does NOT work}
 
 Instead, do the following:
 \preformatted{    > Y <- rnorm(50)   # create vector Y in user workspace
@@ -129,7 +129,7 @@ SummaryStats(n.cat=7)
 # access the breaks variable in the R provided warpbreaks data set
 # although data not attached, access the variable directly by its name
 data(warpbreaks)
-SummaryStats(breaks, by=wool, dframe=warpbreaks)
+SummaryStats(breaks, by=wool, data=warpbreaks)
 
 # Analyze all variables in data frame warpbreaks at once
 SummaryStats(warpbreaks)

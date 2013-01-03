@@ -49,7 +49,7 @@ In the absence of a variable list, the first variable in the re-ordered matrix c
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{cr}}.
+\code{\link{Correlation}}.
 }
 
 \examples{

@@ -10,7 +10,7 @@
 \description{
 Abbreviation: \code{sp}
 
-Generates scatter plots for one or two variables. For two variables a scatterplot is produced accompanied by the analysis of the correlation coefficient. For a data frame, a scatterplot matrix and correlation matrix are produced for all numeric variables in the data frame. If the values of the first specified value are sorted, then points are connected via line segments. The first variable can be numeric or a factor.  The second variable must be numeric. For Likert style response data of two variables, so that each value has less than 10 unique integer values, the points in the plot are transformed into a bubble plot with the size of each bubble, i.e., point, determined by the corresponding joint frequency. An alternate name for \code{ScatterPlot} is just \code{Plot}. 
+Generates scatter plots for one or two variables. For two variables also produces an analysis of the correlation coefficient.  If the values of the first specified value are sorted, then points are connected via line segments. The first variable can be numeric or a factor.  The second variable must be numeric. For Likert style response data of two variables, so that each value has less than 10 unique integer values, the points in the plot are transformed into a bubble plot with the size of each bubble, i.e., point, determined by the corresponding joint frequency. An alternate name for \code{ScatterPlot} is just \code{Plot}. 
 
 One enhancement over the standard R  \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, grid lines, and border can each be explicitly specified, with default colors provided by one of the pre-defined color themes as defined by the \code{\link{set}} function.  
 
@@ -20,34 +20,32 @@ For one variable, based on the standard R function \code{\link{stripchart}}, plo
 }
 
 \usage{
-ScatterPlot(x, y=NULL, by=NULL, dframe=mydata, type=NULL, n.cat=getOption("n.cat"),
+ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
 
          col.fill=getOption("col.fill.pt"),
          col.stroke=getOption("col.stroke.pt"),
-         col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+         col.bg=getOption("col.bg"),
+         col.grid=getOption("col.grid"),
 
-         shape.pts="circle", col.area=NULL, col.box="black",
+         col.area=NULL, col.box="black",
 
-         cex.axis=.85, col.axis="gray30",
+         shape.pts="circle", cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-         time.start=NULL, time.by=NULL, time.reverse=FALSE,
 
          kind=c("default", "regular", "bubble", "sunflower"),
 
          fit.line=c("none", "loess", "ls"), col.fit.line="grey55",
 
-         bubble.size=.25,
+         bubble.size=.25, plot.method="stack",
 
          ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
 
          pt.reg="circle", pt.out="circle", 
          col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
 
-         text.out=TRUE, 
-
-         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 sp(\ldots)
 
@@ -59,15 +57,15 @@ dp(\ldots)
 
 \arguments{
   \item{x}{If both x and y are specified, then the x values are plotted on the horizontal 
-        axis.  If x is not sorted, a scatterplot is produced.  If x is sorted, then a 
-        function is plotted with a smooth line.  If only x is specified with no y, then 
-        these x values are plotted as a dot chart, a one-dimensional scatterplot.}
+        axis.  If x is sorted, then the points are joined by line segments by default.
+        If only x is specified with no y, then these x values are plotted as a dot chart,
+        a one-dimensional scatterplot.}
   \item{y}{Coordinates of points in the plot on the vertical axis.}
   \item{by}{An optional grouping variable such that the points of all (x,y) pairs are
         plotted in the same plotting symbol and/or same color, with a different symbol
         or symbol and/or color for each group. Applies only to \code{kind="regular"}
         scatterplots.}
-  \item{dframe}{Optional data frame that contains one or both of the variables of interest, 
+  \item{data}{Optional data frame that contains one or both of the variables of interest, 
         default is \code{mydata}.}
   \item{type}{Character string that indicates the type of plot, either \code{"p"} for 
         points, \code{"l"} for line, or \code{"b"} for both.  If x and y are provided and 
@@ -77,10 +75,10 @@ dp(\ldots)
         of unique values of variable of a numeric data type for which the variable will
         be analyzed as categorical. Set to 0 to turn off.}
   \item{col.fill}{For plotted points, the interior color of the points. By default, is
-       a partially transparent version of the border color, \code{col.pts}.} 
-  \item{col.stroke}{Border color of the plotted points. If there is a by variable, the color
-        of plotted points for each level of the by (grouping) variable, specified as a
-        vector, one value, point symbol, for each level of by.}
+       a partially transparent version of the border color, \code{col.stroke}. Does not
+       apply if there is a \code{by} variable, which relies upon the default.} 
+  \item{col.stroke}{Border color of the plotted points. If there is a \code{by} variable,
+       specified as a vector, one value for each level of \code{by}.}
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines, with a default of \code{"grey90"}.}
   \item{shape.pts}{The standard plot character, with values defined in \code{\link{points}}. 
@@ -101,9 +99,8 @@ dp(\ldots)
        then \code{xlab} is set to Index unless \code{xlab} has been specified.}
   \item{ylab}{Label for y-axis. If not specified, then the label becomes the name of
       the corresponding variable. If \code{xy.ticks} is \code{FALSE}, then no label displayed.}
-  \item{main}{Label for the title of the graph.  If the corresponding variable labels exist 
-      in the data frame \code{mylabels}, then the title is set by default from the corresponding 
-      variable labels.}
+  \item{main}{Label for the title of the graph.  If the corresponding variable labels exist,
+       then the title is set by default from the corresponding variable labels.}
   \item{cex}{Magnification factor for any displayed points, with default of cex=1.0.}
   \item{x.start}{For Likert style response data, the starting integer value of the x-axis. Useful
       if the actual data do not include all possible values.}
@@ -113,18 +110,6 @@ dp(\ldots)
       if the actual data do not include all possible values.}
   \item{y.end}{For Likert style response data, the ending integer value of the y-axis. Useful
       if the actual data do not include all possible values.}
-  \item{time.start}{Optional starting date for first data value. Format must be 
-       "\%Y-\%m-\%d" or "\%Y/\%m/\%d". If using with \code{x.reverse}, the first date is after 
-       the data are reverse sorted. Not needed if data are a time series with \code{\link{ts}}
-       function.}
-  \item{time.by}{Accompanies the \code{time.start} specification, the interval to increment the
-      date for each sequential data value. A character string, containing one of \code{"day"}, 
-      \code{"week"}, \code{"month"} or \code{"year"}. This string can optionally be preceded by 
-      a positive or negative integer and a space, or followed by "s", as specified in 
-      \code{\link{seq.Date}}. Not needed if data are a time series.}
-  \item{time.reverse}{When \code{TRUE}, reverse the ordering of the dates, particularly when the 
-      data are listed such that first row of data is the newest. Accompanies the \code{time.start}
-      specification.}
   \item{kind}{Default is \code{"default"}, which becomes a \code{"regular"} scatterplot for 
       most data.  If Likert style response data is plotted, that is, 
       each variable has less than 10 integer values, then instead by default a bubble plot is 
@@ -134,6 +119,8 @@ dp(\ldots)
       \code{"loess"} and \code{"ls"}.}
   \item{col.fit.line}{Color of the best fitting line, if the \code{fit.line} option is invoked.}
   \item{bubble.size}{Size of the bubbles in a bubble plot of Likert style data.}
+  \item{plot.method}{Applies to one variable plots. Default is \code{"stack"}, but can also provide
+       \code{"jigger"} to scramble the points.}
   \item{ellipse}{If \code{TRUE}, enclose a scatterplot with the .95 data ellipse from the car package.}
   \item{col.ellipse}{Color of the ellipse.}
   \item{fill.ellipse}{If \code{TRUE}, fill the ellipse with a translucent shade of \code{col.ellipse}.}
@@ -142,21 +129,22 @@ dp(\ldots)
   \item{pt.out}{For a dot plot, type of point for outliers. Default is 19, a filled circle.}
   \item{col.out30}{For a dot plot, color of severe outliers.}
   \item{col.out15}{For a dot plot, color of potential outliers.}
-  \item{text.out}{If \code{TRUE}, then display text output in console window.}
   \item{new}{If \code{FALSE}, then add the dot plot to an existing graph.}
+  \item{quiet}{If set to \code{TRUE}, no text output.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\ldots}{Other parameter values for graphics as defined by and then processed 
       by \code{\link{plot}} and \code{\link{par}}, including \code{xlim}, \code{ylim}, \code{lwd}, 
       and \code{cex} to specify a magnification factor for the plotting symbol. For one variable,
-      parameters from \code{\link{stripchart}}.}
+      parameters from \code{\link{stripchart}}. For type of correlation from \code{\link{cor.test}},
+      \code{method="spearman"} and \code{method="kendall"}.}
 }
 
 
 \details{
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the user's workspace, the global environment. 
+The default input data frame is \code{mydata}.  Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{mydata$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment. 
 
 ADAPTIVE GRAPHICS\cr
 Results for two variables are based on the standard \code{\link{plot}} and related graphic functions, with the additional provided color capabilities and other options including a center line.  The plotting procedure utilizes ``adaptive graphics'', such that \code{ScatterPlot} chooses different default values for different characteristics of the specified plot and data values. The goal is to produce a desired graph from simply relying upon the default values, both of the \code{ScatterPlot} function itself, as well as the base R functions called by \code{ScatterPlot}, such as \code{\link{plot}}. Familiarity with the options permits complete control over the computed defaults, but this familiarity is intended to be optional for most situations.
@@ -177,17 +165,14 @@ For a scatterplot of two numeric variables, the \code{ellipse=TRUE} option draws
 ONE VARIABLE PLOT\cr
 The one variable plot is a one variable scatterplot, that is, a dot chart. Results are based on the standard \code{\link{stripchart}} function. Colors are provided by default and can also be specified. For gray scale output, potential outliers are plotted with squares and actual outliers are plotted with diamonds, otherwise shades of red are used to highlight outliers. The definition of outliers are from the R \code{\link{boxplot}} function.
 
-MULTIPLE VARIABLE PLOT\cr
-If the variable, \code{x} is a data frame, then the data frame must contain only numeric variables.  If not, the first non-numeric variable is noted and the procedure ends. Otherwise, the procedure generates the scatterplot matrix with the R \code{\link{pairs}} function as well as the correlation matrix of all the variables in the data frame with the R \code{\link{cor}} function.
-
 LIKERT DATA\cr
 A scatterplot of Likert type data is problematic because there are so few possibilities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 25 possible paired values to plot, so most of the plotted points overlap with others.  In this situation, that is, when there are less than 10 values for each of the two variables, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values.  A sunflower plot can be requested in lieu of the bubble plot.
 
 VARIABLE LABELS\cr
-Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the corresponding axis and on the text output. For more information, see \code{\link{Read}}.
+Although standard R does not provide for variable labels, \code{lessR} can store the labels in the data frame with the data, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the corresponding axis and on the text output. For more information, see \code{\link{Read}}.
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black backgound, no gridlines and partial transaparency of plotted colors. 
+Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
 
 Colors can also be changed for individual aspects of a scatterplot as well. To provide a warmer tone by slightly enhancing red, try \code{col.bg=snow}. Obtain a very light gray with \code{col.bg=gray99}.  To darken the background gray, try \code{col.bg=gray97} or lower numbers. See the \code{lessR} function \code{\link{showColors}} which provides an example of all available named colors.
 
@@ -200,7 +185,7 @@ Commonly used graphical parameters that are available to the standard R function
 \describe{
 \item{lwd}{Line width, see \code{\link{par}}.}
 \item{cex}{Numerical vector giving the amount by which plotting characters and symbols should be scaled relative to the default. This works as a multiple of \code{\link{par}}("cex"). NULL and NA are equivalent to 1.0. Note that this does not affect annotation.}
-\item{cex.main, col.lab, font.sub, etc}{Settings for main- and sub-title and axis annotation, see \code{\link{title}} and \code{\link{par}}.}
+\item{cex.main, col.lab, font.sub, etc.}{Settings for main- and sub-title and axis annotation, see \code{\link{title}} and \code{\link{par}}.}
 \item{main}{Title of the graph, see \code{\link{title}}.}
 \item{xlim}{The limits of the plot on the x-axis, expressed as c(x1,x2), where x1 and x2 are the limits. Note that x1 > x2 is allowed and leads to a reversed axis.}
 \item{ylim}{The limits of the plot on the y-axis.}
@@ -236,8 +221,8 @@ rm(Gender); rm(x); rm(y); rm(z)
 # although data not attached, access each variable directly by its name
 ScatterPlot(x, y)
 
-# short name
-sp(x,y)
+# short name with Spearman correlation instead of Pearson
+sp(x,y, method="spearman")
 
 # compare to standard R plot, which requires the mydata$ notation
 plot(mydata$x, mydata$y)
@@ -264,19 +249,28 @@ set(colors="gray")
 ScatterPlot(x, y)
 set(colors="blue")
 
-# by variable scatterplot with deGenderault point color, vary shapes
+# by variable scatterplot with default point color, vary shapes
 ScatterPlot(x,y, by=Gender)
 
 # by variable scatterplot with custom colors, keeps only 1 shape
 ScatterPlot(x,y, by=Gender, col.stroke=c("steelblue", "hotpink"))
 
-# by variable with characters Genderor plotting symbols
-# reduce the size oGender the plotted symbols with cex<1
+# by variable with values of Gender for plotting symbols
+# reduce the size of Gender the plotted symbols with cex<1
 ScatterPlot(x, y, by=Gender, shape.pts=c("M","F"), cex=.6)
 
 # vary both shape and color 
 ScatterPlot(x, y, by=Gender, col.stroke=c("steelblue", "hotpink"),
             shape.pts=c("M","F"))
+
+# Default dot plot
+ScatterPlot(y)
+
+# Dot plot with custom colors for outliers
+ScatterPlot(y, pt.reg=23, col.out15="hotpink", col.out30="darkred")
+
+# one variable scatterplot with added jitter of points
+ScatterPlot(x, plot.method="jitter", jitter=0.05)
 
 # by variable dot plot with custom colors, keeps only 1 shape
 ScatterPlot(x, by=Gender, col.stroke=c("steelblue", "hotpink"))
@@ -314,15 +308,6 @@ Plot(x, y)
 Plot(x, y, ylab="My Y", xlab="My X", col.stroke="blue", 
   col.bg="snow", col.area="lightsteelblue", col.grid="lightsalmon")
 
-# Default dot plot
-ScatterPlot(y)
-
-# can also specify DotPlot(y) or dp(y)
-DotPlot(y)
-
-# Dot plot with custom colors for outliers
-ScatterPlot(y, pt.reg=23, col.out15="hotpink", col.out30="darkred")
-
 # modern art
 n <- sample(2:30, size=1)
 x <- rnorm(n)
@@ -343,7 +328,7 @@ ScatterPlot(x, y, type="l", lty="dashed", lwd=3, col.area=color1,
 # variables of interest are in a data frame which is not the default mydata
 # although data not attached, access the variable directly by its name
 data(dataEmployee)
-ScatterPlot(Years, Salary, by=Gender, dframe=dataEmployee)
+ScatterPlot(Years, Salary, by=Gender, data=dataEmployee)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

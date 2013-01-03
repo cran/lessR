@@ -1,21 +1,23 @@
 Read <- 
-function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1, 
+function(ref=NULL, format=c("csv", "SPSS", "R", "lessR"),
+
+         labels=NULL, widths=NULL, missing="", n.mcut=1, 
+
          miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
-         format=c("csv", "SPSS", "R"), data=TRUE, labels=FALSE, 
-         missing="", max.lines=30, widths=NULL, dframe=mydata, ...) {
-         
+      
+         max.lines=30, quiet=FALSE, ...) {
+
   format <- match.arg(format)
 
-  if (!is.null(ref) && !is.null(lessR.data)) {
+  if (is.null(ref) && format=="lessR") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Cannot specify a file to read and a built-in file to read.\n\n")
+        "Cannot browse for a file that is part of lessR.\n",
+        "Specify the file name.\n\n")
   }
 
-  dname <- deparse(substitute(dframe))
-
-  # option for browsing for data file, and then display file name
+# option to browse for data file, and then display file name
   cat("\n")
-  if (is.null(ref) && is.null(lessR.data)) {
+  if (is.null(ref)) {
     ref <- file.choose()
     .dash(68)
     cat("File: \n")
@@ -24,17 +26,77 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
     cat("\n")
   }
 
-  # do the read
-  if (!is.null(widths)) {
-    assign(dname, read.fwf(file=ref, widths=widths, ...), pos=.GlobalEnv)
+  if (grepl(".sav$", ref)) format <- "SPSS" 
+  if (grepl(".rda$", ref)) format <- "R" 
+  if (!is.null(widths)) format <- "fwd"
+
+  # construct full path name for label file if not already
+  if (!is.null(labels) && labels!="row2") {
+    if (!grepl(.Platform$file.sep, labels)) {
+      pth <- strsplit(ref, "/")
+      fp <- ""
+      for (i in 2:length(pth[[1]])-1)
+        fp <- paste(fp, pth[[1]][i], .Platform$file.sep, sep="")
+      ref.lbl <- paste(fp, labels, sep="")
+    }
+    else
+      ref.lbl <- labels
   }
 
-  else if (!is.null(lessR.data)) {
-    if (substr(lessR.data,1,4) == "data")
+
+  # do the read
+  # -----------
+
+  if (format=="fwd" || format=="csv") {  # text file
+
+    if (format=="fwd")
+      mydata <- read.fwf(file=ref, widths=widths, ...)
+
+    else if (format=="csv") {
+      if (is.null(labels)) 
+        mydata <- suppressWarnings(read.csv(file=ref, na.strings=missing, ...))
+      else {
+        if (labels != "row2")
+          mydata <- suppressWarnings(read.csv(file=ref, na.strings=missing, ...))
+        else {
+          mylabels <- read.csv(file=ref, nrows=1, ...)
+          var.names <- names(mylabels)
+          mylabels <- data.frame(t(mylabels))  # var names are row names
+          names(mylabels) <- "label"
+          mydata <- suppressWarnings(read.csv(file=ref, skip=1, 
+                         na.strings=missing, col.names=var.names, ...))
+        }
+      }
+    }
+
+    if (!is.null(labels)) {
+      if (labels != "row2") {
+        mylabels <- 
+          read.csv(file=ref.lbl, row.names=1, col.names=c("","label"), header=FALSE)
+      }
+      # transfer labels to mydata
+      attr(mydata, which="variable.labels") <- as.character(mylabels$label)
+      names(attr(mydata, which="variable.labels")) <- as.character(row.names(mylabels))
+    }
+
+  }  # end text file
+      
+  else if (format == "SPSS")  # data and any labels
+      mydata <- suppressWarnings(read.spss(file=ref, to.data.frame=TRUE, ...))
+
+  else if (format == "R") {  # data and any labels
+    x.env <- new.env()  # scratch environment
+    load(ref, envir=x.env)
+    dname <- ls(x.env)
+    mydata <- get(dname, pos=x.env)
+  }
+
+  else if (format == "lessR") {
+    if (substr(ref,1,4) == "data")
       txt <- ""
     else
       txt <- "data"
-    file.name <- paste(txt, lessR.data, ".rda", sep="")
+    file.name <- paste(txt, ref, ".rda", sep="")
 
     path.name <- paste(find.package("lessR"), "/data/",  file.name, sep="")
 
@@ -48,105 +110,61 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
     x.env <- new.env()  # scratch environment
     load(path.name, envir=x.env)
 
-    dframe.name <-  paste(txt, lessR.data, sep="")
-    dframe <- get(dframe.name, pos=x.env)
+    dname <- paste(txt, ref, sep="")
+    data <- get(dname, pos=x.env)
 
-    assign(dname, dframe, pos=.GlobalEnv)
-  }
-
-  else {
-
-    if (labels && !data)
-      assign("mylabels", read.csv(file=ref, row.names=1, col.names=c("","label"),
-                            header=FALSE), pos=.GlobalEnv)
-
-    else if (labels && data) {
-      mylabels <- read.csv(file=ref, nrows=1, ...)
-      var.names <- names(mylabels)
-      mylabels <- data.frame(t(mylabels))
-      names(mylabels) <- "label"
-      assign("mylabels", mylabels, pos=.GlobalEnv)
-      assign(dname, suppressWarnings(read.csv(file=ref, skip=1, 
-                     na.strings=missing, col.names=var.names, ...)), pos=.GlobalEnv)
-    }
-
-    else if (!labels && data) {
-      if (grepl(".sav$", ref)) format <- "SPSS" 
-      if (grepl(".rda$", ref)) format <- "R" 
-
-      if (format == "csv")
-        assign(dname, suppressWarnings(read.csv(file=ref, 
-          na.strings=missing, ...)), pos=.GlobalEnv)
-
-      else if (format == "SPSS") {
-        assign(dname, suppressWarnings(read.spss(file=ref, 
-              to.data.frame = TRUE, ...)), pos=.GlobalEnv)
-        if (!is.null(attr(dframe, which="variable.labels"))) {
-          mylabels <- matrix(nrow=ncol(dframe), ncol=2)
-          for (i in 1:ncol(dframe)) {
-            mylabels[i,1] <- attr(dframe, which="names")[i]
-            mylabels[i,2] <- attr(dframe, which="variable.labels")[i]
-          }
-          mylabels <- data.frame(mylabels, row.names=1)
-          names(mylabels) <- c("label")      
-          assign("mylabels", mylabels, pos=.GlobalEnv)
-        }
-      }
-
-      else if (format == "R")
-        load(file=ref, envir=.GlobalEnv)
-    }
-
-    if (labels && !brief) {
-      n.labels <- nrow(get("mylabels", pos=.GlobalEnv))
-      n.lines <- min(max.lines, n.labels)
-      cat("\n")
-      cat("Name of data frame that contains the labels:  mylabels ", "\n")
-      cat("Number of Rows in mylabels: ", n.labels, "\n")
-      cat("\n")
-      .dash(64)
-      if (n.labels > n.lines)
-        txt <- paste("First ", toString(n.lines)) else txt <- "The"
-      cat(txt, "variable names and labels\n")
-      .dash(64)
-      print(head(mylabels, n=n.lines))
-      .dash(64)
-      if (n.labels > n.lines) {
-        cat("To see all the variable labels, enter:  mylabels\n")
-        .dash(64)
-        cat("\n")
-      }
-      cat("\n")
-    }
-
+    mydata <- data
   }
 
 
-  if (data  &&  !brief) {  # feedback regarding data
-    n.var <- ncol(dframe)
-    n.obs <- nrow(dframe)
-    n.lines <- min(max.lines, ncol(dframe))
+  # feedback
+  # --------
+
+  if (!is.null(labels) && !quiet) {   # feedback regarding labels
+    n.labels <- nrow(mylabels)
+    n.lines <- min(max.lines, n.labels)
+    cat("\n")
+    cat("Number of labels: ", n.labels, "\n")
+    cat("\n")
+    .dash(64)
+    if (n.labels > n.lines)
+      txt <- paste("First ", toString(n.lines)) else txt <- "The"
+    cat(txt, "variable names and labels\n")
+    .dash(64)
+    print(head(mylabels, n=n.lines))
+    .dash(64)
+    if (n.labels > n.lines) {
+      cat("To see all the variable labels, enter:  mylabels\n")
+      .dash(64)
+      cat("\n")
+    }
+    cat("\n")
+  }
+
+  if (!quiet) {  # feedback regarding data
+    n.var <- ncol(mydata)
+    n.obs <- nrow(mydata)
+    n.lines <- min(max.lines, ncol(mydata))
 
     nu <- integer(length(n.var))
 
     ord.fac <- FALSE
-    for (i in 1:n.var) if (class(dframe[,i])[1] == "ordered") ord.fac <- TRUE
+    for (i in 1:n.var) if (class(mydata[,i])[1] == "ordered") ord.fac <- TRUE
     
     cat("\n")
     cat("Basics\n")
     .dash(55)
-    cat("Name of data frame that contains the data:", dname, "\n")
-    cat("Number of Variables in ", dname, ":    ", n.var, "\n", sep="")
-    cat("Number of Rows of Data in ", dname, ": ", n.obs, "\n", sep="")
+    cat("Number of Variables in the data frame:    ", n.var, "\n", sep="")
+    cat("Number of Rows of Data in the data frame: ", n.obs, "\n", sep="")
     .dash(55)
 
     cat("\n\n")
     cat("Row Names\n")
     .dash(67)
-    cat("First two row names:", row.names(dframe)[1],"   ", 
-        row.names(dframe)[2], "\n") 
-    cat("Last two row names: ", row.names(dframe)[n.obs-1],
-        "   ", row.names(dframe)[n.obs], "\n") 
+    cat("First two row names:", row.names(mydata)[1],"   ", 
+        row.names(mydata)[2], "\n") 
+    cat("Last two row names: ", row.names(mydata)[n.obs-1],
+        "   ", row.names(mydata)[n.obs], "\n") 
     .dash(67)
 
     cat("\n\n")
@@ -164,7 +182,7 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
 
     max.char <- 0
     for (i in 1:n.var) {
-      x.name <- names(dframe)[i]
+      x.name <- names(mydata)[i]
       if (nchar(x.name) > max.char) max.char <- nchar(x.name)
     }
     if (max.char > 7)
@@ -181,25 +199,25 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
     maybe.ID <- NULL
     for (i in 1:n.var) {
 
-      x.name <- names(dframe)[i]
+      x.name <- names(mydata)[i]
 
-      nu[i] <- length(unique(na.omit(dframe[,i])))
+      nu[i] <- length(unique(na.omit(mydata[,i])))
 
-      n <- sum(!is.na(dframe[,i]))
-      n.miss <- sum(is.na(dframe[,i]))
+      n <- sum(!is.na(mydata[,i]))
+      n.miss <- sum(is.na(mydata[,i]))
 
-      the.class <- class(dframe[,i])[1]  # could be an ordered factor
+      the.class <- class(mydata[,i])[1]  # could be an ordered factor
       if (the.class == "ordered") the.class <- "ordfact"
 
       cat(.fmtc(x.name,pad-1), .fmtc(the.class,8), .fmti(n,7),
           .fmti(n.miss,7), .fmti(nu[i],7))
 
-      n1 <- as.character(dframe[1,i])  # the as.character is for cat of factors 
-      n2 <- as.character(dframe[2,i]) 
-      n3 <- as.character(dframe[3,i])
-      e3 <- as.character(dframe[n.obs-2,i])
-      e2 <- as.character(dframe[n.obs-1,i])
-      e1 <- as.character(dframe[n.obs,i])
+      n1 <- as.character(mydata[1,i])  # the as.character is for cat of factors 
+      n2 <- as.character(mydata[2,i]) 
+      n3 <- as.character(mydata[3,i])
+      e3 <- as.character(mydata[n.obs-2,i])
+      e2 <- as.character(mydata[n.obs-1,i])
+      e1 <- as.character(mydata[n.obs,i])
       bn2 <- "  ";  bn3 <- "  ";  be2 <- "  ";  be3 <- "  "
       tot.char <- nchar(paste(n1,n2,n3,e3,e2,e1))
       if (tot.char > 34) {
@@ -211,7 +229,7 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
       cat("   ", n1, bn2, n2, bn3, n3, " ... ", e3, be3,  e2, be2,  e1, sep="")
       cat("\n") 
 
-      if (nu[i]==n  &&  (is.factor(dframe[,i]))) {
+      if (nu[i]==n  &&  (is.factor(mydata[,i]))) {
         maybe.ID <- x.name
         colm.ID <- i
       }
@@ -231,24 +249,24 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
 
     n.cat <- getOption("n.cat")
     int.cat <- FALSE
+    n.cat.temp  <- 4
     for (j in 1:n.var) {
-      if (is.numeric(dframe[,j]) && nu[j] <= n.cat) int.cat <- TRUE
+      if (is.numeric(mydata[,j]) && nu[j] <= n.cat.temp) int.cat <- TRUE
     }
     if (int.cat) {
       cat("\n\n")
       cat("Each of the following variables is numeric, ", 
-         "but has less than or equal n.cat=", n.cat," \n",
-         "unique values. So will treat these variables as categorical in ",
-         "subsequent analyses.\n",
+         "but has less than or equal ", n.cat.temp, " unique\n",
+         "values. So perhaps these variables are categorical.\n",
          "  If really categorical, better to transform these variables ",
          "into a factor with\n",
          "     the functions: Transform and factor, to see examples ",
          "enter:  > ?trans\n", 
-         "  If really integer, increase the value of n.cat, ",
-         "such as:  > set(n.cat=8)\n", sep="")
+         "  Or, specify a value for n.cat, ",
+         "such as:  > set(n.cat=4)\n", sep="")
       .dash(83)
-      for (j in 1:n.var) if (is.numeric(dframe[,j]) && nu[j] <= n.cat)
-        cat(names(dframe)[j], "\n")
+      for (j in 1:n.var) if (is.numeric(mydata[,j]) && nu[j] <= n.cat.temp)
+        cat(names(mydata)[j], "\n")
       .dash(83)
     }
     
@@ -256,7 +274,7 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
     cat("Missing Data Analysis\n")
     .dash(52)
 
-    n.miss.tot <- sum(is.na(dframe))
+    n.miss.tot <- sum(is.na(mydata))
     
     if (n.miss.tot > 0) {
     
@@ -265,10 +283,10 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
     i <- 0
     while ( i<n.obs && n.lines>=0 ) {
       i <- i + 1
-      n.miss <- sum(is.na((dframe)[i, ]))
+      n.miss <- sum(is.na((mydata)[i, ]))
       if ( (n.miss >= n.mcut  || miss.zero) && (n.lines < miss.show) ) {
         n.lines <- n.lines + 1
-        cat(n.miss, "     ", row.names((dframe)[i, ]), "\n")
+        cat(n.miss, "     ", row.names((mydata)[i, ]), "\n")
       }
       if (n.lines == miss.show) {
         n.lines <- -1
@@ -288,8 +306,8 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
 
     if (miss.matrix && n.miss.tot>0) {
       cat("\n\nTable of Missing Values, 1 means missing\nn")
-      print(matrix(as.numeric(is.na(dframe)), nrow=n.obs, ncol=n.var,
-      dimnames = list(row.names(dframe), as.character(1:n.var)) ))
+      print(matrix(as.numeric(is.na(mydata)), nrow=n.obs, ncol=n.var,
+      dimnames = list(row.names(mydata), as.character(1:n.var)) ))
     }
           
    }
@@ -297,6 +315,8 @@ function(ref=NULL, lessR.data=NULL, brief=FALSE, n.mcut=1,
    else cat("No missing data\n\n")
 
   }
+
+  return(mydata)
 
 }
 

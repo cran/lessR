@@ -1,5 +1,5 @@
 Logit <-
-function(my.formula, dframe=mydata, digits.d=4, text.width=120, 
+function(my.formula, data=mydata, digits.d=4, text.width=120, 
 
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
          pred=TRUE, pred.all=FALSE, pred.sort=TRUE, cooks.cut=1, 
@@ -10,7 +10,8 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
          pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
  
   
-  mydframe <- deparse(substitute(dframe))  # get data frame name for cor before sort
+  dname <- deparse(substitute(data))
+  options(dname = dname)
  
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
@@ -38,21 +39,21 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
   pre <- "> "
   line <- "--------------------------------------------------------------------\n"
   
-  if (!exists(mydframe)) {
+  if (!exists(dname)) {
     txtC <- "Function reg requires the data exist in a data frame\n"
-    if (mydframe == "mydata") 
+    if (dname == "mydata") 
       txtA <- ", the default data frame name, " else txtA <- " "
     txtB1 <- "Either create the data frame, such as with data.frame function, or\n"
-    txtB2 <- "  specify the actual data frame with the parameter: dframe\n"
+    txtB2 <- "  specify the actual data frame with the parameter: data\n"
     txtB <- paste(txtB1, txtB2, sep="")
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-        txtC, "Data frame ", mydframe, txtA, "does not exist\n\n", txtB, "\n")
+        txtC, "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
   }
 
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1
-  n.obs <- nrow(dframe)
+  n.obs <- nrow(data)
   
   if(n.pred > 1) {
     collinear <- TRUE
@@ -62,7 +63,7 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
   }
 
   is.bin <- TRUE
-  for (i in 1:n.obs) if (dframe[i,nm[1]]!=0 && dframe[i,nm[1]]!=1) is.bin <- FALSE
+  for (i in 1:n.obs) if (data[i,nm[1]]!=0 && data[i,nm[1]]!=1) is.bin <- FALSE
   if (!is.bin) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "The response variable ", nm[1], " can only have values of 0 or 1.\n\n")
@@ -92,13 +93,13 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
   # sort values of the one predictor variable for scatterplot
   #   so that the prediction/confidence intervals can be drawn
   if (n.pred == 1) { 
-    o <- order(dframe[,nm[2]], decreasing=FALSE)
-    dframe <- dframe[o,]
+    o <- order(data[,nm[2]], decreasing=FALSE)
+    data <- data[o,]
   }
 
   in.data.frame <- TRUE
   for (i in 1:n.vars) {
-    if (!(nm[i] %in% names(dframe))) {
+    if (!(nm[i] %in% names(data))) {
       cat("\n\n\n>>> Note: ", nm[i], "is not in the data frame.\n")
       in.data.frame <- FALSE
     }
@@ -107,8 +108,9 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
   # logit analysis
   #   all analysis done on data in model construct lm.out$model
   #   this model construct contains only model vars, with Y listed first
-  assign("lm.out", glm(my.formula, data=dframe, family="binomial"),
-         pos=.GlobalEnv)
+  #assign("lm.out", glm(my.formula, data=data, family="binomial"),
+         #pos=.GlobalEnv)
+  lm.out <- glm(my.formula, data=data, family="binomial")
 
   n.keep <- nrow(lm.out$model)
     
@@ -118,7 +120,7 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
   
   cat("\n")
   if (sys.nframe() == 1) {  # only accurate if not called from model
-    cat("Data Frame: ", mydframe, "\n\n")
+    cat("Data Frame: ", dname, "\n\n")
   }
 
   for (i in 1:n.vars) {
@@ -156,7 +158,7 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
   # check for all numeric vars  in.data.frame <- TRUE
   numeric.all <- TRUE
   for (i in 1:n.vars) {
-    if (in.data.frame && !is.numeric(dframe[1,which(names(dframe) == nm[i])])) {
+    if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
       cat("\n\n\n>>> Note: ", nm[i], "is not a numeric variable.\n")
       numeric.all <- FALSE
     }
@@ -167,7 +169,7 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
 
     if (!pdf) .graphwin(3)  # set up graphics system
 
-    .logit3Residual(nm, mydframe,
+    .logit3Residual(lm.out, nm, dname,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          res.sort, res.rows, cooks.cut, 
          pdf, pdf.width, pdf.height)
@@ -177,7 +179,7 @@ function(my.formula, dframe=mydata, digits.d=4, text.width=120,
 
     if (res.rows == 0) .graphwin(1)
 
-    .logit4Pred(nm, mydframe, my.formula, brief, res.rows,
+    .logit4Pred(lm.out, nm, dname, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          new.data, pred.sort, pred, pred.all, 
          numeric.all, in.data.frame, X1.new, 

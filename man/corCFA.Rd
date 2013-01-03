@@ -16,7 +16,9 @@ The \code{scales} abbreviation provides scale reliabilities and observed item-sc
 }
 
 \usage{
-corCFA(x=mycor, iter=25, resid=TRUE, item.cor=TRUE, sort=TRUE,
+corCFA(x=mycor, data=mydata,
+
+         iter=25, resid=TRUE, item.cor=TRUE, sort=TRUE,
 
          main=NULL, heat.map=TRUE, bottom=3, right=3, 
 
@@ -32,7 +34,10 @@ scales(\ldots, iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE, heat.map=FALSE)
 }
 
 \arguments{
-  \item{x}{Correlation matrix.}
+  \item{x}{Correlation matrix to be analyzed.}
+  \item{data}{Data frame of the original data to be checked for any
+       variable labels, usually item content. This is not to calculate
+       correlations which are separately provided.}
   \item{iter}{Number of iterations for communality estimates.}
   \item{resid}{If \code{TRUE}, then calculate and print the residuals.}
   \item{item.cor}{If \code{TRUE}, display the item correlations.}
@@ -102,7 +107,7 @@ Hunter, J. and Cohen, J. (1969). PACKAGE: A system of computer routines for the 
 }
 
 \seealso{
-\code{\link{cr}}.
+\code{\link{Correlation}}.
 }
 
 \examples{
@@ -138,14 +143,15 @@ scales(F1=X1:X3, F2=X4:X6)
 set(colors="gray")
 corCFA(F1=X1:X3, F2=X4:X6)
 
-# access the lessR data set called datMach4
-Read(lessR.data="Mach4")
+# access the lessR data set called datMach4, with variable labels
+mydata <- Read("Mach4", format="lessR")
 # reverse score the reflected variables
-Recode(c(m03,m04,m06,m07,m09,m10,m11,m14,m16,m17,m19), old=0:5, new=5:0)
+mydata <- Recode(c(m03,m04,m06,m07,m09,m10,m11,m14,m16,m17,m19),
+                 old=0:5, new=5:0)
 # calculate the correlations and store in mycor
-cr(m01:m20)
+mycor <- cr(m01:m20)
 # confirmatory factor analysis of 4-factor solution of Mach IV scale
-# Hunter, Gerbing and Boster, 1982
+# Hunter, Gerbing and Boster (1982)
 corCFA(F1=c(m06,m07,m09,m10), F2=c(m15,m02),
        F3=c(m04,m11,m16), F4=c(m01,m05,m12,m13))
 

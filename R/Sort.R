@@ -1,20 +1,19 @@
 Sort <-
-function(by, direction=NULL, brief=FALSE, keep=TRUE, dframe=mydata, ...) {
+function(by, direction=NULL, data=mydata, quiet=FALSE, ...) {
 
-  dname <- deparse(substitute(dframe))
+  dname <- deparse(substitute(data))
+  n.obs <- nrow(data)
 
-  n.obs <- nrow(dframe)
+  all.vars <- as.list(seq_along(data))
+  names(all.vars) <- names(data)
 
-  all.vars <- as.list(seq_along(dframe))
-  names(all.vars) <- names(dframe)
-
-  if (!brief) {
+  if (!quiet) {
     cat("\nSort Specification\n")
     .dash(31)
   }
 
   if (deparse(substitute(by)) == "row.names") {
-    ord <- "order(row.names(dframe)"
+    ord <- "order(row.names(data)"
     cat(" ", "row.names", "-->")
     if (!is.null(direction)) {
       if (direction[1] == "+") txt <- "ascending"
@@ -57,9 +56,9 @@ function(by, direction=NULL, brief=FALSE, keep=TRUE, dframe=mydata, ...) {
     else for (i in 1:n.sort) direction[i] <- "+"
 
     # console output
-    if (!brief) {
+    if (!quiet) {
       for (i in 1:n.sort) {
-        cat(" ", names(dframe)[by.col[i]], "-->")
+        cat(" ", names(data)[by.col[i]], "-->")
         if (direction[i] == "+") txt <- "ascending"
         else if (direction[i] == "-") txt <- "descending"
         else {
@@ -77,19 +76,19 @@ function(by, direction=NULL, brief=FALSE, keep=TRUE, dframe=mydata, ...) {
     # construct the call to the order function
     ord <- ""
     for (i in 1:n.sort) { 
-      if ("factor" %in% class(dframe[, by.col[i]])) {  # 2 attributes if ordered
+      if ("factor" %in% class(data[, by.col[i]])) {  # 2 attributes if ordered
         i.fvar <- i.fvar + 1  # another factor variable
-        fvar[, i.fvar] <- as.character(dframe[, by.col[i]])
+        fvar[, i.fvar] <- as.character(data[, by.col[i]])
         for (i.row in 1:n.obs)  # replace value with factor integer prefixed 
           fvar[i.row, i.fvar] <- 
-             paste(toString(as.numeric(dframe[, by.col[i]])[i.row]), 
+             paste(toString(as.numeric(data[, by.col[i]])[i.row]), 
                    as.character(fvar[i.row, i.fvar]), sep="")
         ord <- paste(ord, direction[i], "xtfrm(fvar[, ", toString(i.fvar), "]), ",
                      sep="")
       }
       else   # variable not a factor
         ord <- paste(ord, direction[i], 
-                     "dframe[, by.col[", toString(i), "]], ", sep="")
+                     "data[, by.col[", toString(i), "]], ", sep="")
     }
     ord <- paste("order(", ord, "...)", sep="")
   }
@@ -99,26 +98,21 @@ function(by, direction=NULL, brief=FALSE, keep=TRUE, dframe=mydata, ...) {
   .dash(31)
   cat("\n")
 
+
   # do the sort
   o <- eval(parse(text=ord))
-  dframe <- dframe[o, ]
+  mydata <- data[o, ]
 
-  if (!brief) {
+  if (!quiet) {
     cat("\n")
     .dash(68)
     cat("After the Sort, first five rows of data ")
-    if (keep) cat("for data frame:", dname)
     cat( "\n")
     .dash(68)
-    print(head(dframe, n=5))
+    print(head(mydata, n=5))
     cat("\n")
   }
 
-  if (keep) 
-    assign(dname, dframe, pos=.GlobalEnv)
-  else
-    return(dframe)
-
-
+  return(mydata)
 
 }

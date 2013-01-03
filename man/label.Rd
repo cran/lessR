@@ -4,22 +4,22 @@
 \title{Apply a Variable Label to a non-lessR Function}
 
 \description{
-Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  Generally applies to standard R functions as \code{lessR} functions automatically provide variable labels on the output when the labels are present in the \code{mylabels} data frame.
+Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  Generally applies to standard R functions as \code{lessR} functions automatically provide variable labels on the output when the labels have been read with the data.
 }
 
 \usage{
-label(x, dframe=mylabels)
+label(x, data=mydata)
 }
 
 
 \arguments{
   \item{x}{The variable for which to obtain the corresponding variable label.}
-  \item{dframe}{Data frame that contains the variable of interest, which is \code{mylabels}.}
+  \item{data}{Data frame that contains the variable of interest.}
 }
 
 
 \details{
-Standard R does not provide for variable labels, but \code{lessR} provides for a data frame called \code{mylabels} which stores variable labels.  Read the labels into this data frame with the \code{\link{Read}} function and setting \code{labels=TRUE}. This setting can be accomplished with the short name for the \code{\link{Read}} function, \code{\link{rad}}.  The variable labels can either be read from a separate file by themselves, \code{\link{rad.labels}}, or from the second row of the data file, \code{\link{rad.both}}. 
+Standard R does not provide for variable labels, but \code{lessR}does.  Read the labels \code{\link{Read}} function and setting \code{labels=TRUE}. This setting can be accomplished with the short name for the \code{\link{Read}} function, \code{\link{rd}}.
 
 Each row of the file that contains the labels, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format such as obtained with the \code{csv} option from a standard worksheet application such as Microsoft Excel or LibreOffice Calc. Not all variables in the data frame that contains the data, \code{mydata} by default, need have a label, and the variables with their corresponding labels can be listed in any order. Here is an example of this file for the \code{dat.employee} data file included in this \code{lessR} package.\cr
 
@@ -41,31 +41,14 @@ The \code{label} function is automatically accessed by the \code{lessR} function
 }
 
 \examples{
-# create data frame mydata (usually read from a file with rad)
-n <- 12
-X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
-Y <- rnorm(n=n, mean=50, sd=10)
-mydata <- data.frame(X,Y)
-rm(X); rm(Y);
-
-# create data frame mylabels (usually read from a file with rad)
-# The labels themselves are a variable named \code{label}, but 
-#   this information is only necessary if constructing the 
-#   labels data frame manually, such as is done here.
-vname <- character(length=2)
-vname[1] <- "X"
-vname[2] <- "Y"
-label <- character(length=2)
-label[1] <- "Group"
-label[2] <- "Response"
-mylabels <- data.frame(label)
-row.names(mylabels) <- vname
+# read the data with variable labels
+mydata <- Read("Employee", format="lessR")
 
 # variable label as the title of a graph from a standard R function
 # the data are not attached, so for standard R functions, must
 #   identify the relevant data frame, such as with function: with
-with(mydata, barplot(table(X), main=label(X)))
-with(mydata, hist(Y, main=label(Y)))
+with(mydata, barplot(table(Dept), main=label(Dept)))
+with(mydata, hist(Salary, main=label(Salary)))
 }
 
 

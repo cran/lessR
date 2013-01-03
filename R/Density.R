@@ -1,10 +1,12 @@
 Density <-
-function(x, dframe=mydata, 
+function(x, data=mydata, 
+
          bw="nrd0", type=c("both", "general", "normal"),
-         bin.start=NULL, bin.width=NULL, text.out=TRUE,
+         bin.start=NULL, bin.width=NULL,
 
          col.fill=getOption("col.fill.pt"),
-         col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+         col.bg=getOption("col.bg"),
+         col.grid=getOption("col.grid"),
 
          col.nrm="black", col.gen="black",
          col.fill.nrm="transparent", col.fill.gen="transparent",
@@ -13,27 +15,28 @@ function(x, dframe=mydata,
          x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
          x.min=NULL, x.max=NULL, band=FALSE, 
 
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
-  # get actual variable name before potential call of dframe$x
+  # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x)) 
   options(xname = x.name)
 
   # get data frame name
-  dframe.name <- deparse(substitute(dframe))
+  dname <- deparse(substitute(data))
+  options(dname = dname)
 
-  # get conditions and check for dframe existing
-  xs <- .xstatus(x.name, dframe.name)
+  # get conditions and check for data existing
+  xs <- .xstatus(x.name, dname)
   in.global <- xs$ig 
 
   # see if variable exists in data frame, if x not in Global Env or function call 
-  if (!missing(x) && !in.global) .xcheck(x.name, dframe.name, dframe)
+  if (!missing(x) && !in.global) .xcheck(x.name, dname, data)
 
-  if (!in.global) x.call <- eval(substitute(dframe$x))
+  if (!in.global) x.call <- eval(substitute(data$x))
   else {
     x.call <- x
-    if (is.function(x)) x.call <- eval(substitute(dframe$x))
+    if (is.function(x)) x.call <- eval(substitute(data$x))
   }
 
   # set up graphics system
@@ -42,8 +45,8 @@ function(x, dframe=mydata,
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
 
-  .den.main(x.call, dframe=mydata, 
-            bw, type, bin.start, bin.width, text.out,
+  .den.main(x.call, data=mydata, 
+            bw, type, bin.start, bin.width, quiet,
             col.fill, col.bg, col.grid, col.nrm, col.gen,
             col.fill.nrm, col.fill.gen, 
             cex.axis, col.axis, col.ticks,

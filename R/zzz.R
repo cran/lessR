@@ -1,11 +1,19 @@
 if(getRversion() >= "2.15.1") 
-  globalVariables(c("mydata", "mylabels", "mycor", "lm.out", "av.out"))
+  globalVariables(c("mydata", "mycor"))
 
 
 .onAttach <-
 function(...) {
 
-  packageStartupMessage("\nFor help, enter, after the >,  Help()\n")
+  packageStartupMessage("\nFor help, enter, after the >,  Help()\n\n",
+      "--------------------------------------------------------------------------\n",
+      "The keepers of CRAN have changed the rules. Now must explicitly assign the\n",
+      "output data table name when reading or modifying data, usually:  mydata\n",
+      "    > mydata <- Read()\n",
+      "    > mydata <- Transform(Y=X/12)    also Subset, Merge, Recode, Sort\n",
+      "    > mycor <- Correlation()\n\n",
+      "For more information:   > Help(lessR),  click:  Package NEWS\n",
+      "--------------------------------------------------------------------------\n\n")
 
   options(colors="blue")
   options(trans.fill.bar=0.00)
@@ -19,7 +27,7 @@ function(...) {
   options(col.ghost=FALSE)
   options(col.heat = "darkblue")
 
-  options(n.cat=4)
+  options(n.cat=0)
 
   options(show.signif.stars=FALSE)
   options(scipen=30)
@@ -30,7 +38,7 @@ function(...) {
 .max.dd <- function(x) {
 
  n.dec <-function(xn) {
-    xc <- as.character(xn)
+    xc <- format(xn)  # as.character(51.45-48.98) does not work
     nchar(xc)
     ipos <- 0
     for (i in 1:nchar(xc)) if (substr(xc,i,i)==".") ipos <- i
@@ -44,6 +52,7 @@ function(...) {
 
   return(max.dd)
 }
+
 
 .getdigits <- function(x, min.digits) {
     digits.d <- .max.dd(x) + 1
@@ -74,7 +83,7 @@ function(...) {
 }
 
 
-.xstatus <- function(var.name, dframe.name) {
+.xstatus <- function(var.name, dname) {
 
   # see if analysis from data is based on a formula
   if (grepl("~", var.name)) is.frml <- TRUE else is.frml <- FALSE
@@ -97,14 +106,14 @@ function(...) {
 
   # see if the data frame exists (mydata default), if x from data, not in Global Env
   if (!in.global && from.data) {
-    if (!exists(dframe.name, where=.GlobalEnv)) {
-      if (dframe.name == "mydata") 
+    if (!exists(dname, where=.GlobalEnv)) {
+      if (dname == "mydata") 
         txtA <- ", the default data frame name, " else txtA <- " "
       txtB1 <- "So either create the data frame by reading with the rad function, or\n"
-      txtB2 <- "  specify the actual data frame with the parameter: dframe\n"
+      txtB2 <- "  specify the actual data frame with the parameter: data\n"
       txtB <- paste(txtB1, txtB2, sep="")
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Data frame ", dframe.name, txtA, "does not exist\n\n", txtB, "\n")
+          "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
     }
   }
 
@@ -112,22 +121,140 @@ function(...) {
 }
 
 
-.xcheck <- function(var.name, dframe.name, dframe) {
+.xcheck <- function(var.name, dname, data) {
 
 # see if variable exists in the data frame
-  if (!exists(var.name, where=dframe)) { 
-    if (dframe.name == "mydata") {
+  if (!exists(var.name, where=data)) { 
+    if (dname == "mydata") {
       txt1 <- ", the default name \n\n"
       txt2 <- "So either make sure you are using the correct variable name, or\n"
-      txt3 <- "  specify the actual data frame with the parameter: dframe\n"
+      txt3 <- "  specify the actual data frame with the parameter: data\n"
       txt <- paste(txt1, txt2, txt3, sep="")
     }
     else 
       txt <- " "
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Variable ", var.name, " does not exist either by itself ",
-        "or in the data frame ", dframe.name, txt, "\n\n")
+        "or in the data frame ", dname, txt, "\n\n")
   }
+}
+
+
+.getlabels <- function(xlab, ylab, main) {
+
+  # get variable labels if they exist
+  x.name <- getOption("xname")
+  y.name <- getOption("yname")
+  x.lbl <- NULL
+  y.lbl <- NULL
+
+  dname <- getOption("dname")  # not set for dependent option on tt
+  if (!is.null(dname)) {
+    if (exists(dname, where=.GlobalEnv))
+      mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
+    else
+      mylabels <- NULL
+  }
+  else
+    mylabels <- NULL
+
+  if (!is.null(mylabels)) {
+    x.lbl <- mylabels[which(names(mylabels) == x.name)]
+    if (length(x.lbl) == 0) x.lbl <- NULL
+    y.lbl <- mylabels[which(names(mylabels) == y.name)]
+    if (length(y.lbl) == 0) y.lbl <- NULL
+  }
+
+  # axis and legend labels
+  if (!missing(xlab)) {
+    if (!is.null(xlab)) x.lab <- xlab 
+    else if (is.null(x.lbl)) x.lab <- x.name else x.lab <- x.lbl
+    if (length(x.lab) == 1) if (nchar(x.lab) > 45)  # power.ttest: len > 1
+      x.lab <- paste(substr(x.lab,1,45), "...")
+  }
+  else x.lab <- NULL
+
+  if (!missing(ylab)) {
+    if (!is.null(ylab)) y.lab <- ylab
+    else if (is.null(y.lbl)) y.lab <- y.name else y.lab <- y.lbl
+    if (nchar(y.lab) > 50)
+      y.lab <- paste(substr(y.lab,1,50), "...")
+  }
+  else y.lab <- NULL
+
+  if (!missing(main)) {
+    if (!is.null(main)) main.lab <- main else main.lab <- ""
+  }
+  else main.lab <- NULL
+
+  return(list(xn=x.name, xl=x.lbl, xb=x.lab, 
+              yn=y.name, yl=y.lbl, yb=y.lab, mb=main.lab))
+}
+
+
+.varlist <- function(n.pred, i, var.name, pred.lbl, n.obs, n.keep, lvls=NULL) {
+
+  if (i == 1) txt <- "Response Variable:  "
+  else 
+    if (n.pred > 1) txt <- paste("\n", pred.lbl, " ", 
+      toString(i-1), ": ", sep="")
+    else txt <- "\nPredictor Variable: "
+  cat(txt, var.name)
+
+  dname <- getOption("dname")
+  if (exists(dname, where=.GlobalEnv))
+    mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
+  else
+    mylabels <- NULL
+
+  if (!is.null(mylabels)) {
+    lbl <- mylabels[which(names(mylabels) == var.name)]
+    if (!is.null(lbl)) cat(", ", as.character(lbl))
+  }
+
+  if (!is.null(lvls)) if (i > 1) cat("\n  Levels:", lvls)
+  cat("\n")
+
+  if (i == n.pred+1) {
+    cat("\n")
+    cat("Number of cases (rows) of data: ", n.obs, "\n")
+    cat("Number of cases retained for analysis: ", n.keep, "\n")
+  }
+}
+
+
+.title <- function(x.name, y.name, x.lbl, y.lbl, isnullby) {
+
+  txt1 <- x.name
+  if (!is.null(x.lbl)) txt1 <- paste(txt1, ", ", x.lbl, sep="")
+
+  if (isnullby) txt1 <- paste("---", txt1, "---")
+  else {
+    txt2 <- paste(y.name, sep="")
+    if (!is.null(y.lbl)) txt2 <- paste(txt2, ", ", y.lbl, sep="") 
+  }
+
+  cat("\n")
+  cat(txt1, "\n")
+  if (!isnullby) {
+    cat(txt2, "\n")
+    ndash <- max(nchar(txt1),nchar(txt2))
+    .dash(ndash)
+  }
+  cat("\n")
+
+}
+
+
+.showfile <- function(fname, txt) {
+  if (getwd() == "/")
+    workdir <- "top level (root) of your file system"
+  else
+    workdir <- getwd()
+  cat("\n")
+  cat("The", txt, "was written at the current working directory.\n")
+  cat("       ", fname, " in:  ", workdir, "\n")
+  cat("\n")
 }
 
 
@@ -190,107 +317,6 @@ function(...) {
       dev.off()
       .showfile(pdf.file, "plot")
     }
-}
-
-
-.getlabels <- function(xlab, ylab, main) {
-
-  # get variable labels if they exist
-  x.name <- getOption("xname")
-  y.name <- getOption("yname")
-  x.lbl <- NULL
-  y.lbl <- NULL
-  if (exists("mylabels", where=.GlobalEnv)) {
-    x.lbl <- as.character(mylabels[which(row.names(mylabels)==x.name), "label"])
-    if (length(x.lbl) == 0) x.lbl <- NULL
-    y.lbl <- as.character(mylabels[which(row.names(mylabels)==y.name), "label"])
-    if (length(y.lbl) == 0) y.lbl <- NULL
-  }
-
-  # axis and legend labels
-  if (!missing(xlab)) {
-    if (!is.null(xlab)) x.lab <- xlab 
-    else if (is.null(x.lbl)) x.lab <- x.name else x.lab <- x.lbl
-    if (length(x.lab) == 1) if (nchar(x.lab) > 45)  # power.ttest: len > 1
-      x.lab <- paste(substr(x.lab,1,45), "...")
-  }
-  else x.lab <- NULL
-
-  if (!missing(ylab)) {
-    if (!is.null(ylab)) y.lab <- ylab
-    else if (is.null(y.lbl)) y.lab <- y.name else y.lab <- y.lbl
-    if (nchar(y.lab) > 50)
-      y.lab <- paste(substr(y.lab,1,50), "...")
-  }
-  else y.lab <- NULL
-
-  if (!missing(main)) {
-    if (!is.null(main)) main.lab <- main else main.lab <- ""
-  }
-  else main.lab <- NULL
-
-  return(list(xn=x.name, xl=x.lbl, xb=x.lab, 
-              yn=y.name, yl=y.lbl, yb=y.lab, mb=main.lab))
-}
-
-
-.varlist <- function(n.pred, i, var.name, pred.lbl, n.obs, n.keep, lvls=NULL) {
-
-  if (i == 1) txt <- "Response Variable:  "
-  else 
-    if (n.pred > 1) txt <- paste("\n", pred.lbl, " ", 
-      toString(i-1), ": ", sep="")
-    else txt <- "\nPredictor Variable: "
-  cat(txt, var.name)
-
-  if (exists("mylabels")) {  # use variable label if it exists
-    lbl <- mylabels[which(row.names(mylabels)==var.name), "label"]
-    if (!is.null(lbl)) cat(", ", as.character(lbl))
-  }
-
-  if (!is.null(lvls)) if (i > 1) cat("\n  Levels:", lvls)
-  cat("\n")
-
-  if (i == n.pred+1) {
-    cat("\n")
-    cat("Number of observations (rows) of data: ", n.obs, "\n")
-    cat("Number of observations retained for analysis: ", n.keep, "\n")
-  }
-}
-
-
-.title <- function(x.name, y.name, x.lbl, y.lbl, isnullby) {
-
-  txt1 <- x.name
-  if (!is.null(x.lbl)) txt1 <- paste(txt1, ", ", x.lbl, sep="")
-
-  if (isnullby) txt1 <- paste("---", txt1, "---")
-  else {
-    txt2 <- paste(y.name, sep="")
-    if (!is.null(y.lbl)) txt2 <- paste(txt2, ", ", y.lbl, sep="") 
-  }
-
-  cat("\n")
-  cat(txt1, "\n")
-  if (!isnullby) {
-    cat(txt2, "\n")
-    ndash <- max(nchar(txt1),nchar(txt2))
-    .dash(ndash)
-  }
-  cat("\n")
-
-}
-
-
-.showfile <- function(fname, txt) {
-  if (getwd() == "/")
-    workdir <- "top level (root) of your file system"
-  else
-    workdir <- getwd()
-  cat("\n")
-  cat("The", txt, "was written at the current working directory.\n")
-  cat("       ", fname, " in:  ", workdir, "\n")
-  cat("\n")
 }
 
 

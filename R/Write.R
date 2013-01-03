@@ -1,41 +1,45 @@
 Write <- 
-function(ref=NULL, type=c("csv", "R"), dframe=mydata, ...) {
+function(ref=NULL, format=c("csv", "R"), data=mydata, ...) {
 
-  type <- match.arg(type)
+  format <- match.arg(format)
 
-  dname <- deparse(substitute(dframe))
+  dname <- deparse(substitute(data))
 
   if (!exists(dname, where=.GlobalEnv)) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Data frame ", dname, " does not exist\n\n")
+    cat("\n");
+    if (grepl('"', dname))
+      cat(">>> Do NOT have quotes around the data frame name.\n\n")
+    stop(call.=FALSE, "\n","------\n",
+         "Data frame ", dname, " does not exist.\n")
+    cat("\n")
   }
 
-  if (type == "csv") {
+  if (format == "csv") {
     if (is.null(ref))
-      file.dframe <- paste(dname, ".csv", sep="")
+      file.data <- paste(dname, ".csv", sep="")
     else {
-       if (grepl(ref, ".csv")) 
+       if (grepl(".csv", ref)) 
          txt <- ""
        else
          txt <- ".csv"
-       file.dframe <- paste(ref, txt, sep="")
+       file.data <- paste(ref, txt, sep="")
     }
-    write.csv(dframe, file=file.dframe, ...)
+    write.csv(data, file=file.data, ...)
   }
 
-  else if (type == "R") {
+  else if (format == "R") {
     if (is.null(ref))
-      file.dframe <- paste(dname, ".rda", sep="")
+      file.data <- paste(dname, ".rda", sep="")
     else {
-      if (grepl(ref, ".rda")) 
+      if (grepl(".rda", ref)) 
         txt <- ""
       else
         txt <- ".rda"
-      file.dframe <- paste(ref, txt, sep="")
+      file.data <- paste(ref, txt, sep="")
     }
-    save(list=dname, file=file.dframe, ...)
+    save(list=dname, file=file.data, ...)
   }
   
-  .showfile(file.dframe, c(dname, " data frame contents"))
+  .showfile(file.data, c(dname, "data frame contents"))
 
 }

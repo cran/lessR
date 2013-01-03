@@ -1,52 +1,54 @@
 ANOVA <-
-function(my.formula, dframe=mydata, brief=FALSE, digits.d=NULL, 
+function(my.formula, data=mydata, brief=FALSE, digits.d=NULL, 
          rb.points=TRUE, pdf=FALSE, pdf.width=5, pdf.height=5, ...) {  
 
-  mydframe <- deparse(substitute(dframe))  # get data frame name for cor before sort
+  dname <- deparse(substitute(data))
+  options(dname = dname)
  
   op <- options()  # save current options to reset at end
   options(show.signif.stars=FALSE, scipen=30)
 
-  if (!exists(mydframe)) {
+  if (!exists(dname)) {
     txtC <- "Function ANOVA requires the data exist in a data frame\n"
-    if (mydframe == "mydata") 
+    if (dname == "mydata") 
       txtA <- ", the default data frame name, " else txtA <- " "
     txtB1 <- "Either create the data frame, such as with data.frame function, or\n"
-    txtB2 <- "  specify the actual data frame with the parameter: dframe\n"
+    txtB2 <- "  specify the actual data frame with the parameter: data\n"
     txtB <- paste(txtB1, txtB2, sep="")
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-        txtC, "Data frame ", mydframe, txtA, "does not exist\n\n", txtB, "\n")
+        txtC, "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
   }
 
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1
-  n.obs <- nrow(dframe)
+  n.obs <- nrow(data)
 
   in.data.frame <- TRUE
   for (i in 1:n.vars) {
-    if (!(nm[i] %in% names(dframe))) {
+    if (!(nm[i] %in% names(data))) {
       cat("\n\n\n>>> Note: ", nm[i], "is not in the data frame.\n")
       in.data.frame <- FALSE
     }
   }
 
   for (i in 2:n.vars) {
-      nms <-  which(names(dframe) == nm[i])
-      if (in.data.frame && !is.factor(dframe[ , nms])) {
+      nms <-  which(names(data) == nm[i])
+      if (in.data.frame && !is.factor(data[ , nms])) {
         cat("\n>>> Note: Converting", nm[i], "to a factor for this analysis only.\n")
-        dframe[ ,nms] <- as.factor(dframe[ ,nms])
+        data[ ,nms] <- as.factor(data[ ,nms])
       }
     }  
 
   # ANOVA
   #   all analysis done on data in model construct av.out$model
   #   this model construct contains only model vars, with Y listed first
-  assign("av.out", aov(my.formula, data=dframe), pos=.GlobalEnv)
+  #assign("av.out", aov(my.formula, data=data), pos=.GlobalEnv)
+  av.out <- aov(my.formula, data=data)
 
   n.keep <- nrow(av.out$model)
 
-  if (is.null(digits.d)) digits.d <- .getdigits(dframe[,nm[1]], 2)
+  if (is.null(digits.d)) digits.d <- .getdigits(data[,nm[1]], 2)
     
 
 # ----------
@@ -58,12 +60,12 @@ function(my.formula, dframe=mydata, brief=FALSE, digits.d=NULL,
 
   cat("\n")
   if (sys.nframe() == 1) {  # only accurate if not called from model
-    cat("Data Frame: ", mydframe, "\n\n")
+    cat("Data Frame: ", dname, "\n\n")
   }
   
   for (i in 1:n.vars) {
     ind <- i
-    .varlist(n.pred, ind, nm[i], "Factor", n.obs, n.keep, levels(dframe[,nm[i]]))
+    .varlist(n.pred, ind, nm[i], "Factor", n.obs, n.keep, levels(data[,nm[i]]))
   }
 
 
@@ -72,20 +74,20 @@ function(my.formula, dframe=mydata, brief=FALSE, digits.d=NULL,
 # --------
 
   if (n.pred == 1) 
-    .ANOVAz1(av.out$model[,nm[1]],av.out$model[,nm[2]], nm, n.obs, digits.d, brief,
-      pdf=FALSE, pdf.width=5, pdf.height)
+    .ANOVAz1(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
+        nm, n.obs, digits.d, brief, pdf, pdf.width, pdf.height)
 
   if (n.pred == 2) {
-    if (!is.list(replications(my.formula, data=dframe)))
+    if (!is.list(replications(my.formula, data=data)))
       cat("\nThe design is balanced\n")
     else {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The design is not balanced. The results would be invalid.\n",
         "Consider function  lmer  in the  lme4  package.\n\n")
     }
-    .ANOVAz2(av.out$model[,nm[1]],av.out$model[,nm[2]], av.out$model[,nm[3]],
-      nm, digits.d, brief, as.character(my.formula)[3], rb.points,
-      pdf, pdf.width, pdf.height)
+    .ANOVAz2(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
+        av.out$model[,nm[3]], nm, digits.d, brief, as.character(my.formula)[3],
+        rb.points, pdf, pdf.width, pdf.height)
   }
 
 

@@ -3,7 +3,7 @@
 \alias{dataEmployee}
 \title{Data: Employees}
 
-\description{Some human resource data on 37 employees with 6 variables.}
+\description{Some human resource data on 37 employees with 6 variables. Variable labels are included in the data file.}
 
 \usage{data(dataEmployee)}
 \format{A data table with 37 observations.

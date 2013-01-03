@@ -1,11 +1,11 @@
 \name{Help}
 \alias{Help}
-\alias{hlp}
+\alias{hl}
 
 \title{Help System for Statistics by Topic that Suggests Related Functions}
 
 \description{
-Abbreviation: \code{hlp}
+Abbreviation: \code{hl}
 
 R works by entering function names and arguments.  R provides extensive help for each available function based on a function's name, but these names are not apparent to someone who has not memorized the names.  To alleviate this problem, this help system suggests and briefly explains various function calls regarding a requested topic for statistical analysis. The primary call is \code{Help()}, which displays the main help menu in a persistent graphics window, that is, which remains until explicitly closed by the user regardless of additional graphics analyses. Each specific Help window can be called with any of the function names, or their abbreviations displayed on that specific page.
 }
@@ -13,7 +13,7 @@ R works by entering function names and arguments.  R provides extensive help for
 \usage{
 Help(topic=NULL)
 
-hlp(\ldots)
+hl(\ldots)
 }
 
 
@@ -97,7 +97,7 @@ hlp(\ldots)
 # list the information needed to access a specific topic
 Help()
 # short name
-hlp()
+hl()
 
 # specific help message regarding summary statistics
 Help("SummaryStats")

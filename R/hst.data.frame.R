@@ -1,5 +1,9 @@
 hst.data.frame <-
-function(x, n.cat, text.out, ...)  {
+function(x, n.cat,
+         col.fill, col.stroke, col.bg, col.grid, col.reg,
+         over.grid, cex.axis, col.axis, col.ticks, breaks, bin.start, bin.width,
+         prop, cumul, digits.d, xlab, ylab, main, quiet,
+         pdf.width, pdf.height, ...)  {
 
 
   for (i in 1:ncol(x)) {
@@ -10,8 +14,17 @@ function(x, n.cat, text.out, ...)  {
     options(xname = x.name)
 
     if (is.numeric(x[,i]) && nu > n.cat) {
-      fname <- paste("Hist_", x.name, ".pdf", sep="")
-      hst.default(x[,i], text.out=text.out, pdf.file=fname, ...)
+
+      pdf.file <- paste("Hist_", x.name, ".pdf", sep="")
+      .opendev(pdf.file=pdf.file, pdf.width, pdf.height)
+
+      .hst.main(x[,i], col.fill, col.stroke, col.bg, col.grid, col.reg,
+          over.grid, cex.axis, col.axis, col.ticks, breaks, bin.start, bin.width,
+          prop, cumul, digits.d, xlab, ylab, main, quiet, ...)
+
+      dev.off()
+      if (!quiet) .showfile(pdf.file, "histogram")
+
     }
 
     if (is.numeric(x[,i]) && nu <= n.cat)

@@ -40,7 +40,7 @@ Also provides the associated multiple indicator measurement model suggested by t
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{cr}}.
+\code{\link{Correlation}}.
 }
 
 \examples{

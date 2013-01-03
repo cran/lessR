@@ -1,9 +1,9 @@
-.bc.default <- 
+.bc.main <- 
 function(x, by=NULL, 
          col.fill, col.stroke, col.bg, col.grid, random.col, colors,
-         horiz, over.grid, addtop, gap, brief, prop, xlab, ylab, main,
-         cex.axis, col.axis, col.ticks, beside, col.low, col.hi, count.names,
-         legend.title, legend.loc, legend.labels, legend.horiz, text.out, ...) {
+         horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
+         cex.axis, col.axis, col.ticks, beside, col.low, col.hi, count.levels,
+         legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
  
  if (!is.null(by) && prop) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -32,15 +32,15 @@ function(x, by=NULL,
 
   # entered counts typically integers as entered but stored as type double
   # if names(x) or rownames(x) is null, likely data from sample and c functions
-  # count.names is getting counts directly from a data frame with counts entered
+  # count.levels is getting counts directly from a data frame with counts entered
   entered.pre <- FALSE
   if (!is.matrix(x) && !is.null(names(x))) entered.pre <- TRUE
   if (is.matrix(x) && !is.null(rownames(x))) entered.pre <- TRUE
   if (!is.integer(x) && is.double(x) && entered.pre) 
     entered <- TRUE else entered <- FALSE
-  if (!is.null(count.names)) {
+  if (!is.null(count.levels)) {
     x <- as.numeric(x)
-    names(x) <- count.names
+    names(x) <- count.levels
     entered <- TRUE
   }
   
@@ -84,7 +84,9 @@ function(x, by=NULL,
   }
 
   # color palette
-  if ((order.x && is.null(by)) || order.y) {
+  if ((order.x && is.null(by)) || order.y) {  # one var, ordered factor
+      col.grid <- getOption("col.grid")
+      col.bg <- getOption("col.bg")
     if (colors == "blue") { 
       if (is.null(col.low)) col.low <- "slategray2"
       if (is.null(col.hi)) col.hi <- "slategray4"
@@ -92,19 +94,18 @@ function(x, by=NULL,
     else if (colors == "gray") {
       if (is.null(col.low)) col.low <- "gray70"
       if (is.null(col.hi)) col.hi <- "gray25"
-      col.grid <- "white"
-      col.bg <- "gray90"
+    }
+    else if (colors == "gray.black") {
+      if (is.null(col.low)) col.low <- "gray70"
+      if (is.null(col.hi)) col.hi <- "gray25"
     }
     else if (colors == "green") {
       if (is.null(col.low)) col.low <- "darkseagreen1"
       if (is.null(col.hi)) col.hi <- "darkseagreen4"
-      col.bg <- rgb(230,220,143, maxColorValue=256)
     }
     else if (colors == "rose") {
       if (is.null(col.low)) col.low <- "mistyrose1"
       if (is.null(col.hi)) col.hi <- "mistyrose4"
-      col.grid <- "snow2"
-      col.bg <- "snow1"
     }
     else if (colors == "gold") {
       if (is.null(col.low)) col.low <- "goldenrod1"
@@ -114,24 +115,36 @@ function(x, by=NULL,
       if (is.null(col.low)) col.low <- "coral1"
       if (is.null(col.hi)) col.hi <- "coral4"
     }
-    else if (colors == "orange") { 
-      if (is.null(col.low))
-        col.low <- rgb(255,173,91, maxColorValue=256)
-      if (is.null(col.hi))
-        col.hi <- rgb(169,66,2, maxColorValue=256)
-      col.bg <- rgb(4,4,4, maxColorValue=256)
+    else if (colors == "orange.black") { 
+      if (is.null(col.low)) col.low <- rgb(255,173,91, maxColorValue=256)
+      if (is.null(col.hi)) col.hi <- rgb(169,66,2, maxColorValue=256)
+    }
+    else if (colors == "sienna") { 
+      if (is.null(col.low)) col.low <- "sienna1"
+      if (is.null(col.hi)) col.hi <- "sienna4"
+    }
+    else if (colors == "dodgerblue") { 
+      if (is.null(col.low)) col.low <- "dodgerblue1"
+      if (is.null(col.hi)) col.hi <- "dodgerblue4"
+    }
+    else if (colors == "purple") { 
+      if (is.null(col.low)) col.low <- "purple1"
+      if (is.null(col.hi)) col.hi <- "purple4"
     }
     color.palette <- colorRampPalette(c(col.low, col.hi))
     clr <- color.palette(ncolors)
   }
+
   else if (colors == "gray") {
     color.palette <- colorRampPalette(c("gray30","gray80"))
     clr <- color.palette(nrow(x))
-    if (col.grid == "grey86") col.grid <- getOption("col.grid")
+    if (col.grid == "gray86") col.grid <- getOption("col.grid")
     if (col.bg == "ghostwhite") col.bg <- getOption("col.bg")
   }
   else if ((colors=="blue" || colors=="rose" || colors=="green" 
-          || colors=="gold" || colors=="red" || colors=="orange")
+          || colors=="gold" || colors=="red" || colors=="orange"
+          || colors=="sienna" || colors=="dodgerblue" || colors=="purple"
+          || colors=="orange.black" || colors=="gray.black")
           && (is.null(by) && !is.matrix(x))) {
     color.palette <- colorRampPalette(getOption("col.fill.bar"))
     clr <- color.palette(nrow(x))
@@ -208,7 +221,7 @@ function(x, by=NULL,
   if (legend.loc == "right.margin"  &&  (!is.null(by) || is.matrix(x)))
     par(oma=c(0,0,0,3))
 
-  if(is.null(count.names)) if (horiz) { 
+  if(is.null(count.levels)) if (horiz) { 
     temp <- x.lab; x.lab <- y.lab; y.lab <- temp 
   }
 
@@ -221,11 +234,11 @@ function(x, by=NULL,
   # set rescale to control bar width for small number of bars
   if (rescale == 0) {
     if (!horiz)
-      suppressWarnings(barplot(x, col="transparent", ylim=c(0,max.y), axisnames=FALSE,
-        beside=beside, space=gap, axes=FALSE, ...))
+      barplot(x, col="transparent", ylim=c(0,max.y), axisnames=FALSE,
+        beside=beside, space=gap, axes=FALSE, ...)
     else
-      suppressWarnings(barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
-        beside=beside, space=gap, axes=FALSE, ...))
+      barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
+        beside=beside, space=gap, axes=FALSE, ...)
   }
   else {
     if (rescale == 4) width.bars <- .17
@@ -233,11 +246,11 @@ function(x, by=NULL,
     if (rescale == 2) width.bars <- .28
     gap <- 0.246 + 0.687*width.bars
     if (!horiz)
-      suppressWarnings(barplot(x, col="transparent", ylim=c(0,max.y), axisnames=FALSE,
-        beside=beside, space=gap, width=width.bars, xlim=c(0,1), axes=FALSE, ...))
+      barplot(x, col="transparent", ylim=c(0,max.y), axisnames=FALSE,
+        beside=beside, space=gap, width=width.bars, xlim=c(0,1), axes=FALSE, ...)
     else
-      suppressWarnings(barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
-        beside=beside, space=gap, width=width.bars, ylim=c(0,1), axes=FALSE, ...))
+      barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
+        beside=beside, space=gap, width=width.bars, ylim=c(0,1), axes=FALSE, ...)
   }
 
   if (extend) {
@@ -262,14 +275,14 @@ function(x, by=NULL,
       abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
   if (rescale == 0) {
-     # width.bars <- .8   gap <- .6*width.bars
-    p1<-suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+#    width.bars <- .8   gap <- .6*width.bars
+    suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
           xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
           space=gap, cex.axis=cex.axis, cex.names=cex.axis, 
           col.axis=col.axis, col.ticks=col.ticks, ...))
   }
   else
-    p1<-suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+    suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
           xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), 
           cex.axis=cex.axis, cex.names=cex.axis,
@@ -384,8 +397,37 @@ function(x, by=NULL,
   # ----------------------------------------------------------------------------
   # text output
   if (prop) x  <- x.temp
-  if (text.out) 
-    if (is.null(by)) .ss.factor(x, brief=brief) else .ss.factor(x, by, brief=brief)
+  if (!quiet) { 
+
+    if (is.null(by)) {
+      .ss.factor(x, brief=TRUE)
+
+      ch <- suppressWarnings(chisq.test(x))
+      pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
+      cat("\nChi-squared test of null hypothesis of equal probabilities\n")
+      cat("  Chisq = ", ch$statistic, ",  df = ", ch$parameter, ",  p-value = ", 
+        pvalue, sep="", "\n")
+      if (any(ch$expected < 5)) 
+        cat(">>> Low cell expected frequencies,",
+            "so chi-squared approximation may not be accurate", "\n")
+    }
+
+    else {
+      .ss.factor(x, by, brief=TRUE) 
+
+      cat("\n"); .dash(19); cat("Chi-square Analysis\n"); .dash(19); 
+      ch <- (summary(as.table(x)))
+      pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
+      cat("Number of cases (observations) in analysis:", ch$n.cases, "\n")
+      cat("Number of variables:", ch$n.vars, "\n")
+      cat("Test of independence: ", 
+          "  Chisq = ", ch$statistic, ", df = ", ch$parameter, ", p-value = ", 
+          pvalue, sep="", "\n")
+      if (!ch$approx.ok) 
+        cat(">>> Low cell expected frequencies,",
+            "so chi-squared approximation may not be accurate", "\n")
+    }
+  }
 
   cat("\n")
 

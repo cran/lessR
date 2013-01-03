@@ -1,5 +1,5 @@
 .reg3Residual <-
-function(nm, mydframe,
+function(lm.out, nm, 
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          res.sort, res.rows, cooks.cut,
          pdf, pdf.width, pdf.height) {
@@ -19,20 +19,20 @@ function(nm, mydframe,
     
     if (explain) {
       .dash(68)
-      cat("The identification of observations that have a large residual\n",
+      cat("The identification of cases that have a large residual\n",
           "and/or undue influence on the estimation of the model helps\n",
           "detect potential outliers.  Each of the following statistics is\n",
-          "calculated for a single observation (row of data).\n",
-         "\n",          
+          "calculated for a single case (row of data).\n",
+         "\n", 
           "residual: Value of the response variable ", nm[1], " minus its\n",
           "    fitted value.\n",
           "\n",
-          "rstudent: Studentized residual, standardized value of the residual\n",
-          "    from a model estimated without the observation present.\n",
+          "rstudent: Externally Studentized residual, standardized value of the\n",
+          "    residual from a model estimated without the case present.\n",
           "\n",
-          "dffits: The influence of an observation on its own fitted value.\n",
+          "dffits: The influence of an case on its own fitted value.\n",
          "\n",
-          "cooks: Cook's Distance, the aggregate influence of the observation\n",
+          "cooks: Cook's Distance, the aggregate influence of the case\n",
           "    on the estimation of the model coefficients.\n", sep="")
       .dash(68)
       cat("\n")
@@ -44,7 +44,10 @@ function(nm, mydframe,
       cat("   [sorted by Studentized Residual, ignoring + or - sign]\n")
     if (res.sort == "dffits")  
       cat("   [sorted by dffits, ignoring + or - sign]\n")
-    txt <- "observations (rows) of data]"
+    if (res.rows < n.keep)
+      txt <- "cases (rows) of data, or res.rows=\"all\"]"
+    else
+      txt="]"
     cat("   [res.rows = ", res.rows, " out of ", n.keep, " ", txt, sep="", "\n")
     .dash(68)
 
@@ -62,13 +65,14 @@ function(nm, mydframe,
     names(out)[n.vars+5] <- "cooks"
     if (res.sort != "off") {
       if (res.sort == "cooks") o <- order(out$cooks, decreasing=TRUE)
-      if (res.sort == "rstudent") o <- order(abs(out$rstudent),
-        decreasing=TRUE)
-      if (res.sort == "dffits") o <- order(abs(out$dffits),
-        decreasing=TRUE)
+      if (res.sort == "rstudent") o <- order(abs(out$rstudent), decreasing=TRUE)
+      if (res.sort == "dffits") o <- order(abs(out$dffits), decreasing=TRUE)
       out <- out[o,]
     }
-    print(round(out[1:res.rows,], digits=digits.d))
+    for (i in 1:(n.vars+5))
+      if (is.numeric(out[,i])) if (!is.integer(out[,i]))
+        out[,i] <- .fmt(out[,i],digits.d-1)
+    print(out[1:res.rows,])
     .dash(68)
     rm(out)
   
@@ -82,7 +86,7 @@ function(nm, mydframe,
     }
 
      .den.main(res, main="Evaluate Normality of Residuals", 
-       xlab="Residuals", text.out=FALSE,
+       xlab="Residuals", quiet=TRUE,
        bw="nrd0", type="both",
        bin.start=NULL, bin.width=NULL,
        col.fill=getOption("col.fill.pt"),
@@ -119,7 +123,7 @@ function(nm, mydframe,
     ord <- order(fit)
     fit.ord <- fit[ord]
     res.ord <- res[ord]
-    .plt.main(fit.ord, res.ord, by=NULL, type="p", text.out=FALSE,
+    .plt.main(fit.ord, res.ord, by=NULL, type="p", quiet=TRUE,
         main="Residuals vs Fitted Values", xlab="Fitted Values",
         ylab="Residuals", sub=txt, cex.sub=.8,
         col.area=NULL, col.box="black",
@@ -129,17 +133,14 @@ function(nm, mydframe,
         shape.pts=21, cex.axis=.85, col.axis="gray30",
         col.ticks="gray30", xy.ticks=TRUE,
         fit.line="none", center.line=NULL, cex=NULL, 
-        time.start=NULL, time.by=NULL, time.reverse=FALSE,
         col.bubble=NULL, bubble.size=.25, col.flower=NULL,
-        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
-        n.cat=getOption("n.cat"), kind="default")
-    abline(h=0, lty="dotted", col="gray70")
-    if (getOption("colors") == "gray") col.ftln <- "gray30" else col.ftln <- "plum"
-    lines(lowess(fit.ord, res.ord, f=.9), col=col.ftln)
+        ellipse=FALSE, n.cat=getOption("n.cat"), kind="default")
+    abline(h=0, lty="dotted", col=getOption("col.fill.bar"))
+    lines(lowess(fit.ord, res.ord, f=.9), col=getOption("col.stroke.pt"))
     res.c <- res[which(cook>=cooks.cut)]
     fit.c <- fit[which(cook>=cooks.cut)]
     if (length(fit.c) > 0) {
-      if (getOption("colors") == "gray") col.out <- "black" else col.out <- "red"
+      col.out <- getOption("col.stroke.pt")
       points(fit.c, res.c, col=col.out, pch=19)
       text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
     }

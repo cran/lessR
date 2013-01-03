@@ -1,5 +1,5 @@
 .logit4Pred <-
-function(nm, mydframe, my.formula, brief, res.rows,
+function(lm.out, nm, mydata, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          new.data, pred.sort, pred, pred.all, 
          numeric.all, in.data.frame, X1.new, 
@@ -82,13 +82,12 @@ function(nm, mydframe, my.formula, brief, res.rows,
        shape.pts=21, cex.axis=.85, col.axis="gray30",
        col.ticks="gray30", xy.ticks=TRUE,
        xlab=nm[2], ylab=nm[1], main="Scatterplot and Fitted Values",
-       cex=.8,    
+       cex=.8, kind="default",
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-       time.start=NULL, time.by=NULL, time.reverse=FALSE, kind="default",
        fit.line=fl, col.fit.line="grey55", center.line=NULL,
        col.bubble=NULL, bubble.size=.25, col.flower=NULL,
        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
-       text.out=FALSE, ylim=c(0,1))
+       quiet=TRUE, ylim=c(0,1))
 
     lines(lm.out$model[,nm[2]], p.int$fit, col=col.pts, lwd=2)
   }

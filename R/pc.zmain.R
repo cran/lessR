@@ -1,7 +1,7 @@
 .pc.main <- 
 function(x,
-         random.col, col.slices, col.low, col.hi,
-         colors, text.out, main, ...) {
+         random.col, col.fill, col.low, col.hi,
+         colors, quiet, main, ...) {
 
   # set the labels
   # use variable label for main if it exists and main not specified
@@ -68,9 +68,9 @@ function(x,
     if (random.col) clr <- clr[sample(length(clr))]
   }
 
-  if (!is.null(col.slices)) {
-    for (i in 1:(min(length(col.slices),length(clr)))) clr[i] <- col.slices[i]
-    ncolors <- min(length(col.slices),length(clr))
+  if (!is.null(col.fill)) {
+    for (i in 1:(min(length(col.fill),length(clr)))) clr[i] <- col.fill[i]
+    ncolors <- min(length(col.fill),length(clr))
   }
 
   palette(clr)
@@ -83,7 +83,7 @@ function(x,
 # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
 
   # text output
-  if (text.out) .ss.factor(x, brief=TRUE) 
+  if (!quiet) .ss.factor(x, brief=TRUE) 
 
   cat("\n")
 

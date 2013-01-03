@@ -8,16 +8,18 @@
 \description{
 Abbreviation: \code{dn}
 
-Plots a normal density curve and/or a general density curve superimposed over a histogram, all estimated from the data. Also reports the Shapiro-Wilk normality test.
+Plots a normal density curve and/or a general density curve superimposed over a histogram, all estimated from the data. Also reports the Shapiro-Wilk normality test and summary statistics.
 }
 
 \usage{
-Density(x, dframe=mydata, 
+Density(x, data=mydata, 
+
        bw="nrd0", type=c("both", "general", "normal"),
-       bin.start=NULL, bin.width=NULL, text.out=TRUE,
+       bin.start=NULL, bin.width=NULL,
 
        col.fill=getOption("col.fill.pt"),
-       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+       col.bg=getOption("col.bg"),
+       col.grid=getOption("col.grid"),
 
        col.nrm="black", col.gen="black",
        col.fill.nrm="transparent", col.fill.gen="transparent",
@@ -26,7 +28,7 @@ Density(x, dframe=mydata,
        x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
 
-       pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+       quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 dn(\ldots)
 den(\ldots)
@@ -34,14 +36,13 @@ den(\ldots)
 
 \arguments{
   \item{x}{Variable for which to construct the histogram and density plot.}
-  \item{dframe}{Data frame that contains the variable of interest, default is \code{mydata}.}
+  \item{data}{Data frame that contains the variable of interest, default is \code{mydata}.}
   \item{bw}{Bandwidth of kernel estimation.}
   \item{type}{Type of density curve plotted.  By default, both the general
        density and the normal density are plotted.}
   \item{bin.start}{Optional specified starting value of the bins.}
   \item{bin.width}{Optional specified bin width, which can be specified with or without 
         a \code{bin.start} value.}
-  \item{text.out}{If \code{TRUE}, then display text output in console.}
   \item{col.fill}{Default (for default color theme of \code{"blue"}) is to
        display the histogram in a light gray.  To suppress, the histogram,
        specify a color of \code{"transparent"}.}
@@ -67,6 +68,7 @@ den(\ldots)
   \item{x.max}{Largest value of the variable x plotted on the x-axis.}
   \item{band}{If \code{TRUE}, add a rug plot, a direct display of density in the form of a
         narrow band beneath the density curve}
+  \item{quiet}{If set to \code{TRUE}, no text output.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -88,13 +90,13 @@ The limits for the axes are automatically calculated so as to provide sufficient
 If \code{x.pt} is specified, then \code{type} is set to general and \code{y.axis} set to \code{TRUE}.
 
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
+If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
 
 COLOR THEME\cr
-Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black backgound, no gridlines and partial transaparency of plotted colors. 
+Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
 
 VARIABLE LABELS\cr
-Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
+If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 PDF OUTPUT\cr
 Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
@@ -159,7 +161,7 @@ Density(X)
 # access the breaks variable in the R provided warpbreaks data set
 # although data not attached, access the variable directly by its name
 data(warpbreaks)
-Density(breaks, dframe=warpbreaks)
+Density(breaks, data=warpbreaks)
 }
 
 

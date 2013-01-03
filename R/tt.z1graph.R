@@ -1,5 +1,5 @@
 .OneGraph <-
-function(YA, bw1, Ynm, digits.d, brief, 
+function(YA, bw1, Ynm, y.lbl, digits.d, brief, 
          n1, m1, mu0, mdiff, sw, smd, mmd, msmd,
          clpct, tvalue, pvalue, ub, lb,
          show.title, pdf.file, pdf.width, pdf.height) {
@@ -23,19 +23,25 @@ function(YA, bw1, Ynm, digits.d, brief,
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
   # colors
-  col.1 <- rgb(.63,.46,.15)
-  col.1t <- rgb(.63,.46,.15, alpha=.5)
+  if (getOption("colors") != "gray") {
+    col.1 <- rgb(.63,.46,.15)
+    col.1t <- rgb(.63,.46,.15, alpha=.5)
+  }
+  else {
+    col.1 <- rgb(.40,.40,.40)
+    col.1t <- rgb(.40,.40,.40, alpha=.5)
+  }
   col.2 <- rgb(.49,.56,.69)
-  col.2t <- rgb(.49,.56,.69, alpha=.5)
 
   # plot: set up coordinate system
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  par(mar=c(3,1.5,8,.4), mgp=c(2,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
+  par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
   plot.new()
   plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
   axis(1); box()
-  title(xlab=Ynm)
+  if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
+  title(xlab=y.lbl)
 
   xleft <- par("usr")[1]  # left side of graph
   xright <- par("usr")[2]  # right side of graph
@@ -44,7 +50,10 @@ function(YA, bw1, Ynm, digits.d, brief,
 
   # vertical line for mean
   lines(c(m1,m1), c(0,ytop), lty="solid", lwd=2, col=col.1)
-  lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=2, col=col.2)
+  if (getOption("colors") != "gray")
+    lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=2, col=col.2)
+  else
+    lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=2, col=col.1)
 
   # curve area
   polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1t, border=NA, 
@@ -66,13 +75,13 @@ function(YA, bw1, Ynm, digits.d, brief,
     ll <- mid - .5*mmd  # line left
     lines(c(lr,lr), c(ybot+.44*max.y,ytop-.44*max.y), lty="solid", lwd=2, col=col.e)
     lines(c(ll,ll), c(ybot+.44*max.y,ytop-.44*max.y), lty="solid", lwd=2, col=col.e)
-    text(mid, ybot+.41*max.y, label=toString(round(mmd,2)), col=col.e)
-    text(mid, ytop-.41*max.y, label=toString(round(msmd,2)), col=col.e)
+    text(mid, ybot+.41*max.y, label=toString(.fmt(mmd,2)), col=col.e)
+    text(mid, ytop-.41*max.y, label=toString(.fmt(msmd,2)), col=col.e)
     text(mid, ybot+.38*max.y, label="mmd", col=col.e)
     text(mid, ytop-.375*max.y, label="msmd", col=col.e)
   }
 
-  # scale for s-pooled, d, mdiff at top of graph
+  # scale for s at top of graph
   mlow <- min(m1, mu0)
   mhi  <- max(m1, mu0)
   col.d.unit <- "gray30"
@@ -100,7 +109,7 @@ function(YA, bw1, Ynm, digits.d, brief,
   text((m1+mu0)/2, ytop-.11*max.y, label="d")
 
   # print mdiff value towards bottom  
-  text((m1+mu0)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d-1))
+  text((m1+mu0)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d))
   # horiz bar connects means
   segments(mlow, ybot+.09*max.y, mhi, ybot+.09*max.y, col=col.d.unit, lwd=2)
   # print diff towards bottom

@@ -1,6 +1,6 @@
 .den.main <- 
-function(x, dframe, 
-         bw, type, bin.start, bin.width, text.out,
+function(x, data, 
+         bw, type, bin.start, bin.width, quiet,
          col.fill, col.bg, col.grid, col.nrm, col.gen,
          col.fill.nrm, col.fill.gen,
          cex.axis, col.axis, col.ticks,
@@ -65,7 +65,7 @@ function(x, dframe,
     if (is.null(x.min)) x.min <- min(d.gen$x)
     if (is.null(x.max)) x.max <- mx + abs(min.dev.x)
   }
-  if (abs(max.dev.x) > abs(min.dev.x)) {
+  if (abs(max.dev.x) >= abs(min.dev.x)) {
     if (is.null(x.min)) x.min <- mx - abs(max.dev.x)
     if (is.null(x.max)) x.max <- max(d.gen$x)
   }
@@ -84,10 +84,9 @@ function(x, dframe,
   suppressWarnings(plot(h, border="transparent", freq=FALSE, xlab=x.lab,
      ylab=y.lab, main=main.lab, xlim=c(x.min,x.max), ylim=c(0,max.y), 
      axes=FALSE, ...))
-  suppressWarnings(axis(1,
-       cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...))
-  if (y.axis) suppressWarnings(axis(2,
-       cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...))
+  axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
+  if (y.axis) 
+    axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
   
   # colored background for plotting area
   usr <- par("usr")
@@ -128,7 +127,10 @@ function(x, dframe,
   }
 
   # text output
-  if (text.out) {
+  if (!quiet) {
+ 
+    # summarize data
+    .ss.numeric(x, brief=TRUE)
 
     cat("\nDensity bandwidth for general curve: ", .fmt(d.gen$bw,4), sep="", "\n")
     cat("For a smoother curve, increase bandwidth with option: bw\n")

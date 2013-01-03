@@ -1,6 +1,6 @@
 .ANOVAz1 <- 
-function(y.values, x.values, nm, n.obs, digits.d, brief,
-         pdf=FALSE, pdf.width=5, pdf.height) {
+function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
+         pdf, pdf.width, pdf.height) {
 
   p <- length(unique(na.omit(x.values)))
 
@@ -77,7 +77,7 @@ function(y.values, x.values, nm, n.obs, digits.d, brief,
      fit.line="none", col.fit.line="grey55", center.line=NULL,
      col.bubble=NULL, bubble.size=.25, col.flower=NULL,
      ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
-     text.out=FALSE)
+     quiet=TRUE)
 
   if (pdf) {
     dev.off()
@@ -133,6 +133,7 @@ function(y.values, x.values, nm, n.obs, digits.d, brief,
     cex.axis <- .8; col.axis <- "gray30"; col.ticks <- "gray30"
     suppressWarnings(plot(HSD, 
       cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, las=1))
+
 
     if (pdf) {
       dev.off()
