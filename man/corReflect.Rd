@@ -45,7 +45,7 @@ Define the constituent variables, the items, with a listing of each variable by 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{cr}}.
+\code{\link{Correlation}}.
 }
 
 \examples{

@@ -1,9 +1,7 @@
 .rec.main <-
-function(x, x.name, new.var, old, new, ivar, dframe, dframe.name,
-         brief, keep) {
+function(x, x.name, new.var, old, new, ivar, n.obs, dname, quiet) {
 
   n.values <- length(old)
-  n.obs <- nrow(dframe)
 
   miss.old <- FALSE
   if (!is.null(old)) if (old[1] == "missing") miss.old <- TRUE
@@ -24,21 +22,22 @@ function(x, x.name, new.var, old, new, ivar, dframe, dframe.name,
   }
 
   # text output
-  if (ivar == 1) {
-    cat("\nRecoding Specification\n")
-    .dash(22)
-    for (i in 1:n.values) cat("  ", old[i], "-->", new[i], "\n")
-    cat("\n")
-    if (miss.new)
-      cat("\nR represents missing data with a NA for 'not assigned'.\n\n")
-    cat("Number of observations (rows) to recode:", n.obs, "\n")
-    if (is.null(new.var))
-      cat("\nReplace existing values of each specified variable",
-          ", no value for option: new.var\n", sep="")
-  }
-  cat("\n")
+  if (!quiet) {
 
-  if (!brief) {
+    if (ivar == 1) {
+      cat("\nRecoding Specification\n")
+      .dash(22)
+      for (i in 1:n.values) cat("  ", old[i], "-->", new[i], "\n")
+      cat("\n")
+      if (miss.new)
+        cat("\nR represents missing data with a NA for 'not assigned'.\n\n")
+      cat("Number of cases (rows) to recode:", n.obs, "\n")
+      if (is.null(new.var))
+        cat("\nReplace existing values of each specified variable",
+            ", no value for option: new.var\n", sep="")
+    }
+    cat("\n")
+
     old.unique <- sort(unique(x))
     n.unique <- length(old.unique)
     cat("---  Recode:", x.name, "---------------------------------\n")
@@ -63,7 +62,7 @@ function(x, x.name, new.var, old, new, ivar, dframe, dframe.name,
     cat("Number of values of", x.name, "to recode:", n.values, "\n")
 
     if (!is.null(new.var)) cat("Recode to variable:", new.var, "\n")
-  } 
+  }  # end text 
 
   if (class(x) == "factor") x <- as.character(x)
 
@@ -81,16 +80,6 @@ function(x, x.name, new.var, old, new, ivar, dframe, dframe.name,
     } 
   }
 
-  # insert transformation into dframe
-  nm <- names(dframe)
-  if (is.null(new.var))
-    dframe[, which(nm == x.name)] <- new.x
-  else {
-    dframe <- cbind(dframe, new.x)
-    names(dframe) <- c(nm, new.var)
-  }
-
-  # write the new data frame
-  if (keep) assign(dframe.name, dframe, pos=.GlobalEnv)
+  return(new.x)
  
 }

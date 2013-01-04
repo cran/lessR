@@ -1,5 +1,5 @@
 .logit3Residual <-
-function(nm, mydframe,
+function(lm.out, nm, mydata,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          res.sort, res.rows, cooks.cut,
          pdf, pdf.width, pdf.height) {
@@ -12,7 +12,7 @@ function(nm, mydframe,
       cat("   [sorted by Studentized Residual, ignoring + or - sign]\n")
    if (res.sort == "dffits")  
       cat("   [sorted by dffits, ignoring + or - sign]\n")
-    txt <- "observations (rows) of data]"
+    txt <- "cases (rows) of data]"
     cat("   [res.rows = ", res.rows, " out of ", n.keep, " ", txt, sep="", "\n")
     .dash(68)
 
@@ -48,7 +48,7 @@ function(nm, mydframe,
     }
 
     .den.main(res, main="Evaluate Normality of Residuals", 
-       xlab="Residuals", text.out=FALSE, 
+       xlab="Residuals", quiet=TRUE, 
        bw="nrd0", type="both",
        bin.start=NULL, bin.width=NULL,
        col.fill=getOption("col.fill.pt"),
@@ -85,7 +85,7 @@ function(nm, mydframe,
     ord <- order(fit)
     fit.ord <- fit[ord]
     res.ord <- res[ord]
-    .plt.main(fit.ord, res.ord, by=NULL, type="p", text.out=FALSE,
+    .plt.main(fit.ord, res.ord, by=NULL, type="p", quiet=TRUE,
         main="Residuals vs Fitted Values", xlab="Fitted Values",
         ylab="Residuals", sub=txt, cex.sub=.8,
         col.area=NULL, col.box="black",
@@ -96,10 +96,8 @@ function(nm, mydframe,
         cex.axis=.85, col.axis="gray30",
         col.ticks="gray30", xy.ticks=TRUE,
         fit.line="none", center.line=NULL, cex=NULL, 
-        time.start=NULL, time.by=NULL, time.reverse=FALSE,
         col.bubble=NULL, bubble.size=.25, col.flower=NULL,
-        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
-        n.cat=getOption("n.cat"), kind="default")
+        ellipse=FALSE, n.cat=getOption("n.cat"), kind="default")
     abline(h=0, lty="dotted", col="gray70")
     if (getOption("colors") == "gray") col.ftln <- "gray30" else col.ftln <- "plum"
     lines(lowess(fit.ord, res.ord, f=.9), col=col.ftln)

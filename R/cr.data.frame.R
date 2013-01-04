@@ -1,7 +1,7 @@
 .cr.data.frame <-
 function(x, miss, show.n, n.cat, digits.d,
-         heat.map, main, bottom, right, 
-         pdf.file, pdf.width, pdf.height, ...)  {
+         graphics, main, bottom, right, 
+         pdf, pdf.width, pdf.height, ...)  {
 
   if (!is.null(digits.d) && digits.d<1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",      
@@ -74,7 +74,6 @@ function(x, miss, show.n, n.cat, digits.d,
 
   # calculate correlations, store in mycor
   myc <- round(cor(x, use=miss.type, ...), digits=max.digits)
-  assign("mycor", myc, pos=.GlobalEnv) 
 
   n.vars <- nrow(myc)
   cat("\nCorrelation matrix calculated\n",
@@ -95,12 +94,12 @@ function(x, miss, show.n, n.cat, digits.d,
       }
     }
     options(xname = "Missing Data Analysis")
-    .ss.factor(as.vector(n), brief=TRUE)
     tot.miss <- sum(is.na(x))
     if (tot.miss == 0) 
-      cat(">>> No missing data\n\n")
+      cat("\n>>> No missing data\n\n")
     else {
-      if (n.vars <=15) 
+      .ss.factor(as.vector(n), brief=TRUE)
+      if (n.vars <= 15  ||  show.n) 
         print(n)
       else
         cat("To view the sample size for each correlation coefficient, re-run the\n",
@@ -120,10 +119,57 @@ function(x, miss, show.n, n.cat, digits.d,
     cat("\n\nTo view the correlation matrix, enter:  mycor\n\n")
   }
 
-  if (heat.map  && ncol(x)>3) {
-    if (is.null(main)) main <- "Correlations"
-   .corcolors(mycor, n.vars, main, bottom, right, diag=0,
-              pdf.file, pdf.width, pdf.height)
-  }
+
+  if (graphics  ||  pdf) {
+
+    # set up graphics system for to 2 windows
+    if (!pdf) {
+      .graphwin(2)
+      dev.set(which=3)
+    }
+    else { 
+      pdf.file <- "Cor_SPmatrix.pdf"
+      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    }
   
+    # scatter plot matrix
+    col.pts <- getOption("col.stroke.pt")
+    suppressWarnings(pairs(x, panel=panel.smooth,
+                     col=col.pts, col.smooth="black", lwd=1.5))
+
+    if (pdf) {  # terminate pdf graphics
+      dev.off()
+      .showfile(pdf.file, "scatter plot matrix")
+    }
+
+    # heat map
+    if (!pdf) 
+      dev.set(which=4) 
+    else { 
+      pdf.file <- "Cor_HeatMap.pdf"
+      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    }
+
+    if (is.null(main)) main <- "Correlations"
+
+    for (i in 1:n.vars) mycor[i,i] <- 0
+    cat("\nNote: To provide more color separation for off-diagonal\n",
+        "      elements, the diagonal elements of the matrix for\n",
+        "      computing the heat map are set to 0.\n", sep="")
+
+    max.color <- getOption("col.heat")
+    hmcols <- colorRampPalette(c("white",max.color))(256)
+
+    heatmap(mycor[1:n.vars,1:n.vars], Rowv=NA, Colv="Rowv", symm=TRUE,
+      col=hmcols, margins=c(bottom, right), main=main)
+
+    if (pdf) {  # terminate pdf graphics
+      dev.off()
+      .showfile(pdf.file, "heat map")
+      cat("\n\n")
+    }
+  }
+
+  return(myc)
+
 }

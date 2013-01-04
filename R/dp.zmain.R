@@ -2,8 +2,8 @@
 function(x, by,
          col.fill, col.stroke, col.bg, col.grid, shape.pts,
          cex.axis, col.axis, col.ticks, xlab, main, cex,
-         pt.reg, pt.out, 
-         col.out30, col.out15, text.out, new, ...) {
+         method, pt.reg, pt.out, 
+         col.out30, col.out15, quiet, new, ...) {
 
 
   if (is.null(cex)) pt.size <- 0.8 else pt.size <- cex
@@ -13,15 +13,22 @@ function(x, by,
         "The variable cannot be an R factor (categorical).\n")
   }
 
-  if (getOption("colors") == "gray") {
-    col.out30 <- "black"
-    col.out15 <- "gray30"
+  # outlier points shapes and colors for gray scales
+  if (getOption("colors") %in% c("gray", "gray.black")) {
     pt.out30 <- 23
     pt.out15 <- 22
   }
   else {
     pt.out30 <- pt.out
     pt.out15 <- pt.out
+  }
+  if (getOption("colors") == "gray") {
+    col.out30 <- "black"
+    col.out15 <- "gray30"
+  }
+  else if (getOption("colors") == "gray.black") {
+    col.out30 <- "gray95"
+    col.out15 <- "gray60"
   }
 
   # get variable labels if exist plus axes labels
@@ -31,7 +38,7 @@ function(x, by,
   by.name <- getOption("byname")
 
   # text output (before remove missing)
-  if (text.out && new) .ss.numeric(x, brief=TRUE)
+  if (!quiet && new) .ss.numeric(x, brief=TRUE)
 
   n <- sum(!is.na(x))
   n.miss <- sum(is.na(x))
@@ -73,10 +80,12 @@ function(x, by,
              col=col.out30, bg=col.out30, pch=pt.out30, ...)
 
   # dp for regular points
-  if (is.null(by)) 
-
-    suppressWarnings(stripchart(x[x>lo15 & x<up15], add=TRUE, method="stack",
-                     col=col.stroke, pch=pt.reg, bg=col.fill, ...))
+  if (is.null(by)) {
+    trans.pts <- getOption("trans.fill.pt")
+    clr.trn <- .maketrans(col.fill, (1-trans.pts)*256)
+    suppressWarnings(stripchart(x[x>lo15 & x<up15], add=TRUE, method=method,
+                     col=col.stroke, pch=pt.reg, bg=clr.trn, ...))
+  }
 
     else {  # by grouping variable
       n.levels <- nlevels(by)

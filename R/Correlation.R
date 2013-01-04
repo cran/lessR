@@ -1,105 +1,127 @@
 Correlation <-
-function(x, y, dframe=mydata, # x can be a data frame, or variables in a data frame
+function(x, y, data=mydata, # x can be a data frame, or variables in a data frame
          miss=c("pairwise", "listwise", "everything"),
          show.n=NULL, brief=FALSE, n.cat=getOption("n.cat"),
-         digits.d=NULL, heat.map=TRUE, main=NULL, bottom=3, right=3,
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         digits.d=NULL, graphics=FALSE,
+         main=NULL, bottom=3, right=3,
+         pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
 
   miss <- match.arg(miss)
 
-  xx <- deparse(substitute(x))
+  if (!graphics && !pdf)
+    cat("\n>>> To view a heat map and scatter plot matrix set:  graphics=TRUE\n")
+  
+  x.name <- deparse(substitute(x))
 
-  is.dframe <- FALSE  # is data frame
+  is.data <- FALSE  # is data frame
 
-  if (missing(x)) {
-    x.name <- ""  # in case x is missing, i.e., data frame mydata
-    is.dframe <- TRUE
-    dframe <- eval(substitute(mydata))
-  }
+  if (missing(y)) {  # is a data frame or a list of variables
 
-  else
-    if ( (!grepl(":", xx) && !grepl(",", xx)) && missing(y) ) {   # not a variable(s)
-      if (is.data.frame(x)) {
+    if (missing(x)) {
+      x.name <- ""  # in case x is missing, i.e., data frame mydata
+      is.data <- TRUE
+      data <- eval(substitute(mydata))
+    }
+
+    else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {   # not a var
+      if (is.data.frame(x)) {  # specified data name
+        x.name <- deparse(substitute(x)) 
+        options(xname = x.name)
+
+        if (exists(x.name, where=.GlobalEnv)) {
+          data <- x
+          is.data <- TRUE
+        }
+      }
+    } 
+
+    else {
+      # get actual variable name or list of names from data
       x.name <- deparse(substitute(x)) 
       options(xname = x.name)
 
-      if (exists(x.name, where=.GlobalEnv)) {
-        dframe <- x
-        is.dframe <- TRUE
+
+      all.vars <- as.list(seq_along(data))
+      names(all.vars) <- names(data)
+
+      # proceed here only if x.name is in data or is a list
+      if ( (x.name %in% names(all.vars)) || grepl(":", x.name) || grepl(",", x.name) ) {
+        x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
+
+        # if x is a variable list, create subset data frame
+        if (length(x.col) > 1) {
+          data <- data[, x.col]
+          is.data <- TRUE
+        }
       }
-    }
-  } 
-
-  else {
-
-    # get actual variable name or names
-    x.name <- deparse(substitute(x)) 
-    options(xname = x.name)
-
-    all.vars <- as.list(seq_along(dframe))
-    names(all.vars) <- names(dframe)
-    x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
-
-    # if x is a variable list, create subset data frame
-    if (length(x.col) > 1) {
-      dframe <- dframe[, x.col]
-      is.dframe <- TRUE
     }
   }
 
 
-  if (!is.dframe) {
+  if (!is.data) {
 
-    dframe.name <- deparse(substitute(dframe))
+    dname <- deparse(substitute(data))
+    options(dname = dname)
 
-    # get conditions and check for dframe existing
-    xs <- .xstatus(x.name, dframe.name)
+    # get conditions and check for data existing
+    xs <- .xstatus(x.name, dname)
     is.frml <- xs$ifr
     in.global <- xs$ig 
 
     # see if the variable exists in data frame, if x not in Global Env 
-    if (!in.global) .xcheck(x.name, dframe.name, dframe)
+    if (!in.global) .xcheck(x.name, dname, data)
 
-    if (in.global) x.call <- x else x.call <- eval(substitute(dframe$x))
+    if (in.global) x.call <- x else x.call <- eval(substitute(data$x))
 
     # evaluate y
     if (!missing(y)) {
 
-      # get actual variable name before potential call of dframe$x
+      # get actual variable name before potential call of data$x
       y.name <- deparse(substitute(y)) 
       options(yname = y.name)
 
       # see if y exists from a function call
       # indicate a function call with sys.frame returns larger than 1 
-      if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
-        in.call <- TRUE else in.call <- FALSE
+      #if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
+        #in.call <- TRUE else in.call <- FALSE
+      in.call <- FALSE
 
-      # get conditions and check for dframe existing
+      # get conditions and check for data existing
       if (!in.call) {
-        xs <- .xstatus(y.name, dframe.name)
+        xs <- .xstatus(y.name, dname)
         in.global <- xs$ig 
       }
       else in.global <- FALSE
 
       # see if var exists in data frame, if x not in Global Env or function call 
-      if (!in.global && !in.call) .xcheck(y.name, dframe.name, dframe)
+      if (!in.global && !in.call) .xcheck(y.name, dname, data)
 
       if (in.global) y.call <- y 
-      else y.call <- eval(substitute(dframe$y))
+      else y.call <- eval(substitute(data$y))
     }
-    else {
+    else
       y.call <- NULL
-      if (is.null(show.n))
-        if (nrow(dframe) <= 15) show.n <- TRUE else show.n <- FALSE
-    }
 
   }  # x not data frame
 
-  if (is.dframe) 
-    .cr.data.frame(dframe, miss, show.n, n.cat, digits.d,
-                   heat.map, main, bottom, right, 
-                   pdf.file, pdf.width, pdf.height, ...) 
-  else
-    .cr.default(x.call, y.call, brief, ...) 
+  if (is.data) { 
+    if (is.null(show.n))
+      if (nrow(data) <= 15) show.n <- TRUE else show.n <- FALSE
+    .cr.data.frame(data, miss, show.n, n.cat, digits.d,
+                   graphics, main, bottom, right, 
+                   pdf, pdf.width, pdf.height, ...) 
+    }
+
+  else {
+  
+    if (pdf) {
+      cat("\n");   warning(call.=FALSE, "\n","------\n",
+        " To produce a scatter plot, use the function:  ScatterPlot\n",
+        " No graphics produced here and yet pdf is specified.\n\n",
+         sep="")
+     }
+
+    .cr.main(x.call, y.call, brief, ...) 
+  }
 
 }

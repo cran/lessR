@@ -62,7 +62,7 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
     cat("mu0 =", mu0, "\n")
   }
   
-  # power curve for two groups, assuming mean diff of 0
+  # power curve for two groups, assuming mean difference of 0
   if (mytype == "two.sample") {
     cat("------------------------------------------------------------\n")
     

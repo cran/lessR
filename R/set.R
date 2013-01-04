@@ -1,13 +1,14 @@
 set <-
 function(colors=c("blue", "gray", "rose", "green", "gold", "red",
-                  "orange", "dodgerblue", "purple"),
+         "dodgerblue", "purple", "sienna", "orange.black",
+         "gray.black"),
 
          col.fill.bar=NULL, trans.fill.bar=NULL,
          col.fill.pt=NULL, trans.fill.pt=NULL,
          col.stroke.bar=NULL, col.stroke.pt=NULL, 
          col.bg=NULL, col.grid=NULL, col.heat=NULL, ghost=NULL,
 
-         n.cat=4, width=120, show=FALSE) {
+         n.cat=getOption("n.cat"), width=120, show=FALSE) {
 
   to256 <- function(trans.level) trn <- (1-getOption(trans.level))*256
 
@@ -21,7 +22,7 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
   if (!is.null(ghost)) if (ghost) {
     options(trans.fill.bar = 0.66)
     if (getOption("colors") == "blue")
-      options(col.fill.bar = .maketrans("lightsteelblue", to256("trans.fill.bar")))
+      options(col.fill.bar = .maketrans("lightsteelblue3", to256("trans.fill.bar")))
     if (getOption("colors") == "gray")
       options(col.fill.bar = .maketrans("gray30", to256("trans.fill.bar")))
     if (getOption("colors") == "orange")
@@ -38,6 +39,8 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
       options(col.fill.bar = .maketrans("dodgerblue3", to256("trans.fill.bar")))
     if (getOption("colors") == "purple")
       options(col.fill.bar = .maketrans("purple1", to256("trans.fill.bar")))
+    if (getOption("colors") == "sienna")
+      options(col.fill.bar = .maketrans("sienna3", to256("trans.fill.bar")))
   }
   else {
     colors <- getOption("colors")
@@ -78,9 +81,9 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
     theme <- options("colors")
     if (theme == "blue") {
       if (is.null(col.fill.bar)) 
-        options(col.fill.bar = .maketrans("lightsteelblue", to256("trans.fill.bar")))
+        options(col.fill.bar = .maketrans("lightsteelblue3", to256("trans.fill.bar")))
       if (is.null(col.fill.pt))
-        options(col.fill.pt = .maketrans("lightsteelblue", to256("trans.fill.pt")))
+        options(col.fill.pt = .maketrans("lightsteelblue3", to256("trans.fill.pt")))
       if (is.null(col.stroke.bar)) options(col.stroke.bar = "slategray")
       if (is.null(col.stroke.pt)) options(col.stroke.pt = "darkblue")
       if (is.null(col.bg)) options(col.bg = "ghostwhite")
@@ -148,7 +151,40 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
       if (is.null(col.grid)) if (is.null(col.grid)) options(col.grid="lavenderblush2")
       if (is.null(col.heat)) options(col.heat = "darkred")
     }
-    if (theme == "orange") {
+    if (theme == "dodgerblue") {
+      if (is.null(col.fill.bar))
+        options(col.fill.bar = .maketrans("dodgerblue3", to256("trans.fill.bar")))
+      if (is.null(col.fill.pt))
+        options(col.fill.pt = .maketrans("dodgerblue3", to256("trans.fill.pt")))
+      if (is.null(col.stroke.bar)) options(col.stroke.bar = "steelblue4")
+      if (is.null(col.stroke.pt)) options(col.stroke.pt = "steelblue4")
+      if (is.null(col.bg)) options(col.bg = rgb(232,234,236, maxColorValue=256))
+      if (is.null(col.grid)) options(col.grid = "snow3")
+      if (is.null(col.heat)) options(col.heat = "dodgerblue4")
+    }
+    if (theme == "purple") {
+      if (is.null(col.fill.bar))
+        options(col.fill.bar = .maketrans("purple1", to256("trans.fill.bar")))
+      if (is.null(col.fill.pt))
+        options(col.fill.pt = .maketrans("purple1", to256("trans.fill.pt")))
+      if (is.null(col.stroke.bar)) options(col.stroke.bar = "purple4")
+      if (is.null(col.stroke.pt)) options(col.stroke.pt = "purple4")
+      if (is.null(col.bg)) options(col.bg = "lavenderblush")
+      if (is.null(col.grid)) options(col.grid = "lavenderblush3")
+      if (is.null(col.heat)) options(col.heat = "purple4")
+    }
+    if (theme == "sienna") {
+      if (is.null(col.fill.bar))
+        options(col.fill.bar = .maketrans("sienna3", to256("trans.fill.bar")))
+      if (is.null(col.fill.pt))
+        options(col.fill.pt = .maketrans("sienna3", to256("trans.fill.pt")))
+      if (is.null(col.stroke.bar)) options(col.stroke.bar = "sienna4")
+      if (is.null(col.stroke.pt)) options(col.stroke.pt = "sienna4")
+      if (is.null(col.bg)) options(col.bg = "seashell1")
+      if (is.null(col.grid)) options(col.grid = "seashell2")
+      if (is.null(col.heat)) options(col.heat = "sienna3")
+    }
+    if (theme == "orange.black") {
       if (is.null(col.fill.bar)) options(col.fill.bar = rgb(249,99,2, alpha=to256("trans.fill.bar"),
         maxColorValue=256))
       if (is.null(col.fill.pt)) options(col.fill.pt = rgb(249,99,2, alpha=to256("trans.fill.pt"),
@@ -159,27 +195,16 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
       if (is.null(col.grid)) options(col.grid = rgb(100,100,100, maxColorValue=256))
       if (is.null(col.heat)) options(col.heat = "darkorange3")
     }
-    if (theme == "dodgerblue") {
+    if (theme == "gray.black") {
       if (is.null(col.fill.bar))
-        options(col.fill.bar = .maketrans("dodgerblue3", to256("trans.fill.bar")))
+        options(col.fill.bar = .maketrans("gray55", to256("trans.fill.bar")))
       if (is.null(col.fill.pt))
-        options(col.fill.pt = .maketrans("dodgerblue3", to256("trans.fill.pt")))
-      if (is.null(col.stroke.bar)) options(col.stroke.bar = "steelblue")
-      if (is.null(col.stroke.pt)) options(col.stroke.pt = "steelblue")
-      if (is.null(col.bg)) options(col.bg = "aliceblue")
-      if (is.null(col.grid)) options(col.grid = "gray91")
-      if (is.null(col.heat)) options(col.heat = "dodgerblue4")
-    }
-    if (theme == "purple") {
-      if (is.null(col.fill.bar))
-        options(col.fill.bar = .maketrans("purple1", to256("trans.fill.bar")))
-      if (is.null(col.fill.pt))
-        options(col.fill.pt = .maketrans("purple1", to256("trans.fill.pt")))
-      if (is.null(col.stroke.bar)) options(col.stroke.bar = "purple3")
-      if (is.null(col.stroke.pt)) options(col.stroke.pt = "purple3")
-      if (is.null(col.bg)) options(col.bg = "lavenderblush")
-      if (is.null(col.grid)) options(col.grid = "lavenderblush3")
-      if (is.null(col.heat)) options(col.heat = "purple4")
+        options(col.fill.pt = .maketrans("gray75", to256("trans.fill.pt")))
+      if (is.null(col.stroke.bar)) options(col.stroke.bar = "gray20")
+      if (is.null(col.stroke.pt)) options(col.stroke.pt = "gray95")
+      if (is.null(col.bg)) options(col.bg = "black")
+      if (is.null(col.grid)) options(col.grid = "gray30")
+      if (is.null(col.heat)) options(col.heat = "gray30")
     }
   }
   if (!missing(ghost)) {
@@ -201,6 +226,7 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
     cat("Background color:", getOption("col.bg"), "\n")
     cat("Grid color:", getOption("col.grid"), "\n")
     cat("Heat map color:", getOption("col.heat"), "\n")
+    if (is.null(ghost)) ghost <- FALSE
     cat("Ghost colors:", getOption("ghost"), "\n")
     cat("\n")
     cat("Number of categories:", getOption("n.cat"), "\n")

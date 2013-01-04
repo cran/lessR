@@ -1,5 +1,5 @@
 wrt.r <-
-function(..., type="R")
+function(..., format="R")
 
-  Write(..., type="R")
+  Write(..., format="R")
 

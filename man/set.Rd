@@ -8,14 +8,15 @@ Each graph is based on a default color theme. The original default is \code{colo
 
 \usage{
 set(colors=c("blue", "gray", "rose", "green", "gold", "red",
-                  "orange", "dodgerblue", "purple"),
+        "dodgerblue", "purple", "sienna", "orange.black",
+        "gray.black"),
 
          col.fill.bar=NULL, trans.fill.bar=NULL,
          col.fill.pt=NULL, trans.fill.pt=NULL,
          col.stroke.bar=NULL, col.stroke.pt=NULL, 
          col.bg=NULL, col.grid=NULL, col.heat=NULL, ghost=NULL,
 
-         n.cat=4, width=120, show=FALSE)
+         n.cat=getOption("n.cat"), width=120, show=FALSE)
 }
 
 
@@ -35,11 +36,11 @@ set(colors=c("blue", "gray", "rose", "green", "gold", "red",
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines.}
   \item{col.heat}{Color of the heat map for correlation matrices.}
-  \item{ghost}{Add a black background, transparent gridlines and transparency
+  \item{ghost}{Add a black background, transparent grid lines and transparency
        for the bars. Overrides individual settings for those values.}
   \item{n.cat}{Number of categories, which specifies the largest number of unique
         values of variable of a numeric data type for which the variable will be
-        analyzed as categorical. Set to 0 to turn off.}
+        analyzed as categorical. Default is turned off, a value of 0.}
   \item{width}{Maximum width of each line displayed at the console, just accesses
         the standard R options function for width.}
   \item{show}{Option for showing all settings.}
@@ -51,7 +52,7 @@ Sets the default color palette via the R \code{\link{options}} statement, as wel
 
 The gray color scheme is based on the colors used in Hadley Wickham's \code{ggplot2} package.
 
-Set \code{ghost=TRUE} is equivalent to setting \code{col.bg} to \code{"black"} and \code{col.grid} to \code{"transparent"} with a bar transparency of 0.7. It overides these settings individually, so must turn \code{ghost=FALSE} and set each of the three settings individually to change from the standard \code{ghost} settings.}
+Set \code{ghost=TRUE} is equivalent to setting \code{col.bg} to \code{"black"} and \code{col.grid} to \code{"transparent"} with a bar transparency of 0.7. It overrides these settings individually, so must turn \code{ghost=FALSE} and set each of the three settings individually to change from the standard \code{ghost} settings.}
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
@@ -74,10 +75,10 @@ set(colors="gray")
 #   set unless already changed previously
 # the three ghost settings - trans.fill.bar, col.grid and col.bg --
 #   must be manually entered to achieve  a ghost plot
-set(col.fill.bar="sienna3")
-set(col.fill.pt="sienna3")
-set(col.stroke.bar="sienna3")
-set(col.stroke.pt="sienna4")
+set(col.fill.bar="seagreen3")
+set(col.fill.pt="seagreen3")
+set(col.stroke.bar="seagreen4")
+set(col.stroke.pt="seagreen4")
 set(col.bg="seashell1")
 set(col.grid="seashell2")
 set(trans.fill.bar=.00)

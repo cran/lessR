@@ -1,5 +1,9 @@
 bx.data.frame <-
-function(x, n.cat, text.out, ...)  {
+function(x, n.cat,
+         col.fill, col.stroke, col.bg, col.grid,
+         cex.axis, col.axis, col.ticks,
+         horiz, add.points, xlab, main, digits.d, quiet,
+         pdf.width, pdf.height, ...)  {
 
 
   for (i in 1:ncol(x)) {
@@ -10,8 +14,17 @@ function(x, n.cat, text.out, ...)  {
     options(xname = x.name)
 
     if (is.numeric(x[,i]) && nu > n.cat) {
-      fname <- paste("BoxPlot_", x.name, ".pdf", sep="")
-      bx.default(x[,i], text.out=text.out, pdf.file=fname, ...)
+
+      pdf.file <- paste("BoxPlot_", x.name, ".pdf", sep="")
+      .opendev(pdf.file=pdf.file, pdf.width, pdf.height)
+
+      .bx.main(x[,i], col.fill, col.stroke, col.bg, col.grid,
+         cex.axis, col.axis, col.ticks,
+         horiz, add.points, xlab, main, digits.d, quiet, ...)
+
+      dev.off()
+      .showfile(pdf.file, "boxplot")
+
     }
 
     if (is.numeric(x[,i]) && nu <= n.cat)

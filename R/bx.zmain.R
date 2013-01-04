@@ -1,13 +1,13 @@
-.bx.default <-
+.bx.main <-
 function(x, col.fill, col.stroke, col.bg, col.grid,
-          cex.axis, col.axis, col.ticks,
-          horiz, add.points, xlab, main, digits.d, text.out, ...) {      
-  
+         cex.axis, col.axis, col.ticks,
+         horiz, add.points, xlab, main, digits.d, quiet, ...) {      
+
   if (is.null(col.stroke)) col.stroke <- col.fill
 
-  # get variable label if exists
+# get variable label if exists
   gl <- .getlabels(xlab, main=main)
-  x.name <- gl$xn;  x.lbl <- gl$xl;  x.lab <- gl$xb
+    x.name <- gl$xn;  x.lbl <- gl$xl;  x.lab <- gl$xb
   main.lab <- gl$mb
   if (horiz) y.lab <- ""
   else {
@@ -17,8 +17,9 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
 
   # set up plot area
   bv <- (boxplot(x, col="transparent", bg="transparent",
-     horizontal=horiz, xlab=x.lab, ylab=y.lab, main=main.lab, 
-     cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...))
+     horizontal=horiz, xlab=x.lab, ylab=y.lab, main=main.lab, axes=FALSE, ...))
+  axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
+  axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
   
   # colored background for plotting area
   usr <- par("usr")
@@ -43,12 +44,12 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
          col.fill, col.stroke, col.bg, col.grid, shape.pts=NULL,
          cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xlab=NULL, main=NULL, cex=NULL,
-         pt.reg=21, pt.out=19, 
+         method="stack", pt.reg=21, pt.out=19, 
          col.out30="firebrick2", col.out15="firebrick4", 
-         text.out=TRUE, new=FALSE, vertical=!horiz, ...)
+         quiet=TRUE, new=FALSE, vertical=!horiz, ...)
 
   # summarize data
-  if (text.out) {
+  if (!quiet) {
     digits.d <- .max.dd(x)
     options(digits.d=digits.d)
 

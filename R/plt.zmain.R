@@ -1,12 +1,12 @@
 .plt.main <- 
-function(x, y, by, dframe, type, n.cat,
+function(x, y, by, data, type, n.cat,
          col.fill, col.stroke, col.bg, col.grid,
          shape.pts, col.area, col.box, 
          cex.axis, col.axis, col.ticks, 
          xy.ticks, xlab, ylab, main, cex,
          x.start, x.end, y.start, y.end, kind,
          fit.line, col.fit.line, bubble.size,
-         ellipse, col.ellipse, fill.ellipse, text.out, ...) {
+         ellipse, col.ellipse, fill.ellipse, quiet, ...) {
 
   if (!is.null(type)) if (type != "p" && type != "l" && type != "b") { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -23,7 +23,7 @@ function(x, y, by, dframe, type, n.cat,
   # get variable labels if exist plus axes labels
   gl <- .getlabels(xlab, ylab, main)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
-  y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb;
+  y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
   main.lab <- gl$mb
   by.name <- getOption("byname")
    
@@ -80,19 +80,18 @@ function(x, y, by, dframe, type, n.cat,
 
     if (!is.null(by)) par(omi=c(0,0,0,0.6))  # legend in right margin
 
+    # non-graphical parameters in ... generate warnings when no plot
     suppressWarnings(plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
              main=main.lab, ...))
     if (xy.ticks){
-      suppressWarnings(axis(1, cex.axis=cex.axis, col.axis=col.axis, 
-                         col.ticks=col.ticks, ...))
-      suppressWarnings(axis(2, cex.axis=cex.axis, col.axis=col.axis, 
-                       col.ticks=col.ticks, ...))
+      axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
+      axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
     }
   }
 
   else if (kind == "xcat") {
     plot.default(y ~ x, xlim=c(.5,nlevels(x)+.5), type="n", axes=FALSE, 
-                xlab=x.lab, ylab=y.lab,  main=main.lab)
+                xlab=x.lab, ylab=y.lab, main=main.lab)
     axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
     axis(1, labels=levels(x), at=1:nlevels(x), 
             cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
@@ -155,9 +154,12 @@ function(x, y, by, dframe, type, n.cat,
     }
     if (type == "p" | type == "b") {
 
-      if (is.null(by)) 
+      if (is.null(by)) { 
+        trans.pts <- getOption("trans.fill.pt")
+        clr.trn <- .maketrans(col.fill, (1-trans.pts)*256)
         suppressWarnings(points(x,y, pch=shape.pts, col=col.stroke,
-            bg=col.fill, cex=pt.size, ...))
+            bg=clr.trn, cex=pt.size, ...))
+      }
 
       else {  # by grouping variable
         n.levels <- nlevels(by)
@@ -173,7 +175,7 @@ function(x, y, by, dframe, type, n.cat,
         if (length(shape.pts) == 1)
           for (i in 1:n.levels) shp[i] <- shape.pts
         else
-           shp <- shape.pts
+          shp <- shape.pts
         shape.dft <- c(21,23,22,24,25,7:14)  # shape defaults
         if (length(col.stroke)==1 && length(shape.pts)==1)  # both shape and color default
           for (i in 1:n.levels) shp[i] <- shape.dft[i]  # fill with default shapes
@@ -183,24 +185,15 @@ function(x, y, by, dframe, type, n.cat,
           clr.tr[i] <- .maketrans(clr.tr[i], (1-trans.pts)*256)
           x.lv <- subset(x, by==levels(by)[i])
           y.lv <- subset(y, by==levels(by)[i])
-          points(x.lv, y.lv, pch=shp[i], col=clr[i], bg=clr.tr[i], 
-                 cex=pt.size, lwd=0.75, ...)
+          suppressWarnings(points(x.lv, y.lv, pch=shp[i], col=clr[i],
+              bg=clr.tr[i], cex=pt.size, lwd=0.75, ...))
         }
         cat("\nTransparency level for plotted points: ", trans.pts, "\n\n")
 
+      if (length(col.stroke) > 1) clr.tr <- clr
       .plt.legend(levels(by), col.stroke, clr, clr.tr, shp, trans.pts, col.bg, usr)
 
       }  # end by group
-
-      if (ellipse) {
-        n.del <- sum(is.na(x - y))  # number missing
-        if (n.del == 0)
-          dataEllipse(x, y, col=col.ellipse, levels=.95, lwd=1.5, 
-          fill=fill.ellipse, fill.alpha=.06, center.cex=0, segments=100,
-          plot.points=FALSE)  # car function
-        else
-          cat("\n>>>Note: Ellipse function does not work with missing data.\n")
-      }
     }
   }  # kind = "regular"
 
@@ -219,54 +212,89 @@ function(x, y, by, dframe, type, n.cat,
             fg=col.stroke, inches=bubble.size, add=TRUE, ...)
     zeros <- cords[cords$count==0, ] # 0 plots to a single pixel, so remove
     points(zeros$xx, zeros$yy, col=col.bg, bg=col.bg, pch=21, cex=.5)
-    if (ellipse) {
-      dataEllipse(x, y, col=col.ellipse, levels=.95, lwd=1.5, fill=fill.ellipse, 
-        fill.alpha=.06, center.cex=0, segments=100, plot.points=FALSE)
-    }
   }
 
   else if (kind == "sunflower") {
     sunflowerplot(cords$xx, cords$yy, number=cords$count, 
       seg.col=col.stroke, col=col.fill, cex.axis=cex.axis, col.axis=col.axis,
-      xlab=x.lab, ylab=y.lab, xlim=c(x.lo,x.hi), ylim=c(x.lo,x.hi))
+      xlab=x.lab, ylab=y.lab, xlim=c(x.lo,x.hi), ylim=c(x.lo,x.hi), add=TRUE)
+  }
+
+  if (ellipse) {  # car function
+    n.pair <- sum(!is.na(x - y))  # number of points after listwise deletion
+    n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
+    if (n.del != 0) {  # ellipse function cannot have missing data
+      elp.dat <- na.omit(data.frame(x,y))
+      x <- elp.dat$x
+      y <- elp.dat$y 
+    }
+    dataEllipse(x, y, col=col.ellipse, levels=.95, lwd=1.5, fill=fill.ellipse,
+                fill.alpha=.06, center.cex=0, segments=100, plot.points=FALSE)
   }
 
   # fit line option
-  if (fit.line != "none") {  
-    ok <- is.finite(x) & is.finite(y)
-    if (any(ok)) {
-      x.ok <- x[ok]
-      y.ok <- y[ok]
-      ord <- order(x.ok)
-      x.ord <- x.ok[ord]
-      y.ord <- y.ok[ord] 
-      if (fit.line == "loess") {
-        lines(x.ord, fitted(loess(y.ord~x.ord, ...)), col=col.fit.line)
+  if (fit.line != "none") { 
+
+    if (is.null(by)) {
+      n.iter <- 1
+    }
+    else {
+      n.iter <- n.levels
+    }
+
+    for (i in 1:n.iter) {
+
+      if (is.null(by)) {
+        x.lv <- x
+        y.lv <- y
+        clr <- col.fit.line
       }
-      if (fit.line == "ls") {
-        if(!is.factor(x)) {
-          model <- lm(y.ord ~ x.ord)
-          abline(model$coef, col=col.fit.line)
+      else {
+        x.lv <- subset(x, by==levels(by)[i])
+        y.lv <- subset(y, by==levels(by)[i])
+        clr <- character(length(n.levels))
+        if (length(col.stroke) == 1) 
+          for (i in 1:n.levels) clr[i] <- col.stroke
+        else
+          clr <- col.stroke[i]
+      }
+      ok <- is.finite(x.lv) & is.finite(y.lv)
+      if (any(ok)) {
+        x.ok <- x.lv[ok]
+        y.ok <- y.lv[ok]
+        ord <- order(x.ok)
+        x.ord <- x.ok[ord]
+        y.ord <- y.ok[ord] 
+        if (fit.line == "loess") {
+          lines(x.ord, fitted(loess(y.ord~x.ord, ...)), col=clr, lwd=1.5)
         }
-        else cat("\n>>> Note: Least squares line not permitted for a factor.\n")
+        if (fit.line == "ls") {
+          if(!is.factor(x.lv)) {
+            model <- lm(y.ord ~ x.ord)
+            abline(model$coef, col=clr, lwd=1.5, xpd=FALSE)
+          }
+          else cat("\n>>> Note: Least squares line not permitted for a factor.\n")
+        }
       }
     }
   }
 
   # correlation
-  if (text.out) {
+  if (!quiet) {
     if (!is.null(y)  &&  !is.factor(x)  &&  type == "p") {
+    if (!ellipse) { # ellipse option removes any missing data
       n.pair <- sum(!is.na(x - y))  # number of points after listwise deletion
       n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
+    }      
       cat("\n")
       cat("Number of paired values with neither missing, n:", n.pair, "\n")
-      cat("Number of observations (rows of data) deleted:", n.del, "\n")
-      .cr.default(x, y, brief=TRUE)
+      cat("Number of cases (rows of data) deleted:", n.del, "\n")
+      .cr.main(x, y, brief=TRUE, ...)
     }
     if (!is.null(y) && is.factor(x)) {
       options(yname = x.name)
       options(xname = y.name)
-      .ss.numeric(y, by=x, dframe=dframe, digits.d=digits.d, brief=TRUE)
+      .ss.numeric(y, by=x, data=data, digits.d=digits.d, brief=TRUE)
     }
   }       
 

@@ -40,7 +40,7 @@ If the two plots, of the population and sample distributions respectively, are w
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{cr}}.
+\code{\link{Correlation}}.
 }
 
 \examples{

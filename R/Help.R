@@ -2,11 +2,16 @@ Help <-
 function(topic=NULL) {
 
 
-help.more <-
-function(fname, yline) {
-  h1 <- "Complete list of Help topics, enter:  Help()"
-  h2 <- paste("For more help on a function, enter ? in front of its name:  ?", fname, sep="")
-  lines(c(5,90), c(yline,yline), col="lightsteelblue")
+  help.more <-
+    function(fname, yline) {
+      h1 <- "Complete list of Help topics, enter:  Help()"
+        h2 <- paste("For more help on a function, enter ? in front of its name:  ?", fname, sep="")
+
+        if (getOption("colors") != "gray") 
+    col.sep <- "lightsteelblue"
+  else
+    col.sep <- "gray50"
+  lines(c(5,90), c(yline,yline), col=col.sep)
   text(0,yline-5, label=h1, adj=0)
   text(0,yline-10, label=h2, adj=0)
 }
@@ -30,6 +35,7 @@ function(nlines) {
   options(old.opt)
 }
 
+
 if (missing(topic))
   topic <- NULL
 else {
@@ -47,12 +53,18 @@ if (!is.null(topic)) for (i in 1:nchar(topic)) {
   if (xc %in% LETTERS) substr(topic,i,i) <- letters[which(LETTERS==xc)] 
 }
 
-col.line <- "lightsteelblue"
-col.rect <- rgb(246, 250, 254, maxColorValue=255)
+if (getOption("colors") != "gray") {
+  col.rect <- getOption("col.fill.pt")
+  col.line <- "lightsteelblue"
+}
+else {
+  col.rect <- "gray90"
+  col.line <- "gray30"
+}
 
 if (is.null(topic)) {
 
-t0 <- "Help Topics for lessR v2.6"
+t0 <- "Help Topics for lessR"
 
 fcsv <- bquote(paste(bold("Help(data)"), "  Create a data file from Excel or similar application."))
 frw <- bquote(paste(bold("Help(Read)"), " and ", bold("Help(Write)"), "  Read or write data to or from a file."))
@@ -113,112 +125,122 @@ text(0,pos5-4, label=fpck, adj=0)
 }
 
 
-else if (topic == "data") {
+else if (topic %in% c("data", "file", "csv", "sav", "rda")) {
 t0 <- "Data Files"
 
 t1 <-
 "R can read data files in many formats, including the csv format, or
 \"comma separated values\". A csv file is a text file with commas that
 separate adjacent values in each row. Usually the variable names are in
-the first row and each remaining row contains the data for one observation, 
+the first row and each remaining row contains the data for one case, 
 such as one person or one company, etc. Each column contains the data
 for the corresponding variable.
 
-MS Excel or other worksheet application can save data to a csv file. 
-All numeric data should be displayed in the General format, so that
-the only non-digit character for each numeric data value is a decimal
-point. The General format removes all dollar signs and commas, for
-example, leaving only the pure number, stripped of any extra characters, 
-which R will not properly read by default as a numeric data value.
+MS Excel or other worksheet application can save data to a csv file. All 
+numeric data should be displayed in the General format, so that the only
+non-digit character for each numeric data value is a decimal point. The
+The General format removes all dollar signs and commas, for example,
+leaving only the pure number, stripped of any extra characters, which R 
+will not properly read by default as a numeric data value.
 
 To create the csv file from Excel, under the File option, do a Save As
 and choose the csv format. With the free, open source LibreOffice Calc,
 after the File option and then Save As, click the arrow in the left margin
 towards the bottom labeled File type. From the available options, choose
-Text CSV. Then click the Save button and then the OK button.
+Text CSV. Then click the Save button and then the OK button. Next, read
+the csv data file into R, [see Help(Read)].
 
-Next, read the csv data file into R, [see Help(Read)]. However, using a
-worksheet such as Excel and R are complementary procedures.  R can do 
-extensive data transformations, such as sorting and much else, but so can 
-a worksheet.  Given the simplicity of transferring data from Excel to R, 
-using the lessR Read and Write functions, it is sometimes useful to move 
-back and forth between the two systems."
+Another type of text data file is a fixed width format where each column
+of data values is assigned a specific width. Usually there are no spaces
+between the data values. R can write a data file [see Help(Write)], what
+is called an native R data file with a default file type of .rda. Data
+files written by the SPSS system have the default file type of .sav. By
+ default both of these files can be read into R as well."
 
 set.up.plot()
 text(50,100, label=t0, font=4)
-text(0,54, label=t1, adj=0)
+text(0,55, label=t1, adj=0)
 
 help.more("Read", 10)
 }
 
 
-else if (topic == "read") {
+else if (topic %in% c("Read", "rd", "read")) {
 t0 <- "Read Data into R and Prepare for Analysis"
 
-f1 <- bquote(paste(bold("Read, rad"), "  Read a data file into an R data frame called mydata, and more."))
+f1 <- bquote(paste(bold("Read, rd"), "  Read a data file into an R data frame called mydata."))
 
 t1 <-
 "Browse for a csv, native R or SPSS data file available on the local computer 
-system.
-    > Read()
-Native R files have the default file type of .rda, and SPSS files have the
-.sav file type by default.
+system and read the information into the data table (frame) named: mydata. Use
+the function Read, or its abbreviation, rd. To browse, just add ().
+    > mydata <- Read()
+The  <-  is called the assignment operator and instructs R to take what was
+read and assign it to the data table called mydata. This is the default name
+that all the lessR data analysis functions assume when reading data for analysis.
 
-Or, browse using the short form.
-    > rad()
-
-Or, specify the file to be read. The file can be a path name to a data file 
-available on the local computer system, or to a file on the web.
-    > rad(\"http://web.pdx.edu/~gerbing/data/twogroup.csv\")
+Or, specify the file to be read with the name in quotes. The file can be a path
+name to a data file available on the local computer system, or a file on the web.
+    > mydata <- rd(\"http://web.pdx.edu/~gerbing/data/twogroup.csv\")
 For web files, include the  http://.
 
 To see how to create a csv data file, enter: Help(data)
+To see how to create an R data file, enter: Help(write)
 
-The name of the entire rectangular matrix of data, called a data frame in R, is 
-specifically named \"mydata\" within R when created by the function Read. Make 
-sure to distinguish between the name of the data frame, mydata, and the names 
-of the individual variables, columns, contained within the data frame."
+To read a text file where each column of data values is assigned a specific
+width, add the widths option that specifies the width of each column
+according to the order of the variables.  Enclose the list with the c
+function for combine, here to read 3 variables with widths of 4, 1 and 2.
+    > mydata <- Read(widths=c(4,1,2))
+
+To read a tab-delimmited text file, add the option: sep=\"\\t\"
+To read a text file with a , for a decimal, add the options: sep=\";\", dec=\",\"
+"
 
 set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 #lines(c(5,90), c(89,89), col=col.line)
-text(0,56, label=t1, adj=0)
+text(0,48, label=t1, adj=0)
 
-help.more("Read", 22)
+help.more("Read", 9)
 }
 
 
-else if (topic == "write") {
+else if (topic %in% c("Write", "wrt", "write")) {
 t0 <- "Write Contents of Data Frame mydata into a Data File"
 
-f1 <- bquote(paste(bold("Write, wrt"), "  Write a data file into an R data frame called mydata, and more."))
+f1 <- bquote(paste(bold("Write, wrt"), "  Write a data file called mydata into an R data frame."))
 
 t1 <-
-"The name of the entire rectangular matrix of data, called a data frame in R, can 
-be named \"mydata\" within R.  This is also the name of the data frame given 
-by the lessR function Read that reads the data.
+"The name of the entire rectangular table of data, called a data frame in R, can 
+be named mydata within R.  This is the default name of the data table assumed
+by the lessR data analysis functions.
 
 Here is how to write the contents of mydata to a csv data file with the name of 
 mydata.csv.
     > Write()
+The file is written to the default working directory.  The Write function displays
+this location after writing the file.
 
 Or, explicitly specify the file name.
     > Write(\"mybestdata\")
 The file type of .csv is automatically appended to the file name.
 
-To write a data file in native R format, use the type=\"R\" option.
+To write a data file in native R format, use the type=\"R\" option, or the 
+abbreviation for the function name  wrt.r.
+    > wrt.r(\"mybestdata\")
 
-The less Write function relies upon the R function write.table, which is
+The lessR Write function relies upon the R function write.table, which is
 is quite general, with many options.  For more information, enter ?write.table."
 
 set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 #lines(c(5,90), c(89,89), col=col.line)
-text(0,62, label=t1, adj=0)
+text(0,55, label=t1, adj=0)
 
-help.more("Read", 34)
+help.more("Write", 19)
 }
 
 
@@ -279,22 +301,22 @@ t1 <-
     > fix(mydata)
 
 The lessR function Transform creates a new variable or rewrites over existing.
-    >Transform(SalaryDiv=Salary/1000)
+    > mydata <- Transform(SalaryDiv=Salary/1000)
 
 The lessR function Recode, or just rec, changes individual values. Here change
 the values of variable Scores from 1 to 4 to 10, 15, 20, and 25, respectively.
-    > Recode(Scores, old=c(1:4), new=c(10,15,20,25))
+    > mydata <- Recode(Scores, old=c(1:4), new=c(10,15,20,25))
 
 Use the R function factor to create a new variable with non-numeric categories.
 Severity was encoded with a 1 for Mild, 2 for Moderate and 3 for Severe.
-    > Transform(ordered=TRUE, Severity.f= 
-             factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
+    > mydata <- Transform(ordered=TRUE, Severity.f= 
+                 factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
 Here the values of the new variable are also ordered, from Mild to Severe. 
 
 Extract subsets of data from a data frame with the lessR Subset function.
-    > Subset(rows=Gender==\"M\", columns=c(Years, Salary))
-The default data frame, mydata, now consists only of data for Males limited to
-the variables Years and Salary. To just display a subset, use function:  locate.
+    > mydata <- Subset(rows=Gender==\"M\", columns=c(Years, Salary))
+The data frame, mydata, now consists only of data for Males limited to
+the variables Years and Salary. To just display a subset, drop the mydata <-.
 "
 
 set.up.plot(5)
@@ -322,9 +344,9 @@ t1 <-
 as some of the more commonly used general R settings. One option is to set
 the color theme for the graphics functions. Aspects of these plots can be
 customized individually, but the color theme provides a theme of related colors 
-for a graph.  The default color theme is colors=\"blue\", with other possibilities
-of \"gray\", \"green\",  \"gold\",  \"rose\",  \"red\",  \"dodgerblue\", \"purple\" and \"orange\".
-Here all subsequent graphics are done in gray scale.
+for a graph.  The default color theme is colors=\"blue\", with other possibilities of
+\"gray\", \"green\", \"gold\", \"rose\", \"red\", \"dodgerblue\", \"purple\", \"sienna\",
+\"orange.black\" and \"gray.black\". Here all subsequent graphics are in gray scale.
     > set(colors=\"gray\") 
 The transparency level of bars and plotted points is set with the trans.fill.bar and 
 trans.fill.pt options. Set ghost=\"TRUE\" to get transparent bars against a black
@@ -336,7 +358,7 @@ as numeric.  One option is to redefine these variables as factors [see Help(edit
 Another option is the value of the lessR option n.cat.
     > set(n.cat=3)
 Here any variable with just 3 unique values or less is interpreted as a categorical
-variable.  The default value of n.cat is 4.
+variable.  The default value of n.cat is 0, that is, turned off.
 
 To see all available standard R options, enter the following.
     > options()
@@ -353,12 +375,12 @@ help.more("set", 9)
 }
 
 
-else if (topic %in% c("histogram", "hst", "hist", "boxplot", "box", "bx", 
-  "dotplot", "dp", "dot", "density", "dens")) {
+else if (topic %in% c("histogram", "hs", "hst", "hist", "boxplot", "box", "bx", 
+  "dotplot", "dp", "dot", "density", "dn", "dens")) {
 t0 <- "Histogram, etc."
 
-f1 <- bquote(paste(bold("Histogram, hst"), "  Histogram."))
-f2 <- bquote(paste(bold("Density, dens"), "  Density curve over histogram."))
+f1 <- bquote(paste(bold("Histogram, hs"), "  Histogram."))
+f2 <- bquote(paste(bold("Density, dn"), "  Density curve over histogram."))
 f3 <- bquote(paste(bold("BoxPlot, bx"), "  Box plot."))
 f4 <- bquote(paste(bold("DotPlot, dp"), "  Dot plot."))
 
@@ -366,16 +388,17 @@ t1 <-
 "These functions graph a distribution of data values for a continuous variable
 such as Time. Replace Y in these examples with the actual variable name.
 
-An histogram, or hst, based on the current color theme, such as the default \"blue\".
+An histogram, or hs, based on the current color theme, such as the default \"blue\".
     > Histogram(Y)
 
-Specify a title, a label for the x axis, and the gray scale color theme.
-    > Histogram(Y, main=\"My Title\", xlab=\"Y (mm)\", colors=\"gray\")
+Specify the gray scale color theme, a title, and a label for the x axis.
+    > set(colors=\"gray\")
+    > Histogram(Y, main=\"My Title\", xlab=\"Y (mm)\")
 
 Specify bins, starting at 60 with a bin width of 10.
     > Histogram(Y, bin.start=60, bin.width=10)
 
-Density curve superimposed on the underlying histogram, abbreviated den.
+Density curve superimposed on the underlying histogram, abbreviated dn.
     > Density(Y)
 
 Box plot, abbreviated bx.
@@ -394,7 +417,7 @@ text(0,82, label=f4, adj=0)
 #lines(c(5,90), c(78,78), col=col.line)
 text(0,43, label=t1, adj=0)
 
-help.more("Histogram",10)
+help.more("Histogram",9)
 }
 
 
@@ -482,16 +505,16 @@ t0 <- "Scatterplot"
 f1 <- bquote(paste(bold("ScatterPlot, sp"), "  A scatterplot for one or two variables."))
 
 t1 <-
-"ScatterPlot, or sp, generates a scatter plot, for either one or two variables.
+"ScatterPlot, or sp, generates a scatter plot for either one or two variables.
 The points have a default transparency, which can be set from completely
-transparent to oblique.  The plot is also with a specific color theme.
+transparent to oblique.  The plot uses the current color theme.
 
 This example is the default scatterplot for variables named X and Y.
     > ScatterPlot(X, Y)
 If the values of X are sorted, a function plot is generated instead so that the
 points are not individually displayed and are connected by line segments.
 
-Here a one dimensional scatterplot, that is, a dot plot, is generated for a
+Here generate a one dimensional scatterplot, that is, a dot plot, for a
 variable named Y. 
     > ScatterPlot(Y)
 Can also generate the same plot with the function name of DotPlot or dp.
@@ -500,10 +523,10 @@ ScatterPlot can also provide a for plotting two variables with different
 symbols and/or colors for each level of a third variable.
     > ScatterPlot(X, Y, by=Z)
 
-Color themes are available with the colors option, from a specific call to 
-ScatterPlot or system wide for all graphics output with the function set. In this 
-example, all subsequent graphics output is in gray scale, with no transparency.
-    > set(colors=\"gray\", trans.pts=0)
+Color themes are available with the colors option, from a call to ScatterPlot
+or system wide for all graphics output with the function set. In this example,
+all subsequent graphics are with the green color theme, with no transparency.
+    > set(colors=\"green\", trans.pts=0)
     > ScatterPlot(X, Y)"
 
 set.up.plot(1)
@@ -568,6 +591,9 @@ and a confidence interval.
 This example uses the lessR function ttest, or tt, to evaluate a variable named
 Y and a null hypothesis of mu=100.
     > ttest(Y, mu0=100)
+
+This example uses ttest to do the analysis from the sample statistics.
+    > ttest(n=20, m=47.2, s=8.5, mu0=50)
     
 Here test for a fair coin after getting 53 out of 100 Heads. The R function
 binom.test is based on the exact binomial distribution.  The R prop.test
@@ -585,9 +611,9 @@ text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 text(0,86, label=f3, adj=0)
 #lines(c(5,90), c(82,82), col=col.line)
-text(0,53, label=t1, adj=0)
+text(0,49, label=t1, adj=0)
 
-help.more("ttest", 23)
+help.more("ttest", 14)
 }
 
 
@@ -610,26 +636,29 @@ R refers to this expression as a formula, read as: Y is described by X.
 Can also specify with the more general function model.
     > Model(Y ~ X)
 
-To do a separate analysis of Y for each group, the variables group1 and
-group2 are automatically created when running ttest.
+To do a separate analysis of Y for each group, specify  separate=TRUE  in
+the call to ttest to create the vectors group1 and group2.
     > Histogram(group1)
 
 Sometimes the data for a t-test are arranged so that the responses for 
 each group, Y, already are in separate columns called vectors. Here calculate 
 the t-test directly from two vectors called Y1 and Y2.
-    > ttest(Y1, Y2)"
+    > ttest(Y1, Y2)
+
+Or, directly from summary statistics.
+    > ttest(n=34, m=8.92, s=1.67, Ynm=\"Time\")"
 
 set.up.plot(2)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 #lines(c(5,90), c(86,86), col=col.line)
-text(0,51, label=t1, adj=0)
+text(0,47, label=t1, adj=0)
 
-help.more("ttest", 14)
+help.more("ttest", 8)
 }
 
-else if (topic %in% c("anova", "av")) {
+else if (topic %in% c("anova", "av", "ANOVA")) {
 t0 <- "Compare Means of Two or More Groups"
 
 f1 <- bquote(paste(bold("ANOVA, av"), "  Analysis of variance to compare two or more group means."))
@@ -637,10 +666,9 @@ f2 <- bquote(paste(bold("Model, model"), "  ANOVA if explanatory variables are c
 t1 <-
 "When responses to a variable are organized into exactly two groups, either the 
 t-test function, ttest, or the lessR analysis of variance function, ANOVA, or simply
-av, can compare the group means. With more than two groups, ANOVA is required.
-The function ANOVA works only in formula mode. Here the numerical response
-variable is named Y and the grouping variable, or factor, is X, which may have
-more than two discrete values.
+av, can compare the group means. With more than two groups, ANOVA is
+required. Here the numerical response variable is named Y and the grouping
+variable, or factor, is X, which may have more than two discrete values. 
     > ANOVA(Y ~ X)
 or
     > Model(Y ~ X)
@@ -650,6 +678,12 @@ If the ANOVA with more than two levels is significant, then a post-hoc
 examination of the mean differences with a controlled error rate will help
 uncover where the differences occurred. The ANOVA function relies upon the
 Tukey HSD procedure.  Both tabular and plotted output are obtained.
+
+For a randomized block ANOVA invoke a blocking factor with a + .
+    > ANOVA(Y ~ X + Blck)
+
+For a two way between groups ANOVA, specify two factors with a * .
+    > ANOVA(Y ~ X1 * X2)
 "
 
 set.up.plot(2)
@@ -657,9 +691,9 @@ text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 #lines(c(5,90), c(85,85), col=col.line)
-text(0,59, label=t1, adj=0)
+text(0,51, label=t1, adj=0)
 
-help.more("aov", 33)
+help.more("aov", 17)
 }
 
 
@@ -704,15 +738,15 @@ f1 <- bquote(paste(bold("Correlation, cr"), "  Correlations between two or more 
 f3 <- bquote(paste(bold("ScatterPlot, sp"), "  Graphics, generate a scatterplot for two or more variables."))
 
 t1 <-
-"The lessR function Correlation, or just cr, can compute correlations for a pair 
-of variables. Or for a data frame with all numeric variables, mydata by default, 
-the correlation matrix is computed, with pairwise deletion of missing data by
-default. A heat map of the matrix is also generated. The matrix is displayed 
-and also is stored as mycor such as for a subsequent factor analysis. 
+"The lessR function Correlation, or cr, can compute a correlation for two variables.
+Or for a data frame, mydata by default, the correlation matrix is computed, with
+pairwise deletion of missing data by default. A heat map and scatter plot matrix
+can also be generated with  graphics=TRUE. The matrix is displayed and also is
+stored as mycor such as for a subsequent factor analysis. 
 
 The lessR function, ScatterPlot, or just sp, displays a scatterplot for two variables
-or a scatterplot matrix for a data frame. The corresponding correlation
-or correlation matrix is also displayed.
+or a scatterplot matrix for a data frame. The corresponding correlation or
+correlation matrix is also displayed. See Help(ScatterPlot) for more information.
 
 This example is for the correlation coefficient, inference and scatterplot for two 
 numerical variables, X and Y, both the correlational analysis by itself, and also
@@ -781,10 +815,10 @@ help.more("Regression", 9)
 }
 
 
-else if (topic %in% c("logit", "lgt")) {
+else if (topic %in% c("logit", "lr")) {
 t0 <- "Logit Regression Analysis"
 
-f1 <- bquote(paste(bold("Logit, lgt"), "  Logit regression analysis."))
+f1 <- bquote(paste(bold("Logit, lr"), "  Logit regression analysis."))
 f2 <- bquote(paste(bold("Model, model"), "  Logit analysis if a binary response variable."))
 
 t1 <-
@@ -801,8 +835,8 @@ are numerical, then Model will, in turn, call the Logit function.
     > Model(Y ~ X1 + X2)
 The Model function also applies to the analysis of other linear models.
 
-The abbreviated form of the function is lgt, such as
-     > lgt(Y ~ X1 + X2)
+The abbreviated form of the function is lr, such as
+     > lr(Y ~ X1 + X2)
 "
 
 set.up.plot(2)
@@ -822,7 +856,7 @@ t0 <- "Confirmatory and Exploratory Factor Analysis"
 
 f1 <- bquote(paste(bold("corCFA, cfa"), "  Confirmatory factor analysis."))
 f2 <- bquote(paste(bold("corEFA, efa"), "  Exploratory factor analysis."))
-f3 <- bquote(paste(bold("corRead, rad.cor"), "  Read a correlation matrix."))
+f3 <- bquote(paste(bold("corRead, rd.cor"), "  Read a correlation matrix."))
 f4 <- bquote(paste(bold("corScree, scree"), "  Scree plot of eigenvalues of the correlation matrix."))
 f5 <- bquote(paste(bold("corReorder, reord"), "  Reorder the variables in the correlation matrix."))
 

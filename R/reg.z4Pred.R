@@ -1,7 +1,7 @@
 .reg4Pred <-
-function(nm, mydframe, my.formula, brief, res.rows,
+function(lm.out, nm, my.formula, brief, 
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         new.data, pred.sort, pred, pred.all, scatter.3d, scatter.coef,
+         new.data, pred.sort, pred.rows, scatter.3D, scatter.coef,
          numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new) {
 
@@ -43,10 +43,9 @@ function(nm, mydframe, my.formula, brief, res.rows,
 
   cat("Data, Fitted Values, Confidence and Prediction Intervals\n")
   cat("   [sorted by lower bound of prediction interval]\n")
-  cat("   [pi:wdh is the width of the corresponding prediction interval]\n")
-  if (n.keep > 30 && pred.all == FALSE && !new.data) 
-    cat("   [to save space only some intervals printed, do pred.all=TRUE to see all]\n")
-  .dash(68)
+  if (pred.rows < n.keep  &&  !new.data) 
+    cat("   [to save space only some intervals printed, or pred.rows=\"all\"]\n")
+  .dash(66)
   
   if (!new.data) {
     c.int <- data.frame(predict(lm.out, interval="confidence"))
@@ -83,18 +82,22 @@ function(nm, mydframe, my.formula, brief, res.rows,
   names(out)[n.vars+3] <- "ci:upr"
   names(out)[n.vars+4] <- "pi:lwr"
   names(out)[n.vars+5] <- "pi:upr"
-  names(out)[n.vars+6] <- "pi:wdh"
+  names(out)[n.vars+6] <- " width"
+
+  for (i in 1:(n.vars+6))
+    if (is.numeric(out[,i])) if (!is.integer(out[,i]))
+      out[,i] <- .fmt(out[,i],digits.d-1)
 
   if (!new.data) {
-    if (n.keep < 50  || pred.all == TRUE || new.data)
-      print(round(out, digits=digits.d))
+    if (pred.rows == n.keep)
+      print(out)
     else {
-      print(round(out[1:5,], digits=digits.d))
-      cat("\n... for the middle 5 rows of sorted data ...\n\n")
-      n.mid <- round(n.keep/2)
-      print(round(out[(n.mid-2):(n.mid+2),], digits=digits.d))
-      cat("\n... for the last 5 rows of sorted data ...\n\n")
-      print(round(out[(n.keep-4):n.keep,], digits=digits.d))
+      print(out[1:pred.rows,])
+      cat("\n... for the middle", pred.rows, "rows of sorted data ...\n\n")
+      n.mid <- n.keep/2
+      print(out[(n.mid-(pred.rows/2)):(n.mid+((pred.rows/2)-1)),])
+      cat("\n... for the last", pred.rows, "rows of sorted data ...\n\n")
+      print(out[(n.keep-(pred.rows-1)):n.keep,])
     }
   }
   else 

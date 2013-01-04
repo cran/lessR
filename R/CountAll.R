@@ -2,10 +2,11 @@ CountAll <-
 function(x=mydata)  {
 
 
-  dframe.name <- deparse(substitute(x))
+  dname <- deparse(substitute(x))
+  options(dname = dname)
   
   if (is.null(x))
-    if (!exists(dframe.name, where=.GlobalEnv)) {
+    if (!exists(dname, where=.GlobalEnv)) {
       stop("Need to specify an existing data frame,\n",
            "or data frame mydata must exist.", sep="")
   }
@@ -19,12 +20,12 @@ function(x=mydata)  {
   .dash(37,"+")
   cat("Histogram for Each Numeric Variable\n")
   .dash(37,"+")
-  Histogram(dframe=x)
+  Histogram(data=x)
   
   cat("\n\n\n")
   .dash(39,"+")
   cat("Bar Chart for Each Non-numeric Variable\n")
   .dash(39,"+")
-  BarChart(dframe=x)
+  BarChart(data=x)
   
 }

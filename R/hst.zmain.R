@@ -1,7 +1,8 @@
-.hst.default <- 
+.hst.main <- 
 function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
        over.grid, cex.axis, col.axis, col.ticks, breaks, bin.start, bin.width,
-       prop, cumul, digits.d, xlab, ylab, main, text.out, ...) {
+       prop, cumul, digits.d, xlab, ylab, main, quiet, ...) {
+
 
   if (!is.numeric(x)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -30,7 +31,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
       h <- hist(x, plot=FALSE, breaks="Sturges")
       bin.width <- h$breaks[2]-h$breaks[1]
     }
-    max.x <- max(x, na.rm = TRUE)
+    max.x <- max(x, na.rm=TRUE)
     seq.end <- max.x
     breaks <- seq(bin.start,seq.end,bin.width)
     while (max(breaks) < max.x) {
@@ -72,7 +73,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
 
 
   # calculate but do not plot the histogram
-  # block warnings about any unused parameters due to not plotting 
+  # arguments in ... for plotting instructions generate warnings with no plot
   h <- suppressWarnings(hist(x, plot=FALSE, breaks, ...))
   
   # relative frequency histogram option
@@ -86,9 +87,10 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
   
   # set up plot area
   suppressWarnings(plot(h, border="transparent", xlab=x.lab, ylab=y.lab,
-        main=main.lab, font.main=1, freq=TRUE, cex.axis=cex.axis,
-        col.axis=col.axis, col.ticks=col.ticks, ...))
- 
+        main=main.lab, freq=TRUE, axes=FALSE, ...))
+  axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
+  axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
+
   # colored background for plotting area
   usr <- par("usr")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
@@ -118,7 +120,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
 #------------
 # text output
 #------------
-  if (text.out) {
+  if (!quiet) {
  
     # summarize data
     .ss.numeric(x, digits.d=digits.d, brief=TRUE)

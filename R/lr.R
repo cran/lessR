@@ -1,4 +1,4 @@
-lgt <-
+lr <-
 function(...)
 
   Logit(...)

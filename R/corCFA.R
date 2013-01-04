@@ -1,5 +1,7 @@
 corCFA <- 
-function(x=mycor, iter=25, resid=TRUE, item.cor=TRUE, sort=TRUE,
+function(x=mycor, data=mydata,
+
+         iter=25, resid=TRUE, item.cor=TRUE, sort=TRUE,
 
          main=NULL, heat.map=TRUE, bottom=3, right=3, 
 
@@ -16,6 +18,9 @@ function(x=mycor, iter=25, resid=TRUE, item.cor=TRUE, sort=TRUE,
       "Either enter the correct name, or calculate with: Correlation\n",
       "Or read the correlation matrix with: corRead\n\n")
   }
+
+  dname <- deparse(substitute(data))
+  options(dname = dname)
 
   NVOld <- as.integer(nrow(x))
   NFmax <- 12

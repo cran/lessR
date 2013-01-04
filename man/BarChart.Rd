@@ -1,8 +1,6 @@
 \name{BarChart}
 \alias{BarChart}
 \alias{bc}
-\alias{bc.default}
-\alias{bc.data.frame}
 
 \title{Bar Chart of One or Two Variables}
 
@@ -19,39 +17,35 @@ If the provided object for which to calculate the bar chart is a data frame, the
 }
 
 \usage{
-BarChart(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"),
-         count.names=NULL, text.out=TRUE, \ldots)
+BarChart(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
 
-\method{bc}{data.frame}(x, n.cat, text.out, \dots)
-
-\method{bc}{default}(x, by=NULL, 
-
-         col.fill=NULL, col.stroke="black", col.bg=getOption("col.bg"),
-         col.grid=getOption("col.grid"), random.col=FALSE,
+         col.fill=NULL, col.stroke="black",
+         col.bg=getOption("col.bg"),
+         col.grid=getOption("col.grid"),
+         random.col=FALSE,
          colors=c("rainbow", "terrain", "heat"),
 
          horiz=FALSE, over.grid=FALSE, addtop=1,
-         gap=NULL, brief=TRUE, prop=FALSE,
+         gap=NULL, prop=FALSE,
          
          xlab=NULL, ylab=NULL, main=NULL,
          cex.axis=.85, col.axis="gray30", col.ticks="gray30",
 
-         beside=FALSE, col.low=NULL, col.hi=NULL, count.names=NULL,
+         beside=FALSE, col.low=NULL, col.hi=NULL, count.levels=NULL,
 
          legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
          legend.horiz=FALSE, 
 
-         text.out=TRUE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
-
+         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 bc(\ldots)
 }
 
 \arguments{
-  \item{x}{For each level of this variable, x, display the frequencies.}
+  \item{x}{For each level of this variable display the frequencies.}
   \item{by}{For each level of the first variable, x, display the frequencies at each 
        level of this second variable, y.}
-  \item{dframe}{Optional data frame that contains the variables of interest, default
+  \item{data}{Optional data frame that contains the variables of interest, default
        is \code{mydata}.}
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest
        number of unique values of variable of a numeric data type for which the
@@ -74,8 +68,6 @@ bc(\ldots)
        the standard R \code{\link{barplot}} function with a default of 0.2 unless two
        variables are plotted and beside=\code{TRUE}, in which case the default is
        c(.1,1).}
-  \item{brief}{If \code{FALSE}, then the tables of conditional proportions and chi-square test 
-        are displayed.}
   \item{prop}{Display proportions instead raw frequencies.}
   \item{xlab}{Label for x-axis, more generally the label for the values which could be on 
         the vertical axis for a two variable plot if \code{horiz=TRUE}. Defaults to variable
@@ -92,7 +84,7 @@ bc(\ldots)
        lowest level of the factor in the resulting ordered progression of colors.}
   \item{col.hi}{Only when the variable is an ordered factor, sets the color for the
        highest level of the factor in the resulting ordered progression of colors.}
-  \item{count.names}{If the name of a variable, this signals that the primary
+  \item{count.levels}{If the name of a variable, this signals that the primary
        variable \code{x} has values that are counts, already tabulated, and that the
        specified variable here contains the names of the levels of x.}
   \item{legend.title}{Title of the legend, which is usually set by default except when
@@ -106,7 +98,7 @@ bc(\ldots)
        default are the levels for the second or \code{by} variable.}
   \item{legend.horiz}{By default the legend is vertical, but can be changed to
        horizontal.}
-  \item{text.out}{If \code{TRUE}, then display text output in console.}
+  \item{quiet}{If set to \code{TRUE}, no text output.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -123,10 +115,10 @@ Plot a bar chart with default colors for one or two variables, presumably with a
 The form of the entered data, the first variable x and optionally a second variable, y, is flexible.  The data may be entered as factors, numeric values, characters, or a matrix. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.  Plus, the bar colors for a second variable which is an ordered factor are also ordered in a corresponding progression.
 
 DATA FRAME ACCESS\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment. 
+If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment. 
 
 COLORS\cr
-For a one variable plot, the color of the bars is set by the current color theme according to the function set. When two variables are plotted, a set of arbitrary colors represent the various levels of the second variable. Currently transparency effects are not incorporated.\cr
+For a one variable plot, the color of the bars is set by the current color theme according to the function \code{\link{set}}. When two variables are plotted, a set of arbitrary colors represent the various levels of the second variable. Currently transparency effects are not incorporated.\cr
 There are three ways to override the default colors.\cr
 1. There are two pre-defined color palettes, each with 7 colors.  Three more built-in R color palettes are also available by setting \code{colors} to one of \code{"rainbow"}, \code{"heat"} and \code{"terrain"}.  The most vivid of all the palettes is \code{"rainbow"}.\cr
 2. The order of the colors within the chosen palette can be randomized with the \code{random.col="TRUE"} option. For example, when this option is activated each of the seven colors in a palette has a 1/7 chance of appearing as the first color, the only color used in the plot of a single variable, and the color used for the first bar in each group for a plot of two variables. When invoked for a  \code{color="gray"}, the order from light to dark will generally be lost, which may be desirable if the categories do not represent an ordered factor.\cr
@@ -150,13 +142,13 @@ If the legend is not in the right margin, sometimes bars from the graph may intr
 ENTER COUNTS DIRECTLY\cr
 Instead of calculating the counts from the data, the counts can be entered directly.  For two variables, enter the counts as a matrix and include the \code{xlab} option to label the horizontal axis, such as with the name of the variable.  Also include the \code{legend.title} option to provide a legend.  See the examples below.
 
-Or, include the tabulated counts as the data which is read into R. If \code{count.names} is not \code{NULL}, then it is presumed to be a valid variable name.  As such, it indicates that the primary variable, \code{x} consists of values already tabulated, that is, counts, and is ready to be plotted directly.  The value for \code{count.names} specifies the label for each level of \code{x}.
+Or, include the tabulated counts as the data which is read into R. If \code{count.levels} is not \code{NULL}, then it is presumed to be a valid variable name.  As such, it indicates that the primary variable, \code{x} consists of values already tabulated, that is, counts, and is ready to be plotted directly.  The value for \code{count.levels} specifies the label for each level of \code{x}.
 
 STATISTICS\cr
-In addition to the barchart, descriptive and optional inferential statistics are also presented.  First, the frequency table for one variable or the joint frequency table for two variables is displayed. Second, the corresponding chi-square test is also displayed by default. If \code{brief=FALSE}, then the cell proportions are displayed, as well as based on row sums and column sums.
+In addition to the barchart, descriptive and optional inferential statistics are also presented.  First, the frequency table for one variable or the joint frequency table for two variables is displayed. Second, the corresponding chi-square test is also displayed by default. 
 
 VARIABLE LABELS\cr
-A labels data frame named \code{mylabels}, obtained from the \code{\link{rad}} function, can provide the label for some or all of the variables in the data frame that contains the data for the analysis.  If this labels data frame exists, then the corresponding variable label is listed as the label for the horizontal axis unless xlab is specified in the function call. If there are two variables to plot, the title of the resulting plot is based on the two variable labels, unless a specific title is listed with the \code{main} option. The variable label is also listed in the text output, next to the variable name. If the analysis is for two variables, then labels for both variables are included. 
+If variable labels exist, then the corresponding variable label is listed as the label for the horizontal axis unless xlab is specified in the function call. If there are two variables to plot, the title of the resulting plot is based on the two variable labels, unless a specific title is listed with the \code{main} option. The variable label is also listed in the text output, next to the variable name. If the analysis is for two variables, then labels for both variables are included. 
 
 PDF OUTPUT\cr
 Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
@@ -201,7 +193,7 @@ barplot(table(mydata$Pain))
 BarChart(Gender)
 
 # specify a unique bar color for each of the two bars
-BarChart(Gender, col.fill=c("pink","lightblue"))
+BarChart(Gender, col.fill=c("palegreen3","tan"))
 
 # automatically provide horizontal value labels 
 #   and adjust left margin as needed
@@ -261,7 +253,7 @@ BarChart()
 
 # Use the subset function to specify a variable list
 mysub <- subset(mydata, select=c(Pain))
-BarChart(dframe=mysub)
+BarChart(data=mysub)
 
 
 # ----------------------------
@@ -318,8 +310,8 @@ ADMN,6
 FINC,4
 MKTG,6
 SALE,15", header=TRUE)
-# use count.names to indicate the label for each corresponding count
-bc(Count, count.names=Dept)
+# use count.levels to indicate the label for each corresponding count
+BarChart(Count, count.levels=Dept)
 }
 
 

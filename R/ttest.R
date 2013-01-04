@@ -1,21 +1,21 @@
 ttest <-
-function(x=NULL, y=NULL, dframe=mydata,
+function(x=NULL, y=NULL, data=mydata, paired=FALSE,
 
          n=NULL, m=NULL, s=NULL, mu0=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
 
          Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", 
 
-         brief=FALSE, digits.d=NULL, 
-         conf.level=0.95, mmd=NULL, msmd=NULL, 
+         brief=FALSE, digits.d=NULL, conf.level=0.95,
+         alternative=c("two.sided", "less", "greater"),
+         mmd=NULL, msmd=NULL, 
 
-         bw1="nrd", bw2="nrd", graph=TRUE, show.title=TRUE,
+         show.title=TRUE, bw1="nrd", bw2="nrd", graph=TRUE,
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {       
 
 
 tt.setup <-
 function(x, y=NULL, ...) {
-
 
   cat("\n")
   if (missing(y))
@@ -50,7 +50,7 @@ function(x, y=NULL, ...) {
 
       if ( (length(x) < 2) || (length(y) < 2) )  {
        cat("\n"); stop(call.=FALSE, "\n","------\n",
-         "Need at least two observations per sample.\n\n")
+         "Need at least two cases (observations) per sample.\n\n")
       }
      
       if ( !is.null(mmd) && !is.null(msmd) )  {
@@ -62,7 +62,7 @@ function(x, y=NULL, ...) {
       if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
         .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
-          conf.level, mmd, msmd, bw1, bw2, graph,
+          conf.level, alternative, mmd, msmd, bw1, bw2, graph,
           show.title, pdf.file, pdf.width, pdf.height)
       else {  # switch
         Xtmp <- X2nm
@@ -70,7 +70,7 @@ function(x, y=NULL, ...) {
         X1nm <- Xtmp
         .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
-          conf.level, mmd, msmd, bw1, bw2, graph,
+          conf.level, alternative, mmd, msmd, bw1, bw2, graph,
           show.title, pdf.file, pdf.width, pdf.height)
       }
 
@@ -79,25 +79,33 @@ function(x, y=NULL, ...) {
     else {  # from stats
       .TwoGroup(y, x,
          n1, n2, m1, m2, s1, s2, from.data,
-         Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
-         conf.level, mmd, msmd, bw1, bw2, graph=FALSE)
+         Ynm, Xnm, X1nm, X2nm, brief, digits.d, conf.level,
+         alternative, mmd, msmd, bw1, bw2, graph=FALSE)
     }
 
   }  # end two.gp 
 
   else { # one group
     if (from.data) {
-      Ynm <- x.name
+      if (!paired)
+        Ynm <- x.name
+      else {
+        Ynm <- "Difference"
+        mu0 <- 0
+        options(dname = NULL)
+      }
       options(yname = x.name)
       .OneGroup(x, Ynm, mu0, brief=brief, bw1=bw1,
-           from.data=from.data, conf.level=conf.level, digits.d=digits.d,
+           from.data=from.data, conf.level=conf.level,
+           alternative=alternative, digits.d=digits.d,
            mmd=mmd, msmd=msmd,
            graph=graph, show.title=show.title, pdf.file=pdf.file,
            pdf.width=pdf.width, pdf.height=pdf.height)
     }
     else
       .OneGroup(x, Ynm, mu0, n, m, s, brief=brief, bw1=bw1,
-           from.data=from.data, conf.level=conf.level, digits.d=digits.d,
+           from.data=from.data, conf.level=conf.level,
+           alternative=alternative, digits.d=digits.d,
            mmd=mmd, msmd=msmd,
            graph=graph, show.title=show.title, pdf.file=pdf.file,
            pdf.width=pdf.width, pdf.height=pdf.height, ...)
@@ -111,36 +119,59 @@ function(x, y=NULL, ...) {
 
 #-----------------------------------
 
-  # get actual variable name before potential call of dframe$x, could be NULL
+  alternative <- match.arg(alternative)
+
+  # get actual variable name before potential call of data$x, could be NULL
   x.name <- deparse(substitute(x)) 
 
   # get data frame name
-  dframe.name <- deparse(substitute(dframe))
+  dname <- deparse(substitute(data))
 
-  # get conditions and check for dframe existing
-  xs <- .xstatus(x.name, dframe.name)
+  # get conditions and check for data existing
+  xs <- .xstatus(x.name, dname)
   is.frml <- xs$ifr
   from.data <- xs$fd
   in.global <- xs$ig 
 
   # see if the variable exists in the data frame
-  if (from.data && !in.global && !is.frml) .xcheck(x.name, dframe.name, dframe)
+  if (from.data && !in.global && !is.frml) .xcheck(x.name, dname, data)
     
   # do analysis with tt.setup
   if (in.global) {
     if (is.function(x))  # var names that are R functions get assigned to global 
-      tt.setup(eval(substitute(dframe$x)), Ynm=x.name, ...)  # 1-group
-    else 
-      tt.setup(x, y, ...)  # two vector form must come from global
+      tt.setup(eval(substitute(data$x)), Ynm=x.name, ...)  # 1-group
+    else {
+      if (!paired)
+        tt.setup(x, y, ...)  # two vector form must come from global
+      else {
+        if (paired  &&  length(x)!=length(y))  {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+             "The two data vectors must be of the same size.\n\n")
+        }
+        diff <- eval(substitute(x)) - eval(substitute(y))
+        tt.setup(diff, ...)
+      }
+    }
   }
+
   else if (is.frml) {
-    f <- .tt.formula(x, y, dframe, ...)  # formula
+    f <- .tt.formula(x, y, data, ...)  # formula
     x <- f$x;  y <- f$y;  Ynm <- f$Ynm;  Xnm <- f$Xnm
     X1nm <- f$X1nm;  X2nm <- f$X2nm 
     tt.setup(x, y, ...)
+    if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
+      invisible(list(value1=X1nm, group1=x, value2=X2nm, group2=y))
+    else
+      invisible(list(value1=X2nm, group1=y, value2=X1nm, group2=x))
   }
+
   else if (from.data)
-    tt.setup(eval(substitute(dframe$x)), Ynm=x.name, ...)  # 1-group
+    if (!paired)
+      tt.setup(eval(substitute(data$x)), ...)  # 1-group
+    else {
+      diff <- eval(substitute(data$x)) - eval(substitute(data$y))
+      tt.setup(diff, ...)
+  }
   else
     tt.setup(...)  # analysis from stats
 

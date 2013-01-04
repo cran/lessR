@@ -38,7 +38,7 @@ function (x=mycor,
          xlab=NULL, ylab="Eigenvalue", main=main, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
-         center.line="off", text.out=FALSE, ...)
+         center.line="off", quiet=TRUE, ...)
 
   if (pdf) {
     dev.off()
@@ -68,7 +68,7 @@ function (x=mycor,
          xlab=NULL, ylab="Eigenvalue", main=main, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
-         center.line="off", text.out=FALSE, ...)
+         center.line="off", quiet=TRUE, ...)
    n.dregs <- ceiling(length(ev.diff)/1.35)  # get bottom sequence of ev differences
    dregs <- numeric(length=n.dregs)
    for (i in 1:n.dregs) dregs[i] <- ev.diff[length(ev.diff)-(i-1)] 

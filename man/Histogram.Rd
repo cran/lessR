@@ -2,8 +2,6 @@
 \alias{Histogram}
 \alias{hs}
 \alias{hst}
-\alias{hst.default}
-\alias{hst.data.frame}
 
 
 \title{Histogram with Color}
@@ -11,31 +9,29 @@
 \description{
 Abbreviation: \code{hs}
 
-Accessing the standard R function \code{\link{hist}}, plots a frequency histogram with default colors, including background color and grid lines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
+From the standard R function \code{\link{hist}} plots a frequency histogram with default colors, including background color and grid lines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width and/or the bin start. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
 
-If the provided object for which to calculate the histogram is a data frame, then a histogram is calculated for each numeric variable in the data frame and the results written to a pdf file in the current working directory.  The name of this file and its path are specified in the output.
+If the provided object for which to calculate the histogram is a data frame, then a histogram is calculated for each numeric variable in the data frame and the results written to pdf files in the current working directory.  The name of these files and associated paths are specified in the output.
 }
 
 \usage{
 
-Histogram(x=NULL, dframe=mydata, n.cat=getOption("n.cat"), text.out=TRUE, \ldots)
+Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
-\method{hst}{data.frame}(x, n.cat, text.out, \ldots) 
+         col.fill=getOption("col.fill.bar"), 
+         col.stroke=getOption("col.stroke.bar"),
+         col.bg=getOption("col.bg"),
+         col.grid=getOption("col.grid"),
 
-\method{hst}{default}(x,
-   col.fill=getOption("col.fill.bar"), 
-   col.stroke=getOption("col.stroke.bar"),
-   col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+         col.reg="snow2", over.grid=FALSE,
+         cex.axis=.85, col.axis="gray30", col.ticks="gray30",
 
-   col.reg="snow2", over.grid=FALSE,
-   cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+         breaks="Sturges", bin.start=NULL, bin.width=NULL,
 
-   breaks="Sturges", bin.start=NULL, bin.width=NULL,
+         prop=FALSE, cumul=c("off", "on", "both"), 
+         digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL,
 
-   prop=FALSE, cumul=c("off", "on", "both"), 
-   digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL, text.out=TRUE,
-
-   pdf.file=NULL, pdf.width=5, pdf.height=5, ...) 
+         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 hs(\ldots)
 hst(\ldots)
@@ -43,10 +39,11 @@ hst(\ldots)
 
 \arguments{
   \item{x}{Variable for which to construct the histogram.  Can be a data frame.  If not
-      specified with \code{dframe}, that is, no variable specified, then the data frame
+      specified with \code{data}, that is, no variable specified, then the data frame
       \code{mydata} is assumed.}
-  \item{dframe}{Optional data frame that contains the variable of interest, default
-        is \code{mydata}.} \item{n.cat}{When analyzing all the variables in a data frame,
+  \item{data}{Optional data frame that contains the variable of interest, default
+        is \code{mydata}.}
+  \item{n.cat}{When analyzing all the variables in a data frame,
         specifies the largest number of unique values of variable of a numeric data type
         for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{col.fill}{Color of the bars. To set transparency level, use \code{lessR} 
@@ -77,7 +74,7 @@ hst(\ldots)
   \item{xlab}{Label for x-axis. Defaults to variable name.}
   \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.}
   \item{main}{Title of graph.}
-  \item{text.out}{If \code{TRUE}, then display text output in console.}
+  \item{quiet}{If set to \code{TRUE}, no text output.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -93,18 +90,18 @@ hst(\ldots)
 OVERVIEW\cr
 Results are based on the standard R \code{\link{hist}} function for calculating and plotting a histogram, with the additional provided color capabilities and other options including a relative frequency histogram. 
 
-However, a histogram with densities is not supported. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}.  To plot densities, which correspond to setting \code{freq} to \code{FALSE}, use the \code{lessR} function \code{\link{den}}.
+However, a histogram with densities is not supported. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}.  To plot densities, which correspond to setting \code{freq} to \code{FALSE}, use the \code{lessR} function \code{\link{Density}}.
 
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
+If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
 
 To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses.
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black backgound, no gridlines and partial transaparency of plotted colors. 
+Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
 
 VARIABLE LABELS\cr
-Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
+If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 ONLY VARIABLES ARE REFERENCED\cr
 The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
@@ -157,8 +154,8 @@ Histogram(y)
 
 # histogram with orange color theme, transparent orange bars, no grid lines
 set(colors="orange", ghost=TRUE)
-# back to default of "blue" color theme
 Histogram(y)
+# back to default of "blue" color theme
 set(colors="blue")
 
 # histogram with specified bin width
@@ -209,14 +206,14 @@ Histogram(X)
 
 # histograms for all numeric variables in data frame called mydata
 #  except for numeric variables with unique values < n.cat
-# mydata is the default name, so does not need to be specified with dframe
+# mydata is the default name, so does not need to be specified with data
 Histogram()
 
 # variable of interest is in a data frame which is not the default mydata
 # access the breaks variable in the R provided warpbreaks data set
 # although data not attached, access the variable directly by its name
 data(warpbreaks)
-Histogram(breaks, dframe=warpbreaks)
+Histogram(breaks, data=warpbreaks)
 Histogram()
 
 # histograms for all numeric variables in data frame called mydata
@@ -226,7 +223,7 @@ Histogram(col.fill="palegreen1", col.bg="ivory", labels=TRUE)
 # Use the subset function to specify a variable list
 # histograms for all specified numeric variables
 mysub <- subset(mydata, select=c(X,Y))
-Histogram(dframe=mysub)
+Histogram(data=mysub)
 }
 
 

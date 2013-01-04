@@ -12,11 +12,11 @@ Writes the contents of the specified data frame, such as with the default \code{
 }
 
 \usage{
-Write(ref, type=c("csv", "R"), dframe=mydata, \ldots)
+Write(ref, format=c("csv", "R"), data=mydata, \ldots)
 
 wrt(\ldots)
 
-wrt.r(\ldots, type="R")
+wrt.r(\ldots, format="R")
 }
 
 
@@ -24,9 +24,9 @@ wrt.r(\ldots, type="R")
   \item{ref}{Name of the output file as a character string, that is, with quotes.
         If not included in the name, the file type is automatically added to the
         name, either \code{.csv} or \code{.rda}, depending of the value of
-        \code{type}.}
-  \item{type}{Type of file to be written with \code{.csv} as the default.}
-  \item{dframe}{Data frame to be written as an object, that is, no quotes.}
+        \code{format}.}
+  \item{format}{Format of file to be written with \code{.csv} as the default.}
+  \item{data}{Data frame to be written as an object, that is, no quotes.}
   \item{...}{Other parameter values consistent with the usual \code{\link{write.table}}, such as \code{row.names=FALSE} to suppress writing the row names.}
 }
 
@@ -60,7 +60,7 @@ wrt.r()
 # access the R data frame warpbreaks
 data(warpbreaks)
 # write the file warpbreaks.rda
-wrt.r(dframe=warpbreaks)
+wrt.r(data=warpbreaks)
 
 }
 

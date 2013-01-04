@@ -1,5 +1,5 @@
 SummaryStats <-
-function(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"), 
+function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
          digits.d=NULL, brief=FALSE, ...)  {
 
 
@@ -8,24 +8,25 @@ function(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"),
   if (missing(x)) {
     x.name <- ""  # in case x is missing, i.e., data frame mydata
     is.df <- TRUE
-    dframe <- eval(substitute(mydata))
+    data <- eval(substitute(mydata))
   }
   else {
-    # get actual variable name before potential call of dframe$x
+    # get actual variable name before potential call of data$x
     x.name <- deparse(substitute(x)) 
     options(xname = x.name)
     if (exists(x.name, where=1)) if (is.data.frame(x)) {
        is.df <- TRUE
-       dframe <- x
+       data <- x
     }
   }
 
   if (!is.df) {
 
-    dframe.name <- deparse(substitute(dframe))
+    dname <- deparse(substitute(data))
+    options(dname = dname)
 
-    # get conditions and check for dframe existing
-    xs <- .xstatus(x.name, dframe.name)
+    # get conditions and check for data existing
+    xs <- .xstatus(x.name, dname)
     is.frml <- xs$ifr
     in.global <- xs$ig 
 
@@ -36,18 +37,18 @@ function(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"),
     }
 
     # see if the variable exists in data frame, if x not in Global Env 
-    if (!in.global) .xcheck(x.name, dframe.name, dframe)
+    if (!in.global) .xcheck(x.name, dname, data)
 
-    if (!in.global) x.call <- eval(substitute(dframe$x))
+    if (!in.global) x.call <- eval(substitute(data$x))
     else {  # vars that are function names get assigned to global
       x.call <- x
-      if (is.function(x.call)) x.call <- eval(substitute(dframe$x))
+      if (is.function(x.call)) x.call <- eval(substitute(data$x))
     }
 
     # evaluate by
     if (!missing(by)) {
 
-      # get actual variable name before potential call of dframe$x
+      # get actual variable name before potential call of data$x
       y.name <- deparse(substitute(by)) 
       options(yname = y.name)
 
@@ -56,20 +57,20 @@ function(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"),
       if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
         in.call <- TRUE else in.call <- FALSE
 
-      # get conditions and check for dframe existing
+      # get conditions and check for data existing
       if (!in.call) {
-        xs <- .xstatus(y.name, dframe.name)
+        xs <- .xstatus(y.name, dname)
         in.global <- xs$ig 
       }
       else in.global <- FALSE
 
       # see if var exists in data frame, if x not in Global Env or function call 
-      if (!in.global && !in.call) .xcheck(y.name, dframe.name, dframe)
+      if (!in.global && !in.call) .xcheck(y.name, dname, data)
 
-      if (!in.global) y.call <- eval(substitute(dframe$by))
+      if (!in.global) y.call <- eval(substitute(data$by))
       else {  # vars that are function names get assigned to global
         y.call <- by
-        if (is.function(y.call)) y.call <- eval(substitute(dframe$by))
+        if (is.function(y.call)) y.call <- eval(substitute(data$by))
       }
     }
     else y.call <- NULL
@@ -78,10 +79,10 @@ function(x=NULL, by=NULL, dframe=mydata, n.cat=getOption("n.cat"),
 
   if (!is.df) nu <- length(unique(na.omit(x.call)))
 
-  if (is.df) .ss.data.frame(dframe, n.cat, ...) 
+  if (is.df) .ss.data.frame(data, n.cat, ...) 
 
   else if (is.numeric(x.call)  &&  nu > n.cat)
-     .ss.numeric(x.call, y.call, dframe, digits.d, brief, ...)
+     .ss.numeric(x.call, y.call, data, digits.d, brief, ...)
 
   else if (is.numeric(x.call) && nu <= n.cat) {
     cat("\n>>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",

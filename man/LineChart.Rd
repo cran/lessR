@@ -14,37 +14,41 @@ For data of one variable exhibiting little trend, the center line is provided fo
 }
 
 \usage{
-LineChart(y, dframe=mydata, type=NULL, 
+LineChart(y, data=mydata, type=NULL, 
 
-         col.line=getOption("col.stroke.pt"),
-         col.area=NULL, col.box="black",
-         col.stroke=getOption("col.stroke.pt"), 
-         col.fill=getOption("col.fill.bar"),
-         col.grid=getOption("col.grid"),
+         col.fill=getOption("col.fill.bar"), 
+         col.stroke=getOption("col.stroke.pt"),
          col.bg=getOption("col.bg"),
+         col.grid=getOption("col.grid"),
+         col.line=getOption("col.stroke.pt"),
+
+         col.area=NULL, col.box="black",
 
          shape.pts=21, cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
-         x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
+
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
 
-         center.line=c("default", "mean", "median", "off"), text.out=TRUE, 
+         center.line=c("default", "mean", "median", "off"),
 
-         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 lc(\ldots)
 }
 
 \arguments{
   \item{y}{Variable for which to construct the line chart, values on the vertical axis.}
-  \item{dframe}{Data frame that contains the variable of interest, default is \code{mydata}.}
+  \item{data}{Data frame that contains the variable of interest, default is \code{mydata}.}
   \item{type}{Character string that indicates the type of plot, either \code{"p"} for 
-        points, \code{"l"} for line, or \code{"b"} for both.  If x and y are provided and 
-        x is sorted so that a function is plotted, the default is \code{"l"}, or, when x 
-        is not sorted, the default is \code{"p"} for point, yielding a scatter plot.  If
-        only the values of x are provided, then a run chart is produced with the default 
-        type of \code{"b"} for both points and lines.}
+        points, \code{"l"} for line, or \code{"b"} for both. The default is 
+        \code{"b"} for both points and lines.}
+  \item{col.fill}{For plotted points, the interior color of the point.  For a
+        scatterplot the default value is transparent.  For a run chart the default value is 
+        the color of the point's border, \code{col.stroke}.}
+  \item{col.stroke}{Color of the border of the plotted points.}
+  \item{col.bg}{Color of the plot background.}
+  \item{col.grid}{Color of the grid lines, with a default of \code{"grey90"}.}
   \item{col.line}{Color of any plotted line segments, with a default of \code{"darkblue"}.}
   \item{col.area}{Color of area under the plotted line segments.  To have a border
         at the bottom and right of a run chart but retain the property of no area color, 
@@ -53,16 +57,9 @@ lc(\ldots)
         otherwise there is no default color. }
   \item{col.box}{Color of border around the plot background, the box, that encloses 
         the plot, with a default of \code{"black"}.}
-  \item{col.stroke}{Color of the border of the plotted points.}
-  \item{col.fill}{For plotted points, the interior color of the point.  For a
-        scatterplot the default value is transparent.  For a run chart the default value is 
-        the color of the point's border, \code{col.stroke}.}
-  \item{col.grid}{Color of the grid lines, with a default of \code{"grey90"}.}
-  \item{col.bg}{Color of the plot background.}
   \item{shape.pts}{The standard plot character, with values defined in help(points). The
        default value is 21, a circle with both a border and filled area, specified here as
-       \code{col.stroke} and \code{col.fill}.  For a scatterplot, \code{col.fill}
-       defaults to transparent.  For a run chart, \code{col.fill} defaults to
+       \code{col.stroke} and \code{col.fill}.    \code{col.fill} defaults to
        \code{col.stroke}.}
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be 
         smaller than the axis labels.}
@@ -77,18 +74,9 @@ lc(\ldots)
        then \code{xlab} is set to Index unless \code{xlab} has been specified.}
   \item{ylab}{Label for y-axis. If not specified, then the label becomes the name of
       the corresponding variable. If \code{xy.ticks} is \code{FALSE}, then no label displayed.}
-  \item{main}{Label for the title of the graph.  If the corresponding variable labels exist 
-      in the data frame \code{mylabels}, then the title is set by default from the corresponding 
-      variable labels.}
+  \item{main}{Label for the title of the graph.  If the corresponding variable labels exist,
+      then the title is set by default from the corresponding variable labels.}
   \item{cex}{Magnification factor for any displayed points, with default of cex=1.0.}
-  \item{x.start}{For Likert style response data, the starting integer value of the x-axis. Useful
-      if the actual data do not include all possible values.}
-  \item{x.end}{For Likert style response data, the ending integer value of the x-axis. Useful
-      if the actual data do not include all possible values.}
-  \item{y.start}{For Likert style response data, the starting integer value of the y-axis. Useful
-      if the actual data do not include all possible values.}
-  \item{y.end}{For Likert style response data, the ending integer value of the y-axis. Useful
-      if the actual data do not include all possible values.}
   \item{time.start}{Optional starting date for first data value. Format must be 
        "\%Y-\%m-\%d" or "\%Y/\%m/\%d". If using with \code{x.reverse}, the first date is after 
        the data are reverse sorted. Not needed if data are a time series with
@@ -104,7 +92,7 @@ lc(\ldots)
   \item{center.line}{Plots a dashed line through the middle of a run chart.  The two
       possible values for the line are \code{"mean"} and \code{"median"}.  Provides a centerline
       for the \code{"median"} by default when the values randomly vary about the mean.}
-  \item{text.out}{If \code{TRUE}, then display text output in console.}
+  \item{quiet}{If set to \code{TRUE}, no text output.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -121,13 +109,13 @@ The values on the horizontal axis of the line chart are automatically generated.
 If the data values randomly vary about the mean, the default is to plot the mean as the center line of the graph, otherwise the default is to ignore the center line.  The default plot type for the line chart is \code{type="b"}, for both points and the corresponding connected line segments.  The size of the points is automatically reduced according to the number of points of points plotted, and the \code{cex} option can override the computed default.  If the area below the plotted values is specified to be filled in with color, then the default line type changes to \code{type="l"}.
 
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{dframe} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
+If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{col.stroke} for the color of the border of the plotted points. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black backgound, no gridlines and partial transaparency of plotted colors.  
+Individual colors in the plot can be manipulated with options such as \code{col.stroke} for the color of the border of the plotted points. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
 
 VARIABLE LABELS\cr
-Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
+Although standard R does not provide for variable labels, \code{lessR} does, obtained from the \code{\link{Read}} function.  If the variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 PDF OUTPUT\cr
 Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
@@ -182,13 +170,13 @@ LineChart(y)
 LineChart(y, col.area="transparent")
 # time series chart, i.e., with dates, and filled area
 # with option label for the x-axis
-LineChart(y, time.start="2005/09/01", time.by="month")
+LineChart(y, time.start="2000/09/01", time.by="3 months")
 # time series chart from a time series object
-y.ts <- ts(y, start=c(2005, 9), frequency=12)
+y.ts <- ts(y, start=c(2000, 9), frequency=4)
 LineChart(y.ts)
 
 # LineChart with built-in data set
-LineChart(breaks, dframe=warpbreaks)
+LineChart(breaks, data=warpbreaks)
 }
 
 

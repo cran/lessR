@@ -25,34 +25,29 @@ export (
   corReflect, reflect, corProp, prop, corRead, rad.cor, 
   corScree, scree, corEFA, efa,
   Density, dn, den,
-  Help, hlp,
+  Help, hl,
   Histogram, hs, hst,
   label,
   LineChart, lc,
-  Logit, lgt,
+  Logit, lr,
+  Merge, mrg,
   Model, model, model.brief,
   PieChart, pc,
   prob.norm, prob.znorm, prob.tcut,
-  Read, rad, rad2, rad.brief, rad.labels, rad.both, 
+  Read, rd, rd2, rad, rad2, rad.brief,
   Regression, reg, reg.brief, reg.explain,
   Recode, rec,
   set, showColors,
   simCImean, simCLT, simFlips, simMeans,
   ScatterPlot, sp, Plot, DotPlot, dp,
   Sort, srt,
-  Subset, subs, locate,
+  Subset, subs,
   SummaryStats, ss, ss.brief,
   to,
   Transform, trans,
-  ttest, tt, tt.brief, smd.t.test,
+  ttest, tt, tt.brief,
   ttestPower, ttp,
   values, 
   Write, wrt, wrt.r
 )
 
-S3method(bc, default)
-S3method(bc, data.frame)
-S3method(bx, default)
-S3method(bx, data.frame)
-S3method(hst, default)
-S3method(hst, data.frame)

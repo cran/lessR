@@ -1,21 +1,23 @@
 Model <-
-function(my.formula, dframe=mydata, brief=FALSE, ...) {
-  mydframe <- deparse(substitute(dframe))  # get data frame name for cor before sort
+function(my.formula, data=mydata, brief=FALSE, ...) {
+
+  dname <- deparse(substitute(data))  # get data frame name for cor before sort
+  options(dname = dname)
 
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1
-  n.obs <- nrow(dframe)
+  n.obs <- nrow(data)
 
   var.type <- integer(length=n.vars)
   n.unique <- integer(length=n.vars)
   for (i in 1:n.vars) {
     var.type[i] <- ""
-    if (is.factor(dframe[,nm[i]])) var.type[i] <- "cat"
-    n.unique[i] <- length(unique(dframe[,nm[i]]))
+    if (is.factor(data[,nm[i]])) var.type[i] <- "cat"
+    n.unique[i] <- length(unique(data[,nm[i]]))
     #if (n.unique[i] < n.cat) var.type[i] <- "cat" 
     #else 
-    if (is.numeric(dframe[,nm[i]])) var.type[i] <- "num"
+    if (is.numeric(data[,nm[i]])) var.type[i] <- "num"
   }
 
   all.preds.cat <- TRUE
@@ -28,7 +30,7 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
     if (all.preds.num) {  # regression
 
       is.bin <- TRUE
-      for (i in 1:n.obs) if (dframe[i,nm[1]]!=0 && dframe[i,nm[1]]!=1) is.bin <- FALSE
+      for (i in 1:n.obs) if (data[i,nm[1]]!=0 && data[i,nm[1]]!=1) is.bin <- FALSE
 
       if (is.bin) {
         cat("\n")
@@ -37,10 +39,10 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
             "binary response variable ", nm[1], ".  \n", sep="")
         .dash(44)
         cat("\n")
-        Logit(my.formula, dframe, ...)
+        Logit(my.formula, data, ...)
       }
 
-      else if (length(unique(dframe[,nm[1]])) == 2) {
+      else if (length(unique(data[,nm[1]])) == 2) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "The response variable ", nm[1], " is binary, but can only have values of 0 or 1.\n\n",
           "Use Recode to transform the existing values to 0's and 1's.\n\n")
@@ -53,7 +55,7 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
             ".  \n", sep="")
         .dash(60)
         cat("\n")
-        Regression(my.formula, dframe, ...)
+        Regression(my.formula, data, ...)
       }
     }
 
@@ -67,7 +69,8 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
             "group means of response variable ", nm[1], ".\n", sep="")
         .dash(60)
         cat("\n")
-        f <- .tt.formula(my.formula, y, dframe, Ynm, Xnm, X1nm, X2nm, ...)  # formula
+        f <- .tt.formula(my.formula, y, data, separate=FALSE,
+                         Ynm, Xnm, X1nm, X2nm, ...)  # formula
         x <- f$x;  y <- f$y;
         Ynm <- f$Ynm;  Xnm <- f$Xnm;  X1nm <- f$X1nm;  X2nm <- f$X2nm 
 
@@ -79,7 +82,7 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
           .TwoGroup(x, y, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
             brief=FALSE, digits.d, 
-            conf.level=0.95, mmd=NULL, msmd=NULL, 
+            conf.level=0.95, alternative="two.sided", mmd=NULL, msmd=NULL, 
             bw1="nrd", bw2="nrd", graph=TRUE, show.title=TRUE,
             pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
         else {  # switch
@@ -89,7 +92,7 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
           .TwoGroup(x, y, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
             brief=FALSE, digits.d, 
-            conf.level=0.95, mmd=NULL, msmd=NULL, 
+            conf.level=0.95, alternative="two.sided", mmd=NULL, msmd=NULL, 
             bw1="nrd", bw2="nrd", graph=TRUE, show.title=TRUE,
             pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
         }
@@ -101,7 +104,7 @@ function(my.formula, dframe=mydata, brief=FALSE, ...) {
         cat("Run the ANOVA function to compare the corresponding \n",
             "group means of response variable ", nm[1], ".\n", sep="")
         .dash(60)
-        ANOVA(my.formula, dframe, brief, ...)
+        ANOVA(my.formula, data, brief, ...)
       }
     }  # all preds are categorical
 

@@ -1,11 +1,11 @@
 \name{Logit}
 \alias{Logit}
-\alias{lgt}
+\alias{lr}
 
 \title{Logit Analysis}
 
 \description{
-Abbreviation: \code{lgt}
+Abbreviation: \code{lr}
 
 Based directly on the standard R \code{\link{glm}} function with \code{family="binomial"}, automatically provides a logit regression analysis with graphics from a single, simple function call with many default settings, each of which can be re-specified.  By default the data exists as a data frame with the default name of \code{mydata}, such as data read by the \code{lessR} \code{Read} function.  Specify the model in the function call according to an R \code{\link{formula}}, that is, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign.  
 
@@ -17,7 +17,7 @@ The resulting scatterplot, when written to a pdf file according to \code{pdf=TRU
 }
 
 \usage{
-Logit(my.formula, dframe=mydata, digits.d=4, text.width=120, 
+Logit(my.formula, data=mydata, digits.d=4, text.width=120, 
 
      res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
      pred=TRUE, pred.all=FALSE, pred.sort=TRUE, cooks.cut=1, 
@@ -27,7 +27,7 @@ Logit(my.formula, dframe=mydata, digits.d=4, text.width=120,
 
      pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
 
-lgt(\ldots) 
+lr(\ldots) 
 }
 
 
@@ -35,7 +35,7 @@ lgt(\ldots)
   \item{my.formula}{Standard R \code{\link{formula}} for specifying a model.  For
        example, for a response variable named Y and two predictor variables, X1 and 
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
-  \item{dframe}{The default name of the data frame that contains the data for analysis 
+  \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
@@ -78,17 +78,17 @@ lgt(\ldots)
 OVERVIEW\cr
 The purpose of \code{Logit} is to combine the following function calls into one, as well as provide ancillary analyses such as as graphics, organizing output into tables and sorting to assist interpretation of the output.  
 
-The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of the logit model, \code{\link{glm}} with \code{family="binomial"}. The output of the analysis is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Logit} function. By default \code{reg} automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The correlation matrix of the model variables is obtained with \code{\link{cor}} function. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard generic R function \code{\link{predict}}.  The \code{lessR} \code{\link{den}} function provides the histogram and density plots for the residuals and the \code{\link{ScatterPlot}} function provides the scatter plots of the residuals with the fitted values and of the data for the one-predictor model. 
+The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of the logit model, \code{\link{glm}} with \code{family="binomial"}. The output of the analysis is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Logit} function. By default \code{reg} automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The correlation matrix of the model variables is obtained with \code{\link{cor}} function. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard generic R function \code{\link{predict}}.  The \code{lessR} \code{\link{Density}} function provides the histogram and density plots for the residuals and the \code{\link{ScatterPlot}} function provides the scatter plots of the residuals with the fitted values and of the data for the one-predictor model. 
 
 The default analysis provides the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, analysis of residuals and influence as well as the fitted value and standard error for each observation in the model. The response variable must be binary with only numeric values of 0 and 1. See the examples of how obtain exclusive 0 and 1 values from character data. 
 
 DATA FRAME\cr
-The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{dframe} option if the name is not the default \code{mydata}.
+The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{mydata}.
 
 GRAPHICS\cr
 Two or three default graphs are provided. By default the graphs are written to separate graphics windows (which may overlap each other completely, in which case move the top graphics windows). Or, the \code{graphics.save} option may be invoked to save the graphs to a single pdf file called \code{regOut.pdf}. The directory to which the file is written is displayed on the console text output.
 
-1. A histogram of the residuals includes the superimposed normal and general density plots from the \code{\link{den}} function included in this \code{lessR} package.  The overlapping density plots, which both overlap the histogram, are filled with semi-transparent colors to enhance readability.  
+1. A histogram of the residuals includes the superimposed normal and general density plots from the \code{\link{Density}} function included in this \code{lessR} package.  The overlapping density plots, which both overlap the histogram, are filled with semi-transparent colors to enhance readability.  
 
 2. A scatterplot of the residuals with the fitted values is also provided from the \code{\link{ScatterPlot}} function included in this package. The point corresponding to the largest value of Cook's distance, regardless of its size, is plotted in red and labeled and the corresponding value of Cook's distance specified in the subtitle of the plot. Also by default all points with a Cook's distance value larger than 1.0 are plotted in red, a value that can be specified to any arbitrary value with the \code{cooks.cut} option.  This scatterplot also includes the \code{\link{lowess}} curve.
 
@@ -101,10 +101,10 @@ INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{reg} is finished with a normal termination, the options are re-set to their values before the \code{reg} function began executing.
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black backgound, no gridlines and partial transaparency of plotted colors. 
+Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
 
 VARIABLE LABELS\cr
-Although standard R does not provide for variable labels, \code{lessR} can store the labels in a data frame called \code{mylabels}, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.}
+If variable labels exist,  then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.}
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
@@ -115,18 +115,18 @@ Although standard R does not provide for variable labels, \code{lessR} can store
 \examples{
 # obtain numeric 0,1 values from character data
 # Gender has values of "M" and "F"
-Read(lessR.data="Employee")
+mydata <- Read("Employee", format="lessR")
 # convert factor to integer, values 1 and 2
 # Female is 1 and Male is 2 (alphabetical)
-Transform(Gender=as.numeric(Gender))
+mydata <- Transform(Gender=as.numeric(Gender))
 # so create a new variable with numeric 0 and 1
 # Male is 0, Female is 1
-Recode(Gender, old=c(1,2), new=c(1,0))
+mydata <- Recode(Gender, old=c(1,2), new=c(1,0))
 # proceed with the logit regression
 Logit(Gender ~ Years)
 
 # short name
-lgt(Gender ~ Years)
+lr(Gender ~ Years)
 
 # Modify the default settings as specified
 Logit(Gender ~ Years, res.row=8, res.sort="rstudent", digits.d=8, pred=FALSE)
@@ -141,9 +141,8 @@ Logit(Gender ~ Years, pdf=TRUE, pdf.width=4, pdf.height=4, colors="gray")
 # Specify new values of the predictor variables to calculate
 #  forecasted values
 # Specify an input data frame other than mydata
-Read(lessR.data="Cars93", dframe=cars)
-Logit(Source ~ HP + MidPrice, dframe=cars,
-      X1.new=seq(100,250,50), X2.new=c(10,60,10))
+mydata <- Read("Cars93", format="lessR")
+Logit(Source ~ HP + MidPrice, X1.new=seq(100,250,50), X2.new=c(10,60,10))
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

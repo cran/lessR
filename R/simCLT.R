@@ -160,7 +160,7 @@ else {
        col.fill=col.fill, 
        col.bg=getOption("col.bg"),
        col.grid="transparent",
-       text.out=FALSE,
+       quiet=TRUE,
        bw="nrd0", 
        bin.start=NULL, bin.width=NULL,
        col.nrm="black", col.gen="black",

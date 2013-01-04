@@ -1,14 +1,12 @@
 .reg1Basic <-
-function(nm, mydframe, 
+function(lm.out, nm, dname, 
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line) {
 
 # ----------
 # Background
 # ----------
 
-  if (!explain) 
-    cat("\nAdd this option to view explanations of the results:  explain=TRUE\n")
-  cat( "\n\n\n", "  BACKGROUND", "\n")
+  cat( "\n\n", "  BACKGROUND", "\n")
 
   if(show.R) {
     cv <- paste(nm[1]," ~ ", sep="")
@@ -19,7 +17,7 @@ function(nm, mydframe,
   
   cat("\n")
   if (sys.nframe() == 1) {  # only accurate if not called from model
-    cat("Data Frame: ", mydframe, "\n\n")
+    cat("Data Frame: ", dname, "\n\n")
   }
 
   for (i in 1:n.vars) {
@@ -58,38 +56,7 @@ function(nm, mydframe,
     cat("    Null hypothesis: Corresponding population coefficient is 0\n")
     .dash(68)
    }
-  else cat("The Model, Hypothesis Tests\n")
 
-  smc <- sm$coefficients
-  buf <- 0 
-  for (i in 1:length(n.vars)) {
-    lng.lbl <- nchar(rownames(smc)[i])
-    if (lng.lbl > buf) buf <- lng.lbl 
-   }
-  max.num <- integer(length=0)
-  for (icol in 1:3) {
-    max.num[icol] <- 0 
-    for (i in 1:n.vars) {
-      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 1
-      if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
-    }
-    if (max.num[icol] < 9) max.num[icol] <- 9 
-  }
-  est.lbl <- .fmtc("Estimate", max.num[1]+1)
-  ste.lbl <- .fmtc("Std. Err", max.num[2]+1)
-  tvl.lbl <- .fmtc(" t-value", max.num[3]+1)
-  cat("\n", rep(" ", buf), est.lbl, ste.lbl, tvl.lbl, "   p-value", sep="", "\n")
-  for (i in 1:(n.vars)) {
-    rlb <- .fmtc(rownames(smc)[i], buf)
-    est <- format(sprintf("%7.*f", digits.d, smc[i,1]), width=max.num[1], justify="right")
-    ste <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.num[2], justify="right")
-    tvl <- format(sprintf("%7.*f", digits.d, smc[i,3]), width=max.num[3], justify="right")
-    pvl <- format(sprintf("%6.4f", smc[i,4]), width=9, justify="right")
-    cat(rlb, est, ste, tvl, pvl, "\n")
-  }
- 
-# confidence intervals 
-  cat("\n\n\n")
   if (show.R) cat("\n",line,pre,"confint(model)","\n",line,"\n",sep="")
   if (explain) {
     .dash(68)
@@ -99,11 +66,21 @@ function(nm, mydframe,
         "    The margin of error is half the width of the interval.\n")
     .dash(68)
   }
-  else cat("95% Confidence Intervals\n")
+  else cat("Model Coefficients\n")
 
-  smc <- confint(lm.out, level=0.95) 
+  # model coefficients
+  sm1 <- sm$coefficients
+  sm2 <- confint(lm.out, level=0.95) 
+  smc <- cbind(sm1, sm2)
+
+  buf <- 0 
+  for (i in 1:length(n.vars)) {
+    lng.lbl <- nchar(rownames(smc)[i])
+    if (lng.lbl > buf) buf <- lng.lbl 
+   }
+
   max.num <- integer(length=0)
-  for (icol in 1:2) {
+  for (icol in 1:6) {
     max.num[icol] <- 0 
     for (i in 1:n.vars) {
       ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 1
@@ -111,19 +88,28 @@ function(nm, mydframe,
     }
     if (max.num[icol] < 9) max.num[icol] <- 9 
   }
-  lb.lbl <- .fmtc("Lower", max.num[1]+1)
-  ub.lbl <- .fmtc("Upper", max.num[2]+1)
-  cat("\n", rep(" ", buf), lb.lbl, ub.lbl, sep="", "\n")
-  for (i in 1:(n.vars)) {
-    rlb <- .fmtc(rownames(smc)[i],buf)
-    lb <- format(sprintf("%7.*f", digits.d, smc[i,1]), width=max.num[1], justify="right")
-    ub <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.num[2], justify="right")
-    cat(rlb, lb, ub, "\n")
+
+  est.lbl <- .fmtc("Estimate", max.num[1]+1)
+  ste.lbl <- .fmtc("  Std Err", max.num[2]+2)
+  t.lbl <-  "  t-value"
+  p.lbl <-  "  p-value"
+  lb.lbl <- .fmtc("Lower 95%", max.num[5]+3)
+  ub.lbl <- .fmtc("Upper 95%", max.num[6]+3)
+  cat("\n", rep(" ", buf), est.lbl, ste.lbl, t.lbl, p.lbl, lb.lbl, ub.lbl, sep="", "\n")
+  for (i in 1:(nrow(smc))) {
+    rlb <- .fmtc(rownames(smc)[i], buf)
+    est <- format(sprintf("%7.*f", digits.d, smc[i,1]), width=max.num[1], justify="right")
+    ste <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.num[2]+1, justify="right")
+    tvl <- format(sprintf("%6.3f", smc[i,3]), width=8, justify="right")
+    pvl <- format(sprintf("%6.3f", smc[i,4]), width=8, justify="right")
+    lb <- format(sprintf("%7.*f", digits.d, smc[i,5]), width=max.num[5], justify="right")
+    ub <- format(sprintf("%7.*f", digits.d, smc[i,6]), width=max.num[6], justify="right")
+    cat(rlb, est, ste, tvl, pvl, " ", lb, " ", ub, "\n")
   }
- 
-# model fit
+
+  # model fit
   cat("\n\n\n")
-  cat("Model fit\n")
+  cat("Model Fit\n")
   cat("\n")
   if (explain) {
     .dash(68)
@@ -137,11 +123,14 @@ function(nm, mydframe,
     .dash(68)
     cat("\n")
   }
-  cat("Standard deviation of residuals: ", signif(sm$sigma,4),
+  se <- sm$sigma
+  cat("Standard deviation of residuals: ", .fmt(se,digits.d-1),
     "for", sm$df[2], "degrees of freedom", "\n")
-  cat("If normal, the approximate 95% range of residuals about\n")
-  cat("  each fitted value is 4*", signif(sm$sigma,4), 
-    " or ", signif(4*sm$sigma,4), sep="", "\n\n")
+  cat("If normal, the approximate 95% range of residuals about each fitted\n")
+  tcut <- -qt(0.025, df=sm$df[2])
+  cat("  value is 2*t-cutoff*", se, 
+    ", with a 95% interval t-cutoff of ", .fmt(tcut,3), "\n", sep="")
+  cat("95% range of variation: ", .fmt(2*tcut*se,digits.d-1), sep="", "\n\n")
   if (explain) {
     cat("\n")
     .dash(68)
@@ -157,20 +146,19 @@ function(nm, mydframe,
     .dash(68)
     cat("\n")
   }
+  pvl <- 1-pf(sm$fstatistic[1],sm$fstatistic[2],sm$fstatistic[3])
   cat("R-squared: ", .fmt(sm$r.squared,3), 
     "    Adjusted R-squared: ", .fmt(sm$adj.r.squared,3), "\n")
   cat("\n")
-  cat("F-statistic for null hypothesis that population R-squared=0: ", 
-    .fmt(sm$fstatistic[1],4), "\n") 
-  cat("Degrees of freedom: ", sm$fstatistic[2], "and", sm$fstatistic[3],"\n")
-  pvl <- 1-pf(sm$fstatistic[1],sm$fstatistic[2],sm$fstatistic[3])
-  cat("p-value:",
-    format(sprintf("%5.4f", pvl), width=9, justify="right"), sep="", "\n")
+  cat("Null hypothesis that population R-squared=0\n", 
+      "  F-statistic: ", .fmt(sm$fstatistic[1],3),
+      "     df: ", sm$fstatistic[2], " and ", sm$fstatistic[3],
+      "     p-value:", .fmt(pvl, 3, 7), sep="", "\n")
  
-# ANOVA 
+  # ANOVA 
   smc <- anova(lm.out)
   cat("\n\n")
-  if (show.R) cat("\n\n",line, pre,"anova(model)","\n",line,"\n",sep="") else cat("\n")
+  if (show.R) cat("\n\n",line, pre,"anova(model)", "\n",line,"\n",sep="") else cat("\n")
   if (explain) {
     .dash(68)
     cat("The ANOVA table presents the amount of the explained and unexplained\n",
@@ -182,7 +170,7 @@ function(nm, mydframe,
     .dash(68)
     cat("\n")
   }
-  cat("Analysis of Variance table\n")
+  cat("Analysis of Variance\n")
   buf <- 0 
   for (i in 1:n.vars) {
     lng.lbl <- nchar(rownames(smc)[i])

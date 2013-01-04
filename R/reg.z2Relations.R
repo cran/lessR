@@ -1,5 +1,5 @@
 .reg2Relations <- 
-function(nm, mydframe,
+function(lm.out, nm, dname,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          cor, collinear, subsets, numeric.all, in.data.frame) {
 
@@ -27,7 +27,7 @@ function(nm, mydframe,
         if (show.R) {
           cv <- paste("\"",nm[1],"\"", sep="")
           for (i in 2:n.vars) cv <- paste(cv, ",\"", nm[i], "\"", sep="")
-          cat(line, pre, "cor(", mydframe, "[c(", cv, ")])", "\n", line, "\n", sep="")
+          cat(line, pre, "cor(", dname, "[c(", cv, ")])", "\n", line, "\n", sep="")
         }
         else cat("\n") 
         print(cor(lm.out$model[c(nm)]), digits=2)
@@ -56,13 +56,13 @@ function(nm, mydframe,
     }
     else cat( "\n\n", "Collinearity", "\n", sep="")
     cat("\n")
-   if (numeric.all) {
-      cat("\n  Tolerances\n\n")
-      print(1/(vif(lm.out)), digits=3)  # car function
-      cat("\n\n  Variance Inflation Factors\n\n")
-      print(vif(lm.out), digits=4)
-     }
-     else cat("\n>>> No collinearity analysis because not all variables are numeric.\n")
+    if (numeric.all) {
+      tol <- 1/(vif(lm.out)) 
+      tol <- data.frame(tol, vif(lm.out)) 
+      names(tol) <- c("Tolerance", "    VIF")
+      print(round(tol,3))
+    }
+    else cat("\n>>> No collinearity analysis because not all variables are numeric.\n")
   }
 
   # all possible subsets of predictor variables    
@@ -81,16 +81,25 @@ function(nm, mydframe,
           "A 1 means the predictor variable is in the model, a 0 means it is out.\n", sep="")
       .dash(68)
     }
-    else cat("Predictor Variable Subsets", "\n")
+    else cat("All Possible Subset Regressions", "\n")
     cat("\n")
     if (numeric.all) {
       X <- data.frame(lm.out$model[nm[seq(2,n.vars)]])
       Y <- numeric(length=n.keep)  # convert response to an atomic vector for leaps
       for (i in 1:n.keep) Y[i] <- lm.out$model[nm[1]][i,1]
-      leaps.out <- leaps(X, Y, method="adjr2")  # leaps function
-      models <- data.frame(cbind(leaps.out$which,leaps.out$adjr2), row.names=NULL)
-      names(models) <- c(names(X),"R2adj")
-      print(models[order(models$R2adj, decreasing=TRUE),], digits=3)
+      lp.out <- leaps(X, Y, method="adjr2")  # leaps function
+      md <- lp.out$which
+      rownames(md) <- 1:nrow(md)  # matrix md does not have proper row names
+      models <- data.frame(cbind(md, lp.out$adjr2, lp.out$size-1))  # cbind gives 0, 1
+      names(models) <- c(names(X), "R2adj", "X's")
+      mod.srt <- models[order(models$R2adj, decreasing=TRUE),]
+      names(mod.srt)[ncol(mod.srt)-1] <- "   R2adj"
+      if (nrow(mod.srt) < 51)
+        print(mod.srt, digits=3, row.names=FALSE)
+      else {
+        print(mod.srt[1:50, ], digits=3, row.names=FALSE)
+        cat("\n>>> Only first 50 rows printed.\n\n")
+      }
     }
     else cat("\n>>> No subset analysis reported because not all variables are numeric.\n")
   }

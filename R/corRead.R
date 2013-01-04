@@ -15,6 +15,6 @@ function(ref=NULL, names=NULL) {
   if (!is.null(names)) colnames(myc) <- names
   rownames(myc) <- colnames(myc)
 
-  assign("mycor", myc, pos=.GlobalEnv)
+  return(myc)
 
 }
