@@ -3,7 +3,7 @@
 \alias{wrt}
 \alias{wrt.r}
 
-\title{Write the Contents of Data Frame mydata to an External File}
+\title{Write the Contents of a Data Frame to an External File}
 
 \description{
 Abbreviation: \code{wrt}, \code{wrt.r}

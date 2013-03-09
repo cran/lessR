@@ -1,5 +1,6 @@
 Subset <-
-function(rows, columns, data=mydata, holdout=FALSE, quiet=FALSE, ...) {
+function(rows, columns, data=mydata, holdout=FALSE,
+         quiet=getOption("quiet"), ...) {
 
   dname <- deparse(substitute(data))
 

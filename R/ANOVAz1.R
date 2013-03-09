@@ -4,7 +4,6 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
 
   p <- length(unique(na.omit(x.values)))
 
-  if (!brief) {
     # cell stats
     n <- tapply(y.values, x.values, length) 
     m <- tapply(y.values, x.values, mean) 
@@ -12,6 +11,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     mn <- tapply(y.values, x.values, min) 
     mx <- tapply(y.values, x.values, max) 
 
+  if (!brief) {
     # get maximum chars in 1st three columns
     max.lv <- 0; max.n <- 0; max.m <- 0; max.s <- 0; max.mn <- 0; max.mx <- 0
     for (i in 1:p) {
@@ -85,13 +85,41 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
   }
 
 
-  cat("\n\n")
-  cat("ANOVA\n")
-  .dash(5)
+  cat("\n\n\n")
+  cat("Analysis of Variance\n")
+  .dash(20)
+  n.vars <- 2
+  smc <- anova(av.out)
+  buf <- 0 
+  for (i in 1:n.vars) {
+    lng.lbl <- nchar(rownames(smc)[i])
+    if (lng.lbl > buf) buf <- lng.lbl 
+   }
+  max.num <- integer(length=0)
+  for (icol in 1:4) {
+    max.num[icol] <- 0 
+    for (i in 1:n.vars) {
+      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 2
+      if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
+    }
+    if (icol != 1) if (max.num[icol] < 9) max.num[icol] <- 9 
+  }
+  df.lbl <- .fmtc("     df", max.num[1]+2)
+  SS.lbl <- .fmtc(" Sum Sq", max.num[2]+1)
+  MS.lbl <- .fmtc("Mean Sq", max.num[3]+1)
+  fv.lbl <- .fmtc("F-value", max.num[4]+1)
+  cat(rep(" ", buf-5), df.lbl, SS.lbl, MS.lbl, fv.lbl, "   p-value", sep="", "\n")
+  for (i in 1:(n.vars)) {
+    rlb <- .fmtc(rownames(smc)[i], buf)
+    df <- format(sprintf("%i", smc[i,1]), width=max.num[1]-4, justify="right")
+    SS <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.num[2], justify="right")
+    MS <- format(sprintf("%7.*f", digits.d, smc[i,3]), width=max.num[3], justify="right")
+    fv <- format(sprintf("%7.*f", digits.d, smc[i,4]), width=max.num[4], justify="right")
+    pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
+    if (i < n.vars) cat(rlb, df, SS, MS, fv, pv, "\n") else cat(rlb, df, SS, MS, "\n") 
+  }
+
   sm <- summary(av.out)
-  print(sm)
-
-
   ssb <- sm[[1]][1,2]
   ssw <- sm[[1]][2,2]
   sst <- ssb + ssw

@@ -11,7 +11,7 @@ Sorts the values of a data frame according to the values of one or more variable
 }
 
 \usage{
-Sort(by, direction=NULL, data=mydata, quiet=FALSE, ...)
+Sort(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...)
 
 srt(\ldots)
 }
@@ -24,7 +24,8 @@ srt(\ldots)
        descending, one for each variable to be sorted.}
   \item{data}{The name of the data frame from which to create the subset, which
        is \code{mydata} by default.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{set}} function.}
   \item{\dots}{Parameter values.}
 }
 

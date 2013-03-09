@@ -25,7 +25,8 @@ BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
         horiz=TRUE, add.points=FALSE,
 
-        quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+        quiet=getOption("quiet"),
+        pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 bx(\ldots)
 }
@@ -57,14 +58,16 @@ bx(\ldots)
   \item{horiz}{Orientation of the boxplot. Set \code{FALSE} for vertical.}
   \item{add.points}{If \code{TRUE}, then place a dot plot (i.e., stripchart) over the
        box plot.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
+       \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for graphics as defined processed 
-       by \code{\link{boxplot}} and \code{\link{par}}, including \code{ylim} to set
+       by \code{\link{boxplot}} and \code{\link{bxp}} such as \code{whiskcol} for
+       the whisker color, etc. and \code{\link{par}}, including \code{ylim} to set
        the limits of the value axis, \code{lwd} for the line width, \code{cex.lab}
-       for the size of the label, and \code{col.main} for the title, etc.}
+       for the size of the label, \code{col.main} for the title, etc.}
 }
 
 
@@ -74,8 +77,9 @@ Unlike the standard R boxplot function, \code{\link{boxplot}}, the default here 
 
 Other graphic parameters are available to format the display, such as \code{main} for the title, and other parameters found in \code{\link{boxplot}} and \code{\link{par}}. To minimize white space around the boxplot, re-size the graphics window before or after creating the boxplot.
 
+
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation. 
+The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.
 
@@ -99,11 +103,14 @@ Instead, do the following:
 
 }
 
+\value{
+Based on the standard \code{R} function \code{\link{boxplot}}, invisibly returns a list with components described in \code{\link{boxplot}}.
+}
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{boxplot}}, \code{\link{par}}, \code{\link{set}}.
+\code{\link{boxplot}}, \code{\link{bxp}}, \code{\link{par}}, \code{\link{set}}.
 }
 
 \examples{
@@ -112,9 +119,9 @@ y <- rnorm(100,50,10)
 y[1] <- 90
 
 
-# -----------------------------
-# boxplot for a single variable
-# -----------------------------
+# ------------------------------
+# box plot for a single variable
+# ------------------------------
 
 # standard horizontal boxplot with all defaults
 BoxPlot(y)
@@ -128,29 +135,29 @@ BoxPlot(y, pdf.file="MyBoxPlot.pdf")
 # vertical boxplot with plum color
 BoxPlot(y, horiz=FALSE, col.fill="plum")
 
-# boxplot with outliers more strongly highlighted
+# box plot with outliers more strongly highlighted
 BoxPlot(y, col.stroke="red", xlab="My Variable")
 
 
-# -----------------------------------------------
-# boxplots for data frames and multiple variables
-# -----------------------------------------------
+# ------------------------------------------------
+# box plots for data frames and multiple variables
+# ------------------------------------------------
 
 # create data frame, mydata, to mimic reading data with rad function
 # mydata contains both numeric and non-numeric data
 mydata <- data.frame(rnorm(100), rnorm(100), rnorm(100), rep(c("A","B"),50))
 names(mydata) <- c("X","Y","Z","C")
 
-# boxplot for variable X from data frame, referred to directly
+# box plot for variable X from data frame, referred to directly
 BoxPlot(X)
 
-# boxplot with superimposed dot plot (stripchart)
+# box plot with superimposed dot plot (stripchart)
 BoxPlot(X, dotplot=TRUE)
 
-# boxplots for all numeric variables in data frame called mydata
+# box plots for all numeric variables in data frame called mydata
 BoxPlot()
 
-# boxplots for all numeric variables in data frame called mydata
+# box plots for all numeric variables in data frame called mydata
 #  with specified options
 BoxPlot(col.fill="palegreen1", col.stroke="plum")
 

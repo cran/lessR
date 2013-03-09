@@ -1,13 +1,15 @@
 Logit <-
 function(my.formula, data=mydata, digits.d=4, text.width=120, 
 
+         brief=getOption("brief"),
+
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
-         pred=TRUE, pred.all=FALSE, pred.sort=TRUE, cooks.cut=1, 
+         pred=TRUE, pred.all=FALSE, cooks.cut=1, 
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL,
 
-         pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
  
   
   dname <- deparse(substitute(data))
@@ -16,7 +18,6 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
 
-  brief <- FALSE
   show.R <- FALSE
   explain <- FALSE
 
@@ -63,10 +64,19 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   }
 
   is.bin <- TRUE
-  for (i in 1:n.obs) if (data[i,nm[1]]!=0 && data[i,nm[1]]!=1) is.bin <- FALSE
+  if (is.factor(data[,nm[1]])) { 
+     if (nlevels(data[,nm[1]]) != 2) is.bin  <- FALSE
+  }
+  else {
+    for (i in 1:n.obs)
+      if (!is.na(data[i,nm[1]]))
+        if (data[i,nm[1]]!=0 && data[i,nm[1]]!=1) is.bin <- FALSE
+   }
   if (!is.bin) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "The response variable ", nm[1], " can only have values of 0 or 1.\n\n")
+      "Response variable: ", nm[1], "\n",
+      "If numeric, can only have values of 0 or 1.\n",
+      "If a factor, can only have two levels.\n\n")
   }
   
   if ( !is.null(X1.new) && (n.pred)>5 ) {
@@ -131,62 +141,113 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   
   cat( "\n\n\n", "  BASIC ANALYSIS", "\n\n")
 
+  cat("Model Coefficients\n")
+
   sm <- summary(lm.out)
-  cat("The Model, Hypothesis Tests\n")
-  print(sm)
+  sm1 <- sm$coefficients
+  ci <- suppressMessages(confint(lm.out, level=0.95))
+  smc <- cbind(sm1, ci)
 
-  # CIs using profiled log-likelihood
-  ci <- suppressMessages(confint(lm.out))
-  cat("\n\nConfidence intervals from profiled log-likelihoods\n\n")
-  print(ci)
+  buf <- 0 
+  for (i in 1:length(n.vars)) {
+    lng.lbl <- nchar(rownames(smc)[i])
+    if (lng.lbl > buf) buf <- lng.lbl 
+   }
 
-  # CIs using standard errors
-  ci.se <- confint.default(lm.out)
-  cat("\n\nConfidence intervals from standard errors\n\n")
-  print(ci.se)
+  max.num <- integer(length=0)
+  for (icol in 1:6) {
+    max.num[icol] <- 0 
+    for (i in 1:n.vars) {
+      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 1
+      if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
+    }
+    if (max.num[icol] < 9) max.num[icol] <- 9 
+  }
 
-  # ANOVA
-  av <- anova(lm.out)
-  cat("\n\n")
-  print(av)
+  est.lbl <- .fmtc("Estimate", max.num[1]+1)
+  ste.lbl <- .fmtc("  Std Err", max.num[2]+2)
+  t.lbl <-  "  z-value"
+  p.lbl <-  "  p-value"
+  lb.lbl <- .fmtc("Lower 95%", max.num[5]+3)
+  ub.lbl <- .fmtc("Upper 95%", max.num[6]+3)
+  cat("\n", rep(" ", buf), est.lbl, ste.lbl, t.lbl, p.lbl, lb.lbl, ub.lbl, sep="", "\n")
+  for (i in 1:(nrow(smc))) {
+    rlb <- .fmtc(rownames(smc)[i], buf)
+    ub <- .fmt(smc[i,6], digits.d, max.num[6])
+    est <- .fmt(smc[i,1], digits.d, max.num[1])
+    ste <- .fmt(smc[i,2], digits.d, max.num[2]+1)
+    tvl <- .fmt(smc[i,3], 3, 8)
+    pvl <- .fmt(smc[i,4], 3, 8)
+    lb <- .fmt(smc[i,5], digits.d, max.num[5])
+    ub <- .fmt(smc[i,6], digits.d, max.num[6])
+    cat(rlb, est, ste, tvl, pvl, " ", lb, " ", ub, "\n")
+  }
 
   # odds ratios and 95% CI
-  orci <- exp(cbind(OR = coef(lm.out), ci))
+  OR <- coef(lm.out)
+  orci <- exp(cbind(OR, ci))
   cat("\n\nOdds ratios and confidence intervals\n\n")
-  print(orci)
-  
-  # check for all numeric vars  in.data.frame <- TRUE
+  max.num <- 9
+  OR.lbl <- .fmtc("Odds Ratio", max.num+1)
+  lb.lbl <- .fmtc("Lower 95%", max.num+3)
+  ub.lbl <- .fmtc("Upper 95%", max.num+3)
+  cat(rep(" ",13), OR.lbl, lb.lbl, ub.lbl, sep="", "\n")
+  for (i in 1:(nrow(orci))) {
+    rlb <- .fmtc(rownames(orci)[i], buf)
+    or.est <- .fmt(orci[i,1], digits.d, max.num)
+    lb <- .fmt(orci[i,2], digits.d, max.num)
+    ub <- .fmt(orci[i,3], digits.d, max.num)
+    cat(rlb, " ", or.est, " ", lb, " ", ub, "\n")
+  }
+
+  # model fit
+  cat("\n\n")
+  cat("Model Fit\n")
+  cat("\n")
+  cat("    Null deviance:", .fmt(sm$null.deviance,3), "on",
+      .fmti(sm$df.null), "degrees of freedom\n")
+  cat("Residual deviance:", .fmt(sm$deviance,3),  "on",
+      .fmti(sm$df.residual), "degrees of freedom\n\n")
+  cat("AIC:", sm$aic, "\n\n") 
+  cat("Number of iterations to convergence:", sm$iter, "\n\n")
+
+  # check for all numeric vars (except Y)  in.data.frame <- TRUE
   numeric.all <- TRUE
-  for (i in 1:n.vars) {
+  for (i in 2:n.vars) {
     if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
       cat("\n\n\n>>> Note: ", nm[i], "is not a numeric variable.\n")
       numeric.all <- FALSE
     }
   }
-  
-
-  if (res.rows > 0) {  # two plots here
-
-    if (!pdf) .graphwin(3)  # set up graphics system
+ 
+  # collinearity    
+  if (collinear) {
+    cat( "\n", "Collinearity", "\n", sep="")
+    cat("\n")
+    if (numeric.all) {
+      tol <- 1/(vif(lm.out)) 
+      tol <- data.frame(tol, vif(lm.out)) 
+      names(tol) <- c("Tolerance", "    VIF")
+      print(round(tol,3))
+    }
+    else cat("\n>>> No collinearity analysis because not all variables are numeric.\n")
+  }
+ 
+  if (res.rows > 0)
 
     .logit3Residual(lm.out, nm, dname,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
-         res.sort, res.rows, cooks.cut, 
-         pdf, pdf.width, pdf.height)
-  }
+         res.sort, res.rows, cooks.cut)
  
-  if (pred) {
-
-    if (res.rows == 0) .graphwin(1)
+  if (pred)
 
     .logit4Pred(lm.out, nm, dname, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
-         new.data, pred.sort, pred, pred.all, 
+         new.data, pred, pred.all, 
          numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new,
-         pdf, pdf.width, pdf.height)
-  }
+         pdf.file, pdf.width, pdf.height)
 
-  if (pdf) dev.off()
+  invisible(lm.out)
 
 }

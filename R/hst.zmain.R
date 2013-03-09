@@ -43,7 +43,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
   # for user supplied bins, from seq function or bin.start, 
   #  make sure entire data range is spanned
   if (is.numeric(breaks)) {
-    cc <- cut(x, breaks, ...)   # replace each data value with its bin
+    cc <- cut(x, breaks, dig.lab=6, ...)   # replace each data value with its bin
     labs <- levels(cc)  # get list of unique bins, ordered
     bins <- cbind(lower = as.numeric( sub("\\((.+),.*", "\\1", labs) ),
           upper = as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", labs) ))
@@ -161,4 +161,5 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
 
   cat("\n")
 
+  return(h)
 }

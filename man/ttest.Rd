@@ -21,7 +21,7 @@ ttest(x=NULL, y=NULL, data=mydata, paired=FALSE,
 
          Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", 
 
-         brief=FALSE, digits.d=NULL, conf.level=0.95,
+         brief=getOption("brief"), digits.d=NULL, conf.level=0.95,
          alternative=c("two.sided", "less", "greater"),
          mmd=NULL, msmd=NULL, 
 
@@ -59,7 +59,7 @@ tt(\ldots)
         two levels.}
   \item{X1nm}{Value of grouping variable, the level that defines the first group.}
   \item{X2nm}{Value of grouping variable, the level that defines the second group.}
-  \item{brief}{Extent of displayed results.}
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{set}} function.}
   \item{digits.d}{Number of decimal places for which to display numeric values. Suggestion only.}
   \item{conf.level}{Confidence level of the interval, expressed as a proportion.}
   \item{alternative}{Default is \code{"two.sided"}. Other values are \code{"less"}

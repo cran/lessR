@@ -15,7 +15,8 @@ PieChart(x, data=mydata,
          col.fill=NULL, col.low=NULL, col.hi=NULL,
          colors=c("rainbow", "terrain", "heat"),
          random.col=FALSE, main=NULL, 
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 pc(\ldots)
 }
@@ -34,7 +35,8 @@ pc(\ldots)
         the second variable is not ordered, otherwise is ignored. When \code{TRUE},
         each run of the same function call generally yields different colors of the slices}
   \item{main}{Title of graph.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}

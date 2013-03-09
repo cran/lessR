@@ -6,7 +6,7 @@ function (my.formula, y=NULL, data, ...) {
   if (!exists(dname)) {
     if (dname == "mydata") 
         txtA <- ", the default data frame name, " else txtA <- " "
-      txtB1 <- "So either create data frame by reading with the rad function, or\n"
+      txtB1 <- "So either create data frame by reading with the Read function, or\n"
       txtB2 <- "  specify the actual data frame with the parameter: data\n"
       txtB <- paste(txtB1, txtB2, sep="")
       cat("\n"); stop(call.=FALSE, "\n","------\n",

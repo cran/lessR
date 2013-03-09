@@ -1,20 +1,20 @@
 SummaryStats <-
 function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
-         digits.d=NULL, brief=FALSE, ...)  {
+    digits.d=NULL, brief=getOption("brief"), ...)  {
 
 
   is.df <- FALSE  # is data frame
 
-  if (missing(x)) {
-    x.name <- ""  # in case x is missing, i.e., data frame mydata
-    is.df <- TRUE
-    data <- eval(substitute(mydata))
-  }
-  else {
-    # get actual variable name before potential call of data$x
-    x.name <- deparse(substitute(x)) 
-    options(xname = x.name)
-    if (exists(x.name, where=1)) if (is.data.frame(x)) {
+    if (missing(x)) {
+      x.name <- ""  # in case x is missing, i.e., data frame mydata
+        is.df <- TRUE
+        data <- eval(substitute(mydata))
+    }
+    else {
+# get actual variable name before potential call of data$x
+      x.name <- deparse(substitute(x)) 
+        options(xname = x.name)
+        if (exists(x.name, where=1)) if (is.data.frame(x)) {
        is.df <- TRUE
        data <- x
     }

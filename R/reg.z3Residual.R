@@ -30,7 +30,7 @@ function(lm.out, nm,
           "rstudent: Externally Studentized residual, standardized value of the\n",
           "    residual from a model estimated without the case present.\n",
           "\n",
-          "dffits: The influence of an case on its own fitted value.\n",
+          "dffits: The influence of the case on its own fitted value.\n",
          "\n",
           "cooks: Cook's Distance, the aggregate influence of the case\n",
           "    on the estimation of the model coefficients.\n", sep="")

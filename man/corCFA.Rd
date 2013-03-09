@@ -3,7 +3,7 @@
 \alias{cfa}
 \alias{scales}
 
-\title{Confirmatory Factor Analysis of Multiple Indicator Measurement Models}
+\title{Confirmatory Factor Analysis of a Multiple Indicator Measurement Model}
 
 \description{
 Abbreviation: \code{cfa}, \code{scales}

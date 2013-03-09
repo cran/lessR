@@ -1,14 +1,15 @@
 set <-
 function(colors=c("blue", "gray", "rose", "green", "gold", "red",
          "dodgerblue", "purple", "sienna", "orange.black",
-         "gray.black"),
+         "gray.black", "white"),
 
          col.fill.bar=NULL, trans.fill.bar=NULL,
          col.fill.pt=NULL, trans.fill.pt=NULL,
          col.stroke.bar=NULL, col.stroke.pt=NULL, 
          col.bg=NULL, col.grid=NULL, col.heat=NULL, ghost=NULL,
 
-         n.cat=getOption("n.cat"), width=120, show=FALSE) {
+         n.cat=getOption("n.cat"), quiet=getOption("quiet"),
+         brief=getOption("brief"), width=120, show=FALSE) {
 
   to256 <- function(trans.level) trn <- (1-getOption(trans.level))*256
 
@@ -25,8 +26,6 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
       options(col.fill.bar = .maketrans("lightsteelblue3", to256("trans.fill.bar")))
     if (getOption("colors") == "gray")
       options(col.fill.bar = .maketrans("gray30", to256("trans.fill.bar")))
-    if (getOption("colors") == "orange")
-      options(col.fill.bar = rgb(249,99,2, alpha=to256("trans.fill.bar"), maxColorValue=256))
     if (getOption("colors") == "green")
       options(col.fill.bar = rgb(106,127,16, alpha=to256("trans.fill.bar"), maxColorValue=256))
     if (getOption("colors") == "rose")
@@ -41,6 +40,10 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
       options(col.fill.bar = .maketrans("purple1", to256("trans.fill.bar")))
     if (getOption("colors") == "sienna")
       options(col.fill.bar = .maketrans("sienna3", to256("trans.fill.bar")))
+    if (getOption("colors") == "orange.black")
+      options(col.fill.bar = rgb(249,99,2, alpha=to256("trans.fill.bar"), maxColorValue=256))
+    if (getOption("colors") == "gray.black")
+      options(col.fill.bar =  .maketrans("gray80", to256("trans.fill.bar")))
   }
   else {
     colors <- getOption("colors")
@@ -72,9 +75,10 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
   if (!is.null(col.bg)) options(col.bg=col.bg)
   if (!is.null(col.grid)) options(col.grid=col.grid)
 
-  if (!is.null(n.cat)) options(n.cat=n.cat)
-
-  if (!is.null(width)) options(width=width)
+  options(quiet=quiet)
+  options(brief=brief)
+  options(n.cat=n.cat)
+  options(width=width)
 
 
   if (!missing(colors)) {
@@ -206,7 +210,19 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
       if (is.null(col.grid)) options(col.grid = "gray30")
       if (is.null(col.heat)) options(col.heat = "gray30")
     }
+    if (theme == "white") {
+      if (is.null(col.fill.bar))
+        options(col.fill.bar = "white")
+      if (is.null(col.fill.pt))
+        options(col.fill.pt = "white")
+      if (is.null(col.stroke.bar)) options(col.stroke.bar = "black")
+      if (is.null(col.stroke.pt)) options(col.stroke.pt = "black")
+      if (is.null(col.bg)) options(col.bg = "transparent")
+      if (is.null(col.grid)) options(col.grid = "gray90")
+      if (is.null(col.heat)) options(col.heat = "gray70")
+    }
   }
+
   if (!missing(ghost)) {
     options(ghost=ghost)
     if (ghost) {
@@ -229,6 +245,8 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
     if (is.null(ghost)) ghost <- FALSE
     cat("Ghost colors:", getOption("ghost"), "\n")
     cat("\n")
+    cat("Suppress console output for many functions:", getOption("quiet"), "\n")
+    cat("Reduce console output for many functions:", getOption("brief"), "\n")
     cat("Number of categories:", getOption("n.cat"), "\n")
     cat("Column width:", getOption("width"), "\n")
   }

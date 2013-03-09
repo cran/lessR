@@ -400,7 +400,7 @@ function(x, by=NULL,
   if (!quiet) { 
 
     if (is.null(by)) {
-      .ss.factor(x, brief=TRUE)
+      .ss.factor(x)
 
       ch <- suppressWarnings(chisq.test(x))
       pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")

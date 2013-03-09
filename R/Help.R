@@ -129,7 +129,7 @@ else if (topic %in% c("data", "file", "csv", "sav", "rda")) {
 t0 <- "Data Files"
 
 t1 <-
-"R can read data files in many formats, including the csv format, or
+"R can read data files in many formats, including the csv format or
 \"comma separated values\". A csv file is a text file with commas that
 separate adjacent values in each row. Usually the variable names are in
 the first row and each remaining row contains the data for one case, 
@@ -159,19 +159,19 @@ files written by the SPSS system have the default file type of .sav. By
 
 set.up.plot()
 text(50,100, label=t0, font=4)
-text(0,55, label=t1, adj=0)
+text(0,54, label=t1, adj=0)
 
-help.more("Read", 10)
+help.more("Read", 9)
 }
 
 
-else if (topic %in% c("Read", "rd", "read")) {
+else if (topic %in% c("rd", "read")) {
 t0 <- "Read Data into R and Prepare for Analysis"
 
 f1 <- bquote(paste(bold("Read, rd"), "  Read a data file into an R data frame called mydata."))
 
 t1 <-
-"Browse for a csv, native R or SPSS data file available on the local computer 
+"Browse for a csv, native R or SPSS data file available on your local computer 
 system and read the information into the data table (frame) named: mydata. Use
 the function Read, or its abbreviation, rd. To browse, just add ().
     > mydata <- Read()
@@ -181,17 +181,17 @@ that all the lessR data analysis functions assume when reading data for analysis
 
 Or, specify the file to be read with the name in quotes. The file can be a path
 name to a data file available on the local computer system, or a file on the web.
-    > mydata <- rd(\"http://web.pdx.edu/~gerbing/data/twogroup.csv\")
+    > mydata <- Read(\"http://web.pdx.edu/~gerbing/data/twogroup.csv\")
 For web files, include the  http://.
 
-To see how to create a csv data file, enter: Help(data)
-To see how to create an R data file, enter: Help(write)
+To see how to create a comma separated values or csv data file: > Help(data)
+To see how to create an R data file from within R, enter: > Help(write)
 
 To read a text file where each column of data values is assigned a specific
 width, add the widths option that specifies the width of each column
 according to the order of the variables.  Enclose the list with the c
 function for combine, here to read 3 variables with widths of 4, 1 and 2.
-    > mydata <- Read(widths=c(4,1,2))
+    > mydata <- Read(widths=c(4,1,2), col.names=c(\"ID\", \"Gender\", \"Age\"))
 
 To read a tab-delimmited text file, add the option: sep=\"\\t\"
 To read a text file with a , for a decimal, add the options: sep=\";\", dec=\",\"
@@ -207,7 +207,7 @@ help.more("Read", 9)
 }
 
 
-else if (topic %in% c("Write", "wrt", "write")) {
+else if (topic %in% c("wrt", "write")) {
 t0 <- "Write Contents of Data Frame mydata into a Data File"
 
 f1 <- bquote(paste(bold("Write, wrt"), "  Write a data file called mydata into an R data frame."))
@@ -388,7 +388,7 @@ t1 <-
 "These functions graph a distribution of data values for a continuous variable
 such as Time. Replace Y in these examples with the actual variable name.
 
-An histogram, or hs, based on the current color theme, such as the default \"blue\".
+A histogram, or hs, based on the current color theme, such as the default \"blue\".
     > Histogram(Y)
 
 Specify the gray scale color theme, a title, and a label for the x axis.
@@ -658,7 +658,7 @@ text(0,47, label=t1, adj=0)
 help.more("ttest", 8)
 }
 
-else if (topic %in% c("anova", "av", "ANOVA")) {
+else if (topic %in% c("anova", "av")) {
 t0 <- "Compare Means of Two or More Groups"
 
 f1 <- bquote(paste(bold("ANOVA, av"), "  Analysis of variance to compare two or more group means."))

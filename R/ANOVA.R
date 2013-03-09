@@ -1,6 +1,9 @@
 ANOVA <-
-function(my.formula, data=mydata, brief=FALSE, digits.d=NULL, 
-         rb.points=TRUE, pdf=FALSE, pdf.width=5, pdf.height=5, ...) {  
+function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL, 
+         rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
+         pdf=FALSE, pdf.width=5, pdf.height=5, ...) {  
+
+  res.sort <- match.arg(res.sort)
 
   dname <- deparse(substitute(data))
   options(dname = dname)
@@ -93,18 +96,45 @@ function(my.formula, data=mydata, brief=FALSE, digits.d=NULL,
 
   # residuals
   if (!brief) {
+    n.keep <- nrow(av.out$model)
+    if (is.null(res.rows)) if (n.keep < 20) res.rows <- n.keep else res.rows <- 20 
+    if (res.rows == "all") res.rows <- n.keep  # turn off resids with res.rows=0
+
     cat("\n\n\n")
     cat("Fitted Values, Residuals, Standardized Residuals\n")
-    .dash(48)
-    fit <- .fmt(av.out$fitted, digits.d)
-    res <- .fmt(av.out$residuals, digits.d)
-    sres <- .fmt(rstandard(av.out), digits.d)
+    if (res.sort == "zresid")
+      cat("   [sorted by Standardized Residuals, ignoring + or - sign]\n")
+    if (res.sort == "fitted")  
+      cat("   [sorted by Fitted Value, ignoring + or - sign]\n")
+    if (res.rows < n.keep)
+      txt <- "cases (rows) of data, or res.rows=\"all\"]"
+    else
+      txt="]"
+    cat("   [res.rows = ", res.rows, " out of ", n.keep, " ", txt, sep="", "\n")
+    .dash(68)
+    fit <- fitted(av.out)
+    res <- residuals(av.out)
+    sres <- rstandard(av.out)
     out <- cbind(av.out$model[c(nm[seq(2,n.vars)],nm[1])], fit, res, sres)
     out <- data.frame(out)
     names(out)[n.vars+1] <- "fitted"
     names(out)[n.vars+2] <- "residual"
+    names(out)[n.vars+3] <- "zresid"
+
+    if (res.sort != "off") {
+      if (res.sort == "zresid") o <- order(abs(out$zresid), decreasing=TRUE)
+      if (res.sort == "fitted") o <- order(abs(out$fitted), decreasing=TRUE)
+      out <- out[o,]
+    }
     names(out)[n.vars+3] <- "z-resid"
-    print(out, digits=digits.d)
+    for (i in 1:(n.vars+3))
+      if (is.numeric(out[,i])) if (!is.integer(out[,i])) {
+        if (digits.d > 2) dec.digits <- digits.d-1 else dec.digits <- digits.d
+        out[,i] <- .fmt(out[,i],dec.digits)
+      }
+    print(out[1:res.rows,])
+    .dash(68)
+    rm(out)
   }
 
 # pairwise.t.test(mydata$Steady, mydata$TrtA)
@@ -113,5 +143,8 @@ function(my.formula, data=mydata, brief=FALSE, digits.d=NULL,
   options(op)  # restore options going into reg
 
   cat("\n")
+
+
+  invisible(av.out)
 
 }

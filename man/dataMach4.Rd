@@ -1,7 +1,7 @@
 \name{dataMach4}
 \docType{data}
 \alias{dataMach4}
-\title{Data: Machiavellianism Data}
+\title{Data: Machiavellianism}
 \description{Likert data responses to Christie and Giess's Mach~IV scale.
 
 All Likert items assessed on a 6-point scale from 0: Strongly Disagree to 5: Strongly Agree. Variable labels, the content of each item, are included.

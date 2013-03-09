@@ -24,7 +24,8 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          pt.reg="circle", pt.out="circle", 
          col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
 
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
   fit.line <- match.arg(fit.line)
@@ -75,11 +76,11 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
   options(dname = dname)
 
   # get conditions and check for data existing
-  xs <- .xstatus(x.name, dname)
+  xs <- .xstatus(x.name, dname, quiet)
   in.global <- xs$ig 
 
   # see if variable exists in data frame, if x not in Global Env or function call 
-  if (!missing(x) && !in.global)  .xcheck(x.name, dname, data)
+  if (!missing(x) && !in.global) .xcheck(x.name, dname, data)
 
   if (!in.global) x.call <- eval(substitute(data$x))
   else {  # vars that are function names get assigned to global
@@ -96,7 +97,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
     options(yname = y.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(y.name, dname)
+    xs <- .xstatus(y.name, dname, quiet)
     in.global <- xs$ig 
 
     # see if var exists in data frame, if x not in Global Env or function call 
@@ -119,7 +120,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
     options(byname = by.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(by.name, dname)
+    xs <- .xstatus(by.name, dname, quiet)
     in.global <- xs$ig 
 
     # see if var exists in data frame, if x not in Global Env or function call 

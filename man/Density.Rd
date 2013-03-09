@@ -28,7 +28,8 @@ Density(x, data=mydata,
        x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
 
-       quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+       quiet=getOption("quiet"),
+       pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 dn(\ldots)
 den(\ldots)
@@ -68,7 +69,8 @@ den(\ldots)
   \item{x.max}{Largest value of the variable x plotted on the x-axis.}
   \item{band}{If \code{TRUE}, add a rug plot, a direct display of density in the form of a
         narrow band beneath the density curve}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+        with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -90,7 +92,7 @@ The limits for the axes are automatically calculated so as to provide sufficient
 If \code{x.pt} is specified, then \code{type} is set to general and \code{y.axis} set to \code{TRUE}.
 
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
+The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 COLOR THEME\cr
 Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
@@ -111,6 +113,9 @@ Instead, do the following:
     > Density(Y)     # directly reference Y}
 }
 
+\value{
+Based on the standard \code{R} function \code{\link{density}}, invisibly returns an object of \code{\link{class}} "density". For details see \code{\link{density}}.
+}
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 

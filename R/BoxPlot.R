@@ -11,8 +11,11 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
         horiz=TRUE, add.points=FALSE,
 
-        quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {
+        quiet=getOption("quiet"),
+        pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {
 
+  if (getOption("colors") == "gray") col.stroke <- "black"
+  if (getOption("colors") == "gray.black") col.stroke <- getOption("col.stroke.pt")
 
   is.df <- FALSE  # is data frame
 
@@ -37,7 +40,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     options(dname = dname)
 
     # get conditions and check for data existing
-    xs <- .xstatus(x.name, dname)
+    xs <- .xstatus(x.name, dname, quiet)
     in.global <- xs$ig 
 
     # see if the variable exists in data frame, if x not in Global Env 
@@ -61,7 +64,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
   else {
     .opendev(pdf.file, pdf.width, pdf.height)
 
-    .bx.main(x.call, col.fill, col.stroke, col.bg, col.grid,
+    b <- .bx.main(x.call, col.fill, col.stroke, col.bg, col.grid,
          cex.axis, col.axis, col.ticks,
          horiz, add.points, xlab, main, digits.d, quiet, ...)
 
@@ -69,6 +72,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       dev.off()
       .showfile(pdf.file, "boxplot")
     }
+ 
+  invisible(b)
   }
 
 }

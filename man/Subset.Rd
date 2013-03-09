@@ -11,7 +11,8 @@ Based directly on the standard R \code{\link{subset}} function.  Output is provi
 }
 
 \usage{
-Subset(rows, columns, data=mydata, holdout=FALSE, quiet=FALSE, \ldots)
+Subset(rows, columns, data=mydata, holdout=FALSE,
+       quiet=getOption("quiet"), \ldots)
 
 subs(\ldots)
 }
@@ -26,7 +27,8 @@ subs(\ldots)
        is \code{mydata} by default.}
   \item{holdout}{Create a hold out sample for validation if rows is a proportion
        or an integer to indicate random extraction of rows of data.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{set}} function.}
   \item{\dots}{The list of variables, each of the form, \code{variable = equation}.
        Each \code{variable} can be the name of an existing variable in the data frame
        or a newly created variable.}
@@ -37,7 +39,7 @@ subs(\ldots)
 
 The argument \code{rows} can be a logical expression based on values of the variables, or it can be an integer or proportion to indicate random extraction of rows. An integer specifies the number of rows to retain, and a proportion specifies the corresponding proportion, which is then rounded to an integer. If \code{holdout=TRUE}, then the code to create a hold out data frame with a subsequent \code{Subset} analysis is also created. Copy and run this code on the original data frame to create the hold out sample.
 
-To indicate retaining an observation, specify at least one variable name and the value of the variable for which to retain the corresponding observations, using two equal signs to indicate the logical equality.  If no rows are specified, all rows are retained. Use the code{\link{row.names}} function to identify rows by their row names, as illustrated in the examples below.
+To indicate retaining an observation, specify at least one variable name and the value of the variable for which to retain the corresponding observations, using two equal signs to indicate the logical equality.  If no rows are specified, all rows are retained. Use the \code{\link{row.names}} function to identify rows by their row names, as illustrated in the examples below.
 
 To indicate retaining a variable, specify at least one variable name. To specify multiple variables, separate adjacent variables by a comma, and enclose the list within the standard R combine function, \code{\link{c}}.  A single variable may be replaced by a range of consecutive variables indicated by a colon, which separates the first and last variables of the range.  To delete a variable or variables, put a minus sign, -, in front of the \code{c}.
 }

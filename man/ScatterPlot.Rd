@@ -45,7 +45,8 @@ ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat")
          pt.reg="circle", pt.out="circle", 
          col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
 
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 sp(\ldots)
 
@@ -130,7 +131,8 @@ dp(\ldots)
   \item{col.out30}{For a dot plot, color of severe outliers.}
   \item{col.out15}{For a dot plot, color of potential outliers.}
   \item{new}{If \code{FALSE}, then add the dot plot to an existing graph.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}

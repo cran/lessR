@@ -27,6 +27,9 @@ function(x, n.cat,
           legend.title, legend.loc, legend.labels, legend.horiz, quiet,
           font.main=1, ...)
 
+        dev.off()
+        if (!quiet) .showfile(pdf.file, "bar chart")
+
       if (is.numeric(x[,i]) && nu <= n.cat)
         cat(">>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
             "so treat as a categorical variable.\n",

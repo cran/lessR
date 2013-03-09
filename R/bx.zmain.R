@@ -18,8 +18,10 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   # set up plot area
   bv <- (boxplot(x, col="transparent", bg="transparent",
      horizontal=horiz, xlab=x.lab, ylab=y.lab, main=main.lab, axes=FALSE, ...))
-  axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
-  axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
+  if (horiz)
+    axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
+  else
+    axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
   
   # colored background for plotting area
   usr <- par("usr")
@@ -36,7 +38,11 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   }
   # box plot
   boxplot(x, add=TRUE, col=col.fill, bg=col.stroke, pch=21,
-          horizontal=horiz, axes=FALSE, border=col.stroke)
+          horizontal=horiz, axes=FALSE, border=col.stroke, ...)
+  #boxplot(x, add=TRUE, col=col.fill, bg=col.stroke, pch=21,
+          #horizontal=horiz, axes=FALSE, border=col.stroke,
+          #whiskcol=getOption("col.fill.bar"), staplecol=getOption("col.fill.bar"),
+          #medcol=getOption("col.stroke.bar"))
 
   # dots
   if (add.points) 
@@ -85,6 +91,8 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   }
 
   cat("\n")
+
+  return(bv)
 
 }
 

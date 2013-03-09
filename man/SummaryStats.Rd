@@ -13,7 +13,7 @@ Descriptive or summary statistics for a numeric variable or a factor, one at a t
 
 \usage{
 SummaryStats(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
-         digits.d=NULL, brief=FALSE, \ldots)
+         digits.d=NULL, brief=getOption("brief"), \ldots)
 
 ss.brief(\dots, brief=TRUE)
 
@@ -27,9 +27,8 @@ ss(\dots)
   \item{by}{Applies to an analysis of a numeric variable, which is then analyzed at each level of the \code{by} variable. The variable is coerced to a factor.}
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
-  \item{brief}{If \code{TRUE}, then only sample size information, mean, standard deviation,
-        minimum, median and maximum are reported for a numeric variable. For a categorical
-        variable, only the table of frequencies and the chi-square test are reported.}
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{set}} function.}
+
   \item{\dots}{Further arguments to be passed to or from methods.}
 }
 

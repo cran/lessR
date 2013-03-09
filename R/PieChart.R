@@ -3,7 +3,8 @@ function(x, data=mydata,
          col.fill=NULL, col.low=NULL, col.hi=NULL,
          colors=c("rainbow", "terrain", "heat"),
          random.col=FALSE, main=NULL,
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
   if (missing(colors)) 
@@ -19,7 +20,7 @@ function(x, data=mydata,
   options(dname = dname)
 
   # get conditions and check for data existing
-  xs <- .xstatus(x.name, dname)
+  xs <- .xstatus(x.name, dname, quiet)
   is.frml <- xs$ifr
   from.data <- xs$fd
   in.global <- xs$ig 

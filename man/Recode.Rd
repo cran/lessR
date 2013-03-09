@@ -13,7 +13,8 @@ There is no provision to recode integer values to character strings because that
 }
 
 \usage{
-Recode(old.vars, new.vars=NULL, old, new, data=mydata, quiet=FALSE)
+Recode(old.vars, new.vars=NULL, old, new, data=mydata,
+       quiet=getOption("quiet"))
 
 rec(\ldots)
 }
@@ -30,12 +31,13 @@ rec(\ldots)
        converted to missing.}
   \item{data}{The name of the data frame from which to create the subset, which
        is \code{mydata} by default.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{set}} function.}
   \item{\dots}{Parameter values.}
 }
 
 \details{
-Specify the values to be recoded with the required \code{old} parameter, and the corresponding recoded values with the required \code{new} parameter.  Use \code{new.name} to specify the name of the variable that contains the recoded values. If \code{new.name} is not present, then the values of the original variable are overwritten with the recoded values.
+Specify the values to be recoded with the required \code{old} parameter, and the corresponding recoded values with the required \code{new} parameter.  Use \code{new.vars} to specify the name of the variable that contains the recoded values. If \code{new.vars} is not present, then the values of the original variable are overwritten with the recoded values.
 
 Not all of the existing values of the variable to be recoded need be specified.  Any value not specified is unchanged in the values of the recoded variable. Unless otherwise specified, missing values are unchanged.  To modify missing values, set \code{old="missing"} to covert missing data values to the specified value data value given in \code{new}.  Or, set \code{new="missing"} to covert the one or more existing valid data values specified in \code{old} to missing data values.
 
@@ -47,6 +49,7 @@ If the levels of a factor were to be recoded with \code{Recode}, then the factor
 \value{
 The recoded data frame is returned, usually assigned the name of \code{mydata} as in the examples below.  This is the default name for the data frame input into the \code{lessR} data analysis functions.
 }
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
@@ -74,13 +77,13 @@ mydata <- rec(Severity, old=1:4, new=seq(10,40,by=10))
 data(dataMach4)
 mydata <- Recode(c(m01:m03,m10), old=0:5, new=5:0, data=dataMach4)
 
-# for four Likert variables, convert any 0 or 1 to missing
+# convert any 1 for HealthPlan to missing
 # use Read to put data into mydata data frame
 # write results to newdata data frame
 mydata <- Read("Employee", format="lessR")
 newdata <- Recode(HealthPlan, old=1, new="missing")
 
-# for four Likert variables, convert any missing value to 99
+# for Years and Salary convert any missing value to 99
 mydata <- Read("Employee", format="lessR")
 mydata <- Recode(c(Years, Salary), old="missing", new=99)
 

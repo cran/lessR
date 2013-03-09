@@ -8,15 +8,16 @@ Each graph is based on a default color theme. The original default is \code{colo
 
 \usage{
 set(colors=c("blue", "gray", "rose", "green", "gold", "red",
-        "dodgerblue", "purple", "sienna", "orange.black",
-        "gray.black"),
+         "dodgerblue", "purple", "sienna", "orange.black",
+         "gray.black", "white"),
 
          col.fill.bar=NULL, trans.fill.bar=NULL,
          col.fill.pt=NULL, trans.fill.pt=NULL,
          col.stroke.bar=NULL, col.stroke.pt=NULL, 
          col.bg=NULL, col.grid=NULL, col.heat=NULL, ghost=NULL,
 
-         n.cat=getOption("n.cat"), width=120, show=FALSE)
+         n.cat=getOption("n.cat"), quiet=getOption("quiet"),
+         brief=getOption("brief"), width=120, show=FALSE)
 }
 
 
@@ -36,11 +37,15 @@ set(colors=c("blue", "gray", "rose", "green", "gold", "red",
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines.}
   \item{col.heat}{Color of the heat map for correlation matrices.}
-  \item{ghost}{Add a black background, transparent grid lines and transparency
-       for the bars. Overrides individual settings for those values.}
+  \item{ghost}{If \code{TRUE}, add a black background, transparent grid lines
+       and transparency for the bars. Overrides individual settings for
+       those values. Setting to \code{FALSE} has no effect.}
   \item{n.cat}{Number of categories, which specifies the largest number of unique
         values of variable of a numeric data type for which the variable will be
         analyzed as categorical. Default is turned off, a value of 0.}
+  \item{quiet}{If \code{TRUE} then some functions suppress console output.}
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
+       with \code{\link{set}} function.}
   \item{width}{Maximum width of each line displayed at the console, just accesses
         the standard R options function for width.}
   \item{show}{Option for showing all settings.}

@@ -101,7 +101,7 @@ function(lm.out, nm, my.formula, brief,
     }
   }
   else 
-    print(out, digits=digits.d)
+    print(out, digits=digits.d, row.names=FALSE)
 
   .dash(68)
 

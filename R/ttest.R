@@ -6,7 +6,7 @@ function(x=NULL, y=NULL, data=mydata, paired=FALSE,
 
          Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", 
 
-         brief=FALSE, digits.d=NULL, conf.level=0.95,
+         brief=getOption("brief"), digits.d=NULL, conf.level=0.95,
          alternative=c("two.sided", "less", "greater"),
          mmd=NULL, msmd=NULL, 
 
