@@ -1,7 +1,6 @@
 \name{Histogram}
 \alias{Histogram}
 \alias{hs}
-\alias{hst}
 
 
 \title{Histogram with Color}
@@ -31,10 +30,10 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"),
          prop=FALSE, cumul=c("off", "on", "both"), 
          digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL,
 
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
 
 hs(\ldots)
-hst(\ldots)
 }
 
 \arguments{
@@ -74,7 +73,7 @@ hst(\ldots)
   \item{xlab}{Label for x-axis. Defaults to variable name.}
   \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.}
   \item{main}{Title of graph.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -88,12 +87,10 @@ hst(\ldots)
 
 \details{
 OVERVIEW\cr
-Results are based on the standard R \code{\link{hist}} function for calculating and plotting a histogram, with the additional provided color capabilities and other options including a relative frequency histogram. 
-
-However, a histogram with densities is not supported. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}.  To plot densities, which correspond to setting \code{freq} to \code{FALSE}, use the \code{lessR} function \code{\link{Density}}.
+Results are based on the standard R \code{\link{hist}} function to calculate and plot a histogram, plus the additional provided color capabilities, a relative frequency histogram and summary statistics. However, a histogram with densities is not supported. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}.  To plot densities, which correspond to setting \code{freq} to \code{FALSE}, use the \code{lessR} function \code{\link{Density}}.
 
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
+The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses.
 
@@ -117,6 +114,10 @@ A somewhat relatively common error by beginning users of the base R \code{\link{
 
 PDF OUTPUT\cr
 Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+}
+
+\value{
+Based on the standard \code{R} function \code{\link{hist}}, invisibly returns an object of \code{\link{class}} "histogram". For details see \code{\link{hist}}.
 }
 
 

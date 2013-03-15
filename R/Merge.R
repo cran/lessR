@@ -1,5 +1,5 @@
 Merge <-
-function(data1, data2, by=NULL, quiet=FALSE, ...) {
+function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
 
   dname1 <- deparse(substitute(data1))
   dname2 <- deparse(substitute(data2))

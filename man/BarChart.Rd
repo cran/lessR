@@ -36,7 +36,8 @@ BarChart(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
          legend.horiz=FALSE, 
 
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots) 
 
 bc(\ldots)
 }
@@ -98,7 +99,8 @@ bc(\ldots)
        default are the levels for the second or \code{by} variable.}
   \item{legend.horiz}{By default the legend is vertical, but can be changed to
        horizontal.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
+       \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -114,8 +116,10 @@ Plot a bar chart with default colors for one or two variables, presumably with a
 
 The form of the entered data, the first variable x and optionally a second variable, y, is flexible.  The data may be entered as factors, numeric values, characters, or a matrix. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.  Plus, the bar colors for a second variable which is an ordered factor are also ordered in a corresponding progression.
 
-DATA FRAME ACCESS\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment. 
+DATA\cr
+The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function.
+
+If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment. 
 
 COLORS\cr
 For a one variable plot, the color of the bars is set by the current color theme according to the function \code{\link{set}}. When two variables are plotted, a set of arbitrary colors represent the various levels of the second variable. Currently transparency effects are not incorporated.\cr

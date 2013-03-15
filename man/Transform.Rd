@@ -11,7 +11,7 @@ Based closely on the standard R \code{\link{transform}} function. Output is prov
 }
 
 \usage{
-Transform(data=mydata, quiet=FALSE, \ldots)
+Transform(data=mydata, quiet=getOption("quiet"), \ldots)
 
 trans(\ldots)
 }
@@ -19,7 +19,8 @@ trans(\ldots)
 \arguments{
   \item{data}{The name of the data frame from which to create the subset, which
        is \code{mydata} by default.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{set}} function.}
   \item{\dots}{The list of transformations, each of the form, \code{variable = equation}. Each \code{variable} can be the name of an existing variable in the data frame or a newly created variable.}
 }
 

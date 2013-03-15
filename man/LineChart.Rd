@@ -32,7 +32,8 @@ LineChart(y, data=mydata, type=NULL,
 
          center.line=c("default", "mean", "median", "off"),
 
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 lc(\ldots)
 }
@@ -92,7 +93,8 @@ lc(\ldots)
   \item{center.line}{Plots a dashed line through the middle of a run chart.  The two
       possible values for the line are \code{"mean"} and \code{"median"}.  Provides a centerline
       for the \code{"median"} by default when the values randomly vary about the mean.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
@@ -109,7 +111,7 @@ The values on the horizontal axis of the line chart are automatically generated.
 If the data values randomly vary about the mean, the default is to plot the mean as the center line of the graph, otherwise the default is to ignore the center line.  The default plot type for the line chart is \code{type="b"}, for both points and the corresponding connected line segments.  The size of the points is automatically reduced according to the number of points of points plotted, and the \code{cex} option can override the computed default.  If the area below the plotted values is specified to be filled in with color, then the default line type changes to \code{type="l"}.
 
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
+The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{col.stroke} for the color of the border of the plotted points. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  

@@ -10,6 +10,10 @@ function (x=mycor,
       "Either enter the correct name, or calculate with: Correlation\n",
       "Or read the correlation matrix with: corRead\n\n")
   }
+  
+  # extract eigenvectors
+  eig <- eigen(mycor, symmetric=TRUE, only.values=TRUE)
+  ev <- eig$values
 
   # set up graphics system for 2 windows
   if (!pdf) {
@@ -20,10 +24,6 @@ function (x=mycor,
     pdf.file <- "Scree.pdf"
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
   }
-  
-  # extract eigenvectors
-  eig <- eigen(mycor, symmetric=TRUE, only.values=TRUE)
-  ev <- eig$values
 
   # scree plot
   .lc.main(ev, type=NULL, 

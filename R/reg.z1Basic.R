@@ -98,12 +98,13 @@ function(lm.out, nm, dname,
   cat("\n", rep(" ", buf), est.lbl, ste.lbl, t.lbl, p.lbl, lb.lbl, ub.lbl, sep="", "\n")
   for (i in 1:(nrow(smc))) {
     rlb <- .fmtc(rownames(smc)[i], buf)
-    est <- format(sprintf("%7.*f", digits.d, smc[i,1]), width=max.num[1], justify="right")
-    ste <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.num[2]+1, justify="right")
-    tvl <- format(sprintf("%6.3f", smc[i,3]), width=8, justify="right")
-    pvl <- format(sprintf("%6.3f", smc[i,4]), width=8, justify="right")
-    lb <- format(sprintf("%7.*f", digits.d, smc[i,5]), width=max.num[5], justify="right")
-    ub <- format(sprintf("%7.*f", digits.d, smc[i,6]), width=max.num[6], justify="right")
+    ub <- .fmt(smc[i,6], digits.d, max.num[6])
+    est <- .fmt(smc[i,1], digits.d, max.num[1])
+    ste <- .fmt(smc[i,2], digits.d, max.num[2]+1)
+    tvl <- .fmt(smc[i,3], 3, 8)
+    pvl <- .fmt(smc[i,4], 3, 8)
+    lb <- .fmt(smc[i,5], digits.d, max.num[5])
+    ub <- .fmt(smc[i,6], digits.d, max.num[6])
     cat(rlb, est, ste, tvl, pvl, " ", lb, " ", ub, "\n")
   }
 

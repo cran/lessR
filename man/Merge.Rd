@@ -11,10 +11,9 @@ Based directly on the standard R \code{\link{merge}} function for a vertical mer
 }
 
 \usage{
-Merge(data1, data2, by=NULL, quiet=FALSE, \ldots)
+Merge(data1, data2, by=NULL, quiet=getOption("quiet"), \ldots)
 
 mrg(\ldots)
-
 }
 
 \arguments{
@@ -25,7 +24,8 @@ mrg(\ldots)
   \item{by}{If specified, then signals a vertical merge and the variable by
         which the data frames are merged. Specify \code{"row.names"} for merging
         according to the row names.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{set}} function.}
   \item{\dots}{The specified arguments.}
 }
 

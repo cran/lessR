@@ -1,6 +1,6 @@
 Regression <-
 function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
-         text.width=120, brief=FALSE, explain=FALSE, show.R=FALSE,
+         text.width=120, brief=getOption("brief"), explain=FALSE, show.R=FALSE,
 
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
          pred.rows=NULL, pred.sort=c("predint", "off"),
@@ -67,7 +67,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
   if ( scatter.3D && (n.pred)!=2 ) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-       "Can have a 3d scatterplot only with exactly two predictor variables.\n\n")
+       "Can have a 3D scatterplot only with exactly two predictor variables.\n\n")
   }
   
   if ( !is.null(X1.new) && (n.pred)>5 ) {
@@ -124,6 +124,11 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
        "The attempted solution is singular. Too much linear dependence.\n\n")
   }
  
+  # replace a factor with indicator variables in data frame
+  #mm <- model.matrix(my.formula, data=data)
+  #mf.out <- data.frame(lm.out$model[,1], mm[,2:ncol(mm)])
+  #names(mf.out)[1] <- nm[1]
+
   n.keep <- nrow(lm.out$model)
 
   .reg1Basic(lm.out, nm, dname,
@@ -199,5 +204,8 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
         "  To obtain the reference: Enter citation()\n")
     cat("\n")
   }
+
+
+  invisible(lm.out)
   
 }

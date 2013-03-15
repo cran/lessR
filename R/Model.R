@@ -1,5 +1,5 @@
 Model <-
-function(my.formula, data=mydata, brief=FALSE, ...) {
+function(my.formula, data=mydata, brief=getOption("brief"), ...) {
 
   dname <- deparse(substitute(data))  # get data frame name for cor before sort
   options(dname = dname)

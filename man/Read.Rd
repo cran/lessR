@@ -1,15 +1,12 @@
 \name{Read}
 \alias{Read}
 \alias{rd}
-\alias{rd2}
-\alias{rad}
-\alias{rad2}
-\alias{rad.brief}
+\alias{Read2}
 
 \title{Read and Display Contents of a Data File and Optional Variable Labels}
 
 \description{
-Abbreviation: \code{rd}, \code{rd2}
+Abbreviation: \code{rd}, \code{Read2}
 
 Reads the contents of the specified data file with optional variable labels into an R data table (frame). The format of the file can be standard \code{csv} data file with any delimiter including the default comma, a fixed width formatted data file, or native SPSS or R data file.  Identify the file by either browsing for the file on the local computer system with \code{Read()}, or indicate with an argument as a character string in the form of a path name or a web URL.  The function also provides feedback regarding the data that was read which includes the variable names, the dimensions of the resulting data frame, the data type for each variable, and the values of the variables in the data file for the first and last rows of the data. In addition, an analysis of missing data is provided, listing the number of missing values for each variable and for each observation.
 
@@ -23,14 +20,11 @@ Read(ref=NULL, format=c("csv", "SPSS", "R", "lessR"),
 
          miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
       
-         max.lines=30, quiet=FALSE, \dots)
+         max.lines=30, quiet=getOption("quiet"), \dots)
 
 rd(\ldots) 
-rd2(\ldots, sep=";", dec=",")
 
-rad(\ldots) 
-rad2(\ldots, sep=";", dec=",")
-rad.brief(\ldots, quiet=TRUE) 
+Read2(\ldots, sep=";", dec=",")
 }
 
 
@@ -59,7 +53,8 @@ rad.brief(\ldots, quiet=TRUE)
   \item{sep}{Character that separates adjacent values in a text file of data.}
   \item{dec}{Character that serves as the decimal separator in a number.}
   \item{max.lines}{Maximum number of lines to list of the data and labels.}
-  \item{quiet}{If set to \code{TRUE}, no text output.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{set}} function.}
   \item{...}{Other parameter values consistent with the usual \code{\link{read.table}}
        function, such as row.names and header.}
 }
@@ -67,7 +62,9 @@ rad.brief(\ldots, quiet=TRUE)
 
 \details{
 CREATE csv FILE\cr
-By default \code{Read} reads \code{csv} data files, native R files with file type of \code{.rda} and native SPSS files with file type \code{.sav}. One way to create a csv data file is by entering the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
+By default \code{Read} reads \code{csv} data files, native R files with file type of \code{.rda} and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide the feedback regarding details of the data frame that was read.
+
+One way to create a csv data file is by entering the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
 
 All numeric data in the worksheet should be displayed in the General format, so that the only non-digit character for a numeric data value is a decimal point.  The General format removes all dollar signs and commas, for example, leaving only the pure number, stripped of these extra characters which R will not properly read as part of a numeric data value.
 
@@ -120,7 +117,7 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 
 \seealso{
 \code{\link{read.csv}},\code{\link{read.spss}},\code{\link{read.fwf}}, 
-\code{\link{corRead}}.
+\code{\link{corRead}}, \code{\link{details}}.
 }
 
 \examples{

@@ -6,28 +6,28 @@ if(getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\nFor help, enter, after the >,  Help()\n\n",
-      "--------------------------------------------------------------------------\n",
-      "The keepers of CRAN have changed the rules. Now must explicitly assign the\n",
-      "output data table name when reading or modifying data, usually:  mydata\n",
-      "    > mydata <- Read()\n",
-      "    > mydata <- Transform(Y=X/12)    also Subset, Merge, Recode, Sort\n",
-      "    > mycor <- Correlation()\n\n",
-      "For more information:   > Help(lessR),  click:  Package NEWS\n",
-      "--------------------------------------------------------------------------\n\n")
+      "----------------------------------------------------------------------\n",
+      "Assign the output data table name to read or modify data\n",
+      "    > mydata <- Read()     also Transform, Subset, Merge, Recode, Sort\n",
+      "    > mycor <- Correlation()\n",
+      "----------------------------------------------------------------------\n\n")
 
   options(colors="blue")
   options(trans.fill.bar=0.00)
   options(trans.fill.pt=0.66)
-  options(col.fill.bar="lightsteelblue")
-  options(col.fill.pt="lightsteelblue")
+  options(col.fill.bar = "#A1B4CCFF")  # .maketrans of lightsteelblue3"
+  options(col.fill.pt = "#A1B4CC57")  # .maketrans of "lightsteelblue3"
   options(col.stroke.bar="slategray")
-  options(col.stroke.pt="steelblue4")
+  options(col.stroke.pt="darkblue")
   options(col.bg="ghostwhite")
   options(col.grid="gray90")
   options(col.ghost=FALSE)
-  options(col.heat = "darkblue")
+  options(col.heat="darkblue")
 
   options(n.cat=0)
+
+  options(quiet=FALSE)
+  options(brief=FALSE)
 
   options(show.signif.stars=FALSE)
   options(scipen=30)
@@ -83,7 +83,7 @@ function(...) {
 }
 
 
-.xstatus <- function(var.name, dname) {
+.xstatus <- function(var.name, dname, quiet=FALSE) {
 
   # see if analysis from data is based on a formula
   if (grepl("~", var.name)) is.frml <- TRUE else is.frml <- FALSE
@@ -92,7 +92,13 @@ function(...) {
   if (var.name == "NULL") from.data <- FALSE else from.data <- TRUE
 
   # see if the variable exists in the Global Environment
-  if (exists(var.name, where=.GlobalEnv)) in.global <- TRUE  else in.global <- FALSE
+  if (exists(var.name, where=.GlobalEnv)) {
+    in.global <- TRUE
+    if (!quiet) cat("\n>>> Variable", var.name, "is in the user\'s workspace,",
+        "not in a data frame.\n")
+  }
+  else
+    in.global <- FALSE
 
   # see if "variable" is really a function call
   if (grepl("(", var.name, fixed=TRUE))  {
@@ -109,7 +115,7 @@ function(...) {
     if (!exists(dname, where=.GlobalEnv)) {
       if (dname == "mydata") 
         txtA <- ", the default data frame name, " else txtA <- " "
-      txtB1 <- "So either create the data frame by reading with the rad function, or\n"
+      txtB1 <- "So either create the data frame with the Read function, or\n"
       txtB2 <- "  specify the actual data frame with the parameter: data\n"
       txtB <- paste(txtB1, txtB2, sep="")
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -142,7 +148,9 @@ function(...) {
 
 .getlabels <- function(xlab, ylab, main) {
 
-  # get variable labels if they exist
+  # get variable labels if they exist      txt2 <- "So either make sure you are using the correct variable name, or\n"
+      txt3 <- "  specify the actual data frame with the parameter: data\n"
+
   x.name <- getOption("xname")
   y.name <- getOption("yname")
   x.lbl <- NULL
@@ -196,9 +204,9 @@ function(...) {
 
   if (i == 1) txt <- "Response Variable:  "
   else 
-    if (n.pred > 1) txt <- paste("\n", pred.lbl, " ", 
+    if (n.pred > 1) txt <- paste(pred.lbl, " ", 
       toString(i-1), ": ", sep="")
-    else txt <- "\nPredictor Variable: "
+    else txt <- "Predictor Variable: "
   cat(txt, var.name)
 
   dname <- getOption("dname")

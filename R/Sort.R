@@ -1,5 +1,5 @@
 Sort <-
-function(by, direction=NULL, data=mydata, quiet=FALSE, ...) {
+function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
 
   dname <- deparse(substitute(data))
   n.obs <- nrow(data)
@@ -106,10 +106,10 @@ function(by, direction=NULL, data=mydata, quiet=FALSE, ...) {
   if (!quiet) {
     cat("\n")
     .dash(68)
-    cat("After the Sort, first five rows of data ")
+    cat("After the Sort, first four rows of data ")
     cat( "\n")
     .dash(68)
-    print(head(mydata, n=5))
+    print(head(mydata, n=4))
     cat("\n")
   }
 

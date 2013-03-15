@@ -18,7 +18,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
          legend.horiz=FALSE, 
 
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {
 
 
   if (missing(colors)) 
@@ -49,7 +50,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     options(dname = dname)
 
     # get conditions and check for data existing
-    xs <- .xstatus(x.name, dname)
+    xs <- .xstatus(x.name, dname, quiet)
     is.frml <- xs$ifr
     in.global <- xs$ig 
 
@@ -83,7 +84,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
       # get conditions and check for data existing
       if (!in.call) {
-        xs <- .xstatus(y.name, dname)
+        xs <- .xstatus(y.name, dname, quiet)
         in.global <- xs$ig 
       }
       else in.global <- FALSE
@@ -110,7 +111,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     options(count.levelsname = count.levels.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(count.levels.name, dname)
+    xs <- .xstatus(count.levels.name, dname, quiet)
     in.global <- xs$ig 
 
     # see if var exists in data frame, if x not in Global Env or function call 

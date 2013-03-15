@@ -15,7 +15,8 @@ function(x, data=mydata,
          x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
          x.min=NULL, x.max=NULL, band=FALSE, 
 
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
   # get actual variable name before potential call of data$x
@@ -27,7 +28,7 @@ function(x, data=mydata,
   options(dname = dname)
 
   # get conditions and check for data existing
-  xs <- .xstatus(x.name, dname)
+  xs <- .xstatus(x.name, dname, quiet)
   in.global <- xs$ig 
 
   # see if variable exists in data frame, if x not in Global Env or function call 
@@ -45,7 +46,7 @@ function(x, data=mydata,
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
 
-  .den.main(x.call, data=mydata, 
+  d <- .den.main(x.call, data=mydata, 
             bw, type, bin.start, bin.width, quiet,
             col.fill, col.bg, col.grid, col.nrm, col.gen,
             col.fill.nrm, col.fill.gen, 
@@ -57,5 +58,7 @@ function(x, data=mydata,
     dev.off()
     .showfile(pdf.file, "density plot")
   }
+
+  invisible(d)
 
 }

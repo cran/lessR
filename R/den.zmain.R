@@ -152,4 +152,6 @@ function(x, data,
 
   cat("\n")
 
+  return(d.gen)
+
 } 

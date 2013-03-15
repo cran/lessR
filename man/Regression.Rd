@@ -20,7 +20,7 @@ The resulting scatterplot or scatterplot matrix, when written to a pdf file acco
 
 \usage{
 Regression(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
-         text.width=120, brief=FALSE, explain=FALSE, show.R=FALSE,
+         text.width=120, brief=getOption("brief"), explain=FALSE, show.R=FALSE,
 
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
          pred.rows=NULL, pred.sort=c("predint", "off"),
@@ -53,7 +53,7 @@ reg.explain(\ldots, explain=TRUE)
   \item{standardize}{Standardize each of the variables in the regression model before
         conducting the analysis.}
   \item{text.width}{Width of the text output at the console.}
-  \item{brief}{Extent of displayed results.}
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{set}} function.}
   \item{explain}{Off by default, but if set to \code{TRUE} then brief labels of different
         sections of output are replaced by more complete explanations of the output.}
   \item{show.R}{Display the R instructions that yielded the \code{lessR} output, albeit without
@@ -110,7 +110,7 @@ The purpose of \code{Regression} is to combine the following function calls into
 
 The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of a linear model, \code{\link{lm}}. The output of the analysis of \code{\link{lm}} is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Regression} function. By default \code{reg} automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The correlation matrix of the model variables is obtained with \code{\link{cor}} function. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard R function \code{\link{predict}}, once with the argument \code{interval="confidence"} and once with \code{interval="prediction"}.  The \code{lessR} \code{\link{Density}} function provides the histogram and density plots for the residuals and the \code{\link{ScatterPlot}} function provides the scatter plots of the residuals with the fitted values and of the data for the one-predictor model. The \code{pairs} function provides the scatterplot matrix of all the variables in the model. Thomas Lumley's \code{leaps} package contains the \code{leaps} function that provides the analysis of the fit of all possible model subsets. The \code{car} package provides Henric Nilsson and John Fox's \code{vif} function for the computation of the variance inflation factors for the collinearity analysis. The \code{scatter3d} function from Fox and Weisberg's \code{car} package provides the interactive 3d scatterplot for models with exactly two predictor variables.`
 
-The default analysis provides the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, correlation matrix of the model's variables, analysis of residuals and influence as well as the confidence and prediction intervals for each observation in the model. Also provided, for multiple regression models, collinearity analysis of the predictor variables and adjusted R-squared for the corresponding models defined by each possible subset of the predictor variables. Because the results of the initial call to the linear model function, \code{\link{lm}}, are available after \code{reg} has completed in the R object \code{lm.out}.
+The default analysis provides as text output to the console the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, correlation matrix of the model's variables, analysis of residuals and influence as well as the confidence and prediction intervals for each observation in the model. Also provided, for multiple regression models, collinearity analysis of the predictor variables and adjusted R-squared for the corresponding models defined by each possible subset of the predictor variables. 
 
 DATA FRAME\cr
 The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{mydata}.
@@ -142,13 +142,17 @@ OUTPUT\cr
 The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values. Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg.brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit. An explanation of each section of the output can be obtained by setting the \code{explain} option to \code{TRUE}, or run \code{reg.explain}.  Much of the underlying relevant R code run by \code{Regression} is obtained by setting the \code{show.R} option to \code{TRUE}.
 
 INVOKED R OPTIONS\cr
-The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{reg} is finished with a normal termination, the options are re-set to their values before the \code{reg} function began executing.
+The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{Regression} is finished with a normal termination, the options are re-set to their values before the \code{Regression} function began executing.
 
 COLOR THEME\cr
 A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}. 
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.}
+
+\value{
+Based on the standard \code{R} function \code{\link{lm}}, invisibly returns an object of \code{\link{class}} "lm". For details see \code{\link{lm}}. This object is particularly useful to compare nested models. Assign the output of \code{Regression} for a model to an object.  Then for a nested model.  Then use the standard \code{R} function \code{\link{anova}} to compare the models, as shown in the examples below.
+}
 
 \references{
 Fox, J., & Weisberg, S. (2011). An R companion to applied regression (Second ed.). Thousand Oaks CA: Sage.
@@ -183,6 +187,11 @@ reg.brief(Y ~ X1, standardize=TRUE)
 reg.explain(Y ~ X1)
 # Provide a brief analysis with explanation 
 reg.brief(Y ~ X1, explain=TRUE)
+
+# compare nested models
+full.model <- Regression(Y ~ X1 + X2)
+reduced.model <- Regression(Y ~ X1)
+anova(reduced.model, full.model)
 
 # Modify the default settings as specified
 Regression(Y ~ X1, res.row=8, res.sort="rstudent", pred.rows=0, digits.d=4)

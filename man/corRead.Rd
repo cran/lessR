@@ -3,7 +3,7 @@
 \alias{rd.cor}
 \alias{rad.cor}
 
-\title{Read Specified Correlation Matrix into an R Matrix Named mycor}
+\title{Read Specified Correlation Matrix}
 
 \description{
 Abbreviation: \code{rad.cor}

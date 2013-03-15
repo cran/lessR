@@ -1,4 +1,4 @@
-rd2 <- 
+Read2 <- 
 function(..., sep=";", dec=",") 
          
   Read(..., sep=";", dec=",")

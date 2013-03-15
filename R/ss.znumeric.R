@@ -24,7 +24,11 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     }
   }
 
-  if (is.null(digits.d)) dig.dec <- .max.dd(x) + 1 else dig.dec <- digits.d
+  if (is.null(digits.d)) {
+    dig.dec <- .max.dd(x) + 1
+    if (dig.dec == 1) dig.dec <- 2
+  }
+  else dig.dec <- digits.d
   options(digits.d=dig.dec)
   if (dig.dec > 10  && is.null(digits.d)) {
     cat("\nThese data values contain ", dig.dec, " decimal digits. To enhance\n",
@@ -147,9 +151,20 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
 
   outliers <- boxplot.stats(xx)$out
   if (length(outliers>0) && unique(na.omit(xx)>3)) {
-    cat("\nOutlier")
-    if (length(outliers) > 1) cat("s: ") else cat(": ")
-    for (i in 1:length(outliers)) cat(format(outliers[i], scientific=FALSE), " ")
+    outliers <- sort(outliers, decreasing=TRUE)
+    ln <- length(outliers)
+    if (ln <= 50) {
+      cat("\nOutlier")
+      if (ln > 1) cat("s: ") else cat(": ")
+      for (i in 1:ln) cat(format(outliers[i], scientific=FALSE), " ")
+    }
+    else {
+      cat("\nNumber of outliers:", length(outliers), "\n")
+      cat("\n25 largest outliers:\n")
+      for (i in 1:25) cat(format(outliers[i], scientific=FALSE), " ")
+      cat("\n\n25 smallest outliers:\n")
+      for (i in (ln-25):ln) cat(format(outliers[i], scientific=FALSE), " ")
+    }
     cat("\n")
   }
 

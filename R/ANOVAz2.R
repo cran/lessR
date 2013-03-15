@@ -33,8 +33,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     if (!brief) {
       cat("\nCell Sample Size:", l[1,1], "\n")
 
-      cat("\n\n")
-      cat("\nCell Means\n")
+      cat("\n\nCell Means\n")
       .dash(10)
       m <-  tapply(y.values, 
             list(x1.values, x2.values ), mean, na.rm=TRUE)
@@ -54,7 +53,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     m2 <-  tapply(y.values, x2.values, mean, na.rm=TRUE)
     print(round(m2, digits.d))  # first treatment horizontal dimension
 
-    cat("\nGrand Mean\n")
+    cat("\n\nGrand Mean\n")
     .dash(10)
     mg <-  mean(y.values, na.rm=TRUE)
     cat(round(mg, digits.d+1), "\n")
@@ -72,12 +71,41 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
 
 
   cat("\n\n\n")
-  cat("ANOVA\n")
-  .dash(5)
+  cat("Analysis of Variance\n")
+  .dash(20)
+  if(bet.grp) n.vars <- 4
+  if(wth.grp) n.vars <- 3
+  smc <- anova(av.out)
+  buf <- 0 
+  for (i in 1:n.vars) {
+    lng.lbl <- nchar(rownames(smc)[i])
+    if (lng.lbl > buf) buf <- lng.lbl 
+   }
+  max.num <- integer(length=0)
+  for (icol in 1:4) {
+    max.num[icol] <- 0 
+    for (i in 1:n.vars) {
+      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 2
+      if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
+    }
+    if (icol != 1) if (max.num[icol] < 9) max.num[icol] <- 9 
+  }
+  df.lbl <- .fmtc("     df", max.num[1]+2)
+  SS.lbl <- .fmtc(" Sum Sq", max.num[2]+1)
+  MS.lbl <- .fmtc("Mean Sq", max.num[3]+1)
+  fv.lbl <- .fmtc("F-value", max.num[4]+1)
+  cat(rep(" ", buf-5), df.lbl, SS.lbl, MS.lbl, fv.lbl, "   p-value", sep="", "\n")
+  for (i in 1:(n.vars)) {
+    rlb <- .fmtc(rownames(smc)[i], buf)
+    df <- format(sprintf("%i", smc[i,1]), width=max.num[1]-4, justify="right")
+    SS <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.num[2], justify="right")
+    MS <- format(sprintf("%7.*f", digits.d, smc[i,3]), width=max.num[3], justify="right")
+    fv <- format(sprintf("%7.*f", digits.d, smc[i,4]), width=max.num[4], justify="right")
+    pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
+    if (i < n.vars) cat(rlb, df, SS, MS, fv, pv, "\n") else cat(rlb, df, SS, MS, "\n") 
+  }
+
   sm <- summary(av.out)
-  print(sm)
-
-
   msA <- sm[[1]][1,3]
   msB <- sm[[1]][2,3]
   msAB <- sm[[1]][3,3]
@@ -144,8 +172,8 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
       cat("\nFactor:", nm[3], "\n")
       .dash(11)
       print(round(HSD[[2]], digits.d))  # second factor
-      cat("\nInteraction\n")
-      .dash(11)
+      cat("\nCell Means\n")
+      .dash(10)
       print(round(HSD[[3]], digits.d))  # interaction
     }
   }
@@ -165,7 +193,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
   interaction.plot(x1.values, x2.values, y.values,
                    xlab=nm[2], ylab=nm[1], trace.label=nm[3])
 
-  # terminate pdf graphics system
+  # pdf
   if (!is.null(pdf.file)) {
     dev.off()
     .showfile(pdf.file, "interaction plot")
@@ -191,12 +219,12 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
              bg=rgb(.6, .6, .6, alpha=getOption("trans.pts"), maxColorValue = 1))
       segments(as.numeric(x1.values), av.out$fitted, as.numeric(x1.values), y.values)
     }
-  }
 
-  # terminate pdf graphics system
-  if (!is.null(pdf.file)) {
-    dev.off()
-    .showfile(pdf.file, "interaction plot")
+    # pdf
+    if (!is.null(pdf.file)) {
+      dev.off()
+      .showfile(pdf.file, "fitted values plot")
+    }
   }
 
 } 

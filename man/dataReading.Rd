@@ -3,7 +3,7 @@
 \alias{dataReading}
 \title{Data: Reading Ability}
 
-\description{Reading ability test score and also verbal aptitude test score, number of absences from school and family income in USD $1000's.}
+\description{Reading ability test score and also verbal aptitude test score, number of absences from school and family income in USD $1000's. Data are simulated.}
 
 \usage{data(dataReading)}
 

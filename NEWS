@@ -3,6 +3,87 @@ NEWS
 Update History for Package 'lessR'
 -------------------------------------------------------------------------
 
+
+>>>>>> Changes for lessR version 2.9 (2013-03-11)} <<<<<<
+
+-------------------
+New Functions 2.9
+-------------------
+
+Nest
+  compare a nested model to a full model with least-squares or logit fit
+
+details
+  obtain the details of a data frame, such as called from Read
+
+
+-------------
+Updates 2.9
+-------------
+
+a variable to be analyzed from the user's workspace is so noted
+
+Read2
+  renamed from rd2
+
+Regression
+  can return an object of class lm
+
+Logit
+  classification table added
+  if only some forecasts shown, the middle range is for fitted values
+    close to the threshold of 0.5
+  collinearity analysis added for multiple predictor variables
+  can return an object of class glm
+
+ANOVA
+  ANOVA tables now cleanly formatted
+  residuals displayed as in Regression, by default first 20 sorted
+  res.rows and res.sort options added, as in Regression
+
+Histogram
+  can return an object of class histogram
+
+Density
+  can return an object of class density
+
+BoxPlot
+  allow R graphics parameters to be passed, such as whiskcol, see ?bxp
+  colors adjusted for gray and gray.black
+  can return an object with standard boxplot components
+
+SummaryStats
+  if integers in input data then output to 2 decimal digits
+  if more than 50 outliers, then just first and last 25 are displayed
+
+set
+  color white added
+  quiet option now can be set, e.g., set(quiet=TRUE)
+  brief option now can be set, e.g., set(brief=TRUE)
+
+
+---------------
+Bug Fixes 2.9
+---------------
+
+ANOVA
+  brief form works correctly
+
+Logit
+  plot of fitted values and scatter plot produced consistently
+
+BoxPlot
+  numerical values on the correct axis for vertical and horiz orientation
+
+Histogram
+  situation in which largest value exceeded the largest bin fixed
+
+set
+  transparency properly initialized for default blue
+
+
+
+
 >>>>>> Changes for lessR version 2.8 (2013-02-01)} <<<<<<
 
 The keepers of CRAN have changed the rules. They no longer

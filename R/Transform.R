@@ -1,5 +1,5 @@
 Transform <-
-function(data=mydata, quiet=FALSE, ...) {
+function(data=mydata, quiet=getOption("quiet"), ...) {
 
   dname <- deparse(substitute(data))
 
@@ -16,10 +16,10 @@ function(data=mydata, quiet=FALSE, ...) {
 
     cat("\n")
     .dash(69)
-    cat("Before Transformation, First five rows of data for",
+    cat("Before Transformation, First four rows of data for",
         "data frame:", dname, "\n")
     .dash(69)
-    print(head(get(dname, pos=.GlobalEnv), n=5))
+    print(head(get(dname, pos=.GlobalEnv), n=4))
     cat("\n")
 
     trs.all <- deparse(substitute(list(...)))[[1]]
@@ -73,10 +73,10 @@ function(data=mydata, quiet=FALSE, ...) {
   if (!quiet) {
     cat("\n\n")
     .dash(65)
-    cat("After, First five rows of transformed data ")
+    cat("After, First four rows of transformed data ")
     cat( "\n")
     .dash(65)
-    print(head(data[, names(e), drop=FALSE], n=5))
+    print(head(data[, names(e), drop=FALSE], n=4))
     cat("\n")
   }
  

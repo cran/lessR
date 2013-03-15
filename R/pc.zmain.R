@@ -83,8 +83,20 @@ function(x,
 # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
 
   # text output
-  if (!quiet) .ss.factor(x, brief=TRUE) 
+  if (!quiet) {
 
+     .ss.factor(x, brief=TRUE) 
+
+      ch <- suppressWarnings(chisq.test(x))
+      pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
+      cat("\nChi-squared test of null hypothesis of equal probabilities\n")
+      cat("  Chisq = ", ch$statistic, ",  df = ", ch$parameter, ",  p-value = ", 
+        pvalue, sep="", "\n")
+      if (any(ch$expected < 5)) 
+        cat(">>> Low cell expected frequencies,",
+            "so chi-squared approximation may not be accurate", "\n")
+  }
+ 
   cat("\n")
 
 }  #  end pc.main

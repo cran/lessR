@@ -17,7 +17,8 @@ function(y, data=mydata, type=NULL,
 
          center.line=c("default", "mean", "median", "off"),
 
-         quiet=FALSE, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         quiet=getOption("quiet"),
+         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
   center.line <- match.arg(center.line)
@@ -31,7 +32,7 @@ function(y, data=mydata, type=NULL,
   options(dname = dname)
 
   # get conditions and check for data existing
-  ys <- .xstatus(y.name, dname)
+  ys <- .xstatus(y.name, dname, quiet)
   in.global <- ys$ig 
 
   # see if variable exists in data frame, if y not in Global Env or function call 

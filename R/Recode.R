@@ -1,15 +1,16 @@
 Recode <-
-function(old.vars, new.vars=NULL, old, new, data=mydata, quiet=FALSE) {
+function(old.vars, new.vars=NULL, old, new, data=mydata,
+         quiet=getOption("quiet")) {
 
-  all.vars <- as.list(seq_along(data))
-  names(all.vars) <- names(data)
-  vars <- eval(substitute(old.vars), envir=all.vars, enclos=parent.frame())
+  my.vars <- as.list(seq_along(data))
+  names(my.vars) <- names(data)
+  vars <- eval(substitute(old.vars), envir=my.vars, enclos=parent.frame())
 
   if (!is.null(new.vars)) {
     old.vars.len <- 
-      length(eval(substitute(old.vars), envir=all.vars, enclos=parent.frame()))
+      length(eval(substitute(old.vars), envir=my.vars, enclos=parent.frame()))
     new.vars.len <-
-       length(eval(substitute(new.vars), envir=all.vars, enclos=parent.frame()))
+       length(eval(substitute(new.vars), envir=my.vars, enclos=parent.frame()))
     if (old.vars.len != new.vars.len) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Number of specified existing variables: ", old.vars.len, "\n",
@@ -35,19 +36,19 @@ function(old.vars, new.vars=NULL, old, new, data=mydata, quiet=FALSE) {
   if (!quiet) {
     cat("\n")
     .dash(56)
-    cat("First five rows of data to recode for data frame:", dname, "\n")
+    cat("First four rows of data to recode for data frame:", dname, "\n")
     .dash(56)
-    print(head(data[, vars, drop=FALSE], n=5))
+    print(head(data[, vars, drop=FALSE], n=4))
     cat("\n")
   } 
 
   for (ivar in 1:length(vars)) {
     # get actual variable name before potential call of data$x
-    x.name <- names(all.vars)[vars[ivar]]
+    x.name <- names(my.vars)[vars[ivar]]
     options(xname = x.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(x.name, dname)
+    xs <- .xstatus(x.name, dname, quiet)
     in.global <- xs$ig 
 
     if (in.global)
@@ -86,9 +87,9 @@ function(old.vars, new.vars=NULL, old, new, data=mydata, quiet=FALSE) {
       new.index[i] <- which(names(data)==new.vars[i])
     cat("\n\n")
     .dash(48)
-    cat("First five rows of recoded data\n")
+    cat("First four rows of recoded data\n")
     .dash(48)
-    print(head(data[, c(vars, new.index), drop=FALSE], n=5))
+    print(head(data[, c(vars, new.index), drop=FALSE], n=4))
     cat("\n")
   } 
 

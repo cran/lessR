@@ -12,8 +12,9 @@ Analysis of variance from the R \code{\link{aov}} function plus graphics and eff
 }
 
 \usage{
-ANOVA(my.formula, data=mydata, brief=FALSE, digits.d=NULL, 
-         rb.points=TRUE, pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
+ANOVA(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL, 
+         rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
+         pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
 
 av(\ldots)
 
@@ -25,12 +26,21 @@ av.brief(\ldots, brief=TRUE)
   \item{my.formula}{Standard R \code{\link{formula}} for specifying a model.}
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
-  \item{brief}{Extent of displayed results.}
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
+       with \code{\link{set}} function.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
   \item{rb.points}{For a randomized block design, a plot of the fitted value
         for each cell is obtained as well as the individual data values. Set to
         \code{FALSE} to suppress the data values.}
+  \item{res.rows}{Default is 20, which lists the first 20 rows of data and residuals
+       sorted by the specified sort criterion.  To disable residuals, specify a 
+       value of 0. To see the residuals output for all observations, specify a 
+       value of \code{"all"}.}
+  \item{res.sort}{Default is \code{"zresid"}, for specifying standardized residuals
+       as the sort criterion for the display of the rows of data and associated
+       residuals. Other values are \code{"fitted"} for the fitted values and
+      \code{"off"} to not sort the rows of data.}
   \item{pdf}{Indicator as to if the graphic files should be saved as pdf files
        instead of directed to the standard graphics windows.}
   \item{pdf.width}{Width of the pdf file in inches.}
@@ -55,6 +65,10 @@ The design for the two-factor analyses must be balanced. A check is performed an
 
 DECIMAL DIGITS\cr
 The number of decimal digits displayed on the output is, by default, the maximum number of decimal digits for all the data values of the response variable. Or, this value can be explicitly specified with the \code{digits.d} parameter.
+}
+
+\value{
+Following the standard \code{R} function \code{\link{aov}}, invisibly returns an object of \code{\link{class}} c("aov", "lm").
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

@@ -13,7 +13,7 @@ Automatically selects and then provides an analysis of a linear model: OLS regre
 }
 
 \usage{
-Model(my.formula, data=mydata, brief=FALSE, \ldots)
+Model(my.formula, data=mydata, brief=getOption("brief"), \ldots)
 
 model.brief(\ldots, brief=TRUE) 
 
@@ -27,7 +27,8 @@ model(\ldots)
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
-  \item{brief}{Reduced output.}
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
+       with \code{\link{set}} function.}
   \item{\dots}{Other parameter values for R functions such as \code{\link{lm}} which provide the core computations.} 
 }
 
