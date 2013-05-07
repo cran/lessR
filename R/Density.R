@@ -18,6 +18,16 @@ function(x, data=mydata,
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
+  clr <- getOption("colors") 
+  if (clr == "blue") {
+    if (col.fill == getOption("col.fill.pt")) col.fill <- "gray86"
+    col.fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
+    col.fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
+  }
+  if (clr == "gray.black" || clr == "orange.black") {
+    col.nrm <- getOption("col.stroke.pt")
+    col.gen <- getOption("col.stroke.pt")
+  }
 
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x)) 

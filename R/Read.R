@@ -1,17 +1,17 @@
 Read <- 
-function(ref=NULL, format=c("csv", "SPSS", "R", "lessR"),
+function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
 
          labels=NULL, widths=NULL, missing="", n.mcut=1, 
 
          miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
       
-         max.lines=30, quiet=getOption("quiet"), ...) {
+         max.lines=30, sheetIndex=1, quiet=getOption("quiet"), ...) {
 
   format <- match.arg(format)
 
   if (is.null(ref) && format=="lessR") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Cannot browse for a file that is part of lessR.\n",
+        "Cannot browse for a data file that is part of lessR.\n",
         "Specify the file name.\n\n")
   }
 
@@ -28,6 +28,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "lessR"),
 
   if (grepl(".sav$", ref)) format <- "SPSS" 
   if (grepl(".rda$", ref)) format <- "R" 
+  if (grepl(".xls$", ref) || grepl(".xlsx$", ref)) format <- "Excel" 
   if (!is.null(widths)) format <- "fwd"
 
   # construct full path name for label file if not already
@@ -43,6 +44,11 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "lessR"),
       ref.lbl <- labels
   }
 
+  # see if labels=="row2"
+      if (is.null(labels))
+        isnot.row2 <- TRUE
+      else
+        if (labels != "row2") isnot.row2 <- TRUE else isnot.row2 <- FALSE
 
   # do the read
   # -----------
@@ -53,36 +59,64 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "lessR"),
       data <- read.fwf(file=ref, widths=widths, ...)
 
     else if (format=="csv") {
-      if (is.null(labels)) 
-        data <- suppressWarnings(read.csv(file=ref, na.strings=missing, ...))
-      else {
-        if (labels != "row2")
-          data <- suppressWarnings(read.csv(file=ref, na.strings=missing, ...))
-        else {
-          mylabels <- read.csv(file=ref, nrows=1, ...)
+      line1 <- scan(ref, what="character", nlines=1, sep="\t", quiet=TRUE)
+      if (length(line1) > 1) {
+        message(">>> A tab character detected in the first row of the data file.\n",
+            "    Presume tab delimited data.\n", sep="")
+        delim <- "\t"
+      }
+      else
+        delim <- ","
+      if (isnot.row2)  # read data
+         data <- suppressWarnings(read.csv(file=ref, na.strings=missing,
+                                 sep=delim, ...))
+    }
+
+  }  # end text file
+      
+  else if (format == "Excel") { 
+    library(rJava)
+    if (isnot.row2)  # read data
+      data <- suppressWarnings(read.xlsx(file=ref, sheetIndex=sheetIndex, ...))
+  }
+
+  if (!is.null(labels)) {  # process labels
+    if (format %in% c("fwd", "csv", "Excel")) {
+      if (labels != "row2") {  # read labels
+        mylabels <- 
+          read.csv(file=ref.lbl, row.names=1, col.names=c("","label"), header=FALSE)
+      }
+      else {  # labels == "row2"
+        if (format != "Excel") {
+          mylabels <- read.csv(file=ref, nrows=1, sep=delim, ...)
           var.names <- names(mylabels)
           mylabels <- data.frame(t(mylabels))  # var names are row names
           names(mylabels) <- "label"
           data <- suppressWarnings(read.csv(file=ref, skip=1, 
-                         na.strings=missing, col.names=var.names, ...))
+                         na.strings=missing, col.names=var.names, sep=delim, ...))
         }
-      }
-    }
-
-    if (!is.null(labels)) {
-      if (labels != "row2") {
-        mylabels <- 
-          read.csv(file=ref.lbl, row.names=1, col.names=c("","label"), header=FALSE)
+        else {  # format == "Excel"
+          # get labels
+          first.two <- read.xlsx(file=ref, sheetIndex=1, rowIndex=c(1:2))
+          n.col <- ncol(first.two)
+          for (i in ncol(first.two):1) if (is.na(first.two[1,i])) n.col <- n.col - 1
+          labs <- character(length=n.col)
+          for (i in 1:n.col) labs[i] <- as.character(first.two[1,i])
+          var.names <- names(first.two[1:n.col])
+          mylabels <- data.frame(labs, row.names=var.names)
+          names(mylabels) <- "label"
+          # read data
+          data <- read.xlsx(file=ref, sheetIndex=1, rowIndex=-c(2))
+        }
       }
       # transfer labels to data
       attr(data, which="variable.labels") <- as.character(mylabels$label)
       names(attr(data, which="variable.labels")) <- as.character(row.names(mylabels))
     }
+  }
 
-  }  # end text file
-      
   else if (format == "SPSS")  # data and any labels
-      data <- suppressWarnings(read.spss(file=ref, to.data.frame=TRUE, ...))
+    data <- suppressWarnings(read.spss(file=ref, to.data.frame=TRUE, ...))
 
   else if (format == "R") {  # data and any labels
     x.env <- new.env()  # scratch environment
@@ -91,7 +125,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "lessR"),
     data <- get(dname, pos=x.env)
   }
 
-  else if (format == "lessR") {
+  else if (format == "lessR") {  # data and any labels
     if (substr(ref,1,4) == "data")
       txt <- ""
     else

@@ -1,7 +1,6 @@
 \name{Density}
 \alias{Density}
 \alias{dn}
-\alias{den}
 
 \title{Density Curves from Data plus Histogram}
 
@@ -32,7 +31,6 @@ Density(x, data=mydata,
        pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 dn(\ldots)
-den(\ldots)
 }
 
 \arguments{

@@ -7,7 +7,7 @@ function(...) {
 
   packageStartupMessage("\nFor help, enter, after the >,  Help()\n\n",
       "----------------------------------------------------------------------\n",
-      "Assign the output data table name to read or modify data\n",
+      "Assign the output data table name when reading or modifying data\n",
       "    > mydata <- Read()     also Transform, Subset, Merge, Recode, Sort\n",
       "    > mycor <- Correlation()\n",
       "----------------------------------------------------------------------\n\n")

@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{efa}
 
-An maximum likelihood exploratory factor analysis, provided by the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis. Then constructs the corresponding multiple indicator measurement model (MIMM) suggested by the exploratory factor analysis loadings, and the \code{lessR} to run the confirmatory analysis of the model.
+An maximum likelihood exploratory factor analysis, provided by the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis. Then constructs the corresponding multiple indicator measurement model (MIMM) suggested by the exploratory factor analysis loadings, and the \code{lessR} code needed to run the confirmatory analysis of the model.
 }
 
 \usage{

@@ -121,7 +121,7 @@ Returned value is NULL except for a two-group analysis from a formula.  Then the
 
 
 \references{
-Kelley, K., \code{smd} function from the \code{MBESS} package.
+Ken Kelley and Keke Lai (2012). MBESS: MBESS. R package version 3.3.3. \url{http://CRAN.R-project.org/package=MBESS}
 }
 
 

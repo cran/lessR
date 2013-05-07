@@ -11,16 +11,6 @@ function(x, data,
     type <- "general"
   }
 
-  if (getOption("colors") == "blue") {
-    if (col.fill == getOption("col.fill.pt")) col.fill <- "gray86"
-    col.fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
-    col.fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
-  }
-  if (getOption("colors") == "orange") {
-    if (col.nrm == "black") col.nrm <- "whitesmoke"
-    if (col.gen == "black") col.gen <- "whitesmoke"
-  }
-
   # get variable labels if exist plus axes labels
   gl <- .getlabels(xlab, main=main)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
