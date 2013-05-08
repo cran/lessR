@@ -176,12 +176,13 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE,
   else cat("No missing data\n\n")
 
 
-  # feedback regarding labels
+  # feedback regarding variable labels
   mylabels <- attr(data, which="variable.labels")
-  cat("\nVariable Names and Labels\n")
+  cat("\nVariable Names    Variable Labels\n")
 
   if (!is.null(mylabels)) {
     mylabels <- data.frame(mylabels)
+    names(mylabels) <- ""
     n.labels <- nrow(mylabels)
     n.lines <- min(max.lines, n.labels)
     max.chr <- 0
@@ -189,10 +190,9 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE,
       xlbl <- as.character(mylabels[i,])
       if (nchar(xlbl) > max.chr) max.chr <- nchar(xlbl)
     }
-    .dash(max.chr+5)
-    cat("\n")
+    .dash(max.chr+13)
     print(head(mylabels, n=n.lines))
-    .dash(max.chr+5)
+    .dash(max.chr+13)
     if (n.labels > n.lines) {
       cat("To see all the variable labels set max.lines to", n.labels, "\n")
       .dash(64)

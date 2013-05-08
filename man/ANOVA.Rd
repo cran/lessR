@@ -94,7 +94,7 @@ ANOVA(Y ~ X)
 av(Y ~ X)
 
 # variable of interest is in a data frame which is not the default mydata
-# access the data frame in the lessR dat.twogroup data set
+# access the data frame in the lessR dat.Learn data set
 # although data not attached, access the variables directly by their name
 data(dataLearn)
 ANOVA(Score ~ StudyType, data=dataLearn)

@@ -1,12 +1,11 @@
 \name{corRead}
 \alias{corRead}
 \alias{rd.cor}
-\alias{rad.cor}
 
 \title{Read Specified Correlation Matrix}
 
 \description{
-Abbreviation: \code{rad.cor}
+Abbreviation: \code{rd.cor}
 
 Read a correlation matrix into R. The resulting matrix is named \code{mycor}. All coefficients for each variable must be on one row.  No variable names are in the file to be read.
 }
@@ -15,7 +14,6 @@ Read a correlation matrix into R. The resulting matrix is named \code{mycor}. Al
 corRead(ref=NULL, names=NULL)
 
 rd.cor(\ldots)
-rad.cor(\ldots)
 }
 
 \arguments{

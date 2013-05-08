@@ -9,7 +9,7 @@ Abbreviation: \code{lr}
 
 Based directly on the standard R \code{\link{glm}} function with \code{family="binomial"}, automatically provides a logit regression analysis with graphics from a single, simple function call with many default settings, each of which can be re-specified.  By default the data exists as a data frame with the default name of \code{mydata}, such as data read by the \code{lessR} \code{Read} function.  Specify the model in the function call according to an R \code{\link{formula}}, that is, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign. The response variable is either a factor with two levels or a numeric variable with values only of 0 and 1. 
 
-Default output includes the inferential analysis of the estimated coefficients and model, sorted residuals and Cook's Distance, and sorted fitted values for existing data or new data.  The default output also includes two or three graphs beginning with a histogram of the residuals with superimposed normal and general density curves.  The second graph is a scatterplot of the fitted values with the residuals and the corresponding \code{\link{lowess}} curve. The point corresponding to the largest value of Cook's Distance is labeled accordingly. Also provided, for a model with one predictor variable, is a scatterplot of the data with regression line and confidence and prediction intervals.
+Default output includes the inferential analysis of the estimated coefficients and model, sorted residuals and Cook's Distance, and sorted fitted values for existing data or new data.  For a single predictor variable model, the scatterplot of the data with plotted logit function is provided.
 
 Can also be called from the more general \code{\link{model}} function.
 }
@@ -128,7 +128,7 @@ Logit(Gender ~ Years, res.row=8, res.sort="rstudent", digits.d=8, pred=FALSE)
 Logit(Gender ~ Years + Salary)
 
 # compare nested models
-# easier to use lessR function:  Nest
+# easier and better treatment of missing data to use lessR function:  Nest
 full.model <- Logit(Gender ~ Years + Salary)
 reduced.model <- Logit(Gender ~ Years)
 anova(reduced.model, full.model)

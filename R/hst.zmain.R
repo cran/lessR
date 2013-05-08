@@ -128,7 +128,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
     # frequency table
     # j<17 condition is to stop the 0.99999... problem
     cum.c <- cumsum(h$counts)
-    prop <- round(h$counts/length(x),2)
+    prop <- h$counts / length(x)
     cum.p <- cumsum(prop)
     max.dg <- 0
     for (i in 1:length(h$breaks)) {

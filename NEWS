@@ -4,6 +4,35 @@ Update History for Package 'lessR'
 -------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 2.9.2 (2013-05-08)} <<<<<<
+
+-------------
+Updates 2.9.2
+-------------
+
+Read
+  tab-delimited text data file detected by default in addition to
+   csv text data file
+  Excel files now read and detected by default, including variable labels
+
+Density
+  for colors with a black background, density functions plotted with
+    light colors
+
+corRead
+  abbreviation rad.cor no longer available, use rd.cor
+
+
+---------------
+Bug Fixes 2.9.2
+---------------
+
+Histogram
+  rounding error in the computation of cumulative probabilities fixed
+
+
+
+
 >>>>>> Changes for lessR version 2.9 (2013-03-11)} <<<<<<
 
 -------------------
