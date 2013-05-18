@@ -15,7 +15,7 @@ function(y, data=mydata, type=NULL,
 
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
 
-         center.line=c("default", "mean", "median", "off"),
+         center.line=c("default", "mean", "median", "zero", "off"),
 
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {

@@ -116,14 +116,11 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE,
   }
   if (int.cat) {
     cat("\n\n")
-    cat("Each of the following variables is numeric, ", 
-       "but has less than or equal ", n.cat.temp, " unique\n",
-       "values. So perhaps these variables are categorical.\n",
-       "  If really categorical, better to transform these variables ",
-       "into a factor with\n",
-       "     the functions: Transform and factor, to see examples ",
-       "enter:  > ?trans\n", 
-       "  Or, specify a value for n.cat, ",
+    cat("Each of these variables is numeric, but has less than or equal\n", 
+       n.cat.temp, " unique values. If these variables are categorical consider to\n",
+       "transform each variable into a factor with the Transform and\n",
+       "factor functions. To see examples enter:  > ?trans\n", 
+       "Or, specify a value for n.cat, ",
        "such as:  > set(n.cat=4)\n", sep="")
     .dash(83)
     for (j in 1:n.var) if (is.numeric(data[,j]) && nu[j] <= n.cat.temp)

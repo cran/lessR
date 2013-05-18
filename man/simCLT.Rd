@@ -43,7 +43,7 @@ Four different populations are provided: normal, uniform, lognormal for a skewed
 
 For the lognormal distribution, increase the skew by increasing the value of \code{p2}, which is the population standard deviation.
 
-The anti-normal distribution requires the \code{triangle} package. No population mean and standard deviation are provided for the anti-normal distribution, so the 95\% range of sampling variable of the sample mean in terms of standard errors is not provided.
+The anti-normal distribution requires the \code{triangle} package. No population mean and standard deviation are provided for the anti-normal distribution, so the 95\% range of sampling variable of the sample mean in terms of standard errors is not provided.  ** Not activated until the triangle package is updated. **
 
 If the two plots, of the population and sample distributions respectively, are written to pdf files, according to \code{pdf=TRUE}, they are named SimPopulation.pdf and SimSample.pdf.  Their names and the directory to which they are written are provided as part the console output.
 }

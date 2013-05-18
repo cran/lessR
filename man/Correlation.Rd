@@ -33,7 +33,7 @@ cr(\ldots)
   \item{miss}{Basis for deleting missing data values.}
   \item{show.n}{For pairwise deletion, show the matrix of sample sizes for each
        correlation coefficient, regardless of sample size.}
-  \item{brief}{Peta ins to a single correlation coefficient analysis. If 
+  \item{brief}{Pretains to a single correlation coefficient analysis. If 
        \code{FALSE}, then the sample covariance and number of non-missing
        and missing observations are displayed.}
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Set to 0 to turn off.}

@@ -8,7 +8,7 @@
 \description{
 Abbreviation: \code{rd}, \code{Read2}
 
-Reads the contents of the specified data file with optional variable labels into an R data table (frame). By default the format of the file is detected from its filetype: comma separated value text file from \code{.csv}, Excel file from \code{.xls} or \code{.xlsx}, SPSS data file from \code{.sav}, or R data file from \code{.rda}.  If no filetype is assigned then the file type defaults to a \code{csv} file, which can also recognize tab-limited data files as well.  A fixed width formatted text data file can also be read by specifying the required R \code{widths} option. Identify the file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with a character string in the form of a path name or a web URL. Variable labels can be added to the data table when reading a text file or Excel file, and any variable labels in a native SPSS file are automatically included.
+Reads the contents of the specified data file with optional variable labels into an R data table (frame). By default the format of the file is detected from its filetype: comma separated value text file from \code{.csv}, SPSS data file from \code{.sav}, or R data file from \code{.rda}.  If no filetype is assigned then the file type defaults to a \code{csv} file, which can also recognize tab-limited data files as well.  A fixed width formatted text data file can also be read by specifying the required R \code{widths} option. Identify the file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with a character string in the form of a path name or a web URL. Variable labels can be added to the data table when reading a text file, and any variable labels in a native SPSS file are automatically included.
 
 The function also provides feedback regarding the read data, which includes the variable names, the dimensions of the resulting data frame, the data type for each variable, and the values of the variables in the data file for the first and last rows of the data. In addition, an analysis of missing data is provided, listing the number of missing values for each variable and for each observation.
 
@@ -16,13 +16,13 @@ Also see the \code{lessR} function \code{\link{corRead}} to read a correlation m
 }
 
 \usage{
-Read(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
+Read(ref=NULL, format=c("csv", "SPSS", "R", "lessR"),
 
          labels=NULL, widths=NULL, missing="", n.mcut=1, 
 
          miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
       
-         max.lines=30, sheetIndex=1, quiet=getOption("quiet"), \dots)
+         max.lines=30, quiet=getOption("quiet"), \dots)
 
 rd(\ldots) 
 
@@ -34,10 +34,9 @@ Read2(\ldots, sep=";", dec=",")
   \item{ref}{File reference, either omitted to browse for the data file, or a full path name
        or web URL, included in quotes.  A URL begins with \code{http://}.}
   \item{format}{Format of the data in the file, which by default is a \code{csv} file, which
-        also will recognize tab-delimited text. As an option can be an Excel \code{.xls} or
-        \code{.xlsx}, SPSS \code{.sav} file, which also reads the variable labels if present,
-        or a native R data file with a file type of \code{.rda}, or a (native R) data file
-        part of \code{lessR}.}
+        also will recognize tab-delimited text. As an option can be an SPSS \code{.sav} file,
+        which also reads the variable labels if present, or a native R data file with a file
+        type of \code{.rda}, or a (native R) data file part of \code{lessR}.}
   \item{labels}{File name for the file of variable labels. Either a full path name, or just
        the file name if in the same directory as the data file. Or, if \code{row2}, then
        the labels are in the second line of the data file.}
@@ -56,8 +55,6 @@ Read2(\ldots, sep=";", dec=",")
   \item{sep}{Character that separates adjacent values in a text file of data.}
   \item{dec}{Character that serves as the decimal separator in a number.}
   \item{max.lines}{Maximum number of lines to list of the data and labels.}
-  \item{sheetIndex}{For Excel files, specifies the work sheet to read. The default is the
-        first work sheet.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change the corresponding system
        default with \code{\link{set}} function.}
   \item{...}{Other parameter values define with the R read functions, such as the
@@ -66,7 +63,7 @@ Read2(\ldots, sep=";", dec=",")
 
 
 \details{
-By default \code{Read} reads text data files which are either comma delimited, \code{csv}, or tab-dilimited data files, native Excel files of type \code{.xls} or \code{.xlsx}, native R files with file type of \code{.rda} and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide feedback regarding details of the data frame that was read.
+By default \code{Read} reads text data files which are either comma delimited, \code{csv}, or tab-dilimited data files, native R files with file type of \code{.rda} and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide feedback regarding details of the data frame that was read.
 
 CREATE csv FILE\cr
 One way to create a csv data file is to enter the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
@@ -88,9 +85,6 @@ Relies upon \code{\link{read.spss}} from the \code{foreign} package. To read dat
 R DATA\cr
 Relies upon the standard R function \code{\link{load}}. By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{mydata}, with the \code{lessR} function \code{\link{Write}}.
 
-Excel DATA\cr
-Relies upon the function \code{\link{read.xlsx}} from Adrian Dragulescu's \code{xlsx} package. Files with a file type of \code{.xls} or \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The default worksheet to read from the file is the first worksheet. The \code{read.xlsx} parameter \code{sheetName} can be specified to read from a different worksheet, as well as the \code{sheetIndex} parameter which specifies the ordinal position of the worksheet in the Excel file. The \code{\link{read.xlsx}} function relies upon the \code{rJava} package, which is attached with an internal \code{\link{library}} call before \code{\link{read.xlsx}} is invoked.
-
 lessR DATA\cr
 \code{lessR} has some data sets included with the package.  \code{Read} reads each such data set by specifying its name and setting \code{format="lessR"}. Also, each included data set begins with the prefix \code{dat}, which can be deleted when specifying the name of the data set. This option is a replacement for the standard R \code{\link{data}} function, offering the added information provided by \code{Read}.
 
@@ -103,7 +97,7 @@ By default, \code{Read} provides a list of each variable and each row with the d
 To not list the variable name or row name of variables or rows without missing data, invoke the \code{miss.zero=FALSE} option, which can appreciably reduce the amount of output for large data sets. To view the entire data table in terms of 0's and 1's for non-missing and missing data, respectively, invoke the \code{miss.matrix=TRUE} option. 
 
 VARIABLE LABELS\cr
-Unlike standard R, \code{lessR} provides for variable labels, which can be provided for some or all of the variables in a data frame.  One way to enter the variable labels is to read them from their own file with \code{Read} with \code{labels} set to the full path name or \code{URL} of the labels file, or just the file name if the labels file is in the same directory as the data file.  Another method is to include the labels directly in text data file.  To to this, specify the label of variable labels with the \code{label="row2"} option. The web survey application Qualtrics downloads \code{csv} files in this format. These \code{labels} options work for \code{csv} files and Excel files. Variable labels in an SPSS data file are automatically read into the corresponding R data frame. The labels are stored within the data frame, so if the data frame is written to an external file as a native R data file, the labels are also written as part of that file.
+Unlike standard R, \code{lessR} provides for variable labels, which can be provided for some or all of the variables in a data frame.  One way to enter the variable labels is to read them from their own file with \code{Read} with \code{labels} set to the full path name or \code{URL} of the labels file, or just the file name if the labels file is in the same directory as the data file.  Another method is to include the labels directly in text data file.  To to this, specify the label of variable labels with the \code{label="row2"} option. The web survey application Qualtrics downloads \code{csv} files in this format. These \code{labels} options work for \code{csv} files. Variable labels in an SPSS data file are automatically read into the corresponding R data frame. The labels are stored within the data frame, so if the data frame is written to an external file as a native R data file, the labels are also written as part of that file.
 
 For a file that contains only labels, each row of the file, including the first row, consists of the variable name, a comma, and then the label, that is, the standard \code{csv} format such as obtained with the \code{csv} option from a standard worksheet application such as Microsoft Excel or LibreOffice Calc. Not all variables in the data frame that contains the data, usually \code{mydata}, need have a label, and the variables with their corresponding labels can be listed in any order. An example of this file follows for four variables, I1 through I4, and their associated labels.
 
@@ -123,13 +117,10 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
-\references{Adrian A. Dragulescu (2012). xlsx: Read, write, format Excel 2007 and Excel 97/2000/XP/2003 files. R package version 0.5.0. \url{http://CRAN.R-project.org/package=xlsx}
-}
-
 \seealso{
 \code{\link{read.csv}},\code{\link{read.spss}},
-\code{\link{read.xlsx}},\code{\link{read.fwf}}, 
-\code{\link{corRead}}, \code{\link{details}}.
+\code{\link{read.fwf}}, \code{\link{corRead}},
+\code{\link{details}}.
 }
 
 \examples{
@@ -158,9 +149,6 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 
 # read tab-delimited (or any other white-space) data
 # mydata <- Read(sep="")
-
-# read the second worksheet of an Excel file
-# mydata <- Read(sheetIndex=2)
 
 # read the built-in data set datEmployee
 mydata <- Read("Employee", format="lessR")
