@@ -139,9 +139,16 @@ function(y, type,
       lbl <- "medn"
       lbl.cat <- "median:"
     }
+    else if (center.line == "zero") {
+      m.y <- 0
+      lbl <- ""
+      lbl.cat <- "median:"
+    }
+
     abline(h=m.y, col="gray50", lty="dashed")
     mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
-    
+    if (center.line == "zero") m.y <- median(y) 
+
     # analyze runs
     if (!quiet) {
       cat("\n")

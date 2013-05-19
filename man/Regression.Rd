@@ -9,7 +9,7 @@
 \description{
 Abbreviation: \code{reg}, \code{reg.brief}, \code{reg.explain}
 
-Provides a comprehensive regression analysis with graphics from a single, simple function call with many default settings, each of which can be re-specified.  By default the data exists as a data frame with the default name of \code{mydata}, such as data read by the \code{lessR} \code{Read} function.  Specify the model in the function call according to an R \code{\link{formula}}, that is, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign.  
+Provides a comprehensive regression analysis with graphics from a single, simple function call with many default settings, each of which can be re-specified.  By default the data exists as a data frame with the default name of \code{mydata}, such as data read by the \code{lessR} function \code{Read}.  Specify the model in the function call according to an R \code{\link{formula}}, that is, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign.  
 
 Default output includes the inferential analysis of the estimated coefficients and model, correlation matrix, sorted residuals and Cook's Distance, and sorted prediction intervals for existing data or new data.  For multiple regression models, also included is an analysis of the fit of all possible model subsets and an analysis of collinearity. The default output also includes three graphs beginning with a histogram of the residuals with superimposed normal and general density curves.  The second graph is a scatterplot of the fitted values with the residuals and the corresponding \code{\link{lowess}} curve. The point corresponding to the largest value of Cook's Distance is labeled accordingly. Also provided, for a model with one predictor variable, is a scatterplot of the data with regression line and confidence and prediction intervals.  For multiple regression models the graph is the scatterplot matrix of the model variables with the \code{\link{lowess}} curve displayed for each constituent scatterplot.  If the model has exactly two predictor variables, a 3D scatterplot about the regression plane is optionally produced.
 
@@ -207,6 +207,15 @@ Regression(Y ~ X1, pdf=TRUE, pdf.width=4, pdf.height=4)
 # Specify an input data frame other than mydata, see help(mtcars)
 Regression(mpg ~ hp + wt + disp, data=mtcars, 
   X1.new=seq(50,350,50), X2.new=c(2,3), X3.new=c(100,300))
+
+# Plot the standardized residuals against the values of X
+# Save the results of the analysis into an object, here called reg.out
+reg.out <- reg(Y ~ X1)
+# Use the R rstandard function to get the standardized residuals
+res.stnd <- rstandard(reg.out) 
+# Plot with lessR LineChart function
+LineChart(res.stnd, col.line="transparent", center.line="zero",
+          xlab="X1", ylab="Standardized Residuals")
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

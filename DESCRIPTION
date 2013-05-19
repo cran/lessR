@@ -1,13 +1,12 @@
 Package: lessR
-Version: 2.9.2
-Date: 2013-05-07
+Version: 2.9.3
+Date: 2013-05-18
 Title: Less Code, More Results
 Author: David W. Gerbing, School of Business Administration, Portland
         State University
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
 Depends: R (>= 2.15.0)
-Imports: car, leaps, foreign, MBESS, xlsx, triangle
-Suggests: xlsxjars, rJava
+Imports: car, leaps, foreign, MBESS
 Description: Each function accomplishes the work of several or more
         standard R functions.  For example, two function calls, Read()
         and CountAll(), read the data and generate descriptive
@@ -24,7 +23,7 @@ Description: Each function accomplishes the work of several or more
         such as for the Central Limit Theorem.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2013-05-07 22:50:21 UTC; gerbing
+Packaged: 2013-05-19 15:48:44 UTC; gerbing
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-05-08 07:23:18
+Date/Publication: 2013-05-19 18:49:03

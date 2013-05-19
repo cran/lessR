@@ -15,12 +15,26 @@ function(x, by=NULL,
     "addtop  only works for a vertical bar plot.\n\n")
   }
 
+  if ( (is.table(x) || is.matrix(x)) && is.null(legend.title) ) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    "Need to specify a value for:   legend.title\n\n")
+  }
+
   # get variable labels if exist plus axes labels
   if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- "Proportion"
   gl <- .getlabels(xlab, ylab, main)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
   main.lab <- gl$mb
+
+  # if a table, convert to a matrix 
+  if (is.table(x)) {
+    xr.nm <- rownames(x)
+    xc.nm <- colnames(x)  # as.numeric makes equivalent to matrix input
+    x <- matrix(as.numeric(x), nrow=nrow(x), ncol=ncol(x))
+    rownames(x) <- xr.nm
+    colnames(x) <- xc.nm
+  }
 
   # get legend title, l.lab
   if (!is.null(legend.title)) l.lab <- legend.title 
@@ -48,8 +62,8 @@ function(x, by=NULL,
   if (is.ordered(x) && is.null(by)) order.x <- TRUE else order.x <- FALSE
   if (is.ordered(by)) order.y <- TRUE else order.y <- FALSE
 
-  # convert to table, with variable names, if needed
-  if (!entered && !is.table(x))
+
+  if (!entered)
     if (!is.null(by)) x <- table(by,x, dnn=c(y.name, x.name)) 
     else {  
       x <- table(x, dnn=NULL)
@@ -144,6 +158,7 @@ function(x, by=NULL,
   else if ((colors=="blue" || colors=="rose" || colors=="green" 
           || colors=="gold" || colors=="red" || colors=="orange"
           || colors=="sienna" || colors=="dodgerblue" || colors=="purple"
+          || colors=="white" 
           || colors=="orange.black" || colors=="gray.black")
           && (is.null(by) && !is.matrix(x))) {
     color.palette <- colorRampPalette(getOption("col.fill.bar"))
@@ -156,7 +171,7 @@ function(x, by=NULL,
     else if (colors == "heat") clr <- heat.colors(ncolors)
     else  {  # mono color range does not make sense here 
       clr <- c("slategray", "peachpuff2", "darksalmon", "darkseagreen1", 
-        "thistle4", "azure3", "mistyrose")
+              "lightgoldenrod3", "mistyrose", "azure3", "thistle4")
       cat("\n>>> Note: For two variables, the color theme only applies to\n",
           "        the levels of an ordered factor, except for the \"gray\"\n",
           "        color theme. However, other choices are available for\n",
@@ -297,7 +312,7 @@ function(x, by=NULL,
 
   # ----------------------------------------------------------------------------
   # legend for two variable plot including variable labels
-  if ((!is.null(by) || is.matrix(x)) && !is.null(legend.loc))  {
+  if ( (!is.null(by) || is.matrix(x)) && !is.null(legend.loc))  {
 
     if (col.bg != "black")
       col.txt <- "black"

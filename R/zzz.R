@@ -94,8 +94,9 @@ function(...) {
   # see if the variable exists in the Global Environment
   if (exists(var.name, where=.GlobalEnv)) {
     in.global <- TRUE
-    if (!quiet) cat("\n>>> Variable", var.name, "is in the user\'s workspace,",
-        "not in a data frame.\n")
+    if (!quiet)
+      cat("\n>>> Note: Variable", var.name, "is in the user\'s workspace,\n",
+          "         not in a data frame.\n")
   }
   else
     in.global <- FALSE
@@ -148,8 +149,7 @@ function(...) {
 
 .getlabels <- function(xlab, ylab, main) {
 
-  # get variable labels if they exist      txt2 <- "So either make sure you are using the correct variable name, or\n"
-      txt3 <- "  specify the actual data frame with the parameter: data\n"
+  # get variable labels if they exist
 
   x.name <- getOption("xname")
   y.name <- getOption("yname")

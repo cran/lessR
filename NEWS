@@ -4,6 +4,50 @@ Update History for Package 'lessR'
 -------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 2.9.3 (2013-xx-xx)} <<<<<<
+
+Note:  The Excel read functionality added in 2.9.2 is removed because it required
+    Java, and this additional installation was adding too much complexity
+    for users. To retain this functionality, do the following.
+
+  > install.packages("xlsx")     # one time only
+  > library(xlsx)                # for each R session to invoke the following
+  > mydata <- read.xlsx(file.choose(), sheetIndex=1)
+
+    This provides for a direct read of an Excel file by browsing for the file.
+    To specify a specific path name or URL, replace file.choose() with the
+    correct name in quotes.
+
+    The only lost functionality if the above code is implemented is that variable 
+    labels cannot be read with an Excel file. To provide for these labels first
+    save the Excel file as a csv file.
+
+
+-------------
+Updates 2.9.3
+-------------
+
+LineChart
+  a "zero" option is provided for center.line to pass the line through 0
+
+simCLT
+  the "antinormal" option is inactivated until the supporting triangle 
+    package is updated
+
+
+---------------
+Bug Fixes 2.9.3
+---------------
+
+BarChart
+  does not terminate when a table is specified as input
+
+
+
+
+-------------------------------------------------------------------------
+
+
 >>>>>> Changes for lessR version 2.9.2 (2013-05-08)} <<<<<<
 
 -------------

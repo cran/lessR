@@ -1,11 +1,11 @@
 Read <- 
-function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
+function(ref=NULL, format=c("csv", "SPSS", "R", "lessR"),
 
          labels=NULL, widths=NULL, missing="", n.mcut=1, 
 
          miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
       
-         max.lines=30, sheetIndex=1, quiet=getOption("quiet"), ...) {
+         max.lines=30, quiet=getOption("quiet"), ...) {
 
   format <- match.arg(format)
 
@@ -28,7 +28,6 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
 
   if (grepl(".sav$", ref)) format <- "SPSS" 
   if (grepl(".rda$", ref)) format <- "R" 
-  if (grepl(".xls$", ref) || grepl(".xlsx$", ref)) format <- "Excel" 
   if (!is.null(widths)) format <- "fwd"
 
   # construct full path name for label file if not already
@@ -73,41 +72,20 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
     }
 
   }  # end text file
-      
-  else if (format == "Excel") { 
-    library(rJava)
-    if (isnot.row2)  # read data
-      data <- suppressWarnings(read.xlsx(file=ref, sheetIndex=sheetIndex, ...))
-  }
 
   if (!is.null(labels)) {  # process labels
-    if (format %in% c("fwd", "csv", "Excel")) {
+    if (format %in% c("fwd", "csv")) {
       if (labels != "row2") {  # read labels
         mylabels <- 
           read.csv(file=ref.lbl, row.names=1, col.names=c("","label"), header=FALSE)
       }
       else {  # labels == "row2"
-        if (format != "Excel") {
-          mylabels <- read.csv(file=ref, nrows=1, sep=delim, ...)
-          var.names <- names(mylabels)
-          mylabels <- data.frame(t(mylabels))  # var names are row names
-          names(mylabels) <- "label"
-          data <- suppressWarnings(read.csv(file=ref, skip=1, 
-                         na.strings=missing, col.names=var.names, sep=delim, ...))
-        }
-        else {  # format == "Excel"
-          # get labels
-          first.two <- read.xlsx(file=ref, sheetIndex=1, rowIndex=c(1:2))
-          n.col <- ncol(first.two)
-          for (i in ncol(first.two):1) if (is.na(first.two[1,i])) n.col <- n.col - 1
-          labs <- character(length=n.col)
-          for (i in 1:n.col) labs[i] <- as.character(first.two[1,i])
-          var.names <- names(first.two[1:n.col])
-          mylabels <- data.frame(labs, row.names=var.names)
-          names(mylabels) <- "label"
-          # read data
-          data <- read.xlsx(file=ref, sheetIndex=1, rowIndex=-c(2))
-        }
+        mylabels <- read.csv(file=ref, nrows=1, sep=delim, ...)
+        var.names <- names(mylabels)
+        mylabels <- data.frame(t(mylabels))  # var names are row names
+        names(mylabels) <- "label"
+        data <- suppressWarnings(read.csv(file=ref, skip=1, 
+                       na.strings=missing, col.names=var.names, sep=delim, ...))
       }
       # transfer labels to data
       attr(data, which="variable.labels") <- as.character(mylabels$label)

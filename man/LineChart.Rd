@@ -30,7 +30,7 @@ LineChart(y, data=mydata, type=NULL,
 
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
 
-         center.line=c("default", "mean", "median", "off"),
+         center.line=c("default", "mean", "median", "zero", "off"),
 
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
@@ -92,7 +92,8 @@ lc(\ldots)
       specification.}
   \item{center.line}{Plots a dashed line through the middle of a run chart.  The two
       possible values for the line are \code{"mean"} and \code{"median"}.  Provides a centerline
-      for the \code{"median"} by default when the values randomly vary about the mean.}
+      for the \code{"median"} by default when the values randomly vary about the mean. A
+      value of \code{"zero"} specifies the center line should go through zero.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}

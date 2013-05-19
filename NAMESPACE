@@ -4,8 +4,7 @@ importFrom("car", vif, scatter3d, dataEllipse)
 importFrom("leaps", leaps)
 importFrom("MBESS", ci.smd)
 importFrom("foreign", read.spss)
-importFrom("xlsx", read.xlsx)
-importFrom("triangle", dtriangle, rtriangle)
+#importFrom("triangle", dtriangle, rtriangle)
 
 # Export all names except those that begin with .
 #exportPattern("^[^\\.]")
