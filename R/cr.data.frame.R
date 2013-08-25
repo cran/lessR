@@ -109,14 +109,14 @@ function(x, miss, show.n, n.cat, digits.d,
   }
 
   if (n.vars <= 15) {
-    cat("--- Correlation Matrix mycor ---\n\n")
+    cat("--- Correlation Matrix ---\n\n")
     print(myc)
     cat("\n")
   }
   else {
     cat("\nVariables in the correlation matrix:\n")
     cat(names(x))
-    cat("\n\nTo view the correlation matrix, enter:  mycor\n\n")
+    cat("\n\nTo view the correlation matrix, enter its name such as  mycor\n\n")
   }
 
 
@@ -170,6 +170,9 @@ function(x, miss, show.n, n.cat, digits.d,
     }
   }
 
-  return(myc)
+  else
+    cat("\n>>> To view a heat map and scatter plot matrix set:  graphics=TRUE\n\n")
+
+  invisible(myc)
 
 }

@@ -2,7 +2,7 @@ hst.data.frame <-
 function(x, n.cat,
          col.fill, col.stroke, col.bg, col.grid, col.reg,
          over.grid, cex.axis, col.axis, col.ticks, breaks, bin.start, bin.width,
-         prop, cumul, digits.d, xlab, ylab, main, quiet,
+         bin.end, prop, cumul, digits.d, xlab, ylab, main, quiet,
          pdf.width, pdf.height, ...)  {
 
 
@@ -20,7 +20,7 @@ function(x, n.cat,
 
       .hst.main(x[,i], col.fill, col.stroke, col.bg, col.grid, col.reg,
           over.grid, cex.axis, col.axis, col.ticks, breaks, bin.start, bin.width,
-          prop, cumul, digits.d, xlab, ylab, main, quiet, ...)
+          bin.end, prop, cumul, digits.d, xlab, ylab, main, quiet, ...)
 
       dev.off()
       if (!quiet) .showfile(pdf.file, "histogram")

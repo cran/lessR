@@ -21,8 +21,8 @@ rec(\ldots)
 
 \arguments{
   \item{old.vars}{One or more variables to be recoded.}
-  \item{new.vars}{Name of the new variable or variables that contain the recoded values. If
-       not provided, then the values of the original variable are replaced.}
+  \item{new.vars}{Name of the new variable or variables that contain the recoded values, each
+       name in quotes. If not provided, then the values of the original variable are replaced.}
   \item{old}{The values of the variables that are to be recoded. If the value is
        \code{"missing"} then any existing missing values are replaced by the value specified
        with \code{new}.}

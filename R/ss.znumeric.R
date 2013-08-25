@@ -94,7 +94,7 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     xx <- na.omit(xx)
     m <- mean(xx)
     s <- sd(xx)
-    # skewness
+    # skewness:  adjusted Fisher-Pearson standardized moment coefficient
     sk.coef <- n / ((n-1)*(n-2))
     sk.sum <- 0
     for (j in 1:n) sk.sum <- sk.sum + (( (xx[j]-m) / s)^3) 
@@ -117,7 +117,7 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     if (!brief) {
       out <- c(n, n.miss, m, s, sk, kt, mn, q1, md, q3, mx, qr)
       names(out) <- c("n", "miss", "mean", "sd", "skew", "krts",
-                      "min", "Qrt1", "mdn", "Qrt3", "max", "IQR")
+                      "min", "qrt1", "mdn", "qrt3", "max", "IQR")
     }
     else {
       out <- c(n, n.miss, m, s, mn, md, mx)
@@ -168,6 +168,13 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     cat("\n")
   }
 
-cat("\n")
+  if (n.lines == 1)
+    if (!brief) 
+      return(list(n=n, miss=n.miss, mean=m, sd=s, skew=sk, kurtosis=kt, 
+                  min=mn, quartile1=q1, median=md, quartile3=q3, max=mx, IQR=qr))
+    else 
+      return(list(n=n, miss=n.miss, mean=m, sd=s, min=mn, median=md, max=mx))
+
+  cat("\n")
 
 }

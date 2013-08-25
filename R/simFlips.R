@@ -45,7 +45,7 @@ else {
 }
 
 if (show.title) {
-  mainlabel <- paste("Sample Mean after", toString(n), "Coin Flips:", toString(round(ybar[n],3)), sep=" ")
+  mainlabel <- paste("Sample Mean after", toString(n), "Coin Flips:", toString(.fmt(ybar[n],3)), sep=" ")
  title(main=mainlabel, cex.main=.85)
 }
 n.heads <- sum(flips)

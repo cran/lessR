@@ -3,10 +3,10 @@ function(x, y, by, data, type, n.cat,
          col.fill, col.stroke, col.bg, col.grid,
          shape.pts, col.area, col.box, 
          cex.axis, col.axis, col.ticks, 
-         xy.ticks, xlab, ylab, main, cex,
-         x.start, x.end, y.start, y.end, kind,
+         xy.ticks, xlab, ylab, main, cex, kind,
          fit.line, col.fit.line, bubble.size,
-         ellipse, col.ellipse, fill.ellipse, quiet, ...) {
+         ellipse, col.ellipse, fill.ellipse,
+         diag, col.diag, lines.diag, quiet, ...) {
 
   if (!is.null(type)) if (type != "p" && type != "l" && type != "b") { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -44,14 +44,17 @@ function(x, y, by, data, type, n.cat,
       else {
         diff.x <- diff(x)
         for (i in 2:(length(x)-1)) 
-          if (diff.x[i-1] != diff.x[i]) equal.int <- FALSE else equal.int <- TRUE
+          if ((abs(diff.x[i-1] - diff.x[i]) > 0.0000000001)) 
+            equal.int <- FALSE
+          else
+            equal.int <- TRUE
         rm(diff.x)
       }
       if (!is.unsorted(x) && equal.int  && sum(is.na(y))==0)  # also no y missing 
         type <- "l" else type <- "p"
     }
     if (kind == "default")  # set default
-      if ( length(x)>10 && length(y)>10 && length(unique(x))<10 && length(unique(y))<10 )
+      if (length(x)>10 && length(y)>10 && length(unique(x))<10 && length(unique(y))<10)
         kind <- "bubble"
       else kind <- "regular"
     }
@@ -61,10 +64,25 @@ function(x, y, by, data, type, n.cat,
   }
 
   if ((kind == "bubble") || (kind == "sunflower")) {  
-    if (is.null(x.start)) x.start=min(x, na.rm=TRUE)  # x.start, x.min for bubble plot
-    if (is.null(x.end)) x.end=max(x, na.rm=TRUE)
-    if (is.null(y.start)) y.start=min(y, na.rm=TRUE) 
-    if (is.null(y.end)) y.end=max(y, na.rm=TRUE)
+
+    x.start=min(x, na.rm=TRUE)  # for bubble plot
+    x.end=max(x, na.rm=TRUE)
+    y.start=min(y, na.rm=TRUE) 
+    y.end=max(y, na.rm=TRUE)
+
+    dots <- list(...)  # if xlim or ylim present, use these values
+    if (length(dots) > 0) {
+      for (i in 1:length(dots)) {
+        if (names(dots)[i] == "xlim") {
+          x.start <- dots[[i]][1]
+          x.end <- dots[[i]][2]
+        }
+        if (names(dots)[i] == "ylim") {
+          y.start <- dots[[i]][1]
+          y.end <- dots[[i]][2]
+        }
+      }
+    }
   }
 
   
@@ -80,9 +98,19 @@ function(x, y, by, data, type, n.cat,
 
     if (!is.null(by)) par(omi=c(0,0,0,0.6))  # legend in right margin
 
+    if (diag) {
+      nums <- pretty(c(min(x,y),max(x,y)))
+      l1 <- nums[1]
+      l2 <- nums[length(nums)]
+    }
+
     # non-graphical parameters in ... generate warnings when no plot
-    suppressWarnings(plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
+    if (!diag)
+      suppressWarnings(plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
              main=main.lab, ...))
+    else
+      suppressWarnings(plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
+             main=main.lab, xlim=c(l1,l2), ylim=c(l1,l2), ...))
     if (xy.ticks){
       axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
       axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
@@ -134,6 +162,13 @@ function(x, y, by, data, type, n.cat,
   # colored plotting area
   usr <- par("usr")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
+
+  # diagonal line
+  if (diag) {
+    segments(usr[1], usr[3], usr[2], usr[4], col=col.diag)
+    if (lines.diag)
+      for (i in 1:length(x)) segments(x[i],x[i], x[i], y[i])
+    }
 
   # grid lines
   vx <- pretty(c(usr[1],usr[2]))

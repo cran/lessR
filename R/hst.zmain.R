@@ -1,7 +1,7 @@
 .hst.main <- 
 function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
        over.grid, cex.axis, col.axis, col.ticks, breaks, bin.start, bin.width,
-       prop, cumul, digits.d, xlab, ylab, main, quiet, ...) {
+       bin.end, prop, cumul, digits.d, xlab, ylab, main, quiet, ...) {
 
 
   if (!is.numeric(x)) { 
@@ -24,7 +24,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
   main.lab <- gl$mb
 
   # get breaks from user supplied bin width and/or supplied start value
-  if (!is.null(bin.width)  || !is.null(bin.start)) {
+  if (!is.null(bin.width)  || !is.null(bin.start) || !is.null(bin.end)) {
     if (is.null(bin.start)) 
       bin.start <- pretty(min(x, na.rm = TRUE):max(x, na.rm = TRUE))[1]
     if (is.null(bin.width)) {
@@ -32,9 +32,16 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
       bin.width <- h$breaks[2]-h$breaks[1]
     }
     max.x <- max(x, na.rm=TRUE)
-    seq.end <- max.x
-    breaks <- seq(bin.start,seq.end,bin.width)
-    while (max(breaks) < max.x) {
+    if (is.null(bin.end)) bin.end <- max.x
+    if (bin.end < bin.start) { 
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "bin.start: ", bin.start, "\n",
+        "bin.end: ", bin.end, "\n",
+        "bin.end is larger than bin.start, make bin.end larger.\n\n")
+    }
+    breaks <- seq(bin.start,bin.end,bin.width)
+    seq.end <- bin.end
+    while (max(breaks) < bin.end) {
       seq.end <- seq.end + bin.width
       breaks <- seq(bin.start,seq.end,bin.width)
     }
@@ -52,7 +59,8 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
     n.under <- length(x[which(x<bin.min)])
     n.over <- length(x[which(x>bin.max)])
     if (n.under+n.over > 0) {
-      cat("\nRange of the data: ", min(x), " to ", max(x), "\n", sep="")
+      cat("\nRange of the data: ", min(x, na.rm=TRUE), " to ",
+          max(x, na.rm=TRUE), "\n", sep="")
       if (length(breaks) > 3)
         cat("Specified bin cutpoints: ", bin.min, breaks[2], "...", 
           breaks[length(breaks)-1], bin.max, "\n\n")

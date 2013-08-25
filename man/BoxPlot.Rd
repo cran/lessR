@@ -9,7 +9,7 @@ Abbreviation: \code{bx}
 
 Uses the standard R boxplot function, \code{\link{boxplot}} to display a boxplot in color. Also display the relevant statistics such as the hinges, median and IQR.
 
-If the provided object for which to calculate the box plot is a data frame, then a box plot is calculated for each numeric variable in the data frame and the results written to a pdf file in the current working directory.  The name of this file and its path are specified in the output.
+If the provided object for which to calculate the box plot is a data frame, then a box plot is calculated for each numeric variable in the data frame and the results written to a pdf file in the current working directory. If the provided object is a variable list that is a subset of a given data frame, then the full data frame is reduced to the subset data frame and then analyzed. The name of this file and its path are specified in the output.
 }
 
 \usage{
@@ -81,7 +81,7 @@ Other graphic parameters are available to format the display, such as \code{main
 DATA\cr
 The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
-To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.
+To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.  To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
@@ -162,8 +162,8 @@ BoxPlot()
 BoxPlot(col.fill="palegreen1", col.stroke="plum")
 
 # Use the subset function to specify a variable list
-mysub <- subset(mydata, select=c(X,Y))
-BoxPlot(data=mysub)
+# histograms for all specified numeric variables
+Histogram(c(X,Y))
 }
 
 

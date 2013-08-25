@@ -38,7 +38,7 @@ function(x, y, brief, ...) {
     }
 
     cat("\n")
-    cat(ct$method, "\n")
+    cat(">>> ",ct$method, "\n", sep="")
 
     cat("\n")
     if (!is.null(x.lbl)) cat(x.name, ", ", as.character(y.lbl), sep="", "\n")
@@ -53,12 +53,15 @@ function(x, y, brief, ...) {
       cat("Number of cases (rows of data) deleted:", n.del, "\n\n")
       if (c.type == "pearson") {
         covr <- cov(x, y, use="pairwise.complete.obs")
-        cat("Sample Covariance: cov =", .fmt(covr,3), "\n\n")
+        cat("Sample Covariance: s =", .fmt(covr,3), "\n\n")
       }
     }
 
-    cat("Sample Correlation of ", x.name, " and ", y.name,
+    if (brief) 
+      cat("Sample Correlation of ", x.name, " and ", y.name,
         ": ", sym, " = ", .fmt(ct$estimate,3), sep="", "\n\n")
+    else
+      cat("Sample Correlation: ", sym, " = ", .fmt(ct$estimate,3), sep="", "\n\n")
     cat("Alternative Hypothesis: True", sym.pop, "is", h.txt, "0", "\n")
     cat("  ", names(ct$statistic), "-value: ", .fmt(ct$statistic,3), sep="")
     if (c.type == "pearson")

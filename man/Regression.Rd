@@ -189,9 +189,7 @@ reg.explain(Y ~ X1)
 reg.brief(Y ~ X1, explain=TRUE)
 
 # compare nested models
-full.model <- Regression(Y ~ X1 + X2)
-reduced.model <- Regression(Y ~ X1)
-anova(reduced.model, full.model)
+Nest(Y, X1, c(X1,X2))
 
 # Modify the default settings as specified
 Regression(Y ~ X1, res.row=8, res.sort="rstudent", pred.rows=0, digits.d=4)

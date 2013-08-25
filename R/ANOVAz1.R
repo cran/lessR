@@ -77,6 +77,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
      fit.line="none", col.fit.line="grey55", center.line=NULL,
      col.bubble=NULL, bubble.size=.25, col.flower=NULL,
      ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
+     diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
      quiet=TRUE)
 
   if (pdf) {

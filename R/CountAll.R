@@ -1,5 +1,5 @@
 CountAll <-
-function(x=mydata)  {
+function(x=mydata, ...)  {
 
 
   dname <- deparse(substitute(x))
@@ -20,12 +20,12 @@ function(x=mydata)  {
   .dash(37,"+")
   cat("Histogram for Each Numeric Variable\n")
   .dash(37,"+")
-  Histogram(data=x)
+  Histogram(data=x, ...)
   
   cat("\n\n\n")
   .dash(39,"+")
   cat("Bar Chart for Each Non-numeric Variable\n")
   .dash(39,"+")
-  BarChart(data=x)
+  BarChart(data=x, ...)
   
 }

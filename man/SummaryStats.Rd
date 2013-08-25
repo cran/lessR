@@ -9,7 +9,8 @@
 Abbreviation: \code{ss}, \code{ss.brief}
 
 Descriptive or summary statistics for a numeric variable or a factor, one at a time or for all numeric and factor variables in the data frame.  For a single variable, there is also an option for summary statistics at each level of a second, usually categorical variable or factor, with a relatively few number of levels.  For a numeric variable, output includes the sample mean, standard deviation, skewness, kurtosis, minimum, 1st quartile, median, third quartile and maximum, as well as the number of non-missing and missing values. For a categorical variable, the output includes the table of counts for each value of a factor, the total sample size, and the corresponding proportions.  
-}
+
+If the provided object for which to calculate the summary statistics is a data frame, then a summary statistics are calculated for each numeric variable in the data frame and the results written to pdf files in the current working directory. If the provided object is a variable list that is a subset of a given data frame, then the full data frame is reduced to the subset data frame and then analyzed.  The name of these files and associated paths are specified in the output.}
 
 \usage{
 SummaryStats(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
@@ -40,6 +41,8 @@ The \code{digits.d} parameter specifies the number of decimal digits in the outp
 
 Reported outliers are based on the boxplot criterion.  The determination of an outlier is based on the length of the box, which corresponds, but may not equal exactly, the interquartile range.  A value is reported as an outlier if it is more than 1.5 box lengths away from the box.
 
+Skewness is computed with the usual adjusted Fisher-Pearson standardized moment skewness coefficient, the version found in many commercial packages.
+
 The \code{lessR} function \code{\link{Read}} reads the data from an external csv file into the data frame called \code{mydata}.  To describe all of the variables in a data frame, invoke \code{SummaryStats(mydata)}, or just \code{SummaryStats()}, which then defaults to the former.
 
 In the analysis of a categorical variable, if there are more than 10 levels then an abbreviated analysis is performed, only reporting the values and the associated frequencies. If all the values are unique, then the user is prompted with a note that perhaps this is actually an ID field which should be specified using the \code{row.names} option when reading the data.
@@ -48,7 +51,7 @@ In the analysis of a categorical variable, if there are more than 10 levels then
 DATA\cr
 If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
 
-To analyze each variable in the \code{mydata} data frame, use \code{SummaryStats()}.  Or, for a data frame with a different name, insert the name between the parentheses.
+To analyze each variable in the \code{mydata} data frame, use \code{SummaryStats()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -63,6 +66,12 @@ Instead, do the following:
     > SummaryStats(Y)     # directly reference Y}
 
 
+}
+
+\value{
+If the analysis is of a single numeric variable, the full analysis invisibly returns as a list: \code{n}, \code{miss}, \code{mean}, \code{sd}, \code{skew}, \code{kurtosis}, \code{min}, \code{quartile1}, \code{median}, \code{quartile3}, \code{max}, \code{IQR}. The brief analysis returns the relevant subset of the summary statistics. If a \code{by} variable is included in the analysis, then nothing is returned.
+
+If the analysis is of a single categorical variable, a list is invisibly returned with two tables, the frequencies and the proportions, respectively named \code{freq} and \code{prop}.  If two categorical variables are analyzed, then nothing is returned. 
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -100,14 +109,18 @@ SummaryStats(X)
 ss.brief(Y)
 ss.brief(X)
 
+# Reference the summary stats with code
+stats <- ss(Y)
+my.mean <- stats$mean
+
 # Get the summary statistics for Y at each level of X
 # Specify 2 decimal digits for each statistic displayed
 SummaryStats(Y, by=X, digits.d=2)
 
 
-# -----------------
-# entire data frame 
-# -----------------
+# ----------
+# data frame 
+# ----------
 
 # Analyze all variables in data frame mydata at once
 # Any variables with a numeric data type and 4 or less
@@ -118,6 +131,10 @@ SummaryStats()
 # Any variables with a numeric data type and 7 or less
 #  unique values will be analyzed as a categorical variable
 SummaryStats(n.cat=7)
+
+# analyze just a subset of a data frame
+mydata <- Read("Employee", format="lessR", quiet=TRUE)
+SummaryStats(c(Salary,Years))
 
 
 # ----------------------------------------
@@ -159,5 +176,6 @@ SummaryStats(Travel)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ summary }
+
 
 

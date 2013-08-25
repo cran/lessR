@@ -128,16 +128,18 @@ function(x, data,
     cat("\nSample Size: ", n, "\n")
     cat("Missing Values: ", n.miss, "\n")
 
-    digits.d <- 3
-    if (n > 2 && n < 5000) {
-      nrm <- shapiro.test(x)
-      W <- .fmt(nrm$statistic,min(4,digits.d+1))
-      p.val <- .fmt(nrm$p.value,min(4,digits.d+1))
-      cat("\nNull hypothesis is a normal population\n")
-      cat(nrm$method, ":  W = ", W, ",  p-value = ", p.val, sep="", "\n")
+    if (type == "normal" || type == "both") {
+      digits.d <- 3
+      if (n > 2 && n < 5000) {
+        nrm <- shapiro.test(x)
+        W <- .fmt(nrm$statistic,min(4,digits.d+1))
+        p.val <- .fmt(nrm$p.value,min(4,digits.d+1))
+        cat("\nNull hypothesis is a normal population\n")
+        cat(nrm$method, ":  W = ", W, ",  p-value = ", p.val, sep="", "\n")
+      }
+      else
+        cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
     }
-    else
-      cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
   }
 
   cat("\n")

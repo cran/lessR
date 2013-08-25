@@ -1,5 +1,5 @@
 .ss.data.frame <-
-function(x, n.cat, ...)  {
+function(x, n.cat, brief, ...)  {
 
   for (i in 1:ncol(x)) {
 
@@ -8,7 +8,7 @@ function(x, n.cat, ...)  {
     x.name <- names(x)[i]
     options(xname = x.name)
 
-    if (is.numeric(x[,i]) && nu > n.cat) .ss.numeric(x[,i], brief=TRUE, ...)
+    if (is.numeric(x[,i]) && nu > n.cat) .ss.numeric(x[,i], brief=brief, ...)
 
     else if (is.factor(x[,i]) || nu <= n.cat) {
       .ss.factor(x[,i], ...)

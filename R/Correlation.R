@@ -6,40 +6,32 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
          main=NULL, bottom=3, right=3,
          pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
 
-  miss <- match.arg(miss)
 
-  if (!graphics && !pdf)
-    cat("\n>>> To view a heat map and scatter plot matrix set:  graphics=TRUE\n")
+  miss <- match.arg(miss)
   
   x.name <- deparse(substitute(x))
+  options(xname = x.name)
 
-  is.data <- FALSE  # is data frame
+  is.df <- FALSE  # is data frame
 
   if (missing(y)) {  # is a data frame or a list of variables
 
     if (missing(x)) {
       x.name <- ""  # in case x is missing, i.e., data frame mydata
-      is.data <- TRUE
+      is.df <- TRUE
       data <- eval(substitute(mydata))
     }
 
-    else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {   # not a var
+    else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {
       if (is.data.frame(x)) {  # specified data name
-        x.name <- deparse(substitute(x)) 
-        options(xname = x.name)
-
         if (exists(x.name, where=.GlobalEnv)) {
           data <- x
-          is.data <- TRUE
+          is.df <- TRUE
         }
       }
     } 
 
     else {
-      # get actual variable name or list of names from data
-      x.name <- deparse(substitute(x)) 
-      options(xname = x.name)
-
 
       all.vars <- as.list(seq_along(data))
       names(all.vars) <- names(data)
@@ -51,14 +43,14 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
         # if x is a variable list, create subset data frame
         if (length(x.col) > 1) {
           data <- data[, x.col]
-          is.data <- TRUE
+          is.df <- TRUE
         }
       }
     }
   }
 
 
-  if (!is.data) {
+  if (!is.df) {
 
     dname <- deparse(substitute(data))
     options(dname = dname)
@@ -104,7 +96,8 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
 
   }  # x not data frame
 
-  if (is.data) { 
+
+  if (is.df) { 
     if (is.null(show.n))
       if (nrow(data) <= 15) show.n <- TRUE else show.n <- FALSE
     .cr.data.frame(data, miss, show.n, n.cat, digits.d,

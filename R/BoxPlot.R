@@ -14,8 +14,12 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         quiet=getOption("quiet"),
         pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {
 
+
   if (getOption("colors") == "gray") col.stroke <- "black"
   if (getOption("colors") == "gray.black") col.stroke <- getOption("col.stroke.pt")
+
+  x.name <- deparse(substitute(x))
+  options(xname = x.name)
 
   is.df <- FALSE  # is data frame
 
@@ -24,15 +28,23 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     is.df <- TRUE
     data <- eval(substitute(mydata))
   }
-  else {
-    # get actual variable name before potential call of data$x
-    x.name <- deparse(substitute(x)) 
-    options(xname = x.name)
+
+  else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {  # not a var list
     if (exists(x.name, where=1)) if (is.data.frame(x)) {
-       is.df <- TRUE
-       data <- x
+        data <- x
+        is.df <- TRUE
     }
   }
+
+  # proceed here only if x.name is a var list
+  else if (grepl(":", x.name) || grepl(",", x.name) ) {
+    all.vars <- as.list(seq_along(data))
+    names(all.vars) <- names(data)
+    x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
+    data <- data[, x.col]  # create subset data frame
+    is.df <- TRUE
+  }
+
 
   if (!is.df) {
 

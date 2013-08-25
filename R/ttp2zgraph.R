@@ -1,4 +1,4 @@
-.tt2graph <-
+.ttp2graph <-
 function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
 
   
@@ -38,11 +38,18 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
          kind="default", fit.line="none", col.fit.line="grey55",
          center.line=NULL, col.bubble=NULL, bubble.size=.25, 
          col.flower=NULL, ellipse=FALSE, col.ellipse="lightslategray", 
-         fill.ellipse=TRUE, quiet=TRUE, n.cat=getOption("n.cat"),
+         fill.ellipse=TRUE, 
+         diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
+         quiet=TRUE, n.cat=getOption("n.cat"),
          ylim=c(0,1.1))
   abline(h=0, lwd=.5, col="gray50")
   mtext(mytitle, side=3, line=2.5, cex=1.1, font=2)
-  mtext(paste("n=", .fmt(n,3), ", s=", .fmt(s,4), sep=""), side=3, line=1, font=3)
+  if (abs(n - round(n)) > 0.000001)
+    dgt.n <- 3
+  else  # n is an integer
+    dgt.n <- 0
+  mtext(paste("n=", .fmt(n,dgt.n), ", s=", .fmt(s,4), sep=""),
+               side=3, line=1, font=3)
 
   # delta for a power of mdp, default is 0.8
   if (colors != "gray") col80 <- "firebrick4" else col80 <- "gray20"
@@ -113,12 +120,14 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
       if (del.hi > mmd+H0) {
         .dash(70)
         mytitle <- ">>> Note: Meaningful differences, from "
-        cat(mytitle, d.hi, " to ", .fmt(del.hi,3), ", have Power < ", mdp, "\n", sep="")
+        cat(mytitle, d.hi, " to ", .fmt(del.hi,3), ", have Power < ", mdp, "\n",
+            sep="")
       }
       else {
         .dash(70)
         mytitle <- ">>> Note: Trivial differences, from "
-        cat(mytitle, .fmt(del.hi,3), " to ", mmd+H0, ", have Power > ", mdp, ".\n", sep="")
+        cat(mytitle, .fmt(del.hi,3), " to ", mmd+H0, ", have Power > ", mdp,
+            ".\n", sep="")
         cat(">>> Note: All meaningful differences have Power > ", mdp, "\n", sep="")
       }
       .dash(70)
@@ -128,7 +137,8 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
       pp <- power.t.test(sd=s, delta=mmd, power=mdp, type=mytype)
       n.out <- ceiling(pp$n)
       txt <- ", needed n to achieve power= "
-      if (mytype == "two.sample") mytitle <- paste("Given sw = ", signif(s), txt, sep="")
+      if (mytype == "two.sample") mytitle <- paste("Given sw = ", signif(s), txt,
+          sep="")
       if (mytype == "one.sample") mytitle <- paste("Given s = ", s, txt, sep="")
       cat(mytitle, mdp, " for mmd of ", mmd, ": n = ", n.out, sep="", "\n")
       if (mytype == "two.sample") cat("Sample size n applies to *each* group", "\n")

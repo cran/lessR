@@ -63,7 +63,7 @@ function(x, by=NULL,
   if (is.ordered(by)) order.y <- TRUE else order.y <- FALSE
 
 
-  if (!entered)
+  if (!entered) {
     if (!is.null(by)) x <- table(by,x, dnn=c(y.name, x.name)) 
     else {  
       x <- table(x, dnn=NULL)
@@ -72,6 +72,7 @@ function(x, by=NULL,
         x <- x/sum(x)
       }
     }
+  }
 
   if (is.null(by) && beside && !entered) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -445,6 +446,8 @@ function(x, by=NULL,
   }
 
   cat("\n")
+
+  return(x)
 
 }
 

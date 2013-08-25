@@ -13,7 +13,7 @@ For the analysis of a single variable, the cell proportions are also provided un
 
 Unlike the standard R function, \code{\link{barplot}}, the variable(s) can be entered directly into the function call without first converting to a table.  If two variables are plotted, a legend is automatically provided in the right margin.
 
-If the provided object for which to calculate the bar chart is a data frame, then a bar chart is calculated for each non-numeric variable in the data frame and the results written to a pdf file in the current working directory.  The name of this file and its path are specified in the output.
+If the provided object for which to calculate the bar chart is a data frame, then a bar chart is calculated for each non-numeric variable in the data frame and the results written to a pdf file in the current working directory. If the provided object is a variable list that is a subset of a given data frame, then the full data frame is reduced to the subset data frame and then analyzed.  The name of this file and its path are specified in the output.
 }
 
 \usage{
@@ -70,13 +70,14 @@ bc(\ldots)
        variables are plotted and beside=\code{TRUE}, in which case the default is
        c(.1,1).}
   \item{prop}{Display proportions instead raw frequencies.}
-  \item{xlab}{Label for x-axis, more generally the label for the values which could be on 
-        the vertical axis for a two variable plot if \code{horiz=TRUE}. Defaults to variable
-        name.}
-  \item{ylab}{Label for y-axis, more generally the frequency axis. Defaults to Frequency.}
+  \item{xlab}{Label for x-axis, more generally the label for the values which could
+       be on the vertical axis for a two variable plot if \code{horiz=TRUE}. Defaults
+       to variable name.}
+  \item{ylab}{Label for y-axis, more generally the frequency axis. Defaults to
+       Frequency.}
   \item{main}{Title of graph.}
-  \item{cex.axis}{Scale magnification factor, which by default displays the axis values to be
-        smaller than the axis labels.}
+  \item{cex.axis}{Scale magnification factor, which by default displays the axis 
+       values to be smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
   \item{col.ticks}{Color of the ticks used to label the axis values.}
   \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
@@ -121,6 +122,8 @@ The data may either be a vector from the global enviornment, the user's workspac
 
 If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment. 
 
+To obtain a bar chart of each numerical variable in the \code{mydata} data frame, use \code{bar chart()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
+
 COLORS\cr
 For a one variable plot, the color of the bars is set by the current color theme according to the function \code{\link{set}}. When two variables are plotted, a set of arbitrary colors represent the various levels of the second variable. Currently transparency effects are not incorporated.\cr
 There are three ways to override the default colors.\cr
@@ -158,11 +161,15 @@ PDF OUTPUT\cr
 Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 }
 
+\value{
+Invisibily returns a contingency table from the R \code{\link{table}} function, an object of class "table", an array of integer values.
+}
+
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{barplot}}, \code{\link{legend}}.
+\code{\link{barplot}}, \code{\link{table}}, \code{\link{legend}}.
 }
 
 
@@ -190,6 +197,8 @@ rm(Pain); rm(Gender)
 BarChart(Pain)
 # short name
 bc(Pain)
+# save the frequencies for later analysis
+myCount <- BarChart(Pain)
 # compare to standard R bar plot, which requires mydata$ reference
 barplot(table(mydata$Pain))
 
@@ -256,8 +265,8 @@ BarChart(Pain, by=Gender, col.fill=c("coral3","seagreen3"),
 BarChart()
 
 # Use the subset function to specify a variable list
-mysub <- subset(mydata, select=c(Pain))
-BarChart(data=mysub)
+mydata <- Read("Employee", format="lessR", quiet=TRUE)
+BarChart(c(Dept, Gender))
 
 
 # ----------------------------

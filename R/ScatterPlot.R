@@ -11,7 +11,6 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          shape.pts="circle", cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
-         x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
 
          kind=c("default", "regular", "bubble", "sunflower"),
 
@@ -24,12 +23,26 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          pt.reg="circle", pt.out="circle", 
          col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
 
+         diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
+
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
   fit.line <- match.arg(fit.line)
   kind <- match.arg(kind)
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% c("x.start","x.end","y.start","y.end")) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "x.start, x.end, y.start, and y.end no longer used.\n",
+          "Instead use the standard R xlim and ylim parameters.\n",
+          "xlim=(x.start,x.end), such as xlim=c(0,40). Same for ylim.\n\n")
+      }
+    }
+  }
 
   # process shapes
   bad.shape <- NULL
@@ -155,14 +168,14 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
       .graphwin(1) 
     else
       .graphwin(d.w=pdf.width)  # add width to default of 4.5 for legend
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
   }
   else  {
     if (!missing(by)) pdf.width <- pdf.width + 0.6
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
   }
 
-  orig.params <- par(no.readonly=TRUE)
-  on.exit(par(orig.params))
 
 
   if (class(x.call)[1] == "data.frame") {
@@ -179,10 +192,10 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          col.fill, col.stroke, col.bg, col.grid,
          shape.pts, col.area, col.box, 
          cex.axis, col.axis, col.ticks, 
-         xy.ticks, xlab, ylab, main, cex,
-         x.start, x.end, y.start, y.end, kind,
+         xy.ticks, xlab, ylab, main, cex, kind,
          fit.line, col.fit.line, bubble.size,
-         ellipse, col.ellipse, fill.ellipse, quiet, ...)
+         ellipse, col.ellipse, fill.ellipse,
+         diag, col.diag, lines.diag, quiet, ...)
     }
 
     else

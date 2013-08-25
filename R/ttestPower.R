@@ -48,6 +48,11 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
         cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Specify only one of mmd and msmd as one implies the other.\n\n")
   }
+
+  if ( (!is.null(n1) || !is.null(n2)) && !is.null(mu0) ) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Indicated two samples with n1 and n2 but only a single sample with mu0.\n\n")
+  }
   
   
   cat("------------------------------------------------------------\n")
@@ -112,7 +117,7 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
   # set up graphics system
   .opendev(pdf.file, pdf.width, pdf.height)
   
-  .tt2graph(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...)
+  .ttp2graph(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...)
 
   if (!is.null(pdf.file)) .showfile(pdf.file, "power curve")
 
