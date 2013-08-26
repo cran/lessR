@@ -9,7 +9,7 @@ function(x, data=mydata,
          col.grid=getOption("col.grid"),
 
          col.nrm="black", col.gen="black",
-         col.fill.nrm="transparent", col.fill.gen="transparent",
+         col.fill.nrm=NULL, col.fill.gen=NULL,
 
          cex.axis=.85, col.axis="gray30", col.ticks="gray30",
          x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
@@ -19,15 +19,28 @@ function(x, data=mydata,
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
   clr <- getOption("colors") 
-  if (clr == "blue") {
+  if (clr == "blue")
     if (col.fill == getOption("col.fill.pt")) col.fill <- "gray86"
-    col.fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
-    col.fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
+
+  if (is.null(col.fill.nrm)) {
+    if (clr == "blue")  # default blue fill
+      col.fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
+    else  # default fill for all other colors
+      col.fill.nrm <- "transparent"  
   }
+
+  if (is.null(col.fill.gen)) {
+    if (clr == "blue")  # default blue fill
+      col.fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
+    else  # default fill for all other colors
+      col.fill.gen <- "transparent"
+  }
+
   if (clr == "gray.black" || clr == "orange.black") {
     col.nrm <- getOption("col.stroke.pt")
     col.gen <- getOption("col.stroke.pt")
   }
+
 
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x)) 
@@ -52,9 +65,6 @@ function(x, data=mydata,
 
   # set up graphics system
   .opendev(pdf.file, pdf.width, pdf.height)
-
-  orig.params <- par(no.readonly=TRUE)
-  on.exit(par(orig.params))
 
   d <- .den.main(x.call, data=mydata, 
             bw, type, bin.start, bin.width, quiet,

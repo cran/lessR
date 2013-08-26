@@ -8,7 +8,7 @@
 \description{
 Abbreviation: \code{tt}, \code{tt.brief}
 
-Provides enhanced output from the standard \code{\link{t.test}} function applied to the analysis of the mean of a single variable or the independent groups analysis of the mean difference, from either data or summary statistics. The data can be in the form of a data frame or two separate vectors of data, one for each group. This output includes the basic descriptive statistics, analysis of assumptions and the hypothesis test and confidence interval. For two groups the output also includes the analysis for both with and without the assumption of homogeneous variances, the pooled or within-group standard deviation, and the standardized mean difference or Cohen's \emph{d} and its confidence interval. The output from data for two groups introduces the \acronym{ODDSMD} plot, which displays the Overlapping Density Distributions of the two groups as well as the means, mean difference and Standardized Mean Difference. The plot also includes the results of the descriptive and inferential analyses.
+Provides enhanced output from the standard \code{\link{t.test}} function applied to the analysis of the mean of a single variable, or the independent groups analysis of the mean difference, from either data or summary statistics, or the analysis of a dependent-groups analysis from the data. The data can be in the form of a data frame or separate vectors of data, one for each group. This output includes the basic descriptive statistics, analysis of assumptions and the hypothesis test and confidence interval. For two groups the output also includes the analysis for both with and without the assumption of homogeneous variances, the pooled or within-group standard deviation, and the standardized mean difference or Cohen's \emph{d} and its confidence interval. The output from data for two groups introduces the \acronym{ODDSMD} plot, which displays the Overlapping Density Distributions of the two groups as well as the means, mean difference and Standardized Mean Difference. The plot also includes the results of the descriptive and inferential analyses. For the dependent-groups analysis, a scatter plot of the two groups of data also is produced, which includes the diagonal line through the scatter plot that represents equality, and a line segment for each point in the scatter plot which is the vertical distance from the point to the diagonal line to display the amount of change.
 
 Can also be called from the more general \code{\link{model}} function.
 }
@@ -25,7 +25,7 @@ ttest(x=NULL, y=NULL, data=mydata, paired=FALSE,
          alternative=c("two.sided", "less", "greater"),
          mmd=NULL, msmd=NULL, 
 
-         show.title=TRUE, bw1="nrd", bw2="nrd", graph=TRUE,
+         show.title=TRUE, bw1="bcv", bw2="bcv", graph=TRUE,
          pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 tt.brief(\ldots, brief=TRUE)
@@ -85,7 +85,7 @@ If \code{n} or \code{n1} are set to numeric values, then the analysis proceeds f
 
 Following the format and syntax of the standard \code{\link{t.test}} function, to specfiy the two-group test with a formula, \code{\link{formula}}, the data must include a variable that has exactly two values, a grouping variable or factor generically referred to as X, and a numerical response variable, generically referred to as Y. The formula is of the form Y ~ X, with the names Y and X replaced by the actual variable names specific to a particular analysis.  The formula method automatically retrieves the names of the variables and data values for display on the resulting output.
 
-The values of the response variable Y can be organized into two vectors, the values of Y for each group in its corresponding vector. The vectors must be defined in the user workspace as they are generally of unequal length and so generally not conformable to a data frame. When submitting data in this form, the output is enhanced if the actual names of the variables referred to generically as X and Y, as well as the names of the levels of the factor X, are explicitly provided. 
+The values of the response variable Y can be organized into two vectors, the values of Y for each group in its corresponding vector. When submitting data in this form, the output is enhanced if the actual names of the variables referred to generically as X and Y, as well as the names of the levels of the factor X, are explicitly provided. 
 
 For the output, when computed from the data the two groups are automatically arranged so that the group with the larger mean is listed as the first group.  The result is that the resulting mean difference, as well as the standardized mean difference, is always non-negative.
 
@@ -156,12 +156,13 @@ tt(Y ~ X)
 # brief version of results
 tt.brief(Y ~ X)
 
+# return the vectors group1 and group2 into the object t.out
 # separate the data values for the two groups and analyze separately
 t.out <- ttest(Y ~ X)
 Histogram(group1, data=t.out)
 Histogram(group2, data=t.out)
 
-# Compare to standard R function t.test
+# compare to standard R function t.test
 t.test(mydata$Y ~ mydata$X, var.equal=TRUE)
 
 # consider the practical importance of the difference
@@ -200,13 +201,15 @@ Y2 <- round(rnorm(n=10, mean=60, sd=10),2)
 #   to enhance the readability of the output
 ttest(Y1, Y2, Ynm="MyY", Xnm="MyX", X1nm="Group1", X2nm="Group2")
 
-# dependent t-test from vectors in global environment
+# dependent groups t-test from vectors in global environment
 ttest(Y1, Y2, paired=TRUE)
 
-# dependent t-test from variables in data frame mydata
+# dependent groups t-test from variables in data frame mydata
 mydata <- data.frame(Y1,Y2)
 rm(Y1);  rm(Y2)
 ttest(Y1, Y2, paired=TRUE)
+# independent groups t-test from variables (vectors) in a data frame
+ttest(Y1, Y2)
 
 
 # -------------------------------------------------------

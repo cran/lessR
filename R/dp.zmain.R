@@ -70,13 +70,13 @@ function(x, by,
   lo15 <- q1 - 1.5*IQR(x)
   up15 <- q3 + 1.5*IQR(x)
   up30 <- q3 + 3.0*IQR(x)
-  stripchart(x[x<lo30], add=TRUE, method="stack",
+  stripchart(x[x<lo30], add=TRUE, method=method,
              col=col.out30, bg=col.out30, pch=pt.out30, ...)
-  stripchart(x[x<lo15], add=TRUE, method="stack",
+  stripchart(x[x<lo15], add=TRUE, method=method,
              col=col.out15, bg=col.out15, pch=pt.out15, ...)
-  stripchart(x[x>up15], add=TRUE, method="stack",
+  stripchart(x[x>up15], add=TRUE, method=method,
              col=col.out15, bg=col.out15, pch=pt.out15, ...)
-  stripchart(x[x>up30], add=TRUE, method="stack",
+  stripchart(x[x>up30], add=TRUE, method=method,
              col=col.out30, bg=col.out30, pch=pt.out30, ...)
 
   # dp for regular points

@@ -155,8 +155,7 @@ mycor <- cr(m01:m20)
 corCFA(F1=c(m06,m07,m09,m10), F2=c(m15,m02),
        F3=c(m04,m11,m16), F4=c(m01,m05,m12,m13))
 
-
-# bad model to illustrate indicator diagnostics
+# bad fitting model to illustrate indicator diagnostics
 mycor <- corReflect(vars=c(m20))
 corCFA(F1=c(m06,m09,m19), F2=c(m07),
        F3=c(m04,m11,m16), F4=c(m20,m18,m12,m15))
@@ -167,7 +166,4 @@ corCFA(F1=c(m06,m09,m19), F2=c(m07),
 % R documentation directory.
 \keyword{ correlation }
 \keyword{ factor analysis }
-
-
-
 

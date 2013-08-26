@@ -32,7 +32,6 @@ ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat")
          shape.pts="circle", cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
-         x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
 
          kind=c("default", "regular", "bubble", "sunflower"),
 
@@ -44,6 +43,8 @@ ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat")
 
          pt.reg="circle", pt.out="circle", 
          col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
+
+         diag=FALSE, col.diag=par("fg"), lines.diag=TRUE, 
 
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
@@ -103,14 +104,6 @@ dp(\ldots)
   \item{main}{Label for the title of the graph.  If the corresponding variable labels exist,
        then the title is set by default from the corresponding variable labels.}
   \item{cex}{Magnification factor for any displayed points, with default of cex=1.0.}
-  \item{x.start}{For Likert style response data, the starting integer value of the x-axis. Useful
-      if the actual data do not include all possible values.}
-  \item{x.end}{For Likert style response data, the ending integer value of the x-axis. Useful
-      if the actual data do not include all possible values.}
-  \item{y.start}{For Likert style response data, the starting integer value of the y-axis. Useful
-      if the actual data do not include all possible values.}
-  \item{y.end}{For Likert style response data, the ending integer value of the y-axis. Useful
-      if the actual data do not include all possible values.}
   \item{kind}{Default is \code{"default"}, which becomes a \code{"regular"} scatterplot for 
       most data.  If Likert style response data is plotted, that is, 
       each variable has less than 10 integer values, then instead by default a bubble plot is 
@@ -128,9 +121,14 @@ dp(\ldots)
   \item{pt.reg}{For dot plot, type of regular (non-outlier) point. Default is 21, a circle with
                 specified fill.}
   \item{pt.out}{For a dot plot, type of point for outliers. Default is 19, a filled circle.}
-  \item{col.out30}{For a dot plot, color of severe outliers.}
+  \item{col.out30}{For a dot plot, color of outliers.}
   \item{col.out15}{For a dot plot, color of potential outliers.}
   \item{new}{If \code{FALSE}, then add the dot plot to an existing graph.}
+  \item{diag}{Applies just to scatter plots of 2 numeric variables. If \code{TRUE}, then add
+        a diagonal line to a 2-dimensional scatter plot.}
+  \item{col.diag}{Color of diagonal line if \code{diag=TRUE}.}
+  \item{lines.diag}{If \code{lines.diag=TRUE}, then if \code{diag=TRUE}, each point is
+        connected to the diagonal line with a line segment.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
@@ -169,6 +167,9 @@ The one variable plot is a one variable scatterplot, that is, a dot chart. Resul
 
 LIKERT DATA\cr
 A scatterplot of Likert type data is problematic because there are so few possibilities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 25 possible paired values to plot, so most of the plotted points overlap with others.  In this situation, that is, when there are less than 10 values for each of the two variables, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values.  A sunflower plot can be requested in lieu of the bubble plot.
+
+DIAGONAL\cr
+Useful particularly when comparing pre- and post- scores on some assessement, a diagonal line that runs from the lower-left corner of the graph to the upper-right corner represents the values of no change from a value on the x-axis that equals the corresponding value on the y-axis, where the pre and post scores are equal. Points on either side of that diagonal indicate \code{+} or \code{-} change. To provide this line, specify \code{diag=TRUE}, which will apply only to scatter plots with two numeric, non-categorical, variables. When so specified, for each data coordinate, a vertical line is drawn from the diagonal of no change to the point, unless \code{lines.diag} is set to \code{FALSE}. If \code{diag=TRUE}, then the axes limits are set so that each axis has the same beginning and ending point. 
 
 VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} can store the labels in the data frame with the data, obtained from the \code{\link{Read}} function.  If this labels data frame exists, then the corresponding variable label is by default listed as the label for the corresponding axis and on the text output. For more information, see \code{\link{Read}}.
@@ -241,8 +242,8 @@ ScatterPlot(x, y, fit.line="loess")
 # increase span (smoothing) from default of .75
 ScatterPlot(x, y, fit.line="loess", span=1.25)
 
-# custom scatterplot
-ScatterPlot(x, y, col.stroke="darkred", col.fill="plum")
+# custom scatterplot, with diagonal line, connecting line segments
+ScatterPlot(x, y, col.stroke="darkred", col.fill="plum", diag=TRUE)
 
 # scatterplot with a gray scale color theme 
 #   or, use set(colors="gray") to invoke for all subsequent analyses

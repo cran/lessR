@@ -147,6 +147,7 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
        fit.line="none", col.fit.line="grey55", center.line=NULL,
        col.bubble=NULL, bubble.size=.25, col.flower=NULL,
        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
+       diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
        quiet=TRUE, ylim=c(0,1))
 
     lines(lm.out$model[,nm[2]], p.int$fit, col=col.pts, lwd=2)

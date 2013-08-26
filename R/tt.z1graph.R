@@ -4,14 +4,13 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
          clpct, tvalue, pvalue, ub, lb,
          show.title, pdf.file, pdf.width, pdf.height) {
 
-  dYA <- density(YA, bw1)
+  suppressWarnings(dYA <- density(YA, bw1))
 
   if (!brief) {
     cat("\n\n------ Graphics Smoothing Parameter ------\n\n")
     mytitle <- "Density bandwidth for "
     cat(mytitle, .fmt(dYA$bw,digits.d), sep="", "\n\n")
   }
-
 
 
   cat("--------------------------------------------------\n")

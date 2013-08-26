@@ -145,7 +145,7 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 # mydata <- Read(missing=c(-99, "XXX"))
 
 # do not display any output
-# mydata <- rd.quiet()
+# mydata <- Read(quiet=TRUE)
 
 # read tab-delimited (or any other white-space) data
 # mydata <- Read(sep="")

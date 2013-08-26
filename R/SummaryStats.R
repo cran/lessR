@@ -3,22 +3,33 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     digits.d=NULL, brief=getOption("brief"), ...)  {
 
 
+  x.name <- deparse(substitute(x))
+  options(xname = x.name)
+
   is.df <- FALSE  # is data frame
 
-    if (missing(x)) {
-      x.name <- ""  # in case x is missing, i.e., data frame mydata
+  if (missing(x)) {
+    x.name <- ""  # in case x is missing, i.e., data frame mydata
+    is.df <- TRUE
+    data <- eval(substitute(mydata))
+  }
+
+  else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {  # not a var list
+    if (exists(x.name, where=1)) if (is.data.frame(x)) {
+        data <- x
         is.df <- TRUE
-        data <- eval(substitute(mydata))
-    }
-    else {
-# get actual variable name before potential call of data$x
-      x.name <- deparse(substitute(x)) 
-        options(xname = x.name)
-        if (exists(x.name, where=1)) if (is.data.frame(x)) {
-       is.df <- TRUE
-       data <- x
     }
   }
+
+  # proceed here only if x.name is a var list
+  else if (grepl(":", x.name) || grepl(",", x.name) ) {
+    all.vars <- as.list(seq_along(data))
+    names(all.vars) <- names(data)
+    x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
+    data <- data[, x.col]  # create subset data frame
+    is.df <- TRUE
+  }
+
 
   if (!is.df) {
 
@@ -77,12 +88,13 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   }  # x not data frame
 
+
   if (!is.df) nu <- length(unique(na.omit(x.call)))
 
-  if (is.df) .ss.data.frame(data, n.cat, ...) 
+  if (is.df) .ss.data.frame(data, n.cat, brief, ...) 
 
   else if (is.numeric(x.call)  &&  nu > n.cat)
-     .ss.numeric(x.call, y.call, data, digits.d, brief, ...)
+     stats <- .ss.numeric(x.call, y.call, data, digits.d, brief, ...)
 
   else if (is.numeric(x.call) && nu <= n.cat) {
     cat("\n>>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
@@ -90,16 +102,16 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       "   To obtain the numeric summary, decrease  n.cat  to indicate a lower\n",
       "   number of unique values such as with function: set.\n", 
       "   Perhaps make this variable a factor with R factor function.\n")
-   .ss.factor(x.call, y.call, brief, digits.d, ...)
+    stats <- .ss.factor(x.call, y.call, brief, digits.d, ...)
   }
 
   # ordered factors have two attributes, "ordered" and "factor"
   else if (is.factor(x.call))
-     .ss.factor(x.call, y.call, brief, digits.d, ...)
+     stats <- .ss.factor(x.call, y.call, brief, digits.d, ...)
 
   else if (is.character(x.call))
     if (nlevels(factor(x.call)) < length(x.call)) 
-       .ss.factor(factor(x.call), by, brief, n.cat, digits.d, ...)
+       stats <- .ss.factor(factor(x.call), by, brief, n.cat, digits.d, ...)
     else cat("\n Appears to contain unique Names or IDs", "\n")
 
   else {
@@ -108,6 +120,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
         "character values that can be converted to a factor, or logical values\n",
         "that can be converted to numerical 0 and 1.\n")
   }
+
+  if (!is.df) invisible(stats)
 
 }
 

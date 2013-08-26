@@ -21,7 +21,7 @@ Density(x, data=mydata,
        col.grid=getOption("col.grid"),
 
        col.nrm="black", col.gen="black",
-       col.fill.nrm="transparent", col.fill.gen="transparent",
+       col.fill.nrm=NULL, col.fill.gen=NULL,
 
        cex.axis=.85, col.axis="gray30", col.ticks="gray30",
        x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
@@ -49,10 +49,12 @@ dn(\ldots)
   \item{col.grid}{Color of the grid lines.}
   \item{col.nrm}{Color of the normal curve.}
   \item{col.gen}{Color of the general density curve.}
-  \item{col.fill.nrm}{Fill color for the estimated normal curve, with a transparent blue as
-       the default.}
-  \item{col.fill.gen}{Fill color for the estimated general density curve, with a transparent 
-       light red as the default.}
+  \item{col.fill.nrm}{Fill color for the estimated normal curve, with a partially 
+       transparent blue as the default for a blue color theme, and transparent for
+       all other themes.}
+  \item{col.fill.gen}{Fill color for the estimated general density curve, with a partially
+       transparent light red as the default as the default for a blue color theme, and
+       transparent for all other themes.}
   \item{cex.axis}{Scale magnification factor, which by default displays the axis values to be 
         smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}

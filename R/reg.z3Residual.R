@@ -91,7 +91,7 @@ function(lm.out, nm,
        bin.start=NULL, bin.width=NULL,
        col.fill=getOption("col.fill.pt"),
        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-       col.nrm="black", col.gen="black",
+       col.nrm="gray40", col.gen="gray40",
        col.fill.nrm="transparent", col.fill.gen="transparent",
        cex.axis=.85, col.axis="gray30", col.ticks="gray30",
        x.pt=NULL, y.axis=FALSE, 
@@ -134,7 +134,8 @@ function(lm.out, nm,
         col.ticks="gray30", xy.ticks=TRUE,
         fit.line="none", center.line=NULL, cex=NULL, 
         col.bubble=NULL, bubble.size=.25, col.flower=NULL,
-        ellipse=FALSE, n.cat=getOption("n.cat"), kind="default")
+        ellipse=FALSE, n.cat=getOption("n.cat"), kind="default",
+        diag=FALSE, col.diag=par("fg"), lines.diag=TRUE)
     abline(h=0, lty="dotted", col=getOption("col.fill.bar"))
     lines(lowess(fit.ord, res.ord, f=.9), col=getOption("col.stroke.pt"))
     res.c <- res[which(cook>=cooks.cut)]

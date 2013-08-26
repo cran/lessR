@@ -51,6 +51,7 @@ function(lm.out, nm, my.formula, brief, res.rows,
        fit.line=fl, col.fit.line="grey55", center.line=NULL,
        col.bubble=NULL, bubble.size=.25, col.flower=NULL,
        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
+       diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
        quiet=TRUE, ylim=c(y.min,y.max))
 
     if (do.int) {

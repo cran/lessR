@@ -4,7 +4,83 @@ Update History for Package 'lessR'
 -------------------------------------------------------------------------
 
 
->>>>>> Changes for lessR version 2.9.3 (2013-xx-xx)} <<<<<<
+>>>>>> Changes for lessR version 2.9.4 (2013-08-25)} <<<<<<
+
+-------------
+Updates 2.9.4
+-------------
+
+BarChart
+  return the table of frequencies, so can assign to an object
+
+BoxPlot
+  subset of variables can be specified, e.g., bx(c(x,y,z))
+
+CountAll
+  parameters may now be added, such as bin.start for Histograms
+
+Density
+  test for normality done only if a normal curve is plotted
+
+Histogram
+  bin.end parameter added
+  subset of variables can be specified, e.g., hs(c(x,y,z))
+
+ttest
+  to accommodate density plot of more data sets, bandwidth default
+    changed from nrd to bcv
+  two vector form of two-group t-test now accommodated from a data frame
+    to permit a dependent-groups analysis from a data frame
+  for a dependent-groups analysis, or paired t-test, a scatter plot of
+    the two variables is produced with a diagonal line through the plot
+    to indicate equality and the vertical distance from the line to each
+    point displayed to indicate the extent of the change
+
+ttestPower
+  value of n on graph displayed as an integer or with decimal digits
+    as appropriate
+
+Regression
+  density lines in residuals density plot now appropriate color for
+    black backgrounds
+
+ScatterPlot
+  for a scatter plot of two numeric variables, diag=TRUE places a diagonal 
+    line through the plot with vertical lines from each point to the diagonal,
+    primarily for plotting change in a dependent samples t-test
+  removed x.start, x.end, y.start and y.end for bubble plots: use xlim, ylim
+
+SummaryStats
+  returns summary statistics for analysis of a single variable 
+  subset of variables can be specified, e.g., ss(c(x,y,z))
+  analysis of a data frame yields the default value of brief, which
+    can be overridden in the function call
+
+
+---------------
+Bug Fixes 2.9.4
+---------------
+
+BarChart
+  graceful termination if a bar chart is attempted with only 1 unique value
+
+Density
+  col.fill.nrm, normal curve fill, can set to transparent for blue color theme
+
+ScatterPlot
+  xlim and ylim also applies to bubble plots, before they were ignored
+  line plot by default even when intervals of successive values of a 
+    sorted x are only equal to within 9 decimal digits 
+  1-D plot displays outliers with same plot.method as regular points
+
+Correlation
+  name of first variable in bivariate correlation now displays correctly
+
+
+
+
+
+>>>>>> Changes for lessR version 2.9.3 (2013-05-26)} <<<<<<
 
 Note:  The Excel read functionality added in 2.9.2 is removed because it required
     Java, and this additional installation was adding too much complexity
@@ -45,7 +121,6 @@ BarChart
 
 
 
--------------------------------------------------------------------------
 
 
 >>>>>> Changes for lessR version 2.9.2 (2013-05-08)} <<<<<<

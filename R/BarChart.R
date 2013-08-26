@@ -27,6 +27,9 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else
     colors <- match.arg(colors)
 
+  x.name <- deparse(substitute(x))
+  options(xname = x.name)
+
   is.df <- FALSE  # is data frame
 
   if (missing(x)) {
@@ -34,14 +37,21 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     is.df <- TRUE
     data <- eval(substitute(mydata))
   }
-  else {
-    # get actual variable name before potential call of data$x
-    x.name <- deparse(substitute(x)) 
-    options(xname = x.name)
+
+  else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {  # not a var list
     if (exists(x.name, where=1)) if (is.data.frame(x)) {
-       is.df <- TRUE
-       data <- x
+        data <- x
+        is.df <- TRUE
     }
+  }
+
+  # proceed here only if x.name is a var list
+  else if (grepl(":", x.name) || grepl(",", x.name) ) {
+    all.vars <- as.list(seq_along(data))
+    names(all.vars) <- names(data)
+    x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
+    data <- data[, x.col]  # create subset data frame
+    is.df <- TRUE
   }
 
   if (!is.df) {
@@ -139,12 +149,21 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          pdf.width, pdf.height, ...)
 
   else {
+  
+    if (length(unique(na.omit(x.call))) == 1) { 
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "There is only one unique value for the values of ", x.name,
+        ": ", na.omit(x.call)[1], "\n",
+        "The bar chart is only computed if there is more than one",
+        " unique value\n\n")
+    }
+
     .opendev(pdf.file, pdf.width, pdf.height)
 
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
 
-    .bc.main(x.call, y.call,
+    bc <- .bc.main(x.call, y.call,
          col.fill, col.stroke, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
          cex.axis, col.axis, col.ticks, beside, col.low, col.hi,
@@ -155,6 +174,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       dev.off()
       .showfile(pdf.file, "barchart")
     }
+
+    invisible(bc)
   }
 
 }

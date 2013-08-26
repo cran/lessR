@@ -10,7 +10,7 @@ Abbreviation: \code{hs}
 
 From the standard R function \code{\link{hist}} plots a frequency histogram with default colors, including background color and grid lines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width and/or the bin start. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
 
-If the provided object for which to calculate the histogram is a data frame, then a histogram is calculated for each numeric variable in the data frame and the results written to pdf files in the current working directory.  The name of these files and associated paths are specified in the output.
+If the provided object for which to calculate the histogram is a data frame, then a histogram is calculated for each numeric variable in the data frame and the results written to pdf files in the current working directory. If the provided object is a variable list that is a subset of a given data frame, then the full data frame is reduced to the subset data frame and then analyzed.  The name of these files and associated paths are specified in the output.
 }
 
 \usage{
@@ -25,7 +25,7 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"),
          col.reg="snow2", over.grid=FALSE,
          cex.axis=.85, col.axis="gray30", col.ticks="gray30",
 
-         breaks="Sturges", bin.start=NULL, bin.width=NULL,
+         breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
 
          prop=FALSE, cumul=c("off", "on", "both"), 
          digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL,
@@ -64,6 +64,8 @@ hs(\ldots)
   \item{bin.start}{Optional specified starting value of the bins.}
   \item{bin.width}{Optional specified bin width, which can be specified with or without 
         a \code{bin.start} value.}
+  \item{bin.end}{Optional specified value that is within the last bin, so the actual endpoint
+        of the last bin may be larger than the specified value.}
   \item{prop}{Specify proportions or relative frequencies on the vertical axis. Default
        is \code{FALSE}.}
   \item{cumul}{Specify a cumulative histogram. The value of \code{"on"} displays the 
@@ -92,7 +94,7 @@ Results are based on the standard R \code{\link{hist}} function to calculate and
 DATA\cr
 The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
-To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses.
+To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
@@ -119,7 +121,6 @@ Because of the customized graphic windowing system that maintains a unique graph
 \value{
 Based on the standard \code{R} function \code{\link{hist}}, invisibly returns an object of \code{\link{class}} "histogram". For details see \code{\link{hist}}.
 }
-
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
@@ -223,8 +224,7 @@ Histogram(col.fill="palegreen1", col.bg="ivory", labels=TRUE)
 
 # Use the subset function to specify a variable list
 # histograms for all specified numeric variables
-mysub <- subset(mydata, select=c(X,Y))
-Histogram(data=mysub)
+Histogram(c(X,Y))
 }
 
 

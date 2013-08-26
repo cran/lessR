@@ -78,11 +78,16 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
       cat(.fmti(sum(x), w=w+6))
       cat("\n")
       cat("Proportions: ")
+      xp <- numeric(length=0)
+      sum.x <- sum(x)
+      xp <- x/sum.x
       for (i in 1:length(x)) cat(.fmt(x[i]/sum(x), 3, max.ln[i]))
       cat(.fmtc("1.000", w=w+6))
       cat("\n")
     }
   }
+
+  if (is.null(by) && !is.matrix(x)) return(list(freq=x, prop=xp))
 
   cat("\n")
 

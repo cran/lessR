@@ -10,7 +10,7 @@ function(x=NULL, y=NULL, data=mydata, paired=FALSE,
          alternative=c("two.sided", "less", "greater"),
          mmd=NULL, msmd=NULL, 
 
-         show.title=TRUE, bw1="nrd", bw2="nrd", graph=TRUE,
+         show.title=TRUE, bw1="bcv", bw2="bcv", graph=TRUE,
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {       
 
 
@@ -98,7 +98,7 @@ function(x, y=NULL, ...) {
       .OneGroup(x, Ynm, mu0, brief=brief, bw1=bw1,
            from.data=from.data, conf.level=conf.level,
            alternative=alternative, digits.d=digits.d,
-           mmd=mmd, msmd=msmd,
+           mmd=mmd, msmd=msmd, paired=paired,
            graph=graph, show.title=show.title, pdf.file=pdf.file,
            pdf.width=pdf.width, pdf.height=pdf.height)
     }
@@ -106,7 +106,7 @@ function(x, y=NULL, ...) {
       .OneGroup(x, Ynm, mu0, n, m, s, brief=brief, bw1=bw1,
            from.data=from.data, conf.level=conf.level,
            alternative=alternative, digits.d=digits.d,
-           mmd=mmd, msmd=msmd,
+           mmd=mmd, msmd=msmd, paired=paired,
            graph=graph, show.title=show.title, pdf.file=pdf.file,
            pdf.width=pdf.width, pdf.height=pdf.height, ...)
   }
@@ -118,11 +118,14 @@ function(x, y=NULL, ...) {
 
 
 #-----------------------------------
+# BEGIN
+#-----------------------------------
 
   alternative <- match.arg(alternative)
 
   # get actual variable name before potential call of data$x, could be NULL
   x.name <- deparse(substitute(x)) 
+  if (!missing(y)) y.name <- deparse(substitute(y)) 
 
   # get data frame name
   dname <- deparse(substitute(data))
@@ -132,23 +135,31 @@ function(x, y=NULL, ...) {
   is.frml <- xs$ifr
   from.data <- xs$fd
   in.global <- xs$ig 
+  if (!missing(y)) .xstatus(y.name, dname)  # just for a message on output 
 
   # see if the variable exists in the data frame
   if (from.data && !in.global && !is.frml) .xcheck(x.name, dname, data)
-    
+
   # do analysis with tt.setup
   if (in.global) {
     if (is.function(x))  # var names that are R functions get assigned to global 
       tt.setup(eval(substitute(data$x)), Ynm=x.name, ...)  # 1-group
-    else {
+    else {  # not a function name
+      if (!missing(y))
+         y.l <- length(y)
+      else
+         y.l <- 0
       if (!paired)
-        tt.setup(x, y, ...)  # two vector form must come from global
-      else {
-        if (paired  &&  length(x)!=length(y))  {
+        if (y.l == 0)  # 1-group
+          tt.setup(x, ...)
+        else  # 2-group
+          tt.setup(x, y,  ...)
+      else {  # paired
+        if (length(x)!=length(y))  {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
              "The two data vectors must be of the same size.\n\n")
         }
-        diff <- eval(substitute(x)) - eval(substitute(y))
+        diff <- x - y
         tt.setup(diff, ...)
       }
     }
@@ -159,20 +170,74 @@ function(x, y=NULL, ...) {
     x <- f$x;  y <- f$y;  Ynm <- f$Ynm;  Xnm <- f$Xnm
     X1nm <- f$X1nm;  X2nm <- f$X2nm 
     tt.setup(x, y, ...)
+  }
+
+  else if (from.data) {
+    if (!missing(y))
+       y.l <- length(eval(substitute(data$y)))
+    else
+       y.l <- 0
+    if (!paired) {
+      if (y.l == 0)  # 1-group
+        tt.setup(eval(substitute(data$x)), ...)
+      else  # 2-group
+        tt.setup(eval(substitute(data$x)), eval(substitute(data$y)),  ...)
+    }
+    else {   # paired 
+      diff <- eval(substitute(data$x)) - eval(substitute(data$y))
+      tt.setup(diff, ...)
+    }
+  }
+
+  else
+    tt.setup(...)  # analysis from stats
+
+
+  if (paired) {
+    if (is.null(pdf.file))
+      dev.set(which=4)
+    else
+      pdf(file="PairedScatterPlot.pdf", width=pdf.width, height=pdf.height)
+
+    if (in.global) {
+      x.values <- x
+      y.values <- y
+    }
+    else {
+      x.values <- eval(substitute(data$x))
+      y.values <- eval(substitute(data$y))
+    }
+
+    .plt.main(x.values, y.values,
+       by=NULL, type="p", n.cat=getOption("n.cat"),
+       col.area=NULL, col.box="black",
+       col.fill=getOption("col.fill.pt"),
+       col.stroke=getOption("col.stroke.pt"),
+       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+       shape.pts=21, cex.axis=.85, col.axis="gray30",
+       col.ticks="gray30", xy.ticks=TRUE,
+       xlab=x.name, ylab=y.name, main="",
+       cex=.8, kind="default", 
+       x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
+       fit.line="none", col.fit.line="grey55", center.line=NULL,
+       col.bubble=NULL, bubble.size=.25, col.flower=NULL,
+       ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
+       diag=TRUE, col.diag=par("fg"), lines.diag=TRUE,
+       quiet=TRUE)
+
+    if (!is.null(pdf.file)) {
+      dev.off()
+      .showfile("PairedScatterPlot.pdf", "scatter plot with changes from diagonal")
+      cat("\n\n")
+    }
+
+  }
+
+  if (is.frml) {
     if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
       invisible(list(value1=X1nm, group1=x, value2=X2nm, group2=y))
     else
       invisible(list(value1=X2nm, group1=y, value2=X1nm, group2=x))
   }
-
-  else if (from.data)
-    if (!paired)
-      tt.setup(eval(substitute(data$x)), ...)  # 1-group
-    else {
-      diff <- eval(substitute(data$x)) - eval(substitute(data$y))
-      tt.setup(diff, ...)
-  }
-  else
-    tt.setup(...)  # analysis from stats
 
 }

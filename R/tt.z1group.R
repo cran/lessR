@@ -1,7 +1,7 @@
 .OneGroup  <-
 function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
-         graph, show.title, pdf.file, pdf.width, pdf.height) { 
+         paired, graph, show.title, pdf.file, pdf.width, pdf.height) { 
 
   # get variable label if exists
   gl <- .getlabels()
@@ -130,8 +130,19 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
 
   # densities
   if (from.data && graph && !is.null(mu0)) {
-
-    .opendev(pdf.file, pdf.width, pdf.height)
+ 
+    #.opendev(pdf.file, pdf.width, pdf.height)
+  if (is.null(pdf.file)) {
+    if (!paired)
+      .graphwin(1)
+    else
+      .graphwin(2)
+    dev.set(which=3)
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+  }
+  else 
+    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
 
     .OneGraph(Y, bw1, Ynm, y.lbl, digits.d, brief,
          n, m, mu0, mdiff, s, smd, mmd, msmd,

@@ -1,16 +1,15 @@
-if(getRversion() >= "2.15.1") 
+if (getRversion() >= "2.15.1") 
   globalVariables(c("mydata", "mycor"))
 
 
 .onAttach <-
 function(...) {
 
-  packageStartupMessage("\nFor help, enter, after the >,  Help()\n\n",
-      "----------------------------------------------------------------------\n",
-      "Assign the output data table name when reading or modifying data\n",
-      "    > mydata <- Read()     also Transform, Subset, Merge, Recode, Sort\n",
-      "    > mycor <- Correlation()\n",
-      "----------------------------------------------------------------------\n\n")
+  packageStartupMessage(
+      "--------------------------------------------------------\n",
+      "For help, enter, after the >:  Help()\n",
+      "To read a text, SPSS or R data file:  > mydata <- Read()\n",
+      "--------------------------------------------------------\n\n")
 
   options(colors="blue")
   options(trans.fill.bar=0.00)
@@ -95,8 +94,8 @@ function(...) {
   if (exists(var.name, where=.GlobalEnv)) {
     in.global <- TRUE
     if (!quiet)
-      cat("\n>>> Note: Variable", var.name, "is in the user\'s workspace,\n",
-          "         not in a data frame.\n")
+      cat("\n>>> Note: ", var.name, "created outside of a data",
+          "frame (table)\n")
   }
   else
     in.global <- FALSE
@@ -134,15 +133,17 @@ function(...) {
   if (!exists(var.name, where=data)) { 
     if (dname == "mydata") {
       txt1 <- ", the default name \n\n"
-      txt2 <- "So either make sure you are using the correct variable name, or\n"
-      txt3 <- "  specify the actual data frame with the parameter: data\n"
+      txt2 <- "Either make sure to use the correct variable name, or\n"
+      txt3 <- "specify the actual data frame with the parameter: data\n"
       txt <- paste(txt1, txt2, txt3, sep="")
     }
     else 
-      txt <- " "
+      txt <- "\n"
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Variable ", var.name, " does not exist either by itself ",
-        "or in the data frame ", dname, txt, "\n\n")
+        "(in the user's workspace),\n",
+        "or in the data frame with the name of ", dname, txt, "\n",
+        "To view the existing variable names enter: > names(", dname, ")\n\n")
   }
 }
 
@@ -295,8 +296,11 @@ function(...) {
 
 .opendev <- function(pdf.file, pdf.width, pdf.height) {
 
-  if (is.null(pdf.file)) 
+  if (is.null(pdf.file)) {
     .graphwin(1)
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+  }
   else 
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
 

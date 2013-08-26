@@ -9,7 +9,7 @@ Automatically call the following functions in this package:  \code{\link{Summary
 }
 
 \usage{
-CountAll(x=mydata)
+CountAll(x=mydata, \dots)
 
 ca(\ldots)
 }
