@@ -37,7 +37,7 @@ ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat")
 
          fit.line=c("none", "loess", "ls"), col.fit.line="grey55",
 
-         bubble.size=.25, plot.method="stack",
+         bubble.size=.25, method="stack",
 
          ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
 
@@ -113,7 +113,7 @@ dp(\ldots)
       \code{"loess"} and \code{"ls"}.}
   \item{col.fit.line}{Color of the best fitting line, if the \code{fit.line} option is invoked.}
   \item{bubble.size}{Size of the bubbles in a bubble plot of Likert style data.}
-  \item{plot.method}{Applies to one variable plots. Default is \code{"stack"}, but can also provide
+  \item{method}{Applies to one variable plots. Default is \code{"stack"}, but can also provide
        \code{"jigger"} to scramble the points.}
   \item{ellipse}{If \code{TRUE}, enclose a scatterplot with the .95 data ellipse from the car package.}
   \item{col.ellipse}{Color of the ellipse.}
@@ -273,7 +273,7 @@ ScatterPlot(y)
 ScatterPlot(y, pt.reg=23, col.out15="hotpink", col.out30="darkred")
 
 # one variable scatterplot with added jitter of points
-ScatterPlot(x, plot.method="jitter", jitter=0.05)
+ScatterPlot(x, method="jitter", jitter=0.05)
 
 # by variable dot plot with custom colors, keeps only 1 shape
 ScatterPlot(x, by=Gender, col.stroke=c("steelblue", "hotpink"))

@@ -1,15 +1,20 @@
 \name{details}
 \alias{details}
+\alias{details.brief}
 
 \title{Display Contents of a Data File and Optional Variable Labels}
 
 \description{
+Abbreviation: \code{details.brief}
+
 Provides feedback regarding a data frame which includes the variable names, the dimensions of the resulting data frame, the data type for each variable, and the values of the variables in the data file for the first and last rows of the data. In addition, an analysis of missing data is provided, listing the number of missing values for each variable and for each observation.
 }
 
 \usage{
-details(data=mydata, n.mcut=1, miss.zero=FALSE,
-        max.lines=30, miss.show=30, miss.matrix=FALSE)
+details(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
+         miss.show=30, miss.matrix=FALSE, brief=getOption("brief"))
+
+details.brief(\ldots, brief=TRUE)
 }
 
 \arguments{
@@ -24,6 +29,8 @@ details(data=mydata, n.mcut=1, miss.zero=FALSE,
   \item{miss.matrix}{For the missing value analysis, if there is any missing data, 
         list a version of the complete data table with a 0 for a non-missing value and a 1 for 
         a missing value.}
+  \item{brief}{If \code{TRUE}, display only variable names table plus any variable labels.}
+  \item{\dots}{Further arguments to be passed to or from methods.}
 }
 
 \details{
@@ -58,6 +65,9 @@ mydata <- Read("Employee", format="lessR")
 
 # manually request the details for mydata
 details()
+
+# manually request just variable names, labels for mydata
+details.brief()
 }
 
 

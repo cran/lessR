@@ -4,6 +4,51 @@ Update History for Package 'lessR'
 -------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 2.9.7 (2013-10-29)} <<<<<<
+
+-------------
+Updates 2.9.7
+-------------
+
+details
+  add a brief version, details.brief, which only lists the variable
+    name table and any variable labels
+
+ScatterPlot
+  for 1-D scatter plot, to conform to standard R, rename option
+     plot.method to method
+
+Read
+  relying upon the read.xls function from the gdata package, can
+    read Excel files identified by the .xls or .xlsx filetype
+  add a brief version, which calls the new details.brief
+  provide an option to browse for the labels file, labels=""
+  always display the full path of the data file and any label file
+
+
+---------------
+Bug Fixes 2.9.7
+---------------
+
+BarChart
+  if a data frame analyzed, then a categorical variable with only a
+    a single value would cause a fatal error, now the remaining
+    variables are analyzed and a diagnostic displayed instead
+
+Read
+  labels files for Windows now properly specified
+
+ScatterPlot
+  for a plot with a categorical x-axis, additional parameters such as
+    ylim now work correctly
+
+corScree
+  graph of "successive differences of eigenvalues" now properly labeled
+
+
+
+
+
 >>>>>> Changes for lessR version 2.9.4 (2013-08-25)} <<<<<<
 
 -------------
