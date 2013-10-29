@@ -168,24 +168,26 @@ help.more("Read", 9)
 else if (topic %in% c("rd", "read")) {
 t0 <- "Read Data into R and Prepare for Analysis"
 
-f1 <- bquote(paste(bold("Read, rd"), "  Read a data file into an R data frame called mydata."))
+f1 <- bquote(paste(bold("Read, rd"), "  Read a data file into an R data frame for analysis."))
 
 t1 <-
-"Browse for a csv, native R or SPSS data file available on your local computer 
-system and read the information into the data table (frame) named: mydata. Use
-the function Read, or its abbreviation, rd. To browse, just add ().
+"Browse for a csv, tab-delimited, Excel, R or SPSS data file available on your 
+file system and read the information into the specified data table (frame). Use
+the function Read, or its abbreviations, rd or rd.brief. To browse, use ().
     > mydata <- Read()
-The  <-  is called the assignment operator and instructs R to take what was
+The  <-  is called the assignment operator, which instructs R to take what was
 read and assign it to the data table called mydata. This is the default name
 that all the lessR data analysis functions assume when reading data for analysis.
+
+To read Excel files requires something called Perl, which is usually on Mac and
+Linux systems, but Windows users need to install. Enter ?Read for directions.
 
 Or, specify the file to be read with the name in quotes. The file can be a path
 name to a data file available on the local computer system, or a file on the web.
     > mydata <- Read(\"http://web.pdx.edu/~gerbing/data/twogroup.csv\")
-For web files, include the  http://.
 
 To see how to create a comma separated values or csv data file: > Help(data)
-To see how to create an R data file from within R, enter: > Help(write)
+To see how to use R to create an R data file, enter: > Help(Write)
 
 To read a text file where each column of data values is assigned a specific
 width, add the widths option that specifies the width of each column
@@ -193,7 +195,6 @@ according to the order of the variables.  Enclose the list with the c
 function for combine, here to read 3 variables with widths of 4, 1 and 2.
     > mydata <- Read(widths=c(4,1,2), col.names=c(\"ID\", \"Gender\", \"Age\"))
 
-To read a tab-delimmited text file, add the option: sep=\"\\t\"
 To read a text file with a , for a decimal, add the options: sep=\";\", dec=\",\"
 "
 

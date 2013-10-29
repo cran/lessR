@@ -6,10 +6,10 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage(
-      "--------------------------------------------------------\n",
+      "---------------------------------------------------------------\n",
       "For help, enter, after the >:  Help()\n",
-      "To read a text, SPSS or R data file:  > mydata <- Read()\n",
-      "--------------------------------------------------------\n\n")
+      "To read a text, Excel, SPSS or R data file:  > mydata <- Read()\n",
+      "---------------------------------------------------------------\n\n")
 
   options(colors="blue")
   options(trans.fill.bar=0.00)

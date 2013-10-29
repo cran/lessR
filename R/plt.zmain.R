@@ -119,7 +119,7 @@ function(x, y, by, data, type, n.cat,
 
   else if (kind == "xcat") {
     plot.default(y ~ x, xlim=c(.5,nlevels(x)+.5), type="n", axes=FALSE, 
-                xlab=x.lab, ylab=y.lab, main=main.lab)
+                xlab=x.lab, ylab=y.lab, main=main.lab, ...)
     axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
     axis(1, labels=levels(x), at=1:nlevels(x), 
             cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)

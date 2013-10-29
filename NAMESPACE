@@ -4,6 +4,7 @@ importFrom("car", vif, scatter3d, dataEllipse)
 importFrom("leaps", leaps)
 importFrom("MBESS", ci.smd)
 importFrom("foreign", read.spss)
+importFrom("gdata", read.xls)
 #importFrom("triangle", dtriangle, rtriangle)
 
 # Export all names except those that begin with .
@@ -25,7 +26,7 @@ export (
   corReflect, reflect, corProp, prop, corRead,
   corScree, scree, corEFA, efa,
   Density, dn,
-  details, 
+  details, details.brief, 
   Help, hl,
   Histogram, hs,
   label,
@@ -36,7 +37,7 @@ export (
   Nest,
   PieChart, pc,
   prob.norm, prob.znorm, prob.tcut,
-  Read, rd, Read2,
+  Read, rd, rd.brief, Read2,
   Regression, reg, reg.brief, reg.explain,
   Recode, rec,
   set, showColors,

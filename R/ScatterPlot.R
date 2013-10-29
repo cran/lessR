@@ -16,7 +16,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
 
          fit.line=c("none", "loess", "ls"), col.fit.line="grey55",
 
-         bubble.size=.25, plot.method="stack",
+         bubble.size=.25, method="stack",
 
          ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
 
@@ -202,7 +202,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
       .dp.main(x.call, by.call,
          col.fill, col.stroke, col.bg, col.grid, shape.pts,
          cex.axis, col.axis, col.ticks, xlab, main, cex, 
-         plot.method, pt.reg, pt.out, 
+         method, pt.reg, pt.out, 
          col.out30, col.out15, quiet, new, ...)
   }
 
