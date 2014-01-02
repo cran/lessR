@@ -22,13 +22,17 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
   # colors
-  if (getOption("colors") != "gray") {
+  if (!grepl("gray", getOption("colors"))) {
     col.1 <- rgb(.63,.46,.15)
-    col.1t <- rgb(.63,.46,.15, alpha=.5)
+    col.m1 <- rgb(.71,.65,.65)
+    col.1t <- rgb(.63,.46,.15, alpha=.7)
+    col.1d <- rgb(.63,.46,.15, alpha=.4)
   }
   else {
     col.1 <- rgb(.40,.40,.40)
-    col.1t <- rgb(.40,.40,.40, alpha=.5)
+    col.m1 <- rgb(.40,.40,.40)
+    col.1t <- rgb(.40,.40,.40, alpha=.7)
+    col.1d <- rgb(.40,.40,.40, alpha=.4)
   }
   col.2 <- rgb(.49,.56,.69)
 
@@ -48,21 +52,23 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   ytop <- par("usr")[4]  # height of graph
 
   # vertical line for mean
-  lines(c(m1,m1), c(0,ytop), lty="solid", lwd=2, col=col.1)
-  if (getOption("colors") != "gray")
-    lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=2, col=col.2)
+  lines(c(m1,m1), c(0,ytop), lty="solid", lwd=.85, col=col.m1)
+  if (!grepl("gray", getOption("colors")))
+    lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=.85, col=col.2)
   else
-    lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=2, col=col.1)
+    lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=.85, col=col.1)
 
   # curve area
-  polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1t, border=NA, 
+  polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1d, border=NA, 
           density=10, angle=45)
 
   # bottom border of density curve  
   segments(min(dYA$x), 0, max(dYA$x), 0, col=col.1)
 
   # density curve
-  lines(dYA, col=col.1t, lty="solid", lwd=1.5)
+  lwd.border <- 1.75
+  if (.Platform$OS == "windows") lwd.border <- 2
+  lines(dYA, col=col.1t, lty="solid", lwd=lwd.border)
 
   # minimum mean difference of practical importance
   if ( !is.null(mmd) | !is.null(msmd) ) {
@@ -83,7 +89,7 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   # scale for s at top of graph
   mlow <- min(m1, mu0)
   mhi  <- max(m1, mu0)
-  col.d.unit <- "gray30"
+  col.d.unit <- "gray35"
   # connect first seg to top
   segments(mlow, max.y-.01*max.y, mlow, ytop, lwd=1, col=col.d.unit) 
   # provide at least 2 labeled d units on sd scale at top
@@ -95,24 +101,24 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
     # d units counted
     text(x.i, max.y+.01*max.y, labels=i)
     # horiz bar connects endpoints
-    segments(mlow, ytop, x.i, ytop, col=col.d.unit, lwd=4)
+    segments(mlow, ytop, x.i, ytop, col=col.d.unit, lwd=3)
     last.coord.x <- x.i
   }
   # connect last seg to top
   segments(last.coord.x, max.y+.025*max.y, last.coord.x, ytop, lwd=1, col=col.d.unit)
   # print d value towards top
-  text((m1+mu0)/2, ytop-.07*max.y, label=.fmt(smd))
+  text((m1+mu0)/2, ytop-.07*max.y, label=.fmt(smd), col=col.d.unit, cex=.9)
   # horiz bar connects means
-  segments(mlow, ytop-.09*max.y, mhi, ytop-.09*max.y, col=col.d.unit, lwd=2)
+  segments(mlow, ytop-.09*max.y, mhi, ytop-.09*max.y, col=col.d.unit, lwd=1)
   # print d towards top
-  text((m1+mu0)/2, ytop-.11*max.y, label="d")
+  text((m1+mu0)/2, ytop-.11*max.y, label="d", col=col.d.unit, cex=.9)
 
   # print mdiff value towards bottom  
-  text((m1+mu0)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d))
+  text((m1+mu0)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d), col=col.d.unit, cex=.9)
   # horiz bar connects means
-  segments(mlow, ybot+.09*max.y, mhi, ybot+.09*max.y, col=col.d.unit, lwd=2)
+  segments(mlow, ybot+.09*max.y, mhi, ybot+.09*max.y, col=col.d.unit, lwd=1)
   # print diff towards bottom
-  text((m1+mu0)/2, ybot+.07*max.y, label="diff")
+  text((m1+mu0)/2, ybot+.07*max.y, label="diff", col=col.d.unit, cex=.9)
 
   # title area, above graph
   if (show.title) {

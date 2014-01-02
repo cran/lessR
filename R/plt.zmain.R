@@ -15,7 +15,9 @@ function(x, y, by, data, type, n.cat,
   }
 
   nrows <- length(x)
-  if (is.null(cex)) pt.size <- 0.8 else pt.size <- cex
+  pt.sz <- 0.8
+  if (.Platform$OS == "windows") pt.sz <- 1
+  if (is.null(cex)) pt.size <- pt.sz else pt.size <- cex
 
   if (is.null(col.fill)) col.fill <- "transparent"
   if (is.null(col.area)) col.area <- "transparent"
@@ -35,7 +37,7 @@ function(x, y, by, data, type, n.cat,
         "so treat as categorical.\n",
         "   To treat as numeric, decrease  n.cat  to specify a",
         "lower number of unique values.\n",
-        "   Suggest making this variable a factor with R factor function.\n")
+        "   Suggest making this variable a factor with the R factor function.\n")
    }
 
   if (!is.factor(x)) {
@@ -331,9 +333,9 @@ function(x, y, by, data, type, n.cat,
       options(xname = y.name)
       .ss.numeric(y, by=x, data=data, digits.d=digits.d, brief=TRUE)
     }
-  }       
 
   cat("\n")
+  }       
 
 }  # end plt.main
 

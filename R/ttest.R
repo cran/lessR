@@ -10,7 +10,9 @@ function(x=NULL, y=NULL, data=mydata, paired=FALSE,
          alternative=c("two.sided", "less", "greater"),
          mmd=NULL, msmd=NULL, 
 
-         show.title=TRUE, bw1="bcv", bw2="bcv", graph=TRUE,
+         show.title=TRUE, bw1="bcv", bw2="bcv",
+
+         graph=TRUE, line.chart=FALSE,
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {       
 
 
@@ -63,7 +65,7 @@ function(x, y=NULL, ...) {
         .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
           conf.level, alternative, mmd, msmd, bw1, bw2, graph,
-          show.title, pdf.file, pdf.width, pdf.height)
+          line.chart, show.title, pdf.file, pdf.width, pdf.height)
       else {  # switch
         Xtmp <- X2nm
         X2nm <- X1nm
@@ -71,7 +73,7 @@ function(x, y=NULL, ...) {
         .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
           conf.level, alternative, mmd, msmd, bw1, bw2, graph,
-          show.title, pdf.file, pdf.width, pdf.height)
+          line.chart, show.title, pdf.file, pdf.width, pdf.height)
       }
 
     }
@@ -80,7 +82,7 @@ function(x, y=NULL, ...) {
       .TwoGroup(y, x,
          n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits.d, conf.level,
-         alternative, mmd, msmd, bw1, bw2, graph=FALSE)
+         alternative, mmd, msmd, bw1, bw2, graph=FALSE, line.chart=FALSE)
     }
 
   }  # end two.gp 
@@ -99,19 +101,21 @@ function(x, y=NULL, ...) {
            from.data=from.data, conf.level=conf.level,
            alternative=alternative, digits.d=digits.d,
            mmd=mmd, msmd=msmd, paired=paired,
-           graph=graph, show.title=show.title, pdf.file=pdf.file,
+           graph=graph, line.chart=line.chart,
+           show.title=show.title, pdf.file=pdf.file,
            pdf.width=pdf.width, pdf.height=pdf.height)
     }
-    else
+    else  # from stats
       .OneGroup(x, Ynm, mu0, n, m, s, brief=brief, bw1=bw1,
            from.data=from.data, conf.level=conf.level,
            alternative=alternative, digits.d=digits.d,
            mmd=mmd, msmd=msmd, paired=paired,
-           graph=graph, show.title=show.title, pdf.file=pdf.file,
+           graph=graph, line.chart=line.chart,
+           show.title=show.title, pdf.file=pdf.file,
            pdf.width=pdf.width, pdf.height=pdf.height, ...)
   }
 
-  cat("\n")
+  if (!paired) cat("\n")
 
 
 }  # end tt.setup
@@ -193,9 +197,12 @@ function(x, y=NULL, ...) {
     tt.setup(...)  # analysis from stats
 
 
-  if (paired) {
+  if (paired) {  # scatter plot of both variables, need both vars so do here
     if (is.null(pdf.file))
-      dev.set(which=4)
+      if (!line.chart)
+        dev.set(which=4)
+      else
+        dev.set(which=5)
     else
       pdf(file="PairedScatterPlot.pdf", width=pdf.width, height=pdf.height)
 
@@ -232,6 +239,7 @@ function(x, y=NULL, ...) {
     }
 
   }
+
 
   if (is.frml) {
     if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))

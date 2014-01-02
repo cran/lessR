@@ -83,7 +83,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), ...) {
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
             brief=FALSE, digits.d, 
             conf.level=0.95, alternative="two.sided", mmd=NULL, msmd=NULL, 
-            bw1="nrd", bw2="nrd", graph=TRUE, show.title=TRUE,
+            bw1="nrd", bw2="nrd", graph=TRUE, line.chart=FALSE, show.title=TRUE,
             pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
         else {  # switch
           Xtmp <- X2nm
@@ -93,7 +93,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), ...) {
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
             brief=FALSE, digits.d, 
             conf.level=0.95, alternative="two.sided", mmd=NULL, msmd=NULL, 
-            bw1="nrd", bw2="nrd", graph=TRUE, show.title=TRUE,
+            bw1="nrd", bw2="nrd", graph=TRUE, line.chart=FALSE, show.title=TRUE,
             pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
         }
       }

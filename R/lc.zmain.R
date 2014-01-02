@@ -195,7 +195,7 @@ function(y, type,
     }
   }
 
-  cat("\n")
+  if (!quiet) cat("\n")
 
 }
 

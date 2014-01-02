@@ -25,7 +25,9 @@ ttest(x=NULL, y=NULL, data=mydata, paired=FALSE,
          alternative=c("two.sided", "less", "greater"),
          mmd=NULL, msmd=NULL, 
 
-         show.title=TRUE, bw1="bcv", bw2="bcv", graph=TRUE,
+         show.title=TRUE, bw1="bcv", bw2="bcv",
+
+         graph=TRUE, line.chart=FALSE,
          pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 tt.brief(\ldots, brief=TRUE)
@@ -72,8 +74,11 @@ tt(\ldots)
   \item{bw1}{Bandwidth for the computation of the densities for the first group.}
   \item{bw2}{Bandwidth for the computation of the densities for the second group.}
   \item{graph}{If \code{TRUE}, then display the graph of the overlapping density distributions.}
+  \item{line.chart}{Plot the run chart for the response variable for each group
+        in the analysis.}
   \item{show.title}{Show the title on the graph of the density functions for two groups.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.file}{Name of the pdf file to which the density graph is redirected. Also
+       specifies to save the line charts if they are present with pre-assigned names.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Further arguments to be passed to or from methods.}
@@ -167,6 +172,9 @@ t.test(mydata$Y ~ mydata$X, var.equal=TRUE)
 
 # consider the practical importance of the difference
 ttest(Y ~ X, msmd=.5)
+
+# obtain the line chart of the response variable for each group
+ttest(Y ~ X, line.chart=TRUE)
 
 # variable of interest is in a data frame which is not the default mydata
 # access the data frame in the lessR dat.twogroup data set

@@ -22,17 +22,25 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
   # colors
-  if (getOption("colors") != "gray") {
+  if (!grepl("gray", getOption("colors"))) {
     col.1 <- rgb(.63,.46,.15)
-    col.1t <- rgb(.63,.46,.15, alpha=.5)
+    col.m1 <- rgb(.71,.65,.65)
+    col.1t <- rgb(.63,.46,.15, alpha=.7)
+    col.1d <- rgb(.63,.46,.15, alpha=.4)
     col.2 <- rgb(.49,.56,.69)
-    col.2t <- rgb(.49,.56,.69, alpha=.5)
+    col.m2 <- rgb(.69,.69,.75)
+    col.2t <- rgb(.49,.56,.69, alpha=.8)
+    col.2d <- rgb(.49,.56,.69, alpha=.4)
   }
   else {
     col.1 <- rgb(.40,.40,.40)
-    col.1t <- rgb(.40,.40,.40, alpha=.6)
+    col.m1 <- rgb(.40,.40,.40)
+    col.1t <- rgb(.40,.40,.40, alpha=.7)
+    col.1d <- rgb(.40,.40,.40, alpha=.4)
     col.2 <- rgb(.20,.20,.20)
-    col.2t <- rgb(.20,.20,.20, alpha=.6)
+    col.m2 <- rgb(.20,.20,.20)
+    col.2t <- rgb(.20,.20,.20, alpha=.7)
+    col.2d <- rgb(.20,.20,.20, alpha=.4)
   }
 
   # plot: set up coordinate system
@@ -50,14 +58,14 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   ybot <- par("usr")[3]  # bottom of graph
   ytop <- par("usr")[4]  # height of graph
 
-  # vertical line for mean
-  lines(c(m1,m1), c(0,ytop), lty="solid", lwd=2, col=col.1)
-  lines(c(m2,m2), c(0,ytop), lty="twodash", lwd=2, col=col.2)
+  # vertical line for each mean
+  lines(c(m1,m1), c(0,ytop), lty="solid", lwd=.85, col=col.m1)
+  lines(c(m2,m2), c(0,ytop), lty="twodash", lwd=.85, col=col.m2)
 
   # curve area
-  polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1t, border=NA, 
+  polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1d, border=NA, 
       density=10, angle=45)
-  polygon(c(min(dYB$x),dYB$x,max(dYB$x)), c(0,dYB$y,0), col=col.2t, border=NA, 
+  polygon(c(min(dYB$x),dYB$x,max(dYB$x)), c(0,dYB$y,0), col=col.2d, border=NA, 
       density=10, angle=-45)
 
   # bottom border of density curve  
@@ -65,21 +73,23 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   segments(min(dYB$x), 0, max(dYB$x), 0, col=col.2)
 
   # density curve
-  lines(dYA, col=col.1t, lty="solid", lwd=1.5)
-  lines(dYB, col=col.2t, lty="twodash", lwd=1.5)
+  lwd.border <- 1.75
+  if (.Platform$OS == "windows") lwd.border <- 2
+  lines(dYA, col=col.1t, lty="solid", lwd=lwd.border)
+  lines(dYB, col=col.2t, lty="twodash", lwd=lwd.border)
 
   # minimum mean difference of practical importance
-  if ( !is.null(mmd) | !is.null(msmd) ) {
+  if (!is.null(mmd) | !is.null(msmd)) {
     col.e <- "gray50"  # color for effect
     mid <- (m1 + m2) / 2
     lr <- mid + .5*mmd  # line right
     ll <- mid - .5*mmd  # line left
-    lines(c(lr,lr), c(ybot+.44*max.y,ytop-.44*max.y), lty="solid", lwd=2, col=col.e)
-    lines(c(ll,ll), c(ybot+.44*max.y,ytop-.44*max.y), lty="solid", lwd=2, col=col.e)
+    lines(c(lr,lr), c(ybot+.44*max.y,ytop-.44*max.y), lty="solid", lwd=1, col=col.e)
+    lines(c(ll,ll), c(ybot+.44*max.y,ytop-.44*max.y), lty="solid", lwd=1, col=col.e)
     text(mid, ybot+.41*max.y, label=toString(round(mmd,2)), col=col.e)
-    text(mid, ytop-.41*max.y, label=toString(round(msmd,2)), col=col.e)
+    text(mid, ytop-.375*max.y, label=toString(round(msmd,2)), col=col.e)
     text(mid, ybot+.38*max.y, label="mmd", col=col.e)
-    text(mid, ytop-.375*max.y, label="msmd", col=col.e)
+    text(mid, ytop-.41*max.y, label="msmd", col=col.e)
   }
 
   # legends with descriptive stats (m1 > m2)
@@ -124,7 +134,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   # scale for s-pooled, d, mdiff at top of graph
   mlow <- min(m1, m2)
   mhi  <- max(m1, m2)
-  col.d.unit <- "gray30"
+  col.d.unit <- "gray35"
   # connect first seg to top
   segments(mlow, max.y-.01*max.y, mlow, ytop, lwd=1, col=col.d.unit) 
   # provide at least 2 labeled d units on sd scale at top
@@ -136,39 +146,40 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
     # d units counted
     text(x.i, max.y+.01*max.y, labels=i)
     # horiz bar connects endpoints
-    segments(mlow, ytop, x.i, ytop, col=col.d.unit, lwd=4)
+    segments(mlow, ytop, x.i, ytop, col=col.d.unit, lwd=3)
     last.coord.x <- x.i
   }
   # connect last seg to top
   segments(last.coord.x, max.y+.025*max.y, last.coord.x, ytop, lwd=1, col=col.d.unit)
   # print d value towards top
-  text((m1+m2)/2, ytop-.07*max.y, label=.fmt(smd))
+  text((m1+m2)/2, ytop-.07*max.y, label=.fmt(smd), col=col.d.unit, cex=.9)
   # horiz bar connects means
-  segments(mlow, ytop-.09*max.y, mhi, ytop-.09*max.y, col=col.d.unit, lwd=2)
+  segments(mlow, ytop-.09*max.y, mhi, ytop-.09*max.y, col=col.d.unit, lwd=1)
   # print d towards top
-  text((m1+m2)/2, ytop-.11*max.y, label="smd")
+  text((m1+m2)/2, ytop-.11*max.y, label="smd", col=col.d.unit, cex=.9)
 
   # print mdiff value towards bottom  
-  text((m1+m2)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d))
+  text((m1+m2)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d), col=col.d.unit, cex=.9)
   # horiz bar connects means
-  segments(mlow, ybot+.09*max.y, mhi, ybot+.09*max.y, col=col.d.unit, lwd=2)
+  segments(mlow, ybot+.09*max.y, mhi, ybot+.09*max.y, col=col.d.unit, lwd=1)
   # print diff towards bottom
-  text((m1+m2)/2, ybot+.07*max.y, label="diff")
+  text((m1+m2)/2, ybot+.07*max.y, label="diff", col=col.d.unit, cex=.9)
 
   # title area, above graph
   if (show.title) {
     mtext(paste("TwoGroup Plot"), side=3, line=6.6, font=2)
     mtext(paste("Compare",Ynm,"for",Xnm,X1nm,"and",X2nm), side=3, line=5.6, font=3, cex=.8)
-    mtext(bquote(paste("  Classic t-test of 0 mean diff:   t = ", .(.fmt(tvalue,3)), 
+    mtext(bquote(paste("  Classic t-test of 0 Mean Difference:   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(df), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 
-      line=4.4, cex=.8, adj=0)
+      line=4.0, cex=.8, adj=0)
     mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Mean Difference:  ",
-      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=3.3, cex=.8, adj=0)
-    mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Stnd Mean Diff:   ", 
-      .(.fmt(deltaL,3)), " to ", .(.fmt(deltaU,3)))), side=3, line=2.1, cex=.8, adj=0)
-    mtext(bquote(paste("s-within")), side=3, line=.9, 
+      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=3.0, cex=.8, adj=0)
+    mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Standardized",
+      " Mean Diff:   ", 
+      .(.fmt(deltaL,3)), " to ", .(.fmt(deltaU,3)))), side=3, line=1.9, cex=.8, adj=0)
+    mtext(bquote(paste("s-within")), side=3, line=.7, 
           at=(mlow+(last.coord.x))/2, col="gray40", cex=.8)
-    mtext(bquote(paste(.(round(sw,2)))), side=3, line=.2,
+    mtext(bquote(paste(.(round(sw,2)))), side=3, line=-0.1,
           at=(mlow+(last.coord.x))/2, col="gray40", cex=.8)
   }
 

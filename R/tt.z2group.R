@@ -2,7 +2,7 @@
 function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits.d,
          conf.level, alternative, mmd, msmd, bw1, bw2, graph,
-         show.title, pdf.file, pdf.width, pdf.height, ...)  {        
+         line.chart, show.title, pdf.file, pdf.width, pdf.height, ...)  {        
  
   if ( brief  &&  (!is.null(mmd) || !is.null(msmd)) ) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -99,7 +99,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
           nrm1 <- shapiro.test(YA)
           W.1 <- nrm1$statistic
           p.val1 <- nrm1$p.value
-          cat(nrm1$method, ":  W = ", .fmt(W.1,3), ",  p-value = ", .fmt(p.val1,3), sep="", "\n")
+          cat(nrm1$method, ":  W = ", .fmt(W.1,3), ",  p-value = ",
+              .fmt(p.val1,3), sep="", "\n")
         }
       else
       cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
@@ -114,7 +115,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
         nrm2 <- shapiro.test(YB)
         W.2 <- nrm2$statistic
         p.val2 <- nrm2$p.value
-        cat(nrm2$method, ":  W = ", .fmt(W.2,3), ",  p-value = ", .fmt(p.val2,3), sep="", "\n")
+        cat(nrm2$method, ":  W = ", .fmt(W.2,3), ",  p-value = ",
+            .fmt(p.val2,3), sep="", "\n")
       }
       else
       cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
@@ -294,21 +296,73 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     }
   }
 
-  # densities
+  # graphs
   if (from.data && graph) {
 
-    .opendev(pdf.file, pdf.width, pdf.height)
+    if (is.null(pdf.file)) {
+      if (!line.chart)
+        n.win <- 1
+      else
+        n.win <- 3
+      .graphwin(n.win)
+      dev.set(which=3)
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+    }
+
+    if (line.chart) {  # line.chart=TRUE
+      if (!is.null(pdf.file))
+        pdf(file=paste("LineChart_",X1nm,".pdf",sep=""), width=pdf.width, height=pdf.height)
+
+     .lc.main(YA, type=NULL,
+       col.line=getOption("col.stroke.pt"), col.area=NULL, col.box="black",
+       col.stroke=getOption("col.stroke.pt"), 
+       col.fill=getOption("col.fill.bar"), shape.pts=21,
+       col.grid=getOption("col.grid"), col.bg=getOption("col.bg"),
+       cex.axis=0.85, col.axis="gray30", col.ticks="gray30", xy.ticks=TRUE,
+       line.width=1.1, xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""), main=NULL,
+       cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
+       center.line="default", quiet=TRUE)
+
+     if (is.null(pdf.file))
+       dev.set(which=4)
+     else
+       pdf(file=paste("LineChart_",X2nm,".pdf",sep=""), width=pdf.width, height=pdf.height)
+       
+     .lc.main(YB, type=NULL,
+       col.line=getOption("col.stroke.pt"), col.area=NULL, col.box="black",
+       col.stroke=getOption("col.stroke.pt"), 
+       col.fill=getOption("col.fill.bar"), shape.pts=21,
+       col.grid=getOption("col.grid"), col.bg=getOption("col.bg"),
+       cex.axis=0.85, col.axis="gray30", col.ticks="gray30", xy.ticks=TRUE,
+       line.width=1.1, xlab=NULL, ylab=paste(Ynm,": ",X2nm, sep=""), main=NULL,
+       cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
+
+       center.line="default", quiet=TRUE)
+
+      if (is.null(pdf.file))
+        dev.set(which=5)
+    }
+
+    if (!is.null(pdf.file))
+      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
 
     .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
               clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title)
 
     if (!is.null(pdf.file)) {
+      if (line.chart) {
+        dev.off(); dev.off()
+        .showfile(paste("LineChart_", X1nm, ".pdf", sep=""),
+            paste("line chart of", Ynm, "for Group", X1nm))
+        .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
+            paste("line chart of", Ynm, "for Group", X2nm))
+      }
       dev.off()
-      .showfile(pdf.file, "graph of both groups")
+      .showfile(pdf.file, paste("density plots of", Ynm, "for both groups"))
     }
+
   }
 
 } # End Two Group
-
-

@@ -3,7 +3,7 @@
 \alias{dataBodyMeas}
 \title{Data: Body Measurements}
 
-\description{Body measurements of 170 women and 170 men who purchased motorcycle clothing from Gerbing's Heated Clothing, Inc.
+\description{Body measurements of 170 women and 170 men who purchased motorcycle clothing from Gerbing's Heated Clothing, Inc., now Gordon's Heated Clothing, LLC.
 }
 
 \usage{data(dataBodyMeas)}

@@ -87,40 +87,38 @@ function(x, by,
                      col=col.stroke, pch=pt.reg, bg=clr.trn, ...))
   }
 
-    else {  # by grouping variable
-      n.levels <- nlevels(by)
+  else {  # by grouping variable
+    n.levels <- nlevels(by)
 
-      clr <- character(length(n.levels))
-      if (length(col.stroke) == 1) 
-        for (i in 1:n.levels) clr[i] <- col.stroke
-      else
-        clr <- col.stroke
-      clr.tr <- clr
+    clr <- character(length(n.levels))
+    if (length(col.stroke) == 1) 
+      for (i in 1:n.levels) clr[i] <- col.stroke
+    else
+      clr <- col.stroke
+    clr.tr <- clr
 
-      shp <- integer(length(n.levels))
-      if (length(shape.pts) == 1)
-        for (i in 1:n.levels) shp[i] <- shape.pts
-      else
-         shp <- shape.pts
-      shape.dft <- c(21,23,22,24,25,7:14)  # shape defaults
-      if (length(col.stroke)==1 && length(shape.pts)==1)  # both shape and color default
-        for (i in 1:n.levels) shp[i] <- shape.dft[i]  # fill with default shapes
+    shp <- integer(length(n.levels))
+    if (length(shape.pts) == 1)
+      for (i in 1:n.levels) shp[i] <- shape.pts
+    else
+       shp <- shape.pts
+    shape.dft <- c(21,23,22,24,25,7:14)  # shape defaults
+    if (length(col.stroke)==1 && length(shape.pts)==1)  # both shape and color default
+      for (i in 1:n.levels) shp[i] <- shape.dft[i]  # fill with default shapes
 
-      trans.pts <- getOption("trans.fill.pt")
-      for (i in 1:n.levels) {
-          clr.tr[i] <- .maketrans(clr.tr[i], (1-trans.pts)*256)
-        x.lv <- subset(x, by==levels(by)[i])
-        stripchart(x.lv, pch=shp[i], col=clr[i], bg=clr.tr[i], 
-               cex=pt.size, lwd=0.75, add=TRUE, ...)
-      }
-      cat("\nTransparency level for plotted points: ", trans.pts, "\n")
+    trans.pts <- getOption("trans.fill.pt")
+    for (i in 1:n.levels) {
+        clr.tr[i] <- .maketrans(clr.tr[i], (1-trans.pts)*256)
+      x.lv <- subset(x, by==levels(by)[i])
+      stripchart(x.lv, pch=shp[i], col=clr[i], bg=clr.tr[i], 
+             cex=pt.size, lwd=0.75, add=TRUE, ...)
+    }
+    cat("\nTransparency level for plotted points: ", trans.pts, "\n")
 
-      .plt.legend(levels(by), col.stroke, clr, clr.tr, shp, trans.pts, col.bg, usr)
+    .plt.legend(levels(by), col.stroke, clr, clr.tr, shp, trans.pts, col.bg, usr)
 
-    }  # end by group
+  }  # end by group
 
-
-
-  cat("\n")
+  if (!quiet) cat("\n")
 
 }

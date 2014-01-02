@@ -1,7 +1,8 @@
 .OneGroup  <-
 function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
-         paired, graph, show.title, pdf.file, pdf.width, pdf.height) { 
+         paired, graph, line.chart, show.title,
+         pdf.file, pdf.width, pdf.height) { 
 
   # get variable label if exists
   gl <- .getlabels()
@@ -128,21 +129,39 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
         sep="", "\n")
   }
 
-  # densities
+  # graphs
   if (from.data && graph && !is.null(mu0)) {
  
-    #.opendev(pdf.file, pdf.width, pdf.height)
-  if (is.null(pdf.file)) {
-    if (!paired)
-      .graphwin(1)
-    else
-      .graphwin(2)
-    dev.set(which=3)
-    orig.params <- par(no.readonly=TRUE)
-    on.exit(par(orig.params))
-  }
-  else 
-    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    if (is.null(pdf.file)) {
+      n.win <- 1
+      if (paired) n.win <- n.win + 1
+      if (line.chart) n.win <- n.win + 1
+      .graphwin(n.win)
+      dev.set(which=3)
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+    }
+
+    if (line.chart) {  # line.chart=TRUE
+      if (!is.null(pdf.file))
+        pdf(file=paste("LineChart_",Ynm,".pdf",sep=""), width=pdf.width, height=pdf.height)
+
+     .lc.main(Y, type=NULL,
+       col.line=getOption("col.stroke.pt"), col.area=NULL, col.box="black",
+       col.stroke=getOption("col.stroke.pt"), 
+       col.fill=getOption("col.fill.bar"), shape.pts=21,
+       col.grid=getOption("col.grid"), col.bg=getOption("col.bg"),
+       cex.axis=0.85, col.axis="gray30", col.ticks="gray30", xy.ticks=TRUE,
+       line.width=1.1, xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
+       time.start=NULL, time.by=NULL, time.reverse=FALSE,
+       center.line="default", quiet=TRUE)
+
+      if (is.null(pdf.file))
+        dev.set(which=4)
+     }
+
+    if (!is.null(pdf.file))
+      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
 
     .OneGraph(Y, bw1, Ynm, y.lbl, digits.d, brief,
          n, m, mu0, mdiff, s, smd, mmd, msmd,
@@ -150,8 +169,12 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
          show.title, pdf.file, pdf.width, pdf.height)
 
     if (!is.null(pdf.file)) {
+      if (line.chart) {
+        dev.off()
+        .showfile(paste("LineChart_", Ynm, ".pdf", sep=""), paste("line chart of", Ynm))
+      }
       dev.off()
-      .showfile(pdf.file, "graph of both groups")
+      .showfile(pdf.file, paste("density plot of", Ynm))
     }
   }
 

@@ -25,9 +25,10 @@ function(x, data,
       h <- hist(x, plot=FALSE, breaks="Sturges")
       bin.width <- h$breaks[2]-h$breaks[1]
     }
-    seq.end <- max(x)
+    max.x <- max(x, na.rm = TRUE)
+    seq.end <- max.x
     breaks <- seq(bin.start,seq.end,bin.width)
-    while (max(breaks) < max(x)) {
+    while (max(breaks) < max.x) {
       seq.end <- seq.end + bin.width
       breaks <- seq(bin.start,seq.end,bin.width)
     }
@@ -140,9 +141,9 @@ function(x, data,
       else
         cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
     }
-  }
 
-  cat("\n")
+    cat("\n")
+  }
 
   return(d.gen)
 

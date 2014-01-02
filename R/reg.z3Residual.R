@@ -48,7 +48,7 @@ function(lm.out, nm,
       txt <- "cases (rows) of data, or res.rows=\"all\"]"
     else
       txt="]"
-    cat("   [res.rows = ", res.rows, " out of ", n.keep, " ", txt, sep="", "\n")
+    cat("   [res.rows = ", res.rows, ", out of ", n.keep, " ", txt, sep="", "\n")
     .dash(68)
 
     fit <- fitted(lm.out)
@@ -85,7 +85,7 @@ function(lm.out, nm,
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
     }
 
-     .den.main(res, main="Evaluate Normality of Residuals", 
+     .den.main(res, main="Normality of Residuals", 
        xlab="Residuals", quiet=TRUE,
        bw="nrd0", type="both",
        bin.start=NULL, bin.width=NULL,

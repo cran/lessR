@@ -333,16 +333,17 @@ function(x=mycor, data=mydata,
     cat('Latent Variable (factor) ')
     if (item.cor) cat('/ Observed Variable (item) ')
     cat('Correlations\n')
-    .dash(69)
+    .dash(65)
     if (item.cor)
-      cat('Item Correlation, correlation of two items with each other\n',
-          'Communalities in the diagonal of the item correlations, each the\n',
-          '  variance of an item due to the common factor\n', sep="")
-    cat('Factor Loading, correlation of an item with a factor\n',
-        'Pattern Coefficient, regression coefficient of its factor on an item,\n',
-        '  a special case of a factor loading\n',
-        'Factor Correlation, correlation of two factors with each other\n', sep="")
-    .dash(69)
+      cat('Item Correlation: Correlation of two items with each other\n',
+          'Communality, in the diagonal of the item correlations: Proportion\n',
+          '  of the correlation of an item with itself that is due only to\n',
+          '  its underlying factor\n', sep="")
+    cat('Factor Loading: Correlation of an item with a factor\n',
+        'Pattern Coefficient: Regression coefficient of an item on its,\n',
+        '  underlying factor, a special case of a factor loading\n',
+        'Factor Correlation: Correlation of two factors with each other\n', sep="")
+    .dash(65)
     cat("\n")
   }
 

@@ -4,6 +4,50 @@ Update History for Package 'lessR'
 -------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 3.0 (2014-01-02)} <<<<<<
+
+-------------
+Updates 3.0
+-------------
+
+Subset
+  new parameter: random 
+    Specifies the number or proportion of data rows to retain, which
+    replaces the dual use of the rows parameter to both perform
+    this task and provide a direct specification of the rows of the
+    data table to be included/excluded, so now the following work: 
+      mydata <- Subset(c(1,4))  # retain only rows 1 and 4
+      mydata <- Subset(-c(1,4)) # delete only rows 1 and 4
+
+ttest
+  new parameter: line.chart
+    When set to TRUE, adds a line chart of the response variable
+    for each group in the analysis
+  aesthetics of the density curve output updated
+
+
+---------------
+Bug Fixes 3.0
+---------------
+
+ANOVA
+  condition that lead to a warning for the means plot fixed
+
+Correlation
+  in the output, the correlation matrix object was always described
+    as mycor regardless of the actual assigned name, this line of
+    output is now deleted
+
+Density
+  missing data with specified bins now works
+
+ttest
+  density plot now in gray scale if colors="gray.black"
+
+
+
+
+
 >>>>>> Changes for lessR version 2.9.7 (2013-10-29)} <<<<<<
 
 -------------
@@ -20,7 +64,8 @@ ScatterPlot
 
 Read
   relying upon the read.xls function from the gdata package, can
-    read Excel files identified by the .xls or .xlsx filetype
+    read Excel files identified by the .xls or .xlsx filetype,
+    both the data file and/or the labels file can be Excel files
   add a brief version, which calls the new details.brief
   provide an option to browse for the labels file, labels=""
   always display the full path of the data file and any label file
@@ -281,9 +326,8 @@ set
 
 The keepers of CRAN have changed the rules. They no longer
 allow a function to automatically direct output to a data table.
-Code that works just fine is now judged as not acceptable because
-the keepers do not like that style. They have decided that users
-should always explicitly specify the destination of the output file.
+They have decided that users should always explicitly specify
+the destination of the output file.
 
 What that means for lessR is that any function that outputs a
 data table now cannot automatically write that data table to

@@ -9,7 +9,7 @@ function(y, data=mydata, type=NULL,
 
          col.area=NULL, col.box="black",
 
-         shape.pts=21, cex.axis=.85, col.axis="gray30",
+         shape.pts=21, cex.axis=0.85, col.axis="gray30",
          col.ticks="gray30", xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
 

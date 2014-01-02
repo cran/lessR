@@ -71,14 +71,10 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
      cex.axis=.85, col.axis="gray30",
      col.ticks="gray30", xy.ticks=TRUE,
      xlab=nm[2], ylab=nm[1], main="",
-     cex=.8,    
-     x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-     time.start=NULL, time.by=NULL, time.reverse=FALSE, kind="default",
-     fit.line="none", col.fit.line="grey55", center.line=NULL,
-     col.bubble=NULL, bubble.size=.25, col.flower=NULL,
+     cex=.8, kind="default",
+     fit.line="none", col.fit.line="grey55", bubble.size=.25,
      ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
-     diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
-     quiet=TRUE)
+     diag=FALSE, col.diag=par("fg"), lines.diag=TRUE, quiet=TRUE)
 
   if (pdf) {
     dev.off()
