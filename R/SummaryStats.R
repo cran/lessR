@@ -101,7 +101,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       "so treat as categorical.\n",
       "   To obtain the numeric summary, decrease  n.cat  to indicate a lower\n",
       "   number of unique values such as with function: set.\n", 
-      "   Perhaps make this variable a factor with R factor function.\n")
+      "   Perhaps make this variable a factor with the R factor function.\n")
     stats <- .ss.factor(x.call, y.call, brief, digits.d, ...)
   }
 

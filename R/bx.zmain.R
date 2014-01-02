@@ -88,9 +88,9 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
       for (i in 1:length(outliers)) cat(.fmt(outliers[i]), " ")
       cat("\n")
     } 
-  }
 
-  cat("\n")
+    cat("\n")
+  }
 
   return(bv)
 

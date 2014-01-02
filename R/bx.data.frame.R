@@ -33,7 +33,7 @@ function(x, n.cat,
           "so treat as a categorical variable.\n",
           "   To obtain the boxplot decrease  n.cat  to specify a",
           "lower number of unique values.\n",
-          "   Suggest making this variable a factor with R factor function.\n")
+          "   Suggest making this variable a factor with the R factor function.\n")
 
   }
   

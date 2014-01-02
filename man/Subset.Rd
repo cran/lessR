@@ -7,26 +7,28 @@
 \description{
 Abbreviation: \code{subs}
 
-Based directly on the standard R \code{\link{subset}} function.  Output is provided that provides feedback and guidance regarding the specified subset operations. Rows of data may be randomly extracted with the code provided to generate a hold out validation sample created. The hold out sample is created from the original data frame, usually named mydata, so the subset data frame must be directed to a data frame with a new name or the data re-read to construct the holdout sample.
+Based directly on the standard R \code{\link{subset}} function to only include or exclude specified rows or data, and for specified columns of data.  Output is provided that provides feedback and guidance regarding the specified subset operations. Rows of data may be randomly extracted, and also with the code provided to generate a hold out validation sample created. The hold out sample is created from the original data frame, usually named mydata, so the subset data frame must be directed to a data frame with a new name or the data re-read to construct the holdout sample.
 }
 
 \usage{
 Subset(rows, columns, data=mydata, holdout=FALSE,
-       quiet=getOption("quiet"), \ldots)
+       random=0, quiet=getOption("quiet"), \ldots)
 
 subs(\ldots)
 }
 
 \arguments{
   \item{rows}{Specify the rows, i.e., observations, to be included or deleted,
-       such as with a logical expression. If an integer or proportion, specifies
-       number of rows to data to randomly extract.}
+       such as with a logical expression or by direct specfication of the
+       numbers of the corresponding rows of data.}
   \item{columns}{Specify the columns, i.e., variables, to be included or
         deleted.}
   \item{data}{The name of the data frame from which to create the subset, which
        is \code{mydata} by default.}
   \item{holdout}{Create a hold out sample for validation if rows is a proportion
        or an integer to indicate random extraction of rows of data.}
+  \item{random}{If an integer or proportion, specifies number of rows to data
+        to randomly extract.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{set}} function.}
   \item{\dots}{The list of variables, each of the form, \code{variable = equation}.
@@ -72,6 +74,12 @@ mydata <- subs(Description=="Moderate")
 # locate, that is, display only, the 2nd and 4th rows of data
 Subset(row.names(mydata)=="2" | row.names(mydata)=="4")
 
+# retain only the first and fourth rows of data, store in myd
+myd <- Subset(c(1,4))
+
+# delete only the first and fourth rows of data, store in myd
+myd <- Subset(-c(1,4))
+
 # only retain females and Years and Salary as variables in dataEmployee
 # write result to newdata
 data(dataEmployee)
@@ -83,13 +91,13 @@ mydata <- Read("Employee", format="lessR")
 mydata <- Subset(columns=-c(Years, Salary))
 
 # locate, display only, a specified row by its row.name
-mydata <- Read("Employee", format="lessR")
+mydata <- Read("Employee", format="lessR", brief=TRUE)
 Subset(row.names(mydata)=="Fulton, Scott")
 
 # randomly extract 60\% of the data
 # generate code to create the hold out sample of the rest
-mydata <- Read("Employee", format="lessR")
-mysubset <- Subset(.6, holdout=TRUE)
+mydata <- Read("Employee", format="lessR", brief=TRUE)
+mysubset <- Subset(random=.6, holdout=TRUE)
 }
 
 

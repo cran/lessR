@@ -1,6 +1,6 @@
 Subset <-
 function(rows, columns, data=mydata, holdout=FALSE,
-         quiet=getOption("quiet"), ...) {
+    random=0, quiet=getOption("quiet"), ...) {
 
   dname <- deparse(substitute(data))
 
@@ -21,57 +21,75 @@ function(rows, columns, data=mydata, holdout=FALSE,
     cat("\n")
   }
 
-  if (missing(rows))
-    r <- TRUE
-  else {
-    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
-
-    if (!is.numeric(r) && holdout) {
+  # set rows parameter by a random selection
+  if (random > 0) {
+    if (!missing(rows)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Cannot have a hold out sample unless rows is numeric.\n\n")
+        "Cannot specify both rows, to retain or exclude, and random.\n\n")
     }
-
-    if (is.logical(r))
-      r <- r & !is.na(r)  # set missing for a row to FALSE
-
-    else if (is.numeric(r)) {
-      if (rows>1)
-        n.obs.new <- round(rows,0)
-      else
-        n.obs.new <- round(r*n.obs,0)
-      if (!quiet) {
-        cat("\n")
-        cat("Rows of data randomly extracted\n")
-        .dash(42)
-        if (rows <= 1) cat("Proportion of randomly retained rows: ", rows, "\n")
-        cat("Number of randomly retained rows: ", n.obs.new, "\n")
-      }
-      rand.rows <- sample(1:n.obs, size=n.obs.new, replace=FALSE)
-      rand.rows <- sort(rand.rows)
-      r <- logical(length=n.obs)  # initial default is FALSE
-      j <- 1
-      for (i in 1:n.obs) {
-        if (i == rand.rows[j]) {
-          r[i] <- TRUE 
-          if (j < length(rand.rows)) j <- j + 1
-        }
-      }
+    if (random > 1)
+      n.obs.new <- round(random,0)
+    else
+      n.obs.new <- round(random*n.obs,0)
+    if (!quiet) {
+      cat("\n")
+      cat("Rows of data randomly extracted\n")
+      .dash(42)
+      if (random <= 1) cat("Proportion of randomly retained rows: ", random, "\n")
+      cat("Number of randomly retained rows: ", n.obs.new, "\n")
     }
-
-    else {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Specified value for rows must be an expression or a number.\n\n")
+    rand.rows <- sample(1:n.obs, size=n.obs.new, replace=FALSE)
+    rand.rows <- sort(rand.rows)
+    rows <- logical(length=n.obs)  # initial default is FALSE
+    j <- 1
+    for (i in 1:n.obs) {
+      if (i == rand.rows[j]) {
+        rows[i] <- TRUE 
+        if (j < length(rand.rows)) j <- j + 1
+      }
     }
   }
 
+  
+  # r is the logical vector or row to retain
+  # set r by default to all or by specification
+  if (missing(rows))
+    r <- TRUE  # retain all rows
+  else {  # if numeric, read directly from rows
+    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+
+    if (is.logical(r))
+      r <- r & !is.na(r)  # set missing for a row to FALSE
+  }
+
+  if (is.numeric(r)) {
+    if (length(rows) == 1) {
+      if ((rows > 0)  &&  (rows < 1)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Behavior has changed from previous documentation.\n",
+          "Now use this parameter to draw a random subset:  random\n\n")
+      }
+      else if (rows > 1) {
+        cat("\n"); warning(call.=FALSE, "\n","------\n",
+          "Behavior has changed from previous documentation.\n",
+          "Now use this parameter to draw a random subset:  random\n\n",
+          "Now specifying a single value for rows yields only that\n",
+          "  row in the subset, which is OK if that is what is desired.\n",
+          "  A negative value deletes the row.\n\n")
+      }
+    }
+  }
+
+  # evaluate columns
   if (missing(columns)) 
-    vars <- TRUE
+    vars <- TRUE  # retain all variables
   else {
     all.vars <- as.list(seq_along(data))
     names(all.vars) <- names(data)
     vars <- eval(substitute(columns), envir=all.vars, parent.frame())
  }
 
+  # do the subset
   data.sub <- data[r, vars, drop=FALSE]
 
   if (!quiet) {
@@ -96,7 +114,7 @@ function(rows, columns, data=mydata, holdout=FALSE,
     cat("Holdout Sample\n")
     .dash(70)
     cat("Deleted Rows:", nrow(data.hold), "\n")
-    cat("Copy and paste this code into R to create the hold out sample\n",
+    cat("Copy and paste this code into R to create the holdout sample\n",
         "from the original, unmodified data frame:", dname, "\n\n")
     cat(paste(dname,".hold", sep=""), "<- Subset(\n")
     for (i in 1:nrow(data.hold)) {

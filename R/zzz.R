@@ -261,7 +261,7 @@ function(...) {
   else
     workdir <- getwd()
   cat("\n")
-  cat("The", txt, "was written at the current working directory.\n")
+  cat("The", txt, "written at the current working directory.\n")
   cat("       ", fname, " in:  ", workdir, "\n")
   cat("\n")
 }
@@ -282,6 +282,7 @@ function(...) {
 
   if (length(dl2) == 0) off.two <- TRUE else off.two <- FALSE
 
+  # open graphics windows
   # if not already present, generate a null window for #2 and then remove
   if (off.two) wnew <- wnew + 1
   for (i in 1:wnew) 

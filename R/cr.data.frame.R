@@ -34,7 +34,7 @@ function(x, miss, show.n, n.cat, digits.d,
          "    To obtain the correlations decrease  n.cat  to specify a",
          "lower number\n",
          "      of unique values, such as with the function: set.\n",
-         "    Perhaps make this variable a factor with R factor function.\n")
+         "    Perhaps make this variable a factor with the R factor function.\n")
     }
 
     if (!is.numeric(x[,i])) {
@@ -77,7 +77,6 @@ function(x, miss, show.n, n.cat, digits.d,
 
   n.vars <- nrow(myc)
   cat("\nCorrelation matrix calculated\n",
-      "  Name:  mycor\n",
       "  Number of variables: ", n.vars, "\n",
       "  Missing data deletion: ", miss, "\n") 
 

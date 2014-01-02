@@ -2,9 +2,11 @@
 \docType{data}
 \alias{dataMach4}
 \title{Data: Machiavellianism}
-\description{Likert data responses to Christie and Giess's Mach~IV scale.
+\description{Likert data responses to Christie and Giess's (1970) Mach~IV scale from Hunter, Gerbing and Boster (1982).
 
-All Likert items assessed on a 6-point scale from 0: Strongly Disagree to 5: Strongly Agree. Variable labels, the content of each item, are included.
+All Likert items assessed on a 6-point scale from 0: Strongly Disagree to 5: Strongly Agree. Variable labels, the item content, are included.
+
+The following items should be reverse scored: 3, 4, 6, 7, 9, 10, 11, 14, 16, 17, 19
 }
 
 \usage{data(dataMach4)}
@@ -12,7 +14,7 @@ All Likert items assessed on a 6-point scale from 0: Strongly Disagree to 5: Str
 \format{A data table with 351 observations.
 
 Gender, 1 column, 0:Male, 1:Female\cr
-Mach IV, 20 Likert items, named m01, m02, \ldots, m20 \cr
+Mach IV, 20 Likert items: m01, m02, \ldots, m20 \cr
 
 Christie and Geiss Mach IV Scale\cr
 -------------------------------------------\cr

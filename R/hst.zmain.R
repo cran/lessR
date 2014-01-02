@@ -165,9 +165,9 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
       cat(sprintf("%s > %s %s %6.0f %6.2f %6.0f %6.2f", x.breaks[i], 
         x.breaks[i+1], x.mids[i], h$counts[i], prop[i], cum.c[i], cum.p[i]), "\n") 
     .dash(56)
+  
+    cat("\n")
   }
-
-  cat("\n")
 
   return(h)
 }

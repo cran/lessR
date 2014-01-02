@@ -17,7 +17,7 @@ function(x, n.cat, brief, ...)  {
       "so treat as categorical.\n",
       "   To obtain the numeric summary, decrease  n.cat  to indicate a lower\n",
       "   number of unique values such as with function: set.\n", 
-      "   Perhaps make this variable a factor with R factor function.\n")
+      "   Perhaps make this variable a factor with the R factor function.\n")
     }
     else if (is.character(x[,i])) .ss.factor(factor(x[,i]), ...)
     else cat("\n>>> The following type of variable not processed: ", 

@@ -445,7 +445,7 @@ function(x, by=NULL,
     }
   }
 
-  cat("\n")
+  if (!quiet) cat("\n")
 
   return(x)
 
