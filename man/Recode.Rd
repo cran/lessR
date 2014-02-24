@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{rec}
 
-Recodes the values of one or more integer variables in a data frame. The values of the original variable may be overwritten with the recoded values, or the recoded values can be designated to be placed in a new variable, indicated by the \code{new.name} option. Valid values may be converted to missing, and missing values may be converted to valid values.
+Recodes the values of one or more integer variables in a data frame. The values of the original variable may be overwritten with the recoded values, or the recoded values can be designated to be placed in a new variable, indicated by the \code{new.name} option. Valid values may be converted to missing, and missing values may be converted to valid values. Any existing variable labels are retained in the recoded data frame.
 
 There is no provision to recode integer values to character strings because that task is best accomplished with the standard R \code{\link{factor}} function. 
 }

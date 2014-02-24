@@ -110,14 +110,18 @@ function(lm.out, nm, my.formula, brief, res.rows,
       cat("\n>>> No 3D scatterplot because both predictor variables must be numeric.\n")
     }
     if (proceed.3d) { 
+      #check.rgl <- suppressWarnings(require(rgl, quietly=TRUE))
       cat("\n\n\n",
           "Directions for 3D scatterplot from the car package\n",
-          "--------------------------------------------------\n",
-          "1. Re-size window, click and drag to rotate plot.\n",
+          "--------------------------------------------------\n\n",
+          ">>> The 3D scatter plot requires package rgl.", "\n",
+          ">>> To get the rgl package, run one time only: install.packages(\"rgl\")", "\n\n",
+          "1. Can re-size the plot window, click and drag to rotate plot.\n",
           "2. Press the right mouse button and drag a rectangle around any points to be\n",
           "   identified, and then release. Repeat for each set of points to be identified.\n",
           "3. To exit, right-click in a blank area of the 3d-scatterplot.\n", sep="")
       suppressMessages(scatter3d(my.formula, id.method="identify", data=lm.out$model))  # car
+      cat("\n")
     }
   }
 

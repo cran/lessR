@@ -98,8 +98,10 @@ function(x, miss, show.n, n.cat, digits.d,
       cat("\n>>> No missing data\n\n")
     else {
       .ss.factor(as.vector(n), brief=TRUE)
-      if (n.vars <= 15  ||  show.n) 
+      if (n.vars <= 15  ||  show.n) {
+        cat("\n") 
         print(n)
+      }
       else
         cat("To view the sample size for each correlation coefficient, re-run the\n",
             "analysis with show.n=TRUE\n", sep="")

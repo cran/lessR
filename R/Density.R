@@ -1,5 +1,5 @@
 Density <-
-function(x, data=mydata, 
+function(x, data=mydata, n.cat=getOption("n.cat"), 
 
          bw="nrd0", type=c("both", "general", "normal"),
          bin.start=NULL, bin.width=NULL,
@@ -18,27 +18,25 @@ function(x, data=mydata,
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
-  clr <- getOption("colors") 
-  if (clr == "blue")
-    if (col.fill == getOption("col.fill.pt")) col.fill <- "gray86"
+  clr <- getOption("colors")  # color theme not used except for monochrome 
 
-  if (is.null(col.fill.nrm)) {
-    if (clr == "blue")  # default blue fill
+  if (missing(col.fill))
+    if (.Platform$OS == "windows")
+      col.fill <- "gray80"
+    else
+      col.fill <- "gray86"
+
+  if (missing(col.bg)) col.bg <- "ghostwhite"
+
+  if (missing(col.fill.nrm))
       col.fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
-    else  # default fill for all other colors
-      col.fill.nrm <- "transparent"  
-  }
 
-  if (is.null(col.fill.gen)) {
-    if (clr == "blue")  # default blue fill
+  if (missing(col.fill.gen))
       col.fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
-    else  # default fill for all other colors
-      col.fill.gen <- "transparent"
-  }
 
-  if (clr == "gray.black" || clr == "orange.black") {
-    col.nrm <- getOption("col.stroke.pt")
-    col.gen <- getOption("col.stroke.pt")
+  if (clr == "gray" || clr == "gray.black") {
+    col.fill.nrm <- "transparent"
+    col.fill.gen <- "transparent"
   }
 
 
@@ -46,39 +44,84 @@ function(x, data=mydata,
   x.name <- deparse(substitute(x)) 
   options(xname = x.name)
 
-  # get data frame name
-  dname <- deparse(substitute(data))
-  options(dname = dname)
+  df.name <- deparse(substitute(data))
+  options(dname = df.name)
 
-  # get conditions and check for data existing
-  xs <- .xstatus(x.name, dname, quiet)
-  in.global <- xs$ig 
+  pdf.nm <- FALSE
+  if (!missing(pdf.file)) pdf.nm <- TRUE
 
-  # see if variable exists in data frame, if x not in Global Env or function call 
-  if (!missing(x) && !in.global) .xcheck(x.name, dname, data)
 
-  if (!in.global) x.call <- eval(substitute(data$x))
-  else {
-    x.call <- x
-    if (is.function(x)) x.call <- eval(substitute(data$x))
+# -----------------------------------------------------------
+# establish if a data frame, if not then identify variable(s)
+
+if (!missing(x)) {
+    if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
+      .nodf(df.name)  # check to see if data frame container exists 
+      .xcheck(x.name, df.name, data)  # see if var in df, vars lists not checked
+      vars.list <- as.list(seq_along(data))
+      names(vars.list) <- names(data)
+      x.col <- eval(substitute(x), envir=vars.list)  # col num of each var
+      if (class(data) != "list") {
+        data <- data[, x.col]
+        if (length(x.col) == 1) {
+          data <- data.frame(data)  # x is 1 var
+          names(data) <- x.name
+         }
+      }
+      else {
+        data <- data.frame(data[[x.col]])
+        names(data) <- x.name
+      }
+    }
+    else { # x is in the global environment (vector or data frame)
+      if (is.data.frame(x))  # x a data frame
+        data <- x
+      else {  # x a vector in global
+        data <- data.frame(x)  # x is 1 var
+        names(data) <- x.name
+      }
+    }
   }
 
-  # set up graphics system
-  .opendev(pdf.file, pdf.width, pdf.height)
 
-  d <- .den.main(x.call, data=mydata, 
-            bw, type, bin.start, bin.width, quiet,
+# ---------------
+# do the analysis
+
+  go.pdf <- FALSE
+  if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
+
+  for (i in 1:ncol(data)) {
+    cat("\n")
+
+    nu <- length(unique(na.omit(data[,i])))
+
+    x.name <- names(data)[i]
+    options(xname = x.name)
+
+    if (is.numeric(data[,i])) {
+      if (nu > n.cat) {
+
+      pdf.fnm <- .pdfname("Density", x.name, go.pdf, pdf.nm, pdf.file)
+     .opendev(pdf.fnm, pdf.width, pdf.height)
+
+      d.gen <- .dn.main(data[,i], bw, type, bin.start, bin.width, 
             col.fill, col.bg, col.grid, col.nrm, col.gen,
             col.fill.nrm, col.fill.gen, 
             cex.axis, col.axis, col.ticks,
-            x.pt, xlab, main, y.axis, x.min, x.max, band, ...)
+            x.pt, xlab, main, y.axis, x.min, x.max, band, quiet, ...)
 
-  # terminate pdf graphics system
-  if (!is.null(pdf.file)) {
-    dev.off()
-    .showfile(pdf.file, "density plot")
-  }
+      if (go.pdf) {
+        dev.off()
+        if (!quiet) .showfile(pdf.fnm, "density curve")
+      }
 
-  invisible(d)
+      if (ncol(data) == 1) invisible(d.gen)
+    }  # nu > n.cat
+    else
+      .ncat("Density curve", x.name, nu, n.cat)
 
+    }  # is.numeric(data[,i])
+  }  # for
+
+  if (ncol(data)==1  && nu>n.cat) invisible(d.gen)
 }

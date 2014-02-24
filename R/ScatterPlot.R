@@ -38,10 +38,16 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
       if (names(dots)[i] %in% c("x.start","x.end","y.start","y.end")) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "x.start, x.end, y.start, and y.end no longer used.\n",
-          "Instead use the standard R xlim and ylim parameters.\n",
-          "xlim=(x.start,x.end), such as xlim=c(0,40). Same for ylim.\n\n")
+          "Instead use the standard R xlim and ylim parameters,\n",
+          "such as xlim=c(0,40) to specify from 0 to 40. Same for ylim.\n\n")
       }
     }
+  }
+  if (method %in% c("spearman", "kendall")) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "The  method  parameter has another use for ScatterPlot.\n",
+      "To compute another type of correlation, directly\n",
+      "access the Correlation function.\n\n")
   }
 
   # process shapes
@@ -85,15 +91,15 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
   options(xname = x.name)
 
   # get data frame name
-  dname <- deparse(substitute(data))
-  options(dname = dname)
+  df.name <- deparse(substitute(data))
+  options(dname = df.name)
 
   # get conditions and check for data existing
-  xs <- .xstatus(x.name, dname, quiet)
+  xs <- .xstatus(x.name, df.name, quiet)
   in.global <- xs$ig 
 
   # see if variable exists in data frame, if x not in Global Env or function call 
-  if (!missing(x) && !in.global) .xcheck(x.name, dname, data)
+  if (!missing(x) && !in.global) .xcheck(x.name, df.name, data)
 
   if (!in.global) x.call <- eval(substitute(data$x))
   else {  # vars that are function names get assigned to global
@@ -110,12 +116,12 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
     options(yname = y.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(y.name, dname, quiet)
+    xs <- .xstatus(y.name, df.name, quiet)
     in.global <- xs$ig 
 
     # see if var exists in data frame, if x not in Global Env or function call 
     if (!missing(x) && !in.global)
-      .xcheck(y.name, dname, data)
+      .xcheck(y.name, df.name, data)
 
     if (!in.global) y.call <- eval(substitute(data$y))
     else {  # vars that are function names get assigned to global
@@ -133,12 +139,12 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
     options(byname = by.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(by.name, dname, quiet)
+    xs <- .xstatus(by.name, df.name, quiet)
     in.global <- xs$ig 
 
     # see if var exists in data frame, if x not in Global Env or function call 
     if (!missing(x) && !in.global)
-      .xcheck(by.name, dname, data)
+      .xcheck(by.name, df.name, data)
 
     if (!in.global) by.call <- eval(substitute(data$by))
     else {  # vars that are function names get assigned to global
@@ -150,6 +156,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
   }
   else
    by.call <- NULL
+
 
   if ( (kind == "bubble") || (kind == "sunflower") ) {
     if (missing(y))  {

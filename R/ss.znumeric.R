@@ -106,28 +106,38 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     for (j in 1:n) kt.sum <- kt.sum + ( (xx[j]-m)^4 )
     kt <- ( kt.coef1 * (kt.sum/(var(xx)^2)) ) - kt.coef2
     # order stats
-    mn <- min(xx)
-    q1 <- quantile(xx, probs=0.25)
-    md <- median(xx)
-    q3 <- quantile(xx, probs=0.75)
-    mx <- max(xx)
-    qr <- IQR(xx)
+    if (n > 0) {
+      mn <- min(xx)
+      q1 <- quantile(xx, probs=0.25)
+      md <- median(xx)
+      q3 <- quantile(xx, probs=0.75)
+      mx <- max(xx)
+      qr <- IQR(xx)
+    }
 
-    # print
-    if (!brief) {
-      out <- c(n, n.miss, m, s, sk, kt, mn, q1, md, q3, mx, qr)
-      names(out) <- c("n", "miss", "mean", "sd", "skew", "krts",
-                      "min", "qrt1", "mdn", "qrt3", "max", "IQR")
+    # set values to print
+    if (n > 0) {
+      if (!brief) {
+        out <- c(n, n.miss, m, s, sk, kt, mn, q1, md, q3, mx, qr)
+        names(out) <- c("n", "miss", "mean", "sd", "skew", "krts",
+                        "min", "qrt1", "mdn", "qrt3", "max", "IQR")
+      }
+      else {
+        out <- c(n, n.miss, m, s, mn, md, mx)
+        names(out) <- c("n", "miss", "mean", "sd", "min", "mdn", "max")
+      }
     }
     else {
-      out <- c(n, n.miss, m, s, mn, md, mx)
-      names(out) <- c("n", "miss", "mean", "sd", "min", "mdn", "max")
+      out <- c(n, n.miss)
+      names(out) <- c("n", "miss")
     }
-    # write names
+
+    # write header names
     if (i == 1) { 
       if (max.ln < 4) max.ln <- max.ln + 2
       if (max.ln < 8) max.ln <- max.ln + 1
-      if (n.lines == 1) nbuf <- 1 else nbuf <- 2
+      if (n.lines == 1) nbuf <- 0 else nbuf <- 2
+      cat(" ")
       cat(format(names(out[1]), width=nchar(as.character(out[1]))+nbuf+max.lv, 
           justify="right", sep=""))
       nbuf <- 5
@@ -137,37 +147,27 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
          cat(format(names(out[i]), width=max.ln, justify="right", sep=""))
       cat("\n")
     }
+
     # write values
     cat(format(p.lv, width=max.lv, justify="right", sep=""))
     cat(format(out[1], width=max.n+1, justify="right", sep=""))
     cat(format(out[2], width=max.nm+5, justify="right", sep=""))
-    if (n > 1) for (i in 3:length(out)) 
-      cat(format(sprintf("%.*f", dig.dec, out[i]), width=max.ln,
-          justify="right", sep=""))
-    else cat(format(sprintf("%.*f", dig.dec, out[3]), 
-             width=max.ln, justify="right", sep=""))
-    cat("\n")
-  }
-
-  outliers <- boxplot.stats(xx)$out
-  if (length(outliers>0) && unique(na.omit(xx)>3)) {
-    outliers <- sort(outliers, decreasing=TRUE)
-    ln <- length(outliers)
-    if (ln <= 50) {
-      cat("\nOutlier")
-      if (ln > 1) cat("s: ") else cat(": ")
-      for (i in 1:ln) cat(format(outliers[i], scientific=FALSE), " ")
-    }
-    else {
-      cat("\nNumber of outliers:", length(outliers), "\n")
-      cat("\n25 largest outliers:\n")
-      for (i in 1:25) cat(format(outliers[i], scientific=FALSE), " ")
-      cat("\n\n25 smallest outliers:\n")
-      for (i in (ln-25):ln) cat(format(outliers[i], scientific=FALSE), " ")
+    if (n > 0) {
+      if (n > 1) for (i in 3:length(out)) 
+        cat(format(sprintf("%.*f", dig.dec, out[i]), width=max.ln,
+            justify="right", sep=""))
+      else cat(format(sprintf("%.*f", dig.dec, out[3]), 
+               width=max.ln, justify="right", sep=""))
     }
     cat("\n")
+
   }
 
+  # outlier analysis
+  .outliers(xx)
+
+
+  # return the information back to SummaryStats
   if (n.lines == 1)
     if (!brief) 
       return(list(n=n, miss=n.miss, mean=m, sd=s, skew=sk, kurtosis=kt, 

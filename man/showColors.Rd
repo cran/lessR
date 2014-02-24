@@ -1,7 +1,7 @@
 \name{showColors}
 \alias{showColors}
 
-\title{Display All Named R Colors and Their rgb Values}
+\title{Display All Named R Colors and Corresponding rgb Values}
 
 \description{
 For each specified color, displays the color, the name and the associated \code{rgb} definition.

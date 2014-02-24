@@ -7,7 +7,8 @@
 \description{
 Abbreviation: \code{subs}
 
-Based directly on the standard R \code{\link{subset}} function to only include or exclude specified rows or data, and for specified columns of data.  Output is provided that provides feedback and guidance regarding the specified subset operations. Rows of data may be randomly extracted, and also with the code provided to generate a hold out validation sample created. The hold out sample is created from the original data frame, usually named mydata, so the subset data frame must be directed to a data frame with a new name or the data re-read to construct the holdout sample.
+Based directly on the standard R \code{\link{subset}} function to only include or exclude specified rows or data, and for specified columns of data.  Output is provided that provides feedback and guidance regarding the specified subset operations. Rows of data may be randomly extracted, and also with the code provided to generate a hold out validation sample created. The hold out sample is created from the original data frame, usually named mydata, so the subset data frame must be directed to a data frame with a new name or the data re-read to construct the holdout sample. Any existing variable labels are retained in the subset data frame.
+
 }
 
 \usage{
@@ -19,7 +20,7 @@ subs(\ldots)
 
 \arguments{
   \item{rows}{Specify the rows, i.e., observations, to be included or deleted,
-       such as with a logical expression or by direct specfication of the
+       such as with a logical expression or by direct specification of the
        numbers of the corresponding rows of data.}
   \item{columns}{Specify the columns, i.e., variables, to be included or
         deleted.}

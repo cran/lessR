@@ -1,37 +1,32 @@
 \name{label}
 \alias{label}
 
-\title{Apply a Variable Label to a non-lessR Function}
+\title{Return or Assign a Variable Label}
 
 \description{
-Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  Generally applies to standard R functions as \code{lessR} functions automatically provide variable labels on the output when the labels have been read with the data.
+Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  To return a variable label generally applies to standard R functions such that the functions can access \code{lessR} variable labels. Or, the variable name and label can be listed on the standard output. To assign a variable label, invoke the \code{value} option and assign the output to a specified data frame. 
 }
 
 \usage{
-label(x, data=mydata)
+label(x, value=NULL, data=mydata)
 }
 
 
 \arguments{
   \item{x}{The variable for which to obtain the corresponding variable label.}
-  \item{data}{Data frame that contains the variable of interest.}
+  \item{value}{If assigned, then the specified data frame is updated with this
+       asssigned label.}
+  \item{data}{Data frame that contains the variable of interest. The output
+       of the function is assigned to this data frame.}
 }
 
 
 \details{
-Standard R does not provide for variable labels, but \code{lessR}does.  Read the labels \code{\link{Read}} function and setting \code{labels=TRUE}. This setting can be accomplished with the short name for the \code{\link{Read}} function, \code{\link{rd}}.
+Standard R does not provide for variable labels, but \code{lessR} does.  Read the labels with the \code{lessR} \code{\link{Read}} function, as explained in the corresponding documentation. Individual variable labels can also be assigned with this function. Not all variables need have a label, and the variables with their corresponding labels can be listed or assigned in any order.
 
-Each row of the file that contains the labels, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format such as obtained with the \code{csv} option from a standard worksheet application such as Microsoft Excel or LibreOffice Calc. Not all variables in the data frame that contains the data, \code{mydata} by default, need have a label, and the variables with their corresponding labels can be listed in any order. Here is an example of this file for the \code{dat.employee} data file included in this \code{lessR} package.\cr
+The function provides two different modes. The first mode is to return the variable name and label for an existing variable label. One such use is to provide the function as an argument to an existing R function call to access a \code{lessR} variable label. For example, use the function as the argument for \code{main} in graphics output, where \code{main} is the title of the graph. This mode is triggered by not invoking the \code{value} option.
 
-Years,"Years Employed in the Company"\cr
-Gender,"Male or Female"\cr
-Dept,"Department Employed"\cr
-Salary,"Annual Salary (USD)"\cr
-Satisfaction,"Satisfaction with Work Environment"\cr
-HealthPlan,"1=GoodHealth, 2=YellowCross, 3=BestCare"\cr
-Not all variables need have a label, and the variables with their corresponding labels can be listed in any order.
-
-The \code{label} function is automatically accessed by the \code{lessR} functions that provide data analysis, such as automatically providing the title of a graph as the corresponding variable label.  This function can also be added to standard R function calls as well, such as an argument for \code{main} in graphics output, where \code{main} is the title of the graph.
+The second mode is to assign a variable label to an existing variable. Invoke this mode by specifying a variable label with the \code{value} option. The function accesses the entire specified data frame, and then modifies the specified variable label. As such, assign the output of the function to the data frame of interest, such as the default \code{mydata}. One use of this function is to add a variable label to a data frame that contains a new variable created by a transformation of the existing variables. 
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -41,7 +36,7 @@ The \code{label} function is automatically accessed by the \code{lessR} function
 }
 
 \examples{
-# read the data with variable labels
+# read the internal lessR data frame that contains variable labels
 mydata <- Read("Employee", format="lessR")
 
 # variable label as the title of a graph from a standard R function
@@ -49,6 +44,19 @@ mydata <- Read("Employee", format="lessR")
 #   identify the relevant data frame, such as with function: with
 with(mydata, barplot(table(Dept), main=label(Dept)))
 with(mydata, hist(Salary, main=label(Salary)))
+
+# assign a new label for the variable Years in mydata
+mydata <- label(Years, "Years Worked")
+# verify
+label(Years)
+# or view all variable labels in mydata
+details.brief()
+
+mydata <- Read("Employee", format="lessR")
+# specify a label of variable in a data frame other than mydata
+myd <- Subset(Gender=="M")
+myd <- label(Gender, "Only is Male", data=myd)
+details.brief(myd)
 }
 
 

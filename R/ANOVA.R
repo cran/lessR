@@ -5,6 +5,11 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
 
   res.sort <- match.arg(res.sort)
 
+  if (missing(my.formula)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify a model by listing it first or set according to:  my.formula\n\n")
+  }
+
   dname <- deparse(substitute(data))
   options(dname = dname)
  

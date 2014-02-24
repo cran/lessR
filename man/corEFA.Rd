@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{efa}
 
-An maximum likelihood exploratory factor analysis, provided by the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis. Then constructs the corresponding multiple indicator measurement model (MIMM) suggested by the exploratory factor analysis loadings, and the \code{lessR} code needed to run the confirmatory analysis of the model.
+A maximum likelihood exploratory factor analysis, provided by the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis. Then constructs the code to run the corresponding multiple indicator measurement model (MIMM) suggested by the exploratory factor analysis loadings in terms of both the \code{lessR} \code{\link{corCFA}} and the \code{cfa} function from the \code{lavaan} package.
 }
 
 \usage{
@@ -38,6 +38,12 @@ Also provides the associated multiple indicator measurement model suggested by t
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
+
+\references{
+Yves Rosseel (2012). lavaan: An R Package for Structural Equation
+Modeling. Journal of Statistical Software, 48(2), 1-36. URL
+http://www.jstatsoft.org/v48/i02/.
+}
 
 \seealso{
 \code{\link{Correlation}}.

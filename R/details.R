@@ -158,7 +158,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
             "No more lines displayed to conserve space.\n",
             "Specify n.mcut=2 to see just those lines with 2 missing values, etc,",
             "or use a higher number.\n",
-            "Or increase the default value of miss.show=30 to show more lines.")
+            "Or increase the default value of miss.show=30 to show more lines.\n")
         }
       }
       cat("\n")
@@ -182,7 +182,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   # feedback regarding variable labels
   if (brief) cat("\n")
   mylabels <- attr(data, which="variable.labels")
-  cat("\nVariable Names    Variable Labels\n")
+  cat("\nVariable Names  Variable Labels\n")
 
   if (!is.null(mylabels)) {
     mylabels <- data.frame(mylabels)

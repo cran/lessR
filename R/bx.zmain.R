@@ -81,13 +81,8 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     cat("3rd Quartile :", .fmt(quantile(x, na.rm=TRUE)[4]), "\n")
     cat("IQR          :", .fmt(IQR(x, na.rm=TRUE)), "\n")
 
-    outliers <- boxplot.stats(x)$out
-    if (length(outliers > 0)) {
-      cat("\nOutlier")
-      if (length(outliers) > 1) cat("s: ") else cat(": ")
-      for (i in 1:length(outliers)) cat(.fmt(outliers[i]), " ")
-      cat("\n")
-    } 
+    # outlier analysis
+    .outliers(x)
 
     cat("\n")
   }

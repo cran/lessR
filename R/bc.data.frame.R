@@ -23,7 +23,7 @@ function(x, n.cat,
         else {
 
           pdf.file <- paste("BarChart_", x.name, ".pdf", sep="")
-          .opendev(pdf.file=pdf.file, pdf.width, pdf.height)
+          .opendev(pdf.file, pdf.width, pdf.height)
 
           .bc.main(x[,i], by=NULL,
             col.fill, col.stroke, col.bg, col.grid, random.col, colors,

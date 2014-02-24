@@ -1,6 +1,12 @@
 Model <-
 function(my.formula, data=mydata, brief=getOption("brief"), ...) {
 
+
+  if (missing(my.formula)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify a model by listing it first or set according to:  my.formula\n\n")
+  }
+
   dname <- deparse(substitute(data))  # get data frame name for cor before sort
   options(dname = dname)
 

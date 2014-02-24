@@ -11,6 +11,11 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
 
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
  
+
+  if (missing(my.formula)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify a model by listing it first or set according to:  my.formula\n\n")
+  }
   
   dname <- deparse(substitute(data))
   options(dname = dname)

@@ -5,23 +5,26 @@ if (getRversion() >= "2.15.1")
 .onAttach <-
 function(...) {
 
-  packageStartupMessage(
+  packageStartupMessage("\nlessR 3.1                                  ",
+                        "  www.lessRstats.com\n",
       "---------------------------------------------------------------\n",
-      "For help, enter, after the >:  Help()\n",
+      "To get started, and for help in general, enter:  > Help()\n",
       "To read a text, Excel, SPSS or R data file:  > mydata <- Read()\n",
       "---------------------------------------------------------------\n\n")
 
-  options(colors="blue")
-  options(trans.fill.bar=0.00)
+  # .maketrans(rgb(106,161,214, maxColorValue=256), to256("trans.fill.bar"))
+  # .maketrans("dodgerblue3", to256("trans.fill.bar"))
+  options(colors="dodgerblue")
+  options(trans.fill.bar=0.25)
   options(trans.fill.pt=0.66)
-  options(col.fill.bar = "#A1B4CCFF")  # .maketrans of lightsteelblue3"
-  options(col.fill.pt = "#A1B4CC57")  # .maketrans of "lightsteelblue3"
-  options(col.stroke.bar="slategray")
-  options(col.stroke.pt="darkblue")
-  options(col.bg="ghostwhite")
-  options(col.grid="gray90")
+  options(col.fill.bar = "#1874CCBF")  # .maketrans of dodgerblue3"
+  options(col.fill.pt = "#1874CCBF")  # .maketrans of "dodgerblue3"
+  options(col.stroke.bar="steelblue4")
+  options(col.stroke.pt="steelblue4")
+  options(col.bg="#EDEFF1")
+  options(col.grid="snow3")
   options(col.ghost=FALSE)
-  options(col.heat="darkblue")
+  options(col.heat="dodgerblue4")
 
   options(n.cat=0)
 
@@ -94,7 +97,7 @@ function(...) {
   if (exists(var.name, where=.GlobalEnv)) {
     in.global <- TRUE
     if (!quiet)
-      cat("\n>>> Note: ", var.name, "created outside of a data",
+      cat(">>> Note: ", var.name, "exists outside of a data",
           "frame (table)\n")
   }
   else
@@ -103,47 +106,55 @@ function(...) {
   # see if "variable" is really a function call
   if (grepl("(", var.name, fixed=TRUE))  {
     txtA <- paste("The referenced variable in a lessR function can only be\n",
-            "a variable name.\n\n", sep="")
+            "a variable name (or sometimes multiple names).\n\n", sep="")
     txtB <- "For example, this does not work:\n  > Histogram(rnorm(50))\n\n"
     txtC <- "Instead do this:\n  > Y <- rnorm(50)\n  > Histogram(Y)"
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         txtA, txtB, txtC, "\n")
   }
 
-  # see if the data frame exists (mydata default), if x from data, not in Global Env
-  if (!in.global && from.data) {
-    if (!exists(dname, where=.GlobalEnv)) {
-      if (dname == "mydata") 
-        txtA <- ", the default data frame name, " else txtA <- " "
-      txtB1 <- "So either create the data frame with the Read function, or\n"
-      txtB2 <- "  specify the actual data frame with the parameter: data\n"
-      txtB <- paste(txtB1, txtB2, sep="")
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
-    }
-  }
+  if (!in.global && from.data) .nodf(dname)
 
   return(list(ifr=is.frml, fd=from.data, ig=in.global))
 }
 
 
+.nodf <- function(dname) {
+
+  # see if the data frame exists (mydata default), if x from data, not in Global Env
+  if (!exists(dname, where=.GlobalEnv)) {
+    if (dname == "mydata") 
+      txtA <- ", the default data table name, " else txtA <- " "
+    txtB1 <- "So either create the data table with the Read function, or\n"
+    txtB2 <- "  specify the actual data table with the parameter: data\n"
+    txtB <- paste(txtB1, txtB2, sep="")
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Data frame (table) ", dname, txtA, "does not exist\n\n", txtB, "\n")
+  }
+
+}
+
+
 .xcheck <- function(var.name, dname, data) {
 
-# see if variable exists in the data frame
-  if (!exists(var.name, where=data)) { 
-    if (dname == "mydata") {
-      txt1 <- ", the default name \n\n"
-      txt2 <- "Either make sure to use the correct variable name, or\n"
-      txt3 <- "specify the actual data frame with the parameter: data\n"
-      txt <- paste(txt1, txt2, txt3, sep="")
+  if ( (!grepl(":", var.name) && !grepl(",", var.name)) ) { # x not var list
+
+    # see if variable exists in the data frame
+    if (!exists(var.name, where=data)) { 
+      if (dname == "mydata") {
+        txt1 <- ", the default name \n\n"
+        txt2 <- "Either make sure to use the correct variable name, or\n"
+        txt3 <- "specify the actual data frame with the parameter: data\n"
+        txt <- paste(txt1, txt2, txt3, sep="")
+      }
+      else 
+        txt <- "\n"
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Variable ", var.name, " does not exist either by itself ",
+          "(in the user's workspace),\n",
+          "or in the data frame with the name of ", dname, txt, "\n",
+          "To view the existing variable names enter: > names(", dname, ")\n\n")
     }
-    else 
-      txt <- "\n"
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Variable ", var.name, " does not exist either by itself ",
-        "(in the user's workspace),\n",
-        "or in the data frame with the name of ", dname, txt, "\n",
-        "To view the existing variable names enter: > names(", dname, ")\n\n")
   }
 }
 
@@ -246,6 +257,7 @@ function(...) {
   cat("\n")
   cat(txt1, "\n")
   if (!isnullby) {
+    cat("  - by levels of - \n")
     cat(txt2, "\n")
     ndash <- max(nchar(txt1),nchar(txt2))
     .dash(ndash)
@@ -295,15 +307,47 @@ function(...) {
 }
 
 
-.opendev <- function(pdf.file, pdf.width, pdf.height) {
+.pdfname <- function(analysis, x.name, go.pdf, pdf.nm, pdf.file) {
+  if (go.pdf) {
+    if (pdf.nm)
+      if (!grepl(".pdf", pdf.file))
+        pdf.fnm <- paste(pdf.file, ".pdf", sep="")
+      else
+        pdf.fnm <- pdf.file
+    else
+      pdf.fnm <- paste(analysis, "_", x.name, ".pdf", sep="")
+  }
+  else
+    pdf.fnm <- NULL
 
-  if (is.null(pdf.file)) {
+  return(pdf.fnm)
+}
+
+
+.opendev <- function(pdf.fnm, pdf.width, pdf.height) {
+
+  if (is.null(pdf.fnm)) {
     .graphwin(1)
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
   }
   else 
-    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    pdf(file=pdf.fnm, width=pdf.width, height=pdf.height)
+
+}
+
+
+.ncat <- function(analysis, x.name, nu, n.cat) {
+
+      cat("\n>>>", x.name,  "is numeric,",
+          "but only has", nu, "<= n.cat =", n.cat, "levels,",
+          "so treat as categorical.\n\n",
+          "   If categorical, can make this variable a",
+          "factor with R function: factor\n\n",
+          "   If numerical, to obtain the", tolower(analysis),
+          "decrease  n.cat ",
+          "to specify\n",
+          "   a lower number of unique values.\n")
 
 }
 
@@ -342,4 +386,54 @@ function(...) {
   col.trans <- rgb(r.tr, g.tr, b.tr, alpha=trans.level, maxColorValue=256)
 
   return(col.trans)
+}
+
+.to256 <- function(trans.level)
+   trn <- (1-getOption(trans.level))*256
+
+
+.outliers <- function(x) {
+
+  outliers <- boxplot.stats(x)$out
+  if (length(outliers>0) && unique(na.omit(x)>3)) {
+    cat("\nNumber of outliers:", length(outliers), "\n")
+
+    lo.whisker <- boxplot.stats(x)$stats[1]
+    lo.out <- outliers[outliers < lo.whisker]
+    lo.out <- sort(lo.out, decreasing=FALSE)
+    lo.len <- length(lo.out)
+    cat("Small: ")
+    if (lo.len > 0) {
+      if (lo.len <= 25)
+        for (i in 1:lo.len) cat(format(lo.out[i], scientific=FALSE), " ")
+      else {
+        for (i in 1:16) cat(format(lo.out[i], scientific=FALSE), " ")
+        cat ("...  ")
+        for (i in (lo.len-5):lo.len) cat(format(lo.out[i], scientific=FALSE), " ")
+      }
+    }
+    else
+      cat("none")
+    cat("\n")
+
+    hi.whisker <- boxplot.stats(x)$stats[5]
+    hi.out <- outliers[outliers > hi.whisker]
+    hi.out <- sort(hi.out, decreasing=FALSE)
+    hi.len <- length(hi.out)
+    cat("Large: ")
+    if (hi.len > 0) {
+      if (hi.len <= 25)
+        for (i in 1:hi.len) cat(format(hi.out[i], scientific=FALSE), " ")
+      else {
+        for (i in 1:16) cat(format(hi.out[i], scientific=FALSE), " ")
+        cat ("...  ")
+        for (i in (hi.len-5):hi.len) cat(format(hi.out[i], scientific=FALSE), " ")
+      }
+    }
+    else
+      cat(" none\n")
+
+  }
+
+  cat("\n")
 }

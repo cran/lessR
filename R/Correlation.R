@@ -19,7 +19,7 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
     if (missing(x)) {
       x.name <- ""  # in case x is missing, i.e., data frame mydata
       is.df <- TRUE
-      data <- eval(substitute(mydata))
+      if (missing(data)) data <- eval(substitute(mydata))
     }
 
     else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {

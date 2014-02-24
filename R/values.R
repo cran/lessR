@@ -1,6 +1,7 @@
 values <-
 function(x, data=mydata, ...) {
 
+
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x)) 
 
@@ -12,7 +13,7 @@ function(x, data=mydata, ...) {
   in.global <- xs$ig 
 
   # see if variable exists in the data frame, if x not in Global Env or function call 
-  if (!missing(x) && !in.global)  .xcheck(x.name, dname, data)
+  if (!missing(x) && !in.global) .xcheck(x.name, dname, data)
 
   if (!in.global) x.call <- eval(substitute(data$x))
   else {  # vars that are function names get assigned to global

@@ -1,5 +1,5 @@
 LineChart <-
-function(y, data=mydata, type=NULL, 
+function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
 
          col.fill=getOption("col.fill.bar"), 
          col.stroke=getOption("col.stroke.pt"),
@@ -23,42 +23,87 @@ function(y, data=mydata, type=NULL,
 
   center.line <- match.arg(center.line)
 
-  # get actual variable name before potential call of data$y
-  y.name <- deparse(substitute(y)) 
-  options(yname = y.name)
+  # get actual variable name before potential call of data$x
+  x.name <- deparse(substitute(x))
+  options(xname = x.name)
+  options(yname = x.name)  # for .lc.main, which uses y as the var
 
-  # get data frame name
-  dname <- deparse(substitute(data))
-  options(dname = dname)
+  df.name <- deparse(substitute(data))
+  options(dname = df.name)
 
-  # get conditions and check for data existing
-  ys <- .xstatus(y.name, dname, quiet)
-  in.global <- ys$ig 
+  pdf.nm <- FALSE
+  if (!missing(pdf.file)) pdf.nm <- TRUE
 
-  # see if variable exists in data frame, if y not in Global Env or function call 
-  if (!missing(y) && !in.global)  .xcheck(y.name, dname, data)
+# -----------------------------------------------------------
+# establish if a data frame, if not then identify variable(s)
 
-  if (!in.global) y.call <- eval(substitute(data$y))
-  else {  # vars that are function names get assigned to global
-    y.call <- y
-    if (is.function(y.call)) y.call <- eval(substitute(data$y))
+  if (!missing(x)) {
+    if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
+      .nodf(df.name)  # check to see if data frame container exists 
+      .xcheck(x.name, df.name, data)  # see if var in df, vars lists not checked
+      vars.list <- as.list(seq_along(data))
+      names(vars.list) <- names(data)
+      x.col <- eval(substitute(x), envir=vars.list)  # col num of each var
+      if (class(data) != "list") {
+        data <- data[, x.col]
+        if (length(x.col) == 1) {
+          data <- data.frame(data)  # x is 1 var
+          names(data) <- x.name
+         }
+      }
+      else {
+        data <- data.frame(data[[x.col]])
+        names(data) <- x.name
+      }
+    }
+    else { # x is in the global environment (vector or data frame)
+      if (is.data.frame(x))  # x a data frame
+        data <- x
+      else {  # x a vector in global
+        data <- data.frame(x)  # x is 1 var
+        names(data) <- x.name
+      }
+    }
   }
 
-  # set up graphics system
-  .opendev(pdf.file, pdf.width, pdf.height)
 
-  .lc.main(y.call, type,
-       col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
-       col.grid, col.bg, cex.axis, col.axis, col.ticks, xy.ticks,
-       line.width, xlab, ylab, main, cex,
-       time.start, time.by, time.reverse, 
-       center.line, quiet, ...)
+# ---------------
+# do the analysis
 
-  # terminate pdf graphics system
-  if (!is.null(pdf.file)) {
-    dev.off()
-    .showfile(pdf.file, "line chart")
-  }
+  go.pdf <- FALSE
+  if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
 
+  for (i in 1:ncol(data)) {
+    cat("\n")
+
+    nu <- length(unique(na.omit(data[,i])))
+
+    x.name <- names(data)[i]
+    options(xname = x.name)
+
+    if (is.numeric(data[,i])) {
+      if (nu > n.cat) {
+
+      pdf.fnm <- .pdfname("LC", x.name, go.pdf, pdf.nm, pdf.file)
+     .opendev(pdf.fnm, pdf.width, pdf.height)
+
+      .lc.main(data[,i], type,
+         col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
+         col.grid, col.bg, cex.axis, col.axis, col.ticks, xy.ticks,
+         line.width, xlab, ylab, main, cex,
+         time.start, time.by, time.reverse, 
+         center.line, quiet, ...)
+
+      if (go.pdf) {
+        dev.off()
+        if (!quiet) .showfile(pdf.fnm, "Line Chart")
+      }
+
+    }  # nu > n.cat
+    else
+      .ncat("Line Chart", x.name, nu, n.cat)
+
+    }  # is.numeric(data[,i])
+  }  # for
 
 }

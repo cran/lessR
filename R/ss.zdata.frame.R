@@ -2,6 +2,7 @@
 function(x, n.cat, brief, ...)  {
 
   for (i in 1:ncol(x)) {
+    cat("\n\n")
 
     nu <- length(unique(na.omit(x[,i])))
 

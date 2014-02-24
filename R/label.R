@@ -1,5 +1,5 @@
 label <- 
-function(x, data=mydata) {
+function(x, value=NULL, data=mydata) {
 
   x.name <- deparse(substitute(x)) 
   options(xname = x.name)
@@ -24,14 +24,34 @@ function(x, data=mydata) {
     }
   }
 
-  gl <- .getlabels()
-  lbl <- gl$xl
-  if (length(lbl) == 0) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-    "For variable: ", x.name, "\n",
-    "Either the variable or the label in the data frame or both do not exist.\n")
+  if (is.null(value)) {  # return an existing label
+    gl <- .getlabels()
+    lbl <- gl$xl
+    if (length(lbl) == 0) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "For variable: ", x.name, "\n",
+      "Either the variable or the label in the data frame or both do not exist.\n")
+    }
+    return(lbl)
   }
 
-  return(lbl)
+  else {  # assign a label to a var in a data frame and return data frame
+    mylabels <- attr(data, which="variable.labels")
+    lbl.len <- length(mylabels)
+    if (x.name %in% names(mylabels)) { #cat("IS IN\n")
+      lbl.index <- which(names(mylabels) == x.name)
+      indx <- lbl.index
+    }
+    else
+      indx <- length(mylabels) + 1
+    mylabels[indx] <- value
+    names(mylabels)[indx] <- x.name
+    cat("\n")
+    cat("Variable Name:",  names(mylabels)[indx], "\n")
+    cat("Variable Label:", mylabels[indx], "\n")
+    cat("\n")
+    attr(data, which="variable.labels") <- mylabels
+    return(data) 
+  }
   
 }

@@ -11,7 +11,7 @@ Abbreviation: \code{rd},  \code{rd.brief}, \code{Read2}
 
 Reads the contents of the specified data file with optional variable labels into an R data table (frame). By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, or R data file from \code{.rda}, and, if Perl is installed, Excel file from \code{.xls} or \code{.xlsx} using the \code{gdata} package.  If no filetype is recognized then Read defaults to reading a comma separated or tab-limited text data file.  Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL.
 
-Variable labels can be added to the data table when reading a text file. Any variable labels in a native SPSS of native R file are automatically included. See the \code{details} section below for more information.
+Variable labels can be added to the data table when reading a text file. Any variable labels in a native SPSS of native R file are automatically included. See the \code{details} section below for more information. Variable labels can also be added and modified individually with the \code{lessR} function \code{\link{label}}.
 
 The function also provides feedback regarding the data that is read, which includes the variable names, the dimensions of the resulting data frame, the data type for each variable, and the values of the variables in the data file for the first and last rows of the data. In addition, an analysis of missing data is provided, listing the number of missing values for each variable and for each observation. The brief form just lists the input files, the variable name table, and any variable labels.
 
@@ -89,7 +89,7 @@ Call \code{help(read.table)} to view the other options that can also be implemen
 MECHANICS\cr
 Specify the file as with the \code{\link{Read}} function for reading the data into a data frame.  If no arguments are passed to the function, then interactively browse for the file.  Or, enclose within quotes a full path name or a URL for reading the labels on the web.
 
-Given a csv data file, or tab-delimted text file, read the data into an R data frame called \code{mydata} with \code{Read}. Because \code{Read} calls the standard R function \code{read.csv}, which serves as a wrapper for \code{read.table}, the usual options that work with \code{read.table}, such as \code{row.names}, also can be passed through the call to \code{Read}. 
+Given a csv data file, or tab-delimited text file, read the data into an R data frame called \code{mydata} with \code{Read}. Because \code{Read} calls the standard R function \code{read.csv}, which serves as a wrapper for \code{read.table}, the usual options that work with \code{read.table}, such as \code{row.names}, also can be passed through the call to \code{Read}. 
 
 SPSS DATA\cr
 Relies upon \code{read.spss} from the \code{foreign} package. To read data in the SPSS \code{.sav} format.  If the file has a file type of \code{.sav}, that is, the file specification ends in \code{.sav}, then the \code{format} is automatically set to \code{"SPSS"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="SPSS"}. Any variable labels in the SPSS file are read and stored in the resulting \code{R} data table (frame).
@@ -113,7 +113,7 @@ lessR DATA\cr
 \code{lessR} has some data sets included with the package.  \code{Read} reads each such data set by specifying its name and setting \code{format="lessR"}. Also, each included data set begins with the prefix \code{dat}, which can be deleted when specifying the name of the data set. This option is a replacement for the standard R \code{data} function, offering the added information provided by \code{\link{Read}}.
 
 FIXED WIDTH FORMATTED DATA\cr
-Relies upon \code{read.fwf}. Applies to data files in which the width of the column of data values of a variable is the same for each data value and there is no delimitter to separate adjacent data values.  An example is a data file of Likert scale responses from 1 to 5 on a 50 item survey such that the data consist of 50 columns with no spaces or other delimiter to separate adjacent data values. To read this data set, invoke the \code{widths} option of \code{read.fwf}.  
+Relies upon \code{read.fwf}. Applies to data files in which the width of the column of data values of a variable is the same for each data value and there is no delimiter to separate adjacent data values.  An example is a data file of Likert scale responses from 1 to 5 on a 50 item survey such that the data consist of 50 columns with no spaces or other delimiter to separate adjacent data values. To read this data set, invoke the \code{widths} option of \code{read.fwf}.  
 
 MISSING DATA\cr
 By default, \code{Read} provides a list of each variable and each row with the display of the number of associated missing values, indicated by the standard R missing value code NA. When reading the data, \code{Read} automatically sets any empty values as missing.  Note that this is different from the R default in \code{read.table} in which an empty value for character string variables are treated as a regular data value. Any other valid value for any data type can be set to missing as well with the \code{missing} option. To mimic the standard R default for missing character values, set \code{missing=NA}. 
@@ -152,17 +152,25 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 \seealso{
 \code{read.csv},\code{read.spss},
 \code{read.fwf}, \code{\link{corRead}},
-\code{\link{details}}.
+\code{\link{label}}, \code{\link{details}}.
 }
 
 \examples{
 # remove the # sign before each of the following Read statements to run
 
-# to browse for a csv data file on the computer system, invoke Read with 
+# to browse for a data file on the computer system, invoke Read with 
 #   the ref argument empty
 # mydata <- Read()
 # abbreviated name
 # mydata <- rd()
+# reduced output to the console
+# mydata <- rd.brief()
+
+# browse for a file and then read the variable labels from
+#  the specified label file, here a Excel file with two columns,
+#  the first column of variable names and the second column the 
+#  corresponding labels
+# mydata <- Read(labels="employee_lbl.xlsx")
 
 # same as above, but include standard read.csv options to indicate 
 #  no variable names in first row of the csv data file 

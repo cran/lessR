@@ -42,7 +42,10 @@ function(x, by=NULL,
     if (length(y.lbl) == 0) l.lab <- y.name else l.lab <- y.lbl
 
   # title
-  if (!is.null(main)) main.lbl <- main else main.lbl <- ""
+  if (!is.null(main))
+    main.lbl <- main
+  else
+    main.lbl <- ""
 
   # entered counts typically integers as entered but stored as type double
   # if names(x) or rownames(x) is null, likely data from sample and c functions
@@ -83,13 +86,16 @@ function(x, by=NULL,
   # ----------------------------------------------------------------------------
   # colors
 
-  # get number of colors
-  if (is.null(by) && !order.x && !is.matrix(x)) ncolors <- 1 else ncolors <- nrow(x)
-  if (!is.null(by) && order.y) ncolors <- nrow(x)
+  # get number of colors (does not indicate col.fill multiple colors)
+  if (is.null(by) && !order.x && !is.matrix(x))
+    n.colors <- 1
+  else
+    n.colors <- nrow(x)
+  if (!is.null(by) && order.y) n.colors <- nrow(x)
 
   if ( (colors == "rainbow"  ||  colors=="terrain"  || colors=="heat") ) {
+    n.colors <- nrow(x)
     nogo <- FALSE
-    if (ncolors == 1) nogo <- TRUE
     if (is.ordered(x) && is.null(by)) nogo <- TRUE
     if (is.ordered(by)) nogo <- TRUE
     if (nogo) {
@@ -147,7 +153,7 @@ function(x, by=NULL,
       if (is.null(col.hi)) col.hi <- "purple4"
     }
     color.palette <- colorRampPalette(c(col.low, col.hi))
-    clr <- color.palette(ncolors)
+    clr <- color.palette(n.colors)
   }
 
   else if (colors == "gray") {
@@ -162,14 +168,16 @@ function(x, by=NULL,
           || colors=="white" 
           || colors=="orange.black" || colors=="gray.black")
           && (is.null(by) && !is.matrix(x))) {
-    color.palette <- colorRampPalette(getOption("col.fill.bar"))
-    clr <- color.palette(nrow(x))
-    col.grid <- getOption("col.grid")
-    col.bg <- getOption("col.bg")
-  }
-    else if (colors == "rainbow") clr <- rainbow(ncolors)
-    else if (colors == "terrain") clr <- terrain.colors(ncolors)
-    else if (colors == "heat") clr <- heat.colors(ncolors)
+      if (n.colors > 1) {
+        color.palette <- colorRampPalette(getOption("col.fill.bar"))
+        clr <- color.palette(nrow(x))
+      }
+      col.grid <- getOption("col.grid")
+      col.bg <- getOption("col.bg")
+    }
+    else if (colors == "rainbow") clr <- rainbow(n.colors)
+    else if (colors == "terrain") clr <- terrain.colors(n.colors)
+    else if (colors == "heat") clr <- heat.colors(n.colors)
     else  {  # mono color range does not make sense here 
       clr <- c("slategray", "peachpuff2", "darksalmon", "darkseagreen1", 
               "lightgoldenrod3", "mistyrose", "azure3", "thistle4")
@@ -183,11 +191,22 @@ function(x, by=NULL,
     if (random.col) clr <- clr[sample(length(clr))]
 
   if (!is.null(col.fill)) {
-    for (i in 1:(min(length(col.fill),length(clr)))) clr[i] <- col.fill[i]
-    ncolors <- min(length(col.fill),length(clr))
+    if (n.colors > 1) {
+      for (i in 1:(min(length(col.fill),length(clr)))) clr[i] <- col.fill[i]
+      n.colors <- min(length(col.fill),length(clr))
+    }
+    else {
+      col <- col.fill
+    }
   }
-  palette(clr)
-  col <- 1:ncolors 
+
+  if (n.colors > 1) {
+    palette(clr)
+    col <- 1:n.colors 
+  }
+  else {
+    if (is.null(col.fill)) col <- getOption("col.fill.bar")  
+  }
 
 
   # ----------------------------------------------------------------------------
@@ -413,11 +432,11 @@ function(x, by=NULL,
   # ----------------------------------------------------------------------------
   # text output
   if (prop) x  <- x.temp
-  if (!quiet) { 
 
-    if (is.null(by)) {
-      .ss.factor(x)
+  if (is.null(by)) {
+    stats <- .ss.factor(x)
 
+    if (!quiet) { 
       ch <- suppressWarnings(chisq.test(x))
       pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
       cat("\nChi-squared test of null hypothesis of equal probabilities\n")
@@ -427,10 +446,12 @@ function(x, by=NULL,
         cat(">>> Low cell expected frequencies,",
             "so chi-squared approximation may not be accurate", "\n")
     }
+  }
 
-    else {
-      .ss.factor(x, by, brief=TRUE) 
+  else {
+    stats <- .ss.factor(x, by, brief=TRUE) 
 
+    if (!quiet) { 
       cat("\n"); .dash(19); cat("Chi-square Analysis\n"); .dash(19); 
       ch <- (summary(as.table(x)))
       pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
@@ -445,9 +466,9 @@ function(x, by=NULL,
     }
   }
 
-  if (!quiet) cat("\n")
+  cat("\n")
 
-  return(x)
+  return(stats)
 
 }
 

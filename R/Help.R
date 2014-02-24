@@ -2,12 +2,11 @@ Help <-
 function(topic=NULL) {
 
 
-  help.more <-
-    function(fname, yline) {
-      h1 <- "Complete list of Help topics, enter:  Help()"
-        h2 <- paste("For more help on a function, enter ? in front of its name:  ?", fname, sep="")
+help.more <- function(fname, yline) {
+  h1 <- "Complete list of Help topics, enter:  Help()"
+  h2 <- paste("For more help on a function, enter ? in front of its name:  ?", fname, sep="")
 
-        if (getOption("colors") != "gray") 
+  if (getOption("colors") != "gray") 
     col.sep <- "lightsteelblue"
   else
     col.sep <- "gray50"
@@ -139,7 +138,7 @@ for the corresponding variable.
 MS Excel or other worksheet application can save data to a csv file. All 
 numeric data should be displayed in the General format, so that the only
 non-digit character for each numeric data value is a decimal point. The
-The General format removes all dollar signs and commas, for example,
+General format removes all dollar signs and commas, for example,
 leaving only the pure number, stripped of any extra characters, which R 
 will not properly read by default as a numeric data value.
 
@@ -153,9 +152,9 @@ the csv data file into R, [see Help(Read)].
 Another type of text data file is a fixed width format where each column
 of data values is assigned a specific width. Usually there are no spaces
 between the data values. R can write a data file [see Help(Write)], what
-is called an native R data file with a default file type of .rda. Data
-files written by the SPSS system have the default file type of .sav. By
- default both of these files can be read into R as well."
+is called an native R data file with a default file type of .rda. Data files
+written by the SPSS system have the default file type of .sav. By default
+both of these files can be read into R, as well as Excel files directly."
 
 set.up.plot()
 text(50,100, label=t0, font=4)
@@ -175,27 +174,27 @@ t1 <-
 file system and read the information into the specified data table (frame). Use
 the function Read, or its abbreviations, rd or rd.brief. To browse, use ().
     > mydata <- Read()
-The  <-  is called the assignment operator, which instructs R to take what was
-read and assign it to the data table called mydata. This is the default name
+The  <-, the assignment operator, instructs R to assign what was read to the
+data table (or data frame), here specified as mydata. This is the default name
 that all the lessR data analysis functions assume when reading data for analysis.
+
+Or, specify the file to be read with the name in quotes. Here a file on the web.
+    > mydata <- Read(\"http://lessrstats.com/data/twogroup.csv\")
+To read a text file with a , for a decimal point, use Read2().
 
 To read Excel files requires something called Perl, which is usually on Mac and
 Linux systems, but Windows users need to install. Enter ?Read for directions.
 
-Or, specify the file to be read with the name in quotes. The file can be a path
-name to a data file available on the local computer system, or a file on the web.
-    > mydata <- Read(\"http://web.pdx.edu/~gerbing/data/twogroup.csv\")
+Read variable labels with the labels option to specify the file of labels.
 
 To see how to create a comma separated values or csv data file: > Help(data)
 To see how to use R to create an R data file, enter: > Help(Write)
 
-To read a text file where each column of data values is assigned a specific
+To read a text file with each column of data values assigned a specific
 width, add the widths option that specifies the width of each column
 according to the order of the variables.  Enclose the list with the c
 function for combine, here to read 3 variables with widths of 4, 1 and 2.
     > mydata <- Read(widths=c(4,1,2), col.names=c(\"ID\", \"Gender\", \"Age\"))
-
-To read a text file with a , for a decimal, add the options: sep=\";\", dec=\",\"
 "
 
 set.up.plot(1)
@@ -345,9 +344,9 @@ t1 <-
 as some of the more commonly used general R settings. One option is to set
 the color theme for the graphics functions. Aspects of these plots can be
 customized individually, but the color theme provides a theme of related colors 
-for a graph.  The default color theme is colors=\"blue\", with other possibilities of
-\"gray\", \"green\", \"gold\", \"rose\", \"red\", \"dodgerblue\", \"purple\", \"sienna\",
-\"orange.black\" and \"gray.black\". Here all subsequent graphics are in gray scale.
+for a graph.  The default color theme is colors=\"dodgerblue\", with possibilities of
+\"gray\", \"green\", \"gold\", \"rose\", \"red\", \"dodgerblue\", \"purple\", \"sienna\", \"white\",
+\"orange.black\" and \"gray.black\". Here set subsequent graphics to gray scale.
     > set(colors=\"gray\") 
 The transparency level of bars and plotted points is set with the trans.fill.bar and 
 trans.fill.pt options. Set ghost=\"TRUE\" to get transparent bars against a black
@@ -358,8 +357,8 @@ as 0 for Male and 1 for Female. R is obliged to interpret numerical variables
 as numeric.  One option is to redefine these variables as factors [see Help(edit)].
 Another option is the value of the lessR option n.cat.
     > set(n.cat=3)
-Here any variable with just 3 unique values or less is interpreted as a categorical
-variable.  The default value of n.cat is 0, that is, turned off.
+Here any numerical variable with just 3 unique values or less is interpreted as
+a categorical variable.  The default value of n.cat is 0, that is, turned off.
 
 To see all available standard R options, enter the following.
     > options()
@@ -383,30 +382,31 @@ t0 <- "Histogram, etc."
 f1 <- bquote(paste(bold("Histogram, hs"), "  Histogram."))
 f2 <- bquote(paste(bold("Density, dn"), "  Density curve over histogram."))
 f3 <- bquote(paste(bold("BoxPlot, bx"), "  Box plot."))
-f4 <- bquote(paste(bold("DotPlot, dp"), "  Dot plot."))
+f4 <- bquote(paste(bold("ScatterPlot, sp"), "  Scatter plot of 1 variable."))
 
 t1 <-
-"These functions graph a distribution of data values for a continuous variable
+"These functions plot a distribution of data values for a continuous variable
 such as Time. Replace Y in these examples with the actual variable name.
 
-A histogram, or hs, based on the current color theme, such as the default \"blue\".
+A histogram, or hs, based on the current color theme.
     > Histogram(Y)
 
 Specify the gray scale color theme, a title, and a label for the x axis.
     > set(colors=\"gray\")
     > Histogram(Y, main=\"My Title\", xlab=\"Y (mm)\")
 
-Specify bins, starting at 60 with a bin width of 10.
+Specify bins, starting at 60 with a bin width of 10. Can also specify bin.end.
     > Histogram(Y, bin.start=60, bin.width=10)
 
-Density curve superimposed on the underlying histogram, abbreviated dn.
-    > Density(Y)
+Density curve superimposed on the underlying histogram, abbreviated dn, a
+BoxPlot or bx, and a one variable ScatterPlot, or sp.
+    > Density(Y)   or   > BoxPlot(Y)   or   > ScatterPlot(Y)
 
-Box plot, abbreviated bx.
-    > BoxPlot(Y)
-
-Dot plot, a scatterplot of one variable, abbreviated dp.
-    > DotPlot(Y)
+These functions, except sp, can also replace the variable name such as Y 
+with a list of multiple variables, such as c(Salary, Years) or Salary:Years, or
+an entire data frame. The default data frame is mydata. Here do a histogram
+of all numerical variables in the mydata data frame.
+    > Histogram()
 "
 
 set.up.plot(4)
@@ -418,7 +418,7 @@ text(0,82, label=f4, adj=0)
 #lines(c(5,90), c(78,78), col=col.line)
 text(0,43, label=t1, adj=0)
 
-help.more("Histogram",9)
+help.more("Histogram",8)
 }
 
 
@@ -430,8 +430,8 @@ f2 <- bquote(paste(bold("PieChart, pc"), "  Pie chart of the values of a categor
 f3 <- bquote(paste(bold("pareto.chart"), "  Produce a Pareto chart."))
 
 t1 <-
-"The generic variable in the examples below is generally a categorical variable Y, 
-called a factor. Replace with the actual name of the variable in a specific analysis. 
+"The generic variable in the examples below is usually a categorical variable Y. 
+Replace with the actual name of the variable in a specific analysis. 
 
 Default bar chart with lessR function BarChart, or bc, as well as the frequency
 table, for one or two variables.
@@ -448,6 +448,11 @@ so the name of the variable must be preceded by the data frame name and a $.
     > library(gcc)
     > Ycount <- table(mydata$Y)
     > pareto.chart(Ycount)
+
+Can replace the variable name such as Y with a list of multiple variables, such
+as c(Salary, Years) or Salary:Years, or an entire data frame. The default data
+frame is mydata. Here do a bar chart of all non-numeric variables in mydata.
+    > BarChart()
 "
 
 set.up.plot(3)
@@ -456,9 +461,9 @@ text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 text(0,86, label=f3, adj=0)
 #lines(c(5,90), c(81,81), col=col.line)
-text(0,50, label=t1, adj=0)
+text(0,44, label=t1, adj=0)
 
-help.more("BarChart", 20)
+help.more("BarChart", 8)
 }
 
 
@@ -488,15 +493,20 @@ from a specific call to LineChart or system wide for all graphics output with th
 function set. In this example, all subsequent graphics output is in gray scale.
     > set(colors=\"gray\")
     > LineChart(Y)
+
+Can replace the variable name such as Y with a list of multiple variables, such
+as c(Salary, Years) or Salary:Years, or an entire data frame. The default data
+frame is mydata. Here do a line chart of all numerical variables in mydata.
+    > LineChart()
 "
 
 set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 #lines(c(5,90), c(90,90), col=col.line)
-text(0,53, label=t1, adj=0)
+text(0,48, label=t1, adj=0)
 
-help.more("LineChart", 19)
+help.more("LineChart", 9)
 }
 
 
@@ -520,9 +530,11 @@ variable named Y.
     > ScatterPlot(Y)
 Can also generate the same plot with the function name of DotPlot or dp.
 
-ScatterPlot can also provide a for plotting two variables with different
+ScatterPlot can also provide for plotting two variables with different
 symbols and/or colors for each level of a third variable.
     > ScatterPlot(X, Y, by=Z)
+If the number of response values is less than 10, a bubble plot is produced
+to better display multiple replications of the same point.
 
 Color themes are available with the colors option, from a call to ScatterPlot
 or system wide for all graphics output with the function set. In this example,
@@ -534,9 +546,9 @@ set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 #lines(c(5,90), c(90,90), col=col.line)
-text(0,53, label=t1, adj=0)
+text(0,50, label=t1, adj=0)
 
-help.more("Plot", 12)
+help.more("Plot", 9)
 }
 
 
@@ -590,7 +602,7 @@ of a value of a categorical variable. These tests provide a hypothesis test
 and a confidence interval.
 
 This example uses the lessR function ttest, or tt, to evaluate a variable named
-Y and a null hypothesis of mu=100.
+Y and a null hypothesis of mu=100. Specify the brief version with tt.brief.
     > ttest(Y, mu0=100)
 
 This example uses ttest to do the analysis from the sample statistics.
@@ -637,16 +649,14 @@ R refers to this expression as a formula, read as: Y is described by X.
 Can also specify with the more general function model.
     > Model(Y ~ X)
 
-To do a separate analysis of Y for each group, specify  separate=TRUE  in
-the call to ttest to create the vectors group1 and group2.
-    > Histogram(group1)
-
 Sometimes the data for a t-test are arranged so that the responses for 
 each group, Y, already are in separate columns called vectors. Here calculate 
 the t-test directly from two vectors called Y1 and Y2.
     > ttest(Y1, Y2)
+Add the paired=TRUE option to specify a dependent groups analysis.
 
-Or, directly from summary statistics.
+Or, directly from summary statistics, the sample size (n), sample mean (m)
+and sample standard deviation (s). Ynm is the name of the response variable.
     > ttest(n=34, m=8.92, s=1.67, Ynm=\"Time\")"
 
 set.up.plot(2)
@@ -654,9 +664,9 @@ text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 #lines(c(5,90), c(86,86), col=col.line)
-text(0,47, label=t1, adj=0)
+text(0,50, label=t1, adj=0)
 
-help.more("ttest", 8)
+help.more("ttest", 14)
 }
 
 else if (topic %in% c("anova", "av")) {
@@ -759,8 +769,9 @@ The brief form for the correlation analysis for two variables also exists.
 
 Or, analyze many correlations at once, such as for Y, X1, X2 and X3 in 
 the data frame called mydata.
-    > mynew <- subset(mydata, select=c(Y,X1:X3))
-    > Correlation(mynew)
+    > Correlation(c(Y,X1:X3))
+
+Set the method option to \"spearman\" or \"kendall\" to get these correlations.
 "
 
 set.up.plot(2)
@@ -768,9 +779,9 @@ text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 text(0,90, label=f3, adj=0)
 #lines(c(5,90), c(83,83), col=col.line)
-text(0,48, label=t1, adj=0)
+text(0,44, label=t1, adj=0)
 
-help.more("Correlation", 12)
+help.more("Correlation", 8)
 }
 
 

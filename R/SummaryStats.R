@@ -8,10 +8,14 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   is.df <- FALSE  # is data frame
 
+
+# -----------------------------------------------------------------
+# determine if x is multiple variables, a data frame or a vars list
+
   if (missing(x)) {
     x.name <- ""  # in case x is missing, i.e., data frame mydata
     is.df <- TRUE
-    data <- eval(substitute(mydata))
+    if (missing(data)) data <- eval(substitute(mydata))
   }
 
   else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {  # not a var list
@@ -30,6 +34,9 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     is.df <- TRUE
   }
 
+
+# -----------------------------------------------------
+# do the analysis for a single variable or a data frame 
 
   if (!is.df) {
 
@@ -121,8 +128,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
         "that can be converted to numerical 0 and 1.\n")
   }
 
+  cat("\n")
   if (!is.df) invisible(stats)
-
 }
 
 

@@ -1,92 +1,103 @@
 BoxPlot <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
-        col.fill=getOption("col.fill.bar"),
-        col.stroke=getOption("col.stroke.bar"), 
-        col.bg=getOption("col.bg"),
-        col.grid=getOption("col.grid"),
+    col.fill=getOption("col.fill.bar"),
+    col.stroke=getOption("col.stroke.bar"), 
+    col.bg=getOption("col.bg"),
+    col.grid=getOption("col.grid"),
 
-        cex.axis=.85, col.axis="gray30", col.ticks="gray30",
-        xlab=NULL, main=NULL, digits.d=NULL,
+    cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+    xlab=NULL, main=NULL, digits.d=NULL,
 
-        horiz=TRUE, add.points=FALSE,
+    horiz=TRUE, add.points=FALSE,
 
-        quiet=getOption("quiet"),
-        pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {
+    quiet=getOption("quiet"),
+    pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {
 
 
   if (getOption("colors") == "gray") col.stroke <- "black"
   if (getOption("colors") == "gray.black") col.stroke <- getOption("col.stroke.pt")
 
+  # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x))
   options(xname = x.name)
 
-  is.df <- FALSE  # is data frame
+  df.name <- deparse(substitute(data))
+  options(dname = df.name)
 
-  if (missing(x)) {
-    x.name <- ""  # in case x is missing, i.e., data frame mydata
-    is.df <- TRUE
-    data <- eval(substitute(mydata))
-  }
+  pdf.nm <- FALSE
+  if (!missing(pdf.file)) pdf.nm <- TRUE
 
-  else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {  # not a var list
-    if (exists(x.name, where=1)) if (is.data.frame(x)) {
+# -----------------------------------------------------------
+# establish if a data frame, if not then identify variable(s)
+
+  if (!missing(x)) {
+    if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
+      .nodf(df.name)  # check to see if data frame container exists 
+      .xcheck(x.name, df.name, data)  # see if var in df, vars lists not checked
+      vars.list <- as.list(seq_along(data))
+      names(vars.list) <- names(data)
+      x.col <- eval(substitute(x), envir=vars.list)  # col num of each var
+      if (class(data) != "list") {
+        data <- data[, x.col]
+        if (length(x.col) == 1) {
+          data <- data.frame(data)  # x is 1 var
+          names(data) <- x.name
+         }
+      }
+      else {
+        data <- data.frame(data[[x.col]])
+        names(data) <- x.name
+      }
+    }
+    else { # x is in the global environment (vector or data frame)
+      if (is.data.frame(x))  # x a data frame
         data <- x
-        is.df <- TRUE
+      else {  # x a vector in global
+        data <- data.frame(x)  # x is 1 var
+        names(data) <- x.name
+      }
     }
   }
 
-  # proceed here only if x.name is a var list
-  else if (grepl(":", x.name) || grepl(",", x.name) ) {
-    all.vars <- as.list(seq_along(data))
-    names(all.vars) <- names(data)
-    x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
-    data <- data[, x.col]  # create subset data frame
-    is.df <- TRUE
-  }
 
+# ---------------
+# do the analysis
 
-  if (!is.df) {
+  go.pdf <- FALSE
+  if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
 
-    dname <- deparse(substitute(data))
-    options(dname = dname)
+  for (i in 1:ncol(data)) {
+    cat("\n")
 
-    # get conditions and check for data existing
-    xs <- .xstatus(x.name, dname, quiet)
-    in.global <- xs$ig 
+    nu <- length(unique(na.omit(data[,i])))
 
-    # see if the variable exists in data frame, if x not in Global Env 
-    if (!in.global) .xcheck(x.name, dname, data)
+    x.name <- names(data)[i]
+    options(xname = x.name)
 
-    if (!in.global) x.call <- eval(substitute(data$x))
-    else {  # vars that are function names get assigned to global
-      x.call <- x
-      if (is.function(x.call)) x.call <- eval(substitute(data$x))
-    }
+    if (is.numeric(data[,i])) {
+      if (nu > n.cat) {
 
-  }  # x not data frame
+      pdf.fnm <- .pdfname("BoxChart", x.name, go.pdf, pdf.nm, pdf.file)
+     .opendev(pdf.fnm, pdf.width, pdf.height)
 
-
-  if (is.df) bx.data.frame(data, n.cat,
-         col.fill, col.stroke, col.bg, col.grid,
-         cex.axis, col.axis, col.ticks,
-         horiz, add.points, xlab, main, digits.d, quiet,
-         pdf.width, pdf.height, ...) 
-
-  else {
-    .opendev(pdf.file, pdf.width, pdf.height)
-
-    b <- .bx.main(x.call, col.fill, col.stroke, col.bg, col.grid,
+      bv <- .bx.main(data[,i], col.fill, col.stroke, col.bg, col.grid,
          cex.axis, col.axis, col.ticks,
          horiz, add.points, xlab, main, digits.d, quiet, ...)
 
-    if (!is.null(pdf.file)) {
-      dev.off()
-      .showfile(pdf.file, "boxplot")
-    }
- 
-  invisible(b)
-  }
+      if (go.pdf) {
+        dev.off()
+        if (!quiet) .showfile(pdf.fnm, "Box Plot")
+      }
+
+    }  # nu > n.cat
+    else
+      .ncat("Box Plot", x.name, nu, n.cat)
+
+    }  # is.numeric(data[,i])
+  }  # for
+
+  if (ncol(data)==1  && nu>n.cat) invisible(bv)
 
 }
 
