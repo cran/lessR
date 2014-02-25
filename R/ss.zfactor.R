@@ -27,35 +27,49 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
       { .dash(30); cat("Joint and Marginal Frequencies\n"); .dash(30) }
     print(addmargins(x))
     if (!brief) { 
+      nan.flag <- FALSE
 
-    cat("\n\n"); .dash(30); cat("Cell Proportions and Marginals\n"); .dash(30); 
+      cat("\n\n"); .dash(30); cat("Cell Proportions and Marginals\n"); .dash(30); 
       print(round(addmargins(prop.table(x)),3))
       cat("\n"); .dash(30); cat("Proportions within Each Column\n"); .dash(30);
       x.col <- prop.table(x, margin=2)
       Sum <- numeric(ncol(x.col))
-      for (i in 1:ncol(x.col)) Sum[i] <- sum(x.col[,i])
+      for (i in 1:ncol(x.col)) {
+        Sum[i] <- sum(x.col[,i])
+        if (is.nan(Sum[i])) nan.flag <- TRUE
+      }
       x.col2 <- round(rbind(x.col,Sum),3)
       names(dimnames(x.col2)) <- names(dimnames(x.col))
       print(x.col2)
-    cat("\n"); .dash(27); cat("Proportions within Each Row\n"); .dash(27); 
+
+      cat("\n"); .dash(27); cat("Proportions within Each Row\n"); .dash(27); 
       x.row <- prop.table(x, margin=1)
       Sum <- numeric(nrow(x.row))
-      for (i in 1:nrow(x.row)) Sum[i] <- sum(x.row[i,])
+      for (i in 1:nrow(x.row)) {
+        Sum[i] <- sum(x.row[i,])
+        if (is.nan(Sum[i])) nan.flag <- TRUE
+      }
       x.row2 <- round(cbind(x.row,Sum),3)
       names(dimnames(x.row2)) <- names(dimnames(x.row))
       print(x.row2)
+
+      if (nan.flag)
+        cat("\nNote: NaN results from all values missing for that cell or margin.\n",
+                 "     so any division to compute a proportion is undefined.\n")
     }
   }
+
   else {  # one variable
     proceed <- TRUE
-    if ( length(x) > 10  &&  length(names(x)) < sum(x) ) {
-      proceed <- FALSE
-      print(x)
-    }
+
+    #if (length(x) > 20) {
+      #proceed <- FALSE
+      #print(x)
+    #}
     if (length(names(x)) == sum(x)) {
       proceed <- FALSE
-      cat("\nAll values are unique.  Probably a row ID instead of a variable.\n",
-          "Perhaps use  row.names  option when reading. See help(read.table).\n\n", sep="")
+      cat("\nAll values are unique.  Perhaps a row ID instead of a variable.\n",
+          "If so, use  row.names  option when reading. See help(read.table).\n\n", sep="")
       if (sum(x) < 100) print(names(x))
       else cat("\nOnly the first 100 values listed.  To see all, use\n",
                "the  values  function.\n\n")
@@ -78,17 +92,14 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
       cat(.fmti(sum(x), w=w+6))
       cat("\n")
       cat("Proportions: ")
-      xp <- numeric(length=0)
       sum.x <- sum(x)
+      xp <- numeric(length=0)
       xp <- x/sum.x
-      for (i in 1:length(x)) cat(.fmt(x[i]/sum(x), 3, max.ln[i]))
+      for (i in 1:length(x)) cat(.fmt(xp[i], 3, max.ln[i]))
       cat(.fmtc("1.000", w=w+6))
       cat("\n")
+      return(list(freq=x, prop=xp))  # back to SummaryStats
     }
-  }
-
-  if (is.null(by) && !is.matrix(x)) return(list(freq=x, prop=xp))
-
-  cat("\n")
+  }  # one variable
 
 }

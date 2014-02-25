@@ -6,6 +6,11 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax"),
 
   if (is.na(min.loading)) min.loading <- -9999
 
+  if (missing(n.factors)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "The number of factors must be specified with:  n.factors\n\n")
+  }
+
   cor.name <- deparse(substitute(x))
   if (!exists(cor.name, where=.GlobalEnv)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -13,6 +18,8 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax"),
       "Either enter the correct name, or calculate with: Correlation\n",
       "Or read the correlation matrix with: corRead\n\n")
   }
+
+  n.items <- nrow(x)
 
   # EFA
   fa2 <- factanal(covmat=x, factors=n.factors, rotation="none", ...)
@@ -26,6 +33,7 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax"),
     cat("\nLoadings between -", min.loading, " and ", min.loading, 
         " are not listed\n", sep="")
     print(fa2, cutoff=min.loading, ...)
+    ld <- fa2$loadings
   }
 
   if (n.factors > 1) {
@@ -45,10 +53,9 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax"),
   }
 
 
-  # identify for each item its factor with highest loading
-  n.items <- nrow(x)
+  # generate the MIMM code
 
-  FacItems <- integer(length=n.items)
+  FacItems <- integer(length=n.items)  # factor with highest loading for item
   for (i in 1:n.items) {
     max.ld <- 0
     FacItems[i] <- 0
@@ -60,23 +67,22 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax"),
     }
   }
 
-  # present the MIMM
   cat("\n\n")
   .dash(36)
   cat("Multiple Indicator Measurement Model\n")
   .dash(36)
   cat("\n")
 
-  cat("The following MIMM and associated scales are suggested\n", 
-      "by the exploratory factor analysis. Each MIMM factor is\n",
-      "defined by the items that have the highest loading on\n",
-      "the corresponding exploratory factor.\n\n", sep="")
-  cat("Copy and paste the following lessR instructions to analyze\n",
-      "the model with a confirmatory factor analysis.\n\n", sep="")
+  cat("Each MIMM factor is defined by the items that have the\n",
+      "highest loading on the corresponding exploratory factor.\n\n", sep="")
 
-  cat("corCFA(\n")
   Fac <- integer(length=n.factors)
   n.Fact <- integer(length=n.factors)
+
+  cat("lessR code for iterated centroid confirmatory factor analysis\n")
+  .dash(10)
+
+  cat("corCFA(\n")
   for (i.fact in 1:n.factors) {
     n.Fact[i.fact] <- 0
     k <- 0
@@ -85,7 +91,7 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax"),
       Fac[k] <- j.item
       n.Fact[i.fact] <- n.Fact[i.fact] + 1
     }
-    cat(paste("  F", as.character(i.fact), "=c(", sep=""))
+    cat(paste("  F", as.character(i.fact), " = c(", sep=""))
     if (n.Fact[i.fact] > 0) {
       for (i in 1:n.Fact[i.fact]) {
         cat(colnames(x)[Fac[i]], sep="")
@@ -96,8 +102,36 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax"),
     if (i.fact < n.factors) cat(",")
     cat("\n")
   }
-
   cat(")\n\n")
+
+  cat("lavaan code for maximum likelihood confirmatory factor analysis\n")
+  .dash(11)
+
+  cat("library(lavaan)\n")
+  cat("MeasModel <-\n")
+  for (i.fact in 1:n.factors) {
+    n.Fact[i.fact] <- 0
+    k <- 0
+    if (i.fact == 1) cat("\"") else cat(" ")
+    for (j.item in 1:n.items) if (FacItems[j.item] == i.fact) {
+      k <- k + 1
+      Fac[k] <- j.item
+      n.Fact[i.fact] <- n.Fact[i.fact] + 1
+    }
+    cat(paste("  F", as.character(i.fact), " =~ ", sep=""))
+    if (n.Fact[i.fact] > 0) {
+      for (i in 1:n.Fact[i.fact]) {
+        cat(colnames(x)[Fac[i]], sep="")
+        if (i < n.Fact[i.fact]) cat(" + ")
+      }
+    }
+    if (i.fact == n.factors) cat(" \"")
+    cat("\n")
+  }
+  cat("fit <- cfa(MeasModel, data=mydata)\n")
+  cat("summary(fit, fit.measures=TRUE, standardized=TRUE)\n")
+
+  # report any deleted items
   deleted <- integer(length=n.items)
   del.count <- 0
   for (i.item in 1:n.items) if (FacItems[i.item] == 0) {
@@ -105,12 +139,16 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax"),
     deleted[del.count] <- i.item
   }
   if (del.count > 0) {
-    cat("Any item with the absolute value of its highest loading from\n",
-        "the exploratory factor analysis less than min.loading = ", 
-        min.loading, "\n", "is deleted.\n\n", sep="")
+    cat("\n\n")
+    cat("Deleted items\n")
+    .dash(13)
+    cat("Deletion threshold: min.loading = ", 
+        min.loading, "\n\n", sep="")
     cat("Deleted items: ")
     for (i.item in 1:del.count) cat(colnames(x)[deleted[i.item]], " ", sep="")
-    cat("\n")
+    cat("\n\n")
   }
+  else
+    cat("\n")
 
 }

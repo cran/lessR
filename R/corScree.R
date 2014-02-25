@@ -4,6 +4,7 @@ function (x=mycor,
 
 
   cor.name <- deparse(substitute(x))
+
   if (!exists(cor.name, where=.GlobalEnv)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "No correlation matrix entered.\n\n",
@@ -12,7 +13,7 @@ function (x=mycor,
   }
   
   # extract eigenvectors
-  eig <- eigen(mycor, symmetric=TRUE, only.values=TRUE)
+  eig <- eigen(x, symmetric=TRUE, only.values=TRUE)
   ev <- eig$values
 
   # set up graphics system for 2 windows
@@ -25,9 +26,15 @@ function (x=mycor,
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
   }
 
+  if (getOption("colors") == "gray" || getOption("colors") == "gray.black")
+    col.ln <- getOption("col.fill.bar")
+  else
+    col.ln <- getOption("col.stroke.bar")
+
+
   # scree plot
   .lc.main(ev, type=NULL, 
-         col.line=getOption("col.stroke.bar"),
+         col.line=col.ln,
          col.area=NULL, col.box="black",
          col.stroke=getOption("col.stroke.pt"),
          col.fill=getOption("col.fill.pt"),
@@ -57,7 +64,7 @@ function (x=mycor,
   ev.diff <- -diff(ev)
 
   .lc.main(ev.diff, type=NULL, 
-         col.line=getOption("col.stroke.bar"),
+         col.line=col.ln,
          col.area=NULL, col.box="black",
          col.stroke=getOption("col.stroke.pt"),
          col.fill=getOption("col.fill.pt"),
@@ -65,7 +72,8 @@ function (x=mycor,
          col.bg=getOption("col.bg"),
          cex.axis=.85, col.axis="gray30",
          col.ticks="gray30", xy.ticks=TRUE, line.width=1.1,
-         xlab=NULL, ylab="Differences of Successive Eigenvalues", main=main, cex=NULL,
+         xlab=NULL, ylab="Differences of Successive Eigenvalues",
+         main=main, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
          center.line="off", quiet=TRUE, ...)

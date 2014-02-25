@@ -225,7 +225,6 @@ function(x, y, by, data, type, n.cat,
           suppressWarnings(points(x.lv, y.lv, pch=shp[i], col=clr[i],
               bg=clr.tr[i], cex=pt.size, lwd=0.75, ...))
         }
-        cat("\nTransparency level for plotted points: ", trans.pts, "\n\n")
 
       if (length(col.stroke) > 1) clr.tr <- clr
       .plt.legend(levels(by), col.stroke, clr, clr.tr, shp, trans.pts, col.bg, usr)
@@ -267,7 +266,10 @@ function(x, y, by, data, type, n.cat,
     }
     dataEllipse(x, y, col=col.ellipse, levels=.95, lwd=1.5, fill=fill.ellipse,
                 fill.alpha=.06, center.cex=0, segments=100, plot.points=FALSE)
+    txt <- "[Ellipse with Monette, Fox, and Friendly's function dataEllipse"
+    cat(txt, "from the car package]\n") 
   }
+
 
   # fit line option
   if (fit.line != "none") { 
@@ -323,9 +325,6 @@ function(x, y, by, data, type, n.cat,
       n.pair <- sum(!is.na(x - y))  # number of points after listwise deletion
       n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
     }      
-      cat("\n")
-      cat("Number of paired values with neither missing, n:", n.pair, "\n")
-      cat("Number of cases (rows of data) deleted:", n.del, "\n")
       .cr.main(x, y, brief=TRUE, ...)
     }
     if (!is.null(y) && is.factor(x)) {

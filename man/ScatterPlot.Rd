@@ -224,8 +224,8 @@ rm(Gender); rm(x); rm(y); rm(z)
 # although data not attached, access each variable directly by its name
 ScatterPlot(x, y)
 
-# short name with Spearman correlation instead of Pearson
-sp(x,y, method="spearman")
+# short name 
+sp(x,y)
 
 # compare to standard R plot, which requires the mydata$ notation
 plot(mydata$x, mydata$y)

@@ -94,6 +94,8 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
   }  # end text file
       
   else if (format == "Excel") { 
+    txt <- "Warnes, Rogers and Grothendiek's gdata package]"
+    cat("[with the read.xls function from", txt, "\n") 
     perl.test <- Sys.which("perl")
     if (nchar(perl.test) > 0) {
       if (isnot.row2)  # read data

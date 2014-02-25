@@ -84,7 +84,7 @@ DATA FRAME\cr
 The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{mydata}.
 
 GRAPHICS\cr
-For models with a single predictor variable, a scatter plot of the data is produced, which also includes the fitted values. As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. If more than a single predictor variable, then a scatter plot matrix is prodcued. 
+For models with a single predictor variable, a scatter plot of the data is produced, which also includes the fitted values. As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. If more than a single predictor variable, then a scatter plot matrix is produced. 
 
 FORECASTS\cr
 Fitted and forecasted values are listed for all rows of data if the number of rows is less than 25 or if \code{pred.all=TRUE}. If only some of the rows are listed, sorted by the fitted value, the first and last four rows of data are listed. Also the 4 rows immeadiately around the fitted value of 0.5 are listed.

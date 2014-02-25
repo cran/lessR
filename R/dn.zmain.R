@@ -1,10 +1,10 @@
-.den.main <- 
-function(x, data, 
-         bw, type, bin.start, bin.width, quiet,
+.dn.main <- 
+function(x, 
+         bw, type, bin.start, bin.width,
          col.fill, col.bg, col.grid, col.nrm, col.gen,
          col.fill.nrm, col.fill.gen,
          cex.axis, col.axis, col.ticks,
-         x.pt, xlab, main, y.axis, x.min, x.max, band, ...)  {
+         x.pt, xlab, main, y.axis, x.min, x.max, band, quiet, ...)  {
 
   if (!is.null(x.pt)) {
     y.axis <- TRUE

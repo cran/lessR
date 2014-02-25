@@ -88,7 +88,7 @@ tt(\ldots)
 OVERVIEW\cr
 If \code{n} or \code{n1} are set to numeric values, then the analysis proceeds from the summary statistics, the sample size and mean and standard deviation of each group. Missing data are counted and then removed for further analysis of the non-missing data values.  Otherwise the analysis proceeds from data, which can be in a data frame, by default named \code{mydata}, with a grouping variable and response variable, or in two data vectors, one for each group.
 
-Following the format and syntax of the standard \code{\link{t.test}} function, to specfiy the two-group test with a formula, \code{\link{formula}}, the data must include a variable that has exactly two values, a grouping variable or factor generically referred to as X, and a numerical response variable, generically referred to as Y. The formula is of the form Y ~ X, with the names Y and X replaced by the actual variable names specific to a particular analysis.  The formula method automatically retrieves the names of the variables and data values for display on the resulting output.
+Following the format and syntax of the standard \code{\link{t.test}} function, to specify the two-group test with a formula, \code{\link{formula}}, the data must include a variable that has exactly two values, a grouping variable or factor generically referred to as X, and a numerical response variable, generically referred to as Y. The formula is of the form Y ~ X, with the names Y and X replaced by the actual variable names specific to a particular analysis.  The formula method automatically retrieves the names of the variables and data values for display on the resulting output.
 
 The values of the response variable Y can be organized into two vectors, the values of Y for each group in its corresponding vector. When submitting data in this form, the output is enhanced if the actual names of the variables referred to generically as X and Y, as well as the names of the levels of the factor X, are explicitly provided. 
 
@@ -144,7 +144,7 @@ Ken Kelley and Keke Lai (2012). MBESS: MBESS. R package version 3.3.3. \url{http
 # create simulated data, no population mean difference
 # X has two values only, Y is numeric
 # put into a data frame, required for formula version
-n <- 12
+n <- 24
 X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
 Y <- round(rnorm(n=n, mean=50, sd=10),2)
 mydata <- data.frame(X,Y)

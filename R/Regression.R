@@ -14,6 +14,11 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          pdf=FALSE, pdf.width=5, pdf.height=5, refs=FALSE, ...) {
 
 
+  if (missing(my.formula)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify a model by listing it first or set according to:  my.formula\n\n")
+  }
+
   dname <- deparse(substitute(data))  # get data frame name for cor before sort
   options(dname = dname)
 
@@ -55,6 +60,20 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   n.vars <- length(nm)
   n.pred <- n.vars - 1
   n.obs <- nrow(data)
+
+  # check that variables are not function calls
+  v.str <- deparse(attr(terms.formula(my.formula), which="variables"))
+  v.str <- substr(v.str, 6, nchar(v.str)-1)  # remove "list(" and ending ")"
+  if (grepl("(", v.str, fixed=TRUE))  {
+    txtA <- paste("The reference to a variable in the lessR Regression function can\n",
+      "only be a variable name that refers to a variable in a data frame.\n\n", sep="")
+    txtB <- "For example, this does not work:\n  > reg(Salary ~ log(Years))\n\n"
+    txtC <- "Instead use Transform to first add the new variable to mydata:\n"
+    txtD <- "  > mydata <- Transform(YearsLog = log(Years))\n"
+    txtE <- "  > reg(Salary ~ YearsLog)"
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+        txtA, txtB, txtC, txtD, txtE, "\n")
+  }
   
   if(n.pred > 1) {
     collinear <- TRUE
@@ -180,6 +199,21 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          X2.new, X3.new, X4.new, X5.new, prd$cint, prd$pint,
          pdf, pdf.width, pdf.height, ...)
 
+
+  # cites
+  if (collinear || subsets || scatter.3D) cat("\n")
+  if (collinear) {
+    txt <- "[Collinearity analysis with Nilsson and Fox's vif function"
+    cat(txt, "from the car package]\n") 
+  }
+  if (subsets) {
+    txt <- "[Subsets analysis with Thomas Lumley's leaps function"
+    cat(txt, "from the leap's package]\n") 
+  }
+  if (scatter.3D) {
+    txt <- "[3D scatterplot with John Fox's scatter3d function"
+    cat(txt, "from the car package]\n") 
+  }
 
 # ----------
 # References

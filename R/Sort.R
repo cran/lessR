@@ -1,6 +1,12 @@
 Sort <-
 function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
 
+
+  if (missing(by)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify the variables to sort by listing them first or with:  by\n\n")
+  }
+
   dname <- deparse(substitute(data))
   n.obs <- nrow(data)
 

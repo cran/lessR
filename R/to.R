@@ -1,6 +1,17 @@
 to <-
 function(prefix, until, from=1, same.size=TRUE) {
 
+
+  if (missing(prefix)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify the characters to precede each name with: prefix\n\n")
+  }
+
+  if (missing(until)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify the last name generated in the sequence with:  until\n\n")
+  }
+
   if (from > until) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
        "The value of  until  must be greater than the value of  from .\n\n")

@@ -85,8 +85,8 @@ function(lm.out, nm,
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
     }
 
-     .den.main(res, main="Normality of Residuals", 
-       xlab="Residuals", quiet=TRUE,
+     .dn.main(res, main="Normality of Residuals", 
+       xlab="Residuals", 
        bw="nrd0", type="both",
        bin.start=NULL, bin.width=NULL,
        col.fill=getOption("col.fill.pt"),
@@ -95,7 +95,7 @@ function(lm.out, nm,
        col.fill.nrm="transparent", col.fill.gen="transparent",
        cex.axis=.85, col.axis="gray30", col.ticks="gray30",
        x.pt=NULL, y.axis=FALSE, 
-       x.min=NULL, x.max=NULL, band=FALSE)
+       x.min=NULL, x.max=NULL, band=FALSE, quiet=TRUE)
 
     if (pdf) {
       dev.off()

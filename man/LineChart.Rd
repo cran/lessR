@@ -11,10 +11,11 @@ Plots a line chart, the values of the variable ordered according to their order 
 
 For data of one variable exhibiting little trend, the center line is provided for the generation of a run chart, plotting the values of a variable in order of occurrence over time.  When the center line, the median by default, is plotted, the analyses of the number and composition of the individual runs, number of consecutive values above or below the center line, is also displayed.  Also, the defaults change for each of the types of plots.  The intent is to rely on the default values for a relatively sophisticated plot, particularly when compared to the default values of the standard R \code{\link{plot}} function called with a single variable.
 
+If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 }
 
 \usage{
-LineChart(y, data=mydata, type=NULL, 
+LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
 
          col.fill=getOption("col.fill.bar"), 
          col.stroke=getOption("col.stroke.pt"),
@@ -39,8 +40,18 @@ lc(\ldots)
 }
 
 \arguments{
-  \item{y}{Variable for which to construct the line chart, values on the vertical axis.}
-  \item{data}{Data frame that contains the variable of interest, default is \code{mydata}.}
+  \item{x}{Variable(s) to analyze.  Can be a single numerical variable, 
+        either within a data frame or as a vector in the user's workspace,
+        or multiple variables in a data frame such as designated with the
+        \code{\link{c}} function, or an entire data frame. If not specified,
+        then defaults to all numerical variables in the specified data
+        frame, \code{mydata} by default.}
+  \item{data}{Optional data frame that contains the variable(s) of interest,
+        default is \code{mydata}.}
+  \item{n.cat}{For the analysis of multiple variables, such as a data frame,
+        specifies the largest number of unique values of variable of a numeric data type
+        for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
+
   \item{type}{Character string that indicates the type of plot, either \code{"p"} for 
         points, \code{"l"} for line, or \code{"b"} for both. The default is 
         \code{"b"} for both points and lines.}
@@ -96,7 +107,8 @@ lc(\ldots)
       value of \code{"zero"} specifies the center line should go through zero.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{set}} function.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
+       no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameters such as from \code{\link{par}}.}
@@ -112,7 +124,7 @@ The values on the horizontal axis of the line chart are automatically generated.
 If the data values randomly vary about the mean, the default is to plot the mean as the center line of the graph, otherwise the default is to ignore the center line.  The default plot type for the line chart is \code{type="b"}, for both points and the corresponding connected line segments.  The size of the points is automatically reduced according to the number of points of points plotted, and the \code{cex} option can override the computed default.  If the area below the plotted values is specified to be filled in with color, then the default line type changes to \code{type="l"}.
 
 DATA\cr
-The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{col.stroke} for the color of the border of the plotted points. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
@@ -124,7 +136,7 @@ PDF OUTPUT\cr
 Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
-The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
 \code{    > LineChart(rnorm(50))   # does NOT work}
 
@@ -142,44 +154,53 @@ Instead, do the following:
 
 
 \examples{
-# generate 25 random normal data values
-y <- rnorm(25)
+# create data frame, mydata, to mimic reading data with Read function
+# mydata contains both numeric and non-numeric data
+mydata <- data.frame(rnorm(50), rnorm(50), rnorm(50), rep(c("A","B"),25))
+names(mydata) <- c("X","Y","Z","C")
 
 # default run chart
-LineChart(y)
+LineChart(Y)
 # short name
-lc(y)
+lc(Y)
 # compare to standard R plot
-plot(y, type="l")
+plot(mydata$Y, type="l")
 
 # save run chart to a pdf file
-LineChart(y, pdf.file="MyLineChart.pdf")
+LineChart(Y, pdf.file="MyLineChart.pdf")
 
 # LineChart in gray scale, then back to default "blue"
 set(colors="gray")
-LineChart(y)
+LineChart(Y)
 set(colors="blue")
   
 # customize run chart, pch=24: filled triangle point-up,
-LineChart(y, line.width=2, col.stroke="sienna3", shape.pts=24,
+LineChart(Y, line.width=2, col.stroke="sienna3", shape.pts=24,
   col.area="slategray3", col.bg="mintcream", ylim=c(-3.5,3.5),
   center.line="median")
   
 # generate steadily increasing values
-y <- sort(rexp(50))
+Y <- sort(rexp(50))
 # default line chart
-LineChart(y)
+LineChart(Y)
 # line chart with border around plotted values
-LineChart(y, col.area="transparent")
+LineChart(Y, col.area="transparent")
 # time series chart, i.e., with dates, and filled area
 # with option label for the x-axis
-LineChart(y, time.start="2000/09/01", time.by="3 months")
+LineChart(Y, time.start="2000/09/01", time.by="3 months")
 # time series chart from a time series object
-y.ts <- ts(y, start=c(2000, 9), frequency=4)
+y.ts <- ts(Y, start=c(2000, 9), frequency=4)
 LineChart(y.ts)
 
 # LineChart with built-in data set
 LineChart(breaks, data=warpbreaks)
+
+# Line charts for all numeric variables in a data frame
+LineChart()
+
+# Line charts for all specified numeric variables in a list of variables
+# e.g., use the combine or c function to specify a list of variables
+LineChart(c(X,Y))
 }
 
 
@@ -189,5 +210,3 @@ LineChart(breaks, data=warpbreaks)
 \keyword{ line chart }
 \keyword{ run chart }
 \keyword{ time series chart }
-
-

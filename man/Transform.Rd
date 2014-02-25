@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{trans}
 
-Based closely on the standard R \code{\link{transform}} function. Output is provided that provides feedback and guidance regarding the specified transformation(s).
+Based closely on the standard R \code{\link{transform}} function. Unlike the R function, output is provided that provides feedback and guidance regarding the specified transformation(s), and variable labels are accomodated. Existing variable labels are retained in the transformed data frame. If the transformation creates a new variable, then provide a corresponding variable label with the \code{lessR} function \code{\link{label}}. 
 }
 
 \usage{
@@ -71,7 +71,7 @@ mydata <- Read("Employee", format="lessR")
 # multiple transformations in one statement
 #  Months is a new variable
 #  Salary is a new version of the old Salary
-#  Satisfaction was read as non-numeric, so as a factor, but now is ordinal
+#  Satisfaction was read as non-numeric, so as a factor, but is also ordinal
 #  HealthPlan was read as numeric values 0,1,2, now converted to a factor
 mydata <- Transform(
   Months=Years*12, 
@@ -80,6 +80,11 @@ mydata <- Transform(
   HealthPlan=factor(HealthPlan,
      levels=c(0,1,2), labels=c("GoodHealth", "YellowCross", "BestCare"))
 )
+# new variable Months now exists
+# if relevant, supply a corresponding variable label
+mydata <- label(Months, "Months Employed in the Company")
+# confirm
+details.brief()
 }
 
 

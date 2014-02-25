@@ -5,7 +5,7 @@ importFrom("leaps", leaps)
 importFrom("MBESS", ci.smd)
 importFrom("foreign", read.spss)
 importFrom("gdata", read.xls)
-#importFrom("triangle", dtriangle, rtriangle)
+importFrom("triangle", dtriangle, rtriangle)
 
 # Export all names except those that begin with .
 #exportPattern("^[^\\.]")

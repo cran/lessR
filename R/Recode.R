@@ -2,6 +2,26 @@ Recode <-
 function(old.vars, new.vars=NULL, old, new, data=mydata,
          quiet=getOption("quiet")) {
 
+
+  if (missing(old.vars)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify the variable to be recoded by listing it\n",
+      "first or set according to:  old.vars\n\n")
+  }
+
+  if (missing(old)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify the values of the variable to be recoded with:  old\n\n")
+  }
+
+  if (missing(new)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify the new values of the recoded variable with:  new\n\n")
+  }
+
+  # save variable labels (NULL if no labels) 
+  mylabels <- attr(data, which="variable.labels")
+
   my.vars <- as.list(seq_along(data))
   names(my.vars) <- names(data)
   vars <- eval(substitute(old.vars), envir=my.vars, enclos=parent.frame())
@@ -92,6 +112,9 @@ function(old.vars, new.vars=NULL, old, new, data=mydata,
     print(head(data[, c(vars, new.index), drop=FALSE], n=4))
     cat("\n")
   } 
+ 
+  # restore any variable labels
+  if (!is.null(mylabels)) attr(data, which="variable.labels") <- mylabels
 
   return(data)
 

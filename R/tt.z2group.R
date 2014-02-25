@@ -85,7 +85,9 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     cat("      t-test is typically robust to violations of assumptions.", "\n")
     cat("      Use as heuristic guides instead of interpreting literally.", "\n\n")
 
+
     if (from.data) {
+
   # Normality
       cat("Null hypothesis, for each group, is a normal distribution of ", sep="")
       cat(Ynm, ".", sep="", "\n")
@@ -204,9 +206,9 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     cat("Standard Error of Mean Difference: SE = ", .fmt(sterr), "\n")
   }
   mytitle <- "\nHypothesis Test of 0 Mean Diff:  t = "
-  cat(mytitle, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3), sep="", "\n\n")
-  if (!brief) 
-    cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="", "\n")
+  cat(mytitle, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3),
+      sep="", "\n\n")
+  cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="", "\n")
   cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb), " to ", .fmt(ub), 
       sep="", "\n\n")
 

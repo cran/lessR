@@ -2,6 +2,9 @@ Subset <-
 function(rows, columns, data=mydata, holdout=FALSE,
     random=0, quiet=getOption("quiet"), ...) {
 
+  # save variable labels (NULL if no labels) 
+  mylabels <- attr(data, which="variable.labels")
+
   dname <- deparse(substitute(data))
 
   n.vars <- ncol(data)
@@ -58,6 +61,12 @@ function(rows, columns, data=mydata, holdout=FALSE,
   else {  # if numeric, read directly from rows
     r <- eval(substitute(rows), envir=data, enclos=parent.frame())
 
+  if (all(!r)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "No rows of data would be retained.\n",
+      "The specified value does not occur in these data.\n\n")
+  }
+
     if (is.logical(r))
       r <- r & !is.na(r)  # set missing for a row to FALSE
   }
@@ -89,8 +98,14 @@ function(rows, columns, data=mydata, holdout=FALSE,
     vars <- eval(substitute(columns), envir=all.vars, parent.frame())
  }
 
-  # do the subset
+  # do the subset, including any variable labels to be dropped
   data.sub <- data[r, vars, drop=FALSE]
+  # if no vars dropped, vars is TRUE, otherwise a char vector of names to retain
+  if (!is.logical(vars) && !is.null(mylabels)) {  
+    # warning unless length(mydata) a multiple of length(vars)
+    keep.index <- suppressWarnings(which(names(mydata) == vars))
+    mylabels <- mylabels[keep.index]
+  }
 
   if (!quiet) {
     cat("\n\n")
@@ -123,6 +138,11 @@ function(rows, columns, data=mydata, holdout=FALSE,
     }
     cat(")\n")
   }
+ 
+  # restore any variable labels
+  # note:  variable labels for all variables of original data frame
+  #        even if variables were deleted
+  if (!is.null(mylabels)) attr(data.sub, which="variable.labels") <- mylabels
 
   return(data.sub)
 

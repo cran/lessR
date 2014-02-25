@@ -10,7 +10,8 @@ Abbreviation: \code{ss}, \code{ss.brief}
 
 Descriptive or summary statistics for a numeric variable or a factor, one at a time or for all numeric and factor variables in the data frame.  For a single variable, there is also an option for summary statistics at each level of a second, usually categorical variable or factor, with a relatively few number of levels.  For a numeric variable, output includes the sample mean, standard deviation, skewness, kurtosis, minimum, 1st quartile, median, third quartile and maximum, as well as the number of non-missing and missing values. For a categorical variable, the output includes the table of counts for each value of a factor, the total sample size, and the corresponding proportions.  
 
-If the provided object for which to calculate the summary statistics is a data frame, then a summary statistics are calculated for each numeric variable in the data frame and the results written to pdf files in the current working directory. If the provided object is a variable list that is a subset of a given data frame, then the full data frame is reduced to the subset data frame and then analyzed.  The name of these files and associated paths are specified in the output.}
+If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
+}
 
 \usage{
 SummaryStats(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
@@ -22,10 +23,14 @@ ss(\dots)
 }
 
 \arguments{
- \item{x}{Values of response variable for first group.  If ignored, then the data frame
-          mydata becomes the default value.}
-  \item{data}{Optional data frame that contains the variable of interest, default is \code{mydata}.}
+  \item{x}{Variable(s) to analyze.  Can be a single variable, either
+        within a data frame or as a vector in the user's workspace,
+        or multiple variables in a data frame such as designated with the
+        \code{\link{c}} function, or an entire data frame. If not specified,
+        then defaults to all variables in the specified data frame,
+        \code{mydata} by default.}
   \item{by}{Applies to an analysis of a numeric variable, which is then analyzed at each level of the \code{by} variable. The variable is coerced to a factor.}
+  \item{data}{Optional data frame that contains the variable of interest, default is \code{mydata}.}
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{set}} function.}
@@ -69,7 +74,7 @@ Instead, do the following:
 }
 
 \value{
-If the analysis is of a single numeric variable, the full analysis invisibly returns as a list: \code{n}, \code{miss}, \code{mean}, \code{sd}, \code{skew}, \code{kurtosis}, \code{min}, \code{quartile1}, \code{median}, \code{quartile3}, \code{max}, \code{IQR}. The brief analysis returns the relevant subset of the summary statistics. If a \code{by} variable is included in the analysis, then nothing is returned.
+If the analysis is of a single numeric variable, the full analysis invisibly returns as a list: \code{n}, \code{miss}, \code{mean}, \code{sd}, \code{skew}, \code{kurtosis}, \code{min}, \code{quartile1}, \code{median}, \code{quartile3}, \code{max}, \code{IQR}. The brief analysis returns the corresponding subset of the summary statistics. If a \code{by} variable is included in the analysis, then nothing is returned.
 
 If the analysis is of a single categorical variable, a list is invisibly returned with two tables, the frequencies and the proportions, respectively named \code{freq} and \code{prop}.  If two categorical variables are analyzed, then nothing is returned. 
 }
@@ -109,7 +114,7 @@ SummaryStats(X)
 ss.brief(Y)
 ss.brief(X)
 
-# Reference the summary stats with code
+# Reference the summary stats in the object: stats
 stats <- ss(Y)
 my.mean <- stats$mean
 

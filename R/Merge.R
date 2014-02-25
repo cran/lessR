@@ -1,6 +1,16 @@
 Merge <-
 function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
 
+  if (missing(data1)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify first data frame (table) to merge with:  data1\n\n")
+  }
+
+  if (missing(data2)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify second data frame (table) to merge with:  data2\n\n")
+  }
+
   dname1 <- deparse(substitute(data1))
   dname2 <- deparse(substitute(data2))
 
@@ -27,13 +37,17 @@ function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "To do a vertical merge, both data sets must have the same variables.\n\n")
     }
+    mylabels <- attr(data1, which="variable.labels") # save variable labels
     type <- "vertical"
-    mydata <- rbind(data1, data2)
+    data <- rbind(data1, data2)
   }
 
   else {
     type <- "horizontal"
-    mydata <- merge(data1, data2, by=by)
+    mylabels1 <- attr(data1, which="variable.labels") # save variable labels
+    mylabels2 <- attr(data2, which="variable.labels") # save variable labels
+    data <- merge(data1, data2, by=by)
+    mylabels <- c(mylabels1, mylabels2)
   }
 
 
@@ -46,9 +60,12 @@ function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
     cat("First five rows of data ")
     cat( "\n")
     .dash(68)
-    print(head(mydata, n=5))
+    print(head(data, n=5))
   }
 
-  return(mydata)
+  # restore any variable labels
+  if (!is.null(mylabels)) attr(data, which="variable.labels") <- mylabels
+
+  return(data)
 
 }

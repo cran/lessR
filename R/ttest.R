@@ -115,9 +115,6 @@ function(x, y=NULL, ...) {
            pdf.width=pdf.width, pdf.height=pdf.height, ...)
   }
 
-  if (!paired) cat("\n")
-
-
 }  # end tt.setup
 
 
@@ -240,6 +237,10 @@ function(x, y=NULL, ...) {
 
   }
 
+  txt <- "Kelley and Lai's MBESS package]"
+  cat("[smd CI with Ken Kelley's ci.smd function from", txt, "\n") 
+
+  if (!paired) cat("\n")
 
   if (is.frml) {
     if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))

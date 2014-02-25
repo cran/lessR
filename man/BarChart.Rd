@@ -7,19 +7,19 @@
 \description{
 Abbreviation: \code{bc}
 
-Plots a bar chart of one or two variables with default colors, including background color and grid lines, from a variety of different types of data. Also displays the frequency table for one or two variables and optionally provides the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. 
+Plots a bar chart of one or two variables with default colors, including background color and grid lines, from a variety of different types of data. For two variables a legend is also provided. Also displays the frequency table for one or two variables and optionally provides the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. 
 
 For the analysis of a single variable, the cell proportions are also provided unless there are more than 10 unique values.  If all values are unique, then only the value names are listed.  For the analysis of two variables, also provided are the proportions within each cell, within each column and within each row.   
 
 Unlike the standard R function, \code{\link{barplot}}, the variable(s) can be entered directly into the function call without first converting to a table.  If two variables are plotted, a legend is automatically provided in the right margin.
 
-If the provided object for which to calculate the bar chart is a data frame, then a bar chart is calculated for each non-numeric variable in the data frame and the results written to a pdf file in the current working directory. If the provided object is a variable list that is a subset of a given data frame, then the full data frame is reduced to the subset data frame and then analyzed.  The name of this file and its path are specified in the output.
+If the provided object to analyze is a set of multiple variables, including an entire data frame, then a bar chart is calculated for each non-numeric variable in the data frame and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 }
 
 \usage{
 BarChart(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
 
-         col.fill=NULL, col.stroke="black",
+         col.fill=NULL, col.stroke=getOption("col.stroke.bar"),
          col.bg=getOption("col.bg"),
          col.grid=getOption("col.grid"),
          random.col=FALSE,
@@ -43,7 +43,12 @@ bc(\ldots)
 }
 
 \arguments{
-  \item{x}{For each level of this variable display the frequencies.}
+  \item{x}{Variable(s) to analyze.  Can be a single variable, either
+        within a data frame or as a vector in the user's workspace,
+        or multiple variables in a data frame such as designated with the
+        \code{\link{c}} function, or an entire data frame. If not specified,
+        then defaults to all non-numerical variables in the specified data
+        frame, \code{mydata} by default.}
   \item{by}{For each level of the first variable, x, display the frequencies at each 
        level of this second variable, y.}
   \item{data}{Optional data frame that contains the variables of interest, default
@@ -52,10 +57,12 @@ bc(\ldots)
        number of unique values of variable of a numeric data type for which the
        variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{col.fill}{Specified bar colors.}
-  \item{col.stroke}{Color of the border of the bars. Specify NA to remove the border}
+  \item{col.stroke}{Color of the border of the bars. Black by default unless the
+       background is dark. Specify NA to remove the border}
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines.}
-  \item{colors}{Optional palettes that provide more options.}
+  \item{colors}{Optional palettes that provide more options, which include
+        values of \code{"heat"}, \code{"rainbow"} and \code{"terrain"}.}
   \item{random.col}{For two variable plots, when \code{TRUE}, randomizes the order
        of the colors within the chosen color palette, when the second variable is
        not ordered, otherwise is ignored. Each analysis generally yields different
@@ -113,19 +120,19 @@ bc(\ldots)
 
 \details{
 OVERVIEW\cr
-Plot a bar chart with default colors for one or two variables, presumably with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accommodate both the value labels and the variable label.
+Plot a bar chart with default colors for one or two variables, presumably with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accommodate both the value labels and the variable label. 
 
 The form of the entered data, the first variable x and optionally a second variable, y, is flexible.  The data may be entered as factors, numeric values, characters, or a matrix. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.  Plus, the bar colors for a second variable which is an ordered factor are also ordered in a corresponding progression.
 
 DATA\cr
-The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function.
 
 If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment. 
 
 To obtain a bar chart of each numerical variable in the \code{mydata} data frame, use \code{bar chart()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-For a one variable plot, the color of the bars is set by the current color theme according to the function \code{\link{set}}. When two variables are plotted, a set of arbitrary colors represent the various levels of the second variable. Currently transparency effects are not incorporated.\cr
+For a one variable plot, the color of the bars is set by the current color theme according to the function \code{\link{set}}, which includes the default color theme activated when a \code{lessR} session is initiated. When two variables are plotted, a set of arbitrary colors represent the various levels of the second variable. Transparency effects are only incorporated for a one variable bar plot in a single color.\cr
 There are three ways to override the default colors.\cr
 1. There are two pre-defined color palettes, each with 7 colors.  Three more built-in R color palettes are also available by setting \code{colors} to one of \code{"rainbow"}, \code{"heat"} and \code{"terrain"}.  The most vivid of all the palettes is \code{"rainbow"}.\cr
 2. The order of the colors within the chosen palette can be randomized with the \code{random.col="TRUE"} option. For example, when this option is activated each of the seven colors in a palette has a 1/7 chance of appearing as the first color, the only color used in the plot of a single variable, and the color used for the first bar in each group for a plot of two variables. When invoked for a  \code{color="gray"}, the order from light to dark will generally be lost, which may be desirable if the categories do not represent an ordered factor.\cr
@@ -140,7 +147,7 @@ When plotting one ordered factor, or when plotting two variables, and the second
 Use the \code{\link{showColors}} function in this package to get, for each color:  name, sample color swatch, and corresponding rgb specification.  For a very small number of levels, such as two, it is may be desirable to specify the low and high values to not be closer to each other than the default values.
 
 LEGEND\cr
-When two variables are plotted, a legend is produced, with values for each level of the second variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend.loc} option, which, in addition to the \code{lessR} option of \code{right.margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend. 
+When two variables are plotted, a legend is produced, with values for each level of the second or \code{by} variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend.loc} option, which, in addition to the \code{lessR} option of \code{right.margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend. 
 
 If the default right margin is retained, variable labels are also accommodated for the legend title.  To conserve horizontal space, the variable label is listed in multiple lines if needed. The legend title is constructed by forming lines of maximum length of 12 characters, with multiple words per line if possible. Any single word in the label of more than 12 characters is abbreviated to 12 characters with the R \code{\link{abbreviate}} function. Also, any value labels are abbreviated to a maximum of 6 characters.
 
@@ -162,7 +169,7 @@ Because of the customized graphic windowing system that maintains a unique graph
 }
 
 \value{
-Invisibily returns a contingency table from the R \code{\link{table}} function, an object of class "table", an array of integer values.
+If the analysis is of a single categorical variable, a list is invisibly returned with two tables, the frequencies and the proportions, respectively named \code{freq} and \code{prop}.  If two categorical variables are analyzed, then nothing is returned.
 }
 
 
@@ -197,8 +204,9 @@ rm(Pain); rm(Gender)
 BarChart(Pain)
 # short name
 bc(Pain)
-# save the frequencies for later analysis
+# save and then display the frequencies for later analysis
 myCount <- BarChart(Pain)
+myCount
 # compare to standard R bar plot, which requires mydata$ reference
 barplot(table(mydata$Pain))
 
@@ -230,6 +238,7 @@ BarChart(Pain, by=Gender)
 # color theme set to red with ghost effects
 set(colors="red", ghost=TRUE)
 BarChart(Gender, by=Pain)
+set(colors="sienna")
 
 # specify an ordered blue palette of colors for the ordered levels of Pain
 # only works when the variable is an ordered factor
@@ -264,7 +273,7 @@ BarChart(Pain, by=Gender, col.fill=c("coral3","seagreen3"),
 #   and all numeric variables with a small number of values, < n.cat
 BarChart()
 
-# Use the subset function to specify a variable list
+# specify a list of variables
 mydata <- Read("Employee", format="lessR", quiet=TRUE)
 BarChart(c(Dept, Gender))
 

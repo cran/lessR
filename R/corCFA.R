@@ -1,7 +1,9 @@
 corCFA <- 
 function(x=mycor, data=mydata,
 
-         iter=25, resid=TRUE, item.cor=TRUE, sort=TRUE,
+         labels=c("include", "exclude", "only"),
+
+         iter=50, resid=TRUE, item.cor=TRUE, sort=TRUE,
 
          main=NULL, heat.map=TRUE, bottom=3, right=3, 
 
@@ -11,23 +13,39 @@ function(x=mycor, data=mydata,
          F6=NULL, F7=NULL, F8=NULL, F9=NULL, F10=NULL,
          F11=NULL, F12=NULL) {
 
+  labels <- match.arg(labels)
+
   cor.name <- deparse(substitute(x))
-  if (!exists(cor.name, where=.GlobalEnv)) {
+  if (!exists(cor.name, where=.GlobalEnv) && labels!="only") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "No correlation matrix entered.\n\n",
       "Either enter the correct name, or calculate with: Correlation\n",
       "Or read the correlation matrix with: corRead\n\n")
   }
+  if (!exists("data", where=.GlobalEnv) && labels=="only") {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "No data table (frame) exists\n\n")
+  }
+
+  NFmax <- 12
 
   dname <- deparse(substitute(data))
   options(dname = dname)
 
-  NVOld <- as.integer(nrow(x))
-  NFmax <- 12
-
   # translate variable names into column positions
-  vars.all <- as.list(seq_along(as.data.frame(x)))
-  names(vars.all) <- names(as.data.frame(x))
+  if (labels!="only") {
+    NVOld <- as.integer(nrow(x))
+    vars.all <- as.list(seq_along(as.data.frame(x)))
+    names(vars.all) <- names(as.data.frame(x))
+    nm <- dimnames(x)[[1]]
+  }
+  else {
+    NVOld <- as.integer(nrow(data))
+    vars.all <- as.list(seq_along(data))
+    names(vars.all) <- names(data)
+    nm <- names(data)
+  }
+    
 
   F1n <- eval(substitute(F1), vars.all, parent.frame())
   F2n <- eval(substitute(F2), vars.all, parent.frame())
@@ -83,9 +101,37 @@ function(x=mycor, data=mydata,
     }
   }
 
+  # display labels by factor
+  if (labels == "only") {
+    cat("\n")
+    nmF <- character(length=NF)
+    for (i in 1:NF) nmF[i] <- paste("F", toString(i), sep="")
+
+    for (i in 1:NF) {
+      cat(nmF[i], ": ", sep="")
+      for (j in LblCut[i,1]:LblCut[i,2]) cat(" ",nm[Label[j]])
+      cat("\n")
+
+      for (j in LblCut[i,1]:LblCut[i,2]) {
+        options(xname = nm[Label[j]])
+        gl <- .getlabels()
+        x.lbl <- gl$xl 
+        if (!is.null(x.lbl)) {
+          if (j == LblCut[i,1]) .dash(30)
+          cat(nm[Label[j]], ": ", x.lbl, "\n", sep="")
+          if (j == LblCut[i,2]) cat("\n")
+        }
+      }
+    }
+    cat("\n\n")
+  }  # end labels only
+
+
+  else { # proceed with the analysis
 
   # --------------------------------------------------------
   # re-order R matrix
+
   out <- .Fortran("rrdr",
                   R=as.double(as.matrix(x)),
                   Label=as.integer(as.vector(Label)),
@@ -105,16 +151,24 @@ function(x=mycor, data=mydata,
   for (i in 1:NItems) nm.new[i] <- nm[Label[i]]
   dimnames(out$R) <- list(nm.new, nm.new)
 
+  # get width of largest variable label
+  cc <- as.character(dimnames(out$R)[[1]])
+  max.chr <- 0
+  for (i in 1:NItems)  
+    if (nchar(cc[i]) > max.chr) max.chr <- nchar(cc[i])
+  if (max.chr < 4) max.chr <- 4
+
 
   # --------------------------------------------------------
+  # MIMM CFA
+
   # expand R matrix to include rows/cols for factors
   rr <- matrix(rep(0, NF*NItems), nrow=NF)
   cc <- matrix(rep(0, NF*(NItems+NF)), nrow=(NItems+NF))
   out$R <- cbind(rbind(out$R,rr),cc)
 
-  # MIMM CFA
-  Alpha <- double(length=NF)
-  Omega <- double(length=NF)
+  alpha <- double(length=NF)
+  omega <- double(length=NF)
 
   out <- .Fortran("mimm",
                   R=as.double(as.matrix(out$R)),
@@ -122,8 +176,8 @@ function(x=mycor, data=mydata,
                   NVC=as.integer(NItems),
                   NF=as.integer(NF),
                   Iter=as.integer(iter),
-                  Alpha=as.double(Alpha),
-                  Omega=as.double(Omega))
+                  alpha=as.double(alpha),
+                  omega=as.double(omega))
 
   nmF <- character(length=NF)
   for (i in 1:NF) nmF[i] <- paste("F", toString(i), sep="")
@@ -138,61 +192,10 @@ function(x=mycor, data=mydata,
   nm <- c(nm.new, nmF)
   dimnames(out$R) <- list(nm, nm)
 
-  cat("\n")
-  cat('Factor / Scale Composition\n',
-      '-------------------------------------------------------------------\n',
-      'Each set of items forms a scale, scored as an unweighted composite.\n',
-      'Corresponding to each observed scale score is an underlying factor.\n',
-      '-------------------------------------------------------------------\n\n',
-      sep="")
-
-  for (i in 1:NF) {
-    cat(nmF[i], ": ", sep="")
-    for (j in LblCut[i,1]:LblCut[i,2]) cat(" ", nm.new[j])
-    cat("\n")
-
-    for (j in LblCut[i,1]:LblCut[i,2]) {
-      options(xname = nm.new[j])
-      gl <- .getlabels()
-      x.lbl <- gl$xl 
-      if (!is.null(x.lbl)) {
-        if (j == LblCut[i,1]) .dash(30)
-        cat(nm.new[j], ": ", x.lbl, "\n", sep="")
-        if (j == LblCut[i,2]) cat("\n")
-      }
-    }
-  }
-  cat("\n\n")
-
-  cat('Reliability Analysis\n',
-      '---------------------------------------------------------------------\n',
-      'Reliability of the composite, unweighted total score, for each scale.\n',
-      sep="")
-  if (iter > 0)
-    cat('Alpha assumes equal item reliabilities. The more generally preferred\n', 
-        'Omega uses each item\'s communality in the computation of reliability.\n',
-        sep="")
-  cat('---------------------------------------------------------------------\n\n',
-      sep="")
-
-  if (iter > 0) 
-    cat(' Scale  Alpha  Omega\n',
-        ' -------------------\n', sep="")
-  else
-    cat(' Scale  Alpha\n',
-        ' ------------\n', sep="")
-  for (i in 1:NF) {
-    cat("  ", nmF[i], " ", .fmt(out$Alpha[i],3)) 
-    if (iter > 0)
-      cat(                  " ", .fmt(out$Omega[i],3), "\n")
-    else
-      cat("\n")
-  }
-  cat("\n\n")
-
 
   # --------------------------------------------------------
   # Sort within each group by the group factor loading
+
   if (sort) {
 
     # get new ordering, factor by factor
@@ -235,8 +238,8 @@ function(x=mycor, data=mydata,
     out$R <- cbind(rbind(out$R,rr),cc)
 
     # MIMM CFA
-    Alpha <- double(length=NF)
-    Omega <- double(length=NF)
+    alpha <- double(length=NF)
+    omega <- double(length=NF)
 
     out <- .Fortran("mimm",
                     R=as.double(as.matrix(out$R)),
@@ -244,8 +247,8 @@ function(x=mycor, data=mydata,
                     NVC=as.integer(NItems),
                     NF=as.integer(NF),
                     Iter=as.integer(iter),
-                    Alpha=as.double(Alpha),
-                    Omega=as.double(Omega))
+                    alpha=as.double(alpha),
+                    omega=as.double(omega))
 
     nmF <- character(length=NF)
     for (i in 1:NF) nmF[i] <- paste("F", toString(i), sep="")
@@ -269,18 +272,83 @@ function(x=mycor, data=mydata,
 
 
   # --------------------------------------------------------
+  # Output labels, scale reliabilities
+
+  cat("\n")
+  cat('Factor / Scale Composition\n',
+      '-------------------------------------------------------------------\n',
+      'Each set of items forms a scale, scored as an unweighted composite.\n',
+      'Corresponding to each observed scale score is an underlying factor.\n',
+      '-------------------------------------------------------------------\n\n',
+      sep="")
+
+  for (i in 1:NF) {
+    cat(nmF[i], ": ", sep="")
+    for (j in LblCut[i,1]:LblCut[i,2]) cat(" ", nm.new[j])
+    cat("\n")
+
+  if (labels == "include") {
+      for (j in LblCut[i,1]:LblCut[i,2]) {
+        options(xname = nm.new[j])
+        gl <- .getlabels()
+        x.lbl <- gl$xl 
+        if (!is.null(x.lbl)) {
+          if (j == LblCut[i,1]) .dash(30)
+          cat(nm.new[j], ": ", x.lbl, "\n", sep="")
+          if (j == LblCut[i,2]) cat("\n")
+        }
+      }
+    }
+    if (i == NF) cat("\n\n")
+  }
+
+  cat('Reliability Analysis\n',
+      '---------------------------------------------------------------------\n',
+      'Reliability of the composite, unweighted total score, for each scale.\n',
+      sep="")
+  if (iter > 0)
+    cat('Alpha assumes equal item reliabilities. The more generally preferred\n', 
+        'Omega uses each item\'s communality in the computation of reliability.\n',
+        sep="")
+  cat('---------------------------------------------------------------------\n\n',
+      sep="")
+
+  if (iter > 0) 
+    cat(' Scale  Alpha  Omega\n',
+        ' -------------------\n', sep="")
+  else
+    cat(' Scale  Alpha\n',
+        ' ------------\n', sep="")
+  for (i in 1:NF) {
+    cat("  ", nmF[i], " ", .fmt(out$alpha[i],3)) 
+    if (iter > 0)
+      cat(                  " ", .fmt(out$omega[i],3), "\n")
+    else {
+      out$omega <- NULL
+      cat("\n")
+    }
+  }
+  cat("\n\n")
+
+
+
+  # --------------------------------------------------------
   # Indicator analysis
+
   if (iter > 0 ) {
     MaxBad <- 25
     MaxLbl <- NItems
     Bad <- integer(length=NItems)
 
+    buf <- max.chr - 4
+    if (buf < 0) buf <- 0
+
     cat('Indicator Analysis\n')
     .dash(75)
-    cat('Fac', ' Indi', '  Pat', '   Unique',
+    cat('Fac', ' Indi', .fmtc(" ",buf+1), 'Pat', '    Unique',
        ' Factors with which an indicator correlates too\n')
-    cat('tor', ' cator', ' tern', '   ness',
-        '  highly, and other indicator diagnostics.\n')
+    cat('tor', ' cator', .fmtc("",buf), 'tern', '   ness',
+        '   highly, and other indicator diagnostics.\n')
     .dash(75)
 
     for (IFac in 1:NF) {
@@ -300,21 +368,21 @@ function(x=mycor, data=mydata,
             }
           }
           if (NBad > MaxBad) NBad <- MaxBad
-          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8))
+          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],max.chr), .fmt(Lam,3,7), .fmt(Unique,3,7))
           cat("    ")
           if (NBad > 0) for (IBad in 1:NBad) cat(paste("F",Bad[IBad]," ",sep=""))
         }
 
         else if (Lam <= 0)
-          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), '   xxxx ',
+          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,7), '   xxxx',
            '   ** Negative Loading on Own Factor **')
 
         else if (Unique <= 0) {
           if (LblCut[IFac,2]-LblCut[IFac,1] > 0)
-            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
+            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,7), .fmt(Unique,3,7),
              '   ** Improper Loading **')
           else
-            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,8), .fmt(Unique,3,8),
+            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,7), .fmt(Unique,3,7),
              '   ** Factor Defined by Only One Item **')
         }
 
@@ -329,6 +397,7 @@ function(x=mycor, data=mydata,
 
   # --------------------------------------------------------
   # Solution
+
   if (iter > 0) {
     cat('Latent Variable (factor) ')
     if (item.cor) cat('/ Observed Variable (item) ')
@@ -345,56 +414,60 @@ function(x=mycor, data=mydata,
         'Factor Correlation: Correlation of two factors with each other\n', sep="")
     .dash(65)
     cat("\n")
-  }
 
+  }
+ 
   else {
     cat("Item-Scale and Scale-Scale Correlations\n",
         "---------------------------------------\n", sep="")
   }
 
-
-  # --------------------------------------------------------
-  if (resid) {
-
-    # print the MGRP solution (instead of rely upon return)
+    # print the solution
     if (item.cor)
       print(round(out$R,2))
     else
       print(round(out$R[1:NVTot,(NItems+1):NVTot],2))
 
-    out <- .Fortran("resid",
+
+  # --------------------------------------------------------
+  if (resid) {
+
+    res <- .Fortran("resid",
                     R=as.double(as.matrix(out$R)),
                     LblCut=as.integer(as.matrix(LblCut)),
                     NItems=as.integer(NItems),
                     NF=as.integer(NF))
 
     # construct full R matrix, with all the original vars
-    out$R <- matrix(out$R, nrow=NVTot, ncol=NVTot, byrow=TRUE)
+    res$R <- matrix(res$R, nrow=NVTot, ncol=NVTot, byrow=TRUE)
 
     # take just 1st NItems vars
-    out$R <- out$R[1:NItems,1:NItems]
+    res$R <- res$R[1:NItems,1:NItems]
 
     # assign names
-    dimnames(out$R) <- list(nm.new, nm.new)
+    dimnames(res$R) <- list(nm.new, nm.new)
 
     cat("\n\n")
 
     cat('Residuals\n',
         '--------------------------------------------------------------\n',
-        'Each residual is the difference between the corresponding item\n',
-        'correlation and its value imposed by the estimated multiple\n', 
-        'indicator measurement model.\n',
+        'Difference between an item correlation and its value imposed\n',
+        'by the estimated multiple indicator measurement model.\n',
         '--------------------------------------------------------------\n\n',
         sep="")
 
     # sum of squares, sum of abs
+
     cat("Residual summaries\n",
         "------------------\n\n", sep="")
 
-    cat("     Sum of    Average", "\n",
-        "     Squares   Abs Value", "\n",
-        "     -------   ---------", "\n", sep="")
-    cc <- as.character(dimnames(out$R)[[1]])
+    cat(.fmtc(" ", max.chr+2), "Sum of    Average", "\n",
+        .fmtc(" ", max.chr+2), "Squares   Abs Value", "\n",
+        .fmtc(" ", max.chr+2), "-------   ---------", "\n", sep="")
+
+    cc <- as.character(dimnames(res$R)[[1]])
+    res.avg <- double(length=NItems)
+
     ssq.tot <- 0
     abv.tot <- 0
     abv.all <- 0
@@ -402,13 +475,13 @@ function(x=mycor, data=mydata,
       ssq <- 0
       abv <- 0
       for (j in 1:NItems) {
-        ssq <- ssq + out$R[i,j]^2
-        abv <- abv + abs(out$R[i,j])
-        abv.all <- abv.all + abs(out$R[i,j])
+        ssq <- ssq + res$R[i,j]^2
+        abv <- abv + abs(res$R[i,j])
+        abv.all <- abv.all + abs(res$R[i,j])
       }
       ssq.tot <- ssq.tot + ssq
-      abv.avg <- abv / (NItems - 1)
-      cat(cc[i], "  ", .fmt(ssq,3), "  ", .fmt(abv.avg,3), "\n")
+      res.avg[i] <- abv / (NItems - 1)
+      cat(.fmtc(cc[i],max.chr), "  ", .fmt(ssq,3), "  ", .fmt(res.avg[i],3), "\n")
     }
     abv.all.tot <- abv.all / (NItems^2 - NItems)
     cat("\n")
@@ -418,14 +491,64 @@ function(x=mycor, data=mydata,
     cat("Item residuals\n",
         "--------------\n\n", sep="")
 
-    return(round(out$R,2))
+    print(round(res$R, 2))
+  }
+  else  # no residuals
+    res <- list(R = NULL)
+
+
+  # --------------------------------------------------------
+  # construct lavaan model
+
+  if (iter > 0) {
+    cat("\n\n")
+    cat("lavaan code for confirmatory factor analysis of the model\n",
+        "---------------------------------------------------------\n", sep="")
+
+    cat("\n")
+
+    cat("library(lavaan)\n")
+    cat("MeasModel <-\n")
+    cat("\" ")
+
+    for (i in 1:NF) {
+      cat("\n  ", nmF[i], " =~", sep="")
+      for (j in LblCut[i,1]:LblCut[i,2]) {
+        if ( j == LblCut[i,1])
+          cat(" ", nm.new[j])
+        else  
+          cat(" +", nm.new[j])
+      }
+    }
+
+    cat("\n\"\n")
+    cat("fit <- cfa(MeasModel, data=mydata)\n")
+    cat("summary(fit, fit.measures=TRUE, standardized=TRUE)\n")
+    cat("\n\n")
+
+    cat("--------\n")
+    cat(">>> The preceding code fits the model from data frame:  mydata\n")
+    cat(">>> To access the correlation matrix directly without the data\n")
+    cat(">>> use the following fit statement instead.\n")
+    cat("fit <- cfa(MeasModel, sample.cov=mycor, sample.nobs=nnn)\n")
+    cat(">>>   mycor: name of correlation matrix\n")
+    cat(">>>   nnn: numeric, number of observations\n")
+    cat("\n")
   }
 
-  else {  # not resid
-    if (item.cor)
-      return(round(out$R,2))
-    else
-      return(round(out$R[1:NVTot,(NItems+1):NVTot],2))
-  }
 
+  # --------------------------------------------------------
+  # return
+
+  invisible(list(
+     ff.cor=out$R[(NItems+1):NVTot,(NItems+1):NVTot],
+     if.cor=out$R[1:NItems,(NItems+1):NVTot],
+     diag.cor=diag(out$R[1:NItems,1:NItems]),
+     alpha=out$alpha,
+     omega=out$omega,
+     resid=res$R
+  ))
+
+  }
 }
+

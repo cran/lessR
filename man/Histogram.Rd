@@ -10,7 +10,7 @@ Abbreviation: \code{hs}
 
 From the standard R function \code{\link{hist}} plots a frequency histogram with default colors, including background color and grid lines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width and/or the bin start. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
 
-If the provided object for which to calculate the histogram is a data frame, then a histogram is calculated for each numeric variable in the data frame and the results written to pdf files in the current working directory. If the provided object is a variable list that is a subset of a given data frame, then the full data frame is reduced to the subset data frame and then analyzed.  The name of these files and associated paths are specified in the output.
+If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 }
 
 \usage{
@@ -37,12 +37,15 @@ hs(\ldots)
 }
 
 \arguments{
-  \item{x}{Variable for which to construct the histogram.  Can be a data frame.  If not
-      specified with \code{data}, that is, no variable specified, then the data frame
-      \code{mydata} is assumed.}
-  \item{data}{Optional data frame that contains the variable of interest, default
-        is \code{mydata}.}
-  \item{n.cat}{When analyzing all the variables in a data frame,
+  \item{x}{Variable(s) to analyze.  Can be a single numerical variable, 
+        either within a data frame or as a vector in the user's workspace,
+        or multiple variables in a data frame such as designated with the
+        \code{\link{c}} function, or an entire data frame. If not specified,
+        then defaults to all numerical variables in the specified data
+        frame, \code{mydata} by default.}
+  \item{data}{Optional data frame that contains the variable(s) of interest,
+        default is \code{mydata}.}
+  \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric data type
         for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{col.fill}{Color of the bars. To set transparency level, use \code{lessR} 
@@ -76,7 +79,8 @@ hs(\ldots)
   \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.}
   \item{main}{Title of graph.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with \code{\link{set}} function.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
+       no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for graphics as defined processed 
@@ -92,7 +96,7 @@ OVERVIEW\cr
 Results are based on the standard R \code{\link{hist}} function to calculate and plot a histogram, plus the additional provided color capabilities, a relative frequency histogram and summary statistics. However, a histogram with densities is not supported. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}.  To plot densities, which correspond to setting \code{freq} to \code{FALSE}, use the \code{lessR} function \code{\link{Density}}.
 
 DATA\cr
-The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
@@ -103,7 +107,7 @@ VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 ONLY VARIABLES ARE REFERENCED\cr
-The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
 \code{    > Histogram(rnorm(50))   # does NOT work}
 
@@ -200,7 +204,7 @@ Histogram(y, cumul="both", breaks=seq(-4,4,.25), prop=TRUE,
 
 # create data frame, mydata, to mimic reading data with Read function
 # mydata contains both numeric and non-numeric data
-mydata <- data.frame(rnorm(100), rnorm(100), rnorm(100), rep(c("A","B"),50))
+mydata <- data.frame(rnorm(50), rnorm(50), rnorm(50), rep(c("A","B"),25))
 names(mydata) <- c("X","Y","Z","C")
 
 # although data not attached, access the variable directly by its name
@@ -214,16 +218,15 @@ Histogram()
 # variable of interest is in a data frame which is not the default mydata
 # access the breaks variable in the R provided warpbreaks data set
 # although data not attached, access the variable directly by its name
-data(warpbreaks)
 Histogram(breaks, data=warpbreaks)
-Histogram()
 
 # histograms for all numeric variables in data frame called mydata
+Histogram()
 #  with specified options
 Histogram(col.fill="palegreen1", col.bg="ivory", labels=TRUE)
 
-# Use the subset function to specify a variable list
 # histograms for all specified numeric variables
+# use the combine or c function to specify a list of variables
 Histogram(c(X,Y))
 }
 

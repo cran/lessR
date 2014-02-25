@@ -9,7 +9,7 @@ Abbreviation: \code{bx}
 
 Uses the standard R boxplot function, \code{\link{boxplot}} to display a boxplot in color. Also display the relevant statistics such as the hinges, median and IQR.
 
-If the provided object for which to calculate the box plot is a data frame, then a box plot is calculated for each numeric variable in the data frame and the results written to a pdf file in the current working directory. If the provided object is a variable list that is a subset of a given data frame, then the full data frame is reduced to the subset data frame and then analyzed. The name of this file and its path are specified in the output.
+If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 }
 
 \usage{
@@ -33,14 +33,17 @@ bx(\ldots)
 
 
 \arguments{
-  \item{x}{Variable for which to construct the histogram.  Can be a data frame.  If
-       not specified with \code{data}, that is, no variable specified, then the
-       data frame \code{mydata} is assumed.}
-  \item{data}{Optional data frame that contains the variables of interest, default
-       is \code{mydata}.}
-  \item{n.cat}{When analyzing all the variables in a data frame, specifies the
-       largest number of unique values of variable of a numeric data type for 
-       which the variable will be analyzed as a categorical. Set to 0 to turn off.}
+  \item{x}{Variable(s) to analyze.  Can be a single numerical variable, 
+        either within a data frame or as a vector in the user's workspace,
+        or multiple variables in a data frame such as designated with the
+        \code{\link{c}} function, or an entire data frame. If not specified,
+        then defaults to all numerical variables in the specified data
+        frame, \code{mydata} by default.}
+  \item{data}{Optional data frame that contains the variable(s) of interest,
+        default is \code{mydata}.}
+  \item{n.cat}{For the analysis of multiple variables, such as a data frame,
+        specifies the largest number of unique values of variable of a numeric data type
+        for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
   \item{col.fill}{Color of the box.}
   \item{col.stroke}{Color of any points that designate outliers. By default this
        is the same color as the box.}
@@ -60,7 +63,8 @@ bx(\ldots)
        box plot.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
        \code{\link{set}} function.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
+       no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for graphics as defined processed 
@@ -79,15 +83,15 @@ Other graphic parameters are available to format the display, such as \code{main
 
 
 DATA\cr
-The data may either be a vector from the global enviornment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.  To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
+Individual colors in the plot can be manipulated with options such as \code{col.fill} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
 
 VARIABLE LABELS\cr
-If variable labels , then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
+If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 PDF OUTPUT\cr
 Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
@@ -162,8 +166,8 @@ BoxPlot()
 BoxPlot(col.fill="palegreen1", col.stroke="plum")
 
 # Use the subset function to specify a variable list
-# histograms for all specified numeric variables
-Histogram(c(X,Y))
+# box plots for all specified numeric variables
+BoxPlot(c(X,Y))
 }
 
 

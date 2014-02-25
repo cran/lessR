@@ -14,8 +14,8 @@ to(prefix, until, from=1, same.size=TRUE)
 
 \arguments{
   \item{prefix}{Character string that begins each variable name.}
-  \item{until}{Last number in the sequence.}
-  \item{from}{First number in the sequence.}
+  \item{until}{Last name in the sequence, the one with the last number.}
+  \item{from}{First name in the sequence, the one with the initial number.}
   \item{same.size}{If \code{TRUE}, pads the beginning of each number for the variable
         name with leading zeros so that all names are of the same width.}
 }

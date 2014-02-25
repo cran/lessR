@@ -40,16 +40,23 @@ function(x, y, brief, ...) {
     cat("\n")
     cat(">>> ",ct$method, "\n", sep="")
 
-    cat("\n")
-    if (!is.null(x.lbl)) cat(x.name, ", ", as.character(y.lbl), sep="", "\n")
-    if (!is.null(y.lbl)) cat(y.name, ", ", as.character(x.lbl), sep="", "\n")
-    if (!is.null(x.lbl) || !is.null(y.lbl)) cat("\n")
+    if (!is.null(x.lbl) || !is.null(y.lbl)) {
+      cat("\n")
+      if (!is.null(x.lbl))
+        cat(x.name, ": ", as.character(x.lbl), sep="", "\n")
+      else
+        cat(x.name, "\n")
+      if (!is.null(y.lbl))
+        cat(y.name, ": ", as.character(y.lbl), sep="", "\n")
+      else
+        cat(y.name, "\n")
+    }
    
-
-    if (!brief) {
       n.pair <- sum(!is.na(x - y))  # number of points after pairwise deletion
-      n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
+      cat("\n")
       cat("Number of paired values with neither missing, n:", n.pair, "\n")
+    if (!brief) {
+      n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
       cat("Number of cases (rows of data) deleted:", n.del, "\n\n")
       if (c.type == "pearson") {
         covr <- cov(x, y, use="pairwise.complete.obs")
@@ -58,7 +65,7 @@ function(x, y, brief, ...) {
     }
 
     if (brief) 
-      cat("Sample Correlation of ", x.name, " and ", y.name,
+      cat("\nSample Correlation of ", x.name, " and ", y.name,
         ": ", sym, " = ", .fmt(ct$estimate,3), sep="", "\n\n")
     else
       cat("Sample Correlation: ", sym, " = ", .fmt(ct$estimate,3), sep="", "\n\n")

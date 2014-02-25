@@ -4,6 +4,94 @@ Update History for Package 'lessR'
 -------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 3.1 (2014-02-24)} <<<<<<
+
+-------------
+Updates 3.1
+-------------
+
+default color theme
+  changed from "blue" to "dodgerblue", which now has 0.25 default
+    transparency for bar fill, if the previous "blue" is desired,
+    then set with: set(colors="blue")
+
+citations
+   use of functions from other contributed packages cited in output 
+
+BarChart, BoxPlot, Histogram, ...
+  can specify an entire data frame for analysis with the data parameter
+    in addition to the variable parameter (x, usually listed first), 
+    e.g., hs(attitude) or hs(data=attitude)
+
+Density, LineChart
+  analysis of a data frame or list of multiple variables possible
+
+BarChart
+  invisibly returns the frequencies and proportions just as SummaryStats 
+    e.g., stats <- BarChart(Y), so stats contains this info
+  pre-set transparency level of col.fill.bar applies to bar chart bars
+    of a single variable
+
+SummaryStats (and functions that call SummaryStats)
+  outliers listed in two groups, those above the high box plot whisker,
+    and those below the low box plot whisker, and if more than 25 then
+    the intermediate values in a group are not listed
+  more appropriate output when there is a frequency of zero on a
+    by variable
+  an explanatory note provided when computing row or column 
+    proportions that result in divide by 0, which displays as NaN
+    for "not a number"
+
+label
+  can assign a variable label to a variable as well as list the label,
+    so labels can be created/modified without reading from a file
+
+corCFA
+  lavaan code for the default maximum likelihood solution with the lavaan
+    function cfa generated for the specified measurement model
+  content of items by scale listed in the sorted order by loading
+  parameter added, labels="only" only lists the variable labels with
+    no analysis for a content analysis only
+  model solution invisibly returned that include the estimated parameters
+    and the scale reliabilities plus residuals
+  improved formatting of column displays
+
+corEFA
+  lavaan code generated for measurement model suggested by the EFA solution 
+
+simCLT
+  triangle package needed for antinormal distribution has been updated
+    to R 3.0, so antinormal distribution restored (antinormal distribution
+    has no values in the middle and most values at the extremes)
+
+
+---------------
+Bug Fixes 3.1
+---------------
+
+Merge, Recode, Subset, Transform
+  variable labels that exist in the input data frame(s) are retained
+    in the transformed data frame
+
+BarChart, SummaryStats
+  for more than 10 categories the proportions are correctly computed
+
+Correlation, ScatterPlot
+  correct variable labels listed
+
+ScatterPlot
+  method parameter used for purpose other than specifying spearman or
+    kendall for correlation type, of which use is now flagged
+
+corScree
+  specified correlation matrix analyzed instead of just one named mycor
+
+corEFA
+  1 factor solution completes
+
+
+
+
 >>>>>> Changes for lessR version 3.0 (2014-01-02)} <<<<<<
 
 -------------
@@ -42,7 +130,7 @@ Density
   missing data with specified bins now works
 
 ttest
-  density plot now in gray scale if colors="gray.black"
+  density plot in gray scale if colors="gray.black"
 
 
 
@@ -76,7 +164,7 @@ Bug Fixes 2.9.7
 ---------------
 
 BarChart
-  if a data frame analyzed, then a categorical variable with only a
+  if a data frame analyzed, then a categorical variable with only 
     a single value would cause a fatal error, now the remaining
     variables are analyzed and a diagnostic displayed instead
 
