@@ -156,8 +156,11 @@ Based on the standard \code{R} function \code{\link{lm}}, invisibly returns an o
 
 \references{
 Fox, J., & Weisberg, S. (2011). An R companion to applied regression (Second ed.). Thousand Oaks CA: Sage.
+
 Lumley, T., \code{leaps} function from the \code{leaps} package.\cr
 Nilsson, H. and Fox, J., \code{vif} function from the \code{car} package.\cr
+
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapters 9 and 10, NY: Routledge.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

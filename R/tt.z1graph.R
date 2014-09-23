@@ -9,15 +9,15 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   if (!brief) {
     cat("\n\n------ Graphics Smoothing Parameter ------\n\n")
     mytitle <- "Density bandwidth for "
-    cat(mytitle, .fmt(dYA$bw,digits.d), sep="", "\n\n")
+    cat(mytitle, .fmt(dYA$bw,digits.d), sep="", "\n")
   }
 
 
   cat("--------------------------------------------------\n")
 
   # values needed for graph
-  min.x <- min(dYA$x)  # min x coordinate for graph
-  max.x <- max(dYA$x)  # max x coordinate for graph
+  min.x <- min(min(dYA$x), mu0)  # min x coordinate for graph
+  max.x <- max(max(dYA$x), mu0)  # max x coordinate for graph
   max.y <- max(dYA$y)  # max y coordinate
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 

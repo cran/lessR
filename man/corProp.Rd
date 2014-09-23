@@ -37,6 +37,10 @@ Proportionality coefficients indicate the extent of proportionality between two 
 In the current version the diagonal of the input correlation matrix is ignored.  To maintain parallelism, the diagonal element of 1.00 would need to be replaced the corresponding communalities, which first requires a factor analysis.  
 }
 
+\references{
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 11, NY: Routledge.
+}
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 

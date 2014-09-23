@@ -66,6 +66,10 @@ For treating missing data, the default is \code{pairwise}, which means that an o
 If a correlation matrix is computed, the matrix is returned. Usually assign the name of \code{mycor} to the output matrix, as in following examples. This matrix is ready for input into any of the \code{lessR} functions that analyze correlational data, including confirmatory factor analysis by \code{\link{corCFA}} and also exploratory factor analysis, either the standard R function \code{\link{factanal}} or the \code{lessR} function \code{\link{corEFA}} 
 }
 
+\references{
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 8, NY: Routledge.
+}
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{

@@ -101,6 +101,6 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     }  # is.numeric(data[,i])
   }  # for
 
-  if (ncol(data)==1  && nu>n.cat) invisible(h)
+  if (ncol(data)==1  &&  nu>n.cat) invisible(h)
 
 }

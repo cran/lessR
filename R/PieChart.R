@@ -2,9 +2,10 @@ PieChart <-
 function(x, data=mydata, 
          col.fill=NULL, col.low=NULL, col.hi=NULL,
          colors=c("rainbow", "terrain", "heat"),
-         random.col=FALSE, main=NULL,
+         random.col=FALSE, main=NULL, cex=1, cex.main=1,
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+# ... not working in call to pie, results in a square chart
 
 
   if (missing(colors)) 
@@ -42,7 +43,7 @@ function(x, data=mydata,
 
   .pc.main(x.call, 
        random.col, col.fill, col.low, col.hi,
-       colors, quiet, main, 
+       colors, cex, cex.main, quiet, main, 
        pdf.file, pdf.width, pdf.height, ...)
 
   # terminate pdf graphics system

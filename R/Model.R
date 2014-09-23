@@ -88,7 +88,8 @@ function(my.formula, data=mydata, brief=getOption("brief"), ...) {
           .TwoGroup(x, y, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
             brief=FALSE, digits.d, 
-            conf.level=0.95, alternative="two.sided", mmd=NULL, msmd=NULL, 
+            conf.level=0.95, alternative="two.sided",
+            mmd=NULL, msmd=NULL, Edesired=NULL, 
             bw1="nrd", bw2="nrd", graph=TRUE, line.chart=FALSE, show.title=TRUE,
             pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
         else {  # switch
@@ -98,7 +99,8 @@ function(my.formula, data=mydata, brief=getOption("brief"), ...) {
           .TwoGroup(x, y, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
             brief=FALSE, digits.d, 
-            conf.level=0.95, alternative="two.sided", mmd=NULL, msmd=NULL, 
+            conf.level=0.95, alternative="two.sided",
+            mmd=NULL, msmd=NULL, Edesired=NULL, 
             bw1="nrd", bw2="nrd", graph=TRUE, line.chart=FALSE, show.title=TRUE,
             pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
         }

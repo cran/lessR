@@ -14,9 +14,9 @@ Plots a pie chart with default colors from a variety of different types of data.
 PieChart(x, data=mydata, 
          col.fill=NULL, col.low=NULL, col.hi=NULL,
          colors=c("rainbow", "terrain", "heat"),
-         random.col=FALSE, main=NULL, 
+         random.col=FALSE, main=NULL, cex=1, cex.main=1,
          quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         pdf.file=NULL, pdf.width=5, pdf.height=5, \dots)
 
 pc(\ldots)
 }
@@ -35,13 +35,14 @@ pc(\ldots)
         the second variable is not ordered, otherwise is ignored. When \code{TRUE},
         each run of the same function call generally yields different colors of the slices}
   \item{main}{Title of graph.}
+  \item{cex}{Magnification factor of labels relative to 1.}
+  \item{cex.main}{Magnification factor of title relative to 1.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
-  \item{\dots}{Other parameter values for graphics as defined 
-      by \code{\link{pie}} and  \code{\link{par}} including \code{col.main}, etc.}
+  \item{...}{Other parameter values.}
 }
 
 
@@ -70,7 +71,7 @@ STATISTICS\cr
 In addition to the pie chart, descriptive and optional inferential statistics are also presented.  First, the frequency table with proportions is displayed. Second, the corresponding chi-square test is also displayed.
 
 PDF OUTPUT\cr
-Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+Because \code{lessR} functions generate their own graphics calls, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
 The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:

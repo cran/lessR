@@ -145,7 +145,10 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
-\references{Gregory R. Warnes, Ben Bolker, Gregor Gorjanc, Gabor Grothendieck, Ales Korosec, Thomas Lumley, Don MacQueen, Arni Magnusson, Jim Rogers and others (2013). gdata: Various R programming tools for data manipulation. R package version 2.13.2. \url{http://CRAN.R-project.org/package=gdata}
+\references{
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 2, NY: Routledge.
+
+Gregory R. Warnes, Ben Bolker, Gregor Gorjanc, Gabor Grothendieck, Ales Korosec, Thomas Lumley, Don MacQueen, Arni Magnusson, Jim Rogers and others (2013). gdata: Various R programming tools for data manipulation. R package version 2.13.2. \url{http://CRAN.R-project.org/package=gdata}
 }
 
 

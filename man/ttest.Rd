@@ -8,7 +8,9 @@
 \description{
 Abbreviation: \code{tt}, \code{tt.brief}
 
-Provides enhanced output from the standard \code{\link{t.test}} function applied to the analysis of the mean of a single variable, or the independent groups analysis of the mean difference, from either data or summary statistics, or the analysis of a dependent-groups analysis from the data. The data can be in the form of a data frame or separate vectors of data, one for each group. This output includes the basic descriptive statistics, analysis of assumptions and the hypothesis test and confidence interval. For two groups the output also includes the analysis for both with and without the assumption of homogeneous variances, the pooled or within-group standard deviation, and the standardized mean difference or Cohen's \emph{d} and its confidence interval. The output from data for two groups introduces the \acronym{ODDSMD} plot, which displays the Overlapping Density Distributions of the two groups as well as the means, mean difference and Standardized Mean Difference. The plot also includes the results of the descriptive and inferential analyses. For the dependent-groups analysis, a scatter plot of the two groups of data also is produced, which includes the diagonal line through the scatter plot that represents equality, and a line segment for each point in the scatter plot which is the vertical distance from the point to the diagonal line to display the amount of change.
+Provides enhanced output from the standard \code{\link{t.test}} function applied to the analysis of the mean of a single variable, or the independent groups analysis of the mean difference, from either data or summary statistics. Includes the analysis of a dependent-groups analysis from the data. The data can be in the form of a data frame or separate vectors of data, one for each group. This output includes the basic descriptive statistics, analysis of assumptions and the hypothesis test and confidence interval. For two groups the output also includes the analysis for both with and without the assumption of homogeneous variances, the pooled or within-group standard deviation, and the standardized mean difference or Cohen's \emph{d} and its confidence interval.
+
+The output from data for two groups introduces the \acronym{ODDSMD} plot, which displays the Overlapping Density Distributions of the two groups as well as the means, mean difference and Standardized Mean Difference. The plot also includes the results of the descriptive and inferential analyses. For the dependent-groups analysis, a scatter plot of the two groups of data also is produced, which includes the diagonal line through the scatter plot that represents equality, and a line segment for each point in the scatter plot which is the vertical distance from the point to the diagonal line to display the amount of change.
 
 Can also be called from the more general \code{\link{model}} function.
 }
@@ -23,7 +25,7 @@ ttest(x=NULL, y=NULL, data=mydata, paired=FALSE,
 
          brief=getOption("brief"), digits.d=NULL, conf.level=0.95,
          alternative=c("two.sided", "less", "greater"),
-         mmd=NULL, msmd=NULL, 
+         mmd=NULL, msmd=NULL, Edesired=NULL, 
 
          show.title=TRUE, bw1="bcv", bw2="bcv",
 
@@ -71,12 +73,13 @@ tt(\ldots)
        and msmd is provided.}
   \item{msmd}{For the Standardized Mean Difference, Cohen's d, the Minimum value of
        practical importance. The concept is optional, and only one of mmd and msmd is provided.}
+  \item{Edesired}{The desired margin of error for the needed sample size calculation for a 95\% confidence interval, based on Kupper and Hafner (1989).}
+  \item{show.title}{Show the title on the graph of the density functions for two groups.}
   \item{bw1}{Bandwidth for the computation of the densities for the first group.}
   \item{bw2}{Bandwidth for the computation of the densities for the second group.}
   \item{graph}{If \code{TRUE}, then display the graph of the overlapping density distributions.}
   \item{line.chart}{Plot the run chart for the response variable for each group
         in the analysis.}
-  \item{show.title}{Show the title on the graph of the density functions for two groups.}
   \item{pdf.file}{Name of the pdf file to which the density graph is redirected. Also
        specifies to save the line charts if they are present with pre-assigned names.}
   \item{pdf.width}{Width of the pdf file in inches.}
@@ -127,6 +130,7 @@ Returned value is NULL except for a two-group analysis from a formula.  Then the
 
 \references{
 Ken Kelley and Keke Lai (2012). MBESS: MBESS. R package version 3.3.3. \url{http://CRAN.R-project.org/package=MBESS}
+Kupper and Hafner (1989). The American Statistician, 43(2):101-105.
 }
 
 

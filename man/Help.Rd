@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{hl}
 
-R works by entering function names and arguments.  R provides extensive help for each available function based on a function's name, but these names are not apparent to someone who has not memorized the names.  To alleviate this problem, this help system suggests and briefly explains various function calls regarding a requested topic for statistical analysis. The primary call is \code{Help()}, which displays the main help menu in a persistent graphics window, that is, which remains until explicitly closed by the user regardless of additional graphics analyses. Each specific Help window can be called with any of the function names, or their abbreviations displayed on that specific page.
+R works by entering function names and arguments.  R provides extensive help for each available function based on a function's name, but these names are not apparent to someone who has not memorized the names.  To alleviate this problem, this help system suggests and briefly explains various function calls regarding a requested topic for statistical analysis. The primary call is \code{Help()}, which displays the main help menu in a persistent graphics window, that is, which remains until explicitly closed by the user regardless of additional graphics analyses. Each specific Help window can be called with any of the function names, or their abbreviations or related expressions. The argument can be expressed in any combination of uppercase or lowercae lettes.
 }
 
 \usage{
@@ -99,11 +99,15 @@ Help()
 # short name
 hl()
 
-# specific help message regarding summary statistics
-Help("SummaryStats")
+# specific help message regarding a histogram and related functions
+Help(Histogram)
 
-# abbreviated form of function name
-Help("ss")
+# other ways to call the same help message
+Help(histogram)  # case insensitive
+Help(hs)
+Help(hist)
+Help(hst)
+Help(boxplot)
 }
 
 

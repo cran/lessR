@@ -1,7 +1,7 @@
 .pc.main <- 
 function(x,
          random.col, col.fill, col.low, col.hi,
-         colors, quiet, main, ...) {
+         colors, cex, cex.main, quiet, main, ...) {
 
   # set the labels
   # use variable label for main if it exists and main not specified
@@ -78,7 +78,8 @@ function(x,
 
   # plot the pie chart
   if (!is.table(x)) x <- table(x)
-  pie(x, col=col, main=main.lbl)  # putting ... makes chart a rectangle
+  # putting ... makes chart a rectangle
+  pie(x, col=col, main=main.lbl, cex=cex, cex.main=cex.main)
 
 # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
 

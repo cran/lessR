@@ -1,7 +1,7 @@
 .TwoGroup <-
 function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits.d,
-         conf.level, alternative, mmd, msmd, bw1, bw2, graph,
+         conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, graph,
          line.chart, show.title, pdf.file, pdf.width, pdf.height, ...)  {        
  
   if ( brief  &&  (!is.null(mmd) || !is.null(msmd)) ) { 
@@ -296,6 +296,27 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       cat("Minimum Standardized Mean Difference of practical importance: msmd\n")
       cat("Neither value specified, so no analysis\n")
     }
+  }
+
+  # needed sample size from Edesired
+  if (!is.null(Edesired)) {
+    zcut <- qnorm((1-conf.level)/2)
+    ns <- 2*((zcut*sw)/Edesired)^2 
+    n.needed <- ceiling(1.099*ns + 4.863) 
+    cat("\n\n------ Needed Sample Size ------\n\n")
+    if (Edesired > E) {
+      cat("Note: Desired margin of error,", .fmt(Edesired), 
+         "is worse than what was obtained,", .fmt(E), "\n\n") 
+    }
+    cat("Desired Margin of Error: ", .fmt(Edesired), "\n")
+    cat("\n")
+    cat("For the following sample size there is a 0.9 probability of obtaining\n")
+    cat("the desired margin of error for the resulting 95% confidence interval.\n")
+    cat("-------\n")
+    cat("Needed sample size per group: ", n.needed, "\n")
+    cat("\n")
+    cat("Additional data values needed Group 1: ", n.needed-n1, "\n")
+    cat("Additional data values needed Group 2: ", n.needed-n2, "\n")
   }
 
   # graphs

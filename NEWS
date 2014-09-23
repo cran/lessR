@@ -4,6 +4,50 @@ Update History for Package 'lessR'
 -------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 3.11 (2014-09-22)} <<<<<<
+
+-------------
+Updates 3.1.1
+-------------
+
+corReorder
+   provides a new cor matrix if specified
+
+BarChart
+  for gray scale, bars a little lighter shade of gray
+
+corEFA
+  lavaan code from the EFA solution revised
+
+label
+  no argument, label(), displays all variable names and labels
+
+PieChart
+  passing standard R graphics parameters produces a square chart, so to
+    avoid this issue the magnification factors cex and cex.main, for
+    the labels and title, are explicitly defined
+
+ScatterPlot
+  default 1-dimensional scatter plot is method="overplot"
+
+ttest
+  graph for one group extends to large deviant values of mu0 from the data
+  brief version includes the margin of error
+  includes needed sample size for desired margin of error for 1 and 2 groups
+
+Write
+  for a csv write, create a second file of any variable labels
+
+
+---------------
+Bug Fixes 3.1.1
+---------------
+
+label
+  if the specified variable does not exist, an error message is displayed
+
+
+
 >>>>>> Changes for lessR version 3.1 (2014-02-24)} <<<<<<
 
 -------------
@@ -43,8 +87,8 @@ SummaryStats (and functions that call SummaryStats)
     for "not a number"
 
 label
-  can assign a variable label to a variable as well as list the label,
-    so labels can be created/modified without reading from a file
+  can assign a variable label to a variable as well as list the label, so
+    labels can be created/modified without reading from an external file
 
 corCFA
   lavaan code for the default maximum likelihood solution with the lavaan
@@ -52,7 +96,7 @@ corCFA
   content of items by scale listed in the sorted order by loading
   parameter added, labels="only" only lists the variable labels with
     no analysis for a content analysis only
-  model solution invisibly returned that include the estimated parameters
+  model solution invisibly returned that includes the estimated parameters
     and the scale reliabilities plus residuals
   improved formatting of column displays
 
@@ -143,8 +187,8 @@ Updates 2.9.7
 -------------
 
 details
-  add a brief version, details.brief, which only lists the variable
-    name table and any variable labels
+  add a brief version, details.brief, which only lists the table of
+    variable names and any variable labels
 
 ScatterPlot
   for 1-D scatter plot, to conform to standard R, rename option
@@ -154,7 +198,7 @@ Read
   relying upon the read.xls function from the gdata package, can
     read Excel files identified by the .xls or .xlsx filetype,
     both the data file and/or the labels file can be Excel files
-  add a brief version, which calls the new details.brief
+  add a brief version, rd.brief, which calls the new details.brief
   provide an option to browse for the labels file, labels=""
   always display the full path of the data file and any label file
 
@@ -218,10 +262,6 @@ ttestPower
   value of n on graph displayed as an integer or with decimal digits
     as appropriate
 
-Regression
-  density lines in residuals density plot now appropriate color for
-    black backgrounds
-
 ScatterPlot
   for a scatter plot of two numeric variables, diag=TRUE places a diagonal 
     line through the plot with vertical lines from each point to the diagonal,
@@ -244,6 +284,10 @@ BarChart
 
 Density
   col.fill.nrm, normal curve fill, can set to transparent for blue color theme
+
+Regression
+  density lines in residuals density plot now appropriate color for
+    black backgrounds
 
 ScatterPlot
   xlim and ylim also applies to bubble plots, before they were ignored

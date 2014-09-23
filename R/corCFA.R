@@ -502,35 +502,45 @@ function(x=mycor, data=mydata,
 
   if (iter > 0) {
     cat("\n\n")
-    cat("lavaan code for confirmatory factor analysis of the model\n",
-        "---------------------------------------------------------\n", sep="")
+    cat("lavaan code for confirmatory factor analysis of the model,\n",
+        "fully standardized, maximum likelihood solution\n",
+        "----------------------------------------------------------\n", sep="")
 
     cat("\n")
 
     cat("library(lavaan)\n")
     cat("MeasModel <-\n")
-    cat("\" ")
 
     for (i in 1:NF) {
-      cat("\n  ", nmF[i], " =~", sep="")
+      if (i == 1) {
+        cat("\"")
+        cat("  ", nmF[i], " =~", sep="")
+      }
+      else {
+        cat("   ")
+        cat(nmF[i], " =~", sep="")
+      }
       for (j in LblCut[i,1]:LblCut[i,2]) {
-        if ( j == LblCut[i,1])
-          cat(" ", nm.new[j])
+        if (j == LblCut[i,1])
+          cat(" ", nm.new[j], sep="")
         else  
           cat(" +", nm.new[j])
       }
+      cat("\n")
     }
+    #for (i in 1:NF)
+      #cat("   ", nmF[i], " ~~ 1 * ", nmF[i], "\n", sep="")
+    cat("\"\n")
 
-    cat("\n\"\n")
-    cat("fit <- cfa(MeasModel, data=mydata)\n")
-    cat("summary(fit, fit.measures=TRUE, standardized=TRUE)\n")
+    cat("fit <- cfa(MeasModel, data=mydata, std.ov=TRUE, std.lv=TRUE)\n")
+    cat("summary(fit, fit.measures=TRUE)\n")
     cat("\n\n")
 
     cat("--------\n")
     cat(">>> The preceding code fits the model from data frame:  mydata\n")
     cat(">>> To access the correlation matrix directly without the data\n")
     cat(">>> use the following fit statement instead.\n")
-    cat("fit <- cfa(MeasModel, sample.cov=mycor, sample.nobs=nnn)\n")
+    cat("fit <- cfa(MeasModel, sample.cov=mycor, sample.nobs=nnn, std.lv=TRUE)\n")
     cat(">>>   mycor: name of correlation matrix\n")
     cat(">>>   nnn: numeric, number of observations\n")
     cat("\n")

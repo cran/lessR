@@ -5,7 +5,7 @@ if (getRversion() >= "2.15.1")
 .onAttach <-
 function(...) {
 
-  packageStartupMessage("\nlessR 3.1                                  ",
+  packageStartupMessage("\nlessR 3.1.1                                ",
                         "  www.lessRstats.com\n",
       "---------------------------------------------------------------\n",
       "To get started, and for help in general, enter:  > Help()\n",
@@ -94,14 +94,13 @@ function(...) {
   if (var.name == "NULL") from.data <- FALSE else from.data <- TRUE
 
   # see if the variable exists in the Global Environment
-  if (exists(var.name, where=.GlobalEnv)) {
+  in.global <- FALSE
+  if (nchar(var.name)>0) if (exists(var.name, where=.GlobalEnv)) {
     in.global <- TRUE
     if (!quiet)
       cat(">>> Note: ", var.name, "exists outside of a data",
           "frame (table)\n")
   }
-  else
-    in.global <- FALSE
 
   # see if "variable" is really a function call
   if (grepl("(", var.name, fixed=TRUE))  {

@@ -8,6 +8,12 @@ function(x, value=NULL, data=mydata) {
   dname <- deparse(substitute(data))
   options(dname = dname)
 
+  if (nchar(x.name)>0) if (!exists(x.name, where=data)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    "For data frame: ", dname, "\n",
+    "This variable does not exist: ", x.name, "\n")
+  }
+
   # get conditions and check for data existing
   xs <- .xstatus(x.name, dname)
   in.global <- xs$ig 
@@ -24,15 +30,21 @@ function(x, value=NULL, data=mydata) {
     }
   }
 
-  if (is.null(value)) {  # return an existing label
-    gl <- .getlabels()
-    lbl <- gl$xl
-    if (length(lbl) == 0) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "For variable: ", x.name, "\n",
-      "Either the variable or the label in the data frame or both do not exist.\n")
+  if (is.null(value)) {  # display an existing label
+    if (nchar(x.name) > 0) {
+      gl <- .getlabels()
+      lbl <- gl$xl
+      if (length(lbl) == 0) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "For variable: ", x.name, "\n",
+        "The variable label does not exist.\n")
+      }
+      return(lbl)
+     }
+    else {
+      mylabels <- attr(data, which="variable.labels")
+      return(mylabels)
     }
-    return(lbl)
   }
 
   else {  # assign a label to a var in a data frame and return data frame
@@ -54,4 +66,5 @@ function(x, value=NULL, data=mydata) {
     return(data) 
   }
   
+  cat("\n")
 }

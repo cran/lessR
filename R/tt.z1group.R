@@ -1,7 +1,7 @@
 .OneGroup  <-
 function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
-         paired, graph, line.chart, show.title,
+         Edesired, paired, graph, line.chart, show.title,
          pdf.file, pdf.width, pdf.height) { 
 
   # get variable label if exists
@@ -114,12 +114,11 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     txt <- "Hypothesis Test of Mean:  t-value = "
     cat(txt, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3), sep="", "\n\n")
   }
-  if (!brief)
-    cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="", "\n")
+  cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="", "\n")
   txt <- " Confidence Interval for Mean:  "
   cat(clpct, txt, .fmt(lb), " to ", .fmt(ub), sep="", "\n")
 
-  # mean difference from mu0 and standardized mean difference
+  # difference from mu0 and standardized mean difference
   if (!is.null(mu0)) {
     mdiff <- m - mu0
     smd <- abs(mdiff/s)
@@ -128,6 +127,27 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
         "Standardized Distance, Cohen's d:  ", .fmt(smd),
         sep="", "\n")
   }
+
+  # needed sample size from Edesired
+  if (!is.null(Edesired)) {
+    zcut <- qnorm((1-conf.level)/2)
+    ns <- ((zcut*s)/Edesired)^2 
+    n.needed <- ceiling(1.132*ns + 7.368) 
+    cat("\n\n------ Needed Sample Size ------\n\n")
+    if (Edesired > E) {
+      cat("Note: Desired margin of error,", .fmt(Edesired), 
+         "is worse than what was obtained,", .fmt(E), "\n\n") 
+    }
+    cat("Desired Margin of Error: ", .fmt(Edesired), "\n")
+    cat("\n")
+    cat("For the following sample size there is a 0.9 probability of obtaining\n")
+    cat("the desired margin of error for the resulting 95% confidence interval.\n")
+    cat("-------\n")
+    cat("Needed sample size: ", n.needed, "\n")
+    cat("\n")
+    cat("Additional data values needed: ", n.needed-n, "\n")
+  }
+
 
   # graphs
   if (from.data && graph && !is.null(mu0)) {

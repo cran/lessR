@@ -112,6 +112,8 @@ The function invisibly returns a list of six components.\cr
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \references{
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 11, NY: Routledge.
+
 Gerbing, D. W., & Hamilton, J. G. (1994). The surprising viability of a simple alternate estimation procedure for the construction of large-scale structural equation measurement models. Structural Equation Modeling: A Multidisciplinary Journal, 1, 103-115.
 
 Hunter, J. E., Gerbing, D. W., & Boster, F. J. (1982). Machiavellian beliefs and personality: The construct invalidity of the Machiavellian dimension. Journal of Personality and Social Psychology, 43, 1293-1305.

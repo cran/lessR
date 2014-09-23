@@ -73,9 +73,8 @@ mydata <- Recode(Severity, new.vars="SevereNew", old=1:4, new=c(10,20,30,40))
 mydata <- rec(Severity, old=1:4, new=seq(10,40,by=10))
 
 # reverse score four Likert variables: m01, m02, m03, m10 
-# data in a different data frame than mydata
-data(dataMach4)
-mydata <- Recode(c(m01:m03,m10), old=0:5, new=5:0, data=dataMach4)
+mydata <- Read("Mach4", format="lessR")
+mydata <- Recode(c(m01:m03,m10), old=0:5, new=5:0)
 
 # convert any 1 for HealthPlan to missing
 # use Read to put data into mydata data frame

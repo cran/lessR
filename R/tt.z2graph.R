@@ -10,7 +10,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
     cat("\n\n------ Graphics Smoothing Parameter ------\n\n")
     mytitle <- "Density bandwidth for "
     cat(mytitle, Xnm, " ", X1nm, ": ", .fmt(dYA$bw,digits.d), sep="", "\n")
-    cat(mytitle, Xnm, " ", X2nm, ": ", .fmt(dYB$bw,digits.d), sep="", "\n\n")
+    cat(mytitle, Xnm, " ", X2nm, ": ", .fmt(dYB$bw,digits.d), sep="", "\n")
   }
 
   cat("--------------------------------------------------\n")

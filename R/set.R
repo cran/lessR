@@ -110,9 +110,9 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
     }
     if (theme == "gray") {
       if (is.null(col.fill.bar))
-        options(col.fill.bar = .maketrans("gray30", .to256("trans.fill.bar")))
+        options(col.fill.bar = .maketrans("gray40", .to256("trans.fill.bar")))
       if (is.null(col.fill.pt))
-        options(col.fill.pt = .maketrans("gray30", .to256("trans.fill.pt")))
+        options(col.fill.pt = .maketrans("gray40", .to256("trans.fill.pt")))
       if (is.null(col.stroke.bar)) options(col.stroke.bar = "white")
       if (is.null(col.stroke.pt)) options(col.stroke.pt = "gray30")
       if (is.null(col.bg)) options(col.bg = "gray91")

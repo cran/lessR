@@ -40,6 +40,8 @@ Also provides the associated multiple indicator measurement model suggested by t
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \references{
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 11, NY: Routledge.
+
 Yves Rosseel (2012). lavaan: An R Package for Structural Equation
 Modeling. Journal of Statistical Software, 48(2), 1-36. URL
 http://www.jstatsoft.org/v48/i02/.

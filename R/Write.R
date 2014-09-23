@@ -25,7 +25,18 @@ function(ref=NULL, format=c("csv", "R"), data=mydata, ...) {
        file.data <- paste(ref, txt, sep="")
     }
     write.csv(data, file=file.data, ...)
+    .showfile(file.data, c(dname, "data values"))
+
+    mylabels <- attr(data, which="variable.labels") # save variable labels
+    if (!is.null(mylabels)) {
+      mylabels <- data.frame(mylabels)
+      file.lbl <- substr(file.data,1,nchar(file.data)-4)
+      file.lbl <- paste(paste(file.lbl,"_lbl",sep=""), ".csv" ,sep="")
+      write.table(mylabels, file=file.lbl, col.names=FALSE, dec=".", sep=",")
+      .showfile(file.lbl, c(dname, "variable labels"))
+    }
   }
+  
 
   else if (format == "R") {
     if (is.null(ref))
@@ -38,8 +49,8 @@ function(ref=NULL, format=c("csv", "R"), data=mydata, ...) {
       file.data <- paste(ref, txt, sep="")
     }
     save(list=dname, file=file.data, ...)
+    .showfile(file.data, c(dname, "data frame contents"))
   }
   
-  .showfile(file.data, c(dname, "data frame contents"))
 
 }

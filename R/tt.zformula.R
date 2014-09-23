@@ -58,9 +58,11 @@ function (my.formula, y=NULL, data, ...) {
     gu.out <- ""
     for (i in 1:length(gu)) gu.out <- paste(gu.out, gu[i], sep=" ")
     cat("\n"); stop(call.=FALSE, "\n","------\n",
+    "The grouping variable for this analysis: ", nm[2], "\n",
     "Values of the grouping variable: ", gu.out, "\n",
     "Number of unique values: ", length(gu), "\n",
-    "The grouping variable must have exactly two unique values.\n\n")
+    "The grouping variable must have exactly two unique values.\n",
+    "Use ANOVA to analyze more than two groups.\n\n")
   }
 
   vectors <- split(data[,nm[1]], data[,nm[2]])

@@ -71,7 +71,12 @@ The number of decimal digits displayed on the output is, by default, the maximum
 Following the standard \code{R} function \code{\link{aov}}, invisibly returns an object of \code{\link{class}} c("aov", "lm").
 }
 
+\references{
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 7, NY: Routledge.
+}
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
+
 
 \seealso{
 \code{\link{aov}}, \code{\link{TukeyHSD}}, \code{\link{interaction.plot}}

@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{subs}
 
-Based directly on the standard R \code{\link{subset}} function to only include or exclude specified rows or data, and for specified columns of data.  Output is provided that provides feedback and guidance regarding the specified subset operations. Rows of data may be randomly extracted, and also with the code provided to generate a hold out validation sample created. The hold out sample is created from the original data frame, usually named mydata, so the subset data frame must be directed to a data frame with a new name or the data re-read to construct the holdout sample. Any existing variable labels are retained in the subset data frame.
+Based directly on the standard R \code{\link{subset}} function to only include or exclude specified rows or data, and for specified columns of data.  Output provides feedback and guidance regarding the specified subset operations. Rows of data may be randomly extracted, and also with the code provided to generate a hold out validation sample created. The hold out sample is created from the original data frame, usually named mydata, so the subset data frame must be directed to a data frame with a new name or the data re-read to construct the holdout sample. Any existing variable labels are retained in the subset data frame.
 
 }
 
@@ -67,8 +67,6 @@ mydata <- read.table(text="Severity Description
 
 # only include those with a value of Moderate for Description
 mydata <- Subset(rows=Description=="Moderate")
-
-# only include those with a value of Moderate for Description
 # use abbreviation and do not need the rows= for the first argument
 mydata <- subs(Description=="Moderate")
 

@@ -173,6 +173,11 @@ If the analysis is of a single categorical variable, a list is invisibly returne
 }
 
 
+\references{
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 4, NY: Routledge.
+}
+
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{

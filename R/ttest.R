@@ -8,7 +8,7 @@ function(x=NULL, y=NULL, data=mydata, paired=FALSE,
 
          brief=getOption("brief"), digits.d=NULL, conf.level=0.95,
          alternative=c("two.sided", "less", "greater"),
-         mmd=NULL, msmd=NULL, 
+         mmd=NULL, msmd=NULL, Edesired=NULL, 
 
          show.title=TRUE, bw1="bcv", bw2="bcv",
 
@@ -64,7 +64,7 @@ function(x, y=NULL, ...) {
       if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
         .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
-          conf.level, alternative, mmd, msmd, bw1, bw2, graph,
+          conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, graph,
           line.chart, show.title, pdf.file, pdf.width, pdf.height)
       else {  # switch
         Xtmp <- X2nm
@@ -72,7 +72,7 @@ function(x, y=NULL, ...) {
         X1nm <- Xtmp
         .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
-          conf.level, alternative, mmd, msmd, bw1, bw2, graph,
+          conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, graph,
           line.chart, show.title, pdf.file, pdf.width, pdf.height)
       }
 
@@ -82,8 +82,14 @@ function(x, y=NULL, ...) {
       .TwoGroup(y, x,
          n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits.d, conf.level,
-         alternative, mmd, msmd, bw1, bw2, graph=FALSE, line.chart=FALSE)
+         alternative, mmd, msmd, Edesired, bw1, bw2,
+         graph=FALSE, line.chart=FALSE)
     }
+
+  if (!brief) {
+    txt <- "Kelley and Lai's MBESS package]"
+    cat("\n[smd CI with Ken Kelley's ci.smd function from", txt, "\n") 
+  }
 
   }  # end two.gp 
 
@@ -97,22 +103,16 @@ function(x, y=NULL, ...) {
         options(dname = NULL)
       }
       options(yname = x.name)
-      .OneGroup(x, Ynm, mu0, brief=brief, bw1=bw1,
-           from.data=from.data, conf.level=conf.level,
-           alternative=alternative, digits.d=digits.d,
-           mmd=mmd, msmd=msmd, paired=paired,
-           graph=graph, line.chart=line.chart,
-           show.title=show.title, pdf.file=pdf.file,
-           pdf.width=pdf.width, pdf.height=pdf.height)
+      .OneGroup(x, Ynm, mu0, n=NULL, m=NULL, s=NULL, brief, bw1,
+         from.data, conf.level, alternative, digits.d, mmd, msmd,
+         Edesired, paired, graph, line.chart, show.title,
+         pdf.file, pdf.width, pdf.height, ...)
     }
     else  # from stats
-      .OneGroup(x, Ynm, mu0, n, m, s, brief=brief, bw1=bw1,
-           from.data=from.data, conf.level=conf.level,
-           alternative=alternative, digits.d=digits.d,
-           mmd=mmd, msmd=msmd, paired=paired,
-           graph=graph, line.chart=line.chart,
-           show.title=show.title, pdf.file=pdf.file,
-           pdf.width=pdf.width, pdf.height=pdf.height, ...)
+      .OneGroup(x, Ynm, mu0, n, m, s, brief, bw1,
+         from.data, conf.level, alternative, digits.d, mmd, msmd,
+         Edesired, paired, graph, line.chart, show.title,
+         pdf.file, pdf.width, pdf.height, ...)
   }
 
 }  # end tt.setup
@@ -123,6 +123,11 @@ function(x, y=NULL, ...) {
 #-----------------------------------
 
   alternative <- match.arg(alternative)
+        
+  if (!is.null(Edesired) && conf.level != 0.95) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Edesired calculation only applies to 95% confidence level.\n\n")
+  }
 
   # get actual variable name before potential call of data$x, could be NULL
   x.name <- deparse(substitute(x)) 
@@ -236,9 +241,6 @@ function(x, y=NULL, ...) {
     }
 
   }
-
-  txt <- "Kelley and Lai's MBESS package]"
-  cat("[smd CI with Ken Kelley's ci.smd function from", txt, "\n") 
 
   if (!paired) cat("\n")
 

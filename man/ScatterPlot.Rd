@@ -37,7 +37,7 @@ ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat")
 
          fit.line=c("none", "loess", "ls"), col.fit.line="grey55",
 
-         bubble.size=.25, method="stack",
+         bubble.size=.25, method="overplot",
 
          ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
 
@@ -113,7 +113,7 @@ dp(\ldots)
       \code{"loess"} and \code{"ls"}.}
   \item{col.fit.line}{Color of the best fitting line, if the \code{fit.line} option is invoked.}
   \item{bubble.size}{Size of the bubbles in a bubble plot of Likert style data.}
-  \item{method}{Applies to one variable plots. Default is \code{"stack"}, but can also provide
+  \item{method}{Applies to one variable plots. Default is \code{"overplot"}, but can also provide \code{"stack"} to stack the points or
        \code{"jigger"} to scramble the points.}
   \item{ellipse}{If \code{TRUE}, enclose a scatterplot with the .95 data ellipse from the car package.}
   \item{col.ellipse}{Color of the ellipse.}
@@ -198,6 +198,8 @@ Commonly used graphical parameters that are available to the standard R function
 
 \references{
 Monette, G. and Fox, J., \code{dataEllipse} function from the \code{car} package.
+
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 8, NY: Routledge.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

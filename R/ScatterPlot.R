@@ -16,7 +16,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
 
          fit.line=c("none", "loess", "ls"), col.fit.line="grey55",
 
-         bubble.size=.25, method="stack",
+         bubble.size=.25, method="overplot",
 
          ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
 

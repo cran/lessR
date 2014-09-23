@@ -34,6 +34,10 @@ By default the variables are named V1, V2, etc.  If the \code{names} option is i
 The alternative is to calculate the correlations from the data, such as with the \code{lessR} function \code{\link{Correlation}} or the standard R function \code{\link{cor}}.
 }
 
+\references{
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 8, NY: Routledge.
+}
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{

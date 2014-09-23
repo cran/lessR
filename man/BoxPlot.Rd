@@ -111,6 +111,10 @@ Instead, do the following:
 Based on the standard \code{R} function \code{\link{boxplot}}, invisibly returns a list with components described in \code{\link{boxplot}}.
 }
 
+\references{
+Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 5, NY: Routledge.
+}
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{

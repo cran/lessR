@@ -9,6 +9,7 @@ Abbreviation: \code{mrg}
 
 Based directly on the standard R \code{\link{merge}} function for a horizontal merge that combines data frames horizontally, that is, adds variables (columns) to an existing data frame according to a common shared ID field. The vertical merge is based on the \code{\link{rbind}} function in which the two data frames have the same variables but different cases (observations), so the rows build vertically, stacked on top of each other. Any existing variable labels in the input data frames are retained in the merged data frame.
 
+The advantages of this \code{lessR} function is that it provides a single function for merging data frames, adds text output to the standard R functions that provide feedback regarding properties of the merge, provides more detailed and presumably more useful error messages, and preserves any variable labels that might exist in one or both of the merged data frames.
 
 }
 

@@ -189,6 +189,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
   # --------
   if (!quiet) details(data, n.mcut, miss.zero, max.lines, miss.show,
                       miss.matrix, brief)
+  else cat("\n")
 
   return(data)
 
