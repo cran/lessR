@@ -2,6 +2,20 @@ Help <-
 function(topic=NULL) {
 
 
+# set up plot window
+set.up.plot <- function(nlines) {
+  #dev.new(width=5.5, height=5.5)
+  par(mar=c(.5,.5,.5,.5), bg=rgb(255,253,250,maxColorValue=255),
+                          fg=rgb(20,15,15,maxColorValue=255), cex=.72)
+  plot.new()
+  plot.window(xlim=c(0,100), ylim=c(0,100))
+  if (!missing(nlines)) {
+    ybot <- 100 - ((nlines+1) * 4)
+    rect(-1, ybot, 95, 96, col=col.rect, lwd=.75, border=col.line)
+  }
+}
+
+
 help.more <- function(fname, yline) {
   h1 <- "Complete list of Help topics, enter:  Help()"
   h2 <- paste("For more help on a function, enter ? in front of its name:  ?", fname, sep="")
@@ -13,27 +27,15 @@ help.more <- function(fname, yline) {
   lines(c(5,90), c(yline,yline), col=col.sep)
   text(0,yline-5, label=h1, adj=0)
   text(0,yline-10, label=h2, adj=0)
+
+  on.exit(par(old.par))
 }
 
 
-# set up plot window
-set.up.plot <- 
-function(nlines) {
-  old.opt <- options()
-  on.exit(options(old.opt))
-  graphics.off()  # graphics get a clean start
-  dev.new(width=5.5, height=5.5)
-  par(mar=c(.5,.5,.5,.5), bg=rgb(255,253,250,maxColorValue=255),
-                          fg=rgb(20,15,15,maxColorValue=255), cex=.8)
-  plot.new()
-  plot.window(xlim=c(0,100), ylim=c(0,100))
-  if (!missing(nlines)) {
-    ybot <- 100 - ((nlines+1) * 4)
-    rect(-1, ybot, 95, 96, col=col.rect, lwd=.75, border=col.line)
-  }
-  options(old.opt)
-}
 
+# ------------------------------------------------
+
+old.par <- par("mar", "cex", "bg", "fg")
 
 if (missing(topic))
   topic <- NULL
@@ -47,10 +49,11 @@ else {
 }
 
 # convert topic to all lowercase letters
-if (!is.null(topic)) for (i in 1:nchar(topic)) {
-  xc <- substr(topic,i,i)
-  if (xc %in% LETTERS) substr(topic,i,i) <- letters[which(LETTERS==xc)] 
-}
+if (!is.null(topic))
+  for (i in 1:nchar(topic)) {
+    xc <- substr(topic,i,i)
+    if (xc %in% LETTERS) substr(topic,i,i) <- letters[which(LETTERS==xc)] 
+  }
 
 if (getOption("colors") != "gray") {
   col.rect <- getOption("col.fill.pt")
@@ -137,17 +140,12 @@ for the corresponding variable.
 
 MS Excel or other worksheet application can save data to a csv file. All 
 numeric data should be displayed in the General format, so that the only
-non-digit character for each numeric data value is a decimal point. The
-General format removes all dollar signs and commas, for example,
-leaving only the pure number, stripped of any extra characters, which R 
-will not properly read by default as a numeric data value.
+non-digit character for each numeric data value is a decimal point.
 
-To create the csv file from Excel, under the File option, do a Save As
-and choose the csv format. With the free, open source LibreOffice Calc,
-after the File option and then Save As, click the arrow in the left margin
-towards the bottom labeled File type. From the available options, choose
-Text CSV. Then click the Save button and then the OK button. Next, read
-the csv data file into R, [see Help(Read)].
+To create the csv file from Excel, do a Save As and choose the csv format.
+With the free, open source LibreOffice Calc, click the arrow in the left
+margin towards the bottom labeled File type. From the available options,
+choose Text CSV. Then Save button. 
 
 Another type of text data file is a fixed width format where each column
 of data values is assigned a specific width. Usually there are no spaces
@@ -156,11 +154,11 @@ is called an native R data file with a default file type of .rda. Data files
 written by the SPSS system have the default file type of .sav. By default
 both of these files can be read into R, as well as Excel files directly."
 
-set.up.plot()
+set.up.plot(0)
 text(50,100, label=t0, font=4)
-text(0,54, label=t1, adj=0)
+text(0,53, label=t1, adj=0)
 
-help.more("Read", 9)
+help.more("Read", 8)
 }
 
 
@@ -175,8 +173,9 @@ file system and read the information into the specified data table (frame). Use
 the function Read, or its abbreviations, rd or rd.brief. To browse, use ().
     > mydata <- Read()
 The  <-, the assignment operator, instructs R to assign what was read to the
-data table (or data frame), here specified as mydata. This is the default name
+data table (data frame), here specified as mydata. This is the default name
 that all the lessR data analysis functions assume when reading data for analysis.
+Read variable labels with the labels option to specify the file of labels.
 
 Or, specify the file to be read with the name in quotes. Here a file on the web.
     > mydata <- Read(\"http://lessrstats.com/data/twogroup.csv\")
@@ -184,11 +183,6 @@ To read a text file with a , for a decimal point, use Read2().
 
 To read Excel files requires something called Perl, which is usually on Mac and
 Linux systems, but Windows users need to install. Enter ?Read for directions.
-
-Read variable labels with the labels option to specify the file of labels.
-
-To see how to create a comma separated values or csv data file: > Help(data)
-To see how to use R to create an R data file, enter: > Help(Write)
 
 To read a text file with each column of data values assigned a specific
 width, add the widths option that specifies the width of each column
@@ -238,9 +232,9 @@ set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 #lines(c(5,90), c(89,89), col=col.line)
-text(0,55, label=t1, adj=0)
+text(0,52, label=t1, adj=0)
 
-help.more("Write", 19)
+help.more("Write", 11)
 }
 
 
@@ -252,10 +246,9 @@ f2 <- bquote(paste(bold("library"), "  Load an installed package from the librar
 f3 <- bquote(paste(bold(update.packages), "  Update contributed packages to current versions."))
 
 t1 <-
-"All of R works with functions contained in specific packages. The distinction
-is that some of those packages are included with the default installation of R, 
-and are pre-loaded each time the application is run. Examples are the stat and 
-the graphic packages. Other packages must be explicitly downloaded. 
+"All of R works with functions contained in specific packages. Some packages, 
+such as graphics, are included with the default installation of R, and are
+pre-loaded each time R is run. Other packages must be explicitly downloaded. 
 
 The example here is for the contributed package lessR. Install one time 
 only for a specific computer, with quotes.
@@ -264,15 +257,13 @@ only for a specific computer, with quotes.
 Each time the R application is started, including after the install, load the 
 package from the library, without using quotes.
     > library(lessR)
-
 To see the description of the package and a list of its functions,
     > library(help=lessR)
+To see a list of all installed packages in the library, 
+    > library()
 
 To access updated versions of all installed packages, 
-    > update.packages()
-
-To see a list of all installed packages in the library, 
-    > library()"
+    > update.packages()"
 
 set.up.plot(3)
 text(50,100, label=t0, font=4)
@@ -280,9 +271,9 @@ text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 text(0,86, label=f3, adj=0)
 #lines(c(5,90), c(80,80), col=col.line)
-text(0,47, label=t1, adj=0)
+text(0,44, label=t1, adj=0)
 
-help.more("install.packages", 12)
+help.more("install.packages", 8)
 }
 
 
@@ -299,20 +290,15 @@ f5 <- bquote(paste(bold("Subset"), "  Extract a subset of data, variables (colum
 t1 <-
 "The R function fix provides a graphical/mouse interface for editing data.
     > fix(mydata)
-
 The lessR function Transform creates a new variable or rewrites over existing.
     > mydata <- Transform(SalaryDiv=Salary/1000)
-
-The lessR function Recode, or just rec, changes individual values. Here change
-the values of variable Scores from 1 to 4 to 10, 15, 20, and 25, respectively.
+The lessR function Recode changes individual values. 
     > mydata <- Recode(Scores, old=c(1:4), new=c(10,15,20,25))
-
 Use the R function factor to create a new variable with non-numeric categories.
 Severity was encoded with a 1 for Mild, 2 for Moderate and 3 for Severe.
     > mydata <- Transform(ordered=TRUE, Severity.f= 
                  factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
 Here the values of the new variable are also ordered, from Mild to Severe. 
-
 Extract subsets of data from a data frame with the lessR Subset function.
     > mydata <- Subset(rows=Gender==\"M\", columns=c(Years, Salary))
 The data frame, mydata, now consists only of data for Males limited to
@@ -329,11 +315,11 @@ text(0,78, label=f5, adj=0)
 #lines(c(5,90), c(78,78), col=col.line)
 text(0,40, label=t1, adj=0)
 
-help.more("Recode", 7)
+help.more("Recode", 9)
 }
 
 
-else if (topic == "system") {
+else if (topic %in% c("system", "set")) {
 t0 <- "System Level Settings"
 
 f1 <- bquote(paste(bold("set"), "  lessR function to access to lessR system settings such as a color theme."))
@@ -341,11 +327,9 @@ f2 <- bquote(paste(bold("options"), "  Standard R function to access system sett
 
 t1 <-
 "The lessR function set provides system settings for the lessR system, as well
-as some of the more commonly used general R settings. One option is to set
-the color theme for the graphics functions. Aspects of these plots can be
-customized individually, but the color theme provides a theme of related colors 
-for a graph.  The default color theme is colors=\"dodgerblue\", with possibilities of
-\"gray\", \"green\", \"gold\", \"rose\", \"red\", \"dodgerblue\", \"purple\", \"sienna\", \"white\",
+as some of the more commonly used general R settings. Set the color theme for
+the graphics functions. The default color theme is colors=\"dodgerblue\", with
+possibilities of \"gray\", \"green\", \"gold\", \"rose\", \"red\", \"dodgerblue\", \"purple\", \"sienna\", \"white\",
 \"orange.black\" and \"gray.black\". Here set subsequent graphics to gray scale.
     > set(colors=\"gray\") 
 The transparency level of bars and plotted points is set with the trans.fill.bar and 
@@ -369,7 +353,7 @@ text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 #lines(c(5,90), c(80,80), col=col.line)
-text(0,46, label=t1, adj=0)
+text(0,47, label=t1, adj=0)
 
 help.more("set", 9)
 }
@@ -387,14 +371,11 @@ f4 <- bquote(paste(bold("ScatterPlot, sp"), "  Scatter plot of 1 variable."))
 t1 <-
 "These functions plot a distribution of data values for a continuous variable
 such as Time. Replace Y in these examples with the actual variable name.
-
 A histogram, or hs, based on the current color theme.
     > Histogram(Y)
-
 Specify the gray scale color theme, a title, and a label for the x axis.
     > set(colors=\"gray\")
     > Histogram(Y, main=\"My Title\", xlab=\"Y (mm)\")
-
 Specify bins, starting at 60 with a bin width of 10. Can also specify bin.end.
     > Histogram(Y, bin.start=60, bin.width=10)
 
@@ -404,8 +385,7 @@ BoxPlot or bx, and a one variable ScatterPlot, or sp.
 
 These functions, except sp, can also replace the variable name such as Y 
 with a list of multiple variables, such as c(Salary, Years) or Salary:Years, or
-an entire data frame. The default data frame is mydata. Here do a histogram
-of all numerical variables in the mydata data frame.
+an entire mydata data frame by passing no argument.
     > Histogram()
 "
 
@@ -416,7 +396,7 @@ text(0,90, label=f2, adj=0)
 text(0,86, label=f3, adj=0)
 text(0,82, label=f4, adj=0)
 #lines(c(5,90), c(78,78), col=col.line)
-text(0,43, label=t1, adj=0)
+text(0,42, label=t1, adj=0)
 
 help.more("Histogram",8)
 }
@@ -430,24 +410,20 @@ f2 <- bquote(paste(bold("PieChart, pc"), "  Pie chart of the values of a categor
 f3 <- bquote(paste(bold("pareto.chart"), "  Produce a Pareto chart."))
 
 t1 <-
-"The generic variable in the examples below is usually a categorical variable Y. 
-Replace with the actual name of the variable in a specific analysis. 
-
-Default bar chart with lessR function BarChart, or bc, as well as the frequency
-table, for one or two variables.
+"Default bar chart with lessR function BarChart, or bc, as well as the frequency
+table, for one or two variables. Replace Y and X with your actual variable names.
     > BarChart(Y)
     > BarChart(Y, by=X)
     
 With lessR function PieChart or pc, generate a pie chart and associated frequencies.
     > PieChart(Y)
     
-The pareto.chart function is part of the external library called gcc. To view an 
-explanation of dealing with libraries, enter Help(\"libraries\"). Default input 
-Pareto chart follows, which works from the counts. This function is not from lessR,
-so the name of the variable must be preceded by the data frame name and a $. 
+The pareto.chart function is part of the external library called gcc (see Help(\"libraries\").
+This function is not from lessR, so the name of the variable must be preceded
+by the data frame name and a $. 
     > library(gcc)
     > Ycount <- table(mydata$Y)
-    > pareto.chart(Ycount)
+    > pareto.chart(Ycount$freq)
 
 Can replace the variable name such as Y with a list of multiple variables, such
 as c(Salary, Years) or Salary:Years, or an entire data frame. The default data
@@ -463,7 +439,7 @@ text(0,86, label=f3, adj=0)
 #lines(c(5,90), c(81,81), col=col.line)
 text(0,44, label=t1, adj=0)
 
-help.more("BarChart", 8)
+help.more("BarChart", 9)
 }
 
 
@@ -473,8 +449,8 @@ t0 <- "Line Chart"
 f1 <- bquote(paste(bold("LineChart, lc"), "  A line chart, such as a run chart or time series chart."))
 
 t1 <-
-"The lessR function LineChart, or lc, generates a line chart, in color, with 
-values ordered along some dimension such as time. If the data do not have a 
+"The lessR function LineChart, or lc, generates a line chart with values
+ordered along some dimension such as time. If the data do not have a 
 pronounced trend, a centerline is automatically provided.
     > LineChart(Y)
 Also provided is a list of all the runs in the data.
@@ -482,11 +458,7 @@ Also provided is a list of all the runs in the data.
 The line chart becomes a time series chart with times/dates on the horizontal
 axis.  Use the time.start and time.by options.
     > LineChart(Y, time.start=\"2005/09/01\", time.by=\"month\")
-
-The graphic functions can access a wide range of graphics parameters, such 
-as the size of the margins, the annotations, the line width, etc. These additional 
-options are explained in the help files for the R functions par, title, points 
-and lines. 
+Additional options are explained in the R help files for functions par, title, points and lines. 
 
 Color themes are available with the colors option, which can be invoked
 from a specific call to LineChart or system wide for all graphics output with the 
@@ -519,21 +491,17 @@ t1 <-
 "ScatterPlot, or sp, generates a scatter plot for either one or two variables.
 The points have a default transparency, which can be set from completely
 transparent to oblique.  The plot uses the current color theme.
-
-This example is the default scatterplot for variables named X and Y.
     > ScatterPlot(X, Y)
 If the values of X are sorted, a function plot is generated instead so that the
 points are not individually displayed and are connected by line segments.
+If the number of response values is less than 10, a bubble plot is produced
 
-Here generate a one dimensional scatterplot, that is, a dot plot, for a
-variable named Y. 
+Here generate a one-dimensional scatterplot, that is, a dot plot. 
     > ScatterPlot(Y)
-Can also generate the same plot with the function name of DotPlot or dp.
 
 ScatterPlot can also provide for plotting two variables with different
 symbols and/or colors for each level of a third variable.
     > ScatterPlot(X, Y, by=Z)
-If the number of response values is less than 10, a bubble plot is produced
 to better display multiple replications of the same point.
 
 Color themes are available with the colors option, from a call to ScatterPlot
@@ -548,7 +516,7 @@ text(0,94, label=f1, adj=0)
 #lines(c(5,90), c(90,90), col=col.line)
 text(0,50, label=t1, adj=0)
 
-help.more("Plot", 9)
+help.more("Plot", 8)
 }
 
 
@@ -584,8 +552,8 @@ text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 #lines(c(5,90), c(85,85), col=col.line)
-text(0,52, label=t1, adj=0)
-help.more("SummaryStats", 20)
+text(0,50, label=t1, adj=0)
+help.more("SummaryStats", 11)
 }
 
 
@@ -598,8 +566,7 @@ f3 <- bquote(paste(bold("prop.test"), "  Inference for a proportion from approxi
 
 t1 <-
 "These inference tests analyze the mean of a numeric variable or the proportion 
-of a value of a categorical variable. These tests provide a hypothesis test 
-and a confidence interval.
+of a value of a categorical variable with a hypothesis test and  confidence interval.
 
 This example uses the lessR function ttest, or tt, to evaluate a variable named
 Y and a null hypothesis of mu=100. Specify the brief version with tt.brief.
@@ -624,9 +591,9 @@ text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 text(0,86, label=f3, adj=0)
 #lines(c(5,90), c(82,82), col=col.line)
-text(0,49, label=t1, adj=0)
+text(0,45, label=t1, adj=0)
 
-help.more("ttest", 14)
+help.more("ttest", 8)
 }
 
 
@@ -646,8 +613,6 @@ also called a factor, is named X, which must have exactly two values.
     >  ttest(Y ~ X)
 When the tilde, ~, expresses the relationship between two or more variables, 
 R refers to this expression as a formula, read as: Y is described by X.
-Can also specify with the more general function model.
-    > Model(Y ~ X)
 
 Sometimes the data for a t-test are arranged so that the responses for 
 each group, Y, already are in separate columns called vectors. Here calculate 
@@ -659,30 +624,27 @@ Or, directly from summary statistics, the sample size (n), sample mean (m)
 and sample standard deviation (s). Ynm is the name of the response variable.
     > ttest(n=34, m=8.92, s=1.67, Ynm=\"Time\")"
 
-set.up.plot(2)
+set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
-text(0,90, label=f2, adj=0)
+#text(0,90, label=f2, adj=0)
 #lines(c(5,90), c(86,86), col=col.line)
-text(0,50, label=t1, adj=0)
+text(0,52, label=t1, adj=0)
 
-help.more("ttest", 14)
+help.more("ttest", 12)
 }
 
 else if (topic %in% c("anova", "av")) {
 t0 <- "Compare Means of Two or More Groups"
 
 f1 <- bquote(paste(bold("ANOVA, av"), "  Analysis of variance to compare two or more group means."))
-f2 <- bquote(paste(bold("Model, model"), "  ANOVA if explanatory variables are categorical."))
 t1 <-
 "When responses to a variable are organized into exactly two groups, either the 
-t-test function, ttest, or the lessR analysis of variance function, ANOVA, or simply
-av, can compare the group means. With more than two groups, ANOVA is
-required. Here the numerical response variable is named Y and the grouping
-variable, or factor, is X, which may have more than two discrete values. 
+t-test function, ttest, or the lessR analysis of variance function, ANOVA,
+or simply av, can compare the group means. With more than two groups,
+ANOVA is required. Here the numerical response variable is named Y and the
+grouping variable, or factor, is X. 
     > ANOVA(Y ~ X)
-or
-    > Model(Y ~ X)
 This is called one-way ANOVA because there is only a single factor, X.
 
 If the ANOVA with more than two levels is significant, then a post-hoc
@@ -697,14 +659,13 @@ For a two way between groups ANOVA, specify two factors with a * .
     > ANOVA(Y ~ X1 * X2)
 "
 
-set.up.plot(2)
+set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
-text(0,90, label=f2, adj=0)
 #lines(c(5,90), c(85,85), col=col.line)
-text(0,51, label=t1, adj=0)
+text(0,53, label=t1, adj=0)
 
-help.more("aov", 17)
+help.more("av", 15)
 }
 
 
@@ -736,9 +697,9 @@ set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 #lines(c(5lessR ,90), c(89,89), col=col.line)
-text(0,62, label=t1, adj=0)
+text(0,59, label=t1, adj=0)
 
-help.more("ttp", 33)
+help.more("ttp", 25)
 }
 
 
@@ -753,25 +714,20 @@ t1 <-
 Or for a data frame, mydata by default, the correlation matrix is computed, with
 pairwise deletion of missing data by default. A heat map and scatter plot matrix
 can also be generated with  graphics=TRUE. The matrix is displayed and also is
-stored as mycor such as for a subsequent factor analysis. 
+stored as mycor such as for a subsequent factor analysis. Set the method option to
+\"spearman\" or \"kendall\" to get these correlations.
 
 The lessR function, ScatterPlot, or just sp, displays a scatterplot for two variables
 or a scatterplot matrix for a data frame. The corresponding correlation or
 correlation matrix is also displayed. See Help(ScatterPlot) for more information.
-
-This example is for the correlation coefficient, inference and scatterplot for two 
-numerical variables, X and Y, both the correlational analysis by itself, and also
-with the scatterplot.
-    > Correlation(X,Y)
-    > Plot(X,Y)
+    > mycor <- Correlation(X,Y)
 The brief form for the correlation analysis for two variables also exists.
-    > cr.brief(X,Y)
+    > mycor <- cr.brief(X,Y)
 
 Or, analyze many correlations at once, such as for Y, X1, X2 and X3 in 
 the data frame called mydata.
-    > Correlation(c(Y,X1:X3))
+    > mycor <- Correlation(c(Y,X1:X3))
 
-Set the method option to \"spearman\" or \"kendall\" to get these correlations.
 "
 
 set.up.plot(2)
@@ -779,31 +735,24 @@ text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 text(0,90, label=f3, adj=0)
 #lines(c(5,90), c(83,83), col=col.line)
-text(0,44, label=t1, adj=0)
+text(0,47, label=t1, adj=0)
 
-help.more("Correlation", 8)
+help.more("Correlation", 12)
 }
 
 
 else if (topic %in% c("regression", "reg")) {
-t0 <- "Linear Models and Regression"
+t0 <- "Regression Analysis"
 
-f1 <- bquote(paste(bold("Regression, reg"), "  Regression analysis."))
+f1 <- bquote(paste(bold("Regression, reg, reg.brief"), "  Regression analysis."))
 f2 <- bquote(paste(bold("Model, model"), "  Regression analysis if the variables are numerical."))
 
 t1 <-
-"The function Regression preforms a regression analysis and stores the 
-results in an R object called lm.out, which is available for further analysis. 
-This example specifies a multiple regression model with a response variable
-named Y and two predictor variables, X1 and X2.
+"Regression preforms a regression analysis. Here do multiple regression
+with response variable Y and two predictor variables, X1 and X2.
      > Regression(Y ~ X1 + X2)
 The standard R formula function specifies the model, which uses the tilde, ~,
 to mean 'depends on', and then the plus sign, +, to separate terms.
-
-If all the variables in the model are numerical, then a call to the general
-function Model will, in turn, call the Regression function.
-     > Model(Y ~ X1 + X2)
-The Model function also applies to the analysis of other linear models.
 
 The output of Regression is comprehensive, including a predictor subset
 analysis, residuals, prediction intervals, and graphics for error diagnostics.
@@ -813,17 +762,20 @@ default. A scatterplot matrix is produced for multiple predictor variables.
 
 The abbreviated form of the function is reg, such as
      > reg(Y ~ X1 + X2)
-Also obtain abbreviated output from, for example,
-     > reg.brief(Y ~ X1 + X2)"
+To obtain abbreviated output set brief=TRUE, or
+     > reg.brief(Y ~ X1 + X2)
+To obtain specified prediction intervals, for example,
+     > reg(Y ~ X1 + X2, X1.new=c(10,20), X2.new=c(100:110))
+X1.new, X2.new, etc. always specify the values of the predictor variables
+for the prediction intervals regardless of their names."
 
-set.up.plot(2)
+set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
-text(0,90, label=f2, adj=0)
-#lines(c(5,90), c(87,87), col=col.line)
-text(0,48, label=t1, adj=0)
+text(0,52, label=t1, adj=0)
 
-help.more("Regression", 9)
+help.more("Regression", 11)
+
 }
 
 
@@ -984,9 +936,9 @@ text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 text(0,90, label=f2, adj=0)
 #lines(c(5,90), c(85,85), col=col.line)
-text(0,54, label=t1, adj=0)
+text(0,52, label=t1, adj=0)
 
-help.more("rnorm", 21)
+help.more("rnorm", 15)
 }
 
 
@@ -1020,9 +972,9 @@ set.up.plot(1)
 text(50,100, label=t0, font=4)
 text(0,94, label=f1, adj=0)
 #lines(c(5,90), c(90,90), col=col.line)
-text(0,57, label=t1, adj=0)
+text(0,54, label=t1, adj=0)
 
-help.more("sample", 22)
+help.more("sample", 15)
 }
 
 
@@ -1035,7 +987,7 @@ t3 <- "lessR"
 t4 <- "David W. Gerbing"
 t5 <- "School of Business Administration"
 t6 <- "Portland State University"
-t7 <- "Version 2.4, July 10, 2012"
+#t7 <- "Version 2.4, July 10, 2012"
 #set.up.plot()
   plot.new()
   plot.window(xlim=c(0,100), ylim=c(0,100))
@@ -1045,7 +997,7 @@ text(50,76, label=t3)
 text(50,58, label=t4)
 text(50,54, label=t5)
 text(50,50, label=t6)
-text(50,24, label=t7)
+#text(50,24, label=t7)
 
 #Help()
 Help("data")

@@ -132,6 +132,11 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     }
   }
 
+  # keep track of generated graphics
+    plot.i <- 0
+    plot.title  <- character(length=0)
+
+  # --------------------------------------------------------
   # reg analysis
   #   all analysis done on data in model construct lm.out$model
   #   this model construct contains only model vars, with Y listed first
@@ -173,12 +178,17 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
   if (res.rows > 0) {  # two plots here
 
-    if (!pdf) .graphwin(3)  # set up graphics system
+    if (options("device") != "RStudioGD")
+      if (!pdf) .graphwin(3)  # set up graphics system to manage
 
-    .reg3Residual(lm.out, nm,
+    plt <- .reg3Residual(lm.out, nm,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          res.sort, res.rows, cooks.cut,
          pdf, pdf.width, pdf.height, ...)
+
+    for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
+    plot.i <- plot.i + plt$i
+
    }
 
     
@@ -192,12 +202,15 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new)
    
-  .reg5Plot(lm.out, nm, my.formula, brief, res.rows,
+    splt <- .reg5Plot(lm.out, nm, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
          new.data, pred.rows, scatter.3D, scatter.coef,
          numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new, prd$cint, prd$pint,
          pdf, pdf.width, pdf.height, ...)
+
+    for (i in (plot.i+1):(plot.i+splt$i)) plot.title[i] <- splt$ttl[i-plot.i]
+    plot.i <- plot.i + splt$i
 
 
   # cites
@@ -239,7 +252,9 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     cat("\n")
   }
 
+  if (plot.i > 1) .plotList(plot.i, plot.title)
 
+  dev.set(which=2)  # reset graphics window for standard R functions
   invisible(lm.out)
   
 }

@@ -7,7 +7,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     col.grid=getOption("col.grid"),
 
     col.reg="snow2", over.grid=FALSE,
-    cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+    cex.axis=.85, col.axis="gray30", 
 
     breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
 
@@ -72,7 +72,6 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
 
   for (i in 1:ncol(data)) {
-    cat("\n")
 
     nu <- length(unique(na.omit(data[,i])))
 
@@ -86,7 +85,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
      .opendev(pdf.fnm, pdf.width, pdf.height)
 
       h <- .hst.main(data[,i], col.fill, col.stroke, col.bg, col.grid, col.reg,
-          over.grid, cex.axis, col.axis, col.ticks, breaks, bin.start, bin.width,
+          over.grid, cex.axis, col.axis, breaks, bin.start, bin.width,
           bin.end, prop, cumul, digits.d, xlab, ylab, main, quiet, ...)
 
       if (go.pdf) {
@@ -101,6 +100,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     }  # is.numeric(data[,i])
   }  # for
 
+  dev.set(which=2)  # reset graphics window for standard R functions
   if (ncol(data)==1  &&  nu>n.cat) invisible(h)
 
 }

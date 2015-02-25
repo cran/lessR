@@ -2,7 +2,7 @@
 function(x, y, by, data, type, n.cat,
          col.fill, col.stroke, col.bg, col.grid,
          shape.pts, col.area, col.box, 
-         cex.axis, col.axis, col.ticks, 
+         cex.axis, col.axis,
          xy.ticks, xlab, ylab, main, cex, kind,
          fit.line, col.fit.line, bubble.size,
          ellipse, col.ellipse, fill.ellipse,
@@ -114,17 +114,17 @@ function(x, y, by, data, type, n.cat,
       suppressWarnings(plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
              main=main.lab, xlim=c(l1,l2), ylim=c(l1,l2), ...))
     if (xy.ticks){
-      axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
-      axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
+      axis(1, cex.axis=cex.axis, col.axis=col.axis, ...)
+      axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
     }
   }
 
   else if (kind == "xcat") {
     plot.default(y ~ x, xlim=c(.5,nlevels(x)+.5), type="n", axes=FALSE, 
                 xlab=x.lab, ylab=y.lab, main=main.lab, ...)
-    axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
+    axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
     axis(1, labels=levels(x), at=1:nlevels(x), 
-            cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
+            cex.axis=cex.axis, col.axis=col.axis, ...)
   }
 
   else if ((kind == "bubble") || (kind == "sunflower")) {

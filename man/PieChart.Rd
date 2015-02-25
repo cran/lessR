@@ -98,9 +98,9 @@ Instead, do the following:
 
 # Pain is an ordered factor, Gender is an unordered factor
 # Place in data frame mydata to simulate reading with rad
-Pain <- sample(c("None", "Some", "Much", "Massive"), size=25, replace=TRUE)
+Pain <- sample(c("None", "Some", "Much", "Massive"), size=50, replace=TRUE)
 Pain <- factor(Pain, levels=c("None", "Some", "Much", "Massive"), ordered=TRUE)
-Gender <- sample(c("Male", "Female"), size=25, replace=TRUE)
+Gender <- sample(c("Male", "Female"), size=50, replace=TRUE)
 Gender <- factor(Gender)
 mydata <- data.frame(Pain, Gender)
 rm(Pain); rm(Gender)

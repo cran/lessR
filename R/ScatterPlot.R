@@ -9,7 +9,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          col.area=NULL, col.box="black",
 
          shape.pts="circle", cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE,
+         xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
 
          kind=c("default", "regular", "bubble", "sunflower"),
@@ -169,20 +169,21 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
     }
   }
 
-  # set up graphics system
-  if (is.null(pdf.file))  {
-    if (missing(by)) 
-      .graphwin(1) 
-    else
-      .graphwin(d.w=pdf.width)  # add width to default of 4.5 for legend
-    orig.params <- par(no.readonly=TRUE)
-    on.exit(par(orig.params))
-  }
+  # graphics 
+  if (is.null(pdf.file))  {  
+    if (options("device") != "RStudioGD") {
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+      if (missing(by))  # set up graphics system to manage
+        .graphwin(1) 
+      else
+        .graphwin(d.w=pdf.width)  # add width to default of 4.5 for legend
+      }
+    }
   else  {
     if (!missing(by)) pdf.width <- pdf.width + 0.6
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
   }
-
 
 
   if (class(x.call)[1] == "data.frame") {
@@ -198,7 +199,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
       .plt.main(x.call, y.call, by.call, data, type, n.cat,
          col.fill, col.stroke, col.bg, col.grid,
          shape.pts, col.area, col.box, 
-         cex.axis, col.axis, col.ticks, 
+         cex.axis, col.axis, 
          xy.ticks, xlab, ylab, main, cex, kind,
          fit.line, col.fit.line, bubble.size,
          ellipse, col.ellipse, fill.ellipse,
@@ -208,7 +209,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
     else
       .dp.main(x.call, by.call,
          col.fill, col.stroke, col.bg, col.grid, shape.pts,
-         cex.axis, col.axis, col.ticks, xlab, main, cex, 
+         cex.axis, col.axis, xlab, main, cex, 
          method, pt.reg, pt.out, 
          col.out30, col.out15, quiet, new, ...)
   }

@@ -81,7 +81,7 @@ tt(\ldots)
   \item{line.chart}{Plot the run chart for the response variable for each group
         in the analysis.}
   \item{pdf.file}{Name of the pdf file to which the density graph is redirected. Also
-       specifies to save the line charts if they are present with pre-assigned names.}
+       specifies to save the line charts with pre-assigned names if they are computed.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Further arguments to be passed to or from methods.}

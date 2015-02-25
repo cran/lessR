@@ -14,7 +14,6 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
   options(dname = dname)
  
   op <- options()  # save current options to reset at end
-  options(show.signif.stars=FALSE, scipen=30)
 
   if (!exists(dname)) {
     txtC <- "Function ANOVA requires the data exist in a data frame\n"
@@ -81,9 +80,16 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
 # Analysis
 # --------
 
-  if (n.pred == 1) 
-    .ANOVAz1(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
+  # keep track of generated graphics
+  plot.i <- 0
+  plot.title  <- character(length=0)
+
+  if (n.pred == 1)  {
+    plt1 <- .ANOVAz1(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
         nm, n.obs, digits.d, brief, pdf, pdf.width, pdf.height)
+    for (i in (plot.i+1):(plot.i+plt1$i)) plot.title[i] <- plt1$ttl[i-plot.i]
+    plot.i <- plot.i + plt1$i
+  }
 
   if (n.pred == 2) {
     if (!is.list(replications(my.formula, data=data)))
@@ -93,9 +99,11 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
         "The design is not balanced. The results would be invalid.\n",
         "Consider function  lmer  in the  lme4  package.\n\n")
     }
-    .ANOVAz2(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
+    plt2 <- .ANOVAz2(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
         av.out$model[,nm[3]], nm, digits.d, brief, as.character(my.formula)[3],
         rb.points, pdf, pdf.width, pdf.height)
+    for (i in (plot.i+1):(plot.i+plt2$i)) plot.title[i] <- plt2$ttl[i-plot.i]
+    plot.i <- plot.i + plt2$i
   }
 
 
@@ -149,6 +157,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
 
   cat("\n")
 
+  if (plot.i > 1) .plotList(plot.i, plot.title)
 
   invisible(av.out)
 

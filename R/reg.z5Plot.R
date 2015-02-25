@@ -6,19 +6,25 @@ function(lm.out, nm, my.formula, brief, res.rows,
          X2.new, X3.new, X4.new, X5.new, c.int, p.int,
          pdf, pdf.width, pdf.height) {
 
-  if (!pdf) 
-    if (res.rows > 0) 
-      dev.set(which=5) 
-    else {
-      .graphwin(1)  #  just do a scatterplot
-      dev.set(which=3)
+  # keep track of the number of plots in this routine
+  plt.i <- 0
+  plt.title  <- character(length=0)
+
+  if (!pdf) { 
+    if (options("device") != "RStudioGD") {
+      if (res.rows > 0) 
+        dev.set(which=5) 
+      else {
+        .graphwin(1)  #  just do a scatterplot
+        dev.set(which=3)
+      }
+    }
   }
   else { 
     pdf.file <- "RegScatterplot.pdf"
     if (n.pred > 1) pdf.file <- "RegScatterMatrix.pdf"
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
   }
-
 
   if (n.pred == 1) {  # scatterplot, if one predictor variable
     if ( (pred.rows==0) || is.factor(lm.out$model[,nm[2]]) || !is.null(X1.new) ) 
@@ -36,6 +42,10 @@ function(lm.out, nm, my.formula, brief, res.rows,
       y.max <- max( max(p.int$upr),  max(lm.out$model[,nm[1]]) )
     }
     if (!is.factor(lm.out$model[,nm[2]])) fl <- "ls" else fl <- "none"
+
+    plt.i <- plt.i + 1
+    plt.title[plt.i] <- gsub(pattern="\n", replacement=" ", x=ctitle)
+
     x.values <- lm.out$model[,nm[2]]
     y.values <- lm.out$model[,nm[1]] 
     .plt.main(x.values, y.values, by=NULL, type="p", n.cat=getOption("n.cat"),
@@ -44,7 +54,7 @@ function(lm.out, nm, my.formula, brief, res.rows,
        col.stroke=getOption("col.stroke.pt"),
        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
        shape.pts=21, cex.axis=.85, col.axis="gray30",
-       col.ticks="gray30", xy.ticks=TRUE,
+       xy.ticks=TRUE,
        xlab=nm[2], ylab=nm[1], main=ctitle,
        cex=.8, kind="default", 
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
@@ -68,22 +78,35 @@ function(lm.out, nm, my.formula, brief, res.rows,
     if (numeric.all && in.data.frame) {
       col.pts <- getOption("col.stroke.pt")
       col.line <- getOption("col.stroke.bar")
+      col.bg=getOption("col.bg")
+
+      panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
+        col.pt=getOption("col.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
+        span=2/3, iter=3, ...) 
+      {
+          points(x, y, pch=pch, col=col.pt, cex=cex)
+          ok <- is.finite(x) & is.finite(y)
+          if (any(ok)) 
+            lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
+      }
+
+      plt.i <- plt.i + 1
+      plt.title[plt.i] <- "ScatterPlot Matrix"
+
       if (scatter.coef) {
         panel.cor <- function(x, y, digits=2, prefix="", cex.cor, ...) {
           usr <- par("usr"); on.exit(par(usr))
-          par(usr = c(0, 1, 0, 1))
+          par(usr=c(0, 1, 0, 1))
           r <- cor(x, y)
           txt <- format(c(r, 0.123456789), digits=digits)[1]
           txt <- paste(prefix, txt, sep="")
           if (missing(cex.cor)) cex.cor <- .9/strwidth(txt)
-          text(0.5, 0.5, txt, cex=2, col=col.pts)  # or cex = cex.cor * r
+          text(0.5, 0.5, txt, cex=2, col=col.pts)  # or cex=cex.cor * r
         }
-        suppressWarnings(pairs(lm.out$model[c(nm)], 
-          lower.panel=panel.smooth, upper.panel=panel.cor,
-          col=col.pts, col.smooth=col.line))
+        pairs(lm.out$model[c(nm)],
+          lower.panel=panel2.smooth, upper.panel=panel.cor)
       }
-      else suppressWarnings(pairs(lm.out$model[c(nm)], 
-                            panel=panel.smooth, col=col.pts, col.smooth=col.line))
+      else pairs(lm.out$model[c(nm)], panel=panel2.smooth)
     }
     else {
       cat("\n\n>>> No scatterplot matrix reported because not all variables are ")
@@ -124,5 +147,8 @@ function(lm.out, nm, my.formula, brief, res.rows,
       cat("\n")
     }
   }
+
+  # just generated plot
+  return(list(i=plt.i, ttl=plt.title))
 
 }

@@ -2,7 +2,7 @@ bc.data.frame <-
 function(x, n.cat,
          col.fill, col.stroke, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
-         cex.axis, col.axis, col.ticks, beside, col.low, col.hi, count.levels,
+         cex.axis, col.axis, beside, col.low, col.hi, count.levels,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet,
          pdf.width, pdf.height, ...)  {
 
@@ -28,7 +28,7 @@ function(x, n.cat,
           .bc.main(x[,i], by=NULL,
             col.fill, col.stroke, col.bg, col.grid, random.col, colors,
             horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
-            cex.axis, col.axis, col.ticks, beside, col.low, col.hi, count.levels,
+            cex.axis, col.axis, beside, col.low, col.hi, count.levels,
             legend.title, legend.loc, legend.labels, legend.horiz, quiet,
             font.main=1, ...)
 

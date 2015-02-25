@@ -4,12 +4,12 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
 
   p <- length(unique(na.omit(x.values)))
 
-    # cell stats
-    n <- tapply(y.values, x.values, length) 
-    m <- tapply(y.values, x.values, mean) 
-    s <- tapply(y.values, x.values, sd) 
-    mn <- tapply(y.values, x.values, min) 
-    mx <- tapply(y.values, x.values, max) 
+  # cell stats
+  n <- tapply(y.values, x.values, length) 
+  m <- tapply(y.values, x.values, mean) 
+  s <- tapply(y.values, x.values, sd) 
+  mn <- tapply(y.values, x.values, min) 
+  mx <- tapply(y.values, x.values, max) 
 
   if (!brief) {
     # get maximum chars in 1st three columns
@@ -54,14 +54,24 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
 
 
   # set up graphics system for 2 windows
+
+  # keep track of the number of plots in this routine
+  plt.i <- 0
+  plt.title  <- character(length=0)
+
   if (!pdf) {
-    .graphwin(2)
-    dev.set(which=3)
+    if (options("device") != "RStudioGD") {
+      .graphwin(2)
+      dev.set(which=3)
+    }
   }
   else { 
     pdf.file <- "ANOVA_Means.pdf"
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
   }
+
+  plt.i <- plt.i + 1
+  plt.title[plt.i] <- "Scatterplot with Cell Means"
 
   .plt.main(x.values, y.values, by=NULL, type="p", n.cat=0,
      col.fill=getOption("col.fill.pt"),
@@ -69,8 +79,8 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
      col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
      shape.pts="circle", col.area=NULL, col.box="black",
      cex.axis=.85, col.axis="gray30",
-     col.ticks="gray30", xy.ticks=TRUE,
-     xlab=nm[2], ylab=nm[1], main="",
+     xy.ticks=TRUE,
+     xlab=nm[2], ylab=nm[1], main=plt.title[plt.i],
      cex=.8, kind="default",
      fit.line="none", col.fit.line="grey55", bubble.size=.25,
      ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
@@ -146,19 +156,23 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     .dash(35)
     print(round(HSD[[1]], digits.d))
 
-    if (!pdf) 
-      dev.set(which=4) 
+    if (!pdf) { 
+      if (options("device") != "RStudioGD") dev.set(which=4) 
+    }
     else { 
       pdf.file <- "ANOVA_HSD.pdf"
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
     }
+
+    plt.i <- plt.i + 1
+    plt.title[plt.i] <- "95% family-wise confidence level"
+
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
     par(mar=c(5.1,6.1,4.1,1.5))
-    cex.axis <- .8; col.axis <- "gray30"; col.ticks <- "gray30"
+    cex.axis <- .8; col.axis <- "gray30"; 
     suppressWarnings(plot(HSD, 
-      cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, las=1))
-
+      cex.axis=cex.axis, col.axis=col.axis, las=1))
 
     if (pdf) {
       dev.off()
@@ -166,5 +180,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
       cat("\n\n")
     }
   }
+
+  return(list(i=plt.i, ttl=plt.title))
 
 }

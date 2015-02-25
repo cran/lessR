@@ -18,8 +18,10 @@ function (x=mycor,
 
   # set up graphics system for 2 windows
   if (!pdf) {
-    .graphwin(2)
-    dev.set(which=3)
+    if (options("device") != "RStudioGD") {
+      .graphwin(2)
+      dev.set(which=3)
+    }
   }
   else { 
     pdf.file <- "Scree.pdf"
@@ -31,6 +33,12 @@ function (x=mycor,
   else
     col.ln <- getOption("col.stroke.bar")
 
+  # keep track of generated graphics
+  plot.i <- 0
+  plot.title  <- character(length=0)
+
+  plot.i <- plot.i + 1
+  plot.title[plot.i] <- "Eigenvalues"
 
   # scree plot
   .lc.main(ev, type=NULL, 
@@ -41,7 +49,7 @@ function (x=mycor,
          shape.pts=21, col.grid=getOption("col.grid"),
          col.bg=getOption("col.bg"),
          cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE, line.width=1.1,
+         xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Eigenvalues", main=main, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
@@ -53,8 +61,11 @@ function (x=mycor,
   }
 
 
-  if (!pdf) 
-    dev.set(which=4) 
+  if (!pdf) {
+    if (options("device") != "RStudioGD") {
+      dev.set(which=4) 
+    }
+  }
   else { 
     pdf.file <- "ScreeDiff.pdf"
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
@@ -62,6 +73,9 @@ function (x=mycor,
 
   # differences scree plot
   ev.diff <- -diff(ev)
+
+  plot.i <- plot.i + 1
+  plot.title[plot.i] <- "Differences of Successive Eigenvalues"
 
   .lc.main(ev.diff, type=NULL, 
          col.line=col.ln,
@@ -71,7 +85,7 @@ function (x=mycor,
          shape.pts=21, col.grid=getOption("col.grid"),
          col.bg=getOption("col.bg"),
          cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE, line.width=1.1,
+         xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Differences of Successive Eigenvalues",
          main=main, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
@@ -88,13 +102,18 @@ function (x=mycor,
     cat("\n\n")
   }
 
+  cat("\n")
   cat("Eigenvalues of", deparse(substitute(x)), "\n")
   .dash(15+nchar(deparse(substitute(x))))
   print(round(ev,3))
 
   cat("\n")
   cat("Differences of Successive Eigenvalues of", deparse(substitute(x)), "\n")
-  .dash(35+nchar(deparse(substitute(x))))
+  .dash(41+nchar(deparse(substitute(x))))
   print(round(ev.diff,3))
+
+  .plotList(plot.i, plot.title)
+
+  cat("\n")
 
 }

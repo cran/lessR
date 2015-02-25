@@ -23,7 +23,7 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"),
          col.grid=getOption("col.grid"),
 
          col.reg="snow2", over.grid=FALSE,
-         cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+         cex.axis=.85, col.axis="gray30",
 
          breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
 
@@ -60,7 +60,6 @@ hs(\ldots)
         values to be smaller than the axis labels. Provides the functionality of,
         and can be replaced by, the standard R \code{cex.axis.}}
   \item{col.axis}{Color of the font used to label the axis values.}
-  \item{col.ticks}{Color of the ticks used to label the axis values.}
   \item{breaks}{The method for calculating the bins, or an explicit specification of
        the bins, such as with the standard R \code{\link{seq}} function or other options 
        provided by the \code{\link{hist}} function.}
@@ -87,7 +86,7 @@ hs(\ldots)
       by \code{\link{hist}} and \code{\link{plot}}, including \code{xlim}, \code{ylim},
       \code{lwd} and \code{cex.lab}, \code{col.main}, \code{density}, etc. Also
       includes \code{labels=TRUE} to display the frequency of the bin at the top
-      of the corresponding bar.}
+      of the corresponding bar and \code{col.ticks} to specify the color of the tick marks.}
 }
 
 
@@ -180,10 +179,11 @@ Histogram(y, breaks=15, prop=TRUE)
 # histogram with specified colors, overriding defaults
 # col.bg and col.grid are defined in histogram
 # all other parameters are defined in hist, par and plot functions
-Histogram(y, col.fill="darkblue", col.stroke="lightsteelblue4", col.bg="ivory",
-  col.grid="darkgray", density=25, angle=-45, cex.lab=.8, cex.axis=.8,
-  col.lab="sienna3", main="My Title", col.main="gray40", xlim=c(-5,5), lwd=2,
-  xlab="My Favorite Variable")
+# generates caution messages that can be ignored regarding density and angle
+#Histogram(y, col.fill="darkblue", col.stroke="lightsteelblue4", col.bg="ivory",
+#  col.grid="darkgray", density=25, angle=-45, cex.lab=.8, cex.axis=.8,
+#  col.lab="sienna3", main="My Title", col.main="gray40", xlim=c(-5,5), lwd=2,
+#  xlab="My Favorite Variable")
 
 # ---------------------
 # cumulative histograms

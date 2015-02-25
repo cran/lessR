@@ -2,7 +2,7 @@
 function(x, by=NULL, 
          col.fill, col.stroke, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
-         cex.axis, col.axis, col.ticks, beside, col.low, col.hi, count.levels,
+         cex.axis, col.axis,  beside, col.low, col.hi, count.levels,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
  
  if (!is.null(by) && prop) { 
@@ -314,14 +314,14 @@ function(x, by=NULL,
     suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
           xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
           space=gap, cex.axis=cex.axis, cex.names=cex.axis, 
-          col.axis=col.axis, col.ticks=col.ticks, ...))
+          col.axis=col.axis, ...))
   }
   else
     suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
           xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), 
           cex.axis=cex.axis, cex.names=cex.axis,
-          col.axis=col.axis, col.ticks=col.ticks, ...))
+          col.axis=col.axis, ...))
   if (over.grid) {
     if (!horiz)
       abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)

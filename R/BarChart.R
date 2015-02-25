@@ -11,7 +11,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          gap=NULL, prop=FALSE,
          
          xlab=NULL, ylab=NULL, main=NULL,
-         cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+         cex.axis=.85, col.axis="gray30", 
 
          beside=FALSE, col.low=NULL, col.hi=NULL, count.levels=NULL,
 
@@ -144,7 +144,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     bc <- .bc.main(x.call, y.call,
          col.fill, col.stroke, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
-         cex.axis, col.axis, col.ticks, beside, col.low, col.hi,
+         cex.axis, col.axis,  beside, col.low, col.hi,
          count.levels.call,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...)
 
@@ -160,7 +160,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     bc.data.frame(data, n.cat,
       col.fill, col.stroke, col.bg, col.grid, random.col, colors,
       horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
-      cex.axis, col.axis, col.ticks, beside, col.low, col.hi,
+      cex.axis, col.axis,  beside, col.low, col.hi,
       count.levels,
       legend.title, legend.loc, legend.labels, legend.horiz, quiet,
       pdf.width, pdf.height, ...)

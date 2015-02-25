@@ -6,7 +6,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     col.bg=getOption("col.bg"),
     col.grid=getOption("col.grid"),
 
-    cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+    cex.axis=.85, col.axis="gray30",
     xlab=NULL, main=NULL, digits.d=NULL,
 
     horiz=TRUE, add.points=FALSE,
@@ -82,7 +82,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
      .opendev(pdf.fnm, pdf.width, pdf.height)
 
       bv <- .bx.main(data[,i], col.fill, col.stroke, col.bg, col.grid,
-         cex.axis, col.axis, col.ticks,
+         cex.axis, col.axis, 
          horiz, add.points, xlab, main, digits.d, quiet, ...)
 
       if (go.pdf) {

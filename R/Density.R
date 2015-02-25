@@ -11,7 +11,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
          col.nrm="black", col.gen="black",
          col.fill.nrm=NULL, col.fill.gen=NULL,
 
-         cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+         cex.axis=.85, col.axis="gray30",
          x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
          x.min=NULL, x.max=NULL, band=FALSE, 
 
@@ -107,7 +107,7 @@ if (!missing(x)) {
       d.gen <- .dn.main(data[,i], bw, type, bin.start, bin.width, 
             col.fill, col.bg, col.grid, col.nrm, col.gen,
             col.fill.nrm, col.fill.gen, 
-            cex.axis, col.axis, col.ticks,
+            cex.axis, col.axis, 
             x.pt, xlab, main, y.axis, x.min, x.max, band, quiet, ...)
 
       if (go.pdf) {

@@ -122,7 +122,7 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
 
   # title area, above graph
   if (show.title) {
-    mtext(paste("One Group Plot"), side=3, line=6.6, font=2)
+    mtext(paste("One-Group Plot"), side=3, line=6.6, font=2)
     mtext(paste("Analyze",Ynm), side=3, line=5.4, font=3, cex=.8)
     mtext(bquote(paste("  t-test of mu0=", .(mu0), ":   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(n1-1), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 

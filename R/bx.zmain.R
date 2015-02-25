@@ -1,6 +1,6 @@
 .bx.main <-
 function(x, col.fill, col.stroke, col.bg, col.grid,
-         cex.axis, col.axis, col.ticks,
+         cex.axis, col.axis,
          horiz, add.points, xlab, main, digits.d, quiet, ...) {      
 
   if (is.null(col.stroke)) col.stroke <- col.fill
@@ -19,9 +19,9 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   bv <- (boxplot(x, col="transparent", bg="transparent",
      horizontal=horiz, xlab=x.lab, ylab=y.lab, main=main.lab, axes=FALSE, ...))
   if (horiz)
-    axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
+    axis(1, cex.axis=cex.axis, col.axis=col.axis, ...) 
   else
-    axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
+    axis(2, cex.axis=cex.axis, col.axis=col.axis, ...) 
   
   # colored background for plotting area
   usr <- par("usr")
@@ -49,7 +49,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
       .dp.main(x, by=NULL,
          col.fill, col.stroke, col.bg, col.grid, shape.pts=NULL,
          cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xlab=NULL, main=NULL, cex=NULL,
+          xlab=NULL, main=NULL, cex=NULL,
          method="stack", pt.reg=21, pt.out=19, 
          col.out30="firebrick2", col.out15="firebrick4", 
          quiet=TRUE, new=FALSE, vertical=!horiz, ...)

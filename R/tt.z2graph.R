@@ -167,7 +167,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
 
   # title area, above graph
   if (show.title) {
-    mtext(paste("TwoGroup Plot"), side=3, line=6.6, font=2)
+    mtext(paste("Two-Group Plot"), side=3, line=6.6, font=2)
     mtext(paste("Compare",Ynm,"for",Xnm,X1nm,"and",X2nm), side=3, line=5.6, font=3, cex=.8)
     mtext(bquote(paste("  Classic t-test of 0 Mean Difference:   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(df), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 

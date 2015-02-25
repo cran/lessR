@@ -33,7 +33,7 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
          col.stroke=getOption("col.stoke.pt"),
          col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
          shape.pts=21, cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE, main=NULL, cex=NULL,
+         xy.ticks=TRUE, main=NULL, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          kind="default", fit.line="none", col.fit.line="grey55",
          center.line=NULL, col.bubble=NULL, bubble.size=.25, 

@@ -322,70 +322,93 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   # graphs
   if (from.data && graph) {
 
+    # keep track of the number of plots in this routine
+    plt.i <- 0
+    plt.title  <- character(length=0)
+
     if (is.null(pdf.file)) {
-      if (!line.chart)
-        n.win <- 1
-      else
-        n.win <- 3
-      .graphwin(n.win)
-      dev.set(which=3)
-      orig.params <- par(no.readonly=TRUE)
-      on.exit(par(orig.params))
+      if (options("device") != "RStudioGD") {
+        if (!line.chart)
+          n.win <- 1
+        else
+          n.win <- 3
+        .graphwin(n.win)
+        dev.set(which=3)
+        orig.params <- par(no.readonly=TRUE)
+        on.exit(par(orig.params))
+      }
     }
 
-    if (line.chart) {  # line.chart=TRUE
+    if (line.chart) { 
+
       if (!is.null(pdf.file))
         pdf(file=paste("LineChart_",X1nm,".pdf",sep=""), width=pdf.width, height=pdf.height)
+
+      plt.i <- plt.i + 1
+      plt.title[plt.i] <- paste("Ordered Data:", paste(Xnm, X1nm))
 
      .lc.main(YA, type=NULL,
        col.line=getOption("col.stroke.pt"), col.area=NULL, col.box="black",
        col.stroke=getOption("col.stroke.pt"), 
        col.fill=getOption("col.fill.bar"), shape.pts=21,
        col.grid=getOption("col.grid"), col.bg=getOption("col.bg"),
-       cex.axis=0.85, col.axis="gray30", col.ticks="gray30", xy.ticks=TRUE,
-       line.width=1.1, xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""), main=NULL,
+       cex.axis=0.85, col.axis="gray30", xy.ticks=TRUE,
+       line.width=1.1, xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""),
+       main=plt.title[plt.i],
        cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
        center.line="default", quiet=TRUE)
 
-     if (is.null(pdf.file))
-       dev.set(which=4)
-     else
+     if (is.null(pdf.file)) {
+       if (options("device") != "RStudioGD") dev.set(which=4)
+     }
+     else {
+       dev.off()
        pdf(file=paste("LineChart_",X2nm,".pdf",sep=""), width=pdf.width, height=pdf.height)
-       
+       .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
+            paste("line chart of", Ynm, "for Group", X2nm))
+     }
+
+      plt.i <- plt.i + 1
+      plt.title[plt.i] <- paste("Ordered Data:", paste(Xnm, X2nm))
+ 
      .lc.main(YB, type=NULL,
        col.line=getOption("col.stroke.pt"), col.area=NULL, col.box="black",
        col.stroke=getOption("col.stroke.pt"), 
        col.fill=getOption("col.fill.bar"), shape.pts=21,
        col.grid=getOption("col.grid"), col.bg=getOption("col.bg"),
-       cex.axis=0.85, col.axis="gray30", col.ticks="gray30", xy.ticks=TRUE,
-       line.width=1.1, xlab=NULL, ylab=paste(Ynm,": ",X2nm, sep=""), main=NULL,
+       cex.axis=0.85, col.axis="gray30", xy.ticks=TRUE,
+       line.width=1.1, xlab=NULL, ylab=paste(Ynm,": ",X2nm, sep=""),
+       main=plt.title[plt.i],
        cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
 
        center.line="default", quiet=TRUE)
 
-      if (is.null(pdf.file))
-        dev.set(which=5)
+      if (is.null(pdf.file)) {
+        if (options("device") != "RStudioGD") dev.set(which=5)
+      }
+      else {
+        dev.off()
+        .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
+            paste("line chart of", Ynm, "for Group", X2nm))
+      }
     }
 
     if (!is.null(pdf.file))
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+
+      plt.i <- plt.i + 1
+      plt.title[plt.i] <- "Two-Group Plot"
 
     .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
               clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title)
 
     if (!is.null(pdf.file)) {
-      if (line.chart) {
-        dev.off(); dev.off()
-        .showfile(paste("LineChart_", X1nm, ".pdf", sep=""),
-            paste("line chart of", Ynm, "for Group", X1nm))
-        .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
-            paste("line chart of", Ynm, "for Group", X2nm))
-      }
       dev.off()
       .showfile(pdf.file, paste("density plots of", Ynm, "for both groups"))
     }
 
+    return(list(i=plt.i, ttl=plt.title))
   }
 
 } # End Two Group

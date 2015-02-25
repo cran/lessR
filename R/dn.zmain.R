@@ -3,7 +3,7 @@ function(x,
          bw, type, bin.start, bin.width,
          col.fill, col.bg, col.grid, col.nrm, col.gen,
          col.fill.nrm, col.fill.gen,
-         cex.axis, col.axis, col.ticks,
+         cex.axis, col.axis, 
          x.pt, xlab, main, y.axis, x.min, x.max, band, quiet, ...)  {
 
   if (!is.null(x.pt)) {
@@ -75,9 +75,9 @@ function(x,
   suppressWarnings(plot(h, border="transparent", freq=FALSE, xlab=x.lab,
      ylab=y.lab, main=main.lab, xlim=c(x.min,x.max), ylim=c(0,max.y), 
      axes=FALSE, ...))
-  axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
+  axis(1, cex.axis=cex.axis, col.axis=col.axis, ...)
   if (y.axis) 
-    axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks)
+    axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
   
   # colored background for plotting area
   usr <- par("usr")

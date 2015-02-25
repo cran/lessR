@@ -30,7 +30,7 @@ ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat")
          col.area=NULL, col.box="black",
 
          shape.pts="circle", cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE,
+         xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
 
          kind=c("default", "regular", "bubble", "sunflower"),
@@ -92,7 +92,6 @@ dp(\ldots)
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be 
         smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
-  \item{col.ticks}{Color of the ticks used to label the axis values.}
   \item{xy.ticks}{Flag that indicates if tick marks and associated values on the 
         axes are to be displayed.}
   \item{xlab}{Label for x-axis. For two variables specified, x and y, if \code{xlab} not
@@ -136,7 +135,7 @@ dp(\ldots)
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\ldots}{Other parameter values for graphics as defined by and then processed 
       by \code{\link{plot}} and \code{\link{par}}, including \code{xlim}, \code{ylim}, \code{lwd}, 
-      and \code{cex} to specify a magnification factor for the plotting symbol. For one variable,
+      and \code{cex} to specify a magnification factor for the plotting symbol, and col.ticks to set the color of the ticks used to label the axis values. For one variable,
       parameters from \code{\link{stripchart}}. For type of correlation from \code{\link{cor.test}},
       \code{method="spearman"} and \code{method="kendall"}.}
 }
@@ -242,7 +241,9 @@ ScatterPlot(x, y, ellipse=TRUE, xlim=c(20,80), ylim=c(20,80))
 ScatterPlot(x, y, fit.line="loess")
 
 # increase span (smoothing) from default of .75
-ScatterPlot(x, y, fit.line="loess", span=1.25)
+# span is a loess parameter and generates a caution that can be
+#   ignored that it is not a graphical parameter -- we know that
+#ScatterPlot(x, y, fit.line="loess", span=1.25)
 
 # custom scatterplot, with diagonal line, connecting line segments
 ScatterPlot(x, y, col.stroke="darkred", col.fill="plum", diag=TRUE)

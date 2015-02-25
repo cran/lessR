@@ -1,6 +1,6 @@
 .hst.main <- 
 function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
-       over.grid, cex.axis, col.axis, col.ticks, breaks, bin.start, bin.width,
+       over.grid, cex.axis, col.axis, breaks, bin.start, bin.width,
        bin.end, prop, cumul, digits.d, xlab, ylab, main, quiet, ...) {
 
 
@@ -96,8 +96,8 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
   # set up plot area
   suppressWarnings(plot(h, border="transparent", xlab=x.lab, ylab=y.lab,
         main=main.lab, freq=TRUE, axes=FALSE, ...))
-  axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
-  axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks) 
+  axis(1, cex.axis=cex.axis, col.axis=col.axis, ...) 
+  axis(2, cex.axis=cex.axis, col.axis=col.axis, ...) 
 
   # colored background for plotting area
   usr <- par("usr")

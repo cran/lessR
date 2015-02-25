@@ -239,13 +239,11 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   }
  
   if (res.rows > 0)
-
     .logit3Residual(lm.out, nm, dname,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          res.sort, res.rows, cooks.cut)
  
   if (pred)
-
     .logit4Pred(lm.out, nm, dname, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          new.data, pred, pred.all, 

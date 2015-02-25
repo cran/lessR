@@ -20,7 +20,7 @@ BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         col.bg=getOption("col.bg"),
         col.grid=getOption("col.grid"),
 
-        cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+        cex.axis=.85, col.axis="gray30",
         xlab=NULL, main=NULL, digits.d=NULL,
 
         horiz=TRUE, add.points=FALSE,
@@ -53,7 +53,6 @@ bx(\ldots)
        values to be smaller than the axis labels. Provides the functionality of, and
        can be replaced by, the standard R \code{cex.axis.}}
   \item{col.axis}{Color of the font used to label the axis values.}
-  \item{col.ticks}{Color of the ticks used to label the axis values.}
   \item{xlab}{Label for the value axis, which defaults to the variable's name.}
   \item{main}{Title of graph.}
   \item{digits.d}{Number of decimal digits displayed in the listing of the summary
@@ -71,7 +70,7 @@ bx(\ldots)
        by \code{\link{boxplot}} and \code{\link{bxp}} such as \code{whiskcol} for
        the whisker color, etc. and \code{\link{par}}, including \code{ylim} to set
        the limits of the value axis, \code{lwd} for the line width, \code{cex.lab}
-       for the size of the label, \code{col.main} for the title, etc.}
+       for the size of the label, \code{col.main} for the title, etc., and \code{col.ticks} to specify the color of the tick marks.}
 }
 
 
@@ -160,7 +159,7 @@ names(mydata) <- c("X","Y","Z","C")
 BoxPlot(X)
 
 # box plot with superimposed dot plot (stripchart)
-BoxPlot(X, dotplot=TRUE)
+BoxPlot(X, add.points=TRUE)
 
 # box plots for all numeric variables in data frame called mydata
 BoxPlot()

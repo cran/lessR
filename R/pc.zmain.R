@@ -17,8 +17,13 @@ function(x,
   if (!is.factor(x) && !is.table(x)) x <- factor(x)
   if (!is.table(x)) ncolors <- nlevels(x) else ncolors <- length(x)
 
-    # color palette
+  # color palette
+  # set some default colors in case not assigned below
   if (is.ordered(x)) {
+    if (colors == "dodgerblue") { 
+      if (is.null(col.low)) col.low <- "dodgerblue1"
+      if (is.null(col.hi)) col.hi <- "dodgerblue4"
+    }
     if (colors == "blue") { 
       if (is.null(col.low)) col.low <- "slategray2"
       if (is.null(col.hi)) col.hi <- "slategray4"
@@ -27,9 +32,13 @@ function(x,
       if (is.null(col.low)) col.low <- "gray90"
       if (is.null(col.hi)) col.hi <- "gray30"
     }
+    else if (colors == "sienna") {
+      if (is.null(col.low)) col.low <- "sienna1"
+      if (is.null(col.hi)) col.hi <- "sienna4"
+    }
     else if (colors == "rose") {
-      if (is.null(col.low)) col.low <- "mistyrose1"
-      if (is.null(col.hi)) col.hi <- "mistyrose4"
+      if (is.null(col.low)) col.low <- "orchid1"
+      if (is.null(col.hi)) col.hi <- "orchid4"
     }
     else if (colors == "green") {
       if (is.null(col.low)) col.low <- "darkseagreen1"
@@ -42,6 +51,22 @@ function(x,
     else if (colors == "red") { 
       if (is.null(col.low)) col.low <- "coral1"
       if (is.null(col.hi)) col.hi <- "coral4"
+    }
+    else if (colors == "purple") { 
+      if (is.null(col.low)) col.low <- "darkorchid1"
+      if (is.null(col.hi)) col.hi <- "darkorchid4"
+    }
+    else if (colors == "orange.black") { 
+      if (is.null(col.low)) col.low <- "darkorange4"
+      if (is.null(col.hi)) col.hi <- "darkorange1"
+    }
+    else if (colors == "gray.black") { 
+      if (is.null(col.low)) col.low <- "gray30"
+      if (is.null(col.hi)) col.hi <- "gray90"
+    }
+    else if (colors == "white") { 
+      if (is.null(col.low)) col.low <- "gray30"
+      if (is.null(col.hi)) col.hi <- "gray90"
     }
     color.palette <- colorRampPalette(c(col.low, col.hi))
     clr <- color.palette(ncolors)

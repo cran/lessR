@@ -150,53 +150,83 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
 
 
   # graphs
-  if (from.data && graph && !is.null(mu0)) {
+  if (graph) {
+
+    # keep track of the number of plots in this routine
+    plt.i <- 0
+    plt.title  <- character(length=0)
  
     if (is.null(pdf.file)) {
-      n.win <- 1
-      if (paired) n.win <- n.win + 1
-      if (line.chart) n.win <- n.win + 1
-      .graphwin(n.win)
-      dev.set(which=3)
-      orig.params <- par(no.readonly=TRUE)
-      on.exit(par(orig.params))
+      if (options("device") != "RStudioGD") {
+        n.win <- 0
+        if (!is.null(mu0)) n.win <- n.win + 1
+        if (paired) n.win <- n.win + 1
+        if (line.chart) n.win <- n.win + 1
+        if (n.win > 0) {
+          .graphwin(n.win)
+          i.win <- 2   # start first graphics window on 3
+          orig.params <- par(no.readonly=TRUE)
+          on.exit(par(orig.params))
+        }
+      }
     }
 
-    if (line.chart) {  # line.chart=TRUE
+    if (line.chart) {
       if (!is.null(pdf.file))
         pdf(file=paste("LineChart_",Ynm,".pdf",sep=""), width=pdf.width, height=pdf.height)
 
-     .lc.main(Y, type=NULL,
-       col.line=getOption("col.stroke.pt"), col.area=NULL, col.box="black",
-       col.stroke=getOption("col.stroke.pt"), 
-       col.fill=getOption("col.fill.bar"), shape.pts=21,
-       col.grid=getOption("col.grid"), col.bg=getOption("col.bg"),
-       cex.axis=0.85, col.axis="gray30", col.ticks="gray30", xy.ticks=TRUE,
-       line.width=1.1, xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
-       time.start=NULL, time.by=NULL, time.reverse=FALSE,
-       center.line="default", quiet=TRUE)
+      if (options("device") != "RStudioGD") {
+        i.win  <- i.win + 1 
+        dev.set(which=i.win)
+      }
 
-      if (is.null(pdf.file))
-        dev.set(which=4)
-     }
+      plt.i <- plt.i + 1
+      plt.title[plt.i] <- paste("Ordered Data for", Ynm)
+
+      .lc.main(Y, type=NULL,
+        col.line=getOption("col.stroke.pt"), col.area=NULL, col.box="black",
+        col.stroke=getOption("col.stroke.pt"), 
+        col.fill=getOption("col.fill.bar"), shape.pts=21,
+        col.grid=getOption("col.grid"), col.bg=getOption("col.bg"),
+        cex.axis=0.85, col.axis="gray30", xy.ticks=TRUE,
+        line.width=1.1, xlab=NULL, ylab=NULL, main=plt.title[plt.i], cex=NULL,
+        time.start=NULL, time.by=NULL, time.reverse=FALSE,
+        center.line="default", quiet=TRUE)
+
+      if (!is.null(pdf.file)) {
+        dev.off()
+        .showfile(paste("LineChart_", Ynm, ".pdf", sep=""), paste("line chart of", Ynm))
+      }
+
+    }
+
+
+  if (!is.null(mu0)) {
+
+    if (options("device") != "RStudioGD") {
+      i.win  <- i.win + 1 
+      dev.set(which=i.win)
+    }
 
     if (!is.null(pdf.file))
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+
+    plt.i <- plt.i + 1
+    plt.title[plt.i] <- "One-Group Plot"
 
     .OneGraph(Y, bw1, Ynm, y.lbl, digits.d, brief,
          n, m, mu0, mdiff, s, smd, mmd, msmd,
          clpct, tvalue, pvalue, ub, lb,
          show.title, pdf.file, pdf.width, pdf.height)
 
-    if (!is.null(pdf.file)) {
-      if (line.chart) {
+      if (!is.null(pdf.file)) {
         dev.off()
-        .showfile(paste("LineChart_", Ynm, ".pdf", sep=""), paste("line chart of", Ynm))
+        .showfile(pdf.file, paste("density plot of", Ynm))
       }
-      dev.off()
-      .showfile(pdf.file, paste("density plot of", Ynm))
     }
-  }
+
+    return(list(i=plt.i, ttl=plt.title))
+  }  # end if graph
 
 }  # End One Group
 

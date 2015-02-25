@@ -10,7 +10,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
          col.area=NULL, col.box="black",
 
          shape.pts=21, cex.axis=0.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE, line.width=1.1,
+         xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
 
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
@@ -89,7 +89,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
       .lc.main(data[,i], type,
          col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
-         col.grid, col.bg, cex.axis, col.axis, col.ticks, xy.ticks,
+         col.grid, col.bg, cex.axis, col.axis, xy.ticks,
          line.width, xlab, ylab, main, cex,
          time.start, time.by, time.reverse, 
          center.line, quiet, ...)

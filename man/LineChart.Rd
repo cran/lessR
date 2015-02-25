@@ -26,7 +26,7 @@ LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
          col.area=NULL, col.box="black",
 
          shape.pts=21, cex.axis=.85, col.axis="gray30",
-         col.ticks="gray30", xy.ticks=TRUE, line.width=1.1,
+         xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
 
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
@@ -76,7 +76,6 @@ lc(\ldots)
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be 
         smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
-  \item{col.ticks}{Color of the ticks used to label the axis values.}
   \item{xy.ticks}{Flag that indicates if tick marks and associated values on the 
         axes are to be displayed.}
   \item{line.width}{Width of the density lines.}
@@ -111,7 +110,7 @@ lc(\ldots)
        no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
-  \item{\dots}{Other parameters such as from \code{\link{par}}.}
+  \item{\dots}{Other parameters such as from \code{\link{par}}, and col.ticks to set the color of the ticks used to label the axis values.}
 }
 
 
@@ -169,15 +168,21 @@ plot(mydata$Y, type="l")
 # save run chart to a pdf file
 LineChart(Y, pdf.file="MyLineChart.pdf")
 
-# LineChart in gray scale, then back to default "blue"
+# LineChart in gray scale, then back to default "dodgerblue"
 set(colors="gray")
 LineChart(Y)
-set(colors="blue")
+set(colors="dodgerblue")
   
-# customize run chart, pch=24: filled triangle point-up,
-LineChart(Y, line.width=2, col.stroke="sienna3", shape.pts=24,
-  col.area="slategray3", col.bg="mintcream", ylim=c(-3.5,3.5),
+# customize run chart with LineChart options
+LineChart(Y, line.width=2, col.stroke="sienna3",
+  col.area="slategray3", col.bg="mintcream",
   center.line="median")
+
+# customize run chart with R par parameters
+# 24 is the R value for a half-triangle pointing up
+lc(Y, xlab="My xaxis", ylab="My yaxis", main="My Best Title",
+   cex.axis=.7, cex.lab=1.2, cex.main=1.5, col.lab="red", font.main=3,
+   ylim=c(-4,4), shape.pts=24)
   
 # generate steadily increasing values
 Y <- sort(rexp(50))

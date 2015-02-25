@@ -25,7 +25,7 @@ Density(x, data=mydata, n.cat=getOption("n.cat"),
        col.nrm="black", col.gen="black",
        col.fill.nrm=NULL, col.fill.gen=NULL,
 
-       cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+       cex.axis=.85, col.axis="gray30",
        x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
 
@@ -53,7 +53,7 @@ dn(\ldots)
   \item{bin.start}{Optional specified starting value of the bins.}
   \item{bin.width}{Optional specified bin width, which can be specified with or without 
         a \code{bin.start} value.}
-  \item{col.fill}{Default (for default color theme of \code{"blue"}) is to
+  \item{col.fill}{Default (for default color theme of \code{"dodgerblue"}) is to
        display the histogram in a light gray.  To suppress, the histogram,
        specify a color of \code{"transparent"}.}
   \item{col.bg}{Color of the plot background.}
@@ -69,7 +69,6 @@ dn(\ldots)
   \item{cex.axis}{Scale magnification factor, which by default displays the axis values to be 
         smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
-  \item{col.ticks}{Color of the ticks used to label the axis values.}
   \item{x.pt}{Value of the point on the x-axis for which to draw a unit interval
         around illustrating the corresponding area under the general density curve.  Only
         applies when requesting \code{type=general}.}
@@ -89,7 +88,7 @@ dn(\ldots)
   \item{\dots}{Other parameter values for graphics as defined processed 
       by \code{\link{plot}}, including \code{xlim}, \code{ylim}, \code{lwd} and \code{cex.lab}, 
       \code{col.main}, \code{density}, and, for the general density calculations, can set 
-      bandwidth with the standard \code{bw}, etc.}
+      bandwidth with the standard \code{bw}, etc., and col.ticks to specify the color of the ticks used to label the axis values.}
 }
 
 
@@ -155,7 +154,7 @@ Density(Y, pdf.file="MyDensityPlot.pdf")
 
 # suppress the histogram, leaving only the density curves
 # specify x-axis label per the xlab option for the plot function
-Density(Y, col.bars="transparent", xlab="My Var")
+Density(Y, col.fill="transparent", xlab="My Var")
 
 # specify (non-transparent) colors for the curves,
 # to make transparent, need alpha option for the rgb function

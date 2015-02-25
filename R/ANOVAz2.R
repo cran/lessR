@@ -178,41 +178,58 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     }
   }
 
+  # ------------------------------------
+  # graphics
+  plt.i <- 0
+  plt.title  <- character(length=0)
+
   # interaction plots
   if (!pdf) {
-    pdf.file <- NULL
-    if (bet.grp) .graphwin(1)
-    if (wth.grp) .graphwin(2)
-    dev.set(which=3)
+    if (options("device") != "RStudioGD") {
+      pdf.file <- NULL
+      if (bet.grp) .graphwin(1)
+      if (wth.grp) .graphwin(2)
+      dev.set(which=3)
+    }
   }
   else { 
     pdf.file <- "ANOVA_Interaction.pdf"
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
   }
 
+  plt.i <- plt.i + 1
+  plt.title[plt.i] <- "Interaction Plot"
+
   interaction.plot(x1.values, x2.values, y.values,
-                   xlab=nm[2], ylab=nm[1], trace.label=nm[3])
+                   xlab=nm[2], ylab=nm[1], trace.label=nm[3],
+                   main=plt.title[plt.i])
 
   # pdf
-  if (!is.null(pdf.file)) {
+  if (pdf) {
     dev.off()
     .showfile(pdf.file, "interaction plot")
   }
 
   # fitted interaction plots
   if (wth.grp) {
+
     if (!pdf) {
-      dev.set(which=4)
+      if (options("device") != "RStudioGD") {
+        dev.set(which=4)
+      }
     }
     else { 
       pdf.file <- "ANOVA_FitInter.pdf"
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
     }
 
+  plt.i <- plt.i + 1
+  plt.title[plt.i] <- "Fitted Values"
+
     mn.y <- min(y.values, av.out$fitted)
     mx.y <- max(y.values, av.out$fitted)
     interaction.plot(x1.values, x2.values, 
-             av.out$fitted, main="Plot of Fitted Values",
+             av.out$fitted, main=plt.title[plt.i],
              xlab=nm[2], ylab=nm[1], trace.label=nm[3], ylim=c(mn.y, mx.y))
     if (rb.points) {
       points(x1.values, y.values, pch=21, 
@@ -221,11 +238,12 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     }
 
     # pdf
-    if (!is.null(pdf.file)) {
+    if (pdf) {
       dev.off()
       .showfile(pdf.file, "fitted values plot")
     }
   }
 
+  return(list(i=plt.i, ttl=plt.title))
 } 
 

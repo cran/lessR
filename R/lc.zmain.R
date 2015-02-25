@@ -1,7 +1,7 @@
 .lc.main <- 
 function(y, type,
        col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
-       col.grid, col.bg, cex.axis, col.axis, col.ticks, xy.ticks,
+       col.grid, col.bg, cex.axis, col.axis, xy.ticks,
        line.width, xlab, ylab, main, cex,
        time.start, time.by, time.reverse, 
        center.line, quiet, ...) {
@@ -92,10 +92,10 @@ function(y, type,
   plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, main=main.lab, ...)
   if (xy.ticks){
     if (is.null(time.start) && class(x)!="ts") 
-      axis(1, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...)
+      axis(1, cex.axis=cex.axis, col.axis=col.axis, ...)
     else
       axis.Date(1, x, cex.axis=cex.axis, col.axis=col.axis, ...)
-    axis(2, cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...)
+    axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
   }
 
   # colored plotting area

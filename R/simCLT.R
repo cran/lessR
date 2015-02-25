@@ -175,7 +175,7 @@ function(ns, n, p1=0, p2=1,
          col.nrm="black", col.gen="black",
          col.fill.nrm="transparent",
          col.fill.gen="transparent",
-         cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+         cex.axis=.85, col.axis="gray30",
          x.pt=NULL, y.axis=FALSE, main=NULL, 
          x.min=NULL, x.max=NULL, band=FALSE, quiet=TRUE, pdf.file=NULL)
   if (subtitle) 

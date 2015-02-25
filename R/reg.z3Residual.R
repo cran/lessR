@@ -1,156 +1,171 @@
 .reg3Residual <-
 function(lm.out, nm, 
          n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         res.sort, res.rows, cooks.cut,
-         pdf, pdf.width, pdf.height) {
+         res.sort, res.rows, cooks.cut, pdf, pdf.width, pdf.height) {
   
-    cat( "\n\n\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
-  
-    if (show.R) {
-      cat(line, sep="")
-      cat(pre, "fitted(model)", sep="", "\n")
-      cat(pre, "resid(model)", sep="", "\n")
-      cat(pre, "rstudent(model)", sep="", "\n")
-      cat(pre, "dffits(model)", sep="", "\n")
-      cat(pre, "cooks.distance(model)", sep="", "\n")
-      cat(line, "\n")
-    }
-    else cat("\n")
-    
-    if (explain) {
-      .dash(68)
-      cat("The identification of cases that have a large residual\n",
-          "and/or undue influence on the estimation of the model helps\n",
-          "detect potential outliers.  Each of the following statistics is\n",
-          "calculated for a single case (row of data).\n",
-         "\n", 
-          "residual: Value of the response variable ", nm[1], " minus its\n",
-          "    fitted value.\n",
-          "\n",
-          "rstudent: Externally Studentized residual, standardized value of the\n",
-          "    residual from a model estimated without the case present.\n",
-          "\n",
-          "dffits: The influence of the case on its own fitted value.\n",
-         "\n",
-          "cooks: Cook's Distance, the aggregate influence of the case\n",
-          "    on the estimation of the model coefficients.\n", sep="")
-      .dash(68)
-      cat("\n")
-    }
+  cat( "\n\n\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
 
-    cat("Data, Fitted, Residual, Studentized Residual, Dffits, Cook's Distance\n")
-    if (res.sort == "cooks") cat("   [sorted by Cook's Distance]\n")
-    if (res.sort == "rstudent")  
-      cat("   [sorted by Studentized Residual, ignoring + or - sign]\n")
-    if (res.sort == "dffits")  
-      cat("   [sorted by dffits, ignoring + or - sign]\n")
-    if (res.rows < n.keep)
-      txt <- "cases (rows) of data, or res.rows=\"all\"]"
-    else
-      txt="]"
-    cat("   [res.rows = ", res.rows, ", out of ", n.keep, " ", txt, sep="", "\n")
+  if (show.R) {
+    cat(line, sep="")
+    cat(pre, "fitted(model)", sep="", "\n")
+    cat(pre, "resid(model)", sep="", "\n")
+    cat(pre, "rstudent(model)", sep="", "\n")
+    cat(pre, "dffits(model)", sep="", "\n")
+    cat(pre, "cooks.distance(model)", sep="", "\n")
+    cat(line, "\n")
+  }
+  else cat("\n")
+  
+  if (explain) {
     .dash(68)
-
-    fit <- fitted(lm.out)
-    res <- residuals(lm.out)
-    cook <- cooks.distance(lm.out)
-    
-    out <- cbind(fit, res, rstudent(lm.out), dffits(lm.out), cook)
-    out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])], out)
-    out <- data.frame(out)
-    names(out)[n.vars+1] <- "fitted"
-    names(out)[n.vars+2] <- "residual"
-    names(out)[n.vars+3] <- "rstudent"
-    names(out)[n.vars+4] <- "dffits"
-    names(out)[n.vars+5] <- "cooks"
-    if (res.sort != "off") {
-      if (res.sort == "cooks") o <- order(out$cooks, decreasing=TRUE)
-      if (res.sort == "rstudent") o <- order(abs(out$rstudent), decreasing=TRUE)
-      if (res.sort == "dffits") o <- order(abs(out$dffits), decreasing=TRUE)
-      out <- out[o,]
-    }
-    for (i in 1:(n.vars+5))
-      if (is.numeric(out[,i])) if (!is.integer(out[,i]))
-        out[,i] <- .fmt(out[,i],digits.d-1)
-    print(out[1:res.rows,])
+    cat("The identification of cases that have a large residual\n",
+        "and/or undue influence on the estimation of the model helps\n",
+        "detect potential outliers.  Each of the following statistics is\n",
+        "calculated for a single case (row of data).\n",
+       "\n", 
+        "residual: Value of the response variable ", nm[1], " minus its\n",
+        "    fitted value.\n",
+        "\n",
+        "rstudent: Externally Studentized residual, standardized value of the\n",
+        "    residual from a model estimated without the case present.\n",
+        "\n",
+        "dffits: The influence of the case on its own fitted value.\n",
+       "\n",
+        "cooks: Cook's Distance, the aggregate influence of the case\n",
+        "    on the estimation of the model coefficients.\n", sep="")
     .dash(68)
-    rm(out)
-  
+    cat("\n")
+  }
 
-    # frequency distribution of residuals
-    if (!pdf) 
+  cat("Data, Fitted, Residual, Studentized Residual, Dffits, Cook's Distance\n")
+  if (res.sort == "cooks") cat("   [sorted by Cook's Distance]\n")
+  if (res.sort == "rstudent")  
+    cat("   [sorted by Studentized Residual, ignoring + or - sign]\n")
+  if (res.sort == "dffits")  
+    cat("   [sorted by dffits, ignoring + or - sign]\n")
+  if (res.rows < n.keep)
+    txt <- "cases (rows) of data, or res.rows=\"all\"]"
+  else
+    txt="]"
+  cat("   [res.rows = ", res.rows, ", out of ", n.keep, " ", txt, sep="", "\n")
+  .dash(68)
+
+  fit <- fitted(lm.out)
+  res <- residuals(lm.out)
+  cook <- cooks.distance(lm.out)
+  
+  out <- cbind(fit, res, rstudent(lm.out), dffits(lm.out), cook)
+  out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])], out)
+  out <- data.frame(out)
+  names(out)[n.vars+1] <- "fitted"
+  names(out)[n.vars+2] <- "residual"
+  names(out)[n.vars+3] <- "rstudent"
+  names(out)[n.vars+4] <- "dffits"
+  names(out)[n.vars+5] <- "cooks"
+  if (res.sort != "off") {
+    if (res.sort == "cooks") o <- order(out$cooks, decreasing=TRUE)
+    if (res.sort == "rstudent") o <- order(abs(out$rstudent), decreasing=TRUE)
+    if (res.sort == "dffits") o <- order(abs(out$dffits), decreasing=TRUE)
+    out <- out[o,]
+  }
+  for (i in 1:(n.vars+5))
+    if (is.numeric(out[,i])) if (!is.integer(out[,i]))
+      out[,i] <- .fmt(out[,i],digits.d-1)
+  print(out[1:res.rows,])
+  .dash(68)
+  rm(out)
+
+  # frequency distribution of residuals
+
+  # keep track of the number of plots in this routine
+  plt.i <- 0
+  plt.title  <- character(length=0)
+
+  if (!pdf) { 
+    if (options("device") != "RStudioGD") {
       dev.set(which=3)
-    else {
-      pdf.file <- "RegResiduals.pdf"
-      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
     }
+  }
+  else {
+    pdf.file <- "RegResiduals.pdf"
+    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+  }
 
-     .dn.main(res, main="Normality of Residuals", 
-       xlab="Residuals", 
-       bw="nrd0", type="both",
-       bin.start=NULL, bin.width=NULL,
-       col.fill=getOption("col.fill.pt"),
-       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-       col.nrm="gray40", col.gen="gray40",
-       col.fill.nrm="transparent", col.fill.gen="transparent",
-       cex.axis=.85, col.axis="gray30", col.ticks="gray30",
-       x.pt=NULL, y.axis=FALSE, 
-       x.min=NULL, x.max=NULL, band=FALSE, quiet=TRUE)
+  plt.i <- plt.i + 1
+  plt.title[plt.i] <- "Normality of Residuals"
 
-    if (pdf) {
-      dev.off()
-      .showfile(pdf.file, "residuals plot")
+  .dn.main(res, 
+    bw="nrd0", type="both",
+    bin.start=NULL, bin.width=NULL,
+    col.fill=getOption("col.fill.pt"),
+    col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+    col.nrm="gray40", col.gen="gray40",
+    col.fill.nrm="transparent", col.fill.gen="transparent",
+    cex.axis=.85, col.axis="gray30", 
+    x.pt=NULL, xlab="Residuals",
+    main=plt.title[plt.i], y.axis=FALSE, 
+    x.min=NULL, x.max=NULL, band=FALSE, quiet=TRUE)
+
+  if (pdf) {
+    dev.off()
+    .showfile(pdf.file, "residuals plot")
+  }
+
+
+  # plot of residuals vs fitted
+  max.cook <- max(cook, na.rm=TRUE)
+  if (max.cook < cooks.cut) {
+    cooks.cut <- floor(max.cook*100)/100
+    txt <- paste("Largest Cook's Distance, ", .fmt(max.cook,2), 
+      ", is highlighted", sep="")
+  }
+  else
+    txt <- paste("Points with Cook's Distance >", cooks.cut, "are highlighted")
+
+  if (!pdf) { 
+    if (options("device") != "RStudioGD") {
+      dev.set(which=4)
     }
+  }
+  else { 
+    pdf.file <- "RegResidFitted.pdf"
+    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+  }
 
+  plt.i <- plt.i + 1
+  plt.title[plt.i] <- "Residuals vs Fitted Values"
 
-    # plot of residuals vs fitted
-    max.cook <- max(cook, na.rm=TRUE)
-    if (max.cook < cooks.cut) {
-      cooks.cut <- floor(max.cook*100)/100
-      txt <- paste("Largest Cook's Distance, ", .fmt(max.cook,2), 
-        ", is highlighted", sep="")
-    }
-    else
-      txt <- paste("Points with Cook's Distance >", cooks.cut, "are highlighted")
+  ord <- order(fit)
+  fit.ord <- fit[ord]
+  res.ord <- res[ord]
+  .plt.main(fit.ord, res.ord, by=NULL, type="p", 
+      n.cat=getOption("n.cat"), col.fill=getOption("col.fill.pt"),
+      col.stroke=getOption("col.stroke.pt"),
+      col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+      shape.pts=21, col.area=NULL, col.box="black", 
+      cex.axis=.85, col.axis="gray30", xy.ticks=TRUE,
+      xlab="Fitted Values", ylab="Residuals",
+      main=plt.title[plt.i], cex=NULL, kind="default",
+      fit.line="none", col.fit.line="black", bubble.size=.25,
+      ellipse=FALSE, diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
+      quiet=TRUE) 
+  abline(h=0, lty="dotted", col=getOption("col.fill.bar"))
+  lines(lowess(fit.ord, res.ord, f=.9), col=getOption("col.stroke.pt"))
+  res.c <- res[which(cook>=cooks.cut)]
+  fit.c <- fit[which(cook>=cooks.cut)]
+  if (length(fit.c) > 0) {
+    col.out <- getOption("col.stroke.pt")
+    points(fit.c, res.c, col=col.out, pch=19)
+    text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
+  }
 
-    if (!pdf) 
-      dev.set(which=4) 
-    else { 
-      pdf.file <- "RegResidFitted.pdf"
-      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
-    }
+  if (pdf) {
+    dev.off()
+    .showfile(pdf.file, "residuals vs. fitted plot")
+  }
 
-    ord <- order(fit)
-    fit.ord <- fit[ord]
-    res.ord <- res[ord]
-    .plt.main(fit.ord, res.ord, by=NULL, type="p", quiet=TRUE,
-        main="Residuals vs Fitted Values", xlab="Fitted Values",
-        ylab="Residuals", sub=txt, cex.sub=.8,
-        col.area=NULL, col.box="black",
-        col.fill=getOption("col.fill.pt"),
-        col.stroke=getOption("col.stroke.pt"),
-        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-        shape.pts=21, cex.axis=.85, col.axis="gray30",
-        col.ticks="gray30", xy.ticks=TRUE,
-        fit.line="none", center.line=NULL, cex=NULL, 
-        col.bubble=NULL, bubble.size=.25, col.flower=NULL,
-        ellipse=FALSE, n.cat=getOption("n.cat"), kind="default",
-        diag=FALSE, col.diag=par("fg"), lines.diag=TRUE)
-    abline(h=0, lty="dotted", col=getOption("col.fill.bar"))
-    lines(lowess(fit.ord, res.ord, f=.9), col=getOption("col.stroke.pt"))
-    res.c <- res[which(cook>=cooks.cut)]
-    fit.c <- fit[which(cook>=cooks.cut)]
-    if (length(fit.c) > 0) {
-      col.out <- getOption("col.stroke.pt")
-      points(fit.c, res.c, col=col.out, pch=19)
-      text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
-    }
+  rm(fit, res, cook, res.c, fit.c, fit.ord, res.ord)
 
-    if (pdf) {
-      dev.off()
-      .showfile(pdf.file, "residuals vs. fitted plot")
-    }
-
-    rm(fit, res, cook, res.c, fit.c, fit.ord, res.ord)
+  return(list(i=plt.i, ttl=plt.title))
 
 }

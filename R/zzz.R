@@ -5,7 +5,7 @@ if (getRversion() >= "2.15.1")
 .onAttach <-
 function(...) {
 
-  packageStartupMessage("\nlessR 3.1.1                                ",
+  packageStartupMessage("\nlessR 3.2      now RStudio compatible      ",
                         "  www.lessRstats.com\n",
       "---------------------------------------------------------------\n",
       "To get started, and for help in general, enter:  > Help()\n",
@@ -36,7 +36,6 @@ function(...) {
 
 }
 
-
 .max.dd <- function(x) {
 
  n.dec <-function(xn) {
@@ -63,10 +62,27 @@ function(...) {
 }
 
 
-.dash <- function(ndash, cc) {
+.dash <- function(ndash, cc, newline=TRUE) {
   if (missing(cc)) cc <- "-" 
   for (i in 1:(ndash)) cat(cc)
-  cat("\n") 
+  if (newline) cat("\n") 
+}
+
+
+.plotList <- function(plot.i, plot.title) {
+  mxttl <- 0
+  for (i in 1:plot.i)
+    if (nchar(plot.title[i]) > mxttl) mxttl <- nchar(plot.title[i])
+  mxttl <- mxttl + 8
+  cat("\n")
+  .dash(mxttl, newline=FALSE)
+  for (i in 1:plot.i) {
+    cat("\n", "Plot ", i,": ", plot.title[i], sep="")
+  }
+  cat("\n")
+  .dash(mxttl, newline=FALSE)
+  cat("\n\n")
+
 }
 
 
@@ -278,6 +294,24 @@ function(...) {
 }
 
 
+
+.pdfname <- function(analysis, x.name, go.pdf, pdf.nm, pdf.file) {
+  if (go.pdf) {
+    if (pdf.nm)
+      if (!grepl(".pdf", pdf.file))
+        pdf.fnm <- paste(pdf.file, ".pdf", sep="")
+      else
+        pdf.fnm <- pdf.file
+    else
+      pdf.fnm <- paste(analysis, "_", x.name, ".pdf", sep="")
+  }
+  else
+    pdf.fnm <- NULL
+
+  return(pdf.fnm)
+}
+
+
 .graphwin <- function(wnew=1, d.w=NULL, d.h=NULL) {
 
   dl <- dev.list()
@@ -306,29 +340,14 @@ function(...) {
 }
 
 
-.pdfname <- function(analysis, x.name, go.pdf, pdf.nm, pdf.file) {
-  if (go.pdf) {
-    if (pdf.nm)
-      if (!grepl(".pdf", pdf.file))
-        pdf.fnm <- paste(pdf.file, ".pdf", sep="")
-      else
-        pdf.fnm <- pdf.file
-    else
-      pdf.fnm <- paste(analysis, "_", x.name, ".pdf", sep="")
-  }
-  else
-    pdf.fnm <- NULL
-
-  return(pdf.fnm)
-}
-
-
 .opendev <- function(pdf.fnm, pdf.width, pdf.height) {
 
   if (is.null(pdf.fnm)) {
-    .graphwin(1)
-    orig.params <- par(no.readonly=TRUE)
-    on.exit(par(orig.params))
+    if (options("device") != "RStudioGD") {
+      .graphwin(1)
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+    }
   }
   else 
     pdf(file=pdf.fnm, width=pdf.width, height=pdf.height)

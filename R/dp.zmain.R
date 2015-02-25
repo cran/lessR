@@ -1,7 +1,7 @@
 .dp.main <- 
 function(x, by,
          col.fill, col.stroke, col.bg, col.grid, shape.pts,
-         cex.axis, col.axis, col.ticks, xlab, main, cex,
+         cex.axis, col.axis, xlab, main, cex,
          method, pt.reg, pt.out, 
          col.out30, col.out15, quiet, new, ...) {
 
@@ -52,7 +52,7 @@ function(x, by,
     suppressWarnings(stripchart(x, col="transparent", xlab=x.lab,
        main=main.lab, axes=FALSE, ...))
     suppressWarnings(axis(1,
-       cex.axis=cex.axis, col.axis=col.axis, col.ticks=col.ticks, ...))
+       cex.axis=cex.axis, col.axis=col.axis, ...))
     
     # colored background for plotting area
     usr <- par("usr")

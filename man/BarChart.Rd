@@ -29,7 +29,7 @@ BarChart(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          gap=NULL, prop=FALSE,
          
          xlab=NULL, ylab=NULL, main=NULL,
-         cex.axis=.85, col.axis="gray30", col.ticks="gray30",
+         cex.axis=.85, col.axis="gray30",
 
          beside=FALSE, col.low=NULL, col.hi=NULL, count.levels=NULL,
 
@@ -86,7 +86,6 @@ bc(\ldots)
   \item{cex.axis}{Scale magnification factor, which by default displays the axis 
        values to be smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
-  \item{col.ticks}{Color of the ticks used to label the axis values.}
   \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
        first variable to be plotted as adjacent bars instead of stacked on each other.}
   \item{col.low}{Only when the variable is an ordered factor, sets the color for the
@@ -114,7 +113,7 @@ bc(\ldots)
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for graphics as defined 
       by \code{\link{barplot}}, \code{\link{legend}}, and  \code{\link{par}} including
-      \code{space} for one variable only, and \code{cex.lab}, \code{col.main}, etc.}
+      \code{space} for one variable only, \code{las=2} for vertical axis labels, and \code{cex.lab}, \code{col.main}, etc., and \code{col.ticks} to specify the color of the tick marks.}
 }
 
 
