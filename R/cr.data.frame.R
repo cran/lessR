@@ -123,7 +123,7 @@ function(x, miss, show.n, n.cat, digits.d,
 
   if (graphics  ||  pdf) {
 
-    # set up graphics system for to 2 windows
+    # set up graphics system for 2 windows
     if (!pdf) {
       .graphwin(2)
       dev.set(which=3)
@@ -134,9 +134,17 @@ function(x, miss, show.n, n.cat, digits.d,
     }
   
     # scatter plot matrix
-    col.pts <- getOption("col.stroke.pt")
-    suppressWarnings(pairs(x, panel=panel.smooth,
-                     col=col.pts, col.smooth="black", lwd=1.5))
+      panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
+        col.pt=getOption("col.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
+        span=2/3, iter=3, ...) 
+      {
+          points(x, y, pch=pch, col=col.pt, cex=cex)
+          ok <- is.finite(x) & is.finite(y)
+          if (any(ok)) 
+            lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
+      }
+
+    pairs(x, panel=panel2.smooth)
 
     if (pdf) {  # terminate pdf graphics
       dev.off()
@@ -153,7 +161,7 @@ function(x, miss, show.n, n.cat, digits.d,
 
     if (is.null(main)) main <- "Correlations"
 
-    for (i in 1:n.vars) mycor[i,i] <- 0
+    for (i in 1:ncol(mycor)) mycor[i,i] <- 0
     cat("\nNote: To provide more color separation for off-diagonal\n",
         "      elements, the diagonal elements of the matrix for\n",
         "      computing the heat map are set to 0.\n", sep="")
@@ -161,7 +169,7 @@ function(x, miss, show.n, n.cat, digits.d,
     max.color <- getOption("col.heat")
     hmcols <- colorRampPalette(c("white",max.color))(256)
 
-    heatmap(mycor[1:n.vars,1:n.vars], Rowv=NA, Colv="Rowv", symm=TRUE,
+    heatmap(mycor[1:ncol(mycor),1:ncol(mycor)], Rowv=NA, Colv="Rowv", symm=TRUE,
       col=hmcols, margins=c(bottom, right), main=main)
 
     if (pdf) {  # terminate pdf graphics

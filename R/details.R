@@ -34,7 +34,8 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     .dash(67)
   }
 
-  cat("\n\n")
+  cat("\n")
+  if (!brief) cat("\n")
   cat("Variable Names and Data Types\n")
   if (!brief) {
     .dash(67)
@@ -209,6 +210,5 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     cat("None\n")
   }
 
-    cat("\n")
-
+  cat("\n")
 }

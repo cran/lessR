@@ -1,38 +1,41 @@
 .reg5Plot <-
-function(lm.out, nm, my.formula, brief, res.rows,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         new.data, pred.rows, scatter.3D, scatter.coef,
-         numeric.all, in.data.frame, X1.new, 
-         X2.new, X3.new, X4.new, X5.new, c.int, p.int,
-         pdf, pdf.width, pdf.height) {
+function(lm.out, res.rows=NULL, pred.rows=NULL,
+         scatter.coef=FALSE, scatter.3D=FALSE, X1.new=NULL,
+         numeric.all, in.data.frame, c.int, p.int,
+         pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...) {
 
-  # keep track of the number of plots in this routine
-  plt.i <- 0
-  plt.title  <- character(length=0)
+  nm <- all.vars(lm.out$terms)  # names of vars in the model
+  n.vars <- length(nm)
+  n.pred <- n.vars - 1
+  n.obs <- nrow(data)
+  n.keep <- nrow(lm.out$model)
+  if (is.null(pred.rows)) if (n.keep < 25) pred.rows <- n.keep else pred.rows <- 4 
+  if (pred.rows == "all") pred.rows <- n.keep  # turn off preds with pred.rows=0
 
-  if (!pdf) { 
-    if (options("device") != "RStudioGD") {
-      if (res.rows > 0) 
-        dev.set(which=5) 
-      else {
-        .graphwin(1)  #  just do a scatterplot
-        dev.set(which=3)
-      }
-    }
-  }
-  else { 
+
+  # pdf graphics option
+  if (pdf) { 
     pdf.file <- "RegScatterplot.pdf"
     if (n.pred > 1) pdf.file <- "RegScatterMatrix.pdf"
     pdf(file=pdf.file, width=pdf.width, height=pdf.height)
   }
 
+  # keep track of the plot in this routine
+  plt.i <- 0
+  plt.title  <- character(length=0)
+
   if (n.pred == 1) {  # scatterplot, if one predictor variable
-    if ( (pred.rows==0) || is.factor(lm.out$model[,nm[2]]) || !is.null(X1.new) ) 
-      do.int <- FALSE
+
+    if ( (pred.rows==0) || is.factor(lm.out$model[,nm[2]])
+         || !is.null(X1.new) || is.null(p.int)) 
+      do.predint <- FALSE
     else 
-      do.int <- TRUE
-    if (!do.int) {
-      ctitle <- "Scatterplot and Regression Line"
+      do.predint <- TRUE
+
+    if (!do.predint) {
+      ctitle <- "Scatterplot"
+      if (!is.factor(lm.out$model[,nm[2]]))
+        ctitle <- paste(ctitle, "and Regression Line")
       y.min <- min(lm.out$model[,nm[1]])
       y.max <- max(lm.out$model[,nm[1]])
     }
@@ -41,6 +44,7 @@ function(lm.out, nm, my.formula, brief, res.rows,
       y.min <- min(p.int$lwr)
       y.max <- max( max(p.int$upr),  max(lm.out$model[,nm[1]]) )
     }
+
     if (!is.factor(lm.out$model[,nm[2]])) fl <- "ls" else fl <- "none"
 
     plt.i <- plt.i + 1
@@ -64,7 +68,7 @@ function(lm.out, nm, my.formula, brief, res.rows,
        diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
        quiet=TRUE, ylim=c(y.min,y.max))
 
-    if (do.int) {
+    if (do.predint) {
       col.ci <- getOption("col.stroke.pt")
       col.pi <- "gray30"
       lines(lm.out$model[,nm[2]], c.int$lwr, col=col.ci, lwd=0.75)
@@ -72,7 +76,8 @@ function(lm.out, nm, my.formula, brief, res.rows,
       lines(lm.out$model[,nm[2]], p.int$lwr, col=col.pi, lwd=1.5)
       lines(lm.out$model[,nm[2]], p.int$upr, col=col.pi, lwd=1.5)
     }
-  }
+  }  # end n.pred==1
+
 
   else {  # scatterplot matrix for multiple regression
     if (numeric.all && in.data.frame) {
@@ -109,7 +114,7 @@ function(lm.out, nm, my.formula, brief, res.rows,
       else pairs(lm.out$model[c(nm)], panel=panel2.smooth)
     }
     else {
-      cat("\n\n>>> No scatterplot matrix reported because not all variables are ")
+      cat("\n>>> No scatterplot matrix reported because not all variables are ")
       if (!in.data.frame) cat("in the data frame.\n")
       if (!numeric.all) cat("numeric.\n")
       dev.off()
@@ -133,7 +138,7 @@ function(lm.out, nm, my.formula, brief, res.rows,
       cat("\n>>> No 3D scatterplot because both predictor variables must be numeric.\n")
     }
     if (proceed.3d) { 
-      #check.rgl <- suppressWarnings(require(rgl, quietly=TRUE))
+      #check.rgl <- require(rgl, quietly=TRUE)
       cat("\n\n\n",
           "Directions for 3D scatterplot from the car package\n",
           "--------------------------------------------------\n\n",
@@ -143,12 +148,12 @@ function(lm.out, nm, my.formula, brief, res.rows,
           "2. Press the right mouse button and drag a rectangle around any points to be\n",
           "   identified, and then release. Repeat for each set of points to be identified.\n",
           "3. To exit, right-click in a blank area of the 3d-scatterplot.\n", sep="")
-      suppressMessages(scatter3d(my.formula, id.method="identify", data=lm.out$model))  # car
+      suppressMessages(scatter3d(lm.out$terms, id.method="identify", data=lm.out$model))  # car
       cat("\n")
     }
   }
 
   # just generated plot
-  return(list(i=plt.i, ttl=plt.title))
+  invisible(list(i=plt.i, ttl=plt.title))
 
 }

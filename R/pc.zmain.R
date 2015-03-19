@@ -113,7 +113,7 @@ function(x,
 
      .ss.factor(x, brief=TRUE) 
 
-      ch <- suppressWarnings(chisq.test(x))
+      ch <- chisq.test(x)
       pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
       cat("\nChi-squared test of null hypothesis of equal probabilities\n")
       cat("  Chisq = ", ch$statistic, ",  df = ", ch$parameter, ",  p-value = ", 

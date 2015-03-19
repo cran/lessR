@@ -19,10 +19,6 @@ function(x=NULL, y=NULL, data=mydata, paired=FALSE,
 tt.setup <-
 function(x, y=NULL, ...) {
 
-  # keep track of generated graphics from tt.setup
-  plot.i <- 0
-  plot.title  <- character(length=0)
-
   cat("\n")
   if (missing(y))
     no.y <- TRUE
@@ -52,6 +48,11 @@ function(x, y=NULL, ...) {
     cat("\nThese data contain", digits.d, "significant digits.\n")
     cat("Perhaps specify less digits to display with the  digits.d  parameter.\n\n")
   }
+
+  # keep track of generated graphics from tt.setup
+  plot.i <- 0
+  plot.title  <- character(length=0)
+
 
   if (two.gp) {
     if (from.data) { 
@@ -84,7 +85,6 @@ function(x, y=NULL, ...) {
 
       for (i in (plot.i+1):(plot.i+plt2$i)) plot.title[i] <- plt2$ttl[i-plot.i]
       plot.i <- plot.i + plt2$i
-
 
     }  # end from data
 
@@ -171,7 +171,7 @@ function(x, y=NULL, ...) {
 
 
   # --------------------------
-  # do analysis with  tt.setup
+  # do analysis with tt.setup
   # plt is the returned number of plots generated 
 
   if (in.global || is.frml || from.data) {
@@ -227,6 +227,7 @@ function(x, y=NULL, ...) {
     if (!is.null(plt$i)) {
       for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
       plot.i <- plot.i + plt$i
+      manage.gr <- plt$mgn.gr
     }
   }  # in.global || is.frml || from.data 
 
@@ -240,7 +241,7 @@ function(x, y=NULL, ...) {
   if (paired) {  # scatter plot of both variables, need both vars so do here
 
     if (is.null(pdf.file)) {
-      if (options("device") != "RStudioGD") {
+      if (manage.gr) {
         if (!line.chart)
           dev.set(which=4)
         else
@@ -540,9 +541,10 @@ function(x, y=NULL, ...) {
 
 
   if (paired) {  # scatter plot of both variables, need both vars so do here
+    manage.gr <- .graphman()
 
     if (is.null(pdf.file)) {
-      if (options("device") != "RStudioGD") {
+      if (manage.gr) {
         if (!line.chart)
           dev.set(which=4)
         else
@@ -592,7 +594,8 @@ function(x, y=NULL, ...) {
 
   if (!paired) cat("\n")
 
-  if (plot.i > 1) .plotList(plot.i, plot.title)  # list plots generated
+  if (is.null(options()$knitr.in.progress))
+    if (plot.i > 1) .plotList(plot.i, plot.title)  # list plots generated
 
   if (is.frml) {
     if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))

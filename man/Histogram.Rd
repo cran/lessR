@@ -11,6 +11,8 @@ Abbreviation: \code{hs}
 From the standard R function \code{\link{hist}} plots a frequency histogram with default colors, including background color and grid lines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width and/or the bin start. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
+
+When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output embedded in documents See \code{value} below.
 }
 
 \usage{
@@ -100,7 +102,7 @@ The data may either be a vector from the global environment, the user's workspac
 To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
+Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -122,7 +124,24 @@ Because of the customized graphic windowing system that maintains a unique graph
 }
 
 \value{
-Based on the standard \code{R} function \code{\link{hist}}, invisibly returns an object of \code{\link{class}} "histogram". For details see \code{\link{hist}}.
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.5 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+
+READABLE OUTPUT\cr
+code{out_ss}: Summary statistics\cr
+code{out_freq}: Frequency distribution\cr
+code{out_outliers}: Outlier analysis\cr
+
+STATISTICS\cr
+code{bin_width}: Bin width\cr
+code{n_bins}:  Number of bins\cr
+code{breaks}: Breaks of the bins\cr
+code{mids}: Bin midpoints\cr
+code{counts}: Bin counts\cr
+code{prop}: Bin proportion\cr 
+code{counts_cumul}: Bin cumulative counts\cr 
+code{prop_cumul}: Bin cumulative proportion\cr
+
+Although not typically needed, if the output is assigned to an object named, for example, \code{h}, then the contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(h)}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -147,6 +166,16 @@ Histogram(y)
 hs(y)
 # compare to standard R function hist
 hist(y)
+
+# output saved for later analysis into object h
+h <- hs(y)
+# view full text output
+h
+# view just the outlier analysis
+h$out_outliers
+# list the names of all the components
+names(h)
+
 # save the histogram to a pdf file
 Histogram(y, pdf.file="MyHistogram.pdf")
 

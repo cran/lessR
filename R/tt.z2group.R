@@ -322,12 +322,13 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   # graphs
   if (from.data && graph) {
 
-    # keep track of the number of plots in this routine
+    # keep track of the number of plots in this routine, see if manage graphics
     plt.i <- 0
     plt.title  <- character(length=0)
+    manage.gr <- .graphman()
 
     if (is.null(pdf.file)) {
-      if (options("device") != "RStudioGD") {
+      if (manage.gr) {
         if (!line.chart)
           n.win <- 1
         else
@@ -359,7 +360,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
        center.line="default", quiet=TRUE)
 
      if (is.null(pdf.file)) {
-       if (options("device") != "RStudioGD") dev.set(which=4)
+       if (manage.gr) dev.set(which=4)
      }
      else {
        dev.off()
@@ -384,7 +385,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
        center.line="default", quiet=TRUE)
 
       if (is.null(pdf.file)) {
-        if (options("device") != "RStudioGD") dev.set(which=5)
+        if (manage.gr) dev.set(which=5)
       }
       else {
         dev.off()

@@ -120,18 +120,18 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
     }
   }
 
+  # -----------------------------------------------------------
   # logit analysis
-  #   all analysis done on data in model construct lm.out$model
+  #   all subsequent analysis done on data in model construct lm.out$model
   #   this model construct contains only model vars, with Y listed first
-  #assign("lm.out", glm(my.formula, data=data, family="binomial"),
-         #pos=.GlobalEnv)
   lm.out <- glm(my.formula, data=data, family="binomial")
+  # -----------------------------------------------------------
 
   n.keep <- nrow(lm.out$model)
     
   if (is.null(res.rows)) if (n.keep < 20) res.rows <- n.keep else res.rows <- 20 
-  if (res.rows == "all") res.rows <- n.keep  # turn off resids with res.rows=0 call
-
+  if (res.rows == "all")
+    res.rows <- n.keep  # turn off resids with res.rows=0 call
   
   cat("\n")
   if (sys.nframe() == 1) {  # only accurate if not called from model

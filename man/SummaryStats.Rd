@@ -11,6 +11,8 @@ Abbreviation: \code{ss}, \code{ss.brief}
 Descriptive or summary statistics for a numeric variable or a factor, one at a time or for all numeric and factor variables in the data frame.  For a single variable, there is also an option for summary statistics at each level of a second, usually categorical variable or factor, with a relatively few number of levels.  For a numeric variable, output includes the sample mean, standard deviation, skewness, kurtosis, minimum, 1st quartile, median, third quartile and maximum, as well as the number of non-missing and missing values. For a categorical variable, the output includes the table of counts for each value of a factor, the total sample size, and the corresponding proportions.  
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
+
+When output is assigned into an object, such as \code{s} in \code{s <- ss(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output embedded in documents See \code{value} below.
 }
 
 \usage{
@@ -74,9 +76,15 @@ Instead, do the following:
 }
 
 \value{
-If the analysis is of a single numeric variable, the full analysis invisibly returns as a list: \code{n}, \code{miss}, \code{mean}, \code{sd}, \code{skew}, \code{kurtosis}, \code{min}, \code{quartile1}, \code{median}, \code{quartile3}, \code{max}, \code{IQR}. The brief analysis returns the corresponding subset of the summary statistics. If a \code{by} variable is included in the analysis, then nothing is returned.
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.5 to provide two different types of components: the pieces of readable output in character format, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. A primary motivation of these two types of output is to facilitate \code{knitr} documents, as the name of each piece can be inserted into the \code{knitr} document.
 
-If the analysis is of a single categorical variable, a list is invisibly returned with two tables, the frequencies and the proportions, respectively named \code{freq} and \code{prop}.  If two categorical variables are analyzed, then nothing is returned. 
+If the analysis is of a single numeric variable, the full analysis returns the following statistics: \code{n}, \code{miss}, \code{mean}, \code{sd}, \code{skew}, \code{kurtosis}, \code{min}, \code{quartile1}, \code{median}, \code{quartile3}, \code{max}, \code{IQR}. The brief analysis returns the corresponding subset of the summary statistics. If a \code{by} variable is included in the analysis, then nothing is returned. The pieces of readable output are \code{out_stats} and \code{out_outliers}.
+
+If the analysis is of a single categorical variable, a list is invisibly returned with two tables, the frequencies and the proportions, respectively named \code{freq} and \code{prop}. The pieces of readable output are \code{out_title} and \code{out_stats}.
+
+If two categorical variables are analyzed, then for the full analysis four tables are returned as readable output, but no numerical statistics. The pieces are \code{out_title}, \code{out_freq}, \code{out_prop}, \code{out_colsum}, \code{out_rowsum}.
+
+Although not typically needed, if the output is assigned to an object named, for example, \code{s}, as in \code{s <- ss(Y)}, then the contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(s)}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -105,6 +113,14 @@ rm(X); rm(Y)
 SummaryStats(Y)
 # short name
 ss(Y)
+# output saved for later analysis
+s <- ss(Y)
+# view full text output
+s
+# view just the outlier analysis
+s$out_outliers
+# list the names of all the components
+names(s)
 
 # Analyze the values of categorical X
 # Calculate frequencies and proportions, totals, chi-square
@@ -181,6 +197,8 @@ SummaryStats(Travel)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ summary }
+
+
 
 
 

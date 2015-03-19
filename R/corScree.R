@@ -16,9 +16,12 @@ function (x=mycor,
   eig <- eigen(x, symmetric=TRUE, only.values=TRUE)
   ev <- eig$values
 
-  # set up graphics system for 2 windows
+  # see if graphics are to be managed
+  manage.gr <- .graphman()
+
+  # if manage, set up graphics system for 2 windows default
   if (!pdf) {
-    if (options("device") != "RStudioGD") {
+    if (manage.gr) {
       .graphwin(2)
       dev.set(which=3)
     }
@@ -60,9 +63,8 @@ function (x=mycor,
     .showfile(pdf.file, "scree chart")
   }
 
-
   if (!pdf) {
-    if (options("device") != "RStudioGD") {
+    if (manage.gr) {
       dev.set(which=4) 
     }
   }
@@ -112,7 +114,8 @@ function (x=mycor,
   .dash(41+nchar(deparse(substitute(x))))
   print(round(ev.diff,3))
 
-  .plotList(plot.i, plot.title)
+  if (is.null(options()$knitr.in.progress))
+    .plotList(plot.i, plot.title)
 
   cat("\n")
 

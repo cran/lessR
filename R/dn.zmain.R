@@ -72,9 +72,9 @@ function(x,
   # set up plot area
   # bw if specified also gets passed to plot, so suppress warning
   if (!y.axis) y.lab="" else y.lab="Density"
-  suppressWarnings(plot(h, border="transparent", freq=FALSE, xlab=x.lab,
+  plot(h, border="transparent", freq=FALSE, xlab=x.lab,
      ylab=y.lab, main=main.lab, xlim=c(x.min,x.max), ylim=c(0,max.y), 
-     axes=FALSE, ...))
+     axes=FALSE, ...)
   axis(1, cex.axis=cex.axis, col.axis=col.axis, ...)
   if (y.axis) 
     axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)

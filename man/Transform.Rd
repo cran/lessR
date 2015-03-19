@@ -85,6 +85,38 @@ mydata <- Transform(
 mydata <- label(Months, "Months Employed in the Company")
 # confirm
 details.brief()
+
+
+# ------------------------------------
+# convert between factors and integers
+# ------------------------------------
+
+# recode levels of a factor that should remain a factor
+#   with the Transform and factor functions
+# using Recode destroys the factor attribute, converting to
+#   character strings instead, so Recode does not allow
+mydata <- Read("Employee", format="lessR")
+mydata <- Transform(
+    Gender=factor(Gender, levels=c("F", "M"), labels=c("Female", "Male"))
+)
+
+# recode levels of a factor to convert to integer first by
+#   converting to integer with Transform and as.numeric
+# here Gender has values M and F in the data
+# integers start with 1 through the number of levels, can use
+#    Recode to change this if desired, such as to 0 and 1
+mydata <- Read("Employee", format="lessR")
+mydata <- Transform(Gender=as.numeric(Gender))
+mydata <- Recode(Gender, old=c(1,2), new=c(0,1))
+
+# recode integer values to levels of a factor with value labels
+#   with the Transform function instead of Recode
+# here Gender has values 0 and 1 in the data
+mydata <- Read("Mach4", format="lessR")
+mydata <- Transform(
+      Gender=factor(Gender, levels=c(0,1), labels=c("Male","Female"))
+      )
+# ------------------------------------
 }
 
 

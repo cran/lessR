@@ -103,7 +103,7 @@ function(rows, columns, data=mydata, holdout=FALSE,
   # if no vars dropped, vars is TRUE, otherwise a char vector of names to retain
   if (!is.logical(vars) && !is.null(mylabels)) {  
     # warning unless length(mydata) a multiple of length(vars)
-    keep.index <- suppressWarnings(which(names(mydata) == vars))
+    keep.index <- which(suppressWarnings(names(mydata) == vars))
     mylabels <- mylabels[keep.index]
   }
 

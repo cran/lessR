@@ -108,11 +108,11 @@ function(x, y, by, data, type, n.cat,
 
     # non-graphical parameters in ... generate warnings when no plot
     if (!diag)
-      suppressWarnings(plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
-             main=main.lab, ...))
+      plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
+             main=main.lab, ...)
     else
-      suppressWarnings(plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
-             main=main.lab, xlim=c(l1,l2), ylim=c(l1,l2), ...))
+      plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
+             main=main.lab, xlim=c(l1,l2), ylim=c(l1,l2), ...)
     if (xy.ticks){
       axis(1, cex.axis=cex.axis, col.axis=col.axis, ...)
       axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
@@ -194,8 +194,8 @@ function(x, y, by, data, type, n.cat,
       if (is.null(by)) { 
         trans.pts <- getOption("trans.fill.pt")
         clr.trn <- .maketrans(col.fill, (1-trans.pts)*256)
-        suppressWarnings(points(x,y, pch=shape.pts, col=col.stroke,
-            bg=clr.trn, cex=pt.size, ...))
+        points(x,y, pch=shape.pts, col=col.stroke,
+            bg=clr.trn, cex=pt.size, ...)
       }
 
       else {  # by grouping variable
@@ -222,8 +222,8 @@ function(x, y, by, data, type, n.cat,
           clr.tr[i] <- .maketrans(clr.tr[i], (1-trans.pts)*256)
           x.lv <- subset(x, by==levels(by)[i])
           y.lv <- subset(y, by==levels(by)[i])
-          suppressWarnings(points(x.lv, y.lv, pch=shp[i], col=clr[i],
-              bg=clr.tr[i], cex=pt.size, lwd=0.75, ...))
+          points(x.lv, y.lv, pch=shp[i], col=clr[i],
+              bg=clr.tr[i], cex=pt.size, lwd=0.75, ...)
         }
 
       if (length(col.stroke) > 1) clr.tr <- clr

@@ -10,7 +10,7 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
   if (is.null(by)) n.lines <- 1
   else {
     bu <- as.factor(unique(na.omit(by)))
-    n.lines <- length(bu)
+    n.lines <- nlevels(bu)
     for (i in 1:nlevels(bu))  # largest level name
       if (nchar(levels(bu)[i]) > max.char) max.char <- nchar(levels(bu)[i])
     # split data into the by groups (vectors)
@@ -39,9 +39,6 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     dig.dec <- 4
   }
 
-  # output
-  ndash <- 20
-  .title(x.name, y.name, x.lbl, y.lbl, is.null(by))
 
   # get maximum chars in 1st three columns
   max.lv <- 0; max.n <- 0; max.nm <- 0
@@ -61,8 +58,7 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     max.nm <- nchar(as.character(sum(is.na(x))))
   }
 
-  # get max.ln, maximum length of the individual fields
-  max.ln <- 0
+  max.ln <- 0  # get max.ln, maximum length of the individual fields
   for (i in 1:n.lines) {
     if (n.lines == 1) xx <- x
     else {
@@ -78,7 +74,15 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
   if (max.ln < 5) max.ln <- max.ln + 1
   if (max.ln < 10) max.ln <- max.ln + 1
 
-  # the stats
+
+  tx <- character(length = 0)
+
+  # output, first the title
+  ttlns <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by))
+  for (i in 1:length(ttlns)) tx[length(tx)+1] <- ttlns[i] 
+
+  # --------------------------------
+  # the stats loop
   for (i in 1:n.lines) {
     if (n.lines == 1) {
       xx <- x
@@ -89,22 +93,30 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
       xx <- vectors[[i]]
       p.lv <- format(lv, width=max.char+1)
     }
+
+    m <- NA; s <- NA; mn <- NA; mx <- NA; md=NA
+    sk <- NA; kt <- NA; q1 <- NA; q3 <- NA; qr <- NA
+    # get the descriptive statistics
     n <- sum(!is.na(xx))
     n.miss <- sum(is.na(xx))
     xx <- na.omit(xx)
-    m <- mean(xx)
-    s <- sd(xx)
+    if (n>0) m <- mean(xx)
+    if (n>1) s <- sd(xx)
     # skewness:  adjusted Fisher-Pearson standardized moment coefficient
-    sk.coef <- n / ((n-1)*(n-2))
-    sk.sum <- 0
-    for (j in 1:n) sk.sum <- sk.sum + (( (xx[j]-m) / s)^3) 
-    sk <- sk.coef * sk.sum
+    if (n>2) {
+      sk.coef <- n / ((n-1)*(n-2))
+      sk.sum <- 0
+      for (j in 1:n) sk.sum <- sk.sum + (( (xx[j]-m) / s)^3) 
+      sk <- sk.coef * sk.sum
+    }
     # kurtosis
-    kt.coef1 <- (n*(n+1)) / ((n-1)*(n-2)*(n-3))
-    kt.coef2 <- 3 * ( ((n-1)^2) / ((n-2)*(n-3)) )
-    kt.sum <- 0
-    for (j in 1:n) kt.sum <- kt.sum + ( (xx[j]-m)^4 )
-    kt <- ( kt.coef1 * (kt.sum/(var(xx)^2)) ) - kt.coef2
+    if (n>3) {
+      kt.coef1 <- (n*(n+1)) / ((n-1)*(n-2)*(n-3))
+      kt.coef2 <- 3 * ( ((n-1)^2) / ((n-2)*(n-3)) )
+      kt.sum <- 0
+      for (j in 1:n) kt.sum <- kt.sum + ( (xx[j]-m)^4 )
+      kt <- ( kt.coef1 * (kt.sum/(var(xx)^2)) ) - kt.coef2
+    }
     # order stats
     if (n > 0) {
       mn <- min(xx)
@@ -115,66 +127,71 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
       qr <- IQR(xx)
     }
 
-    # set values to print
-    if (n > 0) {
-      if (!brief) {
-        out <- c(n, n.miss, m, s, sk, kt, mn, q1, md, q3, mx, qr)
-        names(out) <- c("n", "miss", "mean", "sd", "skew", "krts",
-                        "min", "qrt1", "mdn", "qrt3", "max", "IQR")
-      }
-      else {
-        out <- c(n, n.miss, m, s, mn, md, mx)
-        names(out) <- c("n", "miss", "mean", "sd", "min", "mdn", "max")
-      }
-    }
-    else {
-      out <- c(n, n.miss)
-      names(out) <- c("n", "miss")
-    }
 
-    # write header names
-    if (i == 1) { 
+    if (i == 1) { # heading labels 
+
       if (max.ln < 4) max.ln <- max.ln + 2
       if (max.ln < 8) max.ln <- max.ln + 1
-      if (n.lines == 1) nbuf <- 0 else nbuf <- 2
-      cat(" ")
-      cat(format(names(out[1]), width=nchar(as.character(out[1]))+nbuf+max.lv, 
-          justify="right", sep=""))
-      nbuf <- 5
-      cat(format(names(out[2]), 
-          width=nchar(as.character(out[2]))+nbuf, justify="right", sep=""))
-      for (i in 3:length(out))
-         cat(format(names(out[i]), width=max.ln, justify="right", sep=""))
-      cat("\n")
-    }
+      if (n.lines == 1) nbuf <- 2 else nbuf <- 4
+
+      n.lbl <- .fmtc("n", nchar(as.character(n))+nbuf+max.lv)
+      miss.lbl <- .fmtc("miss", nchar(as.character(n.miss))+5)
+      m.lbl <- .fmtc("mean", max.ln)
+      s.lbl <- .fmtc("sd", max.ln)
+      mn.lbl <- .fmtc("min", max.ln)
+      md.lbl <- .fmtc("mdn", max.ln)
+      mx.lbl <- .fmtc("max", max.ln)
+
+      if (brief)
+        tx[length(tx)+1] <- paste(n.lbl, miss.lbl, m.lbl, s.lbl, mn.lbl,
+                                 md.lbl, mx.lbl) 
+      else {
+        sk.lbl <- .fmtc("skew", max.ln)
+        kt.lbl <- .fmtc("krts", max.ln)
+        q1.lbl <- .fmtc("qrt1", max.ln)
+        q3.lbl <- .fmtc("qrt3", max.ln)
+        qr.lbl <- .fmtc("IQR", max.ln)
+        tx[length(tx)+1] <- paste(n.lbl, miss.lbl, m.lbl, s.lbl, sk.lbl,
+              kt.lbl, mn.lbl, q1.lbl, md.lbl, q3.lbl, mx.lbl, qr.lbl)
+      }
+    }  # end first line, labels
 
     # write values
-    cat(format(p.lv, width=max.lv, justify="right", sep=""))
-    cat(format(out[1], width=max.n+1, justify="right", sep=""))
-    cat(format(out[2], width=max.nm+5, justify="right", sep=""))
-    if (n > 0) {
-      if (n > 1) for (i in 3:length(out)) 
-        cat(format(sprintf("%.*f", dig.dec, out[i]), width=max.ln,
-            justify="right", sep=""))
-      else cat(format(sprintf("%.*f", dig.dec, out[3]), 
-               width=max.ln, justify="right", sep=""))
+    lvl <- .fmtc(p.lv, max.lv)
+    n.c <- .fmti(n, max.n+1)
+    miss.c <- .fmti(n.miss, max.nm+5)
+
+    if (n == 0) 
+      tx[length(tx)+1] <- paste(lvl, n.c, miss.c)
+
+    else if (n == 1) {
+        m.c <- .fmt(m, dig.dec, max.ln)
+        tx[length(tx)+1] <- paste(lvl, n.c, miss.c, m.c)
     }
-    cat("\n")
+    else if (n > 1) {
+      m.c <- .fmt(m, dig.dec, max.ln)
+      s.c <- .fmt(s, dig.dec, max.ln)
+      mn.c <- .fmt(mn, dig.dec, max.ln)
+      md.c <- .fmt(md, dig.dec, max.ln)
+      mx.c <- .fmt(mx, dig.dec, max.ln)
+      if (brief)
+        tx[length(tx)+1] <- paste(lvl, n.c, miss.c, m.c, s.c, mn.c, md.c, mx.c)
 
-  }
+      else {
+        sk.c <- .fmt(sk, dig.dec, max.ln)
+        kt.c <- .fmt(kt, dig.dec, max.ln)
+        q1.c <- .fmt(q1, dig.dec, max.ln)
+        q3.c <- .fmt(q3, dig.dec, max.ln)
+        qr.c <- .fmt(qr, dig.dec, max.ln)
+        tx[length(tx)+1] <- paste(lvl, n.c, miss.c, m.c, s.c, sk.c, kt.c,
+             mn.c, q1.c, md.c, q3.c, mx.c, qr.c)
+      }
+    }
 
-  # outlier analysis
-  .outliers(xx)
+  }  # for each line
 
-
-  # return the information back to SummaryStats
-  if (n.lines == 1)
-    if (!brief) 
-      return(list(n=n, miss=n.miss, mean=m, sd=s, skew=sk, kurtosis=kt, 
-                  min=mn, quartile1=q1, median=md, quartile3=q3, max=mx, IQR=qr))
-    else 
-      return(list(n=n, miss=n.miss, mean=m, sd=s, min=mn, median=md, max=mx))
-
-  cat("\n")
+      return(list(tx=tx, n=n, n.miss=n.miss, m=m, s=s, sk=sk, kt=kt, mn=mn,
+                  q1=q1, md=md, q3=q3, mx=mx, qr=qr))
 
 }
+

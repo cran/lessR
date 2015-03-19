@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{prop}
 
-In the population, indicators of the same factor or latent variable have parallel correlations with all other variables. Of course, in the presence of sampling error, this parallelism will only be approximate. To assess this parallelism, proportionality coefficients are computed for each pair of variables in the input correlation matrix.  Also output is a heat map of the resulting matrix of proportionality coefficients. Each graph is based on a default color theme. The original default is "blue", but other color palettes can be generated as well.
+In the population, indicators of the same factor or latent variable have parallel correlations with all other variables. Of course, in the presence of sampling error, this parallelism will only be approximate. To assess this parallelism, proportionality coefficients are computed for each pair of variables in the input correlation matrix.  Also output is a heat map of the resulting matrix of proportionality coefficients. Each graph is based on a default color theme. The original default is \code{dodgerblue}, but other color palettes can be generated as well.
 }
 
 \usage{

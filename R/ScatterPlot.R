@@ -65,7 +65,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
         num.flag <- TRUE
       }
   }
-  if (num.flag) shape.pts <- suppressWarnings(as.numeric(shape.pts))
+  if (num.flag) shape.pts <- as.numeric(shape.pts)
 
   if (pt.reg %in% shapes) 
     pt.reg <- which(pt.reg==shapes) + 20
@@ -170,8 +170,8 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
   }
 
   # graphics 
-  if (is.null(pdf.file))  {  
-    if (options("device") != "RStudioGD") {
+  if (is.null(pdf.file)) {  
+    if (options("device") != "RStudioGD"  &&  is.null(options()$knitr.in.progress)) {
       orig.params <- par(no.readonly=TRUE)
       on.exit(par(orig.params))
       if (missing(by))  # set up graphics system to manage
@@ -214,7 +214,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          col.out30, col.out15, quiet, new, ...)
   }
 
-  # terminate pdf graphics system
+  # terminate pdf graphics system if used
   if (!is.null(pdf.file)) {
     dev.off()
     .showfile(pdf.file, "plot")

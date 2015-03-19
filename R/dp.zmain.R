@@ -49,10 +49,10 @@ function(x, by,
 
     if (!is.null(by)) par(omi=c(0,0,0,0.6))  # legend in right margin
 
-    suppressWarnings(stripchart(x, col="transparent", xlab=x.lab,
-       main=main.lab, axes=FALSE, ...))
-    suppressWarnings(axis(1,
-       cex.axis=cex.axis, col.axis=col.axis, ...))
+    stripchart(x, col="transparent", xlab=x.lab,
+       main=main.lab, axes=FALSE, ...)
+    # jitter passes to stripchart, but not to axis
+    suppressWarnings(axis(1, cex.axis=cex.axis, col.axis=col.axis, ...))
     
     # colored background for plotting area
     usr <- par("usr")
@@ -83,8 +83,8 @@ function(x, by,
   if (is.null(by)) {
     trans.pts <- getOption("trans.fill.pt")
     clr.trn <- .maketrans(col.fill, (1-trans.pts)*256)
-    suppressWarnings(stripchart(x[x>lo15 & x<up15], add=TRUE, method=method,
-                     col=col.stroke, pch=pt.reg, bg=clr.trn, ...))
+    stripchart(x[x>lo15 & x<up15], add=TRUE, method=method,
+                     col=col.stroke, pch=pt.reg, bg=clr.trn, ...)
   }
 
   else {  # by grouping variable

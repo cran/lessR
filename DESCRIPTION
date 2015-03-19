@@ -1,15 +1,15 @@
 Package: lessR
-Version: 3.2
-Date: 2015-02-24
+Version: 3.3
+Date: 2015-03-19
 Title: Less Code, More Results
 Author: David W. Gerbing, School of Business Administration, Portland State University
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
 Depends: R (>= 2.15.0)
 Imports: car, leaps, MBESS, foreign, gdata, triangle
-Description: Each function accomplishes the work of several or more standard R functions.  For example, two function calls, Read() and CountAll(), read the data and generate descriptive statistics for all variables in the data frame, plus histograms and bar charts as appropriate.  Other functions provide for descriptive statistics, a comprehensive regression analysis, analysis of variance and t-test, plotting, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function and color themes. The function Help provides a help system that suggests specific analyses and functions. Variable labels are available. A confirmatory factor analysis of multiple indicator measurement models is also available as is a pedagogical routines for data simulation such as for the Central Limit Theorem.
+Description: Each function accomplishes the work of several or more standard R functions.  For example, two function calls, Read() and CountAll(), read the data and generate summary statistics for all variables in the data frame, plus histograms and bar charts as appropriate.  Other functions provide for descriptive statistics, a comprehensive regression analysis, analysis of variance and t-test, plotting, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function, variable labels, color themes, and a built-in help system. A confirmatory factor analysis of multiple indicator measurement models is also available as are pedagogical routines for data simulation such as for the Central Limit Theorem. Compatible with RStudio and knitr including generation of knitr instructions for interpretative output. 
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2015-02-24 22:14:27 UTC; gerbing
+Packaged: 2015-03-19 19:00:17 UTC; gerbing
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2015-02-25 08:12:36
+Date/Publication: 2015-03-19 23:54:21

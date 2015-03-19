@@ -4,7 +4,7 @@
 \title{Set the Default Color Theme and Other System Settings}
 
 \description{
-Each graph is based on a default color theme. The original default is \code{colors="blue"}, but \code{set} allows other color palettes to be set as default as well. Setting \code{ghost=TRUE} provides transparency effects against a black background. Other system settings are also available.}
+Each graph is based on a default color theme. The original default is \code{colors="dodgerblue"}, but \code{set} allows other color palettes to be set as default as well. Setting \code{ghost=TRUE} provides transparency effects against a black background. Other system settings are also available.}
 
 \usage{
 set(colors=c("blue", "gray", "rose", "green", "gold", "red",

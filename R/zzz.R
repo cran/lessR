@@ -5,11 +5,13 @@ if (getRversion() >= "2.15.1")
 .onAttach <-
 function(...) {
 
-  packageStartupMessage("\nlessR 3.2      now RStudio compatible      ",
-                        "  www.lessRstats.com\n",
+  packageStartupMessage("\n",
+      "lessR 3.3     RStudio, knitr compatible      www.lessRstats.com\n",
       "---------------------------------------------------------------\n",
-      "To get started, and for help in general, enter:  > Help()\n",
-      "To read a text, Excel, SPSS or R data file:  > mydata <- Read()\n",
+      "To get started, and for help in general, enter:  Help()\n",
+      "To read a text, Excel, SPSS or R data file:  mydata <- Read()\n",
+      "---------------------------------------------------------------\n",
+      "To view the new knitr features, enter:  ?Regression\n",
       "---------------------------------------------------------------\n\n")
 
   # .maketrans(rgb(106,161,214, maxColorValue=256), to256("trans.fill.bar"))
@@ -36,6 +38,7 @@ function(...) {
 
 }
 
+
 .max.dd <- function(x) {
 
  n.dec <-function(xn) {
@@ -56,9 +59,9 @@ function(...) {
 
 
 .getdigits <- function(x, min.digits) {
-    digits.d <- .max.dd(x) + 1
-    if (digits.d < min.digits) digits.d <- min.digits
-    return(digits.d)
+  digits.d <- .max.dd(x) + 1
+  if (digits.d < min.digits) digits.d <- min.digits
+  return(digits.d)
 }
 
 
@@ -66,6 +69,14 @@ function(...) {
   if (missing(cc)) cc <- "-" 
   for (i in 1:(ndash)) cat(cc)
   if (newline) cat("\n") 
+}
+
+.dash2 <- function(ndash, cc="-") {
+
+  tx <- ""
+  for (i in 1:(ndash)) tx <- paste(tx, cc, sep="")
+
+  return(tx)
 }
 
 
@@ -86,6 +97,23 @@ function(...) {
 }
 
 
+.plotList2 <- function(plot.i, plot.title) {
+  tx <- character(length = 0)
+
+  mxttl <- 0
+  for (i in 1:plot.i)
+    if (nchar(plot.title[i]) > mxttl) mxttl <- nchar(plot.title[i])
+  mxttl <- mxttl + 8
+
+  tx[length(tx)+1] <- .dash2(mxttl)
+  for (i in 1:plot.i)
+    tx[length(tx)+1] <- paste("Plot ", i,": ", plot.title[i], sep="")
+  tx[length(tx)+1] <- .dash2(mxttl)
+
+  return(tx)
+}
+
+
 .fmt <- function(k, d=getOption("digits.d"), w=0) {
   format(sprintf("%.*f", d, k), width=w, justify="right", scientific=FALSE)
 }
@@ -98,6 +126,11 @@ function(...) {
 
 .fmtc <- function(k, w=0, j="right") {
   format(sprintf("%s", k), width=w, justify=j)
+}
+
+
+.fmtNS <- function(k) {
+  format(k, scientific=FALSE )
 }
 
 
@@ -229,8 +262,9 @@ function(...) {
 
 .varlist <- function(n.pred, i, var.name, pred.lbl, n.obs, n.keep, lvls=NULL) {
 
-  if (i == 1) txt <- "Response Variable:  "
-  else 
+  if (i == 1)
+    txt <- "Response Variable:  "
+  else
     if (n.pred > 1) txt <- paste(pred.lbl, " ", 
       toString(i-1), ": ", sep="")
     else txt <- "Predictor Variable: "
@@ -258,6 +292,34 @@ function(...) {
 }
 
 
+.varlist2 <- function(n.pred, i, var.name, pred.lbl, n.obs, n.keep, lvls=NULL) {
+  tx <- character(length = 0)
+
+  if (i == 1)
+    txt <- "Response Variable:  "
+  else
+    if (n.pred > 1) txt <- paste(pred.lbl, " ", 
+      toString(i-1), ": ", sep="")
+    else txt <- "Predictor Variable: "
+  tx[length(tx)+1] <- paste(txt, var.name, sep="")
+
+  dname <- getOption("dname")
+  if (exists(dname, where=.GlobalEnv))
+    mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
+  else
+    mylabels <- NULL
+
+  if (!is.null(mylabels)) {
+    lbl <- mylabels[which(names(mylabels) == var.name)]
+    if (!is.null(lbl)) tx[length(tx)] <- paste(tx[length(tx)], paste(", ", as.character(lbl)), sep="")
+  }
+
+  if (!is.null(lvls)) if (i > 1) tx[length(tx)+1] <- paste("\n  Levels:", lvls)
+
+  return(tx)
+}
+
+
 .title <- function(x.name, y.name, x.lbl, y.lbl, isnullby) {
 
   txt1 <- x.name
@@ -281,6 +343,30 @@ function(...) {
 
 }
 
+.title2 <- function(x.name, y.name, x.lbl, y.lbl, isnullby) {
+
+  txt1 <- x.name
+  if (!is.null(x.lbl)) txt1 <- paste(txt1, ", ", x.lbl, sep="")
+
+  if (isnullby) txt1 <- paste("---", txt1, "---")
+  else {
+    txt2 <- paste(y.name, sep="")
+    if (!is.null(y.lbl)) txt2 <- paste(txt2, ", ", y.lbl, sep="") 
+  }
+
+  tx <- character(length = 0)
+
+  tx[length(tx)+1] <- txt1
+  if (!isnullby) {
+    tx[length(tx)+1] <- "  - by levels of - "
+    tx[length(tx)+1] <- txt2
+    tx[length(tx)+1] <- .dash2(max(nchar(txt1),nchar(txt2)))
+  }
+
+  return(tx)
+
+}
+
 
 .showfile <- function(fname, txt) {
   if (getwd() == "/")
@@ -293,6 +379,21 @@ function(...) {
   cat("\n")
 }
 
+
+.showfile2 <- function(fname, txt) {
+  if (getwd() == "/")
+    workdir <- "top level (root) of your file system"
+  else
+    workdir <- getwd()
+
+  tx <- character(length = 0)
+
+  tx[length(tx)+1] <- paste("The", txt, "written at the current working directory.")
+  tx[length(tx)+1] <- paste("       ", fname, " in:  ", workdir)
+
+  return(tx)
+
+}
 
 
 .pdfname <- function(analysis, x.name, go.pdf, pdf.nm, pdf.file) {
@@ -312,6 +413,29 @@ function(...) {
 }
 
 
+# see if manage graphics or just sequentially plot
+.graphman <- function() {
+
+  if (options("device") != "RStudioGD")
+    in.RStudio <- FALSE
+  else
+    in.RStudio <- TRUE
+
+  if (is.null(options()$knitr.in.progress))
+    in.knitr <- FALSE
+  else
+    in.knitr <- TRUE
+
+  if (!in.RStudio  &&  !in.knitr)
+    manage.gr <- TRUE
+  else
+    manage.gr <- FALSE
+
+  return(manage.gr)
+}
+
+
+# manages the graphics system (not in RStudio or knitr)
 .graphwin <- function(wnew=1, d.w=NULL, d.h=NULL) {
 
   dl <- dev.list()
@@ -343,7 +467,7 @@ function(...) {
 .opendev <- function(pdf.fnm, pdf.width, pdf.height) {
 
   if (is.null(pdf.fnm)) {
-    if (options("device") != "RStudioGD") {
+    if (options("device") != "RStudioGD"  &&  is.null(options()$knitr.in.progress)) {
       .graphwin(1)
       orig.params <- par(no.readonly=TRUE)
       on.exit(par(orig.params))
@@ -455,3 +579,110 @@ function(...) {
 
   cat("\n")
 }
+
+
+.outliers2 <- function(x) {
+
+  tx <- character(length = 0)
+
+  outliers <- boxplot.stats(x)$out
+  if (length(outliers>0) && unique(na.omit(x)>3)) {
+  tx[length(tx)+1] <- paste("Number of outliers:", length(outliers))
+
+  lo.whisker <- boxplot.stats(x)$stats[1]
+  lo.out <- outliers[outliers < lo.whisker]
+  lo.out <- sort(lo.out, decreasing=FALSE)
+  lo.len <- length(lo.out)
+  tx[length(tx)+1] <- "Small: "
+  if (lo.len > 0) {
+    if (lo.len <= 25) {
+      for (i in 1:lo.len)
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
+    }
+    else {
+      for (i in 1:16) 
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
+      tx[length(tx)] <- "...  "
+      for (i in (lo.len-5):lo.len)
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
+    }
+  }
+  else
+    tx[length(tx)] <- paste(tx[length(tx)], "none")
+
+  hi.whisker <- boxplot.stats(x)$stats[5]
+  hi.out <- outliers[outliers > hi.whisker]
+  hi.out <- sort(hi.out, decreasing=FALSE)
+  hi.len <- length(hi.out)
+  tx[length(tx)+1] <- "Large:"
+  if (hi.len > 0) {
+    if (hi.len <= 25) {
+      for (i in 1:hi.len) 
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
+    }
+    else {
+      for (i in 1:16)
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
+      tx[length(tx)] <- paste(tx[length(tx)], "...  ")
+      for (i in (hi.len-5):hi.len)
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
+    }
+  }
+  else
+    tx[length(tx)] <- paste(tx[length(tx)], "none")
+
+  }
+
+  return(tx)
+}
+
+
+
+.prntbl <- function(x, digits.d=2, cc="-") {
+  tx <- character(length = 0)
+
+  # width of column 1
+  max.c1 <- 0
+  for (i in 1:nrow(x)) {
+    c1 <- nchar(rownames(x)[i])
+    if (c1 > max.c1) max.c1 <- c1
+  }
+  max.c1 <- max.c1 + 2
+
+  # width of data columns
+  max.ln <- integer(length=0)
+  for (i in 1:ncol(x)) {
+    ln.nm <- nchar(colnames(x)[i])
+    max.ln[i] <- ln.nm + 1
+    for (j in 1:nrow(x)) {
+      xjc <- .fmt(x[j,i], d=digits.d)
+      if (nchar(xjc) > max.ln[i]) max.ln[i] <- nchar(xjc)
+    }
+    max.ln[i] <- max.ln[i] + 1
+    if (max.ln[i] < 4) max.ln[i] <- 4
+  }
+
+  tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1, cc=cc)
+  #tx[length(tx)+1] <- ""
+
+  # col labels
+  tx[length(tx)+1] <-  format("", width=max.c1)
+  for (i in 1:ncol(x))
+    tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i], w=max.ln[i]), sep="")
+
+  # values
+  for (i in 1:nrow(x)) {
+    rwnm <- paste(" ", rownames(x)[i])
+    tx[length(tx)+1] <-  format(rwnm, width=max.c1, justify="right")
+    for (j in 1:ncol(x)) 
+      if (is.integer(x[i,j]))
+        tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j], w=max.ln[j]), sep="")
+      else
+        tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i,j], d=digits.d, w=max.ln[j]), sep="")
+  }
+
+  return(tx)
+
+}  # end .prntbl
+
+

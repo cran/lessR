@@ -152,12 +152,13 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
   # graphs
   if (graph) {
 
-    # keep track of the number of plots in this routine
+    # keep track of the number of plots in this routine, see if manage graphics
     plt.i <- 0
     plt.title  <- character(length=0)
+    manage.gr <- .graphman()
  
     if (is.null(pdf.file)) {
-      if (options("device") != "RStudioGD") {
+      if (manage.gr) {
         n.win <- 0
         if (!is.null(mu0)) n.win <- n.win + 1
         if (paired) n.win <- n.win + 1
@@ -175,7 +176,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
       if (!is.null(pdf.file))
         pdf(file=paste("LineChart_",Ynm,".pdf",sep=""), width=pdf.width, height=pdf.height)
 
-      if (options("device") != "RStudioGD") {
+      if (manage.gr) {
         i.win  <- i.win + 1 
         dev.set(which=i.win)
       }
@@ -203,7 +204,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
 
   if (!is.null(mu0)) {
 
-    if (options("device") != "RStudioGD") {
+    if (manage.gr) {
       i.win  <- i.win + 1 
       dev.set(which=i.win)
     }

@@ -101,7 +101,7 @@ function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
 
 
   # finish the console output
-  .dash(31)
+  if (!quiet) .dash(31)
   cat("\n")
 
 

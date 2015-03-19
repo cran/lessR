@@ -62,8 +62,7 @@ function(y, nested.model, full.model, method=c("ls", "logit"), data=mydata) {
   if (method == "ls")
     lm.nest <- lm(my.formula, data=lm.full$model)
   else
-    lm.nest <- suppressWarnings(glm(my.formula, data=lm.full$model,
-                                    family="binomial"))
+    lm.nest <- suppressWarnings(glm(my.formula, data=lm.full$model, family="binomial"))
 
 
   # do the model comparison

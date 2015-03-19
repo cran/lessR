@@ -25,6 +25,8 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
     cat("\n")
   }
 
+  options(data.file=ref)  # save for knitr run
+
   if (grepl(".sav$", ref)) format <- "SPSS" 
   if (grepl(".rda$", ref)) format <- "R" 
   if (grepl(".xls$", ref) || grepl(".xlsx$", ref)) format <- "Excel" 
@@ -55,13 +57,15 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
     }
   }
 
-  max.chr <- nchar(ref)
-  if (!is.null(labels))
-    if (nchar(ref.lbl) > max.chr) max.chr <- nchar(ref.lbl)
-  .dash(max.chr + 14)
-  cat("Data File:   ", ref, "\n")
-  if (!is.null(labels))  cat("Label File:  ", ref.lbl, "\n")
-  .dash(max.chr + 14)
+  if (!quiet) {
+    max.chr <- nchar(ref)
+    if (!is.null(labels))
+      if (nchar(ref.lbl) > max.chr) max.chr <- nchar(ref.lbl)
+    .dash(max.chr + 14)
+    cat("Data File:   ", ref, "\n")
+    if (!is.null(labels))  cat("Label File:  ", ref.lbl, "\n")
+    .dash(max.chr + 14)
+  }
 
   # see if labels=="row2"
   if (is.null(labels))
@@ -87,8 +91,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
       else
         delim <- ","
       if (isnot.row2)  # read data
-         data <- suppressWarnings(read.csv(file=ref, na.strings=missing,
-                                 sep=delim, ...))
+         data <- read.csv(file=ref, na.strings=missing, sep=delim, ...)
     }
 
   }  # end text file
@@ -99,8 +102,8 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
     perl.test <- Sys.which("perl")
     if (nchar(perl.test) > 0) {
       if (isnot.row2)  # read data
-        data <- suppressWarnings(read.xls(xls=ref, sheet=sheet,
-                na.strings=c("NA","#DIV/0!", ""), ...))
+        data <- read.xls(xls=ref, sheet=sheet,
+                na.strings=c("NA","#DIV/0!", ""), ...)
     }
     else {  # no Perl
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -139,11 +142,11 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
         mylabels <- data.frame(t(mylabels))  # var names are row names
         names(mylabels) <- "label"
         if (format != "Excel") 
-          data <- suppressWarnings(read.csv(file=ref, skip=1, 
-                           na.strings=missing, col.names=var.names, sep=delim, ...))
+          data <- read.csv(file=ref, skip=1, 
+                           na.strings=missing, col.names=var.names, sep=delim, ...)
         else
-          data <- suppressWarnings(read.xls(xls=ref, skip=1, 
-                           na.strings=missing, col.names=var.names, ...))
+          data <- read.xls(xls=ref, skip=1, 
+                           na.strings=missing, col.names=var.names, ...)
         }
       # transfer labels to data
       attr(data, which="variable.labels") <- as.character(mylabels$label)
@@ -152,7 +155,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
   }
 
   else if (format == "SPSS")  # data and any labels
-    data <- suppressWarnings(read.spss(file=ref, to.data.frame=TRUE, ...))
+    data <- read.spss(file=ref, to.data.frame=TRUE, ...)
 
   else if (format == "R") {  # data and any labels
     x.env <- new.env()  # scratch environment
@@ -189,7 +192,6 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
   # --------
   if (!quiet) details(data, n.mcut, miss.zero, max.lines, miss.show,
                       miss.matrix, brief)
-  else cat("\n")
 
   return(data)
 

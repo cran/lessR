@@ -28,7 +28,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
     if (is.null(bin.start)) 
       bin.start <- pretty(min(x, na.rm = TRUE):max(x, na.rm = TRUE))[1]
     if (is.null(bin.width)) {
-      h <- hist(x, plot=FALSE, breaks="Sturges")
+      h <- suppressWarnings(hist(x, plot=FALSE, breaks="Sturges"))
       bin.width <- h$breaks[2]-h$breaks[1]
     }
     max.x <- max(x, na.rm=TRUE)
@@ -94,8 +94,8 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
   }
   
   # set up plot area
-  suppressWarnings(plot(h, border="transparent", xlab=x.lab, ylab=y.lab,
-        main=main.lab, freq=TRUE, axes=FALSE, ...))
+  plot(h, border="transparent", xlab=x.lab, ylab=y.lab,
+        main=main.lab, freq=TRUE, axes=FALSE, ...)
   axis(1, cex.axis=cex.axis, col.axis=col.axis, ...) 
   axis(2, cex.axis=cex.axis, col.axis=col.axis, ...) 
 
@@ -113,11 +113,10 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
     abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
 
-  suppressWarnings(plot(h, add=TRUE, col=col.fill,
-                   border=col.stroke, freq=TRUE, ...))
+  plot(h, add=TRUE, col=col.fill, border=col.stroke, freq=TRUE, ...)
   if (cumul == "both") {
     h$counts <- old.counts
-    suppressWarnings(plot(h, add=TRUE, col=col.reg, freq=TRUE))
+    plot(h, add=TRUE, col=col.reg, freq=TRUE)
   }
   if (over.grid) {
     abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
@@ -129,9 +128,8 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
 # text output
 #------------
   if (!quiet) {
- 
-    # summarize data
-    .ss.numeric(x, digits.d=digits.d, brief=TRUE)
+
+    tx <- character(length = 0)
 
     # frequency table
     # j<17 condition is to stop the 0.99999... problem
@@ -151,23 +149,28 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
     x.breaks <- format(h$breaks, width=max.dg, justify="right", scientific=FALSE)
     x.mids <- format(h$mids, width=max.dg.mid+3, justify="right", scientific=FALSE)
     
-    cat("\nBin Width:", h$breaks[2]-h$breaks[1], "\n")
-    cat("Number of Bins:", length(h$breaks)-1, "\n")
-    cat("\n")
+    bin.width <- h$breaks[2]-h$breaks[1]
+    n.bins <- length(h$breaks)-1
+    tx[length(tx)+1] <- paste("Bin Width:", bin.width)
+    tx[length(tx)+1] <- paste("Number of Bins:", n.bins)
+    tx[length(tx)+1] <- ""
     buf1 <- format("", width=max.dg+1)
     strt <- 9 + 2*max.dg
     my.width <- strt-(nchar(buf1)+nchar("Bin"))-7
     buf2 <- format(" ", width=my.width)
-    .dash(56)
-    cat(buf1,"Bin",buf2,"  Midpoint","  Count","  Prop","  Cumul.c"," Cumul.p",sep="","\n")
-    .dash(56)
+    tx[length(tx)+1] <-.dash2(56)
+    tx[length(tx)+1] <- paste(buf1,"Bin",buf2,"  Midpoint","  Count","  Prop",
+                           "  Cumul.c"," Cumul.p",sep="")
+    tx[length(tx)+1] <-.dash2(56)
     for (i in 2:length(h$breaks)-1)
-      cat(sprintf("%s > %s %s %6.0f %6.2f %6.0f %6.2f", x.breaks[i], 
-        x.breaks[i+1], x.mids[i], h$counts[i], prop[i], cum.c[i], cum.p[i]), "\n") 
-    .dash(56)
-  
-    cat("\n")
+      tx[length(tx)+1] <- paste(sprintf("%s > %s %s %6.0f %6.2f %6.0f %6.2f",
+          x.breaks[i], x.breaks[i+1], x.mids[i], h$counts[i], prop[i],
+          cum.c[i], cum.p[i])) 
+    tx[length(tx)+1] <-.dash2(56)
+
+    return(list(tx=tx, bin.width=bin.width, n.bins=n.bins, breaks=h$breaks, 
+      mids=h$mids, counts=h$counts, prop=prop, counts_cum=cum.c,
+      prop_cum=cum.p))
   }
 
-  return(h)
 }

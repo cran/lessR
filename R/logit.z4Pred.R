@@ -162,8 +162,16 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
 
       .opendev(pdf.file, pdf.width, pdf.height)
 
-      suppressWarnings(pairs(lm.out$model[c(nm)], 
-                       panel=panel.smooth, col=col.pts, col.smooth=col.line))
+      panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
+        col.pt=getOption("col.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
+        span=2/3, iter=3, ...) 
+      {
+          points(x, y, pch=pch, col=col.pt, cex=cex)
+          ok <- is.finite(x) & is.finite(y)
+          if (any(ok)) 
+            lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
+      }
+      pairs(lm.out$model[c(nm)], panel=panel2.smooth)
 
       if (!is.null(pdf.file)) {
         dev.off()

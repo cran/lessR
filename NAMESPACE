@@ -7,6 +7,9 @@ importFrom("foreign", read.spss)
 importFrom("gdata", read.xls)
 importFrom("triangle", dtriangle, rtriangle)
 
+S3method(print, out_all)
+S3method(print, out_piece)
+
 # Export all names except those that begin with .
 #exportPattern("^[^\\.]")
 #
@@ -36,9 +39,10 @@ export (
   Model, model, model.brief,
   Nest,
   PieChart, pc,
+  print.out_all, print.out_piece,
   prob.norm, prob.znorm, prob.tcut,
   Read, rd, rd.brief, Read2,
-  Regression, reg, reg.brief, reg.explain,
+  Regression, reg, reg.brief, regPlot,
   Recode, rec,
   set, showColors,
   simCImean, simCLT, simFlips, simMeans,

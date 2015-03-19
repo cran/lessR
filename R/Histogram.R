@@ -21,7 +21,6 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
 
-  
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x))
   options(xname = x.name)
@@ -83,10 +82,17 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
       pdf.fnm <- .pdfname("Hist", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)
+ 
+      if (!quiet) {
+        ssstuff <- .ss.numeric(data[,i], digits.d=digits.d, brief=TRUE)
+        txss <- ssstuff$tx
+      }
 
-      h <- .hst.main(data[,i], col.fill, col.stroke, col.bg, col.grid, col.reg,
+      stuff <- .hst.main(data[,i], col.fill, col.stroke, col.bg, col.grid, col.reg,
           over.grid, cex.axis, col.axis, breaks, bin.start, bin.width,
           bin.end, prop, cumul, digits.d, xlab, ylab, main, quiet, ...)
+      txdst <- stuff$tx
+      txotl <- .outliers2(data[,i])
 
       if (go.pdf) {
         dev.off()
@@ -101,6 +107,17 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
   }  # for
 
   dev.set(which=2)  # reset graphics window for standard R functions
-  if (ncol(data)==1  &&  nu>n.cat) invisible(h)
+
+  if (ncol(data)==1  &&  nu>n.cat) {
+    class(txss) <- "out_piece"
+    class(txdst) <- "out_piece"
+    class(txotl) <- "out_piece"
+    output <- list(out_ss=txss, out_freq=txdst, out_outliers=txotl,
+      bin_width=stuff$bin.width, n_bins=stuff$n.bins, breaks=stuff$breaks,
+      mids=stuff$mids, counts=stuff$counts, prop=stuff$prop,
+      counts_cumul=stuff$counts_cum, prop_cumul=stuff$prop_cum)
+    class(output) <- "out_all"
+    return(output)
+  }
 
 }

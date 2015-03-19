@@ -1,12 +1,12 @@
 Regression <-
 function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
-         text.width=120, brief=getOption("brief"), explain=FALSE, show.R=FALSE,
+         text.width=120, brief=getOption("brief"), explain=TRUE, show.R=FALSE,
 
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
          pred.rows=NULL, pred.sort=c("predint", "off"),
-         subsets=TRUE, cooks.cut=1, 
+         subsets=NULL, cooks.cut=1, 
 
-         scatter.coef=FALSE, scatter.3D=FALSE,
+         scatter.coef=TRUE, scatter.3D=FALSE, graphics=TRUE, knitr.file=NULL,
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL,
@@ -32,18 +32,14 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   options(width=text.width)
 
   # output
-  cor <- TRUE
+  cor <- TRUE  # do even if only one pred variable
 
   if (brief) {
     if (is.null(res.rows)) res.rows <- 0
     if (is.null(pred.rows)) pred.rows <- 0
     relate <- FALSE
-    show.R <- FALSE
    }
    else relate <- TRUE
-      
-  pre <- "> "
-  line <- "--------------------------------------------------------------------\n"
   
   if (!exists(dname)) {
     txtC <- "Function reg requires the data exist in a data frame\n"
@@ -61,6 +57,17 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   n.pred <- n.vars - 1
   n.obs <- nrow(data)
 
+  predictors <- character(length=0)
+  for (i in 2:n.vars) predictors[i-1] <- nm[i]
+
+  # check that variables exist in the data
+  for (i in 1:n.vars) if (!(nm[i] %in% names(data))) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+       "Variable ", nm[i], " is not in the data table ", dname, ".\n\n",
+       "Either the variable name is misspelled ",
+       "or the wrong data table is specified.\n\n")
+  }
+
   # check that variables are not function calls
   v.str <- deparse(attr(terms.formula(my.formula), which="variables"))
   v.str <- substr(v.str, 6, nchar(v.str)-1)  # remove "list(" and ending ")"
@@ -77,7 +84,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   
   if(n.pred > 1) {
     collinear <- TRUE
-    subsets <- TRUE
+    if (is.null(subsets)) subsets <- TRUE
   }
   else {
     collinear <- FALSE
@@ -120,9 +127,11 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   if (is.null(digits.d)) digits.d <- .getdigits(data[,nm[1]], 3)
 
   # standardize option
-  if (standardize)
-    for (i in 1:n.vars)
+  if (standardize) {
+    for (i in 1:n.vars) {
       data[,nm[i]] <- round(scale(data[,nm[i]]), digits.d)
+    }
+  }
 
   in.data.frame <- TRUE
   for (i in 1:n.vars) {
@@ -132,9 +141,12 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     }
   }
 
-  # keep track of generated graphics
-    plot.i <- 0
-    plot.title  <- character(length=0)
+  # keep track of generated graphic, see if manage graphics
+    if (graphics) {
+      plot.i <- 0
+      plot.title  <- character(length=0)
+      manage.gr <- .graphman()
+    }
 
   # --------------------------------------------------------
   # reg analysis
@@ -148,113 +160,232 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
        "The attempted solution is singular. Too much linear dependence.\n\n")
   }
  
+  cook <- cooks.distance(lm.out)
+ 
   # replace a factor with indicator variables in data frame
   #mm <- model.matrix(my.formula, data=data)
   #mf.out <- data.frame(lm.out$model[,1], mm[,2:ncol(mm)])
   #names(mf.out)[1] <- nm[1]
+      
 
-  n.keep <- nrow(lm.out$model)
+  n.keep <- nrow(lm.out$model)  # lm.out$model is the data with deleted
 
-  .reg1Basic(lm.out, nm, dname,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line)
-  
+
+  # basic analysis
+  bck <- .reg1bckBasic(lm.out, dname, digits.d, show.R, n.obs, n.keep)
+  tx1bck <- bck$tx
+
+  est <- .reg1modelBasic(lm.out, dname, digits.d, show.R)
+  tx1est <- est$tx
+
+  fit <- .reg1fitBasic(lm.out, dname, digits.d, show.R)
+  tx1fit <- fit$tx
+
+  anv <- .reg1anvBasic(lm.out, dname, digits.d, show.R)
+  tx1anv <- anv$tx 
+
   # check for all numeric vars  in.data.frame <- TRUE
   numeric.all <- TRUE
   for (i in 1:n.vars) {
       if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
-        cat("\n\n\n>>> Note: ", nm[i], "is not a numeric variable.\n")
+        #cat("\n>>> Note: ", nm[i], "is not a numeric variable.\n",
+            #"   No scatter plot(s) generated.\n")
         numeric.all <- FALSE
       }
     }
 
-  if (relate)
-    .reg2Relations(lm.out, nm, dname,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
+  # relationship analysis
+  tx2rel <- ""; tx2cor <- ""; tx2cln <- ""; tx2all <- ""
+  if (relate) {
+    rel <- .reg2Relations(lm.out, dname, n.keep, show.R,
          cor, collinear, subsets, numeric.all, in.data.frame)
+    tx2cor <- rel$txcor
+    tx2cln <- rel$txcln
+    tx2all <- rel$txall
+    if (!is.matrix(rel$crs)) crs <- round(rel$crs,3) else crs <- NA
+    if (!is.vector(rel$tol)) tol <- round(rel$tol,3) else tol <- NA
+    if (!is.vector(rel$VIF)) VIF <- round(rel$VIF,3) else VIF <- NA
+  }
+  else { # not relate
+    crs <- NA_real_; tol <- NA; VIF <- NA
+  }
   
-    
+  # residual analysis  
   if (is.null(res.rows)) if (n.keep < 20) res.rows <- n.keep else res.rows <- 20 
   if (res.rows == "all") res.rows <- n.keep  # turn off resids with res.rows=0
 
-  if (res.rows > 0) {  # two plots here
+  tx3res <- ""
+  cooks.max <- NA
+  if (res.rows > 0) {
 
-    if (options("device") != "RStudioGD")
-      if (!pdf) .graphwin(3)  # set up graphics system to manage
+    # text output
+    res <- .reg3txtResidual(lm.out, cook, digits.d, res.sort, res.rows, show.R)
+    tx3res <- res$tx
+    if (!is.na(res$cooks.max[1])) cooks.max <- round(res$cooks.max,3)
 
-    plt <- .reg3Residual(lm.out, nm,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         res.sort, res.rows, cooks.cut,
-         pdf, pdf.width, pdf.height, ...)
+    if (graphics) {
+      if (!pdf && manage.gr) {  # set up graphics system
+        if (numeric.all || n.pred==1)
+          .graphwin(3) 
+        else
+          .graphwin(2)  # no scatter plot matrix if not all numeric
+      }
 
-    for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
-    plot.i <- plot.i + plt$i
+      if (manage.gr && !pdf) dev.set(which=3)
+      plt <- .reg3dnResidual(lm.out, pdf, pdf.width, pdf.height, manage.gr, ...)
+      for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
+      plot.i <- plot.i + plt$i 
 
-   }
+      if (manage.gr && !pdf) dev.set(which=4)
+      plt <- .reg3resfitResidual(lm.out, cook, cooks.cut,
+                 pdf, pdf.width, pdf.height, manage.gr, ...)
+      for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
+      plot.i <- plot.i + plt$i
+    }
 
-    
-  if (is.null(pred.rows)) if (n.keep < 25) pred.rows <- n.keep else pred.rows <- 4 
+   }  # res.rows > 0
+
+ 
+  # prediction interval analysis   
+  # scatter plot(s)
+  if (is.null(pred.rows)) if (n.keep < 25) pred.rows <- n.keep else pred.rows <- 10 
   if (pred.rows == "all") pred.rows <- n.keep  # turn off preds with pred.rows=0
 
-  if (pred.rows > 0)
-    prd <- .reg4Pred(lm.out, nm, my.formula, brief,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
+  tx3prd <- ""
+  if (pred.rows > 0) {
+    prd <- .reg4Pred(lm.out, brief,
+         n.keep, digits.d, show.R,
          new.data, pred.sort, pred.rows, scatter.3D, scatter.coef,
-         numeric.all, in.data.frame, X1.new, 
-         X2.new, X3.new, X4.new, X5.new)
-   
-    splt <- .reg5Plot(lm.out, nm, my.formula, brief, res.rows,
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
-         new.data, pred.rows, scatter.3D, scatter.coef,
-         numeric.all, in.data.frame, X1.new, 
-         X2.new, X3.new, X4.new, X5.new, prd$cint, prd$pint,
-         pdf, pdf.width, pdf.height, ...)
+         numeric.all, in.data.frame,
+         X1.new, X2.new, X3.new, X4.new, X5.new)
+    tx3prd <- prd$tx
+  }
 
-    for (i in (plot.i+1):(plot.i+splt$i)) plot.title[i] <- splt$ttl[i-plot.i]
-    plot.i <- plot.i + splt$i
+    if (graphics) {
+      if (manage.gr && !pdf) {
+        if (res.rows > 0)  # already did two plots 
+          dev.set(which=5) 
+        else {
+          .graphwin(1)  #  only plot is a scatterplot
+          dev.set(which=3)
+        }
+      }
+   
+      if ((numeric.all || n.pred==1) && in.data.frame) {
+        splt <- .reg5Plot(lm.out, res.rows, pred.rows, scatter.coef, scatter.3D,
+           X1.new, numeric.all, in.data.frame, prd$cint, prd$pint,
+           pdf, pdf.width, pdf.height, manage.gr, ...)
+
+        for (i in (plot.i+1):(plot.i+splt$i)) plot.title[i] <- splt$ttl[i-plot.i]
+        plot.i <- plot.i + splt$i
+      } 
+    }
 
 
   # cites
-  if (collinear || subsets || scatter.3D) cat("\n")
-  if (collinear) {
-    txt <- "[Collinearity analysis with Nilsson and Fox's vif function"
-    cat(txt, "from the car package]\n") 
+  txcte <- ""
+  if (collinear || subsets || scatter.3D) {
+    tx <- character(length = 0)
+    did <- FALSE
+    if (!brief)  {
+      if (collinear) {
+        txt <- "[Collinearity analysis with Nilsson and Fox's vif function"
+        tx[length(tx)+1] <- paste(txt, "from the car package]") 
+        did <- TRUE
+      }
+      if (subsets) {
+        txt <- "[Subsets analysis with Thomas Lumley's leaps function"
+        tx[length(tx)+1] <- paste(txt, "from the leap's package]") 
+        did <- TRUE
+      }
+    }
+    if (scatter.3D) {
+      tx[length(tx)+1] <- ""
+      txt <- "[3D scatterplot with John Fox's scatter3d function"
+      tx[length(tx)+1] <- paste(txt, "from the car package]") 
+        did <- TRUE
+    }
+
+  if (did) txcte <- tx else txcte=""
   }
-  if (subsets) {
-    txt <- "[Subsets analysis with Thomas Lumley's leaps function"
-    cat(txt, "from the leap's package]\n") 
-  }
-  if (scatter.3D) {
-    txt <- "[3D scatterplot with John Fox's scatter3d function"
-    cat(txt, "from the car package]\n") 
-  }
+
 
 # ----------
 # References
 # ----------
-
+  txref <- ""
+  tx <- character(length = 0)
   if (refs) {
-    cat( "\n\n", "  REFERENCES", "\n")
+    tx[length(tx)+1] <- "  REFERENCES"
 
-    cat("\n",
+    tx[length(tx)+1] <- paste("\n",
         "Function Regression is from David Gerbing's lessR package.\n",
-        "  To obtain the reference: Enter citation(\"lessR\")\n")
-    cat("\n",
+        "  To obtain the reference: Enter citation(\"lessR\")")
+    tx[length(tx)+1] <- paste("\n",
         "Collinearity analysis is from the vif function in\n",
         "John Fox's car package.\n",
-        "  To obtain the reference: Enter citation(\"car\")\n")
-    cat("\n",
+        "  To obtain the reference: Enter citation(\"car\")")
+    tx[length(tx)+1] <- paste("\n",
         "Best model subset analysis is from Thomas Lumley's leaps function\n",
         "in his package leaps.\n",
-        "  To obtain the reference: Enter citation(\"leaps\")\n")
-    cat("\n",
+        "  To obtain the reference: Enter citation(\"leaps\")")
+    tx[length(tx)+1] <- paste("\n",
         "All analyses based on R.\n",
-        "  To obtain the reference: Enter citation()\n")
-    cat("\n")
+        "  To obtain the reference: Enter citation()")
+    txref <- tx
   }
 
-  if (plot.i > 1) .plotList(plot.i, plot.title)
 
-  dev.set(which=2)  # reset graphics window for standard R functions
-  invisible(lm.out)
+  # knitr
+  txkfl <- ""
+  txknt <- .reg.knitr(nm, dname, n.vars, n.pred, pred.rows, digits.d, explain,
+    est$pvalues)
+  if (!is.null(knitr.file)) {
+    if (grepl(".Rmd", knitr.file)) 
+      txt <- ""
+    else
+      txt <- ".Rmd"
+    knitr.file <- paste(knitr.file, txt, sep="") 
+    cat(txknt, file=knitr.file, sep="\n")
+    txkfl <- .showfile2(knitr.file, "knitr instructions")
+  }
+
+  # display list of plots if more than 1
+  txplt <- ""
+  if (graphics) {
+    if (plot.i > 1) txplt <- .plotList2(plot.i, plot.title)
+
+    dev.set(which=2)  # reset graphics window for standard R functions
+  }
+
+  class(tx1bck) <- "out_piece"
+  class(tx1est) <- "out_piece"
+  class(tx1fit) <- "out_piece"
+  class(tx1anv) <- "out_piece"
+  class(tx2cor) <- "out_piece"
+  class(tx2cln) <- "out_piece"
+  class(tx2all) <- "out_piece"
+  class(tx3res) <- "out_piece"
+  class(tx3prd) <- "out_piece"
+  class(txcte) <- "out_piece"
+  class(txplt) <- "out_piece"
+  class(txref) <- "out_piece"
+  class(txkfl) <- "out_piece"
+  class(txknt) <- "out_piece"
+  
+  output <- list(out_background=tx1bck, out_coefs=tx1est, out_fit=tx1fit,
+    out_anova=tx1anv, out_cor=tx2cor, out_collinear=tx2cln, out_subsets=tx2all,
+    out_residuals=tx3res, out_predict=tx3prd, out_cite=txcte, out_ref=txref,
+    out_knitr.file=txkfl, out_plots=txplt, formula=my.formula, n.vars=bck$n.vars,
+    n.obs=bck$n.obs, n.keep=n.keep, 
+    coefs=est$estimates, sterrs=est$sterrs, tvalues=est$tvalues,
+    pvalues=est$pvalues, cilb=est$cilb, ciub=est$ciub, SSE=anv$SSE, se=fit$se,
+    Rsq=fit$Rsq, Rsqadj=fit$Rsqadj, cor=crs, tolerances=tol, VIF=VIF,
+    cooks.max=cooks.max,
+    residuals=lm.out$residuals, fitted.values=lm.out$fitted, 
+    cooks.distance=cook, model=lm.out$model, terms=lm.out$terms,
+    knitr=txknt)
+  class(output) <- "out_all"
+  return(output)
   
 }

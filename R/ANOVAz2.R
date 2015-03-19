@@ -182,10 +182,11 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
   # graphics
   plt.i <- 0
   plt.title  <- character(length=0)
+  manage.gr <- .graphman()
 
   # interaction plots
   if (!pdf) {
-    if (options("device") != "RStudioGD") {
+    if (manage.gr) {
       pdf.file <- NULL
       if (bet.grp) .graphwin(1)
       if (wth.grp) .graphwin(2)
@@ -214,7 +215,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
   if (wth.grp) {
 
     if (!pdf) {
-      if (options("device") != "RStudioGD") {
+      if (manage.gr) {
         dev.set(which=4)
       }
     }

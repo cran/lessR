@@ -55,12 +55,13 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
 
   # set up graphics system for 2 windows
 
-  # keep track of the number of plots in this routine
+  # keep track of the number of plots, see if manage graphics
   plt.i <- 0
   plt.title  <- character(length=0)
+  manage.gr <- .graphman()
 
   if (!pdf) {
-    if (options("device") != "RStudioGD") {
+    if (manage.gr) {
       .graphwin(2)
       dev.set(which=3)
     }
@@ -157,7 +158,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     print(round(HSD[[1]], digits.d))
 
     if (!pdf) { 
-      if (options("device") != "RStudioGD") dev.set(which=4) 
+      if (manage.gr) dev.set(which=4) 
     }
     else { 
       pdf.file <- "ANOVA_HSD.pdf"
@@ -171,8 +172,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     on.exit(par(orig.params))
     par(mar=c(5.1,6.1,4.1,1.5))
     cex.axis <- .8; col.axis <- "gray30"; 
-    suppressWarnings(plot(HSD, 
-      cex.axis=cex.axis, col.axis=col.axis, las=1))
+    plot(HSD, cex.axis=cex.axis, col.axis=col.axis, las=1)
 
     if (pdf) {
       dev.off()

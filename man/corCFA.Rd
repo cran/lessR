@@ -100,7 +100,7 @@ A communality is the percentage of the item's correlation attributable to, in th
 }
 
 \value{
-The function invisibly returns a list of six components.\cr
+Returns a list of six components.\cr
 1. \code{ff.cor}: matrix of the factor correlations\cr
 2. \code{if.cor}: matrix of the indicator-factor correlations that includes the estimated pattern coefficients of the model that link a factor to its indicators\cr
 3. \code{diag.cor}: the indicator communalities\cr

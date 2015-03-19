@@ -1,51 +1,36 @@
 .reg4Pred <-
-function(lm.out, nm, my.formula, brief, 
-         n.vars, n.pred, n.obs, n.keep, digits.d, explain, show.R, pre, line,
+function(lm.out, brief, 
+         n.keep, digits.d, show.R,
          new.data, pred.sort, pred.rows, scatter.3D, scatter.coef,
          numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new) {
+
+  nm <- all.vars(lm.out$terms)  # names of vars in the model
+  n.vars <- length(nm)
+  n.pred <- n.vars - 1
+  n.obs <- nrow(lm.out$model)
+
+  tx <- character(length = 0)
 
 # --------------------
 # prediction intervals
 # --------------------
      
-  cat( "\n\n", "  FORECASTING ERROR", "\n")
+  tx[length(tx)+1] <- "  FORECASTING ERROR"
+  tx[length(tx)+1] <- ""
 
   if (show.R) {
     txt <- "predict(model, interval=\"prediction\")"
-    cat(line, pre, txt, sep="", "\n")
+    tx[length(tx)+1] <- paste("> ", txt, sep="", "\n")
     txt <- "predict(model, interval=\"confidence\")"
-    cat(pre, txt, sep="", "\n")
-    .dash(68)
-  }
-  else cat("\n")
-  
-  if (explain) {
-    .dash(68)
-    cat("The 'standard deviation of the residuals', assumed to be the same\n",
-        "for each set of values of the predictor variables, estimates the\n",
-        "modeling error. However, even for predictions from the current data\n",
-        "from which the model is estimated, the forecasts are based on future\n",
-        "responses from the collection of new data. That is, the sampling\n",
-        "error of the sample regression line must also be considered in the\n",
-        "assessment of forecasting error. The amount of sampling error varies\n",
-        "depending on the values of the predictor variables.\n",
-        "\n",
-        "The 95% confidence interval around each fitted value of the sample\n",
-        "regression model is given below, as well as the likely range of\n",
-        "forecasting error, the 95% prediction interval, the expected range\n",
-        "in which the actual future value of the response variable, ", nm[1], ", \n",
-        "will likely be found.  This forecasting error depends on both modeling\n", 
-        "error and sampling error.\n", sep="")
-    .dash(68)
-    cat("\n")
+    tx[length(tx)+1] <- paste("> ", txt, sep="", "\n")
+    tx[length(tx)+1] <- .dash2(68)
   }
 
-  cat("Data, Fitted Values, Confidence and Prediction Intervals\n")
-  cat("   [sorted by lower bound of prediction interval]\n")
+  tx[length(tx)+1] <- "Data, Fitted Values, Confidence and Prediction Intervals"
+  tx[length(tx)+1] <- "   [sorted by lower bound of prediction interval]"
   if (pred.rows < n.keep  &&  !new.data) 
-    cat("   [to save space only some intervals printed, or pred.rows=\"all\"]\n")
-  .dash(66)
+    tx[length(tx)+1] <- "   [to save space only some intervals printed, or do pred.rows=\"all\"]"
   
   if (!new.data) {
     c.int <- data.frame(predict(lm.out, interval="confidence"))
@@ -63,20 +48,20 @@ function(lm.out, nm, my.formula, brief,
     Xnew <- expand.grid(Xnew.val)
     for (i in 1:(n.pred)) names(Xnew)[i] <- nm[i+1]
     c.int <- data.frame(predict(lm.out, interval="confidence", newdata=Xnew))
-    p.int <- suppressWarnings(data.frame(predict(lm.out,
-                              interval="prediction", newdata=Xnew)))
+    p.int <- data.frame(predict(lm.out, interval="prediction", newdata=Xnew))
     p.width <- p.int$upr - p.int$lwr
     Ynew <- character(length = nrow(Xnew))
     Ynew <- ""
     out <- cbind(Xnew, Ynew, c.int, p.int$lwr, p.int$upr, p.width)
     names(out)[n.vars] <- nm[1]
   }
-  
+
   out <- data.frame(out)
   if (pred.sort == "predint") {
     o <- order(out[,n.vars+4])  # lower bound of prediction interval
     out <- out[o,]
   }
+
   names(out)[n.vars+1] <- "fitted"
   names(out)[n.vars+2] <- "ci:lwr"
   names(out)[n.vars+3] <- "ci:upr"
@@ -84,26 +69,29 @@ function(lm.out, nm, my.formula, brief,
   names(out)[n.vars+5] <- "pi:upr"
   names(out)[n.vars+6] <- " width"
 
-  for (i in 1:(n.vars+6))
-    if (is.numeric(out[,i])) if (!is.integer(out[,i]))
-      out[,i] <- .fmt(out[,i],digits.d-1)
-
   if (!new.data) {
-    if (pred.rows == n.keep)
-      print(out)
+    if (pred.rows == n.keep) {
+      tx2 <- .prntbl(out, digits.d)
+      for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
+    }
     else {
-      print(out[1:pred.rows,])
-      cat("\n... for the middle", pred.rows, "rows of sorted data ...\n\n")
+      piece.rows <- round(pred.rows/3,0)
+      if (piece.rows < 1) piece.rows <- 1
+      tx2 <- .prntbl(out[1:piece.rows,], digits.d)
+      for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
+      tx[length(tx)+1] <- paste("\n... for the middle", piece.rows, "rows of sorted data ...")
       n.mid <- n.keep/2
-      print(out[(n.mid-(pred.rows/2)):(n.mid+((pred.rows/2)-1)),])
-      cat("\n... for the last", pred.rows, "rows of sorted data ...\n\n")
-      print(out[(n.keep-(pred.rows-1)):n.keep,])
+      tx2 <- .prntbl(out[(n.mid-(piece.rows/2)):(n.mid+((piece.rows/2)-1)),], digits.d)
+      for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
+      tx[length(tx)+1] <- paste("\n... for the last", piece.rows, "rows of sorted data ...")
+      tx2 <- .prntbl(out[(nrow(out)-(piece.rows-1)):nrow(out),], digits.d)
+      for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
     }
   }
-  else 
-    print(out, digits=digits.d, row.names=FALSE)
+  else { 
+    tx2 <- .prntbl(out, digits.d)   # want row.names=FALSE
+    for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
+  }
 
-  .dash(68)
-
-  return(list(cint=c.int, pint=p.int))  # need these in 5Plot next
+  return(list(cint=c.int, pint=p.int, tx=tx))  # need these in 5Plot next
 }

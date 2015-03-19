@@ -311,17 +311,17 @@ function(x, by=NULL,
   }
   if (rescale == 0) {
 #    width.bars <- .8   gap <- .6*width.bars
-    suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+    barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
           xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
           space=gap, cex.axis=cex.axis, cex.names=cex.axis, 
-          col.axis=col.axis, ...))
+          col.axis=col.axis, ...)
   }
   else
-    suppressWarnings(barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+    barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
           xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), 
           cex.axis=cex.axis, cex.names=cex.axis,
-          col.axis=col.axis, ...))
+          col.axis=col.axis, ...)
   if (over.grid) {
     if (!horiz)
       abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
@@ -437,7 +437,7 @@ function(x, by=NULL,
     stats <- .ss.factor(x)
 
     if (!quiet) { 
-      ch <- suppressWarnings(chisq.test(x))
+      ch <- chisq.test(x)
       pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
       cat("\nChi-squared test of null hypothesis of equal probabilities\n")
       cat("  Chisq = ", ch$statistic, ",  df = ", ch$parameter, ",  p-value = ", 
