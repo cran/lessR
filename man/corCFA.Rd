@@ -38,9 +38,9 @@ scales(\ldots, iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE, heat.map=FALSE)
 \arguments{
   \item{x}{Correlation matrix to be analyzed.}
   \item{data}{Data frame of the original data to be checked for any
-       variable labels, usually indicator content. This is not to calculate
-       correlations, which is separately provided for by the \code{lessR}
-       function \code{\link{Correlation}}.}
+       variable labels, usually indicator (item) content. This is not to
+       calculate correlations, which is separately provided for by the
+       \code{lessR} function \code{\link{Correlation}}.}
   \item{labels}{If "include" or "exclude" then variable labels are displayed
        or not, organized by the items within each factor. If "only" then no
        data analysis performed, only the display of the labels by factor.}
@@ -79,6 +79,8 @@ A multiple indicator measurement model defines one or more latent variables, cal
 
 INPUT\cr
 Unless \code{labels="only")}, the analysis requires the correlation matrix of the indicators and the specification of the groups of indicators, each of which defines a factor in the multiple indicator measurement model.  The default name for the indicator correlation matrix is \code{mycor}, which is also the default name of the matrix produced by the \code{lessR} function \code{\link{Correlation}} that computes the correlations from the data, as well as the name of the matrix read by the \code{lessR} function \code{\link{corRead}} that reads the already computed correlation matrix from an external file.
+
+For versions of \code{lessR} after 3.3, the correlation matrix computed by \code{\link{Correlation}} is now a list element called \code{cors} within the returned list. For example, \code{mycor$cors} from \code{mycor <- cr(mydata)}. The function \code{corCFA} automatically finds this correlation matrix from just entering the entire list name of the returned list, \code{mycor}, or the specific location, \code{mycor$cors}, or as a stand-alone numerical matrix as done in versions of \code{lessR} previous to 3.3. 
 
 The data frame from which the correlation matrix was computed is requried only if any associated variable labels are listed, organized by the items within each factor. By default, \code{labels="include"}, these labels are listed as part of the analysis if they are available.
 
@@ -148,7 +150,7 @@ rownames(mycor) <- colnames(mycor)
 # first three variables with first factor, last three with second
 # default correlation matrix is mycor
 # two ways to specify the items, with a colon and with commas
-corCFA(F1=X1:X3, F2=c(X4,X5,X6))
+corCFA(F1=c(X4,X5,X6), F2=X1:X3)
 
 # abbreviated form, one factor definition per line
 cfa(
@@ -168,7 +170,7 @@ corCFA(F1=X1:X3, F2=X4:X6)
 # access the solution directly by saving to an object called fit
 fit <- corCFA(F1=X1:X3, F2=c(X4,X5,X6))
 fit
-# get the pattern coefficients from the communalties
+# get the pattern coefficients from the communalities
 lambda <- sqrt(fit$diag.cor)
 lambda
 

@@ -4,7 +4,6 @@ function(topic=NULL) {
 
   # set up plot window
   set.up.plot <- function(nlines) {
-    #dev.new(width=5.5, height=5.5)
     par(mar=c(.5,.5,.5,.5), bg=rgb(255,253,250,maxColorValue=255),
                             fg=rgb(20,15,15,maxColorValue=255), cex=.72)
     plot.new()
@@ -34,6 +33,7 @@ function(topic=NULL) {
   # ------------------------------------------------
 
   old.par <- par("mar", "cex", "bg", "fg")
+  on.exit(par(old.par))
 
   if (missing(topic))
     topic <- NULL
@@ -41,8 +41,7 @@ function(topic=NULL) {
     ischar <- tryCatch(is.character(topic) && length(topic) == 1L, error = identity)
     if (inherits(ischar, "error")) ischar <- FALSE
     if (!ischar) {
-      stopic <- deparse(substitute(topic))
-      topic <- stopic
+      topic <- deparse(substitute(topic))
     }  # else already is a character, i.e., argument entered within quotes
   }
 
@@ -1049,7 +1048,5 @@ function(topic=NULL) {
   \n")
 
   }
-
-  on.exit(par(old.par))
 
 }

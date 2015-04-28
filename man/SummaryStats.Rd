@@ -76,9 +76,9 @@ Instead, do the following:
 }
 
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.5 to provide two different types of components: the pieces of readable output in character format, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. A primary motivation of these two types of output is to facilitate \code{knitr} documents, as the name of each piece can be inserted into the \code{knitr} document.
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output in character format, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. A primary motivation of these two types of output is to facilitate \code{knitr} documents, as the name of each piece can be inserted into the \code{knitr} document.
 
-If the analysis is of a single numeric variable, the full analysis returns the following statistics: \code{n}, \code{miss}, \code{mean}, \code{sd}, \code{skew}, \code{kurtosis}, \code{min}, \code{quartile1}, \code{median}, \code{quartile3}, \code{max}, \code{IQR}. The brief analysis returns the corresponding subset of the summary statistics. If a \code{by} variable is included in the analysis, then nothing is returned. The pieces of readable output are \code{out_stats} and \code{out_outliers}.
+If the analysis is of a single numeric variable, the full analysis returns the following statistics: \code{n}, \code{miss}, \code{mean}, \code{sd}, \code{skew}, \code{kurtosis}, \code{min}, \code{quartile1}, \code{median}, \code{quartile3}, \code{max}, \code{IQR}. The brief analysis returns the corresponding subset of the summary statistics. If a \code{by} variable is included in the analysis, then nothing is returned except the text output. The pieces of readable output are \code{out_stats} and \code{out_outliers}.
 
 If the analysis is of a single categorical variable, a list is invisibly returned with two tables, the frequencies and the proportions, respectively named \code{freq} and \code{prop}. The pieces of readable output are \code{out_title} and \code{out_stats}.
 
@@ -102,7 +102,7 @@ Although not typically needed, if the output is assigned to an object named, for
 # create data frame, mydata, to mimic reading data with rad function
 # mydata contains both numeric and non-numeric data
 # X has two character values, Y is numeric
-n <- 12
+n <- 15
 X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
 Y <- round(rnorm(n=n, mean=50, sd=10),3)
 mydata <- data.frame(X,Y)

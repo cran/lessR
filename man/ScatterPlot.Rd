@@ -17,10 +17,13 @@ One enhancement over the standard R  \code{\link{plot}} function is the automati
 If a scatterplot of two numeric variables is displayed, then the corresponding correlation coefficient as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function \code{\link{cor.test}} function are generated, though in a more readable format.  Also, an option for the .95 data ellipse from John Fox's \code{car} package can enclose the points of the scatterplot.
 
 For one variable, based on the standard R function \code{\link{stripchart}}, plots a one dimensional scatterplot, that is, a dot chart, also called a strip chart. Also identifies outliers according to the criteria specified by a box plot and displays the summary statistics for the variable. The dot plot is also invoked with the function names \code{DotPlot} or just \code{dp}, which are just alternate names for \code{ScatterPlot} when a single variable is referenced.
+
+When output is assigned into an object, such as \code{p} in \code{p <- sp(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output is embedded in documents, facilitated by the \code{knitr.file} option. See \code{value} below.
 }
 
 \usage{
 ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
+         knitr.file=NULL, digits.d=NULL,
 
          col.fill=getOption("col.fill.pt"),
          col.stroke=getOption("col.stroke.pt"),
@@ -47,7 +50,8 @@ ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat")
          diag=FALSE, col.diag=par("fg"), lines.diag=TRUE, 
 
          quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         pdf.file=NULL, pdf.width=5, pdf.height=5,
+         fun.call=NULL, \ldots)
 
 sp(\ldots)
 
@@ -76,6 +80,10 @@ dp(\ldots)
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number
         of unique values of variable of a numeric data type for which the variable will
         be analyzed as categorical. Set to 0 to turn off.}
+  \item{knitr.file}{File name for the file of knitr instructions to be written, if specified.
+        The file type is .Rmd, which automatically opens in RStudio, but it is a simple
+        text file that can be edited with any text editor, including RStudio.}
+  \item{digits.d}{Number of significant digits for each of the displayed summary statistics.}
   \item{col.fill}{For plotted points, the interior color of the points. By default, is
        a partially transparent version of the border color, \code{col.stroke}. Does not
        apply if there is a \code{by} variable, which relies upon the default.} 
@@ -133,6 +141,8 @@ dp(\ldots)
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
+  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
+        obtained from the abbreviated function call \code{sp}.}
   \item{\ldots}{Other parameter values for graphics as defined by and then processed 
       by \code{\link{plot}} and \code{\link{par}}, including \code{xlim}, \code{ylim}, \code{lwd}, 
       and \code{cex} to specify a magnification factor for the plotting symbol, and col.ticks to set the color of the ticks used to label the axis values. For one variable,

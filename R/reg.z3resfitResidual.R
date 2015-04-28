@@ -21,6 +21,7 @@ function(lm.out, cook, cooks.cut,
   else
     txt <- paste("Points with Cook's Distance >", cooks.cut, "are highlighted")
 
+
   # pdf graphics option
   if (pdf) { 
     pdf.file <- "RegResidFitted.pdf"
@@ -45,11 +46,11 @@ function(lm.out, cook, cooks.cut,
       shape.pts=21, col.area=NULL, col.box="black", 
       cex.axis=.85, col.axis="gray30", xy.ticks=TRUE,
       xlab="Fitted Values", ylab="Residuals",
-      main=plt.title[plt.i], cex=NULL, kind="default",
+      main="", cex=NULL, kind="default",
       fit.line="none", col.fit.line="black", bubble.size=.25,
       ellipse=FALSE, diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
       quiet=TRUE, sub=txt, cex.sub=.8) 
-  abline(h=0, lty="dotted", col=getOption("col.fill.bar"))
+  abline(h=0, lty="dotted", lwd=1.5, col=getOption("col.fill.bar"))
   lines(lowess(fit.ord, res.ord, f=.9), col=getOption("col.stroke.pt"))
   res.c <- res[which(cook>=cooks.cut)]
   fit.c <- fit[which(cook>=cooks.cut)]
@@ -64,6 +65,6 @@ function(lm.out, cook, cooks.cut,
     .showfile(pdf.file, "residuals vs. fitted plot")
   }
 
-  invisible(list(i=plt.i, ttl=plt.title))
+  return(list(i=plt.i, ttl=plt.title))
 
 }

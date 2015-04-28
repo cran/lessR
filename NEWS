@@ -3,6 +3,73 @@ NEWS
 Update History for Package 'lessR'
 -------------------------------------------------------------------------
 ------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+>>>>>> Changes for lessR version 3.3.1 (2015-04-27) <<<<<<
+
+-------------
+Updates 3.3.1
+-------------
+
+BoxPlot, Density, Histogram
+  output generated with named pieces such as for knitr,
+    plus knitr.file option
+
+Regression
+  knitr.file much further developed including reproducing the full function
+    call to the Regression function where the knitr.file is created, and
+    now includes flags for output control:  explain, interpret, results
+  knitr information is now only written to a file, not to the 
+    output object
+  displayed prediction intervals always contain the smallest interval
+    and the largest interval
+  PRESS R-squared included in the default output
+  minimum number of decimal digits on output changed from 3 to 2,
+    e.g., integer input leads to 2 decimal digits by default (override
+    with digits.d)
+  spacing of tabled output condensed
+
+Histogram
+  improved formatting of displayed frequency distribution
+
+BoxPlot
+  default for add.points option is overstrike instead of stack
+
+corEFA
+  rotate="none" option replaces show.initial option, now deleted
+
+Nest
+  the specification of the full model, the 3rd argument, can be
+    all the variables in the full model or now just the added 
+    variables to the reduced model to define the full model
+
+output control flags, in this order of presentation: explain, results, interpret 
+  On by default, but each can be set within each procedure that generates a knitr
+    file as well as a global option, such as options(explain=FALSE)  
+
+---------------
+Bug Fixes 3.3.1
+---------------
+
+library(lessR) added to knitr files from knitr.file option
+
+SummaryStats
+  outliers properly identified if smaller in value than 3
+
+Correlation
+  heat map for correlation matrix works more generally
+
+Regression
+  works with no predictor variables, e.g., reg(Y ~ 1)
+  printed tables correctly display factor variables
+
+SummaryStats
+  if a by variable, now no output for stats in assigned object, instead of
+    just for the last row
+
+
+
+
 
 >>>>>> Changes for lessR version 3.3 (2015-03-19)} <<<<<<
 

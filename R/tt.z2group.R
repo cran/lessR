@@ -48,10 +48,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     v2 <- s2^2
   }
 
-  if (from.data)
-    dig.smr.d  <- digits.d
-  else
-    dig.smr.d  <- digits.d - 1
+  if (from.data) dig.smr.d  <- digits.d  else dig.smr.d <- digits.d - 1
 
   clpct <- paste(toString(round((conf.level)*100, 2)), "%", sep="")
   Xnmval <- paste(Xnm, X1nm)
@@ -200,11 +197,11 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       pvalue <- pt(abs(tvalue), df=df, lower.tail=TRUE)
   }
 
-  if (!brief) {
+  if (!brief)
     cat("--- Assume equal population variances of", Ynm, "for each", Xnm, "\n\n")
-    cat("t-cutoff: tcut = ", .fmt(tcut,3), "\n") 
-    cat("Standard Error of Mean Difference: SE = ", .fmt(sterr), "\n")
-  }
+  cat("t-cutoff: tcut = ", .fmt(tcut,3), "\n") 
+  cat("Standard Error of Mean Difference: SE = ", .fmt(sterr), "\n")
+ 
   mytitle <- "\nHypothesis Test of 0 Mean Diff:  t = "
   cat(mytitle, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3),
       sep="", "\n\n")
@@ -329,10 +326,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
     if (is.null(pdf.file)) {
       if (manage.gr) {
-        if (!line.chart)
-          n.win <- 1
-        else
-          n.win <- 3
+        if (!line.chart) n.win <- 1  else n.win <- 3
         .graphwin(n.win)
         dev.set(which=3)
         orig.params <- par(no.readonly=TRUE)

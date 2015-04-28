@@ -1,22 +1,28 @@
 Density <-
 function(x, data=mydata, n.cat=getOption("n.cat"), 
 
-         bw="nrd0", type=c("both", "general", "normal"),
-         bin.start=NULL, bin.width=NULL,
+    bw="nrd0", type=c("both", "general", "normal"),
+    bin.start=NULL, bin.width=NULL,
 
-         col.fill=getOption("col.fill.pt"),
-         col.bg=getOption("col.bg"),
-         col.grid=getOption("col.grid"),
+    knitr.file=NULL, digits.d=NULL,
 
-         col.nrm="black", col.gen="black",
-         col.fill.nrm=NULL, col.fill.gen=NULL,
+    col.fill=getOption("col.fill.pt"),
+    col.bg=getOption("col.bg"),
+    col.grid=getOption("col.grid"),
 
-         cex.axis=.85, col.axis="gray30",
-         x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
-         x.min=NULL, x.max=NULL, band=FALSE, 
+    col.nrm="black", col.gen="black",
+    col.fill.nrm=NULL, col.fill.gen=NULL,
 
-         quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+    cex.axis=.85, col.axis="gray30",
+    x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
+    x.min=NULL, x.max=NULL, band=FALSE, 
+
+    quiet=getOption("quiet"),
+    pdf.file=NULL, pdf.width=5, pdf.height=5,
+    fun.call=NULL, ...) {
+
+
+  if (is.null(fun.call)) fun.call <- match.call()
 
   clr <- getOption("colors")  # color theme not used except for monochrome 
 
@@ -91,7 +97,6 @@ if (!missing(x)) {
   if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
 
   for (i in 1:ncol(data)) {
-    cat("\n")
 
     nu <- length(unique(na.omit(data[,i])))
 
@@ -104,18 +109,35 @@ if (!missing(x)) {
       pdf.fnm <- .pdfname("Density", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)
 
-      d.gen <- .dn.main(data[,i], bw, type, bin.start, bin.width, 
+      gl <- .getlabels()
+      x.name <- gl$xn; x.lbl <- gl$xl;
+      y.name <- gl$yn; y.lbl <- gl$yl
+      if (!quiet)
+        ttlns <- .title2(x.name, y.name, x.lbl, y.lbl, TRUE)
+      else
+        ttlns <- ""
+ 
+      stuff <- .dn.main(data[,i], bw, type, bin.start, bin.width, 
             col.fill, col.bg, col.grid, col.nrm, col.gen,
             col.fill.nrm, col.fill.gen, 
             cex.axis, col.axis, 
             x.pt, xlab, main, y.axis, x.min, x.max, band, quiet, ...)
+      txdst <- stuff$tx
+      if (length(txdst)==0) txdst <- ""
+
+      if (ncol(data) > 1) {  # for a variable range, just print text output
+        class(ttlns) <- "out_piece"
+        class(txdst) <- "out_piece"
+        output <- list(out_title=ttlns, out_stats=txdst)
+        class(output) <- "out_all"
+        print(output)
+      }
 
       if (go.pdf) {
         dev.off()
         if (!quiet) .showfile(pdf.fnm, "density curve")
       }
 
-      if (ncol(data) == 1) invisible(d.gen)
     }  # nu > n.cat
     else
       .ncat("Density curve", x.name, nu, n.cat)
@@ -123,5 +145,40 @@ if (!missing(x)) {
     }  # is.numeric(data[,i])
   }  # for
 
-  if (ncol(data)==1  && nu>n.cat) invisible(d.gen)
+
+  dev.set(which=2)  # reset graphics window for standard R functions
+
+  if (ncol(data)==1  &&  nu>n.cat) {
+
+    # knitr
+    if (is.null(digits.d)) {
+      dig.dec <- .max.dd(data[,i]) + 1
+      if (dig.dec == 1) dig.dec <- 2
+    }
+    else dig.dec <- digits.d
+    options(digits.d=dig.dec)
+
+    txkfl <- ""
+    if (!is.null(knitr.file)) {
+      txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
+      knitr.file <- paste(knitr.file, txt, sep="") 
+      txknt <- .dist.knitr(x.name, df.name, fun.call, digits.d)
+      cat(txknt, file=knitr.file, sep="\n")
+      txkfl <- .showfile2(knitr.file, "knitr instructions")
+    }
+ 
+    class(txdst) <- "out_piece"
+    class(txkfl) <- "out_piece"
+
+    output <- list(type="Density",
+      out_title=ttlns, out_stats=txdst, out_file=txkfl,
+      bw=stuff$bw, n=stuff$n, n.miss=stuff$n.miss, W=stuff$W,
+         pvalue=stuff$pvalue)
+
+    class(output) <- "out_all"
+
+    return(output)
+
+  }
+
 }

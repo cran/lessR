@@ -1,5 +1,6 @@
 BoxPlot <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
+    knitr.file=NULL,
 
     col.fill=getOption("col.fill.bar"),
     col.stroke=getOption("col.stroke.bar"), 
@@ -12,7 +13,11 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     horiz=TRUE, add.points=FALSE,
 
     quiet=getOption("quiet"),
-    pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {
+    pdf.file=NULL, pdf.width=5, pdf.height=5, 
+    fun.call=NULL, ...) {
+
+
+  if (is.null(fun.call)) fun.call <- match.call()
 
 
   if (getOption("colors") == "gray") col.stroke <- "black"
@@ -68,7 +73,6 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
 
   for (i in 1:ncol(data)) {
-    cat("\n")
 
     nu <- length(unique(na.omit(data[,i])))
 
@@ -78,12 +82,28 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     if (is.numeric(data[,i])) {
       if (nu > n.cat) {
 
-      pdf.fnm <- .pdfname("BoxChart", x.name, go.pdf, pdf.nm, pdf.file)
+      pdf.fnm <- .pdfname("BoxPlot", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)
 
-      bv <- .bx.main(data[,i], col.fill, col.stroke, col.bg, col.grid,
+      stuff <- .bx.main(data[,i], col.fill, col.stroke, col.bg, col.grid,
          cex.axis, col.axis, 
          horiz, add.points, xlab, main, digits.d, quiet, ...)
+      txsts <- stuff$tx
+      if (length(txsts)==0) txsts <- ""
+
+      txotl <- ""
+      if (!quiet) {
+        txotl <- .outliers2(data[,i])
+        if (length(txotl)==0) txotl <- "No outliers"
+      }
+
+      if (ncol(data) > 1) {  # for a variable range, just the text output
+        class(txsts) <- "out_piece"
+        class(txotl) <- "out_piece"
+        output <- list(out_stats=txsts, out_outliers=txotl)
+        class(output) <- "out_all"
+        print(output)
+      }
 
       if (go.pdf) {
         dev.off()
@@ -97,7 +117,37 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     }  # is.numeric(data[,i])
   }  # for
 
-  if (ncol(data)==1  && nu>n.cat) invisible(bv)
+
+  dev.set(which=2)  # reset graphics window for standard R functions
+
+  if (ncol(data)==1  &&  nu>n.cat) {
+
+    # knitr
+    txkfl <- ""
+    if (!is.null(knitr.file)) {
+      txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
+      knitr.file <- paste(knitr.file, txt, sep="") 
+      txknt <- .dist.knitr(x.name, df.name, fun.call, digits.d)
+      cat(txknt, file=knitr.file, sep="\n")
+      txkfl <- .showfile2(knitr.file, "knitr instructions")
+    }
+ 
+    class(txsts) <- "out_piece"
+    class(txotl) <- "out_piece"
+    class(txkfl) <- "out_piece"
+
+    output <- list(type="BoxPlot",
+      call=fun.call,
+      out_stats=txsts, out_outliers=txotl, out_file=txkfl,
+      n=stuff$n, n.miss=stuff$n.miss, min=stuff$mn, lower_whisker=stuff$lw,
+      lower_hinge=stuff$lh, median=stuff$md, upper_hinge=stuff$uh,
+      upper_whisker=stuff$uw, max=stuff$mx, IQR=stuff$IQR)
+
+    class(output) <- "out_all"
+
+    return(output)
+
+  }
 
 }
 

@@ -4,7 +4,10 @@ print.out_all <- function(x, ...) {
     if (substr(names(x[ilist]),1,4) == "out_") {
       if (nchar(x[ilist]) > 0) {
         cat("\n\n")
-        for (i in 1:length(x[[ilist]])) cat(x[[ilist]][i], "\n")
+        if (substr(names(x[ilist]),5,9) != "title")
+          for (i in 1:length(x[[ilist]])) cat(x[[ilist]][i], "\n")
+        else
+          cat(x[[ilist]]) 
       }
     }
   }

@@ -82,7 +82,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     if (lng.lbl > buf) buf <- lng.lbl 
    }
   max.num <- integer(length=0)
-  for (icol in 1:4) {
+  for (icol in 1:3) {
     max.num[icol] <- 0 
     for (i in 1:n.vars) {
       ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 2
@@ -93,16 +93,18 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
   df.lbl <- .fmtc("     df", max.num[1]+2)
   SS.lbl <- .fmtc(" Sum Sq", max.num[2]+1)
   MS.lbl <- .fmtc("Mean Sq", max.num[3]+1)
-  fv.lbl <- .fmtc("F-value", max.num[4]+1)
-  cat(rep(" ", buf-5), df.lbl, SS.lbl, MS.lbl, fv.lbl, "   p-value", sep="", "\n")
+  cat(rep(" ", buf-5), df.lbl, SS.lbl, MS.lbl, "   F-value", "   p-value", sep="", "\n")
   for (i in 1:(n.vars)) {
     rlb <- .fmtc(rownames(smc)[i], buf)
     df <- format(sprintf("%i", smc[i,1]), width=max.num[1]-4, justify="right")
     SS <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.num[2], justify="right")
     MS <- format(sprintf("%7.*f", digits.d, smc[i,3]), width=max.num[3], justify="right")
-    fv <- format(sprintf("%7.*f", digits.d, smc[i,4]), width=max.num[4], justify="right")
-    pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
-    if (i < n.vars) cat(rlb, df, SS, MS, fv, pv, "\n") else cat(rlb, df, SS, MS, "\n") 
+    if (i < n.vars) {
+      fv <- format(sprintf("%7.*f", digits.d, smc[i,4]), width=9, justify="right")
+      pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
+    }
+    else
+      cat(rlb, df, SS, MS, "\n") 
   }
 
   sm <- summary(av.out)

@@ -15,17 +15,17 @@ function(x=mycor, data=mydata,
 
   labels <- match.arg(labels)
 
-  cor.name <- deparse(substitute(x))
-  if (!exists(cor.name, where=.GlobalEnv) && labels!="only") {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "No correlation matrix entered.\n\n",
-      "Either enter the correct name, or calculate with: Correlation\n",
-      "Or read the correlation matrix with: corRead\n\n")
+  if (labels!="only") {
+    cor.nm <- deparse(substitute(x))
+    .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
+    if (class(x) == "out_all")
+      x <- eval(parse(text=paste(cor.nm, "$cors", sep="")))  # go to $cors 
   }
-  if (!exists("data", where=.GlobalEnv) && labels=="only") {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "No data table (frame) exists\n\n")
-  }
+  else  # only labels
+    if (!exists("data", where=.GlobalEnv)) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "No data table (frame) exists from which to get the labels\n\n")
+    }
 
   NFmax <- 12
 
@@ -132,27 +132,12 @@ function(x=mycor, data=mydata,
   # --------------------------------------------------------
   # re-order R matrix
 
-  out <- .Fortran("rrdr",
-                  R=as.double(as.matrix(x)),
-                  Label=as.integer(as.vector(Label)),
-                  NVC=as.integer(NItems),
-                  NVOld=as.integer(NVOld))
+   outR <- x[Label,Label]
 
-  # construct full R matrix, with all the original vars
-  out$R <- matrix(out$R, nrow=NVOld, ncol=NVOld, byrow=TRUE)
-
-  # if some vars deleted, take just 1st NItems vars
-  if (NItems < NVOld) out$R <- out$R[1:NItems,1:NItems]
-
-  # assign names
-  nm <- character(length=NVOld)
-  nm.new <- character(length=NItems)
-  nm <- dimnames(x)[[1]]
-  for (i in 1:NItems) nm.new[i] <- nm[Label[i]]
-  dimnames(out$R) <- list(nm.new, nm.new)
+  nm.new <- colnames(outR)
 
   # get width of largest variable label
-  cc <- as.character(dimnames(out$R)[[1]])
+  cc <- as.character(dimnames(outR)[[1]])
   max.chr <- 0
   for (i in 1:NItems)  
     if (nchar(cc[i]) > max.chr) max.chr <- nchar(cc[i])
@@ -165,27 +150,17 @@ function(x=mycor, data=mydata,
   # expand R matrix to include rows/cols for factors
   rr <- matrix(rep(0, NF*NItems), nrow=NF)
   cc <- matrix(rep(0, NF*(NItems+NF)), nrow=(NItems+NF))
-  out$R <- cbind(rbind(out$R,rr),cc)
+  outR <- cbind(rbind(outR,rr),cc)
 
   alpha <- double(length=NF)
   omega <- double(length=NF)
 
-  out <- .Fortran("mimm",
-                  R=as.double(as.matrix(out$R)),
-                  LblCut=as.integer(as.matrix(LblCut)),
-                  NVC=as.integer(NItems),
-                  NF=as.integer(NF),
-                  Iter=as.integer(iter),
-                  alpha=as.double(alpha),
-                  omega=as.double(omega))
+  out <- .mimm(outR, LblCut, NItems, NF, iter)
 
   nmF <- character(length=NF)
   for (i in 1:NF) nmF[i] <- paste("F", toString(i), sep="")
 
   NVTot <- NItems + NF
-
-  # construct full R matrix, with all the original vars
-  out$R <- matrix(out$R, nrow=NVTot, ncol=NVTot, byrow=TRUE)
 
   # assign names
   nm  <- character(length=NVTot)
@@ -211,50 +186,23 @@ function(x=mycor, data=mydata,
     }
     Label <- newLabel
 
-    # re-order R matrix
-    out <- .Fortran("rrdr",
-                    R=as.double(as.matrix(x)),
-                    Label=as.integer(as.vector(Label)),
-                    NVC=as.integer(NItems),
-                    NVOld=as.integer(NVOld))
+    outR <- x[Label,Label]
 
-    # construct full R matrix, with all the original vars
-    out$R <- matrix(out$R, nrow=NVOld, ncol=NVOld, byrow=TRUE)
-
-    # if some vars deleted, take just 1st NItems vars
-    if (NItems < NVOld) out$R <- out$R[1:NItems,1:NItems]
-
-    # assign names
-    nm <- character(length=NVOld)
-    nm.new <- character(length=NItems)
-    nm <- dimnames(x)[[1]]
-    for (i in 1:NItems) nm.new[i] <- nm[Label[i]]
-    dimnames(out$R) <- list(nm.new, nm.new)
-
+    nm.new <- colnames(outR)
 
     # expand R matrix to include rows/cols for factors
     rr <- matrix(rep(0, NF*NItems), nrow=NF)
     cc <- matrix(rep(0, NF*(NItems+NF)), nrow=(NItems+NF))
-    out$R <- cbind(rbind(out$R,rr),cc)
+    outR <- cbind(rbind(outR,rr),cc)
 
     # MIMM CFA
     alpha <- double(length=NF)
     omega <- double(length=NF)
 
-    out <- .Fortran("mimm",
-                    R=as.double(as.matrix(out$R)),
-                    LblCut=as.integer(as.matrix(LblCut)),
-                    NVC=as.integer(NItems),
-                    NF=as.integer(NF),
-                    Iter=as.integer(iter),
-                    alpha=as.double(alpha),
-                    omega=as.double(omega))
+    out <- .mimm(outR, LblCut, NItems, NF, iter)
 
     nmF <- character(length=NF)
     for (i in 1:NF) nmF[i] <- paste("F", toString(i), sep="")
-
-    # construct full R matrix, with all the original vars
-    out$R <- matrix(out$R, nrow=NVTot, ncol=NVTot, byrow=TRUE)
 
     # assign names
     nm  <- character(length=NVTot)
@@ -320,11 +268,11 @@ function(x=mycor, data=mydata,
     cat(' Scale  Alpha\n',
         ' ------------\n', sep="")
   for (i in 1:NF) {
-    cat("  ", nmF[i], " ", .fmt(out$alpha[i],3)) 
+    cat("  ", nmF[i], " ", .fmt(out$Alpha[i],3)) 
     if (iter > 0)
-      cat(                  " ", .fmt(out$omega[i],3), "\n")
+      cat(                  " ", .fmt(out$Omega[i],3), "\n")
     else {
-      out$omega <- NULL
+      out$Omega <- NULL
       cat("\n")
     }
   }
@@ -368,7 +316,8 @@ function(x=mycor, data=mydata,
             }
           }
           if (NBad > MaxBad) NBad <- MaxBad
-          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],max.chr), .fmt(Lam,3,7), .fmt(Unique,3,7))
+          cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],max.chr), .fmt(Lam,3,7),
+              .fmt(Unique,3,7))
           cat("    ")
           if (NBad > 0) for (IBad in 1:NBad) cat(paste("F",Bad[IBad]," ",sep=""))
         }
@@ -379,11 +328,11 @@ function(x=mycor, data=mydata,
 
         else if (Unique <= 0) {
           if (LblCut[IFac,2]-LblCut[IFac,1] > 0)
-            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,7), .fmt(Unique,3,7),
-             '   ** Improper Loading **')
+            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,7),
+                .fmt(Unique,3,7), '   ** Improper Loading **')
           else
-            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,7), .fmt(Unique,3,7),
-             '   ** Factor Defined by Only One Item **')
+            cat(.fmtc(Fnm,3), .fmtc(nm.new[Item],4), .fmt(Lam,3,7),
+                .fmt(Unique,3,7), '   ** Factor Defined by Only One Item **')
         }
 
         cat("\n")
@@ -432,20 +381,10 @@ function(x=mycor, data=mydata,
   # --------------------------------------------------------
   if (resid) {
 
-    res <- .Fortran("resid",
-                    R=as.double(as.matrix(out$R)),
-                    LblCut=as.integer(as.matrix(LblCut)),
-                    NItems=as.integer(NItems),
-                    NF=as.integer(NF))
-
-    # construct full R matrix, with all the original vars
-    res$R <- matrix(res$R, nrow=NVTot, ncol=NVTot, byrow=TRUE)
+    res <- .resid(out$R, LblCut, NItems, NF)
 
     # take just 1st NItems vars
-    res$R <- res$R[1:NItems,1:NItems]
-
-    # assign names
-    dimnames(res$R) <- list(nm.new, nm.new)
+    res <- res[1:NItems,1:NItems]
 
     cat("\n\n")
 
@@ -465,7 +404,7 @@ function(x=mycor, data=mydata,
         .fmtc(" ", max.chr+2), "Squares   Abs Value", "\n",
         .fmtc(" ", max.chr+2), "-------   ---------", "\n", sep="")
 
-    cc <- as.character(dimnames(res$R)[[1]])
+    cc <- as.character(dimnames(res)[[1]])
     res.avg <- double(length=NItems)
 
     ssq.tot <- 0
@@ -475,9 +414,9 @@ function(x=mycor, data=mydata,
       ssq <- 0
       abv <- 0
       for (j in 1:NItems) {
-        ssq <- ssq + res$R[i,j]^2
-        abv <- abv + abs(res$R[i,j])
-        abv.all <- abv.all + abs(res$R[i,j])
+        ssq <- ssq + res[i,j]^2
+        abv <- abv + abs(res[i,j])
+        abv.all <- abv.all + abs(res[i,j])
       }
       ssq.tot <- ssq.tot + ssq
       res.avg[i] <- abv / (NItems - 1)
@@ -491,7 +430,7 @@ function(x=mycor, data=mydata,
     cat("Item residuals\n",
         "--------------\n\n", sep="")
 
-    print(round(res$R, 2))
+    print(round(res, 2))
   }
   else  # no residuals
     res <- list(R = NULL)
@@ -554,9 +493,9 @@ function(x=mycor, data=mydata,
      ff.cor=out$R[(NItems+1):NVTot,(NItems+1):NVTot],
      if.cor=out$R[1:NItems,(NItems+1):NVTot],
      diag.cor=diag(out$R[1:NItems,1:NItems]),
-     alpha=out$alpha,
-     omega=out$omega,
-     resid=res$R
+     alpha=out$Alpha,
+     omega=out$Omega,
+     resid=res
   ))
 
   }

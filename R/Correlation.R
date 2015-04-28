@@ -47,7 +47,7 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
         }
       }
     }
-  }
+  }  # end missing y
 
 
   if (!is.df) {
@@ -91,6 +91,7 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
       if (in.global) y.call <- y 
       else y.call <- eval(substitute(data$y))
     }
+
     else
       y.call <- NULL
 
@@ -100,10 +101,20 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
   if (is.df) { 
     if (is.null(show.n))
       if (nrow(data) <= 15) show.n <- TRUE else show.n <- FALSE
-    .cr.data.frame(data, miss, show.n, n.cat, digits.d,
+    stuff <- .cr.data.frame(data, miss, show.n, n.cat, digits.d,
                    graphics, main, bottom, right, 
                    pdf, pdf.width, pdf.height, ...) 
-    }
+
+    txbck <- stuff$txb
+    txmis <- stuff$txm
+    txcor <- stuff$txc
+
+    class(txbck) <- "out_piece"
+    class(txmis) <- "out_piece"
+    class(txcor) <- "out_piece"
+
+    output <- list(out_background=txbck, out_missing=txmis, out_cor=txcor, cors=stuff$cors)
+  }
 
   else {
   
@@ -114,7 +125,20 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
          sep="")
      }
 
-    .cr.main(x.call, y.call, brief, ...) 
+    stuff <- .cr.main(x.call, y.call, brief, ...) 
+    txbck <- stuff$txb
+    txdsc <- stuff$txd
+    txinf <- stuff$txi
+
+    class(txbck) <- "out_piece"
+    class(txdsc) <- "out_piece"
+    class(txinf) <- "out_piece"
+
+    output <- list(out_background=txbck, out_describe=txdsc, out_inference=txinf,
+      r=stuff$r, tvalue=stuff$tvalue, df=stuff$df, pvalue=stuff$pvalue,
+      lb=stuff$lb, ub=stuff$ub)
   }
 
+    class(output) <- "out_all"
+    return(output)
 }

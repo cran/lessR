@@ -12,7 +12,7 @@ Usually a prelude to a factor analysis, such as provided by \code{\link{corCFA}}
 }
 
 \usage{
-corReflect(x=mycor, vars,
+corReflect(R=mycor, vars,
           main=NULL, heat.map=TRUE, bottom=3,right=3, 
           pdf.file=NULL, pdf.width=5, pdf.height=5)
 
@@ -20,7 +20,7 @@ reflect(\ldots)
 }
 
 \arguments{
-  \item{x}{Correlation matrix.}
+  \item{R}{Correlation matrix.}
   \item{vars}{List of the re-ordered variables, each variable listed by its ordinal
        position in the input correlation matrix.}
   \item{main}{Graph title. Set to \code{main=""} to turn off.}
@@ -63,10 +63,11 @@ colnames(mycor) <- c("V1", "V2", "V3", "V4", "V5", "V6")
 rownames(mycor) <- colnames(mycor) 
 
 # reflect all 3 indicators of the second factor
-corReflect(vars=c(V4,V5,V6))
+mynewcor <- corReflect(vars=c(V4,V5,V6))
 
 # abbreviated form
-reflect(vars=c(V4,V5,V6))
+# replace original mycor
+mycor <- reflect(vars=c(V4,V5,V6))
 }
 
 

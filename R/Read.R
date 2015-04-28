@@ -7,11 +7,16 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
       
          max.lines=30, sheet=1,
 
-         brief=getOption("brief"), quiet=getOption("quiet"), ...) {
+         brief=getOption("brief"), quiet=getOption("quiet"), 
 
+         fun.call=NULL, ...) {
+
+
+  if (is.null(fun.call)) fun.call <- match.call()
+  fncl <- .fun.call.deparse(fun.call) 
+  options(read.call=fncl)  # save for knitr run
 
   format <- match.arg(format)
-
   if (is.null(ref) && format=="lessR") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Cannot browse for a data file that is part of lessR.\n",
@@ -19,13 +24,11 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
   }
 
 # option to browse for data file, and then display file name
-  cat("\n")
   if (is.null(ref)) {
     ref <- file.choose()
     cat("\n")
   }
 
-  options(data.file=ref)  # save for knitr run
 
   if (grepl(".sav$", ref)) format <- "SPSS" 
   if (grepl(".rda$", ref)) format <- "R" 
@@ -165,10 +168,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
   }
 
   else if (format == "lessR") {  # data and any labels
-    if (substr(ref,1,4) == "data")
-      txt <- ""
-    else
-      txt <- "data"
+    txt <- ifelse (substr(ref,1,4) == "data", "", "data")
     file.name <- paste(txt, ref, ".rda", sep="")
 
     path.name <- paste(find.package("lessR"), "/data/",  file.name, sep="")

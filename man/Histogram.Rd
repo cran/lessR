@@ -12,12 +12,13 @@ From the standard R function \code{\link{hist}} plots a frequency histogram with
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 
-When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output embedded in documents See \code{value} below.
+When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output is embedded in documents, facilitated by the \code{knitr.file} option. See \code{value} below.
 }
 
 \usage{
 
 Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"),
+         knitr.file=NULL,
 
          col.fill=getOption("col.fill.bar"), 
          col.stroke=getOption("col.stroke.bar"),
@@ -33,7 +34,8 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"),
          digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL,
 
          quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...)
+         pdf.file=NULL, pdf.width=5, pdf.height=5,
+         fun.call=NULL, \ldots)
 
 hs(\ldots)
 }
@@ -50,6 +52,9 @@ hs(\ldots)
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric data type
         for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
+  \item{knitr.file}{File name for the file of knitr instructions to be written, if specified.
+        The file type is .Rmd, which automatically opens in RStudio, but it is a simple
+        text file that can be edited with any text editor, including RStudio.}
   \item{col.fill}{Color of the bars. To set transparency level, use \code{lessR} 
        function \code{\link{set}} or use \code{\link{rgb}} function directly.}
   \item{col.stroke}{Color of the border of the bars. To set transparency level, use function 
@@ -84,6 +89,8 @@ hs(\ldots)
        no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
+  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
+        obtained from the abbreviated function call \code{hs}.}
   \item{\dots}{Other parameter values for graphics as defined processed 
       by \code{\link{hist}} and \code{\link{plot}}, including \code{xlim}, \code{ylim},
       \code{lwd} and \code{cex.lab}, \code{col.main}, \code{density}, etc. Also
@@ -124,12 +131,13 @@ Because of the customized graphic windowing system that maintains a unique graph
 }
 
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.5 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \$, can be inserted into the \code{knitr} document (see \code{examples}).
 
 READABLE OUTPUT\cr
 code{out_ss}: Summary statistics\cr
 code{out_freq}: Frequency distribution\cr
 code{out_outliers}: Outlier analysis\cr
+code{out_file}: Name and location of optional knitr file\cr
 
 STATISTICS\cr
 code{bin_width}: Bin width\cr

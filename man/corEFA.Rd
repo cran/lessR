@@ -7,12 +7,12 @@
 \description{
 Abbreviation: \code{efa}
 
-A maximum likelihood exploratory factor analysis, provided by the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis. Then constructs the code to run the corresponding multiple indicator measurement model (MIMM) suggested by the exploratory factor analysis loadings in terms of both the \code{lessR} \code{\link{corCFA}} and the \code{cfa} function from the \code{lavaan} package.
+A maximum likelihood exploratory factor analysis of an input correlation matrix, provided by the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis. Then constructs the code to run the corresponding multiple indicator measurement model (MIMM) suggested by the exploratory factor analysis loadings in terms of both the \code{lessR} \code{\link{corCFA}} and the \code{cfa} function from the \code{lavaan} package.
 }
 
 \usage{
-corEFA(x=mycor, n.factors, rotate=c("promax", "varimax"), 
-          min.loading=.2, show.initial=FALSE, sort=TRUE, \ldots)
+corEFA(x=mycor, n.factors, rotate=c("promax", "varimax", "none"), 
+          min.loading=.2, sort=TRUE, knitr.file=NULL, \ldots)
 
 efa(\ldots)
 }
@@ -20,14 +20,15 @@ efa(\ldots)
 \arguments{
   \item{x}{Correlation matrix.}
   \item{n.factors}{Number of factors.}
-  \item{rotate}{Rotation method.}
+  \item{rotate}{Rotation method, if any.}
   \item{min.loading}{Minimum loading to include in suggested factor for
         confirmatory analysis and for the display of the loadings for the
-        exploratory analysis. To ignore, set to NA.}
-  \item{show.initial}{If \code{TRUE}, then display initial factor extraction
-       before rotation.}
+        exploratory analysis. To ignore, set to 0.}
   \item{sort}{Sort the input variables by their highest factor loadings (but only
         first just list those items with loadings larger than 0.5).}
+  \item{knitr.file}{File name for the file of knitr instructions to be written,
+        if specified. The file type is .Rmd, which automatically opens in RStudio,
+        but it is a simple text file that can be edited with any text editor, including RStudio.}
   \item{\dots}{Parameter values.}
 }
 
@@ -35,6 +36,26 @@ efa(\ldots)
 Only the loadings from the exploratory factor analysis are provided, with either an oblique (promax), by default, or an orthogonal (varimax) rotation.  If more information is desired, run \code{\link{factanal}} directly.
 
 Also provides the associated multiple indicator measurement model suggested by the exploratory factor analysis. Each MIMM factor is defined by the items that have the highest loading on the corresponding exploratory factor.
+
+For versions of \code{lessR} after 3.3, the correlation matrix computed by \code{\link{Correlation}} is now a list element called \code{cors} within the returned list. For example, \code{mycor$cors} from \code{mycor <- cr(mydata)}. The function \code{corEFA} automatically finds this correlation matrix from just entering the entire list name of the returned list, \code{mycor}, or the specific location, \code{mycor$cors}, or as a stand-alone numerical matrix as done in versions of \code{lessR} previous to 3.3. 
+}
+
+\value{
+The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3 into three different types: pieces of text that form the readable output, a variety of statistics, and \code{knitr} instructions. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The \code{knitr} output is available for entry direct into \code{knitr}. The motivation of these three types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+
+READABLE OUTPUT\cr
+\code{out_title}: Variables in the model, rows of data and retained\cr
+\code{out_loadings}: Estimated coefficients, hypothesis tests and confidence intervals\cr
+\code{out_sum_squares}: Fit indices\cr
+\code{out_cfa_title}: Analysis of variance\cr
+\code{out_ice}: Correlations among all variables in the model\cr
+\code{out_lavaan}: Collinearity analysis\cr
+\code{out_deleted}: R squared adjusted for all (or many) possible subsets\cr
+
+STATISTICS\cr
+\code{knitr}: Instructions to run through \code{knitr}, such as copy and paste, to obtain output in the form of a web file, pdf document or Word document. Can also obtain these instructions with the \code{knitr.file} option, which writes them directly to the specified text file. Obtain a less detailed \code{knitr} file by setting \code{explain=FALSE}. 
+
+Although not typically needed for analysis, if the regression output is assigned to an object named, for example, \code{fa}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(fa)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out_piece}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -71,8 +92,9 @@ corEFA(n.factors=2)
 
 # abbreviated form
 # use all items to construct the MIMM, regardless of their loadings
+#  and show all loadings
 # show the initial factor extraction
-efa(n.factors=2, min.loading=NA, show.initial=TRUE)
+efa(n.factors=2, min.loading=0, show.initial=TRUE)
 }
 
 

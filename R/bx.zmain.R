@@ -50,44 +50,54 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
          col.fill, col.stroke, col.bg, col.grid, shape.pts=NULL,
          cex.axis=.85, col.axis="gray30",
           xlab=NULL, main=NULL, cex=NULL,
-         method="stack", pt.reg=21, pt.out=19, 
+         method="overplot", pt.reg=21, pt.out=19, 
          col.out30="firebrick2", col.out15="firebrick4", 
          quiet=TRUE, new=FALSE, vertical=!horiz, ...)
 
   # summarize data
+
+    n <- sum(!is.na(x))
+    n.miss <- sum(is.na(x))
+    mn <- .fmt(min(x, na.rm=TRUE))
+    lw <- .fmt(bv$stats[1])
+    lh <- .fmt(bv$stats[2])
+    md <- .fmt(bv$stats[3])
+    uh <- .fmt(bv$stats[4])
+    uw <- .fmt(bv$stats[5])
+    mx <- .fmt(max(x, na.rm=TRUE)) 
+    IQR <- .fmt(IQR(x, na.rm=TRUE))
+
+  tx=""
   if (!quiet) {
     digits.d <- .max.dd(x)
     options(digits.d=digits.d)
 
-    cat("\n")
+    tx <- character(length = 0)
+
     main.lab <- as.character(main.lab)
     if (nchar(main.lab) > 0) main.lab <- paste(",", main.lab)
     txt <- paste("--- ", x.lab, main.lab, " ---", sep="")
-    cat(txt, "\n")
-    cat("\n")
-    cat("Present:", sum(!is.na(x)), "\n")
-    cat("Missing:", sum(is.na(x)), "\n")
-    cat("Total  :", length(x), "\n")
-    cat("\n")
-    cat("Minimum      :", .fmt(min(x, na.rm=TRUE)), "\n")
-    cat("Lower Whisker:", .fmt(bv$stats[1]), "\n")
-    cat("Lower Hinge  :", .fmt(bv$stats[2]), "\n")
-    cat("Median       :", .fmt(bv$stats[3]), "\n")
-    cat("Upper Hinge  :", .fmt(bv$stats[4]), "\n")
-    cat("Upper Whisker:", .fmt(bv$stats[5]), "\n")
-    cat("Maximum      :", .fmt(max(x, na.rm=TRUE)), "\n")
-    cat("\n")
-    cat("1st Quartile :", .fmt(quantile(x, na.rm=TRUE)[2]), "\n")
-    cat("3rd Quartile :", .fmt(quantile(x, na.rm=TRUE)[4]), "\n")
-    cat("IQR          :", .fmt(IQR(x, na.rm=TRUE)), "\n")
+    tx[length(tx)+1] <- txt
+    tx[length(tx)+1] <- paste("Present:", n)
+    tx[length(tx)+1] <- paste("Missing:", n.miss)
+    tx[length(tx)+1] <- paste("Total  :", length(x))
+    tx[length(tx)+1] <- ""
+    tx[length(tx)+1] <- paste("Minimum      :", mn)
+    tx[length(tx)+1] <- paste("Lower Whisker:", lw) 
+    tx[length(tx)+1] <- paste("Lower Hinge  :", lh) 
+    tx[length(tx)+1] <- paste("Median       :", md) 
+    tx[length(tx)+1] <- paste("Upper Hinge  :", uh) 
+    tx[length(tx)+1] <- paste("Upper Whisker:", uw) 
+    tx[length(tx)+1] <- paste("Maximum      :", mx )
+    tx[length(tx)+1] <- ""
+    tx[length(tx)+1] <- paste("1st Quartile :", .fmt(quantile(x, na.rm=TRUE)[2]))
+    tx[length(tx)+1] <- paste("3rd Quartile :", .fmt(quantile(x, na.rm=TRUE)[4]))
+    tx[length(tx)+1] <- paste("IQR          :", IQR)
 
-    # outlier analysis
-    .outliers(x)
+  }  # end !quiet
 
-    cat("\n")
-  }
-
-  return(bv)
+  return(list(tx=tx, n=n, n.miss=n.miss, mn=mn, lw=lw, lh=lh, md=md, uh=uh,
+         uw=uw, mx=mx, IQR=IQR))
 
 }
 

@@ -8,7 +8,7 @@ Following a call to the \code{lessR} function \code{\link{Regression}}, in which
 }
 
 \usage{
-regPlot(reg.out, type, digits.d=NULL, pred.intervals=TRUE,
+regPlot(out, type, digits.d=NULL, pred.intervals=TRUE,
          res.sort=c("cooks","rstudent","dffits","off"),
          res.rows=NULL, cooks.cut=1, scatter.coef=NULL, 
          pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, \ldots)
@@ -16,7 +16,7 @@ regPlot(reg.out, type, digits.d=NULL, pred.intervals=TRUE,
 
 
 \arguments{
-  \item{reg.out}{The object of \code{\link{class}} \code{lm}.}
+  \item{out}{The object returned by the \code{lessR} function  \code{\link{Regression}}.}
   \item{type}{Type of plot: 1 plots the scatter plot for a single predictor
         variable, or the scatter plot matrix for multiple predictors. If a single
         scatter plot, then the confidence and prediction intervals are included. 2
@@ -67,7 +67,7 @@ Gerbing, D. W. (2013). R Data Analysis without Programming, Chapters 9 and 10, N
 \examples{
 # read internal data set
 mydata <- rd("Reading", format="lessR", quiet=TRUE)
-# do regression analysis, save result into reg.out
+# do regression analysis, save result into out
 reg.out <- reg(Reading ~ Verbal)
 # The full output already contains these plots, obtained by
 # entering the name of the saved object

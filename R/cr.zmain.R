@@ -9,6 +9,7 @@ function(x, y, brief, ...) {
   if (!is.factor(x)) {
 
     ct <- cor.test(x,y, ...)
+
     if (ct$method == "Pearson's product-moment correlation") {
       c.type <- "pearson" 
       sym <- "r"
@@ -30,60 +31,93 @@ function(x, y, brief, ...) {
     else if (ct$alternative == "greater")
       h.txt <- "greater than"
 
+    # background
+    tx <- character(length = 0)
     if (!brief) {
-      cat("\n")
-      .dash(55)
-      cat("Correlation Analysis for Variables", x.name, "and", y.name, "\n")
-      .dash(55)
+      txt <- paste("Correlation Analysis for Variables", x.name, "and", y.name)
+      tx[length(tx)+1] <- txt
+      tx[length(tx)+1] <- .dash2(nchar(txt))
     }
 
-    cat("\n")
-    cat(">>> ",ct$method, "\n", sep="")
+    tx[length(tx)+1] <- ""
+    tx[length(tx)+1] <- paste(">>> ",ct$method, sep="")
 
     if (!is.null(x.lbl) || !is.null(y.lbl)) {
-      cat("\n")
+      tx[length(tx)+1] <- ""
       if (!is.null(x.lbl))
-        cat(x.name, ": ", as.character(x.lbl), sep="", "\n")
+        tx[length(tx)+1] <- paste(x.name, ": ", as.character(x.lbl), sep="")
       else
-        cat(x.name, "\n")
+        tx[length(tx)+1] <- paste(x.name)
       if (!is.null(y.lbl))
-        cat(y.name, ": ", as.character(y.lbl), sep="", "\n")
+        tx[length(tx)+1] <- paste(y.name, ": ", as.character(y.lbl), sep="")
       else
-        cat(y.name, "\n")
+        tx[length(tx)+1] <- paste(y.name)
     }
    
       n.pair <- sum(!is.na(x - y))  # number of points after pairwise deletion
-      cat("\n")
-      cat("Number of paired values with neither missing, n:", n.pair, "\n")
+      tx[length(tx)+1] <- ""
+      tx[length(tx)+1] <- paste("Number of paired values with neither",
+        "missing, n =", n.pair)
+
     if (!brief) {
       n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
-      cat("Number of cases (rows of data) deleted:", n.del, "\n\n")
+      tx[length(tx)+1] <- paste("Number of cases (rows of data) deleted:",
+        n.del)
+    }
+
+    txb <- tx
+
+    # descriptive
+    tx <- character(length = 0)
+    if (!brief) {
       if (c.type == "pearson") {
         covr <- cov(x, y, use="pairwise.complete.obs")
-        cat("Sample Covariance: s =", .fmt(covr,3), "\n\n")
+        tx[length(tx)+1] <- paste("Sample Covariance: s =", .fmt(covr,3))
+      tx[length(tx)+1] <- ""
       }
+      tx[length(tx)+1] <- paste("Sample Correlation: ", sym, " = ",
+        .fmt(ct$estimate,3), sep="")
     }
-
-    if (brief) 
-      cat("\nSample Correlation of ", x.name, " and ", y.name,
-        ": ", sym, " = ", .fmt(ct$estimate,3), sep="", "\n\n")
     else
-      cat("Sample Correlation: ", sym, " = ", .fmt(ct$estimate,3), sep="", "\n\n")
-    cat("Alternative Hypothesis: True", sym.pop, "is", h.txt, "0", "\n")
-    cat("  ", names(ct$statistic), "-value: ", .fmt(ct$statistic,3), sep="")
+      tx[length(tx)+1] <- paste("Sample Correlation of ", x.name, " and ",
+        y.name, ": ", sym, " = ", .fmt(ct$estimate,3), sep="")
+
+    txd <- tx
+
+
+    # inferential
+    tx <- character(length = 0)
+
+    tx[length(tx)+1] <- paste("Alternative Hypothesis: True", sym.pop,
+      "is", h.txt, "0")
+    tx[length(tx)+1] <- paste("  ", names(ct$statistic), "-value: ",
+      .fmt(ct$statistic,3), sep="")
     if (c.type == "pearson")
-        cat(",  df: ", ct$parameter, sep="") 
-    cat(",  p-value: ", .fmt(ct$p.value,3), sep="", "\n")
+        tx[length(tx)] <- paste(tx[length(tx)], ",  df: ",
+          ct$parameter, sep="") 
+    tx[length(tx)] <- paste(tx[length(tx)], ",  p-value: ",
+      .fmt(ct$p.value,3), sep="")
+
     if (c.type == "pearson") {
-      cat("\n")
-      cat("95% Confidence Interval of Population Correlation", "\n")
-      cat("  Lower Bound:", .fmt(ct$conf.int,3)[1])
-      cat("     Upper Bound:", .fmt(ct$conf.int,3)[2], "\n")
+      tx[length(tx)+1] <- ""
+      tx[length(tx)+1] <- "95% Confidence Interval of Population Correlation"
+      tx[length(tx)+1] <- paste("  Lower Bound:", .fmt(ct$conf.int,3)[1])
+      tx[length(tx)] <- paste(tx[length(tx)], "     Upper Bound:",
+        .fmt(ct$conf.int,3)[2])
+      df <- round(ct$parameter,0)
+      lb <- round(ct$conf.int,3)[1]
+      ub <- round(ct$conf.int,3)[2]
+    }
+    else {
+      df <- NA; lb <- NA; ub <- NA
     }
 
-    if (!brief) .dash(55)
+    txi <- tx
+
   }
 
-  cat("\n")
+  return(list(txb=txb, txd=txd, txi=txi,
+    r=round(ct$estimate,3), tvalue=round(ct$statistic,3),
+    df=df, pvalue=round(ct$p.value,3), lb, ub))
 
 }

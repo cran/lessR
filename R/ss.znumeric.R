@@ -28,7 +28,8 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     dig.dec <- .max.dd(x) + 1
     if (dig.dec == 1) dig.dec <- 2
   }
-  else dig.dec <- digits.d
+  else
+    dig.dec <- digits.d
   options(digits.d=dig.dec)
   if (dig.dec > 10  && is.null(digits.d)) {
     cat("\nThese data values contain ", dig.dec, " decimal digits. To enhance\n",
@@ -60,13 +61,14 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
 
   max.ln <- 0  # get max.ln, maximum length of the individual fields
   for (i in 1:n.lines) {
-    if (n.lines == 1) xx <- x
+    if (n.lines == 1)
+      xx <- x
     else {
       lv <- levels(as.factor(by))[i]
       xx <- vectors[[i]]
     } 
-    m <- mean(xx)
-    s <- sd(xx)
+    m <- mean(xx, na.rm=TRUE)
+    s <- sd(xx, na.rm=TRUE)
     n.ln <- max(nchar(as.character(round(m, dig.dec))), 
                 nchar(as.character(round(s, dig.dec)))) + dig.dec
     if (n.ln > max.ln) max.ln <- n.ln
@@ -132,7 +134,7 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
 
       if (max.ln < 4) max.ln <- max.ln + 2
       if (max.ln < 8) max.ln <- max.ln + 1
-      if (n.lines == 1) nbuf <- 2 else nbuf <- 4
+      nbuf <- ifelse (n.lines == 1, 2, 4)
 
       n.lbl <- .fmtc("n", nchar(as.character(n))+nbuf+max.lv)
       miss.lbl <- .fmtc("miss", nchar(as.character(n.miss))+5)
@@ -174,6 +176,7 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
       mn.c <- .fmt(mn, dig.dec, max.ln)
       md.c <- .fmt(md, dig.dec, max.ln)
       mx.c <- .fmt(mx, dig.dec, max.ln)
+
       if (brief)
         tx[length(tx)+1] <- paste(lvl, n.c, miss.c, m.c, s.c, mn.c, md.c, mx.c)
 
@@ -189,9 +192,10 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     }
 
   }  # for each line
-
-      return(list(tx=tx, n=n, n.miss=n.miss, m=m, s=s, sk=sk, kt=kt, mn=mn,
+     if (n.lines == 1)
+       return(list(tx=tx, n=n, n.miss=n.miss, m=m, s=s, sk=sk, kt=kt, mn=mn,
                   q1=q1, md=md, q3=q3, mx=mx, qr=qr))
+     else
+       return(list(tx=tx))
 
 }
-

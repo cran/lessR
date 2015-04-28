@@ -1,5 +1,5 @@
 DotPlot <-
 function(...)
 
-  ScatterPlot(...)
+  ScatterPlot(fun.call=match.call(), ...)
 

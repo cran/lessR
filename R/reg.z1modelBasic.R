@@ -11,7 +11,6 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
 # --------------
 # Basic Analysis
 # --------------
-  tx[length(tx)+1] <- "  BASIC ANALYSIS"
  
 # estimates, HTs 
   sm <- summary(lm.out)
@@ -19,15 +18,17 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
   if (show.R) {
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- .dash2(68)
-    tx[length(tx)+1] <- paste("> summary(model)\n> confint(model)", sep="")
+    tx[length(tx)+1] <- "> summary(model)"
+    tx[length(tx)+1] <- "> confint(model)"
     tx[length(tx)+1] <- .dash2(68)
   }
   
-  tx[length(tx)+1] <- ""
-  tx[length(tx)+1] <- ""
-  tx[length(tx)+1] <- "Estimated Model"
+  if (is.null(options()$knitr.in.progress)) {
+    tx[length(tx)+1] <- "Estimated Model"
+    tx[length(tx)+1] <- ""
+  }
 
-  #model coefficients
+  # model coefficients
   sm1 <- sm$coefficients
   sm2 <- confint(lm.out, level=0.95) 
   smc <- cbind(sm1, sm2)
@@ -55,8 +56,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
   p.lbl <-  "  p-value"
   lb.lbl <- .fmtc("Lower 95%", max.num[5]+3)
   ub.lbl <- .fmtc("Upper 95%", max.num[6]+3)
-  tx[length(tx)+1] <- ""
-  tx[length(tx)+1] <- paste(eval(format("", width=buf)), est.lbl, ste.lbl,
+  tx[length(tx)+1] <- paste(format("", width=buf), est.lbl, ste.lbl,
                            t.lbl, p.lbl, lb.lbl, ub.lbl, sep="")
 
   # values row by row

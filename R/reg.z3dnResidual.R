@@ -29,7 +29,7 @@ function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE) {
     col.fill.nrm="transparent", col.fill.gen="transparent",
     cex.axis=.85, col.axis="gray30", 
     x.pt=NULL, xlab="Residuals",
-    main=plt.title[plt.i], y.axis=FALSE, 
+    main="", y.axis=FALSE, 
     x.min=NULL, x.max=NULL, band=FALSE, quiet=TRUE)
 
   if (pdf) {

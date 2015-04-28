@@ -8,7 +8,9 @@
 \description{
 Abbreviation: \code{cr, cr.brief}
 
-For two variables the correlation coefficient with hypothesis test and confidence interval, or for a data frame, or list of variables from a data frame, the correlation matrix. The default computed coefficient(s) are the standard Pearson's product-moment correlation. For the default missing data technique of pairwise deletion, an analysis of missing data for each computed correlation coefficient is provided. For a correlation matrix a statistical summary of the missing data across all cells is provided. 
+For two variables yields the correlation coefficient with hypothesis test and confidence interval. For a data frame or list of variables from a data frame, yields the correlation matrix. The default computed coefficient(s) are the standard Pearson's product-moment correlation, with Spearman and Kendall coefficients available. For the default missing data technique of pairwise deletion, an analysis of missing data for each computed correlation coefficient is provided. For a correlation matrix a statistical summary of the missing data across all cells is provided.
+
+Versions of this function from \code{lessR} 3.3 or earlier returned just a correlation matrix.  Now other values are returned as well so that the correlation matrix is now stored as part of a returned list in \code{cors}, directly available, for example, as \code{mycor$cors} from \code{mycor <- cr(mydata)}. This revision is automatically adjusted for in the \code{lessR} routines that read the subsequent correlation matrix, so all pre-existing code continues to work. That is, the input into any of these routines could be, for example, \code{mycor}, \code{mycor$cors} or a stand-alone correlation matrix such as in pre-\code{lessR} 3.3.
 }
 
 \usage{
@@ -63,7 +65,35 @@ For treating missing data, the default is \code{pairwise}, which means that an o
 }
 
 \value{
-If a correlation matrix is computed, the matrix is returned. Usually assign the name of \code{mycor} to the output matrix, as in following examples. This matrix is ready for input into any of the \code{lessR} functions that analyze correlational data, including confirmatory factor analysis by \code{\link{corCFA}} and also exploratory factor analysis, either the standard R function \code{\link{factanal}} or the \code{lessR} function \code{\link{corEFA}} 
+From versions of \code{lessR} of 3.3 and earlier, if a correlation matrix is computed, the matrix is returned. Now more values are returned, so the matrix is embedded in a list of returned elements.
+
+READABLE OUTPUT\cr
+
+single coefficient\cr
+\code{out_background}: Variables in the model, any variable labels\cr
+\code{out_describe}: Estimated coefficients\cr
+\code{out_inference}: Hypothesis test and confidence interval estimated coefficient\cr
+
+matrix\cr
+\code{out_background}: Variables in the model, any variable labels\cr
+\code{out_missing}: Missing values anlaysis\cr
+\code{out_cor}: Correlations\cr
+
+
+STATISTICS\cr
+
+single coefficient\cr
+\code{r}: Model formula that specifies the model\cr
+\code{tvalue}: t-statistic of estimated value of null hypothesis of no relationship\cr
+\code{df}: Degrees of freedom of hypothesis test 
+\code{pvalue}: Number of rows of data submitted for analysis\cr
+\code{lb}: Lower bound of confidence interval\cr
+\code{ub}: Upper bound of confidence interval\cr
+
+matrix\cr
+\code{cors}: Correlations\cr
+
+Usually assign the name of \code{mycor} to the output matrix, as in following examples. This matrix is ready for input into any of the \code{lessR} functions that analyze correlational data, including confirmatory factor analysis by \code{\link{corCFA}} and also exploratory factor analysis, either the standard R function \code{\link{factanal}} or the \code{lessR} function \code{\link{corEFA}} 
 }
 
 \references{

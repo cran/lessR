@@ -52,10 +52,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     x.name <- names(data)[i]
     if (nchar(x.name) > max.char) max.char <- nchar(x.name)
   }
-  if (max.char > 7)
-    pad <- max.char + 2
-  else
-    pad <- max.char + (10-max.char)
+  pad <- ifelse (max.char > 7, max.char + 2, max.char + (10-max.char))
   if (!brief) cat("\n")
   cat(.fmtc(" ",pad+16), .fmtc("Missing",6), .fmtc("Unique",7), "\n")
   cat(.fmtc(" Variable",max.char+1), .fmtc("Type",8), .fmtc("Values",7),

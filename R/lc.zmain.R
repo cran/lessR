@@ -23,7 +23,7 @@ function(y, type,
   }
 
   nrows <- length(y)
-  if (is.null(cex)) pt.size <- 0.8 else pt.size <- cex
+  pt.size <- ifelse (is.null(cex), 0.8, cex)
 
   # get variable label and axis labels if they exist
   gl <- .getlabels(ylab=ylab, main=main)
@@ -42,11 +42,11 @@ function(y, type,
   }
 
   if (is.null(time.start) && class(y) != "ts") {
-    if (is.null(xlab)) x.lab <- "index" else x.lab <- xlab
+    x.lab <- ifelse (is.null(xlab), "index", xlab)
     x <- 1:length(y)  # ordinal position of each value on x-axis
   }
   else   {  # time.start date specified or a ts
-    if (is.null(xlab)) x.lab <- "" else x.lab <- xlab      
+    x.lab <- ifelse (is.null(xlab), "", xlab)      
     if (class(y) == "ts") {
       time.start <- paste(start(y)[1], "/", start(y)[2], "/01", sep="") 
       frq <- frequency(y)
@@ -64,10 +64,7 @@ function(y, type,
     m <- mean(y, na.rm=TRUE)
     n.change <- 0
     for (i in 1:(length(y)-1)) if ((y[i+1]>m) != (y[i]>m)) n.change <- n.change+1 
-    if (n.change/(length(y)-1) < .15) 
-      center.line <- "off" 
-    else 
-      center.line <- "median"
+    if (n.change/(length(y)-1) < .15) center.line <- "off" else center.line <- "median"
   }
 
   # fill ts chart 
@@ -149,6 +146,16 @@ function(y, type,
     mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
     if (center.line == "zero") m.y <- median(y) 
 
+    gl <- .getlabels()
+    x.name <- gl$xn; x.lbl <- gl$xl;
+    y.name <- gl$yn; y.lbl <- gl$yl
+    ttlns <- .title2(x.name, y.name, x.lbl, y.lbl, TRUE)
+    class(ttlns) <- "out_piece"
+    output <- list(out_title=ttlns)
+    class(output) <- "out_all"
+    print(output)
+
+
     # analyze runs
     if (!quiet) {
       cat("\n")
@@ -173,7 +180,7 @@ function(y, type,
             run[n.runs] <- 0
           }
           run[n.runs] <- run[n.runs] + 1
-          if (i < 10) buf <- "  " else buf <- " "
+          buf <- ifelse (i < 10, "  ", " ")
           line.out <- paste(line.out, buf, i)
         }
       }

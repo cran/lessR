@@ -61,12 +61,7 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   n.pred <- n.vars - 1
   n.obs <- nrow(data)
   
-  if(n.pred > 1) {
-    collinear <- TRUE
-  }
-  else {
-    collinear <- FALSE
-  }
+  if (n.pred > 1) collinear <- TRUE else collinear <- FALSE
 
   is.bin <- TRUE
   if (is.factor(data[,nm[1]])) { 

@@ -18,10 +18,7 @@ function(ref=NULL, format=c("csv", "R"), data=mydata, ...) {
     if (is.null(ref))
       file.data <- paste(dname, ".csv", sep="")
     else {
-       if (grepl(".csv", ref)) 
-         txt <- ""
-       else
-         txt <- ".csv"
+       txt <- ifelse (grepl(".csv", ref), "", ".csv")
        file.data <- paste(ref, txt, sep="")
     }
     write.csv(data, file=file.data, ...)
@@ -42,10 +39,7 @@ function(ref=NULL, format=c("csv", "R"), data=mydata, ...) {
     if (is.null(ref))
       file.data <- paste(dname, ".rda", sep="")
     else {
-      if (grepl(".rda", ref)) 
-        txt <- ""
-      else
-        txt <- ".rda"
+      txt <- ifelse (grepl(".rda", ref), "", ".rda")
       file.data <- paste(ref, txt, sep="")
     }
     save(list=dname, file=file.data, ...)

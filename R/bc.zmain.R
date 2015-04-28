@@ -428,13 +428,20 @@ function(x, by=NULL,
              horiz=legend.horiz, cex=.7, bty="n", text.col=col.txt)
   }
 
-
   # ----------------------------------------------------------------------------
   # text output
   if (prop) x  <- x.temp
 
-  if (is.null(by)) {
+  if (length(dim(x)) == 1) {  # one variable
     stats <- .ss.factor(x)
+
+    txttl <- stats$title
+    tx <- stats$tx
+    class(txttl) <- "out_piece"
+    class(tx) <- "out_piece"
+    output <- list(out_title=txttl, out_text=tx)
+    class(output) <- "out_all"
+    print(output)
 
     if (!quiet) { 
       ch <- chisq.test(x)
@@ -448,8 +455,17 @@ function(x, by=NULL,
     }
   }
 
-  else {
+  else {  # two variables
     stats <- .ss.factor(x, by, brief=TRUE) 
+
+    txttl <- stats$txttl
+    txfrq <- stats$txfrq
+    class(txttl) <- "out_piece"
+    class(txfrq) <- "out_piece"
+    output <- list(out_title=txttl, out_text=txfrq)
+    class(output) <- "out_all"
+    print(output)
+
 
     if (!quiet) { 
       cat("\n"); .dash(19); cat("Chi-square Analysis\n"); .dash(19); 

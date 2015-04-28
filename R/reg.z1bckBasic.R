@@ -11,8 +11,6 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE, n.obs, n.keep) {
 
   tx <- character(length = 0)
 
-  tx[length(tx)+1] <- "  BACKGROUND"
-
   if(show.R) {
     cv <- paste(nm[1]," ~ ", sep="")
     cv <- paste(cv, nm[2], sep="")
@@ -22,10 +20,8 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE, n.obs, n.keep) {
     tx[length(tx)+1] <- .dash2(68)
   }
   
+  tx[length(tx)+1] <- paste("Data Frame: ", dname)  # not accurate from Model
   tx[length(tx)+1] <- ""
-  if (sys.nframe() == 1) {  # only accurate if not called from model
-    tx[length(tx)+1] <- paste("Data Frame: ", dname, "\n\n")
-  }
 
   for (i in 1:n.vars)
     tx[length(tx)+1] <- .varlist2(n.pred, i, nm[i], "Predictor", n.obs, n.obs)

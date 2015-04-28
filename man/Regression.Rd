@@ -8,27 +8,31 @@
 \description{
 Abbreviation: \code{reg}, \code{reg.brief}
 
-Provides a regression analysis with extensive output, including graphics, from a single, simple function call with many default settings, each of which can be re-specified. Based on the \code{R} function \code{\link{lm}} and related \code{R} regression functions, the output of these functions are re-arranged and collated.
+Provides a regression analysis with extensive output, including graphics, from a single, simple function call with many default settings, each of which can be re-specified. The computations are obtained from the \code{R} function \code{\link{lm}} and related \code{R} regression functions, of which the output of these functions are re-arranged and collated.
 
-By default the data exists as a data frame with the default name of \code{mydata}, such as data read by the \code{lessR} function \code{Read}, or specify explicitly with the \code{data} option.  Specify the model in the function call as an R \code{\link{formula}}, that is, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign.  
+By default the data exists as a data frame with the default name of \code{mydata}, or specify explicitly with the \code{data} option.  Specify the model in the function call as an R \code{\link{formula}}, that is, for a basic model, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign.  
 
-When the output is assigned into an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the pieces of output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from , for example, \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word. The result is that interpretation and commentary can be added to each piece of the regression output. A complete \code{knitr} set of instructions ready to knit, such as in \code{RStudio}, would in this example be available in \code{r\$knitr}, or from the \code{knitr.file} option. Simply specify the option and create the file and then open in \code{RStudio} and click the \code{knit} button to create a nicely formatted document that consists of the statistical results and interpretative comments. See the following sections \code{arguments}, \code{value} and \code{examples} for more information.
+Output is generated into distinct pieces by topic. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from, for example, \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete \code{knitr} set of instructions ready to knit from the \code{knitr.file} option. Simply specify the option and create the file and then open in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the following sections \code{arguments}, \code{value} and \code{examples} for more information. 
 }
 
 \usage{
 Regression(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
-         text.width=120, brief=getOption("brief"), explain=TRUE, show.R=FALSE,
+         knitr.file=NULL, explain=getOption("explain"),
+         interpret=getOption("interpret"), results=getOption("results"),
+
+         text.width=120, brief=getOption("brief"), show.R=FALSE,
 
          res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
          pred.rows=NULL, pred.sort=c("predint", "off"),
          subsets=NULL, cooks.cut=1, 
 
-         scatter.coef=TRUE, scatter.3D=FALSE, graphics=TRUE, knitr.file=NULL,
+         scatter.coef=TRUE, scatter.3D=FALSE, graphics=TRUE,
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL,
 
-         pdf=FALSE, pdf.width=5, pdf.height=5, refs=FALSE, \ldots)
+         pdf=FALSE, pdf.width=5, pdf.height=5, refs=FALSE, 
+         fun.call=NULL, \ldots)
 
 reg(\ldots) 
 
@@ -43,14 +47,23 @@ reg.brief(\ldots, brief=TRUE)
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits,
-        set by default to at least 3 or the largest number of digits in the values 
+        set by default to at least 2 or the largest number of digits in the values 
         of the response variable plus 1.}
   \item{standardize}{Standardize each of the variables in the regression model before
         conducting the analysis.}
+  \item{knitr.file}{File name for the file of knitr instructions to be written, if specified.
+        The file type is .Rmd, which automatically opens in RStudio, but it is a simple
+        text file that can be edited with any text editor, including RStudio.}
+  \item{explain}{If set to \code{FALSE} the \code{knitr} explanations
+        of the results are not provided. Set globally with options(explain=FALSE).}
+  \item{interpret}{If set to \code{FALSE} the \code{knitr} interpretations
+        of the results are not provided. Set globally with options(interpret=FALSE).}
+  \item{results}{If set to \code{FALSE} the \code{knitr} results
+        are not provided, relying upon the interpretations. Set globally with
+        options(results=FALSE).}
   \item{text.width}{Width of the text output at the console.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
         with \code{\link{set}} function.}
-  \item{explain}{On by default, but if set to \code{FALSE} the \code{knitr} instructions are less verbose.}
   \item{show.R}{Display the R instructions that yielded the \code{lessR} output, albeit without
         the additional formatting of the results such as combining output of different 
         functions into a table.}
@@ -82,9 +95,6 @@ reg.brief(\ldots, brief=TRUE)
   \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{knitr} can be useful
        to set to \code{FALSE} so that \code{\link{regPlot}} can be used to place
        the graphics within the output file.}
-  \item{knitr.file}{File name for the file of knitr instructions to be written, if specified.
-        The file type is .Rmd, which automatically opens in RStudio, but it is a simple
-        text file that can be edited with any text editor, including RStudio.}
   \item{X1.new}{Values of the first listed predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{X2.new}{Values of the second listed predictor variable for which forecasted values
@@ -100,6 +110,8 @@ reg.brief(\ldots, brief=TRUE)
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{refs}{If \code{TRUE}, then list the references for R and the packages used from
         which functions were used to generate the output.}
+  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
+        obtained from the abbreviated function call \code{reg}.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the
         core computations.} 
 }
@@ -111,17 +123,25 @@ The purpose of \code{Regression} is to combine the following function calls into
 
 The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of a linear model, \code{\link{lm}}. The output of the analysis of \code{\link{lm}} is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Regression} function. By default \code{reg} automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The correlation matrix of the model variables is obtained with \code{\link{cor}} function. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard R function \code{\link{predict}}, once with the argument \code{interval="confidence"} and once with \code{interval="prediction"}. The \code{lessR} \code{\link{Density}} function provides the histogram and density plots for the residuals and the \code{\link{ScatterPlot}} function provides the scatter plots of the residuals with the fitted values and of the data for the one-predictor model. The \code{pairs} function provides the scatterplot matrix of all the variables in the model. Thomas Lumley's \code{leaps} package contains the \code{leaps} function that provides the analysis of the fit of all possible model subsets. The \code{car} package provides Henric Nilsson and John Fox's \code{vif} function for the computation of the variance inflation factors for the collinearity analysis. The \code{scatter3d} function from Fox and Weisberg's \code{car} package provides the interactive 3d scatterplot for models with exactly two predictor variables.
 
-The output is produced in pieces, automatically collated by default in the final output. But the pieces are available for later reference if the output of the function is directed toward an object, such as \code{r} in \code{r <- reg(Y ~ X)}. This is especially useful if the pieces are accessed within \code{knitr} or individual pieces are displayed at the console.
+INPUT DATA FRAME\cr
+The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{mydata}.
+
+TEXT OUTPUT\cr
+The output is produced in pieces by topic (see \code{values} below), automatically collated by default in the final output. But the pieces are available for later reference if the output of the function is directed toward an object, such as \code{r} in \code{r <- reg(Y ~ X)}. This is especially useful if the pieces are accessed within \code{knitr} or individual pieces are displayed at the console.
+
+The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values. Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg.brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit. 
+
+knitr\cr
+A file ready for input into \code{knitr} can be obtained by specifying a value for \code{knitr.file}. For the specified file name, the directory to which the file is written is displayed on the console text output, and the file type \code{.Rmd} is automatically appended to the specified name if it is not included in the specification. Process with \code{RStudio}, or with the \code{knit} function from the \code{knitr} package and the \code{markdownToHTML} function from the \code{markdown} package. 
+
+The output from \code{knitr.file} is conceptually partitioned into three parts:  explanations, interpretations and results. By default all available output is genreated but the flags \code{explain}, \code{interpret} and \code{results} can be set to \code{FALSE} to reduce the output. The options can be specified in a specific function all or set globally, such as with \code{options(explain=FALSE)}. Turning off all three flags leaves just the outline of the potential output and a bare minimum of results.
 
 The default analysis provides as text output to the console the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, correlation matrix of the model's variables, analysis of residuals and influence as well as the confidence and prediction intervals for each observation in the model. Also provided, for multiple regression models, collinearity analysis of the predictor variables and adjusted R-squared for the corresponding models defined by each possible subset of the predictor variables. 
-
-DATA FRAME\cr
-The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{mydata}.
 
 DECIMAL DIGITS\cr
 The number of decimal digits displayed on the output is, by default, the maximum number of decimal digits for all the data values of the response variable. Or, this value can be explicitly specified with the \code{digits.d} parameter.
 
-GRAPHICS\cr
+GRAPHICS OUTPUT\cr
 Three default graphs are provided. When running \code{R} by itself, by default the graphs are written to separate graphics windows (which may overlap each other completely, in which case move the top graphics windows). Or, the \code{pdf} option may be invoked to save the graphs to a single pdf file called \code{regOut.pdf}. Within \code{RStudio} the graphs are successively written to the \code{Plots} window. Within \code{knitr} from \code{RStudio} the graphics will all appear by default at the beginning of the output. Or set to \code{graphics=FALSE}, and generate them individually with the accompanying function \code{\link{regPlot}} at the desired location within the file.
 
 1. A histogram of the residuals includes the superimposed normal and general density plots from the \code{\link{Density}} function included in this \code{lessR} package.  The overlapping density plots, which both overlap the histogram, are filled with semi-transparent colors to enhance readability.  
@@ -141,13 +161,6 @@ The data for the default analysis of the prediction intervals is for the values 
 RELATIONS AMONG THE VARIABLES\cr
 By default the correlation matrix of all the variables in the model is displayed, and, for multiple regression models, collinearity analysis is provided with the \code{vif} function from the Fox and Weisberg (2011) \code{car} package. Also provided are the first 50 models with the largest R squared adjusted from each possible model from an analysis of all possible subsets of the predictor variables.  This all subsets analysis requires the \code{leaps} function from the \code{leaps} package. These contributed packages are automatically loaded if available.  To turn off the all possible sets option, set \code{subsets=FALSE}.
 
-OUTPUT\cr
-The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values. Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg.brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit. 
-
-All text output is written into pieces, which are collated and displayed automatically at the console if there is no assignment to an output object. If an output object is specified, such as \code{r} in \code{r <- reg(Y ~ X)}, then the output is automatically collated and displayed at the console when the name of the object is entered at the console. Or access each individual piece for display (see \code{value} below). 
-
-The \code{knitr} piece is ready for input into \code{knitr}. It can be obtained by specifying a value for \code{knitr.file}, or from saving the output of the function into an object, such as \code{r} in \code{r <- reg(Y ~ X)}, and then copying the contents of \code{r\$knitr}. For the specified file name, the directory to which the file is written is displayed on the console text output, and the file type \code{.Rmd} is automatically appended to the specified name if it is not present.
-
 
 INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{Regression} is finished with a normal termination, the options are re-set to their values before the \code{Regression} function began executing.
@@ -156,14 +169,15 @@ COLOR THEME\cr
 A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{set}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}. 
 
 VARIABLE LABELS\cr
-If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.}
+If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
+}
 
 \value{
-The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3 into three different types: pieces of text that form the readable output, a variety of statistics, and \code{knitr} instructions. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The \code{knitr} output is available for entry direct into \code{knitr}. The motivation of these three types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The motivation of these three types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the \code{knitr} document (see \code{examples}).
 
-READABLE OUTPUT\cr
+TEXT OUTPUT\cr
 \code{out_background}: Variables in the model, rows of data and retained\cr
-\code{out_coefs}: Estimated coefficients, hypothesis tests and confidence intervals\cr
+\code{out_estimates}: Estimated coefficients, hypothesis tests and confidence intervals\cr
 \code{out_fit}: Fit indices\cr
 \code{out_anova}: Analysis of variance\cr
 \code{out_cor}: Correlations among all variables in the model\cr
@@ -176,31 +190,44 @@ READABLE OUTPUT\cr
 \code{out_knitr.file}: Lists the name and location of the \code{knitr} instructions\cr
 \code{out_plots}: List of plots generated if more than one\cr
 
+Also separated from the rest of the text output are the major headings, which can then be deleted from custom collations of the output.
+\code{out_title_bck}: BACKGROUND\cr
+\code{out_title_basic}: BASIC ANALYSIS\cr
+\code{out_title_rel}: RELATIONS AMONG THE VARIABLES\cr
+\code{out_title_res}: ANALYSIS OF RESIDUALS AND INFLUENCE\cr
+\code{out_title_pred}: FORECASTING ERROR\cr
+
 STATISTICS\cr
+\code{fun.call}: Function call that generated the analysis\cr
 \code{formula}: Model formula that specifies the model\cr
 \code{n.vars}: Number of variables in the model\cr
 \code{n.obs}: Number of rows of data submitted for analysis\cr
 \code{n.keep}: Number of rows of data retained in the analysis\cr
-\code{coefs}: Estimated regression coefficients\cr
+\code{coefficients}: Estimated regression coefficients\cr
 \code{sterrs}: Standard errors of the estimated coefficients\cr
 \code{tvalues}: t-values of the estimated coefficients for null of 0\cr
 \code{pvalues}: p-values from the t-tests of the estimated coefficients\cr
 \code{cilb}: lower bound of 95\% confidence interval of estimate\cr
 \code{ciub}: upper bound of 95\% confidence interval of estimate \cr
-\code{SSE}: sum of squared residuals\cr
+\code{anova_model}: Model df, ss, ms, F-value and p-value\cr
+\code{anova_residual}: Residual df, ss and ms\cr
+\code{anova_total}: Total df, ss and ms\cr
 \code{se}: standard deviation of the residuals\cr
+\code{resid_range}: 95\% range of normally distributed fitted residuals\cr
 \code{Rsq}: R-squared\cr
 \code{Rsqadj}: adjusted R-squared\cr
+\code{PRESS}: PRESS sum of squares\cr
+\code{RsqPRESS}: PRESS R-squared\cr
 \code{cor}: correlation matrix of all variables in the model\cr
 \code{tolerances}: tolerance of each predictor variable for collinearity analysis\cr
 \code{VIF}: Variance inflation factor for each predictor variable\cr
-\code{cooks.max}: Five largest values of Cook's distance\cr
+\code{resid.max}: Five largest values of the residuals on which the ouput is sorted\cr
+\code{pred_min_max}: Rows with the smallest and largest prediction intervals\cr
 \code{residuals}: Residuals\cr
 \code{fitted.values}: Fitted values\cr
 \code{cooks.distance}: Cook's distance\cr
 \code{model}: Data retained for the analysis\cr
-\code{terms}: Terms\cr
-\code{knitr}: Instructions to run through \code{knitr}, such as copy and paste, to obtain output in the form of a web file, pdf document or Word document. Can also obtain these instructions with the \code{knitr.file} option, which writes them directly to the specified text file. Obtain a less detailed \code{knitr} file by setting \code{explain=FALSE}. 
+\code{terms}: Terms specified for the analysis\cr
 
 Although not typically needed for analysis, if the regression output is assigned to an object named, for example, \code{r}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(r)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out_piece}.
 }
@@ -219,44 +246,42 @@ Xie, Y. (2013). Dynamic Documents with R and knitr, Chapman & Hall/CRC The R Ser
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{formula}}, \code{\link{lm}}, \code{\link{summary.lm}}, \code{\link{anova}}, \code{\link{confint}}, \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, \code{\link{cooks.distance}}
+\code{\link{formula}}, \code{\link{lm}}, \code{\link{summary.lm}}, \code{\link{anova}}, \code{\link{confint}}, \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, \code{\link{cooks.distance}}, \code{\link{Nest}}, \code{\link{regPlot}}
 }
 
 \examples{
 # Read internal data set
-mydata <- rd("Reading", format="lessR")
+mydata <- rd("Reading", format="lessR", quiet=TRUE)
 
 # One-predictor regression
 # Provide all default analyses including scatterplot etc.
 Regression(Reading ~ Verbal)
-# short name
+# short name of function call
 reg(Reading ~ Verbal)
 # Provide only the brief analysis on the standardized variables
 reg.brief(Reading ~ Verbal, standardize=TRUE)
 
 # Access the pieces of output, here in an object named \code{r}
-r <- reg(Reading ~ Verbal + Absent + Income, scatter.coef=TRUE)
+r <- reg(Reading ~ Verbal + Absent + Income)
 # Display all output at the console
 r
-# Display just the estimated coefficients and their inferential analysis
-r$out_coefs
-#This information is retrieved in the \code{knitr} file as:
-#```{r, echo=FALSE}
-#r$out_coefs
-#```
-# Display the \code{knitr} code
-# in RStudio, copy and paste into the R markdown window and knit
-r$knitr
-# list the names of all the components
+# list the names of all the saved components
 names(r)
-# can also access the knitr instructions with the option: knitr.file
-# output file will be MyRegKnit.Rmd, a simple text file that can
+# Display just the estimated coefficients and their inferential analysis
+r$out_estimates
+# This output obtained from the \code{knitr} file with the 
+#   following automatically generated instructions (when results=TRUE)
+#```{r, echo=FALSE}
+#r$out_estimates
+#```
+
+# Generate knitr instructions with the option: knitr.file
+# Output file will be reg_knit.Rmd, a simple text file that can
 #   be edited with any text editor including RStudio from which it
 #   can be knit to generate dynamic output such as to a Word document
-reg(Reading ~ Verbal, knitr.file="MyRegKnit")
-
-# Compare nested models
-Nest(Reading, Verbal, c(Verbal,Absent))
+reg(Reading ~ Verbal + Absent, knitr.file="read")
+# knitr.file with no explanations
+reg(Reading ~ Verbal + Absent, knitr.file="read", explain=FALSE)
 
 # Modify the default settings as specified
 Regression(Reading ~ Verbal, res.row=8, res.sort="rstudent", pred.rows=0, digits.d=4)
@@ -266,6 +291,11 @@ Regression(Reading ~ Verbal, res.row=8, res.sort="rstudent", pred.rows=0, digits
 Regression(Reading ~ Verbal + Absent + Income)
 # Save the three plots as pdf files 4 inches square
 Regression(Reading ~ Verbal, pdf=TRUE, pdf.width=4, pdf.height=4)
+
+# Compare nested models
+# Reduced model:  Reading ~ Verbal
+# Full model:  Reading ~ Verbal + Income + Absent
+Nest(Reading, Verbal, c(Income, Absent))
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values and the corresponding prediction intervals
@@ -277,9 +307,4 @@ Regression(mpg ~ hp + wt + disp, data=mtcars,
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ regression }
-
-
-
-
-
 

@@ -1,7 +1,7 @@
 .hst.main <- 
 function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
        over.grid, cex.axis, col.axis, breaks, bin.start, bin.width,
-       bin.end, prop, cumul, digits.d, xlab, ylab, main, quiet, ...) {
+       bin.end, prop, cumul, xlab, ylab, main, quiet, ...) {
 
 
   if (!is.numeric(x)) { 
@@ -130,12 +130,14 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
   if (!quiet) {
 
     tx <- character(length = 0)
+    
+    bin.width <- h$breaks[2]-h$breaks[1]
+    n.bins <- length(h$breaks)-1
+    tx[length(tx)+1] <- paste("Bin Width:", bin.width)
+    tx[length(tx)+1] <- paste("Number of Bins:", n.bins)
+    tx[length(tx)+1] <- ""
 
-    # frequency table
     # j<17 condition is to stop the 0.99999... problem
-    cum.c <- cumsum(h$counts)
-    prop <- h$counts / length(x)
-    cum.p <- cumsum(prop)
     max.dg <- 0
     for (i in 1:length(h$breaks)) {
       j <- nchar(as.character(h$breaks[i]))
@@ -147,26 +149,44 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
       if (j>max.dg.mid && j<19) max.dg.mid <- j
     }
     x.breaks <- format(h$breaks, width=max.dg, justify="right", scientific=FALSE)
-    x.mids <- format(h$mids, width=max.dg.mid+3, justify="right", scientific=FALSE)
-    
-    bin.width <- h$breaks[2]-h$breaks[1]
-    n.bins <- length(h$breaks)-1
-    tx[length(tx)+1] <- paste("Bin Width:", bin.width)
-    tx[length(tx)+1] <- paste("Number of Bins:", n.bins)
+    x.mids <- format(h$mids, width=max.dg.mid, justify="right", scientific=FALSE)
+
+    bn <- character(length=0)
+    for (i in 1:(length(x.breaks)-1))
+      bn[i] <- paste(x.breaks[i], ">", x.breaks[i+1])
+
+    cum.c <- cumsum(h$counts)
+    prop <- h$counts / length(x)
+    cum.p <- cumsum(prop)
+
+    out <- data.frame(bn, stringsAsFactors=FALSE)
+    out$x.mids <- x.mids
+    out$counts <- formatC(h$counts, digits=0, format="f")
+    out$prop <- formatC(prop, digits=2, format="f")
+    out$cum.c <- formatC(cum.c, digits=0, format="f")
+    out$cum.p <- formatC(cum.p, digits=2, format="f")
+    names(out) <- c("Bin", "Midpnt", "Count", "  Prop", "Cumul.c", "Cumul.p")
+
+    # width of columns
+    max.ln <- integer(length=0)
+    for (i in 1:ncol(out)) {
+      ln.nm <- nchar(colnames(out)[i]) + 1
+      max.val <- max(nchar(out[,i]))
+      max.ln[i] <- max(ln.nm, max.val) + 1
+    }
+
+    # write col labels
     tx[length(tx)+1] <- ""
-    buf1 <- format("", width=max.dg+1)
-    strt <- 9 + 2*max.dg
-    my.width <- strt-(nchar(buf1)+nchar("Bin"))-7
-    buf2 <- format(" ", width=my.width)
-    tx[length(tx)+1] <-.dash2(56)
-    tx[length(tx)+1] <- paste(buf1,"Bin",buf2,"  Midpoint","  Count","  Prop",
-                           "  Cumul.c"," Cumul.p",sep="")
-    tx[length(tx)+1] <-.dash2(56)
-    for (i in 2:length(h$breaks)-1)
-      tx[length(tx)+1] <- paste(sprintf("%s > %s %s %6.0f %6.2f %6.0f %6.2f",
-          x.breaks[i], x.breaks[i+1], x.mids[i], h$counts[i], prop[i],
-          cum.c[i], cum.p[i])) 
-    tx[length(tx)+1] <-.dash2(56)
+    for (i in 1:ncol(out))
+      tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(out)[i], w=max.ln[i]), sep="")
+    tx[length(tx)+1] <- .dash2(sum(max.ln))
+
+    # write values
+    for (i in 1:nrow(out)) {
+      tx[length(tx)+1] <- ""
+       for (j in 1:ncol(out)) 
+          tx[length(tx)] <- paste(tx[length(tx)], .fmtc(out[i,j], w=max.ln[j]), sep="")
+    }
 
     return(list(tx=tx, bin.width=bin.width, n.bins=n.bins, breaks=h$breaks, 
       mids=h$mids, counts=h$counts, prop=prop, counts_cum=cum.c,

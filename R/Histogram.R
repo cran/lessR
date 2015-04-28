@@ -1,5 +1,6 @@
 Histogram <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
+    knitr.file=NULL,
 
     col.fill=getOption("col.fill.bar"), 
     col.stroke=getOption("col.stroke.bar"),
@@ -15,8 +16,11 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL,
 
     quiet=getOption("quiet"),
-    pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {
+    pdf.file=NULL, pdf.width=5, pdf.height=5,
+    fun.call=NULL, ...) {
 
+
+  if (is.null(fun.call)) fun.call <- match.call()
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
@@ -83,6 +87,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       pdf.fnm <- .pdfname("Hist", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)
  
+      txss <- ""
       if (!quiet) {
         ssstuff <- .ss.numeric(data[,i], digits.d=digits.d, brief=TRUE)
         txss <- ssstuff$tx
@@ -90,9 +95,24 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
       stuff <- .hst.main(data[,i], col.fill, col.stroke, col.bg, col.grid, col.reg,
           over.grid, cex.axis, col.axis, breaks, bin.start, bin.width,
-          bin.end, prop, cumul, digits.d, xlab, ylab, main, quiet, ...)
+          bin.end, prop, cumul, xlab, ylab, main, quiet, ...)
       txdst <- stuff$tx
-      txotl <- .outliers2(data[,i])
+      if (length(txdst)==0) txdst <- ""
+
+      txotl <- ""
+      if (!quiet) {
+        txotl <- .outliers2(data[,i])
+        if (length(txotl)==0) txotl <- "No outliers"
+      }
+
+      if (ncol(data) > 1) {  # for a variable range, print the text output
+        class(txss) <- "out_piece"
+        class(txdst) <- "out_piece"
+        class(txotl) <- "out_piece"
+        output <- list(out_ss=txss, out_freq=txdst, out_outliers=txotl)
+        class(output) <- "out_all"
+        print(output)
+      }
 
       if (go.pdf) {
         dev.off()
@@ -108,16 +128,37 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   dev.set(which=2)  # reset graphics window for standard R functions
 
+
   if (ncol(data)==1  &&  nu>n.cat) {
+
+    # knitr
+    txkfl <- ""
+    if (!is.null(knitr.file)) {
+      txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
+      knitr.file <- paste(knitr.file, txt, sep="") 
+      txknt <- .dist.knitr(x.name, df.name, fun.call, digits.d)
+      cat(txknt, file=knitr.file, sep="\n")
+      txkfl <- .showfile2(knitr.file, "knitr instructions")
+    }
+ 
     class(txss) <- "out_piece"
     class(txdst) <- "out_piece"
     class(txotl) <- "out_piece"
-    output <- list(out_ss=txss, out_freq=txdst, out_outliers=txotl,
-      bin_width=stuff$bin.width, n_bins=stuff$n.bins, breaks=stuff$breaks,
+    class(txkfl) <- "out_piece"
+
+    output <- list(type="Histogram",
+      call=fun.call, 
+      out_ss=txss, out_freq=txdst, out_outliers=txotl,
+      out_file=txkfl,
+      bin_width=stuff$bin.width, n_bins=stuff$n.bins,
+      breaks=stuff$breaks,
       mids=stuff$mids, counts=stuff$counts, prop=stuff$prop,
       counts_cumul=stuff$counts_cum, prop_cumul=stuff$prop_cum)
+
     class(output) <- "out_all"
+
     return(output)
+
   }
 
 }

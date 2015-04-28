@@ -113,12 +113,9 @@ function(x, by,
       stripchart(x.lv, pch=shp[i], col=clr[i], bg=clr.tr[i], 
              cex=pt.size, lwd=0.75, add=TRUE, ...)
     }
-    cat("\nTransparency level for plotted points: ", trans.pts, "\n")
 
     .plt.legend(levels(by), col.stroke, clr, clr.tr, shp, trans.pts, col.bg, usr)
 
   }  # end by group
-
-  if (!quiet) cat("\n")
 
 }

@@ -27,7 +27,9 @@ Read(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
       
          max.lines=30, sheet=1,
 
-         brief=getOption("brief"), quiet=getOption("quiet"), \dots)
+         brief=getOption("brief"), quiet=getOption("quiet"),
+
+         fun.call=NULL, \dots)
 
 rd(\ldots) 
 
@@ -69,6 +71,8 @@ Read2(\ldots, sep=";", dec=",")
   \item{brief}{If \code{TRUE}, display only variable names table plus any variable labels.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change the corresponding system
        default with \code{\link{set}} function.}
+  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
+        obtained from the abbreviated function call \code{rd}.}
   \item{...}{Other parameter values define with the R read functions, such as the
        \code{read.table} function for text files, with row.names and header.}
 }

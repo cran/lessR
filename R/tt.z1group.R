@@ -105,10 +105,9 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     }
   }     
 
-  if (!brief) {
-    cat("t-cutoff: tcut = ", .fmt(tcut,3), "\n") 
-    cat("Standard Error of Mean: SE = ", .fmt(sterr), "\n\n")
-  }
+  cat("t-cutoff: tcut = ", .fmt(tcut,3), "\n") 
+  cat("Standard Error of Mean: SE = ", .fmt(sterr), "\n\n")
+
   if (!is.null(mu0)) {
     cat("Hypothesized Value H0: mu =", mu0, "\n")
     txt <- "Hypothesis Test of Mean:  t-value = "

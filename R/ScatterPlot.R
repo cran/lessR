@@ -1,5 +1,6 @@
 ScatterPlot <-
 function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
+         knitr.file=NULL, digits.d=NULL,
 
          col.fill=getOption("col.fill.pt"),
          col.stroke=getOption("col.stroke.pt"),
@@ -26,8 +27,11 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
 
          quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         pdf.file=NULL, pdf.width=5, pdf.height=5,
+         fun.call=NULL, ...) {
 
+
+  if (is.null(fun.call)) fun.call <- match.call()
 
   fit.line <- match.arg(fit.line)
   kind <- match.arg(kind)
@@ -195,7 +199,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
 
   else {
 
-    if (!missing(y)) {
+    if (!missing(y)) {  # 2-D plot
       .plt.main(x.call, y.call, by.call, data, type, n.cat,
          col.fill, col.stroke, col.bg, col.grid,
          shape.pts, col.area, col.box, 
@@ -206,12 +210,40 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          diag, col.diag, lines.diag, quiet, ...)
     }
 
-    else
+    else {  # 1-D plot
       .dp.main(x.call, by.call,
          col.fill, col.stroke, col.bg, col.grid, shape.pts,
          cex.axis, col.axis, xlab, main, cex, 
          method, pt.reg, pt.out, 
          col.out30, col.out15, quiet, new, ...)
+
+      # terminate pdf graphics system if used
+      if (!is.null(pdf.file)) {
+        dev.off()
+        .showfile(pdf.file, "plot")
+      }
+
+      # knitr
+      txkfl <- ""
+      if (!is.null(knitr.file)) {
+        txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
+        knitr.file <- paste(knitr.file, txt, sep="") 
+        txknt <- .dist.knitr(x.name, df.name, fun.call, digits.d)
+        cat(txknt, file=knitr.file, sep="\n")
+        txkfl <- .showfile2(knitr.file, "knitr instructions")
+      }
+
+      class(txkfl) <- "out_piece"
+
+      output <- list(
+        call=fun.call,
+        type="1D_ScatterPlot", out_file=txkfl)
+
+      class(output) <- "out_all"
+
+      return(output)
+    }  # end 1-D plot
+
   }
 
   # terminate pdf graphics system if used

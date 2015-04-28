@@ -206,6 +206,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     }
 
     class(output) <- "out_all"
+
     return(output)
 
   }

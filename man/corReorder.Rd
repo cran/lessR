@@ -11,7 +11,7 @@ Re-arranges the order of the variables in the input correlation matrix.  If no v
 }
 
 \usage{
-corReorder(x=mycor, vars=NULL, first=0,
+corReorder(R=mycor, vars=NULL, first=0,
           heat.map=TRUE, main=NULL, bottom=3,right=3,
           pdf.file=NULL, pdf.width=5, pdf.height=5)
 
@@ -19,7 +19,7 @@ reord(\ldots)
 }
 
 \arguments{
-  \item{x}{Correlation matrix.}
+  \item{R}{Correlation matrix.}
   \item{vars}{List of the re-ordered variables, each variable listed by its ordinal
        position in the input correlation matrix.}
   \item{first}{The first variable listed in the ordered matrix.}
@@ -68,18 +68,15 @@ rownames(mycor) <- colnames(mycor)
 
 # leave only the 3 indicators of the second factor
 #  in reverse order
-corReorder(vars=c(V6,V5,V4))
+#replace original mycor
+mycor <- corReorder(vars=c(V6,V5,V4))
 
-# reorder the variables according to the ordering algorithm
-corReorder()
-
-# abbreviated form
-# retain only the first three variables
-reord(vars=c(V1:V3))
+#  by their sums of squares
+mynewcor <- corReorder()
 
 # reorder the variables according to the ordering algorithm
 #  with the 4th variable listed first
-corReorder(first=4)
+mynewcor <- corReorder(first=2)
 }
 
 

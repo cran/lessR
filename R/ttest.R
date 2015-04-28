@@ -23,9 +23,9 @@ function(x, y=NULL, ...) {
   if (missing(y))
     no.y <- TRUE
   else 
-    if (is.null(y)) no.y <- TRUE else no.y  <- FALSE
-  if (is.null(n1) && no.y) two.gp <- FALSE else two.gp <- TRUE
-  if (is.null(n) && is.null(n1)) from.data <- TRUE else from.data <- FALSE
+    no.y <- ifelse (is.null(y), TRUE, FALSE)
+  two.gp <- ifelse (is.null(n1) && no.y, FALSE, TRUE)
+  from.data <- ifelse (is.null(n) && is.null(n1), TRUE, FALSE)
 
   if (!from.data) graph <- FALSE
 

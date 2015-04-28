@@ -10,10 +10,13 @@ Abbreviation: \code{bx}
 Uses the standard R boxplot function, \code{\link{boxplot}} to display a boxplot in color. Also display the relevant statistics such as the hinges, median and IQR.
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
+
+When output is assigned into an object, such as \code{b} in \code{b <- bx(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output is embedded in documents, facilitated by the \code{knitr.file} option. See \code{value} below.
 }
 
 \usage{
 BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
+        knitr.file=NULL,
 
         col.fill=getOption("col.fill.bar"),
         col.stroke=getOption("col.stroke.bar"), 
@@ -26,7 +29,8 @@ BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         horiz=TRUE, add.points=FALSE,
 
         quiet=getOption("quiet"),
-        pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+        pdf.file=NULL, pdf.width=5, pdf.height=5,
+        fun.call=NULL, \ldots)
 
 bx(\ldots)
 }
@@ -44,6 +48,8 @@ bx(\ldots)
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric data type
         for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
+  \item{knitr.file}{File name for the file of knitr instructions to be written,
+        if specified.}
   \item{col.fill}{Color of the box.}
   \item{col.stroke}{Color of any points that designate outliers. By default this
        is the same color as the box.}
@@ -66,6 +72,8 @@ bx(\ldots)
        no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
+  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
+        obtained from the abbreviated function call \code{bx}.}
   \item{\dots}{Other parameter values for graphics as defined processed 
        by \code{\link{boxplot}} and \code{\link{bxp}} such as \code{whiskcol} for
        the whisker color, etc. and \code{\link{par}}, including \code{ylim} to set
@@ -107,7 +115,26 @@ Instead, do the following:
 }
 
 \value{
-Based on the standard \code{R} function \code{\link{boxplot}}, invisibly returns a list with components described in \code{\link{boxplot}}.
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+
+READABLE OUTPUT\cr
+code{out_stats}: Summary statistics for a box plot\cr
+code{out_outliers}: Outlier analysis\cr
+code{out_file}: Name and location of optional knitr file\cr
+
+STATISTICS\cr
+code{n}: Number of data values analyzed\cr
+code{n.miss}:  Number of missing data values\cr
+code{min}:  Minimum\cr
+code{lower_whisker}: Lower whisker \cr
+code{lower_hinge}:  Lower hinge\cr
+code{median}: Median\cr
+code{upper_hinge}: Upper hinge\cr
+code{upper_whisker}: Upper whisker \cr
+code{max}: Maximum \cr
+code{IQR}: Inter-quartile range \cr
+
+Although not typically needed, if the output is assigned to an object named, for example, \code{h}, then the contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(h)}.
 }
 
 \references{
@@ -150,16 +177,21 @@ BoxPlot(y, col.stroke="red", xlab="My Variable")
 # box plots for data frames and multiple variables
 # ------------------------------------------------
 
-# create data frame, mydata, to mimic reading data with rad function
+# read internal lessR dataset
 # mydata contains both numeric and non-numeric data
-mydata <- data.frame(rnorm(100), rnorm(100), rnorm(100), rep(c("A","B"),50))
-names(mydata) <- c("X","Y","Z","C")
-
-# box plot for variable X from data frame, referred to directly
-BoxPlot(X)
+mydata <- rd("Employee", format="lessR", quiet=TRUE)
 
 # box plot with superimposed dot plot (stripchart)
-BoxPlot(X, add.points=TRUE)
+BoxPlot(Salary, add.points=TRUE)
+
+# box plot with results saved to object b instead of displaying 
+b <- BoxPlot(Salary)
+# show the results
+b
+# show just the piece regarding the statistics
+b$out_stats
+# list the names of all the components
+names(b)
 
 # box plots for all numeric variables in data frame called mydata
 BoxPlot()
@@ -170,7 +202,7 @@ BoxPlot(col.fill="palegreen1", col.stroke="plum")
 
 # Use the subset function to specify a variable list
 # box plots for all specified numeric variables
-BoxPlot(c(X,Y))
+BoxPlot(c(Salary,Years))
 }
 
 

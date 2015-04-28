@@ -1,5 +1,5 @@
 bx <-
 function(...)
 
-  BoxPlot(...)
+  BoxPlot(fun.call=match.call(), ...)
 

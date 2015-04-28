@@ -6,7 +6,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.3     RStudio, knitr compatible      www.lessRstats.com\n",
+      "lessR 3.3.1    RStudio, knitr compatible     www.lessRstats.com\n",
       "---------------------------------------------------------------\n",
       "To get started, and for help in general, enter:  Help()\n",
       "To read a text, Excel, SPSS or R data file:  mydata <- Read()\n",
@@ -32,6 +32,9 @@ function(...) {
 
   options(quiet=FALSE)
   options(brief=FALSE)
+  options(explain=TRUE)
+  options(interpret=TRUE)
+  options(results=TRUE)
 
   options(show.signif.stars=FALSE)
   options(scipen=30)
@@ -46,7 +49,7 @@ function(...) {
     nchar(xc)
     ipos <- 0
     for (i in 1:nchar(xc)) if (substr(xc,i,i)==".") ipos <- i
-    if (ipos > 0) n.dec <- nchar(xc)-ipos else n.dec <- 0
+    n.dec <- ifelse (ipos > 0, nchar(xc)-ipos, 0)
     return(n.dec)
   }
 
@@ -72,10 +75,8 @@ function(...) {
 }
 
 .dash2 <- function(ndash, cc="-") {
-
   tx <- ""
-  for (i in 1:(ndash)) tx <- paste(tx, cc, sep="")
-
+  if (!is.null(cc)) for (i in 1:(ndash)) tx <- paste(tx, cc, sep="")
   return(tx)
 }
 
@@ -137,10 +138,10 @@ function(...) {
 .xstatus <- function(var.name, dname, quiet=FALSE) {
 
   # see if analysis from data is based on a formula
-  if (grepl("~", var.name)) is.frml <- TRUE else is.frml <- FALSE
+  is.frml <- ifelse (grepl("~", var.name), TRUE, FALSE)
 
   # see if analysis is from descriptive stats or from data 
-  if (var.name == "NULL") from.data <- FALSE else from.data <- TRUE
+  from.data <- ifelse (var.name == "NULL", FALSE, TRUE)
 
   # see if the variable exists in the Global Environment
   in.global <- FALSE
@@ -204,6 +205,30 @@ function(...) {
           "To view the existing variable names enter: > names(", dname, ")\n\n")
     }
   }
+}
+
+
+# see if cor matrix exists as stand-alone or embedded in list structure
+.cor.exists <- function(cor.nm) {
+
+  if (!grepl("$cors", cor.nm, fixed=TRUE))  # no $cors in name
+    is.there <- exists(cor.nm, where=.GlobalEnv)
+
+  else {
+    nm <- sub("$cors", "", cor.nm, fixed=TRUE)  # remove $cors from name
+    if (!exists(nm, where=.GlobalEnv))  # root list exists?
+      is.there <- FALSE
+    else
+      is.there  <- exists("cors", where=eval(parse(text=nm)))  #  cors inside?
+  }
+  if (!is.there) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "No correlation matrix entered.\n\n",
+      "No object called ", cor.nm, " exists.\n\n",
+      "Either enter the correct name, or calculate with: Correlation\n",
+      "Or read the correlation matrix with: corRead\n\n", sep="")
+  }
+
 }
 
 
@@ -358,9 +383,13 @@ function(...) {
 
   tx[length(tx)+1] <- txt1
   if (!isnullby) {
-    tx[length(tx)+1] <- "  - by levels of - "
+    if (is.null(y.lbl))
+      tx[length(tx)+1] <- "  - by levels of - "
+    else
+      tx[length(tx)+1] <- "\n  - by levels of - \n"
     tx[length(tx)+1] <- txt2
-    tx[length(tx)+1] <- .dash2(max(nchar(txt1),nchar(txt2)))
+    if (is.null(y.lbl))
+      tx[length(tx)+1] <- .dash2(max(nchar(txt1),nchar(txt2)))
   }
 
   return(tx)
@@ -416,20 +445,11 @@ function(...) {
 # see if manage graphics or just sequentially plot
 .graphman <- function() {
 
-  if (options("device") != "RStudioGD")
-    in.RStudio <- FALSE
-  else
-    in.RStudio <- TRUE
+  in.RStudio <- ifelse (options("device") != "RStudioGD", FALSE, TRUE)
 
-  if (is.null(options()$knitr.in.progress))
-    in.knitr <- FALSE
-  else
-    in.knitr <- TRUE
+  in.knitr <- ifelse (is.null(options()$knitr.in.progress), FALSE, TRUE)
 
-  if (!in.RStudio  &&  !in.knitr)
-    manage.gr <- TRUE
-  else
-    manage.gr <- FALSE
+  manage.gr <- ifelse (!in.RStudio  &&  !in.knitr, TRUE, FALSE)
 
   return(manage.gr)
 }
@@ -449,7 +469,7 @@ function(...) {
     for (i in min.dd:max.dd) dev.off(which=i)
   }
 
-  if (length(dl2) == 0) off.two <- TRUE else off.two <- FALSE
+  off.two <- ifelse (length(dl2) == 0, TRUE, FALSE)
 
   # open graphics windows
   # if not already present, generate a null window for #2 and then remove
@@ -530,8 +550,71 @@ function(...) {
   return(col.trans)
 }
 
+
 .to256 <- function(trans.level)
    trn <- (1-getOption(trans.level))*256
+
+
+# change class call to class character
+.fun.call.deparse <- function(fun.call) {
+
+  fc.d <- deparse(fun.call)
+  if (length(fc.d) > 1) {  # multiple lines
+    fc <- fc.d[1]
+    for (i in 2:length(fc.d)) fc <- paste(fc, fc.d[i], sep="")  
+  }
+  else
+    fc <- fc.d
+  fc <- sub("    ", " ", fc, fixed=TRUE)
+  fc <- sub("  ", " ", fc, fixed=TRUE)
+
+  return(fc)
+
+}
+
+
+# get the value for a specified function argument
+.get.arg <- function(argm, fc) {
+
+  loc <- regexec(argm, fc)
+  strt1 <- loc[[1]]  # beginning of argument
+  if (strt1 > 0) {
+    j <- strt1
+    while(substr(fc, start=j, stop=j) != "\"") j <- j + 1 
+    strt <- j
+    j <- j + 1  # first " after ,
+    while(substr(fc, start=j, stop=j) != "\"") j <- j + 1 
+    stp <- j  # second " after ,
+    value <- substr(fc, start=strt, stop=stp)
+  }
+  else
+    value <- ""
+
+  return(value)
+}
+
+
+# remove argument and value from a function call
+# argument cannot be listed first
+.rm.arg <-  function(argm, fc) {
+
+  loc <- regexec(argm, fc)
+  strt1 <- loc[[1]]  # beginning of argument
+  if (strt1 > 0) {
+    j <- strt1
+    while(substr(fc, start=j, stop=j) != ",") j <- j - 1 
+    strt <- j  # comma before argument
+    while(substr(fc, start=j, stop=j) != "\"") j <- j + 1 
+    j <- j + 1  # first " after ,
+    while(substr(fc, start=j, stop=j) != "\"") j <- j + 1 
+    stp <- j  # second " after ,
+    remv <- substr(fc, start=strt, stop=stp)
+    fc <- sub(remv, "", fc, fixed=TRUE)
+  }
+
+  return(fc)
+}
+
 
 
 .outliers <- function(x) {
@@ -586,59 +669,62 @@ function(...) {
   tx <- character(length = 0)
 
   outliers <- boxplot.stats(x)$out
-  if (length(outliers>0) && unique(na.omit(x)>3)) {
-  tx[length(tx)+1] <- paste("Number of outliers:", length(outliers))
 
-  lo.whisker <- boxplot.stats(x)$stats[1]
-  lo.out <- outliers[outliers < lo.whisker]
-  lo.out <- sort(lo.out, decreasing=FALSE)
-  lo.len <- length(lo.out)
-  tx[length(tx)+1] <- "Small: "
-  if (lo.len > 0) {
-    if (lo.len <= 25) {
-      for (i in 1:lo.len)
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
+  if (length(outliers>0) && length(unique(na.omit(x)>3))) {
+    tx[length(tx)+1] <- paste("Number of outliers:", length(outliers))
+
+    lo.whisker <- boxplot.stats(x)$stats[1]
+    lo.out <- outliers[outliers < lo.whisker]
+    lo.out <- sort(lo.out, decreasing=FALSE)
+    lo.len <- length(lo.out)
+    tx[length(tx)+1] <- "Small: "
+    if (lo.len > 0) {
+      if (lo.len <= 25) {
+        for (i in 1:lo.len)
+          tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
+      }
+      else {
+        for (i in 1:16) 
+          tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
+        tx[length(tx)] <- "...  "
+        for (i in (lo.len-5):lo.len)
+          tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
+      }
     }
-    else {
-      for (i in 1:16) 
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
-      tx[length(tx)] <- "...  "
-      for (i in (lo.len-5):lo.len)
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
+    else
+      tx[length(tx)] <- paste(tx[length(tx)], "none")
+
+    hi.whisker <- boxplot.stats(x)$stats[5]
+    hi.out <- outliers[outliers > hi.whisker]
+    hi.out <- sort(hi.out, decreasing=FALSE)
+    hi.len <- length(hi.out)
+    tx[length(tx)+1] <- "Large:"
+    if (hi.len > 0) {
+      if (hi.len <= 25) {
+        for (i in 1:hi.len) 
+          tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
+      }
+      else {
+        for (i in 1:16)
+          tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
+        tx[length(tx)] <- paste(tx[length(tx)], "...  ")
+        for (i in (hi.len-5):hi.len)
+          tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
+      }
     }
+    else
+      tx[length(tx)] <- paste(tx[length(tx)], "none")
+
   }
+
   else
-    tx[length(tx)] <- paste(tx[length(tx)], "none")
-
-  hi.whisker <- boxplot.stats(x)$stats[5]
-  hi.out <- outliers[outliers > hi.whisker]
-  hi.out <- sort(hi.out, decreasing=FALSE)
-  hi.len <- length(hi.out)
-  tx[length(tx)+1] <- "Large:"
-  if (hi.len > 0) {
-    if (hi.len <= 25) {
-      for (i in 1:hi.len) 
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
-    }
-    else {
-      for (i in 1:16)
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
-      tx[length(tx)] <- paste(tx[length(tx)], "...  ")
-      for (i in (hi.len-5):hi.len)
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
-    }
-  }
-  else
-    tx[length(tx)] <- paste(tx[length(tx)], "none")
-
-  }
+    tx <- ""
 
   return(tx)
 }
 
 
-
-.prntbl <- function(x, digits.d=2, cc="-") {
+.prntbl <- function(x, digits.d=2, cut=0, cc="-", brk=NULL) {
   tx <- character(length = 0)
 
   # width of column 1
@@ -653,36 +739,44 @@ function(...) {
   max.ln <- integer(length=0)
   for (i in 1:ncol(x)) {
     ln.nm <- nchar(colnames(x)[i])
-    max.ln[i] <- ln.nm + 1
-    for (j in 1:nrow(x)) {
-      xjc <- .fmt(x[j,i], d=digits.d)
-      if (nchar(xjc) > max.ln[i]) max.ln[i] <- nchar(xjc)
-    }
-    max.ln[i] <- max.ln[i] + 1
+    if (is.numeric(x[1,i]))
+      max.val <- max(nchar(formatC(x[,i], digits=digits.d, format="f")))
+    else
+      max.val <- 4
+    max.ln[i] <- max(ln.nm, max.val) + 1
     if (max.ln[i] < 4) max.ln[i] <- 4
   }
 
-  tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1, cc=cc)
-  #tx[length(tx)+1] <- ""
+  if (!is.null(cc)) tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1, cc=cc)
 
-  # col labels
+  # write col labels
   tx[length(tx)+1] <-  format("", width=max.c1)
   for (i in 1:ncol(x))
-    tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i], w=max.ln[i]), sep="")
+    tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i],
+                              w=max.ln[i]), sep="")
 
-  # values
+if (is.data.frame(x)) {  # factor to char
+  i.col <- sapply(x, is.factor)
+  x[i.col] <- lapply(x[i.col], as.character)
+}
+
+  # write values
   for (i in 1:nrow(x)) {
+    if (i %in% brk) tx[length(tx)+1] <- "..."
     rwnm <- paste(" ", rownames(x)[i])
-    tx[length(tx)+1] <-  format(rwnm, width=max.c1, justify="right")
+    tx[length(tx)+1] <- format(rwnm, width=max.c1, justify="right")
     for (j in 1:ncol(x)) 
       if (is.integer(x[i,j]))
         tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j], w=max.ln[j]), sep="")
-      else
-        tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i,j], d=digits.d, w=max.ln[j]), sep="")
+      else if (is.numeric(x[i,j])) {
+        cs <- .fmt(x[i,j], d=digits.d, w=max.ln[j])
+        if (abs(x[i,j]) < cut) cs <- paste(rep(" ", max.ln[j]), collapse = "")
+        tx[length(tx)] <- paste(tx[length(tx)], cs, sep="")
+      }
+      else if (is.character(x[i,j]))
+       tx[length(tx)] <- paste(tx[length(tx)], .fmtc(x[i,j], w=max.ln[j]) , sep="") 
   }
 
   return(tx)
 
 }  # end .prntbl
-
-

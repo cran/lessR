@@ -1,5 +1,3 @@
-useDynLib(lessR)
-
 importFrom("car", vif, scatter3d, dataEllipse)
 importFrom("leaps", leaps)
 importFrom("MBESS", ci.smd)
@@ -42,7 +40,7 @@ export (
   print.out_all, print.out_piece,
   prob.norm, prob.znorm, prob.tcut,
   Read, rd, rd.brief, Read2,
-  Regression, reg, reg.brief, regPlot,
+  Regression, reg, reg.brief, regPlot, 
   Recode, rec,
   set, showColors,
   simCImean, simCLT, simFlips, simMeans,
@@ -51,6 +49,7 @@ export (
   Subset, subs,
   SummaryStats, ss, ss.brief,
   to,
+  tAnd, tNum, tP, tRow,
   Transform, trans,
   ttest, tt, tt.brief,
   ttestPower, ttp,

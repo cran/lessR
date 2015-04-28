@@ -10,6 +10,8 @@ Abbreviation: \code{dn}
 Plots a normal density curve and/or a general density curve superimposed over a histogram, all estimated from the data. Also reports the Shapiro-Wilk normality test and summary statistics.
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
+
+When output is assigned into an object, such as \code{d} in \code{d <- dn(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output is embedded in documents, facilitated by the \code{knitr.file} option. See \code{value} below.
 }
 
 \usage{
@@ -17,6 +19,8 @@ Density(x, data=mydata, n.cat=getOption("n.cat"),
 
        bw="nrd0", type=c("both", "general", "normal"),
        bin.start=NULL, bin.width=NULL,
+
+       knitr.file=NULL, digits.d=NULL,
 
        col.fill=getOption("col.fill.pt"),
        col.bg=getOption("col.bg"),
@@ -30,7 +34,8 @@ Density(x, data=mydata, n.cat=getOption("n.cat"),
        x.min=NULL, x.max=NULL, band=FALSE, 
 
        quiet=getOption("quiet"),
-       pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+       pdf.file=NULL, pdf.width=5, pdf.height=5,
+       fun.call=NULL, \ldots)
 
 dn(\ldots)
 }
@@ -53,6 +58,10 @@ dn(\ldots)
   \item{bin.start}{Optional specified starting value of the bins.}
   \item{bin.width}{Optional specified bin width, which can be specified with or without 
         a \code{bin.start} value.}
+  \item{knitr.file}{File name for the file of knitr instructions to be written, if specified.
+        The file type is .Rmd, which automatically opens in RStudio, but it is a simple
+        text file that can be edited with any text editor, including RStudio.}
+  \item{digits.d}{Number of significant digits for each of the displayed summary statistics.}
   \item{col.fill}{Default (for default color theme of \code{"dodgerblue"}) is to
        display the histogram in a light gray.  To suppress, the histogram,
        specify a color of \code{"transparent"}.}
@@ -85,10 +94,13 @@ dn(\ldots)
        no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
+  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
+        obtained from the abbreviated function call \code{dn}.}
   \item{\dots}{Other parameter values for graphics as defined processed 
       by \code{\link{plot}}, including \code{xlim}, \code{ylim}, \code{lwd} and \code{cex.lab}, 
       \code{col.main}, \code{density}, and, for the general density calculations, can set 
-      bandwidth with the standard \code{bw}, etc., and col.ticks to specify the color of the ticks used to label the axis values.}
+      bandwidth with the standard \code{bw}, etc., and col.ticks to specify the color of
+      the ticks used to label the axis values.}
 }
 
 
@@ -125,8 +137,23 @@ Instead, do the following:
 }
 
 \value{
-Based on the standard \code{R} function \code{\link{density}}, invisibly returns an object of \code{\link{class}} "density". For details see \code{\link{density}}.
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+
+READABLE OUTPUT\cr
+code{out_title}: Title of output\cr
+code{out_stats}: Statistics\cr
+code{out_file}: Name and location of optional knitr file\cr
+
+STATISTICS\cr
+code{bw}: Bandwidth parameter\cr
+code{n}: Number of data values analyzed\cr
+code{n.miss}: Number of missing data values\cr
+code{W}: W statistic fo rShapiro-Wilk normality test\cr
+code{pvalue}: p-value for W statistic\cr
+
+Although not typically needed, if the output is assigned to an object named, for example, \code{h}, then the contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(h)}.
 }
+
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 

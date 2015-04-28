@@ -12,13 +12,10 @@ function(lm.out, dname, n.keep, show.R,
   # -------------------------
   tx <- character(length = 0)
 
-  tx[length(tx)+1] <- "  RELATIONS AMONG VARIABLES"
 
   # correlations
   txall <- ""
   if (cor) {
-    tx[length(tx)+1] <- "" 
-    tx[length(tx)+1] <- "Correlations\n"
   
     if (numeric.all && in.data.frame) {
 
@@ -30,17 +27,18 @@ function(lm.out, dname, n.keep, show.R,
         tx[length(tx)+1] <- .dash2(68)
       }
 
-      tx <- "Correlation Matrix"
+      if (is.null(options()$knitr.in.progress))
+        tx[length(tx)+1] <- "Correlation Matrix\n"
       crs <- cor(lm.out$model[c(nm)])
-      txcrs <- .prntbl(crs, 2, cc=" ")
+      txcrs <- .prntbl(crs, 2, cc=NULL)
       for (i in 1:length(txcrs)) tx[length(tx)+1] <- txcrs[i]
-
     }
 
   else {  # not all numeric
     tx[length(tx)+1] <- ">>> No correlations reported, not all variables are"
-    if (!in.data.frame) tx[length(tx)] <- paste(tx[length(tx)], "in the data frame.\n")
-    if (!numeric.all) tx[length(tx)] <- paste(tx[length(tx)], "numeric.\n")
+    if (!in.data.frame)
+      tx[length(tx)] <- paste(tx[length(tx)], "in the data frame.")
+    if (!numeric.all) tx[length(tx)] <- paste(tx[length(tx)], "numeric.")
     crs <- numeric(length=0)
     crs <- NA
   }
@@ -60,18 +58,21 @@ function(lm.out, dname, n.keep, show.R,
   if (collinear) {
     tx <- character(length = 0)
 
-    tx[length(tx)+1] <- "Collinearity"
+    if (is.null(options()$knitr.in.progress)) {
+      tx[length(tx)+1] <- "Collinearity"
+      tx[length(tx)+1] <- ""
+    }
 
     if (numeric.all) {
 
       VIF <- vif(lm.out)
       tol <- 1/VIF
 
-      out <- cbind(VIF, tol)
-      colnames(out) <- c("VIF", "Tolerance")
+      out <- cbind(tol, VIF)
+      colnames(out) <- c("Tolerance", "      VIF")
       rownames(out) <- nm[2:length(nm)]
 
-      txcln <- .prntbl(out, 3, cc=" ")
+      txcln <- .prntbl(out, 3, cc=NULL)
       for (i in 1:length(txcln)) tx[length(tx)+1] <- txcln[i]
 
     }
@@ -96,7 +97,10 @@ function(lm.out, dname, n.keep, show.R,
   if (subsets) {
     tx <- character(length = 0)
 
-    tx[length(tx)+1] <- "All Possible Subset Regressions"
+    if (is.null(options()$knitr.in.progress)) {
+      tx[length(tx)+1] <- "All Possible Subset Regressions"
+      tx[length(tx)+1] <- ""
+    }
 
     if (numeric.all) {
       X <- data.frame(lm.out$model[nm[seq(2,n.vars)]])
@@ -121,7 +125,6 @@ function(lm.out, dname, n.keep, show.R,
         if (max.ln[i] < 4) max.ln[i] <- 4
       }
 
-      tx[length(tx)+1] <- ""
       tx[length(tx)+1] <- ""
       for (i in 1:(n.pred+2)) {
         if (i <= n.pred) ww <- max.ln[i]

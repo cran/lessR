@@ -58,11 +58,14 @@ function(x, miss, show.n, n.cat, digits.d,
     }
   }
 
+  # background
+  tx <- character(length = 0)
+
   if (i.not > 0) {
-    cat("\n>>> Note: The following variables are not numeric and are deleted",
-        "from the analysis.\n\n")
-    for (i in 1:i.not) cat(i, ". ", names(x)[not.num[i]], "\n", sep="")
-    cat("\n")
+    tx[length(tx)+1] <- paste("The following non-numeric variables are deleted",
+        "from the analysis")
+    for (i in 1:i.not) tx[length(tx)+1] <- paste(i, ". ", names(x)[not.num[i]],
+      sep="")
     x <- x[, -not.num[1:i.not]]
     if (is.null(dim(x))) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -71,22 +74,29 @@ function(x, miss, show.n, n.cat, digits.d,
   }
   
   if (!is.null(digits.d)) max.digits <- digits.d
+  crs <- round(cor(x, use=miss.type, ...), digits=max.digits)  # cor matrix
 
-  # calculate correlations, store in mycor
-  myc <- round(cor(x, use=miss.type, ...), digits=max.digits)
+  n.vars <- nrow(crs)
+  tx[length(tx)+1] <- ""
+  tx[length(tx)+1] <- paste("The correlation matrix contains",
+    n.vars, "variables")
 
-  n.vars <- nrow(myc)
-  cat("\nCorrelation matrix calculated\n",
-      "  Number of variables: ", n.vars, "\n",
-      "  Missing data deletion: ", miss, "\n") 
+  txb <- tx
+
+
+  # missing
+  tx <- character(length = 0)
+
+  tx[length(tx)+1] <- paste("Missing data deletion: ", miss)
 
   if (miss == "listwise") 
-    cat("   Sample size after deleted rows:", sum(complete.cases(x)), "\n\n")
+    tx[length(tx)+1] <- paste("   Sample size after deleted rows:",
+      sum(complete.cases(x)), "\n")
 
   else if (miss == "pairwise") {
-    n <- as.integer(myc)
+    n <- as.integer(crs)
     n <- matrix(n, nrow=n.vars)
-    dimnames(n) <- dimnames(myc)
+    dimnames(n) <- dimnames(crs)
     for (i in 1:n.vars) {
       for (j in 1:n.vars) {
         n[i,j] <- sum(!is.na(x[i] - x[j]))  # non-missing values
@@ -95,30 +105,40 @@ function(x, miss, show.n, n.cat, digits.d,
     options(xname = "Missing Data Analysis")
     tot.miss <- sum(is.na(x))
     if (tot.miss == 0) 
-      cat("\n>>> No missing data\n\n")
+      tx[length(tx)+1] <- paste("\n>>> No missing data")
     else {
       .ss.factor(as.vector(n), brief=TRUE)
       if (n.vars <= 15  ||  show.n) {
-        cat("\n") 
-        print(n)
+        txn <- .prntbl(n, 2, cc=" ")
+        for (i in 1:length(txn)) tx[length(tx)+1] <- txn[i]
       }
       else
-        cat("To view the sample size for each correlation coefficient, re-run the\n",
-            "analysis with show.n=TRUE\n", sep="")
-      cat("\n")
+        tx[length(tx)+1] <- paste("To view the sample size for each ",
+          "correlation, re-run the\n",
+          "analysis with show.n=TRUE\n", sep="")
     }
-  }
+  }  # end pairwise
+
+  txm <- tx
+
+
+  # cor matrix
+  tx <- character(length = 0)
 
   if (n.vars <= 15) {
-    cat("--- Correlation Matrix ---\n\n")
-    print(myc)
-    cat("\n")
+    tx[length(tx)+1] <- paste("Correlation Matrix")
+    txcrs <- .prntbl(crs, 2, cc=" ")
+    for (i in 1:length(txcrs)) tx[length(tx)+1] <- txcrs[i]
   }
   else {
-    cat("\nVariables in the correlation matrix:\n")
-    cat(names(x))
-    cat("\n\nTo view the correlation matrix, enter its name such as  mycor\n\n")
+    tx[length(tx)+1] <- "Variables in the correlation matrix:"
+    tx[length(tx)+1] <- toString(names(x))
+    tx[length(tx)+1] <- paste("\nTo view the correlation matrix, ",
+     "enter the name of the returned object\n", 
+     "followed by  $cors  such as  mycor$cors\n", sep="")
   }
+
+  txc <- tx
 
 
   if (graphics  ||  pdf) {
@@ -161,7 +181,7 @@ function(x, miss, show.n, n.cat, digits.d,
 
     if (is.null(main)) main <- "Correlations"
 
-    for (i in 1:ncol(mycor)) mycor[i,i] <- 0
+    for (i in 1:ncol(crs)) crs[i,i] <- 0
     cat("\nNote: To provide more color separation for off-diagonal\n",
         "      elements, the diagonal elements of the matrix for\n",
         "      computing the heat map are set to 0.\n", sep="")
@@ -169,7 +189,7 @@ function(x, miss, show.n, n.cat, digits.d,
     max.color <- getOption("col.heat")
     hmcols <- colorRampPalette(c("white",max.color))(256)
 
-    heatmap(mycor[1:ncol(mycor),1:ncol(mycor)], Rowv=NA, Colv="Rowv", symm=TRUE,
+    heatmap(crs[1:ncol(crs),1:ncol(crs)], Rowv=NA, Colv="Rowv", symm=TRUE,
       col=hmcols, margins=c(bottom, right), main=main)
 
     if (pdf) {  # terminate pdf graphics
@@ -182,6 +202,7 @@ function(x, miss, show.n, n.cat, digits.d,
   else
     cat("\n>>> To view a heat map and scatter plot matrix set:  graphics=TRUE\n\n")
 
-  invisible(myc)
+  return(list(txb=txb, txm=txm, txc=txc, cors=crs))
+
 
 }

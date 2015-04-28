@@ -1,5 +1,4 @@
 reg <-
 function(...)
 
-  Regression(...)
-
+  Regression(fun.call=match.call(), ...)

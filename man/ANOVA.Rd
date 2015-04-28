@@ -83,20 +83,7 @@ Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 7, NY: Routl
 }
 
 \examples{
-# create simulated data, no population mean difference
-# X has two values only, Y is numeric
-# put into a data frame
-n <- 12
-X <- sample(c("Group1","Group2","Group3"), size=n, replace=TRUE)
-Y <- round(rnorm(n=n, mean=50, sd=10), 2)
-mydata <- data.frame(X,Y)
 
-# analyze data with formula version
-# variable names and levels of X are automatically obtained from data
-# although data frame not attached, reference variable names directly
-ANOVA(Y ~ X)
-# short name
-av(Y ~ X)
 
 # variable of interest is in a data frame which is not the default mydata
 # access the data frame in the lessR dat.Learn data set
@@ -108,7 +95,8 @@ ANOVA(Score ~ StudyType, data=dataLearn)
 ANOVA(breaks ~ wool * tension, data=warpbreaks)
 
 # randomized blocks design with the second term the blocking factor
-ANOVA(breaks ~ wool + tension, data=warpbreaks)
+# use short name
+av(breaks ~ wool + tension, data=warpbreaks)
 }
 
 

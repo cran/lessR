@@ -68,7 +68,7 @@ function(x,
 
   # max y coordinate for graph
   max.y <- max(max(d.nrm), max(d.gen$y), max(h$density))
-  
+
   # set up plot area
   # bw if specified also gets passed to plot, so suppress warning
   if (!y.axis) y.lab="" else y.lab="Density"
@@ -118,33 +118,37 @@ function(x,
   }
 
   # text output
+  tx=""
   if (!quiet) {
+
+    tx <- character(length = 0)
+
+    tx[length(tx)+1] <- paste("Sample Size: ", n)
+    tx[length(tx)+1] <- paste("Missing Values: ", n.miss)
  
-    # summarize data
-    .ss.numeric(x, brief=TRUE)
+    tx[length(tx)+1] <- ""
+    tx[length(tx)+1] <- paste("Density bandwidth for general curve: ",
+      .fmt(d.gen$bw,4), sep="")
+    tx[length(tx)+1] <- "For a smoother curve, increase bandwidth with option: bw"
 
-    cat("\nDensity bandwidth for general curve: ", .fmt(d.gen$bw,4), sep="", "\n")
-    cat("For a smoother curve, increase bandwidth with option: bw\n")
-
-    cat("\nSample Size: ", n, "\n")
-    cat("Missing Values: ", n.miss, "\n")
-
+    tx[length(tx)+1] <- ""
+    W <- NA; p.val <- NA
     if (type == "normal" || type == "both") {
       digits.d <- 3
       if (n > 2 && n < 5000) {
         nrm <- shapiro.test(x)
         W <- .fmt(nrm$statistic,min(4,digits.d+1))
         p.val <- .fmt(nrm$p.value,min(4,digits.d+1))
-        cat("\nNull hypothesis is a normal population\n")
-        cat(nrm$method, ":  W = ", W, ",  p-value = ", p.val, sep="", "\n")
+        tx[length(tx)+1] <- paste("Null hypothesis is a normal population")
+        tx[length(tx)+1] <- paste(nrm$method, ":  W = ", W, ",  p-value = ",
+          p.val, sep="")
       }
-      else
-        cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
+      else 
+        tx[length(tx)+1] <- "Sample size out of range for Shapiro-Wilk normality test."
     }
 
-    cat("\n")
-  }
+  return(list(tx=tx, bw=d.gen$bw, n=n, n.miss=n.miss, W=W, pvalue=p.val))
 
-  return(d.gen)
+  }
 
 } 

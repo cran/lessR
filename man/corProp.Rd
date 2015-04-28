@@ -11,7 +11,7 @@ In the population, indicators of the same factor or latent variable have paralle
 }
 
 \usage{
-corProp(x=mycor, 
+corProp(R=mycor, 
           main=NULL, heat.map=TRUE, bottom=3, right=3, 
           pdf.file=NULL, pdf.width=5, pdf.height=5)
 
@@ -19,7 +19,7 @@ prop(\ldots)
 }
 
 \arguments{
-  \item{x}{Correlation matrix.}
+  \item{R}{Correlation matrix.}
   \item{main}{Graph title. Set to \code{main=""} to turn off.}
   \item{heat.map}{If \code{TRUE}, display a heat map of the item
         correlations with the diagonal ignored.}

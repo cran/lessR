@@ -3,14 +3,12 @@ function (x=mycor,
           main=NULL, pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
 
 
-  cor.name <- deparse(substitute(x))
+  # cor matrix:  mycor as class out_all, mycor$cors, or stand-alone matrix
+  cor.nm <- deparse(substitute(x))
+  .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
+  if (class(x) == "out_all")
+    x <- eval(parse(text=paste(cor.nm, "$cors", sep="")))  # go to $cors 
 
-  if (!exists(cor.name, where=.GlobalEnv)) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "No correlation matrix entered.\n\n",
-      "Either enter the correct name, or calculate with: Correlation\n",
-      "Or read the correlation matrix with: corRead\n\n")
-  }
   
   # extract eigenvectors
   eig <- eigen(x, symmetric=TRUE, only.values=TRUE)
@@ -105,14 +103,16 @@ function (x=mycor,
   }
 
   cat("\n")
-  cat("Eigenvalues of", deparse(substitute(x)), "\n")
-  .dash(15+nchar(deparse(substitute(x))))
-  print(round(ev,3))
+  cat("Eigenvalues of", cor.nm, "\n")
+  .dash(15+nchar(cor.nm))
+  for (i in 1:length(ev)) cat(round(ev[i],3), " ")
+  cat("\n")
 
   cat("\n")
-  cat("Differences of Successive Eigenvalues of", deparse(substitute(x)), "\n")
-  .dash(41+nchar(deparse(substitute(x))))
-  print(round(ev.diff,3))
+  cat("Differences of Successive Eigenvalues of", cor.nm, "\n")
+  .dash(41+nchar(cor.nm))
+  for (i in 1:length(ev.diff)) cat(round(ev.diff[i],3), " ")
+  cat("\n")
 
   if (is.null(options()$knitr.in.progress))
     .plotList(plot.i, plot.title)

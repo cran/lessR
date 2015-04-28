@@ -16,7 +16,8 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
   tx[length(tx)+1] <-  format(y.name, width=max.c1, justify="left")
   w <- nchar(as.character(sum(x)))
   for (i in 1:ncol(x))
-    tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i], w=max.ln[i]), sep="")
+    tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i], w=max.ln[i]),
+      sep="")
 
   # values
   for (i in 1:nrow(x)) {
@@ -24,15 +25,17 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
     tx[length(tx)+1] <-  format(rwnm, width=max.c1, justify="left")
     for (j in 1:ncol(x)) {
       if (type=="r") {
-        tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i,j], d=3, w=max.ln[j]), sep="")
-}
+        tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i,j], d=3, w=max.ln[j]),
+          sep="")
+      }
       else if (type=="i")
-        tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j], w=max.ln[j]), sep="")
+        tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j], w=max.ln[j]),
+          sep="")
     }
   }
 
   return(tx)
-}
+}  # end .prnfreq
 
 
   # get variable labels if exist
@@ -67,7 +70,10 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
     xx <- addmargins(x)
 
     # width of column 1
-    max.c1 <- nchar(y.name)
+    if (!is.null(y.name))
+      max.c1 <- nchar(y.name)
+    else
+      max.c1 <- 0
     for (i in 1:nrow(xx)) {
       c1 <- nchar(rownames(xx)[i])
       if (c1 > max.c1) max.c1 <- c1
@@ -101,7 +107,8 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
 
     # Cell Proportions and Marginals
     xx <- round(addmargins(prop.table(x)),3)
-    txprp <- .prnfreq(xx, "r", max.ln, max.c1, n.dash=30, ttl="Cell Proportions and Marginals")
+    txprp <- .prnfreq(xx, "r", max.ln, max.c1, n.dash=30,
+                      ttl="Cell Proportions and Marginals")
 
     # Cell Proportions within Each Column
     x.col <- prop.table(x, margin=2)
@@ -134,7 +141,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
                  "     so any division to compute a proportion is undefined.\n")
 
     return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txprp=txprp,
-                txcol=txcol, txrow=txrow))  # back to SummaryStats
+                txcol=txcol, txrow=txrow))  # back to ss or ss data frame
 
     # end full analysis
 
