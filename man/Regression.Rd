@@ -8,15 +8,16 @@
 \description{
 Abbreviation: \code{reg}, \code{reg.brief}
 
-Provides a regression analysis with extensive output, including graphics, from a single, simple function call with many default settings, each of which can be re-specified. The computations are obtained from the \code{R} function \code{\link{lm}} and related \code{R} regression functions, of which the output of these functions are re-arranged and collated.
+Provides a regression analysis with extensive output, including graphics, from a single, simple function call with many default settings, each of which can be re-specified. The computations are obtained from the \code{R} function \code{\link{lm}} and related \code{R} regression functions. The outputs of these functions are re-arranged and collated.
 
-By default the data exists as a data frame with the default name of \code{mydata}, or specify explicitly with the \code{data} option.  Specify the model in the function call as an R \code{\link{formula}}, that is, for a basic model, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign.  
+By default the data exists as a data frame with the default name of \code{mydata}, or specify explicitly with the \code{data} option.  Specify the model in the function call as an R \code{\link{formula}}, that is, for a basic model, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign, such as \code{reg(Y ~ X1 + X2)}.  
 
-Output is generated into distinct pieces by topic. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from, for example, \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete \code{knitr} set of instructions ready to knit from the \code{knitr.file} option. Simply specify the option and create the file and then open in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the following sections \code{arguments}, \code{value} and \code{examples} for more information. 
+Output is generated into distinct pieces by topic, organized and displayd in sequence by default. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from, for example, \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete \code{knitr} set of instructions ready to knit from the \code{knitr.file} option. Simply specify the option and create the file and then open in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the following sections \code{arguments}, \code{value} and \code{examples} for more information. 
 }
 
 \usage{
 Regression(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
+
          knitr.file=NULL, explain=getOption("explain"),
          interpret=getOption("interpret"), results=getOption("results"),
 
@@ -29,7 +30,7 @@ Regression(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          scatter.coef=TRUE, scatter.3D=FALSE, graphics=TRUE,
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
-         X5.new=NULL,
+         X5.new=NULL, X6.new=NULL,
 
          pdf=FALSE, pdf.width=5, pdf.height=5, refs=FALSE, 
          fun.call=NULL, \ldots)
@@ -95,23 +96,26 @@ reg.brief(\ldots, brief=TRUE)
   \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{knitr} can be useful
        to set to \code{FALSE} so that \code{\link{regPlot}} can be used to place
        the graphics within the output file.}
-  \item{X1.new}{Values of the first listed predictor variable for which forecasted values
+  \item{X1.new}{Values of the first listed numeric predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
-  \item{X2.new}{Values of the second listed predictor variable for which forecasted values
+  \item{X2.new}{Values of the second listed numeric predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
-  \item{X3.new}{Values of the third listed predictor variable for which forecasted values
+  \item{X3.new}{Values of the third listed numeric predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
-  \item{X4.new}{Values of the fourth listed predictor variable for which forecasted values
+  \item{X4.new}{Values of the fourth listed numeric predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
-  \item{X5.new}{Values of the fifth listed predictor variable for which forecasted values
+  \item{X5.new}{Values of the fifth listed numeric predictor variable for which forecasted values
+        and corresponding prediction intervals are calculated.}
+  \item{X6.new}{Values of the sixth listed numeric predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{refs}{If \code{TRUE}, then list the references for R and the packages used from
         which functions were used to generate the output.}
-  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
-        obtained from the abbreviated function call \code{reg}.}
+  \item{fun.call}{Function call. Used internally with \code{knitr} to pass the 
+        function call when obtained from the abbreviated function call \code{reg}.
+        Not usually invoked by the user.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the
         core computations.} 
 }
@@ -156,7 +160,7 @@ By default the residual analysis lists the data and fitted value for each observ
 PREDICTION INTERVALS\cr
 The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, the lower and upper bounds for the confidence interval and the prediction interval, and the wide of the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are 25 or more observations then the information for only the first four, the middle four and the last four observations is displayed. To turn off the analysis of prediction intervals, specify \code{pred.rows=0}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
 
-The data for the default analysis of the prediction intervals is for the values of the predictor variables for each observation, that is, for each row of the data. New values of the predictor variables can be specified for the calculation of the prediction intervals by providing values for the options \code{X1.new} for the values of the first listed predictor variable in the model, \code{X2.new} for the second listed predictor variable, and so forth for up to five predictor variables. To provide these values, use functions such as \code{\link{seq}} for specifying a sequence of values and \code{\link{c}} for specifying a vector of values. For multiple regression models, all combinations of the specified new values for all of the predictor variables are analyzed.
+The data for the default analysis of the prediction intervals is for the values of the predictor variables for each observation, that is, for each row of the data. New values of the predictor variables can be specified for the calculation of the prediction intervals by providing values for the options \code{X1.new} for the values of the first listed predictor variable in the model, \code{X2.new} for the second listed predictor variable, and so forth for up to five predictor variables, and all predictor variables are numeric. To provide these values, use functions such as \code{\link{seq}} for specifying a sequence of values and \code{\link{c}} for specifying a vector of values. For multiple regression models, all combinations of the specified new values for all of the predictor variables are analyzed.
 
 RELATIONS AMONG THE VARIABLES\cr
 By default the correlation matrix of all the variables in the model is displayed, and, for multiple regression models, collinearity analysis is provided with the \code{vif} function from the Fox and Weisberg (2011) \code{car} package. Also provided are the first 50 models with the largest R squared adjusted from each possible model from an analysis of all possible subsets of the predictor variables.  This all subsets analysis requires the \code{leaps} function from the \code{leaps} package. These contributed packages are automatically loaded if available.  To turn off the all possible sets option, set \code{subsets=FALSE}.
@@ -176,21 +180,21 @@ If variable labels exist, then the corresponding variable label is by default li
 The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The motivation of these three types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the \code{knitr} document (see \code{examples}).
 
 TEXT OUTPUT\cr
-\code{out_background}: Variables in the model, rows of data and retained\cr
-\code{out_estimates}: Estimated coefficients, hypothesis tests and confidence intervals\cr
-\code{out_fit}: Fit indices\cr
+\code{out_background}: variables in the model, rows of data and retained\cr
+\code{out_estimates}: estimated coefficients, hypothesis tests and confidence intervals\cr
+\code{out_fit}: fit indices\cr
 \code{out_anova}: Analysis of variance\cr
-\code{out_cor}: Correlations among all variables in the model\cr
-\code{out_collinear}: Collinearity analysis\cr
+\code{out_cor}: correlations among all variables in the model\cr
+\code{out_collinear}: collinearity analysis\cr
 \code{out_subsets}: R squared adjusted for all (or many) possible subsets\cr
-\code{out_residuals}: Residuals\cr
-\code{out_predict}: Analysis of residuals and influence\cr
-\code{out_cite}: List of packages from other developers used in the analysis\cr
-\code{out_ref}: References if selected on the \code{Regression} function call\cr
-\code{out_knitr.file}: Lists the name and location of the \code{knitr} instructions\cr
-\code{out_plots}: List of plots generated if more than one\cr
+\code{out_residuals}: residuals\cr
+\code{out_predict}: analysis of residuals and influence\cr
+\code{out_cite}: list of packages from other developers used in the analysis\cr
+\code{out_ref}: references if selected on the \code{Regression} function call\cr
+\code{out_knitr.file}: lists the name and location of the \code{knitr} instructions\cr
+\code{out_plots}: list of plots generated if more than one\cr
 
-Also separated from the rest of the text output are the major headings, which can then be deleted from custom collations of the output.
+Separated from the rest of the text output are the major headings, which can then be deleted from custom collations of the output.
 \code{out_title_bck}: BACKGROUND\cr
 \code{out_title_basic}: BASIC ANALYSIS\cr
 \code{out_title_rel}: RELATIONS AMONG THE VARIABLES\cr
@@ -198,20 +202,20 @@ Also separated from the rest of the text output are the major headings, which ca
 \code{out_title_pred}: FORECASTING ERROR\cr
 
 STATISTICS\cr
-\code{fun.call}: Function call that generated the analysis\cr
-\code{formula}: Model formula that specifies the model\cr
-\code{n.vars}: Number of variables in the model\cr
-\code{n.obs}: Number of rows of data submitted for analysis\cr
-\code{n.keep}: Number of rows of data retained in the analysis\cr
-\code{coefficients}: Estimated regression coefficients\cr
-\code{sterrs}: Standard errors of the estimated coefficients\cr
+\code{fun.call}: function call that generated the analysis\cr
+\code{formula}: model formula that specifies the model\cr
+\code{n.vars}: number of variables in the model\cr
+\code{n.obs}: number of rows of data submitted for analysis\cr
+\code{n.keep}: number of rows of data retained in the analysis\cr
+\code{coefficients}: estimated regression coefficients\cr
+\code{sterrs}: standard errors of the estimated coefficients\cr
 \code{tvalues}: t-values of the estimated coefficients for null of 0\cr
 \code{pvalues}: p-values from the t-tests of the estimated coefficients\cr
 \code{cilb}: lower bound of 95\% confidence interval of estimate\cr
 \code{ciub}: upper bound of 95\% confidence interval of estimate \cr
-\code{anova_model}: Model df, ss, ms, F-value and p-value\cr
-\code{anova_residual}: Residual df, ss and ms\cr
-\code{anova_total}: Total df, ss and ms\cr
+\code{anova_model}: model df, ss, ms, F-value and p-value\cr
+\code{anova_residual}: residual df, ss and ms\cr
+\code{anova_total}: total df, ss and ms\cr
 \code{se}: standard deviation of the residuals\cr
 \code{resid_range}: 95\% range of normally distributed fitted residuals\cr
 \code{Rsq}: R-squared\cr
@@ -220,14 +224,14 @@ STATISTICS\cr
 \code{RsqPRESS}: PRESS R-squared\cr
 \code{cor}: correlation matrix of all variables in the model\cr
 \code{tolerances}: tolerance of each predictor variable for collinearity analysis\cr
-\code{VIF}: Variance inflation factor for each predictor variable\cr
-\code{resid.max}: Five largest values of the residuals on which the ouput is sorted\cr
+\code{VIF}: variance inflation factor for each predictor variable\cr
+\code{resid.max}: five largest values of the residuals on which the ouput is sorted\cr
 \code{pred_min_max}: Rows with the smallest and largest prediction intervals\cr
-\code{residuals}: Residuals\cr
-\code{fitted.values}: Fitted values\cr
+\code{residuals}: residuals\cr
+\code{fitted.values}: fitted values\cr
 \code{cooks.distance}: Cook's distance\cr
-\code{model}: Data retained for the analysis\cr
-\code{terms}: Terms specified for the analysis\cr
+\code{model}: data retained for the analysis\cr
+\code{terms}: terms specified for the analysis\cr
 
 Although not typically needed for analysis, if the regression output is assigned to an object named, for example, \code{r}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(r)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out_piece}.
 }
@@ -252,6 +256,8 @@ Xie, Y. (2013). Dynamic Documents with R and knitr, Chapman & Hall/CRC The R Ser
 \examples{
 # Read internal data set
 mydata <- rd("Reading", format="lessR", quiet=TRUE)
+# do not need all this data, so take only 40% to reduce CPU time
+mydata <- Subset(random=.4)
 
 # One-predictor regression
 # Provide all default analyses including scatterplot etc.
@@ -263,25 +269,21 @@ reg.brief(Reading ~ Verbal, standardize=TRUE)
 
 # Access the pieces of output, here in an object named \code{r}
 r <- reg(Reading ~ Verbal + Absent + Income)
-# Display all output at the console
+# Display all output at the console in the standard sequence
 r
 # list the names of all the saved components
 names(r)
 # Display just the estimated coefficients and their inferential analysis
 r$out_estimates
-# This output obtained from the \code{knitr} file with the 
-#   following automatically generated instructions (when results=TRUE)
-#```{r, echo=FALSE}
-#r$out_estimates
-#```
 
 # Generate knitr instructions with the option: knitr.file
-# Output file will be reg_knit.Rmd, a simple text file that can
+# Output file here will be read.Rmd, a simple text file that can
 #   be edited with any text editor including RStudio from which it
-#   can be knit to generate dynamic output such as to a Word document
+#   can be knit to generate dynamic output to a Word document,
+#   pdf file or html file
 reg(Reading ~ Verbal + Absent, knitr.file="read")
 # knitr.file with no explanations
-reg(Reading ~ Verbal + Absent, knitr.file="read", explain=FALSE)
+reg(Reading ~ Verbal + Absent, knitr.file="read2", explain=FALSE)
 
 # Modify the default settings as specified
 Regression(Reading ~ Verbal, res.row=8, res.sort="rstudent", pred.rows=0, digits.d=4)

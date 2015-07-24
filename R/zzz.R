@@ -6,16 +6,14 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.3.1    RStudio, knitr compatible     www.lessRstats.com\n",
-      "---------------------------------------------------------------\n",
+      "lessR 3.3.3    RStudio, knitr compatible     www.lessRstats.com\n",
+      "------------------------------------------------------------------\n",
       "To get started, and for help in general, enter:  Help()\n",
-      "To read a text, Excel, SPSS or R data file:  mydata <- Read()\n",
-      "---------------------------------------------------------------\n",
-      "To view the new knitr features, enter:  ?Regression\n",
-      "---------------------------------------------------------------\n\n")
+      "To read a text, Excel, SPSS, SAS or R data file:  mydata <- Read()\n",
+      "------------------------------------------------------------------\n",
+      "Automatically generate markdown files for knitr, enter:  ?reg\n",
+      "------------------------------------------------------------------\n\n")
 
-  # .maketrans(rgb(106,161,214, maxColorValue=256), to256("trans.fill.bar"))
-  # .maketrans("dodgerblue3", to256("trans.fill.bar"))
   options(colors="dodgerblue")
   options(trans.fill.bar=0.25)
   options(trans.fill.pt=0.66)
@@ -152,10 +150,10 @@ function(...) {
           "frame (table)\n")
   }
 
-  # see if "variable" is really a function call
-  if (grepl("(", var.name, fixed=TRUE))  {
-    txtA <- paste("The referenced variable in a lessR function can only be\n",
-            "a variable name (or sometimes multiple names).\n\n", sep="")
+  # see if "variable" is really a function call or subset
+  if (grepl("(", var.name, fixed=TRUE) ||  grepl("[", var.name, fixed=TRUE))  {
+    txtA <- paste("A referenced variable in a lessR function can only be\n",
+            "a variable name.\n\n", sep="")
     txtB <- "For example, this does not work:\n  > Histogram(rnorm(50))\n\n"
     txtC <- "Instead do this:\n  > Y <- rnorm(50)\n  > Histogram(Y)"
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -317,7 +315,7 @@ function(...) {
 }
 
 
-.varlist2 <- function(n.pred, i, var.name, pred.lbl, n.obs, n.keep, lvls=NULL) {
+.varlist2 <- function(n.pred, i, var.name, pred.lbl, n.obs, lvls=NULL) {
   tx <- character(length = 0)
 
   if (i == 1)
@@ -333,10 +331,20 @@ function(...) {
     mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
   else
     mylabels <- NULL
+  if (exists(dname, where=.GlobalEnv))
+    myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
+  else
+    myunits <- NULL
 
   if (!is.null(mylabels)) {
     lbl <- mylabels[which(names(mylabels) == var.name)]
-    if (!is.null(lbl)) tx[length(tx)] <- paste(tx[length(tx)], paste(", ", as.character(lbl)), sep="")
+    unt <- myunits[which(names(myunits) == var.name)] 
+    if (!is.null(unt)) if (nzchar(unt))
+      lbl <- paste(lbl, " (", unt, ")", sep="")
+    else
+      lbl <- lbl 
+    if (!is.null(lbl))
+      tx[length(tx)] <- paste(tx[length(tx)], ", ", as.character(lbl), sep="")
   }
 
   if (!is.null(lvls)) if (i > 1) tx[length(tx)+1] <- paste("\n  Levels:", lvls)
@@ -565,6 +573,8 @@ function(...) {
   }
   else
     fc <- fc.d
+
+  fc <- sub("     ", " ", fc, fixed=TRUE)
   fc <- sub("    ", " ", fc, fixed=TRUE)
   fc <- sub("  ", " ", fc, fixed=TRUE)
 
@@ -594,26 +604,69 @@ function(...) {
 }
 
 
-# remove argument and value from a function call
-# argument cannot be listed first
+# remove argument and character value from a function call
 .rm.arg <-  function(argm, fc) {
 
-  loc <- regexec(argm, fc)
-  strt1 <- loc[[1]]  # beginning of argument
-  if (strt1 > 0) {
-    j <- strt1
-    while(substr(fc, start=j, stop=j) != ",") j <- j - 1 
-    strt <- j  # comma before argument
-    while(substr(fc, start=j, stop=j) != "\"") j <- j + 1 
+  loc <- regexec(argm, fc)[[1]]  # beginning of argument
+
+  if (loc > 0) {
+
+    first.arg <- ifelse (substr(fc, loc-1, loc-1) == "(", TRUE, FALSE)
+
+    j <- loc
+    if (!first.arg)  # is not first argument, start at preceding comma
+      while(substr(fc, start=j, stop=j) != ",") if (j > 0) j <- j - 1 
+    strt <- j  #  closing parentheses or comma before argument
+
+    while(substr(fc, start=j, stop=j) != "\"") if (j < 1000) j <- j + 1 
     j <- j + 1  # first " after ,
-    while(substr(fc, start=j, stop=j) != "\"") j <- j + 1 
+    while(substr(fc, start=j, stop=j) != "\"") if (j < 1000) j <- j + 1 
     stp <- j  # second " after ,
+
+    if (first.arg) stp <- stp + 2  # remove trailing comma and space
+
     remv <- substr(fc, start=strt, stop=stp)
-    fc <- sub(remv, "", fc, fixed=TRUE)
+    fc.new <- sub(remv, "", fc, fixed=TRUE)
+
   }
 
-  return(fc)
+  return(fc.new)
 }
+
+
+# remove argument and Non-String value from a function call
+.rm.arg.ns <-  function(argm, fc) {
+
+  loc <- regexec(argm, fc)[[1]]  # beginning of argument
+
+  if (loc > 0) {
+
+    first.arg <- ifelse (substr(fc, loc-1, loc-1) == "(", TRUE, FALSE)
+
+    j <- loc
+    if (!first.arg)  # is not first argument, start at preceding comma
+      while(substr(fc, start=j, stop=j) != ",") if (j > 0) j <- j - 1 
+    strt <- j  #  closing parentheses or comma before argument
+
+    dlm <- c(",", ")")
+
+    j <- j + 1
+    while(!(substr(fc, start=j, stop=j) %in% dlm))
+      if (j < 1000) j <- j + 1 
+
+    stp <- j  # got a "," or a ")" 
+    stp <- stp - 1  # retain the "," or ")"
+
+    if (first.arg) stp <- stp + 2  # remove trailing comma and space
+
+    remv <- substr(fc, start=strt, stop=stp)
+    fc.new <- sub(remv, "", fc, fixed=TRUE)
+
+  return(fc.new)
+  }
+
+}
+
 
 
 
@@ -724,8 +777,11 @@ function(...) {
 }
 
 
-.prntbl <- function(x, digits.d=2, cut=0, cc="-", brk=NULL) {
+.prntbl <- function(x, digits.d=2, cut=0, cc="-", cors=FALSE,
+                    brk=NULL, bnd=NULL) {
   tx <- character(length = 0)
+
+  max.ch <- ifelse (cors, 3, 0)  # max char per column, 0 is not applicable
 
   # width of column 1
   max.c1 <- 0
@@ -735,46 +791,128 @@ function(...) {
   }
   max.c1 <- max.c1 + 2
 
-  # width of data columns
-  max.ln <- integer(length=0)
-  for (i in 1:ncol(x)) {
-    ln.nm <- nchar(colnames(x)[i])
-    if (is.numeric(x[1,i]))
-      max.val <- max(nchar(formatC(x[,i], digits=digits.d, format="f")))
+  # widths of variable names
+  colnm.w <- integer(length=ncol(x))
+  for (i in 1:ncol(x)) 
+    colnm.w[i] <- nchar(colnames(x)[i])
+
+  # width of columns
+  max.ln <- integer(length=ncol(x))
+  for (j in 1:ncol(x)) {
+    if (is.numeric(x[,j])) {
+      c.val <- 0
+      for (i in 1:nrow(x)) {
+        i.val <- nchar(formatC(x[i,j], digits=digits.d, format="f"))
+        if (i.val > c.val) c.val <- i.val
+      }
+    }
     else
-      max.val <- 4
-    max.ln[i] <- max(ln.nm, max.val) + 1
-    if (max.ln[i] < 4) max.ln[i] <- 4
+      c.val <- 4
+    if (!cors)
+      max.ln[j] <- max(colnm.w[j], c.val) + 1
+    else {
+      max.ln[j] <- max(colnm.w[j], 4)
+      if (max.ch > 0) max.ln[j] <- max.ch
+      if (max.ln[j] > 4) max.ln[j] <- max.ln[j] + 1
+    }
+    if (max.ln[j] < 4) max.ln[j] <- 4
   }
 
   if (!is.null(cc)) tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1, cc=cc)
 
-  # write col labels
-  tx[length(tx)+1] <-  format("", width=max.c1)
-  for (i in 1:ncol(x))
-    tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i],
-                              w=max.ln[i]), sep="")
+  # matrix for potentially multi-row column names
+  if (max.ch > 0) {
+    nr.ind.lbl <- integer(length=ncol(x))
+    for (i in 1:ncol(x))
+      nr.ind.lbl[i] <- ((nchar(colnames(x)[i]) + (max.ch-1)) %/% max.ch)
 
-if (is.data.frame(x)) {  # factor to char
-  i.col <- sapply(x, is.factor)
-  x[i.col] <- lapply(x[i.col], as.character)
-}
+    nr.lbl <- max(nr.ind.lbl)  # n row of labels
+    col.nm <- matrix(nrow=nr.lbl, ncol=ncol(x))
+    for (i in 1:nrow(col.nm)) {
+      for (j in 1:ncol(col.nm)) { 
+        srt <- ((i-1)*max.ch) + 1
+        stp <- srt + (max.ch - 1) 
+        col.nm[i,j] <- substr(colnames(x)[j], srt, stp) 
+        #if (nchar(col.nm[i,j]) > 0)  # left adjust within column
+          #while (nchar(col.nm[i,j]) <= (max.ch-1))
+            #col.nm[i,j] <- paste(col.nm[i,j], " ", sep="")
+      }
+    }
+  }
+  else {
+    nr.lbl <- 1
+    col.nm <- matrix(nrow=1, ncol=ncol(x))
+    for (j in 1:ncol(col.nm)) col.nm[1,j] <- colnames(x)[j] 
+  }
+  # for each row, shift down value if next row is "", repeat
+  if (nr.lbl > 1) { 
+    for (k in 2:nrow(col.nm)) {  # repeat for each row
+      for (i in 2:nrow(col.nm)) {
+        for (j in 1:ncol(col.nm)) { 
+          if (nchar(col.nm[i,j]) == 0) {
+            col.nm[i,j] <- col.nm[i-1,j]  
+            col.nm[i-1,j] <- ""
+          }
+        }
+      }
+    }
+  }
+
+  # write col labels
+  for (i in 1:nr.lbl) {  # for each row of column labels
+    tx[length(tx)+1] <- format("", width=max.c1)
+    for (j in 1:ncol(x)) {
+      wd <- max.ln[j]
+      tx[length(tx)] <- paste(tx[length(tx)], .fmtc(col.nm[i,j], w=wd), sep="")
+      if (!is.null(bnd)) if (j %in% bnd)
+        if (i == nr.lbl)
+          tx[length(tx)] <- paste(tx[length(tx)], "|", sep="")
+        else
+          tx[length(tx)] <- paste(tx[length(tx)], " ", sep="")
+    }
+  }
+  if (!is.null(bnd))
+    tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1+length(bnd), cc="-")
+
+  # factor vars to char vars
+  if (is.data.frame(x)) { 
+    i.col <- sapply(x, is.factor)
+    x[i.col] <- lapply(x[i.col], as.character)
+  }
 
   # write values
   for (i in 1:nrow(x)) {
     if (i %in% brk) tx[length(tx)+1] <- "..."
     rwnm <- paste(" ", rownames(x)[i])
     tx[length(tx)+1] <- format(rwnm, width=max.c1, justify="right")
-    for (j in 1:ncol(x)) 
+
+    for (j in 1:ncol(x)) {
       if (is.integer(x[i,j]))
         tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j], w=max.ln[j]), sep="")
+
       else if (is.numeric(x[i,j])) {
-        cs <- .fmt(x[i,j], d=digits.d, w=max.ln[j])
-        if (abs(x[i,j]) < cut) cs <- paste(rep(" ", max.ln[j]), collapse = "")
+        wd <- max.ln[j] 
+        if (cors) {
+          if (max.ln[j] > 5) wd <- max(6, max.ln[j]+1) + 1 
+          else wd <- max(6, max.ln[j]+1)
+          cs <- .fmt(x[i,j], d=digits.d, w=wd)
+          cs <- sub("0.", "", cs, fixed=TRUE)
+          cs <- sub(" 1.00", "100", cs, fixed=TRUE)
+        }
+        else
+          cs <- .fmt(x[i,j], d=digits.d, w=wd)
+        if (abs(x[i,j]) < cut) cs <- paste(rep(" ", wd-2), collapse="")
         tx[length(tx)] <- paste(tx[length(tx)], cs, sep="")
+        if (!is.null(bnd)) if (j %in% bnd)
+          tx[length(tx)] <- paste(tx[length(tx)], "|", sep="") 
       }
+
       else if (is.character(x[i,j]))
-       tx[length(tx)] <- paste(tx[length(tx)], .fmtc(x[i,j], w=max.ln[j]) , sep="") 
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtc(x[i,j], w=max.ln[j]) , sep="") 
+    }
+
+    if (!is.null(bnd)) if (i %in% bnd)
+      tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1+length(bnd), cc="-")
   }
 
   return(tx)

@@ -38,7 +38,7 @@ subs(\ldots)
 }
 
 \details{
-\code{Subset} creates a subset based on one or more rows of data and one or more variables in the input data frame, and lists the first five rows of the revised data frame. Guidance and feedback regarding the subsets are provided by default. The first five lines of the input data frame are listed before the subset operation, followed by the first five lines of the output data frame.
+\code{Subset} creates a subset data frame based on one or more rows of data and one or more variables in the input data frame, and lists the first five rows of the revised data frame. Guidance and feedback regarding the subsets are provided by default. The first five lines of the input data frame are listed before the subset operation, followed by the first five lines of the output data frame.
 
 The argument \code{rows} can be a logical expression based on values of the variables, or it can be an integer or proportion to indicate random extraction of rows. An integer specifies the number of rows to retain, and a proportion specifies the corresponding proportion, which is then rounded to an integer. If \code{holdout=TRUE}, then the code to create a hold out data frame with a subsequent \code{Subset} analysis is also created. Copy and run this code on the original data frame to create the hold out sample.
 

@@ -2,8 +2,15 @@ importFrom("car", vif, scatter3d, dataEllipse)
 importFrom("leaps", leaps)
 importFrom("MBESS", ci.smd)
 importFrom("foreign", read.spss)
-importFrom("gdata", read.xls)
+importFrom("sas7bdat", read.sas7bdat)
+importFrom("readxl", read_excel)
 importFrom("triangle", dtriangle, rtriangle)
+
+importFrom("graphics", "abline", "arrows", "axis", "axis.Date", "barplot", "box", "boxplot", "hist", "legend", "lines", "mtext", "pairs", "par", "pie", "plot", "plot.default", "plot.new", "plot.window", "points", "polygon", "rect", "rug", "segments", "stripchart", "strwidth", "sunflowerplot", "symbols", "text", "title")
+importFrom("grDevices", "boxplot.stats", "col2rgb", "colorRampPalette", "colors", "dev.list", "dev.new", "dev.off", "dev.set", "gray", "heat.colors", "palette", "pdf", "rainbow", "rgb", "terrain.colors")
+importFrom("stats", "IQR", "TukeyHSD", "addmargins", "anova", "aov", "as.formula", "chisq.test", "coef", "complete.cases", "confint", "cooks.distance", "cor", "cor.test", "cov", "density", "dffits", "dlnorm", "dnorm", "dt", "dunif", "factanal", "fitted", "frequency", "glm", "heatmap", "interaction.plot", "lm", "lm.influence", "loadings", "loess", "lowess", "median", "na.omit", "pf", "pnorm", "power.t.test", "predict", "promax", "pt", "qnorm", "qt", "quantile", "rbinom", "replications", "residuals", "rlnorm", "rnorm", "rstandard", "rstudent", "runif", "sd", "shapiro.test", "start", "t.test", "terms.formula", "var", "varimax")
+importFrom("utils", "head", "help", "packageVersion", "read.csv", "read.fwf", "read.table", "write.csv", "write.table")
+
 
 S3method(print, out_all)
 S3method(print, out_piece)
@@ -23,6 +30,7 @@ export (
   Correlation, cr, cr.brief,
   CountAll, ca,
   corCFA, cfa, scales,
+  corRead, rd.cor,
   corReorder, reord, 
   corReflect, reflect, corProp, prop, corRead,
   corScree, scree, corEFA, efa,
@@ -49,11 +57,10 @@ export (
   Subset, subs,
   SummaryStats, ss, ss.brief,
   to,
-  tAnd, tNum, tP, tRow,
   Transform, trans,
   ttest, tt, tt.brief,
   ttestPower, ttp,
   values, 
-  Write, wrt, wrt.r
+  Write, wrt, wrt.r,
+  xAnd, xNum, xP, xRow, xU, xW
 )
-

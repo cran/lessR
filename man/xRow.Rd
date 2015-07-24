@@ -1,5 +1,5 @@
-\name{tRow}
-\alias{tRow}
+\name{xRow}
+\alias{xRow}
 
 \title{Add the Word Row to Case Labels that Could be Numeric}
 
@@ -7,7 +7,7 @@
 }
 
 \usage{
-tRow(x)
+xRow(x)
 }
 
 \arguments{
@@ -24,11 +24,11 @@ Input is a vector of values, output is vector of associated row labels, perhaps 
 # The word Row gets added
 v <- c(2, 4, 6)
 names(v) <- c("1", "2", "3")
-tRow(v)
+xRow(v)
 
 # The word Row does not get added
 v <- c(2, 4, 6)
 names(v) <- c("Bill", "Tulane", "Hanna")
-tRow(v)
+xRow(v)
 }
 

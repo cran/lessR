@@ -2,11 +2,11 @@
 function(lm.out, brief, 
          n.keep, digits.d, show.R,
          new.data, pred.sort, pred.rows, scatter.3D, scatter.coef,
-         in.data.frame, X1.new, X2.new, X3.new, X4.new, X5.new) {
+         in.data.frame, X1.new, X2.new, X3.new, X4.new, X5.new, X6.new) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
-  n.pred <- n.vars - 1
+  n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
 
   tx <- character(length = 0)
@@ -23,7 +23,7 @@ function(lm.out, brief,
     tx[length(tx)+1] <- .dash2(68)
   }
 
-  tx[length(tx)+1] <- "Data, Fitted, Standard Error of Forecast, Prediction Intervals"
+  tx[length(tx)+1] <- "Data, Predicted, Standard Error of Forecast, 95% Prediction Intervals"
   tx[length(tx)+1] <- "   [sorted by lower bound of prediction interval]"
   if (pred.rows < n.keep  &&  !new.data) 
     tx[length(tx)+1] <- "   [to see all intervals do pred.rows=\"all\"]"
@@ -66,7 +66,7 @@ function(lm.out, brief,
     out <- out[o,]
   }
 
-  names(out)[n.vars+1] <- "fitted"
+  names(out)[n.vars+1] <- "pred"
   names(out)[n.vars+2] <- "sf"
   names(out)[n.vars+3] <- "pi:lwr"
   names(out)[n.vars+4] <- "pi:upr"

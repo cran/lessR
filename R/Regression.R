@@ -1,5 +1,6 @@
 Regression <-
 function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
+
          knitr.file=NULL, explain=getOption("explain"),
          interpret=getOption("interpret"), results=getOption("results"),
 
@@ -12,7 +13,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          scatter.coef=TRUE, scatter.3D=FALSE, graphics=TRUE,
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
-         X5.new=NULL,
+         X5.new=NULL, X6.new=NULL,
 
          pdf=FALSE, pdf.width=5, pdf.height=5, refs=FALSE, 
          fun.call=NULL, ...) {
@@ -37,15 +38,18 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
   options(width=text.width)
 
+  max.new <- 6
+
   # output
   cor <- TRUE  # do even if only one pred variable
 
   if (brief) {
-    if (is.null(res.rows)) res.rows <- 0
-    if (is.null(pred.rows)) pred.rows <- 0
+    if (is.null(res.rows)) res.rows <- 0L
+    if (is.null(pred.rows)) pred.rows <- 0L
     relate <- FALSE
    }
-   else relate <- TRUE
+  else
+    relate <- TRUE
   
   if (!exists(dname)) {
     txtC <- "Function reg requires the data exist in a data frame\n"
@@ -60,7 +64,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
-  n.pred <- n.vars - 1
+  n.pred <- n.vars - 1L
   n.obs <- nrow(data)
 
   predictors <- character(length=0)
@@ -97,19 +101,43 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     subsets <- FALSE
   }
 
+  in.data.frame <- TRUE
+  for (i in 1:n.vars) {
+    if (!(nm[i] %in% names(data))) {
+      cat("\n\n\n>>> Note: ", nm[i], "is not in the data frame.\n")
+      in.data.frame <- FALSE
+    }
+  }
+
+  # check for all numeric vars  in.data.frame <- TRUE
+  numeric.all <- TRUE
+  for (i in 1:n.vars) {
+      if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
+        #cat("\n>>> Note: ", nm[i], "is not a numeric variable.\n",
+            #"   No scatter plot(s) generated.\n")
+        numeric.all <- FALSE
+      }
+    }
+
   if ( scatter.3D && (n.pred)!=2 ) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
        "Can have a 3D scatterplot only with exactly two predictor variables.\n\n")
   }
   
-  if ( !is.null(X1.new) && (n.pred)>5 ) {
+  if ( !is.null(X1.new)  &&  (n.pred) > max.new ) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "No new data for prediction if more than 5 predictor variables.\n\n")
+        "No new data for prediction if more than", max.new,
+          "predictor variables.\n\n")
+  }
+  
+  if ( !is.null(X1.new) && !numeric.all ) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "All variables must be numeric to use new data for prediction.\n\n")
   }
 
   # check new.data option for consistency  
   new.data <- FALSE
-  if ( n.pred > 0  &&  n.pred <= 5 ) { 
+  if ( n.pred > 0  &&  n.pred <= max.new ) { 
     for (i in 1:(n.pred)) {
       pp <- eval(parse(text=paste("X", toString(i),".new",sep="")))
       if (!is.null(pp)) new.data <- TRUE
@@ -141,20 +169,13 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     }
   }
 
-  in.data.frame <- TRUE
-  for (i in 1:n.vars) {
-    if (!(nm[i] %in% names(data))) {
-      cat("\n\n\n>>> Note: ", nm[i], "is not in the data frame.\n")
-      in.data.frame <- FALSE
-    }
-  }
-
   # keep track of generated graphic, see if manage graphics
     if (graphics) {
-      plot.i <- 0
+      plot.i <- 0L
       plot.title  <- character(length=0)
       manage.gr <- .graphman()
     }
+
 
   # --------------------------------------------------------
   # reg analysis
@@ -192,16 +213,6 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   fit <- .reg1fitBasic(lm.out, dname, anv$tot["ss"], digits.d, show.R)
   tx1fit <- fit$tx
 
-
-  # check for all numeric vars  in.data.frame <- TRUE
-  numeric.all <- TRUE
-  for (i in 1:n.vars) {
-      if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
-        #cat("\n>>> Note: ", nm[i], "is not a numeric variable.\n",
-            #"   No scatter plot(s) generated.\n")
-        numeric.all <- FALSE
-      }
-    }
 
   title_rel <- "  RELATIONS AMONG THE VARIABLES"
   tx2rel <- ""; tx2cor <- ""; tx2cln <- ""; tx2all <- ""
@@ -270,7 +281,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     prd <- .reg4Pred(lm.out, brief,
          n.keep, digits.d, show.R,
          new.data, pred.sort, pred.rows, scatter.3D, scatter.coef,
-         in.data.frame, X1.new, X2.new, X3.new, X4.new, X5.new)
+         in.data.frame, X1.new, X2.new, X3.new, X4.new, X5.new, X6.new)
     tx3prd <- prd$tx
     predmm <- prd$predmm
   }
@@ -353,11 +364,36 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   # knitr
   txkfl <- ""
   if (!is.null(knitr.file)) {
+    new.val <- matrix(nrow=n.pred, ncol=2, byrow=TRUE)
+
+    # get some (generally) unique values for each pred to demo X1.new ...
+    if (n.pred <= max.new  &&  numeric.all  &&  is.null(X1.new)) {
+      for (i in 1:n.pred) {
+        v <- sort(data[,nm[i+1]])
+
+        # get new lower value
+        min.v <- min(v, na.rm=TRUE)
+        test.v <- round(quantile(v, prob=.25)[1])
+        while(test.v %in% v)
+          if (test.v > min.v) test.v <- test.v - 1 else break 
+        new.val[i,1] <- ifelse (test.v == min.v, round(test.v - 1), round(test.v))
+        if (min.v==0  &&  test.v==0) new.val[i,1] <- 0  # don't go neg here
+      
+        # get new upper value
+        max.v <- max(v, na.rm=TRUE)
+        test.v <- round(quantile(v, prob=.75)[1])
+        while(test.v %in% v) 
+          if (test.v < max.v) test.v <- test.v + 1 else break 
+        new.val[i,2] <- ifelse (test.v == max.v, round(test.v + 1), round(test.v))
+      }
+    }
+    
+
     txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
     knitr.file <- paste(knitr.file, txt, sep="") 
     txknt <- .reg.knitr(nm, dname, fun.call, n.vars, res.rows, pred.rows,
         res.sort, digits.d, explain, interpret, results, est$pvalues, tol,
-        resid.max, numeric.all)
+        resid.max, numeric.all, X1.new, new.val)
     cat(txknt, file=knitr.file, sep="\n")
     txkfl <- .showfile2(knitr.file, "knitr instructions")
   }

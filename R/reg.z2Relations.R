@@ -4,7 +4,7 @@ function(lm.out, dname, n.keep, show.R,
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
-  n.pred <- n.vars - 1
+  n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
 
   # -------------------------
@@ -114,7 +114,7 @@ function(lm.out, dname, n.keep, show.R,
       #models <- data.frame(cbind(md, lp.out$adjr2, lp.out$size-1))  
       names(models) <- c(names(X), "R2adj", "X's")
       mod.srt <- models[order(models$R2adj, decreasing=TRUE),]
-      names(mod.srt)[ncol(mod.srt)-1] <- "   R2adj"
+      names(mod.srt)[ncol(mod.srt)-1L] <- "   R2adj"
       lines <- min(50, nrow(mod.srt))
 
       # width of data columns
@@ -122,14 +122,14 @@ function(lm.out, dname, n.keep, show.R,
       for (i in 1:ncol(X)) {
         ln.nm <- nchar(colnames(X)[i])
         max.ln[i] <- ln.nm + 1
-        if (max.ln[i] < 4) max.ln[i] <- 4
+        if (max.ln[i] < 4) max.ln[i] <- 4L
       }
 
       tx[length(tx)+1] <- ""
       for (i in 1:(n.pred+2)) {
         if (i <= n.pred) ww <- max.ln[i]
-        if (i == n.pred+1) ww <- 9
-        if (i == n.pred+2) ww <- 7
+        if (i == n.pred+1) ww <- 9L
+        if (i == n.pred+2) ww <- 7L
         tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(mod.srt)[i], w=ww), sep="")
       }
 

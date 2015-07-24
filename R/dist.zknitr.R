@@ -11,12 +11,30 @@ function(Y, dname, fun.call, d) {
   tx <- character(length = 0)
 
   tx[length(tx)+1] <- "---"
-  tx[length(tx)+1] <- "output: html_document"
+  tx[length(tx)+1] <- "output:"
+  tx[length(tx)+1] <- "  html_document:"
+  tx[length(tx)+1] <- "    fig_height: 4.5"
+  tx[length(tx)+1] <- "    fig_width: 5.5"
+
   tx[length(tx)+1] <- "---"
+
+
+  tx[length(tx)+1] <- ""
+  tx[length(tx)+1] <- "***"
+
+  v <- packageVersion("lessR")
+  tx[length(tx)+1] <- paste(
+"_", format(Sys.time(), "%a %b %d, %Y at %H:%M"), " &nbsp; with ",
+"lessR version ", v, "_",
+sep="")
+
+  tx[length(tx)+1] <- ""
+  tx[length(tx)+1] <- "***"
+
+
 
   tx[length(tx)+1] <- paste("# Distribution of ", Y, sep="")
 
-  tx[length(tx)+1] <- paste("_", format(Sys.time(), "%a %b %d, %Y at %H:%M"), "_", sep="")
 
   tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- "```{r, echo=FALSE}"
@@ -65,7 +83,7 @@ sep="")
 
   tx[length(tx)+1] <- paste(
 "Data from the following variables are available for analysis: ",
-"`r tAnd(names(", dname, "))`. ",
+"`r xAnd(names(", dname, "))`. ",
 sep="")
 
 
@@ -73,6 +91,7 @@ sep="")
 
 
 
+  tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- "## The Histogram"
 
   tx[length(tx)+1] <- ""
@@ -90,7 +109,7 @@ sep="")
 "this sample of data of ", Y, ".",
 sep="")
   tx[length(tx)+1] <- "```{r, echo=FALSE}"
-  tx[length(tx)+1] <- paste("s <- ss(", Y, ")", sep="") 
+  tx[length(tx)+1] <- paste("s <- ss.brief(", Y, ")", sep="") 
   tx[length(tx)+1] <- "```"
 
   tx[length(tx)+1] <- "```{r, echo=FALSE}"
@@ -100,9 +119,9 @@ sep="")
   tx[length(tx)+1] <- paste("\n",
 "Of the `r s$n+s$n.miss` cases presented for analysis, `r s$n` are ",
 "retained, so the number of deleted data values due to missing data ",
-"is `r s$n.miss`. The sample mean of ", Y, " is `r tP(s$mean", d, ")` with ",
-"a standard deviation of `r tP(s$sd", d, ")` ranging from ",
-"`r tP(s$min", d, ")` to `r tP(s$max", d, ")`. ",
+"is `r s$n.miss`. The sample mean of ", Y, " is `r xP(s$mean", d, ")` with ",
+"a standard deviation of `r xP(s$sd", d, ")` ranging from ",
+"`r xP(s$min", d, ")` to `r xP(s$max", d, ")`. ",
 sep="")
   
   tx[length(tx)+1] <- ""

@@ -145,40 +145,34 @@ Kupper and Hafner (1989). The American Statistician, 43(2):101-105.
 # tt for two groups, from a formula
 # ----------------------------------------------------------
 
-# create simulated data, no population mean difference
-# X has two values only, Y is numeric
-# put into a data frame, required for formula version
-n <- 24
-X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
-Y <- round(rnorm(n=n, mean=50, sd=10),2)
-mydata <- data.frame(X,Y)
-rm(X); rm(Y)
+mydata <- Read("Employee", format="lessR", quiet=TRUE)
+
 
 # analyze data with formula version
 # variable names and levels of X are automatically obtained from data
 # although data frame not attached, reference variable names directly
-ttest(Y ~ X)
+ttest(Salary ~ Gender)
 
 # short form
-tt(Y ~ X)
+tt(Salary ~ Gender)
 
 # brief version of results
-tt.brief(Y ~ X)
+tt.brief(Salary ~ Gender)
 
 # return the vectors group1 and group2 into the object t.out
 # separate the data values for the two groups and analyze separately
-t.out <- ttest(Y ~ X)
+t.out <- ttest(Salary ~ Gender)
 Histogram(group1, data=t.out)
 Histogram(group2, data=t.out)
 
 # compare to standard R function t.test
-t.test(mydata$Y ~ mydata$X, var.equal=TRUE)
+t.test(mydata$Salary ~ mydata$Gender, var.equal=TRUE)
 
 # consider the practical importance of the difference
-ttest(Y ~ X, msmd=.5)
+ttest(Salary ~ Gender, msmd=.5)
 
 # obtain the line chart of the response variable for each group
-ttest(Y ~ X, line.chart=TRUE)
+ttest(Salary ~ Gender, line.chart=TRUE)
 
 # variable of interest is in a data frame which is not the default mydata
 # access the data frame in the lessR dat.twogroup data set
@@ -192,10 +186,10 @@ ttest(Score ~ StudyType, data=dataLearn)
 # ----------------------------------------------------------
 
 # confidence interval only, from data
-ttest(Y)
+ttest(Salary)
 
 # confidence interval and hypothesis test, from data
-ttest(Y, mu0=52)
+ttest(Salary, mu0=52000)
 
 
 # -------------------------------------------------------

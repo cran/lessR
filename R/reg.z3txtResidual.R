@@ -3,7 +3,7 @@ function(lm.out, cook, digits.d=NULL, res.sort="cooks", res.rows=NULL, show.R=FA
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
-  n.pred <- n.vars - 1
+  n.pred <- n.vars - 1L
   n.keep <- nrow(lm.out$model)
   
   tx <- character(length = 0)
@@ -53,15 +53,15 @@ function(lm.out, cook, digits.d=NULL, res.sort="cooks", res.rows=NULL, show.R=FA
   if (res.sort != "off") {
     if (res.sort == "cooks") {
       o <- order(out$cooks, decreasing=TRUE)
-      clmn <- 0
+      clmn <- 0L
     }
     if (res.sort == "rstudent") {
       o <- order(abs(out$rstdnt), decreasing=TRUE)
-      clmn <- 2
+      clmn <- 2L
     }
     if (res.sort == "dffits") {
       o <- order(abs(out$dffits), decreasing=TRUE)
-      clmn <- 1
+      clmn <- 1L
     }
     out <- out[o,]
   }

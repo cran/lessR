@@ -6,7 +6,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
-  n.pred <- n.vars - 1
+  n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
   n.keep <- nrow(lm.out$model)
   if (is.null(pred.rows)) if (n.keep < 25) pred.rows <- n.keep else pred.rows <- 4 
@@ -21,7 +21,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
   }
 
   # keep track of the plot in this routine
-  plt.i <- 0
+  plt.i <- 0L
   plt.title  <- character(length=0)
 
   if (n.pred <= 1) {  # scatterplot, if one predictor variable
@@ -57,7 +57,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     else
       fl <- "none"
 
-    plt.i <- plt.i + 1
+    plt.i <- plt.i + 1L
     plt.title[plt.i] <- gsub(pattern="\n", replacement=" ", x=ctitle)
 
     if (n.pred > 0)
@@ -107,7 +107,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       col.bg=getOption("col.bg")
 
       panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        col.pt=getOption("col.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
+        col.pt=col.pts, col.smooth=col.line,
         span=2/3, iter=3, ...) 
       {
           points(x, y, pch=pch, col=col.pt, cex=cex)
@@ -116,7 +116,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
             lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
       }
 
-      plt.i <- plt.i + 1
+      plt.i <- plt.i + 1L
       plt.title[plt.i] <- "ScatterPlot Matrix"
 
       if (scatter.coef) {

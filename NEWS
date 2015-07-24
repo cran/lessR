@@ -5,6 +5,61 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 
+>>>>>> Changes for lessR version 3.3.3 (2015-07-23) <<<<<<
+
+-------------
+Updates 3.3.3
+-------------
+
+Read
+  Hadley Wickam's read_excel function used for reading excel files,
+    which does not require Perl, with the character variables from
+    read_excel set as factors as with reading other data formats,
+    except for the following addition for all formats ...
+  Non-numeric character strings with unique values read as class
+    character instead of factor
+
+Regression
+  extensive further development of the generated markup file from 
+    the knitr.file option
+  up to 6 predictor variables allowed for specifying new data,
+    instead of just 5
+
+Logit
+  up to 6 predictor variables allowed for specifying new data,
+    instead of just 5
+
+corCFA
+  knitr.file option
+  option for lavaan style model specification, the same code runs
+    both corCFA and lavaan
+  min.cor and min.res options added for minimum respective value to be
+    printed, to improve readability of correlation matrices
+  output correlations omit the decimal point for more compact output
+  correlations predicted from the model available in assigned
+    output of function
+  factor labels displayed on output correlation matrices
+
+Label, Details
+  print formatting of labels improved
+
+Read
+  SAS files are read
+
+Write
+  specify parameters in a more standard order:  ref, data, format
+
+
+---------------
+Bug Fixes 3.3.3
+---------------
+
+corRead
+  abbreviated form rd.cor properly recognized
+
+
+
+
 >>>>>> Changes for lessR version 3.3.1 (2015-04-27) <<<<<<
 
 -------------

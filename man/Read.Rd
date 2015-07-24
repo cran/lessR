@@ -9,17 +9,17 @@
 \description{
 Abbreviation: \code{rd},  \code{rd.brief}, \code{Read2}
 
-Reads the contents of the specified data file with optional variable labels into an R data table (frame). By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, or R data file from \code{.rda}, and, if Perl is installed, Excel file from \code{.xls} or \code{.xlsx} using the \code{gdata} package.  If no filetype is recognized then Read defaults to reading a comma separated or tab-limited text data file.  Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL.
+Reads the contents of the specified data file with optional variable labels into an R data table (frame). By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls} or \code{.xlsx} using the \code{readxl} package.  If no filetype is recognized then Read defaults to reading a comma separated or tab-limited text data file.  Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL.
 
 Variable labels can be added to the data table when reading a text file. Any variable labels in a native SPSS of native R file are automatically included. See the \code{details} section below for more information. Variable labels can also be added and modified individually with the \code{lessR} function \code{\link{label}}.
 
 The function also provides feedback regarding the data that is read, which includes the variable names, the dimensions of the resulting data frame, the data type for each variable, and the values of the variables in the data file for the first and last rows of the data. In addition, an analysis of missing data is provided, listing the number of missing values for each variable and for each observation. The brief form just lists the input files, the variable name table, and any variable labels.
 
-Also see the \code{lessR} function \code{\link{corRead}} to read a correlation matrix.
+The \code{lessR} function \code{\link{corRead}} reads a correlation matrix.
 }
 
 \usage{
-Read(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "lessR"),
+Read(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
 
          labels=NULL, widths=NULL, missing="", n.mcut=1, 
 
@@ -79,7 +79,7 @@ Read2(\ldots, sep=";", dec=",")
 
 
 \details{
-By default \code{Read} reads text data files which are either comma delimited, \code{csv}, or tab-dilimited data files, native Excel files of type \code{.xls} or \code{.xlsx}, native R files with file type of \code{.rda} and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide feedback regarding details of the data frame that was read.
+By default \code{Read} reads text data files which are either comma delimited, \code{csv}, or tab-dilimited data files, native Excel files of type \code{.xls} or \code{.xlsx}, native R files with file type of \code{.rda} and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide feedback regarding details of the data frame that was read. Variables defined by non-numeric variables are read as factors if their values are not unique, otherwise they are read as character strings.
 
 CREATE csv FILE\cr
 One way to create a csv data file is to enter the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
@@ -102,16 +102,7 @@ R DATA\cr
 Relies upon the standard R function \code{load}. By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{mydata}, with the \code{lessR} function \code{\link{Write}}.
 
 Excel DATA\cr
-Relies upon the function \code{read.xls} from the \code{gdata} package by Gregory Warnes and others. Files with a file type of \code{.xls} or \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The default worksheet to read from the file is the first worksheet. The \code{read.xls} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file. The \code{read.xls} function relies upon the \code{Perl} scripting language, which must be accessible to R. This language is typically found on Macintosh and Linux/Unix systems but must usually be installed on a Windows system.
-
-To install on Windows and make accessible to R:\cr
-1. Download and \href{http://strawberryperl.com}{install Perl} from: \code{http://strawberryperl.com/}\cr
-Install the  64 bit version if running the 64 bit version of R.\cr
-2. Enter the following function calls into the R console:\cr
-\code{library(gdata)}\cr
-\code{installXLSXsupport(perl = "C:\\\\strawberry\\\\perl\\\\bin\\\\perl.exe")}\cr
-3. Restart R\cr
-If the \code{gdata} package is updated, then the \code{installXLSXsupport} must be re-run.
+Relies upon the function \code{\link{read_excel}} from Hadley Wickham's \code{readxl} package. Files with a file type of \code{.xls} or \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The default worksheet to read from the file is the first worksheet. The \code{read_excel} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file. 
 
 lessR DATA\cr
 \code{lessR} has some data sets included with the package.  \code{Read} reads each such data set by specifying its name and setting \code{format="lessR"}. Also, each included data set begins with the prefix \code{dat}, which can be deleted when specifying the name of the data set. This option is a replacement for the standard R \code{data} function, offering the added information provided by \code{\link{Read}}.
@@ -152,13 +143,13 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 \references{
 Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 2, NY: Routledge.
 
-Gregory R. Warnes, Ben Bolker, Gregor Gorjanc, Gabor Grothendieck, Ales Korosec, Thomas Lumley, Don MacQueen, Arni Magnusson, Jim Rogers and others (2013). gdata: Various R programming tools for data manipulation. R package version 2.13.2. \url{http://CRAN.R-project.org/package=gdata}
+Wickham, H. (2015). readxl: Read Excel Files. R package version 0.1.0. \url{http://CRAN.R-project.org/package=readxl}
 }
 
 
 \seealso{
-\code{read.csv},\code{read.spss},
-\code{read.fwf}, \code{\link{corRead}},
+\code{\link{read.csv}}, \code{\link{read.spss}}, 
+\code{\link{read.fwf}}, \code{\link{corRead}},
 \code{\link{label}}, \code{\link{details}}.
 }
 
@@ -194,13 +185,10 @@ Gregory R. Warnes, Ben Bolker, Gregor Gorjanc, Gabor Grothendieck, Ales Korosec,
 # do not display any output
 # mydata <- Read(quiet=TRUE)
 
-# read tab-delimited (or any other white-space) data
-# mydata <- Read(sep="")
-
 # read the built-in data set datEmployee
 mydata <- Read("Employee", format="lessR")
 
-# read a data file that consists of a 
+# read a data file organized by columns, with a 
 #   5 column ID field, 2 column Age field
 #   and 75 single columns of data, no spaces between columns
 #   name the variables with lessR function: to

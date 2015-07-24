@@ -3,7 +3,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
-  n.pred <- n.vars - 1
+  n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
   d <- digits.d
 
@@ -41,8 +41,8 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
       xjc <- .fmt(smc[j,i], d=digits.d)
       if (nchar(xjc) > max.ln[i]) max.ln[i] <- nchar(xjc)
     }
-    max.ln[i] <- max.ln[i] + 1
-    if (max.ln[i] < 9) max.ln[i] <- 9
+    max.ln[i] <- max.ln[i] + 1L
+    if (max.ln[i] < 9) max.ln[i] <- 9L
   }
 
   df.lbl <- .fmtc("     df", max.ln[1]+1)

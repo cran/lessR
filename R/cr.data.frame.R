@@ -200,9 +200,10 @@ function(x, miss, show.n, n.cat, digits.d,
   }
 
   else
-    cat("\n>>> To view a heat map and scatter plot matrix set:  graphics=TRUE\n\n")
+    if (is.null(options()$knitr.in.progress))
+      cat("\n>>> To view comments, enter the name of the saved object, e.g., mycor\n")
+      cat("\n>>> To view a heat map and scatter plot matrix set:  graphics=TRUE\n\n")
 
   return(list(txb=txb, txm=txm, txc=txc, cors=crs))
-
 
 }

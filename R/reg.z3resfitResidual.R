@@ -29,10 +29,10 @@ function(lm.out, cook, cooks.cut,
   }
 
   # keep track of the plot in this routine
-  plt.i <- 0
+  plt.i <- 0L
   plt.title  <- character(length=0)
 
-  plt.i <- plt.i + 1
+  plt.i <- plt.i + 1L
   plt.title[plt.i] <- "Residuals vs Fitted Values"
 
   # plot of residuals vs fitted

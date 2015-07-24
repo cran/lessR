@@ -1,5 +1,5 @@
 Write <- 
-function(ref=NULL, format=c("csv", "R"), data=mydata, ...) {
+function(ref=NULL, data=mydata, format=c("csv", "R"), ...) {
 
   format <- match.arg(format)
 

@@ -23,7 +23,7 @@ Logit(my.formula, data=mydata, digits.d=4, text.width=120,
      pred=TRUE, pred.all=FALSE, cooks.cut=1, 
 
      X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
-     X5.new=NULL,
+     X5.new=NULL, X6.new=NULL,
 
      pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
@@ -65,6 +65,8 @@ lr(\ldots)
   \item{X4.new}{Values of the fourth listed predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{X5.new}{Values of the fifth listed predictor variable for which forecasted values
+        and corresponding prediction intervals are calculated.}
+  \item{X6.new}{Values of the sixth listed predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}

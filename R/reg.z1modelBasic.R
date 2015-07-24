@@ -3,7 +3,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
-  n.pred <- n.vars - 1
+  n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
 
   tx <- character(length = 0)
@@ -46,7 +46,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
       ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 1
       if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
     }
-    if (max.num[icol] < 9) max.num[icol] <- 9 
+    if (max.num[icol] < 9) max.num[icol] <- 9L 
   }
 
   # row labels

@@ -3,7 +3,7 @@ function(lm.out, dname="mydata", TotSS, digits.d=NULL, show.R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
-  n.pred <- n.vars - 1
+  n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
 
   tx <- character(length = 0)

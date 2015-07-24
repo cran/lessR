@@ -201,6 +201,16 @@ Commonly used graphical parameters that are available to the standard R function
 \item{main}{Title of the graph, see \code{\link{title}}.}
 \item{xlim}{The limits of the plot on the x-axis, expressed as c(x1,x2), where x1 and x2 are the limits. Note that x1 > x2 is allowed and leads to a reversed axis.}
 \item{ylim}{The limits of the plot on the y-axis.}
+
+ONLY VARIABLES ARE REFERENCED\cr
+The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+
+\code{    > ScatterPlot(rnorm(50), rnorm(50))   # does NOT work}
+
+Instead, do the following:
+\preformatted{    > X <- rnorm(50)   # create vector X in user workspace
+    > Y <- rnorm(50)   # create vector Y in user workspace
+    > ScatterPlot(X,Y)     # directly reference X and Y}
 }
 
 }

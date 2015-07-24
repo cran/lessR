@@ -29,6 +29,10 @@ The function provides two different modes. The first mode is to return the varia
 The second mode is to assign a variable label to an existing variable. Invoke this mode by specifying a variable label with the \code{value} option. The function accesses the entire specified data frame, and then modifies the specified variable label. As such, assign the output of the function to the data frame of interest, such as the default \code{mydata}. One use of this function is to add a variable label to a data frame that contains a new variable created by a transformation of the existing variables. 
 }
 
+\value{
+The specified value of \code{value} is returned.
+}
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{

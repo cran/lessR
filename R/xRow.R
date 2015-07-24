@@ -1,4 +1,4 @@
-tRow <- function(x) {
+xRow <- function(x) {
 
   x.name <- names(x[])
 

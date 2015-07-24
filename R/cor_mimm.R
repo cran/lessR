@@ -1,6 +1,5 @@
 .mimm <- function(R, LblCut, NVC, NF, Iter) {
 
-
       NItems <- NVC
 
   # Compute item-factor and fac-fac covariances by calculating sums.
@@ -47,7 +46,6 @@
         }
       }
 
-
   # Compute communalities of the Jth group by iterating.
   # Iter: Number of iterations.
   # OldFF: Factor variance at the beginning of current iteration.
@@ -75,10 +73,10 @@
 
   # Standardize the item-factor and factor-factor covariances.
   # Since the items are already standardized, item-factor covariances are
-  #   standardized by dividing by FacSD. This is accomplished in Loop 140
+  #   standardized by dividing by FacSD. This is accomplished in a loop
   #   as well as beginning the standardization of the factor-factor
   #   covariances.  The second division by the remaining FacSD for the
-  #   factor-factor covariances is accomplished in Loop 150.
+  #   factor-factor covariances is accomplished in a following loop.
 
       for (J in 1:NF) {
         L <- NItems + J

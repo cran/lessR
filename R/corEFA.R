@@ -16,15 +16,18 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
   if (class(x) == "out_all")
     x <- eval(parse(text=paste(cor.nm, "$cors", sep="")))  # go to $cors 
+print(x)
     
 
-  tx <- character(length = 0)
-  tx[length(tx)+1] <- "Exploratory Factor Analysis"
-  tx[length(tx)+1] <- .dash2(30)
-  tx[length(tx)+1] <- "Extraction: maximum likelihood"
-  if (n.factors > 1)  tx[length(tx)+1] <- paste("Rotation:", rotate)
-  tx[length(tx)+1] <- .dash2(30)
-  txttl <- tx
+  title_efa <- "  EXPLORATORY FACTOR ANALYSIS"
+
+  txer <- ""
+  if (is.null(options()$knitr.in.progress)) {
+    tx <- character(length = 0)
+    tx[length(tx)+1] <- "Extraction: maximum likelihood"
+    if (n.factors > 1)  tx[length(tx)+1] <- paste("Rotation:", rotate)
+    txer <- tx
+  }
 
   # EFA
   fa2 <- factanal(covmat=x, factors=n.factors, rotation="none", ...)
@@ -68,9 +71,13 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   txss <- tx
 
 
-  # generate the MIMM code
+  title_cfa <- "  CONFIRMATORY FACTOR ANALYSIS CODE"
 
+  # generate the MIMM code
   FacItems <- integer(length=n.ind)  # factor with highest loading for item
+  Fac <- integer(length=n.factors)
+  n.Fact <- integer(length=n.factors)
+
   for (i in 1:n.ind) {
     max.ld <- 0
     FacItems[i] <- 0
@@ -83,42 +90,8 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   }
 
 
-  Fac <- integer(length=n.factors)
-  n.Fact <- integer(length=n.factors)
-
   tx <- character(length = 0)
-  tx[length(tx)+1] <- "lessR code for iterated centroid confirmatory factor analysis"
-  tx[length(tx)+1] <- .dash2(10)
 
-  tx[length(tx)+1] <- "corCFA("
-  for (i.fact in 1:n.factors) {
-    n.Fact[i.fact] <- 0
-    k <- 0
-    for (j.item in 1:n.ind) if (FacItems[j.item] == i.fact) {
-      k <- k + 1
-      Fac[k] <- j.item
-      n.Fact[i.fact] <- n.Fact[i.fact] + 1
-    }
-    tx[length(tx)+1] <- (paste("  F", as.character(i.fact), " = c(", sep=""))
-    if (n.Fact[i.fact] > 0) {
-      for (i in 1:n.Fact[i.fact]) {
-        tx[length(tx)] <- paste(tx[length(tx)], colnames(x)[Fac[i]], sep="")
-        if (i < n.Fact[i.fact]) tx[length(tx)] <- paste(tx[length(tx)], ", ", sep="")
-      
-      }
-      tx[length(tx)] <- paste(tx[length(tx)], ")", sep="")
-      if (i.fact < n.factors) tx[length(tx)] <- paste(tx[length(tx)], ",", sep="")
-    }
-  }
-  tx[length(tx)+1] <- ")"
-  txmgp <- tx
-
-
-  tx <- character(length = 0)
-  tx[length(tx)+1] <- "lavaan code for maximum likelihood confirmatory factor analysis"
-  tx[length(tx)+1] <- .dash2(11)
-
-  tx[length(tx)+1] <- "library(lavaan)"
   tx[length(tx)+1] <- "MeasModel <- "
   for (i.fact in 1:n.factors) {
     n.Fact[i.fact] <- 0
@@ -141,11 +114,16 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
           tx[length(tx)] <- paste(tx[length(tx)], " + ", sep="")
       }
     }
-    if (i.fact == n.factors) tx[length(tx)] <- paste(tx[length(tx)], "\"")
+    if (i.fact == n.factors) tx[length(tx)] <- paste(tx[length(tx)], "\n\"")
   }
-  tx[length(tx)+1] <- "fit <- cfa(MeasModel, data=mydata)"
+
+  tx[length(tx)+1] <- ""
+  tx[length(tx)+1] <- "fit <- lessR::cfa(MeasModel)\n"
+
+  tx[length(tx)+1] <- "library(lavaan)"
+  tx[length(tx)+1] <- "fit <- lavaan::cfa(MeasModel, data=mydata)"
   tx[length(tx)+1] <- "summary(fit, fit.measures=TRUE, standardized=TRUE)"
-  txlvn <- tx
+  txcfa <- tx
 
 
   # report any deleted items
@@ -156,19 +134,16 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
     deleted[del.count] <- i.item
   }
 
+  txdel <- ""
   tx <- character(length = 0)
   if (del.count > 0) {
-    tx[length(tx)+1] <- "Deleted items"
-    tx[length(tx)+1] <- .dash2(13)
     tx[length(tx)+1] <- paste("Deletion threshold: min.loading = ", 
-        min.loading, "\n", sep="")
+        min.loading, sep="")
     tx[length(tx)+1] <- "Deleted items: "
     for (i.item in 1:del.count)
       tx[length(tx)] <- paste(tx[length(tx)], colnames(x)[deleted[i.item]], " ", sep="")
+    txdel <- tx
   }
-  else
-    tx <- ""
-  txdel <- tx
 
 
   # knitr
@@ -182,17 +157,21 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   }
 
 
-  class(txttl) <- "out_piece"
+  class(title_efa) <- "out_piece"
+  class(txer) <- "out_piece"
   class(txld) <- "out_piece"
   class(txss) <- "out_piece"
-  class(txmgp) <- "out_piece"
-  class(txlvn) <- "out_piece"
+  class(title_cfa) <- "out_piece"
+  class(txcfa) <- "out_piece"
   class(txdel) <- "out_piece"
 
-  output <- list(out_title=txttl, out_loadings=txld, out_sum_squares=txss,
-    out_ice=txmgp, out_lavaan=txlvn, out_deleted=txdel,
-    converged=fa2$converged, n_factors=n.factors, ss_factors=vx, loadings=ld.srt,
-    call=cl)
+  output <- list(
+    out_title_efa=title_efa, out_type=txer, out_loadings=txld, out_ss=txss,
+    out_title_cfa=title_cfa, out_cfa_code=txcfa,
+    out_deleted=txdel,
+
+    converged=fa2$converged, n_factors=n.factors, ss_factors=vx,
+    loadings=ld.srt, call=cl)
 
   class(output) <- "out_all"
   return(output)

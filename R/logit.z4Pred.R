@@ -3,7 +3,7 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          new.data, pred, pred.all, 
          numeric.all, in.data.frame, X1.new, 
-         X2.new, X3.new, X4.new, X5.new,
+         X2.new, X3.new, X4.new, X5.new, X6.new,
          pdf.file, pdf.width, pdf.height) {
 
   pred.sort <- TRUE  # data must be sorted to find cases close to fitted=0.5

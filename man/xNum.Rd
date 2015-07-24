@@ -1,5 +1,5 @@
-\name{tNum}
-\alias{tNum}
+\name{xNum}
+\alias{xNum}
 
 \title{Text Processing: Convert a Number to a Word}
 
@@ -7,13 +7,12 @@
 }
 
 \usage{
-  tNum(x, uc=FALSE) 
+  xNum(x) 
 }
 
 
 \arguments{
   \item{x}{The integer to convert.}
-  \item{uc}{Upper case flag, by default off.}
 }
 
 
@@ -24,6 +23,6 @@ Input is an integer, or coerced to integer after rounding. For integers from 0 t
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \examples{
-tNum(5)
+xNum(5)
 }
 

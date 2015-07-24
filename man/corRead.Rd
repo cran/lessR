@@ -47,11 +47,11 @@ Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 8, NY: Routl
 \examples{
 # browse for the data file because ref is omitted
 # name the variables with the lessR function to
-# corRead(names=to("m",20))
+# mycor <- corRead(names=to("m",20))
 
 # abbreviated form
 # read a matrix with 4 variables and specify the names
-# rd.cor(names=c("m06","m07","m09","m10"))
+# mycor <- rd.cor(names=c("m06","m07","m09","m10"))
 }
 
 

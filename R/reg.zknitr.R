@@ -1,10 +1,14 @@
 .reg.knitr <-
 function(nm, dname, fun.call, n.vars, res.rows, pred.rows, res.sort,
          digits.d, explain, interpret, results, pvalues, tolerances,
-         resid.max, numeric.all) {
+         resid.max, numeric.all, X1.new,
+         new.val=matrix(nrow=n.vars-1, ncol=2, byrow=TRUE)) {
 
   fncl <- .fun.call.deparse(fun.call) 
-  fc <- .rm.arg("knitr.file", fncl) 
+  if (regexec("knitr.file", fncl)[1] > 0) fc <- .rm.arg("knitr.file", fncl) 
+  if (regexec("explain", fc)[1] > 0) fc <- .rm.arg.ns("explain", fc) 
+  if (regexec("interpret", fc)[1] > 0) fc <- .rm.arg.ns("interpret", fc) 
+  if (regexec("results", fc)[1] > 0) fc <- .rm.arg.ns("results", fc) 
 
   # set parameters
   n.pred <- n.vars - 1
@@ -12,16 +16,26 @@ function(nm, dname, fun.call, n.vars, res.rows, pred.rows, res.sort,
   Y <- nm[1]
   pred <- character(length=0)
   for (i in 1:n.pred) pred[i] <- nm[i+1]
-  X <- tAnd(pred)
+  X <- xAnd(pred)
+
+  # get variable labels and units if exist
+  mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
+  myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
+  var.lbl <- character(length=0)
+  var.unit <- character(length=0)
+  for (i in 1:n.vars) {
+    var.lbl[i] <- mylabels[which(names(mylabels) == nm[i])]
+    var.unit[i] <- myunits[which(names(myunits) == nm[i])] 
+  }
 
   if (n.pred > 1) {
     pl <- "s" 
-    et <- "Each "
+    et <- "each "
     cnst <- ", with the values of all remaining predictor variables held constant"
   }
   else {
     pl <- ""
-    et <- "The "
+    et <- "the "
     cnst <- ""
   }
 
@@ -31,16 +45,20 @@ function(nm, dname, fun.call, n.vars, res.rows, pred.rows, res.sort,
   tx <- character(length = 0)
 
   tx[length(tx)+1] <- "---"
-  tx[length(tx)+1] <- "output: html_document"
+  tx[length(tx)+1] <- "output:"
+  tx[length(tx)+1] <- "  html_document:"
+  tx[length(tx)+1] <- "    fig_height: 4.5"
+  tx[length(tx)+1] <- "    fig_width: 5.5"
   tx[length(tx)+1] <- "---"
 
-  if (n.pred > 1)
-    tx[length(tx)+1] <- paste("# Multiple Regression of ", Y, sep="")
-  else
-    tx[length(tx)+1] <- paste("# Regression of ", Y, " on ", X, sep="")
 
+  tx[length(tx)+1] <- ""
+  tx[length(tx)+1] <- "***"
+
+  v <- packageVersion("lessR")
   tx[length(tx)+1] <- paste(
-"_", format(Sys.time(), "%a %b %d, %Y at %H:%M"), "_",
+"_", format(Sys.time(), "%a %b %d, %Y at %H:%M"), " &nbsp; with ",
+"lessR version ", v, "_",
 sep="")
 
   tx[length(tx)+1] <- paste("\n",
@@ -48,15 +66,43 @@ sep="")
 ", results=", results, "_",
 sep="")
 
+  tx[length(tx)+1] <- ""
+  tx[length(tx)+1] <- "***"
+
+
+
+  tx[length(tx)+1] <- ""
+  if (n.pred > 1)
+    tx[length(tx)+1] <- paste("# Multiple Regression of ", Y, sep="")
+  else
+    tx[length(tx)+1] <- paste("# Regression of ", Y, " on ", X, sep="")
+
   tx[length(tx)+1] <- "```{r echo=FALSE}"
   tx[length(tx)+1] <- "suppressPackageStartupMessages(library(lessR))  # load lessR"
   tx[length(tx)+1] <- "```"
 
+  if (!is.na(var.lbl[1])) {
+    Ylbl <- var.lbl[1]
+    txtY <- paste(", ", Ylbl, sep="")
+  }
+  else
+    txtY <- ""
+
+  txtX <- ""
+  if (n.pred == 1) {
+    if (!is.na(var.lbl[2])) {
+      Xlbl <- var.lbl[2]
+      txtX <- paste(", ", Xlbl, sep="")
+    }
+  }
 
   tx[length(tx)+1] <- paste(
-"The purpose of this analysis is to account for the values of the _response ",
-"variable_, ", Y, ", in terms of the values of the ", 
-"_predictor variable", pl, "_ ", X, ".", 
+"The variable of primary interest is the _response variable_, ",
+Y, txtY, ". ",
+"The purpose of this analysis is to account for the values of ",
+Y, " in ",
+" terms ", "of the values of the _predictor variable", pl, "_ ",
+X, txtX, ".", 
 sep="")
 
 
@@ -84,7 +130,8 @@ sep="")
 
 
   if (explain) {
-    tx[length(tx)+1] <- paste("Read the data. ")
+    tx[length(tx)+1] <- paste("Read the data with the `lessR` ",
+"function `Read`. ")
     ref <- .get.arg("ref", rdcall)  # only works for Read, not rd or rd.brief
     if (ref %in% c("Employee", "Reading", "Cars93", "Jackets", "Learn", "Mach4")) {
       ref  <- paste(ref, "\"", ", format=\"lessR", sep="")
@@ -109,7 +156,7 @@ sep="")
 
   tx[length(tx)+1] <- paste(
 "Data from the following variables are available for analysis: ",
-"`r tAnd(names(", dname, "))`. ",
+"`r xAnd(names(", dname, "))`. ",
 sep="")
 
 
@@ -125,7 +172,7 @@ sep="")
   tx[length(tx)+1] <- "### Specified Model"
 
   tx[length(tx)+1] <- paste(
-"Express ", Y, " as a linear function of ", tNum(n.pred), " ", 
+"Express ", Y, " as a linear function of ", xNum(n.pred), " ", 
 "predictor variable", pl, ": ", X, ". ",
 sep="")
 
@@ -146,7 +193,7 @@ sep="")
 
     if (explain) tx[length(tx)+1] <- paste(
 "The _intercept_, $b_0$, indicates ",
-"the fitted value of ", Y, ", when the values of ", X, " are zero.", sep="")
+"the fitted value of ", Y, ", for values of ", X, " all equal to zero.", sep="")
 
     if (n.pred > 1) {
         txt2 <- paste("through $b_", n.pred, "$", sep="")
@@ -156,26 +203,29 @@ sep="")
     }
 
       if (explain) tx[length(tx)+1] <- paste(
-"Applied to the training data, ", tolower(et), "_slope coefficient_, ",
+xU(et), "_slope coefficient_, ",
 "$b_1$ ", txt2, ", is the ",
 "average change in the value of ",
 "response variable, ", Y, ", for a one-unit increase in the value of ",
 "the corresponding predictor variable",
-cnst, ".",
+cnst, ". The values of these estimated coefficients only apply to ",
+"the interpretation of the training data from which they were estimated. ",
 sep="")
 
     if (explain) tx[length(tx)+1] <- paste("\n",
-"To compute $\\hat Y_{", Y, "}$ from the values ",
-"of ", X, " for a specific row of data ",
-"requires the estimated values of ", 
+"To compute $\\hat Y_{", Y, "}$ from a specific set of values ",
+"for ", X, " requires the estimated values of ", 
 "the coefficients of the model, the values of ",
 "each regression coefficient, $b_j$. ",
-"This estimation is based on the _residual_, the difference between the ",
-"actual value of ", Y, " for each row of data, ",
+"This estimation procedure ",
+"depends on the _residual_, the difference between the ",
+"actual value of ", Y, " for each row of data ",
 "and the corresponding value fitted by the model. ", 
-"Here write the model with the subscript _i_ for the $i^{th}$ row of data, ",
-"to emphasize that the equation applies to each row of training data. ",
-"The name of the response variable is understood ",
+"Define the residual as a variable across all rows of data. ",
+"Use the subscript _i_ ",
+"to indicate the $i^{th}$ row of data ",
+"to emphasize that the expression applies to _each_ row of training data. ",
+"The name of the response variable in this notation is understood ",
 "and so is omitted for simplicity. ",
 sep="")
 
@@ -184,21 +234,24 @@ sep="")
 sep="")
 
     if (explain) tx[length(tx)+1] <- paste(
-"Estimate the coefficients ",
-"with ordinary least squares (OLS). ",
-"That is, choose the estimates that minimize the sum of the squared ",
-"residuals, $\\sum e^2_i$, across all the rows of training data. ",
+"Estimate the coefficients with ordinary least squares (OLS), ",
+"which provides the one set of estimates that minimize the ",
+"sum of the squared ",
+"residuals, $\\sum e^2_i$, across all the rows of the training data. ",
 "Accomplish the estimation and related computations with the `lessR` ",
-"function `Regression`.",
+"function `Regression`, which can be abbreviated as `reg`.",
 sep="")
 
-  loc <- regexec("graphics = FALSE", fc)
-  if (loc == -1) fc <- sub(")$", ", graphics=FALSE)", fc)
+  locTRUE <- regexec("graphics = TRUE", fc)
+  if (locTRUE == -1) {
+    loc <- regexec("graphics = FALSE", fc)
+    if (loc == -1) fc <- sub(")$", ", graphics = FALSE)", fc)
+  }
 
   if (results) {
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- paste("```{r", show, "}", sep="")
-    tx[length(tx)+1] <- "# Generate graphics later with `regPlot` function"
+    tx[length(tx)+1] <- "# Keep graphics separate, generate later with `regPlot` function"
     tx[length(tx)+1] <- paste("r <-", fc)
     tx[length(tx)+1] <- "```"
   }
@@ -231,7 +284,8 @@ sep="")
   if (explain) tx[length(tx)+1] <- paste(
 "The analysis of the model begins with the estimation of each sample ",
 "regression coefficient, $b_j$, from the training data. ",
-"Of greater interest is each corresponding population value, $\\beta_j$. ",
+"Of greater interest is each corresponding population value, $\\beta_j$, ",
+"in the _population model_. ",
 sep="")
 
   cv <- paste("$$\\hat Y_{", Y, "} = \\beta_0 + \\beta_1 X_{", nm[2], "}", sep="")
@@ -272,16 +326,22 @@ sep="")
   }
 
   tx[length(tx)+1] <- paste(
-"This estimated model is the specific linear function that provides a ",
-"fitted value of ", Y, " from the value", pl, " of ", X, ".",
+"This estimated model is the specific linear function that yields a ",
+"fitted value of ", Y, " from the provided value", pl, " of ", X, ".",
 sep="")
 
-  cv <- paste("$$\\hat Y_{", Y, "} = `r tP(r$coefficients[1],", d, ")` + ",
-    "`r tP(r$coefficients[2],", d, ")` X_{", nm[2], "}", sep="")
+  cv <- paste(
+"$$\\hat Y_{", Y, "} = `r xP(r$coefficients[1],", d, ")` ", 
+"`r ifelse(sign(r$coefficients)==1, \"+\", \"-\")[2]` ",
+"`r xP(abs(r$coefficients[2]),", d, ")` X_{", nm[2], "}", 
+sep="")
   if (n.vars > 2)
     for (i in 3:n.vars)
-      cv <- paste(cv, " + `r tP(r$coefficients[", i, "],", d, ")`", " X_{",
-                  nm[i], "}", sep="")
+      cv <- paste(
+cv, "`r ifelse(sign(r$coefficients)==1, \"+\", \"-\")[", i, "]` ",
+" `r xP(abs(r$coefficients[", i, "]),", d, ")`",
+" X_{", nm[i], "}",
+sep="")
   cv <- paste(cv, "$$", sep="")
   tx[length(tx)+1] <- cv
 
@@ -290,26 +350,26 @@ sep="")
     if (gt05  > 1) {
       txt1 <- "these"
       txt3 <- "have _p_-values"
-      txt5 <- "Each "
+      txt5 <- "each "
       pl2 <- "s"
     }
     else {
       txt1 <- "this"
       txt3 <- "has a _p_-value"
-      txt5 <- "The "
+      txt5 <- "the "
       pl2 <- ""
     }
 
     if (interpret) tx[length(tx)+1] <- paste(
-tNum(gt05, uc=TRUE), " predictor variable", pl2, " ", txt3, " larger than ",
+xU(xNum(gt05)), " predictor variable", pl2, " ", txt3, " larger than ",
 "$\\alpha$ = 0.05: ", 
-"`r tAnd(names(which(r$pvalues[2:length(r$pvalues)] > 0.05)))`. ", 
+"`r xAnd(names(which(r$pvalues[2:length(r$pvalues)] > 0.05)))`. ", 
 sep="")
 
     if (interpret) tx[length(tx)+1] <- paste(
-txt5, "null hypothesis of no ",
+xU(txt5), "null hypothesis of no ",
 "relationship could not be rejected, so there is a reasonable possibility ",
-"that ", txt1, " predictor variable", pl2, " may not contribute to ",
+"that ", txt5, " predictor variable may not contribute to ",
 "explaining the values of ", Y, cnst, ". ",
 sep="")
   }  #  p > .05
@@ -319,37 +379,38 @@ sep="")
     if (length(which(pvalues[2:length(pvalues)] <= 0.05)) > 1) {
       txt1 <- "These predictor variables each have "
       txt2 <- "their"
-      txt3 <- "these coefficients"
+      txt3 <- "these corresponding coefficients"
       txt4 <- "these"
       pl3 <- "s"
     }
     else {
       txt1 <- "This predictor variable has "
       txt2 <- "its"
-      txt3 <- "this coefficient"
+      txt3 <- "this corresponding coefficient"
       txt4 <- "this"
       pl3 <- ""
     }
 
     if (interpret) tx[length(tx)+1] <- paste("\n",
 txt1, "a _p_-value less than or equal to $\\alpha$ = 0.05: ", 
-"`r tAnd(names(which(r$pvalues[2:length(r$pvalues)] <= 0.05)))`. ",
+"`r xAnd(names(which(r$pvalues[2:length(r$pvalues)] <= 0.05)))`. ",
 sep="")
 
     if (interpret && n.pred > 1  && n.sig < n.pred)
       tx[length(tx)+1] <- paste(
-"The possibility should be further explored in the rest of the ",
-"analysis that ", txt4," ", tNum(n.sig), " variable", pl3, " ", 
-"likely form an equally effective ",
+"The possibility should be further explored in the remainder of this ",
+"analysis that ", txt4," ", xNum(n.sig), " variable", pl3, " ", 
+"may form an equally effective ",
 "but more parsimonious model in terms of ", txt2, " ",
 "cumulative contribution to explaining the values of ", Y, ", ", 
-"compared to the current model with ", tNum(n.pred), " predictor variables. ", 
+"compared to the current model with ", xNum(n.pred), " predictor variables. ", 
 sep="")
 
     if (interpret) tx[length(tx)+1] <- paste("\n",
 "To extend the ",
-"results beyond this sample, interpret the meaning of ", txt3, " ",
-"in terms of ", txt2, " corresponding confidence interval", pl3, ". ",
+"results beyond this sample to the population from which the sample ",
+"was obtained, interpret the meaning of ", txt3, " ",
+"in terms of ", txt2, " confidence interval", pl3, ". ",
 sep="")
 
     if (interpret) {
@@ -357,20 +418,40 @@ sep="")
         j <- which(pvalues[2:length(pvalues)] <= 0.05)[i] 
         if (i == 1 && n.pred > 1) tx[length(tx)+1] <- ""
         if (n.pred > 1) tx[length(tx)+1] <- paste(
-  "* _", pred[j], "_: ",
-  sep="")
+"* _", pred[j], "_: ",
+sep="")
+        u.nm <- which(names(myunits) == pred[j])
+        if (!is.null(myunits[u.nm])) {
+          if (nzchar(myunits[u.nm])) {
+            u <- myunits[u.nm]
+            l <- mylabels[which(names(mylabels) == pred[j])]
+            txt <- paste(u, "of", l)
+          }
+          else
+            txt <- paste("unit of the value of", pred[j])
+        }
+        else
+          txt <- paste("unit of the value of", pred[j])
+
+        if (!is.null(myunits[which(names(myunits) == nm[1])])) {
+          uY <- myunits[which(names(myunits) == nm[1])]
+          uY <- paste("\"", uY, "\"", sep="")
+        }
+        else
+          uY <- ""
+
         tx[length(tx)+1] <- paste(
-  "With 95% confidence, for each additional unit of the value of ",
-  pred[j], ", ",
-  "on average, the value of ", Y, " changes somewhere between ",
-  "`r tP(r$cilb[", j+1, "],", d, ")`", " to ",
-  "`r tP(r$ciub[", j+1, "],", d, ")`",
-  sep="") 
+"With 95% confidence, for each additional ",
+txt,
+", on average, the value of ", Y, " changes somewhere between ",
+"`r xP(r$cilb[", j+1, "],", d, ",", uY, ")`", " to ",
+"`r xP(r$ciub[", j+1, "],", d, "," ,uY, ")`",
+sep="") 
         remn <- sub(pred[j], "", pred)  # leaves an empty vector value
         remain <- character(length=0)
         for (k in 1:n.pred)  # collate into a single string
-          if (nchar(remn[k]) > 0) remain[length(remain)+1] <- remn[k]
-        remain <- tAnd(remain)
+          if (nzchar(remn[k])) remain[length(remain)+1] <- remn[k]
+        remain <- xAnd(remain)
         if (n.pred > 1)
           tx[length(tx)] <- paste(tx[length(tx)], ", with the values of ",
             remain, " held constant",
@@ -392,12 +473,20 @@ sep="")
 "An estimated model is not necessarily a useful model. ",
 sep="")
 
+  if (n.pred == 1)
+    geom <- "line"
+  else if (n.pred == 2)
+    geom <- "plane"
+  else
+    geom <- "surface"
+
   if (explain) tx[length(tx)+1] <- paste(
-"How well does the model fit the training data? ",
-"That is, to what extent do the ",
-"values of ", Y, " fitted by the model match the actual ",
-"data values of ", Y, "? Are the residuals typically ",
-"close to their mean of zero, or are they scattered with ",
+"A preliminary consideration is the fit of the model, ",
+"based on the extent that the ",
+"values of ", Y, " fitted by the model to the training data match the ",
+"corresponding training data values of ", Y, ". Are the residuals typically ",
+"close to their mean of zero, or are they scattered about ",
+"the regression ", geom, " with ",
 "relatively large positive and negative values? ",
 sep="")
 
@@ -409,33 +498,35 @@ sep="")
 
   if (explain) tx[length(tx)+1] <- paste("\n",
 "The analysis of fit depends on the adequacy of the model to account for ",
-"the variability of the data values of $Y_{", Y, "}$. ",
+"the variability of the data values of ", Y, ", expressed in model notation ",
+"as  $Y_{", Y, "}$. ",
 "The core component of variability is the _sum of squares_, short for ",
 "the sum of some type of squared deviations. ",
-"Base the total variability of ", Y,  " ",
-"on the deviations of its data values ",
-"from its mean, ",
+"The _total variability_ of $Y_{", Y, "}$ depends on ",
+"the deviations of its data values from its mean, ",
 "$Y_{", Y, "} - \\bar Y_{", Y, "}$, and then the resulting sums of squares, $SS_{", Y, "}$. ",
 sep="")
 
   if (explain) tx[length(tx)+1] <- paste("\n",
 "The analysis of the residuals, ",
-"$e = Y_{", Y, "} - \\hat Y_{", Y, "}$, is based on their corresponding sum of squares, ", 
+"$e = Y_{", Y, "} - \\hat Y_{", Y, "}$, follows from the ",
+"corresponding sum of squares, ", 
 "the value minimized by the least squares estimation procedure, ",
 "$\\sum e^2_i$ = $SS_{Residual}$. ",
-"It represents variation _not_ accounted for by $\\hat Y_{", Y, "}$. ",
-"The corresponding Model (or Regression) sum of squares ",
-"is the analysis of the deviations of the fitted values about ",
-"the mean, ",
+"This residual sum of squares represents variation of $Y_{", Y, "}$ _not_ ",
+"accounted for by $\\hat Y_{", Y, "}$. ",
+"The complement to the residual sum of squares is the ",
+"Model (or Regression) sum of squares, ",
+"the deviations of the fitted values about the mean, ",
 "$\\hat Y_{", Y, "} - \\bar Y_{", Y, "}$. ", 
 sep="")
 
   if (explain) tx[length(tx)+1] <- paste("\n",
-"The ANOVA partitions this total sum of squares ",
-"into the residual variability, $\\sum e^2_i$, and the Model ",
+"The analysis of variance (ANOVA) partitions this total ",
+"sum of squares into the residual variability, $\\sum e^2_i$, and the Model ",
 "sum of squares, $SS_{Model}$. ",
-"The analysis of variance table (ANOVA) provides the ",
-"analysis of variability from these various sources of variation. ",
+"The ANOVA table ",
+"displays these various sources of variation. ",
 sep="")
 
   if (results) {
@@ -447,9 +538,15 @@ sep="")
 
   if (results) tx[length(tx)+1] <- paste(
 "$$SS_{",Y,"} = SS_{Model} + SS_{Residual} = ",
-"`r tP(r$anova_model[\"ss\"],", d, ")` + ",
-"`r tP(r$anova_residual[\"ss\"],", d, ")` = ",
-"`r tP(r$anova_total[\"ss\"],", d, ")` $$",
+"`r xP(r$anova_model[\"ss\"],", d, ")` + ",
+"`r xP(r$anova_residual[\"ss\"],", d, ")` = ",
+"`r xP(r$anova_total[\"ss\"],", d, ",", uY, ", semi=TRUE)` $$",
+sep="")
+
+  if (explain && n.pred == 1) tx[length(tx)+1] <- paste("\n",
+"This decomposition of the sums of squares ",
+"of ", Y, " into what is explained by the model and what is ",
+"not explained is fundamental to assessing the fit of the model. ",
 sep="")
 
   if (explain && n.pred > 1) tx[length(tx)+1] <- paste("\n",
@@ -462,20 +559,43 @@ sep="")
     for (i in 3:n.vars) cv <- paste(cv, " + SS_{", nm[i], "}", sep="")
 
   if (explain && n.pred > 1) tx[length(tx)+1] <- paste(
-cv, " = `r tP(r$anova_model[\"ss\"],", d, ")`$$",
+cv, " = `r xP(r$anova_model[\"ss\"],", d, ")`$$",
 sep="")
 
   if (explain && n.pred > 1) tx[length(tx)+1] <- paste("\n",
 "The sum of squares for a predictor variable ",
-"is called a _sequential sums of squares_ ",
-"because, unless the predictor variables are uncorrelated, its value depends ",
-"on the variables listed before it in the specification of the model. ",
+"is called a _sequential sums of squares_. ",
+"It represents the effect of a predictor variable ", 
+"after the effects of all previously entered variables ",
+"in the model have already been accounted for. ",
+"Unless the predictor variables are uncorrelated, its value depends ",
+"on the sequence of the variables as specified in the model. ",
+"Usually the interpretation of a sequential effect is more useful ",
+"when the variables ",
+"are entered in order of perceived importance. ",
 sep="")
 
   if (explain && n.pred > 1) tx[length(tx)+1] <- paste("\n",
-"This fundamental relationship of these sums of squares components ",
-"is the basis for assessing fit.",
+"Progressing through the table of the sequential sums of squares for each ",
+"predictor variable from the first entry, ", pred[1], ", through ",
+"the last last entry, ", pred[n.pred],  ", forms ",
+"a sequence of increasingly larger _nested models_ that ",
+"successively contain more variables. ",
+"For example, the _p_-value of ",
+"`r r$pvalues[r$n.vars]` ",
+"for the last variable entered into the model, ",
+"`r all.vars(r$formula)[r$n.vars]`, is the same for both the ANOVA ",
+"table and its regression slope coefficient because in both ",
+"situations the effects of all other predictor variables are ",
+"partialled out. ",
 sep="")
+
+  if (explain && n.pred > 1) tx[length(tx)+1] <- paste("\n",
+"This fundamental relationship of these various sums of squares ",
+"components provides the basis for assessing fit.",
+sep="")
+
+
 
 
 
@@ -500,33 +620,33 @@ sep="")
 "the variability of the data values of ", Y, " about the ",
 "corresponding fitted values for the training data, the particular ",
 "data set from which the model was estimated. ",
-"The mean squares in the ANOVA table are variances, a ",
+"Each mean square in the ANOVA table is a variance, a ",
 "sum of squares divided by the corresponding degrees of freedom, _df_. ",
-"By definition of the standard deviation, ",
-"$s_e$ is the square root of the mean square of ",
-"the residuals. ",
+"By definition, the standard deviation, ",
+"$s_e$ is the square root of the mean square of the residuals. ",
 sep="")
 
   if (explain) tx[length(tx)+1] <- "$$s_e = "
   if (explain) tx[length(tx)] <- paste(tx[length(tx)], 
 "\\sqrt{MS_{Residual}} = ",
-"\\sqrt{`r tP(r$anova_residual[\"ms\"],", d, ")`} = ",
+"\\sqrt{`r xP(r$anova_residual[\"ms\"],", d, ")`} = ",
 sep="")
   if (explain) tx[length(tx)] <- paste(tx[length(tx)],
-"`r tP(r$se,", d, ")`$$",
+"`r xP(r$se,", d, ",", uY, ", semi=TRUE)`$$",
 sep="")
 
   if (interpret) tx[length(tx)+1] <- paste(
-"To interpret $s_e$ = `r tP(r$se,", d, ")`, consider the estimated range ",
+"To interpret $s_e$ = `r xP(r$se,", d, ",", uY, ")`, consider the estimated range ",
 "of 95% of the values of a normally distributed variable, which ",
 "depends on the corresponding 2.5% cutoff from the $t$-distribution ",
 "for df=`r r$anova_residual[\"df\"]`: ",
-"`r tP(-qt(0.025, df=r$anova_residual[\"df\"]),3)`. ",
+"`r xP(-qt(0.025, df=r$anova_residual[\"df\"]),3)`. ",
 sep="")
 
     if (interpret) tx[length(tx)+1] <- paste(
 "$$95\\% \\;  Range: 2 * t_{cutoff} * s_e = ",
-"2 * `r tP(-qt(0.025, df=r$anova_residual[\"df\"]),3)` * `r tP(r$se,", d, ")` = `r tP(r$resid_range,", d, ")`$$",
+"2 * `r xP(-qt(0.025, df=r$anova_residual[\"df\"]),3)` * `r xP(r$se,", d, ")` = 
+`r xP(r$resid_range,", d, ",", uY, ", semi=TRUE)`$$",
 sep="")
 
     if (interpret) tx[length(tx)+1] <- paste("\n",
@@ -538,18 +658,19 @@ sep="")
 "A second type of fit index is ",
 "$R^2$, the proportion of the overall variability of ",
 "response variable ", Y, " that is accounted for by the model, ",
-"expressed either in terms of $SS_{Residual}$ or $SS_{Model}$. ",
+"applied to the training data, expressed either in terms of ",
+"$SS_{Residual}$ or $SS_{Model}$. ",
 sep="")
 
   if (explain) tx[length(tx)+1] <- "$$R^2 = "
   if (explain) tx[length(tx)] <- paste(tx[length(tx)], 
 "1 - \\frac{SS_{Residual}}{SS_{", Y, "}} = ",
 "\\frac{SS_{Model}}{SS_{", Y, "}} = ",
-"\\frac{`r tP(r$anova_model[\"ss\"],", d, ")`} ",
-"{`r tP(r$anova_total[\"ss\"],", d, ")`} = ",
+"\\frac{`r xP(r$anova_model[\"ss\"],", d, ")`} ",
+"{`r xP(r$anova_total[\"ss\"],", d, ")`} = ",
 sep="")
   if (explain) tx[length(tx)] <- paste(tx[length(tx)],
-"`r tP(r$Rsq,3)` $$ ",
+"`r xP(r$Rsq,3)` $$ ",
 sep="")
 
   if (explain) tx[length(tx)+1] <- paste(
@@ -573,28 +694,29 @@ sep="")
   if (explain) tx[length(tx)] <- paste(tx[length(tx)], 
 "1 - \\frac{SS_{Residual} \\; / \\; `r r$anova_residual[\"df\"]`}{SS_{", Y, "} \\; / \\; `r r$anova_total[\"df\"]`} = ",
 "1 - \\frac{MS_{Residual}}{MS_{", Y, "}} = ",
-"1 - \\frac{`r tP(r$anova_residual[\"ms\"],", d, ")`} ",
-"{`r tP(r$anova_total[\"ms\"],", d, ")`} = ", 
+"1 - \\frac{`r xP(r$anova_residual[\"ms\"],", d, ")`} ",
+"{`r xP(r$anova_total[\"ms\"],", d, ")`} = ", 
 sep="")
   if (explain) tx[length(tx)] <- paste(tx[length(tx)],
-"`r tP(r$Rsqadj,3)`$$",
+"`r xP(r$Rsqadj,3)`$$",
 sep="")
 
   if (interpret) tx[length(tx)+1] <- paste(
-"From this analysis compare $R^2$ = `r tP(r$Rsq,3)` to the ",
-"adjusted value of $R^2_{adj}$ = `r tP(r$Rsqadj,3)`, a difference of ", 
-"`r tP((r$Rsq-r$Rsqadj), 3)`. A large difference indicates that too many ",
+"From this analysis compare $R^2$ = `r xP(r$Rsq,3)` to the ",
+"adjusted value of $R^2_{adj}$ = `r xP(r$Rsqadj,3)`, a difference of ", 
+"`r xP((r$Rsq-r$Rsqadj), 3)`. A large difference indicates that too many ",
 "predictor variables in the model for the available data yielded an overfitted ",
 "model. ",
 sep="")
 
   if (explain)  tx[length(tx)+1] <- paste("\n",
 "Both $R^2$ and $R^2_{adj}$ describe the fit of the model to the training ",
-"data. To assess the fit of the model to forecasting from new data, apply ",
-"the concept of the _predictive residual_ (PRE). ",
-"Calculate each residual from the ",
-"model estimated from all the remaining cases in the training data, ",
-"what is called a _leave-one-out_ cross validation procedure. ",
+"data. Base the fit of the model to forecasts from new data ",
+"on the _predictive residual_ (PRE). ",
+"To calculate this residual for a row of data (case), first ",
+"estimate a model with the case deleted, that is, from only all the ",
+"remaining cases in the training data, ",
+"what is called a _case-deletion_ statistic. Repeat for all rows of data. ",
 "$SS_{PRE}$, or PRESS, ",
 "is the sum of squares of all the predictive residuals in a data set. ",
 "From $SS_{PRE}$ define the predictive $R^2$. ",
@@ -603,16 +725,17 @@ sep="")
   if (explain) tx[length(tx)+1] <- "$$R^2_{PRESS} = "
   if (explain) tx[length(tx)] <- paste(tx[length(tx)], 
 "1 - \\frac{SS_{PRE}}{SS_{", Y, "}} = ",
-"1 - \\frac{`r tP(r$PRESS,", d, ")`} ",
-"{`r tP(r$anova_total[\"ss\"],", d, ")`} = ",
+"1 - \\frac{`r xP(r$PRESS,", d, ")`} ",
+"{`r xP(r$anova_total[\"ss\"],", d, ")`} = ",
 sep="")
   if (explain) tx[length(tx)] <- paste(tx[length(tx)],
-"`r tP(r$RsqPRESS,3)` $$ ",
+"`r xP(r$RsqPRESS,3)` $$ ",
 sep="")
 
   if (interpret) tx[length(tx)+1] <- paste("\n",
 "Because an estimated model at least to some extent overfits the training data, ",
-"$R^2_{PRESS}$ = `r tP(r$RsqPRESS,3)` is lower than both $R^2$ and $R^2_{adj}$. ",
+"the more useful ",
+"$R^2_{PRESS}$ = `r xP(r$RsqPRESS,3)` is lower than both $R^2$ and $R^2_{adj}$. ",
 sep="")
 
 
@@ -649,21 +772,8 @@ sep="")
 "with degrees of freedom of ",
 "`r as.integer(r$anova_model[\"df\"])` ",
 "and `r as.integer(r$anova_residual[\"df\"])`, ",
-"the test statistic is _F_ = `r tP(r$anova_model[\"fvalue\"],", d, ")`, ", 
-"with a _p_-value of `r tP(r$anova_model[\"pvalue\"],", d, ")`." ,  
-sep="")
-
-  if (explain && n.pred > 1) tx[length(tx)+1] <- paste("\n",
-"Progressing through the table of the sequential sums of squares for each ",
-"predictor variable, from the last up until the first entry ",
-"forms a sequence of increasingly restrictive _nested models_ that ",
-"contain successively fewer variables. ",
-"For example, the _p_-value of ",
-"`r r$pvalues[r$n.vars]` ",
-"for the last variable entered into the model, ",
-"`r all.vars(r$formula)[r$n.vars]`, is the same for both the ANOVA ",
-"table and its regression slope coefficient because in both ",
-"cases the effects of all other predictor variables are partialled out. ",
+"the test statistic is _F_ = `r xP(r$anova_model[\"fvalue\"],", d, ")`, ", 
+"with a _p_-value of `r xP(r$anova_model[\"pvalue\"],", d, ")`." ,  
 sep="")
 
   if (explain && n.pred > 2) tx[length(tx)+1] <- paste("\n",
@@ -752,7 +862,7 @@ sep="")
   if (explain && n.pred > 2) tx[length(tx)+1] <- paste("\n",
 "`r if ((n$anova_tested[5]< 0.05)) reject else accept`",
 sep="")
-  if (explain && n.pred > 2) tx[length(tx)+1] <- "`r tP(n$anova_tested[5],3)`."
+  if (explain && n.pred > 2) tx[length(tx)+1] <- "`r xP(n$anova_tested[5],3)`."
 
   if (explain && n.pred > 2)tx[length(tx)+1] <- paste(
 "Realize that if the reduced model was constructed solely from analyzing ", 
@@ -792,14 +902,14 @@ sep="")
 
       if (n.pred == 1) tx[length(tx)+1] <- paste(
 "The correlation of ", Y, " with ", X, " in the training data is $r$ = ",
-"`r tP(r$cor[2,1],3)`. ",
+"`r xP(r$cor[2,1],3)`. ",
 sep="")
 
 
       if (n.pred > 1)
         txt <- "all the relationships among the variables"
       else
-        paste("the relationship of ", Y, " and ", X, sep="")
+        txt <- paste("the relationship of ", Y, " and ", X, sep="")
     
       if (explain) tx[length(tx)+1] <- paste("\n",
 "Visually summarize ", txt, " in the model ", 
@@ -836,36 +946,28 @@ sep="")
 
       if (explain) tx[length(tx)+1] <- paste(
 "The collinearity analysis assesses the extent that the ",
-"predictor variables are linearly dependent upon each other. ",
-sep="")
-
-      if (explain) tx[length(tx)+1] <- paste(
-"Although collinearity does not diminish the fit of the model, ",
-"or forecasting efficacy, ",
+"predictor variables are linearly dependent upon each other, ",
+"which in the simplest case is a high pairwise correlation. ",
+"Although collinearity does not diminish neither the fit of the model, ",
+"nor forecasting efficacy, ",
 "it may indicate an overly complex model. ",
-"Also, collinear variables have large ",
-"standard errors of their estimated slope coefficients, ",
-"so the estimates are unstable across different samples. ",
-"The unique effects of collinear variables indicated by their ",
-"slope coefficients ",
+"Further, the unique effects of collinear variables, as indicated ",
+"by their slope coefficients, ",
 "cannot be statistically disentangled without a very ",
 "large sample size. ",
-sep="")
-
-      if (explain) tx[length(tx)+1] <- paste(
-"A primary example is a high pairwise correlation. In general, any linear ",
-"dependency among two or more predictor variables indicates ",
-"collinearity. ",
+"As such, collinear variables have relatively large ",
+"standard errors of their estimated slope coefficients, ",
+"which yields unstable estimates. ",
 sep="")
 
       if (explain) tx[length(tx)+1] <- paste("\n",
-"To assess collinearity for predictor variable $X_j$ ",
-"regress that predictor ",
+"To assess collinearity for predictor variable $X_j$, ",
+"directly assess its extent by regressing that predictor ",
 "onto all of the remaining predictor variables. A high ",
 "resulting $R^2_j$ ",
 "indicates collinearity for that predictor. ",
 "Usually express this result in terms of ",
-"the _tolerance_ of the predictor, 1 minus $R^2_j$, ",
+"the _tolerance_ of the predictor, $1 - R^2_j$, ",
 "the proportion of variance for $X_j$ _not_ due do the ",
 "remaining predictor variables. ",
 "Because each $R^2_j$ should be low, presumably at least less than 0.8, ",
@@ -893,9 +995,9 @@ sep="")
       if (interpret && l20 > 0)
         tx[length(tx)+1] <- paste(
 "Collinearity is indicated. ", 
-tNum(l20, uc=TRUE), " variable", hh, " less than the ", 
+xU(xNum(l20)), " variable", hh, " less than the ", 
 "cutoff of 0.20: ",
-"`r tAnd(names(which(r$tolerances < 0.20)))`. ",
+"`r xAnd(names(which(r$tolerances < 0.20)))`. ",
 sep="")
 
       l2030 <- length(which(tolerances >= 0.20 & tolerances < 0.30))
@@ -906,9 +1008,9 @@ sep="")
 
       if (interpret  &&  l2030 > 0) 
         tx[length(tx)+1] <- paste(
-tNum(l2030, uc=TRUE), " variable", hh, " greater than the ", 
+xU(xNum(l2030)), " variable", hh, " greater than the ", 
 "cutoff of 0.20, but still somewhat low, less than 0.30: ",
-"`r tAnd(names(which(r$tolerances >= 0.20 & r$tolerances < 0.30)))`. ",
+"`r xAnd(names(which(r$tolerances >= 0.20 & r$tolerances < 0.30)))`. ",
 sep="")
 
       if (interpret && length(which(tolerances < 0.30)) == 0)
@@ -922,8 +1024,8 @@ sep="")
 
       if (results  &&  n.pred > 1) tx[length(tx)+1] <- paste(
 "The predictor variable", pl2, " with the lowest tolerance ", vrb, " ",
-"`r tAnd(names(which(r$tolerances == min(r$tolerances))))` at ",
-"`r tP(min(r$tolerances),3)`.",
+"`r xAnd(names(which(r$tolerances == min(r$tolerances))))` at ",
+"`r xP(min(r$tolerances),3)`.",
 sep="")
 
 
@@ -963,8 +1065,9 @@ sep="")
 "This subset analysis is a ",
 "descriptive heuristic that can effectively help eliminate unnecessary ",
 "predictor variables from your model, but all resulting inferential ",
-"statistics such as _p_-values are no longer valid. Ultimately the model ",
-"requires cross-validation on a new data set.",
+"statistics such as _p_-values are no longer valid. ",
+"Ultimately a model revised from the training data ",
+"requires cross-validation on a new data set. ",
 sep="")
 
     }  # end n.pred > 1
@@ -987,18 +1090,17 @@ sep="")
     tx[length(tx)+1] <- "## Analysis of Residuals and Influence"
 
     if (explain) tx[length(tx)+1] <- paste(
-"Values of ", Y, " fitted by the estimated model do not ",
-"equal the corresponding data values. Which cases contribute the most ",
-"to this lack of fit? ",
+"Values of ", Y, " fitted by the estimated model do not generally ",
+"equal the corresponding data values. Which cases (rows of data) ",
+"contribute the most to this lack of fit? ",
 sep="")
 
     if (explain) tx[length(tx)+1] <- paste(
 "The identification of cases that have a large residual ",
 "and/or undue influence on the estimation of the model helps ",
-"detect potential outliers.  ",
-"In addition to the data values, fitted value and residual, ",
-"the analysis provides the following ",
-"values for each single case (row of data). ",
+"detect potential outliers. For each case, ",
+"in addition to the data values, fitted value and corresponding residual, ",
+"the analysis provides the following values . ",
 sep="")
 
     if (explain) tx[length(tx)+1] <- paste("\n",
@@ -1020,10 +1122,10 @@ sep="")
     }
 
     if (res.sort != "off") {
-      cv[1] <- paste("`r tP(r$resid.max[1],2)`", sep="")
+      cv[1] <- paste("`r xP(r$resid.max[1],2)`", sep="")
       for (i in 2:4)
-        cv <- paste(cv, ", `r tP(r$resid.max[", i, "],2)`", sep="")
-      cv <- paste(cv, " and `r tP(r$resid.max[5],2)`.", sep="")
+        cv <- paste(cv, ", `r xP(r$resid.max[", i, "],2)`", sep="")
+      cv <- paste(cv, " and `r xP(r$resid.max[5],2)`.", sep="")
       
 
       if (res.sort == "cooks") txt <- "Cook's distances"
@@ -1045,11 +1147,11 @@ sep="")
     else
       hh <- " has a value"
   
-    lbl <- tRow(resid.max)
+    lbl <- xRow(resid.max)
     if (interpret  && res.sort == "cooks"  && (length(which(resid.max > 1)) > 0))
       tx[length(tx)+1] <- paste(
 "The following case", hh, " more than the ", 
-"cutoff of 1: ", tAnd(lbl[which(resid.max > 1)]), ". ",
+"cutoff of 1: ", xAnd(lbl[which(resid.max > 1)]), ". ",
 "For larger sample sizes this guideline should be reduced as the ",
 "influence of any case tends to diminish as the sample size increases. ",
 "The best basis for understanding a high Cook's distance value is to ",
@@ -1077,23 +1179,31 @@ sep="")
     tx[length(tx)+1] <- "## Prediction Intervals"
 
     if (explain) tx[length(tx)+1] <- paste(
-"Prediction is from _new_ data values of ", X, ". Unfortunately, ",  
-"prediction is not perfect. ",
-"The range of values likely to contain the ",
-"actual data value for ", Y, " predicted from specific values of ", X, " ",
-"quantifies the _forecasting error_. ",
+"Ultimately the analysis moves beyond the training sample. ",
+"Prediction is from _new_ data values of ", X, ", what may be ",
+"called the _prediction sample_. Applying these new data values ",
+"to the estimated model yields the predicted values. ",
+"For data values from the training sample, the fitted value and ",
+"predicted value are the same, ",
+"calculated from the same estimated model, but are ",
+"different concepts with different interpretations. ",
 sep="")
     
     if (explain) tx[length(tx)+1] <- paste("\n",
+"Unfortunately, prediction is not perfect. ",
+"The range of values likely to contain the ",
+"actual data value for ", Y, " predicted from specific values of ", X, " ",
+"quantifies the _forecasting error_. ",
 "The standard deviation of the residuals, $s_e$, assumed to be the same ",
 "for all sets of values of the predictor variables, specifies the ",
-"modeling error of the fitted values from the training data. ",
+"_modeling error_ of the fitted values from the training data, error ",
+"due to imperfections in the model. ",
 "However, for predictions of future values of ", Y, ", new data ",
 "are collected. So sampling ",
 "error of a value on the regression line, ",
 "indicated with $s_{\\hat Y}$, must also be considered in the ",
-"assessment of forecasting error, which results in the _standard ",
-"error of forecast_. ",
+"assessment of forecasting error. Consideration of both sources of ",
+"error results in the _standard error of forecast_. ",
 sep="")
 
     if (explain) tx[length(tx)+1] <- paste("\n",
@@ -1111,12 +1221,23 @@ sep="")
 "of $\\hat Y_{", Y, "}$.",
 sep="")
 
+
+
+
+  if (n.pred <= 6  &&  numeric.all  &&  is.null(X1.new)) {
+    tx[length(tx)+1] <- ""
+    tx[length(tx)+1] <- "### Prediction Intervals from the Training Data"
+  }
+
     if (results) tx[length(tx)+1] <- paste("\n",
-"The analysis provides each row of data values with a fitted value based ",
+"The analysis provides each row of data values, _as if_ they were  ",
+"new data, with a predicted value based ",
 "on the model estimated ",
 "from the training data, as well as the standard error of forecast. From ",
 "these values obtain the lower and upper bounds of the corresponding ",
-"95% prediction interval. ",
+"95% prediction interval. By default, only the first three, middle three ",
+"and last three rows of data are presented, sufficient to indicate the ",
+"ranges of prediction error encountered throughout the ranges of data values",
 sep="")
 
     if (results) {
@@ -1126,11 +1247,19 @@ sep="")
       tx[length(tx)+1] <- "```"
     }
 
-    if (explain  &&  n.pred == 1  &&  pred.rows > 0)
-      tx[length(tx)+1] <- paste(
+    if (interpret) tx[length(tx)+1] <- paste("\n",
+"The size of the prediction intervals for the range of data found ",
+"in the input data table vary from a minimum of ",
+"`r xP(r$pred_min_max[1], ", d, ",", uY, ")` for `r xAnd(xRow(r$pred_min_max[1]))` ",
+"to a maximum of ",
+"`r xP(r$pred_min_max[2], ", d, ",", uY, ")` for `r xAnd(xRow(r$pred_min_max[2]))`. ",
+sep="")
+
+    if (explain  &&  n.pred == 1)
+      tx[length(tx)+1] <- paste("\n",
 "The confidence intervals for the points on the regression line, ",
 "and the much larger prediction intervals for the individual data points, ",
-"can now be illustrated with an enhancement of the original scatter plot.",
+"are illustrated with an enhancement of the original scatter plot.",
 sep="")
 
     if (results  &&  n.pred == 1) {
@@ -1142,14 +1271,86 @@ sep="")
       tx[length(tx)+1] <- "```"
     }
 
+
+
+  if (n.pred <= 6  &&  numeric.all  &&  is.null(X1.new)) {
+
+    tx[length(tx)+1] <- ""
+    tx[length(tx)+1] <- "### Prediction Intervals from New Data"
+
+    tx[length(tx)+1] <- paste("\n",
+"New data values from which to obtain ",
+"a forecast, different from the training data, can be entered with ",
+"the options X1.new, X2.new, up to X6.new, where each option name refers to ",
+"the position of the corresponding predictor variable in the specification ",
+"of the regression model. ", 
+"Any number of values can be specified for each predictor variable. ",
+"Suppose, for example, that there are two values of interest ",
+" for ", et, "predictor variable ",
+"from which to make a forecast, listed below. ",
+sep="")
+    
+    tx[length(tx)+1] <- ""
+    for (i in 1:n.pred) {
+      tx[length(tx)+1] <- paste(
+pred[i], ": ", new.val[i,1], ", ", new.val[i,2], "  ",  
+sep="")
+    }
+
+    tx[length(tx)+1] <- paste("\n",
+"Re-run the analysis to obtain the prediction intervals with these ",
+"specified values. ",
+sep="")
+
+    tx[length(tx)+1] <- ""
+    cv <- ",\n        "
+    for (i in 1:n.pred)
+      cv <- paste(cv,
+" X", i, ".new=c(", new.val[i,1], ",", new.val[i,2], ")",
+ifelse(i == n.pred, "", ","), 
+sep="")
+    cv <- paste(cv, ",\n         graphics = FALSE", sep="")
+    fc <- sub(", graphics = FALSE", cv, fc, fixed=TRUE)
+
+    if (results) {
+      tx[length(tx)+1] <- ""
+      tx[length(tx)+1] <- paste("```{r", show, "}", sep="")
+      tx[length(tx)+1] <- paste("r <-", fc)
+      tx[length(tx)+1] <- "```"
+    }
+
+    if (n.pred > 1)
+      tx[length(tx)+1] <- paste("\n",
+"The new data values are specified for each variable separately, but ",
+"a row of data consists of data values for all the predictor values. ",
+"Accordingly, a prediction interval is calculated for each combination ",
+"of the specified new values for each predictor variable. ",
+sep="")
+    else
+      tx[length(tx)+1] <- paste("\n",
+"The prediction intervals are calculated only for the new data values. ",
+sep="")
+
+    if (results) {
+      tx[length(tx)+1] <- ""
+      tx[length(tx)+1] <- paste("```{r", show, "}", sep="")
+      tx[length(tx)+1] <-"r$out_predict" 
+      tx[length(tx)+1] <- "```"
+    }
+
     if (interpret) tx[length(tx)+1] <- paste("\n",
-"The size of the prediction intervals vary from a minimum of ",
-"`r tP(r$pred_min_max[1], ", d, ")` for `r tAnd(tRow(r$pred_min_max[1]))` ",
+"The size of the prediction intervals for the range of data found ",
+"in the newly specified values vary from a minimum of ",
+"`r xP(r$pred_min_max[1], ", d, ",", uY, ")` for `r xAnd(xRow(r$pred_min_max[1]))` ",
 "to a maximum of ",
-"`r tP(r$pred_min_max[2], ", d, ")` for `r tAnd(tRow(r$pred_min_max[2]))`. ",
+"`r xP(r$pred_min_max[2], ", d, ",", uY, ")` for `r xAnd(xRow(r$pred_min_max[2]))`. ",
+"The rows in the output display, however, are re-ordered according to the ",
+"combinations of the ordered values of the predictor variables. ",
 sep="")
 
     }
+
+  }
 
 
 

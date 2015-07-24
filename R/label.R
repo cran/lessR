@@ -31,19 +31,19 @@ function(x, value=NULL, data=mydata) {
   }
 
   if (is.null(value)) {  # display an existing label
-    if (nchar(x.name) > 0) {
+    if (!is.null(x.name)) {
       gl <- .getlabels()
       lbl <- gl$xl
-      if (length(lbl) == 0) {
+      if (is.null(lbl)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "For variable: ", x.name, "\n",
-        "The variable label does not exist.\n")
+        "The variable label does not exist for variable: ", x.name, "\n\n")
       }
-      return(lbl)
+      cat(x.name, ": ", lbl, "\n", sep="")
      }
     else {
       mylabels <- attr(data, which="variable.labels")
-      return(mylabels)
+      for (i in 1:length(mylabels))
+        cat(names(mylabels)[i], ": ", mylabels[i], "\n", sep="")
     }
   }
 

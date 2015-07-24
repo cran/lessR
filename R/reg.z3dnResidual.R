@@ -13,10 +13,10 @@ function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE) {
   }
 
   # keep track of the plot in this routine
-  plt.i <- 0
+  plt.i <- 0L
   plt.title  <- character(length=0)
 
-  plt.i <- plt.i + 1
+  plt.i <- plt.i + 1L
   plt.title[plt.i] <- "Distribution of Residuals"
 
   # frequency distribution of residuals

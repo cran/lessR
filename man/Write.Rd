@@ -12,7 +12,7 @@ Writes the contents of the specified data frame, such as with the default \code{
 }
 
 \usage{
-Write(ref, format=c("csv", "R"), data=mydata, \ldots)
+Write(ref, data=mydata, format=c("csv", "R"), \ldots)
 
 wrt(\ldots)
 
@@ -25,8 +25,8 @@ wrt.r(\ldots, format="R")
         If not included in the name, the file type is automatically added to the
         name, either \code{.csv} or \code{.rda}, depending of the value of
         \code{format}.}
-  \item{format}{Format of file to be written with \code{.csv} as the default.}
   \item{data}{Data frame to be written as an object, that is, no quotes.}
+  \item{format}{Format of file to be written with \code{.csv} as the default.}
   \item{...}{Other parameter values consistent with the usual \code{\link{write.table}}, such as \code{row.names=FALSE} to suppress writing the row names.}
 }
 

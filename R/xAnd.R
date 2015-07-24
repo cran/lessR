@@ -1,4 +1,4 @@
-tAnd <- function(x) {
+xAnd <- function(x) {
 
   n <- length(x)
   lt <- x[1] 

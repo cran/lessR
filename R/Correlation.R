@@ -113,7 +113,9 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
     class(txmis) <- "out_piece"
     class(txcor) <- "out_piece"
 
-    output <- list(out_background=txbck, out_missing=txmis, out_cor=txcor, cors=stuff$cors)
+    output <- list(
+      out_background=txbck, out_missing=txmis, out_cor=txcor,
+      cors=stuff$cors)
   }
 
   else {

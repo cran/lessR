@@ -165,6 +165,15 @@ If variable labels exist, then the corresponding variable label is listed as the
 
 PDF OUTPUT\cr
 Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+
+ONLY VARIABLES ARE REFERENCED\cr
+The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+
+\code{    > BarChart(cut(rnorm(50), breaks=seq(-5,5)))   # does NOT work}
+
+Instead, do the following:
+\preformatted{    > Y <- cut(rnorm(50), breaks=seq(-5,5))   # create vector Y in user workspace
+    >BarChart(Y)     # directly reference Y}
 }
 
 \value{

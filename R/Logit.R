@@ -7,7 +7,7 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
          pred=TRUE, pred.all=FALSE, cooks.cut=1, 
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
-         X5.new=NULL,
+         X5.new=NULL, X6.new=NULL, 
 
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
  
@@ -22,6 +22,8 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
  
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
+
+  max.new <- 6
 
   show.R <- FALSE
   explain <- FALSE
@@ -79,14 +81,15 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
       "If a factor, can only have two levels.\n\n")
   }
   
-  if ( !is.null(X1.new) && (n.pred)>5 ) {
+  if ( !is.null(X1.new)  &&  (n.pred) > max.new ) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "No new data for prediction if more than 5 predictor variables.\n\n")
+        "No new data for prediction if more than", max.new,
+          "predictor variables.\n\n")
   }
 
   # check new.data option for consistency  
   new.data <- FALSE
-  if ( (n.pred) <= 5 ) { 
+  if ( (n.pred) <= max.new ) { 
     for (i in 1:(n.pred)) {
       pp <- eval(parse(text=paste("X", toString(i),".new",sep="")))
       if (!is.null(pp)) new.data <- TRUE
@@ -243,7 +246,7 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          new.data, pred, pred.all, 
          numeric.all, in.data.frame, X1.new, 
-         X2.new, X3.new, X4.new, X5.new,
+         X2.new, X3.new, X4.new, X5.new, X6.new,
          pdf.file, pdf.width, pdf.height)
 
   invisible(lm.out)
