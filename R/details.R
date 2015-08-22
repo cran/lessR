@@ -18,10 +18,10 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   if (!brief) {
     cat("\n")
     cat("Basics\n")
-    .dash(55)
+    .dash(47)
     cat("Number of Variables in the data frame:    ", n.var, "\n", sep="")
     cat("Number of Rows of Data in the data frame: ", n.obs, "\n", sep="")
-    .dash(55)
+    .dash(47)
 
     cat("\n\n")
     cat("Row Names\n")
@@ -37,7 +37,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   if (!brief) cat("\n")
   cat("Variable Names and Data Types\n")
   if (!brief) {
-    .dash(67)
+    .dash(70)
     cat("factor: Non-numeric categories, initially read as unordered categories\n")
     if (ord.fac)
       cat("ordfact: Ordered, non-numeric categories\n")
@@ -45,7 +45,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     cat("numeric: The data values are numeric with decimal digits\n")
   }
 
-  .dash(69)
+  .dash(70)
   max.char <- 0
   for (i in 1:n.var) {
     x.name <- names(data)[i]
@@ -125,10 +125,10 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
          "factor functions. To see examples enter:  > ?Transform\n", 
          "Or, specify a value for n.cat, ",
          "such as:  > set(n.cat=4)\n", sep="")
-      .dash(83)
+      .dash(63)
       for (j in 1:n.var) if (is.numeric(data[,j]) && nu[j] <= n.cat.temp)
         cat(names(data)[j], "\n")
-      .dash(83)
+      .dash(63)
     }
     
     cat("\n\n")
@@ -180,20 +180,36 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   # feedback regarding variable labels
   if (brief) cat("\n")
   mylabels <- attr(data, which="variable.labels")
-  cat("\nVariable Names  Variable Labels\n")
+  myunits <- attr(data, which="variable.units")
+  cat("\nVariable Names   Variable Labels\n")
 
   if (!is.null(mylabels)) {
-    n.labels <- length(mylabels)
+    n.rows <- length(mylabels)
+    n.lines <- min(max.lines, n.rows)
 
-    max.chr <- 0
-    for (i in 1:length(mylabels))
-      if (nchar(mylabels[i]) > max.chr) max.chr <- nchar(mylabels[i])
-    .dash(max.chr)
-    for (i in 1:length(mylabels))
-      cat(names(mylabels)[i], ": ", mylabels[i], "\n", sep="")
-    .dash(max.chr)
-    if (n.labels > max.lines) {
-      cat("To see all the variable labels set max.lines to", n.labels, "\n")
+    mx.nm <- 0
+    for (i in 1:n.lines)  # var names
+      if (nchar(names(mylabels)[i]) > mx.nm) mx.nm <- nchar(names(mylabels)[i])
+    width.nm <- mx.nm + 1
+
+    mx.ln <- 0
+    for (i in 1:n.lines) {  # get width of largest line
+      nc <- nchar(as.character(mylabels[i]))
+      if (nc > mx.ln) mx.ln <- mx.nm + nc
+    }
+    width.ln <- max(mx.ln, nchar("Variable Names  Variable Labels"))
+    width.ln <- min(mx.ln+3, 80)
+
+    .dash(width.ln)
+    for (i in 1:n.lines) {
+      blanks <- paste(rep(" ", width.nm-nchar(names(mylabels)[i])), collapse = "")
+      if (is.na(mylabels[i])) mylabels[i] <- ""
+      cat(names(mylabels)[i], blanks, mylabels[i], "\n")
+    }
+    .dash(width.ln)
+
+    if (n.rows > n.lines) {
+      cat("To see all the variable labels set mx.lines to", n.rows, "\n")
       .dash(64)
       cat("\n")
     }
@@ -204,30 +220,23 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   }
 
   # feedback regarding variable units
-  if (brief) cat("\n")
-  myunits <- attr(data, which="variable.units")
-  cat("\nVariable Names  Variable Units\n")
+  cat("\n\nVariable Names   Variable Units\n")
 
   if (!is.null(myunits)) {
-    myunits <- data.frame(myunits)
-    names(myunits) <- ""
-    n.labels <- nrow(myunits)
-    n.lines <- min(max.lines, n.labels)
-    max.chr <- 0
-    for (i in 1:n.labels) {  # get width of largest variable label
-      xlbl <- as.character(myunits[i,])
-      if (nchar(xlbl) > max.chr) max.chr <- nchar(xlbl)
-    }
-    max.chr <- max(max.chr, nchar("Variable Names  Variable Units"))
+    n.units <- length(myunits)
+    n.lines <- min(max.lines, n.units)
 
-    for (i in 1:(max.chr)) cat("-")  # no following blank line from .dash
-    print(head(myunits, n=n.lines))
-    .dash(max.chr)
-    if (n.labels > n.lines) {
-      cat("To see all the variable labels set max.lines to", n.labels, "\n")
-      .dash(64)
-      cat("\n")
+    for (i in 1:n.lines)  # get width of largest line
+      width.ln <- width.nm + nchar(as.character(myunits[i]))
+    width.ln <- max(width.ln, 1+nchar("Variable Names  Variable Units"))
+
+    .dash(width.ln)
+    for (i in 1:n.lines) {
+      blanks <- paste(rep(" ", 15-nchar(names(myunits)[i])), collapse = "")
+      if (is.na(myunits[i])) myunits[i] <- ""
+      cat(names(myunits)[i], blanks, myunits[i], "\n")
     }
+    .dash(width.ln)
   }
   else {
     .dash(64)

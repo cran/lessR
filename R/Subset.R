@@ -2,8 +2,9 @@ Subset <-
 function(rows, columns, data=mydata, holdout=FALSE,
     random=0, quiet=getOption("quiet"), ...) {
 
-  # save variable labels (NULL if no labels) 
+  # save variable labels, units (NULL if no labels, units) 
   mylabels <- attr(data, which="variable.labels")
+  myunits <- attr(data, which="variable.units")
 
   dname <- deparse(substitute(data))
 
@@ -139,10 +140,11 @@ function(rows, columns, data=mydata, holdout=FALSE,
     cat(")\n")
   }
  
-  # restore any variable labels
+  # restore any variable units, labels
   # note:  variable labels for all variables of original data frame
   #        even if variables were deleted
   if (!is.null(mylabels)) attr(data.sub, which="variable.labels") <- mylabels
+  if (!is.null(myunits)) attr(data.sub, which="variable.units") <- myunits
 
   return(data.sub)
 

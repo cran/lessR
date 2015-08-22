@@ -8,7 +8,7 @@
 \description{
 Abbreviation: \code{wrt}, \code{wrt.r}
 
-Writes the contents of the specified data frame, such as with the default \code{mydata}, to the current working directory as either the default \code{csv} data file or an R native data file of the specified data frame. If the write is of a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name.
+Writes the contents of the specified data frame, such as with the default \code{mydata}, to the current working directory as either the default \code{csv} data file or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels are automatically included in a native R data file.
 }
 
 \usage{

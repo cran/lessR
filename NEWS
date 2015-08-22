@@ -5,6 +5,49 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 
+
+
+>>>>>> Changes for lessR version 3.3.4 (2015-08-22) <<<<<<
+
+-------------
+Updates 3.3.4
+-------------
+
+Read, details
+  better display format of variable names and units
+
+Regression
+  knitr.file option has added display options code for displaying the
+    code that generated the results and document for documenting the code 
+  knitr.file option extended to work with mydata <- rd(), that is browse
+    for the file to read before doing the regression
+  improved use of variable units in R Markdown from knitr.file option
+
+Set
+  can set the values for display options globally in the generated
+    knitr.file generation, which includes results, explanation,
+    interpretation and document
+
+
+---------------
+Bug Fixes 3.3.4
+---------------
+
+ANOVA
+  missing terms from the sums of squares table added
+
+Histogram, Density and BoxPlot
+  variable names that are also function names are properly processed
+
+Merge, Subset
+  variable units preserved
+
+Read
+  specified format of data file remains regardless of file type
+
+
+
+
 >>>>>> Changes for lessR version 3.3.3 (2015-07-23) <<<<<<
 
 -------------
@@ -17,7 +60,7 @@ Read
     read_excel set as factors as with reading other data formats,
     except for the following addition for all formats ...
   Non-numeric character strings with unique values read as class
-    character instead of factor
+    character instead of class factor
 
 Regression
   extensive further development of the generated markup file from 
@@ -213,6 +256,7 @@ col.ticks parameter no longer defined by lessR functions but passed
 warning messages
   the causes of many warning messages, though benign, were identified and
      removed by reprogramming
+
 
 
 

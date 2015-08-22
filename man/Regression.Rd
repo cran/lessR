@@ -12,14 +12,16 @@ Provides a regression analysis with extensive output, including graphics, from a
 
 By default the data exists as a data frame with the default name of \code{mydata}, or specify explicitly with the \code{data} option.  Specify the model in the function call as an R \code{\link{formula}}, that is, for a basic model, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign, such as \code{reg(Y ~ X1 + X2)}.  
 
-Output is generated into distinct pieces by topic, organized and displayd in sequence by default. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from, for example, \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete \code{knitr} set of instructions ready to knit from the \code{knitr.file} option. Simply specify the option and create the file and then open in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the following sections \code{arguments}, \code{value} and \code{examples} for more information. 
+Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete \code{knitr} set of instructions ready to knit, an R~Markdown file (\code{.Rmd}) from the \code{knitr.file} option. Simply specify the option with a file name, run the Regression function to create the file, and then open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information. 
 }
 
 \usage{
 Regression(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
-         knitr.file=NULL, explain=getOption("explain"),
-         interpret=getOption("interpret"), results=getOption("results"),
+         knitr.file=NULL, 
+         results=getOption("results"), explain=getOption("explain"),
+         interpret=getOption("interpret"), document=getOption("document"), 
+         code=getOption("code"), 
 
          text.width=120, brief=getOption("brief"), show.R=FALSE,
 
@@ -55,13 +57,17 @@ reg.brief(\ldots, brief=TRUE)
   \item{knitr.file}{File name for the file of knitr instructions to be written, if specified.
         The file type is .Rmd, which automatically opens in RStudio, but it is a simple
         text file that can be edited with any text editor, including RStudio.}
-  \item{explain}{If set to \code{FALSE} the \code{knitr} explanations
-        of the results are not provided. Set globally with options(explain=FALSE).}
-  \item{interpret}{If set to \code{FALSE} the \code{knitr} interpretations
-        of the results are not provided. Set globally with options(interpret=FALSE).}
-  \item{results}{If set to \code{FALSE} the \code{knitr} results
-        are not provided, relying upon the interpretations. Set globally with
-        options(results=FALSE).}
+  \item{results}{By default TRUE. If set to \code{FALSE} the \code{knitr} results
+        are not provided, relying upon the interpretations.  Can set globally with
+        set(results=FALSE).}
+  \item{explain}{By default TRUE. If set to \code{FALSE} the \code{knitr} explanations
+        of the results are not provided. Can set globally with set(explain=FALSE).}
+  \item{interpret}{By default TRUE. If set to \code{FALSE} the \code{knitr} interpretations
+        of the results are not provided.  Can set globally with set(interpret=FALSE).}
+  \item{document}{By default TRUE If set to \code{FALSE} the \code{knitr} code documentation
+        is not provided.  Can set globally with set(document=FALSE).}
+  \item{code}{By default TRUE. If set to \code{FALSE} the \code{knitr} interpretations
+        of the results are not provided. Can set globally with set(code=FALSE).}
   \item{text.width}{Width of the text output at the console.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
         with \code{\link{set}} function.}
@@ -136,9 +142,11 @@ The output is produced in pieces by topic (see \code{values} below), automatical
 The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values. Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg.brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit. 
 
 knitr\cr
-A file ready for input into \code{knitr} can be obtained by specifying a value for \code{knitr.file}. For the specified file name, the directory to which the file is written is displayed on the console text output, and the file type \code{.Rmd} is automatically appended to the specified name if it is not included in the specification. Process with \code{RStudio}, or with the \code{knit} function from the \code{knitr} package and the \code{markdownToHTML} function from the \code{markdown} package. 
+A file ready for input into \code{knitr} can be obtained by specifying a value for \code{knitr.file}. For the specified file name, the directory to which the file is written is displayed on the console text output, and the file type \code{.Rmd} is automatically appended to the specified name if it is not included in the specification. Process with the \code{knitr} button in \code{RStudio}, or with the \code{knit} function from the \code{knitr} package and the \code{render} function from the \code{rmarkdown} package. 
 
-The output from \code{knitr.file} is conceptually partitioned into three parts:  explanations, interpretations and results. By default all available output is genreated but the flags \code{explain}, \code{interpret} and \code{results} can be set to \code{FALSE} to reduce the output. The options can be specified in a specific function all or set globally, such as with \code{options(explain=FALSE)}. Turning off all three flags leaves just the outline of the potential output and a bare minimum of results.
+The output from \code{knitr.file} is conceptually partitioned into five parts:  results, explanations of the results, interpretations of the results, documentation o the code, and the code itself. By default all available output is genreated but the flags \code{results}, \code{explain}, \code{interpret}, \code{document}, \code{code} can be set to \code{FALSE} to reduce the output. The options can be specified in a specific function all or set globally, such as with \code{options(explain=FALSE)}. Turning off all five flags leaves just the outline of the potential output and a bare minimum of results.
+
+Both any existing variable labels and variable units are included in the output to the R~Markdown file. Any varible units set as a dollar, are set as USD dollars and cents in the output, displayed with a \$. 
 
 The default analysis provides as text output to the console the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, correlation matrix of the model's variables, analysis of residuals and influence as well as the confidence and prediction intervals for each observation in the model. Also provided, for multiple regression models, collinearity analysis of the predictor variables and adjusted R-squared for the corresponding models defined by each possible subset of the predictor variables. 
 
@@ -158,7 +166,7 @@ RESIDUAL ANALYSIS\cr
 By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual, Cook's distance and dffits, with the first 20 observations listed and sorted by Cook's distance.  The \code{res.sort} option provides for sorting by the Studentized residuals or not sorting at all.  The \code{res.rows} option provides for listing these rows of data and computed statistics statistics for any specified number of observations (rows).  To turn off the analysis of residuals, specify \code{res.rows=0}.
 
 PREDICTION INTERVALS\cr
-The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, the lower and upper bounds for the confidence interval and the prediction interval, and the wide of the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are 25 or more observations then the information for only the first four, the middle four and the last four observations is displayed. To turn off the analysis of prediction intervals, specify \code{pred.rows=0}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
+The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, the lower and upper bounds for the confidence interval and the prediction interval, and the wide of the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are 25 or more observations then the information for only the first three, the middle three and the last three observations is displayed. To turn off the analysis of prediction intervals, specify \code{pred.rows=0}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
 
 The data for the default analysis of the prediction intervals is for the values of the predictor variables for each observation, that is, for each row of the data. New values of the predictor variables can be specified for the calculation of the prediction intervals by providing values for the options \code{X1.new} for the values of the first listed predictor variable in the model, \code{X2.new} for the second listed predictor variable, and so forth for up to five predictor variables, and all predictor variables are numeric. To provide these values, use functions such as \code{\link{seq}} for specifying a sequence of values and \code{\link{c}} for specifying a vector of values. For multiple regression models, all combinations of the specified new values for all of the predictor variables are analyzed.
 
@@ -282,7 +290,8 @@ r$out_estimates
 #   can be knit to generate dynamic output to a Word document,
 #   pdf file or html file
 reg(Reading ~ Verbal + Absent, knitr.file="read")
-# knitr.file with no explanations
+# knitr.file with no explanations of the results, but does
+#  include intepretations of the results and documentation of the code
 reg(Reading ~ Verbal + Absent, knitr.file="read2", explain=FALSE)
 
 # Modify the default settings as specified

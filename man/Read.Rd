@@ -9,7 +9,7 @@
 \description{
 Abbreviation: \code{rd},  \code{rd.brief}, \code{Read2}
 
-Reads the contents of the specified data file with optional variable labels into an R data table (frame). By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls} or \code{.xlsx} using the \code{readxl} package.  If no filetype is recognized then Read defaults to reading a comma separated or tab-limited text data file.  Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL.
+Reads the contents of the specified data file with optional variable labels into an R data table (frame). By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls} or \code{.xlsx} using the \code{readxl} package.  If no filetype is recognized then Read defaults to reading a comma separated or tab-limited text data file.  Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL (except for .Rda files which must be on the local computer system).
 
 Variable labels can be added to the data table when reading a text file. Any variable labels in a native SPSS of native R file are automatically included. See the \code{details} section below for more information. Variable labels can also be added and modified individually with the \code{lessR} function \code{\link{label}}.
 
@@ -40,8 +40,9 @@ Read2(\ldots, sep=";", dec=",")
 
 
 \arguments{
-  \item{ref}{File reference, either omitted to browse for the data file, or a full path name
-       or web URL, included in quotes.  A URL begins with \code{http://}.}
+  \item{ref}{File reference, either omitted to browse for the data file, or (except for .Rda
+       files) a full path name or web URL, included in quotes.  A URL begins with
+       \code{http://}.}
   \item{format}{Format of the data in the file, which by default is a \code{csv} file, which
         also will recognize tab-delimited text. As an option can be an Excel \code{.xls} or
         \code{.xlsx} file or an SPSS \code{.sav} file, which also reads the variable labels
@@ -132,6 +133,8 @@ I3,This instructor relates course materials to real world situations.\cr
 If there is a comma in the variable label, then the label needs to be enclosed in quotes.
 
 The \code{lessR} functions that provide analysis, such as \code{\link{Histogram}} for a histogram, automatically include the variable labels in their output, such as the title of a graph.  Standard R functions can also use these variable labels by invoking the \code{lessR} function \code{\link{label}}, such as setting \code{main=label(I4)} to put the variable label for a variable named I4 in the title of a graph.  
+
+Variable units may also be added to the third column of a variable label file. These are used for generating a better natural language text in the generation of R~Markdown files with the knitr.file option on supporting functions such as \code{\link{Regression}}. For currency (USD), indicate with a unit of: dollar.
 }
 
 \value{

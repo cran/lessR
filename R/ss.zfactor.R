@@ -58,7 +58,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
   # no title if two vars and no labels
   txttl <- ""
   if (is.null(by) || (!is.null(x.lbl) || !is.null(y.lbl))) { #  one var or labels
-    txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by))
+    txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=FALSE)
   }
 
   # print table, chi-square analysis

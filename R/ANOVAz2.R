@@ -102,6 +102,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     if (i < n.vars) {
       fv <- format(sprintf("%7.*f", digits.d, smc[i,4]), width=9, justify="right")
       pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
+      cat(rlb, df, SS, MS, fv, pv, "\n") 
     }
     else
       cat(rlb, df, SS, MS, "\n") 

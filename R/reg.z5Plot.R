@@ -47,7 +47,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     else {
       ctitle <- "Regression Line,\nConfidence and Prediction Intervals"
       y.min <- min(p.int$lwr)
-      y.max <- max( max(p.int$upr),  max(lm.out$model[,nm[1]]) )
+      y.max <- max(max(p.int$upr),  max(lm.out$model[,nm[1]]) )
     }
 
     fl <- "ls"

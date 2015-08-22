@@ -9,7 +9,13 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
          col.bg=NULL, col.grid=NULL, col.heat=NULL, ghost=NULL,
 
          n.cat=getOption("n.cat"), quiet=getOption("quiet"),
-         brief=getOption("brief"), width=120, show=FALSE) {
+         brief=getOption("brief"),
+
+         results=getOption("results"), explain=getOption("explain"),
+         interpret=getOption("interpret"), document=getOption("document"), 
+         code=getOption("code"),
+
+         width=120, show=FALSE) {
 
 
   # default transparency levels
@@ -82,6 +88,12 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
   options(brief=brief)
   options(n.cat=n.cat)
   options(width=width)
+
+  options(results=results)
+  options(explain=explain)
+  options(interpret=interpret)
+  options(document=document)
+  options(code=code)
 
 
   if (!missing(colors)) {

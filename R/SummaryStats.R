@@ -3,108 +3,104 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     digits.d=NULL, brief=getOption("brief"), ...)  {
 
 
-  x.name <- deparse(substitute(x))
+  # get actual variable name before potential call of data$x
+  x.name <- deparse(substitute(x))  # could be a vars list
   options(xname = x.name)
+
+  df.name <- deparse(substitute(data))
+  options(dname = df.name)
 
   is.df <- FALSE  # is data frame
 
 
-# -----------------------------------------------------------------
-# determine if x is multiple variables, a data frame or a vars list
+  # evaluate by, i.e., get y.call
+  if (!missing(by)) {
 
-  if (missing(x)) {
-    x.name <- ""  # in case x is missing, i.e., data frame mydata
-    is.df <- TRUE
-    if (missing(data)) data <- eval(substitute(mydata))
-  }
+    # get actual variable name before potential call of data$x
+    y.name <- deparse(substitute(by)) 
+    options(yname = y.name)
 
-  else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {  # not a var list
-    if (exists(x.name, where=1)) if (is.data.frame(x)) {
-      data <- x
-      is.df <- TRUE
+    # see if y exists from a function call
+    # indicate a function call with sys.frame returns larger than 1 
+    if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
+      in.call <- TRUE else in.call <- FALSE
+
+    # get conditions and check for data existing
+    if (!in.call) {
+      xs <- .xstatus(y.name, df.name)
+      in.global <- xs$ig 
+    }
+    else in.global <- FALSE
+
+    # see if var exists in data frame, if x not in Global Env or function call 
+    if (!in.global && !in.call) .xcheck(y.name, df.name, data)
+
+    if (!in.global) y.call <- eval(substitute(data$by))
+    else {  # vars that are function names get assigned to global
+      y.call <- by
+      if (is.function(y.call)) y.call <- eval(substitute(data$by))
     }
   }
+  else y.call <- NULL
 
-  # proceed here only if x.name is a var list
-  else if (grepl(":", x.name) || grepl(",", x.name) ) {
-    all.vars <- as.list(seq_along(data))
-    names(all.vars) <- names(data)
-    x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
-    data <- data[, x.col]  # create subset data frame
-    is.df <- TRUE
+
+# -----------------------------------------------------------------
+# establish if a data frame, if not then identify variable(s)
+
+  if (!missing(x)) {
+
+    if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
+      .nodf(df.name)  # check to see if data frame container exists 
+      .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      all.vars <- as.list(seq_along(data))  # even if only a single var
+      names(all.vars) <- names(data)  # all data in data frame
+      x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars
+      if (class(data) != "list") {
+        data <- data[, x.col]
+        if (length(x.col) == 1) {  # x is 1 var
+          data <- data.frame(data)
+          names(data) <- x.name
+         }
+      }
+      else {  # class of data is "list"
+        data <- data.frame(data[[x.col]])
+        names(data) <- x.name
+      }
+    }
+
+    else { # x is in the global environment (vector or data frame)
+      if (is.data.frame(x))  # x a data frame
+        data <- x
+      else {  # x a vector in global
+        if (!is.function(x))
+          data <- data.frame(x)  # x is 1 var
+        else
+          data <- data.frame(eval(substitute(data$x)))  # x is 1 var
+        names(data) <- x.name
+      }
+    }
+
   }
+
 
 
 # -----------------------------------------------------
+# data is now set
 # do the analysis for a single variable or a data frame 
 
-  if (!is.df) {
-
-    dname <- deparse(substitute(data))
-    options(dname = dname)
-
-    # get conditions and check for data existing
-    xs <- .xstatus(x.name, dname)
-    is.frml <- xs$ifr
-    in.global <- xs$ig 
-
-    # warn user that old formula mode no longer works
-    if (is.frml) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Instead, of 'Y ~ X', now use the by option, 'Y, by=X' \n\n")
-    }
-
-    # see if the variable exists in data frame, if x not in Global Env 
-    if (!in.global) .xcheck(x.name, dname, data)
-
-    if (!in.global) x.call <- eval(substitute(data$x))
-    else {  # vars that are function names get assigned to global
-      x.call <- x
-      if (is.function(x.call)) x.call <- eval(substitute(data$x))
-    }
-
-    # evaluate by
-    if (!missing(by)) {
-
-      # get actual variable name before potential call of data$x
-      y.name <- deparse(substitute(by)) 
-      options(yname = y.name)
-
-      # see if y exists from a function call
-      # indicate a function call with sys.frame returns larger than 1 
-      if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
-        in.call <- TRUE else in.call <- FALSE
-
-      # get conditions and check for data existing
-      if (!in.call) {
-        xs <- .xstatus(y.name, dname)
-        in.global <- xs$ig 
-      }
-      else in.global <- FALSE
-
-      # see if var exists in data frame, if x not in Global Env or function call 
-      if (!in.global && !in.call) .xcheck(y.name, dname, data)
-
-      if (!in.global) y.call <- eval(substitute(data$by))
-      else {  # vars that are function names get assigned to global
-        y.call <- by
-        if (is.function(y.call)) y.call <- eval(substitute(data$by))
-      }
-    }
-    else y.call <- NULL
-
-  }  # x not data frame
+  if (ncol(data) == 1) {
+    x.call <- data[,1]
+    nu <- length(unique(na.omit(x.call)))
+  }
 
 
-  if (!is.df) nu <- length(unique(na.omit(x.call)))
-
-  if (is.df)
+  if (ncol(data) > 1)
     .ss.data.frame(data, n.cat, brief, ...) 
 
   else if (is.numeric(x.call)) {
     if (nu > n.cat) { 
       sk <- NA; kt <- NA; q1 <- NA; q3 <- NA;  qr <- NA;
-      stuff <- .ss.numeric(x.call, y.call, data, digits.d, brief, ...)
+      stuff <- .ss.numeric(x.call, y.call, digits.d, brief, ...)
       txsts <- stuff$tx
       txotl <- .outliers2(x.call)
     }
@@ -169,7 +165,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
         "that can be converted to numerical 0 and 1.\n")
   }
 
-  if (!is.df) { 
+
+  if (ncol(data) == 1) { 
 
     if (is.numeric(x.call)) {
       class(txsts) <- "out_piece"

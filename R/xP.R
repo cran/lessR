@@ -8,7 +8,7 @@ xP <- function(x, d=NULL, unit=NULL, semi=FALSE) {
   if (!is.na(x)) {
 
     neg.flag <- FALSE
-    if (!is.null(unit)) if (unit == "$"){
+    if (!is.null(unit)) if (unit == "dollar"){
       digits.d <- 2
       if (x < 0) {
         neg.flag <- TRUE
@@ -18,7 +18,7 @@ xP <- function(x, d=NULL, unit=NULL, semi=FALSE) {
     tx <- formatC(x, digits=digits.d, big.mark=",", format="f")
 
     if (!is.null(unit)) {
-      if (unit != '$') {  # Add the $ for display of the value
+      if (unit != "dollar") {  # No $ for display of the value
         if (!semi)
           tx <- paste(tx, unit)
         else
@@ -27,7 +27,7 @@ xP <- function(x, d=NULL, unit=NULL, semi=FALSE) {
       else {
         if (!neg.flag)
           tx <- paste("$", tx, sep="")
-        else # Remove minus sign, then add back in the front
+        else  # Had removed minus sign, now add back in the front
           tx <- paste("-$", tx, sep="")
         }
     }

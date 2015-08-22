@@ -555,7 +555,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
     tx[length(tx)+1] <- "--------"
     tx[length(tx)+1] <- paste(">>> The preceding code fits the model from",
       "data frame:  mydata")
-    tx[length(tx)+1] <- paste(">>> To access the correlation matrix ",
+    tx[length(tx)+1] <- paste(">>> To access the correlation matrix",
       "directly without the data")
     tx[length(tx)+1] <- paste(">>>   use the following fit statement instead.\n")
     tx[length(tx)+1] <- paste("fit <- lavaan::cfa(", nm.mimm, 

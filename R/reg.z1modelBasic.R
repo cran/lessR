@@ -23,8 +23,9 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
     tx[length(tx)+1] <- .dash2(68)
   }
   
+  # output: header
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- "Estimated Model"
+    tx[length(tx)+1] <- paste("Estimated Model")
     tx[length(tx)+1] <- ""
   }
 
@@ -49,7 +50,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
     if (max.num[icol] < 9) max.num[icol] <- 9L 
   }
 
-  # row labels
+  # output: row labels
   est.lbl <- .fmtc("Estimate", max.num[1]+1)
   ste.lbl <- .fmtc("  Std Err", max.num[2]+2)
   t.lbl <-  "  t-value"
@@ -59,7 +60,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
   tx[length(tx)+1] <- paste(format("", width=buf), est.lbl, ste.lbl,
                            t.lbl, p.lbl, lb.lbl, ub.lbl, sep="")
 
-  # values row by row
+  # output: values row by row
   for (i in 1:(nrow(smc))) {
     rlb <- .fmtc(rownames(smc)[i], buf)
     est <- .fmt(smc[i,1], digits.d, max.num[1])

@@ -19,7 +19,6 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (is.null(fun.call)) fun.call <- match.call()
 
-
   if (getOption("colors") == "gray") col.stroke <- "black"
   if (getOption("colors") == "gray.black") col.stroke <- getOption("col.stroke.pt")
 
@@ -37,32 +36,38 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 # establish if a data frame, if not then identify variable(s)
 
   if (!missing(x)) {
+
     if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
       .nodf(df.name)  # check to see if data frame container exists 
-      .xcheck(x.name, df.name, data)  # see if var in df, vars lists not checked
-      vars.list <- as.list(seq_along(data))
-      names(vars.list) <- names(data)
-      x.col <- eval(substitute(x), envir=vars.list)  # col num of each var
+      .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      all.vars <- as.list(seq_along(data))  # even if only a single var
+      names(all.vars) <- names(data)  # all data in data frame
+      x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars
       if (class(data) != "list") {
         data <- data[, x.col]
-        if (length(x.col) == 1) {
-          data <- data.frame(data)  # x is 1 var
+        if (length(x.col) == 1) {  # x is 1 var
+          data <- data.frame(data)
           names(data) <- x.name
          }
       }
-      else {
+      else {  # class of data is "list"
         data <- data.frame(data[[x.col]])
         names(data) <- x.name
       }
     }
+
     else { # x is in the global environment (vector or data frame)
       if (is.data.frame(x))  # x a data frame
         data <- x
       else {  # x a vector in global
-        data <- data.frame(x)  # x is 1 var
+        if (!is.function(x))
+          data <- data.frame(x)  # x is 1 var
+        else
+          data <- data.frame(eval(substitute(data$x)))  # x is 1 var
         names(data) <- x.name
       }
     }
+
   }
 
 

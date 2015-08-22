@@ -38,6 +38,7 @@ function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
         "To do a vertical merge, both data sets must have the same variables.\n\n")
     }
     mylabels <- attr(data1, which="variable.labels") # save variable labels
+    myunits <- attr(data1, which="variable.units") # save variable units
     type <- "vertical"
     data <- rbind(data1, data2)
   }
@@ -46,8 +47,11 @@ function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
     type <- "horizontal"
     mylabels1 <- attr(data1, which="variable.labels") # save variable labels
     mylabels2 <- attr(data2, which="variable.labels") # save variable labels
+    myunits1 <- attr(data1, which="variable.units") # save variable units
+    myunits2 <- attr(data2, which="variable.units") # save variable units
     data <- merge(data1, data2, by=by)
     mylabels <- c(mylabels1, mylabels2)
+    myunits <- c(myunits1, myunits2)
   }
 
 
@@ -63,8 +67,9 @@ function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
     print(head(data, n=5))
   }
 
-  # restore any variable labels
+  # restore any variable labels, units
   if (!is.null(mylabels)) attr(data, which="variable.labels") <- mylabels
+  if (!is.null(myunits)) attr(data.sub, which="variable.units") <- myunits
 
   return(data)
 

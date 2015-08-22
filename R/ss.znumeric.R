@@ -1,5 +1,5 @@
 .ss.numeric <-
-function(x, by=NULL, data, digits.d=NULL, brief, ...) {
+function(x, by=NULL, digits.d=NULL, brief, ...) {
 
   # get variable labels if exist
   gl <- .getlabels()
@@ -7,21 +7,14 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
   y.name <- gl$yn; y.lbl <- gl$yl
 
   max.char <- 0
-  if (is.null(by)) n.lines <- 1
+  if (is.null(by))
+    n.lines <- 1
   else {
     bu <- as.factor(unique(na.omit(by)))
     n.lines <- nlevels(bu)
     for (i in 1:nlevels(bu))  # largest level name
       if (nchar(levels(bu)[i]) > max.char) max.char <- nchar(levels(bu)[i])
-    # split data into the by groups (vectors)
-    if (exists(x.name, where=.GlobalEnv)) {
-      df <- data.frame(x, by)
-      vectors <- split(df$x, df$by)
-      rm(df)
-     }
-    else {  # data only needed if a by variable exists
-      vectors <- split(data[,x.name], data[,y.name])
-    }
+    vectors <- split(x, by)
   }
 
   if (is.null(digits.d)) {
@@ -192,6 +185,7 @@ function(x, by=NULL, data, digits.d=NULL, brief, ...) {
     }
 
   }  # for each line
+
      if (n.lines == 1)
        return(list(tx=tx, n=n, n.miss=n.miss, m=m, s=s, sk=sk, kt=kt, mn=mn,
                   q1=q1, md=md, q3=q3, mx=mx, qr=qr))

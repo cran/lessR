@@ -5,11 +5,12 @@ function(x=mydata, ...)  {
   dname <- deparse(substitute(x))
   options(dname = dname)
   
-  if (is.null(x))
+  if (missing(x))
     if (!exists(dname, where=.GlobalEnv)) {
-      stop("Need to specify an existing data frame,\n",
-           "or data frame mydata must exist.", sep="")
-  }
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Need to specify an existing data frame,\n",
+      "or data frame  mydata  must exist.\n\n")
+    }
     
   cat("\n")
   .dash(25,"-")

@@ -357,7 +357,8 @@ function(topic=NULL) {
 
 
   else if (topic %in% c("histogram", "hs", "hst", "hist", "boxplot", "box", "bx", 
-    "dotplot", "dp", "dot", "density", "dn", "dens")) {
+    "dotplot", "dp", "dot", "density", "dn", "dens", "distribution", "dist",
+    "univariate")) {
   t0 <- "Histogram, etc."
 
   f1 <- bquote(paste(bold("Histogram, hs"), "  Histogram."))
@@ -815,8 +816,7 @@ function(topic=NULL) {
   }
 
 
-  else if (topic %in% c("factor.analysis", "fa", "factors", "corcfa", "cfa", "corefa", 
-                       "efa", "corScree", "scree")) {
+  else if (topic %in% c("factor.analysis", "fa", "factors", "corcfa", "cfa", "corefa", "efa", "corScree", "scree")) {
   t0 <- "Confirmatory and Exploratory Factor Analysis"
 
   f1 <- bquote(paste(bold("corCFA, cfa"), "  Confirmatory factor analysis."))

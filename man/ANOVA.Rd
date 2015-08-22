@@ -85,13 +85,13 @@ Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 7, NY: Routl
 \examples{
 
 
-# variable of interest is in a data frame which is not the default mydata
-# access the data frame in the lessR dat.Learn data set
-# although data not attached, access the variables directly by their name
-data(dataLearn)
-ANOVA(Score ~ StudyType, data=dataLearn)
+# access the data frame in the lessR Learn data set
+mydata <- rd("Learn", format="lessR", quiet=TRUE)
+ANOVA(Score ~ StudyType)
 
+# variable of interest is in a data frame which is not the default mydata
 # two-factor between-groups ANOVA with replications and interaction
+# warpbreaks is a data set provided with R
 ANOVA(breaks ~ wool * tension, data=warpbreaks)
 
 # randomized blocks design with the second term the blocking factor

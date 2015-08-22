@@ -6,12 +6,12 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.3.3    RStudio, knitr compatible     www.lessRstats.com\n",
+      "lessR 3.3.4     RStudio, knitr compatible      www.lessRstats.com\n",
       "------------------------------------------------------------------\n",
       "To get started, and for help in general, enter:  Help()\n",
       "To read a text, Excel, SPSS, SAS or R data file:  mydata <- Read()\n",
       "------------------------------------------------------------------\n",
-      "Automatically generate markdown files for knitr, enter:  ?reg\n",
+      "Automatically generate an R Markdown file for knitr, enter:  ?reg\n",
       "------------------------------------------------------------------\n\n")
 
   options(colors="dodgerblue")
@@ -27,12 +27,14 @@ function(...) {
   options(col.heat="dodgerblue4")
 
   options(n.cat=0)
-
   options(quiet=FALSE)
   options(brief=FALSE)
+
   options(explain=TRUE)
   options(interpret=TRUE)
   options(results=TRUE)
+  options(document=TRUE)
+  options(code=TRUE)
 
   options(show.signif.stars=FALSE)
   options(scipen=30)
@@ -144,13 +146,15 @@ function(...) {
   # see if the variable exists in the Global Environment
   in.global <- FALSE
   if (nchar(var.name)>0) if (exists(var.name, where=.GlobalEnv)) {
-    in.global <- TRUE
-    if (!quiet)
-      cat(">>> Note: ", var.name, "exists outside of a data",
-          "frame (table)\n")
+    if (!is.function(var.name)) { # a global "var" could be a function call 
+      in.global <- TRUE
+      if (!quiet)
+        cat(">>> Note: ", var.name, "exists in the workspace, outside of",
+            "a data frame (table)\n")
+    }
   }
 
-  # see if "variable" is really a function call or subset
+  # see if "variable" is really an expression
   if (grepl("(", var.name, fixed=TRUE) ||  grepl("[", var.name, fixed=TRUE))  {
     txtA <- paste("A referenced variable in a lessR function can only be\n",
             "a variable name.\n\n", sep="")
@@ -376,12 +380,15 @@ function(...) {
 
 }
 
-.title2 <- function(x.name, y.name, x.lbl, y.lbl, isnullby) {
+.title2 <- function(x.name, y.name, x.lbl, y.lbl, isnullby, new.ln=TRUE) {
 
   txt1 <- x.name
   if (!is.null(x.lbl)) txt1 <- paste(txt1, ", ", x.lbl, sep="")
 
-  if (isnullby) txt1 <- paste("---", txt1, "---")
+  if (isnullby) {
+    txt1 <- paste("---", txt1, "---")
+    if (new.ln) txt1 <- paste(txt1, "\n", sep="")
+  }
   else {
     txt2 <- paste(y.name, sep="")
     if (!is.null(y.lbl)) txt2 <- paste(txt2, ", ", y.lbl, sep="") 

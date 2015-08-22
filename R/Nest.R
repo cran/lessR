@@ -105,7 +105,7 @@ function(y, nested.model, full.model, method=c("ls", "logit"),
     SS.lbl <- .fmtc(" Sum Sq", max.ln[2]+1)
     MS.lbl <- .fmtc("Mean Sq", max.ln[3]+1)
     fv.lbl <- .fmtc("F-value", max.ln[4]+3)
-    tx[length(tx)+1] <- paste(eval(format("", width=max.c1-max.ln[1]+2)),
+    tx[length(tx)+1] <- paste(eval(format("", width=max.c1+max.ln[1]-6)),
            df.lbl, SS.lbl, MS.lbl, fv.lbl, "   p-value", sep="")
 
     if (n.pred > 0) {

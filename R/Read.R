@@ -11,11 +11,9 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
 
          fun.call=NULL, ...) {
 
-
   if (is.null(fun.call)) fun.call <- match.call()
-  fncl <- .fun.call.deparse(fun.call) 
-  options(read.call=fncl)  # save for knitr run
 
+  no.format <- ifelse (missing(format), TRUE, FALSE)
   format <- match.arg(format)
   if (is.null(ref) && format=="lessR") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -27,14 +25,32 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
   if (is.null(ref)) {
     ref <- file.choose()
     cat("\n")
+    fncl <- paste("Read(", "ref = \"", ref,  "\", quiet = TRUE)", sep="")
+   
+  }
+  else
+    fncl <- .fun.call.deparse(fun.call) 
+
+  options(read.call=fncl)  # save for knitr run
+
+  if (no.format) {
+    if (grepl(".sav$", ref)) format <- "SPSS" 
+    if (grepl(".sas7bdat$", ref)) format <- "SAS" 
+    if (grepl(".rda$", ref)) format <- "R" 
+    if (grepl(".xls$", ref) || grepl(".xlsx$", ref)) format <- "Excel" 
+    if (!is.null(widths)) format <- "fwd"
   }
 
-
-  if (grepl(".sav$", ref)) format <- "SPSS" 
-  if (grepl(".sas7bdat$", ref)) format <- "SAS" 
-  if (grepl(".rda$", ref)) format <- "R" 
-  if (grepl(".xls$", ref) || grepl(".xlsx$", ref)) format <- "Excel" 
-  if (!is.null(widths)) format <- "fwd"
+  if (format=="Excel"  &&  grepl("http", ref, fixed=TRUE)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "At this time the underlying read_excel function\n",
+        "does not support reading Excel files from the web.\n",
+        "Can use the  download.file  function to download to the\n",
+        "local file system.\n\n",
+        "  download.file(\"", ref, "\", \"MYFILE.xlsx\")\n\n",
+        "Replace MYFILE with the desired file name.\n",
+        "Enter  getwd()  to see where the file was saved. \n\n")
+  }
 
   # construct full path name for label file if not already
   if (!is.null(labels)) {
@@ -209,8 +225,11 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
 
   # feedback
   # --------
-  if (!quiet) details(d, n.mcut, miss.zero, max.lines, miss.show,
+  if (!quiet)
+    details(d, n.mcut, miss.zero, max.lines, miss.show,
                       miss.matrix, brief)
+  else
+    cat("\n")
 
   return(d)
 

@@ -19,8 +19,6 @@ function(old.vars, new.vars=NULL, old, new, data=mydata,
       "Specify the new values of the recoded variable with:  new\n\n")
   }
 
-  # save variable labels (NULL if no labels) 
-  mylabels <- attr(data, which="variable.labels")
 
   my.vars <- as.list(seq_along(data))
   names(my.vars) <- names(data)
@@ -113,9 +111,6 @@ function(old.vars, new.vars=NULL, old, new, data=mydata,
     cat("\n")
   } 
  
-  # restore any variable labels
-  if (!is.null(mylabels)) attr(data, which="variable.labels") <- mylabels
-
   return(data)
 
 }

@@ -9,7 +9,6 @@ function(lm.out, cook, cooks.cut,
   fit <- lm.out$fitted.values
   res <- lm.out$residuals
   class(lm.out) <- "lm"
-  #cook <- cooks.distance(lm.out)
 
   # get largest Cook's distance
   max.cook <- max(cook, na.rm=TRUE)

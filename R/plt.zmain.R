@@ -330,7 +330,7 @@ function(x, y, by, data, type, n.cat,
     if (!is.null(y) && is.factor(x)) {
       options(yname = x.name)
       options(xname = y.name)
-      .ss.numeric(y, by=x, data=data, digits.d=digits.d, brief=TRUE)
+      .ss.numeric(y, by=x, digits.d=digits.d, brief=TRUE)
     }
 
   cat("\n")

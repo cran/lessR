@@ -1,8 +1,10 @@
 Regression <-
 function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
-         knitr.file=NULL, explain=getOption("explain"),
-         interpret=getOption("interpret"), results=getOption("results"),
+         knitr.file=NULL, 
+         results=getOption("results"), explain=getOption("explain"),
+         interpret=getOption("interpret"), document=getOption("document"), 
+         code=getOption("code"), 
 
          text.width=120, brief=getOption("brief"), show.R=FALSE,
 
@@ -392,7 +394,8 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
     knitr.file <- paste(knitr.file, txt, sep="") 
     txknt <- .reg.knitr(nm, dname, fun.call, n.vars, res.rows, pred.rows,
-        res.sort, digits.d, explain, interpret, results, est$pvalues, tol,
+        res.sort, digits.d, results, explain, interpret, document, code,
+        est$pvalues, tol,
         resid.max, numeric.all, X1.new, new.val)
     cat(txknt, file=knitr.file, sep="\n")
     txkfl <- .showfile2(knitr.file, "knitr instructions")
