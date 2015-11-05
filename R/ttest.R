@@ -276,7 +276,7 @@ function(x, y=NULL, ...) {
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
        fit.line="none", col.fit.line="grey55", center.line=NULL,
        col.bubble=NULL, bubble.size=.25, col.flower=NULL,
-       ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
+       ellipse=FALSE, 
        diag=TRUE, col.diag=par("fg"), lines.diag=TRUE,
        quiet=TRUE)
 
@@ -579,7 +579,7 @@ function(x, y=NULL, ...) {
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
        fit.line="none", col.fit.line="grey55", center.line=NULL,
        col.bubble=NULL, bubble.size=.25, col.flower=NULL,
-       ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
+       ellipse=FALSE, 
        diag=TRUE, col.diag=par("fg"), lines.diag=TRUE,
        quiet=TRUE)
 

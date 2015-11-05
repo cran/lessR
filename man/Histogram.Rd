@@ -131,7 +131,7 @@ Because of the customized graphic windowing system that maintains a unique graph
 }
 
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the \code{knitr} document (see \code{examples}).
 
 READABLE OUTPUT\cr
 code{out_ss}: Summary statistics\cr

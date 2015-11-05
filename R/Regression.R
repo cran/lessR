@@ -12,7 +12,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          pred.rows=NULL, pred.sort=c("predint", "off"),
          subsets=NULL, cooks.cut=1, 
 
-         scatter.coef=TRUE, scatter.3D=FALSE, graphics=TRUE,
+         scatter.coef=TRUE, graphics=TRUE,
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL, X6.new=NULL,
@@ -120,11 +120,6 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
         numeric.all <- FALSE
       }
     }
-
-  if ( scatter.3D && (n.pred)!=2 ) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-       "Can have a 3D scatterplot only with exactly two predictor variables.\n\n")
-  }
   
   if ( !is.null(X1.new)  &&  (n.pred) > max.new ) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -208,9 +203,11 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   title_basic <- "  BASIC ANALYSIS"
   est <- .reg1modelBasic(lm.out, dname, digits.d, show.R)
   tx1est <- est$tx
+  sterrs <- est$sterrs
 
   anv <- .reg1anvBasic(lm.out, dname, digits.d, show.R)
   tx1anv <- anv$tx 
+  MSW <- anv$MSW
 
   fit <- .reg1fitBasic(lm.out, dname, anv$tot["ss"], digits.d, show.R)
   tx1fit <- fit$tx
@@ -220,20 +217,21 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   tx2rel <- ""; tx2cor <- ""; tx2cln <- ""; tx2all <- ""
   if (relate  &&  n.pred > 0) {
     rel <- .reg2Relations(lm.out, dname, n.keep, show.R,
-         cor, collinear, subsets, numeric.all, in.data.frame)
+         cor, collinear, subsets, numeric.all, in.data.frame,
+         sterrs, MSW)
     tx2cor <- rel$txcor
     tx2cln <- rel$txcln
     tx2all <- rel$txall
     if (is.matrix(rel$crs)) crs <- round(rel$crs,3) else crs <- NA
     if (is.vector(rel$tol)) tol <- round(rel$tol,3) else tol <- NA
-    if (is.vector(rel$VIF)) VIF <-  round(rel$VIF,3) else VIF <-  NA
+    if (is.vector(rel$vif)) vif <- round(rel$vif,3) else vif <- NA
   }
   else { # not relate and n.pred > 0
-    crs <- NA_real_; tol <- NA; VIF <- NA
+    crs <- NA_real_; tol <- NA; vif <- NA
   }
   
 
-  title_res <- "  ANALYSIS OF RESIDUALS AND INFLUENCE"
+  title_res <- "  RESIDUALS AND INFLUENCE"
   if (is.null(res.rows)) res.rows <- ifelse (n.keep < 20, n.keep, 20) 
   if (res.rows == "all") res.rows <- n.keep  # turn off resids with res.rows=0
 
@@ -282,7 +280,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   if (pred.rows > 0) {
     prd <- .reg4Pred(lm.out, brief,
          n.keep, digits.d, show.R,
-         new.data, pred.sort, pred.rows, scatter.3D, scatter.coef,
+         new.data, pred.sort, pred.rows, scatter.coef,
          in.data.frame, X1.new, X2.new, X3.new, X4.new, X5.new, X6.new)
     tx3prd <- prd$tx
     predmm <- prd$predmm
@@ -299,7 +297,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
       }
    
       if ((numeric.all || n.pred==1) && in.data.frame) {
-        splt <- .reg5Plot(lm.out, res.rows, pred.rows, scatter.coef, scatter.3D,
+        splt <- .reg5Plot(lm.out, res.rows, pred.rows, scatter.coef, 
            X1.new, numeric.all, in.data.frame, prd$cint, prd$pint,
            pdf, pdf.width, pdf.height, manage.gr, ...)
 
@@ -311,28 +309,16 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
   # cites
   txcte <- ""
-  if (collinear || subsets || scatter.3D) {
+  if (subsets) {
     tx <- character(length = 0)
     did <- FALSE
     if (!brief)  {
-      if (collinear) {
-        txt <- "[Collinearity analysis with Nilsson and Fox's vif function"
-        tx[length(tx)+1] <- paste(txt, "from the car package]") 
-        did <- TRUE
-      }
       if (subsets) {
         txt <- "[Subsets analysis with Thomas Lumley's leaps function"
         tx[length(tx)+1] <- paste(txt, "from the leap's package]") 
         did <- TRUE
       }
     }
-    if (scatter.3D) {
-      tx[length(tx)+1] <- ""
-      txt <- "[3D scatterplot with John Fox's scatter3d function"
-      tx[length(tx)+1] <- paste(txt, "from the car package]") 
-        did <- TRUE
-    }
-
     if (did) txcte <- tx else txcte <- ""
   }
 
@@ -348,10 +334,6 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     tx[length(tx)+1] <- paste("\n",
         "Function Regression is from David Gerbing's lessR package.\n",
         "  To obtain the reference: Enter citation(\"lessR\")")
-    tx[length(tx)+1] <- paste("\n",
-        "Collinearity analysis is from the vif function in\n",
-        "John Fox's car package.\n",
-        "  To obtain the reference: Enter citation(\"car\")")
     tx[length(tx)+1] <- paste("\n",
         "Best model subset analysis is from Thomas Lumley's leaps function\n",
         "in his package leaps.\n",
@@ -391,9 +373,10 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     }
     
 
+    # knitr.file
     txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
     knitr.file <- paste(knitr.file, txt, sep="") 
-    txknt <- .reg.knitr(nm, dname, fun.call, n.vars, res.rows, pred.rows,
+    txknt <- .reg.knitr(nm, dname, fun.call, res.rows, pred.rows,
         res.sort, digits.d, results, explain, interpret, document, code,
         est$pvalues, tol,
         resid.max, numeric.all, X1.new, new.val)
@@ -405,7 +388,6 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   txplt <- ""
   if (graphics) {
     if (plot.i > 1) txplt <- .plotList2(plot.i, plot.title)
-
     if (n.pred > 0) dev.set(which=2)  # reset graphics for standard R functions
   }
 
@@ -450,11 +432,11 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     anova_model=anv$mdl, anova_residual=anv$rsd, anova_total=anv$tot, 
     se=fit$se, resid_range=fit$range,
     Rsq=fit$Rsq, Rsqadj=fit$Rsqadj, PRESS=fit$PRESS, RsqPRESS=fit$RsqPRESS,
-    cor=crs, tolerances=tol, VIF=VIF,
+    cor=crs, tolerances=tol, vif=vif,
     resid.max=resid.max, pred_min_max=predmm, 
-    residuals=lm.out$residuals, fitted.values=lm.out$fitted, 
+    residuals=lm.out$residuals, fitted=lm.out$fitted, 
     cooks.distance=cook, model=lm.out$model, terms=lm.out$terms
-    )
+  )
 
   class(output) <- "out_all"
 

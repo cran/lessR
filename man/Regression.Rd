@@ -12,7 +12,7 @@ Provides a regression analysis with extensive output, including graphics, from a
 
 By default the data exists as a data frame with the default name of \code{mydata}, or specify explicitly with the \code{data} option.  Specify the model in the function call as an R \code{\link{formula}}, that is, for a basic model, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign, such as \code{reg(Y ~ X1 + X2)}.  
 
-Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete \code{knitr} set of instructions ready to knit, an R~Markdown file (\code{.Rmd}) from the \code{knitr.file} option. Simply specify the option with a file name, run the Regression function to create the file, and then open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information. 
+Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete \code{knitr} set of instructions ready to knit, an R~Markdown file (\code{.Rmd}) from the \code{knitr.file} option. Simply specify the option with a file name, run the Regression function to create the file. Then open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information. 
 }
 
 \usage{
@@ -29,7 +29,7 @@ Regression(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          pred.rows=NULL, pred.sort=c("predint", "off"),
          subsets=NULL, cooks.cut=1, 
 
-         scatter.coef=TRUE, scatter.3D=FALSE, graphics=TRUE,
+         scatter.coef=TRUE, graphics=TRUE,
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL, X6.new=NULL,
@@ -97,8 +97,6 @@ reg.brief(\ldots, brief=TRUE)
        Values.  Default value is 1.0.}
   \item{scatter.coef}{Display the correlation coefficients in the upper triangle of the
         scatterplot matrix.}
-  \item{scatter.3D}{A 3D scatterplot with best fitting regression plane, which applies only 
-       to models with exactly two predictor variables. To obtain, set to \code{TRUE}.}
   \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{knitr} can be useful
        to set to \code{FALSE} so that \code{\link{regPlot}} can be used to place
        the graphics within the output file.}
@@ -131,7 +129,7 @@ reg.brief(\ldots, brief=TRUE)
 OVERVIEW\cr
 The purpose of \code{Regression} is to combine the following function calls into one, as well as provide ancillary analyses such as as graphics, organizing output into tables and sorting to assist interpretation of the output, as well as run through \code{knitr}, such as with \code{RStudio}.  
 
-The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of a linear model, \code{\link{lm}}. The output of the analysis of \code{\link{lm}} is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Regression} function. By default \code{reg} automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The correlation matrix of the model variables is obtained with \code{\link{cor}} function. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard R function \code{\link{predict}}, once with the argument \code{interval="confidence"} and once with \code{interval="prediction"}. The \code{lessR} \code{\link{Density}} function provides the histogram and density plots for the residuals and the \code{\link{ScatterPlot}} function provides the scatter plots of the residuals with the fitted values and of the data for the one-predictor model. The \code{pairs} function provides the scatterplot matrix of all the variables in the model. Thomas Lumley's \code{leaps} package contains the \code{leaps} function that provides the analysis of the fit of all possible model subsets. The \code{car} package provides Henric Nilsson and John Fox's \code{vif} function for the computation of the variance inflation factors for the collinearity analysis. The \code{scatter3d} function from Fox and Weisberg's \code{car} package provides the interactive 3d scatterplot for models with exactly two predictor variables.
+The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of a linear model, \code{\link{lm}}. The output of the analysis of \code{\link{lm}} is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Regression} function. By default \code{reg} automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The correlation matrix of the model variables is obtained with \code{\link{cor}} function. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard R function \code{\link{predict}}, once with the argument \code{interval="confidence"} and once with \code{interval="prediction"}. The \code{lessR} \code{\link{Density}} function provides the histogram and density plots for the residuals and the \code{\link{ScatterPlot}} function provides the scatter plots of the residuals with the fitted values and of the data for the one-predictor model. The \code{pairs} function provides the scatterplot matrix of all the variables in the model. Thomas Lumley's \code{leaps} package contains the \code{leaps} function that provides the analysis of the fit of all possible model subsets. 
 
 INPUT DATA FRAME\cr
 The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{mydata}.
@@ -185,13 +183,13 @@ If variable labels exist, then the corresponding variable label is by default li
 }
 
 \value{
-The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The motivation of these three types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The motivation of these two types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the \code{knitr} document (see \code{examples}).
 
 TEXT OUTPUT\cr
 \code{out_background}: variables in the model, rows of data and retained\cr
 \code{out_estimates}: estimated coefficients, hypothesis tests and confidence intervals\cr
 \code{out_fit}: fit indices\cr
-\code{out_anova}: Analysis of variance\cr
+\code{out_anova}: analysis of variance\cr
 \code{out_cor}: correlations among all variables in the model\cr
 \code{out_collinear}: collinearity analysis\cr
 \code{out_subsets}: R squared adjusted for all (or many) possible subsets\cr
@@ -210,7 +208,7 @@ Separated from the rest of the text output are the major headings, which can the
 \code{out_title_pred}: FORECASTING ERROR\cr
 
 STATISTICS\cr
-\code{fun.call}: function call that generated the analysis\cr
+\code{call}: function call that generated the analysis\cr
 \code{formula}: model formula that specifies the model\cr
 \code{n.vars}: number of variables in the model\cr
 \code{n.obs}: number of rows of data submitted for analysis\cr
@@ -236,7 +234,7 @@ STATISTICS\cr
 \code{resid.max}: five largest values of the residuals on which the ouput is sorted\cr
 \code{pred_min_max}: Rows with the smallest and largest prediction intervals\cr
 \code{residuals}: residuals\cr
-\code{fitted.values}: fitted values\cr
+\code{fitted}: fitted values\cr
 \code{cooks.distance}: Cook's distance\cr
 \code{model}: data retained for the analysis\cr
 \code{terms}: terms specified for the analysis\cr
@@ -245,8 +243,6 @@ Although not typically needed for analysis, if the regression output is assigned
 }
 
 \references{
-Fox, J., & Weisberg, S. (2011). An R companion to applied regression (Second ed.). Thousand Oaks CA: Sage.
-
 Lumley, T., \code{leaps} function from the \code{leaps} package.\cr
 Nilsson, H. and Fox, J., \code{vif} function from the \code{car} package.\cr
 

@@ -113,7 +113,7 @@ Following the standard \code{R} function \code{\link{glm}}, invisibly returns an
 
 \examples{
 # Gender has values of "M" and "F"
-mydata <- Read("Employee", format="lessR")
+mydata <- Read("Employee", format="lessR", quiet=TRUE)
 # logit regression
 Logit(Gender ~ Years)
 

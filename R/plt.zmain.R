@@ -5,7 +5,7 @@ function(x, y, by, data, type, n.cat,
          cex.axis, col.axis,
          xy.ticks, xlab, ylab, main, cex, kind,
          fit.line, col.fit.line, bubble.size,
-         ellipse, col.ellipse, fill.ellipse,
+         ellipse, 
          diag, col.diag, lines.diag, quiet, ...) {
 
   if (!is.null(type)) if (type != "p" && type != "l" && type != "b") { 
@@ -257,17 +257,10 @@ function(x, y, by, data, type, n.cat,
   }
 
   if (ellipse) {  # car function
-    n.pair <- sum(!is.na(x - y))  # number of points after listwise deletion
-    n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
-    if (n.del != 0) {  # ellipse function cannot have missing data
-      elp.dat <- na.omit(data.frame(x,y))
-      x <- elp.dat$x
-      y <- elp.dat$y 
-    }
-    dataEllipse(x, y, col=col.ellipse, levels=.95, lwd=1.5, fill=fill.ellipse,
-                fill.alpha=.06, center.cex=0, segments=100, plot.points=FALSE)
-    txt <- "[Ellipse with Monette, Fox, and Friendly's function dataEllipse"
-    cat(txt, "from the car package]\n") 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "ellipse option disabled, car package no longer included\n",
+      "because of dependencies issues.\n\n",
+      "If interested, use the dataEllipse function from car.\n\n")
   }
 
 

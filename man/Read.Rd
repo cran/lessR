@@ -9,7 +9,7 @@
 \description{
 Abbreviation: \code{rd},  \code{rd.brief}, \code{Read2}
 
-Reads the contents of the specified data file with optional variable labels into an R data table (frame). By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls} or \code{.xlsx} using the \code{readxl} package.  If no filetype is recognized then Read defaults to reading a comma separated or tab-limited text data file.  Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL (except for .Rda files which must be on the local computer system).
+Reads the contents of the specified data file with optional variable labels into an R data table (frame). By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls} or \code{.xlsx} using the \code{gdata} package.  If no filetype is recognized then Read defaults to reading a comma separated or tab-limited text data file.  Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL (except for .Rda files which must be on the local computer system).
 
 Variable labels can be added to the data table when reading a text file. Any variable labels in a native SPSS of native R file are automatically included. See the \code{details} section below for more information. Variable labels can also be added and modified individually with the \code{lessR} function \code{\link{label}}.
 
@@ -103,7 +103,7 @@ R DATA\cr
 Relies upon the standard R function \code{load}. By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{mydata}, with the \code{lessR} function \code{\link{Write}}.
 
 Excel DATA\cr
-Relies upon the function \code{\link{read_excel}} from Hadley Wickham's \code{readxl} package. Files with a file type of \code{.xls} or \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The default worksheet to read from the file is the first worksheet. The \code{read_excel} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file. 
+Relies upon the function \code{read.xls} from the \code{gdata} package by Gregory Warnes and others. Files with a file type of \code{.xls} or \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The default worksheet to read from the file is the first worksheet. The \code{read.xls} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file. The \code{read.xls} function relies upon the \code{Perl} scripting language, which must be accessible to R. This language is typically found on Macintosh and Linux/Unix systems but must usually be installed on a Windows system. Directions are provided if not already present.
 
 lessR DATA\cr
 \code{lessR} has some data sets included with the package.  \code{Read} reads each such data set by specifying its name and setting \code{format="lessR"}. Also, each included data set begins with the prefix \code{dat}, which can be deleted when specifying the name of the data set. This option is a replacement for the standard R \code{data} function, offering the added information provided by \code{\link{Read}}.
@@ -146,7 +146,8 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 \references{
 Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 2, NY: Routledge.
 
-Wickham, H. (2015). readxl: Read Excel Files. R package version 0.1.0. \url{http://CRAN.R-project.org/package=readxl}
+Gregory R. Warnes, Ben Bolker, Gregor Gorjanc, Gabor Grothendieck, Ales Korosec, Thomas Lumley, Don MacQueen, Arni Magnusson, Jim Rogers and others (2013). gdata: Various R programming tools for data manipulation. R package version 2.13.2. \url{http://CRAN.R-project.org/package=gdata}
+
 }
 
 

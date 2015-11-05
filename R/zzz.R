@@ -6,7 +6,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.3.4     RStudio, knitr compatible      www.lessRstats.com\n",
+      "lessR 3.3.5     RStudio, knitr compatible      www.lessRstats.com\n",
       "------------------------------------------------------------------\n",
       "To get started, and for help in general, enter:  Help()\n",
       "To read a text, Excel, SPSS, SAS or R data file:  mydata <- Read()\n",
@@ -292,9 +292,7 @@ function(...) {
   if (i == 1)
     txt <- "Response Variable:  "
   else
-    if (n.pred > 1) txt <- paste(pred.lbl, " ", 
-      toString(i-1), ": ", sep="")
-    else txt <- "Predictor Variable: "
+      txt <- paste(pred.lbl, " Variable ", toString(i-1), ": ", sep="")
   cat(txt, var.name)
 
   dname <- getOption("dname")
@@ -319,18 +317,22 @@ function(...) {
 }
 
 
-.varlist2 <- function(n.pred, i, var.name, pred.lbl, n.obs, lvls=NULL) {
+.varlist2 <- function(n.pred, ind, var.name, pred.lbl, n.obs, n.keep, lvls=NULL) {
   tx <- character(length = 0)
 
-  if (i == 1)
-    txt <- "Response Variable:  "
-  else
-    if (n.pred > 1) txt <- paste(pred.lbl, " ", 
-      toString(i-1), ": ", sep="")
-    else txt <- "Predictor Variable: "
+  if (ind == 1)
+    txt <- "Response Variable: "
+  else {
+    if (n.pred > 1)
+      txt <- paste(pred.lbl, " Variable ", toString(ind-1), ": ", sep="")
+    else
+      txt <- paste(pred.lbl, " Variable: ", sep="")
+  }
+  if (pred.lbl == "Factor"  &&  ind > 1) tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- paste(txt, var.name, sep="")
 
   dname <- getOption("dname")
+
   if (exists(dname, where=.GlobalEnv))
     mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
   else
@@ -351,7 +353,17 @@ function(...) {
       tx[length(tx)] <- paste(tx[length(tx)], ", ", as.character(lbl), sep="")
   }
 
-  if (!is.null(lvls)) if (i > 1) tx[length(tx)+1] <- paste("\n  Levels:", lvls)
+  if (!is.null(lvls)) {
+    tx2 <- "  Levels:"
+    for (i in 1:length(lvls)) tx2 <- paste(tx2, lvls[i])
+    tx[length(tx)+1] <- tx2 
+  }
+
+  if (ind == n.pred+1) {
+    tx[length(tx)+1] <- ""
+    tx[length(tx)+1] <- paste("Number of cases (rows) of data: ", n.obs)
+    tx[length(tx)+1] <- paste("Number of cases retained for analysis: ", n.keep)
+  }
 
   return(tx)
 }
@@ -785,7 +797,11 @@ function(...) {
 
 
 .prntbl <- function(x, digits.d=2, cut=0, cc="-", cors=FALSE,
-                    brk=NULL, bnd=NULL) {
+                    brk=NULL, bnd=NULL, v1.nm=NULL, v2.nm=NULL) {
+
+# brk: ... replaces rows not printed 
+# bnd: boundary between groups
+
   tx <- character(length = 0)
 
   max.ch <- ifelse (cors, 3, 0)  # max char per column, 0 is not applicable
@@ -796,6 +812,7 @@ function(...) {
     c1 <- nchar(rownames(x)[i])
     if (c1 > max.c1) max.c1 <- c1
   }
+  if (!is.null(v2.nm)) if (nchar(v2.nm) > max.c1) max.c1 <- nchar(v2.nm) 
   max.c1 <- max.c1 + 2
 
   # widths of variable names
@@ -807,14 +824,20 @@ function(...) {
   max.ln <- integer(length=ncol(x))
   for (j in 1:ncol(x)) {
     if (is.numeric(x[,j])) {
-      c.val <- 0
+      c.val <- 0        
       for (i in 1:nrow(x)) {
         i.val <- nchar(formatC(x[i,j], digits=digits.d, format="f"))
         if (i.val > c.val) c.val <- i.val
       }
     }
-    else
-      c.val <- 4
+    else {
+      c.val <- 0        
+      for (i in 1:nrow(x)) {
+        i.val <- nchar(as.character(x[i,j]))
+        if (i.val > c.val) c.val <- i.val
+      }
+    }
+      #c.val <- 4
     if (!cors)
       max.ln[j] <- max(colnm.w[j], c.val) + 1
     else {
@@ -865,9 +888,14 @@ function(...) {
     }
   }
 
+  blnk <- format("", width=max.c1-1)
+  if (!is.null(v1.nm)) tx[length(tx)+1] <- paste(blnk, v1.nm)
   # write col labels
   for (i in 1:nr.lbl) {  # for each row of column labels
-    tx[length(tx)+1] <- format("", width=max.c1)
+    if (is.null(v2.nm))
+      tx[length(tx)+1] <- format("", width=max.c1)
+    else
+      tx[length(tx)+1] <- paste(" ", v2.nm, format("", width=max.c1-nchar(v2.nm)-2), sep="")
     for (j in 1:ncol(x)) {
       wd <- max.ln[j]
       tx[length(tx)] <- paste(tx[length(tx)], .fmtc(col.nm[i,j], w=wd), sep="")
@@ -891,7 +919,10 @@ function(...) {
   for (i in 1:nrow(x)) {
     if (i %in% brk) tx[length(tx)+1] <- "..."
     rwnm <- paste(" ", rownames(x)[i])
-    tx[length(tx)+1] <- format(rwnm, width=max.c1, justify="right")
+    if (is.null(v2.nm))
+      tx[length(tx)+1] <- format(rwnm, width=max.c1, justify="right")
+    else
+      tx[length(tx)+1] <- format(rwnm, width=max.c1-1, justify="right")
 
     for (j in 1:ncol(x)) {
       if (is.integer(x[i,j]))

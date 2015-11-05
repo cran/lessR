@@ -6,6 +6,51 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 3.3.6 (2015-11-05) <<<<<<
+
+-------------
+Updates 3.3.6
+-------------
+
+ANOVA
+  output now constructed in segments for better knitr compatibility, 
+    from a <- ANOVA( ... ), and then  a  to view the output and 
+    names(a) to view the segment names, and then, for example,
+    a$out_anova  to view the summary table
+  knitr.file option for automatic construction of markup file
+  improved formating of summary table
+  graphics=FALSE option added
+
+
+----------------------------
+lessR Installation Bug Fixes
+----------------------------
+Read
+  because package dependency problems loading packages with the readxl
+    package function for reading Excel files, went back to the gdata
+    package for reading Excel files, which requires Perl, which
+    requires a download for Windows computers
+
+ScatterPlot
+  because package dependency problems loading packages with the car
+    package, the ellipse option from that package is deactivated
+
+Regression
+  because package dependency problems loading packages with the car
+    package, the scatter.3D option from that package is deactivated
+
+
+
+---------------
+Bug Fixes 3.3.6
+---------------
+
+Regression
+  background, which listed variables in the model, sample size, etc, 
+    displays the intended information
+
+
+
 
 >>>>>> Changes for lessR version 3.3.4 (2015-08-22) <<<<<<
 
@@ -14,7 +59,7 @@ Updates 3.3.4
 -------------
 
 Read, details
-  better display format of variable names and units
+  better display format of variable labels and units
 
 Regression
   knitr.file option has added display options code for displaying the

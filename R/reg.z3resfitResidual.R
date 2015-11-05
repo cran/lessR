@@ -6,7 +6,7 @@ function(lm.out, cook, cooks.cut,
   n.vars <- length(nm)
   n.keep <- nrow(lm.out$model)
   
-  fit <- lm.out$fitted.values
+  fit <- lm.out$fitted
   res <- lm.out$residuals
   class(lm.out) <- "lm"
 

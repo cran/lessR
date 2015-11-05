@@ -23,12 +23,10 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE, n.obs, n.keep) {
   tx[length(tx)+1] <- paste("Data Frame: ", dname)  # not accurate from Model
   tx[length(tx)+1] <- ""
 
-  for (i in 1:n.vars)
-    tx[length(tx)+1] <- .varlist2(n.pred, i, nm[i], "Predictor", n.obs)
-
-  tx[length(tx)+1] <- ""
-  tx[length(tx)+1] <- paste("Number of cases (rows) of data: ", n.obs, sep="")
-  tx[length(tx)+1] <- paste("Number of cases retained for analysis: ", n.keep, sep="")
+  for (i in 1:n.vars) {
+    txbck <- .varlist2(n.pred, i, nm[i], "Predictor", n.obs, n.keep)
+    for (j in 1:length(txbck)) tx[length(tx)+1] <- txbck[j] 
+}
 
   return(list(tx=tx, n.vars=n.vars, n.obs=n.obs, n.keep=n.keep))
 

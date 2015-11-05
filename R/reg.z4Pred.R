@@ -1,7 +1,7 @@
 .reg4Pred <-
 function(lm.out, brief, 
          n.keep, digits.d, show.R,
-         new.data, pred.sort, pred.rows, scatter.3D, scatter.coef,
+         new.data, pred.sort, pred.rows, scatter.coef,
          in.data.frame, X1.new, X2.new, X3.new, X4.new, X5.new, X6.new) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model

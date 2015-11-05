@@ -1,6 +1,7 @@
 .reg2Relations <- 
 function(lm.out, dname, n.keep, show.R,
-         cor, collinear, subsets, numeric.all, in.data.frame) {
+         cor, collinear, subsets, numeric.all, in.data.frame,
+         sterrs, MSW) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -65,10 +66,15 @@ function(lm.out, dname, n.keep, show.R,
 
     if (numeric.all) {
 
-      VIF <- vif(lm.out)
-      tol <- 1/VIF
+      vif <- numeric(length = 0)
+      tol <- numeric(length = 0)
+      for (i in 1:n.pred) {
+        v <- var(lm.out$model[i+1])
+        vif[i] <- (v * (n.keep-1) * sterrs[i+1]^2) / MSW
+        tol[i] <- 1 / vif[i]
+      }
 
-      out <- cbind(tol, VIF)
+      out <- cbind(tol, vif)
       colnames(out) <- c("Tolerance", "      VIF")
       rownames(out) <- nm[2:length(nm)]
 
@@ -76,9 +82,10 @@ function(lm.out, dname, n.keep, show.R,
       for (i in 1:length(txcln)) tx[length(tx)+1] <- txcln[i]
 
     }
+
     else { 
       tx[length(tx)+1] <- ">>> No collinearity analysis, not all variables are numeric.\n"
-      VIF <- NA
+      vif <- NA
       tol <- NA
     }
 
@@ -86,7 +93,7 @@ function(lm.out, dname, n.keep, show.R,
   } 
 
     else {  # !collinear
-      VIF <- NA
+      vif <- NA
       tol <- NA
     }
 
@@ -156,6 +163,6 @@ function(lm.out, dname, n.keep, show.R,
     txall <- tx
   }
 
-  return(list(txcor=txcor, txcln=txcln, txall=txall, crs=crs, tol=tol, VIF=VIF))
+  return(list(txcor=txcor, txcln=txcln, txall=txall, crs=crs, tol=tol, vif=vif))
 
 }

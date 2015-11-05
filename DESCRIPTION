@@ -1,16 +1,16 @@
 Package: lessR
-Version: 3.3.4
-Date: 2015-08-22
+Version: 3.3.6
+Date: 2015-11-05
 Title: Less Code, More Results
 Author: David W. Gerbing, School of Business Administration, Portland State University
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
 Depends: R (>= 2.15.0)
-Imports: graphics, grDevices, stats, utils, car, leaps, MBESS, foreign,
-        sas7bdat, readxl, triangle
-Description: Each function accomplishes the work of several or more standard R functions.  For example, two function calls, Read() and CountAll(), read the data and generate summary statistics for all variables in the data frame, plus histograms and bar charts as appropriate.  Other functions provide for descriptive statistics, a comprehensive regression analysis, analysis of variance and t-test, plotting, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function, variable labels, color themes, and a built-in help system. A confirmatory factor analysis of multiple indicator measurement models is also available as are pedagogical routines for data simulation such as for the Central Limit Theorem. Compatible with RStudio and knitr including generation of knitr instructions for interpretative output. 
+Imports: graphics, grDevices, stats, utils, leaps, MBESS, foreign,
+        sas7bdat, gdata, triangle
+Description: Each function accomplishes the work of several or more standard R functions.  For example, two function calls, Read() and CountAll(), read the data and generate summary statistics for all variables in the data frame, plus histograms and bar charts as appropriate.  Other functions provide for descriptive statistics, a comprehensive regression analysis, analysis of variance and t-test, plotting, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function, variable labels, color themes, and a built-in help system. A confirmatory factor analysis of multiple indicator measurement models is also available as are pedagogical routines for data simulation such as for the Central Limit Theorem. Compatible with 'RStudio' and 'knitr' including generation of 'knitr' instructions for interpretative output. 
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2015-08-22 17:27:34 UTC; gerbing
+Packaged: 2015-11-05 10:38:24 UTC; gerbing
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2015-08-22 23:24:16
+Date/Publication: 2015-11-05 13:38:32

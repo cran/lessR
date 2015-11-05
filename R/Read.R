@@ -40,17 +40,22 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
     if (grepl(".xls$", ref) || grepl(".xlsx$", ref)) format <- "Excel" 
     if (!is.null(widths)) format <- "fwd"
   }
-
-  if (format=="Excel"  &&  grepl("http", ref, fixed=TRUE)) {
+  if (!is.null(labels) && format=="R") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "At this time the underlying read_excel function\n",
-        "does not support reading Excel files from the web.\n",
-        "Can use the  download.file  function to download to the\n",
-        "local file system.\n\n",
-        "  download.file(\"", ref, "\", \"MYFILE.xlsx\")\n\n",
-        "Replace MYFILE with the desired file name.\n",
-        "Enter  getwd()  to see where the file was saved. \n\n")
+        "An R data file should already contain labels before it was created.\n",
+        "Or add them manually with the lessR function: label\n\n")
   }
+
+  #if (format=="Excel"  &&  grepl("http", ref, fixed=TRUE)) {
+    #cat("\n"); stop(call.=FALSE, "\n","------\n",
+        #"At this time the underlying read_excel function\n",
+        #"does not support reading Excel files from the web.\n",
+        #"Can use the  download.file  function to download to the\n",
+        #"local file system.\n\n",
+        #"  download.file(\"", ref, "\", \"MYFILE.xlsx\")\n\n",
+        #"Replace MYFILE with the desired file name.\n",
+        #"Enter  getwd()  to see where the file was saved. \n\n")
+  #}
 
   # construct full path name for label file if not already
   if (!is.null(labels)) {
@@ -118,13 +123,34 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
   }  # end text file
       
   else if (format == "Excel") { 
-    txt <- "Hadley Wickham's readxl package]"
-    cat("[with the read_excel function from", txt, "\n") 
+    txt <- "Warnes, Rogers and Grothendiek's gdata package]"
+    cat("[with the read.xls function from", txt, "\n\n") 
+    cat("Warning: read.xls reads the data as formatted, not as stored\n",
+        "The number 3.14159 formated as 3.1 is read as 3.1\n",
+        "The currency formatted $46.07 is read as a character value\n",
+        "  instead of a number\n",
+        "Convert the Excel data to General format if needed\n\n") 
+    perl.test <- Sys.which("perl")
+    if (nchar(perl.test) > 0) {
       if (isnot.row2)  # read data
-        d <- read_excel(path=ref, sheet=sheet)
-        if (!is.null(list(...)$row.names))  #  see if do row.names 
+        d <- read.xls(xls=ref, sheet=sheet, na.strings=c("NA","#DIV/0!", ""), ...)
+        #d <- read_excel(path=ref, sheet=sheet)
+        if (!is.null(list(...)$row.names))  #  see if row.names invoked
           d <- data.frame(d, row.names=list(...)$row.names)
-          class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
+        #class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
+  }
+    else {  # no Perl
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "To read an Excel file, Read relies upon the read.xls function\n",
+        "from the gdata package, which requires the Perl scripting language.\n",
+        "Install the 64-bit Perl if running the 64-bit version of R.\n\n",
+        "To install (Strawberry) Perl on Windows and make accessible to R:\n",
+        " 1. Download and install Perl from: http://strawberryperl.com/\n",
+        " 2. Copy and paste the following function calls into the R console:\n",
+        "      library(gdata)\n      ",
+        "installXLSXsupport(perl = 'C:\\\\strawberry\\\\perl\\\\bin\\\\perl.exe')\n",
+        " 3. Restart R.\n\n")
+    }
   }
 
 
@@ -138,8 +164,9 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         if (format.lbl != "Excel") 
           mylabels <- read.csv(file=ref.lbl, row.names=1, header=FALSE)
         else {
-          mylabels <- read_excel(path=ref.lbl, col_names=FALSE)
-          mylabels <- data.frame(mylabels, row.names=1)
+          #mylabels <- read_excel(path=ref.lbl, col_names=FALSE)
+          #mylabels <- data.frame(mylabels, row.names=1)
+          mylabels <- read.xls(xls=ref.lbl, row.names=1, header=FALSE)
         }
         if (ncol(mylabels) == 1) names(mylabels) <- c("label")
         if (ncol(mylabels) == 2) names(mylabels) <- c("label", "unit")
@@ -148,7 +175,8 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         if (format != "Excel") 
           mylabels <- read.csv(file=ref, nrows=1, sep=delim, ...)
         else {
-          mylabels <- read_excel(path=ref, ...)
+          mylabels <- read.xls(xls=ref, nrows=1, na.strings="", ...)
+          #mylabels <- read_excel(path=ref, ...)
           mylabels <- mylabels[1,] 
         }
         var.names <- names(mylabels)
@@ -157,8 +185,12 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         if (format != "Excel") 
           d <- read.csv(file=ref, skip=1, 
                            na.strings=missing, col.names=var.names, sep=delim, ...)
+          #d <- read.csv(file=ref, skip=1, 
+                           #na.strings=missing, col.names=var.names, sep=delim, ...)
         else
-          d <- read_excel(path=ref, col_names=var.names)
+          d <- read.xls(xls=ref, skip=1, 
+                           na.strings=missing, col.names=var.names, ...)
+          #d <- read_excel(path=ref, col_names=var.names)
         }
       # transfer labels and maybe units to data
       attr(d, which="variable.labels") <- as.character(mylabels$label)
@@ -211,16 +243,16 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
   n.col <- apply(d, 2, function(x) sum(!is.na(x)))
   nu.col <- apply(d, 2, function(x) length(unique(na.omit(x))))
   fnu.col <- logical(length=ncol(d))
-  if (format != "Excel") {
+  #if (format != "Excel") {
     for (i in 1:ncol(d)) if (nu.col[i]==n.col[i] && (is.factor(d[,i])))
           fnu.col[i] <- TRUE 
     d[fnu.col] <- lapply(d[fnu.col], as.character)
-  }
-  else {  # read_excel does not convert strings to factors
-    for (i in 1:ncol(d)) if (nu.col[i]!=n.col[i] && (is.character(d[,i])))
-          fnu.col[i] <- TRUE 
-    d[fnu.col] <- lapply(d[fnu.col], as.factor)
-  }
+  #}
+  #else {  # read_excel does not convert strings to factors
+    #for (i in 1:ncol(d)) if (nu.col[i]!=n.col[i] && (is.character(d[,i])))
+          #fnu.col[i] <- TRUE 
+    #d[fnu.col] <- lapply(d[fnu.col], as.factor)
+  #}
 
 
   # feedback

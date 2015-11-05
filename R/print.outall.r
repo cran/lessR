@@ -2,7 +2,7 @@ print.out_all <- function(x, ...) {
 
   n.out <- 0
   for (ilist in 1:length(x)) {
-    if (substr(names(x[ilist]),1,4) == "out_") {
+    if (substr(names(x[ilist]),1,4) == "out_") {  # then print component
 
       n.out <- n.out + 1
       if (nchar(x[ilist]) > 0) {

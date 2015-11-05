@@ -1,6 +1,6 @@
 .ANOVAz1 <- 
 function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
-         pdf, pdf.width, pdf.height) {
+         graphics, pdf, pdf.width, pdf.height) {
 
   p <- length(unique(na.omit(x.values)))
 
@@ -29,108 +29,129 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
       if (nch.mx > max.mx) max.mx <- nch.mx
     }
 
-    cat("\n\n\n")
-    cat("Descriptive Statistics\n")
-    .dash(22)
-    cat(format("n", width=max.lv+max.n+2, justify="right", sep=""))
-    cat(format("mean", width=max.m+3, justify="right", sep=""))
-    cat(format("sd", width=max.s+3, justify="right", sep=""))
-    cat(format("min", width=max.mn+3, justify="right", sep=""))
-    cat(format("max", width=max.mx+3, justify="right", sep=""))
-    cat("\n")
+    title_des <- "  DESCRIPTIVE STATISTICS "
+
+    tx <- character(length = 0)
+
+    n.tx <- format("n", width=max.lv+max.n+2, justify="right", sep="")
+    m.tx <- format("mean", width=max.m+2, justify="right", sep="")
+    s.tx <- format("sd", width=max.s+2, justify="right", sep="")
+    mn.tx <- format("min", width=max.mn+2, justify="right", sep="")
+    mx.tx <- format("max", width=max.mx+2, justify="right", sep="")
+    tx[length(tx)+1] <- paste(n.tx, m.tx, s.tx, mn.tx, mx.tx)
+
     for (i in 1:p) {
-      cat(format(levels(x.values)[i], width=max.lv, justify="left", sep=""), 
-        format(n[i], width=max.n+1, justify="right", sep=""), 
-        format(sprintf("%.*f", digits.d, m[i]), width=max.m+2, justify="right"), 
-        format(sprintf("%.*f", digits.d, s[i]), width=max.s+2, justify="right"), 
-        format(sprintf("%.*f", digits.d, mn[i]), width=max.mn+2, justify="right"), 
-        format(sprintf("%.*f", digits.d, mx[i]), width=max.mx+2, justify="right"), 
-        "\n")
+      xval <- paste(format(levels(x.values)[i], width=max.lv, justify="left", sep="")) 
+      nn <- format(n[i], width=max.n+1, justify="right", sep="") 
+      mm <- format(sprintf("%.*f", digits.d, m[i]), width=max.m+2, justify="right") 
+      ss <- format(sprintf("%.*f", digits.d, s[i]), width=max.s+2, justify="right") 
+      mnn <- format(sprintf("%.*f", digits.d, mn[i]), width=max.mn+2, justify="right") 
+      mxx <- format(sprintf("%.*f", digits.d, mx[i]), width=max.mx+2, justify="right") 
+      tx[length(tx)+1] <- paste(xval, nn, mm, ss, mnn, mxx) 
     }
 
       mg <-  mean(y.values, na.rm=TRUE)
-      cat("\nGrand Mean:", round(mg, digits.d+1), "\n")
-  }  # end !brief   
+      tx[length(tx)+1] <- ""
+      tx[length(tx)+1] <- paste("Grand Mean:", round(mg, digits.d+1))
+  }  # end !brief 
+
+  txdes <- tx
 
 
   # set up graphics system for 2 windows
-
-  # keep track of the number of plots, see if manage graphics
   plt.i <- 0
   plt.title  <- character(length=0)
-  manage.gr <- .graphman()
+  if (graphics) {
 
-  if (!pdf) {
-    if (manage.gr) {
-      .graphwin(2)
-      dev.set(which=3)
-    }
-  }
-  else { 
-    pdf.file <- "ANOVA_Means.pdf"
-    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
-  }
+  # keep track of the number of plots, see if manage graphics
+    manage.gr <- .graphman()
 
-  plt.i <- plt.i + 1
-  plt.title[plt.i] <- "Scatterplot with Cell Means"
-
-  .plt.main(x.values, y.values, by=NULL, type="p", n.cat=0,
-     col.fill=getOption("col.fill.pt"),
-     col.stroke=getOption("col.stroke.pt"),
-     col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-     shape.pts="circle", col.area=NULL, col.box="black",
-     cex.axis=.85, col.axis="gray30",
-     xy.ticks=TRUE,
-     xlab=nm[2], ylab=nm[1], main=plt.title[plt.i],
-     cex=.8, kind="default",
-     fit.line="none", col.fit.line="grey55", bubble.size=.25,
-     ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE,
-     diag=FALSE, col.diag=par("fg"), lines.diag=TRUE, quiet=TRUE)
-
-  if (pdf) {
-    dev.off()
-    .showfile(pdf.file, "means chart")
-  }
-
-
-  cat("\n\n\n")
-  cat("Analysis of Variance\n")
-  .dash(20)
-  n.vars <- 2
-  smc <- anova(av.out)
-  buf <- 0 
-  for (i in 1:n.vars) {
-    lng.lbl <- nchar(rownames(smc)[i])
-    if (lng.lbl > buf) buf <- lng.lbl 
-   }
-  max.num <- integer(length=0)
-  for (icol in 1:3) {
-    max.num[icol] <- 0 
-    for (i in 1:n.vars) {
-      if (icol < n.vars) {
-        ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 2
-        if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm  # fails in R dev
+    if (!pdf) {
+      if (manage.gr) {
+        .graphwin(2)
+        dev.set(which=3)
       }
     }
-    if (icol != 1) if (max.num[icol] < 9) max.num[icol] <- 9 
+    else { 
+      pdf.file <- "ANOVA_Means.pdf"
+      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    }
+
+    plt.i <- plt.i + 1
+    plt.title[plt.i] <- "Scatterplot with Cell Means"
+
+    .plt.main(x.values, y.values, by=NULL, type="p", n.cat=0,
+       col.fill=getOption("col.fill.pt"),
+       col.stroke=getOption("col.stroke.pt"),
+       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+       shape.pts="circle", col.area=NULL, col.box="black",
+       cex.axis=.85, col.axis="gray30",
+       xy.ticks=TRUE,
+       xlab=nm[2], ylab=nm[1], main=plt.title[plt.i],
+       cex=.8, kind="default",
+       fit.line="none", col.fit.line="grey55", bubble.size=.25,
+       ellipse=FALSE, 
+       diag=FALSE, col.diag=par("fg"), lines.diag=TRUE, quiet=TRUE)
+
+    if (pdf) {
+      dev.off()
+      .showfile(pdf.file, "means chart")
+    }
   }
-  df.lbl <- .fmtc("     df", max.num[1]+2)
-  SS.lbl <- .fmtc(" Sum Sq", max.num[2]+1)
-  MS.lbl <- .fmtc("Mean Sq", max.num[3]+1)
-  cat(rep(" ", buf-5), df.lbl, SS.lbl, MS.lbl, "   F-value", "   p-value", sep="", "\n")
-  for (i in 1:(n.vars)) {
-    rlb <- .fmtc(rownames(smc)[i], buf)
-    df <- format(sprintf("%i", smc[i,1]), width=max.num[1]-4, justify="right")
-    SS <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.num[2], justify="right")
-    MS <- format(sprintf("%7.*f", digits.d, smc[i,3]), width=max.num[3], justify="right")
+
+
+  title_basic <- "  BASIC ANALYSIS"
+
+  tx <- character(length = 0)
+
+  if (is.null(options()$knitr.in.progress)) {
+    tx[length(tx)+1] <- paste("Analysis of Variance")
+    tx[length(tx)+1] <- ""
+  }
+
+  n.vars <- 2
+  smc <- anova(av.out)
+
+  # width of column 1
+  max.c1 <- max(nchar("Residuals"), nchar(nm[1]))
+  for (i in 1:n.vars) {
+    c1 <- nchar(rownames(smc)[i])
+    if (c1 > max.c1) max.c1 <- c1 
+  }
+
+  # width of data columns
+  max.ln <- integer(length=0)
+  for (i in 1:4) {
+    ln.nm <- nchar(colnames(smc)[i])
+    max.ln[i] <- ln.nm + 1
+    for (j in 1:nrow(smc)) {
+      xjc <- .fmt(smc[j,i], d=digits.d)
+      if (nchar(xjc) > max.ln[i]) max.ln[i] <- nchar(xjc)
+    }
+    max.ln[i] <- max.ln[i] + 1L
+    if (max.ln[i] < 9L) max.ln[i] <- 9L
+  }
+
+  df.lbl <- .fmtc("     df", max.ln[1]+1)
+  SS.lbl <- .fmtc(" Sum Sq", max.ln[2]+1)
+  MS.lbl <- .fmtc("Mean Sq", max.ln[3]+1)
+  fv.lbl <- .fmtc("F-value", max.ln[4]+1)
+  tx[length(tx)+1] <- paste(format("", width=max.c1-4), df.lbl, SS.lbl,
+                             MS.lbl, fv.lbl, "   p-value", sep="")
+
+  for (i in 1:n.vars) {
+    rlb <- .fmtc(rownames(smc)[i], max.c1, j="left")
+    df <- format(sprintf("%i", smc[i,1]), width=max.ln[1]-4, justify="right")
+    SS <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.ln[2], justify="right")
+    MS <- format(sprintf("%7.*f", digits.d, smc[i,3]), width=max.ln[3], justify="right")
     if (i < n.vars) {
       fv <- format(sprintf("%7.*f", digits.d, smc[i,4]), width=9, justify="right")
       pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
-      cat(rlb, df, SS, MS, fv, pv, "\n")
+      tx[length(tx)+1] <- paste(rlb, df, SS, MS, fv, pv)
     }
     else
-      cat(rlb, df, SS, MS, "\n") 
-  }
+      tx[length(tx)+1] <- paste(rlb, df, SS, MS)
+    }
 
   sm <- summary(av.out)
   ssb <- sm[[1]][1,2]
@@ -138,54 +159,78 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
   sst <- ssb + ssw
   msw <- sm[[1]][2,3]
 
-  cat("\n\n\n")
-  cat("Association and Effect Size\n")
-  .dash(27)
-  rsq <- ssb / sst
-  cat("R Squared:", .fmt(rsq, 2), "\n")
-  rsq.adj <-  1 - ( ((n.obs-1)/(n.obs-p)) * (1-rsq) )
-  cat("R Sq Adjusted:", .fmt(rsq.adj, 2), "\n")
-  omsq <- (ssb - ((p-1)*msw)) / ((ssb + p*(mean(n)-1)*msw) + msw)
-  cat("Omega Squared:", .fmt(omsq, 2), "\n")
-  if (omsq > 0) {
-    cat("\n")
-    f.cohen <- sqrt( (omsq/(1-omsq)) )
-    cat("Cohen's f:", .fmt(f.cohen, 2), "\n")
+  txanv <- tx
+
+
+  tx <- character(length = 0)
+
+  if (is.null(options()$knitr.in.progress)) {
+    tx[length(tx)+1] <- paste("Association and Effect Size")
+    tx[length(tx)+1] <- ""
   }
+
+  rsq <- ssb / sst
+  tx[length(tx)+1] <- paste("R Squared:", .fmt(rsq, 2))
+  rsq.adj <-  1 - ( ((n.obs-1)/(n.obs-p)) * (1-rsq) )
+  tx[length(tx)+1] <- paste("R Sq Adjusted:", .fmt(rsq.adj, 2))
+  omsq <- (ssb - ((p-1)*msw)) / ((ssb + p*(mean(n)-1)*msw) + msw)
+  tx[length(tx)+1] <- paste("Omega Squared:", .fmt(omsq, 2))
+  if (omsq > 0) {
+    tx[length(tx)+1] <- ""
+    f.cohen <- sqrt( (omsq/(1-omsq)) )
+    tx[length(tx)+1] <- paste("Cohen's f:", .fmt(f.cohen, 2))
+  }
+
+  txeft <- tx
+
 
   if (!brief) {
-    cat("\n\n\n")
+    tx <- character(length = 0)
+
+    if (is.null(options()$knitr.in.progress)) {
+      tx[length(tx)+1] <- paste("Tukey Multiple Comparisons of Means")
+      tx[length(tx)+1] <- ""
+    }
+
     HSD <- TukeyHSD(av.out)
     HSD <- TukeyHSD(av.out, which=nm[2])
-    cat("Tukey Multiple Comparisons of Means\n")
-    cat("Family-wise Confidence Level:", attr(HSD, which="conf.level"), "\n")
-    .dash(35)
-    print(round(HSD[[1]], digits.d))
+    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD, which="conf.level"))
+    txHSD <- .prntbl(HSD[[1]], digits.d)
+    for (i in 1:length(txHSD)) tx[length(tx)+1] <- txHSD[i]
 
-    if (!pdf) { 
-      if (manage.gr) dev.set(which=4) 
+    txhsd <- tx
+
+
+    if (graphics) {
+      if (!pdf) { 
+        if (manage.gr) dev.set(which=4) 
+      }
+      else { 
+        pdf.file <- "ANOVA_HSD.pdf"
+        pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+      }
+
+      plt.i <- plt.i + 1
+      plt.title[plt.i] <- "95% family-wise confidence level"
+
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+      par(mar=c(5.1,6.1,4.1,1.5))
+      cex.axis <- .8; col.axis <- "gray30"; 
+      plot(HSD, cex.axis=cex.axis, col.axis=col.axis, las=1)
+
+      if (pdf) {
+        dev.off()
+        .showfile(pdf.file, "Tukey HSD chart")
+        tx[length(tx)+1] <- ""
+      }
     }
-    else { 
-      pdf.file <- "ANOVA_HSD.pdf"
-      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
-    }
+  }  # !brief
 
-    plt.i <- plt.i + 1
-    plt.title[plt.i] <- "95% family-wise confidence level"
-
-    orig.params <- par(no.readonly=TRUE)
-    on.exit(par(orig.params))
-    par(mar=c(5.1,6.1,4.1,1.5))
-    cex.axis <- .8; col.axis <- "gray30"; 
-    plot(HSD, cex.axis=cex.axis, col.axis=col.axis, las=1)
-
-    if (pdf) {
-      dev.off()
-      .showfile(pdf.file, "Tukey HSD chart")
-      cat("\n\n")
-    }
-  }
-
-  return(list(i=plt.i, ttl=plt.title))
+  return(list(
+    title_des=title_des, txdes=txdes,
+    title_basic=title_basic,
+    txanv=txanv, txeft=txeft, txhsd=txhsd,
+    i=plt.i, ttl=plt.title))
 
 }

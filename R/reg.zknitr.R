@@ -1,5 +1,5 @@
 .reg.knitr <-
-function(nm, dname, fun.call, n.vars, res.rows, pred.rows, res.sort,
+function(nm, dname, fun.call, res.rows, pred.rows, res.sort,
          digits.d, results, explain, interpret, document, code,
          pvalues, tolerances, resid.max, numeric.all, X1.new,
          new.val=matrix(nrow=n.vars-1, ncol=2, byrow=TRUE)) {
@@ -13,6 +13,7 @@ function(nm, dname, fun.call, n.vars, res.rows, pred.rows, res.sort,
   show <- ifelse (code, "", ", echo=FALSE")
 
   # set parameters
+  n.vars <- length(nm)
   n.pred <- n.vars - 1
   d <- digits.d
   Y <- nm[1]
@@ -121,13 +122,6 @@ sep="")
        "To generate a knitr output file, first read the data for this\n",
        "regression analysis with the lessR function Read.\n\n")
   }
-
-  #ref <- .get.arg("ref", rdcall)
-  #if (nchar(ref) == 0) {
-      #cat("\n"); stop(call.=FALSE, "\n","------\n",
-       #"To generate a knitr output file, need to specify a file name\n",
-       #"to Read the data for this regression analysis.\n\n")
-  #}
 
 
   if (document) {
@@ -1368,12 +1362,12 @@ sep="")
       tx[length(tx)+1] <- paste("\n",
 "The new data values are specified for each variable separately, but ",
 "a row of data consists of data values for all the predictor values. ",
-"Accordingly, a prediction interval is calculated for each combination ",
+"Accordingly, calculate a prediction interval for each combination ",
 "of the specified new values for each predictor variable. ",
 sep="")
     else
       tx[length(tx)+1] <- paste("\n",
-"The prediction intervals are calculated only for the new data values. ",
+"Calculate the prediction intervals only for the new data values. ",
 sep="")
 
     if (results) {

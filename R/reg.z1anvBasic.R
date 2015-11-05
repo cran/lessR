@@ -15,7 +15,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
 
   if (show.R) {
     tx[length(tx)+1] <- ""
-    tx[length(tx)+1] <-.dash2(68)
+    .dash2(68)
     tx[length(tx)+1] <- paste("> ","anova(model)", "\n",sep="")
     tx[length(tx)+1] <-.dash2(68)
   }
@@ -42,7 +42,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
       if (nchar(xjc) > max.ln[i]) max.ln[i] <- nchar(xjc)
     }
     max.ln[i] <- max.ln[i] + 1L
-    if (max.ln[i] < 9) max.ln[i] <- 9L
+    if (max.ln[i] < 9L) max.ln[i] <- 9L
   }
 
   df.lbl <- .fmtc("     df", max.ln[1]+1)
@@ -99,6 +99,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
   df <- .fmti(smc[n.vars,1], max.ln[1]-5)
   SS <- .fmt(smc[n.vars,2], digits.d, max.ln[2])
   MS <- .fmt(smc[n.vars,3], digits.d, max.ln[3])
+  MSW <- smc[n.vars,3]
   tx[length(tx)+1] <- paste(rlb, df, SS, MS) 
   if (n.pred > 1) tx[length(tx)+1] <- ""
 
@@ -126,6 +127,6 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
   }
 
 
-  return(list(tx=tx, mdl=mdl, rsd=rsd, tot=tot))
+  return(list(tx=tx, mdl=mdl, rsd=rsd, tot=tot, MSW=MSW))
 
 }

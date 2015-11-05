@@ -9,12 +9,15 @@
 Abbreviation: \code{av}, \code{av.brief}
 
 Analysis of variance from the R \code{\link{aov}} function plus graphics and effect sizes. Permitted designs are one-way between groups, two-way between groups and randomized blocks with one treatment factor with one observation for each treatment and block combination. 
+
+Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{a} in \code{a <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete, though preliminary at this time, \code{knitr} set of instructions ready to knit, an R~Markdown file (\code{.Rmd}) from the \code{knitr.file} option. Simply specify the option with a file name, run the ANOVA function to create the file. Then open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information. 
 }
 
 \usage{
 ANOVA(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL, 
+         knitr.file=NULL, graphics=TRUE,
          rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
-         pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
+         pdf=FALSE, pdf.width=5, pdf.height=5, fun.call, \ldots)
 
 av(\ldots)
 
@@ -30,6 +33,13 @@ av.brief(\ldots, brief=TRUE)
        with \code{\link{set}} function.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
+  \item{knitr.file}{File name for the file of knitr instructions to be written,
+        if specified. The file type is .Rmd, which automatically opens in RStudio,
+        but it is a simple text file that can be edited with any text editor,
+        including RStudio.}
+  \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{knitr} can
+        be useful to set to \code{FALSE} so that \code{\link{regPlot}} can be used
+        to place the graphics within the output file.}
   \item{rb.points}{For a randomized block design, a plot of the fitted value
         for each cell is obtained as well as the individual data values. Set to
         \code{FALSE} to suppress the data values.}
@@ -45,6 +55,8 @@ av.brief(\ldots, brief=TRUE)
        instead of directed to the standard graphics windows.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
+  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
+        obtained from the abbreviated function call \code{hs}.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 
 }
 
@@ -67,9 +79,42 @@ DECIMAL DIGITS\cr
 The number of decimal digits displayed on the output is, by default, the maximum number of decimal digits for all the data values of the response variable. Or, this value can be explicitly specified with the \code{digits.d} parameter.
 }
 
+
 \value{
-Following the standard \code{R} function \code{\link{aov}}, invisibly returns an object of \code{\link{class}} c("aov", "lm").
+The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3.5 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The motivation of these two types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+
+TEXT OUTPUT\cr
+\code{out_background}: variables in the model, rows of data and retained\cr
+1-predictor: \code{out_descriptive}: decriptive stats\cr
+2-predictors: \code{out_cell.n}: cell sample size\cr
+2-predictors: \code{out_cell.means}: cell means\cr
+2-predictors: \code{out_cell.marginals}: marginal means\cr
+2-predictors: \code{out_cell.gm}: grand mean\cr
+2-predictors: \code{out_cell.sd}: cell standard deviations\cr
+\code{out_anova}: analysis of variance summary table\cr
+\code{out_effects}: effect sizes\cr
+\code{out_hsd}: Tukey's honestly significant different analysis\cr
+\code{out_res}: residuals\cr
+\code{out_plots}: list of plots generated if more than one\cr
+
+Separated from the rest of the text output are the major headings, which can then be deleted from custom collations of the output.
+\code{out_title_bck}: BACKGROUND\cr
+\code{out_title_des}: DESCRIPTIVE STATISTICS\cr
+\code{out_title_basic}: BASIC ANALYSIS\cr
+\code{out_title_res}: RESIDUALS\cr
+
+STATISTICS\cr
+\code{call}: function call that generated the analysis\cr
+\code{formula}: model formula that specifies the model\cr
+\code{n.vars}: number of variables in the model\cr
+\code{n.obs}: number of rows of data submitted for analysis\cr
+\code{n.keep}: number of rows of data retained in the analysis\cr
+\code{residuals}: residuals\cr
+\code{fitted}: fitted values\cr
+
+Although not typically needed for analysis, if the output is assigned to an object named, for example, \code{a}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(a)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out_piece}.
 }
+
 
 \references{
 Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 7, NY: Routledge.
@@ -89,7 +134,7 @@ Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 7, NY: Routl
 mydata <- rd("Learn", format="lessR", quiet=TRUE)
 ANOVA(Score ~ StudyType)
 
-# variable of interest is in a data frame which is not the default mydata
+# variables of interest in a data frame that is not the default mydata
 # two-factor between-groups ANOVA with replications and interaction
 # warpbreaks is a data set provided with R
 ANOVA(breaks ~ wool * tension, data=warpbreaks)

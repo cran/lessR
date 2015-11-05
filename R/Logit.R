@@ -148,7 +148,8 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
 
   sm <- summary(lm.out)
   sm1 <- sm$coefficients
-  ci <- suppressMessages(confint(lm.out, level=0.95))
+  # conf intervals from standard errors, not confint.glm that requires MASS
+  ci <- suppressMessages(confint.default(lm.out, level=0.95)) 
   smc <- cbind(sm1, ci)
 
   buf <- 0 
@@ -228,10 +229,34 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
     cat( "\n", "Collinearity", "\n", sep="")
     cat("\n")
     if (numeric.all) {
-      tol <- 1/(vif(lm.out)) 
-      tol <- data.frame(tol, vif(lm.out)) 
-      names(tol) <- c("Tolerance", "    VIF")
-      print(round(tol,3))
+
+      #tol <- 1/(vif(lm.out))  # car
+      #tol <- data.frame(tol, vif(lm.out)) 
+      #names(tol) <- c("Tolerance", "    VIF")
+      #print(round(tol,3))
+
+    cat("To get VIF and tolerances run reg function\n",
+        "separately. If response variable is a factor\n",
+        "need to convert to a numeric variable. The VIF's\n",
+        "are a property of the X's, which are analyzed in\n",
+        "the collinearity results.\n\n")
+
+# need to run reg on a numeric transform of Y to get usual 
+# collinearity stats
+  #if (is.factor(data[,nm[1]]))  {
+    #Y <- as.numeric(data[,nm[1]])
+    #m.f <- paste("Y ~", nm[2])
+    #if (n.pred > 1)
+      #for (i in 2:n.pred) m.f <- paste(m.f, "+", nm[i+1])
+    #m.d <- data.frame(Y, data)
+  #}
+  #else {
+    #m.f <- my.formula
+    #m.d <- data
+  #}
+  #lm.out <- lm(as.formula(m.f), data=m.d)
+  # now get MSW and sterrs to get VIF
+ 
     }
     else cat("\n>>> No collinearity analysis because not all variables are numeric.\n")
   }

@@ -25,7 +25,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
   
   # output: header
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("Estimated Model")
+    tx[length(tx)+1] <- "Estimated Model"
     tx[length(tx)+1] <- ""
   }
 

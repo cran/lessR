@@ -19,7 +19,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
 
          bubble.size=.25, method="overplot",
 
-         ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse=TRUE, 
+         ellipse=FALSE, 
 
          pt.reg="circle", pt.out="circle", 
          col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
@@ -206,7 +206,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          cex.axis, col.axis, 
          xy.ticks, xlab, ylab, main, cex, kind,
          fit.line, col.fit.line, bubble.size,
-         ellipse, col.ellipse, fill.ellipse,
+         ellipse, 
          diag, col.diag, lines.diag, quiet, ...)
     }
 

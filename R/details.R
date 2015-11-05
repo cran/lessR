@@ -14,6 +14,9 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   ord.fac <- FALSE
   for (i in 1:n.var) if (class(data[,i])[1] == "ordered") ord.fac <- TRUE
 
+  chr.flg <- FALSE
+  for (i in 1:n.var) if (class(data[,i])[1] == "character") chr.flg <- TRUE
+
 
   if (!brief) {
     cat("\n")
@@ -39,8 +42,8 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   if (!brief) {
     .dash(70)
     cat("factor: Non-numeric categories, initially read as unordered categories\n")
-    if (ord.fac)
-      cat("ordfact: Ordered, non-numeric categories\n")
+    if (ord.fac) cat("ordfact: Ordered, non-numeric categories\n")
+    if (chr.flg) cat("character: Non-numeric unique values\n")
     cat("integer: The data values are numeric but integers only\n")
     cat("numeric: The data values are numeric with decimal digits\n")
   }
@@ -92,7 +95,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     cat("   ", n1, bn2, n2, bn3, n3, " ... ", e3, be3,  e2, be2,  e1, sep="")
     cat("\n") 
 
-    if (nu[i]==n  &&  (is.factor(data[,i]))) {
+    if (nu[i]==n  &&  ((is.factor(data[,i])) || (is.character(data[,i])))) {
       maybe.ID <- x.name
       colm.ID <- i
     }
