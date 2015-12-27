@@ -47,7 +47,8 @@ function(lm.out, cook, cooks.cut,
       xlab="Fitted Values", ylab="Residuals",
       main="", cex=NULL, kind="default",
       fit.line="none", col.fit.line="black", bubble.size=.25,
-      ellipse=FALSE, diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
+      ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent",
+      diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
       quiet=TRUE, sub=txt, cex.sub=.8) 
   abline(h=0, lty="dotted", lwd=1.5, col=getOption("col.fill.bar"))
   lines(lowess(fit.ord, res.ord, f=.9), col=getOption("col.stroke.pt"))

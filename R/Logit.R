@@ -230,32 +230,35 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
     cat("\n")
     if (numeric.all) {
 
-      #tol <- 1/(vif(lm.out))  # car
-      #tol <- data.frame(tol, vif(lm.out)) 
-      #names(tol) <- c("Tolerance", "    VIF")
-      #print(round(tol,3))
+    # need to run reg on a numeric of Y to get usual 
+      if (is.factor(data[,nm[1]]))  {
+        Y <- as.numeric(data[,nm[1]])
+        m.f <- paste("Y ~", nm[2])
+        if (n.pred > 1)
+          for (i in 2:n.pred) m.f <- paste(m.f, "+", nm[i+1])
+        m.d <- data.frame(Y, data)
+      }
+      else {
+        m.f <- my.formula
+        m.d <- data
+      }
 
-    cat("To get VIF and tolerances run reg function\n",
-        "separately. If response variable is a factor\n",
-        "need to convert to a numeric variable. The VIF's\n",
-        "are a property of the X's, which are analyzed in\n",
-        "the collinearity results.\n\n")
+      r.out <- lm(as.formula(m.f), data=m.d)
+      MSW <- anova(r.out)[n.vars,3]
+      sterrs <- summary(r.out)$coefficients[,2]
 
-# need to run reg on a numeric transform of Y to get usual 
-# collinearity stats
-  #if (is.factor(data[,nm[1]]))  {
-    #Y <- as.numeric(data[,nm[1]])
-    #m.f <- paste("Y ~", nm[2])
-    #if (n.pred > 1)
-      #for (i in 2:n.pred) m.f <- paste(m.f, "+", nm[i+1])
-    #m.d <- data.frame(Y, data)
-  #}
-  #else {
-    #m.f <- my.formula
-    #m.d <- data
-  #}
-  #lm.out <- lm(as.formula(m.f), data=m.d)
-  # now get MSW and sterrs to get VIF
+      vif <- numeric(length = 0)
+      tol <- numeric(length = 0)
+      for (i in 1:n.pred) {
+        v <- var(r.out$model[i+1])
+        vif[i] <- (v * (n.keep-1) * sterrs[i+1]^2) / MSW
+        tol[i] <- 1 / vif[i]
+      }
+
+      out <- cbind(tol, vif)
+      colnames(out) <- c("Tolerance", "      VIF")
+      rownames(out) <- nm[2:length(nm)]
+      print(round(out,3))
  
     }
     else cat("\n>>> No collinearity analysis because not all variables are numeric.\n")

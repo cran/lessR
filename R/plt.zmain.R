@@ -5,7 +5,7 @@ function(x, y, by, data, type, n.cat,
          cex.axis, col.axis,
          xy.ticks, xlab, ylab, main, cex, kind,
          fit.line, col.fit.line, bubble.size,
-         ellipse, 
+         ellipse, col.ellipse, fill.ellipse, 
          diag, col.diag, lines.diag, quiet, ...) {
 
   if (!is.null(type)) if (type != "p" && type != "l" && type != "b") { 
@@ -15,9 +15,8 @@ function(x, y, by, data, type, n.cat,
   }
 
   nrows <- length(x)
-  pt.sz <- 0.8
-  if (.Platform$OS == "windows") pt.sz <- 1
-  if (is.null(cex)) pt.size <- pt.sz else pt.size <- cex
+  pt.sz <- ifelse (.Platform$OS == "windows", 1, 0.8)
+  pt.size <- ifelse (is.null(cex), pt.sz, cex)
 
   if (is.null(col.fill)) col.fill <- "transparent"
   if (is.null(col.area)) col.area <- "transparent"
@@ -28,21 +27,11 @@ function(x, y, by, data, type, n.cat,
   y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
   main.lab <- gl$mb
   by.name <- getOption("byname")
-   
-  nu <- length(unique(na.omit(x)))
-  if (is.numeric(x) && nu <= n.cat) {
-    x <- as.factor(x)
-    cat("\n")
-    cat(">>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
-        "so treat as categorical.\n",
-        "   To treat as numeric, decrease  n.cat  to specify a",
-        "lower number of unique values.\n",
-        "   Suggest making this variable a factor with the R factor function.\n")
-   }
 
   if (!is.factor(x)) {
     if (is.null(type)) {  # if x is sorted with equal intervals, plot a line chart
-      if (sum(is.na(x)) > 0) equal.int <- FALSE  # missing data in x present
+      if (sum(is.na(x)) > 0)
+        equal.int <- FALSE  # missing data in x present
       else {
         diff.x <- diff(x)
         for (i in 2:(length(x)-1)) 
@@ -51,14 +40,15 @@ function(x, y, by, data, type, n.cat,
           else
             equal.int <- TRUE
         rm(diff.x)
-      }
-      if (!is.unsorted(x) && equal.int  && sum(is.na(y))==0)  # also no y missing 
-        type <- "l" else type <- "p"
+      }  # also no y missing
+      type <- ifelse (!is.unsorted(x) && equal.int  && sum(is.na(y))==0, "l", "p") 
+
     }
     if (kind == "default")  # set default
       if (length(x)>10 && length(y)>10 && length(unique(x))<10 && length(unique(y))<10)
         kind <- "bubble"
-      else kind <- "regular"
+      else
+        kind <- "regular"
     }
   else {  # x is a factor
     type <- "p"
@@ -95,37 +85,29 @@ function(x, y, by, data, type, n.cat,
   # plot
   # -------------------------
 
-  # plot setup
+  # -----------------------
+  # setup coordinate system
+
   if (kind == "regular") {
 
     if (!is.null(by)) par(omi=c(0,0,0,0.6))  # legend in right margin
 
+    # non-graphical parameters in ... generate warnings when no plot
+    if (!diag && !ellipse)
+      plot(x, y, type="n", axes=FALSE, ann=FALSE, main=main.lab, ...)
     if (diag) {
-      nums <- pretty(c(min(x,y),max(x,y)))
+      nums <- pretty(c(min(x,y, na.rm=TRUE),max(x,y, na.rm=TRUE)))
       l1 <- nums[1]
       l2 <- nums[length(nums)]
-    }
-
-    # non-graphical parameters in ... generate warnings when no plot
-    if (!diag)
-      plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
-             main=main.lab, ...)
-    else
-      plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, 
+      plot(x, y, type="n", axes=FALSE, ann=FALSE,
              main=main.lab, xlim=c(l1,l2), ylim=c(l1,l2), ...)
-    if (xy.ticks){
-      axis(1, cex.axis=cex.axis, col.axis=col.axis, ...)
-      axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
     }
+
   }
 
-  else if (kind == "xcat") {
-    plot.default(y ~ x, xlim=c(.5,nlevels(x)+.5), type="n", axes=FALSE, 
-                xlab=x.lab, ylab=y.lab, main=main.lab, ...)
-    axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
-    axis(1, labels=levels(x), at=1:nlevels(x), 
-            cex.axis=cex.axis, col.axis=col.axis, ...)
-  }
+  else if (kind == "xcat")
+    plot.default(y ~ x, xlim=c(.5,nlevels(x)+.5), type="n",
+                 axes=FALSE, ann=FALSE, main=main.lab, ...)
 
   else if ((kind == "bubble") || (kind == "sunflower")) {
     mytbl <- table(x, y)  # get the counts
@@ -148,11 +130,11 @@ function(x, y, by, data, type, n.cat,
       }
     }
     cords <- data.frame(xx, yy, count)
-    # bubble plot
-    if (kind == "bubble"  ||  kind == "sunflower")
-      plot(x,y, type="n", xlab=x.lab, ylab=y.lab, main=main.lab,
-           xlim=c(x.lo,x.hi), ylim=c(y.lo,y.hi), cex.axis=cex.axis, 
+    if (kind == "bubble"  ||  kind == "sunflower") {
+      plot(x,y, type="n", ann=FALSE, axes=FALSE, main=main.lab,
+           xlim=c(x.lo,x.hi), ylim=c(y.lo,y.hi), cex.axis=cex.axis,
            col.axis=col.axis)
+    }
   }
 
   else {
@@ -160,6 +142,33 @@ function(x, y, by, data, type, n.cat,
     "This type of plot not recognized: ", kind, "\n\n")
   }
 
+  if (ellipse) {  # calculate ellipse and set coords with sufficient room
+    cxy <- cor(x,y, use="complete.obs")
+    s.x <- sd(x, na.rm=TRUE); s.y <- sd(y, na.rm=TRUE)
+    m.x <- mean(x, na.rm=TRUE); m.y <- mean(y, na.rm=TRUE)
+    e <- ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y))
+    plot(e, type="n", axes=FALSE, ann=FALSE, main=main.lab, ...)
+    txt <- "[Ellipse with Murdoch and Chow's function ellipse"
+    cat(txt, "from the ellipse package]\n") 
+  }
+
+
+  # --------------
+  # begin plotting
+
+  if (xy.ticks){
+    if (kind != "xcat")
+      axis(1, cex.axis=cex.axis, col.axis=col.axis, ...)
+    else
+      axis(1, labels=levels(x), at=1:nlevels(x), 
+              cex.axis=cex.axis, col.axis=col.axis, ...)
+    axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
+  }
+
+  # axis labels
+  lbl.lns <- ifelse(xy.ticks, 3, 1)
+  title(xlab=x.lab, line=lbl.lns)
+  title(ylab=y.lab, line=lbl.lns)
 
   # colored plotting area
   usr <- par("usr")
@@ -175,8 +184,8 @@ function(x, y, by, data, type, n.cat,
   # grid lines
   vx <- pretty(c(usr[1],usr[2]))
   vy <- pretty(c(usr[3],usr[4]))
-  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.75)
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.75)
 
   # fill area under curve
   if (type != "p") col.border <- col.stroke else col.border <- "transparent"
@@ -193,6 +202,7 @@ function(x, y, by, data, type, n.cat,
 
       if (is.null(by)) { 
         trans.pts <- getOption("trans.fill.pt")
+        if (ellipse) polygon(e, border=col.ellipse, col=fill.ellipse, lwd=1.5)
         clr.trn <- .maketrans(col.fill, (1-trans.pts)*256)
         points(x,y, pch=shape.pts, col=col.stroke,
             bg=clr.trn, cex=pt.size, ...)
@@ -244,6 +254,7 @@ function(x, y, by, data, type, n.cat,
   }
 
   else if (kind == "bubble") {
+    if (ellipse) polygon(e, border=col.ellipse, col=fill.ellipse, lwd=1.5)
     symbols(cords$xx, cords$yy, circles=cords$count, bg=col.fill, 
             fg=col.stroke, inches=bubble.size, add=TRUE, ...)
     zeros <- cords[cords$count==0, ] # 0 plots to a single pixel, so remove
@@ -251,18 +262,11 @@ function(x, y, by, data, type, n.cat,
   }
 
   else if (kind == "sunflower") {
+    if (ellipse) polygon(e, border=col.ellipse, col=fill.ellipse, lwd=1.5)
     sunflowerplot(cords$xx, cords$yy, number=cords$count, 
       seg.col=col.stroke, col=col.fill, cex.axis=cex.axis, col.axis=col.axis,
       xlab=x.lab, ylab=y.lab, xlim=c(x.lo,x.hi), ylim=c(x.lo,x.hi), add=TRUE)
   }
-
-  if (ellipse) {  # car function
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "ellipse option disabled, car package no longer included\n",
-      "because of dependencies issues.\n\n",
-      "If interested, use the dataEllipse function from car.\n\n")
-  }
-
 
   # fit line option
   if (fit.line != "none") { 
@@ -318,12 +322,30 @@ function(x, y, by, data, type, n.cat,
       n.pair <- sum(!is.na(x - y))  # number of points after listwise deletion
       n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
     }      
-      .cr.main(x, y, brief=TRUE, ...)
-    }
+
     if (!is.null(y) && is.factor(x)) {
       options(yname = x.name)
       options(xname = y.name)
       .ss.numeric(y, by=x, digits.d=digits.d, brief=TRUE)
+    }
+
+    stuff <- .cr.main(x, y, brief=TRUE, ...) 
+    txbck <- stuff$txb
+    txdsc <- stuff$txd
+    txinf <- stuff$txi
+
+    class(txbck) <- "out_piece"
+    class(txdsc) <- "out_piece"
+    class(txinf) <- "out_piece"
+
+    output <- list(out_background=txbck, out_describe=txdsc, out_inference=txinf,
+      r=stuff$r, tvalue=stuff$tvalue, df=stuff$df, pvalue=stuff$pvalue,
+      lb=stuff$lb, ub=stuff$ub)
+
+    class(output) <- "out_all"
+    print(output)
+    #return(output)
+
     }
 
   cat("\n")

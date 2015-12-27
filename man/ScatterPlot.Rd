@@ -14,7 +14,7 @@ Generates scatter plots for one or two variables. For two variables also produce
 
 One enhancement over the standard R  \code{\link{plot}} function is the automatic inclusion of color.  The color of the line segments and/or the points, background, area under the plotted line segments, grid lines, and border can each be explicitly specified, with default colors provided by one of the pre-defined color themes as defined by the \code{\link{set}} function.  
 
-If a scatterplot of two numeric variables is displayed, then the corresponding correlation coefficient as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function \code{\link{cor.test}} function are generated, though in a more readable format.  
+If a scatterplot of two numeric variables is displayed, then the corresponding correlation coefficient as well as the hypothesis test of zero population correlation and the 95\% confidence interval are also displayed.  The same numeric values of the standard R function \code{\link{cor.test}} function are generated, though in a more readable format. Also, an option for the .95 data ellipse from Murdoch and Chow's \code{ellipse} package can enclose the points of the scatterplot.
 
 For one variable, based on the standard R function \code{\link{stripchart}}, plots a one dimensional scatterplot, that is, a dot chart, also called a strip chart. Also identifies outliers according to the criteria specified by a box plot and displays the summary statistics for the variable. The dot plot is also invoked with the function names \code{DotPlot} or just \code{dp}, which are just alternate names for \code{ScatterPlot} when a single variable is referenced.
 
@@ -42,7 +42,7 @@ ScatterPlot(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat")
 
          bubble.size=.25, method="overplot",
 
-         ellipse=FALSE, 
+         ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent", 
 
          pt.reg="circle", pt.out="circle", 
          col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
@@ -122,8 +122,10 @@ dp(\ldots)
   \item{bubble.size}{Size of the bubbles in a bubble plot of Likert style data.}
   \item{method}{Applies to one variable plots. Default is \code{"overplot"}, but can also provide \code{"stack"} to stack the points or
        \code{"jigger"} to scramble the points.}
-  \item{ellipse}{Removed as car package not used due to R not properly processing dependencies.
-        If \code{TRUE}, enclose a scatterplot with the .95 data ellipse from the car package.}
+  \item{ellipse}{If \code{TRUE}, enclose a scatterplot with the .95 data ellipse from the ellipse package.}
+  \item{col.ellipse}{Color of the ellipse.}
+  \item{fill.ellipse}{If \code{TRUE}, fill the ellipse with \code{col.ellipse}. Usually
+        specify low opacity in the color specification, as shown in the examples.}
   \item{pt.reg}{For dot plot, type of regular (non-outlier) point. Default is 21, a circle with
                 specified fill.}
   \item{pt.out}{For a dot plot, type of point for outliers. Default is 19, a filled circle.}
@@ -166,6 +168,9 @@ A variable specified with \code{by=} is a grouping variable that specifies that 
 To explicitly vary the shapes, use \code{shape.pts} and a list of shape values in the standard R form with the \code{\link{c}} function to combine a list of values, one specified shape for each group, as shown in the examples. To explicitly vary the colors, use \code{col.pts}, such as with R standard color names. If \code{col.pts} is specified without \code{shape.pts}, then colors are varied, but not shapes.  To vary both shapes and colors, specify values for both options, always with one shape or color specified for each level of the \code{by} variable. 
 
 Shapes beyond the standard list of named shapes, such as \code{"circle"}, are also available as single characters.  Any single letter, uppercase or lowercase, any single digit, and the characters \code{"+"}, \code{"*"} and \code{"#"} are available, as illustrated in the examples. In the use of \code{shape.pts}, either use standard named shapes, or individual characters, but not both in a single specification.
+
+SCATTERPLOT ELLIPSE\cr
+For a scatterplot of two numeric variables, the \code{ellipse=TRUE} option draws the .95 data ellipse as computed by the \code{ellipse} function, written by Duncan Murdoch and E. D. Chow, from the \code{ellipse} package. The axes are automatically lengthened to provide space for the entire ellipse that extends beyond the maximum and minimum data values. 
 
 ONE VARIABLE PLOT\cr
 The one variable plot is a one variable scatterplot, that is, a dot chart. Results are based on the standard \code{\link{stripchart}} function. Colors are provided by default and can also be specified. For gray scale output, potential outliers are plotted with squares and actual outliers are plotted with diamonds, otherwise shades of red are used to highlight outliers. The definition of outliers are from the R \code{\link{boxplot}} function.
@@ -212,7 +217,7 @@ Instead, do the following:
 }
 
 \references{
-Monette, G. and Fox, J., \code{dataEllipse} function from the \code{car} package.
+Murdoch, D, and  Chow, E. D. (2013).  \code{ellipse} function from the \code{ellipse} package package. 
 
 Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 8, NY: Routledge.
 }
@@ -250,8 +255,8 @@ plot(mydata$x, mydata$y)
 # save scatterplot to a pdf file
 ScatterPlot(x, y, pdf.file="MyScatterScatterPlot.pdf")
 
-# scatterplot, with loess line 
-ScatterPlot(x, y, fit.line="loess")
+# scatterplot, with loess line and filled ellipse with low opacity, .1 
+ScatterPlot(x, y, fit.line="loess", ellipse=TRUE, fill.ellipse=rgb(.6,.3,.3,.1))
 
 # increase span (smoothing) from default of .75
 # span is a loess parameter and generates a caution that can be

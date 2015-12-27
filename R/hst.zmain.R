@@ -4,12 +4,6 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
        bin.end, prop, cumul, xlab, ylab, main, quiet, ...) {
 
 
-  if (!is.numeric(x)) { 
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "A histogram is only computed from a numeric variable.\n",
-      "For the analysis of a categorical variable use BarChart.\n\n")
-  }
-        
   if (is.numeric(breaks) && !is.null(bin.start)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Choose only one option to specify a start value.\n",
@@ -74,7 +68,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
       cat("Each data value must be in a bin.\n")
       txt <- "To fix this problem, extend the bin range "
       if (n.under > 0) cat(txt, "below ", bin.min, ".\n", sep="")
-      if (n.over > 0) cat(txt, "above ", bin.max, ".\n", sep="")
+      if (n.over > 0) cat(txt, "above ", bin.max, ".\n\n", sep="")
       stop("Extend the bin range and rerun.\n\n", call. = FALSE)
     }  
   }
@@ -94,7 +88,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
   }
   
   # set up plot area
-  plot(h, border="transparent", xlab=x.lab, ylab=y.lab,
+  plot(h, xlab=x.lab, ylab=y.lab,
         main=main.lab, freq=TRUE, axes=FALSE, ...)
   axis(1, cex.axis=cex.axis, col.axis=col.axis, ...) 
   axis(2, cex.axis=cex.axis, col.axis=col.axis, ...) 

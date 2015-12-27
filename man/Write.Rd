@@ -8,7 +8,7 @@
 \description{
 Abbreviation: \code{wrt}, \code{wrt.r}
 
-Writes the contents of the specified data frame, such as with the default \code{mydata}, to the current working directory as either the default \code{csv} data file or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels are automatically included in a native R data file.
+Writes the contents of the specified data frame, such as with the default \code{mydata}, to the current working directory as either the default \code{csv} data file or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels and variable units are automatically included in a native R data file.
 }
 
 \usage{
@@ -36,6 +36,8 @@ Can specify the file name without the file type, which \code{Write} adds automat
 
 
 \code{Write} is designed to work in conjunction with the function \code{\link{Read}} from this package, which reads a csv, fixed width format, or native SPSS or R data files into the data frame \code{mydata}. \code{Write} relies upon the R functions \code{\link{write.csv}} and \code{\link{save}}.
+
+When writing the data frame in native R format, the specified name of the resulting \code{.rda} file is distinct from the name of the data frame as stored within R.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

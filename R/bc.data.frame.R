@@ -44,8 +44,11 @@ function(x, n.cat,
         }
       }
 
-      else cat("\n", names(x)[i], "appears to contain unique Names or IDs", "\n")
+      else cat("\n", names(x)[i], "appears to contain unique Names or IDs\n")
     }
+
+    else cat("\n", "--- ", names(x)[i], " --- is numerical, better to do a ",
+             "histogram\n\n", sep="")
 
   }
 

@@ -77,7 +77,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
        fit.line=fl, col.fit.line="grey55", center.line=NULL,
        col.bubble=NULL, bubble.size=.25, col.flower=NULL,
-       ellipse=FALSE, 
+       ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent", 
        diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
        quiet=TRUE, ylim=c(y.min,y.max))
 
@@ -127,7 +127,8 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
           txt <- format(c(r, 0.123456789), digits=digits)[1]
           txt <- paste(prefix, txt, sep="")
           if (missing(cex.cor)) cex.cor <- .9/strwidth(txt)
-          text(0.5, 0.5, txt, cex=2, col=col.pts)  # or cex=cex.cor * r
+          cex.adj <- 2.5 - (0.18*n.pred)  # adjust size of displayed r
+          text(0.5, 0.5, txt, cex=cex.adj, col=col.pts)  # or cex=cex.cor * r
         }
         pairs(lm.out$model[c(nm)],
           lower.panel=panel2.smooth, upper.panel=panel.cor)

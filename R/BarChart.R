@@ -52,10 +52,10 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       if (length(x.col) > 1) data <- data[, x.col]  # x is a vars list
       if (length(x.col) == 1) x.call <- eval(substitute(data$x))  # x is 1 var
     }
-    else { # x is in the global environment (vector or data frame)
+    else {  # x is in the global environment (vector, matrix or data frame)
       if (is.data.frame(x))  # x a data frame
         data <- x
-      else {  # x a vector in global
+      else {  # x a vector or matrix in global
         x.call <- x
         if (is.function(x.call)) x.call <- eval(substitute(data$x))
       }

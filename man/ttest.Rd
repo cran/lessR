@@ -57,7 +57,8 @@ tt(\ldots)
   \item{s2}{Sample standard deviation for second of two groups.}
   \item{data}{Data frame that contains the variable of interest, default is \code{mydata}.}
   \item{paired}{Set to \code{TRUE} for a dependent-samples t-test with two data vectors 
-       or variables from a data frame.}
+       or variables from a data frame, with the difference computed from subtracting
+       the first vector from the second.}
   \item{Ynm}{Name of response variable.}
   \item{Xnm}{Name of predictor variable, the grouping variable or factor with exactly
         two levels.}

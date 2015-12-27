@@ -48,7 +48,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
       cat("\n\n------ Normality Assumption ------\n\n")
       # Normality
       if (n > 30) {
-        cat("Sample mean is normal because n>30, so no test needed.", sep="", "\n")
+        cat("Sample mean assumed normal because n>30, so no test needed.", sep="", "\n")
       }
       else {
         cat("Null hypothesis is a normal distribution", sep="")

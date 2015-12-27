@@ -7,9 +7,9 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
   tx <- character(length = 0)
 
   # title
-  tx[length(tx)+1] <- .dash2(n.dash);
   tx[length(tx)+1] <- ttl 
-  tx[length(tx)+1] <- .dash2(n.dash);
+  tx[length(tx)+1] <- .dash2(n.dash)
+  tx[length(tx)+1] <- ""
 
   # col labels
   tx[length(tx)+1] <-  .fmtc(x.name, w=max.c1+3)
@@ -51,14 +51,17 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
   if (!is.table(x) && !is.matrix(x)) {  # bc yields a table or matrix
     if (!is.null(by)) 
       x <- table(by,x, dnn=c(y.name,x.name)) 
-    else x <- table(x, dnn=NULL)
+    else
+      x <- table(x, dnn=NULL)
   }
 
 
   # no title if two vars and no labels
   txttl <- ""
-  if (is.null(by) || (!is.null(x.lbl) || !is.null(y.lbl))) { #  one var or labels
+  dims <- length(dim(x))
+  if (dims == 1 || (!is.null(x.lbl) || !is.null(y.lbl))) {  #  one var or labels
     txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=FALSE)
+    txttl[1] <- paste("\n", txttl[1])
   }
 
   # print table, chi-square analysis
@@ -90,12 +93,29 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
       if (max.ln[i] < 4) max.ln[i] <- 4
     }
 
-    # Cell frequencies
-    txfrq <- .prnfreq(xx, "i", max.ln, max.c1, n.dash=32,
+    # cell frequencies
+    txfrq <- .prnfreq(xx, "i", max.ln, max.c1, n.dash=30,
                       ttl="Joint and Marginal Frequencies")
 
+    tx <- character(length = 0)
+    ch <- (summary(as.table(x)))
+    min.rc <- min(nrow(x)-1, ncol(x)-1)
+    V <- sqrt(ch$statistic / (min.rc * ch$n.cases))
+    txt <- ifelse(ch$parameter == 1, " (phi)", "") 
+    txt <- paste("Cramer\'s V", txt, ":", sep="")
+    tx[length(tx)+1] <- paste(txt, .fmt(V,3))
+    tx[length(tx)+1] <- ""
+    tx[length(tx)+1] <- paste("Chi-square Test", 
+        ":  Chisq = ", .fmt(ch$statistic,3), ", df = ", ch$parameter,
+        ", p-value = ", .fmt(ch$p.value,3), sep="")
+    if (!ch$approx.ok) 
+      tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
+          "so chi-squared approximation may not be accurate")
+    tx[length(tx)+1] <- ""
+    txXV <- tx
+
     if (brief)
-      return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq))
+      return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txXV=txXV))
 
 
     # full analysis
@@ -105,12 +125,12 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
       if (max.ln[i] < 6) max.ln[i] <- 6
     }
 
-    # Cell Proportions and Marginals
+    # cell proportions and marginals
     xx <- round(addmargins(prop.table(x)),3)
     txprp <- .prnfreq(xx, "r", max.ln, max.c1, n.dash=30,
                       ttl="Cell Proportions and Marginals")
 
-    # Cell Proportions within Each Column
+    # cell proportions within each column
     x.col <- prop.table(x, margin=2)
     Sum <- numeric(ncol(x.col))
     for (i in 1:ncol(x.col)) {
@@ -123,7 +143,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
     txcol <- .prnfreq(x.col2, "r", max.ln, max.c1, n.dash=35,
                       ttl="Cell Proportions within Each Column")
 
-    # Cell Proportions within Each Row
+    # cell proportions within each row
     x.row <- prop.table(x, margin=1)
     Sum <- numeric(nrow(x.row))
     for (i in 1:nrow(x.row)) {
@@ -140,7 +160,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
       cat("\nNote: NaN results from all values missing for that cell or margin.\n",
                  "     so any division to compute a proportion is undefined.\n")
 
-    return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txprp=txprp,
+    return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txXV=txXV, txprp=txprp,
                 txcol=txcol, txrow=txrow))  # back to ss or ss data frame
 
     # end full analysis
@@ -170,7 +190,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
 
       tx <- character(length = 0)
 
-      tx[length(tx)+1] <-  format("", width=13)
+      tx[length(tx)+1] <- format("", width=13)
       w <- nchar(as.character(sum(x)))
       for (i in 1:length(x))
         tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(x[i]), w=max.ln[i]))
@@ -189,7 +209,19 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
         tx[length(tx)] <- paste(tx[length(tx)], .fmt(xp[i], 3, max.ln[i]))
       tx[length(tx)] <- paste(tx[length(tx)], .fmtc("1.000", w=w+6))
 
-      return(list(n.dim=n.dim, title=txttl, tx=tx, frq=x, prp=xp))  # back to SummaryStats
+      txcnt <- tx
+
+      tx <- character(length = 0)
+      ch <- chisq.test(x)
+      tx[length(tx)+1] <- "Chi-squared test of null hypothesis of equal probabilities"
+      tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ",  df = ",
+          ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
+      if (any(ch$expected < 5)) 
+        tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
+            "so chi-squared approximation may not be accurate", "\n")
+      txchi <- tx
+
+      return(list(n.dim=n.dim, title=txttl, counts=txcnt, chi=txchi, freq=x, prop=xp))  # back to SummaryStats
     }
   }  # one variable
 

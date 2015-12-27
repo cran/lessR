@@ -24,6 +24,12 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
+        
+  if (is.numeric(breaks) && !is.null(bin.start)) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Choose only one option to specify a start value.\n",
+      "Either choose the option  breaks  or the option  bin.start.\n\n")
+  }
 
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x))  # could be a list of var names
@@ -49,9 +55,14 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       if (class(data) != "list") {
         data <- data[, x.col]
         if (length(x.col) == 1) {  # x is 1 var
+          if (!is.numeric(data)) { 
+            cat("\n"); stop(call.=FALSE, "\n","------\n",
+              "A histogram is only computed from a numeric variable.\n",
+              "For the frequencies of a categorical variable use BarChart.\n\n")
+          }
           data <- data.frame(data)
           names(data) <- x.name
-         }
+        }
       }
       else {  # class of data is "list"
         data <- data.frame(data[[x.col]])
@@ -154,7 +165,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     output <- list(type="Histogram",
       call=fun.call, 
-      out_ss=txss, out_freq=txdst, out_outliers=txotl,
+      out_ss=txss, out_outliers=txotl, out_freq=txdst,
       out_file=txkfl,
       bin_width=stuff$bin.width, n_bins=stuff$n.bins,
       breaks=stuff$breaks,

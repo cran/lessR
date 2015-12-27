@@ -34,8 +34,8 @@ function (my.formula, y=NULL, data, ...) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
     "You specified ", nm[1], " as the response variable, the 1st variable listed.\n",
     "The response variable must have only numeric values.\n",
-    "The first value of ", nm[1], " is ", data[1,nm[1]], ".\n",
-    "Perhaps you reversed the order of the variables.\n\n")
+    "The first value of ", nm[1], " is ", data[1,nm[1]],
+    ", which is not numeric.\n\n")
   }
 
 # X existence check

@@ -184,6 +184,9 @@ h$out_outliers
 # list the names of all the components
 names(h)
 
+# histogram with no borders for the bars
+Histogram(y, col.stroke="transparent")
+
 # save the histogram to a pdf file
 Histogram(y, pdf.file="MyHistogram.pdf")
 

@@ -90,8 +90,9 @@ reg.brief(\ldots, brief=TRUE)
        intervals by the lower bound of each prediction interval.  Turn off this sort by
        specifying a value of \code{"off"}.}
   \item{subsets}{Default is to produce the analysis of the fit based on adjusted R-squared 
-       for all possible model subsets from the \code{leaps} package. Set to \code{FALSE} to
-       turn off.}
+       for all possible model subsets of size 10 for each number of predictors, from the
+       \code{leaps} package. Set to \code{FALSE} to turn off. Defaults lists a maximum of
+       the first 50 values. Specify an integer to change the maximum.}
   \item{cooks.cut}{Cutoff value of Cook's Distance at which observations with a larger value 
        are flagged in red and labeled in the resulting scatterplot of Residuals and Fitted 
        Values.  Default value is 1.0.}
@@ -195,7 +196,6 @@ TEXT OUTPUT\cr
 \code{out_subsets}: R squared adjusted for all (or many) possible subsets\cr
 \code{out_residuals}: residuals\cr
 \code{out_predict}: analysis of residuals and influence\cr
-\code{out_cite}: list of packages from other developers used in the analysis\cr
 \code{out_ref}: references if selected on the \code{Regression} function call\cr
 \code{out_knitr.file}: lists the name and location of the \code{knitr} instructions\cr
 \code{out_plots}: list of plots generated if more than one\cr

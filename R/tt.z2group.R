@@ -9,7 +9,6 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       "mmd and msmd do not work with the brief version.\n\n")
   }
 
-  cat("------------------------------------------------------------\n")
   cat("Compare", Ynm, "across", Xnm, "levels", X1nm, "and", X2nm, "\n")
   cat("------------------------------------------------------------\n\n")
 
@@ -90,7 +89,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       cat(Ynm, ".", sep="", "\n")
       if (n1 > 30) {
         cat("Group " , X1nm, ": ", sep="")
-        cat("Sample mean is normal because n>30, so no test needed.", sep="", "\n")
+        cat("Sample mean assumed normal because n>30, so no test needed.", sep="", "\n")
       }
       else {
         cat("Group", X1nm, " ")
@@ -106,7 +105,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     }  
     if (n2 > 30) {
       cat("Group " , X2nm, ": ", sep="")
-      cat("Sample mean is normal because n>30, so no test needed.", sep="", "\n")
+      cat("Sample mean assumed normal because n>30, so no test needed.", sep="", "\n")
     }
     else {
       cat("Group", X2nm, " ")

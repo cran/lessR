@@ -65,10 +65,11 @@ Although not typically needed for analysis, if the output is assigned to an obje
 
 mydata <- Read("Reading", format="lessR")
 
-
 # compare least-squares models
-mydata <- Read("Reading", format="lessR")
+# can specify all the variables in the full model
 Nest(Reading, c(Absent), c(Verbal,Absent,Income))
+# or, can specify just the additional variables in the full model
+Nest(Reading, c(Absent), c(Verbal,Income))
 
 # compare logistic models, save results into an object
 # define the full model by adding just the variables

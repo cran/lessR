@@ -5,11 +5,6 @@ function(x, by=NULL,
          cex.axis, col.axis,  beside, col.low, col.hi, count.levels,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
  
- if (!is.null(by) && prop) { 
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-    "Analysis of proportions not valid for two variables.\n\n")
-  }
-
   if (horiz && addtop!=1) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
     "addtop  only works for a vertical bar plot.\n\n")
@@ -21,13 +16,20 @@ function(x, by=NULL,
   }
 
   # get variable labels if exist plus axes labels
-  if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- "Proportion"
+  txt <- "Proportion"
+  if (!is.null(by)) txt <- paste("Row", txt)
+  if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- txt
   gl <- .getlabels(xlab, ylab, main)
-  x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
-  y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
+  x.name <- gl$xn; x.lab <- gl$xb
+  y.name <- gl$yn; y.lab <- gl$yb; y.lbl <- gl$yl
   main.lab <- gl$mb
 
-  # if a table, convert to a matrix 
+  if (is.matrix(x)) {  # get the variable names as counts entered directly
+    options(xname = x.lab)
+    options(yname = legend.title)
+  }
+
+  # if a table, convert to a matrix
   if (is.table(x)) {
     xr.nm <- rownames(x)
     xc.nm <- colnames(x)  # as.numeric makes equivalent to matrix input
@@ -37,15 +39,14 @@ function(x, by=NULL,
   }
 
   # get legend title, l.lab
-  if (!is.null(legend.title)) l.lab <- legend.title 
-  else if (!is.null(by)) if (exists("y.lbl"))
-    if (length(y.lbl) == 0) l.lab <- y.name else l.lab <- y.lbl
+  if (!is.null(legend.title))
+    l.lab <- legend.title 
+  else
+    if (!is.null(by)) if (exists("y.lbl"))
+      l.lab <- ifelse (length(y.lbl) == 0, y.name, y.lbl)
 
   # title
-  if (!is.null(main))
-    main.lbl <- main
-  else
-    main.lbl <- ""
+  main.lbl <- ifelse (!is.null(main), main, "")
 
   # entered counts typically integers as entered but stored as type double
   # if names(x) or rownames(x) is null, likely data from sample and c functions
@@ -62,19 +63,20 @@ function(x, by=NULL,
   }
   
   # save ordered status before converting x to a table
-  if (is.ordered(x) && is.null(by)) order.x <- TRUE else order.x <- FALSE
-  if (is.ordered(by)) order.y <- TRUE else order.y <- FALSE
+  order.x <- ifelse (is.ordered(x) && is.null(by), TRUE, FALSE)
+  order.y <- ifelse (is.ordered(by), TRUE, FALSE)
 
-
-  if (!entered) {
-    if (!is.null(by)) x <- table(by,x, dnn=c(y.name, x.name)) 
-    else {  
-      x <- table(x, dnn=NULL)
-      if (prop) {
-        x.temp <- x
-        x <- x/sum(x)
-      }
+  # convert x to a table
+  if (!entered) {  # x.temp allows frequencies to be restored for text output
+    if (!is.null(by)) {
+      x.temp <- table(by,x, dnn=c(y.name, x.name))
+      x <- table(by,x, dnn=c(y.name, x.name)) 
     }
+    else {  
+      x.temp <- x
+      x <- table(x, dnn=NULL)
+    }
+    if (prop) x <- prop.table(x,1)
   }
 
   if (is.null(by) && beside && !entered) { 
@@ -105,15 +107,23 @@ function(x, by=NULL,
   }
 
   # color palette
-  if ((order.x && is.null(by)) || order.y) {  # one var, ordered factor
+  if ((order.x && is.null(by)) || order.y) {  # one var, an ordered factor
       col.grid <- getOption("col.grid")
       col.bg <- getOption("col.bg")
-    if (colors == "blue") { 
+    if (colors == "dodgerblue") { 
+      if (is.null(col.low)) col.low <- rgb(.765,.824,.886)
+      if (is.null(col.hi)) col.hi <- "dodgerblue4"
+    }
+    else if (colors == "sienna") { 
+      if (is.null(col.low)) col.low <- "#F7E9E2"
+      if (is.null(col.hi)) col.hi <- "sienna3"
+    }
+    else if (colors == "blue") { 
       if (is.null(col.low)) col.low <- "slategray2"
       if (is.null(col.hi)) col.hi <- "slategray4"
     }
     else if (colors == "gray") {
-      if (is.null(col.low)) col.low <- "gray70"
+      if (is.null(col.low)) col.low <- "gray90"
       if (is.null(col.hi)) col.hi <- "gray25"
     }
     else if (colors == "gray.black") {
@@ -140,34 +150,24 @@ function(x, by=NULL,
       if (is.null(col.low)) col.low <- rgb(255,173,91, maxColorValue=256)
       if (is.null(col.hi)) col.hi <- rgb(169,66,2, maxColorValue=256)
     }
-    else if (colors == "sienna") { 
-      if (is.null(col.low)) col.low <- "sienna1"
-      if (is.null(col.hi)) col.hi <- "sienna4"
-    }
-    else if (colors == "dodgerblue") { 
-      if (is.null(col.low)) col.low <- "dodgerblue1"
-      if (is.null(col.hi)) col.hi <- "dodgerblue4"
-    }
     else if (colors == "purple") { 
       if (is.null(col.low)) col.low <- "purple1"
       if (is.null(col.hi)) col.hi <- "purple4"
     }
     color.palette <- colorRampPalette(c(col.low, col.hi))
     clr <- color.palette(n.colors)
-  }
+  } # end ordered
 
   else if (colors == "gray") {
-    color.palette <- colorRampPalette(c("gray30","gray80"))
+    color.palette <- colorRampPalette(c("gray85","gray30"))
     clr <- color.palette(nrow(x))
     if (col.grid == "gray86") col.grid <- getOption("col.grid")
     if (col.bg == "ghostwhite") col.bg <- getOption("col.bg")
   }
-  else if ((colors=="blue" || colors=="rose" || colors=="green" 
-          || colors=="gold" || colors=="red" || colors=="orange"
-          || colors=="sienna" || colors=="dodgerblue" || colors=="purple"
-          || colors=="white" 
-          || colors=="orange.black" || colors=="gray.black")
-          && (is.null(by) && !is.matrix(x))) {
+
+  else if ((colors %in% c("blue","rose","green","gold","red","orange",
+          "sienna","dodgerblue","purple","white","orange.black","gray.black")
+          && (is.null(by) && !is.matrix(x)))) {
       if (n.colors > 1) {
         color.palette <- colorRampPalette(getOption("col.fill.bar"))
         clr <- color.palette(nrow(x))
@@ -175,17 +175,17 @@ function(x, by=NULL,
       col.grid <- getOption("col.grid")
       col.bg <- getOption("col.bg")
     }
+
     else if (colors == "rainbow") clr <- rainbow(n.colors)
     else if (colors == "terrain") clr <- terrain.colors(n.colors)
     else if (colors == "heat") clr <- heat.colors(n.colors)
+
     else  {  # mono color range does not make sense here 
-      clr <- c("slategray", "peachpuff2", "darksalmon", "darkseagreen1", 
-              "lightgoldenrod3", "mistyrose", "azure3", "thistle4")
-      cat("\n>>> Note: For two variables, the color theme only applies to\n",
-          "        the levels of an ordered factor, except for the \"gray\"\n",
-          "        color theme. However, other choices are available for\n",
-          "        the colors option:  \"rainbow\", \"terrain\" and \"heat\". \n\n", 
-          sep="")
+      clr <- .col.discrete()
+      cat("\n>>> Can set colors=\"terrain\", or \"rainbow\" or ",
+          "\"heat\" \n", sep="")  # lighten some default background colors
+      if (col.bg == "#EEF0F2") col.bg <- rgb(245,245,245, maxColorValue=255)
+      if (col.bg == "#E5DB8E") col.bg <- rgb(251,245,220, maxColorValue=255)
     }
 
     if (random.col) clr <- clr[sample(length(clr))]
@@ -212,30 +212,28 @@ function(x, by=NULL,
   # ----------------------------------------------------------------------------
   # preliminaries
  
-  if (is.matrix(x) && !beside) max.y <- max(colSums(x)) else max.y <- max(x)
+  max.y <- ifelse (is.matrix(x) && !beside, max(colSums(x)), max(x))
   if (prop) addtop <- .01
   max.y <- max.y + addtop
 
   if (is.null(legend.labels)) legend.labels <- row.names(x)
-# if (!is.null(legend.labels)) if (is.null(legend.loc)) legend.loc <- "topleft"
   if (beside) legend.horiz <- FALSE
   if ((!is.null(by) || is.matrix(x)) && !beside) {
     legend.horiz <- TRUE
-#   if (is.null(legend.loc)) legend.loc <- "top"
     max.y <- max.y + .18*max.y
   }
 
-  if (is.null(gap)) if (is.matrix(x) && beside) gap <- c(0.1,1) else gap <- 0.2
+  if (is.null(gap)) gap <- ifelse (is.matrix(x) && beside, c(0.1,1), 0.2)
 
   # get max label size
   the.names <- integer(length=0)
   if (length(dim(x)) == 0)
     the.names <- names(x)
   else 
-   if (is.null(by)) the.names <- rownames(x) else the.names <- colnames(x)
+    the.names <- ifelse (is.null(by), rownames(x), colnames(x))
   max.nm <- 0
   for (i in (1:length(the.names))) {
-    li <- nchar(the.names[i])
+    li <- ifelse(!is.na(the.names[i]), nchar(the.names[i]), 0)
     if (li > max.nm) max.nm <- li
   }
 
@@ -334,10 +332,7 @@ function(x, by=NULL,
   # legend for two variable plot including variable labels
   if ( (!is.null(by) || is.matrix(x)) && !is.null(legend.loc))  {
 
-    if (col.bg != "black")
-      col.txt <- "black"
-    else
-      col.txt <- "white"
+     col.txt <- ifelse (sum(col2rgb(col.bg))/3 > 80, "black", rgb(.97,.97,.97))
 
     # default right.margin option
     if (legend.loc == "right.margin") {
@@ -432,27 +427,19 @@ function(x, by=NULL,
   # text output
   if (prop) x  <- x.temp
 
-  if (length(dim(x)) == 1) {  # one variable
+  if (length(dim(x)) == 1  && !quiet) {  # one variable
+
     stats <- .ss.factor(x)
 
     txttl <- stats$title
-    tx <- stats$tx
+    counts <- stats$counts
+    chi <- stats$chi
     class(txttl) <- "out_piece"
-    class(tx) <- "out_piece"
-    output <- list(out_title=txttl, out_text=tx)
+    class(counts) <- "out_piece"
+    class(chi) <- "out_piece"
+    output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
     class(output) <- "out_all"
-    print(output)
-
-    if (!quiet) { 
-      ch <- chisq.test(x)
-      pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
-      cat("\nChi-squared test of null hypothesis of equal probabilities\n")
-      cat("  Chisq = ", ch$statistic, ",  df = ", ch$parameter, ",  p-value = ", 
-        pvalue, sep="", "\n")
-      if (any(ch$expected < 5)) 
-        cat(">>> Low cell expected frequencies,",
-            "so chi-squared approximation may not be accurate", "\n")
-    }
+    print(output)      
   }
 
   else {  # two variables
@@ -460,26 +447,14 @@ function(x, by=NULL,
 
     txttl <- stats$txttl
     txfrq <- stats$txfrq
+    txXV <- stats$txXV
     class(txttl) <- "out_piece"
     class(txfrq) <- "out_piece"
-    output <- list(out_title=txttl, out_text=txfrq)
+    class(txXV) <- "out_piece"
+    output <- list(out_title=txttl, out_text=txfrq, out_XV=txXV)
     class(output) <- "out_all"
     print(output)
 
-
-    if (!quiet) { 
-      cat("\n"); .dash(19); cat("Chi-square Analysis\n"); .dash(19); 
-      ch <- (summary(as.table(x)))
-      pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
-      cat("Number of cases (observations) in analysis:", ch$n.cases, "\n")
-      cat("Number of variables:", ch$n.vars, "\n")
-      cat("Test of independence: ", 
-          "  Chisq = ", ch$statistic, ", df = ", ch$parameter, ", p-value = ", 
-          pvalue, sep="", "\n")
-      if (!ch$approx.ok) 
-        cat(">>> Low cell expected frequencies,",
-            "so chi-squared approximation may not be accurate", "\n")
-    }
   }
 
   cat("\n")

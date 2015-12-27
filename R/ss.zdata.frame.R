@@ -21,14 +21,16 @@ function(x, n.cat, brief, ...)  {
     }
 
     else if (is.factor(x[,i]) || is.character(x[,i]) || nu <= n.cat) {
-      stuff <- .ss.factor(x[,i], ...)
-      txttl <- stuff$title
-      txsts <- stuff$tx
+      stats <- .ss.factor(x[,i], ...)
+      txttl <- stats$title
+      counts <- stats$counts
+      chi <- stats$chi
       class(txttl) <- "out_piece"
-      class(txsts) <- "out_piece"
-      output <- list(out_title_freq=txttl, out_stats=txsts)
+      class(counts) <- "out_piece"
+      class(chi) <- "out_piece"
+      output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
       class(output) <- "out_all"
-      print(output)
+      print(output)      
 
       if (is.numeric(x[,i]) && nu <= n.cat)
         cat("\n>>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",

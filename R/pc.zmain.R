@@ -15,7 +15,7 @@ function(x,
   # if names(x) is null, likely data from sample and c functions
   if (!is.integer(x) && is.double(x) && !is.null(names(x)))  x <- as.table(x)
   if (!is.factor(x) && !is.table(x)) x <- factor(x)
-  if (!is.table(x)) ncolors <- nlevels(x) else ncolors <- length(x)
+  ncolors <- ifelse (!is.table(x), nlevels(x), length(x))
 
   # color palette
   # set some default colors in case not assigned below
@@ -70,7 +70,8 @@ function(x,
     }
     color.palette <- colorRampPalette(c(col.low, col.hi))
     clr <- color.palette(ncolors)
-  }
+  }  # is ordered
+
   else if (!is.null(col.low) && !is.null(col.hi)) {
       color.palette <- colorRampPalette(c(col.low, col.hi))
       clr <- color.palette(ncolors)
@@ -86,10 +87,15 @@ function(x,
     else if (colors == "rainbow") clr <- rainbow(ncolors)
     else if (colors == "terrain") clr <- terrain.colors(ncolors)
     else if (colors == "heat") clr <- heat.colors(ncolors)
-    else  {
-      clr <- c("coral3", "seagreen3", "maroon3", "dodgerblue3", "purple3", 
-        "turquoise3", "yellow3")
+    else  {  # mono color range does not make sense here 
+      clr <- .col.discrete()
+      cat("\n>>> Can set colors=\"terrain\", or \"rainbow\" or ",
+          "\"heat\" \n", sep="")  # lighten some default background colors
     }
+    #else  {
+      #clr <- c("coral3", "seagreen3", "maroon3", "dodgerblue3", "purple3", 
+        #"turquoise3", "yellow3")
+    #}
     if (random.col) clr <- clr[sample(length(clr))]
   }
 
@@ -109,19 +115,21 @@ function(x,
 # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
 
   # text output
-  if (!quiet) {
+  if (length(dim(x)) == 1  && !quiet) {  # one variable
 
-     .ss.factor(x, brief=TRUE) 
+    stats <- .ss.factor(x)
 
-      ch <- chisq.test(x)
-      pvalue <- format(sprintf("%6.4f", ch$p.value), justify="right")
-      cat("\nChi-squared test of null hypothesis of equal probabilities\n")
-      cat("  Chisq = ", ch$statistic, ",  df = ", ch$parameter, ",  p-value = ", 
-        pvalue, sep="", "\n")
-      if (any(ch$expected < 5)) 
-        cat(">>> Low cell expected frequencies,",
-            "so chi-squared approximation may not be accurate", "\n")
+    txttl <- stats$title
+    counts <- stats$counts
+    chi <- stats$chi
+    class(txttl) <- "out_piece"
+    class(counts) <- "out_piece"
+    class(chi) <- "out_piece"
+    output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
+    class(output) <- "out_all"
+    print(output)      
   }
+
  
   cat("\n")
 

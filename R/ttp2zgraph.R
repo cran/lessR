@@ -37,7 +37,8 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          kind="default", fit.line="none", col.fit.line="grey55",
          center.line=NULL, col.bubble=NULL, bubble.size=.25, 
-         col.flower=NULL, ellipse=FALSE, 
+         col.flower=NULL, ellipse=FALSE,
+         col.ellipse="lightslategray", fill.ellipse="transparent", 
          diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
          quiet=TRUE, n.cat=getOption("n.cat"),
          ylim=c(0,1.1))

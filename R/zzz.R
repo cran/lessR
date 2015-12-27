@@ -6,13 +6,13 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.3.5     RStudio, knitr compatible      www.lessRstats.com\n",
-      "------------------------------------------------------------------\n",
-      "To get started, and for help in general, enter:  Help()\n",
-      "To read a text, Excel, SPSS, SAS or R data file:  mydata <- Read()\n",
-      "------------------------------------------------------------------\n",
-      "Automatically generate an R Markdown file for knitr, enter:  ?reg\n",
-      "------------------------------------------------------------------\n\n")
+      "lessR 3.4      feedback: gerbing@pdx.edu     web: lessRstats.com\n",
+      "----------------------------------------------------------------\n",
+      "Get started, and for help in general, enter:  Help()\n",
+      "Read a text, Excel, SPSS, SAS or R data file:  mydata <- Read()\n",
+      "----------------------------------------------------------------\n",
+      "Full interpretation provided for a regression analysis:  ?reg\n",
+      "----------------------------------------------------------------\n\n")
 
   options(colors="dodgerblue")
   options(trans.fill.bar=0.25)
@@ -21,7 +21,7 @@ function(...) {
   options(col.fill.pt = "#1874CCBF")  # .maketrans of "dodgerblue3"
   options(col.stroke.bar="steelblue4")
   options(col.stroke.pt="steelblue4")
-  options(col.bg="#EDEFF1")
+  options(col.bg="#EEF0F2")  # rgb(238, 240, 242)
   options(col.grid="snow3")
   options(col.ghost=FALSE)
   options(col.heat="dodgerblue4")
@@ -135,6 +135,15 @@ function(...) {
 }
 
 
+#.is.integer <- function(x, tol = .Machine$double.eps^0.5) {
+
+  #int.flg <- ifelse (abs(x - round(x)) < tol, TRUE, FALSE)  # each i of vector
+  #result.flg <- ifelse (all(int.flg), TRUE, FALSE)
+
+  #return(result.flg)
+#}
+
+
 .xstatus <- function(var.name, dname, quiet=FALSE) {
 
   # see if analysis from data is based on a formula
@@ -148,9 +157,9 @@ function(...) {
   if (nchar(var.name)>0) if (exists(var.name, where=.GlobalEnv)) {
     if (!is.function(var.name)) { # a global "var" could be a function call 
       in.global <- TRUE
-      if (!quiet)
-        cat(">>> Note: ", var.name, "exists in the workspace, outside of",
-            "a data frame (table)\n")
+      #if (!quiet)
+        #cat(">>> Note: ", var.name, "exists in the workspace, outside of",
+            #"a data frame (table)\n")
     }
   }
 
@@ -165,8 +174,18 @@ function(...) {
   }
 
   if (!in.global && from.data) .nodf(dname)
-
+ 
   return(list(ifr=is.frml, fd=from.data, ig=in.global))
+}
+
+
+.getdfs <- function() {  # get list of data frames in global env
+
+  objs <- function(x) class(get(x))
+
+  dfs <- ls(.GlobalEnv)[sapply(ls(.GlobalEnv), objs) == 'data.frame']
+
+  return(dfs)
 }
 
 
@@ -174,15 +193,79 @@ function(...) {
 
   # see if the data frame exists (mydata default), if x from data, not in Global Env
   if (!exists(dname, where=.GlobalEnv)) {
-    if (dname == "mydata") 
-      txtA <- ", the default data table name, " else txtA <- " "
-    txtB1 <- "So either create the data table with the Read function, or\n"
-    txtB2 <- "  specify the actual data table with the parameter: data\n"
-    txtB <- paste(txtB1, txtB2, sep="")
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Data frame (table) ", dname, txtA, "does not exist\n\n", txtB, "\n")
-  }
+    dfs <- .getdfs()  # list of data frames in global env
+    txtA <- ifelse(dname == "mydata", ", the default data table name, ", " ") 
 
+    if ("Mydata" %in% dfs)
+      txtM <- paste("Because you have a data table called Mydata,\n",
+        " perhaps you meant to call it mydata, so just re-read \n",
+        " into mydata instead of Mydata")
+    else
+      txtM <- paste(
+        "If a data table is not named the default mydata, then to\n",
+        "  analyze the variables in that data table, in the function call\n",
+        "  for the analysis specify the actual data table name with\n",
+        "  the data option\n",
+        "For the data table called ", dfs[1], "\n",
+        "  add the following to your function call:  , data=", dfs[1], "\n\n",
+        "Or, just re-read the data into the mydata data table\n\n", sep="")
+
+    if (length(dfs) == 0) { 
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "The analysis is of data values for one or more variables found\n",
+        "  in a rectangular data table, with the data values for a \n",
+        "  variable located in a column\n\n",
+        "You have not yet read data into a data table for analysis,\n", 
+        "  so the data table ", dname, txtA, "is not\n",
+        "  available for analysis\n\n",
+        "Create the data table using the Read function, usually\n",
+        "  reading the data into an R data table called mydata\n\n",
+        "To read a data file on your computer system into the mydata data\n", 
+        "  table, in which you browse your file folders to locate the\n",
+        "  desired date file, enter:\n",
+        "     mydata <- Read()\n\n",
+        "To read a data table from the web, enter:\n",
+        "     mydata <- Read(\"web address\") \n",
+        "In the web address include the http:// at the beginning\n",
+        "  and also include the quotes around the web address\n\n")
+    }
+    else if (length(dfs) == 1) {
+      nm <- parse(text=paste("names(", dfs[1],")"))
+      nm <- eval(nm)
+      for (i in 1:length(nm)) nm[i] <- paste(nm[i], " ")
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Data table ", dname, txtA, "does not exist\n\n",
+        "You have read data into one data table, ", dfs[1], ", but that\n", 
+        "  is not the data table ", dname, " that was to be analyzed\n\n", 
+        "Following are the names of the variables that are available\n",
+        "  for analysis in the ", dfs[1], " data table\n\n",
+        "  ", nm, "\n\n",
+        txtM, "\n\n")
+    }
+    else if (length(dfs) > 1) {
+      dts <- ""
+      for (i in 1:length(dfs)) dts <- paste(dts, dfs[i])
+      if (dname == "mydata") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Data table ", dname, txtA, "does not exist\n\n",
+          "Data tables you read and/or created: ", dts, "\n\n",
+          "Perhaps you have a data table that contains the variables\n",
+          "  of interest to be analyzed, but it is not named ", dname, "\n",
+          "Can specify the actual name with the data option\n",
+          "For example, for a data table named ", dfs[1], "\n",
+          "  add the following to your function call:  , data=", dfs[1], "\n\n",
+          "Or, just re-read the data into the mydata data table\n\n")
+        }
+      else {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Data table ", dname, txtA, "does not exist\n\n",
+          "Perhaps you have a data table that contains the variables\n",
+          "  of interest to be analyzed, but it is not named ", dname, "\n\n",
+          "Data tables you have already read and/or created: ", dts, "\n\n",
+          "Use an available data table, or read data into a new table\n\n")
+      }
+    }
+  }
 }
 
 
@@ -190,25 +273,77 @@ function(...) {
 
   if ( (!grepl(":", var.name) && !grepl(",", var.name)) ) { # x not var list
 
+    if (grepl("\"", var.name)) { 
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "No quotes with the variable name.\n\n")
+    }
+
     # see if variable exists in the data frame
     if (!exists(var.name, where=data)) { 
-      if (dname == "mydata") {
-        txt1 <- ", the default name \n\n"
-        txt2 <- "Either make sure to use the correct variable name, or\n"
-        txt3 <- "specify the actual data frame with the parameter: data\n"
-        txt <- paste(txt1, txt2, txt3, sep="")
+      dfs <- .getdfs()
+
+      txt1 <- ", the default name \n\n"
+      txt2 <- "Either make sure to use the correct variable name, or\n"
+      txt3 <- "specify the data table that contains the variable with option:  data\n"
+      txt <- ifelse (dname == "mydata",  paste(txt1, txt2, txt3, sep=""), "\n")
+
+      nm <- parse(text=paste("names(", dname,")"))
+      nm <- eval(nm)
+      for (i in 1:length(nm)) nm[i] <- paste(nm[i], " ")
+
+      if (dname == "mydata")
+         txtDef <- ", which is the default data table name\n"
+      else
+         txtDef <- ""
+
+      if (length(dfs) == 1) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "You are attempting to analyze the variable ", var.name, " in the\n", 
+          "  data table called ", dname, txtDef, "\n",
+          "Unfortunately, variable ", var.name, " does not exist in ", dname, "\n\n",
+          "The following variables are currently in the ", dname, " data table,\n",
+          "  available for analysis:\n\n",
+          "  ", nm,  "\n\n")
       }
-      else 
-        txt <- "\n"
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Variable ", var.name, " does not exist either by itself ",
-          "(in the user's workspace),\n",
-          "or in the data frame with the name of ", dname, txt, "\n",
-          "To view the existing variable names enter: > names(", dname, ")\n\n")
+
+      else if (length(dfs) > 1) {
+        nm2 <- parse(text=paste("names(", dfs[1],")"))
+        nm2 <- eval(nm2)
+        for (i in 1:length(nm2)) nm2[i] <- paste(nm2[i], " ")
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "You are attempting to analyze the variable ", var.name, " in the\n", 
+          "  data table called ", dname, txtDef, "\n",
+          "Unfortunately, variable ", var.name, " does not exist in ", dname, "\n\n",
+          "The following variables are currently in the ", dname, " data table,\n",
+          "  available for analysis:\n\n",
+          "  ", nm,  "\n\n",
+          "You do have another data table, but it is named ", dfs[1], "\n",
+          "The following variables are currently in the ", dfs[1], " data table,\n",
+          "  available for analysis:\n\n",
+          "  ", nm2,  "\n\n",
+          "If a data table is not named the default mydata, then to\n",
+          "  analyze the variables in that data table, in the function call\n",
+          "  for the analysis specify the actual data table name with\n",
+          "  the data option\n",
+          "For the data table called ", dfs[1], "\n",
+          "  add the following to your function call:  , data=", dfs[1],
+          "\n\n", sep="") 
+      }
     }
   }
 }
 
+
+# discrete color steps
+.col.discrete <- function() {
+
+  # based on rainbow_hcl(24,c=38,l=75) from colorspace
+  clr <- c( "#A1BAE1", "#D8B193", "#E4ABA8", "#8FC59B", "#B9B3E3",
+            "#B8BD87", "#74C7BD", "#DCA9D4")
+
+  return(clr)
+
+}
 
 # see if cor matrix exists as stand-alone or embedded in list structure
 .cor.exists <- function(cor.nm) {
@@ -345,10 +480,8 @@ function(...) {
   if (!is.null(mylabels)) {
     lbl <- mylabels[which(names(mylabels) == var.name)]
     unt <- myunits[which(names(myunits) == var.name)] 
-    if (!is.null(unt)) if (nzchar(unt))
+    if (!is.null(unt)) if (nzchar(unt))  if(!is.na(unt))
       lbl <- paste(lbl, " (", unt, ")", sep="")
-    else
-      lbl <- lbl 
     if (!is.null(lbl))
       tx[length(tx)] <- paste(tx[length(tx)], ", ", as.character(lbl), sep="")
   }
@@ -430,7 +563,7 @@ function(...) {
   else
     workdir <- getwd()
   cat("\n")
-  cat("The", txt, "written at the current working directory.\n")
+  cat("The", txt, "written at the current working directory\n")
   cat("       ", fname, " in:  ", workdir, "\n")
   cat("\n")
 }
@@ -758,7 +891,7 @@ function(...) {
       else {
         for (i in 1:16) 
           tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
-        tx[length(tx)] <- "...  "
+        tx[length(tx)] <- paste(tx[length(tx)], "... ")
         for (i in (lo.len-5):lo.len)
           tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(lo.out[i]))
       }
@@ -779,7 +912,7 @@ function(...) {
       else {
         for (i in 1:16)
           tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
-        tx[length(tx)] <- paste(tx[length(tx)], "...  ")
+        tx[length(tx)] <- paste(tx[length(tx)], "... ")
         for (i in (hi.len-5):hi.len)
           tx[length(tx)] <- paste(tx[length(tx)], .fmtNS(hi.out[i]))
       }

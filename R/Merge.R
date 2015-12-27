@@ -69,7 +69,7 @@ function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
 
   # restore any variable labels, units
   if (!is.null(mylabels)) attr(data, which="variable.labels") <- mylabels
-  if (!is.null(myunits)) attr(data.sub, which="variable.units") <- myunits
+  if (!is.null(myunits)) attr(data, which="variable.units") <- myunits
 
   return(data)
 

@@ -90,7 +90,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
        xlab=nm[2], ylab=nm[1], main=plt.title[plt.i],
        cex=.8, kind="default",
        fit.line="none", col.fit.line="grey55", bubble.size=.25,
-       ellipse=FALSE, 
+       ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent",
        diag=FALSE, col.diag=par("fg"), lines.diag=TRUE, quiet=TRUE)
 
     if (pdf) {

@@ -1,10 +1,10 @@
 \name{label}
 \alias{label}
 
-\title{Return or Assign a Variable Label}
+\title{Assign Variable Labels [Supersceded by VariableLabels]}
 
 \description{
-Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  To return a variable label generally applies to standard R functions such that the functions can access \code{lessR} variable labels. Or, the variable name and label can be listed on the standard output. To assign a variable label, invoke the \code{value} option and assign the output to a specified data frame. 
+Deprecated, replaced by \code{\link{VariableLabels}}. Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  To return a variable label generally applies to standard R functions such that the functions can access \code{lessR} variable labels. Or, the variable name and label can be listed on the standard output. To assign a variable label, invoke the \code{value} option and assign the output to a specified data frame. 
 }
 
 \usage{

@@ -87,9 +87,12 @@ mydata <- label(Months, "Months Employed in the Company")
 details.brief()
 
 
-# ------------------------------------
-# convert between factors and integers
-# ------------------------------------
+# ----------------------------
+# transformations with factors
+# ----------------------------
+
+# transfrom a nominal variable to ordinal
+mydata <- Transform(Satisfaction=factor(Satisfaction, ordered=TRUE))
 
 # recode levels of a factor that should remain a factor
 #   with the Transform and factor functions
@@ -116,7 +119,7 @@ mydata <- Read("Mach4", format="lessR")
 mydata <- Transform(
       Gender=factor(Gender, levels=c(0,1), labels=c("Male","Female"))
       )
-# ------------------------------------
+# ----------------------------
 }
 
 

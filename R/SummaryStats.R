@@ -3,7 +3,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     digits.d=NULL, brief=getOption("brief"), ...)  {
 
 
-  # get actual variable name before potential call of data$x
+  # get variable name before potential call of data$x
   x.name <- deparse(substitute(x))  # could be a vars list
   options(xname = x.name)
 
@@ -91,6 +91,12 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (ncol(data) == 1) {
     x.call <- data[,1]
     nu <- length(unique(na.omit(x.call)))
+
+    if (nu <= n.cat) {
+      x.call <- as.factor(x.call)
+      cat("\n>>> Variable is numeric, with", nu, "<= n.cat =", n.cat, "levels,",
+        "so treat as categorical\n")
+    }
   }
 
 
@@ -98,63 +104,39 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     .ss.data.frame(data, n.cat, brief, ...) 
 
   else if (is.numeric(x.call)) {
-    if (nu > n.cat) { 
-      sk <- NA; kt <- NA; q1 <- NA; q3 <- NA;  qr <- NA;
-      stuff <- .ss.numeric(x.call, y.call, digits.d, brief, ...)
-      txsts <- stuff$tx
-      txotl <- .outliers2(x.call)
-    }
-    else {
-      cat("\n>>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
-        "so treat as categorical.\n",
-        "   To obtain the numeric summary, decrease  n.cat  to indicate a lower\n",
-        "   number of unique values such as with function: set.\n", 
-        "   Perhaps make this variable a factor with the R factor function.\n")
-      stuff <- .ss.factor(x.call, y.call, brief, digits.d, ...)
-    }
+    sk <- NA; kt <- NA; q1 <- NA; q3 <- NA;  qr <- NA;
+    stuff <- .ss.numeric(x.call, y.call, digits.d, brief, ...)
+    txsts <- stuff$tx
+    txotl <- .outliers2(x.call)
   }
 
   # ordered factors have two attributes, "ordered" and "factor"
   else if (is.factor(x.call)  ||  is.character(x.call)) {
 
-    if (is.factor(x.call)) {
+    if (is.factor(x.call)) 
       stuff <- .ss.factor(x.call, y.call, brief, digits.d, ...)
-      n.dim <- stuff$n.dim
-      if (n.dim == 1) {
-        txttl <- stuff$title
-        txsts <- stuff$tx
-        frq <- stuff$frq
-        prp <- stuff$prp
+    else if (is.character(x.call))
+      if (nlevels(factor(x.call)) < length(x.call)) { 
+        stuff <- .ss.factor(factor(x.call), by, brief, n.cat, digits.d, ...)
       }
-      else if (n.dim == 2) {
-        txttl <- stuff$txttl
-        txfrq <- stuff$txfrq
-        txprp <- stuff$txprp
-        txcol <- stuff$txcol
-        txrow <- stuff$txrow
-      }
-    }
+      else cat("\n Appears to contain unique Names or IDs", "\n")
 
-  else if (is.character(x.call))
-    if (nlevels(factor(x.call)) < length(x.call)) { 
-      stuff <- .ss.factor(factor(x.call), by, brief, n.cat, digits.d, ...)
-      n.dim <- stuff$n.dim
-      if (n.dim == 1) {
-        txttl <- stuff$title
-        txsts <- stuff$tx
-        frq <- stuff$frq
-        prp <- stuff$prp
-      }
-      else if (n.dim == 2) {
-        txttl <- stuff$txttl
-        txfrq <- stuff$txfrq
-        txprp <- stuff$txprp
-        txcol <- stuff$txcol
-        txrow <- stuff$txrow
-      }
-
+    n.dim <- stuff$n.dim
+    if (n.dim == 1) {
+      txttl <- stuff$title
+      txsts <- stuff$counts
+      txchi <- stuff$chi
+      frq <- stuff$freq
+      prp <- stuff$prop
     }
-    else cat("\n Appears to contain unique Names or IDs", "\n")
+    else if (n.dim == 2) {
+      txttl <- stuff$txttl
+      txXV <- stuff$txXV
+      txfrq <- stuff$txfrq
+      txprp <- stuff$txprp
+      txcol <- stuff$txcol
+      txrow <- stuff$txrow
+    }
 
   }
 
@@ -168,7 +150,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (ncol(data) == 1) { 
 
-    if (is.numeric(x.call)) {
+    if (is.numeric(x.call)  &&  nu > n.cat) {
       class(txsts) <- "out_piece"
       class(txotl) <- "out_piece"
 
@@ -178,25 +160,27 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
            median=stuff$md, quartile3=stuff$q3, max=stuff$mx, IQR=stuff$qr)
     }
 
-    else if (is.factor(x.call)  ||  is.character(x.call)) {
+    else if (is.factor(x.call)  ||  is.character(x.call)  ||  nu <= n.cat) {
       if (n.dim == 1) {
         class(txttl) <- "out_piece"
         class(txsts) <- "out_piece"
+        class(txchi) <- "out_piece"
         class(frq) <- "out_piece"
         class(prp) <- "out_piece"
-        output <- list(out_title=txttl, out_stats=txsts, freq=frq, prop=prp)
+        output <- list(out_title=txttl, out_stats=txsts, out_chi=txchi, freq=frq, prop=prp)
       }
       else if (n.dim == 2) {
+        class(txttl) <- "out_piece"
+        class(txfrq) <- "out_piece"
         if (brief) {
-          class(txttl) <- "out_piece"
-          class(txfrq) <- "out_piece"
-          output <- list(out_title=txttl, out_freq=txfrq)
+          output <- list(out_title=txttl, out_freq=txfrq, out_chi=txXV)
         }
         else {
+          class(txXV) <- "out_piece"
           class(txprp) <- "out_piece"
           class(txcol) <- "out_piece"
           class(txrow) <- "out_piece"
-          output <- list(out_title=txttl, out_freq=txfrq,
+          output <- list(out_title=txttl, out_freq=txfrq, out_XV=txXV,
              out_prop=txprp, out_colsum=txcol, out_rowsum=txrow)
         }
       }

@@ -97,10 +97,10 @@ sep="")
   tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- paste(
 "Obtain the histogram and related analyses with the `lessR` function ",
-"`Histogram`, here with the abbreviation `hs`.",
+"`Histogram`. Can also use the abbreviation `hs`.",
 sep="")
   tx[length(tx)+1] <- "```"
-  tx[length(tx)+1] <- paste("h <- hs(", Y, ")", sep="")  # not run here (no {r})
+  tx[length(tx)+1] <- paste("h <- Histogram(", Y, ")", sep="")  # not run here (no {r})
   tx[length(tx)+1] <- "```"
 
   tx[length(tx)+1] <- ""
@@ -153,6 +153,9 @@ sep="")
   tx[length(tx)+1] <- "```"
 
 
+
+
+
   tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- "## The Density Plot"
 
@@ -160,11 +163,13 @@ sep="")
   tx[length(tx)+1] <- paste(
 "Obtain the density plot and related analyses of ", Y,
 " with the `lessR` function ",
-"`Density`, here with the abbreviation `dn`.",
+"`Density`. Can also use the abbreviation `dn`.",
 sep="")
   tx[length(tx)+1] <- "```{r}"
-  tx[length(tx)+1] <- paste("dn(", Y, ", quiet=TRUE)", sep="")  # no stats
+  tx[length(tx)+1] <- paste("Density(", Y, ", quiet=TRUE)", sep="")  # no stats
   tx[length(tx)+1] <- "```"
+
+
 
 
 
@@ -175,11 +180,14 @@ sep="")
   tx[length(tx)+1] <- paste(
 "Obtain the box plot and related analyses of ", Y,
 " with the `lessR` function ",
-"`BoxPlot`, here with the abbreviation `bx`.",
+"`BoxPlot`. Can also use the abbreviation `bx`.",
 sep="")
   tx[length(tx)+1] <- "```{r}"
-  tx[length(tx)+1] <- paste("bx(", Y, ", quiet=TRUE)", sep="")  # no stats
+  tx[length(tx)+1] <- paste("BoxPlot(", Y, ", quiet=TRUE)", sep="")  # no stats
   tx[length(tx)+1] <- "```"
+
+
+
 
 
   tx[length(tx)+1] <- ""
@@ -189,10 +197,10 @@ sep="")
   tx[length(tx)+1] <- paste(
 "Obtain the 1-dimensional scatter plot and related analyses of ", Y,
 " with the ",
-"`lessR` function `ScatterPlot`, here with the abbreviation `sp`.",
+"`lessR` function `ScatterPlot`. Can also use the abbreviation `sp`.",
 sep="")
   tx[length(tx)+1] <- "```{r}"
-  tx[length(tx)+1] <- paste("sp(", Y, ", quiet=TRUE)", sep="")  # no stats
+  tx[length(tx)+1] <- paste("ScatterPlot(", Y, ", quiet=TRUE)", sep="")  # no stats
   tx[length(tx)+1] <- "```"
 
   return(tx)

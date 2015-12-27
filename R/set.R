@@ -26,11 +26,11 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
       options(trans.fill.bar=0.25)
     else
       options(trans.fill.bar=0.00)
-    options(trans.fill.pt=0.66) 
+    options(trans.fill.pt=0.50) 
   }
 
   if (!is.null(ghost)) if (ghost) {
-    options(trans.fill.bar = 0.66)
+    options(trans.fill.bar = 0.50)
     if (getOption("colors") == "blue")
       options(col.fill.bar = .maketrans("lightsteelblue3", .to256("trans.fill.bar")))
     if (getOption("colors") == "gray")
@@ -122,12 +122,12 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
     }
     if (theme == "gray") {
       if (is.null(col.fill.bar))
-        options(col.fill.bar = .maketrans("gray40", .to256("trans.fill.bar")))
+        options(col.fill.bar = .maketrans("gray35", .to256("trans.fill.bar")))
       if (is.null(col.fill.pt))
-        options(col.fill.pt = .maketrans("gray40", .to256("trans.fill.pt")))
-      if (is.null(col.stroke.bar)) options(col.stroke.bar = "white")
+        options(col.fill.pt = .maketrans("gray35", .to256("trans.fill.pt")))
+      if (is.null(col.stroke.bar)) options(col.stroke.bar = "gray60")
       if (is.null(col.stroke.pt)) options(col.stroke.pt = "gray30")
-      if (is.null(col.bg)) options(col.bg = "gray91")
+      if (is.null(col.bg)) options(col.bg = "gray90")
       if (is.null(col.grid)) options(col.grid = "white")
       if (is.null(col.heat)) options(col.heat = "gray5")
     }
@@ -210,7 +210,7 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
         maxColorValue=256))
       if (is.null(col.stroke.bar)) options(col.stroke.bar = rgb(209,87,3, maxColorValue=256))
       if (is.null(col.stroke.pt)) options(col.stroke.pt = rgb(209,87,3, maxColorValue=256))
-      if (is.null(col.bg)) options(col.bg = rgb(4,4,4, maxColorValue=256))
+      if (is.null(col.bg)) options(col.bg = rgb(.015,.015,.015))
       if (is.null(col.grid)) options(col.grid = rgb(100,100,100, maxColorValue=256))
       if (is.null(col.heat)) options(col.heat = "darkorange3")
     }
@@ -221,7 +221,7 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
         options(col.fill.pt = .maketrans("gray75", .to256("trans.fill.pt")))
       if (is.null(col.stroke.bar)) options(col.stroke.bar = "gray20")
       if (is.null(col.stroke.pt)) options(col.stroke.pt = "gray95")
-      if (is.null(col.bg)) options(col.bg = "black")
+      if (is.null(col.bg)) options(col.bg = rgb(.015,.015,.015))
       if (is.null(col.grid)) options(col.grid = "gray30")
       if (is.null(col.heat)) options(col.heat = "gray30")
     }
@@ -248,13 +248,13 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
 
   if (show) {
     cat("Color:", getOption("colors"), "\n")
-    cat("Bar fill color:", getOption("col.fill.bar"), "\n")
-    cat("Point fill color:", getOption("col.fill.pt"), "\n")
+    cat("Bar fill color:", col2rgb(getOption("col.fill.bar")), "\n")
+    cat("Point fill color:", col2rgb(getOption("col.fill.pt")), "\n")
     cat("Bar transparency:", getOption("trans.fill.bar"), "\n")
-    cat("Point transparency:", getOption("trans.fill.pt"), "\n")
+    cat("Point transparency:", col2rgb(getOption("trans.fill.pt")), "\n")
     cat("Bar stroke color:", getOption("col.stroke.bar"), "\n")
     cat("Point stroke color:", getOption("col.stroke.pt"), "\n")
-    cat("Background color:", getOption("col.bg"), "\n")
+    cat("Background color:", col2rgb(getOption("col.bg")), "\n")
     cat("Grid color:", getOption("col.grid"), "\n")
     cat("Heat map color:", getOption("col.heat"), "\n")
     if (is.null(ghost)) ghost <- FALSE

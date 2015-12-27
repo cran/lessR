@@ -1,6 +1,6 @@
 .reg2Relations <- 
 function(lm.out, dname, n.keep, show.R,
-         cor, collinear, subsets, numeric.all, in.data.frame,
+         cor, collinear, subsets, max.sublns, numeric.all, in.data.frame,
          sterrs, MSW) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
@@ -105,7 +105,9 @@ function(lm.out, dname, n.keep, show.R,
     tx <- character(length = 0)
 
     if (is.null(options()$knitr.in.progress)) {
-      tx[length(tx)+1] <- "All Possible Subset Regressions"
+      tx[length(tx)+1] <- "Best Subset Regression Models"
+      if (n.pred > 5)
+        tx[length(tx)+1] <- "for up to 10 subsets of each number of predictors"
       tx[length(tx)+1] <- ""
     }
 
@@ -115,14 +117,12 @@ function(lm.out, dname, n.keep, show.R,
       for (i in 1:n.keep) Y[i] <- lm.out$model[nm[1]][i,1]
       lp.out <- leaps(X, Y, method="adjr2")  # leaps function
       md <- lp.out$which  # md is logical
-      #md <- matrix(as.integer(md), nrow=nrow(md), ncol=ncol(md), byrow=TRUE)
       rownames(md) <- 1:nrow(md)  # matrix md does not have proper row names
       models <- data.frame(md, lp.out$adjr2, lp.out$size-1)  # gives 0, 1
-      #models <- data.frame(cbind(md, lp.out$adjr2, lp.out$size-1))  
       names(models) <- c(names(X), "R2adj", "X's")
       mod.srt <- models[order(models$R2adj, decreasing=TRUE),]
       names(mod.srt)[ncol(mod.srt)-1L] <- "   R2adj"
-      lines <- min(50, nrow(mod.srt))
+      lines <- min(max.sublns, nrow(mod.srt))
 
       # width of data columns
       max.ln <- integer(length=0)
@@ -132,30 +132,40 @@ function(lm.out, dname, n.keep, show.R,
         if (max.ln[i] < 4) max.ln[i] <- 4L
       }
 
-      tx[length(tx)+1] <- ""
-      for (i in 1:(n.pred+2)) {
+      tx[length(tx)+1] <- ""  # build the line of variable names
+      for (i in 1:(n.pred)) {
         if (i <= n.pred) ww <- max.ln[i]
-        if (i == n.pred+1) ww <- 9L
-        if (i == n.pred+2) ww <- 7L
         tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(mod.srt)[i], w=ww), sep="")
+        nms <- tx[length(tx)]
       }
+      for (i in 1:2) {
+        if (i == 1) ww <- 9L
+        if (i == 2) ww <- 7L
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(mod.srt)[n.pred+i],
+                                w=ww), sep="")
+      }
+
 
       for (i in 1:lines) {
+        if (lines > 40) if (i %% 30 == 0) tx[length(tx)+1] <- nms
         tx[length(tx)+1] <- ""
-        for(j in 1:n.pred) {
+        for(j in 1:n.pred)
           tx[length(tx)] <- paste(tx[length(tx)], .fmti(mod.srt[i,j],  w=max.ln[j]), sep="")
-        }
-         tx[length(tx)] <- paste(tx[length(tx)], .fmt(mod.srt[i,n.pred+1], d=3, w=8))
-         tx[length(tx)] <- paste(tx[length(tx)], .fmti(mod.srt[i,n.pred+2], w=6))
+        tx[length(tx)] <- paste(tx[length(tx)], .fmt(mod.srt[i,n.pred+1], d=3, w=8)) # R2adj
+        tx[length(tx)] <- paste(tx[length(tx)], .fmti(mod.srt[i,n.pred+2], w=6))  # num X's
       }
 
-      if (lines > 50)
-        tx[length(tx)+1] <- "\n>>> Only first 50 rows printed.\n\n"
+      if (nrow(mod.srt) > max.sublns)
+        tx[length(tx)+1] <- paste(
+          "\n>>> Only first", lines, "of", nrow(mod.srt), "rows printed\n",
+          "   To indicate more, add subset=n, where n is the number of lines")
 
-      #out <- cbind(
-      #colnames(out) <- paste(colnames(crs), "R2adj", "X's")
+      tx[length(tx)+1] <- ""
+      tx[length(tx)+1] <- paste("[based on Thomas Lumley's leaps function",
+                          "from the leaps package]")
+      tx[length(tx)+1] <- ""
 
-      }
+    }
 
     else  # not numeric.all
       tx[length(tx)+1] <- ">>> No subset analysis reported, not all variables are numeric.\n"

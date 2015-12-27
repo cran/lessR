@@ -49,20 +49,11 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     if (is.null(res.rows)) res.rows <- 0L
     if (is.null(pred.rows)) pred.rows <- 0L
     relate <- FALSE
-   }
+  }
   else
     relate <- TRUE
   
-  if (!exists(dname)) {
-    txtC <- "Function reg requires the data exist in a data frame\n"
-    if (dname == "mydata") 
-      txtA <- ", the default data frame name, " else txtA <- " "
-    txtB1 <- "Either create the data frame, such as with data.frame function, or\n"
-    txtB2 <- "  specify the actual data frame with the parameter: data\n"
-    txtB <- paste(txtB1, txtB2, sep="")
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-        txtC, "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
-  }
+  .nodf(dname)  # does data frame exist?
 
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
@@ -72,13 +63,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   predictors <- character(length=0)
   for (i in 2:n.vars) predictors[i-1] <- nm[i]
 
-  # check that variables exist in the data
-  for (i in 1:n.vars) if (!(nm[i] %in% names(data))) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-       "Variable ", nm[i], " is not in the data table ", dname, ".\n\n",
-       "Either the variable name is misspelled ",
-       "or the wrong data table is specified.\n\n")
-  }
+  for (i in 1:n.vars) .xcheck(nm[i], dname, data)  # do variables exist?
 
   # check that variables are not function calls
   v.str <- deparse(attr(terms.formula(my.formula), which="variables"))
@@ -114,11 +99,8 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   # check for all numeric vars  in.data.frame <- TRUE
   numeric.all <- TRUE
   for (i in 1:n.vars) {
-      if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
-        #cat("\n>>> Note: ", nm[i], "is not a numeric variable.\n",
-            #"   No scatter plot(s) generated.\n")
+      if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])]))
         numeric.all <- FALSE
-      }
     }
   
   if ( !is.null(X1.new)  &&  (n.pred) > max.new ) {
@@ -216,8 +198,13 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   title_rel <- "  RELATIONS AMONG THE VARIABLES"
   tx2rel <- ""; tx2cor <- ""; tx2cln <- ""; tx2all <- ""
   if (relate  &&  n.pred > 0) {
+    max.sublns <- 50
+    if (subsets > 1) {
+      max.sublns <- subsets
+      subsets <- TRUE
+    }
     rel <- .reg2Relations(lm.out, dname, n.keep, show.R,
-         cor, collinear, subsets, numeric.all, in.data.frame,
+         cor, collinear, subsets, max.sublns, numeric.all, in.data.frame,
          sterrs, MSW)
     tx2cor <- rel$txcor
     tx2cln <- rel$txcln
@@ -307,21 +294,6 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     }
 
 
-  # cites
-  txcte <- ""
-  if (subsets) {
-    tx <- character(length = 0)
-    did <- FALSE
-    if (!brief)  {
-      if (subsets) {
-        txt <- "[Subsets analysis with Thomas Lumley's leaps function"
-        tx[length(tx)+1] <- paste(txt, "from the leap's package]") 
-        did <- TRUE
-      }
-    }
-    if (did) txcte <- tx else txcte <- ""
-  }
-
 
 # ----------
 # References
@@ -405,7 +377,6 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   class(tx3res) <- "out_piece"
   class(title_pred) <- "out_piece"
   class(tx3prd) <- "out_piece"
-  class(txcte) <- "out_piece"
   class(txplt) <- "out_piece"
   class(txref) <- "out_piece"
   class(txkfl) <- "out_piece"
@@ -424,7 +395,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     out_title_res=title_res, out_residuals=tx3res,
     out_title_pred=title_pred, out_predict=tx3prd,
 
-    out_cite=txcte, out_ref=txref, out_knitr.file=txkfl, out_plots=txplt,
+    out_ref=txref, out_knitr.file=txkfl, out_plots=txplt,
 
     n.vars=bck$n.vars, n.obs=bck$n.obs, n.keep=n.keep, 
     coefficients=est$estimates, sterrs=est$sterrs, tvalues=est$tvalues,

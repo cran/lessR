@@ -19,7 +19,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
 
          bubble.size=.25, method="overplot",
 
-         ellipse=FALSE, 
+         ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent", 
 
          pt.reg="circle", pt.out="circle", 
          col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
@@ -49,9 +49,14 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
   }
   if (method %in% c("spearman", "kendall")) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "The  method  parameter has another use for ScatterPlot.\n",
+      "The  method  parameter has another meaning for ScatterPlot.\n",
       "To compute another type of correlation, directly\n",
       "access the Correlation function.\n\n")
+  }
+ 
+  if (missing(x)) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Must specify a variable to analyze.\n\n")
   }
 
   # process shapes
@@ -105,7 +110,8 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
   # see if variable exists in data frame, if x not in Global Env or function call 
   if (!missing(x) && !in.global) .xcheck(x.name, df.name, data)
 
-  if (!in.global) x.call <- eval(substitute(data$x))
+  if (!in.global)
+    x.call <- eval(substitute(data$x))
   else {  # vars that are function names get assigned to global
     x.call <- x
     if (is.function(x.call)) x.call <- eval(substitute(data$x))
@@ -127,10 +133,17 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
     if (!missing(x) && !in.global)
       .xcheck(y.name, df.name, data)
 
-    if (!in.global) y.call <- eval(substitute(data$y))
+    if (!in.global)
+      y.call <- eval(substitute(data$y))
     else {  # vars that are function names get assigned to global
       y.call <- y
       if (is.function(y.call)) y.call <- eval(substitute(data$y))
+    }
+
+    if (!is.numeric(y.call)) { 
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "For a scatter plot, the second variable must be numeric\n",
+        "The variable ", y.name, " is not numeric\n\n")
     }
   }
 
@@ -150,7 +163,8 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
     if (!missing(x) && !in.global)
       .xcheck(by.name, df.name, data)
 
-    if (!in.global) by.call <- eval(substitute(data$by))
+    if (!in.global)
+      by.call <- eval(substitute(data$by))
     else {  # vars that are function names get assigned to global
       by.call <- by
       if (is.function(by.call)) by.call <- eval(substitute(data$by))
@@ -165,23 +179,40 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
   if ( (kind == "bubble") || (kind == "sunflower") ) {
     if (missing(y))  {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Option 'bubble' or 'sunflower' are only used in scatterplots.\n\n")
+      "Option 'bubble' or 'sunflower' are only used in scatter plots.\n\n")
     }
     if ( (!is.integer(x.call)) || !is.integer(y.call)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Option 'bubble' or 'sunflower' can only be used with integer data.\n\n")
     }
   }
+   
+  nu <- length(unique(na.omit(x.call)))
+  if (is.numeric(x.call) && nu <= n.cat) {
+    x.call <- as.factor(x.call)
+    cat("\n")
+    cat(">>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
+        "so treat as categorical.\n",
+        "   To treat as numeric, decrease  n.cat  to specify a",
+        "lower number of unique values.\n",
+        "   Suggest making this variable a factor with the R factor function.\n")
+   }
+
+  if (is.factor(x.call) && ellipse) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "An ellipse is not possible with a categorical variable.\n\n")
+  }
 
   # graphics 
   if (is.null(pdf.file)) {  
     if (options("device") != "RStudioGD"  &&  is.null(options()$knitr.in.progress)) {
-      orig.params <- par(no.readonly=TRUE)
-      on.exit(par(orig.params))
       if (missing(by))  # set up graphics system to manage
         .graphwin(1) 
       else
         .graphwin(d.w=pdf.width)  # add width to default of 4.5 for legend
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+
       }
     }
   else  {
@@ -206,7 +237,7 @@ function(x, y=NULL, by=NULL, data=mydata, type=NULL, n.cat=getOption("n.cat"),
          cex.axis, col.axis, 
          xy.ticks, xlab, ylab, main, cex, kind,
          fit.line, col.fit.line, bubble.size,
-         ellipse, 
+         ellipse, col.ellipse, fill.ellipse,
          diag, col.diag, lines.diag, quiet, ...)
     }
 

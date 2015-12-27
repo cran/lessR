@@ -76,7 +76,8 @@ bc(\ldots)
        the standard R \code{\link{barplot}} function with a default of 0.2 unless two
        variables are plotted and beside=\code{TRUE}, in which case the default is
        c(.1,1).}
-  \item{prop}{Display proportions instead raw frequencies.}
+  \item{prop}{Display proportions instead raw frequencies. For two-variable plots,
+        the row proportions are displayed.}
   \item{xlab}{Label for x-axis, more generally the label for the values which could
        be on the vertical axis for a two variable plot if \code{horiz=TRUE}. Defaults
        to variable name.}
@@ -173,7 +174,7 @@ The referenced variable in a \code{lessR} function can only be a variable name (
 
 Instead, do the following:
 \preformatted{    > Y <- cut(rnorm(50), breaks=seq(-5,5))   # create vector Y in user workspace
-    >BarChart(Y)     # directly reference Y}
+    > BarChart(Y)     # directly reference Y}
 }
 
 \value{
