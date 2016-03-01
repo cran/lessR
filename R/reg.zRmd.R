@@ -1,11 +1,11 @@
-.reg.knitr <-
+.reg.Rmd <-
 function(nm, dname, fun.call, res.rows, pred.rows, res.sort,
          digits.d, results, explain, interpret, document, code,
          pvalues, tolerances, resid.max, numeric.all, X1.new,
          new.val=matrix(nrow=n.vars-1, ncol=2, byrow=TRUE)) {
 
   fncl <- .fun.call.deparse(fun.call) 
-  if (regexec("knitr.file", fncl)[1] > 0) fc <- .rm.arg("knitr.file", fncl) 
+  if (regexec("Rmd", fncl)[1] > 0) fc <- .rm.arg("Rmd", fncl) 
   if (regexec("explain", fc)[1] > 0) fc <- .rm.arg.ns("explain", fc) 
   if (regexec("interpret", fc)[1] > 0) fc <- .rm.arg.ns("interpret", fc) 
   if (regexec("results", fc)[1] > 0) fc <- .rm.arg.ns("results", fc) 
@@ -119,7 +119,7 @@ sep="")
   rdcall <- getOption("read.call")
   if (is.null(rdcall)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-       "To generate a knitr output file, first read the data for this\n",
+       "To generate an R markdown file, first read the data for this\n",
        "regression analysis with the lessR function Read.\n\n")
   }
 
@@ -374,8 +374,10 @@ xU(txt5), "null hypothesis of no ",
 sep="")
   }  #  p > .05
 
+
   n.sig <- length(which(pvalues[2:length(pvalues)] <= 0.05)) 
   if (n.sig > 0) {
+
     if (length(which(pvalues[2:length(pvalues)] <= 0.05)) > 1) {
       txt1 <- "These predictor variables each have "
       txt2 <- "their"
@@ -485,7 +487,10 @@ sep="")
       }  #  i in n.sig
     }  # end interpret
 
-  }  #  n.sig > 0
+  }  #  n.sig > 0, i.e., at least one predictor significant
+
+  else
+    uYq <- ""
   
 
 
@@ -980,24 +985,22 @@ sep="")
 
       if (explain) tx[length(tx)+1] <- paste(
 "The collinearity analysis assesses the extent that the ",
-"predictor variables are linearly dependent upon each other, ",
+"predictor variables -- ", X, " -- linearly depend upon each other, ",
 "which in the simplest case is a high pairwise correlation. ",
-"Although collinearity does not diminish neither the fit of the model, ",
-"nor forecasting efficacy, ",
-"it may indicate an overly complex model. ",
-"Further, the unique effects of collinear variables, as indicated ",
-"by their slope coefficients, ",
+"Although collinearity diminishes neither the fit of the model, ",
+"nor forecasting efficacy, it ",
+"typically indicates an overly complex model. ",
+"Collinear variables have relatively large ",
+"standard errors of their estimated slope coefficients, ",
+"which yield unstable estimates. The result is that any ",
+"unique effects of collinear variables ",
 "cannot be statistically disentangled without a very ",
 "large sample size. ",
-"As such, collinear variables have relatively large ",
-"standard errors of their estimated slope coefficients, ",
-"which yields unstable estimates. ",
 sep="")
 
       if (explain) tx[length(tx)+1] <- paste("\n",
-"To assess collinearity for predictor variable $X_j$, ",
-"directly assess its extent by regressing that predictor ",
-"onto all of the remaining predictor variables. A high ",
+"To assess collinearity for predictor variable $X_j$, regress ",
+"that predictor onto all of the remaining predictor variables. A high ",
 "resulting $R^2_j$ ",
 "indicates collinearity for that predictor. ",
 "Usually express this result in terms of ",
@@ -1025,13 +1028,13 @@ sep="")
         hh <- "s have tolerances"
       else
         hh <- " has a tolerance"
-    
+
       if (interpret && l20 > 0)
         tx[length(tx)+1] <- paste(
 "Collinearity is indicated. ", 
 xU(xNum(l20)), " variable", hh, " less than the ", 
-"cutoff of 0.20: ",
-"`r xAnd(names(which(r$tolerances < 0.20)))`. ",
+"cutoff of 0.20: ",  # r$tolerances has no names, so get them at r$model
+"`r xAnd(names(r$model[which(r$tolerances < 0.20) + 1]))`. ",
 sep="")
 
       l2030 <- length(which(tolerances >= 0.20 & tolerances < 0.30))
@@ -1044,7 +1047,7 @@ sep="")
         tx[length(tx)+1] <- paste(
 xU(xNum(l2030)), " variable", hh, " greater than the ", 
 "cutoff of 0.20, but still somewhat low, less than 0.30: ",
-"`r xAnd(names(which(r$tolerances >= 0.20 & r$tolerances < 0.30)))`. ",
+"`r xAnd(names(r$model[which(r$tolerances >= 0.20 & r$tolerances < 0.30) + 1]))`. ",
 sep="")
 
       if (interpret && length(which(tolerances < 0.30)) == 0)
@@ -1058,7 +1061,7 @@ sep="")
 
       if (results  &&  n.pred > 1) tx[length(tx)+1] <- paste(
 "The predictor variable", pl2, " with the lowest tolerance ", vrb, " ",
-"`r xAnd(names(which(r$tolerances == min(r$tolerances))))` at ",
+"`r xAnd(names(r$model[which(r$tolerances == min(r$tolerances)) + 1]))` at ",
 "`r xP(min(r$tolerances),3)`.",
 sep="")
 

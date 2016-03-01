@@ -1,14 +1,16 @@
 BoxPlot <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
-    knitr.file=NULL,
+    Rmd=NULL,
 
     col.fill=getOption("col.fill.bar"),
     col.stroke=getOption("col.stroke.bar"), 
     col.bg=getOption("col.bg"),
     col.grid=getOption("col.grid"),
 
-    cex.axis=.85, col.axis="gray30",
-    xlab=NULL, main=NULL, digits.d=NULL,
+    cex.axis=0.75, col.axis="gray30",
+    xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
+
+    rotate.values=0, offset=0.5,
 
     horiz=TRUE, add.points=FALSE,
 
@@ -21,6 +23,20 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (getOption("colors") == "gray") col.stroke <- "black"
   if (getOption("colors") == "gray.black") col.stroke <- getOption("col.stroke.pt")
+
+  if (!is.null(pdf.file))
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "knitr.file") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "knitr.file  no longer used\n",
+          "Instead use  Rmd  for R Markdown file\n\n")
+      }
+    }
+  }
 
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x))
@@ -91,14 +107,14 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
      .opendev(pdf.fnm, pdf.width, pdf.height)
 
       stuff <- .bx.main(data[,i], col.fill, col.stroke, col.bg, col.grid,
-         cex.axis, col.axis, 
-         horiz, add.points, xlab, main, digits.d, quiet, ...)
+         cex.axis, col.axis, rotate.values, offset, 
+         horiz, add.points, xlab, main, sub, digits.d, quiet, ...)
       txsts <- stuff$tx
       if (length(txsts)==0) txsts <- ""
 
       txotl <- ""
       if (!quiet) {
-        txotl <- .outliers2(data[,i])
+        txotl <- .outliers(data[,i])
         if (length(txotl)==0) txotl <- "No outliers"
       }
 
@@ -127,14 +143,13 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (ncol(data)==1  &&  nu>n.cat) {
 
-    # knitr
+    # R Markdown
     txkfl <- ""
-    if (!is.null(knitr.file)) {
-      txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
-      knitr.file <- paste(knitr.file, txt, sep="") 
-      txknt <- .dist.knitr(x.name, df.name, fun.call, digits.d)
-      cat(txknt, file=knitr.file, sep="\n")
-      txkfl <- .showfile2(knitr.file, "knitr instructions")
+    if (!is.null(Rmd)) {
+      if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
+      txknt <- .dist.Rmd(x.name, df.name, fun.call, digits.d)
+      cat(txknt, file=Rmd, sep="\n")
+      txkfl <- .showfile2(Rmd, "R Markdown instructions")
     }
  
     class(txsts) <- "out_piece"

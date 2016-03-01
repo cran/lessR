@@ -42,7 +42,10 @@ pc(\ldots)
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
-  \item{...}{Other parameter values.}
+  \item{...}{Other parameter values for graphics as defined processed 
+      by \code{\link{pie}} and \code{\link{par}} for general graphics,
+      which includes \code{radius} of the pie, and \code{col.main} for
+      the title of the graph.}
 }
 
 

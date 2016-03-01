@@ -46,7 +46,7 @@ set(colors=c("blue", "gray", "rose", "green", "gold", "red",
   \item{ghost}{If \code{TRUE}, add a black background, transparent grid lines
        and transparency for the bars. Overrides individual settings for
        those values. Setting to \code{FALSE} has no effect.}
-  \item{n.cat}{Number of categories, which specifies the largest number of unique
+  \item{n.cat}{Number of categories that specifies the largest number of unique
         values of variable of a numeric data type for which the variable will be
         analyzed as categorical. Default is turned off, a value of 0.}
   \item{quiet}{If \code{TRUE} then some functions suppress console output.}

@@ -79,23 +79,22 @@ myd <- Subset(c(1,4))
 # delete only the first and fourth rows of data, store in myd
 myd <- Subset(-c(1,4))
 
-# only retain females and Years and Salary as variables in dataEmployee
-# write result to newdata
-data(dataEmployee)
-newdata <- Subset(Gender=="F", columns=c(Years, Salary),
-       data=dataEmployee)
+# built-in data table warpbreaks has several levels of wool
+#  plus breaks and tension
+# retain only the A level of wool and the one variable breaks
+mydata <- Subset(wool=="A", columns=breaks, data=warpbreaks)
 
-# delete Years and Salary from datEmployee
-mydata <- Read("Employee", format="lessR")
+# delete Years and Salary 
+mydata <- Read("Employee", format="lessR", quiet=TRUE)
 mydata <- Subset(columns=-c(Years, Salary))
 
 # locate, display only, a specified row by its row.name
-mydata <- Read("Employee", format="lessR", brief=TRUE)
+mydata <- Read("Employee", format="lessR", quiet=TRUE)
 Subset(row.names(mydata)=="Fulton, Scott")
 
 # randomly extract 60\% of the data
 # generate code to create the hold out sample of the rest
-mydata <- Read("Employee", format="lessR", brief=TRUE)
+mydata <- Read("Employee", format="lessR", quiet=TRUE)
 mysubset <- Subset(random=.6, holdout=TRUE)
 }
 

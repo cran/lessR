@@ -1,7 +1,7 @@
 Regression <-
 function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
-         knitr.file=NULL, 
+         Rmd=NULL, 
          results=getOption("results"), explain=getOption("explain"),
          interpret=getOption("interpret"), document=getOption("document"), 
          code=getOption("code"), 
@@ -12,7 +12,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          pred.rows=NULL, pred.sort=c("predint", "off"),
          subsets=NULL, cooks.cut=1, 
 
-         scatter.coef=TRUE, graphics=TRUE,
+         scatter.coef=TRUE, graphics=TRUE, scatter.3D=FALSE,
 
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL, X6.new=NULL,
@@ -25,7 +25,18 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
   if (missing(my.formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Specify a model by listing it first or set according to:  my.formula\n\n")
+      "Specify a model by listing it first or specify with:  my.formula\n\n")
+  }
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "knitr.file") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "knitr.file  no longer used\n",
+          "Instead use  Rmd  for R Markdown file\n\n")
+      }
+    }
   }
 
   dname <- deparse(substitute(data))  # get data frame name for cor before sort
@@ -143,10 +154,12 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
   # standardize option
   if (standardize) {
-    for (i in 1:n.vars) {
+    stnd.flag <- TRUE
+    for (i in 1:n.vars)
       data[,nm[i]] <- round(scale(data[,nm[i]]), digits.d)
-    }
   }
+  else
+    stnd.flag <- FALSE
 
   # keep track of generated graphic, see if manage graphics
     if (graphics) {
@@ -178,7 +191,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
 
   title_bck <- "  BACKGROUND"
-  bck <- .reg1bckBasic(lm.out, dname, digits.d, show.R, n.obs, n.keep)
+  bck <- .reg1bckBasic(lm.out, dname, digits.d, show.R, n.obs, n.keep, stnd.flag)
   tx1bck <- bck$tx
 
 
@@ -286,7 +299,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
       if ((numeric.all || n.pred==1) && in.data.frame) {
         splt <- .reg5Plot(lm.out, res.rows, pred.rows, scatter.coef, 
            X1.new, numeric.all, in.data.frame, prd$cint, prd$pint,
-           pdf, pdf.width, pdf.height, manage.gr, ...)
+           pdf, pdf.width, pdf.height, manage.gr, scatter.3D, ...)
 
         for (i in (plot.i+1):(plot.i+splt$i)) plot.title[i] <- splt$ttl[i-plot.i]
         plot.i <- plot.i + splt$i
@@ -317,9 +330,9 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   }
 
 
-  # knitr
-  txkfl <- ""
-  if (!is.null(knitr.file)) {
+  # R Markdown
+  txRmd <- ""
+  if (!is.null(Rmd)) {
     new.val <- matrix(nrow=n.pred, ncol=2, byrow=TRUE)
 
     # get some (generally) unique values for each pred to demo X1.new ...
@@ -344,16 +357,13 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
       }
     }
     
-
-    # knitr.file
-    txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
-    knitr.file <- paste(knitr.file, txt, sep="") 
-    txknt <- .reg.knitr(nm, dname, fun.call, res.rows, pred.rows,
+    if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
+    txknt <- .reg.Rmd(nm, dname, fun.call, res.rows, pred.rows,
         res.sort, digits.d, results, explain, interpret, document, code,
         est$pvalues, tol,
         resid.max, numeric.all, X1.new, new.val)
-    cat(txknt, file=knitr.file, sep="\n")
-    txkfl <- .showfile2(knitr.file, "knitr instructions")
+    cat(txknt, file=Rmd, sep="\n")
+    txRmd <- .showfile2(Rmd, "R Markdown file")
   }
 
   # display list of plots if more than 1
@@ -379,7 +389,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   class(tx3prd) <- "out_piece"
   class(txplt) <- "out_piece"
   class(txref) <- "out_piece"
-  class(txkfl) <- "out_piece"
+  class(txRmd) <- "out_piece"
   
   output <- list(
     call=fun.call, formula=my.formula,
@@ -395,7 +405,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     out_title_res=title_res, out_residuals=tx3res,
     out_title_pred=title_pred, out_predict=tx3prd,
 
-    out_ref=txref, out_knitr.file=txkfl, out_plots=txplt,
+    out_ref=txref, out_Rmd=txRmd, out_plots=txplt,
 
     n.vars=bck$n.vars, n.obs=bck$n.obs, n.keep=n.keep, 
     coefficients=est$estimates, sterrs=est$sterrs, tvalues=est$tvalues,

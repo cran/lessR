@@ -17,32 +17,36 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   xmin <- H0 + xmin 
   rm(pp)
 
-  if 
-    (!is.null(getOption("colors"))) colors <- getOption("colors")
-  else
-    colors="blue"
+  #if 
+    #(!is.null(getOption("colors"))) colors <- getOption("colors")
+  #else
+    #colors="dodgerblue"
 
   # power curve
   mypower <- power.t.test(n=n, sd=s, delta=mydeltas, type=mytype)
   x.values <- H0+mydeltas
   y.values <- mypower$power
 
-  .plt.main(x.values, y.values, by=NULL, type="l", xlab=myxlab, ylab="Power",
-         col.area=NULL, col.box="black",
+  .plt.main(x.values, y.values, by=NULL, type="l",
+         n.cat=getOption("n.cat"),
          col.fill=getOption("col.fill.pt"),
-         col.stroke=getOption("col.stoke.pt"),
+         col.stroke=getOption("col.stroke.pt"),
          col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-         shape.pts=21, cex.axis=.85, col.axis="gray30",
-         xy.ticks=TRUE, main=NULL, cex=NULL,
-         x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-         kind="default", fit.line="none", col.fit.line="grey55",
-         center.line=NULL, col.bubble=NULL, bubble.size=.25, 
-         col.flower=NULL, ellipse=FALSE,
-         col.ellipse="lightslategray", fill.ellipse="transparent", 
-         diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
-         quiet=TRUE, n.cat=getOption("n.cat"),
-         ylim=c(0,1.1))
+         shape.pts=21, col.area=NULL, col.box="black",
+         cex.axis=0.75, col.axis="gray30", col.low=NULL, col.hi=NULL,
+         xy.ticks=TRUE, xlab=myxlab, ylab="Power",
+         main="", sub=NULL, cex=NULL,
+         value.labels=NULL, rotate.values=0, offset=0.5,
+         kind="default", means=TRUE,
+         fit.line="none", col.fit.line="grey55",
+         bubble.size=.25, bubble.counts=TRUE, 
+         ellipse=FALSE,
+         col.ellipse="transparent", fill.ellipse="transparent", 
+         diag=FALSE, col.diag=par("fg"), lines.diag=FALSE,
+         quiet=TRUE,
+         ylim=c(0,1.1), want.labels=FALSE)
   abline(h=0, lwd=.5, col="gray50")
+  # custom title (2 lines)
   mtext(mytitle, side=3, line=2.5, cex=1.1, font=2)
   if (abs(n - round(n)) > 0.000001)
     dgt.n <- 3
@@ -52,7 +56,8 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
                side=3, line=1, font=3)
 
   # delta for a power of mdp, default is 0.8
-  if (colors != "gray") col80 <- "firebrick4" else col80 <- "gray20"
+  clr <- getOption("colors")
+  if (clr != "gray") col80 <- "firebrick4" else col80 <- "gray20"
   if (mdp != 0) {
     pp <- power.t.test(n=n, sd=s, power=mdp, type=mytype)
     del.hi <- H0 + pp$delta
@@ -83,7 +88,7 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
     if (mytype == "two.sample" && !is.null(msmd))
       cat("Provided standardized value is msmd = ", msmd, "\n")
   
-    if (colors != "gray") {
+    if (clr != "gray") {
       colmmd <- rgb(112,128,144,40, maxColorValue=255)  # slategray base
       colbrd <- rgb(112,128,144,80, maxColorValue=255)
       coltrv <- rgb(97,129,129, maxColorValue=255)  # darkslategray

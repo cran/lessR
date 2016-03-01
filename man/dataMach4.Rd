@@ -6,7 +6,7 @@
 
 All Likert items assessed on a 6-point scale from 0: Strongly Disagree to 5: Strongly Agree. Variable labels, the item content, are included.
 
-The following items should be reverse scored: 3, 4, 6, 7, 9, 10, 11, 14, 16, 17, 19
+The following items should be reverse scored: m03, m04, m06, m07, m09, m10, m11, m14, m16, m17, m19
 }
 
 \usage{data(dataMach4)}

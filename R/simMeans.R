@@ -21,6 +21,9 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
       "Standard deviation, sigma, cannot be negative.\n\n")
   }
 
+  if (!is.null(pdf.file))
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
   if (is.null(sort)) if (pause) sort <- FALSE else sort <- TRUE
 
   if (set.mu) {
@@ -110,16 +113,20 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   # output
   if (n <= max.data) maxd <- n else maxd <- max.data
   cat("\nSample", "  Mean   ", "  SD   ")
-  if (show.data) for (i in 1:maxd) cat(format(toString(i), width=max.ln, justify="right", sep=""))
+  if (show.data) for (i in 1:maxd) cat(format(toString(i), width=max.ln,
+                                       justify="right", sep=""))
   cat("\n")
   for (i in 1:ns) {
     if (pause) invisible(readline())
     cat(format(o[i], width=5, justify="right", sep=""))
-    cat(format(sprintf("%.*f", digits.d, Ymean[i]), width=max.ln, justify="right", sep=""))
-    cat(format(sprintf("%.*f", digits.d, Ysd[i]), width=max.ln, justify="right", sep=""))
+    cat(format(sprintf("%.*f", digits.d, Ymean[i]), width=max.ln,
+               justify="right", sep=""))
+    cat(format(sprintf("%.*f", digits.d, Ysd[i]), width=max.ln,
+               justify="right", sep=""))
     cat("   ")
     if (show.data) for (j in 1:maxd) 
-      cat(format(sprintf("%.*f", digits.d, data.rep[i,j]), width=max.ln, justify="right", sep=""))
+      cat(format(sprintf("%.*f", digits.d, data.rep[i,j]), width=max.ln,
+          justify="right", sep=""))
     if (n > max.data) cat(" ...")
     cat("\n")
     points(i, Ymean[i], pch=21, col="darkblue", bg="plum")

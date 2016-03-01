@@ -1,10 +1,10 @@
 \name{to}
 \alias{to}
 
-\title{Create a Sequence of Numbered Variable Names with a Common Prefix}
+\title{Create a Sequence of Numbered Variable Names with a Common Prefix and Width}
 
 \description{
-Generates sequentially numbered variable names, all starting with the same prefix, usually in conjunction with reading data values into R.
+Generates sequentially numbered variable names, all starting with the same prefix, usually in conjunction with reading data values into R. The advantage over the standard R function  \code{\link{paste0}} i sthat \code{to} maintains equal widths of the names, such as m08 instead of m8 if some values are m10 or larger up to m99.
 }
 
 \usage{
@@ -37,6 +37,8 @@ to("m", 10)
 
 # generate: "m1"  "m2"  "m3"  "m4"  "m5"  "m6"  "m7"  "m8"  "m9"  "m10"
 to("m",10, same.size=FALSE)
+# equivalent to standard R function
+paste0("m", 1:10)
 
 # generate a 10 x 10 data frame
 mydata <- data.frame(matrix(rnorm(100), nrow=10))

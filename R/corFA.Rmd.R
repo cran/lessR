@@ -1,9 +1,9 @@
-.corfa.knitr <-
+.corfa.Rmd <-
 function(mimm, nm.mimm=NULL, dname, fun.call, n.inds, n.factors, iter, item.cor, 
          explain, interpret, results) {
 
   fncl <- .fun.call.deparse(fun.call) 
-  fc <- .rm.arg("knitr.file", fncl) 
+  fc <- .rm.arg("Rmd", fncl) 
 
   # set parameters
   d <- 3

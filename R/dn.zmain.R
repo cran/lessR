@@ -3,8 +3,8 @@ function(x,
          bw, type, bin.start, bin.width,
          col.fill, col.bg, col.grid, col.nrm, col.gen,
          col.fill.nrm, col.fill.gen,
-         cex.axis, col.axis, 
-         x.pt, xlab, main, y.axis, x.min, x.max, band, quiet, ...)  {
+         cex.axis, col.axis, rotate.values, offset, 
+         x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)  {
 
   if (!is.null(x.pt)) {
     y.axis <- TRUE
@@ -12,9 +12,12 @@ function(x,
   }
 
   # get variable labels if exist plus axes labels
-  gl <- .getlabels(xlab, main=main)
-  x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
+  gl <- .getlabels(xlab, main=main, cex.lab=0.98)
+  x.name <- gl$xn; x.lbl <- gl$xl;
+  x.lab <- gl$xb
   main.lab <- gl$mb
+  sub.lab <- gl$sb
+  cex.lab <- gl$cex.lab
 
   # get breaks from user supplied bin width and/or supplied start value
   # otherwise, breaks="Sturges by default
@@ -35,6 +38,12 @@ function(x,
   }
   else breaks="Sturges"
 
+
+  if (is.null(main)) {
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+    par(mar=c(4,4,2,2)+0.1)
+  }
 
   # histogram calculations, no plot
   h <- hist(x, plot=FALSE, breaks)
@@ -71,14 +80,27 @@ function(x,
 
   # set up plot area
   # bw if specified also gets passed to plot, so suppress warning
+
+  plot(h, border="transparent", freq=FALSE,
+     xlim=c(x.min,x.max), ylim=c(0,max.y),
+     axes=FALSE, ann=FALSE, xlab=NULL, ylab=NULL, main=NULL, ...)
+
+  # axis, axis ticks
+  if (!y.axis)
+    .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
+          par("usr")[1], par("usr")[3], cex.axis, col.axis,
+          rotate.values, offset, ...)
+  else
+    .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
+          par("usr")[1], par("usr")[3], cex.axis, col.axis,
+          rotate.values, offset, ...)
+
+  # axis value labels
   if (!y.axis) y.lab="" else y.lab="Density"
-  plot(h, border="transparent", freq=FALSE, xlab=x.lab,
-     ylab=y.lab, main=main.lab, xlim=c(x.min,x.max), ylim=c(0,max.y), 
-     axes=FALSE, ...)
-  axis(1, cex.axis=cex.axis, col.axis=col.axis, ...)
-  if (y.axis) 
-    axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
-  
+  max.lbl <- max(nchar(axTicks(2)))
+  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
+          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
+
   # colored background for plotting area
   usr <- par("usr")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")

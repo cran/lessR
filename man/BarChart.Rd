@@ -29,7 +29,8 @@ BarChart(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          gap=NULL, prop=FALSE,
          
          xlab=NULL, ylab=NULL, main=NULL,
-         cex.axis=.85, col.axis="gray30",
+         cex.axis=0.75, col.axis="gray30",
+         value.labels=NULL, rotate.values=0, offset=0.5,
 
          beside=FALSE, col.low=NULL, col.hi=NULL, count.levels=NULL,
 
@@ -55,7 +56,7 @@ bc(\ldots)
        is \code{mydata}.}
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest
        number of unique values of variable of a numeric data type for which the
-       variable will be analyzed as a categorical. Set to 0 to turn off.}
+       variable will be analyzed as a categorical. Default is 0.}
   \item{col.fill}{Specified bar colors.}
   \item{col.stroke}{Color of the border of the bars. Black by default unless the
        background is dark. Specify NA to remove the border}
@@ -87,6 +88,16 @@ bc(\ldots)
   \item{cex.axis}{Scale magnification factor, which by default displays the axis 
        values to be smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
+  \item{value.labels}{Labels for the value axis on the graph to override the
+        existing data values, including factor levels. If the variable is a 
+        factor and value.labels is not specified (is \code{NULL}), then the
+        value.labels are set to the factor levels with each space replaced by
+        a new line character.}
+  \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
+        longer values, typically used in conjunction with \code{offset}.}
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
+        is 0.5. Larger values such as 1.0 are used to create space for the label when
+        longer axis value names are rotated.}
   \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
        first variable to be plotted as adjacent bars instead of stacked on each other.}
   \item{col.low}{Only when the variable is an ordered factor, sets the color for the
@@ -113,8 +124,10 @@ bc(\ldots)
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for graphics as defined 
-      by \code{\link{barplot}}, \code{\link{legend}}, and  \code{\link{par}} including
-      \code{space} for one variable only, \code{las=2} for vertical axis labels, and \code{cex.lab}, \code{col.main}, etc., and \code{col.ticks} to specify the color of the tick marks.}
+      by \code{\link{barplot}}, \code{\link{legend}}, and \code{\link{par}} including
+      \code{space} for one variable only, \code{las=2} for vertical axis labels, and
+      \code{cex.lab}, \code{col.main}, \code{col.lab}, \code{sub},
+      \code{col.sub}, and \code{col.ticks} to specify the color of the tick marks.}
 }
 
 
@@ -221,11 +234,16 @@ bc(Pain)
 # save and then display the frequencies for later analysis
 myCount <- BarChart(Pain)
 myCount
+# rotate and offset the axis labels
+BarChart(Pain, rotate.values=45, offset=1)
 # compare to standard R bar plot, which requires mydata$ reference
 barplot(table(mydata$Pain))
 
 # Gender is unordered, so one color used for all the bars
 BarChart(Gender)
+
+# proportions instead of frequencies
+BarChart(Gender, prop=TRUE)
 
 # specify a unique bar color for each of the two bars
 BarChart(Gender, col.fill=c("palegreen3","tan"))
@@ -321,9 +339,20 @@ BarChart(Travel, horiz=TRUE)
 # barchart of one variable with three levels
 # enter counts as a vector with the combine function, c
 # must supply the level names and variable name
-City <- c(206, 94, 382)
-names(City) <- c("LA","Chicago","NY")
-BarChart(City, main="Employees in Each City", addtop=10)
+Dept <- c(5,6,4,6,15)
+names(Dept) <- c("ACCT", "ADMIN", "FINC", "MKTG", "SALE")
+BarChart(Dept)
+
+# counts are in the data table to be read directly
+mydata <- read.csv(text="
+Dept, Count
+ACCT,5
+ADMN,6
+FINC,4
+MKTG,6
+SALE,15", header=TRUE)
+# use count.levels to indicate the label for each corresponding count
+BarChart(Count, count.levels=Dept)
 
 # barchart of two variables
 # two Quality levels, the rows
@@ -335,19 +364,8 @@ row1 <- c(19, 16, 23)
 row2 <- c(6, 6, 8) 
 mytable <- rbind(row1, row2)
 rownames(mytable) <- c("Pass", "Defective")
-colnames(mytable) <- c("Acme, Inc", "Nuts, Inc", "Bolts, Inc")
+colnames(mytable) <- c("Acme Inc", "Nuts Inc", "Bolts Inc")
 BarChart(mytable, xlab="Supplier", legend.title="Quality")
-
-# counts are in the data file to be read directly
-mydata <- read.csv(text="
-Dept, Count
-ACCT,5
-ADMN,6
-FINC,4
-MKTG,6
-SALE,15", header=TRUE)
-# use count.levels to indicate the label for each corresponding count
-BarChart(Count, count.levels=Dept)
 }
 
 
@@ -355,5 +373,6 @@ BarChart(Count, count.levels=Dept)
 % R documentation directory.
 \keyword{ bar chart }
 \keyword{ color }
+
 
 

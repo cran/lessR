@@ -1,5 +1,5 @@
 .ss.factor <-
-function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
+function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL, x.lbl=NULL, y.lbl=NULL, ...)  {
 
 
 # construct a cross-tabs 
@@ -38,11 +38,9 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
 }  # end .prnfreq
 
 
-  # get variable labels if exist
-  gl <- .getlabels()
-  x.name <- gl$xn; x.lbl <- gl$xl
-  y.name <- gl$yn; y.lbl <- gl$yl
-  
+  # begin
+  # ---------------------------------
+
   # save ordered status before converting x to a table
   if (is.ordered(x) && is.null(by)) order.x <- TRUE else order.x <- FALSE
   if (is.ordered(by)) order.y <- TRUE else order.y <- FALSE
@@ -54,7 +52,6 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
     else
       x <- table(x, dnn=NULL)
   }
-
 
   # no title if two vars and no labels
   txttl <- ""
@@ -98,7 +95,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
                       ttl="Joint and Marginal Frequencies")
 
     tx <- character(length = 0)
-    ch <- (summary(as.table(x)))
+    ch <- summary(as.table(x))
     min.rc <- min(nrow(x)-1, ncol(x)-1)
     V <- sqrt(ch$statistic / (min.rc * ch$n.cases))
     txt <- ifelse(ch$parameter == 1, " (phi)", "") 
@@ -212,16 +209,16 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, ...)  {
       txcnt <- tx
 
       tx <- character(length = 0)
-      ch <- chisq.test(x)
+      ch <- suppressWarnings(chisq.test(x))  # provide own warning of small n
       tx[length(tx)+1] <- "Chi-squared test of null hypothesis of equal probabilities"
-      tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ",  df = ",
+      tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ", df = ",
           ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
       if (any(ch$expected < 5)) 
         tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
             "so chi-squared approximation may not be accurate", "\n")
       txchi <- tx
 
-      return(list(n.dim=n.dim, title=txttl, counts=txcnt, chi=txchi, freq=x, prop=xp))  # back to SummaryStats
+      return(list(n.dim=n.dim, title=txttl, counts=txcnt, chi=txchi, freq=x, prop=xp))
     }
   }  # one variable
 

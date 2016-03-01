@@ -72,9 +72,14 @@ function(x, by=NULL, digits.d=NULL, brief, ...) {
 
   tx <- character(length = 0)
 
-  # output, first the title
-  ttlns <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by))
-  for (i in 1:length(ttlns)) tx[length(tx)+1] <- ttlns[i] 
+  # ------
+  # output
+
+  # first the title with any variable labels
+  txlbl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by))
+  txlbl <- gsub("\n", "", txlbl)
+  for (i in 1:length(txlbl)) tx[length(tx)+1] <- txlbl[i] 
+  tx[length(tx)+1] <- ""
 
   # --------------------------------
   # the stats loop
@@ -187,9 +192,9 @@ function(x, by=NULL, digits.d=NULL, brief, ...) {
   }  # for each line
 
      if (n.lines == 1)
-       return(list(tx=tx, n=n, n.miss=n.miss, m=m, s=s, sk=sk, kt=kt, mn=mn,
-                  q1=q1, md=md, q3=q3, mx=mx, qr=qr))
+       return(list(txlbl=txlbl, tx=tx, n=n, n.miss=n.miss, m=m, s=s, sk=sk,
+                   kt=kt, mn=mn, q1=q1, md=md, q3=q3, mx=mx, qr=qr))
      else
-       return(list(tx=tx))
+       return(list(tx=tx))  # contains title with var labels and stats
 
 }

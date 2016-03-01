@@ -1,6 +1,6 @@
 corEFA <- 
 function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"), 
-          min.loading=.2, sort=TRUE, knitr.file=NULL, ...) {
+          min.loading=.2, sort=TRUE, Rmd=NULL, ...) {
 
   cl <- match.call()
 
@@ -148,12 +148,11 @@ print(x)
 
   # knitr
   txkfl <- ""
-  if (!is.null(knitr.file)) {
-    if (grepl(".Rmd", knitr.file)) txt <- "" else txt <- ".Rmd"
-    knitr.file <- paste(knitr.file, txt, sep="") 
-    txknt <- .corfa.knitr(n.ind, n.factors)
-    cat(txknt, file=knitr.file, sep="\n")
-    txkfl <- .showfile2(knitr.file, "knitr instructions")
+  if (!is.null(Rmd)) {
+    if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
+    txknt <- .corfa.Rmd(n.ind, n.factors)
+    cat(txknt, file=Rmd, sep="\n")
+    txkfl <- .showfile2(Rmd, "R Markdown instructions")
   }
 
 

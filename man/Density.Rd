@@ -11,7 +11,7 @@ Plots a normal density curve and/or a general density curve superimposed over a 
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 
-When output is assigned into an object, such as \code{d} in \code{d <- dn(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output is embedded in documents, facilitated by the \code{knitr.file} option. See \code{value} below.
+When output is assigned into an object, such as \code{d} in \code{d <- dn(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation from an R markdown document in which R output is embedded in documents, facilitated by the \code{Rmd} option. See \code{value} below.
 }
 
 \usage{
@@ -20,7 +20,7 @@ Density(x, data=mydata, n.cat=getOption("n.cat"),
        bw="nrd0", type=c("both", "general", "normal"),
        bin.start=NULL, bin.width=NULL,
 
-       knitr.file=NULL, digits.d=NULL,
+       Rmd=NULL, digits.d=NULL,
 
        col.fill=getOption("col.fill.pt"),
        col.bg=getOption("col.bg"),
@@ -29,8 +29,11 @@ Density(x, data=mydata, n.cat=getOption("n.cat"),
        col.nrm="black", col.gen="black",
        col.fill.nrm=NULL, col.fill.gen=NULL,
 
-       cex.axis=.85, col.axis="gray30",
-       x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
+       cex.axis=0.75, col.axis="gray30",
+
+       rotate.values=0, offset=0.5,
+
+       x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
 
        quiet=getOption("quiet"),
@@ -51,14 +54,14 @@ dn(\ldots)
         default is \code{mydata}.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric data type
-        for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
+        for which the variable will be analyzed as categorical. Default is 0.}
   \item{bw}{Bandwidth of kernel estimation.}
   \item{type}{Type of density curve plotted.  By default, both the general
        density and the normal density are plotted.}
   \item{bin.start}{Optional specified starting value of the bins.}
   \item{bin.width}{Optional specified bin width, which can be specified with or without 
         a \code{bin.start} value.}
-  \item{knitr.file}{File name for the file of knitr instructions to be written, if specified.
+  \item{Rmd}{File name for the file of R markdown to be written, if specified.
         The file type is .Rmd, which automatically opens in RStudio, but it is a simple
         text file that can be edited with any text editor, including RStudio.}
   \item{digits.d}{Number of significant digits for each of the displayed summary statistics.}
@@ -78,11 +81,17 @@ dn(\ldots)
   \item{cex.axis}{Scale magnification factor, which by default displays the axis values to be 
         smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
+  \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
+        longer values, typically used in conjunction with \code{offset}.}
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
+        is 0.5. Larger values such as 1.0 are used to create space for the label when
+        longer axis value names are rotated.}
   \item{x.pt}{Value of the point on the x-axis for which to draw a unit interval
         around illustrating the corresponding area under the general density curve.  Only
         applies when requesting \code{type=general}.}
   \item{xlab}{Label for x-axis.}
   \item{main}{Title of graph.}
+  \item{sub}{Sub-title of graph, below xlab.}
   \item{y.axis}{Specifies if the y-axis, the density axis, should be included.}
   \item{x.min}{Smallest value of the variable x plotted on the x-axis.}
   \item{x.max}{Largest value of the variable x plotted on the x-axis.}
@@ -98,9 +107,11 @@ dn(\ldots)
         obtained from the abbreviated function call \code{dn}.}
   \item{\dots}{Other parameter values for graphics as defined processed 
       by \code{\link{plot}}, including \code{xlim}, \code{ylim}, \code{lwd} and \code{cex.lab}, 
-      \code{col.main}, \code{density}, and, for the general density calculations, can set 
-      bandwidth with the standard \code{bw}, etc., and col.ticks to specify the color of
-      the ticks used to label the axis values.}
+      \code{col.main}, \code{col.lab}, \code{sub},
+      \code{col.sub}, and \code{col.ticks} to specify the color of
+      the ticks used to label the axis values, \code{density}, \code{srt} to
+      rotate the axis value labels and, for the general
+      density calculations, can set bandwidth with the standard \code{bw}.}
 }
 
 
@@ -137,18 +148,18 @@ Instead, do the following:
 }
 
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the \code{knitr} document (see \code{examples}).
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the R~Markdown document (see \code{examples}).
 
 READABLE OUTPUT\cr
 code{out_title}: Title of output\cr
 code{out_stats}: Statistics\cr
-code{out_file}: Name and location of optional knitr file\cr
+code{out_file}: Name and location of optional R markdown file\cr
 
 STATISTICS\cr
 code{bw}: Bandwidth parameter\cr
 code{n}: Number of data values analyzed\cr
 code{n.miss}: Number of missing data values\cr
-code{W}: W statistic fo rShapiro-Wilk normality test\cr
+code{W}: W statistic for Shapiro-Wilk normality test\cr
 code{pvalue}: p-value for W statistic\cr
 
 Although not typically needed, if the output is assigned to an object named, for example, \code{h}, then the contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(h)}.
@@ -196,6 +207,9 @@ Density(Y, type="general", bw=.6)
 # display only the general estimated density and a corresponding
 #  interval of unit width around x.pt
 Density(Y, type="general", x.pt=2)
+
+# generate R markdown file to be "knit" such as in RStudio
+dn(Y, Rmd="myout")
 
 # variable of interest is in a data frame which is not the default mydata
 # access the breaks variable in the R provided warpbreaks data set

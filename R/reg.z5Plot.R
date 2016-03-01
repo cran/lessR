@@ -2,7 +2,8 @@
 function(lm.out, res.rows=NULL, pred.rows=NULL,
          scatter.coef=FALSE, X1.new=NULL,
          numeric.all, in.data.frame, c.int, p.int,
-         pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...) {
+         pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE,
+         scatter.3D, ...) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -71,14 +72,15 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
        col.stroke=getOption("col.stroke.pt"),
        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
        shape.pts=21, cex.axis=.85, col.axis="gray30",
-       xy.ticks=TRUE,
-       xlab=nm[2], ylab=nm[1], main=ctitle,
-       cex=.8, kind="default", 
+       col.low=NULL, col.hi=NULL, xy.ticks=TRUE,
+       xlab=nm[2], ylab=nm[1], main=ctitle, sub=NULL,
+       cex=.8, value.labels=NULL, rotate.values=0, offset=.5,
+       kind="default", means=TRUE,
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
        fit.line=fl, col.fit.line="grey55", center.line=NULL,
-       col.bubble=NULL, bubble.size=.25, col.flower=NULL,
+       col.bubble=NULL, bubble.size=.25, bubble.counts=TRUE, col.flower=NULL,
        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent", 
-       diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
+       diag=FALSE, col.diag=par("fg"), lines.diag=FALSE,
        quiet=TRUE, ylim=c(y.min,y.max))
 
     if (n.pred == 0) {
@@ -152,33 +154,24 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     cat("\n\n")
   }
 
-  #if (scatter.3D) {  # 3d scatterplot option for 2-predictor models
-    #cat("\n"); stop(call.=FALSE, "\n","------\n",
-      #"scatter.3D option disabled, car package no longer included\n",
-      #"because of dependencies issues.\n\n",
-      #"If interested, use the scatter3d function from car.\n\n")
+  if (scatter.3D) {  # 3d scatterplot option for 2-predictor models
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "scatter.3D option disabled\n",
+      "car package no longer included because of dependencies issues\n\n",
+      "If interested, directly call the scatter3d function from the car package\n",
+      "First install the needed packages, then invoke the library function:\n",
+      "  install.packages(\"rgl\", \"car\")\n",
+      "  library(car)\n\n",
+      "Example\n ",
+      "  scatter3d(Ozone ~ Wind + Temp, id.method=\"identify\", data=airquality)\n\n",
+      "Directions\n",
+      "  Can re-size the plot window, click and drag to rotate plot\n",
+      "  Press the right mouse button and drag a rectangle around any points to be\n",
+      "    identified, and then release\n",
+      "  To exit, right-click in a blank area of the 3d-scatterplot\n\n", sep="")
 
-    #if (is.numeric(lm.out$model[,nm[2]]) && is.numeric(lm.out$model[,nm[3]]))
-       #proceed.3d <- TRUE
-    #else {
-      #proceed.3d <- FALSE
-      #cat("\n>>> No 3D scatterplot because both predictor variables must be numeric.\n")
-    #}
-    #if (proceed.3d) { 
-      #check.rgl <- require(rgl, quietly=TRUE)
-      #cat("\n\n\n",
-          #"Directions for 3D scatterplot from the car package\n",
-          #"--------------------------------------------------\n\n",
-          #">>> The 3D scatter plot requires package rgl.", "\n",
-          #">>> To get the rgl package, run one time only: install.packages(\"rgl\")", "\n\n",
-          #"1. Can re-size the plot window, click and drag to rotate plot.\n",
-          #"2. Press the right mouse button and drag a rectangle around any points to be\n",
-          #"   identified, and then release. Repeat for each set of points to be identified.\n",
-          #"3. To exit, right-click in a blank area of the 3d-scatterplot.\n", sep="")
       #suppressMessages(scatter3d(lm.out$terms, id.method="identify", data=lm.out$model))  # car
-      #cat("\n")
-    #}
-  #}
+  }
 
   # just generated plot
   invisible(list(i=plt.i, ttl=plt.title))

@@ -46,7 +46,7 @@ The data frame with the variable labels is returned.
 
 \examples{
 # read the internal lessR data frame that contains variable labels
-mydata <- Read("Employee", format="lessR", brief=TRUE)
+mydata <- Read("Employee", format="lessR")
 # processing with a standard R transformation removes the labels
 mydata <- transform(mydata, Years = Years)
 # show that the labels are now gone
@@ -65,7 +65,7 @@ HealthPlan,1=GoodHealth 2=YellowCross 3=BestCare
 mydata <- VariableLabels(lbl)
 
 # read variable labels from a csv file
-mydata <- Read("Employee", format="lessR", brief=TRUE)
+mydata <- Read("Employee", format="lessR")
 mydata <- transform(mydata, Years = Years)  # remove the labels 
 # mydata <- VariableLabels("http://lessRstats.com/data/employee_lbl.csv")
 

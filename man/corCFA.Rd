@@ -14,13 +14,13 @@ Corresponding scale reliabilities are provided, as well as the residuals, the di
 
 The \code{scales} is a wrapper that retains 1's in the diagonal of the indicator correlation matrix, so provides scale reliabilities and observed indicator-scale and scale-scale correlations.
 
-Output is generated into distinct pieces by topic, organized and displayd in sequence by default. When the output is assigned to an object, such as \code{f} in \code{f <- cfa(Fac =~ X1 + X2 + X3)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from, for example, \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete \code{knitr} set of instructions ready to knit from the \code{knitr.file} option. Simply specify the option and create the file and then open in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the following sections \code{arguments}, \code{value} and \code{examples} for more information. 
+Output is generated into distinct pieces by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{f} in \code{f <- cfa(Fac =~ X1 + X2 + X3)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from, for example, \code{RStudio}. The input instructions written to the R~Markdown file are written comments and interpretation with embedded \code{R} code. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete R~Markdown set of instructions ready to knit from the \code{Rmd} option. Simply specify the option and create the file and then open in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the following sections \code{arguments}, \code{value} and \code{examples} for more information. 
 }
 
 \usage{
 corCFA(mimm=NULL, x=mycor, data=mydata, fac.names=NULL, 
 
-         knitr.file=NULL, explain=getOption("explain"),
+         Rmd=NULL, explain=getOption("explain"),
          interpret=getOption("interpret"), results=getOption("results"),
 
          labels=c("include", "exclude", "only"),
@@ -55,16 +55,17 @@ scales(\ldots, iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE, heat.map=FALSE)
        calculate correlations, which is separately provided for by the
        \code{lessR} function \code{\link{Correlation}}.}
   \item{fac.names}{Optional factor names for the original, non-lavaan model specification.}
-  \item{knitr.file}{File name for the file of knitr instructions to be written, if specified.
+  \item{Rmd}{File name for the file of R Markdown instructions to be written, if specified.
         The file type is .Rmd, which automatically opens in RStudio, but it is a simple
         text file that can be edited with any text editor, including RStudio.}
-  \item{explain}{If set to \code{FALSE} the \code{knitr} explanations
-        of the results are not provided. Set globally with options(explain=FALSE).}
-  \item{interpret}{If set to \code{FALSE} the \code{knitr} interpretations
-        of the results are not provided. Set globally with options(interpret=FALSE).}
-  \item{results}{If set to \code{FALSE} the \code{knitr} results
-        are not provided, relying upon the interpretations. Set globally with
-        options(results=FALSE).}
+  \item{explain}{If set to \code{FALSE} the explanations of the results are not
+        provided in the R~Markdown file. Set globally with options(explain=FALSE).}
+  \item{interpret}{If set to \code{FALSE} the interpretations
+        of the results are not provided in the R~Markdown file. Set globally with
+        options(interpret=FALSE).}
+  \item{results}{If set to \code{FALSE} the results
+        are not provided in the R~Markdown file, relying upon the interpretations.
+        Set globally with options(results=FALSE).}
   \item{labels}{If "include" or "exclude" then variable labels are displayed
        (if available) or not, organized by the items within each factor.
        If "only" then no data analysis performed, only the display of the
@@ -115,7 +116,7 @@ Unless \code{labels="only")}, the analysis requires the correlation matrix of th
 
 For versions of \code{lessR} after 3.3, the correlation matrix computed by \code{\link{Correlation}} is now a list element called \code{cors} within the returned list. For example, \code{mycor$cors} from \code{mycor <- cr(mydata)}. The function \code{corCFA} automatically finds this correlation matrix from just entering the entire list name of the returned list, \code{mycor}, or the specific location, \code{mycor$cors}, or as a stand-alone numerical matrix as done in versions of \code{lessR} previous to 3.3. 
 
-The data frame from which the correlation matrix was computed is requried only if any associated variable labels are listed, organized by the items within each factor. By default, \code{labels="include"}, these labels are listed as part of the analysis if they are available.
+The data frame from which the correlation matrix was computed is required only if any associated variable labels are listed, organized by the items within each factor. By default, \code{labels="include"}, these labels are listed as part of the analysis if they are available.
 
 Define the constituent variables, the indicators, of each factor with a listing of each variable by its name in the correlation matrix. Each of the up to 12 factors is named F1, F2, etc. If the specified variables of a factor are in consecutive order in the input correlation matrix, the list can be specified by listing the first variable, a colon, and then the last variable.  To specify multiple variables, a single variable or a list, separate each by a comma, then invoke the R combine or \code{\link{c}} function, preceded by the factor's name and an equals sign. For example, if the first factor is defined by variables in the input correlation matrix from m02 through m05, and the variable Anxiety, then define the factor in the \code{corCFA} function call according to \code{F1=c(m02:m05,Anxiety)}. 
 
@@ -208,6 +209,14 @@ MeasModel <-
 "
 c <- cfa(MeasModel)
 
+# access the solution directly by saving to an object called fit
+cfa(MeasModel)
+fit <- cfa(MeasModel)
+fit
+# get the pattern coefficients from the communalities
+lambda <- sqrt(fit$diag.cor)
+lambda
+
 # alternative specification described in Gerbing(2013),
 #   retained to be consistent with that description
 # can specify the items with a colon and with commas
@@ -223,19 +232,11 @@ scales(F1=X1:X3, F2=X4:X6)
 set(colors="gray")
 corCFA(F1=X1:X3, F2=X4:X6)
 
-# access the solution directly by saving to an object called fit
-fit <- cfa(MeasModel)
-fit
-# get the pattern coefficients from the communalities
-lambda <- sqrt(fit$diag.cor)
-lambda
-
 # access the lessR data set called datMach4, with variable labels
 mydata <- Read("Mach4", format="lessR", quiet=TRUE)
 # calculate the correlations and store in mycor
 mycor <- cr(m01:m20)
-# confirmatory factor analysis of 4-factor solution of Mach IV scale
-# Hunter, Gerbing and Boster (1982)
+# specify measurement model in Lavaan notation
 MeasModel <- 
 " 
    Deceit =~ m07 + m06 + m10 + m09 
@@ -243,7 +244,13 @@ MeasModel <-
    Cynicism =~ m11 + m16 + m04 
    Flattery =~ m15 + m02 
 "
-c <- cfa(MeasModel)
+# confirmatory factor analysis of 4-factor solution of Mach IV scale
+# Hunter, Gerbing and Boster (1982)
+# generate R Markdown instructions with the option: Rmd
+# Output file will be m4.Rmd, a simple text file that can
+#   be edited with any text editor including RStudio, from which it
+#   can be knit to generate dynamic output such as to a Word document
+c <- cfa(MeasModel, Rmd="m4")
 # view all the output
 c
 # view just the scale reliabilities
@@ -251,12 +258,6 @@ c$out_reliability
 
 # analysis of item content only
 cfa(MeasModel, data=mydata, labels="only")
-
-# Generate knitr instructions with the option: knitr.file
-# Output file will be mach.Rmd, a simple text file that can
-#   be edited with any text editor including RStudio from which it
-#   can be knit to generate dynamic output such as to a Word document
-cfa(MeasModel, knitr.file="mach")
 
 
 # bad fitting model to illustrate indicator diagnostics
@@ -276,4 +277,6 @@ cfa(MeasModel)
 % R documentation directory.
 \keyword{ correlation }
 \keyword{ factor analysis }
+
+
 

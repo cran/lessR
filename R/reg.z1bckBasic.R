@@ -1,5 +1,6 @@
 .reg1bckBasic <-
-function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE, n.obs, n.keep) {
+function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE, n.obs, n.keep,
+         stnd.flag) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -26,7 +27,13 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE, n.obs, n.keep) {
   for (i in 1:n.vars) {
     txbck <- .varlist2(n.pred, i, nm[i], "Predictor", n.obs, n.keep)
     for (j in 1:length(txbck)) tx[length(tx)+1] <- txbck[j] 
-}
+  }
+
+  if (stnd.flag) {
+    tx[length(tx)+1] <- ""
+    tx[length(tx)+1] <- "Data are Standardized"
+  }
+  
 
   return(list(tx=tx, n.vars=n.vars, n.obs=n.obs, n.keep=n.keep))
 

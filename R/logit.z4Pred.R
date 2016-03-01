@@ -99,12 +99,15 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
     cat(.fmtc(" ",ln+8), "Baseline         Predicted", "\n")
     .dash(51)
     cat(.fmtc(" ",ln+7), "Total  %Tot        0      1  %Correct", "\n")
-    cat(.fmtc(" ",ln), "  0  ", .fmti(tot0,6), .fmt(100*per0G,1,5), " ", .fmti(hit0,6), .fmti(mis0,6), "   ",
+    cat(.fmtc(" ",ln), "  0  ", .fmti(tot0,6), .fmt(100*per0G,1,5), " ",
+        .fmti(hit0,6), .fmti(mis0,6), "   ",
         .fmt(100*per0,1), "\n")
-    cat(.fmtc(nm[1],ln), "  1  ", .fmti(tot1,6), .fmt(100*per1G,1,5), " ", .fmti(mis1,6), .fmti(hit1,6), "   ",
+    cat(.fmtc(nm[1],ln), "  1  ", .fmti(tot1,6), .fmt(100*per1G,1,5), " ",
+        .fmti(mis1,6), .fmti(hit1,6), "   ",
         .fmt(100*per1,1), "\n")
     .dash(51)
-    cat(.fmtc(" ",ln), "Total", .fmti(totG,6), .fmtc(" ",25), .fmt(100*perT,1), "\n")
+    cat(.fmtc(" ",ln), "Total", .fmti(totG,6), .fmtc(" ",25),
+        .fmt(100*perT,1), "\n")
     cat("\n")
   }
 
@@ -138,15 +141,16 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
        col.stroke=getOption("col.stroke.pt"),
        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
        shape.pts=21, col.area=NULL, col.box="black",
-       cex.axis=.85, col.axis="gray30",
+       cex.axis=.85, col.axis="gray30", col.low=NULL, col.hi=NULL,
        xy.ticks=TRUE,
-       xlab=nm[2], ylab=y.label, main="Logistic Fit and Scatterplot",
-       cex=.8, kind="default",
+       xlab=nm[2], ylab=y.label, main="Logistic Fit and Scatterplot", sub=NULL,
+       cex=.8, value.labels=NULL, rotate.values=0, offset=.5,
+       kind="default", means=TRUE,
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
        fit.line="none", col.fit.line="grey55", center.line=NULL,
-       col.bubble=NULL, bubble.size=.25, col.flower=NULL,
+       col.bubble=NULL, bubble.size=.25, bubble.counts=TRUE, col.flower=NULL,
        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent", 
-       diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
+       diag=FALSE, col.diag=par("fg"), lines.diag=FALSE,
        quiet=TRUE, ylim=c(0,1))
 
     lines(lm.out$model[,nm[2]], p.int$fit, col=col.pts, lwd=2)

@@ -1,8 +1,9 @@
 .bc.main <- 
 function(x, by=NULL, 
          col.fill, col.stroke, col.bg, col.grid, random.col, colors,
-         horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
-         cex.axis, col.axis,  beside, col.low, col.hi, count.levels,
+         horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
+         cex.axis, col.axis, rotate.values, offset, beside,
+         col.low, col.hi, count.levels,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
  
   if (horiz && addtop!=1) { 
@@ -15,14 +16,24 @@ function(x, by=NULL,
     "Need to specify a value for:   legend.title\n\n")
   }
 
+  if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels) 
+
+  # get values for ... parameter values
+  stuff <- .getdots(...)
+  col.main <- stuff$col.main
+  col.lab <- stuff$col.lab
+  col.sub <- stuff$col.sub
+  cex.main <- stuff$cex.main
+
   # get variable labels if exist plus axes labels
   txt <- "Proportion"
-  if (!is.null(by)) txt <- paste("Row", txt)
+  if (!is.null(by)) txt <- "Cell Proportion within Each Row"
   if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- txt
-  gl <- .getlabels(xlab, ylab, main)
-  x.name <- gl$xn; x.lab <- gl$xb
+  gl <- .getlabels(xlab, ylab, main, cex.lab=0.98)
+  x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
   y.name <- gl$yn; y.lab <- gl$yb; y.lbl <- gl$yl
   main.lab <- gl$mb
+  cex.lab <- gl$cex.lab
 
   if (is.matrix(x)) {  # get the variable names as counts entered directly
     options(xname = x.lab)
@@ -54,8 +65,7 @@ function(x, by=NULL,
   entered.pre <- FALSE
   if (!is.matrix(x) && !is.null(names(x))) entered.pre <- TRUE
   if (is.matrix(x) && !is.null(rownames(x))) entered.pre <- TRUE
-  if (!is.integer(x) && is.double(x) && entered.pre) 
-    entered <- TRUE else entered <- FALSE
+  entered <- ifelse (!is.integer(x) && is.double(x) && entered.pre, TRUE, FALSE)
   if (!is.null(count.levels)) {
     x <- as.numeric(x)
     names(x) <- count.levels
@@ -69,14 +79,28 @@ function(x, by=NULL,
   # convert x to a table
   if (!entered) {  # x.temp allows frequencies to be restored for text output
     if (!is.null(by)) {
-      x.temp <- table(by,x, dnn=c(y.name, x.name))
+      if (length(x) == length(by))
+        x.temp <- table(by,x, dnn=c(y.name, x.name))
+      else {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        x.name, " and ", y.name, " must be of the same size\n\n",
+        "Size of ", x.name, ": ", length(x), "\n", 
+        "Size of ", y.name, ": ", length(by), "\n\n", sep="")
+      }
       x <- table(by,x, dnn=c(y.name, x.name)) 
+      if (prop) x <- prop.table(x, 1)
     }
-    else {  
-      x.temp <- x
+    else {  # one variable 
+      x.temp <- x  # save counts
       x <- table(x, dnn=NULL)
+      if (prop) x <- x/sum(x)
     }
-    if (prop) x <- prop.table(x,1)
+  }
+
+  if (!is.null(count.levels)) {
+    x.temp <- x
+    x <- as.table(x)
+    if (prop) x <- x/sum(x)
   }
 
   if (is.null(by) && beside && !entered) { 
@@ -108,52 +132,13 @@ function(x, by=NULL,
 
   # color palette
   if ((order.x && is.null(by)) || order.y) {  # one var, an ordered factor
-      col.grid <- getOption("col.grid")
-      col.bg <- getOption("col.bg")
-    if (colors == "dodgerblue") { 
-      if (is.null(col.low)) col.low <- rgb(.765,.824,.886)
-      if (is.null(col.hi)) col.hi <- "dodgerblue4"
-    }
-    else if (colors == "sienna") { 
-      if (is.null(col.low)) col.low <- "#F7E9E2"
-      if (is.null(col.hi)) col.hi <- "sienna3"
-    }
-    else if (colors == "blue") { 
-      if (is.null(col.low)) col.low <- "slategray2"
-      if (is.null(col.hi)) col.hi <- "slategray4"
-    }
-    else if (colors == "gray") {
-      if (is.null(col.low)) col.low <- "gray90"
-      if (is.null(col.hi)) col.hi <- "gray25"
-    }
-    else if (colors == "gray.black") {
-      if (is.null(col.low)) col.low <- "gray70"
-      if (is.null(col.hi)) col.hi <- "gray25"
-    }
-    else if (colors == "green") {
-      if (is.null(col.low)) col.low <- "darkseagreen1"
-      if (is.null(col.hi)) col.hi <- "darkseagreen4"
-    }
-    else if (colors == "rose") {
-      if (is.null(col.low)) col.low <- "mistyrose1"
-      if (is.null(col.hi)) col.hi <- "mistyrose4"
-    }
-    else if (colors == "gold") {
-      if (is.null(col.low)) col.low <- "goldenrod1"
-      if (is.null(col.hi)) col.hi <- "goldenrod4"
-    }
-    else if (colors == "red") { 
-      if (is.null(col.low)) col.low <- "coral1"
-      if (is.null(col.hi)) col.hi <- "coral4"
-    }
-    else if (colors == "orange.black") { 
-      if (is.null(col.low)) col.low <- rgb(255,173,91, maxColorValue=256)
-      if (is.null(col.hi)) col.hi <- rgb(169,66,2, maxColorValue=256)
-    }
-    else if (colors == "purple") { 
-      if (is.null(col.low)) col.low <- "purple1"
-      if (is.null(col.hi)) col.hi <- "purple4"
-    }
+    col.grid <- getOption("col.grid")
+    col.bg <- getOption("col.bg")
+
+    lowhi <- .ordcolors(colors, col.low, col.hi) 
+    col.low <- lowhi$col.low
+    col.hi <- lowhi$col.hi
+
     color.palette <- colorRampPalette(c(col.low, col.hi))
     clr <- color.palette(n.colors)
   } # end ordered
@@ -176,19 +161,18 @@ function(x, by=NULL,
       col.bg <- getOption("col.bg")
     }
 
-    else if (colors == "rainbow") clr <- rainbow(n.colors)
-    else if (colors == "terrain") clr <- terrain.colors(n.colors)
-    else if (colors == "heat") clr <- heat.colors(n.colors)
+  else if (colors == "rainbow") clr <- rainbow(n.colors)
+  else if (colors == "terrain") clr <- terrain.colors(n.colors)
+  else if (colors == "heat") clr <- heat.colors(n.colors)
 
-    else  {  # mono color range does not make sense here 
-      clr <- .col.discrete()
-      cat("\n>>> Can set colors=\"terrain\", or \"rainbow\" or ",
-          "\"heat\" \n", sep="")  # lighten some default background colors
-      if (col.bg == "#EEF0F2") col.bg <- rgb(245,245,245, maxColorValue=255)
-      if (col.bg == "#E5DB8E") col.bg <- rgb(251,245,220, maxColorValue=255)
-    }
+  else  {  # ordered color range does not make sense here 
+    clr <- .col.discrete()
+    # lighten some default background colors
+    if (col.bg == "#EEF0F2") col.bg <- rgb(245,245,245, maxColorValue=255)
+    if (col.bg == "#E5DB8E") col.bg <- rgb(251,245,220, maxColorValue=255)
+  }
 
-    if (random.col) clr <- clr[sample(length(clr))]
+  if (random.col) clr <- clr[sample(length(clr))]
 
   if (!is.null(col.fill)) {
     if (n.colors > 1) {
@@ -223,7 +207,12 @@ function(x, by=NULL,
     max.y <- max.y + .18*max.y
   }
 
-  if (is.null(gap)) gap <- ifelse (is.matrix(x) && beside, c(0.1,1), 0.2)
+  if (is.null(gap)) {  # ifelse does not work here when gap is a vector
+    if (!is.null(by) && beside)
+      gap <- c(0.1,1)
+    else
+      gap <- 0.2
+  }
 
   # get max label size
   the.names <- integer(length=0)
@@ -249,7 +238,13 @@ function(x, by=NULL,
   # ----------------------------------------------------------------------------
   # set up plot area, color background, grid lines
 
-  if (extend) par(mar=c(5, add.left, 4, 2) + 0.1)
+  if (is.null(main)) {
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+    par(mar=c(4,4,2,2)+0.1)
+    if (extend) par(mar=c(5, add.left, 4, 2) + 0.1)
+  }
+
 
   if (legend.loc == "right.margin"  &&  (!is.null(by) || is.matrix(x)))
     par(oma=c(0,0,0,3))
@@ -273,7 +268,7 @@ function(x, by=NULL,
       barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
         beside=beside, space=gap, axes=FALSE, ...)
   }
-  else {
+  else {  # rescale
     if (rescale == 4) width.bars <- .17
     if (rescale == 3) width.bars <- .22
     if (rescale == 2) width.bars <- .28
@@ -308,24 +303,63 @@ function(x, by=NULL,
       abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
   if (rescale == 0) {
-#    width.bars <- .8   gap <- .6*width.bars
-    barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
-          xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
-          space=gap, cex.axis=cex.axis, cex.names=cex.axis, 
-          col.axis=col.axis, ...)
+    # width.bars <- .8   gap <- .6*width.bars
+    # axisnames suppressed only works if horiz is FALSE,
+    #   otherwise let R generate
+    coords <- barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+          axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
+          space=gap, cex.names=cex.axis, axisnames=horiz, ...)
   }
   else
-    barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
-          xlab=x.lab, ylab=y.lab, main=main.lbl, border=col.stroke, las=las.value, 
+    coords <- barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+          axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), 
-          cex.axis=cex.axis, cex.names=cex.axis,
-          col.axis=col.axis, ...)
+          cex.names=cex.axis, axisnames=horiz, ...)
   if (over.grid) {
     if (!horiz)
       abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
     else
       abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
+
+  # axes  (barplot produces its own axis for the categories,
+  #        unless axisnames=FALSE)
+  ax.freq <- ifelse(horiz, 1, 2)
+  if (!horiz) las.value <- 1
+  axis(ax.freq, cex.axis=cex.axis, col.axis=col.axis, las=las.value, ...) 
+
+  ax.value <- ifelse(horiz, 2, 1)
+  if (!horiz) {
+    if (is.null(value.labels)) {
+      if (is.null(by)) val.lab <- names(x) else val.lab <- colnames(x)
+      if (length(val.lab) == 0) val.lab <- colnames(x)  # read matrix directly
+    }
+    else
+      val.lab <- value.labels
+    val.lab <- gsub(" ", "\n", val.lab) 
+
+    axis(ax.value, at=coords, labels=FALSE, tck=-.01, ...)
+    #offset <- .5 + .01 * rotate.values
+    text(x=coords, y=par("usr")[3], labels=val.lab,
+         pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
+         offset=offset, ...)
+  }
+  #else
+    #text(y=coords, x=par("usr")[1], labels=names(x),
+         #pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
+    
+  # axis labels
+  lbl.lns <- 3
+  lblx.lns <- ifelse (grepl("\n", x.lab, fixed=TRUE), lbl.lns + 0.5, lbl.lns)
+  lblx.lns <- lblx.lns - 0.5
+  if (offset > 0.5) lblx.lns <- lblx.lns + 0.5
+  #if (!horiz) lblx.lns <- lblx.lns - 1
+  #if (offset > 0.5) lblx.lns <- lblx.lns + 1
+  lbly.lns <- ifelse (grepl("\n", y.lab, fixed=TRUE), lbl.lns - .4, lbl.lns)
+  if (horiz) lbly.lns <- lbly.lns - .5
+  title(xlab=x.lab, line=lblx.lns, cex.lab=cex.lab, col.lab=col.lab)
+  title(ylab=y.lab, line=lbly.lns, cex.lab=cex.lab)
+  title(main=main.lab, col.main=col.main)
 
 
   # ----------------------------------------------------------------------------
@@ -425,15 +459,25 @@ function(x, by=NULL,
 
   # ----------------------------------------------------------------------------
   # text output
-  if (prop) x  <- x.temp
+  if (prop && is.null(count.levels)) {
+    if (!is.null(by) || is.matrix(x))
+      x  <- x.temp 
+    else
+      x <- table(x.temp)
+  }
+  if (prop && !is.null(count.levels))
+    x <- as.table(x.temp)
 
-  if (length(dim(x)) == 1  && !quiet) {  # one variable
+  if (is.null(by)  &&  !is.matrix(x)  && !quiet) {  # one variable, dim == 0 if x<-x.temp 
+  #if (length(dim(x)) == 1  && !quiet) {  # one variable, dim == 0 if x<-x.temp 
 
-    stats <- .ss.factor(x)
+    stats <- .ss.factor(x, by=NULL, brief=TRUE, digits.d=NULL,
+                        x.name, y.name, x.lbl, y.lbl)
 
     txttl <- stats$title
-    counts <- stats$counts
+    counts <- stats$count
     chi <- stats$chi
+
     class(txttl) <- "out_piece"
     class(counts) <- "out_piece"
     class(chi) <- "out_piece"
@@ -443,7 +487,8 @@ function(x, by=NULL,
   }
 
   else {  # two variables
-    stats <- .ss.factor(x, by, brief=TRUE) 
+    stats <- .ss.factor(x, by, brief=TRUE, digits.d=NULL,
+                        x.name, y.name, x.lbl, y.lbl) 
 
     txttl <- stats$txttl
     txfrq <- stats$txfrq
@@ -451,7 +496,13 @@ function(x, by=NULL,
     class(txttl) <- "out_piece"
     class(txfrq) <- "out_piece"
     class(txXV) <- "out_piece"
-    output <- list(out_title=txttl, out_text=txfrq, out_XV=txXV)
+    if (!prop)
+      output <- list(out_title=txttl, out_text=txfrq, out_XV=txXV)
+    else {
+      txrow <- stats$txrow
+      class(txrow) <- "out_piece"
+      output <- list(out_title=txttl, out_text=txfrq, out_row=txrow, out_XV=txXV
+)   }
     class(output) <- "out_all"
     print(output)
 

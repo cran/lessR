@@ -9,6 +9,9 @@ function(n, prob=.5, show.title=TRUE,
       "Specify the number of flips with:  n\n\n")
   }
 
+  if (!is.null(pdf.file))
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
   # set up graphics system
   .opendev(pdf.file, pdf.width, pdf.height)
 
@@ -17,7 +20,7 @@ function(n, prob=.5, show.title=TRUE,
   par(mar=c(3,3,1.5,3.5), mgp=c(1.75,.5,0))
 
   plot(0, type="n", xlim=c(1,n), ylim=c(0,1), xlab="Number of Flips", 
-       ylab="Estimate", cex.lab=.8, cex.axis=.7)
+       ylab="Estimate", cex.lab=0.8, cex.axis=0.7)
 
   # color the plot region between the axes
   usr = par("usr")
@@ -54,7 +57,8 @@ function(n, prob=.5, show.title=TRUE,
    title(main=mainlabel, cex.main=.85)
   }
   n.heads <- sum(flips)
-  mtext(bquote(paste(" ", mu, "=", .(prob))), side=4, cex=.85, col="darkslateblue", las=2, at=c(prob))
+  mtext(bquote(paste(" ", mu, "=", .(prob))), side=4, cex=.85,
+        col="darkslateblue", las=2, at=c(prob))
   mtext(bquote(paste(" ", .(n.heads), " Heads")), side=4, cex=.7, las=2, at=c(1))
   mtext(bquote(paste(" ", .(n-n.heads), " Tails")), side=4, cex=.7, las=2, at=c(0))
 

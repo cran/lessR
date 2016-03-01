@@ -1,12 +1,11 @@
 .dp.main <- 
 function(x, by,
          col.fill, col.stroke, col.bg, col.grid, shape.pts,
-         cex.axis, col.axis, xlab, main, cex,
-         method, pt.reg, pt.out, 
+         cex.axis, col.axis, xlab, main, sub, cex,
+         rotate.values, offset, method, pt.reg, pt.out, 
          col.out30, col.out15, quiet, new, ...) {
 
-
-  if (is.null(cex)) pt.size <- 0.8 else pt.size <- cex
+  pt.size <- ifelse (is.null(cex), 0.8, cex)
 
   if (is.factor(x)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -31,10 +30,20 @@ function(x, by,
     col.out15 <- "gray60"
   }
 
+  # get values for ... parameter values
+  stuff <- .getdots(...)
+  col.main <- stuff$col.main
+  col.lab <- stuff$col.lab
+  col.sub <- stuff$col.sub
+  cex.main <- stuff$cex.main
+
   # get variable labels if exist plus axes labels
-  gl <- .getlabels(xlab, main=main)
-  x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
+  gl <- .getlabels(xlab, main=main, cex.lab=0.98)
+  x.name <- gl$xn; x.lbl <- gl$xl
+  x.lab <- gl$xb
   main.lab <- gl$mb
+  sub.lab <- gl$sb
+  cex.lab <- gl$cex.lab
   by.name <- getOption("byname")
 
   # text output (before remove missing)
@@ -47,12 +56,34 @@ function(x, by,
   if (new) {
     # set up plot area
 
-    if (!is.null(by)) par(omi=c(0,0,0,0.6))  # legend in right margin
+    if (is.null(main) &&  is.null(by)) {
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+      par(mar=c(4,4,2,2)+0.1)
+    }
 
-    stripchart(x, col="transparent", xlab=x.lab,
-       main=main.lab, axes=FALSE, ...)
-    # jitter passes to stripchart, but not to axis
-    suppressWarnings(axis(1, cex.axis=cex.axis, col.axis=col.axis, ...))
+    if (!is.null(by)) {
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+      par(omi=c(0,0,0,0.6))  # legend in right margin
+    }
+
+    stripchart(x, col="transparent", xlab=NULL, ylab=NULL, main=NULL,
+       axes=FALSE, ann=FALSE, ...)
+
+    # jitter passes to stripchart, but generates warning to axis
+    #suppressWarnings(axis(1, cex.axis=cex.axis, col.axis=col.axis, ...))
+
+    # axis, axis ticks
+    .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
+          par("usr")[1], par("usr")[3], cex.axis, col.axis,
+          rotate.values, offset, ...)
+
+    # axis labels
+    y.lab <- ""
+    max.lbl <- max(nchar(axTicks(2)))
+    .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
+          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
     
     # colored background for plotting area
     usr <- par("usr")
@@ -117,5 +148,21 @@ function(x, by,
     .plt.legend(levels(by), col.stroke, clr, clr.tr, shp, trans.pts, col.bg, usr)
 
   }  # end by group
+
+      txss <- ""
+      if (!quiet) {
+        digits.d <- NULL
+        ssstuff <- .ss.numeric(x, digits.d=digits.d, brief=TRUE)
+        txss <- ssstuff$tx
+
+        txotl <- .outliers(x)
+        if (length(txotl)==0) txotl <- "No outliers"
+
+        class(txss) <- "out_piece"
+        class(txotl) <- "out_piece"
+        output <- list(out_ss=txss, out_outliers=txotl)
+        class(output) <- "out_all"
+        print(output)
+      }
 
 }

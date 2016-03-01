@@ -27,20 +27,29 @@ function(x, value=NULL, data=mydata, quiet=getOption("quiet")) {
           "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
     }
   }
+    # see if variable exists in the data frame
+    x.is.var <- FALSE
+    if (nzchar(x.name)) if (exists(x.name, where=data)) 
+      x.is.var <- TRUE
+
+
+  # ------------------------------------------
 
   # display existing label or all labels
   if (is.null(value)  &&  !in.global  &&  fmt=="none") {  
-    if (nchar(x.name) > 0) {
+    if (nzchar(x.name)) {
       gl <- .getlabels()
       lbl <- gl$xl
       if (is.null(lbl)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The variable label does not exist for variable: ", x.name, "\n\n")
       }
+      cat("\n")
       cat(x.name, ": ", lbl, "\n", sep="")
      }
     else {  # display all labels
       mylabels <- attr(data, which="variable.labels")
+      cat("\n")
       for (i in 1:length(mylabels))
         cat(names(mylabels)[i], ": ", mylabels[i], "\n", sep="")
     }
@@ -49,11 +58,15 @@ function(x, value=NULL, data=mydata, quiet=getOption("quiet")) {
   else {  # assign labels to vars in a data frame and return data frame
 
     if (fmt == "none")  # no external file
-      mylabels <- read.csv(text=lbl, col.names=c("Var", "label"), row.names=1)
-    else if (fmt == "csv") {
-      mylabels <- read.csv(x, header=FALSE, col.names=c("Var", "label"),
-                           row.names=1)
-}
+      if (!x.is.var)  # x is a file var names and labels from the console
+        mylabels <- read.csv(text=x, col.names=c("Var", "label"), row.names=1,
+                             header=FALSE)
+      else {  # x is a single variable
+        mylabels <- c(x.name, value)
+      }
+    else if (fmt == "csv")  # x is a file name
+      mylabels <- read.csv(x, col.names=c("Var", "label"), row.names=1,
+                           header=FALSE)
     else { 
       if (fmt=="Excel"  &&  grepl("http", x, fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",

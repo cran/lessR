@@ -5,13 +5,15 @@ function(x, data=mydata,
          random.col=FALSE, main=NULL, cex=1, cex.main=1,
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
-# ... not working in call to pie, results in a square chart
 
 
   if (missing(colors)) 
     colors <- getOption("colors")
   else
     colors <- match.arg(colors)
+
+  if (!is.null(pdf.file))
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
 
   x.name <- deparse(substitute(x)) 
   options(xname = x.name)

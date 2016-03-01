@@ -11,8 +11,9 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
 
   nu <- integer(length(n.var))
 
-
   if (!brief) {
+    cat("\n")
+    .dash(58)
     cat("Dimensions:", n.var, "variables over", n.obs, "rows of data")
 
     cat("\n\n")
@@ -21,7 +22,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     cat("Last two row names: ", row.names(data)[n.obs-1],
         "   ", row.names(data)[n.obs], "\n") 
     .dash(58)
-    cat("\n")
+  }
 
     reg.fac <- FALSE
     for (i in 1:n.var) if (class(data[,i])[1] == "factor") reg.fac <- TRUE
@@ -41,7 +42,6 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     cat("integer: Numeric data values, but integers only\n")
     cat("numeric: Numeric data values with decimal digits\n")
     .dash(60)
-  }
   cat("\n")
 
   #if (any(is.na(mydata)))
@@ -102,6 +102,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     }
   }
   .dash(88)
+
 
   if (!brief) {
     if (colm.ID > 0) {

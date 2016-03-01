@@ -27,7 +27,7 @@ Read(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
       
          max.lines=30, sheet=1,
 
-         brief=getOption("brief"), quiet=getOption("quiet"),
+         brief=TRUE, quiet=getOption("quiet"),
 
          fun.call=NULL, \dots)
 
@@ -72,7 +72,7 @@ Read2(\ldots, sep=";", dec=",")
   \item{brief}{If \code{TRUE}, display only variable names table plus any variable labels.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change the corresponding system
        default with \code{\link{set}} function.}
-  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
+  \item{fun.call}{Function call. Used with \code{Rmd} to pass the function call when
         obtained from the abbreviated function call \code{rd}.}
   \item{...}{Other parameter values define with the R read functions, such as the
        \code{read.table} function for text files, with row.names and header.}
@@ -80,7 +80,7 @@ Read2(\ldots, sep=";", dec=",")
 
 
 \details{
-By default \code{Read} reads text data files which are either comma delimited, \code{csv}, or tab-dilimited data files, native Excel files of type \code{.xls} or \code{.xlsx}, native R files with file type of \code{.rda} and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide feedback regarding details of the data frame that was read. Variables defined by non-numeric variables are read as factors if their values are not unique, otherwise they are read as character strings.
+By default \code{Read} reads text data files which are either comma delimited, \code{csv}, or tab-dilimited data files, native Excel files of type \code{.xls} or \code{.xlsx}, native R files with file type of \code{.rda}, native SAS files with file type \code{.sas7bdat}, and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide feedback regarding details of the data frame that was read. Variables defined by non-numeric variables are read as factors if their values are not unique, otherwise they are read as character strings.
 
 CREATE csv FILE\cr
 One way to create a csv data file is to enter the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
@@ -134,7 +134,7 @@ If there is a comma in the variable label, then the label needs to be enclosed i
 
 The \code{lessR} functions that provide analysis, such as \code{\link{Histogram}} for a histogram, automatically include the variable labels in their output, such as the title of a graph.  Standard R functions can also use these variable labels by invoking the \code{lessR} function \code{\link{label}}, such as setting \code{main=label(I4)} to put the variable label for a variable named I4 in the title of a graph.  
 
-Variable units may also be added to the third column of a variable label file. These are used for generating a better natural language text in the generation of R~Markdown files with the knitr.file option on supporting functions such as \code{\link{Regression}}. For currency (USD), indicate with a unit of: dollar.
+Variable units may also be added to the third column of a variable label file. These are used for generating a better natural language text in the generation of R~Markdown files with the \code{Rmd} option on supporting functions such as \code{\link{Regression}}. For currency (USD), indicate with a unit of: dollar.
 }
 
 \value{
@@ -187,6 +187,8 @@ Wickham, H. (2015). Read Excel Files. \url{http://CRAN.R-project.org/package=rea
 
 # do not display any output
 # mydata <- Read(quiet=TRUE)
+# display full output
+# mydata <- Read(brief=FALSE)
 
 # read the built-in data set datEmployee
 mydata <- Read("Employee", format="lessR")

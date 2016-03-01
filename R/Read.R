@@ -7,7 +7,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
       
          max.lines=30, sheet=1,
 
-         brief=getOption("brief"), quiet=getOption("quiet"), 
+         brief=TRUE, quiet=getOption("quiet"), 
 
          fun.call=NULL, ...) {
 
@@ -27,10 +27,12 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
     browse <- TRUE
     ref <- file.choose()
     fncl <- paste("Read(", "ref = \"", ref,  "\", quiet = TRUE)", sep="")
-   
+    fncl2 <- paste("Read(", "ref = \"", ref,  "\")", sep="")
   }
-  else
+  else {
     fncl <- .fun.call.deparse(fun.call) 
+    fncl2 <- .fun.call.deparse(fun.call)  # for read_excel currency bug
+  }
 
   options(read.call=fncl)  # save for knitr run
 
@@ -50,12 +52,12 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
   if (format=="Excel"  &&  grepl("http", ref, fixed=TRUE)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "At this time the underlying read_excel function\n",
-        "does not support reading Excel files from the web.\n",
-        "Can use the  download.file  function to download to the\n",
-        "local file system.\n\n",
+        "  does not support reading Excel files from the web\n",
+        "Can use the  download.file  function to download to your\n",
+        "  local file system and read from there\n\n",
         "  download.file(\"", ref, "\", \"MYFILE.xlsx\")\n\n",
-        "Replace MYFILE with the desired file name.\n",
-        "Enter  getwd()  to see where the file was saved. \n\n")
+        "Replace MYFILE with the desired file name\n",
+        "Enter  getwd()  to see where the file was saved \n\n")
   }
 
   # construct full path name for label file if not already
@@ -77,7 +79,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         }
         else
           ref.lbl <- labels
-      }
+      }  # not row2
       else
         ref.lbl <- "labels in second row of data file"
     }
@@ -89,15 +91,15 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
       if (nchar(ref.lbl) > max.chr) max.chr <- nchar(ref.lbl)
     if (format == "Excel") {
       txt <- "Hadley Wickham's readxl package]"
-      cat("[with the read_excel function from", txt, "\n\n") 
+      cat("[with the read_excel function from", txt, "\n") 
     }
-    else
+    if (brief)
+      cat("[more information with details() for mydata, or details(name)]\n")
+    if (browse) {
       cat("\n")
-    if (!(brief && !browse)) {
       cat("Data File:  ", ref, "\n")
       if (!is.null(labels))  cat("Label File:  ", ref.lbl, "\n")
     }
-    if (!brief) .dash(58)
   }
 
   # see if labels=="row2"
@@ -250,7 +252,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
     d[fnu.col] <- lapply(d[fnu.col], as.character) # back to original char
     d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
     # bug: POSIXct misinterpretation of currency data
-    f.call <- gsub(")$", "", fncl)  # get function call less closing )
+    f.call <- gsub(")$", "", fncl2)  # get function call less closing )
     fnu.col <- logical(length=ncol(d))  # reset
     for (i in 1:ncol(d)) 
       if (class(d[1:rows,i])[1] == "POSIXct") fnu.col[i] <- TRUE
@@ -268,14 +270,11 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
       typ <- paste(typ, ")", sep="")  #  add back removed closing )
       message("The read_excel function sometimes mistakenly reads numbers in\n",
         "the Excel Currency format as the type POSIXct, a date format\n\n",
-        "Type POSIXct was assigned to one or more of your variables:\n",
-        "If type POSIXct is not the correct data type:\n\n",
-        "1. Re-open the Excel file and convert any Currency formatted data\n",
-        "   to the Number format\n",
-        "or\n",
-        "2. Explicitly specify if a variable is text, numeric or a date\n",
-        "   by adding the  col_types  option to Read, so re-read the data\n",
-        "   by copying and pasting the following: \n\n",
+        "Type POSIXct was assigned to one or more of your variables\n\n",
+        "If the variable assigned type POSIXct is not a date, do the following\n\n",
+        "Explicitly specify if a variable is text, numeric or a date\n",
+        "  by adding the  col_types  option to Read, so re-read the data\n",
+        "  by copying and pasting the following: \n\n",
         "   ", typ, "\n")
     }
   }

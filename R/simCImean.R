@@ -21,6 +21,9 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
       "Standard deviation, sigma, cannot be negative.\n\n")
   }
 
+  if (!is.null(pdf.file))
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
   alpha <- 1-cl
   tcut <- qt(1-alpha/2, df=n-1)
   clpct <- round((cl)*100, 2)

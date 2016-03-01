@@ -43,13 +43,15 @@ function(lm.out, cook, cooks.cut,
       col.stroke=getOption("col.stroke.pt"),
       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
       shape.pts=21, col.area=NULL, col.box="black", 
-      cex.axis=.85, col.axis="gray30", xy.ticks=TRUE,
-      xlab="Fitted Values", ylab="Residuals",
-      main="", cex=NULL, kind="default",
-      fit.line="none", col.fit.line="black", bubble.size=.25,
+      cex.axis=.85, col.axis="gray30", col.low=NULL, col.hi=NULL,
+      xy.ticks=TRUE, xlab="Fitted Values", ylab="Residuals",
+      main="", sub=NULL, cex=NULL,
+      value.labels=NULL, rotate.values=0, offset=.5, kind="default",
+      means=TRUE, fit.line="none", col.fit.line="black",
+      bubble.size=.25, bubble.counts=TRUE,
       ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent",
-      diag=FALSE, col.diag=par("fg"), lines.diag=TRUE,
-      quiet=TRUE, sub=txt, cex.sub=.8) 
+      diag=FALSE, col.diag=par("fg"), lines.diag=FALSE,
+      quiet=TRUE)  
   abline(h=0, lty="dotted", lwd=1.5, col=getOption("col.fill.bar"))
   lines(lowess(fit.ord, res.ord, f=.9), col=getOption("col.stroke.pt"))
   res.c <- res[which(cook>=cooks.cut)]

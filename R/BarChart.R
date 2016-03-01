@@ -11,7 +11,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          gap=NULL, prop=FALSE,
          
          xlab=NULL, ylab=NULL, main=NULL,
-         cex.axis=.85, col.axis="gray30", 
+         cex.axis=0.75, col.axis="gray30",
+         value.labels=NULL, rotate.values=0, offset=0.5,
 
          beside=FALSE, col.low=NULL, col.hi=NULL, count.levels=NULL,
 
@@ -29,6 +30,9 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (missing(col.stroke))  # default black border unless dark bg
     if (sum(col2rgb(col.bg))/3 > 80) col.stroke <- "black"
+
+  if (!is.null(pdf.file))
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
 
   x.name <- deparse(substitute(x))
   options(xname = x.name)
@@ -56,6 +60,13 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       if (is.data.frame(x))  # x a data frame
         data <- x
       else {  # x a vector or matrix in global
+        if (exists(x.name, where=.GlobalEnv)) if (is.matrix(x)) { 
+          x.name <- xlab
+          xlab <- NULL
+          y.name <- legend.title
+          options(xname = x.name)
+          options(yname = y.name)
+        }
         x.call <- x
         if (is.function(x.call)) x.call <- eval(substitute(data$x))
       }
@@ -74,20 +85,25 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
       # see if y exists from a function call
       # indicate a function call with sys.nframe returns larger than 1 
-      if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
-        in.call <- TRUE else in.call <- FALSE
+      #if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
+        #in.call <- TRUE else in.call <- FALSE
+
 
       # get conditions and check for data existing
-      if (!in.call) {
+      #if (!in.call) {
         xs <- .xstatus(y.name, df.name, quiet)
         in.global <- xs$ig 
-      }
-      else in.global <- FALSE
+      #}
+      #else in.global <- FALSE
+      # if y is in global, sys.nframe() returns two, in.call is TRUE,
+      #   which leads to in.global FALSE
+      #if (exists(y.name, where=.GlobalEnv)) in.global <- TRUE
 
       # see if var exists in data frame, if x not in Global Env or function call 
-      if (!in.global && !in.call) .xcheck(y.name, df.name, data)
-
-      if (!in.global) y.call <- eval(substitute(data$by))
+      if (!in.global) .xcheck(y.name, df.name, data)
+      #if (!in.global && !in.call) .xcheck(y.name, df.name, data)
+      if (!in.global)
+        y.call <- eval(substitute(data$by))
       else {  # vars that are function names get assigned to global
         y.call <- by
         if (is.function(y.call)) y.call <- eval(substitute(data$by))
@@ -103,16 +119,16 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     if (!missing(count.levels)) {
 
       # get actual variable name before potential call of data$x
-      count.levels.name <- deparse(substitute(count.levels)) 
-      options(count.levelsname = count.levels.name)
+      x.name <- deparse(substitute(count.levels)) 
+      options(xname = x.name)
 
       # get conditions and check for data existing
-      xs <- .xstatus(count.levels.name, df.name, quiet)
+      xs <- .xstatus(x.name, df.name, quiet)
       in.global <- xs$ig 
 
       # see if var exists in data frame, if x not in Global Env or function call 
       if (!missing(x) && !in.global)
-        .xcheck(count.levels.name, df.name, data)
+        .xcheck(x.name, df.name, data)
 
       if (!in.global) count.levels.call <- eval(substitute(data$count.levels))
       else {  # vars that are function names get assigned to global
@@ -143,8 +159,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     bc <- .bc.main(x.call, y.call,
          col.fill, col.stroke, col.bg, col.grid, random.col, colors,
-         horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
-         cex.axis, col.axis,  beside, col.low, col.hi,
+         horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
+         cex.axis, col.axis, rotate.values, offset, beside, col.low, col.hi,
          count.levels.call,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...)
 
@@ -160,8 +176,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else
     bc.data.frame(data, n.cat,
       col.fill, col.stroke, col.bg, col.grid, random.col, colors,
-      horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
-      cex.axis, col.axis,  beside, col.low, col.hi,
+      horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
+      cex.axis, col.axis, rotate.values, offset, beside, col.low, col.hi,
       count.levels,
       legend.title, legend.loc, legend.labels, legend.horiz, quiet,
       pdf.width, pdf.height, ...)

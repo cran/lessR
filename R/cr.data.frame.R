@@ -144,36 +144,38 @@ function(x, miss, show.n, n.cat, digits.d,
   if (graphics  ||  pdf) {
 
     # set up graphics system for 2 windows
-    if (!pdf) {
-      .graphwin(2)
-      dev.set(which=3)
-    }
-    else { 
-      pdf.file <- "Cor_SPmatrix.pdf"
-      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
-    }
+    #if (!pdf) {
+      #.graphwin(2)
+      #dev.set(which=3)
+    #}
+    #else { 
+      #pdf.file <- "Cor_SPmatrix.pdf"
+      #pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    #}
   
     # scatter plot matrix
-      panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        col.pt=getOption("col.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
-        span=2/3, iter=3, ...) 
-      {
-          points(x, y, pch=pch, col=col.pt, cex=cex)
-          ok <- is.finite(x) & is.finite(y)
-          if (any(ok)) 
-            lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
-      }
+      #panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
+        #col.pt=getOption("col.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
+        #span=2/3, iter=3, ...) 
+      #{
+          #points(x, y, pch=pch, col=col.pt, cex=cex)
+          #ok <- is.finite(x) & is.finite(y)
+          #if (any(ok)) 
+            #lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
+      #}
 
-    pairs(x, panel=panel2.smooth)
+    #pairs(x, panel=panel2.smooth)
 
-    if (pdf) {  # terminate pdf graphics
-      dev.off()
-      .showfile(pdf.file, "scatter plot matrix")
-    }
+    #if (pdf) {  # terminate pdf graphics
+      #dev.off()
+      #.showfile(pdf.file, "scatter plot matrix")
+    #}
 
     # heat map
-    if (!pdf) 
-      dev.set(which=4) 
+    if (!pdf) {
+      .graphwin(1)
+      dev.set(which=3) 
+    }
     else { 
       pdf.file <- "Cor_HeatMap.pdf"
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
@@ -202,7 +204,7 @@ function(x, miss, show.n, n.cat, digits.d,
   else
     if (is.null(options()$knitr.in.progress))
       cat("\n>>> To view comments, enter the name of the saved object, e.g., mycor\n")
-      cat("\n>>> To view a heat map and scatter plot matrix set:  graphics=TRUE\n\n")
+      cat("\n>>> To view a heat map, set:  graphics=TRUE\n\n")
 
   return(list(txb=txb, txm=txm, txc=txc, cors=crs))
 

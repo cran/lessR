@@ -6,7 +6,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.4      feedback: gerbing@pdx.edu     web: lessRstats.com\n",
+      "lessR 3.4.4     feedback: gerbing@pdx.edu    web: lessRstats.com\n",
       "----------------------------------------------------------------\n",
       "Get started, and for help in general, enter:  Help()\n",
       "Read a text, Excel, SPSS, SAS or R data file:  mydata <- Read()\n",
@@ -163,8 +163,10 @@ function(...) {
     }
   }
 
-  # see if "variable" is really an expression
-  if (grepl("(", var.name, fixed=TRUE) ||  grepl("[", var.name, fixed=TRUE))  {
+  #see if "variable" is really an expression
+  if (grepl("(", var.name, fixed=TRUE) ||  
+      grepl("[", var.name, fixed=TRUE) ||  
+      grepl("$", var.name, fixed=TRUE))  {
     txtA <- paste("A referenced variable in a lessR function can only be\n",
             "a variable name.\n\n", sep="")
     txtB <- "For example, this does not work:\n  > Histogram(rnorm(50))\n\n"
@@ -271,16 +273,40 @@ function(...) {
 
 .xcheck <- function(var.name, dname, data) {
 
-  if ( (!grepl(":", var.name) && !grepl(",", var.name)) ) { # x not var list
+  if ( (!grepl(":", var.name, fixed=TRUE) &&
+        !grepl("c(", var.name, fixed=TRUE)) ) { # x not var list
 
     if (grepl("\"", var.name)) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "No quotes with the variable name.\n\n")
     }
 
+  # see if "variable" is really an expression
+  if (grepl("(", var.name, fixed=TRUE) ||  grepl("[", var.name, fixed=TRUE))  {
+    txtA <- paste("A referenced variable in a lessR function can only be\n",
+            "a variable name\n\n", sep="")
+    txtB <- paste("For example, for the Histogram function, this does not work:\n",
+            "  > Histogram(rnorm(50))\n\n", sep="")
+    txtC <- "Instead do this:\n  > Y <- rnorm(50)\n  > Histogram(Y)"
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+        txtA, txtB, txtC, "\n")
+  }
+
+  # see if "variable" includes a $ 
+  if ( grepl("$", var.name, fixed=TRUE))  {
+    txtA <- paste("A referenced variable in a lessR function just includes\n",
+            "the variable name\n\n", sep="")
+    txtB <- paste("For example, for the Histogram function, this does not work:\n",
+            "  > Histogram(mydata$Y)\n\n", sep="")
+    txtC <- "Instead do this:\n  > Histogram(Y)"
+    txtD <- "If you wish to specify a data table, use option: data"
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+        txtA, txtB, txtC, "\n", txtD, "\n\n")
+  }
+
     # see if variable exists in the data frame
     if (!exists(var.name, where=data)) { 
-      dfs <- .getdfs()
+      dfs <- .getdfs()  # data frames in global
 
       txt1 <- ", the default name \n\n"
       txt2 <- "Either make sure to use the correct variable name, or\n"
@@ -334,17 +360,6 @@ function(...) {
 }
 
 
-# discrete color steps
-.col.discrete <- function() {
-
-  # based on rainbow_hcl(24,c=38,l=75) from colorspace
-  clr <- c( "#A1BAE1", "#D8B193", "#E4ABA8", "#8FC59B", "#B9B3E3",
-            "#B8BD87", "#74C7BD", "#DCA9D4")
-
-  return(clr)
-
-}
-
 # see if cor matrix exists as stand-alone or embedded in list structure
 .cor.exists <- function(cor.nm) {
 
@@ -369,14 +384,12 @@ function(...) {
 }
 
 
-.getlabels <- function(xlab, ylab, main) {
-
-  # get variable labels if they exist
+# get variable labels if they exist
+.getlabels <- function(xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+                       cex.lab=NULL, ...) {
 
   x.name <- getOption("xname")
   y.name <- getOption("yname")
-  x.lbl <- NULL
-  y.lbl <- NULL
 
   dname <- getOption("dname")  # not set for dependent option on tt
   if (!is.null(dname)) {
@@ -394,31 +407,128 @@ function(...) {
     y.lbl <- mylabels[which(names(mylabels) == y.name)]
     if (length(y.lbl) == 0) y.lbl <- NULL
   }
-
-  # axis and legend labels
-  if (!missing(xlab)) {
-    if (!is.null(xlab)) x.lab <- xlab 
-    else if (is.null(x.lbl)) x.lab <- x.name else x.lab <- x.lbl
-    if (length(x.lab) == 1) if (nchar(x.lab) > 45)  # power.ttest: len > 1
-      x.lab <- paste(substr(x.lab,1,45), "...")
+  else {
+    x.lbl <- NULL
+    y.lbl <- NULL
   }
-  else x.lab <- NULL
 
-  if (!missing(ylab)) {
-    if (!is.null(ylab)) y.lab <- ylab
-    else if (is.null(y.lbl)) y.lab <- y.name else y.lab <- y.lbl
-    if (nchar(y.lab) > 50)
-      y.lab <- paste(substr(y.lab,1,50), "...")
+  # x-axis and legend labels
+  if (is.null(x.lbl) && is.null(xlab))
+    x.lab <- x.name
+
+  else {  # process label
+    if (!is.null(xlab))
+      x.lab <- xlab  # xlab specified
+    else if (!is.null(x.lbl)) 
+      x.lab <- x.lbl
+
+    if (length(x.lab) == 1  &&  !is.null(cex.lab)) {   # power.ttest: len > 1
+      if (strwidth(x.lab, units="figure", cex=cex.lab) > .85) {
+        brk <- nchar(x.lab)
+        while (strwidth(substr(x.lab,1,brk), units="figure", cex=cex.lab) > .85)
+          brk <- brk-1 
+        while (substr(x.lab,brk,brk) != " ") brk <- brk-1
+        x.lab <- paste(substr(x.lab,1,brk), "\n",
+                       substr(x.lab,brk+1,nchar(x.lab)))
+        while (strwidth(x.lab, units="figure", cex=cex.lab) > .85)
+          cex.lab <- cex.lab-0.05
+      }
+    }
+
+    var.nm <- ifelse(is.null(xlab), TRUE, FALSE)  # add var name?
+    if (is.null(xlab))
+      var.nm <- ifelse(is.null(x.name), FALSE, TRUE)
+    if (grepl("Frequency", x.lab, fixed=TRUE)) var.nm <- FALSE 
+    if (grepl("Proportion", x.lab, fixed=TRUE)) var.nm <- FALSE 
+    if (grepl("Alternative", x.lab, fixed=TRUE)) var.nm <- FALSE 
+    if (var.nm) {
+      if (!grepl("\n", x.lab, fixed=TRUE))  # bquote removes the \n
+        x.lab <- bquote(paste(italic(.(x.name)), ": ", .(x.lab))) 
+      else
+        x.lab <- paste(x.name, ":", x.lab)
+    }
   }
-  else y.lab <- NULL
+
+  # y-axis and legend labels
+  if (is.null(y.lbl) && is.null(ylab))
+    y.lab <- y.name
+
+  else {  # process label
+    if (!is.null(ylab))
+      y.lab <- ylab  # ylab specified
+    else if (!is.null(y.lbl)) 
+      y.lab <- y.lbl
+
+    if (length(y.lab) == 1  &&  !is.null(cex.lab)) {   # power.ttest: len > 1
+      if (strwidth(y.lab, units="figure", cex=cex.lab) > .85) {
+        brk <- nchar(y.lab)
+        while (strwidth(substr(y.lab,1,brk), units="figure", cex=cex.lab) > .85)
+          brk <- brk-1 
+        while (substr(y.lab,brk,brk) != " ") brk <- brk-1
+        y.lab <- paste(substr(y.lab,1,brk), "\n",
+                       substr(y.lab,brk+1,nchar(y.lab)))
+        while (strwidth(y.lab, units="figure", cex=cex.lab) > .85)
+          cex.lab <- cex.lab-0.05
+      }
+    }
+
+    var.nm <- ifelse(is.null(ylab), TRUE, FALSE)  # add var name?
+    if (is.null(ylab))
+      var.nm <- ifelse(is.null(y.name), FALSE, TRUE)
+    if (grepl("Frequency", y.lab, fixed=TRUE)) var.nm <- FALSE 
+    if (grepl("Proportion", y.lab, fixed=TRUE)) var.nm <- FALSE 
+    if (grepl("Power", y.lab, fixed=TRUE)) var.nm <- FALSE 
+    if (var.nm) {
+      if (!grepl("\n", y.lab, fixed=TRUE))  # bquote removes the \n
+        y.lab <- bquote(paste(italic(.(y.name)), ": ", .(y.lab))) 
+      else
+        y.lab <- paste(y.name, ":", y.lab)
+    }
+  }
+
 
   if (!missing(main)) {
     if (!is.null(main)) main.lab <- main else main.lab <- ""
   }
-  else main.lab <- NULL
+  else
+    main.lab <- NULL
 
-  return(list(xn=x.name, xl=x.lbl, xb=x.lab, 
-              yn=y.name, yl=y.lbl, yb=y.lab, mb=main.lab))
+  if (!missing(sub)) {
+    if (!is.null(sub)) sub.lab <- sub else sub.lab <- ""
+  }
+  else
+    sub.lab <- NULL
+
+  return(list(xn=x.name, xl=x.lbl, xb=x.lab, yn=y.name, yl=y.lbl, yb=y.lab,
+              mb=main.lab, sb=sub.lab, cex.lab=cex.lab))
+}
+
+
+# get values for passed par parameters because ... cannot be passed to title 
+#   in calling routine as each title will invoke sub if active,
+#   and setting the line forces everything on the same line
+.getdots <- function(...) {
+
+  col.main <- NULL
+  col.lab <- NULL
+  sub.lab <- NULL
+  col.sub <- NULL
+  cex.main <- NULL
+
+  dots <- list(...)  
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "col.main")  col.main <- dots[[i]] 
+      if (names(dots)[i] == "col.lab")  col.lab <- dots[[i]] 
+      if (names(dots)[i] == "sub.lab")  sub.lab <- dots[[i]] 
+      if (names(dots)[i] == "col.sub")  col.sub <- dots[[i]] 
+      if (names(dots)[i] == "cex.main")  cex.main <- dots[[i]] 
+    }
+  }
+
+  return(list(col.main=col.main, col.lab=col.lab, sub.lab=sub.lab,
+              col.sub=col.sub, cex.main=cex.main))
+
 }
 
 
@@ -505,12 +615,12 @@ function(...) {
 .title <- function(x.name, y.name, x.lbl, y.lbl, isnullby) {
 
   txt1 <- x.name
-  if (!is.null(x.lbl)) txt1 <- paste(txt1, ", ", x.lbl, sep="")
+  if (!is.null(x.lbl)) txt1 <- paste(txt1, ": ", x.lbl, sep="")
 
   if (isnullby) txt1 <- paste("---", txt1, "---")
   else {
     txt2 <- paste(y.name, sep="")
-    if (!is.null(y.lbl)) txt2 <- paste(txt2, ", ", y.lbl, sep="") 
+    if (!is.null(y.lbl)) txt2 <- paste(txt2, ": ", y.lbl, sep="") 
   }
 
   cat("\n")
@@ -528,7 +638,7 @@ function(...) {
 .title2 <- function(x.name, y.name, x.lbl, y.lbl, isnullby, new.ln=TRUE) {
 
   txt1 <- x.name
-  if (!is.null(x.lbl)) txt1 <- paste(txt1, ", ", x.lbl, sep="")
+  if (!is.null(x.lbl)) txt1 <- paste(txt1, ": ", x.lbl, sep="")
 
   if (isnullby) {
     txt1 <- paste("---", txt1, "---")
@@ -536,7 +646,7 @@ function(...) {
   }
   else {
     txt2 <- paste(y.name, sep="")
-    if (!is.null(y.lbl)) txt2 <- paste(txt2, ", ", y.lbl, sep="") 
+    if (!is.null(y.lbl)) txt2 <- paste(txt2, ": ", y.lbl, sep="") 
   }
 
   tx <- character(length = 0)
@@ -553,6 +663,74 @@ function(...) {
   }
 
   return(tx)
+
+}
+
+
+.axes <- function(x.lvl, y.lvl, axT1, axT2, par1, par3,
+         cex.axis, col.axis, rotate.values=0, offset=0.5, ...) {
+
+  if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1)
+    axis(1, at=axT1, labels=FALSE, tck=-.01, ...)
+    dec.d <- .getdigits(round(axT1,6),1) - 1
+    text(x=axT1, y=par3, labels=.fmt(axT1,dec.d),
+         pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
+         offset=offset, ...)
+  }
+  else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
+    axis(1, at=1:length(x.lvl), labels=FALSE, tck=-.01, ...)
+    text(x=axT1, y=par3, labels=x.lvl,
+         pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
+         offset=offset, ...)
+  }
+
+  if (is.null(y.lvl)  &&  !is.null(axT2)) {
+    axis(2, at=axT2, labels=FALSE, tck=-.01, ...)
+    dec.d <- .getdigits(round(axT2,6),1) - 1
+    text(x=par1, y=axT2, labels=.fmt(axT2,dec.d),
+         pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
+  }
+  else if (!is.null(y.lvl)) {
+    axis(2, at=1:length(y.lvl), labels=FALSE, tck=-.01, ...)
+    text(x=par1, y=axT2, labels=y.lvl,
+         pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
+  }
+}
+
+
+# axis labels
+.axlabs <- function(x.lab, y.lab, main.lab, sub.lab, max.lbl, xy.ticks,
+                    offset=0.5, ...) {
+
+  lbl.lns <- ifelse(xy.ticks, 3, 1)
+  # xlab positioning
+  lblx.lns <- ifelse (grepl("\n", x.lab, fixed=TRUE), lbl.lns + 0.5, lbl.lns)
+  if (!is.null(sub.lab))
+    lblx.lns <- lblx.lns - 1.4
+  else
+    lblx.lns <- lblx.lns - 0.5
+  if (!xy.ticks) lblx.lns <- lblx.lns + .75
+  if (offset > 0.5) lblx.lns <- lblx.lns + 0.5
+
+  # ylab positioning
+  multi <- FALSE
+  for (i in 1:length(y.lab))
+    if (grepl("\n", y.lab[i], fixed=TRUE)) multi <- TRUE  # multi-line
+  if (multi)
+    lbly.lns <- lbl.lns - 1
+  else {  # single line
+    if (max.lbl == 1)
+      lbly.lns <- lbl.lns - .5 
+    else if (max.lbl == 2)
+      lbly.lns <- lbl.lns - .25 
+    else
+      lbly.lns <- lbl.lns
+  }  # single line
+
+  title(xlab=x.lab, line=lblx.lns, ...)
+  title(sub=sub.lab, line=lblx.lns+1, ...)
+  title(ylab=y.lab, line=lbly.lns, ...)
+  title(main=main.lab, ...)
 
 }
 
@@ -659,17 +837,16 @@ function(...) {
 }
 
 
-.ncat <- function(analysis, x.name, nu, n.cat) {
+.ncat <- function(analysis, x.name, nu, n.cat, brief=FALSE) {
 
-      cat("\n>>>", x.name,  "is numeric,",
-          "but only has", nu, "<= n.cat =", n.cat, "levels,",
-          "so treat as categorical.\n\n",
-          "   If categorical, can make this variable a",
-          "factor with R function: factor\n\n",
-          "   If numerical, to obtain the", tolower(analysis),
-          "decrease  n.cat ",
-          "to specify\n",
-          "   a lower number of unique values.\n")
+  cat("\n")
+  cat(x.name, " is numeric, with only ", nu,
+      " unique values <= n.cat=", n.cat,
+      "  so treat as categorical\n", sep="")
+
+  if (!brief)
+    cat("For numeric, set n.cat smaller than ", nu, 
+        " with ", analysis, " or globally with  set\n", sep="")
 
 }
 
@@ -708,6 +885,74 @@ function(...) {
   col.trans <- rgb(r.tr, g.tr, b.tr, alpha=trans.level, maxColorValue=256)
 
   return(col.trans)
+}
+
+
+# discrete color steps with no order
+.col.discrete <- function() {
+
+  # based on rainbow_hcl(24,c=38,l=75) from colorspace
+  clr <- c( "#A1BAE1", "#D8B193", "#E4ABA8", "#8FC59B", "#B9B3E3",
+            "#B8BD87", "#74C7BD", "#DCA9D4")
+
+  return(clr)
+
+}
+
+
+# for BarChart 1-var and PieChart for an ordered factor
+.ordcolors <- function(colors, col.low, col.hi) {
+
+    if (colors == "dodgerblue") { 
+      if (is.null(col.low)) col.low <- rgb(.765,.824,.886)
+      if (is.null(col.hi)) col.hi <- "dodgerblue4"
+    }
+    else if (colors == "sienna") { 
+      if (is.null(col.low)) col.low <- "#F7E9E2"
+      if (is.null(col.hi)) col.hi <- "sienna3"
+    }
+    else if (colors == "blue") { 
+      if (is.null(col.low)) col.low <- "slategray2"
+      if (is.null(col.hi)) col.hi <- "slategray4"
+    }
+    else if (colors == "gray") {
+      if (is.null(col.low)) col.low <- "gray90"
+      if (is.null(col.hi)) col.hi <- "gray25"
+    }
+    else if (colors == "gray.black") {
+      if (is.null(col.low)) col.low <- "gray70"
+      if (is.null(col.hi)) col.hi <- "gray25"
+    }
+    else if (colors == "green") {
+      if (is.null(col.low)) col.low <- "darkseagreen1"
+      if (is.null(col.hi)) col.hi <- "darkseagreen4"
+    }
+    else if (colors == "rose") {
+      if (is.null(col.low)) col.low <- "mistyrose1"
+      if (is.null(col.hi)) col.hi <- "mistyrose4"
+    }
+    else if (colors == "gold") {
+      if (is.null(col.low)) col.low <- "goldenrod1"
+      if (is.null(col.hi)) col.hi <- "goldenrod4"
+    }
+    else if (colors == "red") { 
+      if (is.null(col.low)) col.low <- "coral1"
+      if (is.null(col.hi)) col.hi <- "coral4"
+    }
+    else if (colors == "orange.black") { 
+      if (is.null(col.low)) col.low <- rgb(255,173,91, maxColorValue=256)
+      if (is.null(col.hi)) col.hi <- rgb(169,66,2, maxColorValue=256)
+    }
+    else if (colors == "purple") { 
+      if (is.null(col.low)) col.low <- "purple1"
+      if (is.null(col.hi)) col.hi <- "purple4"
+    }
+    else if (colors == "white") { 
+      if (is.null(col.low)) col.low <- "gray30"
+      if (is.null(col.hi)) col.hi <- "gray90"
+    }
+
+    return(list(col.low=col.low, col.hi=col.hi))
 }
 
 
@@ -821,62 +1066,14 @@ function(...) {
 
 
 
-
 .outliers <- function(x) {
-
-  outliers <- boxplot.stats(x)$out
-  if (length(outliers>0) && unique(na.omit(x)>3)) {
-    cat("\nNumber of outliers:", length(outliers), "\n")
-
-    lo.whisker <- boxplot.stats(x)$stats[1]
-    lo.out <- outliers[outliers < lo.whisker]
-    lo.out <- sort(lo.out, decreasing=FALSE)
-    lo.len <- length(lo.out)
-    cat("Small: ")
-    if (lo.len > 0) {
-      if (lo.len <= 25)
-        for (i in 1:lo.len) cat(format(lo.out[i], scientific=FALSE), " ")
-      else {
-        for (i in 1:16) cat(format(lo.out[i], scientific=FALSE), " ")
-        cat ("...  ")
-        for (i in (lo.len-5):lo.len) cat(format(lo.out[i], scientific=FALSE), " ")
-      }
-    }
-    else
-      cat("none")
-    cat("\n")
-
-    hi.whisker <- boxplot.stats(x)$stats[5]
-    hi.out <- outliers[outliers > hi.whisker]
-    hi.out <- sort(hi.out, decreasing=FALSE)
-    hi.len <- length(hi.out)
-    cat("Large: ")
-    if (hi.len > 0) {
-      if (hi.len <= 25)
-        for (i in 1:hi.len) cat(format(hi.out[i], scientific=FALSE), " ")
-      else {
-        for (i in 1:16) cat(format(hi.out[i], scientific=FALSE), " ")
-        cat ("...  ")
-        for (i in (hi.len-5):hi.len) cat(format(hi.out[i], scientific=FALSE), " ")
-      }
-    }
-    else
-      cat(" none\n")
-
-  }
-
-  cat("\n")
-}
-
-
-.outliers2 <- function(x) {
 
   tx <- character(length = 0)
 
   outliers <- boxplot.stats(x)$out
 
   if (length(outliers>0) && length(unique(na.omit(x)>3))) {
-    tx[length(tx)+1] <- paste("Number of outliers:", length(outliers))
+    tx[length(tx)+1] <- paste("(Box plot) Outliers:", length(outliers))
 
     lo.whisker <- boxplot.stats(x)$stats[1]
     lo.out <- outliers[outliers < lo.whisker]

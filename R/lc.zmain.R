@@ -1,10 +1,10 @@
 .lc.main <- 
 function(y, type,
        col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
-       col.grid, col.bg, cex.axis, col.axis, xy.ticks,
-       line.width, xlab, ylab, main, cex,
+       col.grid, col.bg, cex.axis, col.axis, rotate.values, offset, xy.ticks,
+       line.width, xlab, ylab, main, sub, cex,
        time.start, time.by, time.reverse, 
-       center.line, quiet, ...) {
+       center.line, show.runs, quiet, ...) {
 
   if (!is.numeric(y)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -26,9 +26,11 @@ function(y, type,
   pt.size <- ifelse (is.null(cex), 0.8, cex)
 
   # get variable label and axis labels if they exist
-  gl <- .getlabels(ylab=ylab, main=main)
+  gl <- .getlabels(ylab=ylab, main=main, cex.lab=0.98)
   y.name <- gl$yn;  y.lbl <- gl$yl;  y.lab <- gl$yb
   main.lab <- gl$mb
+  sub.lab <- gl$sb
+  cex.lab <- gl$cex.lab
 
   # count and remove missing data
   n <- sum(!is.na(y))
@@ -68,8 +70,8 @@ function(y, type,
   }
 
   # fill ts chart 
-  if (!is.null(time.start) && is.null(col.area))
-    col.area <- getOption("col.fill.bar")
+  #if (!is.null(time.start) && is.null(col.area))
+    #col.area <- getOption("col.fill.bar")
 
   if (is.null(type)) 
     if (is.null(col.area) || col.area == "transparent") type <- "b" 
@@ -84,16 +86,37 @@ function(y, type,
   digits.d <- .max.dd(y) + 1
   options(digits.d=digits.d)
 
+  if (is.null(main)) {
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+    par(mar=c(4,4,2,2)+0.1)
+  }
 
   # plot setup
-  plot(x, y, type="n", axes=FALSE, xlab=x.lab, ylab=y.lab, main=main.lab, ...)
+  plot(x, y, type="n", axes=FALSE, ann=FALSE, ...)
+
   if (xy.ticks){
     if (is.null(time.start) && class(x)!="ts") 
-      axis(1, cex.axis=cex.axis, col.axis=col.axis, ...)
-    else
+     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
+        par("usr")[1], par("usr")[3], cex.axis, col.axis,
+        rotate.values, offset, ...)
+    else {
       axis.Date(1, x, cex.axis=cex.axis, col.axis=col.axis, ...)
-    axis(2, cex.axis=cex.axis, col.axis=col.axis, ...)
+      #lbl.dt <- as.Date(axTicks(1), origin = "1970-01-01")
+      #axis.Date(1, x, labels=FALSE, tck=-.01, ...)
+      #text(x=lbl.dt, y=par("usr")[3], labels=lbl.dt,
+           #pos=1, xpd=TRUE, cex=cex.axis, col=col.axis)
+      axis(2, at=axTicks(2), labels=FALSE, tck=-.01, ...)
+      dec.d <- .getdigits(round(axTicks(2),6),1) - 1
+      text(x=par("usr")[1], y=axTicks(2), labels=.fmt(axTicks(2),dec.d),
+           pos=2, xpd=TRUE, cex=cex.axis, col=col.axis)
+    }
   }
+
+  # axis labels
+  max.lbl <- max(nchar(axTicks(2)))
+  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
+          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
 
   # colored plotting area
   usr <- par("usr")
@@ -149,11 +172,13 @@ function(y, type,
     gl <- .getlabels()
     x.name <- gl$xn; x.lbl <- gl$xl;
     y.name <- gl$yn; y.lbl <- gl$yl
-    ttlns <- .title2(x.name, y.name, x.lbl, y.lbl, TRUE)
-    class(ttlns) <- "out_piece"
-    output <- list(out_title=ttlns)
-    class(output) <- "out_all"
-    print(output)
+    if (!quiet) {
+      ttlns <- .title2(x.name, y.name, x.lbl, y.lbl, TRUE)
+      class(ttlns) <- "out_piece"
+      output <- list(out_title=ttlns)
+      class(output) <- "out_all"
+      print(output)
+    }
 
 
     # analyze runs
@@ -164,7 +189,7 @@ function(y, type,
       cat(lbl.cat, round(m.y,digits.d), "\n")
       cat("\n")
       .dash(12); cat("Run Analysis\n"); .dash(12)
-      run <- integer(length=200)  # length of ith run in run[i]
+      run <- integer(length=0)  # length of ith run in run[i]
       n.runs <- 1  # total number of runs
       run[n.runs] <- 1
       line.out <- "    1"
@@ -172,9 +197,11 @@ function(y, type,
       for (i in 2:length(y)) {
         if (y[i] != m.y) {  # throw out values that equal m.y
           if (sign(y[i]-m.y) != sign(y[i-1]-m.y)) {  # new run
-            if (n.runs < 10) buf <- "  " else buf <- " "
-            cat("size=", run[n.runs], "  Run", buf, n.runs, ":",
-                line.out, "\n", sep="")
+            if (show.runs) {
+              if (n.runs < 10) buf <- "  " else buf <- " "
+              cat("size=", run[n.runs], "  Run", buf, n.runs, ":",
+                  line.out, "\n", sep="")
+            }
             line.out <- ""
             n.runs <- n.runs + 1
             run[n.runs] <- 0
@@ -191,10 +218,12 @@ function(y, type,
       txt <- "Total number of values that do not equal the "
       cat(txt, lbl.cat, " ", length(y)-length(eq.ctr), "\n", sep="")
       if (length(eq.ctr) != 0) {
-        cat("\nValues ignored that equal the", lbl.cat, "\n")
-        for (i in 1:length(eq.ctr))
-          cat("    #", eq.ctr[i], " ", y[eq.ctr[i]], sep="", "\n")
-        cat("Total number of values ignored:", length(eq.ctr), "\n")
+        if (show.runs) {
+          cat("\nValues ignored that equal the", lbl.cat, "\n")
+          for (i in 1:length(eq.ctr))
+            cat("    #", eq.ctr[i], " ", y[eq.ctr[i]], sep="", "\n")
+          cat("Total number of values ignored:", length(eq.ctr), "\n")
+        }
       }
       else 
         cat("Total number of values ignored that equal the", lbl.cat, 

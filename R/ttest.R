@@ -140,7 +140,6 @@ function(x, y=NULL, ...) {
 # BEGIN
 #-----------------------------------
 
-
   alternative <- match.arg(alternative)
  
   if (missing(x)  &&  missing(n)  &&  missing(n1)) { 
@@ -228,8 +227,24 @@ function(x, y=NULL, ...) {
     }
 
     else if (from.data) {
-      if (!missing(y))
-         y.l <- length(eval(substitute(data$y)))
+      if (!is.numeric((eval(substitute(data$x))))) { 
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "The variable to analyze must be numeric\n\n", 
+          "The problem is that ", x.name, " does not have numeric values\n",
+          "The first value of  ", x.name, "  is ", data[1,x.name],
+          ", which is not numeric\n\n")
+
+      }
+      if (!missing(y)) {
+        y.l <- length(eval(substitute(data$y)))
+        if (!is.numeric((eval(substitute(data$y))))) { 
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "Variables separated by a comma must both be numeric\n\n",
+            "Perhaps use a tilde, ~, instead of a comma with a\n",
+            "  numeric response variable before the tilde and after the\n",
+            "  tilde a grouping variable with exactly two unique values\n\n")
+        }
+      }
       else
          y.l <- 0
       if (!paired) {
@@ -290,13 +305,14 @@ function(x, y=NULL, ...) {
        col.stroke=getOption("col.stroke.pt"),
        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
        shape.pts=21, cex.axis=.85, col.axis="gray30",
-       xy.ticks=TRUE,
-       xlab=x.name, ylab=y.name, main=plot.title[plot.i],
-       cex=.8, kind="default", 
+       col.low=NULL, col.hi=NULL, xy.ticks=TRUE,
+       xlab=x.name, ylab=y.name, main=plot.title[plot.i], sub=NULL,
+       cex=.8, value.labels=NULL, rotate.values=0, offset=.5,
+       kind="default", means=TRUE, 
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
        fit.line="none", col.fit.line="grey55", center.line=NULL,
-       col.bubble=NULL, bubble.size=.25, col.flower=NULL,
-       ellipse=FALSE, 
+       col.bubble=NULL, bubble.size=.25, bubble.counts=TRUE,
+       col.flower=NULL, ellipse=FALSE, 
        diag=TRUE, col.diag=par("fg"), lines.diag=TRUE,
        quiet=TRUE)
 

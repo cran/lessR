@@ -11,20 +11,22 @@ Uses the standard R boxplot function, \code{\link{boxplot}} to display a boxplot
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 
-When output is assigned into an object, such as \code{b} in \code{b <- bx(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output is embedded in documents, facilitated by the \code{knitr.file} option. See \code{value} below.
+When output is assigned into an object, such as \code{b} in \code{b <- bx(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation from an R Markdown file in which R output is embedded in documents, facilitated by the \code{Rmd} option. See \code{value} below.
 }
 
 \usage{
 BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
-        knitr.file=NULL,
+        Rmd=NULL,
 
         col.fill=getOption("col.fill.bar"),
         col.stroke=getOption("col.stroke.bar"), 
         col.bg=getOption("col.bg"),
         col.grid=getOption("col.grid"),
 
-        cex.axis=.85, col.axis="gray30",
-        xlab=NULL, main=NULL, digits.d=NULL,
+        cex.axis=0.75, col.axis="gray30",
+        xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
+
+        rotate.values=0, offset=0.5,
 
         horiz=TRUE, add.points=FALSE,
 
@@ -47,8 +49,8 @@ bx(\ldots)
         default is \code{mydata}.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric data type
-        for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
-  \item{knitr.file}{File name for the file of knitr instructions to be written,
+        for which the variable will be analyzed as a categorical. Default is 0.}
+  \item{Rmd}{File name for the file of R markdown instructions to be written,
         if specified.}
   \item{col.fill}{Color of the box.}
   \item{col.stroke}{Color of any points that designate outliers. By default this
@@ -61,8 +63,14 @@ bx(\ldots)
   \item{col.axis}{Color of the font used to label the axis values.}
   \item{xlab}{Label for the value axis, which defaults to the variable's name.}
   \item{main}{Title of graph.}
+  \item{sub}{Sub-title of graph, below xlab.}
   \item{digits.d}{Number of decimal digits displayed in the listing of the summary
        statistics.}
+  \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
+        longer values, typically used in conjunction with \code{offset}.}
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
+        is 0.5. Larger values such as 1.0 are used to create space for the label when
+        longer axis value names are rotated.}
   \item{horiz}{Orientation of the boxplot. Set \code{FALSE} for vertical.}
   \item{add.points}{If \code{TRUE}, then place a dot plot (i.e., stripchart) over the
        box plot.}
@@ -78,7 +86,9 @@ bx(\ldots)
        by \code{\link{boxplot}} and \code{\link{bxp}} such as \code{whiskcol} for
        the whisker color, etc. and \code{\link{par}}, including \code{ylim} to set
        the limits of the value axis, \code{lwd} for the line width, \code{cex.lab}
-       for the size of the label, \code{col.main} for the title, etc., and \code{col.ticks} to specify the color of the tick marks.}
+       for the size of the label, \code{col.main} for the title, \code{col.lab},
+       \code{sub}, \code{col.sub}, \code{srt} to rotate the axis value labels,
+       and \code{col.ticks} to specify the color of the tick marks.}
 }
 
 
@@ -115,12 +125,12 @@ Instead, do the following:
 }
 
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the \code{knitr} document (see \code{examples}).
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the \code{Rmd} document (see \code{examples}).
 
 READABLE OUTPUT\cr
 code{out_stats}: Summary statistics for a box plot\cr
 code{out_outliers}: Outlier analysis\cr
-code{out_file}: Name and location of optional knitr file\cr
+code{out_file}: Name and location of optional R markdown file\cr
 
 STATISTICS\cr
 code{n}: Number of data values analyzed\cr
@@ -183,6 +193,8 @@ mydata <- rd("Employee", format="lessR", quiet=TRUE)
 
 # box plot with superimposed dot plot (stripchart)
 BoxPlot(Salary, add.points=TRUE)
+# abbreviation
+bx(Salary)
 
 # box plot with results saved to object b instead of displaying 
 b <- BoxPlot(Salary)
@@ -192,6 +204,13 @@ b
 b$out_stats
 # list the names of all the components
 names(b)
+
+# box plot with rotated axis values, offset more from axis
+BoxPlot(Salary, rotate.values=45, offset=1)
+
+# BoxPlot generates R markdown file to be "knit"
+#  such as in RStudio
+bx(Salary, Rmd="myout")
 
 # box plots for all numeric variables in data frame called mydata
 BoxPlot()
@@ -209,5 +228,7 @@ BoxPlot(c(Salary,Years))
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ boxplot }
+
+
 
 

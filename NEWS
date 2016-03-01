@@ -6,6 +6,101 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 3.4.4 (2016-03-01) <<<<<<
+
+-------------
+Updates 3.4.4
+-------------
+
+Graphics general
+  long variable labels printed on graphs with full text, made
+    multi-line and also size shrunk if needed to fit
+  xlab and ylab arguments also printed multi-line, size shrunk if needed
+  variable name pre-pended to the displayed variable label
+  default tick labels size reduced from 0.85 to 0.75, 
+  white space at top of graph reduced if no title
+  rotate.values and offset options provided to rotate axis values so as
+    to provide more space for the label
+  numerical axes value labels all displayed with same number of decimal digits
+
+BarChart
+  for two variables, prop=TRUE plots the row proportion cell frequencies,
+    which are now also displayed in the text output
+  value.labels option added to provide labels other than the existing values
+
+LineChart
+  individual runs not displayed by default, use show.runs to display
+
+ScatterPlot
+  can specify ellipse level including a vector of values to plot
+    multiple ellipses on the same scatter plot
+  allows bubble plot for two categorical variables in addition to the
+    already categorical x variable, and both x and y numeric for 
+    traditional scatter plot or small number of integer values for a
+    bubble plot
+  if bubble is large enough in a bubble plot, include the frequency
+  displays a 1-D bubble plot for a single factor variable
+  scatter plot of one variable more narrow and centered in plot window 
+  introduces the Bubble Matrix Frequency Plot for Likert-type data in which
+    multiple x-variables display a bubble plot of frequencies for the
+    responses for multiple variables 
+  bubble plot from small number of unique numeric values under user control
+    as set with n.cat, default=10 unique values of a variable
+  means plot with categorical x-axis, lines of means are darker, points 
+    transparent, and the points for means are darker (or lighter)
+  summary stats output of stat analysis for each type of scatter plot
+  bubble plot displays corresponding counts, controlled by bubble.counts
+  labels option added to provide labels other than the existing values for
+    non-numeric variables
+  fit.line can be set to TRUE without specifying a specific best-fit line,
+    which provides a loess best-fit line
+  value.labels option added to provide labels other than the existing values
+  alternate names of DotPlot or dp for a 1-variable plot removed
+  
+
+Merge
+  parameters from the R merge function can be passed through, such as all.x=TRUE
+
+Read
+  brief version of output now default, use details function to full version
+
+Regression
+  new name for the generated R markdown file is Rmd instead of knitr.file
+  if data standardized, then so indicated on the output
+
+
+
+---------------
+Bug Fixes 3.4.4
+---------------
+
+BarChart
+  when counts directly specified in a file, count.levels labels 
+    correct variable name
+  beside=TRUE now works for 2-variable plots
+  prop=TRUE now works for 1-variable plots
+  two global variables now correctly produce 2-variable plot
+
+corCFA
+  item content properly displays
+
+Help
+  superfluous graphics window no longer opens for Help(lessR)
+
+Regression
+  if no predictors are not significant at p<.05, analysis now proceeds
+    to generate Rmd file
+  the names of collinear variables now listed in output of Rmd file
+
+ScatterPlot
+  y variable now correctly re-defined according to n.cat when specified
+
+ttestPower
+  values correctly passed for plotting power curve
+
+
+
+
 >>>>>> Changes for lessR version 3.4 (2015-12-27) <<<<<<
 
 -----------
@@ -74,7 +169,7 @@ ScatterPlot
     transparency such as rgb(.8,.8,.8,.2)
   correlation analysis restored
   if xy.ticks is FALSE, then axis labels moved closer to the plot
-  ellipse possible with bubble/sunflower plot
+  ellipse option applies to bubble/sunflower plot
 
 VariableLabels
   new function that essentially replaces label function, with new

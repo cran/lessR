@@ -12,13 +12,13 @@ From the standard R function \code{\link{hist}} plots a frequency histogram with
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 
-When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation in which R output is embedded in documents, facilitated by the \code{knitr.file} option. See \code{value} below.
+When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation from a generated R markdown file according to the \code{Rmd} option in which interpretative R output is embedded in documents. See \code{value} below.
 }
 
 \usage{
 
 Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"),
-         knitr.file=NULL,
+         Rmd=NULL,
 
          col.fill=getOption("col.fill.bar"), 
          col.stroke=getOption("col.stroke.bar"),
@@ -26,12 +26,14 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"),
          col.grid=getOption("col.grid"),
 
          col.reg="snow2", over.grid=FALSE,
-         cex.axis=.85, col.axis="gray30",
+         cex.axis=0.75, col.axis="gray30",
+
+         rotate.values=0, offset=0.5,
 
          breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
 
-         prop=FALSE, cumul=c("off", "on", "both"), 
-         digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL,
+         prop=FALSE, cumul=c("off", "on", "both"), hist.counts=FALSE, 
+         digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
 
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5,
@@ -51,8 +53,8 @@ hs(\ldots)
         default is \code{mydata}.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric data type
-        for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
-  \item{knitr.file}{File name for the file of knitr instructions to be written, if specified.
+        for which the variable will be analyzed as a categorical. Default is 0.}
+  \item{Rmd}{File name for the file of R markdown to be written, if specified.
         The file type is .Rmd, which automatically opens in RStudio, but it is a simple
         text file that can be edited with any text editor, including RStudio.}
   \item{col.fill}{Color of the bars. To set transparency level, use \code{lessR} 
@@ -67,6 +69,11 @@ hs(\ldots)
         values to be smaller than the axis labels. Provides the functionality of,
         and can be replaced by, the standard R \code{cex.axis.}}
   \item{col.axis}{Color of the font used to label the axis values.}
+  \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
+        longer values, typically used in conjunction with \code{offset}.}
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
+        is 0.5. Larger values such as 1.0 are used to create space for the label when
+        longer axis value names are rotated.}
   \item{breaks}{The method for calculating the bins, or an explicit specification of
        the bins, such as with the standard R \code{\link{seq}} function or other options 
        provided by the \code{\link{hist}} function.}
@@ -77,6 +84,8 @@ hs(\ldots)
         of the last bin may be larger than the specified value.}
   \item{prop}{Specify proportions or relative frequencies on the vertical axis. Default
        is \code{FALSE}.}
+  \item{hist.counts}{Replaces standard R \code{labels} options, which has multiple
+       definitions in R. Specifies to display the count of each bin.}
   \item{cumul}{Specify a cumulative histogram. The value of \code{"on"} displays the 
         cumulative histogram, with default of \code{"off"}. The value of \code{"both"} 
         superimposes the regular histogram.}
@@ -84,6 +93,7 @@ hs(\ldots)
   \item{xlab}{Label for x-axis. Defaults to variable name.}
   \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.}
   \item{main}{Title of graph.}
+  \item{sub}{Sub-title of graph, below xlab.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
        no filetype of \code{.pdf}, the filetype is added to the name.}
@@ -92,10 +102,12 @@ hs(\ldots)
   \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
         obtained from the abbreviated function call \code{hs}.}
   \item{\dots}{Other parameter values for graphics as defined processed 
-      by \code{\link{hist}} and \code{\link{plot}}, including \code{xlim}, \code{ylim},
-      \code{lwd} and \code{cex.lab}, \code{col.main}, \code{density}, etc. Also
-      includes \code{labels=TRUE} to display the frequency of the bin at the top
-      of the corresponding bar and \code{col.ticks} to specify the color of the tick marks.}
+      by \code{\link{hist}} and \code{\link{par}} for general graphics,
+      including \code{xlim}, \code{ylim},
+      \code{lwd} and \code{cex.lab}, \code{col.main}, \code{col.lab}, \code{sub},
+      \code{col.sub}, \code{density}, etc. Also includes 
+      \code{col.ticks} to specify the color of the tick marks and 
+      \code{srt} to rotate the axis value labels.}
 }
 
 
@@ -131,13 +143,13 @@ Because of the customized graphic windowing system that maintains a unique graph
 }
 
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the \code{knitr} document (see \code{examples}).
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the R~Markdown document (see \code{examples}).
 
 READABLE OUTPUT\cr
 code{out_ss}: Summary statistics\cr
 code{out_freq}: Frequency distribution\cr
 code{out_outliers}: Outlier analysis\cr
-code{out_file}: Name and location of optional knitr file\cr
+code{out_file}: Name and location of optional Rmd file\cr
 
 STATISTICS\cr
 code{bin_width}: Bin width\cr
@@ -207,11 +219,15 @@ set(colors="blue")
 # can also use bin.start
 Histogram(y, bin.width=.25)
 
+# histogram with rotated axis values, offset more from axis
+# suppress text output
+Histogram(y, rotate.values=45, offset=1, quiet=TRUE)
+
 # histogram with specified bins and grid lines displayed over the histogram
 Histogram(y, breaks=seq(-5,5,.25), xlab="My Variable", over.grid=TRUE)
 
 # histogram with bins calculated with the Scott method and values displayed
-Histogram(y, breaks="Scott", labels=TRUE)
+Histogram(y, breaks="Scott", hist.counts=TRUE, quiet=TRUE)
 
 # histogram with the number of suggested bins, with proportions
 Histogram(y, breaks=15, prop=TRUE)
@@ -260,10 +276,8 @@ Histogram()
 # although data not attached, access the variable directly by its name
 Histogram(breaks, data=warpbreaks)
 
-# histograms for all numeric variables in data frame called mydata
-Histogram()
-#  with specified options
-Histogram(col.fill="palegreen1", col.bg="ivory", labels=TRUE)
+# all histograms with specified options, including red axis labels
+Histogram(col.fill="palegreen1", col.bg="ivory", hist.counts=TRUE, col.lab="red")
 
 # histograms for all specified numeric variables
 # use the combine or c function to specify a list of variables

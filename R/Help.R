@@ -31,18 +31,13 @@ function(topic=NULL) {
 
 
   # ------------------------------------------------
-
-  old.par <- par("mar", "cex", "bg", "fg")
-  on.exit(par(old.par))
+  # ------------------------------------------------
 
   if (missing(topic))
     topic <- NULL
   else {
-    ischar <- tryCatch(is.character(topic) && length(topic) == 1L, error = identity)
-    if (inherits(ischar, "error")) ischar <- FALSE
-    if (!ischar) {
-      topic <- deparse(substitute(topic))
-    }  # else already is a character, i.e., argument entered within quotes
+    topic <- deparse(substitute(topic))  # make a char string if not
+    topic <- gsub("\"", "", topic)  # if already a char string, remove quotes
   }
 
   # convert topic to all lowercase letters
@@ -61,37 +56,50 @@ function(topic=NULL) {
     col.line <- "gray30"
   }
 
+  # set graphic parameters
+  if (!is.null(topic)) {
+    if (topic != "lessr") {
+      old.par <- par("mar", "cex", "bg", "fg")
+      on.exit(par(old.par))
+    }
+  }
+  else {  # topic is null, Help()
+    old.par <- par("mar", "cex", "bg", "fg")
+    on.exit(par(old.par))
+  }
+
+
   if (is.null(topic)) {
 
   t0 <- "Help Topics for lessR"
 
   fcsv <- bquote(paste(bold("Help(data)"), "  Create a data file from Excel or similar application."))
-  frw <- bquote(paste(bold("Help(Read)"), " and ", bold("Help(Write)"), "  Read or write data to or from a file."))
-  flib <- bquote(paste(bold("Help(library)"), "  Access libraries of functions called packages."))
-  ftrans <- bquote(paste(bold("Help(edit)"), "  Edit data and create new variables from existing variables."))
-  fsys <- bquote(paste(bold("Help(system)"), "  System level settings, such as a color theme for graphics."))
+  frw <- bquote(paste(bold("Help(Read)"), " and ", bold("Help(Write)"), "  Read or write data to or from a file"))
+  flib <- bquote(paste(bold("Help(library)"), "  Access libraries of functions called packages"))
+  ftrans <- bquote(paste(bold("Help(edit)"), "  Edit data and create new variables from existing variables"))
+  fsys <- bquote(paste(bold("Help(system)"), "  System level settings, such as a color theme for graphics"))
 
-  fhist <- bquote(paste(bold("Help(Histogram)"), "  Histogram, box plot, dot plot, density curve."))
-  fbar <- bquote(paste(bold("Help(BarChart)"), "  Bar chart, pie chart."))
-  fline <- bquote(paste(bold("Help(LineChart)"), "  Line chart, such as a run chart or time series chart."))
-  fplot <- bquote(paste(bold("Help(ScatterPlot)"), "  Scatterplot for one or two variables, a function plot."))
+  fhist <- bquote(paste(bold("Help(Histogram)"), "  Histogram, box plot, dot plot, density curve"))
+  fbar <- bquote(paste(bold("Help(BarChart)"), "  Bar chart, pie chart"))
+  fline <- bquote(paste(bold("Help(LineChart)"), "  Line chart, such as a run chart or time series chart"))
+  fplot <- bquote(paste(bold("Help(ScatterPlot)"), "  Scatterplot for one or two variables, a function plot"))
 
-  fstat <- bquote(paste(bold("Help(SummaryStats)"), "  Summary statistics for one or two variables."))
-  fone <- bquote(paste(bold("Help(one.sample)"), "  Analysis of a single sample of data."))
-  fmean <- bquote(paste(bold("Help(ttest)"), "  Compare two groups by their mean difference."))
-  faov <- bquote(paste(bold("Help(ANOVA)"), "  Compare mean differences for many groups."))
-  fpwr <- bquote(paste(bold("Help(power)"), "  Power analysis for the t-test."))
-  fcor <- bquote(paste(bold("Help(Correlation)"), "  Correlation analysis."))
-  freg <- bquote(paste(bold("Help(Regression)"), " and ", bold("Help(Logit)"), " Regression analysis, logit analysis."))
-  ffac <- bquote(paste(bold("Help(factor.analysis)"), "  Confirmatory and exploratory factor analysis."))
+  fstat <- bquote(paste(bold("Help(SummaryStats)"), "  Summary statistics for one or two variables"))
+  fone <- bquote(paste(bold("Help(one.sample)"), "  Analysis of a single sample of data"))
+  fmean <- bquote(paste(bold("Help(ttest)"), "  Compare two groups by their mean difference"))
+  faov <- bquote(paste(bold("Help(ANOVA)"), "  Compare mean differences for many groups"))
+  fpwr <- bquote(paste(bold("Help(power)"), "  Power analysis for the t-test"))
+  fcor <- bquote(paste(bold("Help(Correlation)"), "  Correlation analysis"))
+  freg <- bquote(paste(bold("Help(Regression)"), " and ", bold("Help(Logit)"), " Regression analysis, logit analysis"))
+  ffac <- bquote(paste(bold("Help(factor.analysis)"), "  Confirmatory and exploratory factor analysis"))
 
-  fprob <- bquote(paste(bold("Help(prob)"), "  Probabilities for normal and t-distributions."))
-  frnsm <- bquote(paste(bold("Help(random)"), " and ", bold("Help(sample)"), "  Create random numbers or samples."))
+  fprob <- bquote(paste(bold("Help(prob)"), "  Probabilities for normal and t-distributions"))
+  frnsm <- bquote(paste(bold("Help(random)"), " and ", bold("Help(sample)"), "  Create random numbers or samples"))
 
-  fpdf <- bquote(paste(bold("Help(help.to.pdf)"), "  Obtain a printable pdf of all of the contents."))
-  fpck <- bquote(paste(bold("Help(lessR)"), "  lessR manual and list of updates to current version."))
+  fpdf <- bquote(paste(bold("Help(help.to.pdf)"), "  Obtain a printable pdf of all of the contents"))
+  fpck <- bquote(paste(bold("Help(lessR)"), "  lessR manual and list of updates to current version"))
 
-  set.up.plot()
+  set.up.plot() 
   pos1 <- 93; pos2 <- 69; pos3 <- 49; pos4 <- 14; pos5 <- 7
   text(50,100, label=t0, font=4)
   text(0,pos1, label=fcsv, adj=0)
@@ -128,32 +136,35 @@ function(topic=NULL) {
   t0 <- "Data Files"
 
   t1 <- "
-  R can read data files in many formats, including the csv format or
-  \"comma separated values\". A csv file is a text file with commas that
-  separate adjacent values in each row. Usually the variable names are in
-  the first row and each remaining row contains the data for one case, 
-  such as one person or one company, etc. Each column contains the data
-  for the corresponding variable.
+  A data file organizes the data into a table, with variables in the
+  columns and the data for a single person, company, etc. in a row.
+  By default, include the name of each variable in the first row.
+  After the first row, only data values are included. 
 
-  MS Excel or other worksheet application can save data to a csv file. All 
-  numeric data should be displayed in the General format, so that the only
-  non-digit character for each numeric data value is a decimal point.
+  The lessR function Read can read data files in many file formats,
+  including MS Excel. The most generic format is the csv format, for
+  \"comma separated values\". A csv file is a text file with commas
+  that separate adjacent values in each row. Usually the variable
+  names are in the first row and each remaining row contains the data
+  for one case, such as one person or one company, etc. Each column
+  contains the data for the corresponding variable.
 
-  To create the csv file from Excel, do a Save As and choose the csv format.
-  With the free, open source LibreOffice Calc, click the arrow in the left
-  margin towards the bottom labeled File type. From the available options,
-  choose Text CSV. Then Save button. 
+  To create the csv file from Excel, do a Save As and choose the csv
+  format. With the free, open source LibreOffice Calc, click the arrow
+  in the left margin towards the bottom labeled File type. From the
+  available options, choose Text CSV. Then Save button. 
 
-  Another type of text data file is a fixed width format where each column
-  of data values is assigned a specific width. Usually there are no spaces
-  between the data values. R can write a data file [see Help(Write)], what
-  is called an native R data file with a default file type of .rda. Data files
-  written by the SPSS system have the default file type of .sav. By default
-  both of these files can be read into R, as well as Excel files directly."
+  A fixed width format text data file is where each column of data
+  values is assigned a specific width, often with no spaces between
+  the data values. R can write a data file [see Help(Write)], what is
+  called an native R data file with a default file type of .rda. Data files
+  written by the SPSS system have the default file type of .sav. Both
+  of these files can be read into R, as well as Excel files directly.
+  "
 
   set.up.plot(0)
   text(50,100, label=t0, font=4)
-  text(0,53, label=t1, adj=0)
+  text(0,52, label=t1, adj=0)
 
   help.more("Read", 8)
   }
@@ -167,24 +178,25 @@ function(topic=NULL) {
   t1 <- "
   Browse for a csv, tab-delimited, Excel, R, SAS, or SPSS data file on 
   your file system and read the information into the specified data table
-  (frame) with Read, or its abbreviations, rd or rd.brief. To browse, use ().
+  with Read, or its abbreviation, rd. To browse, use an empty ().
       > mydata <- Read()
   The  <-, the assignment operator, instructs R to assign what was read
-  to the data table (frame), here specified as mydata. This is the default
-  name that the lessR data analysis functions assume when reading data.
-  Read variable labels with the labels option to specify the file of labels.
+  to the data table, here named mydata. This is the default name that
+  the lessR data analysis functions assume will be analyzed. Read
+  variable labels with the labels option to specify the file of labels.
 
-  Or, specify the data file name in quotes, such as from the web.
+  Or, specify the full data path name in quotes, such as from the web.
       > mydata <- Read(\"http://lessrstats.com/data/twogroup.csv\")
   To read a text file with a comma for a decimal point, use Read2().
 
-  To read Excel files requires something called Perl, which is on Mac
-  and Linux systems, but Windows users will be prompted to install.
+  If you wish to view more information about the data table, do
+      > details()
+  If the file is not read into mydata, include the name: details(name).
 
-  To read a text file with each column of data values assigned a specific
-  width, add the widths option that specifies the width of each column
-  according to the order of the variables.  Enclose the list with the c
-  function for combine, here to read 2 variables with widths of 4 and 1.
+  To read a text file in which each column of data values assigned a
+  specific width, add the widths option that specifies the width of each
+  column according to the order of the variables.  Enclose the list
+  with the c function, here read two variables with widths of 4 and 1.
       > mydata <- Read(widths=c(4,1), col.names=c(\"ID\", \"Gender\"))
   "
 
@@ -192,7 +204,7 @@ function(topic=NULL) {
   text(50,100, label=t0, font=4)
   text(0,94, label=f1, adj=0)
   #lines(c(5,90), c(89,89), col=col.line)
-  text(0,48, label=t1, adj=0)
+  text(0,49, label=t1, adj=0)
 
   help.more("Read", 9)
   }
@@ -243,16 +255,17 @@ function(topic=NULL) {
   f3 <- bquote(paste(bold(update.packages), "  Update contributed packages to current versions."))
 
   t1 <- "
-  All of R works with functions contained in specific packages. Some packages, 
-  such as graphics, are included with the default installation of R, and are
-  pre-loaded each time R is run. Other packages must be explicitly downloaded. 
+  R works with functions and each function is contained in a specific
+  package. Some packages, such as graphics, are included with the
+  default installation of R, and are pre-loaded each time R is run.
+  Other packages must be explicitly downloaded from the R servers. 
 
-  The example here is for the contributed package lessR. Install one time 
-  only for a specific computer, with quotes.
+  The example here is for the contributed package lessR. Install one
+  time only for a specific computer, with quotes.
       > install.packages(\"lessR\")
 
-  Each time the R application is started, including after the install, load the 
-  package from the library, without using quotes.
+  Each time the R application is started, including after the install,
+  load the package from the library, without using quotes.
       > library(lessR)
   To see the description of the package and a list of its functions,
       > library(help=lessR)
@@ -268,9 +281,9 @@ function(topic=NULL) {
   text(0,90, label=f2, adj=0)
   text(0,86, label=f3, adj=0)
   #lines(c(5,90), c(80,80), col=col.line)
-  text(0,44, label=t1, adj=0)
+  text(0,48, label=t1, adj=0)
 
-  help.more("install.packages", 8)
+  help.more("install.packages", 10)
   }
 
 
@@ -285,13 +298,13 @@ function(topic=NULL) {
   f5 <- bquote(paste(bold("Subset"), "  Extract a subset of data, variables (columns) and/or rows."))
 
   t1 <- "
-  The R function fix provides a graphical/mouse interface for editing data.
+  R function fix provides a graphical/mouse interface for editing data.
       > fix(mydata)
-  The lessR function Transform creates a new variable or rewrites over existing.
+  lessR function Transform creates a new variable or rewrites over existing.
       > mydata <- Transform(SalaryDiv=Salary/1000)
-  The lessR function Recode changes individual values. 
+  lessR function Recode changes individual values. 
       > mydata <- Recode(Scores, old=c(1:4), new=c(10,15,20,25))
-  Use the R function factor to create a new variable with non-numeric categories.
+  R function factor creates a new variable with non-numeric categories.
   Severity was encoded with a 1 for Mild, 2 for Moderate and 3 for Severe.
       > mydata <- Transform(ordered=TRUE, Severity.f= 
                    factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
@@ -299,7 +312,7 @@ function(topic=NULL) {
   Extract subsets of data from a data frame with the lessR Subset function.
       > mydata <- Subset(rows=Gender==\"M\", columns=c(Years, Salary))
   The data frame, mydata, now consists only of data for Males limited to
-  the variables Years and Salary. To just display a subset, drop the mydata <-.
+  the variables Years and Salary. To display a subset, drop the mydata <-.
   "
 
   set.up.plot(5)
@@ -310,9 +323,9 @@ function(topic=NULL) {
   text(0,82, label=f4, adj=0)
   text(0,78, label=f5, adj=0)
   #lines(c(5,90), c(78,78), col=col.line)
-  text(0,40, label=t1, adj=0)
+  text(0,44, label=t1, adj=0)
 
-  help.more("Recode", 9)
+  help.more("Recode", 11)
   }
 
 
@@ -652,7 +665,7 @@ function(topic=NULL) {
       > ANOVA(Y ~ X)
   This is called one-way ANOVA because there is only a single factor, X.
 
-  If the ANOVA with more than two levels is significant, then a post-hoc
+  If the ANOaVA with more than two levels is significant, then a post-hoc
   examination of the mean differences with a controlled error rate will help
   uncover where the differences occurred. The ANOVA function relies
   upon the Tukey HSD procedure, providing both text and graphics output.
@@ -755,22 +768,23 @@ function(topic=NULL) {
   f2 <- bquote(paste(bold("Model, model"), "  Regression analysis if the variables are numerical."))
 
   t1 <- "
-  The text output of Regression, or reg, is comprehensive. Here obtain
-  a multiple regression of response Y and two predictors, X1 and X2.
+  The full text output of Regression, or reg, is comprehensive. Here
+  specify a multiple regression of response Y and two predictors,
+  X1 and X2.
        > Regression(Y ~ X1 + X2)
+  Obtain abbreviated output with brief=TRUE, or use the abbreviation,
+       > reg.brief(Y ~ X1 + X2)
 
   Can save the output for later analysis and viewing, such as with knitr,
-  and also create a text file of knitr instructions with file type .Rmd.
-       > r <- reg(Y ~ X1 + X2, knitr.file=\"reg_knitr\")
+  and create a text file of R Markdown instructions with file type .Rmd.
+       > r <- reg(Y ~ X1 + X2, Rmd=\"reg_out\")
        > r                       # to see all the output
        > r$out_coefs     # to see this one segment of output
        > names(r)        # to see the names of the output segments
   Many types of output are contained in r, which consists of text output for
-  viewing, statistics in numerical format, and also the knitr instructions
+  viewing, statistics in numerical format, and also the markdown instructions
   to generate the corresponding html, pdf or Word document from RStudio.
-
-  To obtain abbreviated output set brief=TRUE, or use the abbreviation,
-       > reg.brief(Y ~ X1 + X2)
+  
   To obtain specified prediction intervals for new data, for example,
        > reg(Y ~ X1 + X2, X1.new=c(10,20), X2.new=c(100:110))
   X1.new, X2.new, etc. always specify the values of the predictor
@@ -779,9 +793,9 @@ function(topic=NULL) {
   set.up.plot(1)
   text(50,100, label=t0, font=4)
   text(0,94, label=f1, adj=0)
-  text(0,52, label=t1, adj=0)
+  text(0,54, label=t1, adj=0)
 
-  help.more("Regression", 9)
+  help.more("Regression", 10)
 
   }
 

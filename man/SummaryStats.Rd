@@ -33,7 +33,7 @@ ss(\dots)
         \code{mydata} by default.}
   \item{by}{Applies to an analysis of a numeric variable, which is then analyzed at each level of the \code{by} variable. The variable is coerced to a factor.}
   \item{data}{Optional data frame that contains the variable of interest, default is \code{mydata}.}
-  \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
+  \item{n.cat}{Specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Default is off, set to 0.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{set}} function.}
 

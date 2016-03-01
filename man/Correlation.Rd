@@ -38,7 +38,7 @@ cr(\ldots)
   \item{brief}{Pretains to a single correlation coefficient analysis. If 
        \code{FALSE}, then the sample covariance and number of non-missing
        and missing observations are displayed.}
-  \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
+  \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Default is 0.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
   \item{graphics}{If \code{TRUE}, generate a scatter plot matrix and heat map.}
   \item{main}{Graph title of heat map. Set to \code{main=""} to turn off.}

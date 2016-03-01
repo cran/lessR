@@ -188,8 +188,9 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
         col.stroke=getOption("col.stroke.pt"), 
         col.fill=getOption("col.fill.bar"), shape.pts=21,
         col.grid=getOption("col.grid"), col.bg=getOption("col.bg"),
-        cex.axis=0.85, col.axis="gray30", xy.ticks=TRUE,
-        line.width=1.1, xlab=NULL, ylab=NULL, main=plt.title[plt.i], cex=NULL,
+        cex.axis=0.75, col.axis="gray30", rotate.values=0, offset=.5,
+        xy.ticks=TRUE, line.width=1.1,
+        xlab=NULL, ylab=NULL, main=plt.title[plt.i], sub=NULL, cex=NULL,
         time.start=NULL, time.by=NULL, time.reverse=FALSE,
         center.line="default", quiet=TRUE)
 

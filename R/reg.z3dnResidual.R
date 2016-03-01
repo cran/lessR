@@ -1,5 +1,5 @@
 .reg3dnResidual <-
-function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE) {
+function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -27,7 +27,7 @@ function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE) {
     col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
     col.nrm="gray40", col.gen="gray40",
     col.fill.nrm="transparent", col.fill.gen="transparent",
-    cex.axis=.85, col.axis="gray30", 
+    cex.axis=.85, col.axis="gray30", rotate.values=0, offset=0.5, 
     x.pt=NULL, xlab="Residuals",
     main="", y.axis=FALSE, 
     x.min=NULL, x.max=NULL, band=FALSE, quiet=TRUE)

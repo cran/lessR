@@ -1,6 +1,6 @@
 Histogram <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
-    knitr.file=NULL,
+    Rmd=NULL,
 
     col.fill=getOption("col.fill.bar"), 
     col.stroke=getOption("col.stroke.bar"),
@@ -8,12 +8,14 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     col.grid=getOption("col.grid"),
 
     col.reg="snow2", over.grid=FALSE,
-    cex.axis=.85, col.axis="gray30", 
+    cex.axis=0.75, col.axis="gray30", 
+
+    rotate.values=0, offset=0.5,
 
     breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
 
-    prop=FALSE, cumul=c("off", "on", "both"), 
-    digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL,
+    prop=FALSE, cumul=c("off", "on", "both"), hist.counts=FALSE,
+    digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
 
     quiet=getOption("quiet"),
     pdf.file=NULL, pdf.width=5, pdf.height=5,
@@ -24,6 +26,31 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
+
+  if (!is.null(pdf.file))
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
+  kf <- FALSE
+  lbls <- FALSE
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "knitr.file") kf <- TRUE 
+      if (names(dots)[i] == "labels") lbls <- TRUE 
+    }
+  }
+
+  if (lbls) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "labels  has multiple definitions in R\n",
+      "Instead use  hist.counts  to get the bar labels displayed\n\n")
+  }
+
+  if (kf) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "knitr.file  no longer used\n",
+      "Instead use  Rmd  for R Markdown file\n\n")
+  }
         
   if (is.numeric(breaks) && !is.null(bin.start)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -103,7 +130,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
       pdf.fnm <- .pdfname("Hist", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)
- 
+
       txss <- ""
       if (!quiet) {
         ssstuff <- .ss.numeric(data[,i], digits.d=digits.d, brief=TRUE)
@@ -111,14 +138,15 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       }
 
       stuff <- .hst.main(data[,i], col.fill, col.stroke, col.bg, col.grid, col.reg,
-          over.grid, cex.axis, col.axis, breaks, bin.start, bin.width,
-          bin.end, prop, cumul, xlab, ylab, main, quiet, ...)
+          over.grid, cex.axis, col.axis, rotate.values, offset,
+          breaks, bin.start, bin.width,
+          bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub, quiet, ...)
       txdst <- stuff$tx
       if (length(txdst)==0) txdst <- ""
 
       txotl <- ""
       if (!quiet) {
-        txotl <- .outliers2(data[,i])
+        txotl <- .outliers(data[,i])
         if (length(txotl)==0) txotl <- "No outliers"
       }
 
@@ -148,14 +176,13 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (ncol(data)==1  &&  nu>n.cat) {
 
-    # knitr
+    # R Markdown
     txkfl <- ""
-    if (!is.null(knitr.file)) {
-      txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
-      knitr.file <- paste(knitr.file, txt, sep="") 
-      txknt <- .dist.knitr(x.name, df.name, fun.call, digits.d)
-      cat(txknt, file=knitr.file, sep="\n")
-      txkfl <- .showfile2(knitr.file, "knitr instructions")
+    if (!is.null(Rmd)) {
+      if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
+      txknt <- .dist.Rmd(x.name, df.name, fun.call, digits.d)
+      cat(txknt, file=Rmd, sep="\n")
+      txkfl <- .showfile2(Rmd, "R Markdown instructions")
     }
  
     class(txss) <- "out_piece"

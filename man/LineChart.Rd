@@ -1,4 +1,5 @@
 \name{LineChart}
+
 \alias{LineChart}
 \alias{lc}
 
@@ -25,15 +26,18 @@ LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
          col.area=NULL, col.box="black",
 
-         shape.pts=21, cex.axis=.85, col.axis="gray30",
+         shape.pts=21, cex.axis=.75, col.axis="gray30",
+
+         rotate.values=0, offset=.5,
+
          xy.ticks=TRUE, line.width=1.1,
-         xlab=NULL, ylab=NULL, main=NULL, cex=NULL,
+         xlab=NULL, ylab=NULL, main=NULL, sub=NULL, cex=NULL,
 
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
 
          center.line=c("default", "mean", "median", "zero", "off"),
 
-         quiet=getOption("quiet"),
+         show.runs=FALSE, quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 
 lc(\ldots)
@@ -50,8 +54,7 @@ lc(\ldots)
         default is \code{mydata}.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric data type
-        for which the variable will be analyzed as a categorical. Set to 0 to turn off.}
-
+        for which the variable will be analyzed as a categorical. Default is 0.}
   \item{type}{Character string that indicates the type of plot, either \code{"p"} for 
         points, \code{"l"} for line, or \code{"b"} for both. The default is 
         \code{"b"} for both points and lines.}
@@ -62,11 +65,8 @@ lc(\ldots)
   \item{col.bg}{Color of the plot background.}
   \item{col.grid}{Color of the grid lines, with a default of \code{"grey90"}.}
   \item{col.line}{Color of any plotted line segments, with a default of \code{"darkblue"}.}
-  \item{col.area}{Color of area under the plotted line segments.  To have a border
-        at the bottom and right of a run chart but retain the property of no area color, 
-        specify a color of \code{"transparent"}. If the values exhibit a trend and dates 
-        are specified with \code{x.start}, the default area color is \code{slategray3}, 
-        otherwise there is no default color. }
+  \item{col.area}{Color of area under the plotted line segments, which by default is not
+        applied, equivalent to a color of \code{"transparent"}.}
   \item{col.box}{Color of border around the plot background, the box, that encloses 
         the plot, with a default of \code{"black"}.}
   \item{shape.pts}{The standard plot character, with values defined in help(points). The
@@ -76,6 +76,11 @@ lc(\ldots)
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be 
         smaller than the axis labels.}
   \item{col.axis}{Color of the font used to label the axis values.}
+  \item{rotate.values}{Degrees that the axis values are rotated, usually to accomodate
+        longer values, typically used in conjunction with \code{offset}.}
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
+        is 0.5. Larger values such as 1.0 are used to create space for the label when
+        longer axis value names are rotated.}
   \item{xy.ticks}{Flag that indicates if tick marks and associated values on the 
         axes are to be displayed.}
   \item{line.width}{Width of the density lines.}
@@ -87,6 +92,7 @@ lc(\ldots)
       the corresponding variable. If \code{xy.ticks} is \code{FALSE}, then no label displayed.}
   \item{main}{Label for the title of the graph.  If the corresponding variable labels exist,
       then the title is set by default from the corresponding variable labels.}
+  \item{sub}{Sub-title of graph, below xlab.}
   \item{cex}{Magnification factor for any displayed points, with default of cex=1.0.}
   \item{time.start}{Optional starting date for first data value. Format must be 
        "\%Y-\%m-\%d" or "\%Y/\%m/\%d". If using with \code{x.reverse}, the first date is after 
@@ -104,13 +110,17 @@ lc(\ldots)
       possible values for the line are \code{"mean"} and \code{"median"}.  Provides a centerline
       for the \code{"median"} by default when the values randomly vary about the mean. A
       value of \code{"zero"} specifies the center line should go through zero.}
+  \item{show.runs}{If \code{TRUE}, display the individual runs in the run analysis.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{set}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
        no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
-  \item{\dots}{Other parameters such as from \code{\link{par}}, and col.ticks to set the color of the ticks used to label the axis values.}
+  \item{\dots}{Other parameters such as from \code{\link{par}}, \code{col.lab},
+        \code{sub}, \code{col.sub}, \code{col.ticks} to set the color of the
+        ticks used to label the axis values, and
+        \code{srt} to rotate the axis value labels.}
 }
 
 

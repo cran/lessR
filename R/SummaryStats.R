@@ -41,7 +41,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       if (is.function(y.call)) y.call <- eval(substitute(data$by))
     }
   }
-  else y.call <- NULL
+  else
+    y.call <- NULL
 
 
 # -----------------------------------------------------------------
@@ -83,19 +84,17 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   }
 
 
-
 # -----------------------------------------------------
 # data is now set
 # do the analysis for a single variable or a data frame 
 
   if (ncol(data) == 1) {
     x.call <- data[,1]
-    nu <- length(unique(na.omit(x.call)))
 
+    nu <- length(unique(na.omit(x.call)))
     if (nu <= n.cat) {
       x.call <- as.factor(x.call)
-      cat("\n>>> Variable is numeric, with", nu, "<= n.cat =", n.cat, "levels,",
-        "so treat as categorical\n")
+      .ncat("summary statistics", x.name, nu, n.cat)
     }
   }
 
@@ -107,17 +106,23 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     sk <- NA; kt <- NA; q1 <- NA; q3 <- NA;  qr <- NA;
     stuff <- .ss.numeric(x.call, y.call, digits.d, brief, ...)
     txsts <- stuff$tx
-    txotl <- .outliers2(x.call)
+    txotl <- .outliers(x.call)
   }
 
   # ordered factors have two attributes, "ordered" and "factor"
   else if (is.factor(x.call)  ||  is.character(x.call)) {
 
+    gl <- .getlabels(xlab=NULL, ylab=NULL, main=NULL, cex.lab=NULL)
+    x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
+    y.name <- gl$yn; y.lab <- gl$yb; y.lbl <- gl$yl
+
     if (is.factor(x.call)) 
-      stuff <- .ss.factor(x.call, y.call, brief, digits.d, ...)
+      stuff <- .ss.factor(x.call, y.call, brief, digits.d,
+                        x.name, y.name, x.lbl, y.lbl, ...) 
     else if (is.character(x.call))
       if (nlevels(factor(x.call)) < length(x.call)) { 
-        stuff <- .ss.factor(factor(x.call), by, brief, n.cat, digits.d, ...)
+        stuff <- .ss.factor(factor(x.call), by, brief, digits.d=NULL,
+                        x.name, y.name, x.lbl, y.lbl, ...) 
       }
       else cat("\n Appears to contain unique Names or IDs", "\n")
 

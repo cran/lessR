@@ -1,8 +1,9 @@
 ANOVA <-
 function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL, 
-         knitr.file=NULL, graphics=TRUE,
+         Rmd=NULL, graphics=TRUE,
          rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
          pdf=FALSE, pdf.width=5, pdf.height=5, fun.call=NULL, ...) {  
+
 
   if (is.null(fun.call)) fun.call <- match.call()
 
@@ -11,6 +12,17 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
   if (missing(my.formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify a model by listing it first or set according to:  my.formula\n\n")
+  }
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "knitr.file") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "knitr.file  no longer used\n",
+          "Instead use  Rmd  for R Markdown file\n\n")
+      }
+    }
   }
 
   dname <- deparse(substitute(data))
@@ -204,14 +216,14 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
     dev.set(which=2)  # reset graphics window for standard R functions
   }
 
-  # knitr
+  # R Markdown
   txkfl <- ""
-  if (!is.null(knitr.file)) {
-    txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
-    knitr.file <- paste(knitr.file, txt, sep="") 
-    txknt <- .anova.knitr(nm, dname, fun.call, digits.d)
-    cat(txknt, file=knitr.file, sep="\n")
-    txkfl <- .showfile2(knitr.file, "knitr instructions")
+  if (!is.null(Rmd)) {
+    txt <- ifelse (grepl(".Rmd", Rmd), "", ".Rmd")
+    Rmd <- paste(Rmd, txt, sep="") 
+    txknt <- .anova.Rmd(nm, dname, fun.call, digits.d)
+    cat(txknt, file=Rmd, sep="\n")
+    txkfl <- .showfile2(Rmd, "R Markdown instructions")
   }
 
   class(title_bck) <- "out_piece"

@@ -111,7 +111,8 @@ function(ns, n, p1=0, p2=1,
     if (pop) {
       x1 <- seq(0, x.max/2, length=250)
       y1 <- dtriangle(x1, a=0, b=x.max/2, c=0+.01)  # triangle function
-      plot(0, type="n", axes=FALSE, xlim=c(0-.5, x.max+.5), ylim=c(0,max(y1)+.1), xlab="", ylab="")
+      plot(0, type="n", axes=FALSE, xlim=c(0-.5, x.max+.5),
+           ylim=c(0,max(y1)+.1), xlab="", ylab="")
       axis(1)
       usr <- par("usr")
       rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
@@ -169,14 +170,13 @@ function(ns, n, p1=0, p2=1,
   .dn.main(Ymean, type="normal", xlab="", 
          col.fill=col.fill, 
          col.bg=getOption("col.bg"),
-         col.grid="transparent",
-         bw="nrd0", 
+         col.grid="transparent", bw="nrd0", 
          bin.start=NULL, bin.width=NULL,
          col.nrm="black", col.gen="black",
          col.fill.nrm="transparent",
          col.fill.gen="transparent",
-         cex.axis=.85, col.axis="gray30",
-         x.pt=NULL, y.axis=FALSE, main=NULL, 
+         cex.axis=.85, col.axis="gray30", rotate.values=0, offset=.5, 
+         x.pt=NULL, y.axis=FALSE, main=NULL, sub=NULL, 
          x.min=NULL, x.max=NULL, band=FALSE, quiet=TRUE, pdf.file=NULL)
   if (subtitle) 
     txt <- paste(toString(sprintf("%i", ns)), "samples, each of size", toString(n), "from", type)

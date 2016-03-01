@@ -76,7 +76,6 @@ mydata <- Read("Employee", format="lessR")
 mydata <- Transform(
   Months=Years*12, 
   Salary=Salary/1000,
-  Satisfaction=factor(Satisfaction, levels=c("low", "med", "high"), ordered=TRUE),
   HealthPlan=factor(HealthPlan,
      levels=c(0,1,2), labels=c("GoodHealth", "YellowCross", "BestCare"))
 )
@@ -91,8 +90,9 @@ details.brief()
 # transformations with factors
 # ----------------------------
 
-# transfrom a nominal variable to ordinal
-mydata <- Transform(Satisfaction=factor(Satisfaction, ordered=TRUE))
+# transfrom a nominal variable to ordinal, re-order the categories
+mydata <- Transform(Satisfaction=
+  factor(Satisfaction, levels=c("low", "med", "high"), ordered=TRUE))
 
 # recode levels of a factor that should remain a factor
 #   with the Transform and factor functions

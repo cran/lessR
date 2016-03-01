@@ -1,7 +1,8 @@
 .hst.main <- 
 function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
-       over.grid, cex.axis, col.axis, breaks, bin.start, bin.width,
-       bin.end, prop, cumul, xlab, ylab, main, quiet, ...) {
+       over.grid, cex.axis, col.axis, rotate.values, offset,
+       breaks, bin.start, bin.width,
+       bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub, quiet, ...) {
 
 
   if (is.numeric(breaks) && !is.null(bin.start)) { 
@@ -12,10 +13,13 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
 
   # get variable labels if exist plus axes labels
   if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- "Proportion"
-  gl <- .getlabels(xlab, ylab, main)
-  x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
+  gl <- .getlabels(xlab, ylab, main, sub, cex.lab=0.98)
+  x.name <- gl$xn; x.lbl <- gl$xl
+  x.lab <- gl$xb
   y.lab <- gl$yb;
   main.lab <- gl$mb
+  sub.lab <- gl$sb
+  cex.lab <- gl$cex.lab
 
   # get breaks from user supplied bin width and/or supplied start value
   if (!is.null(bin.width)  || !is.null(bin.start) || !is.null(bin.end)) {
@@ -76,7 +80,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
 
   # calculate but do not plot the histogram
   # arguments in ... for plotting instructions generate warnings with no plot
-  h <- suppressWarnings(hist(x, plot=FALSE, breaks, ...))
+  h <- suppressWarnings(hist(x, plot=FALSE, breaks, labels=hist.counts, ...))
   
   # relative frequency histogram option
   if (prop) h$counts <- h$counts/length(x)
@@ -86,12 +90,25 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
     old.counts <- h$counts
     h$counts <- cumsum(h$counts)
   }
+
+  if (is.null(main)) {
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+    par(mar=c(4,4,2,2)+0.1)
+  }
   
   # set up plot area
-  plot(h, xlab=x.lab, ylab=y.lab,
-        main=main.lab, freq=TRUE, axes=FALSE, ...)
-  axis(1, cex.axis=cex.axis, col.axis=col.axis, ...) 
-  axis(2, cex.axis=cex.axis, col.axis=col.axis, ...) 
+  plot(h, freq=TRUE, axes=FALSE, ann=FALSE, ...)
+
+  # axis, axis ticks
+  .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
+        par("usr")[1], par("usr")[3], cex.axis, col.axis,
+        rotate.values, offset, ...)
+
+  # axis labels
+  max.lbl <- max(nchar(axTicks(2)))
+  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
+          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
 
   # colored background for plotting area
   usr <- par("usr")
@@ -107,7 +124,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
     abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
 
-  plot(h, add=TRUE, col=col.fill, border=col.stroke, freq=TRUE, ...)
+  plot(h, add=TRUE, col=col.fill, border=col.stroke, freq=TRUE, labels=hist.counts, ...)
   if (cumul == "both") {
     h$counts <- old.counts
     plot(h, add=TRUE, col=col.reg, freq=TRUE)

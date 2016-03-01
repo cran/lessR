@@ -127,7 +127,7 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
         options(col.fill.pt = .maketrans("gray35", .to256("trans.fill.pt")))
       if (is.null(col.stroke.bar)) options(col.stroke.bar = "gray60")
       if (is.null(col.stroke.pt)) options(col.stroke.pt = "gray30")
-      if (is.null(col.bg)) options(col.bg = "gray90")
+      if (is.null(col.bg)) options(col.bg = "gray92")
       if (is.null(col.grid)) options(col.grid = "white")
       if (is.null(col.heat)) options(col.heat = "gray5")
     }

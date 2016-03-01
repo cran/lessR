@@ -1,7 +1,7 @@
 corCFA <- 
 function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL, 
 
-         knitr.file=NULL, explain=getOption("explain"),
+         Rmd=NULL, explain=getOption("explain"),
          interpret=getOption("interpret"), results=getOption("results"),
 
          labels=c("include", "exclude", "only"),
@@ -29,15 +29,18 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
 
   labels <- match.arg(labels)
 
+  if (!is.null(pdf.file))
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
   max.fname <- 0
   if (!is.null(fac.names)) {
     for (i in 1:length(fac.names))
       if (nchar(fac.names[i]) > max.fname) max.fname <- nchar(fac.names[i])
   }
 
-  if (is.null(dname)  &&  !is.null(knitr.file)) {
+  if (is.null(dname)  &&  !is.null(Rmd)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Need to read from the data table (frame) to generate a knitr.file. \n\n")
+      "Need to read from the data table (frame) to generate a Rmd. \n\n")
   }
 
   if (labels!="only") {
@@ -52,6 +55,9 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
         "No data table (frame) exists from which to get the labels\n\n")
     }
 
+
+  df.name <- deparse(substitute(data))
+  options(dname = df.name)
 
   NFmax <- 12
 
@@ -559,7 +565,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
       "directly without the data")
     tx[length(tx)+1] <- paste(">>>   use the following fit statement instead.\n")
     tx[length(tx)+1] <- paste("fit <- lavaan::cfa(", nm.mimm, 
-     ", sample.cov=mycor,", " sample.nobs=nnn, std.lv=TRUE)\n", sep="")
+     ", sample.cov=mycor$cors,", " sample.nobs=nnn, std.lv=TRUE)\n", sep="")
     tx[length(tx)+1] <- ">>>   mycor: name of correlation matrix"
     tx[length(tx)+1] <- ">>>   nnn: numeric, number of observations"
 
@@ -568,15 +574,14 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
 
 
 
-  # knitr
+  # R Markdown
   txkfl <- ""
-  if (!is.null(knitr.file)) {
-    txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
-    knitr.file <- paste(knitr.file, txt, sep="") 
-    txknt <- .corfa.knitr(mimm, nm.mimm, dname, fun.call, NItems, NF,
+  if (!is.null(Rmd)) {
+    if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
+    txknt <- .corfa.Rmd(mimm, nm.mimm, dname, fun.call, NItems, NF,
                  iter, item.cor, explain, interpret, results)
-    cat(txknt, file=knitr.file, sep="\n")
-    txkfl <- .showfile2(knitr.file, "knitr instructions")
+    cat(txknt, file=Rmd, sep="\n")
+    txkfl <- .showfile2(Rmd, "R Markdown instructions")
   }
 
 
@@ -601,7 +606,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
     out_title_rel=title_rel, out_reliability=txrel,
     out_title_solution=title_sol, out_indicators=txind, out_solution=txsol,
     out_title_residuals=title_res, out_residuals=txres, out_res_stats=txrst,
-    out_title_lavaan=title_lvn, out_lavaan=txlvn,  out_knitr.file=txkfl,
+    out_title_lavaan=title_lvn, out_lavaan=txlvn,  out_Rmd=txkfl,
 
     ff.cor=out$R[(NItems+1):NVTot,(NItems+1):NVTot],
     if.cor=out$R[1:NItems,(NItems+1):NVTot],

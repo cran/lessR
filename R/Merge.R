@@ -49,7 +49,7 @@ function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
     mylabels2 <- attr(data2, which="variable.labels") # save variable labels
     myunits1 <- attr(data1, which="variable.units") # save variable units
     myunits2 <- attr(data2, which="variable.units") # save variable units
-    data <- merge(data1, data2, by=by)
+    data <- merge(data1, data2, by=by, ...)
     mylabels <- c(mylabels1, mylabels2)
     myunits <- c(myunits1, myunits2)
   }

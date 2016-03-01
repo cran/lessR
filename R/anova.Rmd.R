@@ -1,11 +1,11 @@
-.anova.knitr <-
+.anova.Rmd <-
 function(nm, dname, fun.call, d) {
 
   explain <- TRUE
   results <- TRUE
 
   fncl <- .fun.call.deparse(fun.call) 
-  fc <- .rm.arg("knitr.file", fncl) 
+  fc <- .rm.arg("Rmd", fncl) 
 
   if (explain) show <- "" else show <- ", echo=FALSE"
 

@@ -10,12 +10,12 @@ Abbreviation: \code{av}, \code{av.brief}
 
 Analysis of variance from the R \code{\link{aov}} function plus graphics and effect sizes. Permitted designs are one-way between groups, two-way between groups and randomized blocks with one treatment factor with one observation for each treatment and block combination. 
 
-Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{a} in \code{a <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete, though preliminary at this time, \code{knitr} set of instructions ready to knit, an R~Markdown file (\code{.Rmd}) from the \code{knitr.file} option. Simply specify the option with a file name, run the ANOVA function to create the file. Then open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information. 
+Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{a} in \code{a <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete, though preliminary at this time, R Markdown document from the \code{Rmd} option ready to knit. Simply specify the option with a file name, run the ANOVA function to create the file. Then open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information. 
 }
 
 \usage{
 ANOVA(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL, 
-         knitr.file=NULL, graphics=TRUE,
+         Rmd=NULL, graphics=TRUE,
          rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
          pdf=FALSE, pdf.width=5, pdf.height=5, fun.call, \ldots)
 
@@ -33,11 +33,11 @@ av.brief(\ldots, brief=TRUE)
        with \code{\link{set}} function.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
-  \item{knitr.file}{File name for the file of knitr instructions to be written,
+  \item{Rmd}{File name for the file of R Markdown instructions to be written,
         if specified. The file type is .Rmd, which automatically opens in RStudio,
         but it is a simple text file that can be edited with any text editor,
         including RStudio.}
-  \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{knitr} can
+  \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{Rmd} can
         be useful to set to \code{FALSE} so that \code{\link{regPlot}} can be used
         to place the graphics within the output file.}
   \item{rb.points}{For a randomized block design, a plot of the fitted value
@@ -55,7 +55,7 @@ av.brief(\ldots, brief=TRUE)
        instead of directed to the standard graphics windows.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
-  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
+  \item{fun.call}{Function call. Used with \code{Rmd} to pass the function call when
         obtained from the abbreviated function call \code{hs}.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 
 }
@@ -81,7 +81,7 @@ The number of decimal digits displayed on the output is, by default, the maximum
 
 
 \value{
-The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3.5 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The motivation of these two types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3.5 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent R Markdown document. The motivation of these two types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the R markdown document (see \code{examples}).
 
 TEXT OUTPUT\cr
 \code{out_background}: variables in the model, rows of data and retained\cr
@@ -133,6 +133,9 @@ Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 7, NY: Routl
 # access the data frame in the lessR Learn data set
 mydata <- rd("Learn", format="lessR", quiet=TRUE)
 ANOVA(Score ~ StudyType)
+
+# generate R markdown
+av(Score ~ StudyType, Rmd="av_out")
 
 # variables of interest in a data frame that is not the default mydata
 # two-factor between-groups ANOVA with replications and interaction

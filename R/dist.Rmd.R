@@ -1,10 +1,10 @@
-.dist.knitr <-
+.dist.Rmd <-
 function(Y, dname, fun.call, d) {
 
   explain <- TRUE
 
   fncl <- .fun.call.deparse(fun.call) 
-  fc <- .rm.arg("knitr.file", fncl) 
+  fc <- .rm.arg("Rmd", fncl) 
 
   if (explain) show <- "" else show <- ", echo=FALSE"
 

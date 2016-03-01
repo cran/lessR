@@ -1,15 +1,33 @@
 .pc.main <- 
 function(x,
          random.col, col.fill, col.low, col.hi,
-         colors, cex, cex.main, quiet, main, ...) {
+         colors, cex, cex.main, quiet, main, 
+         pdf.file, pdf.width, pdf.height, ...)  {
+
+  # get values for ... parameter values
+  stuff <- .getdots(...)
+  col.main <- stuff$col.main
 
   # set the labels
   # use variable label for main if it exists and main not specified
-  gl <- .getlabels()
-  x.name <- gl$xn;  x.lbl <- gl$xl
+  gl <- .getlabels(main=main)
+  x.name <- gl$xn; x.lbl <- gl$xl
+  cex.lab <- gl$cex.lab
 
   if (!is.null(main)) main.lbl <- main
   else if (length(x.lbl) == 0) main.lbl <- x.name else main.lbl <- x.lbl
+
+  cex.lab <- 0.98
+  if (strwidth(main.lbl, units="figure", cex=cex.lab) > .85) {
+    brk <- nchar(main.lbl)
+    while (strwidth(substr(main.lbl,1,brk), units="figure", cex=cex.lab) > .85)
+      brk <- brk-1 
+    while (substr(main.lbl,brk,brk) != " ") brk <- brk-1
+    main.lbl <- paste(substr(main.lbl,1,brk), "\n",
+                      substr(main.lbl,brk+1,nchar(main.lbl)))
+    while (strwidth(main.lbl, units="figure", cex=cex.lab) > .85)
+      cex.lab <- cex.lab-0.05
+  }
 
   # entered counts typically integers as entered but stored as type double
   # if names(x) is null, likely data from sample and c functions
@@ -20,54 +38,10 @@ function(x,
   # color palette
   # set some default colors in case not assigned below
   if (is.ordered(x)) {
-    if (colors == "dodgerblue") { 
-      if (is.null(col.low)) col.low <- "dodgerblue1"
-      if (is.null(col.hi)) col.hi <- "dodgerblue4"
-    }
-    if (colors == "blue") { 
-      if (is.null(col.low)) col.low <- "slategray2"
-      if (is.null(col.hi)) col.hi <- "slategray4"
-    }
-    else if (colors == "gray") {
-      if (is.null(col.low)) col.low <- "gray90"
-      if (is.null(col.hi)) col.hi <- "gray30"
-    }
-    else if (colors == "sienna") {
-      if (is.null(col.low)) col.low <- "sienna1"
-      if (is.null(col.hi)) col.hi <- "sienna4"
-    }
-    else if (colors == "rose") {
-      if (is.null(col.low)) col.low <- "orchid1"
-      if (is.null(col.hi)) col.hi <- "orchid4"
-    }
-    else if (colors == "green") {
-      if (is.null(col.low)) col.low <- "darkseagreen1"
-      if (is.null(col.hi)) col.hi <- "darkseagreen4"
-    }
-    else if (colors == "gold") {
-      if (is.null(col.low)) col.low <- "goldenrod1"
-      if (is.null(col.hi)) col.hi <- "goldenrod4"
-    }
-    else if (colors == "red") { 
-      if (is.null(col.low)) col.low <- "coral1"
-      if (is.null(col.hi)) col.hi <- "coral4"
-    }
-    else if (colors == "purple") { 
-      if (is.null(col.low)) col.low <- "darkorchid1"
-      if (is.null(col.hi)) col.hi <- "darkorchid4"
-    }
-    else if (colors == "orange.black") { 
-      if (is.null(col.low)) col.low <- "darkorange4"
-      if (is.null(col.hi)) col.hi <- "darkorange1"
-    }
-    else if (colors == "gray.black") { 
-      if (is.null(col.low)) col.low <- "gray30"
-      if (is.null(col.hi)) col.hi <- "gray90"
-    }
-    else if (colors == "white") { 
-      if (is.null(col.low)) col.low <- "gray30"
-      if (is.null(col.hi)) col.hi <- "gray90"
-    }
+    lowhi <- .ordcolors(colors, col.low, col.hi) 
+    col.low <- lowhi$col.low
+    col.hi <- lowhi$col.hi
+
     color.palette <- colorRampPalette(c(col.low, col.hi))
     clr <- color.palette(ncolors)
   }  # is ordered
@@ -87,15 +61,9 @@ function(x,
     else if (colors == "rainbow") clr <- rainbow(ncolors)
     else if (colors == "terrain") clr <- terrain.colors(ncolors)
     else if (colors == "heat") clr <- heat.colors(ncolors)
-    else  {  # mono color range does not make sense here 
+    else  {  # ordered color range does not make sense here 
       clr <- .col.discrete()
-      cat("\n>>> Can set colors=\"terrain\", or \"rainbow\" or ",
-          "\"heat\" \n", sep="")  # lighten some default background colors
     }
-    #else  {
-      #clr <- c("coral3", "seagreen3", "maroon3", "dodgerblue3", "purple3", 
-        #"turquoise3", "yellow3")
-    #}
     if (random.col) clr <- clr[sample(length(clr))]
   }
 
@@ -109,15 +77,14 @@ function(x,
 
   # plot the pie chart
   if (!is.table(x)) x <- table(x)
-  # putting ... makes chart a rectangle
-  pie(x, col=col, main=main.lbl, cex=cex, cex.main=cex.main)
+  pie(x, col=col, main=main.lbl, cex=cex, cex.main=cex.main, col.main=col.main, ...)
 
 # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
 
   # text output
   if (length(dim(x)) == 1  && !quiet) {  # one variable
 
-    stats <- .ss.factor(x)
+    stats <- .ss.factor(x, brief=TRUE, x.name=x.name)
 
     txttl <- stats$title
     counts <- stats$counts

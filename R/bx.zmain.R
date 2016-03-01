@@ -1,27 +1,42 @@
 .bx.main <-
 function(x, col.fill, col.stroke, col.bg, col.grid,
-         cex.axis, col.axis,
-         horiz, add.points, xlab, main, digits.d, quiet, ...) {      
+         cex.axis, col.axis, rotate.values, offset,
+         horiz, add.points, xlab, main, sub, digits.d, quiet, ...) {      
 
   if (is.null(col.stroke)) col.stroke <- col.fill
 
-# get variable label if exists
-  gl <- .getlabels(xlab, main=main)
-    x.name <- gl$xn;  x.lbl <- gl$xl;  x.lab <- gl$xb
-  main.lab <- gl$mb
-  if (horiz) y.lab <- ""
+  # get variable label if exists
+  gl <- .getlabels(xlab, main=main, cex.lab=0.98)
+  x.name <- gl$xn;  x.lbl <- gl$xl
+  x.lab <- gl$xb
+  if (horiz)
+    y.lab <- ""
   else {
     y.lab <- x.lab
     x.lab <- ""
   }
+  main.lab <- gl$mb
+  sub.lab <- gl$sb
+  cex.lab <- gl$cex.lab
 
   # set up plot area
   bv <- (boxplot(x, col="transparent", bg="transparent",
-     horizontal=horiz, xlab=x.lab, ylab=y.lab, main=main.lab, axes=FALSE, ...))
+     horizontal=horiz,  axes=FALSE, ann=FALSE, ...))
+
+  # axes
   if (horiz)
-    axis(1, cex.axis=cex.axis, col.axis=col.axis, ...) 
+  .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
+        par("usr")[1], par("usr")[3], cex.axis, col.axis, 
+        rotate.values, offset=offset, ...)
   else
-    axis(2, cex.axis=cex.axis, col.axis=col.axis, ...) 
+  .axes(x.lvl=NULL, y.lvl=NULL, NULL, axTicks(2),
+        par("usr")[1], par("usr")[3], cex.axis, col.axis,
+        rotate.values, offset=offset, ...)
+
+  # axis labels
+  max.lbl <- max(nchar(axTicks(2)))
+  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
+          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
   
   # colored background for plotting area
   usr <- par("usr")
@@ -76,8 +91,10 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
 
     main.lab <- as.character(main.lab)
     if (nchar(main.lab) > 0) main.lab <- paste(",", main.lab)
-    txt <- paste("--- ", x.lab, main.lab, " ---", sep="")
+    x.lb <- as.character(x.lab[length(x.lab)])  # x.lab is a vector of class call
+    txt <- paste("--- ", x.lb, main.lab, " ---", sep="")
     tx[length(tx)+1] <- txt
+    tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- paste("Present:", n)
     tx[length(tx)+1] <- paste("Missing:", n.miss)
     tx[length(tx)+1] <- paste("Total  :", length(x))

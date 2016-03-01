@@ -4,7 +4,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
     bw="nrd0", type=c("both", "general", "normal"),
     bin.start=NULL, bin.width=NULL,
 
-    knitr.file=NULL, digits.d=NULL,
+    Rmd=NULL, digits.d=NULL,
 
     col.fill=getOption("col.fill.pt"),
     col.bg=getOption("col.bg"),
@@ -13,8 +13,11 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
     col.nrm="black", col.gen="black",
     col.fill.nrm=NULL, col.fill.gen=NULL,
 
-    cex.axis=.85, col.axis="gray30",
-    x.pt=NULL, xlab=NULL, main=NULL, y.axis=FALSE, 
+    cex.axis=0.75, col.axis="gray30",
+
+    rotate.values=0, offset=0.5,
+
+    x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
     x.min=NULL, x.max=NULL, band=FALSE, 
 
     quiet=getOption("quiet"),
@@ -23,6 +26,20 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 
 
   if (is.null(fun.call)) fun.call <- match.call()
+
+  if (!is.null(pdf.file))
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "knitr.file") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "knitr.file  no longer used\n",
+          "Instead use  Rmd  for R Markdown file\n\n")
+      }
+    }
+  }
 
   clr <- getOption("colors")  # color theme not used except for monochrome 
 
@@ -126,8 +143,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
       stuff <- .dn.main(data[,i], bw, type, bin.start, bin.width, 
             col.fill, col.bg, col.grid, col.nrm, col.gen,
             col.fill.nrm, col.fill.gen, 
-            cex.axis, col.axis, 
-            x.pt, xlab, main, y.axis, x.min, x.max, band, quiet, ...)
+            cex.axis, col.axis, rotate.values, offset, 
+            x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)
       txdst <- stuff$tx
       if (length(txdst)==0) txdst <- ""
 
@@ -156,7 +173,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 
   if (ncol(data)==1  &&  nu>n.cat) {
 
-    # knitr
+    # R Markdown
     if (is.null(digits.d)) {
       dig.dec <- .max.dd(data[,i]) + 1
       if (dig.dec == 1) dig.dec <- 2
@@ -165,12 +182,11 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
     options(digits.d=dig.dec)
 
     txkfl <- ""
-    if (!is.null(knitr.file)) {
-      txt <- ifelse (grepl(".Rmd", knitr.file), "", ".Rmd")
-      knitr.file <- paste(knitr.file, txt, sep="") 
-      txknt <- .dist.knitr(x.name, df.name, fun.call, digits.d)
-      cat(txknt, file=knitr.file, sep="\n")
-      txkfl <- .showfile2(knitr.file, "knitr instructions")
+    if (!is.null(Rmd)) {
+      if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
+      txknt <- .dist.Rmd(x.name, df.name, fun.call, digits.d)
+      cat(txknt, file=Rmd, sep="\n")
+      txkfl <- .showfile2(Rmd, "R Markdown instructions")
     }
  
     class(txdst) <- "out_piece"
