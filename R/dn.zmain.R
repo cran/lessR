@@ -12,7 +12,7 @@ function(x,
   }
 
   # get variable labels if exist plus axes labels
-  gl <- .getlabels(xlab, main=main, cex.lab=0.98)
+  gl <- .getlabels(xlab, main=main, cex.lab=getOption("lab.size"))
   x.name <- gl$xn; x.lbl <- gl$xl;
   x.lab <- gl$xb
   main.lab <- gl$mb

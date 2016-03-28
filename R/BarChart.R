@@ -7,14 +7,14 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          random.col=FALSE,
          colors=c("rainbow", "terrain", "heat"),
 
-         horiz=FALSE, over.grid=FALSE, addtop=1,
+         horiz=FALSE, over.grid=FALSE, addtop=0.05,
          gap=NULL, prop=FALSE,
          
          xlab=NULL, ylab=NULL, main=NULL,
          cex.axis=0.75, col.axis="gray30",
          value.labels=NULL, rotate.values=0, offset=0.5,
 
-         beside=FALSE, col.low=NULL, col.hi=NULL, count.levels=NULL,
+         beside=FALSE, col.low=NULL, col.hi=NULL, count.labels=NULL,
 
          legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
          legend.horiz=FALSE, 
@@ -33,6 +33,18 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
+  dots <- list(...)  # check for deprecated/changed parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "addtop") 
+        cat("\naddtop  is now a multiplicative factor instead of additive\n\n")
+      if (names(dots)[i] == "count.levels") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Now use  count.labels  instead of count.levels\n\n")
+      }
+    }
+  }
 
   x.name <- deparse(substitute(x))
   options(xname = x.name)
@@ -114,12 +126,12 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       y.call <- NULL
 
 
-    # evaluate count.levels
+    # evaluate count.labels
     #---------------------
-    if (!missing(count.levels)) {
+    if (!missing(count.labels)) {
 
       # get actual variable name before potential call of data$x
-      x.name <- deparse(substitute(count.levels)) 
+      x.name <- deparse(substitute(count.labels)) 
       options(xname = x.name)
 
       # get conditions and check for data existing
@@ -130,15 +142,21 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       if (!missing(x) && !in.global)
         .xcheck(x.name, df.name, data)
 
-      if (!in.global) count.levels.call <- eval(substitute(data$count.levels))
+      if (!in.global) count.labels.call <- eval(substitute(data$count.labels))
       else {  # vars that are function names get assigned to global
-        count.levels.call <- count.levels
-        if (is.function(count.levels.call)) 
-          count.levels.call <- eval(substitute(data$count.levels))
+        count.labels.call <- count.labels
+        if (is.function(count.labels.call)) 
+          count.labels.call <- eval(substitute(data$count.labels))
       }
+ 
+      #if (!.is.integer(x.call)) { 
+      #cat("\n"); stop(call.=FALSE, "\n","------\n",
+        #"Values to be analyzed must be counts, that is, integers\n",
+        #"First two values to analyze: ", x.call[1], " ", x.call[2], "\n\n")
+      #}
     }
     else
-      count.levels.call <- NULL
+      count.labels.call <- NULL
 
 
     if (length(unique(na.omit(x.call))) == 1) { 
@@ -161,7 +179,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          col.fill, col.stroke, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
          cex.axis, col.axis, rotate.values, offset, beside, col.low, col.hi,
-         count.levels.call,
+         count.labels.call,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...)
 
     if (!is.null(pdf.file)) {
@@ -178,7 +196,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       col.fill, col.stroke, col.bg, col.grid, random.col, colors,
       horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
       cex.axis, col.axis, rotate.values, offset, beside, col.low, col.hi,
-      count.levels,
+      count.labels,
       legend.title, legend.loc, legend.labels, legend.horiz, quiet,
       pdf.width, pdf.height, ...)
 

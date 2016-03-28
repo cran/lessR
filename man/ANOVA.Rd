@@ -130,12 +130,8 @@ Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 7, NY: Routl
 \examples{
 
 
-# access the data frame in the lessR Learn data set
-mydata <- rd("Learn", format="lessR", quiet=TRUE)
-ANOVA(Score ~ StudyType)
-
-# generate R markdown
-av(Score ~ StudyType, Rmd="av_out")
+# access the PlantGrowth data frame
+ANOVA(weight ~ group, data=PlantGrowth)
 
 # variables of interest in a data frame that is not the default mydata
 # two-factor between-groups ANOVA with replications and interaction

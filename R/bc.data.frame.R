@@ -11,7 +11,7 @@ function(x, n.cat,
 
     nu <- length(unique(na.omit(x[,i])))
 
-    if (!is.numeric(x[,i]) || nu <= n.cat) {
+    if (!is.numeric(x[,i]) || .is.num.cat(x[,i],n.cat)) {
  
       if (nlevels(factor(x[,i])) < length(x[,i])) {
 
@@ -37,12 +37,12 @@ function(x, n.cat,
           dev.off()
           if (!quiet) .showfile(pdf.file, "bar chart")
 
-        if (is.numeric(x[,i]) && nu <= n.cat)
-          cat(">>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
+        if (.is.integer(x[,i]) && nu <= n.cat)
+          cat(">>> Variable is integer, but only has", nu, "<= n.cat =", n.cat, "levels,",
               "so treat as a categorical variable.\n",
               "   To obtain the numeric summary, decrease  n.cat  to specify a",
               "lower number of unique values.\n",
-              "   Suggest making this variable a factor with the R factor function.\n")
+              "   Can make this variable a factor with the R factor function.\n")
         }
       }
 

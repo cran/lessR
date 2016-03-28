@@ -53,7 +53,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
       vars.list <- as.list(seq_along(data))
       names(vars.list) <- names(data)
       x.col <- eval(substitute(x), envir=vars.list)  # col num of each var
-      if (class(data) != "list") {
+      if (!("list" %in% class(data))) {
         data <- data[, x.col]
         if (length(x.col) == 1) {
           data <- data.frame(data)  # x is 1 var
@@ -91,7 +91,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
     options(xname = x.name)
 
     if (is.numeric(data[,i])) {
-      if (nu > n.cat) {
+      # let 1 variable go through, even if num.cat
+      if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
 
       pdf.fnm <- .pdfname("LC", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)

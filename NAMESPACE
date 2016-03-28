@@ -55,6 +55,7 @@ export (
   Sort, srt,
   Subset, subs,
   SummaryStats, ss, ss.brief,
+  theme,
   to,
   Transform, trans,
   ttest, tt, tt.brief,

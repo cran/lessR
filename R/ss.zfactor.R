@@ -1,5 +1,6 @@
 .ss.factor <-
-function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL, x.lbl=NULL, y.lbl=NULL, ...)  {
+function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
+         x.lbl=NULL, y.lbl=NULL, ...)  {
 
 
 # construct a cross-tabs 
@@ -84,10 +85,12 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL, x.lbl=NULL
     # width of data columns
     max.ln <- integer(length=0)
     for (i in 1:ncol(xx)) {
-      ln.nm <- nchar(colnames(xx)[i])
-      ln.vl <- nchar(as.character(xx)[i])
-      max.ln[i] <- max(ln.nm, ln.vl) + 1
-      if (max.ln[i] < 4) max.ln[i] <- 4
+        ln.nm <- nchar(colnames(xx)[i])
+      for (j in 1:nrow(xx)) {
+        ln.vl <- nchar(as.character(xx[j,i]))
+      }
+        max.ln[i] <- max(ln.nm, ln.vl) + 1
+        if (max.ln[i] < 4) max.ln[i] <- 4
     }
 
     # cell frequencies
@@ -96,19 +99,25 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL, x.lbl=NULL
 
     tx <- character(length = 0)
     ch <- summary(as.table(x))
-    min.rc <- min(nrow(x)-1, ncol(x)-1)
-    V <- sqrt(ch$statistic / (min.rc * ch$n.cases))
-    txt <- ifelse(ch$parameter == 1, " (phi)", "") 
-    txt <- paste("Cramer\'s V", txt, ":", sep="")
-    tx[length(tx)+1] <- paste(txt, .fmt(V,3))
-    tx[length(tx)+1] <- ""
-    tx[length(tx)+1] <- paste("Chi-square Test", 
-        ":  Chisq = ", .fmt(ch$statistic,3), ", df = ", ch$parameter,
-        ", p-value = ", .fmt(ch$p.value,3), sep="")
-    if (!ch$approx.ok) 
-      tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
-          "so chi-squared approximation may not be accurate")
-    tx[length(tx)+1] <- ""
+    if (!is.nan(ch$statistic)) {
+      min.rc <- min(nrow(x)-1, ncol(x)-1)
+      V <- sqrt(ch$statistic / (min.rc * ch$n.cases))
+      txt <- ifelse(ch$parameter == 1, " (phi)", "") 
+      txt <- paste("Cramer\'s V", txt, ":", sep="")
+      tx[length(tx)+1] <- paste(txt, .fmt(V,3))
+      tx[length(tx)+1] <- ""
+      tx[length(tx)+1] <- paste("Chi-square Test", 
+          ":  Chisq = ", .fmt(ch$statistic,3), ", df = ", ch$parameter,
+          ", p-value = ", .fmt(ch$p.value,3), sep="")
+      if (!ch$approx.ok) 
+        tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
+            "so chi-squared approximation may not be accurate")
+      tx[length(tx)+1] <- ""
+    }
+    else
+      tx[length(tx)+1] <- paste(
+          "Cross-tabulation table not well-formed, usually too many zeros\n",
+          "Cramer's V and the chi-squared analysis not possible\n\n", sep="")
     txXV <- tx
 
     if (brief)
@@ -158,7 +167,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL, x.lbl=NULL
                  "     so any division to compute a proportion is undefined.\n")
 
     return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txXV=txXV, txprp=txprp,
-                txcol=txcol, txrow=txrow))  # back to ss or ss data frame
+                txcol=txrow, txrow=txcol))  # back to ss or ss data frame
 
     # end full analysis
 
@@ -168,12 +177,14 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL, x.lbl=NULL
   else {  # one variable
     n.dim <- 1
 
-    if (length(names(x)) == sum(x)) {
+    if (length(names(x)) == sum(x)) {  # x is a vector of the counts
       cat("\nAll values are unique.  Perhaps a row ID instead of a variable.\n",
-          "If so, use  row.names  option when reading. See help(read.table).\n\n", sep="")
+          "If so, use  row.names=n  option for Read, where n refers to the ",
+          "nth column.\n\n", sep="")
       if (sum(x) < 100) print(names(x))
       else cat("\nOnly the first 100 values listed.  To see all, use\n",
                "the  values  function.\n\n")
+      txttl <- "a";  txcnt <- "";  txchi <- ""; x <- NULL; xp <- NULL
     }
     else {
 
@@ -218,7 +229,8 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL, x.lbl=NULL
             "so chi-squared approximation may not be accurate", "\n")
       txchi <- tx
 
-      return(list(n.dim=n.dim, title=txttl, counts=txcnt, chi=txchi, freq=x, prop=xp))
+      return(list(n.dim=n.dim, title=txttl, counts=txcnt, 
+                  chi=txchi, freq=x, prop=xp))
     }
   }  # one variable
 

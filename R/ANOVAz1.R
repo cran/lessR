@@ -84,16 +84,18 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
        col.fill=getOption("col.fill.pt"),
        col.stroke=getOption("col.stroke.pt"),
        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-       shape.pts="circle", col.area=NULL, col.box="black",
+       shape.pts=21, col.area=NULL, col.box="black",
+       col.trans=getOption("col.trans.pt"),
        cex.axis=.85, col.axis="gray30", col.low=NULL, col.hi=NULL,
        xy.ticks=TRUE,
        xlab=nm[2], ylab=nm[1], main=plt.title[plt.i], sub=NULL, cex=.8,
        value.labels=NULL, rotate.values=0, offset=.5,
-       kind="default", means=TRUE,
+       style="default", means=TRUE, stat="default",
        fit.line="none", col.fit.line="grey55",
        bubble.size=.25, bubble.counts=TRUE,
        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent",
-       diag=FALSE, col.diag=par("fg"), lines.diag=FALSE, quiet=TRUE)
+       diag=FALSE, col.diag=par("fg"), lines.diag=FALSE, 
+       sort.y=FALSE, segments.y=FALSE, segments.x=FALSE, quiet=TRUE)
 
     if (pdf) {
       dev.off()

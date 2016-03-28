@@ -1,7 +1,7 @@
 Correlation <-
 function(x, y, data=mydata, # x can be a data frame, or variables in a data frame
          miss=c("pairwise", "listwise", "everything"),
-         show.n=NULL, brief=FALSE, n.cat=getOption("n.cat"),
+         show.n=NULL, brief=FALSE, 
          digits.d=NULL, graphics=FALSE,
          main=NULL, bottom=3, right=3,
          pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
@@ -101,7 +101,7 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
   if (is.df) { 
     if (is.null(show.n))
       if (nrow(data) <= 15) show.n <- TRUE else show.n <- FALSE
-    stuff <- .cr.data.frame(data, miss, show.n, n.cat, digits.d,
+    stuff <- .cr.data.frame(data, miss, show.n, digits.d,
                    graphics, main, bottom, right, 
                    pdf, pdf.width, pdf.height, ...) 
 

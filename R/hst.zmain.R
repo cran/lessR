@@ -2,7 +2,8 @@
 function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
        over.grid, cex.axis, col.axis, rotate.values, offset,
        breaks, bin.start, bin.width,
-       bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub, quiet, ...) {
+       bin.end, prop, hist.counts, cumul,
+       xlab, ylab, main, sub, quiet, ...) {
 
 
   if (is.numeric(breaks) && !is.null(bin.start)) { 
@@ -13,7 +14,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
 
   # get variable labels if exist plus axes labels
   if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- "Proportion"
-  gl <- .getlabels(xlab, ylab, main, sub, cex.lab=0.98)
+  gl <- .getlabels(xlab, ylab, main, sub, cex.lab=getOption("lab.size"))
   x.name <- gl$xn; x.lbl <- gl$xl
   x.lab <- gl$xb
   y.lab <- gl$yb;

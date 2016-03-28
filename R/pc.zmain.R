@@ -17,7 +17,7 @@ function(x,
   if (!is.null(main)) main.lbl <- main
   else if (length(x.lbl) == 0) main.lbl <- x.name else main.lbl <- x.lbl
 
-  cex.lab <- 0.98
+  cex.lab <- 0.85
   if (strwidth(main.lbl, units="figure", cex=cex.lab) > .85) {
     brk <- nchar(main.lbl)
     while (strwidth(substr(main.lbl,1,brk), units="figure", cex=cex.lab) > .85)

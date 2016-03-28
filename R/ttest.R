@@ -304,17 +304,18 @@ function(x, y=NULL, ...) {
        col.fill=getOption("col.fill.pt"),
        col.stroke=getOption("col.stroke.pt"),
        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+       col.trans=getOption("col.trans.pt"),
        shape.pts=21, cex.axis=.85, col.axis="gray30",
        col.low=NULL, col.hi=NULL, xy.ticks=TRUE,
        xlab=x.name, ylab=y.name, main=plot.title[plot.i], sub=NULL,
        cex=.8, value.labels=NULL, rotate.values=0, offset=.5,
-       kind="default", means=TRUE, 
+       style="default", means=TRUE, stat="default", 
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
        fit.line="none", col.fit.line="grey55", center.line=NULL,
        col.bubble=NULL, bubble.size=.25, bubble.counts=TRUE,
        col.flower=NULL, ellipse=FALSE, 
-       diag=TRUE, col.diag=par("fg"), lines.diag=TRUE,
-       quiet=TRUE)
+       diag=TRUE, col.diag=par("fg"), lines.diag=TRUE, sort.y=FALSE,
+       segments.y=FALSE, segments.x=FALSE, quiet=TRUE)
 
     if (!is.null(pdf.file)) {
       dev.off()

@@ -329,20 +329,20 @@ function(topic=NULL) {
   }
 
 
-  else if (topic %in% c("system", "set")) {
+  else if (topic %in% c("system", "set", "theme")) {
   t0 <- "System Level Settings"
 
   f1 <- bquote(paste(bold("set"), "  lessR function for lessR system settings such as a color theme."))
   f2 <- bquote(paste(bold("options"), "  Standard R function to access system settings."))
 
   t1 <- "
-  The lessR function set provides system settings for the lessR system, as
+  The lessR function theme provides system settings for the lessR system, as
   well as some of the more commonly used general R settings. Set the color
   theme for the graphics functions. The default color theme is \"dodgerblue\",
   with possibilities of \"gray\", \"green\", \"gold\", \"rose\", \"red\", \"dodgerblue\",
   \"purple\", \"sienna\", \"white\", \"orange.black\" and \"gray.black\".
   Here set subsequent graphics to gray scale.
-      > set(colors=\"gray\") 
+      > theme(colors=\"gray\") 
   The transparency level of bars and plotted points is set with the
   trans.fill.bar and trans.fill.pt options. Set ghost=\"TRUE\" to get
   transparent bars against a black background with no grid lines.
@@ -351,7 +351,7 @@ function(topic=NULL) {
   such as 0 for Male and 1 for Female. R is obliged to interpret numerical
   variables as numeric.  One option is to redefine these variables as
   factors [see Help(edit)]. Or set the value of the lessR option n.cat.
-      > set(n.cat=3)
+      > theme(n.cat=3)
   Here any numerical variable with just 3 unique values or less is
   interpreted as a categorical variable. The default value of n.cat is 0,
   that is, turned off.
@@ -367,7 +367,7 @@ function(topic=NULL) {
   #lines(c(5,90), c(80,80), col=col.line)
   text(0,47, label=t1, adj=0)
 
-  help.more("set", 7)
+  help.more("theme", 7)
   }
 
 
@@ -386,7 +386,7 @@ function(topic=NULL) {
   variable Y for the current color theme. Use Histogram or hs.
       > Histogram(Y)
   Specify the gray scale color theme, a title, and a label for the x axis.
-      > set(colors=\"gray\")
+      > theme(colors=\"gray\")
       > Histogram(Y, main=\"My Title\", xlab=\"Y (mm)\")
   Specify bins, begin at 60 with a bin width of 10. Can also specify bin.end.
       > Histogram(Y, bin.start=60, bin.width=10)
@@ -479,8 +479,8 @@ function(topic=NULL) {
 
   Color themes are available with the colors option, which can be invoked
   from a specific call to LineChart or system wide for all graphics output with
-  the function set. Here all subsequent graphics output is in gray scale.
-      > set(colors=\"gray\")
+  the function theme. Here all subsequent graphics output is in gray scale.
+      > theme(colors=\"gray\")
       > LineChart(Y)
 
   Can replace the variable name with a list of multiple variables, such as
@@ -522,9 +522,9 @@ function(topic=NULL) {
   to better display multiple replications of the same point.
 
   The colors option specifies color themes, from a call to ScatterPlot
-  or system wide for all graphics output with the function: set. Here all
+  or system wide for all graphics output with the function: theme. Here all
   subsequent graphics are with the sienna color theme, no transparency.
-      > set(colors=\"sienna\", trans.fill.pt=0)
+      > theme(colors=\"sienna\", trans.fill.pt=0)
       > ScatterPlot(X, Y)"
 
   set.up.plot(1)

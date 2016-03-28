@@ -17,8 +17,7 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, t
 
 \usage{
 
-Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"),
-         Rmd=NULL,
+Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
          col.fill=getOption("col.fill.bar"), 
          col.stroke=getOption("col.stroke.bar"),

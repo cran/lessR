@@ -1,6 +1,5 @@
 .ttp2graph <-
 function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
-
   
   # configure range of deltas (need n)
   pp <- power.t.test(n=n, sd=s, power=.9999, type=mytype)
@@ -17,43 +16,44 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   xmin <- H0 + xmin 
   rm(pp)
 
-  #if 
-    #(!is.null(getOption("colors"))) colors <- getOption("colors")
-  #else
-    #colors="dodgerblue"
-
   # power curve
   mypower <- power.t.test(n=n, sd=s, delta=mydeltas, type=mytype)
   x.values <- H0+mydeltas
   y.values <- mypower$power
 
-  .plt.main(x.values, y.values, by=NULL, type="l",
-         n.cat=getOption("n.cat"),
-         col.fill=getOption("col.fill.pt"),
-         col.stroke=getOption("col.stroke.pt"),
-         col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-         shape.pts=21, col.area=NULL, col.box="black",
-         cex.axis=0.75, col.axis="gray30", col.low=NULL, col.hi=NULL,
-         xy.ticks=TRUE, xlab=myxlab, ylab="Power",
-         main="", sub=NULL, cex=NULL,
-         value.labels=NULL, rotate.values=0, offset=0.5,
-         kind="default", means=TRUE,
-         fit.line="none", col.fit.line="grey55",
-         bubble.size=.25, bubble.counts=TRUE, 
-         ellipse=FALSE,
-         col.ellipse="transparent", fill.ellipse="transparent", 
-         diag=FALSE, col.diag=par("fg"), lines.diag=FALSE,
-         quiet=TRUE,
-         ylim=c(0,1.1), want.labels=FALSE)
+  plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE, ylim=c(0,1.1))
+
+  usr <- par("usr")
+  col.bg <- getOption("col.bg")
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+
+  col.grid <- getOption("col.grid")
+  abline(v=axTicks(1), col=col.grid, lwd=.5)
+  abline(h=axTicks(2), col=col.grid, lwd=.5)
+
+  .axes(NULL, NULL, axTicks(1), axTicks(2),
+        par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30")
+
+  main.lab <- NULL
+  sub.lab <- NULL
+  x.label <- myxlab
+  y.label <- "Power"
+  .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
+
+  col.fill <- getOption("col.fill.pt")
+  col.stroke <- getOption("col.stroke.pt")
+  points(x.values, y.values, pch=21, type="l", col=col.stroke,
+         bg=col.fill, cex=0.8)
+
   abline(h=0, lwd=.5, col="gray50")
   # custom title (2 lines)
-  mtext(mytitle, side=3, line=2.5, cex=1.1, font=2)
+  mtext(mytitle, side=3, line=2.5, cex=1.0, font=2)
   if (abs(n - round(n)) > 0.000001)
     dgt.n <- 3
   else  # n is an integer
     dgt.n <- 0
   mtext(paste("n=", .fmt(n,dgt.n), ", s=", .fmt(s,4), sep=""),
-               side=3, line=1, font=3)
+               side=3, line=1, font=3, cex=0.9)
 
   # delta for a power of mdp, default is 0.8
   clr <- getOption("colors")

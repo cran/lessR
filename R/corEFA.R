@@ -16,7 +16,6 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
   if (class(x) == "out_all")
     x <- eval(parse(text=paste(cor.nm, "$cors", sep="")))  # go to $cors 
-print(x)
     
 
   title_efa <- "  EXPLORATORY FACTOR ANALYSIS"

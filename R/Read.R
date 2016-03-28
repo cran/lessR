@@ -21,7 +21,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         "Specify the file name.\n\n")
   }
 
-# option to browse for data file, and then display file name
+  # option to browse for data file, and then display file name
   browse <- FALSE
   if (is.null(ref)) {
     browse <- TRUE
@@ -276,6 +276,26 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         "  by adding the  col_types  option to Read, so re-read the data\n",
         "  by copying and pasting the following: \n\n",
         "   ", typ, "\n")
+    }
+  }
+
+
+  # check for valid characters in the variable names
+  if (format %in% c("csv", "Excel")) {
+    dg <- character(length=0)
+    for (i in 0:9) dg[i+1] <-  as.character(i)  
+    ltr <- c(letters, LETTERS, dg, "_", ".")
+
+    for (i in 1:length(names(d))) {
+      cc <- names(d)[i]
+      for (j in 1:nchar(cc)) {
+        if (!(substr(cc,j,j) %in% ltr)) {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            substr(cc,j,j), " is an illegal character in the variable name ",
+            names(d)[i], "\n\n",
+            "Use only letters, digits and  .  or   _  in variable names\n\n")
+        }
+      }
     }
   }
 

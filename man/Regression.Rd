@@ -59,20 +59,21 @@ reg.brief(\ldots, brief=TRUE)
         text file that can be edited with any text editor, including RStudio.}
   \item{results}{By default TRUE. If set to \code{FALSE} the results
         are not provided in the R Markdown document, relying upon the interpretations.
-        Can set globally with set(results=FALSE).}
+        Can set globally with \code{theme(results=FALSE)}.}
   \item{explain}{By default TRUE. If set to \code{FALSE} the explanations are not
-        provided in the R Markdown document. Can set globally with set(explain=FALSE).}
+        provided in the R Markdown document. Can set globally with \code{theme(explain=FALSE)}.}
   \item{interpret}{By default TRUE. If set to \code{FALSE} the interpretations
         of the results are not provided in the R Markdown document.  Can set globally
-        with set(interpret=FALSE).}
+        with \code{theme(interpret=FALSE)}.}
   \item{document}{By default TRUE If set to \code{FALSE} the documentation
-        is not provided in the R Markdown file.  Can set globally with set(document=FALSE).}
+        is not provided in the R Markdown file.  Can set globally with
+        \code{theme(document=FALSE)}.}
   \item{code}{By default TRUE. If set to \code{FALSE} the code that generates the results
         is not provided in the R Markdown file. Can set globally
-        with set(code=FALSE).}
+        with \code{theme(code=FALSE)}.}
   \item{text.width}{Width of the text output at the console.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
-        with \code{\link{set}} function.}
+        with \code{\link{theme}} function.}
   \item{show.R}{Display the R instructions that yielded the \code{lessR} output, albeit without
         the additional formatting of the results such as combining output of different 
         functions into a table.}
@@ -264,8 +265,8 @@ Xie, Y. (2013). Dynamic Documents with R and knitr, Chapman & Hall/CRC The R Ser
 \examples{
 # Read internal data set
 mydata <- rd("Reading", format="lessR", quiet=TRUE)
-# do not need all this data, so take only 40% to reduce CPU time
-mydata <- Subset(random=.4)
+# do not need all this data, so take only 30% to reduce CPU time
+mydata <- Subset(random=.3)
 
 # One-predictor regression
 # Provide all default analyses including scatterplot etc.
@@ -290,18 +291,15 @@ r$out_estimates
 #   can be knit to generate dynamic output to a Word document,
 #   pdf file or html file
 reg(Reading ~ Verbal + Absent, Rmd="read")
-# Rmd with no explanations of the results, but does
-#  include interpretations of the results and documentation of the code
-reg(Reading ~ Verbal + Absent, Rmd="read2", explain=FALSE)
 
 # Modify the default settings as specified
-Regression(Reading ~ Verbal, res.row=8, res.sort="rstudent", pred.rows=0, digits.d=4)
+Regression(Reading ~ Verbal, res.row=8, res.sort="rstudent",
+   pred.rows=0, digits.d=4)
 
 # Multiple regression model
-# Provide all default analyses
-Regression(Reading ~ Verbal + Absent + Income)
 # Save the three plots as pdf files 4 inches square
-Regression(Reading ~ Verbal, pdf=TRUE, pdf.width=4, pdf.height=4)
+Regression(Reading ~ Verbal + Absent + Income, pdf=TRUE,
+   pdf.width=4, pdf.height=4)
 
 # Compare nested models
 # Reduced model:  Reading ~ Verbal
@@ -311,8 +309,8 @@ Nest(Reading, Verbal, c(Income, Absent))
 # Specify new values of the predictor variables to calculate
 #  forecasted values and the corresponding prediction intervals
 # Specify an input data frame other than mydata, see help(mtcars)
-Regression(mpg ~ hp + wt + disp, data=mtcars, 
-  X1.new=seq(50,350,50), X2.new=c(2,3), X3.new=c(100,300))
+Regression(mpg ~ hp + wt, data=mtcars, 
+  X1.new=seq(50,350,50), X2.new=c(2,3))
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

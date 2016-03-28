@@ -6,19 +6,18 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.4.4     feedback: gerbing@pdx.edu    web: lessRstats.com\n",
-      "----------------------------------------------------------------\n",
-      "Get started, and for help in general, enter:  Help()\n",
-      "Read a text, Excel, SPSS, SAS or R data file:  mydata <- Read()\n",
-      "----------------------------------------------------------------\n",
-      "Full interpretation provided for a regression analysis:  ?reg\n",
-      "----------------------------------------------------------------\n\n")
+      "lessR 3.4.6      feedback: gerbing@pdx.edu     web: lessRstats.com\n",
+      "------------------------------------------------------------------\n",
+      "1. Read a text, Excel, SPSS, SAS or R data file from your computer\n",
+      "   into the mydata data table:  mydata <- Read()  \n",
+      "2. For a list of specific help topics, enter:  Help()\n",
+      "3. Analyze the data as described in the help topics\n")
 
   options(colors="dodgerblue")
   options(trans.fill.bar=0.25)
-  options(trans.fill.pt=0.66)
-  options(col.fill.bar = "#1874CCBF")  # .maketrans of dodgerblue3"
-  options(col.fill.pt = "#1874CCBF")  # .maketrans of "dodgerblue3"
+  options(trans.fill.pt=0.50)
+  options(col.fill.bar = "#1874CCBF")  # .maketrans of dodgerblue3"  trans=.25
+  options(col.fill.pt = "#1874CC80")  # .maketrans of "dodgerblue3"  trans=.50
   options(col.stroke.bar="steelblue4")
   options(col.stroke.pt="steelblue4")
   options(col.bg="#EEF0F2")  # rgb(238, 240, 242)
@@ -26,7 +25,8 @@ function(...) {
   options(col.ghost=FALSE)
   options(col.heat="dodgerblue4")
 
-  options(n.cat=0)
+  options(n.cat=8)
+  options(lab.size=0.90)
   options(quiet=FALSE)
   options(brief=FALSE)
 
@@ -73,6 +73,7 @@ function(...) {
   for (i in 1:(ndash)) cat(cc)
   if (newline) cat("\n") 
 }
+
 
 .dash2 <- function(ndash, cc="-") {
   tx <- ""
@@ -135,13 +136,18 @@ function(...) {
 }
 
 
-#.is.integer <- function(x, tol = .Machine$double.eps^0.5) {
+.is.integer <- function(x, tol = .Machine$double.eps^0.5) {
 
-  #int.flg <- ifelse (abs(x - round(x)) < tol, TRUE, FALSE)  # each i of vector
-  #result.flg <- ifelse (all(int.flg), TRUE, FALSE)
+  if (is.numeric(x)) {
+    x <- na.omit(x)
+    int.flg <- ifelse (abs(x - round(x)) < tol, TRUE, FALSE)  # each i of vector
+    result.flg <- ifelse (all(int.flg), TRUE, FALSE)
+  }
+  else
+    result.flg <- FALSE
 
-  #return(result.flg)
-#}
+  return(result.flg)
+}
 
 
 .xstatus <- function(var.name, dname, quiet=FALSE) {
@@ -388,6 +394,8 @@ function(...) {
 .getlabels <- function(xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
                        cex.lab=NULL, ...) {
 
+  cutoff <- 0.76
+
   x.name <- getOption("xname")
   y.name <- getOption("yname")
 
@@ -423,15 +431,15 @@ function(...) {
       x.lab <- x.lbl
 
     if (length(x.lab) == 1  &&  !is.null(cex.lab)) {   # power.ttest: len > 1
-      if (strwidth(x.lab, units="figure", cex=cex.lab) > .85) {
+      if (strwidth(x.lab, units="figure", cex=cex.lab) > cutoff) {
         brk <- nchar(x.lab)
-        while (strwidth(substr(x.lab,1,brk), units="figure", cex=cex.lab) > .85)
+        while (strwidth(substr(x.lab,1,brk), units="figure", cex=cex.lab) > cutoff)
           brk <- brk-1 
         while (substr(x.lab,brk,brk) != " ") brk <- brk-1
         x.lab <- paste(substr(x.lab,1,brk), "\n",
                        substr(x.lab,brk+1,nchar(x.lab)))
-        while (strwidth(x.lab, units="figure", cex=cex.lab) > .85)
-          cex.lab <- cex.lab-0.05
+        while (strwidth(x.lab, units="figure", cex=cex.lab) > cutoff)
+          cex.lab <- cex.lab-0.02
       }
     }
 
@@ -460,15 +468,15 @@ function(...) {
       y.lab <- y.lbl
 
     if (length(y.lab) == 1  &&  !is.null(cex.lab)) {   # power.ttest: len > 1
-      if (strwidth(y.lab, units="figure", cex=cex.lab) > .85) {
+      if (strwidth(y.lab, units="figure", cex=cex.lab) > cutoff) {
         brk <- nchar(y.lab)
-        while (strwidth(substr(y.lab,1,brk), units="figure", cex=cex.lab) > .85)
+        while (strwidth(substr(y.lab,1,brk), units="figure", cex=cex.lab) > cutoff)
           brk <- brk-1 
         while (substr(y.lab,brk,brk) != " ") brk <- brk-1
         y.lab <- paste(substr(y.lab,1,brk), "\n",
                        substr(y.lab,brk+1,nchar(y.lab)))
-        while (strwidth(y.lab, units="figure", cex=cex.lab) > .85)
-          cex.lab <- cex.lab-0.05
+        while (strwidth(y.lab, units="figure", cex=cex.lab) > cutoff)
+          cex.lab <- cex.lab-0.02
       }
     }
 
@@ -494,7 +502,7 @@ function(...) {
     main.lab <- NULL
 
   if (!missing(sub)) {
-    if (!is.null(sub)) sub.lab <- sub else sub.lab <- ""
+    if (!is.null(sub)) sub.lab <- sub else sub.lab <- NULL
   }
   else
     sub.lab <- NULL
@@ -635,6 +643,7 @@ function(...) {
 
 }
 
+
 .title2 <- function(x.name, y.name, x.lbl, y.lbl, isnullby, new.ln=TRUE) {
 
   txt1 <- x.name
@@ -678,7 +687,7 @@ function(...) {
          offset=offset, ...)
   }
   else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
-    axis(1, at=1:length(x.lvl), labels=FALSE, tck=-.01, ...)
+    axis(1, at=axT1, labels=FALSE, tck=-.01, ...)
     text(x=axT1, y=par3, labels=x.lvl,
          pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
          offset=offset, ...)
@@ -691,7 +700,7 @@ function(...) {
          pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
   }
   else if (!is.null(y.lvl)) {
-    axis(2, at=1:length(y.lvl), labels=FALSE, tck=-.01, ...)
+    axis(2, at=axT2, labels=FALSE, tck=-.01, ...)
     text(x=par1, y=axT2, labels=y.lvl,
          pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
   }
@@ -699,36 +708,27 @@ function(...) {
 
 
 # axis labels
-.axlabs <- function(x.lab, y.lab, main.lab, sub.lab, max.lbl, xy.ticks,
-                    offset=0.5, ...) {
+.axlabs <- function(x.lab, y.lab, main.lab, sub.lab, max.lbl.y,
+                    xy.ticks=TRUE, offset=0.5, ...) {
 
   lbl.lns <- ifelse(xy.ticks, 3, 1)
+
   # xlab positioning
-  lblx.lns <- ifelse (grepl("\n", x.lab, fixed=TRUE), lbl.lns + 0.5, lbl.lns)
-  if (!is.null(sub.lab))
-    lblx.lns <- lblx.lns - 1.4
-  else
-    lblx.lns <- lblx.lns - 0.5
+  lblx.lns <- ifelse (grepl("\n", x.lab, fixed=TRUE), lbl.lns + 0.4, lbl.lns)
+  lblx.lns <- ifelse (!is.null(sub.lab), lblx.lns - 1.4, lblx.lns - 0.7)
   if (!xy.ticks) lblx.lns <- lblx.lns + .75
   if (offset > 0.5) lblx.lns <- lblx.lns + 0.5
 
   # ylab positioning
   multi <- FALSE
   for (i in 1:length(y.lab))
-    if (grepl("\n", y.lab[i], fixed=TRUE)) multi <- TRUE  # multi-line
-  if (multi)
-    lbly.lns <- lbl.lns - 1
-  else {  # single line
-    if (max.lbl == 1)
-      lbly.lns <- lbl.lns - .5 
-    else if (max.lbl == 2)
-      lbly.lns <- lbl.lns - .25 
-    else
-      lbly.lns <- lbl.lns
-  }  # single line
+    if (!is.null(y.lab))
+      if (grepl("\n", y.lab[i], fixed=TRUE)) multi <- TRUE  # multi-line
+  lm <- par("mar")[2]  # get the current left margin
+  lbly.lns <- ifelse(multi, lm - 2, lm - 1.2)
 
   title(xlab=x.lab, line=lblx.lns, ...)
-  title(sub=sub.lab, line=lblx.lns+1, ...)
+  title(sub=sub.lab, line=lblx.lns+1, cex.sub=0.76, ...)
   title(ylab=y.lab, line=lbly.lns, ...)
   title(main=main.lab, ...)
 
@@ -837,16 +837,46 @@ function(...) {
 }
 
 
+.is.num.cat <- function(x, n.cat) {
+
+  x <- sort(unique(na.omit(x)))
+
+  nu.x <- length(x)
+
+  # num.cat var is integer with small number of unique values
+  if (.is.integer(x)  &&  nu.x <= n.cat) {
+    eq.int <- TRUE
+    d.x <- diff(x)  # check for equal intervals
+    if (nu.x > 2) {
+      for (i in 2:(length(x)-1)) {
+        if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
+      }
+      status <- eq.int  # num.cat var has equal intervals
+    }
+    else
+      status <- TRUE
+
+  }
+  else
+    status <- FALSE 
+
+  return(status)
+
+}
+
+
 .ncat <- function(analysis, x.name, nu, n.cat, brief=FALSE) {
 
   cat("\n")
-  cat(x.name, " is numeric, with only ", nu,
-      " unique values <= n.cat=", n.cat,
-      "  so treat as categorical\n", sep="")
+  message(x.name, " has only only ", nu, " equally spaced unique ",
+      "integer values <= n.cat=", n.cat, "\n",
+      "  so treat as categorical", sep="")
 
   if (!brief)
-    cat("For numeric, set n.cat smaller than ", nu, 
-        " with ", analysis, " or globally with  set\n", sep="")
+    message("For numeric, set n.cat smaller than ", nu, 
+        " with ", analysis, " or globally with  theme", sep="")
+
+  cat("\n")
 
 }
 
@@ -892,7 +922,7 @@ function(...) {
 .col.discrete <- function() {
 
   # based on rainbow_hcl(24,c=38,l=75) from colorspace
-  clr <- c( "#A1BAE1", "#D8B193", "#E4ABA8", "#8FC59B", "#B9B3E3",
+  clr <- c( "#A1BAE1", "#D8B193", "#8FC59B", "#E4ABA8", "#B9B3E3",
             "#B8BD87", "#74C7BD", "#DCA9D4")
 
   return(clr)
@@ -1063,7 +1093,6 @@ function(...) {
   }
 
 }
-
 
 
 .outliers <- function(x) {

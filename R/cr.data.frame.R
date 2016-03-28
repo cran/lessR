@@ -1,5 +1,5 @@
 .cr.data.frame <-
-function(x, miss, show.n, n.cat, digits.d,
+function(x, miss, show.n, digits.d,
          graphics, main, bottom, right, 
          pdf, pdf.width, pdf.height, ...)  {
 
@@ -23,19 +23,19 @@ function(x, miss, show.n, n.cat, digits.d,
     x.name <- names(x)[i]
     options(xname = x.name)
 
-    nu <- length(unique(na.omit(x[,i])))
-    if (is.numeric(x[,i]) && nu <= n.cat) {
-      i.not <- i.not + 1
-      not.num[i.not] <- i
-      cat("\n")
-      cat("\n>>> Note:", x.name,  "is technically numeric, but only has ", 
-          nu, "<= n.cat =", n.cat, " levels,\n",
-         "      so treat as a categorical variable.\n",
-         "    To obtain the correlations decrease  n.cat  to specify a",
-         "lower number\n",
-         "      of unique values, such as with the function: set.\n",
-         "    Perhaps make this variable a factor with the R factor function.\n")
-    }
+    #nu <- length(unique(na.omit(x[,i])))
+    #if (.is.num.cat(x[,i], n.cat)) {
+      #i.not <- i.not + 1
+      #not.num[i.not] <- i
+      #cat("\n")
+      #cat("\n>>> Note:", x.name,  "is technically numeric, but only has ", 
+          #nu, "<= n.cat =", n.cat, " levels,\n",
+         #"      so treat as a categorical variable.\n",
+         #"    To obtain the correlations decrease  n.cat  to specify a",
+         #"lower number\n",
+         #"      of unique values, such as with the function: theme\n",
+         #"    Perhaps make this variable a factor with the R factor function.\n")
+    #}
 
     if (!is.numeric(x[,i])) {
       i.not <- i.not + 1

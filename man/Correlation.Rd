@@ -16,7 +16,7 @@ Versions of this function from \code{lessR} 3.3 or earlier returned just a corre
 \usage{
 Correlation(x, y, data=mydata,
          miss=c("pairwise", "listwise", "everything"),
-         show.n=NULL, brief=FALSE, n.cat=getOption("n.cat"),
+         show.n=NULL, brief=FALSE,
          digits.d=NULL, graphics=FALSE,
          main=NULL, bottom=3, right=3,
          pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
@@ -38,7 +38,6 @@ cr(\ldots)
   \item{brief}{Pretains to a single correlation coefficient analysis. If 
        \code{FALSE}, then the sample covariance and number of non-missing
        and missing observations are displayed.}
-  \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Default is 0.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
   \item{graphics}{If \code{TRUE}, generate a scatter plot matrix and heat map.}
   \item{main}{Graph title of heat map. Set to \code{main=""} to turn off.}

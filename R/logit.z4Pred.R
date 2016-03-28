@@ -4,7 +4,7 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
          new.data, pred, pred.all, 
          numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new, X6.new,
-         pdf.file, pdf.width, pdf.height) {
+         pdf.file, pdf.width, pdf.height, ...) {
 
   pred.sort <- TRUE  # data must be sorted to find cases close to fitted=0.5
 
@@ -113,11 +113,6 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
 
 
   # graphics
-
-  col.pts <- getOption("col.stroke.pt")
-  col.line <- getOption("col.stroke.bar")
-
-
   if (pred && n.pred==1 && !is.factor(lm.out$model[,nm[2]]) && is.null(X1.new)) {
 
     .opendev(pdf.file, pdf.width, pdf.height)
@@ -136,24 +131,30 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
       for (i in 1:length(y.values))
         if (y.values[i] == min.y) y.values[i] <- 0 else y.values[i] <- 1
     }
-    .plt.main(x.values, y.values, by=NULL, type="p", n.cat=getOption("n.cat"),
-       col.fill=getOption("col.fill.pt"),
-       col.stroke=getOption("col.stroke.pt"),
-       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-       shape.pts=21, col.area=NULL, col.box="black",
-       cex.axis=.85, col.axis="gray30", col.low=NULL, col.hi=NULL,
-       xy.ticks=TRUE,
-       xlab=nm[2], ylab=y.label, main="Logistic Fit and Scatterplot", sub=NULL,
-       cex=.8, value.labels=NULL, rotate.values=0, offset=.5,
-       kind="default", means=TRUE,
-       x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-       fit.line="none", col.fit.line="grey55", center.line=NULL,
-       col.bubble=NULL, bubble.size=.25, bubble.counts=TRUE, col.flower=NULL,
-       ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent", 
-       diag=FALSE, col.diag=par("fg"), lines.diag=FALSE,
-       quiet=TRUE, ylim=c(0,1))
 
-    lines(lm.out$model[,nm[2]], p.int$fit, col=col.pts, lwd=2)
+    # plot
+    plot(x.values,y.values, type="n", axes=FALSE, ann=FALSE, ylim=c(-.10,1.10), ...)
+
+    usr <- par("usr")
+    col.bg <- getOption("col.bg")
+    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+
+    col.grid <- getOption("col.grid")
+    abline(v=axTicks(1), col=col.grid, lwd=.5)
+    abline(h=axTicks(2), col=col.grid, lwd=.5)
+
+    .axes(NULL, NULL, axTicks(1), axTicks(2),
+          par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30", ...)
+
+    main.lab <- "Logistic Fit and Scatterplot"
+    sub.lab <- NULL
+    .axlabs(nm[2], y.label, main.lab, sub.lab, max.lbl.y=3,
+            cex.lab=getOption("lab.size"), cex.main=1.0, ...) 
+
+    col.fill <- getOption("col.fill.pt")
+    col.stroke <- getOption("col.stroke.pt")
+    points(x.values,y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
+    lines(x.values, p.int$fit, col=col.stroke, lwd=2)
 
     if (!is.null(pdf.file)) {
       dev.off()

@@ -30,8 +30,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     #if (n.pred == 0)
       #do.predint <- FALSE
     #else {
-      if ( (pred.rows==0) 
-           || !is.null(X1.new) || is.null(p.int)) 
+      if ( (pred.rows==0) || !is.null(X1.new) || is.null(p.int)) 
         do.predint <- FALSE
       else 
         do.predint <- TRUE
@@ -70,18 +69,19 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
        col.area=NULL, col.box="black",
        col.fill=getOption("col.fill.pt"),
        col.stroke=getOption("col.stroke.pt"),
+       col.trans=getOption("col.trans.pt"),
        col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
        shape.pts=21, cex.axis=.85, col.axis="gray30",
        col.low=NULL, col.hi=NULL, xy.ticks=TRUE,
        xlab=nm[2], ylab=nm[1], main=ctitle, sub=NULL,
        cex=.8, value.labels=NULL, rotate.values=0, offset=.5,
-       kind="default", means=TRUE,
+       style="default", means=TRUE, stat="default",
        x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
        fit.line=fl, col.fit.line="grey55", center.line=NULL,
        col.bubble=NULL, bubble.size=.25, bubble.counts=TRUE, col.flower=NULL,
        ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent", 
-       diag=FALSE, col.diag=par("fg"), lines.diag=FALSE,
-       quiet=TRUE, ylim=c(y.min,y.max))
+       diag=FALSE, col.diag=par("fg"), lines.diag=FALSE, sort.y=FALSE,
+       segments.y=FALSE, segments.x=FALSE, quiet=TRUE, ylim=c(y.min,y.max))
 
     if (n.pred == 0) {
       m <- lm.out$coefficients[1]  # mean of Y

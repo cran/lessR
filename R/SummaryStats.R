@@ -56,7 +56,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       all.vars <- as.list(seq_along(data))  # even if only a single var
       names(all.vars) <- names(data)  # all data in data frame
       x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars
-      if (class(data) != "list") {
+      if (!("list" %in% class(data))) {
         data <- data[, x.col]
         if (length(x.col) == 1) {  # x is 1 var
           data <- data.frame(data)
@@ -92,7 +92,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     x.call <- data[,1]
 
     nu <- length(unique(na.omit(x.call)))
-    if (nu <= n.cat) {
+    if (.is.num.cat(x.call, n.cat)) {
       x.call <- as.factor(x.call)
       .ncat("summary statistics", x.name, nu, n.cat)
     }

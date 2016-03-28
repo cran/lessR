@@ -229,7 +229,7 @@ scales(F1=X1:X3, F2=X4:X6)
 # produce a gray scale heat map of the item correlations
 #   with communalities in the diagonal
 # all subsequent graphics are in gray scale until changed
-set(colors="gray")
+theme(colors="gray")
 corCFA(F1=X1:X3, F2=X4:X6)
 
 # access the lessR data set called datMach4, with variable labels

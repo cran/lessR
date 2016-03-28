@@ -20,7 +20,8 @@ function(x, n.cat, brief, ...)  {
       print(output)
     }
 
-    else if (is.factor(x[,i]) || is.character(x[,i]) || nu <= n.cat) {
+    else if (is.factor(x[,i]) || is.character(x[,i]) ||
+             (.is.num.cat(x[,i], n.cat))) {
       gl <- .getlabels(xlab=NULL, ylab=NULL, main=NULL, cex.lab=NULL)
       x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
       stats <- .ss.factor(x[,i], x.name=x.name, x.lbl=x.lbl, ...)

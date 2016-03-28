@@ -117,12 +117,12 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     }
 
     n.cat <- getOption("n.cat")
-    int.cat <- FALSE
+    num.cat <- FALSE
     n.cat.temp  <- 4
     for (j in 1:n.var) {
-      if (is.numeric(data[,j]) && nu[j] <= n.cat.temp) int.cat <- TRUE
+      if (is.numeric(data[,j]) && nu[j] <= n.cat.temp) num.cat <- TRUE
     }
-    if (int.cat) {
+    if (num.cat) {
       cat("\n\n")
       cat("Each of these variables has numeric values, but has less than ",
           n.cat.temp, "\n",
@@ -130,7 +130,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
           "to transform each variable into a factor with the Transform and\n",
           "factor functions. To see examples enter:  > ?Transform\n", 
           "Or, specify a value for n.cat, ",
-          "such as:  > set(n.cat=4)\n", sep="")
+          "such as:  > theme(n.cat=4)\n", sep="")
       .dash(63)
       for (j in 1:n.var) if (is.numeric(data[,j]) && nu[j] <= n.cat.temp)
         cat(names(data)[j], "\n")

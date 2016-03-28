@@ -25,14 +25,17 @@ function(mylevels, col.pts, clr, clr.tr, shp, trans.pts, col.bg, usr) {
   }
   else 
     legend.fill <- clr.tr
-  
+
+  colors <- getOption("colors")
+  the.clr <- ifelse(grepl(".black", colors), "gray90", "black")
+
   if (length(col.pts) > 1)
     legend(xleft, ytop, legend=legend.labels, title=legend.title, 
            fill=legend.fill, horiz=FALSE, cex=.7, box.lwd=.5, 
-           box.col="gray30", bg=col.bg)
+           box.col="gray30", bg=col.bg, col=the.clr, text.col=the.clr)
   else 
     legend(xleft, ytop, legend=legend.labels, title=legend.title, 
            pch=shp, horiz=FALSE, cex=.7, box.lwd=.5, 
-           box.col="gray30", bg=col.bg)
+           box.col="gray30", bg=col.bg, col=the.clr, text.col=the.clr)
 
 }

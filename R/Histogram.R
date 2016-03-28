@@ -1,6 +1,5 @@
 Histogram <-
-function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
-    Rmd=NULL,
+function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     col.fill=getOption("col.fill.bar"), 
     col.stroke=getOption("col.stroke.bar"),
@@ -79,7 +78,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       all.vars <- as.list(seq_along(data))  # even if only a single var
       names(all.vars) <- names(data)  # all data in data frame
       x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars
-      if (class(data) != "list") {
+      if (!("list" %in% class(data))) {
         data <- data[, x.col]
         if (length(x.col) == 1) {  # x is 1 var
           if (!is.numeric(data)) { 
@@ -126,7 +125,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     options(xname = x.name)
 
     if (is.numeric(data[,i])) {
-      if (nu > n.cat) {
+      # let 1 variable go through, even if num.cat
+      if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
 
       pdf.fnm <- .pdfname("Hist", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)
@@ -174,7 +174,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
   dev.set(which=2)  # reset graphics window for standard R functions
 
 
-  if (ncol(data)==1  &&  nu>n.cat) {
+  if (ncol(data)==1) {
 
     # R Markdown
     txkfl <- ""

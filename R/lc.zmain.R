@@ -26,7 +26,7 @@ function(y, type,
   pt.size <- ifelse (is.null(cex), 0.8, cex)
 
   # get variable label and axis labels if they exist
-  gl <- .getlabels(ylab=ylab, main=main, cex.lab=0.98)
+  gl <- .getlabels(ylab=ylab, main=main, cex.lab=getOption("lab.size"))
   y.name <- gl$yn;  y.lbl <- gl$yl;  y.lab <- gl$yb
   main.lab <- gl$mb
   sub.lab <- gl$sb

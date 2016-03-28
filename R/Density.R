@@ -85,7 +85,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
       all.vars <- as.list(seq_along(data))  # even if only a single var
       names(all.vars) <- names(data)  # all data in data frame
       x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars
-      if (class(data) != "list") {
+      if (!("list" %in% class(data))) {
         data <- data[, x.col]
         if (length(x.col) == 1) {  # x is 1 var
           data <- data.frame(data)
@@ -127,7 +127,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
     options(xname = x.name)
 
     if (is.numeric(data[,i])) {
-      if (nu > n.cat) {
+      # let 1 variable go through, even if num.cat
+      if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
 
       pdf.fnm <- .pdfname("Density", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)

@@ -1,7 +1,7 @@
 .dp.main <- 
 function(x, by,
-         col.fill, col.stroke, col.bg, col.grid, shape.pts,
-         cex.axis, col.axis, xlab, main, sub, cex,
+         col.fill, col.stroke, col.bg, col.grid, col.trans,
+         shape.pts, cex.axis, col.axis, xlab, main, sub, cex,
          rotate.values, offset, method, pt.reg, pt.out, 
          col.out30, col.out15, quiet, new, ...) {
 
@@ -38,7 +38,7 @@ function(x, by,
   cex.main <- stuff$cex.main
 
   # get variable labels if exist plus axes labels
-  gl <- .getlabels(xlab, main=main, cex.lab=0.98)
+  gl <- .getlabels(xlab, main=main, cex.lab=getOption("lab.size"))
   x.name <- gl$xn; x.lbl <- gl$xl
   x.lab <- gl$xb
   main.lab <- gl$mb
@@ -111,11 +111,18 @@ function(x, by,
              col=col.out30, bg=col.out30, pch=pt.out30, ...)
 
   # dp for regular points
+
+
   if (is.null(by)) {
-    trans.pts <- getOption("trans.fill.pt")
-    clr.trn <- .maketrans(col.fill, (1-trans.pts)*256)
+    # see if trans is customized for this analysis
+    if (!is.null(col.trans)) {
+      trans.pts <- col.trans
+      col.fill <- .maketrans(col.fill, (1-trans.pts)*256)
+    }
+    #trans.pts <- getOption("trans.fill.pt")
+    #clr.trn <- .maketrans(col.fill, (1-trans.pts)*256)
     stripchart(x[x>lo15 & x<up15], add=TRUE, method=method,
-                     col=col.stroke, pch=pt.reg, bg=clr.trn, ...)
+                     col=col.stroke, pch=pt.reg, bg=col.fill, ...)
   }
 
   else {  # by grouping variable

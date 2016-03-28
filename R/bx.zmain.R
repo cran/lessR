@@ -6,7 +6,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   if (is.null(col.stroke)) col.stroke <- col.fill
 
   # get variable label if exists
-  gl <- .getlabels(xlab, main=main, cex.lab=0.98)
+  gl <- .getlabels(xlab, main=main, cex.lab=getOption("lab.size"))
   x.name <- gl$xn;  x.lbl <- gl$xl
   x.lab <- gl$xb
   if (horiz)
@@ -62,8 +62,8 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   # dots
   if (add.points) 
       .dp.main(x, by=NULL,
-         col.fill, col.stroke, col.bg, col.grid, shape.pts=NULL,
-         cex.axis=.85, col.axis="gray30",
+         col.fill, col.stroke, col.bg, col.grid, col.trans=NULL,
+         shape.pts=NULL, cex.axis=.85, col.axis="gray30",
           xlab=NULL, main=NULL, cex=NULL,
          method="overplot", pt.reg=21, pt.out=19, 
          col.out30="firebrick2", col.out15="firebrick4", 

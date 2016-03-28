@@ -6,7 +6,77 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
->>>>>> Changes for lessR version 3.4.4 (2016-03-01) <<<<<<
+>>>>>> Changes for lessR version 3.4.6 (2016-03-27) <<<<<<
+
+-------------
+Updates 3.4.6
+-------------
+
+BarChart, ScatterPlot, SummaryStats
+  a numeric variable with less than n.cat unique values considered
+    categorical only for values that are all integer 
+
+BarChart
+  addtop is a multiplicative factor for expanding room between
+    the highest bar and the top of the plot, instead of additive,
+    also a little more space added by default for 1-variable plots
+    by setting the default to 0.05 of total height
+  addtop now provides a buffer also for horizontal graphs
+  prop=TRUE for two variables provides column proportions instead
+    of for rows
+  for consistency, count.levels now referred to as count.labels
+
+Read
+  variable names are checked for invalid characters in text files
+    and Excel files, which R does not do 
+
+set
+  re-named theme
+
+SummaryStats, BarChart, ScatterPlot
+  for 2 variable cross-tab analysis, if there is no p-value because
+    the cross-tab table is not well-formed, such as too many 0's, 
+    appropriately indicated in the output
+
+ScatterPlot
+  trans.fill option added to set trans.fill.pt in the function call,
+    can still be set globally from function theme
+  if y-values are unique, as in a Cleveland dot plot, default
+    transparency level is 0 because no over-plotting, though can be
+    set from trans.fill option also
+  bubble.power option provides larger bubbles for smaller frequencies and
+    allows the user to provide a custom value
+  bubble plot applies also to numeric variables
+  option kind renamed style
+  "off" added as a value of style, that is, do not plot the data values
+  stat option added to produce a scatter plot of statistics such as the
+    mean of a continuous variable against levels of a categorical value,
+    or counts of a categorical variable, instead of the original data
+  sort.y added to sort y-values by x-values, for Cleveland dot plot
+  when y is set to row.names, y becomes the row names of the data table
+  segments.y and segments.x options for line segments from axis to points
+
+theme
+  new name for set
+  for default gray theme, base color for point fill and stroke is darker
+
+
+---------------
+Bug Fixes 3.4.6
+---------------
+
+BarChart
+  stats for two variables prop (proportion) option works
+  beside=TRUE, values properly labeled on x-axis
+
+ScatterPlot
+  a factor with more levels than unique values displays properly
+  large values of frequencies display properly
+  by legend displays properly with black background colors
+  extreme outlier points plotted with ellipse
+
+
+>>>>>> Changes for lessR version 3.4.4 (2016-03-04) <<<<<<
 
 -------------
 Updates 3.4.4

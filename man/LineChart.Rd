@@ -179,9 +179,9 @@ plot(mydata$Y, type="l")
 LineChart(Y, pdf.file="MyLineChart.pdf")
 
 # LineChart in gray scale, then back to default "dodgerblue"
-set(colors="gray")
+theme(colors="gray")
 LineChart(Y)
-set(colors="dodgerblue")
+theme(colors="dodgerblue")
   
 # customize run chart with LineChart options
 LineChart(Y, line.width=2, col.stroke="sienna3",

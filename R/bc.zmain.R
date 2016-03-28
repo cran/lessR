@@ -3,13 +3,8 @@ function(x, by=NULL,
          col.fill, col.stroke, col.bg, col.grid, random.col, colors,
          horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
          cex.axis, col.axis, rotate.values, offset, beside,
-         col.low, col.hi, count.levels,
+         col.low, col.hi, count.labels,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
- 
-  if (horiz && addtop!=1) { 
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-    "addtop  only works for a vertical bar plot.\n\n")
-  }
 
   if ( (is.table(x) || is.matrix(x)) && is.null(legend.title) ) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -27,9 +22,9 @@ function(x, by=NULL,
 
   # get variable labels if exist plus axes labels
   txt <- "Proportion"
-  if (!is.null(by)) txt <- "Cell Proportion within Each Row"
+  if (!is.null(by)) txt <- "Cell Proportion within Each Column"
   if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- txt
-  gl <- .getlabels(xlab, ylab, main, cex.lab=0.98)
+  gl <- .getlabels(xlab, ylab, main, cex.lab=getOption("lab.size"))
   x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
   y.name <- gl$yn; y.lab <- gl$yb; y.lbl <- gl$yl
   main.lab <- gl$mb
@@ -61,14 +56,14 @@ function(x, by=NULL,
 
   # entered counts typically integers as entered but stored as type double
   # if names(x) or rownames(x) is null, likely data from sample and c functions
-  # count.levels is getting counts directly from a data frame with counts entered
+  # count.labels is getting counts directly from a data frame with counts entered
   entered.pre <- FALSE
   if (!is.matrix(x) && !is.null(names(x))) entered.pre <- TRUE
   if (is.matrix(x) && !is.null(rownames(x))) entered.pre <- TRUE
   entered <- ifelse (!is.integer(x) && is.double(x) && entered.pre, TRUE, FALSE)
-  if (!is.null(count.levels)) {
+  if (!is.null(count.labels)) {
     x <- as.numeric(x)
-    names(x) <- count.levels
+    names(x) <- count.labels
     entered <- TRUE
   }
   
@@ -88,7 +83,7 @@ function(x, by=NULL,
         "Size of ", y.name, ": ", length(by), "\n\n", sep="")
       }
       x <- table(by,x, dnn=c(y.name, x.name)) 
-      if (prop) x <- prop.table(x, 1)
+      if (prop) x <- prop.table(x, 2)
     }
     else {  # one variable 
       x.temp <- x  # save counts
@@ -97,7 +92,7 @@ function(x, by=NULL,
     }
   }
 
-  if (!is.null(count.levels)) {
+  if (!is.null(count.labels)) {
     x.temp <- x
     x <- as.table(x)
     if (prop) x <- x/sum(x)
@@ -197,15 +192,18 @@ function(x, by=NULL,
   # preliminaries
  
   max.y <- ifelse (is.matrix(x) && !beside, max(colSums(x)), max(x))
-  if (prop) addtop <- .01
-  max.y <- max.y + addtop
+  max.y <- max.y + (addtop * max.y)
+
+  if (any(x < 0)) {
+  min.y <- ifelse (is.matrix(x) && !beside, min(colSums(x)), min(x))
+  min.y <- min.y - abs(addtop * min.y)
+  }
+  else
+    min.y <- 0
 
   if (is.null(legend.labels)) legend.labels <- row.names(x)
   if (beside) legend.horiz <- FALSE
-  if ((!is.null(by) || is.matrix(x)) && !beside) {
-    legend.horiz <- TRUE
-    max.y <- max.y + .18*max.y
-  }
+  if ((!is.null(by) || is.matrix(x)) && !beside) legend.horiz <- TRUE
 
   if (is.null(gap)) {  # ifelse does not work here when gap is a vector
     if (!is.null(by) && beside)
@@ -245,40 +243,43 @@ function(x, by=NULL,
     if (extend) par(mar=c(5, add.left, 4, 2) + 0.1)
   }
 
-
   if (legend.loc == "right.margin"  &&  (!is.null(by) || is.matrix(x)))
     par(oma=c(0,0,0,3))
 
-  if(is.null(count.levels)) if (horiz) { 
+  if(is.null(count.labels)) if (horiz) {  # switch
     temp <- x.lab; x.lab <- y.lab; y.lab <- temp 
   }
 
   if (class(x) == "numeric"  &&  entered) x <- as.table(x)
   rescale <- 0
   if (is.null(by)) if (nrow(x) <=4) rescale <- nrow(x)
-  if (!is.null(by) && !beside) if (ncol(x) <=4) rescale <- ncol(x)
+  if (!is.null(by) && !beside) if (ncol(x) <= 4) rescale <- ncol(x)
   if (class(x) == "matrix" && entered) rescale <- 0  # turned off for now
 
   # set rescale to control bar width for small number of bars
   if (rescale == 0) {
     if (!horiz)
-      barplot(x, col="transparent", ylim=c(0,max.y), axisnames=FALSE,
+      barplot(x, col="transparent", ylim=c(min.y,max.y), axisnames=FALSE,
         beside=beside, space=gap, axes=FALSE, ...)
     else
       barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
-        beside=beside, space=gap, axes=FALSE, ...)
+        beside=beside, space=gap, axes=FALSE, xlim=c(min.y, max.y), ...)
   }
   else {  # rescale
     if (rescale == 4) width.bars <- .17
     if (rescale == 3) width.bars <- .22
     if (rescale == 2) width.bars <- .28
-    gap <- 0.246 + 0.687*width.bars
+    gap <- 0.246 + (0.687 * width.bars)
     if (!horiz)
-      barplot(x, col="transparent", ylim=c(0,max.y), axisnames=FALSE,
-        beside=beside, space=gap, width=width.bars, xlim=c(0,1), axes=FALSE, ...)
+      barplot(x, col="transparent", ylim=c(min.y,max.y), axisnames=FALSE,
+        beside=beside, space=gap, width=width.bars,
+        #beside=beside, space=gap, width=width.bars, xlim=c(0,1),
+        axes=FALSE, ...)
     else
       barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
-        beside=beside, space=gap, width=width.bars, ylim=c(0,1), axes=FALSE, ...)
+        beside=beside, space=gap, width=width.bars, xlim=c(min.y, max.y),
+        axes=FALSE, ...)
+        #ylim=c(0,1), axes=FALSE, ...)
   }
 
   if (extend) {
@@ -294,13 +295,14 @@ function(x, by=NULL,
 
   usr <- par("usr")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
-  if (max.y > 1) vy <- pretty(0:max.y) else vy <- pretty(1:100*max.y)/100
+  #if (max.y > 1) vy <- pretty(0:max.y) else vy <- pretty(1:100*max.y)/100
+  vy <- pretty(min.y:max.y)
  
   if (!over.grid) {
     if (!horiz)
-      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+      abline(h=axTicks(2), col=col.grid, lwd=.5)
     else
-      abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+      abline(v=axTicks(1), col=col.grid, lwd=.5)
   }
   if (rescale == 0) {
     # width.bars <- .8   gap <- .6*width.bars
@@ -333,28 +335,24 @@ function(x, by=NULL,
     if (is.null(value.labels)) {
       if (is.null(by)) val.lab <- names(x) else val.lab <- colnames(x)
       if (length(val.lab) == 0) val.lab <- colnames(x)  # read matrix directly
+      if (!is.null(names(count.labels))) val.lab <- names(count.labels)
     }
     else
       val.lab <- value.labels
     val.lab <- gsub(" ", "\n", val.lab) 
-
+    if (beside) coords <- apply(coords, 2, mean)  # one label per group
     axis(ax.value, at=coords, labels=FALSE, tck=-.01, ...)
-    #offset <- .5 + .01 * rotate.values
     text(x=coords, y=par("usr")[3], labels=val.lab,
          pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
          offset=offset, ...)
+    #offset <- .5 + .01 * rotate.values
   }
-  #else
-    #text(y=coords, x=par("usr")[1], labels=names(x),
-         #pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
     
   # axis labels
   lbl.lns <- 3
   lblx.lns <- ifelse (grepl("\n", x.lab, fixed=TRUE), lbl.lns + 0.5, lbl.lns)
   lblx.lns <- lblx.lns - 0.5
   if (offset > 0.5) lblx.lns <- lblx.lns + 0.5
-  #if (!horiz) lblx.lns <- lblx.lns - 1
-  #if (offset > 0.5) lblx.lns <- lblx.lns + 1
   lbly.lns <- ifelse (grepl("\n", y.lab, fixed=TRUE), lbl.lns - .4, lbl.lns)
   if (horiz) lbly.lns <- lbly.lns - .5
   title(xlab=x.lab, line=lblx.lns, cex.lab=cex.lab, col.lab=col.lab)
@@ -459,35 +457,43 @@ function(x, by=NULL,
 
   # ----------------------------------------------------------------------------
   # text output
-  if (prop && is.null(count.levels)) {
+  if (prop && is.null(count.labels)) {
     if (!is.null(by) || is.matrix(x))
       x  <- x.temp 
     else
       x <- table(x.temp)
   }
-  if (prop && !is.null(count.levels))
+  if (prop && !is.null(count.labels))
     x <- as.table(x.temp)
 
-  if (is.null(by)  &&  !is.matrix(x)  && !quiet) {  # one variable, dim == 0 if x<-x.temp 
-  #if (length(dim(x)) == 1  && !quiet) {  # one variable, dim == 0 if x<-x.temp 
 
-    stats <- .ss.factor(x, by=NULL, brief=TRUE, digits.d=NULL,
-                        x.name, y.name, x.lbl, y.lbl)
+  # one variable, dim == 0 if x<-x.temp 
+  if (is.null(by)  &&  !is.matrix(x)  && !quiet) {
+    if (.is.integer(x) &&  all(x >= 0)) {  # only process if counts
 
-    txttl <- stats$title
-    counts <- stats$count
-    chi <- stats$chi
+      stats <- .ss.factor(x, by=NULL, brief=TRUE, digits.d=NULL,
+                          x.name, y.name, x.lbl, y.lbl)
 
-    class(txttl) <- "out_piece"
-    class(counts) <- "out_piece"
-    class(chi) <- "out_piece"
-    output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
-    class(output) <- "out_all"
-    print(output)      
+      if (!is.null(stats)) {
+        txttl <- stats$title
+        counts <- stats$count
+        chi <- stats$chi
+
+        class(txttl) <- "out_piece"
+        class(counts) <- "out_piece"
+        class(chi) <- "out_piece"
+        output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
+        class(output) <- "out_all"
+        print(output)      
+      }
+    }
+    else
+      stats <- NULL
   }
 
   else {  # two variables
-    stats <- .ss.factor(x, by, brief=TRUE, digits.d=NULL,
+    # need brief=FALSE for row proportions
+    stats <- .ss.factor(x, by, brief=FALSE, digits.d=NULL,
                         x.name, y.name, x.lbl, y.lbl) 
 
     txttl <- stats$txttl

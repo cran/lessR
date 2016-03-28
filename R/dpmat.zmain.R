@@ -1,6 +1,6 @@
 .dpmat.main <- 
-function(x, n.cat, mylabels, nm,
-         col.fill, col.stroke, col.bg, col.grid,
+function(x, mylabels, nm,
+         col.fill, col.stroke, col.bg, col.grid, col.trans,
          shape.pts, col.area, col.box, 
          cex.axis, col.axis, col.low, col.hi,
          xy.ticks, xlab, ylab, main, sub, cex,
@@ -11,7 +11,7 @@ function(x, n.cat, mylabels, nm,
   if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels) 
 
   # if exist, get axes labels
-  gl <- .getlabels(xlab, ylab, main, cex.lab=0.98)
+  gl <- .getlabels(xlab, ylab, main, cex.lab=getOption("lab.size"))
   x.lab <- gl$xb
   y.lab <- gl$yb
   main.lab <- gl$mb
@@ -115,6 +115,10 @@ function(x, n.cat, mylabels, nm,
   }
 
   # bubbles
+  if (!is.null(col.trans)) {
+    trans.pts <- col.trans
+    for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans.pts)*256)
+  }
   symbols(cords$xx, cords$yy, circles=c, bg=clr, 
         fg=col.stroke, inches=bubble.size, add=TRUE, ...)
 
@@ -130,10 +134,8 @@ function(x, n.cat, mylabels, nm,
   if (!quiet) {
 
     # display variable labels
-    txtvl <- ""
     txlbl <- ""
     if (!is.null(mylabels)) {
-      txtvl <- "Variable Labels"
       tx <- character(length = 0)
       for (i in 1:length(rownames(mytbl))) {
         ml <- mylabels[i]
@@ -151,11 +153,10 @@ function(x, n.cat, mylabels, nm,
     for (i in 1:length(txtbl)) tx[length(tx)+1] <- txtbl[i]
     txfrq <- tx
 
-    class(txtvl) <- "out_piece"
     class(txlbl) <- "out_piece"
     class(txttl) <- "out_piece"
     class(txfrq) <- "out_piece"
-    output <- list(out_title=txtvl, out_text=txlbl,
+    output <- list(out_text=txlbl,
                    out_title=txttl, out_text=txfrq)
     class(output) <- "out_all"
     print(output)
