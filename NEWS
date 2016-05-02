@@ -6,6 +6,67 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 3.4.8 (2016-05-01) <<<<<<
+
+-------------
+Updates 3.4.8
+-------------
+
+Graphics routines
+  color.box option added at the global level with theme and locally,
+    which provides for the border of the box around the plot
+  set a color option to "off" sets it to "transparent"
+
+ScatterPlot
+  native RStudio scaling smaller than regular R, now adjusted
+  multiple x-variables allowed for continuous variables in addition
+    to categorical variables
+  multiple y-variables allowed, but not both multiple x and y
+  fit lines (loess or ls) for multiple variables
+  argument for object named regular changed to the more
+    descriptive name of point
+  option name stat changed to topic, with a default of data
+  options that started with the abbreviation col now start with color
+  option sort.y renamed to sort.yx to be more descriptive
+  option sort.yx sorts y by x for a single x-variable, and by x2-x1 for
+    two x-variables
+  option size renamed from the R notation cex for scaling factor of
+    plotted symbol
+  option object replaces more restrictive option type
+  topic arguments include proportion, median, diff for difference
+  row.names can given for the x-axis as well as the y-axis
+  one or more continuous x-variables and no y-variable with a
+    line object results in a run chart(s) with Index on the x axis
+  segments.y for a Cleveland dot plot with two variables specifies
+    to join each pair of points with a line segment
+  diag option for diagonal line dropped because replaced with a
+    Cleveland dot plot for two variables
+  means are plotted for both categorical x and numeric y and vice versa
+  suggestions often provided for alternate visualizations
+
+theme
+  suggest option added, which provides suggestions for additional input
+    (currently implemented for ScatterPlot)
+
+ttest
+  confidence interval of standardized mean difference dropped because
+    it relied upon the MBESS package, which added too many dependencies
+  diagonal line plot replaced with two variable Cleveland dot plot
+
+
+---------------
+Bug Fixes 3.4.8
+---------------
+
+BarChart
+  for small number of levels, bars again now scaled narrow
+
+ScatterPlot
+  line argument works for option object 
+
+
+
+
 >>>>>> Changes for lessR version 3.4.6 (2016-03-27) <<<<<<
 
 -------------

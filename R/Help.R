@@ -73,11 +73,11 @@ function(topic=NULL) {
 
   t0 <- "Help Topics for lessR"
 
-  fcsv <- bquote(paste(bold("Help(data)"), "  Create a data file from Excel or similar application."))
+  fsys <- bquote(paste(bold("Help(theme)"), "  System level settings, such as a color theme for graphics"))
+  fcsv <- bquote(paste(bold("Help(data)"), "  Create a data file from Excel or similar application"))
   frw <- bquote(paste(bold("Help(Read)"), " and ", bold("Help(Write)"), "  Read or write data to or from a file"))
   flib <- bquote(paste(bold("Help(library)"), "  Access libraries of functions called packages"))
   ftrans <- bquote(paste(bold("Help(edit)"), "  Edit data and create new variables from existing variables"))
-  fsys <- bquote(paste(bold("Help(system)"), "  System level settings, such as a color theme for graphics"))
 
   fhist <- bquote(paste(bold("Help(Histogram)"), "  Histogram, box plot, dot plot, density curve"))
   fbar <- bquote(paste(bold("Help(BarChart)"), "  Bar chart, pie chart"))
@@ -102,11 +102,11 @@ function(topic=NULL) {
   set.up.plot() 
   pos1 <- 93; pos2 <- 69; pos3 <- 49; pos4 <- 14; pos5 <- 7
   text(50,100, label=t0, font=4)
-  text(0,pos1, label=fcsv, adj=0)
-  text(0,pos1-4, label=frw, adj=0)
-  text(0,pos1-8, label=flib, adj=0)
-  text(0,pos1-12, label=ftrans, adj=0)
-  text(0,pos1-16, label=fsys, adj=0)
+  text(0,pos1, label=fsys, adj=0)
+  text(0,pos1-4, label=fcsv, adj=0)
+  text(0,pos1-8, label=frw, adj=0)
+  text(0,pos1-12, label=flib, adj=0)
+  text(0,pos1-16, label=ftrans, adj=0)
   lines(c(5,90), c(74,74), col=col.line)
   text(0,pos2, label=fhist, adj=0)
   text(0,pos2-4, label=fbar, adj=0)
@@ -173,7 +173,7 @@ function(topic=NULL) {
   else if (topic %in% c("rd", "read")) {
   t0 <- "Read Data into R and Prepare for Analysis"
 
-  f1 <- bquote(paste(bold("Read, rd"), "  Read a data file into an R data frame for analysis."))
+  f1 <- bquote(paste(bold("Read, rd"), "  Read a data file into an R data frame for analysis"))
 
   t1 <- "
   Browse for a csv, tab-delimited, Excel, R, SAS, or SPSS data file on 
@@ -213,7 +213,7 @@ function(topic=NULL) {
   else if (topic %in% c("wrt", "write")) {
   t0 <- "Write Contents of Data Frame mydata into a Data File"
 
-  f1 <- bquote(paste(bold("Write, wrt"), "  Write a data file called mydata into an R data frame."))
+  f1 <- bquote(paste(bold("Write, wrt"), "  Write a data file called mydata into an R data frame"))
 
   t1 <- "
   The name of the entire rectangular table of data, called a data frame in R, can 
@@ -250,9 +250,9 @@ function(topic=NULL) {
   else if (topic %in% c("library", "package", "install", "update"))  {
   t0 <- "Contributed Packages"
 
-  f1 <- bquote(paste(bold("install.packages"), "  Download a contributed package."))
-  f2 <- bquote(paste(bold("library"), "  Load an installed package from the library into R for access."))
-  f3 <- bquote(paste(bold(update.packages), "  Update contributed packages to current versions."))
+  f1 <- bquote(paste(bold("install.packages"), "  Download a contributed package"))
+  f2 <- bquote(paste(bold("library"), "  Load an installed package from the library into R for access"))
+  f3 <- bquote(paste(bold(update.packages), "  Update contributed packages to current versions"))
 
   t1 <- "
   R works with functions and each function is contained in a specific
@@ -291,11 +291,11 @@ function(topic=NULL) {
                         "subset", "subs"))  {
   t0 <- "Edit Data"
 
-  f1 <- bquote(paste(bold("fix"), "  Use a graphical interface to edit data values, add or delete variables."))
-  f2 <- bquote(paste(bold("Transform"), "  Transform the values of a variable with a formula."))
-  f3 <- bquote(paste(bold("Recode"), "  Recode the values of a variable by specifying the new values."))
-  f4 <- bquote(paste(bold("factor"), "  Explicitly define the values of a categorical variable."))
-  f5 <- bquote(paste(bold("Subset"), "  Extract a subset of data, variables (columns) and/or rows."))
+  f1 <- bquote(paste(bold("fix"), "  Use a graphical interface to edit data values, add or delete variables"))
+  f2 <- bquote(paste(bold("Transform"), "  Transform the values of a variable with a formula"))
+  f3 <- bquote(paste(bold("Recode"), "  Recode the values of a variable by specifying the new values"))
+  f4 <- bquote(paste(bold("factor"), "  Explicitly define the values of a categorical variable"))
+  f5 <- bquote(paste(bold("Subset"), "  Extract a subset of data, variables (columns) and/or rows"))
 
   t1 <- "
   R function fix provides a graphical/mouse interface for editing data.
@@ -307,7 +307,7 @@ function(topic=NULL) {
   R function factor creates a new variable with non-numeric categories.
   Severity was encoded with a 1 for Mild, 2 for Moderate and 3 for Severe.
       > mydata <- Transform(ordered=TRUE, Severity.f= 
-                   factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
+               factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
   Here the values of the new variable are also ordered, from Mild to Severe. 
   Extract subsets of data from a data frame with the lessR Subset function.
       > mydata <- Subset(rows=Gender==\"M\", columns=c(Years, Salary))
@@ -330,34 +330,34 @@ function(topic=NULL) {
 
 
   else if (topic %in% c("system", "set", "theme")) {
-  t0 <- "System Level Settings"
+  t0 <- "Global Settings"
 
-  f1 <- bquote(paste(bold("set"), "  lessR function for lessR system settings such as a color theme."))
-  f2 <- bquote(paste(bold("options"), "  Standard R function to access system settings."))
+  f1 <- bquote(paste(bold("theme"), "  all lessR system settings such as a color theme"))
+  f2 <- bquote(paste(bold("showColors"), "  lessR function to illustrate all color names"))
 
   t1 <- "
-  The lessR function theme provides system settings for the lessR system, as
-  well as some of the more commonly used general R settings. Set the color
-  theme for the graphics functions. The default color theme is \"dodgerblue\",
-  with possibilities of \"gray\", \"green\", \"gold\", \"rose\", \"red\", \"dodgerblue\",
-  \"purple\", \"sienna\", \"white\", \"orange.black\" and \"gray.black\".
-  Here set subsequent graphics to gray scale.
+  The lessR function theme provides global settings for lessR functions.
+  Set the color theme for the graphics functions. The default color theme is
+  \"dodgerblue\", with possibilities of \"gray\", \"green\", \"gold\", \"rose\", \"red\", 
+  \"purple\", \"sienna\", \"white\", \"orange.black\" and \"gray.black\".  Example:
       > theme(colors=\"gray\") 
-  The transparency level of bars and plotted points is set with the
-  trans.fill.bar and trans.fill.pt options. Set ghost=\"TRUE\" to get
-  transparent bars against a black background with no grid lines.
+  Set the transparency level of bars and plotted points with the
+  trans.fill.bar and trans.fill.pt options. Turn off grid lines with col.grid=\"off\".
+  Change or remove background color with col.bg, such as col.bg=\"off\".
 
   Levels of a categorical variable may be encoded with numerical digits,
   such as 0 for Male and 1 for Female. R is obliged to interpret numerical
   variables as numeric.  One option is to redefine these variables as
   factors [see Help(edit)]. Or set the value of the lessR option n.cat.
       > theme(n.cat=3)
-  Here any numerical variable with just 3 unique values or less is
-  interpreted as a categorical variable. The default value of n.cat is 0,
-  that is, turned off.
+  Here any numerical variable with just 3 unique, equally spaced interval 
+  values or less is interpreted as a categorical variable. The default
+  value of n.cat is 8, and applies to ScatterPlot and SummaryStats.
 
-  To see all available standard R options, enter the following.
-      > options()
+  To see all available theme options, enter the following.
+      > theme(show=TRUE)
+  To see all the R named colors, enter the following.
+      > showColors()
   "
 
   set.up.plot(2)
@@ -376,14 +376,14 @@ function(topic=NULL) {
     "univariate")) {
   t0 <- "Histogram, etc."
 
-  f1 <- bquote(paste(bold("Histogram, hs"), "  Histogram."))
-  f2 <- bquote(paste(bold("Density, dn"), "  Density curve over histogram."))
-  f3 <- bquote(paste(bold("BoxPlot, bx"), "  Box plot."))
-  f4 <- bquote(paste(bold("ScatterPlot, sp"), "  Scatter plot of 1 variable."))
+  f1 <- bquote(paste(bold("Histogram, hs"), "  Histogram"))
+  f2 <- bquote(paste(bold("Density, dn"), "  Density curve over histogram"))
+  f3 <- bquote(paste(bold("BoxPlot, bx"), "  Box plot"))
+  f4 <- bquote(paste(bold("ScatterPlot, sp"), "  Scatter plot of 1 variable"))
 
   t1 <- "
   Plot a distribution of data values for a continuous variable, here for
-  variable Y for the current color theme. Use Histogram or hs.
+  variable Y with the current color theme. Use Histogram or hs.
       > Histogram(Y)
   Specify the gray scale color theme, a title, and a label for the x axis.
       > theme(colors=\"gray\")
@@ -420,9 +420,9 @@ function(topic=NULL) {
   else if (topic %in% c("barchart", "bc", "piechart", "pc", "pareto")) {
   t0 <- "BarChart, PieChart and Pareto Chart"
 
-  f1 <- bquote(paste(bold("BarChart, bc"), "  Bar chart for one or more categorical variables."))
-  f2 <- bquote(paste(bold("PieChart, pc"), "  Pie chart for a categorical variable."))
-  f3 <- bquote(paste(bold("pareto.chart"), "  Produce a Pareto chart."))
+  f1 <- bquote(paste(bold("BarChart, bc"), "  Bar chart for one or more categorical variables"))
+  f2 <- bquote(paste(bold("PieChart, pc"), "  Pie chart for a categorical variable"))
+  f3 <- bquote(paste(bold("pareto.chart"), "  Produce a Pareto chart"))
 
   t1 <- "
   Default bar chart with lessR function BarChart, or bc, as well as the
@@ -462,7 +462,7 @@ function(topic=NULL) {
   else if (topic %in% c("linechart", "lc")) {
   t0 <- "Line Chart"
 
-  f1 <- bquote(paste(bold("LineChart, lc"), "  A line chart, such as a run chart or time series chart."))
+  f1 <- bquote(paste(bold("LineChart, lc"), "  A line chart, such as a run chart or time series chart"))
 
   t1 <- "
   The lessR function LineChart, or lc, generates a line chart with values
@@ -502,7 +502,7 @@ function(topic=NULL) {
   else if  (topic %in% c("scatterplot", "sp", "plot", "scatter")) {
   t0 <- "Scatterplot"
 
-  f1 <- bquote(paste(bold("ScatterPlot, sp"), "  A scatterplot for one or two variables."))
+  f1 <- bquote(paste(bold("ScatterPlot, sp"), "  A scatterplot for one or two variables"))
 
   t1 <- "
   ScatterPlot, or sp, generates a scatter plot for one or two variables with
@@ -540,7 +540,7 @@ function(topic=NULL) {
   else if  (topic %in% c("summarystats", "ss", "standard score", "z-score")) {
   t0 <- "Summary Statistics"
 
-  f1 <- bquote(paste(bold("SummaryStats, ss"), "  Summarize the values of a variable."))
+  f1 <- bquote(paste(bold("SummaryStats, ss"), "  Summarize the values of a variable"))
 
   t1 <- "
   Summarize the variable Y with lessR SummaryStats, or just ss.  If numerical, 
@@ -576,9 +576,9 @@ function(topic=NULL) {
   else if (topic %in% c("one.sample", "one sample", "proportion", "prop")) {
   t0 <- "Inference for a Single Variable"
 
-  f1 <- bquote(paste(bold("ttest, tt"), "  Inference for a mean."))
-  f2 <- bquote(paste(bold("binom.test"), "  Inference for a proportion from exact binomial probability."))
-  f3 <- bquote(paste(bold("prop.test"), "  Inference for a proportion from approximate normal probability."))
+  f1 <- bquote(paste(bold("ttest, tt"), "  Inference for a mean"))
+  f2 <- bquote(paste(bold("binom.test"), "  Inference for a proportion from exact binomial probability"))
+  f3 <- bquote(paste(bold("prop.test"), "  Inference for a proportion from approximate normal probability"))
 
   t1 <- "
   These inference tests analyze the mean of a numeric variable or the
@@ -617,8 +617,8 @@ function(topic=NULL) {
   else if (topic %in% c("ttest", "t-test", "tt")) {
   t0 <- "Compare Two Group Means"
 
-  f1 <- bquote(paste(bold("ttest, tt"), "  An enhanced version of t.test to compare two group means."))
-  f2 <- bquote(paste(bold("Model, model"), "  The t-test if Y is numerical and X has two values."))
+  f1 <- bquote(paste(bold("ttest, tt"), "  An enhanced version of t.test to compare two group means"))
+  f2 <- bquote(paste(bold("Model, model"), "  The t-test if Y is numerical and X has two values"))
 
   t1 <- "
   When responses to a variable are organized into two or more groups,
@@ -655,7 +655,7 @@ function(topic=NULL) {
   else if (topic %in% c("anova", "av")) {
   t0 <- "Compare Means of Two or More Groups"
 
-  f1 <- bquote(paste(bold("ANOVA, av"), "  Analysis of variance to compare two or more group means."))
+  f1 <- bquote(paste(bold("ANOVA, av"), "  Analysis of variance to compare two or more group means"))
   t1 <- "
   When responses to a variable are organized into exactly two groups,
   either the t-test function, ttest, or the lessR analysis of variance
@@ -691,7 +691,7 @@ function(topic=NULL) {
   else if (topic == "power") {
   t0 <- "Power"
 
-  f1 <- bquote(paste(bold("ttestPower, ttp"), "  Power analysis of the t-test."))
+  f1 <- bquote(paste(bold("ttestPower, ttp"), "  Power analysis of the t-test"))
 
   t1 <- "
   The lessR function, ttestPower, uses the standard R function, power.t.test, to 
@@ -724,8 +724,8 @@ function(topic=NULL) {
   else if (topic %in% c("correlation", "cr", "cor", "corr")) {
   t0 <- "Correlation and Related Graphics"
 
-  f1 <- bquote(paste(bold("Correlation, cr"), "  Correlations between two or more variables."))
-  f3 <- bquote(paste(bold("ScatterPlot, sp"), "  Graphics, generate a scatterplot for two or more variables."))
+  f1 <- bquote(paste(bold("Correlation, cr"), "  Correlations between two or more variables"))
+  f3 <- bquote(paste(bold("ScatterPlot, sp"), "  Graphics, generate a scatterplot for two or more variables"))
 
   t1 <- "
   The lessR function Correlation, or cr, can compute a correlation for two
@@ -764,8 +764,8 @@ function(topic=NULL) {
   else if (topic %in% c("regression", "reg")) {
   t0 <- "Regression Analysis"
 
-  f1 <- bquote(paste(bold("Regression, reg, reg.brief"), "  Regression analysis."))
-  f2 <- bquote(paste(bold("Model, model"), "  Regression analysis if the variables are numerical."))
+  f1 <- bquote(paste(bold("Regression, reg, reg.brief"), "  Regression analysis"))
+  f2 <- bquote(paste(bold("Model, model"), "  Regression analysis if the variables are numerical"))
 
   t1 <- "
   The full text output of Regression, or reg, is comprehensive. Here
@@ -803,8 +803,8 @@ function(topic=NULL) {
   else if (topic %in% c("logit", "lr")) {
   t0 <- "Logit Regression Analysis"
 
-  f1 <- bquote(paste(bold("Logit, lr"), "  Logit regression analysis."))
-  f2 <- bquote(paste(bold("Model, model"), "  Logit analysis if a binary response variable."))
+  f1 <- bquote(paste(bold("Logit, lr"), "  Logit regression analysis"))
+  f2 <- bquote(paste(bold("Model, model"), "  Logit analysis if a binary response variable"))
 
   t1 <- "
   Logit preforms a logit analysis. This example specifies a multiple
@@ -837,11 +837,11 @@ function(topic=NULL) {
   else if (topic %in% c("factor.analysis", "fa", "factors", "corcfa", "cfa", "corefa", "efa", "corScree", "scree")) {
   t0 <- "Confirmatory and Exploratory Factor Analysis"
 
-  f1 <- bquote(paste(bold("corCFA, cfa"), "  Confirmatory factor analysis."))
-  f2 <- bquote(paste(bold("corEFA, efa"), "  Exploratory factor analysis."))
-  f3 <- bquote(paste(bold("corRead, rd.cor"), "  Read a correlation matrix."))
-  f4 <- bquote(paste(bold("corScree, scree"), "  Scree plot of eigenvalues of the correlation matrix."))
-  f5 <- bquote(paste(bold("corReorder, reord"), "  Reorder the variables in the correlation matrix."))
+  f1 <- bquote(paste(bold("corCFA, cfa"), "  Confirmatory factor analysis"))
+  f2 <- bquote(paste(bold("corEFA, efa"), "  Exploratory factor analysis"))
+  f3 <- bquote(paste(bold("corRead, rd.cor"), "  Read a correlation matrix"))
+  f4 <- bquote(paste(bold("corScree, scree"), "  Scree plot of eigenvalues of the correlation matrix"))
+  f5 <- bquote(paste(bold("corReorder, reord"), "  Reorder the variables in the correlation matrix"))
 
   t1 <- "
   Several lessR functions analyze data in the form of a correlation matrix,
@@ -880,10 +880,10 @@ function(topic=NULL) {
   else if (topic %in% c("prob", "norm", "pt", "qnorm", "prob.tcut")) {
   t0 <- "Probabilities for Normal and t-distributions"
 
-  f1 <- bquote(paste(bold("prob.norm"), "  Normal distribution probability over a range of values."))
-  f2 <- bquote(paste(bold("pt"), "  Probability for a t-distribution related to a specified t-value."))
-  f3 <- bquote(paste(bold("qnorm"), "  Quantile for a normal distribution."))
-  f4 <- bquote(paste(bold("prob.tcut"), "  Cutoff values for a t-distribution based on corresponding quantiles."))
+  f1 <- bquote(paste(bold("prob.norm"), "  Normal distribution probability over a range of values"))
+  f2 <- bquote(paste(bold("pt"), "  Probability for a t-distribution related to a specified t-value"))
+  f3 <- bquote(paste(bold("qnorm"), "  Quantile for a normal distribution"))
+  f4 <- bquote(paste(bold("prob.tcut"), "  Cutoff values for a t-distribution based on corresponding quantiles"))
 
 
   t1 <- "
@@ -925,8 +925,8 @@ function(topic=NULL) {
   else if (topic %in% c("random", "rnorm", "rbinom")) {
   t0 <- "Normal and Binomial Random Values"
 
-  f1 <- bquote(paste(bold("rnorm"), "  Generate randomly sampled values from a normal distribution."))
-  f2 <- bquote(paste(bold("rbinom"), "  Generate randomly sampled values from a binomial distribution."))
+  f1 <- bquote(paste(bold("rnorm"), "  Generate randomly sampled values from a normal distribution"))
+  f2 <- bquote(paste(bold("rbinom"), "  Generate randomly sampled values from a binomial distribution"))
 
   t1 <- "
   R can generate simulated sampling from many different population
@@ -962,7 +962,7 @@ function(topic=NULL) {
   else if (topic == "sample") {
   t0 <- "Generate Random Samples"
 
-  f1 <- bquote(paste(bold("sample"), "  Generate random samples."))
+  f1 <- bquote(paste(bold("sample"), "  Generate random samples"))
 
   t1 <- "
   To use the sample function, first specify the population from which to randomly 

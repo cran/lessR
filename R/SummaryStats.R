@@ -91,18 +91,28 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (ncol(data) == 1) {
     x.call <- data[,1]
 
+    num.cat <- .is.num.cat(x.call, n.cat)
     nu <- length(unique(na.omit(x.call)))
-    if (.is.num.cat(x.call, n.cat)) {
+
+    if (!num.cat && is.integer(x.call) && nu <= n.cat) {
+      cat("\n")
+      cat(">>> ", x.name, " has only only ", nu, " unique ",
+          "integer values, but not equally spaced,\n",
+          "      so treat as numerical in this analysis\n",
+          "    Maybe convert to an R factor to treat as categorical\n\n",
+          sep="")
+    }
+
+    if (num.cat || is.character(x.call)) {
       x.call <- as.factor(x.call)
       .ncat("summary statistics", x.name, nu, n.cat)
     }
   }
 
-
   if (ncol(data) > 1)
     .ss.data.frame(data, n.cat, brief, ...) 
 
-  else if (is.numeric(x.call)) {
+  else if (!is.factor(x.call)) {
     sk <- NA; kt <- NA; q1 <- NA; q3 <- NA;  qr <- NA;
     stuff <- .ss.numeric(x.call, y.call, digits.d, brief, ...)
     txsts <- stuff$tx
@@ -110,7 +120,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   }
 
   # ordered factors have two attributes, "ordered" and "factor"
-  else if (is.factor(x.call)  ||  is.character(x.call)) {
+  else if (is.factor(x.call)) {
 
     gl <- .getlabels(xlab=NULL, ylab=NULL, main=NULL, cex.lab=NULL)
     x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
@@ -148,14 +158,13 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The variable to be analyzed must be numeric or a factor, or have\n",
-        "character values that can be converted to a factor, or logical values\n",
-        "that can be converted to numerical 0 and 1.\n")
+        "character values that can be converted to a factor.\n")
   }
 
 
   if (ncol(data) == 1) { 
 
-    if (is.numeric(x.call)  &&  nu > n.cat) {
+    if (!is.factor(x.call)) {
       class(txsts) <- "out_piece"
       class(txotl) <- "out_piece"
 
@@ -165,7 +174,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
            median=stuff$md, quartile3=stuff$q3, max=stuff$mx, IQR=stuff$qr)
     }
 
-    else if (is.factor(x.call)  ||  is.character(x.call)  ||  nu <= n.cat) {
+    else if (is.factor(x.call)) {
       if (n.dim == 1) {
         class(txttl) <- "out_piece"
         class(txsts) <- "out_piece"

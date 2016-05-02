@@ -1,10 +1,10 @@
 importFrom("ellipse", ellipse)
 importFrom("leaps", leaps)
-importFrom("MBESS", ci.smd)
 importFrom("foreign", read.spss)
 importFrom("sas7bdat", read.sas7bdat)
 importFrom("readxl", read_excel)
 importFrom("triangle", dtriangle, rtriangle)
+# importFrom("MBESS", ci.smd)
 
 importFrom("graphics", "abline", "arrows", "axis", "axis.Date", "barplot", "box", "boxplot", "hist", "legend", "lines", "mtext", "pairs", "par", "pie", "plot", "plot.default", "plot.new", "plot.window", "points", "polygon", "rect", "rug", "segments", "stripchart", "strwidth", "sunflowerplot", "symbols", "text", "title", "axTicks")
 importFrom("grDevices", "boxplot.stats", "col2rgb", "colorRampPalette", "colors", "dev.list", "dev.new", "dev.off", "dev.set", "gray", "heat.colors", "palette", "pdf", "rainbow", "rgb", "terrain.colors")

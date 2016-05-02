@@ -1,10 +1,16 @@
 .dn.main <- 
 function(x, 
          bw, type, bin.start, bin.width,
-         col.fill, col.bg, col.grid, col.nrm, col.gen,
+         col.fill, col.bg, col.grid, col.box, col.nrm, col.gen,
          col.fill.nrm, col.fill.gen,
          cex.axis, col.axis, rotate.values, offset, 
          x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)  {
+
+
+  # scale for regular R or RStudio
+  adj <- .RSadj(bubble.size=NULL, cex.axis)
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
 
   if (!is.null(x.pt)) {
     y.axis <- TRUE
@@ -88,22 +94,22 @@ function(x,
   # axis, axis ticks
   if (!y.axis)
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
-          par("usr")[1], par("usr")[3], cex.axis, col.axis,
+          par("usr")[1], par("usr")[3], size.axis, col.axis,
           rotate.values, offset, ...)
   else
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-          par("usr")[1], par("usr")[3], cex.axis, col.axis,
+          par("usr")[1], par("usr")[3], size.axis, col.axis,
           rotate.values, offset, ...)
 
   # axis value labels
   if (!y.axis) y.lab="" else y.lab="Density"
   max.lbl <- max(nchar(axTicks(2)))
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
+          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
 
   # colored background for plotting area
   usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
   
   # plot the histogram
   plot(h, add=TRUE, freq=FALSE, col=col.fill, border="transparent")

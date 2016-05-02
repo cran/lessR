@@ -22,7 +22,7 @@ VariableLabels(x, value=NULL, data=mydata, quiet=getOption("quiet"))
   \item{data}{Data frame that contains the variable(s) of interest. The output
     of the function is assigned to this data frame.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system
-    default with \code{\link{set}} function.}
+    default with \code{\link{theme}} function.}
 
 vl{\ldots}
 }

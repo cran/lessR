@@ -8,7 +8,7 @@ Display a normal curve with shading according to the z-score, the number of stan
 }
 
 \usage{
-prob.znorm(mu=0, sigma=1, col.border="gray10",
+prob.znorm(mu=0, sigma=1, color.border="gray10",
          r=.10, g=.34, b=.94, a=.20,
          xlab="", ylab="", main="", 
          y.axis=FALSE, z=TRUE, mag=.9, \ldots)
@@ -18,7 +18,7 @@ prob.znorm(mu=0, sigma=1, col.border="gray10",
 \arguments{
   \item{mu}{Population mean of normal distribution.}
   \item{sigma}{Population standard deviation of normal distribution.}
-  \item{col.border}{Color of the border of the normal curve.}
+  \item{color.border}{Color of the border of the normal curve.}
   \item{r}{Red component of fill color, from 0 to 1.}
   \item{g}{Green component of fill color, from 0 to 1.}
   \item{b}{Blue component of fill color, from 0 to 1.}

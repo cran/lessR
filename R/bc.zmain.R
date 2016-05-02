@@ -1,10 +1,16 @@
 .bc.main <- 
 function(x, by=NULL, 
-         col.fill, col.stroke, col.bg, col.grid, random.col, colors,
+         col.fill, col.stroke, col.bg, col.grid, col.box, colors,
          horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
          cex.axis, col.axis, rotate.values, offset, beside,
          col.low, col.hi, count.labels,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
+
+  # scale for regular R or RStudio
+  adj <- .RSadj(bubble.size=NULL, cex.axis)
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
+  size.txt <- adj$size.txt
 
   if ( (is.table(x) || is.matrix(x)) && is.null(legend.title) ) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -22,13 +28,25 @@ function(x, by=NULL,
 
   # get variable labels if exist plus axes labels
   txt <- "Proportion"
-  if (!is.null(by)) txt <- "Cell Proportion within Each Column"
-  if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- txt
+  if (!is.null(by) && prop && !beside) txt <- paste("Cell Proportion within")
+  if (is.null(ylab)) if (!prop) ylab <- "Count" else ylab <- txt
+
   gl <- .getlabels(xlab, ylab, main, cex.lab=getOption("lab.size"))
   x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
   y.name <- gl$yn; y.lab <- gl$yb; y.lbl <- gl$yl
   main.lab <- gl$mb
   cex.lab <- gl$cex.lab
+
+  done <- ifelse (grepl("of", y.lab, fixed=TRUE), TRUE, FALSE) 
+  if ((!prop || is.null(by)) &&  !done) y.lab <- paste(y.lab, "of", x.name)
+  if (!is.null(by)) {
+    if (!beside) {
+      txt <- paste(ylab, "of", x.name)
+      y.lab <- ifelse (!prop, txt, paste(y.lab, x.name, "by", y.name))
+    }
+    else
+      y.lab <- ifelse(prop, "Proportion", "Count")
+  }
 
   if (is.matrix(x)) {  # get the variable names as counts entered directly
     options(xname = x.lab)
@@ -107,9 +125,9 @@ function(x, by=NULL,
   # ----------------------------------------------------------------------------
   # colors
 
-  # get number of colors (does not indicate col.fill multiple colors)
+  # get n.colors (does not indicate col.fill multiple colors)
   if (is.null(by) && !order.x && !is.matrix(x))
-    n.colors <- 1
+    n.colors <- length(col.fill)
   else
     n.colors <- nrow(x)
   if (!is.null(by) && order.y) n.colors <- nrow(x)
@@ -127,8 +145,6 @@ function(x, by=NULL,
 
   # color palette
   if ((order.x && is.null(by)) || order.y) {  # one var, an ordered factor
-    col.grid <- getOption("col.grid")
-    col.bg <- getOption("col.bg")
 
     lowhi <- .ordcolors(colors, col.low, col.hi) 
     col.low <- lowhi$col.low
@@ -139,21 +155,23 @@ function(x, by=NULL,
   } # end ordered
 
   else if (colors == "gray") {
-    color.palette <- colorRampPalette(c("gray85","gray30"))
-    clr <- color.palette(nrow(x))
-    if (col.grid == "gray86") col.grid <- getOption("col.grid")
-    if (col.bg == "ghostwhite") col.bg <- getOption("col.bg")
+    if (n.colors == 1 || length(col.fill) > 1)
+      clr <- col.fill
+    else {
+      color.palette <- colorRampPalette(c("gray85","gray30"))
+      clr <- color.palette(n.colors)
+    }
   }
 
   else if ((colors %in% c("blue","rose","green","gold","red","orange",
           "sienna","dodgerblue","purple","white","orange.black","gray.black")
           && (is.null(by) && !is.matrix(x)))) {
-      if (n.colors > 1) {
+      if (n.colors == 1 || length(col.fill) > 1)
+        clr <- col.fill
+      else {
         color.palette <- colorRampPalette(getOption("col.fill.bar"))
         clr <- color.palette(nrow(x))
       }
-      col.grid <- getOption("col.grid")
-      col.bg <- getOption("col.bg")
     }
 
   else if (colors == "rainbow") clr <- rainbow(n.colors)
@@ -161,31 +179,21 @@ function(x, by=NULL,
   else if (colors == "heat") clr <- heat.colors(n.colors)
 
   else  {  # ordered color range does not make sense here 
-    clr <- .col.discrete()
+    if (length(col.fill) > 1)
+      clr <- col.fill
+    else
+      clr <- .col.discrete()[1:n.colors]
     # lighten some default background colors
     if (col.bg == "#EEF0F2") col.bg <- rgb(245,245,245, maxColorValue=255)
     if (col.bg == "#E5DB8E") col.bg <- rgb(251,245,220, maxColorValue=255)
   }
 
-  if (random.col) clr <- clr[sample(length(clr))]
-
-  if (!is.null(col.fill)) {
-    if (n.colors > 1) {
-      for (i in 1:(min(length(col.fill),length(clr)))) clr[i] <- col.fill[i]
-      n.colors <- min(length(col.fill),length(clr))
-    }
-    else {
-      col <- col.fill
-    }
-  }
-
   if (n.colors > 1) {
     palette(clr)
-    col <- 1:n.colors 
+    colr <- 1:n.colors   # colr is a sequence of integers
   }
-  else {
-    if (is.null(col.fill)) col <- getOption("col.fill.bar")  
-  }
+  else  # colr is a color
+    colr <- ifelse (is.null(col.fill), getOption("col.fill.bar"), col.fill)
 
 
   # ----------------------------------------------------------------------------
@@ -232,7 +240,6 @@ function(x, by=NULL,
     extend <- TRUE
   } 
 
-
   # ----------------------------------------------------------------------------
   # set up plot area, color background, grid lines
 
@@ -270,16 +277,15 @@ function(x, by=NULL,
     if (rescale == 3) width.bars <- .22
     if (rescale == 2) width.bars <- .28
     gap <- 0.246 + (0.687 * width.bars)
+    # need (0,1) limit on value axis to let re-scale work
     if (!horiz)
       barplot(x, col="transparent", ylim=c(min.y,max.y), axisnames=FALSE,
-        beside=beside, space=gap, width=width.bars,
-        #beside=beside, space=gap, width=width.bars, xlim=c(0,1),
+        beside=beside, space=gap, width=width.bars, xlim=c(0,1),
         axes=FALSE, ...)
     else
       barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
         beside=beside, space=gap, width=width.bars, xlim=c(min.y, max.y),
-        axes=FALSE, ...)
-        #ylim=c(0,1), axes=FALSE, ...)
+        ylim=c(0,1), axes=FALSE, ...)
   }
 
   if (extend) {
@@ -294,8 +300,7 @@ function(x, by=NULL,
   # bar plot, grid lines
 
   usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
-  #if (max.y > 1) vy <- pretty(0:max.y) else vy <- pretty(1:100*max.y)/100
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
   vy <- pretty(min.y:max.y)
  
   if (!over.grid) {
@@ -304,19 +309,22 @@ function(x, by=NULL,
     else
       abline(v=axTicks(1), col=col.grid, lwd=.5)
   }
+
   if (rescale == 0) {
     # width.bars <- .8   gap <- .6*width.bars
     # axisnames suppressed only works if horiz is FALSE,
     #   otherwise let R generate
-    coords <- barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+    #coords <- barplot(x, add=TRUE, col=colr, beside=beside, horiz=horiz,
+    coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
-          space=gap, cex.names=cex.axis, axisnames=horiz, ...)
+          space=gap, cex.names=size.txt, axisnames=horiz, ...)
   }
   else
-    coords <- barplot(x, add=TRUE, col=col, beside=beside, horiz=horiz,
+    #coords <- barplot(x, add=TRUE, col=colr, beside=beside, horiz=horiz,
+    coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), 
-          cex.names=cex.axis, axisnames=horiz, ...)
+          cex.names=size.txt, axisnames=horiz, ...)
   if (over.grid) {
     if (!horiz)
       abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
@@ -328,7 +336,7 @@ function(x, by=NULL,
   #        unless axisnames=FALSE)
   ax.freq <- ifelse(horiz, 1, 2)
   if (!horiz) las.value <- 1
-  axis(ax.freq, cex.axis=cex.axis, col.axis=col.axis, las=las.value, ...) 
+  axis(ax.freq, cex.axis=size.axis, col.axis=col.axis, las=las.value, ...) 
 
   ax.value <- ifelse(horiz, 2, 1)
   if (!horiz) {
@@ -343,7 +351,7 @@ function(x, by=NULL,
     if (beside) coords <- apply(coords, 2, mean)  # one label per group
     axis(ax.value, at=coords, labels=FALSE, tck=-.01, ...)
     text(x=coords, y=par("usr")[3], labels=val.lab,
-         pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
+         pos=1, xpd=TRUE, cex=size.txt, col=col.axis, srt=rotate.values,
          offset=offset, ...)
     #offset <- .5 + .01 * rotate.values
   }
@@ -355,8 +363,8 @@ function(x, by=NULL,
   if (offset > 0.5) lblx.lns <- lblx.lns + 0.5
   lbly.lns <- ifelse (grepl("\n", y.lab, fixed=TRUE), lbl.lns - .4, lbl.lns)
   if (horiz) lbly.lns <- lbly.lns - .5
-  title(xlab=x.lab, line=lblx.lns, cex.lab=cex.lab, col.lab=col.lab)
-  title(ylab=y.lab, line=lbly.lns, cex.lab=cex.lab)
+  title(xlab=x.lab, line=lblx.lns, cex.lab=size.lab, col.lab=col.lab)
+  title(ylab=y.lab, line=lbly.lns, cex.lab=size.lab)
   title(main=main.lab, col.main=col.main)
 
 
@@ -432,6 +440,7 @@ function(x, by=NULL,
 
       # horizontal placement
       size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
+      if (options("device") == "RStudioGD") size <- 1.3*size
       epsilon <- (size[1] - ll$rect$w) / 2
 
       # legend box
@@ -445,13 +454,13 @@ function(x, by=NULL,
 
       # legend not multiple title lines aware, so start at last title line
       legend(x=xleft, y=ytop-vbuffer, legend=legend.labels, title=l.lab2,
-             fill=col, horiz=FALSE, cex=.7, bty="n", box.lwd=.5,
+             fill=colr, horiz=FALSE, cex=.7, bty="n", box.lwd=.5,
              box.col="gray30", text.col=col.txt)
 
     }  # right margin
 
     else
-      legend(legend.loc, legend=legend.labels, title=l.lab, fill=col, 
+      legend(legend.loc, legend=legend.labels, title=l.lab, fill=colr, 
              horiz=legend.horiz, cex=.7, bty="n", text.col=col.txt)
   }
 
@@ -467,9 +476,18 @@ function(x, by=NULL,
     x <- as.table(x.temp)
 
 
+  stats <- ""
   # one variable, dim == 0 if x<-x.temp 
   if (is.null(by)  &&  !is.matrix(x)  && !quiet) {
     if (.is.integer(x) &&  all(x >= 0)) {  # only process if counts
+
+      txsug <- ""
+      if (getOption("suggest")) {
+        fc <- paste("sp(", x.name, ") ", sep="")
+        txsug <- paste(txsug, ">>> Suggest: ", fc, sep="")
+        fc <- paste("sp(", x.name, ", topic=\"count\") ", sep="")
+        txsug <- paste(txsug, "\n\n>>> Suggest: ", fc, sep="")
+      }
 
       stats <- .ss.factor(x, by=NULL, brief=TRUE, digits.d=NULL,
                           x.name, y.name, x.lbl, y.lbl)
@@ -479,10 +497,12 @@ function(x, by=NULL,
         counts <- stats$count
         chi <- stats$chi
 
+        class(txsug) <- "out_piece"
         class(txttl) <- "out_piece"
         class(counts) <- "out_piece"
         class(chi) <- "out_piece"
-        output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
+        output <- list(out_suggest=txsug, out_title=txttl, out_counts=counts,
+                       out_chi=chi)
         class(output) <- "out_all"
         print(output)      
       }
@@ -491,19 +511,29 @@ function(x, by=NULL,
       stats <- NULL
   }
 
-  else {  # two variables
+  else if (!quiet) {  # two variables
     # need brief=FALSE for row proportions
+
+    txsug <- ""
+    if (getOption("suggest")) {
+      fc <- paste("sp(", x.name, ",", y.name, ") ", sep="")
+      txsug <- paste(txsug, ">>> Suggest: ", fc, sep="")
+    }
+
     stats <- .ss.factor(x, by, brief=FALSE, digits.d=NULL,
                         x.name, y.name, x.lbl, y.lbl) 
 
     txttl <- stats$txttl
     txfrq <- stats$txfrq
     txXV <- stats$txXV
+
+    class(txsug) <- "out_piece"
     class(txttl) <- "out_piece"
     class(txfrq) <- "out_piece"
     class(txXV) <- "out_piece"
     if (!prop)
-      output <- list(out_title=txttl, out_text=txfrq, out_XV=txXV)
+      output <- list(out_suggest=txsug,out_title=txttl, out_text=txfrq,
+                     out_XV=txXV)
     else {
       txrow <- stats$txrow
       class(txrow) <- "out_piece"

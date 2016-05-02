@@ -1,9 +1,9 @@
 simMeans <- 
 function(ns, n, mu=0, sigma=1, ylim.bound=NULL, 
          show.title=TRUE, show.data=TRUE, max.data=10, 
-         col.grid="grey90", pause=FALSE,
+         color.grid="grey90", pause=FALSE,
          sort=NULL, set.mu=FALSE, digits.d=2,
-         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5) {
+         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
   if (missing(ns)) {
@@ -14,6 +14,17 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   if (missing(n)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify the size of each sample, the number of data values, with:  n\n\n")
+  }
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (substr(names(dots)[i], 1, 4) == "col.") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "options that began with the abbreviation  col  now begin with  ",
+          "color \n\n")
+      }
+    }
   }
 
   if (sigma < 0) { 
@@ -89,8 +100,8 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   # grid lines
   vx <- pretty(c(usr[1],usr[2]))
   vy <- pretty(c(usr[3],usr[4]))
-  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=color.grid, lwd=.5)
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=color.grid, lwd=.5)
 
   if (!set.mu && !pause) {
     if (show.title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma), 

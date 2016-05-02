@@ -14,12 +14,14 @@ theme(colors=c("blue", "gray", "rose", "green", "gold", "red",
          "dodgerblue", "purple", "sienna", "orange.black",
          "gray.black", "white"),
 
-         col.fill.bar=NULL, trans.fill.bar=NULL,
-         col.fill.pt=NULL, trans.fill.pt=NULL,
-         col.stroke.bar=NULL, col.stroke.pt=NULL, 
-         col.bg=NULL, col.grid=NULL, col.heat=NULL, ghost=NULL,
+         color.fill.bar=NULL, trans.fill.bar=NULL,
+         color.fill.pt=NULL, trans.fill.pt=NULL,
+         color.stroke.bar=NULL, color.stroke.pt=NULL, 
+         color.bg=NULL, color.grid=NULL, color.box=NULL,
+         color.heat=NULL, ghost=NULL,
 
          n.cat=getOption("n.cat"), lab.size=getOption("lab.size"),
+         suggest=getOption("suggest"),
          quiet=getOption("quiet"), brief=getOption("brief"),
 
          results=getOption("results"), explain=getOption("explain"),
@@ -34,20 +36,22 @@ set(\ldots)
 
 \arguments{
   \item{colors}{The specified color scheme.}
-  \item{col.fill.bar}{Color of a filled region, such as a histogram bar.}
+  \item{color.fill.bar}{Color of a filled region, such as a histogram bar.}
   \item{trans.fill.bar}{The transparency of a filled bar or rectangular region,
        such as a histogram bar or the box in a box plot. Value from 0 to 1,
        opaque to transparent.}
-  \item{col.fill.pt}{Color of a filled region, such as a plotted point.}
+  \item{color.fill.pt}{Color of a filled region, such as a plotted point.}
   \item{trans.fill.pt}{The transparency of the inner region of a plotted point.
        Value from 0 to 1, opaque to transparent.}
-  \item{col.stroke.bar}{Color of the border of a filled region such as a histogram
+  \item{color.stroke.bar}{Color of the border of a filled region such as a histogram
        bar.}
-  \item{col.stroke.pt}{Color of a line or outline of a filled region, such as the
+  \item{color.stroke.pt}{Color of a line or outline of a filled region, such as the
        border of a plotted point.}
-  \item{col.bg}{Color of the plot background.}
-  \item{col.grid}{Color of the grid lines.}
-  \item{col.heat}{Color of the heat map for correlation matrices.}
+  \item{color.bg}{Color of the plot background.}
+  \item{color.grid}{Color of the grid lines.}
+  \item{color.box}{Color of border around the plot background, the box, that encloses 
+        the plot, with a default of \code{"black"}.}
+  \item{color.heat}{Color of the heat map for correlation matrices.}
   \item{ghost}{If \code{TRUE}, add a black background, transparent grid lines
        and transparency for the bars. Overrides individual settings for
        those values. Setting to \code{FALSE} has no effect.}
@@ -58,6 +62,7 @@ set(\ldots)
         \code{\link{SummaryStats}}, and also to the functions such as 
         \code{\link{Histogram}} when processing multiple graphs.}
   \item{lab.size}{Size of labels for x and y axes.}
+  \item{suggest}{If \code{TRUE}, then provide suggestions for alternative analyses.}
   \item{quiet}{If \code{TRUE} then some functions suppress console output.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
        with \code{\link{theme}} function.}
@@ -83,7 +88,7 @@ Sets the default color palette via the R \code{\link{options}} statement, as wel
 
 The gray color scheme is based on the colors used in Hadley Wickham's \code{ggplot2} package.
 
-Set \code{ghost=TRUE} is equivalent to setting \code{col.bg} to \code{"black"} and \code{col.grid} to \code{"transparent"} with a bar transparency of 0.7. It overrides these settings individually, so must turn \code{ghost=FALSE} and set each of the three settings individually to change from the standard \code{ghost} settings.}
+Set \code{ghost=TRUE} is equivalent to setting \code{color.bg} to \code{"black"} and \code{color.grid} to \code{"transparent"} with a bar transparency of 0.7. It overrides these settings individually, so must turn \code{ghost=FALSE} and set each of the three settings individually to change from the standard \code{ghost} settings.}
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
@@ -104,14 +109,14 @@ theme(colors="gray")
 #   all of the individual components of the theme are changed
 # the trans options are the default values, so not necessary to
 #   set unless already changed previously
-# the three ghost settings - trans.fill.bar, col.grid and col.bg --
+# the three ghost settings - trans.fill.bar, color.grid and color.bg --
 #   must be manually entered to achieve  a ghost plot
-theme(col.fill.bar="seagreen3")
-theme(col.fill.pt="seagreen3")
-theme(col.stroke.bar="seagreen4")
-theme(col.stroke.pt="seagreen4")
-theme(col.bg="seashell1")
-theme(col.grid="seashell2")
+theme(color.fill.bar="seagreen3")
+theme(color.fill.pt="seagreen3")
+theme(color.stroke.bar="seagreen4")
+theme(color.stroke.pt="seagreen4")
+theme(color.bg="seashell1")
+theme(color.grid="seashell2")
 theme(trans.fill.bar=.00)
 theme(trans.fill.pt=.66)
 

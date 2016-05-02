@@ -1,54 +1,99 @@
 .plt.main <- 
-function(x, y, by, type, n.cat,
-         col.fill, col.stroke, col.bg, col.grid,
-         shape.pts, col.area, col.box, col.trans, 
-         cex.axis, col.axis, col.low, col.hi,
-         xy.ticks, xlab, ylab, main, sub, cex,
-         value.labels, rotate.values, offset, style, means, stat,
-         fit.line, col.fit.line,
-         bubble.size, bubble.power, bubble.counts,
-         ellipse, col.ellipse, fill.ellipse, 
-         diag, col.diag, lines.diag, sort.y, segments.y, segments.x,
-         quiet, want.labels=TRUE, ...)  {
+function(x, y, by=NULL, n.cat=getOption("n.cat"),
+         object="point", topic="data",
 
-# want.labels set just for ttestPower, which provides its own labels
+         col.fill=getOption("col.fill.pt"),
+         col.stroke=getOption("col.stroke.pt"),
+         col.bg=getOption("col.bg"),
+         col.grid=getOption("col.grid"),
+         col.box=getOption("col.box"),
+
+         col.trans=NULL, col.area=NULL,
+
+         cex.axis=0.76, col.axis="gray30", xy.ticks=TRUE,
+         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+         value.labels=NULL, rotate.values=0, offset=0.5,
+
+         size=NULL, shape="circle", means=TRUE, 
+         sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
+
+         bubble.size=0.25, bubble.power=0.6, bubble.counts=TRUE,
+         col.low=NULL, col.hi=NULL,
+
+         fit.line="none", col.fit.line="gray55",
+
+         ellipse=FALSE, col.ellipse="lightslategray",
+         fill.ellipse="off", 
+
+         method="overplot", pt.reg="circle", pt.out="circle", 
+         col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
+
+         quiet=getOption("quiet"), fun.call=NULL, want.labels=TRUE, ...)  {
+
+
+  # scale for regular R or RStudio
+  adj <- .RSadj(bubble.size, cex.axis)
+  bubble.size <- adj$bubble.size
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
+  size.txt <- adj$size.txt
+
+  # want.labels set just for ttestPower, which provides its own labels
   # both x and y are plotted, even if only a single variable
   # for a 1-D bubble plot of a single factor var, y.call was set to 0's
   # numerical 1-D scatter plot done in .dp.main
-  if (length(unique(y)) == 1) {
+  if (length(unique(y)) == 1)
     bubble1 <- TRUE
-    if (style == "default") style <- "bubble"
-  }
   else
     bubble1 <- FALSE
 
-  # sort y by x  (for Cleveland dot plot)
-  if (sort.y) {
-    ord <- order(x)
+  unique.x <- ifelse(length(unique(x)) == length(x), TRUE, FALSE)
+  unique.y <- ifelse(length(unique(y)) == length(y), TRUE, FALSE)
+
+  # sort y by x option (intended for Cleveland dot plot)
+  if (sort.yx) {
+    if (!is.matrix(x))
+      ord <- order(x)
+    else
+      if (ncol(x) == 2)
+        ord <- order(x[,2] - x[,1])
+      else {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Sorting not meaningful for more than two x-variables\n\n")
+      }
     y <- factor(y, levels=y[ord])
   }
-
-  # for a Cleveland dot plot, do not do a default bubble plot
-  unique.y <- ifelse(length(unique(y)) == length(y), TRUE, FALSE)
-  if (!is.factor(x) && is.factor(y) && unique.y)
-    if (n.cat == 10) n.cat <- 0
 
   do.ellipse <- ifelse(as.logical(ellipse[1]), TRUE, FALSE) 
 
   if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels) 
 
   # all processing in terms of numeric variables
-  # convert factors, save levels
-  x.lvl <- NULL; y.lvl <- NULL  # if null, then numeric
+  # convert factors to numeric, save levels
+  # x is always a matrix
+  x.lvl <- NULL; y.lvl <- NULL  # if null, then not factors
   if (is.factor(x)) {
     x.lvl <- levels(x)
     if (is.null(value.labels)) value.labels <- gsub(" ", "\n", x.lvl) 
-    x <- as.numeric(x)
+    x <- as.matrix(as.integer(x))
   }
+  else {
+    was.mat <- ifelse(is.matrix(x), TRUE, FALSE)
+    x <- as.matrix(x)
+    if (!was.mat) colnames(x) <- getOption("xname")
+  }
+
   if (is.factor(y)) {
     y.lvl <- levels(y)
-    y <- as.integer(y)
+    y <- as.matrix(as.integer(y))
   }
+  else {
+    was.mat <- ifelse(is.matrix(y), TRUE, FALSE)
+    y <- as.matrix(y)
+    if (!was.mat) colnames(y) <- getOption("yname")
+    #if (getOption("xname") == "Index") ylab <- ""
+  }
+
 
   # see if trans is customized for this analysis
   if (is.null(col.trans)) {  # no change, so no trans for Cleveland dp
@@ -62,11 +107,32 @@ function(x, y, by, type, n.cat,
     col.fill <- .maketrans(col.fill, (1-trans.pts)*256)
   }
 
-  num.cat.x <- ifelse(is.null(x.lvl) && .is.num.cat(x, n.cat), TRUE, FALSE)
-  cat.x <- ifelse (num.cat.x || !is.null(x.lvl), TRUE, FALSE)
+  nrows <- length(x)
+  # line chart
+  size.pt <- NULL
+  if (!is.null(xlab)) {
+    if (xlab == "Index"  &&  object %in% c("line", "both")) {
+      if (is.null(size)) size.pt <- .7
+      if (is.null(size)) size.ln <- 1.25
+    }
+  }
+  if (is.null(size.pt)) {
+    sz <- ifelse (.Platform$OS == "windows", 1, 0.80)
+    sz.pt <- ifelse (is.null(size), sz, size)
+    size.pt <- ifelse (is.null(size), sz.pt, size)
+    if (options("device") == "RStudioGD")
+      size.pt <- ifelse (.Platform$OS == "windows", size.pt*1.45, size.pt*1.13)
+    sz.ln <- ifelse (is.null(size), 2, size)
+    size.ln <- ifelse (is.null(size), sz.ln, size)
+  }
 
+  if (is.null(col.fill)) col.fill <- "transparent"
+  if (is.null(col.area)) col.area <- "transparent"
+
+  num.cat.x <- is.null(x.lvl) && .is.num.cat(x, n.cat)
+  cat.x <- ifelse (num.cat.x || !is.null(x.lvl), TRUE, FALSE)
   if (!bubble1) {
-    num.cat.y <- ifelse(is.null(y.lvl) && .is.num.cat(y, n.cat), TRUE, FALSE)
+    num.cat.y <- is.null(y.lvl) && .is.num.cat(y, n.cat)
     cat.y <- ifelse (num.cat.y || !is.null(y.lvl), TRUE, FALSE)
   }
   else {
@@ -74,20 +140,13 @@ function(x, y, by, type, n.cat,
     cat.y <- FALSE
   }
 
-  nrows <- length(x)
-  pt.sz <- ifelse (.Platform$OS == "windows", 1, 0.80)
-  pt.size <- ifelse (is.null(cex), pt.sz, cex)
-
-  if (is.null(col.fill)) col.fill <- "transparent"
-  if (is.null(col.area)) col.area <- "transparent"
-
   if (want.labels) {
-    gl <- .getlabels(xlab, ylab, main, cex.lab=0.85)
+    gl <- .getlabels(xlab, ylab, main, cex.lab=size.lab)
     x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
     y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
     main.lab <- gl$mb
     sub.lab <- gl$sb
-    cex.lab <- gl$cex.lab
+    size.lab <- gl$cex.lab
     by.name <- getOption("byname")
   }
   else {
@@ -95,27 +154,15 @@ function(x, y, by, type, n.cat,
     y.lab <- ylab
     main.lab <- main
     sub.lab <- sub
-    cex.lab <- 0.85
+    size.lab <- 0.85
   }
 
-  if (is.null(type)) {  # if x is sorted with equal intervals, plot a line chart
-    if (sum(is.na(x)) > 0)
-      eq.int <- FALSE  # missing data in x present
-    else {
-      eq.int <- TRUE
-      d.x <- diff(x)
-      for (i in 2:(length(x)-1)) 
-        if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
-      rm(d.x)
-    }  # also no y missing
-
-    type <- ifelse (!is.unsorted(x) && eq.int && sum(is.na(y))==0, "l", "p") 
+  if (!is.null(x.name)) if (x.name == "Index") {
+    if (ncol(y) > 1) y.lab <- ""
+    if (!is.null(x.lbl)) y.lab <- paste(x.name, ": ", x.lbl, sep="")
   }
 
-  # set bubble plot for small number of unique values of x and y
-  if (style == "default")  # set default
-    style <- ifelse (cat.x && cat.y, "bubble", "regular")
-  
+  # decimal digits
   digits.d <- .max.dd(y) + 1
   options(digits.d=digits.d)
 
@@ -123,6 +170,8 @@ function(x, y, by, type, n.cat,
   # -------------------------
   # plot
   # -------------------------
+  # -------------------------
+
   x.val <- NULL
   y.val <- y.lvl  # if not reset to x value labels
   max.lbl.y <- NULL
@@ -142,6 +191,11 @@ function(x, y, by, type, n.cat,
     x.val <- x.lvl  # x.val is NULL if x is numeric, ignored
     y.val <- y.lvl  # y.val ignored if y is numeric 
   }
+
+
+  # -----------------------
+  # activate graphic system
+  # -----------------------
 
   plot.new()  # activate for strwidth
 
@@ -164,128 +218,67 @@ function(x, y, by, type, n.cat,
   else
     lm <- lm - 0.3
 
-  rm <- ifelse (is.null(by), 0.25, 0.95)
+  rm <- 0.25 
+  if (!is.null(by)) rm <- 0.95
+  if (ncol(y) > 1) rm <- 0.95
   tm <- ifelse (is.null(main), 0.25, 0.75)
   bm <- 0.75
 
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  par(mai=c(bm, lm, tm, rm))
+  RSpad.bm <- ifelse (options("device") == "RStudioGD", 0.4, 0)
+  RSpad.m <- ifelse (options("device") == "RStudioGD", 0.3, 0)
+  par(mai=c(bm+RSpad.bm, lm+RSpad.m, tm+RSpad.m, rm+RSpad.m))
 
 
   # -----------------------
-  # setup coordinate system with plot and type="n"
+  # setup coordinate system only with plot and type="n"
   # non-graphical parameters in ... generate warnings when no plot
+  # -----------------------
+
+  mn.x <- ifelse(is.null(x.lvl), min(x, na.rm=TRUE), 1)
+  mx.x <- ifelse(is.null(x.lvl), max(x, na.rm=TRUE), length(x.lvl))
+  mn.y <- ifelse(is.null(y.lvl), min(y, na.rm=TRUE), 1)
+  mx.y <- ifelse(is.null(y.lvl), max(y, na.rm=TRUE), length(y.lvl))
   
   if (!do.ellipse) {
 
-    if (style %in% c("regular", "off")) {
-
-      if (!lines.diag) {
-        unq.x <- length(unique(na.omit(x)))
-        unq.y <- length(unique(na.omit(y)))
-        if (unq.x > 5  &&  unq.y > 5) {
-          if (stat != "count")
-            plot(x,y, type="n", axes=FALSE, ann=FALSE, ...)
-          else {  # plot counts
-            mx.y <- max(pretty(y))
-            plot(x,y, type="n", axes=FALSE, ann=FALSE, ylim=c(0, mx.y), ...)
-          }
-        }
-        else {  # create a buffer on ends of an axis 
-
-          mn.x <- min(x, na.rm=TRUE)
-          mx.x <- max(x, na.rm=TRUE)
-          mn.y <- min(y, na.rm=TRUE)
-          mx.y <- max(y, na.rm=TRUE)
-          if (unq.x <= 5) {
-            buf.x <- 0.74 - (0.12 * unq.x)
-            mn.x <- mn.x - buf.x
-            mx.x <- mx.x + buf.x
-          }
-          if (unq.y <= 5) {
-            buf.y <- 0.74 - (0.12 * unq.y)
-            mn.y <- mn.y - buf.y
-            mx.y <- mx.y + buf.y
-          }
-          plot(x,y, type="n", axes=FALSE, ann=FALSE,
-               xlim=c(mn.x,mx.x), ylim=c(mn.y,mx.y), ...)
-        }
-      }  # no diag
-      else {  # need same x,y limits on both axes for lines.diag
-        nums <- pretty(c(min(x,y, na.rm=TRUE), max(x,y, na.rm=TRUE)))
-        l1 <- nums[1]
-        l2 <- nums[length(nums)]
-        plot(x,y, type="n", axes=FALSE, ann=FALSE,
-                              xlim=c(l1,l2), ylim=c(l1,l2), ...)
-      }
+    if (cat.x) {
+      mn.x <- mn.x - .5
+      mx.x <- mx.x + .5
+    }
+    if (cat.y) {
+      mn.y <- mn.y - .5
+      mx.y <- mx.y + .5
     }
 
-    else if (style %in% c("bubble", "sunflower", "off")) {
+    if (topic %in% c("count", "prop")) mn.y <- 0
+    if (topic == "prop") mx.y <- 1.0
+    if (topic != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
 
-      # get start and end values for each axis
-      x.start=min(x, na.rm=TRUE)  # for bubble plot
-      x.end=max(x, na.rm=TRUE)
-      y.start=min(y, na.rm=TRUE) 
-      y.end=max(y, na.rm=TRUE)
+    region <- matrix(c(mn.x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
 
-      if (!is.null(x.lvl)) {  # categorical - factor
-        x.start <- .5
-        x.end <- length(x.lvl) + .5
-      }
-      else if (num.cat.x) {  # categorical - numerical
-        x.start <- x.start-.5
-        x.end <- x.end+.5
-      }
-
-      if (!is.null(y.lvl)) {
-        y.start <- .5
-        y.end <- length(y.lvl) + .5
-      }
-      else if (num.cat.y) {
-        y.start <- y.start-.5
-        y.end <- y.end+.5
-      }
-
-      dots <- list(...)  # if xlim or ylim present, use these values
-      if (length(dots) > 0) {
-        for (i in 1:length(dots)) {
-          if (names(dots)[i] == "xlim") {
-            x.start <- dots[[i]][1]
-            x.end <- dots[[i]][2]
-          }
-          if (names(dots)[i] == "ylim") {
-            y.start <- dots[[i]][1]
-            y.end <- dots[[i]][2]
-          }
-        }
-      }
-
-      plot(x,y, type="n", axes=FALSE, ann=FALSE, 
-           xlim=c(x.start,x.end), ylim=c(y.start,y.end))
-    }
-
-  }
+  }  # no ellipse
 
   else {  # set plot with sufficient room for ellipse and data
-    cxy <- cor(x,y, use="complete.obs")
-    s.x <- sd(x, na.rm=TRUE); s.y <- sd(y, na.rm=TRUE)
-    m.x <- mean(x, na.rm=TRUE); m.y <- mean(y, na.rm=TRUE)
+    cxy <- cor(x[,1],y[,1], use="complete.obs")
+    s.x <- sd(x[,1], na.rm=TRUE); s.y <- sd(y[,1], na.rm=TRUE)
+    m.x <- mean(x[,1], na.rm=TRUE); m.y <- mean(y[,1], na.rm=TRUE)
     lvl <- max(ellipse)
-    f <- ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y), level=lvl)
-    f <- rbind(f, c(min(x, na.rm=TRUE), min(y, na.rm=TRUE)))
-    f <- rbind(f, c(max(x, na.rm=TRUE), max(y, na.rm=TRUE)))
-    plot(f, type="n", axes=FALSE, ann=FALSE, main=main.lab, ...)
-    rm(f)
+    region <- ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y), level=lvl)
+    region <- rbind(region, c(mn.x, mn.y))
+    region <- rbind(region, c(mx.x, mx.y))
   }
 
+  plot(region, type="n", axes=FALSE, ann=FALSE, ...)
+  rm(region)
 
-  # ----
-  # plot 
-  # x.lvl and y.lvl are NULL unless x and y are factors
 
-  #axis, axis ticks, value labels
+  # ----------------------
+  # set up plot background
+  # ----------------------
 
+  # axis ticks and values
   if (cat.x) {
     if (!is.null(x.lvl)) axT1 <- 1:length(x.lvl)   # mark category values
     if (num.cat.x) axT1 <- sort(unique(x))
@@ -305,11 +298,11 @@ function(x, y, by, type, n.cat,
   if (xy.ticks) {
     if (!bubble1)
       .axes(x.val, y.val, axT1, axT2,
-            par("usr")[1], par("usr")[3], cex.axis, col.axis,
+            par("usr")[1], par("usr")[3], size.axis, col.axis,
             rotate.values, offset=offset, ...)
     else  # 1-l scatter plot of categorical variable
       .axes(x.val, NULL, axT1, NULL,
-            par("usr")[1], par("usr")[3], cex.axis, col.axis, 
+            par("usr")[1], par("usr")[3], size.axis, col.axis, 
             rotate.values, offset=offset, ...)
   }
        
@@ -327,114 +320,203 @@ function(x, y, by, type, n.cat,
     max.lbl.y <- 0
   }
 
+  if (ncol(x) > 1) x.lab <- NULL
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl.y, 
-          xy.ticks, offset=offset, cex.lab=cex.lab, ...) 
-
+          xy.ticks, offset=offset, cex.lab=size.lab, ...) 
 
   # color plotting area
   usr <- par("usr")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
 
-  # diagonal line
-  if (diag) {
-    segments(usr[1], usr[3], usr[2], usr[4], col=col.diag)  # diagonal line
-    if (lines.diag)  # connect points in scatter plot to the line
-      for (i in 1:length(x)) segments(x[i], x[i], x[i], y[i])
-  }
-
   # grid lines
-  if (!bubble1) {
-    abline(v=axT1, col=col.grid, lwd=.5)
+  abline(v=axT1, col=col.grid, lwd=.5)
+  if (!bubble1)
     abline(h=axT2, col=col.grid, lwd=.5)
-  }
-  else
-    abline(v=axT1, col=col.grid, lwd=.75)  # bubbles only
 
   # fill area under curve
-  col.border <- ifelse (type != "p", col.stroke, "transparent")
-  if (!is.null(col.area)) 
+  col.border <- ifelse (object=="point", col.stroke[1], "transparent")
+  if (!is.null(col.area)  &&  col.area != "transparent") 
     polygon(c(x[1],x,x[length(x)]), c(min(y),y,min(y)),
             col=col.area, border=col.border)
 
-  # plot the values
-  if (style %in% c("regular", "off")) {  # plot lines and/or points
-    if (type == "l" | type == "b")
-      lines(as.numeric(x),y, col=col.stroke, ...)
 
-    if (type == "p" | type == "b") {
+  # ---------------
+  # plot the values
+  # ---------------
+
+  n.col <- 1
+  if (ncol(x) > 1) n.col <- ncol(x) 
+  if (ncol(y) > 1) n.col <- ncol(y) 
+
+  # plot lines and/or points
+  if (object %in% c("point", "line", "both", "off")) {
+    trans.pts <- ifelse(is.null(col.trans), getOption("trans.fill.pt"), col.trans)
+
+    n.by <- ifelse (is.null(by), 0, nlevels(by))
+
+    n.patterns <- max(n.col, n.by)
+
+    stroke <- character(length=0)
+    fill <- character(length=0)
+    if (n.patterns == 1) {
+      stroke[1] <- col.stroke[1]
+      fill[1] <- col.fill[1]
+    }
+    else if (n.patterns == 2) {
+      stroke[1] <- col.stroke[1]
+      stroke[2] <- ifelse (length(col.stroke) > 1, col.stroke[2], col.stroke[1])
+      fill[1] <- col.fill[1]
+      if (object %in% c("line","both")) {
+        fill[2] <- .col.discrete(bright=TRUE)[2]
+        stroke[2] <- fill[2]
+      }
+      else {
+        if (length(col.fill) == 1)
+          fill[2] <- "transparent"
+        else
+          fill[2] <- col.fill[2]
+      }
+    }  # n.patterns=2
+    else  # n.patterns > 2
+      stroke <- .col.discrete(bright=TRUE)[1:n.patterns]
+
+    if (n.patterns > 2)
+      for (i in 1:length(stroke)) fill[i] <- .maketrans(stroke[i], (1-trans.pts)*256)
+
+    # lines
+    if (object == "line" || object == "both") {
+      if (ncol(x) == 1  &&  ncol(y) == 1)
+          lines(as.numeric(x[,1]),y[,1], col=fill, lwd=size.ln, ...)
+      if (ncol(y) > 1)
+        for (i in 1:ncol(y))
+          lines(as.numeric(x[,1]),y[,i], col=fill[i], lwd=size.ln, ...)
+      if (ncol(x) > 1)
+        for (i in 1:ncol(x))
+          lines(as.numeric(x[,i]),y[,1], col=fill[i], lwd=size.ln, ...)
+
+      if (ncol(x) > 1)  # horizontal legend, on x-axis
+        .plt.legend(colnames(x), TRUE, stroke, fill, shape, usr)
+
+      if (ncol(y) > 1)  # vertical legend, on y-axis
+        .plt.legend(colnames(y), FALSE, stroke, fill, shape, usr)
+    }
+
+
+    # points
+    if (object == "point" || object == "both") {
 
       if (is.null(by)) { 
-            
-        if (style != "off") {
-          points(x,y, pch=shape.pts, col=col.stroke, bg=col.fill, cex=pt.size, ...)
 
-          if (segments.y)
-            segments(x0=min(pretty(x)), y0=y, x1=x, y1=y, lty=1, lwd=.75,
-                     col=col.stroke)
-          if (segments.x)
-            segments(y0=min(pretty(y)), x0=x, y1=y, x1=x, lty=1, lwd=.75,
-                     col=col.stroke)
-        }
+        if (object != "off") {
 
-        if (!is.null(x.lvl) && means) {  # plot means
-          m.lvl <- numeric(length = 0)
-          for (i in (1:length(x.lvl))) 
-            m.lvl[i] <- mean(y[x==i], na.rm=TRUE)
+          if (ncol(y) == 1)
+            for (i in 1:ncol(x))
+              points(x[,i],y, pch=shape, col=stroke[i], bg=fill[i],
+                              cex=size.pt, ...)
+          else
+            for (i in 1:ncol(y))
+              points(x[,1],y[,i], pch=shape, col=stroke[i], bg=fill[i],
+                              cex=size.pt, ...)
+
+          if (ncol(x) > 1)  # horizontal legend, on x-axis
+            .plt.legend(colnames(x), TRUE, stroke, fill, shape, usr)
+          if (ncol(y) > 1)  # vertical legend, on y-axis
+            .plt.legend(colnames(y), FALSE, stroke, fill, shape, usr)
+
+
+          if (segments.y) { 
+            if (ncol(x) == 1) # line segments from points to axis
+              segments(x0=min(pretty(x)), y0=y, x1=x, y1=y, lty=1, lwd=.75, col=col.stroke)
+            else if (ncol(x) == 2)  # line segments between points
+              segments(x0=x[,1], y0=y[,1], x1=x[,2], y1=y[,1], lty=1, lwd=.75, col=col.stroke)
+          }
+
+          if (!(topic %in% c("count", "prop"))) {
+            if (segments.x)
+              segments(y0=par("usr")[3], x0=x, y1=y, x1=x, lty=1, lwd=.75,
+                       col=col.stroke)
+          }
+          else {
+            if (segments.x) 
+              if (ncol(x) == 1)
+                 segments(y0=0, x0=x, y1=y, x1=x, lty=1, lwd=1, col=col.stroke)
+          }
+
+        }  # object == "off"
+
+        if (means) {
           pch.avg <- ifelse(getOption("colors")!="gray", 21, 23)
           bck.g <- ifelse(getOption("colors")!="gray", "gray15", "gray30")
           if (grepl(".black", getOption("colors"), fixed=TRUE)) bck.g <- "gray85"
-          abline(h=m.lvl, col="gray50", lwd=.5)
-          points(m.lvl, pch=pch.avg, bg=bck.g)
-        }
-      }
+
+          m.lvl <- numeric(length = 0)
+
+          # plot means for factor x, num y
+          if (!is.null(x.lvl) && is.null(y.lvl) && !unique.x) {
+            for (i in (1:length(x.lvl))) 
+              m.lvl[i] <- mean(y[x==i], na.rm=TRUE)
+            abline(h=m.lvl, col="gray50", lwd=.5)
+            points(m.lvl, pch=pch.avg, bg=bck.g)
+          }
+
+          # plot means for num x, factor y
+          if (is.null(x.lvl) && !is.null(y.lvl) && !unique.y) {
+            for (i in (1:length(y.lvl))) 
+              m.lvl[i] <- mean(x[y==i], na.rm=TRUE)
+            abline(v=m.lvl, col="gray50", lwd=.5)
+            points(m.lvl, 1:length(y.lvl), pch=pch.avg, bg=bck.g)
+          }
+        }  # means
+      }  # null by
 
       else {  # by grouping variable
-        n.levels <- nlevels(by)
 
-        clr <- character(length(n.levels))
-        if (length(col.stroke) == 1) 
-          for (i in 1:n.levels) clr[i] <- col.stroke
+        clr <- character(length(n.by))
+        clr.tr <- character(length(n.by))  # translucent version of clr
+        if (length(stroke) == 1) 
+          for (i in 1:n.by) clr[i] <- stroke  # all levels get same color
         else
-          clr <- col.stroke
-        clr.tr <- clr
+          clr <- stroke
 
-        shp <- integer(length(n.levels))
-        if (length(shape.pts) == 1)
-          for (i in 1:n.levels) shp[i] <- shape.pts
+        shp <- integer(length(n.by))
+        if (length(shape) == 1)
+          for (i in 1:n.by) shp[i] <- shape
         else
-          shp <- shape.pts
+          shp <- shape
+
         shape.dft <- c(21,23,22,24,25,7:14)  # shape defaults
-        if (length(col.stroke)==1 && length(shape.pts)==1)  # shape, color 
-          for (i in 1:n.levels) shp[i] <- shape.dft[i]  # fill is default shapes
+        if (length(stroke)==1 && length(shape)==1)  #  color, shape 
+          for (i in 1:n.by) shp[i] <- shape.dft[i]  # fill is default shapes
 
-        trans.pts <- getOption("trans.fill.pt")
-        for (i in 1:n.levels) {
-          clr.tr[i] <- .maketrans(clr.tr[i], (1-trans.pts)*256)
+        for (i in 1:n.by) {
           x.lv <- subset(x, by==levels(by)[i])
           y.lv <- subset(y, by==levels(by)[i])
-          points(x.lv, y.lv, pch=shp[i], col=clr[i],
-              bg=clr.tr[i], cex=pt.size, lwd=0.75, ...)
+          points(x.lv, y.lv, pch=shp[i], col=clr[i], bg=fill[i], cex=size.pt, lwd=0.75, ...)
         }
 
-      if (length(col.stroke) > 1) clr.tr <- clr
-      .plt.legend(levels(by), col.stroke, clr, clr.tr, shp, trans.pts, col.bg, usr)
+        .plt.by.legend(levels(by), stroke, fill, shp, trans.pts, col.bg, usr)
 
-      }  # end by
+        }  # end by
 
-    }  # type == "p" | type == "b"
-  }  # style = "regular"
+      }  # object is point or both
+    }  # object is point, line, both
 
 
-  else if (style %in% c("bubble", "sunflower")) {
+  else if (object %in% c("bubble", "sunflower")) {
+
+    n.patterns <- 1  # for fit.line
 
     mytbl <- table(x, y)  # get the counts
 
     # colors
-    if (is.null(col.low) ||  is.null(col.hi))
+    if (is.null(col.low) ||  is.null(col.hi)) {
       clr <- col.fill
+      clr.stroke <- col.stroke
+    }
     else {
       color.palette <- colorRampPalette(c(col.low, col.hi))
       clr <- color.palette(nrow(mytbl))
+      clr.stroke <- "gray70"
     }
 
     # melt the table to a data frame
@@ -455,26 +537,25 @@ function(x, y, by, type, n.cat,
     cords <- data.frame(xx, yy, count)
 
     c <- cords$count
-    if (style == "bubble")
+    if (object == "bubble")
       symbols(as.numeric(cords$xx), as.numeric(cords$yy),
             circles=c**bubble.power, inches=bubble.size,
-            bg=clr, fg=col.stroke, add=TRUE, ...)
+            bg=clr, fg=clr.stroke, add=TRUE, ...)
 
-    else if (style == "sunflower") {
+    else if (object == "sunflower") {
       sunflowerplot(cords$xx, cords$yy, number=c, 
-        seg.col=col.stroke, col=col.fill, cex.axis=cex.axis, col.axis=col.axis,
-        xlab=x.lab, ylab=y.lab,
-        xlim=c(x.start,x.end), ylim=c(x.start,x.end), add=TRUE)
+        seg.col=col.stroke, col=col.fill, cex.axis=size.axis, col.axis=col.axis,
+        xlab=x.lab, ylab=y.lab, add=TRUE)
   }
 
-    if (bubble.counts  &&  style == "bubble") { 
+    if (bubble.counts  &&  object == "bubble") { 
       max.c <- max(c, na.rm=TRUE)  # bubble is too small for count
       #min.bubble <- 0.25 * max.c  # radius, bubble.power=1
       #min.bubble <- 0.10 * max.c  # bubble.power=.6
       min.bubble <- (bubble.power/9) * max.c
       for (i in 1:length(c))
         if (!is.na(c[i])) if (c[i] <= min.bubble) c[i] <- NA
-      text(cords$xx, cords$yy, c, cex=.7)
+      text(cords$xx, cords$yy, c, cex=size.txt)
     }
   }  # end bubble/sunflower 
 
@@ -491,29 +572,39 @@ function(x, y, by, type, n.cat,
   # fit line option
   if (fit.line != "none") { 
 
-    if (is.null(by)) {
-      n.iter <- 1
-    }
-    else {
-      n.iter <- n.levels
-    }
+    for (i in 1:n.patterns) {
 
-    for (i in 1:n.iter) {
-
-      if (is.null(by)) {
-        x.lv <- x
-        y.lv <- y
+      if (n.patterns == 1) {  # one plot
+        x.lv <- x[,1]
+        y.lv <- y[,1]
         clr <- col.fit.line
       }
-      else {
-        x.lv <- subset(x, by==levels(by)[i])
-        y.lv <- subset(y, by==levels(by)[i])
-        clr <- character(length(n.levels))
-        if (length(col.stroke) == 1) 
-          for (i in 1:n.levels) clr[i] <- col.stroke
-        else
-          clr <- col.stroke[i]
-      }
+
+      else {  # multiple
+
+        if (!is.null(by)) {  # multiple by plots
+          x.lv <- subset(x, by==levels(by)[i])
+          y.lv <- subset(y, by==levels(by)[i])
+        }
+
+        if (n.col > 1) {  # multiple variable plots
+          if (ncol(x) > 1) {
+            x.lv <- x[,i]
+            y.lv <- y[,1]
+          }
+          else {
+            x.lv <- x[,1]
+            y.lv <- y[,i]
+          }
+        }
+
+        clr <- ifelse (length(stroke) == 1, stroke, stroke[i])
+      }  # multiple
+
+      ln.type <- "solid"
+      if (n.patterns == 2 && i == 2)
+        ln.type <- "dashed"
+
       ok <- is.finite(x.lv) & is.finite(y.lv)
       if (any(ok)) {
         x.ok <- x.lv[ok]
@@ -521,69 +612,171 @@ function(x, y, by, type, n.cat,
         ord <- order(x.ok)
         x.ord <- x.ok[ord]
         y.ord <- y.ok[ord] 
-        if (fit.line == "loess") {
-          lines(x.ord, fitted(loess(y.ord~x.ord, ...)), col=clr, lwd=1.5)
-        }
+
+        if (fit.line == "loess") 
+          lines(x.ord, fitted(loess(y.ord~x.ord, ...)), col=clr, lwd=1.5, lty=ln.type)
+
         if (fit.line == "ls") {
           if(!is.factor(x.lv)) {
             model <- lm(y.ord ~ x.ord)
-            abline(model$coef, col=clr, lwd=1.5, xpd=FALSE)
+            abline(model$coef, col=clr, lwd=1.5, lty=ln.type, xpd=FALSE)
           }
           else cat("\n>>> Note: Least squares line not permitted for a factor.\n")
         }
       }
-    }
-  }
+    }  # ith pattern
+  }  # fit.line
 
 
+
+  # -----------
   # text output
-  if (!quiet) {
+  # -----------
+
+  if (!quiet  &&  topic == "data") {
+
+    # function call for suggestions
+    fncl <- .fun.call.deparse(fun.call) 
+    fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
+    fncl <- gsub(" = ", "=", fncl)
 
     # traditional two-var numeric var scatter plot
-    if (!cat.x  &&  !cat.y  &&  type == "p") {
-      if (do.ellipse) { # ellipse option removes any missing data
-        n.pair <- sum(!is.na(x - y))  # number of points after listwise deletion
-        n.del <- sum(is.na(x - y))  # number of pairwise deleted observations
-      }      
+    if (!cat.x  &&  !cat.y  &&  object %in% c("point", "bubble")) {
 
-      stuff <- .cr.main(x, y, brief=TRUE, ...) 
-      txbck <- stuff$txb
-      txdsc <- stuff$txd
-      txinf <- stuff$txi
+      for (i in 1:n.col) {
 
-      class(txbck) <- "out_piece"
-      class(txdsc) <- "out_piece"
-      class(txinf) <- "out_piece"
+        txsug <- ""
+        if (getOption("suggest")  &&  i == 1) {
+          fc <- ""
+          if (!grepl("ellipse", fncl)  &&  n.col == 1)
+            fc <- paste(fc, ", ellipse=TRUE", sep="")
+          if (!grepl("fit.line", fncl)) fc <- paste(fc, ", fit.line=TRUE", sep="")
+          if (grepl("fit.line=TRUE", fncl))
+            fncl <- sub("fit.line=TRUE", "fit.line=\"ls\"", fncl)
+          if (nzchar(fc)) {
+            fc <- paste(fncl, fc, ") ", sep="")
+            txsug <- paste(">>> Suggest: ", fc, "\n")
+          }
+          fc <- ""
+          if (!grepl("size", fncl)) fc <- paste(fc, ", size=3", sep="")
+          if (!grepl("color.bg", fncl)) fc <- paste(fc, ", color.bg=\"off\"", sep="")
+          if (!grepl("color.grid", fncl)) fc <- paste(fc, ", color.grid=\"off\"", sep="")
+          if (grepl("ellipse", fncl)) fncl <- .rm.arg.l("ellipse", fncl) 
+          if (nzchar(fc)) {
+            fc <- paste(fncl, fc, ") ", sep="")
+            fc <- sub(",,", ",", fc, fixed=TRUE)  # hack
+            txsug <- paste(txsug,"\n>>> Suggest: ", fc)
+          }
+        }
 
-      output <- list(out_background=txbck, out_describe=txdsc, out_inference=txinf,
-        r=stuff$r, tvalue=stuff$tvalue, df=stuff$df, pvalue=stuff$pvalue,
-        lb=stuff$lb, ub=stuff$ub)
+        if (ncol(x) > 1) {
+          options(xname = colnames(x)[i])
+          stuff <- .cr.main(x[,i], y[,1], brief=TRUE, ...) 
+        }
+        else {
+          options(yname = colnames(y)[i])
+          stuff <- .cr.main(x[,1], y[,i], brief=TRUE, ...) 
+        }
 
-      class(output) <- "out_all"
-      print(output)
+        txbck <- stuff$txb
+        txdsc <- stuff$txd
+        txinf <- stuff$txi
+
+        class(txsug) <- "out_piece"
+        class(txbck) <- "out_piece"
+        class(txdsc) <- "out_piece"
+        class(txinf) <- "out_piece"
+
+        if (nzchar(txsug))
+          output <- list(out_suggest=txsug, out_background=txbck,
+            out_describe=txdsc, out_inference=txinf,
+            r=stuff$r, tvalue=stuff$tvalue, df=stuff$df, pvalue=stuff$pvalue,
+            lb=stuff$lb, ub=stuff$ub)
+        else
+          output <- list(out_background=txbck,
+            out_describe=txdsc, out_inference=txinf,
+            r=stuff$r, tvalue=stuff$tvalue, df=stuff$df, pvalue=stuff$pvalue,
+            lb=stuff$lb, ub=stuff$ub)
+
+
+        class(output) <- "out_all"
+        print(output)
+      }
     }
 
-    # categorical x var, numeric y var
-    else if (cat.x && !cat.y && stat=="") {
 
-      if (!is.null(x.lvl))
-        x.by <- factor(x, levels=1:length(x.lvl), labels=x.lvl)  # convert back to a factor
-      else
-        x.by <- x
+    # categorical var with numeric var, means plot or bubble-1D plot
+    else if ((cat.x && !cat.y && !unique.x) || (!cat.x && cat.y && !unique.y)) {
+
+      txsug <- ""
+      if (getOption("suggest")) {
+
+        fc <- ""
+        if (!grepl("means", fncl)) fc <- paste(fc, ", means=FALSE", sep="")
+        if (nzchar(fc)) {
+          fc <- paste(fncl, fc, ") ", sep="")
+          txsug <- paste(">>> To not plot the means:", fc, "\n")
+        }
+        fc <- ""
+        if (!grepl("topic", fncl)) {
+          fc <- paste(fc, ", topic=\"mean\"", sep="")
+          if (grepl("means", fncl)) fncl <- .rm.arg.l("means", fncl) 
+        }
+        if (nzchar(fc)) {
+          fc <- paste(fncl, fc, ") ", sep="")
+          fc <- sub(",,", ",", fc, fixed=TRUE)  # hack
+          txsug <- paste(txsug,"\n>>> To only plot the means: ", fc)
+        }
+      }
 
       if (!bubble1) {
-        options(yname = x.name)  # reverse order of x and y for .ss.numeric
-        options(xname = y.name)
-        stats <- .ss.numeric(y, by=x.by, digits.d=digits.d, brief=TRUE)
+        if (cat.x && !cat.y) {
+          if (!is.null(x.lvl))  # convert back to a factor if was one
+            x.by <- factor(x, levels=1:length(x.lvl), labels=x.lvl)
+          else
+            x.by <- x
+          options(yname = x.name)  # reverse order of x and y for .ss.numeric
+          options(xname = y.name)
+          stats <- .ss.numeric(y, by=x.by, digits.d=digits.d, brief=TRUE)
+        }
+        else if (!cat.x && cat.y) {
+          if (!is.null(y.lvl))  # convert back to a factor if was one
+            y.by <- factor(y, levels=1:length(y.lvl), labels=y.lvl)
+          else
+            y.by <- y
+          stats <- .ss.numeric(x, by=y.by, digits.d=digits.d, brief=TRUE)
+        }
+
         txout <- stats$tx
+
         class(txout) <- "out_piece"
 
-        output <- list(out_txt=txout)
+        output <- list(out_suggest=txsug, out_txt=txout)
         class(output) <- "out_all"
         print(output)
       }
 
       else {  # 1-D bubble plot of a factor var, y just a constant
+
+      txsug <- ""
+      if (getOption("suggest")) {
+        fc <- ""
+        if (!grepl("color.low", fncl))
+          fc <- paste(fc, ", color.low=\"lemonchiffon2\"", sep="")
+        if (!grepl("color.hi", fncl))
+          fc <- paste(fc, ", color.hi=\"lightsteelblue2\"", sep="")
+        if (nzchar(fc)) {
+          fc <- paste(fncl, fc, ") ", sep="")
+          fc <- sub(",,", ",", fc, fixed=TRUE)  # hack
+          txsug <- paste(">>> Suggest: ", fc)
+        }
+      }
+
+        if (!is.null(x.lvl))
+          x.by <- factor(x, levels=1:length(x.lvl), labels=x.lvl)
+        else
+          x.by <- factor(x)
+
         stats <- .ss.factor(x.by, by=NULL, brief=TRUE, digits.d=NULL,
                             x.name, y.name, x.lbl, y.lbl)
 
@@ -591,36 +784,95 @@ function(x, y, by, type, n.cat,
         counts <- stats$count
         chi <- stats$chi
 
+        class(txsug) <- "out_piece"
         class(txttl) <- "out_piece"
         class(counts) <- "out_piece"
         class(chi) <- "out_piece"
-        output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
+        output <- list(out_suggest=txsug, out_title=txttl, out_counts=counts, out_chi=chi)
         class(output) <- "out_all"
         print(output)      
       }
     }
 
-    else if (!cat.x && cat.y && stat == "") {  # Cleveland dot plot
+
+    # Cleveland dot plot
+    else if ((cat.x && !cat.y && unique.x) || (!cat.x && cat.y && unique.y)) { 
+
+      txsug <- ""
+      if (getOption("suggest")) {
+        fc <- ""
+        if (!grepl("sort.yx", fncl)) fc <- paste(fc, ", sort.yx=TRUE", sep="")
+        if (!grepl("segments.y", fncl)) fc <- paste(fc, ", segments.y=TRUE", sep="")
+        if (!grepl("color.bg", fncl)) fc <- paste(fc, ", color.bg=\"off\"", sep="")
+        if (!grepl("color.grid", fncl)) fc <- paste(fc, ", color.grid=\"off\"", sep="")
+        if (nzchar(fc)) {
+          fncl <- .fun.call.deparse(fun.call) 
+          fncl <- gsub(")$", "", fncl)  # get function call less closing )
+          fncl <- gsub(" = ", "=", fncl)
+          fc <- paste(fncl, fc, ") ", sep="")
+          fc <- sub(",,", ",", fc, fixed=TRUE)  # hack
+          txsug <- paste(">>> Suggest: ", fc)
+        }
+      }
+
       if (!is.null(y.lvl))
-        y.by <- factor(y, levels=1:length(y.lvl), labels=y.lvl)  # convert back to a factor
+        # convert back to a factor if was one originally
+        y.by <- factor(y, levels=1:length(y.lvl), labels=y.lvl)
       else
         y.by <- y
 
-        stats <- .ss.numeric(x, digits.d=digits.d, brief=TRUE)
-        txout <- stats$tx
-        class(txout) <- "out_piece"
+        txout <- ""
+        for (i in 1:ncol(x)) {
+          stats <- .ss.numeric(x[,i], digits.d=digits.d, brief=TRUE)
+          txout[length(txout)+1] <- paste("---", colnames(x)[i], "---")
+          for (j in 2:length(stats$tx)) txout[length(txout)+1] <- stats$tx[j]
+          if (i < ncol(x)) {
+            txout[length(txout)+1] <- ""
+            txout[length(txout)+1] <- ""
+          }
+        }
 
-        output <- list(out_txt=txout)
+        class(txsug) <- "out_piece"
+        class(txout) <- "out_piece"
+        if (nzchar(txsug))
+          output <- list(out_suggest=txsug, out_txt=txout)
+        else
+          output <- list(out_txt=txout)
         class(output) <- "out_all"
         print(output)
     }
 
+
     # categorical x and y vars
     else if (cat.x  &&  cat.y) {
+
+      txsug <- ""
+      if (getOption("suggest")) {
+        fc <- ""
+        if (!grepl("color.trans", fncl))
+          fc <- paste(fc, ", color.trans=.8", sep="")
+        if (!grepl("color.stroke", fncl))
+          fc <- paste(fc, ", color.stroke=\"gray40\"", sep="")
+        if (!grepl("bubble.counts", fncl))
+          fc <- paste(fc, ", bubble.counts=FALSE", sep="")
+        if (!grepl("color.bg", fncl))
+          fc <- paste(fc, ", color.bg=\"off\"", sep="")
+        if (!grepl("color.grid", fncl))
+          fc <- paste(fc, ", color.grid=\"off\"", sep="")
+        if (nzchar(fc)) {
+          fncl <- .fun.call.deparse(fun.call) 
+          fncl <- gsub(")$", "", fncl)  # get function call less closing )
+          fncl <- gsub(" = ", "=", fncl)
+          fc <- paste(fncl, fc, ") ", sep="")
+          fc <- sub(",,", ",", fc, fixed=TRUE)  # hack
+          txsug <- paste(">>> Suggest: ", fc)
+        }
+      }
+
       if (!is.null(x.lvl))
         x.fac <- factor(x, levels=1:length(x.lvl), labels=x.lvl)
       else
-        x.fac <- x
+        x.fac <- x[,1]
       if (!is.null(y.lvl))
         y.fac <- factor(y, levels=1:length(y.lvl), labels=y.lvl)
       else
@@ -629,14 +881,15 @@ function(x, y, by, type, n.cat,
       stats <- .ss.factor(x.fac, y.fac, brief=TRUE, digits.d=NULL,
                           x.name, y.name, x.lbl, y.lbl)
 
-
       txttl <- stats$txttl
       txfrq <- stats$txfrq
       txXV <- stats$txXV
+
+      class(txsug) <- "out_piece"
       class(txttl) <- "out_piece"
       class(txfrq) <- "out_piece"
       class(txXV) <- "out_piece"
-      output <- list(out_title=txttl, out_text=txfrq, out_XV=txXV)
+      output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq, out_XV=txXV)
       class(output) <- "out_all"
       print(output)
     }

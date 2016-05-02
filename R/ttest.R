@@ -95,10 +95,10 @@ function(x, y=NULL, ...) {
          alternative, mmd, msmd, Edesired, bw1, bw2,
          graph=FALSE, line.chart=FALSE)
     }
-  if (!brief) {
-    txt <- "Kelley and Lai's MBESS package]"
-    cat("\n[smd CI with Ken Kelley's ci.smd function from", txt, "\n") 
-  }
+  #if (!brief) {
+    #txt <- "Kelley and Lai's MBESS package]"
+    #cat("\n[smd CI with Ken Kelley's ci.smd function from", txt, "\n") 
+  #}
 
   }  # end two group
 
@@ -204,10 +204,14 @@ function(x, y=NULL, ...) {
         else
            y.l <- 0
         if (!paired)
-          if (y.l == 0)  # 1-group
+          if (y.l == 0) {  # 1-group
             plt <- tt.setup(x, ...)
-          else  # 2-group
+            data <- data.frame(x)
+          }
+          else  {# 2-group
             plt <- tt.setup(x, y,  ...)
+            data <- data.frame(x, y)
+          }
         else {  # paired
           if (length(x)!=length(y))  {
             cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -215,6 +219,7 @@ function(x, y=NULL, ...) {
           }
           diff <- y - x
           plt <- tt.setup(diff, ...)
+          data <- data.frame(x, y)
         }
       }
     }
@@ -298,24 +303,33 @@ function(x, y=NULL, ...) {
     plot.i <- plot.i + 1
     plot.title[plot.i] <- "Differences from Equality"
 
-    .plt.main(x.values, y.values,
-       by=NULL, type="p", n.cat=getOption("n.cat"),
-       col.area=NULL, col.box="black",
-       col.fill=getOption("col.fill.pt"),
-       col.stroke=getOption("col.stroke.pt"),
-       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-       col.trans=getOption("col.trans.pt"),
-       shape.pts=21, cex.axis=.85, col.axis="gray30",
-       col.low=NULL, col.hi=NULL, xy.ticks=TRUE,
-       xlab=x.name, ylab=y.name, main=plot.title[plot.i], sub=NULL,
-       cex=.8, value.labels=NULL, rotate.values=0, offset=.5,
-       style="default", means=TRUE, stat="default", 
-       x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-       fit.line="none", col.fit.line="grey55", center.line=NULL,
-       col.bubble=NULL, bubble.size=.25, bubble.counts=TRUE,
-       col.flower=NULL, ellipse=FALSE, 
-       diag=TRUE, col.diag=par("fg"), lines.diag=TRUE, sort.y=FALSE,
-       segments.y=FALSE, segments.x=FALSE, quiet=TRUE)
+    # construct x.call
+    x.call <- data.frame(x.values, y.values)
+    names(x.call) <- c(x.name, y.name)
+    x.call <- data.matrix(x.call, rownames.force=FALSE)
+
+    # construct y.call, need unique values for Cleveland dot plot
+    #if (missing(data)) data <- data.frame(x.call)  # input data are vectors
+    is.unique <- logical(ncol(data))  # initialed to FALSE
+    for(i in 1:ncol(data))
+      if ((length(data[,i])==length(unique(data[,i]))) && !is.numeric(data[,i]))
+{
+        is.unique[i] <- TRUE
+}
+    unq <- which(is.unique)[1]  # choose first non-num variable with unique values
+    if (!is.na(unq))
+      y.call <- factor(data[, unq[1]])
+    else { # no non-num var with unique values, so go to row.names
+      if (row.names(data)[1] != "1")
+        y.call <- factor(row.names(data))
+      else
+        y.call <- factor(row.names(data), levels=1:nrow(data))  # proper sort
+    }
+
+    # Cleveland two-variable dot plot
+    .plt.main(x.call, y.call,
+       shape=21, size=.8, ylab="",
+       segments.y=TRUE, quiet=TRUE)
 
     if (!is.null(pdf.file)) {
       dev.off()

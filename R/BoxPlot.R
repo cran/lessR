@@ -2,12 +2,13 @@ BoxPlot <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     Rmd=NULL,
 
-    col.fill=getOption("col.fill.bar"),
-    col.stroke=getOption("col.stroke.bar"), 
-    col.bg=getOption("col.bg"),
-    col.grid=getOption("col.grid"),
+    color.fill=getOption("color.fill.bar"),
+    color.stroke=getOption("color.stroke.bar"), 
+    color.bg=getOption("color.bg"),
+    color.grid=getOption("color.grid"),
+    color.box=getOption("color.box"),
 
-    cex.axis=0.75, col.axis="gray30",
+    cex.axis=0.75, color.axis="gray30",
     xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
 
     rotate.values=0, offset=0.5,
@@ -21,8 +22,16 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (is.null(fun.call)) fun.call <- match.call()
 
-  if (getOption("colors") == "gray") col.stroke <- "black"
-  if (getOption("colors") == "gray.black") col.stroke <- getOption("col.stroke.pt")
+  for (i in 1:length(color.fill))
+    if (color.fill[i] == "off") color.fill[i] <- "transparent"
+  for (i in 1:length(color.stroke))
+    if (color.stroke[i] == "off") color.stroke[i] <- "transparent"
+  if (color.bg == "off") color.bg <- "transparent"
+  if (color.grid == "off" ) color.grid <- "transparent"
+  if (color.box == "off") color.box <- "transparent"
+
+  if (getOption("colors") == "gray") color.stroke <- "black"
+  if (getOption("colors") == "gray.black") color.stroke <- getOption("color.stroke.pt")
 
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
@@ -35,6 +44,11 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
           "knitr.file  no longer used\n",
           "Instead use  Rmd  for R Markdown file\n\n")
       }
+    }
+    if (substr(names(dots)[i], 1, 4) == "col.") {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "options that began with the abbreviation  col  now begin with  ",
+        "color \n\n")
     }
   }
 
@@ -107,8 +121,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       pdf.fnm <- .pdfname("BoxPlot", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)
 
-      stuff <- .bx.main(data[,i], col.fill, col.stroke, col.bg, col.grid,
-         cex.axis, col.axis, rotate.values, offset, 
+      stuff <- .bx.main(data[,i], color.fill, color.stroke, color.bg, color.grid,
+         color.box, cex.axis, color.axis, rotate.values, offset, 
          horiz, add.points, xlab, main, sub, digits.d, quiet, ...)
       txsts <- stuff$tx
       if (length(txsts)==0) txsts <- ""

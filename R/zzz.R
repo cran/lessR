@@ -6,29 +6,42 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.4.6      feedback: gerbing@pdx.edu     web: lessRstats.com\n",
-      "------------------------------------------------------------------\n",
+      "lessR 3.4.8      feedback: gerbing@pdx.edu      web: lessRstats.com\n",
+      "-------------------------------------------------------------------\n",
       "1. Read a text, Excel, SPSS, SAS or R data file from your computer\n",
       "   into the mydata data table:  mydata <- Read()  \n",
-      "2. For a list of specific help topics, enter:  Help()\n",
-      "3. Analyze the data as described in the help topics\n")
+      "2. For a list of help topics and functions, enter:  Help()\n",
+      "3. Use theme function for global settings, Ex: theme(colors=\"gray\")\n")
 
   options(colors="dodgerblue")
   options(trans.fill.bar=0.25)
   options(trans.fill.pt=0.50)
+  options(color.fill.bar = "#1874CCBF")  # .maketrans of dodgerblue3"  trans=.25
+  options(color.fill.pt = "#1874CC80")  # .maketrans of "dodgerblue3"  trans=.50
+  options(color.stroke.bar="steelblue4")
+  options(color.stroke.pt="steelblue4")
+  options(color.bg="#F2F4F5")  # rgb(242, 244, 245)
+  options(color.grid="snow3")
+  options(color.box="black")
+  options(color.ghost=FALSE)
+  options(color.heat="dodgerblue4")
+
   options(col.fill.bar = "#1874CCBF")  # .maketrans of dodgerblue3"  trans=.25
   options(col.fill.pt = "#1874CC80")  # .maketrans of "dodgerblue3"  trans=.50
   options(col.stroke.bar="steelblue4")
   options(col.stroke.pt="steelblue4")
-  options(col.bg="#EEF0F2")  # rgb(238, 240, 242)
+  options(col.bg="#F2F4F5")  # rgb(242, 244, 245)
   options(col.grid="snow3")
+  options(col.box="black")
   options(col.ghost=FALSE)
   options(col.heat="dodgerblue4")
 
   options(n.cat=8)
-  options(lab.size=0.90)
+  options(lab.size=0.82)
+  options(suggest=TRUE)
   options(quiet=FALSE)
   options(brief=FALSE)
+  options(ghost=FALSE)
 
   options(explain=TRUE)
   options(interpret=TRUE)
@@ -443,10 +456,10 @@ function(...) {
       }
     }
 
-    var.nm <- ifelse(is.null(xlab), TRUE, FALSE)  # add var name?
+    var.nm <- ifelse(is.null(xlab), TRUE, FALSE)  # add var name to label?
     if (is.null(xlab))
       var.nm <- ifelse(is.null(x.name), FALSE, TRUE)
-    if (grepl("Frequency", x.lab, fixed=TRUE)) var.nm <- FALSE 
+    if (grepl("Count", x.lab, fixed=TRUE)) var.nm <- FALSE 
     if (grepl("Proportion", x.lab, fixed=TRUE)) var.nm <- FALSE 
     if (grepl("Alternative", x.lab, fixed=TRUE)) var.nm <- FALSE 
     if (var.nm) {
@@ -680,27 +693,27 @@ function(...) {
          cex.axis, col.axis, rotate.values=0, offset=0.5, ...) {
 
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1)
-    axis(1, at=axT1, labels=FALSE, tck=-.01, ...)
+    axis(1, at=axT1, labels=FALSE, tck=-.01)
     dec.d <- .getdigits(round(axT1,6),1) - 1
     text(x=axT1, y=par3, labels=.fmt(axT1,dec.d),
          pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
          offset=offset, ...)
   }
   else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
-    axis(1, at=axT1, labels=FALSE, tck=-.01, ...)
+    axis(1, at=axT1, labels=FALSE, tck=-.01)
     text(x=axT1, y=par3, labels=x.lvl,
          pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
          offset=offset, ...)
   }
 
   if (is.null(y.lvl)  &&  !is.null(axT2)) {
-    axis(2, at=axT2, labels=FALSE, tck=-.01, ...)
+    axis(2, at=axT2, labels=FALSE, tck=-.01)
     dec.d <- .getdigits(round(axT2,6),1) - 1
     text(x=par1, y=axT2, labels=.fmt(axT2,dec.d),
          pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
   }
   else if (!is.null(y.lvl)) {
-    axis(2, at=axT2, labels=FALSE, tck=-.01, ...)
+    axis(2, at=axT2, labels=FALSE, tck=-.01)
     text(x=par1, y=axT2, labels=y.lvl,
          pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
   }
@@ -735,12 +748,26 @@ function(...) {
 }
 
 
+.RSadj <- function(bubble.size=0.25, cex.axis) {
+
+  # scale for regular R or RStudio
+  if (options("device") == "RStudioGD") bubble.size <- bubble.size*1.5
+  size.axis <- ifelse (options("device") != "RStudioGD", cex.axis, cex.axis*1.118)
+  sz.lab <- getOption("lab.size")
+  size.lab <- ifelse (options("device") != "RStudioGD", sz.lab, sz.lab*1.119)
+  size.txt <- ifelse (options("device") != "RStudioGD", 0.7, 0.8)
+
+  return(list(bubble.size=bubble.size, size.axis=size.axis, size.lab=size.lab,
+              size.txt=size.txt))
+
+}
+
+
 .showfile <- function(fname, txt) {
   if (getwd() == "/")
     workdir <- "top level (root) of your file system"
   else
     workdir <- getwd()
-  cat("\n")
   cat("The", txt, "written at the current working directory\n")
   cat("       ", fname, " in:  ", workdir, "\n")
   cat("\n")
@@ -812,11 +839,12 @@ function(...) {
   # open graphics windows
   # if not already present, generate a null window for #2 and then remove
   if (off.two) wnew <- wnew + 1
+  RS <- ifelse (options("device") == "RStudioGD", TRUE, FALSE)
   for (i in 1:wnew) 
     if (is.null(d.w) && is.null(d.h))
-      dev.new()
+      dev.new(noRStudioGD=RS)
     else
-      dev.new(width=d.w, height=d.h)
+      dev.new(width=d.w, height=d.h, noRStudioGD=RS)
   if (off.two) dev.off(which=2)
 
 }
@@ -868,12 +896,12 @@ function(...) {
 .ncat <- function(analysis, x.name, nu, n.cat, brief=FALSE) {
 
   cat("\n")
-  message(x.name, " has only only ", nu, " equally spaced unique ",
+  cat(">>> ", x.name, " has only only ", nu, " equally spaced unique ",
       "integer values <= n.cat=", n.cat, "\n",
-      "  so treat as categorical", sep="")
+      "    so treat as categorical, and perhaps convert to an R factor\n", sep="")
 
   if (!brief)
-    message("For numeric, set n.cat smaller than ", nu, 
+    cat("    For numeric, set n.cat smaller than ", nu, 
         " with ", analysis, " or globally with  theme", sep="")
 
   cat("\n")
@@ -919,11 +947,16 @@ function(...) {
 
 
 # discrete color steps with no order
-.col.discrete <- function() {
+.col.discrete <- function(bright=FALSE) {
 
-  # based on rainbow_hcl(24,c=38,l=75) from colorspace
-  clr <- c( "#A1BAE1", "#D8B193", "#8FC59B", "#E4ABA8", "#B9B3E3",
-            "#B8BD87", "#74C7BD", "#DCA9D4")
+  # based on rainbow_hcl(24,c=40,l=70) from colorspace
+  if (!bright)
+    clr <- c("#92ADD6", "#D59E93", "#7FB88B", "#BDAA78", "#D09AC8",
+             "#64B8C1", "#C19FD3", "#D899B8")
+  # based on rainbow_hcl(8,c=80,l=65) from colorspace
+  else
+    clr <- c( "#57A2F0", "#E68369", "#1DB556", "#BD9B00", "#E475D6",
+              "#00B7C7", "#CA80EA", "#F072B8")
 
   return(clr)
 
@@ -1054,6 +1087,33 @@ function(...) {
 
     remv <- substr(fc, start=strt, stop=stp)
     fc.new <- sub(remv, "", fc, fixed=TRUE)
+
+  }
+
+  return(fc.new)
+}
+
+
+# remove argument and logical value from a function call
+.rm.arg.l <-  function(argm, fc) {
+
+  loc <- regexec(argm, fc)[[1]]  # beginning of argument
+
+  if (loc > 0) {
+
+    first.arg <- ifelse (substr(fc, loc-1, loc-1) == "(", TRUE, FALSE)
+
+    j <- loc
+    if (!first.arg)  # is not first argument, start at preceding comma
+      while(substr(fc, start=j, stop=j) != "," &&  substr(fc, start=j, stop=j) != "")
+         if (j < 1000) j <- j + 1 
+    stp <- j  #  closing parentheses or comma before argument
+    if (first.arg) stp <- stp + 2  # remove trailing comma and space
+    strt <- loc - 1
+
+    remv <- substr(fc, start=strt, stop=stp)
+    fc.new <- sub(remv, "", fc, fixed=TRUE)
+    fc.new <- sub(",,", "", fc.new, fixed=TRUE)  # hack
 
   }
 

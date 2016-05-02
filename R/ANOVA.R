@@ -221,7 +221,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
   if (!is.null(Rmd)) {
     txt <- ifelse (grepl(".Rmd", Rmd), "", ".Rmd")
     Rmd <- paste(Rmd, txt, sep="") 
-    txknt <- .anova.Rmd(nm, dname, fun.call, digits.d)
+    txknt <- .av.Rmd(nm, dname, fun.call, digits.d)
     cat(txknt, file=Rmd, sep="\n")
     txkfl <- .showfile2(Rmd, "R Markdown instructions")
   }

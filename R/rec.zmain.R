@@ -73,7 +73,7 @@ function(x, x.name, new.var, old, new, ivar, n.obs, dname, quiet) {
     for (j in 1:n.obs) {
       if (!miss.old) {
         if (!is.na(new.x[j])) 
-          if (x[j] == old[i]) if (!miss.new) new.x[j] <- new[i] else new.x[j] <- NA
+          if (x[j] == old[i]) new.x[j] <- ifelse (!miss.new, new[i], NA)
       } 
       else  # miss.old
         if (is.na(new.x[j])) new.x[j] <- new[1]

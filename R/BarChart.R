@@ -1,20 +1,22 @@
 BarChart <-
 function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
 
-         col.fill=NULL, col.stroke=getOption("col.stroke.bar"),
-         col.bg=getOption("col.bg"),
-         col.grid=getOption("col.grid"),
-         random.col=FALSE,
+         color.fill=getOption("color.fill.bar"),
+         color.stroke=getOption("color.stroke.bar"),
+         color.bg=getOption("color.bg"),
+         color.grid=getOption("color.grid"),
+         color.box=getOption("color.box"),
+
          colors=c("rainbow", "terrain", "heat"),
 
          horiz=FALSE, over.grid=FALSE, addtop=0.05,
-         gap=NULL, prop=FALSE,
+         gap=NULL, proportion=FALSE,
          
          xlab=NULL, ylab=NULL, main=NULL,
-         cex.axis=0.75, col.axis="gray30",
+         cex.axis=0.75, color.axis="gray30",
          value.labels=NULL, rotate.values=0, offset=0.5,
 
-         beside=FALSE, col.low=NULL, col.hi=NULL, count.labels=NULL,
+         beside=FALSE, color.low=NULL, color.hi=NULL, count.labels=NULL,
 
          legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
          legend.horiz=FALSE, 
@@ -28,8 +30,18 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else
     colors <- match.arg(colors)
 
-  if (missing(col.stroke))  # default black border unless dark bg
-    if (sum(col2rgb(col.bg))/3 > 80) col.stroke <- "black"
+  if (missing(color.stroke))  # default black border unless dark bg
+    if (sum(col2rgb(color.bg))/3 > 80) color.stroke <- "black"
+
+  if (!is.null(color.fill)) {
+    for (i in 1:length(color.fill))
+      if (color.fill[i] == "off") color.fill[i] <- "transparent"
+  }
+  for (i in 1:length(color.stroke))
+    if (color.stroke[i] == "off") color.stroke[i] <- "transparent"
+  if (color.bg == "off") color.bg <- "transparent"
+  if (color.grid == "off" ) color.grid <- "transparent"
+  if (color.box == "off") color.box <- "transparent"
 
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
@@ -37,6 +49,13 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   dots <- list(...)  # check for deprecated/changed parameters
   if (length(dots) > 0) {
     for (i in 1:length(dots)) {
+      old.nm <- c("col.fill", "col.stroke", "col.bg", "col.grid", "col.box",
+                  "col.reg", "col.axis", "col.trans", "col.low", "col.hi")
+      if (names(dots)[i] %in% old.nm) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "options that began with the abbreviation  col  now begin with  ",
+          "color \n\n")
+        }
       if (names(dots)[i] == "addtop") 
         cat("\naddtop  is now a multiplicative factor instead of additive\n\n")
       if (names(dots)[i] == "count.levels") {
@@ -99,7 +118,6 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       # indicate a function call with sys.nframe returns larger than 1 
       #if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1) 
         #in.call <- TRUE else in.call <- FALSE
-
 
       # get conditions and check for data existing
       #if (!in.call) {
@@ -176,9 +194,9 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     on.exit(par(orig.params))
 
     bc <- .bc.main(x.call, y.call,
-         col.fill, col.stroke, col.bg, col.grid, random.col, colors,
-         horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
-         cex.axis, col.axis, rotate.values, offset, beside, col.low, col.hi,
+         color.fill, color.stroke, color.bg, color.grid, color.box, colors,
+         horiz, over.grid, addtop, gap, proportion, xlab, ylab, main, value.labels,
+         cex.axis, color.axis, rotate.values, offset, beside, color.low, color.hi,
          count.labels.call,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...)
 
@@ -193,9 +211,9 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   else
     bc.data.frame(data, n.cat,
-      col.fill, col.stroke, col.bg, col.grid, random.col, colors,
-      horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
-      cex.axis, col.axis, rotate.values, offset, beside, col.low, col.hi,
+      color.fill, color.stroke, color.bg, color.grid, color.box, colors,
+      horiz, over.grid, addtop, gap, proportion, xlab, ylab, main, value.labels,
+      cex.axis, color.axis, rotate.values, offset, beside, color.low, color.hi,
       count.labels,
       legend.title, legend.loc, legend.labels, legend.horiz, quiet,
       pdf.width, pdf.height, ...)

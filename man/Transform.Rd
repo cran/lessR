@@ -20,7 +20,7 @@ trans(\ldots)
   \item{data}{The name of the data frame from which to create the subset, which
        is \code{mydata} by default.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-       with \code{\link{set}} function.}
+       with \code{\link{theme}} function.}
   \item{\dots}{The list of transformations, each of the form, \code{variable = equation}. Each \code{variable} can be the name of an existing variable in the data frame or a newly created variable.}
 }
 

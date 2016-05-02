@@ -1,7 +1,8 @@
 .TwoGraph <-
 function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
          n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
-         clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title) {
+         clpct, tvalue, pvalue, ub, lb, show.title) {
+         #clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title) {
 
   dYA <- suppressWarnings(density(YA, bw1))
   dYB <- suppressWarnings(density(YB, bw2))
@@ -169,14 +170,14 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   if (show.title) {
     mtext(paste("Two-Group Plot"), side=3, line=6.6, font=2)
     mtext(paste("Compare",Ynm,"for",Xnm,X1nm,"and",X2nm), side=3, line=5.6, font=3, cex=.8)
-    mtext(bquote(paste("  Classic t-test of 0 Mean Difference:   t = ", .(.fmt(tvalue,3)), 
+    mtext(bquote(paste("  Classic t-test of 0 Mean Diff:   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(df), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 
       line=4.0, cex=.8, adj=0)
     mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Mean Difference:  ",
       .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=3.0, cex=.8, adj=0)
-    mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Standardized",
-      " Mean Diff:   ", 
-      .(.fmt(deltaL,3)), " to ", .(.fmt(deltaU,3)))), side=3, line=1.9, cex=.8, adj=0)
+    #mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Standardized",
+      #" Mean Diff:   ", 
+      #.(.fmt(deltaL,3)), " to ", .(.fmt(deltaU,3)))), side=3, line=1.9, cex=.8, adj=0)
     mtext(bquote(paste("s-within")), side=3, line=.7, 
           at=(mlow+(last.coord.x))/2, col="gray40", cex=.8)
     mtext(bquote(paste(.(round(sw,2)))), side=3, line=-0.1,

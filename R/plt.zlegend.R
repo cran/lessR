@@ -1,41 +1,42 @@
 .plt.legend <-
-function(mylevels, col.pts, clr, clr.tr, shp, trans.pts, col.bg, usr) {
+function(colnms, horiz, stroke, fill, shape, usr) {
 
-  par(xpd=NA)  # allow drawing outside of plot region
+  par(xpd=NA) 
+  
+  ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
+               horiz=TRUE, plot=FALSE)  # get coordinates
 
-  n.levels <- length(mylevels)
-  by.name <- getOption("byname")
+  if (horiz) {
+    ytop <- usr[3] - (1.25 * ll$rect$h) 
 
-  legend.labels <- abbreviate(mylevels,6)
-  legend.title  <- abbreviate(by.name, 12)
-  ll <- legend(0,0, legend=legend.labels, title=legend.title, cex=.7,
-           fill="gray", plot=FALSE)
-  size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
-  epsilon <- (size[1] - ll$rect$w) / 2
+    axis.horiz <- usr[2] - usr[1]
+    lgnd.hhalf <- (ll$rect$w) / 2
+    xleft <- usr[1] + axis.horiz/2 - lgnd.hhalf
 
-  axis.vert <- usr[4] - usr[3]
-  xleft <- usr[2] + epsilon   # usr[2] user coordinate of right axis
-  lgnd.vhalf <- (ll$rect$h) / 2
-  axis.cntr <- axis.vert / 2  + usr[3]
-  ytop <- axis.cntr + lgnd.vhalf  # user coordinate of legend top
-
-  if (trans.pts > 0.85) {  # points too light, reduce legend transparency
-    legend.fill <- integer(length=n.levels)
-    for (i in 1:n.levels) legend.fill[i] <- .maketrans(clr[i],.7)
+    legend(xleft, ytop, legend=colnms, horiz=TRUE, box.lwd=.5, 
+           box.col="gray30", cex=.7, pt.cex=1, pt.bg=fill,
+           col=stroke, pch=shape)  # display legend
   }
-  else 
-    legend.fill <- clr.tr
 
-  colors <- getOption("colors")
-  the.clr <- ifelse(grepl(".black", colors), "gray90", "black")
+  else {
 
-  if (length(col.pts) > 1)
-    legend(xleft, ytop, legend=legend.labels, title=legend.title, 
-           fill=legend.fill, horiz=FALSE, cex=.7, box.lwd=.5, 
-           box.col="gray30", bg=col.bg, col=the.clr, text.col=the.clr)
-  else 
-    legend(xleft, ytop, legend=legend.labels, title=legend.title, 
-           pch=shp, horiz=FALSE, cex=.7, box.lwd=.5, 
-           box.col="gray30", bg=col.bg, col=the.clr, text.col=the.clr)
+    # just evaluate largest col name of y, as they are additive
+    max.width <- which(nchar(colnms) == max(nchar(colnms)))
+    ll <- legend(0,0, legend=max.width, cex=.7, pt.cex=0.9,
+                 horiz, plot=FALSE)  # get coordinates
+
+    size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
+    epsilon <- (size[1] - ll$rect$w) / 3
+
+    axis.vert <- usr[4] - usr[3]
+    xleft <- usr[2] + epsilon   # usr[2] user coordinate of right axis
+    lgnd.vhalf <- (ll$rect$h) / 2
+    axis.cntr <- axis.vert / 2  + usr[3]
+    ytop <- axis.cntr + lgnd.vhalf  # user coordinate of legend top
+
+    legend(xleft, ytop, legend=colnms, horiz=FALSE, box.lwd=.5, 
+           box.col="gray30", cex=.7, pt.cex=1, pt.bg=fill,
+           col=stroke, pch=shape)  # display legend
+  }
 
 }

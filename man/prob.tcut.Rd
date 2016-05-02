@@ -9,8 +9,8 @@ Plot a specified t-distribution against the standardized normal curve with the c
 
 \usage{
 prob.tcut(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
-         col.fill="aliceblue", col.tail="palevioletred4",
-         col.nrm=gray(.7), col.t=gray(.08), \ldots)
+         color.fill="aliceblue", color.tail="palevioletred4",
+         color.nrm=gray(.7), color.t=gray(.08), \ldots)
 }
 
 
@@ -19,10 +19,10 @@ prob.tcut(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
   \item{alpha}{Alpha to define the tail cutoff area.}
   \item{dig.dec}{Number of decimal digits in the output.}
   \item{y.axis}{If \code{FALSE}, then the y axis is not displayed.}
-  \item{col.fill}{Fill color for the interior of the t-distribution curve.}
-  \item{col.tail}{Color of the tail areas of the t-distribution.}
-  \item{col.nrm}{Color of the normal curve.}
-  \item{col.t}{Color of the t-distribution curve.}
+  \item{color.fill}{Fill color for the interior of the t-distribution curve.}
+  \item{color.tail}{Color of the tail areas of the t-distribution.}
+  \item{color.nrm}{Color of the normal curve.}
+  \item{color.t}{Color of the t-distribution curve.}
   \item{\ldots}{Other parameter values for graphics.}
 }
 

@@ -9,8 +9,8 @@ Simulate a sequence of coin flips.
 
 \usage{
 simFlips(n, prob=.5, show.title=TRUE,
-         show.flips=TRUE, col.grid="grey90", pause=FALSE,
-         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5)
+         show.flips=TRUE, color.grid="grey90", pause=FALSE,
+         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 }
 
 
@@ -19,12 +19,13 @@ simFlips(n, prob=.5, show.title=TRUE,
   \item{prob}{Probability of a success on any one trial.}
   \item{show.title}{Place a title on the graph that contains the parameter values.}
   \item{show.flips}{Plot the outcome of each flips.}
-  \item{col.grid}{Color of the grid lines.}
+  \item{color.grid}{Color of the grid lines.}
   \item{pause}{Build the graph and the text output confidence interval by confidence interval.}
   \item{main}{Title of graph.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
+  \item{\dots}{Other parameter values, possibly invalid.} 
 }
 
 

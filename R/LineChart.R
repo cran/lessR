@@ -1,19 +1,20 @@
 LineChart <-
 function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
 
-         col.fill=getOption("col.fill.bar"), 
-         col.stroke=getOption("col.stroke.pt"),
-         col.bg=getOption("col.bg"),
-         col.grid=getOption("col.grid"),
-         col.line=getOption("col.stroke.pt"),
+         color.fill=getOption("color.fill.bar"), 
+         color.stroke=getOption("color.stroke.pt"),
+         color.bg=getOption("color.bg"),
+         color.grid=getOption("color.grid"),
+         color.box=getOption("color.box"),
+         color.line=getOption("color.stroke.pt"),
 
-         col.area=NULL, col.box="black",
+         color.area=NULL, 
 
-         shape.pts=21, cex.axis=0.75, col.axis="gray30",
+         shape.pts=21, cex.axis=0.75, color.axis="gray30",
 
          rotate.values=0, offset=.5,
 
-         xy.ticks=TRUE, line.width=1.1,
+         xy.ticks=TRUE, line.width=1,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL, cex=NULL,
 
          time.start=NULL, time.by=NULL, time.reverse=FALSE,
@@ -26,8 +27,31 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
   center.line <- match.arg(center.line)
 
+  for (i in 1:length(color.fill))
+    if (color.fill[i] == "off") color.fill[i] <- "transparent"
+  for (i in 1:length(color.stroke))
+    if (color.stroke[i] == "off") color.stroke[i] <- "transparent"
+  if (color.bg == "off") color.bg <- "transparent"
+  if (color.grid == "off" ) color.grid <- "transparent"
+  if (color.box == "off") color.box <- "transparent"
+  if (color.line == "off") color.box <- "transparent"
+  if (!is.null(color.area)) if (color.area == "off") color.area <- "transparent"
+
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      old.nm <- c("col.fill", "col.stroke", "col.bg", "col.grid", "col.box",
+                  "col.line", "col.axis", "col.area")
+      if (names(dots)[i] %in% old.nm) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "options that began with the abbreviation  col  now begin with  ",
+          "color \n\n")
+      }
+    }
+  }
 
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x))
@@ -98,8 +122,9 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
      .opendev(pdf.fnm, pdf.width, pdf.height)
 
       .lc.main(data[,i], type,
-         col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
-         col.grid, col.bg, cex.axis, col.axis, rotate.values, offset, xy.ticks,
+         color.line, color.area, color.stroke, color.fill, shape.pts,
+         color.grid, color.box, color.bg, cex.axis, color.axis,
+         rotate.values, offset, xy.ticks,
          line.width, xlab, ylab, main, sub, cex,
          time.start, time.by, time.reverse, 
          center.line, show.runs, quiet, ...)

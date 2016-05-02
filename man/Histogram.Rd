@@ -3,7 +3,7 @@
 \alias{hs}
 
 
-\title{Histogram with Color}
+\title{Histogram}
 
 \description{
 Abbreviation: \code{hs}
@@ -16,16 +16,16 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, t
 }
 
 \usage{
-
 Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
-         col.fill=getOption("col.fill.bar"), 
-         col.stroke=getOption("col.stroke.bar"),
-         col.bg=getOption("col.bg"),
-         col.grid=getOption("col.grid"),
+         color.fill=getOption("color.fill.bar"), 
+         color.stroke=getOption("color.stroke.bar"),
+         color.bg=getOption("color.bg"),
+         color.grid=getOption("color.grid"),
+         color.box=getOption("color.box"),
 
-         col.reg="snow2", over.grid=FALSE,
-         cex.axis=0.75, col.axis="gray30",
+         color.reg="snow2", over.grid=FALSE,
+         cex.axis=0.75, color.axis="gray30",
 
          rotate.values=0, offset=0.5,
 
@@ -56,18 +56,20 @@ hs(\ldots)
   \item{Rmd}{File name for the file of R markdown to be written, if specified.
         The file type is .Rmd, which automatically opens in RStudio, but it is a simple
         text file that can be edited with any text editor, including RStudio.}
-  \item{col.fill}{Color of the bars. To set transparency level, use \code{lessR} 
-       function \code{\link{set}} or use \code{\link{rgb}} function directly.}
-  \item{col.stroke}{Color of the border of the bars. To set transparency level, use function 
-       \code{set} or use \code{\link{rgb}} function directly.}
-  \item{col.bg}{Color of the plot background.}
-  \item{col.grid}{Color of the grid lines.}
-  \item{col.reg}{The color of the superimposed, regular histogram when \code{cumul="both"}.}
+  \item{color.fill}{Color of the bars. To set transparency level, use \code{lessR} 
+       function \code{\link{theme}} or use \code{\link{rgb}} function directly.}
+  \item{color.stroke}{Color of the border of the bars. To set transparency level, use function 
+       \code{theme} or use \code{\link{rgb}} function directly.}
+  \item{color.bg}{Color of the plot background.}
+  \item{color.grid}{Color of the grid lines.}
+  \item{color.box}{Color of border around the plot background, the box, that encloses 
+        the plot, with a default of \code{"black"}.}
+  \item{color.reg}{The color of the superimposed, regular histogram when \code{cumul="both"}.}
   \item{over.grid}{If \code{TRUE}, plot the grid lines over the histogram.}
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
         values to be smaller than the axis labels. Provides the functionality of,
         and can be replaced by, the standard R \code{cex.axis.}}
-  \item{col.axis}{Color of the font used to label the axis values.}
+  \item{color.axis}{Color of the font used to label the axis values.}
   \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
         longer values, typically used in conjunction with \code{offset}.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
@@ -93,7 +95,7 @@ hs(\ldots)
   \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.}
   \item{main}{Title of graph.}
   \item{sub}{Sub-title of graph, below xlab.}
-  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with \code{\link{set}} function.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with \code{\link{theme}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
        no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
@@ -120,7 +122,10 @@ The data may either be a vector from the global environment, the user's workspac
 To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
+Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
+
+For the color options, such as \code{color.grid}, the value of \code{"off"} is the same as 
+\code{"transparent"}.
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -166,7 +171,7 @@ Although not typically needed, if the output is assigned to an object named, for
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{hist}}, \code{\link{plot}}, \code{\link{par}}, \code{\link{set}}.
+\code{\link{hist}}, \code{\link{plot}}, \code{\link{par}}, \code{\link{theme}}.
 }
 
 
@@ -196,23 +201,23 @@ h$out_outliers
 names(h)
 
 # histogram with no borders for the bars
-Histogram(y, col.stroke="transparent")
+Histogram(y, color.stroke="off")
 
 # save the histogram to a pdf file
 Histogram(y, pdf.file="MyHistogram.pdf")
 
 # histogram with no grid, red bars, black background, and black border
-Histogram(y, col.grid="transparent", col.bg="black",
-          col.fill="red", col.stroke="black")
+Histogram(y, color.grid="off", color.bg="black",
+          color.fill="red", color.stroke="black")
 # or set this color scheme for all subsequent analyses
-set("red", col.grid="transparent", col.bg="black", col.stroke.bar="black")
+set("red", color.grid="off", color.bg="black", color.stroke.bar="black")
 Histogram(y)
 
 # histogram with orange color theme, transparent orange bars, no grid lines
-set(colors="orange", ghost=TRUE)
+theme(colors="orange", ghost=TRUE)
 Histogram(y)
 # back to default of "blue" color theme
-set(colors="blue")
+theme(colors="blue")
 
 # histogram with specified bin width
 # can also use bin.start
@@ -232,11 +237,11 @@ Histogram(y, breaks="Scott", hist.counts=TRUE, quiet=TRUE)
 Histogram(y, breaks=15, prop=TRUE)
 
 # histogram with specified colors, overriding defaults
-# col.bg and col.grid are defined in histogram
+# color.bg and color.grid are defined in histogram
 # all other parameters are defined in hist, par and plot functions
 # generates caution messages that can be ignored regarding density and angle
-#Histogram(y, col.fill="darkblue", col.stroke="lightsteelblue4", col.bg="ivory",
-#  col.grid="darkgray", density=25, angle=-45, cex.lab=.8, cex.axis=.8,
+#Histogram(y, color.fill="darkblue", color.stroke="lightsteelblue4", color.bg="ivory",
+#  color.grid="darkgray", density=25, angle=-45, cex.lab=.8, cex.axis=.8,
 #  col.lab="sienna3", main="My Title", col.main="gray40", xlim=c(-5,5), lwd=2,
 #  xlab="My Favorite Variable")
 
@@ -250,7 +255,7 @@ Histogram(y, cumul="both")
 # cumulative histogram plus regular histogram
 # present with proportions on vertical axis, override other defaults
 Histogram(y, cumul="both", breaks=seq(-4,4,.25), prop=TRUE, 
-  col.reg="mistyrose")
+  color.reg="mistyrose")
 
 
 # -------------------------------------------------
@@ -276,7 +281,7 @@ Histogram()
 Histogram(breaks, data=warpbreaks)
 
 # all histograms with specified options, including red axis labels
-Histogram(col.fill="palegreen1", col.bg="ivory", hist.counts=TRUE, col.lab="red")
+Histogram(color.fill="palegreen1", color.bg="ivory", hist.counts=TRUE, col.lab="red")
 
 # histograms for all specified numeric variables
 # use the combine or c function to specify a list of variables

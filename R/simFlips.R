@@ -1,12 +1,23 @@
 simFlips <-
 function(n, prob=.5, show.title=TRUE,
-         show.flips=TRUE, col.grid="grey90", pause=FALSE,
-         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5) {
+         show.flips=TRUE, color.grid="grey90", pause=FALSE,
+         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
   if (missing(n)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify the number of flips with:  n\n\n")
+  }
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (substr(names(dots)[i], 1, 4) == "col.") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "options that began with the abbreviation  col  now begin with  ",
+          "color \n\n")
+      }
+    }
   }
 
   if (!is.null(pdf.file))
@@ -28,7 +39,7 @@ function(n, prob=.5, show.title=TRUE,
 
   # grid lines
   vy <- pretty(c(usr[3],usr[4]))
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=color.grid, lwd=.5)
 
   abline(h=prob, col="lightsteelblue", lwd=2)
 

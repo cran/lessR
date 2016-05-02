@@ -6,14 +6,15 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 
     Rmd=NULL, digits.d=NULL,
 
-    col.fill=getOption("col.fill.pt"),
-    col.bg=getOption("col.bg"),
-    col.grid=getOption("col.grid"),
+    color.fill=getOption("color.fill.pt"),
+    color.bg=getOption("color.bg"),
+    color.grid=getOption("color.grid"),
+    color.box=getOption("color.box"),
 
-    col.nrm="black", col.gen="black",
-    col.fill.nrm=NULL, col.fill.gen=NULL,
+    color.nrm="black", color.gen="black",
+    color.fill.nrm=NULL, color.fill.gen=NULL,
 
-    cex.axis=0.75, col.axis="gray30",
+    cex.axis=0.75, color.axis="gray30",
 
     rotate.values=0, offset=0.5,
 
@@ -27,12 +28,25 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 
   if (is.null(fun.call)) fun.call <- match.call()
 
+  for (i in 1:length(color.fill))
+    if (color.fill[i] == "off") color.fill[i] <- "transparent"
+  if (color.bg == "off") color.bg <- "transparent"
+  if (color.grid == "off" ) color.grid <- "transparent"
+  if (color.box == "off") color.box <- "transparent"
+
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
 
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
     for (i in 1:length(dots)) {
+      old.nm <- c("col.fill", "col.bg", "col.grid", "col.box", "col.nrm",
+                  "col.gen", "col.fill.nrm", "col.fill.gen", "col.axis")
+      if (names(dots)[i] %in% old.nm) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "options that began with the abbreviation  col  now begin with  ",
+          "color \n\n")
+      }
       if (names(dots)[i] == "knitr.file") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "knitr.file  no longer used\n",
@@ -43,23 +57,23 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 
   clr <- getOption("colors")  # color theme not used except for monochrome 
 
-  if (missing(col.fill))
+  if (missing(color.fill))
     if (.Platform$OS == "windows")
-      col.fill <- "gray80"
+      color.fill <- "gray80"
     else
-      col.fill <- "gray86"
+      color.fill <- "gray86"
 
-  if (missing(col.bg)) col.bg <- "ghostwhite"
+  if (missing(color.bg)) color.bg <- "ghostwhite"
 
-  if (missing(col.fill.nrm))
-      col.fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
+  if (missing(color.fill.nrm))
+      color.fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
 
-  if (missing(col.fill.gen))
-      col.fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
+  if (missing(color.fill.gen))
+      color.fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
 
   if (clr == "gray" || clr == "gray.black") {
-    col.fill.nrm <- "transparent"
-    col.fill.gen <- "transparent"
+    color.fill.nrm <- "transparent"
+    color.fill.gen <- "transparent"
   }
 
 
@@ -142,9 +156,9 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
         ttlns <- ""
  
       stuff <- .dn.main(data[,i], bw, type, bin.start, bin.width, 
-            col.fill, col.bg, col.grid, col.nrm, col.gen,
-            col.fill.nrm, col.fill.gen, 
-            cex.axis, col.axis, rotate.values, offset, 
+            color.fill, color.bg, color.grid, color.box, color.nrm, color.gen,
+            color.fill.nrm, color.fill.gen, 
+            cex.axis, color.axis, rotate.values, offset, 
             x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)
       txdst <- stuff$tx
       if (length(txdst)==0) txdst <- ""

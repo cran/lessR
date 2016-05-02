@@ -28,7 +28,7 @@ model(\ldots)
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
-       with \code{\link{set}} function.}
+       with \code{\link{theme}} function.}
   \item{\dots}{Other parameter values for R functions such as \code{\link{lm}} which provide the core computations.} 
 }
 

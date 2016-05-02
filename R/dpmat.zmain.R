@@ -4,19 +4,26 @@ function(x, mylabels, nm,
          shape.pts, col.area, col.box, 
          cex.axis, col.axis, col.low, col.hi,
          xy.ticks, xlab, ylab, main, sub, cex,
-         bubble.size, bubble.counts,
+         bubble.size, bubble.counts, bubble.power,
          value.labels, rotate.values, offset, quiet, ...)  {
 
+
+  # scale for regular R or RStudio
+  adj <- .RSadj(bubble.size, cex.axis)
+  bubble.size <- adj$bubble.size
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
+  size.txt <- adj$size.txt
 
   if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels) 
 
   # if exist, get axes labels
-  gl <- .getlabels(xlab, ylab, main, cex.lab=getOption("lab.size"))
+  gl <- .getlabels(xlab, ylab, main, cex.lab=size.lab)
   x.lab <- gl$xb
   y.lab <- gl$yb
   main.lab <- gl$mb
   sub.lab <- gl$sb
-  cex.lab <- gl$cex.lab
+  size.lab <- gl$cex.lab
 
   n.var <- ncol(x)
   t1 <- table(x[,1])  # here relying only on the first variable in x
@@ -41,7 +48,7 @@ function(x, mylabels, nm,
     for (i in 1:n.var)
       cat("  ", names(x)[i], "    ", n.nm[i], "    ", names(table(x[,i])), "\n")
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Not all variables have the same number of response categories\n\n",
+      "The specified variables do not all have the same response categories\n\n",
       "Transform the variables to factors, each with the same levels attribute\n",
       "See the last set of examples from ?Transform\n\n")
   }
@@ -83,7 +90,7 @@ function(x, mylabels, nm,
     x.lvl <- gsub(" ", "\n", x.lvl) 
 
   .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,
-        par("usr")[1], par("usr")[3], cex.axis, col.axis,
+        par("usr")[1], par("usr")[3], size.axis, col.axis,
         rotate.values, offset=offset, ...)
 
   # axis labels 
@@ -95,7 +102,7 @@ function(x, mylabels, nm,
     max.lbl <- 0
 
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks, offset=offset, cex.lab=cex.lab, ...) 
+          xy.ticks, offset=offset, cex.lab=size.lab, ...) 
 
   # color plotting area
   usr <- par("usr")
@@ -125,10 +132,11 @@ function(x, mylabels, nm,
   # counts
   if (bubble.counts) { 
     max.c <- max(c, na.rm=TRUE)  # do not display count if bubble is too small
-    min.bubble <- (.5 - (0.9*bubble.size)) * max.c 
+    #min.bubble <- (.5 - (0.9*bubble.size)) * max.c 
+    min.bubble <- (bubble.power/2.5) * max.c
     for (i in 1:length(c))
       if (!is.na(c[i])) if (c[i] <= min.bubble) c[i] <- NA
-    text(cords$xx, cords$yy, c, cex=.7)
+    text(cords$xx, cords$yy, c, cex=size.txt)
   }
 
   if (!quiet) {

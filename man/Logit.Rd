@@ -41,7 +41,7 @@ lr(\ldots)
         For the rest of the output, it is a suggestion only.}
   \item{text.width}{Width of the text output at the console.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
-       with \code{\link{set}} function.}
+       with \code{\link{theme}} function.}
   \item{res.rows}{Default is 25, which lists the first 25 rows of data sorted by the
        specified sort criterion.  To turn this option off, specify a value of 0.  To see 
        the output for all observations, specify a value of \code{"all"}.}
@@ -98,7 +98,7 @@ INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{reg} is finished with a normal termination, the options are re-set to their values before the \code{reg} function began executing.
 
 COLORS\cr
-The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
+The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
 }
 
 \value{

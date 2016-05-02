@@ -62,8 +62,11 @@ function(x, by=NULL, digits.d=NULL, brief, ...) {
     } 
     m <- mean(xx, na.rm=TRUE)
     s <- sd(xx, na.rm=TRUE)
-    n.ln <- max(nchar(as.character(round(m, dig.dec))), 
-                nchar(as.character(round(s, dig.dec)))) + dig.dec
+    if (is.na(s) || is.null(s))
+      n.ln <- nchar(as.character(round(m, dig.dec))) + dig.dec
+    else
+      n.ln <- max(nchar(as.character(round(m, dig.dec))), 
+                  nchar(as.character(round(s, dig.dec)))) + dig.dec
     if (n.ln > max.ln) max.ln <- n.ln
   }
   if (max.ln < 5) max.ln <- max.ln + 1

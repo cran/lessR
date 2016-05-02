@@ -1,4 +1,4 @@
-.anova.Rmd <-
+.av.Rmd <-
 function(nm, dname, fun.call, d) {
 
   explain <- TRUE

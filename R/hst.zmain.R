@@ -1,10 +1,16 @@
 .hst.main <- 
-function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
+function(x, col.fill, col.stroke, col.bg, col.grid,
+       col.box, col.reg,
        over.grid, cex.axis, col.axis, rotate.values, offset,
        breaks, bin.start, bin.width,
        bin.end, prop, hist.counts, cumul,
-       xlab, ylab, main, sub, quiet, ...) {
+       xlab, ylab, main, sub, quiet, fun.call=NULL, ...) {
 
+
+  # scale for regular R or RStudio
+  adj <- .RSadj(bubble.size=NULL, cex.axis)
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
 
   if (is.numeric(breaks) && !is.null(bin.start)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -13,11 +19,12 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
   }
 
   # get variable labels if exist plus axes labels
-  if (is.null(ylab)) if (!prop) ylab <- "Frequency" else ylab <- "Proportion"
+  if (is.null(ylab))
+    ylab <- ifelse (!prop, "Count of", "Proportion of")
   gl <- .getlabels(xlab, ylab, main, sub, cex.lab=getOption("lab.size"))
   x.name <- gl$xn; x.lbl <- gl$xl
   x.lab <- gl$xb
-  y.lab <- gl$yb;
+  y.lab <- paste(gl$yb, x.name)
   main.lab <- gl$mb
   sub.lab <- gl$sb
   cex.lab <- gl$cex.lab
@@ -58,24 +65,35 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
     n.under <- length(x[which(x<bin.min)])
     n.over <- length(x[which(x>bin.max)])
     if (n.under+n.over > 0) {
-      cat("\nRange of the data: ", min(x, na.rm=TRUE), " to ",
-          max(x, na.rm=TRUE), "\n", sep="")
+      txt.u <- "";  txt.o <- "";  txt.nu <- "";  txt.no <- ""
       if (length(breaks) > 3)
-        cat("Specified bin cutpoints: ", bin.min, breaks[2], "...", 
+        txt.c <- paste("Specified bin cutpoints: ", bin.min, breaks[2], "...", 
           breaks[length(breaks)-1], bin.max, "\n\n")
       else
-        cat("Range of the specified bins: ", bin.min, " to ", bin.max, "\n", sep="")
+        txt.c <- paste("Range of the specified bins: ", bin.min,
+          " to ", bin.max, "\n", sep="")
       if (n.under > 0) 
-        cat("Data values too small to fit in the bins: ", x[which(x<bin.min)], "\n")
+        txt.u <- paste("Data values too small to fit in the bins: ",
+          x[which(x<bin.min)], "\n\n")
       if (n.over > 0)
-        cat("Data values too large to fit in the bins: ", x[which(x>bin.max)], "\n")
-      cat("\n")
-      cat("Each data value must be in a bin.\n")
+        txt.o <- paste("Data values too large to fit in the bins: ",
+          x[which(x>bin.max)], "\n\n")
       txt <- "To fix this problem, extend the bin range "
-      if (n.under > 0) cat(txt, "below ", bin.min, ".\n", sep="")
-      if (n.over > 0) cat(txt, "above ", bin.max, ".\n\n", sep="")
-      stop("Extend the bin range and rerun.\n\n", call. = FALSE)
-    }  
+      if (n.under > 0)
+        txt.nu <- paste(txt, "below ", bin.min, "\n", sep="")
+      if (n.over > 0)
+        txt.no <- paste(txt, "above ", bin.max, "\n", sep="")
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Range of the data for ", x.name, ": ", min(x, na.rm=TRUE), " to ",
+            max(x, na.rm=TRUE), "\n",
+        txt.c,
+        txt.u,
+        txt.o,
+        "Each data value must be in a bin\n",
+        txt.nu,
+        txt.no, "\n",
+        "Extend the bin range by setting bin.start and rerun\n\n")
+    }
   }
 
 
@@ -103,17 +121,17 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
 
   # axis, axis ticks
   .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-        par("usr")[1], par("usr")[3], cex.axis, col.axis,
+        par("usr")[1], par("usr")[3], size.axis, col.axis,
         rotate.values, offset, ...)
 
   # axis labels
   max.lbl <- max(nchar(axTicks(2)))
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
+          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
 
   # colored background for plotting area
   usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
   
   # grid lines computation
   vy <- pretty(h$counts)
@@ -141,68 +159,18 @@ function(x, col.fill, col.stroke, col.bg, col.grid, col.reg,
 #------------
   if (!quiet) {
 
-    tx <- character(length = 0)
-    
-    bin.width <- h$breaks[2]-h$breaks[1]
-    n.bins <- length(h$breaks)-1
-    tx[length(tx)+1] <- paste("Bin Width:", bin.width)
-    tx[length(tx)+1] <- paste("Number of Bins:", n.bins)
-    tx[length(tx)+1] <- ""
+    stats <- .hst.stats(h, length(x), fun.call)
 
-    # j<17 condition is to stop the 0.99999... problem
-    max.dg <- 0
-    for (i in 1:length(h$breaks)) {
-      j <- nchar(as.character(h$breaks[i]))
-      if (j>max.dg && j<17) max.dg <- j
-    }
-    max.dg.mid <- 0
-    for (i in 1:length(h$mids)) {
-      j <- nchar(as.character(h$mids[i]))
-      if (j>max.dg.mid && j<19) max.dg.mid <- j
-    }
-    x.breaks <- format(h$breaks, width=max.dg, justify="right", scientific=FALSE)
-    x.mids <- format(h$mids, width=max.dg.mid, justify="right", scientific=FALSE)
+    txsug=stats$txsug
+    tx=stats$tx
+    bin.width=stats$bin.width
+    n.bins=stats$n.bins
+    prop=stats$prop
+    cum.c=stats$counts_cum
+    cum.p=stats$prop_cum
 
-    bn <- character(length=0)
-    for (i in 1:(length(x.breaks)-1))
-      bn[i] <- paste(x.breaks[i], ">", x.breaks[i+1])
-
-    cum.c <- cumsum(h$counts)
-    prop <- h$counts / length(x)
-    cum.p <- cumsum(prop)
-
-    out <- data.frame(bn, stringsAsFactors=FALSE)
-    out$x.mids <- x.mids
-    out$counts <- formatC(h$counts, digits=0, format="f")
-    out$prop <- formatC(prop, digits=2, format="f")
-    out$cum.c <- formatC(cum.c, digits=0, format="f")
-    out$cum.p <- formatC(cum.p, digits=2, format="f")
-    names(out) <- c("Bin", "Midpnt", "Count", "  Prop", "Cumul.c", "Cumul.p")
-
-    # width of columns
-    max.ln <- integer(length=0)
-    for (i in 1:ncol(out)) {
-      ln.nm <- nchar(colnames(out)[i]) + 1
-      max.val <- max(nchar(out[,i]))
-      max.ln[i] <- max(ln.nm, max.val) + 1
-    }
-
-    # write col labels
-    tx[length(tx)+1] <- ""
-    for (i in 1:ncol(out))
-      tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(out)[i], w=max.ln[i]), sep="")
-    tx[length(tx)+1] <- .dash2(sum(max.ln))
-
-    # write values
-    for (i in 1:nrow(out)) {
-      tx[length(tx)+1] <- ""
-       for (j in 1:ncol(out)) 
-          tx[length(tx)] <- paste(tx[length(tx)], .fmtc(out[i,j], w=max.ln[j]), sep="")
-    }
-
-    return(list(tx=tx, bin.width=bin.width, n.bins=n.bins, breaks=h$breaks, 
-      mids=h$mids, counts=h$counts, prop=prop, counts_cum=cum.c,
-      prop_cum=cum.p))
+    return(list(txsug=txsug, ttx=tx, bin.width=bin.width, n.bins=n.bins, breaks=h$breaks, 
+      mids=h$mids, counts=h$counts, prop=prop, counts_cum=cum.c, prop_cum=cum.p))
   }
 
 }

@@ -176,16 +176,21 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
 
   else {  # one variable
     n.dim <- 1
-
     if (length(names(x)) == sum(x)) {  # x is a vector of the counts
-      cat("\nAll values are unique.  Perhaps a row ID instead of a variable.\n",
-          "If so, use  row.names=n  option for Read, where n refers to the ",
-          "nth column.\n\n", sep="")
-      if (sum(x) < 100) print(names(x))
-      else cat("\nOnly the first 100 values listed.  To see all, use\n",
+      if (length(x) > 100)
+        cat("\nOnly the first 100 values listed.  To see all, use\n",
                "the  values  function.\n\n")
-      txttl <- "a";  txcnt <- "";  txchi <- ""; x <- NULL; xp <- NULL
+      nms <- character(length=0)
+      for (i in 1:min(length(x), 100)) nms[i] <- names(x)[i]
+      cat("\n")
+      print(nms)
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "All values for ", x.name, " are unique, so analysis not meaningful\n\n",
+          "Perhaps a row ID instead of a variable\n",
+          "If so, use  row.names=n  option for Read, where n refers to the ",
+          "nth column\n\n", sep="")
     }
+
     else {
 
       max.ln <- integer(length=0)

@@ -25,6 +25,7 @@ function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...) {
     bin.start=NULL, bin.width=NULL,
     col.fill=getOption("col.fill.pt"),
     col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
+    col.box=getOption("col.box"),
     col.nrm="gray40", col.gen="gray40",
     col.fill.nrm="transparent", col.fill.gen="transparent",
     cex.axis=.85, col.axis="gray30", rotate.values=0, offset=0.5, 

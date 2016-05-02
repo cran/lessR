@@ -37,7 +37,7 @@ Help(topic=NULL)
 
 \code{transform}: Edit and create new variables from existing variables.
 
-\code{system}: System level settings, such as a color theme for graphics.
+\code{theme}: System level settings, such as a color theme for graphics.
 
 ---
 

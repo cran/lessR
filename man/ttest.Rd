@@ -64,7 +64,7 @@ tt(\ldots)
         two levels.}
   \item{X1nm}{Value of grouping variable, the level that defines the first group.}
   \item{X2nm}{Value of grouping variable, the level that defines the second group.}
-  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{set}} function.}
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{theme}} function.}
   \item{digits.d}{Number of decimal places for which to display numeric values. Suggestion only.}
   \item{conf.level}{Confidence level of the interval, expressed as a proportion.}
   \item{alternative}{Default is \code{"two.sided"}. Other values are \code{"less"}

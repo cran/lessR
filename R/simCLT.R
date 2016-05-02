@@ -1,7 +1,7 @@
 simCLT <- 
 function(ns, n, p1=0, p2=1,
          type=c("normal", "uniform", "lognormal", "antinormal"),
-         col.fill="lightsteelblue3", n.display=2, digits.d=3, 
+         color.fill="lightsteelblue3", n.display=2, digits.d=3, 
          subtitle=TRUE, pop=TRUE, 
          main=NULL, pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
 
@@ -57,7 +57,7 @@ function(ns, n, p1=0, p2=1,
       if (max-min < 10) axis(1, at=seq(x.min, x.max, by=1)) else axis(1)
       usr <- par("usr")
       rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
-      polygon(c(min, x, max), c(0, y, 0), col=col.fill, border="black")
+      polygon(c(min, x, max), c(0, y, 0), col=color.fill, border="black")
       if (subtitle) 
         txt <- paste("min=", toString(0), " max=", toString(x.max), sep="") 
       else txt=""  
@@ -168,10 +168,10 @@ function(ns, n, p1=0, p2=1,
   }
 
   .dn.main(Ymean, type="normal", xlab="", 
-         col.fill=col.fill, 
-         col.bg=getOption("col.bg"),
-         col.grid="transparent", bw="nrd0", 
-         bin.start=NULL, bin.width=NULL,
+         col.fill=color.fill, 
+         col.bg=getOption("color.bg"),
+         col.grid="transparent", col.box=getOption("color.box"),
+         bw="nrd0", bin.start=NULL, bin.width=NULL,
          col.nrm="black", col.gen="black",
          col.fill.nrm="transparent",
          col.fill.gen="transparent",

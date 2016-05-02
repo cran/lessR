@@ -71,7 +71,7 @@ Read2(\ldots, sep=";", dec=",")
         first work sheet.}
   \item{brief}{If \code{TRUE}, display only variable names table plus any variable labels.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change the corresponding system
-       default with \code{\link{set}} function.}
+       default with \code{\link{theme}} function.}
   \item{fun.call}{Function call. Used with \code{Rmd} to pass the function call when
         obtained from the abbreviated function call \code{rd}.}
   \item{...}{Other parameter values define with the R read functions, such as the

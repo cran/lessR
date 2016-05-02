@@ -265,12 +265,12 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   cat("Standardized Mean Difference of ", Ynm, ", ",
       "Cohen's d:  ", .fmt(smd), sep="", "\n")
 
-  cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf.level=conf.level)  # MBESS function
-  deltaL <-cid$Lower.Conf.Limit.smd
-  deltaU <- cid$Upper.Conf.Limit.smd
-  if (!brief) cat("\n")
-  cat(clpct," Confidence Interval for smd:  ",
-      .fmt(deltaL), " to ", .fmt(deltaU), sep="", "\n")
+  #cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf.level=conf.level)  # MBESS function
+  #deltaL <-cid$Lower.Conf.Limit.smd
+  #deltaU <- cid$Upper.Conf.Limit.smd
+  #if (!brief) cat("\n")
+  #cat(clpct," Confidence Interval for smd:  ",
+      #.fmt(deltaL), " to ", .fmt(deltaU), sep="", "\n")
 
   if (!brief) {
     cat("\n\n------ Practical Importance ------\n\n")
@@ -285,8 +285,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       cat("Minimum Standardized Mean Difference of practical importance: msmd\n")
       cat("Compare msmd = ", .fmt(msmd,digits.d),
           " to the obtained value of smd = ", .fmt(smd),"\n")
-      if (!is.null(deltaL)) cat("Compare smd to the confidence interval for smd: ", 
-          .fmt(deltaL), " to ", .fmt(deltaU), "\n")
+      #if (!is.null(deltaL)) cat("Compare smd to the confidence interval for smd: ", 
+          #.fmt(deltaL), " to ", .fmt(deltaU), "\n")
     }
     else {
       cat("Minimum Standardized Mean Difference of practical importance: msmd\n")
@@ -397,7 +397,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
     .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
-              clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title)
+              clpct, tvalue, pvalue, ub, lb, show.title)
+              #clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title)
 
     if (!is.null(pdf.file)) {
       dev.off()

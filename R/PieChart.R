@@ -1,8 +1,8 @@
 PieChart <-
 function(x, data=mydata, 
-         col.fill=NULL, col.low=NULL, col.hi=NULL,
+         color.fill=NULL, color.low=NULL, color.hi=NULL,
          colors=c("rainbow", "terrain", "heat"),
-         random.col=FALSE, main=NULL, cex=1, cex.main=1,
+         color.random=FALSE, main=NULL, cex=1, cex.main=1,
          quiet=getOption("quiet"),
          pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
@@ -11,6 +11,18 @@ function(x, data=mydata,
     colors <- getOption("colors")
   else
     colors <- match.arg(colors)
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      old.nm <- c("col.fill", "col.low", "col.hi")
+      if (names(dots)[i] %in% old.nm) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "options that began with the abbreviation  col  now begin with  ",
+          "color \n\n")
+      }
+    }
+  }
 
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
@@ -44,7 +56,7 @@ function(x, data=mydata,
   #on.exit(par(orig.params))
 
   .pc.main(x.call, 
-       random.col, col.fill, col.low, col.hi,
+       color.random, color.fill, color.low, color.hi,
        colors, cex, cex.main, quiet, main, 
        pdf.file, pdf.width, pdf.height, ...)
 

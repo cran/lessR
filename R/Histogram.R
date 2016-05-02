@@ -1,13 +1,14 @@
 Histogram <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
-    col.fill=getOption("col.fill.bar"), 
-    col.stroke=getOption("col.stroke.bar"),
-    col.bg=getOption("col.bg"),
-    col.grid=getOption("col.grid"),
+    color.fill=getOption("color.fill.bar"), 
+    color.stroke=getOption("color.stroke.bar"),
+    color.bg=getOption("color.bg"),
+    color.grid=getOption("color.grid"),
+    color.box=getOption("color.box"),
 
-    col.reg="snow2", over.grid=FALSE,
-    cex.axis=0.75, col.axis="gray30", 
+    color.reg="snow2", over.grid=FALSE,
+    cex.axis=0.75, color.axis="gray30", 
 
     rotate.values=0, offset=0.5,
 
@@ -26,6 +27,14 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
 
+  for (i in 1:length(color.fill))
+    if (color.fill[i] == "off") color.fill[i] <- "transparent"
+  for (i in 1:length(color.stroke))
+    if (color.stroke[i] == "off") color.stroke[i] <- "transparent"
+  if (color.bg == "off") color.bg <- "transparent"
+  if (color.grid == "off" ) color.grid <- "transparent"
+  if (color.box == "off") color.box <- "transparent"
+
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
 
@@ -33,7 +42,14 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   lbls <- FALSE
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
+    old.nm <- c("col.fill", "col.stroke", "col.bg", "col.grid", "col.box",
+                "col.reg", "col.axis") 
     for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% old.nm) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "options that began with the abbreviation  col  now begin with  ",
+          "color \n\n")
+      }
       if (names(dots)[i] == "knitr.file") kf <- TRUE 
       if (names(dots)[i] == "labels") lbls <- TRUE 
     }
@@ -83,8 +99,11 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         if (length(x.col) == 1) {  # x is 1 var
           if (!is.numeric(data)) { 
             cat("\n"); stop(call.=FALSE, "\n","------\n",
-              "A histogram is only computed from a numeric variable.\n",
-              "For the frequencies of a categorical variable use BarChart.\n\n")
+              "A histogram is only computed from a numeric variable\n",
+              "For the frequencies of a categorical variable:\n\n",
+              "  Plot(", x.name, ", topic=\"count\")\n",
+              "or\n",
+              "  BarChart(", x.name, ")\n\n", sep="")
           }
           data <- data.frame(data)
           names(data) <- x.name
@@ -117,6 +136,12 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   go.pdf <- FALSE
   if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
 
+
+  if (ncol(data) > 1) {
+    sug <- getOption("suggest")
+    options(suggest = FALSE)
+  }
+
   for (i in 1:ncol(data)) {
 
     nu <- length(unique(na.omit(data[,i])))
@@ -137,12 +162,17 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         txss <- ssstuff$tx
       }
 
-      stuff <- .hst.main(data[,i], col.fill, col.stroke, col.bg, col.grid, col.reg,
-          over.grid, cex.axis, col.axis, rotate.values, offset,
+      # nothing returned if quiet=TRUE
+      stuff <- .hst.main(data[,i], color.fill, color.stroke, color.bg,
+          color.grid, color.box, color.reg,
+          over.grid, cex.axis, color.axis, rotate.values, offset,
           breaks, bin.start, bin.width,
-          bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub, quiet, ...)
-      txdst <- stuff$tx
-      if (length(txdst)==0) txdst <- ""
+          bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub,
+          quiet, fun.call=fun.call, ...)
+      txsug <- stuff$txsug
+      if (is.null(txsug)) txsug <- ""
+      txdst <- stuff$ttx
+      if (is.null(txdst)) txdst <- ""
 
       txotl <- ""
       if (!quiet) {
@@ -171,6 +201,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     }  # is.numeric(data[,i])
   }  # for
 
+  if (ncol(data) > 1) options(suggest = sug)
+
   dev.set(which=2)  # reset graphics window for standard R functions
 
 
@@ -185,6 +217,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
       txkfl <- .showfile2(Rmd, "R Markdown instructions")
     }
  
+    class(txsug) <- "out_piece"
     class(txss) <- "out_piece"
     class(txdst) <- "out_piece"
     class(txotl) <- "out_piece"
@@ -192,7 +225,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     output <- list(type="Histogram",
       call=fun.call, 
-      out_ss=txss, out_outliers=txotl, out_freq=txdst,
+      out_suggest=txsug, out_ss=txss, out_outliers=txotl, out_freq=txdst,
       out_file=txkfl,
       bin_width=stuff$bin.width, n_bins=stuff$n.bins,
       breaks=stuff$breaks,

@@ -1,10 +1,17 @@
 .lc.main <- 
 function(y, type,
-       col.line, col.area, col.box, col.stroke, col.fill, shape.pts,
-       col.grid, col.bg, cex.axis, col.axis, rotate.values, offset, xy.ticks,
+       col.line, col.area, col.stroke, col.fill, shape.pts,
+       col.grid, col.box, col.bg, cex.axis, col.axis,
+       rotate.values, offset, xy.ticks,
        line.width, xlab, ylab, main, sub, cex,
        time.start, time.by, time.reverse, 
        center.line, show.runs, quiet, ...) {
+
+
+  # scale for regular R or RStudio
+  adj <- .RSadj(bubble.size=NULL, cex.axis)
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
 
   if (!is.numeric(y)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -98,10 +105,10 @@ function(y, type,
   if (xy.ticks){
     if (is.null(time.start) && class(x)!="ts") 
      .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-        par("usr")[1], par("usr")[3], cex.axis, col.axis,
+        par("usr")[1], par("usr")[3], size.axis, col.axis,
         rotate.values, offset, ...)
     else {
-      axis.Date(1, x, cex.axis=cex.axis, col.axis=col.axis, ...)
+      axis.Date(1, x, cex.axis=size.axis, col.axis=col.axis, ...)
       #lbl.dt <- as.Date(axTicks(1), origin = "1970-01-01")
       #axis.Date(1, x, labels=FALSE, tck=-.01, ...)
       #text(x=lbl.dt, y=par("usr")[3], labels=lbl.dt,
@@ -109,14 +116,14 @@ function(y, type,
       axis(2, at=axTicks(2), labels=FALSE, tck=-.01, ...)
       dec.d <- .getdigits(round(axTicks(2),6),1) - 1
       text(x=par("usr")[1], y=axTicks(2), labels=.fmt(axTicks(2),dec.d),
-           pos=2, xpd=TRUE, cex=cex.axis, col=col.axis)
+           pos=2, xpd=TRUE, cex=size.axis, col=col.axis)
     }
   }
 
   # axis labels
   max.lbl <- max(nchar(axTicks(2)))
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
+          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
 
   # colored plotting area
   usr <- par("usr")

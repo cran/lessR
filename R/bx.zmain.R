@@ -1,7 +1,12 @@
 .bx.main <-
 function(x, col.fill, col.stroke, col.bg, col.grid,
-         cex.axis, col.axis, rotate.values, offset,
+         col.box, cex.axis, col.axis, rotate.values, offset,
          horiz, add.points, xlab, main, sub, digits.d, quiet, ...) {      
+
+  # scale for regular R or RStudio
+  adj <- .RSadj(bubble.size=NULL, cex.axis)
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
 
   if (is.null(col.stroke)) col.stroke <- col.fill
 
@@ -26,21 +31,21 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   # axes
   if (horiz)
   .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
-        par("usr")[1], par("usr")[3], cex.axis, col.axis, 
+        par("usr")[1], par("usr")[3], size.axis, col.axis, 
         rotate.values, offset=offset, ...)
   else
   .axes(x.lvl=NULL, y.lvl=NULL, NULL, axTicks(2),
-        par("usr")[1], par("usr")[3], cex.axis, col.axis,
+        par("usr")[1], par("usr")[3], size.axis, col.axis,
         rotate.values, offset=offset, ...)
 
   # axis labels
   max.lbl <- max(nchar(axTicks(2)))
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
+          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
   
   # colored background for plotting area
   usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
   
   # grid lines computation and print
   if (horiz) {
@@ -61,10 +66,10 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
 
   # dots
   if (add.points) 
-      .dp.main(x, by=NULL,
+      .dp.main(x, by=NULL, size=NULL,
          col.fill, col.stroke, col.bg, col.grid, col.trans=NULL,
          shape.pts=NULL, cex.axis=.85, col.axis="gray30",
-          xlab=NULL, main=NULL, cex=NULL,
+         xlab=NULL, main=NULL, cex=NULL,
          method="overplot", pt.reg=21, pt.out=19, 
          col.out30="firebrick2", col.out15="firebrick4", 
          quiet=TRUE, new=FALSE, vertical=!horiz, ...)

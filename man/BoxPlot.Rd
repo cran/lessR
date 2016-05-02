@@ -18,12 +18,13 @@ When output is assigned into an object, such as \code{b} in \code{b <- bx(Y)}, t
 BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         Rmd=NULL,
 
-        col.fill=getOption("col.fill.bar"),
-        col.stroke=getOption("col.stroke.bar"), 
-        col.bg=getOption("col.bg"),
-        col.grid=getOption("col.grid"),
+        color.fill=getOption("color.fill.bar"),
+        color.stroke=getOption("color.stroke.bar"), 
+        color.bg=getOption("color.bg"),
+        color.grid=getOption("color.grid"),
+        color.box=getOption("color.box"),
 
-        cex.axis=0.75, col.axis="gray30",
+        cex.axis=0.75, color.axis="gray30",
         xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
 
         rotate.values=0, offset=0.5,
@@ -52,15 +53,17 @@ bx(\ldots)
         for which the variable will be analyzed as a categorical. Default is 0.}
   \item{Rmd}{File name for the file of R markdown instructions to be written,
         if specified.}
-  \item{col.fill}{Color of the box.}
-  \item{col.stroke}{Color of any points that designate outliers. By default this
+  \item{color.fill}{Color of the box.}
+  \item{color.stroke}{Color of any points that designate outliers. By default this
        is the same color as the box.}
-  \item{col.bg}{Color of the plot background.}
-  \item{col.grid}{Color of the grid lines.}
-  \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
+  \item{color.bg}{Color of the plot background.}
+  \item{color.grid}{Color of the grid lines.}
+  \item{color.box}{Color of border around the plot background, the box, that encloses 
+        the plot, with a default of \code{"black"}.}
+ \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
        values to be smaller than the axis labels. Provides the functionality of, and
        can be replaced by, the standard R \code{cex.axis.}}
-  \item{col.axis}{Color of the font used to label the axis values.}
+  \item{color.axis}{Color of the font used to label the axis values.}
   \item{xlab}{Label for the value axis, which defaults to the variable's name.}
   \item{main}{Title of graph.}
   \item{sub}{Sub-title of graph, below xlab.}
@@ -75,7 +78,7 @@ bx(\ldots)
   \item{add.points}{If \code{TRUE}, then place a dot plot (i.e., stripchart) over the
        box plot.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
-       \code{\link{set}} function.}
+       \code{\link{theme}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
        no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
@@ -86,9 +89,9 @@ bx(\ldots)
        by \code{\link{boxplot}} and \code{\link{bxp}} such as \code{whiskcol} for
        the whisker color, etc. and \code{\link{par}}, including \code{ylim} to set
        the limits of the value axis, \code{lwd} for the line width, \code{cex.lab}
-       for the size of the label, \code{col.main} for the title, \code{col.lab},
-       \code{sub}, \code{col.sub}, \code{srt} to rotate the axis value labels,
-       and \code{col.ticks} to specify the color of the tick marks.}
+       for the size of the label, \code{color.main} for the title, \code{color.lab},
+       \code{sub}, \code{color.sub}, \code{srt} to rotate the axis value labels,
+       and \code{color.ticks} to specify the color of the tick marks.}
 }
 
 
@@ -105,7 +108,10 @@ The data may either be a vector from the global environment, the user's workspac
 To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.  To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{col.fill} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
+Individual colors in the plot can be manipulated with options such as \code{color.fill} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
+
+For the color options, such as \code{color.grid}, the value of \code{"off"} is the same as 
+\code{"transparent"}.
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -154,7 +160,7 @@ Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 5, NY: Routl
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{boxplot}}, \code{\link{bxp}}, \code{\link{par}}, \code{\link{set}}.
+\code{\link{boxplot}}, \code{\link{bxp}}, \code{\link{par}}, \code{\link{theme}}.
 }
 
 \examples{
@@ -177,10 +183,10 @@ bx(y)
 BoxPlot(y, pdf.file="MyBoxPlot.pdf")
 
 # vertical boxplot with plum color
-BoxPlot(y, horiz=FALSE, col.fill="plum")
+BoxPlot(y, horiz=FALSE, color.fill="plum")
 
 # box plot with outliers more strongly highlighted
-BoxPlot(y, col.stroke="red", xlab="My Variable")
+BoxPlot(y, color.stroke="red", xlab="My Variable")
 
 
 # ------------------------------------------------
@@ -217,7 +223,7 @@ BoxPlot()
 
 # box plots for all numeric variables in data frame called mydata
 #  with specified options
-BoxPlot(col.fill="palegreen1", col.stroke="plum")
+BoxPlot(color.fill="palegreen1", color.stroke="plum")
 
 # Use the subset function to specify a variable list
 # box plots for all specified numeric variables

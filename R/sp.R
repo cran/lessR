@@ -1,6 +1,6 @@
 sp <-
 function(...) {
 
-  ScatterPlot(fun.call=match.call(), ...)
+  Plot(fun.call=match.call(), ...)
 
 }

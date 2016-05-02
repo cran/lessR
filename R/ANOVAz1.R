@@ -80,22 +80,42 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     plt.i <- plt.i + 1
     plt.title[plt.i] <- "Scatterplot with Cell Means"
 
-    .plt.main(x.values, y.values, by=NULL, type="p", n.cat=0,
-       col.fill=getOption("col.fill.pt"),
-       col.stroke=getOption("col.stroke.pt"),
-       col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-       shape.pts=21, col.area=NULL, col.box="black",
-       col.trans=getOption("col.trans.pt"),
-       cex.axis=.85, col.axis="gray30", col.low=NULL, col.hi=NULL,
-       xy.ticks=TRUE,
-       xlab=nm[2], ylab=nm[1], main=plt.title[plt.i], sub=NULL, cex=.8,
-       value.labels=NULL, rotate.values=0, offset=.5,
-       style="default", means=TRUE, stat="default",
-       fit.line="none", col.fit.line="grey55",
-       bubble.size=.25, bubble.counts=TRUE,
-       ellipse=FALSE, col.ellipse="lightslategray", fill.ellipse="transparent",
-       diag=FALSE, col.diag=par("fg"), lines.diag=FALSE, 
-       sort.y=FALSE, segments.y=FALSE, segments.x=FALSE, quiet=TRUE)
+    # scatter plot
+    plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
+
+    usr <- par("usr")
+    col.bg <- getOption("col.bg")
+    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+
+    axT1 <- 1:length(unique(x.values))
+
+    col.grid <- getOption("col.grid")
+    abline(v=axT1, col=col.grid, lwd=.5)
+    abline(h=axTicks(2), col=col.grid, lwd=.5)
+
+    .axes(levels(x.values), NULL, axT1, axTicks(2),
+          par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30")
+
+    main.lab <- plt.title[plt.i]
+    sub.lab <- NULL
+    x.label <- nm[2]
+    y.label <- nm[1]
+    .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
+
+    col.fill <- getOption("col.fill.pt")
+    col.stroke <- getOption("col.stroke.pt")
+    points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
+
+    # plot cell means
+    pch.avg <- ifelse(getOption("colors")!="gray", 21, 23)
+    bck.g <- ifelse(getOption("colors")!="gray", "gray15", "gray30")
+    if (grepl(".black", getOption("colors"), fixed=TRUE)) bck.g <- "gray85"
+
+    m.lvl <- numeric(length = 0)
+    for (i in (1:length(levels(x.values))))
+      m.lvl[i] <- mean(y.values[which(x.values==levels(x.values)[i])], na.rm=TRUE)
+    abline(h=m.lvl, col="gray50", lwd=.5)
+    points(m.lvl, pch=pch.avg, bg=bck.g)
 
     if (pdf) {
       dev.off()

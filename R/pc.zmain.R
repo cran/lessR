@@ -51,10 +51,7 @@ function(x,
       clr <- color.palette(ncolors)
   }
   else {
-    if (colors == "blue")
-      clr <- c("slategray", "peachpuff2", "darksalmon", "darkseagreen1", 
-        "thistle4", "azure3", "mistyrose")
-    else if (colors == "gray") {
+    if (colors == "gray") {
       color.palette <- colorRampPalette(c("gray28","gray92"))
       clr <- color.palette(ncolors)
     }

@@ -30,7 +30,7 @@ av.brief(\ldots, brief=TRUE)
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
-       with \code{\link{set}} function.}
+       with \code{\link{theme}} function.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
   \item{Rmd}{File name for the file of R Markdown instructions to be written,

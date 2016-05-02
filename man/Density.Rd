@@ -22,14 +22,15 @@ Density(x, data=mydata, n.cat=getOption("n.cat"),
 
        Rmd=NULL, digits.d=NULL,
 
-       col.fill=getOption("col.fill.pt"),
-       col.bg=getOption("col.bg"),
-       col.grid=getOption("col.grid"),
+       color.fill=getOption("color.fill.pt"),
+       color.bg=getOption("color.bg"),
+       color.grid=getOption("color.grid"),
+       color.box=getOption("color.box"),
 
-       col.nrm="black", col.gen="black",
-       col.fill.nrm=NULL, col.fill.gen=NULL,
+       color.nrm="black", color.gen="black",
+       color.fill.nrm=NULL, color.fill.gen=NULL,
 
-       cex.axis=0.75, col.axis="gray30",
+       cex.axis=0.75, color.axis="gray30",
 
        rotate.values=0, offset=0.5,
 
@@ -65,22 +66,24 @@ dn(\ldots)
         The file type is .Rmd, which automatically opens in RStudio, but it is a simple
         text file that can be edited with any text editor, including RStudio.}
   \item{digits.d}{Number of significant digits for each of the displayed summary statistics.}
-  \item{col.fill}{Default (for default color theme of \code{"dodgerblue"}) is to
+  \item{color.fill}{Default (for default color theme of \code{"dodgerblue"}) is to
        display the histogram in a light gray.  To suppress, the histogram,
        specify a color of \code{"transparent"}.}
-  \item{col.bg}{Color of the plot background.}
-  \item{col.grid}{Color of the grid lines.}
-  \item{col.nrm}{Color of the normal curve.}
-  \item{col.gen}{Color of the general density curve.}
-  \item{col.fill.nrm}{Fill color for the estimated normal curve, with a partially 
+  \item{color.bg}{Color of the plot background.}
+  \item{color.grid}{Color of the grid lines.}
+  \item{color.box}{Color of border around the plot background, the box, that encloses 
+        the plot, with a default of \code{"black"}.}
+  \item{color.nrm}{Color of the normal curve.}
+  \item{color.gen}{Color of the general density curve.}
+  \item{color.fill.nrm}{Fill color for the estimated normal curve, with a partially 
        transparent blue as the default for a blue color theme, and transparent for
        all other themes.}
-  \item{col.fill.gen}{Fill color for the estimated general density curve, with a partially
+  \item{color.fill.gen}{Fill color for the estimated general density curve, with a partially
        transparent light red as the default as the default for a blue color theme, and
        transparent for all other themes.}
   \item{cex.axis}{Scale magnification factor, which by default displays the axis values to be 
         smaller than the axis labels.}
-  \item{col.axis}{Color of the font used to label the axis values.}
+  \item{color.axis}{Color of the font used to label the axis values.}
   \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
         longer values, typically used in conjunction with \code{offset}.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
@@ -98,7 +101,7 @@ dn(\ldots)
   \item{band}{If \code{TRUE}, add a rug plot, a direct display of density in the form of a
         narrow band beneath the density curve}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-        with \code{\link{set}} function.}
+        with \code{\link{theme}} function.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
        no filetype of \code{.pdf}, the filetype is added to the name.}
   \item{pdf.width}{Width of the pdf file in inches.}
@@ -107,8 +110,8 @@ dn(\ldots)
         obtained from the abbreviated function call \code{dn}.}
   \item{\dots}{Other parameter values for graphics as defined processed 
       by \code{\link{plot}}, including \code{xlim}, \code{ylim}, \code{lwd} and \code{cex.lab}, 
-      \code{col.main}, \code{col.lab}, \code{sub},
-      \code{col.sub}, and \code{col.ticks} to specify the color of
+      \code{color.main}, \code{color.lab}, \code{sub},
+      \code{color.sub}, and \code{color.ticks} to specify the color of
       the ticks used to label the axis values, \code{density}, \code{srt} to
       rotate the axis value labels and, for the general
       density calculations, can set bandwidth with the standard \code{bw}.}
@@ -129,7 +132,7 @@ DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 COLOR THEME\cr
-Individual colors in the plot can be manipulated with options such as \code{col.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{set}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{set}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
+Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -192,11 +195,11 @@ Density(Y, pdf.file="MyDensityPlot.pdf")
 
 # suppress the histogram, leaving only the density curves
 # specify x-axis label per the xlab option for the plot function
-Density(Y, col.fill="transparent", xlab="My Var")
+Density(Y, color.fill="transparent", xlab="My Var")
 
 # specify (non-transparent) colors for the curves,
 # to make transparent, need alpha option for the rgb function
-Density(Y, col.nrm="darkgreen", col.gen="plum")
+Density(Y, color.nrm="darkgreen", color.gen="plum")
 
 # display only the general estimated density
 #  so do not display the estimated normal curve

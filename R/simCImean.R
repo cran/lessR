@@ -1,9 +1,9 @@
 simCImean <- 
 function(ns, n, mu=0, sigma=1, cl=0.95, 
          ylim.bound=NULL, show.data=FALSE, show.title=TRUE, 
-         miss.only=FALSE, col.hit="gray40", col.miss="red",
-         col.grid="grey90", pause=FALSE,
-         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5) {
+         miss.only=FALSE, color.hit="gray40", color.miss="red",
+         color.grid="grey90", pause=FALSE,
+         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
 
 
   if (missing(ns)) {
@@ -19,6 +19,17 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   if (sigma < 0) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Standard deviation, sigma, cannot be negative.\n\n")
+  }
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (substr(names(dots)[i], 1, 4) == "col.") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "options that began with the abbreviation  col  now begin with  ",
+          "color \n\n")
+      }
+    }
   }
 
   if (!is.null(pdf.file))
@@ -88,7 +99,7 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
 
   # grid lines
   vy <- pretty(c(usr[3],usr[4]))
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=color.grid, lwd=.5)
 
    # directions
   if (pause) cat("\n>>> Press Enter to obtain the next sample <<< \n\n")
@@ -100,9 +111,9 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   max.ln <- 8
   for (i in 1:ns) {
     if (pause) invisible(readline())
-    if ( (mu>lb[i] && mu<ub[i]) ) linecol <- col.hit else linecol = col.miss
+    if ( (mu>lb[i] && mu<ub[i]) ) linecol <- color.hit else linecol = color.miss
     if (show.data) points(rep(i,n), data.byrep[i,], pch=21, col="gray75", cex=.3)
-    if ( !(miss.only && linecol==col.hit) ) {
+    if ( !(miss.only && linecol==color.hit) ) {
       se <- Ysd[i]/sqrt(n)
       e <- tcut * se
       cat(format(i, width=5, justify="right", sep=""))

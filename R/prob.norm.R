@@ -1,11 +1,23 @@
 prob.norm <- 
-function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black", 
-         col.fill.nrm="grey91", col.fill.int="slategray3", 
+function(lo=NULL, hi=NULL, mu=0, sigma=1, color.nrm="black", 
+         color.fill.nrm="grey91", color.fill.int="slategray3", 
          ylab="", y.axis=FALSE, z=TRUE, mag=.9, ...) { 
 
-  if (sigma <= 0) { 
+
+  dots <- list(...)  # check for deprecated parameters
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (substr(names(dots)[i], 1, 4) == "col.") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Sigma, the population standard deviation, must be larger than zero.\n\n")
+          "options that began with the abbreviation  col  now begin with  ",
+          "color \n\n")
+      }
+    }
+  }
+
+  if (sigma <= 0) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    "Sigma, the population standard deviation, must be larger than zero.\n\n")
   }
  
   if (mu==0  && sigma==1) z=FALSE
@@ -29,8 +41,8 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black",
   cuts <- seq(min.x,max.x,sigma)
   x <- seq(min.x, max.x, length=200)
   d.nrm <- dnorm(x,mu,sigma)
-  plot(x, d.nrm, type="l", col=col.nrm, axes=FALSE, xlab="", ylab="", ...)
-  polygon(c(min.x,x,max.x), c(0,d.nrm,0), col=col.fill.nrm)
+  plot(x, d.nrm, type="l", col=color.nrm, axes=FALSE, xlab="", ylab="", ...)
+  polygon(c(min.x,x,max.x), c(0,d.nrm,0), col=color.fill.nrm)
 
   axis(side=1, at=cuts, cex.axis=mag)
   if (z) axis(side=1, at=cuts, cex.axis=mag, line=1.5, labels=-4:4, lwd=0, lwd.ticks=0)
@@ -45,7 +57,7 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, col.nrm="black",
   y.hi <- dnorm(hi, mu, sigma)
   xsub <- x[x>lo & x<hi]
   ysub <- d.nrm[x>lo & x<hi]
-  polygon(c(lo,xsub,hi), c(0,ysub,0), col=col.fill.int)
+  polygon(c(lo,xsub,hi), c(0,ysub,0), col=color.fill.int)
   
   # prob of interval
   prob <- pnorm(hi, mean=mu, sd=sigma) - pnorm(lo, mean=mu, sd=sigma)

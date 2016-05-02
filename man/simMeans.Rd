@@ -10,9 +10,9 @@ Show a sequence of sample means and data, all simulated from the same normal pop
 \usage{
 simMeans(ns, n, mu=0, sigma=1, ylim.bound=NULL, 
          show.title=TRUE, show.data=TRUE, max.data=10, 
-         col.grid="grey90", pause=FALSE,
+         color.grid="grey90", pause=FALSE,
          sort=NULL, set.mu=FALSE, digits.d=2,
-         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5)
+         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
 }
 
 
@@ -25,7 +25,7 @@ simMeans(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   \item{show.title}{Place a title on the graph that contains the parameter values.}
   \item{show.data}{Show the data values on the text output.}
   \item{max.data}{Maximum number of data values per sample on the text output.}
-  \item{col.grid}{Color of the grid lines.}
+  \item{color.grid}{Color of the grid lines.}
   \item{pause}{Build the graph and the text output sample by sample.}
   \item{sort}{Sort the output by the means in ascending order. By default is \code{TRUE} unless \code{se.mu} or \code{pause} is \code{TRUE}}
   \item{set.mu}{Have the program randomly set \code{mu} and \code{sigma}, usually to guess the correct value.}
@@ -34,6 +34,7 @@ simMeans(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
+  \item{\dots}{Other parameter values, possibly invalid.} 
 }
 
 

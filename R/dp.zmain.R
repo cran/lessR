@@ -1,11 +1,23 @@
 .dp.main <- 
-function(x, by,
+function(x, by, size,
          col.fill, col.stroke, col.bg, col.grid, col.trans,
          shape.pts, cex.axis, col.axis, xlab, main, sub, cex,
          rotate.values, offset, method, pt.reg, pt.out, 
          col.out30, col.out15, quiet, new, ...) {
 
-  pt.size <- ifelse (is.null(cex), 0.8, cex)
+
+  # scale for regular R or RStudio
+  adj <- .RSadj(cex.axis=cex.axis)
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
+
+  if (is.null(cex)) {
+    sz <- ifelse (.Platform$OS == "windows", 1, 0.80)
+    sz.pt <- ifelse (is.null(size), sz, size)
+    size.pt <- ifelse (is.null(size), sz.pt, size)
+    if (options("device") == "RStudioGD")
+      size.pt <- ifelse (.Platform$OS == "windows", size.pt*1.45, size.pt*1.13)
+  }
 
   if (is.factor(x)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -102,13 +114,13 @@ function(x, by,
   up15 <- q3 + 1.5*IQR(x)
   up30 <- q3 + 3.0*IQR(x)
   stripchart(x[x<lo30], add=TRUE, method=method,
-             col=col.out30, bg=col.out30, pch=pt.out30, ...)
+             col=col.out30, bg=col.out30, pch=pt.out30, cex=size, ...)
   stripchart(x[x<lo15], add=TRUE, method=method,
-             col=col.out15, bg=col.out15, pch=pt.out15, ...)
+             col=col.out15, bg=col.out15, pch=pt.out15, cex=size, ...)
   stripchart(x[x>up15], add=TRUE, method=method,
-             col=col.out15, bg=col.out15, pch=pt.out15, ...)
+             col=col.out15, bg=col.out15, pch=pt.out15, cex=size, ...)
   stripchart(x[x>up30], add=TRUE, method=method,
-             col=col.out30, bg=col.out30, pch=pt.out30, ...)
+             col=col.out30, bg=col.out30, pch=pt.out30, cex=size, ...)
 
   # dp for regular points
 
@@ -122,7 +134,7 @@ function(x, by,
     #trans.pts <- getOption("trans.fill.pt")
     #clr.trn <- .maketrans(col.fill, (1-trans.pts)*256)
     stripchart(x[x>lo15 & x<up15], add=TRUE, method=method,
-                     col=col.stroke, pch=pt.reg, bg=col.fill, ...)
+                     col=col.stroke, pch=pt.reg, bg=col.fill, cex=size, ...)
   }
 
   else {  # by grouping variable
@@ -149,10 +161,10 @@ function(x, by,
         clr.tr[i] <- .maketrans(clr.tr[i], (1-trans.pts)*256)
       x.lv <- subset(x, by==levels(by)[i])
       stripchart(x.lv, pch=shp[i], col=clr[i], bg=clr.tr[i], 
-             cex=pt.size, lwd=0.75, add=TRUE, ...)
+             cex=size.pt, lwd=0.75, add=TRUE, ...)
     }
 
-    .plt.legend(levels(by), col.stroke, clr, clr.tr, shp, trans.pts, col.bg, usr)
+    .plt.by.legend(levels(by), col.stroke, clr.tr, shp, trans.pts, col.bg, usr)
 
   }  # end by group
 

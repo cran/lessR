@@ -283,17 +283,22 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
   # check for valid characters in the variable names
   if (format %in% c("csv", "Excel")) {
     dg <- character(length=0)
-    for (i in 0:9) dg[i+1] <-  as.character(i)  
+    for (i in 0:9) dg[i+1] <- as.character(i)  
     ltr <- c(letters, LETTERS, dg, "_", ".")
 
     for (i in 1:length(names(d))) {
       cc <- names(d)[i]
       for (j in 1:nchar(cc)) {
         if (!(substr(cc,j,j) %in% ltr)) {
+          if (substr(cc,j,j) == " ")
+            txt <- "There is a blank space "
+          else
+            txt <-  paste(substr(cc,j,j), "is an illegal character ")
           cat("\n"); stop(call.=FALSE, "\n","------\n",
-            substr(cc,j,j), " is an illegal character in the variable name ",
+            txt, "in the variable name ",
             names(d)[i], "\n\n",
-            "Use only letters, digits and  .  or   _  in variable names\n\n")
+            "Use only letters, digits and  .  or   _  in variable names\n\n",
+            "Go back to your data file and revise the variable name\n\n")
         }
       }
     }
