@@ -1,10 +1,10 @@
 \name{print.out_all}
 \alias{print.out_all}
 
-\title{Disply All Text Output from a Saved List Object}
+\title{Display All Text Output from a Saved List Object}
 
 \description{
-Lists the entire results saved as an \code{R} list into an object from a \code{lessR} analysis.  An example of a saved object is \code{r} in \code{r <- reg(Y ~ X)}. The results are displayed at the console or integrated into a \code{knitr} analysis, for example from \code{RStudio}. This function is usually implicitly accessed by the user simply by entering the name of the saved object at the console or in a \code{knitr} file.
+Displays all the results saved as an \code{R} list into an object from a \code{lessR} analysis.  An example of a saved object is \code{r} in \code{r <- reg(Y ~ X)}. The results are displayed at the console or integrated into a \code{knitr} analysis, for example from \code{RStudio}. This function is usually implicitly accessed by the user simply by entering the name of the saved object at the console or in a \code{knitr} file.
 }
 
 \usage{

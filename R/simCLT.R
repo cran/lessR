@@ -171,13 +171,10 @@ function(ns, n, p1=0, p2=1,
          col.fill=color.fill, 
          col.bg=getOption("color.bg"),
          col.grid="transparent", col.box=getOption("color.box"),
-         bw="nrd0", bin.start=NULL, bin.width=NULL,
          col.nrm="black", col.gen="black",
          col.fill.nrm="transparent",
          col.fill.gen="transparent",
-         cex.axis=.85, col.axis="gray30", rotate.values=0, offset=.5, 
-         x.pt=NULL, y.axis=FALSE, main=NULL, sub=NULL, 
-         x.min=NULL, x.max=NULL, band=FALSE, quiet=TRUE, pdf.file=NULL)
+         quiet=TRUE, pdf.file=NULL)
   if (subtitle) 
     txt <- paste(toString(sprintf("%i", ns)), "samples, each of size", toString(n), "from", type)
   else txt=""

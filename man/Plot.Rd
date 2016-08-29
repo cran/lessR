@@ -8,14 +8,16 @@
 \description{
 Abbreviation: \code{sp}, \code{ScatterPlot}
 
-From the identical syntax, for variables \code{X} and \code{Y}, of \code{Plot(X)} or \code{Plot(X,Y)}, a family of related 1- or 2-dimensional scatterplots and related statistical analyses result from any combination of continuous or categorical variables: the traditional scatterplot of two continuous variables, a bubble (balloon) scatter plot from two categorical variables, a scatter plot with means at each level of a categorical variable paired with a continuous variable, and a Cleveland dot plot as a scatterplot that pairs a continuous variable with a each unique value of an ID-variable for a data table. For multiple plots on the same graph, specify multiple x-variables or y-variables. Summarize univariate distributions with either a 1-dimensional scatter plot of a continuous variable, or with a 1-dimensional bubble plot for a categorical variable as a more compact replacement of the traditional bar chart. From the specification of multiple categorical x-variables that share the same response scale, generalize the later to a matrix of 1-dimensional bubble plots here called the bubble plot frequency matrix. Choose data as the topic of analysis, or of statistics computed from that data such as the mean, and choose among different geometric objects to plot such as points, lines or bars.
+From the identical syntax, for variables \code{X} and \code{Y}, \code{Plot(X)} or \code{Plot(X,Y)}, by default generates a family of related 1- or 2-dimensional scatterplots and related statistical analyses, which result from any combination of continuous or categorical variables: the traditional scatterplot of two continuous variables, a bubble (balloon) scatter plot from two categorical variables, a scatter plot with means at each level of a categorical variable paired with a continuous variable, and a Cleveland dot plot as a scatterplot that pairs a continuous variable with a each unique value of an ID-variable for a data table. Summarize univariate distributions with either a 1-dimensional scatter plot of a continuous variable, or with a 1-dimensional bubble plot for a categorical variable as a more compact replacement of the traditional bar chart. From the specification of multiple categorical x-variables that share the same response scale, generalize the later to a matrix of 1-dimensional bubble plots here called the bubble plot frequency matrix. 
+
+For multiple plots on the same graph, specify multiple x-variables or y-variables such as \code{Plot(c(X1,X2),Y)} for variables X1 and X2 plotted against Y. Represent the influence of a third variable on a 2-variable scatter plot with the use of \code{by} for a categorical variable or \code{size} for a continuous variable, including the option for displaying the corresponding value of size for each of the bubbles. The default \code{topic} of analysis is \code{data}, or choose other values to plot, which are statistics computed from the data such as the \code{mean}. Choose among different geometric objects to plot by setting \code{object} to options beyond the default value of \code{point}, which yields a scatter plot. For example, choose \code{bar} for a histogram of a single continuous variable or a bar chart for a single categorical variable, or \code{line} for a line chart.
 }
 
 \usage{
 Plot(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
-         topic=c("data", "count", "prop", "mean", "sd", "min", "median", "max",
-                 "diff"),
+         topic=c("data", "count", "prop", "sum", "mean", "sd", "min", "median",
+                 "max", "diff"),
          object=c("point", "line", "both", "bubble", "sunflower", "bar", "off"),
 
          color.fill=getOption("color.fill.pt"),
@@ -29,11 +31,12 @@ Plot(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          cex.axis=0.76, color.axis="gray30", xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
          value.labels=NULL, rotate.values=0, offset=0.5,
+         proportion=FALSE, 
 
          size=NULL, shape="circle", means=TRUE, 
          sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
 
-         bubble.size=0.25, bubble.power=0.6, bubble.counts=TRUE,
+         bubble.scale=0.25, bubble.power=0.6, bubble.text=NULL,
          color.low=NULL, color.hi=NULL,
 
          fit.line=NULL, color.fit.line="gray55",
@@ -45,7 +48,7 @@ Plot(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          color.out30="firebrick2", color.out15="firebrick4", new=TRUE,
 
          breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
-         prop=FALSE, cumul=c("off", "on", "both"), hist.counts=FALSE,
+         cumul=c("off", "on", "both"), hist.counts=FALSE,
          color.reg="snow2",
 
          beside=FALSE, horiz=FALSE, 
@@ -65,7 +68,8 @@ sp(\ldots)
 \arguments{
   \item{x}{If both x and y are specified, then the x-values are the coordinates plotted
         on the horizontal axis.  If x is sorted, then the default is to join the
-        points with line segments. Multiple x-variables or y-variables, but not both.}
+        points with line segments. Specify multiple x-variables or multiple y-variables,
+        but not both.}
   \item{y}{Coordinates of points in the plot on the vertical axis.} 
   \item{by}{An optional grouping variable such that the points of all (x,y) pairs are
         plotted in the same plotting symbol and/or same color, with a different symbol
@@ -103,7 +107,8 @@ sp(\ldots)
   \item{color}{Simultaneously specifies both \code{color.stroke} and \code{color.fill}, and
        takes precedence over their individually specified values.}
   \item{color.trans}{Transparency level from 0 (none) to 1 (complete).}
-  \item{color.area}{Color of area under the plotted line segments.}
+  \item{color.area}{Color of the fill area under a curve, the area between the curve
+        and the axis.}
 
   \item{cex.axis}{Scale magnification factor of the values on the axes.}
   \item{color.axis}{Color of the font used to label the axis values.}
@@ -122,7 +127,7 @@ sp(\ldots)
   \item{sub}{Sub-title of graph, below xlab.}
   \item{value.labels}{Labels for the x-axis on the graph to override the
         existing data values, including factor levels. If the variable is a 
-        factor and value.labels is not specified (is \code{NULL}), then the
+        factor and \code{value.labels} is not specified (is \code{NULL}), then the
         value.labels are set to the factor levels with each space replaced by
         a new line character. If x and y-axes have the same scale, they also apply
         to the y-axis.}
@@ -131,10 +136,14 @@ sp(\ldots)
   \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when
         longer axis value names are rotated.}
-
+  \item{proportion}{Specify proportions, relative frequencies, instead of counts.
+        For a two variable bar chart, if \code{TRUE} then to facilitate group
+        comparisons, displays the proportion of data values by fill variable within
+        each group.}
   \item{size}{Magnification factor for any displayed points or line, with default of 1.0 
-        for points and 2.0 for a line. Can also be accomplished with \code{bubble.size}
-        with a different metric.}
+        for points and 2.0 for a line. Can be expressed as a constant, or as a variable
+        in which case a bubble plot is activated with the size of each bubble determined \
+        by the value of \code{size}.}
   \item{shape}{The plot character. The default value is a circle with both a border
        and filled area, specified with \code{color.stroke} and \code{color.fill}.
        Possible values are \code{circle}, \code{square}, \code{diamond},
@@ -142,25 +151,33 @@ sp(\ldots)
        uppercase and lowercase letters, all digits, and most punctuation characters.
        The numbers 21 through 25 as defined by the R \code{\link{points}} function
        also apply.}
+
   \item{means}{If the first variable is a factor and the other variable continuous,
        then if \code{TRUE}, by default, plot means with the scatter plot.}
   \item{sort.yx}{Sort the values of y by the values of x, such as for a
-        Cleveland dot plot, that is, a numeric x variable and categorical y variable
-        with unique values.}
+        Cleveland dot plot, that is, a numeric x-variable paired with a categorical
+        y-variable with unique values.}
   \item{segments.y}{For one x-variable, draw line segments from y-axis to plotted point,
         such as for the Cleveland dot plot. For two x-variables, the line segments
         connect the two points.}
-  \item{segments.x}{Draw line segments from x-axis to plotted point.}
+  \item{segments.x}{Draw line segments from the x-axis to plotted point.}
 
-  \item{bubble.size}{Absolute size of the bubbles in a bubble plot of Likert-style data,
-       with default of 0.25. Setting this value sets default to \code{object="bubble"}.}
+  \item{bubble.scale}{Scaling factor of the bubbles in a bubble plot, which sets the radius
+        of the largest displayed bubble in inches, with default of 0.25 inches. Setting
+        this value sets \code{object="bubble"}.}
   \item{bubble.power}{Relative size of the scaling of the bubbles to each other.
-        Value of 0.5 scales the bubbles so that the area of each bubble is the (joint)
-        frequency. Value of 1 scales so the radius of the bubble is the frequency. The
-        default value is 0.6.}
-  \item{bubble.counts}{If \code{TRUE}, then for a bubble plot, the count underlying a
-       bubble is displayed in the center of the bubble, unless the bubble is too small.
-       Setting this value sets default to \code{object="bubble"}.}
+        Value of 0.5 scales the bubbles so that the area of each bubble is the value of
+        the corresponding sizing variable. Value of 1 scales so the radius of the bubble 
+        is the frequency, increasing the discrepancy of size between the variables. The
+        default value is 0.6. Setting this value sets \code{object="bubble"}.}
+  \item{bubble.text}{If \code{TRUE} (or \code{1}), then for a bubble plot, the value
+        of the sizing variable for a bubble is displayed in the center of selected bubbles,
+        unless the bubble is too small.  If \code{FALSE}, no text is displayed.
+        If a number greater than 1, then the text is displayed only for the
+        corresponding quantiles, such as just the max and min for a setting of 2,
+        unless the bubble is too small. Manually setting this value sets 
+        \code{object="bubble"}. If not manually specified, the default value is set
+        to \code{TRUE} for a categorical \code{x} variable, and 2 otherwise.}
   \item{color.low}{For categorical variables and the resulting bubble plot,
         or a matrix of these plots, allows a color gradient beginning with this color.}
   \item{color.hi}{For categorical variables and the resulting bubble plot,
@@ -172,12 +189,14 @@ sp(\ldots)
   \item{color.fit.line}{Color of the best fitting line, if the \code{fit.line} option
        is invoked.}
 
-  \item{ellipse}{If \code{TRUE}, enclose a scatterplot with the .95 data ellipse from the
-      ellipse package. Or can specify a single numeric value greater than 0 and less than 1,
-      or a vector of levels to plot multiple ellipses.}
-  \item{color.ellipse}{Color of the ellipse. If specified, \code{ellipse} is set to \code{TRUE}.}
-  \item{color.fill.ellipse}{If \code{TRUE}, fill the ellipse with \code{color.ellipse}. Usually
-        specify low opacity in the color specification, as shown in the examples. If specified, \code{ellipse} is set to \code{TRUE}.}
+  \item{ellipse}{If \code{TRUE}, enclose a scatterplot with the default .95 data ellipse
+      from the ellipse package. Or can specify a single numeric value greater than 0
+      and less than 1, or a vector of levels to plot multiple ellipses.}
+  \item{color.ellipse}{Color of the ellipse. If specified, \code{ellipse} is set to
+        \code{TRUE}.}
+  \item{color.fill.ellipse}{If \code{TRUE}, fill the ellipse with \code{color.ellipse}.
+    Usually specify low opacity in the color specification, as shown in the examples. If
+    specified, \code{ellipse} is set to \code{TRUE}.}
 
   \item{method}{Applies to one variable plots. Default is \code{"overplot"}, but can also
        provide \code{"stack"} to stack the points or
@@ -198,8 +217,6 @@ sp(\ldots)
         a \code{bin.start} value.}
   \item{bin.end}{Optional specified value that is within the last bin, so the actual endpoint
         of the last bin may be larger than the specified value.}
-  \item{prop}{Specify proportions or relative frequencies on the vertical axis. Default
-       is \code{FALSE}.}
   \item{cumul}{Specify a cumulative histogram. The value of \code{"on"} displays the 
         cumulative histogram, with default of \code{"off"}. The value of \code{"both"} 
         superimposes the regular histogram.}
@@ -243,8 +260,9 @@ sp(\ldots)
   \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
         obtained from the abbreviated function call \code{sp}.}
   \item{\ldots}{Other parameter values for graphics as defined by and then processed 
-      by \code{\link{plot}} and \code{\link{par}}, including \code{xlim}, \code{ylim} for setting
-      the range of the x and y-axes,
+      by \code{\link{plot}} and \code{\link{par}}, including \code{xlim}, \code{ylim}
+      for setting
+      the range of the x and y-axes, \code{cex.main} for the size of the title,
       \code{lty} for line type, \code{sub} and 
       \code{col.sub} for a subtitle, and \code{col.lab} for the color of the 
       axis labels and \code{color.axis} to set the color of the axis values. For
@@ -254,7 +272,7 @@ sp(\ldots)
 
 \details{
 OUTPUT\cr
-Two (or more) numeric variables produces a traditional scatter plot, based on the standard R function \code{\link{plot}}, with an analysis of the correlation coefficient including hypothesis test and confidence interval. Two categorical variables, such as for Likert-style analysis, produces a bubble plot, in which the size of each plotted point indicates the corresponding joint frequency, and a corresponding cross-tabulation analysis. This analysis is an alternative to the traditional \code{\link{BarChart}}. A categorical variable paired with a numeric variable yields a scatter plot with the means of each level of the categorical variable also plotted, and the summary statistics of the numeric variable for each level of the categorical variable. More information is obtained to list the categorical first in the function call.  If the values of the first variable are numeric and sorted with equal intervals, then points are connected via line segments.  If there is only one variable, a 1-dimensional scatter plot is produced for a numeric variable, based on the standard R function \code{\link{stripchart}}, and a 1-dimensional bubble plot is produced for a factor, with corresponding statistics.
+Two (or more) numeric variables by default produces a traditional scatter plot, based on the standard R function \code{\link{plot}}, with an analysis of the correlation coefficient including hypothesis test and confidence interval. Two categorical variables, such as for Likert-style analysis, produces a bubble plot, in which the size of each plotted point indicates the corresponding joint frequency, and a corresponding cross-tabulation analysis. This analysis is an alternative to the traditional \code{\link{BarChart}}. A categorical variable paired with a numeric variable yields a scatter plot with the means of each level of the categorical variable also plotted, and the summary statistics of the numeric variable for each level of the categorical variable. More information is obtained to list the categorical first in the function call.  If the values of the first variable are numeric and sorted with equal intervals, then points are connected via line segments.  If there is only one variable, a 1-dimensional scatter plot is produced for a numeric variable, based on the standard R function \code{\link{stripchart}}, and a 1-dimensional bubble plot is produced for a factor, with corresponding statistics. Other types of plots are obtained with different values of the \code{object} to be plotted.
 
 The value labels for each axis can be over-ridden from their values in the data to user supplied values with the \code{value.labels} option. This option is particularly useful for Likert-style data coded as integers. Then, for example, a 0 in the data can be mapped into a "Strongly Disagree" on the plot. These value labels apply to integer categorical variables, and also to factor variables. To enhance the readability of the labels on the graph, any blanks in a value label translate into a new line in the resulting plot. Blanks are also transformed as such for the labels of factor variables. 
 
@@ -279,6 +297,9 @@ Multiple categorical variables for \code{x} may be specified, without specifying
 
 BY VARIABLE\cr
 A variable specified with \code{by=} is a grouping variable that specifies that the plot is produced with the points for each group plotted with a different shape and/or color. By default, the shapes vary by group, and the color of the plot symbol remains the same for the groups. The default shapes, in this order, are \code{"circle"}, \code{"diamond"},  \code{"square"}, \code{"triup"} for a triangle pointed up, and \code{"tridown"} for a triangle pointed down.
+
+SIZE VARIABLE\cr
+A variable specified with \code{size=} is a numerical variable that activates a bubble plot in which the size of each bubble is determined by the value of the corresponding value of \code{size}.
 
 To explicitly vary the shapes, use \code{shape} and a list of shape values in the standard R form with the \code{\link{c}} function to combine a list of values, one specified shape for each group, as shown in the examples. To explicitly vary the colors, use \code{color.fill}, such as with R standard color names. If \code{color.fill} is specified without \code{shape}, then colors are varied, but not shapes.  To vary both shapes and colors, specify values for both options, always with one shape or color specified for each level of the \code{by} variable. 
 
@@ -361,6 +382,12 @@ Plot(Years, Salary)
 # new shape and point size, no grid or background color
 Plot(Years, Salary, size=2, shape="diamond", color.bg="off", color.grid="off")
 
+# activate a bubble plot, size of each bubble set by the value of Pre
+Plot(Years, Salary, size=Pre)
+# just display the value of Pre for the bubbles that have the values of
+#   min, median and max
+Plot(Years, Salary, size=Pre, bubble.text=3)
+
 # abbreviated function name
 # scatterplot, with loess line and filled ellipse with low opacity, .1 
 # save scatterplot to a pdf file
@@ -385,6 +412,11 @@ theme(colors="dodgerblue")
 
 # variables of interest are in a data frame which is not the default mydata
 Plot(eruptions, waiting, ellipse=TRUE, data=faithful)
+
+
+#-----------------------------------------------------------------
+# analysis of two numeric variables with a by categorical variable
+#-----------------------------------------------------------------
 
 # by variable scatterplot with default point color, vary shapes
 Plot(Years, Salary, by=Gender)
@@ -464,6 +496,8 @@ Plot(m06,  m07, value.labels=LikertCats)
 Plot(m06, m07, n.cat=2)
 # plot Likert data and get sunflower plot with loess line
 Plot(m06, m07, object="sunflower", fit.line="loess")
+# proportions within each level of the other variable
+Plot(m06, m07, proportion=TRUE)
 
 # two variable bar chart, default is topic="count" for object="bar"
 Plot(m06, m07, object="bar")
@@ -474,7 +508,7 @@ Plot(m06, m07, object="bar")
 #-----------------------------
 
 # generate a table of frequency distributions for multiple categorical
-#   variables witht he same response scale
+#   variables with he same response scale
 # specify a range of x-variables, no y-variable
 # each row is a bubble plot of frequencies for a single variable
 Plot(c(m06,m07,m09,m10), rotate=25, offset=1)

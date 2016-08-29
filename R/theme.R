@@ -19,14 +19,16 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
 
          width=120, show=FALSE) {
 
-  if (!is.null(color.fill.bar)) if (color.fill.bar == "off")
+  if (!is.null(color.fill.bar)) if (color.fill.bar[1] == "off")
     color.fill.bar <- "transparent"
-  if (!is.null(color.fill.pt)) if (color.fill.pt == "off")
+  if (!is.null(color.fill.pt)) if (color.fill.pt[1] == "off")
     color.fill.pt <- "transparent"
-  if (!is.null(color.stroke.bar)) if (color.stroke.bar == "off")
+  if (!is.null(color.stroke.bar)) if (color.stroke.bar[1] == "off")
+    color.stroke.bar <- "transparent"
+  if (!is.null(color.stroke.pt)) if (color.stroke.pt[1] == "off")
     color.stroke.bar <- "transparent"
   if (!is.null(color.bg)) if (color.bg == "off") color.bg <- "transparent"
-  if (!is.null(color.grid)) if (color.grid == "off" ) color.grid <- "transparent"
+  if (!is.null(color.grid)) if (color.grid == "off") color.grid <- "transparent"
   if (!is.null(color.box)) if (color.box == "off") color.box <- "transparent"
 
   # default transparency levels
@@ -79,12 +81,12 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
   }
 
   if (!is.null(color.fill.bar))
-    if (color.fill.bar == "transparent")
+    if (color.fill.bar[1] == "transparent")
       options(color.fill.bar = color.fill.bar) 
     else
       options(color.fill.bar = .maketrans(color.fill.bar, .to256("trans.fill.bar")))
   if (!is.null(color.fill.pt))
-    if (color.fill.pt == "transparent")
+    if (color.fill.pt[1] == "transparent")
       options(color.fill.pt = color.fill.pt) 
     else
       options(color.fill.pt = .maketrans(color.fill.pt, .to256("trans.fill.pt")))

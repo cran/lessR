@@ -78,7 +78,7 @@ lc(\ldots)
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be 
         smaller than the axis labels.}
   \item{color.axis}{Color of the font used to label the axis values.}
-  \item{rotate.values}{Degrees that the axis values are rotated, usually to accomodate
+  \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
         longer values, typically used in conjunction with \code{offset}.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when

@@ -10,7 +10,8 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
   n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
   n.keep <- nrow(lm.out$model)
-  if (is.null(pred.rows)) if (n.keep < 25) pred.rows <- n.keep else pred.rows <- 4 
+  if (is.null(pred.rows))
+    pred.rows <- ifelse (n.keep < 25, n.keep, 4)
   if (pred.rows == "all") pred.rows <- n.keep  # turn off preds with pred.rows=0
 
 
@@ -27,15 +28,9 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
 
   if (n.pred <= 1) {  # scatterplot, if one predictor variable
 
-    #if (n.pred == 0)
-      #do.predint <- FALSE
-    #else {
-      if ( (pred.rows==0) || !is.null(X1.new) || is.null(p.int)) 
-        do.predint <- FALSE
-      else 
-        do.predint <- TRUE
-     #}
-     if (n.pred > 0) if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
+    do.predint <- ifelse ((pred.rows==0) || !is.null(X1.new) || is.null(p.int),
+      FALSE, TRUE) 
+    if (n.pred > 0) if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
 
     if (!do.predint) {
       ctitle <- "Scatterplot"
@@ -50,30 +45,45 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       y.max <- max(max(p.int$upr),  max(lm.out$model[,nm[1]]) )
     }
 
-    fl <- "ls"
-    if (n.pred > 0) {
-      if (is.factor(lm.out$model[,nm[2]])) fl <- "none"
-    }
-    else
-      fl <- "none"
-
     plt.i <- plt.i + 1L
     plt.title[plt.i] <- gsub(pattern="\n", replacement=" ", x=ctitle)
 
     if (n.pred > 0)
-      x.values <- lm.out$model[,nm[2]]
+    x.values <- lm.out$model[,nm[2]]
     else
-      x.values <- 1:n.obs
+    x.values <- 1:n.obs
     y.values <- lm.out$model[,nm[1]] 
-    .plt.main(x.values, y.values,
-       shape=21, size=.8, xlab=nm[2], ylab=nm[1], main=ctitle,
-       fit.line=fl, quiet=TRUE, ylim=c(y.min,y.max))
+
+    plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
+
+    usr <- par("usr")
+    col.bg <- getOption("col.bg")
+    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+
+    col.grid <- getOption("col.grid")
+    abline(v=axTicks(1), col=col.grid, lwd=.5)
+    abline(h=axTicks(2), col=col.grid, lwd=.5)
+
+    .axes(levels(x.values), NULL, axTicks(1), axTicks(2),
+      par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30")
+
+    .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
+        max.lbl.y=3, cex.lab=0.85) 
+
+    col.fill <- getOption("col.fill.pt")
+    col.stroke <- getOption("col.stroke.pt")
+    points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
 
     if (n.pred == 0) {
       m <- lm.out$coefficients[1]  # mean of Y
       mv <- rep(m, n.obs)
       names(mv) <- NULL
       lines(x.values, mv, lwd=0.75)
+    }
+    else {  # plot reg line
+      if (!is.factor(lm.out$model[,nm[2]])) {
+        abline(lm.out$coefficients[1], lm.out$coefficients[2])
+      }
     }
 
     if (do.predint) {
@@ -85,7 +95,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       lines(x.values, p.int$lwr, col=col.pi, lwd=1.5)
       lines(x.values, p.int$upr, col=col.pi, lwd=1.5)
     }
-  }  # end n.pred==1
+  }  # end n.pred<=1
 
 
   else {  # scatterplot matrix for multiple regression

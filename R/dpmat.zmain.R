@@ -4,13 +4,13 @@ function(x, mylabels, nm,
          shape.pts, col.area, col.box, 
          cex.axis, col.axis, col.low, col.hi,
          xy.ticks, xlab, ylab, main, sub, cex,
-         bubble.size, bubble.counts, bubble.power,
+         bubble.scale, bubble.counts, bubble.power,
          value.labels, rotate.values, offset, quiet, ...)  {
 
 
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.size, cex.axis)
-  bubble.size <- adj$bubble.size
+  adj <- .RSadj(bubble.scale, cex.axis)
+  bubble.scale <- adj$bubble.scale
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
   size.txt <- adj$size.txt
@@ -127,12 +127,12 @@ function(x, mylabels, nm,
     for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans.pts)*256)
   }
   symbols(cords$xx, cords$yy, circles=c, bg=clr, 
-        fg=col.stroke, inches=bubble.size, add=TRUE, ...)
+        fg=col.stroke, inches=bubble.scale, add=TRUE, ...)
 
   # counts
   if (bubble.counts) { 
     max.c <- max(c, na.rm=TRUE)  # do not display count if bubble is too small
-    #min.bubble <- (.5 - (0.9*bubble.size)) * max.c 
+    #min.bubble <- (.5 - (0.9*bubble.scale)) * max.c 
     min.bubble <- (bubble.power/2.5) * max.c
     for (i in 1:length(c))
       if (!is.na(c[i])) if (c[i] <= min.bubble) c[i] <- NA

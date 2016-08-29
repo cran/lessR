@@ -148,7 +148,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     }  # nu > n.cat
     else
-      .ncat("Box Plot", x.name, nu, n.cat)
+      if (!quiet) .ncat("Box Plot", x.name, nu, n.cat)
 
     }  # is.numeric(data[,i])
   }  # for

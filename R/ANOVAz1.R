@@ -11,49 +11,47 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
   mn <- tapply(y.values, x.values, min) 
   mx <- tapply(y.values, x.values, max) 
 
-  if (!brief) {
-    # get maximum chars in 1st three columns
-    max.lv <- 0; max.n <- 0; max.m <- 0; max.s <- 0; max.mn <- 0; max.mx <- 0
-    for (i in 1:p) {
-      nch.lv <- nchar(as.character(levels(x.values)[i]))
-      nch.n <- nchar(as.character(n[i]))
-      nch.m <- nchar(.fmt(m[i],digits.d))
-      nch.s <- nchar(.fmt(s[i],digits.d))
-      nch.mn <- nchar(.fmt(mn[i],digits.d))
-      nch.mx <- nchar(.fmt(mx[i],digits.d))
-      if (nch.lv > max.lv) max.lv <- nch.lv
-      if (nch.n > max.n) max.n <- nch.n
-      if (nch.m > max.m) max.m <- nch.m
-      if (nch.s > max.s) max.s <- nch.s
-      if (nch.mn > max.mn) max.mn <- nch.mn
-      if (nch.mx > max.mx) max.mx <- nch.mx
-    }
+  # get maximum chars in 1st three columns
+  max.lv <- 0; max.n <- 0; max.m <- 0; max.s <- 0; max.mn <- 0; max.mx <- 0
+  for (i in 1:p) {
+    nch.lv <- nchar(as.character(levels(x.values)[i]))
+    nch.n <- nchar(as.character(n[i]))
+    nch.m <- nchar(.fmt(m[i],digits.d))
+    nch.s <- nchar(.fmt(s[i],digits.d))
+    nch.mn <- nchar(.fmt(mn[i],digits.d))
+    nch.mx <- nchar(.fmt(mx[i],digits.d))
+    if (nch.lv > max.lv) max.lv <- nch.lv
+    if (nch.n > max.n) max.n <- nch.n
+    if (nch.m > max.m) max.m <- nch.m
+    if (nch.s > max.s) max.s <- nch.s
+    if (nch.mn > max.mn) max.mn <- nch.mn
+    if (nch.mx > max.mx) max.mx <- nch.mx
+  }
 
-    title_des <- "  DESCRIPTIVE STATISTICS "
+  title_des <- "  DESCRIPTIVE STATISTICS "
 
-    tx <- character(length = 0)
+  tx <- character(length = 0)
 
-    n.tx <- format("n", width=max.lv+max.n+2, justify="right", sep="")
-    m.tx <- format("mean", width=max.m+2, justify="right", sep="")
-    s.tx <- format("sd", width=max.s+2, justify="right", sep="")
-    mn.tx <- format("min", width=max.mn+2, justify="right", sep="")
-    mx.tx <- format("max", width=max.mx+2, justify="right", sep="")
-    tx[length(tx)+1] <- paste(n.tx, m.tx, s.tx, mn.tx, mx.tx)
+  n.tx <- format("n", width=max.lv+max.n+2, justify="right", sep="")
+  m.tx <- format("mean", width=max.m+2, justify="right", sep="")
+  s.tx <- format("sd", width=max.s+2, justify="right", sep="")
+  mn.tx <- format("min", width=max.mn+2, justify="right", sep="")
+  mx.tx <- format("max", width=max.mx+2, justify="right", sep="")
+  tx[length(tx)+1] <- paste(n.tx, m.tx, s.tx, mn.tx, mx.tx)
 
-    for (i in 1:p) {
-      xval <- paste(format(levels(x.values)[i], width=max.lv, justify="left", sep="")) 
-      nn <- format(n[i], width=max.n+1, justify="right", sep="") 
-      mm <- format(sprintf("%.*f", digits.d, m[i]), width=max.m+2, justify="right") 
-      ss <- format(sprintf("%.*f", digits.d, s[i]), width=max.s+2, justify="right") 
-      mnn <- format(sprintf("%.*f", digits.d, mn[i]), width=max.mn+2, justify="right") 
-      mxx <- format(sprintf("%.*f", digits.d, mx[i]), width=max.mx+2, justify="right") 
-      tx[length(tx)+1] <- paste(xval, nn, mm, ss, mnn, mxx) 
-    }
+  for (i in 1:p) {
+    xval <- paste(format(levels(x.values)[i], width=max.lv, justify="left", sep="")) 
+    nn <- format(n[i], width=max.n+1, justify="right", sep="") 
+    mm <- format(sprintf("%.*f", digits.d, m[i]), width=max.m+2, justify="right") 
+    ss <- format(sprintf("%.*f", digits.d, s[i]), width=max.s+2, justify="right") 
+    mnn <- format(sprintf("%.*f", digits.d, mn[i]), width=max.mn+2, justify="right") 
+    mxx <- format(sprintf("%.*f", digits.d, mx[i]), width=max.mx+2, justify="right") 
+    tx[length(tx)+1] <- paste(xval, nn, mm, ss, mnn, mxx) 
+  }
 
-      mg <-  mean(y.values, na.rm=TRUE)
-      tx[length(tx)+1] <- ""
-      tx[length(tx)+1] <- paste("Grand Mean:", round(mg, digits.d+1))
-  }  # end !brief 
+  mg <-  mean(y.values, na.rm=TRUE)
+  tx[length(tx)+1] <- ""
+  tx[length(tx)+1] <- paste("Grand Mean:", round(mg, digits.d+1))
 
   txdes <- tx
 
@@ -68,7 +66,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
 
     if (!pdf) {
       if (manage.gr) {
-        .graphwin(2)
+        if (!brief) .graphwin(2) else .graphwin(1)
         dev.set(which=3)
       }
     }
@@ -129,7 +127,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
   tx <- character(length = 0)
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("Analysis of Variance")
+    tx[length(tx)+1] <- paste("Summary Table")
     tx[length(tx)+1] <- ""
   }
 
@@ -208,13 +206,11 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
   txeft <- tx
 
 
+
+  txhsd <- ""
+  title_tukey <- "  TUKEY MULTIPLE COMPARISONS OF MEANS"
   if (!brief) {
     tx <- character(length = 0)
-
-    if (is.null(options()$knitr.in.progress)) {
-      tx[length(tx)+1] <- paste("Tukey Multiple Comparisons of Means")
-      tx[length(tx)+1] <- ""
-    }
 
     HSD <- TukeyHSD(av.out)
     HSD <- TukeyHSD(av.out, which=nm[2])
@@ -254,6 +250,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
   return(list(
     title_des=title_des, txdes=txdes,
     title_basic=title_basic,
+    title_tukey=title_tukey,
     txanv=txanv, txeft=txeft, txhsd=txhsd,
     i=plt.i, ttl=plt.title))
 

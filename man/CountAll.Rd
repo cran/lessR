@@ -9,13 +9,14 @@ Automatically call the following functions in this package:  \code{\link{Summary
 }
 
 \usage{
-CountAll(x=mydata, \dots)
+CountAll(x=mydata, quiet=FALSE, \dots)
 
 ca(\ldots)
 }
 
 \arguments{
   \item{x}{Data frame that contains the variables to analyze, by default \code{mydata}.}
+  \item{quiet}{Suppress text output if \code{TRUE}.}
   \item{\dots}{Other parameter values for graphics.}
 }
 

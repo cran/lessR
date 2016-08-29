@@ -129,7 +129,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
   tx <- character(length = 0)
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("Analysis of Variance")
+    tx[length(tx)+1] <- paste("Summary Table")
     tx[length(tx)+1] <- ""
   }
 
@@ -238,14 +238,12 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
   txeft <- tx
 
 
+  txhsd <- ""
+  title_tukey <- "  TUKEY MULTIPLE COMPARISONS OF MEANS"
   if (!brief) {
     tx <- character(length = 0)
 
-    if (is.null(options()$knitr.in.progress))
-      tx[length(tx)+1] <- paste("Tukey Multiple Comparisons of Means")
-
     HSD <- TukeyHSD(av.out)
-    tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD, which="conf.level"))
     tx[length(tx)+1] <- paste("\nFactor:", nm[2])
 
@@ -260,9 +258,10 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
       txHSD <- .prntbl(HSD[[3]], digits.d)  # interaction
       for (i in 1:length(txHSD)) tx[length(tx)+1] <- txHSD[i]
     }
-  }
 
     txhsd <- tx
+  }
+
 
 
   # ------------------------------------
@@ -338,6 +337,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     txbck2=txbck2, 
     title_des=title_des, txcn=txcn, txcm=txcm, txmm=txmm, txgm=txgm, txcs=txcs,
     title_basic=title_basic,
+    title_tukey=title_tukey,
     txanv=txanv, txeft=txeft, txhsd=txhsd,
     i=plt.i, ttl=plt.title))
 

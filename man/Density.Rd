@@ -18,7 +18,7 @@ When output is assigned into an object, such as \code{d} in \code{d <- dn(Y)}, t
 Density(x, data=mydata, n.cat=getOption("n.cat"), 
 
        bw="nrd0", type=c("both", "general", "normal"),
-       bin.start=NULL, bin.width=NULL,
+       histogram=TRUE, bin.start=NULL, bin.width=NULL,
 
        Rmd=NULL, digits.d=NULL,
 
@@ -59,6 +59,7 @@ dn(\ldots)
   \item{bw}{Bandwidth of kernel estimation.}
   \item{type}{Type of density curve plotted.  By default, both the general
        density and the normal density are plotted.}
+  \item{histogram}{If \code{TRUE} overlay the density plot over a histogram.}
   \item{bin.start}{Optional specified starting value of the bins.}
   \item{bin.width}{Optional specified bin width, which can be specified with or without 
         a \code{bin.start} value.}
@@ -76,11 +77,9 @@ dn(\ldots)
   \item{color.nrm}{Color of the normal curve.}
   \item{color.gen}{Color of the general density curve.}
   \item{color.fill.nrm}{Fill color for the estimated normal curve, with a partially 
-       transparent blue as the default for a blue color theme, and transparent for
-       all other themes.}
+       transparent blue as the default, and transparent for the gray theme.}
   \item{color.fill.gen}{Fill color for the estimated general density curve, with a partially
-       transparent light red as the default as the default for a blue color theme, and
-       transparent for all other themes.}
+       transparent light red as the default, and a light transparent gray for the gray theme.}
   \item{cex.axis}{Scale magnification factor, which by default displays the axis values to be 
         smaller than the axis labels.}
   \item{color.axis}{Color of the font used to label the axis values.}

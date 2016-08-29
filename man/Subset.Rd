@@ -80,9 +80,10 @@ myd <- Subset(c(1,4))
 myd <- Subset(-c(1,4))
 
 # built-in data table warpbreaks has several levels of wool
-#  plus breaks and tension
-# retain only the A level of wool and the one variable breaks
-mydata <- Subset(wool=="A", columns=breaks, data=warpbreaks)
+#   and breaks plus continuous measure tension
+# retain only the A level of wool and the L level of tension,
+#   and the one variable breaks
+mydata <- Subset(wool=="A" & tension=="L", columns=breaks, data=warpbreaks)
 
 # delete Years and Salary 
 mydata <- Read("Employee", format="lessR", quiet=TRUE)

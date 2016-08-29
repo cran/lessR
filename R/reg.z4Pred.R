@@ -86,11 +86,8 @@ function(lm.out, brief,
   min.nm <- rownames(out[min.row,])
 
   max.row <- which(out[n.vars+5] == max(out[n.vars+5]))
-  if (max.row < n.keep/2)
-    max.side <- TRUE
-  else
-    max.side <- FALSE
   if (length(max.row) > 1) max.row <- max.row[1]
+  max.side <- ifelse (max.row < n.keep/2, max.side <- TRUE, max.side <- FALSE)
   max.nm <- rownames(out[max.row,])
 
   names(predmm) <- c(min.nm, max.nm)

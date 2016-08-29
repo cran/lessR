@@ -140,7 +140,7 @@ PieChart(Gender, colors="rainbow")
 # must supply the level names and variable name
 City <- c(206, 94, 382)
 names(City) <- c("LA","Chicago","NY")
-PieChart(City, main="Employees in Each City")
+pc(City, main="Employees in Each City")
 
 }
 

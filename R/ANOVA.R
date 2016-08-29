@@ -127,6 +127,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
     title_basic <- plt1$title_basic
     txanv <- plt1$txanv
     txeft <- plt1$txeft
+    title_tukey <- plt1$title_tukey
     txhsd <- plt1$txhsd
     if (graphics) {
       for (i in (plot.i+1):(plot.i+plt1$i)) plot.title[i] <- plt1$ttl[i-plot.i]
@@ -151,6 +152,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
     title_basic <- plt2$title_basic
     txanv <- plt2$txanv
     txeft <- plt2$txeft
+    title_tukey <- plt2$title_tukey
     txhsd <- plt2$txhsd
     if (graphics) {
       for (i in (plot.i+1):(plot.i+plt2$i)) plot.title[i] <- plt2$ttl[i-plot.i]
@@ -159,6 +161,10 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
   }
 
   # residuals
+  txres <- ""
+  title_res <- "  RESIDUALS" 
+  res <- ""
+  fit <- ""
   if (!brief) {
     tx <- character(length=0)
 
@@ -166,7 +172,6 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
     if (is.null(res.rows)) if (n.keep < 20) res.rows <- n.keep else res.rows <- 20 
     if (res.rows == "all") res.rows <- n.keep  # turn off resids with res.rows=0
 
-    title_res <- "  RESIDUALS" 
     tx[length(tx)+1] <- "Fitted Values, Residuals, Standardized Residuals"
     if (res.sort == "zresid")
       tx[length(tx)+1] <- "   [sorted by Standardized Residuals, ignoring + or - sign]"
@@ -202,7 +207,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
     for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 
     txres <- tx
-  }
+  }  # end !brief
 
 # pairwise.t.test(mydata$Steady, mydata$TrtA)
 # power.anova.test(groups=4, n=8, between.var=16.33, within.var=2.179)
@@ -240,6 +245,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
   class(title_basic) <- "out_piece"
   class(txanv) <- "out_piece"
   class(txeft) <- "out_piece"
+  class(title_tukey) <- "out_piece"
   class(txhsd) <- "out_piece"
   class(title_res) <- "out_piece"
   class(txres) <- "out_piece"
@@ -256,7 +262,10 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
       out_descriptive=txdes,
 
       out_title_basic=title_basic,
-      out_anova=txanv, out_effects=txeft, out_hsd=txhsd, 
+      out_anova=txanv, out_effects=txeft,
+
+      out_title_tukey=title_tukey,
+      out_hsd=txhsd, 
 
       out_title_res=title_res, out_res=txres,
 
@@ -278,7 +287,10 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
       out_gm=txgm, out_cell.sd=txcs,
 
       out_title_basic=title_basic,
-      out_anova=txanv, out_effects=txeft, out_hsd=txhsd, 
+      out_anova=txanv, out_effects=txeft,
+
+      out_title_tukey=title_tukey,
+      out_hsd=txhsd, 
 
       out_title_res=title_res, out_res=txres,
 

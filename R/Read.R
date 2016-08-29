@@ -268,12 +268,13 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
       typ <- gsub("c(, ", "c(", typ, fixed=TRUE) 
       typ <- gsub("ref = ", "", typ, fixed=TRUE) 
       typ <- paste(typ, ")", sep="")  #  add back removed closing )
-      message("The read_excel function sometimes mistakenly reads numbers in\n",
+      message("\nThe read_excel function sometimes mistakenly reads numbers in\n",
         "the Excel Currency format as the type POSIXct, a date format\n\n",
         "Type POSIXct was assigned to one or more of your variables\n\n",
-        "If the variable assigned type POSIXct is not a date, do the following\n\n",
-        "Explicitly specify if a variable is text, numeric or a date\n",
-        "  by adding the  col_types  option to Read, so re-read the data\n",
+        "IF the variable assigned type POSIXct is NOT a date, then\n",
+        "  explicitly specify if a variable is text, numeric or a date\n",
+        "  by adding the  col_types  option to Read\n",
+        "To do this re-read the data\n",
         "  by copying and pasting the following: \n\n",
         "   ", typ, "\n")
     }
@@ -286,22 +287,23 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
     for (i in 0:9) dg[i+1] <- as.character(i)  
     ltr <- c(letters, LETTERS, dg, "_", ".")
 
+    badchar <- FALSE
     for (i in 1:length(names(d))) {
       cc <- names(d)[i]
       for (j in 1:nchar(cc)) {
         if (!(substr(cc,j,j) %in% ltr)) {
+            badchar <- TRUE
+            names(d)[i] <- gsub(substr(cc,j,j), "", names(d)[i])
           if (substr(cc,j,j) == " ")
-            txt <- "There is a blank space "
+            txt <- "Removed the blank space,"
           else
-            txt <-  paste(substr(cc,j,j), "is an illegal character ")
-          cat("\n"); stop(call.=FALSE, "\n","------\n",
-            txt, "in the variable name ",
-            names(d)[i], "\n\n",
-            "Use only letters, digits and  .  or   _  in variable names\n\n",
-            "Go back to your data file and revise the variable name\n\n")
+            txt <- paste("Removed the character, ", substr(cc,j,j), ",", sep="")
+          cat(txt, "new variable name: ", names(d)[i], "\n")
         }
       }
     }
+    if (badchar)
+      cat("\nR only allows letters, digits and . or  _ in variable names\n\n")
   }
 
 

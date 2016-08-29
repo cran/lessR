@@ -6,6 +6,52 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 3.5.0 (2016-08-29) <<<<<<
+
+-------------
+Updates 3.5.0
+-------------
+
+Density
+  gray color theme now has a light-gray, transparent fill for the 
+    general density curve, with the normal curve still no fill
+  histogram option can be set to FALSE for no background histogram
+
+Plot
+  size option can be a variable, which triggers a bubble plot with the
+    size of each bubble scaled according to the values of the variable size
+  bubble.count option renamed to the more general bubble.text
+  bubble.size option renamed to the more accurate bubble.scale
+  when plotting two variables against a third with the gray color theme,
+    both lines or sets of points retain gray scale
+
+Read
+  when detects an illegal character in a variable name, it is removed
+    and the program continues 
+
+
+---------------
+Bug Fixes 3.5.0
+---------------
+
+ANOVA
+  brief version, av.brief, works
+
+BarChart
+  col.bg may be set to "off" as intended
+
+CountAll
+  quiet applies to all output
+
+Plot
+  bubble plot for within column proportions available
+
+Regression
+  for a single predictor, confidence and predictor intervals properly plot
+
+
+
+
 >>>>>> Changes for lessR version 3.4.8 (2016-05-01) <<<<<<
 
 -------------

@@ -7,7 +7,7 @@ function(x, by=NULL,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
 
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.size=NULL, cex.axis)
+  adj <- .RSadj(bubble.scale=NULL, cex.axis)
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
   size.txt <- adj$size.txt
@@ -38,7 +38,8 @@ function(x, by=NULL,
   cex.lab <- gl$cex.lab
 
   done <- ifelse (grepl("of", y.lab, fixed=TRUE), TRUE, FALSE) 
-  if ((!prop || is.null(by)) &&  !done) y.lab <- paste(y.lab, "of", x.name)
+  if ((!prop || is.null(by)) && !done)
+    y.lab <- paste(y.lab, "of", x.name)
   if (!is.null(by)) {
     if (!beside) {
       txt <- paste(ylab, "of", x.name)
@@ -377,85 +378,11 @@ function(x, by=NULL,
     # default right.margin option
     if (legend.loc == "right.margin") {
 
-      par(xpd=NA)  # allow drawing outside of plot region
-
-      # split string into separate words
-      wordlist <- as.vector(strsplit(l.lab, " "))
-      n.words <- length(wordlist[[1]])
-
-      # put elements of word list into words for ease of programming
-      words <- character(length=0)
-      for (i in 1:n.words) words[i] <- abbreviate(wordlist[[1]][i],12)
-
-      # combine words into lines of max length 13
-      lines <- integer(length=0)
-      j <- 0
-      iword1 <- 1
-      while (iword1 <= n.words) {
-        j <- j + 1
-        lines[j] <- words[iword1]
-        trial <- ""
-        iword <- 0
-        while (nchar(trial) < 13  &&  iword1 <= n.words) {
-          trial <- paste(trial, words[iword1+iword]) 
-          if (nchar(trial) <= 13) {
-            lines[j] <- trial
-            iword1 <- iword1 + 1
-          }
-        }
-      }
-      n.lines <- length(lines)
-
-      # remove leading blank in each line
-      for (i in 1:n.lines) lines[i] <- substr(lines[i], 2, nchar(lines[i]))
-
-      # get max word in terms of user coordinates
-      max.wlen <- 0
-      for (i in 1:n.lines) {
-        wl <- strwidth(lines[i])
-        if (wl > max.wlen) {
-          max.wlen <- wl
-          max.word <- lines[i]
-        }
-      }
-
-      # attach a line break at the end of all but the last line
-      if (n.lines > 1)
-        for (i in 1:(n.lines-1)) lines[i] <- paste(lines[i], "\n", sep="")
-
-      # construct the legend title as a single character string
-      l.lab2 <- ""
-      for (i in 1:n.lines) l.lab2 <- paste(l.lab2, lines[i], sep="")
-
-      # construct vertical buffer for legend for additional legend title lines
-      axis.vert <- usr[4] - usr[3]
-      vbuffer <- (n.lines-1)*(0.056*axis.vert)  # usr[4] is top axis coordinate
-
-      # legend function blind to multiple line titles, 
-      # so pass largest word to get the proper width of the legend
-      # also get height of legend with only one title line
-      legend.labels <- abbreviate(legend.labels, 6)
-      ll <- legend(0,0, legend=legend.labels, title=max.word, cex=.7,
-                   fill=col, plot=FALSE)
-
-      # horizontal placement
-      size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
-      if (options("device") == "RStudioGD") size <- 1.3*size
-      epsilon <- (size[1] - ll$rect$w) / 2
-
-      # legend box
-      xleft <- usr[2] + epsilon   # usr[2] is the user coordinate of right axis
-      xright <- xleft + ll$rect$w
-      lgnd.vhalf <- (vbuffer + ll$rect$h) / 2
-      axis.cntr <- axis.vert / 2  + usr[3]
-      ytop <- axis.cntr + lgnd.vhalf
-      ybottom <- axis.cntr - lgnd.vhalf
-      rect(xleft, ybottom, xright, ytop, lwd=.5, border="gray30", col=col.bg)
-
-      # legend not multiple title lines aware, so start at last title line
-      legend(x=xleft, y=ytop-vbuffer, legend=legend.labels, title=l.lab2,
-             fill=colr, horiz=FALSE, cex=.7, bty="n", box.lwd=.5,
-             box.col="gray30", text.col=col.txt)
+      options(byname = getOption("yname"))
+      trans.pts <- .6  # dummy value
+      #.plt.by.legend(levels(by), stroke, fill, shp, trans.pts, col.bg, usr)
+      #.plt.by.legend(levels(by), col.stroke, clr, shp=21, trans.pts, col.bg, usr)
+      .plt.by.legend(legend.labels, col.stroke, clr, shp=21, trans.pts, col.bg, usr)
 
     }  # right margin
 
@@ -483,9 +410,9 @@ function(x, by=NULL,
 
       txsug <- ""
       if (getOption("suggest")) {
-        fc <- paste("sp(", x.name, ") ", sep="")
+        fc <- paste("Plot(", x.name, ") ", sep="")
         txsug <- paste(txsug, ">>> Suggest: ", fc, sep="")
-        fc <- paste("sp(", x.name, ", topic=\"count\") ", sep="")
+        fc <- paste("Plot(", x.name, ", topic=\"count\") ", sep="")
         txsug <- paste(txsug, "\n\n>>> Suggest: ", fc, sep="")
       }
 
@@ -516,7 +443,7 @@ function(x, by=NULL,
 
     txsug <- ""
     if (getOption("suggest")) {
-      fc <- paste("sp(", x.name, ",", y.name, ") ", sep="")
+      fc <- paste("Plot(", x.name, ",", y.name, ") ", sep="")
       txsug <- paste(txsug, ">>> Suggest: ", fc, sep="")
     }
 
@@ -532,13 +459,12 @@ function(x, by=NULL,
     class(txfrq) <- "out_piece"
     class(txXV) <- "out_piece"
     if (!prop)
-      output <- list(out_suggest=txsug,out_title=txttl, out_text=txfrq,
+      output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq,
                      out_XV=txXV)
     else {
       txrow <- stats$txrow
       class(txrow) <- "out_piece"
-      output <- list(out_title=txttl, out_text=txfrq, out_row=txrow, out_XV=txXV
-)   }
+      output <- list(out_title=txttl, out_text=txfrq, out_row=txrow, out_XV=txXV)   }
     class(output) <- "out_all"
     print(output)
 

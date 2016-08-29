@@ -14,8 +14,6 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
     cat(mytitle, Xnm, " ", X2nm, ": ", .fmt(dYB$bw,digits.d), sep="", "\n")
   }
 
-  cat("--------------------------------------------------\n")
-
   # values needed for graph
   min.x <- min(min(dYA$x),min(dYB$x))  # min x coordinate for graph
   max.x <- max(max(dYA$x),max(dYB$x))  # max x coordinate for graph

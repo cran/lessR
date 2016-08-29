@@ -1,8 +1,8 @@
 Plot <- 
 function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
-         topic=c("data", "count", "prop", "mean", "sd", "min", "median", "max",
-                 "diff"),
+         topic=c("data", "count", "prop", "sum", "mean", "sd", "min", "median",
+                 "max", "diff"),
          object=c("point", "line", "both", "bubble", "sunflower", "bar", "off"),
 
          color.fill=getOption("color.fill.pt"),
@@ -16,11 +16,12 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          cex.axis=0.76, color.axis="gray30", xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
          value.labels=NULL, rotate.values=0, offset=0.5,
+         proportion=FALSE, 
 
          size=NULL, shape="circle", means=TRUE, 
          sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
 
-         bubble.size=0.25, bubble.power=0.6, bubble.counts=TRUE,
+         bubble.scale=0.25, bubble.power=0.6, bubble.text=NULL,
          color.low=NULL, color.hi=NULL,
 
          fit.line=NULL, color.fit.line="gray55",
@@ -32,7 +33,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          color.out30="firebrick2", color.out15="firebrick4", new=TRUE,
 
          breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
-         prop=FALSE, cumul=c("off", "on", "both"), hist.counts=FALSE,
+         cumul=c("off", "on", "both"), hist.counts=FALSE,
          color.reg="snow2",
 
          beside=FALSE, horiz=FALSE, 
@@ -54,11 +55,13 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   topic <- match.arg(topic)
   cumul <- match.arg(cumul)
 
+
   if (object.miss) object <- "default"
 
   # any bubble parameter actives a bubble plot
-  if (!missing(bubble.size) || !missing(bubble.size) || !missing(bubble.counts))
+  if (!missing(bubble.scale) || !missing(bubble.scale) || !missing(bubble.text)) {
     object <- "bubble"
+  }
 
   # any ellipse parameter actives an ellipse
   if (!missing(color.ellipse) || !missing(color.fill.ellipse))
@@ -78,6 +81,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     if (missing(color.fill)) color.fill <- getOption("color.fill.bar")
   }
 
+  # let "off" substitute for official arg value of "transparent"
   for (i in 1:length(color.fill))
     if (color.fill[i] == "off") color.fill[i] <- "transparent"
   for (i in 1:length(color.stroke))
@@ -152,7 +156,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       }
       if (names(dots)[i] == "diag") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "diag  option no longer used\n\n")
+          "diag  option no longer available\n\n")
       }
     }
   }
@@ -442,33 +446,75 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     if (!is.factor(by.call)) by.call <- factor(by.call)
   }
+
   else
    by.call <- NULL 
 
-  # graphics 
+
+  # evaluate size (NULL, numeric constant or a variable)
+  #--------------
+  if (!missing(size)) {
+    size.name <- deparse(substitute(size)) 
+
+    # get conditions and check for data existing
+    xs <- .xstatus(size.name, df.name, quiet)
+    in.global <- xs$ig 
+
+    # if size.name is not a number, make.num gets NA with a warning
+    make.num <- suppressWarnings(as.numeric(size.name))
+    is.num <- ifelse (!is.na(make.num), TRUE, FALSE)
+
+    # see if var exists in data frame, if x not in Global Env or function call 
+    if (!is.num) {  # size.name is the name of a variable
+      if (!in.global) {
+        .xcheck(size.name, df.name, data)
+        size <- eval(substitute(data$size))
+      }
+      if (!is.numeric(size)) { 
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Variable ", size.name, " must be numeric\n\n",
+          "Perhaps use: by=", size.name, "\n\n")
+      }
+      options(sizename = size.name) # for later access
+      object <- "bubble"
+      if (is.null(bubble.text)) bubble.text <- ifelse(cat.x, 1, 2)
+    }
+    else  # size is a numerical constant
+      bubble.text <- FALSE
+  }
+  else
+    if (missing(bubble.text)) bubble.text <- TRUE
+
+
   # --------
+  # graphics 
+
   if (is.null(y.call)  &&  ncol(data.x) == 1  &&  method!="stack"
-      &&  !(object %in% c("line", "both"))  && object != "bar")
+      &&  !(object %in% c("line", "both"))  &&  object != "bar")
     plt.h <- ifelse(is.null(main), 2.5, 3.1)  # narrow for 1-D plot
   else
     plt.h <- 4.5
   # for BPFM with more than 7 variables, make extra long
   if (ncol(data.x) > 7) plt.h <- plt.h + ((ncol(data.x) - 7) * 0.5)
 
-  if (is.null(pdf.file)) {  
-    if (options("device") != "RStudioGD"  &&  is.null(options()$knitr.in.progress)) {
+  if (is.null(pdf.file)) {
+    regR <- TRUE
+    if (class(getOption("device")) == "character")
+      if (getOption("device") == "RStudioGD") regR <- FALSE
+    if (!is.null(options()$knitr.in.progress)) regR <- FALSE 
+    if (regR) {  # regular R run
       if (missing(by)) {  # set up graphics system to manage
-        if (is.null(y.call)) {  # works for 1-D scatter plots and BPFM
+        if (is.null(y.call)) {  # applies to 1-D scatter plots and BPFM
           .graphwin(1, d.h=plt.h) 
         }
         else
           .graphwin(1) 
       }
-      else
+      else  # there is a by variable
         .graphwin(d.w=pdf.width)  # add width to default of 4.5 for legend
-
-      }
     }
+  }
+
   else  {  # pdf file
     if (is.null(pdf.width)) pdf.width <- 4.5
     if (!missing(by.call)) pdf.width <- pdf.width + 0.6
@@ -572,7 +618,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     # construct y.call, need unique values for Cleveland dot plot
     if (x.only) data <- data.frame(x.call)  # input data are vectors
     is.unique <- logical(ncol(data))  # initialed to FALSE
-    for(i in 1:ncol(data))
+    for (i in 1:ncol(data))
       if ((length(data[,i])==length(unique(data[,i]))) && !is.numeric(data[,i]))
         is.unique[i] <- TRUE
     unq <- which(is.unique)[1]  # choose first non-num variable with unique values
@@ -600,7 +646,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       h <- .hst.main(x.call, color.fill, color.stroke, color.bg, color.grid,
          color.box, color.reg,
          over.grid=FALSE, cex.axis, color.axis, rotate.values, offset,
-         breaks, bin.start, bin.width, bin.end, prop, hist.counts, cumul,
+         breaks, bin.start, bin.width, bin.end, proportion, hist.counts, cumul,
          xlab, ylab, main, sub, quiet, fun.call=NULL, ...)
 
       if (!quiet) {
@@ -635,7 +681,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
         color.fill, color.stroke, color.bg, color.grid, color.box,
         colors=getOption("colors"),
         horiz, over.grid, addtop, gap,
-        prop, xlab, ylab, main, value.labels,
+        proportion, xlab, ylab, main, value.labels,
         cex.axis, color.axis, rotate.values, offset, beside,
         color.low, color.hi, count.labels,
         legend.title, legend.loc, legend.labels, legend.horiz,
@@ -659,14 +705,13 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     if (length(mylabs) == 0) mylabs <- NULL  # when labels, but not relevant
 
     if (is.null(xlab)) xlab <- ""  # suppress x-axis label if not specified
-print(bubble.power)
 
     .dpmat.main(data[,x.col], mylabs, nm,
       color.fill, color.stroke, color.bg, color.grid, color.trans,
       shape, color.area, color.box, 
       cex.axis, color.axis, color.low, color.hi,
       xy.ticks, xlab, ylab, main, sub, size,
-      bubble.size, bubble.counts, bubble.power,
+      bubble.scale, bubble.text, bubble.power,
       value.labels, rotate.values, offset, quiet, ...)
   }
 
@@ -737,7 +782,12 @@ print(bubble.power)
     }
 
     # set up new x.call and y.call for stats
-    if (topic %in% c("mean", "sd", "min", "median", "max")) {
+    if (topic %in% c("sum", "mean", "sd", "min", "median", "max")) {
+
+      if (topic == "sum") {
+        ylab <- paste("Sum of", y.name) 
+        out <- tapply(y.call, x.call, sum, na.rm=TRUE)
+      }
       if (topic == "mean") {
         ylab <- paste("Mean of", y.name) 
         out <- tapply(y.call, x.call, mean, na.rm=TRUE)
@@ -778,13 +828,13 @@ print(bubble.power)
           color.fill, color.stroke, color.bg, color.grid, color.box,
           colors=getOption("colors"),
           horiz, over.grid, addtop, gap,
-          prop, xlab, ylab, main, value.labels,
+          proportion, xlab, ylab, main, value.labels,
           cex.axis, color.axis, rotate.values, offset, beside,
           color.low, color.hi, count.labels,
           legend.title, legend.loc, legend.labels, legend.horiz,
           quiet=quiet, ...)
       }
-    }  # mean, sd, min, median, max
+    }  # sum, mean, sd, min, median, max
 
     # 2-variable scatter plot
     if (!is.null(y.call)  &&  object != "bar") {  
@@ -794,11 +844,12 @@ print(bubble.power)
          color.trans, color.area,
          cex.axis, color.axis, xy.ticks,
          xlab, ylab, main, sub, value.labels, rotate.values, offset,
+         proportion,
          size, shape, means, sort.yx, segments.y, segments.x,
-         bubble.size, bubble.power, bubble.counts, color.low, color.hi,
+         bubble.scale, bubble.power, bubble.text, color.low, color.hi,
          fit.ln, color.fit.line,
          ellipse, color.ellipse, color.fill.ellipse, 
-         method, pt.reg, pt.out, color.out30, color.out15, new,
+         method, pt.reg, pt.out, color.out30, color.out15,
          quiet, fun.call, ...)
     }
 

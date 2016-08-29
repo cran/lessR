@@ -2,22 +2,23 @@
 function(x, y, by=NULL, n.cat=getOption("n.cat"),
          object="point", topic="data",
 
-         col.fill=getOption("col.fill.pt"),
-         col.stroke=getOption("col.stroke.pt"),
-         col.bg=getOption("col.bg"),
-         col.grid=getOption("col.grid"),
-         col.box=getOption("col.box"),
+         col.fill=getOption("color.fill.pt"),
+         col.stroke=getOption("color.stroke.pt"),
+         col.bg=getOption("color.bg"),
+         col.grid=getOption("color.grid"),
+         col.box=getOption("color.box"),
 
          col.trans=NULL, col.area=NULL,
 
          cex.axis=0.76, col.axis="gray30", xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
          value.labels=NULL, rotate.values=0, offset=0.5,
+         prop=FALSE,
 
          size=NULL, shape="circle", means=TRUE, 
          sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
 
-         bubble.size=0.25, bubble.power=0.6, bubble.counts=TRUE,
+         bubble.scale=0.25, bubble.power=0.6, bubble.text=TRUE,
          col.low=NULL, col.hi=NULL,
 
          fit.line="none", col.fit.line="gray55",
@@ -26,17 +27,17 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          fill.ellipse="off", 
 
          method="overplot", pt.reg="circle", pt.out="circle", 
-         col.out30="firebrick2", col.out15="firebrick4", new=TRUE,
+         col.out30="firebrick2", col.out15="firebrick4", 
 
          quiet=getOption("quiet"), fun.call=NULL, want.labels=TRUE, ...)  {
 
 
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.size, cex.axis)
-  bubble.size <- adj$bubble.size
+  adj <- .RSadj(bubble.scale, cex.axis)
+  bubble.scale <- adj$bubble.scale
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
-  size.txt <- adj$size.txt
+  cex.txt <- adj$size.txt
 
   # want.labels set just for ttestPower, which provides its own labels
   # both x and y are plotted, even if only a single variable
@@ -117,11 +118,11 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     }
   }
   if (is.null(size.pt)) {
-    sz <- ifelse (.Platform$OS == "windows", 1, 0.80)
+    sz <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
     sz.pt <- ifelse (is.null(size), sz, size)
     size.pt <- ifelse (is.null(size), sz.pt, size)
     if (options("device") == "RStudioGD")
-      size.pt <- ifelse (.Platform$OS == "windows", size.pt*1.45, size.pt*1.13)
+      size.pt <- ifelse (.Platform$OS == "windows", size.pt*1.00, size.pt*1.13)
     sz.ln <- ifelse (is.null(size), 2, size)
     size.ln <- ifelse (is.null(size), sz.ln, size)
   }
@@ -210,6 +211,14 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   else 
     max.width <- strwidth(as.character(max(pretty(y))), units="inches")
 
+  # set title for bubble plot if proportions
+  #if (object == "bubble"  &&  prop  &&  is.null(main)  &&  !is.null(y.lvl)) {
+  if (object == "bubble"  &&  prop  &&  is.null(main)  &&  cat.y) {
+    main.lab <- paste("Percentage of", y.name, "\nwithin each level of", x.name)
+    main <- "not null"
+  }
+
+  # set margins
   lm <- max(max.width + 0.3, 0.67)
   if (!is.null(y.lab)) {
     if (!nzchar(y.lab)[1]) lm <- lm - 0.3
@@ -219,15 +228,26 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     lm <- lm - 0.3
 
   rm <- 0.25 
-  if (!is.null(by)) rm <- 0.95
+  if (!is.null(by)) rm <- 0.95  # allow room for legend
   if (ncol(y) > 1) rm <- 0.95
-  tm <- ifelse (is.null(main), 0.25, 0.75)
+
+  tm <- 0.25
+  if (length(size) > 1) {  # size is a variable
+    tm <- tm + 0.10  # room for subtitle
+    if (!is.null(main)) tm <- tm + .20
+  }
+  if (prop) tm <- tm + .5
+
   bm <- 0.75
 
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  RSpad.bm <- ifelse (options("device") == "RStudioGD", 0.4, 0)
-  RSpad.m <- ifelse (options("device") == "RStudioGD", 0.3, 0)
+  RSpad.bm <- 0
+  RSpad.m <- 0
+  if (options("device") == "RStudioGD") {
+    RSpad.bm <- ifelse (.Platform$OS == "windows", 0.3, 0)
+    RSpad.m <- ifelse (.Platform$OS == "windows", 0.3, 0)
+  }
   par(mai=c(bm+RSpad.bm, lm+RSpad.m, tm+RSpad.m, rm+RSpad.m))
 
 
@@ -321,6 +341,12 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
 
   if (ncol(x) > 1) x.lab <- NULL
+  if (length(size) > 1) {
+    sz.nm <- getOption("sizename")
+    txt <- bquote(paste(italic(.(sz.nm)), ": Bubble size from ",
+      .(min(size)), " to ", .(max(size)), sep=""))
+    mtext(txt, side=3, cex=size.lab)
+  }
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl.y, 
           xy.ticks, offset=offset, cex.lab=size.lab, ...) 
 
@@ -335,7 +361,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   # fill area under curve
   col.border <- ifelse (object=="point", col.stroke[1], "transparent")
-  if (!is.null(col.area)  &&  col.area != "transparent") 
+  if (!is.null(col.area)) if (col.area != "transparent") 
     polygon(c(x[1],x,x[length(x)]), c(min(y),y,min(y)),
             col=col.area, border=col.border)
 
@@ -366,11 +392,15 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       stroke[1] <- col.stroke[1]
       stroke[2] <- ifelse (length(col.stroke) > 1, col.stroke[2], col.stroke[1])
       fill[1] <- col.fill[1]
-      if (object %in% c("line","both")) {
-        fill[2] <- .col.discrete(bright=TRUE)[2]
-        stroke[2] <- fill[2]
+      if (object %in% c("line", "both")) {
+        if (!(getOption("colors") %in% c("gray", "gray.black")))
+          fill[2] <- .col.discrete(bright=TRUE)[2]
+        else {
+          fill[2] <- rgb(.15,.15,.15)
+          stroke[2] <- fill[2]
+        }
       }
-      else {
+      else { 
         if (length(col.fill) == 1)
           fill[2] <- "transparent"
         else
@@ -388,8 +418,9 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       if (ncol(x) == 1  &&  ncol(y) == 1)
           lines(as.numeric(x[,1]),y[,1], col=fill, lwd=size.ln, ...)
       if (ncol(y) > 1)
-        for (i in 1:ncol(y))
+        for (i in 1:ncol(y)) {
           lines(as.numeric(x[,1]),y[,i], col=fill[i], lwd=size.ln, ...)
+}
       if (ncol(x) > 1)
         for (i in 1:ncol(x))
           lines(as.numeric(x[,i]),y[,1], col=fill[i], lwd=size.ln, ...)
@@ -506,57 +537,118 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
     n.patterns <- 1  # for fit.line
 
-    mytbl <- table(x, y)  # get the counts
-
     # colors
-    if (is.null(col.low) ||  is.null(col.hi)) {
+    if (is.null(col.low) || is.null(col.hi) || !bubble1) {
       clr <- col.fill
       clr.stroke <- col.stroke
     }
-    else {
+    else {  # 1-D bubble plot can have a color gradient
       color.palette <- colorRampPalette(c(col.low, col.hi))
-      clr <- color.palette(nrow(mytbl))
+      clr <- color.palette(length(x.lvl))
+      #clr <- color.palette(nrow(mytbl))
       clr.stroke <- "gray70"
     }
 
-    # melt the table to a data frame
-    k <- 0
-    xx <- integer(length=0)
-    yy <- integer(length=0)
-    count <- integer(length=0)
-    for (i in 1:nrow(mytbl)) {
-      for (j in 1:ncol(mytbl)) {
-        if (mytbl[i,j] != 0) {  # 0 plots to a single pixel, so remove
-          k <- k + 1
-          count[k] <- mytbl[i,j]
-          xx[k] <- as.numeric(rownames(mytbl)[i])  # rownames are factors
-          yy[k] <- as.numeric(colnames(mytbl)[j])
+    if (is.null(size)) {  # no value for size specified, do counts
+      mytbl <- table(x, y)  # get the counts
+      if (prop) { 
+        count <- numeric(length=0)
+        if (!is.null(y.lvl))
+          mytbl <- prop.table(mytbl, 1)
+        else
+          mytbl <- mytbl/sum(mytbl)
+      }
+      else
+        count <- integer(length=0)
+
+      # melt the table to a data frame
+      k <- 0
+      xx <- integer(length=0)
+      yy <- integer(length=0)
+      for (i in 1:nrow(mytbl)) {
+        for (j in 1:ncol(mytbl)) {
+          if (mytbl[i,j] != 0) {  # 0 plots to a single pixel, so remove
+            k <- k + 1
+            count[k] <- mytbl[i,j]
+            xx[k] <- as.numeric(rownames(mytbl)[i])  # rownames are factors
+            yy[k] <- as.numeric(colnames(mytbl)[j])
+          }
         }
       }
-    }
-    cords <- data.frame(xx, yy, count)
+      if (prop) count <- round(count, 2)
+      cords <- data.frame(xx, yy, count)
 
-    c <- cords$count
-    if (object == "bubble")
-      symbols(as.numeric(cords$xx), as.numeric(cords$yy),
-            circles=c**bubble.power, inches=bubble.size,
+      if (object == "bubble") {
+        sz <- cords[,3]**bubble.power  # radius unscaled 
+        #symbols(as.numeric(cords$xx), as.numeric(cords$yy),
+        symbols(cords$xx, cords$yy,
+            circles=sz, inches=bubble.scale,
             bg=clr, fg=clr.stroke, add=TRUE, ...)
+        mxru <- max(sz)
+        sz <- 2 * (sz/mxru) * bubble.scale  # scaled diameter
+      }
 
-    else if (object == "sunflower") {
-      sunflowerplot(cords$xx, cords$yy, number=c, 
-        seg.col=col.stroke, col=col.fill, cex.axis=size.axis, col.axis=col.axis,
-        xlab=x.lab, ylab=y.lab, add=TRUE)
-  }
-
-    if (bubble.counts  &&  object == "bubble") { 
-      max.c <- max(c, na.rm=TRUE)  # bubble is too small for count
-      #min.bubble <- 0.25 * max.c  # radius, bubble.power=1
-      #min.bubble <- 0.10 * max.c  # bubble.power=.6
-      min.bubble <- (bubble.power/9) * max.c
-      for (i in 1:length(c))
-        if (!is.na(c[i])) if (c[i] <= min.bubble) c[i] <- NA
-      text(cords$xx, cords$yy, c, cex=size.txt)
+      else if (object == "sunflower") {
+        sunflowerplot(cords$xx, cords$yy, number=cords$count, 
+            seg.col=col.stroke, col=col.fill, cex.axis=size.axis,
+            col.axis=col.axis, xlab=x.lab, ylab=y.lab, add=TRUE)
+      }
     }
+
+    else {  # size is a variable  (unless size is constant and bubble specified)
+
+      cords <- data.frame(x, y, size)
+      cords <- na.omit(cords)
+      sz <- cords[,3]**bubble.power  # radius unscaled 
+      symbols(cords[,1], cords[,2], circles=sz,
+        inches=bubble.scale, bg=clr, fg=clr.stroke, add=TRUE, ...)  
+
+      mxru <- max(sz)
+      sz <- 2 * (sz/mxru) * bubble.scale  # scaled diameter
+    }
+
+    if (bubble.text  &&  object == "bubble") { 
+
+      # get q.ind before setting too small bubbles at NA
+      if (bubble.text > 1) { 
+        by.prob <- 1 / (bubble.text - 1)
+        bub.probs <- seq(0, 1, by.prob)
+        qnt <- quantile(cords[,3], probs=bub.probs, type=3, na.rm=TRUE)
+        qnt.TF <- logical(length(cords))
+        for (i in 1:nrow(cords))
+            qnt.TF[i] <- ifelse(cords[i,3] %in% qnt, TRUE, FALSE) 
+        q.ind <- which(qnt.TF)
+      }
+      else
+        q.ind <- 1:nrow(cords)  # all bubbles get text
+
+      # should get size of each bubble.text just for those displayed (q.ind)
+      sz.cex <- numeric(length=nrow(cords))
+      for (i in 1:nrow(cords)) {
+        sz.cex[i] <- cex.txt  # cex target for text size
+        sz.txt <- strwidth(cords[i,3], units="inches", cex=sz.cex[i])  # target for text size
+        while ((sz.txt - sz[i]) > -.03) {
+          if (sz.cex[i] > 0.45) {  # need cex larger than 0.45
+            sz.cex[i] <- sz.cex[i] - 0.05
+            sz.txt <- strwidth(cords[i,3], units="inches", cex=sz.cex[i])  # actual
+          }
+          else {
+            cords[i,3] <- NA
+            break;
+          }
+       }
+    }
+
+      if (!prop)
+        text(cords[q.ind,1], cords[q.ind,2], cords[q.ind,3], cex=sz.cex[q.ind])
+      else {
+        crd <- .fmt0(cords[,3],2)
+        for (j in 1:length(crd))
+          if (grepl("NA", crd[j], fixed=TRUE)) crd[j] <- " "
+        text(cords[,1], cords[,2], crd, cex=sz.cex)
+      }
+    }
+
   }  # end bubble/sunflower 
 
 
@@ -647,6 +739,15 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
         txsug <- ""
         if (getOption("suggest")  &&  i == 1) {
+
+          fc <- ""
+          if (!grepl("bubble.text", fncl)  &&  n.col == 1)
+            fc <- paste(fc, ", bubble.text=2", sep="")
+          if (nzchar(fc)) {
+            fc <- paste(fncl, fc, ") ", sep="")
+            txsug <- paste(">>> Suggest: ", fc, "\n")
+          }
+
           fc <- ""
           if (!grepl("ellipse", fncl)  &&  n.col == 1)
             fc <- paste(fc, ", ellipse=TRUE", sep="")
@@ -655,8 +756,9 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
             fncl <- sub("fit.line=TRUE", "fit.line=\"ls\"", fncl)
           if (nzchar(fc)) {
             fc <- paste(fncl, fc, ") ", sep="")
-            txsug <- paste(">>> Suggest: ", fc, "\n")
+            txsug <- paste(txsug,"\n>>> Suggest: ", fc, "\n")
           }
+
           fc <- ""
           if (!grepl("size", fncl)) fc <- paste(fc, ", size=3", sep="")
           if (!grepl("color.bg", fncl)) fc <- paste(fc, ", color.bg=\"off\"", sep="")
@@ -853,8 +955,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           fc <- paste(fc, ", color.trans=.8", sep="")
         if (!grepl("color.stroke", fncl))
           fc <- paste(fc, ", color.stroke=\"gray40\"", sep="")
-        if (!grepl("bubble.counts", fncl))
-          fc <- paste(fc, ", bubble.counts=FALSE", sep="")
+        if (!grepl("bubble.text", fncl))
+          fc <- paste(fc, ", bubble.text=FALSE", sep="")
         if (!grepl("color.bg", fncl))
           fc <- paste(fc, ", color.bg=\"off\"", sep="")
         if (!grepl("color.grid", fncl))
@@ -878,7 +980,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       else
         y.fac <- y
 
-      stats <- .ss.factor(x.fac, y.fac, brief=TRUE, digits.d=NULL,
+      stats <- .ss.factor(x.fac, y.fac, brief=FALSE, digits.d=NULL,
                           x.name, y.name, x.lbl, y.lbl)
 
       txttl <- stats$txttl
@@ -889,7 +991,14 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       class(txttl) <- "out_piece"
       class(txfrq) <- "out_piece"
       class(txXV) <- "out_piece"
-      output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq, out_XV=txXV)
+      if (!prop)
+        output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq,
+                       out_XV=txXV)
+      else {
+        txrow <- stats$txrow
+        class(txrow) <- "out_piece"
+        output <- list(out_title=txttl, out_text=txfrq, out_row=txrow, out_XV=txXV)   }
+
       class(output) <- "out_all"
       print(output)
     }

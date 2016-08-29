@@ -500,32 +500,34 @@ function(topic=NULL) {
 
 
   else if  (topic %in% c("scatterplot", "sp", "plot", "scatter")) {
-  t0 <- "Scatterplot"
+  t0 <- "Plot"
 
-  f1 <- bquote(paste(bold("ScatterPlot, sp"), "  A scatterplot for one or two variables"))
+  f1 <- bquote(paste(bold("Plot, sp"), "  A scatterplot, etc. for one or two variables"))
 
   t1 <- "
-  ScatterPlot, or sp, generates a scatter plot for one or two variables with
-  the current color theme,  with an optional 0.95 data ellipse. The points
-  have a default transparency, which can be set from transparent to oblique.
-      > ScatterPlot(X, Y, ellipse=TRUE)
-  If the values of X are sorted, a function plot results so that the points
-  are not individually displayed and are connected by line segments. If the
-  number of response values is less than 10, a bubble plot is produced.
+  Plot, or sp, generates a scatter plot for one or more variables with
+  the current color theme, with an optional 0.95 data ellipse and fit line.
+  The points have a default transparency, which can be modified.
+      > Plot(X, Y, ellipse=TRUE, fit.line=TRUE)
+  For sorted values of X, a function plot results so that the points are
+  not individually displayed and are connected by line segments. If the
+  number of unique response values <= n.cat=8, produce a bubble plot.
 
-  Here generate a one-dimensional scatterplot, that is, a dot plot. 
-      > ScatterPlot(Y)
-
-  ScatterPlot can also provide for plotting two variables with different
+  Plot can also provide for plotting two variables with different
   symbols and/or colors for each level of a third variable.
-      > ScatterPlot(X, Y, by=Z)
-  to better display multiple replications of the same point.
+      > Plot(X, Y, by=Z)
+  For a continuous third variable, produce a bubble plot,
+      > Plot(X, Y, size=Z)
 
-  The colors option specifies color themes, from a call to ScatterPlot
-  or system wide for all graphics output with the function: theme. Here all
-  subsequent graphics are with the sienna color theme, no transparency.
+  Here plot Salary against 3 variables, with 3 least squares fit lines.
+      > Plot(Salary, c(Pre, Post, Years), fit.line=\"ls\")
+  Here plot the means of Salary for each Dept.
+      > Plot(Dept, Salary, topic=\"mean\")
+
+  The colors option specifies color themes. Here all subsequent
+  graphics are with the sienna color theme, no transparency.
       > theme(colors=\"sienna\", trans.fill.pt=0)
-      > ScatterPlot(X, Y)"
+      > Plot(X, Y)"
 
   set.up.plot(1)
   text(50,100, label=t0, font=4)
@@ -533,7 +535,7 @@ function(topic=NULL) {
   #lines(c(5,90), c(90,90), col=col.line)
   text(0,50, label=t1, adj=0)
 
-  help.more("Plot", 8)
+  help.more("Plot", 7)
   }
 
 
@@ -725,21 +727,16 @@ function(topic=NULL) {
   t0 <- "Correlation and Related Graphics"
 
   f1 <- bquote(paste(bold("Correlation, cr"), "  Correlations between two or more variables"))
-  f3 <- bquote(paste(bold("ScatterPlot, sp"), "  Graphics, generate a scatterplot for two or more variables"))
+  f3 <- bquote(paste(bold("Plot, sp"), "  Graphics, generate a scatterplot for two or more variables"))
 
   t1 <- "
-  The lessR function Correlation, or cr, can compute a correlation for two
-  variables. Or for a data frame, mydata by default, the correlation matrix
-  is computed, with pairwise deletion of missing data by default. A heat map
-  and scatter plot matrix can also be generated with  graphics=TRUE. The
-  matrix is displayed and also is stored as mycor such as for a subsequent
-  factor analysis. Set the method option to \"spearman\" or \"kendall\" to get
-  these correlations.
+  The lessR function Correlation, or cr, computes a correlation for two
+  variables, or from a data frame, mydata by default, the correlation matrix
+  with default pairwise deletion of missing data. A heat map and scatter plot
+  matrix follow from graphics=TRUE. The matrix is displayed and also is
+  stored as mycor such as for a subsequent factor analysis. Set the method
+  option to \"spearman\" or \"kendall\" to get these correlations.
 
-  The lessR function, ScatterPlot, or just sp, displays a scatterplot for two
-  variables or a scatterplot matrix for a data frame. The corresponding
-  correlation or correlation matrix is also displayed. See Help(ScatterPlot)
-  for more information.
       > mycor <- Correlation(X,Y)
   The brief form for the correlation analysis for two variables also exists.
       > mycor <- cr.brief(X,Y)
@@ -747,6 +744,11 @@ function(topic=NULL) {
   Or, analyze many correlations at once, such as for Y, X1, X2 and X3 in 
   the data frame called mydata.
       > mycor <- Correlation(c(Y,X1:X3))
+
+  The lessR function, Plot, or just sp, displays a scatterplot for two
+  variables or a scatterplot matrix for a data frame. The corresponding
+  correlation or correlation matrix is also displayed. See Help(ScatterPlot)
+  for more information.
 
   "
 

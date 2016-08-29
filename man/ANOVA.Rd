@@ -29,7 +29,8 @@ av.brief(\ldots, brief=TRUE)
   \item{my.formula}{Standard R \code{\link{formula}} for specifying a model.}
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
-  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
+  \item{brief}{If set to \code{TRUE}, reduced text output with no Tukey multiple 
+       comparison of means and no residuals. Can change system default
        with \code{\link{theme}} function.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
@@ -56,14 +57,14 @@ av.brief(\ldots, brief=TRUE)
   \item{pdf.width}{Width of the pdf file in inches.}
   \item{pdf.height}{Height of the pdf file in inches.}
   \item{fun.call}{Function call. Used with \code{Rmd} to pass the function call when
-        obtained from the abbreviated function call \code{hs}.}
+        obtained from the abbreviated function call \code{av}.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 
 }
 
 
 \details{
 OVERVIEW\cr
-The one-way ANOVA with Tukey HSD and plot based on the R functions \code{\link{aov}}, \code{\link{TukeyHSD}}, and provides summary statistics for each level. Two-factor ANOVA also provides an interaction plot of the means with \code{\link{interaction.plot}} as well as a table of means and other summary statistics. The two-factor analysis can be between groups or a randomized blocked design. Residuals are displayed by default. Tukey HSD comparisons and residuals are not displayed if \code{brief=TRUE}.
+The one-way ANOVA with Tukey HSD and corresponding plot is based on the R functions \code{\link{aov}}, \code{\link{TukeyHSD}}, and provides summary statistics for each level. Two-factor ANOVA also provides an interaction plot of the means with \code{\link{interaction.plot}} as well as a table of means and other summary statistics. The two-factor analysis can be between groups or a randomized blocked design. Residuals are displayed by default. Tukey HSD comparisons and residuals are not displayed if \code{brief=TRUE}.
 
 MODEL SPECIFICATION\cr
 In the following specifications, Y is the response variable, X is a treatment variable and Blocks is the blocking variable. The distinction between the one-way randomized blocks and the two-way between groups models is not the variable names, but rather the delimiter between the variable names. Use \code{*} to indicate a two-way crossed between groups design and \code{+} for a randomized blocks design.\cr
@@ -81,7 +82,7 @@ The number of decimal digits displayed on the output is, by default, the maximum
 
 
 \value{
-The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3.5 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent R Markdown document. The motivation of these two types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the R markdown document (see \code{examples}).
+The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3.5 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent R Markdown document. The motivation of these two types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object followed by a $, can be inserted into the R markdown document (see \code{examples}).
 
 TEXT OUTPUT\cr
 \code{out_background}: variables in the model, rows of data and retained\cr
@@ -132,6 +133,8 @@ Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 7, NY: Routl
 
 # access the PlantGrowth data frame
 ANOVA(weight ~ group, data=PlantGrowth)
+#brief version
+av.brief(weight ~ group, data=PlantGrowth)
 
 # variables of interest in a data frame that is not the default mydata
 # two-factor between-groups ANOVA with replications and interaction

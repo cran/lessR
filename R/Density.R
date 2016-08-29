@@ -2,7 +2,7 @@ Density <-
 function(x, data=mydata, n.cat=getOption("n.cat"), 
 
     bw="nrd0", type=c("both", "general", "normal"),
-    bin.start=NULL, bin.width=NULL,
+    histogram=TRUE, bin.start=NULL, bin.width=NULL,
 
     Rmd=NULL, digits.d=NULL,
 
@@ -73,7 +73,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 
   if (clr == "gray" || clr == "gray.black") {
     color.fill.nrm <- "transparent"
-    color.fill.gen <- "transparent"
+    color.fill.gen <- rgb(.75,.75,.75, .5)
   }
 
 
@@ -155,7 +155,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
       else
         ttlns <- ""
  
-      stuff <- .dn.main(data[,i], bw, type, bin.start, bin.width, 
+      stuff <- .dn.main(data[,i], bw, type, histogram, bin.start, bin.width, 
             color.fill, color.bg, color.grid, color.box, color.nrm, color.gen,
             color.fill.nrm, color.fill.gen, 
             cex.axis, color.axis, rotate.values, offset, 
@@ -178,7 +178,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 
     }  # nu > n.cat
     else
-      .ncat("Density curve", x.name, nu, n.cat)
+      if (!quiet) .ncat("Density curve", x.name, nu, n.cat)
 
     }  # is.numeric(data[,i])
   }  # for
@@ -193,7 +193,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
       dig.dec <- .max.dd(data[,i]) + 1
       if (dig.dec == 1) dig.dec <- 2
     }
-    else dig.dec <- digits.d
+    else
+      dig.dec <- digits.d
     options(digits.d=dig.dec)
 
     txkfl <- ""

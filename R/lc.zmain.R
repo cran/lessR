@@ -9,7 +9,7 @@ function(y, type,
 
 
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.size=NULL, cex.axis)
+  adj <- .RSadj(bubble.scale=NULL, cex.axis)
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
 

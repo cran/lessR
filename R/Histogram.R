@@ -196,7 +196,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     }  # nu > n.cat
     else
-      .ncat("Histogram", x.name, nu, n.cat)
+      if (!quiet) .ncat("Histogram", x.name, nu, n.cat)
 
     }  # is.numeric(data[,i])
   }  # for

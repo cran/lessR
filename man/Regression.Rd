@@ -263,12 +263,12 @@ Xie, Y. (2013). Dynamic Documents with R and knitr, Chapman & Hall/CRC The R Ser
 }
 
 \examples{
-# Read internal data set
+# read internal data set
 mydata <- rd("Reading", format="lessR", quiet=TRUE)
 # do not need all this data, so take only 30% to reduce CPU time
 mydata <- Subset(random=.3)
 
-# One-predictor regression
+# one-predictor regression
 # Provide all default analyses including scatterplot etc.
 Regression(Reading ~ Verbal)
 # short name of function call
@@ -305,6 +305,10 @@ Regression(Reading ~ Verbal + Absent + Income, pdf=TRUE,
 # Reduced model:  Reading ~ Verbal
 # Full model:  Reading ~ Verbal + Income + Absent
 Nest(Reading, Verbal, c(Income, Absent))
+
+# Indicator variable
+mydata <- rd("Employee", format="lessR", quiet=TRUE)
+reg(Salary ~ Gender)
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values and the corresponding prediction intervals

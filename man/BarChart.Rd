@@ -75,7 +75,7 @@ bc(\ldots)
        variables are plotted and beside=\code{TRUE}, in which case the default is
        c(.1,1).}
   \item{proportion}{Display proportions instead raw frequencies. For two-variable plots,
-        display the column proportions.}
+        display the column proportions, that is, a proportional stacked bar graph.}
   \item{xlab}{Label for x-axis, more generally the label for the values which could
        be on the vertical axis for a two variable plot if \code{horiz=TRUE}. Defaults
        to variable name.}
@@ -256,7 +256,8 @@ BarChart(Pain, horiz=TRUE)
 BarChart(Pain, by=Gender)
 
 # at each level of Pain, show the row proportions of the Gender levels
-BarChart(Pain, Gender, proportion=TRUE)
+#   i.e., proportional stacked bar graph
+BarChart(Pain, by=Gender, proportion=TRUE)
 
 # at each level of Gender, show the frequencies of the Pain levels
 # Pain levels are ordered, so the corresponding colors are also ordered 
@@ -296,7 +297,7 @@ BarChart()
 
 # specify a list of variables
 mydata <- Read("Employee", format="lessR", quiet=TRUE)
-BarChart(c(Dept, Gender))
+BarChart(c(Dept, by=Gender))
 
 
 # ----------------------------
@@ -307,7 +308,7 @@ BarChart(c(Dept, Gender))
 X1 <- sample(1:4, size=100, replace=TRUE)
 X2 <- sample(1:4, size=100, replace=TRUE)
 BarChart(X1)
-BarChart(X1,X2)
+BarChart(X1, by=X2)
 
 # generate and enter type double data
 X1 <- sample(c(1,2,3,4), size=100, replace=TRUE)

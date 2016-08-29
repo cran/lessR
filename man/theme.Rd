@@ -56,7 +56,7 @@ set(\ldots)
        and transparency for the bars. Overrides individual settings for
        those values. Setting to \code{FALSE} has no effect.}
   \item{n.cat}{Number of categories that specifies the largest number of unique
-        equall-spaced values of variable of a numeric data type for which the
+        equally-spaced values of variable of a numeric data type for which the
         variable will be analyzed as categorical. Applies to
         \code{\link{ScatterPlot}} and 
         \code{\link{SummaryStats}}, and also to the functions such as 

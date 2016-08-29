@@ -328,8 +328,7 @@ function(x, y=NULL, ...) {
 
     # Cleveland two-variable dot plot
     .plt.main(x.call, y.call,
-       shape=21, size=.8, ylab="",
-       segments.y=TRUE, quiet=TRUE)
+       shape=21, size=.8, ylab="", segments.y=TRUE, quiet=TRUE)
 
     if (!is.null(pdf.file)) {
       dev.off()

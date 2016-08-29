@@ -30,9 +30,6 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else
     colors <- match.arg(colors)
 
-  if (missing(color.stroke))  # default black border unless dark bg
-    if (sum(col2rgb(color.bg))/3 > 80) color.stroke <- "black"
-
   if (!is.null(color.fill)) {
     for (i in 1:length(color.fill))
       if (color.fill[i] == "off") color.fill[i] <- "transparent"
@@ -42,6 +39,9 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (color.bg == "off") color.bg <- "transparent"
   if (color.grid == "off" ) color.grid <- "transparent"
   if (color.box == "off") color.box <- "transparent"
+
+  if (missing(color.stroke))  # default black border unless dark bg
+    if (sum(col2rgb(color.bg))/3 > 80) color.stroke <- "black"
 
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")

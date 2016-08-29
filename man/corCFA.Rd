@@ -8,7 +8,7 @@
 \description{
 Abbreviation: \code{cfa}
 
-A multiple indicator measurement model partitions a set of indicators, such as items on a survey, into mutually exclusive groups with one common factor per group of indicators. From the input correlation matrix of the indicator variables, this procedure uses iterated centroid estimation to estimate the coefficients of the model, the factor pattern and factor-factor correlations, as well as the correlations of each factor with each indicator. The analysis is adapted from John Hunter's program PACKAGE (Hunter and Cohen, 1969).
+A multiple indicator measurement model partitions a set of indicators, such as items on a survey, into mutually exclusive groups with one common factor per group of indicators. From the input correlation matrix of the indicator variables, this procedure uses iterated centroid estimation to estimate the coefficients of the model, the factor pattern and factor-factor correlations, as well as the correlations of each factor with each indicator. The analysis is an adaptation and extension of John Hunter's program PACKAGE (Hunter and Cohen, 1969).
 
 Corresponding scale reliabilities are provided, as well as the residuals, the difference between the indicator correlations and those predicted by the model.  To visualize the relationships, a heat map of the re-ordered correlation matrix is also provided, with indicator communalities in the diagonal. To understand the meaning of each factor, the corresponding indicator content is displayed for each factor if the indicators have been read as variable labels. Also provides the code to obtain the maximum likelihood solution of the corresponding multiple indicator measurement model (MIMM) with the \code{cfa} function from the \code{lavaan} package.
 
@@ -277,6 +277,8 @@ cfa(MeasModel)
 % R documentation directory.
 \keyword{ correlation }
 \keyword{ factor analysis }
+
+
 
 
 

@@ -6,18 +6,18 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.4.8      feedback: gerbing@pdx.edu      web: lessRstats.com\n",
+      "lessR 3.5.0      feedback: gerbing@pdx.edu      web: lessRstats.com\n",
       "-------------------------------------------------------------------\n",
       "1. Read a text, Excel, SPSS, SAS or R data file from your computer\n",
-      "   into the mydata data table:  mydata <- Read()  \n",
+      "   into the mydata data table, enter:  mydata <- Read()  \n",
       "2. For a list of help topics and functions, enter:  Help()\n",
       "3. Use theme function for global settings, Ex: theme(colors=\"gray\")\n")
 
   options(colors="dodgerblue")
   options(trans.fill.bar=0.25)
   options(trans.fill.pt=0.50)
-  options(color.fill.bar = "#1874CCBF")  # .maketrans of dodgerblue3"  trans=.25
-  options(color.fill.pt = "#1874CC80")  # .maketrans of "dodgerblue3"  trans=.50
+  options(color.fill.bar="#1874CCBF")  # .maketrans of dodgerblue3"  trans=.25
+  options(color.fill.pt="#1874CC80")  # .maketrans of "dodgerblue3"  trans=.50
   options(color.stroke.bar="steelblue4")
   options(color.stroke.pt="steelblue4")
   options(color.bg="#F2F4F5")  # rgb(242, 244, 245)
@@ -26,8 +26,8 @@ function(...) {
   options(color.ghost=FALSE)
   options(color.heat="dodgerblue4")
 
-  options(col.fill.bar = "#1874CCBF")  # .maketrans of dodgerblue3"  trans=.25
-  options(col.fill.pt = "#1874CC80")  # .maketrans of "dodgerblue3"  trans=.50
+  options(col.fill.bar="#1874CCBF")  # .maketrans of dodgerblue3"  trans=.25
+  options(col.fill.pt="#1874CC80")  # .maketrans of "dodgerblue3"  trans=.50
   options(col.stroke.bar="steelblue4")
   options(col.stroke.pt="steelblue4")
   options(col.bg="#F2F4F5")  # rgb(242, 244, 245)
@@ -81,6 +81,33 @@ function(...) {
 }
 
 
+.fmt <- function(k, d=getOption("digits.d"), w=0) {
+  format(sprintf("%.*f", d, k), width=w, justify="right", scientific=FALSE)
+}
+
+
+.fmt0 <- function(k, d=getOption("digits.d"), w=0) {
+  a <- format(sprintf("%.*f", d, k), width=w, justify="right", scientific=FALSE)
+  a <- substr(a,2,nchar(a))
+  return(a)
+}
+
+
+.fmti <- function(k, w=0) {
+  format(sprintf("%i", k), width=w, justify="right")
+}
+
+
+.fmtc <- function(k, w=0, j="right") {
+  format(sprintf("%s", k), width=w, justify=j)
+}
+
+
+.fmtNS <- function(k) {
+  format(k, scientific=FALSE )
+}
+
+
 .dash <- function(ndash, cc, newline=TRUE) {
   if (missing(cc)) cc <- "-" 
   for (i in 1:(ndash)) cat(cc)
@@ -126,26 +153,6 @@ function(...) {
   tx[length(tx)+1] <- .dash2(mxttl)
 
   return(tx)
-}
-
-
-.fmt <- function(k, d=getOption("digits.d"), w=0) {
-  format(sprintf("%.*f", d, k), width=w, justify="right", scientific=FALSE)
-}
-
-
-.fmti <- function(k, w=0) {
-  format(sprintf("%i", k), width=w, justify="right")
-}
-
-
-.fmtc <- function(k, w=0, j="right") {
-  format(sprintf("%s", k), width=w, justify=j)
-}
-
-
-.fmtNS <- function(k) {
-  format(k, scientific=FALSE )
 }
 
 
@@ -407,7 +414,11 @@ function(...) {
 .getlabels <- function(xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
                        cex.lab=NULL, ...) {
 
-  cutoff <- 0.76
+  cutoff <- 0.70
+  if (options("device") == "RStudioGD") {
+    if (!is.null(cex.lab)) cex.lab <- cex.lab-0.1  
+    cutoff <- 0.52
+  }
 
   x.name <- getOption("xname")
   y.name <- getOption("yname")
@@ -722,7 +733,7 @@ function(...) {
 
 # axis labels
 .axlabs <- function(x.lab, y.lab, main.lab, sub.lab, max.lbl.y,
-                    xy.ticks=TRUE, offset=0.5, ...) {
+                    xy.ticks=TRUE, offset=0.5, main.cex=1, ...) {
 
   lbl.lns <- ifelse(xy.ticks, 3, 1)
 
@@ -743,21 +754,21 @@ function(...) {
   title(xlab=x.lab, line=lblx.lns, ...)
   title(sub=sub.lab, line=lblx.lns+1, cex.sub=0.76, ...)
   title(ylab=y.lab, line=lbly.lns, ...)
-  title(main=main.lab, ...)
+  title(main=main.lab, cex.main=main.cex, ...)
 
 }
 
 
-.RSadj <- function(bubble.size=0.25, cex.axis) {
+.RSadj <- function(bubble.scale=0.25, cex.axis) {
 
   # scale for regular R or RStudio
-  if (options("device") == "RStudioGD") bubble.size <- bubble.size*1.5
+  if (options("device") == "RStudioGD") bubble.scale <- bubble.scale*1.5
   size.axis <- ifelse (options("device") != "RStudioGD", cex.axis, cex.axis*1.118)
   sz.lab <- getOption("lab.size")
   size.lab <- ifelse (options("device") != "RStudioGD", sz.lab, sz.lab*1.119)
   size.txt <- ifelse (options("device") != "RStudioGD", 0.7, 0.8)
 
-  return(list(bubble.size=bubble.size, size.axis=size.axis, size.lab=size.lab,
+  return(list(bubble.scale=bubble.scale, size.axis=size.axis, size.lab=size.lab,
               size.txt=size.txt))
 
 }
@@ -853,7 +864,7 @@ function(...) {
 .opendev <- function(pdf.fnm, pdf.width, pdf.height) {
 
   if (is.null(pdf.fnm)) {
-    if (options("device") != "RStudioGD"  &&  is.null(options()$knitr.in.progress)) {
+    if (options("device") != "RStudioGD" && is.null(options()$knitr.in.progress)) {
       .graphwin(1)
       orig.params <- par(no.readonly=TRUE)
       on.exit(par(orig.params))
@@ -950,6 +961,7 @@ function(...) {
 .col.discrete <- function(bright=FALSE) {
 
   # based on rainbow_hcl(24,c=40,l=70) from colorspace
+  # 92ADD6 is rgb 146,173,214, a kind of medium steel blue
   if (!bright)
     clr <- c("#92ADD6", "#D59E93", "#7FB88B", "#BDAA78", "#D09AC8",
              "#64B8C1", "#C19FD3", "#D899B8")
@@ -964,7 +976,7 @@ function(...) {
 
 
 # for BarChart 1-var and PieChart for an ordered factor
-.ordcolors <- function(colors, col.low, col.hi) {
+.ordcolors <- function(colors, col.low=NULL, col.hi=NULL) {
 
     if (colors == "dodgerblue") { 
       if (is.null(col.low)) col.low <- rgb(.765,.824,.886)

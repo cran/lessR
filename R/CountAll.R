@@ -1,6 +1,5 @@
 CountAll <-
-function(x=mydata, ...)  {
-
+function(x=mydata, quiet=FALSE, ...)  {
 
   dname <- deparse(substitute(x))
   options(dname = dname)
@@ -12,21 +11,27 @@ function(x=mydata, ...)  {
       "or data frame  mydata  must exist.\n\n")
     }
     
-  cat("\n")
-  .dash(25,"-")
-  cat(format(Sys.time(), "%a %b %d, %Y at %H:%M"), "\n")
-  .dash(25,"-")
+  if (!quiet) {
+    cat("\n")
+    .dash(25,"-")
+    cat(format(Sys.time(), "%a %b %d, %Y at %H:%M"), "\n")
+    .dash(25,"-")
+  }
 
-  cat("\n\n\n")
-  .dash(37,"+")
-  cat("Histogram for Each Numeric Variable\n")
-  .dash(37,"+")
-  Histogram(data=x, ...)
+  if (!quiet) {
+    cat("\n\n\n")
+    .dash(37,"+")
+    cat("Histogram for Each Numeric Variable\n")
+    .dash(37,"+")
+  }
+  Histogram(data=x, quiet=quiet, ...)
   
-  cat("\n\n\n")
-  .dash(39,"+")
-  cat("Bar Chart for Each Non-numeric Variable\n")
-  .dash(39,"+")
-  BarChart(data=x, ...)
+  if (!quiet) {
+    cat("\n\n\n")
+    .dash(39,"+")
+    cat("Bar Chart for Each Non-numeric Variable\n")
+    .dash(39,"+")
+  }
+  BarChart(data=x, quiet=quiet, ...)
   
 }

@@ -4,7 +4,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
          horiz, add.points, xlab, main, sub, digits.d, quiet, ...) {      
 
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.size=NULL, cex.axis)
+  adj <- .RSadj(bubble.scale=NULL, cex.axis)
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
 

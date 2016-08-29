@@ -10,7 +10,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   }
 
   cat("Compare", Ynm, "across", Xnm, "levels", X1nm, "and", X2nm, "\n")
-  cat("------------------------------------------------------------\n\n")
+  cat("--------------------------------------------------------------\n\n")
 
   # get variable labels if exist
   options(xname = Xnm)
@@ -399,6 +399,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
               clpct, tvalue, pvalue, ub, lb, show.title)
               #clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title)
+
+    cat("--------------------------------------------------------------\n")
 
     if (!is.null(pdf.file)) {
       dev.off()

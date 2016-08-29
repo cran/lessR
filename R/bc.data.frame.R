@@ -41,12 +41,9 @@ function(x, n.cat,
           dev.off()
           if (!quiet) .showfile(pdf.file, "bar chart")
 
-        if (.is.integer(x[,i]) && nu <= n.cat)
-          cat(">>> Variable is integer, but only has", nu, "<= n.cat =", n.cat, "levels,",
-              "so treat as a categorical variable.\n",
-              "   To obtain the numeric summary, decrease  n.cat  to specify a",
-              "lower number of unique values.\n",
-              "   Can make this variable a factor with the R factor function.\n")
+        if (.is.integer(x[,i]) && nu <= n.cat && !quiet)
+          .ncat("bar chart", x.name, nu, n.cat)
+
         }
       }
 
@@ -56,7 +53,7 @@ function(x, n.cat,
     #else cat("\n", "--- ", names(x)[i], " --- is numerical, better to do a ",
              #"histogram\n\n", sep="")
 
-  }
+  }  # each column in x
 
     options(suggest = sug)
 }

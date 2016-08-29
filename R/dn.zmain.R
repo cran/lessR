@@ -1,14 +1,16 @@
 .dn.main <- 
 function(x, 
-         bw, type, bin.start, bin.width,
+         bw="nrd0", type="both",
+         histogram=TRUE, bin.start=NULL, bin.width=NULL,
          col.fill, col.bg, col.grid, col.box, col.nrm, col.gen,
          col.fill.nrm, col.fill.gen,
-         cex.axis, col.axis, rotate.values, offset, 
-         x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)  {
+         cex.axis=0.75, col.axis="gray30", rotate.values=0, offset=0.5, 
+         x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, x.min=NULL, x.max=NULL,
+         band=FALSE, quiet, ...)  {
 
 
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.size=NULL, cex.axis)
+  adj <- .RSadj(bubble.scale=NULL, cex.axis)
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
 
@@ -31,7 +33,7 @@ function(x,
   if (!is.null(bin.width)  || !is.null(bin.start)) {
     if (is.null(bin.start)) bin.start <- pretty(min(x):max(x))[1]
     if (is.null(bin.width)) {
-      h <- hist(x, plot=FALSE, breaks="Sturges")
+      h <- histogram(x, plot=FALSE, breaks="Sturges")
       bin.width <- h$breaks[2]-h$breaks[1]
     }
     max.x <- max(x, na.rm = TRUE)
@@ -112,7 +114,8 @@ function(x,
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
   
   # plot the histogram
-  plot(h, add=TRUE, freq=FALSE, col=col.fill, border="transparent")
+  if (histogram)
+    plot(h, add=TRUE, freq=FALSE, col=col.fill, border="transparent")
 
   # plot the normal curve
   if (type == "normal" || type == "both") {
@@ -123,7 +126,7 @@ function(x,
 
   # plot the general curve
   if (type == "general" || type == "both") {
-    if (col.fill.gen == "transparent") lw <- 1.35 else lw <- 1
+    lw <- ifelse (col.fill.gen == "transparent", 1.35, 1)
     polygon(d.gen, col=col.fill.gen, border=col.gen, lwd=lw)
   }
 

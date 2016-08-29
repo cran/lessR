@@ -136,7 +136,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
     }  # nu > n.cat
     else
-      .ncat("Line Chart", x.name, nu, n.cat)
+      if (!quiet) .ncat("Line Chart", x.name, nu, n.cat)
 
     }  # is.numeric(data[,i])
   }  # for

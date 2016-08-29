@@ -199,8 +199,6 @@ mydata <- rd("Employee", format="lessR", quiet=TRUE)
 
 # box plot with superimposed dot plot (stripchart)
 BoxPlot(Salary, add.points=TRUE)
-# abbreviation
-bx(Salary)
 
 # box plot with results saved to object b instead of displaying 
 b <- BoxPlot(Salary)
