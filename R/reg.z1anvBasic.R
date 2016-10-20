@@ -33,7 +33,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
    }
 
   # width of data columns
-  max.ln <- integer(length=0)
+  max.ln <- integer(length=4)
   for (i in 1:4) {
     ln.nm <- nchar(colnames(smc)[i])
     max.ln[i] <- ln.nm + 1

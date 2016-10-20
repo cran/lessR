@@ -1,23 +1,10 @@
 .dp.main <- 
 function(x, by, size,
          col.fill, col.stroke, col.bg, col.grid, col.trans,
-         shape.pts, cex.axis, col.axis, xlab, main, sub, cex,
+         shape.pts, cex.axis, col.axis, xlab, main, sub,
          rotate.values, offset, method, pt.reg, pt.out, 
-         col.out30, col.out15, quiet, new, ...) {
+         col.out30, col.out15, quiet, new, fun.call=NULL, ...) {
 
-
-  # scale for regular R or RStudio
-  adj <- .RSadj(cex.axis=cex.axis)
-  size.axis <- adj$size.axis
-  size.lab <- adj$size.lab
-
-  if (is.null(cex)) {
-    sz <- ifelse (.Platform$OS == "windows", 1, 0.80)
-    sz.pt <- ifelse (is.null(size), sz, size)
-    size.pt <- ifelse (is.null(size), sz.pt, size)
-    if (options("device") == "RStudioGD")
-      size.pt <- ifelse (.Platform$OS == "windows", size.pt*1.45, size.pt*1.13)
-  }
 
   if (is.factor(x)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -48,15 +35,32 @@ function(x, by, size,
   col.lab <- stuff$col.lab
   col.sub <- stuff$col.sub
   cex.main <- stuff$cex.main
-
+  
+  # scale for regular R or RStudio
+  adj <- .RSadj(cex.axis=cex.axis)
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
+  
   # get variable labels if exist plus axes labels
-  gl <- .getlabels(xlab, main=main, cex.lab=getOption("lab.size"))
+  gl <- .getlabels(xlab, main=main, cex.lab=size.lab)
   x.name <- gl$xn; x.lbl <- gl$xl
   x.lab <- gl$xb
   main.lab <- gl$mb
   sub.lab <- gl$sb
-  cex.lab <- gl$cex.lab
+  size.lab <- gl$cex.lab
   by.name <- getOption("byname")
+
+  # size of points, a little larger than from .plt.zmain
+  if (is.null(size)) {
+    sz <- ifelse (.Platform$OS == "windows", 1.20, 0.90)
+    if (options("device") == "RStudioGD")
+      size.pt <- ifelse (.Platform$OS == "windows", sz*1.05, sz*1.13)
+    else
+      size.pt <- sz
+  }
+  else
+    size.pt <- size
+
 
   # text output (before remove missing)
   if (!quiet && new) .ss.numeric(x, brief=TRUE)
@@ -88,14 +92,14 @@ function(x, by, size,
 
     # axis, axis ticks
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
-          par("usr")[1], par("usr")[3], cex.axis, col.axis,
+          par("usr")[1], par("usr")[3], cex.axis=size.axis, col.axis,
           rotate.values, offset, ...)
 
     # axis labels
     y.lab <- ""
     max.lbl <- max(nchar(axTicks(2)))
     .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=cex.lab, ...) 
+          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
     
     # colored background for plotting area
     usr <- par("usr")
@@ -114,16 +118,15 @@ function(x, by, size,
   up15 <- q3 + 1.5*IQR(x)
   up30 <- q3 + 3.0*IQR(x)
   stripchart(x[x<lo30], add=TRUE, method=method,
-             col=col.out30, bg=col.out30, pch=pt.out30, cex=size, ...)
+             col=col.out30, bg=col.out30, pch=pt.out30, cex=size.pt, ...)
   stripchart(x[x<lo15], add=TRUE, method=method,
-             col=col.out15, bg=col.out15, pch=pt.out15, cex=size, ...)
+             col=col.out15, bg=col.out15, pch=pt.out15, cex=size.pt, ...)
   stripchart(x[x>up15], add=TRUE, method=method,
-             col=col.out15, bg=col.out15, pch=pt.out15, cex=size, ...)
+             col=col.out15, bg=col.out15, pch=pt.out15, cex=size.pt, ...)
   stripchart(x[x>up30], add=TRUE, method=method,
-             col=col.out30, bg=col.out30, pch=pt.out30, cex=size, ...)
+             col=col.out30, bg=col.out30, pch=pt.out30, cex=size.pt, ...)
 
   # dp for regular points
-
 
   if (is.null(by)) {
     # see if trans is customized for this analysis
@@ -134,7 +137,7 @@ function(x, by, size,
     #trans.pts <- getOption("trans.fill.pt")
     #clr.trn <- .maketrans(col.fill, (1-trans.pts)*256)
     stripchart(x[x>lo15 & x<up15], add=TRUE, method=method,
-                     col=col.stroke, pch=pt.reg, bg=col.fill, cex=size, ...)
+                     col=col.stroke, pch=pt.reg, bg=col.fill, cex=size.pt, ...)
   }
 
   else {  # by grouping variable
@@ -168,20 +171,52 @@ function(x, by, size,
 
   }  # end by group
 
-      txss <- ""
-      if (!quiet) {
-        digits.d <- NULL
-        ssstuff <- .ss.numeric(x, digits.d=digits.d, brief=TRUE)
-        txss <- ssstuff$tx
+  
+  if (getOption("suggest")) {
+    # function call for suggestions
+    fncl <- .fun.call.deparse(fun.call) 
+    fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
+    fncl <- gsub(" = ", "=", fncl)
+  }
 
-        txotl <- .outliers(x)
-        if (length(txotl)==0) txotl <- "No outliers"
+  txsug <- ""
+  if (getOption("suggest")) {
 
-        class(txss) <- "out_piece"
-        class(txotl) <- "out_piece"
-        output <- list(out_ss=txss, out_outliers=txotl)
-        class(output) <- "out_all"
-        print(output)
-      }
+    fc <- ""
+    if (!grepl("size", fncl))
+      fc <- paste(fc, ", size=2", sep="")
+    if (nzchar(fc)) {
+      fc <- paste(fncl, fc, ") ", sep="")
+      txsug <- paste(">>> Suggest: ", fc, "\n")
+    }
+  
+    fc <- paste("Boxplot(", x.name, ", add.points=TRUE", sep="")
+    if (nzchar(fc)) {
+      fc <- paste(fc, ") ", sep="")
+      txsug <- paste(txsug,"\n>>> Suggest: ", fc, "\n")
+    }
+  }
+
+  txss <- ""
+  if (!quiet) {
+    digits.d <- NULL
+    ssstuff <- .ss.numeric(x, digits.d=digits.d, brief=TRUE)
+    txss <- ssstuff$tx
+
+    txotl <- .outliers(x)
+    if (length(txotl)==0) txotl <- "No outliers"
+
+    class(txsug) <- "out_piece"
+    class(txss) <- "out_piece"
+    class(txotl) <- "out_piece"
+    
+    if (nzchar(txsug))
+      output <- list(out_suggest=txsug, out_ss=txss, out_outliers=txotl)
+    else
+      output <- list(out_ss=txss, out_outliers=txotl)
+    
+    class(output) <- "out_all"
+    print(output)
+  }
 
 }

@@ -42,7 +42,7 @@ function(y, type,
   # count and remove missing data
   n <- sum(!is.na(y))
   n.miss <- sum(is.na(y))
-  y <- na.omit(y)
+  if (!is.ts(y)) y <- na.omit(y)
 
   x <- numeric(length = 0)
   if (time.reverse) {  # use x as a temporary place holder
@@ -50,26 +50,30 @@ function(y, type,
     y <- x
   }
 
-  if (is.null(time.start) && class(y) != "ts") {
+  if (is.null(time.start) && !is.ts(y)) {
     x.lab <- ifelse (is.null(xlab), "index", xlab)
     x <- 1:length(y)  # ordinal position of each value on x-axis
   }
   else   {  # time.start date specified or a ts
     x.lab <- ifelse (is.null(xlab), "", xlab)      
-    if (class(y) == "ts") {
-      time.start <- paste(start(y)[1], "/", start(y)[2], "/01", sep="") 
-      frq <- frequency(y)
-      if (frq == 1) time.by <- "year"
-      if (frq == 4) time.by <- "3 months"
-      if (frq == 12) time.by <- "month"
-      if (frq == 52) time.by <- "week"
-      if (frq == 365) time.by <- "year"
+    if (is.ts(y)) {
+		  x <- ts.dates(y)
+      # time.start <- paste(start(y)[1], "/", start(y)[2], "/01", sep="") 
+      # frq <- frequency(y)
+      # if (frq == 1) time.by <- "year"
+      # if (frq == 4) time.by <- "3 months"
+      # if (frq == 12) time.by <- "month"
+      # if (frq == 52) time.by <- "week"
+      # if (frq == 365) time.by <- "year"
     }
-    date.seq <- seq.Date(as.Date(time.start), by=time.by, length.out=nrows)
-    x <- date.seq  # dates on x-axis
+		else {
+			date.seq <- seq.Date(as.Date(time.start), by=time.by, length.out=nrows)
+			x <- date.seq  # dates on x-axis
+		}
   }
 
-  if (center.line == "default") {  # by default display center.line only if many runs
+	# by default display center.line only if  runs
+  if (center.line == "default"  &&  !is.ts(y)) {
     m <- mean(y, na.rm=TRUE)
     n.change <- 0
     for (i in 1:(length(y)-1)) if ((y[i+1]>m) != (y[i]>m)) n.change <- n.change+1 
@@ -77,10 +81,10 @@ function(y, type,
   }
 
   # fill ts chart 
-  #if (!is.null(time.start) && is.null(col.area))
-    #col.area <- getOption("col.fill.bar")
+  #if (!is.null(time.start) && is.null(color.area))
+    #col.area <- getOption("color.fill.bar")
 
-  if (is.null(type)) 
+  if (is.null(type))
     if (is.null(col.area) || col.area == "transparent") type <- "b" 
     else type <- "l"
 
@@ -103,7 +107,7 @@ function(y, type,
   plot(x, y, type="n", axes=FALSE, ann=FALSE, ...)
 
   if (xy.ticks){
-    if (is.null(time.start) && class(x)!="ts") 
+    if (is.null(time.start) && !is.ts(x)) 
      .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
         par("usr")[1], par("usr")[3], size.axis, col.axis,
         rotate.values, offset, ...)
@@ -172,8 +176,10 @@ function(y, type,
       lbl.cat <- "median:"
     }
 
-    abline(h=m.y, col="gray50", lty="dashed")
-    mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
+    if (!is.ts(y)) {
+		  abline(h=m.y, col="gray50", lty="dashed")
+      mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
+		}
     if (center.line == "zero") m.y <- median(y) 
 
     gl <- .getlabels()
@@ -189,7 +195,7 @@ function(y, type,
 
 
     # analyze runs
-    if (!quiet) {
+    if (!quiet  &&  !is.ts(y)) {
       cat("\n")
       cat("n:", n, "\n")
       cat("missing:", n.miss, "\n")

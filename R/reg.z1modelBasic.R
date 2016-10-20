@@ -40,7 +40,7 @@ function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE) {
     if (lng.lbl > buf) buf <- lng.lbl 
    }
 
-  max.num <- integer(length=0)
+  max.num <- integer(length=6)
   for (icol in 1:6) {
     max.num[icol] <- 0 
     for (i in 1:n.vars) {

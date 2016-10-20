@@ -71,7 +71,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   n.pred <- n.vars - 1L
   n.obs <- nrow(data)
 
-  predictors <- character(length=0)
+  predictors <- character(length=n.pred)
   for (i in 2:n.vars) predictors[i-1] <- nm[i]
 
   for (i in 1:n.vars) .xcheck(nm[i], dname, data)  # do variables exist?

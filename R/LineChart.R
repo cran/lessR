@@ -64,9 +64,6 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
   pdf.nm <- FALSE
   if (!missing(pdf.file)) pdf.nm <- TRUE
 
-  if (!quiet && !show.runs)
-    cat("[To view the individual runs: show.runs=TRUE]\n")
-
 # -----------------------------------------------------------
 # establish if a data frame, if not then identify variable(s)
 
@@ -102,15 +99,23 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
 # ---------------
 # do the analysis
+  
+	if (!is.ts(data[,1])) {
+		if (!quiet && !show.runs)
+			cat("[To view the individual runs: show.runs=TRUE]\n")
+	}
 
   go.pdf <- FALSE
   if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
 
   for (i in 1:ncol(data)) {
     cat("\n")
-
-    nu <- length(unique(na.omit(data[,i])))
-
+		
+    if (!is.ts(data[,i]))
+		  nu <- length(unique(na.omit(data[,i])))
+		else {
+      nu <- length(unique(data[,i]))
+			
     x.name <- names(data)[i]
     options(xname = x.name)
 
@@ -140,5 +145,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
     }  # is.numeric(data[,i])
   }  # for
+
+}
 
 }

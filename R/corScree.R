@@ -30,9 +30,9 @@ function (x=mycor,
   }
 
   if (getOption("colors") == "gray" || getOption("colors") == "gray.black")
-    col.ln <- getOption("col.fill.bar")
+    col.ln <- getOption("color.fill.bar")
   else
-    col.ln <- getOption("col.stroke.bar")
+    col.ln <- getOption("color.stroke.bar")
 
   # keep track of generated graphics
   plot.i <- 0
@@ -45,10 +45,10 @@ function (x=mycor,
   .lc.main(ev, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.stroke=getOption("col.stroke.pt"),
-         col.fill=getOption("col.fill.pt"),
+         col.stroke=getOption("color.stroke.pt"),
+         col.fill=getOption("color.fill.pt"),
          shape.pts=21, col.grid=getOption("col.grid"),
-         col.bg=getOption("col.bg"),
+         col.bg=getOption("color.bg"),
          cex.axis=.85, col.axis="gray30", rotate.values=0, offset=0.5,
          xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Eigenvalues", main=main, sub=NULL, cex=NULL,
@@ -80,10 +80,10 @@ function (x=mycor,
   .lc.main(ev.diff, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.stroke=getOption("col.stroke.pt"),
-         col.fill=getOption("col.fill.pt"),
-         shape.pts=21, col.grid=getOption("col.grid"),
-         col.bg=getOption("col.bg"),
+         col.stroke=getOption("color.stroke.pt"),
+         col.fill=getOption("color.fill.pt"),
+         shape.pts=21, col.grid=getOption("color.grid"),
+         col.bg=getOption("color.bg"),
          cex.axis=.85, col.axis="gray30", rotate.values=0, offset=0.5,
          xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Differences of Successive Eigenvalues",

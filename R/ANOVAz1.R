@@ -82,12 +82,12 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
-    col.bg <- getOption("col.bg")
+    col.bg <- getOption("color.bg")
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
 
     axT1 <- 1:length(unique(x.values))
 
-    col.grid <- getOption("col.grid")
+    col.grid <- getOption("color.grid")
     abline(v=axT1, col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
@@ -100,8 +100,8 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     y.label <- nm[1]
     .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
 
-    col.fill <- getOption("col.fill.pt")
-    col.stroke <- getOption("col.stroke.pt")
+    col.fill <- getOption("color.fill.pt")
+    col.stroke <- getOption("color.stroke.pt")
     points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
 
     # plot cell means

@@ -70,8 +70,8 @@ function(lm.out, cook, digits.d=NULL, res.sort="cooks", res.rows=NULL, show.R=FA
   for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 
   if (res.rows > 5  &&  res.sort != "off") {
-    label.top <- numeric(length=0)
-    out.top <- numeric(length=0)
+    label.top <- numeric(length=5)
+    out.top <- numeric(length=5)
     for (i in 1:5) {
       label.top[i] <- rownames(out)[i]
       out.top[i] <- out[i,(ncol(out)-clmn)]

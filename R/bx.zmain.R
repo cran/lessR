@@ -59,17 +59,14 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   # box plot
   boxplot(x, add=TRUE, col=col.fill, bg=col.stroke, pch=21,
           horizontal=horiz, axes=FALSE, border=col.stroke, ...)
-  #boxplot(x, add=TRUE, col=col.fill, bg=col.stroke, pch=21,
-          #horizontal=horiz, axes=FALSE, border=col.stroke,
-          #whiskcol=getOption("col.fill.bar"), staplecol=getOption("col.fill.bar"),
-          #medcol=getOption("col.stroke.bar"))
+          
 
   # dots
   if (add.points) 
       .dp.main(x, by=NULL, size=NULL,
          col.fill, col.stroke, col.bg, col.grid, col.trans=NULL,
          shape.pts=NULL, cex.axis=.85, col.axis="gray30",
-         xlab=NULL, main=NULL, cex=NULL,
+         xlab=NULL, main=NULL,
          method="overplot", pt.reg=21, pt.out=19, 
          col.out30="firebrick2", col.out15="firebrick4", 
          quiet=TRUE, new=FALSE, vertical=!horiz, ...)

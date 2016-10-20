@@ -42,10 +42,10 @@ function(lm.out, cook, cooks.cut,
   plot(fit.ord, res.ord, type="n", axes=FALSE, ann=FALSE)
 
   usr <- par("usr")
-  col.bg <- getOption("col.bg")
+  col.bg <- getOption("color.bg")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
 
-  col.grid <- getOption("col.grid")
+  col.grid <- getOption("color.grid")
   abline(v=axTicks(1), col=col.grid, lwd=.5)
   abline(h=axTicks(2), col=col.grid, lwd=.5)
 
@@ -58,16 +58,16 @@ function(lm.out, cook, cooks.cut,
   y.label <- "Residuals"
   .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
 
-  col.fill <- getOption("col.fill.pt")
-  col.stroke <- getOption("col.stroke.pt")
+  col.fill <- getOption("color.fill.pt")
+  col.stroke <- getOption("color.stroke.pt")
   points(fit.ord, res.ord, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
 
-  abline(h=0, lty="dotted", lwd=1.5, col=getOption("col.fill.bar"))
-  lines(lowess(fit.ord, res.ord, f=.9), col=getOption("col.stroke.pt"))
+  abline(h=0, lty="dotted", lwd=1.5, col=getOption("color.fill.bar"))
+  lines(lowess(fit.ord, res.ord, f=.9), col=getOption("color.stroke.pt"))
   res.c <- res[which(cook>=cooks.cut)]
   fit.c <- fit[which(cook>=cooks.cut)]
   if (length(fit.c) > 0) {
-    col.out <- getOption("col.stroke.pt")
+    col.out <- getOption("color.stroke.pt")
     points(fit.c, res.c, col=col.out, pch=19)
     text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
   }

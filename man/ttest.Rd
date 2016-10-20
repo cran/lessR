@@ -130,7 +130,7 @@ Returned value is NULL except for a two-group analysis from a formula.  Then the
 
 
 \references{
-Ken Kelley and Keke Lai (2012). MBESS: MBESS. R package version 3.3.3. \url{http://CRAN.R-project.org/package=MBESS}
+Ken Kelley and Keke Lai (2012). MBESS: MBESS. R package version 3.3.3. \url{https://CRAN.R-project.org/package=MBESS}
 Kupper and Hafner (1989). The American Statistician, 43(2):101-105.
 }
 

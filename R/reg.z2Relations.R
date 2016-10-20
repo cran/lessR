@@ -125,7 +125,7 @@ function(lm.out, dname, n.keep, show.R,
       lines <- min(max.sublns, nrow(mod.srt))
 
       # width of data columns
-      max.ln <- integer(length=0)
+      max.ln <- integer(length=ncol(X))
       for (i in 1:ncol(X)) {
         ln.nm <- nchar(colnames(X)[i])
         max.ln[i] <- ln.nm + 1

@@ -1,4 +1,4 @@
-.dpmat.main <- 
+.dpmat.main <-   # BPFM
 function(x, mylabels, nm,
          col.fill, col.stroke, col.bg, col.grid, col.trans,
          shape.pts, col.area, col.box, 

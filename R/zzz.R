@@ -6,12 +6,12 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.5.0      feedback: gerbing@pdx.edu      web: lessRstats.com\n",
-      "-------------------------------------------------------------------\n",
-      "1. Read a text, Excel, SPSS, SAS or R data file from your computer\n",
-      "   into the mydata data table, enter:  mydata <- Read()  \n",
-      "2. For a list of help topics and functions, enter:  Help()\n",
-      "3. Use theme function for global settings, Ex: theme(colors=\"gray\")\n")
+      "lessR 3.5.1      feedback: gerbing@pdx.edu       web: lessRstats.com\n",
+      "--------------------------------------------------------------------\n",
+      "1. mydata <- Read()       Read text, Excel, SPSS, SAS or R data file\n",
+      "2. Help()                 Get help\n",
+      "3. theme(colors=\"gray\")   Use theme function for global settings\n",
+      "4. Plot(X) or Plot(X,Y)   For continuous and categorical variables\n")
 
   options(colors="dodgerblue")
   options(trans.fill.bar=0.25)
@@ -26,18 +26,8 @@ function(...) {
   options(color.ghost=FALSE)
   options(color.heat="dodgerblue4")
 
-  options(col.fill.bar="#1874CCBF")  # .maketrans of dodgerblue3"  trans=.25
-  options(col.fill.pt="#1874CC80")  # .maketrans of "dodgerblue3"  trans=.50
-  options(col.stroke.bar="steelblue4")
-  options(col.stroke.pt="steelblue4")
-  options(col.bg="#F2F4F5")  # rgb(242, 244, 245)
-  options(col.grid="snow3")
-  options(col.box="black")
-  options(col.ghost=FALSE)
-  options(col.heat="dodgerblue4")
-
   options(n.cat=8)
-  options(lab.size=0.82)
+  options(lab.size=0.84)  # initial axis label size, adjusted for RStudio, Win
   options(suggest=TRUE)
   options(quiet=FALSE)
   options(brief=FALSE)
@@ -700,16 +690,35 @@ function(...) {
 }
 
 
-.axes <- function(x.lvl, y.lvl, axT1, axT2, par1, par3,
-         cex.axis, col.axis, rotate.values=0, offset=0.5, ...) {
+# extract sequence of dates from a time series
+ts.dates <- function(y) {
 
-  if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1)
-    axis(1, at=axT1, labels=FALSE, tck=-.01)
-    dec.d <- .getdigits(round(axT1,6),1) - 1
-    text(x=axT1, y=par3, labels=.fmt(axT1,dec.d),
-         pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
-         offset=offset, ...)
+  date_num <- as.numeric(time(y))
+  year <- floor(date_num)
+  year_beg <- as.POSIXct(paste0(year, '-01-01'))
+  year_end <- as.POSIXct(paste0(year+1, '-01-01'))
+  diff.yr <- year_end - year_beg
+  dates <- year_beg + ((date_num %% 1) * diff.yr)
+  dates <- as.Date(format(dates, format='%Y-%m-%d')) # from POSIX to Date
+  x <- dates  # dates to be on x-axis
+  
+  return(x)
+}
+
+
+.axes <- function(x.lvl, y.lvl, axT1, axT2, par1, par3,
+         cex.axis, col.axis, rotate.values=0, offset=0.5, y.only=FALSE, ...) {
+
+  if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
+    if (!y.only) {  # do x axis in calling routine for time series
+      axis(1, at=axT1, labels=FALSE, tck=-.01)
+      dec.d <- .getdigits(round(axT1,6),1) - 1
+      text(x=axT1, y=par3, labels=.fmt(axT1,dec.d),
+           pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
+           offset=offset, ...)
+    }
   }
+  
   else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
     axis(1, at=axT1, labels=FALSE, tck=-.01)
     text(x=axT1, y=par3, labels=x.lvl,
@@ -763,10 +772,15 @@ function(...) {
 
   # scale for regular R or RStudio
   if (options("device") == "RStudioGD") bubble.scale <- bubble.scale*1.5
-  size.axis <- ifelse (options("device") != "RStudioGD", cex.axis, cex.axis*1.118)
-  sz.lab <- getOption("lab.size")
-  size.lab <- ifelse (options("device") != "RStudioGD", sz.lab, sz.lab*1.119)
+  size.axis <- ifelse (options("device") != "RStudioGD", cex.axis, cex.axis*1.15)
+  sz.lab <- getOption("lab.size")  # begin with initial label size from zzz.R
+  size.lab <- ifelse (options("device") != "RStudioGD", sz.lab, sz.lab*1.31)
   size.txt <- ifelse (options("device") != "RStudioGD", 0.7, 0.8)
+  
+  if (.Platform$OS == "windows") {
+    size.lab <- size.lab * 1.1
+    size.axis <- size.axis * 1.1
+  }
 
   return(list(bubble.scale=bubble.scale, size.axis=size.axis, size.lab=size.lab,
               size.txt=size.txt))
@@ -833,7 +847,6 @@ function(...) {
 
 # manages the graphics system (not in RStudio or knitr)
 .graphwin <- function(wnew=1, d.w=NULL, d.h=NULL) {
-
   dl <- dev.list()
   dl2 <- dl[which(dl==2)]  # device #2
   dl.more <- dl[which(dl>2)]  # devices larger than #2
@@ -850,12 +863,14 @@ function(...) {
   # open graphics windows
   # if not already present, generate a null window for #2 and then remove
   if (off.two) wnew <- wnew + 1
-  RS <- ifelse (options("device") == "RStudioGD", TRUE, FALSE)
-  for (i in 1:wnew) 
-    if (is.null(d.w) && is.null(d.h))
-      dev.new(noRStudioGD=RS)
-    else
-      dev.new(width=d.w, height=d.h, noRStudioGD=RS)
+    for (i in 1:wnew) {
+      if (is.null(d.w) && is.null(d.h))
+        dev.new()
+      else if (is.null(d.w))  # BPFM and 1 cat var have reduced height only
+        dev.new(height=d.h)
+      else
+        dev.new(width=d.w, height=d.h)
+    }
   if (off.two) dev.off(which=2)
 
 }
@@ -876,13 +891,13 @@ function(...) {
 }
 
 
+# num.cat var is integer with small number of unique values
 .is.num.cat <- function(x, n.cat) {
 
   x <- sort(unique(na.omit(x)))
 
   nu.x <- length(x)
 
-  # num.cat var is integer with small number of unique values
   if (.is.integer(x)  &&  nu.x <= n.cat) {
     eq.int <- TRUE
     d.x <- diff(x)  # check for equal intervals
@@ -919,7 +934,7 @@ function(...) {
 
 }
 
-
+        
 .corcolors <- function(R, NItems, main, bm=3, rm=3, diag=NULL,
                        pdf.file, pdf.width, pdf.height) {
 
@@ -930,7 +945,7 @@ function(...) {
           "      computing the heat map are set to 0.\n", sep="")
     }
 
-    max.color <- getOption("col.heat")
+    max.color <- getOption("color.heat")
     hmcols <- colorRampPalette(c("white",max.color))(256)
     
     .opendev(pdf.file, pdf.width, pdf.height)  # set up graphics

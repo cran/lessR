@@ -502,7 +502,7 @@ function(topic=NULL) {
   else if  (topic %in% c("scatterplot", "sp", "plot", "scatter")) {
   t0 <- "Plot"
 
-  f1 <- bquote(paste(bold("Plot, sp"), "  A scatterplot, etc. for one or two variables"))
+  f1 <- bquote(paste(bold("Plot, sp"), "  A scatterplot for one or two variables"))
 
   t1 <- "
   Plot, or sp, generates a scatter plot for one or more variables with

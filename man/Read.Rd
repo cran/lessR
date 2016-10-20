@@ -146,7 +146,7 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 \references{
 Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 2, NY: Routledge.
 
-Wickham, H. (2015). Read Excel Files. \url{http://CRAN.R-project.org/package=readxl} 
+Wickham, H. (2015). Read Excel Files. \url{https://CRAN.R-project.org/package=readxl} 
 }
 
 

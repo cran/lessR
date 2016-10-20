@@ -9,11 +9,11 @@ citEntry(entry="Manual",
          author = personList(as.person("David W. Gerbing")),
          year = year, 
          note = vers,
-         url = "http://cran.r-project.org/package=lessR",
+         url = "https://cran.r-project.org/package=lessR",
          textVersion = paste("David W. Gerbing, (", 
            year, 
            "). lessR: Less Code, More Results. ", 
            vers, 
-           ", http://cran.r-project.org/web/packages/lessR/index.html",
+           ", https://cran.r-project.org/web/packages/lessR/index.html",
            ".", sep="")
         )

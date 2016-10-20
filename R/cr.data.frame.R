@@ -155,7 +155,7 @@ function(x, miss, show.n, digits.d,
   
     # scatter plot matrix
       #panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        #col.pt=getOption("col.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
+        #col.pt=getOption("color.stroke.pt"), col.smooth=getOption("color.stroke.bar"),
         #span=2/3, iter=3, ...) 
       #{
           #points(x, y, pch=pch, col=col.pt, cex=cex)
@@ -188,7 +188,7 @@ function(x, miss, show.n, digits.d,
         "      elements, the diagonal elements of the matrix for\n",
         "      computing the heat map are set to 0.\n", sep="")
 
-    max.color <- getOption("col.heat")
+    max.color <- getOption("color.heat")
     hmcols <- colorRampPalette(c("white",max.color))(256)
 
     heatmap(crs[1:ncol(crs),1:ncol(crs)], Rowv=NA, Colv="Rowv", symm=TRUE,

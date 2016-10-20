@@ -136,10 +136,10 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
     plot(x.values,y.values, type="n", axes=FALSE, ann=FALSE, ylim=c(-.10,1.10), ...)
 
     usr <- par("usr")
-    col.bg <- getOption("col.bg")
+    col.bg <- getOption("color.bg")
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
 
-    col.grid <- getOption("col.grid")
+    col.grid <- getOption("color.grid")
     abline(v=axTicks(1), col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
@@ -151,8 +151,8 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
     .axlabs(nm[2], y.label, main.lab, sub.lab, max.lbl.y=3,
             cex.lab=getOption("lab.size"), cex.main=1.0, ...) 
 
-    col.fill <- getOption("col.fill.pt")
-    col.stroke <- getOption("col.stroke.pt")
+    col.fill <- getOption("color.fill.pt")
+    col.stroke <- getOption("color.stroke.pt")
     points(x.values,y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
     lines(x.values, p.int$fit, col=col.stroke, lwd=2)
 
@@ -168,7 +168,7 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
       .opendev(pdf.file, pdf.width, pdf.height)
 
       panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        col.pt=getOption("col.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
+        col.pt=getOption("color.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
         span=2/3, iter=3, ...) 
       {
           points(x, y, pch=pch, col=col.pt, cex=cex)

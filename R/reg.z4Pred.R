@@ -77,7 +77,7 @@ function(lm.out, brief,
   #s.upper <- out$fitted + tcut*s.prederr
  
   # min and max of pred interval widths
-  predmm <- numeric(length=0)
+  predmm <- numeric(length=2)
   predmm[1] <- min(out[n.vars+5])
   predmm[2] <- max(out[n.vars+5])
 

@@ -57,10 +57,10 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
-    col.bg <- getOption("col.bg")
+    col.bg <- getOption("color.bg")
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
 
-    col.grid <- getOption("col.grid")
+    col.grid <- getOption("color.grid")
     abline(v=axTicks(1), col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
@@ -70,8 +70,8 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
         max.lbl.y=3, cex.lab=0.85) 
 
-    col.fill <- getOption("col.fill.pt")
-    col.stroke <- getOption("col.stroke.pt")
+    col.fill <- getOption("color.fill.pt")
+    col.stroke <- getOption("color.stroke.pt")
     points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
 
     if (n.pred == 0) {
@@ -87,7 +87,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     }
 
     if (do.predint) {
-      col.ci <- getOption("col.stroke.pt")
+      col.ci <- getOption("color.stroke.pt")
       col.pi <- "gray30"
 
       lines(x.values, c.int$lwr, col=col.ci, lwd=0.75)
@@ -100,9 +100,9 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
 
   else {  # scatterplot matrix for multiple regression
     if (numeric.all && in.data.frame) {
-      col.pts <- getOption("col.stroke.pt")
-      col.line <- getOption("col.stroke.bar")
-      col.bg=getOption("col.bg")
+      col.pts <- getOption("color.stroke.pt")
+      col.line <- getOption("color.stroke.bar")
+      col.bg=getOption("color.bg")
 
       panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
         col.pt=col.pts, col.smooth=col.line,

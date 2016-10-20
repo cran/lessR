@@ -6,22 +6,22 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
        bin.end, prop, hist.counts, cumul,
        xlab, ylab, main, sub, quiet, fun.call=NULL, ...) {
 
-
-  # scale for regular R or RStudio
-  adj <- .RSadj(bubble.scale=NULL, cex.axis)
-  size.axis <- adj$size.axis
-  size.lab <- adj$size.lab
-
+       
   if (is.numeric(breaks) && !is.null(bin.start)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Choose only one option to specify a start value.\n",
       "Either choose the option  breaks  or the option  bin.start.\n\n")
   }
 
+  # scale for regular R or RStudio
+  adj <- .RSadj(bubble.scale=NULL, cex.axis)
+  size.axis <- adj$size.axis
+  size.lab <- adj$size.lab
+
   # get variable labels if exist plus axes labels
   if (is.null(ylab))
     ylab <- ifelse (!prop, "Count of", "Proportion of")
-  gl <- .getlabels(xlab, ylab, main, sub, cex.lab=getOption("lab.size"))
+  gl <- .getlabels(xlab, ylab, main, sub, cex.lab=size.lab)
   x.name <- gl$xn; x.lbl <- gl$xl
   x.lab <- gl$xb
   y.lab <- paste(gl$yb, x.name)

@@ -6,6 +6,38 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 3.5.1 (2016-10-19) <<<<<<
+
+-------------
+Updates 3.5.1
+-------------
+
+Plot
+  Cleveland dot plot displayed with segments.y and color.grid="off" as default
+  2-D scatterplot smoothing option, smoothed, turned on by default for n>=5000
+  for a line plot, input variable can be a time series
+  speeded up the processing of bubble plots
+  time series dates plot more generally and more cleanly
+  
+
+---------------
+Bug Fixes 3.5.1
+---------------
+
+Plot
+  if more than 2 x-variables, sort of y by x (sort.yx), which would not be 
+    meaningful, causes an error and so is not attempted
+  if no sort requested for Cleveland dot plot, no alphabetical ordering
+  a requested color gradient in a bubble plot works for integer variables 
+    as well as factors
+  prop as a topic works in place of counts for bar charts and histograms
+  multiple ellipses display when color.ellipse is specified
+
+LineChart
+  time series plots even if missing data
+
+
+
 >>>>>> Changes for lessR version 3.5.0 (2016-08-29) <<<<<<
 
 -------------

@@ -216,7 +216,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     .dash(width.ln)
 
     if (n.rows > n.lines) {
-      cat("To see all the variable labels set mx.lines to", n.rows, "\n")
+      cat("To see all the variable labels set max.lines =", n.rows, "\n")
       .dash(64)
     }
   }

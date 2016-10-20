@@ -21,9 +21,9 @@ function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...) {
 
   # frequency distribution of residuals
   .dn.main(lm.out$residuals, 
-    col.fill=getOption("col.fill.pt"),
-    col.bg=getOption("col.bg"), col.grid=getOption("col.grid"),
-    col.box=getOption("col.box"),
+    col.fill=getOption("color.fill.pt"),
+    col.bg=getOption("color.bg"), col.grid=getOption("color.grid"),
+    col.box=getOption("color.box"),
     col.nrm="gray40", col.gen="gray40",
     col.fill.nrm="transparent", col.fill.gen="transparent",
     xlab="Residuals", quiet=TRUE)
