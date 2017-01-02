@@ -177,10 +177,10 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
       txotl <- ""
       if (!quiet) {
         txotl <- .outliers(data[,i])
-        if (length(txotl)==0) txotl <- "No outliers"
+        if (txotl[1] == "") txotl <- "No (Box plot) outliers"
       }
 
-      if (ncol(data) > 1) {  # for a variable range, print the text output
+      if (ncol(data) > 1  &&  !quiet) {  # for a variable range, print the text output
         class(txss) <- "out_piece"
         class(txdst) <- "out_piece"
         class(txotl) <- "out_piece"

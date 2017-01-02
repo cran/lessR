@@ -6,6 +6,70 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 3.5.3 (2017-01-01) <<<<<<
+
+-------------
+Updates 3.5.3
+-------------
+  
+corCFA (cfa)
+  RMSE added as a fit index
+  
+Density, Histogram, Plot
+  outlier analysis (for Plot, the single continuous variable analysis)
+
+Plot
+  boxplot option added for 1-variable scatterplot
+  outlier analysis added to Cleveland dot plot
+  suggestions to obtain related plots enhanced
+  bubble plot frequency matrix detects the response categories even if some 
+    variables have zero frequencies in one or more categories
+  sort option (sort.yx) for bubble plot frequency matrix
+  object parameter dropped
+    bar object set as a separate parameter
+    line option controlled by line.width
+    size=0 turns off display of points
+  color.fill.ellipse now set according to current theme color
+  line option for a run chart provides analysis of runs
+  fit.line also applies to a time series
+  color.area also applies to a time series
+  color.area set to TRUE sets default to the point fill current color
+  
+  
+Plot, LineChart, Histogram, BoxPlot, Density
+  spacing of margins and axis labels enhanced and standardized
+  
+SummaryStats
+  column names abbreviated with dictionary for more readable tables
+  
+theme
+  color of color rose changed to rosybrown1, retain rose as its name
+  
+ttest
+  density graph revised, including translucent fill colors
+
+
+---------------
+Bug Fixes 3.5.3
+---------------
+
+BarChart
+  excessive left margin for some horizontal plots reduced
+
+LineChart
+  properly plots
+  
+Plot
+  extra blank graph after each graph in RStudio eliminated
+  grid lines extending past the figure boundary after a by chart fixed
+  legend for multiple x or y variables displays when background is black
+  bubble plot frequency matrix works without variable labels
+
+Regression
+  scatterplot with one categorical predictor variable plots levels correctly
+  
+  
+
 >>>>>> Changes for lessR version 3.5.1 (2016-10-19) <<<<<<
 
 -------------

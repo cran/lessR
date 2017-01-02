@@ -82,7 +82,8 @@ function(x, y=NULL, ...) {
           line.chart, show.title, pdf.file, pdf.width, pdf.height)
       }
 
-      for (i in (plot.i+1):(plot.i+plt2$i)) plot.title[i] <- plt2$ttl[i-plot.i]
+      for (i in (plot.i+1):(plot.i+plt2$i))
+        plot.title[i] <- plt2$ttl[i-plot.i]
       plot.i <- plot.i + plt2$i
 
 

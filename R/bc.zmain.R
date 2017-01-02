@@ -17,7 +17,7 @@ function(x, by=NULL,
     "Need to specify a value for:   legend.title\n\n")
   }
 
-  if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels) 
+  if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels)
 
   # get values for ... parameter values
   stuff <- .getdots(...)
@@ -204,8 +204,8 @@ function(x, by=NULL,
   max.y <- max.y + (addtop * max.y)
 
   if (any(x < 0)) {
-  min.y <- ifelse (is.matrix(x) && !beside, min(colSums(x)), min(x))
-  min.y <- min.y - abs(addtop * min.y)
+    min.y <- ifelse (is.matrix(x) && !beside, min(colSums(x)), min(x))
+    min.y <- min.y - abs(addtop * min.y)
   }
   else
     min.y <- 0
@@ -225,38 +225,67 @@ function(x, by=NULL,
   the.names <- integer(length=0)
   if (length(dim(x)) == 0)
     the.names <- names(x)
-  else 
-    the.names <- ifelse (is.null(by), rownames(x), colnames(x))
+  else
+    if (is.null(by))
+      the.names <- rownames(x)
+    else
+      the.names <- colnames(x)
+
   max.nm <- 0
   for (i in (1:length(the.names))) {
-    li <- ifelse(!is.na(the.names[i]), nchar(the.names[i]), 0)
+    li <- ifelse (!is.na(the.names[i]), nchar(the.names[i]), 0)
     if (li > max.nm) max.nm <- li
   }
+  
+  # labels horiz or vertical
+  las.value <- ifelse (horiz  && max.nm > 5, 0, 1)
 
-  # extend the left margin to accommodate horizontal labels
-  extend <- FALSE
-  if (horiz && max.nm>5) {
-    add.left <- max.nm/2.0
-    if (y.lab != "") add.left <- add.left + 1.5
-    extend <- TRUE
-  } 
-
+  
   # ----------------------------------------------------------------------------
   # set up plot area, color background, grid lines
 
-  if (is.null(main)) {
-    orig.params <- par(no.readonly=TRUE)
-    on.exit(par(orig.params))
-    par(mar=c(4,4,2,2)+0.1)
-    if (extend) par(mar=c(5, add.left, 4, 2) + 0.1)
+  # set margins
+  if (!horiz) {
+    if (is.null(value.labels)) {
+      if (is.null(by)) val.lab <- names(x) else val.lab <- colnames(x)
+      if (length(val.lab) == 0) val.lab <- colnames(x)  # read matrix directly
+      if (!is.null(names(count.labels))) val.lab <- names(count.labels)
+    }
+    else
+      val.lab <- value.labels
+    val.lab <- gsub(" ", "\n", val.lab) 
   }
-
-  if (legend.loc == "right.margin"  &&  (!is.null(by) || is.matrix(x)))
-    par(oma=c(0,0,0,3))
+  else  # horizontal, where value labels do not work
+    val.lab <- NULL
 
   if(is.null(count.labels)) if (horiz) {  # switch
-    temp <- x.lab; x.lab <- y.lab; y.lab <- temp 
+    temp <- x.lab
+    x.lab <- y.lab
+    y.lab <- temp  # FIX: label size processed as x.lab, maybe too large
   }
+
+  max.width <- strwidth(as.character(max(pretty(c(min.y, max.y)))), units="inches")
+
+  margs <- .marg(max.width, y.lab, x.lab, main.lab, x.val=val.lab, prop, rotate.values)
+  lm <- margs$lm
+  tm <- margs$tm
+  rm <- margs$rm
+  bm <- margs$bm
+ 
+  lm <- lm + .10
+  if (prop) lm <- lm + .25
+  if (horiz) {
+    bm <- bm + .10  # kludge, for horiz, long labels overun plot area
+    lm <- lm + .06
+    if (las.value == 1) lm <- lm + .12
+  }
+  if (legend.loc == "right.margin"  &&  (!is.null(by) || is.matrix(x)))
+    rm <- rm + .6
+ 
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))
+  
+  par(mai=c(bm, lm, tm, rm))
 
   if (class(x) == "numeric"  &&  entered) x <- as.table(x)
   rescale <- 0
@@ -289,19 +318,13 @@ function(x, by=NULL,
         ylim=c(0,1), axes=FALSE, ...)
   }
 
-  if (extend) {
-    mtext(y.lab, side=2, line=add.left-1)
-    y.lab <- ""
-    las.value <- 1
-  }
-  else las.value <- 0
-
 
   # ----------------------------------------------------------------------------
   # bar plot, grid lines
 
   usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
+  
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
   vy <- pretty(min.y:max.y)
  
   if (!over.grid) {
@@ -310,18 +333,17 @@ function(x, by=NULL,
     else
       abline(v=axTicks(1), col=col.grid, lwd=.5)
   }
+  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
 
   if (rescale == 0) {
     # width.bars <- .8   gap <- .6*width.bars
     # axisnames suppressed only works if horiz is FALSE,
     #   otherwise let R generate
-    #coords <- barplot(x, add=TRUE, col=colr, beside=beside, horiz=horiz,
     coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
           space=gap, cex.names=size.txt, axisnames=horiz, ...)
   }
   else
-    #coords <- barplot(x, add=TRUE, col=colr, beside=beside, horiz=horiz,
     coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), 
@@ -338,36 +360,39 @@ function(x, by=NULL,
   ax.freq <- ifelse(horiz, 1, 2)
   if (!horiz) las.value <- 1
   axis(ax.freq, cex.axis=size.axis, col.axis=col.axis, las=las.value, ...) 
-
+  
   ax.value <- ifelse(horiz, 2, 1)
   if (!horiz) {
-    if (is.null(value.labels)) {
-      if (is.null(by)) val.lab <- names(x) else val.lab <- colnames(x)
-      if (length(val.lab) == 0) val.lab <- colnames(x)  # read matrix directly
-      if (!is.null(names(count.labels))) val.lab <- names(count.labels)
-    }
-    else
-      val.lab <- value.labels
-    val.lab <- gsub(" ", "\n", val.lab) 
     if (beside) coords <- apply(coords, 2, mean)  # one label per group
     axis(ax.value, at=coords, labels=FALSE, tck=-.01, ...)
     text(x=coords, y=par("usr")[3], labels=val.lab,
          pos=1, xpd=TRUE, cex=size.txt, col=col.axis, srt=rotate.values,
          offset=offset, ...)
-    #offset <- .5 + .01 * rotate.values
   }
     
   # axis labels
-  lbl.lns <- 3
-  lblx.lns <- ifelse (grepl("\n", x.lab, fixed=TRUE), lbl.lns + 0.5, lbl.lns)
-  lblx.lns <- lblx.lns - 0.5
-  if (offset > 0.5) lblx.lns <- lblx.lns + 0.5
-  lbly.lns <- ifelse (grepl("\n", y.lab, fixed=TRUE), lbl.lns - .4, lbl.lns)
-  if (horiz) lbly.lns <- lbly.lns - .5
-  title(xlab=x.lab, line=lblx.lns, cex.lab=size.lab, col.lab=col.lab)
-  title(ylab=y.lab, line=lbly.lns, cex.lab=size.lab)
   title(main=main.lab, col.main=col.main)
 
+  # xlab positioning
+  lblx.lns <- ifelse (grepl("\n", x.lab, fixed=TRUE), 3.1, 2.2)
+  new.ln <- FALSE
+  if (!is.null(val.lab))
+    for (i in 1:length(val.lab)) 
+      if (grepl("\n", val.lab[i], fixed=TRUE)) new.ln <- TRUE
+  if (new.ln) lblx.lns <- lblx.lns + 1
+  if (offset > 0.5) lblx.lns <- lblx.lns + 1 
+  if (horiz) lblx.lns <- lblx.lns + .6 
+  title(xlab=x.lab, line=lblx.lns, cex.lab=size.lab, col.lab=col.lab)
+
+  # ylab positioning (based on .axlabs function)
+  lbl.lns <- 3.6
+  multi <- FALSE
+  for (i in 1:length(y.lab))
+    if (!is.null(y.lab))
+      if (grepl("\n", y.lab[i], fixed=TRUE)) multi <- TRUE  # multi-line
+  lm <- par("mar")[2]  # get the current left margin
+  lbly.lns <- ifelse (multi, lm - 2, lm - 1.4)
+  title(ylab=y.lab, line=lbly.lns, cex.lab=size.lab)
 
   # ----------------------------------------------------------------------------
   # legend for two variable plot including variable labels
@@ -406,14 +431,15 @@ function(x, by=NULL,
   stats <- ""
   # one variable, dim == 0 if x<-x.temp 
   if (is.null(by)  &&  !is.matrix(x)  && !quiet) {
-    if (.is.integer(x) &&  all(x >= 0)) {  # only process if counts
+    if (.is.integer(x)  &&  all(x >= 0)) {  # only process if counts
 
       txsug <- ""
       if (getOption("suggest")) {
+        txsug <- ">>> Suggestions"
         fc <- paste("Plot(", x.name, ") ", sep="")
-        txsug <- paste(txsug, ">>> Suggest: ", fc, sep="")
-        fc <- paste("Plot(", x.name, ", topic=\"count\") ", sep="")
-        txsug <- paste(txsug, "\n\n>>> Suggest: ", fc, sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("Plot(", x.name, ", values=\"count\") ", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
       }
 
       stats <- .ss.factor(x, by=NULL, brief=TRUE, digits.d=NULL,
@@ -443,8 +469,12 @@ function(x, by=NULL,
 
     txsug <- ""
     if (getOption("suggest")) {
-      fc <- paste("Plot(", x.name, ",", y.name, ") ", sep="")
-      txsug <- paste(txsug, ">>> Suggest: ", fc, sep="")
+      txsug <- ">>> Suggestions\n"
+      fc <- paste("Plot(", x.name, ", ", y.name, ") ", sep="")
+      txsug <- paste(txsug, fc, sep="")
+      fc <- paste("\nSummaryStats(", x.name, ", ", y.name, 
+                  ")  # or ss", sep="")
+      txsug <- paste(txsug, fc, sep="")
     }
 
     stats <- .ss.factor(x, by, brief=FALSE, digits.d=NULL,

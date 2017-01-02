@@ -85,10 +85,16 @@ function(x,
 
   # max y coordinate for graph
   max.y <- max(max(d.nrm), max(d.gen$y), max(h$density))
-
+  
+  # set margins
+  margs <- .marg(0, y.lab=NULL, x.lab, main)
+  lm <- margs$lm
+  tm <- margs$tm
+  rm <- margs$rm
+  bm <- margs$bm
+  par(mai=c(bm, lm, tm, rm))
+  
   # set up plot area
-  # bw if specified also gets passed to plot, so suppress warning
-
   plot(h, border="transparent", freq=FALSE,
      xlim=c(x.min,x.max), ylim=c(0,max.y),
      axes=FALSE, ann=FALSE, xlab=NULL, ylab=NULL, main=NULL, ...)

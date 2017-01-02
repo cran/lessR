@@ -16,9 +16,11 @@ theme(colors=c("blue", "gray", "rose", "green", "gold", "red",
 
          color.fill.bar=NULL, trans.fill.bar=NULL,
          color.fill.pt=NULL, trans.fill.pt=NULL,
-         color.stroke.bar=NULL, color.stroke.pt=NULL, 
+         color.stroke.bar=NULL, color.stroke.pt=NULL,
+         color.fill.ellipse=NULL,
          color.bg=NULL, color.grid=NULL, color.box=NULL,
          color.heat=NULL, ghost=NULL,
+
 
          n.cat=getOption("n.cat"), lab.size=getOption("lab.size"),
          suggest=getOption("suggest"),
@@ -47,6 +49,7 @@ set(\ldots)
        bar.}
   \item{color.stroke.pt}{Color of a line or outline of a filled region, such as the
        border of a plotted point.}
+  \item{color.fill.ellipse}{Color of the fill for an ellipse in a scatter plot.}
   \item{color.bg}{Color of the plot background.}
   \item{color.grid}{Color of the grid lines.}
   \item{color.box}{Color of border around the plot background, the box, that encloses 

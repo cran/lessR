@@ -3,14 +3,14 @@ function(x, by, size,
          col.fill, col.stroke, col.bg, col.grid, col.trans,
          shape.pts, cex.axis, col.axis, xlab, main, sub,
          rotate.values, offset, method, pt.reg, pt.out, 
-         col.out30, col.out15, quiet, new, fun.call=NULL, ...) {
+         col.out30, col.out15, bx, quiet, new, vertical, fun.call=NULL, ...) {
 
-
-  if (is.factor(x)) { 
+         
+  if (is.factor(x)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The variable cannot be an R factor (categorical).\n")
-  }
-
+  }  
+  
   # outlier points shapes and colors for gray scales
   if (getOption("colors") %in% c("gray", "gray.black")) {
     pt.out30 <- 23
@@ -71,18 +71,21 @@ function(x, by, size,
  
   if (new) {
     # set up plot area
-
-    if (is.null(main) &&  is.null(by)) {
-      orig.params <- par(no.readonly=TRUE)
-      on.exit(par(orig.params))
-      par(mar=c(4,4,2,2)+0.1)
-    }
-
-    if (!is.null(by)) {
-      orig.params <- par(no.readonly=TRUE)
-      on.exit(par(orig.params))
-      par(omi=c(0,0,0,0.6))  # legend in right margin
-    }
+ 
+    # set margins
+    margs <- .marg(0, y.lab=NULL, x.lab, main)
+    lm <- margs$lm
+    tm <- margs$tm
+    rm <- margs$rm
+    bm <- margs$bm
+    
+    if (!is.null(x.lab)) if (grepl("\n", x.lab[1], fixed=TRUE)) bm <- bm + .10
+    if (!is.null(by)) rm <- rm + 0.75
+ 
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+  
+    par(mai=c(bm, lm, tm, rm))
 
     stripchart(x, col="transparent", xlab=NULL, ylab=NULL, main=NULL,
        axes=FALSE, ann=FALSE, ...)
@@ -98,17 +101,28 @@ function(x, by, size,
     # axis labels
     y.lab <- ""
     max.lbl <- max(nchar(axTicks(2)))
-    .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
-    
-    # colored background for plotting area
-    usr <- par("usr")
-    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
-    
-    # grid lines computation and print
-    vx <- pretty(c(usr[1],usr[2]))
-    abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
+    .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
+          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...)
+          
+              
+  usr <- par("usr")
+
+  # colored plotting area
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
+
+  # grid lines
+  vx <- pretty(c(usr[1],usr[2]))
+  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
+
+  # box around plotting area
+  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border="black")
+
   }
+
+  # outline=FALSE suppresses outlier points, are displayed from stripchart
+  if (bx)
+    boxplot(x, add=TRUE, col=col.fill, bg=col.stroke, pch=21,
+        horizontal=TRUE, axes=FALSE, border=col.stroke, outline=FALSE, ...)
 
   # mark outliers
   q1 <- quantile(x, probs=0.25)
@@ -181,30 +195,67 @@ function(x, by, size,
 
   txsug <- ""
   if (getOption("suggest")) {
+    txsug <- ">>> Suggestions"
 
     fc <- ""
     if (!grepl("size", fncl))
       fc <- paste(fc, ", size=2", sep="")
     if (nzchar(fc)) {
       fc <- paste(fncl, fc, ") ", sep="")
-      txsug <- paste(">>> Suggest: ", fc, "\n")
+      txsug <- paste(txsug,"\n", fc, sep="")
+      #txsug <- .rm.arg.2("x=", txsug) 
     }
-  
-    fc <- paste("Boxplot(", x.name, ", add.points=TRUE", sep="")
+ 
+    fc <- ""
+    if (!grepl("boxplot", fncl))
+      fc <- paste(fc, ", boxplot=TRUE", sep="")
     if (nzchar(fc)) {
-      fc <- paste(fc, ") ", sep="")
-      txsug <- paste(txsug,"\n>>> Suggest: ", fc, "\n")
+      fc <- paste(fncl, fc, ") ", sep="")
+      txsug <- paste(txsug,"\n", fc, sep="")
     }
-  }
+    
+    fc <- ""
+    if (!grepl("run.chart", fncl))
+      fc <- paste(fc, ", run.chart=TRUE)", sep="")
+    if (nzchar(fc)) {
+      fc <- paste(fncl, fc, sep="")
+      txsug <- paste(txsug,"\n", fc, sep="")
+    }
+    
+    fc <- ""
+    if (!grepl("values", fncl))
+      fc <- paste(fc, ", values=\"count\")", sep="")
+    if (nzchar(fc)) {
+      fc <- paste(fncl, fc, sep="")
+      txsug <- paste(txsug,"\n", fc, sep="")
+    }
+   
+    fc <- ""
+    if (!grepl("values", fncl))
+      fc <- paste(fc, ", values=\"count\"", sep="")
+    if (!grepl("values", fncl))
+      fc <- paste(fc, ", color.area=TRUE", sep="")
+    if (!grepl("values", fncl))
+      fc <- paste(fc, ", size=3)", sep="")
+    if (nzchar(fc)) {
+      fc <- paste(fncl, fc, sep="")
+      txsug <- paste(txsug,"\n", fc, sep="")
+    }
+    
+    txsug <- .rm.arg.2(" x=", txsug) 
+    txsug <- .rm.arg.2("(x=", txsug) 
+
+   }
 
   txss <- ""
   if (!quiet) {
     digits.d <- NULL
     ssstuff <- .ss.numeric(x, digits.d=digits.d, brief=TRUE)
     txss <- ssstuff$tx
-
+    
+    txotl <- ""
     txotl <- .outliers(x)
-    if (length(txotl)==0) txotl <- "No outliers"
+    if (txotl[1] == "") txotl <- "No (Box plot) outliers"
 
     class(txsug) <- "out_piece"
     class(txss) <- "out_piece"

@@ -6,8 +6,8 @@ function(y, type,
        line.width, xlab, ylab, main, sub, cex,
        time.start, time.by, time.reverse, 
        center.line, show.runs, quiet, ...) {
-
-
+       
+       
   # scale for regular R or RStudio
   adj <- .RSadj(bubble.scale=NULL, cex.axis)
   size.axis <- adj$size.axis
@@ -51,13 +51,13 @@ function(y, type,
   }
 
   if (is.null(time.start) && !is.ts(y)) {
-    x.lab <- ifelse (is.null(xlab), "index", xlab)
+    x.lab <- ifelse (is.null(xlab), "Index", xlab)
     x <- 1:length(y)  # ordinal position of each value on x-axis
   }
-  else   {  # time.start date specified or a ts
+  else {  # time.start date specified or a ts
     x.lab <- ifelse (is.null(xlab), "", xlab)      
     if (is.ts(y)) {
-		  x <- ts.dates(y)
+      x <- ts.dates(y)
       # time.start <- paste(start(y)[1], "/", start(y)[2], "/01", sep="") 
       # frq <- frequency(y)
       # if (frq == 1) time.by <- "year"
@@ -66,20 +66,24 @@ function(y, type,
       # if (frq == 52) time.by <- "week"
       # if (frq == 365) time.by <- "year"
     }
-		else {
-			date.seq <- seq.Date(as.Date(time.start), by=time.by, length.out=nrows)
-			x <- date.seq  # dates on x-axis
-		}
+    else {
+      date.seq <- seq.Date(as.Date(time.start), by=time.by, length.out=nrows)
+      x <- date.seq  # dates on x-axis
+    }
   }
 
-	# by default display center.line only if  runs
+  # by default display center.line only if runs
   if (center.line == "default"  &&  !is.ts(y)) {
     m <- mean(y, na.rm=TRUE)
     n.change <- 0
     for (i in 1:(length(y)-1)) if ((y[i+1]>m) != (y[i]>m)) n.change <- n.change+1 
-    if (n.change/(length(y)-1) < .15) center.line <- "off" else center.line <- "median"
+    if (n.change/(length(y)-1) < .15)
+      center.line <- "off" 
+    else 
+      center.line <- "median"
   }
 
+  
   # fill ts chart 
   #if (!is.null(time.start) && is.null(color.area))
     #col.area <- getOption("color.fill.bar")
@@ -96,12 +100,23 @@ function(y, type,
   
   digits.d <- .max.dd(y) + 1
   options(digits.d=digits.d)
+  
+  # set margins
+  max.width <- strwidth(as.character(max(pretty(y))), units="inches")
+  
+  margs <- .marg(max.width, y.lab, x.lab, main)
+  lm <- margs$lm
+  tm <- margs$tm
+  rm <- margs$rm
+  bm <- margs$bm
+ 
+  if (center.line != "off") rm <- rm + .2
+ 
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))
 
-  if (is.null(main)) {
-    orig.params <- par(no.readonly=TRUE)
-    on.exit(par(orig.params))
-    par(mar=c(4,4,2,2)+0.1)
-  }
+  par(mai=c(bm, lm, tm, rm))
+
 
   # plot setup
   plot(x, y, type="n", axes=FALSE, ann=FALSE, ...)
@@ -126,18 +141,22 @@ function(y, type,
 
   # axis labels
   max.lbl <- max(nchar(axTicks(2)))
-  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
+  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
+          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...)
+          
+  usr <- par("usr")
 
   # colored plotting area
-  usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
 
   # grid lines
   vx <- pretty(c(usr[1],usr[2]))
   vy <- pretty(c(usr[3],usr[4]))
   abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
   abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+
+  # box around plotting area
+  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
 
   # fill area under curve
   if (!is.null(col.area)  && !is.null(col.stroke)) {
@@ -150,7 +169,7 @@ function(y, type,
       polygon(c(x[1],x,x[length(x)]), c(min(y),y,min(y)),
               col=col.area, border=col.stroke)
 
-  # the plot
+  # plot lines and points
   if (type == "l" || type == "b") {
     lines(as.numeric(x),y, col=col.line, lwd=line.width, ...)
   }
@@ -177,22 +196,37 @@ function(y, type,
     }
 
     if (!is.ts(y)) {
-		  abline(h=m.y, col="gray50", lty="dashed")
+      abline(h=m.y, col="gray50", lty="dashed")
       mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
-		}
+    }
     if (center.line == "zero") m.y <- median(y) 
 
     gl <- .getlabels()
     x.name <- gl$xn; x.lbl <- gl$xl;
     y.name <- gl$yn; y.lbl <- gl$yl
+    
+    
+# -----------
+# text output
+
     if (!quiet) {
       ttlns <- .title2(x.name, y.name, x.lbl, y.lbl, TRUE)
-      class(ttlns) <- "out_piece"
-      output <- list(out_title=ttlns)
-      class(output) <- "out_all"
-      print(output)
+
+    txsug <- ""
+    if (getOption("suggest")  &&  !is.ts(y)) {
+      txsug <- ">>> Suggestions"
+      fc <- paste("\nLineChart(", x.name, ", color.area=\"steelblue\")", sep="")         
+      txsug <- paste(txsug, fc, sep="")
+      fc <- paste("\nLineChart(", x.name, ", show.runs=TRUE)", sep="")           
+      txsug <- paste(txsug, fc, sep="")
     }
 
+    class(ttlns) <- "out_piece"
+    class(txsug) <- "out_piece"
+    output <- list(out_title=ttlns, out_suggest=txsug)
+    class(output) <- "out_all"
+    print(output)    
+  }
 
     # analyze runs
     if (!quiet  &&  !is.ts(y)) {

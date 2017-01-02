@@ -123,7 +123,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 
       stuff <- .bx.main(data[,i], color.fill, color.stroke, color.bg, color.grid,
          color.box, cex.axis, color.axis, rotate.values, offset, 
-         horiz, add.points, xlab, main, sub, digits.d, quiet, ...)
+         horiz, add.points, xlab, main, sub, digits.d, quiet, fun.call, ...)
       txsts <- stuff$tx
       if (length(txsts)==0) txsts <- ""
 

@@ -1,7 +1,8 @@
 .bx.main <-
 function(x, col.fill, col.stroke, col.bg, col.grid,
-         col.box, cex.axis, col.axis, rotate.values, offset,
-         horiz, add.points, xlab, main, sub, digits.d, quiet, ...) {      
+         col.box, cex.axis, col.axis, rotate.values, offset, horiz, add.points,
+         xlab, main, sub, digits.d, quiet, fun.call, ...) {      
+
 
   # scale for regular R or RStudio
   adj <- .RSadj(bubble.scale=NULL, cex.axis)
@@ -23,6 +24,18 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   main.lab <- gl$mb
   sub.lab <- gl$sb
   cex.lab <- gl$cex.lab
+ 
+  # set margins
+  margs <- .marg(0, y.lab, x.lab, main)
+  lm <- margs$lm
+  tm <- margs$tm
+  rm <- margs$rm
+  bm <- margs$bm
+ 
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))
+  
+  par(mai=c(bm, lm, tm, rm))
 
   # set up plot area
   bv <- (boxplot(x, col="transparent", bg="transparent",
@@ -42,10 +55,11 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   max.lbl <- max(nchar(axTicks(2)))
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
           xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
-  
-  # colored background for plotting area
+ 
   usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
+ 
+  # colored background for plotting area
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
   
   # grid lines computation and print
   if (horiz) {
@@ -59,7 +73,9 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   # box plot
   boxplot(x, add=TRUE, col=col.fill, bg=col.stroke, pch=21,
           horizontal=horiz, axes=FALSE, border=col.stroke, ...)
-          
+ 
+  # colored background for plotting area
+  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
 
   # dots
   if (add.points) 
@@ -68,11 +84,10 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
          shape.pts=NULL, cex.axis=.85, col.axis="gray30",
          xlab=NULL, main=NULL,
          method="overplot", pt.reg=21, pt.out=19, 
-         col.out30="firebrick2", col.out15="firebrick4", 
-         quiet=TRUE, new=FALSE, vertical=!horiz, ...)
+         col.out30="firebrick2", col.out15="firebrick4", bx=FALSE,
+         quiet=TRUE, new=FALSE, fun.call=fun.call, ...)
 
   # summarize data
-
     n <- sum(!is.na(x))
     n.miss <- sum(is.na(x))
     mn <- .fmt(min(x, na.rm=TRUE))
@@ -91,8 +106,9 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
 
     tx <- character(length = 0)
 
-    main.lab <- as.character(main.lab)
-    if (nchar(main.lab) > 0) main.lab <- paste(",", main.lab)
+    # main.lab <- as.character(main.lab)
+    if (!is.null(main.lab))
+      if (nchar(main.lab) > 0) main.lab <- paste(",", main.lab)
     x.lb <- as.character(x.lab[length(x.lab)])  # x.lab is a vector of class call
     txt <- paste("--- ", x.lb, main.lab, " ---", sep="")
     tx[length(tx)+1] <- txt

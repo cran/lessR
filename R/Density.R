@@ -133,6 +133,14 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
   go.pdf <- FALSE
   if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
 
+    if (is.null(digits.d)) {
+      dig.dec <- .max.dd(data[,i]) + 1
+      if (dig.dec == 1) dig.dec <- 2
+    }
+    else
+      dig.dec <- digits.d
+    options(digits.d=dig.dec)
+
   for (i in 1:ncol(data)) {
 
     nu <- length(unique(na.omit(data[,i])))
@@ -140,8 +148,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
     x.name <- names(data)[i]
     options(xname = x.name)
 
-    if (is.numeric(data[,i])) {
-      # let 1 variable go through, even if num.cat
+    if (is.numeric(data[,i])) {  # has to be a numeric variable
+      # do not do num.cat vars, unless only 1 variable to analyze
       if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
 
       pdf.fnm <- .pdfname("Density", x.name, go.pdf, pdf.nm, pdf.file)
@@ -150,8 +158,10 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
       gl <- .getlabels()
       x.name <- gl$xn; x.lbl <- gl$xl;
       y.name <- gl$yn; y.lbl <- gl$yl
-      if (!quiet)
+      if (!quiet  &&  ncol(data) > 1) {
         ttlns <- .title2(x.name, y.name, x.lbl, y.lbl, TRUE)
+        ttlns <- paste(" ", "\n", ttlns, sep="")
+      }
       else
         ttlns <- ""
  
@@ -161,12 +171,20 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
             cex.axis, color.axis, rotate.values, offset, 
             x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)
       txdst <- stuff$tx
-      if (length(txdst)==0) txdst <- ""
 
-      if (ncol(data) > 1) {  # for a variable range, just print text output
-        class(ttlns) <- "out_piece"
-        class(txdst) <- "out_piece"
-        output <- list(out_title=ttlns, out_stats=txdst)
+      txotl <- ""
+      if (!quiet) {
+        txotl <- .outliers(data[,i])
+        if (txotl[1] == "") txotl <- "No (Box plot) outliers"
+      }
+
+      class(txdst) <- "out_piece"
+      class(txotl) <- "out_piece"
+      
+      if (ncol(data) > 1) {  # for a variable range, just text output
+        class(ttlns) <- "out_piece"  # title onlyi for multiple variables
+        
+        output <- list(out_title=ttlns, out_stats=txdst, out_outliers=txotl)
         class(output) <- "out_all"
         print(output)
       }
@@ -180,23 +198,14 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
     else
       if (!quiet) .ncat("Density curve", x.name, nu, n.cat)
 
-    }  # is.numeric(data[,i])
-  }  # for
+    }  # is.nmeric(data[,i])
+  }  # for (i in 1:ncol(data)), cycle through all the variables
 
 
-  dev.set(which=2)  # reset graphics window for standard R functions
-
-  if (ncol(data)==1  &&  nu>n.cat) {
+  # now further processing if only a single numerical variable to process
+  if (ncol(data) == 1  &&  nu > n.cat) {
 
     # R Markdown
-    if (is.null(digits.d)) {
-      dig.dec <- .max.dd(data[,i]) + 1
-      if (dig.dec == 1) dig.dec <- 2
-    }
-    else
-      dig.dec <- digits.d
-    options(digits.d=dig.dec)
-
     txkfl <- ""
     if (!is.null(Rmd)) {
       if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
@@ -204,12 +213,11 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
       cat(txknt, file=Rmd, sep="\n")
       txkfl <- .showfile2(Rmd, "R Markdown instructions")
     }
- 
-    class(txdst) <- "out_piece"
+
     class(txkfl) <- "out_piece"
 
     output <- list(type="Density",
-      out_title=ttlns, out_stats=txdst, out_file=txkfl,
+      out_title=ttlns, out_stats=txdst, out_outliers=txotl, out_file=txkfl,
       bw=stuff$bw, n=stuff$n, n.miss=stuff$n.miss, W=stuff$W,
          pvalue=stuff$pvalue)
 
@@ -218,5 +226,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
     return(output)
 
   }
+
+  # dev.set(which=2)  # reset graphics window for standard R functions
 
 }

@@ -25,30 +25,31 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
     col.1 <- rgb(.63,.46,.15)
     col.m1 <- rgb(.71,.65,.65)
     col.1t <- rgb(.63,.46,.15, alpha=.7)
-    col.1d <- rgb(.63,.46,.15, alpha=.4)
+    col.1d <- rgb(.63,.46,.15, alpha=.2)
     col.2 <- rgb(.49,.56,.69)
     col.m2 <- rgb(.69,.69,.75)
-    col.2t <- rgb(.49,.56,.69, alpha=.8)
-    col.2d <- rgb(.49,.56,.69, alpha=.4)
+    col.2t <- rgb(.49,.56,.69, alpha=.7)
+    col.2d <- rgb(.49,.56,.69, alpha=.2)
   }
   else {
     col.1 <- rgb(.40,.40,.40)
     col.m1 <- rgb(.40,.40,.40)
     col.1t <- rgb(.40,.40,.40, alpha=.7)
-    col.1d <- rgb(.40,.40,.40, alpha=.4)
-    col.2 <- rgb(.20,.20,.20)
-    col.m2 <- rgb(.20,.20,.20)
-    col.2t <- rgb(.20,.20,.20, alpha=.7)
-    col.2d <- rgb(.20,.20,.20, alpha=.4)
+    col.1d <- rgb(.40,.40,.40, alpha=.2)
+    col.2 <- rgb(.40,.40,.40)
+    col.m2 <- rgb(.40,.40,.40)
+    col.2t <- rgb(.40,.40,.40, alpha=.7)
+    col.2d <- rgb(.40,.40,.40, alpha=.2)
   }
 
   # plot: set up coordinate system
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
+  par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1.1, cex.lab=1.35)
   plot.new()
   plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
-  axis(1); box()
+  axis(1)
+  box()
   if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
   title(xlab=y.lbl)
 
@@ -59,23 +60,23 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
 
   # vertical line for each mean
   lines(c(m1,m1), c(0,ytop), lty="solid", lwd=.85, col=col.m1)
-  lines(c(m2,m2), c(0,ytop), lty="twodash", lwd=.85, col=col.m2)
+  lines(c(m2,m2), c(0,ytop), lty="solid", lwd=.85, col=col.m2)
 
-  # curve area
-  polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1d, border=NA, 
-      density=10, angle=45)
-  polygon(c(min(dYB$x),dYB$x,max(dYB$x)), c(0,dYB$y,0), col=col.2d, border=NA, 
-      density=10, angle=-45)
+  # curve areas
+  polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1d, border=NA)
+#      density=10, angle=45)
+  polygon(c(min(dYB$x),dYB$x,max(dYB$x)), c(0,dYB$y,0), col=col.2d, border=NA)
+#      density=10, angle=-45)
 
   # bottom border of density curve  
   segments(min(dYA$x), 0, max(dYA$x), 0, col=col.1)
   segments(min(dYB$x), 0, max(dYB$x), 0, col=col.2)
 
-  # density curve
+  # density curves
   lwd.border <- 1.75
   if (.Platform$OS == "windows") lwd.border <- 2
   lines(dYA, col=col.1t, lty="solid", lwd=lwd.border)
-  lines(dYB, col=col.2t, lty="twodash", lwd=lwd.border)
+  lines(dYB, col=col.2t, lty="solid", lwd=lwd.border)
 
   # minimum mean difference of practical importance
   if (!is.null(mmd) | !is.null(msmd)) {
@@ -108,26 +109,30 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
 
   # legends
   col.lgnd <- "gray25"
-  cex.lgnd <- .9
+  cex.lgnd <- 1.1
 
   radj <- xleft + .02*(max.x-min.x)
-  legend("topleft", legend = textL, fill=col.L, density=20, angle=aL, bty="n",
-      text.col=col.lgnd, cex=cex.lgnd)
-  text(radj, ytop-.10*max.y, label=bquote(paste("n = ", .(nL))),
+  # legend("topleft", legend = textL, fill=col.L, density=20, angle=aL, bty="n",
+      # text.col=col.lgnd, cex=cex.lgnd)
+  text(radj, ytop-.05*max.y, label=c(paste(Xnm,X2nm)),
       adj=0, col=col.lgnd, cex=cex.lgnd)
-  text(radj, ytop-.145*max.y, label=bquote(paste("m = ", .(.fmtc(mL,digits.d)))),
+  text(radj, ytop-.115*max.y, label=bquote(paste("n = ", .(nL))),
       adj=0, col=col.lgnd, cex=cex.lgnd)
-  text(radj, ytop-.19*max.y, label=bquote(paste("s = ", .(.fmtc(sL,digits.d)))),
+  text(radj, ytop-.170*max.y, label=bquote(paste("m = ", .(.fmtc(mL,digits.d)))),
+      adj=0, col=col.lgnd, cex=cex.lgnd)
+  text(radj, ytop-.225*max.y, label=bquote(paste("s = ", .(.fmtc(sL,digits.d)))),
       adj=0, col=col.lgnd, cex=cex.lgnd)
 
   ladj <- xright - .02*(xright-xleft)
-  legend("topright", legend = textR, fill=col.R, density=20, angle=aR, bty="n",
-      text.col=col.lgnd, cex=cex.lgnd)
-  text(ladj, ytop-.10*max.y, label=bquote(paste("n = ", .(nR))),
+  # legend("topright", legend = textR, fill=col.R, density=20, angle=aR, bty="n",
+      # text.col=col.lgnd, cex=cex.lgnd)
+  text(ladj, ytop-.05*max.y, label=c(paste(Xnm,X1nm)),
       adj=1, col=col.lgnd, cex=cex.lgnd)
-  text(ladj, ytop-.145*max.y, label=bquote(paste("m = ", .(.fmtc(mR,digits.d)))),
+  text(ladj, ytop-.115*max.y, label=bquote(paste("n = ", .(nR))),
       adj=1, col=col.lgnd, cex=cex.lgnd)
-  text(ladj, ytop-.19*max.y, label=bquote(paste("s = ", .(.fmtc(sR,digits.d)))),
+  text(ladj, ytop-.170*max.y, label=bquote(paste("m = ", .(.fmtc(mR,digits.d)))),
+      adj=1, col=col.lgnd, cex=cex.lgnd)
+  text(ladj, ytop-.225*max.y, label=bquote(paste("s = ", .(.fmtc(sR,digits.d)))),
       adj=1, col=col.lgnd, cex=cex.lgnd)
 
   # scale for s-pooled, d, mdiff at top of graph
@@ -166,20 +171,20 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
 
   # title area, above graph
   if (show.title) {
-    mtext(paste("Two-Group Plot"), side=3, line=6.6, font=2)
-    mtext(paste("Compare",Ynm,"for",Xnm,X1nm,"and",X2nm), side=3, line=5.6, font=3, cex=.8)
+    mtext(paste("Two-Group Plot with Means"), side=3, line=6.6, font=2)
+    mtext(paste("Compare",Ynm,"for",Xnm,X1nm,"and",X2nm), side=3, line=5.5, font=3, cex=.9)
     mtext(bquote(paste("  Classic t-test of 0 Mean Diff:   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(df), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 
-      line=4.0, cex=.8, adj=0)
+      line=3.8, cex=.9, adj=0)
     mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Mean Difference:  ",
-      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=3.0, cex=.8, adj=0)
+      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=2.75, cex=.9, adj=0)
     #mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Standardized",
       #" Mean Diff:   ", 
       #.(.fmt(deltaL,3)), " to ", .(.fmt(deltaU,3)))), side=3, line=1.9, cex=.8, adj=0)
     mtext(bquote(paste("s-within")), side=3, line=.7, 
-          at=(mlow+(last.coord.x))/2, col="gray40", cex=.8)
+          at=(mlow+(last.coord.x))/2, col="gray40", cex=.9)
     mtext(bquote(paste(.(round(sw,2)))), side=3, line=-0.1,
-          at=(mlow+(last.coord.x))/2, col="gray40", cex=.8)
+          at=(mlow+(last.coord.x))/2, col="gray40", cex=.9)
   }
 
 }

@@ -4,7 +4,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
        over.grid, cex.axis, col.axis, rotate.values, offset,
        breaks, bin.start, bin.width,
        bin.end, prop, hist.counts, cumul,
-       xlab, ylab, main, sub, quiet, fun.call=NULL, ...) {
+       xlab, ylab, main, sub, quiet, fun.call=NULL, do.plot=TRUE, ...) {
 
        
   if (is.numeric(breaks) && !is.null(bin.start)) { 
@@ -54,7 +54,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   }
   
   # for user supplied bins, from seq function or bin.start, 
-  #  make sure entire data range is spanned
+  # make sure entire data range is spanned
   if (is.numeric(breaks)) {
     cc <- cut(x, breaks, dig.lab=6, ...)   # replace each data value with its bin
     labs <- levels(cc)  # get list of unique bins, ordered
@@ -100,7 +100,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   # calculate but do not plot the histogram
   # arguments in ... for plotting instructions generate warnings with no plot
   h <- suppressWarnings(hist(x, plot=FALSE, breaks, labels=hist.counts, ...))
-  
+
   # relative frequency histogram option
   if (prop) h$counts <- h$counts/length(x)
     
@@ -109,51 +109,66 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     old.counts <- h$counts
     h$counts <- cumsum(h$counts)
   }
+  
+  if (do.plot) {
 
-  if (is.null(main)) {
+    # set margins
+    max.width <- strwidth(as.character(max(pretty(h$counts))), units="inches")
+    
+    margs <- .marg(max.width, y.lab, main, prop)
+    lm <- margs$lm
+    tm <- margs$tm
+    rm <- margs$rm
+    bm <- margs$bm
+   
     orig.params <- par(no.readonly=TRUE)
-    on.exit(par(orig.params))
-    par(mar=c(4,4,2,2)+0.1)
+    on.exit(par(orig.params))  
+    
+    par(mai=c(bm, lm, tm, rm))
+
+    # set up plot 
+    plot(h, freq=TRUE, axes=FALSE, ann=FALSE, ...)
+
+    # axis, axis ticks
+    .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
+          par("usr")[1], par("usr")[3], size.axis, col.axis,
+          rotate.values, offset, ...)
+
+    # axis labels
+    max.lbl <- max(nchar(axTicks(2)))
+    .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
+            xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
+    
+    # grid lines computation
+    vy <- pretty(h$counts)
+    vx <- h$breaks
+
+    # color plotting background color
+    usr <- par("usr")          
+    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
+
+    # plot the histogram and grid lines
+    if (!over.grid) {
+      abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
+      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+    }
+
+    # box for plotting area
+    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
+
+    plot(h, add=TRUE, col=col.fill, border=col.stroke, freq=TRUE, labels=hist.counts, ...)
+    if (cumul == "both") {
+      h$counts <- old.counts
+      plot(h, add=TRUE, col=col.reg, freq=TRUE)
+    }
+    
+    if (over.grid) {
+      abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
+      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+    }
   }
   
-  # set up plot area
-  plot(h, freq=TRUE, axes=FALSE, ann=FALSE, ...)
-
-  # axis, axis ticks
-  .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-        par("usr")[1], par("usr")[3], size.axis, col.axis,
-        rotate.values, offset, ...)
-
-  # axis labels
-  max.lbl <- max(nchar(axTicks(2)))
-  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
-
-  # colored background for plotting area
-  usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
   
-  # grid lines computation
-  vy <- pretty(h$counts)
-  vx <- h$breaks
-
-  # plot the histogram and grid lines
-  if (!over.grid) {
-    abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
-    abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
-  }
-
-  plot(h, add=TRUE, col=col.fill, border=col.stroke, freq=TRUE, labels=hist.counts, ...)
-  if (cumul == "both") {
-    h$counts <- old.counts
-    plot(h, add=TRUE, col=col.reg, freq=TRUE)
-  }
-  if (over.grid) {
-    abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
-    abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
-  }
-
- 
 #------------
 # text output
 #------------
@@ -172,5 +187,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     return(list(txsug=txsug, ttx=tx, bin.width=bin.width, n.bins=n.bins, breaks=h$breaks, 
       mids=h$mids, counts=h$counts, prop=prop, counts_cum=cum.c, prop_cum=cum.p))
   }
+  
+
 
 }

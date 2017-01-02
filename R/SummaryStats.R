@@ -2,7 +2,6 @@ SummaryStats <-
 function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
     digits.d=NULL, brief=getOption("brief"), ...)  {
 
-
   # get variable name before potential call of data$x
   x.name <- deparse(substitute(x))  # could be a vars list
   options(xname = x.name)
@@ -51,7 +50,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (!missing(x)) {
 
     if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
-      .nodf(df.name)  # check to see if data frame container exists 
+      .nodf(df.name)  # check to see if data frame container exists     
       .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
       all.vars <- as.list(seq_along(data))  # even if only a single var
       names(all.vars) <- names(data)  # all data in data frame
@@ -69,10 +68,11 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       }
     }
 
-    else { # x is in the global environment (vector or data frame)
+    else {  # x is in the global environment (vector or data frame)
       if (is.data.frame(x))  # x a data frame
         data <- x
       else {  # x a vector in global
+        .xstatus(x.name, df.name)  # var in df?, vars lists not checked
         if (!is.function(x))
           data <- data.frame(x)  # x is 1 var
         else
@@ -132,7 +132,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     else if (is.character(x.call))
       if (nlevels(factor(x.call)) < length(x.call)) { 
         stuff <- .ss.factor(factor(x.call), by, brief, digits.d=NULL,
-                        x.name, y.name, x.lbl, y.lbl, ...) 
+                        x.name, y.name, x.lbl, y.lbl, ...)
       }
       else cat("\n Appears to contain unique Names or IDs", "\n")
 
@@ -141,6 +141,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       txttl <- stuff$title
       txsts <- stuff$counts
       txchi <- stuff$chi
+      txlbl <- stuff$lbl
       frq <- stuff$freq
       prp <- stuff$prop
     }
@@ -179,9 +180,11 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
         class(txttl) <- "out_piece"
         class(txsts) <- "out_piece"
         class(txchi) <- "out_piece"
+        class(txlbl) <- "out_piece"
         class(frq) <- "out_piece"
         class(prp) <- "out_piece"
-        output <- list(out_title=txttl, out_stats=txsts, out_chi=txchi, freq=frq, prop=prp)
+        output <- list(out_title=txttl, out_stats=txsts, out_chi=txchi,
+                       out_lbl=txlbl, freq=frq, prop=prp)
       }
       else if (n.dim == 2) {
         class(txttl) <- "out_piece"

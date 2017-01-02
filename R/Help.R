@@ -139,8 +139,13 @@ function(topic=NULL) {
   A data file organizes the data into a table, with variables in the
   columns and the data for a single person, company, etc. in a row.
   By default, include the name of each variable in the first row.
-  After the first row, only data values are included. 
+  After the first row, only data values are included.
+  
+  This Excel example is of four variables -- Age, Gender, Dept and 
+  Salary -- and an ID field, Name. Data are shown for 7 different people.
+  "
 
+  t2 <- "
   The lessR function Read can read data files in many file formats,
   including MS Excel. The most generic format is the csv format, for
   \"comma separated values\". A csv file is a text file with commas
@@ -148,23 +153,14 @@ function(topic=NULL) {
   names are in the first row and each remaining row contains the data
   for one case, such as one person or one company, etc. Each column
   contains the data for the corresponding variable.
-
-  To create the csv file from Excel, do a Save As and choose the csv
-  format. With the free, open source LibreOffice Calc, click the arrow
-  in the left margin towards the bottom labeled File type. From the
-  available options, choose Text CSV. Then Save button. 
-
-  A fixed width format text data file is where each column of data
-  values is assigned a specific width, often with no spaces between
-  the data values. R can write a data file [see Help(Write)], what is
-  called an native R data file with a default file type of .rda. Data files
-  written by the SPSS system have the default file type of .sav. Both
-  of these files can be read into R, as well as Excel files directly.
   "
 
   set.up.plot(0)
+  img <- readPNG(system.file("img", "DataExcel.png", package="lessR"))
+  rasterImage(img, 8, 39 ,48, 66)
   text(50,100, label=t0, font=4)
-  text(0,52, label=t1, adj=0)
+  text(0,82, label=t1, adj=0)
+  text(0,23, label=t2, adj=0)
 
   help.more("Read", 8)
   }
@@ -505,24 +501,24 @@ function(topic=NULL) {
   f1 <- bquote(paste(bold("Plot, sp"), "  A scatterplot for one or two variables"))
 
   t1 <- "
-  Plot, or sp, generates a scatter plot for one or more variables with
-  the current color theme, with an optional 0.95 data ellipse and fit line.
-  The points have a default transparency, which can be modified.
+  Plot, or sp, generates a scatter plot for any combination of continuous
+  or categorical variables with the current color theme. For continuous
+  variables, can have an optional data ellipse and fit line.
       > Plot(X, Y, ellipse=TRUE, fit.line=TRUE)
   For sorted values of X, a function plot results so that the points are
   not individually displayed and are connected by line segments. If the
   number of unique response values <= n.cat=8, produce a bubble plot.
 
-  Plot can also provide for plotting two variables with different
-  symbols and/or colors for each level of a third variable.
+  Can also plot two variables with different symbols and/or colors 
+  for each level of a third variable.
       > Plot(X, Y, by=Z)
   For a continuous third variable, produce a bubble plot,
       > Plot(X, Y, size=Z)
 
   Here plot Salary against 3 variables, with 3 least squares fit lines.
       > Plot(Salary, c(Pre, Post, Years), fit.line=\"ls\")
-  Here plot the means of Salary for each Dept.
-      > Plot(Dept, Salary, topic=\"mean\")
+  Here obain a bubble plot of two categorical variables.
+      > Plot(Gender, Dept)
 
   The colors option specifies color themes. Here all subsequent
   graphics are with the sienna color theme, no transparency.
@@ -642,7 +638,7 @@ function(topic=NULL) {
 
   Or, do the analysis directly from summary statistics, the sample size
   (n), sample mean (m) and sample standard deviation (s). Ynm is the
-  name of the response variable.
+  name of the response variable, the variable to be analyzed.
       > ttest(n=34, m=8.92, s=1.67, Ynm=\"Time\")" 
   set.up.plot(1)
   text(50,100, label=t0, font=4)

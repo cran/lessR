@@ -93,12 +93,25 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
       txt <- "Hadley Wickham's readxl package]"
       cat("[with the read_excel function from", txt, "\n") 
     }
-    if (brief)
-      cat("[more information with details() for mydata, or details(name)]\n")
+    
     if (browse) {
       cat("\n")
       cat("Data File:  ", ref, "\n")
       if (!is.null(labels))  cat("Label File:  ", ref.lbl, "\n")
+    }
+
+    # function call for suggestions
+    fncl <- .fun.call.deparse(fun.call) 
+
+    if (getOption("suggest")) {
+      if (brief || !grepl("labels", fncl))
+        cat("\n>>> Suggestions\n")
+      if (!grepl("labels", fncl)  &&  format != "lessR")
+        cat("Use the  labels  option to read a file of variable labels\n",
+            "  or use the VariableLabels function, also vl, to assign\n")
+      if (brief)
+        cat("Get more information with details() for mydata, or details(name)\n")
+      cat("\n")
     }
   }
 
@@ -132,11 +145,12 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
 
   }  # end text file
       
-  else if (format == "Excel") { 
+  else if (format == "Excel") {
+
     if (isnot.row2) {  # read data
-      d <- read_excel(path=ref, sheet=sheet, ...)
+      d <- read_excel(path=ref, sheet=sheet)
       #d <- read.xls(xls=ref, sheet=sheet, na.strings=c("NA","#DIV/0!", ""), ...)
-      if (!is.null(list(...)$row.names))  #  see if do row.names 
+      if (!is.null(list(...)$row.names))  # add row.names to read_excel
         d <- data.frame(d, row.names=list(...)$row.names)
       class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
     }

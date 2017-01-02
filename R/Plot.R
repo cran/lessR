@@ -1,9 +1,8 @@
 Plot <-
 function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
-         topic=c("data", "count", "prop", "sum", "mean", "sd", "min", "median",
-                 "max"),
-         object=c("point", "line", "both", "sunflower", "bar", "off"),
+         values=c("data", "count", "prop", "sum", "mean", "sd", "min",
+                  "median", "max"),
 
          color.fill=getOption("color.fill.pt"),
          color.stroke=getOption("color.stroke.pt"),
@@ -11,15 +10,20 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          color.grid=getOption("color.grid"),
          color.box=getOption("color.box"),
 
-         color=NULL, color.trans=NULL, color.area=NULL,
+         color=NULL, color.trans=NULL,
 
          cex.axis=0.76, color.axis="gray30", xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
          value.labels=NULL, rotate.values=0, offset=0.5,
          proportion=FALSE,
 
+         run.chart=FALSE, line.width=2, color.area=FALSE, 
+         center.line=c("default", "mean", "median", "zero", "off"),
+         show.runs=FALSE,
+
          size=NULL, shape="circle", means=TRUE,
-         sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
+         sort.yx=FALSE,
+         segments.y=FALSE, segments.x=FALSE,
 
          smooth=FALSE, smooth.points=100, smooth.trans=0.25,
          smooth.bins=128,
@@ -29,12 +33,14 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
          fit.line=NULL, color.fit.line="gray55",
 
-         ellipse=FALSE, color.ellipse="lightslategray",
-         color.fill.ellipse="off",
+         ellipse=FALSE, color.ellipse=getOption("color.stroke.pt"),
+         color.fill.ellipse=getOption("color.fill.ellipse"),
 
          method="overplot", pt.reg="circle", pt.out="circle",
          color.out30="firebrick2", color.out15="firebrick4", new=TRUE,
+         boxplot=FALSE,
 
+         bar=FALSE,
          breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
          cumul=c("off", "on", "both"), hist.counts=FALSE,
          color.reg="snow2",
@@ -48,24 +54,51 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          pdf.file=NULL, pdf.width=NULL, pdf.height=NULL,
          fun.call=NULL, ...) {
 
-
+  # ------
+  # set parameter values 
+  
   if (is.null(fun.call)) fun.call <- match.call()
+   
+  values <- match.arg(values)
+  center.line <- match.arg(center.line)
+  cumul <- match.arg(cumul)
 
-  # missing function only reliable if arg not modified, so capture here
-  object.miss <- ifelse (missing(object), TRUE, FALSE)
-  topic.miss <- ifelse (missing(topic), TRUE, FALSE)
+  # missing function only reliable if arg not modified, so capture 
+  x.miss <- ifelse (missing(x), TRUE, FALSE)
+  y.miss <- ifelse (missing(y), TRUE, FALSE)
+  by.miss <- ifelse (missing(by), TRUE, FALSE)
+  values.miss <- ifelse (missing(values), TRUE, FALSE)
   seg.y.miss <- ifelse (missing(segments.y), TRUE, FALSE)  # for Cleveland plot
   seg.x.miss <- ifelse (missing(segments.x), TRUE, FALSE)
   sort.yx.miss <- ifelse (missing(sort.yx), TRUE, FALSE)
   col.grid.miss <- ifelse (missing(color.grid), TRUE, FALSE)
 
   if (color.grid == "on") color.grid <- getOption("color.grid") # for Cleveland
+  if (is.logical(color.area))
+    color.area <- ifelse (color.area, getOption("color.fill.pt"), "off")
+ 
+  # any run.chart parameter activates a run.chart
+  if (show.runs)
+    run.chart <- TRUE
 
-  object <- match.arg(object)
-  topic <- match.arg(topic)
-  cumul <- match.arg(cumul)
+  # any bin parameter activates bins
+  if (!missing(breaks)  ||  !missing(bin.start)  ||  !missing(bin.width)  ||
+      !missing(bin.end))
+    values <- "count"
 
-  if (object.miss) object <- "default"
+  object <- "default"
+  if (bar) {
+    object <- "bar"
+    if (values == "data") values <- "count"
+
+    if (values.miss) values <- "count"  # default topic for bars
+    if (values == "data") {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Bars do not apply to data, only to count, mean, etc.\n\n")
+    }
+    if (missing(color.fill)) color.fill <- getOption("color.fill.bar")
+  }
+  if (run.chart) object <- "both"
 
   # any bubble parameter activates a bubble plot
   if (!missing(bubble.scale) || !missing(bubble.scale) || !missing(bubble.text)) {
@@ -73,23 +106,21 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   }
 
   # any ellipse parameter actives an ellipse
-  if (missing(ellipse)) if (!missing(color.ellipse) || !missing(color.fill.ellipse))
-    ellipse <- TRUE
+  if (missing(ellipse)) 
+    if (!missing(color.ellipse) || !missing(color.fill.ellipse))
+      ellipse <- TRUE
 
-  # any bin parameter activates bins
-  if (!missing(breaks)  ||  !missing(bin.start)  ||  !missing(bin.width)  ||
-      !missing(bin.end))
-    object <- "bar"
-
-  if (object == "bar") {
-    if (topic.miss) topic <- "count"  # default topic for bars
-    if (topic == "data") {
+  if (is.null(fit.line)) fit.ln <- "off"
+  if (is.logical(fit.line))
+    fit.ln <- ifelse (fit.line, "loess", "off")
+  if (is.character(fit.line)) {
+    if (!(fit.line %in% c("loess", "ls", "off"))) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Bars do not apply to data, only to count, means, etc.\n\n")
+        "fit.line applies only for  loess  or  ls  (least squares)\n\n")
     }
-    if (missing(color.fill)) color.fill <- getOption("color.fill.bar")
+    fit.ln <- fit.line  # fit.ln passed to .plt.main
   }
-
+  
   # "off" substitutes for official arg value of "transparent"
   for (i in 1:length(color.fill))
     if (color.fill[i] == "off") color.fill[i] <- "transparent"
@@ -99,22 +130,12 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (color.grid == "off" ) color.grid <- "transparent"
   if (color.box == "off") color.box <- "transparent"
   if (color.fill.ellipse == "off") color.fill.ellipse <- "transparent"
+  if (!is.null(color.area)) if (color.area == "off") color.area <- "transparent"
 
   # populate color parameters
   if (!is.null(color)) {
     color.stroke <- color
     color.fill <- color
-  }
-
-  if (is.null(fit.line)) fit.ln <- "none"
-  if (is.logical(fit.line))
-    fit.ln <- ifelse (fit.line, "loess", "none")
-  if (is.character(fit.line)) {
-    if (!(fit.line %in% c("loess", "ls", "none"))) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "fit.line applies only for  loess  or  ls  (least squares)\n\n")
-    }
-    fit.ln <- fit.line
   }
 
   if (is.logical(ellipse)) if (ellipse) ellipse <- 0.95
@@ -127,122 +148,61 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
 
 
-  dots <- list(...)  # check for deprecated parameters
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      old.nm <- c("col.fill", "col.stroke", "col.bg", "col.grid", "col.box",
-                  "col.reg", "col.axis", "col.trans", "col.low", "col.hi",
-                  "col.ellipse", "col.fill.ellipse", "col.fit.line", "col.out30",
-                  "col.out15")
-      if (names(dots)[i] %in% old.nm) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  now begin with  ",
-          "color \n\n")
-      }
-      if (names(dots)[i] %in% c("x.start","x.end","y.start","y.end")) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "x.start, x.end, y.start, and y.end no longer used\n\n",
-          "Instead use the standard R xlim and ylim parameters,\n",
-          "such as xlim=c(0,40) to specify from 0 to 40. Same for ylim.\n\n")
-      }
-      if (names(dots)[i] == "kind") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  kind  is renamed  object\n\n")
-      }
-      if (names(dots)[i] == "knitr.file") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "knitr.file  no longer used\n",
-          "Instead use  Rmd  for R Markdown file\n\n")
-      }
-      if (names(dots)[i] == "type") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "type  option replaced with  object\n\n")
-      }
-      if (names(dots)[i] == "diag") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "diag  option no longer available\n\n")
-      }
-    }
-  }
-
-  # inconsistent parameter values
-  if (missing(x)) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Must specify at least one variable to analyze\n\n")
-  }
-
-  if (topic %in% c("mean", "sd", "min", "max") && missing(y)) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Must specify a numeric y-variable from which to compute the\n ",
-      " ", topic, " for each level of ", deparse(substitute(x)), "\n\n")
-  }
-
-  if (topic != "data"  &&  object == "sunflower") {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Sunflowers are only plotted for data\n\n")
-  }
-
-  if (method == "stack") {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Option  stack  does not work\n\n")
-  }
-
-  if (method %in% c("spearman", "kendall")) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "The  method  parameter has another meaning for Plot\n\n",
-      "Compute a Spearman or Kendall correlation\n",
-      "  with the Correlation function\n\n")
-  }
-
-  if (is.numeric(breaks) && !is.null(bin.start)) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Choose only one option to specify a start value.\n",
-      "Either choose the option  breaks  or the option  bin.start.\n\n")
-  }
-
-
+  # ------
   # process shapes
-  bad.shape <- NULL
-  shapes <- c("circle", "square", "diamond", "triup", "tridown")
-  shapes.all <- c(shapes, c(21:25), letters, LETTERS, 0:9, "+", "*", "#",
-                  "%", "!", "=", "-", "&", "$", "?", "|", ">", "<", "@")
+  if (shape[1] == "sunflower")
+    object <- "sunflower"
 
-  num.flag <- FALSE
-  for (i in 1:length(shape)) {
-    if (!(shape[i] %in% shapes.all)) {
-      bad.shape <- shape[i]
-    }
-    else if (shape[i] %in% shapes) {
-        shape[i] <- which(shape[i]==shapes) + 20
+  else {
+    bad.shape <- NULL
+    shapes <- c("circle", "square", "diamond", "triup", "tridown")
+    shapes.all <- c(shapes, c(21:25), letters, LETTERS, 0:9, "+", "*", "#",
+                    "%", "!", "=", "-", "&", "$", "?", "|", ">", "<", "@")
+
+    num.flag <- FALSE
+    for (i in 1:length(shape)) {
+      if (!(shape[i] %in% shapes.all)) {
+        bad.shape <- shape[i]
+      }
+      else if (shape[i] %in% shapes) {
+        shape[i] <- which(shape[i] == shapes) + 20
         num.flag <- TRUE
+      }
+    }
+    if (num.flag) shape <- as.numeric(shape)
+
+    if (pt.reg %in% shapes)  # regular point
+      pt.reg <- which(pt.reg == shapes) + 20
+    else
+      if (!(pt.reg %in% c(21:25))) bad.shape <- pt.reg
+
+    if (pt.out %in% shapes)  # outlier point
+      pt.out <- which(pt.out == shapes) + 20
+    else
+      if (!(pt.out %in% c(21:25))) bad.shape <- pt.out
+
+    if (!is.null(bad.shape)) {
+        message("\nValid shapes")
+        message("------------")
+        for (j in 1:length(shapes)) message(shapes[j])
+        message("all uppercase and lowercase letters")
+        message("all digits")
+        message("+ * # % ! = - & $ ? | < > @")
+        cat("\n")
+        stop(call.=FALSE, "\n","------\n",
+        "Not a valid shape: ", bad.shape, "\n\n")
     }
   }
-  if (num.flag) shape <- as.numeric(shape)
+    
 
-  if (pt.reg %in% shapes)
-    pt.reg <- which(pt.reg==shapes) + 20
-  else
-    if (!(pt.reg %in% c(21:25))) bad.shape <- pt.reg
-
-  if (pt.out %in% shapes)
-    pt.out <- which(pt.out==shapes) + 20
-  else
-    if (!(pt.out %in% c(21:25))) bad.shape <- pt.out
-
-  if (!is.null(bad.shape)) {
-      message("\nValid shapes")
-      message("------------")
-      for (j in 1:length(shapes)) message(shapes[j])
-      message("all uppercase and lowercase letters")
-      message("all digits")
-      message("+ * # % ! = - & $ ? | < > @")
-      cat("\n")
-      stop(call.=FALSE, "\n","------\n",
-      "Not a valid shape: ", bad.shape, "\n\n")
-  }
+  # ------
+  # see if dated or inconsistent parameter values
+  .plt.zbad(x.miss, y.miss, values, method, breaks, bin.start, bar, ...)
 
 
   # ------
+  # evaluate x
+  
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x))
   options(xname = x.name)
@@ -325,9 +285,9 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     if (num.cat.x && !quiet) .ncat("Plot", x.name, nu, n.cat)
     cat.x <- ifelse (num.cat.x || is.factor(x.call), TRUE, FALSE)
 
-    if (cat.x  &&  object %in% c("line", "both")) {
+    if (cat.x  &&  object == "both") {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "A line applies only to continuous variables\n",
+        "A run chart applies only to continuous variables\n",
         x.name, " is a categorical variable\n\n")
     }
   }
@@ -335,7 +295,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else {  # more than one x-variable
     # no y, see if eligible for BPFM where all selected vars are cat
     # multiple lines of a continuous x-variable also can occur
-    if (missing(y)  &&  !(object %in% c("line", "both"))) {
+    if (y.miss  &&  !(object == "both")) {
       for (i in 1:length(x.col)) {  # see if variables are all categorical
         nu <- length(unique(na.omit(data.x[,i])))
         num.cat <- .is.num.cat(data.x[,i], n.cat)
@@ -359,19 +319,17 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       cat.x <- FALSE
     }
   }  # end more than 1 x-variable
-
+ 
+  
   if (!BPFM)
-    n.rows <- ifelse(is.matrix(x.call), nrow(x.call), length(x.call))
+    n.rows <- ifelse (is.matrix(x.call), nrow(x.call), length(x.call))
   else
     n.rows <- length(data.x)
 
+
   # smooth default
-  smooth.switch <- FALSE
-  if (n.rows > 2499) {
-    if (missing(smooth)) smooth <- TRUE
-    smooth.switch <- TRUE
-  }
-  if (smooth) if (missing(color.grid)) color.grid="transparent"
+  if (n.rows > 2499) if (missing(smooth)) smooth <- TRUE
+  if (smooth) if (missing(color.grid)) color.grid <- "transparent"
 
 
   # evaluate y
@@ -447,28 +405,31 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   }
   else { # missing y
     y.call <- NULL
-    if (!cat.x && topic %in% c("count", "prop") && (object.miss)) {
-      object <- "bar"
-      if (missing(color.fill)) color.fill <- getOption("color.fill.bar")
-    }
+    if (bar && missing(color.fill))
+      color.fill <- getOption("color.fill.bar")
   }
 
+    if (cat.x  &&  run.chart) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Run chart only applies to a numerical variable\n\n")
+    }
 
   # ellipse stop conditions
   if (as.logical(ellipse[1])) {
     many.y <- FALSE
-    if (!missing(y)) if (is.matrix(y.call)) many.y <- TRUE
-    if ((ncol(data.x)>1 || many.y)) {
+    if (!y.miss) if (is.matrix(y.call)) many.y <- TRUE
+    if ((ncol(data.x)>1 || many.y)  ||  cat.x  ||  cat.y) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "An ellipse only applies to an analysis of a single x-variable\n",
-        "  with a single y-variable\n\n")
+        "An ellipse only applies to analysis of a single x-variable \n",
+        "  with a single y-variable, both numerical\n\n")
     }
-    if (missing(y)) {
+    if (y.miss) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Need a y-variable to compute an ellipse\n\n")
     }
   }
 
+  
   # evaluate by
   #-----------
   if (!missing(by)) {
@@ -525,7 +486,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       }
       options(sizename = size.name) # for later access
       object <- "bubble"
-      if (is.null(bubble.text)) bubble.text <- ifelse(cat.x, 1, 2)
+      if (is.null(bubble.text)) bubble.text <- ifelse (cat.x, 1, 2)
     }
     else  # size is a numerical constant
       bubble.text <- FALSE
@@ -533,12 +494,15 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else
     if (missing(bubble.text)) bubble.text <- TRUE
 
+  # -----------  x, y, by and size variables established ------------
 
+  
   # --------
-  # graphics
-  if (is.null(y.call)  &&  !BPFM  &&  method != "stack" &&  topic == "data"
-      && !(object %in% c("line", "both", "bar"))  &&  !is.ts(x.call))
-    plt.h <- ifelse(is.null(main), 2.5, 3.1)  # narrow for 1-D plot
+  # manage regular-R or PDF graphics window size
+  
+  if (is.null(y.call)  &&  !BPFM  &&  method != "stack" &&  values == "data"
+      && !(object %in% c("both", "bar"))  &&  !is.ts(x.call))
+    plt.h <- ifelse (is.null(main), 2.5, 3.1)  # narrow for 1-D plot
   else
     plt.h <- 7
 
@@ -552,18 +516,12 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       if (getOption("device") == "RStudioGD") regR <- FALSE
     if (!is.null(options()$knitr.in.progress)) regR <- FALSE
     if (regR) {  # regular R run
-      if (missing(by)) {  # set up graphics system to manage
-      #  if (is.null(y.call)) {  # applies to 1-D scatter plots and BPFM
-          .graphwin(1, d.h=plt.h)
-        # }
-        # else
-          # .graphwin(1)
-      }
+      if (by.miss)  # set up graphics system to manage
+        .graphwin(1, d.h=plt.h)
       else  # there is a by variable
         .graphwin(d.w=pdf.width)  # add width to default of 4.5 for legend
     }
   }
-
   else  {  # pdf file
     if (is.null(pdf.width)) pdf.width <- 4.5
     if (!missing(by.call)) pdf.width <- pdf.width + 0.6
@@ -574,11 +532,11 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
 
   # ------------------------------------------------
-  # set object and topic where needed
+  # set object and values where needed
 
   # prep 1-variable bubble plot to call regular scatter plot function
   # y.call to 0
-  if (is.null(y.call)  &&  cat.x  &&  n.x_var == 1  &&  topic == "data") {
+  if (is.null(y.call)  &&  cat.x  &&  n.x_var == 1  &&  values == "data") {
     y.call <- rep(0, length(x.call))
     cat.y <- FALSE
     if (object == "default") object <- "bubble"
@@ -602,7 +560,10 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
         rm(d.x)
       }  # also no y missing
 
-      if(!is.unsorted(x.call) && eq.int && sum(is.na(y))==0) object <- "line"
+      if(!is.unsorted(x.call) && eq.int && sum(is.na(y))==0) {
+        object <- "both"
+        if (is.null(size)) size <- 0  # by default, just plot a line without the points
+      }
     }
   }
 
@@ -624,7 +585,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
         rm(d.y)
       }  # also no y missing
 
-      if(!is.unsorted(y.call) && eq.int && sum(is.na(x))==0) object <- "line"
+      if (!is.unsorted(y.call) && eq.int && sum(is.na(x))==0) object <- "both"
     }
   }
 
@@ -632,37 +593,36 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (object == "default") {  # set default
     if (!missing(y)) {
       object <- "point"
-      if (topic == "data") if (cat.x && cat.y) object <- "bubble"
+      if (values == "data") if (cat.x && cat.y) object <- "bubble"
     }
-    else if (topic %in% c("count", "prop")) {
+    else if (values %in% c("count", "prop")) {
       object <- "point"
     }
     else {
-      if (topic == "data") object <- ifelse (cat.x, "bubble", "point")
+      if (values == "data") object <- ifelse (cat.x, "bubble", "point")
       if (BPFM) object <- "bubble"  # BPFM
     }
-  }
-
-  if (!quiet) {
-    cat("\n")
-    cat(">>> values to plot:   topic = \"", topic, "\"\n", sep="")
-    cat(">>> geometric object: object = \"", object, "\"\n", sep="")
-    if (smooth.switch)
-      cat("\n>>> 2500 or more rows of data, smoothing turned on \n",
-          "    To plot the data as is: smooth=FALSE\n", sep="")
-    cat("\n")
   }
 
 
   # ------------------------------------------------
   # analysis
-
+  # ------------------------------------------------
+  
+  
+  if (getOption("suggest")) {
+    # function call for suggestions
+    fncl <- .fun.call.deparse(fun.call) 
+    fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
+    fncl <- gsub(" = ", "=", fncl)
+  }
+  
   # histogram or bar chart
-  if (object == "bar"  &&  topic %in% c("count", "prop")){
+  if (object == "bar"  &&  values %in% c("count", "prop")) {
 
     if (!cat.x) {  # histogram
 
-      if (topic == "prop") proportion <- TRUE
+      if (values == "prop") proportion <- TRUE
 
       h <- .hst.main(x.call, color.fill, color.stroke, color.bg, color.grid,
          color.box, color.reg,
@@ -697,9 +657,9 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       }
     }
 
-    else {  # categorical variable, bar chart for topic is count
+    else {  # categorical variable, bar chart for values = "count"
 
-      if (topic == "prop") proportion <- TRUE
+      if (values == "prop") proportion <- TRUE
       .bc.main(x.call, by=y.call,
         color.fill, color.stroke, color.bg, color.grid, color.box,
         colors=getOption("colors"),
@@ -713,76 +673,158 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   }
 
   # bubble plot frequency matrix (BPFM)
-  else if (ncol(data.x) > 1 && missing(y) && object == "bubble") {
+  else if (ncol(data.x) > 1  &&  y.miss  &&  object == "bubble") {
     # get labels just for subset data matrix
     mylabels <- attr(data, which="variable.labels")
     nm <- names(data.x)
-    if (!is.null(mylabels)) {
-      mylabs <- character(length=length(nm))
-      for (i in 1:length(nm))
+    mylabs <- character(length=length(nm))
+    for (i in 1:length(nm)) {
+      if (!(nm[i] %in% names(mylabels)))
+        mylabs[i] <- "not available"
+      else
         mylabs[i] <- mylabels[which(names(mylabels) == nm[i])]
     }
-    else
-      mylabs <- NULL
-    if (length(mylabs) == 0) mylabs <- NULL  # when labels, but not relevant
+    if (all(mylabs == "not available")) mylabs <- NULL
 
     if (is.null(xlab)) xlab <- ""  # suppress x-axis label if not specified
 
-    .dpmat.main(data[,x.col], mylabs, nm,
+    .dpmat.main(data[,x.col], mylabs, sort.yx,
       color.fill, color.stroke, color.bg, color.grid, color.trans,
       shape, color.area, color.box,
       cex.axis, color.axis, color.low, color.hi,
       xy.ticks, xlab, ylab, main, sub, size,
       bubble.scale, bubble.text, bubble.power,
-      value.labels, rotate.values, offset, quiet, ...)
+      value.labels, rotate.values, offset, quiet, fun.call, ...)
   }
+
 
   else {  # all the other analyses
 
     # line chart prep of x.call and y.call
-    if (is.null(y.call) &&  !cat.x  && object %in% c("line", "both")
-        && topic == "data") {
-      y.call <- x.call
-      cat.y <- cat.x
-      options(yname = x.name)
-      if (!is.ts(y.call)) {
-        options(xname = "Index")
-        if (!is.matrix(x.call)) #xlab <- "Index"
-          x.call <- 1:length(x.call)
-        else {
-          x.call <- 1:nrow(x.call)
+    if (y.miss) {  
+
+      if (!cat.x) { 
+
+        if (object == "both"  &&  values == "data") {
+          y.call <- x.call
+          cat.y <- cat.x
+          options(yname = x.name)
+          if (!is.ts(y.call)) {
+            options(xname = "Index")
+            if (!is.matrix(x.call)) # xlab <- "Index"
+              x.call <- 1:length(x.call)
+            else {
+              x.call <- 1:nrow(x.call)
+            }
+          }
+          else {  # time series
+            x.call <- ts.dates(y.call)
+          }
+        }
+
+        else if (values %in% c("count", "prop")) {  # frequency polygon
+
+          ssstuff <- .ss.numeric(x.call, digits.d=digits.d, brief=TRUE)
+          txss <- ssstuff$tx  # stats output before reduce data
+         
+          h <- .hst.main(x.call, color.fill, color.stroke, color.bg, color.grid,
+             color.box, color.reg,
+             over.grid=FALSE, cex.axis, color.axis, rotate.values, offset,
+             breaks, bin.start, bin.width, bin.end, proportion, hist.counts, cumul,
+             xlab, ylab, main, sub, quiet, fun.call=NULL, do.plot=FALSE, ...) 
+
+          x.call <- h$mids
+          y.call <- h$counts
+          if (values == "count")
+            ylab <- paste("Count of", x.name)
+          else {
+            y.call <- y.call / sum(y.call)
+            ylab <- paste("Proportion of", x.name)
+          }
+
+          object <- "both"  # do freq poly as a line chart
+          center.line <- "off"  # not meaningful here
+    
+          txsug <- ""
+          if (getOption("suggest")) {
+            txsug <- ">>> Suggestions"
+
+            fc <- ""
+            if (!grepl("color.area", fncl))
+              fc <- paste(fc, ", color.area=TRUE", sep="")
+            if (nzchar(fc)) {
+              fc <- paste(fncl, fc, ") ", sep="")
+              txsug <- paste(txsug, "\n", fc, sep="")
+            }
+              
+            fc <- ""
+            if (!grepl("size", fncl)  &&  !grepl("color.area", fncl))
+              fc <- paste(fc, ", size=0", sep="")
+            if (nzchar(fc)) {
+              fc <- gsub(" = ", "=", fc)
+              fc <- paste(fncl, fc, ")   # just line segments, no points", sep="")
+              txsug <- paste(txsug, "\n", fc, sep="")
+            }
+
+            bw.new <- pretty((x.call[2] - x.call[1]) / 1.5)  # arbitrary value of new bw
+            fc <- ""
+            if (!grepl("bin.width", fncl))
+              fc <- paste(fc, ", bin.width=", as.character(bw.new[1]), sep="")
+            if (nzchar(fc)) {
+              fc <- paste(fncl, fc, ") ", sep="")
+              txsug <- paste(txsug, "\n", fc, sep="")
+            }
+              
+            txsug <- .rm.arg.2(" x=", txsug) 
+            txsug <- .rm.arg.2("(x=", txsug) 
+          }
+      
+          class(txsug) <- "out_piece"
+        
+          txdst <- h$ttx
+          if (is.null(txdst)) txdst <- ""
+
+          txotl <- .outliers(x.call)
+          if (txotl[1] == "") txotl <- "No (Box plot) outliers"
+          class(txss) <- "out_piece"
+          class(txdst) <- "out_piece"
+          class(txotl) <- "out_piece"
+          output <- list(out_suggest=txsug, out_ss=txss, out_freq=txdst,
+                         out_outliers=txotl)
+          class(output) <- "out_all"
+          print(output)
+
         }
       }
-      else {  # time series
-        x.call <- ts.dates(y.call)
-      }
-    }
 
-    # only 1 variable, so set y.call to plot points for count and prop
-    if (topic %in% c("count", "prop")) {
-      if (is.null(y.call) && cat.x) {
-        if (seg.x.miss) segments.x <- TRUE
-        ylab <- ifelse(topic=="count", "Count of", "Proportion of")
-        ylab <- paste(ylab, x.name)
-        cat.y <- FALSE
-        frq <- table(x.call)
-        if (topic == "prop") frq <- frq / sum(frq)
-        y.call <- as.vector(frq)
-        if (is.factor(x.call))  # preserve ordering, will lose order attribute
-          x.call <- factor(names(frq), levels=levels(x.call))
-        else
-          x.call <- factor(names(frq))
+      else {  # cat.x
+        # just x variable, so set y.call to plot points for count and prop
+        if (values %in% c("count", "prop")) {
+          cat.y <- FALSE
+          if (seg.x.miss) segments.x <- TRUE
+          ylab <- ifelse (values=="count", "Count of", "Proportion of")
+          ylab <- paste(ylab, x.name)
+          frq <- table(x.call)
+          if (values == "prop") frq <- frq / sum(frq)
+          y.call <- as.vector(frq)
+          if (is.factor(x.call))  # preserve ordering, will lose order attribute
+            x.call <- factor(names(frq), levels=levels(x.call))
+          else
+            x.call <- factor(names(frq))
+        }
       }
-    }
 
-    # do stats console output before reducing data
-    if (topic %in% c("sum", "mean", "sd", "min", "median", "max")) {
+    }  # end is null y.call
+    
+
+    else if (values %in% c("sum", "mean", "sd", "min", "median", "max")) {
 
       n.cat <- 0
       means <- FALSE
       if (missing(segments.x)) segments.x <- TRUE
       if (is.null(color.trans)) color.trans <- 0
 
+      # do stats console output before reducing data
       if (!quiet) {
         if (!missing(y)) {
           if (cat.y) {
@@ -810,27 +852,27 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       }
 
     # set up new x.call and y.call for stats
-      if (topic == "sum") {
+      if (values == "sum") {
         ylab <- paste("Sum of", y.name)
         out <- tapply(y.call, x.call, sum, na.rm=TRUE)
       }
-      if (topic == "mean") {
+      if (values == "mean") {
         ylab <- paste("Mean of", y.name)
         out <- tapply(y.call, x.call, mean, na.rm=TRUE)
       }
-      if (topic == "sd") {
+      if (values == "sd") {
         ylab <- paste("Standard Deviation of", y.name)
         out <- tapply(y.call, x.call, sd, na.rm=TRUE)
       }
-      if (topic == "min") {
+      if (values == "min") {
         ylab <- paste("Minimum of", y.name)
         out <- tapply(y.call, x.call, min, na.rm=TRUE)
       }
-      if (topic == "median") {
+      if (values == "median") {
         ylab <- paste("Median of", y.name)
         out <- tapply(y.call, x.call, median, na.rm=TRUE)
       }
-      if (topic == "max") {
+      if (values == "max") {
         ylab <- paste("Maximum of", y.name)
         out <- tapply(y.call, x.call, max, na.rm=TRUE)
       }
@@ -848,7 +890,7 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       }
       y.call <- as.vector(out)
 
-      if (object == "bar") {  # bar chart for stats
+      if (bar) {  # bar chart for stats
         names(y.call) <- x.call
 
         .bc.main(y.call, by=NULL,
@@ -868,12 +910,12 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     # bubble plot for 1-variable (y.call=0) and 2-variable
     # line chart
     if (!is.null(y.call)  &&
-        object %in% c("point", "bubble", "line", "both", "sunflower")) {
+        object %in% c("point", "bubble", "both", "sunflower")) {
 
-      unique.x <- ifelse(length(unique(x.call)) == length(x.call), TRUE, FALSE)
-      unique.y <- ifelse(length(unique(y.call)) == length(y.call), TRUE, FALSE)
+      unique.x <- ifelse (length(unique(x.call)) == length(x.call), TRUE, FALSE)
+      unique.y <- ifelse (length(unique(y.call)) == length(y.call), TRUE, FALSE)
 
-      if (object == "point"  &&  topic == "data"){  # for Cleveland dot plot
+      if (object == "point"  &&  values == "data"){  # for Cleveland dot plot
         if (!cat.x && cat.y && unique.y) {  # no sort.xy option
           if (seg.y.miss) if (unique.y && cat.y) segments.y <- TRUE
           if (seg.x.miss) if (unique.x && cat.x) segments.x <- TRUE
@@ -897,33 +939,35 @@ function(x, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       }
 
       # bigger point for scatterplot of stats
-      if (topic != "data"  &&  object == "point"  )
+      if (values != "data"  &&  object == "point"  )
         if (is.null(size)) size <- 1.75
 
       .plt.main(x.call, y.call, by.call, n.cat,
-         object, topic,
+         object, values,
          color.fill, color.stroke, color.bg, color.grid, color.box,
          color.trans, color.area,
          cex.axis, color.axis, xy.ticks,
          xlab, ylab, main, sub, value.labels, rotate.values, offset,
          proportion,
-         size, shape, means, sort.yx, segments.y, segments.x,
+         size, shape, means, sort.yx, segments.y, segments.x, line.width,
          smooth, smooth.points, smooth.trans, smooth.bins,
          bubble.scale, bubble.power, bubble.text, color.low, color.hi,
          fit.ln, color.fit.line,
          ellipse, color.ellipse, color.fill.ellipse,
+         center.line, show.runs,
          method, pt.reg, pt.out, color.out30, color.out15,
          quiet, fun.call, ...)
     }
 
     # 1-D traditional scatter plot (not bubble plot)
-    else if (!cat.x  &&  is.null(y.call)) {
+    else if (!cat.x  &&  is.null(y.call)  &&  values == "data") {
 
       .dp.main(x.call, by.call, size,
          color.fill, color.stroke, color.bg, color.grid, color.trans,
          shape, cex.axis, color.axis, xlab, main, sub,
          rotate.values, offset, method, pt.reg, pt.out,
-         color.out30, color.out15, quiet, new, fun.call, ...)
+         color.out30, color.out15, boxplot, quiet, new, 
+         vertical=FALSE, fun.call, ...)
 
         # R Markdown
         #txkfl <- ""

@@ -39,7 +39,6 @@ function(x, y, brief, ...) {
       tx[length(tx)+1] <- .dash2(nchar(txt))
     }
 
-    tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- paste(">>> ",ct$method, sep="")
 
     if (!is.null(x.lbl) || !is.null(y.lbl)) {

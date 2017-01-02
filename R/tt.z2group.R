@@ -325,7 +325,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
     if (is.null(pdf.file)) {
       if (manage.gr) {
-        if (!line.chart) n.win <- 1  else n.win <- 3
+        n.win <- ifelse (!line.chart, 1, 3)
         .graphwin(n.win)
         dev.set(which=3)
         orig.params <- par(no.readonly=TRUE)
@@ -339,44 +339,43 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
         pdf(file=paste("LineChart_",X1nm,".pdf",sep=""), width=pdf.width, height=pdf.height)
 
       plt.i <- plt.i + 1
-      plt.title[plt.i] <- paste("Ordered Data:", paste(Xnm, X1nm))
+      plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X1nm))
 
-     .lc.main(YA, type=NULL,
-       col.line=getOption("color.stroke.pt"), col.area=NULL, col.box="black",
-       col.stroke=getOption("color.stroke.pt"), 
-       col.fill=getOption("color.fill.bar"), shape.pts=21,
-       col.grid=getOption("color.grid"), col.bg=getOption("color.bg"),
-       cex.axis=0.75, col.axis="gray30", rotate.values=0, offset=.5,
-       xy.ticks=TRUE, line.width=1.1,
-       xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""),
-       main=plt.title[plt.i], sub=NULL,
-       cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
-       center.line="default", quiet=TRUE)
-
-     if (is.null(pdf.file)) {
-       if (manage.gr) dev.set(which=4)
-     }
-     else {
-       dev.off()
-       pdf(file=paste("LineChart_",X2nm,".pdf",sep=""), width=pdf.width, height=pdf.height)
-       .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
+      .lc.main(YA, type=NULL,
+        col.line=getOption("color.stroke.pt"), col.area=NULL, col.box="black",
+        col.stroke=getOption("color.stroke.pt"), 
+        col.fill=getOption("color.fill.bar"), shape.pts=21,
+        col.grid=getOption("color.grid"), col.bg=getOption("color.bg"),
+        cex.axis=0.75, col.axis="gray30", rotate.values=0, offset=.5,
+        xy.ticks=TRUE, line.width=1.1,
+        xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""),
+        main=plt.title[plt.i], sub=NULL,
+        cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
+        center.line="default", quiet=TRUE)
+        
+      if (is.null(pdf.file)) {
+        if (manage.gr) dev.set(which=4)
+      }
+      else {
+        dev.off()
+        pdf(file=paste("LineChart_",X2nm,".pdf",sep=""), width=pdf.width, height=pdf.height)
+        .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
             paste("line chart of", Ynm, "for Group", X2nm))
      }
 
       plt.i <- plt.i + 1
-      plt.title[plt.i] <- paste("Ordered Data:", paste(Xnm, X2nm))
+      plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X2nm))
  
      .lc.main(YB, type=NULL,
        col.line=getOption("color.stroke.pt"), col.area=NULL, col.box="black",
        col.stroke=getOption("color.stroke.pt"), 
        col.fill=getOption("color.fill.bar"), shape.pts=21,
-       col.grid=getOption("color.grid"), col.bg=getOption("col.bg"),
+       col.grid=getOption("color.grid"), col.bg=getOption("color.bg"),
        cex.axis=0.85, col.axis="gray30", rotate.values=0, offset=.5,
        xy.ticks=TRUE, line.width=1.1,
        xlab=NULL, ylab=paste(Ynm,": ",X2nm, sep=""),
        main=plt.title[plt.i], sub=NULL,
        cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
-
        center.line="default", quiet=TRUE)
 
       if (is.null(pdf.file)) {
@@ -389,6 +388,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       }
     }
 
+    # two density graphs
     if (!is.null(pdf.file))
       pdf(file=pdf.file, width=pdf.width, height=pdf.height)
 
@@ -398,7 +398,6 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
               clpct, tvalue, pvalue, ub, lb, show.title)
-              #clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title)
 
     cat("--------------------------------------------------------------\n")
 
@@ -409,5 +408,4 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
     return(list(i=plt.i, ttl=plt.title))
   }
-
 } # End Two Group

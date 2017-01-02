@@ -85,7 +85,7 @@ lc(\ldots)
         longer axis value names are rotated.}
   \item{xy.ticks}{Flag that indicates if tick marks and associated values on the 
         axes are to be displayed.}
-  \item{line.width}{Width of the density lines.}
+  \item{line.width}{Width of the line segments.}
   \item{xlab}{Label for x-axis. For two variables specified, x and y, if \code{xlab} not
        specified, then the label becomes the name of the corresponding variable. If 
        \code{xy.ticks} is \code{FALSE}, then no label is displayed. If no y variable is specified, 

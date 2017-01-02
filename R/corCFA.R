@@ -510,12 +510,17 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
       }
       ssq.tot <- ssq.tot + ssq
       res.avg[i] <- abv / (NItems - 1)
-      tx[length(tx)+1] <- paste(.fmtc(cc[i],max.chr), "  ", .fmt(ssq,3), "  ", .fmt(res.avg[i],3))
+      tx[length(tx)+1] <- paste(.fmtc(cc[i],max.chr), "  ", .fmt(ssq,3), "  ",
+                                .fmt(res.avg[i],3))
     }
     abv.all.tot <- abv.all / (NItems^2 - NItems)
     tx[length(tx)+1] <- ""
-    tx[length(tx)+1] <- paste("Total sum of squares for all items:", .fmt(ssq.tot,3), "\n")
-    tx[length(tx)+1] <- paste("Average absolute residual w/o the diagonal:", .fmt(abv.all.tot,3), "\n\n")
+    tx[length(tx)+1] <- paste("Total sum of squares for all items:", 
+                              .fmt(ssq.tot,3), "\n")
+    tx[length(tx)+1] <- paste("Root mean square residual for all items:", 
+                              .fmt(sqrt(ssq.tot),3), "\n")
+    tx[length(tx)+1] <- paste("Average absolute residual w/o the diagonal:",
+                              .fmt(abv.all.tot,3), "\n\n")
 
     txrst <- tx
   }

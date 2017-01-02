@@ -5,10 +5,9 @@ function (h, len.x, fun.call) {
     fncl <- .fun.call.deparse(fun.call) 
 
     tx <- character(length = 0)
-    tx  <- ""
     if (getOption("suggest")) {
-      fc <- ""
-      if (!grepl("bin.width", fncl))
+     tx[length(tx)+1] <- ">>> Settings"
+     if (!grepl("bin.width", fncl))
         tx[length(tx)+1] <- "bin.width: set the width of each bin"
       if (!grepl("bin.start", fncl))
         tx[length(tx)+1] <- "bin.start: set the start of the first bin"

@@ -25,18 +25,27 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   if (!grepl("gray", getOption("colors"))) {
     col.1 <- rgb(.63,.46,.15)
     col.m1 <- rgb(.71,.65,.65)
-    col.1t <- rgb(.63,.46,.15, alpha=.7)
-    col.1d <- rgb(.63,.46,.15, alpha=.4)
+#    col.1t <- rgb(.63,.46,.15, alpha=.7)
   }
   else {
     col.1 <- rgb(.40,.40,.40)
     col.m1 <- rgb(.40,.40,.40)
-    col.1t <- rgb(.40,.40,.40, alpha=.7)
-    col.1d <- rgb(.40,.40,.40, alpha=.4)
+#    col.1t <- rgb(.40,.40,.40, alpha=.7)
   }
   col.2 <- rgb(.49,.56,.69)
-
-  # plot: set up coordinate system
+  col.1t <- getOption("color.fill.bar")
+  clr <- getOption("colors")
+  if (clr == "rose") {
+    clr <- "rosybrown1"  # rose not an R color name
+    col.1t <- "rosybrown2"
+  }
+  if (grepl(".black", clr)) clr <- "gray35"  # .black colors not R color names
+  if (clr == "white") {  # white does not print
+    clr <- "transparent"
+    col.1t <- "gray35"
+  }
+  col.1d <- .maketrans(clr, 20)
+  
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
   par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
@@ -59,8 +68,7 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
     lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=.85, col=col.1)
 
   # curve area
-  polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1d, border=NA, 
-          density=10, angle=45)
+  polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1d, border=NA) 
 
   # bottom border of density curve  
   segments(min(dYA$x), 0, max(dYA$x), 0, col=col.1)
@@ -122,16 +130,16 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
 
   # title area, above graph
   if (show.title) {
-    mtext(paste("One-Group Plot"), side=3, line=6.6, font=2)
-    mtext(paste("Analyze",Ynm), side=3, line=5.4, font=3, cex=.8)
+    mtext(paste("One-Group Plot with Mean and Null Mean"), side=3, line=6.6, font=2)
+    mtext(paste("Analyze",Ynm), side=3, line=5.4, font=3, cex=.9)
     mtext(bquote(paste("  t-test of mu0=", .(mu0), ":   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(n1-1), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 
-      line=3.9, cex=.8, adj=0)
+      line=3.7, cex=.9, adj=0)
     mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Mean:  ",
-      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=2.8, cex=.8, adj=0)
+      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=2.6, cex=.9, adj=0)
     mtext(bquote(paste("  ", "n=", .(n1),
        "   m=", .(.fmt(m1, digits.d)),"   s=", .(.fmt(sw, digits.d)))),
-       side=3, line=1.5, cex=.8, adj=0)
+       side=3, line=1.3, cex=.9, adj=0)
   }
 
 }

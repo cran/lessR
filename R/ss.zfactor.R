@@ -59,7 +59,6 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
   dims <- length(dim(x))
   if (dims == 1 || (!is.null(x.lbl) || !is.null(y.lbl))) {  #  one var or labels
     txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=FALSE)
-    txttl[1] <- paste("\n", txttl[1])
   }
 
   # print table, chi-square analysis
@@ -67,6 +66,14 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
   # two variables 
   if (!is.null(by) || is.matrix(x)) { 
     n.dim <- 2
+
+    # potential abbreviation of column labels
+    mx.chr <- max(nchar(colnames(x)))
+    mx.len <- 8
+    if (mx.chr > mx.len) {
+      c.nm <- colnames(x)
+      colnames(x) <- .abbrev(colnames(x), mx.len)
+    }
 
     xx <- addmargins(x)
 
@@ -183,7 +190,6 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       nms <- character(length=0)
       for (i in 1:min(length(x), 100)) nms[i] <- names(x)[i]
       cat("\n")
-      print(nms)
       cat("\n"); stop(call.=FALSE, "\n","------\n",
           "All values for ", x.name, " are unique, so analysis not meaningful\n\n",
           "Perhaps a row ID instead of a variable\n",
@@ -193,18 +199,27 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
 
     else {
 
-      max.ln <- integer(length=0)
-      for (i in 1:length(x)) {
-        ln.nm <- nchar(names(x[i]))
-        ln.vl <- nchar(as.character(x[i]))
-        max.ln[i] <- max(ln.nm, ln.vl) + 1
-        if (max.ln[i] < 6) max.ln[i] <- 6
-      }
+    # potential abbreviation of column labels
+    mx.chr <- max(nchar(names(x)))
+    mx.len <- 8
+    if (mx.chr > mx.len) {
+      c.nm <- names(x)
+      names(x) <- .abbrev(names(x), mx.len)
+    }
+
+     max.ln <- integer(length=0)      
+     for (i in 1:length(x)) {
+       ln.nm <- nchar(names(x[i]))
+       ln.vl <- nchar(as.character(x[i]))
+       max.ln[i] <- max(ln.nm, ln.vl) + 1
+       if (max.ln[i] < 6) max.ln[i] <- 6
+     }
 
       tx <- character(length = 0)
 
       tx[length(tx)+1] <- format("", width=13)
       w <- nchar(as.character(sum(x)))
+
       for (i in 1:length(x))
         tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(x[i]), w=max.ln[i]))
       tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Total", w=w+6))
@@ -221,7 +236,6 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       for (i in 1:length(x))
         tx[length(tx)] <- paste(tx[length(tx)], .fmt(xp[i], 3, max.ln[i]))
       tx[length(tx)] <- paste(tx[length(tx)], .fmtc("1.000", w=w+6))
-
       txcnt <- tx
 
       tx <- character(length = 0)
@@ -233,9 +247,18 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
         tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
             "so chi-squared approximation may not be accurate", "\n")
       txchi <- tx
+      
+      txlbl <- ""
+      tx <- character(length = 0)
+      if (mx.chr > mx.len) {
+        tx[length(tx)+1] <- "Unabbreviated labels"
+        tx[length(tx)+1] <- "--------------------"
+        tx[length(tx)+1] <- paste(c.nm, sep="", collapse="\n")
+        txlbl <- tx
+      }
 
       return(list(n.dim=n.dim, title=txttl, counts=txcnt, 
-                  chi=txchi, freq=x, prop=xp))
+                  chi=txchi, lbl=txlbl, freq=x, prop=xp))
     }
   }  # one variable
 

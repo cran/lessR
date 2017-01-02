@@ -181,7 +181,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
       }
 
       plt.i <- plt.i + 1
-      plt.title[plt.i] <- paste("Ordered Data for", Ynm)
+      plt.title[plt.i] <- paste("Sequentially Plotted Data for", Ynm)
 
       .lc.main(Y, type=NULL,
         col.line=getOption("color.stroke.pt"), col.area=NULL, col.box="black",

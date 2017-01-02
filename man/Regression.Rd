@@ -270,9 +270,8 @@ mydata <- Subset(random=.3)
 
 # one-predictor regression
 # Provide all default analyses including scatterplot etc.
+# Can abbreviate Regression with reg
 Regression(Reading ~ Verbal)
-# short name of function call
-reg(Reading ~ Verbal)
 # Provide only the brief analysis on the standardized variables
 reg.brief(Reading ~ Verbal, standardize=TRUE)
 
@@ -285,7 +284,7 @@ names(r)
 # Display just the estimated coefficients and their inferential analysis
 r$out_estimates
 
-# Generate knitr instructions with the option: Rmd
+# Generate an R markdown file with the option: Rmd
 # Output file here will be read.Rmd, a simple text file that can
 #   be edited with any text editor including RStudio from which it
 #   can be knit to generate dynamic output to a Word document,
@@ -297,7 +296,7 @@ Regression(Reading ~ Verbal, res.row=8, res.sort="rstudent",
    pred.rows=0, digits.d=4)
 
 # Multiple regression model
-# Save the three plots as pdf files 4 inches square
+# Save the three output plots as pdf files 4 inches square
 Regression(Reading ~ Verbal + Absent + Income, pdf=TRUE,
    pdf.width=4, pdf.height=4)
 
@@ -305,10 +304,6 @@ Regression(Reading ~ Verbal + Absent + Income, pdf=TRUE,
 # Reduced model:  Reading ~ Verbal
 # Full model:  Reading ~ Verbal + Income + Absent
 Nest(Reading, Verbal, c(Income, Absent))
-
-# Indicator variable
-mydata <- rd("Employee", format="lessR", quiet=TRUE)
-reg(Salary ~ Gender)
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values and the corresponding prediction intervals

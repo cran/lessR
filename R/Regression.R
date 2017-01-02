@@ -372,7 +372,34 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     if (plot.i > 1) txplt <- .plotList2(plot.i, plot.title)
     if (n.pred > 0) dev.set(which=2)  # reset graphics for standard R functions
   }
+  
+  # suggestion for Rmd option
+  txsug <- ""
+  if (getOption("suggest")) {
+    # function call for suggestions
+    fncl <- .fun.call.deparse(fun.call) 
+    fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
+    fncl <- gsub(" = ", "=", fncl)
+    
+    fc <- ""
+    if (!grepl("Rmd", fncl)) {
+      txsug <- ">>> Suggestion\n"
+      fc <- paste(fc, ", Rmd=\"eg\"", sep="")
+      if (nzchar(fc)) {
+        fc <- paste(fncl, fc, ") ", sep="")
+        txsug <- paste(txsug, 
+           "# Create an R markdown file for intepretative output ",
+           "with the Rmd option\n", sep="")
+        txsug <- paste(txsug, 
+           "# In RStudio, open and then knit this file to generate ",
+           "the output\n", sep="")
+        txsug <- paste(txsug, fc, sep="")
+      }
+    }
+  }
 
+
+  class(txsug) <- "out_piece"
   class(title_bck) <- "out_piece"
   class(tx1bck) <- "out_piece"
   class(title_basic) <- "out_piece"
@@ -392,6 +419,8 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   class(txRmd) <- "out_piece"
   
   output <- list(
+    out_suggest=txsug,
+    
     call=fun.call, formula=my.formula,
 
     out_title_bck=title_bck, out_background=tx1bck,
@@ -422,5 +451,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   class(output) <- "out_all"
 
   return(output)
+  
+  cat("\n")
   
 }

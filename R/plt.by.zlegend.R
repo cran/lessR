@@ -25,8 +25,7 @@ function(mylevels, stroke, fill, shp, trans.pts, col.bg, usr) {
 
   size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
 
-  dv <- ifelse (options("device") == "RStudioGD", 1, 2)
-  epsilon <- (size[1] - ll$rect$w) / dv 
+  epsilon <- (size[1] - ll$rect$w) / 2
 
   axis.vert <- usr[4] - usr[3]
   xleft <- usr[2] + epsilon   # usr[2] user coordinate of right axis
@@ -41,13 +40,14 @@ function(mylevels, stroke, fill, shp, trans.pts, col.bg, usr) {
   else 
     legend.fill <- fill
 
-  colors <- getOption("colors")
-  the.clr <- ifelse(grepl(".black", colors), "gray90", "black")
+  the.clr <- ifelse(grepl(".black", getOption("colors")), "gray90", "black")
 
   yi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
   legend(xleft, ytop, legend=legend.labels, title=legend.title, 
-         pch=shp, horiz=FALSE, cex=.7, pt.cex=.9, box.lwd=.5, 
+         pch=shp, horiz=FALSE, cex=.7, pt.cex=1.2, pt.lwd=0.5, box.lwd=.5, 
          box.col="gray30", bg=col.bg, col=stroke, pt.bg=fill,
          text.col=the.clr, y.intersp=yi)
+
+  par(xpd=FALSE)  # cancel drawing outside of plot region (need for RStudio)
 
 }

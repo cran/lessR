@@ -5,6 +5,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
          pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE,
          scatter.3D, ...) {
 
+         
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1L
@@ -12,7 +13,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
   n.keep <- nrow(lm.out$model)
   if (is.null(pred.rows))
     pred.rows <- ifelse (n.keep < 25, n.keep, 4)
-  if (pred.rows == "all") pred.rows <- n.keep  # turn off preds with pred.rows=0
+  if (pred.rows == "all") pred.rows <- n.keep  # no preds with pred.rows=0
 
 
   # pdf graphics option
@@ -49,11 +50,36 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     plt.title[plt.i] <- gsub(pattern="\n", replacement=" ", x=ctitle)
 
     if (n.pred > 0)
-    x.values <- lm.out$model[,nm[2]]
+      x.values <- lm.out$model[,nm[2]]
     else
-    x.values <- 1:n.obs
-    y.values <- lm.out$model[,nm[1]] 
-
+      x.values <- 1:n.obs
+    y.values <- lm.out$model[,nm[1]]
+               
+    # scale for regular R or RStudio
+    cex.axis <- 0.76
+    bubble.scale <- 0.25
+    adj <- .RSadj(bubble.scale, cex.axis)
+    bubble.scale <- adj$bubble.scale
+    size.axis <- adj$size.axis
+    size.lab <- adj$size.lab
+    cex.txt <- adj$size.txt
+    
+    # size of points
+    size.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
+    if (options("device") == "RStudioGD")
+      size.pt <- ifelse (.Platform$OS == "windows", size.pt*1.05, size.pt*1.13)
+      
+    # set margins
+    max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
+    
+    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=ctitle)
+    lm <- margs$lm
+    tm <- margs$tm
+    rm <- margs$rm
+    bm <- margs$bm
+      
+    par(mai=c(bm, lm, tm, rm))
+    
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
@@ -64,15 +90,24 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     abline(v=axTicks(1), col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
-    .axes(levels(x.values), NULL, axTicks(1), axTicks(2),
+    if (is.factor(x.values)) {
+      x.lvl <- levels(x.values)
+      axT1 <- 1:length(x.lvl)   # mark category values
+    }
+    else {
+      x.lvl <- NULL
+      axT1 <- axTicks(1)  # else numeric, so all the ticks
+    }
+      
+    .axes(x.lvl, NULL, axT1, axTicks(2),
       par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30")
 
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
-        max.lbl.y=3, cex.lab=0.85) 
+        max.lbl.y=3, cex.lab=size.lab) 
 
     col.fill <- getOption("color.fill.pt")
     col.stroke <- getOption("color.stroke.pt")
-    points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
+    points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=size.pt)
 
     if (n.pred == 0) {
       m <- lm.out$coefficients[1]  # mean of Y
@@ -96,7 +131,6 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       lines(x.values, p.int$upr, col=col.pi, lwd=1.5)
     }
   }  # end n.pred<=1
-
 
   else {  # scatterplot matrix for multiple regression
     if (numeric.all && in.data.frame) {

@@ -99,23 +99,18 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
 # ---------------
 # do the analysis
-  
-	if (!is.ts(data[,1])) {
-		if (!quiet && !show.runs)
-			cat("[To view the individual runs: show.runs=TRUE]\n")
-	}
 
   go.pdf <- FALSE
   if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
 
   for (i in 1:ncol(data)) {
     cat("\n")
-		
+    
     if (!is.ts(data[,i]))
-		  nu <- length(unique(na.omit(data[,i])))
-		else {
+      nu <- length(unique(na.omit(data[,i])))
+    else
       nu <- length(unique(data[,i]))
-			
+      
     x.name <- names(data)[i]
     options(xname = x.name)
 
@@ -125,7 +120,6 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
       pdf.fnm <- .pdfname("LC", x.name, go.pdf, pdf.nm, pdf.file)
      .opendev(pdf.fnm, pdf.width, pdf.height)
-
       .lc.main(data[,i], type,
          color.line, color.area, color.stroke, color.fill, shape.pts,
          color.grid, color.box, color.bg, cex.axis, color.axis,
@@ -145,7 +139,5 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
     }  # is.numeric(data[,i])
   }  # for
-
-}
 
 }
