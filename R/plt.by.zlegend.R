@@ -9,18 +9,19 @@ function(mylevels, stroke, fill, shp, trans.pts, col.bg, usr) {
   by.name <- getOption("byname")
 
   legend.labels <- abbreviate(mylevels,6)
-  if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
-    max.width <- which(nchar(legend.labels) == max(nchar(legend.labels)))
-    legend.labels[max.width] <- paste(legend.labels[max.width], "      ", sep="")
-  }
+  #if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
+    #max.width <- which(nchar(legend.labels) == max(nchar(legend.labels)))
+    #legend.labels[max.width] <- paste(legend.labels[max.width], "    ", sep="")
+  #}
 
-  wt <- ifelse (options("device") == "RStudioGD", 10, 12)
+  #wt <- ifelse (options("device") == "RStudioGD", 10, 12)
+  wt <- 10
   legend.title  <- abbreviate(by.name, wt)
-  if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
-    if (nchar(legend.title) > nchar(legend.labels[max.width][1]))
-      legend.title <- paste("  ", legend.title, "  ", sep="") 
-  }
-  ll <- legend(0,0, legend=legend.labels, title=legend.title, cex=.7, pt.cex=.9,
+  #if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
+    #if (nchar(legend.title) > nchar(legend.labels[max.width][1]))
+      #legend.title <- paste(" ", legend.title, " ", sep="") 
+  #}
+  ll <- legend(0,0, legend=legend.labels, title=legend.title, cex=.7, pt.cex=1.1,
             plot=FALSE)
 
   size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
@@ -44,7 +45,7 @@ function(mylevels, stroke, fill, shp, trans.pts, col.bg, usr) {
 
   yi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
   legend(xleft, ytop, legend=legend.labels, title=legend.title, 
-         pch=shp, horiz=FALSE, cex=.7, pt.cex=1.2, pt.lwd=0.5, box.lwd=.5, 
+         pch=shp, horiz=FALSE, cex=.7, pt.cex=1.1, pt.lwd=0.5, box.lwd=.5, 
          box.col="gray30", bg=col.bg, col=stroke, pt.bg=fill,
          text.col=the.clr, y.intersp=yi)
 

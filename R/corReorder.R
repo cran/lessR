@@ -1,7 +1,7 @@
 corReorder <-
 function (R=mycor, vars=NULL, first=0,
           heat.map=TRUE, main=NULL, bottom=3,right=3,
-          pdf.file=NULL, pdf.width=5, pdf.height=5) {
+          pdf.file=NULL, width=5, height=5) {
 
 
   # cor matrix:  mycor as class out_all, mycor$cors, or stand-alone matrix
@@ -89,7 +89,7 @@ function (R=mycor, vars=NULL, first=0,
   if (heat.map) {
    if (is.null(main)) main <- "Reordered Item Coefficients"
    .corcolors(R, nrow(R), main, bottom, right, diag=0,
-              pdf.file, pdf.width, pdf.height)
+              pdf.file, width, height)
   }
 
   # finish

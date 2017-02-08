@@ -57,7 +57,7 @@ function(y, type,
   else {  # time.start date specified or a ts
     x.lab <- ifelse (is.null(xlab), "", xlab)      
     if (is.ts(y)) {
-      x <- ts.dates(y)
+      x <- .ts.dates(y)
       # time.start <- paste(start(y)[1], "/", start(y)[2], "/01", sep="") 
       # frq <- frequency(y)
       # if (frq == 1) time.by <- "year"
@@ -85,8 +85,8 @@ function(y, type,
 
   
   # fill ts chart 
-  #if (!is.null(time.start) && is.null(color.area))
-    #col.area <- getOption("color.fill.bar")
+  #if (!is.null(time.start) && is.null(area))
+    #col.area <- getOption("fill.bar")
 
   if (is.null(type))
     if (is.null(col.area) || col.area == "transparent") type <- "b" 
@@ -110,7 +110,7 @@ function(y, type,
   rm <- margs$rm
   bm <- margs$bm
  
-  if (center.line != "off") rm <- rm + .2
+  if (center.line != "off") rm <- rm + .3
  
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
@@ -215,7 +215,7 @@ function(y, type,
     txsug <- ""
     if (getOption("suggest")  &&  !is.ts(y)) {
       txsug <- ">>> Suggestions"
-      fc <- paste("\nLineChart(", x.name, ", color.area=\"steelblue\")", sep="")         
+      fc <- paste("\nLineChart(", x.name, ", area=\"steelblue\")", sep="")         
       txsug <- paste(txsug, fc, sep="")
       fc <- paste("\nLineChart(", x.name, ", show.runs=TRUE)", sep="")           
       txsug <- paste(txsug, fc, sep="")

@@ -1,6 +1,11 @@
 CountAll <-
 function(x=mydata, quiet=FALSE, ...)  {
 
+  manage.gr <- .graphman()  # see if graphics are to be managed
+  if (manage.gr)
+    cat("\n>>> Note: Must have pdf=TRUE or run in RStudio.\n\n")
+
+
   dname <- deparse(substitute(x))
   options(dname = dname)
   

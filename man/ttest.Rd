@@ -30,7 +30,7 @@ ttest(x=NULL, y=NULL, data=mydata, paired=FALSE,
          show.title=TRUE, bw1="bcv", bw2="bcv",
 
          graph=TRUE, line.chart=FALSE,
-         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         width=5, height=5, pdf.file=NULL, ...)       
 
 tt.brief(\ldots, brief=TRUE)
 
@@ -83,8 +83,8 @@ tt(\ldots)
         in the analysis.}
   \item{pdf.file}{Name of the pdf file to which the density graph is redirected. Also
        specifies to save the line charts with pre-assigned names if they are computed.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Further arguments to be passed to or from methods.}
 }
 
@@ -117,7 +117,7 @@ VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 PDF OUTPUT\cr
-Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+To obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 }
 
 \value{
@@ -228,7 +228,9 @@ ttest(Y1, Y2)
 tt(n=34, m=8.92, s=1.67, Ynm="Time")
 
 # confidence interval and hypothesis test, from descriptive stats
-tt(n=34, m=8.92, s=1.67, mu0=9, conf.level=0.90)
+# get rid of the data frame, analysis should still proceed
+rm(mydata)
+tt.brief(n=34, m=8.92, s=1.67, mu0=9, conf.level=0.90)
 
 # two groups: sample size, mean and sd for each group
 # specify the briefer form of the output

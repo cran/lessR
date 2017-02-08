@@ -2,8 +2,8 @@ simCImean <-
 function(ns, n, mu=0, sigma=1, cl=0.95, 
          ylim.bound=NULL, show.data=FALSE, show.title=TRUE, 
          miss.only=FALSE, color.hit="gray40", color.miss="red",
-         color.grid="grey90", pause=FALSE,
-         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         grid="grey90", pause=FALSE,
+         main=NULL, pdf.file=NULL, width=5, height=5, ...) {
 
 
   if (missing(ns)) {
@@ -81,7 +81,7 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   # plot setup
 
   # set up graphics system
-  .opendev(pdf.file, pdf.width, pdf.height)
+  .opendev(pdf.file, width, height)
 
   orig.params <- par(no.readonly=TRUE)
 
@@ -99,7 +99,7 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
 
   # grid lines
   vy <- pretty(c(usr[3],usr[4]))
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=color.grid, lwd=.5)
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=grid, lwd=.5)
 
    # directions
   if (pause) cat("\n>>> Press Enter to obtain the next sample <<< \n\n")

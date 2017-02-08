@@ -2,7 +2,6 @@
 function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
          n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
          clpct, tvalue, pvalue, ub, lb, show.title) {
-         #clpct, tvalue, pvalue, ub, lb, deltaL, deltaU, show.title) {
 
   dYA <- suppressWarnings(density(YA, bw1))
   dYB <- suppressWarnings(density(YB, bw2))
@@ -13,12 +12,6 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
     cat(mytitle, Xnm, " ", X1nm, ": ", .fmt(dYA$bw,digits.d), sep="", "\n")
     cat(mytitle, Xnm, " ", X2nm, ": ", .fmt(dYB$bw,digits.d), sep="", "\n")
   }
-
-  # values needed for graph
-  min.x <- min(min(dYA$x),min(dYB$x))  # min x coordinate for graph
-  max.x <- max(max(dYA$x),max(dYB$x))  # max x coordinate for graph
-  max.y <- max(max(dYA$y),max(dYB$y))  # max y coordinate
-  max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
   # colors
   if (!grepl("gray", getOption("colors"))) {
@@ -42,6 +35,12 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
     col.2d <- rgb(.40,.40,.40, alpha=.2)
   }
 
+  # values needed for graph
+  min.x <- min(min(dYA$x),min(dYB$x))  # min x coordinate for graph
+  max.x <- max(max(dYA$x),max(dYB$x))  # max x coordinate for graph
+  max.y <- max(max(dYA$y),max(dYB$y))  # max y coordinate
+  max.y <- max.y+.1*max.y  # allow room in graph region for d info
+
   # plot: set up coordinate system
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
@@ -64,9 +63,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
 
   # curve areas
   polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1d, border=NA)
-#      density=10, angle=45)
   polygon(c(min(dYB$x),dYB$x,max(dYB$x)), c(0,dYB$y,0), col=col.2d, border=NA)
-#      density=10, angle=-45)
 
   # bottom border of density curve  
   segments(min(dYA$x), 0, max(dYA$x), 0, col=col.1)

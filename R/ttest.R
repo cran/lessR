@@ -13,7 +13,7 @@ function(x=NULL, y=NULL, data=mydata, paired=FALSE,
          show.title=TRUE, bw1="bcv", bw2="bcv",
 
          graph=TRUE, line.chart=FALSE,
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {       
+         width=5, height=5, pdf.file=NULL, ...)  {       
 
 
 tt.setup <-
@@ -71,7 +71,7 @@ function(x, y=NULL, ...) {
         plt2 <- .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
           conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, graph,
-          line.chart, show.title, pdf.file, pdf.width, pdf.height)
+          line.chart, show.title, pdf.file, width, height)
       else {  # switch
         Xtmp <- X2nm
         X2nm <- X1nm
@@ -79,7 +79,7 @@ function(x, y=NULL, ...) {
         plt2 <- .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
           conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, graph,
-          line.chart, show.title, pdf.file, pdf.width, pdf.height)
+          line.chart, show.title, pdf.file, width, height)
       }
 
       for (i in (plot.i+1):(plot.i+plt2$i))
@@ -110,14 +110,14 @@ function(x, y=NULL, ...) {
       else {
         Ynm <- "Difference"
         mu0 <- 0
-        options(dname = NULL)
+        options(df.name = NULL)
       }
 
       options(yname = x.name)
       plt1 <- .OneGroup(x, Ynm, mu0, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
          Edesired, paired, graph, line.chart, show.title,
-         pdf.file, pdf.width, pdf.height, ...)
+         pdf.file, width, height, ...)
 
     if (!is.null(plt1$i)) {
         for (i in (plot.i+1):(plot.i+plt1$i)) plot.title[i] <- plt1$ttl[i-plot.i]
@@ -128,7 +128,7 @@ function(x, y=NULL, ...) {
        .OneGroup(x, Ynm, mu0, n, m, s, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
          Edesired, paired, graph, line.chart, show.title,
-         pdf.file, pdf.width, pdf.height, ...)
+         pdf.file, width, height, ...)
   }  # end one group
 
   # return number of plots to main
@@ -158,20 +158,32 @@ function(x, y=NULL, ...) {
   plot.title  <- character(length=0)
 
   # get actual variable name before potential call of data$x, could be NULL
-  x.name <- deparse(substitute(x)) 
+  if (!missing(x))
+    x.name <- deparse(substitute(x)) 
+  else
+    x.name <- NULL
   if (!missing(y)) y.name <- deparse(substitute(y)) 
 
-  # get data frame name
-  dname <- deparse(substitute(data))
+  if (!is.null(x.name)) {
+    df.name <- deparse(substitute(data))   # get name of data table
+    options(dname = df.name)
+  }
+  else
+    df.name <- NULL
+
+  # if a tibble convert to data frame (must already have df.name)
+  if (!is.null(x.name)) if (class(data)[1] == "tbl_df") {
+    data <- as.data.frame(data)
+  }
  
-  if (exists(x.name, where=.GlobalEnv)) {
+  if (!is.null(x.name)) if (exists(x.name, where=.GlobalEnv)) {
     if (is.data.frame(x)) {
       nm <- names((eval(substitute(x))))
       txt <- ifelse(length(nm)>1, "one of those variables", "that variable")
       nm2 <- "" 
       for (j in 1:length(nm)) nm2 <- paste(nm2, nm[j])
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "The argument to the ttest function you specified, ", dname, ", is\n",
+        "The argument to the ttest function you specified, ", df.name, ", is\n",
         "a data table, not a variable. A data table contains the data values\n",
         "for one or more variables. This data table references the variables:\n\n",
          "  ", nm2, "\n\n",
@@ -180,14 +192,21 @@ function(x, y=NULL, ...) {
   }
 
   # get conditions and check for data existing
-  xs <- .xstatus(x.name, dname)
-  is.frml <- xs$ifr
-  from.data <- xs$fd
-  in.global <- xs$ig 
-  if (!missing(y)) .xstatus(y.name, dname)  # just for a message on output 
+  if (!is.null(x.name)) {
+    xs <- .xstatus(x.name, df.name)
+    is.frml <- xs$ifr
+    from.data <- xs$fd
+    in.global <- xs$ig 
+    if (!missing(y)) .xstatus(y.name, df.name)  # just for a message on output 
 
-  # see if the variable exists in the data frame
-  if (from.data && !in.global && !is.frml) .xcheck(x.name, dname, data)
+    # see if the variable exists in the data frame
+    if (from.data && !in.global && !is.frml) .xcheck(x.name, df.name, data)
+  }
+  else {
+    is.frml <- FALSE
+    from.data <- FALSE
+    in.global <- FALSE
+  }
 
 
   # --------------------------
@@ -274,7 +293,6 @@ function(x, y=NULL, ...) {
   else
     tt.setup(...)  # analysis from stats
 
-
   # --------------------------
 
 
@@ -290,7 +308,7 @@ function(x, y=NULL, ...) {
       }
     }
     else
-      pdf(file="PairedScatterPlot.pdf", width=pdf.width, height=pdf.height)
+      pdf(file="PairedScatterPlot.pdf", width=width, height=height)
 
     if (in.global) {
       x.values <- x
@@ -314,9 +332,7 @@ function(x, y=NULL, ...) {
     is.unique <- logical(ncol(data))  # initialed to FALSE
     for(i in 1:ncol(data))
       if ((length(data[,i])==length(unique(data[,i]))) && !is.numeric(data[,i]))
-{
         is.unique[i] <- TRUE
-}
     unq <- which(is.unique)[1]  # choose first non-num variable with unique values
     if (!is.na(unq))
       y.call <- factor(data[, unq[1]])
@@ -328,7 +344,7 @@ function(x, y=NULL, ...) {
     }
 
     # Cleveland two-variable dot plot
-    .plt.main(x.call, y.call,
+    .plt.main(data.frame(x.call), data.frame(y.call),
        shape=21, size=.8, ylab="", segments.y=TRUE, quiet=TRUE)
 
     if (!is.null(pdf.file)) {

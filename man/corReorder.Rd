@@ -13,7 +13,7 @@ Re-arranges the order of the variables in the input correlation matrix.  If no v
 \usage{
 corReorder(R=mycor, vars=NULL, first=0,
           heat.map=TRUE, main=NULL, bottom=3,right=3,
-          pdf.file=NULL, pdf.width=5, pdf.height=5)
+          pdf.file=NULL, width=5, height=5)
 
 reord(\ldots)
 }
@@ -29,8 +29,8 @@ reord(\ldots)
   \item{bottom}{Number of lines of bottom margin.}
   \item{right}{Number of lines of right margin.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Parameter values.}
 }
 

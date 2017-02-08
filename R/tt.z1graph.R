@@ -1,8 +1,7 @@
 .OneGraph <-
 function(YA, bw1, Ynm, y.lbl, digits.d, brief, 
          n1, m1, mu0, mdiff, sw, smd, mmd, msmd,
-         clpct, tvalue, pvalue, ub, lb,
-         show.title, pdf.file, pdf.width, pdf.height) {
+         clpct, tvalue, pvalue, ub, lb, show.title) {
 
   dYA <- suppressWarnings(density(YA, bw1))
 
@@ -33,7 +32,7 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
 #    col.1t <- rgb(.40,.40,.40, alpha=.7)
   }
   col.2 <- rgb(.49,.56,.69)
-  col.1t <- getOption("color.fill.bar")
+  col.1t <- getOption("fill.bar")
   clr <- getOption("colors")
   if (clr == "rose") {
     clr <- "rosybrown1"  # rose not an R color name

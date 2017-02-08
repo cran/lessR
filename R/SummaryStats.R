@@ -1,6 +1,6 @@
 SummaryStats <-
 function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
-    digits.d=NULL, brief=getOption("brief"), ...)  {
+    digits.d=NULL, brief=getOption("brief"), label.max=20, ...)  {
 
   # get variable name before potential call of data$x
   x.name <- deparse(substitute(x))  # could be a vars list
@@ -128,11 +128,11 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     if (is.factor(x.call)) 
       stuff <- .ss.factor(x.call, y.call, brief, digits.d,
-                        x.name, y.name, x.lbl, y.lbl, ...) 
+                        x.name, y.name, x.lbl, y.lbl, label.max, ...) 
     else if (is.character(x.call))
       if (nlevels(factor(x.call)) < length(x.call)) { 
         stuff <- .ss.factor(factor(x.call), by, brief, digits.d=NULL,
-                        x.name, y.name, x.lbl, y.lbl, ...)
+                        x.name, y.name, x.lbl, y.lbl, label.max, ...)
       }
       else cat("\n Appears to contain unique Names or IDs", "\n")
 
@@ -181,8 +181,6 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
         class(txsts) <- "out_piece"
         class(txchi) <- "out_piece"
         class(txlbl) <- "out_piece"
-        class(frq) <- "out_piece"
-        class(prp) <- "out_piece"
         output <- list(out_title=txttl, out_stats=txsts, out_chi=txchi,
                        out_lbl=txlbl, freq=frq, prop=prp)
       }

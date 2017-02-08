@@ -4,7 +4,7 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
          show.n=NULL, brief=FALSE, 
          digits.d=NULL, graphics=FALSE,
          main=NULL, bottom=3, right=3,
-         pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
+         pdf=FALSE, width=5, height=5, ...) {
 
 
   miss <- match.arg(miss)
@@ -103,7 +103,7 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
       if (nrow(data) <= 15) show.n <- TRUE else show.n <- FALSE
     stuff <- .cr.data.frame(data, miss, show.n, digits.d,
                    graphics, main, bottom, right, 
-                   pdf, pdf.width, pdf.height, ...) 
+                   pdf, width, height, ...) 
 
     txbck <- stuff$txb
     txmis <- stuff$txm

@@ -17,7 +17,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL, X6.new=NULL,
 
-         pdf=FALSE, pdf.width=5, pdf.height=5, refs=FALSE, 
+         width=5, height=5, pdf=FALSE, refs=FALSE, 
          fun.call=NULL, ...) {
 
 
@@ -26,6 +26,11 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   if (missing(my.formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify a model by listing it first or specify with:  my.formula\n\n")
+  }
+
+  if (!is.null(Rmd) && brief) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "To create an R Markdown File requires the full version of Regression\n\n")
   }
 
   dots <- list(...)  # check for deprecated parameters
@@ -39,8 +44,16 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     }
   }
 
-  dname <- deparse(substitute(data))  # get data frame name for cor before sort
-  options(dname = dname)
+  df.name <- deparse(substitute(data))   # get name of data table
+  options(dname = df.name)
+
+  # if a tibble convert to data frame
+  # data.frame is already #3 in class(data), so no char --> factor conversion 
+  if (class(data)[1] == "tbl_df") {
+    data <- as.data.frame(data, stringsAsFactors=TRUE)
+  }
+
+
 
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
@@ -64,7 +77,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   else
     relate <- TRUE
   
-  .nodf(dname)  # does data frame exist?
+  .nodf(df.name)  # does data frame exist?
 
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
@@ -74,7 +87,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   predictors <- character(length=n.pred)
   for (i in 2:n.vars) predictors[i-1] <- nm[i]
 
-  for (i in 1:n.vars) .xcheck(nm[i], dname, data)  # do variables exist?
+  for (i in 1:n.vars) .xcheck(nm[i], df.name, data)  # do variables exist?
 
   # check that variables are not function calls
   v.str <- deparse(attr(terms.formula(my.formula), which="variables"))
@@ -191,20 +204,20 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
 
 
   title_bck <- "  BACKGROUND"
-  bck <- .reg1bckBasic(lm.out, dname, digits.d, show.R, n.obs, n.keep, stnd.flag)
+  bck <- .reg1bckBasic(lm.out, df.name, digits.d, show.R, n.obs, n.keep, stnd.flag)
   tx1bck <- bck$tx
 
 
   title_basic <- "  BASIC ANALYSIS"
-  est <- .reg1modelBasic(lm.out, dname, digits.d, show.R)
+  est <- .reg1modelBasic(lm.out, df.name, digits.d, show.R)
   tx1est <- est$tx
   sterrs <- est$sterrs
 
-  anv <- .reg1anvBasic(lm.out, dname, digits.d, show.R)
+  anv <- .reg1anvBasic(lm.out, df.name, digits.d, show.R)
   tx1anv <- anv$tx 
   MSW <- anv$MSW
 
-  fit <- .reg1fitBasic(lm.out, dname, anv$tot["ss"], digits.d, show.R)
+  fit <- .reg1fitBasic(lm.out, df.name, anv$tot["ss"], digits.d, show.R)
   tx1fit <- fit$tx
 
 
@@ -216,7 +229,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
       max.sublns <- subsets
       subsets <- TRUE
     }
-    rel <- .reg2Relations(lm.out, dname, n.keep, show.R,
+    rel <- .reg2Relations(lm.out, df.name, n.keep, show.R,
          cor, collinear, subsets, max.sublns, numeric.all, in.data.frame,
          sterrs, MSW)
     tx2cor <- rel$txcor
@@ -248,20 +261,20 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     if (graphics  &&  n.pred > 0) {
       if (!pdf && manage.gr) {  # set up graphics system
         if (numeric.all || n.pred==1)
-          .graphwin(3) 
+          .graphwin(3, width, height) 
         else
-          .graphwin(2)  # no scatter plot matrix if not all numeric
+          .graphwin(2, width, height)  # no sp matrix if not all numeric
       }
 
       if (manage.gr && !pdf) dev.set(which=3)
-      plt <- .reg3dnResidual(lm.out, pdf, pdf.width, pdf.height, manage.gr, ...)
+      plt <- .reg3dnResidual(lm.out, pdf, width, height, manage.gr, ...)
       for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
       plot.i <- plot.i + plt$i 
 
       
       if (manage.gr && !pdf) dev.set(which=4)
       fr <- .reg3resfitResidual(lm.out, cook, cooks.cut,
-                 pdf, pdf.width, pdf.height, manage.gr)
+                 pdf, width, height, manage.gr)
       for (i in (plot.i+1):(plot.i+fr$i)) plot.title[i] <- fr$ttl[i-plot.i]
       crfitres <- fr$crfitres
       plot.i <- plot.i + fr$i
@@ -291,7 +304,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
         if (res.rows > 0  &&  n.pred > 0)  # already did two plots 
           dev.set(which=5) 
         else {
-          .graphwin(1)  #  only plot is a scatterplot
+          .graphwin(1, width, height)  #  only plot is a scatterplot
           dev.set(which=3)
         }
       }
@@ -299,7 +312,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
       if ((numeric.all || n.pred==1) && in.data.frame) {
         splt <- .reg5Plot(lm.out, res.rows, pred.rows, scatter.coef, 
            X1.new, numeric.all, in.data.frame, prd$cint, prd$pint,
-           pdf, pdf.width, pdf.height, manage.gr, scatter.3D, ...)
+           pdf, width, height, manage.gr, scatter.3D, ...)
 
         for (i in (plot.i+1):(plot.i+splt$i)) plot.title[i] <- splt$ttl[i-plot.i]
         plot.i <- plot.i + splt$i
@@ -358,7 +371,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     }
     
     if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
-    txknt <- .reg.Rmd(nm, dname, fun.call, res.rows, pred.rows,
+    txknt <- .reg.Rmd(nm, df.name, fun.call, res.rows, pred.rows,
         res.sort, digits.d, results, explain, interpret, document, code,
         est$pvalues, tol,
         resid.max, numeric.all, X1.new, new.val)
@@ -388,7 +401,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
       if (nzchar(fc)) {
         fc <- paste(fncl, fc, ") ", sep="")
         txsug <- paste(txsug, 
-           "# Create an R markdown file for intepretative output ",
+           "# Create an R markdown file for interpretative output ",
            "with the Rmd option\n", sep="")
         txsug <- paste(txsug, 
            "# In RStudio, open and then knit this file to generate ",

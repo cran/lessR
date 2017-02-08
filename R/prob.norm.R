@@ -1,6 +1,6 @@
 prob.norm <- 
-function(lo=NULL, hi=NULL, mu=0, sigma=1, color.nrm="black", 
-         color.fill.nrm="grey91", color.fill.int="slategray3", 
+function(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black", 
+         fill.nrm="grey91", fill.int="slategray3", 
          ylab="", y.axis=FALSE, z=TRUE, mag=.9, ...) { 
 
 
@@ -41,8 +41,8 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, color.nrm="black",
   cuts <- seq(min.x,max.x,sigma)
   x <- seq(min.x, max.x, length=200)
   d.nrm <- dnorm(x,mu,sigma)
-  plot(x, d.nrm, type="l", col=color.nrm, axes=FALSE, xlab="", ylab="", ...)
-  polygon(c(min.x,x,max.x), c(0,d.nrm,0), col=color.fill.nrm)
+  plot(x, d.nrm, type="l", col=nrm.color, axes=FALSE, xlab="", ylab="", ...)
+  polygon(c(min.x,x,max.x), c(0,d.nrm,0), col=fill.nrm)
 
   axis(side=1, at=cuts, cex.axis=mag)
   if (z) axis(side=1, at=cuts, cex.axis=mag, line=1.5, labels=-4:4, lwd=0, lwd.ticks=0)
@@ -57,7 +57,7 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, color.nrm="black",
   y.hi <- dnorm(hi, mu, sigma)
   xsub <- x[x>lo & x<hi]
   ysub <- d.nrm[x>lo & x<hi]
-  polygon(c(lo,xsub,hi), c(0,ysub,0), col=color.fill.int)
+  polygon(c(lo,xsub,hi), c(0,ysub,0), col=fill.int)
   
   # prob of interval
   prob <- pnorm(hi, mean=mu, sd=sigma) - pnorm(lo, mean=mu, sd=sigma)

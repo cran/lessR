@@ -11,8 +11,8 @@ Show a sequence of confidence intervals, all calculated from repeated samples of
 simCImean(ns, n, mu=0, sigma=1, cl=0.95, 
          ylim.bound=NULL, show.data=FALSE, show.title=TRUE, 
          miss.only=FALSE, color.hit="gray40", color.miss="red",
-         color.grid="grey90", pause=FALSE,
-         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         grid="grey90", pause=FALSE,
+         main=NULL, pdf.file=NULL, width=5, height=5, \ldots)
 }
 
 
@@ -28,12 +28,12 @@ simCImean(ns, n, mu=0, sigma=1, cl=0.95,
   \item{miss.only}{For the text output, only display information for samples that missed the mean.}
   \item{color.hit}{Color of the confidence intervals that contains the mean.}
   \item{color.miss}{Color of the confidence intervals that miss the mean.}
-  \item{color.grid}{Color of the grid lines.}
+  \item{grid}{Color of the grid lines.}
   \item{pause}{Build the graph and the text output confidence interval by confidence interval.}
   \item{main}{Title of graph.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values, possibly invalid.} 
 }
 

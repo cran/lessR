@@ -14,7 +14,7 @@ Usually a prelude to a factor analysis, such as provided by \code{\link{corCFA}}
 \usage{
 corReflect(R=mycor, vars,
           main=NULL, heat.map=TRUE, bottom=3,right=3, 
-          pdf.file=NULL, pdf.width=5, pdf.height=5)
+          pdf.file=NULL, width=5, height=5)
 
 reflect(\ldots)
 }
@@ -29,8 +29,8 @@ reflect(\ldots)
   \item{bottom}{Number of lines of bottom margin.}
   \item{right}{Number of lines of right margin.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Parameter values.}
 }
 

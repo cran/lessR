@@ -1,7 +1,7 @@
 simFlips <-
 function(n, prob=.5, show.title=TRUE,
-         show.flips=TRUE, color.grid="grey90", pause=FALSE,
-         main=NULL, pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         show.flips=TRUE, grid="grey90", pause=FALSE,
+         main=NULL, pdf.file=NULL, width=5, height=5, ...) {
 
 
   if (missing(n)) {
@@ -24,7 +24,7 @@ function(n, prob=.5, show.title=TRUE,
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
 
   # set up graphics system
-  .opendev(pdf.file, pdf.width, pdf.height)
+  .opendev(pdf.file, width, height)
 
   # plot the individual flips and the running mean
   orig.params <- par(no.readonly=TRUE)
@@ -39,7 +39,7 @@ function(n, prob=.5, show.title=TRUE,
 
   # grid lines
   vy <- pretty(c(usr[3],usr[4]))
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=color.grid, lwd=.5)
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=grid, lwd=.5)
 
   abline(h=prob, col="lightsteelblue", lwd=2)
 

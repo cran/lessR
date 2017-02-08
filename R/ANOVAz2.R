@@ -1,6 +1,6 @@
 .ANOVAz2 <- 
 function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
-         delim, rb.points, graphics, pdf, pdf.width, pdf.height) {
+         delim, rb.points, graphics, pdf, width, height) {
 
   if (grepl("*", delim, fixed=TRUE)) bet.grp  <- TRUE else bet.grp <- FALSE
   if (grepl("+", delim, fixed=TRUE)) wth.grp  <- TRUE else wth.grp <- FALSE
@@ -282,7 +282,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     }
     else { 
       pdf.file <- "ANOVA_Interaction.pdf"
-      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+      pdf(file=pdf.file, width=width, height=height)
     }
 
     plt.i <- plt.i + 1
@@ -308,7 +308,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
       }
       else { 
         pdf.file <- "ANOVA_FitInter.pdf"
-        pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+        pdf(file=pdf.file, width=width, height=height)
       }
 
     plt.i <- plt.i + 1

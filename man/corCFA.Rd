@@ -31,7 +31,7 @@ corCFA(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
 
          main=NULL, heat.map=TRUE, bottom=3, right=3, 
 
-         pdf.file=NULL, pdf.width=5, pdf.height=5,
+         pdf.file=NULL, width=5, height=5,
 
          F1=NULL, F2=NULL, F3=NULL, F4=NULL, F5=NULL,
          F6=NULL, F7=NULL, F8=NULL, F9=NULL, F10=NULL,
@@ -87,8 +87,8 @@ scales(\ldots, iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE, heat.map=FALSE)
   \item{bottom}{Number of lines of bottom margin of heat map.}
   \item{right}{Number of lines of right margin of heat map.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{F1}{Variables that define Factor 1.}
   \item{F2}{Variables that define Factor 2.}
   \item{F3}{Variables that define Factor 3.}

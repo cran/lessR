@@ -17,7 +17,7 @@ Output is generated into distinct segments by topic, organized and displayed in 
 ANOVA(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL, 
          Rmd=NULL, graphics=TRUE,
          rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
-         pdf=FALSE, pdf.width=5, pdf.height=5, fun.call, \ldots)
+         pdf=FALSE, width=5, height=5, fun.call, \ldots)
 
 av(\ldots)
 
@@ -54,8 +54,8 @@ av.brief(\ldots, brief=TRUE)
       \code{"off"} to not sort the rows of data.}
   \item{pdf}{Indicator as to if the graphic files should be saved as pdf files
        instead of directed to the standard graphics windows.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{fun.call}{Function call. Used with \code{Rmd} to pass the function call when
         obtained from the abbreviated function call \code{av}.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 

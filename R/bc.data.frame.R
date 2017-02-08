@@ -1,14 +1,29 @@
 bc.data.frame <-
 function(x, n.cat,
          col.fill, col.stroke, col.bg, col.grid, col.box, colors,
-         horiz, over.grid, addtop, gap, prop, xlab, ylab, main, labels,
+         horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
+         labels, label.size,
          cex.axis, col.axis, rotate.values, offset, beside,
          col.low, col.hi, count.levels,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet,
-         pdf.width, pdf.height, ...)  {
+         width, height, pdf, ...)  {
 
   sug <- getOption("suggest")
   options(suggest = FALSE)
+
+  manage.gr <- .graphman()  # see if graphics are to be managed
+  if (manage.gr  &&  !pdf) {
+    i.win <- 0
+    for (i in 1:ncol(x)) {
+      if (is.numeric(x[,i])  &&  !.is.num.cat(x[,i], n.cat)) 
+        i.win <- i.win + 1
+    }
+    .graphwin(i.win, width, height)
+    open.win <- 2
+  }
+
+  plot.i <- 0  # keep track of generated graphics
+  plot.title  <- character(length=0)
 
   for (i in 1:ncol(x)) {
 
@@ -26,20 +41,33 @@ function(x, n.cat,
 
         else {
 
-          pdf.file <- paste("BarChart_", x.name, ".pdf", sep="")
-          .opendev(pdf.file, pdf.width, pdf.height)
+        if (pdf) {
+          pdf.fnm <- paste("BarChart_", x.name, ".pdf", sep="") 
+          .opendev(pdf.fnm, width, height)
+        } 
+        else {
+          pdf.fnm <- NULL
+          plot.i <- plot.i + 1
+          plot.title[plot.i] <- paste("BarChart of ", x.name, sep="")
+          if (manage.gr) {
+            open.win <- open.win + 1
+            dev.set(which = open.win)
+          }
+        }
 
-          .bc.main(x[,i], by=NULL,
-            col.fill, col.stroke, col.bg, col.grid, col.box, colors,
-            horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
-            value.labels=NULL,
-            cex.axis, col.axis, rotate.values, offset, beside,
-            col.low, col.hi, count.levels,
-            legend.title, legend.loc, legend.labels, legend.horiz, quiet,
-            font.main=1, ...)
+        .bc.main(x[,i], by=NULL,
+          col.fill, col.stroke, col.bg, col.grid, col.box, colors,
+          horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
+          value.labels=NULL, label.size,
+          cex.axis, col.axis, rotate.values, offset, beside,
+          col.low, col.hi, count.levels,
+          legend.title, legend.loc, legend.labels, legend.horiz, quiet,
+          font.main=1, ...)
 
+        if (pdf) {
           dev.off()
-          if (!quiet) .showfile(pdf.file, "bar chart")
+          if (!quiet) .showfile(pdf.fnm, "bar chart")
+        }
 
         if (.is.integer(x[,i]) && nu <= n.cat && !quiet)
           .ncat("bar chart", x.name, nu, n.cat)
@@ -56,4 +84,6 @@ function(x, n.cat,
   }  # each column in x
 
     options(suggest = sug)
+    if (!pdf) if (is.null(options()$knitr.in.progress))
+      .plotList(plot.i, plot.title)
 }

@@ -2,7 +2,7 @@
 function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits.d,
          conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, graph,
-         line.chart, show.title, pdf.file, pdf.width, pdf.height, ...)  {        
+         line.chart, show.title, pdf.file, width, height, ...)  {        
  
   if ( brief  &&  (!is.null(mmd) || !is.null(msmd)) ) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -15,7 +15,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   # get variable labels if exist
   options(xname = Xnm)
   options(yname = Ynm)
-  gl <- .getlabels()
+  gl <- .getlabels(graph.win=FALSE)  # graphics window not yet set-up
   x.lbl <- gl$xl
   y.lbl <- gl$yl
 
@@ -326,26 +326,32 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     if (is.null(pdf.file)) {
       if (manage.gr) {
         n.win <- ifelse (!line.chart, 1, 3)
-        .graphwin(n.win)
-        dev.set(which=3)
+        .graphwin(n.win, width, height)
+        i.win <- 2   # start first graphics window on 3
         orig.params <- par(no.readonly=TRUE)
         on.exit(par(orig.params))
-      }
+     }
     }
 
     if (line.chart) { 
 
       if (!is.null(pdf.file))
-        pdf(file=paste("LineChart_",X1nm,".pdf",sep=""), width=pdf.width, height=pdf.height)
+        pdf(file=paste("LineChart_",X1nm,".pdf",sep=""),
+             width=width, height=height)
+
+      if (manage.gr) {
+        i.win <- i.win + 1 
+        dev.set(which=i.win)
+      }
 
       plt.i <- plt.i + 1
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X1nm))
 
       .lc.main(YA, type=NULL,
-        col.line=getOption("color.stroke.pt"), col.area=NULL, col.box="black",
-        col.stroke=getOption("color.stroke.pt"), 
-        col.fill=getOption("color.fill.bar"), shape.pts=21,
-        col.grid=getOption("color.grid"), col.bg=getOption("color.bg"),
+        col.line=getOption("stroke.pt"), col.area=NULL, col.box="black",
+        col.stroke=getOption("stroke.pt"), 
+        col.fill=getOption("fill.bar"), shape.pts=21,
+        col.grid=getOption("grid"), col.bg=getOption("bg"),
         cex.axis=0.75, col.axis="gray30", rotate.values=0, offset=.5,
         xy.ticks=TRUE, line.width=1.1,
         xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""),
@@ -353,24 +359,24 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
         cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
         center.line="default", quiet=TRUE)
         
-      if (is.null(pdf.file)) {
-        if (manage.gr) dev.set(which=4)
-      }
-      else {
+      if (!is.null(pdf.file)) {
         dev.off()
-        pdf(file=paste("LineChart_",X2nm,".pdf",sep=""), width=pdf.width, height=pdf.height)
-        .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
-            paste("line chart of", Ynm, "for Group", X2nm))
-     }
+        .showfile(paste("LineChart_", X1nm, ".pdf", sep=""), paste("line chart of", X1nm))
+      }
+
+      if (manage.gr) {
+        i.win <- i.win + 1 
+        dev.set(which=i.win)
+      }
 
       plt.i <- plt.i + 1
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X2nm))
  
      .lc.main(YB, type=NULL,
-       col.line=getOption("color.stroke.pt"), col.area=NULL, col.box="black",
-       col.stroke=getOption("color.stroke.pt"), 
-       col.fill=getOption("color.fill.bar"), shape.pts=21,
-       col.grid=getOption("color.grid"), col.bg=getOption("color.bg"),
+       col.line=getOption("stroke.pt"), col.area=NULL, col.box="black",
+       col.stroke=getOption("stroke.pt"), 
+       col.fill=getOption("fill.bar"), shape.pts=21,
+       col.grid=getOption("grid"), col.bg=getOption("bg"),
        cex.axis=0.85, col.axis="gray30", rotate.values=0, offset=.5,
        xy.ticks=TRUE, line.width=1.1,
        xlab=NULL, ylab=paste(Ynm,": ",X2nm, sep=""),
@@ -378,22 +384,23 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
        cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
        center.line="default", quiet=TRUE)
 
-      if (is.null(pdf.file)) {
-        if (manage.gr) dev.set(which=5)
-      }
-      else {
+      if (!is.null(pdf.file)) {
         dev.off()
-        .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
-            paste("line chart of", Ynm, "for Group", X2nm))
+        .showfile(paste("LineChart_", X2nm, ".pdf", sep=""), paste("line chart of", X2nm))
       }
     }
 
-    # two density graphs
-    if (!is.null(pdf.file))
-      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
 
-      plt.i <- plt.i + 1
-      plt.title[plt.i] <- "Two-Group Plot"
+    # two density graphs
+    # prepare graphics window, dev or pdf
+
+    if (manage.gr) {
+      i.win  <- i.win + 1 
+      dev.set(which=i.win)
+    }
+
+    plt.i <- plt.i + 1
+    plt.title[plt.i] <- "Two-Group Plot"
 
     .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,

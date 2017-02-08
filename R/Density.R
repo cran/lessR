@@ -1,41 +1,36 @@
 Density <-
-function(x, data=mydata, n.cat=getOption("n.cat"), 
+function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL, 
 
-    bw="nrd0", type=c("both", "general", "normal"),
-    histogram=TRUE, bin.start=NULL, bin.width=NULL,
+       bw="nrd0", type=c("both", "general", "normal"),
+       histogram=TRUE, bin.start=NULL, bin.width=NULL,
 
-    Rmd=NULL, digits.d=NULL,
+       fill=getOption("fill.pt"),
+       bg=getOption("bg"),
+       grid=getOption("grid"),
+       box=getOption("box"),
 
-    color.fill=getOption("color.fill.pt"),
-    color.bg=getOption("color.bg"),
-    color.grid=getOption("color.grid"),
-    color.box=getOption("color.box"),
+       nrm.color="black", gen.color="black",
+       fill.nrm=NULL, fill.gen=NULL,
 
-    color.nrm="black", color.gen="black",
-    color.fill.nrm=NULL, color.fill.gen=NULL,
+       cex.axis=0.75, axes="gray30",
 
-    cex.axis=0.75, color.axis="gray30",
+       rotate.values=0, offset=0.5,
 
-    rotate.values=0, offset=0.5,
+       x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
+       x.min=NULL, x.max=NULL, band=FALSE, 
 
-    x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
-    x.min=NULL, x.max=NULL, band=FALSE, 
-
-    quiet=getOption("quiet"),
-    pdf.file=NULL, pdf.width=5, pdf.height=5,
-    fun.call=NULL, ...) {
+       digits.d=NULL, quiet=getOption("quiet"),
+       width=4.5, height=4.5, pdf=FALSE,
+       fun.call=NULL, ...) {
 
 
   if (is.null(fun.call)) fun.call <- match.call()
 
-  for (i in 1:length(color.fill))
-    if (color.fill[i] == "off") color.fill[i] <- "transparent"
-  if (color.bg == "off") color.bg <- "transparent"
-  if (color.grid == "off" ) color.grid <- "transparent"
-  if (color.box == "off") color.box <- "transparent"
-
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+  for (i in 1:length(fill))
+    if (fill[i] == "off") fill[i] <- "transparent"
+  if (bg == "off") bg <- "transparent"
+  if (grid == "off" ) grid <- "transparent"
+  if (box == "off") box <- "transparent"
 
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
@@ -47,33 +42,42 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
           "options that began with the abbreviation  col  now begin with  ",
           "color \n\n")
       }
+      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "color options dropped the  color. prefix\n",
+          "eg., fill, instead of color.fill.\n\n")
+      }
       if (names(dots)[i] == "knitr.file") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "knitr.file  no longer used\n",
           "Instead use  Rmd  for R Markdown file\n\n")
+      }
+      if (names(dots)[i] == "pdf.file") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "pdf.file  changed to  pdf, either TRUE or FALSE\n\n")
       }
     }
   }
 
   clr <- getOption("colors")  # color theme not used except for monochrome 
 
-  if (missing(color.fill))
+  if (missing(fill))
     if (.Platform$OS == "windows")
-      color.fill <- "gray80"
+      fill <- "gray80"
     else
-      color.fill <- "gray86"
+      fill <- "gray86"
 
-  if (missing(color.bg)) color.bg <- "ghostwhite"
+  if (missing(bg)) bg <- "ghostwhite"
 
-  if (missing(color.fill.nrm))
-      color.fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
+  if (missing(fill.nrm))
+      fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
 
-  if (missing(color.fill.gen))
-      color.fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
+  if (missing(fill.gen))
+      fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
 
   if (clr == "gray" || clr == "gray.black") {
-    color.fill.nrm <- "transparent"
-    color.fill.gen <- rgb(.75,.75,.75, .5)
+    fill.nrm <- "transparent"
+    fill.gen <- rgb(.75,.75,.75, .5)
   }
 
 
@@ -83,9 +87,6 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 
   df.name <- deparse(substitute(data))
   options(dname = df.name)
-
-  pdf.nm <- FALSE
-  if (!missing(pdf.file)) pdf.nm <- TRUE
 
 
 # -----------------------------------------------------------
@@ -130,8 +131,18 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 # ---------------
 # do the analysis
 
-  go.pdf <- FALSE
-  if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
+    plot.i <- 0  # keep track of generated graphics
+    plot.title  <- character(length=0)
+    manage.gr <- .graphman()  # see if graphics are to be managed
+    if (manage.gr  &&  !pdf) {
+      i.win <- 0
+      for (i in 1:ncol(data)) {
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat)) 
+          i.win <- i.win + 1
+      }
+      .graphwin(i.win, width, height)
+    }
+    open.win <- 2
 
     if (is.null(digits.d)) {
       dig.dec <- .max.dd(data[,i]) + 1
@@ -140,6 +151,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
     else
       dig.dec <- digits.d
     options(digits.d=dig.dec)
+
 
   for (i in 1:ncol(data)) {
 
@@ -152,8 +164,20 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
       # do not do num.cat vars, unless only 1 variable to analyze
       if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
 
-      pdf.fnm <- .pdfname("Density", x.name, go.pdf, pdf.nm, pdf.file)
-     .opendev(pdf.fnm, pdf.width, pdf.height)
+      if (pdf) {
+        pdf.fnm <- paste("Density", "_", x.name, ".pdf", sep="") 
+        .opendev(pdf.fnm, width, height)
+      }
+      else {
+        pdf.fnm <- NULL
+        plot.i <- plot.i + 1
+        plot.title[plot.i] <- paste("Density of ", x.name, sep="")
+        if (manage.gr) {
+          open.win <- open.win + 1
+          dev.set(which = open.win)
+        }
+      }
+
 
       gl <- .getlabels()
       x.name <- gl$xn; x.lbl <- gl$xl;
@@ -166,30 +190,33 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
         ttlns <- ""
  
       stuff <- .dn.main(data[,i], bw, type, histogram, bin.start, bin.width, 
-            color.fill, color.bg, color.grid, color.box, color.nrm, color.gen,
-            color.fill.nrm, color.fill.gen, 
-            cex.axis, color.axis, rotate.values, offset, 
+            fill, bg, grid, box, nrm.color, gen.color,
+            fill.nrm, fill.gen, 
+            cex.axis, axes, rotate.values, offset, 
             x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)
-      txdst <- stuff$tx
 
+      txdst <- ""
       txotl <- ""
       if (!quiet) {
+        txdst <- stuff$tx
+
         txotl <- .outliers(data[,i])
         if (txotl[1] == "") txotl <- "No (Box plot) outliers"
+
+        class(txdst) <- "out_piece"
+        class(txotl) <- "out_piece"
       }
 
-      class(txdst) <- "out_piece"
-      class(txotl) <- "out_piece"
       
       if (ncol(data) > 1) {  # for a variable range, just text output
-        class(ttlns) <- "out_piece"  # title onlyi for multiple variables
+        class(ttlns) <- "out_piece"  # title only for multiple variables
         
         output <- list(out_title=ttlns, out_stats=txdst, out_outliers=txotl)
         class(output) <- "out_all"
         print(output)
       }
 
-      if (go.pdf) {
+      if (pdf) {
         dev.off()
         if (!quiet) .showfile(pdf.fnm, "density curve")
       }
@@ -200,6 +227,11 @@ function(x, data=mydata, n.cat=getOption("n.cat"),
 
     }  # is.nmeric(data[,i])
   }  # for (i in 1:ncol(data)), cycle through all the variables
+
+  if (ncol(data) > 1) {
+    if (!pdf) if (is.null(options()$knitr.in.progress))
+      .plotList(plot.i, plot.title)
+  }
 
 
   # now further processing if only a single numerical variable to process

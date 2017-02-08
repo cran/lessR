@@ -105,17 +105,17 @@ function(x, by, size,
           xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...)
           
               
-  usr <- par("usr")
+    usr <- par("usr")
 
-  # colored plotting area
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
+    # colored plotting area
+    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
 
-  # grid lines
-  vx <- pretty(c(usr[1],usr[2]))
-  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
+    # grid lines
+    vx <- pretty(c(usr[1],usr[2]))
+    abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
 
-  # box around plotting area
-  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border="black")
+    # box around plotting area
+    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border="black")
 
   }
 
@@ -215,8 +215,8 @@ function(x, by, size,
     }
     
     fc <- ""
-    if (!grepl("run.chart", fncl))
-      fc <- paste(fc, ", run.chart=TRUE)", sep="")
+    if (!grepl("line.chart", fncl))
+      fc <- paste(fc, ", line.chart=TRUE)", sep="")
     if (nzchar(fc)) {
       fc <- paste(fncl, fc, sep="")
       txsug <- paste(txsug,"\n", fc, sep="")
@@ -226,19 +226,17 @@ function(x, by, size,
     if (!grepl("values", fncl))
       fc <- paste(fc, ", values=\"count\")", sep="")
     if (nzchar(fc)) {
-      fc <- paste(fncl, fc, sep="")
+      fc <- paste("Plot(", x.name, fc, sep="")
       txsug <- paste(txsug,"\n", fc, sep="")
     }
    
     fc <- ""
     if (!grepl("values", fncl))
-      fc <- paste(fc, ", values=\"count\"", sep="")
+      fc <- paste("Plot(", x.name, ", values=\"count\"", sep="")
     if (!grepl("values", fncl))
-      fc <- paste(fc, ", color.area=TRUE", sep="")
-    if (!grepl("values", fncl))
-      fc <- paste(fc, ", size=3)", sep="")
+      fc <- paste(fc, ", area=TRUE", sep="")
     if (nzchar(fc)) {
-      fc <- paste(fncl, fc, sep="")
+      fc <- paste(fc, ") ", sep="")
       txsug <- paste(txsug,"\n", fc, sep="")
     }
     

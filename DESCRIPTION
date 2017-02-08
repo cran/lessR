@@ -1,6 +1,6 @@
 Package: lessR
-Version: 3.5.3
-Date: 2017-01-01
+Version: 3.5.5
+Date: 2017-02-08
 Title: Less Code, More Results
 Author: David W. Gerbing, School of Business Administration, Portland State University
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
@@ -10,7 +10,7 @@ Imports: graphics, grDevices, stats, utils, foreign, ellipse, leaps,
 Description: Each function accomplishes the work of several or more standard R functions. For example, two function calls, Read() and CountAll(), read the data and generate summary statistics for all variables in the data frame, plus histograms and bar charts as appropriate.  Other functions provide for descriptive statistics, a comprehensive regression analysis, analysis of variance and t-test, plotting, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function call, variable labels, color themes, and a built-in help system. A confirmatory factor analysis of multiple indicator measurement models is available, as are pedagogical routines for data simulation such as for the Central Limit Theorem. Compatible with 'RStudio' and 'knitr' including generation of R markdown instructions for interpretative output. 
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2017-01-02 03:55:07 UTC; gerbing
+Packaged: 2017-02-08 11:10:36 UTC; davidgerbing
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2017-01-02 17:59:20
+Date/Publication: 2017-02-09 00:59:03

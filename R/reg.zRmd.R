@@ -112,7 +112,6 @@ sep="")
 
 
 
-
   tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- "## The Data"
 
@@ -120,7 +119,8 @@ sep="")
   if (is.null(rdcall)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
        "To generate an R markdown file, first read the data for this\n",
-       "regression analysis with the lessR function Read.\n\n")
+       "regression analysis with the lessR function Read.\n\n",
+       "ex:  mydata <- Read()\n\n")
   }
 
 

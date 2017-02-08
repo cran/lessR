@@ -2,10 +2,10 @@
 function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
          Edesired, paired, graph, line.chart, show.title,
-         pdf.file, pdf.width, pdf.height) { 
+         pdf.file, width, height) { 
 
   # get variable label if exists
-  gl <- .getlabels()
+  gl <- .getlabels(graph.win=FALSE)  # graphics window not yet set-up
   y.lbl <- gl$yl
 
   if ( (!is.null(y.lbl)) ) {
@@ -30,11 +30,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
 
   clpct <- paste(toString(round((conf.level)*100, 2)), "%", sep="")
 
-  if (from.data)
-    dig.smr.d  <- digits.d
-  else
-    dig.smr.d  <- digits.d - 1
-    
+  dig.smr.d <- ifelse (from.data, digits.d, digits.d - 1)
 
   if (Ynm != "Y") cat(Ynm,  ": ", sep="")
   if (from.data) cat(" n.miss = ", n.miss, ",  ", sep="") 
@@ -163,7 +159,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
         if (paired) n.win <- n.win + 1
         if (line.chart) n.win <- n.win + 1
         if (n.win > 0) {
-          .graphwin(n.win)
+          .graphwin(n.win, width, height)
           i.win <- 2   # start first graphics window on 3
           orig.params <- par(no.readonly=TRUE)
           on.exit(par(orig.params))
@@ -173,10 +169,10 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
 
     if (line.chart) {
       if (!is.null(pdf.file))
-        pdf(file=paste("LineChart_",Ynm,".pdf",sep=""), width=pdf.width, height=pdf.height)
+        pdf(file=paste("LineChart_",Ynm,".pdf",sep=""), width=width, height=height)
 
       if (manage.gr) {
-        i.win  <- i.win + 1 
+        i.win <- i.win + 1 
         dev.set(which=i.win)
       }
 
@@ -184,10 +180,10 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
       plt.title[plt.i] <- paste("Sequentially Plotted Data for", Ynm)
 
       .lc.main(Y, type=NULL,
-        col.line=getOption("color.stroke.pt"), col.area=NULL, col.box="black",
-        col.stroke=getOption("color.stroke.pt"), 
-        col.fill=getOption("color.fill.bar"), shape.pts=21,
-        col.grid=getOption("color.grid"), col.bg=getOption("color.bg"),
+        col.line=getOption("stroke.pt"), col.area=NULL, col.box="black",
+        col.stroke=getOption("stroke.pt"), 
+        col.fill=getOption("fill.bar"), shape.pts=21,
+        col.grid=getOption("grid"), col.bg=getOption("bg"),
         cex.axis=0.75, col.axis="gray30", rotate.values=0, offset=.5,
         xy.ticks=TRUE, line.width=1.1,
         xlab=NULL, ylab=NULL, main=plt.title[plt.i], sub=NULL, cex=NULL,
@@ -209,16 +205,12 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
       dev.set(which=i.win)
     }
 
-    if (!is.null(pdf.file))
-      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
-
     plt.i <- plt.i + 1
     plt.title[plt.i] <- "One-Group Plot"
 
     .OneGraph(Y, bw1, Ynm, y.lbl, digits.d, brief,
          n, m, mu0, mdiff, s, smd, mmd, msmd,
-         clpct, tvalue, pvalue, ub, lb,
-         show.title, pdf.file, pdf.width, pdf.height)
+         clpct, tvalue, pvalue, ub, lb, show.title)
 
       if (!is.null(pdf.file)) {
         dev.off()

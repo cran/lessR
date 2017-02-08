@@ -2,7 +2,7 @@
 function(lm.out, res.rows=NULL, pred.rows=NULL,
          scatter.coef=FALSE, X1.new=NULL,
          numeric.all, in.data.frame, c.int, p.int,
-         pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE,
+         pdf=FALSE, width=5, height=5, manage.gr=FALSE,
          scatter.3D, ...) {
 
          
@@ -20,7 +20,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
   if (pdf) { 
     pdf.file <- "RegScatterplot.pdf"
     if (n.pred > 1) pdf.file <- "RegScatterMatrix.pdf"
-    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    pdf(file=pdf.file, width=width, height=height)
   }
 
   # keep track of the plot in this routine
@@ -83,10 +83,10 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
-    col.bg <- getOption("color.bg")
+    col.bg <- getOption("bg")
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
 
-    col.grid <- getOption("color.grid")
+    col.grid <- getOption("grid")
     abline(v=axTicks(1), col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
@@ -105,8 +105,8 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
         max.lbl.y=3, cex.lab=size.lab) 
 
-    col.fill <- getOption("color.fill.pt")
-    col.stroke <- getOption("color.stroke.pt")
+    col.fill <- getOption("fill.pt")
+    col.stroke <- getOption("stroke.pt")
     points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=size.pt)
 
     if (n.pred == 0) {
@@ -122,21 +122,35 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     }
 
     if (do.predint) {
-      col.ci <- getOption("color.stroke.pt")
+      col.ci <- getOption("stroke.pt")
       col.pi <- "gray30"
 
       lines(x.values, c.int$lwr, col=col.ci, lwd=0.75)
       lines(x.values, c.int$upr, col=col.ci, lwd=0.75)
       lines(x.values, p.int$lwr, col=col.pi, lwd=1.5)
       lines(x.values, p.int$upr, col=col.pi, lwd=1.5)
+
+      len <- length(x.values)
+      xx <- c( c(x.values[1],x.values,x.values[len]),
+                 rev(c(x.values[1],x.values,x.values[len])) )
+
+      yy <- c( c(min(c.int$upr),c.int$upr,min(c.int$upr)),
+                 rev(c(min(c.int$lwr),c.int$lwr,min(c.int$lwr))) )
+      polygon(xx, yy, col=getOption("se.fill"), border="transparent")
+
+      yy <- c( c(min(p.int$upr),p.int$upr,min(p.int$upr)),
+                 rev(c(min(p.int$lwr),p.int$lwr,min(p.int$lwr))) )
+      polygon(xx, yy, col=getOption("fill.ellipse"), border="transparent")
+
+
     }
   }  # end n.pred<=1
 
   else {  # scatterplot matrix for multiple regression
     if (numeric.all && in.data.frame) {
-      col.pts <- getOption("color.stroke.pt")
-      col.line <- getOption("color.stroke.bar")
-      col.bg=getOption("color.bg")
+      col.pts <- getOption("stroke.pt")
+      col.line <- getOption("stroke.bar")
+      col.bg=getOption("bg")
 
       panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
         col.pt=col.pts, col.smooth=col.line,

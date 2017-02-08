@@ -335,7 +335,8 @@ function(topic=NULL) {
   The lessR function theme provides global settings for lessR functions.
   Set the color theme for the graphics functions. The default color theme is
   \"dodgerblue\", with possibilities of \"gray\", \"green\", \"gold\", \"rose\", \"red\", 
-  \"purple\", \"sienna\", \"white\", \"orange.black\" and \"gray.black\".  Example:
+  \"darkred\", \"brown\", \"purple\", \"sienna\", \"white\", \"orange.black\" and
+  \"gray.black\".  Example:
       > theme(colors=\"gray\") 
   Set the transparency level of bars and plotted points with the
   trans.fill.bar and trans.fill.pt options. Turn off grid lines with col.grid=\"off\".
@@ -509,9 +510,9 @@ function(topic=NULL) {
   not individually displayed and are connected by line segments. If the
   number of unique response values <= n.cat=8, produce a bubble plot.
 
-  Can also plot two variables with different symbols and/or colors 
-  for each level of a third variable.
-      > Plot(X, Y, by=Z)
+  Can also plot two variables with different symbols and/or colors for
+  each level of a third variable, and have more than 1 X or Y variable.
+      > Plot(c(X1, X2), Y, by=Z)
   For a continuous third variable, produce a bubble plot,
       > Plot(X, Y, size=Z)
 

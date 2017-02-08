@@ -2,7 +2,7 @@ ANOVA <-
 function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL, 
          Rmd=NULL, graphics=TRUE,
          rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
-         pdf=FALSE, pdf.width=5, pdf.height=5, fun.call=NULL, ...) {  
+         pdf=FALSE, width=5, height=5, fun.call=NULL, ...) {  
 
 
   if (is.null(fun.call)) fun.call <- match.call()
@@ -25,20 +25,27 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
     }
   }
 
-  dname <- deparse(substitute(data))
-  options(dname = dname)
+  df.name <- deparse(substitute(data))   # get name of data table
+  options(dname = df.name)
+
+  # if a tibble convert to data frame
+  # data.frame is already #3 in class(data), so no char --> factor conversion 
+  if (class(data)[1] == "tbl_df") {
+    data <- as.data.frame(data, stringsAsFactors=TRUE)
+  }
+
  
   op <- options()  # save current options to reset at end
 
-  if (!exists(dname)) {
+  if (!exists(df.name)) {
     txtC <- "Function ANOVA requires the data exist in a data frame\n"
-    if (dname == "mydata") 
+    if (df.name == "mydata") 
       txtA <- ", the default data frame name, " else txtA <- " "
     txtB1 <- "Either create the data frame, such as with data.frame function, or\n"
     txtB2 <- "  specify the actual data frame with the parameter: data\n"
     txtB <- paste(txtB1, txtB2, sep="")
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-        txtC, "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
+        txtC, "Data frame ", df.name, txtA, "does not exist\n\n", txtB, "\n")
   }
 
   nm <- all.vars(my.formula)  # names of vars in the model
@@ -82,7 +89,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
   tx <- character(length=0)
 
   if (sys.nframe() == 1) {  # only accurate if not called from model
-    tx[length(tx)+1] <- paste("Data Frame: ", dname)
+    tx[length(tx)+1] <- paste("Data Frame: ", df.name)
     tx[length(tx)+1] <- ""
   }
   
@@ -121,7 +128,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
 
   if (n.pred == 1)  {
     plt1 <- .ANOVAz1(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
-        nm, n.obs, digits.d, brief, graphics, pdf, pdf.width, pdf.height)
+        nm, n.obs, digits.d, brief, graphics, pdf, width, height)
     title_des <- plt1$title_des
     txdes <- plt1$txdes
     title_basic <- plt1$title_basic
@@ -138,7 +145,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
   if (n.pred == 2) {
     plt2 <- .ANOVAz2(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
         av.out$model[,nm[3]], nm, digits.d, brief, as.character(my.formula)[3],
-        rb.points, graphics, pdf, pdf.width, pdf.height)
+        rb.points, graphics, pdf, width, height)
     txbck2 <- plt2$txbck2
     for (i in 1:length(txbck2)) tx[length(txbck)+1] <- txbck2[i]
     title_des <- plt2$title_des
@@ -226,7 +233,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), digits.d=NULL,
   if (!is.null(Rmd)) {
     txt <- ifelse (grepl(".Rmd", Rmd), "", ".Rmd")
     Rmd <- paste(Rmd, txt, sep="") 
-    txknt <- .av.Rmd(nm, dname, fun.call, digits.d)
+    txknt <- .av.Rmd(nm, df.name, fun.call, digits.d)
     cat(txknt, file=Rmd, sep="\n")
     txkfl <- .showfile2(Rmd, "R Markdown instructions")
   }

@@ -1,14 +1,14 @@
 theme <-
-function(colors=c("blue", "gray", "rose", "green", "gold", "red",
-         "dodgerblue", "purple", "sienna", "orange.black",
+function(colors=c("blue", "gray", "rose", "green", "gold", "red", "darkred",
+         "dodgerblue", "purple", "sienna", "brown", "orange.black",
          "gray.black", "white"),
 
-         color.fill.bar=NULL, trans.fill.bar=NULL,
-         color.fill.pt=NULL, trans.fill.pt=NULL,
-         color.stroke.bar=NULL, color.stroke.pt=NULL,
-         color.fill.ellipse=NULL,
-         color.bg=NULL, color.grid=NULL, color.box=NULL,
-         color.heat=NULL, ghost=NULL,
+         fill.bar=NULL, trans.fill.bar=NULL,
+         fill.pt=NULL, trans.fill.pt=NULL,
+         stroke.bar=NULL, stroke.pt=NULL,
+         se.fill=NULL, fill.ellipse=NULL,
+         bg=NULL, grid=NULL, box=NULL,
+         heat=NULL, ghost=NULL,
 
          n.cat=getOption("n.cat"), lab.size=getOption("lab.size"),
          suggest=getOption("suggest"),
@@ -20,19 +20,21 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
 
          width=120, show=FALSE) {
 
-  if (!is.null(color.fill.bar)) if (color.fill.bar[1] == "off")
-    color.fill.bar <- "transparent"
-  if (!is.null(color.fill.pt)) if (color.fill.pt[1] == "off")
-    color.fill.pt <- "transparent"
-  if (!is.null(color.stroke.bar)) if (color.stroke.bar[1] == "off")
-    color.stroke.bar <- "transparent"
-  if (!is.null(color.stroke.pt)) if (color.stroke.pt[1] == "off")
-    color.stroke.bar <- "transparent"
-  if (!is.null(color.fill.ellipse)) if (color.fill.ellipse[1] == "off")
-    color.stroke.bar <- "transparent"
-  if (!is.null(color.bg)) if (color.bg == "off") color.bg <- "transparent"
-  if (!is.null(color.grid)) if (color.grid == "off") color.grid <- "transparent"
-  if (!is.null(color.box)) if (color.box == "off") color.box <- "transparent"
+  if (!is.null(fill.bar)) if (fill.bar[1] == "off")
+    fill.bar <- "transparent"
+  if (!is.null(fill.pt)) if (fill.pt[1] == "off")
+    fill.pt <- "transparent"
+  if (!is.null(stroke.bar)) if (stroke.bar[1] == "off")
+    stroke.bar <- "transparent"
+  if (!is.null(stroke.pt)) if (stroke.pt[1] == "off")
+    stroke.bar <- "transparent"
+  if (!is.null(se.fill)) if (se.fill[1] == "off")
+    se.fill <- "transparent"
+  if (!is.null(fill.ellipse)) if (fill.ellipse[1] == "off")
+    fill.ellipse <- "transparent"
+  if (!is.null(bg)) if (bg == "off") bg <- "transparent"
+  if (!is.null(grid)) if (grid == "off") grid <- "transparent"
+  if (!is.null(box)) if (box == "off") box <- "transparent"
 
   # default transparency levels
   if (!missing(colors)) {
@@ -47,28 +49,34 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
 
   if (!is.null(ghost)) if (ghost) {
     options(trans.fill.bar = 0.50)
-    if (getOption("colors") == "blue")
-      options(color.fill.bar = .maketrans("lightsteelblue3", .to256("trans.fill.bar")))
-    if (getOption("colors") == "gray")
-      options(color.fill.bar = .maketrans("gray30", .to256("trans.fill.bar")))
-    if (getOption("colors") == "green")
-      options(color.fill.bar = rgb(106,127,16, alpha=.to256("trans.fill.bar"), maxColorValue=256))
-    if (getOption("colors") == "rose")
-      options(color.fill.bar = rgb("rosybrown1", alpha=.to256("trans.fill.bar"), maxColorValue=256))
-    if (getOption("colors") == "gold")
-      options(color.fill.bar = .maketrans("goldenrod2", .to256("trans.fill.bar")))
-    if (getOption("colors") == "red")
-      options(color.fill.bar = .maketrans("firebrick2", .to256("trans.fill.bar")))
     if (getOption("colors") == "dodgerblue")
-      options(color.fill.bar = .maketrans("dodgerblue3", .to256("trans.fill.bar")))
+      options(fill.bar = .maketrans("dodgerblue3", .to256("trans.fill.bar")))
+    if (getOption("colors") == "blue")
+      options(fill.bar =
+                .maketrans("lightsteelblue3", .to256("trans.fill.bar")))
+    if (getOption("colors") == "gray")
+      options(fill.bar = .maketrans("gray30", .to256("trans.fill.bar")))
+    if (getOption("colors") == "green")
+      options(fill.bar = rgb(106,127,16,
+                alpha=.to256("trans.fill.bar"), maxColorValue=256))
+    if (getOption("colors") == "rose")
+      options(fill.bar = rgb("rosybrown1",
+                alpha=.to256("trans.fill.bar"), maxColorValue=256))
+    if (getOption("colors") == "gold")
+      options(fill.bar = .maketrans("goldenrod2", .to256("trans.fill.bar")))
+    if (getOption("colors") == "red")
+      options(fill.bar = .maketrans("firebrick2", .to256("trans.fill.bar")))
+    if (getOption("colors") == "darkred")
+      options(fill.bar = .maketrans("firebrick3", .to256("trans.fill.bar")))
     if (getOption("colors") == "purple")
-      options(color.fill.bar = .maketrans("purple1", .to256("trans.fill.bar")))
+      options(fill.bar = .maketrans("purple1", .to256("trans.fill.bar")))
     if (getOption("colors") == "sienna")
-      options(color.fill.bar = .maketrans("sienna3", .to256("trans.fill.bar")))
+      options(fill.bar = .maketrans("sienna3", .to256("trans.fill.bar")))
     if (getOption("colors") == "orange.black")
-      options(color.fill.bar = rgb(249,99,2, alpha=.to256("trans.fill.bar"), maxColorValue=256))
+      options(fill.bar = rgb(249,99,2, alpha=.to256("trans.fill.bar"),
+                maxColorValue=256))
     if (getOption("colors") == "gray.black")
-      options(color.fill.bar =  .maketrans("gray80", .to256("trans.fill.bar")))
+      options(fill.bar =  .maketrans("gray80", .to256("trans.fill.bar")))
   }
   else {
     colors <- getOption("colors")
@@ -76,30 +84,30 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
 
   if (!is.null(trans.fill.bar)) {
     options(trans.fill.bar=trans.fill.bar)
-    options(color.fill.bar = .maketrans(getOption("color.fill.bar"), .to256("trans.fill.bar")))
+    options(fill.bar = .maketrans(getOption("fill.bar"), .to256("trans.fill.bar")))
   }
   if (!is.null(trans.fill.pt)) {
     options(trans.fill.pt=trans.fill.pt)
-    options(color.fill.pt = .maketrans(getOption("color.fill.pt"), .to256("trans.fill.pt")))
+    options(fill.pt = .maketrans(getOption("fill.pt"), .to256("trans.fill.pt")))
   }
 
-  if (!is.null(color.fill.bar))
-    if (color.fill.bar[1] == "transparent")
-      options(color.fill.bar = color.fill.bar) 
+  if (!is.null(fill.bar))
+    if (fill.bar[1] == "transparent")
+      options(fill.bar = fill.bar) 
     else
-      options(color.fill.bar = .maketrans(color.fill.bar, .to256("trans.fill.bar")))
-  if (!is.null(color.fill.pt))
-    if (color.fill.pt[1] == "transparent")
-      options(color.fill.pt = color.fill.pt) 
+      options(fill.bar = .maketrans(fill.bar, .to256("trans.fill.bar")))
+  if (!is.null(fill.pt))
+    if (fill.pt[1] == "transparent")
+      options(fill.pt = fill.pt) 
     else
-      options(color.fill.pt = .maketrans(color.fill.pt, .to256("trans.fill.pt")))
+      options(fill.pt = .maketrans(fill.pt, .to256("trans.fill.pt")))
 
-  if (!is.null(color.stroke.bar)) options(color.stroke.bar = color.stroke.bar) 
-  if (!is.null(color.stroke.pt)) options(color.stroke.pt = color.stroke.pt) 
+  if (!is.null(stroke.bar)) options(stroke.bar = stroke.bar) 
+  if (!is.null(stroke.pt)) options(stroke.pt = stroke.pt) 
 
-  if (!is.null(color.bg)) options(color.bg=color.bg)
-  if (!is.null(color.grid)) options(color.grid=color.grid)
-  if (!is.null(color.box)) options(color.box=color.box)
+  if (!is.null(bg)) options(bg=bg)
+  if (!is.null(grid)) options(grid=grid)
+  if (!is.null(box)) options(box=box)
 
   options(quiet=quiet)
   options(brief=brief)
@@ -114,181 +122,96 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
   options(document=document)
   options(code=code)
 
+  make.color <- function(color1, color2) {
+
+    if (is.null(fill.bar))
+      options(fill.bar = .maketrans(color1, .to256("trans.fill.bar")))
+    if (is.null(fill.pt))
+      options(fill.pt = .maketrans(color1, .to256("trans.fill.pt")))
+    if (is.null(stroke.bar)) options(stroke.bar = color2)
+    if (is.null(stroke.pt)) options(stroke.pt = color2)
+    if (is.null(se.fill)) options(se.fill = .maketrans(color1, 25)) 
+    if (is.null(fill.ellipse))
+      options(fill.ellipse = .maketrans(color1, 15))
+    if (is.null(heat)) options(heat = color2)
+
+  }
+
 
   if (!missing(colors)) {
   # rgb(20,97,172) is dodgerblue 3.5
     theme <- options("colors")
-    if (theme == "dodgerblue") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = .maketrans("dodgerblue3", .to256("trans.fill.bar")))
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = .maketrans("dodgerblue3", .to256("trans.fill.pt")))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "steelblue4")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "steelblue4")
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = .maketrans("dodgerblue3", 15))
-      if (is.null(color.bg))
-        options(color.bg = "grey95")
-      if (is.null(color.grid))
-        options(color.grid = "grey87")
-      if (is.null(color.heat)) options(color.heat = "dodgerblue4")
+
+    if (!grepl(".black", theme, fixed=FALSE)) {
+      if (is.null(bg)) options(bg = "grey92")
+      if (is.null(grid)) options(grid = "white")
     }
+
+    if (theme == "dodgerblue") make.color("dodgerblue3", "steelblue4")
+    if (theme == "sienna") make.color("sienna3", "sienna4")
+    if (theme == "green") make.color("darkseagreen3", "darkseagreen4")
+    if (theme == "rose") make.color("rosybrown3", "rosybrown4")
+    if (theme == "gold") make.color("goldenrod2", "goldenrod4")
+    if (theme == "red") make.color("firebrick3", "firebrick4")
+    if (theme == "darkred") make.color("darkred", rgb(80,0,0, maxColorValue = 256))
+    if (theme == "purple") make.color("purple1", "purple4")
+    if (theme == "blue") make.color("royalblue1", "royalblue4")
+    if (theme == "brown") make.color("rosybrown4", "rosybrown3")
+    if (theme == "white") {
+      make.color("white", "black")
+      if (is.null(bg)) options(bg = "white")
+    } 
+
     if (theme == "gray") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = .maketrans("gray35", .to256("trans.fill.bar")))
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = .maketrans("gray20", .to256("trans.fill.pt")))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "gray60")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "black")
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = .maketrans("gray35", 15))
-      if (is.null(color.bg)) options(color.bg = "gray92")
-      if (is.null(color.grid)) options(color.grid = "white")
-      if (is.null(color.heat)) options(color.heat = "gray5")
+      if (is.null(fill.bar))
+        options(fill.bar = .maketrans("gray35", .to256("trans.fill.bar")))
+      if (is.null(fill.pt))
+        options(fill.pt = .maketrans("gray20", .to256("trans.fill.pt")))
+      if (is.null(stroke.bar)) options(stroke.bar = "gray60")
+      if (is.null(stroke.pt)) options(stroke.pt = "black")
+      if (is.null(se.fill)) options(se.fill = .maketrans("gray0", 25)) 
+      if (is.null(fill.ellipse))
+        options(fill.ellipse = .maketrans("gray35", 15))
+      if (is.null(heat)) options(heat = "gray5")
     }
-    if (theme == "sienna") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = .maketrans("sienna3", .to256("trans.fill.bar")))
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = .maketrans("sienna3", .to256("trans.fill.pt")))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "sienna4")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "sienna4")
-        if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = .maketrans("sienna3", 15))
-    if (is.null(color.bg)) options(color.bg = "seashell1")
-      if (is.null(color.grid)) options(color.grid = "seashell2")
-      if (is.null(color.heat)) options(color.heat = "sienna3")
-    }
-    if (theme == "blue") {
-      if (is.null(color.fill.bar)) 
-        options(color.fill.bar = .maketrans("lightsteelblue3", .to256("trans.fill.bar")))
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = .maketrans("lightsteelblue3", .to256("trans.fill.pt")))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "slategray")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "darkblue")
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = .maketrans("lightsteelblue3", 15))
-      if (is.null(color.bg)) options(color.bg = "ghostwhite")
-      if (is.null(color.grid)) options(color.grid = "gray90")
-      if (is.null(color.heat)) options(color.heat = "darkblue")
-    }
-    if (theme == "green") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = rgb(106,127,16, alpha=.to256("trans.fill.bar"),
-        maxColorValue=256))
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = rgb(106,127,16, alpha=.to256("trans.fill.pt"),
-        maxColorValue=256))
-      if (is.null(color.stroke.bar))
-        options(color.stroke.bar = rgb(71,67,52, maxColorValue=256))
-      if (is.null(color.stroke.pt))
-        options(color.stroke.pt = rgb(71,67,52,  maxColorValue=256))
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = rgb(106,127,16, alpha=15, maxColorValue=256))
-      if (is.null(color.bg)) options(color.bg = rgb(230,220,143, maxColorValue=256))
-      if (is.null(color.grid)) options(color.grid = rgb(96,53,29, alpha=50, maxColorValue=256))
-      if (is.null(color.heat)) options(color.heat = "darkgreen")
-    }
-    if (theme == "rose") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = rgb(255,193,193, alpha=.to256("trans.fill.bar"),
-        maxColorValue=256))  # rosybrown1
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = rgb(255,193,193, alpha=.to256("trans.fill.pt"),
-        maxColorValue=256))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "rosybrown3")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "rosybrown4")
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = rgb(255,193,193, alpha=20, maxColorValue=256))
-      if (is.null(color.bg)) options(color.bg = "snow1")
-      if (is.null(color.grid)) options(color.grid = "snow2")
-      if (is.null(color.heat)) options(color.heat = "rosybrown4")
-    }
-    if (theme == "gold") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = .maketrans("goldenrod2", .to256("trans.fill.bar")))
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = .maketrans("goldenrod2", .to256("trans.fill.pt")))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "goldenrod4")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "goldenrod4")
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = .maketrans("goldenrod2", 15))
-      if (is.null(color.bg)) options(color.bg = rgb(250,250,245, maxColorValue=256))
-      if (is.null(color.grid)) options(color.grid = rgb(220,222,200, maxColorValue=256))
-      if (is.null(color.heat)) options(color.heat = "goldenrod4")
-    }
-    if (theme == "red") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = .maketrans("firebrick2", .to256("trans.fill.bar")))
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = .maketrans("firebrick2", .to256("trans.fill.pt")))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "firebrick4")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "firebrick4")
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = .maketrans("firebrick2", 12))
-      if (is.null(color.bg)) options(color.bg=rgb(255,251,251, maxColorValue=256))
-      if (is.null(color.grid)) if (is.null(color.grid)) options(color.grid="lavenderblush2")
-      if (is.null(color.heat)) options(color.heat = "darkred")
-    }
-    if (theme == "purple") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = .maketrans("purple1", .to256("trans.fill.bar")))
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = .maketrans("purple1", .to256("trans.fill.pt")))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "purple4")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "purple4")
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = .maketrans("purple1", 15))
-      if (is.null(color.bg)) options(color.bg = "lavenderblush")
-      if (is.null(color.grid)) options(color.grid = "lavenderblush3")
-      if (is.null(color.heat)) options(color.heat = "purple4")
-    }
+
     if (theme == "orange.black") {
-      if (is.null(color.fill.bar)) options(color.fill.bar = rgb(249,99,2, alpha=.to256("trans.fill.bar"),
+      if (is.null(fill.bar))
+        options(fill.bar = rgb(249,99,2, alpha=.to256("trans.fill.bar"),
         maxColorValue=256))
-      if (is.null(color.fill.pt)) options(color.fill.pt = rgb(249,99,2, alpha=.to256("trans.fill.pt"),
+      if (is.null(fill.pt))
+        options(fill.pt = rgb(249,99,2, alpha=.to256("trans.fill.pt"),
         maxColorValue=256))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = rgb(209,87,3, maxColorValue=256))
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = rgb(209,87,3, maxColorValue=256))
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = rgb(249,99,2, alpha=55, maxColorValue=256))
-      if (is.null(color.bg)) options(color.bg = rgb(.015,.015,.015))
-      if (is.null(color.grid)) options(color.grid = rgb(100,100,100, maxColorValue=256))
-      if (is.null(color.heat)) options(color.heat = "darkorange3")
+      if (is.null(stroke.bar))
+        options(stroke.bar = rgb(209,87,3, maxColorValue=256))
+      if (is.null(stroke.pt))
+        options(stroke.pt = rgb(209,87,3, maxColorValue=256))
+      if (is.null(fill.ellipse))
+        options(fill.ellipse = rgb(249,99,2, alpha=55, maxColorValue=256))
+      if (is.null(bg)) options(bg = rgb(.015,.015,.015))
+      if (is.null(grid)) options(grid = rgb(100,100,100, maxColorValue=256))
+      if (is.null(heat)) options(heat = "darkorange3")
     }
     if (theme == "gray.black") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = .maketrans("gray55", .to256("trans.fill.bar")))
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = .maketrans("gray75", .to256("trans.fill.pt")))
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "gray20")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "gray95")
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = .maketrans("gray55", 65))
-      if (is.null(color.bg)) options(color.bg = rgb(.015,.015,.015))
-      if (is.null(color.grid)) options(color.grid = "gray30")
-      if (is.null(color.heat)) options(color.heat = "gray30")
-    }
-    if (theme == "white") {
-      if (is.null(color.fill.bar))
-        options(color.fill.bar = "white")
-      if (is.null(color.fill.pt))
-        options(color.fill.pt = "white")
-      if (is.null(color.stroke.bar)) options(color.stroke.bar = "black")
-      if (is.null(color.stroke.pt)) options(color.stroke.pt = "black")
-      if (is.null(color.fill.ellipse))
-        options(color.fill.ellipse = .maketrans("white", 85))
-      if (is.null(color.bg)) options(color.bg = "transparent")
-      if (is.null(color.grid)) options(color.grid = "gray90")
-      if (is.null(color.heat)) options(color.heat = "gray70")
+      if (is.null(fill.bar))
+        options(fill.bar = .maketrans("gray55", .to256("trans.fill.bar")))
+      if (is.null(fill.pt))
+        options(fill.pt = .maketrans("gray75", .to256("trans.fill.pt")))
+      if (is.null(stroke.bar)) options(stroke.bar = "gray20")
+      if (is.null(stroke.pt)) options(stroke.pt = "gray95")
+      if (is.null(fill.ellipse))
+        options(fill.ellipse = .maketrans("gray55", 65))
+      if (is.null(bg)) options(bg = rgb(.015,.015,.015))
+      if (is.null(grid)) options(grid = "gray30")
+      if (is.null(heat)) options(heat = "gray30")
     }
   }
 
   if (!missing(ghost)) {
     options(ghost=ghost)
     if (ghost) {
-      options(color.bg = "black")
-      options(color.grid = "transparent")
+      options(bg = "black")
+      options(grid = "transparent")
     }
   }
 
@@ -296,26 +219,41 @@ function(colors=c("blue", "gray", "rose", "green", "gold", "red",
     cat("\n")
     cat("Note: Colors are in rgb format\n",
         "      A 4th number specifies alpha transparency\n\n", sep="")
-    cat("Note: Can use \"off\" to indicate transparent, eg: color.grid=\"off\"\n\n")
+    cat("Note: Can use \"off\" to indicate transparent, eg: grid=\"off\"\n\n")
 
     cat("colors         Color:", getOption("colors"), "\n")
-    cat("color.fill.bar   Bar fill color:", col2rgb(getOption("color.fill.bar"), TRUE), "\n")
-    cat("color.fill.pt    Point fill color:", col2rgb(getOption("color.fill.pt"), TRUE), "\n")
+    cat("fill.bar   Bar fill color:",
+          col2rgb(getOption("fill.bar"), TRUE), "\n")
+    cat("fill.pt    Point fill color:",
+          col2rgb(getOption("fill.pt"), TRUE), "\n")
     cat("trans.fill.bar Bar transparency:", getOption("trans.fill.bar"), "\n")
     cat("trans.fill.pt  Point transparency:", getOption("trans.fill.pt"), "\n")
-    cat("color.stroke.bar Bar stroke color:", col2rgb(getOption("color.stroke.bar"), TRUE), "\n")
-    cat("color.stroke.pt  Point stroke color:", col2rgb(getOption("color.stroke.pt"), TRUE), "\n")
-    cat("color.bg         Background color:", col2rgb(getOption("color.bg")), "\n")
-    cat("color.grid       Grid color:", col2rgb(getOption("color.grid")), "\n")
-    cat("color.box        Graph Border color:", col2rgb(getOption("color.box")), "\n")
-    cat("color.heat       Heat map color:", col2rgb(getOption("color.heat")), "\n")
+    cat("stroke.bar Bar stroke color:",
+           col2rgb(getOption("stroke.bar"), TRUE), "\n")
+    cat("stroke.pt  Point stroke color:",
+           col2rgb(getOption("stroke.pt"), TRUE), "\n")
+    cat("fill.ellipse  Ellipse fill color:",
+           col2rgb(getOption("fill.ellipse"), TRUE), "\n")
+    cat("bg         Background color:",
+           col2rgb(getOption("bg")), "\n")
+    cat("grid       Grid color:",
+           col2rgb(getOption("grid")), "\n")
+    cat("box        Graph Border color:",
+           col2rgb(getOption("box")), "\n")
+    cat("heat       Heat map color:",
+           col2rgb(getOption("heat")), "\n")
     if (is.null(ghost)) ghost <- FALSE
-    cat("ghost          Ghost colors (black bck, no grid lines):", getOption("ghost"), "\n")
+    cat("ghost          Ghost colors (black bck, no grid lines):",
+           getOption("ghost"), "\n")
     cat("\n")
-    cat("quiet     Suppress console output for many functions:", getOption("quiet"), "\n")
-    cat("brief     Reduce console output for many functions:", getOption("brief"), "\n")
-    cat("suggest   Display suggests for enhanced input:", getOption("suggest"), "\n")
-    cat("n.cat     Number of categories for categorical variable:", getOption("n.cat"), "\n")
+    cat("quiet     Suppress console output for many functions:",
+           getOption("quiet"), "\n")
+    cat("brief     Reduce console output for many functions:",
+           getOption("brief"), "\n")
+    cat("suggest   Display suggests for enhanced input:",
+           getOption("suggest"), "\n")
+    cat("n.cat     Number of categories for categorical variable:",
+           getOption("n.cat"), "\n")
     cat("lab.size  x and y axis label size:", getOption("lab.size"), "\n")
     cat("width     Column width:", getOption("width"), "\n")
     cat("\n")

@@ -18,16 +18,15 @@ If the provided object to analyze is a set of multiple variables, including an e
 \usage{
 LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
 
-         color.fill=getOption("color.fill.bar"), 
-         color.stroke=getOption("color.stroke.pt"),
-         color.bg=getOption("color.bg"),
-         color.grid=getOption("color.grid"),
-         color.box=getOption("color.box"),
-         color.line=getOption("color.stroke.pt"),
+         fill=getOption("fill.bar"), 
+         stroke=getOption("stroke.pt"),
+         bg=getOption("bg"),
+         grid=getOption("grid"),
+         box=getOption("box"),
+         line=getOption("stroke.pt"),
+         area=NULL, 
 
-         color.area=NULL, 
-
-         shape.pts=21, cex.axis=.75, color.axis="gray30",
+         shape.pts=21, cex.axis=.75, axes="gray30",
 
          rotate.values=0, offset=.5,
 
@@ -39,7 +38,8 @@ LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
          center.line=c("default", "mean", "median", "zero", "off"),
 
          show.runs=FALSE, quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+         width=4.5, height=4.5, pdf=FALSE,
+         \ldots)
 
 lc(\ldots)
 }
@@ -54,30 +54,33 @@ lc(\ldots)
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{mydata}.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
-        specifies the largest number of unique values of variable of a numeric data type
-        for which the variable will be analyzed as a categorical. Default is 0.}
+        specifies the largest number of unique values of variable of a numeric
+        data type for which the variable will be analyzed as a categorical.
+        Default is 0.}
   \item{type}{Character string that indicates the type of plot, either \code{"p"} for 
         points, \code{"l"} for line, or \code{"b"} for both. The default is 
-        \code{"b"} for both points and lines.}
-  \item{color.fill}{For plotted points, the interior color of the point.  For a
+        \code{"b"} for both points and lines.}\cr
+
+  \item{fill}{For plotted points, the interior color of the point.  For a
         scatterplot the default value is \code{"transparent"} or \code{"off"}. 
         For a run chart the default value is 
-        the color of the point's border, \code{color.stroke}.}
-  \item{color.stroke}{Color of the border of the plotted points.}
-  \item{color.bg}{Color of the plot background.}
-  \item{color.grid}{Color of the grid lines, with a default of \code{"grey90"}.}
-  \item{color.box}{Color of border around the plot background, the box, that encloses 
-        the plot, with a default of \code{"black"}.}
-  \item{color.line}{Color of any plotted line segments, with a default of \code{"darkblue"}.}
-  \item{color.area}{Color of area under the plotted line segments, which by default is not
+        the color of the point's border, \code{stroke}.}
+  \item{stroke}{Color of the lines. Remove with \code{stroke="off"}.}
+  \item{bg}{Color of the plot background. Remove with \code{bg="off"}.}
+  \item{grid}{Color of the grid lines. Remove with \code{grid="off"}.}
+  \item{box}{Color of border around the plot background, the box, that encloses 
+        the plot. Remove with \code{box="off"}.}
+  \item{line}{Color of the plotted line.}
+  \item{area}{Color of area under the plotted line segments, which by default is not
         applied, equivalent to a color of \code{"transparent"}.}
+
   \item{shape.pts}{The standard plot character, with values defined in help(points). The
        default value is 21, a circle with both a border and filled area, specified here as
-       \code{color.stroke} and \code{color.fill}.    \code{color.fill} defaults to
-       \code{color.stroke}.}
+       \code{stroke} and \code{fill}.    \code{fill} defaults to
+       \code{stroke}.}
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be 
         smaller than the axis labels.}
-  \item{color.axis}{Color of the font used to label the axis values.}
+  \item{axes}{Color of the font used to label the axis values.}
   \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
         longer values, typically used in conjunction with \code{offset}.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
@@ -115,10 +118,9 @@ lc(\ldots)
   \item{show.runs}{If \code{TRUE}, display the individual runs in the run analysis.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{theme}} function.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
-       no filetype of \code{.pdf}, the filetype is added to the name.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the plot window in inches, defaults to 4.5.}
+  \item{height}{Height of the plot window in inches, defaults to 4.5.}
+  \item{pdf}{If \code{TRUE}, the pdf file is to be redirected to a pdf file.}
   \item{\dots}{Other parameters such as from \code{\link{par}}, \code{col.lab},
         \code{sub}, \code{color.sub}, \code{color.ticks} to set the color of the
         ticks used to label the axis values, and
@@ -138,16 +140,16 @@ DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{color.stroke} for the color of the border of the plotted points. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
+Individual colors in the plot can be manipulated with options such as \code{stroke}. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
 
-For the color options, such as \code{color.grid}, the value of \code{"off"} is the same as 
+For the color options, such as \code{grid}, the value of \code{"off"} is the same as 
 \code{"transparent"}.
 
 VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} does, obtained from the \code{\link{Read}} function.  If the variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 PDF OUTPUT\cr
-Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+To obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
 The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
@@ -181,7 +183,7 @@ lc(Y)
 plot(mydata$Y, type="l")
 
 # save run chart to a pdf file
-LineChart(Y, pdf.file="MyLineChart.pdf")
+LineChart(Y, pdf.file=TRUE)
 
 # LineChart in gray scale, then back to default "dodgerblue"
 theme(colors="gray")
@@ -189,8 +191,8 @@ LineChart(Y)
 theme(colors="dodgerblue")
   
 # customize run chart with LineChart options
-LineChart(Y, line.width=2, color.stroke="sienna3",
-  color.area="slategray3", color.bg="mintcream",
+LineChart(Y, line.width=2, stroke="sienna3",
+  area="slategray3", bg="mintcream",
   center.line="median")
 
 # customize run chart with R par parameters
@@ -204,7 +206,7 @@ Y <- sort(rexp(50))
 # default line chart
 LineChart(Y)
 # line chart with border around plotted values
-LineChart(Y, color.area="off")
+LineChart(Y, area="off")
 # time series chart, i.e., with dates, and filled area
 # with option label for the x-axis
 LineChart(Y, time.start="2000/09/01", time.by="3 months")

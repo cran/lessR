@@ -1,10 +1,10 @@
 PieChart <-
 function(x, data=mydata, 
-         color.fill=NULL, color.low=NULL, color.hi=NULL,
+         fill=NULL, low.color=NULL, hi.color=NULL,
          colors=c("rainbow", "terrain", "heat"),
-         color.random=FALSE, main=NULL, cex=1, cex.main=1,
+         random.color=FALSE, main=NULL, cex=1, cex.main=1,
          quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         width=5, height=5, pdf.file=NULL, ...) {
 
 
   if (missing(colors)) 
@@ -50,15 +50,15 @@ function(x, data=mydata,
   }
 
   # set up graphics system
-  .opendev(pdf.file, pdf.width, pdf.height)
+  .opendev(pdf.file, width, height)
 
   #orig.params <- par(no.readonly=TRUE)
   #on.exit(par(orig.params))
 
   .pc.main(x.call, 
-       color.random, color.fill, color.low, color.hi,
+       random.color, fill, low.color, hi.color,
        colors, cex, cex.main, quiet, main, 
-       pdf.file, pdf.width, pdf.height, ...)
+       pdf.file, width, height, ...)
 
   # terminate pdf graphics system
   if (!is.null(pdf.file)) {

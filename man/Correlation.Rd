@@ -19,7 +19,7 @@ Correlation(x, y, data=mydata,
          show.n=NULL, brief=FALSE,
          digits.d=NULL, graphics=FALSE,
          main=NULL, bottom=3, right=3,
-         pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
+         pdf=FALSE, width=5, height=5, \ldots)
 
 cr.brief(\ldots, brief=TRUE) 
 
@@ -45,8 +45,8 @@ cr(\ldots)
   \item{right}{Number of lines of right margin of heat map.}
   \item{pdf}{If \code{TRUE}, generate scatter plot matrix and heat map
        and write to pdf files.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for internally called functions, which
        include \code{method="spearman"} and \code{method="kendall"} and also
        \code{alternative="less"} and \code{alternative="more"}.}

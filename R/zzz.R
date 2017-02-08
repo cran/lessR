@@ -6,32 +6,35 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.5.3      feedback: gerbing@pdx.edu       web: lessRstats.com\n",
+      "lessR 3.5.5      feedback: gerbing@pdx.edu       web: lessRstats.com\n",
       "--------------------------------------------------------------------\n",
       "1. mydata <- Read()       Read text, Excel, SPSS, SAS or R data file\n",
+      "                          or, in RStudio do File --> Import Dataset\n", 
       "2. Help()                 Get help\n",
       "3. theme(colors=\"gray\")   Set global settings with theme function\n",
-      "4. Plot(X) or Plot(X,Y)   For continuous and categorical variables\n",
-      "5. reg(Y ~ X, Rmd=\"eg\")   Regression + R markdown file that, when\n",
+      "4. hs(), bc(), or ca()    All histograms, all bar charts, or both\n",
+      "5. Plot(X) or Plot(X,Y)   For continuous and categorical variables\n",
+      "6. reg(Y ~ X, Rmd=\"eg\")   Regression + R markdown file that, when\n",
       "                          knit, provides full interpretative output\n")
 
   options(colors="dodgerblue")
   options(trans.fill.bar=0.25)
   options(trans.fill.pt=0.50)
-  options(color.fill.bar="#1874CCBF")  # .maketrans of "dodgerblue3"  trans=.25
-  options(color.fill.pt="#1874CC80")   # .maketrans of "dodgerblue3"  trans=.50
-  options(color.stroke.bar="steelblue4")
-  options(color.stroke.pt="steelblue4")
-  options(color.fill.ellipse="#1874CC0F")   # .maketrans("dodgerblue3", 15)
-  options(color.bg="grey95")  # old: rgb(242, 244, 245)
-  options(color.grid="grey87")
-  options(color.box="black")
+  options(fill.bar="#1874CCBF")  # .maketrans of "dodgerblue3"  trans=.25
+  options(fill.pt="#1874CC80")   # .maketrans of "dodgerblue3"  trans=.50
+  options(stroke.bar="steelblue4")
+  options(stroke.pt="steelblue4")
+  options(fill.ellipse="#1874CC0F")   # .maketrans("dodgerblue3", 15)
+  options(se.fill="#1874CC19")   # .maketrans("dodgerblue3", 25)
+  options(bg="grey92")
+  options(grid="white")
+  options(box="gray30")
   options(color.ghost=FALSE)
-  options(color.heat="dodgerblue4")
-#Plot(Years, Salary, color.bg="grey85", color.grid="grey77") on cheap Dell monitor
+  options(heat="dodgerblue4")
+  #Plot(Years, Salary, bg="grey85", grid="grey77") on cheap Dell monitor
 
   options(n.cat=8)
-  options(lab.size=0.88)  # initial axis label size, adjusted for RStudio, Win
+  options(lab.size=0.84)  # initial axis label size, adjusted for RStudio, Win
   options(suggest=TRUE)
   options(quiet=FALSE)
   options(brief=FALSE)
@@ -119,11 +122,33 @@ function(...) {
 # abbreviate column labels for cross-tab and related tables
 .abbrev <- function(nms, mx.len=8) {
 
-  nms <- gsub("Strongly", "Strng", nms)
-  nms <- gsub("Slightly", "Slght", nms)
-  nms <- abbreviate(nms, mx.len)
+  if (max(nchar(nms)) > mx.len) {
+    nms <- gsub("Strongly", "Strng", nms)
+    nms <- gsub("Slightly", "Slght", nms)
+    nms <- abbreviate(nms, mx.len)
+  }
   
   return(nms)
+}
+
+
+# is date function
+.is.date <- function(x) inherits(x, 'Date')
+
+
+# extract sequence of dates from time series y
+.ts.dates <- function(y) {
+
+  date_num <- as.numeric(time(y))
+  year <- floor(date_num)
+  year_beg <- as.POSIXct(paste0(year, '-01-01'))
+  year_end <- as.POSIXct(paste0(year+1, '-01-01'))
+  diff.yr <- year_end - year_beg
+  dates <- year_beg + ((date_num %% 1) * diff.yr)
+  dates <- as.Date(format(dates, format='%Y-%m-%d')) # from POSIX to Date
+  x <- dates  # dates to be on x-axis
+  
+  return(x)
 }
 
 
@@ -251,7 +276,7 @@ function(...) {
         "  in a rectangular data table, with the data values for a \n",
         "  variable located in a column\n\n",
         "You have not yet read data into a data table for analysis,\n", 
-        "  so the data table called", dname, txtA, "is\n",
+        "  so the data table called ", dname, txtA, "is\n",
         "  not available for analysis\n\n",
         "Read the data into an R data table with the Read function, usually\n",
         "  reading the data into an R data table called mydata\n\n",
@@ -322,7 +347,7 @@ function(...) {
             "  > Histogram(rnorm(50))\n\n", sep="")
     txtC <- "Instead do this:\n  > Y <- rnorm(50)\n  > Histogram(Y)"
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-        txtA, txtB, txtC, "\n")
+        txtA, txtB, txtC, "\n\n")
   }
 
   # see if "variable" includes a $ 
@@ -331,7 +356,7 @@ function(...) {
             "the variable name\n\n", sep="")
     txtB <- paste("For example, for the Histogram function, this does not work:\n",
             "  > Histogram(mydata$Y)\n\n", sep="")
-    txtC <- "Instead do this:\n  > Histogram(Y)"
+    txtC <- "Instead do this:\n  > Histogram(Y, data=mydata)"
     txtD <- "If you wish to specify a data table, use option: data"
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         txtA, txtB, txtC, "\n", txtD, "\n\n")
@@ -581,28 +606,14 @@ function(...) {
 }
 
 
-# extract sequence of dates from a time series
-ts.dates <- function(y) {
-
-  date_num <- as.numeric(time(y))
-  year <- floor(date_num)
-  year_beg <- as.POSIXct(paste0(year, '-01-01'))
-  year_end <- as.POSIXct(paste0(year+1, '-01-01'))
-  diff.yr <- year_end - year_beg
-  dates <- year_beg + ((date_num %% 1) * diff.yr)
-  dates <- as.Date(format(dates, format='%Y-%m-%d')) # from POSIX to Date
-  x <- dates  # dates to be on x-axis
-  
-  return(x)
-}
-
-
 # get variable labels if they exist,  get rid of cex.lab - not used
 .getlabels <- function(xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-                       cex.lab=NULL, ...) {
+                       cex.lab=NULL, graph.win=TRUE, ...) {
 
-  cut.x <- .76 * par("fin")[1]
-  cut.y <- .76 * par("fin")[2]
+  if (graph.win) {  # if a graphics window already open, not true for ttest
+    cut.x <- .76 * par("fin")[1]
+    cut.y <- .76 * par("fin")[2]
+  }
 
   x.name <- getOption("xname")
   y.name <- getOption("yname")
@@ -638,10 +649,10 @@ ts.dates <- function(y) {
     else if (!is.null(x.lbl)) 
       x.lab <- x.lbl
 
-    if (length(x.lab) == 1  &&  !is.null(cex.lab)) {   # power.ttest: len > 1
+    if (length(x.lab) == 1  &&  !is.null(cex.lab)  &&  graph.win) {  # power.ttest: len > 1
       if (strwidth(x.lab, units="inches", cex=cex.lab) > cut.x) {
         brk <- nchar(x.lab) %/% 2  # break label down the middle
-        while (substr(x.lab,brk,brk) != " ") brk <- brk-1  # break at a word boundary
+        while (substr(x.lab,brk,brk) != " ") brk <- brk-1  # break at word boundary
         line1 <- substr(x.lab, 1, brk)
         line2 <- substr(x.lab, brk+1, nchar(x.lab))
         x.lab <- paste(line1, "\n",  line2)
@@ -674,7 +685,7 @@ ts.dates <- function(y) {
     else if (!is.null(y.lbl)) 
       y.lab <- y.lbl
 
-   if (length(y.lab) == 1  &&  !is.null(cex.lab)) {   # power.ttest: len > 1
+   if (length(y.lab) == 1  &&  !is.null(cex.lab)  &&  graph.win) {   # power.ttest: len > 1
       if (strwidth(y.lab, units="inches", cex=cex.lab) > cut.y) {
         brk <- nchar(y.lab) %/% 2  # break label down the middle
         while (substr(y.lab,brk,brk) != " ") brk <- brk-1  # break at a word boundary
@@ -768,7 +779,7 @@ ts.dates <- function(y) {
   if (!is.null(y.lab)) if (grepl("\n", y.lab[1], fixed=TRUE)) lm <- lm + .15
    
   # top margin
-  tm <- 0.30
+  tm <- 0.075
 
   if (!is.null(main)) tm <- tm + .25
   # if (options("device") == "RStudioGD") {
@@ -776,7 +787,7 @@ ts.dates <- function(y) {
   # }
   
   # right margin
-  rm <- 0.3
+  rm <- 0.075
  
   # bottom margin
   bm <- 0.70
@@ -830,8 +841,9 @@ ts.dates <- function(y) {
 
 .RSadj <- function(bubble.scale=0.25, cex.axis) {
 
-  # scale for regular R or RStudio
-  if (options("device") == "RStudioGD") bubble.scale <- bubble.scale*1.5
+  # enlarge scale for RStudio
+  if (options("device") == "RStudioGD") bubble.scale <- bubble.scale*1.4
+
   size.axis <- ifelse (options("device") != "RStudioGD", cex.axis, cex.axis*1.25)
   sz.lab <- getOption("lab.size")  # begin with initial label size from zzz.R
   size.lab <- ifelse (options("device") != "RStudioGD", sz.lab, sz.lab*1.3)
@@ -935,17 +947,17 @@ ts.dates <- function(y) {
 }
 
 
-.opendev <- function(pdf.fnm, pdf.width, pdf.height) {
+.opendev <- function(pdf.fnm, width, height) {
 
   if (is.null(pdf.fnm)) {
     if (options("device") != "RStudioGD" && is.null(options()$knitr.in.progress)) {
-      .graphwin(1)
+      .graphwin(1, d.w=width, d.h=height)
       orig.params <- par(no.readonly=TRUE)
       on.exit(par(orig.params))
     }
   }
-  else 
-    pdf(file=pdf.fnm, width=pdf.width, height=pdf.height)
+  else  # windows puts a blank first page without the onefile=FALSE 
+    pdf(file=pdf.fnm, width=width, height=height, onefile=FALSE)
 
 }
 
@@ -995,7 +1007,7 @@ ts.dates <- function(y) {
 
         
 .corcolors <- function(R, NItems, main, bm=3, rm=3, diag=NULL,
-                       pdf.file, pdf.width, pdf.height) {
+                       pdf.file, width, height) {
 
     if (!is.null(diag)) {
       for (i in 1:NItems) R[i,i] <- diag
@@ -1004,10 +1016,10 @@ ts.dates <- function(y) {
           "      computing the heat map are set to 0.\n", sep="")
     }
 
-    max.color <- getOption("color.heat")
+    max.color <- getOption("heat")
     hmcols <- colorRampPalette(c("white",max.color))(256)
     
-    .opendev(pdf.file, pdf.width, pdf.height)  # set up graphics
+    .opendev(pdf.file, width, height)  # set up graphics
 
     heatmap(R[1:NItems,1:NItems], Rowv=NA, Colv="Rowv", symm=TRUE,
       col=hmcols, margins=c(bm,rm), main=main)
@@ -1056,6 +1068,18 @@ ts.dates <- function(y) {
       if (is.null(col.low)) col.low <- rgb(.765,.824,.886)
       if (is.null(col.hi)) col.hi <- "dodgerblue4"
     }
+    else if (colors == "gray") {
+      if (is.null(col.low)) col.low <- "gray90"
+      if (is.null(col.hi)) col.hi <- "gray25"
+    }
+    else if (colors == "darkred") {
+      if (is.null(col.low)) col.low <- "red1"
+      if (is.null(col.hi)) col.hi <- "red4"
+    }
+    else if (colors == "brown") {
+      if (is.null(col.low)) col.low <- "rosybrown1"
+      if (is.null(col.hi)) col.hi <- "rosybrown4"
+    }
     else if (colors == "sienna") { 
       if (is.null(col.low)) col.low <- "#F7E9E2"
       if (is.null(col.hi)) col.hi <- "sienna3"
@@ -1063,10 +1087,6 @@ ts.dates <- function(y) {
     else if (colors == "blue") { 
       if (is.null(col.low)) col.low <- "slategray2"
       if (is.null(col.hi)) col.hi <- "slategray4"
-    }
-    else if (colors == "gray") {
-      if (is.null(col.low)) col.low <- "gray90"
-      if (is.null(col.hi)) col.hi <- "gray25"
     }
     else if (colors == "gray.black") {
       if (is.null(col.low)) col.low <- "gray70"

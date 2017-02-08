@@ -10,9 +10,9 @@ Show the distribution of sample means and relevant summary statistics, such as t
 \usage{
 simCLT(ns, n, p1=0, p2=1,
        type=c("normal", "uniform", "lognormal", "antinormal"),
-       color.fill="lightsteelblue3", n.display=2, digits.d=3, 
+       fill="lightsteelblue3", n.display=2, digits.d=3, 
        subtitle=TRUE, pop=TRUE, 
-       main=NULL, pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
+       main=NULL, pdf=FALSE, width=5, height=5, \ldots)
 }
 
 
@@ -22,7 +22,7 @@ simCLT(ns, n, p1=0, p2=1,
   \item{p1}{First parameter value for the population distribution, the mean, minimum or meanlog for the normal, uniform and lognormal populations, respectively. Must be 0, the minimum, for the anti-normal distribution.}
   \item{p2}{Second parameter value for the population distribution, the standard deviation, maximum or sdlog for the normal, uniform and lognormal populations, respectively. Is the maximum for the anti-normal, usually left at the default value of 1.}
   \item{type}{The general population distribution.}
-  \item{color.fill}{Fill color of the graphs.}
+  \item{fill}{Fill color of the graphs.}
   \item{n.display}{Number of samples for which to display the sample mean and data values.}
   \item{digits.d}{Number of decimal digits to display on the output.}
   \item{subtitle}{If \code{TRUE}, then display the specific parameter values of the population or sample, depending on the graph.}
@@ -30,8 +30,8 @@ simCLT(ns, n, p1=0, p2=1,
   \item{main}{Title of graph.}
   \item{pdf}{Indicator as to if the graphic files should be saved as pdf files
        instead of directed to the standard graphics windows.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 
 }
 

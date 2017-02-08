@@ -1,11 +1,11 @@
 BarChart <-
 function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
 
-         color.fill=getOption("color.fill.bar"),
-         color.stroke=getOption("color.stroke.bar"),
-         color.bg=getOption("color.bg"),
-         color.grid=getOption("color.grid"),
-         color.box=getOption("color.box"),
+         fill=getOption("fill.bar"),
+         stroke=getOption("stroke.bar"),
+         bg=getOption("bg"),
+         grid=getOption("grid"),
+         box=getOption("box"),
 
          colors=c("rainbow", "terrain", "heat"),
 
@@ -13,16 +13,16 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          gap=NULL, proportion=FALSE,
          
          xlab=NULL, ylab=NULL, main=NULL,
-         cex.axis=0.75, color.axis="gray30",
-         value.labels=NULL, rotate.values=0, offset=0.5,
+         cex.axis=0.75, axes="gray30",
+         value.labels=NULL, label.max=20, rotate.values=0, offset=0.5,
 
-         beside=FALSE, color.low=NULL, color.hi=NULL, count.labels=NULL,
+         beside=FALSE, low.color=NULL, hi.color=NULL, count.labels=NULL,
 
          legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
          legend.horiz=FALSE, 
 
          quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...)  {
+         width=4.5, height=4.5, pdf=FALSE, ...)  {
 
 
   if (missing(colors)) 
@@ -30,21 +30,18 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else
     colors <- match.arg(colors)
 
-  if (!is.null(color.fill)) {
-    for (i in 1:length(color.fill))
-      if (color.fill[i] == "off") color.fill[i] <- "transparent"
+  if (!is.null(fill)) {
+    for (i in 1:length(fill))
+      if (fill[i] == "off") fill[i] <- "transparent"
   }
-  for (i in 1:length(color.stroke))
-    if (color.stroke[i] == "off") color.stroke[i] <- "transparent"
-  if (color.bg == "off") color.bg <- "transparent"
-  if (color.grid == "off" ) color.grid <- "transparent"
-  if (color.box == "off") color.box <- "transparent"
+  for (i in 1:length(stroke))
+    if (stroke[i] == "off") stroke[i] <- "transparent"
+  if (bg == "off") bg <- "transparent"
+  if (grid == "off" ) grid <- "transparent"
+  if (box == "off") box <- "transparent"
 
-  if (missing(color.stroke))  # default black border unless dark bg
-    if (sum(col2rgb(color.bg))/3 > 80) color.stroke <- "black"
-
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+  if (missing(stroke))  # default black border unless dark bg
+    if (sum(col2rgb(bg))/3 > 80) stroke <- "black"
 
   dots <- list(...)  # check for deprecated/changed parameters
   if (length(dots) > 0) {
@@ -61,6 +58,15 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       if (names(dots)[i] == "count.levels") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Now use  count.labels  instead of count.levels\n\n")
+      }
+      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "color options dropped the  color. prefix\n",
+          "eg., fill, instead of color.fill.\n\n")
+      }
+      if (names(dots)[i] == "pdf.file") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "pdf.file  changed to  pdf, either TRUE or FALSE\n\n")
       }
     }
   }
@@ -176,7 +182,6 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     else
       count.labels.call <- NULL
 
-
     if (length(unique(na.omit(x.call))) == 1) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "There is only one unique value for the values of ", x.name,
@@ -185,24 +190,28 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
         " unique value\n\n")
     }
 
-# ---------------
-# do the analysis
+    # do the analysis
 
-    .opendev(pdf.file, pdf.width, pdf.height)
+    if (pdf)
+      pdf.fnm <- paste("BarChart_", x.name, ".pdf", sep="") 
+    else
+      pdf.fnm <- NULL
+    .opendev(pdf.fnm, width, height)
 
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
 
     bc <- .bc.main(x.call, y.call,
-         color.fill, color.stroke, color.bg, color.grid, color.box, colors,
-         horiz, over.grid, addtop, gap, proportion, xlab, ylab, main, value.labels,
-         cex.axis, color.axis, rotate.values, offset, beside, color.low, color.hi,
+         fill, stroke, bg, grid, box, colors,
+         horiz, over.grid, addtop, gap, proportion, xlab, ylab, main,
+         value.labels, label.max,
+         cex.axis, axes, rotate.values, offset, beside, low.color, hi.color,
          count.labels.call,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...)
 
-    if (!is.null(pdf.file)) {
+    if (is.null(pdf)) {
       dev.off()
-      if (!quiet) .showfile(pdf.file, "barchart")
+      if (!quiet) .showfile(pdf.fnm, "barchart")
     }
 
     invisible(bc)
@@ -211,12 +220,13 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   else
     bc.data.frame(data, n.cat,
-      color.fill, color.stroke, color.bg, color.grid, color.box, colors,
-      horiz, over.grid, addtop, gap, proportion, xlab, ylab, main, value.labels,
-      cex.axis, color.axis, rotate.values, offset, beside, color.low, color.hi,
+      fill, stroke, bg, grid, box, colors,
+      horiz, over.grid, addtop, gap, proportion, xlab, ylab, main,
+      value.labels, label.max,
+      cex.axis, axes, rotate.values, offset, beside, low.color, hi.color,
       count.labels,
       legend.title, legend.loc, legend.labels, legend.horiz, quiet,
-      pdf.width, pdf.height, ...)
+      width, height, pdf, ...)
 
 }
 

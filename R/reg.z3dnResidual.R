@@ -1,5 +1,5 @@
 .reg3dnResidual <-
-function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...) {
+function(lm.out, pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -9,7 +9,7 @@ function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...) {
   # pdf graphics option
   if (pdf) {
     pdf.file <- "RegResiduals.pdf"
-    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    pdf(file=pdf.file, width=width, height=height)
   }
 
   # keep track of the plot in this routine
@@ -21,9 +21,9 @@ function(lm.out, pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...) {
 
   # frequency distribution of residuals
   .dn.main(lm.out$residuals, 
-    col.fill=getOption("color.fill.pt"),
-    col.bg=getOption("color.bg"), col.grid=getOption("color.grid"),
-    col.box=getOption("color.box"),
+    col.fill=getOption("fill.pt"),
+    col.bg=getOption("bg"), col.grid=getOption("grid"),
+    col.box=getOption("box"),
     col.nrm="gray40", col.gen="gray40",
     col.fill.nrm="transparent", col.fill.gen="transparent",
     xlab="Residuals", quiet=TRUE)

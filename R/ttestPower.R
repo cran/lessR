@@ -1,7 +1,7 @@
 ttestPower <- 
 function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL, 
          mmd=NULL, msmd=NULL, mdp=.8, mu0=NULL, 
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         pdf.file=NULL, width=5, height=5, ...) {
       
   cat("\n")
   
@@ -115,7 +115,7 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
   
 
   # set up graphics system
-  .opendev(pdf.file, pdf.width, pdf.height)
+  .opendev(pdf.file, width, height)
   
   .ttp2graph(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...)
 

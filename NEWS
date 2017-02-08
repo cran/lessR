@@ -1,9 +1,63 @@
-NEWS
+	NEWS
 
 Update History for Package 'lessR'
 -------------------------------------------------------------------------
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
+  
+  
+
+>>>>>> Changes for lessR version 3.5.5 (2017-02-08) <<<<<<
+
+-------------
+Updates 3.5.5
+-------------
+
+ANOVA, Histogram, Plot, Regression, ttest
+  updated to work with tibble data frames obtained from RStudio import
+
+BarChart, BoxPlot, Density, Histogram, LineChart, Plot, Regression, ttest
+  more general height and width replace pdf.height and pdf.width
+  fill, stroke, ... replace color.fill, color.stroke, ...
+  
+BarChart, BoxPlot, CountAll Density, Histogram
+  pdf.name changed to pdf, TRUE or FALSE, with default output going to
+    current graphics window
+
+BarChart, Plot, SummaryStats
+  label.max paramater added to abbreviate value labels
+  
+Plot
+  multiple plots with dates when date specified as the x-variable
+  multivariate time series can be the x-variable for multiple plots
+  stack option for multiple time series / run charts
+  standard error option for plotting fit lines, can be a vector
+  color.segments option for line segment color customization
+  stroke.fit.line name change and default is stroke.pt instead of gray
+  removed bar=TRUE option, use full functionality in Histogram and BarChart
+
+Regression, ttest
+  when running in R and not RStudio, graphs default to 5 x 5 inches
+
+theme
+  all non-black color themes have the same light gray background
+    and white grid lines
+  new brown and darkred color themes
+  
+
+---------------
+Bug Fixes 3.5.5
+---------------
+
+Density
+  now works with quiet=TRUE
+
+Read
+  variables with missing names are eliminated instead of crashing
+
+SummaryStats
+  output values freq and prop accessible as numeric tables
+
 
 
 >>>>>> Changes for lessR version 3.5.3 (2017-01-01) <<<<<<

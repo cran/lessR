@@ -2,7 +2,7 @@
 function(x,
          random.col, col.fill, col.low, col.hi,
          colors, cex, cex.main, quiet, main, 
-         pdf.file, pdf.width, pdf.height, ...)  {
+         pdf.file, width, height, ...)  {
 
   # get values for ... parameter values
   stuff <- .getdots(...)

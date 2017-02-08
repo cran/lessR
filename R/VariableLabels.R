@@ -4,27 +4,31 @@ function(x, value=NULL, data=mydata, quiet=getOption("quiet")) {
   x.name <- deparse(substitute(x)) 
   options(xname = x.name)
 
-  # get data frame name
-  dname <- deparse(substitute(data))
-  options(dname = dname)
+  df.name <- deparse(substitute(data))   # get name of data table
+  options(dname = df.name)
 
+  # if analyzing a data table and not a single var,
+  #   if a tibble convert to data frame (must already have df.name)
+  if (missing(x)) if (class(data)[1] == "tbl_df") {
+    data <- as.data.frame(data)
+  }
   fmt <- "none"  # see if x is a file reference
   if (grepl(".csv", x.name)) fmt <- "csv" 
   if (grepl(".xlsx", x.name)) fmt <- "Excel" 
 
   # get conditions and check for data existing
-  xs <- .xstatus(x.name, dname)
+  xs <- .xstatus(x.name, df.name)
   in.global <- xs$ig 
 
   # see if the data frame exists, if x not in Global Env or function call
   if (!in.global) {
-    if (!exists(dname)) {
-      if (dname == "mydata") 
+    if (!exists(df.name)) {
+      if (df.name == "mydata") 
         txtA <- ", the default data frame name, " else txtA <- " "
       txtB1 <- "Create the labels by reading with Read and labels option\n"
       txtB <- paste(txtB1, sep="")
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
+          "Data frame ", df.name, txtA, "does not exist\n\n", txtB, "\n")
     }
   }
     # see if variable exists in the data frame
@@ -78,6 +82,7 @@ function(x, value=NULL, data=mydata, quiet=getOption("quiet")) {
             "Replace MYFILE with the desired file name.\n",
             "Enter  getwd()  to see where the file was saved. \n\n")
       }
+      #mylabels <- read.xls(xls=x, sheet=1, na.strings=c("NA","#DIV/0!", ""))
       mylabels <- read_excel(x, col_names=c("Var", "label"))
       mylabels <- data.frame(mylabels, row.names=1)
     }

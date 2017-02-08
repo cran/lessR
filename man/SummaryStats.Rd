@@ -17,7 +17,7 @@ When output is assigned into an object, such as \code{s} in \code{s <- ss(Y)}, t
 
 \usage{
 SummaryStats(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
-         digits.d=NULL, brief=getOption("brief"), \ldots)
+         digits.d=NULL, brief=getOption("brief"), label.max=20, \ldots)
 
 ss.brief(\dots, brief=TRUE)
 
@@ -36,6 +36,9 @@ ss(\dots)
   \item{n.cat}{Specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Default is off, set to 0.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{theme}} function.}
+  \item{label.max}{Maximum size of labels for the values of a variable.
+        Not a literal maximum as preserving unique values may require a larger number
+        of characters than specified.}
 
   \item{\dots}{Further arguments to be passed to or from methods.}
 }
@@ -128,7 +131,7 @@ SummaryStats(X)
 
 # Only a subset of available summary statistics
 ss.brief(Y)
-ss.brief(X)
+ss.brief(X, label.max=3)
 
 # Reference the summary stats in the object: stats
 stats <- ss(Y)

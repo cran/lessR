@@ -25,7 +25,7 @@ Logit(my.formula, data=mydata, digits.d=4, text.width=120,
      X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
      X5.new=NULL, X6.new=NULL,
 
-     pdf.file=NULL, pdf.width=5, pdf.height=5, \ldots)
+     pdf.file=NULL, width=5, height=5, \ldots)
 
 lr(\ldots) 
 }
@@ -69,8 +69,8 @@ lr(\ldots)
   \item{X6.new}{Values of the sixth listed predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values for R function \code{\link{glm}} which provides the core computations.} 
 }
 
@@ -135,7 +135,7 @@ anova(reduced.model, full.model)
 
 # Save the three plots as pdf files 4 inches square, gray scale
 Logit(Gender ~ Years, pdf.file="MyModel.pdf",
-      pdf.width=4, pdf.height=4, colors="gray")
+      width=4, height=4, colors="gray")
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values

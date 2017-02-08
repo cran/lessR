@@ -1,7 +1,7 @@
 corProp <- 
 function (R=mycor, 
           main=NULL, heat.map=TRUE, bottom=3, right=3, 
-          pdf.file=NULL, pdf.width=5, pdf.height=5) {
+          pdf.file=NULL, width=5, height=5) {
 
 
   # cor matrix:  mycor as class out_all, mycor$cors, or stand-alone matrix
@@ -79,7 +79,7 @@ function (R=mycor,
   if (heat.map) {
     if (is.null(main)) main <- "Item Proportionalities"
    .corcolors(R, NVOld, main, bottom, right, diag=0,
-              pdf.file, pdf.width, pdf.height)
+              pdf.file, width, height)
   }
 
   # finish

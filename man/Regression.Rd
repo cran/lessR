@@ -34,7 +34,7 @@ Regression(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL, X6.new=NULL,
 
-         pdf=FALSE, pdf.width=5, pdf.height=5, refs=FALSE, 
+         width=5, height=5, pdf=FALSE, refs=FALSE, 
          fun.call=NULL, \ldots)
 
 reg(\ldots) 
@@ -119,8 +119,8 @@ reg.brief(\ldots, brief=TRUE)
   \item{X6.new}{Values of the sixth listed numeric predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{refs}{If \code{TRUE}, then list the references for R and the packages used from
         which functions were used to generate the output.}
   \item{fun.call}{Function call. Used internally with \code{knitr} to pass the 
@@ -298,7 +298,7 @@ Regression(Reading ~ Verbal, res.row=8, res.sort="rstudent",
 # Multiple regression model
 # Save the three output plots as pdf files 4 inches square
 Regression(Reading ~ Verbal + Absent + Income, pdf=TRUE,
-   pdf.width=4, pdf.height=4)
+   width=4, height=4)
 
 # Compare nested models
 # Reduced model:  Reading ~ Verbal

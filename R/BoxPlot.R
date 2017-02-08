@@ -2,13 +2,13 @@ BoxPlot <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     Rmd=NULL,
 
-    color.fill=getOption("color.fill.bar"),
-    color.stroke=getOption("color.stroke.bar"), 
-    color.bg=getOption("color.bg"),
-    color.grid=getOption("color.grid"),
-    color.box=getOption("color.box"),
+    fill=getOption("fill.bar"),
+    stroke=getOption("stroke.bar"), 
+    bg=getOption("bg"),
+    grid=getOption("grid"),
+    box=getOption("box"),
 
-    cex.axis=0.75, color.axis="gray30",
+    cex.axis=0.75, axes="gray30",
     xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
 
     rotate.values=0, offset=0.5,
@@ -16,25 +16,22 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     horiz=TRUE, add.points=FALSE,
 
     quiet=getOption("quiet"),
-    pdf.file=NULL, pdf.width=5, pdf.height=5, 
+    width=4.5, height=4.5, pdf=FALSE,
     fun.call=NULL, ...) {
 
 
   if (is.null(fun.call)) fun.call <- match.call()
 
-  for (i in 1:length(color.fill))
-    if (color.fill[i] == "off") color.fill[i] <- "transparent"
-  for (i in 1:length(color.stroke))
-    if (color.stroke[i] == "off") color.stroke[i] <- "transparent"
-  if (color.bg == "off") color.bg <- "transparent"
-  if (color.grid == "off" ) color.grid <- "transparent"
-  if (color.box == "off") color.box <- "transparent"
+  for (i in 1:length(fill))
+    if (fill[i] == "off") fill[i] <- "transparent"
+  for (i in 1:length(stroke))
+    if (stroke[i] == "off") stroke[i] <- "transparent"
+  if (bg == "off") bg <- "transparent"
+  if (grid == "off" ) grid <- "transparent"
+  if (box == "off") box <- "transparent"
 
-  if (getOption("colors") == "gray") color.stroke <- "black"
-  if (getOption("colors") == "gray.black") color.stroke <- getOption("color.stroke.pt")
-
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+  if (getOption("colors") == "gray") stroke <- "black"
+  if (getOption("colors") == "gray.black") stroke <- getOption("stroke.pt")
 
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
@@ -44,11 +41,20 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
           "knitr.file  no longer used\n",
           "Instead use  Rmd  for R Markdown file\n\n")
       }
+      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "color options dropped the  color. prefix\n",
+          "eg., fill, instead of color.fill.\n\n")
+      }
     }
     if (substr(names(dots)[i], 1, 4) == "col.") {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "options that began with the abbreviation  col  now begin with  ",
         "color \n\n")
+    }
+    if (names(dots)[i] == "pdf.file") {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "pdf.file  changed to  pdf, either TRUE or FALSE\n\n")
     }
   }
 
@@ -59,8 +65,6 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
-  pdf.nm <- FALSE
-  if (!missing(pdf.file)) pdf.nm <- TRUE
 
 # -----------------------------------------------------------
 # establish if a data frame, if not then identify variable(s)
@@ -104,8 +108,19 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 # ---------------
 # do the analysis
 
-  go.pdf <- FALSE
-  if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
+    plot.i <- 0  # keep track of generated graphics
+    plot.title  <- character(length=0)
+    manage.gr <- .graphman()  # see if graphics are to be managed
+    if (manage.gr  &&  !pdf) {
+      i.win <- 0
+      for (i in 1:ncol(data)) {
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat)) 
+          i.win <- i.win + 1
+      }
+      .graphwin(i.win, width, height)
+    }
+    open.win <- 2
+
 
   for (i in 1:ncol(data)) {
 
@@ -118,11 +133,22 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       # let 1 variable go through, even if num.cat
       if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
 
-      pdf.fnm <- .pdfname("BoxPlot", x.name, go.pdf, pdf.nm, pdf.file)
-     .opendev(pdf.fnm, pdf.width, pdf.height)
+      if (pdf) {
+        pdf.fnm <- paste("BoxPlot", "_", x.name, ".pdf", sep="") 
+        .opendev(pdf.fnm, width, height)
+      }
+      else {
+        pdf.fnm <- NULL
+        plot.i <- plot.i + 1
+        plot.title[plot.i] <- paste("BoxPlot of ", x.name, sep="")
+        if (manage.gr) {
+          open.win <- open.win + 1
+          dev.set(which = open.win)
+        }
+      }
 
-      stuff <- .bx.main(data[,i], color.fill, color.stroke, color.bg, color.grid,
-         color.box, cex.axis, color.axis, rotate.values, offset, 
+      stuff <- .bx.main(data[,i], fill, stroke, bg, grid,
+         box, cex.axis, axes, rotate.values, offset, 
          horiz, add.points, xlab, main, sub, digits.d, quiet, fun.call, ...)
       txsts <- stuff$tx
       if (length(txsts)==0) txsts <- ""
@@ -141,7 +167,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         print(output)
       }
 
-      if (go.pdf) {
+      if (pdf) {
         dev.off()
         if (!quiet) .showfile(pdf.fnm, "Box Plot")
       }
@@ -153,8 +179,13 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     }  # is.numeric(data[,i])
   }  # for
 
+  if (ncol(data) > 1) {
+    if (!pdf) if (is.null(options()$knitr.in.progress))
+      .plotList(plot.i, plot.title)
+  }
 
   dev.set(which=2)  # reset graphics window for standard R functions
+
 
   if (ncol(data)==1) {
 

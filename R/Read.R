@@ -110,7 +110,8 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         cat("Use the  labels  option to read a file of variable labels\n",
             "  or use the VariableLabels function, also vl, to assign\n")
       if (brief)
-        cat("Get more information with details() for mydata, or details(name)\n")
+        cat("More information on your data with details() for mydata, or",
+            "details(name)\n")
       cat("\n")
     }
   }
@@ -254,7 +255,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
   else {  # get read_excel results to be equivalent to other formats
     # read_excel does not convert strings to factors, do so if !unique
     for (i in 1:ncol(d)) 
-      if (is.character(d[,i])) if (nu.col[i]!=n.col[i]) fnu.col[i] <- TRUE 
+      if (is.character(d[,i])) if (nu.col[i] != n.col[i]) fnu.col[i] <- TRUE 
     d[fnu.col] <- lapply(d[fnu.col], as.factor)
     # read_excel does not provide an integer variable, so convert
     fnu.col <- logical(length=ncol(d))  # reset
@@ -265,6 +266,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
           fnu.col[i] <- TRUE
     d[fnu.col] <- lapply(d[fnu.col], as.character) # back to original char
     d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
+
     # bug: POSIXct misinterpretation of currency data
     f.call <- gsub(")$", "", fncl2)  # get function call less closing )
     fnu.col <- logical(length=ncol(d))  # reset
@@ -301,13 +303,17 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
     for (i in 0:9) dg[i+1] <- as.character(i)  
     ltr <- c(letters, LETTERS, dg, "_", ".")
 
+    # get rid of variables that are not named (NA's)
+    nm.miss <- is.na(names(d))
+    d[nm.miss] <- NULL
+
     badchar <- FALSE
     for (i in 1:length(names(d))) {
       cc <- names(d)[i]
-      for (j in 1:nchar(cc)) {
+      if (!is.na(cc)) for (j in 1:nchar(cc)) {
         if (!(substr(cc,j,j) %in% ltr)) {
-            badchar <- TRUE
-            names(d)[i] <- gsub(substr(cc,j,j), "", names(d)[i])
+          badchar <- TRUE
+          names(d)[i] <- gsub(substr(cc,j,j), "", names(d)[i])
           if (substr(cc,j,j) == " ")
             txt <- "Removed the blank space,"
           else

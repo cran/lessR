@@ -12,7 +12,7 @@ Plots the successive eigenvalues of an input correlation matrix. Also plots the 
 
 \usage{
 corScree(x=mycor, 
-          main=NULL, pdf=FALSE, pdf.width=5, pdf.height=5, \ldots)
+          main=NULL, pdf=FALSE, width=5, height=5, \ldots)
 
 scree(\ldots)
 }
@@ -22,8 +22,8 @@ scree(\ldots)
   \item{main}{Graph title, which is blank by default.}
   \item{pdf}{Indicator as to if the graphic files should be saved as pdf files
        instead of directed to the standard graphics windows.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Parameter values.}
 }
 
@@ -32,7 +32,7 @@ scree(\ldots)
 Interpretation of the scree plot to assist in the assessment of the number of factors that account for the structure of a correlation matrix depends primarily on the analysis of the differences between the successive eigenvalues. The differences begin to diminish where the "scree" begins, analogous to the debris that falls off of a hill top.  Accordingly both the scree plot itself, the plot of the successive eigenvalues, and the plot of the differences of the successive eigenvalues are presented.
 
 PDF OUTPUT\cr
-Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 If the two plots, of the population and sample distributions respectively, are written to pdf files, according to \code{pdf=TRUE}, they are named Scree.pdf and ScreeDiff.pdf. Their names and the directory to which they are written are provided as part the console output.
 }

@@ -12,21 +12,20 @@ From the standard R function \code{\link{hist}} plots a frequency histogram with
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 
-When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, the pieces of output can be accessed for later analysis. A primary such analysis is \code{knitr} for dynamic report generation from a generated R markdown file according to the \code{Rmd} option in which interpretative R output is embedded in documents. See \code{value} below.
+When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, can assess the pieces of output for later analysis. A primary such analysis is \code{knitr} for dynamic report generation from a generated R markdown file according to the \code{Rmd} option in which interpretative R output is embedded in documents. See \code{value} below.
 }
 
 \usage{
 Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
-         color.fill=getOption("color.fill.bar"), 
-         color.stroke=getOption("color.stroke.bar"),
-         color.bg=getOption("color.bg"),
-         color.grid=getOption("color.grid"),
-         color.box=getOption("color.box"),
+         fill=getOption("fill.bar"), 
+         stroke=getOption("stroke.bar"),
+         bg=getOption("bg"),
+         grid=getOption("grid"),
+         box=getOption("box"),
+         reg="snow2",
 
-         color.reg="snow2", over.grid=FALSE,
-         cex.axis=0.75, color.axis="gray30",
-
+         over.grid=FALSE, cex.axis=0.75, axes="gray30",
          rotate.values=0, offset=0.5,
 
          breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
@@ -35,7 +34,7 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
          digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
 
          quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5,
+         width=4.5, height=4.5, pdf=FALSE, 
          fun.call=NULL, \ldots)
 
 hs(\ldots)
@@ -55,60 +54,66 @@ hs(\ldots)
         for which the variable will be analyzed as a categorical. Default is 0.}
   \item{Rmd}{File name for the file of R markdown to be written, if specified.
         The file type is .Rmd, which automatically opens in RStudio, but it is a simple
-        text file that can be edited with any text editor, including RStudio.}
-  \item{color.fill}{Color of the bars. To set transparency level, use \code{lessR} 
-       function \code{\link{theme}} or use \code{\link{rgb}} function directly.}
-  \item{color.stroke}{Color of the border of the bars. To set transparency level, use function 
-       \code{theme} or use \code{\link{rgb}} function directly.}
-  \item{color.bg}{Color of the plot background.}
-  \item{color.grid}{Color of the grid lines.}
-  \item{color.box}{Color of border around the plot background, the box, that encloses 
-        the plot, with a default of \code{"black"}.}
-  \item{color.reg}{The color of the superimposed, regular histogram when \code{cumul="both"}.}
+        text file that can be edited with any text editor, including RStudio.}\cr
+
+
+  \item{fill}{Specified bar colors. Remove with \code{fill="off"}.}
+  \item{stroke}{Color of the border of the bars. Remove with \code{stroke="off"}.}
+  \item{bg}{Color of the plot background. Turn off with \code{bg="off"}.}
+  \item{grid}{Color of the grid lines. Turn off with \code{grid="off"}.}
+  \item{box}{Color of border around the plot background, the box, that encloses 
+        the plot. Remove with \code{box="off"}.}
+  \item{reg}{The color of the superimposed, regular histogram when
+        \code{cumul="both"}.}\cr
+
   \item{over.grid}{If \code{TRUE}, plot the grid lines over the histogram.}
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
         values to be smaller than the axis labels. Provides the functionality of,
         and can be replaced by, the standard R \code{cex.axis.}}
-  \item{color.axis}{Color of the font used to label the axis values.}
-  \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
-        longer values, typically used in conjunction with \code{offset}.}
+  \item{axes}{Color of the font used to label the axis values.}
+  \item{rotate.values}{Degrees that the axis values are rotated, usually to
+        accommodate longer values, typically used in conjunction with \code{offset}.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when
-        longer axis value names are rotated.}
-  \item{breaks}{The method for calculating the bins, or an explicit specification of
-       the bins, such as with the standard R \code{\link{seq}} function or other options 
-       provided by the \code{\link{hist}} function.}
+        longer axis value names are rotated.}\cr
+
+  \item{breaks}{The method for calculating the bins, or an explicit specification
+       of the bins, such as with the standard R \code{\link{seq}} function or
+       other options provided by the \code{\link{hist}} function.}
   \item{bin.start}{Optional specified starting value of the bins.}
-  \item{bin.width}{Optional specified bin width, which can be specified with or without 
-        a \code{bin.start} value.}
-  \item{bin.end}{Optional specified value that is within the last bin, so the actual endpoint
-        of the last bin may be larger than the specified value.}
-  \item{prop}{Specify proportions or relative frequencies on the vertical axis. Default
-       is \code{FALSE}.}
+  \item{bin.width}{Optional specified bin width, which can be specified with or
+        without a \code{bin.start} value.}
+  \item{bin.end}{Optional specified value that is within the last bin, so the
+        actual endpoint of the last bin may be larger than the specified value.}\cr
+
+  \item{prop}{Specify proportions or relative frequencies on the vertical axis.
+       Default is \code{FALSE}.}
   \item{hist.counts}{Replaces standard R \code{labels} options, which has multiple
        definitions in R. Specifies to display the count of each bin.}
   \item{cumul}{Specify a cumulative histogram. The value of \code{"on"} displays the 
-        cumulative histogram, with default of \code{"off"}. The value of \code{"both"} 
-        superimposes the regular histogram.}
-  \item{digits.d}{Number of significant digits for each of the displayed summary statistics.}
+        cumulative histogram, with default of \code{"off"}. The value of
+        \code{"both"} superimposes the regular histogram.}
+  \item{digits.d}{Number of significant digits for each of the displayed summary
+        statistics.}
   \item{xlab}{Label for x-axis. Defaults to variable name.}
   \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.}
   \item{main}{Title of graph.}
-  \item{sub}{Sub-title of graph, below xlab.}
-  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with \code{\link{theme}} function.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
-       no filetype of \code{.pdf}, the filetype is added to the name.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
-  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
-        obtained from the abbreviated function call \code{hs}.}
+  \item{sub}{Sub-title of graph, below xlab.}\cr
+
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+        with \code{\link{theme}} function.}
+  \item{width}{Width of the plot window in inches, defaults to 4.5.}
+  \item{height}{Height of the plot window in inches, defaults to 4.5.}
+  \item{pdf}{If \code{TRUE}, graphics are to be redirected to a pdf file.}
+  \item{fun.call}{Function call. Used with \code{knitr} to pass the function call
+        when obtained from the abbreviated function call \code{hs}.}\cr
+
   \item{\dots}{Other parameter values for graphics as defined processed 
       by \code{\link{hist}} and \code{\link{par}} for general graphics,
       including \code{xlim}, \code{ylim},
       \code{lwd} and \code{cex.lab}, \code{col.main}, \code{col.lab}, \code{sub},
       \code{col.sub}, \code{density}, etc. Also includes 
-      \code{col.ticks} to specify the color of the tick marks and 
-      \code{srt} to rotate the axis value labels.}
+      \code{col.ticks} to specify the color of the tick marks.}
 }
 
 
@@ -124,7 +129,7 @@ To obtain a histogram of each numerical variable in the \code{mydata} data frame
 COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
 
-For the color options, such as \code{color.grid}, the value of \code{"off"} is the same as 
+For the color options, such as \code{grid}, the value of \code{"off"} is the same as 
 \code{"transparent"}.
 
 VARIABLE LABELS\cr
@@ -143,7 +148,7 @@ ERROR DETECTION\cr
 A somewhat relatively common error by beginning users of the base R \code{\link{hist}} function may encounter is to manually specify a sequence of bins with the \code{seq} function that does not fully span the range of specified data values. The result is a rather cryptic error message and program termination.  Here, \code{Histogram} detects this problem before attempting to generate the histogram with \code{\link{hist}}, and then informs the user of the problem with a more detailed and explanatory error message. Moreover, the entire range of bins need not be specified to customize the bins.  Instead, just a bin width need be specified, \code{bin.width}, and/or a value that begins the first bin, \code{bin.start}.  If a starting value is specified without a bin width, the default Sturges method provides the bin width.
 
 PDF OUTPUT\cr
-Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+To obtain pdf output, use the \code{pdf} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 }
 
 \value{
@@ -201,16 +206,16 @@ h$out_outliers
 names(h)
 
 # histogram with no borders for the bars
-Histogram(y, color.stroke="off")
+Histogram(y, stroke="off")
 
 # save the histogram to a pdf file
-Histogram(y, pdf.file="MyHistogram.pdf")
+Histogram(y, pdf=TRUE)
 
 # histogram with no grid, red bars, black background, and black border
-Histogram(y, color.grid="off", color.bg="black",
-          color.fill="red", color.stroke="black")
+Histogram(y, grid="off", bg="black",
+          fill="red", stroke="black")
 # or set this color scheme for all subsequent analyses
-set("red", color.grid="off", color.bg="black", color.stroke.bar="black")
+set("red", grid="off", bg="black", stroke.bar="black")
 Histogram(y)
 
 # histogram with orange color theme, transparent orange bars, no grid lines
@@ -237,11 +242,11 @@ Histogram(y, breaks="Scott", hist.counts=TRUE, quiet=TRUE)
 Histogram(y, breaks=15, prop=TRUE)
 
 # histogram with specified colors, overriding defaults
-# color.bg and color.grid are defined in histogram
+# bg and grid are defined in histogram
 # all other parameters are defined in hist, par and plot functions
 # generates caution messages that can be ignored regarding density and angle
-#Histogram(y, color.fill="darkblue", color.stroke="lightsteelblue4", color.bg="ivory",
-#  color.grid="darkgray", density=25, angle=-45, cex.lab=.8, cex.axis=.8,
+#Histogram(y, fill="darkblue", stroke="lightsteelblue4", bg="ivory",
+#  grid="darkgray", density=25, angle=-45, cex.lab=.8, cex.axis=.8,
 #  col.lab="sienna3", main="My Title", col.main="gray40", xlim=c(-5,5), lwd=2,
 #  xlab="My Favorite Variable")
 
@@ -255,7 +260,7 @@ Histogram(y, cumul="both")
 # cumulative histogram plus regular histogram
 # present with proportions on vertical axis, override other defaults
 Histogram(y, cumul="both", breaks=seq(-4,4,.25), prop=TRUE, 
-  color.reg="mistyrose")
+  reg="mistyrose")
 
 
 # -------------------------------------------------
@@ -281,7 +286,7 @@ Histogram()
 Histogram(breaks, data=warpbreaks)
 
 # all histograms with specified options, including red axis labels
-Histogram(color.fill="palegreen1", color.bg="ivory", hist.counts=TRUE, col.lab="red")
+Histogram(fill="palegreen1", bg="ivory", hist.counts=TRUE, col.lab="red")
 
 # histograms for all specified numeric variables
 # use the combine or c function to specify a list of variables

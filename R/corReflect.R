@@ -1,7 +1,7 @@
 corReflect <- 
 function (R=mycor, vars,
           main=NULL, heat.map=TRUE, bottom=3,right=3, 
-          pdf.file=NULL, pdf.width=5, pdf.height=5) {
+          pdf.file=NULL, width=5, height=5) {
 
 
   # cor matrix:  mycor as class out_all, mycor$cors, or stand-alone matrix
@@ -33,7 +33,7 @@ function (R=mycor, vars,
   if (heat.map) {
     if (is.null(main)) main <- "With Reflected Item Coefficients"
    .corcolors(R, NVOld, main, bottom, right, diag=0,
-              pdf.file, pdf.width, pdf.height)
+              pdf.file, width, height)
   }
 
   cat("\n")

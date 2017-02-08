@@ -1,9 +1,9 @@
 simCLT <- 
 function(ns, n, p1=0, p2=1,
          type=c("normal", "uniform", "lognormal", "antinormal"),
-         color.fill="lightsteelblue3", n.display=2, digits.d=3, 
+         fill="lightsteelblue3", n.display=2, digits.d=3, 
          subtitle=TRUE, pop=TRUE, 
-         main=NULL, pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
+         main=NULL, pdf=FALSE, width=5, height=5, ...) {
 
   type <- match.arg(type)
 
@@ -23,7 +23,7 @@ function(ns, n, p1=0, p2=1,
   }
   else { 
     pdf.file <- "SimPopulation.pdf"
-    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    pdf(file=pdf.file, width=width, height=height)
   }
 
   digits.d <- 3
@@ -57,7 +57,7 @@ function(ns, n, p1=0, p2=1,
       if (max-min < 10) axis(1, at=seq(x.min, x.max, by=1)) else axis(1)
       usr <- par("usr")
       rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
-      polygon(c(min, x, max), c(0, y, 0), col=color.fill, border="black")
+      polygon(c(min, x, max), c(0, y, 0), col=fill, border="black")
       if (subtitle) 
         txt <- paste("min=", toString(0), " max=", toString(x.max), sep="") 
       else txt=""  
@@ -164,13 +164,13 @@ function(ns, n, p1=0, p2=1,
     dev.set(which=4) 
   else { 
     pdf.file <- "SimSample.pdf"
-    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    pdf(file=pdf.file, width=width, height=height)
   }
 
   .dn.main(Ymean, type="normal", xlab="", 
-         col.fill=color.fill, 
-         col.bg=getOption("color.bg"),
-         col.grid="transparent", col.box=getOption("color.box"),
+         col.fill=fill, 
+         col.bg=getOption("bg"),
+         col.grid="transparent", col.box=getOption("box"),
          col.nrm="black", col.gen="black",
          col.fill.nrm="transparent",
          col.fill.gen="transparent",

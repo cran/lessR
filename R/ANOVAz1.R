@@ -1,6 +1,6 @@
 .ANOVAz1 <- 
 function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
-         graphics, pdf, pdf.width, pdf.height) {
+         graphics, pdf, width, height) {
 
   p <- length(unique(na.omit(x.values)))
 
@@ -72,7 +72,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     }
     else { 
       pdf.file <- "ANOVA_Means.pdf"
-      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+      pdf(file=pdf.file, width=width, height=height)
     }
 
     plt.i <- plt.i + 1
@@ -82,12 +82,12 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
-    col.bg <- getOption("color.bg")
+    col.bg <- getOption("bg")
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
 
     axT1 <- 1:length(unique(x.values))
 
-    col.grid <- getOption("color.grid")
+    col.grid <- getOption("grid")
     abline(v=axT1, col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
@@ -100,8 +100,8 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     y.label <- nm[1]
     .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
 
-    col.fill <- getOption("color.fill.pt")
-    col.stroke <- getOption("color.stroke.pt")
+    col.fill <- getOption("fill.pt")
+    col.stroke <- getOption("stroke.pt")
     points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
 
     # plot cell means
@@ -227,7 +227,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
       }
       else { 
         pdf.file <- "ANOVA_HSD.pdf"
-        pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+        pdf(file=pdf.file, width=width, height=height)
       }
 
       plt.i <- plt.i + 1

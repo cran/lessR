@@ -1,7 +1,8 @@
 .bc.main <- 
 function(x, by=NULL, 
          col.fill, col.stroke, col.bg, col.grid, col.box, colors,
-         horiz, over.grid, addtop, gap, prop, xlab, ylab, main, value.labels,
+         horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
+         value.labels, label.max,
          cex.axis, col.axis, rotate.values, offset, beside,
          col.low, col.hi, count.labels,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
@@ -165,7 +166,8 @@ function(x, by=NULL,
   }
 
   else if ((colors %in% c("blue","rose","green","gold","red","orange",
-          "sienna","dodgerblue","purple","white","orange.black","gray.black")
+          "darkred", "brown", "sienna","dodgerblue","purple","white",
+          "orange.black","gray.black")
           && (is.null(by) && !is.matrix(x)))) {
       if (n.colors == 1 || length(col.fill) > 1)
         clr <- col.fill
@@ -254,9 +256,12 @@ function(x, by=NULL,
     else
       val.lab <- value.labels
     val.lab <- gsub(" ", "\n", val.lab) 
+    val.lab <- .abbrev(val.lab, label.max)
   }
-  else  # horizontal, where value labels do not work
+  else  { # horizontal, where value labels do not work
     val.lab <- NULL
+    names(x) <- .abbrev(names(x), label.max)
+  }
 
   if(is.null(count.labels)) if (horiz) {  # switch
     temp <- x.lab
@@ -275,12 +280,12 @@ function(x, by=NULL,
   lm <- lm + .10
   if (prop) lm <- lm + .25
   if (horiz) {
-    bm <- bm + .10  # kludge, for horiz, long labels overun plot area
+    bm <- bm + .10  # kludge, for horiz, long labels overrun plot area
     lm <- lm + .06
     if (las.value == 1) lm <- lm + .12
   }
   if (legend.loc == "right.margin"  &&  (!is.null(by) || is.matrix(x)))
-    rm <- rm + .6
+    rm <- rm + .82
  
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
@@ -355,7 +360,7 @@ function(x, by=NULL,
       abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
   }
 
-  # axes  (barplot produces its own axis for the categories,
+  # axes (barplot produces its own axis for the categories,
   #        unless axisnames=FALSE)
   ax.freq <- ifelse(horiz, 1, 2)
   if (!horiz) las.value <- 1
@@ -436,14 +441,21 @@ function(x, by=NULL,
       txsug <- ""
       if (getOption("suggest")) {
         txsug <- ">>> Suggestions"
-        fc <- paste("Plot(", x.name, ") ", sep="")
+        fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("Plot(", x.name, ", values=\"count\") ", sep="")
+        fc <- paste("Plot(", x.name,
+                    ", values=\"count\")  # scatter plot", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("BarChart(", x.name,
+                    ", horiz=TRUE)  # horizontal bar chart", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("BarChart(", x.name,
+                    ", colors=\"rainbow\")  # different bar colors", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
       }
 
       stats <- .ss.factor(x, by=NULL, brief=TRUE, digits.d=NULL,
-                          x.name, y.name, x.lbl, y.lbl)
+                          x.name, y.name, x.lbl, y.lbl, label.max)
 
       if (!is.null(stats)) {
         txttl <- stats$title
@@ -478,7 +490,7 @@ function(x, by=NULL,
     }
 
     stats <- .ss.factor(x, by, brief=FALSE, digits.d=NULL,
-                        x.name, y.name, x.lbl, y.lbl) 
+                        x.name, y.name, x.lbl, y.lbl, label.max) 
 
     txttl <- stats$txttl
     txfrq <- stats$txfrq

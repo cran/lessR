@@ -1,6 +1,6 @@
 corScree <- 
 function (x=mycor, 
-          main=NULL, pdf=FALSE, pdf.width=5, pdf.height=5, ...) {
+          main=NULL, pdf=FALSE, width=5, height=5, ...) {
 
 
   # cor matrix:  mycor as class out_all, mycor$cors, or stand-alone matrix
@@ -26,13 +26,13 @@ function (x=mycor,
   }
   else { 
     pdf.file <- "Scree.pdf"
-    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    pdf(file=pdf.file, width=width, height=height)
   }
 
   if (getOption("colors") == "gray" || getOption("colors") == "gray.black")
-    col.ln <- getOption("color.fill.bar")
+    col.ln <- getOption("fill.bar")
   else
-    col.ln <- getOption("color.stroke.bar")
+    col.ln <- getOption("stroke.bar")
 
   # keep track of generated graphics
   plot.i <- 0
@@ -45,10 +45,10 @@ function (x=mycor,
   .lc.main(ev, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.stroke=getOption("color.stroke.pt"),
-         col.fill=getOption("color.fill.pt"),
+         col.stroke=getOption("stroke.pt"),
+         col.fill=getOption("fill.pt"),
          shape.pts=21, col.grid=getOption("col.grid"),
-         col.bg=getOption("color.bg"),
+         col.bg=getOption("bg"),
          cex.axis=.85, col.axis="gray30", rotate.values=0, offset=0.5,
          xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Eigenvalues", main=main, sub=NULL, cex=NULL,
@@ -68,7 +68,7 @@ function (x=mycor,
   }
   else { 
     pdf.file <- "ScreeDiff.pdf"
-    pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+    pdf(file=pdf.file, width=width, height=height)
   }
 
   # differences scree plot
@@ -80,10 +80,10 @@ function (x=mycor,
   .lc.main(ev.diff, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.stroke=getOption("color.stroke.pt"),
-         col.fill=getOption("color.fill.pt"),
-         shape.pts=21, col.grid=getOption("color.grid"),
-         col.bg=getOption("color.bg"),
+         col.stroke=getOption("stroke.pt"),
+         col.fill=getOption("fill.pt"),
+         shape.pts=21, col.grid=getOption("grid"),
+         col.bg=getOption("bg"),
          cex.axis=.85, col.axis="gray30", rotate.values=0, offset=0.5,
          xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Differences of Successive Eigenvalues",

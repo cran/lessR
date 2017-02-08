@@ -4,7 +4,7 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
          new.data, pred, pred.all, 
          numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new, X6.new,
-         pdf.file, pdf.width, pdf.height, ...) {
+         pdf.file, width, height, ...) {
 
   pred.sort <- TRUE  # data must be sorted to find cases close to fitted=0.5
 
@@ -115,7 +115,7 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
   # graphics
   if (pred && n.pred==1 && !is.factor(lm.out$model[,nm[2]]) && is.null(X1.new)) {
 
-    .opendev(pdf.file, pdf.width, pdf.height)
+    .opendev(pdf.file, width, height)
 
     x.values <- lm.out$model[,nm[2]]
     if (!is.factor(lm.out$model[,nm[1]])) {
@@ -136,10 +136,10 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
     plot(x.values,y.values, type="n", axes=FALSE, ann=FALSE, ylim=c(-.10,1.10), ...)
 
     usr <- par("usr")
-    col.bg <- getOption("color.bg")
+    col.bg <- getOption("bg")
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
 
-    col.grid <- getOption("color.grid")
+    col.grid <- getOption("grid")
     abline(v=axTicks(1), col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
@@ -151,8 +151,8 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
     .axlabs(nm[2], y.label, main.lab, sub.lab, max.lbl.y=3,
             cex.lab=getOption("lab.size"), cex.main=1.0, ...) 
 
-    col.fill <- getOption("color.fill.pt")
-    col.stroke <- getOption("color.stroke.pt")
+    col.fill <- getOption("fill.pt")
+    col.stroke <- getOption("stroke.pt")
     points(x.values,y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
     lines(x.values, p.int$fit, col=col.stroke, lwd=2)
 
@@ -165,10 +165,10 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
   else {  # scatterplot matrix for multiple regression
     if (numeric.all && in.data.frame) {
 
-      .opendev(pdf.file, pdf.width, pdf.height)
+      .opendev(pdf.file, width, height)
 
       panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        col.pt=getOption("color.stroke.pt"), col.smooth=getOption("col.stroke.bar"),
+        col.pt=getOption("stroke.pt"), col.smooth=getOption("col.stroke.bar"),
         span=2/3, iter=3, ...) 
       {
           points(x, y, pch=pch, col=col.pt, cex=cex)

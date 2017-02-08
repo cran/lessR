@@ -9,7 +9,7 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL, X6.new=NULL, 
 
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         pdf.file=NULL, width=5, height=5, ...) {
  
 
   if (missing(my.formula)) {
@@ -17,9 +17,23 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
       "Specify a model by listing it first or set according to:  my.formula\n\n")
   }
   
-  dname <- deparse(substitute(data))
-  options(dname = dname)
- 
+  df.name <- deparse(substitute(data))   # get name of data table
+  options(df.name = df.name)
+
+  # if a tibble convert to data frame, no char --> factor conversion 
+  if (class(data)[1] == "tbl_df") {
+    data <- as.data.frame(data, stringsAsFactors=TRUE)
+  }
+
+  # convert character variables to factors (for DV)
+  n.col <- apply(data, 2, function(x) sum(!is.na(x)))  # num values per variable
+  nu.col <- apply(data, 2, function(x) length(unique(na.omit(x))))  # num unique
+  fnu.col <- logical(length=ncol(data))  # logical vector, initial values to FALSE
+
+  for (i in 1:ncol(data)) 
+    if (is.character(data[,i])) if (nu.col[i] != n.col[i]) fnu.col[i] <- TRUE 
+  data[fnu.col] <- lapply(data[fnu.col], as.factor) 
+
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
 
@@ -47,15 +61,15 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   pre <- "> "
   line <- "--------------------------------------------------------------------\n"
   
-  if (!exists(dname)) {
+  if (!exists(df.name)) {
     txtC <- "Function reg requires the data exist in a data frame\n"
-    if (dname == "mydata") 
+    if (df.name == "mydata") 
       txtA <- ", the default data frame name, " else txtA <- " "
     txtB1 <- "Either create the data frame, such as with data.frame function, or\n"
     txtB2 <- "  specify the actual data frame with the parameter: data\n"
     txtB <- paste(txtB1, txtB2, sep="")
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-        txtC, "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
+        txtC, "Data frame ", df.name, txtA, "does not exist\n\n", txtB, "\n")
   }
 
   nm <- all.vars(my.formula)  # names of vars in the model
@@ -73,7 +87,7 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
     for (i in 1:n.obs)
       if (!is.na(data[i,nm[1]]))
         if (data[i,nm[1]]!=0 && data[i,nm[1]]!=1) is.bin <- FALSE
-   }
+  }
   if (!is.bin) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Response variable: ", nm[1], "\n",
@@ -133,7 +147,7 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   
   cat("\n")
   if (sys.nframe() == 1) {  # only accurate if not called from model
-    cat("Data Frame: ", dname, "\n\n")
+    cat("Data Frame: ", df.name, "\n\n")
   }
 
   for (i in 1:n.vars) {
@@ -265,17 +279,17 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   }
  
   if (res.rows > 0)
-    .logit3Residual(lm.out, nm, dname,
+    .logit3Residual(lm.out, nm, df.name,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          res.sort, res.rows, cooks.cut)
  
   if (pred)
-    .logit4Pred(lm.out, nm, dname, my.formula, brief, res.rows,
+    .logit4Pred(lm.out, nm, df.name, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          new.data, pred, pred.all, 
          numeric.all, in.data.frame, X1.new, 
          X2.new, X3.new, X4.new, X5.new, X6.new,
-         pdf.file, pdf.width, pdf.height)
+         pdf.file, width, height)
 
   invisible(lm.out)
 

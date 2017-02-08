@@ -18,13 +18,13 @@ When output is assigned into an object, such as \code{b} in \code{b <- bx(Y)}, t
 BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         Rmd=NULL,
 
-        color.fill=getOption("color.fill.bar"),
-        color.stroke=getOption("color.stroke.bar"), 
-        color.bg=getOption("color.bg"),
-        color.grid=getOption("color.grid"),
-        color.box=getOption("color.box"),
+        fill=getOption("fill.bar"),
+        stroke=getOption("stroke.bar"), 
+        bg=getOption("bg"),
+        grid=getOption("grid"),
+        box=getOption("box"),
 
-        cex.axis=0.75, color.axis="gray30",
+        cex.axis=0.75, axes="gray30",
         xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
 
         rotate.values=0, offset=0.5,
@@ -32,7 +32,7 @@ BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         horiz=TRUE, add.points=FALSE,
 
         quiet=getOption("quiet"),
-        pdf.file=NULL, pdf.width=5, pdf.height=5,
+        width=4.5, height=4.5, pdf=FALSE,
         fun.call=NULL, \ldots)
 
 bx(\ldots)
@@ -49,42 +49,47 @@ bx(\ldots)
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{mydata}.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
-        specifies the largest number of unique values of variable of a numeric data type
-        for which the variable will be analyzed as a categorical. Default is 0.}
+        specifies the largest number of unique values of variable of a numeric
+        data type for which the variable will be analyzed as a categorical.}
   \item{Rmd}{File name for the file of R markdown instructions to be written,
-        if specified.}
-  \item{color.fill}{Color of the box.}
-  \item{color.stroke}{Color of any points that designate outliers. By default this
+        if specified.}\cr
+
+  \item{fill}{Interior color of the box. Turn off with \code{fill="off"}.}
+  \item{stroke}{Color of any points that designate outliers. By default this
        is the same color as the box.}
-  \item{color.bg}{Color of the plot background.}
-  \item{color.grid}{Color of the grid lines.}
-  \item{color.box}{Color of border around the plot background, the box, that encloses 
-        the plot, with a default of \code{"black"}.}
+  \item{bg}{Color of the plot background. Turn off with \code{bg="off"}.}
+  \item{grid}{Color of the grid lines. Turn off with \code{grid="off"}.}
+  \item{box}{Color of border around the plot background, the box, that encloses 
+        the plot. Turn off with \code{box="off"}.}\cr
+
  \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
        values to be smaller than the axis labels. Provides the functionality of, and
        can be replaced by, the standard R \code{cex.axis.}}
-  \item{color.axis}{Color of the font used to label the axis values.}
+  \item{axes}{Color of the font used to label the axis values.}
   \item{xlab}{Label for the value axis, which defaults to the variable's name.}
   \item{main}{Title of graph.}
   \item{sub}{Sub-title of graph, below xlab.}
   \item{digits.d}{Number of decimal digits displayed in the listing of the summary
-       statistics.}
+       statistics.}\cr
+
   \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
         longer values, typically used in conjunction with \code{offset}.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when
-        longer axis value names are rotated.}
+        longer axis value names are rotated.}\cr
+
   \item{horiz}{Orientation of the boxplot. Set \code{FALSE} for vertical.}
   \item{add.points}{If \code{TRUE}, then place a dot plot (i.e., stripchart) over the
-       box plot.}
+       box plot.}\cr
+
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
        \code{\link{theme}} function.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected. If there is
-       no filetype of \code{.pdf}, the filetype is added to the name.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the plot window in inches, defaults to 4.5.}
+  \item{height}{Height of the plot window in inches, defaults to 4.5.}
+  \item{pdf}{If \code{TRUE}, graphics to be redirected to a pdf file.}
   \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
-        obtained from the abbreviated function call \code{bx}.}
+        obtained from the abbreviated function call \code{bx}.}\cr
+
   \item{\dots}{Other parameter values for graphics as defined processed 
        by \code{\link{boxplot}} and \code{\link{bxp}} such as \code{whiskcol} for
        the whisker color, etc. and \code{\link{par}}, including \code{ylim} to set
@@ -108,16 +113,16 @@ The data may either be a vector from the global environment, the user's workspac
 To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.  To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{color.fill} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
+Individual colors in the plot can be manipulated with options such as \code{fill} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
 
-For the color options, such as \code{color.grid}, the value of \code{"off"} is the same as 
+For the color options, such as \code{grid}, the value of \code{"off"} is the same as 
 \code{"transparent"}.
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 PDF OUTPUT\cr
-Because of the customized graphic windowing system that maintains a unique graphic window for the Help function, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{pdf.width} and \code{pdf.height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+To obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
 The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
@@ -180,13 +185,13 @@ BoxPlot(y)
 bx(y)
 
 # save the box plot to a pdf file
-BoxPlot(y, pdf.file="MyBoxPlot.pdf")
+BoxPlot(y, pdf=TRUE)
 
 # vertical boxplot with plum color
-BoxPlot(y, horiz=FALSE, color.fill="plum")
+BoxPlot(y, horiz=FALSE, fill="plum")
 
 # box plot with outliers more strongly highlighted
-BoxPlot(y, color.stroke="red", xlab="My Variable")
+BoxPlot(y, stroke="red", xlab="My Variable")
 
 
 # ------------------------------------------------
@@ -221,7 +226,7 @@ BoxPlot()
 
 # box plots for all numeric variables in data frame called mydata
 #  with specified options
-BoxPlot(color.fill="palegreen1", color.stroke="plum")
+BoxPlot(fill="palegreen1", stroke="plum")
 
 # Use the subset function to specify a variable list
 # box plots for all specified numeric variables

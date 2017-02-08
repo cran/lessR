@@ -12,7 +12,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
 
          main=NULL, heat.map=TRUE, bottom=3, right=3, 
 
-         pdf.file=NULL, pdf.width=5, pdf.height=5,
+         pdf.file=NULL, width=5, height=5,
 
          F1=NULL, F2=NULL, F3=NULL, F4=NULL, F5=NULL,
          F6=NULL, F7=NULL, F8=NULL, F9=NULL, F10=NULL,
@@ -293,7 +293,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
   if (heat.map) {
     if (is.null(main)) main <- "Item Correlations/Communalities"
    .corcolors(out$R, NItems, main, bottom, right, diag=NULL,
-              pdf.file, pdf.width, pdf.height)
+              pdf.file, width, height)
   }
 
 

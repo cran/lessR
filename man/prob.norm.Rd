@@ -8,8 +8,8 @@ Calculate the probability of an interval for a normal distribution with specifie
 }
 
 \usage{
-prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, color.nrm="black", 
-         color.fill.nrm="grey91", color.fill.int="slategray3", 
+prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black", 
+         fill.nrm="grey91", fill.int="slategray3", 
          ylab="", y.axis=FALSE, z=TRUE, mag=.9, \ldots)
 }
 
@@ -19,9 +19,9 @@ prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, color.nrm="black",
   \item{hi}{Highest value in the interval for which to compute probability.}
   \item{mu}{Population mean of normal distribution.}
   \item{sigma}{Population standard deviation of normal distribution.}
-  \item{color.nrm}{Color of the border of the normal curve.}
-  \item{color.fill.nrm}{Fill color of the normal curve.}
-  \item{color.fill.int}{Fill color of the interval for which the probability is computed.}
+  \item{nrm.color}{Color of the border of the normal curve.}
+  \item{fill.nrm}{Fill color of the normal curve.}
+  \item{fill.int}{Fill color of the interval for which the probability is computed.}
   \item{ylab}{Label for the optional vertical axis.}
   \item{y.axis}{If \code{TRUE}, then a vertical axis is included.}
   \item{z}{If \code{TRUE}, then include z-values on the horizontal-axis. Set to \code{FALSE} if \code{mu=0} and \code{sigma=1}.}
@@ -53,7 +53,7 @@ prob.norm(hi=2)
 prob.norm(lo=2)
 
 # Mu=100, Sigma=15: Change default fill color of plotted interval
-prob.norm(lo=115, hi=125, mu=100, sigma=15, color.fill.int="plum")
+prob.norm(lo=115, hi=125, mu=100, sigma=15, fill.int="plum")
 }
 
 

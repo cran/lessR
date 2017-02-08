@@ -24,10 +24,10 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE, ylim=c(0,1.1))
 
   usr <- par("usr")
-  col.bg <- getOption("color.bg")
+  col.bg <- getOption("bg")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
 
-  col.grid <- getOption("color.grid")
+  col.grid <- getOption("grid")
   abline(v=axTicks(1), col=col.grid, lwd=.5)
   abline(h=axTicks(2), col=col.grid, lwd=.5)
 
@@ -40,8 +40,8 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   y.label <- "Power"
   .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
 
-  col.fill <- getOption("color.fill.pt")
-  col.stroke <- getOption("color.stroke.pt")
+  col.fill <- getOption("fill.pt")
+  col.stroke <- getOption("stroke.pt")
   points(x.values, y.values, pch=21, type="l", col=col.stroke,
          bg=col.fill, cex=0.8)
 

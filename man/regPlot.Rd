@@ -11,7 +11,7 @@ Following a call to the \code{lessR} function \code{\link{Regression}}, in which
 regPlot(out, type, digits.d=NULL, pred.intervals=TRUE,
          res.sort=c("cooks","rstudent","dffits","off"),
          res.rows=NULL, cooks.cut=1, scatter.coef=NULL, 
-         pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, \ldots)
+         pdf=FALSE, width=5, height=5, manage.gr=FALSE, \ldots)
 }
 
 
@@ -40,8 +40,8 @@ regPlot(out, type, digits.d=NULL, pred.intervals=TRUE,
   \item{scatter.coef}{Display the correlation coefficients in the upper triangle of the
         scatterplot matrix.}
   \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
-  \item{pdf.width}{Width of the pdf file in inches.}
-  \item{pdf.height}{Height of the pdf file in inches.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{manage.gr}{Usually leave \code{FALSE}. Refers to graphic management of the \code{lessR} system.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 
 }

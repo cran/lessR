@@ -6,12 +6,6 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
        bin.end, prop, hist.counts, cumul,
        xlab, ylab, main, sub, quiet, fun.call=NULL, do.plot=TRUE, ...) {
 
-       
-  if (is.numeric(breaks) && !is.null(bin.start)) { 
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Choose only one option to specify a start value.\n",
-      "Either choose the option  breaks  or the option  bin.start.\n\n")
-  }
 
   # scale for regular R or RStudio
   adj <- .RSadj(bubble.scale=NULL, cex.axis)
@@ -115,7 +109,8 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     # set margins
     max.width <- strwidth(as.character(max(pretty(h$counts))), units="inches")
     
-    margs <- .marg(max.width, y.lab, main, prop)
+    margs <- .marg(max.width, y.lab, x.lab, main.lab, x.val=NULL, prop,
+                   rotate.values)
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm
@@ -156,7 +151,8 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     # box for plotting area
     rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
 
-    plot(h, add=TRUE, col=col.fill, border=col.stroke, freq=TRUE, labels=hist.counts, ...)
+    plot(h, add=TRUE, col=col.fill, border=col.stroke, freq=TRUE,
+         labels=hist.counts, ...)
     if (cumul == "both") {
       h$counts <- old.counts
       plot(h, add=TRUE, col=col.reg, freq=TRUE)
@@ -167,7 +163,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
       abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
     }
   }
-  
+
   
 #------------
 # text output
@@ -184,8 +180,14 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     cum.c=stats$counts_cum
     cum.p=stats$prop_cum
 
-    return(list(txsug=txsug, ttx=tx, bin.width=bin.width, n.bins=n.bins, breaks=h$breaks, 
-      mids=h$mids, counts=h$counts, prop=prop, counts_cum=cum.c, prop_cum=cum.p))
+    return(list(txsug=txsug, ttx=tx, bin.width=bin.width, n.bins=n.bins,
+      breaks=h$breaks, mids=h$mids, counts=h$counts, prop=prop,
+      counts_cum=cum.c, prop_cum=cum.p))
+  }
+
+  else {  # Plot needs binning and midpoints even if not displaying text output
+    return(list(bin.width=bin.width,
+      breaks=h$breaks, mids=h$mids, counts=h$counts))
   }
   
 

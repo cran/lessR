@@ -1,5 +1,5 @@
 .plt.zbad <-
-function (x.miss, y.miss, values, method, breaks, bin.start, bar, ...) {
+function (x.miss, y.miss, values, method, breaks, bin.start, ...) {
 
   # check for dated parameters no longer used
   dots <- list(...)
@@ -15,11 +15,25 @@ function (x.miss, y.miss, values, method, breaks, bin.start, bar, ...) {
           "options that began with the abbreviation  col  now begin with  ",
           "color \n\n")
       }
+      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "color options dropped the  color. prefix\n",
+          "eg., fill, instead of color.fill.\n\n")
+      }
+      if (grepl("fit.line", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "fit.line options dropped the  .line suffix\n",
+          "eg., fit, instead of fit.line.\n\n")
+      }
       if (names(dots)[i] %in% c("x.start","x.end","y.start","y.end")) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "x.start, x.end, y.start, and y.end no longer used\n\n",
           "Instead use the standard R xlim and ylim parameters,\n",
           "such as xlim=c(0,40) to specify from 0 to 40. Same for ylim.\n\n")
+      }
+      if (names(dots)[i] == "topic") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  topic  is renamed  values\n\n")
       }
       if (names(dots)[i] == "topic") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -32,8 +46,7 @@ function (x.miss, y.miss, values, method, breaks, bin.start, bar, ...) {
       if (names(dots)[i] == "object") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "option  object  is no longer active\n\n",
-          "use bar=TRUE to get a bar chart or histogram\n",
-          "use sequential=TRUE to get a line chart\n",
+          "use line.chart=TRUE to get a line chart\n",
           "set size=0 to remove points from the plot\n\n")
       }
       if (names(dots)[i] == "type") {

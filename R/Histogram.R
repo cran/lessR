@@ -1,15 +1,14 @@
 Histogram <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
-    color.fill=getOption("color.fill.bar"), 
-    color.stroke=getOption("color.stroke.bar"),
-    color.bg=getOption("color.bg"),
-    color.grid=getOption("color.grid"),
-    color.box=getOption("color.box"),
+    fill=getOption("fill.bar"), 
+    stroke=getOption("stroke.bar"),
+    bg=getOption("bg"),
+    grid=getOption("grid"),
+    box=getOption("box"),
+    reg="snow2",
 
-    color.reg="snow2", over.grid=FALSE,
-    cex.axis=0.75, color.axis="gray30", 
-
+    over.grid=FALSE, cex.axis=0.75, axes="gray30",
     rotate.values=0, offset=0.5,
 
     breaks="Sturges", bin.start=NULL, bin.width=NULL, bin.end=NULL,
@@ -18,7 +17,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
 
     quiet=getOption("quiet"),
-    pdf.file=NULL, pdf.width=5, pdf.height=5,
+    width=4.5, height=4.5, pdf=FALSE, 
     fun.call=NULL, ...) {
 
 
@@ -27,16 +26,17 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
 
-  for (i in 1:length(color.fill))
-    if (color.fill[i] == "off") color.fill[i] <- "transparent"
-  for (i in 1:length(color.stroke))
-    if (color.stroke[i] == "off") color.stroke[i] <- "transparent"
-  if (color.bg == "off") color.bg <- "transparent"
-  if (color.grid == "off" ) color.grid <- "transparent"
-  if (color.box == "off") color.box <- "transparent"
+  df.name <- deparse(substitute(data))   # get name of data table
+  options(dname = df.name)
 
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+
+  for (i in 1:length(fill))
+    if (fill[i] == "off") fill[i] <- "transparent"
+  for (i in 1:length(stroke))
+    if (stroke[i] == "off") stroke[i] <- "transparent"
+  if (bg == "off") bg <- "transparent"
+  if (grid == "off" ) grid <- "transparent"
+  if (box == "off") box <- "transparent"
 
   kf <- FALSE
   lbls <- FALSE
@@ -50,9 +50,24 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
           "options that began with the abbreviation  col  now begin with  ",
           "color \n\n")
       }
+      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "color options dropped the  color. prefix\n",
+          "eg., fill, instead of color.fill.\n\n")
+      }
+      if (names(dots)[i] == "pdf.file") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "pdf.file  changed to  pdf, either TRUE or FALSE\n\n")
+      }
       if (names(dots)[i] == "knitr.file") kf <- TRUE 
       if (names(dots)[i] == "labels") lbls <- TRUE 
     }
+  }
+
+  if (is.numeric(breaks) && !is.null(bin.start)) { 
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Choose only one option to specify a start value.\n",
+      "Either choose the option  breaks  or the option  bin.start.\n\n")
   }
 
   if (lbls) {
@@ -77,11 +92,6 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   x.name <- deparse(substitute(x))  # could be a list of var names
   options(xname = x.name)
 
-  df.name <- deparse(substitute(data))
-  options(dname = df.name)
-
-  pdf.nm <- FALSE
-  if (!missing(pdf.file)) pdf.nm <- TRUE
 
 # -----------------------------------------------------------
 # establish if a data frame, if not then identify variable(s)
@@ -133,13 +143,23 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 # ---------------
 # do the analysis
 
-  go.pdf <- FALSE
-  if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
-
-
   if (ncol(data) > 1) {
     sug <- getOption("suggest")
     options(suggest = FALSE)
+
+    manage.gr <- .graphman()  # see if graphics are to be managed
+    if (manage.gr) {
+      i.win <- 0
+      for (i in 1:ncol(data)) {
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat)) 
+          i.win <- i.win + 1
+      }
+      .graphwin(i.win, width, height)
+      open.win <- 2
+    }
+
+    plot.i <- 0  # keep track of generated graphics
+    plot.title  <- character(length=0)
   }
 
   for (i in 1:ncol(data)) {
@@ -153,8 +173,21 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
       # let 1 variable go through, even if num.cat
       if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
 
-      pdf.fnm <- .pdfname("Hist", x.name, go.pdf, pdf.nm, pdf.file)
-     .opendev(pdf.fnm, pdf.width, pdf.height)
+      if (pdf) {
+        pdf.fnm <- paste("Hist", "_", x.name, ".pdf", sep="") 
+        .opendev(pdf.fnm, width, height)
+      }
+      else {
+        pdf.fnm <- NULL
+        if (ncol(data) > 1) {
+          plot.i <- plot.i + 1
+          plot.title[plot.i] <- paste("Histogram of ", x.name, sep="")
+          if (manage.gr) {
+            open.win <- open.win + 1
+            dev.set(which = open.win)
+          }
+        }
+      }
 
       txss <- ""
       if (!quiet) {
@@ -163,9 +196,9 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
       }
 
       # nothing returned if quiet=TRUE
-      stuff <- .hst.main(data[,i], color.fill, color.stroke, color.bg,
-          color.grid, color.box, color.reg,
-          over.grid, cex.axis, color.axis, rotate.values, offset,
+      stuff <- .hst.main(data[,i], fill, stroke, bg,
+          grid, box, reg,
+          over.grid, cex.axis, axes, rotate.values, offset,
           breaks, bin.start, bin.width,
           bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub,
           quiet, fun.call=fun.call, ...)
@@ -189,7 +222,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         print(output)
       }
 
-      if (go.pdf) {
+      if (pdf) {
         dev.off()
         if (!quiet) .showfile(pdf.fnm, "Histogram")
       }
@@ -201,12 +234,16 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     }  # is.numeric(data[,i])
   }  # for
 
-  if (ncol(data) > 1) options(suggest = sug)
+  if (ncol(data) > 1) {
+    options(suggest = sug)
+    if (!pdf) if (is.null(options()$knitr.in.progress))
+      .plotList(plot.i, plot.title)
+  }
 
   dev.set(which=2)  # reset graphics window for standard R functions
 
 
-  if (ncol(data)==1) {
+  if (ncol(data) == 1) {
 
     # R Markdown
     txkfl <- ""

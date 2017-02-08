@@ -1,7 +1,7 @@
 .cr.data.frame <-
 function(x, miss, show.n, digits.d,
          graphics, main, bottom, right, 
-         pdf, pdf.width, pdf.height, ...)  {
+         pdf, width, height, ...)  {
 
   if (!is.null(digits.d) && digits.d<1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",      
@@ -150,12 +150,12 @@ function(x, miss, show.n, digits.d,
     #}
     #else { 
       #pdf.file <- "Cor_SPmatrix.pdf"
-      #pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+      #pdf(file=pdf.file, width=width, height=height)
     #}
   
     # scatter plot matrix
       #panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        #col.pt=getOption("color.stroke.pt"), col.smooth=getOption("color.stroke.bar"),
+        #col.pt=getOption("stroke.pt"), col.smooth=getOption("stroke.bar"),
         #span=2/3, iter=3, ...) 
       #{
           #points(x, y, pch=pch, col=col.pt, cex=cex)
@@ -178,7 +178,7 @@ function(x, miss, show.n, digits.d,
     }
     else { 
       pdf.file <- "Cor_HeatMap.pdf"
-      pdf(file=pdf.file, width=pdf.width, height=pdf.height)
+      pdf(file=pdf.file, width=width, height=height)
     }
 
     if (is.null(main)) main <- "Correlations"
@@ -188,7 +188,7 @@ function(x, miss, show.n, digits.d,
         "      elements, the diagonal elements of the matrix for\n",
         "      computing the heat map are set to 0.\n", sep="")
 
-    max.color <- getOption("color.heat")
+    max.color <- getOption("heat")
     hmcols <- colorRampPalette(c("white",max.color))(256)
 
     heatmap(crs[1:ncol(crs),1:ncol(crs)], Rowv=NA, Colv="Rowv", symm=TRUE,

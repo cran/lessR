@@ -11,13 +11,13 @@ function(colnms, horiz, stroke, fill, shape, col.bg, usr, cex.lab=0.8) {
 
   if (horiz) {
 
-    mlt <- 1
+    #mlt <- 1
     # kludge to get RStudio box wider 
-    if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
-      colnms[length(colnms)] <- paste(colnms[length(colnms)], "     ", sep="")
-      mlt <- 2
+    #if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
+      #colnms[length(colnms)] <- paste(colnms[length(colnms)], "     ", sep="")
+      #mlt <- 2
     #mlt <- ifelse (options("device") == "RStudioGD", 2, 1.25)
-    }
+    #}
 
     size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates, [2] is y 
 
@@ -38,10 +38,10 @@ function(colnms, horiz, stroke, fill, shape, col.bg, usr, cex.lab=0.8) {
   else {  # vertical
 
     # kludge to get RStudio box wider 
-    if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
-      max.width <- which(nchar(colnms) == max(nchar(colnms)))
-      colnms[max.width] <- paste(colnms[max.width], "     ", sep="")
-    }
+    #if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
+      #max.width <- which(nchar(colnms) == max(nchar(colnms)))
+      #colnms[max.width] <- paste(colnms[max.width], "     ", sep="")
+    #}
 
     ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
                  horiz, plot=FALSE)  # get coordinates

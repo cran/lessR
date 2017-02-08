@@ -2,7 +2,7 @@ regPlot <-
 function(out, type, digits.d=NULL, pred.intervals=TRUE,
          res.sort=c("cooks","rstudent","dffits","off"),
          res.rows=NULL, cooks.cut=1, scatter.coef=NULL,
-         pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...) {
+         pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
 
 
   if (options("device") != "RStudioGD"  &&  is.null(options()$knitr.in.progress)) 
@@ -10,12 +10,12 @@ function(out, type, digits.d=NULL, pred.intervals=TRUE,
 
 
     # need: out$residuals
-    if (type == 2) .reg3dnResidual(out, pdf, pdf.width, pdf.height, manage.gr)
+    if (type == 2) .reg3dnResidual(out, pdf, width, height, manage.gr)
 
 
     # need: out$fitted.values, out$residuals
     if (type == 3) .reg3resfitResidual(out, out$cooks.distance, cooks.cut,
-                   pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE)
+                   pdf=FALSE, width=5, height=5, manage.gr=FALSE)
 
 
     # need: out$model (the data)
@@ -69,7 +69,7 @@ function(out, type, digits.d=NULL, pred.intervals=TRUE,
     .reg5Plot(out, res.rows=NULL, pred.rows=NULL,
          scatter.coef=s.c, scatter.3D=FALSE, X1.new=NULL,
          numeric.all, in.data.frame, c.int, p.int,
-         pdf=FALSE, pdf.width=5, pdf.height=5, manage.gr=FALSE, ...)
+         pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...)
 
     } # end type == 1
 

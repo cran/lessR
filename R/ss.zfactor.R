@@ -1,9 +1,9 @@
 .ss.factor <-
 function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
-         x.lbl=NULL, y.lbl=NULL, ...)  {
+         x.lbl=NULL, y.lbl=NULL, label.max=20, ...)  {
 
 
-# construct a cross-tabs 
+# construct a cross-tabs
 .prnfreq <- function(x, type, max.ln, max.c1, n.dash, ttl) {
   tx <- character(length = 0)
 
@@ -69,10 +69,9 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
 
     # potential abbreviation of column labels
     mx.chr <- max(nchar(colnames(x)))
-    mx.len <- 8
-    if (mx.chr > mx.len) {
+    if (mx.chr > label.max) {
       c.nm <- colnames(x)
-      colnames(x) <- .abbrev(colnames(x), mx.len)
+      colnames(x) <- .abbrev(colnames(x), label.max)
     }
 
     xx <- addmargins(x)
@@ -201,10 +200,9 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
 
     # potential abbreviation of column labels
     mx.chr <- max(nchar(names(x)))
-    mx.len <- 8
-    if (mx.chr > mx.len) {
+    if (mx.chr > label.max) {
       c.nm <- names(x)
-      names(x) <- .abbrev(names(x), mx.len)
+      names(x) <- .abbrev(names(x), label.max)
     }
 
      max.ln <- integer(length=0)      
@@ -250,7 +248,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       
       txlbl <- ""
       tx <- character(length = 0)
-      if (mx.chr > mx.len) {
+      if (mx.chr > label.max) {
         tx[length(tx)+1] <- "Unabbreviated labels"
         tx[length(tx)+1] <- "--------------------"
         tx[length(tx)+1] <- paste(c.nm, sep="", collapse="\n")

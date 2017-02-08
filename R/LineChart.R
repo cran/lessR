@@ -1,16 +1,15 @@
 LineChart <-
 function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
 
-         color.fill=getOption("color.fill.bar"), 
-         color.stroke=getOption("color.stroke.pt"),
-         color.bg=getOption("color.bg"),
-         color.grid=getOption("color.grid"),
-         color.box=getOption("color.box"),
-         color.line=getOption("color.stroke.pt"),
+         fill=getOption("fill.bar"), 
+         stroke=getOption("stroke.pt"),
+         bg=getOption("bg"),
+         grid=getOption("grid"),
+         box=getOption("box"),
+         line=getOption("stroke.pt"),
+         area=NULL, 
 
-         color.area=NULL, 
-
-         shape.pts=21, cex.axis=0.75, color.axis="gray30",
+         shape.pts=21, cex.axis=0.75, axes="gray30",
 
          rotate.values=0, offset=.5,
 
@@ -22,23 +21,20 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
          center.line=c("default", "mean", "median", "zero", "off"),
 
          show.runs=FALSE, quiet=getOption("quiet"),
-         pdf.file=NULL, pdf.width=5, pdf.height=5, ...) {
+         width=4.5, height=4.5, pdf=FALSE, ...) {
 
 
   center.line <- match.arg(center.line)
 
-  for (i in 1:length(color.fill))
-    if (color.fill[i] == "off") color.fill[i] <- "transparent"
-  for (i in 1:length(color.stroke))
-    if (color.stroke[i] == "off") color.stroke[i] <- "transparent"
-  if (color.bg == "off") color.bg <- "transparent"
-  if (color.grid == "off" ) color.grid <- "transparent"
-  if (color.box == "off") color.box <- "transparent"
-  if (color.line == "off") color.box <- "transparent"
-  if (!is.null(color.area)) if (color.area == "off") color.area <- "transparent"
-
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+  for (i in 1:length(fill))
+    if (fill[i] == "off") fill[i] <- "transparent"
+  for (i in 1:length(stroke))
+    if (stroke[i] == "off") stroke[i] <- "transparent"
+  if (bg == "off") bg <- "transparent"
+  if (grid == "off" ) grid <- "transparent"
+  if (box == "off") box <- "transparent"
+  if (line == "off") box <- "transparent"
+  if (!is.null(area)) if (area == "off") area <- "transparent"
 
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
@@ -49,6 +45,11 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "options that began with the abbreviation  col  now begin with  ",
           "color \n\n")
+      }
+      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "color options dropped the  color. prefix\n",
+          "eg., fill, instead of color.fill.\n\n")
       }
     }
   }
@@ -61,8 +62,6 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
-  pdf.nm <- FALSE
-  if (!missing(pdf.file)) pdf.nm <- TRUE
 
 # -----------------------------------------------------------
 # establish if a data frame, if not then identify variable(s)
@@ -100,8 +99,10 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 # ---------------
 # do the analysis
 
-  go.pdf <- FALSE
-  if (pdf.nm || ncol(data) > 1) go.pdf <- TRUE
+  if (ncol(data) > 1) {
+    plot.i <- 0  # keep track of generated graphics
+    plot.title  <- character(length=0)
+  }
 
   for (i in 1:ncol(data)) {
     cat("\n")
@@ -118,17 +119,28 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
       # let 1 variable go through, even if num.cat
       if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
 
-      pdf.fnm <- .pdfname("LC", x.name, go.pdf, pdf.nm, pdf.file)
-     .opendev(pdf.fnm, pdf.width, pdf.height)
+
+      if (pdf)
+        pdf.fnm <- paste("LC", "_", x.name, ".pdf", sep="") 
+      else {
+        pdf.fnm <- NULL
+        if (ncol(data) > 1) {
+          plot.i <- plot.i + 1
+          plot.title[plot.i] <- paste("LineChart of ", x.name, sep="")
+        }
+      }
+      .opendev(pdf.fnm, width, height)
+
+
       .lc.main(data[,i], type,
-         color.line, color.area, color.stroke, color.fill, shape.pts,
-         color.grid, color.box, color.bg, cex.axis, color.axis,
+         line, area, stroke, fill, shape.pts,
+         grid, box, bg, cex.axis, axes,
          rotate.values, offset, xy.ticks,
          line.width, xlab, ylab, main, sub, cex,
          time.start, time.by, time.reverse, 
          center.line, show.runs, quiet, ...)
 
-      if (go.pdf) {
+      if (pdf) {
         dev.off()
         if (!quiet) .showfile(pdf.fnm, "Line Chart")
       }
@@ -138,6 +150,12 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
       if (!quiet) .ncat("Line Chart", x.name, nu, n.cat)
 
     }  # is.numeric(data[,i])
+
   }  # for
+
+  if (ncol(data) > 1) {
+    if (!pdf) if (is.null(options()$knitr.in.progress))
+      .plotList(plot.i, plot.title)
+  }
 
 }
