@@ -4,13 +4,14 @@ function(x, mylabels, sort.yx,
          shape.pts, col.area, col.box, 
          cex.axis, col.axis, col.low, col.hi,
          xy.ticks, xlab, ylab, main, sub, cex,
-         bubble.scale, bubble.counts, bubble.power,
-         value.labels, rotate.values, offset, quiet, fun.call=NULL, ...)  {
+         radius, size.cut, txt.color="black", power,
+         value.labels, rotate.x, rotate.y, offset, quiet,
+         do.plot, fun.call=NULL, ...)  {
 
 
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.scale, cex.axis)
-  bubble.scale <- adj$bubble.scale
+  adj <- .RSadj(radius, cex.axis)
+  radius <- adj$radius
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
   size.txt <- adj$size.txt
@@ -101,83 +102,85 @@ function(x, mylabels, sort.yx,
   c <- cords$count  # 0 plots to a single pixel, so remove
   for (i in 1:length(c)) if (c[i]==0) c[i] <- NA
 
-  # set margins
-  y.lvl <- rownames(mytbl)
-  max.width <- strwidth(y.lvl[which.max(nchar(y.lvl))], units="inches")
+  if (do.plot) {
+    # set margins
+    y.lvl <- rownames(mytbl)
+    max.width <- strwidth(y.lvl[which.max(nchar(y.lvl))], units="inches")
   
-  # here keep same bm if 1 or 2 line x labels
-  margs <- .marg(max.width, y.lab, x.lab, main) 
-  lm <- margs$lm
-  tm <- margs$tm
-  rm <- margs$rm
-  bm <- margs$bm
- 
-  orig.params <- par(no.readonly=TRUE)
-  on.exit(par(orig.params))
-  
-  par(mai=c(bm, lm, tm, rm))
+    # here keep same bm if 1 or 2 line x labels
+    margs <- .marg(max.width, y.lab, x.lab, main) 
+    lm <- margs$lm
+    tm <- margs$tm
+    rm <- margs$rm
+    bm <- margs$bm
+   
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+    
+    par(mai=c(bm, lm, tm, rm))
 
-  plot(cords$xx, cords$yy, type="n", axes=FALSE, ann=FALSE, 
-       xlim=c(.5, n.resp+.5), ylim=c(.5, n.var+.5))
+    plot(cords$xx, cords$yy, type="n", axes=FALSE, ann=FALSE, 
+         xlim=c(.5, n.resp+.5), ylim=c(.5, n.var+.5))
 
-  # axis, axis ticks, value labels
-  if (is.null(value.labels))
-    x.lvl <- colnames(mytbl)
-  else
-    x.lvl <- value.labels
-    x.lvl <- gsub(" ", "\n", x.lvl) 
+    # axis, axis ticks, value labels
+    if (is.null(value.labels))
+      x.lvl <- colnames(mytbl)
+    else
+      x.lvl <- value.labels
+      x.lvl <- gsub(" ", "\n", x.lvl) 
 
-  .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,
-        par("usr")[1], par("usr")[3], size.axis, col.axis,
-        rotate.values, offset=offset, ...)
+    .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,
+          par("usr")[1], par("usr")[3], size.axis, col.axis,
+          rotate.x, rotate.y, offset=offset, ...)
 
-  # axis labels 
-  if (!is.null(y.lvl))
-    max.lbl <- max(nchar(y.lvl))
-  else
-    max.lbl <- max(nchar(axTicks(2)))
-    y.lab <- ""
-    max.lbl <- 0
+    # axis labels 
+    if (!is.null(y.lvl))
+      max.lbl <- max(nchar(y.lvl))
+    else
+      max.lbl <- max(nchar(axTicks(2)))
+      y.lab <- ""
+      max.lbl <- 0
 
-  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
+    .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
+            xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
 
-  usr <- par("usr")
+    usr <- par("usr")
 
-  # color plotting area
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
+    # color plotting area
+    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
 
-  # grid lines
-  abline(h=1:n.var, col=col.grid, lwd=.75)
-  abline(v=axTicks(1), col=col.grid, lwd=.75)  # bubbles only
+    # grid lines
+    abline(h=1:n.var, col=col.grid, lwd=.75)
+    abline(v=axTicks(1), col=col.grid, lwd=.75)  # bubbles only
 
-  # color plotting area
-  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
+    # color plotting area
+    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
 
-  # colors
-  if (is.null(col.low) ||  is.null(col.hi))
-    clr <- col.fill
-  else {
-    color.palette <- colorRampPalette(c(col.low, col.hi))
-    clr <- color.palette(n.resp)
-  }
+    # colors
+    if (is.null(col.low) ||  is.null(col.hi))
+      clr <- col.fill
+    else {
+      color.palette <- colorRampPalette(c(col.low, col.hi))
+      clr <- color.palette(n.resp)
+    }
 
-  # bubbles
-  if (!is.null(col.trans)) {
-    trans.pts <- col.trans
-    for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans.pts)*256)
-  }
-  symbols(cords$xx, cords$yy, circles=c, bg=clr, 
-        fg=col.stroke, inches=bubble.scale, add=TRUE, ...)
+    # bubbles
+    if (!is.null(col.trans)) {
+      trans.pts <- col.trans
+      for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans.pts)*256)
+    }
+    symbols(cords$xx, cords$yy, circles=c, bg=clr, 
+          fg=col.stroke, inches=radius, add=TRUE, ...)
 
-  # counts
-  if (bubble.counts) { 
-    max.c <- max(c, na.rm=TRUE)  # do not display count if bubble is too small
-    #min.bubble <- (.5 - (0.9*bubble.scale)) * max.c 
-    min.bubble <- (bubble.power/2.5) * max.c
-    for (i in 1:length(c))
-      if (!is.na(c[i])) if (c[i] <= min.bubble) c[i] <- NA
-    text(cords$xx, cords$yy, c, cex=size.txt)
+    # counts
+    if (size.cut) { 
+      max.c <- max(c, na.rm=TRUE)  # do not display count if bubble is too small
+      #min.bubble <- (.5 - (0.9*radius)) * max.c 
+      min.bubble <- (power/2.5) * max.c
+      for (i in 1:length(c))
+        if (!is.na(c[i])) if (c[i] <= min.bubble) c[i] <- NA
+      text(cords$xx, cords$yy, c, cex=size.txt, col=txt.color)
+    }
   }
 
   if (!quiet) {
@@ -193,8 +196,8 @@ function(x, mylabels, sort.yx,
     if (getOption("suggest")) {
       txsug <- ">>> Suggestions"
       fc <- ""
-      if (!grepl("bubble.scale", fncl))
-        fc <- paste(fc, ", bubble.scale=0.2", sep="")
+      if (!grepl("radius", fncl))
+        fc <- paste(fc, ", radius=0.2", sep="")
       if (nzchar(fc)) {
         fc <- paste(fncl, fc, ") ", sep="")
         txsug <- paste(txsug,"\n", fc, sep="")

@@ -38,7 +38,7 @@ In the current version the diagonal of the input correlation matrix is ignored. 
 }
 
 \references{
-Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 11, NY: Routledge.
+Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 11, NY: Routledge.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

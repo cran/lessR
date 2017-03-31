@@ -4,13 +4,13 @@ function(x,
          histogram=TRUE, bin.start=NULL, bin.width=NULL,
          col.fill, col.bg, col.grid, col.box, col.nrm, col.gen,
          col.fill.nrm, col.fill.gen,
-         cex.axis=0.75, col.axis="gray30", rotate.values=0, offset=0.5, 
+         cex.axis=0.75, col.axis="gray30", rotate.x=0, rotate.y=0, offset=0.5, 
          x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, x.min=NULL, x.max=NULL,
          band=FALSE, quiet, ...)  {
 
 
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.scale=NULL, cex.axis)
+  adj <- .RSadj(radius=NULL, cex.axis)
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
 
@@ -103,11 +103,11 @@ function(x,
   if (!y.axis)
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
           par("usr")[1], par("usr")[3], size.axis, col.axis,
-          rotate.values, offset, ...)
+          rotate.x, rotate.y, offset, ...)
   else
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
           par("usr")[1], par("usr")[3], size.axis, col.axis,
-          rotate.values, offset, ...)
+          rotate.x, rotate.y, offset, ...)
 
   # axis value labels
   if (!y.axis) y.lab="" else y.lab="Density"

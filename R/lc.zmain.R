@@ -2,14 +2,14 @@
 function(y, type,
        col.line, col.area, col.stroke, col.fill, shape.pts,
        col.grid, col.box, col.bg, cex.axis, col.axis,
-       rotate.values, offset, xy.ticks,
+       rotate.x, rotate.y, offset, xy.ticks,
        line.width, xlab, ylab, main, sub, cex,
        time.start, time.by, time.reverse, 
        center.line, show.runs, quiet, ...) {
        
        
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.scale=NULL, cex.axis)
+  adj <- .RSadj(radius=NULL, cex.axis)
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
 
@@ -125,7 +125,7 @@ function(y, type,
     if (is.null(time.start) && !is.ts(x)) 
      .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
         par("usr")[1], par("usr")[3], size.axis, col.axis,
-        rotate.values, offset, ...)
+        rotate.x, rotate.y, offset, ...)
     else {
       axis.Date(1, x, cex.axis=size.axis, col.axis=col.axis, ...)
       #lbl.dt <- as.Date(axTicks(1), origin = "1970-01-01")

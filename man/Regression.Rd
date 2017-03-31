@@ -59,21 +59,21 @@ reg.brief(\ldots, brief=TRUE)
         text file that can be edited with any text editor, including RStudio.}
   \item{results}{By default TRUE. If set to \code{FALSE} the results
         are not provided in the R Markdown document, relying upon the interpretations.
-        Can set globally with \code{theme(results=FALSE)}.}
+        Can set globally with \code{global(results=FALSE)}.}
   \item{explain}{By default TRUE. If set to \code{FALSE} the explanations are not
-        provided in the R Markdown document. Can set globally with \code{theme(explain=FALSE)}.}
+        provided in the R Markdown document. Can set globally with \code{global(explain=FALSE)}.}
   \item{interpret}{By default TRUE. If set to \code{FALSE} the interpretations
         of the results are not provided in the R Markdown document.  Can set globally
-        with \code{theme(interpret=FALSE)}.}
+        with \code{global(interpret=FALSE)}.}
   \item{document}{By default TRUE If set to \code{FALSE} the documentation
         is not provided in the R Markdown file.  Can set globally with
-        \code{theme(document=FALSE)}.}
+        \code{global(document=FALSE)}.}
   \item{code}{By default TRUE. If set to \code{FALSE} the code that generates the results
         is not provided in the R Markdown file. Can set globally
-        with \code{theme(code=FALSE)}.}
+        with \code{global(code=FALSE)}.}
   \item{text.width}{Width of the text output at the console.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
-        with \code{\link{theme}} function.}
+        with \code{\link{global}} function.}
   \item{show.R}{Display the R instructions that yielded the \code{lessR} output, albeit without
         the additional formatting of the results such as combining output of different 
         functions into a table.}
@@ -182,7 +182,7 @@ INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{Regression} is finished with a normal termination, the options are re-set to their values before the \code{Regression} function began executing.
 
 COLOR THEME\cr
-A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}. 
+A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{global}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{global}}. 
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -251,7 +251,7 @@ Although not typically needed for analysis, if the regression output is assigned
 Lumley, T., \code{leaps} function from the \code{leaps} package.\cr
 Nilsson, H. and Fox, J., \code{vif} function from the \code{car} package.\cr
 
-Gerbing, D. W. (2013). R Data Analysis without Programming, Chapters 9 and 10, NY: Routledge.
+Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, NY: Routledge.
 
 Xie, Y. (2013). Dynamic Documents with R and knitr, Chapman & Hall/CRC The R Series.
 }

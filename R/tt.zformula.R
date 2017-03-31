@@ -44,7 +44,7 @@ function (my.formula, y=NULL, data, ...) {
     "The t-test for the mean difference is of the form\n\n",
     "  ttest(response_variable ~ grouping_variable)\n\n",
     "The response variable is numeric and the grouping variable\n",
-    "  has exactly two unique values\n\n", 
+    "  has exactly two unique values, one for each group\n\n", 
     "You specified ", nm[1], " as the response variable, the 1st variable listed\n\n",
     "The response variable must have only numeric values\n",
     "The first value of ", nm[1], " is ", data[1,nm[1]],

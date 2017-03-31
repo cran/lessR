@@ -11,13 +11,13 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     cex.axis=0.75, axes="gray30",
     xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
 
-    rotate.values=0, offset=0.5,
+    rotate.x=0, rotate.y=0, offset=0.5,
 
     horiz=TRUE, add.points=FALSE,
 
     quiet=getOption("quiet"),
     width=4.5, height=4.5, pdf=FALSE,
-    fun.call=NULL, ...) {
+    do.plot=TRUE, fun.call=NULL, ...) {
 
 
   if (is.null(fun.call)) fun.call <- match.call()
@@ -44,17 +44,20 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       if (grepl("color.", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "color options dropped the  color. prefix\n",
-          "eg., fill, instead of color.fill.\n\n")
+          "eg., fill, instead of color.fill\n\n")
       }
-    }
-    if (substr(names(dots)[i], 1, 4) == "col.") {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "options that began with the abbreviation  col  now begin with  ",
-        "color \n\n")
-    }
-    if (names(dots)[i] == "pdf.file") {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "pdf.file  changed to  pdf, either TRUE or FALSE\n\n")
+      if (grepl("col.", names(dots)[i], fixed=TRUE)) 
+        if (names(dots)[i] != "col.main"  &&
+            names(dots)[i] != "col.lab"  &&
+            names(dots)[i] != "col.sub") {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "color options dropped the  col. prefix\n",
+            "eg., fill, instead of col.fill\n\n")
+      }
+      if (names(dots)[i] == "pdf.file") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "pdf.file  changed to  pdf, either TRUE or FALSE\n\n")
+      }
     }
   }
 
@@ -108,6 +111,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
 # ---------------
 # do the analysis
 
+  if (do.plot) {
     plot.i <- 0  # keep track of generated graphics
     plot.title  <- character(length=0)
     manage.gr <- .graphman()  # see if graphics are to be managed
@@ -120,6 +124,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       .graphwin(i.win, width, height)
     }
     open.win <- 2
+  }
 
 
   for (i in 1:ncol(data)) {
@@ -148,8 +153,9 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       }
 
       stuff <- .bx.main(data[,i], fill, stroke, bg, grid,
-         box, cex.axis, axes, rotate.values, offset, 
-         horiz, add.points, xlab, main, sub, digits.d, quiet, fun.call, ...)
+         box, cex.axis, axes, rotate.x, rotate.y, offset, 
+         horiz, add.points, xlab, main, sub, digits.d, quiet,
+         do.plot, fun.call, ...)
       txsts <- stuff$tx
       if (length(txsts)==0) txsts <- ""
 
@@ -184,7 +190,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
       .plotList(plot.i, plot.title)
   }
 
-  dev.set(which=2)  # reset graphics window for standard R functions
+  if (do.plot)
+    dev.set(which=2)  # reset graphics window for standard R functions
 
 
   if (ncol(data)==1) {

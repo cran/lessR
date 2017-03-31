@@ -28,7 +28,7 @@ LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
          shape.pts=21, cex.axis=.75, axes="gray30",
 
-         rotate.values=0, offset=.5,
+         rotate.x=0, rotate.y=0, offset=.5,
 
          xy.ticks=TRUE, line.width=1,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL, cex=NULL,
@@ -61,10 +61,11 @@ lc(\ldots)
         points, \code{"l"} for line, or \code{"b"} for both. The default is 
         \code{"b"} for both points and lines.}\cr
 
-  \item{fill}{For plotted points, the interior color of the point.  For a
-        scatterplot the default value is \code{"transparent"} or \code{"off"}. 
-        For a run chart the default value is 
-        the color of the point's border, \code{stroke}.}
+  \item{fill}{For plotted points, the interior color of the point.  This
+       and the following colors can also be changed globally, individually and as 
+       a color theme, with the \code{lessR} \code{\link{global}} function. The
+       \code{lessR} function \code{\link{showColors}} provides examples of all
+       R named colors.}
   \item{stroke}{Color of the lines. Remove with \code{stroke="off"}.}
   \item{bg}{Color of the plot background. Remove with \code{bg="off"}.}
   \item{grid}{Color of the grid lines. Remove with \code{grid="off"}.}
@@ -81,8 +82,9 @@ lc(\ldots)
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be 
         smaller than the axis labels.}
   \item{axes}{Color of the font used to label the axis values.}
-  \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
-        longer values, typically used in conjunction with \code{offset}.}
+  \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
+        accommodate longer values, typically used in conjunction with \code{offset}.}
+  \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when
         longer axis value names are rotated.}
@@ -117,7 +119,7 @@ lc(\ldots)
       value of \code{"zero"} specifies the center line should go through zero.}
   \item{show.runs}{If \code{TRUE}, display the individual runs in the run analysis.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-       with \code{\link{theme}} function.}
+       with \code{\link{global}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
   \item{pdf}{If \code{TRUE}, the pdf file is to be redirected to a pdf file.}
@@ -140,7 +142,7 @@ DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{stroke}. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
+Individual colors in the plot can be manipulated with options such as \code{stroke}. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{global}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{global}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
 
 For the color options, such as \code{grid}, the value of \code{"off"} is the same as 
 \code{"transparent"}.
@@ -149,7 +151,7 @@ VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} does, obtained from the \code{\link{Read}} function.  If the variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 PDF OUTPUT\cr
-To obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+To obtain pdf output, use the \code{pdf} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
 The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
@@ -165,7 +167,7 @@ Instead, do the following:
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{plot}}, \code{\link{theme}}. 
+\code{\link{plot}}, \code{\link{global}}. 
 }
 
 
@@ -183,12 +185,12 @@ lc(Y)
 plot(mydata$Y, type="l")
 
 # save run chart to a pdf file
-LineChart(Y, pdf.file=TRUE)
+LineChart(Y, pdf=TRUE)
 
 # LineChart in gray scale, then back to default "dodgerblue"
-theme(colors="gray")
+global(colors="gray")
 LineChart(Y)
-theme(colors="dodgerblue")
+global(colors="dodgerblue")
   
 # customize run chart with LineChart options
 LineChart(Y, line.width=2, stroke="sienna3",

@@ -1,6 +1,6 @@
 PieChart <-
 function(x, data=mydata, 
-         fill=NULL, low.color=NULL, hi.color=NULL,
+         fill=NULL, low.fill=NULL, hi.fill=NULL,
          colors=c("rainbow", "terrain", "heat"),
          random.color=FALSE, main=NULL, cex=1, cex.main=1,
          quiet=getOption("quiet"),
@@ -56,7 +56,7 @@ function(x, data=mydata,
   #on.exit(par(orig.params))
 
   .pc.main(x.call, 
-       random.color, fill, low.color, hi.color,
+       random.color, fill, low.fill, hi.fill,
        colors, cex, cex.main, quiet, main, 
        pdf.file, width, height, ...)
 

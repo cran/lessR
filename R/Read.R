@@ -177,7 +177,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         if (ncol(mylabels) == 2) names(mylabels) <- c("label", "unit")
       }
 
-      else {  # labels == "row2"
+      else {  # labels == "row2", usually from Qualtrics data download
         if (format != "Excel") 
           mylabels <- read.csv(file=ref, nrows=1, sep=delim, ...)
         else {
@@ -189,12 +189,12 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         mylabels <- data.frame(t(mylabels))  # var names are row names
         names(mylabels) <- "label"
         if (format != "Excel")  # read the data 
-          d <- read.csv(file=ref, skip=1, 
+          d <- read.csv(file=ref, skip=2, 
                            na.strings=missing, col.names=var.names, sep=delim, ...)
         else
           #d <- read.xls(xls=ref, skip=1, 
                            #na.strings=missing, col.names=var.names, ...)
-          d <- read_excel(path=ref, skip=2, col_names=var.names)
+          d <- read_excel(path=ref, skip=3, col_names=var.names)
         }
       # transfer labels and maybe units to data
       attr(d, which="variable.labels") <- as.character(mylabels$label)

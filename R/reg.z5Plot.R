@@ -57,9 +57,9 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
                
     # scale for regular R or RStudio
     cex.axis <- 0.76
-    bubble.scale <- 0.25
-    adj <- .RSadj(bubble.scale, cex.axis)
-    bubble.scale <- adj$bubble.scale
+    radius <- 0.25
+    adj <- .RSadj(radius, cex.axis)
+    radius <- adj$radius
     size.axis <- adj$size.axis
     size.lab <- adj$size.lab
     cex.txt <- adj$size.txt
@@ -107,7 +107,43 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
 
     col.fill <- getOption("fill.pt")
     col.stroke <- getOption("stroke.pt")
-    points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=size.pt)
+    
+    if (length(unique(x.values)) > getOption("n.cat"))
+      points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=size.pt)
+
+    else {
+      mytbl <- table(x.values, y.values)  # get the counts, all x-y combinations
+      n.count <- nrow(mytbl) * ncol(mytbl)
+      count <- integer(length=n.count)
+
+      # melt the table of counts to a data frame with xx, yy, count
+      xx <- integer(length=n.count)
+      yy <- integer(length=n.count)
+      k <- 0
+      for (i in 1:nrow(mytbl)) {
+        for (j in 1:ncol(mytbl)) {
+          if (mytbl[i,j] != 0) {  # 0 plots to a single pixel, so remove
+            k <- k + 1
+            count[k] <- mytbl[i,j]
+            xx[k] <- as.numeric(rownames(mytbl)[i])  # rownames are factors
+            yy[k] <- as.numeric(colnames(mytbl)[j])
+          }
+        }
+      }
+      cords <- data.frame(xx, yy, count)
+
+      power <- 0.6
+      sz <- cords[,3]**power  # radius unscaled 
+      radius <- 0.25
+      symbols(cords$xx, cords$yy, circles=sz, inches=radius,
+          bg=col.fill, fg=col.stroke, add=TRUE, ...)
+
+      q.ind <- 1:nrow(cords)  # all bubbles get text
+      for (i in 1:nrow(cords)) if (cords[i,3] < 5) cords[i,3] <- NA 
+      text(cords[q.ind,1], cords[q.ind,2], cords[q.ind,3], cex=0.8)
+
+    }  # end bubble plot
+
 
     if (n.pred == 0) {
       m <- lm.out$coefficients[1]  # mean of Y
@@ -148,38 +184,10 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
 
   else {  # scatterplot matrix for multiple regression
     if (numeric.all && in.data.frame) {
-      col.pts <- getOption("stroke.pt")
-      col.line <- getOption("stroke.bar")
-      col.bg=getOption("bg")
-
-      panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        col.pt=col.pts, col.smooth=col.line,
-        span=2/3, iter=3, ...) 
-      {
-          points(x, y, pch=pch, col=col.pt, cex=cex)
-          ok <- is.finite(x) & is.finite(y)
-          if (any(ok)) 
-            lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
-      }
-
       plt.i <- plt.i + 1L
       plt.title[plt.i] <- "ScatterPlot Matrix"
 
-      if (scatter.coef) {
-        panel.cor <- function(x, y, digits=2, prefix="", cex.cor, ...) {
-          usr <- par("usr"); on.exit(par(usr))
-          par(usr=c(0, 1, 0, 1))
-          r <- cor(x, y)
-          txt <- format(c(r, 0.123456789), digits=digits)[1]
-          txt <- paste(prefix, txt, sep="")
-          if (missing(cex.cor)) cex.cor <- .9/strwidth(txt)
-          cex.adj <- 2.5 - (0.18*n.pred)  # adjust size of displayed r
-          text(0.5, 0.5, txt, cex=cex.adj, col=col.pts)  # or cex=cex.cor * r
-        }
-        pairs(lm.out$model[c(nm)],
-          lower.panel=panel2.smooth, upper.panel=panel.cor)
-      }
-      else pairs(lm.out$model[c(nm)], panel=panel2.smooth)
+      .plt.mat(lm.out$model[c(nm)], fit="ls")
     }
     else {
       cat("\n>>> No scatterplot matrix reported because not all variables are ")

@@ -62,7 +62,7 @@ Although not typically needed for analysis, if the output is assigned to an obje
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \references{
-Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 11, NY: Routledge.
+Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 11, NY: Routledge.
 
 Yves Rosseel (2012). lavaan: An R Package for Structural Equation
 Modeling. Journal of Statistical Software, 48(2), 1-36. URL

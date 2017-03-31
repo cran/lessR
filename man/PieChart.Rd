@@ -13,7 +13,7 @@ Plots a pie chart with default colors from a variety of different types of data.
 \usage{
 PieChart(x, data=mydata, 
 
-         fill=NULL, low.color=NULL, hi.color=NULL,
+         fill=NULL, low.fill=NULL, hi.fill=NULL,
          colors=c("rainbow", "terrain", "heat"),
          random.color=FALSE,
 
@@ -31,11 +31,13 @@ pc(\ldots)
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{mydata}.}\cr
 
-  \item{fill}{Specified color of each slice.}
-  \item{low.color}{Only when the variable is an ordered factor, sets the color
+  \item{fill}{Specified color of each slice. The
+       \code{lessR} function \code{\link{showColors}} provides examples of all
+       R named colors.}
+  \item{low.fill}{Only when the variable is an ordered factor, sets the color
         for the lowest level of the factor in the resulting ordered progression
         of colors.}
-  \item{hi.color}{Only when the variable is an ordered factor, sets the color
+  \item{hi.fill}{Only when the variable is an ordered factor, sets the color
         for the highest level of the factor in the resulting ordered progression
          of colors.}
   \item{colors}{Optional palettes that provide more options.}
@@ -49,7 +51,7 @@ pc(\ldots)
   \item{cex.main}{Magnification factor of title relative to 1.}\cr
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-       with \code{\link{theme}} function.}
+       with \code{\link{global}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
   \item{pdf.file}{Name of the pdf file to if graphics to be redirected to a
@@ -79,7 +81,7 @@ barplot(rep(1,7), names=clr, col=clr, border=NA, space=.1)\cr
 clr <- c("coral3", "seagreen3", "maroon3", "dodgerblue3", "purple3", "turquoise3", "yellow3")\cr
 barplot(rep(1,7), names=clr, col=clr, border=NA, space=.1)
 
-When plotting ordered factor then neither of the two standard color palettes are used.  Instead, the resulting slice colors for each level of the ordered factor are also ordered in a progression of colors. The default progression is based on the first color of either the regular, vivid or gray color palettes, but this can be changed with the \code{low.color} and \code{hi.color} options, or individually specify the color of each piece with the \code{fill} option. A specified palette can, for example, be from light to dark of the same hue, or from a light color of one hue to a dark color of another hue. Each color value can be specified with a color name, or with a specification with the \code{\link{rgb}} function.  See the examples below.  
+When plotting ordered factor then neither of the two standard color palettes are used.  Instead, the resulting slice colors for each level of the ordered factor are also ordered in a progression of colors. The default progression is based on the first color of either the regular, vivid or gray color palettes, but this can be changed with the \code{low.fill} and \code{hi.fill} options, or individually specify the color of each piece with the \code{fill} option. A specified palette can, for example, be from light to dark of the same hue, or from a light color of one hue to a dark color of another hue. Each color value can be specified with a color name, or with a specification with the \code{\link{rgb}} function.  See the examples below.  
 
 Use the \code{\link{showColors}} function in this package to get, for each color:  name,  sample color swatch, and corresponding rgb specification.  For a very small number of levels, such as two, it is may be desirable to specify the low and high values to not be closer to each other than the default values.
 

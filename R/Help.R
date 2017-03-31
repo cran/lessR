@@ -1,8 +1,8 @@
 Help <- 
-function(topic=NULL) {
+function(topic=NULL, width=4.5, height=4.5) {
 
 
-  # set up plot window
+  # function: set up plot window
   set.up.plot <- function(nlines) {
     par(mar=c(.5,.5,.5,.5), bg=rgb(255,253,250,maxColorValue=255),
                             fg=rgb(20,15,15,maxColorValue=255), cex=.72)
@@ -15,9 +15,11 @@ function(topic=NULL) {
   }
 
 
+  # function: footer of a help page
   help.more <- function(fname, yline) {
     h1 <- "Complete list of Help topics, enter:  Help()"
-    h2 <- paste("For more help on a function, enter ? in front of its name:  ?", fname, sep="")
+    txt <- "For more help on a function, enter"
+    h2 <- paste(txt, " ? in front of its name:  ?", fname, sep="")
 
     if (getOption("colors") != "gray") 
       col.sep <- "lightsteelblue"
@@ -31,6 +33,7 @@ function(topic=NULL) {
 
 
   # ------------------------------------------------
+  # BEGIN
   # ------------------------------------------------
 
   if (missing(topic))
@@ -41,11 +44,7 @@ function(topic=NULL) {
   }
 
   # convert topic to all lowercase letters
-  if (!is.null(topic))
-    for (i in 1:nchar(topic)) {
-      xc <- substr(topic,i,i)
-      if (xc %in% LETTERS) substr(topic,i,i) <- letters[which(LETTERS==xc)] 
-    }
+  if (!is.null(topic)) topic <- tolower(topic)
 
   if (getOption("colors") != "gray") {
     col.rect <- getOption("col.fill.pt")
@@ -57,26 +56,19 @@ function(topic=NULL) {
   }
 
   # set graphic parameters
-  if (!is.null(topic)) {
-    if (topic != "lessr") {
-      old.par <- par("mar", "cex", "bg", "fg")
-      on.exit(par(old.par))
-    }
-  }
-  else {  # topic is null, Help()
-    old.par <- par("mar", "cex", "bg", "fg")
-    on.exit(par(old.par))
-  }
+  .graphwin(1, d.w=width, d.h=height)
+  old.par <- par("mar", "cex", "bg", "fg")
+  on.exit(par(old.par))
 
 
   if (is.null(topic)) {
 
   t0 <- "Help Topics for lessR"
 
-  fsys <- bquote(paste(bold("Help(theme)"), "  System level settings, such as a color theme for graphics"))
+  fsys <- bquote(paste(bold("Help(global)"), "  System level settings, such as a color theme for graphics"))
   fcsv <- bquote(paste(bold("Help(data)"), "  Create a data file from Excel or similar application"))
   frw <- bquote(paste(bold("Help(Read)"), " and ", bold("Help(Write)"), "  Read or write data to or from a file"))
-  flib <- bquote(paste(bold("Help(library)"), "  Access libraries of functions called packages"))
+  flib <- bquote(paste(bold("Help(library)"), "  Access sets of functions called packages"))
   ftrans <- bquote(paste(bold("Help(edit)"), "  Edit data and create new variables from existing variables"))
 
   fhist <- bquote(paste(bold("Help(Histogram)"), "  Histogram, box plot, dot plot, density curve"))
@@ -325,34 +317,35 @@ function(topic=NULL) {
   }
 
 
-  else if (topic %in% c("system", "set", "theme")) {
+  else if (topic %in% c("system", "set", "theme", "global")) {
   t0 <- "Global Settings"
 
-  f1 <- bquote(paste(bold("theme"), "  all lessR system settings such as a color theme"))
+  f1 <- bquote(paste(bold("global"), "  all lessR system settings such as a color theme"))
   f2 <- bquote(paste(bold("showColors"), "  lessR function to illustrate all color names"))
 
   t1 <- "
-  The lessR function theme provides global settings for lessR functions.
-  Set the color theme for the graphics functions. The default color theme is
+  The lessR function global provides global settings for lessR functions.
+  Set the color theme for the graphics functions. The default color global is
   \"dodgerblue\", with possibilities of \"gray\", \"green\", \"gold\", \"rose\", \"red\", 
   \"darkred\", \"brown\", \"purple\", \"sienna\", \"white\", \"orange.black\" and
   \"gray.black\".  Example:
-      > theme(colors=\"gray\") 
+      > global(colors=\"gray\") 
   Set the transparency level of bars and plotted points with the
-  trans.fill.bar and trans.fill.pt options. Turn off grid lines with col.grid=\"off\".
-  Change or remove background color with col.bg, such as col.bg=\"off\".
+  trans.fill.bar and trans.fill.pt options, or just trans.
+  Turn off grid lines with grid=\"off\".
+  Change or remove background color with bg, such as bg=\"off\".
 
   Levels of a categorical variable may be encoded with numerical digits,
   such as 0 for Male and 1 for Female. R is obliged to interpret numerical
   variables as numeric.  One option is to redefine these variables as
   factors [see Help(edit)]. Or set the value of the lessR option n.cat.
-      > theme(n.cat=3)
+      > global(n.cat=3)
   Here any numerical variable with just 3 unique, equally spaced interval 
   values or less is interpreted as a categorical variable. The default
   value of n.cat is 8, and applies to ScatterPlot and SummaryStats.
 
-  To see all available theme options, enter the following.
-      > theme(show=TRUE)
+  To see all available global options, enter the following.
+      > global(show=TRUE)
   To see all the R named colors, enter the following.
       > showColors()
   "
@@ -364,7 +357,7 @@ function(topic=NULL) {
   #lines(c(5,90), c(80,80), col=col.line)
   text(0,47, label=t1, adj=0)
 
-  help.more("theme", 7)
+  help.more("global", 7)
   }
 
 
@@ -379,20 +372,19 @@ function(topic=NULL) {
   f4 <- bquote(paste(bold("ScatterPlot, sp"), "  Scatter plot of 1 variable"))
 
   t1 <- "
-  Plot a distribution of data values for a continuous variable, here for
-  variable Y with the current color theme. Use Histogram or hs.
+  Plot a distribution of data values for a continuous variable with the current
+  color theme, here for variable Y. Use Histogram or hs.
       > Histogram(Y)
-  Specify the gray scale color theme, a title, and a label for the x axis.
-      > theme(colors=\"gray\")
+  Specify the gray-scale color theme, a title, and a label for the x-axis.
+      > global(\"gray\")
       > Histogram(Y, main=\"My Title\", xlab=\"Y (mm)\")
   Specify bins, begin at 60 with a bin width of 10. Can also specify bin.end.
       > Histogram(Y, bin.start=60, bin.width=10)
-  Save the output of the function for later analysis and view separately.
-      > h <- hs(Y)
-      > h
+  Get Trellis graphics with by and by2 parameters for categorial variables.
+      > Histogram(Y, by=Gender)
 
   Density curve superimposed on the underlying histogram, abbreviated
-  dn, a BoxPlot or bx, and a one variable ScatterPlot, or sp.
+  dn, a BoxPlot or bx, and a one-variable ScatterPlot, or sp.
       > Density(Y)   or   > BoxPlot(Y)   or   > ScatterPlot(Y)
 
   These functions, except sp, can also replace the variable name such as Y 
@@ -476,8 +468,8 @@ function(topic=NULL) {
 
   Color themes are available with the colors option, which can be invoked
   from a specific call to LineChart or system wide for all graphics output with
-  the function theme. Here all subsequent graphics output is in gray scale.
-      > theme(colors=\"gray\")
+  the function global Here all subsequent graphics output is in gray scale.
+      > global(colors=\"gray\")
       > LineChart(Y)
 
   Can replace the variable name with a list of multiple variables, such as
@@ -505,7 +497,7 @@ function(topic=NULL) {
   Plot, or sp, generates a scatter plot for any combination of continuous
   or categorical variables with the current color theme. For continuous
   variables, can have an optional data ellipse and fit line.
-      > Plot(X, Y, ellipse=TRUE, fit.line=TRUE)
+      > Plot(X, Y, ellipse=TRUE, fit=TRUE)
   For sorted values of X, a function plot results so that the points are
   not individually displayed and are connected by line segments. If the
   number of unique response values <= n.cat=8, produce a bubble plot.
@@ -517,13 +509,13 @@ function(topic=NULL) {
       > Plot(X, Y, size=Z)
 
   Here plot Salary against 3 variables, with 3 least squares fit lines.
-      > Plot(Salary, c(Pre, Post, Years), fit.line=\"ls\")
-  Here obain a bubble plot of two categorical variables.
+      > Plot(Salary, c(Pre, Post, Years), fit=\"ls\")
+  Here obtain a bubble plot of two categorical variables.
       > Plot(Gender, Dept)
 
   The colors option specifies color themes. Here all subsequent
-  graphics are with the sienna color theme, no transparency.
-      > theme(colors=\"sienna\", trans.fill.pt=0)
+  graphics are with the darkred color theme, no transparency.
+      > global(colors=\"darkred\", trans.fill.pt=0)
       > Plot(X, Y)"
 
   set.up.plot(1)

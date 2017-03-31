@@ -118,7 +118,7 @@ Although not typically needed for analysis, if the output is assigned to an obje
 
 
 \references{
-Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 7, NY: Routledge.
+Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 7, NY: Routledge.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

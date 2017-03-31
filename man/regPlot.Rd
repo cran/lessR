@@ -55,7 +55,7 @@ To help assess the validity of the model, Plot 2 is of the distribution of the r
 }
 
 \references{
-Gerbing, D. W. (2013). R Data Analysis without Programming, Chapters 9 and 10, NY: Routledge.
+Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, NY: Routledge.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

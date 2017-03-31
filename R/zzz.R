@@ -1,27 +1,29 @@
 if (getRversion() >= "2.15.1")
-  globalVariables(c("mydata", "mycor"))
+  globalVariables(c("mydata", "mycor", "P1", "P2", "P3"))
+# clr is for latticeExtra layer function, which requires a global variable
 
 
 .onAttach <-
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.5.5      feedback: gerbing@pdx.edu       web: lessRstats.com\n",
-      "--------------------------------------------------------------------\n",
-      "1. mydata <- Read()       Read text, Excel, SPSS, SAS or R data file\n",
-      "                          or, in RStudio do File --> Import Dataset\n", 
-      "2. Help()                 Get help\n",
-      "3. theme(colors=\"gray\")   Set global settings with theme function\n",
-      "4. hs(), bc(), or ca()    All histograms, all bar charts, or both\n",
-      "5. Plot(X) or Plot(X,Y)   For continuous and categorical variables\n",
-      "6. reg(Y ~ X, Rmd=\"eg\")   Regression + R markdown file that, when\n",
-      "                          knit, provides full interpretative output\n")
+      "lessR 3.6.0      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
+      "---------------------------------------------------------------------\n",
+      "1. mydata <- Read()        Read text, Excel, SPSS, SAS or R data file\n",
+      "                           or, in RStudio do File --> Import Dataset\n", 
+      "2. Help()                  Get help\n",
+      "3. global(\"gray\")          Set theme settings with global function\n",
+      "4. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
+      "5. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
+      "6. reg(Y ~ X, Rmd=\"eg\")    Regression + R markdown file that, when\n",
+      "                           knit, provides full interpretative output\n",
+      "7. by= , by2= , by.group=  Trellis graphics for Histogram, Plot\n")
 
   options(colors="dodgerblue")
-  options(trans.fill.bar=0.25)
-  options(trans.fill.pt=0.50)
-  options(fill.bar="#1874CCBF")  # .maketrans of "dodgerblue3"  trans=.25
-  options(fill.pt="#1874CC80")   # .maketrans of "dodgerblue3"  trans=.50
+  options(trans.fill.bar=0.10)
+  options(trans.fill.pt=0.40)
+  options(fill.bar="#1874CCE0")  # .maketrans("dodgerblue3", 225)  trans=.10
+  options(fill.pt="#1874CC98")   # .maketrans("dodgerblue3", 153)  trans=.40
   options(stroke.bar="steelblue4")
   options(stroke.pt="steelblue4")
   options(fill.ellipse="#1874CC0F")   # .maketrans("dodgerblue3", 15)
@@ -133,7 +135,16 @@ function(...) {
 
 
 # is date function
-.is.date <- function(x) inherits(x, 'Date')
+.is.date <- function(x) {
+
+  isdate <- ifelse(class(x) == "Date", TRUE, FALSE)
+
+  if (!isdate[1])  # ordered factor has more than 1 class
+    isdate <- ifelse(grepl("POSIX",  class(x), fixed=TRUE)[1], TRUE, FALSE)  
+
+  return(isdate)
+
+}
 
 
 # extract sequence of dates from time series y
@@ -336,7 +347,7 @@ function(...) {
 
     if (grepl("\"", var.name)) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "No quotes with the variable name.\n\n")
+        "No quotes allowed with the variable name.\n\n")
     }
 
   # see if "variable" is really an expression
@@ -596,7 +607,7 @@ function(...) {
       tx[length(tx)+1] <- "  - by levels of - "
     else
       tx[length(tx)+1] <- "\n  - by levels of - \n"
-    tx[length(tx)+1] <- txt2
+    tx[length(tx)] <- paste(tx[length(tx)], txt2, sep="")  # no leading blank
     if (is.null(y.lbl))
       tx[length(tx)+1] <- .dash2(max(nchar(txt1),nchar(txt2)))
   }
@@ -611,8 +622,8 @@ function(...) {
                        cex.lab=NULL, graph.win=TRUE, ...) {
 
   if (graph.win) {  # if a graphics window already open, not true for ttest
-    cut.x <- .76 * par("fin")[1]
-    cut.y <- .76 * par("fin")[2]
+    cut.x <- .72 * par("fin")[1]
+    cut.y <- .72 * par("fin")[2]
   }
 
   x.name <- getOption("xname")
@@ -726,18 +737,19 @@ function(...) {
 
   return(list(xn=x.name, xl=x.lbl, xb=x.lab, yn=y.name, yl=y.lbl, yb=y.lab,
               mb=main.lab, sb=sub.lab, cex.lab=cex.lab))
-}
+}  # end .getlabels
 
 
 .axes <- function(x.lvl, y.lvl, axT1, axT2, par1, par3,
-         cex.axis, col.axis, rotate.values=0, offset=0.5, y.only=FALSE, ...) {
+         cex.axis, col.axis, rotate.x=0, rotate.y=0, offset=0.5,
+         y.only=FALSE, ...) {
 
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
     if (!y.only) {  # do x axis in calling routine for time series
       axis(1, at=axT1, labels=FALSE, tck=-.01)
       dec.d <- .getdigits(round(axT1,6),1) - 1
       text(x=axT1, y=par3, labels=.fmt(axT1,dec.d),
-           pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
+           pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.x,
            offset=offset, ...)
     }
   }
@@ -745,27 +757,28 @@ function(...) {
   else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
     axis(1, at=axT1, labels=FALSE, tck=-.01)
     text(x=axT1, y=par3, labels=x.lvl,
-         pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.values,
+         pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.x,
          offset=offset, ...)
   }
 
   if (is.null(y.lvl)  &&  !is.null(axT2)) {
     axis(2, at=axT2, labels=FALSE, tck=-.01)
+    axis(2, at=axT2, labels=FALSE, tck=-.01)
     dec.d <- .getdigits(round(axT2,6),1) - 1
     text(x=par1, y=axT2, labels=.fmt(axT2,dec.d),
-         pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
+         pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.y, ...)
   }
   else if (!is.null(y.lvl)) {
     axis(2, at=axT2, labels=FALSE, tck=-.01)
     text(x=par1, y=axT2, labels=y.lvl,
-         pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, ...)
+         pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.y, ...)
   }
 }
 
 
 # margins
 .marg <- function(max.lm.width, y.lab, x.lab, main, x.val=NULL, prop=FALSE,
-                  rotate.values=0) {
+                  rotate.x=0) {
 
 # x.val contains non-numeric x-axis labels
 
@@ -800,7 +813,7 @@ function(...) {
     tm <- ifelse (is.null(main), tm+.25, tm+.05)  #  compensate tm for increased bm
   }
   if (!is.null(x.lab)) if (grepl("\n", x.lab[1], fixed=TRUE)) bm <- bm + .20
-  if (rotate.values != 0) bm <- bm + .15
+  if (rotate.x != 0) bm <- bm + .15
 
   return(list(lm=lm, tm=tm, rm=rm, bm=bm))
 }
@@ -839,10 +852,10 @@ function(...) {
 }
 
 
-.RSadj <- function(bubble.scale=0.25, cex.axis) {
+.RSadj <- function(radius=0.25, cex.axis) {
 
   # enlarge scale for RStudio
-  if (options("device") == "RStudioGD") bubble.scale <- bubble.scale*1.4
+  if (options("device") == "RStudioGD") radius <- radius*1.4
 
   size.axis <- ifelse (options("device") != "RStudioGD", cex.axis, cex.axis*1.25)
   sz.lab <- getOption("lab.size")  # begin with initial label size from zzz.R
@@ -854,7 +867,7 @@ function(...) {
     # size.axis <- size.axis * 1.1
   # }
 
-  return(list(bubble.scale=bubble.scale, size.axis=size.axis, size.lab=size.lab,
+  return(list(radius=radius, size.axis=size.axis, size.lab=size.lab,
               size.txt=size.txt))
 }
 
@@ -956,7 +969,7 @@ function(...) {
       on.exit(par(orig.params))
     }
   }
-  else  # windows puts a blank first page without the onefile=FALSE 
+  else  # windows puts a blank first page without onefile=FALSE 
     pdf(file=pdf.fnm, width=width, height=height, onefile=FALSE)
 
 }
@@ -999,7 +1012,7 @@ function(...) {
 
   if (!brief)
     cat("    For numeric, set n.cat smaller than ", nu, 
-        " with ", analysis, " or globally with  theme", sep="")
+        " with ", analysis, " or globally with  global", sep="")
 
   cat("\n")
 
@@ -1231,14 +1244,15 @@ function(...) {
 .rm.arg.2 <-  function(argm, fc) {
 
   fc <- sub(",,", ",", fc, fixed=TRUE)
-
+ 
   fc1 <- gsub(argm, "", fc, fixed=TRUE)  # remove all argm from fc
   fc2 <- gsub(",", ", ", fc1, fixed=TRUE)  # each , goes to , space
   fc3 <- gsub("  ", " ", fc2, fixed=TRUE)
+  fc3 <- gsub(") #", ")  #", fc3, fixed=TRUE)  # restore blank before #
 
   if (grepl("(", argm, fixed=TRUE)) fc3 <- gsub("Plot", "Plot(", fc3)
   fc3 <- gsub("((", "(", fc3, fixed=TRUE)
-  fc3 <- gsub(", ,", ",", fc3, fixed=TRUE)
+  fc3 <- sub(", ,", ",", fc3, fixed=TRUE)
 
   return(fc3)
 }

@@ -14,7 +14,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
        cex.axis=0.75, axes="gray30",
 
-       rotate.values=0, offset=0.5,
+       rotate.x=0, rotate.y=0, offset=0.5,
 
        x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
@@ -192,7 +192,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
       stuff <- .dn.main(data[,i], bw, type, histogram, bin.start, bin.width, 
             fill, bg, grid, box, nrm.color, gen.color,
             fill.nrm, fill.gen, 
-            cex.axis, axes, rotate.values, offset, 
+            cex.axis, axes, rotate.x, rotate.y, offset, 
             x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)
 
       txdst <- ""

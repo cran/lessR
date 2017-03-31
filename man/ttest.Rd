@@ -102,8 +102,6 @@ The inferential analysis in the full version provides both homogeneity of varian
 
 If computed from the data, the bandwidth parameter controls the smoothness of the estimated density curve.  To obtain a smoother curve, increase the bandwidth from the default value.
 
-The confidence interval of the standardized mean difference is computed by the \code{ci.smd} function, written by Ken Kelley, from the \code{MBESS} package.
-
 DATA\cr
 If the input data frame is named something different than \code{mydata}, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name without having to invoke the mydata$name notation. 
 
@@ -130,7 +128,8 @@ Returned value is NULL except for a two-group analysis from a formula.  Then the
 
 
 \references{
-Ken Kelley and Keke Lai (2012). MBESS: MBESS. R package version 3.3.3. \url{https://CRAN.R-project.org/package=MBESS}
+Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 8, NY: Routledge.
+
 Kupper and Hafner (1989). The American Statistician, 43(2):101-105.
 }
 

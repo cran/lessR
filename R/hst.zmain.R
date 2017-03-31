@@ -1,14 +1,14 @@
 .hst.main <- 
 function(x, col.fill, col.stroke, col.bg, col.grid,
        col.box, col.reg,
-       over.grid, cex.axis, col.axis, rotate.values, offset,
+       over.grid, cex.axis, col.axis, rotate.x, rotate.y, offset,
        breaks, bin.start, bin.width,
        bin.end, prop, hist.counts, cumul,
-       xlab, ylab, main, sub, quiet, fun.call=NULL, do.plot=TRUE, ...) {
+       xlab, ylab, main, sub, quiet, do.plot=TRUE, fun.call=NULL, ...) {
 
 
   # scale for regular R or RStudio
-  adj <- .RSadj(bubble.scale=NULL, cex.axis)
+  adj <- .RSadj(radius=NULL, cex.axis)
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
 
@@ -22,6 +22,12 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   main.lab <- gl$mb
   sub.lab <- gl$sb
   cex.lab <- gl$cex.lab
+
+  num.cat.x <- .is.num.cat(x, n.cat=getOption("n.cat"))
+  if (num.cat.x) {
+    if (is.null(bin.width)) bin.width <- 1
+    if (is.null(bin.start)) bin.start <- min(x, na.rm=TRUE) - .5 
+  } 
 
   # get breaks from user supplied bin width and/or supplied start value
   if (!is.null(bin.width)  || !is.null(bin.start) || !is.null(bin.end)) {
@@ -110,7 +116,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     max.width <- strwidth(as.character(max(pretty(h$counts))), units="inches")
     
     margs <- .marg(max.width, y.lab, x.lab, main.lab, x.val=NULL, prop,
-                   rotate.values)
+                   rotate.x)
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm
@@ -127,7 +133,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     # axis, axis ticks
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
           par("usr")[1], par("usr")[3], size.axis, col.axis,
-          rotate.values, offset, ...)
+          rotate.x, rotate.y, offset, ...)
 
     # axis labels
     max.lbl <- max(nchar(axTicks(2)))

@@ -2,19 +2,23 @@ importFrom("ellipse", ellipse)
 importFrom("leaps", leaps)
 importFrom("foreign", read.spss)
 importFrom("sas7bdat", read.sas7bdat)
-#importFrom("gdata", read.xls)
 importFrom("triangle", dtriangle, rtriangle)
 importFrom("png", readPNG)
 importFrom("readxl", read_excel)
-# importFrom("MBESS", ci.smd)
+#importFrom("gdata", read.xls)
+#importFrom("MBESS", ci.smd)
 
 importFrom("graphics", "abline", "arrows", "axis", "axis.Date", "barplot", "box", "boxplot", "hist", "legend", "lines", "mtext", "pairs", "par", "pie", "plot", "plot.default", "plot.new", "plot.window", "points", "polygon", "rasterImage", "rect", "rug", "segments", "stripchart", "strwidth", "sunflowerplot", "symbols", "text", "title", "axTicks", "smoothScatter")
 
 importFrom("grDevices", "boxplot.stats", "col2rgb", "colorRampPalette", "colors", "dev.list", "dev.new", "dev.off", "dev.set", "gray", "heat.colors", "palette", "pdf", "rainbow", "rgb", "terrain.colors")
 
-importFrom("stats", "confint.default", "IQR", "TukeyHSD", "addmargins", "anova", "aov", "as.formula", "chisq.test", "coef", "complete.cases", "confint", "cooks.distance", "cor", "cor.test", "cov", "density", "dffits", "dlnorm", "dnorm", "dt", "dunif", "factanal", "fitted", "frequency", "glm", "heatmap", "interaction.plot", "lm", "lm.influence", "loadings", "loess", "lowess", "median", "na.omit", "pf", "pnorm", "power.t.test", "predict", "promax", "pt", "qnorm", "qt", "quantile", "rbinom", "replications", "residuals", "rlnorm", "rnorm", "rstandard", "rstudent", "runif", "sd", "shapiro.test", "start", "t.test", "terms.formula", "var", "varimax", "is.ts", "time",  "weighted.mean")
+importFrom("stats", "confint.default", "IQR", "TukeyHSD", "addmargins", "anova", "aov", "as.formula", "chisq.test", "coef", "complete.cases", "confint", "cooks.distance", "cor", "cor.test", "cov", "density", "dffits", "dlnorm", "dnorm", "dt", "dunif", "factanal", "fitted", "frequency", "glm", "heatmap", "interaction.plot", "lm", "lm.influence", "loadings", "loess", "lowess", "median", "mahalanobis", "na.omit", "pf", "pnorm", "power.t.test", "predict", "promax", "pt", "qnorm", "qt", "quantile", "rbinom", "replications", "residuals", "rlnorm", "rnorm", "rstandard", "rstudent", "runif", "sd", "shapiro.test", "start", "t.test", "terms.formula", "update", "var", "varimax", "is.ts", "time",  "weighted.mean")
 
 importFrom("utils", "head", "help", "packageVersion", "read.csv", "read.fwf", "read.table", "type.convert", "write.csv", "write.table")
+
+importFrom("lattice", "trellis.par.get", "trellis.par.set", "xyplot", "histogram", "panel.grid", "panel.xyplot", "panel.loess", "panel.lmline")
+
+importFrom("latticeExtra", "layer", "panel.ellipse", "panel.xyarea")
 
 S3method(print, out_all)
 S3method(print, out_piece)
@@ -39,7 +43,8 @@ export (
   corReflect, reflect, corProp, prop, corRead,
   corScree, scree, corEFA, efa,
   Density, dn,
-  details, details.brief, 
+  details, details.brief,
+  global,
   Help,
   Histogram, hs,
   label,

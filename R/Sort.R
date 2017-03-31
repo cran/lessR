@@ -36,7 +36,7 @@ function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
     if (txt =="descending") ord.txt <- "decreasing=TRUE"
     ord <- paste(ord, ",", ord.txt, ",...)", sep="")
     cat(" ", txt, "\n") 
-  }
+  }  # end row.names
 
   else if (deparse(substitute(by)) == "random") {
     cat(" ", "random\n")
@@ -46,6 +46,7 @@ function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
 
   else {  # sort variable(s)
 
+    # columns to sort
     by.col <- eval(substitute(by), envir=all.vars, enclos=parent.frame())
     n.sort <- length(by.col)
 
@@ -59,7 +60,8 @@ function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
         "the list of values and the list of the sort direction.\n\n")
       }
     }
-    else for (i in 1:n.sort) direction[i] <- "+"
+    else
+      for (i in 1:n.sort) direction[i] <- "+"
 
     # console output
     if (!quiet) {

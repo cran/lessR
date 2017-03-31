@@ -30,7 +30,7 @@ Density(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
        cex.axis=0.75, axes="gray30",
 
-       rotate.values=0, offset=0.5,
+       rotate.x=0, rotate.y=0, offset=0.5,
 
        x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
@@ -67,9 +67,12 @@ dn(\ldots)
   \item{bin.width}{Optional specified bin width, which can be specified with or
         without a \code{bin.start} value.}\cr
 
-  \item{fill}{Default (for default color theme of \code{"dodgerblue"}) is to
-       display the histogram in a light gray.  To suppress, the histogram,
-       specify a color of \code{"transparent"}.}
+  \item{fill}{Interior fill color of the histogram bars. To suppress the color
+       of the bars, specify a color of \code{"off"}. This
+       and the following colors can also be changed globally, individually and as 
+       a color theme, with the \code{lessR} \code{\link{global}} function. The
+       \code{lessR} function \code{\link{showColors}} provides examples of all
+       R named colors.}
   \item{bg}{Color of the plot background.}
   \item{grid}{Color of the grid lines.}
   \item{box}{Color of border around the plot background, the box, that encloses 
@@ -87,8 +90,9 @@ dn(\ldots)
         values to be smaller than the axis labels.}
   \item{axes}{Color of the font used to label the axis values.}\cr
 
-  \item{rotate.values}{Degrees that the axis values are rotated, usually to
+  \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
         accommodate longer values, typically used in conjunction with \code{offset}.}
+  \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when
         longer axis value names are rotated.}\cr
@@ -108,7 +112,7 @@ dn(\ldots)
   \item{digits.d}{Number of significant digits for each of the displayed summary
         statistics.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-        with \code{\link{theme}} function.}
+        with \code{\link{global}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
   \item{pdf}{If \code{TRUE}, graphics are to be redirected to a pdf file.}
@@ -138,7 +142,7 @@ DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 COLOR THEME\cr
-Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
+Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{global}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{global}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.

@@ -9,13 +9,14 @@ R works by entering function names and arguments.  R provides extensive help for
 }
 
 \usage{
-Help(topic=NULL)
+Help(topic=NULL, width=4.5, height=4.5)
 }
 
 
 \arguments{
   \item{topic}{Message reference, either null to specify a list of available topics or a specific argument to reference a specific help message.}
-  \item{\dots}{Other parameter values to be passed to Help.}
+  \item{width}{Width of Help window.}
+  \item{height}{Height of Help window.}
 }
 
 \details{
@@ -27,6 +28,8 @@ Help(topic=NULL)
 
 ---
 
+\code{global}: System level settings, such as a color theme for graphics.
+
 \code{data}: Create a csv data file from a worksheet application.
 
 \code{Read}: Read an external data file in csv format.
@@ -37,17 +40,15 @@ Help(topic=NULL)
 
 \code{transform}: Edit and create new variables from existing variables.
 
-\code{theme}: System level settings, such as a color theme for graphics.
-
 ---
 
 \code{Histogram}: Histogram, box plot, dot plot and density curve..
 
 \code{BarChart}: Bar chart or pie chart of a categorical variable.
 
-\code{Plot}: Scatterplot for one or two variables, line chart.
+\code{LineChart}: Run chart or time series chart.
 
-\code{RunChart}: Run chart or time series chart.
+\code{Plot}: Scatterplot for one or two variables, line chart.
 
 ---
 
@@ -65,7 +66,7 @@ Help(topic=NULL)
 
 \code{Regression}: Regression analysis.
 
-\code{Logistic}: Logistic regression analysis.
+\code{Logit}: Logistic regression analysis.
 
 \code{factor.analysis}: Confirmatory or exploratory factor analysis.
 

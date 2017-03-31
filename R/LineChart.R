@@ -11,7 +11,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
          shape.pts=21, cex.axis=0.75, axes="gray30",
 
-         rotate.values=0, offset=.5,
+         rotate.x=0, rotate.y=0, offset=.5,
 
          xy.ticks=TRUE, line.width=1,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL, cex=NULL,
@@ -39,17 +39,18 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      old.nm <- c("col.fill", "col.stroke", "col.bg", "col.grid", "col.box",
-                  "col.line", "col.axis", "col.area")
-      if (names(dots)[i] %in% old.nm) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  now begin with  ",
-          "color \n\n")
-      }
       if (grepl("color.", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "color options dropped the  color. prefix\n",
-          "eg., fill, instead of color.fill.\n\n")
+          "eg., fill, instead of color.fill\n\n")
+      }
+      if (grepl("col.", names(dots)[i], fixed=TRUE)) 
+        if (names(dots)[i] != "col.main"  &&
+            names(dots)[i] != "col.lab"  &&
+            names(dots)[i] != "col.sub") {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "color options dropped the  col. prefix\n",
+            "eg., fill, instead of col.fill\n\n")
       }
     }
   }
@@ -135,7 +136,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
       .lc.main(data[,i], type,
          line, area, stroke, fill, shape.pts,
          grid, box, bg, cex.axis, axes,
-         rotate.values, offset, xy.ticks,
+         rotate.x, rotate.y, offset, xy.ticks,
          line.width, xlab, ylab, main, sub, cex,
          time.start, time.by, time.reverse, 
          center.line, show.runs, quiet, ...)

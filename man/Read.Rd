@@ -144,7 +144,7 @@ The read data frame is returned, usually assigned the name of \code{mydata} as i
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \references{
-Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 2, NY: Routledge.
+Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 2, NY: Routledge.
 
 Wickham, H. (2015). Read Excel Files. \url{https://CRAN.R-project.org/package=readxl} 
 }

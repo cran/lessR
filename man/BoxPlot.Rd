@@ -27,13 +27,13 @@ BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         cex.axis=0.75, axes="gray30",
         xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
 
-        rotate.values=0, offset=0.5,
+        rotate.x=0, rotate.y=0, offset=0.5,
 
         horiz=TRUE, add.points=FALSE,
 
         quiet=getOption("quiet"),
         width=4.5, height=4.5, pdf=FALSE,
-        fun.call=NULL, \ldots)
+        do.plot=TRUE, fun.call=NULL, \ldots)
 
 bx(\ldots)
 }
@@ -54,7 +54,12 @@ bx(\ldots)
   \item{Rmd}{File name for the file of R markdown instructions to be written,
         if specified.}\cr
 
-  \item{fill}{Interior color of the box. Turn off with \code{fill="off"}.}
+  \item{fill}{Interior color of the box. Turn off with \code{fill="off"}.
+       This and the following colors can also be changed globally, individually
+       and as 
+       a color theme, with the \code{lessR} \code{\link{global}} function.
+       The \code{lessR} function \code{\link{showColors}} provides examples of all
+       R named colors.}
   \item{stroke}{Color of any points that designate outliers. By default this
        is the same color as the box.}
   \item{bg}{Color of the plot background. Turn off with \code{bg="off"}.}
@@ -71,9 +76,9 @@ bx(\ldots)
   \item{sub}{Sub-title of graph, below xlab.}
   \item{digits.d}{Number of decimal digits displayed in the listing of the summary
        statistics.}\cr
-
-  \item{rotate.values}{Degrees that the axis values are rotated, usually to accommodate
-        longer values, typically used in conjunction with \code{offset}.}
+  \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
+        accommodate longer values, typically used in conjunction with \code{offset}.}
+  \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when
         longer axis value names are rotated.}\cr
@@ -83,10 +88,11 @@ bx(\ldots)
        box plot.}\cr
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
-       \code{\link{theme}} function.}
+       \code{\link{global}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
   \item{pdf}{If \code{TRUE}, graphics to be redirected to a pdf file.}
+  \item{do.plot}{If \code{TRUE}, the default, then generate the plot.}
   \item{fun.call}{Function call. Used with \code{knitr} to pass the function call when
         obtained from the abbreviated function call \code{bx}.}\cr
 
@@ -113,7 +119,7 @@ The data may either be a vector from the global environment, the user's workspac
 To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.  To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{fill} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{theme}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{theme}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
+Individual colors in the plot can be manipulated with options such as \code{fill} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{global}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{global}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
 
 For the color options, such as \code{grid}, the value of \code{"off"} is the same as 
 \code{"transparent"}.
@@ -159,13 +165,13 @@ Although not typically needed, if the output is assigned to an object named, for
 }
 
 \references{
-Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 5, NY: Routledge.
+Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 5, NY: Routledge.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{boxplot}}, \code{\link{bxp}}, \code{\link{par}}, \code{\link{theme}}.
+\code{\link{boxplot}}, \code{\link{bxp}}, \code{\link{par}}, \code{\link{global}}.
 }
 
 \examples{
@@ -215,7 +221,7 @@ b$out_stats
 names(b)
 
 # box plot with rotated axis values, offset more from axis
-BoxPlot(Salary, rotate.values=45, offset=1)
+BoxPlot(Salary, rotate.x=45, offset=1)
 
 # BoxPlot generates R markdown file to be "knit"
 #  such as in RStudio

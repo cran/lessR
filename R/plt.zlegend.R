@@ -4,20 +4,12 @@ function(colnms, horiz, stroke, fill, shape, col.bg, usr, cex.lab=0.8) {
   par(xpd=NA) 
   
   # text color
-  the.clr <- ifelse(grepl(".black", getOption("colors")), "gray90", "black")
+  the.clr <- ifelse(sum(col2rgb(col.bg)) < 370, "gray90", "black")
 
   ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
                horiz=TRUE, plot=FALSE)  # get coordinates
 
   if (horiz) {
-
-    #mlt <- 1
-    # kludge to get RStudio box wider 
-    #if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
-      #colnms[length(colnms)] <- paste(colnms[length(colnms)], "     ", sep="")
-      #mlt <- 2
-    #mlt <- ifelse (options("device") == "RStudioGD", 2, 1.25)
-    #}
 
     size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates, [2] is y 
 
@@ -36,12 +28,6 @@ function(colnms, horiz, stroke, fill, shape, col.bg, usr, cex.lab=0.8) {
   }
 
   else {  # vertical
-
-    # kludge to get RStudio box wider 
-    #if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
-      #max.width <- which(nchar(colnms) == max(nchar(colnms)))
-      #colnms[max.width] <- paste(colnms[max.width], "     ", sep="")
-    #}
 
     ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
                  horiz, plot=FALSE)  # get coordinates

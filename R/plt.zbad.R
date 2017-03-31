@@ -1,4 +1,4 @@
-.plt.zbad <-
+.plt.bad <-
 function (x.miss, y.miss, values, method, breaks, bin.start, ...) {
 
   # check for dated parameters no longer used
@@ -6,30 +6,49 @@ function (x.miss, y.miss, values, method, breaks, bin.start, ...) {
   
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      old.nm <- c("col.fill", "col.stroke", "col.bg", "col.grid", "col.box",
-                  "col.reg", "col.axis", "col.trans", "col.low", "col.hi",
-                  "col.ellipse", "col.fill.ellipse", "col.fit.line", "col.out30",
-                  "col.out15")
-      if (names(dots)[i] %in% old.nm) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  now begin with  ",
-          "color \n\n")
-      }
       if (grepl("color.", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "color options dropped the  color. prefix\n",
-          "eg., fill, instead of color.fill.\n\n")
+          "eg., fill, instead of color.fill\n\n")
+      }
+      if (grepl("col.", names(dots)[i], fixed=TRUE)) 
+        if (names(dots)[i] != "col.main"  &&
+            names(dots)[i] != "col.lab"  &&
+            names(dots)[i] != "col.sub") {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "color options dropped the  col. prefix\n",
+            "eg., fill, instead of col.fill\n\n")
       }
       if (grepl("fit.line", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "fit.line options dropped the  .line suffix\n",
-          "eg., fit, instead of fit.line.\n\n")
+          "eg., fit, instead of fit.line\n\n")
       }
       if (names(dots)[i] %in% c("x.start","x.end","y.start","y.end")) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "x.start, x.end, y.start, and y.end no longer used\n\n",
           "Instead use the standard R xlim and ylim parameters,\n",
-          "such as xlim=c(0,40) to specify from 0 to 40. Same for ylim.\n\n")
+          "such as xlim=c(0,40) to specify from 0 to 40. Same for ylim\n\n")
+      }
+      if (names(dots)[i] == "line.chart") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  line.chart  is renamed  run\n\n")
+      }
+      if (names(dots)[i] == "line.width") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  line.width  is renamed  lwd\n\n")
+      }
+      if (names(dots)[i] == "bubble.size") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  bubble.size  is renamed  radius\n\n")
+      }
+      if (names(dots)[i] == "bubble.scale") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  bubble.scale  is renamed  power\n\n")
+      }
+      if (names(dots)[i] == "bubble.text") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  bubble.text  is renamed  labels\n\n")
       }
       if (names(dots)[i] == "topic") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -61,6 +80,14 @@ function (x.miss, y.miss, values, method, breaks, bin.start, ...) {
       if (names(dots)[i] == "diag") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "diag  option no longer available\n\n")
+      }
+      if (names(dots)[i] == "low.color") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  low.color  is renamed  low.fill\n\n")
+      }
+      if (names(dots)[i] == "hi.color") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  hi.color  is renamed  hi.fill\n\n")
       }
     }
   }

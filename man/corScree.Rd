@@ -39,6 +39,10 @@ If the two plots, of the population and sample distributions respectively, are w
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
+\references{
+Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, NY: Routledge.
+}
+
 \seealso{
 \code{\link{Correlation}}.
 }

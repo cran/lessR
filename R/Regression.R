@@ -161,7 +161,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     data <- data[o,]
   }
 
-  if (is.null(digits.d)) digits.d <- .getdigits(data[,nm[1]], 2)
+  if (is.null(digits.d)) digits.d <- .getdigits(data[,nm[1]], 3)
   options(digits.d=digits.d) 
 
 

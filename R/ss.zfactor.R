@@ -13,7 +13,8 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
   tx[length(tx)+1] <- ""
 
   # col labels
-  tx[length(tx)+1] <-  .fmtc(x.name, w=max.c1+3)
+  if (!is.null(x.name))
+    tx[length(tx)+1] <-  .fmtc(x.name, w=max.c1+3)
   tx[length(tx)+1] <-  format(y.name, width=max.c1, justify="left")
   w <- nchar(as.character(sum(x)))
   for (i in 1:ncol(x))
@@ -70,7 +71,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
     # potential abbreviation of column labels
     mx.chr <- max(nchar(colnames(x)))
     if (mx.chr > label.max) {
-      c.nm <- colnames(x)
+      c.nm <- colnames(x)  # store for later use
       colnames(x) <- .abbrev(colnames(x), label.max)
     }
 
@@ -201,7 +202,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
     # potential abbreviation of column labels
     mx.chr <- max(nchar(names(x)))
     if (mx.chr > label.max) {
-      c.nm <- names(x)
+      c.nm <- names(x)  # store for later use
       names(x) <- .abbrev(names(x), label.max)
     }
 
@@ -213,7 +214,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
        if (max.ln[i] < 6) max.ln[i] <- 6
      }
 
-      tx <- character(length = 0)
+      tx <- character(length=0)
 
       tx[length(tx)+1] <- format("", width=13)
       w <- nchar(as.character(sum(x)))

@@ -33,7 +33,7 @@ function(x, miss, show.n, digits.d,
          #"      so treat as a categorical variable.\n",
          #"    To obtain the correlations decrease  n.cat  to specify a",
          #"lower number\n",
-         #"      of unique values, such as with the function: theme\n",
+         #"      of unique values, such as with the function: global\n",
          #"    Perhaps make this variable a factor with the R factor function.\n")
     #}
 
