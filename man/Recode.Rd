@@ -32,7 +32,7 @@ rec(\ldots)
   \item{data}{The name of the data frame from which to create the subset, which
        is \code{mydata} by default.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-       with \code{\link{theme}} function.}
+       with \code{\link{style}} function.}
   \item{\dots}{Parameter values.}
 }
 

@@ -24,12 +24,13 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE, ylim=c(0,1.1))
 
   usr <- par("usr")
-  col.bg <- getOption("bg")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+  rect(usr[1], usr[3], usr[2], usr[4],
+       col=getOption("bg.fill"), border=getOption("bg.stroke"))
 
-  col.grid <- getOption("grid")
-  abline(v=axTicks(1), col=col.grid, lwd=.5)
-  abline(h=axTicks(2), col=col.grid, lwd=.5)
+  abline(v=axTicks(1), col=getOption("grid.x.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+  abline(h=axTicks(2), col=getOption("grid.y.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
   .axes(NULL, NULL, axTicks(1), axTicks(2),
         par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30")
@@ -40,8 +41,8 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   y.label <- "Power"
   .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
 
-  col.fill <- getOption("fill.pt")
-  col.stroke <- getOption("stroke.pt")
+  col.fill <- getOption("pt.fill")
+  col.stroke <- getOption("pt.stroke")
   points(x.values, y.values, pch=21, type="l", col=col.stroke,
          bg=col.fill, cex=0.8)
 
@@ -56,7 +57,7 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
                side=3, line=1, font=3, cex=0.9)
 
   # delta for a power of mdp, default is 0.8
-  clr <- getOption("colors")
+  clr <- getOption("theme")
   if (clr != "gray") col80 <- "firebrick4" else col80 <- "gray20"
   if (mdp != 0) {
     pp <- power.t.test(n=n, sd=s, power=mdp, type=mytype)

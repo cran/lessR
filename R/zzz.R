@@ -1,55 +1,84 @@
 if (getRversion() >= "2.15.1")
   globalVariables(c("mydata", "mycor", "P1", "P2", "P3"))
-# clr is for latticeExtra layer function, which requires a global variable
+# Pn is for latticeExtra layer function
 
 
 .onAttach <-
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.6.0      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
+      "lessR 3.6.2      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
       "---------------------------------------------------------------------\n",
       "1. mydata <- Read()        Read text, Excel, SPSS, SAS or R data file\n",
-      "                           or, in RStudio do File --> Import Dataset\n", 
       "2. Help()                  Get help\n",
-      "3. global(\"gray\")          Set theme settings with global function\n",
-      "4. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
-      "5. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
+      "3. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
+      "4. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
+      "5. by1= , by2=             Trellis graphics, a plot for each by1, by2\n",
       "6. reg(Y ~ X, Rmd=\"eg\")    Regression + R markdown file that, when\n",
       "                           knit, provides full interpretative output\n",
-      "7. by= , by2= , by.group=  Trellis graphics for Histogram, Plot\n")
+      "7. style(\"gold\", sub.theme=\"black\")   Set theme and sub.theme\n",
+      "                           Use style(\"dodgerblue\") for original theme\n")
 
-  options(colors="dodgerblue")
-  options(trans.fill.bar=0.10)
-  options(trans.fill.pt=0.40)
-  options(fill.bar="#1874CCE0")  # .maketrans("dodgerblue3", 225)  trans=.10
-  options(fill.pt="#1874CC98")   # .maketrans("dodgerblue3", 153)  trans=.40
-  options(stroke.bar="steelblue4")
-  options(stroke.pt="steelblue4")
-  options(fill.ellipse="#1874CC0F")   # .maketrans("dodgerblue3", 15)
-  options(se.fill="#1874CC19")   # .maketrans("dodgerblue3", 25)
-  options(bg="grey92")
-  options(grid="white")
-  options(box="gray30")
-  options(color.ghost=FALSE)
-  options(heat="dodgerblue4")
+  options(theme = "lightbronze")
+  options(sub.theme = "default")
+  options(device.fill = "#F7F2E6")  # rgb(247,242,230, maxColorValue=255)
+  options(bg.fill = "transparent")
+  options(bg.stroke = "#DED9CD")  # rgb(222,217,205, maxColorValue=255)
+
+  options(trans.bar.fill = 0.10)
+  options(trans.pt.fill = 0.00)
+  options(bar.fill = "#7F7F7FE6")  # .maketrans("gray50", .to256("trans.bar.fill"))
+  options(bar.stroke = "gray30")
+  options(pt.fill = "gray20")
+  options(pt.stroke = "gray20")
+  options(bubble.fill = "#7F7F7FE6") 
+  options(ellipse.fill = "#8B8B8B37")   # .maketrans("gray55", 55)
+  options(se.fill = "#1A1A1A19")   # .maketrans("gray10", 25)
+  options(fit.stroke = "gray15")
+  options(heat = "gray30")
+
+  options(main.stroke = "gray15")
+  options(lab.stroke = "gray15")
+  options(values.stroke = "gray15")
+  options(axis.x.stroke = "gray15")
+  options(axis.y.stroke = "gray15")
+  options(segment.stroke = "gray15")
+  options(bubble.text.stroke = "#F7F2E6")  # rgb(247,242,230, maxColorValue=255)
+
+  options(grid.x.stroke = "#DED9CD")  # rgb(222,217,205, maxColorValue=255)
+  options(grid.y.stroke = "#DED9CD")  # rgb(222,217,205, maxColorValue=255)
+  options(grid.lwd=0.5)
+  options(grid.lty="solid")
+
+  options(cex.axis = 0.76)
+  options(rotate.x = 0)
+  options(rotate.y = 0)
+  options(offset = 0.5)
+
+  options(bg.lwd = 0.5)
+  options(bg.lty = "solid")
   #Plot(Years, Salary, bg="grey85", grid="grey77") on cheap Dell monitor
 
-  options(n.cat=8)
-  options(lab.size=0.84)  # initial axis label size, adjusted for RStudio, Win
-  options(suggest=TRUE)
-  options(quiet=FALSE)
-  options(brief=FALSE)
-  options(ghost=FALSE)
+  options(add.cex = 1)
+  options(add.lwd = 1)
+  options(add.lty = "solid")
+  options(add.stroke = "gray50")
+  options(add.fill = getOption("pt.fill"))
 
-  options(explain=TRUE)
-  options(interpret=TRUE)
-  options(results=TRUE)
-  options(document=TRUE)
-  options(code=TRUE)
+  options(n.cat = 8)
+  options(lab.size = 0.95)  # initial axis label size, adjusted for RStudio, Win
+  options(suggest = TRUE)
+  options(quiet = FALSE)
+  options(brief = FALSE)
 
-  options(show.signif.stars=FALSE)
-  options(scipen=30)
+  options(explain = TRUE)
+  options(interpret = TRUE)
+  options(results = TRUE)
+  options(document = TRUE)
+  options(code = TRUE)
+
+  options(show.signif.stars = FALSE)
+  options(scipen = 30)
 
 }
 
@@ -219,13 +248,13 @@ function(...) {
   # see if analysis is from descriptive stats or from data 
   from.data <- ifelse (var.name == "NULL", FALSE, TRUE)
 
-  # see if the variable exists in the Global Environment
-  in.global <- FALSE
+  # see if the variable exists in the global environment
+  in.style <- FALSE
   if (nchar(var.name)>0) if (exists(var.name, where=.GlobalEnv)) {
-    # a global "var" could be the name of a function
+    # a style "var" could be the name of a function
     # var.name is a character string, so convert to an object
     if (!is.function(eval(parse(text=var.name)))) {
-      in.global <- TRUE
+      in.style <- TRUE
       if (!quiet)
         cat(">>> Note: ", var.name, "exists in the workspace, outside of",
             "a data frame (table)\n")
@@ -244,13 +273,13 @@ function(...) {
         txtA, txtB, txtC, "\n")
   }
 
-  if (!in.global && from.data) .nodf(dname)
+  if (!in.style && from.data) .nodf(dname)
  
-  return(list(ifr=is.frml, fd=from.data, ig=in.global))
+  return(list(ifr=is.frml, fd=from.data, ig=in.style))
 }
 
 
-.getdfs <- function() {  # get list of data frames in global env
+.getdfs <- function() {  # get list of data frames in style env
 
   objs <- function(x) class(get(x))
 
@@ -262,9 +291,9 @@ function(...) {
 
 .nodf <- function(dname) {
 
-  # see if the data frame exists (mydata default), if x from data, not in Global Env
+  # see if the data frame exists (mydata default), if x from data, not in style Env
   if (!exists(dname, where=.GlobalEnv)) {
-    dfs <- .getdfs()  # list of data frames in global env
+    dfs <- .getdfs()  # list of data frames in style env
     txtA <- ifelse (dname == "mydata", ", the default data table name, ", " ") 
 
     if ("Mydata" %in% dfs)
@@ -375,7 +404,7 @@ function(...) {
 
     # see if variable exists in the data frame
     if (!exists(var.name, where=data)) { 
-      dfs <- .getdfs()  # data frames in global
+      dfs <- .getdfs()  # data frames in style
 
       txt1 <- ", the default name \n\n"
       txt2 <- "Either make sure to use the correct variable name, or\n"
@@ -604,7 +633,7 @@ function(...) {
   tx[length(tx)+1] <- txt1
   if (!isnullby) {
     if (is.null(y.lbl))
-      tx[length(tx)+1] <- "  - by levels of - "
+      tx[length(tx)+1] <- "  - by levels of - \n"
     else
       tx[length(tx)+1] <- "\n  - by levels of - \n"
     tx[length(tx)] <- paste(tx[length(tx)], txt2, sep="")  # no leading blank
@@ -621,7 +650,9 @@ function(...) {
 .getlabels <- function(xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
                        cex.lab=NULL, graph.win=TRUE, ...) {
 
-  if (graph.win) {  # if a graphics window already open, not true for ttest
+  # if a graphics window already open, not true for ttest
+  # otherwise a call to par will open a window in regular R
+  if (graph.win) {
     cut.x <- .72 * par("fin")[1]
     cut.y <- .72 * par("fin")[2]
   }
@@ -746,32 +777,33 @@ function(...) {
 
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
     if (!y.only) {  # do x axis in calling routine for time series
-      axis(1, at=axT1, labels=FALSE, tck=-.01)
+      axis(1, at=axT1, labels=FALSE, tck=-.01, col=getOption("axis.x.stroke"))
       dec.d <- .getdigits(round(axT1,6),1) - 1
       text(x=axT1, y=par3, labels=.fmt(axT1,dec.d),
-           pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.x,
-           offset=offset, ...)
+           pos=1, xpd=TRUE, cex=cex.axis, col=getOption("values.stroke"),
+           srt=rotate.x, offset=offset, ...)
     }
   }
   
   else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
     axis(1, at=axT1, labels=FALSE, tck=-.01)
     text(x=axT1, y=par3, labels=x.lvl,
-         pos=1, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.x,
-         offset=offset, ...)
+         pos=1, xpd=TRUE, cex=cex.axis, col=getOption("values.stroke"),
+         srt=rotate.x, offset=offset, ...)
   }
 
   if (is.null(y.lvl)  &&  !is.null(axT2)) {
-    axis(2, at=axT2, labels=FALSE, tck=-.01)
-    axis(2, at=axT2, labels=FALSE, tck=-.01)
+    axis(2, at=axT2, labels=FALSE, tck=-.01, col=getOption("axis.y.stroke"))
     dec.d <- .getdigits(round(axT2,6),1) - 1
     text(x=par1, y=axT2, labels=.fmt(axT2,dec.d),
-         pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.y, ...)
+         pos=2, xpd=TRUE, cex=cex.axis, col=getOption("values.stroke"),
+         srt=rotate.y, ...)
   }
   else if (!is.null(y.lvl)) {
     axis(2, at=axT2, labels=FALSE, tck=-.01)
     text(x=par1, y=axT2, labels=y.lvl,
-         pos=2, xpd=TRUE, cex=cex.axis, col=col.axis, srt=rotate.y, ...)
+         pos=2, xpd=TRUE, cex=cex.axis, col=getOption("values.stroke"),
+         srt=rotate.y, ...)
   }
 }
 
@@ -792,7 +824,7 @@ function(...) {
   if (!is.null(y.lab)) if (grepl("\n", y.lab[1], fixed=TRUE)) lm <- lm + .15
    
   # top margin
-  tm <- 0.075
+  tm <- 0.1
 
   if (!is.null(main)) tm <- tm + .25
   # if (options("device") == "RStudioGD") {
@@ -800,7 +832,7 @@ function(...) {
   # }
   
   # right margin
-  rm <- 0.075
+  rm <- 0.1
  
   # bottom margin
   bm <- 0.70
@@ -821,7 +853,7 @@ function(...) {
 
   # axis labels
   .axlabs <- function(x.lab, y.lab, main.lab, sub.lab, max.lbl.y,
-                    x.val=NULL, xy.ticks=TRUE, offset=0.5, main.cex=1, ...) {
+                      x.val=NULL, xy.ticks=TRUE, offset=0.5, main.cex=1, ...) {
 
   # xlab positioning
   lblx.lns <- ifelse (grepl("\n", x.lab, fixed=TRUE), 4.2, 3.1)
@@ -844,23 +876,29 @@ function(...) {
   lm <- par("mar")[2]  # get the current left margin
   lbly.lns <- ifelse (multi, lm - 2.1, lm - 1.4)
 
-  title(xlab=x.lab, line=lblx.lns, ...)
-  title(sub=sub.lab, line=lblx.lns+1, cex.sub=0.76, ...)
-  title(ylab=y.lab, line=lbly.lns, ...)
-  title(main=main.lab, cex.main=main.cex, ...)
+  title(xlab=x.lab, line=lblx.lns, col.lab=getOption("lab.stroke"), ...)
+  title(sub=sub.lab, line=lblx.lns+1, cex.sub=0.76,
+        col.lab=getOption("lab.stroke"), ...)
+  title(ylab=y.lab, line=lbly.lns, col.lab=getOption("lab.stroke"), ...)
+  title(main=main.lab, cex.main=main.cex,
+        col.main=getOption("main.stroke"), ...)
 
 }
 
 
-.RSadj <- function(radius=0.25, cex.axis) {
+.RSadj <- function(radius=0.25, cex.axis, cex.names=NULL, cex.lab=NULL) {
 
   # enlarge scale for RStudio
   if (options("device") == "RStudioGD") radius <- radius*1.4
 
   size.axis <- ifelse (options("device") != "RStudioGD", cex.axis, cex.axis*1.25)
-  sz.lab <- getOption("lab.size")  # begin with initial label size from zzz.R
-  size.lab <- ifelse (options("device") != "RStudioGD", sz.lab, sz.lab*1.3)
-  size.txt <- ifelse (options("device") != "RStudioGD", 0.7, 0.8)
+  if (is.null(cex.names))
+    size.txt <- ifelse (options("device") != "RStudioGD", 0.7, 0.8)
+  else
+    size.txt <- ifelse (options("device") != "RStudioGD", cex.names, cex.names*1.15)
+
+  sz.lab <- ifelse(is.null(cex.lab), getOption("lab.size"), cex.lab)
+  size.lab <- ifelse (options("device") != "RStudioGD", sz.lab, sz.lab*1.12)
   
   # if (.Platform$OS == "windows") {
     # size.lab <- size.lab * 1.1
@@ -1012,7 +1050,7 @@ function(...) {
 
   if (!brief)
     cat("    For numeric, set n.cat smaller than ", nu, 
-        " with ", analysis, " or globally with  global", sep="")
+        " with ", analysis, " or globally with  style", sep="")
 
   cat("\n")
 
@@ -1057,17 +1095,24 @@ function(...) {
 
 
 # discrete color steps with no order
+# bright option not currently functioning
 .col.discrete <- function(bright=FALSE) {
 
-  # based on rainbow_hcl(24,c=40,l=70) from colorspace
+  # based on rainbow_hcl(8,c=50,l=70) from colorspace
   # 92ADD6 is rgb 146,173,214, a kind of medium steel blue
   if (!bright)
-    clr <- c("#92ADD6", "#D59E93", "#7FB88B", "#BDAA78", "#D09AC8",
-             "#64B8C1", "#C19FD3", "#D899B8")
+    clr <- c("#64B5D6", "#E495A5", "#72BB83", "#D2A277", "#ACA4E2",
+             "#39BEB1", "#D995CF", "#ABB065")
   # based on rainbow_hcl(8,c=80,l=65) from colorspace
   else
-    clr <- c( "#57A2F0", "#E68369", "#1DB556", "#BD9B00", "#E475D6",
-              "#00B7C7", "#CA80EA", "#F072B8")
+    clr <- c("#00AFE0", "#F07894", "#1DB556", "#1DB556", "#9F91F3",
+              "#00BAA7", "#E475D6", "#9DA500")
+
+  if (grepl(".black", getOption("theme"), fixed=FALSE)) {
+    clr <- c("#737373", "#A6A6A6", "#BFBFBF", "#4D4D4D", "#9C9C9C",
+             "#4D4D4D", "#B4B4B4", "#7D7D7D") 
+  }
+
 
   return(clr)
 
@@ -1075,61 +1120,69 @@ function(...) {
 
 
 # for BarChart 1-var and PieChart for an ordered factor
-.ordcolors <- function(colors, col.low=NULL, col.hi=NULL) {
+.ordcolors <- function(theme, col.low=NULL, col.hi=NULL) {
 
-    if (colors == "dodgerblue") { 
+    if (theme == "lightbronze") { 
+      if (is.null(col.low)) col.low <- "gray40"
+      if (is.null(col.hi)) col.hi <- "gray70"
+    }
+    if (theme == "dodgerblue") { 
       if (is.null(col.low)) col.low <- rgb(.765,.824,.886)
       if (is.null(col.hi)) col.hi <- "dodgerblue4"
     }
-    else if (colors == "gray") {
+    else if (theme == "gray") {
       if (is.null(col.low)) col.low <- "gray90"
       if (is.null(col.hi)) col.hi <- "gray25"
     }
-    else if (colors == "darkred") {
+    else if (theme == "darkred") {
       if (is.null(col.low)) col.low <- "red1"
       if (is.null(col.hi)) col.hi <- "red4"
     }
-    else if (colors == "brown") {
+    else if (theme == "darkgreen") {
+      if (is.null(col.low)) col.low <- "green1"
+      if (is.null(col.hi)) col.hi <- "green4"
+    }
+    else if (theme == "brown") {
       if (is.null(col.low)) col.low <- "rosybrown1"
       if (is.null(col.hi)) col.hi <- "rosybrown4"
     }
-    else if (colors == "sienna") { 
+    else if (theme == "sienna") { 
       if (is.null(col.low)) col.low <- "#F7E9E2"
       if (is.null(col.hi)) col.hi <- "sienna3"
     }
-    else if (colors == "blue") { 
+    else if (theme == "blue") { 
       if (is.null(col.low)) col.low <- "slategray2"
       if (is.null(col.hi)) col.hi <- "slategray4"
     }
-    else if (colors == "gray.black") {
+    else if (theme == "gray.black") {
       if (is.null(col.low)) col.low <- "gray70"
       if (is.null(col.hi)) col.hi <- "gray25"
     }
-    else if (colors == "green") {
+    else if (theme == "green") {
       if (is.null(col.low)) col.low <- "darkseagreen1"
       if (is.null(col.hi)) col.hi <- "darkseagreen4"
     }
-    else if (colors == "rose") {
+    else if (theme == "rose") {
       if (is.null(col.low)) col.low <- "mistyrose1"
       if (is.null(col.hi)) col.hi <- "mistyrose4"
     }
-    else if (colors == "gold") {
+    else if (theme == "gold") {
       if (is.null(col.low)) col.low <- "goldenrod1"
       if (is.null(col.hi)) col.hi <- "goldenrod4"
     }
-    else if (colors == "red") { 
+    else if (theme == "red") { 
       if (is.null(col.low)) col.low <- "coral1"
       if (is.null(col.hi)) col.hi <- "coral4"
     }
-    else if (colors == "orange.black") { 
-      if (is.null(col.low)) col.low <- rgb(255,173,91, maxColorValue=256)
-      if (is.null(col.hi)) col.hi <- rgb(169,66,2, maxColorValue=256)
+    else if (theme == "orange") { 
+      if (is.null(col.low)) col.low <- "orange"
+      if (is.null(col.hi)) col.hi <- "orange3"
     }
-    else if (colors == "purple") { 
+    else if (theme == "purple") { 
       if (is.null(col.low)) col.low <- "purple1"
       if (is.null(col.hi)) col.hi <- "purple4"
     }
-    else if (colors == "white") { 
+    else if (theme == "white") { 
       if (is.null(col.low)) col.low <- "gray30"
       if (is.null(col.hi)) col.hi <- "gray90"
     }
@@ -1140,6 +1193,9 @@ function(...) {
 
 .to256 <- function(trans.level)
    trn <- (1-getOption(trans.level))*256
+
+.to256n <- function(trans.level)
+   trn <- (1-trans.level) * 256
 
 
 # change class call to class character

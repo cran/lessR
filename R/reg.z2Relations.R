@@ -135,7 +135,8 @@ function(lm.out, dname, n.keep, show.R,
       tx[length(tx)+1] <- ""  # build the line of variable names
       for (i in 1:(n.pred)) {
         if (i <= n.pred) ww <- max.ln[i]
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(mod.srt)[i], w=ww), sep="")
+        tx[length(tx)] <- paste(tx[length(tx)],
+            .fmtc(names(mod.srt)[i], w=ww), sep="")
         nms <- tx[length(tx)]
       }
       for (i in 1:2) {
@@ -150,9 +151,12 @@ function(lm.out, dname, n.keep, show.R,
         if (lines > 40) if (i %% 30 == 0) tx[length(tx)+1] <- nms
         tx[length(tx)+1] <- ""
         for(j in 1:n.pred)
-          tx[length(tx)] <- paste(tx[length(tx)], .fmti(mod.srt[i,j],  w=max.ln[j]), sep="")
-        tx[length(tx)] <- paste(tx[length(tx)], .fmt(mod.srt[i,n.pred+1], d=3, w=8)) # R2adj
-        tx[length(tx)] <- paste(tx[length(tx)], .fmti(mod.srt[i,n.pred+2], w=6))  # num X's
+          tx[length(tx)] <- paste(tx[length(tx)], .fmti(mod.srt[i,j],
+            w=max.ln[j]), sep="")
+        tx[length(tx)] <- paste(tx[length(tx)], .fmt(mod.srt[i,n.pred+1],
+            d=3, w=8)) # R2adj
+        tx[length(tx)] <- paste(tx[length(tx)], .fmti(mod.srt[i,n.pred+2],
+            w=6))  # num X's
       }
 
       if (nrow(mod.srt) > max.sublns)
@@ -168,7 +172,7 @@ function(lm.out, dname, n.keep, show.R,
     }
 
     else  # not numeric.all
-      tx[length(tx)+1] <- ">>> No subset analysis reported, not all variables are numeric.\n"
+      tx[length(tx)+1] <- ">>> No subset analysis, not all variables are numeric.\n"
 
     txall <- tx
   }

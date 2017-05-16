@@ -1,39 +1,46 @@
 Plot <-
 function(x, y=NULL, data=mydata,
-         values=c("data", "count", "prop", "sum", "mean", "sd", "min",
-                  "median", "max"),
+         values=c("data", "count", "prop", "sum", "mean", "sd",
+                  "min", "median", "max"),
          n.cat=getOption("n.cat"),
 
-         by=NULL, by2=NULL, by.group=NULL,
+         by=NULL, by1=NULL, by2=NULL,
          n.row=NULL, n.col=NULL, aspect="fill",
 
-         fill=getOption("fill.pt"), stroke=getOption("stroke.pt"),
-         bg=getOption("bg"), box=getOption("box"), 
-         grid=getOption("grid"),
-         segment=getOption("stroke.pt"),
+         fill=getOption("pt.fill"), stroke=getOption("pt.stroke"),
+         bg.fill=getOption("bg.fill"), bg.stroke=getOption("bg.stroke"), 
+         segment.stroke=getOption("segment.stroke"),
          color=NULL, trans=NULL,
 
-         cex.axis=0.76, axes="gray30", xy.ticks=TRUE,
-         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+         cex.lab=1.0,
+         cex.axis=getOption("cex.axis"),
+         xy.ticks=TRUE, xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+
          value.labels=NULL, label.max=20,
-         rotate.x=0, rotate.y=0, offset=0.5,
+         rotate.x=getOption("rotate.x"),
+         rotate.y=getOption("rotate.y"),
+         offset=getOption("offset"),
          proportion=FALSE,
+         origin.x=NULL,
 
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
          sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
 
-         ID="row.name", ID.cut=NULL, ID.color="gray50", ID.size=0.75,
+         ID="row.name", ID.cut=0, ID.color="gray50", ID.size=0.75,
 
-         radius=0.25, power=0.6, bubble.text="black",
+         radius=0.25, power=0.6,
+         bubble.text=getOption("bubble.text.stroke"),
+         bubble.fill=getOption("bubble.fill"),
          low.fill=NULL, hi.fill=NULL,
 
-         smooth=FALSE, points.smooth=100, trans.smooth=0.25,
-         bins.smooth=128,
+         smooth=FALSE, smooth.points=100, smooth.trans=0.25,
+         smooth.bins=128,
 
-         fit=FALSE, stroke.fit="gray20", lwd.fit=NULL, se.fit=0,
+         fit=FALSE, fit.stroke=getOption("fit.stroke"),
+         fit.lwd=NULL, fit.se=0,
 
-         ellipse=FALSE, stroke.ellipse=getOption("stroke.pt"),
-         fill.ellipse=getOption("fill.ellipse"), lwd.ellipse=1,
+         ellipse=FALSE, ellipse.stroke=getOption("pt.stroke"),
+         ellipse.fill=getOption("ellipse.fill"), ellipse.lwd=1,
 
          method="overplot", pt.reg="circle", pt.out="circle",
          out30="firebrick2", out15="firebrick4", new=TRUE,
@@ -48,12 +55,13 @@ function(x, y=NULL, data=mydata,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
          add.cex=1, add.lwd=1, add.lty="solid", 
-         add.stroke="gray50", add.fill=getOption("fill.pt"),
+         add.stroke="gray50", add.fill=getOption("pt.fill"),
          add.trans=NULL,
 
          digits.d=NULL, quiet=getOption("quiet"), do.plot=TRUE,
          width=NULL, height=NULL, pdf.file=NULL, 
          fun.call=NULL, ...) {
+
 
   # ------
   # set parameter values 
@@ -69,38 +77,37 @@ function(x, y=NULL, data=mydata,
 
   # if a tibble convert to data frame
   # data.frame is already #3 in class(data), so no char --> factor conversion 
-  if (class(data)[1] == "tbl_df") {
+  if (exists(df.name, where=.GlobalEnv)) if (class(data)[1] == "tbl_df") {
     data <- as.data.frame(data, stringsAsFactors=TRUE)
   }
 
   # missing function only reliable if arg not modified, so capture 
   x.miss <- ifelse (missing(x), TRUE, FALSE)
   y.miss <- ifelse (missing(y), TRUE, FALSE)
+  by1.miss <- ifelse (missing(by1), TRUE, FALSE)
   by.miss <- ifelse (missing(by), TRUE, FALSE)
-  by.group.miss <- ifelse (missing(by.group), TRUE, FALSE)
   values.miss <- ifelse (missing(values), TRUE, FALSE)
   seg.y.miss <- ifelse (missing(segments.y), TRUE, FALSE)  # for Cleveland plot
   seg.x.miss <- ifelse (missing(segments.x), TRUE, FALSE)
   sort.yx.miss <- ifelse (missing(sort.yx), TRUE, FALSE)
-  col.grid.miss <- ifelse (missing(grid), TRUE, FALSE)
   area.miss <- ifelse (missing(area), TRUE, FALSE)
   ellipse.miss <- ifelse (missing(ellipse), TRUE, FALSE)
-  stroke.ellipse.miss <- ifelse (missing(stroke.ellipse), TRUE, FALSE)
-  fill.ellipse.miss <- ifelse (missing(fill.ellipse), TRUE, FALSE)
+  ellipse.stroke.miss <- ifelse (missing(ellipse.stroke), TRUE, FALSE)
+  ellipse.fill.miss <- ifelse (missing(ellipse.fill), TRUE, FALSE)
   fit.miss <- ifelse (missing(fit), TRUE, FALSE)
   ID.miss <- ifelse (missing(ID), TRUE, FALSE)
   lwd.miss <- ifelse (missing(lwd), TRUE, FALSE)
+  data.miss <- ifelse (missing(data), TRUE, FALSE)
   
   # "off" substitutes for official value of "transparent"
   fill[which(fill == "off")] <- "transparent"
   stroke[which(stroke == "off")] <- "transparent"
-  stroke.ellipse[which(stroke.ellipse == "off")] <- "transparent"
-  fill.ellipse[which(fill.ellipse == "off")] <- "transparent"
+  ellipse.stroke[which(ellipse.stroke == "off")] <- "transparent"
+  ellipse.fill[which(ellipse.fill == "off")] <- "transparent"
   add.fill[which(add.fill == "off")] <- "transparent"
   add.stroke[which(add.stroke == "off")] <- "transparent"
-  if (bg == "off") bg <- "transparent"
-  if (grid == "off" ) grid <- "transparent"
-  if (box == "off") box <- "transparent"
+  if (bg.fill == "off") bg.fill <- "transparent"
+  if (bg.stroke == "off") bg.stroke <- "transparent"
   if (bubble.text == "off") bubble.text <- "transparent"
 
   # populate color parameters
@@ -112,28 +119,19 @@ function(x, y=NULL, data=mydata,
   date.ts <- FALSE  # default is not a time series
   freq.poly <- FALSE  # default is not a frequency polygon
 
-  if (grid == "on") grid <- getOption("grid") # for Cleveland
+  #grid.x.stroke <- getOption("grid.x.stroke") # for Cleveland
 
   if (show.runs) run <- TRUE
 
-  Trellis <- ifelse((!by.miss && (!y.miss || run)), TRUE, FALSE)
-
   # any ellipse parameter actives an ellipse
   if (ellipse.miss) 
-    if (!stroke.ellipse.miss || !fill.ellipse.miss)
+    if (!ellipse.stroke.miss || !ellipse.fill.miss)
       ellipse <- TRUE
 
-  if (is.logical(ellipse))
-    ellipse <- ifelse (ellipse, 0.95, 0.00)
-  if (ellipse[1] > 0  &&  !Trellis) {
-    txt <- "[Ellipse with Murdoch and Chow's function ellipse"
-    cat(txt, "from the ellipse package]\n")
-  }
-
   # fit.ln
-  if (se.fit[1] > 0) if (fit.miss) fit <- TRUE
-  if (!missing(stroke.fit)) if (fit.miss) fit <- TRUE
-  if (!missing(lwd.fit)) if (fit.miss) fit <- TRUE
+  if (fit.se[1] > 0) if (fit.miss) fit <- TRUE
+  if (!missing(fit.stroke)) if (fit.miss) fit <- TRUE
+  if (!missing(fit.lwd)) if (fit.miss) fit <- TRUE
 
   if (is.logical(fit))
     fit.ln <- ifelse (fit, "loess", "off")
@@ -154,12 +152,12 @@ function(x, y=NULL, data=mydata,
   if (stack) if (area.miss) area <- TRUE  # stack default
   if (is.logical(area)) {
     if (area) if (missing(stack)) stack <- TRUE
-    area <- ifelse (area, getOption("fill.pt"), "transparent")
+    area <- ifelse (area, getOption("bar.fill"), "transparent")
   }
 
   # ID
-  if (missing(ID.cut))
-    ID.cut <- ifelse (ellipse.miss, 0, 1-(max(ellipse)-0.03)) 
+  #if (missing(ID.cut))
+    #ID.cut <- ifelse (ellipse.miss, 0, 1-(max(ellipse)-0.03)) 
 
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
@@ -236,7 +234,7 @@ function(x, y=NULL, data=mydata,
   options(xname = x.name)
 
   # get data to be analyzed into data.x data frame
-  
+
   # process row.names if specified
   if (x.name == "row.names") {
     # retain order of row names, otherwise will be alphabetical
@@ -262,21 +260,18 @@ function(x, y=NULL, data=mydata,
         names(data.x) <- names(all.vars)[x.col]
       else
         names(data.x) <- x.col  # if x a vector, x.col can return names
-
+      data.miss <- FALSE  # use mydata even if not specified (default)
     }  # end x not in global
 
     # x is in the global environment (vector or data frame)
     # can only access x directly if it is not in a data frame
- 
-    else if (is.data.frame(x)) {
-        # x a data frame
+    else if (is.data.frame(x)) { # x a data frame
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Need to specify variables for analysis,\n",
           "not a full data frame\n\n")
     }
       
     else if (is.ts(x)) {  # time series in global
-
       # just the dates for x var
       data.x <- data.frame(.ts.dates(x))
       names(data.x) <- "date"
@@ -401,23 +396,42 @@ function(x, y=NULL, data=mydata,
       cat.x <- FALSE
    
   }  # end more than 1 x-variable
+
+   if (!is.factor(x.call[,1])) if (cat.x) x.call[,1] <- factor(x.call[,1])
  
-  
+ 
+
+  if (!cat.x)
+    Trellis <- ifelse((!by1.miss && (!y.miss || run)), TRUE, FALSE)
+  else
+    Trellis <- ifelse(!by1.miss, TRUE, FALSE)
+ 
+  if (is.logical(ellipse))
+    ellipse <- ifelse (ellipse, 0.95, 0.00)
+  if (ellipse[1] > 0  &&  !Trellis) {
+    txt <- "[Ellipse with Murdoch and Chow's function ellipse"
+    cat(txt, "from the ellipse package]\n")
+  }
+ 
   if (!BPFM)
     nrows <- ifelse (is.matrix(x.call[,1]), nrow(x.call[,1]), length(x.call[,1]))
   else
     nrows <- nrow(data.x)
 
 
-  # smooth default
   if (nrows > 2499) if (missing(smooth)) smooth <- TRUE
-  if (smooth) if (missing(grid)) grid <- "transparent"
 
   if(date.ts) object <- "both"
 
 
   #-----------
   # evaluate y
+
+  #if (!y.miss) if (deparse(substitute(y)) %in% c("count", "prop")) {
+    #if (deparse(substitute(y)) == "count") values <- "count"
+    #if (deparse(substitute(y)) == "prop") values <- "prop"
+    #y.miss <- TRUE
+  #}
 
   if (!y.miss) {
     # get actual variable name before potential call of data$y
@@ -534,7 +548,7 @@ function(x, y=NULL, data=mydata,
     xs <- .xstatus(by.name, df.name, quiet)
     in.global <- xs$ig
 
-    # see if var exists in data frame, if x not in Global Env or function call
+    # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
       .xcheck(by.name, df.name, data)
 
@@ -551,6 +565,36 @@ function(x, y=NULL, data=mydata,
   else
    by.call <- NULL
 
+  
+  # evaluate by1
+  #-------------
+  if (!missing(by1)) {
+
+    # get actual variable name before potential call of data$x
+    by1.name <- deparse(substitute(by1))
+    options(by1name = by1.name)
+
+    # get conditions and check for data existing
+    xs <- .xstatus(by1.name, df.name, quiet)
+    in.global <- xs$ig
+
+    # see if var exists in data frame, if x not in global Env or function call
+    if (!missing(x) && !in.global)
+      .xcheck(by1.name, df.name, data)
+
+    if (!in.global)
+      by1.call <- eval(substitute(data$by1))
+    else {  # vars that are function names get assigned to global
+      by1.call <- by1
+      if (is.function(by1.call)) by1.call <- eval(substitute(data$by1))
+    }
+
+    if (!is.factor(by1.call)) by1.call <- factor(by1.call)
+  }
+
+  else
+   by1.call <- NULL
+
 
   # evaluate by2
   #-------------
@@ -564,7 +608,7 @@ function(x, y=NULL, data=mydata,
     xs <- .xstatus(by2.name, df.name, quiet)
     in.global <- xs$ig
 
-    # see if var exists in data frame, if x not in Global Env or function call
+    # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
       .xcheck(by2.name, df.name, data)
 
@@ -582,35 +626,6 @@ function(x, y=NULL, data=mydata,
    by2.call <- NULL
 
 
-  # evaluate by.group
-  #-------------
-  if (!missing(by.group)) {
-
-    # get actual variable name before potential call of data$x
-    by.name <- deparse(substitute(by.group))
-    options(byname = by.name)
-
-    # get conditions and check for data existing
-    xs <- .xstatus(by.name, df.name, quiet)
-    in.global <- xs$ig
-
-    # see if var exists in data frame, if x not in Global Env or function call
-    if (!missing(x) && !in.global)
-      .xcheck(by.name, df.name, data)
-
-    if (!in.global)
-      byg.call <- eval(substitute(data$by.group))
-    else {  # vars that are function names get assigned to global
-      byg.call <- by
-      if (is.function(byg.call)) byg.call <- eval(substitute(data$by.group))
-    }
-
-    if (!is.factor(byg.call)) byg.call <- factor(byg.call)
-  }
-
-  else
-     byg.call <- NULL
-
 
   # evaluate size (NULL, numeric constant or a variable)
   #--------------
@@ -625,7 +640,7 @@ function(x, y=NULL, data=mydata,
     make.num <- suppressWarnings(as.numeric(size.name))
     is.num <- ifelse (!is.na(make.num), TRUE, FALSE)
 
-    # see if var exists in data frame, if x not in Global Env or function call
+    # see if var exists in data frame, if x not in global Env or function call
     if (!is.num) {  # size.name is the name of a variable
       if (!in.global) {
         .xcheck(size.name, df.name, data)
@@ -651,8 +666,12 @@ function(x, y=NULL, data=mydata,
   #------------
   if (ID.cut > 0) {
 
-    if (ID.miss)
-      ID.call <- factor(row.names(data), levels=row.names(data))
+    if (ID.miss) {
+      if (!data.miss)
+        ID.call <- factor(row.names(data), levels=row.names(data))
+      else
+        ID.call <- 1:nrows
+    }
 
     else {
       ID.name <- deparse(substitute(ID))
@@ -661,6 +680,7 @@ function(x, y=NULL, data=mydata,
       ID.call <- eval(substitute(data$ID))
     }
   }
+
 
 
   # -----------  x, y, by and size variables established ------------
@@ -678,15 +698,13 @@ function(x, y=NULL, data=mydata,
   }
 
   if (is.null(width)) width <- 5
-  if (!by.group.miss) width <- width + .85  # wider plot  
+  if (!by.miss) width <- width + .85  # wider plot  
 
 
   # --------
     # adjust by, manage regular-R or PDF graphics window size
-  if (!Trellis) {
-     by.call <- byg.call  # regular lessR only uses by.call
+  if (!Trellis)
     .opendev(pdf.file, width, height)  # prepare plot window, dev or pdf
-  }
 
 
   # ------------------------------------------------
@@ -760,7 +778,7 @@ function(x, y=NULL, data=mydata,
 
       if (!cat.x) { 
 
-        if (object == "both"  &&  values == "data") {
+        if (object == "both"  &&  values == "data") {  # run chart
           y.call <- x.call
           cat.y <- cat.x
           options(yname = x.name)
@@ -778,9 +796,8 @@ function(x, y=NULL, data=mydata,
           hist.counts <- FALSE
           hist.cumul <- ifelse(cumul, "on", "off")
           reg <- "snow2"  # applies to cumulative histogram
-          h <- .hst.main(x.call[,1], fill, stroke, bg, grid,
-             box, reg,
-             over.grid=FALSE, cex.axis, axes, rotate.x, rotate.y, offset,
+          h <- .hst.main(x.call[,1], fill, stroke, bg.fill, bg.stroke, reg,
+             cex.axis, rotate.x, rotate.y, offset,
              breaks, bin.start, bin.width, bin.end, proportion, hist.counts,
              hist.cumul, xlab, ylab, main, sub, quiet, fun.call=NULL,
              do.plot=FALSE, ...) 
@@ -865,20 +882,33 @@ function(x, y=NULL, data=mydata,
       else {  # cat.x
         # just x variable, so set y.call to plot points for count and prop
         if (values %in% c("count", "prop")) {
-          cat.y <- FALSE
-          if (seg.x.miss) segments.x <- TRUE
-          ylab <- ifelse (values=="count", "Count of", "Proportion of")
-          ylab <- paste(ylab, x.name)
-          frq <- table(x.call)
-          if (values == "prop") frq <- frq / sum(frq)
-          y.call <- data.frame(as.vector(frq))
-          if (is.factor(x.call))  # preserve ordering, will lose order attribute
-            x.call <- factor(names(frq), levels=levels(x.call))
-          else
-            x.call <- factor(names(frq))
-          x.call <- data.frame(x.call)
-        }
-      }
+          if (Trellis) {  # follow dot plot format and do horizontal plot
+            cat.y <- FALSE
+            if (seg.x.miss) segments.x <- TRUE
+            ylab <- ifelse (values=="count", "Count of", "Proportion of")
+            ylab <- paste(ylab, x.name)
+            x.call <- data.frame(x.call)
+          }  # end if Trellis
+          else {  # not Trellis, so manually flip to match dot plot style
+            cat.x <- FALSE
+            if (seg.y.miss) segments.y <- TRUE
+            xlab <- ifelse (values=="count", "Count of", "Proportion of")
+            xlab <- paste(xlab, x.name)
+            if (!Trellis) {  # Trellis needs the full data for a dot plot
+              ylab <- NULL
+              frq <- table(x.call)
+              if (values == "prop") frq <- frq / sum(frq)
+              if (is.factor(x.call))  # preserve ordering, will lose order attribute
+                y.call <- factor(names(frq), levels=levels(x.call))
+              else
+                y.call <- factor(names(frq))
+            }
+            options(yname=x.name)
+            y.call <- data.frame(y.call)
+            x.call <- data.frame(as.vector(frq))
+          }
+        }  # end values in
+      }  # end cat.x
 
     }  # end is null y.call
 
@@ -893,8 +923,8 @@ function(x, y=NULL, data=mydata,
   
   # size of fit line
   # windows line too thin at 1, but no increments allowed, and 2 is too thick
-  if (fit.ln != "off") if (is.null(lwd.fit)) 
-    lwd.fit <- ifelse(.Platform$OS == "windows", 2, 1.5)
+  if (fit.ln != "off") if (is.null(fit.lwd)) 
+    fit.lwd <- ifelse(.Platform$OS == "windows", 2, 1.5)
 
   # size of points
   scale.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
@@ -908,7 +938,7 @@ function(x, y=NULL, data=mydata,
       size.pt <- 0.77 * size.pt  # default pt size for lines
       if (area != "transparent") {  # default no points if area shown
         size.pt <- 0
-        segment <- stroke
+        segment.stroke <- stroke
       }
       else if (nrows > 50) {
         size.pt <- .9 - 0.002*nrows
@@ -936,15 +966,25 @@ function(x, y=NULL, data=mydata,
   
 
   if (Trellis && do.plot) {
-    .plt.lattice(x.call[,1], y.call[,1], by.call, by2.call, byg.call,
-                 object, n.row, n.col, aspect,
-                 fill, stroke, bg, grid, trans, size.pt, size.ln, 
-                 xlab, ylab, main, shape, cex.axis, axes,
-                 max(ellipse), stroke.ellipse, lwd.ellipse,
-                 fit.ln, stroke.fit, lwd.fit,
-                 area, area.origin,
-                 rotate.x, rotate.y, width, height, pdf.file)
+    if (!cat.x)
+      .plt.lattice(x.call[,1], y.call[,1], by1.call, by2.call, by.call,
+                   object, n.row, n.col, aspect,
+                   fill, stroke, bg.fill, bg.stroke, trans, size.pt, size.ln, 
+                   xlab, ylab, main, shape, cex.lab, cex.axis,
+                   max(ellipse), ellipse.stroke, ellipse.lwd,
+                   fit.ln, fit.stroke, fit.lwd,
+                   area, area.origin,
+                   rotate.x, rotate.y, width, height, pdf.file, ...)
+    else {  # dot plot
+        if (seg.x.miss) segments.x <- TRUE
+        .bar.lattice(x.call[,1], by1.call, by2=NULL, n.row, n.col, aspect,
+                     prop=FALSE, fill, stroke, bg.fill, bg.stroke, trans,
+                     size.pt, xlab, ylab, main, cex.lab, cex.axis,
+                     rotate.x, rotate.y, width, height, pdf.file,
+                     segments.x, breaks=NULL, c.type="dot", ...)
+    }
   }
+
 
   # bubble plot frequency matrix (BPFM)
   else if (ncol(data.x) > 1  &&  y.miss  &&  object == "bubble") {
@@ -963,18 +1003,20 @@ function(x, y=NULL, data=mydata,
     if (is.null(xlab)) xlab <- ""  # suppress x-axis label if not specified
 
     .dpmat.main(data[,x.col], mylabs, sort.yx,
-      fill, stroke, bg, grid, trans,
-      shape, area, box,
-      cex.axis, axes, low.fill, hi.fill,
+      bubble.fill, stroke, bg.fill, trans,
+      shape, area, bg.stroke,
+      cex.axis, low.fill, hi.fill,
       xy.ticks, xlab, ylab, main, sub, size,
       radius, size.cut, bubble.text, power,
       value.labels, rotate.x, rotate.y, offset, quiet, do.plot, fun.call, ...)
   }
 
   else if (spmat && do.plot) {
+    bckg <- ifelse(bg.fill=="transparent", getOption("device.fill"), bg.fill)
+    nm <- names(data.x)
     .plt.mat(data.x, coef=TRUE, fit=fit,
              col.fill=fill, col.stroke=stroke,
-             col.fit=stroke.fit, col.bg=bg, col.box=box)
+             col.fit=fit.stroke, col.bg=bckg, col.box=bg.stroke)
   }
 
   else {  # all the other analyses
@@ -1055,6 +1097,18 @@ function(x, y=NULL, data=mydata,
 
       x.call <- data.frame(x.call)
       y.call <- data.frame(y.call)
+
+    # switch
+      temp.call <- x.call
+      x.call <- y.call
+      y.call <- temp.call
+      xlab <- ylab
+      ylab <- NULL
+      options(yname = x.name)
+      if (segments.x) {
+        segments.x <- ifelse(segments.y, TRUE, FALSE)
+        segments.y <- TRUE
+       }
     }  # sum, mean, sd, min, median, max
 
 
@@ -1074,7 +1128,6 @@ function(x, y=NULL, data=mydata,
           if (seg.y.miss) if (unique.y && cat.y) segments.y <- TRUE
           if (seg.x.miss) if (unique.x && cat.x) segments.x <- TRUE
           if (sort.yx.miss) if (n.x_var <= 2) sort.yx <- TRUE
-          if (col.grid.miss) grid <- "transparent"
         }
       }
 
@@ -1096,22 +1149,22 @@ function(x, y=NULL, data=mydata,
   
       # bigger point for scatterplot of stats
       if (values != "data"  &&  object == "point")
-        if (is.null(size)) size.pt <- 2.75
+        if (is.null(size)) size.pt <- 1.25
 
       if (do.plot)
         .plt.main(x.call, y.call, by.call, n.cat,
           object, values,
-          fill, stroke, bg, grid, box,
-          trans, segment, area,
-          cex.axis, axes, xy.ticks,
+          fill, stroke, bg.fill, bg.stroke,
+          trans, segment.stroke, area,
+          cex.lab, cex.axis, xy.ticks,
           xlab, ylab, main, sub, value.labels, label.max,
-          rotate.x, rotate.y, offset, proportion,
+          rotate.x, rotate.y, offset, proportion, origin.x,
           size.pt, shape, means, sort.yx, segments.y, segments.x, size.ln,
-          smooth, points.smooth, trans.smooth, bins.smooth,
-          radius, power, size.cut, bubble.text, low.fill, hi.fill,
+          smooth, smooth.points, smooth.trans, smooth.bins,
+          radius, power, size.cut, bubble.text, bubble.fill, low.fill, hi.fill,
           ID.call, ID.cut, ID.color, ID.size,
-          fit.ln, stroke.fit, lwd.fit, se.fit,
-          ellipse, stroke.ellipse, fill.ellipse, lwd.ellipse,
+          fit.ln, fit.stroke, fit.lwd, fit.se,
+          ellipse, ellipse.stroke, ellipse.fill, ellipse.lwd,
           center.line, show.runs, stack,
           method, pt.reg, pt.out, out30, out15,
           freq.poly,
@@ -1122,15 +1175,15 @@ function(x, y=NULL, data=mydata,
       if (!quiet)  # text output
         .plt.txt(x.call, y.call, values, object, n.cat, xlab, ylab,
                  smooth, center.line, proportion, size, show.runs,
-                 radius, fun.call)
+                 radius, digits.d, fun.call)
     }
 
     # 1-D traditional scatter plot (not bubble plot)
     else if (!cat.x  &&  is.null(y.call)  &&  values == "data") {
 
       .dp.main(x.call[,1], by.call, size, means,
-         fill, stroke, bg, grid, trans,
-         shape, cex.axis, axes, xlab, main, sub,
+         fill, stroke, bg.fill, trans,
+         shape, cex.axis, xlab, main, sub,
          rotate.x, rotate.y, offset, method, pt.reg, pt.out,
          out30, out15, boxplot, quiet, new, 
          vertical=FALSE, do.plot, fun.call, ...)

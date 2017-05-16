@@ -22,7 +22,7 @@ VariableLabels(x, value=NULL, data=mydata, quiet=getOption("quiet"))
   \item{data}{Data frame that contains the variable(s) of interest. The output
     of the function is assigned to this data frame.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system
-    default with \code{\link{theme}} function.}
+    default with \code{\link{style}} function.}
 
 vl{\ldots}
 }
@@ -55,12 +55,12 @@ details.brief()
 
 # construct and read variable labels from console
 lbl <- "
-Years,time of company employment
-Gender,Male or Female
-Dept,department employed
-Salary,annual salary
-Satisfaction,satisfaction with work environment
-HealthPlan,1=GoodHealth 2=YellowCross 3=BestCare
+Years, Years of Company Employment
+Gender, Male or Female
+Dept, Department Employed
+Salary, Annual Salary
+Satisfaction, Satisfaction with Work Environment
+HealthPlan, 1=GoodHealth 2=YellowCross 3=BestCare
 "
 mydata <- VariableLabels(lbl)
 

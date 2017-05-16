@@ -7,30 +7,35 @@
 \description{
 Abbreviation: \code{bc}
 
-Plots a bar chart, one categorical variable and one numeric variable, potentially with a second categorival variable with a provided legend. By default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables. The numeric variable can be entered as the y-variable, in which case it could be counts or a non-integer variable. Also displays the frequency table for one or two variables, Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. Unlike the standard R function, \code{\link{barplot}}, the variable name(s) can be entered directly into the function call without first converting to a table.
+Plots a bar chart, one categorical variable and one numeric variable, potentially with a second categorival variable with a provided legend. By default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables. The numeric variable can be entered as the y-variable, in which case it could be counts or a non-integer variable. Also displays the frequency table for one or two variables, Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. Unlike the standard R function, \code{\link{barplot}}, the variable name(s) can be entered directly into the function call without first converting to a table. Trellis graphics activated by specifying a \code{by1} variable. 
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then a bar chart is calculated for each non-numeric variable in the data frame and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 }
 
 \usage{
-BarChart(x=NULL, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
+BarChart(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"), 
 
-         fill=getOption("fill.bar"),
-         stroke=getOption("stroke.bar"),
-         bg=getOption("bg"),
-         grid=getOption("grid"),
-         box=getOption("box"),
+         by=NULL, by1=NULL,
+         n.row=NULL, n.col=NULL, aspect="fill", 
+
+         fill=getOption("bar.fill"),
+         stroke=getOption("bar.stroke"),
+         bg.fill=getOption("bg.fill"),
+         bg.stroke=getOption("bg.stroke"),
          trans=NULL,
 
          colors=c("rainbow", "terrain", "heat"),
 
-         horiz=FALSE, over.grid=FALSE, addtop=0.05,
+         horiz=FALSE, addtop=0.05,
          gap=NULL, proportion=FALSE,
          
-         xlab=NULL, ylab=NULL, main=NULL,
-         cex.axis=0.75, axes="gray30",
+         xlab=NULL, ylab=NULL, main=NULL, cex.names=0.70,
+         cex.lab=0.84,
+         cex.axis=getOption("cex.axis"),
          value.labels=NULL, label.max=20,
-         rotate.x=0, rotate.y=0, offset=0.5,
+         rotate.x=getOption("rotate.x"),
+         rotate.y=getOption("rotate.y"),
+         offset=getOption("offset"),
 
          beside=FALSE, low.fill=NULL, hi.fill=NULL, 
 
@@ -38,15 +43,14 @@ BarChart(x=NULL, y=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
          legend.horiz=FALSE, 
 
          quiet=getOption("quiet"),
-         width=4.5, height=4.5, pdf=FALSE,
-         \ldots) 
+         width=5, height=4.5, pdf.file=NULL, \ldots) 
 
 bc(\ldots)
 }
 
 \arguments{
   \item{x}{Variable(s) to analyze.  Can be a single variable, either
-        within a data frame or as a vector in the user's workspace,
+        within a data frame or as a vector in the users workspace,
         or multiple variables in a data frame such as designated with the
         \code{\link{c}} function, or an entire data frame. If not specified,
         then defaults to all non-numerical variables in the specified data
@@ -54,8 +58,6 @@ bc(\ldots)
   \item{y}{Numeric variable for which the values are displayed on the vertical
         axis. If not specified, then its value is the frequency of each
         category or joint category, automatically computed.}
-  \item{by}{For each level of the first variable, x, display the value of \code{y}
-       at each level of this second variable, \code{by}.}
   \item{data}{Optional data frame that contains the variables of interest, default
        is \code{mydata}. Can contain data from which frequencies are computed, or
        can contain values to plot on the y-axis instead of counts.}
@@ -63,17 +65,40 @@ bc(\ldots)
        number of unique values of variable of a numeric data type for which the
        variable will be analyzed as a categorical. Default is 0.}\cr
 
+  \item{by}{A categorical variable to provide a scatterplot for
+        each level of the numeric primary variables \code{x} and
+        \code{y} on the \emph{same} plot, which applies to the panels of
+        a Trellis plot if \code{by1} is specified.}
+  \item{by1}{A categorical variable called a conditioning variable that
+        activates \bold{Trellis graphics}, from the lattice package, to provide
+        a separate scatterplot (panel) of numeric primary variables \code{x}
+        and \code{y} for each level of the variable.}
+  \item{n.row}{Optional specification for the number of rows in the layout
+        of a multi-panel display with Trellis graphics. Need not specify
+        \code{n.col}.}
+  \item{n.col}{Optional specification for the number of columns in the
+        layout of a multi-panel display with
+        Trellis graphics. Need not specify \code{n.row}. If set to 1, then
+        the strip that labels each group locates to the left of each plot
+        instead of the top.}
+  \item{aspect}{Lattice parameter for the aspect ratio of the panels,
+        defined as height divided by width.
+        The default value is \code{"fill"} to have the panels
+        expand to occupy as much space as possible. Set to 1 for square panels.
+        Set to \code{"xy"} to specify a ratio calculated
+        to "bank" to 45 degrees, that is, with the line slope approximately
+        45 degrees.}\cr
+
   \item{fill}{Specified bar colors. Remove with \code{fill="off"}. This
        and the following colors can also be changed globally, individually and as 
-       a color theme, with the \code{lessR} \code{\link{global}} function.
+       a color theme, with the \code{lessR} \code{\link{style}} function.
        The \code{lessR} function \code{\link{showColors}} provides examples of all
        R named colors.}
   \item{stroke}{Color of the border of the bars. Black by default unless the
        background is dark. Remove with \code{stroke="off"}.}
-  \item{bg}{Color of the plot background. Remove with \code{bg="off"}.}
-  \item{grid}{Color of the grid lines. Remove with \code{grid="off"}.}
-  \item{box}{Color of border around the plot background, the box, that encloses 
-        the plot. Remove with \code{box="off"}.}
+  \item{bg.fill}{Color of the plot background. Remove with \code{bg.fill="off"}.}
+  \item{bg.stroke}{Color of border around the plot background, the box, that encloses 
+        the plot. Remove with \code{bg.stroke="off"}.}
   \item{trans}{Transparency level of plotted bars from 0 (none) to 1 (complete).
         Default transparency of fill color for the bars is 0.10.}\cr
   \item{colors}{Optional palettes that provide pre-defined color gradients,
@@ -81,7 +106,6 @@ bc(\ldots)
         \code{"terrain"}.}\cr
         
   \item{horiz}{By default bars are vertical, but can set to \code{TRUE}.}
-  \item{over.grid}{If \code{TRUE}, plot the grid lines over the histogram.}
   \item{addtop}{When \code{horiz=FALSE}, in the same scale as the vertical axis, puts
        more space between the bars and the top of the plot area, usually to
        accommodate the legend when plotting two variables. Now a multiplicative
@@ -100,9 +124,9 @@ bc(\ldots)
   \item{ylab}{Label for y-axis, more generally the frequency axis. Defaults to
        Frequency.}
   \item{main}{Title of graph.}
-  \item{cex.axis}{Scale magnification factor, which by default displays the axis 
-       values to be smaller than the axis labels.}
-  \item{axes}{Color of the font used to label the axis values.}
+  \item{cex.names}{Scale magnification factor for the categories.}
+  \item{cex.lab}{Size of the axis labels.}
+  \item{cex.axis}{Scale magnification factor for the values on the numerical axis.}
   \item{value.labels}{Labels for the value axis on the graph to override the
         existing data values, including factor levels. If the variable is a 
         factor and value.labels is not specified (is \code{NULL}), then the
@@ -138,10 +162,11 @@ bc(\ldots)
        horizontal.}\cr
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
-       \code{\link{global}} function.}
+       \code{\link{style}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
-  \item{pdf}{If \code{TRUE}, the pdf file is to be redirected to a pdf file.}\cr
+  \item{pdf.file}{Indicate to direct pdf graphics to the specified name of
+        the pdf file.}
 
   \item{\dots}{Other parameter values for graphics as defined 
       by \code{\link{barplot}}, \code{\link{legend}}, and \code{\link{par}} including
@@ -149,12 +174,10 @@ bc(\ldots)
       \code{cex.main} for the size of the title\cr
       \code{col.main} for the color of the title\cr
       \code{cex} for the size of the axis value labels\cr
-      \code{cex.lab} for the size of the axis labels\cr
       \code{col.lab} for the color of the axis labels\cr
       \code{"dotted"}, \code{"dotdash"}\cr
       \code{sub} and \code{col.sub} for a subtitle and its color\cr
       \code{col.lab} for the color of the axis labels\cr
-      \code{axes} to set the color of the axis values\cr
       \code{las=3} to reorient vertical axis labels\cr 
       \code{space} for one variable only}
 }
@@ -174,12 +197,12 @@ If the name of vector in the global environment and of a variable in the input d
 To obtain a bar chart of each numerical variable in the \code{mydata} data frame, invoke \code{Bar chart()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the variable list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-For a one variable plot, the color of the bars is set by the current color theme according to the function \code{\link{global}}, which includes the default color theme \code{dodgerblue}. When two variables are plotted, a set of arbitrary colors represent the various levels of the second variable. Transparency effects are only incorporated for a one variable bar plot in a single color.\cr
+For a one variable plot, the color of the bars is set by the current color theme according to the function \code{\link{style}}, which includes the default color theme \code{lightbronze}. When two variables are plotted, a set of arbitrary colors represent the various levels of the second variable. Transparency effects are only incorporated for a one variable bar plot in a single color.\cr
 There are two ways to override the default colors.\cr
 1. There are two pre-defined color palettes, each with 7 colors.  Three more built-in R color palettes are also available by setting \code{colors} to one of \code{"rainbow"}, \code{"heat"} and \code{"terrain"}.  The most vivid of all the palettes is \code{"rainbow"}.\cr
 2. The desired colors can be explicitly specified with the \code{color.bars} option, which overrides any other bar color options. When plotting one variable, include one color in this color list, the color used for all of the bars.  When plotting two variables, usually the list of colors includes the same number of elements as the number of levels for the second variable.  As always with R, if the list includes more than once color, the \code{c} function must be used to generate the list, as in\cr \code{color.bars=c("coral3","seagreen3")} for a second variable with two levels. When two variables are plotted, if there are fewer specified colors than the levels of the second variable, the remaining colors are selected from the remaining colors in the activated palette.
 
-For the color options, such as \code{grid}, the value of \code{"off"} is the same as 
+For the color options, such as \code{grid.stroke}, the value of \code{"off"} is the same as 
 \code{"transparent"}.
 
 When plotting one ordered factor, or when plotting two variables, and the second variable is an ordered factor, then neither of the two standard color palettes are used.  Instead, the resulting bar colors for each level of the ordered factor are also ordered in a progression of colors. The default progression is based on the first color of either the regular or gray color palettes, but this can be changed with the \code{low.fill} and \code{hi.fill} options, or individually specify the color of each bar with the \code{color.bars} option. A specified palette can, for example, be from light to dark of the same hue, or from a light color of one hue to a dark color of another hue. Each color value can be specified with a color name, or with a specification with the \code{\link{rgb}} function.  See the examples below.  
@@ -297,9 +320,9 @@ BarChart(Pain, by=Gender, proportion=TRUE)
 # at each level of Gender, show the frequencies of the Pain levels
 # Pain levels are ordered, so the corresponding colors are also ordered 
 # color theme set to gray
-global(colors="gray")
+style("gray")
 BarChart(Gender, by=Pain)
-global(colors="sienna")
+style("sienna")
 
 # specify an ordered blue palette of colors for the ordered levels of Pain
 # only works when the variable is an ordered factor
@@ -313,13 +336,13 @@ BarChart(Gender, by=Pain, beside=TRUE, legend.horiz=TRUE)
 # horizontal bar chart of two variables, put legend on the top
 BarChart(Gender, by=Pain, horiz=TRUE, legend.loc="top")
 
-# many options, including those from par: axes, col.main, col.lab, cex.lab
+# many options, including those from par: col.main, col.lab, cex.lab
 # for more info on these graphic options, enter:  help(par)
-BarChart(Pain, by=Gender, fill=c("coral3","seagreen3"), 
-  legend.loc="topleft", legend.labels=c("Girls", "Boys"), 
-  xlab="Pain Level", main="Gender for Different Pain Levels", 
-  bg="wheat1", grid="wheat3", axes="wheat4", trans=.7, 
-  col.main="wheat4", col.lab="wheat4", cex.lab=1.2)
+# BarChart(Pain, by=Gender, fill=c("coral3","seagreen3"), 
+#   legend.loc="topleft", legend.labels=c("Girls", "Boys"), 
+#   xlab="Pain Level", main="Gender for Different Pain Levels", 
+#   bg.fill="wheat1", values.stroke="wheat4", trans=.7, 
+#   col.main="wheat4", col.lab="wheat4", cex.lab=1.2)
 
 
 # ---------------------------------------------
@@ -328,7 +351,7 @@ BarChart(Pain, by=Gender, fill=c("coral3","seagreen3"),
 
 # bar charts for all non-numeric variables in the data frame called mydata
 #   and all numeric variables with a small number of values, < n.cat
-BarChart()
+# BarChart()
 
 
 
@@ -369,7 +392,8 @@ MKTG,60257.13
 SALE,68830.06", header=TRUE)
 BarChart(Dept, Salary)
 
-# specify a y-variable to provide the counts directly
+# specify two variables for a two variable bar chart
+# also specify a y-variable to provide the counts directly
 mydata <- read.csv(text="
 Dept,Gender,Count
 ACCT,F,3

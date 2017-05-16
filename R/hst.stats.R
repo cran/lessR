@@ -6,13 +6,16 @@ function (h, len.x, fun.call) {
 
     tx <- character(length = 0)
     if (getOption("suggest")) {
-     tx[length(tx)+1] <- ">>> Settings"
+     tx[length(tx)+1] <- ">>> Suggestions"
      if (!grepl("bin.width", fncl))
         tx[length(tx)+1] <- "bin.width: set the width of each bin"
       if (!grepl("bin.start", fncl))
         tx[length(tx)+1] <- "bin.start: set the start of the first bin"
       if (!grepl("bin.end", fncl))
         tx[length(tx)+1] <- "bin.end: set the end of the last bin"
+      txt <- "  # smoothed density curves plus histogram"
+      tx[length(tx)+1] <- paste("Density(", getOption("xname"), ")", txt,
+         sep="")      
     }
     txsug <- tx
 

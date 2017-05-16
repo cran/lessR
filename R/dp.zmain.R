@@ -1,7 +1,7 @@
 .dp.main <- 
 function(x, by, size, means,
-         col.fill, col.stroke, col.bg, col.grid, col.trans,
-         shape.pts, cex.axis, col.axis, xlab, main, sub,
+         col.fill, col.stroke, col.bg, col.trans,
+         shape.pts, cex.axis, xlab, main, sub,
          rotate.x, rotate.y, offset, method, pt.reg, pt.out, 
          col.out30, col.out15, bx, quiet, new, vertical,
          do.plot, fun.call=NULL, ...) {
@@ -11,9 +11,11 @@ function(x, by, size, means,
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The variable cannot be an R factor (categorical).\n")
   }  
+
+  col.fill <- getOption("bar.fill")
   
   # outlier points shapes and colors for gray scales
-  if (getOption("colors") %in% c("gray", "gray.black")) {
+  if (getOption("theme") %in% c("gray", "gray.black")) {
     pt.out30 <- 23
     pt.out15 <- 22
   }
@@ -21,11 +23,11 @@ function(x, by, size, means,
     pt.out30 <- pt.out
     pt.out15 <- pt.out
   }
-  if (getOption("colors") == "gray") {
+  if (getOption("theme") == "gray") {
     col.out30 <- "black"
     col.out15 <- "gray30"
   }
-  else if (getOption("colors") == "gray.black") {
+  else if (getOption("theme") == "gray.black") {
     col.out30 <- "gray95"
     col.out15 <- "gray60"
   }
@@ -87,6 +89,7 @@ function(x, by, size, means,
       orig.params <- par(no.readonly=TRUE)
       on.exit(par(orig.params))
     
+      par(bg=getOption("device.fill"))
       par(mai=c(bm, lm, tm, rm))
 
       stripchart(x, col="transparent", xlab=NULL, ylab=NULL, main=NULL,
@@ -96,7 +99,7 @@ function(x, by, size, means,
 
       # axis, axis ticks
       .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
-            usr[1], usr[3], cex.axis=size.axis, col.axis,
+            usr[1], usr[3], cex.axis=size.axis, getOption("axis.x.stroke"),
             rotate.x, rotate.y, offset, ...)
 
       # axis labels
@@ -110,11 +113,14 @@ function(x, by, size, means,
 
       # grid lines
       vx <- pretty(c(usr[1],usr[2]))
-      abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
+      abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]),
+         col=getOption("grid.x.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty")) 
 
-      # box around plotting area
-      rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border="black")
-
+      # box around plot
+      rect(usr[1], usr[3], usr[2], usr[4],
+        col="transparent", border=getOption("bg.stroke"),
+        lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
     }  # end new
 
     else
@@ -123,8 +129,8 @@ function(x, by, size, means,
 
     # outline=FALSE suppresses outlier points, are displayed from stripchart
     if (bx)
-      boxplot(x, add=TRUE, col=col.fill, bg=col.stroke, pch=21,
-          horizontal=TRUE, axes=FALSE, border=col.stroke, outline=FALSE, ...)
+      boxplot(x, add=TRUE, col=col.fill, border=col.stroke, pch=21,
+          horizontal=TRUE, axes=FALSE, outline=FALSE, ...)
 
     # mark outliers
     q1 <- quantile(x, probs=0.25)
@@ -182,7 +188,7 @@ function(x, by, size, means,
       if (length(col.stroke)==1 && length(shape.pts)==1)  # both shape, color default
         for (i in 1:n.levels) shp[i] <- shape.dft[i]  # fill with default shapes
 
-      trans.pts <- getOption("trans.fill.pt")
+      trans.pts <- getOption("trans.pt.fill")
       for (i in 1:n.levels) {
           clr.tr[i] <- .maketrans(clr.tr[i], (1-trans.pts)*256)
         x.lv <- subset(x, by==levels(by)[i])

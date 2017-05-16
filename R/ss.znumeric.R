@@ -2,7 +2,8 @@
 function(x, by=NULL, digits.d=NULL, brief, ...) {
 
   # get variable labels if exist
-  gl <- .getlabels()
+  # graph.win=FALSE turns off call to par, so blank window in R not produced
+  gl <- .getlabels(graph.win=FALSE)
   x.name <- gl$xn; x.lbl <- gl$xl;
   y.name <- gl$yn; y.lbl <- gl$yl
 
@@ -80,9 +81,10 @@ function(x, by=NULL, digits.d=NULL, brief, ...) {
 
   # first the title with any variable labels
   txlbl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by))
-  txlbl <- gsub("\n", "", txlbl)
-  for (i in 1:length(txlbl)) tx[length(tx)+1] <- txlbl[i] 
-  tx[length(tx)+1] <- ""
+  if (length(txlbl) > 1) if (substr(txlbl[2],1,1) ==  "\n")
+    txlbl[2] <- sub("\n", "", txlbl[2])
+  txlbl[length(txlbl)+1] <- ""
+  tx <- txlbl
 
   # --------------------------------
   # the stats loop

@@ -51,7 +51,7 @@ pc(\ldots)
   \item{cex.main}{Magnification factor of title relative to 1.}\cr
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-       with \code{\link{global}} function.}
+       with \code{\link{style}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
   \item{pdf.file}{Name of the pdf file to if graphics to be redirected to a
@@ -71,7 +71,7 @@ Plot a pie chart with default colors for one or two variables, presumably with a
 COLORS\cr
 There are three ways to override the default colors.\cr
 1. There are two pre-defined color palettes, each with 7 colors.  The default palette provides lighter, more pastel colors.  The vivid palette, activated by \code{color="vivid"}, provides brighter colors with a brighter background (cornsilk1). A third color palette, set by \code{color="gray"}, provides an ordered gray scale. Three more built-in R color palettes are also available by setting \code{color} to one of \code{"rainbow"}, \code{"heat"} and \code{"terrain"}.  The most vivid of all the palettes is \code{"rainbow"}.\cr
-2. The order of the colors within the chosen palette can be randomized with the \code{random.color="TRUE"} option. For example, when this option is activated each of the seven colors in a palette has a 1/7 chance of appearing as the first color, the only color used in the plot of a single variable. When invoked for a  \code{colors="gray"}, the order from light to dark will generally be lost, which may be desirable if the categories do not represent an ordered factor.\cr
+2. The order of the colors within the chosen palette can be randomized with the \code{random.color="TRUE"} option. For example, when this option is activated each of the seven colors in a palette has a 1/7 chance of appearing as the first color, the only color used in the plot of a single variable. When invoked for a  \code{theme="gray"}, the order from light to dark will generally be lost, which may be desirable if the categories do not represent an ordered factor.\cr
 3. The desired colors can be explicitly specified with the \code{fill} option, which overrides any other color options. When plotting one variable, include one color in this color list, the color used for all of the slices  As always with R, if the list includes more than once color, the \code{c} function must be used to generate the list, as in\cr \code{fill=c("coral3","seagreen3")}.
 
 The colors provided by the gray color palette are shades of gray. The default colors in the other two provided color palettes can be viewed, in the order in which they are displayed, by running the corresponding two lines of R code, first for the default colors and second for the vivid colors:\cr\cr

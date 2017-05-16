@@ -31,7 +31,7 @@ av.brief(\ldots, brief=TRUE)
        is \code{mydata}, otherwise explicitly specify.}
   \item{brief}{If set to \code{TRUE}, reduced text output with no Tukey multiple 
        comparison of means and no residuals. Can change system default
-       with \code{\link{theme}} function.}
+       with \code{\link{style}} function.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
   \item{Rmd}{File name for the file of R Markdown instructions to be written,

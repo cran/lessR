@@ -8,7 +8,7 @@ function(x, data=mydata,
 
 
   if (missing(colors)) 
-    colors <- getOption("colors")
+    colors <- getOption("theme")
   else
     colors <- match.arg(colors)
 
@@ -38,13 +38,13 @@ function(x, data=mydata,
   xs <- .xstatus(x.name, dname, quiet)
   is.frml <- xs$ifr
   from.data <- xs$fd
-  in.global <- xs$ig 
+  in.style <- xs$ig 
 
-  # see if variable exists in the data frame, if x not in Global Env or function call 
-  if (!missing(x) && !in.global)  .xcheck(x.name, dname, data)
+  # see if variable exists in the data frame, if x not in style Env or function call 
+  if (!missing(x) && !in.style)  .xcheck(x.name, dname, data)
 
-  if (!in.global) x.call <- eval(substitute(data$x))
-  else {  # vars that are function names get assigned to global
+  if (!in.style) x.call <- eval(substitute(data$x))
+  else {  # vars that are function names get assigned to style
     x.call <- x
     if (is.function(x.call)) x.call <- eval(substitute(data$x))
   }

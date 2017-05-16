@@ -16,7 +16,8 @@ importFrom("stats", "confint.default", "IQR", "TukeyHSD", "addmargins", "anova",
 
 importFrom("utils", "head", "help", "packageVersion", "read.csv", "read.fwf", "read.table", "type.convert", "write.csv", "write.table")
 
-importFrom("lattice", "trellis.par.get", "trellis.par.set", "xyplot", "histogram", "panel.grid", "panel.xyplot", "panel.loess", "panel.lmline")
+importFrom("lattice", "trellis.par.get", "trellis.par.set", "xyplot", "histogram", "barchart", "panel.grid", "panel.xyplot", "panel.loess", "panel.lmline",
+"panel.barchart", "panel.histogram", "panel.dotplot", "panel.points", "panel.segments")
 
 importFrom("latticeExtra", "layer", "panel.ellipse", "panel.xyarea")
 
@@ -44,7 +45,6 @@ export (
   corScree, scree, corEFA, efa,
   Density, dn,
   details, details.brief,
-  global,
   Help,
   Histogram, hs,
   label,
@@ -65,7 +65,7 @@ export (
   Sort, srt,
   Subset, subs,
   SummaryStats, ss, ss.brief,
-  theme,
+  style,
   to,
   Transform, trans,
   ttest, tt, tt.brief,

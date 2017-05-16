@@ -58,12 +58,12 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
     # get conditions and check for data existing
     xs <- .xstatus(x.name, dname)
     is.frml <- xs$ifr
-    in.global <- xs$ig 
+    in.style <- xs$ig 
 
-    # see if the variable exists in data frame, if x not in Global Env 
-    if (!in.global) .xcheck(x.name, dname, data)
+    # see if the variable exists in data frame, if x not in style Env 
+    if (!in.style) .xcheck(x.name, dname, data)
 
-    if (in.global) x.call <- x else x.call <- eval(substitute(data$x))
+    if (in.style) x.call <- x else x.call <- eval(substitute(data$x))
 
     # evaluate y
     if (!missing(y)) {
@@ -81,14 +81,14 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
       # get conditions and check for data existing
       if (!in.call) {
         xs <- .xstatus(y.name, dname)
-        in.global <- xs$ig 
+        in.style <- xs$ig 
       }
-      else in.global <- FALSE
+      else in.style <- FALSE
 
-      # see if var exists in data frame, if x not in Global Env or function call 
-      if (!in.global && !in.call) .xcheck(y.name, dname, data)
+      # see if var exists in data frame, if x not in style Env or function call 
+      if (!in.style && !in.call) .xcheck(y.name, dname, data)
 
-      if (in.global) y.call <- y 
+      if (in.style) y.call <- y 
       else y.call <- eval(substitute(data$y))
     }
 

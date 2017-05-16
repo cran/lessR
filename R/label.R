@@ -16,10 +16,10 @@ function(x, value=NULL, data=mydata) {
 
   # get conditions and check for data existing
   xs <- .xstatus(x.name, dname)
-  in.global <- xs$ig 
+  in.style <- xs$ig 
 
-  # see if the data frame exists, if x not in Global Env or function call
-  if (!in.global) {
+  # see if the data frame exists, if x not in style Env or function call
+  if (!in.style) {
     if (!exists(dname)) {
       if (dname == "mydata") 
         txtA <- ", the default data frame name, " else txtA <- " "

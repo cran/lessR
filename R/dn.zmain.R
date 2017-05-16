@@ -2,10 +2,11 @@
 function(x, 
          bw="nrd0", type="both",
          histogram=TRUE, bin.start=NULL, bin.width=NULL,
-         col.fill, col.bg, col.grid, col.box, col.nrm, col.gen,
-         col.fill.nrm, col.fill.gen,
+         col.fill, col.bg, col.box,
+         col.nrm, col.gen, col.fill.nrm, col.fill.gen,
          cex.axis=0.75, col.axis="gray30", rotate.x=0, rotate.y=0, offset=0.5, 
-         x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, x.min=NULL, x.max=NULL,
+         x.pt=NULL, xlab=NULL, main=NULL, sub=NULL,
+         y.axis=FALSE, x.min=NULL, x.max=NULL,
          band=FALSE, quiet, ...)  {
 
 
@@ -92,7 +93,13 @@ function(x,
   tm <- margs$tm
   rm <- margs$rm
   bm <- margs$bm
+
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))  
+  
+  par(bg=getOption("device.fill"))
   par(mai=c(bm, lm, tm, rm))
+
   
   # set up plot area
   plot(h, border="transparent", freq=FALSE,
@@ -117,7 +124,8 @@ function(x,
 
   # colored background for plotting area
   usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
+  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box,
+    lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
   
   # plot the histogram
   if (histogram)

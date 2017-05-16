@@ -1,12 +1,17 @@
 .plt.mat <-
 function(x, coef=TRUE, fit="loess",
-         col.fill=getOption("fill.pt"), col.stroke=getOption("stroke.pt"),
-         col.fit=getOption("stroke.bar"), col.bg=getOption("bg"),
-         col.box=getOption("box")) {
+         col.fill=getOption("pt.fill"), col.stroke=getOption("pt.stroke"),
+         col.fit=getOption("bar.stroke"), col.bg=getOption("bg.fill"),
+         col.box=getOption("bg.stroke")) {
+
 
   if (is.null(fit)) fit <- "loess"
 
+  if (getOption("sub.theme") == "black") col.stroke <- getOption("lab.stroke")
+
   n.var <- ncol(x)
+
+  par(bg=getOption("device.fill"))
 
   panel.smooth <- function (x, y, fit.line=fit, pch=par("pch"), cex=.76,
     col.pt=col.stroke, col.smooth=col.fit, span=2/3, iter=3, ...)
@@ -31,6 +36,7 @@ function(x, coef=TRUE, fit="loess",
   panel.cor <- function(x, y, digits=2, prefix="", cex.cor, ...)
   {
     usr <- par("usr"); on.exit(par(usr))
+    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
     par(usr=c(0, 1, 0, 1))
     r <- cor(x, y)
     txt <- .fmt(r, 2)
@@ -40,12 +46,20 @@ function(x, coef=TRUE, fit="loess",
     text(0.5, 0.5, txt, cex=cex.adj, col=col.stroke)  # or cex=cex.cor * r
   }
 
+  text.diag <- function(x, y, nm, ...) {  # nm from calling routine
+    usr <- par("usr")          
+    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
+    txt <-  nm  # nm from parameter list, so adjusts for each panel
+    text(0.5, 0.5, txt, cex=1.8, col=getOption("lab.stroke"))
+  }
+
   # -----
   # begin
 
   if (coef)  # no missing data
-    pairs(na.omit(x), lower.panel=panel.smooth, upper.panel=panel.cor)
+    pairs(na.omit(x), lower.panel=panel.smooth, upper.panel=panel.cor,
+      text.panel=text.diag)
   else
-    pairs(na.omit(x), panel=panel.smooth)
+    pairs(na.omit(x), panel=panel.smooth, text.panel=text.diag)
 
 }

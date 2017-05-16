@@ -1,15 +1,14 @@
 LineChart <-
 function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
 
-         fill=getOption("fill.bar"), 
-         stroke=getOption("stroke.pt"),
-         bg=getOption("bg"),
-         grid=getOption("grid"),
-         box=getOption("box"),
-         line=getOption("stroke.pt"),
+         fill=getOption("bar.fill"), 
+         stroke=getOption("pt.stroke"),
+         bg.fill=getOption("bg.fill"),
+         bg.stroke=getOption("bg.stroke"),
+         line=getOption("pt.stroke"),
          area=NULL, 
 
-         shape.pts=21, cex.axis=0.75, axes="gray30",
+         shape.pts=21, cex.axis=0.75, values.stroke="gray30",
 
          rotate.x=0, rotate.y=0, offset=.5,
 
@@ -30,10 +29,9 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
     if (fill[i] == "off") fill[i] <- "transparent"
   for (i in 1:length(stroke))
     if (stroke[i] == "off") stroke[i] <- "transparent"
-  if (bg == "off") bg <- "transparent"
-  if (grid == "off" ) grid <- "transparent"
-  if (box == "off") box <- "transparent"
-  if (line == "off") box <- "transparent"
+  if (bg.fill == "off") bg.fill <- "transparent"
+  if (bg.stroke == "off") bg.stroke <- "transparent"
+  if (line == "off") bg.stroke <- "transparent"
   if (!is.null(area)) if (area == "off") area <- "transparent"
 
   dots <- list(...)  # check for deprecated parameters
@@ -135,7 +133,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
       .lc.main(data[,i], type,
          line, area, stroke, fill, shape.pts,
-         grid, box, bg, cex.axis, axes,
+         bg.stroke, bg.fill,
+         cex.axis, values.stroke,
          rotate.x, rotate.y, offset, xy.ticks,
          line.width, xlab, ylab, main, sub, cex,
          time.start, time.by, time.reverse, 

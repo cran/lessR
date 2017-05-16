@@ -14,7 +14,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   }
 
   # colors
-  if (!grepl("gray", getOption("colors"))) {
+  if (!grepl("gray", getOption("theme"))) {
     col.1 <- rgb(.63,.46,.15)
     col.m1 <- rgb(.71,.65,.65)
     col.1t <- rgb(.63,.46,.15, alpha=.7)
@@ -41,16 +41,24 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   max.y <- max(max(dYA$y),max(dYB$y))  # max y coordinate
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
+  col.tx <- getOption("lab.stroke")
+  col.ln <- getOption("bar.stroke")
+
+
+  # ------------------------------
   # plot: set up coordinate system
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
+  par(bg=getOption("device.fill"))
   par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1.1, cex.lab=1.35)
+
   plot.new()
   plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
-  axis(1)
-  box()
+
+  axis(1, col=getOption("axis.x.stroke"), col.axis=getOption("lab.stroke"))
+  box(col=getOption("bg.stroke"))
   if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
-  title(xlab=y.lbl)
+  title(xlab=y.lbl, col.lab=col.tx)
 
   xleft <- par("usr")[1]  # left side of graph
   xright <- par("usr")[2]  # right side of graph
@@ -76,8 +84,8 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   lines(dYB, col=col.2t, lty="solid", lwd=lwd.border)
 
   # minimum mean difference of practical importance
+  col.e <- getOption("lab.stroke")  # color for effect
   if (!is.null(mmd) | !is.null(msmd)) {
-    col.e <- "gray50"  # color for effect
     mid <- (m1 + m2) / 2
     lr <- mid + .5*mmd  # line right
     ll <- mid - .5*mmd  # line left
@@ -105,7 +113,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   aL <- -45
 
   # legends
-  col.lgnd <- "gray25"
+  col.lgnd <- getOption("lab.stroke")
   cex.lgnd <- 1.1
 
   radj <- xleft + .02*(max.x-min.x)
@@ -135,7 +143,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   # scale for s-pooled, d, mdiff at top of graph
   mlow <- min(m1, m2)
   mhi  <- max(m1, m2)
-  col.d.unit <- "gray35"
+  col.d.unit <- "gray50"
   # connect first seg to top
   segments(mlow, max.y-.01*max.y, mlow, ytop, lwd=1, col=col.d.unit) 
   # provide at least 2 labeled d units on sd scale at top
@@ -145,7 +153,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
     # sd units
     segments(x.i, max.y+.025*max.y, x.i, ytop, col=col.d.unit, lwd=1)
     # d units counted
-    text(x.i, max.y+.01*max.y, labels=i)
+    text(x.i, max.y+.01*max.y, labels=i, col=col.tx)
     # horiz bar connects endpoints
     segments(mlow, ytop, x.i, ytop, col=col.d.unit, lwd=3)
     last.coord.x <- x.i
@@ -168,20 +176,23 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
 
   # title area, above graph
   if (show.title) {
-    mtext(paste("Two-Group Plot with Means"), side=3, line=6.6, font=2)
-    mtext(paste("Compare",Ynm,"for",Xnm,X1nm,"and",X2nm), side=3, line=5.5, font=3, cex=.9)
+    mtext(paste("Two-Group Plot with Means"), side=3, line=6.6, font=2,
+          col=col.tx)
+    mtext(paste("Compare",Ynm,"for",Xnm,X1nm,"and",X2nm), side=3, line=5.5,
+          font=3, cex=.9, col=col.tx)
     mtext(bquote(paste("  Classic t-test of 0 Mean Diff:   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(df), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 
-      line=3.8, cex=.9, adj=0)
+      line=3.8, cex=.9, adj=0, col=col.tx)
     mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Mean Difference:  ",
-      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=2.75, cex=.9, adj=0)
+      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=2.75, cex=.9, adj=0i,
+      col=col.tx)
     #mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Standardized",
       #" Mean Diff:   ", 
       #.(.fmt(deltaL,3)), " to ", .(.fmt(deltaU,3)))), side=3, line=1.9, cex=.8, adj=0)
     mtext(bquote(paste("s-within")), side=3, line=.7, 
-          at=(mlow+(last.coord.x))/2, col="gray40", cex=.9)
+          at=(mlow+(last.coord.x))/2, col=col.d.unit, cex=.9)
     mtext(bquote(paste(.(round(sw,2)))), side=3, line=-0.1,
-          at=(mlow+(last.coord.x))/2, col="gray40", cex=.9)
+          at=(mlow+(last.coord.x))/2, col=col.d.unit, cex=.9)
   }
 
 }

@@ -1,6 +1,7 @@
 .bx.main <-
-function(x, col.fill, col.stroke, col.bg, col.grid,
-         col.box, cex.axis, col.axis, rotate.x, rotate.y, offset, horiz, add.points,
+function(x, col.fill, col.stroke, col.bg,
+         col.box, cex.axis, col.axis,
+         rotate.x, rotate.y, offset, horiz, add.points,
          xlab, main, sub, digits.d, quiet, do.plot, fun.call, ...) {      
 
 
@@ -36,6 +37,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
     
+    par(bg=getOption("device.fill"))
     par(mai=c(bm, lm, tm, rm))
 
     # set up plot area
@@ -60,28 +62,42 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     usr <- par("usr")
    
     # colored background for plotting area
-    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
+    rect(usr[1], usr[3], usr[2], usr[4],
+         col=getOption("bg.fill"), border="transparent")
     
     # grid lines computation and print
     if (horiz) {
       vx <- pretty(c(usr[1],usr[2]))
-      abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
+      abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=getOption("grid.x.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))  
     }
     else {
       vy <- pretty(c(usr[3],usr[4]))
-      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=getOption("grid.y.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
     }
     # box plot
     boxplot(x, add=TRUE, col=col.fill, bg=col.stroke, pch=21,
             horizontal=horiz, axes=FALSE, border=col.stroke, ...)
    
-    # colored background for plotting area
-    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
+    # box around plot
+    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
+      lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
+    if (col.box == "transparent") {
+      if (getOption("axis.x.stroke") != "transparent")
+        segments(usr[1], usr[3], usr[2], usr[3], lwd=3)
+      if (getOption("axis.y.stroke") != "transparent")
+        segments(usr[1], usr[3], usr[1], usr[4], lwd=3)
+    }
+
+
+
+
 
     # dots
     if (add.points) 
         .dp.main(x, by=NULL, size=NULL, means=TRUE,
-           col.fill, col.stroke, col.bg, col.grid, col.trans=NULL,
+           col.fill, col.stroke, col.bg, col.trans=NULL,
            shape.pts=NULL, cex.axis=.85, col.axis="gray30",
            xlab=NULL, main=NULL,
            method="overplot", pt.reg=21, pt.out=19, 

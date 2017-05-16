@@ -29,10 +29,11 @@ function (x=mycor,
     pdf(file=pdf.file, width=width, height=height)
   }
 
-  if (getOption("colors") == "gray" || getOption("colors") == "gray.black")
-    col.ln <- getOption("fill.bar")
+  if (getOption("theme") == "gray" ||
+     (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black"))
+    col.ln <- getOption("bar.fill")
   else
-    col.ln <- getOption("stroke.bar")
+    col.ln <- getOption("bar.stroke")
 
   # keep track of generated graphics
   plot.i <- 0
@@ -45,10 +46,10 @@ function (x=mycor,
   .lc.main(ev, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.stroke=getOption("stroke.pt"),
-         col.fill=getOption("fill.pt"),
-         shape.pts=21, col.grid=getOption("col.grid"),
-         col.bg=getOption("bg"),
+         col.stroke=getOption("pt.stroke"),
+         col.fill=getOption("pt.fill"),
+         shape.pts=21,
+         col.bg=getOption("bg.fill"),
          cex.axis=.85, col.axis="gray30", rotate.x=0, rotate.y=0, offset=0.5,
          xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Eigenvalues", main=main, sub=NULL, cex=NULL,
@@ -80,10 +81,10 @@ function (x=mycor,
   .lc.main(ev.diff, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.stroke=getOption("stroke.pt"),
-         col.fill=getOption("fill.pt"),
-         shape.pts=21, col.grid=getOption("grid"),
-         col.bg=getOption("bg"),
+         col.stroke=getOption("pt.stroke"),
+         col.fill=getOption("pt.fill"),
+         shape.pts=21,
+         col.bg=getOption("bg.fill"),
          cex.axis=.85, col.axis="gray30", rotate.x=0, rotate.y=0, offset=0.5,
          xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Differences of Successive Eigenvalues",

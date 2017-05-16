@@ -1,8 +1,8 @@
 set <-
 function(...) {
 
-  message("New name for the set function:  global\n")
-  global(...)
+  message("New name for the set function:  style\n")
+  style(...)
 
 }
 

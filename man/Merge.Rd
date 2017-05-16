@@ -28,7 +28,7 @@ mrg(\ldots)
         which the data frames are merged. Specify \code{"row.names"} for merging
         according to the row names.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-       with \code{\link{theme}} function.}
+       with \code{\link{style}} function.}
   \item{\dots}{Additional arguments available in the base R \code{\link{merge}}
        function such as \code{all.x=TRUE} for retaining all rows of the first 
        data frame even if not matched by a row in the second data table.}

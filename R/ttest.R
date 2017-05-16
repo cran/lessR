@@ -196,16 +196,16 @@ function(x, y=NULL, ...) {
     xs <- .xstatus(x.name, df.name)
     is.frml <- xs$ifr
     from.data <- xs$fd
-    in.global <- xs$ig 
+    in.style <- xs$ig 
     if (!missing(y)) .xstatus(y.name, df.name)  # just for a message on output 
 
     # see if the variable exists in the data frame
-    if (from.data && !in.global && !is.frml) .xcheck(x.name, df.name, data)
+    if (from.data && !in.style && !is.frml) .xcheck(x.name, df.name, data)
   }
   else {
     is.frml <- FALSE
     from.data <- FALSE
-    in.global <- FALSE
+    in.style <- FALSE
   }
 
 
@@ -213,10 +213,10 @@ function(x, y=NULL, ...) {
   # do analysis with  tt.setup
   # plt is the returned number of plots generated 
 
-  if (in.global || is.frml || from.data) {
+  if (in.style || is.frml || from.data) {
 
-    if (in.global) {
-      if (is.function(x))  # var names that are R functions get assigned to global 
+    if (in.style) {
+      if (is.function(x))  # var names that are R functions get assigned to style 
         plt <- tt.setup(eval(substitute(data$x)), Ynm=x.name, ...)  # 1-group
       else {  # not a function name
         if (!missing(y))
@@ -288,7 +288,7 @@ function(x, y=NULL, ...) {
       for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
       plot.i <- plot.i + plt$i
     }
-  }  # in.global || is.frml || from.data 
+  }  # in.style || is.frml || from.data 
 
   else
     tt.setup(...)  # analysis from stats
@@ -310,7 +310,7 @@ function(x, y=NULL, ...) {
     else
       pdf(file="PairedScatterPlot.pdf", width=width, height=height)
 
-    if (in.global) {
+    if (in.style) {
       x.values <- x
       y.values <- y
     }

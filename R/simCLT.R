@@ -157,7 +157,7 @@ function(ns, n, p1=0, p2=1,
   Ymean <- apply(data.byrep, 1, mean)
   Ysd <- apply(data.byrep, 1, sd)
 
-  if (!is.null(getOption("colors"))) colors <- getOption("colors")
+  if (!is.null(getOption("theme"))) colors <- getOption("theme")
   else colors="blue"
 
   if (!pdf) 
@@ -169,8 +169,8 @@ function(ns, n, p1=0, p2=1,
 
   .dn.main(Ymean, type="normal", xlab="", 
          col.fill=fill, 
-         col.bg=getOption("bg"),
-         col.grid="transparent", col.box=getOption("box"),
+         col.bg=getOption("bg.fill"),
+         col.box=getOption("bg.stroke"),
          col.nrm="black", col.gen="black",
          col.fill.nrm="transparent",
          col.fill.gen="transparent",

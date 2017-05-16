@@ -41,7 +41,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       y.max <- max(lm.out$model[,nm[1]])
     }
     else {
-      ctitle <- "Regression Line,\nConfidence and Prediction Intervals"
+      ctitle <- "Regression Line, Confidence and Prediction Intervals"
       y.min <- min(p.int$lwr)
       y.max <- max(max(p.int$upr),  max(lm.out$model[,nm[1]]) )
     }
@@ -78,17 +78,19 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     rm <- margs$rm
     bm <- margs$bm
       
+    par(bg=getOption("device.fill"))
     par(mai=c(bm, lm, tm, rm))
     
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
-    col.bg <- getOption("bg")
-    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+    rect(usr[1], usr[3], usr[2], usr[4],
+      col=getOption("bg.fill"), border=getOption("bg.stroke"))
 
-    col.grid <- getOption("grid")
-    abline(v=axTicks(1), col=col.grid, lwd=.5)
-    abline(h=axTicks(2), col=col.grid, lwd=.5)
+    abline(v=axTicks(1), col=getOption("grid.x.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+    abline(h=axTicks(2), col=getOption("grid.y.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
     if (is.factor(x.values)) {
       x.lvl <- levels(x.values)
@@ -105,8 +107,8 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
         max.lbl.y=3, cex.lab=size.lab) 
 
-    col.fill <- getOption("fill.pt")
-    col.stroke <- getOption("stroke.pt")
+    col.fill <- getOption("pt.fill")
+    col.stroke <- getOption("pt.stroke")
     
     if (length(unique(x.values)) > getOption("n.cat"))
       points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=size.pt)
@@ -153,12 +155,13 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     }
     else {  # plot reg line
       if (!is.factor(lm.out$model[,nm[2]])) {
-        abline(lm.out$coefficients[1], lm.out$coefficients[2])
+        abline(lm.out$coefficients[1], lm.out$coefficients[2],
+               col=getOption("bar.stroke"), lwd=1)
       }
     }
 
     if (do.predint) {
-      col.ci <- getOption("stroke.pt")
+      col.ci <- getOption("pt.stroke")
       col.pi <- "gray30"
 
       lines(x.values, c.int$lwr, col=col.ci, lwd=0.75)
@@ -176,7 +179,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
 
       yy <- c( c(min(p.int$upr),p.int$upr,min(p.int$upr)),
                  rev(c(min(p.int$lwr),p.int$lwr,min(p.int$lwr))) )
-      polygon(xx, yy, col=getOption("fill.ellipse"), border="transparent")
+      polygon(xx, yy, col=getOption("ellipse.fill"), border="transparent")
 
 
     }
@@ -187,7 +190,10 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       plt.i <- plt.i + 1L
       plt.title[plt.i] <- "ScatterPlot Matrix"
 
-      .plt.mat(lm.out$model[c(nm)], fit="ls")
+      bg.fill <- getOption("bg.fill")  
+      device.fill <- getOption("device.fill")  
+      bckg <- ifelse(bg.fill=="transparent", device.fill, bg.fill)
+      .plt.mat(lm.out$model[c(nm)], fit="ls", col.bg=bckg)
     }
     else {
       cat("\n>>> No scatterplot matrix reported because not all variables are ")

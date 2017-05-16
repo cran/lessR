@@ -10,7 +10,7 @@ Abbreviation: \code{hs}
 
 From the standard R function \code{\link{hist}}, plots a frequency histogram with default colors, including background color and grid lines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width and/or the bin start. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
 
-If a set of multiple variables is provided, including an entire data frame, then each numeric variable in that set of variables is analyzed, with the option to write the resulting histograms to separate pdf files. The related \code{\link{CountAll}} function does the same for all variables in the set of variables, histograms for continuous variables and bar charts for categorical variables. Specifying a \code{by} or \code{by2} variable implements Trellis graphics.
+If a set of multiple variables is provided, including an entire data frame, then each numeric variable in that set of variables is analyzed, with the option to write the resulting histograms to separate pdf files. The related \code{\link{CountAll}} function does the same for all variables in the set of variables, histograms for continuous variables and bar charts for categorical variables. Specifying a \code{by1} or \code{by2} variable implements Trellis graphics.
 
 When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, can assess the pieces of output for later analysis. A primary such analysis is \code{knitr} for dynamic report generation from a generated R markdown file according to the \code{Rmd} option in which interpretative R output is embedded in documents. See \code{value} below.
 }
@@ -18,19 +18,20 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, c
 \usage{
 Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
-         by=NULL, by2=NULL,
+         by1=NULL, by2=NULL,
          n.row=NULL, n.col=NULL, aspect="fill",
 
-         fill=getOption("fill.bar"), 
-         stroke=getOption("stroke.bar"),
-         bg=getOption("bg"),
-         grid=getOption("grid"),
-         box=getOption("box"),
-         trans=getOption("trans.fill.bar"),
+         fill=getOption("bar.fill"), 
+         stroke=getOption("bar.stroke"),
+         bg.fill=getOption("bg.fill"),
+         bg.stroke=getOption("bg.stroke"),
+         trans=getOption("trans.bar.fill"),
          reg="snow2",
 
-         over.grid=FALSE, cex.axis=0.75, axes="gray30",
-         rotate.x=0, rotate.y=0, offset=0.5,
+         cex.lab=0.84, cex.axis=getOption("cex.axis"),
+         rotate.x=getOption("rotate.x"),
+         rotate.y=getOption("rotate.y"),
+         offset=getOption("offset"),
 
          bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
 
@@ -46,7 +47,7 @@ hs(\ldots)
 
 \arguments{
   \item{x}{Variable(s) to analyze.  Can be a single numerical variable, 
-        either within a data frame or as a vector in the user's workspace,
+        either within a data frame or as a vector in the users workspace,
         or multiple variables in a data frame such as designated with the
         \code{\link{c}} function, or an entire data frame. If not specified,
         then defaults to all numerical variables in the specified data
@@ -62,12 +63,12 @@ hs(\ldots)
         a simple
         text file that can be edited with any text editor, including RStudio.}\cr
 
-  \item{by}{A categorical variable called a conditioning variable that
+  \item{by1}{A categorical variable called a conditioning variable that
         activates \bold{Trellis graphics}, from the lattice package, to provide
         a separate scatterplot (panel) of numeric primary variables \code{x}
         and \code{y} for each level of the variable.}
   \item{by2}{A second conditioning variable to generate Trellis
-        plots jointly conditioned on both the \code{by} and \code{by2} variables,
+        plots jointly conditioned on both the \code{by1} and \code{by2} variables,
         with \code{by2} as the row variable, which yields a scatterplot (panel)
         for each cross-classification of the levels of numeric \code{x} and
         \code{y} variables.}
@@ -90,24 +91,22 @@ hs(\ldots)
 
   \item{fill}{Specified bar colors. Remove with \code{fill="off"}. This
        and the following colors can also be changed globally, individually and as 
-       a color theme, with the \code{lessR} \code{\link{global}} function.
+       a color theme, with the \code{lessR} \code{\link{style}} function.
        The \code{lessR} function \code{\link{showColors}} provides examples
        of all R named colors.}
   \item{stroke}{Color of the border of the bars. Remove with \code{stroke="off"}.}
-  \item{bg}{Color of the plot background. Turn off with \code{bg="off"}.}
-  \item{grid}{Color of the grid lines. Turn off with \code{grid="off"}.}
-  \item{box}{Color of border around the plot background, the box, that encloses 
-        the plot. Remove with \code{box="off"}.}
+  \item{bg.fill}{Color of the plot background. Turn off with \code{bg.fill="off"}.}
+  \item{bg.stroke}{Color of border around the plot background, the box, that encloses 
+        the plot. Remove with \code{bg.stroke="off"}.}
   \item{trans}{Transparency level of plotted bars from 0 (none) to 1 (complete).
-        Default transparency of fill color for the bars is 0.10.}\cr
+        Default transparency of fill color for the bars is 0.10.}
   \item{reg}{The color of the superimposed, regular histogram when
         \code{cumul="both"}.}\cr
 
-  \item{over.grid}{If \code{TRUE}, plot the grid lines over the histogram.}
+  \item{cex.lab}{Scale magnification factor for the axes label.}
   \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
         values to be smaller than the axis labels. Provides the functionality of,
         and can be replaced by, the standard R \code{cex.axis.}}
-  \item{axes}{Color of the font used to label the axis values.}
   \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
         accommodate longer values, typically used in conjunction with \code{offset}.}
   \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
@@ -139,7 +138,7 @@ hs(\ldots)
   \item{sub}{Sub-title of graph, below xlab.}\cr
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-        with \code{\link{global}} function.}
+        with \code{\link{style}} function.}
   \item{do.plot}{If \code{TRUE}, the default, then generate the plot.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
@@ -157,8 +156,7 @@ hs(\ldots)
       \code{col.lab} for the color of the axis labels\cr
       \code{lty} for line type, such as \code{"solid"}, \code{"dashed"},
       \code{"dotted"}, \code{"dotdash"}\cr
-      \code{col.lab} for the color of the axis labels\cr
-      \code{axes} to set the color of the axis values}
+      \code{col.lab} for the color of the axis labels}
 }
 
 
@@ -167,7 +165,7 @@ OVERVIEW\cr
 Results are based on the standard R \code{\link{hist}} function to calculate and plot a histogram, or a multi-panel display of histograms with Trellis graphics, plus the additional provided color capabilities, a relative frequency histogram, summary statistics and outlier analysis. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}.  To plot densities, use the \code{lessR} function \code{\link{Density}}.
 
 VARIABLES and TRELLIS PLOTS\cr
-At a minimum there is one primary variable, \code{x}, which results in a single histogram. Trellis graphics, from Deepayan Sarkar's \code{lattice} package, may be implemented in which multiple panels are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by} is a conditioning variable that results in a Trellis plot, the histogram of \code{x} produced at \emph{each} level of the \code{by} variable. Inclusion of a second conditioning variable, \code{by2}, results in a separate histogram for \emph{each} combination of cross-classified values of both \code{by} and \code{by2}. 
+At a minimum there is one primary variable, \code{x}, which results in a single histogram. Trellis graphics, from Deepayan Sarkar's \code{lattice} package, may be implemented in which multiple panels are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by1} is a conditioning variable that results in a Trellis plot, the histogram of \code{x} produced at \emph{each} level of the \code{by1} variable. Inclusion of a second conditioning variable, \code{by2}, results in a separate histogram for \emph{each} combination of cross-classified values of both \code{by1} and \code{by2}. 
 
 DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
@@ -175,10 +173,9 @@ The data may either be a vector from the global environment, the user's workspac
 To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{global}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{global}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors. 
+Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{lightbronze}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub.theme="black")} for a black background and partial transparency of plotted colors. 
 
-For the color options, such as \code{grid}, the value of \code{"off"} is the same as 
-\code{"transparent"}.
+For the color options, such as \code{fill}, the value of \code{"off"} is the same as \code{"transparent"}.
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -230,7 +227,7 @@ Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springe
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{hist}}, \code{\link{plot}}, \code{\link{par}}, \code{\link{global}}.
+\code{\link{hist}}, \code{\link{plot}}, \code{\link{par}}, \code{\link{style}}.
 }
 
 
@@ -265,18 +262,19 @@ Histogram(y, stroke="off")
 # save the histogram to a pdf file
 Histogram(y, pdf=TRUE)
 
-# histogram with no grid, red bars, black background, and black border
-Histogram(y, grid="off", bg="black",
-          fill="red", stroke="black")
+# histogram with red bars, black background, and black border
+Histogram(y, bg.fill="black",
+          fill="red", bg.stroke="black")
 # or set this color scheme for all subsequent analyses
-set("red", grid="off", bg="black", stroke.bar="black")
+#  here with the grid turned off as well
+style(grid.stroke="off", bg.fill="black", bar.stroke="black")
 Histogram(y)
 
-# histogram with orange color theme, transparent orange bars, no grid lines
-global(colors="orange", ghost=TRUE)
+# histogram with purple color theme, translucent gold bars
+style("purple", sub.theme="black")
 Histogram(y)
-# back to default of "blue" color theme
-global(colors="blue")
+# back to default color theme
+style("lightbronze")
 
 # histogram with specified bin width
 # can also use bin.start
@@ -287,7 +285,7 @@ Histogram(y, bin.width=.25)
 Histogram(y, rotate.x=45, offset=1, quiet=TRUE)
 
 # histogram with specified bins and grid lines displayed over the histogram
-Histogram(y, breaks=seq(-5,5,.25), xlab="My Variable", over.grid=TRUE)
+Histogram(y, breaks=seq(-5,5,.25), xlab="My Variable")
 
 # histogram with bins calculated with the Scott method and values displayed
 Histogram(y, breaks="Scott", hist.counts=TRUE, quiet=TRUE)
@@ -295,14 +293,13 @@ Histogram(y, breaks="Scott", hist.counts=TRUE, quiet=TRUE)
 # histogram with the number of suggested bins, with proportions
 Histogram(y, breaks=15, prop=TRUE)
 
-# histogram with specified colors, overriding defaults
-# bg and grid are defined in histogram
-# all other parameters are defined in hist, par and plot functions
-# generates caution messages that can be ignored regarding density and angle
-#Histogram(y, fill="darkblue", stroke="lightsteelblue4", bg="ivory",
-#  grid="darkgray", density=25, angle=-45, cex.lab=.8, cex.axis=.8,
-#  col.lab="sienna3", main="My Title", col.main="gray40", xlim=c(-5,5), lwd=2,
-#  xlab="My Favorite Variable")
+
+# ----------------
+# Trellis graphics
+# ----------------
+mydata <- rd("Employee", format="lessR", quiet=TRUE)
+Histogram(Salary, by1=Dept)
+
 
 # ---------------------
 # cumulative histograms
@@ -340,7 +337,7 @@ Histogram()
 Histogram(breaks, data=warpbreaks)
 
 # all histograms with specified options, including red axis labels
-Histogram(fill="palegreen1", bg="ivory", hist.counts=TRUE, col.lab="red")
+Histogram(fill="palegreen1", bg.fill="ivory", hist.counts=TRUE, col.lab="red")
 
 # histograms for all specified numeric variables
 # use the combine or c function to specify a list of variables

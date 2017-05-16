@@ -1,8 +1,8 @@
 .dpmat.main <-   # BPFM
 function(x, mylabels, sort.yx,
-         col.fill, col.stroke, col.bg, col.grid, col.trans,
+         col.fill, col.stroke, col.bg, col.trans,
          shape.pts, col.area, col.box, 
-         cex.axis, col.axis, col.low, col.hi,
+         cex.axis, col.low, col.hi,
          xy.ticks, xlab, ylab, main, sub, cex,
          radius, size.cut, txt.color="black", power,
          value.labels, rotate.x, rotate.y, offset, quiet,
@@ -117,6 +117,7 @@ function(x, mylabels, sort.yx,
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
     
+    par(bg=getOption("device.fill"))
     par(mai=c(bm, lm, tm, rm))
 
     plot(cords$xx, cords$yy, type="n", axes=FALSE, ann=FALSE, 
@@ -130,7 +131,7 @@ function(x, mylabels, sort.yx,
       x.lvl <- gsub(" ", "\n", x.lvl) 
 
     .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,
-          par("usr")[1], par("usr")[3], size.axis, col.axis,
+          par("usr")[1], par("usr")[3], size.axis, getOption("axis.x.stroke"),
           rotate.x, rotate.y, offset=offset, ...)
 
     # axis labels 
@@ -150,11 +151,20 @@ function(x, mylabels, sort.yx,
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
 
     # grid lines
-    abline(h=1:n.var, col=col.grid, lwd=.75)
-    abline(v=axTicks(1), col=col.grid, lwd=.75)  # bubbles only
-
-    # color plotting area
-    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
+    abline(h=1:n.var, col=getOption("grid.y,stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+    abline(v=axTicks(1), col=getOption("grid.x.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))  # bubbles only
+ 
+    # box around plot
+    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
+      lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
+    if (col.box == "transparent") {
+      if (getOption("axis.x.stroke") != "transparent")
+        segments(usr[1], usr[3], usr[2], usr[3], lwd=3)
+      if (getOption("axis.y.stroke") != "transparent")
+        segments(usr[1], usr[3], usr[1], usr[4], lwd=3)
+    }
 
     # colors
     if (is.null(col.low) ||  is.null(col.hi))
@@ -271,3 +281,4 @@ function(x, mylabels, sort.yx,
   }  # end !quiet
 
 }
+

@@ -82,14 +82,15 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
-    col.bg <- getOption("bg")
-    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+    col.bg <- getOption("bg.fill")
+    rect(usr[1], usr[3], usr[2], usr[4],
+         col=getOption("bg.fill"), border=getOption("bg.stroke"))
 
     axT1 <- 1:length(unique(x.values))
-
-    col.grid <- getOption("grid")
-    abline(v=axT1, col=col.grid, lwd=.5)
-    abline(h=axTicks(2), col=col.grid, lwd=.5)
+    abline(v=axT1, col=getOption("grid.x.stroke"),
+                        lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+    abline(h=axTicks(2), col=getOption("grid.y.stroke"),
+                        lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
     .axes(levels(x.values), NULL, axT1, axTicks(2),
           par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30")
@@ -100,14 +101,14 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     y.label <- nm[1]
     .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
 
-    col.fill <- getOption("fill.pt")
-    col.stroke <- getOption("stroke.pt")
+    col.fill <- getOption("pt.fill")
+    col.stroke <- getOption("pt.stroke")
     points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
 
     # plot cell means
-    pch.avg <- ifelse(getOption("colors")!="gray", 21, 23)
-    bck.g <- ifelse(getOption("colors")!="gray", "gray15", "gray30")
-    if (grepl(".black", getOption("colors"), fixed=TRUE)) bck.g <- "gray85"
+    pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
+    bck.g <- ifelse(getOption("theme")!="gray", "gray15", "gray30")
+    if (grepl(".black", getOption("theme"), fixed=TRUE)) bck.g <- "gray85"
 
     m.lvl <- numeric(length = 0)
     for (i in (1:length(levels(x.values))))

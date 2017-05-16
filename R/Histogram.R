@@ -1,19 +1,20 @@
 Histogram <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
-    by=NULL, by2=NULL,
+    by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
 
-    fill=getOption("fill.bar"), 
-    stroke=getOption("stroke.bar"),
-    bg=getOption("bg"),
-    grid=getOption("grid"),
-    box=getOption("box"),
-    trans=getOption("trans.fill.bar"),
+    fill=getOption("bar.fill"),
+    stroke=getOption("bar.stroke"),
+    bg.fill=getOption("bg.fill"),
+    bg.stroke=getOption("bg.stroke"),
+    trans=getOption("trans.bar.fill"),
     reg="snow2",
 
-    over.grid=FALSE, cex.axis=0.75, axes="gray30",
-    rotate.x=0, rotate.y=0, offset=0.5,
+    cex.lab=0.84, cex.axis=getOption("cex.axis"), 
+    rotate.x=getOption("rotate.x"),
+    rotate.y=getOption("rotate.y"),
+    offset=getOption("offset"),
 
     bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
 
@@ -33,7 +34,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   df.name <- deparse(substitute(data))   # get name of data table
   options(dname = df.name)
 
-  Trellis <- ifelse(!missing(by), TRUE, FALSE)
+  Trellis <- ifelse(!missing(by1), TRUE, FALSE)
 
   if (!missing(trans)) fill <- .maketrans(fill, (1-trans)*256) 
 
@@ -41,9 +42,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     if (fill[i] == "off") fill[i] <- "transparent"
   for (i in 1:length(stroke))
     if (stroke[i] == "off") stroke[i] <- "transparent"
-  if (bg == "off") bg <- "transparent"
-  if (grid == "off" ) grid <- "transparent"
-  if (box == "off") box <- "transparent"
+  if (bg.fill == "off") bg.fill <- "transparent"
+  if (bg.stroke == "off") bg.stroke <- "transparent"
 
   kf <- FALSE
   lbls <- FALSE
@@ -67,6 +67,22 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "pdf.file  changed to  pdf, either TRUE or FALSE\n\n")
       }
+      if (names(dots)[i] == "box") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  box  is renamed  bg.stroke\n\n")
+      }
+      if (names(dots)[i] == "bg") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  bg  is renamed  bg.fill\n\n")
+      }
+      if (names(dots)[i] == "axes") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  axes  is renamed  values.stroke\n\n")
+      }
+      if (names(dots)[i] == "overgrid") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  overgrid  removed\n\n")
+      }
       if (names(dots)[i] == "knitr.file") kf <- TRUE 
       if (names(dots)[i] == "labels") lbls <- TRUE 
     }
@@ -88,12 +104,6 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "knitr.file  no longer used\n",
       "Instead use  Rmd  for R Markdown file\n\n")
-  }
-        
-  if (is.numeric(breaks) && !is.null(bin.start)) { 
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Choose only one option to specify a start value.\n",
-      "Either choose the option  breaks  or the option  bin.start.\n\n")
   }
 
   # get actual variable name before potential call of data$x
@@ -120,7 +130,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
           if (!is.numeric(data.x)) { 
             cat("\n"); stop(call.=FALSE, "\n","------\n",
               "A histogram is only computed from a numeric variable\n",
-              "For the frequencies of a categorical variable:\n\n",
+              "To tabulate the values of a categorical variable:\n\n",
               "  Plot(", x.name, ", topic=\"count\")\n",
               "or\n",
               "  BarChart(", x.name, ")\n\n", sep="")
@@ -133,7 +143,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         data.x <- data.frame(data[[x.col]])
         names(data.x) <- x.name
       }
-    }
+    }  # x not in global
 
     else { # x is in the global environment (vector or data frame)
 
@@ -150,34 +160,34 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   }
   
-  # evaluate by
-  #------------
-  if (!missing(by)) {
+  # evaluate by1
+  #-------------
+  if (!missing(by1)) {
 
     # get actual variable name before potential call of data$x
-    by.name <- deparse(substitute(by))
-    options(byname = by.name)
+    by1.name <- deparse(substitute(by1))
+    options(by1name = by1.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(by.name, df.name, quiet)
+    xs <- .xstatus(by1.name, df.name, quiet)
     in.global <- xs$ig
 
-    # see if var exists in df, if x not in Global Env or function call
+    # see if var exists in df, if x not in global Env or function call
     if (!missing(x) && !in.global)
-      .xcheck(by.name, df.name, data)
+      .xcheck(by1.name, df.name, data)
 
     if (!in.global)
-      by.call <- eval(substitute(data$by))
+      by1.call <- eval(substitute(data$by1))
     else {  # vars that are function names get assigned to global
-      by.call <- by
-      if (is.function(by.call)) by.call <- eval(substitute(data$by))
+      by1.call <- by1
+      if (is.function(by1.call)) by1.call <- eval(substitute(data$by1))
     }
 
-    if (!is.factor(by.call)) by.call <- factor(by.call)
+    if (!is.factor(by1.call)) by1.call <- factor(by1.call)
   }
 
   else
-   by.call <- NULL
+   by1.call <- NULL
 
 
   # evaluate by2
@@ -192,7 +202,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     xs <- .xstatus(by2.name, df.name, quiet)
     in.global <- xs$ig
 
-    # var in data frame? if x not in Global Env or function call
+    # var in data frame? if x not in global Env or function call
     if (!missing(x) && !in.global)
       .xcheck(by2.name, df.name, data)
 
@@ -214,9 +224,10 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 # do the analysis
 
   if (Trellis && do.plot) {
-    .hst.lattice(data.x[,1], by.call, by2.call, n.row, n.col, aspect,
-                 fill, stroke, bg, grid, trans,
-                 xlab, ylab, main, breaks, cex.axis, width, height, pdf)
+    .bar.lattice(data.x[,1], by1.call, by2.call, n.row, n.col, aspect, prop,
+                 fill, stroke, bg.fill, bg.stroke, trans, size.pt=NULL,
+                 xlab, ylab, main, cex.lab, cex.axis, rotate.x, rotate.y,
+                 width, height, pdf, segments.x=NULL, breaks, c.type="hist")
   }
 
   else {
@@ -278,9 +289,9 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         }
 
         # nothing returned if quiet=TRUE
-        stuff <- .hst.main(data[,i], fill, stroke, bg,
-            grid, box, reg,
-            over.grid, cex.axis, axes, rotate.x, rotate.y, offset,
+        stuff <- .hst.main(data[,i], fill, stroke, bg.fill,
+            bg.stroke, reg,
+            cex.axis, rotate.x, rotate.y, offset,
             breaks, bin.start, bin.width,
             bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub,
             quiet, do.plot, fun.call=fun.call, ...)

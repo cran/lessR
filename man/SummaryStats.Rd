@@ -35,7 +35,7 @@ ss(\dots)
   \item{data}{Optional data frame that contains the variable of interest, default is \code{mydata}.}
   \item{n.cat}{Specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Default is off, set to 0.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
-  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{theme}} function.}
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{style}} function.}
   \item{label.max}{Maximum size of labels for the values of a variable.
         Not a literal maximum as preserving unique values may require a larger number
         of characters than specified.}

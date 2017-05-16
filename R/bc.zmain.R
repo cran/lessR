@@ -1,14 +1,18 @@
 .bc.main <- 
 function(x, y, by, 
-         col.fill, col.stroke, col.bg, col.grid, col.box, col.trans, colors,
-         horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
+         col.fill, col.stroke, col.bg, col.box, col.trans, colors,
+         horiz, addtop, gap, prop, xlab, ylab, main, cex.lab,
          value.labels, label.max,
-         cex.axis, col.axis, rotate.x, rotate.y, offset, beside,
+         cex.axis, cex.names, rotate.x, rotate.y, offset, beside,
          col.low, col.hi,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
 
+
+  # if x is integer, not labeled correctly
+  if (length(unique(x)) != length(x)) if (!is.factor(x)) x <- factor(x)
+
   # scale for regular R or RStudio
-  adj <- .RSadj(radius=NULL, cex.axis)
+  adj <- .RSadj(radius=NULL, cex.axis, cex.names, cex.lab)
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
   size.txt <- adj$size.txt
@@ -36,7 +40,6 @@ function(x, y, by,
 
   ylab.keep <- ifelse(is.null(ylab), FALSE, TRUE)
 
-  # get axis labels
   if (ylab.keep) {
       y.lab <- ylab
   }
@@ -50,7 +53,7 @@ function(x, y, by,
     }
     else {
       y.lab <- x.name
-      x.lab <- ""
+      if (length(unique(x)) != length(x)) x.lab <- ""
     }
   }
 
@@ -199,26 +202,32 @@ function(x, y, by,
     clr <- color.palette(n.colors)
   } # end ordered
 
-  else if (colors == "gray") {
+  else if (colors %in% c("lightbronze", "gray", "white")) {
     if (n.colors == 1 || length(col.fill) > 1)
       clr <- col.fill
     else {
-      color.palette <- colorRampPalette(c("gray85","gray30"))
+      if (n.colors == 2)
+        { light <- "gray70"; dark <- "gray40" }
+      else if (n.colors == 3)
+        { light <- "gray80"; dark <- "gray30" }
+      else 
+        { light <- "gray92"; dark <- "gray28" }
+      color.palette <- colorRampPalette(c(dark, light))
       clr <- color.palette(n.colors)
     }
   }
 
-  else if ((colors %in% c("blue","rose","green","gold","red","orange",
-          "darkred", "brown", "sienna","dodgerblue","purple","white",
-          "orange.black","gray.black")
+  else if ((colors %in% c("darkred", "gray", "blue", "rose",
+      "green", "gold", "red", "dodgerblue", "darkgreen", "purple", "sienna",
+      "brown", "orange")
           && (is.null(by) && !is.matrix(x)))) {
       if (n.colors == 1 || length(col.fill) > 1)
         clr <- col.fill
       else {
-        color.palette <- colorRampPalette(getOption("col.fill.bar"))
+        color.palette <- colorRampPalette(getOption("col.bar.fill"))
         clr <- color.palette(nrow(x))
       }
-    }
+  }
 
   else if (colors == "rainbow") clr <- rainbow(n.colors)
   else if (colors == "terrain") clr <- terrain.colors(n.colors)
@@ -228,13 +237,12 @@ function(x, y, by,
     if (length(col.fill) > 1)
       clr <- col.fill
     else
-      clr <- .col.discrete()[1:n.colors]
+      if (n.colors > 1) clr <- .col.discrete()[1:n.colors]
     # lighten some default background colors
     if (col.bg == "#EEF0F2") col.bg <- rgb(245,245,245, maxColorValue=255)
     if (col.bg == "#E5DB8E") col.bg <- rgb(251,245,220, maxColorValue=255)
   }
 
-  if (is.null(col.trans)) col.trans <- getOption("trans.fill.bar")
 
   if (!is.null(col.trans)) 
     for (i in 1:n.colors) clr[i] <- .maketrans(clr[i], (1-col.trans)*256) 
@@ -244,7 +252,7 @@ function(x, y, by,
     colr <- 1:n.colors   # colr is a sequence of integers
   }
   else  # colr is a color
-    colr <- ifelse (is.null(col.fill), getOption("col.fill.bar"), col.fill)
+    colr <- ifelse (is.null(col.fill), getOption("bar.fill"), col.fill)
 
 
   # ----------------------------------------------------------------------------
@@ -292,30 +300,21 @@ function(x, y, by,
 
   
   # ----------------------------------------------------------------------------
-  # set up plot area, color background, grid lines
+  # set up plot area
 
   # set margins
-  if (!horiz) {
-    if (is.null(value.labels)) {
-      if (is.null(by))
-        val.lab <- names(x)
-      else
-        val.lab <- colnames(x)
-      if (length(val.lab) == 0) val.lab <- colnames(x)  # read matrix directly
-      if (!is.null(names(y))) val.lab <- names(y)
-    }
+  if (is.null(value.labels)) {
+    if (is.null(by))
+      val.lab <- names(x)
     else
-      val.lab <- value.labels
-    val.lab <- gsub(" ", "\n", val.lab) 
-    if (!is.null(val.lab)) val.lab <- .abbrev(val.lab, label.max)
+      val.lab <- colnames(x)
+    if (length(val.lab) == 0) val.lab <- colnames(x)  # read matrix directly
+    if (!is.null(names(y))) val.lab <- names(y)
   }
-  else  { # horizontal, where value labels do not work
-    val.lab <- NULL
-    if (is.null(by)  &&  !is.vector(x)  &&  !is.matrix(x))
-      names(x) <- .abbrev(names(x), label.max)
-    else
-      colnames(x) <- .abbrev(colnames(x), label.max)
-  }
+  else
+    val.lab <- value.labels
+  val.lab <- gsub(" ", "\n", val.lab) 
+  if (!is.null(val.lab)) val.lab <- .abbrev(val.lab, label.max)
  
   if(is.null(y)) if (horiz) {  # switch
     temp <- x.lab
@@ -344,16 +343,26 @@ function(x, y, by,
  
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  
+
+  par(bg=getOption("device.fill"))
   par(mai=c(bm, lm, tm, rm))
 
+  # rescale to control bar width for small number of bars
+  # set rescale
   if (class(x) == "numeric"  &&  entered) x <- as.table(x)
   rescale <- 0
-  if (is.null(by)) if (nrow(x) <=4) rescale <- nrow(x)
+  if (is.null(by)) if (nrow(x) <= 4) rescale <- nrow(x)
   if (!is.null(by) && !beside) if (ncol(x) <= 4) rescale <- ncol(x)
   if (class(x) == "matrix" && entered) rescale <- 0  # turned off for now
+  # set width.bars, gap
+  if (rescale == 4) width.bars <- .17
+  if (rescale == 3) width.bars <- .22
+  if (rescale == 2) width.bars <- .28
+  if (rescale > 0) gap <- 0.246 + (0.687 * width.bars)
 
-  # set rescale to control bar width for small number of bars
+  # barplot run here only to establish usr coordinates
+  #  otherwise usr is just 0,1 for both axes
+  # the barplot itself is not retained, but overwritten
   if (rescale == 0) {
     if (!horiz)
       barplot(x, col="transparent", ylim=c(min.y,max.y), axisnames=FALSE,
@@ -362,13 +371,7 @@ function(x, y, by,
       barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
         beside=beside, space=gap, axes=FALSE, xlim=c(min.y, max.y), ...)
   }
-
-  else {  # rescale
-    if (rescale == 4) width.bars <- .17
-    if (rescale == 3) width.bars <- .22
-    if (rescale == 2) width.bars <- .28
-    gap <- 0.246 + (0.687 * width.bars)
-    # need (0,1) limit on value axis to let re-scale work
+  else { # rescale, need (0,1) limit on cat axis for re-scale to work
     if (!horiz)
       barplot(x, col="transparent", ylim=c(min.y,max.y), axisnames=FALSE,
         beside=beside, space=gap, width=width.bars, xlim=c(0,1),
@@ -386,50 +389,44 @@ function(x, y, by,
   usr <- par("usr")
   
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
-  vy <- pretty(min.y:max.y)
  
-  if (!over.grid) {
-    if (!horiz)
-      abline(h=axTicks(2), col=col.grid, lwd=.5)
-    else
-      abline(v=axTicks(1), col=col.grid, lwd=.5)
-  }
-  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
+  ax.num <- ifelse(horiz, 1, 2)  # location of numerical axis
+  vy <- pretty(min.y:max.y)
+  abline(h=axTicks(ax.num), col=getOption("grid.y.stroke"), 
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
-  if (rescale == 0) {
-    # width.bars <- .8   gap <- .6*width.bars
-    # axisnames suppressed only works if horiz is FALSE,
-    #   otherwise let R generate
+  # box around plot
+  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
+    lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
+
+  ## PLOT
+  if (rescale == 0)
     coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
-          space=gap, cex.names=size.txt, axisnames=horiz, ...)
-  }
+          space=gap, axisnames=FALSE, ...)
   else
     coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
-          space=gap, width=width.bars, xlim=c(0,1), 
-          cex.names=size.txt, axisnames=horiz, ...)
-  if (over.grid) {
-    if (!horiz)
-      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
-    else
-      abline(v=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
-  }
+          space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
 
-  # axes (barplot produces its own axis for the categories,
-  #        unless axisnames=FALSE)
-  ax.freq <- ifelse(horiz, 1, 2)
+  # axes
   if (!horiz) las.value <- 1
-  axis(ax.freq, cex.axis=size.axis, col.axis=col.axis, las=las.value, ...) 
+  axis(ax.num, cex.axis=size.axis, col=getOption("axis.y.stroke"),
+       col.axis=getOption("values.stroke"), las=las.value, ...) 
   
-  ax.value <- ifelse(horiz, 2, 1)
+  if (beside) coords <- apply(coords, 2, mean)  # one label per group
   if (!horiz) {
-    if (beside) coords <- apply(coords, 2, mean)  # one label per group
-    axis(ax.value, at=coords, labels=FALSE, tck=-.01, ...)
-    text(x=coords, y=par("usr")[3], labels=val.lab,
-         pos=1, xpd=TRUE, cex=size.txt, col=col.axis, srt=rotate.x,
-         offset=offset, ...)
+    ax.value <- 1;  xx <- coords;  yy <- par("usr")[3]
   }
+  else {
+    ax.value <- 2;  xx <- par("usr")[3];  yy <- coords
+  }
+  if (horiz && beside) xx <- -0.032  # otherwise usr3 is a + value
+  axis(ax.value, at=coords, labels=FALSE, tck=-.01,
+       col=getOption("axis.x.stroke"), ...)
+  text(x=xx, y=yy, labels=val.lab,
+       pos=ax.value, xpd=TRUE, cex=size.txt, col=getOption("values.stroke"),
+       srt=rotate.x, offset=offset, ...)
     
   # axis labels
   title(main=main.lab, col.main=col.main)
@@ -443,7 +440,8 @@ function(x, y, by,
   if (new.ln) lblx.lns <- lblx.lns + 1
   if (offset > 0.5) lblx.lns <- lblx.lns + 1 
   if (horiz) lblx.lns <- lblx.lns + .6 
-  title(xlab=x.lab, line=lblx.lns, cex.lab=size.lab, col.lab=col.lab)
+  title(xlab=x.lab, line=lblx.lns, cex.lab=size.lab,
+        col.lab=getOption("lab.stroke"))
 
   # ylab positioning (based on .axlabs function)
   lbl.lns <- 3.6
@@ -453,13 +451,14 @@ function(x, y, by,
       if (grepl("\n", y.lab[i], fixed=TRUE)) multi <- TRUE  # multi-line
   lm <- par("mar")[2]  # get the current left margin
   lbly.lns <- ifelse (multi, lm - 2, lm - 1.4)
-  title(ylab=y.lab, line=lbly.lns, cex.lab=size.lab)
+  title(ylab=y.lab, line=lbly.lns, cex.lab=size.lab,
+        col.lab=getOption("lab.stroke"))
 
   # ----------------------------------------------------------------------------
   # legend for two variable plot including variable labels
   if ( (!is.null(by) || is.matrix(x)) && !is.null(legend.loc))  {
 
-     col.txt <- ifelse (sum(col2rgb(col.bg))/3 > 80, "black", rgb(.97,.97,.97))
+    col.txt <- ifelse (sum(col2rgb(col.bg))/3 > 80, "black", rgb(.97,.97,.97))
 
     # default right.margin option
     if (legend.loc == "right.margin") {

@@ -60,6 +60,11 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   if (from.data) cat("n.miss = ", n2.miss, ",  ", sep="")
   cat("n = ", n2, sep="")
   cat(",  mean = ", .fmt(m2,dig.smr.d), ",  sd = ", .fmt(s2,dig.smr.d), sep="", "\n")
+  cat("\n")
+
+  # sample mean difference
+  mdiff <- m1 - m2
+  cat("Sample Mean Difference of ", Ynm, ":  " , .fmt(mdiff), sep="", "\n")
   if (!brief) cat("\n")
 
 # sw
@@ -69,9 +74,10 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   sw <- sqrt(swsq)
   if (!brief) cat("Within-group Standard Deviation:  ", .fmt(sw), "\n")
 
-  # sample mean difference
-  mdiff <- m1 - m2
-
+  smd <- mdiff/sw
+  if (brief) 
+    cat("Standardized Mean Difference of ", Ynm, ", ",
+        "Cohen's d:  ", .fmt(smd), sep="", "\n")
 
   if (!brief) {
 
@@ -256,14 +262,12 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   }
 
   # mean difference and standardized mean difference
-  smd <- mdiff/sw
   if (!brief) {
     cat("\n\n------ Effect Size ------\n\n")
     cat("--- Assume equal population variances of", Ynm, "for each", Xnm, "\n\n")
+    cat("Standardized Mean Difference of ", Ynm, ", ",
+        "Cohen's d:  ", .fmt(smd), sep="", "\n")
   }
-  cat("Sample Mean Difference of ", Ynm, ":  " , .fmt(mdiff), sep="", "\n")
-  cat("Standardized Mean Difference of ", Ynm, ", ",
-      "Cohen's d:  ", .fmt(smd), sep="", "\n")
 
   #cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf.level=conf.level)  # MBESS function
   #deltaL <-cid$Lower.Conf.Limit.smd
@@ -348,10 +352,10 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X1nm))
 
       .lc.main(YA, type=NULL,
-        col.line=getOption("stroke.pt"), col.area=NULL, col.box="black",
-        col.stroke=getOption("stroke.pt"), 
-        col.fill=getOption("fill.bar"), shape.pts=21,
-        col.grid=getOption("grid"), col.bg=getOption("bg"),
+        col.line=getOption("pt.stroke"), col.area=NULL, col.box=getOption("bg.stroke"),
+        col.stroke=getOption("pt.stroke"), 
+        col.fill=getOption("bar.fill"), shape.pts=21,
+        col.bg=getOption("bg.fill"),
         cex.axis=0.75, col.axis="gray30", rotate.x=0, rotate.y=0, offset=.5,
         xy.ticks=TRUE, line.width=1.1,
         xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""),
@@ -373,10 +377,10 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X2nm))
  
      .lc.main(YB, type=NULL,
-       col.line=getOption("stroke.pt"), col.area=NULL, col.box="black",
-       col.stroke=getOption("stroke.pt"), 
-       col.fill=getOption("fill.bar"), shape.pts=21,
-       col.grid=getOption("grid"), col.bg=getOption("bg"),
+       col.line=getOption("pt.stroke"), col.area=NULL, col.box=getOption("bg.stroke"),
+       col.stroke=getOption("pt.stroke"), 
+       col.fill=getOption("bar.fill"), shape.pts=21,
+       col.bg=getOption("bg.fill"),
        cex.axis=0.85, col.axis="gray30", rotate.x=0, rotate.y=0, offset=.5,
        xy.ticks=TRUE, line.width=1.1,
        xlab=NULL, ylab=paste(Ynm,": ",X2nm, sep=""),
@@ -406,7 +410,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
               clpct, tvalue, pvalue, ub, lb, show.title)
 
-    cat("--------------------------------------------------------------\n")
+    cat("\n")
 
     if (!is.null(pdf.file)) {
       dev.off()

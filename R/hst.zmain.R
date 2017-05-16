@@ -1,7 +1,7 @@
 .hst.main <- 
-function(x, col.fill, col.stroke, col.bg, col.grid,
+function(x, col.fill, col.stroke, col.bg, 
        col.box, col.reg,
-       over.grid, cex.axis, col.axis, rotate.x, rotate.y, offset,
+       cex.axis, rotate.x, rotate.y, offset,
        breaks, bin.start, bin.width,
        bin.end, prop, hist.counts, cumul,
        xlab, ylab, main, sub, quiet, do.plot=TRUE, fun.call=NULL, ...) {
@@ -13,12 +13,16 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
   size.lab <- adj$size.lab
 
   # get variable labels if exist plus axes labels
-  if (is.null(ylab))
+  if (is.null(ylab)) {
+    was.null <- TRUE
     ylab <- ifelse (!prop, "Count of", "Proportion of")
+  }
+  else
+    was.null <- FALSE
   gl <- .getlabels(xlab, ylab, main, sub, cex.lab=size.lab)
   x.name <- gl$xn; x.lbl <- gl$xl
   x.lab <- gl$xb
-  y.lab <- paste(gl$yb, x.name)
+  y.lab <- ifelse (was.null, paste(gl$yb, x.name), gl$yb)
   main.lab <- gl$mb
   sub.lab <- gl$sb
   cex.lab <- gl$cex.lab
@@ -125,6 +129,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))  
     
+    par(bg=getOption("device.fill"))
     par(mai=c(bm, lm, tm, rm))
 
     # set up plot 
@@ -132,7 +137,7 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
 
     # axis, axis ticks
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-          par("usr")[1], par("usr")[3], size.axis, col.axis,
+          par("usr")[1], par("usr")[3], size.axis,
           rotate.x, rotate.y, offset, ...)
 
     # axis labels
@@ -140,33 +145,28 @@ function(x, col.fill, col.stroke, col.bg, col.grid,
     .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
             xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
     
-    # grid lines computation
-    vy <- pretty(h$counts)
-    vx <- h$breaks
-
     # color plotting background color
     usr <- par("usr")          
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
 
-    # plot the histogram and grid lines
-    if (!over.grid) {
-      abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
-      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
-    }
+    # plot grid lines
+    vx <- h$breaks
+    abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=getOption("grid.x.stroke"),
+      lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+    vy <- pretty(h$counts)
+    abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=getOption("grid.y.stroke"),
+      lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
-    # box for plotting area
-    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
+    # box around plot
+    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
+      lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
 
+    # plot the histogram
     plot(h, add=TRUE, col=col.fill, border=col.stroke, freq=TRUE,
          labels=hist.counts, ...)
     if (cumul == "both") {
       h$counts <- old.counts
       plot(h, add=TRUE, col=col.reg, freq=TRUE)
-    }
-    
-    if (over.grid) {
-      abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
-      abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
     }
   }
 

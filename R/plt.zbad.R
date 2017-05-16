@@ -22,7 +22,12 @@ function (x.miss, y.miss, values, method, breaks, bin.start, ...) {
       if (grepl("fit.line", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "fit.line options dropped the  .line suffix\n",
-          "eg., fit, instead of fit.line\n\n")
+          "use  fit, instead of fit.line\n\n")
+      }
+      if (grepl("by.group", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "by.group option is now just  by, its original meaning\n",
+          "use  by1  and  by2  for 1 and 2 variable Trellis graphics\n\n")
       }
       if (names(dots)[i] %in% c("x.start","x.end","y.start","y.end")) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -85,9 +90,37 @@ function (x.miss, y.miss, values, method, breaks, bin.start, ...) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "option  low.color  is renamed  low.fill\n\n")
       }
-      if (names(dots)[i] == "hi.color") {
+      if (names(dots)[i] == "fill.ellipse") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  hi.color  is renamed  hi.fill\n\n")
+          "option  fill.ellipse  is renamed  ellipse.fill\n\n")
+      }
+      if (names(dots)[i] == "stroke.ellipse") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  stroke.ellipse  is renamed  ellipse.stroke\n\n")
+      }
+      if (names(dots)[i] == "stroke.fit") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  stroke.fit  is renamed  fit.stroke\n\n")
+      }
+      if (names(dots)[i] == "lwd.fit") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  lwd.fit  is renamed  fit.lwd\n\n")
+      }
+      if (names(dots)[i] == "se.fit") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  se.fit  is renamed  fit.se\n\n")
+      }
+      if (names(dots)[i] == "box") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  box  is renamed  bg.stroke\n\n")
+      }
+      if (names(dots)[i] == "bg") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  bg  is renamed  bg.fill\n\n")
+      }
+      if (names(dots)[i] == "axes") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  axes  is renamed  values.stroke\n\n")
       }
     }
   }

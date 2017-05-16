@@ -127,7 +127,7 @@ VARIABLE LABELS\cr
 To display the indicator content, first read the indicators as variable labels with the \code{lessR} function \code{\link{Read}}.  If this labels data frame exists, then the corresponding variable labels, such as the actual items on a survey, are listed by factor. For more information, see \code{\link{Read}}.
 
 HEAT MAP\cr
-To help visualize the overall pattering of the correlations, the corresponding heat map of the item correlation matrix with communalities is produced when \code{heat.map=TRUE}, the default. As is true of the output correlation matrix, the correlations illustrated in the heat map are also sorted by their ordering within each factor. The corresponding color scheme is dictated by the system setting, according to the \code{lessR} function \code{\link{global}}.  The default color scheme is \code{blue}.
+To help visualize the overall pattering of the correlations, the corresponding heat map of the item correlation matrix with communalities is produced when \code{heat.map=TRUE}, the default. As is true of the output correlation matrix, the correlations illustrated in the heat map are also sorted by their ordering within each factor. The corresponding color scheme is dictated by the system setting, according to the \code{lessR} function \code{\link{style}}.  The default color scheme is \code{blue}.
 
 ESTIMATION PROCEDURE\cr
 The estimation procedure is centroid factor analysis, which defines each factor, parallel to the definition of each scale score, as the unweighted composite of the corresponding items for that scale.  The latent variables are obtained by replacing the 1's in the diagonal of the indicator variable correlation matrix with communality estimates.  These estimates are obtained by iterating the solution to the specified number of iterations according to \code{iter}, which defaults to 50.
@@ -229,7 +229,7 @@ scales(F1=X1:X3, F2=X4:X6)
 # produce a gray scale heat map of the item correlations
 #   with communalities in the diagonal
 # all subsequent graphics are in gray scale until changed
-global(colors="gray")
+style("gray")
 corCFA(F1=X1:X3, F2=X4:X6)
 
 # access the lessR data set called datMach4, with variable labels

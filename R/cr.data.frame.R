@@ -33,7 +33,7 @@ function(x, miss, show.n, digits.d,
          #"      so treat as a categorical variable.\n",
          #"    To obtain the correlations decrease  n.cat  to specify a",
          #"lower number\n",
-         #"      of unique values, such as with the function: global\n",
+         #"      of unique values, such as with the function: style\n",
          #"    Perhaps make this variable a factor with the R factor function.\n")
     #}
 
@@ -155,7 +155,7 @@ function(x, miss, show.n, digits.d,
   
     # scatter plot matrix
       #panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        #col.pt=getOption("stroke.pt"), col.smooth=getOption("stroke.bar"),
+        #col.pt=getOption("pt.stroke"), col.smooth=getOption("bar.stroke"),
         #span=2/3, iter=3, ...) 
       #{
           #points(x, y, pch=pch, col=col.pt, cex=cex)

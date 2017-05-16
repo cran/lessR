@@ -28,7 +28,7 @@ Help(topic=NULL, width=4.5, height=4.5)
 
 ---
 
-\code{global}: System level settings, such as a color theme for graphics.
+\code{style}: System level settings, such as a color theme for graphics.
 
 \code{data}: Create a csv data file from a worksheet application.
 

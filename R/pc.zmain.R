@@ -33,7 +33,7 @@ function(x,
   # if names(x) is null, likely data from sample and c functions
   if (!is.integer(x) && is.double(x) && !is.null(names(x)))  x <- as.table(x)
   if (!is.factor(x) && !is.table(x)) x <- factor(x)
-  ncolors <- ifelse (!is.table(x), nlevels(x), length(x))
+  n.colors <- ifelse (!is.table(x), nlevels(x), length(x))
 
   # color palette
   # set some default colors in case not assigned below
@@ -43,34 +43,54 @@ function(x,
     col.hi <- lowhi$col.hi
 
     color.palette <- colorRampPalette(c(col.low, col.hi))
-    clr <- color.palette(ncolors)
-  }  # is ordered
+    clr <- color.palette(n.colors)
+  } # end ordered
 
-  else if (!is.null(col.low) && !is.null(col.hi)) {
-      color.palette <- colorRampPalette(c(col.low, col.hi))
-      clr <- color.palette(ncolors)
+  else if (colors %in% c("lightbronze", "gray", "white")) {
+    if (n.colors == 1 || length(col.fill) > 1)
+      clr <- col.fill
+    else {
+      if (n.colors == 2)
+        { light <- "gray70"; dark <- "gray40" }
+      else if (n.colors == 3)
+        { light <- "gray80"; dark <- "gray30" }
+      else 
+        { light <- "gray92"; dark <- "gray28" }
+      color.palette <- colorRampPalette(c(dark, light))
+      clr <- color.palette(n.colors)
+    }
   }
-  else {
-    if (colors == "gray") {
-      color.palette <- colorRampPalette(c("gray28","gray92"))
-      clr <- color.palette(ncolors)
-    }
-    else if (colors == "rainbow") clr <- rainbow(ncolors)
-    else if (colors == "terrain") clr <- terrain.colors(ncolors)
-    else if (colors == "heat") clr <- heat.colors(ncolors)
-    else  {  # ordered color range does not make sense here 
-      clr <- .col.discrete()
-    }
-    if (random.col) clr <- clr[sample(length(clr))]
+
+  else if ((colors %in% c("darkred", "gray", "blue", "rose",
+      "green", "gold", "red", "dodgerblue", "darkgreen", "purple", "sienna",
+      "brown", "orange")
+          && (is.null(by) && !is.matrix(x)))) {
+      if (n.colors == 1 || length(col.fill) > 1)
+        clr <- col.fill
+      else {
+        color.palette <- colorRampPalette(getOption("col.bar.fill"))
+        clr <- color.palette(nrow(x))
+      }
+  }
+
+  else if (colors == "rainbow") clr <- rainbow(n.colors)
+  else if (colors == "terrain") clr <- terrain.colors(n.colors)
+  else if (colors == "heat") clr <- heat.colors(n.colors)
+
+  else  {  # ordered color range does not make sense here 
+    if (length(col.fill) > 1)
+      clr <- col.fill
+    else
+      if (n.colors > 1) clr <- .col.discrete()[1:n.colors]
   }
 
   if (!is.null(col.fill)) {
     for (i in 1:(min(length(col.fill),length(clr)))) clr[i] <- col.fill[i]
-    ncolors <- min(length(col.fill),length(clr))
+    n.colors <- min(length(col.fill),length(clr))
   }
 
   palette(clr)
-  col <- 1:ncolors 
+  col <- 1:n.colors 
 
   # plot the pie chart
   if (!is.table(x)) x <- table(x)

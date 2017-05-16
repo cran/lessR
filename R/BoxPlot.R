@@ -2,13 +2,12 @@ BoxPlot <-
 function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     Rmd=NULL,
 
-    fill=getOption("fill.bar"),
-    stroke=getOption("stroke.bar"), 
-    bg=getOption("bg"),
-    grid=getOption("grid"),
-    box=getOption("box"),
+    fill=getOption("bar.fill"),
+    stroke=getOption("bar.stroke"), 
+    bg.fill=getOption("bg.fill"),
+    bg.stroke=getOption("bg.stroke"),
 
-    cex.axis=0.75, axes="gray30",
+    cex.axis=0.75, values.stroke="gray30",
     xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
 
     rotate.x=0, rotate.y=0, offset=0.5,
@@ -26,12 +25,12 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
     if (fill[i] == "off") fill[i] <- "transparent"
   for (i in 1:length(stroke))
     if (stroke[i] == "off") stroke[i] <- "transparent"
-  if (bg == "off") bg <- "transparent"
-  if (grid == "off" ) grid <- "transparent"
-  if (box == "off") box <- "transparent"
+  if (bg.fill == "off") bg.fill <- "transparent"
+  if (bg.stroke == "off") bg.stroke <- "transparent"
 
-  if (getOption("colors") == "gray") stroke <- "black"
-  if (getOption("colors") == "gray.black") stroke <- getOption("stroke.pt")
+  if (getOption("theme") == "gray") stroke <- "black"
+  if (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black")
+     stroke <- getOption("pt.stroke")
 
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
@@ -152,8 +151,9 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         }
       }
 
-      stuff <- .bx.main(data[,i], fill, stroke, bg, grid,
-         box, cex.axis, axes, rotate.x, rotate.y, offset, 
+      stuff <- .bx.main(data[,i], fill, stroke, bg.fill,
+         bg.stroke, cex.axis, values.stroke,
+         rotate.x, rotate.y, offset, 
          horiz, add.points, xlab, main, sub, digits.d, quiet,
          do.plot, fun.call, ...)
       txsts <- stuff$tx

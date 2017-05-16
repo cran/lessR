@@ -42,7 +42,7 @@ function(mylevels, stroke, fill, shp, trans.pts, col.bg, usr,
   else 
     legend.fill <- fill
 
-  the.clr <- ifelse(grepl(".black", getOption("colors")), "gray90", "black")
+  the.clr <- getOption("lab.stroke")
 
   yi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
   # fill=length(legend.labels):1  puts the legend labels in the correct

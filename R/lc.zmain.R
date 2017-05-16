@@ -1,7 +1,7 @@
 .lc.main <- 
 function(y, type,
        col.line, col.area, col.stroke, col.fill, shape.pts,
-       col.grid, col.box, col.bg, cex.axis, col.axis,
+       col.box, col.bg, cex.axis, col.axis,
        rotate.x, rotate.y, offset, xy.ticks,
        line.width, xlab, ylab, main, sub, cex,
        time.start, time.by, time.reverse, 
@@ -86,7 +86,7 @@ function(y, type,
   
   # fill ts chart 
   #if (!is.null(time.start) && is.null(area))
-    #col.area <- getOption("fill.bar")
+    #col.area <- getOption("bar.fill")
 
   if (is.null(type))
     if (is.null(col.area) || col.area == "transparent") type <- "b" 
@@ -115,6 +115,7 @@ function(y, type,
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
 
+  par(bg=getOption("device.fill"))
   par(mai=c(bm, lm, tm, rm))
 
 
@@ -151,12 +152,23 @@ function(y, type,
 
   # grid lines
   vx <- pretty(c(usr[1],usr[2]))
+  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=getOption("grid.x.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
   vy <- pretty(c(usr[3],usr[4]))
-  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=col.grid, lwd=.5)
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=col.grid, lwd=.5)
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=getOption("grid.y.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
-  # box around plotting area
-  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
+  # box around plot
+  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
+    lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
+  if (col.box == "transparent") {
+    if (getOption("axis.x.stroke") != "transparent")
+      segments(usr[1], usr[3], usr[2], usr[3], lwd=3)
+    if (getOption("axis.y.stroke") != "transparent")
+      segments(usr[1], usr[3], usr[1], usr[4], lwd=3)
+  }
+
+
 
   # fill area under curve
   if (!is.null(col.area)  && !is.null(col.stroke)) {

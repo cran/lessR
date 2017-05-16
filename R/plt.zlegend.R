@@ -4,7 +4,7 @@ function(colnms, horiz, stroke, fill, shape, col.bg, usr, cex.lab=0.8) {
   par(xpd=NA) 
   
   # text color
-  the.clr <- ifelse(sum(col2rgb(col.bg)) < 370, "gray90", "black")
+  the.clr <- getOption("lab.stroke")
 
   ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
                horiz=TRUE, plot=FALSE)  # get coordinates

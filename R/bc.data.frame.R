@@ -1,18 +1,20 @@
 bc.data.frame <-
 function(x, n.cat,
-         col.fill, col.stroke, col.bg, col.grid, col.box, col.trans, colors,
-         horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
+         col.fill, col.stroke, col.bg, col.box,
+         col.trans, colors,
+         horiz,  addtop, gap, prop, xlab, ylab, main, cex.lab,
          labels, label.size,
-         cex.axis, col.axis, rotate.x, rotate.y, offset, beside,
+         cex.axis, cex.names, rotate.x, rotate.y, offset, beside,
          col.low, col.hi,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet,
-         width, height, pdf, ...)  {
+         width, height, pdf.file, ...)  {
+
 
   sug <- getOption("suggest")
   options(suggest = FALSE)
 
   manage.gr <- .graphman()  # see if graphics are to be managed
-  if (manage.gr  &&  !pdf) {
+  if (manage.gr  &&  is.null(pdf.file)) {
     i.win <- 0
     for (i in 1:ncol(x)) {
       if (is.numeric(x[,i])  &&  !.is.num.cat(x[,i], n.cat)) 
@@ -41,7 +43,7 @@ function(x, n.cat,
 
         else {
 
-        if (pdf) {
+        if (!is.null(pdf.file)) {
           pdf.fnm <- paste("BarChart_", x.name, ".pdf", sep="") 
           .opendev(pdf.fnm, width, height)
         } 
@@ -56,15 +58,16 @@ function(x, n.cat,
         }
 
         .bc.main(x[,i], y=NULL, by=NULL,
-          col.fill, col.stroke, col.bg, col.grid, col.box, col.trans, colors,
-          horiz, over.grid, addtop, gap, prop, xlab, ylab, main,
+          col.fill, col.stroke, col.bg, col.box,
+          col.trans, colors,
+          horiz, addtop, gap, prop, xlab, ylab, main, cex.lab,
           value.labels=NULL, label.size,
-          cex.axis, col.axis, rotate.x, rotate.y, offset, beside,
+          cex.axis, cex.names, rotate.x, rotate.y, offset, beside,
           col.low, col.hi, 
           legend.title, legend.loc, legend.labels, legend.horiz, quiet,
           font.main=1, ...)
 
-        if (pdf) {
+        if (!is.null(pdf.file)) {
           dev.off()
           if (!quiet) .showfile(pdf.fnm, "bar chart")
         }
@@ -84,6 +87,6 @@ function(x, n.cat,
   }  # each column in x
 
     options(suggest = sug)
-    if (!pdf) if (is.null(options()$knitr.in.progress))
+    if (is.null(pdf.file)) if (is.null(options()$knitr.in.progress))
       .plotList(plot.i, plot.title)
 }

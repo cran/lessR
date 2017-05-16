@@ -4,15 +4,14 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
        bw="nrd0", type=c("both", "general", "normal"),
        histogram=TRUE, bin.start=NULL, bin.width=NULL,
 
-       fill=getOption("fill.pt"),
-       bg=getOption("bg"),
-       grid=getOption("grid"),
-       box=getOption("box"),
+       fill=getOption("pt.fill"),
+       bg.fill=getOption("bg.fill"),
+       bg.stroke=getOption("bg.stroke"),
 
        nrm.color="black", gen.color="black",
        fill.nrm=NULL, fill.gen=NULL,
 
-       cex.axis=0.75, axes="gray30",
+       cex.axis=0.75, values.stroke="gray30",
 
        rotate.x=0, rotate.y=0, offset=0.5,
 
@@ -28,9 +27,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   for (i in 1:length(fill))
     if (fill[i] == "off") fill[i] <- "transparent"
-  if (bg == "off") bg <- "transparent"
-  if (grid == "off" ) grid <- "transparent"
-  if (box == "off") box <- "transparent"
+  if (bg.fill == "off") bg.fill <- "transparent"
+  if (bg.stroke == "off") bg.stroke <- "transparent"
 
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
@@ -39,8 +37,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
                   "col.gen", "col.fill.nrm", "col.fill.gen", "col.axis")
       if (names(dots)[i] %in% old.nm) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  now begin with  ",
-          "color \n\n")
+          "options that began with the abbreviation  col  replaced with  ",
+          "new options, see ?dn \n\n")
       }
       if (grepl("color.", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -59,7 +57,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     }
   }
 
-  clr <- getOption("colors")  # color theme not used except for monochrome 
+  clr <- getOption("theme")  # color theme not used except for monochrome 
 
   if (missing(fill))
     if (.Platform$OS == "windows")
@@ -67,19 +65,21 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     else
       fill <- "gray86"
 
-  if (missing(bg)) bg <- "ghostwhite"
-
   if (missing(fill.nrm))
       fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
 
   if (missing(fill.gen))
       fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
 
-  if (clr == "gray" || clr == "gray.black") {
+  if (clr == "gray" ||
+     (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black")) {
     fill.nrm <- "transparent"
     fill.gen <- rgb(.75,.75,.75, .5)
   }
 
+  #orig.params <- par(no.readonly=TRUE)
+  #on.exit(par(orig.params))
+  #par(bg=getOption("device.fill"))
 
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x)) 
@@ -94,7 +94,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   if (!missing(x)) {
 
-    if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
+    if (!exists(x.name, where=.GlobalEnv)) {  # x not in style env, in df
       .nodf(df.name)  # check to see if data frame container exists 
       .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
       all.vars <- as.list(seq_along(data))  # even if only a single var
@@ -116,7 +116,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     else { # x is in the global environment (vector or data frame)
       if (is.data.frame(x))  # x a data frame
         data <- x
-      else {  # x a vector in global
+      else {  # x a vector in style
         if (!is.function(x))
           data <- data.frame(x)  # x is 1 var
         else
@@ -190,9 +190,9 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         ttlns <- ""
  
       stuff <- .dn.main(data[,i], bw, type, histogram, bin.start, bin.width, 
-            fill, bg, grid, box, nrm.color, gen.color,
-            fill.nrm, fill.gen, 
-            cex.axis, axes, rotate.x, rotate.y, offset, 
+            fill, bg.fill, bg.stroke,
+            nrm.color, gen.color, fill.nrm, fill.gen, 
+            cex.axis, values.stroke, rotate.x, rotate.y, offset, 
             x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)
 
       txdst <- ""

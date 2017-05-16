@@ -49,7 +49,10 @@ function (my.formula, y=NULL, data, ...) {
     "The response variable must have only numeric values\n",
     "The first value of ", nm[1], " is ", data[1,nm[1]],
     ", which is not numeric\n\n",
-    txt, "\n\n")
+    txt, "\n\n",
+    "Maybe you switched the order of the intended response variable\n",
+    "  and grouping variable\n\n", sep="")
+
   }
 
   # X existence check

@@ -18,10 +18,10 @@ function(x, value=NULL, data=mydata, quiet=getOption("quiet")) {
 
   # get conditions and check for data existing
   xs <- .xstatus(x.name, df.name)
-  in.global <- xs$ig 
+  in.style <- xs$ig 
 
-  # see if the data frame exists, if x not in Global Env or function call
-  if (!in.global) {
+  # see if the data frame exists, if x not in style Env or function call
+  if (!in.style) {
     if (!exists(df.name)) {
       if (df.name == "mydata") 
         txtA <- ", the default data frame name, " else txtA <- " "
@@ -40,7 +40,7 @@ function(x, value=NULL, data=mydata, quiet=getOption("quiet")) {
   # ------------------------------------------
 
   # display existing label or all labels
-  if (is.null(value)  &&  !in.global  &&  fmt=="none") {  
+  if (is.null(value)  &&  !in.style  &&  fmt=="none") {  
     if (nzchar(x.name)) {
       gl <- .getlabels()
       lbl <- gl$xl
@@ -87,7 +87,7 @@ function(x, value=NULL, data=mydata, quiet=getOption("quiet")) {
       mylabels <- data.frame(mylabels, row.names=1)
     }
 
-    if (in.global  ||  fmt!="none") { # transfer table of labels and maybe units to data
+    if (in.style  ||  fmt!="none") { # transfer table of labels and maybe units to data
       
       attr(data, which="variable.labels") <- as.character(mylabels$label)
       names(attr(data, which="variable.labels")) <- as.character(row.names(mylabels))

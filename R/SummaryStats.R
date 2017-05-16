@@ -27,15 +27,15 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     # get conditions and check for data existing
     if (!in.call) {
       xs <- .xstatus(y.name, df.name)
-      in.global <- xs$ig 
+      in.style <- xs$ig 
     }
-    else in.global <- FALSE
+    else in.style <- FALSE
 
-    # see if var exists in data frame, if x not in Global Env or function call 
-    if (!in.global && !in.call) .xcheck(y.name, df.name, data)
+    # see if var exists in data frame, if x not in style Env or function call 
+    if (!in.style && !in.call) .xcheck(y.name, df.name, data)
 
-    if (!in.global) y.call <- eval(substitute(data$by))
-    else {  # vars that are function names get assigned to global
+    if (!in.style) y.call <- eval(substitute(data$by))
+    else {  # vars that are function names get assigned to style
       y.call <- by
       if (is.function(y.call)) y.call <- eval(substitute(data$by))
     }
@@ -49,7 +49,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (!missing(x)) {
 
-    if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
+    if (!exists(x.name, where=.GlobalEnv)) {  # x not in style env, in df
       .nodf(df.name)  # check to see if data frame container exists     
       .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
       all.vars <- as.list(seq_along(data))  # even if only a single var
@@ -71,7 +71,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     else {  # x is in the global environment (vector or data frame)
       if (is.data.frame(x))  # x a data frame
         data <- x
-      else {  # x a vector in global
+      else {  # x a vector in style
         .xstatus(x.name, df.name)  # var in df?, vars lists not checked
         if (!is.function(x))
           data <- data.frame(x)  # x is 1 var
@@ -114,6 +114,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     .ss.data.frame(data, n.cat, brief, ...) 
 
   else if (!is.factor(x.call)) {
+
     sk <- NA; kt <- NA; q1 <- NA; q3 <- NA;  qr <- NA;
     stuff <- .ss.numeric(x.call, y.call, digits.d, brief, ...)
     txsts <- stuff$tx
@@ -130,6 +131,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     if (is.factor(x.call)) 
 {
+
       stuff <- .ss.factor(x.call, y.call, brief, digits.d,
                         x.name, y.name, x.lbl, y.lbl, label.max, ...)
 } 

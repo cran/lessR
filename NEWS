@@ -1,11 +1,79 @@
 	NEWS
 
 Update History for Package 'lessR'
--------------------------------------------------------------------------
+------------------------------------------------------------------------
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
   
   
+
+>>>>>> Changes for lessR version 3.6.2 (2017-05-13) <<<<<<
+
+-------------
+Updates 3.6.2 
+-------------
+
+BarChart, Density, Histogram, LineChart, Plot
+  all parameters to specify color are now specified, for a given object, as
+    object.fill or object.stroke, except that fill and stroke by themselves
+    refer to the primary object, a bar or a point
+  slightly increased the intensity of the colors for different discrete levels
+
+BarChart
+  Trellis graphics added with by1 as the conditioning variable
+  cex.names option added to specify size of labels for the categories
+  cex.lab option added to specify size of axis labels
+  for horizontal chart, scaling of value labels consistent
+  over.plot option eliminated
+
+Histogram
+  rotate.x, rotate.y and axes extended to Trellis graphics
+  grid lines added to Trellis graphics
+  over.plot option eliminated
+  
+Plot
+  categorical x-variable, value="count" ...
+    a. if by1 set, then a Trellis dot plot
+    b. single panel dot plot horizontal to match dot plot style
+  fill.ellipse, stroke.ellipse, stroke.fit, ... changed to 
+  
+    ellipse.fit, ellipse.stroke, fit.stroke, ...
+  cex.lab option added for regular and lattice plots
+  bubble.fill option added
+  ID labels for extreme points active for smoothed plots
+  
+style
+  re-setting the theme resets all parameter values, setting sub.theme and
+    individual values cumulates the changes without resetting
+  when setting a global theme, can now specify fill and stroke generally,
+    to set both fill.bar and fill.pt, and stroke.bar and stroke.pt
+  theme replaces colors as the name of the option that specifies the color theme
+  cex.axis, axis.stroke, rotate.x, rotate.y, offset added to style
+  device.fill, grid.lwd, grid.lty, bg.lwd, bg.lty added to style
+  black themes fill the entire device window with black using device.fill
+  darkgreen theme added
+  ghost option invoked now with style(sub.theme="black")
+  gray.dark theme replaced with style("gray", sub.theme="black")
+  sub.themes added, which changes the plot style as well as colors
+
+
+---------------
+Bug Fixes 3.6.2
+--------------- 
+
+BarChart
+  if reading values direct with y-var, x-axis label now provided
+  
+Histogram
+  custom y-axis label does not add variable name to the end of the label
+  
+Plot
+  means for categorical-continuous plot now printed if for a non-factor
+    categorical variable (i.e., a small number of integer values)
+  time series from global plots even if no mydata data frame exists
+ 
+
+
 
 >>>>>> Changes for lessR version 3.6.0 (2017-03-30) <<<<<<
 

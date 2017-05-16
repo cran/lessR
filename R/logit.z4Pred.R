@@ -132,14 +132,16 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
         if (y.values[i] == min.y) y.values[i] <- 0 else y.values[i] <- 1
     }
 
+    par(bg=getOption("device.fill"))
+
     # plot
-    plot(x.values,y.values, type="n", axes=FALSE, ann=FALSE, ylim=c(-.10,1.10), ...)
-
+    plot(x.values,y.values, type="n", axes=FALSE, ann=FALSE,
+         ylim=c(-.10,1.10), ...)
     usr <- par("usr")
-    col.bg <- getOption("bg")
-    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="black")
+    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("bg.fill"),
+         border=getOption("bg.stroke"))
 
-    col.grid <- getOption("grid")
+    col.grid <- getOption("grid.x.stroke")
     abline(v=axTicks(1), col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
@@ -151,8 +153,8 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
     .axlabs(nm[2], y.label, main.lab, sub.lab, max.lbl.y=3,
             cex.lab=getOption("lab.size"), cex.main=1.0, ...) 
 
-    col.fill <- getOption("fill.pt")
-    col.stroke <- getOption("stroke.pt")
+    col.fill <- getOption("pt.fill")
+    col.stroke <- getOption("pt.stroke")
     points(x.values,y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
     lines(x.values, p.int$fit, col=col.stroke, lwd=2)
 
@@ -168,10 +170,14 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
       .opendev(pdf.file, width, height)
 
       panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        col.pt=getOption("stroke.pt"), col.smooth=getOption("col.stroke.bar"),
+        col.pt=getOption("pt.stroke"), col.smooth=getOption("col.bar.stroke"),
         span=2/3, iter=3, ...) 
       {
-          points(x, y, pch=pch, col=col.pt, cex=cex)
+          usr <- par("usr")          
+          rect(usr[1], usr[3], usr[2], usr[4],
+               col=getOption("border.fill"), border=getOption("border.stroke"))
+          points(x, y, pch=pch, col=col.pt, bg=getOption("pt.fill"), cex=cex)
+
           ok <- is.finite(x) & is.finite(y)
           if (any(ok)) 
             lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)

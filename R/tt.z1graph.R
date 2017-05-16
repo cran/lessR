@@ -21,7 +21,7 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
   # colors
-  if (!grepl("gray", getOption("colors"))) {
+  if (!grepl("gray", getOption("theme"))) {
     col.1 <- rgb(.63,.46,.15)
     col.m1 <- rgb(.71,.65,.65)
 #    col.1t <- rgb(.63,.46,.15, alpha=.7)
@@ -32,27 +32,27 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
 #    col.1t <- rgb(.40,.40,.40, alpha=.7)
   }
   col.2 <- rgb(.49,.56,.69)
-  col.1t <- getOption("fill.bar")
-  clr <- getOption("colors")
-  if (clr == "rose") {
-    clr <- "rosybrown1"  # rose not an R color name
-    col.1t <- "rosybrown2"
-  }
-  if (grepl(".black", clr)) clr <- "gray35"  # .black colors not R color names
-  if (clr == "white") {  # white does not print
-    clr <- "transparent"
-    col.1t <- "gray35"
-  }
-  col.1d <- .maketrans(clr, 20)
-  
+
+  col.1t <- getOption("bar.stroke")
+  col.1d <- getOption("ellipse.fill")
+
+  col.tx <- getOption("lab.stroke")
+  col.ln <- getOption("bar.stroke")
+
+
+  # ------------------------------ 
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
+  par(bg=getOption("device.fill"))
   par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
+
   plot.new()
   plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
-  axis(1); box()
+
+  axis(1, col=getOption("axis.x.stroke"), col.axis=getOption("lab.stroke"))
+  box(col=getOption("bg.stroke"))
   if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
-  title(xlab=y.lbl)
+  title(xlab=y.lbl, col.lab=col.tx)
 
   xleft <- par("usr")[1]  # left side of graph
   xright <- par("usr")[2]  # right side of graph
@@ -61,7 +61,7 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
 
   # vertical line for mean
   lines(c(m1,m1), c(0,ytop), lty="solid", lwd=.85, col=col.m1)
-  if (!grepl("gray", getOption("colors")))
+  if (!grepl("gray", getOption("theme")))
     lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=.85, col=col.2)
   else
     lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=.85, col=col.1)
@@ -78,10 +78,10 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   lines(dYA, col=col.1t, lty="solid", lwd=lwd.border)
 
   # minimum mean difference of practical importance
+  col.e <- getOption("lab.stroke")  # color for effect
   if ( !is.null(mmd) | !is.null(msmd) ) {
     if (!is.null(mmd)) msmd <- mmd / sw
     if (!is.null(msmd)) mmd <- msmd * sw
-    col.e <- "gray50"  # color for effect
     mid <- (m1 + mu0) / 2
     lr <- mid + .5*mmd  # line right
     ll <- mid - .5*mmd  # line left
@@ -96,7 +96,7 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   # scale for s at top of graph
   mlow <- min(m1, mu0)
   mhi  <- max(m1, mu0)
-  col.d.unit <- "gray35"
+  col.d.unit <- "gray50"
   # connect first seg to top
   segments(mlow, max.y-.01*max.y, mlow, ytop, lwd=1, col=col.d.unit) 
   # provide at least 2 labeled d units on sd scale at top
@@ -129,16 +129,19 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
 
   # title area, above graph
   if (show.title) {
-    mtext(paste("One-Group Plot with Mean and Null Mean"), side=3, line=6.6, font=2)
-    mtext(paste("Analyze",Ynm), side=3, line=5.4, font=3, cex=.9)
+    mtext(paste("One-Group Plot with Mean and Null Mean"), side=3, line=6.6, font=2,
+          col=col.tx)
+    mtext(paste("Analyze",Ynm), side=3, line=5.4, font=3, cex=.9,
+          col=col.tx)
     mtext(bquote(paste("  t-test of mu0=", .(mu0), ":   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(n1-1), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 
-      line=3.7, cex=.9, adj=0)
+      line=3.7, cex=.9, adj=0, col=col.tx)
     mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Mean:  ",
-      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=2.6, cex=.9, adj=0)
+      .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=2.6, cex=.9, adj=0,
+          col=col.tx)
     mtext(bquote(paste("  ", "n=", .(n1),
        "   m=", .(.fmt(m1, digits.d)),"   s=", .(.fmt(sw, digits.d)))),
-       side=3, line=1.3, cex=.9, adj=0)
+       side=3, line=1.3, cex=.9, adj=0, col=col.tx)
   }
 
 }

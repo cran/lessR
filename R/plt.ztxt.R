@@ -1,6 +1,7 @@
 .plt.txt <- 
 function(x, y, values, object, n.cat, xlab, ylab, smooth,
-         center.line, prop, size, show.runs, radius, fun.call=NULL) {
+         center.line, prop, size, show.runs, radius, digits.d, 
+         fun.call=NULL) {
 
 
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
@@ -83,7 +84,7 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
   #by.name <- getOption("byname")
 
   # decimal digits
-  digits.d <- .max.dd(y[,1]) + 1
+  if (is.null(digits.d)) digits.d <- .max.dd(y[,1]) + 1
   options(digits.d=digits.d)
 
   size.pt <- ifelse (is.null(size), 1, size)  # dummy non-zero value
@@ -134,11 +135,11 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
   }
   
 
-  # do a comment or not after the suggestion
-  cmt <- function(ct, mx.ch=70) {
+  # comment after the suggestion?
+  cmt <- function(ct, mx.ch=88) {
 
     fc <- gsub(" = ", "=", fc)
-    nch <- nchar(paste(fncl, fc))
+    nch <- nchar(paste(fncl, fc, ct))
     if (nch > mx.ch) ct <- "" 
     fc <- paste(fncl, fc, ")  ", ct, sep="")
     txsug <- paste(txsug, "\n", fc, sep="")
@@ -160,8 +161,9 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
           fc <- ""
           if (!grepl("ellipse", fncl)  &&  n.col == 1)
             fc <- paste(fc, ", ellipse=0.95", sep="")
-          if (grepl("ellipse", fncl)  &&  n.col == 1)
-            fc <- paste(fc, ", fill.ellipse=\"off\"", sep="")
+          if (!grepl("ellipse.fill=\"off\"", fncl) &&
+              !grepl("ellipse.fill = \"off\"", fncl)  &&  n.col == 1)
+            fc <- paste(fc, ", ellipse.fill=\"off\"", sep="")
           if (!grepl("fit", fncl)) 
             fc <- paste(fc, ", fit=TRUE", sep="")
           if (grepl("fit=TRUE", fncl))
@@ -172,23 +174,17 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
           }
          
           fc <- ""
-          if (grepl("ellipse", fncl)  &&  !grepl("ID.cut", fncl))
-            fc <- paste(fc, ", ID.cut=0", sep="")
+          if (!grepl("ID.cut", fncl))
+            fc <- paste(fc, ", ID.cut=.10", sep="")
           if (nzchar(fc))
-            txsug <- cmt("# turn off labels for points")
+            txsug <- cmt("# label top 10% potential outliers")
          
           fc <- ""
-          if (!grepl("ellipse", fncl)  &&  !grepl("ID.cut", fncl))
-            fc <- paste(fc, ", ID.cut=0.1", sep="")
-          if (nzchar(fc))
-            txsug <- cmt("# labels for extreme 10% of points")
-         
-          fc <- ""
-          if (!grepl("se.fit", fncl))
-            fc <- paste(fc, ", se.fit=1:3", sep="")
+          if (!grepl("fit.se", fncl))
+            fc <- paste(fc, ", fit.se=1:3", sep="")
             txt <- "# fit line with standard errors of 1, 2 and 3"
           if (nzchar(fc))
-            txsug <- cmt(txt, mx.ch=62)
+            txsug <- cmt(txt)
             
           fc <- ""
           if (!grepl("ellipse", fncl)  &&  n.col == 1)
@@ -204,9 +200,17 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
           if (grepl("ellipse", fncl)) fncl <- .rm.arg.l("ellipse", fncl)
           if (nzchar(fc))
             txsug <- cmt("# smooth default for > 2500 rows of data")
+
+          fc <- ""
+          if (smooth) {
+            fc <- "style(grid.x.stroke=\"off\", grid.y.stroke=\"off\")" 
+            fc <- paste(fc, "# turn off grid lines")
+            if (nzchar(fc))
+              txsug <- paste(txsug, "\n", fc, sep="")
+          }
           
+          fc <- ""
           if (!smooth) {
-            fc <- ""
             if (!grepl("size", fncl)  &&  n.col == 1)
               fc <- paste(fc, ", size=2", sep="")
             if (!grepl("shape", fncl)  &&  n.col == 1)

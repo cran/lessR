@@ -2,36 +2,37 @@
 function(x, y, by=NULL, n.cat=getOption("n.cat"),
          object="point", values="data",
 
-         col.fill=getOption("fill.pt"),
-         col.stroke=getOption("stroke.pt"),
-         col.bg=getOption("bg"),
-         col.grid=getOption("grid"),
-         col.box=getOption("box"),
+         col.fill=getOption("pt.fill"),
+         col.stroke=getOption("pt.stroke"),
+         col.bg=getOption("bg.fill"),
+         col.box=getOption("bg.stroke"),
 
-         col.trans=NULL, col.segment=col.stroke,
+         col.trans=NULL, col.segment=getOption("segment.stroke"),
          col.area="transparent",
 
-         cex.axis=0.76, col.axis="gray30", xy.ticks=TRUE,
+         cex.lab=1, cex.axis=0.76, xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
          value.labels=NULL, label.max=20,
-         rotate.x=0, rotate.y=0, offset=0.5, prop=FALSE,
+         rotate.x=0, rotate.y=0, offset=0.5, prop=FALSE, origin.x=NULL,
 
          size=NULL, shape="circle", means=TRUE, 
          sort.yx=FALSE,
          segments.y=FALSE, segments.x=FALSE, size.ln=2,
 
-         smooth=FALSE, points.smooth=100, trans.smooth=0.25,
-         bins.smooth=128,
+         smooth=FALSE, smooth.points=100, smooth.trans=0.25,
+         smooth.bins=128,
 
-         radius=0.25, power=0.6, size.cut=TRUE, bubble.text="black",
+         radius=0.25, power=0.6, size.cut=TRUE, 
+         bubble.text=getOption("bubble.text.stroke"),
+         bubble.fill=getOption("bubble.fill"),
          col.low=NULL, col.hi=NULL,
 
          ID=NULL, ID.cut=0, ID.color="gray50", ID.size=0.75,
 
-         fit.line="off", col.fit.line="gray55", lwd.fit=1.5, se.fit=1,
+         fit.line="off", col.fit.line="gray55", fit.lwd=1.5, fit.se=1,
 
          ellipse=FALSE, col.ellipse="lightslategray",
-         fill.ellipse="off", lwd.ellipse,
+         ellipse.fill="off", ellipse.lwd,
          
          center.line="default", show.runs=FALSE, stack=FALSE,
 
@@ -118,7 +119,6 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   else
     cleveland <- FALSE
 
-
   # see if trans is customized for this analysis
   if (is.null(col.trans)) {  # no change, so no trans for Cleveland dp
     if (cleveland) {
@@ -134,7 +134,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
            
   # scale for regular R or RStudio
-  adj <- .RSadj(radius, cex.axis)
+  adj <- .RSadj(radius=radius, cex.axis=cex.axis, cex.lab=cex.lab)
   radius <- adj$radius
   size.axis <- adj$size.axis
   size.lab <- adj$size.lab
@@ -279,6 +279,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
   
+  par(bg=getOption("device.fill"))
   par(mai=c(bm, lm, tm, rm))
 
 
@@ -311,18 +312,24 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   if (!do.ellipse) {
 
     if (cat.x) {
-      mn.x <- mn.x - .5
-      mx.x <- mx.x + .5
+      mn.x <- mn.x - .4
+      mx.x <- mx.x + .4
     }
     if (cat.y) {
-      mn.y <- mn.y - .5
-      mx.y <- mx.y + .5
+      mn.y <- mn.y - .4
+      mx.y <- mx.y + .4
     }
 
-    if (values %in% c("count", "prop")) mn.y <- 0
+    if (is.null(origin.x)) {
+      if (values %in% c("count", "prop"))
+        origin.x <- 0
+      else
+        origin.x <- mn.x        
+    }
     if (values != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
+ 
+    region <- matrix(c(origin.x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
 
-    region <- matrix(c(mn.x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
 
   }  # no ellipse
 
@@ -340,7 +347,6 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   rm(region)
 
   usr <- par("usr")          
-  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border="blue")
 
   #
   # set up plot background
@@ -354,6 +360,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
   else
     axT1 <-axTicks(1)  # else numeric, so all the ticks
+    #axT1 <- pretty(x)  # else numeric, so all the ticks
   
   if (cat.y) {
     if (!is.null(y.lvl)) axT2 <- 1:length(y.lvl)
@@ -362,26 +369,31 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
   else
     axT2 <- axTicks(2) 
+    #axT2 <- pretty(y) 
 
   if (xy.ticks) {
     if (!bubble1) {
       if (!date.ts) {  # get ticks for both axes
         .axes(x.val, y.val, axT1, axT2,
-              par("usr")[1], par("usr")[3], size.axis, col.axis,
+              par("usr")[1], par("usr")[3], size.axis,
+              col.axis=getOption("axis.x.stroke"),
               rotate.x, rotate.y, offset=offset, ...)
       }
       else {  # time 
-        axis.Date(1, x.val, cex.axis=size.axis, col.axis=col.axis, ...)  # strptime
+        axis.Date(1, x.val, cex.axis=size.axis,
+          col.axis=getOption("axis.x.stroke"), ...)  # strptime
         .axes(NULL, y.val, axT1, axT2,
-              par("usr")[1], par("usr")[3], size.axis, col.axis,
+              #pretty(par("usr")[1], par("usr")[3]), size.axis,
+              par("usr")[1], par("usr")[3], size.axis,
+              col.axis=getOption("axis.x.stroke"),
               rotate.x, rotate.y, offset=offset, y.only=TRUE, ...)  # only do y-axis
       }
     }
     else  # bubble1: 1-D scatter plot of categorical variable
       .axes(x.val, NULL, axT1, NULL,
-            par("usr")[1], par("usr")[3], size.axis, col.axis, 
+            par("usr")[1], par("usr")[3], size.axis, getOption("axis.x.stroke"), 
             rotate.x, rotate.y, offset=offset, ...)
-  }
+  }  # end xy.ticks
 
   # axis labels 
   if (is.null(max.lbl.y)) {  # could be set earlier when x.val = y.val
@@ -400,16 +412,27 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl.y, 
           x.val, xy.ticks, offset=offset, cex.lab=size.lab, ...) 
 
-  # color plotting background color
+  # background color
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
 
-  # grid lines (put before box stroke of plot)
-  abline(v=axT1, col=col.grid, lwd=.5)
+  # grid lines (put before box stroke around plot)
+  abline(v=axT1, col=getOption("grid.x.stroke"),
+         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
   if (!bubble1)
-    abline(h=axT2, col=col.grid, lwd=.5)
+    abline(h=axT2, col=getOption("grid.y.stroke"), 
+           lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
   
   # box around plot
-  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box)
+  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
+    lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
+  #if (col.box == "transparent") {
+    #if (!cat.x && ellipse==FALSE)
+       #if (getOption("axis.x.stroke") != "transparent")
+          #segments(usr[1], usr[3], usr[2], usr[3], lwd=3)
+    #if (!cat.y && ellipse==FALSE)
+       #if (getOption("axis.y.stroke") != "transparent")
+          #segments(usr[1], usr[3], usr[1], usr[4], lwd=3)
+  #}
 
 
   # ---------------
@@ -419,7 +442,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # plot lines and/or points
   if (object %in% c("point", "both")) {
     trans.pts <- ifelse(is.null(col.trans), 
-                        getOption("trans.fill.pt"), col.trans)
+                        getOption("trans.pt.fill"), col.trans)
 
     # colors
     n.patterns <- max(n.col, n.by)
@@ -435,10 +458,16 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     else if (n.patterns == 2) {
       stroke[1] <- col.stroke[1]
       stroke[2] <- ifelse (length(col.stroke) > 1, col.stroke[2], col.stroke[1])
+      if (getOption("sub.theme") == "black") {
+        if (getOption("theme") != "gray")
+          stroke[2] <- getOption("bar.stroke")
+        else
+          stroke[2] <- getOption("lab.stroke")
+      }
       fill[1] <- col.fill[1]
       if (object == "both") {
         ltype[2] <- "dotted"
-        if (!(getOption("colors") %in% c("gray", "gray.black")))
+        if (!(getOption("theme") %in% c("gray")))
           #fill[2] <- .col.discrete(bright=TRUE)[2]
           fill[2] <- fill[1]
         else {
@@ -454,7 +483,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
         else
           fill[2] <- col.fill[2]
       }
-    }  # n.patterns=2
+    }  # end n.patterns=2
     else  {  # n.patterns > 2
       stroke <- .col.discrete(bright=TRUE)[1:n.patterns]
       for (i in 1:length(stroke))
@@ -494,9 +523,9 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
               }
               if (i > 1) { 
                 yl[,1] <- yl[,1] + yo[,1]
-                xx <- c( c(xl[1],xl,xl[length(xl)]), rev(c(xl[1],xl,xl[length(xl)])) )
-                yy <- c( c(min(yl[,1]),yl[,1],min(yl[,1])),
-                           rev(c(min(yo[,1]),yo[,1],min(yo[,1]))) )
+                xx <- c(c(xl[1],xl,xl[length(xl)]), rev(c(xl[1],xl,xl[length(xl)])))
+                yy <- c(c(min(yl[,1]),yl[,1],min(yl[,1])),
+                           rev(c(min(yo[,1]),yo[,1],min(yo[,1]))))
                 if (col.area != "transparent") 
                   polygon(xx, yy, col=fill[i], border="transparent")
               }
@@ -582,12 +611,15 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       if (is.null(by)) {
       
         if (smooth) {  # 2-D kernel density plot
-          clr.den <- colorRampPalette(c("white", getOption("fill.bar")))
-          smoothScatter(x, y, nrpoints=points.smooth, nbin=bins.smooth,
-                        transformation=function(x) x^(trans.smooth),
-                        colramp = clr.den, add=TRUE)
-          abline(v=axT1, col=col.grid, lwd=.5) # grid lines (off by default)
-          if (!bubble1) abline(h=axT2, col=col.grid, lwd=.5)
+          clr.den <- colorRampPalette(c("white", getOption("bar.fill")))
+          smoothScatter(x, y, nrpoints=smooth.points, nbin=smooth.bins,
+                        transformation=function(x) x^(smooth.trans),
+                        colramp = clr.den, bg="transparent", add=TRUE)
+          abline(v=axT1, col=getOption("grid.x.stroke"),
+                 lwd=getOption("grid.lwd"), lty=getOption("grid.lty")) 
+          if (!bubble1)
+            abline(h=axT2, col=getOption("grid.x.stroke"),
+                   lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
         }
     
         else {  # plot the individual points, plus means, segments, etc.
@@ -606,36 +638,12 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
             }
           }
 
-          # label points with ID
-          do.pts <- TRUE
-          if (!is.null(size)) if (size == 0) do.pts <- FALSE
-
-          if (ID.cut > 0 && do.pts) if (n.xcol == 1  &&  n.ycol == 1) {
-
-            m.x <- mean(x, na.rm=TRUE)
-            m.y <- mean(y, na.rm=TRUE)
-            center <- c(m.x, m.y)
-
-            mat <- matrix(c(x,y), ncol=2)
-            cov.mat <- cov(mat, use="complete.obs")
-
-            dst <- numeric(length=nrow(mat))
-            for (i in 1:nrow(mat))
-              dst[i] <- mahalanobis(c(mat[i,1], mat[i,2]), center, cov.mat)
-            ord <- order(dst, decreasing=TRUE)
-
-            df <- data.frame(x, y, dst, ID)
-            df <- df[ord,]
-            df <- na.omit(df)
-            df <- subset(df, dst > quantile(dst, 1-ID.cut))
-            text(df[,1], df[,2], labels=df[,4],
-                 pos=1, offset=0.4, col=ID.color, cex=ID.size)
-          }  # end label points
-
           if (segments.y) { 
             if (n.xcol == 1) # line segments from points to axis
-              segments(x0=min(pretty(x)), y0=y, x1=x, y1=y, 
-                       lty=1, lwd=.75, col=col.stroke)
+              segments(x0=0, y0=y, x1=x, y1=y, 
+                       lty=1, lwd=.75, col=col.segment)
+              #segments(x0=min(pretty(x)), y0=y, x1=x, y1=y, 
+                       #lty=1, lwd=.75, col=col.stroke)
             else if (n.xcol == 2)  # line segments between points
               segments(x0=x[,1], y0=y[,1], x1=x[,2], y1=y[,1], 
                        lty=1, lwd=.75, col=col.segment)
@@ -653,9 +661,9 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           }
 
           if (means  &&  values == "data") {
-            pch.avg <- ifelse(getOption("colors")!="gray", 21, 23)
-            bck.g <- ifelse(getOption("colors")!="gray", "gray15", "gray30")
-            if (grepl(".black", getOption("colors"), fixed=TRUE))
+            pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
+            bck.g <- ifelse(getOption("theme")!="gray", "gray15", "gray30")
+            if (grepl(".black", getOption("theme"), fixed=TRUE))
               bck.g <- "gray85"
 
             m.lvl <- numeric(length = 0)
@@ -676,9 +684,36 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
               points(m.lvl, 1:length(y.lvl), pch=pch.avg, bg=bck.g)
             }
           }  # means
-        }  # null by
-        
-      }
+        }  # end not smooth
+ 
+          # label points with ID
+          #do.pts <- TRUE
+          #if (!is.null(size)) if (size == 0) do.pts <- FALSE
+
+          if (ID.cut > 0) if (n.xcol == 1  &&  n.ycol == 1) {
+
+            m.x <- mean(x, na.rm=TRUE)
+            m.y <- mean(y, na.rm=TRUE)
+            center <- c(m.x, m.y)
+
+            mat <- matrix(c(x,y), ncol=2)
+            cov.mat <- cov(mat, use="complete.obs")
+
+            dst <- numeric(length=nrow(mat))
+            for (i in 1:nrow(mat))
+              dst[i] <- mahalanobis(c(mat[i,1], mat[i,2]), center, cov.mat)
+            ord <- order(dst, decreasing=TRUE)
+
+            df <- data.frame(x, y, dst, ID)
+            df <- df[ord,]
+            df <- na.omit(df)
+            df <- subset(df, dst > quantile(dst, 1-ID.cut))
+            text(df[,1], df[,2], labels=df[,4],
+                 pos=1, offset=0.4, col=ID.color, cex=ID.size)
+          }  # end label points       
+
+      }  # end is null by
+
 
       else {  # by grouping variable
 
@@ -729,7 +764,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
     # colors
     if (is.null(col.low) || is.null(col.hi) || !bubble1) {
-      clr <- col.fill
+      clr <- bubble.fill
       clr.stroke <- col.stroke
     }
     else {  # 1-var bubble plot and BPFM can have a color gradient
@@ -768,6 +803,11 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       if (prop) count <- round(count, 2)
       cords <- data.frame(xx, yy, count)
 
+# can use xyTable instead, though does not have coordinates for count=0
+#cnt <- xyTable(x,y)
+#symbols(cnt$x, cnt$y, circles=sz, inches=radius,
+        #bg=clr, fg=clr.stroke, add=TRUE, ...)
+
       if (object == "bubble") {
         sz <- cords[,3]**power  # radius unscaled 
         symbols(cords$xx, cords$yy,
@@ -780,9 +820,10 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       else if (object == "sunflower") {
         sunflowerplot(cords$xx, cords$yy, number=cords$count, 
             seg.col=col.stroke, col=col.fill, cex.axis=size.axis,
-            col.axis=col.axis, xlab=x.lab, ylab=y.lab, add=TRUE)
+            col.axis=getOption("axis.x.stroke"),
+            xlab=x.lab, ylab=y.lab, add=TRUE)
       }
-    }
+    }  # end length(size) == 1
 
     else {  # size is a variable (unless size is constant and bubble specified)
 
@@ -848,16 +889,6 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }  # end bubble/sunflower 
 
 
-  #ellipse option
-  #if (do.ellipse) {
-    #for (i in 1:length(ellipse)) {
-      #e <- ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y),  
-                   #level=ellipse[i], npoints=200)
-      #polygon(e, border=col.ellipse, col=fill.ellipse, lwd=1)
-    #}
-  #}
-
-
   # ellipse option
   if (do.ellipse) { 
 
@@ -902,8 +933,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
         e <- ellipse(corr, scale=c(s.x, s.y), centre=c(m.x, m.y),
                      level=ellipse[j])
-        polygon(e, border=col.border, col=fill.ellipse,
-                lwd=lwd.ellipse, lty=ln.type)
+        polygon(e, border=col.border, col=ellipse.fill,
+                lwd=ellipse.lwd, lty=ln.type)
       }  # jth ellipse
     }  # ith pattern
   }  # do.ellipse
@@ -965,19 +996,21 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
         # fit line
         f.ln <- fitted(l.ln, ...)
-        lines(x.lv, f.ln, col=clr, lwd=lwd.fit, lty=ln.type)
+        lines(x.lv, f.ln, col=clr, lwd=fit.lwd, lty=ln.type)
 
         # se bands about fit line
-        for (j in 1:length(se.fit)) {
-          p.ln <- predict(l.ln, se=TRUE)
-          up.ln <- fitted(l.ln, ...) + (se.fit[j] * p.ln$se.fit)
-          dn.ln <- fitted(l.ln, ...) - (se.fit[j] * p.ln$se.fit)
-          lines(x.lv, up.ln, col=clr, lwd=0.5, lty=ln.type)
-          lines(x.lv, dn.ln, col=clr, lwd=0.5, lty=ln.type)
-          xx <- c(x.lv, rev(x.lv))
-          yy <- c(up.ln, rev(dn.ln))
-          polygon(xx, yy, col=getOption("se.fill"), border="transparent")
-        }  # end for each se plot
+        if (fit.se[1] != 0) {  # if fit.se=0, length(fit.se) still = 1
+          for (j in 1:length(fit.se)) {
+            p.ln <- predict(l.ln, se=TRUE)
+            up.ln <- fitted(l.ln, ...) + (fit.se[j] * p.ln$se.fit)
+            dn.ln <- fitted(l.ln, ...) - (fit.se[j] * p.ln$se.fit)
+            lines(x.lv, up.ln, col=clr, lwd=0.5, lty=ln.type)
+            lines(x.lv, dn.ln, col=clr, lwd=0.5, lty=ln.type)
+            xx <- c(x.lv, rev(x.lv))
+            yy <- c(up.ln, rev(dn.ln))
+            polygon(xx, yy, col=getOption("se.fill"), border="transparent")
+          }  # end for each se plot
+        }
       }
 
     }  # ith pattern

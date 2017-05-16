@@ -67,9 +67,9 @@ function(old.vars, new.vars=NULL, old, new, data=mydata,
 
     # get conditions and check for data existing
     xs <- .xstatus(x.name, dname, quiet)
-    in.global <- xs$ig 
+    in.style <- xs$ig 
 
-    if (in.global)
+    if (in.style)
       if (is.function(old.vars)) 
         x.call <- as.vector(eval(substitute(data[,vars[ivar]])))
       else {
@@ -77,7 +77,7 @@ function(old.vars, new.vars=NULL, old, new, data=mydata,
             "Only variables in a data frame are processed.\n\n")
     }
 
-    # see if variable exists in data frame, if x not in Global Env or function call 
+    # see if variable exists in data frame, if x not in style Env or function call 
     .xcheck(x.name, dname, data)
 
     x.call <- as.vector(eval(substitute(data[,vars[ivar]])))

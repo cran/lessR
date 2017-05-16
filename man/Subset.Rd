@@ -31,7 +31,7 @@ subs(\ldots)
   \item{random}{If an integer or proportion, specifies number of rows to data
         to randomly extract.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-       with \code{\link{theme}} function.}
+       with \code{\link{style}} function.}
   \item{\dots}{The list of variables, each of the form, \code{variable = equation}.
        Each \code{variable} can be the name of an existing variable in the data frame
        or a newly created variable.}

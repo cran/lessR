@@ -18,7 +18,7 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   }
   
   df.name <- deparse(substitute(data))   # get name of data table
-  options(df.name = df.name)
+  options(dname = df.name)
 
   # if a tibble convert to data frame, no char --> factor conversion 
   if (class(data)[1] == "tbl_df") {

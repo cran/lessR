@@ -18,13 +18,12 @@ When output is assigned into an object, such as \code{b} in \code{b <- bx(Y)}, t
 BoxPlot(x=NULL, data=mydata, n.cat=getOption("n.cat"),
         Rmd=NULL,
 
-        fill=getOption("fill.bar"),
-        stroke=getOption("stroke.bar"), 
-        bg=getOption("bg"),
-        grid=getOption("grid"),
-        box=getOption("box"),
+        fill=getOption("bar.fill"),
+        stroke=getOption("bar.stroke"), 
+        bg.fill=getOption("bg.fill"),
+        bg.stroke=getOption("bg.stroke"),
 
-        cex.axis=0.75, axes="gray30",
+        cex.axis=0.75, values.stroke="gray30",
         xlab=NULL, main=NULL, sub=NULL, digits.d=NULL,
 
         rotate.x=0, rotate.y=0, offset=0.5,
@@ -57,20 +56,19 @@ bx(\ldots)
   \item{fill}{Interior color of the box. Turn off with \code{fill="off"}.
        This and the following colors can also be changed globally, individually
        and as 
-       a color theme, with the \code{lessR} \code{\link{global}} function.
+       a color theme, with the \code{lessR} \code{\link{style}} function.
        The \code{lessR} function \code{\link{showColors}} provides examples of all
        R named colors.}
   \item{stroke}{Color of any points that designate outliers. By default this
        is the same color as the box.}
-  \item{bg}{Color of the plot background. Turn off with \code{bg="off"}.}
-  \item{grid}{Color of the grid lines. Turn off with \code{grid="off"}.}
-  \item{box}{Color of border around the plot background, the box, that encloses 
-        the plot. Turn off with \code{box="off"}.}\cr
+  \item{bg.fill}{Color of the plot background. Turn off with \code{bg.fill="off"}.}
+  \item{bg.stroke}{Color of border around the plot background, the box, that encloses 
+        the plot. Turn off with \code{bg.stroke="off"}.}\cr
 
  \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
        values to be smaller than the axis labels. Provides the functionality of, and
        can be replaced by, the standard R \code{cex.axis.}}
-  \item{axes}{Color of the font used to label the axis values.}
+  \item{values.stroke}{Color of the font used to label the axis values.}
   \item{xlab}{Label for the value axis, which defaults to the variable's name.}
   \item{main}{Title of graph.}
   \item{sub}{Sub-title of graph, below xlab.}
@@ -88,7 +86,7 @@ bx(\ldots)
        box plot.}\cr
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
-       \code{\link{global}} function.}
+       \code{\link{style}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
   \item{pdf}{If \code{TRUE}, graphics to be redirected to a pdf file.}
@@ -119,9 +117,9 @@ The data may either be a vector from the global environment, the user's workspac
 To obtain a box plot of each numerical variable in the \code{mydata} data frame, use \code{BoxPlot()}.  Or, for a data frame with a different name, insert the name between the parentheses.  To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{fill} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{global}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{global}}, such as \code{"red"} and \code{"green"}. Use the option \code{ghost=TRUE} for a black background, no grid lines and partial transparency of plotted colors.  
+Individual colors in the plot can be manipulated with options such as \code{fill} for the color of the box. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub.theme="black")} for a black background and partial transparency of plotted colors.  
 
-For the color options, such as \code{grid}, the value of \code{"off"} is the same as 
+For the color options, such as \code{grid.stroke}, the value of \code{"off"} is the same as 
 \code{"transparent"}.
 
 VARIABLE LABELS\cr
@@ -171,7 +169,7 @@ Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 5, NY: Routl
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{boxplot}}, \code{\link{bxp}}, \code{\link{par}}, \code{\link{global}}.
+\code{\link{boxplot}}, \code{\link{bxp}}, \code{\link{par}}, \code{\link{style}}.
 }
 
 \examples{
