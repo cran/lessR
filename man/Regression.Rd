@@ -182,7 +182,7 @@ INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text.width} option.  After \code{Regression} is finished with a normal termination, the options are re-set to their values before the \code{Regression} function began executing.
 
 COLOR THEME\cr
-A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{style}}. The default color theme is \code{lightbronze}, but a gray scale is available by removing the bronze background, such as with \code{style(device.fill="white")} or with \code{"gray"}. Other themes are available as explained in \code{\link{style}}. 
+A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{style}}. The default color theme is \code{lightbronze}, but a gray scale is available by removing the bronze background, such as with \code{style(window.fill="white")} or with \code{"gray"}. Other themes are available as explained in \code{\link{style}}. 
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.

@@ -1,10 +1,11 @@
 bc.data.frame <-
 function(x, n.cat,
-         col.fill, col.stroke, col.bg, col.box,
+         col.fill, col.color, col.bg, col.box,
          col.trans, colors,
-         horiz,  addtop, gap, prop, xlab, ylab, main, cex.lab,
+         horiz, addtop, gap, prop,
+         xlab, ylab, main, lab.cex,
          labels, label.size,
-         cex.axis, cex.names, rotate.x, rotate.y, offset, beside,
+         axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
          col.low, col.hi,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet,
          width, height, pdf.file, ...)  {
@@ -58,11 +59,12 @@ function(x, n.cat,
         }
 
         .bc.main(x[,i], y=NULL, by=NULL,
-          col.fill, col.stroke, col.bg, col.box,
+          col.fill, col.color, col.bg, col.box,
           col.trans, colors,
-          horiz, addtop, gap, prop, xlab, ylab, main, cex.lab,
+          horiz, addtop, gap, prop,
+          xlab, ylab, main, lab.cex,
           value.labels=NULL, label.size,
-          cex.axis, cex.names, rotate.x, rotate.y, offset, beside,
+          axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
           col.low, col.hi, 
           legend.title, legend.loc, legend.labels, legend.horiz, quiet,
           font.main=1, ...)

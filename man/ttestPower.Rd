@@ -39,7 +39,7 @@ ttp(\ldots)
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
-  \item{\ldots}{Other parameter values, such as \code{lwd} and \code{cex.lab} from \code{\link{plot}}
+  \item{\ldots}{Other parameter values, such as \code{lwd} and \code{lab.cex} from \code{\link{plot}}
         and \code{col.line} and \code{col.bg} from \code{\link{ScatterPlot}}.}
 }
 

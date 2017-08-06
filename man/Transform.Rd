@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{trans}
 
-Based closely on the standard R \code{\link{transform}} function. Unlike the R function, output is provided that provides feedback and guidance regarding the specified transformation(s), and variable labels are accomodated. Existing variable labels are retained in the transformed data frame. If the transformation creates a new variable, then provide a corresponding variable label with the \code{lessR} function \code{\link{label}}. 
+Based closely on the standard R \code{\link{transform}} function. Unlike the R function, output is provided that provides feedback and guidance regarding the specified transformation(s), and variable labels are accommodated. Existing variable labels are retained in the transformed data frame. If the transformation creates a new variable, then provide a corresponding variable label with the \code{lessR} function \code{\link{label}}. 
 }
 
 \usage{
@@ -90,7 +90,7 @@ details.brief()
 # transformations with factors
 # ----------------------------
 
-# transfrom a nominal variable to ordinal, re-order the categories
+# transform a nominal variable to ordinal, re-order the categories
 mydata <- Transform(Satisfaction=
   factor(Satisfaction, levels=c("low", "med", "high"), ordered=TRUE))
 

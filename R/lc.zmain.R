@@ -1,17 +1,12 @@
 .lc.main <- 
 function(y, type,
-       col.line, col.area, col.stroke, col.fill, shape.pts,
-       col.box, col.bg, cex.axis, col.axis,
+       col.line, col.area, col.color, col.fill, shape.pts,
+       col.box, col.bg, lab.cex, axis.cex, col.axis,
        rotate.x, rotate.y, offset, xy.ticks,
        line.width, xlab, ylab, main, sub, cex,
        time.start, time.by, time.reverse, 
        center.line, show.runs, quiet, ...) {
-       
-       
-  # scale for regular R or RStudio
-  adj <- .RSadj(radius=NULL, cex.axis)
-  size.axis <- adj$size.axis
-  size.lab <- adj$size.lab
+
 
   if (!is.numeric(y)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -33,11 +28,10 @@ function(y, type,
   pt.size <- ifelse (is.null(cex), 0.8, cex)
 
   # get variable label and axis labels if they exist
-  gl <- .getlabels(ylab=ylab, main=main, cex.lab=getOption("lab.size"))
+  gl <- .getlabels(ylab=ylab, main=main)
   y.name <- gl$yn;  y.lbl <- gl$yl;  y.lab <- gl$yb
   main.lab <- gl$mb
   sub.lab <- gl$sb
-  cex.lab <- gl$cex.lab
 
   # count and remove missing data
   n <- sum(!is.na(y))
@@ -115,7 +109,7 @@ function(y, type,
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
 
-  par(bg=getOption("device.fill"))
+  par(bg=getOption("window.fill"))
   par(mai=c(bm, lm, tm, rm))
 
 
@@ -125,25 +119,27 @@ function(y, type,
   if (xy.ticks){
     if (is.null(time.start) && !is.ts(x)) 
      .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-        par("usr")[1], par("usr")[3], size.axis, col.axis,
-        rotate.x, rotate.y, offset, ...)
+        par("usr")[1], par("usr")[3], 
+        rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
     else {
-      axis.Date(1, x, cex.axis=size.axis, col.axis=col.axis, ...)
+      axis.x.color <- ifelse(is.null(getOption("axis.x.color")), 
+        getOption("axis.color"), getOption("axis.x.color"))
+      axis.Date(1, x, cex.axis=axis.cex, col.axis=col.axis, ...)
       #lbl.dt <- as.Date(axTicks(1), origin = "1970-01-01")
       #axis.Date(1, x, labels=FALSE, tck=-.01, ...)
       #text(x=lbl.dt, y=par("usr")[3], labels=lbl.dt,
-           #pos=1, xpd=TRUE, cex=cex.axis, col=col.axis)
+           #pos=1, xpd=TRUE, cex=axis.cex, col=col.axis)
       axis(2, at=axTicks(2), labels=FALSE, tck=-.01, ...)
       dec.d <- .getdigits(round(axTicks(2),6),1) - 1
       text(x=par("usr")[1], y=axTicks(2), labels=.fmt(axTicks(2),dec.d),
-           pos=2, xpd=TRUE, cex=size.axis, col=col.axis)
+           pos=2, xpd=TRUE,  col=col.axis)
     }
   }
 
   # axis labels
   max.lbl <- max(nchar(axTicks(2)))
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
-          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...)
+          xy.ticks=TRUE, offset=offset, ...)
           
   usr <- par("usr")
 
@@ -152,41 +148,34 @@ function(y, type,
 
   # grid lines
   vx <- pretty(c(usr[1],usr[2]))
-  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=getOption("grid.x.stroke"),
+  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=getOption("grid.x.color"),
          lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
   vy <- pretty(c(usr[3],usr[4]))
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=getOption("grid.y.stroke"),
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=getOption("grid.y.color"),
          lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
   # box around plot
   rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
-    lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
-  if (col.box == "transparent") {
-    if (getOption("axis.x.stroke") != "transparent")
-      segments(usr[1], usr[3], usr[2], usr[3], lwd=3)
-    if (getOption("axis.y.stroke") != "transparent")
-      segments(usr[1], usr[3], usr[1], usr[4], lwd=3)
-  }
-
+    lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
 
   # fill area under curve
-  if (!is.null(col.area)  && !is.null(col.stroke)) {
-    if (col.area=="transparent"  &&  col.stroke=="transparent")
+  if (!is.null(col.area)  && !is.null(col.color)) {
+    if (col.area=="transparent"  &&  col.color=="transparent")
       col.area <- NULL
-    else if (type != "p"  &&  is.null(col.stroke))
-      col.stroke <- col.line
+    else if (type != "p"  &&  is.null(col.color))
+      col.color <- col.line
   }
     if (!is.null(col.area)) 
       polygon(c(x[1],x,x[length(x)]), c(min(y),y,min(y)),
-              col=col.area, border=col.stroke)
+              col=col.area, border=col.color)
 
   # plot lines and points
   if (type == "l" || type == "b") {
     lines(as.numeric(x),y, col=col.line, lwd=line.width, ...)
   }
   if (type == "p" || type == "b") {
-    points(x,y, col=col.stroke, pch=shape.pts, bg=col.fill, cex=pt.size, ...)
+    points(x,y, col=col.color, pch=shape.pts, bg=col.fill, cex=pt.size, ...)
   }
 
   # plot center line

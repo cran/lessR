@@ -5,6 +5,64 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
   
+>>>>>> Changes for lessR version 3.6.5 (2017-08-06) <<<<<<
+
+-------------
+Updates 3.6.5
+-------------
+
+Density
+  automatically smooth the density plot, or manually specify bandwidth (bw)
+
+Plot
+  upgraded the boxplot option to a Violin plot with an enclosed Box plot
+    and Scatterplot called a VBS plot
+  VBS plot can be applied to conditioned variables by1 and by2 to provide
+    multiple panels
+  VBS plot can be applied to grouping variable by, multiple plots on 1 panel
+  box.mean option added for the boxplot as part of a VBS plot
+  outlier identification for boxplot can optionally be based on the medcouple skew
+    index and box plot adjustment added for box plot in VBS plots 
+  outliers in a boxplot labeled on the plot and identified in console output
+  if outliers labeled according to ID.cut, labeled points plotted with out.fill
+  out.cut to identify outliers can be specified as either a proportion or as a count
+  display inner fences that determine the outliers when fences=TRUE
+  2-D scatterplot: if outliers labeled according to ID.cut, and a fit line
+   indicated, then a second (dashed) fit line is calculated without outliers
+   and displayed
+  2-D scatterplot: MD.cut added to identify outliers by Mahalanobis Distance
+  changed the meaning of n.cat, default now 0, so default is that equally
+    spaced integer values represent measurements of a continuous variable,
+     bubble plot for two variables follows now from repetitions of data values
+  smooth option for large datasets uses window.fill to color plot background
+  . is a valid shape
+  auto=TRUE adds much information to the two-variable scatterplot
+  
+Regression
+  scatterplot matrix aesthetics improved, including larger typeface for
+    the correlation coefficients
+    
+style
+  all parameter values can be saved as a list, e.g., p <- style("gold")
+  the set parameter allows previously saved list to read back into style
+  many more controls of graphics parameters added
+
+
+---------------
+Bug Fixes 3.6.5
+--------------- 
+
+Plot
+  outlier point specification of a letter, digit or punctuation works
+  provided list of bright discrete colors now has each color unique
+  
+Regression
+  suggestion for .Rmd file properly references reg instead of reg.brief
+
+ttest
+  y-axis for paired differences graph labeled correctly
+  
+  
   
 
 >>>>>> Changes for lessR version 3.6.2 (2017-05-13) <<<<<<
@@ -36,7 +94,6 @@ Plot
     a. if by1 set, then a Trellis dot plot
     b. single panel dot plot horizontal to match dot plot style
   fill.ellipse, stroke.ellipse, stroke.fit, ... changed to 
-  
     ellipse.fit, ellipse.stroke, fit.stroke, ...
   cex.lab option added for regular and lattice plots
   bubble.fill option added

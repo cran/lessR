@@ -132,31 +132,31 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
         if (y.values[i] == min.y) y.values[i] <- 0 else y.values[i] <- 1
     }
 
-    par(bg=getOption("device.fill"))
+    par(bg=getOption("window.fill"))
 
     # plot
     plot(x.values,y.values, type="n", axes=FALSE, ann=FALSE,
          ylim=c(-.10,1.10), ...)
     usr <- par("usr")
-    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("bg.fill"),
-         border=getOption("bg.stroke"))
+    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("panel.fill"),
+         border=getOption("panel.color"))
 
-    col.grid <- getOption("grid.x.stroke")
+    col.grid <- getOption("grid.x.color")
     abline(v=axTicks(1), col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
     .axes(NULL, NULL, axTicks(1), axTicks(2),
-          par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30", ...)
+          par("usr")[1], par("usr")[3], ...)
 
     main.lab <- "Logistic Fit and Scatterplot"
     sub.lab <- NULL
     .axlabs(nm[2], y.label, main.lab, sub.lab, max.lbl.y=3,
-            cex.lab=getOption("lab.size"), cex.main=1.0, ...) 
+            cex.lab=getOption("lab.cex"), cex.main=1.0, ...) 
 
     col.fill <- getOption("pt.fill")
-    col.stroke <- getOption("pt.stroke")
-    points(x.values,y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
-    lines(x.values, p.int$fit, col=col.stroke, lwd=2)
+    col.color <- getOption("pt.color")
+    points(x.values,y.values, pch=21, col=col.color, bg=col.fill, cex=0.8)
+    lines(x.values, p.int$fit, col=col.color, lwd=2)
 
     if (!is.null(pdf.file)) {
       dev.off()
@@ -170,12 +170,12 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
       .opendev(pdf.file, width, height)
 
       panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        col.pt=getOption("pt.stroke"), col.smooth=getOption("col.bar.stroke"),
+        col.pt=getOption("pt.color"), col.smooth=getOption("col.bar.color"),
         span=2/3, iter=3, ...) 
       {
           usr <- par("usr")          
           rect(usr[1], usr[3], usr[2], usr[4],
-               col=getOption("border.fill"), border=getOption("border.stroke"))
+               col=getOption("border.fill"), border=getOption("border.color"))
           points(x, y, pch=pch, col=col.pt, bg=getOption("pt.fill"), cex=cex)
 
           ok <- is.finite(x) & is.finite(y)

@@ -1,9 +1,10 @@
 .bc.main <- 
 function(x, y, by, 
-         col.fill, col.stroke, col.bg, col.box, col.trans, colors,
-         horiz, addtop, gap, prop, xlab, ylab, main, cex.lab,
+         col.fill, col.color, col.bg, col.box, col.trans, colors,
+         horiz, addtop, gap, prop,
+         xlab, ylab, main, lab.cex,
          value.labels, label.max,
-         cex.axis, cex.names, rotate.x, rotate.y, offset, beside,
+         axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
          col.low, col.hi,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
 
@@ -12,10 +13,10 @@ function(x, y, by,
   if (length(unique(x)) != length(x)) if (!is.factor(x)) x <- factor(x)
 
   # scale for regular R or RStudio
-  adj <- .RSadj(radius=NULL, cex.axis, cex.names, cex.lab)
-  size.axis <- adj$size.axis
-  size.lab <- adj$size.lab
-  size.txt <- adj$size.txt
+  #adj <- .RSadj(radius=NULL, axis.cex, cex.names, lab.cex)
+  #size.axis <- adj$size.axis
+  #size.lab <- adj$size.lab
+  #size.txt <- adj$size.txt
 
   if ( (is.table(x) || is.matrix(x)) && is.null(legend.title) ) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -25,17 +26,29 @@ function(x, y, by,
   if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels)
 
   # get values for ... parameter values
-  stuff <- .getdots(...)
-  col.main <- stuff$col.main
-  col.lab <- stuff$col.lab
-  col.sub <- stuff$col.sub
-  cex.main <- stuff$cex.main
+  #stuff <- .getdots(...)
+  #col.main <- stuff$col.main
+  #col.lab <- stuff$col.lab
+  #col.sub <- stuff$col.sub
+  #cex.main <- stuff$cex.main
 
-  gl <- .getlabels(xlab, ylab, main, cex.lab=getOption("lab.size"))
+  # get lab.x.cex  lab.y.cex
+  lab.cex <- getOption("lab.cex")
+  lab.x.cex <- getOption("lab.x.cex")
+  lab.y.cex <- getOption("lab.y.cex")
+  lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
+  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+  lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
+  adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
+
+  gl <- .getlabels(xlab, ylab, main, by.nm=TRUE, lab.x.cex=lab.x.cex, 
+                   lab.y.cex=lab.y.cex)
   x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
-  by.name <- y.lbl <- gl$yl
+  y.lbl <- gl$yl
+  by.name <- y.lbl
   main.lab <- gl$mb
-  cex.lab <- gl$cex.lab
+  lab.x.cex <- gl$lab.x.cex
+  lab.y.cex <- gl$lab.y.cex
   if (!is.null(by)) by.name <- getOption("byname")
 
   ylab.keep <- ifelse(is.null(ylab), FALSE, TRUE)
@@ -111,16 +124,36 @@ function(x, y, by,
   if (!is.null(y)) {  # do not do counts, y is provided
     entered <- TRUE
     if (is.null(by)) {  # no by variable
+      yn <- getOption("yname")
       if (!is.numeric(y) > 0) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "y-values, those from the 2nd variable, must be numeric\n",
-          "As of lessR 3.5.6, explicitly indicate the by variable\n\n",
-          "To specify a by variable, precede its name with:  by=", "\n\n")
+          "y-values, those from the 2nd unlabeled variable, ", yn, ",",
+          " must be\n", " numeric\n\n",
+          "A by variable is categorical, with a small number of potentially\n",
+          "  non-numeric values\n",
+          "It appears that ", yn, " is a by variable\n",
+          "As of lessR 3.5.6, explicitly indicate the by variable if it\n",
+          "  second in the list for the function call\n\n",
+          "To specify a by variable as the 2nd variable in the function call,\n",
+          "  explicitly precede its name with:  by=", "\n\n")
       } 
+
       if (anyDuplicated(names(x)) > 0) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "The data contain duplicated values of variable: ", x.name, "\n\n")
       } 
+
+      if (length(y) > 20) {
+        warning(call.=FALSE, "There are more than 20 categories to plot\n\n",
+            "Perhaps you mean for the 2nd variable, ", yn, ", to be a",
+            " by variable\n",
+            "  even though it is numeric\n\n",
+            "A by variable only has a small number of values\n\n",
+            "To specify a by variable as the 2nd variable in the",
+            " function call,\n",
+            "  explicitly precede its name with:  by=", "\n\n")
+     }
+
       x.temp <- x
       x <- y
       names(x) <- x.temp
@@ -322,7 +355,19 @@ function(x, y, by,
     y.lab <- temp  # FIX: label size processed as x.lab, maybe too large
   }
 
-  max.width <- strwidth(as.character(max(pretty(c(min.y, max.y)))), units="inches")
+  ly <- length(y.lab)
+  if (ly > 1) {  # not perfect, but some line break better than none
+    if (nchar(y.lab[ly]) > 33) {
+      brk <- nchar(y.lab[ly]) %/% 2  # break label down the middle
+      while (substr(y.lab[ly],brk,brk) != " ") brk <- brk-1  # break at a word
+      line1 <- substr(y.lab[ly], 1, brk)
+      line2 <- substr(y.lab[ly], brk+1, nchar(y.lab[ly]))
+      y.lab[ly] <- paste(line1, "\n",  line2)
+    }
+  }
+
+  max.width <- strwidth(as.character(max(pretty(c(min.y, max.y)))),
+                        units="inches")
 
   margs <- .marg(max.width, y.lab, x.lab, main.lab, x.val=val.lab, prop,
                  rotate.x)
@@ -344,7 +389,7 @@ function(x, y, by,
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
 
-  par(bg=getOption("device.fill"))
+  par(bg=getOption("window.fill"))
   par(mai=c(bm, lm, tm, rm))
 
   # rescale to control bar width for small number of bars
@@ -389,30 +434,50 @@ function(x, y, by,
   usr <- par("usr")
   
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
+
+  grid.x.color <- ifelse(is.null(getOption("grid.x.color")), 
+    getOption("grid.color"), getOption("grid.x.color"))
+  grid.y.color <- ifelse(is.null(getOption("grid.y.color")), 
+    getOption("grid.color"), getOption("grid.y.color"))
+ 
+  grid.x.lwd <- ifelse(is.null(getOption("grid.x.lwd")), 
+    getOption("grid.lwd"), getOption("grid.x.lwd"))
+  grid.y.lwd <- ifelse(is.null(getOption("grid.y.lwd")), 
+    getOption("grid.lwd"), getOption("grid.y.lwd"))
+
+  grid.x.lty <- ifelse(is.null(getOption("grid.x.lty")), 
+    getOption("grid.lty"), getOption("grid.x.lty"))
+  grid.y.lty <- ifelse(is.null(getOption("grid.y.lty")), 
+    getOption("grid.lty"), getOption("grid.y.lty"))
  
   ax.num <- ifelse(horiz, 1, 2)  # location of numerical axis
   vy <- pretty(min.y:max.y)
-  abline(h=axTicks(ax.num), col=getOption("grid.y.stroke"), 
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+  abline(h=axTicks(ax.num), col=grid.y.color, lwd=grid.y.lwd, lty=grid.y.lty)
 
   # box around plot
   rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
-    lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
+    lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
   ## PLOT
   if (rescale == 0)
     coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
-          axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
+          axes=FALSE, ann=FALSE, border=col.color, las=las.value, 
           space=gap, axisnames=FALSE, ...)
   else
     coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
-          axes=FALSE, ann=FALSE, border=col.stroke, las=las.value, 
+          axes=FALSE, ann=FALSE, border=col.color, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
 
   # axes
   if (!horiz) las.value <- 1
-  axis(ax.num, cex.axis=size.axis, col=getOption("axis.y.stroke"),
-       col.axis=getOption("values.stroke"), las=las.value, ...) 
+  axis.y.color <- ifelse(is.null(getOption("axis.y.color")), 
+    getOption("axis.color"), getOption("axis.y.color"))
+  axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")), 
+    getOption("axis.cex"), getOption("axis.y.cex"))
+  adj <- .RSadj(axis.cex=axis.y.cex); axis.y.cex <- adj$axis.cex
+  axis(ax.num, col=axis.y.color,
+       col.axis=axis.y.color, cex.axis=axis.y.cex,
+       las=las.value, ...) 
   
   if (beside) coords <- apply(coords, 2, mean)  # one label per group
   if (!horiz) {
@@ -421,15 +486,21 @@ function(x, y, by,
   else {
     ax.value <- 2;  xx <- par("usr")[3];  yy <- coords
   }
-  if (horiz && beside) xx <- -0.032  # otherwise usr3 is a + value
+  if (horiz) xx <- -0.032  # otherwise usr3 is a + value
+  axis.x.color <- ifelse(is.null(getOption("axis.x.color")), 
+    getOption("axis.color"), getOption("axis.x.color"))
+  axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")), 
+    getOption("axis.cex"), getOption("axis.x.cex"))
+  adj <- .RSadj(axis.cex=axis.x.cex); axis.x.cex <- adj$axis.cex
   axis(ax.value, at=coords, labels=FALSE, tck=-.01,
-       col=getOption("axis.x.stroke"), ...)
+       col=axis.x.color, cex.axis=axis.x.cex, ...)
   text(x=xx, y=yy, labels=val.lab,
-       pos=ax.value, xpd=TRUE, cex=size.txt, col=getOption("values.stroke"),
+       pos=ax.value, xpd=TRUE, cex=axis.x.cex, col=getOption("axis.text.color"),
        srt=rotate.x, offset=offset, ...)
     
-  # axis labels
-  title(main=main.lab, col.main=col.main)
+  # title
+  title(main=main.lab, cex.main= getOption("main.cex"),
+        col.main=getOption("main.color"))
 
   # xlab positioning
   lblx.lns <- ifelse (grepl("\n", x.lab, fixed=TRUE), 3.1, 2.2)
@@ -440,8 +511,9 @@ function(x, y, by,
   if (new.ln) lblx.lns <- lblx.lns + 1
   if (offset > 0.5) lblx.lns <- lblx.lns + 1 
   if (horiz) lblx.lns <- lblx.lns + .6 
-  title(xlab=x.lab, line=lblx.lns, cex.lab=size.lab,
-        col.lab=getOption("lab.stroke"))
+  lab.x.color <- ifelse(is.null(getOption("lab.x.color")), 
+    getOption("lab.color"), getOption("lab.x.color"))
+  title(xlab=x.lab, line=lblx.lns, cex=lab.x.cex, col.lab=lab.x.color)
 
   # ylab positioning (based on .axlabs function)
   lbl.lns <- 3.6
@@ -451,8 +523,9 @@ function(x, y, by,
       if (grepl("\n", y.lab[i], fixed=TRUE)) multi <- TRUE  # multi-line
   lm <- par("mar")[2]  # get the current left margin
   lbly.lns <- ifelse (multi, lm - 2, lm - 1.4)
-  title(ylab=y.lab, line=lbly.lns, cex.lab=size.lab,
-        col.lab=getOption("lab.stroke"))
+  lab.y.color <- ifelse(is.null(getOption("lab.y.color")), 
+    getOption("lab.color"), getOption("lab.y.color"))
+  title(ylab=y.lab, line=lbly.lns, cex=lab.y.cex, col.lab=lab.y.color)
 
   # ----------------------------------------------------------------------------
   # legend for two variable plot including variable labels
@@ -465,7 +538,7 @@ function(x, y, by,
 
       options(byname = getOption("byname"))
       trans.pts <- .6  # dummy value
-      .plt.by.legend(legend.labels, col.stroke, clr, shp=22, trans.pts,
+      .plt.by.legend(legend.labels, col.color, clr, shp=22, trans.pts,
                      col.bg, usr, pt.size=1.6, pt.lwd=0)
 
     }  # right margin

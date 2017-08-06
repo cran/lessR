@@ -10,23 +10,23 @@ function(x,
 
   # set the labels
   # use variable label for main if it exists and main not specified
-  gl <- .getlabels(main=main)
+  gl <- .getlabels(main=main, lab.cex=getOption("lab.cex"))
   x.name <- gl$xn; x.lbl <- gl$xl
-  cex.lab <- gl$cex.lab
+  lab.cex <- gl$lab.cex
 
   if (!is.null(main)) main.lbl <- main
   else if (length(x.lbl) == 0) main.lbl <- x.name else main.lbl <- x.lbl
 
-  cex.lab <- 0.85
-  if (strwidth(main.lbl, units="figure", cex=cex.lab) > .85) {
+  lab.cex <- 0.85
+  if (strwidth(main.lbl, units="figure", cex=lab.cex) > .85) {
     brk <- nchar(main.lbl)
-    while (strwidth(substr(main.lbl,1,brk), units="figure", cex=cex.lab) > .85)
+    while (strwidth(substr(main.lbl,1,brk), units="figure", cex=lab.cex) > .85)
       brk <- brk-1 
     while (substr(main.lbl,brk,brk) != " ") brk <- brk-1
     main.lbl <- paste(substr(main.lbl,1,brk), "\n",
                       substr(main.lbl,brk+1,nchar(main.lbl)))
-    while (strwidth(main.lbl, units="figure", cex=cex.lab) > .85)
-      cex.lab <- cex.lab-0.05
+    while (strwidth(main.lbl, units="figure", cex=lab.cex) > .85)
+      lab.cex <- lab.cex-0.05
   }
 
   # entered counts typically integers as entered but stored as type double

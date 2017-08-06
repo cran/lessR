@@ -1,8 +1,8 @@
 .dpmat.main <-   # BPFM
 function(x, mylabels, sort.yx,
-         col.fill, col.stroke, col.bg, col.trans,
-         shape.pts, col.area, col.box, 
-         cex.axis, col.low, col.hi,
+         col.fill, col.color, col.bg,
+         col.trans, shape.pts, col.area, col.box, 
+         col.low, col.hi,
          xy.ticks, xlab, ylab, main, sub, cex,
          radius, size.cut, txt.color="black", power,
          value.labels, rotate.x, rotate.y, offset, quiet,
@@ -10,21 +10,18 @@ function(x, mylabels, sort.yx,
 
 
   # scale for regular R or RStudio
-  adj <- .RSadj(radius, cex.axis)
+  adj <- .RSadj(radius)
   radius <- adj$radius
-  size.axis <- adj$size.axis
-  size.lab <- adj$size.lab
   size.txt <- adj$size.txt
 
   if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels) 
 
   # if exist, get axes labels
-  gl <- .getlabels(xlab, ylab, main, cex.lab=size.lab)
+  gl <- .getlabels(xlab, ylab, main)
   x.lab <- gl$xb
   y.lab <- gl$yb
   main.lab <- gl$mb
   sub.lab <- gl$sb
-  size.lab <- gl$cex.lab
 
   n.var <- ncol(x)
 
@@ -117,7 +114,7 @@ function(x, mylabels, sort.yx,
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
     
-    par(bg=getOption("device.fill"))
+    par(bg=getOption("window.fill"))
     par(mai=c(bm, lm, tm, rm))
 
     plot(cords$xx, cords$yy, type="n", axes=FALSE, ann=FALSE, 
@@ -131,8 +128,9 @@ function(x, mylabels, sort.yx,
       x.lvl <- gsub(" ", "\n", x.lvl) 
 
     .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,
-          par("usr")[1], par("usr")[3], size.axis, getOption("axis.x.stroke"),
-          rotate.x, rotate.y, offset=offset, ...)
+          par("usr")[1], par("usr")[3],
+          rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
+
 
     # axis labels 
     if (!is.null(y.lvl))
@@ -143,7 +141,7 @@ function(x, mylabels, sort.yx,
       max.lbl <- 0
 
     .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-            xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
+            xy.ticks=TRUE, offset=offset, ...) 
 
     usr <- par("usr")
 
@@ -151,20 +149,14 @@ function(x, mylabels, sort.yx,
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
 
     # grid lines
-    abline(h=1:n.var, col=getOption("grid.y,stroke"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
-    abline(v=axTicks(1), col=getOption("grid.x.stroke"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))  # bubbles only
+    .grid("v", axTicks(1))
+    .grid("h", 1:n.var)
+    #abline(v=axTicks(1), col=grid.x.color, lwd=grid.x.lwd, lty=grid.x.lty)
+    #abline(h=1:n.var, col=grid.y.color, lwd=grid.x.lwd, lty=grid.y.lty)
  
     # box around plot
     rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
-      lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
-    if (col.box == "transparent") {
-      if (getOption("axis.x.stroke") != "transparent")
-        segments(usr[1], usr[3], usr[2], usr[3], lwd=3)
-      if (getOption("axis.y.stroke") != "transparent")
-        segments(usr[1], usr[3], usr[1], usr[4], lwd=3)
-    }
+      lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
     # colors
     if (is.null(col.low) ||  is.null(col.hi))
@@ -180,7 +172,7 @@ function(x, mylabels, sort.yx,
       for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans.pts)*256)
     }
     symbols(cords$xx, cords$yy, circles=c, bg=clr, 
-          fg=col.stroke, inches=radius, add=TRUE, ...)
+          fg=col.color, inches=radius, add=TRUE, ...)
 
     # counts
     if (size.cut) { 

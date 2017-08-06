@@ -16,6 +16,9 @@ function (h, len.x, fun.call) {
       txt <- "  # smoothed density curves plus histogram"
       tx[length(tx)+1] <- paste("Density(", getOption("xname"), ")", txt,
          sep="")      
+      txt <- "  # integrated Violin/Box/Scatterplot (VBS) plot"
+      tx[length(tx)+1] <- paste("Plot(", getOption("xname"), ")", txt,
+         sep="")      
     }
     txsug <- tx
 

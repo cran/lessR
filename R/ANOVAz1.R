@@ -82,28 +82,28 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
-    col.bg <- getOption("bg.fill")
+    col.bg <- getOption("panel.fill")
     rect(usr[1], usr[3], usr[2], usr[4],
-         col=getOption("bg.fill"), border=getOption("bg.stroke"))
+         col=getOption("panel.fill"), border=getOption("panel.color"))
 
     axT1 <- 1:length(unique(x.values))
-    abline(v=axT1, col=getOption("grid.x.stroke"),
+    abline(v=axT1, col=getOption("grid.x.color"),
                         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
-    abline(h=axTicks(2), col=getOption("grid.y.stroke"),
+    abline(h=axTicks(2), col=getOption("grid.y.color"),
                         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
     .axes(levels(x.values), NULL, axT1, axTicks(2),
-          par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30")
+          par("usr")[1], par("usr")[3])
 
     main.lab <- plt.title[plt.i]
     sub.lab <- NULL
     x.label <- nm[2]
     y.label <- nm[1]
-    .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
+    .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3) 
 
     col.fill <- getOption("pt.fill")
-    col.stroke <- getOption("pt.stroke")
-    points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=0.8)
+    col.color <- getOption("pt.color")
+    points(x.values, y.values, pch=21, col=col.color, bg=col.fill, cex=0.8)
 
     # plot cell means
     pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
@@ -237,8 +237,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
       orig.params <- par(no.readonly=TRUE)
       on.exit(par(orig.params))
       par(mar=c(5.1,6.1,4.1,1.5))
-      cex.axis <- .8; col.axis <- "gray30"; 
-      plot(HSD, cex.axis=cex.axis, col.axis=col.axis, las=1)
+      plot(HSD, cex.axis=0.8, col.axis="gray30", las=1)
 
       if (pdf) {
         dev.off()

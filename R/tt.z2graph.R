@@ -41,22 +41,22 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   max.y <- max(max(dYA$y),max(dYB$y))  # max y coordinate
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
-  col.tx <- getOption("lab.stroke")
-  col.ln <- getOption("bar.stroke")
+  col.tx <- getOption("lab.color")
+  col.ln <- getOption("bar.color")
 
 
   # ------------------------------
   # plot: set up coordinate system
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  par(bg=getOption("device.fill"))
+  par(bg=getOption("window.fill"))
   par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1.1, cex.lab=1.35)
 
   plot.new()
   plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
 
-  axis(1, col=getOption("axis.x.stroke"), col.axis=getOption("lab.stroke"))
-  box(col=getOption("bg.stroke"))
+  axis(1, col=getOption("axis.x.color"), col.axis=getOption("lab.color"))
+  box(col=getOption("panel.color"))
   if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
   title(xlab=y.lbl, col.lab=col.tx)
 
@@ -84,7 +84,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   lines(dYB, col=col.2t, lty="solid", lwd=lwd.border)
 
   # minimum mean difference of practical importance
-  col.e <- getOption("lab.stroke")  # color for effect
+  col.e <- getOption("lab.color")  # color for effect
   if (!is.null(mmd) | !is.null(msmd)) {
     mid <- (m1 + m2) / 2
     lr <- mid + .5*mmd  # line right
@@ -113,7 +113,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   aL <- -45
 
   # legends
-  col.lgnd <- getOption("lab.stroke")
+  col.lgnd <- getOption("lab.color")
   cex.lgnd <- 1.1
 
   radj <- xleft + .02*(max.x-min.x)

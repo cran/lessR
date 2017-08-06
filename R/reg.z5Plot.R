@@ -56,9 +56,9 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     y.values <- lm.out$model[,nm[1]]
                
     # scale for regular R or RStudio
-    cex.axis <- 0.76
+    axis.cex <- 0.76
     radius <- 0.25
-    adj <- .RSadj(radius, cex.axis)
+    adj <- .RSadj(radius, axis.cex, lab.cex=getOption("lab.cex"))
     radius <- adj$radius
     size.axis <- adj$size.axis
     size.lab <- adj$size.lab
@@ -78,18 +78,18 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     rm <- margs$rm
     bm <- margs$bm
       
-    par(bg=getOption("device.fill"))
+    par(bg=getOption("window.fill"))
     par(mai=c(bm, lm, tm, rm))
     
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
     rect(usr[1], usr[3], usr[2], usr[4],
-      col=getOption("bg.fill"), border=getOption("bg.stroke"))
+      col=getOption("panel.fill"), border=getOption("panel.color"))
 
-    abline(v=axTicks(1), col=getOption("grid.x.stroke"),
+    abline(v=axTicks(1), col=getOption("grid.x.color"),
          lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
-    abline(h=axTicks(2), col=getOption("grid.y.stroke"),
+    abline(h=axTicks(2), col=getOption("grid.y.color"),
          lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
     if (is.factor(x.values)) {
@@ -101,17 +101,21 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       axT1 <- axTicks(1)  # else numeric, so all the ticks
     }
       
-    .axes(x.lvl, NULL, axT1, axTicks(2),
-      par("usr")[1], par("usr")[3], cex.axis=.8, col.axis="gray30")
+    .axes(x.lvl, NULL, axT1, axTicks(2), par("usr")[1], par("usr")[3])
 
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
         max.lbl.y=3, cex.lab=size.lab) 
 
-    col.fill <- getOption("pt.fill")
-    col.stroke <- getOption("pt.stroke")
+    col.fill <- getOption("bar.fill")
+    col.color <- getOption("pt.color")
     
-    if (length(unique(x.values)) > getOption("n.cat"))
-      points(x.values, y.values, pch=21, col=col.stroke, bg=col.fill, cex=size.pt)
+    eq.int <- TRUE
+    d.x <- diff(x.values) 
+    for (i in 2:(length(d.x)))
+      if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
+
+    if (length(unique(x.values)) > getOption("n.cat")  ||  !eq.int)
+      points(x.values, y.values, pch=21, col=col.color, bg=col.fill, cex=size.pt)
 
     else {
       mytbl <- table(x.values, y.values)  # get the counts, all x-y combinations
@@ -138,7 +142,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       sz <- cords[,3]**power  # radius unscaled 
       radius <- 0.25
       symbols(cords$xx, cords$yy, circles=sz, inches=radius,
-          bg=col.fill, fg=col.stroke, add=TRUE, ...)
+          bg=col.fill, fg=col.color, add=TRUE, ...)
 
       q.ind <- 1:nrow(cords)  # all bubbles get text
       for (i in 1:nrow(cords)) if (cords[i,3] < 5) cords[i,3] <- NA 
@@ -156,18 +160,18 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     else {  # plot reg line
       if (!is.factor(lm.out$model[,nm[2]])) {
         abline(lm.out$coefficients[1], lm.out$coefficients[2],
-               col=getOption("bar.stroke"), lwd=1)
+               col=getOption("segment.color"), lwd=1)
       }
     }
 
     if (do.predint) {
-      col.ci <- getOption("pt.stroke")
+      col.ci <- getOption("segment.color")
       col.pi <- "gray30"
 
       lines(x.values, c.int$lwr, col=col.ci, lwd=0.75)
       lines(x.values, c.int$upr, col=col.ci, lwd=0.75)
-      lines(x.values, p.int$lwr, col=col.pi, lwd=1.5)
-      lines(x.values, p.int$upr, col=col.pi, lwd=1.5)
+      lines(x.values, p.int$lwr, col=col.pi, lwd=1)
+      lines(x.values, p.int$upr, col=col.pi, lwd=1)
 
       len <- length(x.values)
       xx <- c( c(x.values[1],x.values,x.values[len]),
@@ -190,9 +194,9 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       plt.i <- plt.i + 1L
       plt.title[plt.i] <- "ScatterPlot Matrix"
 
-      bg.fill <- getOption("bg.fill")  
-      device.fill <- getOption("device.fill")  
-      bckg <- ifelse(bg.fill=="transparent", device.fill, bg.fill)
+      panel.fill <- getOption("panel.fill")  
+      window.fill <- getOption("window.fill")  
+      bckg <- ifelse(panel.fill=="transparent", window.fill, panel.fill)
       .plt.mat(lm.out$model[c(nm)], fit="ls", col.bg=bckg)
     }
     else {

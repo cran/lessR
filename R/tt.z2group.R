@@ -352,11 +352,12 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X1nm))
 
       .lc.main(YA, type=NULL,
-        col.line=getOption("pt.stroke"), col.area=NULL, col.box=getOption("bg.stroke"),
-        col.stroke=getOption("pt.stroke"), 
+        col.line=getOption("pt.color"), col.area=NULL,
+        col.box=getOption("panel.color"),
+        col.color=getOption("pt.color"), 
         col.fill=getOption("bar.fill"), shape.pts=21,
-        col.bg=getOption("bg.fill"),
-        cex.axis=0.75, col.axis="gray30", rotate.x=0, rotate.y=0, offset=.5,
+        col.bg=getOption("panel.fill"), lab.cex=getOption("lab.cex"),
+        axis.cex=0.75, col.axis="gray30", rotate.x=0, rotate.y=0, offset=.5,
         xy.ticks=TRUE, line.width=1.1,
         xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""),
         main=plt.title[plt.i], sub=NULL,
@@ -377,11 +378,12 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X2nm))
  
      .lc.main(YB, type=NULL,
-       col.line=getOption("pt.stroke"), col.area=NULL, col.box=getOption("bg.stroke"),
-       col.stroke=getOption("pt.stroke"), 
+       col.line=getOption("pt.color"), col.area=NULL,
+       col.box=getOption("panel.color"),
+       col.color=getOption("pt.color"), 
        col.fill=getOption("bar.fill"), shape.pts=21,
-       col.bg=getOption("bg.fill"),
-       cex.axis=0.85, col.axis="gray30", rotate.x=0, rotate.y=0, offset=.5,
+       col.bg=getOption("panel.fill"), lab.cex=getOption("lab.cex"),
+       axis.cex=0.85, col.axis="gray30", rotate.x=0, rotate.y=0, offset=.5,
        xy.ticks=TRUE, line.width=1.1,
        xlab=NULL, ylab=paste(Ynm,": ",X2nm, sep=""),
        main=plt.title[plt.i], sub=NULL,
@@ -390,7 +392,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
       if (!is.null(pdf.file)) {
         dev.off()
-        .showfile(paste("LineChart_", X2nm, ".pdf", sep=""), paste("line chart of", X2nm))
+        .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
+                  paste("line chart of", X2nm))
       }
     }
 

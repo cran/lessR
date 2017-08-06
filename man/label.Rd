@@ -1,7 +1,7 @@
 \name{label}
 \alias{label}
 
-\title{Assign Variable Labels [Supersceded by VariableLabels]}
+\title{Assign Variable Labels [Superseded by VariableLabels]}
 
 \description{
 Deprecated, replaced by \code{\link{VariableLabels}}. Display a variable label for output, either text output at the console or graphics, such as a title on a graph.  To return a variable label generally applies to standard R functions such that the functions can access \code{lessR} variable labels. Or, the variable name and label can be listed on the standard output. To assign a variable label, invoke the \code{value} option and assign the output to a specified data frame. 
@@ -15,7 +15,7 @@ label(x, value=NULL, data=mydata)
 \arguments{
   \item{x}{The variable for which to obtain the corresponding variable label.}
   \item{value}{If assigned, then the specified data frame is updated with this
-       asssigned label.}
+       assigned label.}
   \item{data}{Data frame that contains the variable of interest. The output
        of the function is assigned to this data frame.}
 }

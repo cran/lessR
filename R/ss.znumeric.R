@@ -1,11 +1,15 @@
 .ss.numeric <-
-function(x, by=NULL, digits.d=NULL, brief, ...) {
+function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE, ...) {
 
   # get variable labels if exist
   # graph.win=FALSE turns off call to par, so blank window in R not produced
   gl <- .getlabels(graph.win=FALSE)
   x.name <- gl$xn; x.lbl <- gl$xl;
-  y.name <- gl$yn; y.lbl <- gl$yl
+  if (by1.nm) {
+    y.name <- ifelse (is.null(y.name), gl$yn, y.name)  # sometimes need by1.name
+    gl <- .getlabels(graph.win=FALSE, by1.nm=TRUE)
+  }
+  y.lbl <- gl$yl
 
   max.char <- 0
   if (is.null(by))
@@ -29,7 +33,7 @@ function(x, by=NULL, digits.d=NULL, brief, ...) {
     cat("\nThese data values contain ", dig.dec, " decimal digits. To enhance\n",
         "the readability of the output, only 4 decimal digits are\n",
         "displayed.  To customize this setting, use the digits.d  parameter.\n",
-        "Example for Variables Y and X:  > ss(Y, by=X, digits.d=3)\n",
+        "Example for Variables Y and X:  > ss(Y, by=X, digits.d=3)\n\n",
         sep="")
     dig.dec <- 4
   }
@@ -139,7 +143,7 @@ function(x, by=NULL, digits.d=NULL, brief, ...) {
       if (max.ln < 8) max.ln <- max.ln + 1
       nbuf <- ifelse (n.lines == 1, 2, 4)
 
-      n.lbl <- .fmtc("n", nchar(as.character(n))+nbuf+max.lv)
+      n.lbl <- .fmtc("n", nchar(as.character(n))+nbuf+max.lv-1)
       miss.lbl <- .fmtc("miss", nchar(as.character(n.miss))+5)
       m.lbl <- .fmtc("mean", max.ln)
       s.lbl <- .fmtc("sd", max.ln)

@@ -33,24 +33,24 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   }
   col.2 <- rgb(.49,.56,.69)
 
-  col.1t <- getOption("bar.stroke")
+  col.1t <- getOption("bar.color")
   col.1d <- getOption("ellipse.fill")
 
-  col.tx <- getOption("lab.stroke")
-  col.ln <- getOption("bar.stroke")
+  col.tx <- getOption("lab.color")
+  col.ln <- getOption("bar.color")
 
 
   # ------------------------------ 
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  par(bg=getOption("device.fill"))
+  par(bg=getOption("window.fill"))
   par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
 
   plot.new()
   plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
 
-  axis(1, col=getOption("axis.x.stroke"), col.axis=getOption("lab.stroke"))
-  box(col=getOption("bg.stroke"))
+  axis(1, col=getOption("axis.x.color"), col.axis=getOption("lab.color"))
+  box(col=getOption("panel.color"))
   if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
   title(xlab=y.lbl, col.lab=col.tx)
 
@@ -78,7 +78,7 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
   lines(dYA, col=col.1t, lty="solid", lwd=lwd.border)
 
   # minimum mean difference of practical importance
-  col.e <- getOption("lab.stroke")  # color for effect
+  col.e <- getOption("lab.color")  # color for effect
   if ( !is.null(mmd) | !is.null(msmd) ) {
     if (!is.null(mmd)) msmd <- mmd / sw
     if (!is.null(msmd)) mmd <- msmd * sw

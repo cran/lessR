@@ -1,7 +1,7 @@
 # plot legend for by variables
 
 .plt.by.legend <-
-function(mylevels, stroke, fill, shp, trans.pts, col.bg, usr,
+function(mylevels, color, fill, shp, trans.pts, col.bg, usr,
          pt.size=1.1, pt.lwd=0.5) {
 
   par(xpd=NA)  # allow drawing outside of plot region
@@ -37,19 +37,19 @@ function(mylevels, stroke, fill, shp, trans.pts, col.bg, usr,
 
   if (trans.pts > 0.85) {  # points too light, reduce legend transparency
     legend.fill <- integer(length=n.levels)
-    for (i in 1:n.levels) legend.fill[i] <- .maketrans(stroke[i],.7)
+    for (i in 1:n.levels) legend.fill[i] <- .maketrans(color[i],.7)
   }
   else 
     legend.fill <- fill
 
-  the.clr <- getOption("lab.stroke")
+  the.clr <- getOption("lab.color")
 
   yi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
   # fill=length(legend.labels):1  puts the legend labels in the correct
   #   order, but only for inflexible boxes that cannot be resized with pt.cex
   legend(xleft, ytop, legend=legend.labels, title=legend.title, 
          pch=shp, horiz=FALSE, cex=.7, pt.cex=pt.size, pt.lwd=pt.lwd,
-         box.lwd=.5, box.col="gray30", bg=col.bg, col=stroke, pt.bg=fill,
+         box.lwd=.5, box.col="gray30", bg=col.bg, col=color, pt.bg=fill,
          text.col=the.clr, y.intersp=yi)
 
   par(xpd=FALSE)  # cancel drawing outside of plot region (need for RStudio)

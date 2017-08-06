@@ -155,7 +155,7 @@ function(x, miss, show.n, digits.d,
   
     # scatter plot matrix
       #panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        #col.pt=getOption("pt.stroke"), col.smooth=getOption("bar.stroke"),
+        #col.pt=getOption("pt.color"), col.smooth=getOption("bar.color"),
         #span=2/3, iter=3, ...) 
       #{
           #points(x, y, pch=pch, col=col.pt, cex=cex)

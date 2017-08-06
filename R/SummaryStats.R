@@ -116,25 +116,26 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else if (!is.factor(x.call)) {
 
     sk <- NA; kt <- NA; q1 <- NA; q3 <- NA;  qr <- NA;
-    stuff <- .ss.numeric(x.call, y.call, digits.d, brief, ...)
+#cat("exists y.name:", exists("y.name"), "\n")
+    if (exists("y.name"))
+      nm <- y.name
+    else
+      nm <- NULL
+    stuff <- .ss.numeric(x.call, y.call, digits.d, brief, y.name=nm, ...)
     txsts <- stuff$tx
-    txotl <- .outliers(x.call)
+    txotl <- .bx.stats(x.call)$txotl
   }
 
   # ordered factors have two attributes, "ordered" and "factor"
   else if (is.factor(x.call)) {
 
-    gl <- .getlabels(xlab=NULL, ylab=NULL, main=NULL, cex.lab=NULL,
-                     graph.win=FALSE)
+    gl <- .getlabels(graph.win=FALSE)
     x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
     y.name <- gl$yn; y.lab <- gl$yb; y.lbl <- gl$yl
 
     if (is.factor(x.call)) 
-{
-
       stuff <- .ss.factor(x.call, y.call, brief, digits.d,
                         x.name, y.name, x.lbl, y.lbl, label.max, ...)
-} 
     else if (is.character(x.call))
       if (nlevels(factor(x.call)) < length(x.call)) { 
         stuff <- .ss.factor(factor(x.call), by, brief, digits.d=NULL,

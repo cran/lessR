@@ -12,7 +12,7 @@ function(x, n.cat, brief, ...)  {
     if (is.numeric(x[,i]) && nu > n.cat) {
       stuff <- .ss.numeric(x[,i], brief=brief, ...)
       txsts <- stuff$tx
-      txotl <- .outliers(x[,i])
+      txotl <- .bx.stats(x[,i])$txotl
       class(txsts) <- "out_piece"
       class(txotl) <- "out_piece"
       output <- list(out_stats=txsts, out_outliers=txotl)
@@ -22,7 +22,7 @@ function(x, n.cat, brief, ...)  {
 
     else if (is.factor(x[,i]) || is.character(x[,i]) ||
              (.is.num.cat(x[,i], n.cat))) {
-      gl <- .getlabels(xlab=NULL, ylab=NULL, main=NULL, cex.lab=NULL)
+      gl <- .getlabels()
       x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
       stats <- .ss.factor(x[,i], x.name=x.name, x.lbl=x.lbl, ...)
       txttl <- stats$title

@@ -33,7 +33,7 @@ function (x=mycor,
      (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black"))
     col.ln <- getOption("bar.fill")
   else
-    col.ln <- getOption("bar.stroke")
+    col.ln <- getOption("bar.color")
 
   # keep track of generated graphics
   plot.i <- 0
@@ -46,11 +46,12 @@ function (x=mycor,
   .lc.main(ev, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.stroke=getOption("pt.stroke"),
+         col.color=getOption("pt.color"),
          col.fill=getOption("pt.fill"),
          shape.pts=21,
-         col.bg=getOption("bg.fill"),
-         cex.axis=.85, col.axis="gray30", rotate.x=0, rotate.y=0, offset=0.5,
+         col.bg=getOption("panel.fill"),
+         lab.cex=getOption("lab.cex"), axis.cex=.85, col.axis="gray30",
+         rotate.x=0, rotate.y=0, offset=0.5,
          xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Eigenvalues", main=main, sub=NULL, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
@@ -81,11 +82,12 @@ function (x=mycor,
   .lc.main(ev.diff, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.stroke=getOption("pt.stroke"),
+         col.color=getOption("pt.color"),
          col.fill=getOption("pt.fill"),
          shape.pts=21,
-         col.bg=getOption("bg.fill"),
-         cex.axis=.85, col.axis="gray30", rotate.x=0, rotate.y=0, offset=0.5,
+         col.bg=getOption("panel.fill"),
+         lab.cex=getOption("lab.cex"), axis.cex=.85, col.axis="gray30",
+         rotate.x=0, rotate.y=0, offset=0.5,
          xy.ticks=TRUE, line.width=1.1,
          xlab=NULL, ylab="Differences of Successive Eigenvalues",
          main=main, sub=NULL, cex=NULL,

@@ -1,5 +1,7 @@
 .plt.txt <- 
-function(x, y, values, object, n.cat, xlab, ylab, smooth,
+function(x, y, values, object, n.cat,
+         cat.x, num.cat.x, cat.y, num.cat.y,
+         xlab, ylab, smooth, box.adj,
          center.line, prop, size, show.runs, radius, digits.d, 
          fun.call=NULL) {
 
@@ -61,22 +63,27 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
     cleveland <- FALSE
 
 
-  if (!date.ts) {
-    num.cat.x <- is.null(x.lvl)  &&  .is.num.cat(x[,1], n.cat)
-    cat.x <- ifelse (num.cat.x || !is.null(x.lvl), TRUE, FALSE)
-  }
-  else {
-    num.cat.x <- FALSE
-    cat.x <- FALSE
-  }
-  if (!bubble1  &&  !date.ts) {
-    num.cat.y <- is.null(y.lvl) && .is.num.cat(y[,1], n.cat)
-    cat.y <- ifelse (num.cat.y || !is.null(y.lvl), TRUE, FALSE)
-  }
-  else {
-    num.cat.y <- FALSE
-    cat.y <- FALSE
-  }
+  #if (!date.ts) {
+    #num.cat.x <- is.null(x.lvl)  &&  .is.num.cat(x[,1], n.cat)
+    #cat.x <- ifelse (num.cat.x || !is.null(x.lvl), TRUE, FALSE)
+  #}
+  #else {
+    #num.cat.x <- FALSE
+    #cat.x <- FALSE
+  #}
+  #if (!bubble1  &&  !date.ts) {
+    #num.cat.y <- is.null(y.lvl) && .is.num.cat(y[,1], n.cat)
+    #cat.y <- ifelse (num.cat.y || !is.null(y.lvl), TRUE, FALSE)
+  #}
+  #else {
+    #num.cat.y <- FALSE
+    #cat.y <- FALSE
+  #}
+        #cat.x <- TRUE
+        #num.cat.x <- TRUE
+        #cat.y <- TRUE
+        #num.cat.y <- TRUE
+
 
   gl <- .getlabels(xlab, ylab)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
@@ -137,13 +144,11 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
 
   # comment after the suggestion?
   cmt <- function(ct, mx.ch=88) {
-
     fc <- gsub(" = ", "=", fc)
     nch <- nchar(paste(fncl, fc, ct))
     if (nch > mx.ch) ct <- "" 
     fc <- paste(fncl, fc, ")  ", ct, sep="")
     txsug <- paste(txsug, "\n", fc, sep="")
-
   }
 
 
@@ -157,84 +162,29 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
   
         if (getOption("suggest")) {
           txsug <- ">>> Suggestions"
-            
-          fc <- ""
-          if (!grepl("ellipse", fncl)  &&  n.col == 1)
-            fc <- paste(fc, ", ellipse=0.95", sep="")
-          if (!grepl("ellipse.fill=\"off\"", fncl) &&
-              !grepl("ellipse.fill = \"off\"", fncl)  &&  n.col == 1)
-            fc <- paste(fc, ", ellipse.fill=\"off\"", sep="")
-          if (!grepl("fit", fncl)) 
-            fc <- paste(fc, ", fit=TRUE", sep="")
-          if (grepl("fit=TRUE", fncl))
-            fncl <- sub("fit=TRUE", "fit=\"ls\"", fncl)
-          if (nzchar(fc)) {
-            fc <- paste(fncl, fc, ") ", sep="")
-            txsug <- paste(txsug, "\n", fc, sep="")
+
+          fc <- paste("Plot(", x.name, ", ", y.name, sep="")
+
+          if (!grepl("fit", fncl)) {
+            txt <- ", fit=\"ls\", fit.se=1:3)  # fit line with standard errors"
+            txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
-         
-          fc <- ""
-          if (!grepl("ID.cut", fncl))
-            fc <- paste(fc, ", ID.cut=.10", sep="")
-          if (nzchar(fc))
-            txsug <- cmt("# label top 10% potential outliers")
-         
-          fc <- ""
-          if (!grepl("fit.se", fncl))
-            fc <- paste(fc, ", fit.se=1:3", sep="")
-            txt <- "# fit line with standard errors of 1, 2 and 3"
-          if (nzchar(fc))
-            txsug <- cmt(txt)
-            
-          fc <- ""
-          if (!grepl("ellipse", fncl)  &&  n.col == 1)
-            fc <- paste(fc, ", ellipse=seq(.25,.95,.10)", sep="")
-          if (!grepl("size", fncl))
-            fc <- paste(fc, ", size=0", sep="")
-          if (nzchar(fc))
-            txsug <- cmt("# no points, shaded ellipses")
 
-          fc <- ""
-          if (!grepl("smooth", fncl)  &&  smooth)
-            fc <- paste(fc, ", smooth=FALSE", sep="")
-          if (grepl("ellipse", fncl)) fncl <- .rm.arg.l("ellipse", fncl)
-          if (nzchar(fc))
-            txsug <- cmt("# smooth default for > 2500 rows of data")
+          if (!grepl("out.cut", fncl)) {
+            txt <- ", out.cut=.10)  # label top 10% potential outliers"
+            txsug <- paste(txsug, "\n", fc, txt, sep="")
+          }
 
-          fc <- ""
-          if (smooth) {
-            fc <- "style(grid.x.stroke=\"off\", grid.y.stroke=\"off\")" 
-            fc <- paste(fc, "# turn off grid lines")
-            if (nzchar(fc))
-              txsug <- paste(txsug, "\n", fc, sep="")
+          if (!grepl("ellipse", fncl)) {
+            txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
+            txsug <- paste(txsug, "\n", fc, txt, sep="")
+          }
+
+          if (!grepl("smooth", fncl)) {
+            txt <- ", shape=\"diamond\")  # change plot character"
+            txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
           
-          fc <- ""
-          if (!smooth) {
-            if (!grepl("size", fncl)  &&  n.col == 1)
-              fc <- paste(fc, ", size=2", sep="")
-            if (!grepl("shape", fncl)  &&  n.col == 1)
-              fc <- paste(fc, ", shape=\"diamond\"", sep="")
-            if (!grepl("bg", fncl)) 
-              fc <- paste(fc, ", bg=\"off\"", sep="")
-            if (!grepl("grid", fncl)) 
-              fc <- paste(fc, ", grid=\"off\"", sep="")
-            if (nzchar(fc)) {
-              fc <- paste(fncl, fc, ") ", sep="")
-              txsug <- paste(txsug, "\n", fc, sep="")
-            }
-          }
-
-          if (!smooth) {
-            fc <- ""
-            if (!grepl("smooth", fncl))
-              fc <- paste(fc, ", smooth=TRUE", sep="")
-            if (!grepl("fit", fncl))
-              fc <- paste(fc, ", fit=\"ls\"", sep="")
-            if (grepl("ellipse", fncl)) fncl <- .rm.arg.l("ellipse", fncl)
-            if (nzchar(fc))
-              txsug <- cmt("# smoothed plot, least-squares fit line")
-          }
 
           if (object == "bubble") {
             fc <- ""
@@ -255,11 +205,8 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
                 txsug <- paste(txsug, "\n", fc, sep="")
               }
             }
-          }
+          }  # end bubble
 
-          txsug <- .rm.arg.2(" x=", txsug) 
-          txsug <- .rm.arg.2("(x=", txsug)
-          txsug <- .rm.arg.2(" y=", txsug) 
         }  # end suggest
 
         for (i in 1:n.col) {
@@ -296,9 +243,11 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
             print(output)
           }
         }  # end for i
+
       }  # end traditional 2-way scatter plot
 
 
+      # --------------------------------
       # categorical var with numeric var for means plot or bubble-1D plot
       else if ((cat.x && !cat.y && !unique.x) || (!cat.x && cat.y && !unique.y)) {
    
@@ -354,7 +303,8 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
               x.by <- x
             options(yname = x.name)  # reverse order of x and y for .ss.numeric
             options(xname = y.name)
-            stats <- .ss.numeric(y, by=x.by, digits.d=digits.d, brief=TRUE)
+            stats <- .ss.numeric(y, by=x.by, digits.d=digits.d,
+                                 brief=TRUE, y.name=x.name)
           }
           else if (!cat.x && cat.y) {
             if (!is.null(y.lvl))  # convert back to a factor if was one
@@ -464,19 +414,19 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
         }
       
         txotl <- ""
-        txotl <- .outliers(x)
+        txotl <- .bx.stats(x)$txotl
         if (txotl[1] == "") txotl <- "No (Box plot) outliers"
 
-            class(txsug) <- "out_piece"
-            class(txout) <- "out_piece"
-            class(txotl) <- "out_piece"
+          class(txsug) <- "out_piece"
+          class(txout) <- "out_piece"
+          class(txotl) <- "out_piece"
 
-            if (nzchar(txsug))
-              output <- list(out_suggest=txsug, out_txt=txout, out_outliers=txotl)
-            else
-              output <- list(out_txt=txout, out_outliers=txotl)
-            class(output) <- "out_all"
-            print(output)
+          if (nzchar(txsug))
+            output <- list(out_suggest=txsug, out_txt=txout, out_outliers=txotl)
+          else
+            output <- list(out_txt=txout, out_outliers=txotl)
+          class(output) <- "out_all"
+          print(output)
       }  # end Cleveland
 
 
@@ -576,14 +526,16 @@ function(x, y, values, object, n.cat, xlab, ylab, smooth,
         }
           
         fc <- ""
-        if (!grepl("line.width", fncl))
-          fc <- paste(fc, ", line.width=0", sep="")
+        if (!grepl("lwd", fncl))
+          fc <- paste(fc, ", lwd=0", sep="")
         if (nzchar(fc)) {
           fc <- gsub(" = ", "=", fc)
           if (size.pt > 0)
             txt <- "just points, no line segments"
-          else
+          else {
+            fc <- paste(fc, ", area=TRUE", sep="")
             txt <- "just area"
+          }
           fc <- paste(fncl, fc, ")   # ", txt, sep="")
           txsug <- paste(txsug, "\n", fc, sep="")
         }

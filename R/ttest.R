@@ -104,26 +104,29 @@ function(x, y=NULL, ...) {
   }  # end two group
 
   else { # one group, including paired
+
     if (from.data) {
       if (!paired)
         Ynm <- x.name
       else {
         Ynm <- "Difference"
         mu0 <- 0
-        options(df.name = NULL)
+        options(df.name=NULL)
       }
 
-      options(yname = x.name)
+      options(yname=x.name)
       plt1 <- .OneGroup(x, Ynm, mu0, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
          Edesired, paired, graph, line.chart, show.title,
          pdf.file, width, height, ...)
 
     if (!is.null(plt1$i)) {
-        for (i in (plot.i+1):(plot.i+plt1$i)) plot.title[i] <- plt1$ttl[i-plot.i]
+        for (i in (plot.i+1):(plot.i+plt1$i))
+          plot.title[i] <- plt1$ttl[i-plot.i]
         plot.i <- plot.i + plt1$i
       }
     }  # end from data
+
     else  # from stats
        .OneGroup(x, Ynm, mu0, n, m, s, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
@@ -344,7 +347,7 @@ function(x, y=NULL, ...) {
     }
 
     # Cleveland two-variable dot plot
-    .plt.main(data.frame(x.call), data.frame(y.call),
+    .plt.main(data.frame(x.call), data.frame(y.call), cat.y=TRUE,
        shape=21, size=.8, ylab="", segments.y=TRUE, quiet=TRUE)
 
     if (!is.null(pdf.file)) {

@@ -1,10 +1,10 @@
 .plt.add <- 
 function(add, x1, x2, y1, y2,
-         add.cex, add.lwd, add.lty, add.stroke, add.fill, add.trans, ...) { 
+         add.cex, add.lwd, add.lty, add.color, add.fill, add.trans, ...) { 
 
 
   n.obj <- length(add)
-  n.stk <- length(add.stroke)
+  n.stk <- length(add.color)
   n.fll <- length(add.fill)
   n.lty <- length(add.lty)
   n.lwd <- length(add.lwd)
@@ -26,7 +26,7 @@ function(add, x1, x2, y1, y2,
 
     if (!is.null(add.trans[i.trn])) {
       if (add[i] %in% c("text", "line", "v.line", "h.line", "arrow"))
-        add.stroke[i.stk] <- .maketrans(add.stroke[i.stk], (1-add.trans[i.trn])*256)
+        add.color[i.stk] <- .maketrans(add.color[i.stk], (1-add.trans[i.trn])*256)
       if (add[i] %in% c("rect"))
         add.fill[i.fll] <- .maketrans(add.fill[i.fll], (1-add.trans[i.trn])*256)
     }
@@ -39,7 +39,7 @@ function(add, x1, x2, y1, y2,
         x1i <- x1i + 1;  y1i <- y1i + 1
         xx <- x1[x1i];  yy <- y1[y1i]  # multiple objects, multiple locations
       }
-      text(xx, yy, labels=add[i], cex=add.cex[i.cex], col=add.stroke[i.stk], ...)
+      text(xx, yy, labels=add[i], cex=add.cex[i.cex], col=add.color[i.stk], ...)
     }
 
     else if (add[i] == "v.line") {
@@ -49,7 +49,7 @@ function(add, x1, x2, y1, y2,
         x1i <- x1i + 1
         xx <- x1[x1i]  # multiple objects, multiple locations
       }
-      segments(xx, usr[3], xx, usr[4], col=add.stroke[i.stk],
+      segments(xx, usr[3], xx, usr[4], col=add.color[i.stk],
                lwd=add.lwd[i.lwd], lty=add.lty[i.lty], ...)
     }
 
@@ -57,7 +57,7 @@ function(add, x1, x2, y1, y2,
       y1i <- y1i + 1
       yy <- y1[y1i]  # multiple objects, multiple locations
       if (n.obj == 1) yy <- y1  # same object, mult locations
-      segments(usr[1], yy, usr[2], yy, col=add.stroke[i.stk],
+      segments(usr[1], yy, usr[2], yy, col=add.color[i.stk],
                lwd=add.lwd[i.lwd], lty=add.lty[i.lty], ...)
     }
 
@@ -70,13 +70,13 @@ function(add, x1, x2, y1, y2,
         xx1 <- x1[x1i];  xx2 <- x2[x2i];  yy1 <- y1[y1i];  yy2 <- y2[y2i]
       }
       if (add[i] == "line")
-        segments(xx1, yy1, xx2, yy2, col=add.stroke[i.stk],
+        segments(xx1, yy1, xx2, yy2, col=add.color[i.stk],
                  lwd=add.lwd[i.lwd], lty=add.lty[i.lty], ...)
       if (add[i] == "rect")
-        rect(xx1, yy1, xx2, yy2, border=add.stroke[i.stk], col=add.fill[i.fll],
+        rect(xx1, yy1, xx2, yy2, border=add.color[i.stk], col=add.fill[i.fll],
              lwd=add.lwd[i.lwd], lty=add.lty[i.lty], ...)
       if (add[i] == "arrow")
-        arrows(xx1, yy1, xx2, yy2, col=add.stroke[i.stk], 
+        arrows(xx1, yy1, xx2, yy2, col=add.color[i.stk], 
              lwd=add.lwd[i.lwd], lty=add.lty[i.lty], ...)
     }
 

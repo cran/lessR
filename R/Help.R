@@ -333,7 +333,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   Setting a style resets all attributes. Or set individual attributes,
   or more grouped attributes with sub.theme, which cumulate until reset. 
   For example, to convert the default theme to gray scale, 
-      > style(device.fill=\"white\")
+      > style(window.fill=\"white\")
   which sets the entire graphics window to a white background.
 
   Levels of a categorical variable may be encoded with numerical digits,
@@ -343,7 +343,7 @@ function(topic=NULL, width=4.5, height=4.5) {
       > style(n.cat=3)
   Here any numerical variable with just 3 unique, equally spaced interval 
   values or less is interpreted as a categorical variable. The default
-  value of n.cat is 8, and applies to ScatterPlot and SummaryStats.
+  value of n.cat is 8, and applies to Plot and SummaryStats.
 
   To see all available style options, enter the following.
       > style(show=TRUE)
@@ -364,29 +364,32 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   else if (topic %in% c("histogram", "hs", "hst", "hist", "boxplot", "box", "bx", 
     "dotplot", "dp", "dot", "density", "dn", "dens", "distribution", "dist",
-    "univariate")) {
+    "univariate", "VBS", "violin", "box")) {
   t0 <- "Histogram, etc."
 
   f1 <- bquote(paste(bold("Histogram, hs"), "  Histogram"))
   f2 <- bquote(paste(bold("Density, dn"), "  Density curve over histogram"))
-  f3 <- bquote(paste(bold("BoxPlot, bx"), "  Box plot"))
-  f4 <- bquote(paste(bold("ScatterPlot, sp"), "  Scatter plot of 1 variable"))
+  f3 <- bquote(paste(bold("Plot, ScatterPlot, sp"), "  Violin/Box/Scatterplot"))
 
   t1 <- "
   Plot a distribution of data values for a continuous variable with the current
-  color theme, here for variable Y. Use Histogram or hs.
+  color theme, here for variable Y. Traditionally, use Histogram or hs.
       > Histogram(Y)
   Specify the gray-scale color theme, a title, and a label for the x-axis.
       > style(\"gray\")
       > Histogram(Y, main=\"My Title\", xlab=\"Y (mm)\")
   Specify bins, begin at 60 with a bin width of 10. Can also specify bin.end.
       > Histogram(Y, bin.start=60, bin.width=10)
-  Get Trellis graphics with by and by2 parameters for categorial variables.
-      > Histogram(Y, by=Gender)
+  Get Trellis graphics with by1 and by2 parameters for categorical variables.
+      > Histogram(Salary, by1=Gender)
 
-  Density curve superimposed on the underlying histogram, abbreviated
-  dn, a BoxPlot or bx, and a one-variable ScatterPlot, or sp.
-      > Density(Y)   or   > BoxPlot(Y)   or   > ScatterPlot(Y)
+  A new plot, the integrated Violin/Box/Scatterplot, or VBS plot, is introduced.
+      > Plot(Y)
+  Can also invoke Trellis graphics, here for two conditioned variables.
+      > Plot(Salary, by1=Dept, by2=Gender)
+
+  Density curve superimposed on the underlying histogram, or dn.
+      > Density(Y) 
 
   These functions, except sp, can also replace the variable name such as Y 
   with a list of multiple variables, such as c(Salary, Years) or Salary:Years,
@@ -394,14 +397,13 @@ function(topic=NULL, width=4.5, height=4.5) {
       > Histogram()
   "
 
-  set.up.plot(4)
+  set.up.plot(3)
   text(50,100, label=t0, font=4)
   text(0,94, label=f1, adj=0)
   text(0,90, label=f2, adj=0)
   text(0,86, label=f3, adj=0)
-  text(0,82, label=f4, adj=0)
-  #lines(c(5,90), c(78,78), col=col.line)
-  text(0,44, label=t1, adj=0)
+  #lines(c(5,90), c(81,81), col=col.line)
+  text(0,46, label=t1, adj=0)
 
   help.more("Histogram",8)
   }
@@ -459,6 +461,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   ordered along some dimension such as time. If the data do not have a 
   pronounced trend, a center line is automatically provided.
       > LineChart(Y)
+  or
+      > Plot(Y, run=TRUE)
   Also provided is a list of all the runs in the data.
 
   The line chart becomes a time series chart with times/dates on the

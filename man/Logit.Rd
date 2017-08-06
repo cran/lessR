@@ -89,7 +89,7 @@ GRAPHICS\cr
 For models with a single predictor variable, a scatter plot of the data is produced, which also includes the fitted values. As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. If more than a single predictor variable, then a scatter plot matrix is produced. 
 
 FORECASTS\cr
-Fitted and forecasted values are listed for all rows of data if the number of rows is less than 25 or if \code{pred.all=TRUE}. If only some of the rows are listed, sorted by the fitted value, the first and last four rows of data are listed. Also the 4 rows immeadiately around the fitted value of 0.5 are listed.
+Fitted and forecasted values are listed for all rows of data if the number of rows is less than 25 or if \code{pred.all=TRUE}. If only some of the rows are listed, sorted by the fitted value, the first and last four rows of data are listed. Also the 4 rows immediately around the fitted value of 0.5 are listed.
 
 RESIDUAL ANALYSIS\cr
 By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual, Cook's distance and dffits, with the first 20 observations listed and sorted by Cook's distance. The residual displayed is the actual difference between fitted and observed, that is, with the setting in the \code{\link{residuals}} of \code{type="response"}.  The \code{res.sort} option provides for sorting by the Studentized residuals or not sorting at all.  The \code{res.rows} option provides for listing these rows of data and computed statistics statistics for any specified number of observations (rows).  To turn off the analysis of residuals, specify \code{res.rows=0}.

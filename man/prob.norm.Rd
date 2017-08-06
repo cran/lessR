@@ -25,7 +25,7 @@ prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black",
   \item{ylab}{Label for the optional vertical axis.}
   \item{y.axis}{If \code{TRUE}, then a vertical axis is included.}
   \item{z}{If \code{TRUE}, then include z-values on the horizontal-axis. Set to \code{FALSE} if \code{mu=0} and \code{sigma=1}.}
-  \item{mag}{Magnification factor for the axis labels, the value of \code{cex.axis}.}
+  \item{mag}{Magnification factor for the axis labels, the value of \code{axis.cex}.}
   \item{\ldots}{Other parameter values for graphics.}
 }
 

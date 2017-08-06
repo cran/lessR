@@ -4,29 +4,32 @@ function(x,
          histogram=TRUE, bin.start=NULL, bin.width=NULL,
          col.fill, col.bg, col.box,
          col.nrm, col.gen, col.fill.nrm, col.fill.gen,
-         cex.axis=0.75, col.axis="gray30", rotate.x=0, rotate.y=0, offset=0.5, 
+         lab.cex=1.0, axis.cex=0.75, col.axis="gray30",
+         rotate.x=0, rotate.y=0, offset=0.5, 
          x.pt=NULL, xlab=NULL, main=NULL, sub=NULL,
          y.axis=FALSE, x.min=NULL, x.max=NULL,
          band=FALSE, quiet, ...)  {
 
-
-  # scale for regular R or RStudio
-  adj <- .RSadj(radius=NULL, cex.axis)
-  size.axis <- adj$size.axis
-  size.lab <- adj$size.lab
 
   if (!is.null(x.pt)) {
     y.axis <- TRUE
     type <- "general"
   }
 
+  # get lab.x.cex  lab.y.cex
+  lab.cex <- getOption("lab.cex")
+  lab.x.cex <- getOption("lab.x.cex")
+  lab.y.cex <- getOption("lab.y.cex")
+  lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
+  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+  lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
+  adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
+
   # get variable labels if exist plus axes labels
-  gl <- .getlabels(xlab, main=main, cex.lab=getOption("lab.size"))
-  x.name <- gl$xn; x.lbl <- gl$xl;
-  x.lab <- gl$xb
-  main.lab <- gl$mb
-  sub.lab <- gl$sb
-  cex.lab <- gl$cex.lab
+    gl <- .getlabels(xlab, ylab=NULL, main, lab.x.cex=lab.x.cex) 
+    x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
+    main.lab <- gl$mb
+    sub.lab <- gl$sb
 
   # get breaks from user supplied bin width and/or supplied start value
   # otherwise, breaks="Sturges by default
@@ -97,7 +100,7 @@ function(x,
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))  
   
-  par(bg=getOption("device.fill"))
+  par(bg=getOption("window.fill"))
   par(mai=c(bm, lm, tm, rm))
 
   
@@ -109,23 +112,23 @@ function(x,
   # axis, axis ticks
   if (!y.axis)
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
-          par("usr")[1], par("usr")[3], size.axis, col.axis,
-          rotate.x, rotate.y, offset, ...)
+          par("usr")[1], par("usr")[3], 
+          rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
   else
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-          par("usr")[1], par("usr")[3], size.axis, col.axis,
-          rotate.x, rotate.y, offset, ...)
+          par("usr")[1], par("usr")[3],
+          rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
 
   # axis value labels
   if (!y.axis) y.lab="" else y.lab="Density"
   max.lbl <- max(nchar(axTicks(2)))
-  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
+  .axlabs(x.lab, y.lab=NULL, main.lab, sub.lab, max.lbl, 
+          xy.ticks=TRUE, offset=offset, ...) 
 
   # colored background for plotting area
   usr <- par("usr")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box,
-    lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
+    lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
   
   # plot the histogram
   if (histogram)

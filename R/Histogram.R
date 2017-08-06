@@ -4,24 +4,17 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
 
-    fill=getOption("bar.fill"),
-    stroke=getOption("bar.stroke"),
-    bg.fill=getOption("bg.fill"),
-    bg.stroke=getOption("bg.stroke"),
-    trans=getOption("trans.bar.fill"),
-    reg="snow2",
+    bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
 
-    cex.lab=0.84, cex.axis=getOption("cex.axis"), 
+    prop=FALSE, hist.counts=FALSE,
+    reg="snow2", cumul=c("off", "on", "both"),
+
+    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
     rotate.x=getOption("rotate.x"),
     rotate.y=getOption("rotate.y"),
     offset=getOption("offset"),
 
-    bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
-
-    prop=FALSE, cumul=c("off", "on", "both"), hist.counts=FALSE,
-    digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-
-    quiet=getOption("quiet"), do.plot=TRUE,
+    digits.d=NULL, quiet=getOption("quiet"), do.plot=TRUE,
     width=4.5, height=4.5, pdf=FALSE, 
     fun.call=NULL, ...) {
 
@@ -31,80 +24,22 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
 
+  fill <- getOption("bar.fill")
+  color <- getOption("bar.color")
+  trans <- getOption("trans.bar.fill")
+  panel.fill <- getOption("panel.fill")
+  panel.color <- getOption("panel.color")
+  grid.color <- getOption("grid.color")
+  lab.color <- getOption("lab.color")
+  lab.cex <- getOption("lab.cex")
+  axis.cex <- getOption("axis.cex") 
+
   df.name <- deparse(substitute(data))   # get name of data table
   options(dname = df.name)
 
   Trellis <- ifelse(!missing(by1), TRUE, FALSE)
 
-  if (!missing(trans)) fill <- .maketrans(fill, (1-trans)*256) 
-
-  for (i in 1:length(fill))
-    if (fill[i] == "off") fill[i] <- "transparent"
-  for (i in 1:length(stroke))
-    if (stroke[i] == "off") stroke[i] <- "transparent"
-  if (bg.fill == "off") bg.fill <- "transparent"
-  if (bg.stroke == "off") bg.stroke <- "transparent"
-
-  kf <- FALSE
-  lbls <- FALSE
-  dots <- list(...)  # check for deprecated parameters
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "color options dropped the  color. prefix\n",
-          "eg., fill, instead of color.fill\n\n")
-      }
-      if (grepl("col.", names(dots)[i], fixed=TRUE)) 
-        if (names(dots)[i] != "col.main"  &&
-            names(dots)[i] != "col.lab"  &&
-            names(dots)[i] != "col.sub") {
-          cat("\n"); stop(call.=FALSE, "\n","------\n",
-            "color options dropped the  col. prefix\n",
-            "eg., fill, instead of col.fill\n\n")
-      }
-      if (names(dots)[i] == "pdf.file") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "pdf.file  changed to  pdf, either TRUE or FALSE\n\n")
-      }
-      if (names(dots)[i] == "box") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  box  is renamed  bg.stroke\n\n")
-      }
-      if (names(dots)[i] == "bg") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  bg  is renamed  bg.fill\n\n")
-      }
-      if (names(dots)[i] == "axes") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  axes  is renamed  values.stroke\n\n")
-      }
-      if (names(dots)[i] == "overgrid") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  overgrid  removed\n\n")
-      }
-      if (names(dots)[i] == "knitr.file") kf <- TRUE 
-      if (names(dots)[i] == "labels") lbls <- TRUE 
-    }
-  }
-
-  if (is.numeric(breaks) && !is.null(bin.start)) { 
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Choose only one option to specify a start value.\n",
-      "Either choose the option  breaks  or the option  bin.start.\n\n")
-  }
-
-  if (lbls) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "labels  has multiple definitions in R\n",
-      "Instead use  hist.counts  to get the bar labels displayed\n\n")
-  }
-
-  if (kf) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "knitr.file  no longer used\n",
-      "Instead use  Rmd  for R Markdown file\n\n")
-  }
+  .param.old(...)
 
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x))  # could be a list of var names
@@ -225,8 +160,9 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   if (Trellis && do.plot) {
     .bar.lattice(data.x[,1], by1.call, by2.call, n.row, n.col, aspect, prop,
-                 fill, stroke, bg.fill, bg.stroke, trans, size.pt=NULL,
-                 xlab, ylab, main, cex.lab, cex.axis, rotate.x, rotate.y,
+                 fill, color, panel.fill, panel.color,
+                 trans, size.pt=NULL,
+                 xlab, ylab, main, lab.cex, axis.cex, rotate.x, rotate.y,
                  width, height, pdf, segments.x=NULL, breaks, c.type="hist")
   }
 
@@ -289,9 +225,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         }
 
         # nothing returned if quiet=TRUE
-        stuff <- .hst.main(data[,i], fill, stroke, bg.fill,
-            bg.stroke, reg,
-            cex.axis, rotate.x, rotate.y, offset,
+        stuff <- .hst.main(data[,i], fill, color, reg,
+            lab.cex, axis.cex, rotate.x, rotate.y, offset,
             breaks, bin.start, bin.width,
             bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub,
             quiet, do.plot, fun.call=fun.call, ...)
@@ -302,7 +237,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
         txotl <- ""
         if (!quiet) {
-          txotl <- .outliers(data[,i])
+          txotl <- .bx.stats(data[,i])$txotl
           if (txotl[1] == "") txotl <- "No (Box plot) outliers"
         }
 

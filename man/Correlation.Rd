@@ -35,7 +35,7 @@ cr(\ldots)
   \item{miss}{Basis for deleting missing data values.}
   \item{show.n}{For pairwise deletion, show the matrix of sample sizes for each
        correlation coefficient, regardless of sample size.}
-  \item{brief}{Pretains to a single correlation coefficient analysis. If 
+  \item{brief}{Pertains to a single correlation coefficient analysis. If 
        \code{FALSE}, then the sample covariance and number of non-missing
        and missing observations are displayed.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
@@ -75,7 +75,7 @@ single coefficient\cr
 
 matrix\cr
 \code{out_background}: Variables in the model, any variable labels\cr
-\code{out_missing}: Missing values anlaysis\cr
+\code{out_missing}: Missing values analysis\cr
 \code{out_cor}: Correlations\cr
 
 

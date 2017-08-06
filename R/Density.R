@@ -1,19 +1,13 @@
 Density <-
 function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL, 
 
-       bw="nrd0", type=c("both", "general", "normal"),
+       bw=NULL, type=c("both", "general", "normal"),
        histogram=TRUE, bin.start=NULL, bin.width=NULL,
-
-       fill=getOption("pt.fill"),
-       bg.fill=getOption("bg.fill"),
-       bg.stroke=getOption("bg.stroke"),
 
        nrm.color="black", gen.color="black",
        fill.nrm=NULL, fill.gen=NULL,
 
-       cex.axis=0.75, values.stroke="gray30",
-
-       rotate.x=0, rotate.y=0, offset=0.5,
+       axis.text.color="gray30", rotate.x=0, rotate.y=0, offset=0.5,
 
        x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
@@ -25,37 +19,16 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   if (is.null(fun.call)) fun.call <- match.call()
 
-  for (i in 1:length(fill))
-    if (fill[i] == "off") fill[i] <- "transparent"
-  if (bg.fill == "off") bg.fill <- "transparent"
-  if (bg.stroke == "off") bg.stroke <- "transparent"
+  fill <- getOption("se.fill")
+  panel.fill <- getOption("panel.fill")
+  panel.color <- getOption("panel.color")
+  lab.cex <- getOption("lab.cex")
+  axis.cex <- getOption("axis.cex")
 
-  dots <- list(...)  # check for deprecated parameters
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      old.nm <- c("col.fill", "col.bg", "col.grid", "col.box", "col.nrm",
-                  "col.gen", "col.fill.nrm", "col.fill.gen", "col.axis")
-      if (names(dots)[i] %in% old.nm) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  replaced with  ",
-          "new options, see ?dn \n\n")
-      }
-      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "color options dropped the  color. prefix\n",
-          "eg., fill, instead of color.fill.\n\n")
-      }
-      if (names(dots)[i] == "knitr.file") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "knitr.file  no longer used\n",
-          "Instead use  Rmd  for R Markdown file\n\n")
-      }
-      if (names(dots)[i] == "pdf.file") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "pdf.file  changed to  pdf, either TRUE or FALSE\n\n")
-      }
-    }
-  }
+  # see if dated parameter values
+  .param.old(...)
+
+  bw.miss <- ifelse (missing(bw), TRUE, FALSE)
 
   clr <- getOption("theme")  # color theme not used except for monochrome 
 
@@ -79,7 +52,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   #orig.params <- par(no.readonly=TRUE)
   #on.exit(par(orig.params))
-  #par(bg=getOption("device.fill"))
+  #par(bg=getOption("window.fill"))
 
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x)) 
@@ -145,7 +118,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     open.win <- 2
 
     if (is.null(digits.d)) {
-      dig.dec <- .max.dd(data[,i]) + 1
+      dig.dec <- .max.dd(data[,1]) + 1
       if (dig.dec == 1) dig.dec <- 2
     }
     else
@@ -178,7 +151,6 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         }
       }
 
-
       gl <- .getlabels()
       x.name <- gl$xn; x.lbl <- gl$xl;
       y.name <- gl$yn; y.lbl <- gl$yl
@@ -188,11 +160,14 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
       }
       else
         ttlns <- ""
+
+      # get bandwidth
+      if (bw.miss) bw <- .band.width(data[,i], ...)
  
       stuff <- .dn.main(data[,i], bw, type, histogram, bin.start, bin.width, 
-            fill, bg.fill, bg.stroke,
+            fill, panel.fill, panel.color,
             nrm.color, gen.color, fill.nrm, fill.gen, 
-            cex.axis, values.stroke, rotate.x, rotate.y, offset, 
+            lab.cex, axis.cex, axis.text.color, rotate.x, rotate.y, offset, 
             x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)
 
       txdst <- ""
@@ -200,7 +175,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
       if (!quiet) {
         txdst <- stuff$tx
 
-        txotl <- .outliers(data[,i])
+        txotl <- .bx.stats(data[,i])$txotl
         if (txotl[1] == "") txotl <- "No (Box plot) outliers"
 
         class(txdst) <- "out_piece"
@@ -225,11 +200,12 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     else
       if (!quiet) .ncat("Density curve", x.name, nu, n.cat)
 
-    }  # is.nmeric(data[,i])
+    }  # is.numeric(data[,i])
   }  # for (i in 1:ncol(data)), cycle through all the variables
 
+
   if (ncol(data) > 1) {
-    if (!pdf) if (is.null(options()$knitr.in.progress))
+    if (!pdf) if (is.null(options()$knitr.in.progress)) if (plot.i > 0)
       .plotList(plot.i, plot.title)
   }
 

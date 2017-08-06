@@ -15,7 +15,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
   # col labels
   if (!is.null(x.name))
     tx[length(tx)+1] <-  .fmtc(x.name, w=max.c1+3)
-  tx[length(tx)+1] <-  format(y.name, width=max.c1, justify="left")
+  tx[length(tx)+1] <- format(y.name, width=max.c1, justify="left")
   w <- nchar(as.character(sum(x)))
   for (i in 1:ncol(x))
     tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i], w=max.ln[i]),
@@ -59,7 +59,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
   txttl <- ""
   dims <- length(dim(x))
   if (dims == 1 || (!is.null(x.lbl) || !is.null(y.lbl))) {  #  one var or labels
-    txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=FALSE)
+    txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=TRUE)
   }
 
   # print table, chi-square analysis
@@ -118,8 +118,8 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
           ", p-value = ", .fmt(ch$p.value,3), sep="")
       if (!ch$approx.ok) 
         tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
-            "so chi-squared approximation may not be accurate")
-      tx[length(tx)+1] <- ""
+            "chi-squared approximation may not be accurate")
+      #tx[length(tx)+1] <- ""
     }
     else
       tx[length(tx)+1] <- paste(

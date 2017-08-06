@@ -1,33 +1,28 @@
 BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"), 
 
-         by=NULL, by1=NULL,
-         n.row=NULL, n.col=NULL, aspect="fill",
+        by=NULL, by1=NULL,
+        n.row=NULL, n.col=NULL, aspect="fill",
 
-         fill=getOption("bar.fill"),
-         stroke=getOption("bar.stroke"),
-         bg.fill=getOption("bg.fill"),
-         bg.stroke=getOption("bg.stroke"),
-         trans=NULL,
+        colors=c("rainbow", "terrain", "heat"),
 
-         colors=c("rainbow", "terrain", "heat"),
+        horiz=FALSE, addtop=0.05,
+        gap=NULL, proportion=FALSE,
 
-         horiz=FALSE, addtop=0.05,
-         gap=NULL, proportion=FALSE,
-         
-         xlab=NULL, ylab=NULL, main=NULL, cex.names=0.70,
-         cex.lab=0.84, cex.axis=getOption("cex.axis"),
-         value.labels=NULL, label.max=20,
-         rotate.x=getOption("rotate.x"),
-         rotate.y=getOption("rotate.y"),
-         offset=getOption("offset"),
+        beside=FALSE, low.fill=NULL, hi.fill=NULL, 
 
-         beside=FALSE, low.fill=NULL, hi.fill=NULL, 
+        legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
+        legend.horiz=FALSE, 
 
-         legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
-         legend.horiz=FALSE, 
+        xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
 
-         quiet=getOption("quiet"),
-         width=5, height=4.5, pdf.file=NULL, ...)  {
+        cex.names=0.70,
+        value.labels=NULL, label.max=20,
+        rotate.x=getOption("rotate.x"),
+        rotate.y=getOption("rotate.y"),
+        offset=getOption("offset"),
+
+        quiet=getOption("quiet"),
+        width=5, height=4.5, pdf.file=NULL, ...)  {
 
 
   if (missing(colors)) 
@@ -35,76 +30,33 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
   else
     colors <- match.arg(colors)
 
+  options(xname = NULL)
+  options(yname = NULL)
+  options(byname = NULL)
+
   Trellis <- ifelse(!missing(by1), TRUE, FALSE)
   do.plot <- TRUE
+
+  fill <- getOption("bar.fill")
+  color <- getOption("bar.color")
+  trans <- NULL
+  panel.fill <- getOption("panel.fill")
+  panel.color <- getOption("panel.color")
+  grid.color <- getOption("grid.color")
+  lab.color <- getOption("lab.color")
+  lab.cex <- getOption("lab.cex")
+  axis.color <- getOption("axis.color")
+  axis.cex <- getOption("axis.cex") 
 
   if (!is.null(fill)) {
     for (i in 1:length(fill))
       if (fill[i] == "off") fill[i] <- "transparent"
   }
-  for (i in 1:length(stroke))
-    if (stroke[i] == "off") stroke[i] <- "transparent"
-  if (bg.fill == "off") bg.fill <- "transparent"
-  if (bg.stroke == "off") bg.stroke <- "transparent"
 
-  if (missing(stroke))  # default black border unless dark bg
-    if (sum(col2rgb(bg.fill))/3 > 80) stroke <- "black"
+  #if (missing(color))  # default black border unless dark bg
+    #if (sum(col2rgb(panel.fill))/3 > 80) color <- "black"
 
-  dots <- list(...)  # check for deprecated/changed parameters
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "color options dropped the  color. prefix\n",
-          "eg., fill, instead of color.fill\n\n")
-      }
-      if (grepl("col.", names(dots)[i], fixed=TRUE)) 
-        if (names(dots)[i] != "col.main"  &&
-            names(dots)[i] != "col.lab"  &&
-            names(dots)[i] != "col.sub") {
-          cat("\n"); stop(call.=FALSE, "\n","------\n",
-            "color options dropped the  col. prefix\n",
-            "eg., fill, instead of col.fill\n\n")
-      }
-      if (names(dots)[i] == "addtop") 
-        cat("\naddtop  is now a multiplicative factor instead of additive\n\n")
-      if (names(dots)[i] == "count.levels") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Now use  count.labels  instead of count.levels\n\n")
-      }
-      if (names(dots)[i] == "count.labels") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "count.labels  not available, but now specify a y-variable for\n",
-          "the data values to obtain the same effect, which can be\n",
-          " continuous, and a categorical variable for the labels\n\n")
-      }
-      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "color options dropped the  color. prefix\n",
-          "eg., fill, instead of color.fill.\n\n")
-      }
-      if (names(dots)[i] == "over.grid") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "over.grid  option removed\n\n")
-      }
-      if (names(dots)[i] == "pdf") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "pdf  changed to  pdf.file\n\n")
-      }
-      if (names(dots)[i] == "box") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  box  is renamed  bg.stroke\n\n")
-      }
-      if (names(dots)[i] == "bg") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  bg  is renamed  bg.fill\n\n")
-      }
-      if (names(dots)[i] == "axes") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  axes  is renamed  values.stroke\n\n")
-      }
-    }
-  }
+  .param.old(...)
 
   x.name <- deparse(substitute(x))
   options(xname = x.name)
@@ -258,8 +210,8 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     if (Trellis && do.plot) {
       .bar.lattice(x.call, by1.call, by2=NULL, n.row, n.col, aspect, prop=FALSE,
-                   fill, stroke, bg.fill, bg.stroke, trans, 
-                   size.pt=NULL, xlab, ylab, main, cex.lab, cex.axis,
+                   fill, color, panel.fill, panel.color,
+                   trans, size.pt=NULL, xlab, ylab, main, lab.cex, axis.cex,
                    rotate.x, rotate.y, width, height, pdf.file,
                    segments.x=NULL, breaks=NULL, c.type="bar")
     }
@@ -273,11 +225,12 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
       .opendev(pdf.fnm, width, height)
 
       bc <- .bc.main(x.call, y.call, by.call,
-           fill, stroke, bg.fill,
-           bg.stroke, trans, colors,
-           horiz, addtop, gap, proportion, xlab, ylab, main, cex.lab,
+           fill, color, panel.fill,
+           panel.color, trans, colors,
+           horiz, addtop, gap, proportion,
+           xlab, ylab, main, lab.cex,
            value.labels, label.max,
-           cex.axis, cex.names, rotate.x, rotate.y, offset,
+           axis.cex, cex.names, rotate.x, rotate.y, offset,
            beside, low.fill, hi.fill,
            legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...)
 
@@ -294,11 +247,12 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
   else {
 
     bc.data.frame(data, n.cat,
-      fill, stroke, bg.fill, bg.stroke,
+      fill, color, panel.fill, panel.color,
       trans, colors,
-      horiz, addtop, gap, proportion, xlab, ylab, main, cex.lab,
+      horiz, addtop, gap, proportion,
+      xlab, ylab, main, lab.cex,
       value.labels, label.max,
-      cex.axis, cex.names, rotate.x, rotate.y, offset,
+      axis.cex, cex.names, rotate.x, rotate.y, offset,
       beside, low.fill, hi.fill,
       legend.title, legend.loc, legend.labels, legend.horiz, quiet,
       width, height, pdf.file, ...)

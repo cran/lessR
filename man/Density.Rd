@@ -17,19 +17,13 @@ When output is assigned into an object, such as \code{d} in \code{d <- dn(Y)}, t
 \usage{
 Density(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL, 
 
-       bw="nrd0", type=c("both", "general", "normal"),
+ bw=NULL, type=c("both", "general", "normal"),
        histogram=TRUE, bin.start=NULL, bin.width=NULL,
-
-       fill=getOption("pt.fill"),
-       bg.fill=getOption("bg.fill"),
-       bg.stroke=getOption("bg.stroke"),
 
        nrm.color="black", gen.color="black",
        fill.nrm=NULL, fill.gen=NULL,
 
-       cex.axis=0.75, values.stroke="gray30",
-
-       rotate.x=0, rotate.y=0, offset=0.5,
+       axis.text.color="gray30", rotate.x=0, rotate.y=0, offset=0.5,
 
        x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
@@ -58,23 +52,14 @@ dn(\ldots)
         simple text file that can be edited with any text editor, including
         RStudio.}\cr
 
-  \item{bw}{Bandwidth of kernel estimation.}
+  \item{bw}{Bandwidth of kernel estimation. Initial value is "nrd0", but unless
+       specified, then may be iterated upward to create a smoother curve.}
   \item{type}{Type of density curve plotted.  By default, both the general
        density and the normal density are plotted.}
   \item{histogram}{If \code{TRUE} overlay the density plot over a histogram.}
   \item{bin.start}{Optional specified starting value of the bins.}
   \item{bin.width}{Optional specified bin width, which can be specified with or
         without a \code{bin.start} value.}\cr
-
-  \item{fill}{Interior fill color of the histogram bars. To suppress the color
-       of the bars, specify a color of \code{"off"}. This
-       and the following colors can also be changed globally, individually and as 
-       a color theme, with the \code{lessR} \code{\link{style}} function. The
-       \code{lessR} function \code{\link{showColors}} provides examples of all
-       R named colors.}
-  \item{bg.fill}{Color of the plot background.}
-  \item{bg.stroke}{Color of border around the plot background, the box, that encloses 
-        the plot, with a default of \code{"black"}.}\cr
 
   \item{nrm.color}{Color of the normal curve.}
   \item{gen.color}{Color of the general density curve.}
@@ -84,10 +69,7 @@ dn(\ldots)
         partially transparent light red as the default, and a light transparent
         gray for the gray theme.}\cr
 
-  \item{cex.axis}{Scale magnification factor, which by default displays the axis
-        values to be smaller than the axis labels.}
-  \item{values.stroke}{Color of the font used to label the axis values.}\cr
-
+  \item{axis.text.color}{Color of the font used to label the axis values.}
   \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
         accommodate longer values, typically used in conjunction with \code{offset}.}
   \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
@@ -118,7 +100,7 @@ dn(\ldots)
         obtained from the abbreviated function call \code{dn}.}\cr
 
   \item{\dots}{Other parameter values for graphics as defined processed 
-      by \code{\link{plot}}, including \code{xlim}, \code{ylim}, \code{lwd} and \code{cex.lab}, 
+      by \code{\link{plot}}, including \code{xlim}, \code{ylim}, \code{lwd} and \code{lab.cex}, 
       \code{color.main}, \code{color.lab}, \code{sub},
       \code{color.sub}, and \code{color.ticks} to specify the color of
       the ticks used to label the axis values, \code{density}, for the general
@@ -201,10 +183,6 @@ dn(Y)
 # save the density plot to a pdf file
 Density(Y, pdf=TRUE)
 
-# suppress the histogram, leaving only the density curves
-# specify x-axis label per the xlab option for the plot function
-Density(Y, fill="transparent", xlab="My Var")
-
 # specify (non-transparent) colors for the curves,
 # to make transparent, need alpha option for the rgb function
 Density(Y, nrm.color="darkgreen", gen.color="plum")
@@ -229,6 +207,9 @@ Density(breaks, data=warpbreaks)
 
 # densities for all numeric variables in a data frame
 Density()
+# densities for an integer variable with less than n.cat equally
+#  spaced values, so treat as numeric instead of categorical
+# Density(n.cat=0)
 
 # densities for all specified numeric variables in a list of variables
 # e.g., use the combine or c function to specify a list of variables

@@ -3,7 +3,7 @@
 
 \title{Text Processing: Wrap Words to Create New Lines From a Specified Line}
 
-\description{Split a larger line into mulitple lines by wrapping words with inserted line feeds. Primarily for internal use in text processing of \code{knitr} output. Not usually referenced by the user.
+\description{Split a larger line into multiple lines by wrapping words with inserted line feeds. Primarily for internal use in text processing of \code{knitr} output. Not usually referenced by the user.
 }
 
 \usage{

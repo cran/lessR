@@ -7,52 +7,100 @@
 \description{
 Deprecated Names: \code{set}, \code{theme}
 
-The color and style attributes of each plot can be individually set from the following list of attributes. For convenience, groups of these attributes are specified to define color themes, plus style sub-themes that apply to any theme, with default values:  \code{theme="lighbronze"} and \code{sub.theme="default"}. 
+The color and style attributes of each plot can be set as a general theme, or individually set from the following list of attributes. For convenience, groups of these attributes are specified to define color themes, plus style sub-themes that apply to any theme, with default values:  \code{theme="lightbronze"} and \code{sub.theme="default"}. To reset to the default theme: \code{style()}. 
 }
 
 \usage{
 style(
-  theme=c("lightbronze", "darkred", "dodgerblue", "gray", "gold",
-        "darkgreen", "blue", "red", "rose", "green", "purple", "sienna",
-        "brown", "orange", "white"),
+  theme=c("lightbronze", "dodgerblue", "darkred", "gray", "gold",
+      "darkgreen", "blue", "red", "rose", "green", "purple", "sienna",
+      "brown", "orange", "white"),
   sub.theme=c("default", "black", "no.y.axis"),
+  set=NULL,
 
-  device.fill=getOption("device.fill"),
-  bg.fill=getOption("bg.fill"), bg.stroke=getOption("bg.stroke"),
-  bg.lwd=getOption("bg.lwd"), bg.lty=getOption("bg.lty"),
+  window.fill=getOption("window.fill"),
+  panel.fill=getOption("panel.fill"),
+  panel.color=getOption("panel.color"),
+  panel.lwd=getOption("panel.lwd"),
+  panel.lty=getOption("panel.lty"),
 
-  fill=NULL, bar.fill=getOption("bar.fill"), pt.fill=getOption("pt.fill"),
-  trans=NULL, trans.bar.fill=getOption("trans.bar.fill"),
+  fill=NULL,
+  bar.fill=getOption("bar.fill"),
+  pt.fill=getOption("pt.fill"),
+  trans=NULL,
+  trans.bar.fill=getOption("trans.bar.fill"),
   trans.pt.fill=getOption("trans.pt.fill"),
-  stroke=NULL, bar.stroke=getOption("bar.stroke"),
-  pt.stroke=getOption("pt.stroke"),
-  se.fill=getOption("se.fill"), ellipse.fill=getOption("ellipse.fill"),
-  bubble.fill=getOption("bubble.fill"),
-  bubble.text.stroke=getOption("bubble.text.stroke"),
-  heat=getOption("heat"), 
+  color=NULL,
+  bar.color=getOption("bar.color"),
+  pt.color=getOption("pt.color"),
+  se.fill=getOption("se.fill"),
+  ellipse.fill=getOption("ellipse.fill"),
+  ellipse.color=getOption("ellipse.color"),
+  ellipse.lwd=getOption("ellipse.lwd"),
+  fit.color=getOption("fit.color"),
 
-  cex.axis=getOption("cex.axis"),
-  axis.x.stroke=getOption("axis.x.stroke"),
-  axis.y.stroke=getOption("axis.y.stroke"),
-  values.stroke=getOption("values.stroke"),
+  fit.lwd=getOption("fit.lwd"),
+  bubble.text.color=getOption("bubble.text.color"),
+  heat=getOption("heat"), 
+  segment.color=getOption("segment.color"),
+  ID.color=getOption("ID.color"),
+  area.fill=getOption("area.fill"),
+  out.fill=getOption("out.fill"),
+  out2.fill=getOption("out2.fill"),
+
+  violin.fill=getOption("violin.fill"),
+  violin.color=getOption("violin.color"),
+  box.fill=getOption("box.fill"),
+  box.color=getOption("box.color"),
+
+  axis.color=getOption("axis.color"),
+  axis.x.color=getOption("axis.x.color"),
+  axis.y.color=getOption("axis.y.color"),
+  axis.lwd=getOption("axis.lwd"),
+  axis.x.lwd=getOption("axis.x.lwd"),
+  axis.y.lwd=getOption("axis.y.lwd"),
+  axis.lty=getOption("axis.lty"),
+  axis.x.lty=getOption("axis.x.lty"),
+  axis.y.lty=getOption("axis.y.lty"),
+  axis.cex=getOption("axis.cex"),
+  axis.x.cex=getOption("axis.x.cex"),
+  axis.y.cex=getOption("axis.y.cex"),
+  axis.text.color=getOption("axis.text.color"),
+  axis.x.text.color=getOption("axis.x.text.color"),
+  axis.y.text.color=getOption("axis.y.text.color"),
   rotate.x=getOption("rotate.x"),
   rotate.y=getOption("rotate.y"),
   offset=getOption("offset"),
 
-  grid.stroke=NULL,
-  grid.x.stroke=getOption("grid.x.stroke"),
-  grid.y.stroke=getOption("grid.y.stroke"),
-  grid.lwd=getOption("grid.lwd"), grid.lty=getOption("grid.lty"),
-  lab.stroke=getOption("lab.stroke"),
-  lab.size=getOption("lab.size"),
-  main.stroke=getOption("main.stroke"),
-  segment.stroke=getOption("segment.stroke"),
+  lab.color=getOption("lab.color"),
+  lab.x.color=getOption("lab.x.color"),
+  lab.y.color=getOption("lab.y.color"),
+  lab.cex=getOption("lab.cex"),
+  lab.x.cex=getOption("lab.x.cex"),
+  lab.y.cex=getOption("lab.y.cex"),
+  main.color=getOption("main.color"),
+  main.cex=getOption("main.cex"),
 
-  add.stroke=getOption("add.stroke"),
+  grid.color=getOption("grid.color"),
+  grid.x.color=getOption("grid.x.color"),
+  grid.y.color=getOption("grid.y.color"),
+  grid.lwd=getOption("grid.lwd"),
+  grid.x.lwd=getOption("grid.x.lwd"),
+  grid.y.lwd=getOption("grid.y.lwd"),
+  grid.lty=getOption("grid.lty"),
+  grid.x.lty=getOption("grid.x.lty"),
+  grid.y.lty=getOption("grid.y.lty"),
+
+  strip.fill=getOption("strip.fill"),
+  strip.color=getOption("strip.color"),
+  strip.text.color=getOption("strip.text.color"),
+
+  add.fill=getOption("add.fill"),
+  add.trans=getOption("add.trans"),
+  add.color=getOption("add.color"),
   add.cex=getOption("add.cex"),
   add.lwd=getOption("add.lwd"),
   add.lty=getOption("add.lty"),
-  add.fill=getOption("pt.fill"),
 
   n.cat=getOption("n.cat"), suggest=getOption("suggest"),
   quiet=getOption("quiet"), brief=getOption("brief"),
@@ -70,43 +118,83 @@ set(\ldots)
 \arguments{
   \item{theme}{The specified color scheme. If specified, re-sets all style
        attributes to their start-up values.}
-  \item{sub.theme}{Further modification of the main themes.}\cr
+  \item{sub.theme}{Further modification of the main themes.}
+  \item{set}{A list of parameter values, a theme, that was previously
+       saved, and now is read back to become the current set of parameter
+       values.}\cr
 
-  \item{device.fill}{Fill color of the entire device window.}
-  \item{bg.fill}{Color of the plot background.}
-  \item{bg.stroke}{Color of border around the plot background, the box, that encloses 
-        the plot, with a default of \code{"black"}.}
-  \item{bg.lwd}{Line width of the box around the plot.}
-  \item{bg.lty}{Line type of the box around the plot: "solid", "dashed",
+  \item{window.fill}{Fill color of the entire device window.}
+  \item{panel.fill}{Color of the plot background.}
+  \item{panel.color}{Color of border around the plot background, the box, that
+        encloses the plot, with a default of \code{"black"}.}
+  \item{panel.lwd}{Line width of the box around the plot.}
+  \item{panel.lty}{Line type of the box around the plot: "solid", "dashed",
         "dotted", "dotdash", "longdash", or "twodash", or "blank".}\cr
 
-  \item{fill}{Color of a filled region, both bars and points.}
-  \item{bar.fill}{Color of a filled region, such as a histogram bar.}
-  \item{pt.fill}{Color of a filled region, such as a plotted point.}
-  \item{trans}{Transparency of a filled bar or rectangular region and points.}
+  \item{fill}{Color of a filled region -- bars, points and bubbles -- depending on the
+       objected plotted.}
+  \item{bar.fill}{Color of a filled bar, bubble or box.}
+  \item{pt.fill}{Color of a filled plotted point.}
+  \item{trans}{Transparency of a filled bar, rectangular region, or points from 0
+       (none) to 1 (complete).}
   \item{trans.bar.fill}{The transparency of a filled bar or rectangular region,
        such as a histogram bar or the box in a box plot. Value from 0 to 1,
        opaque to transparent.}
   \item{trans.pt.fill}{The transparency of the inner region of a plotted point.
        Value from 0 to 1, opaque to transparent.}
-  \item{stroke}{Color of a stroke, a line such as the border of bar or point.}
-  \item{bar.stroke}{Color of the border of a filled region such as a histogram
+  \item{color}{Color of a line segment such as the border of bar or point.}
+  \item{bar.color}{Color of the border of a filled region such as a histogram
        bar.}
-  \item{pt.stroke}{Color of a line or outline of a filled region, such as the
+  \item{pt.color}{Color of a line or outline of a filled region, such as the
        border of a plotted point.}
   \item{se.fill}{Color of the fill for the standard error plot about a
        fit line in a scatter plot.}
   \item{ellipse.fill}{Color of the fill for an ellipse in a scatter plot.}
-  \item{bubble.fill}{Fill color of bubbles.}
-  \item{bubble.text.stroke}{Color of bubble text.}
-  \item{heat}{Color of the heat map for correlation matrices.}\cr
+  \item{ellipse.color}{Color of the border for an ellipse in a scatter plot.}
+  \item{ellipse.lwd}{Line width of the border for an ellipse in a scatter plot.}
+  \item{fit.color}{Color of the fit line in a scatter plot.}
+  \item{fit.lwd}{Width of fit line. By default is 2 for Windows and 1.5 for Mac.}
+  \item{bubble.text.color}{Color of the displayed text regarding the size of a bubble,
+        either a tabulated frequency for categorical variables, or the value of a
+        third variable according to \code{size}.}
+  \item{heat}{Color of the heat map for correlation matrices.}
+  \item{segment.color}{Color of connecting line segments when there are also plotted
+        points, such as in a frequency polygon. Default color is \code{color}.}
+  \item{ID.color}{Color of the text to display the ID labels.}
+  \item{area.fill}{Fill color of the area under a line in a run chart or time
+       series.}
+  \item{out2.fill}{For a 1-D scatterplot, color of potential outliers, which,
+       for the unadjusted boxplot, are default values
+       3 IQR's beyond the lower or upper quartile.}
+  \item{out.fill}{For a 1-D scatterplot, color of potential outliers, which,
+       for the unadjusted boxplot, are default values
+       1.5 IQR's beyond the lower or upper quartile.}\cr
 
-  \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
+  \item{violin.fill}{Fill color for a \bold{violin plot}, applicable to a 
+        1-variable scatter plot of a continuous variable.}
+  \item{violin.color}{Border color for the "violin" in a violin plot.}
+  \item{box.fill}{Fill color for a box plot, part of a {violin plot},
+        applicable to a 1-variable scatter plot of a continuous variable.}
+  \item{box.color}{Border color of a box in a box plot.\cr}
+
+  \item{axis.color}{Color of the axes.}
+  \item{axis.x.color}{Color of the \code{x}-axis.}
+  \item{axis.y.color}{Color of the \code{y}-axis.}
+  \item{axis.lwd}{Line width of axes.}
+  \item{axis.x.lwd}{Line width of horizontal axis.}
+  \item{axis.y.lwd}{Line width of vertical axis.}
+  \item{axis.lty}{Line type of axes, either "solid", "dashed",
+       "dotted", "dotdash", "longdash", "twodash", or "blank".}
+  \item{axis.x.lty}{Line type of horizontal axis.}
+  \item{axis.y.lty}{Line type of vertical axis.}
+  \item{axis.cex}{Scale magnification factor, which by defaults displays the axis
         values to be smaller than the axis labels. Provides the functionality of,
-        and can be replaced by, the standard R \code{cex.axis.}}
-  \item{axis.x.stroke}{Color of the \code{x}-axis.}
-  \item{axis.y.stroke}{Color of the \code{y}-axis.}
-  \item{values.stroke}{Color of the font used to label the axis values.}\cr
+        and can be replaced by, the standard R \code{cex.axis}.}
+  \item{axis.x.cex}{Scale magnification factor for the \code{x}-axis.}
+  \item{axis.y.cex}{Scale magnification factor for the \code{y}-axis.}
+  \item{axis.text.color}{Color of the font used to label the axis values.}
+  \item{axis.x.text.color}{Color of the font used to label the \code{x}-axis values.}
+  \item{axis.y.text.color}{Color of the font used to label the \code{y}-axis values.}
   \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
         accommodate longer values, typically used in conjunction with \code{offset}.}
   \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
@@ -114,22 +202,40 @@ set(\ldots)
         is 0.5. Larger values such as 1.0 are used to create space for the label when
         longer axis value names are rotated.}\cr
 
-  \item{grid.stroke}{Color of the grid lines.}
-  \item{grid.x.stroke}{Color of the grid lines for the \code{x}-axis.}
-  \item{grid.y.stroke}{Color of the grid lines for the \code{y}-axis.}
+  \item{lab.color}{Color of the axis labels.}
+  \item{lab.x.color}{Color of the axis labels on the horizontal axis.}
+  \item{lab.y.color}{Color of the axis labels on the vertical axis.}
+  \item{lab.cex}{Size of labels for x and y axes.}
+  \item{lab.x.cex}{Size of labels for x.}
+  \item{lab.y.cex}{Size of labels for y.}
+  \item{main.color}{Color of the title.}
+  \item{main.cex}{Size of the title font.}\cr
+
+  \item{grid.color}{Color of the grid lines.}
+  \item{grid.x.color}{Color of the grid lines for the \code{x}-axis.}
+  \item{grid.y.color}{Color of the grid lines for the \code{y}-axis.}
   \item{grid.lwd}{Width of grid lines.}
+  \item{grid.x.lwd}{Width of vertical grid lines, inherits from \code{grid.lwd}.}
+  \item{grid.y.lwd}{Width of horizontal grid lines, inherits from \code{grid.lwd}.}
   \item{grid.lty}{Line type for grid lines: "solid", "dashed",
         "dotted", "dotdash", "longdash", or "twodash", or "blank".}
-  \item{lab.stroke}{Color of the axis labels.}
-  \item{lab.size}{Size of labels for x and y axes.}
-  \item{main.stroke}{Color of the title.}
-  \item{segment.stroke}{Color of line segments.}\cr
+  \item{grid.x.lty}{Line-type of vertical grid lines, inherits from \code{grid.lty}.}
+  \item{grid.y.lty}{Line-type of horizontal grid lines, inherits from \code{grid.lty}.}\cr
 
-  \item{add.stroke}{Color of added text.}
-  \item{add.cex}{Size of added text.}
-  \item{add.lwd}{Line width of added lines.}
-  \item{add.lty}{Line type of added lines.}
-  \item{add.fill}{Fill color of added rectangles.}\cr
+  \item{strip.fill}{Fill color for the \bold{strip that labels each panel} in
+   a Trellis plot.}
+  \item{strip.color}{Border color for the strip that labels each panel in
+   a Trellis plot.}
+  \item{strip.text.color}{Color of the label in each strip of a Trellis plot.}\cr
+
+  \item{add.fill}{Interior fill color of added object.}
+  \item{add.trans}{Transparency level of color or fill, which ever is
+       applicable from 0 (opaque) to 1 (transparent).}
+  \item{add.color}{Color of borders and lines of added object.}
+  \item{add.cex}{Text expansion factor, relative to 1. As with the following
+   properties, can be a vector for multiple placement or objects.}
+  \item{add.lwd}{Line width of added object.}
+  \item{add.lty}{Line type of added object.}\cr
 
   \item{n.cat}{Number of categories that specifies the largest number of unique
         equally-spaced values of variable of a numeric data type for which the
@@ -161,12 +267,29 @@ set(\ldots)
 
 \details{
 OVERVIEW\cr
-Sets the default color palette via the R \code{\link{options}} statement, as well as the transparency of plotted bars and points and other non-color characteristics such as the color of the grid lines. For convenience, groups of attributes are organized into themes and sub-themes. When \code{theme} is specified, \emph{all} options are reset to their default values. All other modifications, with individual parameters or grouped parameters as a sub-theme, are cumulative. For example, one sub-theme can be followed by another, as well as the specifications of individual attributes.
+Sets the default color palette via the R \code{\link{options}} statement, as well as the transparency of plotted bars and points and other non-color characteristics such as the color of the grid lines. For convenience, groups of attributes are organized into themes and sub-themes. When the \code{theme} is specified, \emph{all} options are reset to their default values. All other modifications, with individual parameters or grouped parameters as a sub-theme, are cumulative. For example, one sub-theme can be followed by another, as well as the specifications of individual attributes. Calling the function with no arguments sets to the default style.
+
+Available themes:\cr
+"lightbronze" [default]\cr
+"dodgerblue" [prior default]\cr
+"darkred"\cr
+"gray"\cr
+"gold"\cr
+"darkgreen"\cr
+"blue"\cr
+"red"\cr
+"rose"\cr
+"green"\cr
+"purple"\cr
+"sienna"\cr
+"brown"\cr
+"orange"\cr
+"white"\cr
 
 The \code{"gray"} color theme is based on the colors used in Hadley Wickham's \code{ggplot2} package. The \code{"lightbronze"} theme, especially with the \code{no.y.axis} sub-theme, is based on Jeffrey Arnold's \code{wsj} theme from his ggthemes package.
 
 SUB-THEMES\cr
-\code{"black"}: Black background of the entire device window witth translucent fill colors from the current theme. 
+\code{"black"}: Black background of the entire device window with translucent fill colors from the current theme. 
 \code{"no.y.axis"}: Similar to the \code{wsj} theme from the \code{ggthemes} package, especially with the theme of \code{"lightbronze"}. The \code{y}-axis is removed with though the value labels retained, the vertical grid is removed, and the horizontal grid is dotted and thicker than the default.
 }
 
@@ -191,10 +314,10 @@ mydata <- rd("Employee", format="lessR", quiet=TRUE)
 style("gold", sub.theme="black")
 Plot(Years, Salary, size=0, ellipse=seq(.1,.9,.1))
 
-# four ways to go gray scale
+# four ways to do gray scale
 # 1. remove the light bronze background from default lightbronze theme,
 #    which otherwise displays only in gray scale
-style(device.fill="white")
+style(window.fill="white")
 # 2. gray scale with a light gray background
 style("gray")
 # 3. gray scale with a dark, almost black, background
@@ -202,13 +325,21 @@ style("gray", sub.theme="black")
 # 4. mostly black and white
 style("white")
 
+# reset style to the default \"lightbronze\"
+style()
+
+# adjust Trellis strip to a dark background
+style(strip.fill="gray60", strip.color="gray20",
+      strip.text.color=rgb(247,242,230, maxColorValue=255))
+Plot(Years, Salary, by1=Gender)
+
 # define a custom style beyond just colors
-style(bg.fill="off", bg.stroke="off",
-      device.fill=rgb(247,242,230, maxColorValue=255),
+style(panel.fill="off", panel.color="off",
+      window.fill=rgb(247,242,230, maxColorValue=255),
       pt.fill="black", trans=0,
-      lab.stroke="black", values.stroke="black",
-      axis.y.stroke="off",
-      grid.x.stroke="off", grid.y.stroke="black",  grid.lty="dotted", grid.lwd=1)
+      lab.color="black", axis.text.color="black",
+      axis.y.color="off",
+      grid.x.color="off", grid.y.color="black",  grid.lty="dotted", grid.lwd=1)
 hs(Salary)
 
 
@@ -221,6 +352,8 @@ style(n.cat=8)}
 % R documentation directory.
 \keyword{ sets }
 \keyword{ csv }
+
+
 
 
 

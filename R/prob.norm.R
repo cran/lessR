@@ -23,12 +23,12 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black",
   if (mu==0  && sigma==1) z=FALSE
  
   if (is.null(lo)) {
-    lo <- mu-sigma*10
+    lo <- mu - sigma*10
     lo.lbl <- "..."
   }
   else lo.lbl <- as.character(lo)
   if (is.null(hi)) {
-    hi <- mu+sigma*10
+    hi <- mu + sigma*10
     hi.lbl <- "..."
   }
   else hi.lbl <- as.character(hi)  
@@ -36,8 +36,8 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black",
   
   # normal density curve
   .graphwin(1)
-  min.x <- mu-4*sigma
-  max.x <- mu+4*sigma
+  min.x <- mu - 4*sigma
+  max.x <- mu + 4*sigma
   cuts <- seq(min.x,max.x,sigma)
   x <- seq(min.x, max.x, length=200)
   d.nrm <- dnorm(x,mu,sigma)
@@ -45,7 +45,8 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black",
   polygon(c(min.x,x,max.x), c(0,d.nrm,0), col=fill.nrm)
 
   axis(side=1, at=cuts, cex.axis=mag)
-  if (z) axis(side=1, at=cuts, cex.axis=mag, line=1.5, labels=-4:4, lwd=0, lwd.ticks=0)
+  if (z) axis(side=1, at=cuts, cex.axis=mag, line=1.5,
+              labels=-4:4, lwd=0, lwd.ticks=0)
   if (y.axis) {
     axis(side=2, cex.axis=mag)
     if (ylab == "") ylab="Normal Density"

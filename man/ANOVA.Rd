@@ -86,7 +86,7 @@ The output can optionally be returned and saved into an \code{R} object, otherwi
 
 TEXT OUTPUT\cr
 \code{out_background}: variables in the model, rows of data and retained\cr
-1-predictor: \code{out_descriptive}: decriptive stats\cr
+1-predictor: \code{out_descriptive}: descriptive stats\cr
 2-predictors: \code{out_cell.n}: cell sample size\cr
 2-predictors: \code{out_cell.means}: cell means\cr
 2-predictors: \code{out_cell.marginals}: marginal means\cr

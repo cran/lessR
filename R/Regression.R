@@ -393,6 +393,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     fncl <- .fun.call.deparse(fun.call) 
     fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
     fncl <- gsub(" = ", "=", fncl)
+    fncl <- gsub("reg.brief", "reg", fncl)
     
     fc <- ""
     if (!grepl("Rmd", fncl)) {

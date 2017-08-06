@@ -18,29 +18,22 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, c
 \usage{
 Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
-         by1=NULL, by2=NULL,
-         n.row=NULL, n.col=NULL, aspect="fill",
+    by1=NULL, by2=NULL,
+    n.row=NULL, n.col=NULL, aspect="fill",
 
-         fill=getOption("bar.fill"), 
-         stroke=getOption("bar.stroke"),
-         bg.fill=getOption("bg.fill"),
-         bg.stroke=getOption("bg.stroke"),
-         trans=getOption("trans.bar.fill"),
-         reg="snow2",
+    bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
 
-         cex.lab=0.84, cex.axis=getOption("cex.axis"),
-         rotate.x=getOption("rotate.x"),
-         rotate.y=getOption("rotate.y"),
-         offset=getOption("offset"),
+    prop=FALSE, hist.counts=FALSE,
+    reg="snow2", cumul=c("off", "on", "both"),
 
-         bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
+    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+    rotate.x=getOption("rotate.x"),
+    rotate.y=getOption("rotate.y"),
+    offset=getOption("offset"),
 
-         prop=FALSE, cumul=c("off", "on", "both"), hist.counts=FALSE, 
-         digits.d=NULL, xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-
-         quiet=getOption("quiet"), do.plot=TRUE,
-         width=4.5, height=4.5, pdf=FALSE, 
-         fun.call=NULL, \ldots)
+    digits.d=NULL, quiet=getOption("quiet"), do.plot=TRUE,
+    width=4.5, height=4.5, pdf=FALSE, 
+    fun.call=NULL, \ldots)
 
 hs(\ldots)
 }
@@ -78,7 +71,7 @@ hs(\ldots)
   \item{n.col}{Optional specification for the number of columns in the
         layout a multi-panel display with
         Trellis graphics. Need not specify \code{n.row} If set to 1, then
-        the stip that labels each group is moved to the left of each plot
+        the strip that labels each group is moved to the left of each plot
         instead of the top.}
   \item{aspect}{Lattice parameter for the aspect ratio of the panels,
         defined as height divided by width.
@@ -88,32 +81,6 @@ hs(\ldots)
         to "bank" to 45 degrees, that is, with the line slope approximately
         45 degrees.}\cr
 
-
-  \item{fill}{Specified bar colors. Remove with \code{fill="off"}. This
-       and the following colors can also be changed globally, individually and as 
-       a color theme, with the \code{lessR} \code{\link{style}} function.
-       The \code{lessR} function \code{\link{showColors}} provides examples
-       of all R named colors.}
-  \item{stroke}{Color of the border of the bars. Remove with \code{stroke="off"}.}
-  \item{bg.fill}{Color of the plot background. Turn off with \code{bg.fill="off"}.}
-  \item{bg.stroke}{Color of border around the plot background, the box, that encloses 
-        the plot. Remove with \code{bg.stroke="off"}.}
-  \item{trans}{Transparency level of plotted bars from 0 (none) to 1 (complete).
-        Default transparency of fill color for the bars is 0.10.}
-  \item{reg}{The color of the superimposed, regular histogram when
-        \code{cumul="both"}.}\cr
-
-  \item{cex.lab}{Scale magnification factor for the axes label.}
-  \item{cex.axis}{Scale magnification factor, which by defaults displays the axis
-        values to be smaller than the axis labels. Provides the functionality of,
-        and can be replaced by, the standard R \code{cex.axis.}}
-  \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
-        accommodate longer values, typically used in conjunction with \code{offset}.}
-  \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
-  \item{offset}{The amount of spacing between the axis values and the axis. Default
-        is 0.5. Larger values such as 1.0 are used to create space for the label when
-        longer axis value names are rotated.}\cr
-
   \item{bin.start}{Optional specified starting value of the bins.}
   \item{bin.width}{Optional specified bin width, which can be specified with or
         without a \code{bin.start} value.}
@@ -121,22 +88,32 @@ hs(\ldots)
         actual endpoint of the last bin may be larger than the specified value.}\cr
   \item{breaks}{The method for calculating the bins, or an explicit specification
        of the bins, such as with the standard R \code{\link{seq}} function or
-       other options provided by the \code{\link{hist}} function.}
+       other options provided by the \code{\link{hist}} function.}\cr
 
   \item{prop}{Specify proportions or relative frequencies on the vertical axis.
        Default is \code{FALSE}.}
   \item{hist.counts}{Replaces standard R \code{labels} options, which has multiple
        definitions in R. Specifies to display the count of each bin.}
+  \item{reg}{The color of the superimposed, regular histogram when
+        \code{cumul="both"}.}
   \item{cumul}{Specify a cumulative histogram. The value of \code{"on"} displays the 
         cumulative histogram, with default of \code{"off"}. The value of
-        \code{"both"} superimposes the regular histogram.}
-  \item{digits.d}{Number of significant digits for each of the displayed summary
-        statistics.}
+        \code{"both"} superimposes the regular histogram.}\cr
+
   \item{xlab}{Label for x-axis. Defaults to variable name.}
   \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.}
   \item{main}{Title of graph.}
   \item{sub}{Sub-title of graph, below xlab.}\cr
 
+  \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
+        accommodate longer values, typically used in conjunction with \code{offset}.}
+  \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
+        is 0.5. Larger values such as 1.0 are used to create space for the label when
+        longer axis value names are rotated.}\cr
+
+  \item{digits.d}{Number of significant digits for each of the displayed summary
+        statistics.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
         with \code{\link{style}} function.}
   \item{do.plot}{If \code{TRUE}, the default, then generate the plot.}
@@ -152,10 +129,6 @@ hs(\ldots)
       \code{cex.main} for the size of the title\cr
       \code{col.main} for the color of the title\cr
       \code{cex} for the size of the axis value labels\cr
-      \code{cex.lab} for the size of the axis labels\cr
-      \code{col.lab} for the color of the axis labels\cr
-      \code{lty} for line type, such as \code{"solid"}, \code{"dashed"},
-      \code{"dotted"}, \code{"dotdash"}\cr
       \code{col.lab} for the color of the axis labels}
 }
 
@@ -256,25 +229,27 @@ h$out_outliers
 # list the names of all the components
 names(h)
 
-# histogram with no borders for the bars
-Histogram(y, stroke="off")
+# histogram with no borders for the bars, then restore default theme
+style(bar.color="off")
+Histogram(y)
+style()
 
 # save the histogram to a pdf file
 Histogram(y, pdf=TRUE)
 
 # histogram with red bars, black background, and black border
-Histogram(y, bg.fill="black",
-          fill="red", bg.stroke="black")
+style(panel.fill="black", fill="red", panel.color="black")
+Histogram(y)
 # or set this color scheme for all subsequent analyses
 #  here with the grid turned off as well
-style(grid.stroke="off", bg.fill="black", bar.stroke="black")
+style(grid.color="off", panel.fill="black", bar.color="black")
 Histogram(y)
 
 # histogram with purple color theme, translucent gold bars
 style("purple", sub.theme="black")
 Histogram(y)
 # back to default color theme
-style("lightbronze")
+style()
 
 # histogram with specified bin width
 # can also use bin.start
@@ -337,7 +312,9 @@ Histogram()
 Histogram(breaks, data=warpbreaks)
 
 # all histograms with specified options, including red axis labels
-Histogram(fill="palegreen1", bg.fill="ivory", hist.counts=TRUE, col.lab="red")
+style(fill="palegreen1", panel.fill="ivory", axis.color="red") 
+Histogram(hist.counts=TRUE)
+style()  # reset
 
 # histograms for all specified numeric variables
 # use the combine or c function to specify a list of variables

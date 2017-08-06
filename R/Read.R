@@ -242,59 +242,60 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
     d <- get(dname, pos=x.env)
   }
 
-
-  # !Excel: if a column is unique non-numeric, convert read as factor to char
-  n.col <- apply(d, 2, function(x) sum(!is.na(x)))  # num values per variable
-  nu.col <- apply(d, 2, function(x) length(unique(na.omit(x))))  # num unique
-  fnu.col <- logical(length=ncol(d))  # logical vector, initial values to FALSE
-  if (format != "Excel") {
-    for (i in 1:ncol(d)) if (nu.col[i]==n.col[i] && (is.factor(d[,i])))
-      fnu.col[i] <- TRUE 
-    d[fnu.col] <- lapply(d[fnu.col], as.character)
-  }
-  else {  # get read_excel results to be equivalent to other formats
-    # read_excel does not convert strings to factors, do so if !unique
-    for (i in 1:ncol(d)) 
-      if (is.character(d[,i])) if (nu.col[i] != n.col[i]) fnu.col[i] <- TRUE 
-    d[fnu.col] <- lapply(d[fnu.col], as.factor)
-    # read_excel does not provide an integer variable, so convert
-    fnu.col <- logical(length=ncol(d))  # reset
-    rows <- min(50, nrow(d))  # save some time scanning
-    for (i in 1:ncol(d)) 
-      if (is.numeric(d[,i]))
-        if (is.integer(type.convert(as.character(d[1:rows,i]))))
-          fnu.col[i] <- TRUE
-    d[fnu.col] <- lapply(d[fnu.col], as.character) # back to original char
-    d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
-
-    # bug: POSIXct misinterpretation of currency data
-    f.call <- gsub(")$", "", fncl2)  # get function call less closing )
-    fnu.col <- logical(length=ncol(d))  # reset
-    for (i in 1:ncol(d)) 
-      if (class(d[1:rows,i])[1] == "POSIXct") fnu.col[i] <- TRUE
-    if (any(fnu.col)) {  # construct alternate Read function call
-      typ <- paste("mydata <- ", f.call, ", col_types=c(", sep="")
-      for (i in 1:ncol(d)) {
-        if (class(d[,i])[1] %in% c("integer", "numeric", "POSIXct"))
-          typ <- paste(typ, ", \"numeric\"", sep="")
-        else if (class(d[,i])[1] %in% c("character", "factor"))
-          typ <- paste(typ, ", \"text\"", sep="")
-      }
-      typ <- paste(typ, ")", sep="")
-      typ <- gsub("c(, ", "c(", typ, fixed=TRUE) 
-      typ <- gsub("ref = ", "", typ, fixed=TRUE) 
-      typ <- paste(typ, ")", sep="")  #  add back removed closing )
-      message("\nThe read_excel function sometimes mistakenly reads numbers in\n",
-        "the Excel Currency format as the type POSIXct, a date format\n\n",
-        "Type POSIXct was assigned to one or more of your variables\n\n",
-        "IF the variable assigned type POSIXct is NOT a date, then\n",
-        "  explicitly specify if a variable is text, numeric or a date\n",
-        "  by adding the  col_types  option to Read\n",
-        "To do this re-read the data\n",
-        "  by copying and pasting the following: \n\n",
-        "   ", typ, "\n")
+  if (is.data.frame(d)) {
+    # !Excel: if a column is unique non-numeric, convert read as factor to char
+    n.col <- apply(d, 2, function(x) sum(!is.na(x)))  # num values per variable
+    nu.col <- apply(d, 2, function(x) length(unique(na.omit(x))))  # num unique
+    fnu.col <- logical(length=ncol(d))  # logical vector, initial values to FALSE
+    if (format != "Excel") {
+      for (i in 1:ncol(d)) if (nu.col[i]==n.col[i] && (is.factor(d[,i])))
+        fnu.col[i] <- TRUE 
+      d[fnu.col] <- lapply(d[fnu.col], as.character)
     }
-  }
+    else {  # get read_excel results to be equivalent to other formats
+      # read_excel does not convert strings to factors, do so if !unique
+      for (i in 1:ncol(d)) 
+        if (is.character(d[,i])) if (nu.col[i] != n.col[i]) fnu.col[i] <- TRUE 
+      d[fnu.col] <- lapply(d[fnu.col], as.factor)
+      # read_excel does not provide an integer variable, so convert
+      fnu.col <- logical(length=ncol(d))  # reset
+      rows <- min(50, nrow(d))  # save some time scanning
+      for (i in 1:ncol(d)) 
+        if (is.numeric(d[,i]))
+          if (is.integer(type.convert(as.character(d[1:rows,i]))))
+            fnu.col[i] <- TRUE
+      d[fnu.col] <- lapply(d[fnu.col], as.character) # back to original char
+      d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
+
+      # bug: POSIXct misinterpretation of currency data
+      f.call <- gsub(")$", "", fncl2)  # get function call less closing )
+      fnu.col <- logical(length=ncol(d))  # reset
+      for (i in 1:ncol(d)) 
+        if (class(d[1:rows,i])[1] == "POSIXct") fnu.col[i] <- TRUE
+      if (any(fnu.col)) {  # construct alternate Read function call
+        typ <- paste("mydata <- ", f.call, ", col_types=c(", sep="")
+        for (i in 1:ncol(d)) {
+          if (class(d[,i])[1] %in% c("integer", "numeric", "POSIXct"))
+            typ <- paste(typ, ", \"numeric\"", sep="")
+          else if (class(d[,i])[1] %in% c("character", "factor"))
+            typ <- paste(typ, ", \"text\"", sep="")
+        }
+        typ <- paste(typ, ")", sep="")
+        typ <- gsub("c(, ", "c(", typ, fixed=TRUE) 
+        typ <- gsub("ref = ", "", typ, fixed=TRUE) 
+        typ <- paste(typ, ")", sep="")  #  add back removed closing )
+        message("\nThe read_excel function sometimes mistakenly reads numbers in\n",
+          "the Excel Currency format as the type POSIXct, a date format\n\n",
+          "Type POSIXct was assigned to one or more of your variables\n\n",
+          "IF the variable assigned type POSIXct is NOT a date, then\n",
+          "  explicitly specify if a variable is text, numeric or a date\n",
+          "  by adding the  col_types  option to Read\n",
+          "To do this re-read the data\n",
+          "  by copying and pasting the following: \n\n",
+          "   ", typ, "\n")
+      }
+    }
+  }  # end is data.frame
 
 
   # check for valid characters in the variable names
@@ -329,7 +330,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
 
   # feedback
   # --------
-  if (!quiet)
+  if (!quiet  &&  is.data.frame(d))
     details(d, n.mcut, miss.zero, max.lines, miss.show,
                       miss.matrix, brief)
   else

@@ -1,14 +1,10 @@
 LineChart <-
 function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
 
-         fill=getOption("bar.fill"), 
-         stroke=getOption("pt.stroke"),
-         bg.fill=getOption("bg.fill"),
-         bg.stroke=getOption("bg.stroke"),
-         line=getOption("pt.stroke"),
-         area=NULL, 
+         line.color=getOption("pt.color"), area=NULL, 
 
-         shape.pts=21, cex.axis=0.75, values.stroke="gray30",
+         shape.pts=21, lab.cex=1.0, axis.cex=0.75,
+         axis.text.color="gray30",
 
          rotate.x=0, rotate.y=0, offset=.5,
 
@@ -25,13 +21,12 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
   center.line <- match.arg(center.line)
 
-  for (i in 1:length(fill))
-    if (fill[i] == "off") fill[i] <- "transparent"
-  for (i in 1:length(stroke))
-    if (stroke[i] == "off") stroke[i] <- "transparent"
-  if (bg.fill == "off") bg.fill <- "transparent"
-  if (bg.stroke == "off") bg.stroke <- "transparent"
-  if (line == "off") bg.stroke <- "transparent"
+   fill <- getOption("bar.fill") 
+   color <- getOption("pt.color")
+   panel.fill <- getOption("panel.fill")
+   panel.color <- getOption("panel.color")
+
+  if (line.color == "off") line.color <- "transparent"
   if (!is.null(area)) if (area == "off") area <- "transparent"
 
   dots <- list(...)  # check for deprecated parameters
@@ -41,6 +36,10 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "color options dropped the  color. prefix\n",
           "eg., fill, instead of color.fill\n\n")
+      }
+      if (names(dots)[i] == "line") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "line  is now  line.color\n\n")
       }
       if (grepl("col.", names(dots)[i], fixed=TRUE)) 
         if (names(dots)[i] != "col.main"  &&
@@ -132,9 +131,9 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
 
       .lc.main(data[,i], type,
-         line, area, stroke, fill, shape.pts,
-         bg.stroke, bg.fill,
-         cex.axis, values.stroke,
+         line.color, area, color, fill, shape.pts,
+         panel.color, panel.fill,
+         lab.cex, axis.cex, axis.text.color,
          rotate.x, rotate.y, offset, xy.ticks,
          line.width, xlab, ylab, main, sub, cex,
          time.start, time.by, time.reverse, 

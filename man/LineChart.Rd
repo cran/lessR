@@ -18,14 +18,10 @@ If the provided object to analyze is a set of multiple variables, including an e
 \usage{
 LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
 
-         fill=getOption("bar.fill"), 
-         stroke=getOption("pt.stroke"),
-         bg.fill=getOption("bg.fill"),
-         bg.stroke=getOption("bg.stroke"),
-         line=getOption("pt.stroke"),
-         area=NULL, 
+         line.color=getOption("pt.color"), area=NULL, 
 
-         shape.pts=21, cex.axis=.75, values.stroke="gray30",
+         shape.pts=21, lab.cex=1.0, axis.cex=0.75,
+         axis.text.color="gray30",
 
          rotate.x=0, rotate.y=0, offset=.5,
 
@@ -60,26 +56,18 @@ lc(\ldots)
         points, \code{"l"} for line, or \code{"b"} for both. The default is 
         \code{"b"} for both points and lines.}\cr
 
-  \item{fill}{For plotted points, the interior color of the point.  This
-       and the following colors can also be changed globally, individually and as 
-       a color theme, with the \code{lessR} \code{\link{style}} function. The
-       \code{lessR} function \code{\link{showColors}} provides examples of all
-       R named colors.}
-  \item{stroke}{Color of the lines. Remove with \code{stroke="off"}.}
-  \item{bg.fill}{Color of the plot background. Remove with \code{bg.fill="off"}.}
-  \item{bg.stroke}{Color of border around the plot background, the box, that encloses 
-        the plot. Remove with \code{bg.stroke="off"}.}
-  \item{line}{Color of the plotted line.}
+  \item{line.color}{Color of the plotted line.}
   \item{area}{Color of area under the plotted line segments, which by default is not
         applied, equivalent to a color of \code{"transparent"}.}
 
   \item{shape.pts}{The standard plot character, with values defined in help(points). The
        default value is 21, a circle with both a border and filled area, specified here as
-       \code{stroke} and \code{fill}.    \code{fill} defaults to
-       \code{stroke}.}
-  \item{cex.axis}{Scale magnification factor, which by defaults displays the axis values to be 
+       \code{color} and \code{fill}.    \code{fill} defaults to
+       \code{color}.}
+  \item{lab.cex}{Scale magnification factor for axis labels.}
+  \item{axis.cex}{Scale magnification factor, which by defaults displays the axis values to be 
         smaller than the axis labels.}
-  \item{values.stroke}{Color of the font used to label the axis values.}
+  \item{axis.text.color}{Color of the font used to label the axis values.}
   \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
         accommodate longer values, typically used in conjunction with \code{offset}.}
   \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
@@ -140,9 +128,9 @@ DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
 COLORS\cr
-Individual colors in the plot can be manipulated with options such as \code{stroke}. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub.theme="black")} for a black background and partial transparency of plotted colors.  
+Individual colors in the plot can be manipulated with options such as \code{color}. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub.theme="black")} for a black background and partial transparency of plotted colors.  
 
-For the color options, such as \code{grid.stroke}, the value of \code{"off"} is the same as \code{"transparent"}.
+For the color options, such as \code{grid.color}, the value of \code{"off"} is the same as \code{"transparent"}.
 
 VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} does, obtained from the \code{\link{Read}} function.  If the variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -184,21 +172,20 @@ plot(mydata$Y, type="l")
 # save run chart to a pdf file
 LineChart(Y, pdf=TRUE)
 
-# LineChart in gray scale, then back to default "dodgerblue"
+# LineChart in gray scale, then back to default theme
 style("gray")
 LineChart(Y)
-style("dodgerblue")
+style()
   
 # customize run chart with LineChart options
-LineChart(Y, line.width=2, stroke="sienna3",
-  area="slategray3", bg.fill="mintcream",
-  center.line="median")
+style(panel.fill="mintcream", color="sienna3")
+LineChart(Y, line.width=2, area="slategray3", center.line="median")
+style()  # reset style
 
 # customize run chart with R par parameters
 # 24 is the R value for a half-triangle pointing up
 lc(Y, xlab="My xaxis", ylab="My yaxis", main="My Best Title",
-   cex.axis=.7, cex.lab=1.2, cex.main=1.5, col.lab="red", font.main=3,
-   ylim=c(-4,4), shape.pts=24)
+   cex.main=1.5, font.main=3, ylim=c(-4,4), shape.pts=24)
   
 # generate steadily increasing values
 Y <- sort(rexp(50))

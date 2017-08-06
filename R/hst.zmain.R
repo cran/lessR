@@ -1,16 +1,12 @@
 .hst.main <- 
-function(x, col.fill, col.stroke, col.bg, 
-       col.box, col.reg,
-       cex.axis, rotate.x, rotate.y, offset,
+function(x, col.fill=NULL, col.color=NULL, col.reg=NULL,
+       lab.cex=NULL, axis.cex=NULL,
+       rotate.x=NULL, rotate.y=NULL, offset=NULL,
        breaks, bin.start, bin.width,
-       bin.end, prop, hist.counts, cumul,
-       xlab, ylab, main, sub, quiet, do.plot=TRUE, fun.call=NULL, ...) {
+       bin.end, prop, hist.counts=NULL, cumul="off",
+       xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+       quiet=FALSE, do.plot=TRUE, fun.call=NULL, ...) {
 
-
-  # scale for regular R or RStudio
-  adj <- .RSadj(radius=NULL, cex.axis)
-  size.axis <- adj$size.axis
-  size.lab <- adj$size.lab
 
   # get variable labels if exist plus axes labels
   if (is.null(ylab)) {
@@ -19,13 +15,24 @@ function(x, col.fill, col.stroke, col.bg,
   }
   else
     was.null <- FALSE
-  gl <- .getlabels(xlab, ylab, main, sub, cex.lab=size.lab)
+
+  lab.cex <- getOption("lab.cex")
+  lab.x.cex <- getOption("lab.x.cex")
+  lab.y.cex <- getOption("lab.y.cex")
+  lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
+  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+  lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
+  adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
+
+  gl <- .getlabels(xlab, ylab, main, lab.x.cex=lab.x.cex, 
+                   lab.y.cex=lab.y.cex)
   x.name <- gl$xn; x.lbl <- gl$xl
   x.lab <- gl$xb
   y.lab <- ifelse (was.null, paste(gl$yb, x.name), gl$yb)
   main.lab <- gl$mb
   sub.lab <- gl$sb
-  cex.lab <- gl$cex.lab
+  lab.x.cex <- gl$lab.x.cex
+  lab.y.cex <- gl$lab.y.cex
 
   num.cat.x <- .is.num.cat(x, n.cat=getOption("n.cat"))
   if (num.cat.x) {
@@ -125,11 +132,14 @@ function(x, col.fill, col.stroke, col.bg,
     tm <- margs$tm
     rm <- margs$rm
     bm <- margs$bm
+
+    if (lab.x.cex > 1.2) bm <- bm + (.15*lab.x.cex)
+    if (lab.y.cex > 1.2) lm <- lm + (.15*lab.y.cex)
    
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))  
     
-    par(bg=getOption("device.fill"))
+    par(bg=getOption("window.fill"))
     par(mai=c(bm, lm, tm, rm))
 
     # set up plot 
@@ -137,32 +147,33 @@ function(x, col.fill, col.stroke, col.bg,
 
     # axis, axis ticks
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-          par("usr")[1], par("usr")[3], size.axis,
-          rotate.x, rotate.y, offset, ...)
+          par("usr")[1], par("usr")[3], 
+          rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
 
     # axis labels
     max.lbl <- max(nchar(axTicks(2)))
     .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
-            xy.ticks=TRUE, offset=offset, cex.lab=size.lab, ...) 
+            xy.ticks=TRUE, offset=offset, 
+            lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, ...) 
     
     # color plotting background color
     usr <- par("usr")          
-    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
+    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("panel.fill"),
+         border="transparent")
 
     # plot grid lines
     vx <- h$breaks
-    abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=getOption("grid.x.stroke"),
-      lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+    .grid("v", seq(vx[1],vx[length(vx)],vx[2]-vx[1]))
     vy <- pretty(h$counts)
-    abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=getOption("grid.y.stroke"),
-      lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+    .grid("h", seq(vy[1],vy[length(vy)],vy[2]-vy[1]))
 
     # box around plot
-    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
-      lwd=getOption("bg.lwd"), lty=getOption("bg.lty"))
+    rect(usr[1], usr[3], usr[2], usr[4], col="transparent",
+      border=getOption("panel.color"),
+      lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
     # plot the histogram
-    plot(h, add=TRUE, col=col.fill, border=col.stroke, freq=TRUE,
+    plot(h, add=TRUE, col=col.fill, border=col.color, freq=TRUE,
          labels=hist.counts, ...)
     if (cumul == "both") {
       h$counts <- old.counts

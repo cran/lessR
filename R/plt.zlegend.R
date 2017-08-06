@@ -1,10 +1,10 @@
 .plt.legend <-
-function(colnms, horiz, stroke, fill, shape, col.bg, usr, cex.lab=0.8) {
+function(colnms, horiz, color, fill, shape, col.bg, usr, lab.cex=0.8) {
 
   par(xpd=NA) 
   
   # text color
-  the.clr <- getOption("lab.stroke")
+  the.clr <- getOption("lab.color")
 
   ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
                horiz=TRUE, plot=FALSE)  # get coordinates
@@ -24,7 +24,7 @@ function(colnms, horiz, stroke, fill, shape, col.bg, usr, cex.lab=0.8) {
 
     legend(xleft, ytop, legend=colnms, horiz=TRUE, box.lwd=.5, 
            box.col="gray30", cex=.85, pt.cex=1.2, pt.bg=fill, bg=col.bg,
-           col=stroke, pch=shape, text.col=the.clr) # display legend
+           col=color, pch=shape, text.col=the.clr) # display legend
   }
 
   else {  # vertical
@@ -47,7 +47,7 @@ function(colnms, horiz, stroke, fill, shape, col.bg, usr, cex.lab=0.8) {
 
     legend(xleft, ytop, legend=colnms, horiz=FALSE, box.lwd=.5, 
            box.col="gray30", cex=.8, pt.cex=1.2, pt.bg=fill, bg=col.bg,
-           col=stroke, pch=shape, text.col=the.clr,
+           col=color, pch=shape, text.col=the.clr,
            x.intersp=xi, y.intersp=yi)  # display legend
   }
 
