@@ -513,7 +513,7 @@ function(x, y, by,
   if (horiz) lblx.lns <- lblx.lns + .6 
   lab.x.color <- ifelse(is.null(getOption("lab.x.color")), 
     getOption("lab.color"), getOption("lab.x.color"))
-  title(xlab=x.lab, line=lblx.lns, cex=lab.x.cex, col.lab=lab.x.color)
+  title(xlab=x.lab, line=lblx.lns, cex.lab=lab.x.cex, col.lab=lab.x.color)
 
   # ylab positioning (based on .axlabs function)
   lbl.lns <- 3.6
@@ -525,7 +525,7 @@ function(x, y, by,
   lbly.lns <- ifelse (multi, lm - 2, lm - 1.4)
   lab.y.color <- ifelse(is.null(getOption("lab.y.color")), 
     getOption("lab.color"), getOption("lab.y.color"))
-  title(ylab=y.lab, line=lbly.lns, cex=lab.y.cex, col.lab=lab.y.color)
+  title(ylab=y.lab, line=lbly.lns, cex.lab=lab.y.cex, col.lab=lab.y.color)
 
   # ----------------------------------------------------------------------------
   # legend for two variable plot including variable labels

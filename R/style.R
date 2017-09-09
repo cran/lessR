@@ -4,7 +4,7 @@ function(
       "darkgreen", "blue", "red", "rose", "green", "purple", "sienna",
       "brown", "orange", "white"),
   sub.theme=c("default", "black", "no.y.axis"),
-  set=NULL,
+  set=NULL, get=TRUE,
 
   window.fill=getOption("window.fill"),
   panel.fill=getOption("panel.fill"),
@@ -33,7 +33,9 @@ function(
   ID.color=getOption("ID.color"),
   area.fill=getOption("area.fill"),
   out.fill=getOption("out.fill"),
+  out.color=getOption("out.color"),
   out2.fill=getOption("out2.fill"),
+  out2.color=getOption("out2.color"),
 
   violin.fill=getOption("violin.fill"),
   violin.color=getOption("violin.color"),
@@ -130,6 +132,111 @@ function(
   }
 
 
+  # ------------------------------------------------
+  # reset values according to previously written set
+  if (!is.null(set)) {
+
+    theme <- set$theme
+    sub.theme <- set$sub.theme
+
+    window.fill <- set$window.fill
+    panel.fill <- set$panel$fill
+    panel.color <- set$panel$color
+    panel.lwd <- set$panel$lwd
+    panel.lty <- set$panel$lty
+
+    bar.fill <- set$bar$fill
+    trans.bar.fill <- set$bar$trans.fill
+    bar.color <- set$bar$color
+    pt.fill <- set$pt$fill
+    trans.pt.fill <- set$pt$trans.fill
+    pt.color <- set$pt$color
+    out.fill <- set$pt$out.fill
+    out.color <- set$pt$out.color
+    out2.fill <- set$pt$out2.fill
+    out2.color <- set$pt$out2.color
+
+
+    violin.fill <- set$VBS$violin.fill
+    violin.color <- set$VBS$violin.color
+    box.fill <- set$VBS$box.fill
+    box.color <- set$VBS$box.color
+
+    ellipse.fill <- set$ellipse$fill
+    ellipse.color <- set$ellipse$color
+    ellipse.lwd <- set$ellipse$lwd
+
+    fit.color <- set$fit.color
+    fit.lwd <- set$fit.lwd
+    se.fill <- set$se.fill
+    bubble.text.color <- set$bubble.text.color
+    heat <- set$heat 
+    segment.color <- set$segment.color
+    ID.color <- set$ID.color
+    area.fill <- set$area.fill
+
+    axis.color <- set$axis$color
+    axis.x.color <- set$axis.x$color
+    axis.y.color <- set$axis.y$color
+    axis.lwd <- set$axis$lwd
+    axis.x.lwd <- set$axis.x$lwd
+    axis.y.lwd <- set$axis.y$lwd
+    axis.lty <- set$axis$lty
+    axis.x.lty <- set$axis.x$lty
+    axis.y.lty <- set$axis.y$lty
+    axis.cex <- set$axis$cex
+    axis.x.cex <- set$axis.x$cex
+    axis.y.cex <- set$axis.y$cex
+    axis.text.color <- set$axis$text.color
+    axis.x.text.color <- set$axis.x$text.color
+    axis.y.text.color <- set$axis.y$text.color
+    rotate.x <- set$rotate$x
+    rotate.y <- set$rotate$y
+    offset <- set$rotate$offset
+
+    lab.color <- set$lab$color
+    lab.x.color <- set$lab.x$color
+    lab.y.color <- set$lab.y$color
+    lab.cex <- set$lab$cex
+    lab.x.cex <- set$lab.x$cex
+    lab.y.cex <- set$lab.y$cex
+    main.color <- set$main$color
+    main.cex <- set$main$cex
+
+    grid.color <- set$grid$color
+    grid.x.color <- set$grid.x$color
+    grid.y.color <- set$grid.y$color
+    grid.lwd <- set$grid$lwd
+    grid.x.lwd <- set$grid.x$lwd
+    grid.y.lwd <- set$grid.y$lwd
+    grid.lty <- set$grid$lty
+    grid.x.lty <- set$grid.x$lty
+    grid.y.lty <- set$grid.y$lty
+
+    strip.fill <- set$strip$fill
+    strip.color <- set$strip$color
+    strip.text.color <- set$strip$text.color
+
+    add.fill <- set$add$fill
+    add.trans <- set$add$trans
+    add.color <- set$add$color
+    add.cex <- set$add$cex
+    add.lwd <- set$add$lwd
+    add.lty <- set$add$lty
+
+    n.cat <- set$n.cat
+    suggest <- set$suggest
+    quiet <- set$quiet
+    brief <- set$brief
+
+    results <- set$output$results
+    explain <- set$output$explain
+    interpret <- set$output$interpret
+    document <- set$output$document 
+    code <- set$output$code
+  }  # end not null set
+
+        
   # reset all parameters to start-up condition for new theme
   if (!miss.theme) {
     suppressPackageStartupMessages(.onAttach())
@@ -226,8 +333,10 @@ function(
   if (segment.color == "off") segment.color <- "transparent"
   if (ID.color == "off") ID.color <- "transparent"
   if (area.fill == "off") area.fill <- "transparent"
-  if (out2.fill == "off") out2.fill <- "transparent"
   if (out.fill == "off") out.fill <- "transparent"
+  if (out.color == "off") out.color <- "transparent"
+  if (out2.fill == "off") out2.fill <- "transparent"
+  if (out2.color == "off") out2.color <- "transparent"
   if (bubble.text.color == "off") bubble.text.color <- "transparent"
   if (add.color[1] == "off") add.color <- "transparent"
   if (add.fill[1] == "off") add.fill <- "transparent"
@@ -253,105 +362,6 @@ function(
     else
       options(pt.fill = .maketrans(pt.fill, .to256("trans.pt.fill")))
 
-  # ------------------------------------------------
-  # reset values according to previously written set
-  if (!is.null(set)) {
-
-    theme <- set$theme
-    sub.theme <- set$sub.theme
-
-    window.fill <- set$window.fill
-    panel.fill <- set$panel$fill
-    panel.color <- set$panel$color
-    panel.lwd <- set$panel$lwd
-    panel.lty <- set$panel$lty
-
-    bar.fill <- set$bar$fill
-    pt.fill <- set$pt$fill
-    trans.bar.fill <- set$bar$trans.fill
-    trans.pt.fill <- set$pt$trans.fill
-    bar.color <- set$bar$color
-    pt.color <- set$pt$color
-    se.fill <- set$se.fill
-    fit.color <- set$fit.color
-    fit.lwd <- set$fit.lwd
-
-    violin.fill <- set$violin.fill
-    violin.color <- set$violin.color
-    box.fill <- set$box.fill
-    box.color <- set$box.color
-
-    ellipse.fill <- set$ellipse$fill
-    ellipse.color <- set$ellipse$color
-    ellipse.lwd <- set$ellipse$lwd
-    bubble.text.color <- set$bubble.text.color
-    heat <- set$heat 
-    segment.color <- set$segment.color
-    ID.color <- set$ID.color
-    area.fill <- set$area.fill
-    out2.fill <- set$out2.fill
-    out.fill <- set$out.fill
-
-    axis.color <- set$axis$color
-    axis.x.color <- set$axis.x$color
-    axis.y.color <- set$axis.y$color
-    axis.lwd <- set$axis$lwd
-    axis.x.lwd <- set$axis.x$lwd
-    axis.y.lwd <- set$axis.y$lwd
-    axis.lty <- set$axis$lty
-    axis.x.lty <- set$axis.x$lty
-    axis.y.lty <- set$axis.y$lty
-    axis.cex <- set$axis$cex
-    axis.x.cex <- set$axis.x$cex
-    axis.y.cex <- set$axis.y$cex
-    axis.text.color <- set$axis$text.color
-    axis.x.text.color <- set$axis.x$text.color
-    axis.y.text.color <- set$axis.y$text.color
-    rotate.x <- set$rotate$x
-    rotate.y <- set$rotate$y
-    offset <- set$rotate$offset
-
-    lab.color <- set$lab$color
-    lab.x.color <- set$lab.x$color
-    lab.y.color <- set$lab.y$color
-    lab.cex <- set$lab$cex
-    lab.x.cex <- set$lab.x$cex
-    lab.y.cex <- set$lab.y$cex
-    main.color <- set$main$color
-    main.cex <- set$main$cex
-
-    grid.color <- set$grid$color
-    grid.x.color <- set$grid.x$color
-    grid.y.color <- set$grid.y$color
-    grid.lwd <- set$grid$lwd
-    grid.x.lwd <- set$grid.x$lwd
-    grid.y.lwd <- set$grid.y$lwd
-    grid.lty <- set$grid$lty
-    grid.x.lty <- set$grid.x$lty
-    grid.y.lty <- set$grid.y$lty
-
-    strip.fill <- set$strip$fill
-    strip.color <- set$strip$color
-    strip.text.color <- set$strip$text.color
-
-    add.fill <- set$add.fill
-    add.trans <- set$add.trans
-    add.color <- set$add$color
-    add.cex <- set$add$cex
-    add.lwd <- set$add$lwd
-    add.lty <- set$add$lty
-
-    n.cat <- set$n.cat
-    suggest <- set$suggest
-    quiet <- set$quiet
-    brief <- set$brief
-
-    results <- set$results
-    explain <- set$explain
-    interpret <- set$interpret
-    document <- set$document 
-    code <- set$code
-  }  # end not null set
 
 
   # ---------------
@@ -380,11 +390,14 @@ function(
   options(ellipse.lwd=ellipse.lwd)
   options(fit.color=fit.color)
   options(fit.lwd=fit.lwd)
+  options(se.fill=se.fill)
   options(segment.color=segment.color)
   options(ID.color=ID.color)
   options(area.fill=area.fill)
   options(out.fill=out.fill)
+  options(out.color=out.color)
   options(out2.fill=out2.fill)
+  options(out2.color=out2.color)
   options(bubble.text.color=bubble.text.color)
 
   options(grid.color=grid.color)
@@ -465,7 +478,8 @@ function(
     options(box.color = "gray15") 
     options(se.fill = .maketrans(color1, 25)) 
     options(ellipse.fill = .maketrans(color1, 15))
-    options(ellipse.color = .maketrans(color1, 200))
+    if (ellipse.color[1] != "transparent")
+      options(ellipse.color = .maketrans(color1, 200))
     options(heat = color2)
     options(segment.color = color1)
     options(bubble.text.color = "black")
@@ -542,6 +556,7 @@ function(
   }
 
   make.no.y.axis  <- function() {
+    options(window.fill = getOption("panel.fill"))
     options(axis.y.color = "transparent")
     gxs <- ifelse (getOption("window.fill") == "#040404", "white", "#040404")
     options(grid.y.color = gxs)
@@ -593,8 +608,10 @@ function(
       options(area.fill = "black") 
       options(se.fill = .maketrans("gray10", 25)) 
       options(grid.color = "gray90")
-      options(out2.fill="gray25")
       options(out.fill="black")
+      options(out.color="black")
+      options(out2.fill="gray25")
+      options(out2.color="gray25")
     }
 
     else if (theme == "gray") {
@@ -615,8 +632,10 @@ function(
       options(heat = "gray5")
       options(segment.color = "gray20")
       options(grid.color = "white")
+      options(out.fill="black")
+      options(out.color="black")
       options(out2.fill="black")
-      options(out.fill="gray25")
+      options(out2.color="black")
     }
 
     else if (theme == "lightbronze") {
@@ -674,168 +693,180 @@ function(
   # ---------------------------------------
   # create list of current parameter values
 
-  # create sub-lists
+  if (get) {
 
-  panel <- list(
-    fill = getOption("panel.fill"),
-    color = getOption("panel.color"),
-    lwd = getOption("panel.lwd"),
-    lty = getOption("panel.lty")
-  )
+    # create sub-lists
 
-  bar <- list(
-    fill = getOption("bar.fill"),
-    trans.fill = getOption("trans.bar.fill"),
-    color =getOption("bar.color")
-  )
+    panel <- list(
+      fill = getOption("panel.fill"),
+      color = getOption("panel.color"),
+      lwd = getOption("panel.lwd"),
+      lty = getOption("panel.lty")
+    )
 
-  pt <- list(
-    fill = getOption("pt.fill"),
-    trans.fill = getOption("trans.pt.fill"),
-    color = getOption("pt.color")
-  )
+    bar <- list(
+      fill = getOption("bar.fill"),
+      trans.fill = getOption("trans.bar.fill"),
+      color =getOption("bar.color")
+    )
 
-  VBS <- list(
-    violin.fill = getOption("violin.fill"),
-    violin.color = getOption("violin.color"),
-    box.fill = getOption("box.fill"),
-    box.color = getOption("box.color"),
-    out2.fill=getOption("out2.fill"),
-    out.fill=getOption("out.fill")
-  )
+    pt <- list(
+      fill = getOption("pt.fill"),
+      trans.fill = getOption("trans.pt.fill"),
+      color = getOption("pt.color"),
+      out.fill=getOption("out.fill"),
+      out.color=getOption("out.color"),
+      out2.fill=getOption("out2.fill"),
+      out2.color=getOption("out2.color")
+    )
 
-  ellipse <- list(
-    fill = getOption("ellipse.fill"),
-    color = getOption("ellipse.color")
-  )
+    VBS <- list(
+      violin.fill = getOption("violin.fill"),
+      violin.color = getOption("violin.color"),
+      box.fill = getOption("box.fill"),
+      box.color = getOption("box.color")
+    )
 
-  axis <- list(
-    color = getOption("axis.color"),
-    lwd = getOption("axis.lwd"),
-    lty = getOption("axis.lty"),
-    cex = getOption("axis.cex"),
-    text.color = getOption("axis.text.color")
-  )
-  axis.x <- list(
-    color = getOption("axis.x.color"),
-    lwd = getOption("axis.x.lwd"),
-    lty = getOption("axis.x.lty"),
-    cex = getOption("axis.x.cex"),
-    text.color = getOption("axis.x.text.color")
-  )
-  axis.y <- list(
-    color = getOption("axis.y.color"),
-    lwd = getOption("axis.y.lwd"),
-    lty = getOption("axis.y.lty"),
-    cex = getOption("axis.y.cex"),
-    text.color = getOption("axis.y.text.color")
-  )
+    ellipse <- list(
+      fill = getOption("ellipse.fill"),
+      color = getOption("ellipse.color")
+    )
 
-  rotate <- list(
-    x = getOption("rotate.x"),
-    y = getOption("rotate.y"),
-    offset = getOption("offset")
-  )
+    axis <- list(
+      color = getOption("axis.color"),
+      lwd = getOption("axis.lwd"),
+      lty = getOption("axis.lty"),
+      cex = getOption("axis.cex"),
+      text.color = getOption("axis.text.color")
+    )
+    axis.x <- list(
+      color = getOption("axis.x.color"),
+      lwd = getOption("axis.x.lwd"),
+      lty = getOption("axis.x.lty"),
+      cex = getOption("axis.x.cex"),
+      text.color = getOption("axis.x.text.color")
+    )
+    axis.y <- list(
+      color = getOption("axis.y.color"),
+      lwd = getOption("axis.y.lwd"),
+      lty = getOption("axis.y.lty"),
+      cex = getOption("axis.y.cex"),
+      text.color = getOption("axis.y.text.color")
+    )
 
-  lab <- list(
-    color = getOption("lab.color"),
-    cex = getOption("lab.cex")
-  )
-  lab.x <- list(
-    color = getOption("lab.x.color"),
-    cex = getOption("lab.x.cex")
-  )
-  lab.y <- list(
-    color = getOption("lab.y.color"),
-    cex = getOption("lab.y.cex")
-  )
+    rotate <- list(
+      x = getOption("rotate.x"),
+      y = getOption("rotate.y"),
+      offset = getOption("offset")
+    )
 
-  main <- list(
-    color = getOption("main.color"),
-    cex = getOption("main.cex")
-  )
+    lab <- list(
+      color = getOption("lab.color"),
+      cex = getOption("lab.cex")
+    )
+    lab.x <- list(
+      color = getOption("lab.x.color"),
+      cex = getOption("lab.x.cex")
+    )
+    lab.y <- list(
+      color = getOption("lab.y.color"),
+      cex = getOption("lab.y.cex")
+    )
 
-  grid <- list(
-    color = getOption("grid.color"),
-    lwd = getOption("grid.lwd"),
-    lty = getOption("grid.lty")
-  )
-  grid.x <- list(
-    color = getOption("grid.x.color"),
-    lwd = getOption("grid.x.lwd"),
-    lty = getOption("grid.x.lty")
-  )
-  grid.y <- list(
-    color = getOption("grid.y.color"),
-    lwd = getOption("grid.y.lwd"),
-    lty = getOption("grid.y.lty")
-  )
+    main <- list(
+      color = getOption("main.color"),
+      cex = getOption("main.cex")
+    )
 
-  strip <- list(
-    fill = getOption("strip.fill"),
-    color = getOption("strip.color"),
-    text.color = getOption("strip.text.color")
-  )
+    grid <- list(
+      color = getOption("grid.color"),
+      lwd = getOption("grid.lwd"),
+      lty = getOption("grid.lty")
+    )
+    grid.x <- list(
+      color = getOption("grid.x.color"),
+      lwd = getOption("grid.x.lwd"),
+      lty = getOption("grid.x.lty")
+    )
+    grid.y <- list(
+      color = getOption("grid.y.color"),
+      lwd = getOption("grid.y.lwd"),
+      lty = getOption("grid.y.lty")
+    )
 
-  add <- list(
-    fill = getOption("add.fill"),
-    color = getOption("add.color"),
-    cex = getOption("add.cex"),
-    lwd = getOption("add.lwd"),
-    lty = getOption("add.lty")
-  )
+    strip <- list(
+      fill = getOption("strip.fill"),
+      color = getOption("strip.color"),
+      text.color = getOption("strip.text.color")
+    )
 
-  # create main list
-  gp <- list(
-    theme = getOption("theme"),
-    sub.theme = getOption("sub.theme"),
+    add <- list(
+      fill = getOption("add.fill"),
+      trans = getOption("add.trans"),
+      color = getOption("add.color"),
+      cex = getOption("add.cex"),
+      lwd = getOption("add.lwd"),
+      lty = getOption("add.lty")
+    )
 
-    window.fill = getOption("window.fill"),
-    panel = panel,
+    output <- list(
+      results = getOption("results"),
+      explain = getOption("explain"),
+      interpret = getOption("interpret"),
+      document = getOption("document"),
+      code = getOption("code")
+    )
 
-    bar = bar,
-    pt = pt,
+    # create main list
+    gp <- list(
+      theme = getOption("theme"),
+      sub.theme = getOption("sub.theme"),
 
-    VBS = VBS,
-    ellipse = ellipse,
+      window.fill = getOption("window.fill"),
+      panel = panel,
 
-    se.fill = getOption("se.fill"),
-    bubble.text.color = getOption("bubble.text.color"),
-    heat = getOption("heat"),
-    segment.color = getOption("segment.color"),
-    ID.color=getOption("ID.color"),
-    area.fill=getOption("area.fill"),
+      bar = bar,
+      pt = pt,
 
-    axis = axis,
-    axis.x = axis.x,
-    axis.y = axis.y,
-    rotate = rotate,
+      VBS = VBS,
+      ellipse = ellipse,
 
-    lab = lab,
-    lab.x = lab.x,
-    lab.y = lab.y,
-    main = main,
+      fit.color = getOption("fit.color"),
+      fit.lwd = getOption("fit.lwd"),
+      se.fill = getOption("se.fill"),
+      bubble.text.color = getOption("bubble.text.color"),
+      heat = getOption("heat"),
+      segment.color = getOption("segment.color"),
+      ID.color=getOption("ID.color"),
+      area.fill=getOption("area.fill"),
 
-    grid = grid,
-    grid.x = grid.x,
-    grid.y = grid.y,
+      axis = axis,
+      axis.x = axis.x,
+      axis.y = axis.y,
+      rotate = rotate,
 
-    strip = strip,
+      lab = lab,
+      lab.x = lab.x,
+      lab.y = lab.y,
+      main = main,
 
-    add = add,
+      grid = grid,
+      grid.x = grid.x,
+      grid.y = grid.y,
 
-    n.cat = getOption("n.cat"),
-    suggest = getOption("suggest"),
-    quiet = getOption("quiet"),
-    brief = getOption("brief"),
+      strip = strip,
 
-    results = getOption("results"),
-    explain = getOption("explain"),
-    interpret = getOption("interpret"),
-    document = getOption("document"),
-    code = getOption("code")
+      add = add,
 
-  )
+      n.cat = getOption("n.cat"),
+      suggest = getOption("suggest"),
+      quiet = getOption("quiet"),
+      brief = getOption("brief"),
+
+      output = output
+      
+    )
+  }
 
   invisible(gp)
 

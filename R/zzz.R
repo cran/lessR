@@ -7,14 +7,14 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.6.5      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
+      "lessR 3.6.6      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
       "---------------------------------------------------------------------\n",
       "1. mydata <- Read()        Read text, Excel, SPSS, SAS or R data file\n",
       "2. Help()                  Get help\n",
       "3. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
-      "4. by1= , by2=             Trellis graphics, a plot for each by1, by2\n",
-      "5. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
+      "4. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
       "                           Plot(X) gives new VBS plot for numerical X\n",
+      "5. by1= , by2=             Trellis graphics, a plot for each by1, by2\n",
       "6. reg(Y ~ X, Rmd=\"eg\")    Regression + R markdown file that, when\n",
       "                           knit, provides full interpretative output\n",
       "7. style(\"gold\", sub.theme=\"black\")   Set theme and sub.theme\n",
@@ -38,7 +38,9 @@ function(...) {
   options(trans.pt.fill = 0.00)
   options(pt.color = "gray20")
   options(out.fill = "firebrick4")
+  options(out.color = "firebrick4")
   options(out2.fill = "firebrick2")
+  options(out2.color = "firebrick2")
 
   options(violin.fill = "#7F7F7F95")  # .maketrans("gray50", 150)) 
   options(violin.color = "gray15") 
@@ -104,8 +106,8 @@ function(...) {
   options(add.fill = "gray20")
   options(add.trans = 0.0)
   options(add.color = "gray60")
-  options(add.cex = 1.0)
-  options(add.lwd = 1.0)
+  options(add.cex = 0.6)
+  options(add.lwd = 0.5)
   options(add.lty = "solid")
 
   options(n.cat = 1)
@@ -882,11 +884,11 @@ function(dir, axT) {
   grid.y.lty <- ifelse(is.null(getOption("grid.y.lty")), 
     getOption("grid.lty"), getOption("grid.y.lty"))
 
-  if (dir == "v")
-    abline(v=axT, col=grid.x.color, lwd=grid.x.lwd, lty=grid.x.lty)
+  if (dir == "v") if (grid.y.lwd > 0) 
+    abline(v=axT, col=grid.y.color, lwd=grid.y.lwd, lty=grid.y.lty)
 
-  if (dir == "h")
-    abline(h=axT, col=grid.y.color, lwd=grid.x.lwd, lty=grid.x.lty)
+  if (dir == "h") if (grid.x.lwd > 0) 
+    abline(h=axT, col=grid.x.color, lwd=grid.x.lwd, lty=grid.x.lty)
 
 }
 
@@ -1022,7 +1024,7 @@ function(dir, axT) {
 # x.val contains non-numeric x-axis labels
 
   # left margin
-  mm <- max.lm.width + 0.6
+  mm <- max.lm.width + 0.55  # old value 0.6
   if (!is.null(y.lab)) {
      if (!nzchar(y.lab)[1]) mm <- mm - 0.25
      if (grepl("\n", y.lab[1], fixed=TRUE)) mm <- mm + .15
@@ -1040,7 +1042,7 @@ function(dir, axT) {
   rm <- 0.1
  
   # bottom margin
-  bm <- 0.70
+  bm <- 0.65  # old value 0.70
   new.ln <- FALSE
   if (!is.null(x.val)) {
     for (i in 1:length(x.val)) 
@@ -1419,13 +1421,26 @@ return(clr)
 
   if (is.null(color))
     rgb.color <- "NULL"
-  else
-    rgb.color <- col2rgb(color, alpha=TRUE)
+  else {  # preserve color name if it exists
+    if (!(color %in% colors()))
+      rgb.color <- col2rgb(color, alpha=TRUE)
+    else
+      rgb.color <- color
+  }
 
   return(rgb.color)
 
 }
 
+
+.to_num <- function(k, d=1, w=0) {
+  if (!is.null(k)) 
+    val <- format(sprintf("%.*f", d, k), width=w, justify="right",
+                  scientific=FALSE)
+  else
+    val <- "NULL" 
+  return(val)
+}
 
 .to_str <- function(cc) {
   if (is.null(cc)) cc <- "NULL"

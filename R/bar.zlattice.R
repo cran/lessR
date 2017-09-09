@@ -8,6 +8,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
 
   cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n\n")
 
+
   grid.x.color <- ifelse(is.null(getOption("grid.x.color")), 
     getOption("grid.color"), getOption("grid.x.color"))
   grid.y.color <- ifelse(is.null(getOption("grid.y.color")), 
@@ -27,10 +28,29 @@ function(x, by1, by2, nrows, ncols, asp, prop,
     getOption("axis.color"), getOption("axis.x.color"))
   axis.y.color <- ifelse(is.null(getOption("axis.y.color")), 
     getOption("axis.color"), getOption("axis.y.color"))
+  # axis color is panel.color unless axis.color is changed from default
+  theme <- getOption("theme")
+  sub.theme <- getOption("sub.theme")
+  if (sub.theme != "black")  {  
+     panel.color <- ifelse (axis.x.color != "gray15", axis.x.color, "#DED9CD")
+     if (panel.color == "#DED9CD")
+       panel.color <- ifelse (axis.y.color != "gray15", axis.y.color, "#DED9CD")
+  }
+  else {
+     panel.color <- ifelse (axis.x.color != "gray55", axis.x.color, "gray55")
+     if (panel.color == "gray55")
+       panel.color <- ifelse (axis.y.color != "gray55", axis.y.color, "gray55")
+  }
+
+  axis.x.text.color <- ifelse(is.null(getOption("axis.x.text.color")), 
+    getOption("axis.text.color"), getOption("axis.x.text.color"))
+  axis.y.text.color <- ifelse(is.null(getOption("axis.y.text.color")), 
+    getOption("axis.text.color"), getOption("axis.y.text.color"))
 
   axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")), 
     getOption("axis.cex"), getOption("axis.x.cex"))
   adj <- .RSadj(axis.cex=axis.x.cex); axis.x.cex <- adj$axis.cex
+
   axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")), 
     getOption("axis.cex"), getOption("axis.y.cex"))
   adj <- .RSadj(axis.cex=axis.y.cex); axis.y.cex <- adj$axis.cex
@@ -39,6 +59,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
     getOption("lab.color"), getOption("lab.x.color"))
   lab.y.color <- ifelse(is.null(getOption("lab.y.color")), 
     getOption("lab.color"), getOption("lab.y.color"))
+
 
   # if applicable, open graphics window of specified dimensions
   in.RStudio <- ifelse (options("device") != "RStudioGD", FALSE, TRUE)
@@ -132,17 +153,17 @@ function(x, by1, by2, nrows, ncols, asp, prop,
   g.y.color <- grid.y.color
   if (g.y.color ==  "transparent") g.y.color <- grid.x.color
 
-  a.x.color <- axis.x.color
-  if (a.x.color ==  "transparent") a.x.color <-axis.y.color
-  a.y.color <-axis.y.color
-  if (a.y.color ==  "transparent") a.y.color <- axis.x.color
+  a.x.text.color <- axis.x.text.color
+  if (a.x.text.color ==  "transparent") a.x.text.color <-axis.y.text.color
+  a.y.text.color <- axis.y.text.color
+  if (a.y.text.color ==  "transparent") a.y.text.color <- axis.x.text.color
 
   l.x.color <- lab.x.color
-  if (l.x.color ==  "transparent") l.x.color <-lab.y.color
+  if (l.x.color == "transparent") l.x.color <-lab.y.color
   l.y.color <- lab.y.color
-  if (l.y.color ==  "transparent") l.y.color <- lab.x.color
+  if (l.y.color == "transparent") l.y.color <- lab.x.color
 
-  # separate the axis from the axis labels unless too many rows
+  # more physical space of the axis from the axis labels unless too many rows
   if (is.null(nrows)) nrows <- 1
   if (nrows < 7) { 
     pad <- 2.08 - 0.56*log(nrows)
@@ -172,8 +193,8 @@ function(x, by1, by2, nrows, ncols, asp, prop,
            strip.border=list(col=getOption("strip.color"), lwd=0.5),
            strip.background=list(col=getOption("strip.fill"))),
          scales=list(
-           x = list(cex=axis.x.cex, rot=rotate.x, col=a.x.color),
-           y = list(cex=axis.y.cex, rot=rotate.y, col=a.y.color)),
+           x = list(cex=axis.x.cex, rot=rotate.x, col=a.x.text.color),
+           y = list(cex=axis.y.cex, rot=rotate.y, col=a.y.text.color)),
          panel = function(x, y, ...) {
              panel.grid(h=0, v=-1, col=g.x.color,
                         lwd=grid.x.lwd, lty=grid.x.lty)

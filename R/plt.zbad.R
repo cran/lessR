@@ -1,6 +1,6 @@
 .plt.bad <-
 function (x.miss, y.miss, values, breaks, bin.start, n.row, n.col,
-          MD.cut, out.cut, ...) {
+          MD.cut, out.cut, fit.se, ...) {
 
   # check for inconsistent parameters
   
@@ -13,7 +13,12 @@ function (x.miss, y.miss, values, breaks, bin.start, n.row, n.col,
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Choose MD.cut or out.cut to specify outliers, but not both\n\n")
   }
-
+  
+  if (fit.se[1] > 0.999) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "fit.se now specified as the confidence level, between 0 and 1\n\n")
+  }
+  
   if (values %in% c("mean", "sd", "min", "max") && y.miss) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Must specify a numeric y-variable from which to compute the\n ",

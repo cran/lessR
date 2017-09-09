@@ -84,8 +84,10 @@ function(my.formula, data=mydata, brief=getOption("brief"), ...) {
         if (digits.d == 1) digits.d <- 2
         options(digits.d=digits.d)  # .fmt requires if not specified
 
+        # need to assign to out to avoid returned info displayed at console
         if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
-          .TwoGroup(x, y, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
+          out <- .TwoGroup(x, y,
+            n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
             brief=FALSE, digits.d, 
             conf.level=0.95, alternative="two.sided",
@@ -96,7 +98,8 @@ function(my.formula, data=mydata, brief=getOption("brief"), ...) {
           Xtmp <- X2nm
           X2nm <- X1nm
           X1nm <- Xtmp
-          .TwoGroup(x, y, n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
+          out <- .TwoGroup(x, y,
+            n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
             brief=FALSE, digits.d, 
             conf.level=0.95, alternative="two.sided",

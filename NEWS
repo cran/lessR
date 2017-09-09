@@ -1,10 +1,54 @@
 	NEWS
 
-Update History for Package 'lessR'
+Update His tory for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
+
   
+>>>>>> Changes for lessR version 3.6.6 (2017-09-08) <<<<<<
+
+-------------
+Updates 3.6.6
+-------------
+
+Plot
+  add = "labels" to plot labels for the points
+  confidence level for best-fit line specified directly, e.g., 0.95, instead
+    of the number of standard errors
+  left margin and bottom margin slightly reduced to increase plot size
+  for Trellis and VBS plots, i.e., via lattice, axis.color settings override
+    panel.color because they are otherwise the same setting in lattice
+  
+showWheel
+  new hcl color wheel function, also allows manual entry of colors
+  
+style
+  get=TRUE option added, as a placeholder to get the current theme settings
+    without making any changes
+  no.y.axis sub.theme now extends the panel.fill to window.fill as well
+  style setting show=TRUE shows color names when applicable instead of
+    rgb values and NULL instead of blank
+ 
+
+---------------
+Bug Fixes 3.6.6
+--------------- 
+
+BarChart
+  scaling of axis label works
+
+Plot
+  for grayscale, outliers in black instead of gray to better view
+
+Style
+  saving and then re-reading style parameters works consistently
+  se.fill works
+
+
+
+
+
 >>>>>> Changes for lessR version 3.6.5 (2017-08-06) <<<<<<
 
 -------------

@@ -39,6 +39,10 @@ function (...) {
           "  with function:  style\n\n")
       }
 
+      if (grepl("rotate", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Use the style function for rotate.x, rotate.y, offset\n\n")
+      }
       if (grepl("fit.line", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "fit.line options dropped the  .line suffix\n",
@@ -58,6 +62,11 @@ function (...) {
       if (names(dots)[i] == "line.chart") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "option  line.chart  is renamed  run\n\n")
+      }
+      if (names(dots)[i] == "rotate.values") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Rotation of the axis labels can now be applied to both axes\n\n",
+          "option  rotate.values  is renamed  rotate.x or rotate.y\n\n")
       }
       if (names(dots)[i] == "line.width") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",

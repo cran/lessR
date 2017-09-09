@@ -170,7 +170,7 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
 
     if (is.null(size)) {
       if (!reps)
-        size.pt <- ifelse (lx < 2000, 
+        size.pt <- ifelse (lx < 2535,  # at this value both equations equal
           1.096 - 0.134*log(lx), 0.226 - 0.023*log(lx))
       else
         size.pt <- 0.842 - 0.109*log(mx.c)

@@ -37,11 +37,7 @@ function(x, y=NULL, data=mydata,
 
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
 
-         xy.ticks=TRUE, value.labels=NULL, label.max=20,
-         rotate.x=getOption("rotate.x"),
-         rotate.y=getOption("rotate.y"),
-         offset=getOption("offset"),
-         origin.x=NULL,
+         xy.ticks=TRUE, value.labels=NULL, label.max=20, origin.x=NULL,
 
          auto=FALSE, digits.d=NULL, quiet=getOption("quiet"),
          do.plot=TRUE, width=NULL, height=NULL, pdf.file=NULL, 
@@ -90,10 +86,13 @@ function(x, y=NULL, data=mydata,
 
   fit.color <- getOption("fit.color")
   fit.lwd <- getOption("fit.lwd")
+  se.fill <- getOption("se.fill")
 
   ID.color <- getOption("ID.color")
-  out2.fill <- getOption("out2.fill")
   out.fill <- getOption("out.fill")
+  out.color <- getOption("out.color")
+  out2.fill <- getOption("out2.fill")
+  out2.color <- getOption("out2.color")
 
   panel.fill <- getOption("panel.fill")
   panel.color <- getOption("panel.color") 
@@ -108,6 +107,10 @@ function(x, y=NULL, data=mydata,
   add.cex <- getOption("add.cex")
   add.lwd <- getOption("add.lwd")
   add.lty <- getOption("add.lty")
+
+  rotate.x <- getOption("rotate.x")
+  rotate.y <- getOption("rotate.y")
+  offset <- getOption("offset")
 
   # missing function only reliable if arg not modified, so capture 
   x.miss <- ifelse (missing(x), TRUE, FALSE)
@@ -249,7 +252,7 @@ function(x, y=NULL, data=mydata,
   # see if dated or inconsistent parameter values
   .param.old(...)
   .plt.bad(x.miss, y.miss, values, breaks, bin.start, n.row, n.col,
-           MD.cut, out.cut, ...)
+           MD.cut, out.cut, fit.se, ...)
 
 
   # ----------
@@ -547,20 +550,27 @@ function(x, y=NULL, data=mydata,
         "Run chart only applies to a numerical variable\n\n")
     }
 
-  # ellipse stop conditions
+  # ---------------------------------
+  # ellipse, fit line stop conditions
   if (ellipse[1] > 0) {
     many.y <- FALSE
     if (!y.miss) if (is.matrix(y.call)) many.y <- TRUE
     if ((ncol(data.x)>1 || many.y)  ||  cat.x  ||  cat.y) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "An ellipse only applies to analysis of a single x-variable \n",
-        "  with a single y-variable, both continuous\n\n")
+        "An ellipse only applies to analysis of a single y-variable \n",
+        "  which is continuous\n\n")
     }
     if (y.miss) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Need a y-variable to compute an ellipse\n\n")
     }
   }
+  
+  if (y.miss  &&  (fit.ln != "off")  &&  n.x_var == 1  &&  !date.ts) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Fit line only applicable if just one x variable, if y is present\n\n")
+  }
+
 
   if (!y.miss) if (cat.x && !cat.y) {
     cat("\n>>> Note\n",
@@ -834,7 +844,8 @@ function(x, y=NULL, data=mydata,
   # evaluate ID 
   #------------
   get.ID <- FALSE
-  if (y.miss && !cat.x) get.ID <- TRUE  # VBS plot
+  if (y.miss && !cat.x) get.ID <- TRUE  # VBS plot 
+  if (!is.null(add)) if (add[1] == "labels") get.ID <- TRUE 
   if (!y.miss) if (!cat.x && !cat.y && (MD.cut>0 || out.cut>0))
     get.ID <- TRUE 
   if (get.ID) {
@@ -1198,7 +1209,8 @@ function(x, y=NULL, data=mydata,
                    fit.ln, fit.color, fit.lwd,
                    area.fill, area.origin, jitter.y, bw, violin,
                    box, vbs.size, box.adj, a, b, k.iqr, 
-                   fences, vbs.mean, out.shape, out.size, out2.fill, out.fill,
+                   fences, vbs.mean, out.shape, out.size,
+                   out.fill, out.color, out2.fill, out2.color,
                    ID.call, out.cut, ID.color, ID.size,
                    rotate.x, rotate.y, width, height, pdf.file,
                    c.type, ...)
@@ -1405,8 +1417,8 @@ function(x, y=NULL, data=mydata,
           smooth, smooth.points, smooth.trans, smooth.bins,
           radius, power, size.cut, bubble.text, low.fill, hi.fill,
           ID.call, ID.color, ID.size, out.ind,
-          out.fill, out.shape.miss,
-          fit.ln, fit.color, fit.lwd, fit.se,
+          out.fill, out.color, out.shape.miss,
+          fit.ln, fit.color, fit.lwd, fit.se, se.fill,
           ellipse, ellipse.color, ellipse.fill, ellipse.lwd,
           center.line, show.runs, stack,
           freq.poly, jitter.x, jitter.y,

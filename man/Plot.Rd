@@ -66,9 +66,7 @@ Plot(x, y=NULL, data=mydata,
 
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
 
-         xy.ticks=TRUE, value.labels=NULL, label.max=20,
-         rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
-         offset=getOption("offset"), origin.x=NULL,
+         xy.ticks=TRUE, value.labels=NULL, label.max=20, origin.x=NULL,
 
          auto=FALSE, digits.d=NULL, quiet=getOption("quiet"),
          do.plot=TRUE, width=NULL, height=NULL, pdf.file=NULL, 
@@ -284,7 +282,8 @@ bx(\ldots)
         a second (dashed) fit line is displayed calculated \emph{without}
         the outliers. Modify the color from the current \code{theme} with the 
         \code{\link{style}} function parameter \code{fit.color}.}
-  \item{fit.se}{Number of standard errors to plot around the fit. The default
+  \item{fit.se}{Confidence level for the error band displayed around the
+       line of best fit. The default
        value of 0 turns off the standard error plot. Can be a vector to display
        multiple ranges.}\cr
  
@@ -377,7 +376,9 @@ bx(\ldots)
   \item{sub}{Sub-title of graph, below \code{xlab}.}\cr
 
   \item{xy.ticks}{Flag that indicates if tick marks and associated \bold{axis values}
-        on the axes are to be displayed.}
+        on the axes are to be displayed. To rotate the axis values, use
+        \code{rotate.x}, \code{rotate.y}, and \code{offset} from the
+        \code{\link{style}} function.}
   \item{value.labels}{Labels for the \code{x}-axis on the graph to override 
         existing data values, including factor levels. If the variable is a 
         factor and \code{value.labels} is not specified (is \code{NULL}), then the
@@ -387,12 +388,6 @@ bx(\ldots)
   \item{label.max}{Maximum size of labels for the values of a categorical variable.
         Not a literal maximum as preserving unique values may require a larger number
         of characters than specified.}
-  \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
-        accommodate longer values, typically used in conjunction with \code{offset}.}
-  \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
-  \item{offset}{The spacing between the axis values and the axis. Default
-        is 0.5. Larger values such as 1.0 are used to create space for the label when
-        longer axis value names are rotated.}
   \item{origin.x}{Origin of \code{x}-axis. Particularly useful for plots of
        \code{count}, etc, where the origin will be zero by default, but can
        be modified. Otherwise the origin of the plot is based on the minimum
@@ -554,9 +549,8 @@ Instead, do the following:
 }
 
 
-
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. The output here is just for the outlier analysis of the two-variable scatterplot with continuous variables.
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. The output here is just for the outlier analysis of the two-variable scatterplot with continuous variables. The outlier identification must be activated for the analysis, such as from parameter \code{MD.cut}.
 
 READABLE OUTPUT\cr
 code{out_outlier}: Mahalanobis Distance of each outlier.\cr
@@ -607,7 +601,7 @@ Plot(Years, Salary)
 Plot(Years, Salary, auto=TRUE)
 
 # plot 0.95 data ellipse with the points identified that represent
-# outliers defined by a Mahalanobis Distance larger than 6 
+#   outliers defined by a Mahalanobis Distance larger than 6 
 # save outliers into R object out, then remove from mydata
 mydata[1, "Salary"] <- 200000
 out <- Plot(Years, Salary, ellipse=0.95, MD.cut=6)
@@ -615,42 +609,44 @@ mydata <- mydata[-out$outlier_indices,]
 
 # new shape and point size, no grid or background color
 # then put style back to default
-# style(panel.fill="powderblue", grid.color="off")
-# Plot(Years, Salary, size=2, shape="diamond")
-# style()
+#style(panel.fill="powderblue", grid.color="off")
+#Plot(Years, Salary, size=2, shape="diamond")
+#style()
 
 # translucent data ellipses without points or edges
 #  show the idealized joint distribution for bivariate normality
-# style(ellipse.color="off")
-# Plot(Years, Salary, size=0, ellipse=seq(.1,.9,.10))
+#style(ellipse.color="off")
+#Plot(Years, Salary, size=0, ellipse=seq(.1,.9,.10))
 
 # bubble plot with size determined by the value of Pre
 # display the value for the bubbles with values of  min, median and max
-# Plot(Years, Salary, size=Pre, size.cut=3)
+#Plot(Years, Salary, size=Pre, size.cut=3)
 
 # variables of interest are in a data frame not the default mydata
 # plot 0.6 and 0.9 data ellipses
 # change color theme to gold with black background
-# style("gold", sub.theme="black")
-# Plot(eruptions, waiting, ellipse=seq(.6,.9), data=faithful)
+#style("gold", sub.theme="black")
+#Plot(eruptions, waiting, ellipse=seq(.6,.9), data=faithful)
 
 # scatterplot with two x-variables, plotted against Salary
 # define a new style, then back to default
-# style(window.fill=rgb(247,242,230, maxColorValue=255),
-#   panel.fill="off", panel.color="off", pt.fill="black", trans=0,
-#   lab.color="black", axis.text.color="black",
-#   axis.y.color="off", grid.x.color="off", grid.y.color="black",
-#   grid.lty="dotted", grid.lwd=1)
-# Plot(c(Pre, Post), Salary)
-# style()
+#style(window.fill=rgb(247,242,230, maxColorValue=255),
+# panel.fill="off", panel.color="off", pt.fill="black", trans=0,
+# lab.color="black", axis.text.color="black",
+# axis.y.color="off", grid.x.color="off", grid.y.color="black",
+# grid.lty="dotted", grid.lwd=1)
+#Plot(c(Pre, Post), Salary)
+#style()
 
 # increase span (smoothing) from default of .7 to 1.25
 # span is a loess parameter, which generates a caution that can be
 #   ignored that it is not a graphical parameter -- we know that
-# Plot(Years, Salary, fit="loess", span=1.25)
+# display confidence intervals about best-fit line at
+#   0.95 confidence level
+#Plot(Years, Salary, fit="loess", span=1.25, fit.se=0.95)
 
 # 2-D kernel density (more useful for larger sample sizes) 
-# Plot(Years, Salary, smooth=TRUE)
+#Plot(Years, Salary, smooth=TRUE)
 
 
 #------------------------------------------------------
@@ -658,7 +654,7 @@ mydata <- mydata[-out$outlier_indices,]
 #------------------------------------------------------
 
 # with least squares fit line
-# Plot(c("Salary", "Years", "Pre"), fit="ls")
+#Plot(c("Salary", "Years", "Pre"), fit="ls")
 
 
 #--------------------------------------------------------------
@@ -669,16 +665,16 @@ mydata <- mydata[-out$outlier_indices,]
 Plot(Years, Salary, by1=Dept)
 
 # all three by variables
-# Plot(Years, Salary, by1=Dept, by2=Gender, by=HealthPlan)
+#Plot(Years, Salary, by1=Dept, by2=Gender, by=HealthPlan)
 
 # vary both shape and color with a least-squares fit line for each group
-# style(color=c("darkgreen", "brown"))
-# Plot(Years, Salary, by1=Gender, fit="ls", shape=c("F","M"), size=.8)
-# style("gray")
+#style(color=c("darkgreen", "brown"))
+#Plot(Years, Salary, by1=Gender, fit="ls", shape=c("F","M"), size=.8)
+#style("gray")
 
 # compare the men and women Salary according to Years worked
 #   with an ellipse for each group
-# Plot(Years, Salary, by=Gender, ellipse=.50)
+#Plot(Years, Salary, by=Gender, ellipse=.50)
 
 
 #--------------------------------------------------
@@ -688,58 +684,58 @@ Plot(Years, Salary, by1=Dept)
 # One continuous variable
 # -----------------------
 # Integrated Violin/Box/Scatterplot, a VBS plot
-Plot(Salary)
+#Plot(Salary)
 
 # by variable, different colors for different values of the variable
 # all on one panel
-Plot(Salary, by=Dept)
+#Plot(Salary, by=Dept)
 
 # large sample size
-# x <- rnorm(10000)
-# Plot(x)
+#x <- rnorm(10000)
+#Plot(x)
 
 # custom colors for outliers, which might not appear in this subset data
-# style(out.fill="hotpink", out2.fill="purple")
-# Plot(Salary)
-# style()
+#style(out.fill="hotpink", out2.fill="purple")
+#Plot(Salary)
+#style()
 
 # no violin plot, boxplot and scatterplot only
-# Plot(x, vbs.plot="bs")
+#Plot(x, vbs.plot="bs")
 
 # binned values to plot counts
 # ----------------------------
 # bin the values of Salary to plot counts as a frequency polygon
 # the counts are plotted as points instead of the data
-# Plot(Salary, values="count")  # bin the values
+#Plot(Salary, values="count")  # bin the values
 
 # time charts
 #------------
 # run chart, with fill area
-Plot(Salary, run=TRUE, area=TRUE)
+#Plot(Salary, run=TRUE, area=TRUE)
 
 # two run charts in same plot
 # or could do a multivariate time series
-# Plot(c(Pre, Post), run=TRUE)
+#Plot(c(Pre, Post), run=TRUE)
 
 # Trellis graphics run chart with custom line width, no points
-# Plot(Salary, run=TRUE, by1=Gender, lwd=3, size=0)
+#Plot(Salary, run=TRUE, by1=Gender, lwd=3, size=0)
 
 # daily time series plot
 # create the daily time series from R built-in data set airquality
-# oz.ts <- ts(airquality$Ozone, start=c(1973, 121), frequency=365)
-# Plot(oz.ts)
+#oz.ts <- ts(airquality$Ozone, start=c(1973, 121), frequency=365)
+#Plot(oz.ts)
 
 # multiple time series plotted from dates and stacked
 # black background with translucent areas, then reset theme to default
-# style(sub.theme="black", color="steelblue2", trans=.55, 
-#    window.fill="gray10", grid.color="gray25")
-# date <- seq(as.Date("2013/1/1"), as.Date("2016/1/1"), by="quarter")
-# x1 <- rnorm(13, 100, 15)
-# x2 <- rnorm(13, 100, 15)
-# x3 <- rnorm(13, 100, 15)
-# df <- data.frame(date, x1, x2, x3)
-# Plot(date, x1:x3, data=df)
-# style()
+#style(sub.theme="black", color="steelblue2", trans=.55, 
+#   window.fill="gray10", grid.color="gray25")
+#date <- seq(as.Date("2013/1/1"), as.Date("2016/1/1"), by="quarter")
+#x1 <- rnorm(13, 100, 15)
+#x2 <- rnorm(13, 100, 15)
+#x3 <- rnorm(13, 100, 15)
+#df <- data.frame(date, x1, x2, x3)
+#Plot(date, x1:x3, data=df)
+#style()
 
 
 #------------------------------------------
@@ -751,10 +747,10 @@ Plot(Salary, run=TRUE, area=TRUE)
 Plot(Dept)
 
 # abbreviated category labels
-# Plot(Dept, label.max=2)
+#Plot(Dept, label.max=2)
 
 # plot of frequencies for each category (level), replaces bar chart 
-# Plot(Dept, values="count")
+#Plot(Dept, values="count")
 
 
 #----------------------------------------------------
@@ -763,7 +759,9 @@ Plot(Dept)
 
 # generate a chart with the plotted mean of each level
 # rotate x-axis labels and then offset to fit
-# Plot(Dept, Salary, rotate.x=45, offset=1)
+#style(rotate.x=45, offset=1)
+#Plot(Dept, Salary)
+#style()
 
 
 #-------------------
@@ -774,10 +772,10 @@ Plot(Dept)
 Plot(Salary, row.names)
 
 # standard scatterplot
-# Plot(Salary, row.names, sort.yx=FALSE, segments.y=FALSE)
+#Plot(Salary, row.names, sort.yx=FALSE, segments.y=FALSE)
 
 # Cleveland dot plot with two x-variables
-# Plot(c(Pre, Post), row.names)
+#Plot(c(Pre, Post), row.names)
 
 
 #------------
@@ -785,90 +783,89 @@ Plot(Salary, row.names)
 #------------
 
 # add text at the one location specified by x1 and x2
-# Plot(Years, Salary, add="Hi There", x1=12, y1=80000)
+#Plot(Years, Salary, add="Hi There", x1=12, y1=80000)
 
 # add text at three different specified locations 
-# Plot(Years, Salary, add="Hi There", x1=c(12, 16, 18),
-#   y1=c(80000, 100000, 60000))
+#Plot(Years, Salary, add="Hi", x1=c(12, 16, 18), y1=c(80000, 100000, 60000))
 
 # add three different text blocks at three different specified locations
-# Plot(Years, Salary, add=c("Hi", "Bye", "Wow"), x1=c(12, 16, 18),
-#   y1=c(80000, 100000, 60000))
+#Plot(Years, Salary, add=c("Hi", "Bye", "Wow"), x1=c(12, 16, 18),
+#  y1=c(80000, 100000, 60000))
 
 # add an 0.95 data ellipse and horizontal and vertical lines through the
 #  respective means
-# Plot(Years, Salary, ellipse=TRUE, add=c("v.line", "h.line"),
-#   x1="mean.x", y1="mean.y")
+#Plot(Years, Salary, ellipse=TRUE, add=c("v.line", "h.line"),
+#  x1="mean.x", y1="mean.y")
 # can be done also with the following short-hand
-# Plot(Years, Salary, ellipse=TRUE, add=c("means"))
+#Plot(Years, Salary, ellipse=TRUE, add=c("means"))
  
 # a rectangle requires two points, <x1,y1> and <x2,y2>
-# style(add.trans=.8, add.fill="gold", add.color="gold4", add.lwd=0.5)
-# Plot(Years, Salary, add="rect", x1=12, y1=80000, x2=16, y2=115000)
+#style(add.trans=.8, add.fill="gold", add.color="gold4", add.lwd=0.5)
+#Plot(Years, Salary, add="rect", x1=12, y1=80000, x2=16, y2=115000)
 
 # the first object, a rectangle, requires all four coordinates
 # the vertical line at x=2 requires only an x1 coordinate, listed 2nd 
-# Plot(Years, Salary, add=c("rect", "v.line"), x1=c(10, 2),
-#   y1=80000, x2=12, y2=115000)
+#Plot(Years, Salary, add=c("rect", "v.line"), x1=c(10, 2),
+#  y1=80000, x2=12, y2=115000)
 
 # two different rectangles with different locations, fill colors and translucence
-# style(add.fill=c("gold3", "green"), add.trans=c(.8,.4))
-# Plot(Years, Salary, add=c("rect", "rect"), 
-#   x1=c(10, 2), y1=c(60000, 45000), x2=c(12, 75000), y2=c(80000, 55000))
+#style(add.fill=c("gold3", "green"), add.trans=c(.8,.4))
+#Plot(Years, Salary, add=c("rect", "rect"), 
+#  x1=c(10, 2), y1=c(60000, 45000), x2=c(12, 75000), y2=c(80000, 55000))
 
 
 #----------------------------------------------------
 # analysis of two categorical variables (Likert data)
 #----------------------------------------------------
 
-# mydata <- rd("Mach4", format="lessR", quiet=TRUE)  # Likert data, 0 to 5
-# mydata <- Subset(random=.5, quiet=TRUE)  # less computationally intensive
+mydata <- rd("Mach4", format="lessR", quiet=TRUE)  # Likert data, 0 to 5
+mydata <- Subset(random=.5, quiet=TRUE)  # less computationally intensive
 
 # size of each plotted point (bubble) depends on its joint frequency
 # triggered by default when replication of joint values and
-#  less than 9 unique data values for each 
-# Plot(m06, m07)
+#   less than 9 unique data values for each 
+Plot(m06, m07)
 
 # use value labels for the integer values, modify color options
-# LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
-#    "Slightly Agree", "Agree", "Strongly Agree")
-# style(fill="powderblue", color="blue", bubble.text="darkred")
-# Plot(m06,  m07, value.labels=LikertCats)
-# style("darkred")  # reset theme
+#LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
+#   "Slightly Agree", "Agree", "Strongly Agree")
+#style(fill="powderblue", color="blue", bubble.text="darkred")
+#Plot(m06,  m07, value.labels=LikertCats)
+#style("darkred")  # reset theme
 
 # get correlation analysis instead of cross-tab analysis:
 #   maximum number of categories of equally spaced integer values
 #   to define a variable as categorical here specified as 0
-# Plot(m06, m07, n.cat=0)
+#Plot(m06, m07, n.cat=0)
 
 # proportions within each level of the other variable
-# Plot(m06, m07, proportion=TRUE)
+#Plot(m06, m07, proportion=TRUE)
 
 
 #-----------------------------
 # Bubble Plot Frequency Matrix
 #-----------------------------
 
-# Plot(c(m06,m07,m09,m10), value.labels=LikertCats)
+#Plot(c(m06,m07,m09,m10), value.labels=LikertCats)
 
 
 #---------------
 # function curve
 #---------------
 
-# x <- seq(10,50,by=2) 
-# y1 <- sqrt(x)
-# y2 <- x**.33
+#x <- seq(10,50,by=2) 
+#y1 <- sqrt(x)
+#y2 <- x**.33
 # x is sorted with equal intervals so run chart by default
-# Plot(x, y1)
+#Plot(x, y1)
 # custom function plot
-# style(panel.fill="snow", area.fill="lightsteelblue")
-# Plot(x, y1, ylab="My Y", xlab="My X", main="My Curve")
-# style()
+#style(panel.fill="snow", area.fill="lightsteelblue")
+#Plot(x, y1, ylab="My Y", xlab="My X", main="My Curve")
+#style()
 
 # multiple plots, need data frame
-# mydata <- data.frame(x, y1, y2)
-# Plot(x, c(y1, y2))
+#mydata <- data.frame(x, y1, y2)
+#Plot(x, c(y1, y2))
 
 
 
@@ -876,19 +873,19 @@ Plot(Salary, row.names)
 # modern art
 #-----------
 
-clr <- colors()
-color0 <- clr[sample(1:length(clr), size=1)]
-clr <- clr[-(153:353)]  # get rid of most of the grays
-n <- sample(4:30, size=1)
-x <- rnorm(n)
-y <- rnorm(n)
-color1 <- clr[sample(1:length(clr), size=1)]
-color2 <- clr[sample(1:length(clr), size=1)]
-style(window.fill=color0, area.fill=color1, color=color2)
-Plot(x, y, run=TRUE, 
- xy.ticks=FALSE, main="Modern Art", xlab="", ylab="",
- cex.main=2, col.main="lightsteelblue", n.cat=0, center.line="off")
-style() # reset style to default
+#clr <- colors()
+#color0 <- clr[sample(1:length(clr), size=1)]
+#clr <- clr[-(153:353)]  # get rid of most of the grays
+#n <- sample(4:30, size=1)
+#x <- rnorm(n)
+#y <- rnorm(n)
+#color1 <- clr[sample(1:length(clr), size=1)]
+#color2 <- clr[sample(1:length(clr), size=1)]
+#style(window.fill=color0, area.fill=color1, color=color2)
+#Plot(x, y, run=TRUE, 
+# xy.ticks=FALSE, main="Modern Art", xlab="", ylab="",
+# cex.main=2, col.main="lightsteelblue", n.cat=0, center.line="off")
+#style() # reset style to default
 }
 
 

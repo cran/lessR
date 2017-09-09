@@ -26,9 +26,11 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          col.low=NULL, col.hi=NULL,
 
          ID=NULL, ID.color="gray50", ID.size=0.75, out.ind,
-         out.fill, out.shape.miss,
+         out.fill, out.color, out.shape.miss,
 
-         fit.line="off", col.fit.line="gray55", fit.lwd=1.5, fit.se=1,
+         fit.line="off", col.fit.line="gray55", fit.lwd=1.5,
+         fit.se=1, se.fill="gray80",
+ 
 
          ellipse=FALSE, col.ellipse="lightslategray",
          ellipse.fill="off", ellipse.lwd,
@@ -49,7 +51,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
 
-  size.pt <- size  # size is set in Plot.R
+  size.pt <- size * .9  # size is set in Plot.R, reduce a bit for here
 
   if (center.line == "default") if (date.ts) center.line <- "off"
 
@@ -627,7 +629,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
  
           if (n.xcol == 1  && n.ycol == 1) {
 
-             if (length(out.ind) == 0)
+             if (length(out.ind) == 0)  # not outliers
                 points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
                        cex=size.pt, ...)
 
@@ -639,7 +641,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                 points(x[-out.ind,1], y[-out.ind,1],
                    pch=shape, col=color[1], bg=fill[1], cex=size.pt, ...)
                 points(x[out.ind,1], y[out.ind,1],
-                   pch=shape, col=out.fill, bg=out.fill, cex=size.pt, ...)
+                   pch=shape, col=out.color, bg=out.fill, cex=size.pt, ...)
                 text(x[out.ind], y[out.ind], labels=ID[out.ind],
                    pos=1, offset=0.4, col=ID.color, cex=ID.size)
              }
@@ -998,29 +1000,24 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
         y.lv <- y.lv[od] 
 
         # fit line
-        if (fit.line == "loess") {
+        if (fit.line == "loess")
           l.ln <- loess(y.lv ~ x.lv)
-          f.ln <- fitted(l.ln, ...)
-          lines(x.lv, f.ln, col=clr, lwd=fit.lwd, lty=ln.type)
-        }
-        else if (fit.line == "ls") {
+        else if (fit.line == "ls")
           l.ln <- lm(y.lv ~ x.lv)
-          int <- l.ln[[1]][1]
-          slp <- l.ln[[1]][2]
-          abline(a=int, b=slp, col=clr, lwd=fit.lwd, lty=ln.type)
-        }
+        f.ln <- fitted(l.ln, ...)
+        lines(x.lv, f.ln, col=clr, lwd=fit.lwd, lty=ln.type)
 
         # se bands about fit line
-        if (fit.se[1] != 0) {  # if fit.se=0, length(fit.se) still = 1
+        if (fit.se[1] != 0) {
           for (j in 1:length(fit.se)) {
             p.ln <- predict(l.ln, se=TRUE)
-            up.ln <- fitted(l.ln, ...) + (fit.se[j] * p.ln$se.fit)
-            dn.ln <- fitted(l.ln, ...) - (fit.se[j] * p.ln$se.fit)
+            prb <- (1 - fit.se[j]) / 2
+            up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
+            dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
             lines(x.lv, up.ln, col=clr, lwd=0.5, lty=ln.type)
             lines(x.lv, dn.ln, col=clr, lwd=0.5, lty=ln.type)
-            xx <- c(x.lv, rev(x.lv))
-            yy <- c(up.ln, rev(dn.ln))
-            polygon(xx, yy, col=getOption("se.fill"), border="transparent")
+            polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
+                    col=getOption("se.fill"), border="transparent")
           }  # end for each se plot
         }
       }
@@ -1048,9 +1045,15 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     y1 <- as.numeric(y1)
   }
 
-  if (!is.null(add))
-    .plt.add (add, x1, x2, y1, y2,
-         add.cex, add.lwd, add.lty, add.color, add.fill, add.trans)
+  if (!is.null(add)) {
+      if (add[1] == "labels")
+        text(x, y, labels=ID, pos=1, offset=0.4,
+           pch=shape, col=getOption("add.color"), cex=getOption("add.cex"))
+      else 
+        .plt.add (add, x1, x2, y1, y2,
+             add.cex, add.lwd, add.lty, add.color, add.fill, add.trans)
+  }
+
 
 }  # end plt.main
 

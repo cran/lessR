@@ -17,9 +17,6 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
 
         cex.names=0.70,
         value.labels=NULL, label.max=20,
-        rotate.x=getOption("rotate.x"),
-        rotate.y=getOption("rotate.y"),
-        offset=getOption("offset"),
 
         quiet=getOption("quiet"),
         width=5, height=4.5, pdf.file=NULL, ...)  {
@@ -40,13 +37,20 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
   fill <- getOption("bar.fill")
   color <- getOption("bar.color")
   trans <- NULL
+
   panel.fill <- getOption("panel.fill")
   panel.color <- getOption("panel.color")
   grid.color <- getOption("grid.color")
+
   lab.color <- getOption("lab.color")
-  lab.cex <- getOption("lab.cex")
   axis.color <- getOption("axis.color")
+
+  lab.cex <- getOption("lab.cex")
   axis.cex <- getOption("axis.cex") 
+
+  rotate.x <- getOption("rotate.x")
+  rotate.y <- getOption("rotate.y")
+  offset <- getOption("offset")
 
   if (!is.null(fill)) {
     for (i in 1:length(fill))

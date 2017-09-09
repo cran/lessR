@@ -16,7 +16,7 @@ style(
       "darkgreen", "blue", "red", "rose", "green", "purple", "sienna",
       "brown", "orange", "white"),
   sub.theme=c("default", "black", "no.y.axis"),
-  set=NULL,
+  set=NULL, get=TRUE,
 
   window.fill=getOption("window.fill"),
   panel.fill=getOption("panel.fill"),
@@ -46,7 +46,9 @@ style(
   ID.color=getOption("ID.color"),
   area.fill=getOption("area.fill"),
   out.fill=getOption("out.fill"),
+  out.color=getOption("out.color"),
   out2.fill=getOption("out2.fill"),
+  out2.color=getOption("out2.color"),
 
   violin.fill=getOption("violin.fill"),
   violin.color=getOption("violin.color"),
@@ -117,11 +119,13 @@ set(\ldots)
 
 \arguments{
   \item{theme}{The specified color scheme. If specified, re-sets all style
-       attributes to their start-up values.}
+       attributes to the values consistent with that theme.}
   \item{sub.theme}{Further modification of the main themes.}
   \item{set}{A list of parameter values, a theme, that was previously
        saved, and now is read back to become the current set of parameter
-       values.}\cr
+       values. See the examples.}
+  \item{get}{Save the current list of parameter values, a theme, into
+       an R object.}\cr
 
   \item{window.fill}{Fill color of the entire device window.}
   \item{panel.fill}{Color of the plot background.}
@@ -163,12 +167,14 @@ set(\ldots)
   \item{ID.color}{Color of the text to display the ID labels.}
   \item{area.fill}{Fill color of the area under a line in a run chart or time
        series.}
-  \item{out2.fill}{For a 1-D scatterplot, color of potential outliers, which,
+  \item{out.fill}{For a scatterplot, color of the border of potential outliers, which,
+       for the unadjusted boxplot, are default values
+       1.5 IQR's beyond the lower or upper quartile.}
+  \item{out.color}{For a scatterplot, color of potential outliers.}
+  \item{out2.fill}{For a scatterplot, color of extreme outliers, which,
        for the unadjusted boxplot, are default values
        3 IQR's beyond the lower or upper quartile.}
-  \item{out.fill}{For a 1-D scatterplot, color of potential outliers, which,
-       for the unadjusted boxplot, are default values
-       1.5 IQR's beyond the lower or upper quartile.}\cr
+  \item{out2.color}{For a scatterplot, color of the border of extreme outliers.}\cr
 
   \item{violin.fill}{Fill color for a \bold{violin plot}, applicable to a 
         1-variable scatter plot of a continuous variable.}
@@ -271,7 +277,7 @@ Sets the default color palette via the R \code{\link{options}} statement, as wel
 
 Available themes:\cr
 "lightbronze" [default]\cr
-"dodgerblue" [prior default]\cr
+"dodgerblue" [default \code{lessR} 3.6.0 and earlier]\cr
 "darkred"\cr
 "gray"\cr
 "gold"\cr
@@ -293,13 +299,19 @@ SUB-THEMES\cr
 \code{"no.y.axis"}: Similar to the \code{wsj} theme from the \code{ggthemes} package, especially with the theme of \code{"lightbronze"}. The \code{y}-axis is removed with though the value labels retained, the vertical grid is removed, and the horizontal grid is dotted and thicker than the default.
 }
 
-\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
+
+\value{
+The current settings can optionally be saved into an \code{R} object, and then read back at a later time with the \code{set} function..\cr
+}
+
 
 \references{
 Arnold, Jeffrey B., (2017), ggthemes: Extra Themes, Scales and Geoms for 'ggplot2'. R package version 3.4.0. https://CRAN.R-project.org/package=ggthemes
 
 Wickham, Hadley, (2009), ggplot2: Elegant Graphics for Data Analysis, 2nd edition, Springer.
 }
+
+\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
 \code{\link{options}}.
@@ -325,7 +337,7 @@ style("gray", sub.theme="black")
 # 4. mostly black and white
 style("white")
 
-# reset style to the default \"lightbronze\"
+# reset style to the default "lightbronze"
 style()
 
 # adjust Trellis strip to a dark background
@@ -341,6 +353,22 @@ style(panel.fill="off", panel.color="off",
       axis.y.color="off",
       grid.x.color="off", grid.y.color="black",  grid.lty="dotted", grid.lwd=1)
 hs(Salary)
+
+# save the current theme settings into an R object without changes
+# unless set to FALSE, get is always TRUE, for all calls to style
+mystyle <- style(get=TRUE)
+# ...  bunch of changes
+# then recall older settings to current theme setting
+style(set=mystyle)
+
+# create a gray-scale with a sub-theme of no.y.axis
+# save, and then at a later session read back in
+grayWSJ <- style("gray", sub.theme="no.y.axis")
+Write("grayWSJ", data=grayWSJ, format="R")
+# ...
+mystyle <- Read("grayWSJ.rda")  # read grayWSJ.rda
+style(set=mystyle)
+
 
 
 # all numeric variables with 8 or less unique values and equally spaced

@@ -45,7 +45,11 @@ function() {
         .to_rgb(getOption("pt.color")), "\n")
     cat("out.fill ......... Outlier point fill ....... ",
         .to_rgb(getOption("out.fill")), "\n")
+    cat("out.color ........ Outlier point color ...... ",
+        .to_rgb(getOption("out.fill")), "\n")
     cat("out2.fill ........ Extreme outlier point fill ",
+        .to_rgb(getOption("out2.fill")), "\n")
+    cat("out2.color ....... Extreme outlier point color",
         .to_rgb(getOption("out2.fill")), "\n")
     cat("violin.fill ...... Violin fill color .........",
         .to_rgb(getOption("violin.fill")), "\n")
@@ -63,7 +67,7 @@ function() {
         .to_rgb(getOption("ellipse.fill")), "\n")
     cat("ellipse.color .... Ellipse border color ..... ",
         .to_rgb(getOption("ellipse.color")), "\n")
-    cat("ellipse.lwd ...... Ellipse border color ..... ",
+    cat("ellipse.lwd ...... Ellipse border width ..... ",
         .fmt(getOption("ellipse.lwd"), 2), "\n")
     cat("area.fill ........ Line chart area fill color ",
         .to_rgb(getOption("area.fill")), "\n")
@@ -84,25 +88,25 @@ function() {
         .to_rgb(getOption("axis.y.color")), "\n")
 
     cat("axis.lwd ....... Axis line width ............", 
-      .fmt(getOption("axis.lwd"), 1), "\n")
+      .to_num(getOption("axis.lwd")), "\n")
     cat("axis.x.lwd ..... Axis line width ............", 
-      .fmt(getOption("axis.x.lwd"), 1), "\n")
+      .to_num(getOption("axis.x.lwd")), "\n")
     cat("axis.y.lwd ..... Axis line width ............", 
-      .fmt(getOption("axis.y.lwd"), 1), "\n")
+      .to_num(getOption("axis.y.lwd")), "\n")
 
-    cat("axis.lty ....... Axis line type .............",
-      getOption("axis.lty"), "\n")
-    cat("axis.x.lty ..... Axis line type .............", 
-      getOption("axis.x.lty"), "\n")
-    cat("axis.y.lty ..... Axis line type .............", 
-      getOption("axis.y.lty"), "\n")
+    cat("axis.lty ....... Line type of axes ..........",
+      .to_str(getOption("axis.lty")), "\n")
+    cat("axis.x.lty ..... Line type of x-axis ........", 
+      .to_str(getOption("axis.x.lty")), "\n")
+    cat("axis.y.lty ..... Line type of y-axis ........", 
+      .to_str(getOption("axis.y.lty")), "\n")
 
     cat("axis.cex ....... x and y axis text size ...........",
-        .fmt(getOption("axis.cex"), 2), "\n")
+        .to_num(getOption("axis.cex"), 2), "\n")
     cat("axis.x.cex ..... x-axis text size .................",
-        .fmt(getOption("axis.x.cex"), 2), "\n")
+        .to_num(getOption("axis.x.cex"), 2), "\n")
     cat("axis.y.cex ..... y-axis text size .................",
-        .fmt(getOption("axis.y.cex"), 2), "\n")
+        .to_num(getOption("axis.y.cex"), 2), "\n")
     cat("axis.text.color  x and y axis values text color ...",
         .to_rgb(getOption("axis.text.color")), "\n")
     cat("axis.x.text.color  x-axis values text color .......",
@@ -115,6 +119,9 @@ function() {
         .fmt(getOption("rotate.y"), 2), "\n")
     cat("offset ......... Offset of values text from axis ..",
         .fmt(getOption("offset"), 2), "\n")
+
+    cat("\n")
+    cat("LABELS\n")
     cat("lab.color ...... Color of axis labels .............",
         .to_rgb(getOption("lab.color")), "\n")
     cat("lab.x.color .... Color of x-axis label ............",
@@ -122,7 +129,11 @@ function() {
     cat("lab.y.color .... Color of y-axis label ............",
         .to_rgb(getOption("lab.y.color")), "\n")
     cat("lab.cex ........ Size of axis labels ..............",
-        .fmt(getOption("lab.cex"),2), "\n")
+        .to_num(getOption("lab.cex"),2), "\n")
+    cat("lab.x.cex ...... Size of x-axis labels ............",
+        .to_num(getOption("lab.x.cex"),2), "\n")
+    cat("lab.y.cex ...... Size of y-axis labels ............",
+        .to_num(getOption("lab.y.cex"),2), "\n")
     cat("main.color ..... Color of plot label ..............",
         getOption("main.color"), "\n")
 

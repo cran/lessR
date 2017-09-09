@@ -32,9 +32,6 @@ BarChart(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
 
         cex.names=0.70,
         value.labels=NULL, label.max=20,
-        rotate.x=getOption("rotate.x"),
-        rotate.y=getOption("rotate.y"),
-        offset=getOption("offset"),
 
         quiet=getOption("quiet"),
         width=5, height=4.5, pdf.file=NULL, \ldots) 
@@ -134,7 +131,10 @@ bc(\ldots)
        then the title is set by default from the corresponding variable labels.}
   \item{sub}{Sub-title of graph, below \code{xlab}.}\cr
 
-  \item{cex.names}{Scale magnification factor for the categories.}
+  \item{cex.names}{Scale magnification factor for the categories.
+        To rotate the axis values, use
+        \code{rotate.x}, \code{rotate.y}, and \code{offset} from the
+        \code{\link{style}} function.}
   \item{value.labels}{Labels for the \code{x}-axis on the graph to override 
         existing data values, including factor levels. If the variable is a 
         factor and \code{value.labels} is not specified (is \code{NULL}), then the
@@ -143,13 +143,7 @@ bc(\ldots)
         they also apply to the \code{y}-axis.}
   \item{label.max}{Maximum size of labels for the values of a variable.
         Not a literal maximum as preserving unique values may require a larger number
-        of characters than specified.}
-  \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
-        accommodate longer values, typically used in conjunction with \code{offset}.}
-  \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
-  \item{offset}{The spacing between the axis values and the axis. Default
-        is 0.5. Larger values such as 1.0 are used to create space for the label when
-        longer axis value names are rotated.}\cr
+        of characters than specified.}\cr
 
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
@@ -207,8 +201,12 @@ If the default right margin is retained, variable labels are also accommodated f
 
 If the legend is not in the right margin, sometimes bars from the graph may intrude into the legend. One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{addtop} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend.horiz} option.
 
-ENTER COUNTS DIRECTLY\cr
-Instead of calculating the counts from the data, the counts can be entered directly.  For two variables, enter the counts as a matrix and include the \code{xlab} option to label the horizontal axis, such as with the name of the variable.  Also include the \code{legend.title} option to provide a legend.  See the examples below.
+LONG CATEGORY NAMES\cr
+For many plots, the names of the categories tend to be long. To adjust the plot for these long names, they can be rotated using the \code{rotate.x} and \code{rotate.y} parameters, in conjunction with \code{offset}, from the \code{\link{style}} function. The \code{offset} parameter moves the category name out from the axis to compensate for the rotation. The changes from \code{\link{style}} persist until further changes. To reset to the default after obtaining an analysis, use \code{style()}.
+
+
+ENTER NUMERIC VARIABLE DIRECTLY\cr
+Instead of calculating the counts from the data, the counts, or the values of any other numerical variable, can be entered directly as the \code{y}-variable, in addition to the \code{x}-variable, and perhaps a \code{by}-variable. See the examples below, under "bar chart directly from data".
 
 Or, include the already tabulated counts as the data which is read into R, either as a matrix or a data frame.
 
@@ -275,7 +273,9 @@ bc(Pain)
 myCount <- BarChart(Pain)
 myCount
 # rotate and offset the axis labels
-BarChart(Pain, rotate.x=45, offset=1)
+style(rotate.x=45, offset=1)
+BarChart(Pain)
+style()
 # compare to standard R bar plot, which requires mydata$ reference
 barplot(table(mydata$Pain))
 

@@ -7,7 +7,8 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
          fit="off", fit.color=NULL, fit.lwd=NULL,
          area="transparent", origin=NULL, jitter, bw, violin,
          box, vbs.size, box.adj, a, b, k.iqr, fences, vbs.mean,
-         out.shape, out.size, out2.fill, out.fill,
+         out.shape, out.size,
+         out.fill, out.color, out2.fill, out2.color,
          ID, out.cut, ID.color, ID.size,
          rotate.x, rotate.y, width, height, pdf.file, c.type, ...) {
 
@@ -29,17 +30,36 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
   grid.y.lty <- ifelse(is.null(getOption("grid.y.lty")), 
     getOption("grid.lty"), getOption("grid.y.lty"))
 
-  axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")), 
-    getOption("axis.cex"), getOption("axis.x.cex"))
-  adj <- .RSadj(axis.cex=axis.x.cex); axis.x.cex <- adj$axis.cex
-  axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")), 
-    getOption("axis.cex"), getOption("axis.y.cex"))
-  adj <- .RSadj(axis.cex=axis.y.cex); axis.y.cex <- adj$axis.cex
-
   axis.x.color <- ifelse(is.null(getOption("axis.x.color")), 
     getOption("axis.color"), getOption("axis.x.color"))
   axis.y.color <- ifelse(is.null(getOption("axis.y.color")), 
     getOption("axis.color"), getOption("axis.y.color"))
+  # axis color is panel.color unless axis.color is changed from default
+  theme <- getOption("theme")
+  sub.theme <- getOption("sub.theme")
+  if (sub.theme != "black")  {  
+     panel.color <- ifelse (axis.x.color != "gray15", axis.x.color, "#DED9CD")
+     if (panel.color == "#DED9CD")
+       panel.color <- ifelse (axis.y.color != "gray15", axis.y.color, "#DED9CD")
+  }
+  else {
+     panel.color <- ifelse (axis.x.color != "gray55", axis.x.color, "gray55")
+     if (panel.color == "gray55")
+       panel.color <- ifelse (axis.y.color != "gray55", axis.y.color, "gray55")
+  }
+
+  axis.x.text.color <- ifelse(is.null(getOption("axis.x.text.color")), 
+    getOption("axis.text.color"), getOption("axis.x.text.color"))
+  axis.y.text.color <- ifelse(is.null(getOption("axis.y.text.color")), 
+    getOption("axis.text.color"), getOption("axis.y.text.color"))
+
+  axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")), 
+    getOption("axis.cex"), getOption("axis.x.cex"))
+  adj <- .RSadj(axis.cex=axis.x.cex); axis.x.cex <- adj$axis.cex
+
+  axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")), 
+    getOption("axis.cex"), getOption("axis.y.cex"))
+  adj <- .RSadj(axis.cex=axis.y.cex); axis.y.cex <- adj$axis.cex
 
   lab.x.color <- ifelse(is.null(getOption("lab.x.color")), 
     getOption("lab.color"), getOption("lab.x.color"))
@@ -202,15 +222,15 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
   g.y.color <- grid.y.color
   if (g.y.color ==  "transparent") g.y.color <- grid.x.color
 
-  a.x.color <- axis.x.color
-  if (a.x.color ==  "transparent") a.x.color <-axis.y.color
-  a.y.color <-axis.y.color
-  if (a.y.color ==  "transparent") a.y.color <- axis.x.color
+  a.x.text.color <- axis.x.text.color
+  if (a.x.text.color ==  "transparent") a.x.text.color <-axis.y.text.color
+  a.y.text.color <- axis.y.text.color
+  if (a.y.text.color ==  "transparent") a.y.text.color <- axis.x.text.color
 
   l.x.color <- lab.x.color
-  if (l.x.color ==  "transparent") l.x.color <-lab.y.color
+  if (l.x.color == "transparent") l.x.color <-lab.y.color
   l.y.color <- lab.y.color
-  if (l.y.color ==  "transparent") l.y.color <- lab.x.color
+  if (l.y.color == "transparent") l.y.color <- lab.x.color
 
   # separate the axis from the axis labels unless too many rows
   if (is.null(nrows)) nrows <- 1
@@ -248,8 +268,8 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
              col=col.color, fill=col.fill),
            superpose.line=list(col=col.color, lty=ltype)),
          scales=list(
-           x = list(cex=axis.x.cex, rot=rotate.x, col=a.x.color),
-           y = list(cex=axis.y.cex, rot=rotate.y, col=a.y.color))
+           x = list(cex=axis.x.cex, rot=rotate.x, col=a.x.text.color),
+           y = list(cex=axis.y.cex, rot=rotate.y, col=a.y.text.color))
   )
 
   if (c.type == "contcont") {
@@ -326,11 +346,6 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
        })
     }  # end fences
 
-    p <- update(p,
-       par.settings=list(
-         box.rectangle=list(col=getOption("box.color")),
-         box.umbrella=list(col=getOption("box.color"), lty="solid"))
-       )
 
     if (n.groups > 1) {  # cex refers to the text, not the points
       c.color <- character(length=length(n.groups))
@@ -355,6 +370,13 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     }
 
     p <- update(p,
+
+       par.settings=list(  # col option does not work directly on panel.bwplot
+         box.rectangle=list(fill=getOption("box.fill"),
+                            col=getOption("box.color")),
+         box.umbrella=list(col=getOption("box.color"), lty="solid")
+       ),
+
        panel=function(x=x, box.ratio, wID=ID, ...,
                       groups=groups, subscripts=subscripts) {
 
@@ -403,12 +425,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
             if (!box.adj)
               .panel.bwplot(x=x, ..., pch="|", vbs.mean=vbs.mean, fences=fences,
                   box.ratio=vbs.size/denom, mean.color=out.fill, 
-                  fill=getOption("box.fill"), col=getOption("box.color"),   
                   stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE) 
             else
               .panel.bwplot(x=x, ...,  pch="|", vbs.mean=vbs.mean, fences=fences,
                   box.ratio=vbs.size/denom, mean.color=out.fill, 
-                  fill=getOption("box.fill"), col=getOption("box.color"), 
                   stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE) 
           }  # end box
 
@@ -427,7 +447,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
               }
               # plot extreme outliers
               .panel.stripplot(x=x[i.out],
-                cex=out.size, col=out2.fill, fill=fill.out, pch=out.shape, ...)
+                cex=out.size, col=out2.color, fill=fill.out, pch=out.shape, ...)
 
               i.out <- which(x>=fnc.out[1] & x<fnc.in[1] |
                               x>fnc.in[2] & x<=fnc.out[2])
@@ -441,7 +461,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
               }
               # plot outliers
               .panel.stripplot(x= x[i.out],
-                cex=out.size, col=out.fill, fill=fill.out, pch=out.shape, ...)
+                cex=out.size, col=out.color, fill=fill.out, pch=out.shape, ...)
 
               # label outliers
               if (out.cut > 0) {
