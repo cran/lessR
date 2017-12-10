@@ -116,7 +116,6 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   else if (!is.factor(x.call)) {
 
     sk <- NA; kt <- NA; q1 <- NA; q3 <- NA;  qr <- NA;
-#cat("exists y.name:", exists("y.name"), "\n")
     if (exists("y.name"))
       nm <- y.name
     else
@@ -170,7 +169,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   }
 
 
-  if (ncol(data) == 1) { 
+  if (ncol(data) == 1) {  # not a data frame analysis 
 
     if (!is.factor(x.call)) {
       class(txsts) <- "out_piece"

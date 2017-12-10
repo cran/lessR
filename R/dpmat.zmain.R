@@ -131,7 +131,6 @@ function(x, mylabels, sort.yx,
           par("usr")[1], par("usr")[3],
           rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
 
-
     # axis labels 
     if (!is.null(y.lvl))
       max.lbl <- max(nchar(y.lvl))
@@ -183,7 +182,7 @@ function(x, mylabels, sort.yx,
         if (!is.na(c[i])) if (c[i] <= min.bubble) c[i] <- NA
       text(cords$xx, cords$yy, c, cex=size.txt, col=txt.color)
     }
-  }
+  }  # end do.plot
 
   if (!quiet) {
   

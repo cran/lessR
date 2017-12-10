@@ -1,10 +1,18 @@
 .ss.numeric <-
-function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE, ...) {
+function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
+         x.name=NULL, ...) {
 
   # get variable labels if exist
   # graph.win=FALSE turns off call to par, so blank window in R not produced
   gl <- .getlabels(graph.win=FALSE)
-  x.name <- gl$xn; x.lbl <- gl$xl;
+
+  if (is.null(x.name)) {
+    x.name <- gl$xn
+    x.lbl <- gl$xl
+  }
+  else  # option just for pc.main
+    x.lbl <- NULL
+
   if (by1.nm) {
     y.name <- ifelse (is.null(y.name), gl$yn, y.name)  # sometimes need by1.name
     gl <- .getlabels(graph.win=FALSE, by1.nm=TRUE)

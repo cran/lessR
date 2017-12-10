@@ -31,7 +31,6 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          fit.line="off", col.fit.line="gray55", fit.lwd=1.5,
          fit.se=1, se.fill="gray80",
  
-
          ellipse=FALSE, col.ellipse="lightslategray",
          ellipse.fill="off", ellipse.lwd,
          
@@ -46,7 +45,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          quiet=getOption("quiet"), want.labels=TRUE, ...)  {
 
 
-  col.bg <- getOption("panel.fill")
+  fill.bg <- getOption("panel.fill")
   col.box <- getOption("panel.color")
 
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
@@ -164,6 +163,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     y.lab <- ylab
     main.lab <- main
     sub.lab <- sub
+    x.name <- NULL
   }
 
   if (date.ts  &&  is.null(xx.lab)) x.lab <- ""
@@ -241,7 +241,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     if (options("device") != "RStudioGD")  # not work in R, only RStudio
       max.width <- .09 * axis.y.cex * max(nchar(yv))
   }
-  else {  #  y-axis labels are numeric
+  else {  # y-axis labels are numeric
     max.width <- strwidth(as.character(max(pretty(y[,1]))), units="inches",
                           cex=axis.y.cex)
     max.width <- max.width + .05
@@ -421,7 +421,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, ...) 
 
   # background color
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
+  rect(usr[1], usr[3], usr[2], usr[4], col=fill.bg, border="transparent")
 
   # grid lines (put before box color around plot)
   .grid("v", axT1)
@@ -740,7 +740,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                  lwd=0.75, ...)
         }
 
-        .plt.by.legend(levels(by), color, fill, shp, trans.pts, col.bg, usr)
+        .plt.by.legend(levels(by), color, fill, shp, trans.pts, fill.bg, usr)
 
         }  # end by
 
@@ -748,10 +748,10 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       
       # plot legend as needed
       if (n.xcol > 1)  # horizontal legend, on x-axis
-        .plt.legend(colnames(x), TRUE, color, fill, shape, col.bg, usr, 
+        .plt.legend(colnames(x), TRUE, color, fill, shape, fill.bg, usr, 
                     lab.cex=lab.x.cex)
       if (n.ycol > 1)  # vertical legend, on y-axis
-        .plt.legend(colnames(y), FALSE, color, fill, shape, col.bg, usr, 
+        .plt.legend(colnames(y), FALSE, color, fill, shape, fill.bg, usr, 
                     lab.cex=lab.y.cex)
 
     }  # object is point, line, both

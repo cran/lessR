@@ -108,7 +108,7 @@ bx(\ldots)
   \item{by}{A categorical variable to provide a scatterplot for
         each level of the numeric primary variables \code{x} and
         \code{y} on the \emph{same} plot, a \emph{grouping variable}.
-        For two varaiable plots, applies to the panels of a
+        For two-variable plots, applies to the panels of a
         \bold{Trellis graphic} if \code{by1} is specified.}
   \item{by1}{A categorical variable called a \emph{conditioning variable} that
         activates Trellis graphics, provided by Deepayan Sarkar's (2007) lattice
@@ -144,16 +144,17 @@ bx(\ldots)
        by the value of \code{radius}. Applies to the standard two-variable
        scatterplot as well as to the scatterplot component of the
        integrated Violin-Box-Scatterplot (VBS) of a single continuous variable.}
-  \item{size.cut}{If \code{TRUE} (or \code{1}), then for a bubble plot of two
-        variables in which the bubble sizes are defined by a
+  \item{size.cut}{If \code{TRUE} (or \code{1}), then for a bubble plot in which the
+       bubble sizes are defined by a
        \code{size} variable, show the value
-        of the sizing variable for selected bubbles in the center of
-        the bubbles, unless the bubble is too small.
+       of the sizing variable for selected bubbles in the center of
+       the bubbles, unless the bubble is too small.
      If \code{FALSE}, no value is displayed.
         If a number greater than 1, then display the value only for the
-        corresponding quantiles, such as just the max and min for a setting of 2,
+        indicated number of values, such as just the max and min for a setting of 2,
         the default value when bubbles represent a size
-        variable.  Color of the displayed text set by \code{bubble.text}.}
+        variable.  Color of the displayed text set by \code{bubble.text} from
+        the \code{\link{style}} function.}
   \item{shape}{The plot character(s). The default value is a circle with both an
        color and filled area, specified with \code{color} and \code{fill}.
        Possible values are \code{circle}, \code{square}, \code{diamond},
@@ -819,27 +820,28 @@ Plot(Salary, row.names)
 #----------------------------------------------------
 
 mydata <- rd("Mach4", format="lessR", quiet=TRUE)  # Likert data, 0 to 5
-mydata <- Subset(random=.5, quiet=TRUE)  # less computationally intensive
 
 # size of each plotted point (bubble) depends on its joint frequency
 # triggered by default when replication of joint values and
 #   less than 9 unique data values for each 
-Plot(m06, m07)
+# n.cat=6 means treat responses as categorical for up to 6 equally-spaced
+#   integer values
+Plot(m06, m07, n.cat=6)
 
 # use value labels for the integer values, modify color options
 #LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
 #   "Slightly Agree", "Agree", "Strongly Agree")
 #style(fill="powderblue", color="blue", bubble.text="darkred")
-#Plot(m06,  m07, value.labels=LikertCats)
+#Plot(m06,  m07, value.labels=LikertCats, n.cat=6)
 #style("darkred")  # reset theme
 
-# get correlation analysis instead of cross-tab analysis:
-#   maximum number of categories of equally spaced integer values
-#   to define a variable as categorical here specified as 0
-#Plot(m06, m07, n.cat=0)
-
 # proportions within each level of the other variable
-#Plot(m06, m07, proportion=TRUE)
+#Plot(m06, m07, proportion=TRUE, n.cat=6)
+
+# get correlation analysis instead of cross-tab analysis
+# rely upon the default value of n.cat=0 so that integer
+#   valued variables are analyzed as numerical
+#Plot(m06, m07)
 
 
 #-----------------------------

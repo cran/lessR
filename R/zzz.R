@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.6.6      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
+      "lessR 3.6.7      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
       "---------------------------------------------------------------------\n",
       "1. mydata <- Read()        Read text, Excel, SPSS, SAS or R data file\n",
       "2. Help()                  Get help\n",
@@ -25,7 +25,8 @@ function(...) {
   options(sub.theme = "default")
 
   options(window.fill = "#F7F2E6")  # rgb(247,242,230, maxColorValue=255)
-  options(panel.fill = "transparent")
+  options(panel.fill = "#F7F2E6")
+  #options(panel.fill = "transparent")
   options(panel.color = "#DED9CD")  # rgb(222,217,205, maxColorValue=255)
   options(panel.lwd = 0.5)
   options(panel.lty = "solid")
@@ -1042,7 +1043,7 @@ function(dir, axT) {
   rm <- 0.1
  
   # bottom margin
-  bm <- 0.65  # old value 0.70
+  bm <- 0.70
   new.ln <- FALSE
   if (!is.null(x.val)) {
     for (i in 1:length(x.val)) 
@@ -1117,6 +1118,40 @@ function(dir, axT) {
 
 }
 
+
+.band.width <- function(x, details=FALSE, ...) {
+
+  if (details) {
+    cat("\n")
+    cat("iterate for smoother density bandwidth (bw)\n")
+    cat("changes: number of times densities change sign\n")
+    cat("----------------------------------------------\n")
+  }
+
+  bw <- bw.nrd0(na.omit(x))
+#cat("\n\nbw initial:", bw, "\n\n")
+  irep <- 0
+
+  repeat {
+    irep <- irep + 1
+    d.gen <- suppressWarnings(density(x, bw, ...))
+    xd <- diff(d.gen$y)
+
+    flip <- 0
+    for (j in 2:length(xd))
+      if (sign(xd[j-1]) != sign(xd[j])) flip <- flip + 1
+    if (details)
+      cat(irep, " changes:", .fmti(flip,3), "   bw: ", .fmt(bw,4), "\n", sep="")
+    if (flip > 1  &&  irep < 25)
+{
+      bw <- 1.1 * bw
+}
+    else
+      break;
+  }  # end repeat
+
+  return(bw)
+}
 
 .pdfname <- function(analysis, x.name, go.pdf, pdf.nm, pdf.file) {
   if (go.pdf) {
@@ -1237,37 +1272,6 @@ function(dir, axT) {
 
 }
 
-
-.band.width <- function(x, details=FALSE, ...) {
-
-  if (details) {
-    cat("\n")
-    cat("iterate for smoother density bandwidth (bw)\n")
-    cat("changes: number of times densities change sign\n")
-    cat("----------------------------------------------\n")
-  }
-
-  bw <- bw.nrd0(na.omit(x))
-  irep <- 0
-
-  repeat {
-    irep <- irep + 1
-    d.gen <- suppressWarnings(density(x, bw, ...))
-    xd <- diff(d.gen$y)
-    flip <- 0
-    for (j in 2:length(xd))
-      if (sign(xd[j-1]) != sign(xd[j])) flip <- flip + 1
-    if (details)
-      cat(irep, " changes:", .fmti(flip,3), "   bw: ", .fmt(bw,4), "\n", sep="")
-    if (flip > 1  &&  irep < 25)
-      bw <- 1.1 * bw
-    else
-      break;
-  }  # end repeat
-
-  return(bw)
-}
-
         
 .corcolors <- function(R, NItems, main, bm=3, rm=3, diag=NULL,
                        pdf.file, width, height) {
@@ -1311,7 +1315,6 @@ function(dir, axT) {
 
 
 # discrete color steps with no order
-# bright option not currently functioning
 .col.discrete <- function(scheme="default") {
 
    # default is re-arrangement of colors from Set3, RColorBrewer
@@ -1324,11 +1327,11 @@ function(dir, axT) {
       clr <- c("#377EB8", "#F072B8", "#4DAF4A", "#984EA3", "#FDAE6B", 
                "#FFFF33", "#A65628", "#F781BF", "#999999")
 
-  # based on rainbow_hcl(8,c=50,l=70) from colorspace
-  # 92ADD6 is rgb 146,173,214, a kind of medium steel blue
-  else if (scheme == "bright")
-    clr <- c("#64B5D6", "#E495A5", "#72BB83", "#D2A277", "#ACA4E2",
-             "#39BEB1", "#D995CF", "#ABB065")
+    # based on rainbow_hcl(8,c=50,l=70) from colorspace
+    # 92ADD6 is rgb 146,173,214, a kind of medium steel blue
+    else if (scheme == "hcl")
+      clr <- c("#64B5D6", "#E495A5", "#72BB83", "#D2A277", "#ACA4E2",
+               "#39BEB1", "#D995CF", "#ABB065")
 
   # based on rainbow_hcl(8,c=80,l=65) from colorspace
     #clr <- c("#00AFE0", "#F072B8", "#00B981", "#D58F35", "#9DA500",

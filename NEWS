@@ -1,9 +1,42 @@
 	NEWS
 
-Update His tory for Package 'lessR'
+Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
+
+  
+>>>>>> Changes for lessR version 3.6.7 (2017-xx-xx) <<<<<<
+
+-------------
+Updates 3.6.7
+-------------
+
+BarChart
+  added a returned dataframe of the frequency table
+  
+BoxPlot
+  deprecated with message to use Plot instead
+
+PieChart
+  doughnut or ring chart capability added and is now the default
+  all the options from R function pie now included, such as density
+  option to read y-variable directly, the numeric variable to plot
+  y can can integer or real valued
+  
+Plot
+  x-axis label adjusted slightly upward
+  
+showWheel
+  further refined
+ 
+
+---------------
+Bug Fixes 3.6.7
+--------------- 
+
+in Debian and some other versions of Linux, regression  mark-up file for
+  interpretation crashed, now fixed
 
   
 >>>>>> Changes for lessR version 3.6.6 (2017-09-08) <<<<<<
@@ -185,8 +218,7 @@ Updates 3.6.0
 BarChart
   y parameter added to allow a bar chart of any y-variable with new
     parameter order -- x, y, by -- so by must now be explicitly indicated
-    to specify a by variable; if no by variable is specified, then
-    counts are tabulated for the second variable, the y variable, by default
+    to specify a by variable
 
 BarChart, Histogram
   trans option added to set trans.fill.bar

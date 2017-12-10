@@ -67,6 +67,7 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
   }
 
 
+
   # BEGIN
   # -----
   
@@ -137,7 +138,14 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
 
   if (!is.factor(x)) if (bw.miss)
     bw <- .band.width(na.omit(x), ...)  # default bw
-
+#d.gen <- suppressWarnings(density(na.omit(x), bw, ...))
+#xd <- diff(d.gen$y)
+#cat("\n\n\n*** bw:", bw, "\n")
+#xd2 <- diff(xd)
+#cat("\n\nxd2:\n")
+#print(as.numeric(.fmt(xd2,7)))
+#cat("\n\nxd2 sorted:\n")
+#print(sort(as.numeric(.fmt(xd2,7))))
   rep.prop <- (lx - n.ux) / lx
 
   # -------

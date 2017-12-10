@@ -467,7 +467,7 @@ function(
 
   make.color <- function(color1, color2) {
     options(window.fill = "white")
-    options(panel.fill = "grey92")
+    options(panel.fill = "grey95")
     options(bar.fill = .maketrans(color1, .to256("trans.bar.fill")))
     options(pt.fill = .maketrans(color1, .to256("trans.pt.fill")))
     options(bar.color = color2)
@@ -489,7 +489,7 @@ function(
   }
 
   make.default <- function()  {
-    options(panel.fill = "grey92")
+    options(panel.fill = "grey95")
     if (theme == "white") options(panel.fill = "white")
     options(window.fill = "white")
     options(grid.x.color = "white")
@@ -616,7 +616,7 @@ function(
 
     else if (theme == "gray") {
       options(window.fill = "white")
-      options(panel.fill = "grey92")
+      options(panel.fill = "grey95")
       options(bar.fill = .maketrans("gray25", .to256("trans.bar.fill")))
       options(pt.fill = .maketrans("gray20", .to256("trans.pt.fill")))
       options(bar.color = "gray60")
@@ -640,7 +640,8 @@ function(
 
     else if (theme == "lightbronze") {
       options(window.fill = rgb(247,242,230, maxColorValue=255))
-      options(panel.fill = "transparent")
+      options(panel.fill = rgb(247,242,230, maxColorValue=255))
+      #options(panel.fill = "transparent")
       options(panel.color = rgb(222,217,205, maxColorValue=255))
       options(bar.fill = .maketrans("gray50", .to256("trans.bar.fill")))  # 230
       options(bar.color = "gray30")

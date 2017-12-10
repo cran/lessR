@@ -25,10 +25,12 @@ function(nm, dname, fun.call, res.rows, pred.rows, res.sort,
   mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
   myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
   var.lbl <- character(length=0)
-  var.unit <- character(length=0)
+  # var.unit <- character(length=0)
   for (i in 1:n.vars) {
-    var.lbl[i] <- mylabels[which(names(mylabels) == nm[i])]
-    var.unit[i] <- myunits[which(names(myunits) == nm[i])] 
+    if (!is.null(mylabels))
+      var.lbl[i] <- mylabels[which(names(mylabels) == nm[i])]
+    #if (!is.null(myunits))
+	#  var.unit[i] <- myunits[which(names(myunits) == nm[i])]  # not used
   }
 
   if (n.pred > 1) {

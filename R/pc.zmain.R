@@ -1,12 +1,15 @@
 .pc.main <- 
-function(x,
-         random.col, col.fill, col.low, col.hi,
-         colors, cex, cex.main, quiet, main, 
+function(x, y,
+         random.col, col.fill, col.low, col.hi, colors,
+         radius, hole, hole.fill, edges, 
+         clockwise, init.angle, 
+         density, angle, border, lty,
+         cex, cex.main, quiet, main,
          pdf.file, width, height, ...)  {
 
   # get values for ... parameter values
-  stuff <- .getdots(...)
-  col.main <- stuff$col.main
+  #stuff <- .getdots(...)
+  #col.main <- stuff$col.main
 
   # set the labels
   # use variable label for main if it exists and main not specified
@@ -35,7 +38,11 @@ function(x,
   if (!is.factor(x) && !is.table(x)) x <- factor(x)
   n.colors <- ifelse (!is.table(x), nlevels(x), length(x))
 
+ 
+  # -------------
   # color palette
+  # -------------
+
   # set some default colors in case not assigned below
   if (is.ordered(x)) {
     lowhi <- .ordcolors(colors, col.low, col.hi) 
@@ -49,39 +56,23 @@ function(x,
   else if (colors %in% c("lightbronze", "gray", "white")) {
     if (n.colors == 1 || length(col.fill) > 1)
       clr <- col.fill
-    else {
-      if (n.colors == 2)
-        { light <- "gray70"; dark <- "gray40" }
-      else if (n.colors == 3)
-        { light <- "gray80"; dark <- "gray30" }
-      else 
-        { light <- "gray92"; dark <- "gray28" }
+    else {  # ordered grays
+      if (n.colors == 2) { light <- "gray70"; dark <- "gray40" }
+      else { light <- "gray84"; dark <- "gray30" }
       color.palette <- colorRampPalette(c(dark, light))
       clr <- color.palette(n.colors)
     }
-  }
-
-  else if ((colors %in% c("darkred", "gray", "blue", "rose",
-      "green", "gold", "red", "dodgerblue", "darkgreen", "purple", "sienna",
-      "brown", "orange")
-          && (is.null(by) && !is.matrix(x)))) {
-      if (n.colors == 1 || length(col.fill) > 1)
-        clr <- col.fill
-      else {
-        color.palette <- colorRampPalette(getOption("col.bar.fill"))
-        clr <- color.palette(nrow(x))
-      }
   }
 
   else if (colors == "rainbow") clr <- rainbow(n.colors)
   else if (colors == "terrain") clr <- terrain.colors(n.colors)
   else if (colors == "heat") clr <- heat.colors(n.colors)
 
-  else  {  # ordered color range does not make sense here 
+  else  {  # ordered color range not applicable here 
     if (length(col.fill) > 1)
       clr <- col.fill
     else
-      if (n.colors > 1) clr <- .col.discrete()[1:n.colors]
+      if (n.colors > 1) clr <- .col.discrete("hcl")[1:n.colors]
   }
 
   if (!is.null(col.fill)) {
@@ -92,24 +83,123 @@ function(x,
   palette(clr)
   col <- 1:n.colors 
 
+
+  # ----------------
+  # prepare the data
+  # ----------------
+
+  if (is.null(y)) {  # x is categorical variable, convert to freq table
+    if (!is.table(x)) x <- table(x)
+  }
+  else {  # y contains the values, x the names (categories)
+    x.names <- x
+    x <- y
+    x <- as.table(x)
+    names(x) <- x.names 
+  }
+
+  x.tbl <- x
+  labels <- names(x)
+  x <- as.numeric(x)
+
+
+  # ------------------
   # plot the pie chart
-  if (!is.table(x)) x <- table(x)
-  pie(x, col=col, main=main.lbl, cex=cex, cex.main=cex.main, col.main=col.main, ...)
+  # ------------------
+
+  # pie(x, col=col, main=main.lbl, cex=cex, cex.main=cex.main, col.main=col.main, ...)
+  # modified pie function to add inner hole at the end, and plot two radiuses
+  if (!is.numeric(x) || any(is.na(x) | x < 0)) 
+      stop("'x' values must be positive.")
+
+  if (is.null(labels)) 
+    labels <- as.character(seq_along(x))
+  else
+    labels <- as.graphicsAnnot(labels)
+
+  x <- c(0, cumsum(x)/sum(x))
+  dx <- diff(x)
+  nx <- length(dx)
+
+  par(bg=getOption("panel.fill"))
+  par(mai=c(.4, .5, .8, .5))
+  plot.new()
+
+  pin <- par("pin")  # plot dimensions in inches
+  xlim <- c(-1, 1)
+  ylim <- c(-1, 1)
+  if (pin[1L] > pin[2L]) 
+    xlim <- (pin[1L]/pin[2L]) * xlim
+  else
+    ylim <- (pin[2L]/pin[1L]) * ylim
+  plot.window(xlim, ylim, "", asp=1)
+
+  if (length(border) < nx) border <- rep_len(border, nx)
+  if (length(lty) < nx) lty <- rep_len(lty, nx)
+  angle <- rep(angle, nx)
+  if (!is.null(density))
+    if (length(density) < nx) density <- rep_len(density, nx)
+
+  # get coordinates of a circle with specified radius
+  twopi <- ifelse (clockwise, -2*pi, 2*pi)
+  t2xy <- function(t, radius) {
+      t2p <- twopi * t + init.angle * pi/180
+      list(x = radius * cos(t2p), y = radius * sin(t2p))
+  }
+
+  # construct plot slice by slice
+  for (i in 1L:nx) { 
+
+    # plot slice
+    n <- max(2, floor(edges * dx[i]))
+    P <- t2xy(seq.int(x[i], x[i + 1], length.out=n), radius)
+    polygon(c(P$x, 0), c(P$y, 0), density=density[i], angle=angle[i], 
+        border=border[i], col=col[i], lty=lty[i])
+
+    # plot label
+    lab <- as.character(labels[i])
+    P <- t2xy(mean(x[i + 0:1]), radius)
+    if (!is.na(lab) && nzchar(lab)) {
+        lines(c(1, 1.05) * P$x, c(1, 1.05) * P$y)
+        text(1.1 * P$x, 1.1 * P$y, labels[i], xpd=TRUE, 
+            adj=ifelse(P$x < 0, 1, 0), ...)
+    }
+
+  }  # end slice by slice
+
+  # add centered hole over the top of the pie
+  P <- t2xy(seq.int(0, 1, length.out=n*nx), hole)
+  polygon(P$x, P$y, col=hole.fill, border=border)
+
+  title(main=main.lbl, col.main=getOption("main.color"),
+        line=par("mgp")[1]-.5, ...)
 
 # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
 
+
+  # -----------
   # text output
-  if (length(dim(x)) == 1  && !quiet) {  # one variable
+  # -----------
 
-    stats <- .ss.factor(x, brief=TRUE, x.name=x.name)
+  #if (length(dim(x)) == 1  && !quiet) {  # one variable
+  if (!quiet) { 
 
-    txttl <- stats$title
-    counts <- stats$counts
-    chi <- stats$chi
-    class(txttl) <- "out_piece"
-    class(counts) <- "out_piece"
-    class(chi) <- "out_piece"
-    output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
+    if (.is.integer(x.tbl)) {
+      stats <- .ss.factor(x.tbl, brief=TRUE, x.name=x.name)
+      txttl <- stats$title
+      counts <- stats$counts
+      chi <- stats$chi
+      class(txttl) <- "out_piece"
+      class(counts) <- "out_piece"
+      class(chi) <- "out_piece"
+      output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
+    }
+    else {
+      stats <- .ss.numeric(x.tbl, brief=TRUE, x.name=getOption("yname"))
+      txout <- stats$tx
+      output <- list(out_stats=txout)
+    }
+
     class(output) <- "out_all"
     print(output)      
   }

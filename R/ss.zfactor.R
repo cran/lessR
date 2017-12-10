@@ -197,7 +197,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
           "nth column\n\n", sep="")
     }
 
-    else {
+    else {  # table not of unique values
 
     # potential abbreviation of column labels
     mx.chr <- max(nchar(names(x)))
@@ -256,8 +256,11 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
         txlbl <- tx
       }
 
+      freq.df <- as.data.frame(x)
+      names(freq.df)[1] <- x.name
+
       return(list(n.dim=n.dim, title=txttl, counts=txcnt, 
-                  chi=txchi, lbl=txlbl, freq=x, prop=xp))
+                  chi=txchi, lbl=txlbl, freq=x, freq.df=freq.df, prop=xp))
     }
   }  # one variable
 

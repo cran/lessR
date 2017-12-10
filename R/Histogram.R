@@ -155,8 +155,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
    by2.call <- NULL
 
 
-# ---------------
-# do the analysis
+  # ---------------
+  # do the analysis
 
   if (Trellis && do.plot) {
     .bar.lattice(data.x[,1], by1.call, by2.call, n.row, n.col, aspect, prop,

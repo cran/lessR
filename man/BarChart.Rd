@@ -211,7 +211,7 @@ Instead of calculating the counts from the data, the counts, or the values of an
 Or, include the already tabulated counts as the data which is read into R, either as a matrix or a data frame.
 
 STATISTICS\cr
-In addition to the barchart, descriptive and optional inferential statistics are also presented.  First, the frequency table for one variable or the joint frequency table for two variables is displayed. Second, the corresponding Cramer's V and chi-square test are also displayed by default. 
+In addition to the bar chart, descriptive and optional inferential statistics are also presented.  First, the frequency table for one variable or the joint frequency table for two variables is displayed. Second, the corresponding Cramer's V and chi-square test are also displayed by default. 
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is listed as the label for the horizontal axis unless xlab is specified in the function call. If there are two variables to plot, the title of the resulting plot is based on the two variable labels, unless a specific title is listed with the \code{main} option. The variable label is also listed in the text output, next to the variable name. If the analysis is for two variables, then labels for both variables are included. 
@@ -230,7 +230,7 @@ Instead, do the following:
 }
 
 \value{
-If the analysis is of a single categorical variable, a list is invisibly returned with two tables, the frequencies and the proportions, respectively named \code{freq} and \code{prop}.  If two categorical variables are analyzed, then nothing is returned.
+If the analysis is of a single categorical variable, a list is invisibly returned with two tables, the frequencies and the proportions, respectively named \code{freq} and \code{prop}, and also the frequency table converted to a data frame, named \code{freq.df} for input into other functions, including \code{ggplot2}.  If two categorical variables are analyzed, then nothing is returned.
 }
 
 
@@ -260,9 +260,9 @@ mydata <- data.frame(Pain, Gender)
 rm(Pain); rm(Gender)
 
 
-# --------------------------------------------
-# barchart from the data for a single variable
-# --------------------------------------------
+# ---------------------------------------------
+# bar chart from the data for a single variable
+# ---------------------------------------------
 
 # for each level of Pain, display the frequencies
 # Pain is an ordered factor, so the bar colors are ordered
@@ -299,9 +299,9 @@ myd <- Read("Cars93", format="lessR")
 bc(Make, horiz=TRUE, label.max=4, data=myd)
 
 
-# ----------------------------------------
-# barchart from the data for two variables
-# ----------------------------------------
+# -----------------------------------------
+# bar chart from the data for two variables
+# -----------------------------------------
 
 # at each level of Pain, show the frequencies of the Gender levels
 BarChart(Pain, by=Gender)

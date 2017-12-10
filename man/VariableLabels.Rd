@@ -58,7 +58,7 @@ lbl <- "
 Years, Years of Company Employment
 Gender, Male or Female
 Dept, Department Employed
-Salary, Annual Salary
+Salary, Annual Salary (USD)
 Satisfaction, Satisfaction with Work Environment
 HealthPlan, 1=GoodHealth 2=YellowCross 3=BestCare
 "

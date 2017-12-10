@@ -2,7 +2,6 @@
 function(add, x1, x2, y1, y2,
          add.cex, add.lwd, add.lty, add.color, add.fill, add.trans, ...) { 
 
-
   n.obj <- length(add)
   n.stk <- length(add.color)
   n.fll <- length(add.fill)

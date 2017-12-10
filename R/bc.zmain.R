@@ -121,7 +121,11 @@ function(x, y, by,
   if (is.matrix(x) && !is.null(rownames(x))) entered.pre <- TRUE
   entered <- ifelse (!is.integer(x) && is.double(x) && entered.pre, TRUE, FALSE)
 
-  if (!is.null(y)) {  # do not do counts, y is provided
+
+  # -------------------------------
+  # do not do counts, y is provided
+
+  if (!is.null(y)) {
     entered <- TRUE
     if (is.null(by)) {  # no by variable
       yn <- getOption("yname")
@@ -169,7 +173,8 @@ function(x, y, by,
       names(dimnames(m)) <- c(by.name, x.name) 
       x <- m
     }
-  }
+  }  # end !is.null(y)
+
   
   # save ordered status before converting x to a table
   order.x <- ifelse (is.ordered(x) && is.null(by), TRUE, FALSE)
@@ -194,7 +199,7 @@ function(x, y, by,
       x <- table(x, dnn=NULL)
       if (prop) x <- x/sum(x)
     }
-  }
+  }  # end !entered
 
 
   if (is.null(by) && beside && !entered) { 
@@ -203,7 +208,7 @@ function(x, y, by,
   }
 
 
-  # ----------------------------------------------------------------------------
+  # ------
   # colors
 
   # get n.colors (does not indicate col.fill multiple colors)
@@ -225,8 +230,8 @@ function(x, y, by,
   }
 
   # color palette
-  if ((order.x && is.null(by)) || order.y) {  # one var, an ordered factor
 
+  if ((order.x && is.null(by)) || order.y) {  # one var, an ordered factor
     lowhi <- .ordcolors(colors, col.low, col.hi) 
     col.low <- lowhi$col.low
     col.hi <- lowhi$col.hi
@@ -239,12 +244,8 @@ function(x, y, by,
     if (n.colors == 1 || length(col.fill) > 1)
       clr <- col.fill
     else {
-      if (n.colors == 2)
-        { light <- "gray70"; dark <- "gray40" }
-      else if (n.colors == 3)
-        { light <- "gray80"; dark <- "gray30" }
-      else 
-        { light <- "gray92"; dark <- "gray28" }
+      if (n.colors == 2) { light <- "gray70"; dark <- "gray40" }
+      else { light <- "gray84"; dark <- "gray30" }
       color.palette <- colorRampPalette(c(dark, light))
       clr <- color.palette(n.colors)
     }
@@ -612,7 +613,7 @@ function(x, y, by,
 
     if (!is.null(y) || !.is.integer(x)) {
       stats <- .ss.real(x, y, by, digits.d=dd,
-                        x.name, getOption("yname"), by.name, x.lbl, y.lbl, label.max) 
+                   x.name, getOption("yname"), by.name, x.lbl, y.lbl, label.max) 
       txtbl <- stats$txtbl 
       class(txtbl) <- "out_piece"
       output <- list(out_txt=txtbl)
@@ -620,7 +621,7 @@ function(x, y, by,
       class(output) <- "out_all"
       print(output)         
     }
-  }
+  }  # if (n.dim == 1  && !quiet)
 
   else if (!quiet) {  # two variables
     # need brief=FALSE for row proportions

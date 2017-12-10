@@ -101,12 +101,12 @@ function(x, y=NULL, data=mydata,
   lab.cex <- getOption("lab.cex")
   axis.cex <- getOption("axis.cex")
 
-  add.fill <- getOption("add.fill")
-  add.trans <- getOption("add.trans")
-  add.color <- getOption("add.color")
   add.cex <- getOption("add.cex")
   add.lwd <- getOption("add.lwd")
   add.lty <- getOption("add.lty")
+  add.color <- getOption("add.color")
+  add.fill <- getOption("add.fill")
+  add.trans <- getOption("add.trans")
 
   rotate.x <- getOption("rotate.x")
   rotate.y <- getOption("rotate.y")
@@ -1156,7 +1156,8 @@ function(x, y=NULL, data=mydata,
     fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
     fncl <- gsub(" = ", "=", fncl)
   }
-  
+
+
   if (Trellis && do.plot) {
 
     if (c.type != "dot") {

@@ -9,21 +9,26 @@ Generates a color wheel for specified \code{hcl} colors at fixed values of chrom
 }
 
 \usage{
-  showWheel(clr=NULL, h.beg=0, h.end=300, n.colors=10, c=100, l=65,
-           radius=0.9)
+  showWheel(clr="discrete", h1=0, h2=NULL, n=10, c=100, l=65, fixup=TRUE,
+         radius=0.9, \ldots)
 }
 
 \arguments{
-  \item{clr}{Optional specified colors to plot on the wheel. If specified,
-  then the following parameters are not relevant.}/cr
+  \item{clr}{Optional specified colors to plot on the wheel. If list of
+  custom colors, then the following parameters are not relevant.}/cr
 
-  \item{h.beg}{Beginning hue, 0 to 360.}
-  \item{h.end}{Ending hue, 0 to 360.}
-  \item{n.colors}{Number of hues to display.}
+  \item{h1}{Beginning hue, 0 to 360.}
+  \item{h2}{Ending hue, 0 to 360.}
+  \item{n}{Number of hues to display.}
   \item{c}{Constant value of chroma.}
-  \item{l}{Constant value of luminance.}\cr
+  \item{l}{Constant value of luminance.}
+  \item{fixup}{R parameter name. If \code{TRUE}, then HCL values outside of
+        the displayable RGB color space are transformed to fit into that space
+        so as to display.}\cr
 
   \item{radius}{Size of wheel.}\cr
+
+  \item{\ldots}{Other parameter values.}
 }
 
 
@@ -45,7 +50,7 @@ Plots a \code{hcl} color wheel with constant chroma and luminance. Or, enter a s
 showWheel()
 
 # generate a color wheel with 10 slices, starting at h=220 (blue)
-showWheel(h.beg=220, h.end=200, n.colors=10)
+showWheel(h1=220, h2=200, n=10)
 
 # manual entry
 showWheel(c("black", "blue", "red"))
