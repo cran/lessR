@@ -81,6 +81,9 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     par(bg=getOption("window.fill"))
     par(mai=c(bm, lm, tm, rm))
     
+    if (!is.numeric(x.values))
+      if (!is.factor(x.values)) x.values <- as.factor(x.values)
+
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
@@ -110,9 +113,11 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     col.color <- getOption("pt.color")
     
     eq.int <- TRUE
-    d.x <- diff(x.values) 
-    for (i in 2:(length(d.x)))
-      if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
+    if (is.numeric(x.values)) {
+      d.x <- diff(x.values) 
+      for (i in 2:(length(d.x)))
+        if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
+    }
 
     if (length(unique(x.values)) > getOption("n.cat")  ||  !eq.int)
       points(x.values, y.values, pch=21, col=col.color, bg=col.fill, cex=size.pt)

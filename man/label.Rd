@@ -46,21 +46,21 @@ mydata <- Read("Employee", format="lessR")
 # variable label as the title of a graph from a standard R function
 # the data are not attached, so for standard R functions, must
 #   identify the relevant data frame, such as with function: with
-with(mydata, barplot(table(Dept), main=label(Dept)))
-with(mydata, hist(Salary, main=label(Salary)))
+#with(mydata, barplot(table(Dept), main=label(Dept)))
+#with(mydata, hist(Salary, main=label(Salary)))
 
 # assign a new label for the variable Years in mydata
-mydata <- label(Years, "Years Worked")
+#mydata <- label(Years, "Years Worked")
 # verify
-label(Years)
+#label(Years)
 # or view all variable labels in mydata
-details.brief()
+#db()
 
-mydata <- Read("Employee", format="lessR")
+#mydata <- Read("Employee", format="lessR")
 # specify a label of variable in a data frame other than mydata
-myd <- Subset(Gender=="M")
-myd <- label(Gender, "Only is Male", data=myd)
-details.brief(myd)
+#myd <- Subset(Gender=="M")
+#myd <- label(Gender, "Only is Male", data=myd)
+#db(myd)
 }
 
 

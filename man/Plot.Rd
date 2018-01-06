@@ -390,7 +390,7 @@ bx(\ldots)
         Not a literal maximum as preserving unique values may require a larger number
         of characters than specified.}
   \item{origin.x}{Origin of \code{x}-axis. Particularly useful for plots of
-       \code{count}, etc, where the origin will be zero by default, but can
+       \code{count}, etc, where the origin is zero by default, but can
        be modified. Otherwise the origin of the plot is based on the minimum
        value of \code{x}.}\cr
 
@@ -604,9 +604,9 @@ Plot(Years, Salary, auto=TRUE)
 # plot 0.95 data ellipse with the points identified that represent
 #   outliers defined by a Mahalanobis Distance larger than 6 
 # save outliers into R object out, then remove from mydata
-mydata[1, "Salary"] <- 200000
-out <- Plot(Years, Salary, ellipse=0.95, MD.cut=6)
-mydata <- mydata[-out$outlier_indices,]
+#mydata[1, "Salary"] <- 200000
+#out <- Plot(Years, Salary, ellipse=0.95, MD.cut=6)
+#mydata <- mydata[-out$outlier_indices,]
 
 # new shape and point size, no grid or background color
 # then put style back to default
@@ -621,7 +621,7 @@ mydata <- mydata[-out$outlier_indices,]
 
 # bubble plot with size determined by the value of Pre
 # display the value for the bubbles with values of  min, median and max
-#Plot(Years, Salary, size=Pre, size.cut=3)
+# Plot(Years, Salary, size=Pre, size.cut=3)
 
 # variables of interest are in a data frame not the default mydata
 # plot 0.6 and 0.9 data ellipses
@@ -632,10 +632,10 @@ mydata <- mydata[-out$outlier_indices,]
 # scatterplot with two x-variables, plotted against Salary
 # define a new style, then back to default
 #style(window.fill=rgb(247,242,230, maxColorValue=255),
-# panel.fill="off", panel.color="off", pt.fill="black", trans=0,
-# lab.color="black", axis.text.color="black",
-# axis.y.color="off", grid.x.color="off", grid.y.color="black",
-# grid.lty="dotted", grid.lwd=1)
+#  panel.fill="off", panel.color="off", pt.fill="black", trans=0,
+#  lab.color="black", axis.text.color="black",
+#  axis.y.color="off", grid.x.color="off", grid.y.color="black",
+#  grid.lty="dotted", grid.lwd=1)
 #Plot(c(Pre, Post), Salary)
 #style()
 
@@ -685,7 +685,7 @@ Plot(Years, Salary, by1=Dept)
 # One continuous variable
 # -----------------------
 # Integrated Violin/Box/Scatterplot, a VBS plot
-#Plot(Salary)
+Plot(Salary)
 
 # by variable, different colors for different values of the variable
 # all on one panel
@@ -819,14 +819,14 @@ Plot(Salary, row.names)
 # analysis of two categorical variables (Likert data)
 #----------------------------------------------------
 
-mydata <- rd("Mach4", format="lessR", quiet=TRUE)  # Likert data, 0 to 5
+#mydata <- rd("Mach4", format="lessR", quiet=TRUE)  # Likert data, 0 to 5
 
 # size of each plotted point (bubble) depends on its joint frequency
 # triggered by default when replication of joint values and
 #   less than 9 unique data values for each 
 # n.cat=6 means treat responses as categorical for up to 6 equally-spaced
 #   integer values
-Plot(m06, m07, n.cat=6)
+#Plot(m06, m07, n.cat=6)
 
 # use value labels for the integer values, modify color options
 #LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
@@ -885,8 +885,8 @@ Plot(m06, m07, n.cat=6)
 #color2 <- clr[sample(1:length(clr), size=1)]
 #style(window.fill=color0, area.fill=color1, color=color2)
 #Plot(x, y, run=TRUE, 
-# xy.ticks=FALSE, main="Modern Art", xlab="", ylab="",
-# cex.main=2, col.main="lightsteelblue", n.cat=0, center.line="off")
+#  xy.ticks=FALSE, main="Modern Art", xlab="", ylab="",
+#  cex.main=2, col.main="lightsteelblue", n.cat=0, center.line="off")
 #style() # reset style to default
 }
 

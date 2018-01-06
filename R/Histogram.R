@@ -220,15 +220,17 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
         txss <- ""
         if (!quiet) {
-          ssstuff <- .ss.numeric(data[,i], digits.d=digits.d, brief=TRUE)
+          ssstuff <- .ss.numeric(data[,i], digits.d=digits.d,
+            brief=TRUE)
           txss <- ssstuff$tx
         }
 
         # nothing returned if quiet=TRUE
+
         stuff <- .hst.main(data[,i], fill, color, reg,
             lab.cex, axis.cex, rotate.x, rotate.y, offset,
             breaks, bin.start, bin.width,
-            bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub,
+            bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub, 
             quiet, do.plot, fun.call=fun.call, ...)
         txsug <- stuff$txsug
         if (is.null(txsug)) txsug <- ""

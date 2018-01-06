@@ -1,123 +1,117 @@
-VariableLabels <- 
-function(x, value=NULL, data=mydata, quiet=getOption("quiet")) {
+VariableLabels <-
+function(x, value=NULL, quiet=getOption("quiet")) {
 
-  x.name <- deparse(substitute(x)) 
-  options(xname = x.name)
-
-  df.name <- deparse(substitute(data))   # get name of data table
-  options(dname = df.name)
-
-  # if analyzing a data table and not a single var,
-  #   if a tibble convert to data frame (must already have df.name)
-  if (missing(x)) if (class(data)[1] == "tbl_df") {
-    data <- as.data.frame(data)
+  missx <- ifelse (missing(x), TRUE, FALSE) 
+  if (!missx) {
+    x.name <- deparse(substitute(x))
+    options(xname = x.name)
   }
-  fmt <- "none"  # see if x is a file reference
-  if (grepl(".csv", x.name)) fmt <- "csv" 
-  if (grepl(".xlsx", x.name)) fmt <- "Excel" 
+  else
+    x.name <- NULL
 
-  # get conditions and check for data existing
-  xs <- .xstatus(x.name, df.name)
-  in.style <- xs$ig 
-
-  # see if the data frame exists, if x not in style Env or function call
-  if (!in.style) {
-    if (!exists(df.name)) {
-      if (df.name == "mydata") 
-        txtA <- ", the default data frame name, " else txtA <- " "
-      txtB1 <- "Create the labels by reading with Read and labels option\n"
-      txtB <- paste(txtB1, sep="")
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Data frame ", df.name, txtA, "does not exist\n\n", txtB, "\n")
+  # extract labels/units from a data frame
+  if (!is.null(x.name)) if (exists(x.name, where=.GlobalEnv)) { 
+    if (is.data.frame(x)) {
+      label <- attr(get(x.name, pos=.GlobalEnv), which="variable.labels")
+      unit <- attr(get(x.name, pos=.GlobalEnv), which="variable.units")
+      mylbl <- cbind(label, unit)
+      mylabels <- as.data.frame(mylbl, stringsAsFactors=FALSE,
+                                row.names=names(label))
+      if (!is.null(unit)) for (i in 1:nrow(mylabels))
+        if (is.na(mylabels[i,2])) mylabels[i,2] <- ""
+      if (ncol(mylabels) == 1) names(mylabels) <- "label"
+      if (ncol(mylabels) == 2) names(mylabels) <- c("label", "unit")
+      if (is.null(mylbl))
+        cat("\nNo variable labels present in the data file\n\n")
+      return(mylabels)
     }
   }
-    # see if variable exists in the data frame
-    x.is.var <- FALSE
-    if (nzchar(x.name)) if (exists(x.name, where=data)) 
-      x.is.var <- TRUE
+
+  # mylabels: modify existing or add new row
+  mylbYN <- ifelse (exists("mylabels", where=.GlobalEnv), TRUE, FALSE) 
+  if (mylbYN && !missx && !is.null(value)) {
+    if (length(mylabels[which(row.names(mylabels) == x.name), 1]) > 0) {
+      mylabels[which(row.names(mylabels) == x.name), 1] <- value
+    }
+    else {
+      nr <- nrow(mylabels)
+      mylabels[nr + 1, 1] <- value
+      row.names(mylabels)[nr + 1] <- x.name
+    }
+  return(mylabels)
+  }
 
 
-  # ------------------------------------------
+  # display only or read from external file
+  # --------------------------------------- 
 
-  # display existing label or all labels
-  if (is.null(value)  &&  !in.style  &&  fmt=="none") {  
-    if (nzchar(x.name)) {
-      gl <- .getlabels()
-      lbl <- gl$xl
+  frm.cnsl <- FALSE
+  if (!missx) 
+    if (exists(x.name, where=.GlobalEnv))
+      if (grepl("\n", x, fixed=TRUE)) frm.cnsl <- TRUE  # from console
+
+  fmt <- "none"  # see if x is a file reference
+  if (!is.null(x.name)) {
+    if (grepl(".csv", x.name)) fmt <- "csv"
+    if (grepl(".xlsx", x.name)) fmt <- "Excel"
+  }
+
+
+  # display only
+  if (!frm.cnsl  &&  fmt=="none" && is.null(value)) {
+    if (missx && is.null(x.name)) {  # display all labels
+      cat("\n")
+      for (i in 1:nrow(mylabels))
+        cat(row.names(mylabels)[i], ": ", mylabels[i,], "\n", sep="")
+    }
+    else {  # display existing label
+      lbl <- mylabels[which(row.names(mylabels) == x.name), 1]
       if (is.null(lbl)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The variable label does not exist for variable: ", x.name, "\n\n")
       }
       cat("\n")
       cat(x.name, ": ", lbl, "\n", sep="")
-     }
-    else {  # display all labels
-      mylabels <- attr(data, which="variable.labels")
-      cat("\n")
-      for (i in 1:length(mylabels))
-        cat(names(mylabels)[i], ": ", mylabels[i], "\n", sep="")
     }
   }
 
-  else {  # assign labels to vars in a data frame and return data frame
+  # assign labels to vars in a data frame and return data frame
+  else {
 
-    if (fmt == "none")  # no external file
-      if (!x.is.var)  # x is a file var names and labels from the console
-        mylabels <- read.csv(text=x, col.names=c("Var", "label"), row.names=1,
-                             header=FALSE)
-      else {  # x is a single variable
-        mylabels <- c(x.name, value)
-      }
-    else if (fmt == "csv")  # x is a file name
-      mylabels <- read.csv(x, col.names=c("Var", "label"), row.names=1,
-                           header=FALSE)
-    else { 
+    # get labels
+    if (fmt == "none")  {# no external file, read from console
+      l <- read.csv(text=x, row.names=1,
+                    header=FALSE, stringsAsFactors=FALSE)
+      if (ncol(l) == 1) names(l) <- "label"
+      if (ncol(l) == 2) names(l) <- c("label", "unit")
+    }
+    else if (fmt == "csv") {  # x is a file name
+      l <- read.csv(x, row.names=1,
+                           header=FALSE, stringsAsFactors=FALSE)
+      if (ncol(l) == 1) names(l) <- "label"
+      if (ncol(l) == 2) names(l) <- c("label", "unit")
+    }
+    else {
       if (fmt=="Excel"  &&  grepl("http", x, fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-            "At this time the underlying read_excel function\n",
-            "does not support reading Excel files from the web.\n",
-            "Can use the  download.file  function to download to the\n",
-            "local file system.\n\n",
+            "The underlying read_excel function does not\n",
+            "support reading Excel files from the web.\n",
+            "Use the  download.file  function to download\n",
+            "the file to your local file system.\n\n",
             "  download.file(\"", x, "\", \"MYFILE.xlsx\")\n\n",
             "Replace MYFILE with the desired file name.\n",
             "Enter  getwd()  to see where the file was saved. \n\n")
       }
-      #mylabels <- read.xls(xls=x, sheet=1, na.strings=c("NA","#DIV/0!", ""))
-      mylabels <- read_excel(x, col_names=c("Var", "label"))
-      mylabels <- data.frame(mylabels, row.names=1)
+      l <- as.data.frame(read_excel(x, col_names=FALSE))
+      l <- as.data.frame(l, row.names=l[,1])
+      l <- l[, -1]
+      if (ncol(l) == 1) names(l) <- "label"
+      if (ncol(l) == 2) names(l) <- c("label", "unit")
     }
 
-    if (in.style  ||  fmt!="none") { # transfer table of labels and maybe units to data
-      
-      attr(data, which="variable.labels") <- as.character(mylabels$label)
-      names(attr(data, which="variable.labels")) <- as.character(row.names(mylabels))
-      if (ncol(mylabels) == 2) {
-        attr(data, which="variable.units") <- as.character(mylabels$unit)
-        names(attr(data, which="variable.units")) <- as.character(row.names(mylabels))
-      }
-      if (!quiet) details.brief(data)
-    }
-
-    else {  # single assignment of a variable label
-      mylabels <- attr(data, which="variable.labels")
-      lbl.len <- length(mylabels)
-      if (x.name %in% names(mylabels)) { #cat("IS IN\n")
-        lbl.index <- which(names(mylabels) == x.name)
-        indx <- lbl.index
-      }
-      else
-        indx <- length(mylabels) + 1
-      mylabels[indx] <- value
-      names(mylabels)[indx] <- x.name
-      cat("\n")
-      cat("Variable Name:",  names(mylabels)[indx], "\n")
-      cat("Variable Label:", mylabels[indx], "\n")
-      cat("\n")
-      attr(data, which="variable.labels") <- mylabels
-    }
-
-    return(data) 
+  return(l)
   }
-  
+
   cat("\n")
+
 }

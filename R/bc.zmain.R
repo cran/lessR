@@ -8,7 +8,6 @@ function(x, y, by,
          col.low, col.hi,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
 
-
   # if x is integer, not labeled correctly
   if (length(unique(x)) != length(x)) if (!is.factor(x)) x <- factor(x)
 
@@ -22,8 +21,6 @@ function(x, y, by,
     cat("\n"); stop(call.=FALSE, "\n","------\n",
     "Need to specify a value for:  legend.title\n\n")
   }
-
-  if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels)
 
   # get values for ... parameter values
   #stuff <- .getdots(...)
@@ -164,6 +161,7 @@ function(x, y, by,
       x <- as.table(x)
       if (prop) x <- x/sum(x)
     }
+
     else {  # a by variable
       do.row <- ifelse (x[1] == x[2], FALSE, TRUE)  # x is outer loop
       m <- matrix(y, nrow=length(levels(by)), byrow=do.row)
@@ -172,6 +170,7 @@ function(x, y, by,
       m <- as.table(m, dnn=c(by.name, x.name))
       names(dimnames(m)) <- c(by.name, x.name) 
       x <- m
+      if (prop) x <- prop.table(x, 2)
     }
   }  # end !is.null(y)
 
@@ -180,7 +179,7 @@ function(x, y, by,
   order.x <- ifelse (is.ordered(x) && is.null(by), TRUE, FALSE)
   order.y <- ifelse (is.ordered(by), TRUE, FALSE)
 
-  # tabulate when need to get counts
+  # tabulate for counts
   if (!entered) {  # x.temp allows frequencies to be restored for text output
     if (!is.null(by)) {
       if (length(x) == length(by))
@@ -336,8 +335,11 @@ function(x, y, by,
   # ----------------------------------------------------------------------------
   # set up plot area
 
-  # set margins
-  if (is.null(value.labels)) {
+  # value labels
+  if (!is.null(value.labels)) {
+    val.lab <- value.labels
+  }
+  else {
     if (is.null(by))
       val.lab <- names(x)
     else
@@ -345,9 +347,9 @@ function(x, y, by,
     if (length(val.lab) == 0) val.lab <- colnames(x)  # read matrix directly
     if (!is.null(names(y))) val.lab <- names(y)
   }
-  else
-    val.lab <- value.labels
-  val.lab <- gsub(" ", "\n", val.lab) 
+
+  for (i in 1:length(val.lab))  # for each value label, partition into lines
+    val.lab[i] <- .makelines(val.lab[i], mx.ch=11)
   if (!is.null(val.lab)) val.lab <- .abbrev(val.lab, label.max)
  
   if(is.null(y)) if (horiz) {  # switch
@@ -358,7 +360,7 @@ function(x, y, by,
 
   ly <- length(y.lab)
   if (ly > 1) {  # not perfect, but some line break better than none
-    if (nchar(y.lab[ly]) > 33) {
+    if (nchar(y.lab[ly]) > 38) {
       brk <- nchar(y.lab[ly]) %/% 2  # break label down the middle
       while (substr(y.lab[ly],brk,brk) != " ") brk <- brk-1  # break at a word
       line1 <- substr(y.lab[ly], 1, brk)
@@ -367,8 +369,16 @@ function(x, y, by,
     }
   }
 
-  max.width <- strwidth(as.character(max(pretty(c(min.y, max.y)))),
-                        units="inches")
+  if (!horiz)
+    max.width <- strwidth(as.character(max(pretty(c(min.y, max.y)))),
+                          units="inches")
+  else {
+    val.split <- unlist(strsplit(val.lab, "\n"))
+    # strange strwidth bug, 1st time works, 2nd time too large by 0.5
+    # refresh source code, works again until 2nd time
+    #max.width <- strwidth(max(val.split), units="inches") 
+    max.width <- nchar(max(val.split)) / 16
+ }
 
   margs <- .marg(max.width, y.lab, x.lab, main.lab, x.val=val.lab, prop,
                  rotate.x)
@@ -377,11 +387,9 @@ function(x, y, by,
   rm <- margs$rm
   bm <- margs$bm
  
-  lm <- lm + .10
-  if (prop) lm <- lm + .25
   if (horiz) {
     bm <- bm + .10  # kludge, for horiz, long labels overrun plot area
-    lm <- lm + .06
+    #lm <- lm + .06
     if (las.value == 1) lm <- lm + .12
   }
   if (legend.loc == "right.margin"  &&  (!is.null(by) || is.matrix(x)))
@@ -523,7 +531,7 @@ function(x, y, by,
     if (!is.null(y.lab))
       if (grepl("\n", y.lab[i], fixed=TRUE)) multi <- TRUE  # multi-line
   lm <- par("mar")[2]  # get the current left margin
-  lbly.lns <- ifelse (multi, lm - 2, lm - 1.4)
+  lbly.lns <- ifelse (multi, lm - 2.3, lm - 1.4)
   lab.y.color <- ifelse(is.null(getOption("lab.y.color")), 
     getOption("lab.color"), getOption("lab.y.color"))
   title(ylab=y.lab, line=lbly.lns, cex.lab=lab.y.cex, col.lab=lab.y.color)
@@ -549,24 +557,23 @@ function(x, y, by,
              horiz=legend.horiz, cex=.7, bty="n", text.col=col.txt)
   }
 
+
   # ----------------------------------------------------------------------------
   # text output
 
-  if (prop && is.null(y)) {
-    if (!is.null(by) || is.matrix(x))
-      x  <- x.temp 
-    else
-      x <- table(x.temp)
+  if (prop) {
+    if (is.null(y)) {
+      if (!is.null(by) || is.matrix(x))
+        x  <- x.temp 
+      else
+        x <- table(x.temp)
+    }
   }
-  if (prop && !is.null(y))
-    x <- as.table(x.temp)
-
 
   dd <- .getdigits(x, min.digits=0) - 1
   n.dim <- length(dim(x))
   stats <- ""
   # one variable, dim == 0 if x<-x.temp 
-  #if (is.null(by)  &&  !is.matrix(x)  && !quiet) {
   if (n.dim == 1  && !quiet) {
     # only process if counts
     if (.is.integer(x)  &&  all(x >= 0)  &&  is.null(y) ) {
@@ -577,13 +584,15 @@ function(x, y, by,
         fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("Plot(", x.name,
-                    ", values=\"count\")  # scatter plot", sep="")
+                    ", values=\"count\")  # lollipop plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("BarChart(", x.name,
                     ", horiz=TRUE)  # horizontal bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("BarChart(", x.name,
                     ", colors=\"rainbow\")  # different bar colors", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("PieChart(", x.name, ")  # doughnut chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
       }
 
@@ -609,7 +618,7 @@ function(x, y, by,
       }  # is.null(y)
     }
     else 
-        stats <- NULL
+      stats <- NULL
 
     if (!is.null(y) || !.is.integer(x)) {
       stats <- .ss.real(x, y, by, digits.d=dd,
@@ -623,18 +632,23 @@ function(x, y, by,
     }
   }  # if (n.dim == 1  && !quiet)
 
-  else if (!quiet) {  # two variables
+  # two variables
+  else if (!quiet) {
     # need brief=FALSE for row proportions
 
     txsug <- ""
     if (getOption("suggest")) {
-      txsug <- ">>> Suggestions\n"
-      fc <- paste("Plot(", x.name, ", ", by.name, ") ", sep="")
-      txsug <- paste(txsug, fc, sep="")
-      fc <- paste("\nSummaryStats(", x.name, ", ", by.name, 
-                  ")  # or ss", sep="")
-      txsug <- paste(txsug, fc, sep="")
+      txsug <- ">>> Suggestions"
+      fc <- paste("Plot(", x.name, ", ", by.name, ")  # bubble plot", sep="")
+      txsug <- paste(txsug, "\n", fc, sep="")
+      fc <- paste("BarChart(", x.name, ", by=", by.name,
+                  ", horiz=TRUE)  # horizontal bar chart", sep="")
+      txsug <- paste(txsug, "\n", fc, sep="")
+      fc <- paste("BarChart(", x.name, ", by=", by.name,
+                  ", colors=\"rainbow\")  # different bar colors", sep="")
+      txsug <- paste(txsug, "\n", fc, sep="")
     }
+
     if (is.null(y) && .is.integer(x)) {
 
       stats <- .ss.factor(x, by, brief=FALSE, digits.d=NULL,
@@ -660,7 +674,7 @@ function(x, y, by,
     }  # end is.null(y)
 
     else {  # y is present
-      stats <- .ss.real(x, y, by, digits.d=dd,
+      stats <- .ss.real(x, y, by, digits.d=3,
                         x.name, getOption("yname"), by.name, x.lbl, y.lbl, label.max) 
       txtbl <- stats$txtbl 
       class(txtbl) <- "out_piece"

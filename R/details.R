@@ -25,22 +25,29 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   }
 
     reg.fac <- FALSE
-    for (i in 1:n.var) if (class(data[,i])[1] == "factor") reg.fac <- TRUE
+    for (i in 1:n.var) if (is.factor(data[,i])[1]) reg.fac <- TRUE
 
     ord.fac <- FALSE
-    for (i in 1:n.var) if (class(data[,i])[1] == "ordered") ord.fac <- TRUE
+    for (i in 1:n.var) if (is.ordered(data[,i])[1]) ord.fac <- TRUE
 
     chr.flg <- FALSE
-    for (i in 1:n.var) if (class(data[,i])[1] == "character") chr.flg <- TRUE
+    for (i in 1:n.var) if (is.character(data[,i])[1]) chr.flg <- TRUE
+
+    int.flg <- FALSE
+    for (i in 1:n.var) if (is.integer(data[,i])[1]) int.flg <- TRUE
+
+    num.flg <- FALSE
+    for (i in 1:n.var) if (is.numeric(data[,i])[1]) num.flg <- TRUE
 
     cat("\n")
     cat("Data Types\n")
     .dash(60)
-    if (reg.fac) cat("factor: Non-numeric categories, read as unordered categories\n")
+    if (reg.fac) cat("factor: Non-numeric categories, read as unordered ",
+        "categories\n")
     if (ord.fac) cat("ordfact: Ordered, non-numeric categories\n")
-    if (chr.flg) cat("character: Non-numeric unique values\n")
-    cat("integer: Numeric data values, but integers only\n")
-    cat("numeric: Numeric data values with decimal digits\n")
+    if (chr.flg) cat("character: Non-numeric data values\n")
+    if (int.flg) cat("integer: Numeric data values, integers only\n")
+    if (num.flg) cat("numeric: Numeric data values with decimal digits\n")
     .dash(60)
   cat("\n")
 
@@ -209,7 +216,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
 
     .dash(width.ln)
     for (i in 1:n.lines) {
-      blanks <- paste(rep(" ", width.nm-nchar(names(mylabels)[i])), collapse = "")
+      blanks <- paste(rep(" ", width.nm-nchar(names(mylabels)[i])), collapse="")
       if (is.na(mylabels[i])) mylabels[i] <- ""
       cat(names(mylabels)[i], blanks, mylabels[i], "\n")
     }
@@ -220,8 +227,8 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
       .dash(64)
     }
   }
-  else
-    cat("No variable labels\n")
+  #else
+  #  cat("No variable labels\n")
 
     cat("\n")
 
@@ -246,8 +253,8 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     }
     .dash(width.ln)
   }
-  else
-    cat("No variable units\n")
+  #else
+  #  cat("No variable units\n")
 
   cat("\n")
 }

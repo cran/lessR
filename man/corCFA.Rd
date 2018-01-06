@@ -217,7 +217,7 @@ fit
 lambda <- sqrt(fit$diag.cor)
 lambda
 
-# alternative specification described in Gerbing(2013),
+# alternative specification described in Gerbing(2014),
 #   retained to be consistent with that description
 # can specify the items with a colon and with commas
 # abbreviated form of function name: cfa

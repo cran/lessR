@@ -1,21 +1,10 @@
 BoxPlot <-
 function(...) {
 
-cat("\n")
-cat("The BoxPlot function is deprecated\n")
-cat("Use Plot instead, which, for a continuous variable,\n")
-cat("  generates an integrated Violin/Box/Scatterplot, a VBS plot\n")
-cat("\n")
-cat("If only a box plot is wanted, add the parameter\n")
-cat("      vbs.plot=\"b\"\n")
-cat("to the function call to Plot\n")
-cat("The default is vbs.plot=\"vbs\", that is, all three plots\n")
-cat("\n")
-cat("For a Trellis plot, multiple panels, one for each level of,\n")
-cat("  a variable named X\n")
-cat("Add the parameter by1=X, and by2 for two categorical variables\n")
-cat("And the parameter by=X for multiple levels on the same panel\n")
-cat("\n")
+ cat("BoxPlot is now just a special case of the Plot function with\n",
+     "vbs.plot=\"b\", i.e., only a box plot instead of integrated\n",
+     "with a violin plot and a scatterplot (VBS plot)")
+ cat("\n\n")
+ Plot(fun.call=match.call(), vbs.plot="b", ...)
+
 }
-
-

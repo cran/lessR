@@ -1,4 +1,4 @@
-details.brief <-
+db <-
 function(..., brief=TRUE)
 
  details(..., brief=TRUE)

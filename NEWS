@@ -6,14 +6,64 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
   
->>>>>> Changes for lessR version 3.6.7 (2017-xx-xx) <<<<<<
+>>>>>> Changes for lessR version 3.7.0 (2019-01-06) <<<<<<
+
+-------------
+Updates 3.7.0
+-------------
+
+BarChart
+  value labels more efficiently partitioned into separate lines
+  y-label moved in a bit for horz=TRUE and mult-line label
+
+BoxPlot
+  function call restored, calls Plot(..., vbs.plot="b")
+
+Details
+  details.brief shortened to db
+
+Plot
+  parameter values only displayed if corresponding plot selected,
+    e.g., no bandwidth (bw) if no violin plot, vbs.plot="bs" 
+
+Read
+  stringsAsFactors=FALSE, that is, character string variables read
+    as type character instead of type factor
+  labels parameter deprecated as labels now stored in mylabels
+
+VariableLabels
+  creates or modifies existing data frame of variable labels distinct 
+    from the data frame of the data, save labels in mylabels data frame
+
+
+---------------
+Bug Fixes 3.7.0
+--------------- 
+
+BarChart
+  prop works for y (numerical value to plot) directly specified
+  decimal digits set to 3 for prop, fields fit better
+
+Density
+  missing data now automatically removed
+
+Regression
+  dummy variables work
+
+Sort
+  can sort character variables
+
+
+
+  
+>>>>>> Changes for lessR version 3.6.7 (2017-12-10) <<<<<<
 
 -------------
 Updates 3.6.7
 -------------
 
 BarChart
-  added a returned dataframe of the frequency table
+  added a returned data frame of the frequency table
   
 BoxPlot
   deprecated with message to use Plot instead
@@ -35,8 +85,9 @@ showWheel
 Bug Fixes 3.6.7
 --------------- 
 
-in Debian and some other versions of Linux, regression  mark-up file for
+in Debian and some other versions of Linux, regression mark-up file for
   interpretation crashed, now fixed
+
 
   
 >>>>>> Changes for lessR version 3.6.6 (2017-09-08) <<<<<<

@@ -24,6 +24,7 @@ function(x, col.fill=NULL, col.color=NULL, col.reg=NULL,
   lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
   adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
 
+
   gl <- .getlabels(xlab, ylab, main, lab.x.cex=lab.x.cex, 
                    lab.y.cex=lab.y.cex)
   x.name <- gl$xn; x.lbl <- gl$xl

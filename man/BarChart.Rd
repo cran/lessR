@@ -260,9 +260,9 @@ mydata <- data.frame(Pain, Gender)
 rm(Pain); rm(Gender)
 
 
-# ---------------------------------------------
-# bar chart from the data for a single variable
-# ---------------------------------------------
+# --------------------------------------------------------
+# bar chart from tabulating the data for a single variable
+# --------------------------------------------------------
 
 # for each level of Pain, display the frequencies
 # Pain is an ordered factor, so the bar colors are ordered
@@ -276,8 +276,6 @@ myCount
 style(rotate.x=45, offset=1)
 BarChart(Pain)
 style()
-# compare to standard R bar plot, which requires mydata$ reference
-barplot(table(mydata$Pain))
 
 # Gender is unordered, so one color used for all the bars
 BarChart(Gender)
@@ -285,23 +283,19 @@ BarChart(Gender)
 # column proportions instead of frequencies
 BarChart(Gender, proportion=TRUE)
 
-# specify a unique bar color for each of the two bars, then reset theme
+# unique bar color for each of the two bars, then reset theme
 style(bar.fill=c("palegreen3","tan"))
 BarChart(Gender)
 style()
 
-# automatically provide horizontal value labels 
-#   and adjust left margin as needed
-BarChart(Pain, horiz=TRUE)
-
-# manage size of horizontal value labels
+# invoke and manage size of horizontal value labels
 myd <- Read("Cars93", format="lessR")
 bc(Make, horiz=TRUE, label.max=4, data=myd)
 
 
-# -----------------------------------------
-# bar chart from the data for two variables
-# -----------------------------------------
+# ----------------------------------------------------
+# bar chart from tabulating the data for two variables
+# ----------------------------------------------------
 
 # at each level of Pain, show the frequencies of the Gender levels
 BarChart(Pain, by=Gender)
@@ -341,9 +335,9 @@ BarChart(Pain, by=Gender,
 style()
 
 
-# ---------------------------------------------
-# multiple bar charts across multiple variables
-# ---------------------------------------------
+# -----------------------------------------------------------------
+# multiple bar charts tabulated from data across multiple variables
+# -----------------------------------------------------------------
 
 # bar charts for all non-numeric variables in the data frame called mydata
 #   and all numeric variables with a small number of values, < n.cat
@@ -376,7 +370,6 @@ BarChart(Travel, horiz=TRUE)
 # ----------------------------
 # bar chart directly from data
 # ----------------------------
-
 
 # include a y-variable, here Salary, in the data table to read directly
 mydata <- read.csv(text="

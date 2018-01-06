@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.6.7      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
+      "lessR 3.7.0      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
       "---------------------------------------------------------------------\n",
       "1. mydata <- Read()        Read text, Excel, SPSS, SAS or R data file\n",
       "2. Help()                  Get help\n",
@@ -691,10 +691,37 @@ function(...) {
 }
 
 
+# process a char string of words into lines of max <D-d>mx.ch length
+.makelines <- function(ch, mx.ch=11) {
+
+  w <- unlist(strsplit(ch, " "))
+  lw <- length(w)
+  n <- nchar(w)
+  n[lw + 1] <- 0
+
+  vlbl <- ""
+  n.ln <- 0
+  for (i in 1:lw) {
+    if (n.ln + n[i] > mx.ch) {
+      delim <- "\n"
+      n.ln <- 0
+    }
+    else {
+      delim <- " "
+      n.ln <- n.ln + n[i] + 1
+    }
+  if (i == 1) delim <- ""
+  vlbl <- paste(vlbl, delim, w[i], sep="")
+  }
+
+  return(vlbl)
+}
+
+
 # get variable labels if they exist,  get rid of lab.cex - not used
 .getlabels <- function(xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
                        y.nm=FALSE, by.nm=FALSE, by1.nm=FALSE,
-                       lab.x.cex=NULL, lab.y.cex=NULL,
+                       lab.x.cex=NULL, lab.y.cex=NULL, labels=mylabels,
                        graph.win=TRUE, ...) {
 
   # strwidth function not working in regular R, lab.cex has no affect
@@ -704,7 +731,7 @@ function(...) {
   if (!in.RStudio && !in.knitr) regR <- TRUE 
 
 
-  # if a graphics window already open, not true for ttest, Su5mmaryStats
+  # if a graphics window already open, not true for ttest, SummaryStats
   # otherwise a call to par will open a window in regular R
   if (graph.win) {
     cut.x <- .86 * par("fin")[1]
@@ -725,26 +752,37 @@ function(...) {
   else if (!by.nm && by1.nm)
     y.name <- getOption("by1name")
 
-  dname <- getOption("dname")  # not set for dependent option on tt
-  if (!is.null(dname)) {
-    if (exists(dname, where=.GlobalEnv))
-      mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
-    else
-      mylabels <- NULL
-  }
-  else
-    mylabels <- NULL
-
-  if (!is.null(mylabels)) {
-    x.lbl <- mylabels[which(names(mylabels) == x.name)]
+  # get variable labels
+  x.lbl <- NULL
+  y.lbl <- NULL
+  l.name <- deparse(substitute(labels))
+  if (exists(l.name, where=.GlobalEnv)) {
+    mylabels <- get(l.name, pos=.GlobalEnv)
+    x.lbl <- mylabels[which(row.names(mylabels) == x.name),]
     if (length(x.lbl) == 0) x.lbl <- NULL
-    y.lbl <- mylabels[which(names(mylabels) == y.name)]
+    y.lbl <- mylabels[which(row.names(mylabels) == y.name),]
     if (length(y.lbl) == 0) y.lbl <- NULL
   }
-  else {
-    x.lbl <- NULL
-    y.lbl <- NULL
-  }
+  else {  # labels embedded in data
+    dname <- getOption("dname")  # not set for dependent option on tt
+    if (!is.null(dname)) {
+      if (exists(dname, where=.GlobalEnv)) {
+        mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
+        myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
+      }
+      else
+        mylabels <- NULL
+    }
+    else
+      mylabels <- NULL
+
+    if (!is.null(mylabels)) {
+      x.lbl <- mylabels[which(names(mylabels) == x.name)]
+      if (length(x.lbl) == 0) x.lbl <- NULL
+      y.lbl <- mylabels[which(names(mylabels) == y.name)]
+      if (length(y.lbl) == 0) y.lbl <- NULL
+    }
+  }  # end labels embedded in data
 
   # x-axis and legend labels
   if (is.null(x.lbl) && is.null(xlab))
@@ -797,16 +835,13 @@ function(...) {
   # y-axis and legend labels
 
   if (is.null(y.lbl) && is.null(ylab))
-{
     y.lab <- y.name
-}
 
   else {  # process label
     if (!is.null(ylab))
       y.lab <- ylab  # ylab specified
     else if (!is.null(y.lbl)) 
       y.lab <- y.lbl
-
 
 
     if (length(y.lab) == 1  &&  !is.null(lab.y.cex)  &&  graph.win) {  # power.ttest: len > 1
@@ -1025,11 +1060,10 @@ function(dir, axT) {
 # x.val contains non-numeric x-axis labels
 
   # left margin
-  mm <- max.lm.width + 0.55  # old value 0.6
-  if (!is.null(y.lab)) {
-     if (!nzchar(y.lab)[1]) mm <- mm - 0.25
-     if (grepl("\n", y.lab[1], fixed=TRUE)) mm <- mm + .15
-  }
+  mm <- max.lm.width + 0.60 
+  if (!is.null(y.lab))
+     if (grepl("\\n", deparse((y.lab)), fixed=TRUE)) mm <- mm + .15
+  if (prop) mm <- mm + .25
    
   # top margin
   tm <- 0.15
@@ -1128,13 +1162,13 @@ function(dir, axT) {
     cat("----------------------------------------------\n")
   }
 
-  bw <- bw.nrd0(na.omit(x))
-#cat("\n\nbw initial:", bw, "\n\n")
+  x <- na.omit(x)
+  bw <- bw.nrd0(x)
   irep <- 0
 
   repeat {
     irep <- irep + 1
-    d.gen <- suppressWarnings(density(x, bw, ...))
+    d.gen <- suppressWarnings(density(x, bw, ...))  # no missing data
     xd <- diff(d.gen$y)
 
     flip <- 0

@@ -2,7 +2,8 @@
 function(x, by1, by2, nrows, ncols, asp, prop,
          fill, color, panel.fill, panel.color,
          trans, size.pt, xlab, ylab, main,
-         lab.cex, axis.cex, rotate.x, rotate.y, width, height, pdf.file,
+         lab.cex, axis.cex, rotate.x, rotate.y,
+         width, height, pdf.file,
          segments.x, breaks, c.type) {
 
 

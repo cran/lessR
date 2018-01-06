@@ -60,6 +60,7 @@ function(x,
   # histogram calculations, no plot
   h <- hist(x, plot=FALSE, breaks)
 
+  # no missing data
   n <- sum(!is.na(x))
   n.miss <- sum(is.na(x))
   if (n.miss > 0) x <- na.omit(x)

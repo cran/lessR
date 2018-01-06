@@ -1,11 +1,11 @@
 \name{details}
 \alias{details}
-\alias{details.brief}
+\alias{db}
 
 \title{Display Contents of a Data File and Optional Variable Labels}
 
 \description{
-Abbreviation: \code{details.brief}
+Abbreviation: \code{db}
 
 Provides feedback regarding a data frame which includes the variable names, the dimensions of the resulting data frame, the data type for each variable, and the values of the variables in the data file for the first and last rows of the data. In addition, an analysis of missing data is provided, listing the number of missing values for each variable and for each observation.
 }
@@ -14,7 +14,7 @@ Provides feedback regarding a data frame which includes the variable names, the 
 details(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
          miss.show=30, miss.matrix=FALSE, brief=getOption("brief"))
 
-details.brief(\ldots, brief=TRUE)
+db(\ldots, brief=TRUE)
 }
 
 \arguments{
@@ -67,7 +67,7 @@ mydata <- Read("Employee", format="lessR")
 details()
 
 # manually request just variable names, labels for mydata
-details.brief()
+db()
 }
 
 

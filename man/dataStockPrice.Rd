@@ -1,9 +1,9 @@
 \name{dataStockPrice}
 \docType{data}
 \alias{dataStockPrice}
-\title{Data: Stock price of Apple, IBM and Intel from 1980 into 2017}
+\title{Data: Stock price of Apple, IBM and Intel from 1980 through 2017}
 
-\description{Monthly adjusted stock price of Apple, IBM and Intel from 1980 into 2017 from finance.yahoo.com.}
+\description{Monthly adjusted stock price of Apple, IBM and Intel from 1980 through 2017 from finance.yahoo.com.}
 
 \usage{data(dataStockPrice)}
 

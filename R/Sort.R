@@ -83,6 +83,8 @@ function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
 
     # construct the call to the order function
     ord <- ""
+    if (is.character(data[, by.col[i]]))
+      data[, by.col[i]] <- as.factor(data[, by.col[i]])  # sort char not work
     for (i in 1:n.sort) { 
       if ("factor" %in% class(data[, by.col[i]])) {  # 2 attributes if ordered
         i.fvar <- i.fvar + 1  # another factor variable
@@ -95,8 +97,10 @@ function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
                      sep="")
       }
       else   # variable not a factor
+{
         ord <- paste(ord, direction[i], 
                      "data[, by.col[", toString(i), "]], ", sep="")
+}
     }
     ord <- paste("order(", ord, "...)", sep="")
   }

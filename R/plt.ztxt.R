@@ -180,6 +180,11 @@ function(x, y, values, object, n.cat,
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
 
+          if (!grepl("auto", fncl)) {
+            txt <- ", auto=TRUE)  # many options, including the above"
+            txsug <- paste(txsug, "\n", fc, txt, sep="")
+          }
+
           if (!grepl("smooth", fncl)) {
             txt <- ", shape=\"diamond\")  # change plot character"
             txsug <- paste(txsug, "\n", fc, txt, sep="")

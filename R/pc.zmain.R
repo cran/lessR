@@ -184,6 +184,22 @@ function(x, y,
   #if (length(dim(x)) == 1  && !quiet) {  # one variable
   if (!quiet) { 
 
+    txsug <- ""
+    if (getOption("suggest")) {
+      txsug <- ">>> Suggestions"
+        fc <- paste("PieChart(", x.name,
+                    ", hole=0)  # traditional pie chart", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("BarChart(", x.name, ")  # bar chart", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("Plot(", x.name,
+                    ", values=\"count\")  # lollipop plot", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+    }
+    class(txsug) <- "out_piece"
+
     if (.is.integer(x.tbl)) {
       stats <- .ss.factor(x.tbl, brief=TRUE, x.name=x.name)
       txttl <- stats$title
@@ -192,12 +208,13 @@ function(x, y,
       class(txttl) <- "out_piece"
       class(counts) <- "out_piece"
       class(chi) <- "out_piece"
-      output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
+      output <- list(out_suggest=txsug, out_title=txttl,
+                     out_counts=counts, out_chi=chi)
     }
     else {
       stats <- .ss.numeric(x.tbl, brief=TRUE, x.name=getOption("yname"))
       txout <- stats$tx
-      output <- list(out_stats=txout)
+      output <- list(out_suggest=txsug, out_stats=txout)
     }
 
     class(output) <- "out_all"

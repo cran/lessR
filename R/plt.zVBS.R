@@ -1,7 +1,7 @@
 .plt.VBS <-
 function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux, 
          k.iqr, box.adj, a, b,
-         x.name, by1.name, by.name,
+         x.name, by1.name, by.name, vbs.plot,
          n.col.miss, n.row.miss,
          size, j.x.miss, jitter.x, j.y.miss, jitter.y,
          bin=FALSE, breaks=NULL, bin.start=NULL, bin.width=NULL,
@@ -52,14 +52,17 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
     tx <- character(length = 0)
     tx[length(tx)+1] <- "Parameter values (can be manually set)"
     tx[length(tx)+1] <- .dash2(55)
-    tx[length(tx)+1] <- paste("size:", .fmt(size.pt,2),
-        "     size of plotted points")
-    tx[length(tx)+1] <- paste("jitter.y:", .fmt(jitter.y,2),
-        " random vertical movement of points")
-    tx[length(tx)+1] <- paste("jitter.x:", .fmt(jitter.x,2),
-        " random horizontal movement of points")
-            if (size.pt < 0.02) size.pt <- .02
-    tx[length(tx)+1] <- paste("bw:" , .fmt(bw,2),
+    if (grepl("s", vbs.plot)) {
+      tx[length(tx)+1] <- paste("size:", .fmt(size.pt,2),
+          "     size of plotted points")
+      tx[length(tx)+1] <- paste("jitter.y:", .fmt(jitter.y,2),
+          " random vertical movement of points")
+      tx[length(tx)+1] <- paste("jitter.x:", .fmt(jitter.x,2),
+          " random horizontal movement of points")
+              if (size.pt < 0.02) size.pt <- .02
+    }
+    if (grepl("v", vbs.plot))
+      tx[length(tx)+1] <- paste("bw:" , .fmt(bw,2),
         "    set bandwidth higher for smoother edges")
     txprm <- tx
     class(txprm) <- "out_piece"
@@ -199,7 +202,10 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
       jitter.y <- jitter.y + (jy.adj * jitter.y)   # increases jitter
     } 
 
-    txprm <- .get.param(size, jitter.y, jitter.x, bw)
+    if (grepl("v", vbs.plot) || grepl("s", vbs.plot)) 
+      txprm <- .get.param(size, jitter.y, jitter.x, bw)
+    else
+      txprm <- ""
 
     # get freq table, before jitter, not all x are unique
     if (n.ux < 9  &&  n.ux < length(x)) { 
@@ -277,7 +283,10 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
         jitter.y <-  -1.221 + 0.576*log(mx.c) + 0.032*n.lvl
         if (jitter.y < 0.5) jitter.y <- 0.5
       }
-      txprm <- .get.param(size, jitter.y, jitter.x, bw)
+      if (grepl("v", vbs.plot) || grepl("s", vbs.plot)) 
+        txprm <- .get.param(size, jitter.y, jitter.x, bw)
+      else
+        txprm <- ""
       output <- list(out_grp=txgrp, out_rep=txrep, out_parm=txprm)
     }  # end !reps
 
@@ -302,7 +311,10 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
       if (j.x.miss) jitter.x <- 0.086 + 0.141*log(mx.c)
       #if (j.x.miss) jitter.x <- 0.086 + 0.141*log(mc.w)
       if (jitter.x < 0) jitter.x <- 0
-      txprm <- .get.param(size, jitter.y, jitter.x, bw)
+      if (grepl("v", vbs.plot) || grepl("s", vbs.plot)) 
+        txprm <- .get.param(size, jitter.y, jitter.x, bw)
+      else
+        txprm <- ""
 
       if (n.ux < 9) {  # get x stats before jitter
         ssstuff <- .ss.factor(x, by=by1,

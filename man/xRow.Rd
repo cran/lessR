@@ -1,7 +1,7 @@
 \name{xRow}
 \alias{xRow}
 
-\title{Add the Word Row to Case Labels that Could be Numeric}
+\title{Text Processing: Add the Word Row to Case Labels that Could be Numeric}
 
 \description{For a vector of row names, if the names can be represented as integers the word Row is added to the beginning of each name in the vector. Primarily for internal use in text processing of \code{knitr} output. Not usually referenced by the user.
 }

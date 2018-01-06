@@ -81,9 +81,9 @@ mydata <- Transform(
 )
 # new variable Months now exists
 # if relevant, supply a corresponding variable label
-mydata <- label(Months, "Months Employed in the Company")
+# mydata <- label(Months, "Months Employed in the Company")
 # confirm
-details.brief()
+db()
 
 
 # ----------------------------
@@ -108,7 +108,7 @@ mydata <- Transform(
 # here Gender has values M and F in the data
 # integers start with 1 through the number of levels, can use
 #    Recode to change this if desired, such as to 0 and 1
-mydata <- Read("Employee", format="lessR")
+# Gender is now a factor to illustrate
 mydata <- Transform(Gender=as.numeric(Gender))
 mydata <- Recode(Gender, old=c(1,2), new=c(0,1))
 

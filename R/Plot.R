@@ -1183,7 +1183,7 @@ function(x, y=NULL, data=mydata,
 
         VBS <- .plt.VBS(x.call[,1], ID.call, by1.call, by1.miss, by.call,
                 bw, bw.miss, lx, n.ux, k.iqr, box.adj, a, b,
-                x.name, by1.name, by.name,
+                x.name, by1.name, by.name, vbs.plot,
                 n.col.miss, n.row.miss,
                 size, j.x.miss, jitter.x, j.y.miss, jitter.y,
                 bin, breaks, bin.start, bin.width, bin.end, proportion, 
