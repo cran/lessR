@@ -1,12 +1,12 @@
 .bc.main <- 
 function(x, y, by, 
-         col.fill, col.color, col.bg, col.box, col.trans, colors,
+         fill, col.color, col.bg, col.box, col.trans, theme,
          horiz, addtop, gap, prop,
          xlab, ylab, main, lab.cex,
          value.labels, label.max,
          axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
-         col.low, col.hi,
-         legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...) {
+         legend.title, legend.loc, legend.labels, legend.horiz,
+         add, x1, x2, y1, y2, quiet, ...) {
 
   # if x is integer, not labeled correctly
   if (length(unique(x)) != length(x)) if (!is.factor(x)) x <- factor(x)
@@ -124,6 +124,7 @@ function(x, y, by,
 
   if (!is.null(y)) {
     entered <- TRUE
+	
     if (is.null(by)) {  # no by variable
       yn <- getOption("yname")
       if (!is.numeric(y) > 0) {
@@ -165,8 +166,8 @@ function(x, y, by,
     else {  # a by variable
       do.row <- ifelse (x[1] == x[2], FALSE, TRUE)  # x is outer loop
       m <- matrix(y, nrow=length(levels(by)), byrow=do.row)
-      colnames(m) <- levels(x) 
-      rownames(m) <- levels(by) 
+      colnames(m) <- unique(x) 
+      rownames(m) <- unique(by) 
       m <- as.table(m, dnn=c(by.name, x.name))
       names(dimnames(m)) <- c(by.name, x.name) 
       x <- m
@@ -210,82 +211,34 @@ function(x, y, by,
   # ------
   # colors
 
-  # get n.colors (does not indicate col.fill multiple colors)
-  if (is.null(by) && !order.x && !is.matrix(x))
-    n.colors <- length(col.fill)
+  # if use getColors to generate a range of colors
+  if (is.null(by) && !is.matrix(x))
+    n.clr <- length(x)
+  else
+    n.clr <- nrow(x)
+  if (!is.null(by)) n.clr <- nrow(x)
+  # see if apply a pre-defined color range
+  if (length(fill) == 1) fill <- .color.range(fill, n.clr)
+
+  # get n.colors (does not indicate fill multiple colors)
+  if (is.null(by) && !is.matrix(x))
+    n.colors <- length(fill)
   else
     n.colors <- nrow(x)
-  if (!is.null(by) && order.y) n.colors <- nrow(x)
-
-  if ( (colors == "rainbow"  ||  colors=="terrain"  || colors=="heat") ) {
-    n.colors <- nrow(x)
-    nogo <- FALSE
-    if (is.ordered(x) && is.null(by)) nogo <- TRUE
-    if (is.ordered(by)) nogo <- TRUE
-    if (nogo) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Can only do an R color range when there is more than one color. \n\n")
-    }
-  }
-
-  # color palette
-
-  if ((order.x && is.null(by)) || order.y) {  # one var, an ordered factor
-    lowhi <- .ordcolors(colors, col.low, col.hi) 
-    col.low <- lowhi$col.low
-    col.hi <- lowhi$col.hi
-
-    color.palette <- colorRampPalette(c(col.low, col.hi))
-    clr <- color.palette(n.colors)
-  } # end ordered
-
-  else if (colors %in% c("lightbronze", "gray", "white")) {
-    if (n.colors == 1 || length(col.fill) > 1)
-      clr <- col.fill
-    else {
-      if (n.colors == 2) { light <- "gray70"; dark <- "gray40" }
-      else { light <- "gray84"; dark <- "gray30" }
-      color.palette <- colorRampPalette(c(dark, light))
-      clr <- color.palette(n.colors)
-    }
-  }
-
-  else if ((colors %in% c("darkred", "gray", "blue", "rose",
-      "green", "gold", "red", "dodgerblue", "darkgreen", "purple", "sienna",
-      "brown", "orange")
-          && (is.null(by) && !is.matrix(x)))) {
-      if (n.colors == 1 || length(col.fill) > 1)
-        clr <- col.fill
-      else {
-        color.palette <- colorRampPalette(getOption("col.bar.fill"))
-        clr <- color.palette(nrow(x))
-      }
-  }
-
-  else if (colors == "rainbow") clr <- rainbow(n.colors)
-  else if (colors == "terrain") clr <- terrain.colors(n.colors)
-  else if (colors == "heat") clr <- heat.colors(n.colors)
-
-  else  {  # ordered color range does not make sense here 
-    if (length(col.fill) > 1)
-      clr <- col.fill
-    else
-      if (n.colors > 1) clr <- .col.discrete()[1:n.colors]
-    # lighten some default background colors
-    if (col.bg == "#EEF0F2") col.bg <- rgb(245,245,245, maxColorValue=255)
-    if (col.bg == "#E5DB8E") col.bg <- rgb(251,245,220, maxColorValue=255)
-  }
-
+  if (!is.null(by)) n.colors <- nrow(x)
+  
+  if (length(fill) < n.colors)  # two-variable bar chart
+    fill <- getColors(n=length(unique(by)))
 
   if (!is.null(col.trans)) 
-    for (i in 1:n.colors) clr[i] <- .maketrans(clr[i], (1-col.trans)*256) 
+    for (i in 1:n.colors) fill[i] <- .maketrans(fill[i], (1-col.trans)*256) 
 
   if (n.colors > 1) {
-    palette(clr)
+    palette(fill)
     colr <- 1:n.colors   # colr is a sequence of integers
   }
   else  # colr is a color
-    colr <- ifelse (is.null(col.fill), getOption("bar.fill"), col.fill)
+    colr <- ifelse (is.null(fill), getOption("bar.fill"), fill)
 
 
   # ----------------------------------------------------------------------------
@@ -461,7 +414,10 @@ function(x, y, by,
  
   ax.num <- ifelse(horiz, 1, 2)  # location of numerical axis
   vy <- pretty(min.y:max.y)
-  abline(h=axTicks(ax.num), col=grid.y.color, lwd=grid.y.lwd, lty=grid.y.lty)
+  if (!horiz)
+    abline(h=axTicks(ax.num), col=grid.y.color, lwd=grid.y.lwd, lty=grid.y.lty)
+  else
+    abline(v=axTicks(ax.num), col=grid.x.color, lwd=grid.x.lwd, lty=grid.x.lty)  
 
   # box around plot
   rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
@@ -469,11 +425,11 @@ function(x, y, by,
 
   ## PLOT
   if (rescale == 0)
-    coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
+    coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.color, las=las.value, 
           space=gap, axisnames=FALSE, ...)
   else
-    coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
+    coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.color, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
 
@@ -504,8 +460,8 @@ function(x, y, by,
   axis(ax.value, at=coords, labels=FALSE, tck=-.01,
        col=axis.x.color, cex.axis=axis.x.cex, ...)
   text(x=xx, y=yy, labels=val.lab,
-       pos=ax.value, xpd=TRUE, cex=axis.x.cex, col=getOption("axis.text.color"),
-       srt=rotate.x, offset=offset, ...)
+       pos=ax.value, xpd=TRUE, cex=axis.x.cex,
+       col=getOption("axis.text.color"), srt=rotate.x, offset=offset, ...)
     
   # title
   title(main=main.lab, cex.main= getOption("main.cex"),
@@ -547,7 +503,7 @@ function(x, y, by,
 
       options(byname = getOption("byname"))
       trans.pts <- .6  # dummy value
-      .plt.by.legend(legend.labels, col.color, clr, shp=22, trans.pts,
+      .plt.by.legend(legend.labels, col.color, fill, shp=22, trans.pts,
                      col.bg, usr, pt.size=1.6, pt.lwd=0)
 
     }  # right margin
@@ -574,7 +530,7 @@ function(x, y, by,
   n.dim <- length(dim(x))
   stats <- ""
   # one variable, dim == 0 if x<-x.temp 
-  if (n.dim == 1  && !quiet) {
+  if (n.dim == 1) {
     # only process if counts
     if (.is.integer(x)  &&  all(x >= 0)  &&  is.null(y) ) {
 
@@ -590,7 +546,7 @@ function(x, y, by,
                     ", horiz=TRUE)  # horizontal bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("BarChart(", x.name,
-                    ", colors=\"rainbow\")  # different bar colors", sep="")
+                    ", fill=\"hcl\")  # hcl colorspace bar colors", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("PieChart(", x.name, ")  # doughnut chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
@@ -613,7 +569,7 @@ function(x, y, by,
           output <- list(out_suggest=txsug, out_title=txttl, out_counts=counts,
                          out_chi=chi)
           class(output) <- "out_all"
-          print(output)      
+          if (!quiet) print(output)      
         }
       }  # is.null(y)
     }
@@ -628,12 +584,12 @@ function(x, y, by,
       output <- list(out_txt=txtbl)
 
       class(output) <- "out_all"
-      print(output)         
+      if (!quiet) print(output)         
     }
-  }  # if (n.dim == 1  && !quiet)
+  }  # if (n.dim == 1)
 
   # two variables
-  else if (!quiet) {
+  else {
     # need brief=FALSE for row proportions
 
     txsug <- ""
@@ -644,8 +600,8 @@ function(x, y, by,
       fc <- paste("BarChart(", x.name, ", by=", by.name,
                   ", horiz=TRUE)  # horizontal bar chart", sep="")
       txsug <- paste(txsug, "\n", fc, sep="")
-      fc <- paste("BarChart(", x.name, ", by=", by.name,
-                  ", colors=\"rainbow\")  # different bar colors", sep="")
+      fc <- paste("BarChart(", x.name,
+                  ", fill=\"hcl\")  # different bar colors", sep="")
       txsug <- paste(txsug, "\n", fc, sep="")
     }
 
@@ -670,7 +626,7 @@ function(x, y, by,
         output <- list(out_title=txttl, out_text=txfrq, out_row=txrow, out_XV=txXV)
       }
       class(output) <- "out_all"
-      print(output)
+      if (!quiet) print(output)
     }  # end is.null(y)
 
     else {  # y is present
@@ -681,11 +637,23 @@ function(x, y, by,
       output <- list(out_txt=txtbl)
 
       class(output) <- "out_all"
-      print(output)
+      if (quiet) print(output)
     }
   
   }
 
+  if (!is.null(add)) {
+
+    add.cex <- getOption("add.cex")
+    add.lwd <- getOption("add.lwd")
+    add.lty <- getOption("add.lty")
+    add.color <- getOption("add.color")
+    add.fill <- getOption("add.fill")
+    add.trans <- getOption("add.trans")
+
+    .plt.add (add, x1, x2, y1, y2,
+              add.cex, add.lwd, add.lty, add.color, add.fill, add.trans) 
+  }
   cat("\n")
 
   return(stats)

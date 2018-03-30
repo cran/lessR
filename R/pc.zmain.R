@@ -1,11 +1,14 @@
 .pc.main <- 
 function(x, y,
-         random.col, col.fill, col.low, col.hi, colors,
-         radius, hole, hole.fill, edges, 
-         clockwise, init.angle, 
-         density, angle, border, lty,
-         cex, cex.main, quiet, main,
-         pdf.file, width, height, ...)  {
+        fill, color, trans, 
+        radius, hole, hole.fill, edges, 
+        clockwise, init.angle, 
+        density, angle, lty, lwd,
+        values, values.pos, values.color,
+        values.cex, labels.cex, main.cex,
+        main, main.miss,
+        add, x1, x2, y1, y2,
+        quiet, pdf.file, width, height, ...)  {
 
   # get values for ... parameter values
   #stuff <- .getdots(...)
@@ -15,114 +18,108 @@ function(x, y,
   # use variable label for main if it exists and main not specified
   gl <- .getlabels(main=main, lab.cex=getOption("lab.cex"))
   x.name <- gl$xn; x.lbl <- gl$xl
-  lab.cex <- gl$lab.cex
+  if (!is.null(main))
+    main.lbl <- main
+  else {
+    if (main.miss)  # main was not explicitly set to NULL 
+      main.lbl <- ifelse (is.null(x.lbl), x.name, x.lbl)
+    else
+      main.lbl <- NULL
+  }
 
-  if (!is.null(main)) main.lbl <- main
-  else if (length(x.lbl) == 0) main.lbl <- x.name else main.lbl <- x.lbl
-
-  lab.cex <- 0.85
-  if (strwidth(main.lbl, units="figure", cex=lab.cex) > .85) {
+  # size the label for display
+  if (strwidth(main.lbl, units="figure", cex=main.cex) > .85) {
     brk <- nchar(main.lbl)
-    while (strwidth(substr(main.lbl,1,brk), units="figure", cex=lab.cex) > .85)
+    while (strwidth(substr(main.lbl,1,brk), units="figure", cex=main.cex) > .85)
       brk <- brk-1 
     while (substr(main.lbl,brk,brk) != " ") brk <- brk-1
     main.lbl <- paste(substr(main.lbl,1,brk), "\n",
                       substr(main.lbl,brk+1,nchar(main.lbl)))
-    while (strwidth(main.lbl, units="figure", cex=lab.cex) > .85)
-      lab.cex <- lab.cex-0.05
+    while (strwidth(main.lbl, units="figure", cex=main.cex) > .85)
+      main.cex <- main.cex-0.05
   }
 
   # entered counts typically integers as entered but stored as type double
   # if names(x) is null, likely data from sample and c functions
-  if (!is.integer(x) && is.double(x) && !is.null(names(x)))  x <- as.table(x)
-  if (!is.factor(x) && !is.table(x)) x <- factor(x)
-  n.colors <- ifelse (!is.table(x), nlevels(x), length(x))
+  if (!is.integer(x) && is.double(x) && !is.null(names(x)))
+    x <- as.table(x)
+  if (!is.factor(x) && !is.table(x))
+    x <- factor(x)
+  n.vals <- ifelse (!is.table(x), nlevels(x), length(x))
+ # clr is the color palette to display for the slices
+  clr <- character(length=n.vals)
 
- 
-  # -------------
-  # color palette
-  # -------------
+  # ------
+  # colors
 
-  # set some default colors in case not assigned below
-  if (is.ordered(x)) {
-    lowhi <- .ordcolors(colors, col.low, col.hi) 
-    col.low <- lowhi$col.low
-    col.hi <- lowhi$col.hi
+  # custom color progression
+  #if (!is.null(end.fill)) {
+  #  color.palette <- colorRampPalette(c(fill, end.fill))
+  #  clr <- color.palette(n.vals)
+  #}
 
-    color.palette <- colorRampPalette(c(col.low, col.hi))
-    clr <- color.palette(n.colors)
-  } # end ordered
+  #else {
 
-  else if (colors %in% c("lightbronze", "gray", "white")) {
-    if (n.colors == 1 || length(col.fill) > 1)
-      clr <- col.fill
-    else {  # ordered grays
-      if (n.colors == 2) { light <- "gray70"; dark <- "gray40" }
-      else { light <- "gray84"; dark <- "gray30" }
-      color.palette <- colorRampPalette(c(dark, light))
-      clr <- color.palette(n.colors)
+  # set user specified multiple colors
+  if (length(fill) > 1) {
+    j <- 0
+    for (i in 1:(n.vals)) {
+      j <- j + 1
+      if (j > length(fill)) j <- 1  # recycle colors
+      clr[i] <- fill[j]
     }
+  } # end fill is multiple values
+
+  else {
+    if (length(fill) == 1) clr <- .color.range(fill, n.vals)
   }
+  #}
 
-  else if (colors == "rainbow") clr <- rainbow(n.colors)
-  else if (colors == "terrain") clr <- terrain.colors(n.colors)
-  else if (colors == "heat") clr <- heat.colors(n.colors)
-
-  else  {  # ordered color range not applicable here 
-    if (length(col.fill) > 1)
-      clr <- col.fill
-    else
-      if (n.colors > 1) clr <- .col.discrete("hcl")[1:n.colors]
-  }
-
-  if (!is.null(col.fill)) {
-    for (i in 1:(min(length(col.fill),length(clr)))) clr[i] <- col.fill[i]
-    n.colors <- min(length(col.fill),length(clr))
-  }
-
-  palette(clr)
-  col <- 1:n.colors 
+  if (!is.null(trans)) 
+    for (i in 1:n.vals) clr[i] <- .maketrans(clr[i], (1-trans)*256) 
 
 
   # ----------------
   # prepare the data
   # ----------------
 
-  if (is.null(y)) {  # x is categorical variable, convert to freq table
+  # x is categorical variable
+  if (is.null(y)) {  # tabulate x
     if (!is.table(x)) x <- table(x)
   }
-  else {  # y contains the values, x the names (categories)
-    x.names <- x
+  else {  # y contains the values
+    x.cat <- x
     x <- y
     x <- as.table(x)
-    names(x) <- x.names 
+    names(x) <- x.cat 
   }
 
-  x.tbl <- x
+  x.tbl <- x  # save tabled values for text output
   labels <- names(x)
   x <- as.numeric(x)
+  if (values == "input")
+    x.txt <- as.character(x)
+  else if (values == "percent")
+    x.txt <- paste(as.character(round(x/sum(x) * 100, 1)), "%", sep="")
+  else if (values == "prop")
+    x.txt <- as.character(round(x/sum(x), 2))
 
 
   # ------------------
   # plot the pie chart
   # ------------------
 
-  # pie(x, col=col, main=main.lbl, cex=cex, cex.main=cex.main, col.main=col.main, ...)
-  # modified pie function to add inner hole at the end, and plot two radiuses
+  # modified R pie function to add inner hole at the end, plot a radius for each
   if (!is.numeric(x) || any(is.na(x) | x < 0)) 
       stop("'x' values must be positive.")
-
-  if (is.null(labels)) 
-    labels <- as.character(seq_along(x))
-  else
-    labels <- as.graphicsAnnot(labels)
-
-  x <- c(0, cumsum(x)/sum(x))
-  dx <- diff(x)
-  nx <- length(dx)
-
+  
+  # set up and open plot window
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))
+  
   par(bg=getOption("panel.fill"))
-  par(mai=c(.4, .5, .8, .5))
+  tm <- ifelse (is.null(main.lbl), .6, .8)
+  par(mai=c(.4, .5, tm, .5))
   plot.new()
 
   pin <- par("pin")  # plot dimensions in inches
@@ -134,7 +131,17 @@ function(x, y,
     ylim <- (pin[2L]/pin[1L]) * ylim
   plot.window(xlim, ylim, "", asp=1)
 
-  if (length(border) < nx) border <- rep_len(border, nx)
+  # set labels
+  if (is.null(labels)) 
+    labels <- as.character(seq_along(x))
+  else
+    labels <- as.graphicsAnnot(labels)
+
+  x <- c(0, cumsum(x)/sum(x))
+  dx <- diff(x)
+  nx <- length(dx)
+
+  if (length(color) < nx) color <- rep_len(color, nx)
   if (length(lty) < nx) lty <- rep_len(lty, nx)
   angle <- rep(angle, nx)
   if (!is.null(density))
@@ -148,33 +155,60 @@ function(x, y,
   }
 
   # construct plot slice by slice
+  values.cl <- character(length=nx)
+  if (length(values.color) == 1)
+    for (i in 1:nx) values.cl[i] <- values.color[1]
+  if (length(values.color) == nx)
+    values.cl <- values.color
+  else {  # recycle
+    j <- 0
+    for (i in 1:nx) {
+      j <- j + 1
+      if (j > length(values.color)) j <- 1
+      values.cl[i] <- values.color[j]
+    }
+  }
+
   for (i in 1L:nx) { 
 
     # plot slice
     n <- max(2, floor(edges * dx[i]))
     P <- t2xy(seq.int(x[i], x[i + 1], length.out=n), radius)
     polygon(c(P$x, 0), c(P$y, 0), density=density[i], angle=angle[i], 
-        border=border[i], col=col[i], lty=lty[i])
+        border=color[i], col=clr[i], lty=lty[i], lwd=lwd)
 
-    # plot label
-    lab <- as.character(labels[i])
+    # plot label, optional values
     P <- t2xy(mean(x[i + 0:1]), radius)
+    lab <- as.character(labels[i])
     if (!is.na(lab) && nzchar(lab)) {
-        lines(c(1, 1.05) * P$x, c(1, 1.05) * P$y)
-        text(1.1 * P$x, 1.1 * P$y, labels[i], xpd=TRUE, 
-            adj=ifelse(P$x < 0, 1, 0), ...)
+      lines(c(1, 1.05)*P$x, c(1, 1.05)*P$y)  # tick marks
+
+      if (values != "none") if (values.pos == "labels")  # results to labels
+        labels[i] <- paste(labels[i], "\n", x.txt[i], sep="")
+      text(1.1 * P$x, 1.175 * P$y, labels[i], xpd=TRUE, 
+        adj=ifelse(P$x < 0, 1, 0), cex=labels.cex, ...)  # labels
+
+      if (values != "none") if (values.pos == "pie") {
+        cx <- 0.82;  cy <- 0.86  # scale factors to position labels
+        if (hole < 0.65) {  # scale factor to slide text down for small hole
+          cx <- cx * (1 - (.16 * (1-hole)))  # max slide is 0.84
+          cy <- cy * (1 - (.16 * (1-hole)))
+        }
+        text(cx*P$x, cy*P$y, x.txt[i], xpd=TRUE, col=values.cl[i],
+             cex=values.cex, ...)
+      }
     }
 
   }  # end slice by slice
 
   # add centered hole over the top of the pie
   P <- t2xy(seq.int(0, 1, length.out=n*nx), hole)
-  polygon(P$x, P$y, col=hole.fill, border=border)
+  polygon(P$x, P$y, col=hole.fill, border=color, lty=lty[1], lwd=lwd)
 
-  title(main=main.lbl, col.main=getOption("main.color"),
+  title(main=main.lbl, cex.main=main.cex, col.main=getOption("main.color"),
         line=par("mgp")[1]-.5, ...)
 
-# legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
+  # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
 
 
   # -----------
@@ -189,6 +223,9 @@ function(x, y,
       txsug <- ">>> Suggestions"
         fc <- paste("PieChart(", x.name,
                     ", hole=0)  # traditional pie chart", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("PieChart(", x.name,
+                    ", values=\"percent\")  # display %'s on the chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("BarChart(", x.name, ")  # bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
@@ -221,7 +258,19 @@ function(x, y,
     print(output)      
   }
 
- 
+  if (!is.null(add)) {
+
+    add.cex <- getOption("add.cex")
+    add.lwd <- getOption("add.lwd")
+    add.lty <- getOption("add.lty")
+    add.color <- getOption("add.color")
+    add.fill <- getOption("add.fill")
+    add.trans <- getOption("add.trans")
+
+    .plt.add (add, x1, x2, y1, y2,
+              add.cex, add.lwd, add.lty, add.color, add.fill, add.trans) 
+  }
+
   cat("\n")
 
 }  #  end pc.main

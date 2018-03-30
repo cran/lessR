@@ -1,13 +1,26 @@
 .TwoGroup <-
 function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits.d,
-         conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, graph,
+         conf.level, alternative, mmd, msmd, Edesired, bw1, bw2,
+         graph, xlab,
          line.chart, show.title, pdf.file, width, height, ...)  {        
  
   if ( brief  &&  (!is.null(mmd) || !is.null(msmd)) ) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "mmd and msmd do not work with the brief version.\n\n")
   }
+
+  # get lab.x.cex  lab.y.cex
+  lab.cex <- getOption("lab.cex")
+  lab.x.cex <- getOption("lab.x.cex")
+  lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
+  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+
+  # get variable labels if exist plus axes labels
+  gl <- .getlabels(xlab=NULL, ylab=xlab, main=NULL, lab.x.cex=lab.x.cex,
+                   graph.win=FALSE)  # # graphics window not yet set-up
+  x.name <- gl$yn; x.lbl <- gl$yl; x.lab <- gl$yb
+
 
   cat("Compare", Ynm, "across", Xnm, "levels", X1nm, "and", X2nm, "\n")
   cat("--------------------------------------------------------------\n\n")
@@ -411,7 +424,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
     .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
-              clpct, tvalue, pvalue, ub, lb, show.title)
+              clpct, tvalue, pvalue, ub, lb, x.lab, show.title)
 
     cat("\n")
 

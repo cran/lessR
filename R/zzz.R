@@ -7,19 +7,19 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.7.0      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
+      "lessR 3.7.2      feedback: gerbing@pdx.edu        web: lessRstats.com\n",
       "---------------------------------------------------------------------\n",
       "1. mydata <- Read()        Read text, Excel, SPSS, SAS or R data file\n",
       "2. Help()                  Get help\n",
       "3. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
       "4. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
-      "                           Plot(X) gives new VBS plot for numerical X\n",
+      "                           numerical X: Violin, Box, Scatter plot \n",
       "5. by1= , by2=             Trellis graphics, a plot for each by1, by2\n",
       "6. reg(Y ~ X, Rmd=\"eg\")    Regression + R markdown file that, when\n",
       "                           knit, provides full interpretative output\n",
-      "7. style(\"gold\", sub.theme=\"black\")   Set theme and sub.theme\n",
-      "   style(\"dodgerblue\")     original blue theme\n",
-      "   style(show=TRUE)        all color/style options and current values\n")
+      "7. style(\"gold\", sub.theme=\"black\") Set theme, optional sub.theme\n",
+      "   style(show=TRUE)        all color/style options and current values\n",
+	  "8. getColors()             create discrete, continuous color scales\n")
 
   options(theme = "lightbronze")
   options(sub.theme = "default")
@@ -32,7 +32,7 @@ function(...) {
   options(panel.lty = "solid")
 
   options(bar.fill = "#7F7F7FE6")  # .maketrans("gray50", .to256("trans.bar.fill"))
-  options(trans.bar.fill = 0.10)
+  options(trans.bar.fill = 0.0)
   options(bar.color = "gray30")
 
   options(pt.fill = "gray20")
@@ -107,7 +107,7 @@ function(...) {
   options(add.fill = "gray20")
   options(add.trans = 0.0)
   options(add.color = "gray60")
-  options(add.cex = 0.6)
+  options(add.cex = 0.9)
   options(add.lwd = 0.5)
   options(add.lty = "solid")
 
@@ -301,7 +301,7 @@ function(...) {
     if (!is.function(eval(parse(text=var.name)))) {
       in.style <- TRUE
       if (!quiet)
-        cat(">>>", var.name, "exists in the workspace, outside of",
+        cat(">>>", var.name, "analyzed from the workspace, not in",
             "a data frame (table)\n")
     }
   }
@@ -884,7 +884,10 @@ function(...) {
 
 
   if (!missing(main)) {
-    if (!is.null(main)) main.lab <- main else main.lab <- NULL
+    if (!is.null(main))
+      main.lab <- main
+    else 
+      main.lab <- NULL
   }
   else
     main.lab <- NULL
@@ -960,6 +963,7 @@ function(dir, axT) {
   axis.y.text.color <- ifelse(is.null(getOption("axis.y.text.color")), 
     getOption("axis.text.color"), getOption("axis.y.text.color"))
 
+  
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
     if (!y.only) {  # do x axis in calling routine for time series
       axis(1, at=axT1, labels=FALSE, tck=-.01, col=axis.x.color,
@@ -1348,6 +1352,23 @@ function(dir, axT) {
 }
 
 
+# generate a pre-defined color range if requested
+.color.range <- function(fill, n.clr) {
+
+  if (fill[1] == "hcl") clrs <- getColors("hcl", n=n.clr)
+  else if (fill[1] == "grays") clrs <- getColors("grays", n=n.clr)
+  else if (fill[1] == "blues") clrs <- getColors("blues", n=n.clr)
+  else if (fill[1] == "reds") clrs <- getColors("reds", n=n.clr)
+  else if (fill[1] == "greens") clrs <- getColors("greens", n=n.clr)
+  else if (fill[1] == "heat") clrs <- getColors("heat", n=n.clr)
+  else if (fill[1] == "terrain") clrs <- getColors("terrain", n=n.clr)
+  else if (fill[1] == "rainbow") clrs<- getColors("rainbow", n=n.clr)
+  else clrs <- fill
+
+  return(clrs)
+}
+
+
 # discrete color steps with no order
 .col.discrete <- function(scheme="default") {
 
@@ -1362,10 +1383,10 @@ function(dir, axT) {
                "#FFFF33", "#A65628", "#F781BF", "#999999")
 
     # based on rainbow_hcl(8,c=50,l=70) from colorspace
-    # 92ADD6 is rgb 146,173,214, a kind of medium steel blue
+    # sequence: 6 1 4 2 7 3 5 8
     else if (scheme == "hcl")
       clr <- c("#64B5D6", "#E495A5", "#72BB83", "#D2A277", "#ACA4E2",
-               "#39BEB1", "#D995CF", "#ABB065")
+                "#ABB065", "#39BEB1", "#D995CF")
 
   # based on rainbow_hcl(8,c=80,l=65) from colorspace
     #clr <- c("#00AFE0", "#F072B8", "#00B981", "#D58F35", "#9DA500",
@@ -1450,7 +1471,7 @@ return(clr)
       if (is.null(col.hi)) col.hi <- "gray90"
     }
 
-    return(list(col.low=col.low, col.hi=col.hi))
+    return(list(low.fill=col.low, hi.fill=col.hi))
 }
 
 

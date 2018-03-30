@@ -6,6 +6,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   x.name <- deparse(substitute(x))  # could be a vars list
   options(xname = x.name)
 
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
@@ -49,7 +50,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   if (!missing(x)) {
 
-    if (!exists(x.name, where=.GlobalEnv)) {  # x not in style env, in df
+    # x not in global env, in df, specify data= forces to data frame
+    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
       .nodf(df.name)  # check to see if data frame container exists     
       .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
       all.vars <- as.list(seq_along(data))  # even if only a single var
@@ -88,6 +90,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 # data is now set
 # do the analysis for a single variable or a data frame 
 
+  # see if a single variable is categorical; if so, make a factor
   if (ncol(data) == 1) {
     x.call <- data[,1]
 
@@ -105,7 +108,6 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     if (num.cat || is.character(x.call)) {
       x.call <- as.factor(x.call)
-
      .ncat("summary statistics", x.name, nu, n.cat)
     }
   }
@@ -113,7 +115,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (ncol(data) > 1)
     .ss.data.frame(data, n.cat, brief, ...) 
 
-  else if (!is.factor(x.call)) {
+  else if (!is.factor(x.call)) {  # numeric analysis
 
     sk <- NA; kt <- NA; q1 <- NA; q3 <- NA;  qr <- NA;
     if (exists("y.name"))
@@ -132,15 +134,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
     y.name <- gl$yn; y.lab <- gl$yb; y.lbl <- gl$yl
 
-    if (is.factor(x.call)) 
-      stuff <- .ss.factor(x.call, y.call, brief, digits.d,
-                        x.name, y.name, x.lbl, y.lbl, label.max, ...)
-    else if (is.character(x.call))
-      if (nlevels(factor(x.call)) < length(x.call)) { 
-        stuff <- .ss.factor(factor(x.call), by, brief, digits.d=NULL,
-                        x.name, y.name, x.lbl, y.lbl, label.max, ...)
-      }
-      else cat("\n Appears to contain unique Names or IDs", "\n")
+    stuff <- .ss.factor(x.call, y.call, brief, digits.d,
+                      x.name, y.name, x.lbl, y.lbl, label.max, ...)
 
     n.dim <- stuff$n.dim
     if (n.dim == 1) {

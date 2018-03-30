@@ -58,6 +58,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   x.name <- deparse(substitute(x)) 
   options(xname = x.name)
 
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
@@ -67,7 +68,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   if (!missing(x)) {
 
-    if (!exists(x.name, where=.GlobalEnv)) {  # x not in style env, in df
+    # x not in global env, in df, specify data= forces to data frame
+    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
       .nodf(df.name)  # check to see if data frame container exists 
       .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
       all.vars <- as.list(seq_along(data))  # even if only a single var
@@ -90,6 +92,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
       if (is.data.frame(x))  # x a data frame
         data <- x
       else {  # x a vector in style
+        .xstatus(x.name, df.name, quiet)
         if (!is.function(x))
           data <- data.frame(x)  # x is 1 var
         else

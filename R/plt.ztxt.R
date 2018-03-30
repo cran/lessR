@@ -387,8 +387,6 @@ function(x, y, values, object, n.cat,
             fc <- paste(fc, ", sort.yx=FALSE", sep="")
           if (!grepl("segments.y", fncl)) 
             fc <- paste(fc, ", segments.y=FALSE", sep="")
-          if (!grepl("grid", fncl)) 
-            fc <- paste(fc, ", grid=\"on\"", sep="")
           if (nzchar(fc)) {
             fncl <- .fun.call.deparse(fun.call) 
             fncl <- gsub(")$", "", fncl)  # get function call less closing

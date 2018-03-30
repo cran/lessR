@@ -19,17 +19,14 @@ function(x,
   # get lab.x.cex  lab.y.cex
   lab.cex <- getOption("lab.cex")
   lab.x.cex <- getOption("lab.x.cex")
-  lab.y.cex <- getOption("lab.y.cex")
   lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
   adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
-  lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
-  adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
 
   # get variable labels if exist plus axes labels
-    gl <- .getlabels(xlab, ylab=NULL, main, lab.x.cex=lab.x.cex) 
-    x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
-    main.lab <- gl$mb
-    sub.lab <- gl$sb
+  gl <- .getlabels(xlab, ylab=NULL, main, lab.x.cex=lab.x.cex) 
+  x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
+  main.lab <- gl$mb
+  sub.lab <- gl$sb
 
   # get breaks from user supplied bin width and/or supplied start value
   # otherwise, breaks="Sturges by default

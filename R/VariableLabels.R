@@ -56,7 +56,6 @@ function(x, value=NULL, quiet=getOption("quiet")) {
     if (grepl(".xlsx", x.name)) fmt <- "Excel"
   }
 
-
   # display only
   if (!frm.cnsl  &&  fmt=="none" && is.null(value)) {
     if (missx && is.null(x.name)) {  # display all labels
@@ -79,7 +78,7 @@ function(x, value=NULL, quiet=getOption("quiet")) {
   else {
 
     # get labels
-    if (fmt == "none")  {# no external file, read from console
+    if (fmt == "none")  {  # no external file, read from console
       l <- read.csv(text=x, row.names=1,
                     header=FALSE, stringsAsFactors=FALSE)
       if (ncol(l) == 1) names(l) <- "label"
@@ -92,19 +91,21 @@ function(x, value=NULL, quiet=getOption("quiet")) {
       if (ncol(l) == 2) names(l) <- c("label", "unit")
     }
     else {
-      if (fmt=="Excel"  &&  grepl("http", x, fixed=TRUE)) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-            "The underlying read_excel function does not\n",
-            "support reading Excel files from the web.\n",
-            "Use the  download.file  function to download\n",
-            "the file to your local file system.\n\n",
-            "  download.file(\"", x, "\", \"MYFILE.xlsx\")\n\n",
-            "Replace MYFILE with the desired file name.\n",
-            "Enter  getwd()  to see where the file was saved. \n\n")
-      }
-      l <- as.data.frame(read_excel(x, col_names=FALSE))
+#     if (fmt=="Excel"  &&  grepl("http", x, fixed=TRUE)) {
+#       cat("\n"); stop(call.=FALSE, "\n","------\n",
+#           "The underlying read_excel function does not\n",
+#           "support reading Excel files from the web.\n",
+#           "Use the  download.file  function to download\n",
+#           "the file to your local file system.\n\n",
+#           "  download.file(\"", x, "\", \"MYFILE.xlsx\")\n\n",
+#           "Replace MYFILE with the desired file name.\n",
+#           "Enter  getwd()  to see where the file was saved. \n\n")
+#     }
+      l <- as.data.frame(read.xlsx(x, colNames=FALSE))
+#     l <- as.data.frame(read_excel(x, col_names=FALSE))
+
       l <- as.data.frame(l, row.names=l[,1])
-      l <- l[, -1]
+      l <- l[, -1, drop=FALSE]  # keep as a data frame with drop
       if (ncol(l) == 1) names(l) <- "label"
       if (ncol(l) == 2) names(l) <- c("label", "unit")
     }

@@ -1,18 +1,29 @@
 .OneGroup  <-
 function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
-         Edesired, paired, graph, line.chart, show.title,
+         Edesired, paired, graph, xlab, line.chart, show.title,
          pdf.file, width, height) { 
 
-  # get variable label if exists
+  # get lab.x.cex  lab.y.cex
+  lab.cex <- getOption("lab.cex")
+  lab.x.cex <- getOption("lab.x.cex")
+  lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
+  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+
+  # get variable labels if exist plus axes labels
+  gl <- .getlabels(xlab=NULL, ylab=xlab, main=NULL, lab.x.cex=lab.x.cex,
+                   graph.win=FALSE)  # # graphics window not yet set-up
+  x.name <- gl$yn; x.lbl <- gl$yl; x.lab <- gl$yb
+  main.lab <- gl$mb
+  sub.lab <- gl$sb
+
+  # get variable label if exists (redundant with above
   gl <- .getlabels(graph.win=FALSE)  # graphics window not yet set-up
   y.lbl <- gl$yl
-
   if ( (!is.null(y.lbl)) ) {
     cat("Response Variable:  ", Ynm, ", ", as.character(y.lbl), sep="", "\n")
     cat("\n")
   }
-  else y.lbl <- Ynm
 
   if (!brief) cat("\n------ Description ------\n\n")
 
@@ -208,9 +219,9 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     plt.i <- plt.i + 1
     plt.title[plt.i] <- "One-Group Plot"
 
-    .OneGraph(Y, bw1, Ynm, y.lbl, digits.d, brief,
+    .OneGraph(Y, bw1, Ynm, digits.d, brief,
          n, m, mu0, mdiff, s, smd, mmd, msmd,
-         clpct, tvalue, pvalue, ub, lb, show.title)
+         clpct, tvalue, pvalue, ub, lb, x.lab, show.title)
 
       if (!is.null(pdf.file)) {
         dev.off()

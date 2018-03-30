@@ -1,7 +1,7 @@
 .OneGraph <-
-function(YA, bw1, Ynm, y.lbl, digits.d, brief, 
+function(YA, bw1, Ynm, digits.d, brief,
          n1, m1, mu0, mdiff, sw, smd, mmd, msmd,
-         clpct, tvalue, pvalue, ub, lb, show.title) {
+         clpct, tvalue,  pvalue, ub, lb, x.lab, show.title) {
 
   dYA <- suppressWarnings(density(YA, bw1))
 
@@ -51,8 +51,12 @@ function(YA, bw1, Ynm, y.lbl, digits.d, brief,
 
   axis(1, col=getOption("axis.x.color"), col.axis=getOption("lab.color"))
   box(col=getOption("panel.color"))
-  if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
-  title(xlab=y.lbl, col.lab=col.tx)
+  if (length(x.lab) == 1)
+    xl <- x.lab
+  else
+    xl <- x.lab[4]  # variable labels have italics, multiple entries
+  if (nchar(xl) > 52) xl <- paste(substr(xl,1,50), "...")
+  title(xlab=x.lab, col.lab=col.tx)
 
   xleft <- par("usr")[1]  # left side of graph
   xright <- par("usr")[2]  # right side of graph

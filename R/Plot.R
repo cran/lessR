@@ -7,6 +7,10 @@ function(x, y=NULL, data=mydata,
          by=NULL, by1=NULL, by2=NULL,
          n.row=NULL, n.col=NULL, aspect="fill",
 
+         fill=getOption("pt.fill"),
+         color=getOption("pt.color"),
+         trans=getOption("trans.pt.fill"),
+
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
          sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
          jitter.x=0, jitter.y=0,
@@ -21,7 +25,7 @@ function(x, y=NULL, data=mydata,
          radius=0.25, power=0.6,
          low.fill=NULL, hi.fill=NULL, proportion=FALSE,
 
-         smooth=FALSE, smooth.points=100, smooth.trans=0.25,
+         smooth=FALSE, smooth.points=100, smooth.trans=0.20,
          smooth.bins=128,
 
          fit=FALSE, fit.se=0, ellipse=FALSE, 
@@ -59,6 +63,7 @@ function(x, y=NULL, data=mydata,
   violin <- ifelse (grepl("v", vbs.plot), TRUE, FALSE)
   box <- ifelse (grepl("b", vbs.plot), TRUE, FALSE)
 
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
@@ -72,9 +77,9 @@ function(x, y=NULL, data=mydata,
 
   cat.x <- NULL;  num.cat.x <- NULL;  cat.y <- NULL;  num.cat.y <- NULL; 
 
-  pt.fill <- getOption("pt.fill")
-  pt.color <- getOption("pt.color")
-  pt.trans <- getOption("trans.pt.fill")
+  pt.fill <- fill
+  pt.color <- color
+  pt.trans <- trans
   bar.color <- getOption("bar.color")
   bubble.text <- getOption("bubble.text.color")
   segment.color <- getOption("segment.color")
@@ -135,7 +140,6 @@ function(x, y=NULL, data=mydata,
   bw.miss <- ifelse (missing(bw), TRUE, FALSE)
   n.col.miss <- ifelse (missing(n.col), TRUE, FALSE)
   n.row.miss <- ifelse (missing(n.row), TRUE, FALSE)
-  data.miss <- ifelse (missing(data), TRUE, FALSE)
   add.miss <- ifelse (missing(add), TRUE, FALSE)
 
   if (!missing(a) || !missing(b)) box.adj <- TRUE
@@ -272,72 +276,72 @@ function(x, y=NULL, data=mydata,
     cat.x <- TRUE
   }
 
-  else if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
-      .nodf(df.name)  # check to see if data frame container exists
-      .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
-      all.vars <- as.list(seq_along(data))  # even if only a single var
-      names(all.vars) <- names(data)  # all data in data frame
-      x.col <- eval(substitute(x), envir=all.vars)  # col num of selected vars
-      if (!("list" %in% class(data))) {
-        data.x <- data[, x.col]
-        data.x <- data.frame(data.x)
+  # x not in global env, in df, specify data= forces to data frame
+  else if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
+    .nodf(df.name)  # check to see if data frame container exists
+    .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+    all.vars <- as.list(seq_along(data))  # even if only a single var
+    names(all.vars) <- names(data)  # all data in data frame
+    x.col <- eval(substitute(x), envir=all.vars)  # col num of selected vars
+    if (!("list" %in% class(data))) {
+      data.x <- data[, x.col]
+      data.x <- data.frame(data.x)
      }      
      else {  # class of data is "list"
         data.x <- data.frame(data[[x.col]])
-      }
-      if (is.numeric(x.col))
-        names(data.x) <- names(all.vars)[x.col]
-      else
-        names(data.x) <- x.col  # if x a vector, x.col can return names
-      data.miss <- FALSE  # use mydata even if not specified (default)
-    }  # end x not in global
-
-    # x is in the global environment (vector or data frame)
-    # can only access x directly if it is not in a data frame
-    else if (is.data.frame(x)) { # x a data frame
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Need to specify variables for analysis,\n",
-          "not a full data frame\n\n")
     }
+    if (is.numeric(x.col))
+      names(data.x) <- names(all.vars)[x.col]
+    else
+      names(data.x) <- x.col  # if x a vector, x.col can return names
+    #data.miss <- FALSE  # use mydata even if not specified (default)
+  }  # end x not in global
+
+  # x is in the global environment (vector or data frame)
+  # can only access x directly if it is not in a data frame
+  else if (is.data.frame(x)) { # x a data frame
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Need to specify variables for analysis,\n",
+        "not a full data frame\n\n")
+  }
       
-    else if (is.ts(x)) {  # time series in global
-      # just the dates for x var
-      data.x <- data.frame(.ts.dates(x))
-      names(data.x) <- "date"
-      date.ts <- TRUE
-      if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
+  else if (is.ts(x)) {  # time series in global # just the dates for x var
+    data.x <- data.frame(.ts.dates(x))
+    names(data.x) <- "date"
+    date.ts <- TRUE
+    if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
 
-      # flip x to y
-      nc <- ifelse (is.matrix(x), ncol(x), 1)
-      if (nc == 1)
-        y.call <- x
-      else {
-        y.call <- x[,1]
-        if (nc > 1) for (i in 2:nc) y.call <- cbind(y.call, x[,i])
-      }
-      y.call <- data.frame(y.call)
-      y.col <- ncol(y.call)
-      cat.y <- FALSE
-      if (nc == 1) {
-        names(y.call) <- x.name
-        y.name <- x.name
-      }
-      else
-        names(y.call) <- colnames(x)
-
-      y.name <- deparse(substitute(x))
-      options(yname = y.name)
+    # flip x to y
+    nc <- ifelse (is.matrix(x), ncol(x), 1)
+    if (nc == 1)
+      y.call <- x
+    else {
+      y.call <- x[,1]
+      if (nc > 1) for (i in 2:nc) y.call <- cbind(y.call, x[,i])
     }
+    y.call <- data.frame(y.call)
+    y.col <- ncol(y.call)
+    cat.y <- FALSE
+    if (nc == 1) {
+      names(y.call) <- x.name
+      y.name <- x.name
+    }
+    else
+      names(y.call) <- colnames(x)
+
+    y.name <- deparse(substitute(x))
+    options(yname = y.name)
+  }
       
-    else {  # x a not ts vector in global
-      if (!is.function(x)) {
-        data.x <- data.frame(x)  # x is 1 var
-        cat(">>> ", x.name, "in the global environment, not a data frame\n\n")
-      }
-      else
-        data.x <- data.frame(eval(substitute(data$x)))  # x is 1 var
-      names(data.x) <- x.name
+  else {  # x a not ts vector in global
+    if (!is.function(x)) {
+      data.x <- data.frame(x)  # x is 1 var
+      cat(">>> ", x.name, "in the global environment, not a data frame\n\n")
     }
+    else
+      data.x <- data.frame(eval(substitute(data$x)))  # x is 1 var
+    names(data.x) <- x.name
+  }
     
   n.x_var <- ncol(data.x)  # number of x-variables
   x.call <- data.x
@@ -477,7 +481,8 @@ function(x, y=NULL, data=mydata,
       data.y <- data.frame(y.call)
     }
       
-    else if (!exists(y.name, where=.GlobalEnv)) {  # y not in global env, in df
+    # y not in global env, in df, specify data= forces to data frame
+    else if (!exists(y.name, where=.GlobalEnv) || !data.miss) {
         .nodf(df.name)  # check to see if data frame container exists
         .xcheck(y.name, df.name, data)  # var in df?, vars lists not checked
         all.vars <- as.list(seq_along(data))  # even if only a single var
@@ -605,8 +610,8 @@ function(x, y=NULL, data=mydata,
     }
   }
 
-#if (!y.miss) cat("cat.y:", cat.y, "\n")
-#if (!y.miss) cat("num.cat.y:", num.cat.y, "\n")
+  #if (!y.miss) cat("cat.y:", cat.y, "\n")
+  #if (!y.miss) cat("num.cat.y:", num.cat.y, "\n")
   if (values == "data"  &&  n.x_var == 1) {
     if (y.miss) {  # y missing
       if (!cat.x) {  # continuous x
@@ -981,12 +986,11 @@ function(x, y=NULL, data=mydata,
         hist.counts <- FALSE
         hist.cumul <- ifelse(cumul, "on", "off")
         reg <- "snow2"  # applies to cumulative histogram
-        h <- .hst.main(x.call[,1], pt.fill, pt.color, reg,
+        h <- .hst.main(x.call[,1], pt.fill, pt.color, pt.trans, reg,
            lab.cex, axis.cex, rotate.x, rotate.y, offset,
            breaks, bin.start, bin.width, bin.end, proportion, hist.counts,
            hist.cumul, xlab, ylab, main, sub, quiet, fun.call=NULL,
            do.plot=FALSE, ...) 
-
 
         n.cat <- 0  # not many midpoints, do not want to trigger num.cat
         x.call <- h$mids
@@ -1182,7 +1186,7 @@ function(x, y=NULL, data=mydata,
         }
 
         VBS <- .plt.VBS(x.call[,1], ID.call, by1.call, by1.miss, by.call,
-                bw, bw.miss, lx, n.ux, k.iqr, box.adj, a, b,
+                by.miss, bw, bw.miss, lx, n.ux, k.iqr, box.adj, a, b,
                 x.name, by1.name, by.name, vbs.plot,
                 n.col.miss, n.row.miss,
                 size, j.x.miss, jitter.x, j.y.miss, jitter.y,

@@ -134,7 +134,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     n.panels <- ifelse (is.null(by2), nlevels(by1), nlevels(by1)*nlevels(by2))
     if (n.panels == 0) n.panels <- 1
     if (c.type == "cont") {
-      if (is.null(ncols) &&  is.null(nrows)) {
+      if (is.null(ncols) && is.null(nrows)) {
         ncols <- ifelse (n.panels < 7, 1, 2) 
       }
     }
@@ -326,24 +326,25 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
       p <- update(p,
          prepanel=function(x=x) {
 
-         num5 <- fivenum(x, na.rm=TRUE)
-         q1 <- num5[2];  q3 <- num5[4];  iqr <- q3 - q1
+           num5 <- fivenum(x, na.rm=TRUE)
+           q1 <- num5[2];  q3 <- num5[4];  iqr <- q3 - q1
 
-         m.c <- ifelse (box.adj, mc(x, na.rm=TRUE), 0)
-         if (m.c >= 0) {
-           fnc.lwr <- q1 - (k.iqr * exp(a*m.c) * iqr)
-           fnc.upr <- q3 + (k.iqr * exp(b*m.c) * iqr)
+           m.c <- ifelse (box.adj, mc(x, na.rm=TRUE), 0)
+           if (m.c >= 0) {
+             fnc.lwr <- q1 - (k.iqr * exp(a*m.c) * iqr)
+             fnc.upr <- q3 + (k.iqr * exp(b*m.c) * iqr)
+           }
+           else {  # m.c < 0
+             fnc.lwr <- q1 - (k.iqr * exp(-b*m.c) * iqr)
+             fnc.upr <- q3 + (k.iqr * exp(-a*m.c) * iqr)
+           } 
+
+           min.x <- min(x, fnc.lwr) 
+           max.x <- max(x, fnc.upr)
+
+           list(xlim=c(min.x, max.x))
          }
-         else {  # m.c < 0
-           fnc.lwr <- q1 - (k.iqr * exp(-b*m.c) * iqr)
-           fnc.upr <- q3 + (k.iqr * exp(-a*m.c) * iqr)
-         } 
-
-         min.x <- min(x, fnc.lwr) 
-         max.x <- max(x, fnc.upr)
-
-         list(xlim=c(min.x, max.x))
-       })
+       )
     }  # end fences
 
 

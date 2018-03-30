@@ -6,7 +6,112 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
   
->>>>>> Changes for lessR version 3.7.0 (2019-01-06) <<<<<<
+>>>>>> Changes for lessR version 3.7.1 (2018-03-30) <<<<<<
+
+-------------
+Updates 3.7.1
+-------------
+
+BarChart, Density, Histogram, LineChart, Plot, SummaryStats
+  specify data parameter forces variable from specified data table
+
+BarChart
+  statistics for each group printed for by1 variable
+  fill, color and trans parameters restored, which correspond to
+    style function bar.fill, bar.color and trans.bar.fill
+  all non-default colors provided by restored fill parameter, perhaps
+    with lessR function getColors, so colors parameter removed
+  annotation option added
+
+Histogram
+  fill, color and trans parameters restored, which correspond to
+    style function bar.fill, bar.color and trans.bar.fill
+  annotation option added
+
+PieChart
+  numerical results -- percents, proportions or counts -- can be
+    displayed either inside the pie chart or added to the labels with
+    a variety of options for inside the pie that govern their display
+  fill, color and trans parameters restored, which correspond to
+    style function bar.fill, bar.color and trans.bar.fill
+  cex is a general scaling factor for all displayed text: main.cex,
+    values.cex and label.cex
+  default color scheme for default theme, lightbronze, is now hcl, the
+    scale of discrete hcl colors with constant chroma and luminosity
+  lwd for line width parameter added for borders
+  annotation option added
+  generated colors available in output, invisibly returned
+
+Plot
+  fill, color and trans parameters restored, which correspond to
+    style function bar.fill, bar.color and trans.bar.fill
+  statistics for each group printed for by1 variable
+
+Read
+  Excel files now read with Alexander Walker's openxlsx package,
+    which also allows to read Excel files directly from the web
+  R type numeric, an ambiguous term, now referred to as R type double
+
+getColors (old name: showWheel)
+  rgb color approximation also displayed for each requested hcl color
+  especially to display many colors, options to turn off border between
+    slices and labels
+  larger color wheel within confines of plot space
+  quiet option added to suppress console output
+  discrete HCL scale now re-ordered by default to obtain maximum
+    adjacent separation for 24 or fewer colors
+  continuous color gradation from setting clr and end.clr
+  pre-specified color ranges added: blues, reds and greens
+
+ScatterPlot
+  now a convenience function instead of an equivalence to Plot,
+    just calls Plot with vbs.plot="s" 
+
+ttest
+  xlab option added for custom specification of x-axis label,
+    also now does the variable label by default if present
+
+Write
+  format="Excel" option added to write an Excel data table into an
+    Excel worksheet with Alexander Walker's openxlsx package
+  row.names option added explicitly to provide the same parameter
+    to the different internal write function calls
+
+ViolinPlot
+  convenience function, just calls Plot with vbs.plot="v"
+
+
+---------------
+Bug Fixes 3.7.1
+--------------- 
+
+BarChart
+  If a bar chart plotted for each categorical variable of the data table
+    with bc(), no longer crashes if no categorical variables
+  For y read directly (instead of tabulated counts), when both x and y-axis
+    are given x need not be sorted alphabetically
+  Grid lines properly display for horizontal plot
+  trans.bar.fill from style function now properly sets bar 
+
+Histogram, LineChart, Plot
+  axes color from style apply correctly
+
+Read
+  Excel read works with labels in the second row
+
+Plot
+  time series axis labels color can be modified
+
+Regression
+  Color of a fit line in scatterplot matrix according to fit.color works
+
+VariableLabels
+  reading labels from an Excel file works
+
+
+
+  
+>>>>>> Changes for lessR version 3.7.0 (2018-01-06) <<<<<<
 
 -------------
 Updates 3.7.0

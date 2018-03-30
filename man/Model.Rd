@@ -13,7 +13,7 @@ Automatically selects and then provides an analysis of a linear model: OLS regre
 }
 
 \usage{
-Model(my.formula, data=mydata, brief=getOption("brief"), \ldots)
+Model(my.formula, data=mydata, brief=getOption("brief"), xlab=NULL, \ldots)
 
 model.brief(\ldots, brief=TRUE) 
 
@@ -29,6 +29,7 @@ model(\ldots)
        is \code{mydata}, otherwise explicitly specify.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
        with \code{\link{style}} function.}
+  \item{xlab}{x-axis label, defaults to variable name, or, if present, variable label.}
   \item{\dots}{Other parameter values for R functions such as \code{\link{lm}} which provide the core computations.} 
 }
 

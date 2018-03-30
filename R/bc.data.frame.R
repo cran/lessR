@@ -6,7 +6,6 @@ function(x, n.cat,
          xlab, ylab, main, lab.cex,
          labels, label.size,
          axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
-         col.low, col.hi,
          legend.title, legend.loc, legend.labels, legend.horiz, quiet,
          width, height, pdf.file, ...)  {
 
@@ -39,8 +38,10 @@ function(x, n.cat,
         x.name <- names(x)[i]
         options(xname = x.name)
 
-        if (nu == 1)
-          cat("\nVariable", x.name, "has only one value. No barchart produced.\n\n")
+        if (nu == 1) {
+          cat("\nVariable", x.name, "has only one value.\n",
+              "No bar chart produced.\n\n")
+        }
 
         else {
 
@@ -65,8 +66,8 @@ function(x, n.cat,
           xlab, ylab, main, lab.cex,
           value.labels=NULL, label.size,
           axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
-          col.low, col.hi, 
-          legend.title, legend.loc, legend.labels, legend.horiz, quiet,
+          legend.title, legend.loc, legend.labels, legend.horiz,
+          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, quiet,
           font.main=1, ...)
 
         if (!is.null(pdf.file)) {
@@ -77,7 +78,7 @@ function(x, n.cat,
         if (.is.integer(x[,i]) && nu <= n.cat && !quiet)
           .ncat("bar chart", x.name, nu, n.cat)
 
-        }
+        }  # end else
       }
 
       else cat("\n", names(x)[i], "appears to contain unique Names or IDs\n")
@@ -88,7 +89,18 @@ function(x, n.cat,
 
   }  # each column in x
 
-    options(suggest = sug)
-    if (is.null(pdf.file)) if (is.null(options()$knitr.in.progress))
-      .plotList(plot.i, plot.title)
+  options(suggest = sug)
+  if (plot.i > 0) {
+    if (is.null(pdf.file))
+      if (is.null(options()$knitr.in.progress))
+        .plotList(plot.i, plot.title)
+  }
+  else {
+    cat("No categorical variables, so no bar charts.\n\n",
+        "If you have integer variables that are categorical,\n",
+        "  then set the n.cat parameter to the maximum\n",
+        "  number of integer values (categories),\n",
+        "  or convert them to R factors.\n\n", sep="")
+  }
+
 }

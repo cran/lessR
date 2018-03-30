@@ -4,6 +4,10 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
 
+    fill=getOption("bar.fill"),
+    color=getOption("bar.color"),
+    trans=getOption("trans.bar.fill"),
+
     bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
 
     prop=FALSE, hist.counts=FALSE,
@@ -13,6 +17,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     rotate.x=getOption("rotate.x"),
     rotate.y=getOption("rotate.y"),
     offset=getOption("offset"),
+
+    add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
     digits.d=NULL, quiet=getOption("quiet"), do.plot=TRUE,
     width=4.5, height=4.5, pdf=FALSE, 
@@ -24,18 +30,12 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
 
-  fill <- getOption("bar.fill")
-  color <- getOption("bar.color")
-  trans <- getOption("trans.bar.fill")
   panel.fill <- getOption("panel.fill")
   panel.color <- getOption("panel.color")
   grid.color <- getOption("grid.color")
   lab.color <- getOption("lab.color")
   lab.cex <- getOption("lab.cex")
   axis.cex <- getOption("axis.cex") 
-
-  df.name <- deparse(substitute(data))   # get name of data table
-  options(dname = df.name)
 
   Trellis <- ifelse(!missing(by1), TRUE, FALSE)
 
@@ -45,6 +45,12 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   x.name <- deparse(substitute(x))  # could be a list of var names
   options(xname = x.name)
 
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
+  df.name <- deparse(substitute(data))   # get name of data table
+  options(dname = df.name)
+
+  fill[which(fill == "off")] <- "transparent"
+  color[which(color == "off")] <- "transparent"
 
 # -----------------------------------------------------------
 # establish if a data frame, if not then identify variable(s)
@@ -53,7 +59,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   if (!missing(x)) {
 
-    if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
+    # x not in global env, in df, specify data= forces to data frame
+    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
       .nodf(df.name)  # check to see if data frame container exists 
       .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
       all.vars <- as.list(seq_along(data))  # even if only a single var
@@ -81,17 +88,17 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     }  # x not in global
 
     else { # x is in the global environment (vector or data frame)
-
       if (is.data.frame(x))  # x a data frame
         data.x <- x
       else {  # x a vector in global
+        .xstatus(x.name, df.name, quiet)
         if (!is.function(x))
           data.x <- data.frame(x)  # x is 1 var
         else
           data.x <- data.frame(eval(substitute(data$x)))  # x is 1 var
         names(data.x) <- x.name
       }
-    }
+    }  # x is in global
 
   }
   
@@ -227,10 +234,11 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
         # nothing returned if quiet=TRUE
 
-        stuff <- .hst.main(data[,i], fill, color, reg,
+        stuff <- .hst.main(data[,i], fill, color, trans, reg,
             lab.cex, axis.cex, rotate.x, rotate.y, offset,
             breaks, bin.start, bin.width,
             bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub, 
+            add, x1, x2, y1, y2,
             quiet, do.plot, fun.call=fun.call, ...)
         txsug <- stuff$txsug
         if (is.null(txsug)) txsug <- ""

@@ -21,7 +21,7 @@ ttest(x=NULL, y=NULL, data=mydata, paired=FALSE,
          n=NULL, m=NULL, s=NULL, mu0=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
 
-         Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", 
+         Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", xlab=NULL, 
 
          brief=getOption("brief"), digits.d=NULL, conf.level=0.95,
          alternative=c("two.sided", "less", "greater"),
@@ -64,6 +64,7 @@ tt(\ldots)
         two levels.}
   \item{X1nm}{Value of grouping variable, the level that defines the first group.}
   \item{X2nm}{Value of grouping variable, the level that defines the second group.}
+  \item{xlab}{x-axis label, defaults to variable name, or, if present, variable label.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{style}} function.}
   \item{digits.d}{Number of decimal places for which to display numeric values. Suggestion only.}
   \item{conf.level}{Confidence level of the interval, expressed as a proportion.}

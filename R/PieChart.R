@@ -3,43 +3,55 @@ function(x, y=NULL, data=mydata,
 
          radius=1, hole=0.65, hole.fill=getOption("panel.fill"),
 
-         fill=NULL, low.fill=NULL, hi.fill=NULL,
-         colors=c("rainbow", "terrain", "heat"),
-         random.color=FALSE,
+         fill=NULL, 
+         color=getOption("bar.color"),
+         trans=getOption("trans.bar.fill"),
+
+         density=NULL, angle=45,
+         lty="solid", lwd=1, edges=200,
 
          clockwise=FALSE, init.angle=ifelse (clockwise, 90, 0), 
-         density=NULL, angle=45, border="black", lty="solid",
-         edges=200, 
 
-         main=NULL, cex=1, cex.main=1,
+         values=c("none", "percent", "prop", "input"),
+         values.pos=c("pie", "labels"), values.color="white",
+         values.cex=.85,
+
+         main=NULL, main.cex=1.2, labels.cex=0.9, cex,
+
+         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
          quiet=getOption("quiet"),
          width=5, height=5, pdf.file=NULL, ...) {
 
 
-  if (missing(colors)) 
-    colors <- getOption("theme")
-  else
-    colors <- match.arg(colors)
+  values <- match.arg(values)
+  values.pos <- match.arg(values.pos)
 
-  if (border[1] == "off") border[1] <- "transparent"
+  if (!missing(cex)) {
+    main.cex <- cex * main.cex
+    labels.cex <- cex * labels.cex
+    values.cex <- cex * values.cex
+  }
+
+  if (missing(x)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Need a variable from which to calculate the pie chart\n\n")
+  }
+
+  main.miss <- ifelse (missing(main), TRUE, FALSE)
+
+  # default color scale
+  if (is.null(fill)) {
+    theme <- getOption("theme")
+    fill <- ifelse (theme %in% c("gray", "white"), "grayscale", "hcl")
+  }
 
   if (hole < 0  ||  hole >= 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "size of hole is a proportion, so must be between 0 and 1\n\n")
   }
 
-  dots <- list(...)  # check for deprecated parameters
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      old.nm <- c("col.fill", "col.low", "col.hi")
-      if (names(dots)[i] %in% old.nm) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  now begin with  ",
-          "color \n\n")
-      }
-    }
-  }
+  .param.old(...)
 
 
   # evaluate x
@@ -64,6 +76,7 @@ function(x, y=NULL, data=mydata,
     if (is.data.frame(x))  # x a data frame
       data <- x
     else {  # x a vector or matrix in global
+      .xstatus(x.name, df.name, quiet)
       if (exists(x.name, where=.GlobalEnv)) if (is.matrix(x)) { 
         x.name <- xlab
         xlab <- NULL
@@ -106,17 +119,16 @@ function(x, y=NULL, data=mydata,
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
   .opendev(pdf.file, width, height)
 
-  #orig.params <- par(no.readonly=TRUE)
-  #on.exit(par(orig.params))
-
   hole <- hole * radius
   .pc.main(x.call, y.call, 
-       random.color, fill, low.fill, hi.fill, colors,
-       radius, hole, hole.fill, edges, 
-       clockwise, init.angle, 
-       density, angle, border, lty,
-       cex, cex.main, quiet, main,
-       pdf.file, width, height, ...)
+        fill, color, trans, 
+        radius, hole, hole.fill, edges, 
+        clockwise, init.angle, 
+        density, angle, lty, lwd,
+        values, values.pos, values.color, values.cex,
+        labels.cex, main.cex, main, main.miss,
+        add, x1, x2, y1, y2,
+        quiet, pdf.file, width, height, ...)
 
   # terminate pdf graphics system
   if (!is.null(pdf.file)) {

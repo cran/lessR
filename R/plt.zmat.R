@@ -1,7 +1,7 @@
 .plt.mat <-
 function(x, cor.coef=TRUE, fit="loess",
          col.fill=getOption("pt.fill"), col.color=getOption("pt.color"),
-         col.fit=getOption("bar.color"), col.bg=getOption("panel.fill"),
+         col.fit=getOption("fit.color"), col.bg=getOption("panel.fill"),
          col.box=getOption("panel.color")) {
 
 
@@ -13,7 +13,7 @@ function(x, cor.coef=TRUE, fit="loess",
 
   par(bg=getOption("window.fill"))
 
-  panel.smooth <- function (x, y, fit.line=fit, pch=par("pch"), cex=.76,
+  panel.smooth <- function(x, y, fit.line=fit, pch=par("pch"), cex=.76,
     col.pt=col.color, col.smooth=col.fit, span=2/3, iter=3, ...)
  {
     usr <- par("usr")          

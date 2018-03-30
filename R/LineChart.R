@@ -57,6 +57,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
   options(xname = x.name)
   options(yname = x.name)  # for .lc.main, which uses y as the var
 
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
@@ -65,7 +66,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 # establish if a data frame, if not then identify variable(s)
 
   if (!missing(x)) {
-    if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
+    # x not in global env, in df, specify data= forces to data frame
+    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
       .nodf(df.name)  # check to see if data frame container exists 
       .xcheck(x.name, df.name, data)  # see if var in df, vars lists not checked
       vars.list <- as.list(seq_along(data))
@@ -87,6 +89,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
       if (is.data.frame(x))  # x a data frame
         data <- x
       else {  # x a vector in global
+        .xstatus(x.name, df.name, quiet)
         data <- data.frame(x)  # x is 1 var
         names(data) <- x.name
       }

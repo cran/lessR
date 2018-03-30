@@ -1,5 +1,5 @@
 .plt.VBS <-
-function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux, 
+function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux, 
          k.iqr, box.adj, a, b,
          x.name, by1.name, by.name, vbs.plot,
          n.col.miss, n.row.miss,
@@ -77,6 +77,7 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
   if (is.null(by0)) by.name <- ""
   if (is.null(by1)) by1.name <- ""
 
+  # suggestions
   if (getOption("suggest")) {
     # function call for suggestions
     fncl <- .fun.call.deparse(fun.call) 
@@ -153,7 +154,7 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
 
   # -------
   # ONE VAR VBS plot: # no by1, so x by itself
-  if (by1.miss) { 
+  if (by1.miss && by.miss) { 
 
     # box plot outliers, stats
     bx <- .bx.stats(x, ID, k.iqr, box.adj, a, b, digits.d)
@@ -243,6 +244,7 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
   # -------
   # TWO VAR: x-variable with a Y categorical variable, by1
   else {
+    if (by1.miss && !by.miss) by1 <- by0
     frq <- table(x, by1)
     n.lvl <- nlevels(by1)
     lvl <- levels(by1)
@@ -259,17 +261,18 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
     rep.max <- max(rep.t)
     txrep <- .get.dup(mc.w, x.name, lvl)
 
-    mx.c <- max(tapply(x, by1, length))
-    ssstuff <- .ss.numeric(x, by=by1, y.name=by1.name,
+    b.name <- ifelse(by.miss, by1.name, by.name)
+    ssstuff <- .ss.numeric(x, by=by1, y.name=b.name,
                            digits.d=digits.d, brief=TRUE, by1.nm=TRUE)
-    if (n.col.miss && n.row.miss) n.col <- 1
     txgrp <- ssstuff$tx
     class(txgrp) <- "out_piece"
 
-  if (rep.prop > 0.15  &&  mc.w > (.05 * lx))  # many reps?
-    reps <- TRUE
-  else
-    reps <- FALSE 
+    #if (n.col.miss && n.row.miss) n.col <- 1
+    mx.c <- max(tapply(x, by1, length))
+    if (rep.prop > 0.15  &&  mc.w > (.05 * lx))  # many reps?
+      reps <- TRUE
+    else
+      reps <- FALSE 
 
     # continuous variable with a categorical variable
     if (!reps) {  # reps-cat
@@ -295,7 +298,7 @@ function(x, ID, by1, by1.miss, by0, bw, bw.miss, lx, n.ux,
       if (!by1.miss) {
         mx.c <- max(table(x, by1))
         n.lvl <- nlevels(by1)
-        if (n.col.miss) n.col <- 1
+        #if (n.col.miss) n.col <- 1
       }
 
       if (is.null(size))

@@ -5,9 +5,8 @@ importFrom("foreign", read.spss)
 importFrom("sas7bdat", read.sas7bdat)
 importFrom("triangle", dtriangle, rtriangle)
 importFrom("png", readPNG)
-importFrom("readxl", read_excel)
+importFrom("openxlsx", read.xlsx, addWorksheet, createStyle, createWorkbook, saveWorkbook, setColWidths, writeDataTable)
 importFrom("robustbase", adjboxStats, mc)
-#importFrom("gdata", read.xls)
 #importFrom("MBESS", ci.smd)
 
 importFrom("graphics", "abline", "arrows", "axis", "axis.Date", "barplot", "box", "boxplot", "hist", "legend", "lines", "mtext", "pairs", "par", "pie", "plot", "plot.default", "plot.new", "plot.window", "points", "polygon", "rasterImage", "rect", "rug", "segments", "stripchart", "strwidth", "sunflowerplot", "symbols", "text", "title", "axTicks", "smoothScatter")
@@ -27,7 +26,7 @@ importFrom("lattice", "xyplot", "histogram", "barchart", "panel.grid", "panel.xy
 
 importFrom("latticeExtra", "layer", "panel.ellipse", "panel.xyarea")
 
-importFrom("colorspace", "polarLUV")
+#importFrom("colorspace", "polarLUV")
 
 S3method(print, out_all)
 S3method(print, out_piece)
@@ -53,6 +52,7 @@ export (
   corScree, scree, corEFA, efa,
   Density, dn,
   details, db,
+  getColors,
   Help,
   Histogram, hs,
   label,
@@ -68,7 +68,6 @@ export (
   Regression, reg, reg.brief, regPlot, 
   Recode, rec,
   set, showColors,
-  showWheel,
   simCImean, simCLT, simFlips, simMeans,
   ScatterPlot, sp, Plot, 
   Sort, srt,
@@ -80,6 +79,7 @@ export (
   ttest, tt, tt.brief,
   ttestPower, ttp,
   values, VariableLabels, vl, 
+  ViolinPlot, vp,
   Write, wrt, wrt.r,
   xAnd, xNum, xP, xRow, xU, xW
 )

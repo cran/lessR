@@ -1,5 +1,5 @@
 Model <-
-function(my.formula, data=mydata, brief=getOption("brief"), ...) {
+function(my.formula, data=mydata, brief=getOption("brief"), xlab=NULL, ...) {
 
 
   if (missing(my.formula)) {
@@ -84,6 +84,18 @@ function(my.formula, data=mydata, brief=getOption("brief"), ...) {
         if (digits.d == 1) digits.d <- 2
         options(digits.d=digits.d)  # .fmt requires if not specified
 
+        # get lab.x.cex  lab.y.cex
+        lab.cex <- getOption("lab.cex")
+        lab.x.cex <- getOption("lab.x.cex")
+        lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
+        adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+
+        # get variable labels if exist plus axes labels
+        gl <- .getlabels(xlab=NULL, ylab=xlab, main=NULL, lab.x.cex=lab.x.cex,
+                         graph.win=FALSE)  # # graphics window not yet set-up
+        x.lab <- gl$yb
+        #x.name <- gl$yn; x.lbl <- gl$yl; x.lab <- gl$yb
+
         # need to assign to out to avoid returned info displayed at console
         if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
           out <- .TwoGroup(x, y,
@@ -92,7 +104,8 @@ function(my.formula, data=mydata, brief=getOption("brief"), ...) {
             brief=FALSE, digits.d, 
             conf.level=0.95, alternative="two.sided",
             mmd=NULL, msmd=NULL, Edesired=NULL, 
-            bw1="nrd", bw2="nrd", graph=TRUE, line.chart=FALSE, show.title=TRUE,
+            bw1="nrd", bw2="nrd", graph=TRUE, xlab=xlab,
+            line.chart=FALSE, show.title=TRUE,
             pdf.file=NULL, width=5, height=5, ...)
         else {  # switch
           Xtmp <- X2nm
@@ -104,7 +117,8 @@ function(my.formula, data=mydata, brief=getOption("brief"), ...) {
             brief=FALSE, digits.d, 
             conf.level=0.95, alternative="two.sided",
             mmd=NULL, msmd=NULL, Edesired=NULL, 
-            bw1="nrd", bw2="nrd", graph=TRUE, line.chart=FALSE, show.title=TRUE,
+            bw1="nrd", bw2="nrd", graph=TRUE, xlab=xlab,
+            line.chart=FALSE, show.title=TRUE,
             pdf.file=NULL, width=5, height=5, ...)
         }
       }

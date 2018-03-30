@@ -1,7 +1,7 @@
 .TwoGraph <-
 function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
          n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
-         clpct, tvalue, pvalue, ub, lb, show.title) {
+         clpct, tvalue, pvalue, ub, lb, x.lab, show.title) {
 
   dYA <- suppressWarnings(density(YA, bw1))
   dYB <- suppressWarnings(density(YB, bw2))
@@ -58,7 +58,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   axis(1, col=getOption("axis.x.color"), col.axis=getOption("lab.color"))
   box(col=getOption("panel.color"))
   if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
-  title(xlab=y.lbl, col.lab=col.tx)
+  title(xlab=x.lab, col.lab=col.tx)
 
   xleft <- par("usr")[1]  # left side of graph
   xright <- par("usr")[2]  # right side of graph

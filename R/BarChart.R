@@ -1,14 +1,15 @@
-BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"), 
+BarChart <- function(x=NULL, y=NULL, data=mydata,
+        n.cat=getOption("n.cat"),
+
+        fill=getOption("bar.fill"),
+        color=getOption("bar.color"),
+        trans=getOption("trans.bar.fill"),
 
         by=NULL, by1=NULL,
         n.row=NULL, n.col=NULL, aspect="fill",
 
-        colors=c("rainbow", "terrain", "heat"),
-
-        horiz=FALSE, addtop=0.05,
-        gap=NULL, proportion=FALSE,
-
-        beside=FALSE, low.fill=NULL, hi.fill=NULL, 
+        horiz=FALSE, addtop=0.05, gap=NULL,
+        proportion=FALSE, beside=FALSE,
 
         legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
         legend.horiz=FALSE, 
@@ -18,14 +19,13 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
         cex.names=0.70,
         value.labels=NULL, label.max=20,
 
+        add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
+
         quiet=getOption("quiet"),
         width=5, height=4.5, pdf.file=NULL, ...)  {
 
 
-  if (missing(colors)) 
-    colors <- getOption("theme")
-  else
-    colors <- match.arg(colors)
+  theme <- getOption("theme")
 
   options(xname = NULL)
   options(yname = NULL)
@@ -33,10 +33,6 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
 
   Trellis <- ifelse(!missing(by1), TRUE, FALSE)
   do.plot <- TRUE
-
-  fill <- getOption("bar.fill")
-  color <- getOption("bar.color")
-  trans <- NULL
 
   panel.fill <- getOption("panel.fill")
   panel.color <- getOption("panel.color")
@@ -52,10 +48,12 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
   rotate.y <- getOption("rotate.y")
   offset <- getOption("offset")
 
-  if (!is.null(fill)) {
-    for (i in 1:length(fill))
-      if (fill[i] == "off") fill[i] <- "transparent"
-  }
+  #if (!is.null(fill)) {
+  # for (i in 1:length(fill))
+  #   if (fill[i] == "off") fill[i] <- "transparent"
+  #}
+  fill[which(fill == "off")] <- "transparent"
+  color[which(color == "off")] <- "transparent"
 
   #if (missing(color))  # default black border unless dark bg
     #if (sum(col2rgb(panel.fill))/3 > 80) color <- "black"
@@ -65,6 +63,7 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
   x.name <- deparse(substitute(x))
   options(xname = x.name)
 
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
@@ -75,7 +74,8 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
   x.call <- NULL
 
   if (!missing(x)) {
-    if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
+    # x not in global env, in df, specify data= forces to data frame
+    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
       .nodf(df.name)  # check to see if data frame container exists 
       .xcheck(x.name, df.name, data)  # see if var in df, vars lists not checked
       vars.list <- as.list(seq_along(data))
@@ -230,13 +230,13 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
 
       bc <- .bc.main(x.call, y.call, by.call,
            fill, color, panel.fill,
-           panel.color, trans, colors,
+           panel.color, trans, theme,
            horiz, addtop, gap, proportion,
            xlab, ylab, main, lab.cex,
            value.labels, label.max,
-           axis.cex, cex.names, rotate.x, rotate.y, offset,
-           beside, low.fill, hi.fill,
-           legend.title, legend.loc, legend.labels, legend.horiz, quiet, ...)
+           axis.cex, cex.names, rotate.x, rotate.y, offset, beside, 
+           legend.title, legend.loc, legend.labels, legend.horiz,
+           add, x1, x2, y1, y2, quiet, ...)
 
       if (!is.null(pdf.file)) {
         dev.off()
@@ -252,12 +252,11 @@ BarChart <- function(x=NULL, y=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     bc.data.frame(data, n.cat,
       fill, color, panel.fill, panel.color,
-      trans, colors,
+      trans, theme,
       horiz, addtop, gap, proportion,
       xlab, ylab, main, lab.cex,
       value.labels, label.max,
-      axis.cex, cex.names, rotate.x, rotate.y, offset,
-      beside, low.fill, hi.fill,
+      axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
       legend.title, legend.loc, legend.labels, legend.horiz, quiet,
       width, height, pdf.file, ...)
   }

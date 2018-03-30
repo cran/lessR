@@ -9,8 +9,8 @@ function (...) {
       if (grepl("fill", names(dots)[i], fixed=TRUE)  ||
           grepl("color.", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "The parameter list for Plot is much shortened by moving most\n",
-          "color and related style attributes to function:  style\n\n",
+          "The parameter list for this function is much shortened by moving\n",
+          "most color and related style attributes to function:  style\n\n",
           "Example: Here set the theme to gold with a fill color of ",
           "\"powerderblue\"\n\n",
           "style(\"gold\", fill=\"powderblue\")\n\n",
@@ -22,7 +22,7 @@ function (...) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "stroke  replaced with:  color\n",
           "e.g., ellipse.color  instead of  ellipse.stroke\n\n",
-          "Also, now only modify via function:  style\n\n",
+          "Also, now modify via function:  style\n\n",
           "Example: style(\"gold\", color=\"powderblue\")\n\n",
           "Enter   style(show=TRUE)  to see all the options\n",
           "Enter   ?style  to view the help file\n\n")
@@ -35,8 +35,14 @@ function (...) {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
             "color options dropped the  col. prefix\n",
             "eg., fill, instead of col.fill\n\n",
-          "Also, now only modify fill and related colors\n",
+          "Also, now can modify fill and related colors\n",
           "  with function:  style\n\n")
+      }
+
+      if (grepl("colors", names(dots)[i], fixed=TRUE)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "colors option removed because the fill parameter\n",
+          "  and getColors function offer more functionality\n\n")
       }
 
       if (grepl("rotate", names(dots)[i], fixed=TRUE)) {

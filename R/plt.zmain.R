@@ -376,6 +376,17 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     axT2 <- axTicks(2) 
     #axT2 <- pretty(y) 
 
+  # background color
+  rect(usr[1], usr[3], usr[2], usr[4], col=fill.bg, border="transparent")
+
+  # grid lines (put before box color around plot)
+  .grid("v", axT1)
+  if (!bubble1) .grid("h", axT2)
+  
+  # box around plot
+  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
+    lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
+
   if (xy.ticks) {
     if (!bubble1) {
       if (!date.ts) {  # get ticks for both axes
@@ -386,8 +397,10 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       else {  # time 
         axis.x.color <- ifelse(is.null(getOption("axis.x.color")), 
           getOption("axis.color"), getOption("axis.x.color"))
-        axis.Date(1, x.val, col.axis=axis.x.color, 
-                  cex.lab=lab.x.cex, ...)  # strptime
+        axis.x.text.color <- ifelse(is.null(getOption("axis.x.text.color")), 
+          getOption("axis.text.color"), getOption("axis.x.text.color"))
+        axis.Date(1, x.val, col=axis.x.color, cex.lab=lab.x.cex,
+                  col.axis=axis.x.text.color, ...)  # strptime
         .axes(NULL, y.val, axT1, axT2,
               #pretty(par("usr")[1], par("usr")[3]),
               par("usr")[1], par("usr")[3],
@@ -419,17 +432,6 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl.y, 
           x.val, xy.ticks, offset=offset,
           lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, ...) 
-
-  # background color
-  rect(usr[1], usr[3], usr[2], usr[4], col=fill.bg, border="transparent")
-
-  # grid lines (put before box color around plot)
-  .grid("v", axT1)
-  if (!bubble1) .grid("h", axT2)
-  
-  # box around plot
-  rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
-    lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
 
   # ---------------

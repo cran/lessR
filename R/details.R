@@ -37,17 +37,17 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     for (i in 1:n.var) if (is.integer(data[,i])[1]) int.flg <- TRUE
 
     num.flg <- FALSE
-    for (i in 1:n.var) if (is.numeric(data[,i])[1]) num.flg <- TRUE
+    for (i in 1:n.var) if (is.double(data[,i])[1]) num.flg <- TRUE
 
     cat("\n")
     cat("Data Types\n")
     .dash(60)
-    if (reg.fac) cat("factor: Non-numeric categories, read as unordered ",
+    if (reg.fac) cat("factor: Non-numeric categories, read as unordered",
         "categories\n")
     if (ord.fac) cat("ordfact: Ordered, non-numeric categories\n")
     if (chr.flg) cat("character: Non-numeric data values\n")
     if (int.flg) cat("integer: Numeric data values, integers only\n")
-    if (num.flg) cat("numeric: Numeric data values with decimal digits\n")
+    if (num.flg) cat("double: Numeric data values with decimal digits\n")
     .dash(60)
   cat("\n")
 
@@ -82,6 +82,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
 
     the.class <- class(data[,i])[1]  # could be an ordered factor
     if (the.class == "ordered") the.class <- "ordfact"
+    if (the.class == "numeric") the.class <- "double"
 
     cat(.fmtc(x.name,pad-1), .fmtc(the.class,9), .fmti(n,6),
         .fmti(n.miss,7), .fmti(nu[i],7))
@@ -127,7 +128,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     num.cat <- FALSE
     n.cat.temp  <- 4
     for (j in 1:n.var) {
-      if (is.numeric(data[,j]) && nu[j] <= n.cat.temp) num.cat <- TRUE
+      if (is.double(data[,j]) && nu[j] <= n.cat.temp) num.cat <- TRUE
     }
     if (num.cat) {
       cat("\n\n")
@@ -139,7 +140,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
           "Or, specify a value for n.cat, ",
           "such as:  > style(n.cat=4)\n", sep="")
       .dash(63)
-      for (j in 1:n.var) if (is.numeric(data[,j]) && nu[j] <= n.cat.temp)
+      for (j in 1:n.var) if (is.double(data[,j]) && nu[j] <= n.cat.temp)
         cat(names(data)[j], "\n")
       .dash(63)
     }
@@ -178,7 +179,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
 
       if (miss.matrix && n.miss.tot>0) {
         cat("\n\nTable of Missing Values, 1 means missing\nn")
-        print(matrix(as.numeric(is.na(data)), nrow=n.obs, ncol=n.var,
+        print(matrix(as.double(is.na(data)), nrow=n.obs, ncol=n.var,
         dimnames = list(row.names(data), as.character(1:n.var)) ))
       }
           

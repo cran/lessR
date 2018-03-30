@@ -7,7 +7,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
          segments.x, breaks, c.type) {
 
 
-  cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n\n")
+  cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n")
 
 
   grid.x.color <- ifelse(is.null(getOption("grid.x.color")), 
@@ -197,11 +197,11 @@ function(x, by1, by2, nrows, ncols, asp, prop,
            x = list(cex=axis.x.cex, rot=rotate.x, col=a.x.text.color),
            y = list(cex=axis.y.cex, rot=rotate.y, col=a.y.text.color)),
          panel = function(x, y, ...) {
-             panel.grid(h=0, v=-1, col=g.x.color,
+            panel.grid(h=0, v=-1, col=g.x.color,
                         lwd=grid.x.lwd, lty=grid.x.lty)
             if (c.type == "hist") {
-             panel.grid(h=-1, v=0, g.y.color,
-                        lwd=grid.y.lwd, lty=grid.y.lty)
+              panel.grid(h=-1, v=0, g.y.color,
+                         lwd=grid.y.lwd, lty=grid.y.lty)
               panel.histogram(x, col=fill, border=color, ...)
               #panel.dnFill(x, fill=rgb(.3,.3,.9,.2), color="darkblue",
                            #ref=TRUE, origin=0, ...)
@@ -235,6 +235,38 @@ function(x, by1, by2, nrows, ncols, asp, prop,
     print(p)
   }
 
+  # text output
+  if (!getOption("quiet")) {
+
+    if (c.type == "hist"  &&  is.null(by2)) {
+      stuff <- .ss.numeric(x, by1, digits.d=getOption("digits.d"), 
+                           brief=TRUE, y.name=getOption("by1name"))
+      txsts <- stuff$tx
+      class(txsts) <- "out_piece"
+      output <- list(out_stats=txsts)
+      class(output) <- "out_all"
+      print(output)
+    }
+
+    else if (c.type == "bar"  &&  is.null(by2)) {
+        stats <- .ss.factor(x, by=by1, brief=TRUE, digits.d=getOption("digits.d"),
+                            x.name=x.name, y.name=getOption("by1name"),
+                            x.lbl=x.lbl, y.lbl=y.lbl)
+        if (!is.null(stats)) {
+          txttl <- stats$txttl
+          txfrq <- stats$txfrq
+          txXV <- stats$txXV
+
+          class(txttl) <- "out_piece"
+          class(txXV) <- "out_piece"
+          output <- list(out_frq=txfrq, out_chi=txXV)
+          class(output) <- "out_all"
+          print(output)      
+      }
+
+    }
+  }
+
+  cat("\n")
+
 }
-
-

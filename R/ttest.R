@@ -4,7 +4,7 @@ function(x=NULL, y=NULL, data=mydata, paired=FALSE,
          n=NULL, m=NULL, s=NULL, mu0=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
 
-         Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", 
+         Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", xlab=NULL, 
 
          brief=getOption("brief"), digits.d=NULL, conf.level=0.95,
          alternative=c("two.sided", "less", "greater"),
@@ -70,7 +70,8 @@ function(x, y=NULL, ...) {
       if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
         plt2 <- .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
-          conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, graph,
+          conf.level, alternative, mmd, msmd, Edesired, bw1, bw2,
+          graph, xlab,
           line.chart, show.title, pdf.file, width, height)
       else {  # switch
         Xtmp <- X2nm
@@ -78,7 +79,8 @@ function(x, y=NULL, ...) {
         X1nm <- Xtmp
         plt2 <- .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
-          conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, graph,
+          conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, 
+          graph, xlab,
           line.chart, show.title, pdf.file, width, height)
       }
 
@@ -94,7 +96,7 @@ function(x, y=NULL, ...) {
          n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits.d, conf.level,
          alternative, mmd, msmd, Edesired, bw1, bw2,
-         graph=FALSE, line.chart=FALSE)
+         graph=FALSE, xlab=NULL, line.chart=FALSE)
     }
   #if (!brief) {
     #txt <- "Kelley and Lai's MBESS package]"
@@ -117,7 +119,7 @@ function(x, y=NULL, ...) {
       options(yname=x.name)
       plt1 <- .OneGroup(x, Ynm, mu0, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
-         Edesired, paired, graph, line.chart, show.title,
+         Edesired, paired, graph, xlab, line.chart, show.title,
          pdf.file, width, height, ...)
 
     if (!is.null(plt1$i)) {
@@ -130,7 +132,7 @@ function(x, y=NULL, ...) {
     else  # from stats
        .OneGroup(x, Ynm, mu0, n, m, s, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
-         Edesired, paired, graph, line.chart, show.title,
+         Edesired, paired, graph, xlab, line.chart, show.title,
          pdf.file, width, height, ...)
   }  # end one group
 

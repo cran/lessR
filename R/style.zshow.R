@@ -173,8 +173,8 @@ function() {
     cat("ANNOTATION\n")
     cat("add.fill  .. Fill color of annotated figures ..",
         .to_rgb(getOption("add.fill")), "\n")
-    cat("add.trans .. Transparency of fill .............",
-        getOption("add.lty"), "\n")
+    cat("add.trans .. Fill transparency ................",
+        getOption("add.trans"), "\n")
     cat("add.color .. Color of annotated lines .........",
         getOption("add.color"), "\n")
     cat("add.cex  ... Size of annotated text ...........",

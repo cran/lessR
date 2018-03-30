@@ -100,7 +100,6 @@ function(
 
   width=120, show=FALSE, ...) {
 
-
   if (nargs() == 0) {
      theme <- "lightbronze"
      cat("theme set to \"lightbronze\"\n\n")
@@ -257,58 +256,58 @@ function(
 
   # inheritance
   if (!missing(trans)) {
-    trans.pt.fill <- trans;
-    trans.bar.fill <- trans;
+    trans.pt.fill <- trans
+    trans.bar.fill <- trans
   }
   if (!missing(fill)) {
-    pt.fill <- fill;
-    bar.fill <- fill;
+    pt.fill <- fill
+    bar.fill <- fill
   }
   if (!missing(color)) {
-    pt.color <- color;
-    bar.color <- color;
+    pt.color <- color
+    bar.color <- color
   }
   if (!missing(axis.color)) {
-    axis.x.color <- axis.color;
-    axis.y.color <- axis.color;
+    axis.x.color <- axis.color
+    axis.y.color <- axis.color
   }
   if (!missing(axis.cex)) {
-    axis.x.cex <- axis.cex;
-    axis.y.cex <- axis.cex;
+    axis.x.cex <- axis.cex
+    axis.y.cex <- axis.cex
   }
   if (!missing(lab.color)) {
-    lab.x.color <- lab.color;
-    lab.y.color <- lab.color;
+    lab.x.color <- lab.color
+    lab.y.color <- lab.color
   }
   if (!missing(lab.cex)) {
-    lab.x.cex <- lab.cex;
-    lab.y.cex <- lab.cex;
+    lab.x.cex <- lab.cex
+    lab.y.cex <- lab.cex
   }
   if (!missing(grid.color)) {
-    grid.x.color <- grid.color;
-    grid.y.color <- grid.color;
+    grid.x.color <- grid.color
+    grid.y.color <- grid.color
   }
   if (!missing(grid.lwd)) {
-    grid.x.lwd <- grid.lwd;
+    grid.x.lwd <- grid.lwd
     grid.y.lwd <- grid.lwd;
   }
   if (!missing(grid.lty)) {
-    grid.x.lty <- grid.lty;
-    grid.y.lty <- grid.lty;
+    grid.x.lty <- grid.lty
+    grid.y.lty <- grid.lty
   }
 
   # "off" is "transparent"
-  if (bar.fill[1] == "off") bar.fill <- "transparent"
-  if (pt.fill[1] == "off") pt.fill <- "transparent"
-  if (bar.color[1] == "off") bar.color <- "transparent"
-  if (pt.color[1] == "off") pt.color <- "transparent"
-  if (violin.fill[1] == "off") violin.fill <- "transparent"
-  if (violin.color[1] == "off") violin.color <- "transparent"
-  if (box.fill[1] == "off") box.fill <- "transparent"
-  if (box.color[1] == "off") box.color <- "transparent"
-  if (se.fill[1] == "off") se.fill <- "transparent"
-  if (ellipse.fill[1] == "off") ellipse.fill <- "transparent"
-  if (ellipse.color[1] == "off") ellipse.color <- "transparent"
+  bar.fill[which(bar.fill == "off")] <- "transparent"
+  pt.fill[which(pt.fill == "off")] <- "transparent"
+  bar.color[which(bar.color == "off")] <- "transparent"
+  pt.color[which(pt.color == "off")] <- "transparent"
+  violin.fill[which(violin.fill == "off")] <- "transparent"
+  violin.color[which(violin.color == "off")] <- "transparent"
+  box.fill[which(box.fill == "off")] <- "transparent"
+  box.color[which(box.color == "off")] <- "transparent"
+  se.fill[which(se.fill == "off")] <- "transparent"
+  ellipse.fill[which(ellipse.fill == "off")] <- "transparent"
+  ellipse.color[which(ellipse.color == "off")] <- "transparent"
   if (panel.fill == "off") panel.fill <- "transparent"
   if (!is.null(grid.x.color))
     if (grid.x.color == "off") grid.x.color <- "transparent"
@@ -338,30 +337,39 @@ function(
   if (out2.fill == "off") out2.fill <- "transparent"
   if (out2.color == "off") out2.color <- "transparent"
   if (bubble.text.color == "off") bubble.text.color <- "transparent"
-  if (add.color[1] == "off") add.color <- "transparent"
-  if (add.fill[1] == "off") add.fill <- "transparent"
+  add.color[which(add.color == "off")] <- "transparent"
+  add.fill[which(add.fill == "off")] <- "transparent"
+
+  bar.fill <- .color.range(bar.fill, 24)
+  bar.color <- .color.range(bar.color, 24)
+  pt.fill <- .color.range(pt.fill, 24)
+  pt.color <- .color.range(pt.color, 24)
+  add.fill <- .color.range(add.fill, 24)
+  add.color <- .color.range(add.color, 24)
 
 # default transparency levels
   if (!is.null(trans.bar.fill)) {
     options(trans.bar.fill=trans.bar.fill)
-    options(bar.fill = .maketrans(getOption("bar.fill"), .to256("trans.bar.fill")))
+    options(bar.fill = .maketrans(getOption("bar.fill"), 
+           .to256("trans.bar.fill")))
   }
   if (!is.null(trans.pt.fill)) {
     options(trans.pt.fill=trans.pt.fill)
     options(pt.fill = .maketrans(getOption("pt.fill"), .to256("trans.pt.fill")))
   }
 
-  if (!is.null(bar.fill))
+  if (!is.null(bar.fill)) {
     if (bar.fill[1] == "transparent")
       options(bar.fill = bar.fill) 
     else
       options(bar.fill = .maketrans(bar.fill, .to256("trans.bar.fill")))
-  if (!is.null(pt.fill))
+  }
+  if (!is.null(pt.fill)) {
     if (pt.fill[1] == "transparent")
       options(pt.fill = pt.fill) 
     else
       options(pt.fill = .maketrans(pt.fill, .to256("trans.pt.fill")))
-
+  }
 
 
   # ---------------

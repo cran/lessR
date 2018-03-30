@@ -30,7 +30,9 @@ db(\ldots, brief=TRUE)
         list a version of the complete data table with a 0 for a non-missing value and a 1 for 
         a missing value.}
   \item{brief}{If \code{TRUE}, display only variable names table plus any variable labels.}
-  \item{\dots}{Further arguments to be passed to or from methods.}
+  \item{\dots}{Further arguments to be passed to or from methods consistent
+       with the R \code{\link{read.table}} function. For example, can set
+       \code{stringsAsFactors} as \code{TRUE}.}
 }
 
 \details{

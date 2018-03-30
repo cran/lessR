@@ -1,10 +1,11 @@
 .hst.main <- 
-function(x, col.fill=NULL, col.color=NULL, col.reg=NULL,
+function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
        lab.cex=NULL, axis.cex=NULL,
        rotate.x=NULL, rotate.y=NULL, offset=NULL,
        breaks, bin.start, bin.width,
        bin.end, prop, hist.counts=NULL, cumul="off",
        xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+       add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
        quiet=FALSE, do.plot=TRUE, fun.call=NULL, ...) {
 
 
@@ -145,17 +146,6 @@ function(x, col.fill=NULL, col.color=NULL, col.reg=NULL,
 
     # set up plot 
     plot(h, freq=TRUE, axes=FALSE, ann=FALSE, ...)
-
-    # axis, axis ticks
-    .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-          par("usr")[1], par("usr")[3], 
-          rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
-
-    # axis labels
-    max.lbl <- max(nchar(axTicks(2)))
-    .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
-            xy.ticks=TRUE, offset=offset, 
-            lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, ...) 
     
     # color plotting background color
     usr <- par("usr")          
@@ -173,16 +163,51 @@ function(x, col.fill=NULL, col.color=NULL, col.reg=NULL,
       border=getOption("panel.color"),
       lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
+    # axis, axis ticks
+    .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
+          par("usr")[1], par("usr")[3], 
+          rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
+
+    # axis labels
+    max.lbl <- max(nchar(axTicks(2)))
+    .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
+            xy.ticks=TRUE, offset=offset, 
+            lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, ...) 
+
+    # see if apply a pre-defined color range
+    n.bins <- length(h$counts)
+    if (length(fill) == 1) fill <- .color.range(fill, n.bins)
+
+    # bar transparency
+    n.clr <- length(fill)
+    if (!is.null(trans)) if (trans > 0)
+      for (i in 1:n.clr) fill[i] <- .maketrans(fill[i], (1-trans)*256) 
+
     # plot the histogram
-    plot(h, add=TRUE, col=col.fill, border=col.color, freq=TRUE,
+    plot(h, add=TRUE, col=fill, border=color, freq=TRUE,
          labels=hist.counts, ...)
     if (cumul == "both") {
       h$counts <- old.counts
       plot(h, add=TRUE, col=col.reg, freq=TRUE)
     }
-  }
 
-  
+
+    # annotations
+    if (!is.null(add)) {
+
+      add.cex <- getOption("add.cex")
+      add.lwd <- getOption("add.lwd")
+      add.lty <- getOption("add.lty")
+      add.color <- getOption("add.color")
+      add.fill <- getOption("add.fill")
+      add.trans <- getOption("add.trans")
+
+      .plt.add (add, x1, x2, y1, y2,
+                add.cex, add.lwd, add.lty, add.color, add.fill, add.trans) 
+    }
+  }
+ 
+
 #------------
 # text output
 #------------
@@ -207,7 +232,5 @@ function(x, col.fill=NULL, col.color=NULL, col.reg=NULL,
     return(list(bin.width=bin.width,
       breaks=h$breaks, mids=h$mids, counts=h$counts))
   }
-  
-
 
 }

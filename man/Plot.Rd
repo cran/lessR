@@ -4,11 +4,16 @@
 \alias{sp}
 \alias{BoxPlot}
 \alias{bx}
+\alias{ViolinPlot}
+\alias{vp}
 
 \title{Plot One or Two Continuous and/or Categorical Variables}
 
 \description{
-Abbreviation: \code{sp}, \code{ScatterPlot}
+Abbreviation:\cr
+\verb{  }Violin Plot only: \code{vp}, \code{ViolinPlot}\cr
+\verb{  }Box Plot only: \code{bx}, \code{BoxPlot}\cr
+\verb{  }Scatter Plot only: \code{sp}, \code{ScatterPlot}\cr
 
 A scatterplot displays the values of a distribution, or the relationship between the two distributions in terms of their joint values, as a set of points in an \emph{n}-dimensional coordinate system, in which the coordinates of each point are the values of \emph{n} variables for a single observation (row of data). From the identical syntax, from any combination of continuous or categorical variables variables \code{x} and \code{y}, \code{Plot(x)} or \code{Plot(x,y)}, where \code{x} or \code{y} can be a vector, by default generates a family of related 1- or 2-variable scatterplots, possibly enhanced, as well as related statistical analyses. A categorical variable is either non-numeric, such as an R factor, or may be defined to consist of a small number of equally spaced integer values. The maximum number of such values to define such an integer variable as categorical is set by the \code{n.cat} parameter, with a default value of 0, that is, by default, all variables with numerical values are defined as continuous variables. 
 
@@ -36,6 +41,10 @@ Plot(x, y=NULL, data=mydata,
          by=NULL, by1=NULL, by2=NULL,
          n.row=NULL, n.col=NULL, aspect="fill",
 
+         fill=getOption("pt.fill"),
+         color=getOption("pt.color"),
+         trans=getOption("trans.pt.fill"),
+
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
          sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
          jitter.x=0, jitter.y=0,
@@ -50,7 +59,7 @@ Plot(x, y=NULL, data=mydata,
          radius=0.25, power=0.6,
          low.fill=NULL, hi.fill=NULL, proportion=FALSE,
 
-         smooth=FALSE, smooth.points=100, smooth.trans=0.25,
+         smooth=FALSE, smooth.points=100, smooth.trans=0.20,
          smooth.bins=128,
 
          fit=FALSE, fit.se=0, ellipse=FALSE, 
@@ -76,6 +85,8 @@ ScatterPlot(\ldots)
 sp(\ldots)
 BoxPlot(\ldots)
 bx(\ldots)
+ViolinPlot(\ldots)
+vp(\ldots)
 }
 
 \arguments{
@@ -136,6 +147,17 @@ bx(\ldots)
         Set to \code{"xy"} to specify a ratio calculated
         to "bank" to 45 degrees, that is, with the line slope approximately
         45 degrees.}\cr
+
+  \item{fill}{Fill color of the points. Can also set with the lessR function
+	   \code{\link{getColors}} to select from a variety of color palettes.
+        Default is
+        \code{pt.color} from the lessR \code{\link{style}} function.}
+  \item{color}{Border color of the points, can be a vector
+        to customize the color for each point. Default is
+        \code{pt.color} from the lessR \code{\link{style}} function.}
+  \item{trans}{Transparency factor of the area of each point.
+        Default is
+        \code{trans.pt.fill} from the lessR \code{\link{style}} function.}\cr
 
   \item{size}{When set to a constant, the scaling factor for \bold{standard points}
       (not bubbles) or a line, with default of 1.0 for points and 2.0 for a line.
@@ -432,7 +454,7 @@ bx(\ldots)
 VARIABLES and TRELLIS PLOTS\cr
 There is at least one primary variable, \code{x}, which defines the coordinate system for plotting in terms of the \code{x}-axis, the horizontal axis. Plots may also specify a second primary variable, \code{y}, which defines the \code{y}-axis of the coordinate system. One of these primary variables may be a vector. The simplest plot is from the specification of only one or two primary variables, each as a single variable, which generates a single scatterplot of either one or two variables, necessarily on a single plot, called a panel, defined by a single \code{x}-axis and usually a single \code{y}-axis.
 
-For numeric primary variables, a single panel may also contain multiple scatterplots, of two types. Form the first type from subsets of observations (rows of data) based on values of a categorical variable. Specify this plot with the \code{by} parameter, which identifies the grouping variable to generate a scatterplot of the primary variables for each of its levels. The points for each group are plotted with a different shape and/or color. By default, the colors vary, though to maintain the color scheme, if there are only two levels of the grouping variable, the points for one level are filled with the current theme color and the points for the second level are plotted with transparent interiors. 
+For numeric primary variables, a single panel may also contain multiple plots of two types. Form the first type from subsets of observations (rows of data) based on values of a categorical variable. Specify this plot with the \code{by} parameter, which identifies the grouping variable to generate a scatterplot of the primary variables for each of its levels. The points for each group are plotted with a different shape and/or color. By default, the colors vary, though to maintain the color scheme, if there are only two levels of the grouping variable, the points for one level are filled with the current theme color and the points for the second level are plotted with transparent interiors. 
 
 Or, obtain multiple scatterplots on the same panel with multiple numeric \code{x}-variables, or multiple \code{y}-variables. To obtain this graph, specify one of the primary variables as a vector of multiple variables. 
 
@@ -521,7 +543,7 @@ text \tab text \tab x1, x2\cr
 ----------- \tab ------------------- \tab ----------------\cr
 }
 
-The value of \code{add} specifies the object. For a single object, enter a single value. Then specify the value of the needed corresponding coordinates, as specified in the above table. For multiple placements of that object, specify vectors of corresponding coordinates. To annotate multiple objects, specify multiple values for \code{add} as a vector. Then list the corresponding coordinates, for up to each of four coordinates, in the order of the objects listed in \code{add}. See the examples for more explanation.
+The value of \code{add} specifies the object. For a single object, enter a single value. Then specify the value of the needed corresponding coordinates, as specified in the above table. For multiple placements of that object, specify vectors of corresponding coordinates. To annotate multiple objects, specify multiple values for \code{add} as a vector. Then list the corresponding coordinates, for up to each of four coordinates, in the order of the objects listed in \code{add}. See the examples for illustrations.
 
 Can also specify vectors of different properties, such as \code{add.color}. That is, different objects can be different colors, different transparency levels, etc.
 
@@ -598,8 +620,9 @@ Plot(Years, Salary)
 # or use full expression ScatterPlot in place of Plot
 
 # maximum information, minimum input: scatterplot +
-#  outliers, ellipse, least-squares line with and w/o outliers, means
+#  means, outliers, ellipse, least-squares lines with and w/o outliers
 Plot(Years, Salary, auto=TRUE)
+
 
 # plot 0.95 data ellipse with the points identified that represent
 #   outliers defined by a Mahalanobis Distance larger than 6 
@@ -618,26 +641,27 @@ Plot(Years, Salary, auto=TRUE)
 #  show the idealized joint distribution for bivariate normality
 #style(ellipse.color="off")
 #Plot(Years, Salary, size=0, ellipse=seq(.1,.9,.10))
+#style()
 
 # bubble plot with size determined by the value of Pre
 # display the value for the bubbles with values of  min, median and max
-# Plot(Years, Salary, size=Pre, size.cut=3)
+#Plot(Years, Salary, size=Pre, size.cut=3)
 
-# variables of interest are in a data frame not the default mydata
-# plot 0.6 and 0.9 data ellipses
+# variables in a data frame not the default mydata
+# plot 0.6 and 0.9 data ellipses with partially transparent points
 # change color theme to gold with black background
 #style("gold", sub.theme="black")
-#Plot(eruptions, waiting, ellipse=seq(.6,.9), data=faithful)
+#Plot(eruptions, waiting, trans=.5, ellipse=seq(.6,.9), data=faithful)
 
 # scatterplot with two x-variables, plotted against Salary
 # define a new style, then back to default
-#style(window.fill=rgb(247,242,230, maxColorValue=255),
-#  panel.fill="off", panel.color="off", pt.fill="black", trans=0,
-#  lab.color="black", axis.text.color="black",
-#  axis.y.color="off", grid.x.color="off", grid.y.color="black",
-#  grid.lty="dotted", grid.lwd=1)
-#Plot(c(Pre, Post), Salary)
-#style()
+style(window.fill=rgb(247,242,230, maxColorValue=255),
+  panel.fill="off", panel.color="off", pt.fill="black", trans=0,
+  lab.color="black", axis.text.color="black",
+  axis.y.color="off", grid.x.color="off", grid.y.color="black",
+  grid.lty="dotted", grid.lwd=1)
+Plot(c(Pre, Post), Salary)
+style()
 
 # increase span (smoothing) from default of .7 to 1.25
 # span is a loess parameter, which generates a caution that can be
@@ -700,8 +724,10 @@ Plot(Salary)
 #Plot(Salary)
 #style()
 
-# no violin plot, boxplot and scatterplot only
-#Plot(x, vbs.plot="bs")
+# no violin plot or scatterplot, just a boxplot
+#Plot(x, vbs.plot="b")
+# or, the same with the mnemonic
+#BoxPlot(x)
 
 # binned values to plot counts
 # ----------------------------
@@ -712,7 +738,7 @@ Plot(Salary)
 # time charts
 #------------
 # run chart, with fill area
-#Plot(Salary, run=TRUE, area=TRUE)
+Plot(Salary, run=TRUE, area=TRUE)
 
 # two run charts in same plot
 # or could do a multivariate time series
@@ -729,7 +755,7 @@ Plot(Salary)
 # multiple time series plotted from dates and stacked
 # black background with translucent areas, then reset theme to default
 #style(sub.theme="black", color="steelblue2", trans=.55, 
-#   window.fill="gray10", grid.color="gray25")
+#  window.fill="gray10", grid.color="gray25")
 #date <- seq(as.Date("2013/1/1"), as.Date("2016/1/1"), by="quarter")
 #x1 <- rnorm(13, 100, 15)
 #x2 <- rnorm(13, 100, 15)
@@ -738,6 +764,11 @@ Plot(Salary)
 #Plot(date, x1:x3, data=df)
 #style()
 
+# or, trigger a time series with a Date variable specified first
+#x <- seq.Date(from=as.Date("2010-1-1"), to=as.Date("2017-12-31"), by="month")
+#y <- rnorm(length(x)) 
+#Plot(x,y)
+
 
 #------------------------------------------
 # analysis of a single categorical variable
@@ -745,7 +776,7 @@ Plot(Salary)
 
 # default 1-D bubble plot
 # frequency plot, replaces bar chart 
-Plot(Dept)
+#Plot(Dept)
 
 # abbreviated category labels
 #Plot(Dept, label.max=2)
@@ -770,7 +801,7 @@ Plot(Dept)
 #-------------------
 
 # row.names on the y-axis
-Plot(Salary, row.names)
+#Plot(Salary, row.names)
 
 # standard scatterplot
 #Plot(Salary, row.names, sort.yx=FALSE, segments.y=FALSE)
@@ -800,7 +831,7 @@ Plot(Salary, row.names)
 # can be done also with the following short-hand
 #Plot(Years, Salary, ellipse=TRUE, add=c("means"))
  
-# a rectangle requires two points, <x1,y1> and <x2,y2>
+# a rectangle requires two points, four coordinates, <x1,y1> and <x2,y2>
 #style(add.trans=.8, add.fill="gold", add.color="gold4", add.lwd=0.5)
 #Plot(Years, Salary, add="rect", x1=12, y1=80000, x2=16, y2=115000)
 
@@ -812,14 +843,14 @@ Plot(Salary, row.names)
 # two different rectangles with different locations, fill colors and translucence
 #style(add.fill=c("gold3", "green"), add.trans=c(.8,.4))
 #Plot(Years, Salary, add=c("rect", "rect"), 
-#  x1=c(10, 2), y1=c(60000, 45000), x2=c(12, 75000), y2=c(80000, 55000))
+# x1=c(10, 2), y1=c(60000, 45000), x2=c(12, 75000), y2=c(80000, 55000))
 
 
 #----------------------------------------------------
 # analysis of two categorical variables (Likert data)
 #----------------------------------------------------
 
-#mydata <- rd("Mach4", format="lessR", quiet=TRUE)  # Likert data, 0 to 5
+mydata <- rd("Mach4", format="lessR", quiet=TRUE)  # Likert data, 0 to 5
 
 # size of each plotted point (bubble) depends on its joint frequency
 # triggered by default when replication of joint values and
@@ -829,8 +860,8 @@ Plot(Salary, row.names)
 #Plot(m06, m07, n.cat=6)
 
 # use value labels for the integer values, modify color options
-#LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
-#   "Slightly Agree", "Agree", "Strongly Agree")
+LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
+   "Slightly Agree", "Agree", "Strongly Agree")
 #style(fill="powderblue", color="blue", bubble.text="darkred")
 #Plot(m06,  m07, value.labels=LikertCats, n.cat=6)
 #style("darkred")  # reset theme
@@ -868,7 +899,6 @@ Plot(Salary, row.names)
 # multiple plots, need data frame
 #mydata <- data.frame(x, y1, y2)
 #Plot(x, c(y1, y2))
-
 
 
 #-----------

@@ -86,7 +86,6 @@ function(y, type,
     if (is.null(col.area) || col.area == "transparent") type <- "b" 
     else type <- "l"
 
-
   # set point size       
   if (type == "b" && is.null(cex))  
     if (nrows < 50) pt.size <- 0.8 else pt.size <- .9 - 0.002*nrows
@@ -112,34 +111,8 @@ function(y, type,
   par(bg=getOption("window.fill"))
   par(mai=c(bm, lm, tm, rm))
 
-
   # plot setup
   plot(x, y, type="n", axes=FALSE, ann=FALSE, ...)
-
-  if (xy.ticks){
-    if (is.null(time.start) && !is.ts(x)) 
-     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-        par("usr")[1], par("usr")[3], 
-        rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
-    else {
-      axis.x.color <- ifelse(is.null(getOption("axis.x.color")), 
-        getOption("axis.color"), getOption("axis.x.color"))
-      axis.Date(1, x, cex.axis=axis.cex, col.axis=col.axis, ...)
-      #lbl.dt <- as.Date(axTicks(1), origin = "1970-01-01")
-      #axis.Date(1, x, labels=FALSE, tck=-.01, ...)
-      #text(x=lbl.dt, y=par("usr")[3], labels=lbl.dt,
-           #pos=1, xpd=TRUE, cex=axis.cex, col=col.axis)
-      axis(2, at=axTicks(2), labels=FALSE, tck=-.01, ...)
-      dec.d <- .getdigits(round(axTicks(2),6),1) - 1
-      text(x=par("usr")[1], y=axTicks(2), labels=.fmt(axTicks(2),dec.d),
-           pos=2, xpd=TRUE,  col=col.axis)
-    }
-  }
-
-  # axis labels
-  max.lbl <- max(nchar(axTicks(2)))
-  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
-          xy.ticks=TRUE, offset=offset, ...)
           
   usr <- par("usr")
 
@@ -158,6 +131,30 @@ function(y, type,
   rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
     lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
+  if (xy.ticks){
+    axis.x.color <- ifelse(is.null(getOption("axis.x.color")), 
+      getOption("axis.color"), getOption("axis.x.color"))
+    if (is.null(time.start) && !is.ts(x)) 
+     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
+        par("usr")[1], par("usr")[3],
+        rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
+    else {
+      axis.Date(1, x, cex.axis=axis.cex, col.axis=col.axis, ...)
+      #lbl.dt <- as.Date(axTicks(1), origin = "1970-01-01")
+      #axis.Date(1, x, labels=FALSE, tck=-.01, ...)
+      #text(x=lbl.dt, y=par("usr")[3], labels=lbl.dt,
+           #pos=1, xpd=TRUE, cex=axis.cex, col=col.axis)
+      axis(2, at=axTicks(2), labels=FALSE, tck=-.01, ...)
+      dec.d <- .getdigits(round(axTicks(2),6),1) - 1
+      text(x=par("usr")[1], y=axTicks(2), labels=.fmt(axTicks(2),dec.d),
+           pos=2, xpd=TRUE,  col=col.axis)
+    }
+  }
+
+  # axis labels
+  max.lbl <- max(nchar(axTicks(2)))
+  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
+          xy.ticks=TRUE, offset=offset, ...)
 
   # fill area under curve
   if (!is.null(col.area)  && !is.null(col.color)) {
