@@ -4,9 +4,8 @@ function(x, y,
         radius, hole, hole.fill, edges, 
         clockwise, init.angle, 
         density, angle, lty, lwd,
-        values, values.pos, values.color,
-        values.cex, labels.cex, main.cex,
-        main, main.miss,
+        values, values.pos, values.color, values.cex, values.digits,
+        labels.cex, main.cex, main, main.miss,
         add, x1, x2, y1, y2,
         quiet, pdf.file, width, height, ...)  {
 
@@ -28,16 +27,16 @@ function(x, y,
   }
 
   # size the label for display
-  if (strwidth(main.lbl, units="figure", cex=main.cex) > .85) {
-    brk <- nchar(main.lbl)
-    while (strwidth(substr(main.lbl,1,brk), units="figure", cex=main.cex) > .85)
-      brk <- brk-1 
-    while (substr(main.lbl,brk,brk) != " ") brk <- brk-1
-    main.lbl <- paste(substr(main.lbl,1,brk), "\n",
-                      substr(main.lbl,brk+1,nchar(main.lbl)))
-    while (strwidth(main.lbl, units="figure", cex=main.cex) > .85)
-      main.cex <- main.cex-0.05
-  }
+# if (strwidth(main.lbl, units="figure", cex=main.cex) > .85) {
+#   brk <- nchar(main.lbl)
+#   while (strwidth(substr(main.lbl,1,brk), units="figure", cex=main.cex) > .85)
+#     brk <- brk-1 
+#   while (substr(main.lbl,brk,brk) != " ") brk <- brk-1
+#   main.lbl <- paste(substr(main.lbl,1,brk), "\n",
+#                     substr(main.lbl,brk+1,nchar(main.lbl)))
+#   while (strwidth(main.lbl, units="figure", cex=main.cex) > .85)
+#     main.cex <- main.cex-0.05
+# }
 
   # entered counts typically integers as entered but stored as type double
   # if names(x) is null, likely data from sample and c functions
@@ -46,19 +45,11 @@ function(x, y,
   if (!is.factor(x) && !is.table(x))
     x <- factor(x)
   n.vals <- ifelse (!is.table(x), nlevels(x), length(x))
- # clr is the color palette to display for the slices
-  clr <- character(length=n.vals)
+  clr <- character(length=n.vals)  # slice colors
+
 
   # ------
   # colors
-
-  # custom color progression
-  #if (!is.null(end.fill)) {
-  #  color.palette <- colorRampPalette(c(fill, end.fill))
-  #  clr <- color.palette(n.vals)
-  #}
-
-  #else {
 
   # set user specified multiple colors
   if (length(fill) > 1) {
@@ -73,15 +64,14 @@ function(x, y,
   else {
     if (length(fill) == 1) clr <- .color.range(fill, n.vals)
   }
-  #}
 
+  trans <- NULL
   if (!is.null(trans)) 
     for (i in 1:n.vals) clr[i] <- .maketrans(clr[i], (1-trans)*256) 
 
 
   # ----------------
   # prepare the data
-  # ----------------
 
   # x is categorical variable
   if (is.null(y)) {  # tabulate x
@@ -97,12 +87,14 @@ function(x, y,
   x.tbl <- x  # save tabled values for text output
   labels <- names(x)
   x <- as.numeric(x)
-  if (values == "input")
-    x.txt <- as.character(x)
-  else if (values == "percent")
-    x.txt <- paste(as.character(round(x/sum(x) * 100, 1)), "%", sep="")
-  else if (values == "prop")
-    x.txt <- as.character(round(x/sum(x), 2))
+  if (values != "off") {
+    if (values == "input")
+      x.txt <- as.character(x)
+    else if (values == "%")
+      x.txt <- paste(.fmt(x/sum(x) * 100, values.digits), "%", sep="")
+    else if (values == "prop")
+      x.txt <- .fmt(x/sum(x), values.digits)
+  }
 
 
   # ------------------
@@ -169,8 +161,13 @@ function(x, y,
     }
   }
 
-  for (i in 1L:nx) { 
+  if (options("device") != "RStudioGD") {
+    labels.cex <- labels.cex * 1.3
+    values.cex <- values.cex * 1.3
+    main.cex <- main.cex * 1.3
+  }
 
+  for (i in 1L:nx) { 
     # plot slice
     n <- max(2, floor(edges * dx[i]))
     P <- t2xy(seq.int(x[i], x[i + 1], length.out=n), radius)
@@ -183,12 +180,13 @@ function(x, y,
     if (!is.na(lab) && nzchar(lab)) {
       lines(c(1, 1.05)*P$x, c(1, 1.05)*P$y)  # tick marks
 
-      if (values != "none") if (values.pos == "labels")  # results to labels
+
+      if (values != "off") if (values.pos == "out")  # results to labels
         labels[i] <- paste(labels[i], "\n", x.txt[i], sep="")
       text(1.1 * P$x, 1.175 * P$y, labels[i], xpd=TRUE, 
         adj=ifelse(P$x < 0, 1, 0), cex=labels.cex, ...)  # labels
 
-      if (values != "none") if (values.pos == "pie") {
+      if (values != "off") if (values.pos == "in") {
         cx <- 0.82;  cy <- 0.86  # scale factors to position labels
         if (hole < 0.65) {  # scale factor to slide text down for small hole
           cx <- cx * (1 - (.16 * (1-hole)))  # max slide is 0.84
@@ -225,7 +223,7 @@ function(x, y,
                     ", hole=0)  # traditional pie chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("PieChart(", x.name,
-                    ", values=\"percent\")  # display %'s on the chart", sep="")
+                    ", values=\"%\")  # display %'s on the chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("BarChart(", x.name, ")  # bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")

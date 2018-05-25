@@ -1,11 +1,13 @@
 .hst.main <- 
 function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
-       lab.cex=NULL, axis.cex=NULL,
        rotate.x=NULL, rotate.y=NULL, offset=NULL,
        breaks, bin.start, bin.width,
        bin.end, prop, hist.counts=NULL, cumul="off",
        xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+       xlab.adj=NULL, ylab.adj=NULL,
+       bm.adj=NULL, lm.adj=NULL, tm.adj=NULL, rm.adj=NULL,
        add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
+       scale.x=NULL, scale.y=NULL,
        quiet=FALSE, do.plot=TRUE, fun.call=NULL, ...) {
 
 
@@ -33,8 +35,6 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
   y.lab <- ifelse (was.null, paste(gl$yb, x.name), gl$yb)
   main.lab <- gl$mb
   sub.lab <- gl$sb
-  lab.x.cex <- gl$lab.x.cex
-  lab.y.cex <- gl$lab.y.cex
 
   num.cat.x <- .is.num.cat(x, n.cat=getOption("n.cat"))
   if (num.cat.x) {
@@ -80,7 +80,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     if (n.under+n.over > 0) {
       txt.u <- "";  txt.o <- "";  txt.nu <- "";  txt.no <- ""
       if (length(breaks) > 3)
-        txt.c <- paste("Specified bin cutpoints: ", bin.min, breaks[2], "...", 
+        txt.c <- paste("Specified bin cut-points: ", bin.min, breaks[2], "...", 
           breaks[length(breaks)-1], bin.max, "\n\n")
       else
         txt.c <- paste("Range of the specified bins: ", bin.min,
@@ -128,15 +128,24 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     # set margins
     max.width <- strwidth(as.character(max(pretty(h$counts))), units="inches")
     
-    margs <- .marg(max.width, y.lab, x.lab, main.lab, x.val=NULL, prop,
-                   rotate.x)
+    margs <- .marg(max.width, y.lab, x.lab, main.lab, rotate.x)
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm
     bm <- margs$bm
+    n.lab.x.ln <- margs$n.lab.x.ln
+    n.lab.y.ln <- margs$n.lab.y.ln
 
-    if (lab.x.cex > 1.2) bm <- bm + (.15*lab.x.cex)
-    if (lab.y.cex > 1.2) lm <- lm + (.15*lab.y.cex)
+#   if (lab.x.cex > 1.2) bm <- bm + (.15*lab.x.cex)
+#   if (lab.y.cex > 1.2) lm <- lm + (.15*lab.y.cex)
+
+    if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
+
+    # user manual adjustment here
+    bm <- bm + bm.adj
+    lm <- lm + lm.adj
+    tm <- tm + tm.adj
+    rm <- rm + rm.adj
    
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))  
@@ -153,9 +162,15 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
          border="transparent")
 
     # plot grid lines
-    vx <- h$breaks
+    if(is.null(scale.x))
+      vx <- h$breaks
+    else
+      vx <- axTicks(1, axp=scale.x)
     .grid("v", seq(vx[1],vx[length(vx)],vx[2]-vx[1]))
-    vy <- pretty(h$counts)
+    if(is.null(scale.y))
+      vy <- pretty(h$counts)
+    else
+      vy <- axTicks(2, axp=scale.y)
     .grid("h", seq(vy[1],vy[length(vy)],vy[2]-vy[1]))
 
     # box around plot
@@ -164,7 +179,8 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
       lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
     # axis, axis ticks
-    .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
+    .axes(x.lvl=NULL, y.lvl=NULL,
+          axTicks(1, axp=scale.x), axTicks(2, axp=scale.y),
           par("usr")[1], par("usr")[3], 
           rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
 
@@ -172,7 +188,10 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     max.lbl <- max(nchar(axTicks(2)))
     .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
             xy.ticks=TRUE, offset=offset, 
-            lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, ...) 
+            lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, main.cex=NULL,
+            n.lab.x.ln=n.lab.x.ln, n.lab.y.ln=n.lab.y.ln,
+            xlab.adj=xlab.adj, ylab.adj=ylab.adj, ...) 
+
 
     # see if apply a pre-defined color range
     n.bins <- length(h$counts)
@@ -180,6 +199,9 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 
     # bar transparency
     n.clr <- length(fill)
+cat("n.clr:", n.clr, "\n")
+print(fill)
+print(getOption("bar.fill.ordered"))
     if (!is.null(trans)) if (trans > 0)
       for (i in 1:n.clr) fill[i] <- .maketrans(fill[i], (1-trans)*256) 
 

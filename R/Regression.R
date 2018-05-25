@@ -17,7 +17,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL, X6.new=NULL,
 
-         width=5, height=5, pdf=FALSE, refs=FALSE, 
+         width=6.5, height=6.5, pdf=FALSE, refs=FALSE, 
          fun.call=NULL, ...) {
 
 

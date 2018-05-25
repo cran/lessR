@@ -41,7 +41,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       y.max <- max(lm.out$model[,nm[1]])
     }
     else {
-      ctitle <- "Regression Line, Confidence and Prediction Intervals"
+      ctitle <- "Reg Line, Confidence and Prediction Intervals"
       y.min <- min(p.int$lwr)
       y.max <- max(max(p.int$upr),  max(lm.out$model[,nm[1]]) )
     }
@@ -60,9 +60,8 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     radius <- 0.25
     adj <- .RSadj(radius, axis.cex, lab.cex=getOption("lab.cex"))
     radius <- adj$radius
-    size.axis <- adj$size.axis
-    size.lab <- adj$size.lab
-    cex.txt <- adj$size.txt
+    size.lab <- getOption("lab.cex")
+    cex.txt <- getOption("axis.cex")
     
     # size of points
     size.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)

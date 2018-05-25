@@ -38,12 +38,13 @@ function(x, value=NULL, data=mydata) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The variable label does not exist for variable: ", x.name, "\n\n")
       }
-      cat(x.name, ": ", lbl, "\n", sep="")
-     }
+      return(lbl)
+    }
     else {
       mylabels <- attr(data, which="variable.labels")
       for (i in 1:length(mylabels))
         cat(names(mylabels)[i], ": ", mylabels[i], "\n", sep="")
+       return(lbl)
     }
   }
 

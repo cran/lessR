@@ -3,7 +3,7 @@ function(
   theme=c("lightbronze", "dodgerblue", "darkred", "gray", "gold",
       "darkgreen", "blue", "red", "rose", "green", "purple", "sienna",
       "brown", "orange", "white"),
-  sub.theme=c("default", "black", "no.y.axis"),
+  sub.theme=c("default", "black", "colors", "no.y.axis"),
   set=NULL, get=TRUE,
 
   window.fill=getOption("window.fill"),
@@ -14,12 +14,18 @@ function(
 
   fill=NULL,
   bar.fill=getOption("bar.fill"),
-  pt.fill=getOption("pt.fill"),
   trans=NULL,
   trans.bar.fill=getOption("trans.bar.fill"),
-  trans.pt.fill=getOption("trans.pt.fill"),
   color=NULL,
   bar.color=getOption("bar.color"),
+  values=getOption("values"),
+  values.color=getOption("values.color"), 
+  values.cex=getOption("values.cex"),
+  values.digits=getOption("values.digits"),
+  values.pos=getOption("values.pos"),
+		 
+  pt.fill=getOption("pt.fill"),
+  trans.pt.fill=getOption("trans.pt.fill"),
   pt.color=getOption("pt.color"),
   se.fill=getOption("se.fill"),
   ellipse.fill=getOption("ellipse.fill"),
@@ -147,6 +153,13 @@ function(
     bar.fill <- set$bar$fill
     trans.bar.fill <- set$bar$trans.fill
     bar.color <- set$bar$color
+	
+    values <- set$bar$values
+    values.color <- set$bar$values.color
+    values.cex <- set$bar$values.cex
+    values.digits <- set$bar$values.digits
+    values.pos <- set$bar$values.pos
+		 
     pt.fill <- set$pt$fill
     trans.pt.fill <- set$pt$trans.fill
     pt.color <- set$pt$color
@@ -381,7 +394,13 @@ function(
   options(bar.fill = bar.fill) 
   options(bar.color = bar.color) 
   options(pt.color = pt.color) 
-
+  
+  options(values=values)
+  options(values.color=values.color)
+  options(values.cex=values.cex)
+  options(values.digits=values.digits)
+  options(values.pos=values.pos)
+  
   options(window.fill=window.fill)
   options(panel.fill=panel.fill)
   options(panel.color=panel.color)
@@ -475,7 +494,7 @@ function(
 
   make.color <- function(color1, color2) {
     options(window.fill = "white")
-    options(panel.fill = "grey95")
+    options(panel.fill = "grey98")
     options(bar.fill = .maketrans(color1, .to256("trans.bar.fill")))
     options(pt.fill = .maketrans(color1, .to256("trans.pt.fill")))
     options(bar.color = color2)
@@ -509,14 +528,14 @@ function(
   prepare.black <- function() {
     options(window.fill = rgb(.015,.015,.015))
     options(panel.fill = rgb(.015,.015,.015))
-    options(grid.color = "gray25")
+    options(grid.color = "gray55")
     options(panel.color = "gray80")
     options(segment.color = "gray65")
-    options(lab.color = "gray55")
-    options(main.color = "gray55")
-    options(axis.x.color = "gray55")
-    options(axis.y.color = "gray55")
-    options(axis.text.color = "gray55")
+    options(lab.color = "gray85")
+    options(main.color = "gray85")
+    options(axis.x.color = "gray85")
+    options(axis.y.color = "gray85")
+    options(axis.text.color = "gray85")
     options(add.color = "gray55")
     options(heat = "gray30")
   }
@@ -572,6 +591,30 @@ function(
     options(grid.lty = "dotted")
     options(grid.lwd = 1)
   }
+
+  # sub-theme colors
+  make.colors  <- function() {
+    options(window.fill = getOption("panel.fill"))
+    options(bar.fill.discrete = "colors")
+    options(bar.color = "transparent")
+    options(values = "%")
+    if (theme == "lightbronze") options(bar.fill.ordered = "blues")
+    if (theme == "dodgerblue") options(bar.fill.ordered = "blues")
+    if (theme == "blue") options(bar.fill.ordered = "blues")
+    if (theme == "darkred") options(bar.fill.ordered = "reds")
+    if (theme == "gold") options(bar.fill.ordered = "yellows")
+    if (theme == "brown") options(bar.fill.ordered = "yellows")
+    if (theme == "green") options(bar.fill.ordered = "greens")
+    if (theme == "darkgreen") options(bar.fill.ordered = "greens")
+    if (theme == "red") options(bar.fill.ordered = "reds")
+    if (theme == "rose") options(bar.fill.ordered = "reds")
+    if (theme == "purple") options(bar.fill.ordered = "purples")
+    if (theme == "sienna") options(bar.fill.ordered = "rusts")
+    if (theme == "orange") options(bar.fill.ordered = "rusts")
+    if (theme == "gray") options(bar.fill.ordered = "grays")
+    if (theme == "white") options(bar.fill.ordered = "grays")
+  }
+
   # ----------------------------------------------
 
 
@@ -603,6 +646,7 @@ function(
       options(panel.fill = "white")
       options(bar.fill = "white")
       options(bar.color = "black")
+      options(values.color = "black")
       options(pt.fill = "white")
       options(pt.color = "black")
       options(bubble.text.color = "black")
@@ -651,14 +695,15 @@ function(
       options(panel.fill = rgb(247,242,230, maxColorValue=255))
       #options(panel.fill = "transparent")
       options(panel.color = rgb(222,217,205, maxColorValue=255))
-      options(bar.fill = .maketrans("gray50", .to256("trans.bar.fill")))  # 230
-      options(bar.color = "gray30")
-      options(pt.fill = "gray20")
-      options(pt.color = "gray20")
+      #options(bar.fill = .maketrans("gray50", .to256("trans.bar.fill")))  # 230
+      options(bar.fill = rgb(123,140,150, maxColorValue=255))  
+      options(bar.color = rgb(108,126,144, maxColorValue=255))
+      options(pt.fill = rgb(123,140,150, maxColorValue=255))  # old: gray20
+      options(pt.color = rgb(123,140,150, maxColorValue=255))
       options(ellipse.fill = .maketrans("gray50", 50))
       options(ellipse.color = "gray20")
       options(se.fill = .maketrans("gray50", 30)) 
-      options(violin.fill = .maketrans("gray50", 150)) 
+      options(violin.fill = rgb(142,166,182, maxColorValue=255))
       options(violin.color = "gray15") 
       options(box.fill = .maketrans("gray15", 35)) 
       options(box.color = "gray15") 
@@ -687,6 +732,7 @@ function(
   }  # not miss theme
 
   if (!miss.sub.theme) {
+    if (sub.theme == "colors") make.colors()
     if (sub.theme == "no.y.axis") make.no.y.axis()
     if (sub.theme == "black") {
       prepare.black()
@@ -716,7 +762,12 @@ function(
     bar <- list(
       fill = getOption("bar.fill"),
       trans.fill = getOption("trans.bar.fill"),
-      color =getOption("bar.color")
+      color = getOption("bar.color"),
+      values = getOption("values"),
+      values.color = getOption("values.color"),
+      values.cex = getOption("values.cex"),
+      values.digits = getOption("values.digits"),
+      values.pos = getOption("values.pos")
     )
 
     pt <- list(

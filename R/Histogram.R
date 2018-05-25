@@ -4,7 +4,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
 
-    fill=getOption("bar.fill"),
+    fill=getOption("bar.fill.ordered"),
     color=getOption("bar.color"),
     trans=getOption("trans.bar.fill"),
 
@@ -14,14 +14,17 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     reg="snow2", cumul=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    rotate.x=getOption("rotate.x"),
-    rotate.y=getOption("rotate.y"),
+    xlab.adj=0, ylab.adj=0,
+    bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
+
+    rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
     offset=getOption("offset"),
+    scale.x=NULL, scale.y=NULL,
 
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-    digits.d=NULL, quiet=getOption("quiet"), do.plot=TRUE,
-    width=4.5, height=4.5, pdf=FALSE, 
+    eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"), do.plot=TRUE,
+    width=6, height=6, pdf=FALSE, 
     fun.call=NULL, ...) {
 
 
@@ -29,6 +32,22 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
+
+  if (missing(fill))
+    fill <- ifelse (is.null(getOption("bar.fill.ordered")), 
+      getOption("bar.fill"), getOption("bar.fill.ordered"))
+
+  if (!is.null(scale.x)) if (length(scale.x) != 3)  {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Starting value, ending value, and number of intervals\n",
+      "  must all be specified as a vector, e.g., scale.x=c(0, 9 , 5)\n\n")
+  }
+
+  if (!is.null(scale.y)) if (length(scale.y) != 3)  {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Starting value, ending value, and number of intervals\n",
+      "  must all be specified as a vector, e.g., scale.y=c(0, 9 , 5)\n\n")
+  }
 
   panel.fill <- getOption("panel.fill")
   panel.color <- getOption("panel.color")
@@ -39,6 +58,10 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   Trellis <- ifelse(!missing(by1), TRUE, FALSE)
 
+  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
+  if (is.null(eval.df))  # default values
+    eval.df <- ifelse (shiny, FALSE, TRUE) 
+
   .param.old(...)
 
   # get actual variable name before potential call of data$x
@@ -46,6 +69,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   options(xname = x.name)
 
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
+  if (data.miss && shiny)  # force evaluation (not lazy)
+    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))   # get name of data table
   options(dname = df.name)
 
@@ -61,8 +86,10 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     # x not in global env, in df, specify data= forces to data frame
     if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
-      .nodf(df.name)  # check to see if data frame container exists 
-      .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      if (eval.df) {
+        .nodf(df.name)  # check to see if data frame container exists 
+        .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      }
       all.vars <- as.list(seq_along(data))  # even if only a single var
       names(all.vars) <- names(data)  # all data in data frame
       x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars
@@ -99,7 +126,6 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         names(data.x) <- x.name
       }
     }  # x is in global
-
   }
   
   # evaluate by1
@@ -129,7 +155,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   }
 
   else
-   by1.call <- NULL
+    by1.call <- NULL
 
 
   # evaluate by2
@@ -167,9 +193,9 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
   if (Trellis && do.plot) {
     .bar.lattice(data.x[,1], by1.call, by2.call, n.row, n.col, aspect, prop,
-                 fill, color, panel.fill, panel.color,
-                 trans, size.pt=NULL,
-                 xlab, ylab, main, lab.cex, axis.cex, rotate.x, rotate.y,
+                 fill, color, trans, size.pt=NULL,
+                 xlab, ylab, main,
+                 rotate.x, offset,
                  width, height, pdf, segments.x=NULL, breaks, c.type="hist")
   }
 
@@ -235,11 +261,14 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         # nothing returned if quiet=TRUE
 
         stuff <- .hst.main(data[,i], fill, color, trans, reg,
-            lab.cex, axis.cex, rotate.x, rotate.y, offset,
+            rotate.x, rotate.y, offset,
             breaks, bin.start, bin.width,
             bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub, 
+            xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
             add, x1, x2, y1, y2,
+            scale.x, scale.y,
             quiet, do.plot, fun.call=fun.call, ...)
+
         txsug <- stuff$txsug
         if (is.null(txsug)) txsug <- ""
         txdst <- stuff$ttx
@@ -284,6 +313,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     if (ncol(data) == 1) {
 
       # R Markdown
+      txsug <- ""
       txkfl <- ""
       if (!is.null(Rmd)) {
         if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")

@@ -6,10 +6,98 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
   
->>>>>> Changes for lessR version 3.7.1 (2018-03-30) <<<<<<
+>>>>>> Changes for lessR version 3.7.4 (2018-05-25) <<<<<<
 
 -------------
-Updates 3.7.1
+Updates 3.7.4
+-------------
+
+style
+  default lightbronze style changed with bar and point fill a slate gray
+
+BarChart, Histogram, PieChart, Plot
+  no.eval parameter added to force not evaluating for missing data frame
+    and misspecified variable to allow to run in Shiny, set by default
+    to TRUE for a Shiny analysis when the Shiny package is loaded
+
+BarChart, Histogram, Plot
+  manual adjustment of margins and axis label placement possible with
+    new parameters: xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj
+  scale.x and scale.y parameters allow custom specification of numerical
+    axis values 
+
+BarChart
+  better margin computations with parameters added for manual adjustment
+  sort.x parameter for decreasing sort of x for 1 and 2 variables
+  labels.max option that can invoke abbreviation of value labels now
+    provides a table that lists both abbreviated and full value label
+  out.size options now added to specify the number of columns that the
+    frequency distribution can take up before displayed as vertical
+  for one variable analysis, n of missing data reported in text output
+  similar to PieChart, values now can be displayed within the bars
+  for managing large category values, which are displayed as axis
+    labels, use an underscore, _, to indicate to not place a new line
+    symbol in place of the space, which is then displayed as a space
+    on the corresponding axis label
+  data frame of frequencies also returned for two-variables if output
+    assigned to a named R object
+  variable labels as axis labels now not reduced in size if too long,
+    instead uses as many lines as needed at current cex size 
+  rotate.x=90, perpendicular x-axis labels, more aesthetic with no
+    size limitation
+  text output in a column if width does not fit into current console width
+  pdf.file parameter now called pdf as it is TRUE or FALSE
+
+getColors
+  color sequence can be generated for any specified hue, h, from 0 to 360
+  more pre-specified color sequence names such as "yellows", "olives"
+  pre-specified color sequences can be modified according to
+    chroma, c, and luminance, l
+  rectangular display option added as the default, wheel an option 
+  control of the content and size of the plot title provided
+  default border color from black to lightgray
+  output parameter added to force text and graphics output on or off
+
+style
+  for the themes with a white window and gray panel, such as "darkred",
+    the default panel color is lightened from "gray95" to "gray98"
+  new sub-theme "colors" which adds a progressive color gradient for
+    histograms consistent with the current theme, hcl colors for bar
+    and pie charts, and displayed values for bar and pie charts
+
+
+---------------
+Bug Fixes 3.7.4
+--------------- 
+
+style
+  vertical and horizontal grid lines now properly aligned
+
+BarChart
+  axis.y.text.color now properly affects the display of the numerical axis
+
+LineChart
+  y-axis label prints for lc(), that is, multiple plots
+
+Plot
+  if boxplot only requested (vbs.plot="b"), scatterplot now not displayed
+
+Read
+  properly reads Excel label files from the Read function
+
+label
+  properly returns the label when used in non-lessR functions
+
+labels (for all plotting functions)
+  if label missing for a variable, then ignored instead of show as NA
+  
+
+
+  
+>>>>>> Changes for lessR version 3.7.2 (2018-03-30) <<<<<<
+
+-------------
+Updates 3.7.2
 -------------
 
 BarChart, Density, Histogram, LineChart, Plot, SummaryStats
@@ -82,7 +170,7 @@ ViolinPlot
 
 
 ---------------
-Bug Fixes 3.7.1
+Bug Fixes 3.7.2
 --------------- 
 
 BarChart

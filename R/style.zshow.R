@@ -3,14 +3,14 @@ function() {
 
     cat("\nAvailable Themes\n")
     cat("----------------\n")
-    cat("lightbronze", " dodgerblue", " darkred", " gray", " gold",
+    cat("lightbronze",  " dodgerblue", " darkred", " gray", " gold",
           " darkgreen", "\n",
         "blue", " red", " rose", " green", " purple", " sienna", " brown",
         " orange", " white", "\n", sep="")
 
     cat("\nAvailable Sub-themes\n")
     cat("--------------------\n")
-    cat("default", "black", "no.y.axis", "\n\n")
+    cat("default", "black", "colors", "no.y.axis", "\n\n")
 
     cat("THEME\n")
     cat("theme ........ Theme color .......", getOption("theme"), "\n")
@@ -37,6 +37,18 @@ function() {
         .fmt(getOption("trans.bar.fill"), 2), "\n")
     cat("bar.color ........ Bar border color ..........",
         .to_rgb(getOption("bar.color")), "\n")
+    cat("values ........... Form of bar or pie values .",
+        .to_str(getOption("values")), "\n")
+    cat("values.color ..... Color of bar or pie values .",
+        .to_rgb(getOption("values.color")), "\n")
+    cat("values.cex ....... Size of values on bars, pie ",
+        .to_num(getOption("values.cex")), "\n")
+    cat("values.digits .... Decimal digits on bars, pie ",
+        .to_num(getOption("values.digits")), "\n")
+    cat("values.pos ...... Position of values on pie ...",
+        .to_str(getOption("values.pos")), "\n")
+
+    cat("\n")
     cat("pt.fill .......... Point fill color ..........",
         .to_rgb(getOption("pt.fill")), "\n")
     cat("trans.pt.fill .... Point fill transparency .. ",
@@ -136,6 +148,8 @@ function() {
         .to_num(getOption("lab.y.cex"),2), "\n")
     cat("main.color ..... Color of plot label ..............",
         getOption("main.color"), "\n")
+    cat("main.cex ....... Size of plot title ...............",
+        .to_num(getOption("main.cex"),2), "\n")
 
     cat("\n")
     cat("GRID LINES\n")

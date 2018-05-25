@@ -74,10 +74,12 @@ Plot(x, y=NULL, data=mydata,
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+         xlab.adj=0, ylab.adj=0,
+         bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
 
          xy.ticks=TRUE, value.labels=NULL, label.max=20, origin.x=NULL,
 
-         auto=FALSE, digits.d=NULL, quiet=getOption("quiet"),
+         auto=FALSE, eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
          do.plot=TRUE, width=NULL, height=NULL, pdf.file=NULL, 
          fun.call=NULL, \ldots)
 
@@ -398,6 +400,24 @@ vp(\ldots)
        then the title is set by default from the corresponding variable labels.}
   \item{sub}{Sub-title of graph, below \code{xlab}.}\cr
 
+  \item{xlab.adj}{Adjustment to the provided computation for the
+       x-axis category labels, indicated in approximate inches.
+       + values move the label up. This and
+       the following not applicable to Trellis graphics.}
+  \item{ylab.adj}{Adjustment to the provided computation for the
+       y-axis category labels. + values move the label up,
+       indicated in approximate inches.}
+  \item{bm.adj}{Adjustment to the provided computation for the
+       bottom margin, which also adjusts the x-label position in inches.
+       + values move the margin up.}
+  \item{lm.adj}{Adjustment to the provided computation for the
+       left margin, which also adjusts the y-label position in inches.
+       + values move the margin left.}
+  \item{tm.adj}{Adjustment to the provided computation for the
+       top margin in inches.}
+  \item{rm.adj}{Adjustment to the provided computation for the
+       right margin in inches.}\cr
+
   \item{xy.ticks}{Flag that indicates if tick marks and associated \bold{axis values}
         on the axes are to be displayed. To rotate the axis values, use
         \code{rotate.x}, \code{rotate.y}, and \code{offset} from the
@@ -423,6 +443,11 @@ vp(\ldots)
         the best-fitting least squares line of the regular data without the
         outliers, and a horizontal and vertical line to represent the mean of
         each of the two variables.}
+  \item{eval.df}{Determines if to check for existing data frame and
+        specified variables. By default is \code{TRUE} 
+        unless the \code{shiny} package is loaded then set to \code{FALSE} so
+        that Shiny will run. Needs to be set to \code{FALSE} if using
+        the pipe \code{\%\>\%} notation.}
   \item{digits.d}{Number of significant digits for each of the displayed summary
         statistics.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
@@ -655,13 +680,13 @@ Plot(Years, Salary, auto=TRUE)
 
 # scatterplot with two x-variables, plotted against Salary
 # define a new style, then back to default
-style(window.fill=rgb(247,242,230, maxColorValue=255),
-  panel.fill="off", panel.color="off", pt.fill="black", trans=0,
-  lab.color="black", axis.text.color="black",
-  axis.y.color="off", grid.x.color="off", grid.y.color="black",
-  grid.lty="dotted", grid.lwd=1)
-Plot(c(Pre, Post), Salary)
-style()
+#style(window.fill=rgb(247,242,230, maxColorValue=255),
+#  panel.fill="off", panel.color="off", pt.fill="black", trans=0,
+#  lab.color="black", axis.text.color="black",
+#  axis.y.color="off", grid.x.color="off", grid.y.color="black",
+#  grid.lty="dotted", grid.lwd=1)
+#Plot(c(Pre, Post), Salary)
+#style()
 
 # increase span (smoothing) from default of .7 to 1.25
 # span is a loess parameter, which generates a caution that can be
@@ -687,7 +712,7 @@ style()
 #--------------------------------------------------------------
 
 # Trellis plot with condition on 1-variable
-Plot(Years, Salary, by1=Dept)
+#Plot(Years, Salary, by1=Dept)
 
 # all three by variables
 #Plot(Years, Salary, by1=Dept, by2=Gender, by=HealthPlan)
@@ -709,7 +734,7 @@ Plot(Years, Salary, by1=Dept)
 # One continuous variable
 # -----------------------
 # Integrated Violin/Box/Scatterplot, a VBS plot
-Plot(Salary)
+#Plot(Salary)
 
 # by variable, different colors for different values of the variable
 # all on one panel
@@ -738,7 +763,7 @@ Plot(Salary)
 # time charts
 #------------
 # run chart, with fill area
-Plot(Salary, run=TRUE, area=TRUE)
+#Plot(Salary, run=TRUE, area=TRUE)
 
 # two run charts in same plot
 # or could do a multivariate time series
@@ -801,7 +826,7 @@ Plot(Salary, run=TRUE, area=TRUE)
 #-------------------
 
 # row.names on the y-axis
-#Plot(Salary, row.names)
+Plot(Salary, row.names)
 
 # standard scatterplot
 #Plot(Salary, row.names, sort.yx=FALSE, segments.y=FALSE)
@@ -843,7 +868,7 @@ Plot(Salary, run=TRUE, area=TRUE)
 # two different rectangles with different locations, fill colors and translucence
 #style(add.fill=c("gold3", "green"), add.trans=c(.8,.4))
 #Plot(Years, Salary, add=c("rect", "rect"), 
-# x1=c(10, 2), y1=c(60000, 45000), x2=c(12, 75000), y2=c(80000, 55000))
+#  x1=c(10, 2), y1=c(60000, 45000), x2=c(12, 75000), y2=c(80000, 55000))
 
 
 #----------------------------------------------------
@@ -857,7 +882,7 @@ mydata <- rd("Mach4", format="lessR", quiet=TRUE)  # Likert data, 0 to 5
 #   less than 9 unique data values for each 
 # n.cat=6 means treat responses as categorical for up to 6 equally-spaced
 #   integer values
-#Plot(m06, m07, n.cat=6)
+Plot(m06, m07, n.cat=6)
 
 # use value labels for the integer values, modify color options
 LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
@@ -879,7 +904,7 @@ LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
 # Bubble Plot Frequency Matrix
 #-----------------------------
 
-#Plot(c(m06,m07,m09,m10), value.labels=LikertCats)
+Plot(c(m06,m07,m09,m10), value.labels=LikertCats)
 
 
 #---------------

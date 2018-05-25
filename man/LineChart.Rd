@@ -33,7 +33,7 @@ LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
          center.line=c("default", "mean", "median", "zero", "off"),
 
          show.runs=FALSE, quiet=getOption("quiet"),
-         width=4.5, height=4.5, pdf=FALSE,
+         width=6, height=6, pdf=FALSE,
          \ldots)
 
 lc(\ldots)
@@ -166,8 +166,6 @@ names(mydata) <- c("X","Y","Z","C")
 LineChart(Y)
 # short name
 lc(Y)
-# compare to standard R plot
-plot(mydata$Y, type="l")
 
 # save run chart to a pdf file
 LineChart(Y, pdf=TRUE)

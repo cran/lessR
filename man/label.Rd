@@ -40,14 +40,15 @@ The specified value of \code{value} is returned.
 }
 
 \examples{
-# read the internal lessR data frame that contains variable labels
-mydata <- Read("Employee", format="lessR")
+# read the data and variable labels
+#mydata <- rd("http://lessRstats.com/data/employee.xlsx")
+#mylabels <- vl("http://lessRstats.com/data/employee_lbl.xlsx")
 
-# variable label as the title of a graph from a standard R function
-# the data are not attached, so for standard R functions, must
-#   identify the relevant data frame, such as with function: with
-#with(mydata, barplot(table(Dept), main=label(Dept)))
-#with(mydata, hist(Salary, main=label(Salary)))
+# variable label as the title of a graph for non-lessR functions
+# base R
+#hist(mydata$Salary, xlab=label(Salary))
+# ggplot2
+#ggplot(mydata, aes(Salary)) + geom_histogram(binwidth=10000) + labs(x=label(Salary))
 
 # assign a new label for the variable Years in mydata
 #mydata <- label(Years, "Years Worked")

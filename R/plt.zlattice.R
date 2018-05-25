@@ -34,6 +34,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     getOption("axis.color"), getOption("axis.x.color"))
   axis.y.color <- ifelse(is.null(getOption("axis.y.color")), 
     getOption("axis.color"), getOption("axis.y.color"))
+
   # axis color is panel.color unless axis.color is changed from default
   theme <- getOption("theme")
   sub.theme <- getOption("sub.theme")
@@ -87,8 +88,6 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
   y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
   main.lab <- gl$mb
   sub.lab <- gl$sb
-  lab.x.cex <- gl$lab.x.cex
-  lab.y.cex <- gl$lab.y.cex
 
   if (trans > 0) fill <- .maketrans(fill, (1-trans)*256)
   col.bg <- ifelse(sum(col2rgb(panel.fill)) < 370, "transparent", panel.fill)

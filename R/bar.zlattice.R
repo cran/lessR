@@ -1,14 +1,17 @@
 .bar.lattice <- 
 function(x, by1, by2, nrows, ncols, asp, prop,
-         fill, color, panel.fill, panel.color,
+         fill, color,
          trans, size.pt, xlab, ylab, main,
-         lab.cex, axis.cex, rotate.x, rotate.y,
+         rotate.x, offset,
          width, height, pdf.file,
          segments.x, breaks, c.type) {
 
 
   cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n")
 
+
+  panel.fill <- getOption("panel.fill")
+  panel.color <- getOption("panel.color")
 
   grid.x.color <- ifelse(is.null(getOption("grid.x.color")), 
     getOption("grid.color"), getOption("grid.x.color"))
@@ -194,8 +197,10 @@ function(x, by1, by2, nrows, ncols, asp, prop,
            strip.border=list(col=getOption("strip.color"), lwd=0.5),
            strip.background=list(col=getOption("strip.fill"))),
          scales=list(
-           x = list(cex=axis.x.cex, rot=rotate.x, col=a.x.text.color),
-           y = list(cex=axis.y.cex, rot=rotate.y, col=a.y.text.color)),
+           x = list(cex=axis.x.cex, rot=rotate.x,
+                    col=a.x.text.color),
+           y = list(cex=axis.y.cex, rot=getOption("rotate.y"),
+                    col=a.y.text.color)),
          panel = function(x, y, ...) {
             panel.grid(h=0, v=-1, col=g.x.color,
                         lwd=grid.x.lwd, lty=grid.x.lty)

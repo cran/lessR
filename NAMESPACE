@@ -7,9 +7,10 @@ importFrom("triangle", dtriangle, rtriangle)
 importFrom("png", readPNG)
 importFrom("openxlsx", read.xlsx, addWorksheet, createStyle, createWorkbook, saveWorkbook, setColWidths, writeDataTable)
 importFrom("robustbase", adjboxStats, mc)
+importFrom("colorspace", sequential_hcl)
 #importFrom("MBESS", ci.smd)
 
-importFrom("graphics", "abline", "arrows", "axis", "axis.Date", "barplot", "box", "boxplot", "hist", "legend", "lines", "mtext", "pairs", "par", "pie", "plot", "plot.default", "plot.new", "plot.window", "points", "polygon", "rasterImage", "rect", "rug", "segments", "stripchart", "strwidth", "sunflowerplot", "symbols", "text", "title", "axTicks", "smoothScatter")
+importFrom("graphics", "abline", "arrows", "axis", "axis.Date", "barplot", "box", "boxplot", "grconvertX", "grconvertY", "hist", "legend", "lines", "mtext", "pairs", "par", "pie", "plot", "plot.default", "plot.new", "plot.window", "points", "polygon", "rasterImage", "rect", "rug", "segments", "stripchart", "strwidth", "sunflowerplot", "symbols", "text", "title", "axTicks", "smoothScatter")
 
 importFrom("grDevices", "boxplot.stats", "col2rgb", "colorRampPalette", "colors", "dev.list", "dev.new", "dev.off", "dev.set", "gray", "heat.colors", "hcl", "palette", "pdf", "rainbow", "rgb", "terrain.colors", "as.graphicsAnnot")
 

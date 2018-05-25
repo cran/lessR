@@ -2,7 +2,6 @@
 \alias{Histogram}
 \alias{hs}
 
-
 \title{Histogram}
 
 \description{
@@ -21,7 +20,7 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
 
-    fill=getOption("bar.fill"),
+    fill=getOption("bar.fill.ordered"),
     color=getOption("bar.color"),
     trans=getOption("trans.bar.fill"),
 
@@ -31,14 +30,17 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     reg="snow2", cumul=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    rotate.x=getOption("rotate.x"),
-    rotate.y=getOption("rotate.y"),
+    xlab.adj=0, ylab.adj=0,
+    bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
+
+    rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
     offset=getOption("offset"),
+    scale.x=NULL, scale.y=NULL,
 
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-    digits.d=NULL, quiet=getOption("quiet"), do.plot=TRUE,
-    width=4.5, height=4.5, pdf=FALSE, 
+    eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"), do.plot=TRUE,
+    width=6, height=6, pdf=FALSE, 
     fun.call=NULL, \ldots)
 
 hs(\ldots)
@@ -122,17 +124,46 @@ hs(\ldots)
         cumulative histogram, with default of \code{"off"}. The value of
         \code{"both"} superimposes the regular histogram.}\cr
 
-  \item{xlab}{Label for x-axis. Defaults to variable name.}
-  \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.}
-  \item{main}{Title of graph.}
-  \item{sub}{Sub-title of graph, below xlab.}\cr
+  \item{xlab}{Label for x-axis. Defaults to variable name unless variable labels
+        are present, the defaults to also include the corresponding variable
+        label. Can style with the lessR \code{\link{style}} function}
+  \item{ylab}{Label for y-axis. Defaults to Frequency or Proportion.
+       Can style with the lessR \code{\link{style}} function.}
+  \item{main}{Label for the title of the graph.
+       Can set size with \code{main.cex} and color with \code{main.color} from the
+       lessR \code{\link{style}} function.}
+  \item{sub}{Sub-title of graph, below xlab.}
+  \item{xlab.adj}{Adjustment to the provided computation for the
+       x-axis category labels, indicated in approximate inches.
+       + values move the label up. This and
+       the following not applicable to Trellis graphics.}
+  \item{ylab.adj}{Adjustment to the provided computation for the
+       y-axis category labels. + values move the label up,
+       indicated in approximate inches.}
+  \item{bm.adj}{Adjustment to the provided computation for the
+       bottom margin, which also adjusts the x-label position in inches.
+       + values move the margin up.}
+  \item{lm.adj}{Adjustment to the provided computation for the
+       left margin, which also adjusts the y-label position in inches.
+       + values move the margin left.}
+  \item{tm.adj}{Adjustment to the provided computation for the
+       top margin in inches.}
+  \item{rm.adj}{Adjustment to the provided computation for the
+       right margin in inches.}\cr
 
   \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
-        accommodate longer values, typically used in conjunction with \code{offset}.}
-  \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.}
+        accommodate longer values, typically used in conjunction with \code{offset}.
+        Can set persistently with the lessR \code{\link{style}} function.}
+  \item{rotate.y}{Degrees that the \code{y}-axis values are rotated.
+        Can set persistently with the lessR \code{\link{style}} function.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when
-        longer axis value names are rotated.}\cr
+        longer axis value names are rotated.
+        Can set persistently with the lessR \code{\link{style}} function.}
+  \item{scale.x}{If specified, a vector of three values that define the
+        numerical values of the x-axis: starting, ending and
+        number of intervals, within the bounds of plot region.}
+  \item{scale.y}{Applies to the y-axis. See \code{scale.x}.}\cr
 
   \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
        on the plot.
@@ -152,6 +183,11 @@ hs(\ldots)
   \item{y2}{Second y coordinate to be considered for each object.
         Only used for \code{"rect"}, \code{"line"} and \code{arrow}.}\cr
 
+  \item{eval.df}{Determines if to check for existing data frame and
+        specified variables. By default is \code{TRUE} 
+        unless the \code{shiny} package is loaded then set to \code{FALSE} so
+        that Shiny will run. Needs to be set to \code{FALSE} if using
+        the pipe \code{\%\>\%} notation.}
   \item{digits.d}{Number of significant digits for each of the displayed summary
         statistics.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
@@ -189,6 +225,8 @@ COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{lightbronze}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub.theme="black")} for a black background and partial transparency of plotted colors. 
 
 For the color options, such as \code{fill}, the value of \code{"off"} is the same as \code{"transparent"}.
+
+Set \code{fill} to a single color or a color range, of which there are many possibilities. For \code{"colors"} colors of the same chroma and luminance set \code{fill} to multiple colors all with the same saturation and brightness. Also available are the pre-specified R color schemes \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. Can also provide pre-defined color ranges \code{"blues"}, \code{"reds"} and \code{"greens"}, or generate custom colors, such as from the lessR function \code{\link{getColors}}. 
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -240,13 +278,13 @@ Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springe
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{
-\code{\link{hist}}, \code{\link{plot}}, \code{\link{par}}, \code{\link{style}}.
+\code{\link{getColors}}, \code{\link{hist}}, \code{\link{plot}}, \code{\link{par}}, \code{\link{style}}.
 }
 
 
 \examples{
-# generate 50 random normal data values with three decimal digits
-y <- round(rnorm(50),3)
+# get the data
+mydata <- rd("Employee", format="lessR")
 
 
 # --------------------
@@ -254,14 +292,12 @@ y <- round(rnorm(50),3)
 # --------------------
 
 # histogram with all defaults
-Histogram(y)
+Histogram(Salary)
 # short form
-#hs(y)
-# compare to standard R function hist
-hist(y)
+#hs(Salary)
 
 # output saved for later analysis into object h
-h <- hs(y)
+h <- hs(Salary)
 # view full text output
 h
 # view just the outlier analysis
@@ -269,49 +305,58 @@ h$out_outliers
 # list the names of all the components
 names(h)
 
-# histogram with no borders for the bars, then restore default theme
-Histogram(y, color="off")
+# histogram with no borders for the bars
+Histogram(Salary, color="off")
+
+# histogram with progressive colors, color matched to current theme
+# setting sub.theme same as setting bar.fill.ordered plus others
+style(sub.theme="colors")
+Histogram(Salary)
+# reset color theme
+style()
 
 # save the histogram to a pdf file
-Histogram(y, pdf=TRUE)
+#Histogram(Salary, pdf=TRUE)
 
 # histogram with red bars, black background, and black border
 style(panel.fill="black", fill="red", panel.color="black")
-Histogram(y)
+Histogram(Salary)
 # or set this color scheme for with the R heat colors
 #   with some transparency
-Histogram(y, fill="heat", trans=.4)
+Histogram(Salary, fill="heat", trans=.4)
 
 # histogram with purple color theme, translucent gold bars
 style("purple", sub.theme="black")
-Histogram(y)
+Histogram(Salary)
 # back to default color theme
 style()
 
 # histogram with specified bin width
 # can also use bin.start
-Histogram(y, bin.width=.25)
+Histogram(Salary, bin.width=12000)
 
 # histogram with rotated axis values, offset more from axis
 # suppress text output
 style(rotate.x=45, offset=1)
-Histogram(y, quiet=TRUE)
+Histogram(Salary, quiet=TRUE)
 style()
 
 # histogram with specified bins and grid lines displayed over the histogram
-Histogram(y, breaks=seq(-5,5,.25), xlab="My Variable")
+Histogram(Salary, breaks=seq(0,150000,20000), xlab="My Variable")
 
 # histogram with bins calculated with the Scott method and values displayed
-Histogram(y, breaks="Scott", hist.counts=TRUE, quiet=TRUE)
+Histogram(Salary, breaks="Scott", hist.counts=TRUE, quiet=TRUE)
 
 # histogram with the number of suggested bins, with proportions
-Histogram(y, breaks=15, prop=TRUE)
+Histogram(Salary, breaks=15, prop=TRUE)
 
+# histogram with non-default values for x- and y-axes
+mydata[2,4] <- 45000
+Histogram(Salary, scale.x=c(30000,130000,5), scale.y=c(0,9.5,5))
 
 # ----------------
 # Trellis graphics
 # ----------------
-mydata <- rd("Employee", format="lessR", quiet=TRUE)
 Histogram(Salary, by1=Dept)
 
 
@@ -320,12 +365,11 @@ Histogram(Salary, by1=Dept)
 # ---------------------
 
 # cumulative histogram with superimposed regular histogram, all defaults
-Histogram(y, cumul="both")
+Histogram(Salary, cumul="both")
 
 # cumulative histogram plus regular histogram
 # present with proportions on vertical axis, override other defaults
-Histogram(y, cumul="both", breaks=seq(-4,4,.25), prop=TRUE, 
-  reg="mistyrose")
+Histogram(Salary, cumul="both", prop=TRUE, reg="mistyrose")
 
 
 # -------------------------------------------------

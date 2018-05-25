@@ -1,9 +1,10 @@
 .ss.factor <-
 function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
-         x.lbl=NULL, y.lbl=NULL, label.max=20, ...)  {
+         x.lbl=NULL, y.lbl=NULL, label.max=20,
+         x.miss=NULL, by.miss=NULL, out.size=NULL, ...)  {
 
 
-# construct a cross-tabs
+# print a cross-tabs
 .prnfreq <- function(x, type, max.ln, max.c1, n.dash, ttl) {
   tx <- character(length = 0)
 
@@ -43,16 +44,15 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
   # begin
   # ---------------------------------
 
-  # save ordered status before converting x to a table
-  if (is.ordered(x) && is.null(by)) order.x <- TRUE else order.x <- FALSE
-  if (is.ordered(by)) order.y <- TRUE else order.y <- FALSE
+  # maximum number of output text columns
+  c.nm <- NULL  # storage for full value labels when they are abbreviated
 
-  # convert to table, with variable names, if needed
-  if (!is.table(x) && !is.matrix(x)) {  # bc yields a table or matrix
-    if (!is.null(by)) 
-      x <- table(by,x, dnn=c(y.name,x.name)) 
+  # convert to table with variable names if needed 
+  if (!is.table(x) && !is.matrix(x)) {  # bc could send a table or matrix
+    if (is.null(by)) 
+      x <- table(x, dnn=NULL)  # if missing data
     else
-      x <- table(x, dnn=NULL)
+      x <- table(by,x, dnn=c(y.name,x.name)) 
   }
 
   # no title if two vars and no labels
@@ -62,9 +62,10 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
     txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=TRUE)
   }
 
+
+  # two variables 
   # print table, chi-square analysis
   # -------------------------------------
-  # two variables 
   if (!is.null(by) || is.matrix(x)) { 
     n.dim <- 2
 
@@ -74,6 +75,9 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       c.nm <- colnames(x)  # store for later use
       colnames(x) <- .abbrev(colnames(x), label.max)
     }
+
+    # use for returned output, x is a 2-way table
+    freq.df <- as.data.frame(x)
 
     xx <- addmargins(x)
 
@@ -128,7 +132,8 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
     txXV <- tx
 
     if (brief)
-      return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txXV=txXV))
+      return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txXV=txXV,
+                  freq.df=freq.df))
 
 
     # full analysis
@@ -172,21 +177,32 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
     if (nan.flag)
       cat("\nNote: NaN results from all values missing for that cell or margin.\n",
                  "     so any division to compute a proportion is undefined.\n")
+      
+    txlbl <- ""
+    tx <- character(length = 0)
+    if (!is.null(c.nm)) {
+      tx[length(tx)+1] <- "Labels"
+      tx[length(tx)+1] <- "--------------------"
+      tx[length(tx)+1] <- paste(.fmtc(colnames(x), w=max(nchar(colnames(x))),
+                                   j="left"), "  ", c.nm, sep="", collapse="\n")
+      txlbl <- tx
+    }
 
-    return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txXV=txXV, txprp=txprp,
-                txcol=txrow, txrow=txcol))  # back to ss or ss data frame
-
+    # back to ss or ss data frame
+    return(list(n.dim=n.dim, txttl=txttl, txlbl=txlbl, txfrq=txfrq,
+                txXV=txXV, txprp=txprp, txcol=txrow, txrow=txcol,
+                freq.df=freq.df))
     # end full analysis
 
   }  # end two variable
 
 
   else {  # one variable
-    n.dim <- 1
+
     if (length(names(x)) == sum(x)) {  # x is a vector of the counts
       if (length(x) > 100)
-        cat("\nOnly the first 100 values listed.  To see all, use\n",
-               "the  values  function.\n\n")
+        cat("\nOnly the first 100 values listed.  To see all values\n",
+               "use the  values  function.\n\n")
       nms <- character(length=0)
       for (i in 1:min(length(x), 100)) nms[i] <- names(x)[i]
       cat("\n")
@@ -197,22 +213,26 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
           "nth column\n\n", sep="")
     }
 
-    else {  # table not of unique values
+    else {  # table not of unique values, so proceed
+      n.dim <- 1
 
-    # potential abbreviation of column labels
-    mx.chr <- max(nchar(names(x)))
-    if (mx.chr > label.max) {
-      c.nm <- names(x)  # store for later use
-      names(x) <- .abbrev(names(x), label.max)
-    }
+      # potential abbreviation of column labels
+#     if (is.na(names(x)[length(x)])) names(x)[length(x)] <- "missing"
+      mx.chr <- max(nchar(names(x)))
 
-     max.ln <- integer(length=0)      
-     for (i in 1:length(x)) {
-       ln.nm <- nchar(names(x[i]))
-       ln.vl <- nchar(as.character(x[i]))
-       max.ln[i] <- max(ln.nm, ln.vl) + 1
-       if (max.ln[i] < 6) max.ln[i] <- 6
-     }
+      c.nm <- NULL
+      if (mx.chr > label.max) {
+        c.nm <- names(x)  # store for later use
+        names(x) <- .abbrev(names(x), label.max)
+      }
+
+       max.ln <- integer(length=0)      
+       for (i in 1:length(x)) {
+         ln.nm <- nchar(names(x[i]))
+         ln.vl <- nchar(as.character(x[i]))
+         max.ln[i] <- max(ln.nm, ln.vl) + 1
+         if (max.ln[i] < 6) max.ln[i] <- 6
+       }
 
       tx <- character(length=0)
 
@@ -222,6 +242,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       for (i in 1:length(x))
         tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(x[i]), w=max.ln[i]))
       tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Total", w=w+6))
+      col.width <- nchar(tx[length(tx)])
 
       tx[length(tx)+1] <- "Frequencies: "
       for (i in 1:length(x))
@@ -237,11 +258,43 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       tx[length(tx)] <- paste(tx[length(tx)], .fmtc("1.000", w=w+6))
       txcnt <- tx
 
+      max.clmns <- ifelse (is.null(out.size), getOption("width"), out.size)
+      if (col.width > max.clmns) {  # vertical display
+        mx.nm <- max(nchar(names(x)), nchar("Total"))
+        mx.fr <- nchar(sum(x)) + 2
+        tx <- character(length=0)
+        xnm <- ifelse (nchar(x.name) > 13, .abbrev(x.name, 13), x.name)
+        tx[length(tx)+1] <- .fmtc(xnm, w=mx.nm)
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Count", w=mx.fr))
+        tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Prop", w=6))
+
+        tx[length(tx)+1] <- .dash2(mx.nm + mx.fr + 9)
+        for (i in 1:length(x)) {
+          tx[length(tx)+1] <- .fmtc(names(x[i]), w=mx.nm)
+          tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i], w=mx.fr)) 
+          tx[length(tx)] <- paste(tx[length(tx)], .fmt(xp[i], 3, w=7)) 
+        }
+        tx[length(tx)+1] <- .dash2(mx.nm + mx.fr + 9)
+        tx[length(tx)+1] <- .fmtc("Total", w=mx.nm)
+        tx[length(tx)] <- paste(tx[length(tx)], .fmti(sum(x), w=mx.fr))
+        tx[length(tx)] <- paste(tx[length(tx)],  .fmtc("1.000", w=7))
+        txcnt <- tx
+      }
+
+      txmis <- NULL
+      if (!is.null(x.miss)) {
+        tx <- character(length = 0)
+        txt <- paste("Missing Values of ", x.name, ":", sep="")
+        tx[length(tx)+1] <- paste(txt, x.miss) 
+        txmis <- tx    
+      }
+
       tx <- character(length = 0)
       ch <- suppressWarnings(chisq.test(x))  # provide own warning of small n
-      tx[length(tx)+1] <- "Chi-squared test of null hypothesis of equal probabilities"
+      tx[length(tx)+1] <- 
+        "Chi-squared test of null hypothesis of equal probabilities"
       tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ", df = ",
-          ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
+        ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
       if (any(ch$expected < 5)) 
         tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
             "so chi-squared approximation may not be accurate", "\n")
@@ -249,7 +302,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       
       txlbl <- ""
       tx <- character(length = 0)
-      if (mx.chr > label.max) {
+      if (!is.null(c.nm)) {
         tx[length(tx)+1] <- "Unabbreviated labels"
         tx[length(tx)+1] <- "--------------------"
         tx[length(tx)+1] <- paste(c.nm, sep="", collapse="\n")
@@ -259,7 +312,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       freq.df <- as.data.frame(x)
       names(freq.df)[1] <- x.name
 
-      return(list(n.dim=n.dim, title=txttl, counts=txcnt, 
+      return(list(n.dim=n.dim, title=txttl, counts=txcnt, miss=txmis, 
                   chi=txchi, lbl=txlbl, freq=x, freq.df=freq.df, prop=xp))
     }
   }  # one variable

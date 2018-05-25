@@ -1,31 +1,64 @@
-BarChart <- function(x=NULL, y=NULL, data=mydata,
+BarChart <-
+function(x=NULL, y=NULL, by=NULL, data=mydata,
         n.cat=getOption("n.cat"),
 
-        fill=getOption("bar.fill"),
-        color=getOption("bar.color"),
-        trans=getOption("trans.bar.fill"),
-
-        by=NULL, by1=NULL,
-        n.row=NULL, n.col=NULL, aspect="fill",
+        by1=NULL, n.row=NULL, n.col=NULL, aspect="fill",
 
         horiz=FALSE, addtop=0.05, gap=NULL,
         proportion=FALSE, beside=FALSE,
+        scale.y=NULL,
 
-        legend.title=NULL, legend.loc="right.margin", legend.labels=NULL,
-        legend.horiz=FALSE, 
+        fill=getOption("bar.fill.discrete"),
+        color=getOption("bar.color"),
+        trans=getOption("trans.bar.fill"),
 
+        legend.title=NULL, legend.loc="right.margin",
+        legend.labels=NULL, legend.horiz=FALSE, 
+
+        value.labels=NULL,
+        rotate.x=getOption("rotate.x"),
+        offset=getOption("offset"),
+        break.x=TRUE, sort.x=c("off", "down", "up"),
+
+        label.max=100, out.size=80,
+
+        values=getOption("values"),
+        values.color=getOption("values.color"), 
+ 	values.cex=getOption("values.cex"),
+        values.digits=getOption("values.digits"),
+        values.pos=getOption("values.pos"),
+		
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-
-        cex.names=0.70,
-        value.labels=NULL, label.max=20,
+        xlab.adj=0, ylab.adj=0,
+        bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
 
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-        quiet=getOption("quiet"),
-        width=5, height=4.5, pdf.file=NULL, ...)  {
+        eval.df=NULL, quiet=getOption("quiet"),
+        width=6.5, height=6, pdf=NULL, ...)  {
 
+  sort.x <- match.arg(sort.x)
+  values.miss <- ifelse (missing(values), TRUE, FALSE)
 
   theme <- getOption("theme")
+
+  if (missing(fill))
+    fill <- ifelse (is.null(getOption("bar.fill.discrete")), 
+      getOption("bar.fill"), getOption("bar.fill.discrete"))
+
+  if (values.miss && (!missing(values.color) || !missing(values.cex)
+      || !missing(values.digits) || !missing(values.pos)))
+    values <- "%"
+
+  if (is.null(values.digits)) {
+    if (values == "%") values.digits <- 0
+    if (values == "prop") values.digits <- 2
+  }
+
+  if (missing(values.color)) {
+    values.color <- "white" 
+    if (values.pos == "out") values.color <- getOption("axis.text.color")
+  }
 
   options(xname = NULL)
   options(yname = NULL)
@@ -33,30 +66,36 @@ BarChart <- function(x=NULL, y=NULL, data=mydata,
 
   Trellis <- ifelse(!missing(by1), TRUE, FALSE)
   do.plot <- TRUE
+ 
+  if (Trellis  &&  sort.x != "off") {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Sort not applicable to Trellis plots\n\n")
+  }
+ 
+  if (!(values %in% c("off", "%", "prop", "input"))) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "values  must be set to \"off\", \"%\", \"prop\" or \"input\"\n\n")
+  }
+ 
+  if (!(values.pos %in% c("in", "out"))) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "values.pos  must be set to \"in\", \"out\"\n\n")
+  }
+ 
+  if (!(values.pos %in% c("in", "out"))) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "values.pos  must be set to \"in\", \"out\"\n\n")
+  }
 
-  panel.fill <- getOption("panel.fill")
-  panel.color <- getOption("panel.color")
-  grid.color <- getOption("grid.color")
-
-  lab.color <- getOption("lab.color")
-  axis.color <- getOption("axis.color")
-
-  lab.cex <- getOption("lab.cex")
-  axis.cex <- getOption("axis.cex") 
-
-  rotate.x <- getOption("rotate.x")
-  rotate.y <- getOption("rotate.y")
-  offset <- getOption("offset")
-
-  #if (!is.null(fill)) {
-  # for (i in 1:length(fill))
-  #   if (fill[i] == "off") fill[i] <- "transparent"
-  #}
   fill[which(fill == "off")] <- "transparent"
   color[which(color == "off")] <- "transparent"
 
   #if (missing(color))  # default black border unless dark bg
     #if (sum(col2rgb(panel.fill))/3 > 80) color <- "black"
+
+  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
+  if (is.null(eval.df))  # default values
+    eval.df <- ifelse (shiny, FALSE, TRUE) 
 
   .param.old(...)
 
@@ -64,6 +103,8 @@ BarChart <- function(x=NULL, y=NULL, data=mydata,
   options(xname = x.name)
 
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
+  if (data.miss && shiny)  # force evaluation (not lazy)
+    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
@@ -73,11 +114,13 @@ BarChart <- function(x=NULL, y=NULL, data=mydata,
 
   x.call <- NULL
 
-  if (!missing(x)) {
+  if (!missing(x) && is.null(x.call)) {
     # x not in global env, in df, specify data= forces to data frame
     if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
-      .nodf(df.name)  # check to see if data frame container exists 
-      .xcheck(x.name, df.name, data)  # see if var in df, vars lists not checked
+      if (eval.df) {
+        .nodf(df.name)  # check to see if data frame container exists 
+        .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      }
       vars.list <- as.list(seq_along(data))
       names(vars.list) <- names(data)
       x.col <- eval(substitute(x), envir=vars.list)  # col num of each var
@@ -99,6 +142,13 @@ BarChart <- function(x=NULL, y=NULL, data=mydata,
         if (is.function(x.call)) x.call <- eval(substitute(data$x))
       }
     }
+
+    # read from console with text parameter can insert extra space at front
+    if (is.factor(x.call))
+      if (nchar(levels(x.call)[1]) > 5)
+        levels(x.call) <- trimws(levels(x.call), which="left")
+    else if (is.character(x.call))
+      if (nchar(x.call[1]) > 5) x.call <- trimws(x.call, which="left")
   }
 
 
@@ -127,7 +177,7 @@ BarChart <- function(x=NULL, y=NULL, data=mydata,
       #if (exists(by.name, where=.GlobalEnv)) in.global <- TRUE
 
       # see if var exists in data frame, if x not in global Env or function call 
-      if (!in.global) .xcheck(by.name, df.name, data)
+      if (eval.df) if (!in.global) .xcheck(by.name, df.name, data)
       #if (!in.global && !in.call) .xcheck(by.name, df.name, data)
       if (!in.global)
         by.call <- eval(substitute(data$by))
@@ -139,7 +189,6 @@ BarChart <- function(x=NULL, y=NULL, data=mydata,
     }
     else
       by.call <- NULL
-
 
     # evaluate y
     #-------------
@@ -154,7 +203,7 @@ BarChart <- function(x=NULL, y=NULL, data=mydata,
       in.global <- xs$ig 
 
       # see if var exists in data frame, if x not in global Env or function call 
-      if (!in.global) .xcheck(y.name, df.name, data)
+      if (eval.df) if (!in.global) .xcheck(y.name, df.name, data)
       if (!in.global)
         y.call <- eval(substitute(data$y))
       else {  # vars that are function names get assigned to global
@@ -214,51 +263,57 @@ BarChart <- function(x=NULL, y=NULL, data=mydata,
 
     if (Trellis && do.plot) {
       .bar.lattice(x.call, by1.call, by2=NULL, n.row, n.col, aspect, prop=FALSE,
-                   fill, color, panel.fill, panel.color,
-                   trans, size.pt=NULL, xlab, ylab, main, lab.cex, axis.cex,
-                   rotate.x, rotate.y, width, height, pdf.file,
+                   fill, color, trans, size.pt=NULL, xlab, ylab, main,
+                   rotate.x, offset,
+                   width, height, pdf,
                    segments.x=NULL, breaks=NULL, c.type="bar")
     }
 
     else {
+      if (is.null(by.call))
+        f.name <- x.name
+      else
+        f.name <- paste(x.name, "x", by.name, sep="")
 
-      if (!is.null(pdf.file))
-        pdf.fnm <- paste("BarChart_", x.name, ".pdf", sep="") 
+      if (!is.null(pdf))
+        pdf.fnm <- paste("BarChart_", f.name, ".pdf", sep="") 
       else
         pdf.fnm <- NULL
       .opendev(pdf.fnm, width, height)
 
       bc <- .bc.main(x.call, y.call, by.call,
-           fill, color, panel.fill,
-           panel.color, trans, theme,
-           horiz, addtop, gap, proportion,
-           xlab, ylab, main, lab.cex,
-           value.labels, label.max,
-           axis.cex, cex.names, rotate.x, rotate.y, offset, beside, 
-           legend.title, legend.loc, legend.labels, legend.horiz,
-           add, x1, x2, y1, y2, quiet, ...)
+            fill, color, trans, theme,
+            horiz, addtop, gap, proportion, scale.y,
+            xlab, ylab, main,
+            value.labels, label.max, beside, 
+            rotate.x, offset, break.x, sort.x,
+            values, values.color, values.cex, values.digits, values.pos,
+            xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+            legend.title, legend.loc, legend.labels, legend.horiz,
+            add, x1, x2, y1, y2, out.size, quiet, ...)
 
-      if (!is.null(pdf.file)) {
+      if (!is.null(pdf)) {
         dev.off()
         if (!quiet) .showfile(pdf.fnm, "barchart")
       }
 
       invisible(bc)
-    }  # end !Trellis
+    }  # end .bc.main
   }
   
 
   else {
 
     bc.data.frame(data, n.cat,
-      fill, color, panel.fill, panel.color,
-      trans, theme,
-      horiz, addtop, gap, proportion,
-      xlab, ylab, main, lab.cex,
-      value.labels, label.max,
-      axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
-      legend.title, legend.loc, legend.labels, legend.horiz, quiet,
-      width, height, pdf.file, ...)
+      fill, color, trans, theme,
+      horiz, addtop, gap, proportion, scale.y,
+      xlab, ylab, main,
+      value.labels, label.max, beside,
+      rotate.x, offset, break.x, sort.x,
+      values, values.color, values.cex, values.digits, values.pos,
+      xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+      legend.title, legend.loc, legend.labels, legend.horiz,
+      out.size, quiet, width, height, pdf, ...)
   }
 
 }

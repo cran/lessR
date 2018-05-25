@@ -4,7 +4,7 @@ function(x, y=NULL, data=mydata,
          radius=1, hole=0.65, hole.fill=getOption("panel.fill"),
 
          fill=NULL, 
-         color=getOption("bar.color"),
+         color="lightgray",
          trans=getOption("trans.bar.fill"),
 
          density=NULL, angle=45,
@@ -12,27 +12,50 @@ function(x, y=NULL, data=mydata,
 
          clockwise=FALSE, init.angle=ifelse (clockwise, 90, 0), 
 
-         values=c("none", "percent", "prop", "input"),
-         values.pos=c("pie", "labels"), values.color="white",
-         values.cex=.85,
+         values=getOption("values"),
+         values.color=getOption("values.color"), 
+	 values.cex=getOption("values.cex"),
+         values.digits=getOption("values.digits"),
+         values.pos=getOption("values.pos"),
 
          main=NULL, main.cex=1.2, labels.cex=0.9, cex,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-         quiet=getOption("quiet"),
-         width=5, height=5, pdf.file=NULL, ...) {
+         eval.df=NULL, quiet=getOption("quiet"),
+         width=6.5, height=6, pdf.file=NULL, ...) {
 
-
-  values <- match.arg(values)
-  values.pos <- match.arg(values.pos)
-
+0
   if (!missing(cex)) {
     main.cex <- cex * main.cex
     labels.cex <- cex * labels.cex
     values.cex <- cex * values.cex
   }
 
+  # default color scale
+  if (is.null(fill)) {
+    theme <- getOption("theme")
+    fill <- ifelse (theme %in% c("gray", "white"), "grayscale", "colors")
+  }
+
+  if (is.null(values.digits)) {
+    if (values == "%") values.digits <- 0
+    if (values == "prop") values.digits <- 2
+  }
+
+  if (missing(values) && (!missing(values.color) || !missing(values.cex)
+      || !missing(values.digits) || !missing(values.pos)))
+    values <- "%"
+
+  if (is.null(values.digits)) {
+    if (values == "%") values.digits <- 0
+    if (values == "prop") values.digits <- 2
+  }
+
+  if (missing(values.color)) {
+    values.color <- "white" 
+    if (values.pos == "out") values.color <- getOption("axis.text.color")
+  }
   if (missing(x)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Need a variable from which to calculate the pie chart\n\n")
@@ -40,11 +63,9 @@ function(x, y=NULL, data=mydata,
 
   main.miss <- ifelse (missing(main), TRUE, FALSE)
 
-  # default color scale
-  if (is.null(fill)) {
-    theme <- getOption("theme")
-    fill <- ifelse (theme %in% c("gray", "white"), "grayscale", "hcl")
-  }
+  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
+  if (is.null(eval.df))  # default values
+    eval.df <- ifelse (shiny, FALSE, TRUE) 
 
   if (hole < 0  ||  hole >= 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -60,12 +81,17 @@ function(x, y=NULL, data=mydata,
   options(xname = x.name)
 
   # get data frame name
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
+  if (data.miss && shiny)  # force evaluation (not lazy)
+    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
-  if (!exists(x.name, where=.GlobalEnv)) {  # x not in global env, in df
-    .nodf(df.name)  # check to see if data frame container exists 
-    .xcheck(x.name, df.name, data)  # see if var in df, vars lists not checked
+    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
+      if (eval.df) {
+        .nodf(df.name)  # check to see if data frame container exists 
+        .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      }
     vars.list <- as.list(seq_along(data))
     names(vars.list) <- names(data)
     x.col <- eval(substitute(x), envir=vars.list)  # col num of each var
@@ -119,13 +145,13 @@ function(x, y=NULL, data=mydata,
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
   .opendev(pdf.file, width, height)
 
-  hole <- hole * radius
+   hole <- hole * radius
   .pc.main(x.call, y.call, 
         fill, color, trans, 
         radius, hole, hole.fill, edges, 
         clockwise, init.angle, 
         density, angle, lty, lwd,
-        values, values.pos, values.color, values.cex,
+        values, values.pos, values.color, values.cex, values.digits,
         labels.cex, main.cex, main, main.miss,
         add, x1, x2, y1, y2,
         quiet, pdf.file, width, height, ...)

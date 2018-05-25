@@ -15,7 +15,7 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab.cex=0.8) {
 
     bm.user <- par("mai")[1] * size[2]  # size of bot margin in user coords
     # move down, /5 is for the existing line of axis numbers
-    ytop <- usr[3] - (bm.user - (2.4 * bm.user/5))
+    ytop <- usr[3] - (bm.user - (2.6 * bm.user/5))
     # ytop <- usr[3] - (bm.user - bm.user/5 + ll$rect$h) 
 
     axis.horiz <- usr[2] - usr[1]

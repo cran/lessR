@@ -23,12 +23,19 @@ function(y, type,
      cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Specified  time.start  so also need  time.by.\n\n")
   }
+  lab.cex <- getOption("lab.cex")
+  lab.x.cex <- getOption("lab.x.cex")
+  lab.y.cex <- getOption("lab.y.cex")
+  lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
+  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+  lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
+  adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
 
   nrows <- length(y)
   pt.size <- ifelse (is.null(cex), 0.8, cex)
 
   # get variable label and axis labels if they exist
-  gl <- .getlabels(ylab=ylab, main=main)
+  gl <- .getlabels(ylab=ylab, main=main, lab.y.cex=lab.y.cex)
   y.name <- gl$yn;  y.lbl <- gl$yl;  y.lab <- gl$yb
   main.lab <- gl$mb
   sub.lab <- gl$sb
@@ -97,11 +104,15 @@ function(y, type,
   # set margins
   max.width <- strwidth(as.character(max(pretty(y))), units="inches")
   
-  margs <- .marg(max.width, y.lab, x.lab, main)
+  margs <- .marg(max.width, y.lab, x.lab, main,
+                 rotate.x=getOption("rotate.x"),
+                 lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex)
   lm <- margs$lm
   tm <- margs$tm
   rm <- margs$rm
   bm <- margs$bm
+  n.lab.x.ln <- margs$n.lab.x.ln
+  n.lab.y.ln <- margs$n.lab.y.ln
  
   if (center.line != "off") rm <- rm + .3
  
@@ -153,9 +164,11 @@ function(y, type,
 
   # axis labels
   max.lbl <- max(nchar(axTicks(2)))
-  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
-          xy.ticks=TRUE, offset=offset, ...)
-
+  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
+          x.val=NULL, xy.ticks=TRUE, offset=offset,
+          lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex,
+          main.cex=getOption("main.cex"),
+          n.lab.x.ln, n.lab.y.ln, ...) 
   # fill area under curve
   if (!is.null(col.area)  && !is.null(col.color)) {
     if (col.area=="transparent"  &&  col.color=="transparent")

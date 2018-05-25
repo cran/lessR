@@ -40,10 +40,12 @@ function(x, y=NULL, data=mydata,
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+         xlab.adj=0, ylab.adj=0,
+         bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
 
          xy.ticks=TRUE, value.labels=NULL, label.max=20, origin.x=NULL,
 
-         auto=FALSE, digits.d=NULL, quiet=getOption("quiet"),
+         auto=FALSE, eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
          do.plot=TRUE, width=NULL, height=NULL, pdf.file=NULL, 
          fun.call=NULL, ...) {
 
@@ -59,11 +61,17 @@ function(x, y=NULL, data=mydata,
   values <- match.arg(values)
   center.line <- match.arg(center.line)
 
+  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
+  if (is.null(eval.df))  # default values
+    eval.df <- ifelse (shiny, FALSE, TRUE) 
+
   vbs.plot <- tolower(vbs.plot)
   violin <- ifelse (grepl("v", vbs.plot), TRUE, FALSE)
   box <- ifelse (grepl("b", vbs.plot), TRUE, FALSE)
 
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
+  if (data.miss && shiny)  # force evaluation (not lazy)
+    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
@@ -105,6 +113,7 @@ function(x, y=NULL, data=mydata,
 
   lab.cex <- getOption("lab.cex")
   axis.cex <- getOption("axis.cex")
+  main.cex <- getOption("main.cex")
 
   add.cex <- getOption("add.cex")
   add.lwd <- getOption("add.lwd")
@@ -148,6 +157,8 @@ function(x, y=NULL, data=mydata,
     vbs.size <- ifelse (y.miss || by1.miss, vbs.size*3.75, vbs.size*5)
  
   # "off" substitutes for official value of "transparent"
+  fill[which(fill == "off")] <- "transparent"
+  color[which(color == "off")] <- "transparent"
   ellipse.color[which(ellipse.color == "off")] <- "transparent"
   ellipse.fill[which(ellipse.fill == "off")] <- "transparent"
   add.fill[which(add.fill == "off")] <- "transparent"
@@ -278,8 +289,10 @@ function(x, y=NULL, data=mydata,
 
   # x not in global env, in df, specify data= forces to data frame
   else if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
-    .nodf(df.name)  # check to see if data frame container exists
-    .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+    if (eval.df) {
+      .nodf(df.name)  # check to see if data frame container exists 
+      .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+    }
     all.vars <- as.list(seq_along(data))  # even if only a single var
     names(all.vars) <- names(data)  # all data in data frame
     x.col <- eval(substitute(x), envir=all.vars)  # col num of selected vars
@@ -483,8 +496,10 @@ function(x, y=NULL, data=mydata,
       
     # y not in global env, in df, specify data= forces to data frame
     else if (!exists(y.name, where=.GlobalEnv) || !data.miss) {
-        .nodf(df.name)  # check to see if data frame container exists
-        .xcheck(y.name, df.name, data)  # var in df?, vars lists not checked
+        if (eval.df) {
+          .nodf(df.name)  # check to see if data frame container exists 
+          .xcheck(y.name, df.name, data)  # var in df?, vars lists not checked
+        }
         all.vars <- as.list(seq_along(data))  # even if only a single var
         names(all.vars) <- names(data)  # all data in data frame
         y.col <- eval(substitute(y), envir=all.vars)  # col num selected vars
@@ -880,15 +895,15 @@ function(x, y=NULL, data=mydata,
   if (is.null(height)) { 
     if (is.null(y.call)  &&  !BPFM  
         &&  values == "data" &&  object != "both"  &&  !.is.date(x.call))
-      height <- ifelse (is.null(main), 2.5, 3.1)  # narrow for 1-D dot plot
+      height <- ifelse (is.null(main), 4, 4.6)  # narrow for 1-D dot plot
     else
-      height <- 4.5
+      height <- 6
 
     if (BPFM)  # more than 7 variables, make plot extra long
       height <- height + ((ncol(data.x) - 7) * 0.5)
   }
 
-  if (is.null(width)) width <- 5
+  if (is.null(width)) width <- 6
   if (!by.miss) width <- width + .85  # wider plot  
 
 
@@ -987,7 +1002,7 @@ function(x, y=NULL, data=mydata,
         hist.cumul <- ifelse(cumul, "on", "off")
         reg <- "snow2"  # applies to cumulative histogram
         h <- .hst.main(x.call[,1], pt.fill, pt.color, pt.trans, reg,
-           lab.cex, axis.cex, rotate.x, rotate.y, offset,
+           rotate.x, rotate.y, offset,
            breaks, bin.start, bin.width, bin.end, proportion, hist.counts,
            hist.cumul, xlab, ylab, main, sub, quiet, fun.call=NULL,
            do.plot=FALSE, ...) 
@@ -1142,7 +1157,7 @@ function(x, y=NULL, data=mydata,
   }
   else  # size had been set
     size.pt <- size * scale.pt
-    if (is.null(out.size)) out.size <- size.pt
+  if (is.null(out.size)) out.size <- size.pt
 
   if (getOption("theme") == "gray")
     if (size.pt > 0.9) if (out.shape.miss) out.shape <- 23
@@ -1205,6 +1220,7 @@ function(x, y=NULL, data=mydata,
       if (jitter.x > 0)  # not available in stripplot
         x.call[,1] <- jitter(x.call[,1], factor=jitter.x) 
 
+      if (!grepl("s", vbs.plot)) size.pt <- 0  # gets rescaled if earlier
       .plt.lattice(x.call[,1], y.call[,1], by1.call, by2.call, by.call,
                    adj.bx.ht, object, n.row, n.col, aspect,
                    pt.fill, pt.color, panel.fill, panel.color,
@@ -1226,9 +1242,10 @@ function(x, y=NULL, data=mydata,
     else {  # dot plot
       if (seg.x.miss) segments.x <- TRUE
       .bar.lattice(x.call[,1], by1.call, by2=NULL, n.row, n.col, aspect,
-                   prop=FALSE, pt.fill, pt.color, panel.fill, panel.color,
-                   pt.trans, size.pt, xlab, ylab, main, lab.cex, axis.cex,
-                   rotate.x, rotate.y, width, height, pdf.file,
+                   prop=FALSE, pt.fill, pt.color,
+                   pt.trans, size.pt, xlab, ylab, main,
+                   rotate.x, offset,
+                   width, height, pdf.file,
                    segments.x, breaks=NULL, c.type, ...)
     }
 
@@ -1416,7 +1433,8 @@ function(x, y=NULL, data=mydata,
           object, values,
           pt.fill, pt.color,
           pt.trans, segment.color, area.fill,
-          xy.ticks, xlab, ylab, main, sub, value.labels, label.max,
+          xy.ticks, xlab, ylab, main, main.cex,
+          sub, value.labels, label.max,
           rotate.x, rotate.y, offset, proportion, origin.x,
           size.pt, shape, means, sort.yx, segments.y, segments.x, size.ln,
           smooth, smooth.points, smooth.trans, smooth.bins,
@@ -1427,6 +1445,7 @@ function(x, y=NULL, data=mydata,
           ellipse, ellipse.color, ellipse.fill, ellipse.lwd,
           center.line, show.runs, stack,
           freq.poly, jitter.x, jitter.y,
+          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
           add, x1, x2, y1, y2, add.cex, add.lwd, add.lty,
           add.color, add.fill, add.trans,
           quiet, ...)

@@ -21,6 +21,7 @@ function (h, len.x, fun.call) {
          sep="")      
     }
     txsug <- tx
+    if (length(txsug) == 0) txsug <- ""
 
     tx <- character(length = 0)
     

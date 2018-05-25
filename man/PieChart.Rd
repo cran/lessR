@@ -16,7 +16,7 @@ PieChart(x, y=NULL, data=mydata,
          radius=1, hole=0.65, hole.fill=getOption("panel.fill"),
 
          fill=NULL, 
-         color=getOption("bar.color"),
+         color="lightgray",
          trans=getOption("trans.bar.fill"),
 
          density=NULL, angle=45,
@@ -24,15 +24,18 @@ PieChart(x, y=NULL, data=mydata,
 
          clockwise=FALSE, init.angle=ifelse (clockwise, 90, 0), 
 
-         values=c("none", "percent", "prop", "input"),
-         values.pos=c("pie", "labels"), values.color="white", values.cex=.85,
+         values=getOption("values"),
+         values.color=getOption("values.color"), 
+	 values.cex=getOption("values.cex"),
+         values.digits=getOption("values.digits"),
+         values.pos=getOption("values.pos"),
 
          main=NULL, main.cex=1.2, labels.cex=0.9, cex,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-         quiet=getOption("quiet"),
-         width=5, height=5, pdf.file=NULL,
+         eval.df=NULL, quiet=getOption("quiet"),
+         width=6.5, height=6, pdf.file=NULL,
          \dots)
 
 pc(\ldots)
@@ -59,12 +62,12 @@ pc(\ldots)
 
 
   \item{fill}{Specified color of each slice. Default is the discrete 
-        \code{"hcl"} scale with, with fixed
+        scale with, with fixed
         chroma (50) and luminance (75) for unbiased comparison 
         across colors, for all color themes except 
         \code{"gray"} and \code{"white"}, with default gray scale.
         Can explicitly choose \code{"grays"}
-        or \code{"hcl"} colors, or pre-specified R color schemes 
+        or \code{"colors"} , or pre-specified R color schemes 
         \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. Can also
         provide pre-defined color ranges \code{"blues"}, \code{"reds"}
         and \code{"greens"}, as well as
@@ -96,20 +99,25 @@ pc(\ldots)
        the default value is 0 (3 o'clock), otherwise 90 (12 o'clock).}\cr
 
 
-  \item{values}{If not the default value of \code{"none"}, adds the
-        numerical results to the plot according to \code{"percent"}, 
-        \code{"prop"} or \code{"input"}, which corresponds to percentages,
+  \item{values}{If not the default value of \code{"off"}, adds the
+        numerical results to the plot according to \code{"\%"}, 
+        \code{"prop"} or \code{"input"}, that is, percentages,
          proportions, or the value from which the slices are plotted,
          such as tabulated counts if \code{y} is not specified,
-         or the value of \code{y} if the plotted values are provided.}
-  \item{values.pos}{Position of the plotted text. Default is inside the pie,
-        or, if \code{"label"}, as part of the label for each value
-        outside of the pie.}
+         or the value of \code{y} if the plotted values are provided. If
+         any other \code{values} parameter is specified, default is set
+         to \code{"\%"}.}
   \item{values.color}{Color of the plotted text. Could be a vector to specify
         a unique color for each value. If fewer colors are specified than
         the number of categories, the colors are recycled.}
   \item{values.cex}{Character expansion factor, the size, of the plotted text, 
-        for which the default value is 0.95.}\cr
+        for which the default value is 0.95.}
+  \item{values.digits}{Number of decimal digits for which to display the values.
+        Default is 0, round to the nearest integer, for \code{"\%"}
+        and 2 for \code{"prop"}.}
+  \item{values.pos}{Position of the plotted text. Default is inside the pie,
+        or, if \code{"label"}, as part of the label for each value
+        outside of the pie.}\cr
 
 
   \item{main}{Title of graph. Set the color with \code{main.color} with
@@ -139,7 +147,11 @@ pc(\ldots)
   \item{y2}{Second y coordinate to be considered for each object.
         Only used for \code{"rect"}, \code{"line"} and \code{arrow}.}\cr
 
-
+  \item{eval.df}{Determines if to check for existing data frame and
+        specified variables. By default is \code{TRUE} 
+        unless the \code{shiny} package is loaded then set to \code{FALSE} so
+        that Shiny will run. Needs to be set to \code{FALSE} if using
+        the pipe \code{\%\>\%} notation.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
@@ -220,12 +232,10 @@ mydata <- rd("Employee", format="lessR")
 # --------------------------------------------------------
 
 # basic pie chart, actually a doughnut or ring chart
-# with default hcl colors (except for themes "gray" and "white"
+# with default hcl colors (except for themes "gray" and "white")
 PieChart(Dept)
 # short name
-pc(Dept)
-# compare to standard R pie chart, which requires mydata$ reference
-pie(table(mydata$Dept))
+#pc(Dept)
 
 # standard pie chart with no hole
 pc(Dept, hole=0)
@@ -239,9 +249,7 @@ PieChart(Gender, fill=c("pink","lightblue"), lty="blank")
 # need to set the correct number of colors to span the full range
 mycolors <- getColors(n=5, clr=getColors("aliceblue", end.clr="steelblue"))
 PieChart(Dept, fill=mycolors)
-# here implicitly as part of the call to PieChart
-PieChart(Dept, fill=getColors("aliceblue", end.fill="blue"), quiet=TRUE)
-# or call getColors directly from PieChart
+# call getColors directly from PieChart
 PieChart(Dept, fill=getColors(n=5, clr="aliceblue", end.clr="blue"))
 
 # specify the colors from the R palette rainbow
@@ -249,7 +257,7 @@ PieChart(Dept, fill="rainbow")
 
 # display the percentage inside each slice of the pie
 # provide a unique color for each displayed value
-PieChart(Dept, values="percent",
+PieChart(Dept, values="\%",
          values.color=c("yellow", "pink", "blue", "purple", "brown"))
 
 # display the counts inside each slice of the pie
@@ -258,7 +266,7 @@ PieChart(Dept, values="input", values.cex=0.75,
          values.color=getOption("window.fill"))
 
 # add transparency and custom color for the displayed values
-PieChart(Dept, trans=.6, values="percent", values.color=rgb(.3,.3,.3))
+PieChart(Dept, trans=.6, values="\%", values.color=rgb(.3,.3,.3))
 
 
 # ------------------------------

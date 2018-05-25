@@ -16,7 +16,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
          center.line=c("default", "mean", "median", "zero", "off"),
 
          show.runs=FALSE, quiet=getOption("quiet"),
-         width=4.5, height=4.5, pdf=FALSE, ...) {
+         width=6, height=6, pdf=FALSE, ...) {
 
 
   center.line <- match.arg(center.line)
@@ -100,38 +100,57 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 # ---------------
 # do the analysis
 
-  if (ncol(data) > 1) {
+    # set up graphics
+    manage.gr <- .graphman()  # manage graphics?
+    if (manage.gr) {
+      i.win <- 0
+      for (i in 1:ncol(data)) {
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat)) 
+          i.win <- i.win + 1
+      }
+      .graphwin(i.win, d.w=width, d.h=height)
+      open.win <- 2
+    }
+
     plot.i <- 0  # keep track of generated graphics
     plot.title  <- character(length=0)
-  }
 
-  for (i in 1:ncol(data)) {
-    cat("\n")
-    
-    if (!is.ts(data[,i]))
-      nu <- length(unique(na.omit(data[,i])))
-    else
-      nu <- length(unique(data[,i]))
-      
-    x.name <- names(data)[i]
-    options(xname = x.name)
+    # no suggestions if multiple variables
+    if (ncol(data) > 1) {
+      sug <- getOption("suggest")
+      options(suggest = FALSE)
+    }
 
-    if (is.numeric(data[,i])) {
-      # let 1 variable go through, even if num.cat
-      if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
+    for (i in 1:ncol(data)) {
 
+      if (!is.ts(data[,i]))
+        nu <- length(unique(na.omit(data[,i])))
+      else
+        nu <- length(unique(data[,i]))
 
-      if (pdf)
-        pdf.fnm <- paste("LC", "_", x.name, ".pdf", sep="") 
-      else {
-        pdf.fnm <- NULL
-        if (ncol(data) > 1) {
-          plot.i <- plot.i + 1
-          plot.title[plot.i] <- paste("LineChart of ", x.name, sep="")
+      x.name <- names(data)[i]
+      options(xname = x.name)
+      options(yname = x.name)  # just needed for lc()
+
+      if (is.numeric(data[,i])) {
+        # let 1 variable go through, even if num.cat
+        if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
+
+        if (pdf) {
+          pdf.fnm <- paste("LC", "_", x.name, ".pdf", sep="") 
+          .opendev(pdf.fnm, width, height)
         }
-      }
-      .opendev(pdf.fnm, width, height)
-
+        else {
+          pdf.fnm <- NULL
+          if (ncol(data) > 1) {
+            plot.i <- plot.i + 1
+            plot.title[plot.i] <- paste("Line Chart of ", x.name, sep="")
+            if (manage.gr) {
+              open.win <- open.win + 1
+              dev.set(which = open.win)
+            }
+          }
+        }
 
       .lc.main(data[,i], type,
          line.color, area, color, fill, shape.pts,

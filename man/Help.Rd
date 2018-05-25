@@ -98,11 +98,11 @@ Help()
 Help(Histogram)
 
 # other ways to call the same help message
-Help(histogram)  # case insensitive
-Help(hs)
-Help(hist)
-Help(hst)
-Help(boxplot)
+#Help(histogram)  # case insensitive
+#Help(hs)
+#Help(hist)
+#Help(hst)
+#Help(boxplot)
 }
 
 

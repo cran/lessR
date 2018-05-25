@@ -59,7 +59,7 @@ function(ref=NULL, data=mydata, format=c("csv", "R", "Excel"),
           textDecoration="italic", border="Bottom")
     setColWidths(wb, sheet=1, cols=1:ncol(data), widths="auto") 
     writeDataTable(wb, "mydata", x=mydata, colNames=TRUE,
-         startCol="A", startRow=1, tableStyle="TableStyleMedium9",
+         startCol="A", startRow=1, tableStyle="TableStyleLight9",
          rowNames=row.names)
          #borders="none", headerStyle=hs1, borderStyle="dashed")
     saveWorkbook(wb, file=file.data, overwrite=TRUE)

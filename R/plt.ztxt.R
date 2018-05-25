@@ -452,8 +452,8 @@ function(x, y, values, object, n.cat,
           }
            
           fc <- ""
-          if (!grepl("color.trans", fncl))
-            fc <- paste(fc, ", color.trans=.8", sep="")
+          if (!grepl("trans", fncl))
+            fc <- paste(fc, ", trans=.8", sep="")
           if (!grepl("bg", fncl))
             fc <- paste(fc, ", bg=\"off\"", sep="")
           if (!grepl("grid", fncl))

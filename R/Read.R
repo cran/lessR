@@ -99,8 +99,6 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
     if (format == "Excel") {
       txt <- "Alexander Walker's openxlsx package]"
       cat("[with the read.xlsx function from", txt, "\n")
-#     txt <- "Hadley Wickham's readxl package]"
-#     cat("[with the read_excel function from", txt, "\n")
     }
 
     if (browse) {
@@ -116,8 +114,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
       if (brief || !grepl("labels", fncl))
         cat("\n>>> Suggestions\n")
       if (!grepl("labels", fncl)  &&  format != "lessR")
-        cat("Use the  labels  option to read a file of variable labels\n",
-            "  or use the VariableLabels function, also vl, to assign\n")
+        cat("Use the VariableLabels function, also vl, to read labels\n")
       if (brief)
         cat("More information on your data with details() for mydata, or",
             "details(name)\n")
@@ -196,7 +193,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         if (format != "Excel")
           mylabels <- read.csv(file=ref, skip=1, nrows=1, sep=delim, ...)
         else {
-          mylabels <- read.xlsx(ref, rows=1:2, colNames=TRUE, ...)
+          mylabels <- read.xlsx(ref, rows=1:2, colNames=FALSE, ...)
           mylabels <- mylabels[1,]
         }
         var.names <- names(mylabels)
@@ -274,8 +271,9 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
       if (stringsAsFactors) {
       # read_excel does not convert strings to factors, do so if !unique
         for (i in 1:ncol(d))
-          if (is.character(d[,i])) if (nu.col[i] != n.col[i]) fnu.col[i] <- TRUE
-         d[fnu.col] <- lapply(d[fnu.col], as.factor)
+          if (is.character(d[,i])) if (nu.col[i] != n.col[i])
+	    fnu.col[i] <- TRUE
+          d[fnu.col] <- lapply(d[fnu.col], as.factor)
 #        d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
       }
         fnu.col <- logical(length=ncol(d))  # reset
@@ -318,7 +316,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
 
   # check for valid characters in the variable names
   if (format %in% c("csv", "Excel")) {
-    dg <- character(length=0)
+    dg <- character(length=10)
     for (i in 0:9) dg[i+1] <- as.character(i)
     ltr <- c(letters, LETTERS, dg, "_", ".")
 

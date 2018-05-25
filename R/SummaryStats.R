@@ -102,7 +102,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       cat(">>> ", x.name, " has only only ", nu, " unique ",
           "integer values, but not equally spaced,\n",
           "      so treat as numerical in this analysis\n",
-          "    Maybe convert to an R factor to treat as categorical\n\n",
+          "    Convert to an R factor to treat as categorical\n\n",
           sep="")
     }
 
@@ -128,7 +128,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   }
 
   # ordered factors have two attributes, "ordered" and "factor"
-  else if (is.factor(x.call)) {
+  else {  # is.factor(x.call)
 
     gl <- .getlabels(graph.win=FALSE)
     x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
@@ -154,17 +154,17 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
       txcol <- stuff$txcol
       txrow <- stuff$txrow
     }
-
   }
 
-  else {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "The variable to be analyzed must be numeric or a factor, or have\n",
-        "character values that can be converted to a factor.\n")
-  }
+  # else {
+  #   cat("\n"); stop(call.=FALSE, "\n","------\n",
+  #       "The variable to be analyzed must be numeric or a factor, or have\n",
+  #       "character values that can be converted to a factor.\n")
+  # }
 
 
-  if (ncol(data) == 1) {  # not a data frame analysis 
+  # not a data frame analysis
+  if (ncol(data) == 1) { 
 
     if (!is.factor(x.call)) {
       class(txsts) <- "out_piece"
@@ -176,7 +176,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
            median=stuff$md, quartile3=stuff$q3, max=stuff$mx, IQR=stuff$qr)
     }
 
-    else if (is.factor(x.call)) {
+    else {  # is.factor(x.call)
       if (n.dim == 1) {
         class(txttl) <- "out_piece"
         class(txsts) <- "out_piece"

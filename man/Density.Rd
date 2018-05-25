@@ -28,7 +28,7 @@ Density(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
        x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
 
-       digits.d=NULL, quiet=getOption("quiet"),
+       eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
        width=4.5, height=4.5, pdf=FALSE,
        fun.call=NULL, \ldots)
 
@@ -80,8 +80,12 @@ dn(\ldots)
   \item{x.pt}{Value of the point on the x-axis for which to draw a unit interval
         around illustrating the corresponding area under the general density curve.
         Only applies when requesting \code{type=general}.}
-  \item{xlab}{Label for x-axis.}
-  \item{main}{Title of graph.}
+  \item{xlab}{Label for x-axis. Defaults to variable name unless variable labels
+        are present, the defaults to also include the corresponding variable
+        label. Can style with the lessR \code{\link{style}} function.}
+  \item{main}{Label for the title of the graph.
+       Can set size with \code{main.cex} and color with \code{main.color} from the
+       lessR \code{\link{style}} function.}
   \item{sub}{Sub-title of graph, below xlab.}
   \item{y.axis}{Specifies if the y-axis, the density axis, should be included.}
   \item{x.min}{Smallest value of the variable x plotted on the x-axis.}
@@ -89,6 +93,11 @@ dn(\ldots)
   \item{band}{If \code{TRUE}, add a rug plot, a direct display of density in the
         form of a narrow band beneath the density curve.}\cr
 
+  \item{eval.df}{Determines if to check for existing data frame and
+        specified variables. By default is \code{TRUE} 
+        unless the \code{shiny} package is loaded then set to \code{FALSE} so
+        that Shiny will run. Needs to be set to \code{FALSE} if using
+        the pipe \code{\%\>\%} notation.}
   \item{digits.d}{Number of significant digits for each of the displayed summary
         statistics.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
@@ -159,7 +168,9 @@ Although not typically needed, if the output is assigned to an object named, for
 }
 
 
-\author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
+\author{
+David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})
+}
 
 \seealso{
 \code{\link{dnorm}}, \code{\link{density}}, \code{\link{hist}}, \code{\link{plot}}, \code{\link{rgb}}, \code{\link{shapiro.test}}.

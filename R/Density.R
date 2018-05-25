@@ -12,7 +12,7 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
        x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
        x.min=NULL, x.max=NULL, band=FALSE, 
 
-       digits.d=NULL, quiet=getOption("quiet"),
+       eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
        width=4.5, height=4.5, pdf=FALSE,
        fun.call=NULL, ...) {
 
@@ -25,10 +25,14 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   lab.cex <- getOption("lab.cex")
   axis.cex <- getOption("axis.cex")
 
-  # see if dated parameter values
-  .param.old(...)
+  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
+  if (is.null(eval.df))  # default values
+    eval.df <- ifelse (shiny, FALSE, TRUE) 
 
   bw.miss <- ifelse (missing(bw), TRUE, FALSE)
+
+  # see if dated parameter values
+  .param.old(...)
 
   clr <- getOption("theme")  # color theme not used except for monochrome 
 
@@ -59,6 +63,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   options(xname = x.name)
 
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
+  if (data.miss && shiny)  # force evaluation (not lazy)
+    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
@@ -70,8 +76,10 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     # x not in global env, in df, specify data= forces to data frame
     if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
-      .nodf(df.name)  # check to see if data frame container exists 
-      .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      if (eval.df) {
+        .nodf(df.name)  # check to see if data frame container exists 
+        .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      }
       all.vars <- as.list(seq_along(data))  # even if only a single var
       names(all.vars) <- names(data)  # all data in data frame
       x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars

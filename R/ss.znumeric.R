@@ -97,7 +97,6 @@ function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     txlbl[2] <- sub("\n", "", txlbl[2])
   txlbl[length(txlbl)+1] <- ""
   tx <- txlbl
-
   # --------------------------------
   # the stats loop
   for (i in 1:n.lines) {
@@ -194,7 +193,6 @@ function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
 
       if (brief)
         tx[length(tx)+1] <- paste(lvl, n.c, miss.c, m.c, s.c, mn.c, md.c, mx.c)
-
       else {
         sk.c <- .fmt(sk, dig.dec, max.ln)
         kt.c <- .fmt(kt, dig.dec, max.ln)

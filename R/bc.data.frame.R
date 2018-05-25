@@ -1,20 +1,21 @@
 bc.data.frame <-
 function(x, n.cat,
-         col.fill, col.color, col.bg, col.box,
-         col.trans, colors,
-         horiz, addtop, gap, prop,
-         xlab, ylab, main, lab.cex,
-         labels, label.size,
-         axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
-         legend.title, legend.loc, legend.labels, legend.horiz, quiet,
-         width, height, pdf.file, ...)  {
+         col.fill, col.color, col.trans, theme,
+         horiz, addtop, gap, prop, scale.y,
+         xlab, ylab, main,
+         labels, label.size, beside,
+         rotate.x, offset, break.x, sort.x,
+         values, values.color, values.cex, value.digits, values.pos,
+         xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+         legend.title, legend.loc, legend.labels, legend.horiz,
+         out.size, quiet, width, height, pdf, ...)  {
 
 
-  sug <- getOption("suggest")
+  sug.keep <- getOption("suggest")
   options(suggest = FALSE)
 
   manage.gr <- .graphman()  # see if graphics are to be managed
-  if (manage.gr  &&  is.null(pdf.file)) {
+  if (manage.gr  &&  is.null(pdf)) {
     i.win <- 0
     for (i in 1:ncol(x)) {
       if (is.numeric(x[,i])  &&  !.is.num.cat(x[,i], n.cat)) 
@@ -45,7 +46,7 @@ function(x, n.cat,
 
         else {
 
-        if (!is.null(pdf.file)) {
+        if (!is.null(pdf)) {
           pdf.fnm <- paste("BarChart_", x.name, ".pdf", sep="") 
           .opendev(pdf.fnm, width, height)
         } 
@@ -60,17 +61,17 @@ function(x, n.cat,
         }
 
         .bc.main(x[,i], y=NULL, by=NULL,
-          col.fill, col.color, col.bg, col.box,
-          col.trans, colors,
-          horiz, addtop, gap, prop,
-          xlab, ylab, main, lab.cex,
-          value.labels=NULL, label.size,
-          axis.cex, cex.names, rotate.x, rotate.y, offset, beside,
+          col.fill, col.color, col.trans, theme,
+          horiz, addtop, gap, prop, scale.y,
+          xlab, ylab, main,
+          value.labels=NULL, label.size, beside,
+          rotate.x, offset, break.x, sort.x,
+          values, values.color, values.cex, value.digits, values.pos,
+          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
           legend.title, legend.loc, legend.labels, legend.horiz,
-          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, quiet,
-          font.main=1, ...)
+          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out.size, quiet, ...)
 
-        if (!is.null(pdf.file)) {
+        if (!is.null(pdf)) {
           dev.off()
           if (!quiet) .showfile(pdf.fnm, "bar chart")
         }
@@ -89,9 +90,10 @@ function(x, n.cat,
 
   }  # each column in x
 
-  options(suggest = sug)
+  options(suggest = sug.keep)
+
   if (plot.i > 0) {
-    if (is.null(pdf.file))
+    if (is.null(pdf))
       if (is.null(options()$knitr.in.progress))
         .plotList(plot.i, plot.title)
   }
@@ -104,3 +106,4 @@ function(x, n.cat,
   }
 
 }
+

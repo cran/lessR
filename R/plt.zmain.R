@@ -10,7 +10,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          col.area="transparent",
 
          xy.ticks=TRUE,
-         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+         xlab=NULL, ylab=NULL, main=NULL, main.cex=NULL, sub=NULL,
          value.labels=NULL, label.max=20,
          rotate.x=0, rotate.y=0, offset=0.5, prop=FALSE, origin.x=NULL,
 
@@ -37,6 +37,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          center.line="default", show.runs=FALSE, stack=FALSE,
 
          freq.poly=FALSE, jitter.x=0, jitter.y=0,
+
+         xlab.adj=0, ylab.adj=0, bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
 
          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
          add.cex=NULL, add.lwd=1, add.lty="solid",
@@ -67,8 +69,6 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   do.ellipse <- ifelse(ellipse[1] > 0, TRUE, FALSE)
 
-  if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels) 
-
   # all processing in terms of numeric variables
   # convert factors to numeric, save levels, so x and y are always numeric
   # x will always be a matrix
@@ -76,7 +76,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   nm.x <- names(x)
   if (is.factor(x[,1])) {
     x.lvl <- levels(x[,1])
-    if (is.null(value.labels)) value.labels <- gsub(" ", "\n", x.lvl) 
+    if (is.null(value.labels)) value.labels <- gsub(" ", "\n", x.lvl)
     x <- as.matrix(as.integer(x[,1]))
   }
   else if (!date.ts) {
@@ -131,20 +131,20 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     if (col.area != "transparent")
       col.area <- .maketrans(col.area, (1-trans.pts)*256)
   }
+
            
   # scale for regular R or RStudio
   adj <- .RSadj(radius=radius)
   radius <- adj$radius
-  cex.txt <- adj$size.txt
 
   # get lab.x.cex  lab.y.cex
   lab.cex <- getOption("lab.cex")
   lab.x.cex <- getOption("lab.x.cex")
   lab.y.cex <- getOption("lab.y.cex")
   lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
-  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+# adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
   lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
-  adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
+# adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
 
   if (date.ts) xx.lab <- xlab
   if (want.labels) {
@@ -154,8 +154,6 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
     main.lab <- gl$mb
     sub.lab <- gl$sb
-    lab.x.cex <- gl$lab.x.cex
-    lab.y.cex <- gl$lab.y.cex
     by.name <- getOption("byname")
   }
   else {
@@ -199,7 +197,11 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # -------------------------
   # -------------------------
 
+  # graphic system parameters
+
   # x.val is either any value.labels or x.lvl, or NULL if x is numeric
+  mx.x.val.ln <- 1
+  mx.y.val.ln <- 1
   if (!date.ts) {
     x.val <- NULL
     y.val <- y.lvl  # if not reset to x value labels
@@ -216,7 +218,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
         }
       }
     }
-    else {
+    else {  # is null value.labels
       x.val <- x.lvl  # x.val is NULL if x is numeric, ignored
       y.val <- y.lvl  # y.val ignored if y is numeric 
     }
@@ -226,27 +228,33 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     y.val <- NULL
   }
 
+  # get max number of lines in x value labels
+  if (!is.null(x.val)) {
+    stuff <- .get.val.ln(x.val, x.name)
+    x.val <- stuff$val.lab 
+    mx.x.val.ln <- stuff$mx.val.ln
+  }
 
-  # -------------------------
-  # graphic system parameters
-  # -------------------------
+  # get max number of lines in y value labels
+  if (!is.null(y.val)  &&  y.name != "row.names") {
+    stuff <- .get.val.ln(y.val, y.name)
+    y.val <- stuff$val.lab 
+    mx.y.val.ln <- stuff$mx.val.ln
+  }
 
   axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")), 
     getOption("axis.cex"), getOption("axis.y.cex"))
 
   if (!is.null(y.val)) {  # y-axis labels are characters  
     yv <- unlist(strsplit(y.val, "\n", fixed=TRUE))
-    max.width <- max(strwidth(yv, units="inches", cex=axis.y.cex))
-    max.width <- max.width + .15
+    max.y.width <- max(strwidth(yv, units="inches", cex=axis.y.cex))
     if (options("device") != "RStudioGD")  # not work in R, only RStudio
-      max.width <- .09 * axis.y.cex * max(nchar(yv))
+      max.y.width <- .09 * axis.y.cex * max(nchar(yv))
   }
   else {  # y-axis labels are numeric
-    max.width <- strwidth(as.character(max(pretty(y[,1]))), units="inches",
-                          cex=axis.y.cex)
-    max.width <- max.width + .05
-    if (options("device") != "RStudioGD")  # does not work in R, only RStudio
-      max.width <- .09 * axis.y.cex * nchar(as.character(max(pretty(y[,1]))))
+    prety <- max(pretty(c(min(y, na.rm=TRUE), max(y, na.rm=TRUE))))
+    mx.num <-  ifelse (!prop, as.character(prety), .fmt(prety, 2))
+    max.y.width <- max(strwidth(mx.num, cex=axis.y.cex, units="inches"))
   }
   
 
@@ -265,11 +273,15 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
 
   # set margins
-  margs <- .marg(max.width, y.lab, x.lab, main.lab, x.val, prop, rotate.x)
+  margs <- .marg(max.y.width, y.lab, x.lab, main.lab, rotate.x,
+                mx.x.val.ln, mx.y.val.ln,
+                lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex)
   mm <- margs$lm  # left margin, lm is linear model
   tm <- margs$tm
   rm <- margs$rm
   bm <- margs$bm
+  n.lab.x.ln <- margs$n.lab.x.ln
+  n.lab.y.ln <- margs$n.lab.y.ln
 
   if (lab.x.cex > 1.2) {
      bm <- bm + (.15*lab.x.cex)
@@ -280,6 +292,17 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   if (!is.null(by)) rm <- rm + 0.85  # room for legend
   if (object == "both")
     if (center.line != "off") rm <- rm + .4  # room for center.line label
+
+  if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
+  
+# mm <- mm - 0.1  # generic kludge
+# bm <- bm - 0.1
+
+  # user manual adjustment
+  bm <- bm + bm.adj
+  mm <- mm + lm.adj
+  tm <- tm + tm.adj
+  rm <- rm + rm.adj
   
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
@@ -387,6 +410,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
     lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
+  # axes
   if (xy.ticks) {
     if (!bubble1) {
       if (!date.ts) {  # get ticks for both axes
@@ -431,7 +455,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl.y, 
           x.val, xy.ticks, offset=offset,
-          lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, ...) 
+          lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, main.cex,
+          n.lab.x.ln, n.lab.y.ln, xlab.adj, ylab.adj, ...) 
 
 
   # ---------------
@@ -805,10 +830,10 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       if (prop) count <- round(count, 2)
       cords <- data.frame(xx, yy, count)
 
-# can use xyTable instead, though does not have coordinates for count=0
-#cnt <- xyTable(x,y)
-#symbols(cnt$x, cnt$y, circles=sz, inches=radius,
-        #bg=clr, fg=clr.color, add=TRUE, ...)
+  # can use xyTable instead, though does not have coordinates for count=0
+  #cnt <- xyTable(x,y)
+  #symbols(cnt$x, cnt$y, circles=sz, inches=radius,
+          #bg=clr, fg=clr.color, add=TRUE, ...)
 
       if (object == "bubble") {
         sz <- cords[,3]**power  # radius unscaled 
@@ -857,11 +882,11 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       # should get size of each amount just for those displayed (q.ind)
       sz.cex <- numeric(length=nrow(cords))
       for (i in 1:nrow(cords)) {
-        sz.cex[i] <- cex.txt  # cex target for text size
+        sz.cex[i] <- getOption("axis.cex")  # cex target for text size
        # target for text size
         sz.txt <- strwidth(cords[i,3], units="inches", cex=sz.cex[i])
         while ((sz.txt - sz[i]) > -.03) {
-          if (sz.cex[i] > 0.45) {  # need cex larger than 0.45
+          if (sz.cex[i] > 0.5) {  # need cex larger than 0.5
             sz.cex[i] <- sz.cex[i] - 0.05
             # actual
             sz.txt <- strwidth(cords[i,3], units="inches", cex=sz.cex[i])
@@ -871,6 +896,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
             break;
           }
         }
+        if (options("device") != "RStudioGD")
+          sz.cex[i] <- sz.cex[i] * 1.3
       }
 
       # write bubble text
