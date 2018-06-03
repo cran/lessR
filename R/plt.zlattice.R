@@ -112,7 +112,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
       if (object == "both") ltype[2] <- "dotted"
   }  
   else  {  # n.groups > 2
-    col.color <- .col.discrete()[1:n.groups]
+    col.color <- getColors("colors", n=n.groups)
     for (i in 1:n.groups) {
       col.fill[i] <- col.color[i]
       col.fill[i] <- .maketrans(col.fill[i], (1-trans)*256)

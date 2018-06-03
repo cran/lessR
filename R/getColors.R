@@ -1,6 +1,6 @@
 getColors <-
 function(clr=NULL, end.clr=NULL, shape=c("rectangle", "wheel"),
-         n=5, h=0, h2=NULL, c=65, l=55, fixup=TRUE,
+         n=5, h=0, h2=NULL, c=70, l=55, fixup=TRUE,
          in.order=FALSE, radius=0.9, main=NULL,
          labels=NULL, labels.cex=0.8, border="lightgray", lty="solid",
          output=NULL, quiet=getOption("quiet"), ...) {

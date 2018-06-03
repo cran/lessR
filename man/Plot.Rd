@@ -41,8 +41,7 @@ Plot(x, y=NULL, data=mydata,
          by=NULL, by1=NULL, by2=NULL,
          n.row=NULL, n.col=NULL, aspect="fill",
 
-         fill=getOption("pt.fill"),
-         color=getOption("pt.color"),
+         fill=getOption("pt.fill"), color=getOption("pt.color"),
          trans=getOption("trans.pt.fill"),
 
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
@@ -76,6 +75,9 @@ Plot(x, y=NULL, data=mydata,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
          xlab.adj=0, ylab.adj=0,
          bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
+
+         rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
+         offset=getOption("offset"),
 
          xy.ticks=TRUE, value.labels=NULL, label.max=20, origin.x=NULL,
 
@@ -418,6 +420,18 @@ vp(\ldots)
   \item{rm.adj}{Adjustment to the provided computation for the
        right margin in inches.}\cr
 
+  \item{rotate.x}{Degrees that the axis values for the value labels on
+        the \code{x}-axis are rotated, usually to accommodate longer values,
+        typically used in conjunction with \code{offset}. When equal 90
+        the value labels are perpendicular to the x-axis and a different
+        algorithm places the labels so that \code{offset} is not needed.}
+  \item{rotate.y}{Degrees that the axis values for the value labels on
+        the \code{y}-axis are rotated, usually to accommodate longer values,
+        typically used in conjunction with \code{offset}.}
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
+        is 0.5. Larger values such as 1.0 are used to create space for the label when
+        longer axis value names are rotated.}\cr
+
   \item{xy.ticks}{Flag that indicates if tick marks and associated \bold{axis values}
         on the axes are to be displayed. To rotate the axis values, use
         \code{rotate.x}, \code{rotate.y}, and \code{offset} from the
@@ -652,9 +666,9 @@ Plot(Years, Salary, auto=TRUE)
 # plot 0.95 data ellipse with the points identified that represent
 #   outliers defined by a Mahalanobis Distance larger than 6 
 # save outliers into R object out, then remove from mydata
-#mydata[1, "Salary"] <- 200000
-#out <- Plot(Years, Salary, ellipse=0.95, MD.cut=6)
-#mydata <- mydata[-out$outlier_indices,]
+mydata[1, "Salary"] <- 200000
+out <- Plot(Years, Salary, ellipse=0.95, MD.cut=6)
+mydata <- mydata[-out$outlier_indices,]
 
 # new shape and point size, no grid or background color
 # then put style back to default
@@ -681,10 +695,10 @@ Plot(Years, Salary, auto=TRUE)
 # scatterplot with two x-variables, plotted against Salary
 # define a new style, then back to default
 #style(window.fill=rgb(247,242,230, maxColorValue=255),
-#  panel.fill="off", panel.color="off", pt.fill="black", trans=0,
-#  lab.color="black", axis.text.color="black",
-#  axis.y.color="off", grid.x.color="off", grid.y.color="black",
-#  grid.lty="dotted", grid.lwd=1)
+# panel.fill="off", panel.color="off", pt.fill="black", trans=0,
+# lab.color="black", axis.text.color="black",
+# axis.y.color="off", grid.x.color="off", grid.y.color="black",
+# grid.lty="dotted", grid.lwd=1)
 #Plot(c(Pre, Post), Salary)
 #style()
 
@@ -712,7 +726,7 @@ Plot(Years, Salary, auto=TRUE)
 #--------------------------------------------------------------
 
 # Trellis plot with condition on 1-variable
-#Plot(Years, Salary, by1=Dept)
+Plot(Years, Salary, by1=Dept)
 
 # all three by variables
 #Plot(Years, Salary, by1=Dept, by2=Gender, by=HealthPlan)
@@ -774,13 +788,13 @@ Plot(Years, Salary, auto=TRUE)
 
 # daily time series plot
 # create the daily time series from R built-in data set airquality
-#oz.ts <- ts(airquality$Ozone, start=c(1973, 121), frequency=365)
+#z.ts <- ts(airquality$Ozone, start=c(1973, 121), frequency=365)
 #Plot(oz.ts)
 
 # multiple time series plotted from dates and stacked
 # black background with translucent areas, then reset theme to default
 #style(sub.theme="black", color="steelblue2", trans=.55, 
-#  window.fill="gray10", grid.color="gray25")
+# window.fill="gray10", grid.color="gray25")
 #date <- seq(as.Date("2013/1/1"), as.Date("2016/1/1"), by="quarter")
 #x1 <- rnorm(13, 100, 15)
 #x2 <- rnorm(13, 100, 15)
@@ -882,14 +896,14 @@ mydata <- rd("Mach4", format="lessR", quiet=TRUE)  # Likert data, 0 to 5
 #   less than 9 unique data values for each 
 # n.cat=6 means treat responses as categorical for up to 6 equally-spaced
 #   integer values
-Plot(m06, m07, n.cat=6)
+#Plot(m06, m07, n.cat=6)
 
 # use value labels for the integer values, modify color options
 LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
    "Slightly Agree", "Agree", "Strongly Agree")
-#style(fill="powderblue", color="blue", bubble.text="darkred")
-#Plot(m06,  m07, value.labels=LikertCats, n.cat=6)
-#style("darkred")  # reset theme
+style(fill="powderblue", color="blue", bubble.text="darkred")
+Plot(m06,  m07, value.labels=LikertCats, n.cat=6)
+style()  # reset theme
 
 # proportions within each level of the other variable
 #Plot(m06, m07, proportion=TRUE, n.cat=6)
@@ -904,7 +918,7 @@ LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
 # Bubble Plot Frequency Matrix
 #-----------------------------
 
-Plot(c(m06,m07,m09,m10), value.labels=LikertCats)
+#Plot(c(m06,m07,m09,m10), value.labels=LikertCats)
 
 
 #---------------
@@ -951,3 +965,4 @@ Plot(c(m06,m07,m09,m10), value.labels=LikertCats)
 \keyword{ plot }
 \keyword{ color }
 \keyword{ grouping variable }
+

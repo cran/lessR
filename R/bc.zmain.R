@@ -235,35 +235,24 @@ function(x, y, by,
 
   # ------
   # colors
+  # fill is input and usually words, clr are actual colors
 
-  # if use getColors to generate a range of colors
-  if (is.null(by) && !is.matrix(x))
-    n.cat <- length(x)  
-  else
-    n.cat <- nrow(x)
-  if (!is.null(by)) n.cat <- nrow(x)  # num cat for by variable
-  # see if apply a pre-defined color range
-  if (length(fill) == 1) fill <- .color.range(fill, n.cat)  # range
+  n.cat <- ifelse (!is.null(by), nrow(x), length(x))
 
-  # get n.colors (does not indicate fill multiple colors)
-  if (is.null(by) && !is.matrix(x))
-    n.colors <- length(fill)
-  else
-    n.colors <- nrow(x)
-  if (!is.null(by)) n.colors <- nrow(x)
-  
-  if (length(fill) < n.colors)  # two-variable bar chart
-    fill <- getColors(n=length(unique(by)))
+  # see if apply a pre-defined color range to fill
+  clr <- NULL
+  if (length(fill) == 1) clr <- .color.range(fill, n.cat)  # see if range
 
-  if (!is.null(col.trans)) 
-    for (i in 1:n.colors) fill[i] <- .maketrans(fill[i], (1-col.trans)*256) 
-
-  if (n.colors > 1) {
-    palette(fill)
-    colr <- 1:n.colors   # colr is a sequence of integers
+  # not a color range, so assign clr here
+  if (is.null(clr)) {
+    if (length(fill) == 1  &&  !is.null(by)) 
+      clr <- getColors("colors", n=n.cat)
+    else
+      clr <- fill  # user provided the colors
   }
-  else  # colr is a color
-    colr <- ifelse (is.null(fill), getOption("bar.fill"), fill)
+
+ if (!is.null(col.trans)) 
+   for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-col.trans)*256) 
 
 
   # ----------------------------------------------------------------------------
@@ -460,11 +449,11 @@ function(x, y, by,
 
   # the bars
   if (rescale == 0)
-    x.coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
+    x.coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.color, las=las.value, 
           space=gap, axisnames=FALSE, ...)
   else
-    x.coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
+    x.coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col.color, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
 
@@ -614,13 +603,13 @@ function(x, y, by,
 
       options(byname = getOption("byname"))
       trans.pts <- .6  # dummy value
-      .plt.by.legend(legend.labels, col.color, fill, shp=22, trans.pts,
+      .plt.by.legend(legend.labels, col.color, clr, shp=22, trans.pts,
                      col.bg, usr, pt.size=1.6, pt.lwd=0)
 
     }  # right margin
 
     else
-      legend(legend.loc, legend=legend.labels, title=l.lab, fill=colr, 
+      legend(legend.loc, legend=legend.labels, title=l.lab, fill=clr, 
              horiz=legend.horiz, cex=.7, bty="n", text.col=col.txt)
   }
 

@@ -493,12 +493,9 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       if (object == "both") {
         ltype[2] <- "dotted"
         if (!(getOption("theme") %in% c("gray")))
-          #fill[2] <- .col.discrete()[2]
           fill[2] <- fill[1]
         else {
           fill[2] <- fill[1]
-          #fill[2] <- rgb(.15,.15,.15)
-          #color[2] <- fill[2]
           color[2] <- rgb(.15,.15,.15)
         }
       }  # end object is both
@@ -510,7 +507,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       }
     }  # end n.patterns=2
     else  {  # n.patterns > 2
-      color <- .col.discrete()[1:n.patterns]
+      color <- getColors("colors", n=n.patterns)
       for (i in 1:length(color))
         fill[i] <- .maketrans(color[i], (1-trans.pts)*256)
     }

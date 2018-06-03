@@ -26,7 +26,7 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
 
-    prop=FALSE, hist.counts=FALSE,
+    prop=FALSE, values=FALSE,
     reg="snow2", cumul=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -116,7 +116,7 @@ hs(\ldots)
 
   \item{prop}{Specify proportions or relative frequencies on the vertical axis.
        Default is \code{FALSE}.}
-  \item{hist.counts}{Replaces standard R \code{labels} options, which has multiple
+  \item{values}{Replaces standard R \code{labels} options, which has multiple
        definitions in R. Specifies to display the count of each bin.}
   \item{reg}{The color of the superimposed, regular histogram when
         \code{cumul="both"}.}
@@ -345,7 +345,7 @@ style()
 Histogram(Salary, breaks=seq(0,150000,20000), xlab="My Variable")
 
 # histogram with bins calculated with the Scott method and values displayed
-Histogram(Salary, breaks="Scott", hist.counts=TRUE, quiet=TRUE)
+Histogram(Salary, breaks="Scott", values=TRUE, quiet=TRUE)
 
 # histogram with the number of suggested bins, with proportions
 Histogram(Salary, breaks=15, prop=TRUE)
@@ -394,9 +394,9 @@ Histogram()
 # although data not attached, access the variable directly by its name
 Histogram(breaks, data=warpbreaks)
 
-# all histograms with specified options, including red axis labels
+# histogram with specified options, including red axis labels
 style(fill="palegreen1", panel.fill="ivory", axis.color="red") 
-Histogram(hist.counts=TRUE)
+Histogram(values=TRUE)
 style()  # reset
 
 # histograms for all specified numeric variables

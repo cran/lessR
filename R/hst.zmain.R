@@ -2,7 +2,7 @@
 function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
        rotate.x=NULL, rotate.y=NULL, offset=NULL,
        breaks, bin.start, bin.width,
-       bin.end, prop, hist.counts=NULL, cumul="off",
+       bin.end, prop, values=NULL, cumul="off",
        xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
        xlab.adj=NULL, ylab.adj=NULL,
        bm.adj=NULL, lm.adj=NULL, tm.adj=NULL, rm.adj=NULL,
@@ -112,7 +112,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 
   # calculate but do not plot the histogram
   # arguments in ... for plotting instructions generate warnings with no plot
-  h <- suppressWarnings(hist(x, plot=FALSE, breaks, labels=hist.counts, ...))
+  h <- suppressWarnings(hist(x, plot=FALSE, breaks, labels=values, ...))
 
   # relative frequency histogram option
   if (prop) h$counts <- h$counts/length(x)
@@ -195,19 +195,16 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 
     # see if apply a pre-defined color range
     n.bins <- length(h$counts)
-    if (length(fill) == 1) fill <- .color.range(fill, n.bins)
+    if (length(fill) == 1) fill <- .color.range(fill, n.bins, no.change=TRUE)
 
     # bar transparency
     n.clr <- length(fill)
-cat("n.clr:", n.clr, "\n")
-print(fill)
-print(getOption("bar.fill.ordered"))
     if (!is.null(trans)) if (trans > 0)
       for (i in 1:n.clr) fill[i] <- .maketrans(fill[i], (1-trans)*256) 
 
     # plot the histogram
     plot(h, add=TRUE, col=fill, border=color, freq=TRUE,
-         labels=hist.counts, ...)
+         labels=values, ...)
     if (cumul == "both") {
       h$counts <- old.counts
       plot(h, add=TRUE, col=col.reg, freq=TRUE)

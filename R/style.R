@@ -14,6 +14,8 @@ function(
 
   fill=NULL,
   bar.fill=getOption("bar.fill"),
+  bar.fill.discrete=getOption("bar.fill.discrete"),
+  bar.fill.ordered=getOption("bar.fill.ordered"),
   trans=NULL,
   trans.bar.fill=getOption("trans.bar.fill"),
   color=NULL,
@@ -311,6 +313,8 @@ function(
 
   # "off" is "transparent"
   bar.fill[which(bar.fill == "off")] <- "transparent"
+  bar.fill.discrete[which(bar.fill.discrete == "off")] <- "transparent"
+  bar.fill.ordered[which(bar.fill.ordered == "off")] <- "transparent"
   pt.fill[which(pt.fill == "off")] <- "transparent"
   bar.color[which(bar.color == "off")] <- "transparent"
   pt.color[which(pt.color == "off")] <- "transparent"
@@ -353,14 +357,15 @@ function(
   add.color[which(add.color == "off")] <- "transparent"
   add.fill[which(add.fill == "off")] <- "transparent"
 
-  bar.fill <- .color.range(bar.fill, 24)
-  bar.color <- .color.range(bar.color, 24)
-  pt.fill <- .color.range(pt.fill, 24)
-  pt.color <- .color.range(pt.color, 24)
-  add.fill <- .color.range(add.fill, 24)
-  add.color <- .color.range(add.color, 24)
+  # see if a pre-defined color range, if not return the calling color
+  bar.fill <- .color.range(bar.fill, 24, no.change=TRUE)
+  bar.color <- .color.range(bar.color, 24, no.change=TRUE)
+  pt.fill <- .color.range(pt.fill, 24, no.change=TRUE)
+  pt.color <- .color.range(pt.color, 24, no.change=TRUE)
+  add.fill <- .color.range(add.fill, 24, no.change=TRUE)
+  add.color <- .color.range(add.color, 24, no.change=TRUE)
 
-# default transparency levels
+  # default transparency levels
   if (!is.null(trans.bar.fill)) {
     options(trans.bar.fill=trans.bar.fill)
     options(bar.fill = .maketrans(getOption("bar.fill"), 
@@ -392,6 +397,8 @@ function(
   options(sub.theme = sub.theme)
 
   options(bar.fill = bar.fill) 
+  options(bar.fill.discrete = bar.fill.discrete) 
+  options(bar.fill.ordered = bar.fill.ordered) 
   options(bar.color = bar.color) 
   options(pt.color = pt.color) 
   
@@ -496,6 +503,8 @@ function(
     options(window.fill = "white")
     options(panel.fill = "grey98")
     options(bar.fill = .maketrans(color1, .to256("trans.bar.fill")))
+    options(bar.fill.discrete = .maketrans(color1, .to256("trans.bar.fill")))
+    options(bar.fill.ordered = .maketrans(color1, .to256("trans.bar.fill")))
     options(pt.fill = .maketrans(color1, .to256("trans.pt.fill")))
     options(bar.color = color2)
     options(pt.color = color2)
@@ -548,6 +557,10 @@ function(
  
     else if (theme ==  "gray"  &&  sub.theme == "black") { 
       options(bar.fill = .maketrans("gray55", .to256("trans.bar.fill")))
+      options(bar.fill.discrete =
+        .maketrans("gray55", .to256("trans.bar.fill")))
+      options(bar.fill.ordered =
+        .maketrans("gray55", .to256("trans.bar.fill")))
       options(bar.color = "gray20")
       options(pt.fill = .maketrans("gray75", .to256("trans.pt.fill")))
       options(pt.color = .maketrans("gray75", .to256("trans.pt.fill")))
@@ -565,8 +578,10 @@ function(
       clr1 <- "gray55"
     }
     else if (theme ==  "orange"  &&  sub.theme == "black") {
-      if (miss.tr.bar.fill) options(trans.bar.fill = .2)
-      options(bar.fill = rgb(249,99,2, alpha=.to256("trans.bar.fill"),
+      if (miss.tr.bar.fill) options(trans.bar.fill = .05)
+      options(bar.fill.discrete = rgb(139,69,0, alpha=.to256("trans.bar.fill"),
+            maxColorValue=256))
+      options(bar.fill.ordered = rgb(139,69,0, alpha=.to256("trans.bar.fill"),
             maxColorValue=256))
       options(pt.fill = rgb(139,69,0, alpha=.to256("trans.pt.fill"),
             maxColorValue=256))
@@ -645,6 +660,8 @@ function(
       options(window.fill = "white")
       options(panel.fill = "white")
       options(bar.fill = "white")
+      options(bar.fill.ordered = "white")
+      options(bar.fill.discrete = "white")
       options(bar.color = "black")
       options(values.color = "black")
       options(pt.fill = "white")
@@ -670,6 +687,8 @@ function(
       options(window.fill = "white")
       options(panel.fill = "grey95")
       options(bar.fill = .maketrans("gray25", .to256("trans.bar.fill")))
+      options(bar.fill.discrete = .maketrans("gray25",.to256("trans.bar.fill")))
+      options(bar.fill.ordered = .maketrans("gray25", .to256("trans.bar.fill")))
       options(pt.fill = .maketrans("gray20", .to256("trans.pt.fill")))
       options(bar.color = "gray60")
       options(pt.color = "black")
@@ -697,13 +716,15 @@ function(
       options(panel.color = rgb(222,217,205, maxColorValue=255))
       #options(bar.fill = .maketrans("gray50", .to256("trans.bar.fill")))  # 230
       options(bar.fill = rgb(123,140,150, maxColorValue=255))  
+      options(bar.fill.ordered = rgb(123,140,150, maxColorValue=255))  
+      options(bar.fill.discrete = rgb(123,140,150, maxColorValue=255))  
       options(bar.color = rgb(108,126,144, maxColorValue=255))
       options(pt.fill = rgb(123,140,150, maxColorValue=255))  # old: gray20
       options(pt.color = rgb(123,140,150, maxColorValue=255))
       options(ellipse.fill = .maketrans("gray50", 50))
       options(ellipse.color = "gray20")
       options(se.fill = .maketrans("gray50", 30)) 
-      options(violin.fill = rgb(142,166,182, maxColorValue=255))
+      options(violin.fill = rgb(144,165,175, maxColorValue=255))
       options(violin.color = "gray15") 
       options(box.fill = .maketrans("gray15", 35)) 
       options(box.color = "gray15") 

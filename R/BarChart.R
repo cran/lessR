@@ -24,7 +24,7 @@ function(x=NULL, y=NULL, by=NULL, data=mydata,
 
         values=getOption("values"),
         values.color=getOption("values.color"), 
- 	values.cex=getOption("values.cex"),
+ 	      values.cex=getOption("values.cex"),
         values.digits=getOption("values.digits"),
         values.pos=getOption("values.pos"),
 		
@@ -82,9 +82,9 @@ function(x=NULL, y=NULL, by=NULL, data=mydata,
       "values.pos  must be set to \"in\", \"out\"\n\n")
   }
  
-  if (!(values.pos %in% c("in", "out"))) {
+  if (values != "off"  &&  beside) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "values.pos  must be set to \"in\", \"out\"\n\n")
+      "beside=TRUE  option not currently working with values\n\n")
   }
 
   fill[which(fill == "off")] <- "transparent"
@@ -277,9 +277,12 @@ function(x=NULL, y=NULL, by=NULL, data=mydata,
 
       if (!is.null(pdf))
         pdf.fnm <- paste("BarChart_", f.name, ".pdf", sep="") 
-      else
-        pdf.fnm <- NULL
-      .opendev(pdf.fnm, width, height)
+      else {
+        if (!shiny) {  # not dev.new for shiny
+          pdf.fnm <- NULL
+          .opendev(pdf.fnm, width, height)
+        }
+      }
 
       bc <- .bc.main(x.call, y.call, by.call,
             fill, color, trans, theme,

@@ -7,8 +7,7 @@ function(x, y=NULL, data=mydata,
          by=NULL, by1=NULL, by2=NULL,
          n.row=NULL, n.col=NULL, aspect="fill",
 
-         fill=getOption("pt.fill"),
-         color=getOption("pt.color"),
+         fill=getOption("pt.fill"), color=getOption("pt.color"),
          trans=getOption("trans.pt.fill"),
 
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
@@ -42,6 +41,9 @@ function(x, y=NULL, data=mydata,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
          xlab.adj=0, ylab.adj=0,
          bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
+
+         rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
+         offset=getOption("offset"),
 
          xy.ticks=TRUE, value.labels=NULL, label.max=20, origin.x=NULL,
 
@@ -121,10 +123,6 @@ function(x, y=NULL, data=mydata,
   add.color <- getOption("add.color")
   add.fill <- getOption("add.fill")
   add.trans <- getOption("add.trans")
-
-  rotate.x <- getOption("rotate.x")
-  rotate.y <- getOption("rotate.y")
-  offset <- getOption("offset")
 
   # missing function only reliable if arg not modified, so capture 
   x.miss <- ifelse (missing(x), TRUE, FALSE)
@@ -909,7 +907,7 @@ function(x, y=NULL, data=mydata,
 
   # --------
     # adjust by, manage regular-R or PDF graphics window size
-  if (!Trellis)
+  if (!Trellis && !shiny)
     .opendev(pdf.file, width, height)  # prepare plot window, dev or pdf
 
 

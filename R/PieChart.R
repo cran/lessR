@@ -25,12 +25,16 @@ function(x, y=NULL, data=mydata,
          eval.df=NULL, quiet=getOption("quiet"),
          width=6.5, height=6, pdf.file=NULL, ...) {
 
-0
+
   if (!missing(cex)) {
     main.cex <- cex * main.cex
     labels.cex <- cex * labels.cex
     values.cex <- cex * values.cex
   }
+
+  main.miss <- ifelse (missing(main), TRUE, FALSE)
+
+  color[which(color == "off")] <- "transparent"
 
   # default color scale
   if (is.null(fill)) {
@@ -56,20 +60,25 @@ function(x, y=NULL, data=mydata,
     values.color <- "white" 
     if (values.pos == "out") values.color <- getOption("axis.text.color")
   }
-  if (missing(x)) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Need a variable from which to calculate the pie chart\n\n")
-  }
-
-  main.miss <- ifelse (missing(main), TRUE, FALSE)
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
   if (is.null(eval.df))  # default values
     eval.df <- ifelse (shiny, FALSE, TRUE) 
 
+
+  if (missing(x)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Need a variable from which to calculate the pie chart\n\n")
+  }
+
   if (hole < 0  ||  hole >= 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "size of hole is a proportion, so must be between 0 and 1\n\n")
+  }
+
+  if (!(values %in% c("off", "%", "prop", "input"))) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Valid values of values: \"off\",  \"%\", \"prop\", and \"input\"\n\n")
   }
 
   .param.old(...)

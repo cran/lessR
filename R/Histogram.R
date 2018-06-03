@@ -10,7 +10,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
 
-    prop=FALSE, hist.counts=FALSE,
+    prop=FALSE, values=FALSE,
     reg="snow2", cumul=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -205,7 +205,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     # set up graphics
     manage.gr <- .graphman()  # manage graphics?
-    if (manage.gr) {
+    if (manage.gr && !shiny) {
       i.win <- 0
       for (i in 1:ncol(data)) {
         if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat)) 
@@ -263,7 +263,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         stuff <- .hst.main(data[,i], fill, color, trans, reg,
             rotate.x, rotate.y, offset,
             breaks, bin.start, bin.width,
-            bin.end, prop, hist.counts, cumul, xlab, ylab, main, sub, 
+            bin.end, prop, values, cumul, xlab, ylab, main, sub, 
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
             add, x1, x2, y1, y2,
             scale.x, scale.y,
@@ -307,7 +307,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         .plotList(plot.i, plot.title)
     }
 
-    dev.set(which=2)  # reset graphics window for standard R functions
+    if (!shiny)
+      dev.set(which=2)  # reset graphics window for standard R functions
 
 
     if (ncol(data) == 1) {
@@ -346,3 +347,4 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   }  # else not Trellis
 
 }
+

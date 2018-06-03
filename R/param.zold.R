@@ -5,7 +5,9 @@ function (...) {
   dots <- list(...)
   
   if (!is.null(dots)) if (length(dots) > 0) {
+
     for (i in 1:length(dots)) {
+
       if (grepl("fill", names(dots)[i], fixed=TRUE)  ||
           grepl("color.", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -64,6 +66,10 @@ function (...) {
           "x.start, x.end, y.start, and y.end no longer used\n\n",
           "Instead use the standard R xlim and ylim parameters,\n",
           "such as xlim=c(0,40) to specify from 0 to 40. Same for ylim\n\n")
+      }
+      if (names(dots)[i] == "hist.counts") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  hist.counts  is renamed  values\n\n")
       }
       if (names(dots)[i] == "line.chart") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",

@@ -44,30 +44,30 @@ function(x, y,
     x <- as.table(x)
   if (!is.factor(x) && !is.table(x))
     x <- factor(x)
-  n.vals <- ifelse (!is.table(x), nlevels(x), length(x))
-  clr <- character(length=n.vals)  # slice colors
+  n.cat <- ifelse (!is.table(x), nlevels(x), length(x))
+  clr <- character(length=n.cat)  # slice colors
 
 
   # ------
   # colors
 
-  # set user specified multiple colors
-  if (length(fill) > 1) {
+  # see if a pre-defined color range
+  clr <- NULL
+  if (length(fill) == 1)
+    clr <- .color.range(fill, n.cat)
+
+  # not a range, so set user specified multiple colors
+  if (is.null(clr)) {
     j <- 0
-    for (i in 1:(n.vals)) {
+    for (i in 1:(n.cat)) {
       j <- j + 1
       if (j > length(fill)) j <- 1  # recycle colors
       clr[i] <- fill[j]
     }
   } # end fill is multiple values
 
-  else {
-    if (length(fill) == 1) clr <- .color.range(fill, n.vals)
-  }
-
-  trans <- NULL
   if (!is.null(trans)) 
-    for (i in 1:n.vals) clr[i] <- .maketrans(clr[i], (1-trans)*256) 
+    for (i in 1:n.cat) clr[i] <- .maketrans(clr[i], (1-trans)*256) 
 
 
   # ----------------

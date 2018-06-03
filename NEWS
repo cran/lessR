@@ -6,14 +6,20 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
   
->>>>>> Changes for lessR version 3.7.4 (2018-05-25) <<<<<<
+>>>>>> Changes for lessR version 3.7.5 (2018-06-03) <<<<<<
 
 -------------
-Updates 3.7.4
+Updates 3.7.5
 -------------
 
 style
   default lightbronze style changed with bar and point fill a slate gray
+  for the themes with a white window and gray panel, such as "darkred",
+    the default panel color is lightened from "gray95" to "gray98"
+  new sub-theme "colors" which adds a progressive color gradient for
+    histograms consistent with the current theme, hcl colors for bar
+    and pie charts, no borders, and displayed values for bar and pie
+    charts written in white inside the bar or slice of the pie
 
 BarChart, Histogram, PieChart, Plot
   no.eval parameter added to force not evaluating for missing data frame
@@ -58,16 +64,17 @@ getColors
   default border color from black to lightgray
   output parameter added to force text and graphics output on or off
 
-style
-  for the themes with a white window and gray panel, such as "darkred",
-    the default panel color is lightened from "gray95" to "gray98"
-  new sub-theme "colors" which adds a progressive color gradient for
-    histograms consistent with the current theme, hcl colors for bar
-    and pie charts, and displayed values for bar and pie charts
+Histogram
+  for consistency with BarChart and PieChart for the display of the values
+    for a bar, the parameter hist.counts changed to values
+
+Plot
+  rotate.x, rotate.y, offset added back so can set locally as well
+    with the style function
 
 
 ---------------
-Bug Fixes 3.7.4
+Bug Fixes 3.7.5
 --------------- 
 
 style

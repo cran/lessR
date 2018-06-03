@@ -45,7 +45,7 @@ function() {
         .to_num(getOption("values.cex")), "\n")
     cat("values.digits .... Decimal digits on bars, pie ",
         .to_num(getOption("values.digits")), "\n")
-    cat("values.pos ...... Position of values on pie ...",
+    cat("values.pos ....... Position of values ...... ..",
         .to_str(getOption("values.pos")), "\n")
 
     cat("\n")

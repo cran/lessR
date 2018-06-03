@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.7.4     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.7.5     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. mydata <- Read()        Read text, Excel, SPSS, SAS or R data file\n",
       "2. Help()                  Get help\n",
@@ -51,7 +51,7 @@ function(...) {
   options(out2.fill = "firebrick2")
   options(out2.color = "firebrick2")
 
-  options(violin.fill = rgb(142,166,182, maxColorValue=255))
+  options(violin.fill = rgb(144,165,175, maxColorValue=255))
   options(violin.color = "gray15") 
   options(box.fill = "#7F7F7F23")  # .maketrans("gray10", 35)) 
   options(box.color = "gray15") 
@@ -287,7 +287,7 @@ function(...) {
 
 
 
-.is.integer <- function(x, tol = .Machine$double.eps^0.5) {
+.is.integer <- function(x, tol= .Machine$double.eps^0.5) {
 
   if (is.numeric(x)) {
     x <- na.omit(x)
@@ -1120,7 +1120,7 @@ function(dir, axT) {
   else {
     bm <- max.x.width + (ln.ht * n.lab.x.ln) + 0.25 
   }
-  tm <- ifelse (is.null(main), tm+.25, tm+.05)  #  adjust tm for increased bm
+  tm <- ifelse (is.null(main), tm+.05, tm+.25)  #  adjust tm for increased bm
   if (rotate.x != 0) bm <- bm + .15
 
 
@@ -1389,132 +1389,31 @@ function(dir, axT) {
 
 
 # generate a pre-defined color range if requested
-.color.range <- function(fill, n.clr) {
+.color.range <- function(fill, n.clr, no.change=FALSE) {
+  f1 <- fill[1]
 
-  if (fill[1] == "colors") clrs <- getColors("colors", n=n.clr)
-  else if (fill[1] == "reds") clrs <- getColors("reds", n=n.clr)
-  else if (fill[1] == "yellows") clrs <- getColors("yellows", n=n.clr)
-  else if (fill[1] == "rusts") clrs <- getColors("rusts", n=n.clr)
-  else if (fill[1] == "olives") clrs <- getColors("olives", n=n.clr)
-  else if (fill[1] == "greens") clrs <- getColors("greens", n=n.clr)
-  else if (fill[1] == "turquoises") clrs <- getColors("turquoises", n=n.clr)
-  else if (fill[1] == "aquas") clrs <- getColors("aquas", n=n.clr)
-  else if (fill[1] == "blues") clrs <- getColors("blues", n=n.clr)
-  else if (fill[1] == "purples") clrs <- getColors("purples", n=n.clr)
-  else if (fill[1] == "grays") clrs <- getColors("grays", n=n.clr)
-  else if (fill[1] == "heat") clrs <- getColors("heat", n=n.clr)
-  else if (fill[1] == "terrain") clrs <- getColors("terrain", n=n.clr)
-  else if (fill[1] == "rainbow") clrs<- getColors("rainbow", n=n.clr)
-
-  else clrs <- fill
+       if (f1 == "colors") clrs <- getColors("colors", n=n.clr)
+  else if (f1 == "reds") clrs <- getColors("reds", n=n.clr)
+  else if (f1 == "yellows") clrs <- getColors("yellows", n=n.clr)
+  else if (f1 == "rusts") clrs <- getColors("rusts", n=n.clr)
+  else if (f1 == "olives") clrs <- getColors("olives", n=n.clr)
+  else if (f1 == "greens") clrs <- getColors("greens", n=n.clr)
+  else if (f1 == "turquoises") clrs <- getColors("turquoises", n=n.clr)
+  else if (f1 == "aquas") clrs <- getColors("aquas", n=n.clr)
+  else if (f1 == "blues") clrs <- getColors("blues", n=n.clr)
+  else if (f1 == "purples") clrs <- getColors("purples", n=n.clr)
+  else if (f1 == "grays") clrs <- getColors("grays", n=n.clr)
+  else if (f1 == "heat") clrs <- getColors("heat", n=n.clr)
+  else if (f1 == "terrain") clrs <- getColors("terrain", n=n.clr)
+  else if (f1 == "rainbow") clrs <- getColors("rainbow", n=n.clr)
+  else {
+    if (!no.change)
+      clrs <- NULL
+     else  # for style, lines 374+
+      clrs <- fill
+  }
 
   return(clrs)
-}
-
-
-# discrete color steps with no order
-.col.discrete <- function(scheme="default") {
-
-   # default is re-arrangement of colors from Set3, RColorBrewer
-   if (scheme == "default")
-     clr <- c("#80b1d3","#fb8072","#b3de69","#fdb462",
-              "#bc80bd","#ffed6f","#d9d9d9","#bebada",
-              "#fccde5","#8dd3c7","#ccebc5","#ffffb3")
-
-    else if (scheme == "pale")
-      clr <- c("#377EB8", "#F072B8", "#4DAF4A", "#984EA3", "#FDAE6B", 
-               "#FFFF33", "#A65628", "#F781BF", "#999999")
-
-    # based on rainbow_hcl(8,c=50,l=70) from colorspace
-    # sequence: 6 1 4 2 7 3 5 8
-    else if (scheme == "hcl")
-      clr <- c("#64B5D6", "#E495A5", "#72BB83", "#D2A277", "#ACA4E2",
-                "#ABB065", "#39BEB1", "#D995CF")
-
-  # based on rainbow_hcl(8,c=80,l=65) from colorspace
-    #clr <- c("#00AFE0", "#F072B8", "#00B981", "#D58F35", "#9DA500",
-              #"#9F91F3", "#CA80EA", "#00B7C7") 
-
-  # gray scale
-  #if (grepl(".black", getOption("theme"), fixed=FALSE)) {
-    #clr <- c("#737373", "#A6A6A6", "#BFBFBF", "#4D4D4D", "#9C9C9C",
-             #"#4D4D4D", "#B4B4B4", "#7D7D7D") 
-  #}
-
-return(clr)
-
-}
-
-
-# for BarChart 1-var and PieChart for an ordered factor
-.ordcolors <- function(theme, col.low=NULL, col.hi=NULL) {
-
-    if (theme == "lightbronze") { 
-      if (is.null(col.low)) col.low <- "gray40"
-      if (is.null(col.hi)) col.hi <- "gray70"
-    }
-    if (theme == "dodgerblue") { 
-      if (is.null(col.low)) col.low <- rgb(.765,.824,.886)
-      if (is.null(col.hi)) col.hi <- "dodgerblue4"
-    }
-    else if (theme == "gray") {
-      if (is.null(col.low)) col.low <- "gray90"
-      if (is.null(col.hi)) col.hi <- "gray25"
-    }
-    else if (theme == "darkred") {
-      if (is.null(col.low)) col.low <- "red1"
-      if (is.null(col.hi)) col.hi <- "red4"
-    }
-    else if (theme == "darkgreen") {
-      if (is.null(col.low)) col.low <- "green1"
-      if (is.null(col.hi)) col.hi <- "green4"
-    }
-    else if (theme == "brown") {
-      if (is.null(col.low)) col.low <- "rosybrown1"
-      if (is.null(col.hi)) col.hi <- "rosybrown4"
-    }
-    else if (theme == "sienna") { 
-      if (is.null(col.low)) col.low <- "#F7E9E2"
-      if (is.null(col.hi)) col.hi <- "sienna3"
-    }
-    else if (theme == "blue") { 
-      if (is.null(col.low)) col.low <- "slategray2"
-      if (is.null(col.hi)) col.hi <- "slategray4"
-    }
-    else if (theme == "gray.black") {
-      if (is.null(col.low)) col.low <- "gray70"
-      if (is.null(col.hi)) col.hi <- "gray25"
-    }
-    else if (theme == "green") {
-      if (is.null(col.low)) col.low <- "darkseagreen1"
-      if (is.null(col.hi)) col.hi <- "darkseagreen4"
-    }
-    else if (theme == "rose") {
-      if (is.null(col.low)) col.low <- "mistyrose1"
-      if (is.null(col.hi)) col.hi <- "mistyrose4"
-    }
-    else if (theme == "gold") {
-      if (is.null(col.low)) col.low <- "goldenrod1"
-      if (is.null(col.hi)) col.hi <- "goldenrod4"
-    }
-    else if (theme == "red") { 
-      if (is.null(col.low)) col.low <- "coral1"
-      if (is.null(col.hi)) col.hi <- "coral4"
-    }
-    else if (theme == "orange") { 
-      if (is.null(col.low)) col.low <- "orange"
-      if (is.null(col.hi)) col.hi <- "orange3"
-    }
-    else if (theme == "purple") { 
-      if (is.null(col.low)) col.low <- "purple1"
-      if (is.null(col.hi)) col.hi <- "purple4"
-    }
-    else if (theme == "white") { 
-      if (is.null(col.low)) col.low <- "gray30"
-      if (is.null(col.hi)) col.hi <- "gray90"
-    }
-
-    return(list(low.fill=col.low, hi.fill=col.hi))
 }
 
 
@@ -1542,6 +1441,7 @@ return(clr)
     val <- "NULL" 
   return(val)
 }
+
 
 .to_str <- function(cc) {
   if (is.null(cc)) cc <- "NULL"
