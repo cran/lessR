@@ -1,11 +1,12 @@
 Histogram <-
-function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
+function(x=NULL, data=mydata, rows=NULL,
+         n.cat=getOption("n.cat"), Rmd=NULL,
 
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
 
     fill=getOption("bar.fill.ordered"),
-    color=getOption("bar.color"),
+    color=getOption("bar.color.ordered"),
     trans=getOption("trans.bar.fill"),
 
     bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
@@ -14,8 +15,8 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     reg="snow2", cumul=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    xlab.adj=0, ylab.adj=0,
-    bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
+    lab.adj=c(0,0), margin.adj=c(0,0,0,0),
+
 
     rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
     offset=getOption("offset"),
@@ -56,46 +57,66 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   lab.cex <- getOption("lab.cex")
   axis.cex <- getOption("axis.cex") 
 
-  Trellis <- ifelse(!missing(by1), TRUE, FALSE)
-
-  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval.df))  # default values
-    eval.df <- ifelse (shiny, FALSE, TRUE) 
-
-  .param.old(...)
-
-  # get actual variable name before potential call of data$x
-  x.name <- deparse(substitute(x))  # could be a list of var names
-  options(xname = x.name)
-
-  data.miss <- ifelse (missing(data), TRUE, FALSE) 
-  if (data.miss && shiny)  # force evaluation (not lazy)
-    data <- eval(substitute(data), envir=parent.frame())
-  df.name <- deparse(substitute(data))   # get name of data table
-  options(dname = df.name)
-
   fill[which(fill == "off")] <- "transparent"
   color[which(color == "off")] <- "transparent"
 
+  Trellis <- ifelse(!missing(by1), TRUE, FALSE)
+  
+  xlab.adj <- lab.adj[1];   ylab.adj <- lab.adj[2]
+  tm.adj <- margin.adj[1];  rm.adj <- margin.adj[2]
+  bm.adj <- margin.adj[3];  lm.adj <- margin.adj[4]
+
+  .param.old(...)
+
+  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
+  if (is.null(eval.df))  # default values
+    eval.df <- ifelse (shiny, FALSE, TRUE)
+
+  # get actual variable name before potential call of data$x
+  if (!missing(x))  # can't do is.null or anything else with x until evaluated
+    x.name <- deparse(substitute(x))  # could be a list of var names
+  else
+    x.name <- NULL  # otherwise is actually set to "NULL" if NULL
+    options(xname = x.name)
+
+  if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
+    data <- eval(substitute(data), envir=parent.frame())
+  df.name <- deparse(substitute(data))  # get name of data table
+  options(dname = df.name)
+
+  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+    if (class(data)[1] == "tbl_df")
+      data <- as.data.frame(data, stringsAsFactors=FALSE)
+
+  if (!is.null(x.name))
+    x.in.global <- .in.global(x.name)  # see if in global, includes vars list
+  else
+    x.in.global <- FALSE
+    
 # -----------------------------------------------------------
 # establish if a data frame, if not then identify variable(s)
 # x can be missing entirely, with a data frame passed instead
-
+# if x a vector, then x.name not in data, but also not in global
 
   if (!missing(x)) {
 
     # x not in global env, in df, specify data= forces to data frame
-    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
+    if (!x.in.global) {
       if (eval.df) {
         .nodf(df.name)  # check to see if data frame container exists 
-        .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+        .xcheck(x.name, df.name, names(data))  # x-vars in df?
       }
-      all.vars <- as.list(seq_along(data))  # even if only a single var
-      names(all.vars) <- names(data)  # all data in data frame
-      x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars
+      data.vars <- as.list(seq_along(data))
+      names(data.vars) <- names(data)
+      ind <- eval(substitute(x), envir=data.vars)  # col num of each var     
+      if (!missing(rows)) {  # subset rows
+        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+        r <- r & !is.na(r)  # set missing for a row to FALSE
+        data <- data[r,,drop=FALSE]
+      }
       if (!("list" %in% class(data))) {
-        data.x <- data[, x.col]
-        if (length(x.col) == 1) {  # x is 1 var
+        data.x <- data[, ind]
+        if (length(ind) == 1) {  # x is 1 var
           if (!is.numeric(data.x)) { 
             cat("\n"); stop(call.=FALSE, "\n","------\n",
               "A histogram is only computed from a numeric variable\n",
@@ -109,7 +130,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         }
       }
       else {  # class of data is "list"
-        data.x <- data.frame(data[[x.col]])
+        data.x <- data.frame(data[[ind]])
         names(data.x) <- x.name
       }
     }  # x not in global
@@ -142,7 +163,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     # see if var exists in df, if x not in global Env or function call
     if (!missing(x) && !in.global)
-      .xcheck(by1.name, df.name, data)
+      .xcheck(by1.name, df.name, names(data))
 
     if (!in.global)
       by1.call <- eval(substitute(data$by1))
@@ -172,7 +193,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
     # var in data frame? if x not in global Env or function call
     if (!missing(x) && !in.global)
-      .xcheck(by2.name, df.name, data)
+      .xcheck(by2.name, df.name, names(data))
 
     if (!in.global)
       by2.call <- eval(substitute(data$by2))
@@ -192,6 +213,7 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   # do the analysis
 
   if (Trellis && do.plot) {
+
     .bar.lattice(data.x[,1], by1.call, by2.call, n.row, n.col, aspect, prop,
                  fill, color, trans, size.pt=NULL,
                  xlab, ylab, main,
@@ -310,11 +332,9 @@ function(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     if (!shiny)
       dev.set(which=2)  # reset graphics window for standard R functions
 
-
     if (ncol(data) == 1) {
 
       # R Markdown
-      txsug <- ""
       txkfl <- ""
       if (!is.null(Rmd)) {
         if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")

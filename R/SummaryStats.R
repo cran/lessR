@@ -9,7 +9,12 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
   df.name <- deparse(substitute(data))
   options(dname = df.name)
-
+  
+  x.in.df <- FALSE
+  if (nchar(x.name) > 0)
+    if (exists(df.name, where=.GlobalEnv))
+      if (exists(x.name, where=data)) x.in.df <- TRUE
+      
   is.df <- FALSE  # is data frame
 
 
@@ -33,7 +38,7 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
     else in.style <- FALSE
 
     # see if var exists in data frame, if x not in style Env or function call 
-    if (!in.style && !in.call) .xcheck(y.name, df.name, data)
+    if (!in.style && !in.call) .xcheck(y.name, df.name, names(data))
 
     if (!in.style) y.call <- eval(substitute(data$by))
     else {  # vars that are function names get assigned to style
@@ -51,9 +56,9 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (!missing(x)) {
 
     # x not in global env, in df, specify data= forces to data frame
-    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
+    if (!exists(x.name, where=.GlobalEnv) || x.in.df) {
       .nodf(df.name)  # check to see if data frame container exists     
-      .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      .xcheck(x.name, df.name, names(data))  # var in df?, vars lists not checked
       all.vars <- as.list(seq_along(data))  # even if only a single var
       names(all.vars) <- names(data)  # all data in data frame
       x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars

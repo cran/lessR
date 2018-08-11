@@ -25,7 +25,9 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   }
 
     reg.fac <- FALSE
-    for (i in 1:n.var) if (is.factor(data[,i])[1]) reg.fac <- TRUE
+    for (i in 1:n.var)
+      if (is.factor(data[,i])[1]  &&  !(is.ordered(data[,i])[1]))
+        reg.fac <- TRUE
 
     ord.fac <- FALSE
     for (i in 1:n.var) if (is.ordered(data[,i])[1]) ord.fac <- TRUE
@@ -35,18 +37,22 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
 
     int.flg <- FALSE
     for (i in 1:n.var) if (is.integer(data[,i])[1]) int.flg <- TRUE
+    
+    dte.flg <- FALSE
+    for (i in 1:n.var) if (inherits(data[,i][1], "Date")) dte.flg <- TRUE
 
     num.flg <- FALSE
     for (i in 1:n.var) if (is.double(data[,i])[1]) num.flg <- TRUE
 
-    cat("\n")
+
     cat("Data Types\n")
     .dash(60)
     if (reg.fac) cat("factor: Non-numeric categories, read as unordered",
         "categories\n")
-    if (ord.fac) cat("ordfact: Ordered, non-numeric categories\n")
+    if (ord.fac) cat("ordfactor: Ordered, non-numeric categories\n")
     if (chr.flg) cat("character: Non-numeric data values\n")
     if (int.flg) cat("integer: Numeric data values, integers only\n")
+    if (dte.flg) cat("Date: Date with year, month and day\n")
     if (num.flg) cat("double: Numeric data values with decimal digits\n")
     .dash(60)
   cat("\n")
@@ -63,11 +69,13 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
   pad <- ifelse (max.char > 7, max.char + 2, max.char + (10-max.char))
   pad2 <- ifelse (max.char > 8, max.char - 8, 0)
   if (!brief) cat("\n")
+  cat("   ")  # account for variable number in first two columns
   cat(.fmtc(" Variable",9+pad2), .fmtc(" ",pad2+(16-pad2)),
       .fmtc("Missing",7), .fmtc("Unique",7), "\n")
+  cat("   ")
   cat(.fmtc("     Name",max.char+1), .fmtc("Type",8), .fmtc("Values",7),
       .fmtc("Values",7), .fmtc("Values",7), "  First and last values\n")
-  .dash(88)
+  .dash(90)
 
   colm.ID <- 0
   maybe.ID <- NULL
@@ -81,10 +89,10 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     n.miss <- sum(is.na(data[,i]))
 
     the.class <- class(data[,i])[1]  # could be an ordered factor
-    if (the.class == "ordered") the.class <- "ordfact"
+    if (the.class == "ordered") the.class <- "ordfactor"
     if (the.class == "numeric") the.class <- "double"
 
-    cat(.fmtc(x.name,pad-1), .fmtc(the.class,9), .fmti(n,6),
+    cat(.fmti(i,2), .fmtc(x.name,pad-1), .fmtc(the.class,9), .fmti(n,6),
         .fmti(n.miss,7), .fmti(nu[i],7))
 
     n1 <- as.character(data[1,i])  # the as.character is for cat of factors 
@@ -109,7 +117,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
       colm.ID <- i
     }
   }
-  .dash(88)
+  .dash(90)
 
 
   if (!brief) {

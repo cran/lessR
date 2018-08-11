@@ -11,7 +11,7 @@ A nested model has a subset of predictor variables from the corresponding full m
 }
 
 \usage{
-Nest(y, nested.model, full.model, method=c("ls", "logit"),
+Nest(y, nested.model, full.model, method=c("lm", "logit"),
          data=mydata, digits.d=NULL)
 
 nt(\ldots)
@@ -63,7 +63,7 @@ Although not typically needed for analysis, if the output is assigned to an obje
 
 \examples{
 
-mydata <- Read("Reading", format="lessR")
+mydata <- Read("Reading", in.lessR=TRUE)
 
 # compare least-squares models
 # can specify all the variables in the full model
@@ -74,7 +74,7 @@ Nest(Reading, c(Absent), c(Verbal,Income))
 # compare logistic models, save results into an object
 # define the full model by adding just the variables
 #  not found in the reduced model
-mydata <- Read("BodyMeas", format="lessR")
+mydata <- Read("BodyMeas", in.lessR=TRUE)
 n <- Nest(Gender, c(Weight, Hips, Hand, Shoe),
       c(Height, Waist, Chest), method="logit")
 # view the results

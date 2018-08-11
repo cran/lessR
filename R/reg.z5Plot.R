@@ -103,12 +103,12 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       axT1 <- axTicks(1)  # else numeric, so all the ticks
     }
       
-    .axes(x.lvl, NULL, axT1, axTicks(2), par("usr")[1], par("usr")[3])
+    .axes(x.lvl, NULL, axT1, axTicks(2))
 
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
         max.lbl.y=3, cex.lab=size.lab) 
 
-    col.fill <- getOption("bar.fill")
+    col.fill <- getOption("bar.fill.ordered")
     col.color <- getOption("pt.color")
     
     eq.int <- TRUE
@@ -201,7 +201,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       panel.fill <- getOption("panel.fill")  
       window.fill <- getOption("window.fill")  
       bckg <- ifelse(panel.fill=="transparent", window.fill, panel.fill)
-      .plt.mat(lm.out$model[c(nm)], fit="ls", col.bg=bckg)
+      .plt.mat(lm.out$model[c(nm)], fit="lm", col.bg=bckg)
     }
     else {
       cat("\n>>> No scatterplot matrix reported because not all variables are ")

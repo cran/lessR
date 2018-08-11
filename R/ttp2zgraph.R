@@ -32,8 +32,7 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   abline(h=axTicks(2), col=getOption("grid.y.color"),
          lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
-  .axes(NULL, NULL, axTicks(1), axTicks(2),
-        par("usr")[1], par("usr")[3], col.axis="gray30")
+  .axes(NULL, NULL, axTicks(1), axTicks(2), col.axis="gray30")
 
   main.lab <- NULL
   sub.lab <- NULL

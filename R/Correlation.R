@@ -61,7 +61,7 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
     in.style <- xs$ig 
 
     # see if the variable exists in data frame, if x not in style Env 
-    if (!in.style) .xcheck(x.name, dname, data)
+    if (!in.style) .xcheck(x.name, dname, names(data))
 
     if (in.style) x.call <- x else x.call <- eval(substitute(data$x))
 
@@ -86,7 +86,7 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
       else in.style <- FALSE
 
       # see if var exists in data frame, if x not in style Env or function call 
-      if (!in.style && !in.call) .xcheck(y.name, dname, data)
+      if (!in.style && !in.call) .xcheck(y.name, dname, names(data))
 
       if (in.style) y.call <- y 
       else y.call <- eval(substitute(data$y))

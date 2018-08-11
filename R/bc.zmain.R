@@ -5,13 +5,17 @@ function(x, y, by,
          xlab, ylab, main,
          value.labels, label.max, beside,
          rotate.x, offset, break.x, sort.x,
-         values, values.color, values.cex, values.digits, values.pos,
+         values, values.color, values.cex, values.digits,
+         values.pos, values.cut,
          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
          legend.title, legend.loc, legend.labels, legend.horiz,
          add, x1, x2, y1, y2, out.size, quiet, ...) {
+  
+  multi <- ifelse (is.data.frame(x), TRUE, FALSE)
 
-  # if x is integer, not labeled correctly
-  if (length(unique(x)) != length(x)) if (!is.factor(x)) x <- factor(x)
+  # if x is integer, not labeled correctly, set to factor
+  if (!is.data.frame(x))
+    if (length(unique(x)) != length(x)) if (!is.factor(x)) x <- factor(x)
   
   if ( (is.table(x) || is.matrix(x)) && is.null(legend.title) ) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -37,14 +41,14 @@ function(x, y, by,
   adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
   lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
   adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
-
   gl <- .getlabels(xlab, ylab, main, by.nm=TRUE, lab.x.cex=lab.x.cex, 
                    lab.y.cex=lab.y.cex, flip=horiz)
   x.name <- gl$xn;  x.lbl <- gl$xl;  y.lbl <- gl$yl
   x.lab <- ifelse (horiz, gl$yb, gl$xb)
   main.lab <- gl$mb
   by.name <- y.lbl
-  if (!is.null(by)) by.name <- getOption("byname")
+  if (!is.null(by) || is.data.frame(x))
+    by.name <- getOption("byname")
 
   ylab.keep <- ifelse (is.null(ylab), FALSE, TRUE)
 
@@ -180,33 +184,80 @@ function(x, y, by,
   }  # end !is.null(y)
 
 
-  # tabulate for counts
+  # x = tabulate for counts
 
-  if (!entered) {  
-    if (is.null(by)) {
-      x.temp <- x  # save counts, to be restored for text output
-      x <- table(x, dnn=NULL)
-      if (prop) {
-        x.count <- x  # save table of counts for possible bar display
-        x <- x/sum(x)
+  if (!entered) {
+    if (!is.data.frame(x)) { # a single x value
+      if (is.null(by)) {
+        x.temp <- x  # save counts, to be restored for text output
+        x <- table(x, dnn=NULL)
+        if (prop) {
+          x.count <- x  # save table of counts for possible bar display
+          x <- x/sum(x)
+        }
+      }
+      else {  # a by variable
+        if (length(x) == length(by))
+          x.temp <- table(by, x, dnn=c(by.name, x.name))
+        else {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+          x.name, " and ", by.name, " must be of the same size\n\n",
+          "Size of ", x.name, ": ", length(x), "\n", 
+          "Size of ", by.name, ": ", length(by), "\n\n", sep="")
+        }
+        x <- x.temp
+        if (prop) {
+          x.count <- x  # save table of counts for possible bar display
+          x <-prop.table(x, 2)
+        }
+      }
+    }   # end single x value
+    
+    else {  # x is a data frame, so combine x's
+      if (!is.factor(x[,1])) {
+        resp <- unique(x[,1])
+        for (i in 2:ncol(x)) resp <- union(resp, unique(x[,i]))
+        resp <- sort(resp)  # sort removes any NA
+      }
+      else {  # is factor
+        resp <- levels(x[,1])
+        for (i in 2:ncol(x)) resp <- union(resp, levels(x[,i]))
+      }
+      n.resp <-length(resp)
+      frq <- matrix(nrow=n.resp, ncol=ncol(x))  # all elements NA
+      frq <- apply(frq, c(1, 2), function(x) 0)
+      rownames(frq) <- as.character(resp)
+      colnames(frq) <- names(x)
+
+      for (i in 1:ncol(x)) {  # maybe an x not has a value in full set
+        tblx.i <- table(x[,i])
+        k <- 0
+        for (j in 1:n.resp) {
+          if (rownames(frq)[j] %in% names(table(x[,i]))) {
+            k <- k + 1
+            frq[j,i] <- tblx.i[k]
+          }
+        }
+      }  # end col i of x
+      
+      x <- as.table(frq)
+      if (is.numeric(resp))
+        wt <- resp
+      else
+        wt <- 1:n.resp
+      wm <- double(length=ncol(x))
+      for (i in 1:ncol(x)) wm[i] <- weighted.mean(wt, x[,i])
+
+      if (sort.x != "0") {
+        srt.dwn <- ifelse (sort.x == "-", TRUE, FALSE)
+        m.o <- order(wm, decreasing=srt.dwn)
+        x <- x[,m.o]
+        wm <- wm[m.o]
       }
     }
-    else {  # a by variable
-      if (length(x) == length(by))
-        x.temp <- table(by,x, dnn=c(by.name, x.name))
-      else {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-        x.name, " and ", by.name, " must be of the same size\n\n",
-        "Size of ", x.name, ": ", length(x), "\n", 
-        "Size of ", by.name, ": ", length(by), "\n\n", sep="")
-      }
-      x <- table(by, x, dnn=c(by.name, x.name))
-      if (prop) {
-        x.count <- x  # save table of counts for possible bar display
-        x <-prop.table(x, 2)
-      }
-    }
-  }  # end !entered so tabulate
+  }  # end !entered so tabulated
+    
+
 
   if (prop) {
     if (any(is.nan(x))) {
@@ -219,10 +270,9 @@ function(x, y, by,
 
   # ------------
   # sort options
-
-  if (sort.x != "off") {
-    srt.dwn <- ifelse (sort.x == "down", TRUE, FALSE)
-    if (is.null(by)) {
+  if (sort.x != "0") {
+    srt.dwn <- ifelse (sort.x == "-", TRUE, FALSE)
+    if (!is.matrix(x)) {
       x <- x[order(x, decreasing=srt.dwn)]
     }
     else {
@@ -237,32 +287,38 @@ function(x, y, by,
   # colors
   # fill is input and usually words, clr are actual colors
 
-  n.cat <- ifelse (!is.null(by), nrow(x), length(x))
+  n.cat <- ifelse (is.matrix(x), nrow(x), length(x))
 
-  # see if apply a pre-defined color range to fill
+  # see if apply a pre-defined color range to **fill**
   clr <- NULL
-  if (length(fill) == 1) clr <- .color.range(fill, n.cat)  # see if range
+  clr <- .color.range(fill, n.cat)  # see if range
 
-  # not a color range, so assign clr here
+  # not a color range such as "colors" or "blues", so assign clr here
   if (is.null(clr)) {
-    if (length(fill) == 1  &&  !is.null(by)) 
-      clr <- getColors("colors", n=n.cat)
+    if (length(fill) == 1  &&  is.matrix(x)) 
+      clr <- getColors("colors", n=n.cat)  # default with by variable
     else
       clr <- fill  # user provided the colors
   }
 
- if (!is.null(col.trans)) 
+  if (!is.null(col.trans)) 
    for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-col.trans)*256) 
 
+  # see if apply a pre-defined color range to **color**
+  col.clr <- NULL
+  col.clr <- .color.range(col.color, n.cat)  # see if range
+  if (!is.null(col.clr)) col.color <- col.clr
 
-  # ----------------------------------------------------------------------------
+
+  # -------------
   # preliminaries
 
-  if (values.pos == "out") addtop <- addtop + .02  # kludge
+  if (values.pos == "out") addtop <- addtop + .06
+  # a 2-D table is an instance of a matrix, a 1-D table is not
   max.y <- ifelse (is.matrix(x) && !beside, max(colSums(x)), max(x))
   max.y <- max.y + (addtop * max.y)
 
-  if (any(x < 0)) {
+  if (any(x < 0, na.rm = TRUE)) {
     min.y <- ifelse (is.matrix(x) && !beside, min(colSums(x)), min(x))
     min.y <- min.y - abs(addtop * min.y)
   }
@@ -271,7 +327,7 @@ function(x, y, by,
 
   if (is.null(legend.labels)) legend.labels <- row.names(x)
   if (beside) legend.horiz <- FALSE
-  if ((!is.null(by) || is.matrix(x)) && !beside) legend.horiz <- TRUE
+  if (is.matrix(x) && !beside) legend.horiz <- TRUE
 
   if (is.null(gap)) {  # ifelse does not work here when gap is a vector
     if (!is.null(by) && beside)
@@ -355,8 +411,7 @@ function(x, y, by,
     else
       max.x.width <- max(strwidth(val.split, cex=axis.x.cex, units="inches"))
   }
-
-  
+    
   # ----------------
   # set up plot area
 
@@ -375,7 +430,7 @@ function(x, y, by,
   else 
     if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
-  if (legend.loc == "right.margin"  &&  (!is.null(by) || is.matrix(x)))
+  if (legend.loc == "right.margin"  &&  (is.matrix(x)))
     rm <- rm + .82
 
   # user manual adjustment
@@ -389,11 +444,11 @@ function(x, y, by,
 
 
   # rescale to control bar width for small number of bars
-  # set rescale
+  # set rescale 
   if (class(x) == "numeric"  &&  entered) x <- as.table(x)
   rescale <- 0
   if (is.null(by)) if (nrow(x) <= 4) rescale <- nrow(x)
-  if (!is.null(by) && !beside) if (ncol(x) <= 4) rescale <- ncol(x)
+  if (is.matrix(x) && !beside) if (ncol(x) <= 4) rescale <- ncol(x)
   if (class(x) == "matrix" && entered) rescale <- 0  # turned off for now
   # set width.bars, gap
   if (rescale == 4) width.bars <- .17
@@ -426,7 +481,7 @@ function(x, y, by,
         ylim=c(0,1), axes=FALSE, ...)
   }
 
-  ax.num <- ifelse(horiz, 1, 2)  # location of numerical axis
+  ax.num <- ifelse (horiz, 1, 2)  # location of numerical axis
   y.coords <- axTicks(ax.num, axp=scale.y)
 
 
@@ -457,17 +512,46 @@ function(x, y, by,
           axes=FALSE, ann=FALSE, border=col.color, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
 
-  # text labels on or above the bars
+
+  # display text labels of values on or above the bars
+  # --------------------------------------------------
   if (values != "off") {
+    if (is.null(values.cut)) {
+      values.cut <- 0.015
+      if (prop && is.matrix(x)  ||  multi) values.cut <- 0.045
+    }
+
+    # set type of the values to display
+
 
     if (!prop) {
+      if (!multi)
+        x.prop <- x/sum(x)
+      else
+        x.prop <- x/colSums(x)
+
       if (values == "input")
         x.txt <- as.character(x)
       else if (values == "%")
-        x.txt <- paste(.fmt(x/sum(x) * 100, values.digits), "%", sep="")
+        x.txt <- paste(.fmt(x.prop * 100, values.digits), "%", sep="")
       else if (values == "prop")
-        x.txt <- .fmt(x/sum(x), values.digits)
+        x.txt <- .fmt(x.prop, values.digits)
+      
+      if (is.matrix(x))
+          x.txt <- matrix(x.txt, nrow=nrow(x))
+        
+      if (values.pos != "out") {
+        if (is.null(by)) {
+          for (i in 1:length(x.prop))
+            x.txt[i] <- ifelse (x.prop[i] >= values.cut, x.txt[i], "")
+        }
+        else {  # by variable
+          for (i in 1:nrow(x.prop)) for (j in 1:ncol(x.prop)) 
+            x.txt[i,j] <- ifelse (x.prop[i,j] >= values.cut, x.txt[i,j], "")
+        }
+      }
     }
+    
     else {  # prop
       if (values == "input")
         x.txt <- as.character(x.count)
@@ -475,50 +559,91 @@ function(x, y, by,
         x.txt <- paste(.fmt(x * 100, values.digits), "%", sep="")
       else if (values == "prop")
         x.txt <- .fmt(x, values.digits)
-    }
+      
+      if (is.matrix(x))
+          x.txt <- matrix(x.txt, nrow=nrow(x))
 
-    # as.numeric & as.character convert table to vector: re-convert
-    if (!is.null(by)) x.txt <- matrix(x.txt, nrow=nrow(x))
-
-    if (!horiz) {
-      if (is.null(by)) {
-        if (values.pos == "out") {
-           usr.y.in <- diff(grconvertY(0:1, 'inches', 'user'))
-           ycrd <- x + .1 * usr.y.in 
-        } 
-        else
-          ycrd <- x/2
-        text(x.coords, ycrd, labels=x.txt, col=values.color, cex=values.cex)
-      }  # no by
-      else {
-        for (i in 1:ncol(x)) {
-          mid.x <- cumsum(x[,i]) - (x[,i] / 2)
-          text(x.coords[i], mid.x, labels=x.txt[,i],
-             col=values.color, cex=values.cex) 
+      if (values.pos != "out") {
+        if (is.null(by)) {
+          for (i in 1:length(x))
+            x.txt[i] <- ifelse (x[i] >= values.cut, x.txt[i], "")
+        }
+        else {  # by variable
+          # as.numeric & as.character convert table to vector: re-convert
+          for (i in 1:nrow(x)) for (j in 1:ncol(x)) 
+            x.txt[i,j] <- ifelse (x[i,j] >= values.cut, x.txt[i,j], "")
         }
       }
     }
-    else {  # horiz
-      if (is.null(by)) {
-        if (values.pos == "out") {
-           usr.x.in <- diff(grconvertX(0:1, 'inches', 'user')) 
-           ycrd <- x + .17 * usr.x.in 
-        } 
-        else
+
+    # vertical bars
+    if (!horiz) {
+      if (!is.matrix(x)) { # 1 variable
+        usr.y.inch <- diff(grconvertY(0:1, 'inches', 'user'))
+        if (values.pos == "in")
           ycrd <- x/2
-        text(ycrd, x.coords, labels=x.txt, col=values.color, cex=values.cex)
+        else
+          ycrd <- x + 0.17*usr.y.inch
+        text(x.coords, ycrd, labels=x.txt, col=values.color, cex=values.cex)
       }  # no by
-      else {
-        for (i in 1:ncol(x)) {
-          mid.x <- cumsum(x[,i]) - (x[,i] / 2)
-          text(mid.x, x.coords[i], labels=x.txt[,i],
+      else {  # 2 variables
+        if (!beside) {
+          for (i in 1:ncol(x)) {
+            ycrd <- cumsum(x[,i]) - (x[,i] / 2)
+            text(x.coords[i], ycrd, labels=x.txt[,i],
+                 col=values.color, cex=values.cex) 
+          }
+        }  # end !beside
+        else {  # beside
+          usr.y.inch <- diff(grconvertY(0:1, 'inches', 'user'))
+          if (values.pos == "in")
+            ycrd <- x/2
+          else  # value.pos == "out"
+            ycrd <- x + 0.10*usr.y.inch
+          for (i in 1:ncol(x)) {
+            text(x.coords[,i], ycrd[,i], labels=x.txt[,i],
+                 col=values.color, cex=values.cex) 
+          }
+        }  # end beside
+      }  # end 2 variables
+	  }  # end vertical bars
+	
+    # horiz bars
+    else {
+      if (!is.matrix(x)) {  # 1 variable
+        usr.x.inch <- diff(grconvertX(0:1, 'inches', 'user'))
+        if (values.pos == "in")
+          ycrd <- x/2
+        else
+          ycrd <- x + 0.17*usr.x.inch
+        text(ycrd, x.coords, labels=x.txt, col=values.color, cex=values.cex)
+      }  # end no by
+      else {  # by variable
+        if (!beside) {  # stacked chart
+        for (i in 1:ncol(x)) {  # each level of by
+          ycrd <- cumsum(x[,i]) - (x[,i] / 2)
+          text(ycrd, x.coords[i], labels=x.txt[,i],
              col=values.color, cex=values.cex) 
         }
-      }  # end !horiz
-    }
-  }  # end values
+      }
+      else {  # beside chart
+        usr.x.inch <- diff(grconvertX(0:1, 'inches', 'user'))
+        if (values.pos == "in")
+          ycrd <- x/2
+        else  # value.pos == "out"
+          ycrd <- x + 0.17*usr.x.inch
+          for (i in 1:ncol(x)) {
+            text(ycrd[,i], x.coords[,i], labels=x.txt[,i],
+                 col=values.color, cex=values.cex) 
+          }
+        }  # end beside
+      }  # end by
+    }  # end horiz bars
+	
+  }  # end display values
+  
 
-  # y-axis
+  # y-axis is the numerical axis
   if (!horiz) las.value <- 1
   axis.y.color <- ifelse(is.null(getOption("axis.y.color")), 
     getOption("axis.color"), getOption("axis.y.color"))
@@ -529,7 +654,7 @@ function(x, y, by,
     lblval.y <- as.character(y.coords)
   axis(ax.num, col=axis.y.color,   # maybe split off the text like with x axis?
        col.axis=axis.y.text.color, cex.axis=axis.y.cex, las=las.value,
-       tck=-.03, padj=adj1,  at=y.coords, labels=lblval.y, ...) 
+       tck=-.02, padj=adj1,  at=y.coords, labels=lblval.y, ...) 
        #tck=-.03, padj=adj1,  at=axTicks(ax.num, axp=scale.y), ...) 
   
   # x-axis is the category value axis
@@ -537,7 +662,6 @@ function(x, y, by,
     getOption("axis.color"), getOption("axis.x.color"))
   axis.x.text.color <- ifelse(is.null(getOption("axis.x.text.color")), 
     getOption("axis.text.color"), getOption("axis.x.text.color"))
-
 
   if (beside) x.coords <- apply(x.coords, 2, mean)  # one label per group
   if (!horiz) {
@@ -614,7 +738,7 @@ function(x, y, by,
   }
 
 
-  # ----------------------------------------------------------------------------
+  # -----------------------------------------------------------------------
   # text output
 
   if (prop) {
@@ -629,10 +753,83 @@ function(x, y, by,
   dd <- .getdigits(x, min.digits=0) - 1
   n.dim <- length(dim(x))
   stats <- ""
+  
+  if (multi) {
+  
+    txsug <- ""
+    
+    # display variable labels
+    txlbl <- ""
+    l.name <- "mylabels"
+    if (exists(l.name, where=.GlobalEnv)) {
+      mylabs <- get(l.name, pos=.GlobalEnv)
+      mylabs <- mylabs[colnames(x),]
+      if (!is.null(mylabs)) {
+        tx <- character(length = 0)
+        for (i in 1:length(colnames(x))) {
+          ml <- mylabs[i]
+          if (!is.na(ml))
+            tx[length(tx)+1] <- paste(colnames(x)[i], ": ", ml, sep="")
+        }
+        tx[length(tx)+1] <- " "
+        tx[length(tx)+1] <- "Variable Labels"
+        txlbl <- rev(tx)
+        blnk <- " "
+      }
+    }
+    
+    # display frequencies and means of each variable
+    txttl <- "Frequencies of Responses by Variable"
+    tx <- character(length = 0)
+    mx.chr <- max(nchar(rownames(x)))
+    mx.len <- 8
+    if (mx.chr > mx.len) {
+      c.nm <- rownames(x)
+      rownames(x) <- .abbrev(rownames(x), mx.len)
+    }
+    x <- t(x)
+    
+    txtbl <- .prntbl(x, 0, cc=NULL)
+    mx <- max(nchar(round(wm,2)))
+    txtbl[1] <- paste(txtbl[1], " ", .fmtc("Mean", w=mx+1))
+    n.var <- nrow(x)
+    for (i in 1:n.var)
+      txtbl[i+1] <- paste(txtbl[i+1], " ", .fmt(wm[i],3,w=mx+1))
+     txtbl[2:length(txtbl)] <- rev(txtbl[2:length(txtbl)])
+    
+    if (mx.chr > mx.len) {
+      txtbl[n.var+2] <- ""
+      txtbl[n.var+3] <- ""
+      txtbl[n.var+4] <- "Unabbreviated labels"
+      txtbl[n.var+5] <- "--------------------"
+      txtbl[n.var+6] <- paste(c.nm, sep="", collapse="\n")
+    }
+    strt <- ifelse (mx.chr > mx.len, 7, 2)
+    if (is.null(resp)) {
+      txtbl[n.var+strt] <- ""
+      txtbl[n.var+strt+1] <- paste("Computation of the mean based on coding",
+                                   "response categories from 1 to", n.var)
+    }
+
+    class(txsug) <- "out_piece"
+    class(txtbl) <- "out_piece"
+    class(txttl) <- "out_piece"
+    
+    if (nzchar(txsug))
+      output <- list(out_suggest=txsug,
+                     out_text=txlbl, out_title=txttl, out_text=txtbl)
+    else
+      output <- list(out_text=txlbl,
+                     out_title=txttl, out_text=txtbl)
+                     
+    class(output) <- "out_all"
+    if (!quiet) print(output)
+    
+  }  # end multi
 
   # x is a table, could be real values or integers <0 if y is specified
   # no by variable, dim == 0 if x<-x.temp 
-  if (n.dim == 1) {
+  else if (n.dim == 1) {
     if (.is.integer(x)  &&  all(x >= 0)) {  # x is table of count-like values
 
       txsug <- ""
@@ -647,12 +844,12 @@ function(x, y, by,
                     ", horiz=TRUE)  # horizontal bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("BarChart(", x.name,
-                 ", fill=\"colors\", color=\"off\")  # hcl bar colors", sep="")
+                 ", fill=\"greens\")  # sequential green bars", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("PieChart(", x.name, ")  # doughnut chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
       }
-
+      
       stats <- .ss.factor(x, by=NULL, brief=TRUE, digits.d=NULL,
                           x.name, by.name, x.lbl, y.lbl, label.max,
                           x.miss, by.miss, out.size)
@@ -699,6 +896,7 @@ function(x, y, by,
     }
   }  # if (n.dim == 1)
 
+  # -------------
   # a by variable
   else {
 
@@ -731,12 +929,12 @@ function(x, y, by,
       class(txXV) <- "out_piece"
       class(txlbl) <- "out_piece"
       if (!prop)
-        output <- list(out_suggest=txsug, out_title=txttl, out_lbl=txlbl,
-                       out_text=txfrq, out_XV=txXV)
+        output <- list(out_suggest=txsug, out_title=txttl, out_lbl=txlbl, out_text=txfrq, out_XV=txXV)
       else {
         txrow <- stats$txrow
         class(txrow) <- "out_piece"
-        output <- list(out_title=txttl, out_text=txfrq, out_row=txrow, out_XV=txXV)
+        output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq,
+                       out_row=txrow, out_XV=txXV)
       }
       class(output) <- "out_all"
       if (!quiet) print(output)
@@ -753,7 +951,7 @@ function(x, y, by,
       if (quiet) print(output)
     }
   
-  }
+  }  # end a by variable
 
   if (!is.null(add)) {
 

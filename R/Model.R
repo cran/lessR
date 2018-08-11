@@ -129,7 +129,7 @@ function(my.formula, data=mydata, brief=getOption("brief"), xlab=NULL, ...) {
         cat("Run the ANOVA function to compare the corresponding \n",
             "group means of response variable ", nm[1], ".\n", sep="")
         .dash(60)
-        ANOVA(my.formula, data, brief, ...)
+        ANOVA(my.formula, data, brief=brief, ...)
       }
     }  # all preds are categorical
 

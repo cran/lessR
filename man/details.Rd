@@ -63,7 +63,7 @@ The \code{lessR} functions that provide analysis, such as \code{\link{Histogram}
 \examples{
 # read the built-in data set datEmployee
 # this provides an automatic call to details
-mydata <- Read("Employee", format="lessR")
+mydata <- Read("Employee", in.lessR=TRUE)
 
 # manually request the details for mydata
 details()

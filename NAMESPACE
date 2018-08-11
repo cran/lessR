@@ -7,7 +7,7 @@ importFrom("triangle", dtriangle, rtriangle)
 importFrom("png", readPNG)
 importFrom("openxlsx", read.xlsx, addWorksheet, createStyle, createWorkbook, saveWorkbook, setColWidths, writeDataTable)
 importFrom("robustbase", adjboxStats, mc)
-importFrom("colorspace", sequential_hcl)
+importFrom("colorspace", sequential_hcl, diverge_hcl)
 #importFrom("MBESS", ci.smd)
 
 importFrom("graphics", "abline", "arrows", "axis", "axis.Date", "barplot", "box", "boxplot", "grconvertX", "grconvertY", "hist", "legend", "lines", "mtext", "pairs", "par", "pie", "plot", "plot.default", "plot.new", "plot.window", "points", "polygon", "rasterImage", "rect", "rug", "segments", "stripchart", "strwidth", "sunflowerplot", "symbols", "text", "title", "axTicks", "smoothScatter")
@@ -53,6 +53,7 @@ export (
   corScree, scree, corEFA, efa,
   Density, dn,
   details, db,
+  doFactors,
   getColors,
   Help,
   Histogram, hs,

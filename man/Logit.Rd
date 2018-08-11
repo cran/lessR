@@ -15,7 +15,8 @@ Can also be called from the more general \code{\link{model}} function.
 }
 
 \usage{
-Logit(my.formula, data=mydata, digits.d=4, text.width=120, 
+Logit(my.formula, data=mydata, rows=NULL,
+      digits.d=4, text.width=120, 
 
      brief=getOption("brief"),
 
@@ -37,6 +38,8 @@ lr(\ldots)
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{mydata}, otherwise explicitly specify.}
+  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+       to analyze.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
   \item{text.width}{Width of the text output at the console.}
@@ -82,8 +85,10 @@ The purpose of \code{Logit} is to combine the following function calls into one,
 
 The default analysis provides the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, analysis of residuals and influence as well as the fitted value and standard error for each observation in the model. 
 
-DATA FRAME\cr
+DATA\cr
 The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{mydata}.
+
+The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 GRAPHICS\cr
 For models with a single predictor variable, a scatter plot of the data is produced, which also includes the fitted values. As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. If more than a single predictor variable, then a scatter plot matrix is produced. 
@@ -113,7 +118,7 @@ Following the standard \code{R} function \code{\link{glm}}, invisibly returns an
 
 \examples{
 # Gender has values of "M" and "F"
-mydata <- Read("Employee", format="lessR", quiet=TRUE)
+mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 # logit regression
 Logit(Gender ~ Years)
 
@@ -122,6 +127,9 @@ lr(Gender ~ Years)
 
 # Modify the default settings as specified
 Logit(Gender ~ Years, res.row=8, res.sort="rstudent", digits.d=8, pred=FALSE)
+
+# just for employees who have worked more than 5 years at the firm
+Logit(Gender ~ Years, rows=(Years > 5))
 
 # Multiple logistic regression model
 # Provide all default analyses
@@ -140,7 +148,7 @@ Logit(Gender ~ Years, pdf.file="MyModel.pdf",
 # Specify new values of the predictor variables to calculate
 #  forecasted values
 # Specify an input data frame other than mydata
-mydata <- Read("Cars93", format="lessR")
+mydata <- Read("Cars93", in.lessR=TRUE)
 Logit(Source ~ HP + MidPrice, X1.new=seq(100,250,50), X2.new=c(10,60,10))
 }
 

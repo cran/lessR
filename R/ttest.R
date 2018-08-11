@@ -205,7 +205,7 @@ function(x, y=NULL, ...) {
     if (!missing(y)) .xstatus(y.name, df.name)  # just for a message on output 
 
     # see if the variable exists in the data frame
-    if (from.data && !in.style && !is.frml) .xcheck(x.name, df.name, data)
+    if (from.data && !in.style && !is.frml) .xcheck(x.name, df.name, names(data))
   }
   else {
     is.frml <- FALSE

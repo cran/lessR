@@ -15,13 +15,14 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, c
 }
 
 \usage{
-Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
+Histogram(x=NULL, data=mydata, rows=NULL,
+          n.cat=getOption("n.cat"), Rmd=NULL,
 
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
 
     fill=getOption("bar.fill.ordered"),
-    color=getOption("bar.color"),
+    color=getOption("bar.color.ordered"),
     trans=getOption("trans.bar.fill"),
 
     bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
@@ -30,8 +31,7 @@ Histogram(x=NULL, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     reg="snow2", cumul=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    xlab.adj=0, ylab.adj=0,
-    bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
+    lab.adj=c(0,0), margin.adj=c(0,0,0,0),
 
     rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
     offset=getOption("offset"),
@@ -55,6 +55,8 @@ hs(\ldots)
         frame, \code{mydata} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{mydata}.}
+  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+       to analyze.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric
         data type
@@ -109,10 +111,11 @@ hs(\ldots)
   \item{bin.width}{Optional specified bin width, which can be specified with or
         without a \code{bin.start} value.}
   \item{bin.end}{Optional specified value that is within the last bin, so the
-        actual endpoint of the last bin may be larger than the specified value.}\cr
+        actual endpoint of the last bin may be larger than the specified value.}
   \item{breaks}{The method for calculating the bins, or an explicit specification
        of the bins, such as with the standard R \code{\link{seq}} function or
-       other options provided by the \code{\link{hist}} function.}\cr
+       other options provided by the \code{\link{hist}} function that include
+       the default \code{"Sturges"} plust \code{"Scott"} and \code{"FD"}.}\cr
 
   \item{prop}{Specify proportions or relative frequencies on the vertical axis.
        Default is \code{FALSE}.}
@@ -133,23 +136,13 @@ hs(\ldots)
        Can set size with \code{main.cex} and color with \code{main.color} from the
        lessR \code{\link{style}} function.}
   \item{sub}{Sub-title of graph, below xlab.}
-  \item{xlab.adj}{Adjustment to the provided computation for the
-       x-axis category labels, indicated in approximate inches.
-       + values move the label up. This and
-       the following not applicable to Trellis graphics.}
-  \item{ylab.adj}{Adjustment to the provided computation for the
-       y-axis category labels. + values move the label up,
-       indicated in approximate inches.}
-  \item{bm.adj}{Adjustment to the provided computation for the
-       bottom margin, which also adjusts the x-label position in inches.
-       + values move the margin up.}
-  \item{lm.adj}{Adjustment to the provided computation for the
-       left margin, which also adjusts the y-label position in inches.
-       + values move the margin left.}
-  \item{tm.adj}{Adjustment to the provided computation for the
-       top margin in inches.}
-  \item{rm.adj}{Adjustment to the provided computation for the
-       right margin in inches.}\cr
+  \item{lab.adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
+       the position of the axis labels in approximate inches. + values move
+       the labels away from plot edge. Not applicable to Trellis graphics.}
+  \item{margin.adj}{Four-element vector -- top, right, bottom and left --
+       adjusts the margins of the plotted figure in approximate inches.
+       + values move the corresponding margin away from plot edge. 
+       Not applicable to Trellis graphics.}\cr
 
   \item{rotate.x}{Degrees that the \code{x}-axis values are rotated, usually to
         accommodate longer values, typically used in conjunction with \code{offset}.
@@ -221,6 +214,8 @@ The data may either be a vector from the global environment, the user's workspac
 
 To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
+The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+
 COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{lightbronze}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub.theme="black")} for a black background and partial transparency of plotted colors. 
 
@@ -284,7 +279,11 @@ Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springe
 
 \examples{
 # get the data
-mydata <- rd("Employee", format="lessR")
+mydata <- rd("Employee", in.lessR=TRUE)
+
+
+# make sure default style is active
+style()
 
 
 # --------------------
@@ -308,22 +307,18 @@ names(h)
 # histogram with no borders for the bars
 Histogram(Salary, color="off")
 
-# histogram with progressive colors, color matched to current theme
-# setting sub.theme same as setting bar.fill.ordered plus others
-style(sub.theme="colors")
-Histogram(Salary)
-# reset color theme
-style()
-
 # save the histogram to a pdf file
 #Histogram(Salary, pdf=TRUE)
+
+# just males employed more than 5 years
+Histogram(Salary, rows=(Gender=="M" & Years > 5))
 
 # histogram with red bars, black background, and black border
 style(panel.fill="black", fill="red", panel.color="black")
 Histogram(Salary)
-# or set this color scheme for with the R heat colors
+# or use a lessR pre-defined sequential color palette
 #   with some transparency
-Histogram(Salary, fill="heat", trans=.4)
+Histogram(Salary, fill="rusts", color="brown", trans=.1)
 
 # histogram with purple color theme, translucent gold bars
 style("purple", sub.theme="black")
@@ -408,7 +403,7 @@ Histogram(c(X,Y))
 # annotations
 # -----------
 
-mydata <- rd("Employee", format="lessR")
+mydata <- rd("Employee", in.lessR=TRUE)
 
 # Place a message in the top-right of the graph
 # Use \n to indicate a new line

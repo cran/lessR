@@ -92,8 +92,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     abline(h=axTicks(2), col=getOption("grid.y.color"),
                         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
-    .axes(levels(x.values), NULL, axT1, axTicks(2),
-          par("usr")[1], par("usr")[3])
+    .axes(levels(x.values), NULL, axT1, axTicks(2))
 
     main.lab <- plt.title[plt.i]
     sub.lab <- NULL

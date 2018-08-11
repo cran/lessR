@@ -1,5 +1,6 @@
 Regression <-
-function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
+function(my.formula, data=mydata,rows=NULL,
+         digits.d=NULL, standardize=FALSE,
 
          Rmd=NULL, 
          results=getOption("results"), explain=getOption("explain"),
@@ -47,13 +48,9 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   df.name <- deparse(substitute(data))   # get name of data table
   options(dname = df.name)
 
-  # if a tibble convert to data frame
-  # data.frame is already #3 in class(data), so no char --> factor conversion 
-  if (class(data)[1] == "tbl_df") {
-    data <- as.data.frame(data, stringsAsFactors=TRUE)
-  }
-
-
+  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+    if (class(data)[1] == "tbl_df")
+      data <- as.data.frame(data, stringsAsFactors=FALSE)
 
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
@@ -76,18 +73,25 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
   }
   else
     relate <- TRUE
-  
+
   .nodf(df.name)  # does data frame exist?
 
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1L
+
+  if (!missing(rows)) {  # subset rows
+    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+    r <- r & !is.na(r)  # set missing for a row to FALSE
+    data <- data[r,,drop=FALSE]
+  }
   n.obs <- nrow(data)
 
   predictors <- character(length=n.pred)
   for (i in 2:n.vars) predictors[i-1] <- nm[i]
 
-  for (i in 1:n.vars) .xcheck(nm[i], df.name, data)  # do variables exist?
+#  for (i in 1:n.vars) .xcheck(nm[i], df.name, names(data))  # do variables exist?
+  .xcheck(nm, df.name, names(data))  # do variables exist?
 
   # check that variables are not function calls
   v.str <- deparse(attr(terms.formula(my.formula), which="variables"))
@@ -102,7 +106,7 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         txtA, txtB, txtC, txtD, txtE, "\n")
   }
-  
+
   if(n.pred > 1) {
     collinear <- TRUE
     if (is.null(subsets)) subsets <- TRUE
@@ -180,7 +184,6 @@ function(my.formula, data=mydata, digits.d=NULL, standardize=FALSE,
       plot.title  <- character(length=0)
       manage.gr <- .graphman()
     }
-
 
   # --------------------------------------------------------
   # reg analysis

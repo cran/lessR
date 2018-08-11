@@ -1,5 +1,6 @@
 Density <-
-function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL, 
+function(x, data=mydata, rows=NULL,
+         n.cat=getOption("n.cat"), Rmd=NULL,
 
        bw=NULL, type=c("both", "general", "normal"),
        histogram=TRUE, bin.start=NULL, bin.width=NULL,
@@ -9,8 +10,8 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
        axis.text.color="gray30", rotate.x=0, rotate.y=0, offset=0.5,
 
-       x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
-       x.min=NULL, x.max=NULL, band=FALSE, 
+       x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE,
+       x.min=NULL, x.max=NULL, band=FALSE,
 
        eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
        width=4.5, height=4.5, pdf=FALSE,
@@ -25,16 +26,12 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
   lab.cex <- getOption("lab.cex")
   axis.cex <- getOption("axis.cex")
 
-  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval.df))  # default values
-    eval.df <- ifelse (shiny, FALSE, TRUE) 
-
   bw.miss <- ifelse (missing(bw), TRUE, FALSE)
 
   # see if dated parameter values
   .param.old(...)
 
-  clr <- getOption("theme")  # color theme not used except for monochrome 
+  clr <- getOption("theme")  # color theme not used except for monochrome
 
   if (missing(fill))
     if (.Platform$OS == "windows")
@@ -54,44 +51,61 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     fill.gen <- rgb(.75,.75,.75, .5)
   }
 
-  #orig.params <- par(no.readonly=TRUE)
-  #on.exit(par(orig.params))
-  #par(bg=getOption("window.fill"))
-
+  
+  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
+  if (is.null(eval.df))  # default values
+    eval.df <- ifelse (shiny, FALSE, TRUE)
   # get actual variable name before potential call of data$x
-  x.name <- deparse(substitute(x)) 
+  if (!missing(x))  # can't do is.null or anything else with x until evaluated
+    x.name <- deparse(substitute(x))  # could be a list of var names
+  else
+    x.name <- NULL  # otherwise is actually set to "NULL" if NULL
   options(xname = x.name)
 
-  data.miss <- ifelse (missing(data), TRUE, FALSE) 
-  if (data.miss && shiny)  # force evaluation (not lazy)
+  if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
     data <- eval(substitute(data), envir=parent.frame())
-  df.name <- deparse(substitute(data))
+  df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
+  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+    if (class(data)[1] == "tbl_df")
+      data <- as.data.frame(data, stringsAsFactors=FALSE)
 
+  if (!is.null(x.name))
+    x.in.global <- .in.global(x.name)  # see if in global, includes vars list
+  else
+    x.in.global <- FALSE
+    
 # -----------------------------------------------------------
 # establish if a data frame, if not then identify variable(s)
+# x can be missing entirely, with a data frame passed instead
+# if x a vector, then x.name not in data, but also not in global
 
   if (!missing(x)) {
 
     # x not in global env, in df, specify data= forces to data frame
-    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
+    if (!x.in.global) {
       if (eval.df) {
-        .nodf(df.name)  # check to see if data frame container exists 
-        .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+        .nodf(df.name)  # check to see if data frame container exists
+        .xcheck(x.name, df.name, names(data))  # var in df?, vars lists not checked
       }
-      all.vars <- as.list(seq_along(data))  # even if only a single var
-      names(all.vars) <- names(data)  # all data in data frame
-      x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars
+      data.vars <- as.list(seq_along(data))
+      names(data.vars) <- names(data)
+      ind <- eval(substitute(x), envir=data.vars)  # col num of each var
+      if (!missing(rows)) {  # subset rows
+        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+        r <- r & !is.na(r)  # set missing for a row to FALSE
+        data <- data[r,,drop=FALSE]
+      }
       if (!("list" %in% class(data))) {
-        data <- data[, x.col]
-        if (length(x.col) == 1) {  # x is 1 var
+        data <- data[, ind]
+        if (length(ind) == 1) {  # x is 1 var
           data <- data.frame(data)
           names(data) <- x.name
          }
       }
       else {  # class of data is "list"
-        data <- data.frame(data[[x.col]])
+        data <- data.frame(data[[ind]])
         names(data) <- x.name
       }
     }
@@ -118,10 +132,10 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     plot.i <- 0  # keep track of generated graphics
     plot.title  <- character(length=0)
     manage.gr <- .graphman()  # see if graphics are to be managed
-    if (manage.gr  &&  !pdf) {
+    if (manage.gr  &&  !pdf  && !shiny) {
       i.win <- 0
       for (i in 1:ncol(data)) {
-        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat)) 
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat))
           i.win <- i.win + 1
       }
       .graphwin(i.win, width, height)
@@ -149,14 +163,14 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
       if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
 
       if (pdf) {
-        pdf.fnm <- paste("Density", "_", x.name, ".pdf", sep="") 
+        pdf.fnm <- paste("Density", "_", x.name, ".pdf", sep="")
         .opendev(pdf.fnm, width, height)
       }
       else {
         pdf.fnm <- NULL
         plot.i <- plot.i + 1
         plot.title[plot.i] <- paste("Density of ", x.name, sep="")
-        if (manage.gr) {
+        if (manage.gr && !shiny) {
           open.win <- open.win + 1
           dev.set(which = open.win)
         }
@@ -174,11 +188,11 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
 
       # get bandwidth
       if (bw.miss) bw <- .band.width(data[,i], ...)
- 
-      stuff <- .dn.main(data[,i], bw, type, histogram, bin.start, bin.width, 
+
+      stuff <- .dn.main(data[,i], bw, type, histogram, bin.start, bin.width,
             fill, panel.fill, panel.color,
-            nrm.color, gen.color, fill.nrm, fill.gen, 
-            lab.cex, axis.cex, axis.text.color, rotate.x, rotate.y, offset, 
+            nrm.color, gen.color, fill.nrm, fill.gen,
+            lab.cex, axis.cex, axis.text.color, rotate.x, rotate.y, offset,
             x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)
 
       txdst <- ""
@@ -193,10 +207,10 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
         class(txotl) <- "out_piece"
       }
 
-      
+
       if (ncol(data) > 1) {  # for a variable range, just text output
         class(ttlns) <- "out_piece"  # title only for multiple variables
-        
+
         output <- list(out_title=ttlns, out_stats=txdst, out_outliers=txotl)
         class(output) <- "out_all"
         print(output)
@@ -219,6 +233,9 @@ function(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL,
     if (!pdf) if (is.null(options()$knitr.in.progress)) if (plot.i > 0)
       .plotList(plot.i, plot.title)
   }
+
+  if (!shiny)
+    dev.set(which=2)  # reset graphics window for standard R functions
 
 
   # now further processing if only a single numerical variable to process

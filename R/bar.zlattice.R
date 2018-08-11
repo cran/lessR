@@ -113,7 +113,8 @@ function(x, by1, by2, nrows, ncols, asp, prop,
     strp <- FALSE;  strp.lft <- TRUE
   }
 
-  # ---------------------------------------
+  # ------------------------------------------------
+  # calculate the histogram or bar chart or dot plot
   # set conditioning variables, by1 and by2
 
   h.type <- ifelse(prop, "percent", "count")
@@ -123,13 +124,22 @@ function(x, by1, by2, nrows, ncols, asp, prop,
       p <- lattice::histogram(~ x | by1, type=h.type)
     else
       p <- lattice::histogram(~ x | by1 * by2, type=h.type)
+    # see if there is a color range for fill, if so then get the colors
+    # if breaks were possible, use unlist(p)$panel.args.common.breaks
+    n.bar <- unlist(p)$panel.args.common.nint
   }
 
   else if (c.type %in% c("bar", "dot")) {
     mytab <- table(x, by1)
     mytabDF <- as.data.frame.table(mytab, responseName="Count")
     p <- lattice::barchart(x ~ Count | by1, data=mytabDF)
+    n.bar <- nrow(mytab)
   }
+
+  # process a potential color range (such as "blues")
+  clr <- NULL
+  clr <- .color.range(fill, n.bar)  # if range, return colors
+  if (!is.null(clr)) fill <- clr
 
   # customize layout cols and rows, need only specify one
   if (!is.null(nrows) ||  !is.null(ncols)) {

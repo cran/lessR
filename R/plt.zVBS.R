@@ -78,7 +78,7 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
   if (is.null(by1)) by1.name <- ""
 
   # suggestions
-  if (getOption("suggest")) {
+  if (getOption("suggest") && !quiet) {
     # function call for suggestions
     fncl <- .fun.call.deparse(fun.call) 
     fncl <- gsub(")$", "", fncl)  # get function call less closing ) 

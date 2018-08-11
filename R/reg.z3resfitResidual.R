@@ -52,8 +52,7 @@ function(lm.out, cook, cooks.cut,
   abline(h=axTicks(2), col=getOption("grid.y.color"),
          lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
 
-  .axes(NULL, NULL, axTicks(1), axTicks(2),
-        par("usr")[1], par("usr")[3])
+  .axes(NULL, NULL, axTicks(1), axTicks(2))
 
   main.lab <- NULL
   sub.lab <- "Largest Cook's Distance Highlighted"
@@ -65,10 +64,10 @@ function(lm.out, cook, cooks.cut,
   col.color <- getOption("pt.color")
   points(fit.ord, res.ord, pch=21, col=col.color, bg=col.fill, cex=0.8)
 
-  abline(h=0, lty="dotted", lwd=1.5, col=getOption("bar.fill"))
+  abline(h=0, lty="dotted", lwd=1.5, col=getOption("bar.fill.ordered"))
   lines(lowess(fit.ord, res.ord, f=.9), col=getOption("pt.color"))
-  res.c <- res[which(cook>=cooks.cut)]
-  fit.c <- fit[which(cook>=cooks.cut)]
+  res.c <- res[which(cook >= cooks.cut)]
+  fit.c <- fit[which(cook >= cooks.cut)]
   if (length(fit.c) > 0) {
     col.out <- getOption("pt.color")
     points(fit.c, res.c, col=col.out, pch=19)

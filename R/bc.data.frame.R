@@ -5,7 +5,8 @@ function(x, n.cat,
          xlab, ylab, main,
          labels, label.size, beside,
          rotate.x, offset, break.x, sort.x,
-         values, values.color, values.cex, value.digits, values.pos,
+         values, values.color, values.cex, value.digits,
+         values.pos, values.cut,
          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
          legend.title, legend.loc, legend.labels, legend.horiz,
          out.size, quiet, width, height, pdf, ...)  {
@@ -15,7 +16,7 @@ function(x, n.cat,
   options(suggest = FALSE)
 
   manage.gr <- .graphman()  # see if graphics are to be managed
-  if (manage.gr  &&  is.null(pdf)) {
+  if (manage.gr  &&  !pdf) {
     i.win <- 0
     for (i in 1:ncol(x)) {
       if (is.numeric(x[,i])  &&  !.is.num.cat(x[,i], n.cat)) 
@@ -46,7 +47,7 @@ function(x, n.cat,
 
         else {
 
-        if (!is.null(pdf)) {
+        if (pdf) {
           pdf.fnm <- paste("BarChart_", x.name, ".pdf", sep="") 
           .opendev(pdf.fnm, width, height)
         } 
@@ -66,12 +67,13 @@ function(x, n.cat,
           xlab, ylab, main,
           value.labels=NULL, label.size, beside,
           rotate.x, offset, break.x, sort.x,
-          values, values.color, values.cex, value.digits, values.pos,
+          values, values.color, values.cex, value.digits,
+          values.pos, values.cut,
           xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
           legend.title, legend.loc, legend.labels, legend.horiz,
           add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out.size, quiet, ...)
 
-        if (!is.null(pdf)) {
+        if (pdf) {
           dev.off()
           if (!quiet) .showfile(pdf.fnm, "bar chart")
         }
@@ -92,17 +94,18 @@ function(x, n.cat,
 
   options(suggest = sug.keep)
 
-  if (plot.i > 0) {
-    if (is.null(pdf))
+  if (!pdf) {  # no evaluation for pdf is TRUE
+    if (plot.i > 0) {
       if (is.null(options()$knitr.in.progress))
         .plotList(plot.i, plot.title)
-  }
-  else {
-    cat("No categorical variables, so no bar charts.\n\n",
-        "If you have integer variables that are categorical,\n",
-        "  then set the n.cat parameter to the maximum\n",
-        "  number of integer values (categories),\n",
-        "  or convert them to R factors.\n\n", sep="")
+    }
+    else {
+      cat("No categorical variables, so no bar charts.\n\n",
+          "If you have integer variables that are categorical,\n",
+          "  then set the n.cat parameter to the maximum\n",
+          "  number of integer values (categories),\n",
+          "  or convert them to R factors.\n\n", sep="")
+    }
   }
 
 }

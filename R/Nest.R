@@ -1,5 +1,5 @@
 Nest <-
-function(y, nested.model, full.model, method=c("ls", "logit"),
+function(y, nested.model, full.model, method=c("lm", "logit"),
          data=mydata, digits.d=NULL) {
 
   method <- match.arg(method)
@@ -65,7 +65,7 @@ function(y, nested.model, full.model, method=c("ls", "logit"),
 
   # do the model comparison
 
-  if (method=="ls") {
+  if (method=="lm") {
     lm.full <- lm(f.formula, data=data)
     lm.nest <- lm(n.formula, data=lm.full$model)
     av <- anova(lm.nest, lm.full)
@@ -138,7 +138,7 @@ function(y, nested.model, full.model, method=c("ls", "logit"),
     txtbl <- tx
 
     }
-  }  # end method="ls"
+  }  # end method="lm"
 
   else {
     lm.full <- suppressWarnings(glm(f.formula, data=data, family="binomial"))

@@ -201,18 +201,19 @@ function(topic=NULL, width=4.5, height=4.5) {
   else if (topic %in% c("wrt", "write")) {
   t0 <- "Write Contents of Data Frame mydata into a Data File"
 
-  f1 <- bquote(paste(bold("Write, wrt"), "  Write a data file called mydata into an R data frame"))
+  f1 <- bquote(paste(bold("Write, wrt"), 
+    "  Write a data file called mydata into an R data frame"))
 
   t1 <- "
-  The name of the entire rectangular table of data, called a data frame in R, can 
-  be named mydata within R.  This is the default name of the data table assumed
-  by the lessR data analysis functions.
+  The name of the entire rectangular table of data, called a data frame in R, 
+  can be named mydata within R.  This is the default name of the data table
+  assumed by the lessR data analysis functions.
 
-  Here is how to write the contents of mydata to a csv data file with the name of 
-  mydata.csv.
+  Here is how to write the contents of mydata to a csv data file with the name
+  of mydata.csv.
       > Write()
-  The file is written to the default working directory.  The Write function displays
-  this location after writing the file.
+  The file is written to the default working directory.  The Write function 
+  displays this location after writing the file.
 
   Or, explicitly specify the file name.
       > Write(\"mybestdata\")

@@ -1,5 +1,5 @@
 Read <-
-function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
+function(ref=NULL, format=NULL, in.lessR=FALSE,
 
          labels=NULL, widths=NULL, stringsAsFactors=FALSE,
          missing="", n.mcut=1,
@@ -14,23 +14,37 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
 
   if (is.null(fun.call)) fun.call <- match.call()
 
+  if (!is.null(ref))
+    if (nchar(ref) == 0) ref <- NULL  #  "" to NULL
+
   if (hasArg(labels)) {
     #cat("\n"); stop(call.=FALSE, "\n","------\n",
       cat(">>> Note: ",
       "VariableLabels function, vl, now preferred to read labels\n\n")
   }
 
-  no.format <- ifelse (missing(format), TRUE, FALSE)
-  format <- match.arg(format)
-  if (is.null(ref) && format=="lessR") {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Cannot browse for a data file that is part of lessR.\n",
-        "Specify the file name.\n\n")
+  miss.format <- ifelse (missing(format), TRUE, FALSE)
+  fmts <- c("text", "csv", "tsv", "Excel", "R", "SPSS", "SAS")
+  if (!is.null(format)) {
+    if (!(format %in% c(fmts, "lessR"))) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+          ">>> Specified format must be one of:\n",
+               "\"text\", \"Excel\", \"R\", \"SPSS\", \"SAS\",\n\n")
+    }
+    if (format %in% c("text", "tsv")) format <- "csv"
+
+    if (is.null(ref) && format=="lessR") {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Cannot browse for a data file that is part of lessR.\n",
+          "Specify the file name.\n\n")
+    }
   }
 
   # option to browse for data file, and then display file name
   browse <- FALSE
   if (is.null(ref)) {
+    if (options("device") == "RStudioGD")
+      cat(">>> Browse window may be hidden behind RStudio window\n")
     browse <- TRUE
     ref <- file.choose()
     fncl <- paste("Read(", "ref = \"", ref,  "\", quiet = TRUE)", sep="")
@@ -43,29 +57,22 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
 
   options(read.call=fncl)  # save for knitr run
 
-  if (no.format) {
-    if (grepl(".sav$", ref)) format <- "SPSS"
-    if (grepl(".sas7bdat$", ref)) format <- "SAS"
-    if (grepl(".rda$", ref)) format <- "R"
-    if (grepl(".xls$", ref) || grepl(".xlsx$", ref)) format <- "Excel"
-    if (!is.null(widths)) format <- "fwd"
+  if (miss.format) {
+         if (in.lessR) format <- "lessR"
+    else if (!is.null(widths)) format <- "fwd"
+    else if (grepl(".csv$", ref)) format <- "csv"
+    else if (grepl(".tsv$", ref)) format <- "csv"
+    else if (grepl(".txt$", ref)) format <- "csv"
+    else if (grepl(".sav$", ref)) format <- "SPSS"
+    else if (grepl(".sas7bdat$", ref)) format <- "SAS"
+    else if (grepl(".rda$", ref)) format <- "R"
+    else if (grepl(".xls$", ref) || grepl(".xlsx$", ref)) format <- "Excel"
   }
   if (!is.null(labels) && format=="R") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "An R data file should already contain labels before it was created.\n",
         "Or add them manually with the lessR function: label\n\n")
   }
-
-# if (format=="Excel"  &&  grepl("http", ref, fixed=TRUE)) {
-#   cat("\n"); stop(call.=FALSE, "\n","------\n",
-#       "At this time the underlying read_excel function\n",
-#       "  does not support reading Excel files from the web\n",
-#       "Can use the  download.file  function to download to your\n",
-#       "  local file system and read from there\n\n",
-#       "  download.file(\"", ref, "\", \"MYFILE.xlsx\")\n\n",
-#       "Replace MYFILE with the desired file name\n",
-#       "Enter  getwd()  to see where the file was saved \n\n")
-# }
 
   # construct full path name for label file if not already
   if (!is.null(labels)) {
@@ -115,9 +122,13 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
         cat("\n>>> Suggestions\n")
       if (!grepl("labels", fncl)  &&  format != "lessR")
         cat("Use the VariableLabels function, also vl, to read labels\n")
-      if (brief)
-        cat("More information on your data with details() for mydata, or",
-            "details(name)\n")
+      if (brief) {
+        cat("Details about your data, Enter:  details()  for mydata, or",
+           " details(name)\n")
+        if (options("device") == "RStudioGD")
+          cat("To view your data, Enter:  View(name)  such as ",
+          " View(mydata)\n")
+      }
       cat("\n")
     }
   }
@@ -177,7 +188,7 @@ function(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
           cat("\n"); stop(call.=FALSE, "\n","------\n",
               "Format of label file must be .csv or .xlsx\n\n")
         }
-    
+
         if (format.lbl != "Excel")
           mylabels <- read.csv(file=ref.lbl, row.names=1, header=FALSE)
         else {  # openxlsx

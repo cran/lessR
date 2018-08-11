@@ -146,7 +146,7 @@ Kupper and Hafner (1989). The American Statistician, 43(2):101-105.
 # tt for two groups, from a formula
 # ----------------------------------------------------------
 
-mydata <- Read("Employee", format="lessR", quiet=TRUE)
+mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 
 
 # analyze data with formula version

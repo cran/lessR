@@ -136,8 +136,8 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     n.lab.x.ln <- margs$n.lab.x.ln
     n.lab.y.ln <- margs$n.lab.y.ln
 
-#   if (lab.x.cex > 1.2) bm <- bm + (.15*lab.x.cex)
-#   if (lab.y.cex > 1.2) lm <- lm + (.15*lab.y.cex)
+    if (lab.x.cex > 1.1) bm <- bm + (.10*lab.x.cex)  # kludge
+    if (lab.y.cex > 1.1) lm <- lm + (.10*lab.y.cex)
 
     if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
@@ -181,7 +181,6 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     # axis, axis ticks
     .axes(x.lvl=NULL, y.lvl=NULL,
           axTicks(1, axp=scale.x), axTicks(2, axp=scale.y),
-          par("usr")[1], par("usr")[3], 
           rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
 
     # axis labels
@@ -195,15 +194,20 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 
     # see if apply a pre-defined color range
     n.bins <- length(h$counts)
-    if (length(fill) == 1) fill <- .color.range(fill, n.bins, no.change=TRUE)
+    clr <- NULL
+    clr <- .color.range(fill, n.bins, no.change=TRUE)
+      
+    # not a color range such as "colors" or "blues", so assign clr here
+    if (is.null(clr)) {
+        clr <- fill  # user provided the colors
+    }
 
     # bar transparency
-    n.clr <- length(fill)
     if (!is.null(trans)) if (trans > 0)
-      for (i in 1:n.clr) fill[i] <- .maketrans(fill[i], (1-trans)*256) 
+      for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans)*256)                 
 
     # plot the histogram
-    plot(h, add=TRUE, col=fill, border=color, freq=TRUE,
+    plot(h, add=TRUE, col=clr, border=color, freq=TRUE,
          labels=values, ...)
     if (cumul == "both") {
       h$counts <- old.counts

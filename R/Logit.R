@@ -1,5 +1,6 @@
 Logit <-
-function(my.formula, data=mydata, digits.d=4, text.width=120, 
+function(my.formula, data=mydata, rows=NULL,
+         digits.d=4, text.width=120, 
 
          brief=getOption("brief"),
 
@@ -75,6 +76,12 @@ function(my.formula, data=mydata, digits.d=4, text.width=120,
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1
+
+  if (!missing(rows)) {  # subset rows
+    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+    r <- r & !is.na(r)  # set missing for a row to FALSE
+    data <- data[r,,drop=FALSE]
+  }
   n.obs <- nrow(data)
   
   if (n.pred > 1) collinear <- TRUE else collinear <- FALSE

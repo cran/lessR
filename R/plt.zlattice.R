@@ -11,8 +11,11 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
          out.fill, out.color, out2.fill, out2.color,
          ID, out.cut, ID.color, ID.size,
          rotate.x, rotate.y, width, height, pdf.file, c.type, ...) {
-
-
+    
+  date.ts <- FALSE
+  if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
+  if (date.ts) xx.lab <- xlab
+  
   if (size.pt == 0) object <- "line"
 
   grid.x.color <- ifelse(is.null(getOption("grid.x.color")), 
@@ -88,6 +91,11 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
   y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
   main.lab <- gl$mb
   sub.lab <- gl$sb
+
+  # if xlab not specified and if time series, then no x.lab
+  date.ts <- FALSE
+  if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
+  if (date.ts  &&  is.null(xx.lab)) x.lab <- NULL
 
   if (trans > 0) fill <- .maketrans(fill, (1-trans)*256)
   col.bg <- ifelse(sum(col2rgb(panel.fill)) < 370, "transparent", panel.fill)
@@ -260,7 +268,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
            strip.background=list(col=getOption("strip.fill")),
            plot.polygon=list(col=getOption("violin.color"), 
              fill=getOption("violin.fill"), lty="solid", lwd=1),
-           plot.line=list(col=color, lty="solid", lwd=1),
+           plot.line=list(col=col.color, lty="solid", lwd=1),
            plot.symbol=list(pch=shape, cex=size.pt, col=col.color,
              fill=col.fill),
            superpose.symbol=list(pch=shape, cex=size.pt,
@@ -302,7 +310,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     if (fit == "loess")
       p <- p + latticeExtra::layer(panel.loess(x, y, col=P1, lwd=P2),
                      data=list(P1=fit.color, P2=fit.lwd))
-    else if (fit == "ls")
+    else if (fit == "lm")
       p <- p + latticeExtra::layer(panel.lmline(x, y, col=P1, lwd=P2),
                      data=list(P1=fit.color, P2=fit.lwd))
 
@@ -359,14 +367,12 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     else
       c.color <- col.fill
 
-    if (c.type %in% c("cont", "contcat")) {
-      if (n.groups > 1) {
-        legend.lbl.cex <- ifelse (in.RStudio, .75, .66) 
-        p <- update(p, key=list(space="top", columns=n.groups,
-               text=list(levels(by), cex=legend.lbl.cex), 
-               points=list(pch=21, fill=col.fill, col=c.color, cex=1),
-               border="gray80", background=col.bg, padding.text=2))
-      }
+    if (n.groups > 1) {
+      legend.lbl.cex <- ifelse (in.RStudio, .75, .66) 
+      p <- update(p, key=list(space="top", columns=n.groups,
+             text=list(levels(by), cex=legend.lbl.cex), 
+             points=list(pch=21, fill=col.fill, col=c.color, cex=1),
+             border="gray80", background=col.bg, padding.text=2))
     }
 
     p <- update(p,
@@ -430,94 +436,90 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
               .panel.bwplot(x=x, ...,  pch="|", vbs.mean=vbs.mean, fences=fences,
                   box.ratio=vbs.size/denom, mean.color=out.fill, 
                   stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE) 
-          }  # end box
 
-          # plotting a subset of x requires adjusting y, in .panel.strip
-          if (c.type == "cont"  ||  c.type == "contcat") {
-            if (box) {  # only display outliers
-
-              i.out <- which(x<fnc.out[1] | x>fnc.out[2])
-              if (n.groups == 1) {
-                i.out.clr <- 1
-                fill.out <- out2.fill
-              }
-              else {
-                i.out.clr <- as.numeric(groups[i.out])
-                fill.out <- col.fill[i.out.clr]
-              }
-              # plot extreme outliers
-              .panel.stripplot(x=x[i.out],
-                cex=out.size, col=out2.color, fill=fill.out, pch=out.shape, ...)
-
-              i.out <- which(x>=fnc.out[1] & x<fnc.in[1] |
-                              x>fnc.in[2] & x<=fnc.out[2])
-              if (n.groups == 1) {
-                i.out.clr <- 1
-                fill.out <- out.fill
-              }
-              else {
-                i.out.clr <- as.numeric(groups[i.out])
-                fill.out <- col.fill[i.out.clr]
-              }
-              # plot outliers
-              .panel.stripplot(x= x[i.out],
-                cex=out.size, col=out.color, fill=fill.out, pch=out.shape, ...)
-
-              # label outliers
-              if (out.cut > 0) {
-                wwID <- wID[subscripts]
-
-                ind.lo <- which(x < fnc.in[1])
-                x.lo <- x[ind.lo]
-                ID.lo <- wwID[ind.lo]
-                ord <- order(x.lo, decreasing=FALSE)
-                x.lo <- x.lo[ord]
-                x.lo <- na.omit(x.lo[1:min(length(x.lo),out.cut)])
-                ID.lo <- ID.lo[ord] 
-                ID.lo <- na.omit(ID.lo[1:min(length(ID.lo),out.cut)]) 
-                
-                ind.hi <- which(x > fnc.in[2])
-                x.hi <- x[ind.hi]
-                ID.hi <- wwID[ind.hi]
-                ord <- order(x.hi, decreasing=TRUE)
-                x.hi <- x.hi[ord]
-                x.hi <- na.omit(x.hi[1:min(length(x.hi),out.cut)])
-                ID.hi <- ID.hi[ord] 
-                ID.hi <- na.omit(ID.hi[1:min(length(ID.hi),out.cut)]) 
-
-                x.out <- c(x.lo, x.hi)
-                ID.lbl <- union(ID.lo, ID.hi)  # combine factors
-
-                panel.text(x.out, y=1.08, labels=ID.lbl,
-                           col=ID.color, cex=ID.size, adj=0, srt=90)
-              }
-            }  # end box
-
-            if (size.pt > 0) {  # regular points
-              s.pt <- ifelse (n.groups > 1, size.pt*1.2, size.pt)
-              if (box) {
-                i.out <- which(x>=fnc.in[1] & x<=fnc.in[2])
-                if (n.groups == 1) {
-                  i.out.clr <- 1
-                  fill.out <- col.fill
-                }
-                else {
-                  i.out.clr <- as.numeric(groups[i.out])
-                  fill.out <- col.fill[i.out.clr]
-                }
-              }  # end box
-              else {
-                i.out <- 1:length(x)
-                fill.out <- col.fill
-              }
-              color.out <- fill.out
-              if (n.groups == 2) color.out <- "black"
-              .panel.stripplot(x=x[i.out], 
-                 cex=s.pt, pch=shape, col=color.out, fill=fill.out,
-                 jitter.data=jitter.data, factor=jitter, ...)
+           # plotting a subset of x requires adjusting y, in .panel.strip
+            i.out <- which(x<fnc.out[1] | x>fnc.out[2])
+            if (n.groups == 1) {
+              i.out.clr <- 1
+              fill.out <- out2.fill
+            }
+            else {
+              i.out.clr <- as.numeric(groups[i.out])
+              fill.out <- col.fill[i.out.clr]
             }
 
-          }  # end c.type == "cont"
+            # plot extreme outliers
+            .panel.stripplot(x=x[i.out],
+              cex=out.size, col=out2.color, fill=fill.out, pch=out.shape, ...)
+
+            i.out <- which(x>=fnc.out[1] & x<fnc.in[1] |
+                            x>fnc.in[2] & x<=fnc.out[2])
+            if (n.groups == 1) {
+              i.out.clr <- 1
+              fill.out <- out.fill
+            }
+            else {
+              i.out.clr <- as.numeric(groups[i.out])
+              fill.out <- col.fill[i.out.clr]
+            }
+
+            # plot outliers
+            .panel.stripplot(x= x[i.out],
+              cex=out.size, col=out.color, fill=fill.out, pch=out.shape, ...)
+
+            # label outliers
+            if (out.cut > 0) {
+              wwID <- wID[subscripts]
+
+              ind.lo <- which(x < fnc.in[1])
+              x.lo <- x[ind.lo]
+              ID.lo <- wwID[ind.lo]
+              ord <- order(x.lo, decreasing=FALSE)
+              x.lo <- x.lo[ord]
+              x.lo <- na.omit(x.lo[1:min(length(x.lo),out.cut)])
+              ID.lo <- ID.lo[ord] 
+              ID.lo <- na.omit(ID.lo[1:min(length(ID.lo),out.cut)]) 
+              
+              ind.hi <- which(x > fnc.in[2])
+              x.hi <- x[ind.hi]
+              ID.hi <- wwID[ind.hi]
+              ord <- order(x.hi, decreasing=TRUE)
+              x.hi <- x.hi[ord]
+              x.hi <- na.omit(x.hi[1:min(length(x.hi),out.cut)])
+              ID.hi <- ID.hi[ord] 
+              ID.hi <- na.omit(ID.hi[1:min(length(ID.hi),out.cut)]) 
+
+              x.out <- c(x.lo, x.hi)
+              ID.lbl <- union(ID.lo, ID.hi)  # combine factors
+
+              panel.text(x.out, y=1.08, labels=ID.lbl,
+                         col=ID.color, cex=ID.size, adj=0, srt=90)
+            }
+          }  # end box
+
+          if (size.pt > 0) {  # regular points
+            s.pt <- ifelse (n.groups > 1, size.pt*1.2, size.pt)
+            if (box) {
+              i.out <- which(x>=fnc.in[1] & x<=fnc.in[2])
+              if (n.groups == 1) {
+                i.out.clr <- 1
+                fill.out <- col.fill
+              }
+              else {
+                i.out.clr <- as.numeric(groups[i.out])
+                fill.out <- col.fill[i.out.clr]
+              }
+            }  # end box
+            else {
+              i.out <- 1:length(x)
+              fill.out <- col.fill
+            }
+            color.out <- fill.out
+            if (n.groups == 2) color.out <- "black"
+            .panel.stripplot(x=x[i.out], 
+               cex=s.pt, pch=shape, col=color.out, fill=fill.out,
+               jitter.data=jitter.data, factor=jitter, ...)
+          }
 
         }  # end panel function
       )  # end update

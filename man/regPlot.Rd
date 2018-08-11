@@ -66,7 +66,7 @@ Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, N
 
 \examples{
 # read internal data set
-mydata <- rd("Reading", format="lessR", quiet=TRUE)
+mydata <- rd("Reading", in.lessR=TRUE, quiet=TRUE)
 # do regression analysis, save result into out
 reg.out <- reg(Reading ~ Verbal)
 # The full output already contains these plots, obtained by

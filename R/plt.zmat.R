@@ -27,7 +27,7 @@ function(x, cor.coef=TRUE, fit="loess",
         l.ln <- lowess(y[ok] ~ x[ok], f=span, iter=iter)
         lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
       }
-      else if (fit.line == "ls") {
+      else if (fit.line == "lm") {
         l.ln <- lm(y[ok] ~ x[ok])
         lines(x[ok], fitted(l.ln), col=col.smooth, ...)
       }

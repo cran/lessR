@@ -41,6 +41,22 @@ function (...) {
           "  with function:  style\n\n")
       }
 
+      if (names(dots)[i] %in% c("tm.adj", "rm.adj", "bm.adj", "lm.adj")) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Now use margin.adj vector: top, right, bottom, left\n",
+          "e.g., margin.adj=c(.5,0,0,0) moves top margin in 0.5 in \n\n")
+      }
+      if (names(dots)[i] %in% c("xlab.adj", "ylab.adj")) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Now use lab.adj vector: xlab, ylab\n",
+          "e.g., lab.adj=c(.5,0) moves x-axis label in 0.5 in \n\n")
+      }
+
+      if (names(dots)[i] == "sort.x") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option sort.x  renamed  sort\n\n")
+      }
+      
       if (grepl("colors", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "colors option removed because the fill parameter\n",
@@ -69,28 +85,28 @@ function (...) {
       }
       if (names(dots)[i] == "hist.counts") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  hist.counts  is renamed  values\n\n")
+          "option  hist.counts  renamed  values\n\n")
       }
       if (names(dots)[i] == "line.chart") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  line.chart  is renamed  run\n\n")
+          "option  line.chart  renamed  run\n\n")
       }
       if (names(dots)[i] == "rotate.values") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Rotation of the axis labels can now be applied to both axes\n\n",
-          "option  rotate.values  is renamed  rotate.x or rotate.y\n\n")
+          "option  rotate.values  renamed  rotate.x or rotate.y\n\n")
       }
       if (names(dots)[i] == "line.width") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  line.width  is renamed  lwd\n\n")
+          "option  line.width  renamed  lwd\n\n")
       }
       if (names(dots)[i] == "bubble.size") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  bubble.size  is renamed  radius\n\n")
+          "option  bubble.size  renamed  radius\n\n")
       }
       if (names(dots)[i] == "bubble.scale") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  bubble.scale  is renamed  power\n\n")
+          "option  bubble.scale  renamed  power\n\n")
       }
       if (names(dots)[i] == "bubble.text") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -98,15 +114,15 @@ function (...) {
       }
       if (names(dots)[i] == "size.out") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  size.out  is renamed  out.size\n\n")
+          "option  size.out  renamed  out.size\n\n")
       }
       if (names(dots)[i] == "shape.out") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  shape.out  is renamed  out.shape\n\n")
+          "option  shape.out  renamed  out.shape\n\n")
       }
       if (names(dots)[i] == "topic") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  topic  is renamed  values\n\n")
+          "option  topic  renamed  values\n\n")
       }
       if (names(dots)[i] == "kind") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -120,7 +136,7 @@ function (...) {
       }
       if (names(dots)[i] == "type") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  type  is renamed  object\n\n")
+          "option  type  renamed  object\n\n")
       }
       if (names(dots)[i] == "knitr.file") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -133,39 +149,39 @@ function (...) {
       }
       if (names(dots)[i] == "low.color") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  low.color  is renamed  low.fill\n\n")
+          "option  low.color  renamed  low.fill\n\n")
       }
       if (names(dots)[i] == "fill.ellipse") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  fill.ellipse  is renamed  ellipse.fill\n\n")
+          "option  fill.ellipse  renamed  ellipse.fill\n\n")
       }
       if (names(dots)[i] == "color.ellipse") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  color.ellipse  is renamed  ellipse.color\n\n")
+          "option  color.ellipse  renamed  ellipse.color\n\n")
       }
       if (names(dots)[i] == "color.fit") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  color.fit  is renamed  fit.color\n\n")
+          "option  color.fit  renamed  fit.color\n\n")
       }
       if (names(dots)[i] == "lwd.fit") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  lwd.fit  is renamed  fit.lwd\n\n")
+          "option  lwd.fit  renamed  fit.lwd\n\n")
       }
       if (names(dots)[i] == "se.fit") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  se.fit  is renamed  fit.se\n\n")
+          "option  se.fit  renamed  fit.se\n\n")
       }
       if (names(dots)[i] == "box") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  box  is renamed  panel.color\n\n")
+          "option  box  renamed  panel.color\n\n")
       }
       if (names(dots)[i] == "bg") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  bg  is renamed  panel.fill\n\n")
+          "option  bg  renamed  panel.fill\n\n")
       }
       if (names(dots)[i] == "axes") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  axes  is renamed  axis.text.color\n\n")
+          "option  axes  renamed  axis.text.color\n\n")
       }
       if (names(dots)[i] == "boxplot") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",

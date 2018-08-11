@@ -31,9 +31,9 @@ function (x=mycor,
 
   if (getOption("theme") == "gray" ||
      (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black"))
-    col.ln <- getOption("bar.fill")
+    col.ln <- getOption("bar.fill.ordered")
   else
-    col.ln <- getOption("bar.color")
+    col.ln <- getOption("bar.color.ordered")
 
   # keep track of generated graphics
   plot.i <- 0

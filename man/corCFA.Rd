@@ -233,7 +233,7 @@ style("gray")
 corCFA(F1=X1:X3, F2=X4:X6)
 
 # access the lessR data set called datMach4, with variable labels
-mydata <- Read("Mach4", format="lessR", quiet=TRUE)
+mydata <- Read("Mach4", in.lessR=TRUE, quiet=TRUE)
 # calculate the correlations and store in mycor
 mycor <- cr(m01:m20)
 # specify measurement model in Lavaan notation

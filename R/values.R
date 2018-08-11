@@ -13,7 +13,7 @@ function(x, data=mydata, ...) {
   in.style <- xs$ig 
 
   # see if variable exists in the data frame, if x not in style Env or function call 
-  if (!missing(x) && !in.style) .xcheck(x.name, dname, data)
+  if (!missing(x) && !in.style) .xcheck(x.name, dname, names(data))
 
   if (!in.style) x.call <- eval(substitute(data$x))
   else {  # vars that are function names get assigned to style

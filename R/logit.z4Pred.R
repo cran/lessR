@@ -145,8 +145,7 @@ function(lm.out, nm, mydata, my.formula, brief, res.rows,
     abline(v=axTicks(1), col=col.grid, lwd=.5)
     abline(h=axTicks(2), col=col.grid, lwd=.5)
 
-    .axes(NULL, NULL, axTicks(1), axTicks(2),
-          par("usr")[1], par("usr")[3], ...)
+    .axes(NULL, NULL, axTicks(1), axTicks(2))
 
     main.lab <- "Logistic Fit and Scatterplot"
     sub.lab <- NULL

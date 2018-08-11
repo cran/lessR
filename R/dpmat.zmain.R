@@ -69,7 +69,7 @@ function(x, mylabels, sort.yx,
   if (!is.null(x.resp))
     w <- x.resp  # use existing integer codes
   else
-    for (i in 1:n.resp) w[i] <- i
+    w <- 1:n.resp
   m <- integer(length=n.var)
   for (i in 1:n.var) m[i] <- round(weighted.mean(w, mytbl[i,]), 3)
   if (sort.yx) {
@@ -105,7 +105,7 @@ function(x, mylabels, sort.yx,
     max.width <- strwidth(y.lvl[which.max(nchar(y.lvl))], units="inches")
   
     # here keep same bm if 1 or 2 line x labels
-    margs <- .marg(max.width, y.lab, x.lab, main) 
+    margs <- .marg(max.width, y.lab, x.lab, main, rotate.x) 
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm
@@ -128,7 +128,6 @@ function(x, mylabels, sort.yx,
       x.lvl <- gsub(" ", "\n", x.lvl) 
 
     .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,
-          par("usr")[1], par("usr")[3],
           rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
 
     # axis labels 
@@ -210,6 +209,7 @@ function(x, mylabels, sort.yx,
 
     # display variable labels
     txlbl <- ""
+    mylabels <- mylabels[rownames(mytbl),]
     if (!is.null(mylabels)) {
       tx <- character(length = 0)
       tx[length(tx)+1] <- ">>> Labels"
@@ -249,10 +249,8 @@ function(x, mylabels, sort.yx,
       txtbl[n.var+strt+1] <- paste("Computation of the mean based on coding",
                                    "response categories from 1 to", n.resp)
     }
-    
     myt <- cbind(myt, m[m.o])
     colnames(myt)[n.resp+2] <- "Mean"    
-    
     txfrq <- txtbl
    
     class(txsug) <- "out_piece"

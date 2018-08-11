@@ -1,5 +1,6 @@
 LineChart <-
-function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
+function(x, data=mydata, rows=NULL,
+         n.cat=getOption("n.cat"), type=NULL, 
 
          line.color=getOption("pt.color"), area=NULL, 
 
@@ -15,14 +16,14 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
          center.line=c("default", "mean", "median", "zero", "off"),
 
-         show.runs=FALSE, quiet=getOption("quiet"),
+         show.runs=FALSE, eval.df=NULL, quiet=getOption("quiet"),
          width=6, height=6, pdf=FALSE, ...) {
 
 
   center.line <- match.arg(center.line)
 
-   fill <- getOption("bar.fill") 
-   color <- getOption("pt.color")
+   fill <- getOption("bar.fill.ordered") 
+   color <- getOption("pt.color.ordered")
    panel.fill <- getOption("panel.fill")
    panel.color <- getOption("panel.color")
 
@@ -52,36 +53,58 @@ function(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
     }
   }
 
-  # get actual variable name before potential call of data$x
-  x.name <- deparse(substitute(x))
-  options(xname = x.name)
-  options(yname = x.name)  # for .lc.main, which uses y as the var
+  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
+  if (is.null(eval.df))  # default values
+    eval.df <- ifelse (shiny, FALSE, TRUE)
+   # get actual variable name before potential call of data$x
+  if (!missing(x))  # can't do is.null or anything else with x until evaluated
+    x.name <- deparse(substitute(x))  # could be a list of var names
+  else
+    x.name <- NULL  # otherwise is actually set to "NULL" if NULL
+    options(xname = x.name)
 
-  data.miss <- ifelse (missing(data), TRUE, FALSE) 
-  df.name <- deparse(substitute(data))
+  if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
+    data <- eval(substitute(data), envir=parent.frame())
+  df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
+  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+    if (class(data)[1] == "tbl_df")
+      data <- as.data.frame(data, stringsAsFactors=FALSE)
 
+  if (!is.null(x.name))
+    x.in.global <- .in.global(x.name)  # see if in global, includes vars list
+  else
+    x.in.global <- FALSE
+    
 # -----------------------------------------------------------
 # establish if a data frame, if not then identify variable(s)
+# x can be missing entirely, with a data frame passed instead
+# if x a vector, then x.name not in data, but also not in global
 
   if (!missing(x)) {
+
     # x not in global env, in df, specify data= forces to data frame
-    if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
+    if (!x.in.global) {
       .nodf(df.name)  # check to see if data frame container exists 
-      .xcheck(x.name, df.name, data)  # see if var in df, vars lists not checked
-      vars.list <- as.list(seq_along(data))
-      names(vars.list) <- names(data)
-      x.col <- eval(substitute(x), envir=vars.list)  # col num of each var
+        .xcheck(x.name, df.name, names(data))  # x-var in df?
+      data.vars <- as.list(seq_along(data))
+      names(data.vars) <- names(data)
+      ind <- eval(substitute(x), envir=data.vars)  # col num of each var      
+      if (!missing(rows)) {  # subset rows
+        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+        r <- r & !is.na(r)  # set missing for a row to FALSE
+        data <- data[r,,drop=FALSE]
+      }
       if (!("list" %in% class(data))) {
-        data <- data[, x.col]
-        if (length(x.col) == 1) {
+        data <- data[, ind]
+        if (length(ind) == 1) {
           data <- data.frame(data)  # x is 1 var
           names(data) <- x.name
          }
       }
       else {
-        data <- data.frame(data[[x.col]])
+        data <- data.frame(data[[ind]])
         names(data) <- x.name
       }
     }

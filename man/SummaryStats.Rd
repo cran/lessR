@@ -157,7 +157,7 @@ SummaryStats()
 SummaryStats(n.cat=7)
 
 # analyze just a subset of a data frame
-mydata <- Read("Employee", format="lessR", quiet=TRUE)
+mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 SummaryStats(c(Salary,Years))
 
 

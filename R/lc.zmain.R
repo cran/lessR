@@ -147,7 +147,6 @@ function(y, type,
       getOption("axis.color"), getOption("axis.x.color"))
     if (is.null(time.start) && !is.ts(x)) 
      .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-        par("usr")[1], par("usr")[3],
         rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
     else {
       axis.Date(1, x, cex.axis=axis.cex, col.axis=col.axis, ...)

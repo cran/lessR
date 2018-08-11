@@ -13,13 +13,13 @@ Reads the contents of the specified data file into an R data table, what R calls
 
 Any variable labels in a native SPSS of native R file are automatically included in the data file. See the \code{details} section below for more information. Variable labels can also be added and modified individually with the \code{lessR} function \code{\link{label}}, and more comprehensively with the \code{\link{VariableLabels}} function.
 
-The function provides feedback regarding the data that is read by invoking the \code{lessR} function \code{\link{details}}.  The brief form of this function invoked by default only lists the input files, the variable name table, and any variable labels.
+The function provides feedback regarding the data that is read by invoking the \code{lessR} function \code{\link{details}}. The brief form of this function invoked by default only lists the input files, the variable name table, and any variable labels.
 
 The \code{lessR} function \code{\link{corRead}} reads a correlation matrix.
 }
 
 \usage{
-Read(ref=NULL, format=c("csv", "SPSS", "R", "Excel", "SAS", "lessR"),
+Read(ref=NULL, format=NULL, in.lessR=FALSE,
 
          labels=NULL, widths=NULL, stringsAsFactors=FALSE,
          missing="", n.mcut=1,
@@ -44,11 +44,15 @@ Read2(\ldots, sep=";", dec=",")
   \item{ref}{File reference, either omitted to browse for the data file, or (except for .Rda
        files) a full path name or web URL, included in quotes.  A URL begins with
        \code{http://}.}
-  \item{format}{Format of the data in the file, which by default is a \code{csv} file, which
-        also will recognize tab-delimited text. As an option can be an Excel \code{.xls} or
-        \code{.xlsx} file or an SPSS \code{.sav} file, which also reads the variable labels
-        if present, or a native R data file with a file type of \code{.rda}, or a (native R)
-        data file part of \code{lessR}.}
+  \item{format}{Format of the data in the file, which by default is aligned with the
+        file type of the file to read: \code{.csv}, \code{.tsv} or \code{.txt}
+        read as a text file, \code{.xls} or \code{.xlsx} read as an Excel file, 
+        \code{.sav} reads as an SPSS file, which also reads the variable labels
+        if present, \code{.sas7bdat} reads as a SAS file, and \code{.rda} reads as a
+        native R data file. If the data file is not identified by one of these
+        file types, then explicitly set to one.}
+  \item{in.lessR}{If \code{TRUE} then the data file has been downloaded as part of the
+       lessR package.}
   \item{labels}{[This is a legacy option in which the labels are part of the data file,
        replaced by the \code{\link{VariableLabels}} function to have labels in mylabels.]
        File name for the file of variable labels. Either a full path name,
@@ -112,7 +116,7 @@ Excel DATA\cr
 Relies upon the function \code{\link{read.xlsx}} from Alexander Walker's \code{openxlsx} package. Files with a file type of \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The \code{read_excel} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file, with a default value of 1. The \code{row.names} parameter can only have a value of 1.     
 
 lessR DATA\cr
-\code{lessR} has some data sets included with the package.  \code{Read} reads each such data set by specifying its name and setting \code{format="lessR"}. Also, each included data set begins with the prefix \code{dat}, which can be deleted when specifying the name of the data set. This option is a replacement for the standard R \code{data} function, offering the added information provided by \code{\link{Read}}.
+\code{lessR} has some data sets included with the package.  \code{Read} reads each such data set by specifying its name and setting \code{in.lessR=TRUE}. (The older \code{format="lessR"} is deprecated.) Also, each included data set begins with the prefix \code{dat}, which can be deleted when specifying the name of the data set. This option is a replacement for the standard R \code{data} function, offering the added information provided by \code{\link{Read}}.
 
 FIXED WIDTH FORMATTED DATA\cr
 Relies upon \code{read.fwf}. Applies to data files in which the width of the column of data values of a variable is the same for each data value and there is no delimiter to separate adjacent data values.  An example is a data file of Likert scale responses from 1 to 5 on a 50 item survey such that the data consist of 50 columns with no spaces or other delimiter to separate adjacent data values. To read this data set, invoke the \code{widths} option of \code{read.fwf}.  
@@ -184,7 +188,7 @@ Alexander Walker (2017). openxlsx: Read, Write and Edit XLSX Files. https://CRAN
 # mydata <- Read(brief=FALSE)
 
 # read the built-in data set dataEmployee
-mydata <- Read("Employee", format="lessR")
+mydata <- Read("Employee", in.lessR=TRUE)
 
 # read a data file organized by columns, with a 
 #   5 column ID field, 2 column Age field

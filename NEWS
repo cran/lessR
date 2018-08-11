@@ -4,7 +4,108 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
+ 
+ 
+>>>>>> Changes for lessR version 3.7.6 (2018-08-10) <<<<<<
 
+-------------
+Updates 3.7.6
+-------------
+
+all analysis functions
+  each variable in a vector of x-variables are checked to 
+    actually exist in the specified data frame
+  rows parameter added to provide for subsetting the input data
+    frame by rows
+  xlab.adj and ylab.adj replaced with a vector, lab.adj
+  tm.adj, rm.adj, bm.adj, lm.adj replaced with a vector, margin.adj
+  more complete display of axis lines
+  fine-tuning of left and bottom margins
+
+BarChart
+  multiple x-variables with a common response scale such as a set
+    of items with responses on a common Likert scale, are plotted
+    on the same panel, many bar graphs combined into one
+  more room added to the top of the plot when values.pos="out" to
+    provide enough room to accommodate the added label
+  values displayed on the bars with a by variable and beside=TRUE
+  more room for legend for longer titles and value labels
+  small values not displayed in the bars, controlled by values.
+  sort.x values changed from "off", "down", "up" to "0", "-", "+"
+  properly processes tibble files from the tidyverse
+
+details
+  ordinal position of each variable now listed (also with Read)
+  
+doFactors
+  new function that converts one or more variables in a
+    data frame to factors either as replacements or new variables,
+    where the variables are specified as names: one name, a vector
+    of sequential range of names from the data frame, or any
+    arbitrary vector of names
+
+getColors
+  more pre-defined color names added so that now there is a name for
+    each 30 degrees of the HCL color wheel: 
+    "reds", "rusts", "yellows", "olives", "greens", "emeralds",
+    "turquoises", "aquas", "blues", "purples","violets", "magentas"
+    + "grays" + "colors" for a qualitative sequence
+  pre-defined color names such as "blues" define a divergent color
+    palette by specifying a vector of two such names, applicable to
+    visualization functions as an argument to the fill parameter
+  sequential color palettes created with lightness of colors closer
+    to each other the smaller number of colors generated
+  trans options or transparency
+
+Histogram
+  properly processes tibble files from the tidyverse
+
+Plot
+  for gray theme, grayscale applied to multiple line plots
+  color can be set to a sequential color range such as "blues"
+  fit="ls" changed to fit="lm", former still works
+  fit.se default changed from 0 to 0.95, so now shows by default
+  se.fill a little darker with no border lines
+    
+Read
+  empty character string option added to browse for file, Read(""), 
+    more consistent with specifying a name than Read(), which still works
+  when in RStudio added a warning added for browsing with rd("")
+    that the browsing window is obscured behind the RStudio window
+  in.lessR parameter added in place of deprecated format="lessR"
+  when in RStudio, lists the data table in the Source window
+ 
+style
+  new default color theme is "colors", which yields discrete HCL colors 
+    of different hues for bar/pie charts, and no longer a sub.theme
+
+
+---------------
+Bug Fixes 3.7.6
+--------------- 
+
+BarChart, Histogram
+  for printing multiple variables, erroneous "no categorical
+    variables" not displayed
+  color ranges such as "colors" can be used for Trellis plots
+
+margins
+  axis label set to empty character string, "", now treated as NULL
+    instead of occupying space as if there were a label
+  
+PieChart
+  now properly generates a gray scale fill pattern when requested
+
+Plot
+  entered colors applied to line plots
+  date axis annotations proper size instead of too large
+  BPFM bottom margin corrected when value labels are rotated
+  
+style
+  margins adjusted for better placement with large axis labels
+
+
+  
   
 >>>>>> Changes for lessR version 3.7.5 (2018-06-03) <<<<<<
 

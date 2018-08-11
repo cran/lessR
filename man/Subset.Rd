@@ -2,7 +2,7 @@
 \alias{Subset}
 \alias{subs}
 
-\title{Subset the Values of an Integer or Factor Variable}
+\title{Subset the Values of One or More Variables}
 
 \description{
 Abbreviation: \code{subs}
@@ -86,16 +86,16 @@ myd <- Subset(-c(1,4))
 mydata <- Subset(wool=="A" & tension=="L", columns=breaks, data=warpbreaks)
 
 # delete Years and Salary 
-mydata <- Read("Employee", format="lessR", quiet=TRUE)
+mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 mydata <- Subset(columns=-c(Years, Salary))
 
 # locate, display only, a specified row by its row.name
-mydata <- Read("Employee", format="lessR", quiet=TRUE)
+mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 Subset(row.names(mydata)=="Fulton, Scott")
 
 # randomly extract 60\% of the data
 # generate code to create the hold out sample of the rest
-mydata <- Read("Employee", format="lessR", quiet=TRUE)
+mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 mysubset <- Subset(random=.6, holdout=TRUE)
 }
 

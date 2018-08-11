@@ -1,5 +1,5 @@
 Plot <-
-function(x, y=NULL, data=mydata,
+function(x, y=NULL, data=mydata, rows=NULL,
          values=c("data", "count", "prop", "sum", "mean", "sd",
                   "min", "median", "max"),
          n.cat=getOption("n.cat"),
@@ -27,7 +27,7 @@ function(x, y=NULL, data=mydata,
          smooth=FALSE, smooth.points=100, smooth.trans=0.20,
          smooth.bins=128,
 
-         fit=FALSE, fit.se=0, ellipse=FALSE, 
+         fit="off", fit.se=0.95, ellipse=0, 
 
          bin=FALSE, bin.start=NULL, bin.width=NULL, bin.end=NULL,
          breaks="Sturges", cumul=FALSE, 
@@ -36,23 +36,22 @@ function(x, y=NULL, data=mydata,
          center.line=c("default", "mean", "median", "zero", "off"),
          show.runs=FALSE, stack=FALSE,
 
-         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
-
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-         xlab.adj=0, ylab.adj=0,
-         bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
+         lab.adj=c(0,0), margin.adj=c(0,0,0,0),
 
          rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
          offset=getOption("offset"),
 
          xy.ticks=TRUE, value.labels=NULL, label.max=20, origin.x=NULL,
 
+         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
+
          auto=FALSE, eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
          do.plot=TRUE, width=NULL, height=NULL, pdf.file=NULL, 
          fun.call=NULL, ...) {
 
 
-  # ------
+# ------
   # set parameter values 
 
   vbs.pt.fill <- match.arg(vbs.pt.fill)
@@ -71,18 +70,6 @@ function(x, y=NULL, data=mydata,
   violin <- ifelse (grepl("v", vbs.plot), TRUE, FALSE)
   box <- ifelse (grepl("b", vbs.plot), TRUE, FALSE)
 
-  data.miss <- ifelse (missing(data), TRUE, FALSE) 
-  if (data.miss && shiny)  # force evaluation (not lazy)
-    data <- eval(substitute(data), envir=parent.frame())
-  df.name <- deparse(substitute(data))
-  options(dname = df.name)
-
-  # if a tibble convert to data frame
-  # data.frame is already #3 in class(data), so no char --> factor conversion 
-  if (exists(df.name, where=.GlobalEnv)) if (class(data)[1] == "tbl_df") {
-    data <- as.data.frame(data, stringsAsFactors=TRUE)
-  }
-
   k.iqr <- k   # k is a function name, so do not use internally
 
   cat.x <- NULL;  num.cat.x <- NULL;  cat.y <- NULL;  num.cat.y <- NULL; 
@@ -99,6 +86,7 @@ function(x, y=NULL, data=mydata,
   ellipse.color <- getOption("ellipse.color")
   ellipse.lwd <- getOption("ellipse.lwd")
 
+  if (fit == "ls") fit <- "lm"  # new value
   fit.color <- getOption("fit.color")
   fit.lwd <- getOption("fit.lwd")
   se.fill <- getOption("se.fill")
@@ -166,9 +154,13 @@ function(x, y=NULL, data=mydata,
     if (ellipse.miss) ellipse <- 0.95
     if (MD.miss) MD.cut <- 6
     if (add.miss) add <- "means"
-    if (fit.miss) fit <- "ls"
+    if (fit.miss) fit <- "lm"
   }
-
+  
+  xlab.adj <- lab.adj[1];   ylab.adj <- lab.adj[2]
+  tm.adj <- margin.adj[1];  rm.adj <- margin.adj[2]
+  bm.adj <- margin.adj[3];  lm.adj <- margin.adj[4]
+  
   date.ts <- FALSE  # default is not a time series
   freq.poly <- FALSE  # default is not a frequency polygon
 
@@ -176,15 +168,12 @@ function(x, y=NULL, data=mydata,
 
   if (show.runs) run <- TRUE
 
-  # fit.ln
-  if (fit.se[1] > 0) if (fit.miss) fit <- TRUE
-
   if (is.logical(fit))
     fit.ln <- ifelse (fit, "loess", "off")
   if (is.character(fit)) {
-    if (!(fit %in% c("loess", "ls", "off"))) {
+    if (!(fit %in% c("loess", "lm", "off", "ls"))) {  # "ls" deprecated
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "fit applies only for  loess  or  ls  (least squares)\n\n")
+        "fit applies only for  loess  or  lm  (linear model)\n\n")
     }
     fit.ln <- fit  # fit.ln passed to .plt.main
   }
@@ -195,7 +184,11 @@ function(x, y=NULL, data=mydata,
     bin <- TRUE
 
   # area
-  if (stack) if (area.miss) area <- TRUE  # stack default
+  if (!is.logical(area))  {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Parameter  area  is logical, TRUE or FALSE, to trigger area.fill\n\n")
+  }
+  if (stack) if (area.miss) area <- TRUE  # stack default has area
   if (area) if (missing(stack)) stack <- TRUE
   area.fill <- ifelse (area, getOption("area.fill"), "transparent")
 
@@ -267,15 +260,26 @@ function(x, y=NULL, data=mydata,
   .plt.bad(x.miss, y.miss, values, breaks, bin.start, n.row, n.col,
            MD.cut, out.cut, fit.se, ...)
 
-
-  # ----------
-  # evaluate x
+  # ---------------------------------
+  # get variable and data frame names
   
-  # get actual variable name before potential call of data$x
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
+  if (data.miss && shiny)  # force evaluation (not lazy)
+    data <- eval(substitute(data), envir=parent.frame())
+  df.name <- deparse(substitute(data))
+  options(dname = df.name)
+
+  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+    if (class(data)[1] == "tbl_df")
+      data <- as.data.frame(data, stringsAsFactors=FALSE)
+    
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
 
-  # get data to be analyzed into data.x data frame
+  x.in.global <- .in.global(x.name)  # see if in global, includes vars lists
+
+  
+  #  get data to be analyzed into data.x data frame
 
   # process row.names if specified
   if (x.name == "row.names") {
@@ -286,27 +290,33 @@ function(x, y=NULL, data=mydata,
   }
 
   # x not in global env, in df, specify data= forces to data frame
-  else if (!exists(x.name, where=.GlobalEnv) || !data.miss) {
+  else if (!x.in.global) {
     if (eval.df) {
       .nodf(df.name)  # check to see if data frame container exists 
-      .xcheck(x.name, df.name, data)  # var in df?, vars lists not checked
+      .xcheck(x.name, df.name, names(data))  # stop if x an expression
     }
-    all.vars <- as.list(seq_along(data))  # even if only a single var
-    names(all.vars) <- names(data)  # all data in data frame
-    x.col <- eval(substitute(x), envir=all.vars)  # col num of selected vars
+    data.vars <- as.list(seq_along(data))
+    names(data.vars) <- names(data)
+    x.col <- eval(substitute(x), envir=data.vars)  # col num of each var
+    
+    if (!missing(rows)) {  # subset rows
+      r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+      r <- r & !is.na(r)  # set missing for a row to FALSE
+      data <- data[r,,drop=FALSE]
+    }
     if (!("list" %in% class(data))) {
       data.x <- data[, x.col]
       data.x <- data.frame(data.x)
-     }      
-     else {  # class of data is "list"
-        data.x <- data.frame(data[[x.col]])
+    }      
+    else {  # class of data is "list"
+       data.x <- data.frame(data[[x.col]])
     }
     if (is.numeric(x.col))
-      names(data.x) <- names(all.vars)[x.col]
+      names(data.x) <- names(data.vars)[x.col]
     else
       names(data.x) <- x.col  # if x a vector, x.col can return names
     #data.miss <- FALSE  # use mydata even if not specified (default)
-  }  # end x not in global
+  }  # end x in df
 
   # x is in the global environment (vector or data frame)
   # can only access x directly if it is not in a data frame
@@ -345,10 +355,8 @@ function(x, y=NULL, data=mydata,
   }
       
   else {  # x a not ts vector in global
-    if (!is.function(x)) {
+    if (!is.function(x))
       data.x <- data.frame(x)  # x is 1 var
-      cat(">>> ", x.name, "in the global environment, not a data frame\n\n")
-    }
     else
       data.x <- data.frame(eval(substitute(data$x)))  # x is 1 var
     names(data.x) <- x.name
@@ -473,16 +481,12 @@ function(x, y=NULL, data=mydata,
   #-----------
   # evaluate y
 
-  #if (!y.miss) if (deparse(substitute(y)) %in% c("count", "prop")) {
-    #if (deparse(substitute(y)) == "count") values <- "count"
-    #if (deparse(substitute(y)) == "prop") values <- "prop"
-    #y.miss <- TRUE
-  #}
-
   if (!y.miss) {
     # get actual variable name before potential call of data$y
     y.name <- deparse(substitute(y))
     options(yname = y.name)
+  
+    y.in.global <- .in.global(y.name)  # see if in global, includes vars lists
 
     if (deparse(substitute(y)) == "row.names") {
       # retain order of row names, otherwise will be alphabetical
@@ -493,15 +497,13 @@ function(x, y=NULL, data=mydata,
     }
       
     # y not in global env, in df, specify data= forces to data frame
-    else if (!exists(y.name, where=.GlobalEnv) || !data.miss) {
-        if (eval.df) {
-          .nodf(df.name)  # check to see if data frame container exists 
-          .xcheck(y.name, df.name, data)  # var in df?, vars lists not checked
-        }
-        all.vars <- as.list(seq_along(data))  # even if only a single var
-        names(all.vars) <- names(data)  # all data in data frame
-        y.col <- eval(substitute(y), envir=all.vars)  # col num selected vars
-       if (!("list" %in% class(data))) {
+    else if (!y.in.global) {
+        if (eval.df) .xcheck(y.name, df.name, names(data))  # var in df?
+        data.vars <- as.list(seq_along(data))  # even if only a single var
+        names(data.vars) <- names(data)  # all data in data frame
+        y.col <- eval(substitute(y), envir=data.vars)  # col num selected vars
+        
+        if (!("list" %in% class(data))) {
           data.y <- data[, y.col]
           data.y <- data.frame(data.y)
        }      
@@ -509,7 +511,7 @@ function(x, y=NULL, data=mydata,
           data.y <- data.frame(data[[y.col]])
         }
       if (is.numeric(y.col))
-        names(data.y) <- names(all.vars)[y.col]
+        names(data.y) <- names(data.vars)[y.col]
       else
         names(data.y) <- y.col
       }  # end global y
@@ -517,15 +519,17 @@ function(x, y=NULL, data=mydata,
       else if (is.data.frame(y)){ # y is in the global env (vector or data frame)
           # y a data frame
           data.y <- y
-       }
+      }
        
-        else {  # y a vector in global
-          if (!is.function(y))
-            data.y <- data.frame(y)  # y is 1 var
-          else
-            data.y <- data.frame(eval(substitute(data$y)))  # y is 1 var
-          names(data.y) <- y.name
+      else {  # y a vector in global
+        if (!is.function(y)) {
+          .xstatus(y.name, df.name, quiet)  # in global note
+          data.y <- data.frame(y)  # y is 1 var
         }
+        else
+          data.y <- data.frame(eval(substitute(data$y)))  # y is 1 var
+        names(data.y) <- y.name
+      }
 
       n.y_var <- ncol(data.y)  # number of y-variables
       y.call <- data.y
@@ -632,7 +636,7 @@ function(x, y=NULL, data=mydata,
         Trellis <- TRUE
         c.type <- "cont"
        }
-       else {  # run/ts chart
+       else {  # runs chart
           if (by1.miss) {  # single panel
             Trellis <- FALSE
           }
@@ -744,7 +748,7 @@ function(x, y=NULL, data=mydata,
 
     # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
-      .xcheck(by.name, df.name, data)
+      .xcheck(by.name, df.name, names(data))
 
     if (!in.global)
       by.call <- eval(substitute(data$by))
@@ -774,7 +778,7 @@ function(x, y=NULL, data=mydata,
 
     # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
-      .xcheck(by1.name, df.name, data)
+      .xcheck(by1.name, df.name, names(data))
 
     if (!in.global)
       by1.call <- eval(substitute(data$by1))
@@ -805,7 +809,7 @@ function(x, y=NULL, data=mydata,
 
     # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
-      .xcheck(by2.name, df.name, data)
+      .xcheck(by2.name, df.name, names(data))
 
     if (!in.global)
       by2.call <- eval(substitute(data$by2))
@@ -838,7 +842,7 @@ function(x, y=NULL, data=mydata,
     # see if var exists in data frame, if x not in global Env or function call
     if (!is.num) {  # size.name is the name of a variable
       if (!in.global) {
-        .xcheck(size.name, df.name, data)
+        .xcheck(size.name, df.name, names(data))
         size <- eval(substitute(data$size))
       }
       if (!is.numeric(size)) {
@@ -856,7 +860,7 @@ function(x, y=NULL, data=mydata,
   else
     if (missing(size.cut)) size.cut <- TRUE
 
-  if (!grepl("s", vbs.plot)) size <-  0
+  if (!grepl("s", vbs.plot)) size <- 0
 
 
   # evaluate ID 
@@ -878,7 +882,7 @@ function(x, y=NULL, data=mydata,
     else {  # allow a specified variable in data table to be the ID
       ID.name <- deparse(substitute(ID))
       .xstatus(ID.name, df.name, quiet)  # check for data existing
-      .xcheck(ID.name, df.name, data)  # var exists in data frame?
+      .xcheck(ID.name, df.name, names(data))  # var exists in data frame?
       ID.call <- eval(substitute(data$ID))
     }
   }
@@ -1133,15 +1137,14 @@ function(x, y=NULL, data=mydata,
   
   # size of fit line
   # windows line too thin at 1, but no increments allowed, and 2 is too thick
-  if (fit.ln != "off") if (is.null(fit.lwd)) 
-    fit.lwd <- ifelse(.Platform$OS == "windows", 2, 1.5)
+  if (fit.ln != "off") if (is.null(fit.lwd)) fit.lwd <- getOption("fit.lwd") 
+#   fit.lwd <- ifelse(.Platform$OS == "windows", 2, 1.5)
 
   # size of points
   scale.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
   if (size.miss) {  # size.pt not set yet
     size.pt <- scale.pt
-    if (options("device") == "RStudioGD")
-      size.pt <- size.pt*1.20
+#   if (options("device") == "RStudioGD") size.pt <- size.pt*1.10
 
     if (object == "both") {
       size.pt <- 0.77 * size.pt  # default pt size for lines
@@ -1265,11 +1268,15 @@ function(x, y=NULL, data=mydata,
         mylabs[i] <- mylabels[which(names(mylabels) == nm[i])]
     }
     if (all(mylabs == "not available")) mylabs <- NULL
+    
+    l.name <- "mylabels"
+    if (exists(l.name, where=.GlobalEnv))
+      mylabs <- get(l.name, pos=.GlobalEnv)
 
     if (is.null(xlab)) xlab <- ""  # suppress x-axis label if not specified
 
     .dpmat.main(data[,x.col], mylabs, sort.yx,
-      getOption("bar.fill"), pt.color, panel.fill,
+      getOption("bar.fill.ordered"), pt.color, panel.fill,
       pt.trans, shape, area.fill, panel.color,
       low.fill, hi.fill,
       xy.ticks, xlab, ylab, main, sub, size,
@@ -1426,6 +1433,17 @@ function(x, y=NULL, data=mydata,
       }
 
       if (do.plot) {
+
+      if (nrow(x.call) != nrow(y.call))  {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "number of elements in x: ", nrow(x.call), "\n",
+          "number of elements in y: ", nrow(y.call), "\n\n",
+          "The number of elements must be equal, probably\n",
+          "  have variables from user workspace so maybe\n",
+          "  use the  remove function, e.g., remove(x)\n\n")
+      }
+              
+         
         .plt.main(x.call, y.call, by.call, n.cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
           object, values,
@@ -1450,6 +1468,7 @@ function(x, y=NULL, data=mydata,
       }
 
       if (!quiet) {  # text output
+
         .plt.txt(x.call, y.call, values, object, n.cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
           xlab, ylab,

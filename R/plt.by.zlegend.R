@@ -9,19 +9,11 @@ function(mylevels, color, fill, shp, trans.pts, col.bg, usr,
   n.levels <- length(mylevels)
   by.name <- getOption("byname")
 
-  legend.labels <- abbreviate(mylevels,6)
-  #if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
-    #max.width <- which(nchar(legend.labels) == max(nchar(legend.labels)))
-    #legend.labels[max.width] <- paste(legend.labels[max.width], "    ", sep="")
-  #}
+  legend.labels <- abbreviate(mylevels,10)
 
-  #wt <- ifelse (options("device") == "RStudioGD", 10, 12)
   wt <- 10
   legend.title  <- abbreviate(by.name, wt)
-  #if (options("device") == "RStudioGD" && .Platform$OS != "windows") {
-    #if (nchar(legend.title) > nchar(legend.labels[max.width][1]))
-      #legend.title <- paste(" ", legend.title, " ", sep="") 
-  #}
+
   ll <- legend(0,0, legend=legend.labels, title=legend.title, cex=.7,
                pt.cex=pt.size, pt.lwd=pt.lwd, plot=FALSE)
 
@@ -30,7 +22,7 @@ function(mylevels, color, fill, shp, trans.pts, col.bg, usr,
   epsilon <- (size[1] - ll$rect$w) / 2
 
   axis.vert <- usr[4] - usr[3]
-  xleft <- usr[2] + epsilon   # usr[2] user coordinate of right axis
+  xleft <- usr[2] + epsilon  # usr[2] user coordinate of right axis
   lgnd.vhalf <- (ll$rect$h) / 2
   axis.cntr <- axis.vert / 2  + usr[3]
   ytop <- axis.cntr + lgnd.vhalf  # user coordinate of legend top

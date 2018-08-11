@@ -78,7 +78,7 @@ function(old.vars, new.vars=NULL, old, new, data=mydata,
     }
 
     # see if variable exists in data frame, if x not in style Env or function call 
-    .xcheck(x.name, dname, data)
+    .xcheck(x.name, dname, names(data))
 
     x.call <- as.vector(eval(substitute(data[,vars[ivar]])))
 

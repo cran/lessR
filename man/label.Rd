@@ -57,7 +57,7 @@ The specified value of \code{value} is returned.
 # or view all variable labels in mydata
 #db()
 
-#mydata <- Read("Employee", format="lessR")
+#mydata <- Read("Employee", in.lessR=TRUE)
 # specify a label of variable in a data frame other than mydata
 #myd <- Subset(Gender=="M")
 #myd <- label(Gender, "Only is Male", data=myd)

@@ -75,7 +75,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       c.nm <- colnames(x)  # store for later use
       colnames(x) <- .abbrev(colnames(x), label.max)
     }
-
+    
     # use for returned output, x is a 2-way table
     freq.df <- as.data.frame(x)
 
@@ -217,7 +217,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       n.dim <- 1
 
       # potential abbreviation of column labels
-#     if (is.na(names(x)[length(x)])) names(x)[length(x)] <- "missing"
+      #  if (is.na(names(x)[length(x)])) names(x)[length(x)] <- "missing"
       mx.chr <- max(nchar(names(x)))
 
       c.nm <- NULL

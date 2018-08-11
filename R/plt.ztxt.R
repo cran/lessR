@@ -166,7 +166,7 @@ function(x, y, values, object, n.cat,
           fc <- paste("Plot(", x.name, ", ", y.name, sep="")
 
           if (!grepl("fit", fncl)) {
-            txt <- ", fit=\"ls\", fit.se=1:3)  # fit line with standard errors"
+            txt <- ", fit=\"lm\", fit.se=c(.90,.99))  # fit line, standard errors"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
 

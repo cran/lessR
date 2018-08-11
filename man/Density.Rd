@@ -15,7 +15,8 @@ When output is assigned into an object, such as \code{d} in \code{d <- dn(Y)}, t
 }
 
 \usage{
-Density(x, data=mydata, n.cat=getOption("n.cat"), Rmd=NULL, 
+Density(x, data=mydata, rows=NULL,
+        n.cat=getOption("n.cat"), Rmd=NULL, 
 
  bw=NULL, type=c("both", "general", "normal"),
        histogram=TRUE, bin.start=NULL, bin.width=NULL,
@@ -44,6 +45,8 @@ dn(\ldots)
         frame, \code{mydata} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{mydata}.}
+  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+       to analyze.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric data
         type for which the variable will be analyzed as categorical. Default is 0.}
@@ -129,6 +132,8 @@ If \code{x.pt} is specified, then \code{type} is set to general and \code{y.axis
 
 DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
+       
+The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than.
 
 COLOR THEME\cr
 Individual colors in the plot can be manipulated with options such as \code{color.bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub.theme="black")} for a black background and partial transparency of plotted colors. 
@@ -178,6 +183,9 @@ David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})
 
 
 \examples{
+
+# make sure default style is active
+style()
 
 # create data frame, mydata, to mimic reading data with Read function
 # mydata contains both numeric and non-numeric data

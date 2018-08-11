@@ -57,9 +57,9 @@ The merged data frame is returned, usually assigned the name of \code{mydata} as
 \examples{
 # Horizontal
 #-----------
-mydata <- Read("Employee", format="lessR", quiet=TRUE)
+mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 Emp1a <- Subset(1:4, columns = c("Years", "Gender", "Dept", "Salary"))
-Emp1b <- Subset(1:4, columns = c("Satisfaction", "HealthPlan"))
+Emp1b <- Subset(1:4, columns = c("JobSat", "Plan"))
 # horizontal merge
 mydata <- Merge(Emp1a, Emp1b, by="row.names")
 # suppress output to console
@@ -67,7 +67,7 @@ mydata <- Merge(Emp1a, Emp1b, by="row.names", quiet=TRUE)
 
 # Vertical
 #---------
-mydata <- Read("Employee", format="lessR", quiet=TRUE)
+mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 Emp2a <- Subset(1:4)
 Emp2b <- Subset(7:10)
 # vertical merge

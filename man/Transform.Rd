@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{trans}
 
-Based closely on the standard R \code{\link{transform}} function. Unlike the R function, output is provided that provides feedback and guidance regarding the specified transformation(s), and variable labels are accommodated. Existing variable labels are retained in the transformed data frame. If the transformation creates a new variable, then provide a corresponding variable label with the \code{lessR} function \code{\link{label}}. 
+A wrapper for the base R \code{\link{transform}} function that defaults to the mydata data frame and provides output regarding the specified transformation(s). 
 }
 
 \usage{
@@ -54,7 +54,6 @@ mydata <- read.table(text="Status Severity
 mydata <- Transform(Status=Status-1)
 
 # abbreviated form
-# replace original with recoded
 mydata <- trans(StatusNew=Status-1)
 
 # replace Status with a transformed version
@@ -67,16 +66,16 @@ newdata <- Transform(Status=Status-1)
 mydata <- Transform(Status=factor(Status, labels=c("OK","Hurts","Painful","Yikes")))
 
 # read lessR data set dataEmployee into data frame mydata
-mydata <- Read("Employee", format="lessR")
+mydata <- Read("Employee", in.lessR=TRUE)
 # multiple transformations in one statement
 #  Months is a new variable
 #  Salary is a new version of the old Salary
-#  Satisfaction was read as non-numeric, so as a factor, but is also ordinal
-#  HealthPlan was read as numeric values 0,1,2, now converted to a factor
+#  JobSat was read as non-numeric, so as a factor, but is also ordinal
+#  Plan was read as numeric values 0,1,2, now converted to a factor
 mydata <- Transform(
   Months=Years*12, 
   Salary=Salary/1000,
-  HealthPlan=factor(HealthPlan,
+  Plan=factor(Plan,
      levels=c(0,1,2), labels=c("GoodHealth", "YellowCross", "BestCare"))
 )
 # new variable Months now exists
@@ -91,14 +90,14 @@ db()
 # ----------------------------
 
 # transform a nominal variable to ordinal, re-order the categories
-mydata <- Transform(Satisfaction=
-  factor(Satisfaction, levels=c("low", "med", "high"), ordered=TRUE))
+mydata <- Transform(JobSat=
+  factor(JobSat, levels=c("low", "med", "high"), ordered=TRUE))
 
 # recode levels of a factor that should remain a factor
 #   with the Transform and factor functions
 # using Recode destroys the factor attribute, converting to
 #   character strings instead, so Recode does not allow
-mydata <- Read("Employee", format="lessR")
+mydata <- Read("Employee", in.lessR=TRUE)
 mydata <- Transform(
     Gender=factor(Gender, levels=c("F", "M"), labels=c("Female", "Male"))
 )
@@ -115,7 +114,7 @@ mydata <- Recode(Gender, old=c(1,2), new=c(0,1))
 # recode integer values to levels of a factor with value labels
 #   with the Transform function instead of Recode
 # here Gender has values 0 and 1 in the data
-mydata <- Read("Mach4", format="lessR")
+mydata <- Read("Mach4", in.lessR=TRUE)
 mydata <- Transform(
       Gender=factor(Gender, levels=c(0,1), labels=c("Male","Female"))
       )

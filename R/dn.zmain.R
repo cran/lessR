@@ -110,11 +110,9 @@ function(x,
   # axis, axis ticks
   if (!y.axis)
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
-          par("usr")[1], par("usr")[3], 
           rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
   else
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-          par("usr")[1], par("usr")[3],
           rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
 
   # axis value labels

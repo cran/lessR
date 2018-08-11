@@ -16,7 +16,8 @@ If the provided object to analyze is a set of multiple variables, including an e
 }
 
 \usage{
-LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL, 
+LineChart(x, data=mydata, rows=NULL,
+          n.cat=getOption("n.cat"), type=NULL, 
 
          line.color=getOption("pt.color"), area=NULL, 
 
@@ -32,7 +33,7 @@ LineChart(x, data=mydata, n.cat=getOption("n.cat"), type=NULL,
 
          center.line=c("default", "mean", "median", "zero", "off"),
 
-         show.runs=FALSE, quiet=getOption("quiet"),
+         show.runs=FALSE, eval.df=NULL, quiet=getOption("quiet"),
          width=6, height=6, pdf=FALSE,
          \ldots)
 
@@ -48,6 +49,8 @@ lc(\ldots)
         frame, \code{mydata} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{mydata}.}
+  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+       to analyze.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric
         data type for which the variable will be analyzed as a categorical.
@@ -104,6 +107,11 @@ lc(\ldots)
       for the \code{"median"} by default when the values randomly vary about the mean. A
       value of \code{"zero"} specifies the center line should go through zero.}
   \item{show.runs}{If \code{TRUE}, display the individual runs in the run analysis.}
+  \item{eval.df}{Determines if to check for existing data frame and
+        specified variables. By default is \code{TRUE} 
+        unless the \code{shiny} package is loaded then set to \code{FALSE} so
+        that Shiny will run. Needs to be set to \code{FALSE} if using
+        the pipe \code{\%\>\%} notation.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
@@ -126,6 +134,8 @@ If the data values randomly vary about the mean, the default is to plot the mean
 
 DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
+       
+The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than.
 
 COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{color}. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{dodgerblue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub.theme="black")} for a black background and partial transparency of plotted colors.  
@@ -186,16 +196,17 @@ lc(Y, xlab="My xaxis", ylab="My yaxis", main="My Best Title",
    cex.main=1.5, font.main=3, ylim=c(-4,4), shape.pts=24)
   
 # generate steadily increasing values
-Y <- sort(rexp(50))
+# get a variable named A in the user workspace
+A <- sort(rexp(50))
 # default line chart
-LineChart(Y)
+LineChart(A)
 # line chart with border around plotted values
-LineChart(Y, area="off")
+LineChart(A, area="off")
 # time series chart, i.e., with dates, and filled area
 # with option label for the x-axis
-LineChart(Y, time.start="2000/09/01", time.by="3 months")
+LineChart(A, time.start="2000/09/01", time.by="3 months")
 # time series chart from a time series object
-y.ts <- ts(Y, start=c(2000, 9), frequency=4)
+y.ts <- ts(A, start=c(2000, 9), frequency=4)
 LineChart(y.ts)
 
 # LineChart with built-in data set
