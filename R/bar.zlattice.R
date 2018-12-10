@@ -4,7 +4,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
          trans, size.pt, xlab, ylab, main,
          rotate.x, offset,
          width, height, pdf.file,
-         segments.x, breaks, c.type) {
+         segments.x, breaks, c.type, quiet) {
 
 
   cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n")
@@ -87,7 +87,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
   lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
   adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
   gl <- .getlabels(xlab, ylab, main, lab.x.cex=lab.x.cex, 
-                     lab.y.cex=lab.y.cex)
+                   lab.y.cex=lab.y.cex)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   y.name <- gl$yn; y.lbl <- gl$yl
   y.lab <- ifelse (was.null, paste(gl$yb, x.name), gl$yb)
@@ -240,24 +240,24 @@ function(x, by1, by2, nrows, ncols, asp, prop,
         )
 
   # display
-  if (is.null(pdf.file)) pdf.file <- FALSE  # from BarChart
-  if (pdf.file) {
-    pdf(pdf.file, width=width, height=height)
-    print(p)
-    dev.off()
+  if (!is.null(pdf.file)) {
+    cat("\n>>> pdf.file does not work for Trellis graphics, manually save\n\n")
+#   pdf(pdf.file, width=width, height=height)
+#   print(p)
+#   dev.off()
+# }
+# else {
   }
-  else {
-    print(p)
-  }
+  print(p)
 
   # text output
-  if (!getOption("quiet")) {
+  if (!quiet) {
 
     if (c.type == "hist"  &&  is.null(by2)) {
       stuff <- .ss.numeric(x, by1, digits.d=getOption("digits.d"), 
                            brief=TRUE, y.name=getOption("by1name"))
       txsts <- stuff$tx
-      class(txsts) <- "out_piece"
+      class(txsts) <- "out"
       output <- list(out_stats=txsts)
       class(output) <- "out_all"
       print(output)
@@ -272,8 +272,8 @@ function(x, by1, by2, nrows, ncols, asp, prop,
           txfrq <- stats$txfrq
           txXV <- stats$txXV
 
-          class(txttl) <- "out_piece"
-          class(txXV) <- "out_piece"
+          class(txttl) <- "out"
+          class(txXV) <- "out"
           output <- list(out_frq=txfrq, out_chi=txXV)
           class(output) <- "out_all"
           print(output)      

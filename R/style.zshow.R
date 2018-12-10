@@ -3,13 +3,13 @@ function() {
 
     cat("\nAvailable Themes\n")
     cat("----------------\n")
-    cat("colors", " lightbronze",  " dodgerblue", " darkred", " gray", " gold",
-        " darkgreen", " blue", " red", " rose", " green", " purple", " sienna",
-        " brown", " orange", " white", "\n", sep="")
+    cat("colors", "lightbronze",  "dodgerblue", "darkred", "gray", "gold",
+        "darkgreen", "blue", "red", "rose", "green", "purple", "sienna",
+        "brown", "orange", "white", "\n")
 
     cat("\nAvailable Sub-themes\n")
     cat("--------------------\n")
-    cat("default", "black", "colors", "no.y.axis", "\n\n")
+    cat("default", "black", "wsj", "\n\n")
 
     cat("THEME\n")
     cat("theme ........ Theme color .......", getOption("theme"), "\n")

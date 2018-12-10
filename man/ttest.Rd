@@ -18,7 +18,7 @@ Can also be called from the more general \code{\link{model}} function.
 \usage{
 ttest(x=NULL, y=NULL, data=mydata, paired=FALSE,
 
-         n=NULL, m=NULL, s=NULL, mu0=NULL, 
+         n=NULL, m=NULL, s=NULL, mu=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
 
          Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", xlab=NULL, 
@@ -48,7 +48,7 @@ tt(\ldots)
   \item{n}{Sample size for one group.}
   \item{m}{Sample size for one group.}
   \item{s}{Sample size for one group.}
-  \item{mu0}{Hypothesized mean for one group. If not present, then confidence interval only.}
+  \item{mu}{Hypothesized mean for one group. If not present, then confidence interval only.}
   \item{n1}{Sample size for first of two groups.}
   \item{n2}{Sample size for second of two groups.}
   \item{m1}{Sample mean for first of two groups.}
@@ -190,7 +190,7 @@ ttest(Score ~ StudyType, data=dataLearn)
 ttest(Salary)
 
 # confidence interval and hypothesis test, from data
-ttest(Salary, mu0=52000)
+ttest(Salary, mu=52000)
 
 
 # -------------------------------------------------------
@@ -230,7 +230,7 @@ tt(n=34, m=8.92, s=1.67, Ynm="Time")
 # confidence interval and hypothesis test, from descriptive stats
 # get rid of the data frame, analysis should still proceed
 rm(mydata)
-tt.brief(n=34, m=8.92, s=1.67, mu0=9, conf.level=0.90)
+tt.brief(n=34, m=8.92, s=1.67, mu=9, conf.level=0.90)
 
 # two groups: sample size, mean and sd for each group
 # specify the briefer form of the output

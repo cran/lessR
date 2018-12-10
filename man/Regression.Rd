@@ -56,30 +56,34 @@ reg.brief(\ldots, brief=TRUE)
         set by default to at least 2 or the largest number of digits in the values
         of the response variable plus 1.}
   \item{standardize}{Standardize each of the variables in the regression model before
-        conducting the analysis.}
-  \item{Rmd}{File name for the automatically generated R markdown file, if specified.
+        conducting the analysis.}\cr
+
+  \item{Rmd}{File name for the automatically generated R Markdown file, if specified.
         The file type is .Rmd, which automatically opens in RStudio, but it is a simple
         text file that can be edited with any text editor, including RStudio.}
   \item{results}{By default TRUE. If set to \code{FALSE} the results
         are not provided in the R Markdown document, relying upon the interpretations.
         Can set globally with \code{style(results=FALSE)}.}
   \item{explain}{By default TRUE. If set to \code{FALSE} the explanations are not
-        provided in the R Markdown document. Can set globally with \code{style(explain=FALSE)}.}
+        provided in the R Markdown document. Can set globally with
+        \code{style(explain=FALSE)}.}
   \item{interpret}{By default TRUE. If set to \code{FALSE} the interpretations
         of the results are not provided in the R Markdown document.  Can set globally
         with \code{style(interpret=FALSE)}.}
-  \item{document}{By default TRUE If set to \code{FALSE} the documentation
+  \item{document}{By default TRUE. If set to \code{FALSE} the R documentation
         is not provided in the R Markdown file.  Can set globally with
         \code{style(document=FALSE)}.}
-  \item{code}{By default TRUE. If set to \code{FALSE} the code that generates the results
-        is not provided in the R Markdown file. Can set globally
-        with \code{style(code=FALSE)}.}
+  \item{code}{By default TRUE. If set to \code{FALSE} the R code that generates the
+        results is not provided in the R Markdown file. Can set globally
+        with \code{style(code=FALSE)}.}\cr
+
   \item{text.width}{Width of the text output at the console.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
         with \code{\link{style}} function.}
-  \item{show.R}{Display the R instructions that yielded the \code{lessR} output, albeit without
-        the additional formatting of the results such as combining output of different
-        functions into a table.}
+  \item{show.R}{Display the R instructions that yielded the \code{lessR} output,
+        albeit without the additional formatting of the results such as combining
+        output of different functions into a table.}\cr
+
   \item{res.rows}{Default is 20, which lists the first 20 rows of data sorted by the
        specified sort criterion.  To disable residuals, specify a value of 0.  To see
        the output for all observations, specify a value of \code{"all"}.}
@@ -87,8 +91,8 @@ reg.brief(\ldots, brief=TRUE)
        criterion for the display of the rows of data and associated residuals. Other values
        are \code{"rstudent"} for externally Studentized residuals, \code{"dffits"} for dffits
        and \code{"off"} to not sort the rows of data.}
-  \item{pred.rows}{Default is 4, which lists prediction intervals only for the
-       first, middle and last 4 rows of data, unless there are 25 or less
+  \item{pred.rows}{Default is 3, which lists prediction intervals only for the
+       first, middle and last 3 rows of data, unless there are 25 or less
        rows of data when all rows are displayed.  To disable prediction intervals,
        specify a value of 0.  To see the output for rows of data, specify a value of
        \code{"all"}.}
@@ -101,14 +105,16 @@ reg.brief(\ldots, brief=TRUE)
        the first 50 values. Specify an integer to change the maximum.}
   \item{cooks.cut}{Cutoff value of Cook's Distance at which observations with a larger value
        are flagged in red and labeled in the resulting scatterplot of Residuals and Fitted
-       Values.  Default value is 1.0.}
+       Values.  Default value is 1.0.}\cr
+
   \item{scatter.coef}{Display the correlation coefficients in the upper triangle of the
         scatterplot matrix.}
   \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{knitr} can be useful
        to set to \code{FALSE} so that \code{\link{regPlot}} can be used to place
        the graphics within the output file.}
   \item{scatter.3D}{De-activated because car package no longer linked, but if set to
-       \code{TRUE}, directions are provided to use the car scatter3d function directly.}
+       \code{TRUE}, directions are provided to use the car scatter3d function directly.}\cr
+
   \item{X1.new}{Values of the first listed numeric predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{X2.new}{Values of the second listed numeric predictor variable for which forecasted values
@@ -120,7 +126,8 @@ reg.brief(\ldots, brief=TRUE)
   \item{X5.new}{Values of the fifth listed numeric predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{X6.new}{Values of the sixth listed numeric predictor variable for which forecasted values
-        and corresponding prediction intervals are calculated.}
+        and corresponding prediction intervals are calculated.}\cr
+
   \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
@@ -180,7 +187,7 @@ The output for the confidence and prediction intervals includes a table with the
 The data for the default analysis of the prediction intervals is for the values of the predictor variables for each observation, that is, for each row of the data. New values of the predictor variables can be specified for the calculation of the prediction intervals by providing values for the options \code{X1.new} for the values of the first listed predictor variable in the model, \code{X2.new} for the second listed predictor variable, and so forth for up to five predictor variables, and all predictor variables are numeric. To provide these values, use functions such as \code{\link{seq}} for specifying a sequence of values and \code{\link{c}} for specifying a vector of values. For multiple regression models, all combinations of the specified new values for all of the predictor variables are analyzed.
 
 RELATIONS AMONG THE VARIABLES\cr
-By default the correlation matrix of all the variables in the model is displayed, and, for multiple regression models, collinearity analysis is provided with the \code{vif} function from the Fox and Weisberg (2011) \code{car} package. Also provided are the first 50 models with the largest R squared adjusted from each possible model from an analysis of all possible subsets of the predictor variables.  This all subsets analysis requires the \code{leaps} function from the \code{leaps} package. These contributed packages are automatically loaded if available.  To turn off the all possible sets option, set \code{subsets=FALSE}.
+By default the correlation matrix of all the variables in the model is displayed, and, for multiple regression models, collinearity analysis is provided. Also provided are the first 50 models with the largest R squared adjusted from each possible model from an analysis of all possible subsets of the predictor variables.  This all subsets analysis requires the \code{leaps} function from the \code{leaps} package. These contributed packages are automatically loaded if available.  To turn off the all possible sets option, set \code{subsets=FALSE}.
 
 
 INVOKED R OPTIONS\cr
@@ -199,7 +206,7 @@ The output can optionally be returned and saved into an \code{R} object, otherwi
 TEXT OUTPUT\cr
 \code{out_background}: variables in the model, rows of data and retained\cr
 \code{out_estimates}: estimated coefficients, hypothesis tests and confidence intervals\cr
-\code{out_fit}: fit indices\cr
+\code{out_fit}: fit indices; st dev of residuals; R-sq with adj and PRESS versions\cr
 \code{out_anova}: analysis of variance\cr
 \code{out_cor}: correlations among all variables in the model\cr
 \code{out_collinear}: collinearity analysis\cr
@@ -209,8 +216,9 @@ TEXT OUTPUT\cr
 \code{out_ref}: references if selected on the \code{Regression} function call\cr
 \code{out_Rmd}: lists the name and location of the generated \code{Rmd} file\cr
 \code{out_plots}: list of plots generated if more than one\cr
+\code{out_suggest}: list of suggested other analyses\cr
 
-Separated from the rest of the text output are the major headings, which can then be deleted from custom collations of the output.
+Separated from the rest of the text output are the major headings, which can be not included with custom collations of the output.
 \code{out_title_bck}: BACKGROUND\cr
 \code{out_title_basic}: BASIC ANALYSIS\cr
 \code{out_title_rel}: RELATIONS AMONG THE VARIABLES\cr
@@ -249,12 +257,11 @@ STATISTICS\cr
 \code{model}: data retained for the analysis\cr
 \code{terms}: terms specified for the analysis\cr
 
-Although not typically needed for analysis, if the regression output is assigned to an object named, for example, \code{r}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(r)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out_piece}.
+Although not typically needed for analysis, if the regression output is assigned to an object named, for example, \code{r}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(r)}. Invoking the \code{\link{class}} function on the saved object reveals a class of \code{out_all}. The class of each of the text pieces of output is \code{out}.
 }
 
 \references{
 Lumley, T., \code{leaps} function from the \code{leaps} package.\cr
-Nilsson, H. and Fox, J., \code{vif} function from the \code{car} package.\cr
 
 Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, NY: Routledge.
 

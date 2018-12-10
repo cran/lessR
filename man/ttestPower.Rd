@@ -14,7 +14,7 @@ For both the one and two-group t-tests, power is calculated from a single sample
 
 \usage{
 ttestPower(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL, 
-         mmd=NULL, msmd=NULL, mdp=.8, mu0=NULL, 
+         mmd=NULL, msmd=NULL, mdp=.8, mu=NULL, 
          pdf.file=NULL, width=5, height=5, \ldots)
 
 ttp(\ldots)
@@ -34,7 +34,7 @@ ttp(\ldots)
        practical importance. The concept is optional, and only one of \code{mmd} and \code{msmd} is provided.}
   \item{mdp}{Minimum Desired Power, the smallest value of power considered to provide
        sufficient power. Default is 0.8. If changed to 0 then the concept is dropped from the analysis.}
-  \item{mu0}{Hypothesized mean, of which a provided value triggers a one-sample 
+  \item{mu}{Hypothesized mean, of which a provided value triggers a one-sample 
        analysis.}
   \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
@@ -51,7 +51,7 @@ Also plotted, if provided, is the minimal meaningful difference, \code{mmd}, as 
 
 Invoke the function with the either the within-group (pooled) standard deviation, \code{s}, or the two separate group standard deviations, \code{s1} and \code{s2}, from which \code{s} is computed.  If the separate standard deviations are provided, then also provide the sample sizes, either as a single value of \code{n} or as two separate sample sizes, \code{n1} and \code{n2}.  If separate sample sizes \code{n1} and \code{n2} are entered, their harmonic mean serves as the value of \code{n}.
 
-For power analysis of the two-sample t-test, the null hypothesis is a zero population mean difference.  For a one-sample test, the null hypothesis is specified, and it is this non-null specification of mu0 that triggers the one-sample analysis. Only non-directional or two-tailed tests are analyzed.
+For power analysis of the two-sample t-test, the null hypothesis is a zero population mean difference.  For a one-sample test, the null hypothesis is specified, and it is this non-null specification of mu that triggers the one-sample analysis. Only non-directional or two-tailed tests are analyzed.
 
 The  effect size that achieves a power of 0.8 is displayed. If a minimal meaningful difference, \code{mmd}, is provided, then the  associated power is also displayed, as well as the needed sample size to achieve a power of 0.8.
 
@@ -78,8 +78,8 @@ ttestPower(n=20, s=5, mmd=2)
 #   practical importance to obtain corresponding power
 ttestPower(n1=14, n2=27, s1=4, s2=6, msmd=.5)
   
-# power curve for one sample t-test, triggered by non-null mu0
-ttestPower(n=20, s=5, mu0=30, mmd=2)
+# power curve for one sample t-test, triggered by non-null mu
+ttestPower(n=20, s=5, mu=30, mmd=2)
 }
 
 

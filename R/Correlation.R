@@ -109,9 +109,9 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
     txmis <- stuff$txm
     txcor <- stuff$txc
 
-    class(txbck) <- "out_piece"
-    class(txmis) <- "out_piece"
-    class(txcor) <- "out_piece"
+    class(txbck) <- "out"
+    class(txmis) <- "out"
+    class(txcor) <- "out"
 
     output <- list(
       out_background=txbck, out_missing=txmis, out_cor=txcor,
@@ -132,9 +132,9 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
     txdsc <- stuff$txd
     txinf <- stuff$txi
 
-    class(txbck) <- "out_piece"
-    class(txdsc) <- "out_piece"
-    class(txinf) <- "out_piece"
+    class(txbck) <- "out"
+    class(txdsc) <- "out"
+    class(txinf) <- "out"
 
     output <- list(out_background=txbck, out_describe=txdsc, out_inference=txinf,
       r=stuff$r, tvalue=stuff$tvalue, df=stuff$df, pvalue=stuff$pvalue,

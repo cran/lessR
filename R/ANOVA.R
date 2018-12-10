@@ -245,25 +245,25 @@ function(my.formula, data=mydata, rows=NULL,
     txkfl <- .showfile2(Rmd, "R Markdown instructions")
   }
 
-  class(title_bck) <- "out_piece"
-  class(txbck) <- "out_piece"
-  class(title_des) <- "out_piece"
+  class(title_bck) <- "out"
+  class(txbck) <- "out"
+  class(title_des) <- "out"
   if (n.pred == 1)
-    class(txdes) <- "out_piece"
+    class(txdes) <- "out"
   if (n.pred == 2) {
-    class(txcn) <- "out_piece"
-    class(txcm) <- "out_piece"
-    class(txmm) <- "out_piece"
-    class(txcs) <- "out_piece"
+    class(txcn) <- "out"
+    class(txcm) <- "out"
+    class(txmm) <- "out"
+    class(txcs) <- "out"
   }
-  class(title_basic) <- "out_piece"
-  class(txanv) <- "out_piece"
-  class(txeft) <- "out_piece"
-  class(title_tukey) <- "out_piece"
-  class(txhsd) <- "out_piece"
-  class(title_res) <- "out_piece"
-  class(txres) <- "out_piece"
-  class(txplt) <- "out_piece"
+  class(title_basic) <- "out"
+  class(txanv) <- "out"
+  class(txeft) <- "out"
+  class(title_tukey) <- "out"
+  class(txhsd) <- "out"
+  class(title_res) <- "out"
+  class(txres) <- "out"
+  class(txplt) <- "out"
   
 
   if (n.pred == 1)  {

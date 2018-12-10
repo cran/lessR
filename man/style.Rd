@@ -15,8 +15,8 @@ style(
   theme=c("colors", "lightbronze", "dodgerblue", "darkred", "gray",
       "gold", "darkgreen", "blue", "red", "rose", "green", "purple",
 	    "sienna", "brown", "orange", "white"),
-  sub.theme=c("default", "black", "no.y.axis"),
-  set=NULL, get=TRUE,
+  sub.theme=c("default", "black", "wsj"),
+  set=NULL, get=FALSE, reset=TRUE,
 
   window.fill=getOption("window.fill"),
   panel.fill=getOption("panel.fill"),
@@ -135,7 +135,8 @@ set(\ldots)
        saved, and now is read back to become the current set of parameter
        values. See the examples.}
   \item{get}{Save the current list of parameter values, a theme, into
-       an R object.}\cr
+       an R object.}
+  \item{reset}{Change one or more settings or the entire theme.}\cr
 
   \item{window.fill}{Fill color of the entire device window.}
   \item{panel.fill}{Color of the plot background.}
@@ -149,7 +150,7 @@ set(\ldots)
   \item{fill}{Color of a filled region -- bars, points and bubbles -- 
         depending on the
         objected plotted. Can explicitly choose \code{"grays"}
-        or \code{"colors"} , or pre-specified R color schemes 
+        or \code{"hues"} , or pre-specified R color schemes 
         \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. Can also
         provide pre-defined color ranges \code{"blues"}, \code{"reds"}
         and \code{"greens"}, as well as
@@ -164,7 +165,7 @@ set(\ldots)
        opaque to transparent.}
   \item{color}{Color of a line segment such as the border of bar or point.
         Can explicitly choose \code{"grays"}
-        or \code{"colors"}, or pre-specified R color schemes 
+        or \code{"hues"}, or pre-specified R color schemes 
         \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. Can also
         provide pre-defined color ranges \code{"blues"}, \code{"reds"}
         and \code{"greens"}, as well as
@@ -226,12 +227,10 @@ set(\ldots)
        3 IQR's beyond the lower or upper quartile.}
   \item{out2.color}{For a scatterplot, color of the border of extreme outliers.}\cr
 
-  \item{violin.fill}{Fill color for a \bold{violin plot}, applicable to a 
-        1-variable scatter plot of a continuous variable.}
-  \item{violin.color}{Border color for the "violin" in a violin plot.}
-  \item{box.fill}{Fill color for a box plot, part of a {violin plot},
-        applicable to a 1-variable scatter plot of a continuous variable.}
-  \item{box.color}{Border color of a box in a box plot.\cr}
+  \item{violin.fill}{Fill color for a \bold{violin plot.}}
+  \item{violin.color}{Border color for the violin in a violin plot.}
+  \item{box.fill}{Fill color for a box plot.}
+  \item{box.color}{Border color of a box in a box plot.}\cr
 
   \item{axis.color}{Color of the axes.}
   \item{axis.x.color}{Color of the \code{x}-axis.}
@@ -286,7 +285,7 @@ set(\ldots)
 
   \item{add.fill}{Interior fill color of added object.
         Can explicitly choose \code{"grays"}
-        or \code{"colors"}, or pre-specified R color schemes 
+        or \code{"hues"}, or pre-specified R color schemes 
         \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. Can also
         provide pre-defined color ranges \code{"blues"}, \code{"reds"}
         and \code{"greens"}, as well as
@@ -348,11 +347,11 @@ Available themes:\cr
 "orange"\cr
 "white"\cr
 
-The \code{"gray"} color theme is based on the colors used in Hadley Wickham's \code{ggplot2} package. The \code{"lightbronze"} theme, especially with the \code{no.y.axis} sub-theme, is based on Jeffrey Arnold's \code{wsj} theme from his ggthemes package.
+The \code{"gray"} color theme is based on the colors used in Hadley Wickham's \code{ggplot2} package. The \code{"lightbronze"} theme, especially with the \code{wsj} sub-theme, is based on Jeffrey Arnold's \code{wsj} theme from his ggthemes package.
 
 SUB-THEMES\cr
 \code{"black"}: Black background of the entire device window with translucent fill colors from the current theme. 
-\code{"no.y.axis"}: Similar to the \code{wsj} theme from the \code{ggthemes} package, especially with the theme of \code{"lightbronze"}. The \code{y}-axis is removed with though the value labels retained, the vertical grid is removed, and the horizontal grid is dotted and thicker than the default.
+\code{"wsj"}: Similar to the \code{wsj} theme from the \code{ggthemes} package, especially with the theme of \code{"lightbronze"}. The \code{y}-axis is removed with though the value labels retained, the vertical grid is removed, and the horizontal grid is dotted and thicker than the default.
 }
 
 
@@ -428,9 +427,9 @@ mystyle <- style(get=TRUE)
 # then recall older settings to current theme setting
 style(set=mystyle)
 
-# create a gray-scale with a sub-theme of no.y.axis
+# create a gray-scale with a sub-theme of wsj
 # save, and then at a later session read back in
-grayWSJ <- style("gray", sub.theme="no.y.axis")
+grayWSJ <- style("gray", sub.theme="wsj")
 Write("grayWSJ", data=grayWSJ, format="R")
 # ...
 mystyle <- Read("grayWSJ.rda")  # read grayWSJ.rda

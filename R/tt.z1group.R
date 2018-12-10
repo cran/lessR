@@ -1,5 +1,5 @@
 .OneGroup  <-
-function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
+function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
          Edesired, paired, graph, xlab, line.chart, show.title,
          pdf.file, width, height) { 
@@ -76,7 +76,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
   if (!brief) cat("\n\n------ Inference ------\n\n")
 
   # t-test
-  if (!is.null(mu0)) m.dist <- m - mu0
+  if (!is.null(mu)) m.dist <- m - mu
   df <- n - 1
   sterr <- s * sqrt(1/n)
   if (alternative == "two.sided")
@@ -86,13 +86,13 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
   else if (alternative == "greater")
     tcut <- qt(1-conf.level, df=df, lower.tail=TRUE)
   if (from.data) {
-    if (!is.null(mu0)) mu.null <- mu0 else mu.null <- 0
+    if (!is.null(mu)) mu.null <- mu else mu.null <- 0
     ttest <- t.test(Y, conf.level=conf.level, alternative=alternative, mu=mu.null)
     df <- ttest$parameter
     lb <- ttest$conf[1]
     ub <- ttest$conf[2]
     E <- (ub-lb)/2
-    if (!is.null(mu0)) {
+    if (!is.null(mu)) {
       tvalue <- ttest$statistic
       pvalue <- ttest$p.value
     }
@@ -101,7 +101,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     E <- tcut * sterr
     lb <- m - E
     ub <- m + E
-    if (!is.null(mu0)) {
+    if (!is.null(mu)) {
       tvalue <- m.dist/sterr
       if (alternative == "two.sided")
         pvalue <- 2 * pt(abs(tvalue), df=df, lower.tail=FALSE)
@@ -115,8 +115,8 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
   cat("t-cutoff: tcut = ", .fmt(tcut,3), "\n") 
   cat("Standard Error of Mean: SE = ", .fmt(sterr), "\n\n")
 
-  if (!is.null(mu0)) {
-    cat("Hypothesized Value H0: mu =", mu0, "\n")
+  if (!is.null(mu)) {
+    cat("Hypothesized Value H0: mu =", mu, "\n")
     txt <- "Hypothesis Test of Mean:  t-value = "
     cat(txt, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3), sep="", "\n\n")
   }
@@ -124,9 +124,9 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
   txt <- " Confidence Interval for Mean:  "
   cat(clpct, txt, .fmt(lb), " to ", .fmt(ub), sep="", "\n")
 
-  # difference from mu0 and standardized mean difference
-  if (!is.null(mu0)) {
-    mdiff <- m - mu0
+  # difference from mu and standardized mean difference
+  if (!is.null(mu)) {
+    mdiff <- m - mu
     smd <- abs(mdiff/s)
     if (!brief) cat("\n\n------ Effect Size ------\n\n") else cat("\n")
     cat("Distance of sample mean from hypothesized:  " , .fmt(mdiff), "\n",
@@ -166,7 +166,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     if (is.null(pdf.file)) {
       if (manage.gr) {
         n.win <- 0
-        if (!is.null(mu0)) n.win <- n.win + 1
+        if (!is.null(mu)) n.win <- n.win + 1
         if (paired) n.win <- n.win + 1
         if (line.chart) n.win <- n.win + 1
         if (n.win > 0) {
@@ -209,7 +209,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     }
 
 
-  if (!is.null(mu0)) {
+  if (!is.null(mu)) {
 
     if (manage.gr) {
       i.win  <- i.win + 1 
@@ -220,7 +220,7 @@ function(Y, Ynm, mu0=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     plt.title[plt.i] <- "One-Group Plot"
 
     .OneGraph(Y, bw1, Ynm, digits.d, brief,
-         n, m, mu0, mdiff, s, smd, mmd, msmd,
+         n, m, mu, mdiff, s, smd, mmd, msmd,
          clpct, tvalue, pvalue, ub, lb, x.lab, show.title)
 
       if (!is.null(pdf.file)) {

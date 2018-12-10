@@ -85,7 +85,7 @@ function(x, y, values, object, n.cat,
         #num.cat.y <- TRUE
 
 
-  gl <- .getlabels(xlab, ylab)
+  gl <- .getlabels(xlab, ylab)  # this redoes if already a plot
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
   #by.name <- getOption("byname")
@@ -180,8 +180,8 @@ function(x, y, values, object, n.cat,
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
 
-          if (!grepl("auto", fncl)) {
-            txt <- ", auto=TRUE)  # many options, including the above"
+          if (!grepl("enhance", fncl)) {
+            txt <- ", enhance=TRUE)  # many options, including the above"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
 
@@ -196,18 +196,20 @@ function(x, y, values, object, n.cat,
             smaller <- as.character(.fmt(radius / 1.5, 2))
             larger <- as.character(.fmt(radius * 1.5, 2))
             if (!grepl("bubble", fncl)) {
-              if (radius >= 0.25) {
-                fc <- paste(fc, ", radius=", smaller, sep="")
-                txt <- "# smaller bubbles"
-              }
-              else {
-                fc <- paste(fc, ", radius=", larger, sep="")
-                txt <- "# larger bubbles"
-              }
-              if (nzchar(fc)) {
-                fc <- paste(fncl, fc, ") ", sep="")
-                fc <- paste(fc, txt, sep="")
-                txsug <- paste(txsug, "\n", fc, sep="")
+              if (!is.null(radius)) {
+                if (radius >= 0.22) {
+                  fc <- paste(fc, ", radius=", smaller, sep="")
+                  txt <- "# smaller bubbles"
+                }
+                else {
+                  fc <- paste(fc, ", radius=", larger, sep="")
+                  txt <- "# larger bubbles"
+                }
+                if (nzchar(fc)) {
+                  fc <- paste(fncl, fc, ") ", sep="")
+                  fc <- paste(fc, txt, sep="")
+                  txsug <- paste(txsug, "\n", fc, sep="")
+                }
               }
             }
           }  # end bubble
@@ -228,10 +230,10 @@ function(x, y, values, object, n.cat,
             txdsc <- stuff$txd
             txinf <- stuff$txi
 
-            class(txsug) <- "out_piece"
-            class(txbck) <- "out_piece"
-            class(txdsc) <- "out_piece"
-            class(txinf) <- "out_piece"
+            class(txsug) <- "out"
+            class(txbck) <- "out"
+            class(txdsc) <- "out"
+            class(txinf) <- "out"
 
             if (nzchar(txsug)  &&  i == 1)
               output <- list(out_suggest=txsug, out_background=txbck,
@@ -321,7 +323,7 @@ function(x, y, values, object, n.cat,
 
           txout <- stats$tx
 
-          class(txout) <- "out_piece"
+          class(txout) <- "out"
 
           output <- list(out_suggest=txsug, out_txt=txout)
           class(output) <- "out_all"
@@ -364,10 +366,10 @@ function(x, y, values, object, n.cat,
           counts <- stats$count
           chi <- stats$chi
 
-          class(txsug) <- "out_piece"
-          class(txttl) <- "out_piece"
-          class(counts) <- "out_piece"
-          class(chi) <- "out_piece"
+          class(txsug) <- "out"
+          class(txttl) <- "out"
+          class(counts) <- "out"
+          class(chi) <- "out"
           output <- list(out_suggest=txsug, out_title=txttl,
                          out_counts=counts, out_chi=chi)
           class(output) <- "out_all"
@@ -420,9 +422,9 @@ function(x, y, values, object, n.cat,
         txotl <- .bx.stats(x)$txotl
         if (txotl[1] == "") txotl <- "No (Box plot) outliers"
 
-          class(txsug) <- "out_piece"
-          class(txout) <- "out_piece"
-          class(txotl) <- "out_piece"
+          class(txsug) <- "out"
+          class(txout) <- "out"
+          class(txotl) <- "out"
 
           if (nzchar(txsug))
             output <- list(out_suggest=txsug, out_txt=txout, out_outliers=txotl)
@@ -494,16 +496,16 @@ function(x, y, values, object, n.cat,
         txfrq <- stats$txfrq
         txXV <- stats$txXV
 
-        class(txsug) <- "out_piece"
-        class(txttl) <- "out_piece"
-        class(txfrq) <- "out_piece"
-        class(txXV) <- "out_piece"
+        class(txsug) <- "out"
+        class(txttl) <- "out"
+        class(txfrq) <- "out"
+        class(txXV) <- "out"
         if (!prop)
           output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq,
                          out_XV=txXV)
         else {
           txrow <- stats$txrow
-          class(txrow) <- "out_piece"
+          class(txrow) <- "out"
           output <- list(out_title=txttl, out_text=txfrq,
                          out_row=txrow, out_XV=txXV)   }
 
@@ -557,7 +559,7 @@ function(x, y, values, object, n.cat,
         txsug <- .rm.arg.2(" y=", txsug)   
       }
       
-      class(txsug) <- "out_piece"
+      class(txsug) <- "out"
       output <- list(out_suggest=txsug)
       class(output) <- "out_all"
       print(output)
@@ -635,7 +637,7 @@ function(x, y, values, object, n.cat,
         txsug <- .rm.arg.2("(x=", txsug)
         txsug <- .rm.arg.2(" y=", txsug) 
 
-        class(txsug) <- "out_piece"
+        class(txsug) <- "out"
 
         if (nzchar(txsug)) {
           output <- list(out_suggest=txsug)

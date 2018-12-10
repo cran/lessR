@@ -18,6 +18,7 @@ function(x, data=mydata, rows=NULL,
        fun.call=NULL, ...) {
 
 
+  type <- match.arg(type)
   if (is.null(fun.call)) fun.call <- match.call()
 
   fill <- getOption("se.fill")
@@ -62,24 +63,25 @@ function(x, data=mydata, rows=NULL,
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
   options(xname = x.name)
 
-  if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
-    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
-  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+  if (exists(df.name, where=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
+    if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
+      data <- eval(substitute(data), envir=parent.frame())
+  }
 
   if (!is.null(x.name))
     x.in.global <- .in.global(x.name)  # see if in global, includes vars list
   else
     x.in.global <- FALSE
     
-# -----------------------------------------------------------
-# establish if a data frame, if not then identify variable(s)
-# x can be missing entirely, with a data frame passed instead
-# if x a vector, then x.name not in data, but also not in global
+  # -----------------------------------------------------------
+  # establish if a data frame, if not then identify variable(s)
+  # x can be missing entirely, with a data frame passed instead
+  # if x a vector, then x.name not in data, but also not in global
 
   if (!missing(x)) {
 
@@ -126,8 +128,8 @@ function(x, data=mydata, rows=NULL,
   }
 
 
-# ---------------
-# do the analysis
+    # ---------------
+    # do the analysis
 
     plot.i <- 0  # keep track of generated graphics
     plot.title  <- character(length=0)
@@ -203,13 +205,13 @@ function(x, data=mydata, rows=NULL,
         txotl <- .bx.stats(data[,i])$txotl
         if (txotl[1] == "") txotl <- "No (Box plot) outliers"
 
-        class(txdst) <- "out_piece"
-        class(txotl) <- "out_piece"
+        class(txdst) <- "out"
+        class(txotl) <- "out"
       }
 
 
       if (ncol(data) > 1) {  # for a variable range, just text output
-        class(ttlns) <- "out_piece"  # title only for multiple variables
+        class(ttlns) <- "out"  # title only for multiple variables
 
         output <- list(out_title=ttlns, out_stats=txdst, out_outliers=txotl)
         class(output) <- "out_all"
@@ -250,7 +252,7 @@ function(x, data=mydata, rows=NULL,
       txkfl <- .showfile2(Rmd, "R Markdown instructions")
     }
 
-    class(txkfl) <- "out_piece"
+    class(txkfl) <- "out"
 
     output <- list(type="Density",
       out_title=ttlns, out_stats=txdst, out_outliers=txotl, out_file=txkfl,

@@ -5,13 +5,15 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
          xlab, ylab, main, shape, lab.cex, axis.cex,
          lvl=0, ellipse.color=NULL, ellipse.lwd=NULL,
          fit="off", fit.color=NULL, fit.lwd=NULL,
-         area="transparent", origin=NULL, jitter, bw, violin,
-         box, vbs.size, box.adj, a, b, k.iqr, fences, vbs.mean,
+         area="transparent", origin=NULL, jitter,
+         violin, violin.fill, box, box.fill, 
+         bw, vbs.size, box.adj, a, b, k.iqr, fences, vbs.mean,
          out.shape, out.size,
          out.fill, out.color, out2.fill, out2.color,
          ID, out.cut, ID.color, ID.size,
          rotate.x, rotate.y, width, height, pdf.file, c.type, ...) {
     
+#cat("c.type:", c.type, "\n")
   date.ts <- FALSE
   if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
   if (date.ts) xx.lab <- xlab
@@ -120,7 +122,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
       if (object == "both") ltype[2] <- "dotted"
   }  
   else  {  # n.groups > 2
-    col.color <- getColors("colors", n=n.groups)
+    if (getOption("theme") %in% c("gray", "white"))
+      col.color <- getColors("grays", n=n.groups)
+    else
+      col.color <- getColors("hues", n=n.groups)
     for (i in 1:n.groups) {
       col.fill[i] <- col.color[i]
       col.fill[i] <- .maketrans(col.fill[i], (1-trans)*256)
@@ -267,7 +272,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
            strip.border=list(col=getOption("strip.color"), lwd=0.5),
            strip.background=list(col=getOption("strip.fill")),
            plot.polygon=list(col=getOption("violin.color"), 
-             fill=getOption("violin.fill"), lty="solid", lwd=1),
+             fill=violin.fill, lty="solid", lwd=1),
            plot.line=list(col=col.color, lty="solid", lwd=1),
            plot.symbol=list(pch=shape, cex=size.pt, col=col.color,
              fill=col.fill),
@@ -355,6 +360,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     }  # end fences
 
 
+#cat("n.groups:", n.groups, "\n")
     if (n.groups > 1) {  # cex refers to the text, not the points
       c.color <- character(length=length(n.groups))
       if (n.groups == 2) {
@@ -378,7 +384,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     p <- update(p,
 
        par.settings=list(  # col option does not work directly on panel.bwplot
-         box.rectangle=list(fill=getOption("box.fill"),
+         box.rectangle=list(fill=box.fill,
                             col=getOption("box.color")),
          box.umbrella=list(col=getOption("box.color"), lty="solid")
        ),
@@ -416,7 +422,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
             # to get a violin plot, cannot have y and by1
             vw <- ifelse (!is.null(y) && !is.null(by1), FALSE, TRUE) 
             panel.violin(x=x, ...,
-                col=getOption("violin.fill"), border=getOption("violin.color"),
+                col=violin.fill, border=getOption("violin.color"),
                 varwidth=vw, box.width=vbs.size, bw=bw)
            }
 
@@ -512,7 +518,8 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
             }  # end box
             else {
               i.out <- 1:length(x)
-              fill.out <- col.fill
+              fill.out <- "black"
+              #fill.out <- col.fill
             }
             color.out <- fill.out
             if (n.groups == 2) color.out <- "black"

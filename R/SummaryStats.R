@@ -172,8 +172,8 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
   if (ncol(data) == 1) { 
 
     if (!is.factor(x.call)) {
-      class(txsts) <- "out_piece"
-      class(txotl) <- "out_piece"
+      class(txsts) <- "out"
+      class(txotl) <- "out"
 
       output <- list(out_stats=txsts, out_outliers=txotl, n=stuff$n,
            n.miss=stuff$n.miss, mean=stuff$m, sd=stuff$s, skew=stuff$sk,
@@ -183,24 +183,24 @@ function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"),
 
     else {  # is.factor(x.call)
       if (n.dim == 1) {
-        class(txttl) <- "out_piece"
-        class(txsts) <- "out_piece"
-        class(txchi) <- "out_piece"
-        class(txlbl) <- "out_piece"
+        class(txttl) <- "out"
+        class(txsts) <- "out"
+        class(txchi) <- "out"
+        class(txlbl) <- "out"
         output <- list(out_title=txttl, out_stats=txsts, out_chi=txchi,
                        out_lbl=txlbl, freq=frq, prop=prp)
       }
       else if (n.dim == 2) {
-        class(txttl) <- "out_piece"
-        class(txfrq) <- "out_piece"
+        class(txttl) <- "out"
+        class(txfrq) <- "out"
         if (brief) {
           output <- list(out_title=txttl, out_freq=txfrq, out_chi=txXV)
         }
         else {
-          class(txXV) <- "out_piece"
-          class(txprp) <- "out_piece"
-          class(txcol) <- "out_piece"
-          class(txrow) <- "out_piece"
+          class(txXV) <- "out"
+          class(txprp) <- "out"
+          class(txcol) <- "out"
+          class(txrow) <- "out"
           output <- list(out_title=txttl, out_freq=txfrq, out_XV=txXV,
              out_prop=txprp, out_colsum=txcol, out_rowsum=txrow)
         }

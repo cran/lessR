@@ -3,7 +3,7 @@
 
 \title{Create Factor Variables Across a Sequential Range or Vector of Variables}
 
-\description{Creates factors for many variables. Specify a range from a given \code{start} variable and \code{end} variable.
+\description{Creates factors for many variables. Specify a range from a given \code{start} variable and \code{end} variable.  Applies only to variables in a data frame, \code{mydata} by default.
 }
 
 \usage{

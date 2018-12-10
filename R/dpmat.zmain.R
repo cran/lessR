@@ -253,10 +253,10 @@ function(x, mylabels, sort.yx,
     colnames(myt)[n.resp+2] <- "Mean"    
     txfrq <- txtbl
    
-    class(txsug) <- "out_piece"
-    class(txlbl) <- "out_piece"
-    class(txttl) <- "out_piece"
-    class(txfrq) <- "out_piece"
+    class(txsug) <- "out"
+    class(txlbl) <- "out"
+    class(txttl) <- "out"
+    class(txfrq) <- "out"
     
     if (nzchar(txsug))
       output <- list(out_suggest=txsug,

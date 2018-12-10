@@ -11,7 +11,8 @@ Display a normal curve with shading according to the z-score, the number of stan
 prob.znorm(mu=0, sigma=1, color.border="gray10",
          r=.10, g=.34, b=.94, a=.20,
          xlab="", ylab="", main="", 
-         y.axis=FALSE, z=TRUE, mag=.9, \ldots)
+         y.axis=FALSE, z=TRUE, axis.size=.9,
+         pdf.file=NULL, width=5, height=5, \ldots)
 }
 
 
@@ -27,8 +28,13 @@ prob.znorm(mu=0, sigma=1, color.border="gray10",
   \item{ylab}{Label for the optional vertical axis.}
   \item{main}{Label for the graph title.}
   \item{y.axis}{If \code{TRUE}, then a vertical axis is included.}
-  \item{z}{If \code{TRUE}, then include z-values on the horizontal-axis. Set to \code{FALSE} if \code{mu=0} and \code{sigma=1}.}
-  \item{mag}{Magnification factor for the axis labels, the value of \code{axis.cex}.}
+  \item{z}{If \code{TRUE}, then include z-values on the horizontal-axis.
+       Set to \code{FALSE} if \code{mu=0} and \code{sigma=1}.}
+  \item{axis.size}{Magnification factor for the axis labels, the value of
+       \code{axis.cex}.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\ldots}{Other parameter values for graphics.}
 }
 

@@ -90,7 +90,7 @@ function(my.formula, data=mydata,rows=NULL,
   predictors <- character(length=n.pred)
   for (i in 2:n.vars) predictors[i-1] <- nm[i]
 
-#  for (i in 1:n.vars) .xcheck(nm[i], df.name, names(data))  # do variables exist?
+  #  for (i in 1:n.vars) .xcheck(nm[i], df.name, names(data))  # do variables exist?
   .xcheck(nm, df.name, names(data))  # do variables exist?
 
   # check that variables are not function calls
@@ -324,9 +324,9 @@ function(my.formula, data=mydata,rows=NULL,
 
 
 
-# ----------
-# References
-# ----------
+  # ----------
+  # References
+  # ----------
   txref <- ""
   tx <- character(length = 0)
   if (refs) {
@@ -416,24 +416,24 @@ function(my.formula, data=mydata,rows=NULL,
   }
 
 
-  class(txsug) <- "out_piece"
-  class(title_bck) <- "out_piece"
-  class(tx1bck) <- "out_piece"
-  class(title_basic) <- "out_piece"
-  class(tx1est) <- "out_piece"
-  class(tx1fit) <- "out_piece"
-  class(tx1anv) <- "out_piece"
-  class(title_rel) <- "out_piece"
-  class(tx2cor) <- "out_piece"
-  class(tx2cln) <- "out_piece"
-  class(tx2all) <- "out_piece"
-  class(title_res) <- "out_piece"
-  class(tx3res) <- "out_piece"
-  class(title_pred) <- "out_piece"
-  class(tx3prd) <- "out_piece"
-  class(txplt) <- "out_piece"
-  class(txref) <- "out_piece"
-  class(txRmd) <- "out_piece"
+  class(txsug) <- "out"
+  class(title_bck) <- "out"
+  class(tx1bck) <- "out"
+  class(title_basic) <- "out"
+  class(tx1est) <- "out"
+  class(tx1fit) <- "out"
+  class(tx1anv) <- "out"
+  class(title_rel) <- "out"
+  class(tx2cor) <- "out"
+  class(tx2cln) <- "out"
+  class(tx2all) <- "out"
+  class(title_res) <- "out"
+  class(tx3res) <- "out"
+  class(title_pred) <- "out"
+  class(tx3prd) <- "out"
+  class(txplt) <- "out"
+  class(txref) <- "out"
+  class(txRmd) <- "out"
   
   output <- list(
     out_suggest=txsug,

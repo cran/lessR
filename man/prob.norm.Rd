@@ -10,7 +10,8 @@ Calculate the probability of an interval for a normal distribution with specifie
 \usage{
 prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black", 
          fill.nrm="grey91", fill.int="slategray3", 
-         ylab="", y.axis=FALSE, z=TRUE, mag=.9, \ldots)
+         ylab="", y.axis=FALSE, z=TRUE, axis.size=.9,
+         pdf.file=NULL, width=5, height=5, \ldots)
 }
 
 
@@ -24,8 +25,13 @@ prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black",
   \item{fill.int}{Fill color of the interval for which the probability is computed.}
   \item{ylab}{Label for the optional vertical axis.}
   \item{y.axis}{If \code{TRUE}, then a vertical axis is included.}
-  \item{z}{If \code{TRUE}, then include z-values on the horizontal-axis. Set to \code{FALSE} if \code{mu=0} and \code{sigma=1}.}
-  \item{mag}{Magnification factor for the axis labels, the value of \code{axis.cex}.}
+  \item{z}{If \code{TRUE}, then include z-values on the horizontal-axis. Set to 
+       \code{FALSE} if \code{mu=0} and \code{sigma=1}.}
+  \item{axis.size}{Magnification factor for the axis labels, the value of
+       \code{axis.cex}.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\ldots}{Other parameter values for graphics.}
 }
 

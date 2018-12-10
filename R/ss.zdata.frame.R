@@ -13,8 +13,8 @@ function(x, n.cat, brief, ...)  {
       stuff <- .ss.numeric(x[,i], brief=brief, ...)
       txsts <- stuff$tx
       txotl <- .bx.stats(x[,i])$txotl
-      class(txsts) <- "out_piece"
-      class(txotl) <- "out_piece"
+      class(txsts) <- "out"
+      class(txotl) <- "out"
       output <- list(out_stats=txsts, out_outliers=txotl)
       class(output) <- "out_all"
       print(output)
@@ -28,9 +28,9 @@ function(x, n.cat, brief, ...)  {
       txttl <- stats$title
       counts <- stats$counts
       chi <- stats$chi
-      class(txttl) <- "out_piece"
-      class(counts) <- "out_piece"
-      class(chi) <- "out_piece"
+      class(txttl) <- "out"
+      class(counts) <- "out"
+      class(chi) <- "out"
       output <- list(out_title=txttl, out_counts=counts, out_chi=chi)
       class(output) <- "out_all"
       print(output)      

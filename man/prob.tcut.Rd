@@ -10,7 +10,8 @@ Plot a specified t-distribution against the standardized normal curve with the c
 \usage{
 prob.tcut(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
          fill="aliceblue", color.tail="palevioletred4",
-         nrm.color=gray(.7), color.t=gray(.08), \ldots)
+         nrm.color=gray(.7), color.t=gray(.08),
+         pdf.file=NULL, width=5, height=5, \ldots)
 }
 
 
@@ -23,6 +24,9 @@ prob.tcut(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
   \item{color.tail}{Color of the tail areas of the t-distribution.}
   \item{nrm.color}{Color of the normal curve.}
   \item{color.t}{Color of the t-distribution curve.}
+  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{width}{Width of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}
   \item{\ldots}{Other parameter values for graphics.}
 }
 

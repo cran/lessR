@@ -1,6 +1,6 @@
 .OneGraph <-
 function(YA, bw1, Ynm, digits.d, brief,
-         n1, m1, mu0, mdiff, sw, smd, mmd, msmd,
+         n1, m1, mu, mdiff, sw, smd, mmd, msmd,
          clpct, tvalue,  pvalue, ub, lb, x.lab, show.title) {
 
   dYA <- suppressWarnings(density(YA, bw1))
@@ -15,8 +15,8 @@ function(YA, bw1, Ynm, digits.d, brief,
   cat("--------------------------------------------------\n")
 
   # values needed for graph
-  min.x <- min(min(dYA$x), mu0)  # min x coordinate for graph
-  max.x <- max(max(dYA$x), mu0)  # max x coordinate for graph
+  min.x <- min(min(dYA$x), mu)  # min x coordinate for graph
+  max.x <- max(max(dYA$x), mu)  # max x coordinate for graph
   max.y <- max(dYA$y)  # max y coordinate
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
@@ -66,9 +66,9 @@ function(YA, bw1, Ynm, digits.d, brief,
   # vertical line for mean
   lines(c(m1,m1), c(0,ytop), lty="solid", lwd=.85, col=col.m1)
   if (!grepl("gray", getOption("theme")))
-    lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=.85, col=col.2)
+    lines(c(mu,mu), c(0,ytop), lty="twodash", lwd=.85, col=col.2)
   else
-    lines(c(mu0,mu0), c(0,ytop), lty="twodash", lwd=.85, col=col.1)
+    lines(c(mu,mu), c(0,ytop), lty="twodash", lwd=.85, col=col.1)
 
   # curve area
   polygon(c(min(dYA$x),dYA$x,max(dYA$x)), c(0,dYA$y,0), col=col.1d, border=NA) 
@@ -86,7 +86,7 @@ function(YA, bw1, Ynm, digits.d, brief,
   if ( !is.null(mmd) | !is.null(msmd) ) {
     if (!is.null(mmd)) msmd <- mmd / sw
     if (!is.null(msmd)) mmd <- msmd * sw
-    mid <- (m1 + mu0) / 2
+    mid <- (m1 + mu) / 2
     lr <- mid + .5*mmd  # line right
     ll <- mid - .5*mmd  # line left
     lines(c(lr,lr), c(ybot+.44*max.y,ytop-.44*max.y), lty="solid", lwd=2, col=col.e)
@@ -98,8 +98,8 @@ function(YA, bw1, Ynm, digits.d, brief,
   }
 
   # scale for s at top of graph
-  mlow <- min(m1, mu0)
-  mhi  <- max(m1, mu0)
+  mlow <- min(m1, mu)
+  mhi  <- max(m1, mu)
   col.d.unit <- "gray50"
   # connect first seg to top
   segments(mlow, max.y-.01*max.y, mlow, ytop, lwd=1, col=col.d.unit) 
@@ -118,18 +118,18 @@ function(YA, bw1, Ynm, digits.d, brief,
   # connect last seg to top
   segments(last.coord.x, max.y+.025*max.y, last.coord.x, ytop, lwd=1, col=col.d.unit)
   # print d value towards top
-  text((m1+mu0)/2, ytop-.07*max.y, label=.fmt(smd), col=col.d.unit, cex=.9)
+  text((m1+mu)/2, ytop-.07*max.y, label=.fmt(smd), col=col.d.unit, cex=.9)
   # horiz bar connects means
   segments(mlow, ytop-.09*max.y, mhi, ytop-.09*max.y, col=col.d.unit, lwd=1)
   # print d towards top
-  text((m1+mu0)/2, ytop-.11*max.y, label="d", col=col.d.unit, cex=.9)
+  text((m1+mu)/2, ytop-.11*max.y, label="d", col=col.d.unit, cex=.9)
 
   # print mdiff value towards bottom  
-  text((m1+mu0)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d), col=col.d.unit, cex=.9)
+  text((m1+mu)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d), col=col.d.unit, cex=.9)
   # horiz bar connects means
   segments(mlow, ybot+.09*max.y, mhi, ybot+.09*max.y, col=col.d.unit, lwd=1)
   # print diff towards bottom
-  text((m1+mu0)/2, ybot+.07*max.y, label="diff", col=col.d.unit, cex=.9)
+  text((m1+mu)/2, ybot+.07*max.y, label="diff", col=col.d.unit, cex=.9)
 
   # title area, above graph
   if (show.title) {
@@ -137,7 +137,7 @@ function(YA, bw1, Ynm, digits.d, brief,
           col=col.tx)
     mtext(paste("Analyze",Ynm), side=3, line=5.4, font=3, cex=.9,
           col=col.tx)
-    mtext(bquote(paste("  t-test of mu0=", .(mu0), ":   t = ", .(.fmt(tvalue,3)), 
+    mtext(bquote(paste("  t-test of mu=", .(mu), ":   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(n1-1), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 
       line=3.7, cex=.9, adj=0, col=col.tx)
     mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Mean:  ",

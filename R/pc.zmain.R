@@ -13,6 +13,8 @@ function(x, y,
   #stuff <- .getdots(...)
   #col.main <- stuff$col.main
 
+  is.ord <- ifelse (is.ordered(x), TRUE, FALSE)
+
   # set the labels
   # use variable label for main if it exists and main not specified
   gl <- .getlabels(main=main, lab.cex=getOption("lab.cex"))
@@ -52,19 +54,46 @@ function(x, y,
   # colors
 
   # see if a pre-defined color range
-  clr <- NULL
-  if (length(fill) == 1)
-    clr <- .color.range(fill, n.cat)
 
-  # not a range, so set user specified multiple colors
-  if (is.null(clr)) {
+# else {
+#   if (!is.ord)
+#     clr <- .color.range(fill, n.cat)  # see if range, otherwise NULL
+#   else {  # ordered factor, default to pre-set range
+#     clr <- .color.range(.get.fill(), n.cat)  # make a range 
+#     if (color == getOption("bar.color.discrete")) color <- "transparent"
+#   }
+# }
+
+  if (length(fill) > 1) {
+    clr <- fill
     j <- 0
     for (i in 1:(n.cat)) {
       j <- j + 1
       if (j > length(fill)) j <- 1  # recycle colors
       clr[i] <- fill[j]
     }
-  } # end fill is multiple values
+  }
+  else {
+    if (is.null(fill)) {  # fill not specified
+      if (!is.ord) {  # default qualitative for theme
+        clr <- getOption("bar.fill.discrete") 
+        if (!is.null(.color.range(clr, n.cat)))  
+          clr <- .color.range(clr, n.cat)
+      }
+      else  # sequential palette based on theme
+        clr <- .color.range(.get.fill(), n.cat) 
+    }
+    else {  # fill specified by user
+      if (is.null(.color.range(fill, n.cat)))
+        clr <- fill  # user assigned
+      else 
+        clr <- .color.range(fill, n.cat)  # do default range, or user assigned
+    }
+  }
+
+  # not a range, so set user specified multiple colors
+# if (is.null(clr)) {
+# } # end fill is multiple values
 
   if (!is.null(trans)) 
     for (i in 1:n.cat) clr[i] <- .maketrans(clr[i], (1-trans)*256) 
@@ -177,14 +206,16 @@ function(x, y,
     # plot label, optional values
     P <- t2xy(mean(x[i + 0:1]), radius)
     lab <- as.character(labels[i])
-    if (!is.na(lab) && nzchar(lab)) {
-      lines(c(1, 1.05)*P$x, c(1, 1.05)*P$y)  # tick marks
+    if (labels.cex > 0)
+      if (!is.na(lab) && nzchar(lab)) {
+        lines(c(1, 1.05)*P$x, c(1, 1.05)*P$y)  # tick marks
 
 
       if (values != "off") if (values.pos == "out")  # results to labels
         labels[i] <- paste(labels[i], "\n", x.txt[i], sep="")
-      text(1.1 * P$x, 1.175 * P$y, labels[i], xpd=TRUE, 
-        adj=ifelse(P$x < 0, 1, 0), cex=labels.cex, ...)  # labels
+      if (labels.cex > 0)
+         text(1.1 * P$x, 1.175 * P$y, labels[i], xpd=TRUE, 
+           adj=ifelse(P$x < 0, 1, 0), cex=labels.cex, ...)  # labels
 
       if (values != "off") if (values.pos == "in") {
         cx <- 0.82;  cy <- 0.86  # scale factors to position labels
@@ -233,16 +264,16 @@ function(x, y,
                     ", values=\"count\")  # lollipop plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
     }
-    class(txsug) <- "out_piece"
+    class(txsug) <- "out"
 
     if (.is.integer(x.tbl)) {
       stats <- .ss.factor(x.tbl, brief=TRUE, x.name=x.name)
       txttl <- stats$title
       counts <- stats$counts
       chi <- stats$chi
-      class(txttl) <- "out_piece"
-      class(counts) <- "out_piece"
-      class(chi) <- "out_piece"
+      class(txttl) <- "out"
+      class(counts) <- "out"
+      class(chi) <- "out"
       output <- list(out_suggest=txsug, out_title=txttl,
                      out_counts=counts, out_chi=chi)
     }

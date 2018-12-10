@@ -57,7 +57,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
                
     # scale for regular R or RStudio
     axis.cex <- 0.76
-    radius <- 0.25
+    radius <- 0.22
     adj <- .RSadj(radius, axis.cex, lab.cex=getOption("lab.cex"))
     radius <- adj$radius
     size.lab <- getOption("lab.cex")

@@ -84,12 +84,12 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   .opendev(pdf.file, width, height)
 
   orig.params <- par(no.readonly=TRUE)
-
   par(mar=c(2,2,1.75,2), mgp=c(1,.5,0))
 
-  plot(lb, type = "n", ylim = c(l,u), xlab = "", ylab = "", cex.main=.95, cex.axis=.8)
-  if (show.title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma), "  ",
-     "cl=", .(clpct), "%  n=", .(n))), cex.main=1)
+  plot(lb, type = "n", ylim = c(l,u), xlab = "", ylab = "", cex.main=.95,
+       cex.axis=.8)
+  if (show.title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=",
+     .(sigma), "  ", "cl=", .(clpct), "%  n=", .(n))), cex.main=1)
 
   mtext(bquote(paste(" ", mu)), side=4, cex=1.5, col="darkslateblue", las=2)
 
@@ -105,14 +105,15 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   if (pause) cat("\n>>> Press Enter to obtain the next sample <<< \n\n")
 
   # plot confidence intervals
-  cat("\nSample", "  Mean", " StdDev", " StdErr", "  Error", "     LB", "     UB", "\n")
+  cat("\nSample", "  Mean", " StdDev", " StdErr", "  Error", "     LB",
+       "     UB", "\n")
   abline(h=mu, col="darkslateblue", lwd=1.5) # horizontal centerline at mu
   dig.dec <- 3
   max.ln <- 8
   for (i in 1:ns) {
     if (pause) invisible(readline())
     if ( (mu>lb[i] && mu<ub[i]) ) linecol <- color.hit else linecol = color.miss
-    if (show.data) points(rep(i,n), data.byrep[i,], pch=21, col="gray75", cex=.3)
+    if (show.data) points(rep(i,n), data.byrep[i,], pch=21, col="gray75",cex=.3)
     if ( !(miss.only && linecol==color.hit) ) {
       se <- Ysd[i]/sqrt(n)
       e <- tcut * se

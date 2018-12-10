@@ -6,6 +6,10 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab.cex=0.8) {
   # text color
   the.clr <- getOption("lab.color")
 
+  text.cex <- ifelse(is.null(getOption("axis.x.cex")),
+      getOption("axis.cex"), getOption("axis.x.cex"))
+  if (text.cex > 0.99) text.cex <- .83 * text.cex
+
   ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
                horiz=TRUE, plot=FALSE)  # get coordinates
 
@@ -23,7 +27,7 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab.cex=0.8) {
     xleft <- usr[1] + axis.horiz/2 - lgnd.hhalf
 
     legend(xleft, ytop, legend=colnms, horiz=TRUE, box.lwd=.5, 
-           box.col="gray30", cex=.85, pt.cex=1.2, pt.bg=fill, bg=col.bg,
+           box.col="gray30", cex=text.cex, pt.cex=1.2, pt.bg=fill, bg=col.bg,
            col=color, pch=shape, text.col=the.clr) # display legend
   }
 
@@ -46,7 +50,7 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab.cex=0.8) {
     yi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
 
     legend(xleft, ytop, legend=colnms, horiz=FALSE, box.lwd=.5, 
-           box.col="gray30", cex=.8, pt.cex=1.2, pt.bg=fill, bg=col.bg,
+           box.col="gray30", cex=text.cex, pt.cex=1.2, pt.bg=fill, bg=col.bg,
            col=color, pch=shape, text.col=the.clr,
            x.intersp=xi, y.intersp=yi)  # display legend
   }

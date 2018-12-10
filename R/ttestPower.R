@@ -1,6 +1,6 @@
 ttestPower <- 
 function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL, 
-         mmd=NULL, msmd=NULL, mdp=.8, mu0=NULL, 
+         mmd=NULL, msmd=NULL, mdp=.8, mu=NULL, 
          pdf.file=NULL, width=5, height=5, ...) {
       
   cat("\n")
@@ -49,14 +49,14 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
         "Specify only one of mmd and msmd as one implies the other.\n\n")
   }
 
-  if ( (!is.null(n1) || !is.null(n2)) && !is.null(mu0) ) {
+  if ( (!is.null(n1) || !is.null(n2)) && !is.null(mu) ) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Indicated two samples with n1 and n2 but only a single sample with mu0.\n\n")
+        "Indicated two samples with n1 and n2 but only a single sample with mu.\n\n")
   }
   
   
   cat("------------------------------------------------------------\n")
-  if (is.null(mu0)) {
+  if (is.null(mu)) {
     mytype <- "two.sample"
     cat("Power Curve Analysis for Independent Groups t-test\n")
   }
@@ -64,7 +64,7 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
     mytype <- "one.sample"
     cat("Power Curve Analysis for One Sample t-test\n")
     cat("------------------------------------------------------------\n")
-    cat("mu0 =", mu0, "\n")
+    cat("mu =", mu, "\n")
   }
   
   # power curve for two groups, assuming mean difference of 0
@@ -99,11 +99,11 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
     H0 <- 0
   }
   
-  # power values for a single sample, triggered by nonzero mu0
+  # power values for a single sample, triggered by nonzero mu
   else {
     mytitle <- "Power Curve for One Sample t-test"
     myxlab <- bquote(paste("Alternative Values of ", mu))
-    H0 <- mu0
+    H0 <- mu
   }
   cat("------------------------------------------------------------\n")
   

@@ -14,7 +14,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
 
          values=getOption("values"),
          values.color=getOption("values.color"), 
-	       values.cex=getOption("values.cex"),
+         values.size=getOption("values.size"),
          values.digits=getOption("values.digits"),
          values.pos=getOption("values.pos"),
 
@@ -29,25 +29,20 @@ function(x, y=NULL, data=mydata, rows=NULL,
   if (!missing(cex)) {
     main.cex <- cex * main.cex
     labels.cex <- cex * labels.cex
-    values.cex <- cex * values.cex
+    values.size <- cex * values.size
   }
 
+  fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   main.miss <- ifelse (missing(main), TRUE, FALSE)
 
   color[which(color == "off")] <- "transparent"
-
-  # default color scale
-  if (is.null(fill)) {
-    theme <- getOption("theme")
-    fill <- ifelse (theme %in% c("gray", "white"), "grays", "colors")
-  }
 
   if (is.null(values.digits)) {
     if (values == "%") values.digits <- 0
     if (values == "prop") values.digits <- 2
   }
 
-  if (missing(values) && (!missing(values.color) || !missing(values.cex)
+  if (missing(values) && (!missing(values.color) || !missing(values.size)
       || !missing(values.digits) || !missing(values.pos)))
     values <- "%"
 
@@ -87,10 +82,10 @@ function(x, y=NULL, data=mydata, rows=NULL,
   x.name <- deparse(substitute(x))  # could be a list of var names
   options(xname = x.name)
 
-  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
-    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
+  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
+    data <- eval(substitute(data), envir=parent.frame())
  
   # if a tibble convert to data frame
   # data.frame is already #3 in class(data), so no char --> factor conversion 
@@ -101,8 +96,8 @@ function(x, y=NULL, data=mydata, rows=NULL,
   x.in.global <- .in.global(x.name)  # see if in global, includes vars list
 
 
-# -----------------------------------------------------------
-# establish if a data frame, if not then identify variable(s)
+  # -----------------------------------------------------------
+  # establish if a data frame, if not then identify variable(s)
 
   if (!x.in.global) {
     if (eval.df) {
@@ -162,13 +157,39 @@ function(x, y=NULL, data=mydata, rows=NULL,
     y.call <- NULL
 
 
-  # set up graphics system
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
-  if (!shiny) .opendev(pdf.file, width, height)
+  # evaluate fill (NULL, numeric constant or a variable)
+  #--------------
+  if (!fill.miss) {
+    fill.name <- deparse(substitute(fill))
+    in.df <- ifelse (exists(fill.name, where=data), TRUE, FALSE)
 
-# if (!shiny)
-#   dev.set(which=2)  # reset graphics window for standard R functions
+    # only works for y given, not tabulated
+    if (in.df) {
+      fill.val <- eval(substitute(data$fill))
+      fill <- .getColC(fill.val)
+    }
+
+    # or do a tabulation to get value of y
+    if (fill.name == "(count)") {
+      xtb <- table(x.call)
+      fill <- .getColC(xtb)
+    }  # end .count 
+  }  # end !fill.miss
+
+  if (!is.null(pdf.file)) {
+    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+    .opendev(pdf.file, width, height)
+  }
+  else {
+    if (!shiny) {  # not dev.new for shiny
+      pdf.fnm <- NULL
+      .opendev(pdf.file, width, height)
+    }
+  }
+
+
+  # if (!shiny)
+  #   dev.set(which=2)  # reset graphics window for standard R functions
 
    hole <- hole * radius
   .pc.main(x.call, y.call, 
@@ -176,7 +197,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
         radius, hole, hole.fill, edges, 
         clockwise, init.angle, 
         density, angle, lty, lwd,
-        values, values.pos, values.color, values.cex, values.digits,
+        values, values.pos, values.color, values.size, values.digits,
         labels.cex, main.cex, main, main.miss,
         add, x1, x2, y1, y2,
         quiet, pdf.file, width, height, ...)

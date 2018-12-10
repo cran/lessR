@@ -118,7 +118,7 @@ STATISTICS\cr
 \code{residuals}: residuals\cr
 \code{fitted}: fitted values\cr
 
-Although not typically needed for analysis, if the output is assigned to an object named, for example, \code{a}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(a)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out_piece}.
+Although not typically needed for analysis, if the output is assigned to an object named, for example, \code{a}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(a)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out}.
 }
 
 

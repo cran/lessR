@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.7.6     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.7.9     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. mydata <- Read(\"\")      Read text, Excel, SPSS, SAS or R data file\n",
       "2. Help()                  Get help\n",
@@ -19,7 +19,7 @@ function(...) {
       "                           knit, provides full interpretative output\n",
       "7. style(\"lightbronze\")    Return to previous, more neutral theme\n",
       "   style(show=TRUE)        all color/style options and current values\n",
-      "8. getColors()             create all types of color palettes\n")
+      "8. getColors()             create many types of color palettes\n")
 
   options(theme = "colors")
   options(sub.theme = "default")
@@ -32,7 +32,9 @@ function(...) {
 
   # .maketrans("gray50", .to256("trans.bar.fill"))
   options(bar.fill = rgb(121,138,148, maxColorValue=255))  # relevant?
-  options(bar.fill.discrete = "colors")
+  options(bar.fill.discrete = c("#2D8BC3", "#A57E08", "#51932E",
+      "#C7657B", "#8E76C9", "#009B8B", "#BB714D", "#838A00",
+      "#0097AD", "#C561A2", "#009962", "#B068BE"))  # getColors("hues")
   options(bar.fill.ordered = rgb(144,165,175, maxColorValue=255))
   options(trans.bar.fill = 0.0)
   options(bar.color = rgb(126,144,168, maxColorValue=255))
@@ -40,7 +42,7 @@ function(...) {
   options(bar.color.ordered = rgb(126,144,168, maxColorValue=255))
   options(values = "%")
   options(values.color = "white")
-  options(values.cex = 0.75)
+  options(values.size = 0.75)
   options(values.digits = NULL)
   options(values.pos = "in")
 
@@ -59,7 +61,7 @@ function(...) {
   options(violin.color = "gray15")
   options(box.fill = c("#2D8BC3", "#A57E08", "#51932E", "#C7657B", "#8E76C9",
                        "#009B8B", "#BB714D", "#838A00", "#0097AD", "#C561A2",
-                       "#009962", "#B068BE"))  # getColors("colors")
+                       "#009962", "#B068BE"))  # getColors("hues")
   options(box.color = "gray15")
   options(line.color = "gray15")
 
@@ -402,6 +404,7 @@ function(...) {
         "In the web address include the http:// at the beginning\n",
         "  and also include the quotes around the web address\n\n")
     }
+
     else if (length(dfs) == 1) {
       nm <- parse(text=paste("names(", dfs[1],")"))
       nm <- eval(nm)
@@ -415,6 +418,7 @@ function(...) {
         "  ", nm, "\n\n",
         txtM, "\n\n")
     }
+
     else if (length(dfs) > 1) {
       dts <- ""
       for (i in 1:length(dfs)) dts <- paste(dts, dfs[i])
@@ -777,7 +781,6 @@ function(...) {
   }
 
 
-
   # strwidth function not working in regular R, lab.cex has no affect
   regR <- FALSE
   in.RStudio <- ifelse (options("device") != "RStudioGD", FALSE, TRUE)
@@ -831,28 +834,30 @@ function(...) {
     }
   }  # end labels embedded in data
 
-
   # ------------------------
   # get x.lab
-  if (is.null(x.lbl) && is.null(xlab))
+  st.nya <- ifelse (getOption("sub.theme") == "wsj", TRUE, FALSE)
+  if (is.null(x.lbl) && is.null(xlab)) {
     x.lab <- x.name
+  }
   else {
     if (!is.null(xlab))
       x.lab <- xlab  # xlab specified
     else if (!is.null(x.lbl))
       x.lab <- x.lbl
   }
+  if (is.null(xlab)) if (st.nya) x.lab <- ""
 
   # get y.lab
   if (is.null(y.lbl) && is.null(ylab))
-    y.lab <- y.name
+      y.lab <- y.name
   else {
     if (!is.null(ylab))
       y.lab <- ylab  # ylab specified
     else if (!is.null(y.lbl))
       y.lab <- y.lbl
-
   }
+  if (is.null(ylab)) if (st.nya) y.lab <- ""
 
   if (flip) {
     temp <- ylab;  ylab <- xlab;  xlab <- temp
@@ -861,11 +866,10 @@ function(...) {
     temp <- lab.y.cex;  lab.y.cex <- lab.x.cex;  lab.x.cex <- temp
     temp <- y.name;  y.name <- x.name; #  x.name <- temp
   }
-
   # ------------------------
   # x-axis and legend labels
 
-  if (!is.null(x.lbl) || !is.null(xlab)) {
+  if ((!is.null(x.lbl) || !is.null(xlab)) && !st.nya) {
     # power.ttest: len > 1;  # add var name to label?
     if (length(x.lab) == 1  &&  !is.null(lab.x.cex)  &&  graph.win) {
       var.nm <- ifelse (is.null(x.lbl) && !is.null(x.name), FALSE, TRUE)
@@ -875,11 +879,10 @@ function(...) {
     }
   }  # end get x.lab
 
-
   # ------------------------
   # y-axis and legend labels
 
-    if (!is.null(y.lab)) { # power.ttest: len > 1
+    if (!is.null(y.lab)  &&  !st.nya) { # power.ttest: len > 1
     if (length(y.lab) == 1  &&  !is.null(lab.y.cex)  &&  graph.win) {
       var.nm <- ifelse (is.null(y.lbl) && !is.null(y.name), FALSE, TRUE)
       if (!is.null(ylab)) var.nm <- FALSE  # ylab is the complete label
@@ -905,7 +908,7 @@ function(...) {
     sub.lab <- NULL
 
   return(list(xn=x.name, xl=x.lbl, xb=x.lab, yn=y.name, yl=y.lbl, yb=y.lab,
-     mb=main.lab, sb=sub.lab))
+     mb=main.lab, sb=sub.lab, lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex))
 }  # end .getlabels
 
 
@@ -1026,6 +1029,8 @@ function(dir, axT) {
   axis.y.text.color <- ifelse(is.null(getOption("axis.y.text.color")),
     getOption("axis.text.color"), getOption("axis.y.text.color"))
 
+  fnt <- ifelse (getOption("sub.theme") == "wsj", 2, 1) # bold
+
   usr <- par("usr")
 
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
@@ -1036,7 +1041,7 @@ function(dir, axT) {
       axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
       text(x=axT, y=usr[3], labels=.fmt(axT,dec.d),
            pos=1, xpd=TRUE, cex=axis.x.cex, col=axis.x.text.color,
-           srt=rotate.x, offset=offset, ...)
+           srt=rotate.x, offset=offset, font=fnt, ...)
     }
   }
 
@@ -1045,7 +1050,7 @@ function(dir, axT) {
         lwd=axis.x.lwd, lty=axis.x.lty)
     text(x=axT1, y=usr[3], labels=x.lvl,
          pos=1, xpd=TRUE, cex=axis.x.cex, col=axis.x.text.color,
-         srt=rotate.x, offset=offset, ...)
+         srt=rotate.x, offset=offset, font=fnt, ...)
   }
 
   if (is.null(y.lvl)  &&  !is.null(axT2)) {
@@ -1055,14 +1060,14 @@ function(dir, axT) {
     axT <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
     text(x=usr[1], y=axT, labels=.fmt(axT,dec.d),
          pos=2, xpd=TRUE, cex=axis.y.cex, col=axis.y.text.color,
-         srt=rotate.y, ...)
+         srt=rotate.y, font=fnt, ...)
   }
   else if (!is.null(y.lvl)) {
     axis(2, at=axT2, labels=FALSE, tck=-.01, col=axis.y.color,
         lwd=axis.y.lwd, lty=axis.y.lty)
     text(x=usr[1], y=axT2, labels=y.lvl,
          pos=2, xpd=TRUE, cex=axis.y.cex, col=axis.y.text.color,
-         srt=rotate.y, ...)
+         srt=rotate.y, font=fnt, ...)
   }
 }
 
@@ -1123,12 +1128,16 @@ function(dir, axT) {
   ln.val <- integer(length=length(val.lab))
 
   for (i in seq_along(val.lab)) {
-    val.lab[i] <- gsub(" ", "\n", val.lab[i])  # space to new line
-    val.lab[i] <- gsub("_", " ", val.lab[i])  # underline to space
-    ln.br <- 0
-    for (j in 1:nchar(val.lab[i]))
-      if (substr(val.lab[i], j, j)=="\n") ln.br <- ln.br + 1
-    ln.val[i] <- ln.br + 1
+    if (!is.na(val.lab[i])) {
+      val.lab[i] <- gsub(" ", "\n", val.lab[i])  # space to new line
+      val.lab[i] <- gsub("_", " ", val.lab[i])  # underline to space
+      ln.br <- 0
+      for (j in 1:nchar(val.lab[i]))
+        if (substr(val.lab[i], j, j)=="\n") ln.br <- ln.br + 1
+      ln.val[i] <- ln.br + 1
+    }
+    else
+      val.lab[i] <- "<NA>"  # when y is given and a value of x is missing
   }
   mx.val.ln <- max(ln.val)  # largest number of value label lines
 
@@ -1248,18 +1257,20 @@ function(dir, axT) {
 }
 
 
-.band.width <- function(x, details=FALSE, ...) {
+.band.width <- function(x, bw.iter=25, details=FALSE, ...) {
 
   if (details) {
     cat("\n")
     cat("iterate for smoother density bandwidth (bw)\n")
-    cat("changes: number of times densities change sign\n")
-    cat("----------------------------------------------\n")
+    cat("flips: number of times densities change sign\n")
+    cat("--------------------------------------------\n")
   }
 
   x <- na.omit(x)
   bw <- bw.nrd0(x)
   irep <- 0
+  if (details)
+    cat(irep, .fmtc(" ", 10) , "   bw: ", .fmt(bw,4), "\n", sep="")
 
   repeat {
     irep <- irep + 1
@@ -1269,18 +1280,18 @@ function(dir, axT) {
     flip <- 0
     for (j in 2:length(xd))
       if (sign(xd[j-1]) != sign(xd[j])) flip <- flip + 1
-    if (details)
-      cat(irep, " changes:", .fmti(flip,3), "   bw: ", .fmt(bw,4), "\n", sep="")
-    if (flip > 1  &&  irep < 25)
-{
+    if (flip > 1  &&  irep <= bw.iter) {
       bw <- 1.1 * bw
-}
+      if (details)
+        cat(irep, "  flips:", .fmti(flip,3), "  bw: ", .fmt(bw,4), "\n", sep="")
+    }
     else
       break;
   }  # end repeat
 
   return(bw)
 }
+
 
 .pdfname <- function(analysis, x.name, go.pdf, pdf.nm, pdf.file) {
   if (go.pdf) {
@@ -1447,26 +1458,105 @@ function(dir, axT) {
 # generate a pre-defined color range if requested
 .color.range <- function(fill, n.clr, no.change=FALSE) {
 
-  nm <- c("reds", "rusts", "yellows", "olives", "greens", "emeralds",
+  # names of color palettes generated by getColors
+  nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",
           "turquoises", "aquas", "blues", "purples", "violets", "magentas",
-          "grays", "colors")
+          "grays", "hues", "viridis", "cividis")
   nmR <- c("rainbow", "heat", "terrain")
+  nmV<- c("viridis", "cividis", "magma", "inferno", "plasma")
+  nmD<- c("distinct")
+  nmW<- c("BottleRocket1", "BottleRocket2", "Rushmore1", "Rushmore",
+          "Royal1", "Royal2", "Zissou1", "Darjeeling1", "Darjeeling2",
+          "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2",
+          "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2",
+          "IsleofDogs1", "IsleofDogs2")
 
-  if ((fill[1] %in% nm)  ||  (fill[1] %in% nmR))
-    clrs <- getColors(fill[1], n=n.clr)
-  else {
-    if (!no.change)
-      clrs <- NULL
-     else  # for style, lines 374+
-      clrs <- fill
+  # fill is a function such as hcl or is a named vector
+  if (is.call(fill) || is.name(fill)) {
+    clrs <- eval(fill)
   }
 
-  if (length(fill == 2)) {
-    if (fill[2] %in% nm)
-      clrs <- getColors(fill[1], fill[2], n=n.clr)
+  # or evaluate the character string fill
+  else {
+
+    if (fill[1] == "colors")  fill[1] <- "hues"  # new range name for 3.7.7
+    if (fill[1] == "yellows")  fill[1] <- "browns"  # new range name for 3.7.7
+
+    if (fill[1] %in% nm  ||  fill[1] %in% nmR  ||  fill[1] %in% nmV  ||
+        fill[1] %in% nmW  ||  fill[1] %in% nmD)
+      clrs <- getColors(fill[1], n=n.clr)  # generate palette
+    else {
+      if (!no.change)
+        clrs <- NULL
+       else  # for style, lines 374+
+        clrs <- fill
+    }
+
+    if (length(fill == 2)) {
+      if (fill[2] %in% nm)
+        clrs <- getColors(fill[1], fill[2], n=n.clr)
+    }
   }
 
   return(clrs)
+}
+
+
+# match a hue to the color theme
+.get.h <- function(theme= getOption("theme")) {
+
+       if (theme %in% c("gray", "white")) h=0  # any value for he works
+  else if (theme %in% c("colors", "lightbronze", "dodgerblue", "blue")) h <- 240
+  else if (theme %in% c("gold", "brown", "sienna")) h <- 60
+  else if (theme == "orange") h <- 30
+  else if (theme %in% c("darkred", "red", "rose")) h <- 0
+  else if (theme %in% c("darkgreen", "green")) h <- 120
+  else if (theme == "purple") h <- 300
+  else h <- 240
+
+  return(h)
+
+}
+
+
+# continuous color scale
+.getColC <- function(x, chroma=55) {
+
+  if (getOption("theme") %in% c("gray", "white")) chroma <- 0
+
+  xp <- pretty(x)
+  xp.mn <- min(xp)
+  xp.mx <- max(xp)
+  xp.rn <- xp.mx - xp.mn
+
+  x.nrm <- (x - xp.mn) / xp.rn
+
+  lum <- 100 - (100*x.nrm)  # scale, light to dark flip
+  expn <- (82 + (2 * length(x))) / 100
+  lum <- (lum**expn) + 9  # compress, which darkens, then lighten a bit
+  cc <- hcl(h=.get.h(), c=chroma, l=lum)
+  clr <- getColors(cc)
+
+  return(clr)
+
+}
+
+
+# link a pre=set range with the current theme
+.get.fill <- function(theme=getOption("theme")) {
+
+  if (theme %in% c("gray", "white")) clrs <- "grays"
+  else if (theme %in% c("lightbronze", "dodgerblue", "blue")) clrs <- "blues"
+  else if (theme == "colors" ) clrs <- "blues"
+  else if (theme %in% c("gold", "brown", "sienna")) clrs <- "browns"
+  else if (theme == "orange") clrs <- "rusts"
+  else if (theme %in% c("darkred", "red", "rose")) clrs <- "reds"
+  else if (theme %in% c("darkgreen", "green")) clrs <- "greens"
+  else if (theme == "purple") clrs <- "violets"
+  else clrs <- "blues"
+
+  return(clrs)
+
 }
 
 

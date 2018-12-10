@@ -2,7 +2,8 @@
 prob.tcut <- 
 function(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
          fill="aliceblue", color.tail="palevioletred4",
-         nrm.color=gray(.7), color.t=gray(.08), ...) {
+         nrm.color=gray(.7), color.t=gray(.08),
+         pdf.file=NULL, width=5, height=5, ...) {
 
 
   dots <- list(...)  # check for deprecated parameters
@@ -21,9 +22,12 @@ function(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
     "The parameter  df  must be 2 or larger.\n\n")
   }
 
-  .graphwin(1)
+  # set up plot 
+  .opendev(pdf.file, width, height)
+
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
+  par(mar=c(4, 3, 1, 2), mgp=c(2,.6,0))
 
   xmin <- -5.5
   xmax <- 5.5
@@ -33,7 +37,7 @@ function(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
 
   tail.area <- alpha / 2
 
-  par(mar=c(4, 3, 1, 2), mgp=c(2,.6,0))
+
   #-------------
   # t Dist
   #-------------
@@ -107,7 +111,15 @@ function(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
   legend("topright", c("Normal", dflbl), lwd=c(1,1.5),
     col=c(nrm.color,color.t), box.lwd=.5, cex=.75)
 
-  return(qntl)
+
+  # terminate pdf graphics system
+  par(orig.params)        
+  if (!is.null(pdf.file)) {
+    dev.off()
+    .showfile(pdf.file, "t-curve probability")
+  }
+
+  cat("Probability: ", qntl, "\n")
 
 }
 

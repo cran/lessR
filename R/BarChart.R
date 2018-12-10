@@ -1,15 +1,17 @@
 BarChart <-
 function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
-        n.cat=getOption("n.cat"), one.plot=NULL,
+        theme=getOption("theme"), n.cat=getOption("n.cat"),
+        one.plot=NULL,
 
         by1=NULL, n.row=NULL, n.col=NULL, aspect="fill",
 
         horiz=FALSE, beside=FALSE, gap=NULL,
         proportion=FALSE, scale.y=NULL,
 
-        fill=getOption("bar.fill.discrete"),
+        fill=NULL,
         color=getOption("bar.color.discrete"),
         trans=getOption("trans.bar.fill"),
+        fill.split=NULL,
 
         legend.title=NULL, legend.loc="right.margin",
         legend.labels=NULL, legend.horiz=FALSE,
@@ -21,9 +23,9 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
 
         label.max=100, out.size=80,
 
-        values=getOption("values"),
+        values=NULL,
         values.color=getOption("values.color"),
-        values.cex=getOption("values.cex"),
+        values.size=getOption("values.size"),
         values.digits=getOption("values.digits"),
         values.pos=getOption("values.pos"),
         values.cut=NULL,
@@ -37,13 +39,20 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
         width=6.5, height=6, pdf=FALSE, ...)  {
 
 
-  values.miss <- ifelse (missing(values), TRUE, FALSE)
+  if (theme != getOption("theme")) {  # not the default theme
+    sty <- style(theme, reset=FALSE)
+    #fill <- sty$bar$bar.fill.discrete
+    #color <- sty$bar$color
+    trans <- sty$bar$trans.fill
+  }
+
+  # evaluate in bc.main, under color, when n.levels is known
+  if (is.null(values)) values <- "eval.later"
+
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   color.miss <- ifelse (missing(color), TRUE, FALSE)
   horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
-
-  theme <- getOption("theme")
 
   if (sort[1] %in% c("off", "up", "down")) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -51,24 +60,6 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
       " instead of \"off\", \"down\", \"up\"\n\n")
   }
   sort <- match.arg(sort)
-
-  if (missing(fill))
-    fill <- ifelse (is.null(getOption("bar.fill.discrete")),
-      getOption("bar.fill"), getOption("bar.fill.discrete"))
-
-  if (values.miss && (!missing(values.color) || !missing(values.cex)
-      || !missing(values.digits) || !missing(values.pos)))
-    values <- "%"
-
-  if (is.null(values.digits)) {
-    if (values == "%") values.digits <- 0
-    if (values == "prop") values.digits <- 2
-  }
-
-  if (missing(values.color)) {
-    values.color <- "white"
-    if (values.pos == "out") values.color <- getOption("axis.text.color")
-  }
 
   options(xname = NULL)
   options(yname = NULL)
@@ -81,10 +72,7 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
   lm.adj <- lm.adj + .1  # pull these margins back a bit for bc
   bm.adj <- bm.adj + .1
 
-  fill[which(fill == "off")] <- "transparent"
-  color[which(color == "off")] <- "transparent"
-
-  Trellis <- ifelse(!missing(by1), TRUE, FALSE)
+  Trellis <- ifelse (!missing(by1), TRUE, FALSE)
   do.plot <- TRUE
 
   if (Trellis  &&  sort != "0") {
@@ -92,14 +80,22 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
       "Sort not applicable to Trellis plots\n\n")
   }
 
+    if (values != "eval.later") {
+      if (!(values %in% c("off", "%", "prop", "input"))) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "values  must be set to \"off\", \"%\", \"prop\" or \"input\"\n\n")
+      }
+    }
+
+    if (missing(values.color)) {
+      values.color <- "white"
+      if (values.pos == "out") values.color <- getOption("axis.text.color")
+    }
+
   if (values.pos == "out"  &&  !missing(by)  &&  !beside) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "values.pos=\"out\" not meaningful for a  by  variable\n",
       "  without beside=TRUE\n\n")
-  }
-  if (!(values %in% c("off", "%", "prop", "input"))) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "values  must be set to \"off\", \"%\", \"prop\" or \"input\"\n\n")
   }
 
   if (!(values.pos %in% c("in", "out"))) {
@@ -136,24 +132,25 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
     options(xname = x.name)
 
-  if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
-    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
-  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+  if (exists(df.name, where=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
+    if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
+      data <- eval(substitute(data), envir=parent.frame())
+  }
 
   if (!is.null(x.name))
     x.in.global <- .in.global(x.name)  # see if in global, includes vars list
   else
     x.in.global <- FALSE
     
-# -----------------------------------------------------------
-# establish if a data frame, if not then identify variable(s)
-# x can be missing entirely, with a data frame passed instead
-# if x a vector, then x.name not in data, but also not in global
+  # -----------------------------------------------------------
+  # establish if a data frame, if not then identify variable(s)
+  # x can be missing entirely, with a data frame passed instead
+  # if x a vector, then x.name not in data, but also not in global
 
   x.call <- NULL
 
@@ -294,6 +291,42 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
       by1.call <- NULL
 
 
+  # evaluate fill (NULL, numeric constant or a variable)
+  #--------------
+  if (!fill.miss) {
+    fill.name <- deparse(substitute(fill))
+
+    if (exists(df.name, where=.GlobalEnv))
+      in.df <- ifelse (exists(fill.name, where=data), TRUE, FALSE)
+    else
+      in.df <- FALSE
+
+    # only works for y given, not tabulated
+    if (in.df) {
+      fill.val <- eval(substitute(data$fill))
+      fill <- .getColC(fill.val)
+
+      if (sort != "0") {
+        srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
+        fill <- fill[order(fill.val, decreasing=srt.dwn)]
+      }
+    }
+    else if (fill.name != "(count)") {
+      fill[which(fill == "off")] <- "transparent"
+      color[which(color == "off")] <- "transparent"
+    }
+
+    # or do a tabulation to get value of y
+    if (fill.name == "(count)") {
+      xtb <- table(x.call)
+      if (sort != "0") {
+        srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
+        xtb <- xtb[order(xtb, decreasing=srt.dwn)]
+      }
+      fill <- .getColC(xtb)
+    }  # end .count 
+  }  # end !fill.miss
+
 
     if (length(unique(na.omit(x.call))) == 1) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -316,7 +349,7 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
                    fill, color, trans, size.pt=NULL, xlab, ylab, main,
                    rotate.x, offset,
                    width, height, pdf,
-                   segments.x=NULL, breaks=NULL, c.type="bar")
+                   segments.x=NULL, breaks=NULL, c.type="bar", quiet)
     }
 
     else {  # not Trellis
@@ -337,12 +370,12 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
       }
 
       bc <- .bc.main(x.call, y.call, by.call,
-            fill, color, trans, theme,
+            fill, color, trans, fill.split, theme,
             horiz, addtop, gap, proportion, scale.y,
             xlab, ylab, main,
             value.labels, label.max, beside,
             rotate.x, offset, break.x, sort,
-            values, values.color, values.cex, values.digits,
+            values, values.color, values.size, values.digits,
             values.pos, values.cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
             legend.title, legend.loc, legend.labels, legend.horiz,
@@ -363,6 +396,16 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
     if (!is.null(by) || !is.null(by1)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "by and by1 variables not available for multiple x variables\n\n")
+    }
+
+    # if values not assigned, do default
+    if (is.null(values) || (!missing(values.color) || !missing(values.size)
+      || !missing(values.digits) || !missing(values.pos))) 
+        values <- ifelse (missing(y), getOption("values"), "input")
+
+    if (is.null(values.digits)) {
+      if (values == "%") values.digits <- 0
+      if (values == "prop") values.digits <- 2
     }
 
     if (is.null(one.plot)) {  # see if one.plot
@@ -395,27 +438,26 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
       options(byname = "Responses")
       if (is.null(xlab)) xlab <- ""
       if (is.null(ylab)) ylab <- ""
-
-      if (missing(values.cex)) values.cex <- 0.8 - (0.008 * ncol(data))
+      if (missing(values.size)) values.size <- 0.8 - (0.008 * ncol(data))
       if (sort.miss) sort <- "+"
       if (horiz.miss) horiz <- TRUE
 
       if (color.miss) color <- "transparent"
-      if (fill.miss) {
+      if (fill.miss) {  # define divergent palette
         if ((theme %in% c("gray", "white"))) {
           fill <- c("grays","grays")
           color <- c("gray50")
-      }
-      else if ((theme %in% c("colors", "lightbronze", "dodgerblue", "blue",
-                              "gold", "brown", "sienna", "orange")))
-        fill <- c("yellows", "blues")
-      else if ((theme %in% c("darkred", "red", "rose")))
-        fill <- c("turquoises", "reds")
-      else if ((theme %in% c("darkgreen", "green", "purple")))
-        fill <- c("violets", "greens")
-      else
-        fill <- c("yellows", "blues")
-      }
+        }
+        else if ((theme %in% c("hues", "lightbronze", "dodgerblue", "blue",
+                                "gold", "brown", "sienna", "orange")))
+          fill <- c("browns", "blues")
+        else if ((theme %in% c("darkred", "red", "rose")))
+          fill <- c("turquoises", "reds")
+        else if ((theme %in% c("darkgreen", "green", "purple")))
+          fill <- c("violets", "greens")
+        else
+          fill <- c("browns", "blues")
+      }  # end fill.miss
         
       if (pdf) {
         f.name <- sub(":", "_", x.name, fixed=TRUE)
@@ -430,12 +472,12 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
       }
       
       bc <- .bc.main(data, y.call, by.call,
-            fill, color, trans, theme,
+            fill, color, trans, fill.split, theme,
             horiz, addtop, gap, proportion, scale.y,
             xlab, ylab, main,
             value.labels, label.max, beside,
             rotate.x, offset, break.x, sort,
-            values, values.color, values.cex, values.digits,
+            values, values.color, values.size, values.digits,
             values.pos, values.cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
             legend.title, legend.loc, legend.labels, legend.horiz,
@@ -449,12 +491,12 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
 
     else {  # analyze each x column separately
       bc.data.frame(data, n.cat,
-        fill, color, trans, theme,
+        fill, color, trans, fill.split, theme,
         horiz, addtop, gap, proportion, scale.y,
         xlab, ylab, main,
         value.labels, label.max, beside,
         rotate.x, offset, break.x, sort,
-        values, values.color, values.cex, values.digits,
+        values, values.color, values.size, values.digits,
         values.pos, values.cut,
         xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
         legend.title, legend.loc, legend.labels, legend.horiz,

@@ -52,7 +52,7 @@ STATISTICS\cr
 \code{anova_residual}: Residual df, and either ss and ms or deviance for logit\cr
 \code{anova_total}: For logit, total df and deviance\cr
 
-Although not typically needed for analysis, if the output is assigned to an object named, for example, \code{n}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(n)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out_piece}.
+Although not typically needed for analysis, if the output is assigned to an object named, for example, \code{n}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(n)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

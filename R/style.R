@@ -2,9 +2,9 @@ style <-
 function(
   theme=c("colors", "lightbronze", "dodgerblue", "darkred", "gray",
       "gold", "darkgreen", "blue", "red", "rose", "green", "purple",
-	    "sienna", "brown", "orange", "white"),
-  sub.theme=c("default", "black", "no.y.axis"),
-  set=NULL, get=TRUE,
+      "sienna", "brown", "orange", "white"),
+  sub.theme=c("default", "black", "wsj"),
+  set=NULL, get=FALSE, reset=TRUE,
 
   window.fill=getOption("window.fill"),
   panel.fill=getOption("panel.fill"),
@@ -27,7 +27,7 @@ function(
   values.cex=getOption("values.cex"),
   values.digits=getOption("values.digits"),
   values.pos=getOption("values.pos"),
-		 
+ 
   pt.fill=getOption("pt.fill"),
   trans.pt.fill=getOption("trans.pt.fill"),
   pt.color=getOption("pt.color"),
@@ -110,14 +110,24 @@ function(
 
   width=120, show=FALSE, ...) {
 
+  
 
   if (nargs() == 0) {
      theme <- "colors"
      miss.theme <- FALSE    
      cat("theme set to \"colors\"\n\n")
   }
-  else
+  else {
     miss.theme <- ifelse (missing(theme), TRUE, FALSE)
+  }
+  if (miss.theme)
+    theme <- getOption("theme")
+  else
+    theme <- match.arg(theme)
+
+  # reset: make change with new options, usually TRUE, but could be ...
+  # set: save current options, get: get current options
+  if (show || get) reset <- FALSE
 
   miss.set <- ifelse (missing(set), TRUE, FALSE) 
   miss.tr.bar.fill <- ifelse (missing(trans.bar.fill), TRUE, FALSE)
@@ -129,7 +139,6 @@ function(
   }
   sub.theme <- match.arg(sub.theme)
   
-
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
     for (i in 1:length(dots)) {
@@ -149,7 +158,7 @@ function(
   }
 
   # ------------------------------------------------
-  # reset values according to previously written set
+  # restore values according to previously saved  set
   if (!is.null(set)) {
 
     theme <- set$theme
@@ -164,13 +173,13 @@ function(
     bar.fill <- set$bar$fill
     trans.bar.fill <- set$bar$trans.fill
     bar.color <- set$bar$color
-	
+
     values <- set$bar$values
     values.color <- set$bar$values.color
     values.cex <- set$bar$values.cex
     values.digits <- set$bar$values.digits
     values.pos <- set$bar$values.pos
-		 
+ 
     pt.fill <- set$pt$fill
     trans.pt.fill <- set$pt$trans.fill
     pt.color <- set$pt$color
@@ -178,7 +187,6 @@ function(
     out.color <- set$pt$out.color
     out2.fill <- set$pt$out2.fill
     out2.color <- set$pt$out2.color
-
 
     violin.fill <- set$VBS$violin.fill
     violin.color <- set$VBS$violin.color
@@ -261,21 +269,23 @@ function(
 
         
   # reset all parameters to start-up condition for new theme
-  if (!miss.theme) {
-    suppressPackageStartupMessages(.onAttach())
-    miss.theme <- FALSE
-    theme <- match.arg(theme) 
-    options(theme=theme)
-    options(trans.bar.fill=0.10)
-    options(trans.pt.fill=0.00) 
-  }
-  else if (miss.set)
-    theme <- getOption("theme")
+  if (reset) { 
+    if (!miss.theme) {
+      suppressPackageStartupMessages(.onAttach())
+      miss.theme <- FALSE
+      theme <- match.arg(theme) 
+      options(theme=theme)
+      options(trans.bar.fill=0.10)
+      options(trans.pt.fill=0.00) 
+    }
+    else if (miss.set)
+      theme <- getOption("theme")
 
-  if (!miss.sub.theme)
-    options(sub.theme=sub.theme)
-  else
-    sub.theme <- getOption("sub.theme")
+    if (!miss.sub.theme)
+      options(sub.theme=sub.theme)
+    else
+      sub.theme <- getOption("sub.theme")
+  }
 
 
   # inheritance
@@ -376,422 +386,549 @@ function(
   add.color <- .color.range(add.color, 24, no.change=TRUE)
 
   # default transparency levels
-  if (!is.null(trans.bar.fill)) {
-    options(trans.bar.fill=trans.bar.fill)
-    options(bar.fill = .maketrans(getOption("bar.fill"), 
-           .to256("trans.bar.fill")))
-  }
-  if (!is.null(trans.pt.fill)) {
-    options(trans.pt.fill=trans.pt.fill)
-    options(pt.fill = .maketrans(getOption("pt.fill"), .to256("trans.pt.fill")))
-  }
+  if (reset) {
+    if (!is.null(trans.bar.fill)) {
+      options(trans.bar.fill=trans.bar.fill)
+      options(bar.fill = .maketrans(getOption("bar.fill"), 
+             .to256("trans.bar.fill")))
+    }
+    if (!is.null(trans.pt.fill)) {
+      options(trans.pt.fill=trans.pt.fill)
+      options(pt.fill = .maketrans(getOption("pt.fill"), .to256("trans.pt.fill")))
+    }
 
-  if (!is.null(bar.fill)) {
-    if (bar.fill[1] == "transparent")
-      options(bar.fill = bar.fill) 
-    else
-      options(bar.fill = .maketrans(bar.fill, .to256("trans.bar.fill")))
-  }
-  if (!is.null(pt.fill)) {
-    if (pt.fill[1] == "transparent")
-      options(pt.fill = pt.fill) 
-    else
-      options(pt.fill = .maketrans(pt.fill, .to256("trans.pt.fill")))
+    if (!is.null(bar.fill)) {
+      if (bar.fill[1] == "transparent")
+        options(bar.fill = bar.fill) 
+      else
+        options(bar.fill = .maketrans(bar.fill, .to256("trans.bar.fill")))
+    }
+    if (!is.null(pt.fill)) {
+      if (pt.fill[1] == "transparent")
+        options(pt.fill = pt.fill) 
+      else
+        options(pt.fill = .maketrans(pt.fill, .to256("trans.pt.fill")))
+    }
   }
 
 
   # ---------------
   # set the options
+  if (reset) {
 
-  options(theme = theme)
-  options(sub.theme = sub.theme)
+    options(theme = theme)
+    options(sub.theme = sub.theme)
 
-  options(bar.fill = bar.fill) 
-  options(bar.fill.discrete = bar.fill.discrete) 
-  options(bar.fill.ordered = bar.fill.ordered) 
-  options(bar.color.discrete = bar.color.discrete) 
-  options(bar.color.ordered = bar.color.ordered) 
-  options(pt.color = pt.color) 
-  
-  options(values=values)
-  options(values.color=values.color)
-  options(values.cex=values.cex)
-  options(values.digits=values.digits)
-  options(values.pos=values.pos)
-  
-  options(window.fill=window.fill)
-  options(panel.fill=panel.fill)
-  options(panel.color=panel.color)
-  options(panel.lwd=panel.lwd)
-  options(panel.lty=panel.lty)
+    options(bar.fill = bar.fill) 
+    options(bar.fill.discrete = bar.fill.discrete) 
+    options(bar.fill.ordered = bar.fill.ordered) 
+    options(bar.color.discrete = bar.color.discrete) 
+    options(bar.color.ordered = bar.color.ordered) 
+    options(pt.color = pt.color) 
+    
+    options(values=values)
+    options(values.color=values.color)
+    options(values.cex=values.cex)
+    options(values.digits=values.digits)
+    options(values.pos=values.pos)
+    
+    options(window.fill=window.fill)
+    options(panel.fill=panel.fill)
+    options(panel.color=panel.color)
+    options(panel.lwd=panel.lwd)
+    options(panel.lty=panel.lty)
 
-  options(violin.fill=violin.fill)
-  options(violin.color=violin.color)
-  options(box.fill=box.fill)
-  options(box.color=box.color)
+    options(violin.fill=violin.fill)
+    options(violin.color=violin.color)
+    options(box.fill=box.fill)
+    options(box.color=box.color)
 
-  options(ellipse.fill=ellipse.fill)
-  options(ellipse.color=ellipse.color)
-  options(ellipse.lwd=ellipse.lwd)
-  options(fit.color=fit.color)
-  options(fit.lwd=fit.lwd)
-  options(se.fill=se.fill)
-  options(segment.color=segment.color)
-  options(ID.color=ID.color)
-  options(area.fill=area.fill)
-  options(out.fill=out.fill)
-  options(out.color=out.color)
-  options(out2.fill=out2.fill)
-  options(out2.color=out2.color)
-  options(bubble.text.color=bubble.text.color)
+    options(ellipse.fill=ellipse.fill)
+    options(ellipse.color=ellipse.color)
+    options(ellipse.lwd=ellipse.lwd)
+    options(fit.color=fit.color)
+    options(fit.lwd=fit.lwd)
+    options(se.fill=se.fill)
+    options(segment.color=segment.color)
+    options(ID.color=ID.color)
+    options(area.fill=area.fill)
+    options(out.fill=out.fill)
+    options(out.color=out.color)
+    options(out2.fill=out2.fill)
+    options(out2.color=out2.color)
+    options(bubble.text.color=bubble.text.color)
 
-  options(grid.color=grid.color)
-  options(grid.x.color=grid.x.color)
-  options(grid.y.color=grid.y.color)
-  options(grid.lwd=grid.lwd)
-  options(grid.x.lwd=grid.x.lwd)
-  options(grid.y.lwd=grid.y.lwd)
-  options(grid.lty=grid.lty)
-  options(grid.x.lty=grid.x.lty)
-  options(grid.y.lty=grid.y.lty)
+    options(grid.color=grid.color)
+    options(grid.x.color=grid.x.color)
+    options(grid.y.color=grid.y.color)
+    options(grid.lwd=grid.lwd)
+    options(grid.x.lwd=grid.x.lwd)
+    options(grid.y.lwd=grid.y.lwd)
+    options(grid.lty=grid.lty)
+    options(grid.x.lty=grid.x.lty)
+    options(grid.y.lty=grid.y.lty)
 
-  options(lab.color=lab.color)
-  options(lab.x.color=lab.x.color)
-  options(lab.y.color=lab.y.color)
-  options(lab.cex=lab.cex)
-  options(lab.x.cex=lab.x.cex)
-  options(lab.y.cex=lab.y.cex)
-  options(main.color=main.color)
-  options(main.cex=main.cex)
-  options(axis.color=axis.color)
-  options(axis.x.color=axis.x.color)
-  options(axis.y.color=axis.y.color)
-  options(axis.lwd=axis.lwd)
-  options(axis.x.lwd=axis.x.lwd)
-  options(axis.y.lwd=axis.y.lwd)
-  options(axis.lty=axis.lty)
-  options(axis.x.lty=axis.x.lty)
-  options(axis.y.lty=axis.y.lty)
+    options(lab.color=lab.color)
+    options(lab.x.color=lab.x.color)
+    options(lab.y.color=lab.y.color)
+    options(lab.cex=lab.cex)
+    options(lab.x.cex=lab.x.cex)
+    options(lab.y.cex=lab.y.cex)
+    options(main.color=main.color)
+    options(main.cex=main.cex)
+    options(axis.color=axis.color)
+    options(axis.x.color=axis.x.color)
+    options(axis.y.color=axis.y.color)
+    options(axis.lwd=axis.lwd)
+    options(axis.x.lwd=axis.x.lwd)
+    options(axis.y.lwd=axis.y.lwd)
+    options(axis.lty=axis.lty)
+    options(axis.x.lty=axis.x.lty)
+    options(axis.y.lty=axis.y.lty)
 
-  options(axis.cex=axis.cex)
-  options(axis.x.cex=axis.x.cex)
-  options(axis.y.cex=axis.y.cex)
-  options(axis.text.color=axis.text.color)
-  options(axis.x.text.color=axis.x.text.color)
-  options(axis.y.text.color=axis.y.text.color)
-  options(rotate.x=rotate.x)
-  options(rotate.y=rotate.y)
-  options(offset=offset)
+    options(axis.cex=axis.cex)
+    options(axis.x.cex=axis.x.cex)
+    options(axis.y.cex=axis.y.cex)
+    options(axis.text.color=axis.text.color)
+    options(axis.x.text.color=axis.x.text.color)
+    options(axis.y.text.color=axis.y.text.color)
+    options(rotate.x=rotate.x)
+    options(rotate.y=rotate.y)
+    options(offset=offset)
 
-  options(add.fill=add.fill)
-  options(add.trans=add.trans)
-  options(add.cex=add.cex)
-  options(add.lwd=add.lwd)
-  options(add.lty=add.lty)
-  options(add.color=add.color)
+    options(add.fill=add.fill)
+    options(add.trans=add.trans)
+    options(add.cex=add.cex)
+    options(add.lwd=add.lwd)
+    options(add.lty=add.lty)
+    options(add.color=add.color)
 
-  options(strip.fill=strip.fill)
-  options(strip.color=strip.color)
-  options(strip.text.color=strip.text.color)
+    options(strip.fill=strip.fill)
+    options(strip.color=strip.color)
+    options(strip.text.color=strip.text.color)
 
-  options(quiet=quiet)
-  options(brief=brief)
-  options(n.cat=n.cat)
-  options(suggest=suggest)
-  options(width=width)
+    options(quiet=quiet)
+    options(brief=brief)
+    options(n.cat=n.cat)
+    options(suggest=suggest)
+    options(width=width)
 
-  options(results=results)
-  options(explain=explain)
-  options(interpret=interpret)
-  options(document=document)
-  options(code=code)
-
-
-  # ----------------------------------------------
-  # functions
-
-  make.color <- function(color1, color2) {
-    options(window.fill = "white")
-    options(panel.fill = "grey99")
-    options(bar.fill = .maketrans(color1, .to256("trans.bar.fill")))
-    options(bar.fill.discrete = .maketrans(color1, .to256("trans.bar.fill")))
-    options(bar.fill.ordered = .maketrans(color1, .to256("trans.bar.fill")))
-    options(pt.fill = .maketrans(color1, .to256("trans.pt.fill")))
-    options(bar.color.discrete = color2)
-    options(bar.color.ordered = color2)
-    options(pt.color = color2)
-    options(violin.fill = .maketrans(color1, 125))  # smaller, more trans 
-    options(violin.color = "gray15") 
-    options(box.fill = .maketrans(color1, 35)) 
-    options(box.color = "gray15") 
-    options(se.fill = .maketrans(color1, 40)) 
-    options(ellipse.fill = .maketrans(color1, 15))
-    if (ellipse.color[1] != "transparent")
-      options(ellipse.color = .maketrans(color1, 200))
-    options(heat = color2)
-    options(segment.color = color1)
-    options(bubble.text.color = "black")
-    options(strip.fill = .maketrans(color1, 55)) 
-    options(strip.color = color2) 
-    options(strip.text.color = color2) 
+    options(results=results)
+    options(explain=explain)
+    options(interpret=interpret)
+    options(document=document)
+    options(code=code)
   }
-
-  make.default <- function()  {
-    options(panel.fill = "grey95")
-    if (theme == "white") options(panel.fill = "white")
-    options(window.fill = "white")
-    options(grid.x.color = "white")
-    options(grid.y.color = "white")
-    options(lab.color = "black")
-    options(main.color = "black")
-  }
-
-  prepare.black <- function() {
-    options(window.fill = rgb(.015,.015,.015))
-    options(panel.fill = rgb(.015,.015,.015))
-    options(grid.color = "gray25")
-    options(panel.color = "gray80")
-    options(segment.color = "gray65")
-    options(lab.color = "gray85")
-    options(main.color = "gray85")
-    options(axis.x.color = "gray85")
-    options(axis.y.color = "gray85")
-    options(axis.text.color = "gray85")
-    options(add.color = "gray55")
-    options(values.color = "gray85")
-    options(heat = "gray30")
-  }
-
-  make.black <- function(color1) {
-    if (sum(col2rgb(panel.fill)) < 370) {
-      options(strip.color = .maketrans(color1, .to256n(0.40))) 
-      options(strip.text.color = "gray65") 
-    }
  
-    else if (theme ==  "gray"  &&  sub.theme == "black") {
-      options(window.fill = "gray10")
-      options(panel.color = "gray55")
-      options(trans.bar.fill = 0.55)
-      options(trans.pt.fill = 0.0)
-      options(bar.fill = .maketrans("gray55", .to256("trans.bar.fill")))
-      options(bar.fill.discrete =
-        .maketrans("gray55", .to256("trans.bar.fill")))
-      options(bar.fill.ordered =
-        .maketrans("gray55", .to256("trans.bar.fill")))
-      options(bar.color.discrete = "gray20")
-      options(bar.color.ordered = "gray20")
-      options(pt.fill = .maketrans("gray75", .to256("trans.pt.fill")))
-      options(pt.color = "gray90")
-      options(violin.fill = .maketrans("gray85", 160))
-      options(violin.color = "gray15") 
-      options(box.fill = .maketrans("gray15", 35)) 
-      options(box.color = "gray15") 
-      options(area.fill = "gray70") 
-      options(ellipse.fill = .maketrans("gray55", 65))
-      options(fit.color = "gray75")
-      options(area.fill = .maketrans("gray55", .to256("trans.bar.fill"))) 
-      options(se.fill = .maketrans("gray55", 65)) 
-      options(heat = "gray30")
-      options(strip.color = .maketrans(color1, .to256n(0.40))) 
-      options(strip.text.color = "gray65") 
-      clr1 <- "gray55"
-    }
-    else if (theme ==  "orange"  &&  sub.theme == "black") {
-      if (miss.tr.bar.fill) options(trans.bar.fill = .05)
-      options(bar.fill.discrete = rgb(139,69,0, alpha=.to256("trans.bar.fill"),
-            maxColorValue=256))
-      options(bar.fill.ordered = rgb(139,69,0, alpha=.to256("trans.bar.fill"),
-            maxColorValue=256))
-      options(pt.fill = rgb(139,69,0, alpha=.to256("trans.pt.fill"),
-            maxColorValue=256))
-      options(bar.color.discrete = "orange4")
-      options(bar.color.ordered = "orange4")
-      options(pt.color = rgb(139,69,0, maxColorValue=256))
-      options(ellipse.fill = rgb(249,99,2, alpha=45, maxColorValue=256))
-      options(fit.color = rgb(209,87,3, maxColorValue=256))
-      options(area.fill = rgb(249,99,2, alpha=.to256("trans.bar.fill"),
-            maxColorValue=256)) 
-      options(heat="darkorange3")
-      options(segment.color = rgb(249,99,2, maxColorValue=256))
-      clr1 <- rgb(249,99,2, maxColorValue=256)
-    }
-  }
 
-  make.no.y.axis  <- function() {
-    options(window.fill = getOption("panel.fill"))
-    options(axis.y.color = "transparent")
-    gxs <- ifelse (getOption("window.fill") == "#040404", "white", "#040404")
-    options(grid.y.color = gxs)
-    options(grid.x.color = "transparent")
-    options(grid.lty = "dotted")
-    options(grid.lwd = 1)
-  }
-
-  
-  # ----------------------------------------------
+  # only run if theme is specified, resets all parameters
 
 
   # set colors
+  if (theme == "colors") {clr1 <- "dodgerblue3"; clr2 <- "steelblue4"}
+  if (theme == "lightbronze") {clr1 <- rgb(247,242,230, maxColorValue=255)}
   if (theme == "dodgerblue") {clr1 <- "dodgerblue3"; clr2 <- "steelblue4"}
-  if (theme == "sienna") {clr1 <- "sienna3"; clr2 <- "sienna4"}
-  if (theme == "green") {clr1 <- "darkgreen"; clr2 <- "darkseagreen4"}
+  if (theme == "darkred") {clr1 <- "darkred"; clr2 <- rgb(80,0,0,
+           maxColorValue=256)}
+  if (theme == "gray") {clr1 <- "gray25"}
+  if (theme == "gold") {clr1 <- "goldenrod3"; clr2 <- "goldenrod4"}
   if (theme == "darkgreen") {
     clr1 <- "darkgreen"; clr2 <- rgb(0,80,0,maxColorValue=256)
   }
-  if (theme == "rose") {clr1 <- "rosybrown3"; clr2 <- "rosybrown4"}
-  if (theme == "gold") {clr1 <- "goldenrod3"; clr2 <- "goldenrod4"}
-  if (theme == "red") {clr1 <- "firebrick3"; clr2 <- "firebrick4"}
-  if (theme == "darkred") {clr1 <- "darkred"; clr2 <-rgb(80,0,0,maxColorValue=256)}
-  if (theme == "purple") {clr1 <- "purple1"; clr2 <- "purple4"}
   if (theme == "blue") {clr1 <- "royalblue1"; clr2 <- "royalblue4"}
+  if (theme == "red") {clr1 <- "firebrick3"; clr2 <- "firebrick4"}
+  if (theme == "rose") {clr1 <- "rosybrown3"; clr2 <- "rosybrown4"}
+  if (theme == "green") {clr1 <- "darkgreen"; clr2 <- "darkseagreen4"}
+  if (theme == "purple") {clr1 <- "purple1"; clr2 <- "purple4"}
+  if (theme == "sienna") {clr1 <- "sienna3"; clr2 <- "sienna4"}
   if (theme == "brown") {clr1 <- "rosybrown4"; clr2 <- "rosybrown3"}
   if (theme == "orange") {clr1 <- "orange"; clr2 <- "orange3"}
   if (theme == "white") {clr1 <- "white"; clr2 <- "black"}
-  if (theme == "gray") {clr1 <- "gray25"}
-  if (theme == "lightbronze") {clr1 <- rgb(247,242,230, maxColorValue=255)}
 
-  # only run if theme is specified, resets all parameters
+
   if (!miss.theme) {
-    theme <- getOption("theme")
 
     if (theme == "white") {
-      options(window.fill = "white")
-      options(panel.fill = "white")
-      options(bar.fill = "white")
-      options(bar.fill.ordered = "white")
-      options(bar.fill.discrete = "white")
-      options(bar.color.discrete = "black")
-      options(bar.color.ordered = "black")      
-      options(values.color = "black")
-      options(pt.fill = "white")
-      options(pt.color = "black")
-      options(bubble.text.color = "black")
-      options(ellipse.fill = .maketrans("gray55", 55))
-      options(ellipse.color = "black")
-      options(fit.color = "gray15")
-      options(violin.fill = "white") 
-      options(violin.color = "black") 
-      options(box.fill = "white") 
-      options(box.color = "black") 
-      options(area.fill = "black") 
-      options(se.fill = .maketrans("gray10", 40)) 
-      options(grid.color = "gray85")
-      options(out.fill="black")
-      options(out.color="black")
-      options(out2.fill="gray25")
-      options(out2.color="gray25")
+      window.fill = "white"
+      panel.fill = "white"
+      bar.fill = "white"
+      bar.fill.ordered = "white"
+      bar.fill.discrete = "white"
+      bar.color.discrete = "black"
+      bar.color.ordered = "black"      
+      values.color = "black"
+      pt.fill = "white"
+      pt.color = "black"
+      bubble.text.color = "black"
+      ellipse.fill = .maketrans("gray55", 55)
+      ellipse.color = "black"
+      fit.color = "gray15"
+      violin.fill = "white"
+      violin.color = "black"
+      box.fill = "white"
+      box.color = "black"
+      area.fill = "black"
+      se.fill = .maketrans("gray10", 40)
+      grid.color = "gray85"
+      out.fill = "black"
+      out.color = "black"
+      out2.fill = "gray25"
+      out2.color = "gray25"
     }
 
     else if (theme == "gray") {
-      options(window.fill = "white")
-      options(panel.fill = "white")
-      options(bar.fill = .maketrans("gray25", .to256("trans.bar.fill")))
-      options(bar.fill.discrete = .maketrans("gray25",.to256("trans.bar.fill")))
-      options(bar.fill.ordered = .maketrans("gray25", .to256("trans.bar.fill")))
-      options(bar.color.discrete = "gray60")
-      options(bar.color.ordered = "gray60")
-      options(pt.fill = "gray20")
-      options(trans.pt.fill = 0.00)
-      options(pt.color = "gray20")
-      options(violin.fill=.maketrans("gray50", 40))
-      options(violin.color = "gray15") 
-      options(box.fill="gray75")
-      options(box.color = "gray15") 
-      options(ellipse.fill = .maketrans("gray35", 15))
-      options(fit.color = "black")
-      options(area.fill = .maketrans("gray25", .to256("trans.bar.fill"))) 
-      options(se.fill = .maketrans("gray10", 40)) 
-      options(heat = "gray5")
-      options(segment.color = "gray20")
-      options(grid.color = "gray85")
-      options(out.fill="black")
-      options(out.color="black")
-      options(out2.fill="black")
-      options(out2.color="black")
+      window.fill = "white"
+      panel.fill = "white"
+      bar.fill = .maketrans("gray25", .to256("trans.bar.fill"))
+      bar.fill.discrete = .maketrans("gray25",.to256("trans.bar.fill"))
+      bar.fill.ordered = .maketrans("gray25", .to256("trans.bar.fill"))
+      bar.color.discrete = "gray60"
+      bar.color.ordered = "gray60"
+      pt.fill = "gray20"
+      trans.pt.fill = 0.00
+      pt.color = "gray20"
+      violin.fill=.maketrans("gray50", 40)
+      violin.color = "gray15" 
+      box.fill="gray75"
+      box.color = "gray15" 
+      ellipse.fill = .maketrans("gray35", 15)
+      fit.color = "black"
+      area.fill = .maketrans("gray25", .to256("trans.bar.fill"))
+      se.fill = .maketrans("gray10", 40) 
+      heat = "gray5"
+      segment.color = "gray20"
+      grid.color = "gray85"
+      out.fill = "black"
+      out.color = "black"
+      out2.fill = "black"
+      out2.color = "black"
     }
 
     else if (theme == "lightbronze") {
-      options(window.fill = rgb(247,242,230, maxColorValue=255))
-      options(panel.fill = rgb(247,242,230, maxColorValue=255))
-      #options(panel.fill = "transparent")
-      options(panel.color = rgb(222,217,205, maxColorValue=255))
-      #options(bar.fill = .maketrans("gray50", .to256("trans.bar.fill")))  # 230
-      options(bar.fill = rgb(123,140,150, maxColorValue=255))  
-      options(bar.fill.ordered = rgb(123,140,150, maxColorValue=255))  
-      options(bar.fill.discrete = rgb(123,140,150, maxColorValue=255))  
-      options(bar.color.discrete = "transparent")
-      options(bar.color.ordered = rgb(126,144,168, maxColorValue=255))
-      options(pt.fill = rgb(70,80,90, maxColorValue=255))
-      options(trans.pt.fill = 0.00)
-      options(pt.color = rgb(70,80,90, maxColorValue=255))
-      options(ellipse.fill = .maketrans("gray50", 50))
-      options(ellipse.color = "gray20")
-      options(se.fill = .maketrans("gray10", 40)) 
-      options(violin.fill = rgb(144,165,175, maxColorValue=255))
-      options(violin.color = "gray15") 
-      options(box.fill = .maketrans("gray15", 35)) 
-      options(box.color = "gray15") 
-      options(strip.fill = .maketrans("gray55"))
-      options(fit.color = "gray15")
-      options(area.fill = .maketrans("gray50", .to256("trans.bar.fill")))
-      options(heat = "gray30")
-      options(main.color = "gray15")
-      options(lab.color = "gray15")
-      options(axis.color = "gray15")
-      options(axis.text.color = "gray15")
-      options(segment.color = "gray50") 
-      options(strip.color = "gray55") 
-      options(strip.text.color = "gray15") 
-      options(ellipse.color = "gray15")
-      options(bubble.text.color = rgb(247,242,230, maxColorValue=255))
-      options(grid.color = rgb(222,217,205, maxColorValue=255))
-      options(trans = 0)
+      window.fill = rgb(247,242,230, maxColorValue=255)
+      panel.fill = rgb(247,242,230, maxColorValue=255)
+      #panel.fill = "transparent"
+      panel.color = rgb(222,217,205, maxColorValue=255)
+      #bar.fill = .maketrans("gray50", .to256("trans.bar.fill")))  # 230
+      bar.fill = rgb(123,140,150, maxColorValue=255)  
+      bar.fill.ordered = rgb(123,140,150, maxColorValue=255)  
+      bar.fill.discrete = rgb(123,140,150, maxColorValue=255)  
+      bar.color.discrete = "transparent"
+      bar.color.ordered = rgb(126,144,168, maxColorValue=255)
+      pt.fill = rgb(70,80,90, maxColorValue=255)
+      trans.pt.fill = 0.00
+      pt.color = rgb(70,80,90, maxColorValue=255)
+      ellipse.fill = .maketrans("gray50", 50)
+      ellipse.color = "gray20"
+      se.fill = .maketrans("gray10", 40) 
+      violin.fill = rgb(144,165,175, maxColorValue=255)
+      violin.color = "gray15" 
+      box.fill = .maketrans("gray15", 35) 
+      box.color = "gray15" 
+      strip.fill = .maketrans("gray55")
+      fit.color = "gray15"
+      area.fill = .maketrans("gray50", .to256("trans.bar.fill"))
+      heat = "gray30"
+      main.color = "gray15"
+      lab.color = "gray15"
+      axis.color = "gray15"
+      axis.text.color = "gray15"
+      segment.color = "gray50" 
+      strip.color = "gray55" 
+      strip.text.color = "gray15" 
+      ellipse.color = "gray15"
+      bubble.text.color = rgb(247,242,230, maxColorValue=255)
+      grid.color = rgb(222,217,205, maxColorValue=255)
+      trans = 0
     }
-	
+
     else if (theme == "colors") {
-      options(panel.fill = "white")
-      options(window.fill = getOption("panel.fill"))
-      options(bar.fill.discrete = "colors")
-      options(bar.fill.ordered = rgb(144,165,175, maxColorValue=255))
-      options(bar.color.discrete = "transparent")
-      options(bar.color.ordered = rgb(126,144,168, maxColorValue=255))
-      options(pt.fill = rgb(70,80,90, maxColorValue=255))
-      options(trans.pt.fill = 0.00)
-      options(pt.color = rgb(70,80,90, maxColorValue=255))
-      options(box.fill=getColors("colors"))
-      options(violin.fill = .maketrans(hcl(240,20,55), 90))
-      options(area.fill = "gray50")
-      options(grid.color = rgb(222,217,205, maxColorValue=255))
-      options(values = "%")
-    }
-	
-    else {
-      make.color(clr1, clr2)
-      if (!miss.sub.theme) if (sub.theme == "default") make.default()
+      panel.fill = "white"
+      window.fill = getOption("panel.fill")
+      bar.fill.discrete = "hues"
+      bar.fill.ordered = rgb(144,165,175, maxColorValue=255)
+      bar.color.discrete = "transparent"
+      bar.color.ordered = rgb(126,144,168, maxColorValue=255)
+      pt.fill = rgb(70,80,90, maxColorValue=255)
+      trans.pt.fill = 0.00
+      pt.color = rgb(70,80,90, maxColorValue=255)
+      box.fill = getColors("hues")
+      violin.fill = .maketrans(hcl(240,20,55), 90)
+      area.fill = "gray50"
+      grid.color = rgb(222,217,205, maxColorValue=255)
+      values = "%"
     }
 
-  }  # not miss theme
+    else {  # process the other theme colors
 
+      window.fill = "white"
+      panel.fill = "grey99"
+      bar.fill = .maketrans(clr1, .to256("trans.bar.fill"))
+      bar.fill.discrete = .maketrans(clr1, .to256("trans.bar.fill"))
+      bar.fill.ordered = .maketrans(clr1, .to256("trans.bar.fill"))
+      pt.fill = .maketrans(clr1, .to256("trans.pt.fill"))
+      bar.color.discrete = clr2
+      bar.color.ordered = clr2
+      pt.color = clr2
+      if (theme %in% c("darkred", "red", "rose"))  # kludge until all HCL colors 
+        box.fill <- hcl(0,40,55) 
+      else if (theme %in% c("dodgerblue", "blue"))
+        box.fill <- hcl(240,40,55)
+      else if (theme %in% c("darkgreen", "green"))
+        box.fill <- hcl(120,40,55)
+      else {
+        violin.fill = .maketrans(clr1, 125)  # smaller, more trans 
+        box.fill = .maketrans(clr1, 35)
+      }
+      violin.color = "gray15"
+      box.color = "gray15"
+      se.fill = .maketrans(clr1, 40)
+      ellipse.fill = .maketrans(clr1, 15)
+      if (ellipse.color[1] != "transparent")
+        ellipse.color = .maketrans(clr1, 200)
+      heat = clr2
+      segment.color = clr1
+      bubble.text.color = "black"
+      strip.fill = .maketrans(clr1, 55) 
+      strip.color = clr2 
+      strip.text.color = clr2 
+    }
+  }  # not miss theme 
+
+
+  # sub.theme
   if (!miss.sub.theme) {
-    if (sub.theme == "no.y.axis") make.no.y.axis()
-    if (sub.theme == "black") {
-      prepare.black()
-      make.black(clr1)
-    }
-  }
 
+    if (sub.theme == "default") {
+      panel.fill = "grey95"
+      if (theme == "white") panel.fill = "white"
+      window.fill = "white"
+      grid.x.color = "white"
+      grid.y.color = "white"
+      lab.color = "black"
+      main.color = "black"
+    }
+
+    else if (sub.theme == "wsj")  {
+      if (!(theme %in% c("gray", "white"))) {
+        window.fill = rgb(247,242,230, maxColorValue=255)
+        panel.fill = rgb(247,242,230, maxColorValue=255)
+      }
+      else {
+        window.fill = "gray93"
+        panel.fill = "gray93"
+      }
+  #   window.fill = getOption("panel.fill")
+      panel.color = "transparent"
+      axis.y.color = "transparent"
+      gxs <- ifelse (getOption("window.fill") == "#040404", "white", "#040404")
+      grid.y.color = gxs
+      grid.x.color = "transparent"
+      grid.lty = "dotted"
+      grid.lwd = 1
+    }
+   
+    else if (theme ==  "gray"  &&  sub.theme == "black") {
+      window.fill = "gray10"
+      panel.fill = "gray10"
+      panel.color = "gray80"
+      trans.bar.fill = 0.55
+      trans.pt.fill = 0.0
+      bar.fill = .maketrans("gray55", .to256("trans.bar.fill"))
+      bar.fill.discrete =
+        .maketrans("gray55", .to256("trans.bar.fill"))
+      bar.fill.ordered =
+        .maketrans("gray55", .to256("trans.bar.fill"))
+      bar.color.discrete = "gray20"
+      bar.color.ordered = "gray20"
+      pt.fill = .maketrans("gray75", .to256("trans.pt.fill"))
+      pt.color = "gray90"
+      violin.fill = .maketrans("gray85", 160)
+      violin.color = "gray15"
+      box.fill = .maketrans("gray15", 35)
+      box.color = "gray15"
+      area.fill = "gray70"
+      ellipse.fill = .maketrans("gray55", 65)
+      fit.color = "gray75"
+      area.fill = .maketrans("gray55", .to256("trans.bar.fill"))
+      se.fill = .maketrans("gray55", 65)
+      heat = "gray30"
+      strip.color = .maketrans(clr1, .to256n(0.40))
+      strip.text.color = "gray65"
+      segment.color = "gray65"
+      lab.color = "gray85"
+      main.color = "gray85"
+      axis.x.color = "gray85"
+      axis.y.color = "gray85"
+      axis.text.color = "gray85"
+      grid.color = "gray25"
+      add.color = "gray55"
+      values.color = "gray85"
+      heat = "gray30"
+      clr1 <- "gray55"
+    }
+  
+    else if (sub.theme == "black") {
+
+      window.fill = rgb(.015,.015,.015)
+      panel.fill = rgb(.015,.015,.015)
+      grid.color = "gray25"
+      panel.color = "gray80"
+      segment.color = "gray65"
+      lab.color = "gray85"
+      main.color = "gray85"
+      axis.x.color = "gray85"
+      axis.y.color = "gray85"
+      axis.text.color = "gray85"
+      add.color = "gray55"
+      values.color = "gray85"
+      heat = "gray30"
+
+      if (sum(col2rgb(panel.fill)) < 370) {
+        strip.color = .maketrans(clr1, .to256n(0.40))
+        strip.text.color = "gray65"
+      }
+
+      else if (theme ==  "orange"  &&  sub.theme == "black") {
+        if (miss.tr.bar.fill) trans.bar.fill = .05
+        bar.fill.discrete = rgb(139,69,0, alpha=.to256("trans.bar.fill"),
+              maxColorValue=256)
+        bar.fill.ordered = rgb(139,69,0, alpha=.to256("trans.bar.fill"),
+              maxColorValue=256)
+        pt.fill = rgb(139,69,0, alpha=.to256("trans.pt.fill"),
+              maxColorValue=256)
+        bar.color.discrete = "orange4"
+        bar.color.ordered = "orange4"
+        pt.color = rgb(139,69,0, maxColorValue=256)
+        ellipse.fill = rgb(249,99,2, alpha=45, maxColorValue=256)
+        fit.color = rgb(209,87,3, maxColorValue=256)
+        area.fill = rgb(249,99,2, alpha=.to256("trans.bar.fill"),
+              maxColorValue=256)
+        heat="darkorange3"
+        segment.color = rgb(249,99,2, maxColorValue=256)
+        clr1 <- rgb(249,99,2, maxColorValue=256)
+      }
+    }
+
+  }  # end not miss sub.theme
 
   if (show) {
     .style.show()
   }
 
+
+  # set the options
+  if (reset) {
+
+    options(theme = theme)
+    options(sub.theme = sub.theme)
+
+    options(bar.fill = bar.fill) 
+    options(bar.fill.discrete = bar.fill.discrete) 
+    options(bar.fill.ordered = bar.fill.ordered) 
+    options(bar.color.discrete = bar.color.discrete) 
+    options(bar.color.ordered = bar.color.ordered) 
+    options(pt.color = pt.color) 
+    
+    options(values=values)
+    options(values.color=values.color)
+    options(values.cex=values.cex)
+    options(values.digits=values.digits)
+    options(values.pos=values.pos)
+    
+    options(window.fill=window.fill)
+    options(panel.fill=panel.fill)
+    options(panel.color=panel.color)
+    options(panel.lwd=panel.lwd)
+    options(panel.lty=panel.lty)
+
+    options(violin.fill=violin.fill)
+    options(violin.color=violin.color)
+    options(box.fill=box.fill)
+    options(box.color=box.color)
+
+    options(ellipse.fill=ellipse.fill)
+    options(ellipse.color=ellipse.color)
+    options(ellipse.lwd=ellipse.lwd)
+    options(fit.color=fit.color)
+    options(fit.lwd=fit.lwd)
+    options(se.fill=se.fill)
+    options(segment.color=segment.color)
+    options(ID.color=ID.color)
+    options(area.fill=area.fill)
+    options(out.fill=out.fill)
+    options(out.color=out.color)
+    options(out2.fill=out2.fill)
+    options(out2.color=out2.color)
+    options(bubble.text.color=bubble.text.color)
+
+    options(grid.color=grid.color)
+    options(grid.x.color=grid.x.color)
+    options(grid.y.color=grid.y.color)
+    options(grid.lwd=grid.lwd)
+    options(grid.x.lwd=grid.x.lwd)
+    options(grid.y.lwd=grid.y.lwd)
+    options(grid.lty=grid.lty)
+    options(grid.x.lty=grid.x.lty)
+    options(grid.y.lty=grid.y.lty)
+
+    options(lab.color=lab.color)
+    options(lab.x.color=lab.x.color)
+    options(lab.y.color=lab.y.color)
+    options(lab.cex=lab.cex)
+    options(lab.x.cex=lab.x.cex)
+    options(lab.y.cex=lab.y.cex)
+    options(main.color=main.color)
+    options(main.cex=main.cex)
+    options(axis.color=axis.color)
+    options(axis.x.color=axis.x.color)
+    options(axis.y.color=axis.y.color)
+    options(axis.lwd=axis.lwd)
+    options(axis.x.lwd=axis.x.lwd)
+    options(axis.y.lwd=axis.y.lwd)
+    options(axis.lty=axis.lty)
+    options(axis.x.lty=axis.x.lty)
+    options(axis.y.lty=axis.y.lty)
+
+    options(axis.cex=axis.cex)
+    options(axis.x.cex=axis.x.cex)
+    options(axis.y.cex=axis.y.cex)
+    options(axis.text.color=axis.text.color)
+    options(axis.x.text.color=axis.x.text.color)
+    options(axis.y.text.color=axis.y.text.color)
+    options(rotate.x=rotate.x)
+    options(rotate.y=rotate.y)
+    options(offset=offset)
+
+    options(add.fill=add.fill)
+    options(add.trans=add.trans)
+    options(add.cex=add.cex)
+    options(add.lwd=add.lwd)
+    options(add.lty=add.lty)
+    options(add.color=add.color)
+
+    options(strip.fill=strip.fill)
+    options(strip.color=strip.color)
+    options(strip.text.color=strip.text.color)
+
+    options(quiet=quiet)
+    options(brief=brief)
+    options(n.cat=n.cat)
+    options(suggest=suggest)
+    options(width=width)
+
+    options(results=results)
+    options(explain=explain)
+    options(interpret=interpret)
+    options(document=document)
+    options(code=code)
+  }
   
+
   # ---------------------------------------
-  # create list of current parameter values
-
+  # get current parameter values
+  # create a list of sub-lists
   if (get) {
-
-    # create sub-lists
 
     panel <- list(
       fill = getOption("panel.fill"),
@@ -802,6 +939,8 @@ function(
 
     bar <- list(
       fill = getOption("bar.fill"),
+      bar.fill.discrete = getOption("bar.fill.discrete"),
+      bar.fill.ordered = getOption("bar.fill.ordered"),
       trans.fill = getOption("trans.bar.fill"),
       color = getOption("bar.color"),
       values = getOption("values"),
@@ -917,57 +1056,191 @@ function(
       document = getOption("document"),
       code = getOption("code")
     )
-
-    # create main list
-    gp <- list(
-      theme = getOption("theme"),
-      sub.theme = getOption("sub.theme"),
-
-      window.fill = getOption("window.fill"),
-      panel = panel,
-
-      bar = bar,
-      pt = pt,
-
-      VBS = VBS,
-      ellipse = ellipse,
-
-      fit.color = getOption("fit.color"),
-      fit.lwd = getOption("fit.lwd"),
-      se.fill = getOption("se.fill"),
-      bubble.text.color = getOption("bubble.text.color"),
-      heat = getOption("heat"),
-      segment.color = getOption("segment.color"),
-      ID.color=getOption("ID.color"),
-      area.fill=getOption("area.fill"),
-
-      axis = axis,
-      axis.x = axis.x,
-      axis.y = axis.y,
-      rotate = rotate,
-
-      lab = lab,
-      lab.x = lab.x,
-      lab.y = lab.y,
-      main = main,
-
-      grid = grid,
-      grid.x = grid.x,
-      grid.y = grid.y,
-
-      strip = strip,
-
-      add = add,
-
-      n.cat = getOption("n.cat"),
-      suggest = getOption("suggest"),
-      quiet = getOption("quiet"),
-      brief = getOption("brief"),
-
-      output = output
-      
-    )
   }
+  
+
+  # ---------------------------------------
+  # create list of current parameter values
+  # create sub-lists
+
+  panel <- list(
+    fill = panel.fill,
+    color = panel.color,
+    lwd = panel.lwd,
+    lty = panel.lty
+  )
+
+
+  bar <- list(
+    fill = bar.fill,
+    bar.fill.discrete = bar.fill.discrete,
+    bar.fill.ordered = bar.fill.ordered,
+    trans.fill = trans.bar.fill,
+    color = bar.color,
+    values = values,
+    values.color = values.color,
+    values.cex = values.cex,
+    values.digits = values.digits,
+    values.pos = values.pos
+  )
+
+  pt <- list(
+    fill = pt.fill,
+    trans.fill = trans.pt.fill,
+    color = pt.color,
+    out.fill=out.fill,
+    out.color=out.color,
+    out2.fill=out2.fill,
+    out2.color=out2.color
+  )
+
+  VBS <- list(
+    violin.fill = violin.fill,
+    violin.color = violin.color,
+    box.fill = box.fill,
+    box.color = box.color
+  )
+
+  ellipse <- list(
+    fill = ellipse.fill,
+    color = ellipse.color
+  )
+
+  axis <- list(
+    color = axis.color,
+    lwd = axis.lwd,
+    lty = axis.lty,
+    cex = axis.cex,
+    text.color = axis.text.color
+  )
+  axis.x <- list(
+    color = axis.x.color,
+    lwd = axis.x.lwd,
+    lty = axis.x.lty,
+    cex = axis.x.cex,
+    text.color = axis.x.text.color
+  )
+  axis.y <- list(
+    color = axis.y.color,
+    lwd = axis.y.lwd,
+    lty = axis.y.lty,
+    cex = axis.y.cex,
+    text.color = axis.y.text.color
+  )
+
+  rotate <- list(
+    x = rotate.x,
+    y = rotate.y,
+    offset = offset
+  )
+
+  lab <- list(
+    color = lab.color,
+    cex = lab.cex
+  )
+  lab.x <- list(
+    color = lab.x.color,
+    cex = lab.x.cex
+  )
+  lab.y <- list(
+    color = lab.y.color,
+    cex = lab.y.cex
+  )
+
+  main <- list(
+    color = main.color,
+    cex = main.cex
+  )
+
+  grid <- list(
+    color = grid.color,
+    lwd = grid.lwd,
+    lty = grid.lty
+  )
+  grid.x <- list(
+    color = grid.x.color,
+    lwd = grid.x.lwd,
+    lty = grid.x.lty
+  )
+  grid.y <- list(
+    color = grid.y.color,
+    lwd = grid.y.lwd,
+    lty = grid.y.lty
+  )
+
+  strip <- list(
+    fill = strip.fill,
+    color = strip.color,
+    text.color = strip.text.color
+  )
+
+  add <- list(
+    fill = add.fill,
+    trans = add.trans,
+    color = add.color,
+    cex = add.cex,
+    lwd = add.lwd,
+    lty = add.lty
+  )
+
+  output <- list(
+    results = results,
+    explain = explain,
+    interpret = interpret,
+    document = document,
+    code = code
+  )
+
+
+  # create main list
+  gp <- list(
+    theme = theme,
+    sub.theme = getOption("sub.theme"),
+
+    window.fill = getOption("window.fill"),
+    panel = panel,
+
+    bar = bar,
+    pt = pt,
+
+    VBS = VBS,
+    ellipse = ellipse,
+
+    fit.color = getOption("fit.color"),
+    fit.lwd = getOption("fit.lwd"),
+    se.fill = getOption("se.fill"),
+    bubble.text.color = getOption("bubble.text.color"),
+    heat = getOption("heat"),
+    segment.color = getOption("segment.color"),
+    ID.color=getOption("ID.color"),
+    area.fill=getOption("area.fill"),
+
+    axis = axis,
+    axis.x = axis.x,
+    axis.y = axis.y,
+    rotate = rotate,
+
+    lab = lab,
+    lab.x = lab.x,
+    lab.y = lab.y,
+    main = main,
+
+    grid = grid,
+    grid.x = grid.x,
+    grid.y = grid.y,
+
+    strip = strip,
+
+    add = add,
+
+    n.cat = getOption("n.cat"),
+    suggest = getOption("suggest"),
+    quiet = getOption("quiet"),
+    brief = getOption("brief"),
+
+    output = output
+    
+  )
 
   invisible(gp)
 

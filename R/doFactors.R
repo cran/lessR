@@ -2,9 +2,9 @@ doFactors <-
 function (x, levels, labels=NULL, data=mydata, ordered=FALSE,
           new=FALSE, suffix=".f", var.labels=FALSE) {
 
-  if (missing(levels)) levels <- NULL
-  if (is.null(labels)) labels <- as.character(levels)
   if (var.labels) new <- TRUE
+  if (missing(levels) && var.labels) levels <- NULL
+  if (is.null(labels)) labels <- as.character(levels)
 
   # get ind, the indices of selected variables
   data.vars <- as.list(seq_along(data))

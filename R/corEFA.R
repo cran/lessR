@@ -155,13 +155,13 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   }
 
 
-  class(title_efa) <- "out_piece"
-  class(txer) <- "out_piece"
-  class(txld) <- "out_piece"
-  class(txss) <- "out_piece"
-  class(title_cfa) <- "out_piece"
-  class(txcfa) <- "out_piece"
-  class(txdel) <- "out_piece"
+  class(title_efa) <- "out"
+  class(txer) <- "out"
+  class(txld) <- "out"
+  class(txss) <- "out"
+  class(title_cfa) <- "out"
+  class(txcfa) <- "out"
+  class(txdel) <- "out"
 
   output <- list(
     out_title_efa=title_efa, out_type=txer, out_loadings=txld, out_ss=txss,

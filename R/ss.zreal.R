@@ -10,7 +10,7 @@ function(x, y=NULL, by=NULL, digits.d=NULL, x.name, y.name=NULL, by.name=NULL,
   if (n.dim == 2) { 
 
     # potential abbreviation of column labels
-    mx.chr <- max(nchar(colnames(x)))
+    mx.chr <- max(nchar(colnames(x)), na.rm=TRUE)
     if (mx.chr > label.max) {
       c.nm <- colnames(x)
       colnames(x) <- .abbrev(colnames(x), label.max)
@@ -76,16 +76,18 @@ function(x, y=NULL, by=NULL, digits.d=NULL, x.name, y.name=NULL, by.name=NULL,
   else {  # one variable
 
     # potential abbreviation of column labels
-    mx.chr <- max(nchar(names(x)))
+    mx.chr <- max(nchar(names(x)), na.rm=TRUE)
     if (mx.chr > label.max) {
       c.nm <- names(x)
       names(x) <- .abbrev(names(x), label.max)
     }
 
+     names(x)[which(is.na(names(x)))] <- "<NA>"  # for y given, a missing x
      max.ln <- integer(length=0)      
      for (i in 1:length(x)) {
+       if (is.na(names(x[i]))) names(x[i]) <- "xxx"
        ln.nm <- nchar(names(x[i]))
-       ln.vl <- nchar(as.character(x[i]))
+       ln.vl <- nchar(format(x[i]))
        max.ln[i] <- max(ln.nm, ln.vl) + 1
        if (max.ln[i] < 6) max.ln[i] <- 6
      }

@@ -63,14 +63,15 @@ function(x, data=mydata, rows=NULL,
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
     options(xname = x.name)
 
-  if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
-    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
-  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+  if (exists(df.name, where=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
+    if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
+      data <- eval(substitute(data), envir=parent.frame())
+  }
 
   if (!is.null(x.name))
     x.in.global <- .in.global(x.name)  # see if in global, includes vars list

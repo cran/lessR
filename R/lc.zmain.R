@@ -231,8 +231,8 @@ function(y, type,
       txsug <- paste(txsug, fc, sep="")
     }
 
-    class(ttlns) <- "out_piece"
-    class(txsug) <- "out_piece"
+    class(ttlns) <- "out"
+    class(txsug) <- "out"
     output <- list(out_title=ttlns, out_suggest=txsug)
     class(output) <- "out_all"
     print(output)    

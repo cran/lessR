@@ -121,7 +121,9 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
       if (brief || !grepl("labels", fncl))
         cat("\n>>> Suggestions\n")
       if (!grepl("labels", fncl)  &&  format != "lessR")
-        cat("Use the VariableLabels function, also vl, to read labels\n")
+        cat("Use the VariableLabels function, or vl, to read\n",
+            "  a csv or Excel file of variable labels\n",
+            "  Each row of the file is Variable Name, Variable Label\n")
       if (brief) {
         cat("Details about your data, Enter:  details()  for mydata, or",
            " details(name)\n")
@@ -168,10 +170,10 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
 
     if (isnot.row2) {  # read data
       d <- openxlsx::read.xlsx(ref, sheet=sheet)
-#     d <- readxl::read_excel(path=ref, sheet=sheet)
+      # d <- readxl::read_excel(path=ref, sheet=sheet)
       if (!is.null(list(...)$row.names))  # add row.names to read function
         d <- data.frame(d, row.names=list(...)$row.names)
-#     class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
+      # class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
     }
   }
 
@@ -193,8 +195,8 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
           mylabels <- read.csv(file=ref.lbl, row.names=1, header=FALSE)
         else {  # openxlsx
           mylabels <- read.xlsx(ref.lbl, rowNames=TRUE, colNames=FALSE)
-#         mylabels <- read_excel(path=ref.lbl, col_names=FALSE)
-#         mylabels <- data.frame(mylabels, row.names=1)
+          # mylabels <- read_excel(path=ref.lbl, col_names=FALSE)
+          #  mylabels <- data.frame(mylabels, row.names=1)
         }
         if (ncol(mylabels) == 1) names(mylabels) <- c("label")
         if (ncol(mylabels) == 2) names(mylabels) <- c("label", "unit")
@@ -283,9 +285,9 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
       # read_excel does not convert strings to factors, do so if !unique
         for (i in 1:ncol(d))
           if (is.character(d[,i])) if (nu.col[i] != n.col[i])
-	    fnu.col[i] <- TRUE
+          fnu.col[i] <- TRUE
           d[fnu.col] <- lapply(d[fnu.col], as.factor)
-#        d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
+          # d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
       }
         fnu.col <- logical(length=ncol(d))  # reset
         for (i in 1:ncol(d))
@@ -329,7 +331,7 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
   if (format %in% c("csv", "Excel")) {
     dg <- character(length=10)
     for (i in 0:9) dg[i+1] <- as.character(i)
-    ltr <- c(letters, LETTERS, dg, "_", ".")
+    ltr <- c(letters, LETTERS, dg, "_", ".", "(", ")")
 
     # get rid of variables that are not named (NA's)
     nm.miss <- is.na(names(d))

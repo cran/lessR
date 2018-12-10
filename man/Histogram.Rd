@@ -16,7 +16,7 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, c
 
 \usage{
 Histogram(x=NULL, data=mydata, rows=NULL,
-          n.cat=getOption("n.cat"), Rmd=NULL,
+         theme=getOption("theme"), n.cat=getOption("n.cat"), Rmd=NULL,
 
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
@@ -57,6 +57,7 @@ hs(\ldots)
         default is \code{mydata}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
+  \item{theme}{Color theme for this analysis.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric
         data type
@@ -221,7 +222,7 @@ Individual colors in the plot can be manipulated with options such as \code{colo
 
 For the color options, such as \code{fill}, the value of \code{"off"} is the same as \code{"transparent"}.
 
-Set \code{fill} to a single color or a color range, of which there are many possibilities. For \code{"colors"} colors of the same chroma and luminance set \code{fill} to multiple colors all with the same saturation and brightness. Also available are the pre-specified R color schemes \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. Can also provide pre-defined color ranges \code{"blues"}, \code{"reds"} and \code{"greens"}, or generate custom colors, such as from the lessR function \code{\link{getColors}}. 
+Set \code{fill} to a single color or a color range, of which there are many possibilities. For \code{"hues"} colors of the same chroma and luminance set \code{fill} to multiple colors all with the same saturation and brightness. Also available are the pre-specified R color schemes \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. Can also provide pre-defined color ranges \code{"blues"}, \code{"reds"} and \code{"greens"}, or generate custom colors, such as from the lessR function \code{\link{getColors}}. 
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -243,25 +244,23 @@ To obtain pdf output, use the \code{pdf} option, perhaps with the optional \code
 }
 
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the R~Markdown document (see \code{examples}).
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Two different types of components are provided: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for display. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the R~Markdown document (see \code{examples}), interspersed with explanation and interpretation.
 
 READABLE OUTPUT\cr
-code{out_ss}: Summary statistics\cr
-code{out_freq}: Frequency distribution\cr
-code{out_outliers}: Outlier analysis\cr
-code{out_file}: Name and location of optional Rmd file\cr
+\code{out_suggest}: Suggestions for other similar analyses\cr
+\code{out_summary}: Summary statistics\cr
+\code{out_freq}: Frequency distribution\cr
+\code{out_outliers}: Outlier analysis\cr
 
 STATISTICS\cr
-code{bin_width}: Bin width\cr
-code{n_bins}:  Number of bins\cr
-code{breaks}: Breaks of the bins\cr
-code{mids}: Bin midpoints\cr
-code{counts}: Bin counts\cr
-code{prop}: Bin proportion\cr 
-code{counts_cumul}: Bin cumulative counts\cr 
-code{prop_cumul}: Bin cumulative proportion\cr
-
-Although not typically needed, if the output is assigned to an object named, for example, \code{h}, then the contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(h)}.
+\code{bin.width}: Bin width\cr
+\code{n.bins}: Number of bins\cr
+\code{breaks}: Breaks of the bins\cr
+\code{mids}: Bin midpoints\cr
+\code{counts}: Bin counts\cr
+\code{prop}: Bin proportion\cr 
+\code{cumul}: Bin cumulative counts\cr 
+\code{cprop}: Bin cumulative proportion\cr
 }
 
 \references{

@@ -133,7 +133,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
 
     if (brief)
       return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txXV=txXV,
-                  freq.df=freq.df))
+                  freq.df=freq.df, pvalue=ch$p.value))
 
 
     # full analysis
@@ -191,7 +191,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
     # back to ss or ss data frame
     return(list(n.dim=n.dim, txttl=txttl, txlbl=txlbl, txfrq=txfrq,
                 txXV=txXV, txprp=txprp, txcol=txrow, txrow=txcol,
-                freq.df=freq.df))
+                freq.df=freq.df, pvalue=ch$p.value))
     # end full analysis
 
   }  # end two variable
@@ -313,7 +313,8 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       names(freq.df)[1] <- x.name
 
       return(list(n.dim=n.dim, title=txttl, counts=txcnt, miss=txmis, 
-                  chi=txchi, lbl=txlbl, freq=x, freq.df=freq.df, prop=xp))
+                  chi=txchi, lbl=txlbl, freq=x, freq.df=freq.df, prop=xp,
+                  pvalue=ch$p.value))
     }
   }  # one variable
 

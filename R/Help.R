@@ -166,12 +166,12 @@ function(topic=NULL, width=4.5, height=4.5) {
   t1 <- "
   Browse for a csv, tab-delimited, Excel, R, SAS, or SPSS data file on 
   your file system and read the information into the specified data table
-  with Read, or its abbreviation, rd. To browse, use an empty ().
-      > mydata <- Read()
+  with Read, or its abbreviation, rd. To browse, use an empty (\"\").
+      > mydata <- Read(\"\")
   The  <-, the assignment operator, instructs R to assign what was read
-  to the data table, here named mydata. This is the default name that
-  the lessR data analysis functions assume will be analyzed. Read
-  variable labels with the labels option to specify the file of labels.
+  to the data table, here named mydata. This is the default name for
+  the lessR data analysis functions. Use the VariableLabels function, or
+  vl, to read the optional file of file of variable names and labels.
 
   Or, specify the full data path name in quotes, such as from the web.
       > mydata <- Read(\"http://lessrstats.com/data/twogroup.csv\")
@@ -209,22 +209,20 @@ function(topic=NULL, width=4.5, height=4.5) {
   can be named mydata within R.  This is the default name of the data table
   assumed by the lessR data analysis functions.
 
-  Here is how to write the contents of mydata to a csv data file with the name
-  of mydata.csv.
-      > Write()
-  The file is written to the default working directory.  The Write function 
-  displays this location after writing the file.
-
-  Or, explicitly specify the file name.
+  Here write the file with specified name in csv format.
       > Write(\"mybestdata\")
   The file type of .csv is automatically appended to the file name.
 
-  To write a data file in native R format, use the type=\"R\" option, or the 
-  abbreviation for the function name  wrt.r.
+  To write a data file in Excel format, use the format=\"Excel\" option.
+      > Write(\"mybestdata\", format=Excel)
+
+  To write a data file in native R format, use the format=\"R\" option,
+  or the abbreviation for the function name  wrt.r.
       > wrt.r(\"mybestdata\")
 
-  The lessR Write function relies upon the R function write.table, which is
-  is quite general, with many options.  For more information, enter ?write.table."
+  The lessR Write function relies upon the R function write.table, which
+  is is quite general, with many options.  For more information, enter
+  ?write.table."
 
   set.up.plot(1)
   text(50,100, label=t0, font=4)
@@ -584,10 +582,10 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   This example uses the lessR function ttest, or tt, to evaluate a variable
   named Y and a null hypothesis of mu=100. The brief version is tt.brief.
-      > ttest(Y, mu0=100)
+      > ttest(Y, mu=100)
 
   This example uses ttest to do the analysis from the sample statistics.
-      > ttest(n=20, m=47.2, s=8.5, mu0=50)
+      > ttest(n=20, m=47.2, s=8.5, mu=50)
       
   Here test for a fair coin after getting 53 out of 100 Heads. The R function
   binom.test is based on the exact binomial distribution.  The R prop.test
@@ -611,17 +609,18 @@ function(topic=NULL, width=4.5, height=4.5) {
   }
 
 
-  else if (topic %in% c("ttest", "t-test", "tt")) {
+  else if (topic %in% c("ttest", "t-test", "t test", "tt", "two groups",
+                        "two-groups", "mean difference")) {
   t0 <- "Compare Two Group Means"
 
-  f1 <- bquote(paste(bold("ttest, tt"), "  An enhanced version of t.test to compare two group means"))
+  f1 <- bquote(paste(bold("ttest, tt"), "  An enhanced version of R t.test to compare two group means"))
   f2 <- bquote(paste(bold("Model, model"), "  The t-test if Y is numerical and X has two values"))
 
   t1 <- "
-  When responses to a variable are organized into two or more groups,
-  compare the group means with a t-test.  For example, suppose the
-  response variable is Salary and the grouping variable is Gender, with
-  two values, M and F.
+  When responses to a continuous variable are organized into two or
+  more groups, compare the group means with a t-test.  For example,
+  suppose the response variable is Salary and the grouping variable
+  is Gender, with two values, M and F.
 
   Here the numerical response variable is named Y and the grouping
   variable, also called a factor, is named X, with exactly two values.
@@ -633,7 +632,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   each group, Y, already are in separate columns called vectors. Here
   calculate the t-test directly from two vectors called Y1 and Y2.
       > ttest(Y1, Y2)
-  Add the paired=TRUE option to specify a dependent groups analysis.
+  The paired=TRUE option to specify a dependent groups analysis.
 
   Or, do the analysis directly from summary statistics, the sample size
   (n), sample mean (m) and sample standard deviation (s). Ynm is the

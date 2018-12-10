@@ -8,6 +8,9 @@ importFrom("png", readPNG)
 importFrom("openxlsx", read.xlsx, addWorksheet, createStyle, createWorkbook, saveWorkbook, setColWidths, writeDataTable)
 importFrom("robustbase", adjboxStats, mc)
 importFrom("colorspace", sequential_hcl, diverge_hcl)
+importFrom("viridisLite", viridis, cividis, magma, inferno, plasma)
+importFrom("wesanderson", wes_palette)
+importFrom("randomcoloR", distinctColorPalette)
 #importFrom("MBESS", ci.smd)
 
 importFrom("graphics", "abline", "arrows", "axis", "axis.Date", "barplot", "box", "boxplot", "grconvertX", "grconvertY", "hist", "legend", "lines", "mtext", "pairs", "par", "pie", "plot", "plot.default", "plot.new", "plot.window", "points", "polygon", "rasterImage", "rect", "rug", "segments", "stripchart", "strwidth", "sunflowerplot", "symbols", "text", "title", "axTicks", "smoothScatter")
@@ -30,7 +33,7 @@ importFrom("latticeExtra", "layer", "panel.ellipse", "panel.xyarea")
 #importFrom("colorspace", "polarLUV")
 
 S3method(print, out_all)
-S3method(print, out_piece)
+S3method(print, out)
 
 # Export all names except those that begin with .
 #exportPattern("^[^\\.]")
@@ -64,14 +67,15 @@ export (
   Model, model, model.brief,
   Nest,
   PieChart, pc,
-  print.out_all, print.out_piece,
+  Plot, pl,
+  print.out_all, print.out,
   prob.norm, prob.znorm, prob.tcut,
   Read, rd, rd.brief, Read2,
   Regression, reg, reg.brief, regPlot, 
   Recode, rec,
-  set, showColors,
+  set, showColors, showPalettes,
   simCImean, simCLT, simFlips, simMeans,
-  ScatterPlot, sp, Plot, 
+  ScatterPlot, sp, 
   Sort, srt,
   Subset, subs,
   SummaryStats, ss, ss.brief,

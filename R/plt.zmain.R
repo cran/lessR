@@ -1,7 +1,7 @@
 .plt.main <-
 function(x, y, by=NULL, n.cat=getOption("n.cat"),
          cat.x=FALSE, num.cat.x=FALSE, cat.y=FALSE, num.cat.y=FALSE,
-         object="point", values="data",
+         object="point", topic="data",
 
          col.fill=getOption("pt.fill"),
          col.color=getOption("pt.color"),
@@ -18,10 +18,10 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          sort.yx=FALSE,
          segments.y=FALSE, segments.x=FALSE, size.ln=2,
 
-         smooth=FALSE, smooth.points=100, smooth.trans=0.25,
-         smooth.bins=128,
+         smooth=FALSE, smooth.points=100, smooth.size=1,
+         smooth.trans=0.25, smooth.bins=128,
 
-         radius=0.25, power=0.6, size.cut=TRUE,
+         radius=0.15, power=0.6, size.cut=TRUE,
          bubble.text=getOption("bubble.text.color"),
          col.low=NULL, col.hi=NULL,
 
@@ -47,11 +47,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
          quiet=getOption("quiet"), want.labels=TRUE, ...)  {
 
-
   fill.bg <- getOption("panel.fill")
-
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
-
   size.pt <- size * .9  # size is set in Plot.R, reduce a bit for here
 
   if (center.line == "default") if (date.ts) center.line <- "off"
@@ -127,24 +124,22 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
   else {  # trans has been changed from default, so change col.fill
     trans.pts <- col.trans
-    col.fill <- .maketrans(col.fill, (1-trans.pts)*256)
-    if (col.area != "transparent")
-      col.area <- .maketrans(col.area, (1-trans.pts)*256)
+    if (trans.pts > 0) {
+      col.fill <- .maketrans(col.fill, (1-trans.pts)*256)
+      if (col.area != "transparent")
+        col.area <- .maketrans(col.area, (1-trans.pts)*256)
+    }
   }
 
-
-  # scale for regular R or RStudio
-  adj <- .RSadj(radius=radius)
-  radius <- adj$radius
 
   # get lab.x.cex  lab.y.cex
   lab.cex <- getOption("lab.cex")
   lab.x.cex <- getOption("lab.x.cex")
   lab.y.cex <- getOption("lab.y.cex")
   lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
-# adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+  # adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
   lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
-# adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
+  # adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
 
   if (date.ts) xx.lab <- xlab
   if (want.labels) {
@@ -308,7 +303,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   # -----------------------
   # setup coordinate system only with plot and type="n"
-  # non-graphical parameters in ... generate warnings when no plot
+  # non-graphical parameters in ... Generate warnings when no plot
   # -----------------------
 
   mn.x <- ifelse(is.null(x.lvl), min(x, na.rm=TRUE), 1)
@@ -344,12 +339,12 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     }
 
     if (is.null(origin.x)) {
-      if (values %in% c("count", "prop"))
+      if (topic %in% c("count", "prop"))
         origin.x <- 0
       else
         origin.x <- mn.x
     }
-    if (values != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
+    if (topic != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
 
     region <- matrix(c(origin.x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
 
@@ -475,33 +470,55 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
     # ------
     # colors
-    n.patterns <- max(n.col, n.by)
+    n.clrs <- max(n.col, n.by)
 
     color <- character(length=length(col.color))
     fill <- character(length=length(col.fill))
-    ltype <- character(length=n.patterns)
+    ltype <- character(length=n.clrs)
     for (i in 1:length(ltype)) ltype[i] <- "solid"
-    if (n.patterns == 1) {
+    if (n.clrs == 1) {
       color[1] <- col.color[1]
       fill[1] <- col.fill[1]
     }
-    else  {  # n.patterns > 1, default is sequential colors
-      if (length(col.color) > 1)
-        color <- col.color  # use entered color vector
-      else {  # default
-        clr <- .color.range(col.color, n.patterns)  # see if range
-        if (!is.null(clr))
-          color <- clr
-        else {
-          if (getOption("theme") %in% c("gray", "white"))
-            color <- getColors("grays", n=n.patterns)
-          else
-            color <- getColors("colors", n=n.patterns)
-        }
+
+    else  {  # n.clrs > 1
+      if (length(col.fill) > 1) {
+        fill <- col.fill  # use entered color vector
       }
-      for (i in 1:length(color))
-        fill[i] <- .maketrans(color[i], (1-trans.pts)*256)
+      else {  # see if color range 
+        clr <- .color.range(col.fill, n.clrs)  # see if range
+        if (!is.null(clr))
+          fill <- clr  # the range
+        else {  # default
+          if (!is.ordered(by)) {
+            if (getOption("theme") %in% c("gray", "white"))
+              fill <- getColors("grays", n=n.clrs)
+            else
+              fill <- getColors("hues", n=n.clrs)
+          }
+          else {
+            col.fill <- .get.fill() 
+            fill <- .color.range(col.fill, n.clrs)  # see if range
+          }
+        }
+      if (trans.pts > 0) for (i in 1:length(fill))
+        fill[i] <- .maketrans(fill[i], (1-trans.pts)*256)
+      }
+
+      if (length(col.color) < length(fill) &&
+          col.color == getOption("pt.color"))
+        color <- fill 
+      else
+        color <- col.color  # color different than fill
     }
+
+    col.clr <- .color.range(col.color, n.clrs)  # see if range
+    if (!is.null(col.clr)) color <- col.clr
+
+    if (object != "point"  ||  size == 0) fill <- color  # no fill in legend
+    fill[which(fill == "off")] <- "transparent"
+    color[which(color == "off")] <- "transparent"
+
 
     # ----------
     # plot lines
@@ -622,16 +639,17 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       if (is.null(by)) {
 
         if (smooth) {  # 2-D kernel density plot
+          # grid lines only plot after the sp, so no effect here
+         #abline(v=axT1, col=getOption("grid.x.color"),
+         #       lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+         #if (!bubble1)
+         #  abline(h=axT2, col=getOption("grid.y.color"),
+         #         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
           clr.den <- colorRampPalette(c(getOption("window.fill"),
                                          getOption("bar.fill.ordered")))
           smoothScatter(x, y, nrpoints=smooth.points, nbin=smooth.bins,
                         transformation=function(x) x^(smooth.trans),
-                        colramp = clr.den, bg="transparent", add=TRUE)
-          abline(v=axT1, col=getOption("grid.x.color"),
-                 lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
-          if (!bubble1)
-            abline(h=axT2, col=getOption("grid.y.color"),
-                   lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+                        colramp=clr.den, cex=smooth.size, add=TRUE)
         }
 
         else {  # plot the individual points, plus means, segments, etc.
@@ -641,7 +659,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           if (jitter.y > 0)
             y[,1] <- jitter(y[,1], factor=jitter.y)
 
-          if (n.xcol == 1  && n.ycol == 1) {
+          if (n.xcol == 1  &&  n.ycol == 1) {
 
              if (length(out.ind) == 0)  # not outliers
                 points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
@@ -650,7 +668,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
              else {  # display outliers separately
 
                 if (getOption("theme") == "gray")
-                  if (size.pt > 0.9) if (out.shape.miss) out.shape <- 23
+                  if (any(size.pt > 0.9)) if (out.shape.miss) out.shape <- 23
 
                 points(x[-out.ind,1], y[-out.ind,1],
                    pch=shape, col=color[1], bg=fill[1], cex=size.pt, ...)
@@ -670,7 +688,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
           else  if (n.xcol == 1) {  # one x
             for (i in 1:n.ycol) {  # one to many y's
-                if (n.patterns == 2  &&  i == 2) fill[i] <- "transparent"
+                if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
                 points(x[,1],y[,i], pch=shape, col=color[i], bg=fill[i],
                        cex=size.pt, ...)  # one x
             }
@@ -687,7 +705,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                        lty=1, lwd=.75, col=col.segment)
           }
 
-          if (!(values %in% c("count", "prop"))) {
+          if (!(topic %in% c("count", "prop"))) {
             if (segments.x)
               segments(y0=par("usr")[3], x0=x, y1=y, x1=x, lty=1, lwd=.75,
                        col=col.segment)
@@ -698,7 +716,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                  segments(y0=0, x0=x, y1=y, x1=x, lty=1, lwd=1, col=col.segment)
           }
 
-          if (means  &&  values == "data") {
+          if (means  &&  topic == "data") {
             pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
             bck.g <- ifelse(getOption("theme")!="gray", "gray15", "gray30")
             if (grepl(".black", getOption("theme"), fixed=TRUE))
@@ -744,8 +762,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           shp <- shape
 
         shape.dft <- c(21,23,22,24,25,7:14)  # shape defaults
-        if (length(color)==1 && length(shape)==1)  #  color, shape
-          for (i in 1:n.by) shp[i] <- shape.dft[i]  # fill is default shapes
+        if (length(color)==1 && length(fill) == 1 && length(shape)==1)
+          for (i in 1:n.by) shp[i] <- shape.dft[i]  #  default shapes
 
         for (i in 1:n.by) {
           x.lv <- subset(x, by==levels(by)[i])
@@ -773,7 +791,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   else if (object %in% c("bubble", "sunflower")) {
 
-    n.patterns <- 1  # for fit.line
+    n.clrs <- 1  # for fit.line
 
     # colors
     if (is.null(col.low) || is.null(col.hi) || !bubble1) {
@@ -809,13 +827,20 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           if (mytbl[i,j] != 0) {  # 0 plots to a single pixel, so remove
             k <- k + 1
             count[k] <- mytbl[i,j]
-            xx[k] <- as.numeric(rownames(mytbl)[i])  # rownames are factors
+            xx[k] <- as.numeric(rownames(mytbl)[i])  # row names are factors
             yy[k] <- as.numeric(colnames(mytbl)[j])
           }
         }
       }
       if (prop) count <- round(count, 2)
       cords <- data.frame(xx, yy, count)
+
+
+      if (is.null(radius)) radius <- .22
+
+  # scale for regular R or RStudio
+  adj <- .RSadj(radius=radius)  # reg R multiply by 1.6
+  radius <- adj$radius
 
   # can use xyTable instead, though does not have coordinates for count=0
   #cnt <- xyTable(x,y)
@@ -824,8 +849,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
       if (object == "bubble") {
         sz <- cords[,3]**power  # radius unscaled
-        symbols(cords$xx, cords$yy,
-            circles=sz, inches=radius,
+        symbols(cords$xx, cords$yy, circles=sz, inches=radius,
             bg=clr, fg=clr.color, add=TRUE, ...)
         mxru <- max(sz)
         sz <- 2 * (sz/mxru) * radius  # scaled diameter (symbols does)
@@ -841,7 +865,14 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
     else {  # size is a variable (unless size is constant and bubble specified)
 
+      if (is.null(radius)) radius <- .1
+
+      # scale for regular R or RStudio
+      adj <- .RSadj(radius=radius)  # reg R multiply by 1.6
+      radius <- adj$radius
+
       cords <- data.frame(x, y, size)
+
       cords <- na.omit(cords)
       sz <- cords[,3]**power  # radius unscaled
       symbols(cords[,1], cords[,2], circles=sz,
@@ -908,8 +939,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # ellipse option
   if (do.ellipse) {
 
-    for (i in 1:n.patterns) {
-      if (n.patterns == 1) {  # one plot, all the data
+    for (i in 1:n.clrs) {
+      if (n.clrs == 1) {  # one plot, all the data
           x.lv <- x[,1]
           y.lv <- y[,1]
       }
@@ -943,9 +974,9 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
         s.x <- sd(x.lv, na.rm=TRUE)
         s.y <- sd(y.lv, na.rm=TRUE)
 
-        ln.type <- ifelse (n.patterns == 2 && i == 2, "dashed", "solid")
-        corr <- ifelse (n.patterns == 1, cxy, cxy[1,1])
-        col.border <- ifelse (n.patterns == 1, col.ellipse, clr)
+        ln.type <- ifelse (n.clrs == 2 && i == 2, "dashed", "solid")
+        corr <- ifelse (n.clrs == 1, cxy, cxy[1,1])
+        col.border <- ifelse (n.clrs == 1, col.ellipse, clr)
 
         e <- ellipse(corr, scale=c(s.x, s.y), centre=c(m.x, m.y),
                      level=ellipse[j])
@@ -964,8 +995,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     do.remove <- FALSE
     for (i.rem in 1:(as.numeric(fit.remove)+1)) {
       if (fit.remove) if (i.rem == 2) do.remove <- TRUE  # 2nd pass
-    for (i in 1:n.patterns) {
-      if (n.patterns == 1) {  # one plot, all the data
+    for (i in 1:n.clrs) {
+      if (n.clrs == 1) {  # one plot, all the data
         if (!date.ts) {
           x.lv <- x[,1]
           y.lv <- y[,1]
@@ -999,7 +1030,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       }  # end multiple
 
       ln.type <- "solid"
-      if (n.patterns == 2 && i == 2) ln.type <- "dashed"
+      if (n.clrs == 2 && i == 2) ln.type <- "dashed"
 
       if (!is.null(out.ind)) if (do.remove) {
         x.lv <- x.lv[-out.ind]
@@ -1031,8 +1062,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
             prb <- (1 - fit.se[j]) / 2
             up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
             dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
-#            lines(x.lv, up.ln, col=clr, lwd=0.5, lty=ln.type)
-#            lines(x.lv, dn.ln, col=clr, lwd=0.5, lty=ln.type)
+            # lines(x.lv, up.ln, col=clr, lwd=0.5, lty=ln.type)
+            # lines(x.lv, dn.ln, col=clr, lwd=0.5, lty=ln.type)
             polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
                     col=getOption("se.fill"), border="transparent")
           }  # end for each se plot

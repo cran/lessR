@@ -197,14 +197,14 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     clr <- NULL
     clr <- .color.range(fill, n.bins, no.change=TRUE)
       
-    # not a color range such as "colors" or "blues", so assign clr here
+    # not a color range such as "hues" or "blues", so assign clr here
     if (is.null(clr)) {
         clr <- fill  # user provided the colors
     }
 
     # bar transparency
     if (!is.null(trans)) if (trans > 0)
-      for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans)*256)                 
+      for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans)*256)
 
     # plot the histogram
     plot(h, add=TRUE, col=clr, border=color, freq=TRUE,
@@ -234,7 +234,6 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 #------------
 # text output
 #------------
-  if (!quiet) {
 
     stats <- .hst.stats(h, length(x), fun.call)
 
@@ -249,11 +248,5 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     return(list(txsug=txsug, ttx=tx, bin.width=bin.width, n.bins=n.bins,
       breaks=h$breaks, mids=h$mids, counts=h$counts, prop=prop,
       counts_cum=cum.c, prop_cum=cum.p))
-  }
-
-  else {  # Plot needs binning and midpoints even if not displaying text output
-    return(list(bin.width=bin.width,
-      breaks=h$breaks, mids=h$mids, counts=h$counts))
-  }
 
 }

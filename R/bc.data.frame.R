@@ -1,6 +1,6 @@
 bc.data.frame <-
 function(x, n.cat,
-         col.fill, col.color, col.trans, theme,
+         col.fill, col.color, col.trans, fill.split, theme,
          horiz, addtop, gap, prop, scale.y,
          xlab, ylab, main,
          labels, label.size, beside,
@@ -62,7 +62,7 @@ function(x, n.cat,
         }
 
         .bc.main(x[,i], y=NULL, by=NULL,
-          col.fill, col.color, col.trans, theme,
+          col.fill, col.color, col.trans, fill.split, theme,
           horiz, addtop, gap, prop, scale.y,
           xlab, ylab, main,
           value.labels=NULL, label.size, beside,
@@ -71,7 +71,8 @@ function(x, n.cat,
           values.pos, values.cut,
           xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
           legend.title, legend.loc, legend.labels, legend.horiz,
-          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out.size, quiet, ...)
+          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out.size,
+          quiet, ...)
 
         if (pdf) {
           dev.off()

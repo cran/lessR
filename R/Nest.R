@@ -218,8 +218,8 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
   }  # end method="logit"
 
 
-  class(txtmdl) <- "out_piece"
-  class(txtbl) <- "out_piece"
+  class(txtmdl) <- "out"
+  class(txtbl) <- "out"
   
   output <- list(
     fun.call=match.call(), out_models=txtmdl, out_anova=txtbl,

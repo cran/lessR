@@ -6,6 +6,125 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
  
  
+>>>>>> Changes for lessR version 3.7.9 (2018-12-10) <<<<<<
+
+-------------
+Updates 3.7.9
+-------------
+ 
+BarChart, Histogram, Plot
+  theme parameter added to change theme just for current analysis
+
+BarChart, Histogram
+  saved output to an object, e.g., h <- hs(Salary), now
+    consistent with documentation and revised with more information
+
+BarChart, PieChart
+  an ordered factor plotted with a pre-defined sequential color
+    palette by default, such as "blues", according to the color theme
+  values.cex renamed values.size
+
+BarChart
+  fill color can be mapped for the value of the categorical variable,
+    usually y when given, or refer to (count) when y is tabulated
+  fill.split parameter added to display fill in two colors if
+    above or below the value
+  missing data for category with y given now allowed, plots as <NA>
+        
+BoxPlot
+  fill parameter sent to Plot as box.fill
+
+getColors
+  qualitative color palette named "hues" instead of "colors"
+  default for shape="wheel" is in.order=TRUE
+  added viridis color palettes: "viridis", "cividis", "magma",
+    "inferno", and "plasma"
+  palettes from the wesanderson package added
+  generate palettes of distinct random colors with the
+    distinctColorPalette function from randomcoloR package,
+    reference as "random"
+
+Plot
+  violin.fill and box.fill parameters added
+  for VBS plot, vbs.pt.fill now applies to any specified color
+  color ranges such as "blues" now apply
+  by variable that is an ordered factor, levels "blues", etc
+    is default according to the current color theme
+  parameter named values renamed topic to avoid BarChart conflict
+    of parameter also named values
+  for legend in multi-variable plots on an axis with large axis.x.cex,
+    legend text changed to be 0.83 * axis.x.cex
+  smooth.size parameter added for size of plotted points in smoothed
+    scatterplots
+  for size a continuous variable, radius set to 0.1 instead of 0.25
+  for plotting categorical variables, radius set to 0.22
+  smooth.trans default changed from 0.20 to 0.25
+  for VBS plot of discrete variable, display freq dist if requested
+  bw.iter parameter added for use control of bandwidth iterations
+  pl abbreviation for Plot
+
+prob,norm, prob.tcut, prob.znorm
+  pdf.file option, graphics output window consistent with other functions
+  axis.size is new parameter name for mag (not applicable to prob.tcut)
+
+Regression
+  Rmd file better reflects parameter settings of explain, interpret, etc.
+
+showPalettes
+  new function to show all the palettes in a set, includes the
+    hcl colors, viridis palettes and wesanderson palettes
+
+style
+  sub-theme no.y.axis improved
+
+ttest
+  mu is new name for mu0 parameter, which still works
+ 
+ViolinPlot
+  fill parameter sent to Plot as violin.fill
+
+
+---------------
+Bug Fixes 3.7.9
+--------------- 
+
+BarChart, Histogram, Plot etc
+  fill parameter can now be set to a color function such as hcl
+    or a named vector
+  label size change (lab.x.cex, lab.y.cex) properly changed in 
+    Trellis graphics, that is, with by1 and by2
+  beside=TRUE plots correct color sequence
+
+BarChart
+  default values for y-provided analysis (instead of tabulated
+    counts) is "input" instead of "%", which is not meaningful
+    in this context
+  values properly displayed for y-provided analysis
+  quiet=TRUE works for Trellis graphics, by1 and by2
+
+doFactors
+  levels now required unless adding variable labels but not
+    creating one or more factors
+
+Plot
+  Default of row names now properly label outliers in a box plot
+  ID variable for labeling points beyond just default of row names
+  for grayscale Trellis plots, points plot in grayscale
+
+Read
+  characters "(" and ")" now can be in a variable name that is parsed
+    for invalid characters
+
+Regression
+  Rmd file generated if interpret=FALSE
+  Rmd file knit under all combinations of explain, interpret, etc.
+
+style
+  "gray" theme with "black" sub.theme displays correctly
+
+
+
+ 
 >>>>>> Changes for lessR version 3.7.6 (2018-08-10) <<<<<<
 
 -------------
@@ -47,9 +166,9 @@ doFactors
 getColors
   more pre-defined color names added so that now there is a name for
     each 30 degrees of the HCL color wheel: 
-    "reds", "rusts", "yellows", "olives", "greens", "emeralds",
+    "reds", "rusts", "browns", "olives", "greens", "emeralds",
     "turquoises", "aquas", "blues", "purples","violets", "magentas"
-    + "grays" + "colors" for a qualitative sequence
+    + "grays" + "hues" for a qualitative sequence
   pre-defined color names such as "blues" define a divergent color
     palette by specifying a vector of two such names, applicable to
     visualization functions as an argument to the fill parameter
@@ -76,7 +195,7 @@ Read
   when in RStudio, lists the data table in the Source window
  
 style
-  new default color theme is "colors", which yields discrete HCL colors 
+  new default color theme is "hues", which yields discrete HCL colors 
     of different hues for bar/pie charts, and no longer a sub.theme
 
 
@@ -87,7 +206,7 @@ Bug Fixes 3.7.6
 BarChart, Histogram
   for printing multiple variables, erroneous "no categorical
     variables" not displayed
-  color ranges such as "colors" can be used for Trellis plots
+  color ranges such as "hues" can be used for Trellis plots
 
 margins
   axis label set to empty character string, "", now treated as NULL
@@ -157,7 +276,7 @@ BarChart
 
 getColors
   color sequence can be generated for any specified hue, h, from 0 to 360
-  more pre-specified color sequence names such as "yellows", "olives"
+  more pre-specified color sequence names such as "browns", "olives"
   pre-specified color sequences can be modified according to
     chroma, c, and luminance, l
   rectangular display option added as the default, wheel an option 

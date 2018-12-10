@@ -1,6 +1,6 @@
 Histogram <-
 function(x=NULL, data=mydata, rows=NULL,
-         n.cat=getOption("n.cat"), Rmd=NULL,
+         theme=getOption("theme"), n.cat=getOption("n.cat"), Rmd=NULL,
 
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
@@ -17,7 +17,6 @@ function(x=NULL, data=mydata, rows=NULL,
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
     lab.adj=c(0,0), margin.adj=c(0,0,0,0),
 
-
     rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
     offset=getOption("offset"),
     scale.x=NULL, scale.y=NULL,
@@ -33,6 +32,13 @@ function(x=NULL, data=mydata, rows=NULL,
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
+
+  if (theme != getOption("theme")) {
+    sty <- style(theme, reset=FALSE)
+    fill <- sty$bar$bar.fill.ordered
+    color <- sty$bar$color.ordered
+    trans <- sty$bar$trans.fill
+  }
 
   if (missing(fill))
     fill <- ifelse (is.null(getOption("bar.fill.ordered")), 
@@ -79,24 +85,25 @@ function(x=NULL, data=mydata, rows=NULL,
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
     options(xname = x.name)
 
-  if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
-    data <- eval(substitute(data), envir=parent.frame())
   df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
-  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+  if (exists(df.name, where=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
+    if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
+      data <- eval(substitute(data), envir=parent.frame())
+  }
 
   if (!is.null(x.name))
     x.in.global <- .in.global(x.name)  # see if in global, includes vars list
   else
     x.in.global <- FALSE
     
-# -----------------------------------------------------------
-# establish if a data frame, if not then identify variable(s)
-# x can be missing entirely, with a data frame passed instead
-# if x a vector, then x.name not in data, but also not in global
+  # -----------------------------------------------------------
+  # establish if a data frame, if not then identify variable(s)
+  # x can be missing entirely, with a data frame passed instead
+  # if x a vector, then x.name not in data, but also not in global
 
   if (!missing(x)) {
 
@@ -218,7 +225,8 @@ function(x=NULL, data=mydata, rows=NULL,
                  fill, color, trans, size.pt=NULL,
                  xlab, ylab, main,
                  rotate.x, offset,
-                 width, height, pdf, segments.x=NULL, breaks, c.type="hist")
+                 width, height, pdf, segments.x=NULL, breaks, c.type="hist",
+                 quiet)
   }
 
   else {
@@ -274,11 +282,9 @@ function(x=NULL, data=mydata, rows=NULL,
         }
 
         txss <- ""
-        if (!quiet) {
-          ssstuff <- .ss.numeric(data[,i], digits.d=digits.d,
-            brief=TRUE)
-          txss <- ssstuff$tx
-        }
+        ssstuff <- .ss.numeric(data[,i], digits.d=digits.d,
+          brief=TRUE)
+        txss <- ssstuff$tx
 
         # nothing returned if quiet=TRUE
 
@@ -297,18 +303,16 @@ function(x=NULL, data=mydata, rows=NULL,
         if (is.null(txdst)) txdst <- ""
 
         txotl <- ""
-        if (!quiet) {
           txotl <- .bx.stats(data[,i])$txotl
           if (txotl[1] == "") txotl <- "No (Box plot) outliers"
-        }
 
         if (ncol(data) > 1  &&  !quiet) {  # for var range, print text output
-          class(txss) <- "out_piece"
-          class(txdst) <- "out_piece"
-          class(txotl) <- "out_piece"
+          class(txss) <- "out"
+          class(txdst) <- "out"
+          class(txotl) <- "out"
           output <- list(out_ss=txss, out_freq=txdst, out_outliers=txotl)
           class(output) <- "out_all"
-          print(output)
+          if (!quiet) print(output)
         }
 
         if (pdf) {
@@ -343,24 +347,35 @@ function(x=NULL, data=mydata, rows=NULL,
         txkfl <- .showfile2(Rmd, "R Markdown instructions")
       }
    
-      class(txsug) <- "out_piece"
-      class(txss) <- "out_piece"
-      class(txdst) <- "out_piece"
-      class(txotl) <- "out_piece"
-      class(txkfl) <- "out_piece"
+      class(txsug) <- "out"
+      class(txss) <- "out"
+      class(txdst) <- "out"
+      class(txotl) <- "out"
+      class(txkfl) <- "out"
 
       output <- list(type="Histogram",
         call=fun.call, 
         out_suggest=txsug, out_ss=txss, out_outliers=txotl, out_freq=txdst,
         out_file=txkfl,
-        bin_width=stuff$bin.width, n_bins=stuff$n.bins,
+        bin.width=stuff$bin.width, n.bins=stuff$n.bins,
         breaks=stuff$breaks,
         mids=stuff$mids, counts=stuff$counts, prop=stuff$prop,
-        counts_cumul=stuff$counts_cum, prop_cumul=stuff$prop_cum)
+        cumul=stuff$counts_cum, cprop=stuff$prop_cum)
 
       class(output) <- "out_all"
+      if (!quiet) print(output)
 
-      return(output)
+      # names and order of components per documentation in BarChart.Rd
+      stuff$out_outliers <- txotl  # after to class out for line breaks
+      stuff$out_summary <- txss
+      stuff$out_freq <- txdst
+      names(stuff) <- c("out_suggest", "out_freq", "bin.width", "n.bins",
+              "breaks", "mids", "counts", "prop", "cumul", "cprop",
+              "out_summary", "out_outliers")
+      stuff <- c(stuff[1], stuff[11], stuff[2], stuff[12], stuff[3], stuff[4],
+                 stuff[5], stuff[6], stuff[7], stuff[8], stuff[9], stuff[10])
+      invisible(stuff)
+
 
     }  # end ncol(data) == 1
 

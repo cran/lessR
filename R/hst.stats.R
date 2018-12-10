@@ -23,6 +23,7 @@ function (h, len.x, fun.call) {
     txsug <- tx
     if (length(txsug) == 0) txsug <- ""
 
+
     tx <- character(length = 0)
     
     bin.width <- h$breaks[2]-h$breaks[1]
@@ -60,8 +61,8 @@ function (h, len.x, fun.call) {
     out$cum.c <- formatC(cum.c, digits=0, format="f")
     out$cum.p <- formatC(cum.p, digits=2, format="f")
     names(out) <- c("Bin", "Midpnt", "Count", "  Prop", "Cumul.c", "Cumul.p")
-
     # width of columns
+
     max.ln <- integer(length=0)
     for (i in 1:ncol(out)) {
       ln.nm <- nchar(colnames(out)[i]) + 1
@@ -72,14 +73,16 @@ function (h, len.x, fun.call) {
     # write col labels
     tx[length(tx)+1] <- ""
     for (i in 1:ncol(out))
-      tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(out)[i], w=max.ln[i]), sep="")
+      tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(out)[i],
+                              w=max.ln[i]), sep="")
     tx[length(tx)+1] <- .dash2(sum(max.ln))
 
     # write values
     for (i in 1:nrow(out)) {
       tx[length(tx)+1] <- ""
        for (j in 1:ncol(out)) 
-          tx[length(tx)] <- paste(tx[length(tx)], .fmtc(out[i,j], w=max.ln[j]), sep="")
+          tx[length(tx)] <- paste(tx[length(tx)], .fmtc(out[i,j],
+                                   w=max.ln[j]), sep="")
     }
 
     return(list(txsug=txsug, tx=tx, bin.width=bin.width, n.bins=n.bins,

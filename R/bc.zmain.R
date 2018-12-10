@@ -1,17 +1,32 @@
 .bc.main <- 
 function(x, y, by, 
-         fill, col.color, col.trans, theme,
+         fill, col.color, col.trans, fill.split, theme,
          horiz, addtop, gap, prop, scale.y,
          xlab, ylab, main,
          value.labels, label.max, beside,
          rotate.x, offset, break.x, sort.x,
-         values, values.color, values.cex, values.digits,
+         values, values.color, values.size, values.digits,
          values.pos, values.cut,
          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
          legend.title, legend.loc, legend.labels, legend.horiz,
          add, x1, x2, y1, y2, out.size, quiet, ...) {
   
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
+  y.given <- ifelse (!is.null(y), TRUE, FALSE)
+  is.ord <- ifelse (is.ordered(x), TRUE, FALSE)
+
+  if (is.null(values.digits)) {
+    if (y.given) {
+      if (max(abs(y)) > 9999)
+        values.digits <- 0
+      else {
+        if (!is.null(y))
+          values.digits <- .getdigits(y,0) - 1
+        else
+          values.digits <- 0
+      }
+    }
+  }
 
   # if x is integer, not labeled correctly, set to factor
   if (!is.data.frame(x))
@@ -131,7 +146,7 @@ function(x, y, by,
   # do not tabulate counts, y is provided
   if (!is.null(y)) {
     entered <- TRUE
-	
+
     if (is.null(by)) {  # no by variable
       yn <- getOption("yname")
       if (!is.numeric(y) > 0) {
@@ -151,12 +166,11 @@ function(x, y, by,
 
       if (length(y) > 20) {
         warning(call.=FALSE, "There are more than 20 categories to plot\n\n",
-            "Perhaps you mean for the 2nd variable, ", yn, ", to be a",
+            "Perhaps you mean for the 2nd variable, ", yn, ", to be a ",
             "by  variable even though it is numeric\n\n",
             "A by variable only has a small number of values\n\n",
             "Explicitly precede the variable's name with:  by=", "\n\n")
      }
-
       x.temp <- x
       x <- y
       names(x) <- x.temp
@@ -181,13 +195,13 @@ function(x, y, by,
         x <- prop.table(x, 2)
       }
     }
-  }  # end !is.null(y)
+  }  # end y is present
 
 
   # x = tabulate for counts
 
   if (!entered) {
-    if (!is.data.frame(x)) { # a single x value
+    if (!is.data.frame(x)) { # a single x variable
       if (is.null(by)) {
         x.temp <- x  # save counts, to be restored for text output
         x <- table(x, dnn=NULL)
@@ -229,7 +243,8 @@ function(x, y, by,
       rownames(frq) <- as.character(resp)
       colnames(frq) <- names(x)
 
-      for (i in 1:ncol(x)) {  # maybe an x not has a value in full set
+      # maybe an x not has a value in full set
+      for (i in 1:ncol(x)) {  
         tblx.i <- table(x[,i])
         k <- 0
         for (j in 1:n.resp) {
@@ -287,26 +302,71 @@ function(x, y, by,
   # colors
   # fill is input and usually words, clr are actual colors
 
-  n.cat <- ifelse (is.matrix(x), nrow(x), length(x))
+  n.levels <- ifelse (is.matrix(x), nrow(x), length(x))
+
+  # need n.levels for this evaluation
+  if (values %in% c("eval.later")) {
+    if (n.levels > 14)
+      values <- "off"
+    else
+      values <- ifelse (y.given, "input", getOption("values"))
+  }
+
+  if (is.null(values.digits)) {  # if too large for "input", get in bc.main
+    if (values == "%") values.digits <- 0
+    else if (values == "prop") values.digits <- 2
+    else if (values == "input") values.digits <- 0
+  }
 
   # see if apply a pre-defined color range to **fill**
-  clr <- NULL
-  clr <- .color.range(fill, n.cat)  # see if range
 
-  # not a color range such as "colors" or "blues", so assign clr here
-  if (is.null(clr)) {
-    if (length(fill) == 1  &&  is.matrix(x)) 
-      clr <- getColors("colors", n=n.cat)  # default with by variable
-    else
-      clr <- fill  # user provided the colors
+  # is the value for fill a user-specified color range?
+  # allow for assigned diverging color scale
+  if (is.null(fill)) {  # fill not specified
+    if (!is.ord) {  # default qualitative for theme
+      if (theme == getOption("theme")) {  # the default theme
+        clr <- getOption("bar.fill.discrete")  # default theme 
+      }
+      else {  # not the default theme
+        sty <- style(theme, reset=FALSE)
+        clr <- sty$bar$bar.fill.discrete
+        color <- sty$bar$color
+        trans <- sty$bar$trans.fill
+      }
+      if (!is.null(.color.range(clr, n.levels)))  # if a color range 
+        clr <- .color.range(clr, n.levels)
+      if (beside) clr <- clr[1:n.levels]  # longer vector OK if !beside
+    }
+    else  # ordered factor, so sequential palette
+      clr <- .color.range(.get.fill(theme), n.levels) 
+  }
+
+  else {  # fill specified by user
+    if (is.null(.color.range(fill, n.levels)))
+      clr <- fill  # user assigned
+    else 
+      clr <- .color.range(fill, n.levels)  # do default range
+  }  # end null fill
+
+# if (beside && !is.null(by)) clr <- clr[1:n.levels]
+
+  if (!is.null(fill.split)) {
+    chroma <- ifelse (theme %in% c("gray", "white"), 0, 55)
+    hue <- .get.h(theme)
+    fill[1] <- hcl(hue, chroma, l=30) 
+    fill[2] <- hcl(hue, chroma, l=70) 
+    for (i in 1:length(x))
+      clr[i] <- ifelse (x[i] <= fill.split, fill[1], fill[2])
   }
 
   if (!is.null(col.trans)) 
    for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-col.trans)*256) 
 
+  # by default, no color borders if a range
+  if (identical(col.color, getOption("bar.color.discrete")))
+    col.color <- "transparent"  
   # see if apply a pre-defined color range to **color**
-  col.clr <- NULL
-  col.clr <- .color.range(col.color, n.cat)  # see if range
+  col.clr <- .color.range(col.color, n.levels)  # see if range, NULL if not
   if (!is.null(col.clr)) col.color <- col.clr
 
 
@@ -369,9 +429,7 @@ function(x, y, by,
   # for each value label, partition into mx.x.val.ln lines if (break.x)
   mx.x.val.ln <- 1
   ln.val <- integer(length=length(val.lab))
-  if (break.x) {
-    stuff <- .get.val.ln(val.lab, x.name)
-  }
+  if (break.x) stuff <- .get.val.ln(val.lab, x.name)
   val.lab <- stuff$val.lab 
   mx.x.val.ln <- stuff$mx.val.ln
 
@@ -464,19 +522,23 @@ function(x, y, by,
   # the barplot itself is not retained
   if (rescale == 0) {
     if (!horiz)
-      barplot(x, col="transparent", ylim=c(min.y,max.y), axisnames=FALSE,
+      barplot(x, col="transparent", border="transparent", 
+        ylim=c(min.y,max.y), axisnames=FALSE,
         beside=beside, space=gap, axes=FALSE, ...)
     else
-      barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
+      barplot(x, col="transparent", border="transparent", horiz=TRUE,
+        axisnames=FALSE,
         beside=beside, space=gap, axes=FALSE, xlim=c(min.y, max.y), ...)
   }
   else { # rescale, need (0,1) limit on cat axis for re-scale to work
     if (!horiz)
-      barplot(x, col="transparent", ylim=c(min.y,max.y), axisnames=FALSE,
+      barplot(x, col="transparent", border="transparent",
+        ylim=c(min.y,max.y), axisnames=FALSE,
         beside=beside, space=gap, width=width.bars, xlim=c(0,1),
         axes=FALSE, ...)
     else
-      barplot(x, col="transparent", horiz=TRUE, axisnames=FALSE,
+      barplot(x, col="transparent", border="transparent", horiz=TRUE,
+        axisnames=FALSE,
         beside=beside, space=gap, width=width.bars, xlim=c(min.y, max.y),
         ylim=c(0,1), axes=FALSE, ...)
   }
@@ -515,35 +577,41 @@ function(x, y, by,
 
   # display text labels of values on or above the bars
   # --------------------------------------------------
+  if (beside  &&  values.pos != "out") values.size <- .9 * values.size
+
   if (values != "off") {
     if (is.null(values.cut)) {
       values.cut <- 0.015
       if (prop && is.matrix(x)  ||  multi) values.cut <- 0.045
     }
 
-    # set type of the values to display
-
+    # set type of the values to display, x.txt
 
     if (!prop) {
       if (!multi)
         x.prop <- x/sum(x)
       else
         x.prop <- x/colSums(x)
-
-      if (values == "input")
-        x.txt <- as.character(x)
+      if (values == "input") {
+        if (is.null(by))
+          x.txt <- .fmt(x, values.digits)   # as.char not accurate for dec dig
+        else
+          x.txt <- as.character(x)  # .fmt does not work on a table, so kludge     
+      }
       else if (values == "%")
         x.txt <- paste(.fmt(x.prop * 100, values.digits), "%", sep="")
       else if (values == "prop")
         x.txt <- .fmt(x.prop, values.digits)
-      
+
       if (is.matrix(x))
           x.txt <- matrix(x.txt, nrow=nrow(x))
         
       if (values.pos != "out") {
         if (is.null(by)) {
-          for (i in 1:length(x.prop))
-            x.txt[i] <- ifelse (x.prop[i] >= values.cut, x.txt[i], "")
+          if (!y.given) {
+            for (i in 1:length(x.prop))
+              x.txt[i] <- ifelse (x.prop[i] >= values.cut, x.txt[i], "")
+          }
         }
         else {  # by variable
           for (i in 1:nrow(x.prop)) for (j in 1:ncol(x.prop)) 
@@ -584,14 +652,14 @@ function(x, y, by,
           ycrd <- x/2
         else
           ycrd <- x + 0.17*usr.y.inch
-        text(x.coords, ycrd, labels=x.txt, col=values.color, cex=values.cex)
+        text(x.coords, ycrd, labels=x.txt, col=values.color, cex=values.size)
       }  # no by
       else {  # 2 variables
         if (!beside) {
           for (i in 1:ncol(x)) {
             ycrd <- cumsum(x[,i]) - (x[,i] / 2)
             text(x.coords[i], ycrd, labels=x.txt[,i],
-                 col=values.color, cex=values.cex) 
+                 col=values.color, cex=values.size) 
           }
         }  # end !beside
         else {  # beside
@@ -602,12 +670,12 @@ function(x, y, by,
             ycrd <- x + 0.10*usr.y.inch
           for (i in 1:ncol(x)) {
             text(x.coords[,i], ycrd[,i], labels=x.txt[,i],
-                 col=values.color, cex=values.cex) 
+                 col=values.color, cex=values.size) 
           }
         }  # end beside
       }  # end 2 variables
-	  }  # end vertical bars
-	
+    }  # end vertical bars
+
     # horiz bars
     else {
       if (!is.matrix(x)) {  # 1 variable
@@ -616,14 +684,14 @@ function(x, y, by,
           ycrd <- x/2
         else
           ycrd <- x + 0.17*usr.x.inch
-        text(ycrd, x.coords, labels=x.txt, col=values.color, cex=values.cex)
+        text(ycrd, x.coords, labels=x.txt, col=values.color, cex=values.size)
       }  # end no by
       else {  # by variable
         if (!beside) {  # stacked chart
         for (i in 1:ncol(x)) {  # each level of by
           ycrd <- cumsum(x[,i]) - (x[,i] / 2)
           text(ycrd, x.coords[i], labels=x.txt[,i],
-             col=values.color, cex=values.cex) 
+             col=values.color, cex=values.size) 
         }
       }
       else {  # beside chart
@@ -634,12 +702,12 @@ function(x, y, by,
           ycrd <- x + 0.17*usr.x.inch
           for (i in 1:ncol(x)) {
             text(ycrd[,i], x.coords[,i], labels=x.txt[,i],
-                 col=values.color, cex=values.cex) 
+                 col=values.color, cex=values.size) 
           }
         }  # end beside
       }  # end by
     }  # end horiz bars
-	
+
   }  # end display values
   
 
@@ -738,6 +806,21 @@ function(x, y, by,
   }
 
 
+  if (!is.null(add)) {
+
+    add.cex <- getOption("add.cex")
+    add.lwd <- getOption("add.lwd")
+    add.lty <- getOption("add.lty")
+    add.color <- getOption("add.color")
+    add.fill <- getOption("add.fill")
+    add.trans <- getOption("add.trans")
+
+    .plt.add (add, x1, x2, y1, y2,
+              add.cex, add.lwd, add.lty, add.color, add.fill, add.trans) 
+  }
+
+
+  # -----------------------------------------------------------------------
   # -----------------------------------------------------------------------
   # text output
 
@@ -811,9 +894,9 @@ function(x, y, by,
                                    "response categories from 1 to", n.var)
     }
 
-    class(txsug) <- "out_piece"
-    class(txtbl) <- "out_piece"
-    class(txttl) <- "out_piece"
+    class(txsug) <- "out"
+    class(txtbl) <- "out"
+    class(txttl) <- "out"
     
     if (nzchar(txsug))
       output <- list(out_suggest=txsug,
@@ -827,6 +910,7 @@ function(x, y, by,
     
   }  # end multi
 
+
   # x is a table, could be real values or integers <0 if y is specified
   # no by variable, dim == 0 if x<-x.temp 
   else if (n.dim == 1) {
@@ -835,11 +919,6 @@ function(x, y, by,
       txsug <- ""
       if (getOption("suggest")) {
         txsug <- ">>> Suggestions"
-        fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
-        txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("Plot(", x.name,
-                    ", values=\"count\")  # lollipop plot", sep="")
-        txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("BarChart(", x.name,
                     ", horiz=TRUE)  # horizontal bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
@@ -847,6 +926,11 @@ function(x, y, by,
                  ", fill=\"greens\")  # sequential green bars", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("PieChart(", x.name, ")  # doughnut chart", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
+        txsug <- paste(txsug, "\n", fc, sep="")
+        fc <- paste("Plot(", x.name,
+                    ", topic=\"count\")  # lollipop plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
       }
       
@@ -861,17 +945,26 @@ function(x, y, by,
         chi <- stats$chi
         lbl <- stats$lbl
 
-        class(txsug) <- "out_piece"
-        class(txttl) <- "out_piece"
-        class(counts) <- "out_piece"
-        class(miss) <- "out_piece"
-        class(chi) <- "out_piece"
-        class(lbl) <- "out_piece"
+        class(txsug) <- "out"
+        class(txttl) <- "out"
+        class(counts) <- "out"
+        class(miss) <- "out"
+        class(chi) <- "out"
+        class(lbl) <- "out"
         output <- list(out_suggest=txsug, out_title=txttl, out_miss=miss,
                        out_lbl=lbl, out_counts=counts, out_chi=chi)
         class(output) <- "out_all"
         if (!quiet) print(output)      
       }
+
+    # names and order of components per documentation in BarChart.Rd
+      stats$n.miss <- x.miss
+      stats$p_value <- .fmt(stats$p_value, 3)
+      names(stats) <- c("n.dim", "out_title", "out_counts", "out_miss",
+                        "out_chi", "out_lbl", "freq", "freq.df", "prop",
+                         "p_value", "n.miss")
+      stats <- c(stats[2], stats[6], stats[3], stats[5], stats[4],
+                 stats[1], stats[10], stats[8], stats[7], stats[9], stats[11])
     }  # end counts or count-like
 
     else {  # x (table from y) not count-like: not integer or values < 0
@@ -887,13 +980,17 @@ function(x, y, by,
       stats <- .ss.real(x, by, digits.d=dd,
                    x.name, getOption("yname"), by.name, x.lbl, y.lbl, label.max) 
       txtbl <- stats$txtbl 
-      class(txsug) <- "out_piece"
-      class(txtbl) <- "out_piece"
+      class(txsug) <- "out"
+      class(txtbl) <- "out"
       output <- list(out_suggest=txsug, out_txt=txtbl)
 
       class(output) <- "out_all"
       if (!quiet) print(output)         
+
+      names(stats) <- c("n.dim", "out_y")
+      stats <- c(stats[2], stats[1])
     }
+
   }  # if (n.dim == 1)
 
   # -------------
@@ -909,7 +1006,7 @@ function(x, y, by,
                   ", horiz=TRUE)  # horizontal bar chart", sep="")
       txsug <- paste(txsug, "\n", fc, sep="")
       fc <- paste("BarChart(", x.name,
-                  ", fill=\"colors\")  # different bar colors", sep="")
+                  ", fill=\"steelblue\")  # steelblue bars", sep="")
       txsug <- paste(txsug, "\n", fc, sep="")
     }
 
@@ -923,48 +1020,46 @@ function(x, y, by,
       txXV <- stats$txXV
       txlbl <- stats$txlbl
 
-      class(txsug) <- "out_piece"
-      class(txttl) <- "out_piece"
-      class(txfrq) <- "out_piece"
-      class(txXV) <- "out_piece"
-      class(txlbl) <- "out_piece"
+      class(txsug) <- "out"
+      class(txttl) <- "out"
+      class(txfrq) <- "out"
+      class(txXV) <- "out"
+      class(txlbl) <- "out"
       if (!prop)
-        output <- list(out_suggest=txsug, out_title=txttl, out_lbl=txlbl, out_text=txfrq, out_XV=txXV)
+        output <- list(out_suggest=txsug, out_title=txttl, out_lbl=txlbl,
+                       out_text=txfrq, out_XV=txXV)
       else {
         txrow <- stats$txrow
-        class(txrow) <- "out_piece"
+        class(txrow) <- "out"
         output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq,
                        out_row=txrow, out_XV=txXV)
       }
       class(output) <- "out_all"
       if (!quiet) print(output)
+
+      names(stats) <- c("n.dim", "out_title", "out_lbl", "out_counts",
+                        "out_chi", "out_prop", "out_row",
+                        "out_col", "freq.df", "p_value")
+      stats <- c(stats[2], stats[3], stats[4], stats[5], stats[6],
+                 stats[7], stats[8], stats[1], stats[9], stats[10])
     }  # end is.null(y)
 
     else {  # y is present
       stats <- .ss.real(x, y, by, digits.d=3, x.name,
                         getOption("yname"), by.name, x.lbl, y.lbl, label.max) 
       txtbl <- stats$txtbl 
-      class(txtbl) <- "out_piece"
+      class(txtbl) <- "out"
       output <- list(out_txt=txtbl)
 
       class(output) <- "out_all"
-      if (quiet) print(output)
+      if (!quiet) print(output)
+
+      names(stats) <- c("n.dim", "out_y")
+      stats <- c(stats[2], stats[1])
     }
-  
+
   }  # end a by variable
 
-  if (!is.null(add)) {
-
-    add.cex <- getOption("add.cex")
-    add.lwd <- getOption("add.lwd")
-    add.lty <- getOption("add.lty")
-    add.color <- getOption("add.color")
-    add.fill <- getOption("add.fill")
-    add.trans <- getOption("add.trans")
-
-    .plt.add (add, x1, x2, y1, y2,
-              add.cex, add.lwd, add.lty, add.color, add.fill, add.trans) 
-  }
   cat("\n")
 
   return(stats)

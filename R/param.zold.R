@@ -52,9 +52,14 @@ function (...) {
           "e.g., lab.adj=c(.5,0) moves x-axis label in 0.5 in \n\n")
       }
 
+      if (names(dots)[i] == "values.cex") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  values.cex  renamed  values.size\n\n")
+      }
+
       if (names(dots)[i] == "sort.x") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option sort.x  renamed  sort\n\n")
+          "option  sort.x  renamed  sort\n\n")
       }
       
       if (grepl("colors", names(dots)[i], fixed=TRUE)) {

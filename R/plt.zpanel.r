@@ -1,4 +1,3 @@
-# for .plt.lattice
 .panel.bwplot <-
 function (x, y, box.ratio=1, vbs.size=box.ratio/(1 + box.ratio), 
     horizontal=TRUE, alpha=trellis.par.get("box.dot")$alpha,
@@ -11,8 +10,12 @@ function (x, y, box.ratio=1, vbs.size=box.ratio/(1 + box.ratio),
 
     stats.nm <- deparse(substitute(stats))
 
+#cat("\n\nIn panel.bwplot*************\n")
+#print(x)
+#print(y)
     x <- as.numeric(x)
-    y <- as.numeric(y)
+    y <- as.numeric(y)  # could be a factor, need numeric version
+#print(y)
 
     box.rectangle <- trellis.par.get("box.rectangle")
     box.umbrella <- trellis.par.get("box.umbrella")
@@ -24,12 +27,20 @@ function (x, y, box.ratio=1, vbs.size=box.ratio/(1 + box.ratio),
 
     if (horizontal) {
       if (stats.nm == "boxplot.stats")
+{
         blist <- tapply(x, factor(y, levels=levels.fos), stats, 
           coef=k.iqr, do.out=do.out)
+#cat("\nlevels.fos\n")
+#print(levels.fos)
+#cat("\nblist\n")
+#print(blist)
+}
       if (stats.nm == "adjboxStats")
         blist <- tapply(x, factor(y, levels=levels.fos), stats, 
           coef=k.iqr, a=a, b=b, do.out=do.out)
       blist.stats <- t(sapply(blist, "[[", "stats"))
+#cat("\nblist.stats\n")
+#print(blist.stats)
       blist.out <- lapply(blist, "[[", "out")
       blist.height <- vbs.size
       if (varwidth) {

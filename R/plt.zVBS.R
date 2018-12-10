@@ -1,5 +1,6 @@
 .plt.VBS <-
-function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux, 
+function(x, ID, by1, by1.miss, by0, by.miss,
+         bw, bw.miss, bw.iter, iter.details, lx, n.ux, 
          k.iqr, box.adj, a, b,
          x.name, by1.name, by.name, vbs.plot,
          n.col.miss, n.row.miss,
@@ -42,7 +43,7 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
     }
 
     txrep <- tx 
-    class(txrep) <- "out_piece"
+    class(txrep) <- "out"
     return(txrep)
   }
 
@@ -65,7 +66,7 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
       tx[length(tx)+1] <- paste("bw:" , .fmt(bw,2),
         "    set bandwidth higher for smoother edges")
     txprm <- tx
-    class(txprm) <- "out_piece"
+    class(txprm) <- "out"
     return(txprm)
   }
 
@@ -129,7 +130,7 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
     txsug <- .rm.arg.2("(x=", txsug)
     txsug <- .rm.arg.2(" y=", txsug) 
 
-    class(txsug) <- "out_piece"
+    class(txsug) <- "out"
 
     if (nzchar(txsug)) {
       output <- list(out_suggest=txsug)
@@ -141,7 +142,7 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
 
 
   if (!is.factor(x)) if (bw.miss)
-    bw <- .band.width(na.omit(x), ...)  # default bw
+    bw <- .band.width(na.omit(x), bw.iter, iter.details, ...) # initial bw
 #d.gen <- suppressWarnings(density(na.omit(x), bw, ...))
 #xd <- diff(d.gen$y)
 #cat("\n\n\n*** bw:", bw, "\n")
@@ -152,6 +153,7 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
 #print(sort(as.numeric(.fmt(xd2,7))))
   rep.prop <- (lx - n.ux) / lx
 
+
   # -------
   # ONE VAR VBS plot: # no by1, so x by itself
   if (by1.miss && by.miss) { 
@@ -160,8 +162,8 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
     bx <- .bx.stats(x, ID, k.iqr, box.adj, a, b, digits.d)
     txbox <- bx$txstat
     txotl <- bx$txotl
-    class(txbox) <- "out_piece"
-    class(txotl) <- "out_piece"
+    class(txbox) <- "out"
+    class(txotl) <- "out"
     txgrp <- ""
 
     # check for repetitions of x values (as a single variable)
@@ -208,30 +210,31 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
     else
       txprm <- ""
 
-    # get freq table, before jitter, not all x are unique
-    if (n.ux < 9  &&  n.ux < length(x)) { 
-      ssstuff <- .ss.factor(x, x.name=x.name, ...)
-      txttl <- ssstuff$title
-      txfrq <- ssstuff$counts
-      txXV <- ssstuff$chi
-      class(txttl) <- "out_piece"
-      class(txfrq) <- "out_piece"
-      class(txXV) <- "out_piece"
-      output <- list(type="VBS_Plot", call=fun.call,
-        out_title=txttl, out_text=txfrq, out_XV=txXV,
-        out_tx=txbox, out_outliers=txotl, out_parm=txprm)
-    }
-    else {  # no freq table for discrete variable
-
+    # get freq table for discrete, before jitter, not all x are unique
+    txdst <- ""
     if (bin) {
       h <- .hst.main(x, breaks=breaks, bin.start=bin.start,
          bin.width=bin.width, bin.end=bin.end, prop=proportion, 
          quite=quiet, fun.call=NULL, do.plot=FALSE, ...) 
       txdst <- h$ttx
-      class(txdst) <- "out_piece"
+      class(txdst) <- "out"
     }
-    else
-      txdst <- ""  # no freq distribution from histogram
+
+    if (n.ux < 9  &&  n.ux < length(x)) {  # x is discrete 
+      ssstuff <- .ss.factor(x, x.name=x.name, ...)
+      txttl <- ssstuff$title
+      txfrq <- ssstuff$counts
+      txXV <- ssstuff$chi
+      class(txttl) <- "out"
+      class(txfrq) <- "out"
+      class(txXV) <- "out"
+      output <- list(type="VBS_Plot", call=fun.call,
+        out_title=txttl, out_text=txfrq, out_freq=txdst, out_XV=txXV,
+        out_tx=txbox, out_outliers=txotl, out_parm=txprm)
+    }
+    else {  # no freq table for not discrete variable
+
+    if (!bin) txdst <- ""  # no freq distribution from histogram
 
     output <- list(type="Violin/Box/ScatterPlot",
       call=fun.call,  
@@ -265,7 +268,7 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
     ssstuff <- .ss.numeric(x, by=by1, y.name=b.name,
                            digits.d=digits.d, brief=TRUE, by1.nm=TRUE)
     txgrp <- ssstuff$tx
-    class(txgrp) <- "out_piece"
+    class(txgrp) <- "out"
 
     #if (n.col.miss && n.row.miss) n.col <- 1
     mx.c <- max(tapply(x, by1, length))
@@ -324,8 +327,8 @@ function(x, ID, by1, by1.miss, by0, by.miss, bw, bw.miss, lx, n.ux,
                               x.name=x.name, y.name=by1.name, ...)
         txfrq <- ssstuff$txfrq
         txXV <- ssstuff$txXV
-        class(txfrq) <- "out_piece"
-        class(txXV) <- "out_piece"
+        class(txfrq) <- "out"
+        class(txXV) <- "out"
         output <- list(out_text=txfrq, out_XV=txXV,
            out_rep=txrep, out_parm=txprm)
       }

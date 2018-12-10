@@ -1,7 +1,7 @@
 ttest <-
 function(x=NULL, y=NULL, data=mydata, paired=FALSE,
 
-         n=NULL, m=NULL, s=NULL, mu0=NULL, 
+         n=NULL, m=NULL, s=NULL, mu=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
 
          Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", xlab=NULL, 
@@ -112,12 +112,12 @@ function(x, y=NULL, ...) {
         Ynm <- x.name
       else {
         Ynm <- "Difference"
-        mu0 <- 0
+        mu <- 0
         options(df.name=NULL)
       }
 
       options(yname=x.name)
-      plt1 <- .OneGroup(x, Ynm, mu0, n=NULL, m=NULL, s=NULL, brief, bw1,
+      plt1 <- .OneGroup(x, Ynm, mu, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
          Edesired, paired, graph, xlab, line.chart, show.title,
          pdf.file, width, height, ...)
@@ -130,7 +130,7 @@ function(x, y=NULL, ...) {
     }  # end from data
 
     else  # from stats
-       .OneGroup(x, Ynm, mu0, n, m, s, brief, bw1,
+       .OneGroup(x, Ynm, mu, n, m, s, brief, bw1,
          from.data, conf.level, alternative, digits.d, mmd, msmd,
          Edesired, paired, graph, xlab, line.chart, show.title,
          pdf.file, width, height, ...)
@@ -156,6 +156,13 @@ function(x, y=NULL, ...) {
   if (!is.null(Edesired) && conf.level != 0.95) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Edesired calculation only applies to 95% confidence level.\n\n")
+  }
+
+  dots <- list(...)
+  if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "mu0")  mu <- dots[[i]]
+    }
   }
 
   # keep track of generated graphics

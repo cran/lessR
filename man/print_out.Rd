@@ -1,5 +1,5 @@
-\name{print.out_piece}
-\alias{print.out_piece}
+\name{print.out}
+\alias{print.out}
 
 \title{Display a Portion of Output from a Saved List Object}
 
@@ -10,7 +10,7 @@ Now just applies to the \code{lessR} \code{\link{Regression}} function.
 }
 
 \usage{
-\method{print}{out_piece}(x, ...)
+\method{print}{out}(x, ...)
 }
 
 
@@ -40,7 +40,7 @@ s$outliers
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ print.out_piece }
+\keyword{ print.out }
 
 
 

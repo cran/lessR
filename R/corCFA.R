@@ -199,7 +199,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
     }
 
     txlbl <- tx
-    class(txlbl) <- "out_piece"
+    class(txlbl) <- "out"
     output <- list(out_labels=txlbl)
   }  # end labels only
 
@@ -590,19 +590,19 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
   }
 
 
-  class(title_scales) <- "out_piece"
-  class(txlbl) <- "out_piece"
-  class(title_rel) <- "out_piece"
-  class(txrel) <- "out_piece"
-  class(title_sol) <- "out_piece"
-  class(txind) <- "out_piece"
-  class(txsol) <- "out_piece"
-  class(title_res) <- "out_piece"
-  class(txres) <- "out_piece"
-  class(txrst) <- "out_piece"
-  class(title_lvn) <- "out_piece"
-  class(txlvn) <- "out_piece"
-  class(txkfl) <- "out_piece"
+  class(title_scales) <- "out"
+  class(txlbl) <- "out"
+  class(title_rel) <- "out"
+  class(txrel) <- "out"
+  class(title_sol) <- "out"
+  class(txind) <- "out"
+  class(txsol) <- "out"
+  class(title_res) <- "out"
+  class(txres) <- "out"
+  class(txrst) <- "out"
+  class(title_lvn) <- "out"
+  class(txlvn) <- "out"
+  class(txkfl) <- "out"
 
   output <- list(
     call=fun.call,

@@ -1,5 +1,6 @@
 \name{Plot}
 \alias{Plot}
+\alias{pl}
 \alias{ScatterPlot}
 \alias{sp}
 \alias{BoxPlot}
@@ -34,32 +35,34 @@ Represent the influence of additional categorical variables with \code{by1} or \
 
 \usage{
 Plot(x, y=NULL, data=mydata, rows=NULL,
-         values=c("data", "count", "prop", "sum", "mean", "sd",
+         topic=c("data", "count", "prop", "sum", "mean", "sd",
                   "min", "median", "max"),
-         n.cat=getOption("n.cat"),
+         theme=getOption("theme"), n.cat=getOption("n.cat"),
 
          by=NULL, by1=NULL, by2=NULL,
          n.row=NULL, n.col=NULL, aspect="fill",
 
          fill=getOption("pt.fill"), color=getOption("pt.color"),
          trans=getOption("trans.pt.fill"),
+         violin.fill=getOption("violin.fill"), 
+         box.fill=getOption("box.fill"), 
 
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
          sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
          jitter.x=0, jitter.y=0,
 
-         ID="row.name", ID.size=0.75,
+         ID="row.name", ID.size=0.85,
          MD.cut=0, out.cut=0, out.shape="circle", out.size=1,
 
-         vbs.plot="vbs", vbs.pt.fill=c("black", "default"), bw=NULL,
+         vbs.plot="vbs", vbs.pt.fill="black", bw=NULL, bw.iter=10,
          vbs.size=0.9, vbs.mean=FALSE, fences=FALSE,
          k=1.5, box.adj=FALSE, a=-4, b=3,
 
-         radius=0.25, power=0.6,
+         radius=NULL, power=0.6,
          low.fill=NULL, hi.fill=NULL, proportion=FALSE,
 
-         smooth=FALSE, smooth.points=100, smooth.trans=0.20,
-         smooth.bins=128,
+         smooth=FALSE, smooth.points=100, smooth.size=1,
+         smooth.trans=0.25, smooth.bins=128,
 
          fit="off", fit.se=0.95, ellipse=0, 
 
@@ -80,10 +83,11 @@ Plot(x, y=NULL, data=mydata, rows=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-         auto=FALSE, eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
+         enhance=FALSE, eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
          do.plot=TRUE, width=NULL, height=NULL, pdf.file=NULL, 
          fun.call=NULL, \ldots)
 
+pl(\ldots)
 ScatterPlot(\ldots)
 sp(\ldots)
 BoxPlot(\ldots)
@@ -111,10 +115,11 @@ vp(\ldots)
         \code{y}. Default data frame is \code{mydata}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
-  \item{values}{The values that are the coordinates from which to plot the points,
+  \item{topic}{The values that are the coordinates from which to plot the points,
         \code{data} values by default.  For \code{y}, which is continuous, then
         for either a categorical \code{x} variable, or a continuous \code{x} variable
         with values binned into categories, then can apply \code{"mean"}, etc.}
+  \item{theme}{Color theme for this analysis.}
   \item{n.cat}{Number of categories, specifies the largest number of
         unique, equally spaced integer values of a variable for which
         the variable will be analyzed as categorical instead of continuous.
@@ -163,7 +168,9 @@ vp(\ldots)
         \code{pt.color} from the lessR \code{\link{style}} function.}
   \item{trans}{Transparency factor of the area of each point.
         Default is
-        \code{trans.pt.fill} from the lessR \code{\link{style}} function.}\cr
+        \code{trans.pt.fill} from the lessR \code{\link{style}} function.}
+  \item{violin.fill}{Fill color for a \bold{violin plot}.}
+  \item{box.fill}{Fill color for a box plot.}\cr
 
   \item{size}{When set to a constant, the scaling factor for \bold{standard points}
       (not bubbles) or a line, with default of 1.0 for points and 2.0 for a line.
@@ -247,10 +254,14 @@ vp(\ldots)
   \item{vbs.pt.fill}{Points in a VBS scatterplot are black by default because
         the background is the violin, which is based on the current theme
         color. To use the values for \code{pt.fill} and \code{pt.color} 
-        specified by the \code{\link{style}} function, set to \code{"default"}.}
+        specified by the \code{\link{style}} function, set to \code{"default"}.
+        Or set to any desired color.}
   \item{bw}{Bandwidth for the smoothness of the violin plot. Higher values 
         for smoother plots. Default is to calculate a bandwidth that provides
         a relative smooth density plot.}
+  \item{bw.iter}{Number of iterations used to modify default R bandwidth
+        to further smooth the obtained density estimate. When set, also
+        displays the iterations and corresponding results.}
   \item{vbs.size}{Width of the violin plot to the plot area. Make the
         violin (and also the accompanying box plot) larger or smaller by
         making the plot area and/or this value larger or smaller.}
@@ -269,14 +280,13 @@ vp(\ldots)
         of the whiskers. If explicitly set, activates \code{box.adj}.}\cr
 
   \item{radius}{Scaling factor of the bubbles in a \bold{bubble plot}, which
-        sets the radius of the largest displayed bubble in inches, with default of
-        0.25 inches. To activate, set the value of \code{size} to
-        a third variable, which
-        sets the size of a bubble according to the size of the third variable.
-        Or activate when the values of the variables are categorical, either a
+        sets the radius of the largest displayed bubble in inches. To
+        activate, either set the value of \code{size} to
+        a third variable where the default is 0.10,
+        or for categorical variables, either a
         factor or an integer variable with the number of unique values less than
-        \code{n.cat}, in which case the size of the bubbles represents
-        frequency.} 
+        \code{n.cat}, the size of the bubbles represents
+        frequency, with a default of 0.22.} 
   \item{power}{Relative size of the scaling of the bubbles to each other.
         Value of 0.5 scales the bubbles so that the area of each bubble is the
         value of the corresponding sizing variable. Value of 1 scales so the
@@ -300,6 +310,7 @@ vp(\ldots)
         areas of
         the lowest density to help identify outliers, which controls how dark
         are the smoothed points.}
+  \item{smooth.size}{Size of points superimposed on the density plot.}
   \item{smooth.trans}{Exponent of the function that maps the density scale to
         the color scale.}
   \item{smooth.bins}{Number of bins in both directions for the density
@@ -439,7 +450,7 @@ vp(\ldots)
        \code{"mean.y"}.  Only used for \code{"rect"}, \code{"line"} and
        \code{arrow}.}\cr
 
-  \item{auto}{For a two-variable scatterplot, if \code{TRUE},
+  \item{enhance}{For a two-variable scatterplot, if \code{TRUE},
         automatically add the 0.95 data ellipse, 
         labeling of outliers beyond a Mahalanobis distance of 6 from the 
         ellipse center, the best-fitting least squares line of all the data,
@@ -500,7 +511,7 @@ A scatterplot of Likert type data is problematic because there are so few possib
 DATA\cr
 The default input data frame is \code{mydata}. Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{mydata$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment.
 
-The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin.width}, to override default values. The \code{values} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
+The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin.width}, to override default values. The \code{topic} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
        
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -659,7 +670,7 @@ Plot(Years, Salary)
 
 # maximum information, minimum input: scatterplot +
 #  means, outliers, ellipse, least-squares lines with and w/o outliers
-Plot(Years, Salary, auto=TRUE)
+Plot(Years, Salary, enhance=TRUE)
 
 
 \donttest{
@@ -778,9 +789,6 @@ BoxPlot(Salary)
 
 # two related displays of box plots for different levels of a
 #   categorical variable
-# 1. With default theme of "colors" display box plots with different colors
-BoxPlot(Salary, Dept)
-# 2. Display box plots with the same hue (blue by default)
 BoxPlot(Salary, by1=Dept)
 
 
@@ -788,7 +796,7 @@ BoxPlot(Salary, by1=Dept)
 # ----------------------------
 # bin the values of Salary to plot counts as a frequency polygon
 # the counts are plotted as points instead of the data
-Plot(Salary, values="count")  # bin the values
+Plot(Salary, topic="count")  # bin the values
 
 # time charts
 #------------
@@ -846,7 +854,7 @@ Plot(Dept)
 Plot(Dept, label.max=2)
 
 # plot of frequencies for each category (level), replaces bar chart 
-Plot(Dept, values="count")
+Plot(Dept, topic="count")
 
 
 #----------------------------------------------------

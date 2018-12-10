@@ -17,9 +17,12 @@ function(ns, n, p1=0, p2=1,
       "Specify the size of each sample, the number of data values, with:  n\n\n")
   }
 
+  manage.gr <- .graphman()
   if (!pdf) {
-    .graphwin(2)
-    dev.set(which=3)
+    if (manage.gr) {
+      .graphwin(2)
+      dev.set(which=3)
+    }
   }
   else { 
     pdf.file <- "SimPopulation.pdf"
@@ -133,6 +136,13 @@ function(ns, n, p1=0, p2=1,
     dev.off()
     .showfile(pdf.file, "population distribution")
   }
+
+  if (!pdf) {
+    if (manage.gr) {
+      dev.set(which=4) 
+    }
+  }
+        
 
   cat("\n")
   cat("Population mean, mu :", mu, "\n")

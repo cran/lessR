@@ -1,7 +1,7 @@
 getColors <-
-function(clr=NULL, end.clr=NULL,
+function(pal=NULL, end.pal=NULL,
          n=12, h=0, h2=NULL, c=NULL, l=NULL, trans=0,
-         in.order=FALSE, fixup=TRUE,
+         in.order=NULL, fixup=TRUE,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
          main=NULL, labels=NULL, labels.cex=0.8, lty="solid",
          output=NULL, quiet=getOption("quiet"), ...) {
@@ -13,10 +13,13 @@ function(clr=NULL, end.clr=NULL,
   miss.l <- ifelse (missing(l), TRUE, FALSE)
   miss.c <- ifelse (missing(c), TRUE, FALSE)
 
-  if (!is.null(end.clr) && length(clr) > 1) {
+  if (!is.null(end.pal) && length(pal) > 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "To specify a sequence of colors, only specify one beginning color\n\n")
   }
+
+  if (is.null(in.order))
+    in.order <- ifelse (shape == "wheel", TRUE, FALSE)  # for a wheel do in order
 
   if (!missing(h2)  &&  in.order == FALSE) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -29,37 +32,59 @@ function(clr=NULL, end.clr=NULL,
   # default color scale
   ln.c <- length(c)
   ln.l <- length(l)
-  if (is.null(clr) && is.null(end.clr) && ln.c==1 && ln.l==1) {
-    if (getOption("theme") %in% c("gray", "white")) clr <- "grays"
+  if (is.null(pal) && is.null(end.pal) && ln.c==1 && ln.l==1) {
+    if (getOption("theme") %in% c("gray", "white")) pal <- "grays"
+      else
+    pal <- "hues"
   }
 
-  nm <- c("reds", "rusts", "yellows", "olives", "greens", "emeralds",  
+  if (!is.null(pal[1]))
+    if (pal[1] == "yellows") pal[1] <- "browns"  # as of 3.7.7
+  if (!is.null(end.pal))
+    if (end.pal == "yellows") end.pal <- "browns"
+
+  nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",  
           "turquoises", "aquas", "blues", "purples", "violets",
           "magentas", "grays")
   nmR <- c("rainbow", "heat", "terrain")
+  nmV<- c("viridis", "cividis", "magma", "inferno", "plasma")
+  nmD<- c("distinct")
+  nmW<- c("BottleRocket1", "BottleRocket2", "Rushmore1", "Rushmore",
+          "Royal1", "Royal2", "Zissou1", "Darjeeling1", "Darjeeling2",
+          "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2",
+          "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2",
+          "IsleofDogs1", "IsleofDogs2")
 
 
   # set kind of analysis: qualitative, sequential, divergent,  or manual
   # ---------------------------------------------------------------------
 
-  if (!is.null(clr)) {  # at least one color specified
-      if (clr[1] %in% nm) {
+  if (!is.null(pal)) {  # at least one color specified
+      if (pal[1] %in% nm) {
         kind <- "sequential"
-      if (!is.null(end.clr[1])) if (end.clr[1] %in% nm)
+      if (!is.null(end.pal[1])) if (end.pal[1] %in% nm)
         kind <- "divergent"
     }
-    else if (clr[1] %in% nmR)
+    else if (pal[1] %in% nmR)
       kind <- "seq.R"
-    else if (clr[1] == "colors")
+    else if (pal[1] == "hues")
       kind <- "qualitative"
-    else {
-      if (is.null(end.clr))  # no ending color specified
+    else if (pal[1] %in% nmV)
+      kind <- "viridis"
+    else if (pal[1] %in% nmW)
+      kind <- "wes"
+    else if (pal[1] %in% nmD)
+      kind <- "distinct"
+
+    else {  # pal[1] not in any nm vector
+      if (is.null(end.pal))  # no ending color specified
         kind <- "manual.q"  # manual qualitative sequence
       else
         kind <- "manual.s"  # manual sequential sequence
     }
-  }  # end clr is not null
-  else {  # is.null clr, so HCL
+  }  # end pal is not null
+
+  else {  # is.null pal -- defaults
     if (length(c) > 1  ||  length(l) > 1)  # multiple chroma or luminance
       kind <- "sequential" 
     else
@@ -75,45 +100,45 @@ function(clr=NULL, end.clr=NULL,
     labels <- ifelse (kind == "qualitative", TRUE, FALSE)
     
   # set hcl hue for pre-defined color sequence
-  if (!is.null(clr)) {
-    if (clr[1] %in% nm  &&  !(clr[1] %in% nmR)) {
-      if (clr[1] == "reds") h <- 0
-      if (clr[1] == "rusts") h <- 30
-      if (clr[1] == "yellows") h <- 60
-      if (clr[1] == "olives") h <- 90
-      if (clr[1] == "greens") h <- 120
-      if (clr[1] == "emeralds") h <- 150
-      if (clr[1] == "turquoises") h <- 180
-      if (clr[1] == "aquas") h <- 210
-      if (clr[1] == "blues") h <- 240
-      if (clr[1] == "purples") h <- 270
-      if (clr[1] == "violets") h <- 300
-      if (clr[1] == "magentas") h <- 330
-      if (clr[1] == "grays") {
+  if (!is.null(pal)) {
+    if (pal[1] %in% nm  &&  !(pal[1] %in% nmR)) {
+      if (pal[1] == "reds") h <- 0
+      if (pal[1] == "rusts") h <- 30
+      if (pal[1] == "browns") h <- 60
+      if (pal[1] == "olives") h <- 90
+      if (pal[1] == "greens") h <- 120
+      if (pal[1] == "emeralds") h <- 150
+      if (pal[1] == "turquoises") h <- 180
+      if (pal[1] == "aquas") h <- 210
+      if (pal[1] == "blues") h <- 240
+      if (pal[1] == "purples") h <- 270
+      if (pal[1] == "violets") h <- 300
+      if (pal[1] == "magentas") h <- 330
+      if (pal[1] == "grays") {
         c <- 0
         miss.c <- FALSE
       }
-      if (is.null(end.clr)) clr <- NULL
+      if (is.null(end.pal)) pal <- NULL
     }
-    if (!is.null(end.clr)) {
-      if (end.clr %in% nm  &&  !(end.clr %in% nmR)) {
-      if (end.clr == "reds") h2 <- 0
-      if (end.clr == "rusts") h2 <- 3
-      if (end.clr == "yellows") h2 <- 60
-      if (end.clr == "olives") h2 <- 90
-      if (end.clr == "greens") h2 <- 120
-      if (end.clr == "emeralds") h2 <- 150
-      if (end.clr == "turquoises") h2 <- 180
-      if (end.clr == "aquas") h2 <- 210
-      if (end.clr == "blues") h2 <- 240
-      if (end.clr == "purples") h2 <- 270
-      if (end.clr == "violets") h2 <- 300
-      if (end.clr == "magentas") h2 <- 330
-      if (end.clr == "grays") {
+    if (!is.null(end.pal)) {
+      if (end.pal %in% nm  &&  !(end.pal %in% nmR)) {
+      if (end.pal == "reds") h2 <- 0
+      if (end.pal == "rusts") h2 <- 3
+      if (end.pal == "browns") h2 <- 60
+      if (end.pal == "olives") h2 <- 90
+      if (end.pal == "greens") h2 <- 120
+      if (end.pal == "emeralds") h2 <- 150
+      if (end.pal == "turquoises") h2 <- 180
+      if (end.pal == "aquas") h2 <- 210
+      if (end.pal == "blues") h2 <- 240
+      if (end.pal == "purples") h2 <- 270
+      if (end.pal == "violets") h2 <- 300
+      if (end.pal == "magentas") h2 <- 330
+      if (end.pal == "grays") {
           c <- 0
           miss.c <- FALSE
         }
-        clr <- NULL
+        pal <- NULL
       }
     }
   }
@@ -149,8 +174,8 @@ function(clr=NULL, end.clr=NULL,
 
     if (miss.c) c <- 65
     if (miss.l) l <- 55
-    clr <- hcl(h, c, l, fixup=fixup)[1:n]  # generate the colors
-    #clr <- hex(polarLUV(L=l, C=c, H=h), fixup=fixup, ...)
+    pal <- hcl(h, c, l, fixup=fixup)[1:n]  # generate the colors
+    #pal <- hex(polarLUV(L=l, C=c, H=h), fixup=fixup, ...)
     lbl <- .fmt(h, 0)
     ttl <- paste("HCL Color Palette for\n",
                  "Chroma=", c, " Luminance=", l)
@@ -163,18 +188,16 @@ function(clr=NULL, end.clr=NULL,
     if (length(c) > 1)
       txt.c <- paste(txt.c, " to ", .fmt(c[2],0), sep="")
 
-    l.dk <- 25  # darkest color
+    l.dk <- 40 - (3*n)  # darkest color
+    if (l.dk < 14) l.dk <- 14  # any darker and the hue is no longer true
     l.lt <- 58 + (5*n)  # lightest color
-    if (l.lt > 94) {
-      l.lt <- 94
-      l.dk <- 15
-    }
+    if (l.lt > 92) l.lt <- 92
     if (miss.l) l <- c(l.lt, l.dk)  # 2 -> 68, 3 -> 73, 6 -> 88, 8 -> 98
     txt.l <- .fmt(l[1],0)
     if (length(l) > 1)
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
 
-    clr <- sequential_hcl(n, h=h, c.=c, l=l, power=1,
+    pal <- sequential_hcl(n, h=h, c.=c, l=l, power=1,
                           fixup=fixup, alpha=1)
     ttl <- paste("Sequential Colors for\n", "h=", .fmt(h,0),
                   ", c=", txt.c, ",  l=", txt.l, sep="")
@@ -192,58 +215,78 @@ function(clr=NULL, end.clr=NULL,
     if (length(c) > 1)
       txt.c <- paste(txt.c, " to ", .fmt(c[2],0), sep="")
       
-    if (miss.l) l <- c(40,70)
+    if (miss.l) l <- c(30,80)
     txt.l <- .fmt(l[1],0)
     if (length(l) > 1)
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
 
-    clr <- diverge_hcl(n, h=h, c=c, l=l, power=0.75,
+    pal <- diverge_hcl(n, h=h, c=c, l=l, power=0.75,
                        fixup=fixup, alpha=1)
     ttl <- paste("Divergent Colors for\n", "h=", txt.h,
                   ", c=", txt.c, ",  l=", txt.l, sep="")
   }
 
+  # viridis sequence
+  else if (kind == "viridis") {
+    ttl <- paste("A viridis Color Palette for:", pal[1], "\n") 
+    fn <-  paste(pal[1], "(", n, ")", sep="")
+    pal <- eval(parse(text=fn))
+  }
+
+  # Wes Anderson sequence
+  else if (kind == "wes") {
+    ttl <- paste("A Wes Anderson Color Palette for:", pal[1], "\n") 
+    pal <- wes_palette(pal[1], n, type="continuous")
+  }
+
+  # random distinct colors
+  else if (kind == "distinct") {
+    ttl <- paste("Random distinct colors:", pal[1], "\n") 
+    pal <- distinctColorPalette(n)
+  }
+
   # custom color sequence
   else if (kind == "manual.s") {
-    color.palette <- colorRampPalette(c(clr, end.clr))
-    clr <- color.palette(n)
+    color.palette <- colorRampPalette(c(pal, end.pal))
+    pal <- color.palette(n)
     ttl <- "Custom Color Sequence"
   }
 
   # user specified multiple colors
   else if (kind == "manual.q") {
-    n <- length(clr)
+    n <- length(pal)
     j <- 0
     for (i in 1:(n)) {
       j <- j + 1
-      if (j > length(clr)) j <- 1  # recycle colors
-      clr[i] <- clr[j]
+      if (j > length(pal)) j <- 1  # recycle colors
+      pal[i] <- pal[j]
     }
     ttl <- ""
   } 
 
   else if (kind == "seq.R") {
 
-    if (clr == "rainbow") {
-      clr <- rainbow(n)
+    if (pal == "rainbow") {
+      pal <- rainbow(n)
       ttl <- "Rainbow Colors"
     }
 
-    else if (clr == "terrain") {
-      clr <- terrain.colors(n)
+    else if (pal == "terrain") {
+      pal <- terrain.colors(n)
       ttl <- "Terrain Colors"
     }
 
-    else if (clr == "heat") {
-      clr <- heat.colors(n)
+    else if (pal == "heat") {
+      pal <- heat.colors(n)
       ttl <- "Heat Colors"
     }
   }
 
   # set lbl except for hcl which provides the hues
-  if (lbl[1] == "") lbl <- clr
+  if (lbl[1] == "") lbl <- pal
 
   # evaluate if text and graphics output
+  # sys.nframe(): depth of function call,  sys.calls(): the calls
   go.out <- NULL
   if (!is.null(output)) {
     if (output == "on") go.out <- TRUE 
@@ -256,12 +299,11 @@ function(clr=NULL, end.clr=NULL,
       go.out <- ifelse (sys.nframe() == 19, TRUE, FALSE)
   } 
 
-  if (!is.null(trans)) 
-   for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans)*256) 
+  if (trans > 0) 
+   for (i in 1:length(pal)) pal[i] <- .maketrans(pal[i], (1-trans)*256) 
 
   # -------------
   # plot and text
-  # sys.nframe(): depth of function call,  sys.calls(): the calls
 
   if (go.out) { 
 
@@ -284,7 +326,7 @@ function(clr=NULL, end.clr=NULL,
         ylim <- (pin[2L]/pin[1L]) * ylim
       plot.window(xlim, ylim, "", asp=1)
 
-      pie(rep(1, length(clr)), col=clr, radius=radius, labels=lbl,
+      pie(rep(1, length(pal)), col=pal, radius=radius, labels=lbl,
           border=border, lty=lty, cex=labels.cex)
     }  # end wheel
 
@@ -309,7 +351,7 @@ function(clr=NULL, end.clr=NULL,
 
       plot(0, 0, type="n", xlim=c(0, 1), ylim=c(0, 1), axes=FALSE,
            xlab="", ylab="")
-      rect(0:(n-1)/n, bm, 1:n/n, 1, col=clr, border=border)
+      rect(0:(n-1)/n, bm, 1:n/n, 1, col=pal, border=border)
       text(0:(n-1)/n + 1/(2*n), bm.tx, labels=lbl[1:n], srt=rotate.x,
            cex=labels.cex)
     }  # end rectangle
@@ -322,7 +364,7 @@ function(clr=NULL, end.clr=NULL,
     # text output
 
     if (!quiet) {
-      mc <- max(nchar(clr))
+      mc <- max(nchar(pal))
       cat("\n")
       if (kind %in% c("qualitative", "sequential")) {  # HCL colors
         if (kind == "sequential") {
@@ -332,25 +374,25 @@ function(clr=NULL, end.clr=NULL,
         }
         cat("      h    hex      r    g    b\n")
         cat("-------------------------------\n")
-        for (i in 1:length(clr))
-              cat(.fmt(i,0,w=2), " ", .fmt(h[i],0, w=3), clr[i],
-                  .fmt(col2rgb(clr[i])[1],0,w=4), 
-                  .fmt(col2rgb(clr[i])[2],0,w=4),
-                  .fmt(col2rgb(clr[i])[3],0,w=4),"\n")
+        for (i in 1:length(pal))
+              cat(.fmt(i,0,w=2), " ", .fmt(h[i],0, w=3), pal[i],
+                  .fmt(col2rgb(pal[i])[1],0,w=4), 
+                  .fmt(col2rgb(pal[i])[2],0,w=4),
+                  .fmt(col2rgb(pal[i])[3],0,w=4),"\n")
       }
 
       else {
         cat("  color    r    g    b\n")
         cat("----------------------\n")
-          for (i in 1:length(clr))
-            cat(.fmtc(clr[i], w=mc, j="left"),
-                .fmt(col2rgb(clr[i])[1],0,w=4), .fmt(col2rgb(clr[i])[2],0,w=4),
-                .fmt(col2rgb(clr[i])[3],0,w=4),"\n")
+          for (i in 1:length(pal))
+            cat(.fmtc(pal[i], w=mc, j="left"),
+                .fmt(col2rgb(pal[i])[1],0,w=4), .fmt(col2rgb(pal[i])[2],0,w=4),
+                .fmt(col2rgb(pal[i])[3],0,w=4),"\n")
       }
     }
     cat("\n")
   }  # called directly
 
-  invisible(clr)
+  invisible(pal)
 }
 
