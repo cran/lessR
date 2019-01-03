@@ -1,5 +1,5 @@
 Plot <-
-function(x, y=NULL, data=mydata, rows=NULL,
+function(x, y=NULL, data=d, rows=NULL,
          topic=c("data", "count", "prop", "sum", "mean", "sd",
                   "min", "median", "max"),
          theme=getOption("theme"), n.cat=getOption("n.cat"),
@@ -9,8 +9,6 @@ function(x, y=NULL, data=mydata, rows=NULL,
 
          fill=getOption("pt.fill"), color=getOption("pt.color"),
          trans=getOption("trans.pt.fill"),
-         violin.fill=getOption("violin.fill"), 
-         box.fill=getOption("box.fill"), 
 
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
          sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
@@ -19,15 +17,18 @@ function(x, y=NULL, data=mydata, rows=NULL,
          ID="row.name", ID.size=0.85,
          MD.cut=0, out.cut=0, out.shape="circle", out.size=1,
 
-         vbs.plot="vbs", vbs.pt.fill="black", bw=NULL, bw.iter=10,      
-         vbs.size=0.9, vbs.mean=FALSE, fences=FALSE,
+         vbs.plot="vbs", vbs.size=0.9, bw=NULL, bw.iter=10,
+         violin.fill=getOption("violin.fill"), 
+         box.fill=getOption("box.fill"), 
+         vbs.pt.fill="black",
+         vbs.mean=FALSE, fences=FALSE,
          k=1.5, box.adj=FALSE, a=-4, b=3,
 
-         radius=NULL, power=0.6,
+         radius=NULL, power=0.5,
          low.fill=NULL, hi.fill=NULL, proportion=FALSE,
 
          smooth=FALSE, smooth.points=100, smooth.size=1,
-         smooth.trans=0.25, smooth.bins=128,
+         smooth.exp=0.25, smooth.bins=128,
 
          fit="off", fit.se=0.95, ellipse=0, 
 
@@ -62,11 +63,17 @@ function(x, y=NULL, data=mydata, rows=NULL,
   topic <- match.arg(topic)
   center.line <- match.arg(center.line)
 
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
+
+  # replaced older names with current name
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
       if (names(dots)[i] == "auto")  enhance <- dots[[i]]
       if (names(dots)[i] == "values") topic <- dots[[i]]
+      if (names(dots)[i] == "smooth.trans") smooth.exp <- dots[[i]]
     }
   }
 
@@ -276,12 +283,12 @@ function(x, y=NULL, data=mydata, rows=NULL,
   options(dname = df.name)
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
 
-  if (exists(df.name, where=.GlobalEnv)) {  # tibble to df
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
     if ((data.miss && shiny))  # force eval (not lazy) if data not specified
       data <- eval(substitute(data), envir=parent.frame())
-  }   
+  } 
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
@@ -325,7 +332,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
       names(data.x) <- names(data.vars)[x.col]
     else
       names(data.x) <- x.col  # if x a vector, x.col can return names
-    #data.miss <- FALSE  # use mydata even if not specified (default)
+    #data.miss <- FALSE  # use d even if not specified (default)
   }  # end x in df
 
   # x is in the global environment (vector or data frame)
@@ -892,7 +899,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
   ID.name <- gsub("\"", "", ID.name)
   if (get.ID) {
     if (ID.name == "row.name") {
-      if (exists(df.name, where=.GlobalEnv)  &&  !x.in.global)
+      if (df.name %in% ls(name=.GlobalEnv)  &&  !x.in.global)
         ID.call <- factor(row.names(data), levels=row.names(data))
       else
         ID.call <- 1:nrows
@@ -1158,8 +1165,8 @@ function(x, y=NULL, data=mydata, rows=NULL,
   #   fit.lwd <- ifelse(.Platform$OS == "windows", 2, 1.5)
 
   # size of points
-  scale.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
   if (size.miss) {  # size.pt not set yet
+    scale.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
     size.pt <- scale.pt
   #   if (options("device") == "RStudioGD") size.pt <- size.pt*1.10
 
@@ -1173,9 +1180,14 @@ function(x, y=NULL, data=mydata, rows=NULL,
       }
     }
   }
-  else  # size had been set
+  else {  # size had been set
+    if (length(size) == 1)
+      scale.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
+    else   # size var
+      scale.pt <- 1  # forget Win/Mac scaling for size var, ruins size for Mac
     size.pt <- size * scale.pt
-  if (is.null(out.size)) out.size <- size.pt
+  }
+if (is.null(out.size)) out.size <- size.pt
 
   if (getOption("theme") == "gray")
     if (any(size.pt > 0.9)) if (out.shape.miss) out.shape <- 23
@@ -1300,7 +1312,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
     if (all(mylabs == "not available")) mylabs <- NULL
     
     l.name <- "mylabels"
-    if (exists(l.name, where=.GlobalEnv))
+    if (l.name %in% ls(name=.GlobalEnv))
       mylabs <- get(l.name, pos=.GlobalEnv)
 
     if (is.null(xlab)) xlab <- ""  # suppress x-axis label if not specified
@@ -1311,6 +1323,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
       low.fill, hi.fill,
       xy.ticks, xlab, ylab, main, sub, size,
       radius, size.cut, bubble.text, power,
+      bm.adj, lm.adj, tm.adj, rm.adj,
       value.labels, rotate.x, rotate.y, offset, quiet, do.plot, fun.call, ...)
   }
 
@@ -1483,7 +1496,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
           sub, value.labels, label.max,
           rotate.x, rotate.y, offset, proportion, origin.x,
           size.pt, shape, means, sort.yx, segments.y, segments.x, size.ln,
-          smooth, smooth.points, smooth.size, smooth.trans, smooth.bins,
+          smooth, smooth.points, smooth.size, smooth.exp, smooth.bins,
           radius, power, size.cut, bubble.text, low.fill, hi.fill,
           ID.call, ID.color, ID.size, out.ind,
           out.fill, out.color, out.shape.miss,

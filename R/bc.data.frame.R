@@ -6,9 +6,10 @@ function(x, n.cat,
          labels, label.size, beside,
          rotate.x, offset, break.x, sort.x,
          values, values.color, values.cex, value.digits,
-         values.pos, values.cut,
+         values.position, values.cut,
          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-         legend.title, legend.loc, legend.labels, legend.horiz,
+         legend.title, legend.position, legend.labels,
+         legend.horiz, legend.size,
          out.size, quiet, width, height, pdf, ...)  {
 
 
@@ -68,9 +69,10 @@ function(x, n.cat,
           value.labels=NULL, label.size, beside,
           rotate.x, offset, break.x, sort.x,
           values, values.color, values.cex, value.digits,
-          values.pos, values.cut,
+          values.position, values.cut,
           xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-          legend.title, legend.loc, legend.labels, legend.horiz,
+          legend.title, legend.position, legend.labels,
+          legend.horiz, legend.size,
           add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out.size,
           quiet, ...)
 

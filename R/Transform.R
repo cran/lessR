@@ -1,5 +1,5 @@
 Transform <-
-function(data=mydata, quiet=getOption("quiet"), ...) {
+function(data=d, quiet=getOption("quiet"), ...) {
 
   # save variable labels (NULL if no labels) 
   mylabels <- attr(data, which="variable.labels")

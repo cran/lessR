@@ -188,11 +188,11 @@ function(pal=NULL, end.pal=NULL,
     if (length(c) > 1)
       txt.c <- paste(txt.c, " to ", .fmt(c[2],0), sep="")
 
-    l.dk <- 40 - (3*n)  # darkest color
+    l.dk <- 36 - (3*n)  # darkest color
     if (l.dk < 14) l.dk <- 14  # any darker and the hue is no longer true
-    l.lt <- 58 + (5*n)  # lightest color
+    l.lt <- 48 + (5*n)  # lightest color
     if (l.lt > 92) l.lt <- 92
-    if (miss.l) l <- c(l.lt, l.dk)  # 2 -> 68, 3 -> 73, 6 -> 88, 8 -> 98
+    if (miss.l) l <- c(l.lt, l.dk)  # 2 -> 58, 3 -> 63, 6 -> 78, 8 -> 88
     txt.l <- .fmt(l[1],0)
     if (length(l) > 1)
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")

@@ -115,14 +115,14 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     if (nlevels(by1) == 2  ||  nlevels(by0) == 2) {
       nm <- ifelse (nlevels(by1) == 2, by1.name, by.name)
       txt1 <- paste("ttest(", x.name, " ~ ", nm, ")", sep="") 
-      txt2 <- "  # add the data parameter if not mydata"
+      txt2 <- "  # add the data parameter if not d"
       txsug <- paste(txsug, "\n", txt1, txt2, sep="")
     }
 
     if (nlevels(by1) > 2  ||  nlevels(by0) > 2) {
       nm <- ifelse (nlevels(by1) > 2, by1.name, by.name)
       txt1 <- paste("ANOVA(", x.name, " ~ ", nm, ")", sep="") 
-      txt2 <- "  # add the data parameter if not mydata"
+      txt2 <- "  # add the data parameter if not d"
       txsug <- paste(txsug, "\n", txt1, txt2, sep="")
     }
 

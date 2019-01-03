@@ -125,11 +125,11 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
             "  a csv or Excel file of variable labels\n",
             "  Each row of the file is Variable Name, Variable Label\n")
       if (brief) {
-        cat("Details about your data, Enter:  details()  for mydata, or",
+        cat("Details about your data, Enter:  details()  for d, or",
            " details(name)\n")
         if (options("device") == "RStudioGD")
           cat("To view your data, Enter:  View(name)  such as ",
-          " View(mydata)\n")
+          " View(d)\n")
       }
       cat("\n")
     }
@@ -302,7 +302,7 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
       # for (i in 1:ncol(d))
       #   if (class(d[1:rows,i])[1] == "POSIXct") fnu.col[i] <- TRUE
       # if (any(fnu.col)) {  # construct alternate Read function call
-      #   typ <- paste("mydata <- ", f.call, ", col_types=c(", sep="")
+      #   typ <- paste("d <- ", f.call, ", col_types=c(", sep="")
       #   for (i in 1:ncol(d)) {
       #     if (class(d[,i])[1] %in% c("integer", "double", "POSIXct"))
       #       typ <- paste(typ, ", \"double\"", sep="")

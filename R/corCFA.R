@@ -1,5 +1,5 @@
 corCFA <- 
-function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL, 
+function(mimm=NULL, x=mycor, data=d, fac.names=NULL, 
 
          Rmd=NULL, explain=getOption("explain"),
          interpret=getOption("interpret"), results=getOption("results"),
@@ -20,7 +20,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
 
          fun.call=NULL) {
 
-  if (exists(deparse(substitute(data)), where=.GlobalEnv)) 
+  if (exists(deparse(substitute(data)), where=.GlobalEnv, inherits=FALSE)) 
     dname <- deparse(substitute(data))
   else
     dname <- NULL
@@ -47,7 +47,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
     cor.nm <- deparse(substitute(x))
     .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
     if (class(x) == "out_all")
-      x <- eval(parse(text=paste(cor.nm, "$cors", sep="")))  # go to $cors 
+      x <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
   }
   else  # if only labels, then need the data 
     if (is.null(dname)) {
@@ -231,6 +231,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
   alpha <- numeric(length=NF)
   omega <- numeric(length=NF)
 
+  # do CFA:  get R with factors, alpha, omega
   out <- .mimm(outR, LblCut, NItems, NF, iter)
 
   nmF <- character(length=NF)
@@ -238,7 +239,7 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
 
   NVTot <- NItems + NF
 
-  # assign names
+  # assign factor names
   nm  <- character(length=NVTot)
   nm <- c(nm.new, nmF)
   dimnames(out$R) <- list(nm, nm)
@@ -558,19 +559,19 @@ function(mimm=NULL, x=mycor, data=mydata, fac.names=NULL,
     tx[length(tx)+1] <- paste("\"\n")
 
     tx[length(tx)+1] <- paste("library(lavaan)")
-    tx[length(tx)+1] <- paste("fit <- lavaan::cfa(", nm.mimm, ", data=mydata,",
+    tx[length(tx)+1] <- paste("fit <- lavaan::cfa(", nm.mimm, ", data=d,",
       " std.ov=TRUE, std.lv=TRUE)", sep="")
     tx[length(tx)+1] <- "summary(fit, fit.measures=TRUE)"
     tx[length(tx)+1] <- ""
 
     tx[length(tx)+1] <- "--------"
     tx[length(tx)+1] <- paste(">>> The preceding code fits the model from",
-      "data frame:  mydata")
+      "data frame:  d")
     tx[length(tx)+1] <- paste(">>> To access the correlation matrix",
       "directly without the data")
     tx[length(tx)+1] <- paste(">>>   use the following fit statement instead.\n")
     tx[length(tx)+1] <- paste("fit <- lavaan::cfa(", nm.mimm, 
-     ", sample.cov=mycor$cors,", " sample.nobs=nnn, std.lv=TRUE)\n", sep="")
+     ", sample.cov=mycor$R,", " sample.nobs=nnn, std.lv=TRUE)\n", sep="")
     tx[length(tx)+1] <- ">>>   mycor: name of correlation matrix"
     tx[length(tx)+1] <- ">>>   nnn: numeric, number of observations"
 

@@ -19,7 +19,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          segments.y=FALSE, segments.x=FALSE, size.ln=2,
 
          smooth=FALSE, smooth.points=100, smooth.size=1,
-         smooth.trans=0.25, smooth.bins=128,
+         smooth.exp=0.25, smooth.bins=128,
 
          radius=0.15, power=0.6, size.cut=TRUE,
          bubble.text=getOption("bubble.text.color"),
@@ -648,7 +648,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           clr.den <- colorRampPalette(c(getOption("window.fill"),
                                          getOption("bar.fill.ordered")))
           smoothScatter(x, y, nrpoints=smooth.points, nbin=smooth.bins,
-                        transformation=function(x) x^(smooth.trans),
+                        transformation=function(x) x^(smooth.exp),
                         colramp=clr.den, cex=smooth.size, add=TRUE)
         }
 
@@ -796,7 +796,6 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     # colors
     if (is.null(col.low) || is.null(col.hi) || !bubble1) {
       clr <- getOption("bar.fill.ordered")
-      #clr <- col.fill
       clr.color <- col.color
     }
     else {  # 1-var bubble plot and BPFM can have a color gradient
@@ -884,7 +883,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
     if (size.cut  &&  object == "bubble") {
 
-      # get q.ind before setting too small bubbles at NA
+      # get q.ind before setting too small bubbles for text at NA
       if (size.cut > 1) {
         by.prob <- 1 / (size.cut - 1)
         bub.probs <- seq(0, 1, by.prob)

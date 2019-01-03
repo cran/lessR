@@ -37,9 +37,9 @@ style(
   
   values=getOption("values"),
   values.color=getOption("values.color"), 
-  values.cex=getOption("values.cex"),
+  values.size=getOption("values.size"),
   values.digits=getOption("values.digits"),
-  values.pos=getOption("values.pos"),
+  values.position=getOption("values.position"),
 		 
   pt.fill=getOption("pt.fill"),
   trans.pt.fill=getOption("trans.pt.fill"),
@@ -51,7 +51,6 @@ style(
   fit.color=getOption("fit.color"),
   fit.lwd=getOption("fit.lwd"),
   bubble.text.color=getOption("bubble.text.color"),
-  heat=getOption("heat"), 
   segment.color=getOption("segment.color"),
   ID.color=getOption("ID.color"),
   area.fill=getOption("area.fill"),
@@ -188,12 +187,12 @@ set(\ldots)
   \item{values.color}{Color of the plotted text. Could be a vector to specify
         a unique color for each value. If fewer colors are specified than
         the number of categories, the colors are recycled.}
-  \item{values.cex}{Character expansion factor, the size, of the plotted text, 
+  \item{values.size}{Character expansion factor, the size, of the plotted text, 
         for which the default value is 0.95.}
   \item{values.digits}{Number of decimal digits for which to display the values.
         Default is 0, round to the nearest integer, for \code{"\%"}
         and 2 for \code{"prop"}.}
-  \item{values.pos}{Position of the plotted text. Default is inside the pie,
+  \item{values.position}{Position of the plotted text. Default is inside the pie,
         or, if \code{"label"}, as part of the label for each value
         outside of the pie.}\cr
 
@@ -212,7 +211,6 @@ set(\ldots)
   \item{bubble.text.color}{Color of the displayed text regarding the size of a bubble,
         either a tabulated frequency for categorical variables, or the value of a
         third variable according to \code{size}.}
-  \item{heat}{Color of the heat map for correlation matrices.}
   \item{segment.color}{Color of connecting line segments when there are also plotted
         points, such as in a frequency polygon. Default color is \code{color}.}
   \item{ID.color}{Color of the text to display the ID labels.}
@@ -356,7 +354,7 @@ SUB-THEMES\cr
 
 
 \value{
-The current settings can optionally be saved into an \code{R} object, and then read back at a later time with the \code{set} function..\cr
+The current settings can optionally be saved into an \code{R} object, and then read back at a later time with the \code{set} function.\cr
 }
 
 
@@ -375,7 +373,7 @@ Wickham, Hadley, (2009), ggplot2: Elegant Graphics for Data Analysis, 2nd editio
 \examples{
 
 # some data
-mydata <- rd("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- rd("Employee", in.lessR=TRUE, quiet=TRUE)
 
 # gold colors embedded in a black background
 style("gold", sub.theme="black")

@@ -16,7 +16,7 @@ If the provided object to analyze is a set of multiple variables, including an e
 }
 
 \usage{
-LineChart(x, data=mydata, rows=NULL,
+LineChart(x, data=d, rows=NULL,
           n.cat=getOption("n.cat"), type=NULL, 
 
          line.color=getOption("pt.color"), area=NULL, 
@@ -46,9 +46,9 @@ lc(\ldots)
         or multiple variables in a data frame such as designated with the
         \code{\link{c}} function, or an entire data frame. If not specified,
         then defaults to all numerical variables in the specified data
-        frame, \code{mydata} by default.}
+        frame, \code{d} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
-        default is \code{mydata}.}
+        default is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
@@ -133,7 +133,7 @@ The values on the horizontal axis of the line chart are automatically generated.
 If the data values randomly vary about the mean, the default is to plot the mean as the center line of the graph, otherwise the default is to ignore the center line.  The default plot type for the line chart is \code{type="b"}, for both points and the corresponding connected line segments.  The size of the points is automatically reduced according to the number of points of points plotted, and the \code{cex} option can override the computed default.  If the area below the plotted values is specified to be filled in with color, then the default line type changes to \code{type="l"}.
 
 DATA\cr
-The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{d}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{d$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
        
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than.
 
@@ -149,7 +149,7 @@ PDF OUTPUT\cr
 To obtain pdf output, use the \code{pdf} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
-The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{d}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
 \code{    > LineChart(rnorm(50))   # does NOT work}
 
@@ -167,10 +167,10 @@ Instead, do the following:
 
 
 \examples{
-# create data frame, mydata, to mimic reading data with Read function
-# mydata contains both numeric and non-numeric data
-mydata <- data.frame(rnorm(50), rnorm(50), rnorm(50), rep(c("A","B"),25))
-names(mydata) <- c("X","Y","Z","C")
+# create data frame, d, to mimic reading data with Read function
+# d contains both numeric and non-numeric data
+d <- data.frame(rnorm(50), rnorm(50), rnorm(50), rep(c("A","B"),25))
+names(d) <- c("X","Y","Z","C")
 
 # default run chart
 LineChart(Y)

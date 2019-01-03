@@ -1,5 +1,5 @@
 details <-
-function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
+function(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
          miss.show=30, miss.matrix=FALSE, brief=getOption("brief")) {
 
   dname <- deparse(substitute(data))  # from read is called data
@@ -57,7 +57,7 @@ function(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
     .dash(60)
   cat("\n")
 
-  #if (any(is.na(mydata)))
+  #if (any(is.na(d)))
     #cat("NA indicates a missing data value, Not Available\n")
   #cat("\n")
 

@@ -15,19 +15,20 @@ When output is assigned into an object, such as \code{d} in \code{d <- dn(Y)}, t
 }
 
 \usage{
-Density(x, data=mydata, rows=NULL,
+Density(x, data=d, rows=NULL,
         n.cat=getOption("n.cat"), Rmd=NULL, 
 
  bw=NULL, type=c("both", "general", "normal"),
        histogram=TRUE, bin.start=NULL, bin.width=NULL,
 
-       nrm.color="black", gen.color="black",
+       color.nrm="black", color.gen="black",
        fill.nrm=NULL, fill.gen=NULL,
 
        axis.text.color="gray30", rotate.x=0, rotate.y=0, offset=0.5,
 
-       x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE, 
-       x.min=NULL, x.max=NULL, band=FALSE, 
+       x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE,
+       x.min=NULL, x.max=NULL,
+       rug=FALSE, color.rug="black", size.rug=0.5,
 
        eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
        width=4.5, height=4.5, pdf=FALSE,
@@ -42,9 +43,9 @@ dn(\ldots)
         or multiple variables in a data frame such as designated with the
         \code{\link{c}} function, or an entire data frame. If not specified,
         then defaults to all numerical variables in the specified data
-        frame, \code{mydata} by default.}
+        frame, \code{d} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
-        default is \code{mydata}.}
+        default is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
@@ -64,8 +65,8 @@ dn(\ldots)
   \item{bin.width}{Optional specified bin width, which can be specified with or
         without a \code{bin.start} value.}\cr
 
-  \item{nrm.color}{Color of the normal curve.}
-  \item{gen.color}{Color of the general density curve.}
+  \item{color.nrm}{Color of the normal curve.}
+  \item{color.gen}{Color of the general density curve.}
   \item{fill.nrm}{Fill color for the estimated normal curve, with a partially 
        transparent blue as the default, and transparent for the gray theme.}
   \item{fill.gen}{Fill color for the estimated general density curve, with a
@@ -93,8 +94,10 @@ dn(\ldots)
   \item{y.axis}{Specifies if the y-axis, the density axis, should be included.}
   \item{x.min}{Smallest value of the variable x plotted on the x-axis.}
   \item{x.max}{Largest value of the variable x plotted on the x-axis.}
-  \item{band}{If \code{TRUE}, add a rug plot, a direct display of density in the
-        form of a narrow band beneath the density curve.}\cr
+  \item{rug}{If \code{TRUE}, add a rug plot, a direct display of density in the
+        form of a narrow band beneath the density curve.}
+  \item{color.rug}{Color of the rug ticks.}
+  \item{size.rug}{Line width of the rug ticks.}\cr
 
   \item{eval.df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE} 
@@ -131,7 +134,7 @@ The limits for the axes are automatically calculated so as to provide sufficient
 If \code{x.pt} is specified, then \code{type} is set to general and \code{y.axis} set to \code{TRUE}.
 
 DATA\cr
-The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{d}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{d$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
        
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than.
 
@@ -145,7 +148,7 @@ PDF OUTPUT\cr
 To obtain pdf output, use the \code{pdf} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
-The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{d}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
 \code{    > Density(rnorm(50))   # does NOT work}
 
@@ -187,10 +190,10 @@ David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})
 # make sure default style is active
 style()
 
-# create data frame, mydata, to mimic reading data with Read function
-# mydata contains both numeric and non-numeric data
-mydata <- data.frame(rnorm(50), rnorm(50), rnorm(50), rep(c("A","B"),25))
-names(mydata) <- c("X","Y","Z","C")
+# create data frame, d, to mimic reading data with Read function
+# d contains both numeric and non-numeric data
+d <- data.frame(rnorm(50), rnorm(50), rnorm(50), rep(c("A","B"),25))
+names(d) <- c("X","Y","Z","C")
 
 # normal curve and general density curves superimposed over histogram
 # all defaults
@@ -204,7 +207,10 @@ Density(Y, pdf=TRUE)
 
 # specify (non-transparent) colors for the curves,
 # to make transparent, need alpha option for the rgb function
-Density(Y, nrm.color="darkgreen", gen.color="plum")
+Density(Y, color.nrm="darkgreen", color.gen="plum")
+
+# rug with custom color and width of ticks
+Density(Y, color.rug="steelblue", size.rug=1)
 
 # display only the general estimated density
 #  so do not display the estimated normal curve
@@ -219,7 +225,7 @@ Density(Y, type="general", x.pt=2)
 # generate R markdown file to be "knit" such as in RStudio
 dn(Y, Rmd="myout")
 
-# variable of interest is in a data frame which is not the default mydata
+# variable of interest is in a data frame which is not the default d
 # access the breaks variable in the R provided warpbreaks data set
 # although data not attached, access the variable directly by its name
 Density(breaks, data=warpbreaks)

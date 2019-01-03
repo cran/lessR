@@ -38,7 +38,7 @@ Only the loadings from the exploratory factor analysis are provided, with either
 
 Also provides the associated multiple indicator measurement model suggested by the exploratory factor analysis. Each MIMM factor is defined by the items that have the highest loading on the corresponding exploratory factor.
 
-For versions of \code{lessR} after 3.3, the correlation matrix computed by \code{\link{Correlation}} is now a list element called \code{cors} within the returned list. For example, \code{mycor$cors} from \code{mycor <- cr(mydata)}. The function \code{corEFA} automatically finds this correlation matrix from just entering the entire list name of the returned list, \code{mycor}, or the specific location, \code{mycor$cors}, or as a stand-alone numerical matrix as done in versions of \code{lessR} previous to 3.3. 
+For versions of \code{lessR} after 3.3, the correlation matrix computed by \code{\link{Correlation}} is now a list element called \code{R} within the returned list. For example, \code{mycor$R} from \code{mycor <- cr(d)}. The function \code{corEFA} automatically finds this correlation matrix from just entering the entire list name of the returned list, \code{mycor}, or the specific location, \code{mycor$R}, or as a stand-alone numerical matrix as done in versions of \code{lessR} previous to 3.3. 
 }
 
 \value{

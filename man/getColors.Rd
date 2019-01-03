@@ -83,7 +83,7 @@ A second possibility is to generate a sequence of colors according to the value 
 
 Or, access implicit calls Zeileis (2009) \code{\link{sequential_hcl}} and \code{\link{diverge_hcl}} functions from the \code{colorspace} package to access pre-defined color ranges including \code{"grays"}, which is the default if the color theme is \code{"gray"} or  \code{"white"}. Other predefined sequences are shown in the following table. Also can invoke the standard R color ranges of \code{"heat"}, \code{"terrain"}, and \code{"rainbow"}. Can specify any value of hue with \code{h}. Can also provide custom values of chroma (c) and luminance (l), with either one a range of values defined as a vector of two values. Default values are \code{c=100} and \code{l=c(75,35)}. That is, the color sequence is generated according to the given hue, \code{h}, with a chroma of 100 and luminance varying from 75 to the darker 45.
 
-The predefined sequences consist of the following hues and color names, defined in 30 degree increments around the HCL color wheel. Visualize the color wheel with then discrete colors below with the lessR function \code{\link{getColors}}. Visualize sequential color scales for each of the colors below with the lessR function \code{\link{showPalettes}}.\cr
+The predefined sequences consist of the following hues and color names, defined in 30 degree increments around the HCL color wheel. Visualize the color wheel with then discrete colors below with the lessR function \code{\link{getColors}}, specifically the function call \code{getColors(shape="wheel")}. Visualize sequential color scales for each of the colors below with the lessR function \code{\link{showPalettes}}.\cr
 
 \tabular{lll}{
  colors \tab param \tab value\cr
@@ -205,7 +205,7 @@ getColors(pal="aliceblue", end.pal="blue")
 
 # Plots
 # -----
-mydata <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in.lessR=TRUE)
 
 # default quantitative scale
 bc(Dept, fill=getColors())

@@ -1,81 +1,103 @@
 corReorder <-
-function (R=mycor, vars=NULL, first=0,
-          heat.map=TRUE, main=NULL, bottom=3,right=3,
+function (R=mycor, order=c("hclust", "chain", "manual"),
+          hclust.type = c("complete", "ward.D", "ward.D2", "single",
+                          "average", "mcquitty", "median", "centroid"),
+          n.clusters=NULL, vars=NULL, chain.first=0,
+          heat.map=TRUE, diagonal.new=TRUE,
+          main=NULL, bottom=3, right=3,
           pdf.file=NULL, width=5, height=5) {
 
+  order <- match.arg(order)
+  hclust.type <- match.arg(hclust.type)
 
-  # cor matrix:  mycor as class out_all, mycor$cors, or stand-alone matrix
+  # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
   cor.nm <- deparse(substitute(R))
   .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
   if (class(R) == "out_all")
-    R <- eval(parse(text=paste(cor.nm, "$cors", sep="")))  # go to $cors 
-
-
-  # translate variable names into column positions
-  vars.all <- as.list(seq_along(as.data.frame(R)))
-  names(vars.all) <- names(as.data.frame(R))
-  vars.num <- eval(substitute(vars), vars.all, parent.frame())
+    R <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
 
   NVOld <- nrow(R)
-  NVC <- as.integer(NVOld)
-
+  nvc <- as.integer(NVOld)
   Label <- integer(length=NVOld)
-  Label <- as.integer(as.vector(vars.num))
 
-  # -----------------------------
-  # if not specified get vars.num 
-  if (is.null(vars.num)) {
+  if (!missing(vars)) order <- "manual"
 
+  # -----
+  # ORDER
 
-    IFirst <- as.integer(first)
+  if (order == "manual") {
+    # translate variable names into column positions
+    vars.all <- as.list(seq_along(as.data.frame(R)))
+    names(vars.all) <- names(as.data.frame(R))
+    vars.num <- eval(substitute(vars), vars.all, parent.frame())
+    Label <- as.integer(as.vector(vars.num))
+  }
 
-    NV <- NVC
+  else if (order == "hclust") {
+    dst <- as.dist(1-R)
+    ord <- hclust(dst, method=hclust.type)
+    Label <- ord$order
 
-  # If IFirst = 0 (default), best variable is chosen first
-  # If IFirst gt 0, IFirst is the first variable chosen by user
+    if (!is.null(n.clusters)) {
+     clt <- sort(cutree(ord, k=n.clusters)) 
+     ttl <- paste(as.character(n.clusters), " Cluster Solution", sep="")
+     cat("\n", ttl, "\n")
+     .dash(nchar(ttl) + 1)  
+     print(clt)
+    }
+  }
 
-    Label <- rep(0, NV)
+  else if (order == "chain") {  # Hunter 1973
 
-  # Find max sum sq variable for IFirst if not user specified
-  # IFirst gives starting value
-    if (IFirst == 0) {
-      VMax <- 0.0
-      for (I in 1:NV) {
-        VT <- 0.0
-        for (J in 1:NV) {
-          VT <- VT + R[I,J]**2
+    i.first <- as.integer(chain.first)
+
+    nv <- nvc
+
+  # If i.first = 0 (default), best variable is chosen first
+  # If i.first gt 0, i.first is the first variable chosen by user
+
+    Label <- rep(0, nv)
+
+  # i.first gives starting value
+  # Find max sum sq variable for i.first if not user specified
+    if (i.first == 0) {
+      v.max <- 0.0
+      for (i in 1:nv) {
+        vt <- 0.0
+        for (j in 1:nv) {
+          vt <- vt + R[i,j]**2
         }
-        if (VT > VMax) {
-          VMax <- VT
-          IMax <- I
+        if (vt > v.max) {
+          v.max <- vt
+          i.max <- i
         }
       }
-      IFirst <- IMax
+      i.first <- i.max
     }
 
   # get Labels
 
-    Label[1] <- IFirst * 1000
-    Label[IFirst] <- Label[IFirst] + 1
+    Label[1] <- i.first * 1000
+    Label[i.first] <- Label[i.first] + 1
 
-    for (I in 2:NV) {
-      RMax <- 0.0
-      K <- Label[I-1] / 1000
-      for (J in 1:NV) {
-        Lbctad <- Label[J] - (Label[J] %/% 1000) * 1000
+    for (i in 2:nv) {
+      R.max <- 0.0
+      k <- Label[i-1] / 1000
+      for (j in 1:nv) {
+        Lbctad <- Label[j] - (Label[j] %/% 1000) * 1000
         if (Lbctad == 0) {
-          if (abs(R[K,J]) > RMax) {
-            RMax <- abs(R[K,J])
-            IMax <- J
+          if (abs(R[k,j]) > R.max) {
+            R.max <- abs(R[k,j])
+            i.max <- j
           }
         }
       }
-      Label[IMax] <- Label[IMax] + I
-      Label[I] <- Label[I]+1000 * IMax
+      Label[i.max] <- Label[i.max] + i
+      Label[i] <- Label[i]+1000 * i.max
     }
 
-    for (I in 1:NV) {
-      Label[I] <- Label[I] %/% 1000
+    for (i in 1:nv) {
+      Label[i] <- Label[i] %/% 1000
     }
 
     #vars.num <- Label  # derived vars.num (not user specified)
@@ -85,16 +107,39 @@ function (R=mycor, vars=NULL, first=0,
   # -----------------------------
   # re-order R matrix
   R <- R[Label,Label]
+  nv <- ncol(R)
 
-  if (heat.map) {
-   if (is.null(main)) main <- "Reordered Item Coefficients"
-   .corcolors(R, nrow(R), main, bottom, right, diag=0,
-              pdf.file, width, height)
+  # save diagonal if change
+  Rdiag <- double(length=nv)
+  for (i in 1:nv) Rdiag[i] <- R[i,i]
+
+  # diagonal is based on adjacent values
+  if (diagonal.new) {
+      R[1,1] <- R[1,2]
+    if (nv > 2) {
+      for (i in 1: nv) {
+        for (i in 2:(nv-1)) {
+          R[i,i] <- (R[i,i-1] + R[i,i+1]) / 2
+          R[i,i] <- round(R[i,i], 2)
+        }
+      }
+      R[nv,nv] <- R[nv,nv-1]
+    }  # end > 2
+    
   }
+
+  if (heat.map)
+     .corcolors(R, nrow(R), main, bottom, right, diag=NULL,
+                pdf.file, width, height)
+
+  # restore diagonal if changed
+  if (diagonal.new)
+    for (i in 1:nv) R[i,i] <- Rdiag[i]
+    
 
   # finish
   cat("\n")
-  return(R)
+  invisible(R)
 }
 
 

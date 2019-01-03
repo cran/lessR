@@ -1,5 +1,5 @@
 label <- 
-function(x, value=NULL, data=mydata) {
+function(x, value=NULL, data=d) {
 
   x.name <- deparse(substitute(x)) 
   options(xname = x.name)
@@ -21,7 +21,7 @@ function(x, value=NULL, data=mydata) {
   # see if the data frame exists, if x not in style Env or function call
   if (!in.style) {
     if (!exists(dname)) {
-      if (dname == "mydata") 
+      if (dname == "d") 
         txtA <- ", the default data frame name, " else txtA <- " "
       txtB1 <- "Create the labels by reading with Read and labels option\n"
       txtB <- paste(txtB1, sep="")

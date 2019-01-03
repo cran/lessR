@@ -15,6 +15,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
   if (is.null(ylab)) {
     was.null <- TRUE
     ylab <- ifelse (!prop, "Count of", "Proportion of")
+    if (cumul != "off") ylab <- paste("Cumulative", ylab)
   }
   else
     was.null <- FALSE

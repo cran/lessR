@@ -1,5 +1,5 @@
 .reg1bckBasic <-
-function(lm.out, dname="mydata", digits.d=NULL, show.R=FALSE, n.obs, n.keep,
+function(lm.out, dname="d", digits.d=NULL, show.R=FALSE, n.obs, n.keep,
          stnd.flag) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model

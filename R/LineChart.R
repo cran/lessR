@@ -1,5 +1,5 @@
 LineChart <-
-function(x, data=mydata, rows=NULL,
+function(x, data=d, rows=NULL,
          n.cat=getOption("n.cat"), type=NULL, 
 
          line.color=getOption("pt.color"), area=NULL, 
@@ -22,10 +22,14 @@ function(x, data=mydata, rows=NULL,
 
   center.line <- match.arg(center.line)
 
-   fill <- getOption("bar.fill.ordered") 
-   color <- getOption("pt.color.ordered")
-   panel.fill <- getOption("panel.fill")
-   panel.color <- getOption("panel.color")
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
+
+  fill <- getOption("bar.fill.ordered") 
+  color <- getOption("pt.color.ordered")
+  panel.fill <- getOption("panel.fill")
+  panel.color <- getOption("panel.color")
 
   if (line.color == "off") line.color <- "transparent"
   if (!is.null(area)) if (area == "off") area <- "transparent"
@@ -66,7 +70,7 @@ function(x, data=mydata, rows=NULL,
   df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
-  if (exists(df.name, where=.GlobalEnv)) {  # tibble to df
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
     if ((missing(data) && shiny))  # force eval (not lazy) if data not specified

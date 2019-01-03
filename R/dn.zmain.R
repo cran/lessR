@@ -8,8 +8,7 @@ function(x,
          rotate.x=0, rotate.y=0, offset=0.5, 
          x.pt=NULL, xlab=NULL, main=NULL, sub=NULL,
          y.axis=FALSE, x.min=NULL, x.max=NULL,
-         band=FALSE, quiet, ...)  {
-
+         band=FALSE, color.rug="gray40", size.rug=0.5, quiet, ...)  {
 
   if (!is.null(x.pt)) {
     y.axis <- TRUE
@@ -143,7 +142,7 @@ function(x,
     polygon(d.gen, col=col.fill.gen, border=col.gen, lwd=lw)
   }
 
-  if (band) rug(x, col="gray70")
+  if (band) rug(x, col=color.rug, lwd=size.rug)
  
   # plot the optional bar about a chosen point for general curve only
   if (!is.null(x.pt)  &&  type == "general") {

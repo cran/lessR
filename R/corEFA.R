@@ -11,11 +11,11 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
       "The number of factors must be specified with:  n.factors\n\n")
   }
 
-  # cor matrix:  mycor as class out_all, mycor$cors, or stand-alone matrix
+  # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
   cor.nm <- deparse(substitute(x))
   .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
   if (class(x) == "out_all")
-    x <- eval(parse(text=paste(cor.nm, "$cors", sep="")))  # go to $cors 
+    x <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
     
 
   title_efa <- "  EXPLORATORY FACTOR ANALYSIS"
@@ -120,7 +120,7 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   tx[length(tx)+1] <- "fit <- lessR::cfa(MeasModel)\n"
 
   tx[length(tx)+1] <- "library(lavaan)"
-  tx[length(tx)+1] <- "fit <- lavaan::cfa(MeasModel, data=mydata)"
+  tx[length(tx)+1] <- "fit <- lavaan::cfa(MeasModel, data=d)"
   tx[length(tx)+1] <- "summary(fit, fit.measures=TRUE, standardized=TRUE)"
   txcfa <- tx
 

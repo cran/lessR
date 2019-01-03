@@ -1,5 +1,5 @@
 Recode <-
-function(old.vars, new.vars=NULL, old, new, data=mydata,
+function(old.vars, new.vars=NULL, old, new, data=d,
          quiet=getOption("quiet")) {
 
 

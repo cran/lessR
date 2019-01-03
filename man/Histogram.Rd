@@ -15,7 +15,7 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, c
 }
 
 \usage{
-Histogram(x=NULL, data=mydata, rows=NULL,
+Histogram(x=NULL, data=d, rows=NULL,
          theme=getOption("theme"), n.cat=getOption("n.cat"), Rmd=NULL,
 
     by1=NULL, by2=NULL,
@@ -52,9 +52,9 @@ hs(\ldots)
         or multiple variables in a data frame such as designated with the
         \code{\link{c}} function, or an entire data frame. If not specified,
         then defaults to all numerical variables in the specified data
-        frame, \code{mydata} by default.}
+        frame, \code{d} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
-        default is \code{mydata}.}
+        default is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{theme}{Color theme for this analysis.}
@@ -211,9 +211,9 @@ VARIABLES and TRELLIS PLOTS\cr
 At a minimum there is one primary variable, \code{x}, which results in a single histogram. Trellis graphics, from Deepayan Sarkar's \code{lattice} package, may be implemented in which multiple panels are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by1} is a conditioning variable that results in a Trellis plot, the histogram of \code{x} produced at \emph{each} level of the \code{by1} variable. Inclusion of a second conditioning variable, \code{by2}, results in a separate histogram for \emph{each} combination of cross-classified values of both \code{by1} and \code{by2}. 
 
 DATA\cr
-The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{d}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{d$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
 
-To obtain a histogram of each numerical variable in the \code{mydata} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
+To obtain a histogram of each numerical variable in the \code{d} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -228,7 +228,7 @@ VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 ONLY VARIABLES ARE REFERENCED\cr
-The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{d}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
 \code{    > Histogram(rnorm(50))   # does NOT work}
 
@@ -278,7 +278,7 @@ Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springe
 
 \examples{
 # get the data
-mydata <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in.lessR=TRUE)
 
 
 # make sure default style is active
@@ -345,7 +345,7 @@ Histogram(Salary, breaks="Scott", values=TRUE, quiet=TRUE)
 Histogram(Salary, breaks=15, prop=TRUE)
 
 # histogram with non-default values for x- and y-axes
-mydata[2,4] <- 45000
+d[2,4] <- 45000
 Histogram(Salary, scale.x=c(30000,130000,5), scale.y=c(0,9.5,5))
 
 # ----------------
@@ -370,20 +370,20 @@ Histogram(Salary, cumul="both", prop=TRUE, reg="mistyrose")
 # histograms for data frames and multiple variables
 # -------------------------------------------------
 
-# create data frame, mydata, to mimic reading data with Read function
-# mydata contains both numeric and non-numeric data
-mydata <- data.frame(rnorm(50), rnorm(50), rnorm(50), rep(c("A","B"),25))
-names(mydata) <- c("X","Y","Z","C")
+# create data frame, d, to mimic reading data with Read function
+# d contains both numeric and non-numeric data
+d <- data.frame(rnorm(50), rnorm(50), rnorm(50), rep(c("A","B"),25))
+names(d) <- c("X","Y","Z","C")
 
 # although data not attached, access the variable directly by its name
 Histogram(X)
 
-# histograms for all numeric variables in data frame called mydata
+# histograms for all numeric variables in data frame called d
 #  except for numeric variables with unique values < n.cat
-# mydata is the default name, so does not need to be specified with data
+# d is the default name, so does not need to be specified with data
 Histogram()
 
-# variable of interest is in a data frame which is not the default mydata
+# variable of interest is in a data frame which is not the default d
 # access the breaks variable in the R provided warpbreaks data set
 # although data not attached, access the variable directly by its name
 Histogram(breaks, data=warpbreaks)
@@ -402,7 +402,7 @@ Histogram(c(X,Y))
 # annotations
 # -----------
 
-mydata <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in.lessR=TRUE)
 
 # Place a message in the top-right of the graph
 # Use \n to indicate a new line

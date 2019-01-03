@@ -14,7 +14,7 @@ Output is generated into distinct segments by topic, organized and displayed in 
 }
 
 \usage{
-ANOVA(my.formula, data=mydata, rows=NULL,
+ANOVA(my.formula, data=d, rows=NULL,
          brief=getOption("brief"), digits.d=NULL, 
          Rmd=NULL, graphics=TRUE,
          rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
@@ -29,7 +29,7 @@ av.brief(\ldots, brief=TRUE)
 \arguments{
   \item{my.formula}{Standard R \code{\link{formula}} for specifying a model.}
   \item{data}{The default name of the data frame that contains the data for analysis 
-       is \code{mydata}, otherwise explicitly specify.}
+       is \code{d}, otherwise explicitly specify.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{brief}{If set to \code{TRUE}, reduced text output with no Tukey multiple 
@@ -144,7 +144,7 @@ av.brief(weight ~ group, data=PlantGrowth)
 # drop the second treatment, just control and 1 treatment
 ANOVA(weight ~ group, data=PlantGrowth, rows=(group != "trt2"))
 
-# variables of interest in a data frame that is not the default mydata
+# variables of interest in a data frame that is not the default d
 # two-factor between-groups ANOVA with replications and interaction
 # warpbreaks is a data set provided with R
 ANOVA(breaks ~ wool * tension, data=warpbreaks)

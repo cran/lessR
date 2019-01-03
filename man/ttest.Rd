@@ -16,7 +16,7 @@ Can also be called from the more general \code{\link{model}} function.
 }
 
 \usage{
-ttest(x=NULL, y=NULL, data=mydata, paired=FALSE,
+ttest(x=NULL, y=NULL, data=d, paired=FALSE,
 
          n=NULL, m=NULL, s=NULL, mu=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
@@ -55,7 +55,7 @@ tt(\ldots)
   \item{m2}{Sample mean for second of two groups.}
   \item{s1}{Sample standard deviation for first of two groups.}
   \item{s2}{Sample standard deviation for second of two groups.}
-  \item{data}{Data frame that contains the variable of interest, default is \code{mydata}.}
+  \item{data}{Data frame that contains the variable of interest, default is \code{d}.}
   \item{paired}{Set to \code{TRUE} for a dependent-samples t-test with two data vectors 
        or variables from a data frame, with the difference computed from subtracting
        the first vector from the second.}
@@ -91,7 +91,7 @@ tt(\ldots)
 
 \details{
 OVERVIEW\cr
-If \code{n} or \code{n1} are set to numeric values, then the analysis proceeds from the summary statistics, the sample size and mean and standard deviation of each group. Missing data are counted and then removed for further analysis of the non-missing data values.  Otherwise the analysis proceeds from data, which can be in a data frame, by default named \code{mydata}, with a grouping variable and response variable, or in two data vectors, one for each group.
+If \code{n} or \code{n1} are set to numeric values, then the analysis proceeds from the summary statistics, the sample size and mean and standard deviation of each group. Missing data are counted and then removed for further analysis of the non-missing data values.  Otherwise the analysis proceeds from data, which can be in a data frame, by default named \code{d}, with a grouping variable and response variable, or in two data vectors, one for each group.
 
 Following the format and syntax of the standard \code{\link{t.test}} function, to specify the two-group test with a formula, \code{\link{formula}}, the data must include a variable that has exactly two values, a grouping variable or factor generically referred to as X, and a numerical response variable, generically referred to as Y. The formula is of the form Y ~ X, with the names Y and X replaced by the actual variable names specific to a particular analysis.  The formula method automatically retrieves the names of the variables and data values for display on the resulting output.
 
@@ -104,7 +104,7 @@ The inferential analysis in the full version provides both homogeneity of varian
 If computed from the data, the bandwidth parameter controls the smoothness of the estimated density curve.  To obtain a smoother curve, increase the bandwidth from the default value.
 
 DATA\cr
-If the input data frame is named something different than \code{mydata}, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name without having to invoke the mydata$name notation. 
+If the input data frame is named something different than \code{d}, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name without having to invoke the d$name notation. 
 
 PRACTICAL IMPORTANCE\cr
 The practical importance of the size of the mean difference is addressed when one of two parameter values are supplied, the minimum mean difference of practical importance, mmd, or the corresponding standardized version, msmd.  The  remaining value is calculated and both values are added to the graph and the console output.
@@ -146,7 +146,7 @@ Kupper and Hafner (1989). The American Statistician, 43(2):101-105.
 # tt for two groups, from a formula
 # ----------------------------------------------------------
 
-mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 
 
 # analyze data with formula version
@@ -167,7 +167,7 @@ Histogram(group1, data=t.out)
 Histogram(group2, data=t.out)
 
 # compare to standard R function t.test
-t.test(mydata$Salary ~ mydata$Gender, var.equal=TRUE)
+t.test(d$Salary ~ d$Gender, var.equal=TRUE)
 
 # consider the practical importance of the difference
 ttest(Salary ~ Gender, msmd=.5)
@@ -175,7 +175,7 @@ ttest(Salary ~ Gender, msmd=.5)
 # obtain the line chart of the response variable for each group
 ttest(Salary ~ Gender, line.chart=TRUE)
 
-# variable of interest is in a data frame which is not the default mydata
+# variable of interest is in a data frame which is not the default d
 # access the data frame in the lessR dat.twogroup data set
 # although data not attached, access the variables directly by their name
 data(dataLearn)
@@ -211,8 +211,8 @@ ttest(Y1, Y2, Ynm="MyY", Xnm="MyX", X1nm="Group1", X2nm="Group2")
 # dependent groups t-test from vectors in global environment
 ttest(Y1, Y2, paired=TRUE)
 
-# dependent groups t-test from variables in data frame mydata
-mydata <- data.frame(Y1,Y2)
+# dependent groups t-test from variables in data frame d
+d <- data.frame(Y1,Y2)
 rm(Y1);  rm(Y2)
 ttest(Y1, Y2, paired=TRUE)
 # independent groups t-test from variables (vectors) in a data frame
@@ -229,7 +229,7 @@ tt(n=34, m=8.92, s=1.67, Ynm="Time")
 
 # confidence interval and hypothesis test, from descriptive stats
 # get rid of the data frame, analysis should still proceed
-rm(mydata)
+rm(d)
 tt.brief(n=34, m=8.92, s=1.67, mu=9, conf.level=0.90)
 
 # two groups: sample size, mean and sd for each group

@@ -16,7 +16,7 @@ When output is assigned into an object, such as \code{s} in \code{s <- ss(Y)}, t
 }
 
 \usage{
-SummaryStats(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
+SummaryStats(x=NULL, by=NULL, data=d, n.cat=getOption("n.cat"), 
          digits.d=NULL, brief=getOption("brief"), label.max=20, \ldots)
 
 ss.brief(\dots, brief=TRUE)
@@ -30,9 +30,9 @@ ss(\dots)
         or multiple variables in a data frame such as designated with the
         \code{\link{c}} function, or an entire data frame. If not specified,
         then defaults to all variables in the specified data frame,
-        \code{mydata} by default.}
+        \code{d} by default.}
   \item{by}{Applies to an analysis of a numeric variable, which is then analyzed at each level of the \code{by} variable. The variable is coerced to a factor.}
-  \item{data}{Optional data frame that contains the variable of interest, default is \code{mydata}.}
+  \item{data}{Optional data frame that contains the variable of interest, default is \code{d}.}
   \item{n.cat}{Specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Default is off, set to 0.}
   \item{digits.d}{Specifies the number of decimal digits to display in the output.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{style}} function.}
@@ -53,21 +53,21 @@ Reported outliers are based on the boxplot criterion.  The determination of an o
 
 Skewness is computed with the usual adjusted Fisher-Pearson standardized moment skewness coefficient, the version found in many commercial packages.
 
-The \code{lessR} function \code{\link{Read}} reads the data from an external csv file into the data frame called \code{mydata}.  To describe all of the variables in a data frame, invoke \code{SummaryStats(mydata)}, or just \code{SummaryStats()}, which then defaults to the former.
+The \code{lessR} function \code{\link{Read}} reads the data from an external csv file into the data frame called \code{d}.  To describe all of the variables in a data frame, invoke \code{SummaryStats(d)}, or just \code{SummaryStats()}, which then defaults to the former.
 
 In the analysis of a categorical variable, if there are more than 10 levels then an abbreviated analysis is performed, only reporting the values and the associated frequencies. If all the values are unique, then the user is prompted with a note that perhaps this is actually an ID field which should be specified using the \code{row.names} option when reading the data.
 
 
 DATA\cr
-If the variable is in a data frame, the input data frame has the assumed name of \code{mydata}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{mydata$name} notation.
+If the variable is in a data frame, the input data frame has the assumed name of \code{d}.  If this data frame is named something different, then specify the name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variable directly by its name, that is, no need to invoke the \code{d$name} notation.
 
-To analyze each variable in the \code{mydata} data frame, use \code{SummaryStats()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
+To analyze each variable in the \code{d} data frame, use \code{SummaryStats()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 ONLY VARIABLES ARE REFERENCED\cr
-The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, such as the default \code{d}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
 \code{> SummaryStats(rnorm(50))   # does NOT work}
 
@@ -102,13 +102,13 @@ Although not typically needed, if the output is assigned to an object named, for
 # one or two numeric or categorical variables
 # -------------------------------------------
 
-# create data frame, mydata, to mimic reading data with rad function
-# mydata contains both numeric and non-numeric data
+# create data frame, d, to mimic reading data with rad function
+# d contains both numeric and non-numeric data
 # X has two character values, Y is numeric
 n <- 15
 X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
 Y <- round(rnorm(n=n, mean=50, sd=10),3)
-mydata <- data.frame(X,Y)
+d <- data.frame(X,Y)
 rm(X); rm(Y)
 
 # Analyze the values of numerical Y
@@ -146,26 +146,26 @@ SummaryStats(Y, by=X, digits.d=2)
 # data frame 
 # ----------
 
-# Analyze all variables in data frame mydata at once
+# Analyze all variables in data frame d at once
 # Any variables with a numeric data type and 4 or less
 #  unique values will be analyzed as a categorical variable
 SummaryStats()
 
-# Analyze all variables in data frame mydata at once
+# Analyze all variables in data frame d at once
 # Any variables with a numeric data type and 7 or less
 #  unique values will be analyzed as a categorical variable
 SummaryStats(n.cat=7)
 
 # analyze just a subset of a data frame
-mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 SummaryStats(c(Salary,Years))
 
 
 # ----------------------------------------
-# data frame different from default mydata
+# data frame different from default d
 # ----------------------------------------
 
-# variables in a data frame which is not the default mydata
+# variables in a data frame which is not the default d
 # access the breaks variable in the R provided warpbreaks data set
 # although data not attached, access the variable directly by its name
 data(warpbreaks)

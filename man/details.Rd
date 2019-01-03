@@ -11,7 +11,7 @@ Provides feedback regarding a data frame which includes the variable names, the 
 }
 
 \usage{
-details(data=mydata, n.mcut=1, miss.zero=FALSE, max.lines=30,
+details(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
          miss.show=30, miss.matrix=FALSE, brief=getOption("brief"))
 
 db(\ldots, brief=TRUE)
@@ -42,7 +42,7 @@ By default, \code{details} provides a list of each variable and each row with th
 VARIABLE LABELS\cr
 Standard R does not provide for variable labels, but \code{lessR} does. Variable labels can be provided for some or all of the variables in the data frames.  One way to enter the variable labels is to read them from their own file with \code{details} with \code{labels} set to the full path name or \code{URL} of the labels file, or just the file name if the labels file is in the same directory as the data file.  Another method is to include the labels directly in the data file.  To to this, specify the file of variable labels with the \code{label="row2"} option. The web survey application Qualtrics downloads \code{csv} files in this format.
 
-For a file that contains only labels, each row of the file, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format such as obtained with the \code{csv} option from a standard worksheet application such as Microsoft Excel or LibreOffice Calc. Not all variables in the data frame that contains the data, usually \code{mydata}, need have a label, and the variables with their corresponding labels can be listed in any order. An example follows.
+For a file that contains only labels, each row of the file, including the first row, consists of the variable name, a comma, and then the label, that is, standard \code{csv} format such as obtained with the \code{csv} option from a standard worksheet application such as Microsoft Excel or LibreOffice Calc. Not all variables in the data frame that contains the data, usually \code{d}, need have a label, and the variables with their corresponding labels can be listed in any order. An example follows.
 
 I2,This instructor presents material in a clear and organized manner.\cr
 I4,Overall, this instructor was highly effective in this class.\cr
@@ -63,12 +63,12 @@ The \code{lessR} functions that provide analysis, such as \code{\link{Histogram}
 \examples{
 # read the built-in data set datEmployee
 # this provides an automatic call to details
-mydata <- Read("Employee", in.lessR=TRUE)
+d <- Read("Employee", in.lessR=TRUE)
 
-# manually request the details for mydata
+# manually request the details for d
 details()
 
-# manually request just variable names, labels for mydata
+# manually request just variable names, labels for d
 db()
 }
 

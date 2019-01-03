@@ -1,5 +1,5 @@
 ANOVA <-
-function(my.formula, data=mydata, rows=NULL,
+function(my.formula, data=d, rows=NULL,
          brief=getOption("brief"), digits.d=NULL, 
          Rmd=NULL, graphics=TRUE,
          rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
@@ -9,6 +9,10 @@ function(my.formula, data=mydata, rows=NULL,
   if (is.null(fun.call)) fun.call <- match.call()
 
   res.sort <- match.arg(res.sort)
+
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
 
   if (missing(my.formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -31,8 +35,10 @@ function(my.formula, data=mydata, rows=NULL,
 
   # if a tibble convert to data frame
   # data.frame is already #3 in class(data), so no char --> factor conversion 
-  if (class(data)[1] == "tbl_df") {
-    data <- as.data.frame(data, stringsAsFactors=TRUE)
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
+    if (class(data)[1] == "tbl_df") {
+      data <- as.data.frame(data, stringsAsFactors=TRUE)
+    }
   }
 
  
@@ -40,7 +46,7 @@ function(my.formula, data=mydata, rows=NULL,
 
   if (!exists(df.name)) {
     txtC <- "Function ANOVA requires the data exist in a data frame\n"
-    if (df.name == "mydata") 
+    if (df.name == "d") 
       txtA <- ", the default data frame name, " else txtA <- " "
     txtB1 <- "Either create the data frame, such as with data.frame function, or\n"
     txtB2 <- "  specify the actual data frame with the parameter: data\n"
@@ -223,7 +229,7 @@ function(my.formula, data=mydata, rows=NULL,
     txres <- tx
   }  # end !brief
 
-# pairwise.t.test(mydata$Steady, mydata$TrtA)
+# pairwise.t.test(d$Steady, d$TrtA)
 # power.anova.test(groups=4, n=8, between.var=16.33, within.var=2.179)
 
   options(op)  # restore options going into reg

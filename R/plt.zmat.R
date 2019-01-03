@@ -23,13 +23,25 @@ function(x, cor.coef=TRUE, fit="loess",
 
     ok <- is.finite(x) & is.finite(y)
     if (any(ok)) {
-      if (fit.line == "loess") {
-        l.ln <- lowess(y[ok] ~ x[ok], f=span, iter=iter)
-        lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
-      }
-      else if (fit.line == "lm") {
-        l.ln <- lm(y[ok] ~ x[ok])
-        lines(x[ok], fitted(l.ln), col=col.smooth, ...)
+      if (fit.line %in% c("loess", "lm")) {
+        yo <- order(x[ok])  # need to order x, then have y follow
+        x[ok] <- sort(x[ok])
+        y[ok] <- y[ok][yo]
+        if (fit.line == "loess") {
+          l.ln <- loess(y[ok] ~ x[ok])
+          lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
+        }
+        else if (fit.line == "lm") {
+          l.ln <- lm(y[ok] ~ x[ok])
+          lines(x[ok], fitted(l.ln), col=col.smooth, ...)
+        }
+        f.ln <- fitted(l.ln, ...)
+        p.ln <- predict(l.ln, se=TRUE) # get standard errors
+        prb <- (1 - 0.95) / 2 # 0.95 confidence level
+        up.ln <- f.ln + (qt(prb,length(x[ok])-1) * p.ln$se.fit)
+        dn.ln <- f.ln - (qt(prb,length(x[ok])-1) * p.ln$se.fit)
+        polygon(c(x[ok], rev(x[ok])), c(dn.ln, rev(up.ln)),
+          col=getOption("se.fill"), border="transparent") #
       }
     }
   }

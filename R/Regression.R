@@ -1,5 +1,5 @@
 Regression <-
-function(my.formula, data=mydata,rows=NULL,
+function(my.formula, data=d,rows=NULL,
          digits.d=NULL, standardize=FALSE,
 
          Rmd=NULL, 
@@ -48,9 +48,10 @@ function(my.formula, data=mydata,rows=NULL,
   df.name <- deparse(substitute(data))   # get name of data table
   options(dname = df.name)
 
-  if (exists(df.name, where=.GlobalEnv))  # tibble to df
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
+  }
 
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
@@ -100,8 +101,8 @@ function(my.formula, data=mydata,rows=NULL,
     txtA <- paste("The reference to a variable in the lessR Regression function can\n",
       "only be a variable name that refers to a variable in a data frame.\n\n", sep="")
     txtB <- "For example, this does not work:\n  > reg(Salary ~ log(Years))\n\n"
-    txtC <- "Instead use Transform to first add the new variable to mydata:\n"
-    txtD <- "  > mydata <- Transform(YearsLog = log(Years))\n"
+    txtC <- "Instead use Transform to first add the new variable to d:\n"
+    txtD <- "  > d <- Transform(YearsLog = log(Years))\n"
     txtE <- "  > reg(Salary ~ YearsLog)"
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         txtA, txtB, txtC, txtD, txtE, "\n")

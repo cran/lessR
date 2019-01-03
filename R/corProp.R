@@ -4,11 +4,11 @@ function (R=mycor,
           pdf.file=NULL, width=5, height=5) {
 
 
-  # cor matrix:  mycor as class out_all, mycor$cors, or stand-alone matrix
+  # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
   cor.nm <- deparse(substitute(R))
   .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
   if (class(R) == "out_all")
-    R <- eval(parse(text=paste(cor.nm, "$cors", sep="")))  # go to $cors 
+    R <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
 
   NVOld <- as.integer(nrow(R))
 
@@ -84,6 +84,6 @@ function (R=mycor,
 
   # finish
   cat("\n")
-  return(round(R,2))
+  invisible(round(R,2))
 
 }

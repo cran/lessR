@@ -58,6 +58,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
   # no title if two vars and no labels
   txttl <- ""
   dims <- length(dim(x))
+#cat("x.name:", x.name, "\n")
   if (dims == 1 || (!is.null(x.lbl) || !is.null(y.lbl))) {  #  one var or labels
     txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=TRUE)
   }

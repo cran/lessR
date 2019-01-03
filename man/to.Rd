@@ -41,9 +41,9 @@ to("m",10, same.size=FALSE)
 paste0("m", 1:10)
 
 # generate a 10 x 10 data frame
-mydata <- data.frame(matrix(rnorm(100), nrow=10))
+d <- data.frame(matrix(rnorm(100), nrow=10))
 # name the variables in the data frame
-names(mydata) <- to("m", 10)
+names(d) <- to("m", 10)
 }
 
 

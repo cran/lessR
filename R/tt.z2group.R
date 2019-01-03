@@ -414,9 +414,13 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     # two density graphs
     # prepare graphics window, dev or pdf
 
-    if (manage.gr) {
-      i.win  <- i.win + 1 
-      dev.set(which=i.win)
+    if (!is.null(pdf.file))
+      .opendev(pdf.file, width, height)
+    else {
+      if (manage.gr) {
+        i.win  <- i.win + 1 
+        dev.set(which=i.win)
+      }
     }
 
     plt.i <- plt.i + 1

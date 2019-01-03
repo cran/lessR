@@ -1,10 +1,14 @@
 CountAll <-
-function(x=mydata, quiet=FALSE, ...)  {
+function(x=d, quiet=FALSE, ...)  {
 
   manage.gr <- .graphman()  # see if graphics are to be managed
   if (manage.gr)
     cat("\n>>> Note: Must have pdf=TRUE or run in RStudio.\n\n")
 
+
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) x <- mydata 
 
   dname <- deparse(substitute(x))
   options(dname = dname)
@@ -13,7 +17,7 @@ function(x=mydata, quiet=FALSE, ...)  {
     if (!exists(dname, where=.GlobalEnv)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Need to specify an existing data frame,\n",
-      "or data frame  mydata  must exist.\n\n")
+      "or data frame  d  must exist.\n\n")
     }
     
   if (!quiet) {

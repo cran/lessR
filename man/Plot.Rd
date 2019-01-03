@@ -34,7 +34,7 @@ Represent the influence of additional categorical variables with \code{by1} or \
 }
 
 \usage{
-Plot(x, y=NULL, data=mydata, rows=NULL,
+Plot(x, y=NULL, data=d, rows=NULL,
          topic=c("data", "count", "prop", "sum", "mean", "sd",
                   "min", "median", "max"),
          theme=getOption("theme"), n.cat=getOption("n.cat"),
@@ -44,8 +44,6 @@ Plot(x, y=NULL, data=mydata, rows=NULL,
 
          fill=getOption("pt.fill"), color=getOption("pt.color"),
          trans=getOption("trans.pt.fill"),
-         violin.fill=getOption("violin.fill"), 
-         box.fill=getOption("box.fill"), 
 
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
          sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
@@ -54,15 +52,18 @@ Plot(x, y=NULL, data=mydata, rows=NULL,
          ID="row.name", ID.size=0.85,
          MD.cut=0, out.cut=0, out.shape="circle", out.size=1,
 
-         vbs.plot="vbs", vbs.pt.fill="black", bw=NULL, bw.iter=10,
-         vbs.size=0.9, vbs.mean=FALSE, fences=FALSE,
+         vbs.plot="vbs", vbs.size=0.9, bw=NULL, bw.iter=10,
+         violin.fill=getOption("violin.fill"), 
+         box.fill=getOption("box.fill"), 
+         vbs.pt.fill="black",
+         vbs.mean=FALSE, fences=FALSE,
          k=1.5, box.adj=FALSE, a=-4, b=3,
 
-         radius=NULL, power=0.6,
+         radius=NULL, power=0.5,
          low.fill=NULL, hi.fill=NULL, proportion=FALSE,
 
          smooth=FALSE, smooth.points=100, smooth.size=1,
-         smooth.trans=0.25, smooth.bins=128,
+         smooth.exp=0.25, smooth.bins=128,
 
          fit="off", fit.se=0.95, ellipse=0, 
 
@@ -112,7 +113,7 @@ vp(\ldots)
         the plot on the vertical axis. Can be continuous or categorical.
         Can be in a data frame or defined in the global environment.} 
   \item{data}{Optional data frame that contains one or both of \code{x} and
-        \code{y}. Default data frame is \code{mydata}.}
+        \code{y}. Default data frame is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{topic}{The values that are the coordinates from which to plot the points,
@@ -168,9 +169,7 @@ vp(\ldots)
         \code{pt.color} from the lessR \code{\link{style}} function.}
   \item{trans}{Transparency factor of the area of each point.
         Default is
-        \code{trans.pt.fill} from the lessR \code{\link{style}} function.}
-  \item{violin.fill}{Fill color for a \bold{violin plot}.}
-  \item{box.fill}{Fill color for a box plot.}\cr
+        \code{trans.pt.fill} from the lessR \code{\link{style}} function.}\cr
 
   \item{size}{When set to a constant, the scaling factor for \bold{standard points}
       (not bubbles) or a line, with default of 1.0 for points and 2.0 for a line.
@@ -196,8 +195,8 @@ vp(\ldots)
        \code{triup} (triangle up), \code{tridown} (triangle down), all
        uppercase and lowercase letters, all digits, and most punctuation characters.
        The numbers 21 through 25 as defined by the R \code{\link{points}} function
-       also apply. If plotting levels according to \code{by}, then list one shape for 
-       each level to be plotted.}
+       also apply. If plotting levels according to \code{by}, then list one
+       shape for each level to be plotted.}
   \item{means}{If the one variable is categorical the other variable continuous,
        then if \code{TRUE}, by default, plot means with the scatterplot. Also
        applies to a 1-D scatterplot.}
@@ -209,7 +208,8 @@ vp(\ldots)
         \code{y}-axis to
         each plotted point, such as for the Cleveland dot plot. For two
         \code{x}-variables, the line segments connect the two points.}
-  \item{segments.x}{Draw a line segment from the \code{x}-axis for each plotted point.}
+  \item{segments.x}{Draw a line segment from the \code{x}-axis for each
+        plotted point.}
   \item{jitter.x}{Randomly perturbs the plotted points of 
         a scatterplot horizontally according to an internally 
         computed formula, or can be explicitly specified.}
@@ -251,20 +251,22 @@ vp(\ldots)
         Modify fill and border colors from the current \code{theme} with
         the \code{\link{style}} function parameters \code{violin.fill},
         \code{violin.color}, \code{box.fill} and \code{box.color}.}
-  \item{vbs.pt.fill}{Points in a VBS scatterplot are black by default because
-        the background is the violin, which is based on the current theme
-        color. To use the values for \code{pt.fill} and \code{pt.color} 
-        specified by the \code{\link{style}} function, set to \code{"default"}.
-        Or set to any desired color.}
+  \item{vbs.size}{Width of the violin plot to the plot area. Make the
+        violin (and also the accompanying box plot) larger or smaller by
+        making the plot area and/or this value larger or smaller.}
   \item{bw}{Bandwidth for the smoothness of the violin plot. Higher values 
         for smoother plots. Default is to calculate a bandwidth that provides
         a relative smooth density plot.}
   \item{bw.iter}{Number of iterations used to modify default R bandwidth
         to further smooth the obtained density estimate. When set, also
         displays the iterations and corresponding results.}
-  \item{vbs.size}{Width of the violin plot to the plot area. Make the
-        violin (and also the accompanying box plot) larger or smaller by
-        making the plot area and/or this value larger or smaller.}
+  \item{violin.fill}{Fill color for a \bold{violin plot}.}
+  \item{box.fill}{Fill color for a box plot.}
+  \item{vbs.pt.fill}{Points in a VBS scatterplot are black by default because
+        the background is the violin, which is based on the current theme
+        color. To use the values for \code{pt.fill} and \code{pt.color} 
+        specified by the \code{\link{style}} function, set to \code{"default"}.
+        Or set to any desired color.}
   \item{vbs.mean}{Show the mean on the box plot with a strip the color
         of \code{out.fill}, which can be changed with the 
         \code{\link{style}} function.}
@@ -288,11 +290,11 @@ vp(\ldots)
         \code{n.cat}, the size of the bubbles represents
         frequency, with a default of 0.22.} 
   \item{power}{Relative size of the scaling of the bubbles to each other.
-        Value of 0.5 scales the bubbles so that the area of each bubble is the
-        value of the corresponding sizing variable. Value of 1 scales so the
-        radius of the bubble 
+        Default value of 0.5 scales the bubbles so that the area of each
+        bubble is the value of the corresponding sizing variable. Value of 1
+        scales so the radius of the bubble 
         is the value of the sizing variable, increasing the discrepancy of size
-        between the variables. The default value is 0.6.}
+        between the variables.}
   \item{low.fill}{For a categorical variable and the resulting bubble plot,
         or a matrix of these plots, sets a color gradient of the fill color
         beginning with this color.}
@@ -307,11 +309,10 @@ vp(\ldots)
   \item{smooth}{\bold{Smoothed density plot} for two numerical variables. By 
         default, set to \code{TRUE} for 2500 or more rows of data.}
   \item{smooth.points}{Number of points superimposed on the density plot in the
-        areas of
-        the lowest density to help identify outliers, which controls how dark
-        are the smoothed points.}
+        areas of the lowest density to help identify outliers, which controls
+        how dark are the smoothed points.}
   \item{smooth.size}{Size of points superimposed on the density plot.}
-  \item{smooth.trans}{Exponent of the function that maps the density scale to
+  \item{smooth.exp}{Exponent of the function that maps the density scale to
         the color scale.}
   \item{smooth.bins}{Number of bins in both directions for the density
         estimation.}\cr
@@ -504,12 +505,12 @@ Control the panel dimensions and the overall size of the Trellis plot with the f
 CATEGORICAL VARIABLES\cr
 Conceptually, there are continuous variables and categorical variables. Categorical variables have relatively few unique data values. However, categorical variables can be defined with non-numeric values, but also with numeric values, such as responses to a five-point Likert scale from Strongly Disagree to Strongly Agree, with responses coded 1 to 5. The three \code{by} --variables -- \code{by1}, \code{by2} and \code{by} -- only apply to graphs created with numeric \code{x} and/or \code{y} variables, continuous or categorical.
 
-The standard and most general way to define a categorical variable is as an R factor, such as created with the lessR \code{\link{doFactors}} function. \code{lessR} provides the option to define an integer variable with equally spaced values as categorical based on the value of \code{n.cat}, which can be set locally or globally with the \code{\link{style}} function. For example, for a variable with data values from 5-point Likert scale, a value of \code{n.cat} of 5 will define the define the variable as categorical. The default value is 0. To explicitly analyze the values as categorical, set \code{n.cat} to a value larger than 0, at least the size of the number of unique integer values. Can also annotate a graph of the values of an integer categorical variable with \code{value.labels} option.  
+The standard and most general way to define a categorical variable is as an R factor, such as created with the lessR \code{\link{factors}} function. \code{lessR} provides the option to define an integer variable with equally spaced values as categorical based on the value of \code{n.cat}, which can be set locally or globally with the \code{\link{style}} function. For example, for a variable with data values from 5-point Likert scale, a value of \code{n.cat} of 5 will define the define the variable as categorical. The default value is 0. To explicitly analyze the values as categorical, set \code{n.cat} to a value larger than 0, at least the size of the number of unique integer values. Can also annotate a graph of the values of an integer categorical variable with \code{value.labels} option.  
 
 A scatterplot of Likert type data is problematic because there are so few possibilities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 26 possible paired values to plot, so most of the plotted points overlap with others. In this situation, that is, when a single variable or two variables with Likert response scales are specified, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values. To request a sunflower plot in lieu of the bubble plot, set the \code{shape} to \code{"sunflower"}.
 
 DATA\cr
-The default input data frame is \code{mydata}. Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{mydata$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment.
+The default input data frame is \code{d}. Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{d$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment.
 
 The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin.width}, to override default values. The \code{topic} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
        
@@ -569,7 +570,7 @@ Specifying one or more \code{x}-variables with no \code{y}-variables, and \code{
 If the specified \code{x}-variable is of type \code{Date}, or is a time series, a time series plot is generated for each specified variable. If a formal R time-series, univariate or multivariate, specify as the \code{x}-variable. Or, specify the \code{x}-variable of type Date, and then specify the  \code{y}-variable as one or more time series to plot. The \code{y}-variable can be formatted as tidy data with all the values in a single column, or as wide-formatted data with the time-series variables in separate columns. 
 
 2-D KERNEL DENSITY\cr
-With \code{smooth=TRUE}, the R function \code{\link{smoothScatter}} is invoked according to the current color theme. Useful for very large data sets. The \code{smooth.points} parameter plots points from the s of the lowest density. The \code{smooth.bins} parameter specifies the number of bins in both directions for the density estimation. The \code{smooth.trans} parameter specifies the exponent in the function that maps the density scale to the color scale to allow customization of the intensity of the plotted gradient colors. Higher values result in less color saturation, de-emphasizing points from regions of lessor density. These parameters are respectively passed directly to the \code{\link{smoothScatter}} \code{nrpoints}, \code{nbin} and \code{transformation} parameters. Grid lines are turned off, but can be displayed by setting the \code{grid.color} parameter.
+With \code{smooth=TRUE}, the R function \code{\link{smoothScatter}} is invoked according to the current color theme. Useful for very large data sets. The \code{smooth.points} parameter plots points from the regions of the lowest density. The \code{smooth.bins} parameter specifies the number of bins in both directions for the density estimation. The \code{smooth.exp} parameter specifies the exponent in the function that maps the density scale to the color scale to allow customization of the intensity of the plotted gradient colors. Higher values result in less color saturation, de-emphasizing points from regions of lessor density. These parameters are respectively passed directly to the \code{\link{smoothScatter}} \code{nrpoints}, \code{nbin} and \code{transformation} parameters. Grid lines are turned off, but can be displayed by setting the \code{grid.color} parameter.
 
 COLORS\cr
 A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{"lightbronze"}. A gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"sienna"} and \code{"darkred"}. Use the option \code{style(sub.theme="black")} for a black background and partial transparency of plotted colors. 
@@ -613,7 +614,7 @@ Commonly used graphical parameters that are available to the standard R function
 }
 
 ONLY VARIABLES ARE REFERENCED\cr
-A referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+A referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, such as the default \code{d}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
 \code{    > Plot(rnorm(50), rnorm(50))   # does NOT work}
 
@@ -656,8 +657,8 @@ Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springe
 
 \examples{
 # read the data
-mydata <- rd("Employee", in.lessR=TRUE, quiet=TRUE)
-mydata <- Subset(random=.6, quiet=TRUE)  # less computationally intensive
+d <- rd("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Subset(random=.6, quiet=TRUE)  # less computationally intensive
 
 #---------------------------------------------------
 # traditional scatterplot with two numeric variables
@@ -680,10 +681,10 @@ Plot(Years, Salary, rows=(Gender=="M" & Years > 5))
 
 # plot 0.95 data ellipse with the points identified that represent
 #   outliers defined by a Mahalanobis Distance larger than 6 
-# save outliers into R object out, then remove from mydata
-mydata[1, "Salary"] <- 200000
+# save outliers into R object out, then remove from d
+d[1, "Salary"] <- 200000
 out <- Plot(Years, Salary, ellipse=0.95, MD.cut=6)
-mydata <- mydata[-out$outlier_indices,]
+d <- d[-out$outlier_indices,]
 
 # new shape and point size, no grid or background color
 # then put style back to default
@@ -701,7 +702,7 @@ style()
 # display the value for the bubbles with values of  min, median and max
 Plot(Years, Salary, size=Pre, size.cut=3)
 
-# variables in a data frame not the default mydata
+# variables in a data frame not the default d
 # plot 0.6 and 0.9 data ellipses with partially transparent points
 # change color theme to gold with black background
 style("gold", sub.theme="black")
@@ -830,7 +831,7 @@ style()
 
 # trigger a time series with a Date variable specified first
 # stock prices for three companies by month:  Apple, IBM, Intel
-mydata <- rd("StockPrice", in.lessR=TRUE)
+d <- rd("StockPrice", in.lessR=TRUE)
 # only plot Apple
 Plot(date, Price, rows=(Company=="Apple"))
 # Trellis plots, one for each company
@@ -842,7 +843,7 @@ Plot(date, Price, by=Company, color="blues")
 #------------------------------------------
 # analysis of a single categorical variable
 #------------------------------------------
-mydata <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in.lessR=TRUE)
 
 # default 1-D bubble plot
 # frequency plot, replaces bar chart 
@@ -921,7 +922,7 @@ Plot(Years, Salary, add=c("rect", "rect"),
 # analysis of two categorical variables (Likert data)
 #----------------------------------------------------
 
-mydata <- rd("Mach4", in.lessR=TRUE, quiet=TRUE)  # Likert data, 0 to 5
+d <- rd("Mach4", in.lessR=TRUE, quiet=TRUE)  # Likert data, 0 to 5
 
 # size of each plotted point (bubble) depends on its joint frequency
 # triggered by default when replication of joint values and
@@ -968,7 +969,7 @@ Plot(x, y1)
 
 # multiple plots from variable vectors need to have the variables
 #  in a data frame
-mydata <- data.frame(x, y1, y2)
+d <- data.frame(x, y1, y2)
 # if variables are in the user workspace and in a data frame
 #   with the same names, the user workspace versions are used,
 #   which do not work with vectors of variables, so remove

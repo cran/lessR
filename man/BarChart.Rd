@@ -11,7 +11,7 @@ Plots a bar chart, one categorical variable, \code{x} and one numeric variable \
 }
 
 \usage{
-BarChart(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
+BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         theme=getOption("theme"), n.cat=getOption("n.cat"),
         one.plot=NULL,
 
@@ -25,8 +25,9 @@ BarChart(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
         trans=getOption("trans.bar.fill"),
         fill.split=NULL,
 
-        legend.title=NULL, legend.loc="right.margin",
+        legend.title=NULL, legend.position="right.margin",
         legend.labels=NULL, legend.horiz=FALSE,
+        legend.size=NULL,
 
         value.labels=NULL,
         rotate.x=getOption("rotate.x"),
@@ -39,7 +40,7 @@ BarChart(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
         values.color=getOption("values.color"),
         values.size=getOption("values.size"),
         values.digits=getOption("values.digits"),
-        values.pos=getOption("values.pos"),
+        values.position=getOption("values.position"),
         values.cut=NULL,
 
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -59,7 +60,7 @@ bc(\ldots)
         or multiple variables in a data frame such as designated with the
         \code{\link{c}} function, or an entire data frame. If not specified,
         then defaults to all non-numerical variables in the specified data
-        frame, \code{mydata} by default.\cr
+        frame, \code{d} by default.\cr
         To manage large category values, unless \code{break.x} is \code{FALSE},
         any space in each category value is
         converted to new line for the corresponding axis label in the plot.
@@ -74,7 +75,7 @@ bc(\ldots)
         \code{y} on the \emph{same} plot, which applies to the panels of
         a Trellis plot if \code{by1} is specified.}
   \item{data}{Optional data frame that contains the variables of interest, default
-       is \code{mydata}. Can contain data from which frequencies are computed, or
+       is \code{d}. Can contain data from which frequencies are computed, or
        can contain values to plot on the y-axis instead of counts.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
@@ -151,14 +152,15 @@ bc(\ldots)
   \item{legend.title}{Title of the legend, which is usually set by default except
         when raw counts are entered as a matrix.  Then a title must be specified
         to generate a legend.}
-  \item{legend.loc}{When plotting two variables, location of the legend, with the
+  \item{legend.position}{When plotting two variables, location of the legend, with the
         default in the right margin. Additional options from standard R are
         "topleft", "top", "topright" and others as shown in the help for the
         \code{\link{legend}} function.}
   \item{legend.labels}{When plotting two variables, labels for the legend, which by
        default are the levels for the second or \code{by} variable.}
   \item{legend.horiz}{By default the legend is vertical, but can be changed to
-       horizontal.}\cr
+       horizontal.}
+  \item{legend.size}{Size of legend text.}\cr
 
   \item{value.labels}{For factors, default is the factor labels, and for
         character variables, default is the character values.
@@ -200,7 +202,8 @@ bc(\ldots)
         numerical results to the plot according to the default \code{"\%"}
         for tabulated counts and \code{"input"} for the input values for
         a \code{y}-variable explicitly provided, unless there are more than
-        15 levels in which case the default is \code{"off"}. For tabulated
+        15 levels or \code{y} is present and non-integer in which case
+        the default is \code{"off"}. For tabulated
         counts, \code{"prop"} is also available for proportions as well as
         \code{"input"}.}
   \item{values.color}{Color of the plotted text. Could be a vector to specify
@@ -208,20 +211,20 @@ bc(\ldots)
         the number of categories, the colors are recycled.}
   \item{values.size}{Character expansion factor, the size, of the plotted text,
         for which the default value is 0.95, or 0.9 of value if \code{beside}
-        is \code{TRUE} and \code{values.pos} is \code{"in"} because bars are
+        is \code{TRUE} and \code{values.position} is \code{"in"} because bars are
         narrower.}
   \item{values.digits}{Number of decimal digits for which to display the values.
         Default is 0, round to the nearest integer for \code{"\%"},
         2 for \code{"prop"}, and if \code{"input"} and \code{y} is entered
         directly, display the literal value unless > 9999, in which case
         set to 0.}
-  \item{values.pos}{Position of the plotted text. Default is inside the bar,
+  \item{values.position}{Position of the plotted text. Default is inside the bar,
         or, if \code{"out"}, as part of the label for each value
         outside of the bar.}
-  \item{values.cut}{Threshold for displaying the value. If \code{values.pos}
-       equals \code{"out"}, then default is 0.015 unless there is a
+  \item{values.cut}{Threshold for displaying the value. If \code{values.position}
+       equals \code{"out"}, then default is 0.028 unless there is a
        \code{by} variable or multiple x-variables on the same plot, then
-       default is 0.045.}\cr
+       default is 0.040}\cr
 
   \item{xlab}{Label for \code{x}-axis. If \code{xlab} is not specified, then
        the label becomes
@@ -298,11 +301,11 @@ Plot a bar chart with default colors for one or two variables, presumably with a
 
 
 DATA\cr
-The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{mydata}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{d}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{d$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function.
 
 If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment.
 
-To obtain a bar chart of each numerical variable in the \code{mydata} data frame, invoke \code{BarChart()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the variable list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
+To obtain a bar chart of each numerical variable in the \code{d} data frame, invoke \code{BarChart()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the variable list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -323,7 +326,7 @@ The values of another variable can be mapped into the fill color of the bars. To
 
 
 LEGEND\cr
-When two variables are plotted, a legend is produced, with values for each level of the second or \code{by} variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend.loc} option, which, in addition to the \code{lessR} option of \code{right.margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend.
+When two variables are plotted, a legend is produced, with values for each level of the second or \code{by} variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend.position} option, which, in addition to the \code{lessR} option of \code{right.margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend.
 
 If the default right margin is retained, variable labels are also accommodated for the legend title.  To conserve horizontal space, the variable label is listed in multiple lines if needed. The legend title is constructed by forming lines of maximum length of 12 characters, with multiple words per line if possible. Any single word in the label of more than 12 characters is abbreviated to 12 characters with the R \code{\link{abbreviate}} function. Also, any value labels are abbreviated to a maximum of 6 characters.
 
@@ -362,7 +365,7 @@ PDF OUTPUT\cr
 To obtain pdf output, set the \code{pdf} option to \code{TRUE}, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
-The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{mydata}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{d}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
 \code{    > BarChart(cut(rnorm(50), breaks=seq(-5,5)))   # does NOT work}
 
@@ -419,7 +422,7 @@ David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})
 \examples{
 
 # get the data
-mydata <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in.lessR=TRUE)
 
 # --------------------------------------------------------
 # bar chart from tabulating the data for a single variable
@@ -475,6 +478,14 @@ bc(Make, rotate.x=90, data=myd)
 # manage size of horizontal value labels
 bc(Make, horiz=TRUE, label.max=4, data=myd)
 
+# wes anderson move theme palette
+# see getColors help file to see the full list of themes
+BarChart(Dept, fill="GrandBudapest1", values="off")
+
+# display bars for values of count <= 10 in a different color
+#  than values above
+BarChart(Dept, sort="+", fill.split=10)
+
 
 # ----------------------------------------------------
 # bar chart from tabulating the data for two variables
@@ -491,15 +502,6 @@ BarChart(Dept, by=Gender, proportion=TRUE)
 # do not display percentages directly on the bars
 BarChart(Gender, by=JobSat, fill="reds", values="off")
 
-# wes anderson move theme palette
-# see getColors help file to see the full list of themes
-BarChart(Dept, fill="GrandBudapest1", values="off")
-
-# display bars for values of count <= 10 in a different color
-#  than values above
-BarChart(Dept, sort="+", fill.split=10)
-
-
 # specify two fill colors for Gender
 BarChart(Dept, by=Gender, fill=getColors(c("deepskyblue", "black")))
 
@@ -513,10 +515,10 @@ BarChart(Gender, by=Dept,
 # the levels of Dept are included within each respective bar
 # plot horizontally, display the value for each bar at the
 #   top of each bar
-BarChart(Gender, by=Dept, beside=TRUE, horiz=TRUE, values.pos="out")
+BarChart(Gender, by=Dept, beside=TRUE, horiz=TRUE, values.position="out")
 
 # horizontal bar chart of two variables, put legend on the top
-BarChart(Gender, by=Dept, horiz=TRUE, legend.loc="top")
+BarChart(Gender, by=Dept, horiz=TRUE, legend.position="top")
 
 # for more info on base R graphic options, enter:  help(par)
 # for lessR options, enter:  style(show=TRUE)
@@ -525,7 +527,7 @@ BarChart(Gender, by=Dept, horiz=TRUE, legend.loc="top")
 style(fill=c("coral3","seagreen3"), lab.color="wheat4", lab.cex=1.2,
       panel.fill="wheat1", main.color="wheat4")
 BarChart(Dept, by=Gender,
-         legend.loc="topleft", legend.labels=c("Girls", "Boys"),
+         legend.position="topleft", legend.labels=c("Girls", "Boys"),
          xlab="Dept Level", main="Gender for Different Dept Levels",
          value.labels=c("None", "Some", "Much", "Ouch!"))
 style()
@@ -535,11 +537,11 @@ style()
 # multiple bar charts tabulated from data across multiple variables
 # -----------------------------------------------------------------
 
-# bar charts for all non-numeric variables in the data frame called mydata
+# bar charts for all non-numeric variables in the data frame called d
 #   and all numeric variables with a small number of values, < n.cat
 # BarChart(one.plot=FALSE)
 
-mydata <- rd("Mach4", in.lessR=TRUE, quiet=TRUE)
+d <- rd("Mach4", in.lessR=TRUE, quiet=TRUE)
 
 # all on the same plot, bar charts for 20 6-pt Likert scale items
 # default scale is divergent from "browns" to "blues"
@@ -584,7 +586,7 @@ BarChart(Travel, horiz=TRUE)
 # ----------------------------
 
 # include a y-variable, here Salary, in the data table to read directly
-mydata <- read.csv(text="
+d <- read.csv(text="
 Dept, Salary
 ACCT,51792.78
 ADMN,71277.12
@@ -595,7 +597,7 @@ BarChart(Dept, Salary)
 
 # specify two variables for a two variable bar chart
 # also specify a y-variable to provide the counts directly
-mydata <- read.csv(text="
+d <- read.csv(text="
 Dept,Gender,Count
 ACCT,F,3
 ACCT,M,2
@@ -614,7 +616,7 @@ BarChart(Dept, Count, by=Gender)
 # annotations
 # -----------
 
-mydata <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in.lessR=TRUE)
 
 # Place a message in the center of the plot
 # \n indicates a new line

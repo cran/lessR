@@ -60,7 +60,7 @@ function(x, y=NULL, by=NULL, digits.d=NULL, x.name, y.name=NULL, by.name=NULL,
   # values
   for (i in 1:nrow(x)) {
     rwnm <- paste(" ", rownames(x)[i])
-    tx[length(tx)+1] <-  format(rwnm, width=max.c1, justify="left")
+    tx[length(tx)+1] <- format(rwnm, width=max.c1, justify="left")
     for (j in 1:ncol(x)) {
       tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i,j], d=digits.d,
              w=max.ln[j]), sep="")

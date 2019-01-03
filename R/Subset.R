@@ -1,5 +1,5 @@
 Subset <-
-function(rows, columns, data=mydata, holdout=FALSE,
+function(rows, columns, data=d, holdout=FALSE,
     random=0, quiet=getOption("quiet"), ...) {
 
   # save variable labels, units (NULL if no labels, units) 
@@ -103,8 +103,8 @@ function(rows, columns, data=mydata, holdout=FALSE,
   data.sub <- data[r, vars, drop=FALSE]
   # if no vars dropped, vars is TRUE, otherwise a char vector of names to retain
   if (!is.logical(vars) && !is.null(mylabels)) {  
-    # warning unless length(mydata) a multiple of length(vars)
-    keep.index <- which(suppressWarnings(names(mydata) == vars))
+    # warning unless length(d) a multiple of length(vars)
+    keep.index <- which(suppressWarnings(names(d) == vars))
     mylabels <- mylabels[keep.index]
   }
 

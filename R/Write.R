@@ -1,5 +1,5 @@
 Write <- 
-function(ref=NULL, data=mydata, format=c("csv", "R", "Excel"), 
+function(ref=NULL, data=d, format=c("csv", "R", "Excel"), 
          row.names=TRUE, ...) {
 
   format <- match.arg(format)
@@ -58,7 +58,7 @@ function(ref=NULL, data=mydata, format=c("csv", "R", "Excel"),
     hs1 <- createStyle(fgFill=rgb(.9,.9,.9), halign="CENTER",
           textDecoration="italic", border="Bottom")
     setColWidths(wb, sheet=1, cols=1:ncol(data), widths="auto") 
-    writeDataTable(wb, "mydata", x=mydata, colNames=TRUE,
+    writeDataTable(wb, df.name, x=data, colNames=TRUE,
          startCol="A", startRow=1, tableStyle="TableStyleLight9",
          rowNames=row.names)
          #borders="none", headerStyle=hs1, borderStyle="dashed")

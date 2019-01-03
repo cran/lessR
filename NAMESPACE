@@ -17,7 +17,7 @@ importFrom("graphics", "abline", "arrows", "axis", "axis.Date", "barplot", "box"
 
 importFrom("grDevices", "boxplot.stats", "col2rgb", "colorRampPalette", "colors", "dev.list", "dev.new", "dev.off", "dev.set", "gray", "heat.colors", "hcl", "palette", "pdf", "rainbow", "rgb", "terrain.colors", "as.graphicsAnnot")
 
-importFrom("stats", "confint.default", "IQR", "TukeyHSD", "addmargins", "anova", "aov", "as.formula", "bw.nrd0", "chisq.test", "coef", "complete.cases", "confint", "cooks.distance", "cor", "cor.test", "cov", "density", "dffits", "dlnorm", "dnorm", "dt", "dunif", "factanal", "fitted", "frequency", "glm", "heatmap", "interaction.plot", "lm", "lm.influence", "loadings", "loess", "lowess", "median", "mahalanobis", "na.omit", "pf", "pnorm", "power.t.test", "predict", "promax", "pt", "qnorm", "qt", "quantile", "rbinom", "replications", "residuals", "rlnorm", "rnorm", "rstandard", "rstudent", "runif", "sd", "shapiro.test", "start", "t.test", "terms.formula", "update", "var", "varimax", "is.ts", "time",  "weighted.mean", "fivenum")
+importFrom("stats", "confint.default", "IQR", "TukeyHSD", "addmargins", "anova", "aov", "as.formula", "bw.nrd0", "chisq.test", "coef", "complete.cases", "confint", "cooks.distance", "cor", "cor.test", "cov", "density", "dffits", "dlnorm", "dnorm", "dt", "dunif", "factanal", "fitted", "frequency", "glm", "heatmap", "interaction.plot", "lm", "lm.influence", "loadings", "loess", "lowess", "median", "mahalanobis", "na.omit", "pf", "pnorm", "power.t.test", "predict", "promax", "pt", "qnorm", "qt", "quantile", "rbinom", "replications", "residuals", "rlnorm", "rnorm", "rstandard", "rstudent", "runif", "sd", "shapiro.test", "start", "t.test", "terms.formula", "update", "var", "varimax", "is.ts", "time",  "weighted.mean", "fivenum", "as.dist", "hclust", "cutree")
 
 importFrom("utils", "head", "help", "packageVersion", "read.csv", "read.fwf", "read.table", "type.convert", "write.csv", "write.table")
 
@@ -56,7 +56,7 @@ export (
   corScree, scree, corEFA, efa,
   Density, dn,
   details, db,
-  doFactors,
+  factors, doFactors,
   getColors,
   Help,
   Histogram, hs,

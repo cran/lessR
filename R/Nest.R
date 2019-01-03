@@ -1,6 +1,6 @@
 Nest <-
 function(y, nested.model, full.model, method=c("lm", "logit"),
-         data=mydata, digits.d=NULL) {
+         data=d, digits.d=NULL) {
 
   method <- match.arg(method)
 

@@ -1,5 +1,5 @@
 .logit4Pred <-
-function(lm.out, nm, mydata, my.formula, brief, res.rows,
+function(lm.out, nm, d, my.formula, brief, res.rows,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          new.data, pred, pred.all, 
          numeric.all, in.data.frame, X1.new, 

@@ -34,7 +34,7 @@ Help(topic=NULL, width=4.5, height=4.5)
 
 \code{Read}: Read an external data file in csv format.
 
-\code{Write}: Write the contents of mydata to a data file in csv format.
+\code{Write}: Write the contents of d to a data file in csv format.
 
 \code{library}: Many libraries of functions developed by others can be added to R.
 

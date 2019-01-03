@@ -50,38 +50,43 @@ Read2(\ldots, sep=";", dec=",")
         \code{.sav} reads as an SPSS file, which also reads the variable labels
         if present, \code{.sas7bdat} reads as a SAS file, and \code{.rda} reads as a
         native R data file. If the data file is not identified by one of these
-        file types, then explicitly set to one.}
+        file types, then explicitly set by setting to one of the following values:
+        \code{"csv"}, \code{"tsv"}, \code{"Excel"}, \code{"R"}, \code{"SPSS"},
+        or \code{"SAS"}.}
   \item{in.lessR}{If \code{TRUE} then the data file has been downloaded as part of the
        lessR package.}
   \item{labels}{[This is a legacy option in which the labels are part of the data file,
-       replaced by the \code{\link{VariableLabels}} function to have labels in mylabels.]
-       File name for the file of variable labels. Either a full path name,
+       replaced by the \code{\link{VariableLabels}} function to have labels
+       in mylabels.] File name for the file of variable labels. Either a full path name,
        or just the file name if in the same directory as the data file, or no
        reference between the quotes, which allows the user to browse for the
        labels file. Or, if \code{row2}, then the labels are in the second line of
        the data file. Must be a literal string, not a character variable.}
-  \item{widths}{Specifies the width of the successive columns for fixed width formatted data.}
-  \item{stringsAsFactors}{Defaults to \code{FALSE}, so variables with at least one non-numeric
-        data value are read as character strings instead of factors.}
-  \item{missing}{Missing value code, which by default is literally a missing data value in the
-        data table.}
-  \item{n.mcut}{For the missing value analysis, list the row name and number of missing values
-        if the number of missing exceeds or equals this cutoff.}
-  \item{miss.show}{For the missing value analysis, the number of rows, one row per observation,
-        that has as many or missing values as \code{n.mcut}.}
+  \item{widths}{Specifies the width of the successive columns for fixed width
+       formatted data.}
+  \item{stringsAsFactors}{Defaults to \code{FALSE}, so variables with at least
+        one non-numeric data value are read as character strings instead of factors.}
+  \item{missing}{Missing value code, which by default is literally a missing data
+        value in the data table.}
+  \item{n.mcut}{For the missing value analysis, list the row name and number of
+        missing values if the number of missing exceeds or equals this cutoff.}
+  \item{miss.show}{For the missing value analysis, the number of rows, one row per
+        observation, that has as many or missing values as \code{n.mcut}.}
   \item{miss.zero}{For the missing value analysis, list the variable name or the row name
-        even for values of 0. By default only variables and rows with missing data are listed.}
+        even for values of 0, that is rows with no missing data. By default only 
+       variables and rows with missing data are listed.}
   \item{miss.matrix}{For the missing value analysis, if there is any missing data, 
-        list a version of the complete data table with a 0 for a non-missing value and a 1 for 
-        a missing value.}
+        list a version of the complete data table with a 0 for a non-missing value
+        and a 1 for a missing value.}
   \item{sep}{Character that separates adjacent values in a text file of data.}
   \item{dec}{Character that serves as the decimal separator in a number.}
   \item{max.lines}{Maximum number of lines to list of the data and labels.}
   \item{sheet}{For Excel files, specifies the work sheet to read. The default is the
         first work sheet.}
-  \item{brief}{If \code{TRUE}, display only variable names table plus any variable labels.}
-  \item{quiet}{If set to \code{TRUE}, no text output. Can change the corresponding system
-       default with \code{\link{style}} function.}
+  \item{brief}{If \code{TRUE}, display only variable names table plus any variable
+       labels.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change the corresponding
+       system default with \code{\link{style}} function.}
   \item{fun.call}{Function call. Used with \code{Rmd} to pass the function call when
         obtained from the abbreviated function call \code{rd}.}
   \item{...}{Other parameter values define with the R read functions, such as the
@@ -104,13 +109,13 @@ Call \code{help(read.table)} to view the other options that can also be implemen
 MECHANICS\cr
 Specify the file as with the \code{\link{Read}} function for reading the data into a data frame.  If no arguments are passed to the function, then interactively browse for the file.
 
-Given a csv data file, or tab-delimited text file, read the data into an R data frame called \code{mydata} with \code{\link{Read}}. Because \code{\link{Read}} calls the standard R function \code{read.csv}, which serves as a wrapper for \code{read.table}, the usual options that work with \code{read.table}, such as \code{row.names}, also can be passed through the call to \code{Read}. 
+Given a csv data file, or tab-delimited text file, read the data into an R data frame called \code{d} with \code{\link{Read}}. Because \code{\link{Read}} calls the standard R function \code{read.csv}, which serves as a wrapper for \code{read.table}, the usual options that work with \code{read.table}, such as \code{row.names}, also can be passed through the call to \code{Read}. 
 
 SPSS DATA\cr
 Relies upon \code{\link{read.spss}} from the \code{foreign} package. To read data in the SPSS \code{.sav} format.  If the file has a file type of \code{.sav}, that is, the file specification ends in \code{.sav}, then the \code{format} is automatically set to \code{"SPSS"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="SPSS"}. Any variable labels in the SPSS file are read and stored in the resulting \code{R} data table (frame). However, SPSS allows value labels for integer variables, so to preserve the variable labels in R the resulting variable is typed as a factor. To preserve the integer type, invoke the \code{\link{read.spss}} option \code{use.value.labels=FALSE}.
 
 R DATA\cr
-Relies upon the standard R function \code{load}. By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{mydata}, with the \code{lessR} function \code{\link{Write}}.
+Relies upon the standard R function \code{load}. By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{d}, with the \code{lessR} function \code{\link{Write}}.
 
 Excel DATA\cr
 Relies upon the function \code{\link{read.xlsx}} from Alexander Walker's \code{openxlsx} package. Files with a file type of \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The \code{read_excel} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file, with a default value of 1. The \code{row.names} parameter can only have a value of 1.     
@@ -135,7 +140,7 @@ The \code{lessR} functions that provide analysis, such as \code{\link{Histogram}
 }
 
 \value{
-The read data frame is returned, usually assigned the name of \code{mydata} as in the examples below.  This is the default name for the data frame input into the \code{lessR} data analysis functions.
+The read data frame is returned, usually assigned the name of \code{d} as in the examples below.  This is the default name for the data frame input into the \code{lessR} data analysis functions.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -158,44 +163,44 @@ Alexander Walker (2017). openxlsx: Read, Write and Edit XLSX Files. https://CRAN
 
 # to browse for a data file on the computer system, invoke Read with 
 #   the ref argument empty
-# mydata <- Read()
+# d <- Read()
 # abbreviated name
-# mydata <- rd()
+# d <- rd()
 # reduced output to the console
-# mydata <- rd.brief()
+# d <- rd.brief()
 
 # browse for a file and then read the variable labels from
 #  the specified label file, here a Excel file with two columns,
 #  the first column of variable names and the second column the 
 #  corresponding labels
-# mydata <- Read(labels="employee_lbl.xlsx")
+# d <- Read(labels="employee_lbl.xlsx")
 
 # same as above, but include standard read.csv options to indicate 
 #  no variable names in first row of the csv data file 
 #   and then provide the names
 # also indicate that the first column is an ID field
-# mydata <- Read(header=FALSE, col.names=c("X", "Y"), row.names=1)
+# d <- Read(header=FALSE, col.names=c("X", "Y"), row.names=1)
 
 # read a csv data file from the web
-# mydata <- Read("http://web.pdx.edu/~gerbing/data/twogroup.csv")
+# d <- Read("http://web.pdx.edu/~gerbing/data/twogroup.csv")
 
 # read a csv data file with -99 and XXX set to missing
-# mydata <- Read(missing=c(-99, "XXX"))
+# d <- Read(missing=c(-99, "XXX"))
 
 # do not display any output
-# mydata <- Read(quiet=TRUE)
+# d <- Read(quiet=TRUE)
 # display full output
-# mydata <- Read(brief=FALSE)
+# d <- Read(brief=FALSE)
 
 # read the built-in data set dataEmployee
-mydata <- Read("Employee", in.lessR=TRUE)
+d <- Read("Employee", in.lessR=TRUE)
 
 # read a data file organized by columns, with a 
 #   5 column ID field, 2 column Age field
 #   and 75 single columns of data, no spaces between columns
 #   name the variables with lessR function: to
 #   the variable names are Q01, Q02, ..., Q74, Q75
-# mydata <- Read(widths=c(5,2,rep(1,75)), col.names=c("ID", "Age", to("Q", 75)))
+# d <- Read(widths=c(5,2,rep(1,75)), col.names=c("ID", "Age", to("Q", 75)))
 }
 
 

@@ -1,5 +1,5 @@
 Logit <-
-function(my.formula, data=mydata, rows=NULL,
+function(my.formula, data=d, rows=NULL,
          digits.d=4, text.width=120, 
 
          brief=getOption("brief"),
@@ -17,13 +17,19 @@ function(my.formula, data=mydata, rows=NULL,
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify a model by listing it first or set according to:  my.formula\n\n")
   }
+
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
   
   df.name <- deparse(substitute(data))   # get name of data table
   options(dname = df.name)
 
   # if a tibble convert to data frame, no char --> factor conversion 
-  if (class(data)[1] == "tbl_df") {
-    data <- as.data.frame(data, stringsAsFactors=TRUE)
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
+    if (class(data)[1] == "tbl_df") {
+      data <- as.data.frame(data, stringsAsFactors=TRUE)
+    }
   }
 
   # convert character variables to factors (for DV)
@@ -64,7 +70,7 @@ function(my.formula, data=mydata, rows=NULL,
   
   if (!exists(df.name)) {
     txtC <- "Function reg requires the data exist in a data frame\n"
-    if (df.name == "mydata") 
+    if (df.name == "d") 
       txtA <- ", the default data frame name, " else txtA <- " "
     txtB1 <- "Either create the data frame, such as with data.frame function, or\n"
     txtB2 <- "  specify the actual data frame with the parameter: data\n"

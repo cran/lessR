@@ -1,5 +1,5 @@
 SummaryStats <-
-function(x=NULL, by=NULL, data=mydata, n.cat=getOption("n.cat"), 
+function(x=NULL, by=NULL, data=d, n.cat=getOption("n.cat"), 
     digits.d=NULL, brief=getOption("brief"), label.max=20, ...)  {
 
   # get variable name before potential call of data$x

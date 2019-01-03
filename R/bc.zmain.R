@@ -8,7 +8,8 @@ function(x, y, by,
          values, values.color, values.size, values.digits,
          values.pos, values.cut,
          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-         legend.title, legend.loc, legend.labels, legend.horiz,
+         legend.title, legend.position, legend.labels,
+         legend.horiz, legend.size,
          add, x1, x2, y1, y2, out.size, quiet, ...) {
   
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
@@ -112,8 +113,22 @@ function(x, y, by,
   if (!is.null(legend.title))
     l.lab <- legend.title 
   else
-    if (!is.null(by)) if (exists("y.lbl"))
-      l.lab <- ifelse (length(y.lbl) == 0, by.name, y.lbl)
+    if (horiz) {
+      if (!is.null(by)) if (exists("x.lbl")) {
+        if (length(x.lbl) == 0)
+          l.lab <-  by.name
+        else
+          l.lab <- paste(by.name, ": ", x.lbl, sep="")
+      }
+    }
+    else {
+      if (!is.null(by)) if (exists("y.lbl")) {
+        if (length(y.lbl) == 0)
+          l.lab <-  by.name
+        else
+          l.lab <- paste(by.name, ": ", y.lbl, sep="")
+      }
+    }
 
   # title
   main.lbl <- ifelse (!is.null(main), main, "")
@@ -184,7 +199,7 @@ function(x, y, by,
     else {  # a by variable
       x.temp <- x
       do.row <- ifelse (x[1] == x[2], FALSE, TRUE)  # x is outer loop
-      m <- matrix(y, nrow=length(levels(by)), byrow=do.row)
+      m <- matrix(y, nrow=length(unique(by)), byrow=do.row)
       colnames(m) <- unique(x) 
       rownames(m) <- unique(by) 
       m <- as.table(m, dnn=c(by.name, x.name))
@@ -305,8 +320,10 @@ function(x, y, by,
   n.levels <- ifelse (is.matrix(x), nrow(x), length(x))
 
   # need n.levels for this evaluation
-  if (values %in% c("eval.later")) {
-    if (n.levels > 14)
+  if (values == "eval.later") {
+    is_int <- TRUE
+    if (!is.null(y)) if (!.is.integer(y)) is_int <- FALSE
+    if (n.levels > 14  || !is_int) 
       values <- "off"
     else
       values <- ifelse (y.given, "input", getOption("values"))
@@ -325,7 +342,10 @@ function(x, y, by,
   if (is.null(fill)) {  # fill not specified
     if (!is.ord) {  # default qualitative for theme
       if (theme == getOption("theme")) {  # the default theme
-        clr <- getOption("bar.fill.discrete")  # default theme 
+        if (is.null(by)) 
+          clr <- getOption("bar.fill.discrete")  # default theme 
+        else 
+           clr <- .color.range(.get.fill(theme, FALSE), n.levels)
       }
       else {  # not the default theme
         sty <- style(theme, reset=FALSE)
@@ -488,8 +508,12 @@ function(x, y, by,
   else 
     if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
-  if (legend.loc == "right.margin"  &&  (is.matrix(x)))
-    rm <- rm + .82
+  if (legend.position == "right.margin"  &&  (is.matrix(x)))
+    rm <- rm + (.52 + (.4 * axis.x.cex))
+
+  if (legend.position == "top") tm <- tm + (-0.08 + (0.446 * lab.cex))
+  #if (legend.position == "top") tm <- tm + .45
+  #if (legend.position == "top") tm <- tm + .25
 
   # user manual adjustment
   bm <- bm + bm.adj
@@ -581,8 +605,8 @@ function(x, y, by,
 
   if (values != "off") {
     if (is.null(values.cut)) {
-      values.cut <- 0.015
-      if (prop && is.matrix(x)  ||  multi) values.cut <- 0.045
+      values.cut <- 0.028
+      if ((prop && is.matrix(x)) || multi) values.cut <- 0.040
     }
 
     # set type of the values to display, x.txt
@@ -719,7 +743,10 @@ function(x, y, by,
     getOption("axis.text.color"), getOption("axis.y.text.color"))
   adj1 <- ifelse (!horiz, 0.5, -1.0)
   if (is.null(scale.y))  # if scale.y defined, can evaluate earlier
-    lblval.y <- as.character(y.coords)
+    if (!prop)
+      lblval.y <- as.character(y.coords)
+    else
+      lblval.y <- .fmt(y.coords,2)
   axis(ax.num, col=axis.y.color,   # maybe split off the text like with x axis?
        col.axis=axis.y.text.color, cex.axis=axis.y.cex, las=las.value,
        tck=-.02, padj=adj1,  at=y.coords, labels=lblval.y, ...) 
@@ -786,25 +813,49 @@ function(x, y, by,
   # ------------------------------------------------------
   # legend for two variable plot including variable labels
 
-  if ( (!is.null(by) || is.matrix(x)) && !is.null(legend.loc))  {
+  if ( (!is.null(by) || is.matrix(x)) && !is.null(legend.position)) {
 
     col.txt <- ifelse (sum(col2rgb(col.bg))/3 > 80, "black", rgb(.97,.97,.97))
 
+    # evaluate in bc.main, under color, when n.levels is known
+    if (is.null(legend.size)) {
+      if (legend.position == "top")
+        legend.size <- getOption("lab.cex")
+      else
+        legend.size <- axis.x.cex 
+    }
+
     # default right.margin option
-    if (legend.loc == "right.margin") {
+    if (legend.position == "right.margin") {
 
       options(byname = getOption("byname"))
       trans.pts <- .6  # dummy value
+      point.size <- 2.5 * axis.x.cex
       .plt.by.legend(legend.labels, col.color, clr, shp=22, trans.pts,
-                     col.bg, usr, pt.size=1.6, pt.lwd=0)
+                     col.bg, usr, pt.size=point.size, pt.lwd=0, legend.size)
 
-    }  # right margin
+    }  # end right margin
 
+    # top option
+    else if (legend.position == "top") {
+      ll <- legend("top", legend=legend.labels, plot=FALSE,
+             title=l.lab, xpd=NA, x.intersp=.15,
+             fill=clr, border="transparent",
+             horiz=legend.horiz, cex=legend.size, bty="n", text.col=col.txt)
+      fct <- (-0.043 + (0.257 * lab.cex))  # more cushion for large cex
+      legend(ll$rect$left, usr[4]+(fct*(usr[4])), legend=legend.labels,
+             title=l.lab, xpd=NA, x.intersp=.15, pt.cex=10,
+             fill=clr, border="transparent",
+             horiz=legend.horiz, cex=legend.size, bty="n", text.col=col.txt)
+    }
+
+    # everything else, not so consistent
     else
-      legend(legend.loc, legend=legend.labels, title=l.lab, fill=clr, 
-             horiz=legend.horiz, cex=.7, bty="n", text.col=col.txt)
-  }
+      legend(legend.position, legend=legend.labels, title=l.lab,
+             fill=clr, border="transparent", x.intersp=.15,
+             horiz=legend.horiz, cex=legend.size, bty="n", text.col=col.txt)
 
+  } # end legend
 
   if (!is.null(add)) {
 
@@ -1032,7 +1083,7 @@ function(x, y, by,
         txrow <- stats$txrow
         class(txrow) <- "out"
         output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq,
-                       out_row=txrow, out_XV=txXV)
+                       out_XV=txXV, out_row=txrow)
       }
       class(output) <- "out_all"
       if (!quiet) print(output)

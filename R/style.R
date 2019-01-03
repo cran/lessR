@@ -24,9 +24,9 @@ function(
   bar.color.discrete=getOption("bar.color.discrete"),
   values=getOption("values"),
   values.color=getOption("values.color"), 
-  values.cex=getOption("values.cex"),
+  values.size=getOption("values.size"),
   values.digits=getOption("values.digits"),
-  values.pos=getOption("values.pos"),
+  values.position=getOption("values.position"),
  
   pt.fill=getOption("pt.fill"),
   trans.pt.fill=getOption("trans.pt.fill"),
@@ -38,7 +38,6 @@ function(
   fit.color=getOption("fit.color"),
   fit.lwd=getOption("fit.lwd"),
   bubble.text.color=getOption("bubble.text.color"),
-  heat=getOption("heat"), 
   segment.color=getOption("segment.color"),
   ID.color=getOption("ID.color"),
   area.fill=getOption("area.fill"),
@@ -110,7 +109,12 @@ function(
 
   width=120, show=FALSE, ...) {
 
-  
+   dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "values.cex")  values.size <- dots[[i]]
+    }
+  } 
 
   if (nargs() == 0) {
      theme <- "colors"
@@ -128,6 +132,7 @@ function(
   # reset: make change with new options, usually TRUE, but could be ...
   # set: save current options, get: get current options
   if (show || get) reset <- FALSE
+
 
   miss.set <- ifelse (missing(set), TRUE, FALSE) 
   miss.tr.bar.fill <- ifelse (missing(trans.bar.fill), TRUE, FALSE)
@@ -176,9 +181,9 @@ function(
 
     values <- set$bar$values
     values.color <- set$bar$values.color
-    values.cex <- set$bar$values.cex
+    values.size <- set$bar$values.size
     values.digits <- set$bar$values.digits
-    values.pos <- set$bar$values.pos
+    values.position <- set$bar$values.position
  
     pt.fill <- set$pt$fill
     trans.pt.fill <- set$pt$trans.fill
@@ -201,7 +206,6 @@ function(
     fit.lwd <- set$fit.lwd
     se.fill <- set$se.fill
     bubble.text.color <- set$bubble.text.color
-    heat <- set$heat 
     segment.color <- set$segment.color
     ID.color <- set$ID.color
     area.fill <- set$area.fill
@@ -378,12 +382,17 @@ function(
   add.fill[which(add.fill == "off")] <- "transparent"
 
   # see if a pre-defined color range, if not return the calling color
+  if (length(bar.fill) == 0) bar.fill <- getOption("bar.fill.discrete")
   bar.fill <- .color.range(bar.fill, 24, no.change=TRUE)
+  if (length(bar.color) > 0) bar.colro <- getOption("bar.color.discrete")
   bar.color <- .color.range(bar.color, 24, no.change=TRUE)
+  if (length(pt.fill) > 0) pt.fill <- getOption("pt.fill")
   pt.fill <- .color.range(pt.fill, 24, no.change=TRUE)
+  if (length(pt.color) > 0) pt.color <- getOption("pt.color")
   pt.color <- .color.range(pt.color, 24, no.change=TRUE)
-  add.fill <- .color.range(add.fill, 24, no.change=TRUE)
-  add.color <- .color.range(add.color, 24, no.change=TRUE)
+  if (length(add.fill) > 0) add.fill <- getOption("add.fill")
+  if (length(add.color) > 0) add.color <- getOption("add.color")
+    add.color <- .color.range(add.color, 24, no.change=TRUE)
 
   # default transparency levels
   if (reset) {
@@ -428,9 +437,9 @@ function(
     
     options(values=values)
     options(values.color=values.color)
-    options(values.cex=values.cex)
+    options(values.size=values.size)
     options(values.digits=values.digits)
-    options(values.pos=values.pos)
+    options(values.position=values.position)
     
     options(window.fill=window.fill)
     options(panel.fill=panel.fill)
@@ -595,7 +604,6 @@ function(
       fit.color = "black"
       area.fill = .maketrans("gray25", .to256("trans.bar.fill"))
       se.fill = .maketrans("gray10", 40) 
-      heat = "gray5"
       segment.color = "gray20"
       grid.color = "gray85"
       out.fill = "black"
@@ -628,7 +636,6 @@ function(
       strip.fill = .maketrans("gray55")
       fit.color = "gray15"
       area.fill = .maketrans("gray50", .to256("trans.bar.fill"))
-      heat = "gray30"
       main.color = "gray15"
       lab.color = "gray15"
       axis.color = "gray15"
@@ -686,7 +693,6 @@ function(
       ellipse.fill = .maketrans(clr1, 15)
       if (ellipse.color[1] != "transparent")
         ellipse.color = .maketrans(clr1, 200)
-      heat = clr2
       segment.color = clr1
       bubble.text.color = "black"
       strip.fill = .maketrans(clr1, 55) 
@@ -752,7 +758,6 @@ function(
       fit.color = "gray75"
       area.fill = .maketrans("gray55", .to256("trans.bar.fill"))
       se.fill = .maketrans("gray55", 65)
-      heat = "gray30"
       strip.color = .maketrans(clr1, .to256n(0.40))
       strip.text.color = "gray65"
       segment.color = "gray65"
@@ -764,7 +769,6 @@ function(
       grid.color = "gray25"
       add.color = "gray55"
       values.color = "gray85"
-      heat = "gray30"
       clr1 <- "gray55"
     }
   
@@ -782,7 +786,6 @@ function(
       axis.text.color = "gray85"
       add.color = "gray55"
       values.color = "gray85"
-      heat = "gray30"
 
       if (sum(col2rgb(panel.fill)) < 370) {
         strip.color = .maketrans(clr1, .to256n(0.40))
@@ -804,7 +807,6 @@ function(
         fit.color = rgb(209,87,3, maxColorValue=256)
         area.fill = rgb(249,99,2, alpha=.to256("trans.bar.fill"),
               maxColorValue=256)
-        heat="darkorange3"
         segment.color = rgb(249,99,2, maxColorValue=256)
         clr1 <- rgb(249,99,2, maxColorValue=256)
       }
@@ -832,9 +834,9 @@ function(
     
     options(values=values)
     options(values.color=values.color)
-    options(values.cex=values.cex)
+    options(values.size=values.size)
     options(values.digits=values.digits)
-    options(values.pos=values.pos)
+    options(values.position=values.position)
     
     options(window.fill=window.fill)
     options(panel.fill=panel.fill)
@@ -945,9 +947,9 @@ function(
       color = getOption("bar.color"),
       values = getOption("values"),
       values.color = getOption("values.color"),
-      values.cex = getOption("values.cex"),
+      values.size = getOption("values.size"),
       values.digits = getOption("values.digits"),
-      values.pos = getOption("values.pos")
+      values.position = getOption("values.position")
     )
 
     pt <- list(
@@ -1079,9 +1081,9 @@ function(
     color = bar.color,
     values = values,
     values.color = values.color,
-    values.cex = values.cex,
+    values.size = values.size,
     values.digits = values.digits,
-    values.pos = values.pos
+    values.position = values.position
   )
 
   pt <- list(
@@ -1210,7 +1212,6 @@ function(
     fit.lwd = getOption("fit.lwd"),
     se.fill = getOption("se.fill"),
     bubble.text.color = getOption("bubble.text.color"),
-    heat = getOption("heat"),
     segment.color = getOption("segment.color"),
     ID.color=getOption("ID.color"),
     area.fill=getOption("area.fill"),

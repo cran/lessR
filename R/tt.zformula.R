@@ -4,7 +4,7 @@ function (my.formula, y=NULL, data, ...) {
   # data frame existence check
   dname <- deparse(substitute(data))
   if (!exists(dname)) {
-    if (dname == "mydata") 
+    if (dname == "d") 
         txtA <- ", the default data frame name, " else txtA <- " "
       txtB1 <- "So either create data frame by reading with the Read function, or\n"
       txtB2 <- "  specify the actual data frame with the parameter: data\n"
@@ -17,7 +17,7 @@ function (my.formula, y=NULL, data, ...) {
 
   # Y existence check
   if (!exists(nm[1], where=data)) { 
-    if (dname == "mydata") {
+    if (dname == "d") {
       txt1 <- ", the default name \n\n"
       txt2 <- "So either make sure you are using the correct variable name, or\n"
       txt3 <- "  specify the actual data frame with the parameter: data\n"
@@ -57,7 +57,7 @@ function (my.formula, y=NULL, data, ...) {
 
   # X existence check
   if (!exists(nm[2], where=data)) { 
-    if (dname == "mydata") {
+    if (dname == "d") {
       txt1 <- ", the default name \n\n"
       txt2 <- "So either make sure you are using the correct variable name, or\n"
       txt3 <- "  specify the actual data frame with the parameter: data\n"

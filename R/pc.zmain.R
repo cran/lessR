@@ -4,7 +4,7 @@ function(x, y,
         radius, hole, hole.fill, edges, 
         clockwise, init.angle, 
         density, angle, lty, lwd,
-        values, values.pos, values.color, values.cex, values.digits,
+        values, values.position, values.color, values.cex, values.digits,
         labels.cex, main.cex, main, main.miss,
         add, x1, x2, y1, y2,
         quiet, pdf.file, width, height, ...)  {
@@ -211,13 +211,13 @@ function(x, y,
         lines(c(1, 1.05)*P$x, c(1, 1.05)*P$y)  # tick marks
 
 
-      if (values != "off") if (values.pos == "out")  # results to labels
+      if (values != "off") if (values.position == "out")  # results to labels
         labels[i] <- paste(labels[i], "\n", x.txt[i], sep="")
       if (labels.cex > 0)
          text(1.1 * P$x, 1.175 * P$y, labels[i], xpd=TRUE, 
            adj=ifelse(P$x < 0, 1, 0), cex=labels.cex, ...)  # labels
 
-      if (values != "off") if (values.pos == "in") {
+      if (values != "off") if (values.position == "in") {
         cx <- 0.82;  cy <- 0.86  # scale factors to position labels
         if (hole < 0.65) {  # scale factor to slide text down for small hole
           cx <- cx * (1 - (.16 * (1-hole)))  # max slide is 0.84

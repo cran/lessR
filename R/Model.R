@@ -1,11 +1,15 @@
 Model <-
-function(my.formula, data=mydata, brief=getOption("brief"), xlab=NULL, ...) {
+function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
 
 
   if (missing(my.formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify a model by listing it first or set according to:  my.formula\n\n")
   }
+
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
 
   dname <- deparse(substitute(data))  # get data frame name for cor before sort
   options(dname = dname)

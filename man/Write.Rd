@@ -8,11 +8,11 @@
 \description{
 Abbreviation: \code{wrt}, \code{wrt.r}
 
-Writes the contents of the specified data frame, such as with the default \code{mydata}, to the current working directory as either the default \code{csv} data file, an Excel data table, or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels and variable units are automatically included in a native R data file.
+Writes the contents of the specified data frame, such as with the default \code{d}, to the current working directory as either the default \code{csv} data file, an Excel data table, or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels and variable units are automatically included in a native R data file.
 }
 
 \usage{
-Write(ref=NULL, data=mydata, format=c("csv", "R", "Excel"), 
+Write(ref=NULL, data=d, format=c("csv", "R", "Excel"), 
          row.names=TRUE, \ldots)
 
 wrt(\ldots)
@@ -38,7 +38,7 @@ Can specify the file name without the file type, which \code{Write} adds automat
 
 An Excel file is written using functions from Alexander Walker's \code{\link{openxlsx}} package.
 
-\code{Write} is designed to work in conjunction with the function \code{\link{Read}} from this package, which reads a csv, fixed width format, or native SPSS or R data files into the data frame \code{mydata}. \code{Write} relies upon the R functions \code{\link{write.csv}} and \code{\link{save}}.
+\code{Write} is designed to work in conjunction with the function \code{\link{Read}} from this package, which reads a csv, fixed width format, or native SPSS or R data files into the data frame \code{d}. \code{Write} relies upon the R functions \code{\link{write.csv}} and \code{\link{save}}.
 
 When writing the data frame in native R format, the specified name of the resulting \code{.rda} file is distinct from the name of the data frame as stored within R.
 }
@@ -50,16 +50,16 @@ When writing the data frame in native R format, the specified name of the result
 }
 
 \examples{
-# create data frame called mydata
+# create data frame called d
 n <- 12
 X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
 Y <- rnorm(n=n, mean=50, sd=10)
-mydata <- data.frame(X,Y)
+d <- data.frame(X,Y)
 
-# write the current contents of default data frame mydata to GoodData.csv
+# write the current contents of default data frame d to GoodData.csv
 Write("GoodData")
 # short name
-# write the default data frame mydata to the R data file mydata.rda
+# write the default data frame d to the R data file d.rda
 wrt.r()
 
 # write the data as an Excel data table in an Excel file

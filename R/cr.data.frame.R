@@ -1,6 +1,6 @@
 .cr.data.frame <-
 function(x, miss, show.n, digits.d,
-         graphics, main, bottom, right, 
+         heat.map, fill.low, fill.hi, main, bottom, right, 
          pdf, width, height, ...)  {
 
   if (!is.null(digits.d) && digits.d<1) {
@@ -21,7 +21,7 @@ function(x, miss, show.n, digits.d,
   for (i in 1:ncol(x)) {
 
     x.name <- names(x)[i]
-    options(xname = x.name)
+    options(xname = x.name)  # sets for each variable   WHY???
 
     #nu <- length(unique(na.omit(x[,i])))
     #if (.is.num.cat(x[,i], n.cat)) {
@@ -107,7 +107,7 @@ function(x, miss, show.n, digits.d,
     if (tot.miss == 0) 
       tx[length(tx)+1] <- paste("\n>>> No missing data")
     else {
-      .ss.factor(as.vector(n), brief=TRUE)
+      .ss.factor(as.vector(n), brief=TRUE, x.name=" ")  # x.name KLUDGE
       if (n.vars <= 15  ||  show.n) {
         txn <- .prntbl(n, 2, cc=" ")
         for (i in 1:length(txn)) tx[length(tx)+1] <- txn[i]
@@ -135,64 +135,73 @@ function(x, miss, show.n, digits.d,
     tx[length(tx)+1] <- toString(names(x))
     tx[length(tx)+1] <- paste("\nTo view the correlation matrix, ",
      "enter the name of the returned object\n", 
-     "followed by  $cors  such as  mycor$cors\n", sep="")
+     "followed by  $R  such as  mycor$R\n", sep="")
   }
 
   txc <- tx
 
 
-  if (graphics  ||  pdf) {
-
-    # set up graphics system for 2 windows
-    #if (!pdf) {
-      #.graphwin(2)
-      #dev.set(which=3)
-    #}
-    #else { 
-      #pdf.file <- "Cor_SPmatrix.pdf"
-      #pdf(file=pdf.file, width=width, height=height)
-    #}
-  
-    # scatter plot matrix
-      #panel2.smooth <- function (x, y, pch=par("pch"), cex=.9,
-        #col.pt=getOption("pt.color"), col.smooth=getOption("bar.color"),
-        #span=2/3, iter=3, ...) 
-      #{
-          #points(x, y, pch=pch, col=col.pt, cex=cex)
-          #ok <- is.finite(x) & is.finite(y)
-          #if (any(ok)) 
-            #lines(lowess(x[ok], y[ok], f=span, iter=iter), col=col.smooth, ...)
-      #}
-
-    #pairs(x, panel=panel2.smooth)
-
-    #if (pdf) {  # terminate pdf graphics
-      #dev.off()
-      #.showfile(pdf.file, "scatter plot matrix")
-    #}
+  if (heat.map  ||  pdf) {
 
     # heat map
     if (!pdf) {
-      .graphwin(1)
-      dev.set(which=3) 
+      manage.gr <- .graphman()  # manage graphics?
+      if (manage.gr) {
+        .graphwin(1)
+        dev.set(which=3) 
+      }
     }
     else { 
       pdf.file <- "Cor_HeatMap.pdf"
       pdf(file=pdf.file, width=width, height=height)
     }
 
-    if (is.null(main)) main <- "Correlations"
+    # NEED to integrate into .corcolors
+    if (is.null(fill.low)  &&  is.null(fill.hi)) {      
+      if (getOption("theme") %in% c("colors", "dodgerblue", "blue", 
+                                    "lightbronze")) {
+        fill.low <- "rusts"
+        fill.hi <- "blues"
+      }
+      else if (getOption("theme") %in% c("darkred", "red", "rose")) {
+        fill.low <- "turquoises" 
+        fill.hi <- "reds"
+      }
+      else if (getOption("theme") %in% c("darkgreen", "green")) {
+        fill.low <- "violets" 
+        fill.hi <- "greens"
+      }
+      else if (getOption("theme") %in% c("gold", "brown", "sienna")) {
+        fill.low <- "blues" 
+        fill.hi <- "browns"
+      }
+      else if (getOption("theme") %in% c("gray", "white")) {
+        fill.low <- "white"
+        fill.hi <- "black"
+      }
+    }
 
-    for (i in 1:ncol(crs)) crs[i,i] <- 0
-    cat("\nNote: To provide more color separation for off-diagonal\n",
-        "      elements, the diagonal elements of the matrix for\n",
-        "      computing the heat map are set to 0.\n", sep="")
+    else if (is.null(fill.low) || is.null(fill.hi)) { 
+      fill.low <- "white"
+      fill.hi <- "gray20"
+    }
 
-    max.color <- getOption("heat")
-    hmcols <- colorRampPalette(c("white",max.color))(256)
+    # fill.low and fill.hi "blues", etc, then divergent, else sequential`
+#   if (getOption("theme") %in% c("gray", "white"))
+#     hmcols <- getColors("grays", "grays", l=c(10,100))
+#   else
+      hmcols <- getColors(fill.low, fill.hi, l=c(10,90))
+#   hmcols <- colorRampPalette(c(fill.low, fill.hi))(256)
+
+    axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")),
+        getOption("axis.cex"), getOption("axis.x.cex"))
+    axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")),
+        getOption("axis.cex"), getOption("axis.y.cex"))
 
     heatmap(crs[1:ncol(crs),1:ncol(crs)], Rowv=NA, Colv="Rowv", symm=TRUE,
-      col=hmcols, margins=c(bottom, right), main=main)
+      col=hmcols, margins=c(bottom, right), main=main,
+      cexRow=axis.x.cex, cexCol=axis.y.cex)
+
 
     if (pdf) {  # terminate pdf graphics
       dev.off()
@@ -204,8 +213,7 @@ function(x, miss, show.n, digits.d,
   else
     if (is.null(options()$knitr.in.progress))
       cat("\n>>> To view comments, enter the name of the saved object, e.g., mycor\n")
-      cat("\n>>> To view a heat map, set:  graphics=TRUE\n\n")
 
-  return(list(txb=txb, txm=txm, txc=txc, cors=crs))
+  return(list(txb=txb, txm=txm, txc=txc, R=crs))
 
 }

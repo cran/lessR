@@ -45,7 +45,7 @@ Guidance and feedback regarding the merge are provided by default. The first fiv
 }
 
 \value{
-The merged data frame is returned, usually assigned the name of \code{mydata} as in the examples below.  This is the default name for the data frame input into the \code{lessR} data analysis functions.
+The merged data frame is returned, usually assigned the name of \code{d} as in the examples below.  This is the default name for the data frame input into the \code{lessR} data analysis functions.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -57,21 +57,21 @@ The merged data frame is returned, usually assigned the name of \code{mydata} as
 \examples{
 # Horizontal
 #-----------
-mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 Emp1a <- Subset(1:4, columns = c("Years", "Gender", "Dept", "Salary"))
 Emp1b <- Subset(1:4, columns = c("JobSat", "Plan"))
 # horizontal merge
-mydata <- Merge(Emp1a, Emp1b, by="row.names")
+d <- Merge(Emp1a, Emp1b, by="row.names")
 # suppress output to console
-mydata <- Merge(Emp1a, Emp1b, by="row.names", quiet=TRUE)
+d <- Merge(Emp1a, Emp1b, by="row.names", quiet=TRUE)
 
 # Vertical
 #---------
-mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 Emp2a <- Subset(1:4)
 Emp2b <- Subset(7:10)
 # vertical merge
-mydata <- Merge(Emp2a, Emp2b)
+d <- Merge(Emp2a, Emp2b)
 
 
 }

@@ -10,13 +10,13 @@ Abbreviation: \code{reg}, \code{reg.brief}
 
 Provides a regression analysis with extensive output, including graphics, from a single, simple function call with many default settings, each of which can be re-specified. The computations are obtained from the \code{R} function \code{\link{lm}} and related \code{R} regression functions. The outputs of these functions are re-arranged and collated.
 
-By default the data exists as a data frame with the default name of \code{mydata}, or specify explicitly with the \code{data} option.  Specify the model in the function call as an R \code{\link{formula}}, that is, for a basic model, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign, such as \code{reg(Y ~ X1 + X2)}.
+By default the data exists as a data frame with the default name of \code{d}, or specify explicitly with the \code{data} option.  Specify the model in the function call as an R \code{\link{formula}}, that is, for a basic model, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign, such as \code{reg(Y ~ X1 + X2)}.
 
 Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document -- either html, pdf or Word -- by default with explanation and interpretation. Generate a complete  R~Markdown file with filetype (\code{.Rmd}) from the \code{Rmd} option. Simply specify the option with a file name in quotes, then run the Regression analysis to create the markdown file. Open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results plus interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information.
 }
 
 \usage{
-Regression(my.formula, data=mydata, rows=NULL,
+Regression(my.formula, data=d, rows=NULL,
            digits.d=NULL, standardize=FALSE,
 
          Rmd=NULL,
@@ -49,7 +49,7 @@ reg.brief(\ldots, brief=TRUE)
        example, for a response variable named Y and two predictor variables, X1 and
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
   \item{data}{The default name of the data frame that contains the data for analysis
-       is \code{mydata}, otherwise explicitly specify.}
+       is \code{d}, otherwise explicitly specify.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits,
@@ -148,7 +148,7 @@ The purpose of \code{Regression} is to combine the following function calls into
 The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of a linear model, \code{\link{lm}}. The output of the analysis of \code{\link{lm}} is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Regression} function. By default \code{reg} automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The correlation matrix of the model variables is obtained with \code{\link{cor}} function. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard R function \code{\link{predict}}, once with the argument \code{interval="confidence"} and once with \code{interval="prediction"}. The \code{lessR} \code{\link{Density}} function provides the histogram and density plots for the residuals and the \code{\link{ScatterPlot}} function provides the scatter plots of the residuals with the fitted values and of the data for the one-predictor model. The \code{pairs} function provides the scatterplot matrix of all the variables in the model. Thomas Lumley's \code{leaps} package contains the \code{leaps} function that provides the analysis of the fit of all possible model subsets.
 
 INPUT DATA FRAME\cr
-The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{mydata}.
+The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{d}.
        
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -276,9 +276,9 @@ Xie, Y. (2013). Dynamic Documents with R and knitr, Chapman & Hall/CRC The R Ser
 
 \examples{
 # read internal data set
-mydata <- rd("Reading", in.lessR=TRUE, quiet=TRUE)
+d <- rd("Reading", in.lessR=TRUE, quiet=TRUE)
 # do not need all this data, so take only 30% to reduce CPU time
-mydata <- Subset(random=.3)
+d <- Subset(random=.3)
 
 # one-predictor regression
 # Provide all default analyses including scatterplot etc.
@@ -318,12 +318,12 @@ Nest(Reading, Verbal, c(Income, Absent))
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values and the corresponding prediction intervals
-# Specify an input data frame other than mydata, see help(mtcars)
+# Specify an input data frame other than d, see help(mtcars)
 Regression(mpg ~ hp + wt, data=mtcars,
   X1.new=seq(50,350,50), X2.new=c(2,3))
 
 # Indicator (dummy) variable
-mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 reg(Salary ~ Dept)
 }
 

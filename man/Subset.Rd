@@ -7,12 +7,12 @@
 \description{
 Abbreviation: \code{subs}
 
-Based directly on the standard R \code{\link{subset}} function to only include or exclude specified rows or data, and for specified columns of data.  Output provides feedback and guidance regarding the specified subset operations. Rows of data may be randomly extracted, and also with the code provided to generate a hold out validation sample created. The hold out sample is created from the original data frame, usually named mydata, so the subset data frame must be directed to a data frame with a new name or the data re-read to construct the holdout sample. Any existing variable labels are retained in the subset data frame.
+Based directly on the standard R \code{\link{subset}} function to only include or exclude specified rows or data, and for specified columns of data.  Output provides feedback and guidance regarding the specified subset operations. Rows of data may be randomly extracted, and also with the code provided to generate a hold out validation sample created. The hold out sample is created from the original data frame, usually named d, so the subset data frame must be directed to a data frame with a new name or the data re-read to construct the holdout sample. Any existing variable labels are retained in the subset data frame.
 
 }
 
 \usage{
-Subset(rows, columns, data=mydata, holdout=FALSE,
+Subset(rows, columns, data=d, holdout=FALSE,
        random=0, quiet=getOption("quiet"), \ldots)
 
 subs(\ldots)
@@ -25,7 +25,7 @@ subs(\ldots)
   \item{columns}{Specify the columns, i.e., variables, to be included or
         deleted.}
   \item{data}{The name of the data frame from which to create the subset, which
-       is \code{mydata} by default.}
+       is \code{d} by default.}
   \item{holdout}{Create a hold out sample for validation if rows is a proportion
        or an integer to indicate random extraction of rows of data.}
   \item{random}{If an integer or proportion, specifies number of rows to data
@@ -48,7 +48,7 @@ To indicate retaining a variable, specify at least one variable name. To specify
 }
 
 \value{
-The subset of the data frame is returned, usually assigned the name of \code{mydata} as in the examples below.  This is the default name for the data frame input into the \code{lessR} data analysis functions.
+The subset of the data frame is returned, usually assigned the name of \code{d} as in the examples below.  This is the default name for the data frame input into the \code{lessR} data analysis functions.
 }
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
@@ -58,7 +58,7 @@ The subset of the data frame is returned, usually assigned the name of \code{myd
 
 \examples{
 # construct data frame
-mydata <- read.table(text="Severity Description
+d <- read.table(text="Severity Description
 1 Mild
 4 Moderate
 3 Moderate
@@ -66,12 +66,12 @@ mydata <- read.table(text="Severity Description
 1 Severe", header=TRUE)
 
 # only include those with a value of Moderate for Description
-mydata <- Subset(rows=Description=="Moderate")
+d <- Subset(rows=Description=="Moderate")
 # use abbreviation and do not need the rows= for the first argument
-mydata <- subs(Description=="Moderate")
+d <- subs(Description=="Moderate")
 
 # locate, that is, display only, the 2nd and 4th rows of data
-Subset(row.names(mydata)=="2" | row.names(mydata)=="4")
+Subset(row.names(d)=="2" | row.names(d)=="4")
 
 # retain only the first and fourth rows of data, store in myd
 myd <- Subset(c(1,4))
@@ -83,19 +83,19 @@ myd <- Subset(-c(1,4))
 #   and breaks plus continuous measure tension
 # retain only the A level of wool and the L level of tension,
 #   and the one variable breaks
-mydata <- Subset(wool=="A" & tension=="L", columns=breaks, data=warpbreaks)
+d <- Subset(wool=="A" & tension=="L", columns=breaks, data=warpbreaks)
 
 # delete Years and Salary 
-mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
-mydata <- Subset(columns=-c(Years, Salary))
+d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Subset(columns=-c(Years, Salary))
 
 # locate, display only, a specified row by its row.name
-mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
-Subset(row.names(mydata)=="Fulton, Scott")
+d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+Subset(row.names(d)=="Fulton, Scott")
 
 # randomly extract 60\% of the data
 # generate code to create the hold out sample of the rest
-mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 mysubset <- Subset(random=.6, holdout=TRUE)
 }
 

@@ -1,5 +1,5 @@
 PieChart <-
-function(x, y=NULL, data=mydata, rows=NULL,
+function(x, y=NULL, data=d, rows=NULL,
 
          radius=1, hole=0.65, hole.fill=getOption("panel.fill"),
 
@@ -16,7 +16,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
          values.color=getOption("values.color"), 
          values.size=getOption("values.size"),
          values.digits=getOption("values.digits"),
-         values.pos=getOption("values.pos"),
+         values.position=getOption("values.position"),
 
          main=NULL, main.cex=1.2, labels.cex=0.9, cex,
 
@@ -43,7 +43,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
   }
 
   if (missing(values) && (!missing(values.color) || !missing(values.size)
-      || !missing(values.digits) || !missing(values.pos)))
+      || !missing(values.digits) || !missing(values.position)))
     values <- "%"
 
   if (is.null(values.digits)) {
@@ -53,7 +53,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
 
   if (missing(values.color)) {
     values.color <- "white" 
-    if (values.pos == "out") values.color <- getOption("axis.text.color")
+    if (values.position == "out") values.color <- getOption("axis.text.color")
   }
 
   if (missing(x)) {
@@ -197,7 +197,7 @@ function(x, y=NULL, data=mydata, rows=NULL,
         radius, hole, hole.fill, edges, 
         clockwise, init.angle, 
         density, angle, lty, lwd,
-        values, values.pos, values.color, values.size, values.digits,
+        values, values.position, values.color, values.size, values.digits,
         labels.cex, main.cex, main, main.miss,
         add, x1, x2, y1, y2,
         quiet, pdf.file, width, height, ...)

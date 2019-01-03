@@ -1,17 +1,18 @@
 Density <-
-function(x, data=mydata, rows=NULL,
+function(x, data=d, rows=NULL,
          n.cat=getOption("n.cat"), Rmd=NULL,
 
        bw=NULL, type=c("both", "general", "normal"),
        histogram=TRUE, bin.start=NULL, bin.width=NULL,
 
-       nrm.color="black", gen.color="black",
+       color.nrm="black", color.gen="black",
        fill.nrm=NULL, fill.gen=NULL,
 
        axis.text.color="gray30", rotate.x=0, rotate.y=0, offset=0.5,
 
        x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE,
-       x.min=NULL, x.max=NULL, band=FALSE,
+       x.min=NULL, x.max=NULL,
+       rug=FALSE, color.rug="black", size.rug=0.5,
 
        eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
        width=4.5, height=4.5, pdf=FALSE,
@@ -21,35 +22,55 @@ function(x, data=mydata, rows=NULL,
   type <- match.arg(type)
   if (is.null(fun.call)) fun.call <- match.call()
 
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
+
   fill <- getOption("se.fill")
   panel.fill <- getOption("panel.fill")
   panel.color <- getOption("panel.color")
   lab.cex <- getOption("lab.cex")
   axis.cex <- getOption("axis.cex")
 
+  if (!missing(color.rug) || !missing(size.rug)) rug <- TRUE
+
   bw.miss <- ifelse (missing(bw), TRUE, FALSE)
+
+  # replaced older names with current name
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "band")  rug <- dots[[i]]
+      if (names(dots)[i] == "gen.color") color.gen <- dots[[i]]
+      if (names(dots)[i] == "nrm.color") color.nrm <- dots[[i]]
+    }
+  }
 
   # see if dated parameter values
   .param.old(...)
 
   clr <- getOption("theme")  # color theme not used except for monochrome
 
-  if (missing(fill))
-    if (.Platform$OS == "windows")
-      fill <- "gray80"
-    else
-      fill <- "gray86"
+# if (missing(fill))
+#   if (.Platform$OS == "windows")
+#     fill <- "gray80"
+#   else
+#     fill <- "gray86"
 
-  if (missing(fill.nrm))
+  if (missing(fill.nrm)) {
       fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
+    if (clr == "gray" ||
+       (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black")) {
+      fill.nrm <- "transparent"
+    }
+  }
 
-  if (missing(fill.gen))
+  if (missing(fill.gen)) {
       fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
-
-  if (clr == "gray" ||
-     (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black")) {
-    fill.nrm <- "transparent"
-    fill.gen <- rgb(.75,.75,.75, .5)
+    if (clr == "gray" ||
+       (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black")) {
+      fill.gen <- rgb(.75,.75,.75, .5)
+    }
   }
 
   
@@ -66,7 +87,7 @@ function(x, data=mydata, rows=NULL,
   df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
-  if (exists(df.name, where=.GlobalEnv)) {  # tibble to df
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
     if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
@@ -193,9 +214,10 @@ function(x, data=mydata, rows=NULL,
 
       stuff <- .dn.main(data[,i], bw, type, histogram, bin.start, bin.width,
             fill, panel.fill, panel.color,
-            nrm.color, gen.color, fill.nrm, fill.gen,
+            color.nrm, color.gen, fill.nrm, fill.gen,
             lab.cex, axis.cex, axis.text.color, rotate.x, rotate.y, offset,
-            x.pt, xlab, main, sub, y.axis, x.min, x.max, band, quiet, ...)
+            x.pt, xlab, main, sub, y.axis, x.min, x.max,
+            rug, color.rug, size.rug, quiet, ...)
 
       txdst <- ""
       txotl <- ""

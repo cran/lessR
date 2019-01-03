@@ -1,5 +1,5 @@
 Histogram <-
-function(x=NULL, data=mydata, rows=NULL,
+function(x=NULL, data=d, rows=NULL,
          theme=getOption("theme"), n.cat=getOption("n.cat"), Rmd=NULL,
 
     by1=NULL, by2=NULL,
@@ -32,6 +32,10 @@ function(x=NULL, data=mydata, rows=NULL,
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumul <- match.arg(cumul)
+
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
 
   if (theme != getOption("theme")) {
     sty <- style(theme, reset=FALSE)
@@ -88,7 +92,7 @@ function(x=NULL, data=mydata, rows=NULL,
   df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
-  if (exists(df.name, where=.GlobalEnv)) {  # tibble to df
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
     if ((missing(data) && shiny))  # force eval (not lazy) if data not specified

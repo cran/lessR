@@ -8,7 +8,7 @@ Deprecated, replaced by \code{\link{VariableLabels}}. Display a variable label f
 }
 
 \usage{
-label(x, value=NULL, data=mydata)
+label(x, value=NULL, data=d)
 }
 
 
@@ -26,7 +26,7 @@ Standard R does not provide for variable labels, but \code{lessR} does.  Read th
 
 The function provides two different modes. The first mode is to return the variable name and label for an existing variable label. One such use is to provide the function as an argument to an existing R function call to access a \code{lessR} variable label. For example, use the function as the argument for \code{main} in graphics output, where \code{main} is the title of the graph. This mode is triggered by not invoking the \code{value} option.
 
-The second mode is to assign a variable label to an existing variable. Invoke this mode by specifying a variable label with the \code{value} option. The function accesses the entire specified data frame, and then modifies the specified variable label. As such, assign the output of the function to the data frame of interest, such as the default \code{mydata}. One use of this function is to add a variable label to a data frame that contains a new variable created by a transformation of the existing variables. 
+The second mode is to assign a variable label to an existing variable. Invoke this mode by specifying a variable label with the \code{value} option. The function accesses the entire specified data frame, and then modifies the specified variable label. As such, assign the output of the function to the data frame of interest, such as the default \code{d}. One use of this function is to add a variable label to a data frame that contains a new variable created by a transformation of the existing variables. 
 }
 
 \value{
@@ -41,24 +41,24 @@ The specified value of \code{value} is returned.
 
 \examples{
 # read the data and variable labels
-#mydata <- rd("http://lessRstats.com/data/employee.xlsx")
+#d <- rd("http://lessRstats.com/data/employee.xlsx")
 #mylabels <- vl("http://lessRstats.com/data/employee_lbl.xlsx")
 
 # variable label as the title of a graph for non-lessR functions
 # base R
-#hist(mydata$Salary, xlab=label(Salary))
+#hist(d$Salary, xlab=label(Salary))
 # ggplot2
-#ggplot(mydata, aes(Salary)) + geom_histogram(binwidth=10000) + labs(x=label(Salary))
+#ggplot(d, aes(Salary)) + geom_histogram(binwidth=10000) + labs(x=label(Salary))
 
-# assign a new label for the variable Years in mydata
-#mydata <- label(Years, "Years Worked")
+# assign a new label for the variable Years in d
+#d <- label(Years, "Years Worked")
 # verify
 #label(Years)
-# or view all variable labels in mydata
+# or view all variable labels in d
 #db()
 
-#mydata <- Read("Employee", in.lessR=TRUE)
-# specify a label of variable in a data frame other than mydata
+#d <- Read("Employee", in.lessR=TRUE)
+# specify a label of variable in a data frame other than d
 #myd <- Subset(Gender=="M")
 #myd <- label(Gender, "Only is Male", data=myd)
 #db(myd)

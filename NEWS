@@ -6,6 +6,96 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
  
  
+>>>>>> Changes for lessR version 3.8.0 (2019-01-02) <<<<<<
+
+-------------
+Updates 3.8.0
+-------------
+
+all data analysis routines
+  d is new name for default data frame, deprecated mydata still works
+ 
+BarChart
+  for 100% bar chart, chi-square test displayed right after two-way
+    frequency table it assesses, before column proportions
+  proportions on y-axis print with two digits consistently
+  legend adjusts in size according to the size of x-axis values
+  box around legend removed
+  values.position new name for values.pos, which still works
+  legend.size new parameter for size of legend text
+
+Correlation
+  fill.low and fill.hi parameters added for a custom sequential
+    palette for a heat map
+  output correlation matrix named R instead of cors
+  heat.map new name for graphics because only heat.map generated
+
+corReorder
+  diagonal.new option added for diagonal of matrix to be replaced
+    with average value of item on the diagonal with adjacent item
+  n.clusters parameter added to get cluster membership for
+    specified number of clusters for hierarchical cluster solution
+  new parameter order specifies ordering procedure of retained
+    correlations
+  hierarchical cluster analysis new ordering technique and default
+ 
+Correlation, corReflect, corCFA, corProp, corReflect
+  correlation heat map now with divergent scales except for "grays",
+    which is sequential from "white" to "black"
+  axis.cex controls size of axis labels
+
+Density
+  for consistency, color.gen and color.nrm new names for gen.color
+    and nrm.color
+  rug new name for parameter band to better describe the option
+  if indicated gray scale, can still customize non-gray colors
+  added parameters color.rug and size.rug
+
+factors
+  new name for deprecated name doFactors, create multiple factors
+
+Plot
+  default size for bubble plot set to power=0.5, that is the 
+   value of size that maps into the area so that a size of 0 maps
+   to 0, before was close, old value of power was 0.6 
+  smooth.exp the more descriptive name for smooth.trans
+  scatterplot matrices with reg line now have CI about line
+
+style
+  values.size new name for deprecated name values.cex
+
+
+---------------
+Bug Fixes 3.8.0
+--------------- 
+
+all analysis functions
+  prior search for data frames in the global environment was
+    too broad, going into sub-objects, now properly restrictive
+
+BarChart
+  when not in default "colors" theme, two variable bar chart
+    properly displays two colors
+  title of horizontal legend correct
+  location of top legend plots correctly
+  non-factor by variables more consistently processed
+  by1 option works consistently
+
+Plot
+  when size is a variable, correct labeling of min and max
+    bubble sizes
+  Bubble Plot Frequency Matrix works
+
+ttest
+  two-group pdf.file properly created when requested
+
+Write
+  Excel format works for any name of input file, not just the
+    default name d (or old mydata)
+
+
+ 
+ 
 >>>>>> Changes for lessR version 3.7.9 (2018-12-10) <<<<<<
 
 -------------
@@ -675,7 +765,7 @@ Histogram
 Plot
   means for categorical-continuous plot now printed if for a non-factor
     categorical variable (i.e., a small number of integer values)
-  time series from global plots even if no mydata data frame exists
+  time series from global plots even if no d data frame exists
  
 
 
@@ -1197,7 +1287,7 @@ error trapping
     of existing lessR explanations and the following additions:
     1. specifying variables to analyze that do not exist in the data table
     2. specifying variables to analyze without having a data table
-    3. naming the intended default data table Mydata instead of mydata
+    3. naming the intended default data table Mydata instead of d
     4. calling a data frame in place of a variable in ttest
     5. improperly enclosing a variable name in quotes in a function call
     6. failing to specify a variable to analyze in ttest and ScatterPlot
@@ -1347,7 +1437,7 @@ Read, details
 Regression
   knitr.file option has added display options code for displaying the
     code that generated the results and document for documenting the code 
-  knitr.file option extended to work with mydata <- rd(), that is browse
+  knitr.file option extended to work with d <- rd(), that is browse
     for the file to read before doing the regression
   improved use of variable units in R Markdown from knitr.file option
 
@@ -1732,8 +1822,8 @@ Subset
     replaces the dual use of the rows parameter to both perform
     this task and provide a direct specification of the rows of the
     data table to be included/excluded, so now the following work: 
-      mydata <- Subset(c(1,4))  # retain only rows 1 and 4
-      mydata <- Subset(-c(1,4)) # delete only rows 1 and 4
+      d <- Subset(c(1,4))  # retain only rows 1 and 4
+      d <- Subset(-c(1,4)) # delete only rows 1 and 4
 
 ttest
   new parameter: line.chart
@@ -1894,7 +1984,7 @@ Note:  The Excel read functionality added in 2.9.2 is removed because it require
 
   > install.packages("xlsx")     # one time only
   > library(xlsx)                # for each R session to invoke the following
-  > mydata <- read.xlsx(file.choose(), sheetIndex=1)
+  > d <- read.xlsx(file.choose(), sheetIndex=1)
 
     This provides for a direct read of an Excel file by browsing for the file.
     To specify a specific path name or URL, replace file.choose() with the
@@ -2047,22 +2137,22 @@ the destination of the output file.
 
 What that means for lessR is that any function that outputs a
 data table now cannot automatically write that data table to
-mydata or other chosen name. Instead you must now explicitly
+d or other chosen name. Instead you must now explicitly
 assign the output data table name when reading or modifying data,
-usually use  mydata  or  mycor. To do this, use the R assign
+usually use  d  or  mycor. To do this, use the R assign
 notation, <- , which assigns anything on the right side to whatever
 is on the left side of the expression.
-    > mydata <- Read()
-    > mydata <- Transform(Y=X/12)     also Subset, Merge, Recode, Sort
+    > d <- Read()
+    > d <- Transform(Y=X/12)     also Subset, Merge, Recode, Sort
     > mycor <- Correlation()
 If you do not make this explicit assignment, the function still
 works, but the output is dumped at the console instead of sent
-to a stored data frame such as mydata to be available for later analysis.
+to a stored data frame such as d to be available for later analysis.
 
 
 Other generic changes:
 
-To be consistent with R functions, the data frame option has been changed from dframe to data.  Usually this is not used as the default mydata is relied upon, but now specify other names with the data option.
+To be consistent with R functions, the data frame option has been changed from dframe to data.  Usually this is not used as the default d is relied upon, but now specify other names with the data option.
 
 Previously the brief option was used inconsistently.  For some functions it lead to a brief output, and for others it suppressed output.  It remains for functions that primarily send output to the console.  For graphics functions and data modification functions, now completely suppress output with quiet=TRUE.
 
@@ -2084,10 +2174,10 @@ default system setting
     a categorical variable by default, changed to 0, turned off by default
 
 Recode, Sort, Subset, Transform
-  now precede the function call with, for example:   mydata <-
+  now precede the function call with, for example:   d <-
 
 Read
-  now precede the function call with, for example:   mydata <-
+  now precede the function call with, for example:   d <-
   variable labels now incorporated directly into the data frame and
     are now read with the labels option
   rd is the abbreviation, though the older rad is still available
@@ -2252,7 +2342,7 @@ Read
   can read directly from built-in data sets with lessR.data= option
 
 Write
-  write any specified data frame, not just the default mydata
+  write any specified data frame, not just the default d
   specify any file name or rely upon the default
   by default write row IDs as part of the written csv file
   the dframe option moved to the end of the parameter list to be
@@ -2537,7 +2627,7 @@ SummaryStats
 
 BarChart
   legend placement option for right margin added to the standard R legend
-    locations and is now the default, legend.loc="right.margin"
+    locations and is now the default, legend.position="right.margin"
   legend in right margin accommodates variable labels
   for displayed cross-tabulation table, variable names instead of 
      variable labels used
@@ -2619,11 +2709,11 @@ subsequent analyses, or it may be set for any one specific call to Plot.
 Direct Reference of Variable Names (from 2.2)
 ----------------------------------
 lessR defaults the name of the data frame with data read from the Read or rad 
-function with mydata. Now this convention is leveraged by dropping the need for the
+function with d. Now this convention is leveraged by dropping the need for the
 R attach function, or by having to include the data frame name and a $ in front of
 the variable name, or using the with function. Instead, for each specified variable
 name, lessR searches the user's workspace, the global environment, as well as the
-data frame mydata, or the specified data frame name, for the relevant variable.
+data frame d, or the specified data frame name, for the relevant variable.
 
 Variable Labels (from 2.2)
 ---------------
@@ -2741,7 +2831,7 @@ system wide
   a variable named with the name of an R function is now permissible
 
 ttest, tt
-  Analysis from summary statistics does not need a mydata data frame 
+  Analysis from summary statistics does not need a d data frame 
            to exist prior to the function call
   Variable labels no longer switched on response and grouping variables
   Labels now work with one group analysis
@@ -2887,7 +2977,7 @@ package
 
 rad   [in 2.3 also named Read]
   display name of file read at the beginning of the output only if rad()
-  default is now to not attach mydata
+  default is now to not attach d
   add read labels options with rad.labels and rad.both
   add max.lines options and display full data/labels when applicable
   convert display option to brief option, add function

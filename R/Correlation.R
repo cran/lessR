@@ -1,25 +1,33 @@
 Correlation <-
-function(x, y, data=mydata, # x can be a data frame, or variables in a data frame
+function(x, y, data=d, # x can be a data frame, or variables in a data frame
          miss=c("pairwise", "listwise", "everything"),
+         fill.low=NULL, fill.hi=NULL,
          show.n=NULL, brief=FALSE, 
-         digits.d=NULL, graphics=FALSE,
+         digits.d=NULL, heat.map=TRUE,
          main=NULL, bottom=3, right=3,
          pdf=FALSE, width=5, height=5, ...) {
 
 
   miss <- match.arg(miss)
+
+  # replaced older names with current name
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "graphics")  heat.map <- dots[[i]]
+    }
+  }
   
   x.name <- deparse(substitute(x))
-  options(xname = x.name)
 
   is.df <- FALSE  # is data frame
 
   if (missing(y)) {  # is a data frame or a list of variables
 
     if (missing(x)) {
-      x.name <- ""  # in case x is missing, i.e., data frame mydata
+      x.name <- "$"  # in case x is missing, i.e., data frame d
       is.df <- TRUE
-      if (missing(data)) data <- eval(substitute(mydata))
+      if (missing(data)) data <- eval(substitute(d))
     }
 
     else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {
@@ -37,7 +45,8 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
       names(all.vars) <- names(data)
 
       # proceed here only if x.name is in data or is a list
-      if ( (x.name %in% names(all.vars)) || grepl(":", x.name) || grepl(",", x.name) ) {
+      if ( (x.name %in% names(all.vars)) || grepl(":", x.name)
+            || grepl(",", x.name) ) {
         x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
 
         # if x is a variable list, create subset data frame
@@ -102,7 +111,7 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
     if (is.null(show.n))
       if (nrow(data) <= 15) show.n <- TRUE else show.n <- FALSE
     stuff <- .cr.data.frame(data, miss, show.n, digits.d,
-                   graphics, main, bottom, right, 
+                   heat.map, fill.low, fill.hi, main, bottom, right, 
                    pdf, width, height, ...) 
 
     txbck <- stuff$txb
@@ -115,15 +124,15 @@ function(x, y, data=mydata, # x can be a data frame, or variables in a data fram
 
     output <- list(
       out_background=txbck, out_missing=txmis, out_cor=txcor,
-      cors=stuff$cors)
+      R=stuff$R)
   }
 
   else {
   
     if (pdf) {
       cat("\n");   warning(call.=FALSE, "\n","------\n",
-        " To produce a scatter plot, use the function:  ScatterPlot\n",
-        " No graphics produced here and yet pdf is specified.\n\n",
+        " To produce a scatter plot, pass a vector to:  Plot\n",
+        " No heat map produced here and yet pdf is specified.\n\n",
          sep="")
      }
 

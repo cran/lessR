@@ -138,8 +138,10 @@ function(x, by1, by2, nrows, ncols, asp, prop,
 
   # process a potential color range (such as "blues")
   clr <- NULL
+  if (is.null(fill))  fill <- getOption("bar.fill.discrete")
   clr <- .color.range(fill, n.bar)  # if range, return colors
-  if (!is.null(clr)) fill <- clr
+  fill <- clr  # NOTE:  somewhere  fill  is still being used instead of clr
+
 
   # customize layout cols and rows, need only specify one
   if (!is.null(nrows) ||  !is.null(ncols)) {
@@ -238,9 +240,12 @@ function(x, by1, by2, nrows, ncols, asp, prop,
               panel.barchart(x, y, col=fill, border=color, ...)
           }
         )
+        
 
   # display
-  if (!is.null(pdf.file)) {
+# if (is.null(pdf.file)) pdf.file <- FALSE
+  pdf.file <- FALSE   # NOTE:  don't take the chance
+  if (pdf.file) {
     cat("\n>>> pdf.file does not work for Trellis graphics, manually save\n\n")
 #   pdf(pdf.file, width=width, height=height)
 #   print(p)

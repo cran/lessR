@@ -125,7 +125,7 @@ sep="")
       cat("\n"); stop(call.=FALSE, "\n","------\n",
        "To generate an R markdown file, first read the data for this\n",
        "regression analysis with the lessR function Read.\n\n",
-       "ex:  mydata <- Read(\"\")\n\n")
+       "ex:  d <- Read(\"\")\n\n")
   }
 
 

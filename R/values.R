@@ -1,5 +1,5 @@
 values <-
-function(x, data=mydata, ...) {
+function(x, data=d, ...) {
 
 
   # get actual variable name before potential call of data$x

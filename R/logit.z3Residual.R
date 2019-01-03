@@ -1,5 +1,5 @@
 .logit3Residual <-
-function(lm.out, nm, mydata,
+function(lm.out, nm, d,
          n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
          res.sort, res.rows, cooks.cut) {
   

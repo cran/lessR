@@ -1,5 +1,5 @@
 BarChart <-
-function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
+function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         theme=getOption("theme"), n.cat=getOption("n.cat"),
         one.plot=NULL,
 
@@ -13,8 +13,9 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
         trans=getOption("trans.bar.fill"),
         fill.split=NULL,
 
-        legend.title=NULL, legend.loc="right.margin",
+        legend.title=NULL, legend.position="right.margin",
         legend.labels=NULL, legend.horiz=FALSE,
+        legend.size=NULL,
 
         value.labels=NULL,
         rotate.x=getOption("rotate.x"),
@@ -27,7 +28,7 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
         values.color=getOption("values.color"),
         values.size=getOption("values.size"),
         values.digits=getOption("values.digits"),
-        values.pos=getOption("values.pos"),
+        values.position=getOption("values.position"),
         values.cut=NULL,
 
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -46,7 +47,10 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
     trans <- sty$bar$trans.fill
   }
 
-  # evaluate in bc.main, under color, when n.levels is known
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
+
   if (is.null(values)) values <- "eval.later"
 
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
@@ -60,6 +64,15 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
       " instead of \"off\", \"down\", \"up\"\n\n")
   }
   sort <- match.arg(sort)
+
+  # replaced older names with current name
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "legend.loc")  legend.position <- dots[[i]]
+      if (names(dots)[i] == "values.pos") values.position <- dots[[i]]
+    }
+  }
 
   options(xname = NULL)
   options(yname = NULL)
@@ -89,18 +102,18 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
 
     if (missing(values.color)) {
       values.color <- "white"
-      if (values.pos == "out") values.color <- getOption("axis.text.color")
+      if (values.position == "out") values.color <- getOption("axis.text.color")
     }
 
-  if (values.pos == "out"  &&  !missing(by)  &&  !beside) {
+  if (values.position == "out"  &&  !missing(by)  &&  !beside) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "values.pos=\"out\" not meaningful for a  by  variable\n",
+      "values.position=\"out\" not meaningful for a  by  variable\n",
       "  without beside=TRUE\n\n")
   }
 
-  if (!(values.pos %in% c("in", "out"))) {
+  if (!(values.position %in% c("in", "out"))) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "values.pos  must be set to \"in\", \"out\"\n\n")
+      "values.position  must be set to \"in\", \"out\"\n\n")
   }
 
   #if (missing(color))  # default black border unless dark bg
@@ -135,7 +148,7 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
   df.name <- deparse(substitute(data))  # get name of data table
   options(dname = df.name)
 
-  if (exists(df.name, where=.GlobalEnv)) {  # tibble to df
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
     if (class(data)[1] == "tbl_df")
       data <- as.data.frame(data, stringsAsFactors=FALSE)
     if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
@@ -376,9 +389,10 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
             value.labels, label.max, beside,
             rotate.x, offset, break.x, sort,
             values, values.color, values.size, values.digits,
-            values.pos, values.cut,
+            values.position, values.cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-            legend.title, legend.loc, legend.labels, legend.horiz,
+            legend.title, legend.position, legend.labels,
+            legend.horiz, legend.size,
             add, x1, x2, y1, y2, out.size, quiet, ...)
 
         if (pdf) {
@@ -400,7 +414,7 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
 
     # if values not assigned, do default
     if (is.null(values) || (!missing(values.color) || !missing(values.size)
-      || !missing(values.digits) || !missing(values.pos))) 
+      || !missing(values.digits) || !missing(values.position))) 
         values <- ifelse (missing(y), getOption("values"), "input")
 
     if (is.null(values.digits)) {
@@ -478,9 +492,10 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
             value.labels, label.max, beside,
             rotate.x, offset, break.x, sort,
             values, values.color, values.size, values.digits,
-            values.pos, values.cut,
+            values.position, values.cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-            legend.title, legend.loc, legend.labels, legend.horiz,
+            legend.title, legend.position, legend.labels,
+            legend.horiz, legend.size,
             add, x1, x2, y1, y2, out.size, quiet, ...)
       
       if (pdf) {
@@ -497,9 +512,10 @@ function(x=NULL, y=NULL, by=NULL, data=mydata, rows=NULL,
         value.labels, label.max, beside,
         rotate.x, offset, break.x, sort,
         values, values.color, values.size, values.digits,
-        values.pos, values.cut,
+        values.position, values.cut,
         xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-        legend.title, legend.loc, legend.labels, legend.horiz,
+        legend.title, legend.position, legend.labels,
+        legend.horiz, legend.size,
         out.size, quiet, width, height, pdf, ...)
     }
   }

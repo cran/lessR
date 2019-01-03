@@ -1,5 +1,5 @@
 ttest <-
-function(x=NULL, y=NULL, data=mydata, paired=FALSE,
+function(x=NULL, y=NULL, data=d, paired=FALSE,
 
          n=NULL, m=NULL, s=NULL, mu=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 

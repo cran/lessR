@@ -2,7 +2,7 @@
 
 .plt.by.legend <-
 function(mylevels, color, fill, shp, trans.pts, col.bg, usr,
-         pt.size=1.1, pt.lwd=0.5) {
+         pt.size=1.1, pt.lwd=0.5, legend.size=NULL) {
 
   par(xpd=NA)  # allow drawing outside of plot region
 
@@ -36,13 +36,21 @@ function(mylevels, color, fill, shp, trans.pts, col.bg, usr,
 
   the.clr <- getOption("lab.color")
 
-  yi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
+  yi <- 0.95
+
+  if (is.null(legend.size)) {
+    axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")), 
+      getOption("axis.cex"), getOption("axis.x.cex"))
+    adj <- .RSadj(axis.cex=axis.x.cex); axis.x.cex <- adj$axis.cex
+    legend.size <- axis.x.cex
+  }
+
   # fill=length(legend.labels):1  puts the legend labels in the correct
   #   order, but only for inflexible boxes that cannot be resized with pt.cex
   legend(xleft, ytop, legend=legend.labels, title=legend.title, 
-         pch=shp, horiz=FALSE, cex=.7, pt.cex=pt.size, pt.lwd=pt.lwd,
-         box.lwd=.5, box.col="gray30", bg=col.bg, col=color, pt.bg=fill,
-         text.col=the.clr, y.intersp=yi)
+         pch=shp, horiz=FALSE, cex=legend.size, pt.cex=pt.size, pt.lwd=pt.lwd,
+         bg=col.bg, col=color, pt.bg=fill,
+         text.col=the.clr, y.intersp=yi, bty="n")
 
   par(xpd=FALSE)  # cancel drawing outside of plot region (need for RStudio)
 

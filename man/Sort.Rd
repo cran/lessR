@@ -11,7 +11,7 @@ Sorts the values of a data frame according to the values of one or more variable
 }
 
 \usage{
-Sort(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...)
+Sort(by, direction=NULL, data=d, quiet=getOption("quiet"), ...)
 
 srt(\ldots)
 }
@@ -23,7 +23,7 @@ srt(\ldots)
        Or, specify a list of \code{"+"} for ascending and \code{"-"} for
        descending, one for each variable to be sorted.}
   \item{data}{The name of the data frame from which to create the subset, which
-       is \code{mydata} by default.}
+       is \code{d} by default.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}
   \item{\dots}{Parameter values.}
@@ -38,7 +38,7 @@ A list of consecutive variables can be specified using the colon notation, such 
 }
 
 \value{
-The sorted data frame is returned, usually assigned the name of \code{mydata} as in the examples below.  This is the default name for the data frame input into the \code{lessR} data analysis functions.
+The sorted data frame is returned, usually assigned the name of \code{d} as in the examples below.  This is the default name for the data frame input into the \code{lessR} data analysis functions.
 }
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
@@ -48,35 +48,35 @@ The sorted data frame is returned, usually assigned the name of \code{mydata} as
 
 \examples{
 # construct data frame
-mydata <- read.table(text="Severity Description
+d <- read.table(text="Severity Description
 1 Mild
 4 Moderate
 3 Moderate
 2 Mild
 1 Severe", header=TRUE)
 
-# sort the data frame called mydata according to Severity
+# sort the data frame called d according to Severity
 #   in ascending order
-mydata <- Sort(Severity)
+d <- Sort(Severity)
 
 # abbreviated form, replace original with sorted
-mydata <- srt(Severity)
+d <- srt(Severity)
 
 # sort Description in descending order, sort Severity within
 #  each level of Description in ascending order
-mydata <- Sort(c(Description, Severity), direction=c("-", "+"))  
+d <- Sort(c(Description, Severity), direction=c("-", "+"))  
 
-# data in a different data frame than mydata
+# data in a different data frame than d
 data(dataEmployee)
-mydata <- Sort(Gender, data=dataEmployee)
+d <- Sort(Gender, data=dataEmployee)
 
 # sort by row names in ascending order
-mydata <- Read("Employee", in.lessR=TRUE)
-mydata <- Sort(row.names)
+d <- Read("Employee", in.lessR=TRUE)
+d <- Sort(row.names)
 
 # randomly re-shuffle the rows of data
-mydata <- Read("Employee", in.lessR=TRUE)
-mydata <- Sort(random)
+d <- Read("Employee", in.lessR=TRUE)
+d <- Sort(random)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{lr}
 
-Based directly on the standard R \code{\link{glm}} function with \code{family="binomial"}, automatically provides a logit regression analysis with graphics from a single, simple function call with many default settings, each of which can be re-specified.  By default the data exists as a data frame with the default name of \code{mydata}, such as data read by the \code{lessR} \code{Read} function.  Specify the model in the function call according to an R \code{\link{formula}}, that is, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign. The response variable is either a factor with two levels or a numeric variable with values only of 0 and 1. 
+Based directly on the standard R \code{\link{glm}} function with \code{family="binomial"}, automatically provides a logit regression analysis with graphics from a single, simple function call with many default settings, each of which can be re-specified.  By default the data exists as a data frame with the default name of \code{d}, such as data read by the \code{lessR} \code{Read} function.  Specify the model in the function call according to an R \code{\link{formula}}, that is, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign. The response variable is either a factor with two levels or a numeric variable with values only of 0 and 1. 
 
 Default output includes the inferential analysis of the estimated coefficients and model, sorted residuals and Cook's Distance, and sorted fitted values for existing data or new data.  For a single predictor variable model, the scatterplot of the data with plotted logit function is provided.
 
@@ -15,7 +15,7 @@ Can also be called from the more general \code{\link{model}} function.
 }
 
 \usage{
-Logit(my.formula, data=mydata, rows=NULL,
+Logit(my.formula, data=d, rows=NULL,
       digits.d=4, text.width=120, 
 
      brief=getOption("brief"),
@@ -37,7 +37,7 @@ lr(\ldots)
        example, for a response variable named Y and two predictor variables, X1 and 
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
   \item{data}{The default name of the data frame that contains the data for analysis 
-       is \code{mydata}, otherwise explicitly specify.}
+       is \code{d}, otherwise explicitly specify.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
@@ -86,7 +86,7 @@ The purpose of \code{Logit} is to combine the following function calls into one,
 The default analysis provides the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, analysis of residuals and influence as well as the fitted value and standard error for each observation in the model. 
 
 DATA\cr
-The name \code{mydata} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{mydata}.
+The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{d}.
 
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -118,7 +118,7 @@ Following the standard \code{R} function \code{\link{glm}}, invisibly returns an
 
 \examples{
 # Gender has values of "M" and "F"
-mydata <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
 # logit regression
 Logit(Gender ~ Years)
 
@@ -147,8 +147,8 @@ Logit(Gender ~ Years, pdf.file="MyModel.pdf",
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values
-# Specify an input data frame other than mydata
-mydata <- Read("Cars93", in.lessR=TRUE)
+# Specify an input data frame other than d
+d <- Read("Cars93", in.lessR=TRUE)
 Logit(Source ~ HP + MidPrice, X1.new=seq(100,250,50), X2.new=c(10,60,10))
 }
 

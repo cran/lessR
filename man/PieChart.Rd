@@ -11,7 +11,7 @@ Plots a pie chart of a categorical variable (\code{x}). The default chart is a d
 }
 
 \usage{
-PieChart(x, y=NULL, data=mydata, rows=NULL,
+PieChart(x, y=NULL, data=d, rows=NULL,
 
          radius=1, hole=0.65, hole.fill=getOption("panel.fill"),
 
@@ -28,7 +28,7 @@ PieChart(x, y=NULL, data=mydata, rows=NULL,
          values.color=getOption("values.color"), 
 	 values.size=getOption("values.size"),
          values.digits=getOption("values.digits"),
-         values.pos=getOption("values.pos"),
+         values.position=getOption("values.position"),
 
          main=NULL, main.cex=1.2, labels.cex=0.9, cex,
 
@@ -49,7 +49,7 @@ pc(\ldots)
         then its value is the frequency of each category of \code{x},
         automatically tabulated.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
-        default is \code{mydata}.}
+        default is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}\cr
 
@@ -119,7 +119,7 @@ pc(\ldots)
   \item{values.digits}{Number of decimal digits for which to display the values.
         Default is 0, round to the nearest integer, for \code{"\%"}
         and 2 for \code{"prop"}.}
-  \item{values.pos}{Position of the plotted text. Default is inside the pie,
+  \item{values.position}{Position of the plotted text. Default is inside the pie,
         or, if \code{"label"}, as part of the label for each value
         outside of the pie.}\cr
 
@@ -177,7 +177,7 @@ OVERVIEW\cr
 Plot a pie chart with default colors, presumably with a relatively small number of values for each variable.  By default, colors are selected for the slices, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{pie}} and \code{\link{chisq.test}} and the \code{lessR} function  \code{\link{chisq.test}}. A minor modification of the original \code{\link{pie}} code provides for the hole in the middle of the pie, the default doughnut or ring chart.
 
 DATA\cr
-The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{mydata}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{mydata$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{d}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{d$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
        
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -217,7 +217,7 @@ PDF OUTPUT\cr
 Because \code{lessR} functions generate their own graphics calls, the standard graphic output functions such as \code{\link{pdf}} do not work with the \code{lessR} graphics functions.  Instead, to obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
-The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{mydata} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
+The referenced variable in a \code{lessR} function can only be a variable name. This referenced variable must exist in either the referenced data frame, \code{d} by default, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
 
 \code{    > PieChart(rnorm(10))   # does NOT work}
 
@@ -236,7 +236,7 @@ Instead, do the following:
 
 \examples{
 # get the data from a file included with lessR
-mydata <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in.lessR=TRUE)
 
 # --------------------------------------------------------
 # pie (doughnut) chart from the data for a single variable
@@ -304,14 +304,14 @@ pc(City, main="Employees in Each City")
 # counts from data frame
 x <- c("ACCT", "ADMN", "FINC", "MKTG", "SALE")
 y <- c(5, 6, 4, 6, 15)
-mydata <- data.frame(x,y)
-names(mydata) <- c("Dept", "Count")
+d <- data.frame(x,y)
+names(d) <- c("Dept", "Count")
 PieChart(Dept, Count)
 
 # real numbers from data frame 
 Dept <- c("ACCT", "ADMN", "FINC", "MKTG", "SALE")
 Salary <- c(86208.42, 29808.29, 42305.52, 75855.81, 65175.51)
-mydata <- data.frame(x,y)
+d <- data.frame(x,y)
 pc(Dept, Salary)
 rm(Dept)
 rm(Salary)
@@ -320,7 +320,7 @@ rm(Salary)
 # annotations
 # -----------
 
-mydata <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in.lessR=TRUE)
 
 # Place a message in the center of the pie
 # Use \n to indicate a new line

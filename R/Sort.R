@@ -1,5 +1,5 @@
 Sort <-
-function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
+function(by, direction=NULL, data=d, quiet=getOption("quiet"), ...) {
 
 
   if (missing(by)) {
@@ -113,7 +113,7 @@ function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
 
   # do the sort
   o <- eval(parse(text=ord))
-  mydata <- data[o, ]
+  d <- data[o, ]
 
   if (!quiet) {
     cat("\n")
@@ -121,10 +121,10 @@ function(by, direction=NULL, data=mydata, quiet=getOption("quiet"), ...) {
     cat("After the Sort, first four rows of data ")
     cat( "\n")
     .dash(68)
-    print(head(mydata, n=4))
+    print(head(d, n=4))
     cat("\n")
   }
 
-  return(mydata)
+  return(d)
 
 }

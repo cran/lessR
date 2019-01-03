@@ -167,25 +167,25 @@ function(topic=NULL, width=4.5, height=4.5) {
   Browse for a csv, tab-delimited, Excel, R, SAS, or SPSS data file on 
   your file system and read the information into the specified data table
   with Read, or its abbreviation, rd. To browse, use an empty (\"\").
-      > mydata <- Read(\"\")
+      > d <- Read(\"\")
   The  <-, the assignment operator, instructs R to assign what was read
-  to the data table, here named mydata. This is the default name for
+  to the data table, here named d. This is the default name for
   the lessR data analysis functions. Use the VariableLabels function, or
   vl, to read the optional file of file of variable names and labels.
 
   Or, specify the full data path name in quotes, such as from the web.
-      > mydata <- Read(\"http://lessrstats.com/data/twogroup.csv\")
+      > d <- Read(\"http://lessrstats.com/data/twogroup.csv\")
   To read a text file with a comma for a decimal point, use Read2().
 
   If you wish to view more information about the data table, do
       > details()
-  If the file is not read into mydata, include the name: details(name).
+  If the file is not read into d, include the name: details(name).
 
   To read a text file in which each column of data values assigned a
   specific width, add the widths option that specifies the width of each
   column according to the order of the variables.  Enclose the list
   with the c function, here read two variables with widths of 4 and 1.
-      > mydata <- Read(widths=c(4,1), col.names=c(\"ID\", \"Gender\"))
+      > d <- Read(widths=c(4,1), col.names=c(\"ID\", \"Gender\"))
   "
 
   set.up.plot(1)
@@ -199,14 +199,14 @@ function(topic=NULL, width=4.5, height=4.5) {
 
 
   else if (topic %in% c("wrt", "write")) {
-  t0 <- "Write Contents of Data Frame mydata into a Data File"
+  t0 <- "Write Contents of Data Frame d into a Data File"
 
   f1 <- bquote(paste(bold("Write, wrt"), 
-    "  Write a data file called mydata into an R data frame"))
+    "  Write a data file called d into an R data frame"))
 
   t1 <- "
   The name of the entire rectangular table of data, called a data frame in R, 
-  can be named mydata within R.  This is the default name of the data table
+  can be named d within R.  This is the default name of the data table
   assumed by the lessR data analysis functions.
 
   Here write the file with specified name in csv format.
@@ -286,20 +286,20 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   t1 <- "
   R function fix provides a graphical/mouse interface for editing data.
-      > fix(mydata)
+      > fix(d)
   lessR function Transform creates a new variable or rewrites over existing.
-      > mydata <- Transform(SalaryDiv=Salary/1000)
+      > d <- Transform(SalaryDiv=Salary/1000)
   lessR function Recode changes individual values. 
-      > mydata <- Recode(Scores, old=c(1:4), new=c(10,15,20,25))
+      > d <- Recode(Scores, old=c(1:4), new=c(10,15,20,25))
   R function factor creates a new variable with non-numeric categories.
   Severity was encoded with a 1 for Mild, 2 for Moderate and 3 for Severe.
-      > mydata <- Transform(ordered=TRUE, Severity.f= 
+      > d <- Transform(ordered=TRUE, Severity.f= 
                factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
   Here the values of the new variable are also ordered, from Mild to Severe. 
   Extract subsets of data from a data frame with the lessR Subset function.
-      > mydata <- Subset(rows=Gender==\"M\", columns=c(Years, Salary))
-  The data frame, mydata, now consists only of data for Males limited to
-  the variables Years and Salary. To display a subset, drop the mydata <-.
+      > d <- Subset(rows=Gender==\"M\", columns=c(Years, Salary))
+  The data frame, d, now consists only of data for Males limited to
+  the variables Years and Salary. To display a subset, drop the d <-.
   "
 
   set.up.plot(5)
@@ -392,7 +392,7 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   These functions, except sp, can also replace the variable name such as Y 
   with a list of multiple variables, such as c(Salary, Years) or Salary:Years,
-  or an entire mydata data frame by passing no argument.
+  or an entire d data frame by passing no argument.
       > Histogram()
   "
 
@@ -428,12 +428,12 @@ function(topic=NULL, width=4.5, height=4.5) {
   (see Help(\"libraries\"). This function is not from lessR, so the name
   of the variable must be preceded by the data frame name and a $. 
       > library(gcc)
-      > Ycount <- table(mydata$Y)
+      > Ycount <- table(d$Y)
       > pareto.chart(Ycount$freq)
 
   Can replace a variable name with a list of variables, e.g., c(Salary, Years)
-  or Salary:Years, or an entire data frame. The default data frame is mydata.
-  Here do a bar chart of all categorical variables in mydata, those that are
+  or Salary:Years, or an entire data frame. The default data frame is d.
+  Here do a bar chart of all categorical variables in d, those that are
   non-numeric, or less than n.cat=8 equally spaced integer values.
       > BarChart()
   "
@@ -478,7 +478,7 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   Can replace the variable name with a list of multiple variables, such as
   c(Salary, Years) or Salary:Years, or an entire data frame. The default data
-  frame is mydata. Here do a line chart of all numerical variables in mydata.
+  frame is d. Here do a line chart of all numerical variables in d.
       > LineChart()
   "
 
@@ -548,7 +548,7 @@ function(topic=NULL, width=4.5, height=4.5) {
       > s <- ss.brief(Y)
       > s
 
-  Summarize all variables in the data frame mydata.
+  Summarize all variables in the data frame d.
       > SummaryStats()
       
   For a numerical variable Y, provide an optional grouping variable, X, to
@@ -725,7 +725,7 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   t1 <- "
   The lessR function Correlation, or cr, computes a correlation for two
-  variables, or from a data frame, mydata by default, the correlation matrix
+  variables, or from a data frame, d by default, the correlation matrix
   with default pairwise deletion of missing data. A heat map and scatter plot
   matrix follow from graphics=TRUE. The matrix is displayed and also is
   stored as mycor such as for a subsequent factor analysis. Set the method
@@ -736,7 +736,7 @@ function(topic=NULL, width=4.5, height=4.5) {
       > mycor <- cr.brief(X,Y)
 
   Or, analyze many correlations at once, such as for Y, X1, X2 and X3 in 
-  the data frame called mydata.
+  the data frame called d.
       > mycor <- Correlation(c(Y,X1:X3))
 
   The lessR function, Plot, or just sp, displays a scatterplot for two

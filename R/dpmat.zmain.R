@@ -5,14 +5,15 @@ function(x, mylabels, sort.yx,
          col.low, col.hi,
          xy.ticks, xlab, ylab, main, sub, cex,
          radius, size.cut, txt.color="black", power,
+         bm.adj, lm.adj, tm.adj, rm.adj,
          value.labels, rotate.x, rotate.y, offset, quiet,
          do.plot, fun.call=NULL, ...)  {
-
 
   # scale for regular R or RStudio
   adj <- .RSadj(radius)
   radius <- adj$radius
-  size.txt <- adj$size.txt
+
+  size.txt <- ifelse (options("device") == "RStudioGD", 0.8, 0.7)
 
   if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels) 
 
@@ -106,10 +107,17 @@ function(x, mylabels, sort.yx,
   
     # here keep same bm if 1 or 2 line x labels
     margs <- .marg(max.width, y.lab, x.lab, main, rotate.x) 
+    bm <- margs$bm
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm
-    bm <- margs$bm
+  
+    # user manual adjustment
+    bm <- bm + bm.adj
+    lm <- lm + lm.adj
+    tm <- tm + tm.adj
+    rm <- rm + rm.adj
+
    
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
@@ -121,6 +129,8 @@ function(x, mylabels, sort.yx,
          xlim=c(.5, n.resp+.5), ylim=c(.5, n.var+.5))
 
     # axis, axis ticks, value labels
+# NEED a bottom margin adjust for two lines of values
+# otherwise margin.adj=c(0,0,.2,0)
     if (is.null(value.labels))
       x.lvl <- colnames(mytbl)
     else
@@ -157,7 +167,7 @@ function(x, mylabels, sort.yx,
       lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
 
     # colors
-    if (is.null(col.low) ||  is.null(col.hi))
+    if (is.null(col.low) || is.null(col.hi))
       clr <- col.fill
     else {
       color.palette <- colorRampPalette(c(col.low, col.hi))
@@ -165,12 +175,15 @@ function(x, mylabels, sort.yx,
     }
 
     # bubbles
+    # KLUDGE, default can be 0, so add some, really need a lighter gray instead
+    col.trans <- col.trans + .2
     if (!is.null(col.trans)) {
       trans.pts <- col.trans
       for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans.pts)*256)
     }
+
     symbols(cords$xx, cords$yy, circles=c, bg=clr, 
-          fg=col.color, inches=radius, add=TRUE, ...)
+            fg=col.color, inches=radius, add=TRUE, ...)
 
     # counts
     if (size.cut) { 
@@ -182,6 +195,10 @@ function(x, mylabels, sort.yx,
       text(cords$xx, cords$yy, c, cex=size.txt, col=txt.color)
     }
   }  # end do.plot
+
+
+  # ------------
+  # text output
 
   if (!quiet) {
   

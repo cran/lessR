@@ -1,5 +1,5 @@
 if (getRversion() >= "2.15.1")
-  globalVariables(c("mydata", "mycor", "P1", "P2", "P3"))
+  globalVariables(c("d", "mydata", "mycor", "P1", "P2", "P3"))
 # Pn is for latticeExtra layer function
 
 
@@ -7,9 +7,10 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.7.9     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.8.0     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
-      "1. mydata <- Read(\"\")      Read text, Excel, SPSS, SAS or R data file\n",
+      "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
+      "                           d: default data frame (mydata still works)\n",
       "2. Help()                  Get help\n",
       "3. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
       "4. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
@@ -44,7 +45,7 @@ function(...) {
   options(values.color = "white")
   options(values.size = 0.75)
   options(values.digits = NULL)
-  options(values.pos = "in")
+  options(values.position = "in")
 
 #  options(pt.fill = rgb(121,138,148, maxColorValue=255))  # old: gray20
   options(pt.fill = rgb(70,80,90, maxColorValue=255))
@@ -319,7 +320,7 @@ function(...) {
 
   # see if the variable exists in the global environment
   in.global <- FALSE
-  if (nchar(var.name)>0) if (exists(var.name, where=.GlobalEnv)) {
+  if (nchar(var.name)>0) if (var.name %in% ls(name=.GlobalEnv)) {
     in.global <- TRUE
     # a style "var" could be the name of a function
     # var.name is a character string, so convert to an object
@@ -364,24 +365,24 @@ function(...) {
 
 .nodf <- function(dname) {
 
-  # see if df exists (mydata default), if x from data, not in style Env
-  if (!exists(dname, where=.GlobalEnv)) {
+  # see if df exists (d default), if x from data, not in style Env
+  if (!exists(dname, where=.GlobalEnv)) {  # search Global and inside
     dfs <- .getdfs()  # list of data frames in style env
-    txtA <- ifelse (dname == "mydata", ", the default data table name, ", " ")
+    txtA <- ifelse (dname == "d", ", the default data table name, ", " ")
 
-    if ("Mydata" %in% dfs)
-      txtM <- paste("Because you have a data table called Mydata,\n",
-        " perhaps you meant to call it mydata, if so just re-read \n",
-        " into mydata instead of Mydata")
+    if ("D" %in% dfs)
+      txtM <- paste("Because you have a data table called D,\n",
+        " perhaps you meant to call it d, if so just re-read \n",
+        " into d instead of D")
     else
       txtM <- paste(
-        "If a data table is not named the default mydata, then to\n",
+        "If a data table is not named the default d, then to\n",
         "  analyze the variables in that data table, in the function call\n",
         "  for the analysis specify the actual data table name with\n",
         "  the data option\n",
         "For the data table called ", dfs[1], "\n",
         "  add the following to your function call:  , data=", dfs[1], "\n\n",
-        "Or, just re-read the data into the mydata data table\n\n", sep="")
+        "Or, just re-read the data into the d data table\n\n", sep="")
 
     if (length(dfs) == 0) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -392,15 +393,15 @@ function(...) {
         "  so the data table called ", dname, txtA, "is\n",
         "  not available for analysis\n\n",
         "Read the data into an R data table with the Read function, usually\n",
-        "  reading the data into an R data table called mydata\n\n",
-        "To read a data file on your computer system into the mydata data\n",
+        "  reading the data into an R data table called d\n\n",
+        "To read a data file on your computer system into the d data\n",
         "  table, in which you browse your file folders to locate the\n",
         "  desired date file, enter:\n",
-        "     mydata <- Read(\"\")\n\n",
+        "     d <- Read(\"\")\n\n",
         "To specify a data table from your computer or the web, enter:\n",
-        "     mydata <- Read(\"path name\") \n",
+        "     d <- Read(\"path name\") \n",
         "  or \n",
-        "     mydata <- Read(\"web address\") \n",
+        "     d <- Read(\"web address\") \n",
         "In the web address include the http:// at the beginning\n",
         "  and also include the quotes around the web address\n\n")
     }
@@ -422,7 +423,7 @@ function(...) {
     else if (length(dfs) > 1) {
       dts <- ""
       for (i in 1:length(dfs)) dts <- paste(dts, dfs[i])
-      if (dname == "mydata") {
+      if (dname == "d") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Data table ", dname, txtA, "does not exist\n\n",
           "Data tables you read and/or created: ", dts, "\n\n",
@@ -431,7 +432,7 @@ function(...) {
           "Can specify the actual name with the data option\n",
           "For example, for a data table named ", dfs[1], "\n",
           "  add the following to your function call:  , data=", dfs[1], "\n\n",
-          "Or, just re-read the data into the mydata data table\n\n")
+          "Or, just re-read the data into the d data table\n\n")
         }
       else {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -455,7 +456,7 @@ function(...) {
   for (i in 1:length(var.nm)) {  # each variable in var list one at a time
     in.global[i] <- FALSE
     if (!is.null(var.nm[i])) if (!is.na(var.nm[i])) if (nchar(var.nm[i]) > 0) {
-      if (exists(var.nm[i], where=.GlobalEnv)) {
+      if (var.nm[i] %in% ls(name=.GlobalEnv)) {
         if (!is.function(eval(parse(text=var.nm[i])))) in.global[i] <- TRUE
       }
     }
@@ -508,8 +509,8 @@ function(...) {
       txtA <- paste("A referenced variable in a lessR function just includes\n",
                     "the variable name\n\n", sep="")
       txtB <- paste("For example, for the Histogram function, this does not work:\n",
-                    "  > Histogram(mydata$Y)\n\n", sep="")
-      txtC <- "Instead do this:\n  > Histogram(Y, data=mydata)"
+                    "  > Histogram(d$Y)\n\n", sep="")
+      txtC <- "Instead do this:\n  > Histogram(Y, data=d)"
       txtD <- "If you wish to specify a data table, use option: data"
       cat("\n"); stop(call.=FALSE, "\n","------\n",
                       txtA, txtB, txtC, "\n", txtD, "\n\n")
@@ -523,12 +524,12 @@ function(...) {
       txt1 <- ", the default name \n\n"
       txt2 <- "Either make sure to use the correct variable name, or\n"
       txt3 <- "specify the data table that contains the variable with option:  data\n"
-      txt <- ifelse (dname == "mydata",  paste(txt1, txt2, txt3, sep=""), "\n")
+      txt <- ifelse (dname == "d",  paste(txt1, txt2, txt3, sep=""), "\n")
 
 #      nm <- eval(parse(text=paste("names(", dname,")")))
       nm <- paste(nms, " ")  # add a space for output listing
 
-      if (dname == "mydata")
+      if (dname == "d")
         txtDef <- ", which is the default data table name\n"
       else
         txtDef <- ""
@@ -558,7 +559,7 @@ function(...) {
           "The following variables are currently in the ", dfs[1], " data table,\n",
           "  available for analysis:\n\n",
           "  ", nm2,  "\n\n",
-          "If a data table is not named the default mydata, then to\n",
+          "If a data table is not named the default d, then to\n",
           "  analyze the variables in that data table, in the function call\n",
           "  for the analysis specify the actual data table name with\n",
           "  the data option\n",
@@ -574,15 +575,15 @@ function(...) {
 # see if cor matrix exists as stand-alone or embedded in list structure
 .cor.exists <- function(cor.nm) {
 
-  if (!grepl("$cors", cor.nm, fixed=TRUE))  # no $cors in name
-    is.there <- exists(cor.nm, where=.GlobalEnv)
+  if (!grepl("$R", cor.nm, fixed=TRUE))  # no $R in name
+    is.there <- cor.nm %in% ls(name=.GlobalEnv)
 
   else {
-    nm <- sub("$cors", "", cor.nm, fixed=TRUE)  # remove $cors from name
-    if (!exists(nm, where=.GlobalEnv))  # root list exists?
+    nm <- sub("$R", "", cor.nm, fixed=TRUE)  # remove $R from name
+    if (!(nm %in% ls(name=.GlobalEnv)))  # root list exists?
       is.there <- FALSE
     else
-      is.there  <- exists("cors", where=eval(parse(text=nm)))  #  cors inside?
+      is.there  <- exists("R", where=eval(parse(text=nm)))  #  R inside?
   }
   if (!is.there) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -632,7 +633,7 @@ function(...) {
   cat(txt, var.name)
 
   dname <- getOption("dname")
-  if (exists(dname, where=.GlobalEnv))
+  if (dname %in% ls(name=.GlobalEnv))
     mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
   else
     mylabels <- NULL
@@ -653,7 +654,8 @@ function(...) {
 }
 
 
-.varlist2 <- function(n.pred, ind, var.name, pred.lbl, n.obs, n.keep, lvls=NULL) {
+.varlist2 <- function(n.pred, ind, var.name, pred.lbl, n.obs, n.keep,
+                      lvls=NULL) {
   tx <- character(length = 0)
 
   if (ind == 1)
@@ -669,11 +671,11 @@ function(...) {
 
   dname <- getOption("dname")
 
-  if (exists(dname, where=.GlobalEnv))
+  if (dname %in% ls(name=.GlobalEnv))
     mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
   else
     mylabels <- NULL
-  if (exists(dname, where=.GlobalEnv))
+  if (dname %in% ls(name=.GlobalEnv))
     myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
   else
     myunits <- NULL
@@ -801,7 +803,7 @@ function(...) {
   x.lbl <- NULL
   y.lbl <- NULL
   l.name <- deparse(substitute(labels))
-  if (exists(l.name, where=.GlobalEnv)) {
+  if (l.name %in% ls(name=.GlobalEnv)) {
     mylabels <- get(l.name, pos=.GlobalEnv)
 
     i.row <- which(row.names(mylabels) == x.name)
@@ -816,7 +818,7 @@ function(...) {
   else {  # labels embedded in data
     dname <- getOption("dname")  # not set for dependent option on tt
     if (!is.null(dname)) {
-      if (exists(dname, where=.GlobalEnv)) {
+      if (dname %in% ls(name=.GlobalEnv)) {
         mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
         myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
       }
@@ -1207,6 +1209,8 @@ function(dir, axT) {
 # enlarge scale for R
 .RSadj <- function(radius=0.25, axis.cex=NULL, cex.names=NULL, lab.cex=NULL) {
 
+  if (is.null(radius)) radius <- 0.25
+
   regR <- FALSE  # regular R by itself
   in.RStudio <- ifelse (options("device") == "RStudioGD", TRUE, FALSE)
   in.knitr <- ifelse (!is.null(options()$knitr.in.progress), TRUE, FALSE)
@@ -1417,25 +1421,68 @@ function(dir, axT) {
 .corcolors <- function(R, NItems, main, bm=3, rm=3, diag=NULL,
                        pdf.file, width, height) {
 
-    if (!is.null(diag)) {
-      for (i in 1:NItems) R[i,i] <- diag
-      cat("\nNote: To provide more color separation for off-diagonal\n",
-          "      elements, the diagonal elements of the matrix for\n",
-          "      computing the heat map are set to 0.\n", sep="")
+  if (!is.null(diag)) {
+    for (i in 1:NItems) R[i,i] <- diag
+    cat("\nNote: To provide more color separation for off-diagonal\n",
+        "      elements, the diagonal elements of the matrix for\n",
+        "      computing the heat map are set to 0.\n", sep="")
+  }
+
+  .opendev(pdf.file, width, height)  # set up graphics
+
+  fill.low <- NULL
+  fill.hi <- NULL
+
+  if (is.null(fill.low)  &&  is.null(fill.hi)) {      
+    if (getOption("theme") %in% c("colors", "dodgerblue", "blue", 
+                                  "lightbronze")) {
+      fill.low <- "rusts"
+      fill.hi <- "blues"
+      hmcols <- getColors(fill.low, fill.hi, l=c(10,90), n=100)
     }
-
-    max.color <- getOption("heat")
-    hmcols <- colorRampPalette(c("white",max.color))(256)
-
-    .opendev(pdf.file, width, height)  # set up graphics
-
-    heatmap(R[1:NItems,1:NItems], Rowv=NA, Colv="Rowv", symm=TRUE,
-      col=hmcols, margins=c(bm,rm), main=main)
-
-    if (!is.null(pdf.file)) {  # terminate pdf graphics
-      dev.off()
-      .showfile(pdf.file, "plot")
+    else if (getOption("theme") %in% c("darkred", "red", "rose")) {
+      fill.low <- "turquoises" 
+      fill.hi <- "reds"
+      hmcols <- getColors(fill.low, fill.hi, l=c(10,90), n=100)
     }
+    else if (getOption("theme") %in% c("darkgreen", "green")) {
+      fill.low <- "violets" 
+      fill.hi <- "greens"
+      hmcols <- getColors(fill.low, fill.hi, l=c(10,90), n=100)
+    }
+    else if (getOption("theme") %in% c("gold", "brown", "sienna")) {
+      fill.low <- "blues" 
+      fill.hi <- "browns"
+      hmcols <- getColors(fill.low, fill.hi, l=c(10,90), n=100)
+    }
+    else if (getOption("theme") %in% c("gray", "white")) {
+      fill.low <- "white"
+      fill.hi <- "black"
+      hmcols <- colorRampPalette(c("white", "gray75", "black"))(100)
+    }
+  }
+
+  else if (is.null(fill.low) || is.null(fill.hi)) { 
+    fill.low <- "white"
+    fill.hi <- "gray20"
+    hmcols <- colorRampPalette(c("white", "gray75", "black"))(100)
+  }
+
+  # fill.low and fill.hi "blues", etc, then divergent, else sequential`
+
+  axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")),
+      getOption("axis.cex"), getOption("axis.x.cex"))
+  axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")),
+      getOption("axis.cex"), getOption("axis.y.cex"))
+
+  heatmap(R[1:NItems,1:NItems], Rowv=NA, Colv="Rowv", symm=TRUE,
+    col=hmcols, margins=c(bm,rm), main=main,
+    cexRow=axis.x.cex, cexCol=axis.y.cex)
+
+  if (!is.null(pdf.file)) {  # terminate pdf graphics
+    dev.off()
+    .showfile(pdf.file, "plot")
+  }
 }
 
 
@@ -1478,24 +1525,29 @@ function(dir, axT) {
 
   # or evaluate the character string fill
   else {
+    if (!is.null(fill[1])) {
+      if (fill[1] == "colors") fill[1] <- "hues" 
+      if (fill[1] == "yellows")  fill[1] <- "browns"  # new range name for 3.7.7
 
-    if (fill[1] == "colors")  fill[1] <- "hues"  # new range name for 3.7.7
-    if (fill[1] == "yellows")  fill[1] <- "browns"  # new range name for 3.7.7
+      if (fill[1] %in% nm  ||  fill[1] %in% nmR  ||  fill[1] %in% nmV  ||
+          fill[1] %in% nmW  ||  fill[1] %in% nmD) {
+        clrs <- getColors(fill[1], n=n.clr)  # generate sequential palette
+      }
+      else {
+#       if (no.change)
+#         clrs <- NULL
+#        else  # for style, lines 374+
+          clrs <- fill
+      }
 
-    if (fill[1] %in% nm  ||  fill[1] %in% nmR  ||  fill[1] %in% nmV  ||
-        fill[1] %in% nmW  ||  fill[1] %in% nmD)
-      clrs <- getColors(fill[1], n=n.clr)  # generate palette
-    else {
-      if (!no.change)
-        clrs <- NULL
-       else  # for style, lines 374+
-        clrs <- fill
-    }
+      if (length(fill == 2)) {  # divergent
+        if (fill[2] %in% nm)
+          clrs <- getColors(fill[1], fill[2], n=n.clr)
+      }
+    }  # fill[1] not NULL
 
-    if (length(fill == 2)) {
-      if (fill[2] %in% nm)
-        clrs <- getColors(fill[1], fill[2], n=n.clr)
-    }
+    else  # fill[1] is NULL
+      clrs <- NULL
   }
 
   return(clrs)
@@ -1542,12 +1594,20 @@ function(dir, axT) {
 }
 
 
-# link a pre=set range with the current theme
-.get.fill <- function(theme=getOption("theme")) {
+# link a pre-set range with the current theme
+.get.fill <- function(theme=getOption("theme"), seq.pal=TRUE) {
 
-  if (theme %in% c("gray", "white")) clrs <- "grays"
+  # for ordinal variables, or color theme not default, get sequential palette
+  # for not ordinal and default color theme, qualitative palette
+  if (theme == "colors" ) {
+    if (seq.pal)
+      clrs <- "blues"
+    else
+      clrs <- "hues"
+  }
+
+  else if (theme %in% c("gray", "white")) clrs <- "grays"
   else if (theme %in% c("lightbronze", "dodgerblue", "blue")) clrs <- "blues"
-  else if (theme == "colors" ) clrs <- "blues"
   else if (theme %in% c("gold", "brown", "sienna")) clrs <- "browns"
   else if (theme == "orange") clrs <- "rusts"
   else if (theme %in% c("darkred", "red", "rose")) clrs <- "reds"
