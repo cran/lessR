@@ -18,19 +18,33 @@ function(my.formula, data=d, rows=NULL,
       "Specify a model by listing it first or set according to:  my.formula\n\n")
   }
 
+
   # let deprecated mydata work as default
   dfs <- .getdfs() 
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
-  
-  df.name <- deparse(substitute(data))   # get name of data table
-  options(dname = df.name)
-
-  # if a tibble convert to data frame, no char --> factor conversion 
-  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-    if (class(data)[1] == "tbl_df") {
-      data <- as.data.frame(data, stringsAsFactors=TRUE)
+  mydata.ok <- FALSE
+  if (!is.null(dfs)) {
+    if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+      d <- mydata
+      df.name <- "mydata"
+      mydata.ok <- TRUE
+      options(dname = df.name)
     }
   }
+
+  if (!mydata.ok) {
+    df.name <- deparse(substitute(data))  # get name of data table
+    options(dname = df.name)
+  }
+ 
+  # if a tibble convert to data frame
+  if (!is.null(dfs)) {
+    if (df.name %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data, stringsAsFactors=TRUE)
+      }
+    }
+  }
+
 
   # convert character variables to factors (for DV)
   n.col <- apply(data, 2, function(x) sum(!is.na(x)))  # num values per variable

@@ -47,10 +47,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
     trans <- sty$bar$trans.fill
   }
 
-  # let deprecated mydata work as default
-  dfs <- .getdfs() 
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
-
   if (is.null(values)) values <- "eval.later"
 
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
@@ -64,15 +60,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       " instead of \"off\", \"down\", \"up\"\n\n")
   }
   sort <- match.arg(sort)
-
-  # replaced older names with current name
-  dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] == "legend.loc")  legend.position <- dots[[i]]
-      if (names(dots)[i] == "values.pos") values.position <- dots[[i]]
-    }
-  }
 
   options(xname = NULL)
   options(yname = NULL)
@@ -145,15 +132,36 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
     options(xname = x.name)
 
-  df.name <- deparse(substitute(data))  # get name of data table
-  options(dname = df.name)
 
-  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-    if (class(data)[1] == "tbl_df")
-      data <- as.data.frame(data, stringsAsFactors=FALSE)
-    if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
-      data <- eval(substitute(data), envir=parent.frame())
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if (!is.null(dfs)) {
+    if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+      d <- mydata
+      df.name <- "mydata"
+      mydata.ok <- TRUE
+      options(dname = df.name)
+    }
   }
+
+  if (!mydata.ok) {
+    df.name <- deparse(substitute(data))  # get name of data table
+    options(dname = df.name)
+  }
+ 
+  # if a tibble convert to data frame
+  if (!is.null(dfs)) {
+    if (df.name %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data, stringsAsFactors=TRUE)
+      }
+    }
+  }
+
+  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
+    data <- eval(substitute(data), envir=parent.frame())
+
 
   if (!is.null(x.name))
     x.in.global <- .in.global(x.name)  # see if in global, includes vars list
@@ -171,7 +179,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
     if (!x.in.global) {
       if (eval.df) {
-        .nodf(df.name)  # check to see if data frame container exists
+        if (!mydata.ok) .nodf(df.name)  # check to see if df exists
         .xcheck(x.name, df.name, names(data))  # x-vars in df?
       }
       data.vars <- as.list(seq_along(data))

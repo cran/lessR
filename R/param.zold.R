@@ -52,6 +52,31 @@ function (...) {
           "e.g., lab.adj=c(.5,0) moves x-axis label in 0.5 in \n\n")
       }
 
+      if (names(dots)[i] == "band") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  band  renamed  rug\n\n")
+      }
+
+      if (names(dots)[i] == "gen.color") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  gen.color  renamed  color.gen\n\n")
+      }
+
+      if (names(dots)[i] == "nrm.color") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  nrm.color  renamed  colr.nrm\n\n")
+      }
+
+      if (names(dots)[i] == "legend.loc") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  legend.loc  renamed  legend.position\n\n")
+      }
+
+      if (names(dots)[i] == "values.pos") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  values.pos  renamed  values.position\n\n")
+      }
+
       if (names(dots)[i] == "values.cex") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "option  values.cex  renamed  values.size\n\n")
@@ -139,9 +164,21 @@ function (...) {
           "use line.chart=TRUE to get a line chart\n",
           "set size=0 to remove points from the plot\n\n")
       }
+      if (names(dots)[i] == "auto") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  auto  renamed  enhance\n\n")
+      }
+      if (names(dots)[i] == "values") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  values  renamed  stat\n\n")
+      }
       if (names(dots)[i] == "type") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  type  renamed  object\n\n")
+          "option  type  renamed  stat\n\n")
+      }
+      if (names(dots)[i] == "smooth.trans") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  smooth.trans  renamed  smooth.exp\n\n")
       }
       if (names(dots)[i] == "knitr.file") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",

@@ -35,7 +35,7 @@ Represent the influence of additional categorical variables with \code{by1} or \
 
 \usage{
 Plot(x, y=NULL, data=d, rows=NULL,
-         topic=c("data", "count", "prop", "sum", "mean", "sd",
+         stat=c("data", "count", "prop", "sum", "mean", "sd",
                   "min", "median", "max"),
          theme=getOption("theme"), n.cat=getOption("n.cat"),
 
@@ -68,7 +68,7 @@ Plot(x, y=NULL, data=d, rows=NULL,
          fit="off", fit.se=0.95, ellipse=0, 
 
          bin=FALSE, bin.start=NULL, bin.width=NULL, bin.end=NULL,
-         breaks="Sturges", cumul=FALSE,
+         breaks="Sturges", cumulate=FALSE,
 
          run=FALSE, lwd=2, area=FALSE, area.origin=0, 
          center.line=c("default", "mean", "median", "zero", "off"),
@@ -116,7 +116,7 @@ vp(\ldots)
         \code{y}. Default data frame is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
-  \item{topic}{The values that are the coordinates from which to plot the points,
+  \item{stat}{The values that are the coordinates from which to plot the points,
         \code{data} values by default.  For \code{y}, which is continuous, then
         for either a categorical \code{x} variable, or a continuous \code{x} variable
         with values binned into categories, then can apply \code{"mean"}, etc.}
@@ -353,7 +353,7 @@ vp(\ldots)
         specification of the bins, such as with the standard R
         \code{\link{seq}} function or other options provided by the 
         \code{\link{hist}} function.  Also, sets \code{bin} to \code{TRUE}.}
-  \item{cumul}{Specify a cumulative frequency polygon.}\cr
+  \item{cumulate}{Specify a cumulative frequency polygon.}\cr
         
   \item{run}{If set to \code{TRUE}, generate a \bold{run chart}, i.e., line chart,
         in which
@@ -512,7 +512,7 @@ A scatterplot of Likert type data is problematic because there are so few possib
 DATA\cr
 The default input data frame is \code{d}. Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{d$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment.
 
-The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin.width}, to override default values. The \code{topic} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
+The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin.width}, to override default values. The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
        
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -797,7 +797,7 @@ BoxPlot(Salary, by1=Dept)
 # ----------------------------
 # bin the values of Salary to plot counts as a frequency polygon
 # the counts are plotted as points instead of the data
-Plot(Salary, topic="count")  # bin the values
+Plot(Salary, stat="count")  # bin the values
 
 # time charts
 #------------
@@ -855,7 +855,7 @@ Plot(Dept)
 Plot(Dept, label.max=2)
 
 # plot of frequencies for each category (level), replaces bar chart 
-Plot(Dept, topic="count")
+Plot(Dept, stat="count")
 
 
 #----------------------------------------------------

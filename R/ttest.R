@@ -147,6 +147,14 @@ function(x, y=NULL, ...) {
 #-----------------------------------
 
   alternative <- match.arg(alternative)
+
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+    d <- mydata 
+    mydata.ok <- TRUE
+  }
  
   if (missing(x)  &&  missing(n)  &&  missing(n1)) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -177,16 +185,23 @@ function(x, y=NULL, ...) {
   if (!missing(y)) y.name <- deparse(substitute(y)) 
 
   if (!is.null(x.name)) {
-    df.name <- deparse(substitute(data))   # get name of data table
-    options(dname = df.name)
+    dfs <- .getdfs() 
+    mydata.ok <- FALSE
+    if (!is.null(dfs)) {
+      if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+        d <- mydata
+        df.name <- "mydata"
+        mydata.ok <- TRUE
+        options(dname = df.name)
+      }
+    }
+    if (!mydata.ok) {
+      df.name <- deparse(substitute(data))   # get name of data table
+      options(dname = df.name)
+    }
   }
   else
     df.name <- NULL
-
-  # if a tibble convert to data frame (must already have df.name)
-  if (!is.null(x.name)) if (class(data)[1] == "tbl_df") {
-    data <- as.data.frame(data)
-  }
  
   if (!is.null(x.name)) if (exists(x.name, where=.GlobalEnv)) {
     if (is.data.frame(x)) {
@@ -205,8 +220,21 @@ function(x, y=NULL, ...) {
 
   # get conditions and check for data existing
   if (!is.null(x.name)) {
+
+ 
+  # if a tibble convert to data frame
+  if (!is.null(dfs)) {
+    if (df.name %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data, stringsAsFactors=TRUE)
+      }
+    }
+  }
+
+
     xs <- .xstatus(x.name, df.name)
     is.frml <- xs$ifr
+    if (is.frml) if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
     from.data <- xs$fd
     in.style <- xs$ig 
     if (!missing(y)) .xstatus(y.name, df.name)  # just for a message on output 

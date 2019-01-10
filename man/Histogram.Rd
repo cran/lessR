@@ -28,7 +28,7 @@ Histogram(x=NULL, data=d, rows=NULL,
     bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
 
     prop=FALSE, values=FALSE,
-    reg="snow2", cumul=c("off", "on", "both"),
+    reg="snow2", cumulate=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
     lab.adj=c(0,0), margin.adj=c(0,0,0,0),
@@ -123,8 +123,8 @@ hs(\ldots)
   \item{values}{Replaces standard R \code{labels} options, which has multiple
        definitions in R. Specifies to display the count of each bin.}
   \item{reg}{The color of the superimposed, regular histogram when
-        \code{cumul="both"}.}
-  \item{cumul}{Specify a cumulative histogram. The value of \code{"on"} displays the 
+        \code{cumulate="both"}.}
+  \item{cumulate}{Specify a cumulative histogram. The value of \code{"on"} displays the 
         cumulative histogram, with default of \code{"off"}. The value of
         \code{"both"} superimposes the regular histogram.}\cr
 
@@ -259,7 +259,7 @@ STATISTICS\cr
 \code{mids}: Bin midpoints\cr
 \code{counts}: Bin counts\cr
 \code{prop}: Bin proportion\cr 
-\code{cumul}: Bin cumulative counts\cr 
+\code{cumulate}: Bin cumulative counts\cr 
 \code{cprop}: Bin cumulative proportion\cr
 }
 
@@ -359,11 +359,11 @@ Histogram(Salary, by1=Dept)
 # ---------------------
 
 # cumulative histogram with superimposed regular histogram, all defaults
-Histogram(Salary, cumul="both")
+Histogram(Salary, cumulate="both")
 
 # cumulative histogram plus regular histogram
 # present with proportions on vertical axis, override other defaults
-Histogram(Salary, cumul="both", prop=TRUE, reg="mistyrose")
+Histogram(Salary, cumulate="both", prop=TRUE, reg="mistyrose")
 
 
 # -------------------------------------------------

@@ -22,10 +22,6 @@ function(x, data=d, rows=NULL,
 
   center.line <- match.arg(center.line)
 
-  # let deprecated mydata work as default
-  dfs <- .getdfs() 
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
-
   fill <- getOption("bar.fill.ordered") 
   color <- getOption("pt.color.ordered")
   panel.fill <- getOption("panel.fill")
@@ -67,15 +63,36 @@ function(x, data=d, rows=NULL,
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
     options(xname = x.name)
 
-  df.name <- deparse(substitute(data))  # get name of data table
-  options(dname = df.name)
 
-  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-    if (class(data)[1] == "tbl_df")
-      data <- as.data.frame(data, stringsAsFactors=FALSE)
-    if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
-      data <- eval(substitute(data), envir=parent.frame())
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if (!is.null(dfs)) {
+    if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+      d <- mydata
+      df.name <- "mydata"
+      mydata.ok <- TRUE
+      options(dname = df.name)
+    }
   }
+
+  if (!mydata.ok) {
+    df.name <- deparse(substitute(data))  # get name of data table
+    options(dname = df.name)
+  }
+ 
+  # if a tibble convert to data frame
+  if (!is.null(dfs)) {
+    if (df.name %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data, stringsAsFactors=TRUE)
+      }
+    }
+  }
+
+  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
+    data <- eval(substitute(data), envir=parent.frame())
+
 
   if (!is.null(x.name))
     x.in.global <- .in.global(x.name)  # see if in global, includes vars list
@@ -91,8 +108,8 @@ function(x, data=d, rows=NULL,
 
     # x not in global env, in df, specify data= forces to data frame
     if (!x.in.global) {
-      .nodf(df.name)  # check to see if data frame container exists 
-        .xcheck(x.name, df.name, names(data))  # x-var in df?
+      if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
+     .xcheck(x.name, df.name, names(data))  # x-var in df?
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
       ind <- eval(substitute(x), envir=data.vars)  # col num of each var      

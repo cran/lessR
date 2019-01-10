@@ -1,7 +1,7 @@
 .plt.main <-
 function(x, y, by=NULL, n.cat=getOption("n.cat"),
          cat.x=FALSE, num.cat.x=FALSE, cat.y=FALSE, num.cat.y=FALSE,
-         object="point", topic="data",
+         object="point", stat="data",
 
          col.fill=getOption("pt.fill"),
          col.color=getOption("pt.color"),
@@ -339,12 +339,12 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     }
 
     if (is.null(origin.x)) {
-      if (topic %in% c("count", "prop"))
+      if (stat %in% c("count", "prop"))
         origin.x <- 0
       else
         origin.x <- mn.x
     }
-    if (topic != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
+    if (stat != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
 
     region <- matrix(c(origin.x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
 
@@ -705,7 +705,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                        lty=1, lwd=.75, col=col.segment)
           }
 
-          if (!(topic %in% c("count", "prop"))) {
+          if (!(stat %in% c("count", "prop"))) {
             if (segments.x)
               segments(y0=par("usr")[3], x0=x, y1=y, x1=x, lty=1, lwd=.75,
                        col=col.segment)
@@ -716,7 +716,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                  segments(y0=0, x0=x, y1=y, x1=x, lty=1, lwd=1, col=col.segment)
           }
 
-          if (means  &&  topic == "data") {
+          if (means  &&  stat == "data") {
             pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
             bck.g <- ifelse(getOption("theme")!="gray", "gray15", "gray30")
             if (grepl(".black", getOption("theme"), fixed=TRUE))

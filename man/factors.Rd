@@ -66,6 +66,4 @@ d <- factors(c(m06, m07, m20), levels=0:5, labels=LikertCats, new=TRUE)
 # now copy the variable labels from the original integer variables to the 
 #   newly created factor variables
 mylabels <- factors(c(m06, m07, m20), var.labels=TRUE)
-
-
 }

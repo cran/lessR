@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.8.0     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.8.1     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
       "                           d: default data frame (mydata still works)\n",
@@ -344,20 +344,41 @@ function(...) {
         txtA, txtB, txtC, "\n")
   }
 
-  if (!in.global && from.data) .nodf(dname)
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+    d <- mydata 
+    mydata.ok <- TRUE
+  }
+  if (!mydata.ok) if (!in.global && from.data) .nodf(dname)
 
   return(list(ifr=is.frml, fd=from.data, ig=in.global))
 }
 
 
-.getdfs <- function() {  # get list of data frames in global env
+# get list of data frames in global environment
+# include both R data frames and tidyverse tibbles
+.getdfs <- function() { 
 
   objs <- function(x) class(get(x))
 
-  dfs <- ls(.GlobalEnv)[sapply(ls(.GlobalEnv), objs) == 'data.frame']
+  inGlb <- ls(name=.GlobalEnv)
+  if (length(inGlb) > 0) {
+    dfs <- character(length=0)
+    k <- 0
+    for (i in 1:length(inGlb)) {
+      if (any(class(get(inGlb[i])) == "data.frame")) {
+        k <- k + 1
+        dfs[k] <- inGlb[i]
+      } 
+    }
 
-  mylbl <- which(dfs == "mylabels")
-  if (length(mylbl) > 0) dfs <- dfs[-mylbl]
+    mylbl <- which(dfs == "mylabels")
+    if (length(mylbl) > 0) dfs <- dfs[-mylbl]
+  }
+  else
+    dfs <- NULL
 
   return(dfs)
 }

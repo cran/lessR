@@ -10,10 +10,6 @@ function(my.formula, data=d, rows=NULL,
 
   res.sort <- match.arg(res.sort)
 
-  # let deprecated mydata work as default
-  dfs <- .getdfs() 
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
-
   if (missing(my.formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify a model by listing it first or set according to:  my.formula\n\n")
@@ -30,15 +26,27 @@ function(my.formula, data=d, rows=NULL,
     }
   }
 
-  df.name <- deparse(substitute(data))   # get name of data table
-  options(dname = df.name)
 
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+    d <- mydata
+    df.name <- "mydata"
+    mydata.ok <- TRUE
+    options(dname = df.name)
+  }
+
+  if (!mydata.ok) {
+    df.name <- deparse(substitute(data))  # get name of data table
+    options(dname = df.name)
+  }
+ 
   # if a tibble convert to data frame
-  # data.frame is already #3 in class(data), so no char --> factor conversion 
   if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-    if (class(data)[1] == "tbl_df") {
-      data <- as.data.frame(data, stringsAsFactors=TRUE)
-    }
+   if (any(grepl("tbl", class(data), fixed=TRUE))) {
+      data <- data.frame(data, stringsAsFactors=TRUE)
+   }
   }
 
  
@@ -75,7 +83,7 @@ function(my.formula, data=d, rows=NULL,
   }
 
   for (i in 2:n.vars) {  # all IVs must be factors
-      nms <-  which(names(data) == nm[i])
+      nms <- which(names(data) == nm[i])
       if (in.data.frame && !is.factor(data[ , nms])) {
         cat("\n>>> Note: Converting", nm[i], "to a factor for this analysis only.\n")
         data[ ,nms] <- as.factor(data[ ,nms])
@@ -86,6 +94,7 @@ function(my.formula, data=d, rows=NULL,
   #   all analysis done on data in model construct av.out$model
   #   this model construct contains only model vars, with Y listed first
   #assign("av.out", aov(my.formula, data=data), pos=.GlobalEnv)
+  if (!mydata.ok) .nodf(df.name)
   av.out <- aov(my.formula, data=data)
 
   n.keep <- nrow(av.out$model)

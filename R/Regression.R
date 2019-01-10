@@ -45,13 +45,33 @@ function(my.formula, data=d,rows=NULL,
     }
   }
 
-  df.name <- deparse(substitute(data))   # get name of data table
-  options(dname = df.name)
 
-  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-    if (class(data)[1] == "tbl_df")
-      data <- as.data.frame(data, stringsAsFactors=FALSE)
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if (!is.null(dfs)) {
+    if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+      d <- mydata
+      df.name <- "mydata"
+      mydata.ok <- TRUE
+      options(dname = df.name)
+    }
   }
+
+  if (!mydata.ok) {
+    df.name <- deparse(substitute(data))  # get name of data table
+    options(dname = df.name)
+  }
+ 
+  # if a tibble convert to data frame
+  if (!is.null(dfs)) {
+    if (df.name %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data, stringsAsFactors=TRUE)
+      }
+    }
+  }
+
 
   # produce actual argument, such as from an abbreviation, and flag if not exist
   res.sort <- match.arg(res.sort)
@@ -75,7 +95,7 @@ function(my.formula, data=d,rows=NULL,
   else
     relate <- TRUE
 
-  .nodf(df.name)  # does data frame exist?
+  if (!mydata.ok) .nodf(df.name)  # does data frame exist?
 
   nm <- all.vars(my.formula)  # names of vars in the model
   n.vars <- length(nm)

@@ -1,7 +1,7 @@
 Plot <-
 function(x, y=NULL, data=d, rows=NULL,
-         topic=c("data", "count", "prop", "sum", "mean", "sd",
-                  "min", "median", "max"),
+         stat=c("data", "count", "prop", "sum", "mean", "sd",
+                "min", "median", "max"),
          theme=getOption("theme"), n.cat=getOption("n.cat"),
 
          by=NULL, by1=NULL, by2=NULL,
@@ -33,7 +33,7 @@ function(x, y=NULL, data=d, rows=NULL,
          fit="off", fit.se=0.95, ellipse=0, 
 
          bin=FALSE, bin.start=NULL, bin.width=NULL, bin.end=NULL,
-         breaks="Sturges", cumul=FALSE, 
+         breaks="Sturges", cumulate=FALSE, 
 
          run=FALSE, lwd=2, area=FALSE, area.origin=0, 
          center.line=c("default", "mean", "median", "zero", "off"),
@@ -55,28 +55,13 @@ function(x, y=NULL, data=d, rows=NULL,
 
 
   # ------
-  # set parameter topic 
+  # set parameter stat 
 
   if (is.null(fun.call)) fun.call <- match.call()
    
   # limit actual argument to alternatives, perhaps abbreviated
-  topic <- match.arg(topic)
+  stat <- match.arg(stat)
   center.line <- match.arg(center.line)
-
-  # let deprecated mydata work as default
-  dfs <- .getdfs() 
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
-
-  # replaced older names with current name
-  dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] == "auto")  enhance <- dots[[i]]
-      if (names(dots)[i] == "values") topic <- dots[[i]]
-      if (names(dots)[i] == "smooth.trans") smooth.exp <- dots[[i]]
-    }
-  }
-
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
   if (is.null(eval.df))  # default values
     eval.df <- ifelse (shiny, FALSE, TRUE) 
@@ -134,7 +119,6 @@ function(x, y=NULL, data=d, rows=NULL,
   by1.miss <- ifelse (missing(by1), TRUE, FALSE)
   by2.miss <- ifelse (missing(by2), TRUE, FALSE)
   by.miss <- ifelse (missing(by), TRUE, FALSE)
-  topic.miss <- ifelse (missing(topic), TRUE, FALSE)
   size.miss <- ifelse (missing(size), TRUE, FALSE)
   seg.y.miss <- ifelse (missing(segments.y), TRUE, FALSE)  # for Cleveland plot
   seg.x.miss <- ifelse (missing(segments.x), TRUE, FALSE)
@@ -211,7 +195,7 @@ function(x, y=NULL, data=d, rows=NULL,
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
 
-  if (topic != "data") if (is.null(pt.trans)) pt.trans <- 0
+  if (stat != "data") if (is.null(pt.trans)) pt.trans <- 0
 
   # set object 
   if (!missing(radius) || !missing(power)) {
@@ -273,22 +257,44 @@ function(x, y=NULL, data=d, rows=NULL,
   # ------
   # see if dated or inconsistent parameter values
   .param.old(...)
-  .plt.bad(x.miss, y.miss, topic, breaks, bin.start, n.row, n.col,
+  .plt.bad(x.miss, y.miss, stat, breaks, bin.start, n.row, n.col,
            MD.cut, out.cut, fit.se, ...)
 
   # ---------------------------------
   # get variable and data frame names
   
-  df.name <- deparse(substitute(data))
-  options(dname = df.name)
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
 
-  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-    if (class(data)[1] == "tbl_df")
-      data <- as.data.frame(data, stringsAsFactors=FALSE)
-    if ((data.miss && shiny))  # force eval (not lazy) if data not specified
-      data <- eval(substitute(data), envir=parent.frame())
-  } 
+
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if (!is.null(dfs)) {
+    if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+      d <- mydata
+      df.name <- "mydata"
+      mydata.ok <- TRUE
+      options(dname = df.name)
+    }
+  }
+
+  if (!mydata.ok) {
+    df.name <- deparse(substitute(data))  # get name of data table
+    options(dname = df.name)
+  }
+ 
+  # if a tibble convert to data frame
+  if (!is.null(dfs)) {
+    if (df.name %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data, stringsAsFactors=TRUE)
+      }
+    }
+  }
+
+  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
+    data <- eval(substitute(data), envir=parent.frame())
+
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
@@ -309,7 +315,7 @@ function(x, y=NULL, data=d, rows=NULL,
   # x not in global env, in df, specify data= forces to data frame
   else if (!x.in.global) {
     if (eval.df) {
-      .nodf(df.name)  # check to see if data frame container exists 
+      if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
       .xcheck(x.name, df.name, names(data))  # stop if x an expression
     }
     data.vars <- as.list(seq_along(data))
@@ -658,7 +664,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
   #if (!y.miss) cat("cat.y:", cat.y, "\n")
   #if (!y.miss) cat("num.cat.y:", num.cat.y, "\n")
-  if (topic == "data"  &&  n.x_var == 1) {
+  if (stat == "data"  &&  n.x_var == 1) {
     if (y.miss) {  # y missing
       if (!cat.x) {  # continuous x
         if (!run && !date.ts) {  # not a run chart or ts
@@ -920,7 +926,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
   if (is.null(height)) { 
     if (is.null(y.call)  &&  !BPFM  
-        &&  topic == "data" &&  object != "both"  &&  !.is.date(x.call))
+        &&  stat == "data" &&  object != "both"  &&  !.is.date(x.call))
       height <- ifelse (is.null(main), 4, 4.6)  # narrow for 1-D dot plot
     else
       height <- 6
@@ -944,7 +950,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
   # prep 1-variable bubble plot to call regular scatter plot function
   # y.call to 0
-  if (is.null(y.call)  &&  cat.x  &&  n.x_var == 1  &&  topic == "data") {
+  if (is.null(y.call)  &&  cat.x  &&  n.x_var == 1  &&  stat == "data") {
     y.call <- data.frame(rep(0, nrow(x.call)))
     cat.y <- FALSE
     if (object == "default") object <- "bubble"
@@ -993,13 +999,13 @@ function(x, y=NULL, data=d, rows=NULL,
   if (object == "default") {  # set default
     if (!y.miss) {
       object <- "point"
-      if (topic == "data") if (cat.x && cat.y) object <- "bubble"
+      if (stat == "data") if (cat.x && cat.y) object <- "bubble"
     }
-    else if (topic %in% c("count", "prop")) {
+    else if (stat %in% c("count", "prop")) {
       object <- "point"
     }
     else {
-      if (topic == "data") object <- ifelse (cat.x, "bubble", "point")
+      if (stat == "data") object <- ifelse (cat.x, "bubble", "point")
       if (BPFM) object <- "bubble"  # BPFM
     }
   }
@@ -1010,33 +1016,34 @@ function(x, y=NULL, data=d, rows=NULL,
     if (!cat.x) { 
 
       # run chart prep of x.call and y.call
-      if (object == "both"  &&  topic == "data") {  # run chart
+      if (object == "both"  &&  stat == "data") {  # run chart
         y.call <- x.call
         cat.y <- cat.x
-        options(yname = x.name)
+        options(yname=x.name)
         
-        options(xname = "Index")
+        options(xname="Index")
         x.call <- data.frame(1:nrow(x.call))
         names(x.call) <- "Index"
       }
 
-      else if (topic %in% c("count", "prop")) {  # frequency polygon
+      else if (stat %in% c("count", "prop")) {  # frequency polygon
 
         ssstuff <- .ss.numeric(x.call[,1], digits.d=digits.d, brief=TRUE)
        
-        hist.counts <- FALSE
-        hist.cumul <- ifelse(cumul, "on", "off")
+        values <- NULL
+        hist.cumul <- ifelse(cumulate, "on", "off")
         reg <- "snow2"  # applies to cumulative histogram
         h <- .hst.main(x.call[,1], pt.fill, pt.color, pt.trans, reg,
            rotate.x, rotate.y, offset,
-           breaks, bin.start, bin.width, bin.end, proportion, hist.counts,
-           hist.cumul, xlab, ylab, main, sub, quiet, fun.call=NULL,
-           do.plot=FALSE, ...) 
+           breaks, bin.start, bin.width, bin.end,
+           proportion, values, hist.cumul,
+           xlab, ylab, main, sub, quiet=quiet, do.plot=FALSE,
+           fun.call=NULL, ...) 
 
         n.cat <- 0  # not many midpoints, do not want to trigger num.cat
         x.call <- h$mids
         y.call <- h$counts
-        if (topic == "count")
+        if (stat == "count")
           ylab <- paste("Count of", x.name)
         else {
           y.call <- y.call / sum(y.call)
@@ -1116,11 +1123,11 @@ function(x, y=NULL, data=d, rows=NULL,
 
     else {  # cat.x
       # just x variable, so set y.call to plot points for count and prop
-      if (topic %in% c("count", "prop")) {
+      if (stat %in% c("count", "prop")) {
         if (Trellis) {  # follow dot plot format and do horizontal plot
           cat.y <- FALSE
           if (seg.x.miss) segments.x <- TRUE
-          ylab <- ifelse (topic=="count", "Count of", "Proportion of")
+          ylab <- ifelse (stat=="count", "Count of", "Proportion of")
           ylab <- paste(ylab, x.name)
           x.call <- data.frame(x.call)
         }  # end if Trellis
@@ -1128,12 +1135,12 @@ function(x, y=NULL, data=d, rows=NULL,
         else {  # not Trellis, so manually flip to match dot plot style
           cat.x <- FALSE
           if (seg.y.miss) segments.y <- TRUE
-          xlab <- ifelse (topic=="count", "Count of", "Proportion of")
+          xlab <- ifelse (stat=="count", "Count of", "Proportion of")
           xlab <- paste(xlab, x.name)
           if (!Trellis) {  # Trellis needs the full data for a dot plot
             ylab <- NULL
             frq <- table(x.call)
-            if (topic == "prop") frq <- frq / sum(frq)
+            if (stat == "prop") frq <- frq / sum(frq)
             if (is.factor(x.call))  # preserve ordering, will lose order attribute
               y.call <- factor(names(frq), levels=levels(x.call))
             else
@@ -1340,7 +1347,7 @@ if (is.null(out.size)) out.size <- size.pt
   else {  # all the other analyses
     
 
-    if (topic %in% c("sum", "mean", "sd", "min", "median", "max")) {
+    if (stat %in% c("sum", "mean", "sd", "min", "median", "max")) {
 
       n.cat <- 0
       means <- FALSE
@@ -1375,27 +1382,27 @@ if (is.null(out.size)) out.size <- size.pt
       }
 
     # set up new x.call and y.call for stats
-      if (topic == "sum") {
+      if (stat == "sum") {
         ylab <- paste("Sum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], sum, na.rm=TRUE)
       }
-      if (topic == "mean") {
+      if (stat == "mean") {
         ylab <- paste("Mean of", y.name)
         out <- tapply(y.call[,1], x.call[,1], mean, na.rm=TRUE)
       }
-      if (topic == "sd") {
+      if (stat == "sd") {
         ylab <- paste("Standard Deviation of", y.name)
         out <- tapply(y.call[,1], x.call[,1], sd, na.rm=TRUE)
       }
-      if (topic == "min") {
+      if (stat == "min") {
         ylab <- paste("Minimum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], min, na.rm=TRUE)
       }
-      if (topic == "median") {
+      if (stat == "median") {
         ylab <- paste("Median of", y.name)
         out <- tapply(y.call[,1], x.call[,1], median, na.rm=TRUE)
       }
-      if (topic == "max") {
+      if (stat == "max") {
         ylab <- paste("Maximum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], max, na.rm=TRUE)
       }
@@ -1438,7 +1445,7 @@ if (is.null(out.size)) out.size <- size.pt
     if ((!is.null(y.call) || date.ts) &&
         object %in% c("point", "bubble", "both", "sunflower")) {
 
-      if (object == "point"  &&  topic == "data"){  # for Cleveland dot plot
+      if (object == "point"  &&  stat == "data"){  # for Cleveland dot plot
         if (!cat.x && cat.y && y.unique) {  # no sort.xy option
           if (seg.y.miss) if (y.unique && cat.y) segments.y <- TRUE
           if (seg.x.miss) if (x.unique && cat.x) segments.x <- TRUE
@@ -1463,7 +1470,7 @@ if (is.null(out.size)) out.size <- size.pt
       }
   
       # bigger point for scatterplot of stats (instead of data)
-      if (topic != "data"  &&  object == "point")
+      if (stat != "data"  &&  object == "point")
         if (is.null(size)) size.pt <- 1.25
 
       out.ind <- NULL
@@ -1486,10 +1493,9 @@ if (is.null(out.size)) out.size <- size.pt
           "  use the  remove function, e.g., remove(x)\n\n")
       }
               
-         
         .plt.main(x.call, y.call, by.call, n.cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
-          object, topic,
+          object, stat,
           pt.fill, pt.color,
           pt.trans, segment.color, area.fill,
           xy.ticks, xlab, ylab, main, main.cex,
@@ -1512,7 +1518,7 @@ if (is.null(out.size)) out.size <- size.pt
 
       if (!quiet) {  # text output
 
-        .plt.txt(x.call, y.call, topic, object, n.cat,
+        .plt.txt(x.call, y.call, stat, object, n.cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
           xlab, ylab,
           smooth, box.adj, center.line, proportion, size,

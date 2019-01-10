@@ -12,7 +12,7 @@ function(x=NULL, data=d, rows=NULL,
     bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
 
     prop=FALSE, values=FALSE,
-    reg="snow2", cumul=c("off", "on", "both"),
+    reg="snow2", cumulate=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
     lab.adj=c(0,0), margin.adj=c(0,0,0,0),
@@ -31,11 +31,15 @@ function(x=NULL, data=d, rows=NULL,
   if (is.null(fun.call)) fun.call <- match.call()
 
   # limit actual argument to alternatives, perhaps abbreviated
-  cumul <- match.arg(cumul)
+  cumulate <- match.arg(cumulate)
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) d <- mydata 
+  mydata.ok <- FALSE
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+    d <- mydata 
+    mydata.ok <- TRUE
+  }
 
   if (theme != getOption("theme")) {
     sty <- style(theme, reset=FALSE)
@@ -89,15 +93,30 @@ function(x=NULL, data=d, rows=NULL,
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
     options(xname = x.name)
 
-  df.name <- deparse(substitute(data))  # get name of data table
-  options(dname = df.name)
-
-  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-    if (class(data)[1] == "tbl_df")
-      data <- as.data.frame(data, stringsAsFactors=FALSE)
-    if ((missing(data) && shiny))  # force eval (not lazy) if data not specified
-      data <- eval(substitute(data), envir=parent.frame())
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+    d <- mydata
+    df.name <- "mydata"
+    mydata.ok <- TRUE
+    options(dname = df.name)
   }
+
+  if (!mydata.ok) {
+    df.name <- deparse(substitute(data))  # get name of data table
+    options(dname = df.name)
+  }
+ 
+  # if a tibble convert to data frame
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
+   if (any(grepl("tbl", class(data), fixed=TRUE))) {
+      data <- data.frame(data, stringsAsFactors=TRUE)
+   }
+  }
+
+  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
+    data <- eval(substitute(data), envir=parent.frame())
 
   if (!is.null(x.name))
     x.in.global <- .in.global(x.name)  # see if in global, includes vars list
@@ -114,7 +133,7 @@ function(x=NULL, data=d, rows=NULL,
     # x not in global env, in df, specify data= forces to data frame
     if (!x.in.global) {
       if (eval.df) {
-        .nodf(df.name)  # check to see if data frame container exists 
+        if(!mydata.ok) .nodf(df.name)  # check to see if data frame container exists 
         .xcheck(x.name, df.name, names(data))  # x-vars in df?
       }
       data.vars <- as.list(seq_along(data))
@@ -295,7 +314,7 @@ function(x=NULL, data=d, rows=NULL,
         stuff <- .hst.main(data[,i], fill, color, trans, reg,
             rotate.x, rotate.y, offset,
             breaks, bin.start, bin.width,
-            bin.end, prop, values, cumul, xlab, ylab, main, sub, 
+            bin.end, prop, values, cumulate, xlab, ylab, main, sub, 
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
             add, x1, x2, y1, y2,
             scale.x, scale.y,
@@ -364,7 +383,7 @@ function(x=NULL, data=d, rows=NULL,
         bin.width=stuff$bin.width, n.bins=stuff$n.bins,
         breaks=stuff$breaks,
         mids=stuff$mids, counts=stuff$counts, prop=stuff$prop,
-        cumul=stuff$counts_cum, cprop=stuff$prop_cum)
+        cumulate=stuff$counts_cum, cprop=stuff$prop_cum)
 
       class(output) <- "out_all"
       if (!quiet) print(output)
@@ -374,7 +393,7 @@ function(x=NULL, data=d, rows=NULL,
       stuff$out_summary <- txss
       stuff$out_freq <- txdst
       names(stuff) <- c("out_suggest", "out_freq", "bin.width", "n.bins",
-              "breaks", "mids", "counts", "prop", "cumul", "cprop",
+              "breaks", "mids", "counts", "prop", "cumulate", "cprop",
               "out_summary", "out_outliers")
       stuff <- c(stuff[1], stuff[11], stuff[2], stuff[12], stuff[3], stuff[4],
                  stuff[5], stuff[6], stuff[7], stuff[8], stuff[9], stuff[10])

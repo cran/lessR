@@ -6,6 +6,26 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
  
  
+>>>>>> Changes for lessR version 3.8.0 (2019-01-10) <<<<<<
+
+-------------
+Updates 3.8.1
+-------------
+
+Histogram, Plot
+  cumulate new name for old parameter name cumul
+
+---------------
+Bug Fixes 3.8.1
+---------------  
+
+all data analysis routines
+  adjustment to change in class of tibbles to recognize
+    and internally convert to data frames
+  properly use mydata as default if d not specified
+
+
+ 
 >>>>>> Changes for lessR version 3.8.0 (2019-01-02) <<<<<<
 
 -------------

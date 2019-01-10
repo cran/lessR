@@ -1,8 +1,8 @@
 .hst.main <- 
 function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
        rotate.x=NULL, rotate.y=NULL, offset=NULL,
-       breaks, bin.start, bin.width,
-       bin.end, prop, values=NULL, cumul="off",
+       breaks, bin.start, bin.width, bin.end,
+       prop, values=NULL, cumulate="off",
        xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
        xlab.adj=NULL, ylab.adj=NULL,
        bm.adj=NULL, lm.adj=NULL, tm.adj=NULL, rm.adj=NULL,
@@ -15,7 +15,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
   if (is.null(ylab)) {
     was.null <- TRUE
     ylab <- ifelse (!prop, "Count of", "Proportion of")
-    if (cumul != "off") ylab <- paste("Cumulative", ylab)
+    if (cumulate != "off") ylab <- paste("Cumulative", ylab)
   }
   else
     was.null <- FALSE
@@ -119,7 +119,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
   if (prop) h$counts <- h$counts/length(x)
     
   # cumulative histogram option
-  if (cumul != "off") {
+  if (cumulate != "off") {
     old.counts <- h$counts
     h$counts <- cumsum(h$counts)
   }
@@ -210,7 +210,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     # plot the histogram
     plot(h, add=TRUE, col=clr, border=color, freq=TRUE,
          labels=values, ...)
-    if (cumul == "both") {
+    if (cumulate == "both") {
       h$counts <- old.counts
       plot(h, add=TRUE, col=col.reg, freq=TRUE)
     }

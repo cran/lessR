@@ -82,16 +82,34 @@ function(x, y=NULL, data=d, rows=NULL,
   x.name <- deparse(substitute(x))  # could be a list of var names
   options(xname = x.name)
 
-  df.name <- deparse(substitute(data))  # get name of data table
-  options(dname = df.name)
-  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
-    data <- eval(substitute(data), envir=parent.frame())
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if (!is.null(dfs)) {
+    if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+      d <- mydata
+      df.name <- "mydata"
+      mydata.ok <- TRUE
+      options(dname = df.name)
+    }
+  }
+
+  if (!mydata.ok) {
+    df.name <- deparse(substitute(data))  # get name of data table
+    options(dname = df.name)
+  }
  
   # if a tibble convert to data frame
-  # data.frame is already #3 in class(data), so no char --> factor conversion 
-  if (class(data)[1] == "tbl_df") {
-    data <- as.data.frame(data, stringsAsFactors=TRUE)
+  if (!is.null(dfs)) {
+    if (df.name %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data, stringsAsFactors=TRUE)
+      }
+    }
   }
+
+  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
+    data <- eval(substitute(data), envir=parent.frame())
 
   x.in.global <- .in.global(x.name)  # see if in global, includes vars list
 
@@ -101,7 +119,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
   if (!x.in.global) {
     if (eval.df) {
-      .nodf(df.name)  # check to see if data frame container exists 
+      if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
       .xcheck(x.name, df.name, names(data))  # x-var in df?
     }
     data.vars <- as.list(seq_along(data))
