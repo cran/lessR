@@ -1,13 +1,15 @@
 .dpmat.main <-   # BPFM
-function(x, mylabels, sort.yx,
+function(x, l, sort.yx,
          col.fill, col.color, col.bg,
-         col.trans, shape.pts, col.area, col.box, 
+         col.trans, shape.pts, col.box, 
          col.low, col.hi,
          xy.ticks, xlab, ylab, main, sub, cex,
          radius, size.cut, txt.color="black", power,
          bm.adj, lm.adj, tm.adj, rm.adj,
          value.labels, rotate.x, rotate.y, offset, quiet,
          do.plot, fun.call=NULL, ...)  {
+
+  col.area <- col.fill  # kludge
 
   # scale for regular R or RStudio
   adj <- .RSadj(radius)
@@ -73,8 +75,9 @@ function(x, mylabels, sort.yx,
     w <- 1:n.resp
   m <- integer(length=n.var)
   for (i in 1:n.var) m[i] <- round(weighted.mean(w, mytbl[i,]), 3)
-  if (sort.yx) {
-    m.o <- order(m, decreasing=FALSE)
+  if (sort.yx != "0") {
+    srt.dwn <- ifelse (sort.yx == "-", TRUE, FALSE)
+    m.o <- order(m, decreasing=srt.dwn)
     mytbl <- mytbl[m.o,]
     m <- m[m.o]
   }
@@ -226,12 +229,12 @@ function(x, mylabels, sort.yx,
 
     # display variable labels
     txlbl <- ""
-    mylabels <- mylabels[rownames(mytbl),]
-    if (!is.null(mylabels)) {
+    l <- l[rownames(mytbl),]
+    if (!is.null(l)) {
       tx <- character(length = 0)
       tx[length(tx)+1] <- ">>> Labels"
       for (i in 1:length(rownames(mytbl))) {
-        ml <- mylabels[i]
+        ml <- l[i]
         if (!is.na(ml))
           tx[length(tx)+1] <- paste(rownames(mytbl)[i], ": ", ml, sep="")
       }

@@ -19,7 +19,7 @@ Output is generated into distinct segments by topic, organized and displayed in 
 Regression(my.formula, data=d, rows=NULL,
            digits.d=NULL, standardize=FALSE,
 
-         Rmd=NULL,
+         Rmd=NULL, Rmd.format="html", Rmd.browser=TRUE, 
          results=getOption("results"), explain=getOption("explain"),
          interpret=getOption("interpret"), document=getOption("document"),
          code=getOption("code"),
@@ -35,7 +35,8 @@ Regression(my.formula, data=d, rows=NULL,
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL,
          X5.new=NULL, X6.new=NULL,
 
-         width=6.5, height=6.5, pdf=FALSE, refs=FALSE,
+         quiet=getOption("quiet"),
+         pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
          fun.call=NULL, \ldots)
 
 reg(\ldots)
@@ -59,8 +60,13 @@ reg.brief(\ldots, brief=TRUE)
         conducting the analysis.}\cr
 
   \item{Rmd}{File name for the automatically generated R Markdown file, if specified.
-        The file type is .Rmd, which automatically opens in RStudio, but it is a simple
-        text file that can be edited with any text editor, including RStudio.}
+        The file type is .Rmd, a simple text file that can be edited with
+        any text editor, including RStudio to generate custom output.}
+  \item{Rmd.format}{Format of rendered R Markdown file, default is html, with
+        a browser view automatic, or word or pdf (if LaTeX is available). Requires
+        \code{pandoc} installed, such as from \code{RStudio}.}
+  \item{Rmd.browser}{If \code{html} format for Rmd rendering, then automatically
+        open output in a browser.}
   \item{results}{By default TRUE. If set to \code{FALSE} the results
         are not provided in the R Markdown document, relying upon the interpretations.
         Can set globally with \code{style(results=FALSE)}.}
@@ -128,6 +134,8 @@ reg.brief(\ldots, brief=TRUE)
   \item{X6.new}{Values of the sixth listed numeric predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}\cr
 
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{style}} function.}
   \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
@@ -300,8 +308,8 @@ r$out_estimates
 # Output file here will be read.Rmd, a simple text file that can
 #   be edited with any text editor including RStudio from which it
 #   can be knit to generate dynamic output to a Word document,
-#   pdf file or html file
-reg(Reading ~ Verbal + Absent, Rmd="read")
+#   pdf file or html file, as well as automatically rendered
+reg(Reading ~ Verbal + Absent, Rmd="read", Rmd.browser=FALSE)
 
 # just for incomes > 100000 and less than 5 days absent 
 Regression(Reading ~ Verbal, rows=(Income > 100 & Absent < 5))

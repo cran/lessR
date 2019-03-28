@@ -35,18 +35,20 @@ Represent the influence of additional categorical variables with \code{by1} or \
 
 \usage{
 Plot(x, y=NULL, data=d, rows=NULL,
-         stat=c("data", "count", "prop", "sum", "mean", "sd",
-                  "min", "median", "max"),
-         theme=getOption("theme"), n.cat=getOption("n.cat"),
+         stat.x=c("data", "count", "proportion", "\%"),
+         stat.yx=c("data", "sum", "mean", "sd", "dev", "min", "median", "max"),
+         n.cat=getOption("n.cat"),
 
          by=NULL, by1=NULL, by2=NULL,
          n.row=NULL, n.col=NULL, aspect="fill",
 
-         fill=getOption("pt.fill"), color=getOption("pt.color"),
+         theme=getOption("theme"),
+         fill=NULL,
+         color=NULL,
          trans=getOption("trans.pt.fill"),
 
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
-         sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
+         sort.yx=c("0", "-", "+"), segments.y=FALSE, segments.x=FALSE,
          jitter.x=0, jitter.y=0,
 
          ID="row.name", ID.size=0.85,
@@ -60,7 +62,7 @@ Plot(x, y=NULL, data=d, rows=NULL,
          k=1.5, box.adj=FALSE, a=-4, b=3,
 
          radius=NULL, power=0.5,
-         low.fill=NULL, hi.fill=NULL, proportion=FALSE,
+         low.fill=NULL, hi.fill=NULL,
 
          smooth=FALSE, smooth.points=100, smooth.size=1,
          smooth.exp=0.25, smooth.bins=128,
@@ -70,7 +72,7 @@ Plot(x, y=NULL, data=d, rows=NULL,
          bin=FALSE, bin.start=NULL, bin.width=NULL, bin.end=NULL,
          breaks="Sturges", cumulate=FALSE,
 
-         run=FALSE, lwd=2, area=FALSE, area.origin=0, 
+         run=FALSE, lwd=2, area.fill="transparent", area.origin=0, 
          center.line=c("default", "mean", "median", "zero", "off"),
          show.runs=FALSE, stack=FALSE,
          
@@ -81,6 +83,7 @@ Plot(x, y=NULL, data=d, rows=NULL,
          offset=getOption("offset"),
 
          xy.ticks=TRUE, value.labels=NULL, label.max=20, origin.x=NULL,
+         legend.title=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
@@ -116,11 +119,17 @@ vp(\ldots)
         \code{y}. Default data frame is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
-  \item{stat}{The values that are the coordinates from which to plot the points,
-        \code{data} values by default.  For \code{y}, which is continuous, then
-        for either a categorical \code{x} variable, or a continuous \code{x} variable
-        with values binned into categories, then can apply \code{"mean"}, etc.}
-  \item{theme}{Color theme for this analysis.}
+  \item{stat.x}{Transform data for categorical variable \code{x}
+       into a simple table of paired levels of
+       \code{x} with numerical values of \code{y}, height of each bar.
+       Apply specified transformation such as \code{"count"}
+       to each of the levels of \code{x}. Dot plot analogous to a bar chart.}
+  \item{stat.yx}{Transformation of \code{y} for each level of \code{x}.
+       Transform data into a simple table of paired levels of
+       \code{x} with numerical values of \code{y}. Apply specified transformation
+       of \code{y} to the levels of \code{x}, that is,
+       \code{"mean"}, \code{sd}, etc.}
+
   \item{n.cat}{Number of categories, specifies the largest number of
         unique, equally spaced integer values of a variable for which
         the variable will be analyzed as categorical instead of continuous.
@@ -135,8 +144,10 @@ vp(\ldots)
   \item{by1}{A categorical variable called a \emph{conditioning variable} that
         activates Trellis graphics, provided by Deepayan Sarkar's (2007) lattice
         package, to provide
-        a \emph{separate} scatterplot (panel) of numeric primary variables \code{x}
-        and \code{y} for each level of the variable.}
+        a \emph{separate} panel of numeric primary variables \code{x}
+        and \code{y} for each level of the variable. Re-order the levels by
+        first converting to a factor variable with \code{\link{factor}} or
+        lessR \code{\link{factors}}.}
   \item{by2}{A second \emph{conditioning variable} to generate Trellis
         plots jointly conditioned on both the \code{by1} and \code{by2} variables,
         with \code{by2} as the row variable, which yields a scatterplot (panel)
@@ -159,15 +170,18 @@ vp(\ldots)
         to "bank" to 45 degrees, that is, with the line slope approximately
         45 degrees.}\cr
 
-  \item{fill}{Fill color of the points. Can also set with the lessR function
-	   \code{\link{getColors}} to select from a variety of color palettes.
-        Default is
-        \code{pt.color} from the lessR \code{\link{style}} function.}
+  \item{theme}{Color theme for this analysis. Make persistent across analyses
+        with \code{\link{style}}.}
+  \item{fill}{Either fill color of the points or the area under a line chart.
+        Can also set with the lessR function \code{\link{getColors}} to
+        select from a variety of color palettes. For points, default is
+        \code{pt.fill} and for area under a line chart, \code{violin.fill}.
+        For a line chart, set to \code{"on"} for default color.}
   \item{color}{Border color of the points or line color for line plot,
         can be a vector to customize the color for each point or a color
         range such as "blues" (see \code{\link{getColors}}. Default is
         \code{pt.color} from the lessR \code{\link{style}} function.}
-  \item{trans}{Transparency factor of the area of each point.
+  \item{trans}{Transparency factor of the fill color of each point.
         Default is
         \code{trans.pt.fill} from the lessR \code{\link{style}} function.}\cr
 
@@ -190,7 +204,7 @@ vp(\ldots)
       variable.  Color of the displayed text set by \code{bubble.text} from
       the \code{\link{style}} function.}
   \item{shape}{The plot character(s). The default value is a circle with both an
-       color and filled area, specified with \code{color} and \code{fill}.
+       color and filled interior, specified with \code{color} and \code{fill}.
        Possible values are \code{circle}, \code{square}, \code{diamond},
        \code{triup} (triangle up), \code{tridown} (triangle down), all
        uppercase and lowercase letters, all digits, and most punctuation characters.
@@ -300,11 +314,7 @@ vp(\ldots)
         beginning with this color.}
   \item{hi.fill}{For a categorical variable and the resulting bubble plot,
         or a matrix of these plots, sets a color gradient of the fill color
-        ending with this color.}
-  \item{proportion}{Specify proportions, relative frequencies, instead of counts.
-        For a two variable bubble chart, if \code{TRUE} then to facilitate group
-        comparisons, displays the proportion of data values by fill variable
-        \emph{within} each group.}\cr
+        ending with this color.}\cr
   
   \item{smooth}{\bold{Smoothed density plot} for two numerical variables. By 
         default, set to \code{TRUE} for 2500 or more rows of data.}
@@ -365,10 +375,12 @@ vp(\ldots)
         with function \code{\link{style}}.}
   \item{lwd}{Width of the line segments. Set to zero to remove the line
         segments.}       
-  \item{area}{If \code{FALSE}, no color is filled for the area under a plotted
-        line from a run chart or time series. Usual default is \code{FALSE},
-        but default is \code{TRUE} if multiple time series are plotted on
-        the same panel. Default fill color is \code{area.fill} set with function \code{\link{style}}.}
+  \item{area.fill}{Parameter \code{fill} applies to points if only points and
+       if only a run chart or time series chart, then to area under
+       line segments. But \code{area.fill} takes precedence over \code{fill}
+       for the area under the line segments, which is needed to provide both
+       fill for points and this area. Like \code{fill}, the value of \code{"on"}
+       sets the default fill color for points.}
   \item{area.origin}{Origin for the filled area under the time series line. Values
        less than this value are below the corresponding reference line, values
        larger are above the line.}
@@ -425,10 +437,12 @@ vp(\ldots)
   \item{label.max}{Maximum size of labels for the values of a categorical variable.
         Not a literal maximum as preserving unique values may require a larger number
         of characters than specified.}
-  \item{origin.x}{Origin of \code{x}-axis. Particularly useful for plots of
-       \code{count}, etc, where the origin is zero by default, but can
-       be modified. Otherwise the origin of the plot is based on the minimum
-       value of \code{x}.}\cr
+  \item{origin.x}{Origin of \code{x}-axis. Starting value of \code{x}, by
+       default the minimum value of \code{x}, except when \code{stat.x}
+       is set to \code{"count"} or related  where the origin is zero
+       by default, but can be modified.}
+  \item{legend.title}{Title of the legend for a multiple-variable \code{x}
+       or \code{y} plot.}\cr
 
   \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
        on the plot.
@@ -512,7 +526,7 @@ A scatterplot of Likert type data is problematic because there are so few possib
 DATA\cr
 The default input data frame is \code{d}. Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{d$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment.
 
-The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin.width}, to override default values. The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
+The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin.width}, to override default values. The \code{stat.x} or \code{stat.yx} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
        
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -586,7 +600,7 @@ Use the \code{add} and related parameters to annotate the plot with text and/or 
 \tabular{lll}{
 Value \tab Object \tab Required Coordinates\cr
 ----------- \tab ------------------- \tab ----------------\cr
-text \tab text \tab x1, x2\cr
+\code{"\emph{text}"} \tab text \tab x1, y1\cr
 \code{"rect"} \tab rectangle \tab x1, y1, x2, y2\cr
 \code{"line"} \tab line segment \tab x1, y1, x2, y2\cr
 \code{"arrow"} \tab arrow \tab x1, y1, x2, y2\cr
@@ -596,7 +610,7 @@ text \tab text \tab x1, x2\cr
 ----------- \tab ------------------- \tab ----------------\cr
 }
 
-The value of \code{add} specifies the object. For a single object, enter a single value. Then specify the value of the needed corresponding coordinates, as specified in the above table. For multiple placements of that object, specify vectors of corresponding coordinates. To annotate multiple objects, specify multiple values for \code{add} as a vector. Then list the corresponding coordinates, for up to each of four coordinates, in the order of the objects listed in \code{add}. See the examples for illustrations.
+The value of \code{add} specifies the object. For a single object, enter a single value. Then specify the value of the needed corresponding coordinates, as specified in the above table. For multiple placements of that object, specify vectors of corresponding coordinates. To annotate multiple objects, specify multiple values for \code{add} as a vector. Then list the corresponding coordinates, for up to each of four coordinates, in the order of the objects listed in \code{add}. 
 
 Can also specify vectors of different properties, such as \code{add.color}. That is, different objects can be different colors, different transparency levels, etc.
 
@@ -742,7 +756,10 @@ Plot(c(Salary, Years, Pre), fit="lm")
 #--------------------------------------------------------------
 
 # Trellis plot with condition on 1-variable
-Plot(Years, Salary, by1=Dept)
+# optionally re-order default alphabetical R ordering by converting
+#   to a factor with lessR factors (which also does multiple variables
+d$Gender <- factors(Gender, levels=c("M", "F"))
+Plot(Years, Salary, by1=Gender)
 
 \donttest{
 
@@ -797,12 +814,12 @@ BoxPlot(Salary, by1=Dept)
 # ----------------------------
 # bin the values of Salary to plot counts as a frequency polygon
 # the counts are plotted as points instead of the data
-Plot(Salary, stat="count")  # bin the values
+Plot(Salary, stat.x="count")  # bin the values
 
 # time charts
 #------------
-# run chart, with fill area
-Plot(Salary, run=TRUE, area=TRUE)
+# run chart, with default fill area
+Plot(Salary, run=TRUE, area.fill="on")
 
 # two run charts in same plot
 # or could do a multivariate time series
@@ -855,7 +872,7 @@ Plot(Dept)
 Plot(Dept, label.max=2)
 
 # plot of frequencies for each category (level), replaces bar chart 
-Plot(Dept, stat="count")
+Plot(Dept, stat.x="count")
 
 
 #----------------------------------------------------
@@ -877,7 +894,7 @@ style()
 Plot(Salary, row.names)
 
 # standard scatterplot
-Plot(Salary, row.names, sort.yx=FALSE, segments.y=FALSE)
+Plot(Salary, row.names, sort.yx="0", segments.y=FALSE)
 
 # Cleveland dot plot with two x-variables
 Plot(c(Pre, Post), row.names)
@@ -941,7 +958,7 @@ style()  # reset theme
 \donttest{
 
 # proportions within each level of the other variable
-Plot(m06, m07, proportion=TRUE, n.cat=6)
+Plot(m06, m07, stat.x="proportion", n.cat=6)
 
 # get correlation analysis instead of cross-tab analysis
 # rely upon the default value of n.cat=0 so that integer
@@ -990,8 +1007,8 @@ y <- rnorm(n)
 color1 <- clr[sample(1:length(clr), size=1)]
 color2 <- clr[sample(1:length(clr), size=1)]
 
-style(window.fill=color0, area.fill=color1, color=color2)
-Plot(x, y, run=TRUE, area=TRUE,
+style(window.fill=color0, color=color2)
+Plot(x, y, run=TRUE, area.fill="on",
   xy.ticks=FALSE, main="Modern Art", xlab="", ylab="",
   cex.main=2, col.main="lightsteelblue", n.cat=0, center.line="off")
 style() # reset style to default

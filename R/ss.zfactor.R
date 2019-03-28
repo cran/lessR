@@ -199,19 +199,22 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
 
 
   else {  # one variable
-
-    if (length(names(x)) == sum(x)) {  # x is a vector of the counts
+    lnx <- length(names(x))
+    if (lnx == sum(x)) {  # x is a vector of the counts
       if (length(x) > 100)
-        cat("\nOnly the first 100 values listed.  To see all values\n",
-               "use the  values  function.\n\n")
+        cat("\nOnly the first 100 value out of", lnx, "listed.\n\n")
       nms <- character(length=0)
       for (i in 1:min(length(x), 100)) nms[i] <- names(x)[i]
       cat("\n")
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "All values for ", x.name, " are unique, so analysis not meaningful\n\n",
-          "Perhaps a row ID instead of a variable\n",
+      cat("Values:", nms, "\n")
+      cat("\n",  #; stop(call.=FALSE, "\n","------\n",
+          "All values for ", x.name, " are unique\n",
+          "Perhaps a row ID instead of a variable for analysis\n",
           "If so, use  row.names=n  option for Read, where n refers to the ",
           "nth column\n\n", sep="")
+      return(list(n.dim=1, title="", counts="", miss="", 
+                  chi="", lbl="", freq=x, freq.df="", prop="",
+                  pvalue=""))
     }
 
     else {  # table not of unique values, so proceed

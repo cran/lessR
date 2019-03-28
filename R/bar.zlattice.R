@@ -9,7 +9,6 @@ function(x, by1, by2, nrows, ncols, asp, prop,
 
   cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n")
 
-
   panel.fill <- getOption("panel.fill")
   panel.color <- getOption("panel.color")
 
@@ -117,7 +116,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
   # calculate the histogram or bar chart or dot plot
   # set conditioning variables, by1 and by2
 
-  h.type <- ifelse(prop, "percent", "count")
+  h.type <- ifelse(prop, "percent", "count")  # histogram type
   #h.type <- "density"   # need to integrate density as a 3rd option
   if (c.type == "hist") {
     if (is.null(by2))
@@ -131,6 +130,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
 
   else if (c.type %in% c("bar", "dot")) {
     mytab <- table(x, by1)
+    if (prop) mytab <- prop.table(mytab, margin=2)
     mytabDF <- as.data.frame.table(mytab, responseName="Count")
     p <- lattice::barchart(x ~ Count | by1, data=mytabDF)
     n.bar <- nrow(mytab)

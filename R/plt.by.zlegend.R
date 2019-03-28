@@ -2,7 +2,7 @@
 
 .plt.by.legend <-
 function(mylevels, color, fill, shp, trans.pts, col.bg, usr,
-         pt.size=1.1, pt.lwd=0.5, legend.size=NULL) {
+         pt.size=1.25, pt.lwd=0.5, legend.size=NULL) {
 
   par(xpd=NA)  # allow drawing outside of plot region
 

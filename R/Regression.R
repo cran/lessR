@@ -2,7 +2,7 @@ Regression <-
 function(my.formula, data=d,rows=NULL,
          digits.d=NULL, standardize=FALSE,
 
-         Rmd=NULL, 
+         Rmd=NULL, Rmd.format="html", Rmd.browser=TRUE, 
          results=getOption("results"), explain=getOption("explain"),
          interpret=getOption("interpret"), document=getOption("document"), 
          code=getOption("code"), 
@@ -18,7 +18,8 @@ function(my.formula, data=d,rows=NULL,
          X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
          X5.new=NULL, X6.new=NULL,
 
-         width=6.5, height=6.5, pdf=FALSE, refs=FALSE, 
+         quiet=getOption("quiet"),
+         pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
          fun.call=NULL, ...) {
 
 
@@ -41,6 +42,10 @@ function(my.formula, data=d,rows=NULL,
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "knitr.file  no longer used\n",
           "Instead use  Rmd  for R Markdown file\n\n")
+      }
+      if (names(dots)[i] == "quiet") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "quiet  option not available for Regression\n\n")
       }
     }
   }
@@ -67,7 +72,7 @@ function(my.formula, data=d,rows=NULL,
   if (!is.null(dfs)) {
     if (df.name %in% dfs) {  # tibble to df
       if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data, stringsAsFactors=TRUE)
+        data <- data.frame(data, stringsAsFactors=FALSE)
       }
     }
   }
@@ -394,14 +399,29 @@ function(my.formula, data=d,rows=NULL,
       }
     }
     
-    if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
     txknt <- .reg.Rmd(nm, df.name, fun.call, res.rows, pred.rows,
         res.sort, digits.d, results, explain, interpret, document, code,
         est$pvalues, tol,
         resid.max, numeric.all, X1.new, new.val)
+    if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
     cat(txknt, file=Rmd, sep="\n")
     txRmd <- .showfile2(Rmd, "R Markdown file")
-  }
+
+    if (pandoc_available()) {
+      pandocYN <- TRUE
+      if (!grepl("_document", Rmd.format))
+        Rmd.format <- paste(Rmd.format, "_document", sep="")
+      render(Rmd, quiet=TRUE, output_format=Rmd.format)
+      if (Rmd.browser) browseURL(sub("Rmd", "html", Rmd, fixed=TRUE))
+    }
+    else {
+      message("\n",
+      "R Markdown (Rmd) file created\n",
+      "However, need  pandoc  installed to render web, Word, or pdf output\n",
+      "<< Re-run analysis in RStudio, which makes the process automatic >>\n",
+      "Otherwise can download from pandoc.org and run manually\n\n")
+    }
+  }  # end Rmd not null
 
   # display list of plots if more than 1
   txplt <- ""
@@ -427,10 +447,7 @@ function(my.formula, data=d,rows=NULL,
         fc <- paste(fncl, fc, ") ", sep="")
         txsug <- paste(txsug, 
            "# Create an R markdown file for interpretative output ",
-           "with the Rmd option\n", sep="")
-        txsug <- paste(txsug, 
-           "# In RStudio, open and then knit this file to generate ",
-           "the output\n", sep="")
+           "with  Rmd = \"file_name\"\n", sep="")
         txsug <- paste(txsug, fc, sep="")
       }
     }
@@ -488,7 +505,13 @@ function(my.formula, data=d,rows=NULL,
 
   class(output) <- "out_all"
 
-  return(output)
+  in.knitr <- ifelse (is.null(options()$knitr.in.progress), FALSE, TRUE)
+  if (in.knitr)
+    return(output)    
+  else
+    if (!quiet) return(output)
+
+  
   
   cat("\n")
   

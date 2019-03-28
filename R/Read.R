@@ -1,7 +1,7 @@
 Read <-
-function(ref=NULL, format=NULL, in.lessR=FALSE,
+function(from=NULL, format=NULL, in.lessR=FALSE,
 
-         labels=NULL, widths=NULL, stringsAsFactors=FALSE,
+         var.labels=FALSE, widths=NULL, stringsAsFactors=FALSE,
          missing="", n.mcut=1,
 
          miss.show=30, miss.zero=FALSE, miss.matrix=FALSE,
@@ -14,14 +14,17 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
 
   if (is.null(fun.call)) fun.call <- match.call()
 
-  if (!is.null(ref))
-    if (nchar(ref) == 0) ref <- NULL  #  "" to NULL
+  if (!is.null(from))
+    if (nchar(from) == 0) from <- NULL  #  "" to NULL
 
   if (hasArg(labels)) {
-    #cat("\n"); stop(call.=FALSE, "\n","------\n",
-      cat(">>> Note: ",
-      "VariableLabels function, vl, now preferred to read labels\n\n")
+     cat("\n"); stop(call.=FALSE, "\n","------\n",
+         ">>> To read a csv or Excel file of variable labels, each row a\n",
+         "    variable name and then variable label, just set\n",
+         "    var.labels=TRUE in the Read statement\n\n")
   }
+
+  .param.old(...)
 
   miss.format <- ifelse (missing(format), TRUE, FALSE)
   fmts <- c("text", "csv", "tsv", "Excel", "R", "SPSS", "SAS")
@@ -33,7 +36,7 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
     }
     if (format %in% c("text", "tsv")) format <- "csv"
 
-    if (is.null(ref) && format=="lessR") {
+    if (is.null(from) && format=="lessR") {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Cannot browse for a data file that is part of lessR.\n",
           "Specify the file name.\n\n")
@@ -42,13 +45,13 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
 
   # option to browse for data file, and then display file name
   browse <- FALSE
-  if (is.null(ref)) {
+  if (is.null(from)) {
     if (options("device") == "RStudioGD")
       cat(">>> Browse window may be hidden behind RStudio window\n")
     browse <- TRUE
-    ref <- file.choose()
-    fncl <- paste("Read(", "ref = \"", ref,  "\", quiet = TRUE)", sep="")
-    fncl2 <- paste("Read(", "ref = \"", ref,  "\")", sep="")
+    from <- file.choose()
+    fncl <- paste("Read(", "from = \"", from,  "\", quiet = TRUE)", sep="")
+    fncl2 <- paste("Read(", "from = \"", from,  "\")", sep="")
   }
   else {
     fncl <- .fun.call.deparse(fun.call)
@@ -60,49 +63,22 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
   if (miss.format) {
          if (in.lessR) format <- "lessR"
     else if (!is.null(widths)) format <- "fwd"
-    else if (grepl(".csv$", ref)) format <- "csv"
-    else if (grepl(".tsv$", ref)) format <- "csv"
-    else if (grepl(".txt$", ref)) format <- "csv"
-    else if (grepl(".sav$", ref)) format <- "SPSS"
-    else if (grepl(".sas7bdat$", ref)) format <- "SAS"
-    else if (grepl(".rda$", ref)) format <- "R"
-    else if (grepl(".xls$", ref) || grepl(".xlsx$", ref)) format <- "Excel"
+    else if (grepl(".csv$", from)) format <- "csv"
+    else if (grepl(".tsv$", from)) format <- "csv"
+    else if (grepl(".txt$", from)) format <- "csv"
+    else if (grepl(".sav$", from)) format <- "SPSS"
+    else if (grepl(".sas7bdat$", from)) format <- "SAS"
+    else if (grepl(".rda$", from)) format <- "R"
+    else if (grepl(".xls$", from) || grepl(".xlsx$", from)) format <- "Excel"
   }
-  if (!is.null(labels) && format=="R") {
+  if (var.labels && format=="R") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "An R data file should already contain labels before it was created.\n",
         "Or add them manually with the lessR function: label\n\n")
   }
 
-  # construct full path name for label file if not already
-  if (!is.null(labels)) {
-    if (labels == "")
-      ref.lbl <- file.choose()
-    else {
-      if (labels!="row2") {
-        if (!grepl("/", labels) && !grepl("\\\\", labels)) {  # not full path
-          nc <- nchar(ref)
-          ch <- substr(ref, start=1, stop=nc)
-          n.gone <- 0
-          while ((ch != "/")  &&  (ch != "\\")) {
-            n.gone <- n.gone + 1
-            ch <- substr(ref, start=nc-n.gone, stop=nc-n.gone)
-          }
-          ref.lbl <- substr(ref, start=1, stop=nc-n.gone)
-          ref.lbl <- paste(ref.lbl, labels, sep="")
-        }
-        else
-          ref.lbl <- labels
-      }  # not row2
-      else
-        ref.lbl <- "labels in second row of data file"
-    }
-  }
-
   if (!quiet) {
-    max.chr <- nchar(ref)
-    if (!is.null(labels))
-      if (nchar(ref.lbl) > max.chr) max.chr <- nchar(ref.lbl)
+    max.chr <- nchar(from)
     if (format == "Excel") {
       txt <- "Alexander Walker's openxlsx package]"
       cat("[with the read.xlsx function from", txt, "\n")
@@ -110,20 +86,18 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
 
     if (browse) {
       cat("\n")
-      cat("Data File:  ", ref, "\n")
-      if (!is.null(labels))  cat("Label File:  ", ref.lbl, "\n")
+      cat("Data File:  ", from, "\n")
     }
 
     # function call for suggestions
     fncl <- .fun.call.deparse(fun.call)
 
     if (getOption("suggest")) {
-      if (brief || !grepl("labels", fncl))
+      if (brief || !grepl("var.labels", fncl))
         cat("\n>>> Suggestions\n")
-      if (!grepl("labels", fncl)  &&  format != "lessR")
-        cat("Use the VariableLabels function, or vl, to read\n",
-            "  a csv or Excel file of variable labels\n",
-            "  Each row of the file is Variable Name, Variable Label\n")
+      if (!grepl("var.labels", fncl)  &&  format != "lessR")
+        cat("To read a csv or Excel file of variable labels, var.labels=TRUE\n",
+            "  Each row of the file:  Variable Name, Variable Label\n")
       if (brief) {
         cat("Details about your data, Enter:  details()  for d, or",
            " details(name)\n")
@@ -135,122 +109,84 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
     }
   }
 
-  # see if labels=="row2"
-  if (is.null(labels))
-    isnot.row2 <- TRUE
-  else
-    isnot.row2 <- ifelse (labels != "row2", TRUE, FALSE)
 
+  # read the data (into object d)
+  # ---------------------__------
 
-  # do the read (into object d)
-  # ---------------------------
-
-  if (format=="fwd" || format=="csv") {  # text file
+  if (format %in% c("fwd", "csv")) {  # text file
 
     if (format=="fwd")
-      d <- read.fwf(file=ref, widths=widths, ...)
+      d <- read.fwf(file=from, widths=widths, ...)
 
     else if (format=="csv") {
-      line1 <- scan(ref, what="character", nlines=1, sep="\t", quiet=TRUE)
+      line1 <- scan(from, what="character", nlines=1, sep="\t", quiet=TRUE)
       if (length(line1) > 1) {
-        message(">>> A tab character detected in the first row of the data file.\n",
-            "    Presume tab delimited data.\n", sep="")
+        message(">>> A tab character detected in the first row of the\n",
+            "     data file. Presume tab delimited data.\n", sep="")
         delim <- "\t"
       }
       else
         delim <- ","
-      if (isnot.row2)  # read data
-         d <- read.csv(file=ref, na.strings=missing, sep=delim,
-                       stringsAsFactors=stringsAsFactors, ...)
+      if (!var.labels)
+        d <- read.csv(file=from, na.strings=missing, sep=delim,
+                      stringsAsFactors=stringsAsFactors, ...)
+      else
+        d <- read.csv(file=from, header=FALSE,
+                  row.names=1, col.names=c("x", "label"),
+                  sep=delim, stringsAsFactors=FALSE, ...)
     }
 
   }  # end text file
 
   else if (format == "Excel") {
 
-    if (isnot.row2) {  # read data
-      d <- openxlsx::read.xlsx(ref, sheet=sheet)
-      # d <- readxl::read_excel(path=ref, sheet=sheet)
-      if (!is.null(list(...)$row.names))  # add row.names to read function
-        d <- data.frame(d, row.names=list(...)$row.names)
-      # class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
+    if (!var.labels)
+      d <- openxlsx::read.xlsx(from, sheet=sheet, detectDates=TRUE, ...)
+    else {
+      d <- openxlsx::read.xlsx(from, sheet=sheet,
+                               colNames=FALSE, rowNames=TRUE)
+      names(d) <- "label" 
     }
-  }
+#     fnu.col <- logical(length=ncol(d))  # reset to FALSE
+#     for (i in 1:ncol(d)) if (.is.date(d[,i])) fnu.col[i] <- TRUE
+#     d[fnu.col] <- lapply(d[fnu.col], function(x) x <- x+1)  # read.xlsx bug?
+    # d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
 
+    # d <- readxl::read_excel(path=from, sheet=sheet)
+    if (!is.null(list(...)$row.names))  # add any row.names to data frame
+      d <- data.frame(d, row.names=list(...)$row.names)
+    # class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
 
-  if (!is.null(labels)) {  # process labels
-    if (format %in% c("fwd", "csv", "Excel")) {
+      # if true integer, then convert from type double to integer
+      rows <- min(50, nrow(d))  # save some time scanning
+      fnu.col <- logical(length=ncol(d))
+      for (i in 1:ncol(d))
+        if (is.double(d[,i]))
+          if (is.integer(type.convert(as.character(d[1:rows,i]))))
+            fnu.col[i] <- TRUE
+       d[fnu.col] <- lapply(d[fnu.col], as.integer) # move to integer
 
-      if (labels != "row2") {  # read labels file
-        if (grepl(".xlsx$", ref.lbl))
-          format.lbl <- "Excel"
-        else if (grepl(".csv$", ref.lbl))
-          format.lbl <- "csv"
-        else {
-          cat("\n"); stop(call.=FALSE, "\n","------\n",
-              "Format of label file must be .csv or .xlsx\n\n")
-        }
-
-        if (format.lbl != "Excel")
-          mylabels <- read.csv(file=ref.lbl, row.names=1, header=FALSE)
-        else {  # openxlsx
-          mylabels <- read.xlsx(ref.lbl, rowNames=TRUE, colNames=FALSE)
-          # mylabels <- read_excel(path=ref.lbl, col_names=FALSE)
-          #  mylabels <- data.frame(mylabels, row.names=1)
-        }
-        if (ncol(mylabels) == 1) names(mylabels) <- c("label")
-        if (ncol(mylabels) == 2) names(mylabels) <- c("label", "unit")
-      }
-
-      else {  # labels == "row2", usually from Qualtrics data download
-        if (format != "Excel")
-          mylabels <- read.csv(file=ref, skip=1, nrows=1, sep=delim, ...)
-        else {
-          mylabels <- read.xlsx(ref, rows=1:2, colNames=FALSE, ...)
-          mylabels <- mylabels[1,]
-        }
-        var.names <- names(mylabels)
-        mylabels <- data.frame(t(mylabels))  # var names are row names
-        names(mylabels) <- "label"
-       if (format != "Excel")  # read the data
-          d <- read.csv(file=ref, skip=2,
-                        na.strings=missing, col.names=var.names, sep=delim, ...)
-        else {
-          d <- read.xlsx(ref, cols=1)  # read just 1st col to get num rows
-          num.rows <- nrow(d) + 1  # account for label row
-          d <- read.xlsx(ref, rows=c(1,3:(num.rows)))  # skip Row 2
-        }
-      }  # end row2
-
-      # transfer labels and maybe units to data
-      attr(d, which="variable.labels") <- as.character(mylabels$label)
-      names(attr(d, which="variable.labels")) <- as.character(row.names(mylabels))
-      if (ncol(mylabels) == 2) {
-        attr(d, which="variable.units") <- as.character(mylabels$unit)
-        names(attr(d, which="variable.units")) <- as.character(row.names(mylabels))
-      }
-    }
-  }
+  }  # end (format == "Excel")
 
   else if (format == "SPSS")  # data and any labels
-    d <- read.spss(file=ref, to.data.frame=TRUE, ...)
+    d <- read.spss(file=from, to.data.frame=TRUE, use.value.labels=TRUE, ...)
 
   else if (format == "SAS") { # data
-    d <- read.sas7bdat(file=ref, ...)
+    d <- read.sas7bdat(file=from, ...)
     txt <- "Matt Shotwell's sas7bdat package]"
     cat("[with the read.sas7bdat function from", txt, "\n")
   }
 
   else if (format == "R") {  # data and any labels
     x.env <- new.env()  # scratch environment
-    load(ref, envir=x.env)
+    load(from, envir=x.env)
     dname <- ls(x.env)
     d <- get(dname, pos=x.env)
   }
 
   else if (format == "lessR") {  # data and any labels
-    txt <- ifelse (substr(ref,1,4) == "data", "", "data")
-    file.name <- paste(txt, ref, ".rda", sep="")
+    txt <- ifelse (substr(from,1,4) == "data", "", "data")
+    file.name <- paste(txt, from, ".rda", sep="")
 
     path.name <- paste(find.package("lessR"), "/data/",  file.name, sep="")
 
@@ -264,67 +200,9 @@ function(ref=NULL, format=NULL, in.lessR=FALSE,
     x.env <- new.env()  # scratch environment
     load(path.name, envir=x.env)
 
-    dname <- paste(txt, ref, sep="")
+    dname <- paste(txt, from, sep="")
     d <- get(dname, pos=x.env)
-  }
-
-  if (is.data.frame(d)) {
-    n.col <- apply(d, 2, function(x) sum(!is.na(x)))  # num values per variable
-    nu.col <- apply(d, 2, function(x) length(unique(na.omit(x))))  # num unique
-    fnu.col <- logical(length=ncol(d))  # logical vector, initial values to FALSE
-    # !Excel: if a column is unique non-numeric, convert read as factor to char
-    # if (format != "Excel") {
-    #   for (i in 1:ncol(d)) if (nu.col[i]==n.col[i] && (is.factor(d[,i])))
-    #     fnu.col[i] <- TRUE
-    #   d[fnu.col] <- lapply(d[fnu.col], as.character)
-    # }
-    # else {  # get read_excel results to be equivalent to other formats
-    if (format == "Excel") {
-      rows <- min(50, nrow(d))  # save some time scanning
-      if (stringsAsFactors) {
-      # read_excel does not convert strings to factors, do so if !unique
-        for (i in 1:ncol(d))
-          if (is.character(d[,i])) if (nu.col[i] != n.col[i])
-          fnu.col[i] <- TRUE
-          d[fnu.col] <- lapply(d[fnu.col], as.factor)
-          # d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
-      }
-        fnu.col <- logical(length=ncol(d))  # reset
-        for (i in 1:ncol(d))
-          if (is.double(d[,i]))
-            if (is.integer(type.convert(as.character(d[1:rows,i]))))
-              fnu.col[i] <- TRUE
-         d[fnu.col] <- lapply(d[fnu.col], as.integer) # move to integer
-
-      # bug: POSIXct misinterpretation of currency data
-      # f.call <- gsub(")$", "", fncl2)  # get function call less closing )
-      # fnu.col <- logical(length=ncol(d))  # reset
-      # for (i in 1:ncol(d))
-      #   if (class(d[1:rows,i])[1] == "POSIXct") fnu.col[i] <- TRUE
-      # if (any(fnu.col)) {  # construct alternate Read function call
-      #   typ <- paste("d <- ", f.call, ", col_types=c(", sep="")
-      #   for (i in 1:ncol(d)) {
-      #     if (class(d[,i])[1] %in% c("integer", "double", "POSIXct"))
-      #       typ <- paste(typ, ", \"double\"", sep="")
-      #     else if (class(d[,i])[1] %in% c("character", "factor"))
-      #       typ <- paste(typ, ", \"text\"", sep="")
-      #   }
-      #   typ <- paste(typ, ")", sep="")
-      #   typ <- gsub("c(, ", "c(", typ, fixed=TRUE)
-      #   typ <- gsub("ref = ", "", typ, fixed=TRUE)
-      #   typ <- paste(typ, ")", sep="")  #  add back removed closing )
-      #   message("\nThe read_excel function sometimes mistakenly reads numbers in\n",
-      #     "the Excel Currency format as the type POSIXct, a date format\n\n",
-      #     "Type POSIXct was assigned to one or more of your variables\n\n",
-      #     "IF the variable assigned type POSIXct is NOT a date, then\n",
-      #     "  explicitly specify if a variable is text, double or a date\n",
-      #     "  by adding the  col_types  option to Read\n",
-      #     "To do this re-read the data\n",
-      #     "  by copying and pasting the following: \n\n",
-      #     "   ", typ, "\n")
-      # }
-    }
-  }  # end is data.frame
+  }  # end (format == "lessR")
 
 
   # check for valid characters in the variable names

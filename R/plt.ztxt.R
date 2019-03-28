@@ -1,19 +1,19 @@
 .plt.txt <- 
 function(x, y, values, object, n.cat,
-         cat.x, num.cat.x, cat.y, num.cat.y,
-         xlab, ylab, smooth, box.adj,
-         center.line, prop, size, show.runs, radius, digits.d, 
-         fun.call=NULL) {
+       cat.x, num.cat.x, cat.y, num.cat.y,
+       xlab, ylab, smooth, box.adj,
+       center.line, prop, size, show.runs, radius, digits.d, 
+       fun.call=NULL, txdif=NULL) {
 
 
-  date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
+date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
 
-  if (date.ts) center.line <- "off"
+if (date.ts) center.line <- "off"
 
-  # x and y come across here in their natural state, within each data frame
-  # a time series has dates for x and numeric for y, factors are factors, etc
-  
-  bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
+# x and y come across here in their natural state, within each data frame
+# a time series has dates for x and numeric for y, factors are factors, etc
+
+bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
 
   unique.x <- ifelse(length(unique(x[,1])) == length(x[,1]), TRUE, FALSE)
   unique.y <- ifelse(length(unique(y[,1])) == length(y[,1]), TRUE, FALSE)
@@ -99,11 +99,13 @@ function(x, y, values, object, n.cat,
   # by default display center.line only if runs, so detect if a run
   if (n.col > 1) center.line <- "off"   # no center.line for multiple plots
   if (center.line == "default"  &&  !date.ts  &&  object == "both") {
-    m <- mean(y, na.rm=TRUE)
+    y <- (!is.na(y))
+    m <- mean(y)
     n.change <- 0
     for (i in 1:(length(y)-1))
-      if ((y[i+1] > m) != (y[i] > m)) n.change <- n.change+1 
+      if ((y[i+1] > m) != (y[i] > m)) n.change <- n.change+1
     if (n.change/(length(y)-1) < .15)
+
       center.line <- "off" 
     else 
       center.line <- "median"
@@ -425,11 +427,13 @@ function(x, y, values, object, n.cat,
           class(txsug) <- "out"
           class(txout) <- "out"
           class(txotl) <- "out"
+          class(txdif) <- "out"
 
           if (nzchar(txsug))
-            output <- list(out_suggest=txsug, out_txt=txout, out_outliers=txotl)
+            output <- list(out_suggest=txsug, out_txt=txout, out_outliers=txotl,
+                           out_diff=txdif)
           else
-            output <- list(out_txt=txout, out_outliers=txotl)
+            output <- list(out_txt=txout, out_outliers=txotl, out_diff=txdif)
           class(output) <- "out_all"
           print(output)
       }  # end Cleveland
@@ -538,7 +542,7 @@ function(x, y, values, object, n.cat,
           if (size.pt > 0)
             txt <- "just points, no line segments"
           else {
-            fc <- paste(fc, ", area=TRUE", sep="")
+            fc <- paste(fc, ", fill=\"on\"", sep="")
             txt <- "just area"
           }
           fc <- paste(fncl, fc, ")   # ", txt, sep="")
@@ -546,8 +550,8 @@ function(x, y, values, object, n.cat,
         }
           
         fc <- ""
-        if (!grepl("area", fncl)  &&  (!grepl("stack", fncl)))
-          fc <- paste(fc, ", area=TRUE", sep="")
+        if (!grepl("fill", fncl)  &&  (!grepl("stack", fncl)))
+          fc <- paste(fc, ", fill=\"on\"", sep="")
         if (nzchar(fc)) {
           fc <- gsub(" = ", "=", fc)
           fc <- paste(fncl, fc, ")   # default color fill", sep="")
@@ -577,25 +581,27 @@ function(x, y, values, object, n.cat,
         run[n.runs] <- 1
         line.out <- "    1"
         cat("\n")
-        for (i in 2:length(y)) {
+        for (i in 2:length(y)) {  # find the runs
           if (y[i] != m.y) {  # throw out values that equal m.y
             if (sign(y[i]-m.y) != sign(y[i-1]-m.y)) {  # new run
               if (show.runs) {
                 if (n.runs < 10) buf <- "  " else buf <- " "
-                cat("size=", run[n.runs], "  Run", buf, n.runs, ":",
-                    line.out, "\n", sep="")
+                  if (run[n.runs] > 1)  # print only if run of size 2 or more
+                    cat("size=", run[n.runs], "  Run", buf, n.runs, ":",
+                      line.out, "\n", sep="")
               }
               line.out <- ""
               n.runs <- n.runs + 1
               run[n.runs] <- 0
             }
-            run[n.runs] <- run[n.runs] + 1
-            buf <- ifelse (i < 10, "  ", " ")
-            line.out <- paste(line.out, buf, i)
           }
-        }
-        cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out,
-            "\n", sep="")
+          run[n.runs] <- run[n.runs] + 1
+          buf <- ifelse (i < 10, "  ", " ")
+          line.out <- paste(line.out, buf, i)
+        }  # end find the runs
+        if (run[n.runs] > 1)  # print only if run has at least 2 elements
+          cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out,
+              "\n", sep="")
         eq.ctr <- which(y==m.y)
         cat("\nTotal number of runs:", n.runs, "\n")
         txt <- "Total number of values that do not equal the "

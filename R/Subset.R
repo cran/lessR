@@ -3,7 +3,7 @@ function(rows, columns, data=d, holdout=FALSE,
     random=0, quiet=getOption("quiet"), ...) {
 
   # save variable labels, units (NULL if no labels, units) 
-  mylabels <- attr(data, which="variable.labels")
+  l <- attr(data, which="variable.labels")
   myunits <- attr(data, which="variable.units")
 
   dname <- deparse(substitute(data))
@@ -102,10 +102,10 @@ function(rows, columns, data=d, holdout=FALSE,
   # do the subset, including any variable labels to be dropped
   data.sub <- data[r, vars, drop=FALSE]
   # if no vars dropped, vars is TRUE, otherwise a char vector of names to retain
-  if (!is.logical(vars) && !is.null(mylabels)) {  
+  if (!is.logical(vars) && !is.null(l)) {  
     # warning unless length(d) a multiple of length(vars)
     keep.index <- which(suppressWarnings(names(d) == vars))
-    mylabels <- mylabels[keep.index]
+    l <- l[keep.index]
   }
 
   if (!quiet) {
@@ -143,7 +143,7 @@ function(rows, columns, data=d, holdout=FALSE,
   # restore any variable units, labels
   # note:  variable labels for all variables of original data frame
   #        even if variables were deleted
-  if (!is.null(mylabels)) attr(data.sub, which="variable.labels") <- mylabels
+  if (!is.null(l)) attr(data.sub, which="variable.labels") <- l
   if (!is.null(myunits)) attr(data.sub, which="variable.units") <- myunits
 
   return(data.sub)

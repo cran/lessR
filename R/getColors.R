@@ -1,7 +1,7 @@
 getColors <-
 function(pal=NULL, end.pal=NULL,
          n=12, h=0, h2=NULL, c=NULL, l=NULL, trans=0,
-         in.order=NULL, fixup=TRUE,
+         in.order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
          main=NULL, labels=NULL, labels.cex=0.8, lty="solid",
          output=NULL, quiet=getOption("quiet"), ...) {
@@ -197,7 +197,8 @@ function(pal=NULL, end.pal=NULL,
     if (length(l) > 1)
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
 
-    pal <- sequential_hcl(n, h=h, c.=c, l=l, power=1,
+    if (is.null(power)) power <- 1
+    pal <- sequential_hcl(n, h=h, c.=c, l=l, power=power,
                           fixup=fixup, alpha=1)
     ttl <- paste("Sequential Colors for\n", "h=", .fmt(h,0),
                   ", c=", txt.c, ",  l=", txt.l, sep="")
@@ -220,7 +221,8 @@ function(pal=NULL, end.pal=NULL,
     if (length(l) > 1)
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
 
-    pal <- diverge_hcl(n, h=h, c=c, l=l, power=0.75,
+    if (is.null(power)) power <- 0.75
+    pal <- diverge_hcl(n, h=h, c=c, l=l, power=power,
                        fixup=fixup, alpha=1)
     ttl <- paste("Divergent Colors for\n", "h=", txt.h,
                   ", c=", txt.c, ",  l=", txt.l, sep="")

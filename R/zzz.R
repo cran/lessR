@@ -1,5 +1,5 @@
 if (getRversion() >= "2.15.1")
-  globalVariables(c("d", "mydata", "mycor", "P1", "P2", "P3"))
+  globalVariables(c("d", "mydata", "mylabels", "mycor", "P1", "P2", "P3"))
 # Pn is for latticeExtra layer function
 
 
@@ -7,20 +7,20 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.8.1     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.8.2     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
-      "                           d: default data frame (mydata still works)\n",
-      "2. Help()                  Get help\n",
-      "3. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
-      "4. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
-      "                           numerical X: Violin, Box, Scatter plot \n",
-      "5. by1= , by2=             Trellis graphics, a plot for each by1, by2\n",
-      "6. reg(Y ~ X, Rmd=\"eg\")    Regression + R markdown file that, when\n",
-      "                           knit, provides full interpretative output\n",
-      "7. style(\"lightbronze\")    Return to previous, more neutral theme\n",
+      "                           d: default data frame, no need for data=\n",
+      "2. l <- Read(\"\", var.labels=TRUE)   Read variable labels into l,\n",
+      "                           required name for data frame of labels\n",
+      "3. Help()                  Get help, and, e.g., Help(Read)\n",
+      "4. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
+      "5. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
+      "6. by1= , by2=             Trellis graphics, a plot for each by1, by2\n",
+      "7. reg(Y ~ X, Rmd=\"eg\")    Regression with full interpretative output\n",
+      "8. style(\"gray\")           Grayscale theme, + many others available\n",
       "   style(show=TRUE)        all color/style options and current values\n",
-      "8. getColors()             create many types of color palettes\n")
+      "9. getColors()             create many styles of color palettes\n")
 
   options(theme = "colors")
   options(sub.theme = "default")
@@ -73,9 +73,8 @@ function(...) {
   options(se.fill = "#1A1A1A28")   # .maketrans("gray10", 40)
   options(fit.color = "gray15")
   options(fit.lwd = 2)
-  options(area.fill = "gray80")
   options(heat = "gray30")
-  options(segment.color = "gray15")
+  options(segment.color = "gray40")
   options(ID.color = "gray50")
 
   options(main.color = "gray15")
@@ -124,7 +123,7 @@ function(...) {
 
   options(add.fill = "gray20")
   options(add.trans = 0.0)
-  options(add.color = "gray60")
+  options(add.color = "gray30")
   options(add.cex = 0.9)
   options(add.lwd = 0.5)
   options(add.lty = "solid")
@@ -374,8 +373,8 @@ function(...) {
       } 
     }
 
-    mylbl <- which(dfs == "mylabels")
-    if (length(mylbl) > 0) dfs <- dfs[-mylbl]
+#   mylbl <- which(dfs == "l")
+#   if (length(mylbl) > 0) dfs <- dfs[-mylbl]
   }
   else
     dfs <- NULL
@@ -655,12 +654,12 @@ function(...) {
 
   dname <- getOption("dname")
   if (dname %in% ls(name=.GlobalEnv))
-    mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
+    l <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
   else
-    mylabels <- NULL
+    l <- NULL
 
-  if (!is.null(mylabels)) {
-    lbl <- mylabels[which(names(mylabels) == var.name)]
+  if (!is.null(l)) {
+    lbl <- l[which(names(l) == var.name)]
     if (!is.null(lbl)) cat(", ", as.character(lbl))
   }
 
@@ -693,16 +692,16 @@ function(...) {
   dname <- getOption("dname")
 
   if (dname %in% ls(name=.GlobalEnv))
-    mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
+    l <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
   else
-    mylabels <- NULL
+    l <- NULL
   if (dname %in% ls(name=.GlobalEnv))
     myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
   else
     myunits <- NULL
 
-  if (!is.null(mylabels)) {
-    lbl <- mylabels[which(names(mylabels) == var.name)]
+  if (!is.null(l)) {
+    lbl <- l[which(names(l) == var.name)]
     unt <- myunits[which(names(myunits) == var.name)]
     if (!is.null(unt)) if (nzchar(unt))  if(!is.na(unt))
       lbl <- paste(lbl, " (", unt, ")", sep="")
@@ -785,7 +784,7 @@ function(...) {
 # get variable labels if they exist
 .getlabels <- function(xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
                        y.nm=FALSE, by.nm=FALSE, by1.nm=FALSE,
-                       lab.x.cex=NULL, lab.y.cex=NULL, labels=mylabels,
+                       lab.x.cex=NULL, lab.y.cex=NULL, labels=l,
                        graph.win=TRUE, flip=FALSE, ...) {
 
   if (graph.win) {  # do not open a graphics window if no plot
@@ -820,39 +819,51 @@ function(...) {
   else if (!by.nm && by1.nm)
     y.name <- getOption("by1name")
 
-  # get variable labels, x.lbl and y.lbl
   x.lbl <- NULL
   y.lbl <- NULL
-  l.name <- deparse(substitute(labels))
+
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mylabels.ok <- FALSE
+  if (!is.null(dfs)) {
+    if ("mylabels" %in% dfs  &&  !("l" %in% dfs)) {
+      l <- mylabels
+      l.name <- "mylabels"
+      mylabels.ok <- TRUE
+    }
+  }
+  if (!mylabels.ok)
+    l.name <- deparse(substitute(labels))
+
   if (l.name %in% ls(name=.GlobalEnv)) {
-    mylabels <- get(l.name, pos=.GlobalEnv)
+    l <- get(l.name, pos=.GlobalEnv)
 
-    i.row <- which(row.names(mylabels) == x.name)
+    i.row <- which(row.names(l) == x.name)
     if (length(i.row) > 0) if (is.numeric(i.row))
-      if (!is.na(mylabels[i.row, ])) x.lbl <- mylabels[i.row,1]
+      if (!is.na(l[i.row, ])) x.lbl <- l[i.row,1]
 
-    i.row <- which(row.names(mylabels) == y.name)
+    i.row <- which(row.names(l) == y.name)
     if (length(i.row) > 0) if (is.numeric(i.row))
-      if (!is.na(mylabels[i.row, ])) y.lbl <- mylabels[i.row,1]
+      if (!is.na(l[i.row, ])) y.lbl <- l[i.row,1]
   }
 
   else {  # labels embedded in data
     dname <- getOption("dname")  # not set for dependent option on tt
     if (!is.null(dname)) {
       if (dname %in% ls(name=.GlobalEnv)) {
-        mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
+        l <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
         myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
       }
       else
-        mylabels <- NULL
+        l <- NULL
     }
     else
-      mylabels <- NULL
+      l <- NULL
 
-    if (!is.null(mylabels)) {
-      x.lbl <- mylabels[which(names(mylabels) == x.name)]
+    if (!is.null(l)) {
+      x.lbl <- l[which(names(l) == x.name)]
       if (length(x.lbl) == 0) x.lbl <- NULL
-      y.lbl <- mylabels[which(names(mylabels) == y.name)]
+      y.lbl <- l[which(names(l) == y.name)]
       if (length(y.lbl) == 0) y.lbl <- NULL
     }
   }  # end labels embedded in data
@@ -882,13 +893,14 @@ function(...) {
   }
   if (is.null(ylab)) if (st.nya) y.lab <- ""
 
-  if (flip) {
+  if (flip) {  # is this doing any good???  should it be x.lab???
     temp <- ylab;  ylab <- xlab;  xlab <- temp
     temp <- y.lab;  y.lab <- x.lab;  x.lab <- temp
     temp <- y.lbl;  y.lbl <- x.lbl;  x.lbl <- temp
     temp <- lab.y.cex;  lab.y.cex <- lab.x.cex;  lab.x.cex <- temp
     temp <- y.name;  y.name <- x.name; #  x.name <- temp
   }
+
   # ------------------------
   # x-axis and legend labels
 
@@ -1137,7 +1149,7 @@ function(dir, axT) {
         col.lab=lab.x.color, cex.lab=lab.x.cex, ...)
   title(sub=sub.lab, line=lblx.lns+1, cex.sub=0.76,
         col.lab=lab.x.color, ...)
-  title(ylab=y.lab, line=lbly.lns-ylab.adj,
+  title(ylab=y.lab, line=lbly.lns-ylab.adj+.1,
         col.lab=lab.y.color, cex.lab=lab.y.cex, ...)
   title(main=main.lab, cex.main= getOption("main.cex"),
         col.main=getOption("main.color"), ...)
@@ -1188,15 +1200,16 @@ function(dir, axT) {
   # right margin
   rm <- 0.1
 
-
   # bottom margin
   n.lab.x.ln <- 0  # in case x.lab is null
   if (!is.null(x.lab)) {
     if (x.lab != "") {
       strn <- unlist(gregexpr("\n", x.lab, fixed=TRUE))
-      if (strn[1] == -1) strn <- NULL  # return of -1 means no occurrence
+      if (strn[1] == -1) strn <- NULL  # return of -1 means no \n
       n.lab.x.ln <- length(strn) + 1
     }
+    else    # such as from default for time series
+      n.lab.x.ln <- -0.6 + (.1 * lab.x.cex)
   }
 
   ln.ht <- par('cin')[2] * lab.x.cex * par('lheight')  # lin ht inches
@@ -1208,19 +1221,22 @@ function(dir, axT) {
     bm <- max.x.width + (ln.ht * n.lab.x.ln) + 0.25
   tm <- ifelse (is.null(main), tm+.05, tm+.25)  #  adjust tm for increased bm
   if (rotate.x != 0) bm <- bm + .15
+  if (lab.x.cex > 1.1) bm <- bm + .04  # actually should be axis.cex
 
   # left margin
   n.lab.y.ln <- 0  # in case x.lab is null
   if (!is.null(y.lab)) {
     if (y.lab != "") {
       strn <- unlist(gregexpr("\n", y.lab, fixed=TRUE))
-      if (strn[1] == -1) strn <- NULL  # return of -1 means no occurrence
+      if (strn[1] == -1) strn <- NULL  # return of -1 means no \n
       n.lab.y.ln <- length(strn) + 1
     }
   }
 
-  mm <- max.y.width + 0.20
-  if (!is.null(y.lab)) mm <- mm + (n.lab.y.ln * .25)
+  mm <- max.y.width + 0.22
+  if (max.y.width < .10) mm <- mm + .02
+  if (lab.y.cex > 1) mm <- mm + .10
+  if (!is.null(y.lab)) mm <- mm + (n.lab.y.ln * .20)
 
   return(list(lm=mm, tm=tm, rm=rm, bm=bm,
               n.lab.x.ln=n.lab.x.ln, n.lab.y.ln=n.lab.y.ln))
@@ -1524,7 +1540,7 @@ function(dir, axT) {
 
 
 # generate a pre-defined color range if requested
-.color.range <- function(fill, n.clr, no.change=FALSE) {
+.color.range <- function(fill, n.clr) {
 
   # names of color palettes generated by getColors
   nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",
@@ -1555,9 +1571,6 @@ function(dir, axT) {
         clrs <- getColors(fill[1], n=n.clr)  # generate sequential palette
       }
       else {
-#       if (no.change)
-#         clrs <- NULL
-#        else  # for style, lines 374+
           clrs <- fill
       }
 
@@ -1578,7 +1591,7 @@ function(dir, axT) {
 # match a hue to the color theme
 .get.h <- function(theme= getOption("theme")) {
 
-       if (theme %in% c("gray", "white")) h=0  # any value for he works
+       if (theme %in% c("gray", "white")) h=0  # any value for h works
   else if (theme %in% c("colors", "lightbronze", "dodgerblue", "blue")) h <- 240
   else if (theme %in% c("gold", "brown", "sienna")) h <- 60
   else if (theme == "orange") h <- 30
@@ -1593,22 +1606,33 @@ function(dir, axT) {
 
 
 # continuous color scale
-.getColC <- function(x, chroma=55) {
+.getColC <- function(x, chroma=55, fill.name) {
 
   if (getOption("theme") %in% c("gray", "white")) chroma <- 0
 
-  xp <- pretty(x)
-  xp.mn <- min(xp)
-  xp.mx <- max(xp)
-  xp.rn <- xp.mx - xp.mn
+  if (!grepl(".v", fill.name, fixed=TRUE)) {
 
-  x.nrm <- (x - xp.mn) / xp.rn
+    xp <- pretty(x)
+    xp.mn <- min(xp)
+    xp.mx <- max(xp)
+    xp.rn <- xp.mx - xp.mn
 
-  lum <- 100 - (100*x.nrm)  # scale, light to dark flip
-  expn <- (82 + (2 * length(x))) / 100
-  lum <- (lum**expn) + 9  # compress, which darkens, then lighten a bit
-  cc <- hcl(h=.get.h(), c=chroma, l=lum)
-  clr <- getColors(cc)
+    x.nrm <- (x - xp.mn) / xp.rn
+
+    lum <- 100 - (100*x.nrm)  # scale each value, light to dark flip
+    expn <- (82 + (2 * length(x))) / 100
+    lum <- (lum**expn) + 9  # compress, which darkens, then lighten a bit
+    cc <- hcl(h=.get.h(), c=chroma, l=lum)
+    clr <- getColors(cc)
+  }
+
+  else {  # (count.v) so do viridis scaling
+    vir <- viridis(100)
+    x.nrm <- x / max(x)
+    cc <- double(length=length(x.nrm))
+    for (i in 1:length(cc)) cc[i] <- viridis(1, begin=x.nrm[i]) 
+    clr <- cc
+  }
 
   return(clr)
 

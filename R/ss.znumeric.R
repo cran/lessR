@@ -46,7 +46,6 @@ function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     dig.dec <- 4
   }
 
-
   # get maximum chars in 1st three columns
   max.lv <- 0; max.n <- 0; max.nm <- 0
   if (n.lines > 1) {

@@ -1,5 +1,5 @@
 bc.data.frame <-
-function(x, n.cat,
+function(x, n.cat, within,
          col.fill, col.color, col.trans, fill.split, theme,
          horiz, addtop, gap, prop, scale.y,
          xlab, ylab, main,
@@ -62,7 +62,7 @@ function(x, n.cat,
           }
         }
 
-        .bc.main(x[,i], y=NULL, by=NULL,
+        .bc.main(x[,i], y=NULL, by=NULL, within,
           col.fill, col.color, col.trans, fill.split, theme,
           horiz, addtop, gap, prop, scale.y,
           xlab, ylab, main,

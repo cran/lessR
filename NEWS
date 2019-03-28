@@ -6,14 +6,111 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
  
  
->>>>>> Changes for lessR version 3.8.0 (2019-01-10) <<<<<<
+>>>>>> Changes for lessR version 3.8.2 (2019-03-28) <<<<<<
+
+-------------
+Updates 3.8.2
+-------------
+
+data
+  dataStockPrice.rda data updated through January of 2019
+
+BarChart
+  break.x now defaults to FALSE for horizontal bar chart, that is,
+    do not break value labels at blanks by default
+  break.x, break value labels to new line at a space, default
+    only when not horizontal and rotate.x=0 
+  stat.y parameter added to plot the "mean", "sd", "dev", etc. of
+    y for each level of x, with default of "mean" for raw data table
+  bar chart now possible with unique values of x
+  row.names a valid variable name for x
+  if analyze one variable of unique values, analysis proceeds by
+    listing the values, instead of throwing an error message
+  stack100 replaces prop, which no longer works but gives message
+  fill=(count.v) for viridis palette of mapping y to fill
+
+getColors
+  power parameter added to allow customization for sequential and
+    divergent scales (relying upon package colorspace functions)
+
+Histogram
+  prop parameter changed to stat.x="proportion" for consistency
+
+Plot
+  for Cleveland dot plot with two variables plotted against categorical,
+    differences for each row of data displayed at the console
+  annotations for a time series with dates on the x-axis now possible
+    with passing x-coordinates as type Date
+  for line plots, replace area=TRUE to get default fill color
+    with fill="on"
+  new area.fill parameter allows custom fill color
+  Cleveland dot plot for counts now has axis that begins at 0
+  stat.x parameter has "%" option to display percentages by level of x
+  stat.yx parameter has "dev" option to plot mean deviations
+  legend for two x-variables now vertical, just like two y-variables
+  y-axis label plots by default even for Cleveland dot plot
+  legend box color set to "transparent"
+  stacked time series yields black lines of width=1
+  Trellis time series by default n.col=1 if 4 or less panels, else is 2
+
+Read
+  automatically convert Excel date fields to R Date type (i.e., set
+    openxlsx read.xlsx function parameter detectDates to TRUE)
+  name of first parameter, the input file, changed from ref to from
+  var.labels parameter replaces labels, set to TRUE if reading labels
+  l replaces data frame name mylabels for reading variable labels
+
+Regression
+  quiet option provided
+  automatic rendering of Rmd file
+  if rendered Rmd output is html, automatically open in a browser
+  Rmd.format parameter added for html, word, or pdf rendering
+
+ttest
+  rows option for selecting rows of data
+
+Write
+  name of first parameter, the output file, changed from ref to to
+  Excel.table parameter added, default is FALSE for no table
+  ExcelColWidth option added, set to FALSE to save time for large files
+  if row names are consecutive integers, by default not written
+  wrt.x abbreviation for format="Excel"
+
+
+---------------
+Bug Fixes 3.8.2
+---------------  
+
+BarChart
+  axis labels for bar chart with values of y read (not tabulated)
+    no longer reversed
+ 
+Plot
+  Cleveland dot plot of a vector of two or more numerical variables
+    against a categorical variable displays correctly
+  run=TRUE works if missing data
+  Trellis dot chart shows proportions if requested
+  color range such as "blues" and trans > 0 works
+
+style
+  style("gray") followed by a call to style with no theme and
+    non-gray attributes now allowed
+  pt.fill properly set
+
+SummaryStats
+  allow old default name mydata to work in place of new name d
+
+
+ 
+>>>>>> Changes for lessR version 3.8.1 (2019-01-10) <<<<<<
 
 -------------
 Updates 3.8.1
 -------------
 
 Histogram, Plot
-  cumulate new name for old parameter name cumul
+  cumulate new name for old parameter name cumul, which still works
+
 
 ---------------
 Bug Fixes 3.8.1
@@ -22,7 +119,7 @@ Bug Fixes 3.8.1
 all data analysis routines
   adjustment to change in class of tibbles to recognize
     and internally convert to data frames
-  properly use mydata as default if d not specified
+  properly use mydata as default if new default d not specified
 
 
  

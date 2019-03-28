@@ -16,18 +16,20 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, c
 
 \usage{
 Histogram(x=NULL, data=d, rows=NULL,
-         theme=getOption("theme"), n.cat=getOption("n.cat"), Rmd=NULL,
+          stat.x=c("count", "proportion"),
+          n.cat=getOption("n.cat"), Rmd=NULL,
 
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
 
+    bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
+
+    theme=getOption("theme"),
     fill=getOption("bar.fill.ordered"),
     color=getOption("bar.color.ordered"),
     trans=getOption("trans.bar.fill"),
 
-    bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
-
-    prop=FALSE, values=FALSE,
+    values=FALSE,
     reg="snow2", cumulate=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -57,7 +59,9 @@ hs(\ldots)
         default is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
-  \item{theme}{Color theme for this analysis.}
+  \item{stat.x}{Bin and transform values of variable \code{x} into
+       \code{"counts"} by default or \code{"proportion"} if specified,
+       that is, frequencies or relative frequencies.}
   \item{n.cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric
         data type
@@ -92,6 +96,18 @@ hs(\ldots)
         to "bank" to 45 degrees, that is, with the line slope approximately
         45 degrees.}\cr
 
+  \item{bin.start}{Optional specified starting value of the bins.}
+  \item{bin.width}{Optional specified bin width, which can be specified with or
+        without a \code{bin.start} value.}
+  \item{bin.end}{Optional specified value that is within the last bin, so the
+        actual endpoint of the last bin may be larger than the specified value.}
+  \item{breaks}{The method for calculating the bins, or an explicit specification
+       of the bins, such as with the standard R \code{\link{seq}} function or
+       other options provided by the \code{\link{hist}} function that include
+       the default \code{"Sturges"} plus \code{"Scott"} and \code{"FD"}.}\cr
+
+  \item{theme}{Color theme for this analysis. Make persistent across analyses
+        with \code{\link{style}}.}
   \item{fill}{Fill color of the bars. 
         Can explicitly choose \code{"grays"}
         or \code{"hcl"} colors, or pre-specified R color schemes 
@@ -108,18 +124,6 @@ hs(\ldots)
         Default is
         \code{trans.bar.fill} from the lessR \code{\link{style}} function.}\cr
 
-  \item{bin.start}{Optional specified starting value of the bins.}
-  \item{bin.width}{Optional specified bin width, which can be specified with or
-        without a \code{bin.start} value.}
-  \item{bin.end}{Optional specified value that is within the last bin, so the
-        actual endpoint of the last bin may be larger than the specified value.}
-  \item{breaks}{The method for calculating the bins, or an explicit specification
-       of the bins, such as with the standard R \code{\link{seq}} function or
-       other options provided by the \code{\link{hist}} function that include
-       the default \code{"Sturges"} plust \code{"Scott"} and \code{"FD"}.}\cr
-
-  \item{prop}{Specify proportions or relative frequencies on the vertical axis.
-       Default is \code{FALSE}.}
   \item{values}{Replaces standard R \code{labels} options, which has multiple
        definitions in R. Specifies to display the count of each bin.}
   \item{reg}{The color of the superimposed, regular histogram when
@@ -342,7 +346,7 @@ Histogram(Salary, breaks=seq(0,150000,20000), xlab="My Variable")
 Histogram(Salary, breaks="Scott", values=TRUE, quiet=TRUE)
 
 # histogram with the number of suggested bins, with proportions
-Histogram(Salary, breaks=15, prop=TRUE)
+Histogram(Salary, breaks=15, stat.x="proportion")
 
 # histogram with non-default values for x- and y-axes
 d[2,4] <- 45000
@@ -362,8 +366,7 @@ Histogram(Salary, by1=Dept)
 Histogram(Salary, cumulate="both")
 
 # cumulative histogram plus regular histogram
-# present with proportions on vertical axis, override other defaults
-Histogram(Salary, cumulate="both", prop=TRUE, reg="mistyrose")
+Histogram(Salary, cumulate="both", reg="mistyrose")
 
 
 # -------------------------------------------------

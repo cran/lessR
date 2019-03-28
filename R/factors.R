@@ -50,17 +50,17 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
   # copy the variable labels to the newly created .f vars
   if (var.labels) {
 
-    l.name <- "mylabels"
+    l.name <- "l"
     if (exists(l.name, where=.GlobalEnv)) {
-      mylabels <- get(l.name, pos=.GlobalEnv)
+      l <- get(l.name, pos=.GlobalEnv)
     }
     else {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-                      "No mylabels data frame available.\n\n")
+                      "No l data frame available.\n\n")
     }
 
     nm.vars <- names(data)[ind]
-    new.lbls <- mylabels[which(row.names(mylabels) %in% nm.vars), ]
+    new.lbls <- l[which(row.names(l) %in% nm.vars), ]
 
     new.mat2 <- data.frame(matrix(nrow=n.add, ncol=1))
     names(new.mat2) <- "label"
@@ -69,7 +69,7 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
     row.end <- n.col + n.add
     rownames(new.mat2)[1:n.add] <- all.names[(row.start):(row.end)]
     new.mat2[, 1] <- new.lbls
-    new.labels <- rbind(mylabels, new.mat2)
+    new.labels <- rbind(l, new.mat2)
   }
 
   if (!var.labels)

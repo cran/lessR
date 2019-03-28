@@ -80,8 +80,6 @@ function() {
         .to_rgb(getOption("ellipse.color")), "\n")
     cat("ellipse.lwd ...... Ellipse border width ..... ",
         .fmt(getOption("ellipse.lwd"), 2), "\n")
-    cat("area.fill ........ Line chart area fill color ",
-        .to_rgb(getOption("area.fill")), "\n")
     cat("bubble.text.color  Bubble text color .........",
         .to_rgb(getOption("bubble.text.color")), "\n")
     cat("segment.color .... Line segment color ........",

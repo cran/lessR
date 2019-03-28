@@ -2,33 +2,40 @@
 \alias{Write}
 \alias{wrt}
 \alias{wrt.r}
+\alias{wrt.x}
 
 \title{Write the Contents of a Data Frame to an External File}
 
 \description{
-Abbreviation: \code{wrt}, \code{wrt.r}
+Abbreviation: \code{wrt}, \code{wrt.r}, \code{wrt.x}
 
 Writes the contents of the specified data frame, such as with the default \code{d}, to the current working directory as either the default \code{csv} data file, an Excel data table, or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels and variable units are automatically included in a native R data file.
 }
 
 \usage{
-Write(ref=NULL, data=d, format=c("csv", "R", "Excel"), 
-         row.names=TRUE, \ldots)
+Write(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
+         ExcelTable=FALSE, ExcelColWidth=TRUE, \ldots)
 
 wrt(\ldots)
 
 wrt.r(\ldots, format="R")
+wrt.x(\ldots, format="Excel")
 }
 
 
 \arguments{
-  \item{ref}{Name of the output file as a character string, that is, with quotes.
+  \item{to}{Name of the output file as a character string, that is, with quotes.
         If not included in the name, the file type is automatically added to the
         name, either \code{.csv} or \code{.rda}, depending of the value of
         \code{format}.}
   \item{data}{Data frame to be written as an object, that is, no quotes.}
   \item{format}{Format of file to be written with \code{.csv} as the default.}
-  \item{row.names}{Format of file to be written with \code{.csv} as the default.}
+  \item{rowNames}{Format of file to be written with \code{.csv} as the default.
+       Set to \code{TRUE} by default unless writing to Excel or csv file
+       and row names are just the integers from 1 to the number of rows.}
+  \item{ExcelTable}{If \code{TRUE}, write the Excel file as an Excel table.}
+  \item{ExcelColWidth}{On by default but calculation of column widths for
+       large files takes more time, so option to turn off.}
   \item{...}{Other parameter values consistent with the usual \code{\link{write.table}}.}
 }
 
@@ -63,8 +70,9 @@ Write("GoodData")
 wrt.r()
 
 # write the data as an Excel data table in an Excel file
-# do not include row names in the output Excel files
-Write("GoodData", format="Excel", row.names=FALSE)
+Write("GoodData", format="Excel")
+# with abbreviation
+wrt.x("GoodData")
 
 # access the R data frame warpbreaks
 data(warpbreaks)

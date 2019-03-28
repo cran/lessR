@@ -45,7 +45,7 @@ function(my.formula, data=d, rows=NULL,
   # if a tibble convert to data frame
   if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
    if (any(grepl("tbl", class(data), fixed=TRUE))) {
-      data <- data.frame(data, stringsAsFactors=TRUE)
+      data <- data.frame(data, stringsAsFactors=FALSE)
    }
   }
 

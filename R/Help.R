@@ -74,9 +74,9 @@ function(topic=NULL, width=4.5, height=4.5) {
   fhist <- bquote(paste(bold("Help(Histogram)"), "  Histogram, box plot, dot plot, density curve"))
   fbar <- bquote(paste(bold("Help(BarChart)"), "  Bar chart, pie chart"))
   fline <- bquote(paste(bold("Help(LineChart)"), "  Line chart, such as a run chart or time series chart"))
-  fplot <- bquote(paste(bold("Help(ScatterPlot)"), "  Scatterplot for one or two variables, a function plot"))
+  fplot <- bquote(paste(bold("Help(Plot)"), "  Scatterplot for one or two variables, a function plot"))
 
-  fstat <- bquote(paste(bold("Help(SummaryStats)"), "  Summary statistics for one or two variables"))
+  fstat <- bquote(paste(bold("Help(ss)"), "  Summary statistics for one or two variables"))
   fone <- bquote(paste(bold("Help(one.sample)"), "  Analysis of a single sample of data"))
   fmean <- bquote(paste(bold("Help(ttest)"), "  Compare two groups by their mean difference"))
   faov <- bquote(paste(bold("Help(ANOVA)"), "  Compare mean differences for many groups"))
@@ -169,17 +169,21 @@ function(topic=NULL, width=4.5, height=4.5) {
   with Read, or its abbreviation, rd. To browse, use an empty (\"\").
       > d <- Read(\"\")
   The  <-, the assignment operator, instructs R to assign what was read
-  to the data table, here named d. This is the default name for
-  the lessR data analysis functions. Use the VariableLabels function, or
-  vl, to read the optional file of file of variable names and labels.
+  to the data table, here named d (for data). This is the default name
+  for the lessR data analysis functions, so data= parameter not needed. 
+
+  To read the optional file of file of variable labels, use.
+      > l <- Read(\"\", var.labels=TRUE)
+  The csv or Excel labels file consists of two columns and one row for
+  each variable specified, the variable name followed by its label, 
+  read into the data frame named the lowercase letter l (for labels).
 
   Or, specify the full data path name in quotes, such as from the web.
       > d <- Read(\"http://lessrstats.com/data/twogroup.csv\")
   To read a text file with a comma for a decimal point, use Read2().
 
   If you wish to view more information about the data table, do
-      > details()
-  If the file is not read into d, include the name: details(name).
+      > details()    or  details(name)  if d is not the data frame name.
 
   To read a text file in which each column of data values assigned a
   specific width, add the widths option that specifies the width of each
@@ -192,7 +196,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   text(50,100, label=t0, font=4)
   text(0,94, label=f1, adj=0)
   #lines(c(5,90), c(89,89), col=col.line)
-  text(0,49, label=t1, adj=0)
+  text(0,45, label=t1, adj=0)
 
   help.more("Read", 9)
   }
@@ -211,18 +215,19 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   Here write the file with specified name in csv format.
       > Write(\"mybestdata\")
-  The file type of .csv is automatically appended to the file name.
+  The file type of .csv is automatically appended to the file name. Relies
+  upon the base R write.table, which is is quite general, with many
+  options.  For more information, enter ?write.table.
 
   To write a data file in Excel format, use the format=\"Excel\" option.
       > Write(\"mybestdata\", format=Excel)
+  Abbreviation, not needing the format parameter, is wrt.x. Relies upon
+  the openxlsx function read.xlsx.
 
   To write a data file in native R format, use the format=\"R\" option,
   or the abbreviation for the function name  wrt.r.
       > wrt.r(\"mybestdata\")
-
-  The lessR Write function relies upon the R function write.table, which
-  is is quite general, with many options.  For more information, enter
-  ?write.table."
+"
 
   set.up.plot(1)
   text(50,100, label=t0, font=4)
@@ -321,19 +326,20 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   f1 <- bquote(paste(bold("style"), "  all lessR system settings such as a color theme"))
   f2 <- bquote(paste(bold("showColors"), "  lessR function to illustrate all color names"))
+  f3 <- bquote(paste(bold("showPalettes"), "  lessR function to illustrate color palettes"))
 
   t1 <- "
   The lessR function style provides style settings for lessR functions.
-  Set the color theme for the graphics functions. The default color style is
-  \"lightbronze\". Other themes are of \"gray\", \"green\", \"darkgreen\", \"gold\",
-  \"rose\", \"red\", \"darkred\", \"brown\", \"purple\", \"sienna\", \"white\",
-  and \"orange\". Can further modify with sub.theme.  Example:
-      > style(\"gold\", sub.theme=\"black\") 
-  Setting a style resets all attributes. Or set individual attributes,
-  or more grouped attributes with sub.theme, which cumulate until reset. 
-  For example, to convert the default theme to gray scale, 
-      > style(window.fill=\"white\")
-  which sets the entire graphics window to a white background.
+  The default color style is \"colors\", with many other available. Set a
+  new theme to reset all attributes. Other changes cumulate until reset.]
+  For example, to convert  to gray scale, 
+      > style(\"gray\")
+  Further modify with a sub.theme, here for another version of grayscale. 
+      > style(\"gray\", sub.theme=\"black\")
+
+  All style options:         > style(show=TRUE)
+  All R named colors:    > showColors()
+  All lessR palettes:       > showPalettes()
 
   Levels of a categorical variable may be encoded with numerical digits,
   such as 0 for Male and 1 for Female. R is obliged to interpret numerical
@@ -343,19 +349,15 @@ function(topic=NULL, width=4.5, height=4.5) {
   Here any numerical variable with just 3 unique, equally spaced interval 
   values or less is interpreted as a categorical variable. The default
   value of n.cat is 8, and applies to Plot and SummaryStats.
-
-  To see all available style options, enter the following.
-      > style(show=TRUE)
-  To see all the R named colors, enter the following.
-      > showColors()
   "
 
-  set.up.plot(2)
+  set.up.plot(3)
   text(50,100, label=t0, font=4)
   text(0,94, label=f1, adj=0)
   text(0,90, label=f2, adj=0)
+  text(0,86, label=f3, adj=0)
   #lines(c(5,90), c(80,80), col=col.line)
-  text(0,47, label=t1, adj=0)
+  text(0,46, label=t1, adj=0)
 
   help.more("style", 7)
   }
@@ -460,7 +462,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   ordered along some dimension such as time. If the data do not have a 
   pronounced trend, a center line is automatically provided.
       > LineChart(Y)
-  or
+  or,
       > Plot(Y, run=TRUE)
   Also provided is a list of all the runs in the data.
 
@@ -495,16 +497,21 @@ function(topic=NULL, width=4.5, height=4.5) {
   else if  (topic %in% c("scatterplot", "sp", "plot", "scatter")) {
   t0 <- "Plot"
 
-  f1 <- bquote(paste(bold("Plot, sp"), "  A scatterplot for one or two variables"))
+  f1 <- bquote(paste(bold("Plot, sp"), "  A scatterplot (and more) for one or two variables"))
 
   t1 <- "
   Plot, or sp, generates a scatter plot for any combination of continuous
-  or categorical variables with the current color theme. For continuous
-  variables, can have an optional data ellipse and fit line.
-      > Plot(X, Y, ellipse=TRUE, fit=TRUE)
+  or categorical variables with the current color theme. For two continuous
+  variables, can have an optional data ellipse and fit line and more.
+      > Plot(X, Y, enhance=TRUE)
   For sorted values of X, a function plot results so that the points are
   not individually displayed and are connected by line segments. If the
   number of unique response values <= n.cat=8, produce a bubble plot.
+
+  For a single numeric variable, get a VBS plot, an integrated violin,
+  box and scatter plot.
+      > Plot(X)
+  Parameter settings automatically adjusted to provide an optimal plot.
 
   Can also plot two variables with different symbols and/or colors for
   each level of a third variable, and have more than 1 X or Y variable.
@@ -515,12 +522,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   Here plot Salary against 3 variables, with 3 least squares fit lines.
       > Plot(Salary, c(Pre, Post, Years), fit=\"ls\")
   Here obtain a bubble plot of two categorical variables.
-      > Plot(Gender, Dept)
-
-  The theme option specifies color themes. Here all subsequent
-  graphics are with the darkred color theme, no transparency.
-      > style(\"darkred\", trans.pt.fill=0)
-      > Plot(X, Y)"
+      > Plot(Gender, Dept)"
 
   set.up.plot(1)
   text(50,100, label=t0, font=4)
@@ -771,8 +773,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   Obtain abbreviated output with brief=TRUE, or use the abbreviation,
        > reg.brief(Y ~ X1 + X2)
 
-  Can save the output for later analysis and viewing, such as with knitr,
-  and create a text file of R Markdown instructions with file type .Rmd.
+  Specify a file name with the Rmd parameter and obtain full interpretative
+  output from generated R Markdown instructions right to a web browser.
        > r <- reg(Y ~ X1 + X2, Rmd=\"reg_out\")
        > r                       # to see all the output
        > r$out_coefs     # to see this one segment of output

@@ -199,25 +199,25 @@ function(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
 
   # feedback regarding variable labels
   if (brief) cat("\n")
-  mylabels <- attr(data, which="variable.labels")
+  l <- attr(data, which="variable.labels")
   myunits <- attr(data, which="variable.units")
 
-  if (!is.null(mylabels)) {
+  if (!is.null(l)) {
     cat("\nVariable Names   Variable Labels\n")
-    n.rows <- length(mylabels)
+    n.rows <- length(l)
     n.lines <- min(max.lines, n.rows)
 
     mx.nm <- 0
     for (i in 1:n.lines) {  # width of var names
-      if (!is.na(mylabels[i])) if (nchar(names(mylabels)[i]) > mx.nm)
-        mx.nm <- nchar(names(mylabels)[i])
+      if (!is.na(l[i])) if (nchar(names(l)[i]) > mx.nm)
+        mx.nm <- nchar(names(l)[i])
     }
     width.nm <- mx.nm + 1
 
     mx.ln <- 0
     nc <- 0
     for (i in 1:n.lines) {  # get width of largest line
-      if (!is.na(mylabels[i])) nc <- nchar(as.character(mylabels[i]))
+      if (!is.na(l[i])) nc <- nchar(as.character(l[i]))
       if (nc > mx.ln) mx.ln <- mx.nm + nc
     }
     width.ln <- max(mx.ln, nchar("Variable Names  Variable Labels"))
@@ -225,9 +225,9 @@ function(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
 
     .dash(width.ln)
     for (i in 1:n.lines) {
-      blanks <- paste(rep(" ", width.nm-nchar(names(mylabels)[i])), collapse="")
-      if (is.na(mylabels[i])) mylabels[i] <- ""
-      cat(names(mylabels)[i], blanks, mylabels[i], "\n")
+      blanks <- paste(rep(" ", width.nm-nchar(names(l)[i])), collapse="")
+      if (is.na(l[i])) l[i] <- ""
+      cat(names(l)[i], blanks, l[i], "\n")
     }
     .dash(width.ln)
 

@@ -24,13 +24,13 @@ function(nm, dname, fun.call, res.rows, pred.rows, res.sort,
   X <- xAnd(pred)
 
   # get variable labels and units if exist
-  mylabels <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
+  l <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
   myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
   var.lbl <- character(length=0)
   # var.unit <- character(length=0)
   for (i in 1:n.vars) {
-    if (!is.null(mylabels))
-      var.lbl[i] <- mylabels[which(names(mylabels) == nm[i])]
+    if (!is.null(l))
+      var.lbl[i] <- l[which(names(l) == nm[i])]
     #if (!is.null(myunits))
 	#  var.unit[i] <- myunits[which(names(myunits) == nm[i])]  # not used
   }
@@ -432,10 +432,10 @@ sep="")
     if (interpret) {
 
         # response variable labels/units
-        l.nm <- which(names(mylabels) == Y)
-        if (!is.null(mylabels[l.nm])) {
-          if (nzchar(mylabels[l.nm])) {
-            lY <- mylabels[which(names(mylabels) == Y)]
+        l.nm <- which(names(l) == Y)
+        if (!is.null(l[l.nm])) {
+          if (nzchar(l[l.nm])) {
+            lY <- l[which(names(l) == Y)]
             txtY <- lY
           }
         }
@@ -460,10 +460,10 @@ sep="")
         if (i == 1 && n.pred > 1) tx[length(tx)+1] <- ""
         if (n.pred > 1) tx[length(tx)+1] <- paste( "* _", pred[j], "_: ", sep="")
 
-        l.nm <- which(names(mylabels) == pred[j])
-        if (!is.null(mylabels[l.nm])) {
-          if (nzchar(mylabels[l.nm])) {
-            l <- mylabels[which(names(mylabels) == pred[j])]
+        l.nm <- which(names(l) == pred[j])
+        if (!is.null(l[l.nm])) {
+          if (nzchar(l[l.nm])) {
+            l <- l[which(names(l) == pred[j])]
             txt <- paste("unit of the value of", l)
           }
         }

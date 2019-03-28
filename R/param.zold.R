@@ -8,17 +8,17 @@ function (...) {
 
     for (i in 1:length(dots)) {
 
-      if (grepl("fill", names(dots)[i], fixed=TRUE)  ||
-          grepl("color.", names(dots)[i], fixed=TRUE)) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "The parameter list for this function is much shortened by moving\n",
-          "most color and related style attributes to function:  style\n\n",
-          "Example: Here set the theme to gold with a fill color of ",
-          "\"powerderblue\"\n\n",
-          "style(\"gold\", fill=\"powderblue\")\n\n",
-          "Enter   style(show=TRUE)  to see all the options\n",
-          "Enter   ?style  to view the help file\n\n")
-      }
+#     if (grepl("fill", names(dots)[i], fixed=TRUE)  ||
+#         grepl("color.", names(dots)[i], fixed=TRUE)) {
+#       cat("\n"); stop(call.=FALSE, "\n","------\n",
+#         "The parameter list for this function is much shortened by moving\n",
+#         "most color and related style attributes to function:  style\n\n",
+#         "Example: Here set the theme to gold with a fill color of ",
+#         "\"powerderblue\"\n\n",
+#         "style(\"gold\", fill=\"powderblue\")\n\n",
+#         "Enter   style(show=TRUE)  to see all the options\n",
+#         "Enter   ?style  to view the help file\n\n")
+#     }
 
       if (grepl("stroke", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -31,7 +31,8 @@ function (...) {
       }
 
       if (grepl("col.", names(dots)[i], fixed=TRUE)) 
-        if (names(dots)[i] != "col.main"  &&
+        if (names(dots)[i] != "col.names"  &&
+            names(dots)[i] != "col.main"  &&
             names(dots)[i] != "col.lab"  &&
             names(dots)[i] != "col.sub") {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -50,6 +51,27 @@ function (...) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Now use lab.adj vector: xlab, ylab\n",
           "e.g., lab.adj=c(.5,0) moves x-axis label in 0.5 in \n\n")
+      }
+
+      if (names(dots)[i] == "area") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  area=TRUE  renamed  fill=\"on\" or area.fill=\"on\"\n\n")
+      }
+
+      if (names(dots)[i] == "ref") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  ref  renamed  from  or  to  for Read and Write\n\n")
+      }
+
+      if (names(dots)[i] == "prop") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  prop  renamed  stack100 for two variables\n",
+          "and  stat.x=\"proportion\"  for one variable\n\n")
+      }
+
+      if (names(dots)[i] == "proportion") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  proportion  renamed  stat.x=\"proportion\" \n\n")
       }
 
       if (names(dots)[i] == "band") {
@@ -170,7 +192,7 @@ function (...) {
       }
       if (names(dots)[i] == "values") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  values  renamed  stat\n\n")
+          "option  values  renamed  stat.x  or  stat.yx\n\n")
       }
       if (names(dots)[i] == "type") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",

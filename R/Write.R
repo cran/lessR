@@ -1,10 +1,12 @@
 Write <- 
-function(ref=NULL, data=d, format=c("csv", "R", "Excel"), 
-         row.names=TRUE, ...) {
+function(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
+         ExcelTable=FALSE, ExcelColWidth=TRUE, ...) {
 
   format <- match.arg(format)
 
   df.name <- deparse(substitute(data))
+
+  .param.old(...)
 
   if (!exists(df.name, where=.GlobalEnv)) {
     cat("\n");
@@ -15,60 +17,75 @@ function(ref=NULL, data=d, format=c("csv", "R", "Excel"),
     cat("\n")
   }
 
+  if (is.null(rowNames)) {  # if just consecutive integers, ignore row names
+    if (format %in% c("csv", "Excel")) {
+      rn <- length(setdiff(row.names(data), as.character(1:nrow(data))))
+      rowNames <- ifelse (rn == 0, FALSE, TRUE) 
+    } 
+  }
+
   if (format == "csv") {
-    if (is.null(ref))
+    if (is.null(to))
       file.data <- paste(df.name, ".csv", sep="")
     else {
-       txt <- ifelse (grepl(".csv", ref), "", ".csv")
-       file.data <- paste(ref, txt, sep="")
+       txt <- ifelse (grepl(".csv", to), "", ".csv")
+       file.data <- paste(to, txt, sep="")
     }
-    write.csv(data, file=file.data, ...)
+    write.csv(data, file=file.data, row.names=rowNames, ...)
     .showfile(file.data, c(df.name, "data values"))
 
-    mylabels <- attr(data, which="variable.labels") # save variable labels
-    if (!is.null(mylabels)) {
-      mylabels <- data.frame(mylabels)
+    l <- attr(data, which="variable.labels") # save variable labels
+    if (!is.null(l)) {
+      l <- data.frame(l)
       file.lbl <- substr(file.data,1,nchar(file.data)-4)
       file.lbl <- paste(paste(file.lbl,"_lbl",sep=""), ".csv" ,sep="")
-      write.table(mylabels, file=file.lbl, col.names=FALSE, dec=".", sep=",")
+      write.table(l, file=file.lbl, col.names=FALSE, dec=".", sep=",")
       .showfile(file.lbl, c(df.name, "variable labels"))
     }
   }
   
-  else if (format == "R") {
-    if (is.null(ref))
-      file.data <- paste(df.name, ".rda", sep="")
-    else {
-      txt <- ifelse (grepl(".rda", ref), "", ".rda")
-      file.data <- paste(ref, txt, sep="")
-    }
-    save(list=df.name, file=file.data, ...)
-    .showfile(file.data, c(df.name, "data frame contents"))
-  }
-  
   else if (format == "Excel") {
-    if (is.null(ref))
+    if (is.null(to))
       file.data <- paste(df.name, ".xlsx", sep="")
     else {
-      txt <- ifelse (grepl(".xlsx", ref), "", ".xlsx")
-      file.data <- paste(ref, txt, sep="")
+      txt <- ifelse (grepl(".xlsx", to), "", ".xlsx")
+      file.data <- paste(to, txt, sep="")
     }
+
     wb <- createWorkbook()
     addWorksheet(wb, df.name)
-    hs1 <- createStyle(fgFill=rgb(.9,.9,.9), halign="CENTER",
-          textDecoration="italic", border="Bottom")
-    setColWidths(wb, sheet=1, cols=1:ncol(data), widths="auto") 
-    writeDataTable(wb, df.name, x=data, colNames=TRUE,
-         startCol="A", startRow=1, tableStyle="TableStyleLight9",
-         rowNames=row.names)
-         #borders="none", headerStyle=hs1, borderStyle="dashed")
+    if (ExcelColWidth)
+      setColWidths(wb, sheet=1, cols=1:ncol(data), widths="auto") 
+    if (ExcelTable)
+      writeDataTable(wb, df.name, x=data, colNames=TRUE,
+           xy=c("A",1), rowNames=rowNames, tableStyle="TableStyleLight9")
+    else {
+      hsl <- createStyle(fgFill="gray85", border="bottom")
+      writeData(wb, df.name, x=data, colNames=TRUE, xy=c("A",1),
+                rowNames=rowNames, headerStyle=hsl)
+    }
+
     saveWorkbook(wb, file=file.data, overwrite=TRUE)
     txt <- "Alexander Walker's openxlsx package]"
-    cat("[with the writeDataTable function from", txt, "\n")
+    if (ExcelTable)
+      cat("[with the writeDataTable function from", txt, "\n")
+    else
+      cat("[with the writeData function from", txt, "\n")
     cat("\n")
     .showfile(file.data, c(df.name, "data values"))
     cat("\n")
 
+  }
+  
+  else if (format == "R") {
+    if (is.null(to))
+      file.data <- paste(df.name, ".rda", sep="")
+    else {
+      txt <- ifelse (grepl(".rda", to), "", ".rda")
+      file.data <- paste(to, txt, sep="")
+    }
+    save(list=df.name, file=file.data, ...)
+    .showfile(file.data, c(df.name, "data frame contents"))
   }
 
 }

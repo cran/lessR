@@ -1,17 +1,19 @@
 Histogram <-
 function(x=NULL, data=d, rows=NULL,
-         theme=getOption("theme"), n.cat=getOption("n.cat"), Rmd=NULL,
+         stat.x=c("count", "proportion"),
+         n.cat=getOption("n.cat"), Rmd=NULL,
 
     by1=NULL, by2=NULL,
     n.row=NULL, n.col=NULL, aspect="fill",
 
+    bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
+
+    theme=getOption("theme"),
     fill=getOption("bar.fill.ordered"),
     color=getOption("bar.color.ordered"),
     trans=getOption("trans.bar.fill"),
 
-    bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
-
-    prop=FALSE, values=FALSE,
+    values=FALSE,
     reg="snow2", cumulate=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -32,6 +34,9 @@ function(x=NULL, data=d, rows=NULL,
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumulate <- match.arg(cumulate)
+
+  stat.x <- match.arg(stat.x)
+  proportion <- ifelse (stat.x == "proportion", TRUE, FALSE)   # old signal
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -111,7 +116,7 @@ function(x=NULL, data=d, rows=NULL,
   # if a tibble convert to data frame
   if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
    if (any(grepl("tbl", class(data), fixed=TRUE))) {
-      data <- data.frame(data, stringsAsFactors=TRUE)
+      data <- data.frame(data, stringsAsFactors=FALSE)
    }
   }
 
@@ -151,7 +156,7 @@ function(x=NULL, data=d, rows=NULL,
             cat("\n"); stop(call.=FALSE, "\n","------\n",
               "A histogram is only computed from a numeric variable\n",
               "To tabulate the values of a categorical variable:\n\n",
-              "  Plot(", x.name, ", topic=\"count\")\n",
+              "  Plot(", x.name, ", stat=\"count\")\n",
               "or\n",
               "  BarChart(", x.name, ")\n\n", sep="")
           }
@@ -244,10 +249,9 @@ function(x=NULL, data=d, rows=NULL,
 
   if (Trellis && do.plot) {
 
-    .bar.lattice(data.x[,1], by1.call, by2.call, n.row, n.col, aspect, prop,
-                 fill, color, trans, size.pt=NULL,
-                 xlab, ylab, main,
-                 rotate.x, offset,
+    .bar.lattice(data.x[,1], by1.call, by2.call, n.row, n.col, aspect, 
+                 proportion, fill, color, trans, size.pt=NULL,
+                 xlab, ylab, main, rotate.x, offset,
                  width, height, pdf, segments.x=NULL, breaks, c.type="hist",
                  quiet)
   }
@@ -314,7 +318,7 @@ function(x=NULL, data=d, rows=NULL,
         stuff <- .hst.main(data[,i], fill, color, trans, reg,
             rotate.x, rotate.y, offset,
             breaks, bin.start, bin.width,
-            bin.end, prop, values, cumulate, xlab, ylab, main, sub, 
+            bin.end, proportion, values, cumulate, xlab, ylab, main, sub, 
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
             add, x1, x2, y1, y2,
             scale.x, scale.y,

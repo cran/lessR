@@ -63,7 +63,7 @@ d <- read.table(text="Severity Description
 4 Moderate
 3 Moderate
 2 Mild
-1 Severe", header=TRUE)
+1 Severe", header=TRUE, stringsAsFactors=FALSE)
 
 # recode Severity into a new variable called SevereNew
 d <- Recode(Severity, new.vars="SevereNew", old=1:4, new=c(10,20,30,40))

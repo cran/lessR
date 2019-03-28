@@ -4,7 +4,7 @@
 
 \title{Create Factor Variables Across a Sequential Range or Vector of Variables}
 
-\description{Creates factors for many variables. Specify a range from a given \code{start} variable and \code{end} variable.  Applies only to variables in a data frame, \code{d} by default.
+\description{Creates factors for many variables. Specify a range from a given \code{start} variable and \code{end} variable.  Applies only to variables in a data frame, \code{d} by default, and outputs the entire data frame including the factor transformation.
 }
 
 \usage{
@@ -35,7 +35,7 @@ doFactors(\dots)
 }
 
 \details{
-Invokes the base R \code{\link{Extract}}, \code{\link{which}} and  \code{\link{lapply}} functions to easily define a sequential range of variables within a data frame and then converts the specified variables to factors according to the specified levels and labels.
+Returns the entire data frame if applied to one or more variables in a data frame, including the new factors. 
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -57,7 +57,7 @@ d <- factors(m01:m20, levels=0:5, labels=LikertCats)
 
 # read the data again and this time also the variable labels
 d <- rd("Mach4", in.lessR=TRUE, quiet=TRUE)
-mylabels <- rd("dataMach4_lbl", in.lessR=TRUE)
+l <- rd("dataMach4_lbl", in.lessR=TRUE)
 
 # convert specified variables to factors according to the given vector
 #   of three variables only
@@ -65,5 +65,5 @@ mylabels <- rd("dataMach4_lbl", in.lessR=TRUE)
 d <- factors(c(m06, m07, m20), levels=0:5, labels=LikertCats, new=TRUE)
 # now copy the variable labels from the original integer variables to the 
 #   newly created factor variables
-mylabels <- factors(c(m06, m07, m20), var.labels=TRUE)
+l <- factors(c(m06, m07, m20), var.labels=TRUE)
 }

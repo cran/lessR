@@ -1,5 +1,5 @@
 ttest <-
-function(x=NULL, y=NULL, data=d, paired=FALSE,
+function(x=NULL, y=NULL, data=d, rows=NULL, paired=FALSE,
 
          n=NULL, m=NULL, s=NULL, mu=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
@@ -218,19 +218,23 @@ function(x, y=NULL, ...) {
     }
   }
 
-  # get conditions and check for data existing
-  if (!is.null(x.name)) {
-
- 
-  # if a tibble convert to data frame
-  if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  # tibble to df
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data, stringsAsFactors=TRUE)
-      }
-    }
+  if (!missing(rows)) {  # subset rows
+    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+    r <- r & !is.na(r)  # set missing for a row to FALSE
+    data <- data[r,,drop=FALSE]
   }
 
+  # get conditions and check for data existing
+  if (!is.null(x.name)) {
+ 
+    # if a tibble convert to data frame
+    if (!is.null(dfs)) {
+      if (df.name %in% dfs) {  # tibble to df
+        if (any(grepl("tbl", class(data), fixed=TRUE))) {
+          data <- data.frame(data, stringsAsFactors=FALSE)
+        }
+      }
+    }
 
     xs <- .xstatus(x.name, df.name)
     is.frml <- xs$ifr
@@ -242,6 +246,7 @@ function(x, y=NULL, ...) {
     # see if the variable exists in the data frame
     if (from.data && !in.style && !is.frml) .xcheck(x.name, df.name, names(data))
   }
+
   else {
     is.frml <- FALSE
     from.data <- FALSE
@@ -368,12 +373,11 @@ function(x, y=NULL, ...) {
     x.call <- data.matrix(x.call, rownames.force=FALSE)
 
     # construct y.call, need unique values for Cleveland dot plot
-    #if (missing(data)) data <- data.frame(x.call)  # input data are vectors
     is.unique <- logical(ncol(data))  # initialed to FALSE
     for(i in 1:ncol(data))
       if ((length(data[,i])==length(unique(data[,i]))) && !is.numeric(data[,i]))
         is.unique[i] <- TRUE
-    unq <- which(is.unique)[1]  # choose first non-num variable with unique values
+    unq <- which(is.unique)[1]  # choose 1st non-num variable with unique values
     if (!is.na(unq))
       y.call <- factor(data[, unq[1]])
     else { # no non-num var with unique values, so go to row.names

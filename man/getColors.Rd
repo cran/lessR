@@ -13,14 +13,14 @@ In terms of workflow, use the function by itself to select a set of colors from 
 \usage{
   getColors(pal=NULL, end.pal=NULL,
          n=12, h=0, h2=NULL, c=NULL, l=NULL, trans=0,
-         in.order=NULL, fixup=TRUE,
+         in.order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
          main=NULL, labels=NULL, labels.cex=0.8, lty="solid",
          output=NULL, quiet=getOption("quiet"), \ldots)
 }
 
 \arguments{
-  \item{pal}{Optional specified colors to plot. If a set of
+  \item{pal}{Palette of optional specified colors to plot. If a set of
   specified colors, then the following parameters are not relevant. Can also
   be pre-defined color codes that trigger a sequence of colors from light to
   dark, such as \code{"blues"}.}
@@ -46,7 +46,11 @@ In terms of workflow, use the function by itself to select a set of colors from 
         inclusion in visualizations with qualitative, discrete color scales.}
   \item{fixup}{R parameter name. If \code{TRUE}, then HCL values outside of
         the displayable RGB color space are transformed to fit into that space
-        so as to display.}\cr
+        so as to display.}
+  \item{power}{Power for generating a sequential or divergent HCL scale
+       (via colorspace package) for potentially non-linear changes
+       in chroma and luminance across the scale. Default for sequential is 1
+       and for divergent 0.75.}\cr
    
   \item{shape}{Default is a "rectangle", or specify a "wheel".}
   \item{radius}{Size of wheel. Not applicable to the rectangular shape.}
@@ -171,6 +175,9 @@ getColors("blues", labels=FALSE)
 
 # generate yellow hcl sequence with varying chroma
 getColors("browns", c=c(20,90), l=65)
+
+# non-linear grayscale, more concentration of colors at the beginning
+getColors("black", "white", n=24, power=0.75)
 
 # generate custom hue color sequence close to colorbrewer Blues
 # library(RColorBrewer)

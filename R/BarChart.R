@@ -1,13 +1,15 @@
 BarChart <-
 function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
-        theme=getOption("theme"), n.cat=getOption("n.cat"),
-        one.plot=NULL,
+        stat.x=c("count", "proportion"),
+        stat.yx=c("mean", "sum", "sd", "dev", "min", "median", "max"),
+        n.cat=getOption("n.cat"), one.plot=NULL,
 
         by1=NULL, n.row=NULL, n.col=NULL, aspect="fill",
 
-        horiz=FALSE, beside=FALSE, gap=NULL,
-        proportion=FALSE, scale.y=NULL,
+        horiz=FALSE, beside=FALSE, stack100=FALSE,
+        gap=NULL, scale.y=NULL,
 
+        theme=getOption("theme"),
         fill=NULL,
         color=getOption("bar.color.discrete"),
         trans=getOption("trans.bar.fill"),
@@ -20,7 +22,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         value.labels=NULL,
         rotate.x=getOption("rotate.x"),
         offset=getOption("offset"),
-        break.x=TRUE, sort=c("0", "-", "+"),
+        break.x=NULL, sort=c("0", "-", "+"),
 
         label.max=100, out.size=80,
 
@@ -40,6 +42,19 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         width=6.5, height=6, pdf=FALSE, ...)  {
 
 
+  fill.miss <- ifelse (missing(fill), TRUE, FALSE)
+  color.miss <- ifelse (missing(color), TRUE, FALSE)
+  horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
+
+  stat.x <- match.arg(stat.x)
+  proportion <- ifelse (stat.x == "proportion", TRUE, FALSE)   # old signal
+
+  stat.yx.miss <- ifelse (missing(stat.yx), TRUE, FALSE)
+  stat.yx <- match.arg(stat.yx)
+
+  sort.miss <- ifelse (missing(sort), TRUE, FALSE)
+  sort <- match.arg(sort)
+
   if (theme != getOption("theme")) {  # not the default theme
     sty <- style(theme, reset=FALSE)
     #fill <- sty$bar$bar.fill.discrete
@@ -49,17 +64,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   if (is.null(values)) values <- "eval.later"
 
-  fill.miss <- ifelse (missing(fill), TRUE, FALSE)
-  color.miss <- ifelse (missing(color), TRUE, FALSE)
-  horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
-  sort.miss <- ifelse (missing(sort), TRUE, FALSE)
+  if (missing(break.x)) 
+    break.x <- ifelse (!horiz  &&  rotate.x == 0, TRUE, FALSE)
 
   if (sort[1] %in% c("off", "up", "down")) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Sort now uses \"0\", \"-\", \"+",
       " instead of \"off\", \"down\", \"up\"\n\n")
   }
-  sort <- match.arg(sort)
 
   options(xname = NULL)
   options(yname = NULL)
@@ -115,6 +127,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "option by2 not applicable to BarChart\n\n")
       }
+      if (nms[i] == "proportion") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  proportion  now  stat.x=\"proportion\"\n\n")
+      }
     }
   }
 
@@ -132,7 +148,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
     options(xname = x.name)
 
-
   # let deprecated mydata work as default
   dfs <- .getdfs() 
   mydata.ok <- FALSE
@@ -144,7 +159,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       options(dname = df.name)
     }
   }
-
   if (!mydata.ok) {
     df.name <- deparse(substitute(data))  # get name of data table
     options(dname = df.name)
@@ -154,12 +168,13 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   if (!is.null(dfs)) {
     if (df.name %in% dfs) {  # tibble to df
       if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data, stringsAsFactors=TRUE)
+        data <- data.frame(data, stringsAsFactors=FALSE)
       }
     }
   }
 
-  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
+  # force evaluation (not lazy) if data not specified but relies on default d
+  if ((missing(data) && shiny))
     data <- eval(substitute(data), envir=parent.frame())
 
 
@@ -175,7 +190,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   x.call <- NULL
 
-  if (!missing(x)) {
+  if (is.null(x.name)) x.name <- ""
+  if (x.name == "row.names") {
+    # retain order of row names, otherwise will be alphabetical
+    x.call <- factor(row.names(data), levels=row.names(data))
+    if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
+  }
+
+  else if (!missing(x)) {
 
     if (!x.in.global) {
       if (eval.df) {
@@ -209,7 +231,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
     }
 
-    # read from console with text parameter can insert extra space at front
+    # if read from console with text parameter can insert extra space at front
     if (is.factor(x.call))
       if (nchar(levels(x.call)[1]) > 5)
         levels(x.call) <- trimws(levels(x.call), which="left")
@@ -229,13 +251,13 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
       # see if y exists from a function call
       # indicate a function call with sys.nframe returns larger than 1
-      #if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1)
-        #in.call <- TRUE else in.call <- FALSE
+      # if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1)
+      # in.call <- TRUE else in.call <- FALSE
 
       # get conditions and check for data existing
       #if (!in.call) {
-        xs <- .xstatus(by.name, df.name, quiet)
-        in.global <- xs$ig
+      xs <- .xstatus(by.name, df.name, quiet)
+      in.global <- xs$ig
       #}
       #else in.global <- FALSE
       # if y is in global, sys.nframe() returns two, in.call is TRUE,
@@ -252,7 +274,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
 
     }
-    else
+    else  # end not missing by
       by.call <- NULL
 
 
@@ -332,65 +354,155 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         fill <- fill[order(fill.val, decreasing=srt.dwn)]
       }
     }
-    else if (fill.name != "(count)") {
+    else if (substr(fill.name, 1, 6) != "(count") {
       fill[which(fill == "off")] <- "transparent"
       color[which(color == "off")] <- "transparent"
     }
 
     # or do a tabulation to get value of y
-    if (fill.name == "(count)") {
+    if (substr(fill.name, 1, 6) == "(count") {
       xtb <- table(x.call)
       if (sort != "0") {
         srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
         xtb <- xtb[order(xtb, decreasing=srt.dwn)]
       }
-      fill <- .getColC(xtb)
+      fill <- .getColC(xtb, fill.name=fill.name)
+         
     }  # end .count 
   }  # end !fill.miss
-
-
-    if (length(unique(na.omit(x.call))) == 1) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "There is only one unique value for the values of ", x.name,
-        ": ", na.omit(x.call)[1], "\n",
-        "The bar chart is only computed if there is more than one",
-        " unique value\n\n")
-    }
 
 
   # -----------  x, y, and by variables established ------------
   # ------------------------------------------------------------
 
-    # do the analysis
+  # do the analysis
 
-    if (Trellis && do.plot) {
-
-      .bar.lattice(x.call, by1.call, by2=NULL, n.row, n.col, aspect,
-                   prop=FALSE,
-                   fill, color, trans, size.pt=NULL, xlab, ylab, main,
-                   rotate.x, offset,
-                   width, height, pdf,
-                   segments.x=NULL, breaks=NULL, c.type="bar", quiet)
+  # if data table is raw data, them default stat.yx is "mean"
+  if (stat.yx.miss) {
+    stat.yx <- "data"  # default, no transformation
+    if (!is.null(y.call)) {
+      lx.u <- length(unique(na.omit(x.call)))
+      lb.u <- ifelse(is.null(by.call), 1, length(unique(na.omit(by.call))))
+        if (nrow(data) > lx.u*lb.u) stat.yx <- "mean"
     }
+  }
 
-    else {  # not Trellis
-      if (is.null(by.call))
-        f.name <- x.name
-      else
-        f.name <- paste(x.name, "x", by.name, sep="")
-        
-      if (pdf) {
-        pdf.fnm <- paste("BarChart", "_", f.name, ".pdf", sep="") 
+  if (stat.yx != "data"  &&  is.null(y.call)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "To do a transformation of y for each level of ", x.name, "\n",
+      " need a numerical y variable\n\n")
+  }
+
+
+  if (Trellis && do.plot) {
+
+    .bar.lattice(x.call, by1.call, by2=NULL, n.row, n.col, aspect,
+                 prop=FALSE, 
+                 fill, color, trans, size.pt=NULL, xlab, ylab, main,
+                 rotate.x, offset,
+                 width, height, pdf,
+                 segments.x=NULL, breaks=NULL, c.type="bar", quiet)
+  }
+
+  else {  # not Trellis
+
+    if (is.null(by.call))
+      f.name <- x.name
+    else
+      f.name <- paste(x.name, "x", by.name, sep="")
+      
+    if (pdf) {
+      pdf.fnm <- paste("BarChart", "_", f.name, ".pdf", sep="") 
+      .opendev(pdf.fnm, width, height)
+    }
+    else {
+      if (!shiny) {  # not dev.new for shiny
+        pdf.fnm <- NULL
         .opendev(pdf.fnm, width, height)
       }
-      else {
-        if (!shiny) {  # not dev.new for shiny
-          pdf.fnm <- NULL
-          .opendev(pdf.fnm, width, height)
+    }
+
+    if (stat.yx %in% c("mean", "sum", "sd", "dev", "min", "median", "max")) {
+
+      n.cat <- 0
+      means <- FALSE
+
+      # do stats console output before reducing data
+      if (!quiet) {
+        digits.d <- getOption("digits.d")
+
+        if (!missing(y)) {
+          options(yname = x.name)  # reverse order of x and y for .ss.numeric
+          options(xname = y.name)
+          stats <- .ss.numeric(y.call, by=x.call,
+                               digits.d=digits.d, brief=TRUE, y.name=x.name)
+          txout <- stats$tx
+          options(xname = x.name)  # reverse back
+          options(yname = y.name)
         }
+        else  {
+          stats <- .ss.factor(x.call, digits.d=digits.d, x.name=x.name,
+                              brief=TRUE)
+          txout <- stats$counts
+        }
+
+        class(txout) <- "out"
+
+        output <- list(out_txt=txout)
+        class(output) <- "out_all"
+        print(output)
       }
 
-      bc <- .bc.main(x.call, y.call, by.call,
+    # set up new x.call and y.call for stats
+      if (stat.yx == "sum") {
+        ylab <- paste("Sum of", y.name)
+        out <- tapply(y.call, x.call, sum, na.rm=TRUE)
+      }
+      if (stat.yx == "mean") {
+        ylab <- paste("Mean of", y.name)
+        out <- tapply(y.call, x.call, mean, na.rm=TRUE)
+      }
+      if (stat.yx == "sd") {
+        ylab <- paste("Standard Deviation of", y.name)
+        out <- tapply(y.call, x.call, sd, na.rm=TRUE)
+      }
+      if (stat.yx == "dev") {
+        ylab <- paste("Mean Deviations of", y.name)
+        out <- tapply(y.call, x.call, mean, na.rm=TRUE)
+        out <- out - mean(out, na.rm=TRUE)
+      }
+      if (stat.yx == "min") {
+        ylab <- paste("Minimum of", y.name)
+        out <- tapply(y.call, x.call, min, na.rm=TRUE)
+      }
+      if (stat.yx == "median") {
+        ylab <- paste("Median of", y.name)
+        out <- tapply(y.call, x.call, median, na.rm=TRUE)
+      }
+      if (stat.yx == "max") {
+        ylab <- paste("Maximum of", y.name)
+        out <- tapply(y.call, x.call, max, na.rm=TRUE)
+      }
+
+    #if (is.factor(x.call))  # preserve ordering, will lose order attribute
+      #x.call <- factor(names(out), levels=levels(x.call))
+    #else {
+      #if (is.numeric(x.call)) {
+        #m1 <- min(sort(unique(x.call[,1])))
+        #m2 <- max(sort(unique(x.call[,1])))
+        #x.call <- factor(names(out), levels=m1:m2)  # get entire numeric range
+      #}
+      #else
+      x.call <- factor(names(out))
+    #}
+      y.call <- as.vector(out)
+
+#     x.call <- data.frame(x.call)
+#     y.call <- data.frame(y.call)
+    }  # sum, mean, sd, min, median, max
+
+
+      bc <- .bc.main(x.call, y.call, by.call, stack100,
             fill, color, trans, fill.split, theme,
             horiz, addtop, gap, proportion, scale.y,
             xlab, ylab, main,
@@ -410,9 +522,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         
       invisible(bc)
     }  # not Trellis
+
   }  # end x is a single var
 
 
+  # -----------------------------------------------
   else {  # x is a data frame of multiple variables
 
     if (!is.null(by) || !is.null(by1)) {
@@ -421,8 +535,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
     }
 
     # if values not assigned, do default
-    if (is.null(values) || (!missing(values.color) || !missing(values.size)
-      || !missing(values.digits) || !missing(values.position))) 
+#   if (is.null(values) || (!missing(values.color) || !missing(values.size)
+#     || !missing(values.digits) || !missing(values.position))) 
+    if (is.null(values)) 
         values <- ifelse (missing(y), getOption("values"), "input")
 
     if (is.null(values.digits)) {
@@ -453,7 +568,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
     }  # end determine one.plot
 
-    if (one.plot) {  # one.plot all x's into a single plot
+    if (one.plot) {  # one.plot all x's into a single plot, BPFM for bars
       y.call <- NULL
       by.call <- NULL
       legend.title <- "Title"
@@ -493,7 +608,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         }
       }
       
-      bc <- .bc.main(data, y.call, by.call,
+      bc <- .bc.main(data, y.call, by.call, stack100,
             fill, color, trans, fill.split, theme,
             horiz, addtop, gap, proportion, scale.y,
             xlab, ylab, main,
@@ -513,7 +628,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
     }  # end one.plot
 
     else {  # analyze each x column separately
-      bc.data.frame(data, n.cat,
+      bc.data.frame(data, n.cat, stack100,
         fill, color, trans, fill.split, theme,
         horiz, addtop, gap, proportion, scale.y,
         xlab, ylab, main,

@@ -7,19 +7,23 @@
 \description{
 Abbreviation: \code{bc}
 
-Plots a bar chart, one categorical variable, \code{x} and one numeric variable \code{y}, as well as an optional second categorical variable \code{by} with a provided legend. By default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables, which can be replaced with custom color scales. The numeric variable can be entered as the \code{y}-variable, in which case it could be a non-integer variable. Also displays the frequency table for one or two variables, Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. Activate Trellis graphics  by specifying a \code{by1} variable. If the provided object to analyze is a set of multiple variables, including an entire data frame, then a bar chart is calculated for each non-numeric variable in the data frame.
+Plots a bar chart, one categorical variable, \code{x} against one numeric variable \code{y}, as well as an optional second categorical variable \code{by} with a provided legend. One option is to enter the reduced data table, which consists of each level of \code{x} paired with the corresponding numerical value of \code{y}, with the number of rows the number of levels. Or, transform the full data table of original measurements. If no value of \code{y} is specified, by default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables, which can be replaced with custom color scales. Or, if a \code{y} variable is specified, obtain the reduced data table from which the bar chart is computed by summarizing the value of \code{y} at each level of \code{x}, such as the mean or a variety of other summary statistics.
+
+Also displays the frequency table for one or two variables, Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. To activate Trellis graphics specify a \code{by1} variable. If the provided object to analyze is a set of multiple variables, including an entire data frame, then a bar chart is calculated for each non-numeric variable in the data frame.
 }
 
 \usage{
 BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
-        theme=getOption("theme"), n.cat=getOption("n.cat"),
-        one.plot=NULL,
+        stat.x=c("count", "proportion"),
+        stat.yx=c("mean", "sum", "sd", "dev", "min", "median", "max"),
+        n.cat=getOption("n.cat"), one.plot=NULL,
 
         by1=NULL, n.row=NULL, n.col=NULL, aspect="fill",
 
-        horiz=FALSE, beside=FALSE, gap=NULL,
-        proportion=FALSE, scale.y=NULL,
+        horiz=FALSE, beside=FALSE, stack100=FALSE,
+        gap=NULL, scale.y=NULL,
 
+        theme=getOption("theme"),
         fill=NULL,
         color=getOption("bar.color.discrete"),
         trans=getOption("trans.bar.fill"),
@@ -32,7 +36,7 @@ BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         value.labels=NULL,
         rotate.x=getOption("rotate.x"),
         offset=getOption("offset"),
-        break.x=TRUE, sort=c("0", "-", "+"),
+        break.x=NULL, sort=c("0", "-", "+"),
 
         label.max=100, out.size=80,
 
@@ -79,7 +83,16 @@ bc(\ldots)
        can contain values to plot on the y-axis instead of counts.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
-  \item{theme}{Color theme for this analysis.}
+  \item{stat.x}{When there is no \code{y} variable, transform data table of
+       measurements into a simple table of paired levels of
+       \code{x} with numerical values of \code{y}, height of each bar
+       for each level of \code{x}.
+       Transform according to  \code{"count"} or \code{"proportion"}.}
+  \item{stat.yx}{Statistics transformation of \code{y} by \code{x}.
+       Transform data table of measurements into a simple table of paired levels of
+       \code{x} with numerical values of \code{y}. Apply specified transformation
+       of \code{y} to the levels of \code{x}, that is,
+       \code{"mean"}, \code{sd}, etc. Default is \code{"mean"}.}
   \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest
        number of unique values of variable of a numeric data type for which the
        variable will be analyzed as a categorical. Default is 0.}
@@ -115,17 +128,19 @@ bc(\ldots)
   \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
        first variable to be plotted as adjacent bars instead of stacked on each
        other.}
+  \item{stack100}{100\% stacked bar chart when a \code{by} variable is present,
+       also activated by setting \code{stat.x} to \code{"proportion"} with a
+       \code{by} variable.}
   \item{gap}{Gap between bars.  Provides the value of the \code{space} option from
        the standard R \code{\link{barplot}} function with a default of 0.2 unless two
        variables are plotted and beside=\code{TRUE}, in which case the default is
        c(.1,1).}
-  \item{proportion}{Display proportions instead raw frequencies. For two-variable
-        plots, display the column proportions, that is, a proportional stacked
-        bar graph.}
   \item{scale.y}{If specified, a vector of three values that define the
         numerical values of the y-axis, the numerical axis, within the bounds of
         plot region: starting, ending and number of intervals.}\cr
 
+  \item{theme}{Color theme for this analysis. Make persistent across analyses
+        with \code{\link{style}}.}
   \item{fill}{Fill color of the bars, override the default with a vector
         of colors: names, rgb, hex or hcl and many other possibilities from
         palettes such as viridis.
@@ -133,7 +148,8 @@ bc(\ldots)
         divergent palettes generated by lessR \code{\link{getColors}},
         such as \code{"blues"},  or
         set to the name of \code{y} to map the values of bar fill, specified
-        as \code{(count)} if tabulated from the data.
+        as \code{(count)} if tabulated from the data, or \code{(count.v)} for 
+        viridis palette.
         See the details and examples sections. Default is
         \code{bar.color.discrete} from the lessR \code{\link{style}} function 
         except sequential ordered factors.}
@@ -147,7 +163,8 @@ bc(\ldots)
         bars that correspond to values of \code{y} <= \code{fill.split} are
         displayed in the first \code{fill} color and other values displayed
         in the second \code{fill} color, with the first two values of
-        the qualitative hues by default. }\cr
+        the default palette by default, or as specified by a vector of
+        exactly two fill colors.}\cr
 
   \item{legend.title}{Title of the legend, which is usually set by default except
         when raw counts are entered as a matrix.  Then a title must be specified
@@ -181,7 +198,9 @@ bc(\ldots)
         is 0.5. Larger values such as 1.0 are used to create space for the label when
         longer axis value names are rotated.}
   \item{break.x}{Replace spaces in the category values with a new line
-       and replace underscores with a blank.}
+       and replace underscores with a blank. By default, \code{TRUE} for 
+       vertical bar charts with \code{rotate.x} set to \code{0},
+       and \code{FALSE} otherwise.}
   \item{sort}{Sort the categories by their frequency for one variable and by
         the column sums if a \code{by} variable. Not applicable to Trellis plots.
         By default \code{"0"} for no sort, or sort descending \code{"-"} or
@@ -297,20 +316,39 @@ bc(\ldots)
 
 \details{
 OVERVIEW\cr
-Plot a bar chart with default colors for one or two variables, presumably with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accommodate both the value labels and the variable label.
+Plot a bar chart with default colors for one or two categorical variables, that is, with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accommodate both the value labels and the variable label.
 
 
 DATA\cr
+Ultimately the bar chart is constructed from a simple table in which each row consists of a level of the categorical variable \code{x} paired with the corresponding value of the numerical variable, \code{y}, with as many rows as the number of levels of \code{x}. A data table of this form can be read by specifying the variable \code{x} and the variable \code{y}. Alternatively, read a data table in the form in which the data are typically gathered, with many replications of the levels of the categorical variable \code{x}. In this situation, with just the specification of the variable \code{x}, the corresponding numerical variable is the tabulation of the counts of the number of occurrences for each level of \code{x}. Or, specify a numerical variable from a data table of this form and reduce to the smaller data table via statistical transformation of the values of \code{y} for each level of \code{x}, such as the mean. 
+
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{d}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{d$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function.
 
-If the name of vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment.
+If the name of the vector is in the global environment and of a variable in the input data frame has the same name, the vector from the global environment is analyzed, unless the data name frame is explicitly provided, not relying upon the default \code{d}. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment.
 
-To obtain a bar chart of each numerical variable in the \code{d} data frame, invoke \code{BarChart()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the variable list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
+To obtain a bar chart of each categorical variable in the \code{d} data frame, invoke \code{BarChart()}.  Or, for a data frame with a different name, insert the data frame name between the parentheses as the first listed parameter value. To analyze a subset of the variables in a data frame, specify the variable list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
-The form of the entered data, the first variable x and optionally a second variable, y, is flexible.  The data may be entered as factors, numeric values, characters, or a matrix. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.
+The form of the entered data, the first variable, categorical \code{x}, and optionally a second variable, numerical \code{y}, is flexible.  The data may be entered as factors, numeric values, characters, or a matrix. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.
 
+STATISTICAL TRANSFORMATIONS\cr
+Ultimately the bar plot is constructed from a small table of data values with each row a level of the categorical variable \code{x} paired with the corresponding value of the numerical variable \code{y}, with as many rows as values of \code{x}. It is also possible to plot transformations of the values of \code{y} for each level of categorical variable \code{x} from a full data table with many replications of each value of \code{x} and corresponding \code{y}. Then reduce the larger data table down to the summary table with one of following transformations.
+
+\tabular{ll}{
+Transformation \tab Meaning\cr
+-------------- \tab -------------------\cr
+\code{"sum"} \tab sum\cr
+\code{"mean"} \tab mean\cr
+\code{"sd"} \tab standard deviation\cr
+\code{"dev"} \tab mean deviation\cr
+\code{"min"} \tab minimum\cr
+\code{"median"} \tab median\cr
+\code{"max"} \tab maximum\cr
+------------- \tab -------------------\cr
+
+The other statistical transformation is simply counting the number of occurrences of each level of \code{x}, which does not involve a value of \code{y} read from the data. Instead the value of \code{y} for each level of \code{x} is tabulated.
+}
 
 COLORS\cr
 For a one variable plot, set the default color of the bars by the current color theme according to \code{bar.fill.discrete} argument of the function \code{\link{style}}, which includes the default color theme \code{"hues"} that defines a qualitative HCL color scale, or set the bar color with the \code{fill} parameter, which references a specified vector of color specifications, such as generated by the lessR \code{\link{getColors}} function.
@@ -466,10 +504,12 @@ BarChart(Gender, fill=c("palegreen3","tan"))
 BarChart(Dept, fill=getColors(l=25), trans=0.4)
 
 # column proportions instead of frequencies
-BarChart(Gender, proportion=TRUE)
+BarChart(Gender, stat.x="proportion")
 
-# map value of tabulated count to bar fill<D-d>
+# map value of tabulated count to bar fill
 BarChart(Dept, fill=(count))
+# viridis palette
+BarChart(Dept, fill=(count.v))
 
 # data with many values of categorical variable Make and large labels
 myd <- Read("Cars93", in.lessR=TRUE)
@@ -486,6 +526,10 @@ BarChart(Dept, fill="GrandBudapest1", values="off")
 #  than values above
 BarChart(Dept, sort="+", fill.split=10)
 
+# read y variable, Salary, then bars are height of 
+#  corresponding mean Salary
+BarChart(Dept, Salary, stat.yx="mean")
+
 
 # ----------------------------------------------------
 # bar chart from tabulating the data for two variables
@@ -496,7 +540,7 @@ BarChart(Dept, by=Gender)
 
 # at each level of Dept, show the row proportions of the Gender levels
 #   i.e., proportional stacked bar graph
-BarChart(Dept, by=Gender, proportion=TRUE)
+BarChart(Dept, by=Gender, stack100=TRUE)
 
 # at each level of Gender, show the frequencies of the Dept levels
 # do not display percentages directly on the bars
@@ -601,8 +645,8 @@ d <- read.csv(text="
 Dept,Gender,Count
 ACCT,F,3
 ACCT,M,2
-ADMIN,F,4
-ADMIN,M,2
+ADMN,F,4
+ADMN,M,2
 FINC,F,1
 FINC,M,3
 MKTG,F,5

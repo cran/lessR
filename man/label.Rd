@@ -42,7 +42,7 @@ The specified value of \code{value} is returned.
 \examples{
 # read the data and variable labels
 #d <- rd("http://lessRstats.com/data/employee.xlsx")
-#mylabels <- vl("http://lessRstats.com/data/employee_lbl.xlsx")
+#l <- vl("http://lessRstats.com/data/employee_lbl.xlsx")
 
 # variable label as the title of a graph for non-lessR functions
 # base R

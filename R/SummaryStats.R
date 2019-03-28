@@ -2,19 +2,47 @@ SummaryStats <-
 function(x=NULL, by=NULL, data=d, n.cat=getOption("n.cat"), 
     digits.d=NULL, brief=getOption("brief"), label.max=20, ...)  {
 
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+    d <- mydata 
+    mydata.ok <- TRUE
+  }
+
   # get variable name before potential call of data$x
   x.name <- deparse(substitute(x))  # could be a vars list
   options(xname = x.name)
 
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
-  df.name <- deparse(substitute(data))
-  options(dname = df.name)
+
+  # let deprecated mydata work as default
+  dfs <- .getdfs() 
+  mydata.ok <- FALSE
+  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+    d <- mydata
+    df.name <- "mydata"
+    mydata.ok <- TRUE
+    options(dname = df.name)
+  }
+
+  if (!mydata.ok) {
+    df.name <- deparse(substitute(data))  # get name of data table
+    options(dname = df.name)
+  }
   
   x.in.df <- FALSE
   if (nchar(x.name) > 0)
-    if (exists(df.name, where=.GlobalEnv))
+    if (exists(df.name, where=.GlobalEnv, inherits=FALSE))
       if (exists(x.name, where=data)) x.in.df <- TRUE
-      
+ 
+  # if a tibble convert to data frame
+  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
+   if (any(grepl("tbl", class(data), fixed=TRUE))) {
+      data <- data.frame(data, stringsAsFactors=FALSE)
+   }
+  }
+
   is.df <- FALSE  # is data frame
 
 

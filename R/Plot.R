@@ -1,17 +1,19 @@
 Plot <-
 function(x, y=NULL, data=d, rows=NULL,
-         stat=c("data", "count", "prop", "sum", "mean", "sd",
-                "min", "median", "max"),
-         theme=getOption("theme"), n.cat=getOption("n.cat"),
+         stat.x=c("data", "count", "proportion", "%"),
+         stat.yx=c("data", "sum", "mean", "sd", "dev", "min", "median", "max"),
+         n.cat=getOption("n.cat"),
 
          by=NULL, by1=NULL, by2=NULL,
          n.row=NULL, n.col=NULL, aspect="fill",
 
-         fill=getOption("pt.fill"), color=getOption("pt.color"),
+         theme=getOption("theme"),
+         fill=NULL,
+         color=NULL,
          trans=getOption("trans.pt.fill"),
 
          size=NULL, size.cut=NULL, shape="circle", means=TRUE,
-         sort.yx=FALSE, segments.y=FALSE, segments.x=FALSE,
+         sort.yx=c("0", "-", "+"), segments.y=FALSE, segments.x=FALSE,
          jitter.x=0, jitter.y=0,
 
          ID="row.name", ID.size=0.85,
@@ -25,7 +27,7 @@ function(x, y=NULL, data=d, rows=NULL,
          k=1.5, box.adj=FALSE, a=-4, b=3,
 
          radius=NULL, power=0.5,
-         low.fill=NULL, hi.fill=NULL, proportion=FALSE,
+         low.fill=NULL, hi.fill=NULL,
 
          smooth=FALSE, smooth.points=100, smooth.size=1,
          smooth.exp=0.25, smooth.bins=128,
@@ -35,7 +37,7 @@ function(x, y=NULL, data=d, rows=NULL,
          bin=FALSE, bin.start=NULL, bin.width=NULL, bin.end=NULL,
          breaks="Sturges", cumulate=FALSE, 
 
-         run=FALSE, lwd=2, area=FALSE, area.origin=0, 
+         run=FALSE, lwd=2, area.fill="transparent", area.origin=0, 
          center.line=c("default", "mean", "median", "zero", "off"),
          show.runs=FALSE, stack=FALSE,
 
@@ -46,6 +48,7 @@ function(x, y=NULL, data=d, rows=NULL,
          offset=getOption("offset"),
 
          xy.ticks=TRUE, value.labels=NULL, label.max=20, origin.x=NULL,
+         legend.title=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
@@ -54,14 +57,23 @@ function(x, y=NULL, data=d, rows=NULL,
          fun.call=NULL, ...) {
 
 
-  # ------
-  # set parameter stat 
+# Note: stat is both object (dot plot) and statistic   
 
   if (is.null(fun.call)) fun.call <- match.call()
    
   # limit actual argument to alternatives, perhaps abbreviated
-  stat <- match.arg(stat)
+  stat.yx.miss <- ifelse (missing(stat.yx), TRUE, FALSE)
+  sort.yx.miss <- ifelse (missing(sort.yx), TRUE, FALSE)
+  sort.yx <- match.arg(sort.yx)
+
+  stat.x <- match.arg(stat.x)
+  stat.yx <- match.arg(stat.yx)
   center.line <- match.arg(center.line)
+  data.do <- ifelse ((stat.x == "data") && (stat.yx == "data"), TRUE, FALSE)
+
+  proportion <- ifelse (stat.x == "proportion", TRUE, FALSE)   # old signal
+  prop <- ifelse (stat.x == "proportion", TRUE, FALSE)   # old signal (Trellis)
+
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
   if (is.null(eval.df))  # default values
     eval.df <- ifelse (shiny, FALSE, TRUE) 
@@ -120,10 +132,10 @@ function(x, y=NULL, data=d, rows=NULL,
   by2.miss <- ifelse (missing(by2), TRUE, FALSE)
   by.miss <- ifelse (missing(by), TRUE, FALSE)
   size.miss <- ifelse (missing(size), TRUE, FALSE)
+  fill.miss <- ifelse (missing(fill), TRUE, FALSE)
+  color.miss <- ifelse (missing(color), TRUE, FALSE)
   seg.y.miss <- ifelse (missing(segments.y), TRUE, FALSE)  # for Cleveland plot
   seg.x.miss <- ifelse (missing(segments.x), TRUE, FALSE)
-  sort.yx.miss <- ifelse (missing(sort.yx), TRUE, FALSE)
-  area.miss <- ifelse (missing(area), TRUE, FALSE)
   ellipse.miss <- ifelse (missing(ellipse), TRUE, FALSE)
   fit.miss <- ifelse (missing(fit), TRUE, FALSE)
   MD.miss <- ifelse (missing(MD.cut), TRUE, FALSE)
@@ -136,6 +148,9 @@ function(x, y=NULL, data=d, rows=NULL,
   n.col.miss <- ifelse (missing(n.col), TRUE, FALSE)
   n.row.miss <- ifelse (missing(n.row), TRUE, FALSE)
   add.miss <- ifelse (missing(add), TRUE, FALSE)
+
+
+  stat <- ifelse(y.miss, stat.x, stat.yx) 
 
   if (!missing(a) || !missing(b)) box.adj <- TRUE
 
@@ -156,6 +171,8 @@ function(x, y=NULL, data=d, rows=NULL,
     if (add.miss) add <- "means"
     if (fit.miss) fit <- "lm"
   }
+
+  txdif <- ""  # used to transfer output for diffs of two vars Cleveland sp
   
   xlab.adj <- lab.adj[1];   ylab.adj <- lab.adj[2]
   tm.adj <- margin.adj[1];  rm.adj <- margin.adj[2]
@@ -164,10 +181,9 @@ function(x, y=NULL, data=d, rows=NULL,
   date.ts <- FALSE  # default is not a time series
   freq.poly <- FALSE  # default is not a frequency polygon
 
-  #grid.x.color <- getOption("grid.x.color") # for Cleveland
-
   if (show.runs) run <- TRUE
 
+  if (!missing(fit.se)) if (missing(fit))  fit <- "loess"
   if (is.logical(fit))
     fit.ln <- ifelse (fit, "loess", "off")
   if (is.character(fit)) {
@@ -183,19 +199,12 @@ function(x, y=NULL, data=d, rows=NULL,
       !missing(bin.end))
     bin <- TRUE
 
-  # area
-  if (!is.logical(area))  {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Parameter  area  is logical, TRUE or FALSE, to trigger area.fill\n\n")
-  }
-  if (stack) if (area.miss) area <- TRUE  # stack default has area
-  if (area) if (missing(stack)) stack <- TRUE
-  area.fill <- ifelse (area, getOption("area.fill"), "transparent")
+  if (stack) if (fill.miss) fill <- getOption("violin.fill")  # default 
 
   if (!is.null(pdf.file))
     if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
 
-  if (stat != "data") if (is.null(pt.trans)) pt.trans <- 0
+  if (!data.do) if (is.null(pt.trans)) pt.trans <- 0  # trans, so dot plot
 
   # set object 
   if (!missing(radius) || !missing(power)) {
@@ -257,7 +266,7 @@ function(x, y=NULL, data=d, rows=NULL,
   # ------
   # see if dated or inconsistent parameter values
   .param.old(...)
-  .plt.bad(x.miss, y.miss, stat, breaks, bin.start, n.row, n.col,
+  .plt.bad(x.miss, y.miss, stat.yx, breaks, bin.start, n.row, n.col,
            MD.cut, out.cut, fit.se, ...)
 
   # ---------------------------------
@@ -287,7 +296,7 @@ function(x, y=NULL, data=d, rows=NULL,
   if (!is.null(dfs)) {
     if (df.name %in% dfs) {  # tibble to df
       if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data, stringsAsFactors=TRUE)
+        data <- data.frame(data, stringsAsFactors=FALSE)
       }
     }
   }
@@ -596,16 +605,6 @@ function(x, y=NULL, data=d, rows=NULL,
       "Run chart only applies to a numerical variable\n\n")
   }
 
-  # convert any name of a color range to the colors, otherwise leave unchanged
-    n.levels <- 1
-    if (!y.miss) if (cat.y) n.levels <- length(unique(na.omit(y.call[,1])))
-    if (!missing(fill))
-      fill <- .color.range(fill, n.levels, no.change=TRUE)
-    if (!missing(violin.fill))
-      violin.fill <- .color.range(violin.fill, n.levels, no.change=TRUE)
-    if (!missing(box.fill))
-      box.fill <- .color.range(box.fill, n.levels, no.change=TRUE)
-
 
   # ---------------------------------
   # ellipse, fit line stop conditions
@@ -640,7 +639,9 @@ function(x, y=NULL, data=d, rows=NULL,
 
 
   # ------------------------------------------
+  # ------------------------------------------
   # master control funnel for type of analysis
+  # ------------------------------------------
 
   lx <- length(x.call[,1])
   ly <- length(y.call[,1])
@@ -649,7 +650,7 @@ function(x, y=NULL, data=d, rows=NULL,
   x.unique <- ifelse (n.ux == lx, TRUE, FALSE)
   y.unique <- ifelse (n.uy == ly, TRUE, FALSE)
 
-  # replications from two variable cross-tabs? then go bubble plot 
+  # f replications from two variable cross-tabs, then go bubble plot 
   if (!y.miss) if (n.cat > 0) {  # can set n.cat > 0 to force discrete
     if (n.ux < 12  &&  n.uy < 12)  {
       tbl <- table(x.call[,1], y.call[,1])
@@ -662,16 +663,14 @@ function(x, y=NULL, data=d, rows=NULL,
     }
   }
 
-  #if (!y.miss) cat("cat.y:", cat.y, "\n")
-  #if (!y.miss) cat("num.cat.y:", num.cat.y, "\n")
-  if (stat == "data"  &&  n.x_var == 1) {
+  if (data.do  &&  n.x_var == 1) {
     if (y.miss) {  # y missing
       if (!cat.x) {  # continuous x
         if (!run && !date.ts) {  # not a run chart or ts
         Trellis <- TRUE
         c.type <- "cont"
        }
-       else {  # runs chart
+       else {  # run chart
           if (by1.miss) {  # single panel
             Trellis <- FALSE
           }
@@ -742,7 +741,7 @@ function(x, y=NULL, data=d, rows=NULL,
         }
       }  # x is cat
     }  # y present
-  }  # end values is data
+  }  # end: data.do  &&  n.x_var == 1
 
   else {  # for all analysis of stat transformed data
     if (n.x_var == 1) {
@@ -893,7 +892,6 @@ function(x, y=NULL, data=d, rows=NULL,
 
   if (!grepl("s", vbs.plot)) size <- 0
 
-
   # evaluate ID 
   #------------
   get.ID <- FALSE
@@ -924,9 +922,31 @@ function(x, y=NULL, data=d, rows=NULL,
   # -----------  x, y, by and size variables established ------------
   # -----------------------------------------------------------------
 
+    #get n.levels
+    n.xcol <- ncol(x.call)
+    n.ycol <- ifelse (y.miss, 0, ncol(y.call))
+    nn.col <- max(n.xcol, n.ycol)  # n.col goes into lattice, do not change
+    if (!is.null(by.call))
+      n.by <-  nlevels(by.call)
+    else
+      n.by <- 0
+    n.levels <- max(nn.col, n.by)
+
+    if (!y.miss) if (cat.y) n.levels <- length(unique(na.omit(y.call[,1])))
+
+    if (!missing(violin.fill)) {
+      if (length(violin.fill) == 1)
+         violin.fill <- .color.range(violin.fill, n.levels)
+    }
+    if (!missing(box.fill)) {
+      if (length(box.fill) == 1)
+         box.fill <- .color.range(box.fill, n.levels)
+    }
+    # end n.levels, only referred to in preceding block
+
   if (is.null(height)) { 
     if (is.null(y.call)  &&  !BPFM  
-        &&  stat == "data" &&  object != "both"  &&  !.is.date(x.call))
+        &&  data.do  &&  object != "both"  &&  !.is.date(x.call))
       height <- ifelse (is.null(main), 4, 4.6)  # narrow for 1-D dot plot
     else
       height <- 6
@@ -950,7 +970,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
   # prep 1-variable bubble plot to call regular scatter plot function
   # y.call to 0
-  if (is.null(y.call)  &&  cat.x  &&  n.x_var == 1  &&  stat == "data") {
+  if (is.null(y.call)  &&  cat.x  &&  n.x_var == 1  &&  data.do) {
     y.call <- data.frame(rep(0, nrow(x.call)))
     cat.y <- FALSE
     if (object == "default") object <- "bubble"
@@ -999,24 +1019,23 @@ function(x, y=NULL, data=d, rows=NULL,
   if (object == "default") {  # set default
     if (!y.miss) {
       object <- "point"
-      if (stat == "data") if (cat.x && cat.y) object <- "bubble"
+      if (data.do) if (cat.x && cat.y) object <- "bubble"
     }
-    else if (stat %in% c("count", "prop")) {
+    else if (stat.x %in% c("count", "proportion", "%")) {
       object <- "point"
     }
     else {
-      if (stat == "data") object <- ifelse (cat.x, "bubble", "point")
+      if (data.do) object <- ifelse (cat.x, "bubble", "point")
       if (BPFM) object <- "bubble"  # BPFM
     }
   }
-
 
   if (y.miss  &&  !date.ts  &&  object != "bubble") {  
 
     if (!cat.x) { 
 
       # run chart prep of x.call and y.call
-      if (object == "both"  &&  stat == "data") {  # run chart
+      if (object == "both"  &&  data.do) {  # run chart
         y.call <- x.call
         cat.y <- cat.x
         options(yname=x.name)
@@ -1026,7 +1045,7 @@ function(x, y=NULL, data=d, rows=NULL,
         names(x.call) <- "Index"
       }
 
-      else if (stat %in% c("count", "prop")) {  # frequency polygon
+      else if (stat.x %in% c("count", "proportion", "%")) {  # frequency polygon
 
         ssstuff <- .ss.numeric(x.call[,1], digits.d=digits.d, brief=TRUE)
        
@@ -1043,13 +1062,14 @@ function(x, y=NULL, data=d, rows=NULL,
         n.cat <- 0  # not many midpoints, do not want to trigger num.cat
         x.call <- h$mids
         y.call <- h$counts
-        if (stat == "count")
+        if (stat.x == "count")
           ylab <- paste("Count of", x.name)
         else {
           y.call <- y.call / sum(y.call)
           ylab <- paste("Proportion of", x.name)
         }
 
+        # last assignment of object, now determined
         object <- "both"  # do freq poly as a line chart
         freq.poly <- TRUE  # need to indicate fill possibility
         center.line <- "off"  # not meaningful here
@@ -1066,15 +1086,7 @@ function(x, y=NULL, data=d, rows=NULL,
           fncl <- gsub(" = ", "=", fncl)
 
           fc <- ""
-          if (!grepl("area", fncl))
-            fc <- paste(fc, ", area=TRUE", sep="")
-          if (nzchar(fc)) {
-            fc <- paste(fncl, fc, ") ", sep="")
-            txsug <- paste(txsug, "\n", fc, sep="")
-          }
-            
-          fc <- ""
-          if (!grepl("size", fncl)  &&  !grepl("area", fncl))
+          if (!grepl("size", fncl))
             fc <- paste(fc, ", size=0", sep="")
           if (nzchar(fc)) {
             fc <- gsub(" = ", "=", fc)
@@ -1088,7 +1100,7 @@ function(x, y=NULL, data=d, rows=NULL,
             fc <- paste(fc, ", bin.width=", as.character(bw.new[1]), sep="")
           if (nzchar(fc)) {
             fc <- paste(fncl, fc, ") ", sep="")
-            txsug <- paste(txsug, "\n", fc, sep="")
+            txsug <- paste(txsug, fc, sep="")
           }
             
           txsug <- .rm.arg.2(" x=", txsug) 
@@ -1123,11 +1135,11 @@ function(x, y=NULL, data=d, rows=NULL,
 
     else {  # cat.x
       # just x variable, so set y.call to plot points for count and prop
-      if (stat %in% c("count", "prop")) {
+      if (stat.x %in% c("count", "proportion", "%")) {
         if (Trellis) {  # follow dot plot format and do horizontal plot
           cat.y <- FALSE
           if (seg.x.miss) segments.x <- TRUE
-          ylab <- ifelse (stat=="count", "Count of", "Proportion of")
+          ylab <- ifelse (stat.x == "count", "Count of", "Proportion of")
           ylab <- paste(ylab, x.name)
           x.call <- data.frame(x.call)
         }  # end if Trellis
@@ -1135,19 +1147,23 @@ function(x, y=NULL, data=d, rows=NULL,
         else {  # not Trellis, so manually flip to match dot plot style
           cat.x <- FALSE
           if (seg.y.miss) segments.y <- TRUE
-          xlab <- ifelse (stat=="count", "Count of", "Proportion of")
+          if (stat.x == "count")
+            xlab <- "Count of"
+          else if (stat.x == "proportion")
+            xlab <- "Proportion of"
+          else 
+            xlab <- "Percentage of"
           xlab <- paste(xlab, x.name)
-          if (!Trellis) {  # Trellis needs the full data for a dot plot
-            ylab <- NULL
-            frq <- table(x.call)
-            if (stat == "prop") frq <- frq / sum(frq)
-            if (is.factor(x.call))  # preserve ordering, will lose order attribute
-              y.call <- factor(names(frq), levels=levels(x.call))
-            else
-              y.call <- factor(names(frq))
-            cat.y <- TRUE
-            num.cat.y <- TRUE
-          }
+          ylab <- NULL
+          frq <- table(x.call)
+          if (stat.x == "proportion") frq <- frq / sum(frq)
+          if (stat.x == "%") frq <- (frq / sum(frq)) * 100
+          if (is.factor(x.call))  # preserve ordering, will lose order attribute
+            y.call <- factor(names(frq), levels=levels(x.call))
+          else
+            y.call <- factor(names(frq))
+          cat.y <- TRUE
+          num.cat.y <- TRUE
           options(yname=x.name)
           y.call <- data.frame(y.call)
           x.call <- data.frame(as.vector(frq))
@@ -1158,6 +1174,7 @@ function(x, y=NULL, data=d, rows=NULL,
   }  # end is null y.call
 
 
+  # object now determined
   # size of lines for line chart
   if (object == "both") {
     size.ln <- lwd  # size of lines
@@ -1177,15 +1194,13 @@ function(x, y=NULL, data=d, rows=NULL,
     size.pt <- scale.pt
   #   if (options("device") == "RStudioGD") size.pt <- size.pt*1.10
 
-    if (object == "both") {
-      size.pt <- 0.77 * size.pt  # default pt size for lines
-      if (area.fill != "transparent")  # default no points if area shown
-        size.pt <- 0
-      else if (nrows > 50) {
-        size.pt <- .9 - 0.002*nrows
-        if (size.pt < 0.10) size.pt <- 0
-      }
-    }
+if (is.null(out.size)) out.size <- size.pt
+
+  if (getOption("theme") == "gray")
+    if (any(size.pt > 0.9)) if (out.shape.miss) out.shape <- 23
+  
+  if (is.null(pt.fill)) pt.fill <- "transparent"
+
   }
   else {  # size had been set
     if (length(size) == 1)
@@ -1194,12 +1209,31 @@ function(x, y=NULL, data=d, rows=NULL,
       scale.pt <- 1  # forget Win/Mac scaling for size var, ruins size for Mac
     size.pt <- size * scale.pt
   }
-if (is.null(out.size)) out.size <- size.pt
 
-  if (getOption("theme") == "gray")
-    if (any(size.pt > 0.9)) if (out.shape.miss) out.shape <- 23
-  
-  if (is.null(pt.fill)) pt.fill <- "transparent"
+  # object: "both", "point", "bubble", or "sunflower"
+  if (fill.miss) {
+    if (object == "both"  &&  !stack)   # line chart
+      fill[1] <- "transparent"
+    else
+      fill[1] <- getOption("pt.fill") 
+  }
+  else if (fill[1] == "on")  # default color
+    if (object == "both")   # line chart
+      fill[1] <- getOption("violin.fill")
+    else
+      fill[1] <- getOption("pt.fill") 
+
+  if (size.miss) {
+    if (object == "both") {
+      size.pt <- 0.77 * size.pt  # default pt size for lines
+      if (fill[1] != "transparent")  # default no points if area shown
+        size.pt <- 0
+      else if (nrows > 50) {
+        size.pt <- .9 - 0.002*nrows
+        if (size.pt < 0.10) size.pt <- 0
+      }
+    }
+  }
 
 
   # ------------------------------------------------
@@ -1269,15 +1303,17 @@ if (is.null(out.size)) out.size <- size.pt
       if (jitter.x > 0)  # not available in stripplot
         x.call[,1] <- jitter(x.call[,1], factor=jitter.x) 
 
+      # n.col is null for at Plot(x), Plot(x, by=), Plot(x, by1=)
       if (!grepl("s", vbs.plot)) size.pt <- 0  # gets rescaled if earlier
+      if (is.null(pt.color)) pt.color <- getOption("pt.color")
       .plt.lattice(x.call[,1], y.call[,1], by1.call, by2.call, by.call,
                    adj.bx.ht, object, n.row, n.col, aspect,
-                   pt.fill, pt.color, panel.fill, panel.color,
+                   fill, pt.color, panel.fill, panel.color,
                    pt.trans, size.pt, size.ln, 
                    xlab, ylab, main, shape, lab.cex, axis.cex,
                    max(ellipse), ellipse.color, ellipse.lwd,
                    fit.ln, fit.color, fit.lwd,
-                   area.fill, area.origin, jitter.y,
+                   area.origin, jitter.y,
                    violin, violin.fill, box, box.fill, 
                    bw, vbs.size, box.adj, a, b, k.iqr, fences, vbs.mean,
                    out.shape, out.size,
@@ -1290,9 +1326,10 @@ if (is.null(out.size)) out.size <- size.pt
 
 
     else {  # dot plot
+
       if (seg.x.miss) segments.x <- TRUE
       .bar.lattice(x.call[,1], by1.call, by2=NULL, n.row, n.col, aspect,
-                   prop=FALSE, pt.fill, pt.color,
+                   prop, pt.fill, pt.color,
                    pt.trans, size.pt, xlab, ylab, main,
                    rotate.x, offset,
                    width, height, pdf.file,
@@ -1302,23 +1339,22 @@ if (is.null(out.size)) out.size <- size.pt
   }  # end Trellis && do.plot
 
 
-
   # -----------------------------------
   # bubble plot frequency matrix (BPFM)
   else if (ncol(data.x) > 1  &&  y.miss  &&  object == "bubble") {
     # get labels just for subset data matrix
-    mylabels <- attr(data, which="variable.labels")
+    l <- attr(data, which="variable.labels")
     nm <- names(data.x)
     mylabs <- character(length=length(nm))
     for (i in 1:length(nm)) {
-      if (!(nm[i] %in% names(mylabels)))
+      if (!(nm[i] %in% names(l)))
         mylabs[i] <- "not available"
       else
-        mylabs[i] <- mylabels[which(names(mylabels) == nm[i])]
+        mylabs[i] <- l[which(names(l) == nm[i])]
     }
     if (all(mylabs == "not available")) mylabs <- NULL
     
-    l.name <- "mylabels"
+    l.name <- "l"
     if (l.name %in% ls(name=.GlobalEnv))
       mylabs <- get(l.name, pos=.GlobalEnv)
 
@@ -1326,7 +1362,7 @@ if (is.null(out.size)) out.size <- size.pt
 
     .dpmat.main(data[,x.col], mylabs, sort.yx,
       getOption("bar.fill.ordered"), pt.color, panel.fill,
-      pt.trans, shape, area.fill, panel.color,
+      pt.trans, shape, panel.color,
       low.fill, hi.fill,
       xy.ticks, xlab, ylab, main, sub, size,
       radius, size.cut, bubble.text, power,
@@ -1345,9 +1381,8 @@ if (is.null(out.size)) out.size <- size.pt
   }
 
   else {  # all the other analyses
-    
 
-    if (stat %in% c("sum", "mean", "sd", "min", "median", "max")) {
+    if (stat.yx %in% c("sum", "mean", "sd", "dev", "min", "median", "max")) {
 
       n.cat <- 0
       means <- FALSE
@@ -1382,27 +1417,32 @@ if (is.null(out.size)) out.size <- size.pt
       }
 
     # set up new x.call and y.call for stats
-      if (stat == "sum") {
+      if (stat.yx == "sum") {
         ylab <- paste("Sum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], sum, na.rm=TRUE)
       }
-      if (stat == "mean") {
+      if (stat.yx == "mean") {
         ylab <- paste("Mean of", y.name)
         out <- tapply(y.call[,1], x.call[,1], mean, na.rm=TRUE)
       }
-      if (stat == "sd") {
+      if (stat.yx == "sd") {
         ylab <- paste("Standard Deviation of", y.name)
         out <- tapply(y.call[,1], x.call[,1], sd, na.rm=TRUE)
       }
-      if (stat == "min") {
+      if (stat.yx == "dev") {
+        ylab <- paste("Mean Deviations of", y.name)
+        out <- tapply(y.call[,1], x.call[,1], mean, na.rm=TRUE)
+        out <- out - mean(out, na.rm=TRUE)
+      }
+      if (stat.yx == "min") {
         ylab <- paste("Minimum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], min, na.rm=TRUE)
       }
-      if (stat == "median") {
+      if (stat.yx == "median") {
         ylab <- paste("Median of", y.name)
         out <- tapply(y.call[,1], x.call[,1], median, na.rm=TRUE)
       }
-      if (stat == "max") {
+      if (stat.yx == "max") {
         ylab <- paste("Maximum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], max, na.rm=TRUE)
       }
@@ -1445,32 +1485,69 @@ if (is.null(out.size)) out.size <- size.pt
     if ((!is.null(y.call) || date.ts) &&
         object %in% c("point", "bubble", "both", "sunflower")) {
 
-      if (object == "point"  &&  stat == "data"){  # for Cleveland dot plot
+      if (object == "point"  &&  data.do){  # for Cleveland dot plot
         if (!cat.x && cat.y && y.unique) {  # no sort.xy option
           if (seg.y.miss) if (y.unique && cat.y) segments.y <- TRUE
           if (seg.x.miss) if (x.unique && cat.x) segments.x <- TRUE
-          if (sort.yx.miss) if (n.x_var <= 2) sort.yx <- TRUE
+          if (sort.yx.miss) if (n.x_var <= 2) sort.yx <- "+"
         }
       }
 
      # sort y by x option (intended for Cleveland dot plot)
-      if (sort.yx) {
-        if (n.x_var == 1)  # one x-variable
-          ord <- order(x.call)
-        else
-          if (n.x_var == 2)  # two x-vars, sort on diffs
-            ord <- order(x.call[,2] - x.call[,1])
-          else {
-            cat("\n"); stop(call.=FALSE, "\n","------\n",
-            "Sorting not meaningful for more than two x-variables\n\n")
-          }
+      tx <- character(length=0)
+      if (sort.yx != "0") {
+        srt.dwn <- ifelse (sort.yx == "-", TRUE, FALSE)
+        if (n.x_var == 1) {  # one x-variable
+          ord <- order(x.call, decreasing=srt.dwn)
+        }
+        else if (n.x_var == 2) {  # two x-vars, sort on diffs
+          difs <- x.call[,2] - x.call[,1] 
+          ord <- order(difs, decreasing=srt.dwn)
+        }  # !quiet
+        else {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Sorting not meaningful for more than two x-variables\n\n")
+        }
+
         y.c <- y.call[,1]
         y.c <- factor(y.c, levels=y.c[ord])
         y.call[,1] <- y.c
+
+      }  # end sort.yx
+      else {
+        if (n.x_var == 2  &&  ncol(x.call) == 2) {  # run==TRUE only 1-col
+          ord <- 1:nrow(x.call)
+          difs <- x.call[,2] - x.call[,1] 
+        }
       }
-  
+
+      # for Cleveland dot plot of two vars, print difference by level
+      if (n.x_var == 2  &&  ncol(x.call) == 2  &&  !quiet) {
+        dd <- .max.dd(c(x.call[1], x.call[2])) + 1
+        if (dd > getOption("digits")) dd <- getOption("digits")
+        ny <- nrow(y.call)
+        mx.i <- nchar(as.character(ny))
+        mx.d <- max(nchar(.fmt(difs, dd)))
+        mx.f <- ifelse (is.factor(y.call[,1]), 
+           max(nchar(as.character(levels(y.call[,1])))), 5)  #  5 is dummy
+        tx[length(tx)+1] <- paste(.fmtc("n",mx.i), " ", 
+            .fmtc(" diff", mx.d), "  Row", sep="")
+        tx[length(tx)+1] <- .dash2(mx.i + mx.d + mx.f + 2, "-") 
+        if (ny <= 20)
+          rng <- 1:ny
+        else
+          rng <- c(1:10, (ny-10):ny)
+        for (i in 1:ny) {
+          k <- nrow(y.call) - (i - 1)  # reverse order, + diffs first
+          if (i %in% rng)
+            tx[length(tx)+1] <- paste(.fmti(i, mx.i),
+              .fmt(difs[ord[k]], dd, mx.d), levels(y.call[,1])[k])
+        }
+        txdif <- tx  # a little hack, only display in .plt.txt
+      }
+
       # bigger point for scatterplot of stats (instead of data)
-      if (stat != "data"  &&  object == "point")
+      if (!data.do  &&  object == "point")
         if (is.null(size)) size.pt <- 1.25
 
       out.ind <- NULL
@@ -1484,24 +1561,31 @@ if (is.null(out.size)) out.size <- size.pt
 
       if (do.plot) {
 
-      if (nrow(x.call) != nrow(y.call))  {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "number of elements in x: ", nrow(x.call), "\n",
-          "number of elements in y: ", nrow(y.call), "\n\n",
-          "The number of elements must be equal, probably\n",
-          "  have variables from user workspace so maybe\n",
-          "  use the  remove function, e.g., remove(x)\n\n")
-      }
-              
+        if (nrow(x.call) != nrow(y.call))  {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "number of elements in x: ", nrow(x.call), "\n",
+            "number of elements in y: ", nrow(y.call), "\n\n",
+            "The number of elements must be equal, probably\n",
+            "  have variables from user workspace so maybe\n",
+            "  use the  remove function, e.g., remove(x)\n\n")
+        }
+
+  if (run) if (lwd == 0) fill <- getOption("violin.fill")
+  if (object == "both"  &&  nn.col > 1) {
+     stack <- TRUE  # meaningless otherwise
+     if (fill == "on") fill <- getOption("violin.fill")  # change to multi later
+  }
+
+ 
         .plt.main(x.call, y.call, by.call, n.cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
           object, stat,
-          pt.fill, pt.color,
-          pt.trans, segment.color, area.fill,
+          fill, area.fill, pt.color,
+          pt.trans, segment.color, 
           xy.ticks, xlab, ylab, main, main.cex,
           sub, value.labels, label.max,
           rotate.x, rotate.y, offset, proportion, origin.x,
-          size.pt, shape, means, sort.yx, segments.y, segments.x, size.ln,
+          size.pt, shape, means, segments.y, segments.x, size.ln,
           smooth, smooth.points, smooth.size, smooth.exp, smooth.bins,
           radius, power, size.cut, bubble.text, low.fill, hi.fill,
           ID.call, ID.color, ID.size, out.ind,
@@ -1511,6 +1595,7 @@ if (is.null(out.size)) out.size <- size.pt
           center.line, show.runs, stack,
           freq.poly, jitter.x, jitter.y,
           xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+          legend.title,
           add, x1, x2, y1, y2, add.cex, add.lwd, add.lty,
           add.color, add.fill, add.trans,
           quiet, ...)
@@ -1522,7 +1607,7 @@ if (is.null(out.size)) out.size <- size.pt
           cat.x, num.cat.x, cat.y, num.cat.y,
           xlab, ylab,
           smooth, box.adj, center.line, proportion, size,
-          show.runs, radius, digits.d, fun.call)
+          show.runs, radius, digits.d, fun.call, txdif)
 
        if (!y.miss && !Trellis) if (n.x_var == 1  &&  n.y_var == 1) {
           class(txout) <- "out"  # MD outlier analysis

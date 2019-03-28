@@ -21,15 +21,17 @@ db(\ldots, brief=TRUE)
   \item{data}{Data frame for which to provide the details.}
   \item{n.mcut}{For the missing value analysis, list the row name and number of missing values
         if the number of missing exceeds or equals this cutoff.}
-  \item{miss.zero}{For the missing value analysis, list the variable name or the row name
-        even for values of 0. By default only variables and rows with missing data are listed.}
+  \item{miss.zero}{For the missing value analysis, list the variable name
+       or the row name even for values of 0. By default only variables and
+       rows with missing data are listed.}
   \item{max.lines}{Maximum number of lines to list of the data and labels.}
-  \item{miss.show}{For the missing value analysis, the number of rows, one row per observation,
-        that has as many or missing values as \code{n.mcut}.}
+  \item{miss.show}{For the missing value analysis, the number of rows, one
+       row per observation, that has as many or missing values as \code{n.mcut}.}
   \item{miss.matrix}{For the missing value analysis, if there is any missing data, 
-        list a version of the complete data table with a 0 for a non-missing value and a 1 for 
-        a missing value.}
-  \item{brief}{If \code{TRUE}, display only variable names table plus any variable labels.}
+       list a version of the complete data table with a 0 for a non-missing]
+        value and a 1 for a missing value.}
+  \item{brief}{If \code{TRUE}, display only variable names table plus any
+        variable labels. The default for ``details brief'' abbreviation \code{db}.}
   \item{\dots}{Further arguments to be passed to or from methods consistent
        with the R \code{\link{read.table}} function. For example, can set
        \code{stringsAsFactors} as \code{TRUE}.}

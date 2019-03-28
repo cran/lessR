@@ -2,7 +2,7 @@ Transform <-
 function(data=d, quiet=getOption("quiet"), ...) {
 
   # save variable labels (NULL if no labels) 
-  mylabels <- attr(data, which="variable.labels")
+  l <- attr(data, which="variable.labels")
 
   # transformations done here into vector e, e[1] the first trans, etc.
   e <- eval(substitute(list(...)), data, parent.frame())
@@ -84,7 +84,7 @@ function(data=d, quiet=getOption("quiet"), ...) {
   }
  
   # restore any variable labels
-  if (!is.null(mylabels)) attr(data, which="variable.labels") <- mylabels
+  if (!is.null(l)) attr(data, which="variable.labels") <- l
 
   return(data)
 

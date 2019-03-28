@@ -19,9 +19,9 @@ The \code{lessR} function \code{\link{corRead}} reads a correlation matrix.
 }
 
 \usage{
-Read(ref=NULL, format=NULL, in.lessR=FALSE,
+Read(from=NULL, format=NULL, in.lessR=FALSE,
 
-         labels=NULL, widths=NULL, stringsAsFactors=FALSE,
+         var.labels=FALSE, widths=NULL, stringsAsFactors=FALSE,
          missing="", n.mcut=1,
 
          miss.show=30, miss.zero=FALSE, miss.matrix=FALSE, 
@@ -41,7 +41,7 @@ Read2(\ldots, sep=";", dec=",")
 
 
 \arguments{
-  \item{ref}{File reference, either omitted to browse for the data file, or (except for .Rda
+  \item{from}{File reference, either omitted to browse for the data file, or (except for .Rda
        files) a full path name or web URL, included in quotes.  A URL begins with
        \code{http://}.}
   \item{format}{Format of the data in the file, which by default is aligned with the
@@ -55,13 +55,9 @@ Read2(\ldots, sep=";", dec=",")
         or \code{"SAS"}.}
   \item{in.lessR}{If \code{TRUE} then the data file has been downloaded as part of the
        lessR package.}
-  \item{labels}{[This is a legacy option in which the labels are part of the data file,
-       replaced by the \code{\link{VariableLabels}} function to have labels
-       in mylabels.] File name for the file of variable labels. Either a full path name,
-       or just the file name if in the same directory as the data file, or no
-       reference between the quotes, which allows the user to browse for the
-       labels file. Or, if \code{row2}, then the labels are in the second line of
-       the data file. Must be a literal string, not a character variable.}
+  \item{var.labels}{Set \code{TRUE} if reading a csv or Excel file of 
+       variable labels in which each row consists of a variable name in the first
+       column and the corresponding variable label in the second column.}
   \item{widths}{Specifies the width of the successive columns for fixed width
        formatted data.}
   \item{stringsAsFactors}{Defaults to \code{FALSE}, so variables with at least
@@ -118,7 +114,7 @@ R DATA\cr
 Relies upon the standard R function \code{load}. By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{d}, with the \code{lessR} function \code{\link{Write}}.
 
 Excel DATA\cr
-Relies upon the function \code{\link{read.xlsx}} from Alexander Walker's \code{openxlsx} package. Files with a file type of \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The \code{read_excel} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file, with a default value of 1. The \code{row.names} parameter can only have a value of 1.     
+Relies upon the function \code{\link{read.xlsx}} from Alexander Walker's \code{openxlsx} package. Files with a file type of \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The \code{read.xlsx} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file, with a default value of 1. The \code{row.names} parameter can only have a value of 1. Dates stored in Excel as an Excel date type are automatically read as an R Date type.  
 
 lessR DATA\cr
 \code{lessR} has some data sets included with the package.  \code{Read} reads each such data set by specifying its name and setting \code{in.lessR=TRUE}. (The older \code{format="lessR"} is deprecated.) Also, each included data set begins with the prefix \code{dat}, which can be deleted when specifying the name of the data set. This option is a replacement for the standard R \code{data} function, offering the added information provided by \code{\link{Read}}.
@@ -132,9 +128,11 @@ By default, \code{Read} provides a list of each variable and each row with the d
 To not list the variable name or row name of variables or rows without missing data, invoke the \code{miss.zero=FALSE} option, which can appreciably reduce the amount of output for large data sets. To view the entire data table in terms of 0's and 1's for non-missing and missing data, respectively, invoke the \code{miss.matrix=TRUE} option. 
 
 VARIABLE LABELS\cr
-Unlike standard R, \code{lessR} provides for variable labels, which can be provided for some or all of the variables in a data frame. The variable labels are best stored in a separate data frame \code{mylabels}. The legacy approach is to store the variable labels directly with the data in the same data frame. The problem with this approach is that any transformations of the data with any function other than \code{lessR} transformation functions remove the variable labels. The option for reading the variable labels with the \code{labels} option of \code{Read} statement is retained for compatibility.
+Unlike standard R, \code{lessR} provides for variable labels, which can be provided for some or all of the variables in a data frame. The variable labels are best stored in a separate data frame \code{l}. The legacy approach is to store the variable labels directly with the data in the same data frame. The problem with this approach is that any transformations of the data with any function other than \code{lessR} transformation functions remove the variable labels. The option for reading the variable labels with the \code{labels} option of \code{Read} statement is retained for compatibility.
 
-There are, however, two reasons that are necessary to read the variable labels into the same data frame as the data. The first is when the variable labels are embedded directly in a text or Excel data file as the second row of the data file.  To accomplish this read, specify the \code{label="row2"} option. The web survey application Qualtrics downloads \code{csv} files in this format. The second reason for embedding variable labels within the data file are when the data are read from an SPSS file, which retains the SPSS variable labels as part of the data file. The \code{lessR} data analysis functions will properly process these variable labels, but any non-\code{lessR} data transformations will remove the labels from the data frame. To retain the labels, copy them to the \code{mylabels} data frame with the \code{\link{VariableLabels}} function with the name of the data frame as the sole argument.
+The variable labels file that is read by \code{Read} consists of one row for each variable for which a variable label is provided. Each row consists of two columns, the variable name in the first column and the associated variable label in the second column. The format of the file can be \code{csv} or \code{xlsx}. The data frame \code{Read} constructs from this input consists of one variable, called \code{label}, with the variable names as row names. 
+
+Reading the data from an SPSS file, however, retains the SPSS variable labels as part of the data file. The \code{lessR} data analysis functions will properly process these variable labels, but any non-\code{lessR} data transformations will remove the labels from the data frame. To retain the labels, copy them to the \code{l} data frame with the \code{\link{VariableLabels}} function with the name of the data frame as the sole argument.
 
 The \code{lessR} functions that provide analysis, such as \code{\link{Histogram}} for a histogram, automatically include the variable labels in their output, such as the title of a graph.  Standard R functions can also use these variable labels by invoking the \code{lessR} function \code{\link{label}}, such as setting \code{main=label(I4)} to put the variable label for a variable named I4 in the title of a graph.  
 }
@@ -148,7 +146,7 @@ The read data frame is returned, usually assigned the name of \code{d} as in the
 \references{
 Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 2, NY: Routledge.
 
-Alexander Walker (2017). openxlsx: Read, Write and Edit XLSX Files. https://CRAN.R-project.org/package=openxlsx
+Alexander Walker (2018). openxlsx: Read, Write and Edit XLSX Files. R package version 4.1.0. https://CRAN.R-project.org/package=openxlsx
 }
 
 
@@ -162,7 +160,7 @@ Alexander Walker (2017). openxlsx: Read, Write and Edit XLSX Files. https://CRAN
 # remove the # sign before each of the following Read statements to run
 
 # to browse for a data file on the computer system, invoke Read with 
-#   the ref argument empty
+#   the from argument empty
 # d <- Read()
 # abbreviated name
 # d <- rd()
@@ -173,13 +171,7 @@ Alexander Walker (2017). openxlsx: Read, Write and Edit XLSX Files. https://CRAN
 #  the specified label file, here a Excel file with two columns,
 #  the first column of variable names and the second column the 
 #  corresponding labels
-# d <- Read(labels="employee_lbl.xlsx")
-
-# same as above, but include standard read.csv options to indicate 
-#  no variable names in first row of the csv data file 
-#   and then provide the names
-# also indicate that the first column is an ID field
-# d <- Read(header=FALSE, col.names=c("X", "Y"), row.names=1)
+# l <- Read("employee_lbl.xlsx", var.labels=TRUE)
 
 # read a csv data file from the web
 # d <- Read("http://web.pdx.edu/~gerbing/data/twogroup.csv")

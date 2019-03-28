@@ -5,7 +5,10 @@
 \title{Create or Display Variable Labels}
 
 \description{
-Assign and/or display variable labels stored in the data frame \code{mylabels}. Variable labels enhance output of analyses either as text output at the console or as graphics, such as an axis label on a graph.  The variable labels can be assigned individually, or for some or all variables. 
+Assign and/or display variable labels stored in the data frame \code{l}. Variable labels enhance output of analyses either as text output at the console or as graphics, such as an axis label on a graph.  The variable labels can be assigned individually, or for some or all variables. 
+
+NOTE: Mostly deprecated. Can just set \code{var.labels=TRUE} on for a call to 
+\code{\link{Read}} to read a file of variable labels, and assign the output to \code{l}. Still needed to pull labels out of data frame from an SPSS read, or to read units to generate Rmd files from \code{\link{Regression}} .
 }
 
 \usage{
@@ -29,7 +32,7 @@ vl{\ldots}
 
 
 \details{
-Unlike standard R, \code{lessR} provides for variable labels, here stored in the data frame \code{mylabels}. To read the labels from an external file, specify a file reference as the first argument of the function call. Or create a character string of variable names and labels and specify the character string as the first argument to the function call. To assign an individual variable label with this function specify the variable name as the first argument followed by the label in quotes. Not all variables need have a label, and the variables with their corresponding labels can be listed or assigned in any order. If the \code{mylabels} data frame is created or modified, the output of the function must be assigned to \code{mylabels}, as shown in the following examples.
+Unlike standard R, \code{lessR} provides for variable labels, here stored in the data frame \code{l}. To read the labels from an external file, specify a file reference as the first argument of the function call. Or create a character string of variable names and labels and specify the character string as the first argument to the function call. To assign an individual variable label with this function specify the variable name as the first argument followed by the label in quotes. Not all variables need have a label, and the variables with their corresponding labels can be listed or assigned in any order. If the \code{l} data frame is created or modified, the output of the function must be assigned to \code{l}, as shown in the following examples.
 
 When all or some of the labels are read, either from the console or an external \code{csv} or \code{Excel} file, each line of the file contains the variable name and then the associated variable label. The file types of \code{.csv} and \code{.xlsx} in the file reference listed in the first position of the function call are what trigger the interpretation of the argument as a file reference. 
 
@@ -61,8 +64,8 @@ The data frame with the variable labels is returned.
 \examples{
 
 # read file and then variable labels from csv files
-# mylabels <- Read("http://lessRstats.com/data/employee.csv")
-# mylabels <- VariableLabels("http://lessRstats.com/data/employee_lbl.csv")
+# l <- Read("http://lessRstats.com/data/employee.csv")
+# l <- VariableLabels("http://lessRstats.com/data/employee_lbl.csv")
 
 # construct and read variable labels from console
 lbl <- "
@@ -73,12 +76,12 @@ Salary, Annual Salary (USD)
 JobSat, JobSat with Work Environment
 Plan, 1=GoodHealth 2=YellowCross 3=BestCare
 "
-mylabels <- VariableLabels(lbl)
-mylabels
+l <- VariableLabels(lbl)
+l
 
 # add/modify a single variable label
-mylabels <- VariableLabels(Salary, "Annual Salaries in USD")
-mylabels
+l <- VariableLabels(Salary, "Annual Salaries in USD")
+l
 
 # list the contents of a single variable label
 VariableLabels(Salary)

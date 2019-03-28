@@ -40,7 +40,6 @@ function(
   bubble.text.color=getOption("bubble.text.color"),
   segment.color=getOption("segment.color"),
   ID.color=getOption("ID.color"),
-  area.fill=getOption("area.fill"),
   out.fill=getOption("out.fill"),
   out.color=getOption("out.color"),
   out2.fill=getOption("out2.fill"),
@@ -109,7 +108,7 @@ function(
 
   width=120, show=FALSE, ...) {
 
-   dots <- list(...)
+  dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
       if (names(dots)[i] == "values.cex")  values.size <- dots[[i]]
@@ -208,7 +207,6 @@ function(
     bubble.text.color <- set$bubble.text.color
     segment.color <- set$segment.color
     ID.color <- set$ID.color
-    area.fill <- set$area.fill
 
     axis.color <- set$axis$color
     axis.x.color <- set$axis.x$color
@@ -372,7 +370,6 @@ function(
     if (lab.y.color == "off") lab.y.color <- "transparent"
   if (segment.color == "off") segment.color <- "transparent"
   if (ID.color == "off") ID.color <- "transparent"
-  if (area.fill == "off") area.fill <- "transparent"
   if (out.fill == "off") out.fill <- "transparent"
   if (out.color == "off") out.color <- "transparent"
   if (out2.fill == "off") out2.fill <- "transparent"
@@ -383,16 +380,16 @@ function(
 
   # see if a pre-defined color range, if not return the calling color
   if (length(bar.fill) == 0) bar.fill <- getOption("bar.fill.discrete")
-  bar.fill <- .color.range(bar.fill, 24, no.change=TRUE)
-  if (length(bar.color) > 0) bar.colro <- getOption("bar.color.discrete")
-  bar.color <- .color.range(bar.color, 24, no.change=TRUE)
-  if (length(pt.fill) > 0) pt.fill <- getOption("pt.fill")
-  pt.fill <- .color.range(pt.fill, 24, no.change=TRUE)
-  if (length(pt.color) > 0) pt.color <- getOption("pt.color")
-  pt.color <- .color.range(pt.color, 24, no.change=TRUE)
-  if (length(add.fill) > 0) add.fill <- getOption("add.fill")
-  if (length(add.color) > 0) add.color <- getOption("add.color")
-    add.color <- .color.range(add.color, 24, no.change=TRUE)
+  bar.fill <- .color.range(bar.fill, 24)
+  if (length(bar.color) == 0) bar.colro <- getOption("bar.color.discrete")
+  bar.color <- .color.range(bar.color, 24)
+  if (length(pt.fill) == 0) pt.fill <- getOption("pt.fill")
+  pt.fill <- .color.range(pt.fill, 24)
+  if (length(pt.color) == 0) pt.color <- getOption("pt.color")
+  pt.color <- .color.range(pt.color, 24)
+  if (length(add.fill) == 0) add.fill <- getOption("add.fill")
+  if (length(add.color) == 0) add.color <- getOption("add.color")
+    add.color <- .color.range(add.color, 24)
 
   # default transparency levels
   if (reset) {
@@ -460,7 +457,6 @@ function(
     options(se.fill=se.fill)
     options(segment.color=segment.color)
     options(ID.color=ID.color)
-    options(area.fill=area.fill)
     options(out.fill=out.fill)
     options(out.color=out.color)
     options(out2.fill=out2.fill)
@@ -576,7 +572,6 @@ function(
       violin.color = "black"
       box.fill = "white"
       box.color = "black"
-      area.fill = "black"
       se.fill = .maketrans("gray10", 40)
       grid.color = "gray85"
       out.fill = "black"
@@ -602,7 +597,6 @@ function(
       box.color = "gray15" 
       ellipse.fill = .maketrans("gray35", 15)
       fit.color = "black"
-      area.fill = .maketrans("gray25", .to256("trans.bar.fill"))
       se.fill = .maketrans("gray10", 40) 
       segment.color = "gray20"
       grid.color = "gray85"
@@ -635,7 +629,6 @@ function(
       box.color = "gray15" 
       strip.fill = .maketrans("gray55")
       fit.color = "gray15"
-      area.fill = .maketrans("gray50", .to256("trans.bar.fill"))
       main.color = "gray15"
       lab.color = "gray15"
       axis.color = "gray15"
@@ -661,7 +654,6 @@ function(
       pt.color = rgb(70,80,90, maxColorValue=255)
       box.fill = getColors("hues")
       violin.fill = .maketrans(hcl(240,20,55), 90)
-      area.fill = "gray50"
       grid.color = rgb(222,217,205, maxColorValue=255)
       values = "%"
     }
@@ -671,6 +663,7 @@ function(
       window.fill = "white"
       panel.fill = "grey99"
       bar.fill = .maketrans(clr1, .to256("trans.bar.fill"))
+      violin.fill = bar.fill
       bar.fill.discrete = .maketrans(clr1, .to256("trans.bar.fill"))
       bar.fill.ordered = .maketrans(clr1, .to256("trans.bar.fill"))
       pt.fill = .maketrans(clr1, .to256("trans.pt.fill"))
@@ -734,7 +727,7 @@ function(
       grid.lwd = 1
     }
    
-    else if (theme ==  "gray"  &&  sub.theme == "black") {
+    else if (!miss.theme  &&  theme == "gray"  &&  sub.theme == "black") {
       window.fill = "gray10"
       panel.fill = "gray10"
       panel.color = "gray80"
@@ -753,10 +746,8 @@ function(
       violin.color = "gray15"
       box.fill = .maketrans("gray15", 35)
       box.color = "gray15"
-      area.fill = "gray70"
       ellipse.fill = .maketrans("gray55", 65)
       fit.color = "gray75"
-      area.fill = .maketrans("gray55", .to256("trans.bar.fill"))
       se.fill = .maketrans("gray55", 65)
       strip.color = .maketrans(clr1, .to256n(0.40))
       strip.text.color = "gray65"
@@ -805,8 +796,6 @@ function(
         pt.color = rgb(139,69,0, maxColorValue=256)
         ellipse.fill = rgb(249,99,2, alpha=45, maxColorValue=256)
         fit.color = rgb(209,87,3, maxColorValue=256)
-        area.fill = rgb(249,99,2, alpha=.to256("trans.bar.fill"),
-              maxColorValue=256)
         segment.color = rgb(249,99,2, maxColorValue=256)
         clr1 <- rgb(249,99,2, maxColorValue=256)
       }
@@ -830,6 +819,7 @@ function(
     options(bar.fill.ordered = bar.fill.ordered) 
     options(bar.color.discrete = bar.color.discrete) 
     options(bar.color.ordered = bar.color.ordered) 
+    options(pt.fill = pt.fill) 
     options(pt.color = pt.color) 
     
     options(values=values)
@@ -857,7 +847,6 @@ function(
     options(se.fill=se.fill)
     options(segment.color=segment.color)
     options(ID.color=ID.color)
-    options(area.fill=area.fill)
     options(out.fill=out.fill)
     options(out.color=out.color)
     options(out2.fill=out2.fill)
@@ -1214,7 +1203,6 @@ function(
     bubble.text.color = getOption("bubble.text.color"),
     segment.color = getOption("segment.color"),
     ID.color=getOption("ID.color"),
-    area.fill=getOption("area.fill"),
 
     axis = axis,
     axis.x = axis.x,

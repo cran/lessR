@@ -5,15 +5,20 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
          xlab, ylab, main, shape, lab.cex, axis.cex,
          lvl=0, ellipse.color=NULL, ellipse.lwd=NULL,
          fit="off", fit.color=NULL, fit.lwd=NULL,
-         area="transparent", origin=NULL, jitter,
+         origin=NULL, jitter,
          violin, violin.fill, box, box.fill, 
          bw, vbs.size, box.adj, a, b, k.iqr, fences, vbs.mean,
          out.shape, out.size,
          out.fill, out.color, out2.fill, out2.color,
          ID, out.cut, ID.color, ID.size,
          rotate.x, rotate.y, width, height, pdf.file, c.type, ...) {
+
     
-#cat("c.type:", c.type, "\n")
+  if (object == "both")
+    area <- fill
+   else
+    area <- "transparent"
+
   date.ts <- FALSE
   if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
   if (date.ts) xx.lab <- xlab
@@ -145,9 +150,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
   else {
     n.panels <- ifelse (is.null(by2), nlevels(by1), nlevels(by1)*nlevels(by2))
     if (n.panels == 0) n.panels <- 1
-    if (c.type == "cont") {
+
+    if (c.type %in% c("cont", "contcont")) {
       if (is.null(ncols) && is.null(nrows)) {
-        ncols <- ifelse (n.panels < 7, 1, 2) 
+        ncols <- ifelse (n.panels < 5, 1, 2) 
       }
     }
   }

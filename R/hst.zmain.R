@@ -196,7 +196,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     # see if apply a pre-defined color range
     n.bins <- length(h$counts)
     clr <- NULL
-    clr <- .color.range(fill, n.bins, no.change=TRUE)
+    clr <- .color.range(fill, n.bins)
       
     # not a color range such as "hues" or "blues", so assign clr here
     if (is.null(clr)) {

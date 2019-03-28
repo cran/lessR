@@ -1,5 +1,5 @@
 .plt.bad <-
-function (x.miss, y.miss, topic, breaks, bin.start, n.row, n.col,
+function (x.miss, y.miss, stat, breaks, bin.start, n.row, n.col,
           MD.cut, out.cut, fit.se, ...) {
 
   # check for inconsistent parameters
@@ -19,10 +19,10 @@ function (x.miss, y.miss, topic, breaks, bin.start, n.row, n.col,
       "fit.se now specified as the confidence level, between 0 and 1\n\n")
   }
   
-  if (topic %in% c("mean", "sd", "min", "max") && y.miss) {
+  if (stat %in% c("mean", "sd", "dev", "min", "median", "max") && y.miss) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Must specify a numeric y-variable from which to compute the\n ",
-      " ", values, " for each level of ", deparse(substitute(x)), "\n\n")
+      " ", stat, " for each level of ", deparse(substitute(x)), "\n\n")
   }
 
   #if (values != "data"  &&  object == "sunflower") {

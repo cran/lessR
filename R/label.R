@@ -41,29 +41,29 @@ function(x, value=NULL, data=d) {
       return(lbl)
     }
     else {
-      mylabels <- attr(data, which="variable.labels")
-      for (i in 1:length(mylabels))
-        cat(names(mylabels)[i], ": ", mylabels[i], "\n", sep="")
+      l <- attr(data, which="variable.labels")
+      for (i in 1:length(l))
+        cat(names(l)[i], ": ", l[i], "\n", sep="")
        return(lbl)
     }
   }
 
   else {  # assign a label to a var in a data frame and return data frame
-    mylabels <- attr(data, which="variable.labels")
-    lbl.len <- length(mylabels)
-    if (x.name %in% names(mylabels)) { #cat("IS IN\n")
-      lbl.index <- which(names(mylabels) == x.name)
+    l <- attr(data, which="variable.labels")
+    lbl.len <- length(l)
+    if (x.name %in% names(l)) { #cat("IS IN\n")
+      lbl.index <- which(names(l) == x.name)
       indx <- lbl.index
     }
     else
-      indx <- length(mylabels) + 1
-    mylabels[indx] <- value
-    names(mylabels)[indx] <- x.name
+      indx <- length(l) + 1
+    l[indx] <- value
+    names(l)[indx] <- x.name
     cat("\n")
-    cat("Variable Name:",  names(mylabels)[indx], "\n")
-    cat("Variable Label:", mylabels[indx], "\n")
+    cat("Variable Name:",  names(l)[indx], "\n")
+    cat("Variable Label:", l[indx], "\n")
     cat("\n")
-    attr(data, which="variable.labels") <- mylabels
+    attr(data, which="variable.labels") <- l
     return(data) 
   }
   

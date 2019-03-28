@@ -53,7 +53,6 @@ style(
   bubble.text.color=getOption("bubble.text.color"),
   segment.color=getOption("segment.color"),
   ID.color=getOption("ID.color"),
-  area.fill=getOption("area.fill"),
   out.fill=getOption("out.fill"),
   out.color=getOption("out.color"),
   out2.fill=getOption("out2.fill"),
@@ -214,8 +213,6 @@ set(\ldots)
   \item{segment.color}{Color of connecting line segments when there are also plotted
         points, such as in a frequency polygon. Default color is \code{color}.}
   \item{ID.color}{Color of the text to display the ID labels.}
-  \item{area.fill}{Fill color of the area under a line in a run chart or time
-       series.}
   \item{out.fill}{For a scatterplot, color of the border of potential outliers, which,
        for the unadjusted boxplot, are default values
        1.5 IQR's beyond the lower or upper quartile.}

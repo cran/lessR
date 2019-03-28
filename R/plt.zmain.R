@@ -4,10 +4,10 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          object="point", stat="data",
 
          col.fill=getOption("pt.fill"),
+         area.fill=getOption("pt.fill"),
          col.color=getOption("pt.color"),
 
          col.trans=NULL, col.segment=getOption("segment.color"),
-         col.area="transparent",
 
          xy.ticks=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, main.cex=NULL, sub=NULL,
@@ -15,8 +15,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          rotate.x=0, rotate.y=0, offset=0.5, prop=FALSE, origin.x=NULL,
 
          size=NULL, shape="circle", means=TRUE,
-         sort.yx=FALSE,
-         segments.y=FALSE, segments.x=FALSE, size.ln=2,
+         segments.y=FALSE, segments.x=FALSE, ln.width=2,
 
          smooth=FALSE, smooth.points=100, smooth.size=1,
          smooth.exp=0.25, smooth.bins=128,
@@ -40,12 +39,14 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
          freq.poly=FALSE, jitter.x=0, jitter.y=0,
 
          xlab.adj=0, ylab.adj=0, bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
+         legend.title=NULL,
 
          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
          add.cex=NULL, add.lwd=1, add.lty="solid",
          add.color=NULL, add.fill=NULL, add.trans=NULL,
 
          quiet=getOption("quiet"), want.labels=TRUE, ...)  {
+
 
   fill.bg <- getOption("panel.fill")
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
@@ -115,23 +116,6 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   else
     cleveland <- FALSE
 
-  # see if trans is customized for this analysis
-  if (is.null(col.trans)) {  # no change, so no trans for Cleveland dp
-    if (cleveland) {
-      trans.pts <- 0
-      col.fill <- .maketrans(col.fill, (1-trans.pts)*256)
-    }
-  }
-  else {  # trans has been changed from default, so change col.fill
-    trans.pts <- col.trans
-    if (trans.pts > 0) {
-      col.fill <- .maketrans(col.fill, (1-trans.pts)*256)
-      if (col.area != "transparent")
-        col.area <- .maketrans(col.area, (1-trans.pts)*256)
-    }
-  }
-
-
   # get lab.x.cex  lab.y.cex
   lab.cex <- getOption("lab.cex")
   lab.x.cex <- getOption("lab.x.cex")
@@ -142,6 +126,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
 
   if (date.ts) xx.lab <- xlab
+# if (is.null(ylab))  # no ylab for Cleveland dot plot
+#   if (is.null(x.lvl) && !is.null(y.lvl) && unique.y) ylab <- ""
   if (want.labels) {
     gl <- .getlabels(xlab, ylab, main, lab.x.cex=lab.x.cex,
                      lab.y.cex=lab.y.cex)
@@ -170,11 +156,12 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   # by default display center.line only if runs, so detect if a run
   if (center.line == "default"  &&  !date.ts  &&  object == "both") {
-    m <- mean(y, na.rm=TRUE)
+    y.clean <- na.omit(y)
+    m <- mean(y.clean)
     n.change <- 0
-    for (i in 1:(length(y)-1))
-      if ((y[i+1] > m) != (y[i] > m)) n.change <- n.change+1
-    if (n.change/(length(y)-1) < .15)
+    for (i in 1:(length(y.clean)-1))
+      if ((y.clean[i+1] > m) != (y.clean[i] > m)) n.change <- n.change+1
+    if (n.change/(length(y.clean)-1) < .15)
       center.line <- "off"
     else
       center.line <- "median"
@@ -231,7 +218,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
 
   # get max number of lines in y value labels
-  if (!is.null(y.val)  &&  y.name != "row.names") {
+  if (!is.null(y.val)  &&  y.name != "row.names"  && !cleveland) {
     stuff <- .get.val.ln(y.val, y.name)
     y.val <- stuff$val.lab
     mx.y.val.ln <- stuff$mx.val.ln
@@ -259,7 +246,9 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     main <- "not null"
   }
 
-  if (!date.ts) if (n.xcol > 1) x.lab <- NULL
+# if (!date.ts) if (is.null(x.lab)) if (n.xcol > 1) x.lab <- NULL
+  if (!is.null(x.lab)) if (n.xcol > 1  &&  substr(x.lab, 1, 2) == "c(")
+      x.lab <- NULL   # e.g., get rid of x.lab == "c(Female,Male)" 
 
   if (length(size) > 1) {  # size is a variable
     sz.nm <- getOption("sizename")
@@ -278,9 +267,11 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   n.lab.x.ln <- margs$n.lab.x.ln
   n.lab.y.ln <- margs$n.lab.y.ln
 
-  if (n.ycol > 1) rm <- rm + 0.85  # room for legend
-  if (n.xcol > 1) bm <- bm + .2
-  if (!is.null(by)) rm <- rm + 0.85  # room for legend
+  if (n.xcol > 1  ||  n.ycol > 1  ||  !is.null(by)) {  # vertical legend room
+    new.adj <- .22  + (.65 * axis.y.cex)
+    rm <- rm + new.adj 
+    if (axis.y.cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
+  }
   if (object == "both")
     if (center.line != "off") rm <- rm + .4  # room for center.line label
 
@@ -338,8 +329,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       mx.y <- mx.y + .4
     }
 
-    if (is.null(origin.x)) {
-      if (stat %in% c("count", "prop"))
+    if (is.null(origin.x)) {  # set default for minimum x-value displayed
+      if (stat %in% c("count", "proportion", "%"))
         origin.x <- 0
       else
         origin.x <- mn.x
@@ -366,7 +357,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   usr <- par("usr")
 
-  #
+
   # set up plot background
   # ----------------------
 
@@ -377,8 +368,19 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     if (num.cat.x) axT1 <- sort(unique(x))  # x.lvl or x.val are NULL
   }
   else {
-    if (!date.ts)
-      axT1 <- pretty(x)  # else numeric, so all the ticks
+    if (!date.ts) {
+      if (stat == "count") {
+        if (mx.x <= 3)  # just want integers for count axis
+          n.best <- 3
+        else if (mx.x > 3  &&  mx.x < 100)
+          n.best <- 4
+        else
+          n.best <- 5
+        axT1 <- pretty(origin.x:mx.x, n=n.best)
+      }
+      else
+        axT1 <- pretty(c(origin.x, x))  # else numeric, so all the ticks
+    }
     else
       axT1 <-axTicks(1)  
   }
@@ -463,81 +465,161 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # plot the values
   # ---------------
 
-  # plot lines and/or points
-  if (object %in% c("point", "both")) {
-    trans.pts <- ifelse(is.null(col.trans),
-                        getOption("trans.pt.fill"), col.trans)
-
     # ------
     # colors
+
     n.clrs <- max(n.col, n.by)
 
-    color <- character(length=length(col.color))
-    fill <- character(length=length(col.fill))
+  # prepare col.fill and col.color, values that enter into the analysis
+  # convert any name of a color range to the colors, otherwise leave unchanged
+  #   set NULL value to default
+
+  if (!is.null(col.fill)) {
+    if (length(col.fill) == 1) col.fill <- .color.range(col.fill, n.clrs)
+  }
+  else 
+    col.fill <- getOption("pt.fill")  # default
+
+  color.miss <- ifelse (is.null(col.color), TRUE, FALSE)
+  if (!color.miss) {
+    if (length(col.color) == 1) col.color <- .color.range(col.color, n.clrs)
+  }
+  else {
+    if (stack  &&  col.fill != "transparent") {
+      for (i in 1:n.clrs) col.color[i] <- "black"
+    }
+    else
+      col.color <- getOption("pt.color")  # default
+  }
+
+
+
+
+  if (object %in% c("point", "both")) {
+
+    color <- character(length=length(n.clrs))
+    fill <- character(length=length(n.clrs))
     ltype <- character(length=n.clrs)
     for (i in 1:length(ltype)) ltype[i] <- "solid"
+
     if (n.clrs == 1) {
       color[1] <- col.color[1]
       fill[1] <- col.fill[1]
     }
 
-    else  {  # n.clrs > 1
-      if (length(col.fill) > 1) {
-        fill <- col.fill  # use entered color vector
-      }
-      else {  # see if color range 
-        clr <- .color.range(col.fill, n.clrs)  # see if range
-        if (!is.null(clr))
-          fill <- clr  # the range
-        else {  # default
-          if (!is.ordered(by)) {
-            if (getOption("theme") %in% c("gray", "white"))
-              fill <- getColors("grays", n=n.clrs)
-            else
-              fill <- getColors("hues", n=n.clrs)
-          }
-          else {
-            col.fill <- .get.fill() 
-            fill <- .color.range(col.fill, n.clrs)  # see if range
-          }
-        }
-      if (trans.pts > 0) for (i in 1:length(fill))
-        fill[i] <- .maketrans(fill[i], (1-trans.pts)*256)
-      }
+#   else if (n.clrs == 2) {
+#     color[1] <- col.color[1]
+#     color[2] <- ifelse (length(col.color) > 1, col.color[2], col.color[1])
+#     if (getOption("sub.theme") == "black") {
+#       if (getOption("theme") != "gray")
+#         color[2] <- getOption("bar.color")
+#       else
+#         color[2] <- getOption("lab.color")
+#     }
+#     if (col.fill == "transparent") fill[1] <- color[1]
+#     if (object == "both") {
+#       ltype[2] <- "dotted"
+#       if (!(getOption("theme") %in% c("gray")))
+#         fill[2] <- fill[1]
+#       else {
+#         fill[2] <- fill[1]
+#         color[2] <- rgb(.15,.15,.15)
+#       }
+#     }  # end object is both
+#     else { 
+#       if (length(col.fill) == 1)
+#         fill[2] <- "transparent"
+#       else
+#         fill[2] <- col.fill[2]
+#     }
+#   }  # end n.clrs=2
 
-      if (length(col.color) < length(fill) &&
-          col.color == getOption("pt.color"))
-        color <- fill 
-      else
-        color <- col.color  # color different than fill
+    else { # n.clrs > 1 
+      if (length(col.fill) > 1) {
+        fill <- col.fill  # use given color vector
+      }
+      else if (!is.ordered(by)) {
+        if (getOption("theme") %in% c("gray", "white")) {
+          if (col.fill != "transparent") fill <- getColors("grays", n=n.clrs)
+        }
+        else {
+          if (col.fill != "transparent")
+            fill <- getColors("hues", n=n.clrs)
+          else
+            fill <- "transparent"
+          if (object == "both"  &&  color.miss  &&  fill != "transparent")
+            color <- fill
+        }
+      }
+      else {  # ordered default
+        fill <- .color.range(.get.fill(), n.clrs)  # see if range
+      }
+    } # end n.clrs > 1
+
+    
+    #  kludge needed for Plot(c(x1,x2), y)
+    if (length(col.color) < length(fill) &&  # more fill than color colors
+        col.color == getOption("pt.color"))  # default
+      color <- fill 
+    else {
+      color <- col.color  # color different than fill
     }
 
-    col.clr <- .color.range(col.color, n.clrs)  # see if range
-    if (!is.null(col.clr)) color <- col.clr
+    if (length(col.color) == 1  &&  n.clrs > 1)
+      if (!color.miss)
+        for (i in 1:n.clrs) color[i] <- col.color
+      else {
+        if (col.color != "transparent")
+          color <- getColors("hues", n=n.clrs)
+        else
+          color <- "transparent"
+      }
 
-    if (object != "point"  ||  size == 0) fill <- color  # no fill in legend
+    if (!stack  &&  color.miss  &&  fill != "transparent"  &&  n.clrs > 1)
+      color <- fill
+
+
+    trans.pts <- ifelse(is.null(col.trans),
+                        getOption("trans.pt.fill"), col.trans)  # default
+
+    # see if trans is customized for this analysis
+    if (is.null(col.trans))  # no change, so no trans for Cleveland dp
+      trans.pts <- ifelse (cleveland, 0, getOption("trans.pt.fill")) 
+    else
+      trans.pts <- col.trans
+    if (trans.pts > 0  &&  fill[1] != "transparent")
+      fill <- .maketrans(fill, (1-trans.pts)*256)
+
+    # if (object != "point"  ||  size == 0) fill <- color  # no fill in legend
     fill[which(fill == "off")] <- "transparent"
     color[which(color == "off")] <- "transparent"
 
+     if (area.fill == "on") area.fill <- getOption("violin.fill")
+     if (object == "both") if (area.fill == "transparent") area.fill <- fill
+     if (ln.width == 0) area.fill <- "transparent"
+
+
 
     # ----------
-    # plot lines
+    # plot lines (and area.fill)
     if (object == "both") {
 
       if (n.xcol == 1  &&  n.ycol == 1) {
         if (n.by <= 1) {  # pure single panel, data in wide format
 
-          if (size.ln > 0)  # plot line(s)
-            if (date.ts || freq.poly || object == "both")
-                lines(as.numeric(x[,1]), y[,1], col=col.segment, lwd=size.ln, ...)
+          if (ln.width > 0)  # plot line(s)
+            if (date.ts || freq.poly || object == "both")  # object == "both"
+                #lines(as.numeric(x[,1]), y[,1], col=col.segment, lwd=ln.width,
+                lines(as.numeric(x[,1]), y[,1], col=color[1], lwd=ln.width,
+                      ...)
 
-          if (col.area != "transparent") # fill area
+          if (fill[1] != "transparent") # fill area
             polygon(c(x[1],x,x[length(x)]), c(min(y[,1]),y[,1],min(y[,1])),
-                col=col.area, border="transparent")
+                col=area.fill, border="transparent")
         }  # n.by is 1
 
         else {  # n.by > 1,  tidy format, all y data in same column
-          for (i in 1:n.by) {
+          for (i in 1:n.by) {  # only stack=TRUE makes sense
             xl <- subset(x, by==levels(by)[i])
             if (i > 1) yo <- yl
             yl <- subset(y, by==levels(by)[i])
@@ -546,22 +628,25 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
               if (i == 1) {
                 xx <- c(xl[1],xl,xl[length(xl)])
                 yy <- c(min(yl[,1]),yl[,1],min(yl[,1]))
-                if (col.area != "transparent")
-                  polygon(xx, yy, col=fill[1], border="transparent")
+                if (fill[1] != "transparent")
+                  polygon(xx, yy, col=area.fill[1], border="transparent")
               }
               if (i > 1) {
                 yl[,1] <- yl[,1] + yo[,1]
-                xx <- c(c(xl[1],xl,xl[length(xl)]), rev(c(xl[1],xl,xl[length(xl)])))
+                xx <- c(c(xl[1],xl,xl[length(xl)]),
+                      rev(c(xl[1],xl,xl[length(xl)])))
                 yy <- c(c(min(yl[,1]),yl[,1],min(yl[,1])),
                            rev(c(min(yo[,1]),yo[,1],min(yo[,1]))))
-                if (col.area != "transparent")
-                  polygon(xx, yy, col=fill[i], border="transparent")
+                if (fill[1] != "transparent")
+                 polygon(xx, yy, col=area.fill[i], border="transparent")
               }
             }
 
-            if (size.ln > 0) {
-                lines(xl, yl[,1], col=color[i], lty=ltype[i], lwd=size.ln, ...)
-            }  # end size.ln > 0
+            if (ln.width > 0) {
+              if (stack)  # set line properties here, no option for user
+                ln.width <- 1
+              lines(xl, yl[,1], col=color[i], lty=ltype[i], lwd=ln.width, ...)
+            }  # end ln.width > 0
           }
         }
       }  # end n.xcol and n.ycol = 1
@@ -573,30 +658,30 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
             if (i == 1) {
               xx <- c(x[1],x,x[length(x)])
               yy <- c(min(y[,1]),y[,1],min(y[,1]))
-              if (col.area != "transparent")
-                polygon(xx, yy, col=fill[1], border="transparent")
+              if (fill[1] != "transparent")
+                polygon(xx, yy, col=area.fill[1], border="transparent")
             }
             if (i > 1) {
               y[,i] <- apply(y[,(i-1):i], 1, sum, na.rm=TRUE)  # sum for stacking
               xx <- c( c(x[1],x,x[length(x)]), rev(c(x[1],x,x[length(x)])) )
               yy <- c( c(min(y[,i]),y[,i],min(y[,i])),
                          rev(c(min(y[,i-1]),y[,i-1],min(y[,i-1]))) )
-              if (col.area != "transparent")
-                polygon(xx, yy, col=fill[i], border="transparent")
+              if (fill[1] != "transparent")
+                polygon(xx, yy, col=area.fill[i], border="transparent")
             }
           }
 
-          if (size.ln > 0) {
-              lines(x[,1], y[,i], col=color[i], lty=ltype[i], lwd=size.ln, ...)
-          }  # end size.ln > 0
+          if (ln.width > 0) {
+              lines(x[,1], y[,i], col=color[i], lty=ltype[i], lwd=ln.width, ...)
+          }  # end ln.width > 0
 
         }  # end i loop
 
       }  # end n.ycol > 1
 
       if (n.xcol > 1) {
-        if (size.ln > 0) for (i in 1:n.xcol)
-          lines(as.numeric(x.val),y[,1], col=fill[i], lwd=size.ln, ...)
+        if (ln.width > 0) for (i in 1:n.xcol)
+          lines(as.numeric(x.val),y[,1], col=fill[i], lwd=ln.width, ...)
       }
 
       # plot center line
@@ -629,7 +714,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
         m.y <- median(y[,1], na.rm=TRUE)
       }
 
-    }  # end lines
+    }  # end both
 
 
     # -----------
@@ -652,7 +737,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                         colramp=clr.den, cex=smooth.size, add=TRUE)
         }
 
-        else {  # plot the individual points, plus means, segments, etc.
+        else if (size > 0) {  # plot the individual points, plus means, segments, etc.
 
           if (jitter.x > 0)
             x[,1] <- jitter(x[,1], factor=jitter.x)
@@ -681,6 +766,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
           else if (n.ycol == 1) {  # one y
             for (i in 1:n.xcol) {  # one to many x's
+                if (getOption("theme") %in% c("gray", "white"))
+                  if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
                 points(x[,i], y[,1], pch=shape, col=color[i], bg=fill[i],
                        cex=size.pt, ...)
             }
@@ -688,7 +775,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
           else  if (n.xcol == 1) {  # one x
             for (i in 1:n.ycol) {  # one to many y's
-                if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
+                if (getOption("theme") %in% c("gray", "white"))
+                  if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
                 points(x[,1],y[,i], pch=shape, col=color[i], bg=fill[i],
                        cex=size.pt, ...)  # one x
             }
@@ -705,7 +793,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                        lty=1, lwd=.75, col=col.segment)
           }
 
-          if (!(stat %in% c("count", "prop"))) {
+          if (!(stat %in% c("count", "prop", "%"))) {
             if (segments.x)
               segments(y0=par("usr")[3], x0=x, y1=y, x1=x, lty=1, lwd=.75,
                        col=col.segment)
@@ -771,20 +859,28 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i], cex=size.pt,
                  lwd=0.75, ...)
         }
-
-        .plt.by.legend(levels(by), color, fill, shp, trans.pts, fill.bg, usr)
+        if (fill[1] == "transparent") fill <- color
+        if (stack) {
+          point.size <- 2.5 * axis.x.cex
+          .plt.by.legend(levels(by), color, fill, shp=22, trans.pts, fill.bg,
+                       usr, pt.size=point.size)
+        }
+        else
+          .plt.by.legend(levels(by), color, fill, shp, trans.pts, fill.bg, usr)
 
         }  # end by
 
-      }  # end object is point or both
+      }  # end plot points object is point or both
 
-      # plot legend as needed
+
+#     if (stack) fill <- color  # fill can be very translucent
+      if (fill[1] == "transparent") fill <- color
       if (n.xcol > 1)  # horizontal legend, on x-axis
-        .plt.legend(colnames(x), TRUE, color, fill, shape, fill.bg, usr,
-                    lab.cex=lab.x.cex)
+        .plt.legend(colnames(x), FALSE, color, fill, shape, fill.bg, usr,
+                    lab.cex=lab.x.cex, pt.size=1.25, legend.title)
       if (n.ycol > 1)  # vertical legend, on y-axis
         .plt.legend(colnames(y), FALSE, color, fill, shape, fill.bg, usr,
-                    lab.cex=lab.y.cex)
+                    lab.cex=lab.y.cex, pt.size=1.25, legend.title)
 
     }  # object is point, line, both
 
@@ -795,7 +891,10 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
     # colors
     if (is.null(col.low) || is.null(col.hi) || !bubble1) {
-      clr <- getOption("bar.fill.ordered")
+      if (col.fill[1] != "#46505A")  # default
+        clr <- col.fill
+      else
+        clr <- getOption("bar.fill.ordered")
       clr.color <- col.color
     }
     else {  # 1-var bubble plot and BPFM can have a color gradient
@@ -994,82 +1093,82 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     do.remove <- FALSE
     for (i.rem in 1:(as.numeric(fit.remove)+1)) {
       if (fit.remove) if (i.rem == 2) do.remove <- TRUE  # 2nd pass
-    for (i in 1:n.clrs) {
-      if (n.clrs == 1) {  # one plot, all the data
-        if (!date.ts) {
-          x.lv <- x[,1]
-          y.lv <- y[,1]
-        }
-        else {
-          x.lv <- as.numeric(x.val)
-          y.lv <- as.numeric(y[,i])
-        }
-        clr <- col.fit.line
-      }
-
-      else {  # multiple, pull out subset
-
-        if (!is.null(by)) {  # multiple by plots
-          x.lv <- subset(x, by==levels(by)[i])
-          y.lv <- subset(y, by==levels(by)[i])
-        }
-
-        if (n.col > 1) {  # multiple variable plots
-          if (n.xcol > 1) {
-            x.lv <- x[,i]
+      for (i in 1:n.clrs) {
+        if (n.clrs == 1) {  # one plot, all the data
+          if (!date.ts) {
+            x.lv <- x[,1]
             y.lv <- y[,1]
           }
           else {
-            x.lv <- x[,1]
-            y.lv <- y[,i]
+            x.lv <- as.numeric(x.val)
+            y.lv <- as.numeric(y[,i])
+          }
+          clr <- col.fit.line
+        }
+
+        else {  # multiple, pull out subset
+
+          if (!is.null(by)) {  # multiple by plots
+            x.lv <- subset(x, by==levels(by)[i])
+            y.lv <- subset(y, by==levels(by)[i])
+          }
+
+          if (n.col > 1) {  # multiple variable plots
+            if (n.xcol > 1) {
+              x.lv <- x[,i]
+              y.lv <- y[,1]
+            }
+            else {
+              x.lv <- x[,1]
+              y.lv <- y[,i]
+            }
+          }
+
+          clr <- ifelse (length(color) == 1, color, color[i])
+        }  # end multiple
+
+        ln.type <- "solid"
+        if (n.clrs == 2 && i == 2) ln.type <- "dashed"
+
+        if (!is.null(out.ind)) if (do.remove) {
+          x.lv <- x.lv[-out.ind]
+          y.lv <- y.lv[-out.ind]
+          ln.type <- ifelse (ln.type != "dashed", "dashed", "solid")
+          fit.se[1] <- 0  # for line w/o outliers, no se band
+        }
+
+        ok <- is.finite(x.lv) & is.finite(y.lv)
+        if (any(ok)) {
+          x.lv <- x.lv[ok]
+          y.lv <- y.lv[ok]
+          od <- order(x.lv)
+          x.lv <- x.lv[od]
+          y.lv <- y.lv[od]
+
+          # fit line
+          if (fit.line == "loess")
+            l.ln <- loess(y.lv ~ x.lv)
+          else if (fit.line == "lm")
+            l.ln <- lm(y.lv ~ x.lv)
+          f.ln <- fitted(l.ln, ...)
+          lines(x.lv, f.ln, col=clr, lwd=fit.lwd, lty=ln.type)
+
+          # se bands about fit line
+          if (fit.se[1] != 0) {
+            for (j in 1:length(fit.se)) {
+              p.ln <- predict(l.ln, se=TRUE)
+              prb <- (1 - fit.se[j]) / 2
+              up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
+              dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
+              # lines(x.lv, up.ln, col=clr, lwd=0.5, lty=ln.type)
+              # lines(x.lv, dn.ln, col=clr, lwd=0.5, lty=ln.type)
+              polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
+                      col=getOption("se.fill"), border="transparent")
+            }  # end for each se plot
           }
         }
 
-        clr <- ifelse (length(color) == 1, color, color[i])
-      }  # end multiple
-
-      ln.type <- "solid"
-      if (n.clrs == 2 && i == 2) ln.type <- "dashed"
-
-      if (!is.null(out.ind)) if (do.remove) {
-        x.lv <- x.lv[-out.ind]
-        y.lv <- y.lv[-out.ind]
-        ln.type <- ifelse (ln.type != "dashed", "dashed", "solid")
-        fit.se[1] <- 0  # for line w/o outliers, no se band
-      }
-
-      ok <- is.finite(x.lv) & is.finite(y.lv)
-      if (any(ok)) {
-        x.lv <- x.lv[ok]
-        y.lv <- y.lv[ok]
-        od <- order(x.lv)
-        x.lv <- x.lv[od]
-        y.lv <- y.lv[od]
-
-        # fit line
-        if (fit.line == "loess")
-          l.ln <- loess(y.lv ~ x.lv)
-        else if (fit.line == "lm")
-          l.ln <- lm(y.lv ~ x.lv)
-        f.ln <- fitted(l.ln, ...)
-        lines(x.lv, f.ln, col=clr, lwd=fit.lwd, lty=ln.type)
-
-        # se bands about fit line
-        if (fit.se[1] != 0) {
-          for (j in 1:length(fit.se)) {
-            p.ln <- predict(l.ln, se=TRUE)
-            prb <- (1 - fit.se[j]) / 2
-            up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
-            dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
-            # lines(x.lv, up.ln, col=clr, lwd=0.5, lty=ln.type)
-            # lines(x.lv, dn.ln, col=clr, lwd=0.5, lty=ln.type)
-            polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
-                    col=getOption("se.fill"), border="transparent")
-          }  # end for each se plot
-        }
-      }
-
-    }  # ith pattern
+      }  # ith pattern
     }  # fit.remove
   }  # fit.line
 
@@ -1084,12 +1183,17 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
 
   if (!is.null(x1)) {
-    x1[which(x1 == "mean.x")] <- mean(x, na.rm=TRUE)
-    x1 <- as.numeric(x1)
+    if (date.ts) x1 <- julian(x1)  # dates to date serial numbers
+    if (length(which(x1 == "mean.x")) > 0) {
+      x1[which(x1 == "mean.x")] <- mean(x, na.rm=TRUE)
+      x1 <- as.numeric(x1)
+    }
   }
   if (!is.null(y1)) {
-    y1[which(y1 == "mean.y")] <- mean(y, na.rm=TRUE)
-    y1 <- as.numeric(y1)
+    if (length(which(y1 == "mean.y")) > 0) {
+      y1[which(y1 == "mean.y")] <- mean(y, na.rm=TRUE)
+      y1 <- as.numeric(y1)
+    }
   }
 
   if (!is.null(add)) {

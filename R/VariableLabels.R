@@ -15,30 +15,30 @@ function(x, value=NULL, quiet=getOption("quiet")) {
       label <- attr(get(x.name, pos=.GlobalEnv), which="variable.labels")
       unit <- attr(get(x.name, pos=.GlobalEnv), which="variable.units")
       mylbl <- cbind(label, unit)
-      mylabels <- as.data.frame(mylbl, stringsAsFactors=FALSE,
+      l <- as.data.frame(mylbl, stringsAsFactors=FALSE,
                                 row.names=names(label))
-      if (!is.null(unit)) for (i in 1:nrow(mylabels))
-        if (is.na(mylabels[i,2])) mylabels[i,2] <- ""
-      if (ncol(mylabels) == 1) names(mylabels) <- "label"
-      if (ncol(mylabels) == 2) names(mylabels) <- c("label", "unit")
+      if (!is.null(unit)) for (i in 1:nrow(l))
+        if (is.na(l[i,2])) l[i,2] <- ""
+      if (ncol(l) == 1) names(l) <- "label"
+      if (ncol(l) == 2) names(l) <- c("label", "unit")
       if (is.null(mylbl))
         cat("\nNo variable labels present in the data file\n\n")
-      return(mylabels)
+      return(l)
     }
   }
 
-  # mylabels: modify existing or add new row
-  mylbYN <- ifelse (exists("mylabels", where=.GlobalEnv), TRUE, FALSE) 
+  # l: modify existing or add new row
+  mylbYN <- ifelse (exists("l", where=.GlobalEnv), TRUE, FALSE) 
   if (mylbYN && !missx && !is.null(value)) {
-    if (length(mylabels[which(row.names(mylabels) == x.name), 1]) > 0) {
-      mylabels[which(row.names(mylabels) == x.name), 1] <- value
+    if (length(l[which(row.names(l) == x.name), 1]) > 0) {
+      l[which(row.names(l) == x.name), 1] <- value
     }
     else {
-      nr <- nrow(mylabels)
-      mylabels[nr + 1, 1] <- value
-      row.names(mylabels)[nr + 1] <- x.name
+      nr <- nrow(l)
+      l[nr + 1, 1] <- value
+      row.names(l)[nr + 1] <- x.name
     }
-  return(mylabels)
+  return(l)
   }
 
 
@@ -60,11 +60,11 @@ function(x, value=NULL, quiet=getOption("quiet")) {
   if (!frm.cnsl  &&  fmt=="none" && is.null(value)) {
     if (missx && is.null(x.name)) {  # display all labels
       cat("\n")
-      for (i in 1:nrow(mylabels))
-        cat(row.names(mylabels)[i], ": ", mylabels[i,], "\n", sep="")
+      for (i in 1:nrow(l))
+        cat(row.names(l)[i], ": ", l[i,], "\n", sep="")
     }
     else {  # display existing label
-      lbl <- mylabels[which(row.names(mylabels) == x.name), 1]
+      lbl <- l[which(row.names(l) == x.name), 1]
       if (is.null(lbl)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The variable label does not exist for variable: ", x.name, "\n\n")
