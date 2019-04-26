@@ -1,14 +1,14 @@
 .plt.txt <- 
-function(x, y, values, object, n.cat,
+function(x, y, values, object, n_cat,
        cat.x, num.cat.x, cat.y, num.cat.y,
-       xlab, ylab, smooth, box.adj,
-       center.line, prop, size, show.runs, radius, digits.d, 
-       fun.call=NULL, txdif=NULL) {
+       xlab, ylab, smooth, box_adj,
+       center_line, prop, size, show_runs, radius, digits_d, 
+       fun_call=NULL, txdif=NULL) {
 
 
 date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
 
-if (date.ts) center.line <- "off"
+if (date.ts) center_line <- "off"
 
 # x and y come across here in their natural state, within each data frame
 # a time series has dates for x and numeric for y, factors are factors, etc
@@ -47,7 +47,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
   # dimensions
   n.xcol <- ncol(x)
   n.ycol <- ncol(y)  
-  n.col <- max(n.xcol, n.ycol)
+  n_col <- max(n.xcol, n.ycol)
   nrows <- nrow(x)
   
   if (date.ts) {
@@ -64,7 +64,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
 
 
   #if (!date.ts) {
-    #num.cat.x <- is.null(x.lvl)  &&  .is.num.cat(x[,1], n.cat)
+    #num.cat.x <- is.null(x.lvl)  &&  .is.num.cat(x[,1], n_cat)
     #cat.x <- ifelse (num.cat.x || !is.null(x.lvl), TRUE, FALSE)
   #}
   #else {
@@ -72,7 +72,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
     #cat.x <- FALSE
   #}
   #if (!bubble1  &&  !date.ts) {
-    #num.cat.y <- is.null(y.lvl) && .is.num.cat(y[,1], n.cat)
+    #num.cat.y <- is.null(y.lvl) && .is.num.cat(y[,1], n_cat)
     #cat.y <- ifelse (num.cat.y || !is.null(y.lvl), TRUE, FALSE)
   #}
   #else {
@@ -91,14 +91,14 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
   #by.name <- getOption("byname")
 
   # decimal digits
-  if (is.null(digits.d)) digits.d <- .max.dd(y[,1]) + 1
-  options(digits.d=digits.d)
+  if (is.null(digits_d)) digits_d <- .max.dd(y[,1]) + 1
+  options(digits_d=digits_d)
 
   size.pt <- ifelse (is.null(size), 1, size)  # dummy non-zero value
     
-  # by default display center.line only if runs, so detect if a run
-  if (n.col > 1) center.line <- "off"   # no center.line for multiple plots
-  if (center.line == "default"  &&  !date.ts  &&  object == "both") {
+  # by default display center_line only if runs, so detect if a run
+  if (n_col > 1) center_line <- "off"   # no center_line for multiple plots
+  if (center_line == "default"  &&  !date.ts  &&  object == "both") {
     y <- (!is.na(y))
     m <- mean(y)
     n.change <- 0
@@ -106,25 +106,25 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
       if ((y[i+1] > m) != (y[i] > m)) n.change <- n.change+1
     if (n.change/(length(y)-1) < .15)
 
-      center.line <- "off" 
+      center_line <- "off" 
     else 
-      center.line <- "median"
+      center_line <- "median"
   }
   else  # default if not automatically assigned above
-    if (!(center.line %in% c("off", "mean"))) center.line <- "median"
+    if (!(center_line %in% c("off", "mean"))) center_line <- "median"
 
-  if (center.line != "off") {
-    if (center.line == "mean") {
+  if (center_line != "off") {
+    if (center_line == "mean") {
       m.y <- mean(y[,1], na.rm=TRUE)
       lbl <- " mean"
       lbl.cat <- "mean:"
     }
-    else if (center.line == "median") {
+    else if (center_line == "median") {
       m.y <- median(y[,1], na.rm=TRUE)
       lbl <- " medn"
       lbl.cat <- "median:"
     }
-    else if (center.line == "zero") {
+    else if (center_line == "zero") {
       m.y <- 0
       lbl <- ""
       lbl.cat <- "zero:"
@@ -138,7 +138,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
 
   if (getOption("suggest")) {
     # function call for suggestions
-    fncl <- .fun.call.deparse(fun.call) 
+    fncl <- .fun_call.deparse(fun_call) 
     fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
     fncl <- gsub(" = ", "=", fncl)
   }
@@ -168,12 +168,12 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
           fc <- paste("Plot(", x.name, ", ", y.name, sep="")
 
           if (!grepl("fit", fncl)) {
-            txt <- ", fit=\"lm\", fit.se=c(.90,.99))  # fit line, standard errors"
+            txt <- ", fit=\"lm\", fit_se=c(.90,.99))  # fit line, standard errors"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
 
-          if (!grepl("out.cut", fncl)) {
-            txt <- ", out.cut=.10)  # label top 10% potential outliers"
+          if (!grepl("out_cut", fncl)) {
+            txt <- ", out_cut=.10)  # label top 10% potential outliers"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
 
@@ -218,7 +218,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
 
         }  # end suggest
 
-        for (i in 1:n.col) {
+        for (i in 1:n_col) {
 
           if (n.xcol > 1) {
             options(xname = colnames(x)[i])
@@ -312,7 +312,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
               x.by <- x
             options(yname = x.name)  # reverse order of x and y for .ss.numeric
             options(xname = y.name)
-            stats <- .ss.numeric(y, by=x.by, digits.d=digits.d,
+            stats <- .ss.numeric(y, by=x.by, digits_d=digits_d,
                                  brief=TRUE, y.name=x.name)
           }
           else if (!cat.x && cat.y) {
@@ -320,7 +320,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
               y.by <- factor(y, levels=1:length(y.lvl), labels=y.lvl)
             else
               y.by <- y
-            stats <- .ss.numeric(x, by=y.by, digits.d=digits.d, brief=TRUE)
+            stats <- .ss.numeric(x, by=y.by, digits_d=digits_d, brief=TRUE)
           }
 
           txout <- stats$tx
@@ -330,7 +330,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
           output <- list(out_suggest=txsug, out_txt=txout)
           class(output) <- "out_all"
           print(output)
-        }  # !bubble.1
+        }  # !bubble_1
 
         else {  # 1-D bubble plot of a factor var, y just a constant
 
@@ -339,10 +339,10 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
             txsug <- ">>> Suggestions"
             
             fc <- ""
-            if (!grepl("color.low", fncl))
-              fc <- paste(fc, ", color.low=\"lemonchiffon2\"", sep="")
-            if (!grepl("color.hi", fncl))
-              fc <- paste(fc, ", color.hi=\"maroon3\"", sep="")
+            if (!grepl("color_low", fncl))
+              fc <- paste(fc, ", color_low=\"lemonchiffon2\"", sep="")
+            if (!grepl("color_hi", fncl))
+              fc <- paste(fc, ", color_hi=\"maroon3\"", sep="")
             if (nzchar(fc)) {
               fc <- paste(fncl, fc, ") ", sep="")
               txsug <- paste(txsug, "\n", fc, sep="")
@@ -361,7 +361,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
           else
             x.by <- factor(x)
 
-          stats <- .ss.factor(x.by, by=NULL, brief=TRUE, digits.d=NULL,
+          stats <- .ss.factor(x.by, by=NULL, brief=TRUE, digits_d=NULL,
                               x.name, y.name, x.lbl, y.lbl)
 
           txttl <- stats$title
@@ -387,12 +387,12 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
         if (getOption("suggest")) {
           txsug <- ">>> Suggestions"
           fc <- ""
-          if (!grepl("sort.yx", fncl))
-            fc <- paste(fc, ", sort.yx=FALSE", sep="")
-          if (!grepl("segments.y", fncl)) 
-            fc <- paste(fc, ", segments.y=FALSE", sep="")
+          if (!grepl("sort_yx", fncl))
+            fc <- paste(fc, ", sort_yx=FALSE", sep="")
+          if (!grepl("segments_y", fncl)) 
+            fc <- paste(fc, ", segments_y=FALSE", sep="")
           if (nzchar(fc)) {
-            fncl <- .fun.call.deparse(fun.call) 
+            fncl <- .fun_call.deparse(fun_call) 
             fncl <- gsub(")$", "", fncl)  # get function call less closing
             fncl <- gsub(" = ", "=", fncl)
             fc <- paste(fncl, fc, ") ", sep="")
@@ -411,7 +411,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
 
         txout <- ""
         for (i in 1:n.xcol) {
-          stats <- .ss.numeric(x[,i], digits.d=digits.d, brief=TRUE)
+          stats <- .ss.numeric(x[,i], digits_d=digits_d, brief=TRUE)
           txout[length(txout)+1] <- paste("---", colnames(x)[i], "---")
           for (j in 2:length(stats$tx)) txout[length(txout)+1] <- stats$tx[j]
           if (i < n.xcol) {
@@ -447,10 +447,10 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
           txsug <- ">>> Suggestions"
           
           fc <- ""
-          if (!grepl("size.cut", fncl))
-            fc <- paste(fc, ", size.cut=FALSE", sep="")
+          if (!grepl("size_cut", fncl))
+            fc <- paste(fc, ", size_cut=FALSE", sep="")
           if (nzchar(fc)) {
-            fncl <- .fun.call.deparse(fun.call) 
+            fncl <- .fun_call.deparse(fun_call) 
             fncl <- gsub(")$", "", fncl)  # get function call less closing )
             fncl <- gsub(" = ", "=", fncl)
             fc <- paste(fncl, fc, ") ", sep="")
@@ -465,7 +465,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
           if (!grepl("grid", fncl))
             fc <- paste(fc, ", grid=\"off\"", sep="")
           if (nzchar(fc)) {
-            fncl <- .fun.call.deparse(fun.call) 
+            fncl <- .fun_call.deparse(fun_call) 
             fncl <- gsub(")$", "", fncl)  # get function call less closing )
             fncl <- gsub(" = ", "=", fncl)
             fc <- paste(fncl, fc, ") ", sep="")
@@ -493,7 +493,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
         else
           y.fac <- y
 
-        stats <- .ss.factor(x.fac, y.fac, brief=FALSE, digits.d=NULL,
+        stats <- .ss.factor(x.fac, y.fac, brief=FALSE, digits_d=NULL,
                             x.name, y.name, x.lbl, y.lbl)
 
         txttl <- stats$txttl
@@ -569,11 +569,11 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
       print(output)
       
       # analyze runs
-      if (!date.ts  &&  center.line != "off") {
+      if (!date.ts  &&  center_line != "off") {
         cat("n:", nrows, "\n")
         n.miss <- sum(is.na(y))
         cat("missing:", n.miss, "\n")
-        cat(lbl.cat, round(m.y,digits.d), "\n")
+        cat(lbl.cat, round(m.y,digits_d), "\n")
         cat("\n")
         .dash(12); cat("Run Analysis\n"); .dash(12)
         run <- integer(length=0)  # length of ith run in run[i]
@@ -584,7 +584,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
         for (i in 2:length(y)) {  # find the runs
           if (y[i] != m.y) {  # throw out values that equal m.y
             if (sign(y[i]-m.y) != sign(y[i-1]-m.y)) {  # new run
-              if (show.runs) {
+              if (show_runs) {
                 if (n.runs < 10) buf <- "  " else buf <- " "
                   if (run[n.runs] > 1)  # print only if run of size 2 or more
                     cat("size=", run[n.runs], "  Run", buf, n.runs, ":",
@@ -607,7 +607,7 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
         txt <- "Total number of values that do not equal the "
         cat(txt, lbl.cat, " ", length(y)-length(eq.ctr), "\n", sep="")
         if (length(eq.ctr) != 0) {
-          if (show.runs) {
+          if (show_runs) {
             cat("\nValues ignored that equal the", lbl.cat, "\n")
             for (i in 1:length(eq.ctr))
               cat("    #", eq.ctr[i], " ", y[eq.ctr[i]], sep="", "\n")
@@ -632,8 +632,8 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
         txsug <- ">>> Suggestions"
           
         fc <- ""
-        if (!grepl("segments.x", fncl))
-          fc <- paste(fc, ", segments.x=FALSE", sep="")
+        if (!grepl("segments_x", fncl))
+          fc <- paste(fc, ", segments_x=FALSE", sep="")
         if (nzchar(fc)) {
           fc <- paste(fncl, fc, ")  # just points", sep="")
           txsug <- paste(txsug, "\n", fc, sep="")

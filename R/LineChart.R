@@ -1,46 +1,62 @@
 LineChart <-
 function(x, data=d, rows=NULL,
-         n.cat=getOption("n.cat"), type=NULL, 
+         n_cat=getOption("n_cat"), type=NULL, 
 
-         line.color=getOption("pt.color"), area=NULL, 
+         line_color=getOption("pt_color"), area=NULL, 
 
-         shape.pts=21, lab.cex=1.0, axis.cex=0.75,
-         axis.text.color="gray30",
+         shape_pts=21, lab_cex=1.0, axis_cex=0.75,
+         axis_text_color=getOption("axis_x_text_color"),
 
-         rotate.x=0, rotate.y=0, offset=.5,
+         rotate_x=0, rotate_y=0, offset=.5,
 
-         xy.ticks=TRUE, line.width=1,
+         xy_ticks=TRUE, line_width=1,
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL, cex=NULL,
 
-         time.start=NULL, time.by=NULL, time.reverse=FALSE,
+         time_start=NULL, time_by=NULL, time_reverse=FALSE,
 
-         center.line=c("default", "mean", "median", "zero", "off"),
+         center_line=c("default", "mean", "median", "zero", "off"),
 
-         show.runs=FALSE, eval.df=NULL, quiet=getOption("quiet"),
+         show_runs=FALSE, eval_df=NULL, quiet=getOption("quiet"),
          width=6, height=6, pdf=FALSE, ...) {
 
 
-  center.line <- match.arg(center.line)
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("n.cat", "line.color", "shape.pts", "lab.cex", "axis.cex",
+                "axis.text.color",  "rotate.x", "rotate.y",
+                "time.reverse", "center.line", "show.runs")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
-  fill <- getOption("bar.fill.ordered") 
-  color <- getOption("pt.color.ordered")
-  panel.fill <- getOption("panel.fill")
-  panel.color <- getOption("panel.color")
 
-  if (line.color == "off") line.color <- "transparent"
+  center_line <- match.arg(center_line)
+
+  fill <- getOption("bar_fill_ordered") 
+  color <- getOption("pt_color_ordered")
+  panel_fill <- getOption("panel_fill")
+  panel_color <- getOption("panel_color")
+
+  if (line_color == "off") line_color <- "transparent"
   if (!is.null(area)) if (area == "off") area <- "transparent"
 
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      if (grepl("color.", names(dots)[i], fixed=TRUE)) {
+      if (grepl("color_", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "color options dropped the  color. prefix\n",
-          "eg., fill, instead of color.fill\n\n")
+          "color options dropped the  color_ prefix\n",
+          "eg., fill, instead of color_fill\n\n")
       }
       if (names(dots)[i] == "line") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "line  is now  line.color\n\n")
+          "line  is now  line_color\n\n")
       }
       if (grepl("col.", names(dots)[i], fixed=TRUE)) 
         if (names(dots)[i] != "col.main"  &&
@@ -48,14 +64,14 @@ function(x, data=d, rows=NULL,
             names(dots)[i] != "col.sub") {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
             "color options dropped the  col. prefix\n",
-            "eg., fill, instead of col.fill\n\n")
+            "eg., fill, instead of col_fill\n\n")
       }
     }
   }
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval.df))  # default values
-    eval.df <- ifelse (shiny, FALSE, TRUE)
+  if (is.null(eval_df))  # default values
+    eval_df <- ifelse (shiny, FALSE, TRUE)
    # get actual variable name before potential call of data$x
   if (!missing(x))  # can't do is.null or anything else with x until evaluated
     x.name <- deparse(substitute(x))  # could be a list of var names
@@ -150,7 +166,7 @@ function(x, data=d, rows=NULL,
     if (manage.gr) {
       i.win <- 0
       for (i in 1:ncol(data)) {
-        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat)) 
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n_cat)) 
           i.win <- i.win + 1
       }
       .graphwin(i.win, d.w=width, d.h=height)
@@ -179,7 +195,7 @@ function(x, data=d, rows=NULL,
 
       if (is.numeric(data[,i])) {
         # let 1 variable go through, even if num.cat
-        if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
+        if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n_cat)) {
 
         if (pdf) {
           pdf.fnm <- paste("LC", "_", x.name, ".pdf", sep="") 
@@ -198,22 +214,22 @@ function(x, data=d, rows=NULL,
         }
 
       .lc.main(data[,i], type,
-         line.color, area, color, fill, shape.pts,
-         panel.color, panel.fill,
-         lab.cex, axis.cex, axis.text.color,
-         rotate.x, rotate.y, offset, xy.ticks,
-         line.width, xlab, ylab, main, sub, cex,
-         time.start, time.by, time.reverse, 
-         center.line, show.runs, quiet, ...)
+         line_color, area, color, fill, shape_pts,
+         panel_color, panel_fill,
+         lab_cex, axis_cex, axis_text_color,
+         rotate_x, rotate_y, offset, xy_ticks,
+         line_width, xlab, ylab, main, sub, cex,
+         time_start, time_by, time_reverse, 
+         center_line, show_runs, quiet, ...)
 
       if (pdf) {
         dev.off()
         if (!quiet) .showfile(pdf.fnm, "Line Chart")
       }
 
-    }  # nu > n.cat
+    }  # nu > n_cat
     else
-      if (!quiet) .ncat("Line Chart", x.name, nu, n.cat)
+      if (!quiet) .ncat("Line Chart", x.name, nu, n_cat)
 
     }  # is.numeric(data[,i])
 

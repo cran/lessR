@@ -1,17 +1,17 @@
 .plt.lattice <- 
 function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
-         fill, color, panel.fill, panel.color,
+         fill, color, panel_fill, panel_color,
          trans, size.pt, size.ln,
-         xlab, ylab, main, shape, lab.cex, axis.cex,
-         lvl=0, ellipse.color=NULL, ellipse.lwd=NULL,
-         fit="off", fit.color=NULL, fit.lwd=NULL,
+         xlab, ylab, main, shape, lab_cex, axis_cex,
+         lvl=0, ellipse_color=NULL, ellipse_lwd=NULL,
+         fit="off", fit_color=NULL, fit_lwd=NULL,
          origin=NULL, jitter,
-         violin, violin.fill, box, box.fill, 
-         bw, vbs.size, box.adj, a, b, k.iqr, fences, vbs.mean,
-         out.shape, out.size,
-         out.fill, out.color, out2.fill, out2.color,
-         ID, out.cut, ID.color, ID.size,
-         rotate.x, rotate.y, width, height, pdf.file, c.type, ...) {
+         violin, violin_fill, box, box_fill, 
+         bw, vbs_size, box_adj, a, b, k.iqr, fences, vbs_mean,
+         out_shape, out_size,
+         out_fill, out_color, out2_fill, out2_color,
+         ID, out_cut, ID_color, ID_size,
+         rotate_x, rotate_y, width, height, pdf_file, c.type, ...) {
 
     
   if (object == "both")
@@ -25,75 +25,75 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
   
   if (size.pt == 0) object <- "line"
 
-  grid.x.color <- ifelse(is.null(getOption("grid.x.color")), 
-    getOption("grid.color"), getOption("grid.x.color"))
-  grid.y.color <- ifelse(is.null(getOption("grid.y.color")), 
-    getOption("grid.color"), getOption("grid.y.color"))
+  grid_x_color <- ifelse(is.null(getOption("grid_x_color")), 
+    getOption("grid_color"), getOption("grid_x_color"))
+  grid_y_color <- ifelse(is.null(getOption("grid_y_color")), 
+    getOption("grid_color"), getOption("grid_y_color"))
  
-  grid.x.lwd <- ifelse(is.null(getOption("grid.x.lwd")), 
-    getOption("grid.lwd"), getOption("grid.x.lwd"))
-  grid.y.lwd <- ifelse(is.null(getOption("grid.y.lwd")), 
-    getOption("grid.lwd"), getOption("grid.y.lwd"))
+  grid_x_lwd <- ifelse(is.null(getOption("grid_x_lwd")), 
+    getOption("grid_lwd"), getOption("grid_x_lwd"))
+  grid_y_lwd <- ifelse(is.null(getOption("grid_y_lwd")), 
+    getOption("grid_lwd"), getOption("grid_y_lwd"))
 
-  grid.x.lty <- ifelse(is.null(getOption("grid.x.lty")), 
-    getOption("grid.lty"), getOption("grid.x.lty"))
-  grid.y.lty <- ifelse(is.null(getOption("grid.y.lty")), 
-    getOption("grid.lty"), getOption("grid.y.lty"))
+  grid_x_lty <- ifelse(is.null(getOption("grid_x_lty")), 
+    getOption("grid_lty"), getOption("grid_x_lty"))
+  grid_y_lty <- ifelse(is.null(getOption("grid_y_lty")), 
+    getOption("grid_lty"), getOption("grid_y_lty"))
 
-  axis.x.color <- ifelse(is.null(getOption("axis.x.color")), 
-    getOption("axis.color"), getOption("axis.x.color"))
-  axis.y.color <- ifelse(is.null(getOption("axis.y.color")), 
-    getOption("axis.color"), getOption("axis.y.color"))
+  axis_x_color <- ifelse(is.null(getOption("axis_x_color")), 
+    getOption("axis_color"), getOption("axis_x_color"))
+  axis_y_color <- ifelse(is.null(getOption("axis_y_color")), 
+    getOption("axis_color"), getOption("axis_y_color"))
 
-  # axis color is panel.color unless axis.color is changed from default
+  # axis color is panel_color unless axis_color is changed from default
   theme <- getOption("theme")
-  sub.theme <- getOption("sub.theme")
-  if (sub.theme != "black")  {  
-     panel.color <- ifelse (axis.x.color != "gray15", axis.x.color, "#DED9CD")
-     if (panel.color == "#DED9CD")
-       panel.color <- ifelse (axis.y.color != "gray15", axis.y.color, "#DED9CD")
+  sub_theme <- getOption("sub_theme")
+  if (sub_theme != "black")  {  
+     panel_color <- ifelse (axis_x_color != "gray15", axis_x_color, "#DED9CD")
+     if (panel_color == "#DED9CD")
+       panel_color <- ifelse (axis_y_color != "gray15", axis_y_color, "#DED9CD")
   }
   else {
-     panel.color <- ifelse (axis.x.color != "gray55", axis.x.color, "gray55")
-     if (panel.color == "gray55")
-       panel.color <- ifelse (axis.y.color != "gray55", axis.y.color, "gray55")
+     panel_color <- ifelse (axis_x_color != "gray55", axis_x_color, "gray55")
+     if (panel_color == "gray55")
+       panel_color <- ifelse (axis_y_color != "gray55", axis_y_color, "gray55")
   }
 
-  axis.x.text.color <- ifelse(is.null(getOption("axis.x.text.color")), 
-    getOption("axis.text.color"), getOption("axis.x.text.color"))
-  axis.y.text.color <- ifelse(is.null(getOption("axis.y.text.color")), 
-    getOption("axis.text.color"), getOption("axis.y.text.color"))
+  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")), 
+    getOption("axis_text_color"), getOption("axis_x_text_color"))
+  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")), 
+    getOption("axis_text_color"), getOption("axis_y_text_color"))
 
-  axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")), 
-    getOption("axis.cex"), getOption("axis.x.cex"))
-  adj <- .RSadj(axis.cex=axis.x.cex); axis.x.cex <- adj$axis.cex
+  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")), 
+    getOption("axis_cex"), getOption("axis_x_cex"))
+  adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
 
-  axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")), 
-    getOption("axis.cex"), getOption("axis.y.cex"))
-  adj <- .RSadj(axis.cex=axis.y.cex); axis.y.cex <- adj$axis.cex
+  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")), 
+    getOption("axis_cex"), getOption("axis_y_cex"))
+  adj <- .RSadj(axis_cex=axis_y_cex); axis_y_cex <- adj$axis_cex
 
-  lab.x.color <- ifelse(is.null(getOption("lab.x.color")), 
-    getOption("lab.color"), getOption("lab.x.color"))
-  lab.y.color <- ifelse(is.null(getOption("lab.y.color")), 
-    getOption("lab.color"), getOption("lab.y.color"))
+  lab_x_color <- ifelse(is.null(getOption("lab_x_color")), 
+    getOption("lab_color"), getOption("lab_x_color"))
+  lab_y_color <- ifelse(is.null(getOption("lab_y_color")), 
+    getOption("lab_color"), getOption("lab_y_color"))
 
   # if applicable, open graphics window of specified dimensions
   in.RStudio <- ifelse (options("device") != "RStudioGD", FALSE, TRUE)
   in.knitr <- ifelse (is.null(options()$knitr.in.progress), FALSE, TRUE)
   if (!in.RStudio && !in.knitr) dev.new(width=width, height=height)
 
-  # get lab.x.cex  lab.y.cex
-  lab.cex <- getOption("lab.cex")
-  lab.x.cex <- getOption("lab.x.cex")
-  lab.y.cex <- getOption("lab.y.cex")
-  lab.x.cex <- ifelse (is.null(lab.x.cex), lab.cex, lab.x.cex)
-  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
-  lab.y.cex <- ifelse (is.null(lab.y.cex), lab.cex, lab.y.cex)
-  adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
+  # get lab_x_cex  lab_y_cex
+  lab_cex <- getOption("lab_cex")
+  lab_x_cex <- getOption("lab_x_cex")
+  lab_y_cex <- getOption("lab_y_cex")
+  lab_x_cex <- ifelse (is.null(lab_x_cex), lab_cex, lab_x_cex)
+  adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
+  lab_y_cex <- ifelse (is.null(lab_y_cex), lab_cex, lab_y_cex)
+  adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
 
   is.y <- ifelse (!is.null(y), TRUE, FALSE)
-  gl <- .getlabels(xlab, ylab, main, y.nm=is.y, lab.x.cex=lab.x.cex, 
-                     lab.y.cex=lab.y.cex, by1.nm=TRUE)
+  gl <- .getlabels(xlab, ylab, main, y.nm=is.y, lab_x_cex=lab_x_cex, 
+                     lab_y_cex=lab_y_cex, by1.nm=TRUE)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
   main.lab <- gl$mb
@@ -105,43 +105,43 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
   if (date.ts  &&  is.null(xx.lab)) x.lab <- NULL
 
   if (trans > 0) fill <- .maketrans(fill, (1-trans)*256)
-  col.bg <- ifelse(sum(col2rgb(panel.fill)) < 370, "transparent", panel.fill)
+  col.bg <- ifelse(sum(col2rgb(panel_fill)) < 370, "transparent", panel_fill)
 
   n.groups <- ifelse (is.null(by), 1, nlevels(by))
 
-  col.color <- character(length=length(n.groups))
-  col.fill <- character(length=length(n.groups))
+  col_color <- character(length=length(n.groups))
+  col_fill <- character(length=length(n.groups))
   ltype <- character(length=n.groups)
 
   # set colors
   if (n.groups == 1) {
-    col.fill <- fill[1]
-    col.color <- color[1]
+    col_fill <- fill[1]
+    col_color <- color[1]
   }
   else if (n.groups == 2) {
-      col.fill[1] <- fill[1]
-      col.fill[2] <- "gray70"
-      col.color[1] <- color[1]
-      col.color[2] <- "black"
+      col_fill[1] <- fill[1]
+      col_fill[2] <- "gray70"
+      col_color[1] <- color[1]
+      col_color[2] <- "black"
       ltype[1] <- "solid"
       if (object == "both") ltype[2] <- "dotted"
   }  
   else  {  # n.groups > 2
     if (getOption("theme") %in% c("gray", "white"))
-      col.color <- getColors("grays", n=n.groups)
+      col_color <- getColors("grays", n=n.groups)
     else
-      col.color <- getColors("hues", n=n.groups)
+      col_color <- getColors("hues", n=n.groups)
     for (i in 1:n.groups) {
-      col.fill[i] <- col.color[i]
-      col.fill[i] <- .maketrans(col.fill[i], (1-trans)*256)
+      col_fill[i] <- col_color[i]
+      col_fill[i] <- .maketrans(col_fill[i], (1-trans)*256)
       ltype[i] <- "solid"
     }
   }
 
   if (object != "point") if (area != "transparent")
-    if (col.fill[1] != area) col.fill[1] <- .maketrans(area, (1-trans)*256)
+    if (col_fill[1] != area) col_fill[1] <- .maketrans(area, (1-trans)*256)
 
-  legend.title <- abbreviate(getOption("byname"), 7)
+  legend_title <- abbreviate(getOption("byname"), 7)
   leg.cex.title <- 0.85  # abbreviate only returns of type character
   if (!is.null(by)) by <- factor(abbreviate(by, 5), levels(by))  # retain order
 
@@ -188,7 +188,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     }
   }
 
-  else if (c.type == "contcat") {  # cont - cat
+  else if (c.type == "con_cat") {  # cont - cat
       jitter <- .4 * jitter
       if (is.null(by1)  &&  is.null(by2)) {
         p <- lattice::bwplot(y ~ x, groups=by, ...)
@@ -199,7 +199,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
       else {  # by2 is present
         p <- lattice::bwplot(y ~ x | by1 * by2, groups=by, ...)
       }
-  }  # end contcat
+  }  # end con_cat
 
   else if (c.type == "cont") {  # cont
     # set 0, 1 or 2 conditioning variables
@@ -223,32 +223,32 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
   # scale down the point size, grid line width for the multi-panel dot plots
   n.pnl <- length(levels(by1))
   if (!is.null(by2)) n.pnl <- n.pnl + length(levels(by2))
-  if (n.pnl > 3  &&  grid.x.lwd > 0.99) grid.x.lwd <- .5 * grid.x.lwd
-  if (n.pnl > 3  &&  grid.y.lwd > 0.99) grid.y.lwd <- .5 * grid.y.lwd
+  if (n.pnl > 3  &&  grid_x_lwd > 0.99) grid_x_lwd <- .5 * grid_x_lwd
+  if (n.pnl > 3  &&  grid_y_lwd > 0.99) grid_y_lwd <- .5 * grid_y_lwd
 
   size.mult <- ifelse (n.pnl > 3, 0.70, 0.833)
   size.pt <- size.pt * size.mult
 
   # separate panels with a border even if turned off when only one plot
-  panel_frame.color <- ifelse(panel.color == "transparent",
-                              "gray50", panel.color)
+  panel_frame_color <- ifelse(panel_color == "transparent",
+                              "gray50", panel_color)
 
   # even if no axis in single plot, multi-panel needs an axis to separate
   # scales, as currently configured, does not separate values from the axis
-  g.x.color <- grid.x.color
-  if (g.x.color ==  "transparent") g.x.color <- grid.y.color
-  g.y.color <- grid.y.color
-  if (g.y.color ==  "transparent") g.y.color <- grid.x.color
+  g.x_color <- grid_x_color
+  if (g.x_color ==  "transparent") g.x_color <- grid_y_color
+  g.y_color <- grid_y_color
+  if (g.y_color ==  "transparent") g.y_color <- grid_x_color
 
-  a.x.text.color <- axis.x.text.color
-  if (a.x.text.color ==  "transparent") a.x.text.color <-axis.y.text.color
-  a.y.text.color <- axis.y.text.color
-  if (a.y.text.color ==  "transparent") a.y.text.color <- axis.x.text.color
+  a.x.text_color <- axis_x_text_color
+  if (a.x.text_color ==  "transparent") a.x.text_color <-axis_y_text_color
+  a.y.text_color <- axis_y_text_color
+  if (a.y.text_color ==  "transparent") a.y.text_color <- axis_x_text_color
 
-  l.x.color <- lab.x.color
-  if (l.x.color == "transparent") l.x.color <-lab.y.color
-  l.y.color <- lab.y.color
-  if (l.y.color == "transparent") l.y.color <- lab.x.color
+  l.x_color <- lab_x_color
+  if (l.x_color == "transparent") l.x_color <-lab_y_color
+  l.y_color <- lab_y_color
+  if (l.y_color == "transparent") l.y_color <- lab_x_color
 
   # separate the axis from the axis labels unless too many rows
   if (is.null(nrows)) nrows <- 1
@@ -256,7 +256,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     pad <- 2.08 - 0.56*log(nrows)
     p <- update(p,
          par.settings=list(
-           layout.heights=list(axis.xlab.padding=pad)))
+           layout_heights=list(axis_xlab_padding=pad)))
   }
 
   top.pad <- ifelse (is.null(main), 0, 1)
@@ -265,29 +265,29 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
 
   p <- update(p,
          strip=strp, strip.left=strp.lft, aspect=asp,
-         par.strip.text=list(cex=axis.x.cex, col=getOption("strip.text.color")),
-         xlab=list(label=x.lab, cex=lab.x.cex, col=l.x.color),
-         ylab=list(label=y.lab, cex=lab.y.cex, col=l.y.color),
-         main=list(label=main.lab, col=getOption("lab.color")), 
+         par.strip_text=list(cex=axis_x_cex, col=getOption("strip_text_color")),
+         xlab=list(label=x.lab, cex=lab_x_cex, col=l.x_color),
+         ylab=list(label=y.lab, cex=lab_y_cex, col=l.y_color),
+         main=list(label=main.lab, col=getOption("lab_color")), 
          par.settings=list(
-           background=list(col=getOption("window.fill")),
-           panel.background=list(col=panel.fill),
-           layout.heights=list(top.padding=top.pad, axis.top=axs.top),
-           axis.line=list(col=panel_frame.color,
-             lty=getOption("axis.lty"), lwd=getOption("axis.lwd")), 
-           strip.border=list(col=getOption("strip.color"), lwd=0.5),
-           strip.background=list(col=getOption("strip.fill")),
-           plot.polygon=list(col=getOption("violin.color"), 
-             fill=violin.fill, lty="solid", lwd=1),
-           plot.line=list(col=col.color, lty="solid", lwd=1),
-           plot.symbol=list(pch=shape, cex=size.pt, col=col.color,
-             fill=col.fill),
+           background=list(col=getOption("window_fill")),
+           panel.background=list(col=panel_fill),
+           layout_heights=list(top.padding=top.pad, axis_top=axs.top),
+           axis_line=list(col=panel_frame_color,
+             lty=getOption("axis_lty"), lwd=getOption("axis_lwd")), 
+           strip.border=list(col=getOption("strip_color"), lwd=0.5),
+           strip.background=list(col=getOption("strip_fill")),
+           plot.polygon=list(col=getOption("violin_color"), 
+             fill=violin_fill, lty="solid", lwd=1),
+           plot.line=list(col=col_color, lty="solid", lwd=1),
+           plot.symbol=list(pch=shape, cex=size.pt, col=col_color,
+             fill=col_fill),
            superpose.symbol=list(pch=shape, cex=size.pt,
-             col=col.color, fill=col.fill),
-           superpose.line=list(col=col.color, lty=ltype)),
+             col=col_color, fill=col_fill),
+           superpose.line=list(col=col_color, lty=ltype)),
          scales=list(
-           x = list(cex=axis.x.cex, rot=rotate.x, col=a.x.text.color),
-           y = list(cex=axis.y.cex, rot=rotate.y, col=a.y.text.color))
+           x = list(cex=axis_x_cex, rot=rotate_x, col=a.x.text_color),
+           y = list(cex=axis_y_cex, rot=rotate_y, col=a.y.text_color))
   )
 
   if (c.type == "contcont") {
@@ -297,22 +297,22 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
            cex=0.85,
            space="right", rows=length(unique(by)),
            border=TRUE, background=col.bg,
-           title=legend.title, cex.title=leg.cex.title),
+           title=legend_title, cex.title=leg.cex.title),
 
          panel = function(x, y, ...) {
-             panel.grid(h=0, v=-1, col=g.x.color,
-                        lwd=grid.x.lwd, lty=grid.x.lty)
-             panel.grid(h=-1, v=0, g.y.color,
-                        lwd=grid.y.lwd, lty=grid.y.lty)
+             panel.grid(h=0, v=-1, col=g.x_color,
+                        lwd=grid_x_lwd, lty=grid_x_lty)
+             panel.grid(h=-1, v=0, g.y_color,
+                        lwd=grid_y_lwd, lty=grid_y_lty)
              if (area != "transparent")
-               panel.xyarea(x, y, origin=origin, col=col.fill)
+               panel.xyarea(x, y, origin=origin, col=col_fill)
              if (object == "point")
                tp <- "p" 
              else if (object == "both")
                tp <- "b"
              else if (object == "line")
                tp <- "l"
-             panel.xyplot(x, y, type=tp, col=col.color, fill=col.fill,
+             panel.xyplot(x, y, type=tp, col=col_color, fill=col_fill,
                           lwd=size.ln, ...)
           }
         )
@@ -320,22 +320,22 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     # fit line
     if (fit == "loess")
       p <- p + latticeExtra::layer(panel.loess(x, y, col=P1, lwd=P2),
-                     data=list(P1=fit.color, P2=fit.lwd))
+                     data=list(P1=fit_color, P2=fit_lwd))
     else if (fit == "lm")
       p <- p + latticeExtra::layer(panel.lmline(x, y, col=P1, lwd=P2),
-                     data=list(P1=fit.color, P2=fit.lwd))
+                     data=list(P1=fit_color, P2=fit_lwd))
 
     # ellipse
     if (lvl > 0)
       p <- p + latticeExtra::layer(panel.ellipse(x, y, center.cex=0,
                        level=P2, col=P1, lwd=P3),
-                     data=list(P1=ellipse.color, P2=lvl, P3=ellipse.lwd))
+                     data=list(P1=ellipse_color, P2=lvl, P3=ellipse_lwd))
   }  # end contcont 
 
-  else if (c.type %in% c("contcat", "cont")) {
+  else if (c.type %in% c("con_cat", "cont")) {
 
     #myboxStats <- function(...) 
-      #if (!box.adj)
+      #if (!box_adj)
         #return(boxplot.stats(x))
       #else
         #return(adjboxStats(x, coef=k.iqr, a=a, b=b))
@@ -347,7 +347,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
            num5 <- fivenum(x, na.rm=TRUE)
            q1 <- num5[2];  q3 <- num5[4];  iqr <- q3 - q1
 
-           m.c <- ifelse (box.adj, mc(x, na.rm=TRUE), 0)
+           m.c <- ifelse (box_adj, mc(x, na.rm=TRUE), 0)
            if (m.c >= 0) {
              fnc.lwr <- q1 - (k.iqr * exp(a*m.c) * iqr)
              fnc.upr <- q3 + (k.iqr * exp(b*m.c) * iqr)
@@ -357,10 +357,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
              fnc.upr <- q3 + (k.iqr * exp(-a*m.c) * iqr)
            } 
 
-           min.x <- min(x, fnc.lwr) 
+           min_x <- min(x, fnc.lwr) 
            max.x <- max(x, fnc.upr)
 
-           list(xlim=c(min.x, max.x))
+           list(xlim=c(min_x, max.x))
          }
        )
     }  # end fences
@@ -368,37 +368,37 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
 
 #cat("n.groups:", n.groups, "\n")
     if (n.groups > 1) {  # cex refers to the text, not the points
-      c.color <- character(length=length(n.groups))
+      c_color <- character(length=length(n.groups))
       if (n.groups == 2) {
-        c.color[1] <- col.fill[1]  
-        c.color[2] <- "black"
+        c_color[1] <- col_fill[1]  
+        c_color[2] <- "black"
       }
       else
-        c.color <- col.fill
+        c_color <- col_fill
     }
     else
-      c.color <- col.fill
+      c_color <- col_fill
 
     if (n.groups > 1) {
-      legend.lbl.cex <- ifelse (in.RStudio, .75, .66) 
+      legend_lbl.cex <- ifelse (in.RStudio, .75, .66) 
       p <- update(p, key=list(space="top", columns=n.groups,
-             text=list(levels(by), cex=legend.lbl.cex), 
-             points=list(pch=21, fill=col.fill, col=c.color, cex=1),
+             text=list(levels(by), cex=legend_lbl.cex), 
+             points=list(pch=21, fill=col_fill, col=c_color, cex=1),
              border="gray80", background=col.bg, padding.text=2))
     }
 
     p <- update(p,
 
        par.settings=list(  # col option does not work directly on panel.bwplot
-         box.rectangle=list(fill=box.fill,
-                            col=getOption("box.color")),
-         box.umbrella=list(col=getOption("box.color"), lty="solid")
+         box.rectangle=list(fill=box_fill,
+                            col=getOption("box_color")),
+         box.umbrella=list(col=getOption("box_color"), lty="solid")
        ),
 
        panel=function(x=x, box.ratio, wID=ID, ...,
                       groups=groups, subscripts=subscripts) {
 
-          jitter.data <- ifelse (jitter > 0, TRUE, FALSE)
+          jitter_data <- ifelse (jitter > 0, TRUE, FALSE)
           size.pt <- size.pt * 1.2  # lattice adjustment
 
           num5 <- fivenum(x, na.rm=TRUE)
@@ -408,7 +408,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
           fnc.in <- rep(NA_real_, 2)   # inner fences
           fnc.out <- rep(NA_real_, 2)  # outer fences
 
-          m.c <- ifelse(box.adj, mc(x, na.rm=TRUE), 0)
+          m.c <- ifelse(box_adj, mc(x, na.rm=TRUE), 0)
           if (m.c >= 0) {
             fnc.in[1] <- q1 - (k.iqr * exp(a*m.c) * iqr)
             fnc.in[2] <- q3 + (k.iqr * exp(b*m.c) * iqr)
@@ -422,14 +422,14 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
             fnc.out[2] <- q3 + (2 * k.iqr * exp(-a*m.c) * iqr)
           } 
 
-          panel.grid(h=0, v=-1, col=g.x.color, lwd=grid.x.lwd, lty=grid.x.lty)
+          panel.grid(h=0, v=-1, col=g.x_color, lwd=grid_x_lwd, lty=grid_x_lty)
 
           if (violin) {
             # to get a violin plot, cannot have y and by1
             vw <- ifelse (!is.null(y) && !is.null(by1), FALSE, TRUE) 
             panel.violin(x=x, ...,
-                col=violin.fill, border=getOption("violin.color"),
-                varwidth=vw, box.width=vbs.size, bw=bw)
+                col=violin_fill, border=getOption("violin_color"),
+                varwidth=vw, box.width=vbs_size, bw=bw)
            }
 
           if (box) {
@@ -440,47 +440,47 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
             denom <- int - 0.5*n.lvl
             if (denom < 1.5) denom <- 1.5
 
-            if (!box.adj)
-              .panel.bwplot(x=x, ..., pch="|", vbs.mean=vbs.mean, fences=fences,
-                  box.ratio=vbs.size/denom, mean.color=out.fill, 
+            if (!box_adj)
+              .panel.bwplot(x=x, ..., pch="|", vbs_mean=vbs_mean, fences=fences,
+                  box.ratio=vbs_size/denom, mean_color=out_fill, 
                   stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE) 
             else
-              .panel.bwplot(x=x, ...,  pch="|", vbs.mean=vbs.mean, fences=fences,
-                  box.ratio=vbs.size/denom, mean.color=out.fill, 
+              .panel.bwplot(x=x, ...,  pch="|", vbs_mean=vbs_mean, fences=fences,
+                  box.ratio=vbs_size/denom, mean_color=out_fill, 
                   stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE) 
 
            # plotting a subset of x requires adjusting y, in .panel.strip
             i.out <- which(x<fnc.out[1] | x>fnc.out[2])
             if (n.groups == 1) {
-              i.out.clr <- 1
-              fill.out <- out2.fill
+              i.out_clr <- 1
+              fill_out <- out2_fill
             }
             else {
-              i.out.clr <- as.numeric(groups[i.out])
-              fill.out <- col.fill[i.out.clr]
+              i.out_clr <- as.numeric(groups[i.out])
+              fill_out <- col_fill[i.out_clr]
             }
 
             # plot extreme outliers
             .panel.stripplot(x=x[i.out],
-              cex=out.size, col=out2.color, fill=fill.out, pch=out.shape, ...)
+              cex=out_size, col=out2_color, fill=fill_out, pch=out_shape, ...)
 
             i.out <- which(x>=fnc.out[1] & x<fnc.in[1] |
                             x>fnc.in[2] & x<=fnc.out[2])
             if (n.groups == 1) {
-              i.out.clr <- 1
-              fill.out <- out.fill
+              i.out_clr <- 1
+              fill_out <- out_fill
             }
             else {
-              i.out.clr <- as.numeric(groups[i.out])
-              fill.out <- col.fill[i.out.clr]
+              i.out_clr <- as.numeric(groups[i.out])
+              fill_out <- col_fill[i.out_clr]
             }
 
             # plot outliers
             .panel.stripplot(x= x[i.out],
-              cex=out.size, col=out.color, fill=fill.out, pch=out.shape, ...)
+              cex=out_size, col=out_color, fill=fill_out, pch=out_shape, ...)
 
             # label outliers
-            if (out.cut > 0) {
+            if (out_cut > 0) {
               wwID <- wID[subscripts]
 
               ind.lo <- which(x < fnc.in[1])
@@ -488,24 +488,24 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
               ID.lo <- wwID[ind.lo]
               ord <- order(x.lo, decreasing=FALSE)
               x.lo <- x.lo[ord]
-              x.lo <- na.omit(x.lo[1:min(length(x.lo),out.cut)])
+              x.lo <- na.omit(x.lo[1:min(length(x.lo),out_cut)])
               ID.lo <- ID.lo[ord] 
-              ID.lo <- na.omit(ID.lo[1:min(length(ID.lo),out.cut)]) 
+              ID.lo <- na.omit(ID.lo[1:min(length(ID.lo),out_cut)]) 
               
               ind.hi <- which(x > fnc.in[2])
               x.hi <- x[ind.hi]
               ID.hi <- wwID[ind.hi]
               ord <- order(x.hi, decreasing=TRUE)
               x.hi <- x.hi[ord]
-              x.hi <- na.omit(x.hi[1:min(length(x.hi),out.cut)])
+              x.hi <- na.omit(x.hi[1:min(length(x.hi),out_cut)])
               ID.hi <- ID.hi[ord] 
-              ID.hi <- na.omit(ID.hi[1:min(length(ID.hi),out.cut)]) 
+              ID.hi <- na.omit(ID.hi[1:min(length(ID.hi),out_cut)]) 
 
               x.out <- c(x.lo, x.hi)
               ID.lbl <- union(ID.lo, ID.hi)  # combine factors
 
               panel.text(x.out, y=1.08, labels=ID.lbl,
-                         col=ID.color, cex=ID.size, adj=0, srt=90)
+                         col=ID_color, cex=ID_size, adj=0, srt=90)
             }
           }  # end box
 
@@ -514,24 +514,24 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
             if (box) {
               i.out <- which(x>=fnc.in[1] & x<=fnc.in[2])
               if (n.groups == 1) {
-                i.out.clr <- 1
-                fill.out <- col.fill
+                i.out_clr <- 1
+                fill_out <- col_fill
               }
               else {
-                i.out.clr <- as.numeric(groups[i.out])
-                fill.out <- col.fill[i.out.clr]
+                i.out_clr <- as.numeric(groups[i.out])
+                fill_out <- col_fill[i.out_clr]
               }
             }  # end box
             else {
               i.out <- 1:length(x)
-              fill.out <- "black"
-              #fill.out <- col.fill
+              fill_out <- "black"
+              #fill_out <- col_fill
             }
-            color.out <- fill.out
-            if (n.groups == 2) color.out <- "black"
+            color_out <- fill_out
+            if (n.groups == 2) color_out <- "black"
             .panel.stripplot(x=x[i.out], 
-               cex=s.pt, pch=shape, col=color.out, fill=fill.out,
-               jitter.data=jitter.data, factor=jitter, ...)
+               cex=s.pt, pch=shape, col=color_out, fill=fill_out,
+               jitter_data=jitter_data, factor=jitter, ...)
           }
 
         }  # end panel function
@@ -540,8 +540,8 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
 
 
   # display
-  if (!is.null(pdf.file)) {
-    pdf(pdf.file, width=width, height=height)
+  if (!is.null(pdf_file)) {
+    pdf(pdf_file, width=width, height=height)
     print(p)
     dev.off()
   }

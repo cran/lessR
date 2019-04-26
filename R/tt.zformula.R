@@ -1,5 +1,5 @@
 .tt.formula <-
-function (my.formula, y=NULL, data, ...) {
+function (my_formula, y=NULL, data, ...) {
 
   # data frame existence check
   dname <- deparse(substitute(data))
@@ -13,7 +13,7 @@ function (my.formula, y=NULL, data, ...) {
           "Data frame ", dname, txtA, "does not exist\n\n", txtB, "\n")
   }
 
-  nm <- all.vars(my.formula)  # names of vars in the model
+  nm <- all.vars(my_formula)  # names of vars in the model
 
   # Y existence check
   if (!exists(nm[1], where=data)) { 

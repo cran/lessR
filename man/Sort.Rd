@@ -26,7 +26,7 @@ srt(\ldots)
        is \code{d} by default.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}
-  \item{\dots}{Parameter values.}
+  \item{\dots}{Parameter values_}
 }
 
 \details{
@@ -71,11 +71,11 @@ data(dataEmployee)
 d <- Sort(Gender, data=dataEmployee)
 
 # sort by row names in ascending order
-d <- Read("Employee", in.lessR=TRUE)
+d <- Read("Employee", in_lessR=TRUE)
 d <- Sort(row.names)
 
 # randomly re-shuffle the rows of data
-d <- Read("Employee", in.lessR=TRUE)
+d <- Read("Employee", in_lessR=TRUE)
 d <- Sort(random)
 }
 

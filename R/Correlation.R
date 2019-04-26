@@ -1,12 +1,24 @@
 Correlation <-
 function(x, y, data=d, # x can be a data frame, or variables in a data frame
          miss=c("pairwise", "listwise", "everything"),
-         fill.low=NULL, fill.hi=NULL,
-         show.n=NULL, brief=FALSE, 
-         digits.d=NULL, heat.map=TRUE,
+         fill_low=NULL, fill_hi=NULL,
+         show_n=NULL, brief=FALSE, 
+         digits_d=NULL, heat_map=TRUE,
          main=NULL, bottom=3, right=3,
          pdf=FALSE, width=5, height=5, ...) {
 
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (length(grep(".", names(dots)[i], fixed=TRUE)) > 0) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   miss <- match.arg(miss)
 
@@ -14,7 +26,7 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      if (names(dots)[i] == "graphics")  heat.map <- dots[[i]]
+      if (names(dots)[i] == "graphics")  heat_map <- dots[[i]]
     }
   }
   
@@ -108,10 +120,10 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
 
 
   if (is.df) { 
-    if (is.null(show.n))
-      if (nrow(data) <= 15) show.n <- TRUE else show.n <- FALSE
-    stuff <- .cr.data.frame(data, miss, show.n, digits.d,
-                   heat.map, fill.low, fill.hi, main, bottom, right, 
+    if (is.null(show_n))
+      if (nrow(data) <= 15) show_n <- TRUE else show_n <- FALSE
+    stuff <- .cr.data.frame(data, miss, show_n, digits_d,
+                   heat_map, fill_low, fill_hi, main, bottom, right, 
                    pdf, width, height, ...) 
 
     txbck <- stuff$txb

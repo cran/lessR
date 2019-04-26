@@ -1,9 +1,23 @@
 simCLT <- 
 function(ns, n, p1=0, p2=1,
          type=c("normal", "uniform", "lognormal", "antinormal"),
-         fill="lightsteelblue3", n.display=2, digits.d=3, 
+         fill="lightsteelblue3", n_display=2, digits_d=3, 
          subtitle=TRUE, pop=TRUE, 
          main=NULL, pdf=FALSE, width=5, height=5, ...) {
+
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("n.display", "digits.d")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   type <- match.arg(type)
 
@@ -25,11 +39,11 @@ function(ns, n, p1=0, p2=1,
     }
   }
   else { 
-    pdf.file <- "SimPopulation.pdf"
-    pdf(file=pdf.file, width=width, height=height)
+    pdf_file <- "SimPopulation.pdf"
+    pdf(file=pdf_file, width=width, height=height)
   }
 
-  digits.d <- 3
+  digits_d <- 3
   max.ln <- 8
    
   # data generation and plot population
@@ -134,7 +148,7 @@ function(ns, n, p1=0, p2=1,
 
   if (pdf) {
     dev.off()
-    .showfile(pdf.file, "population distribution")
+    .showfile(pdf_file, "population distribution")
   }
 
   if (!pdf) {
@@ -173,18 +187,18 @@ function(ns, n, p1=0, p2=1,
   if (!pdf) 
     dev.set(which=4) 
   else { 
-    pdf.file <- "SimSample.pdf"
-    pdf(file=pdf.file, width=width, height=height)
+    pdf_file <- "SimSample.pdf"
+    pdf(file=pdf_file, width=width, height=height)
   }
 
   .dn.main(Ymean, type="normal", xlab="", 
-         col.fill=fill, 
-         col.bg=getOption("panel.fill"),
-         col.box=getOption("panel.color"),
+         col_fill=fill, 
+         col.bg=getOption("panel_fill"),
+         col.box=getOption("panel_color"),
          col.nrm="black", col.gen="black",
-         col.fill.nrm="transparent",
-         col.fill.gen="transparent",
-         quiet=TRUE, pdf.file=NULL)
+         col_fill_nrm="transparent",
+         col_fill_gen="transparent",
+         quiet=TRUE, pdf_file=NULL)
   if (subtitle) 
     txt <- paste(toString(sprintf("%i", ns)), "samples, each of size", toString(n), "from", type)
   else txt=""
@@ -192,13 +206,13 @@ function(ns, n, p1=0, p2=1,
 
   if (pdf) {
     dev.off()
-    .showfile(pdf.file, "sample distribution")
+    .showfile(pdf_file, "sample distribution")
     cat("\n\n")
   }
 
   cat("\nAnalysis of Sample Means\n")
-  cat("   Mean:", .fmt(mean(Ymean), digits.d, w=max.ln), "\n")
-  cat("Std Dev:", .fmt(sd(Ymean), digits.d, w=max.ln), "\n")
+  cat("   Mean:", .fmt(mean(Ymean), digits_d, w=max.ln), "\n")
+  cat("Std Dev:", .fmt(sd(Ymean), digits_d, w=max.ln), "\n")
   cat("\n")
   cat("Observed 95% range of Sample Mean\n", 
       "   Original Units:",  quantile(Ymean, prob=c(.025,.975)),"\n")
@@ -207,11 +221,11 @@ function(ns, n, p1=0, p2=1,
   if (type == "antinormal") cat("   Estimated from Data,")
   cat("  Standard Errors:",  quantile(z, prob=c(.025,.975)),"\n")
 
-  if (n.display > 0)
-    for(i in 1:n.display) 
+  if (n_display > 0)
+    for(i in 1:n_display) 
       cat("\nSample", toString(i), "\n",
-          "Mean:", sprintf("%.*f", digits.d, Ymean[i]), "\n",
-          "Rounded Data Values:", .fmt(data.byrep[i,], digits.d), "\n")
+          "Mean:", sprintf("%.*f", digits_d, Ymean[i]), "\n",
+          "Rounded Data Values:", .fmt(data.byrep[i,], digits_d), "\n")
 
   cat("\n")
 

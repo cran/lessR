@@ -1,11 +1,11 @@
 .lc.main <- 
 function(y, type,
-       col.line, col.area, col.color, col.fill, shape.pts,
-       col.box, col.bg, lab.cex, axis.cex, col.axis,
-       rotate.x, rotate.y, offset, xy.ticks,
-       line.width, xlab, ylab, main, sub, cex,
-       time.start, time.by, time.reverse, 
-       center.line, show.runs, quiet, ...) {
+       col.line, col.area, col_color, col_fill, shape_pts,
+       col.box, col.bg, lab_cex, axis_cex, col.axis,
+       rotate_x, rotate_y, offset, xy_ticks,
+       line_width, xlab, ylab, main, sub, cex,
+       time_start, time_by, time_reverse, 
+       center_line, show_runs, quiet, ...) {
 
 
   if (!is.numeric(y)) { 
@@ -19,23 +19,23 @@ function(y, type,
         "  \"l\" for line or \"b\" for both.\n\n")
   }
 
-  if (!is.null(time.start) && is.null(time.by)) {
+  if (!is.null(time_start) && is.null(time_by)) {
      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Specified  time.start  so also need  time.by.\n\n")
+        "Specified  time_start  so also need  time_by.\n\n")
   }
-  lab.cex <- getOption("lab.cex")
-  lab.x.cex <- getOption("lab.x.cex")
-  lab.y.cex <- getOption("lab.y.cex")
-  lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
-  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
-  lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
-  adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
+  lab_cex <- getOption("lab_cex")
+  lab_x_cex <- getOption("lab_x_cex")
+  lab_y_cex <- getOption("lab_y_cex")
+  lab_x_cex <- ifelse(is.null(lab_x_cex), lab_cex, lab_x_cex)
+  adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
+  lab_y_cex <- ifelse(is.null(lab_y_cex), lab_cex, lab_y_cex)
+  adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
 
   nrows <- length(y)
   pt.size <- ifelse (is.null(cex), 0.8, cex)
 
   # get variable label and axis labels if they exist
-  gl <- .getlabels(ylab=ylab, main=main, lab.y.cex=lab.y.cex)
+  gl <- .getlabels(ylab=ylab, main=main, lab_y_cex=lab_y_cex)
   y.name <- gl$yn;  y.lbl <- gl$yl;  y.lab <- gl$yb
   main.lab <- gl$mb
   sub.lab <- gl$sb
@@ -46,48 +46,48 @@ function(y, type,
   if (!is.ts(y)) y <- na.omit(y)
 
   x <- numeric(length = 0)
-  if (time.reverse) {  # use x as a temporary place holder
+  if (time_reverse) {  # use x as a temporary place holder
     for (i in 1:nrows) x[i] <- y[nrows+1-i]
     y <- x
   }
 
-  if (is.null(time.start) && !is.ts(y)) {
+  if (is.null(time_start) && !is.ts(y)) {
     x.lab <- ifelse (is.null(xlab), "Index", xlab)
     x <- 1:length(y)  # ordinal position of each value on x-axis
   }
-  else {  # time.start date specified or a ts
+  else {  # time_start date specified or a ts
     x.lab <- ifelse (is.null(xlab), "", xlab)      
     if (is.ts(y)) {
       x <- .ts.dates(y)
-      # time.start <- paste(start(y)[1], "/", start(y)[2], "/01", sep="") 
+      # time_start <- paste(start(y)[1], "/", start(y)[2], "/01", sep="") 
       # frq <- frequency(y)
-      # if (frq == 1) time.by <- "year"
-      # if (frq == 4) time.by <- "3 months"
-      # if (frq == 12) time.by <- "month"
-      # if (frq == 52) time.by <- "week"
-      # if (frq == 365) time.by <- "year"
+      # if (frq == 1) time_by <- "year"
+      # if (frq == 4) time_by <- "3 months"
+      # if (frq == 12) time_by <- "month"
+      # if (frq == 52) time_by <- "week"
+      # if (frq == 365) time_by <- "year"
     }
     else {
-      date.seq <- seq.Date(as.Date(time.start), by=time.by, length.out=nrows)
+      date.seq <- seq.Date(as.Date(time_start), by=time_by, length.out=nrows)
       x <- date.seq  # dates on x-axis
     }
   }
 
-  # by default display center.line only if runs
-  if (center.line == "default"  &&  !is.ts(y)) {
+  # by default display center_line only if runs
+  if (center_line == "default"  &&  !is.ts(y)) {
     m <- mean(y, na.rm=TRUE)
     n.change <- 0
     for (i in 1:(length(y)-1)) if ((y[i+1]>m) != (y[i]>m)) n.change <- n.change+1 
     if (n.change/(length(y)-1) < .15)
-      center.line <- "off" 
+      center_line <- "off" 
     else 
-      center.line <- "median"
+      center_line <- "median"
   }
 
   
   # fill ts chart 
-  #if (!is.null(time.start) && is.null(area))
-    #col.area <- getOption("bar.fill")
+  #if (!is.null(time_start) && is.null(area))
+    #col.area <- getOption("bar_fill")
 
   if (is.null(type))
     if (is.null(col.area) || col.area == "transparent") type <- "b" 
@@ -98,28 +98,28 @@ function(y, type,
     if (nrows < 50) pt.size <- 0.8 else pt.size <- .9 - 0.002*nrows
   if (pt.size < 0) pt.size <- 0
   
-  digits.d <- .max.dd(y) + 1
-  options(digits.d=digits.d)
+  digits_d <- .max.dd(y) + 1
+  options(digits_d=digits_d)
   
   # set margins
   max.width <- strwidth(as.character(max(pretty(y))), units="inches")
   
   margs <- .marg(max.width, y.lab, x.lab, main,
-                 rotate.x=getOption("rotate.x"),
-                 lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex)
+                 rotate_x=getOption("rotate_x"),
+                 lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex)
   lm <- margs$lm
   tm <- margs$tm
   rm <- margs$rm
   bm <- margs$bm
-  n.lab.x.ln <- margs$n.lab.x.ln
-  n.lab.y.ln <- margs$n.lab.y.ln
+  n.lab_x.ln <- margs$n.lab_x.ln
+  n.lab_y.ln <- margs$n.lab_y.ln
  
-  if (center.line != "off") rm <- rm + .3
+  if (center_line != "off") rm <- rm + .3
  
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
 
-  par(bg=getOption("window.fill"))
+  par(bg=getOption("window_fill"))
   par(mai=c(bm, lm, tm, rm))
 
   # plot setup
@@ -132,28 +132,28 @@ function(y, type,
 
   # grid lines
   vx <- pretty(c(usr[1],usr[2]))
-  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=getOption("grid.x.color"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+  abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=getOption("grid_x_color"),
+         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
   vy <- pretty(c(usr[3],usr[4]))
-  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=getOption("grid.y.color"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+  abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=getOption("grid_y_color"),
+         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
 
   # box around plot
   rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
-    lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
+    lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
 
-  if (xy.ticks){
-    axis.x.color <- ifelse(is.null(getOption("axis.x.color")), 
-      getOption("axis.color"), getOption("axis.x.color"))
-    if (is.null(time.start) && !is.ts(x)) 
+  if (xy_ticks){
+    axis_x_color <- ifelse(is.null(getOption("axis_x_color")), 
+      getOption("axis_color"), getOption("axis_x_color"))
+    if (is.null(time_start) && !is.ts(x)) 
      .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-        rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
+        rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
     else {
-      axis.Date(1, x, cex.axis=axis.cex, col.axis=col.axis, ...)
+      axis.Date(1, x, cex.axis=axis_cex, col.axis=col.axis, ...)
       #lbl.dt <- as.Date(axTicks(1), origin = "1970-01-01")
       #axis.Date(1, x, labels=FALSE, tck=-.01, ...)
       #text(x=lbl.dt, y=par("usr")[3], labels=lbl.dt,
-           #pos=1, xpd=TRUE, cex=axis.cex, col=col.axis)
+           #pos=1, xpd=TRUE, cex=axis_cex, col=col.axis)
       axis(2, at=axTicks(2), labels=FALSE, tck=-.01, ...)
       dec.d <- .getdigits(round(axTicks(2),6),1) - 1
       text(x=par("usr")[1], y=axTicks(2), labels=.fmt(axTicks(2),dec.d),
@@ -164,42 +164,42 @@ function(y, type,
   # axis labels
   max.lbl <- max(nchar(axTicks(2)))
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-          x.val=NULL, xy.ticks=TRUE, offset=offset,
-          lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex,
-          main.cex=getOption("main.cex"),
-          n.lab.x.ln, n.lab.y.ln, ...) 
+          x.val=NULL, xy_ticks=TRUE, offset=offset,
+          lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex,
+          main_cex=getOption("main_cex"),
+          n.lab_x.ln, n.lab_y.ln, ...) 
   # fill area under curve
-  if (!is.null(col.area)  && !is.null(col.color)) {
-    if (col.area=="transparent"  &&  col.color=="transparent")
+  if (!is.null(col.area)  && !is.null(col_color)) {
+    if (col.area=="transparent"  &&  col_color=="transparent")
       col.area <- NULL
-    else if (type != "p"  &&  is.null(col.color))
-      col.color <- col.line
+    else if (type != "p"  &&  is.null(col_color))
+      col_color <- col.line
   }
     if (!is.null(col.area)) 
       polygon(c(x[1],x,x[length(x)]), c(min(y),y,min(y)),
-              col=col.area, border=col.color)
+              col=col.area, border=col_color)
 
   # plot lines and points
   if (type == "l" || type == "b") {
-    lines(as.numeric(x),y, col=col.line, lwd=line.width, ...)
+    lines(as.numeric(x),y, col=col.line, lwd=line_width, ...)
   }
   if (type == "p" || type == "b") {
-    points(x,y, col=col.color, pch=shape.pts, bg=col.fill, cex=pt.size, ...)
+    points(x,y, col=col_color, pch=shape_pts, bg=col_fill, cex=pt.size, ...)
   }
 
   # plot center line
-  if (center.line != "off") {
-    if (center.line == "mean") {
+  if (center_line != "off") {
+    if (center_line == "mean") {
       m.y <- mean(y)
       lbl <- "mean"
       lbl.cat <- "mean:"
     }
-    else if (center.line == "median") {
+    else if (center_line == "median") {
       m.y <- median(y)
       lbl <- "medn"
       lbl.cat <- "median:"
     }
-    else if (center.line == "zero") {
+    else if (center_line == "zero") {
       m.y <- 0
       lbl <- ""
       lbl.cat <- "median:"
@@ -209,7 +209,7 @@ function(y, type,
       abline(h=m.y, col="gray50", lty="dashed")
       mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
     }
-    if (center.line == "zero") m.y <- median(y) 
+    if (center_line == "zero") m.y <- median(y) 
 
     gl <- .getlabels()
     x.name <- gl$xn; x.lbl <- gl$xl;
@@ -227,7 +227,7 @@ function(y, type,
       txsug <- ">>> Suggestions"
       fc <- paste("\nLineChart(", x.name, ", area=\"steelblue\")", sep="")         
       txsug <- paste(txsug, fc, sep="")
-      fc <- paste("\nLineChart(", x.name, ", show.runs=TRUE)", sep="")           
+      fc <- paste("\nLineChart(", x.name, ", show_runs=TRUE)", sep="")           
       txsug <- paste(txsug, fc, sep="")
     }
 
@@ -243,7 +243,7 @@ function(y, type,
       cat("\n")
       cat("n:", n, "\n")
       cat("missing:", n.miss, "\n")
-      cat(lbl.cat, round(m.y,digits.d), "\n")
+      cat(lbl.cat, round(m.y,digits_d), "\n")
       cat("\n")
       .dash(12); cat("Run Analysis\n"); .dash(12)
       run <- integer(length=0)  # length of ith run in run[i]
@@ -254,7 +254,7 @@ function(y, type,
       for (i in 2:length(y)) {
         if (y[i] != m.y) {  # throw out values that equal m.y
           if (sign(y[i]-m.y) != sign(y[i-1]-m.y)) {  # new run
-            if (show.runs) {
+            if (show_runs) {
               if (n.runs < 10) buf <- "  " else buf <- " "
               cat("size=", run[n.runs], "  Run", buf, n.runs, ":",
                   line.out, "\n", sep="")
@@ -275,7 +275,7 @@ function(y, type,
       txt <- "Total number of values that do not equal the "
       cat(txt, lbl.cat, " ", length(y)-length(eq.ctr), "\n", sep="")
       if (length(eq.ctr) != 0) {
-        if (show.runs) {
+        if (show_runs) {
           cat("\nValues ignored that equal the", lbl.cat, "\n")
           for (i in 1:length(eq.ctr))
             cat("    #", eq.ctr[i], " ", y[eq.ctr[i]], sep="", "\n")

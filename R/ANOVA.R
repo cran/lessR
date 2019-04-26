@@ -1,18 +1,32 @@
 ANOVA <-
-function(my.formula, data=d, rows=NULL,
-         brief=getOption("brief"), digits.d=NULL, 
+function(my_formula, data=d, rows=NULL,
+         brief=getOption("brief"), digits_d=NULL, 
          Rmd=NULL, graphics=TRUE,
-         rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
-         pdf=FALSE, width=5, height=5, fun.call=NULL, ...) {  
+         rb_points=TRUE, res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
+         pdf=FALSE, width=5, height=5, fun_call=NULL, ...) {  
 
 
-  if (is.null(fun.call)) fun.call <- match.call()
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("my.formula", "digits.d", "rb.points",
+                "res.rows", "res.sort", "fun.call")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
-  res.sort <- match.arg(res.sort)
+  if (is.null(fun_call)) fun_call <- match.call()
 
-  if (missing(my.formula)) {
+  res_sort <- match.arg(res_sort)
+
+  if (missing(my_formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Specify a model by listing it first or set according to:  my.formula\n\n")
+      "Specify a model by listing it first or set according to:  my_formula\n\n")
   }
 
   dots <- list(...)  # check for deprecated parameters
@@ -63,7 +77,7 @@ function(my.formula, data=d, rows=NULL,
         txtC, "Data frame ", df.name, txtA, "does not exist\n\n", txtB, "\n")
   }
 
-  nm <- all.vars(my.formula)  # names of vars in the model
+  nm <- all.vars(my_formula)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1
   
@@ -93,13 +107,13 @@ function(my.formula, data=d, rows=NULL,
   # ANOVA
   #   all analysis done on data in model construct av.out$model
   #   this model construct contains only model vars, with Y listed first
-  #assign("av.out", aov(my.formula, data=data), pos=.GlobalEnv)
+  #assign("av.out", aov(my_formula, data=data), pos=.GlobalEnv)
   if (!mydata.ok) .nodf(df.name)
-  av.out <- aov(my.formula, data=data)
+  av.out <- aov(my_formula, data=data)
 
   n.keep <- nrow(av.out$model)
 
-  if (is.null(digits.d)) digits.d <- .getdigits(data[,nm[1]], 2)
+  if (is.null(digits_d)) digits_d <- .getdigits(data[,nm[1]], 2)
     
 
 # ----------
@@ -123,7 +137,7 @@ function(my.formula, data=d, rows=NULL,
   }
 
   if (n.pred == 2) {
-    if (!is.list(replications(my.formula, data=data))) {
+    if (!is.list(replications(my_formula, data=data))) {
       tx[length(tx)+1] <- ""
       tx[length(tx)+1] <- "The design is balanced"
     }
@@ -150,7 +164,7 @@ function(my.formula, data=d, rows=NULL,
 
   if (n.pred == 1)  {
     plt1 <- .ANOVAz1(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
-        nm, n.obs, digits.d, brief, graphics, pdf, width, height)
+        nm, n.obs, digits_d, brief, graphics, pdf, width, height)
     title_des <- plt1$title_des
     txdes <- plt1$txdes
     title_basic <- plt1$title_basic
@@ -166,8 +180,8 @@ function(my.formula, data=d, rows=NULL,
 
   if (n.pred == 2) {
     plt2 <- .ANOVAz2(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
-        av.out$model[,nm[3]], nm, digits.d, brief, as.character(my.formula)[3],
-        rb.points, graphics, pdf, width, height)
+        av.out$model[,nm[3]], nm, digits_d, brief, as.character(my_formula)[3],
+        rb_points, graphics, pdf, width, height)
     txbck2 <- plt2$txbck2
     for (i in 1:length(txbck2)) tx[length(txbck)+1] <- txbck2[i]
     title_des <- plt2$title_des
@@ -198,19 +212,19 @@ function(my.formula, data=d, rows=NULL,
     tx <- character(length=0)
 
     n.keep <- nrow(av.out$model)
-    if (is.null(res.rows)) if (n.keep < 20) res.rows <- n.keep else res.rows <- 20 
-    if (res.rows == "all") res.rows <- n.keep  # turn off resids with res.rows=0
+    if (is.null(res_rows)) if (n.keep < 20) res_rows <- n.keep else res_rows <- 20 
+    if (res_rows == "all") res_rows <- n.keep  # turn off resids with res_rows=0
 
     tx[length(tx)+1] <- "Fitted Values, Residuals, Standardized Residuals"
-    if (res.sort == "zresid")
+    if (res_sort == "zresid")
       tx[length(tx)+1] <- "   [sorted by Standardized Residuals, ignoring + or - sign]"
-    if (res.sort == "fitted")  
+    if (res_sort == "fitted")  
       tx[length(tx)+1] <- "   [sorted by Fitted Value, ignoring + or - sign]"
-    if (res.rows < n.keep)
-      txt <- "cases (rows) of data, or res.rows=\"all\"]"
+    if (res_rows < n.keep)
+      txt <- "cases (rows) of data, or res_rows=\"all\"]"
     else
       txt="]"
-    tx[length(tx)+1] <- paste("   [res.rows = ", res.rows, ", out of ", n.keep, " ", txt, sep="")
+    tx[length(tx)+1] <- paste("   [res_rows = ", res_rows, ", out of ", n.keep, " ", txt, sep="")
 
     fit <- fitted(av.out)
     res <- residuals(av.out)
@@ -221,18 +235,18 @@ function(my.formula, data=d, rows=NULL,
     names(out)[n.vars+2] <- "residual"
     names(out)[n.vars+3] <- "zresid"
 
-    if (res.sort != "off") {
-      if (res.sort == "zresid") o <- order(abs(out$zresid), decreasing=TRUE)
-      if (res.sort == "fitted") o <- order(abs(out$fitted), decreasing=TRUE)
+    if (res_sort != "off") {
+      if (res_sort == "zresid") o <- order(abs(out$zresid), decreasing=TRUE)
+      if (res_sort == "fitted") o <- order(abs(out$fitted), decreasing=TRUE)
       out <- out[o,]
     }
     names(out)[n.vars+3] <- "z-resid"
     for (i in 1:(n.vars+3))
       if (is.numeric(out[,i])) if (!is.integer(out[,i])) {
-        if (digits.d > 2) dec.digits <- digits.d-1 else dec.digits <- digits.d
+        if (digits_d > 2) dec.digits <- digits_d-1 else dec.digits <- digits_d
         out[,i] <- .fmt(out[,i],dec.digits)
       }
-    tx2 <- .prntbl(out[1:res.rows,], digits.d)
+    tx2 <- .prntbl(out[1:res_rows,], digits_d)
     for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 
     txres <- tx
@@ -255,7 +269,7 @@ function(my.formula, data=d, rows=NULL,
   if (!is.null(Rmd)) {
     txt <- ifelse (grepl(".Rmd", Rmd), "", ".Rmd")
     Rmd <- paste(Rmd, txt, sep="") 
-    txknt <- .av.Rmd(nm, df.name, fun.call, digits.d)
+    txknt <- .av.Rmd(nm, df.name, fun_call, digits_d)
     cat(txknt, file=Rmd, sep="\n")
     txkfl <- .showfile2(Rmd, "R Markdown instructions")
   }
@@ -283,7 +297,7 @@ function(my.formula, data=d, rows=NULL,
 
   if (n.pred == 1)  {
     output <- list(
-      call=fun.call, formula=my.formula,
+      call=fun_call, formula=my_formula,
 
       out_title_bck=title_bck, out_background=txbck,
 
@@ -307,7 +321,7 @@ function(my.formula, data=d, rows=NULL,
 
   if (n.pred == 2)  {
     output <- list(
-      call=fun.call, formula=my.formula,
+      call=fun_call, formula=my_formula,
 
       out_title_bck=title_bck, out_background=txbck,
 

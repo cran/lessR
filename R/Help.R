@@ -47,7 +47,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   if (!is.null(topic)) topic <- tolower(topic)
 
   if (!(getOption("theme") %in% c("lightbronze", "gray"))) { 
-    col.rect <- getOption("col.pt.fill")
+    col.rect <- getOption("col.pt_fill")
     col.line <- "lightsteelblue"
   }
   else {
@@ -173,7 +173,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   for the lessR data analysis functions, so data= parameter not needed. 
 
   To read the optional file of file of variable labels, use.
-      > l <- Read(\"\", var.labels=TRUE)
+      > l <- Read(\"\", var_labels=TRUE)
   The csv or Excel labels file consists of two columns and one row for
   each variable specified, the variable name followed by its label, 
   read into the data frame named the lowercase letter l (for labels).
@@ -221,12 +221,12 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   To write a data file in Excel format, use the format=\"Excel\" option.
       > Write(\"mybestdata\", format=Excel)
-  Abbreviation, not needing the format parameter, is wrt.x. Relies upon
+  Abbreviation, not needing the format parameter, is wrt_x. Relies upon
   the openxlsx function read.xlsx.
 
   To write a data file in native R format, use the format=\"R\" option,
-  or the abbreviation for the function name  wrt.r.
-      > wrt.r(\"mybestdata\")
+  or the abbreviation for the function name  wrt_r.
+      > wrt_r(\"mybestdata\")
 "
 
   set.up.plot(1)
@@ -294,7 +294,7 @@ function(topic=NULL, width=4.5, height=4.5) {
       > fix(d)
   lessR function Transform creates a new variable or rewrites over existing.
       > d <- Transform(SalaryDiv=Salary/1000)
-  lessR function Recode changes individual values. 
+  lessR function Recode changes individual values_ 
       > d <- Recode(Scores, old=c(1:4), new=c(10,15,20,25))
   R function factor creates a new variable with non-numeric categories.
   Severity was encoded with a 1 for Mild, 2 for Moderate and 3 for Severe.
@@ -334,8 +334,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   new theme to reset all attributes. Other changes cumulate until reset.]
   For example, to convert  to gray scale, 
       > style(\"gray\")
-  Further modify with a sub.theme, here for another version of grayscale. 
-      > style(\"gray\", sub.theme=\"black\")
+  Further modify with a sub_theme, here for another version of grayscale. 
+      > style(\"gray\", sub_theme=\"black\")
 
   All style options:         > style(show=TRUE)
   All R named colors:    > showColors()
@@ -344,11 +344,11 @@ function(topic=NULL, width=4.5, height=4.5) {
   Levels of a categorical variable may be encoded with numerical digits,
   such as 0 for Male and 1 for Female. R is obliged to interpret numerical
   variables as numeric.  One option is to redefine these variables as
-  factors [see Help(edit)]. Or set the value of the lessR option n.cat.
-      > style(n.cat=3)
+  factors [see Help(edit)]. Or set the value of the lessR option n_cat.
+      > style(n_cat=3)
   Here any numerical variable with just 3 unique, equally spaced interval 
   values or less is interpreted as a categorical variable. The default
-  value of n.cat is 8, and applies to Plot and SummaryStats.
+  value of n_cat is 8, and applies to Plot and SummaryStats.
   "
 
   set.up.plot(3)
@@ -376,11 +376,11 @@ function(topic=NULL, width=4.5, height=4.5) {
   Plot a distribution of data values for a continuous variable with the current
   color theme, here for variable Y. Traditionally, use Histogram or hs.
       > Histogram(Y)
-  Specify the gray-scale color theme, a title, and a label for the x-axis.
+  Specify the gray-scale color theme, a title, and a label for the x-axis_
       > style(\"gray\")
       > Histogram(Y, main=\"My Title\", xlab=\"Y (mm)\")
-  Specify bins, begin at 60 with a bin width of 10. Can also specify bin.end.
-      > Histogram(Y, bin.start=60, bin.width=10)
+  Specify bins, begin at 60 with a bin width of 10. Can also specify bin_end.
+      > Histogram(Y, bin_start=60, bin_width=10)
   Get Trellis graphics with by1 and by2 parameters for categorical variables.
       > Histogram(Salary, by1=Gender)
 
@@ -436,7 +436,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   Can replace a variable name with a list of variables, e.g., c(Salary, Years)
   or Salary:Years, or an entire data frame. The default data frame is d.
   Here do a bar chart of all categorical variables in d, those that are
-  non-numeric, or less than n.cat=8 equally spaced integer values.
+  non-numeric, or less than n_cat=8 equally spaced integer values_
       > BarChart()
   "
 
@@ -459,7 +459,7 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   t1 <- "
   The lessR function LineChart, or lc, generates a line chart with values
-  ordered along some dimension such as time. If the data do not have a 
+  ordered along some dimension such as time_ If the data do not have a 
   pronounced trend, a center line is automatically provided.
       > LineChart(Y)
   or,
@@ -467,8 +467,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   Also provided is a list of all the runs in the data.
 
   The line chart becomes a time series chart with times/dates on the
-  horizontal axis.  Use the time.start and time.by options.
-      > LineChart(Y, time.start=\"2005/09/01\", time.by=\"month\")
+  horizontal axis_  Use the time_start and time_by options.
+      > LineChart(Y, time_start=\"2005/09/01\", time_by=\"month\")
   Additional options are explained in the R help files for functions par,
   title, points and lines. 
 
@@ -505,8 +505,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   variables, can have an optional data ellipse and fit line and more.
       > Plot(X, Y, enhance=TRUE)
   For sorted values of X, a function plot results so that the points are
-  not individually displayed and are connected by line segments. If the
-  number of unique response values <= n.cat=8, produce a bubble plot.
+  not individually displayed and are connected by line segments_ If the
+  number of unique response values <= n_cat=8, produce a bubble plot.
 
   For a single numeric variable, get a VBS plot, an integrated violin,
   box and scatter plot.
@@ -625,7 +625,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   is Gender, with two values, M and F.
 
   Here the numerical response variable is named Y and the grouping
-  variable, also called a factor, is named X, with exactly two values.
+  variable, also called a factor, is named X, with exactly two values_
       >  ttest(Y ~ X)
   The tilde, ~, expresses the relationship between two or more variables.
   R refers to this expression as a formula, read as: Y is described by X.
@@ -698,12 +698,12 @@ function(topic=NULL, width=4.5, height=4.5) {
   To obtain a power curve with power.t.test requires setting up the range of
   alternative mean or mean difference values, usually by trial and error, 
   invoking ttestPower, saving the results, and then invoking the plot function,
-  including the labeling of each axis. Then to analyze related results such 
+  including the labeling of each axis_ Then to analyze related results such 
   as power at a different sample size, the ttestPower function must be run
    several more times. 
 
   The enhanced function, ttestPower, does all of this automatically for one 
-  or two sample t-tests, and also plots the power curve in color. This example is 
+  or two sample t-tests, and also plots the power curve in color_ This example is 
   for the default power curve for a sample size of 20 in each group and 
   a within-group or pooled standard deviation of 5.
       > ttestPower(n=20, s=5)
@@ -784,8 +784,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   to generate the corresponding html, pdf or Word document from RStudio.
   
   To obtain specified prediction intervals for new data, for example,
-       > reg(Y ~ X1 + X2, X1.new=c(10,20), X2.new=c(100:110))
-  X1.new, X2.new, etc. always specify the values of the predictor
+       > reg(Y ~ X1 + X2, X1_new=c(10,20), X2_new=c(100:110))
+  X1_new, X2_new, etc. always specify the values of the predictor
   variables for the prediction intervals regardless of their names."
 
   set.up.plot(1)

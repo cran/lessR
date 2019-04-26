@@ -3,21 +3,21 @@ function(x, x.name, new.var, old, new, ivar, n.obs, dname, quiet) {
 
   n.values <- length(old)
 
-  miss.old <- FALSE
-  if (!is.null(old)) if (old[1] == "missing") miss.old <- TRUE
+  miss_old <- FALSE
+  if (!is.null(old)) if (old[1] == "missing") miss_old <- TRUE
 
-  miss.new <- FALSE
+  miss_new <- FALSE
   if (!is.null(new)) {
     if (new[1] != "missing") {
       if (n.values != length(new)) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The same number of values must be specified for both\n",
-        "old and new values.\n\n")
+        "old and new values_\n\n")
       }
     }
     else {
       for (i in 1:n.values) new[i] <- "missing"
-      miss.new <- TRUE
+      miss_new <- TRUE
     }
   }
 
@@ -29,7 +29,7 @@ function(x, x.name, new.var, old, new, ivar, n.obs, dname, quiet) {
       .dash(22)
       for (i in 1:n.values) cat("  ", old[i], "-->", new[i], "\n")
       cat("\n")
-      if (miss.new)
+      if (miss_new)
         cat("\nR represents missing data with a NA for 'not assigned'.\n\n")
       cat("Number of cases (rows) to recode:", n.obs, "\n")
       if (is.null(new.var))
@@ -71,11 +71,11 @@ function(x, x.name, new.var, old, new, ivar, n.obs, dname, quiet) {
   # the recode
   for (i in 1:n.values) {
     for (j in 1:n.obs) {
-      if (!miss.old) {
+      if (!miss_old) {
         if (!is.na(new.x[j])) 
-          if (x[j] == old[i]) new.x[j] <- ifelse (!miss.new, new[i], NA)
+          if (x[j] == old[i]) new.x[j] <- ifelse (!miss_new, new[i], NA)
       } 
-      else  # miss.old
+      else  # miss_old
         if (is.na(new.x[j])) new.x[j] <- new[1]
     } 
   }

@@ -1,5 +1,5 @@
 .reg2Relations <- 
-function(lm.out, dname, n.keep, show.R,
+function(lm.out, dname, n.keep, show_R,
          cor, collinear, subsets, max.sublns, numeric.all, in.data.frame,
          sterrs, MSW) {
 
@@ -20,7 +20,7 @@ function(lm.out, dname, n.keep, show.R,
   
     if (numeric.all && in.data.frame) {
 
-      if (show.R) {
+      if (show_R) {
         cv <- paste("\"",nm[1],"\"", sep="")
         for (i in 2:n.vars) cv <- paste(cv, ",\"", nm[i], "\"", sep="")
         tx[length(tx)+1] <- .dash2(68)

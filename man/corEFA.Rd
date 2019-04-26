@@ -11,17 +11,17 @@ A maximum likelihood exploratory factor analysis of an input correlation matrix,
 }
 
 \usage{
-corEFA(x=mycor, n.factors, rotate=c("promax", "varimax", "none"), 
-          min.loading=.2, sort=TRUE, Rmd=NULL, \ldots)
+corEFA(x=mycor, n_factors, rotate=c("promax", "varimax", "none"), 
+          min_loading=.2, sort=TRUE, Rmd=NULL, \ldots)
 
 efa(\ldots)
 }
 
 \arguments{
   \item{x}{Correlation matrix.}
-  \item{n.factors}{Number of factors.}
+  \item{n_factors}{Number of factors.}
   \item{rotate}{Rotation method, if any.}
-  \item{min.loading}{Minimum loading to include in suggested factor for
+  \item{min_loading}{Minimum loading to include in suggested factor for
         confirmatory analysis and for the display of the loadings for the
         exploratory analysis. To ignore, set to 0.}
   \item{sort}{Sort the input variables by their highest factor loadings (but only
@@ -30,7 +30,7 @@ efa(\ldots)
         if specified. The file type is .Rmd, which automatically opens in RStudio,
         but it is a simple text file that can be edited with any text editor,
         including RStudio.}
-  \item{\dots}{Parameter values.}
+  \item{\dots}{Parameter values_}
 }
 
 \details{
@@ -89,13 +89,13 @@ rownames(mycor) <- colnames(mycor)
 
 # default factor analysis of default correlation matrix mycor
 #   with two factors extracted
-corEFA(n.factors=2)
+corEFA(n_factors=2)
 
 # abbreviated form
 # use all items to construct the MIMM, regardless of their loadings
 #  and show all loadings
 # show the initial factor extraction
-efa(n.factors=2, min.loading=0, show.initial=TRUE)
+efa(n_factors=2, min_loading=0, show_initial=TRUE)
 }
 
 

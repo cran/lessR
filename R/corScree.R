@@ -25,15 +25,15 @@ function (x=mycor,
     }
   }
   else { 
-    pdf.file <- "Scree.pdf"
-    pdf(file=pdf.file, width=width, height=height)
+    pdf_file <- "Scree.pdf"
+    pdf(file=pdf_file, width=width, height=height)
   }
 
   if (getOption("theme") == "gray" ||
-     (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black"))
-    col.ln <- getOption("bar.fill.ordered")
+     (getOption("theme") == "gray"  &&  getOption("sub_theme") == "black"))
+    col.ln <- getOption("bar_fill_ordered")
   else
-    col.ln <- getOption("bar.color.ordered")
+    col.ln <- getOption("bar_color_ordered")
 
   # keep track of generated graphics
   plot.i <- 0
@@ -46,21 +46,21 @@ function (x=mycor,
   .lc.main(ev, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.color=getOption("pt.color"),
-         col.fill=getOption("pt.fill"),
-         shape.pts=21,
-         col.bg=getOption("panel.fill"),
-         lab.cex=getOption("lab.cex"), axis.cex=.85, col.axis="gray30",
-         rotate.x=0, rotate.y=0, offset=0.5,
-         xy.ticks=TRUE, line.width=1.1,
+         col_color=getOption("pt_color"),
+         col_fill=getOption("pt_fill"),
+         shape_pts=21,
+         col.bg=getOption("panel_fill"),
+         lab_cex=getOption("lab_cex"), axis_cex=.85, col.axis="gray30",
+         rotate_x=0, rotate_y=0, offset=0.5,
+         xy_ticks=TRUE, line_width=1.1,
          xlab=NULL, ylab="Eigenvalues", main=main, sub=NULL, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-         time.start=NULL, time.by=NULL, time.reverse=FALSE,
-         center.line="off", quiet=TRUE, ...)
+         time_start=NULL, time_by=NULL, time_reverse=FALSE,
+         center_line="off", quiet=TRUE, ...)
 
   if (pdf) {
     dev.off()
-    .showfile(pdf.file, "scree chart")
+    .showfile(pdf_file, "scree chart")
   }
 
   if (!pdf) {
@@ -69,8 +69,8 @@ function (x=mycor,
     }
   }
   else { 
-    pdf.file <- "ScreeDiff.pdf"
-    pdf(file=pdf.file, width=width, height=height)
+    pdf_file <- "ScreeDiff.pdf"
+    pdf(file=pdf_file, width=width, height=height)
   }
 
   # differences scree plot
@@ -82,18 +82,18 @@ function (x=mycor,
   .lc.main(ev.diff, type=NULL, 
          col.line=col.ln,
          col.area=NULL, col.box="black",
-         col.color=getOption("pt.color"),
-         col.fill=getOption("pt.fill"),
-         shape.pts=21,
-         col.bg=getOption("panel.fill"),
-         lab.cex=getOption("lab.cex"), axis.cex=.85, col.axis="gray30",
-         rotate.x=0, rotate.y=0, offset=0.5,
-         xy.ticks=TRUE, line.width=1.1,
+         col_color=getOption("pt_color"),
+         col_fill=getOption("pt_fill"),
+         shape_pts=21,
+         col.bg=getOption("panel_fill"),
+         lab_cex=getOption("lab_cex"), axis_cex=.85, col.axis="gray30",
+         rotate_x=0, rotate_y=0, offset=0.5,
+         xy_ticks=TRUE, line_width=1.1,
          xlab=NULL, ylab="Differences of Successive Eigenvalues",
          main=main, sub=NULL, cex=NULL,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-         time.start=NULL, time.by=NULL, time.reverse=FALSE,
-         center.line="off", quiet=TRUE, ...)
+         time_start=NULL, time_by=NULL, time_reverse=FALSE,
+         center_line="off", quiet=TRUE, ...)
    n.dregs <- ceiling(length(ev.diff)/1.35)  # get bottom sequence of ev differences
    dregs <- numeric(length=n.dregs)
    for (i in 1:n.dregs) dregs[i] <- ev.diff[length(ev.diff)-(i-1)] 
@@ -101,7 +101,7 @@ function (x=mycor,
 
   if (pdf) {
     dev.off()
-    .showfile(pdf.file, "scree difference chart")
+    .showfile(pdf_file, "scree difference chart")
     cat("\n\n")
   }
 

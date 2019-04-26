@@ -1,15 +1,15 @@
 .dpmat.main <-   # BPFM
-function(x, l, sort.yx,
-         col.fill, col.color, col.bg,
-         col.trans, shape.pts, col.box, 
+function(x, l, sort_yx,
+         col_fill, col_color, col.bg,
+         col.trans, shape_pts, col.box, 
          col.low, col.hi,
-         xy.ticks, xlab, ylab, main, sub, cex,
-         radius, size.cut, txt.color="black", power,
+         xy_ticks, xlab, ylab, main, sub, cex,
+         radius, size_cut, txt_color="black", power,
          bm.adj, lm.adj, tm.adj, rm.adj,
-         value.labels, rotate.x, rotate.y, offset, quiet,
-         do.plot, fun.call=NULL, ...)  {
+         value_labels, rotate_x, rotate_y, offset, quiet,
+         do_plot, fun_call=NULL, ...)  {
 
-  col.area <- col.fill  # kludge
+  col.area <- col_fill  # kludge
 
   # scale for regular R or RStudio
   adj <- .RSadj(radius)
@@ -17,7 +17,7 @@ function(x, l, sort.yx,
 
   size.txt <- ifelse (options("device") == "RStudioGD", 0.8, 0.7)
 
-  if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", value.labels) 
+  if (!is.null(value_labels)) value_labels <- gsub(" ", "\n", value_labels) 
 
   # if exist, get axes labels
   gl <- .getlabels(xlab, ylab, main)
@@ -75,8 +75,8 @@ function(x, l, sort.yx,
     w <- 1:n.resp
   m <- integer(length=n.var)
   for (i in 1:n.var) m[i] <- round(weighted.mean(w, mytbl[i,]), 3)
-  if (sort.yx != "0") {
-    srt.dwn <- ifelse (sort.yx == "-", TRUE, FALSE)
+  if (sort_yx != "0") {
+    srt.dwn <- ifelse (sort_yx == "-", TRUE, FALSE)
     m.o <- order(m, decreasing=srt.dwn)
     mytbl <- mytbl[m.o,]
     m <- m[m.o]
@@ -103,13 +103,13 @@ function(x, l, sort.yx,
   c <- cords$count  # 0 plots to a single pixel, so remove
   for (i in 1:length(c)) if (c[i]==0) c[i] <- NA
 
-  if (do.plot) {
+  if (do_plot) {
     # set margins
     y.lvl <- rownames(mytbl)
     max.width <- strwidth(y.lvl[which.max(nchar(y.lvl))], units="inches")
   
     # here keep same bm if 1 or 2 line x labels
-    margs <- .marg(max.width, y.lab, x.lab, main, rotate.x) 
+    margs <- .marg(max.width, y.lab, x.lab, main, rotate_x) 
     bm <- margs$bm
     lm <- margs$lm
     tm <- margs$tm
@@ -125,7 +125,7 @@ function(x, l, sort.yx,
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
     
-    par(bg=getOption("window.fill"))
+    par(bg=getOption("window_fill"))
     par(mai=c(bm, lm, tm, rm))
 
     plot(cords$xx, cords$yy, type="n", axes=FALSE, ann=FALSE, 
@@ -133,15 +133,15 @@ function(x, l, sort.yx,
 
     # axis, axis ticks, value labels
 # NEED a bottom margin adjust for two lines of values
-# otherwise margin.adj=c(0,0,.2,0)
-    if (is.null(value.labels))
+# otherwise margin_adj=c(0,0,.2,0)
+    if (is.null(value_labels))
       x.lvl <- colnames(mytbl)
     else
-      x.lvl <- value.labels
+      x.lvl <- value_labels
       x.lvl <- gsub(" ", "\n", x.lvl) 
 
     .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,
-          rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
+          rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
 
     # axis labels 
     if (!is.null(y.lvl))
@@ -152,7 +152,7 @@ function(x, l, sort.yx,
       max.lbl <- 0
 
     .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
-            xy.ticks=TRUE, offset=offset, ...) 
+            xy_ticks=TRUE, offset=offset, ...) 
 
     usr <- par("usr")
 
@@ -162,42 +162,42 @@ function(x, l, sort.yx,
     # grid lines
     .grid("v", axTicks(1))
     .grid("h", 1:n.var)
-    #abline(v=axTicks(1), col=grid.x.color, lwd=grid.x.lwd, lty=grid.x.lty)
-    #abline(h=1:n.var, col=grid.y.color, lwd=grid.x.lwd, lty=grid.y.lty)
+    #abline(v=axTicks(1), col=grid_x_color, lwd=grid_x_lwd, lty=grid_x_lty)
+    #abline(h=1:n.var, col=grid_y_color, lwd=grid_x_lwd, lty=grid_y_lty)
  
     # box around plot
     rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
-      lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
+      lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
 
     # colors
     if (is.null(col.low) || is.null(col.hi))
-      clr <- col.fill
+      clr <- col_fill
     else {
-      color.palette <- colorRampPalette(c(col.low, col.hi))
-      clr <- color.palette(n.resp)
+      color_palette <- colorRampPalette(c(col.low, col.hi))
+      clr <- color_palette(n.resp)
     }
 
     # bubbles
     # KLUDGE, default can be 0, so add some, really need a lighter gray instead
     col.trans <- col.trans + .2
     if (!is.null(col.trans)) {
-      trans.pts <- col.trans
-      for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans.pts)*256)
+      trans_pts <- col.trans
+      for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans_pts)*256)
     }
 
     symbols(cords$xx, cords$yy, circles=c, bg=clr, 
-            fg=col.color, inches=radius, add=TRUE, ...)
+            fg=col_color, inches=radius, add=TRUE, ...)
 
     # counts
-    if (size.cut) { 
+    if (size_cut) { 
       max.c <- max(c, na.rm=TRUE)  # do not display count if bubble is too small
-      #min.bubble <- (.5 - (0.9*radius)) * max.c 
-      min.bubble <- (power/2.5) * max.c
+      #min_bubble <- (.5 - (0.9*radius)) * max.c 
+      min_bubble <- (power/2.5) * max.c
       for (i in 1:length(c))
-        if (!is.na(c[i])) if (c[i] <= min.bubble) c[i] <- NA
-      text(cords$xx, cords$yy, c, cex=size.txt, col=txt.color)
+        if (!is.na(c[i])) if (c[i] <= min_bubble) c[i] <- NA
+      text(cords$xx, cords$yy, c, cex=size.txt, col=txt_color)
     }
-  }  # end do.plot
+  }  # end do_plot
 
 
   # ------------
@@ -207,7 +207,7 @@ function(x, l, sort.yx,
   
     if (getOption("suggest")) {
       # function call for suggestions
-      fncl <- .fun.call.deparse(fun.call) 
+      fncl <- .fun_call.deparse(fun_call) 
       fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
       fncl <- gsub(" = ", "=", fncl)
     }  # display suggestions

@@ -6,14 +6,14 @@ function(x=NULL, y=NULL, data=d, rows=NULL, paired=FALSE,
 
          Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", xlab=NULL, 
 
-         brief=getOption("brief"), digits.d=NULL, conf.level=0.95,
-         alternative=c("two.sided", "less", "greater"),
+         brief=getOption("brief"), digits_d=NULL, conf_level=0.95,
+         alternative=c("two_sided", "less", "greater"),
          mmd=NULL, msmd=NULL, Edesired=NULL, 
 
-         show.title=TRUE, bw1="bcv", bw2="bcv",
+         show_title=TRUE, bw1="bcv", bw2="bcv",
 
-         graph=TRUE, line.chart=FALSE,
-         width=5, height=5, pdf.file=NULL, ...)  {       
+         graph=TRUE, line_chart=FALSE,
+         width=5, height=5, pdf_file=NULL, ...)  {       
 
 
 tt.setup <-
@@ -33,24 +33,25 @@ function(x, y=NULL, ...) {
 
   if (!from.data) graph <- FALSE
 
-  if (is.null(digits.d)) {
-    if (from.data) digits.d <- .max.dd(x)
+  if (is.null(digits_d)) {
+    if (from.data) digits_d <- .max.dd(x)
     else {
-      digits.d <- 0
-      if (!is.null(m)) if (.max.dd(m) > digits.d) digits.d <- .max.dd(m)   
-      if (!is.null(s)) if (.max.dd(s) > digits.d) digits.d <- .max.dd(s)   
-      if (!is.null(m1)) if (.max.dd(m1) > digits.d) digits.d <- .max.dd(m1)   
-      if (!is.null(m2)) if (.max.dd(m2) > digits.d) digits.d <- .max.dd(m2)   
-      if (!is.null(s1)) if (.max.dd(s1) > digits.d) digits.d <- .max.dd(s1)   
-      if (!is.null(s2)) if (.max.dd(s2) > digits.d) digits.d <- .max.dd(s2)   
+      digits_d <- 0
+      if (!is.null(m)) if (.max.dd(m) > digits_d) digits_d <- .max.dd(m)   
+      if (!is.null(s)) if (.max.dd(s) > digits_d) digits_d <- .max.dd(s)   
+      if (!is.null(m1)) if (.max.dd(m1) > digits_d) digits_d <- .max.dd(m1)   
+      if (!is.null(m2)) if (.max.dd(m2) > digits_d) digits_d <- .max.dd(m2)   
+      if (!is.null(s1)) if (.max.dd(s1) > digits_d) digits_d <- .max.dd(s1)   
+      if (!is.null(s2)) if (.max.dd(s2) > digits_d) digits_d <- .max.dd(s2)   
     }
-    digits.d <- digits.d + 1
-    if (digits.d == 1) digits.d <- 2
+    digits_d <- digits_d + 1
+    if (digits_d < 3) digits_d <- 3
   }
-  options(digits.d=digits.d)
-  if (digits.d > 10) {
-    cat("\nThese data contain", digits.d, "significant digits.\n")
-    cat("Perhaps specify less digits to display with the  digits.d  parameter.\n\n")
+  options(digits_d=digits_d)
+  if (digits_d > 10) {
+    cat("\nThese data contain", digits_d, "significant digits.\n")
+    cat("Perhaps specify less digits to display with the  digits_d ",
+        " parameter.\n\n")
   }
 
   if (two.gp) {
@@ -69,19 +70,19 @@ function(x, y=NULL, ...) {
       # Always put the group with the largest mean first
       if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
         plt2 <- .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
-          Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
-          conf.level, alternative, mmd, msmd, Edesired, bw1, bw2,
+          Ynm, Xnm, X1nm, X2nm, brief, digits_d, 
+          conf_level, alternative, mmd, msmd, Edesired, bw1, bw2,
           graph, xlab,
-          line.chart, show.title, pdf.file, width, height)
+          line_chart, show_title, pdf_file, width, height)
       else {  # switch
         Xtmp <- X2nm
         X2nm <- X1nm
         X1nm <- Xtmp
         plt2 <- .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
-          Ynm, Xnm, X1nm, X2nm, brief, digits.d, 
-          conf.level, alternative, mmd, msmd, Edesired, bw1, bw2, 
+          Ynm, Xnm, X1nm, X2nm, brief, digits_d, 
+          conf_level, alternative, mmd, msmd, Edesired, bw1, bw2, 
           graph, xlab,
-          line.chart, show.title, pdf.file, width, height)
+          line_chart, show_title, pdf_file, width, height)
       }
 
       for (i in (plot.i+1):(plot.i+plt2$i))
@@ -94,9 +95,9 @@ function(x, y=NULL, ...) {
     else {  # from stats
       .TwoGroup(y, x,
          n1, n2, m1, m2, s1, s2, from.data,
-         Ynm, Xnm, X1nm, X2nm, brief, digits.d, conf.level,
+         Ynm, Xnm, X1nm, X2nm, brief, digits_d, conf_level,
          alternative, mmd, msmd, Edesired, bw1, bw2,
-         graph=FALSE, xlab=NULL, line.chart=FALSE)
+         graph=FALSE, xlab=NULL, line_chart=FALSE)
     }
   #if (!brief) {
     #txt <- "Kelley and Lai's MBESS package]"
@@ -118,9 +119,9 @@ function(x, y=NULL, ...) {
 
       options(yname=x.name)
       plt1 <- .OneGroup(x, Ynm, mu, n=NULL, m=NULL, s=NULL, brief, bw1,
-         from.data, conf.level, alternative, digits.d, mmd, msmd,
-         Edesired, paired, graph, xlab, line.chart, show.title,
-         pdf.file, width, height, ...)
+         from.data, conf_level, alternative, digits_d, mmd, msmd,
+         Edesired, paired, graph, xlab, line_chart, show_title,
+         pdf_file, width, height, ...)
 
     if (!is.null(plt1$i)) {
         for (i in (plot.i+1):(plot.i+plt1$i))
@@ -131,9 +132,9 @@ function(x, y=NULL, ...) {
 
     else  # from stats
        .OneGroup(x, Ynm, mu, n, m, s, brief, bw1,
-         from.data, conf.level, alternative, digits.d, mmd, msmd,
-         Edesired, paired, graph, xlab, line.chart, show.title,
-         pdf.file, width, height, ...)
+         from.data, conf_level, alternative, digits_d, mmd, msmd,
+         Edesired, paired, graph, xlab, line_chart, show_title,
+         pdf_file, width, height, ...)
   }  # end one group
 
   # return number of plots to main
@@ -145,8 +146,21 @@ function(x, y=NULL, ...) {
 #-----------------------------------
 # BEGIN
 #-----------------------------------
-
   alternative <- match.arg(alternative)
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("digits.d", "conf.level", "show.title", "line.chart",
+                "pdf.file")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -161,7 +175,7 @@ function(x, y=NULL, ...) {
       "Must specify a variable to analyze, or provide summary stats.\n\n")
   }
         
-  if (!is.null(Edesired) && conf.level != 0.95) { 
+  if (!is.null(Edesired) && conf_level != 0.95) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Edesired calculation only applies to 95% confidence level.\n\n")
   }
@@ -321,7 +335,8 @@ function(x, y=NULL, ...) {
         if (y.l == 0)  # 1-group
           plt <- tt.setup(eval(substitute(data$x)), ...)
         else  # 2-group
-          plt <- tt.setup(eval(substitute(data$x)), eval(substitute(data$y)),  ...)
+          plt <- tt.setup(eval(substitute(data$x)), eval(substitute(data$y)),
+                          ...)
       }
       else {   # paired 
         diff <- eval(substitute(data$y)) - eval(substitute(data$x))
@@ -344,9 +359,9 @@ function(x, y=NULL, ...) {
   if (paired) {  # scatter plot of both variables, need both vars so do here
     manage.gr <- .graphman()
 
-    if (is.null(pdf.file)) {
+    if (is.null(pdf_file)) {
       if (manage.gr) {
-        if (!line.chart)
+        if (!line_chart)
           dev.set(which=4)
         else
           dev.set(which=5)
@@ -389,9 +404,9 @@ function(x, y=NULL, ...) {
 
     # Cleveland two-variable dot plot
     .plt.main(data.frame(x.call), data.frame(y.call), cat.y=TRUE,
-       shape=21, size=.8, ylab="", segments.y=TRUE, quiet=TRUE)
+       shape=21, size=.8, ylab="", segments_y=TRUE, quiet=TRUE)
 
-    if (!is.null(pdf.file)) {
+    if (!is.null(pdf_file)) {
       dev.off()
       .showfile("PairedScatterPlot.pdf", "scatter plot with changes from diagonal")
       cat("\n\n")

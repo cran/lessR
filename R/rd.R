@@ -1,5 +1,5 @@
 rd <-
 function(...)
 
-  Read(..., fun.call=match.call())
+  Read(..., fun_call=match.call())
 

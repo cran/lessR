@@ -1,5 +1,5 @@
 hs <-
 function(...)
 
-  Histogram(fun.call=match.call(), ...)
+  Histogram(fun_call=match.call(), ...)
 

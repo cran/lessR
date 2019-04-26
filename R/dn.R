@@ -1,7 +1,7 @@
 dn <-
 function(...)
 
-  Density(fun.call=match.call(), ...)
+  Density(fun_call=match.call(), ...)
 
 
 

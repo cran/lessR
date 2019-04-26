@@ -1,8 +1,21 @@
 simFlips <-
-function(n, prob=.5, show.title=TRUE,
-         show.flips=TRUE, grid="grey90", pause=FALSE,
-         main=NULL, pdf.file=NULL, width=5, height=5, ...) {
+function(n, prob=.5, show_title=TRUE,
+         show_flips=TRUE, grid="grey90", pause=FALSE,
+         main=NULL, pdf_file=NULL, width=5, height=5, ...) {
 
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("show.title", "show,flips", "pdf.file")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   if (missing(n)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -20,11 +33,11 @@ function(n, prob=.5, show.title=TRUE,
     }
   }
 
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+  if (!is.null(pdf_file))
+    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
 
   # set up graphics system
-  .opendev(pdf.file, width, height)
+  .opendev(pdf_file, width, height)
 
   # plot the individual flips and the running mean
   orig.params <- par(no.readonly=TRUE)
@@ -49,13 +62,13 @@ function(n, prob=.5, show.title=TRUE,
 
   if (!pause) {
     lines(ybar, type="l", lwd=3, col="coral3")
-    if (show.flips) 
+    if (show_flips) 
       points(1:n, flips, col="lightsteelblue", pch=23, bg="darkblue", cex=.7)
   }
   else {
     if (pause) cat("\n>>> Press Enter to obtain the next sample <<< \n\n")
     for (i in 1:(n)) {
-      if (show.flips)
+      if (show_flips)
         points(i, flips[i], col="lightsteelblue", pch=23, bg="darkblue", cex=.7)
       invisible(readline())
       segments(i, ybar[i], i+1, ybar[i+1], lwd=3, col="coral3")
@@ -63,7 +76,7 @@ function(n, prob=.5, show.title=TRUE,
 
   }
 
-  if (show.title) {
+  if (show_title) {
     mainlabel <- paste("Sample Mean after", toString(n), "Coin Flips:", toString(.fmt(ybar[n],3)), sep=" ")
    title(main=mainlabel, cex.main=.85)
   }
@@ -74,9 +87,9 @@ function(n, prob=.5, show.title=TRUE,
   mtext(bquote(paste(" ", .(n-n.heads), " Tails")), side=4, cex=.7, las=2, at=c(0))
 
   # terminate pdf graphics system
-  if (!is.null(pdf.file)) {
+  if (!is.null(pdf_file)) {
     dev.off()
-    .showfile(pdf.file, "coin flips")
+    .showfile(pdf_file, "coin flips")
   }
 
 }

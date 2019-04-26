@@ -1,6 +1,6 @@
 ScatterPlot <-
 function(...) {
 
- Plot(fun.call=match.call(), vbs.plot="s", ...)
+ Plot(fun_call=match.call(), vbs_plot="s", ...)
 
 }

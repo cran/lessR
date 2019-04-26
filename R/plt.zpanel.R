@@ -1,8 +1,8 @@
 .panel.bwplot <-
-function (x, y, box.ratio=1, vbs.size=box.ratio/(1 + box.ratio), 
+function (x, y, box.ratio=1, vbs_size=box.ratio/(1 + box.ratio), 
     horizontal=TRUE, alpha=trellis.par.get("box.dot")$alpha,
     fill=box.rectangle$fill, varwidth=FALSE,
-    vbs.mean=FALSE, mean.color="darkred", fences=FALSE,
+    vbs_mean=FALSE, mean_color="darkred", fences=FALSE,
     notch=FALSE, notch.frac=0.5, ...,
     levels.fos=if (horizontal) sort(unique(y)) else sort(unique(x)), 
     stats=boxplot.stats, k.iqr=1.5, a=3, b=4,
@@ -42,7 +42,7 @@ function (x, y, box.ratio=1, vbs.size=box.ratio/(1 + box.ratio),
 #cat("\nblist.stats\n")
 #print(blist.stats)
       blist.out <- lapply(blist, "[[", "out")
-      blist.height <- vbs.size
+      blist.height <- vbs_size
       if (varwidth) {
           maxn <- max(table(y))
           blist.n <- sapply(blist, "[[", "n")
@@ -101,12 +101,12 @@ function (x, y, box.ratio=1, vbs.size=box.ratio/(1 + box.ratio),
               up30 <- blist.stats[, 4] + 2 * k.iqr * exp(-a*m.c) * iqr
             } 
 
-        s.t <- getOption("sub.theme")
-        fence.color <- ifelse (s.t == "black", "gray85", box.umbrella$col)
+        s.t <- getOption("sub_theme")
+        fence_color <- ifelse (s.t == "black", "gray85", box.umbrella$col)
         panel.segments(
             c(lo15, up15), levels.fos - blist.height/2,
             c(lo15, up15), levels.fos + blist.height/2, 
-            col=fence.color, alpha=box.umbrella$alpha, 
+            col=fence_color, alpha=box.umbrella$alpha, 
             lwd=box.umbrella$lwd, lty="dotted",
             identifier=paste(identifier, "cap", sep="."))
       }  # end fences
@@ -118,13 +118,13 @@ function (x, y, box.ratio=1, vbs.size=box.ratio/(1 + box.ratio),
           col=box.rectangle$col, alpha=alpha,
           identifier=paste(identifier, "dot", sep="."))
 
-      if (vbs.mean) {
+      if (vbs_mean) {
         mx <- mean(x, na.rm=TRUE)
         panel.segments(  # mean
             mx, levels.fos - blist.height/2,
             mx, levels.fos + blist.height/2,
             lwd=2, lty=box.rectangle$lty,
-            col=mean.color, alpha=alpha,
+            col=mean_color, alpha=alpha,
             identifier=paste(identifier, "dot", sep="."))
       }
 
@@ -135,11 +135,11 @@ function (x, y, box.ratio=1, vbs.size=box.ratio/(1 + box.ratio),
 # need to manually adjust the size of y downward because x is a subset
 # cannot call panel.xyplot directly because formal arg y has mult args
 .panel.stripplot <-
-function (x, y, jitter.data=FALSE, factor=0.5, amount=NULL, 
+function (x, y, jitter_data=FALSE, factor=0.5, amount=NULL, 
     horizontal=TRUE, groups=NULL, ..., identifier="stripplot") {
 
-    panel.xyplot(x=x, y=y[1:length(x)], jitter.x=jitter.data && !horizontal, 
-        jitter.y=jitter.data && horizontal, factor=factor, 
+    panel.xyplot(x=x, y=y[1:length(x)], jitter_x=jitter_data && !horizontal, 
+        jitter_y=jitter_data && horizontal, factor=factor, 
         amount=amount, horizontal=horizontal, 
         ..., identifier=identifier)
 }
@@ -149,7 +149,7 @@ function (x, y, jitter.data=FALSE, factor=0.5, amount=NULL,
 # panel.densityplot with an added line for panel.xyarea, parameters fill, color
 #panel.dnFill <-
 #function (x, fill, color, darg=list(n=512), plot.points="jitter", ref=FALSE, 
-    #groups=NULL, weights=NULL, jitter.amount=0.01 * diff(current.panel.limits()$ylim), 
+    #groups=NULL, weights=NULL, jitter_amount=0.01 * diff(current.panel.limits()$ylim), 
     #type="p", ..., identifier="density") 
 #{
     #if (ref) {
@@ -161,7 +161,7 @@ function (x, y, jitter.data=FALSE, factor=0.5, amount=NULL,
     #if (!is.null(groups)) {
         #panel.superpose(x, darg=darg, plot.points=plot.points, 
             #ref=FALSE, groups=groups, weights=weights, 
-            #panel.groups=panel.densityplot, jitter.amount=jitter.amount, 
+            #panel.groups=panel.densityplot, jitter_amount=jitter_amount, 
             #type=type, ...)
     #}
     #else {
@@ -170,7 +170,7 @@ function (x, y, jitter.data=FALSE, factor=0.5, amount=NULL,
             #rug=panel.rug(x=x, start=0, end=0, x.units=c("npc", 
                 #"native"), type=type, ..., identifier=paste(identifier, 
                 #"rug")), jitter=panel.xyplot(x=x, y=jitter(rep(0, 
-                #length(x)), amount=jitter.amount), type=type, 
+                #length(x)), amount=jitter_amount), type=type, 
                 #..., identifier=identifier))
         #density.fun <- function(x, weights, subscripts=TRUE, 
             #darg, ...) {

@@ -1,10 +1,10 @@
 .reg.Rmd <-
-function(nm, dname, fun.call, res.rows, pred.rows, res.sort,
-         digits.d, results, explain, interpret, document, code,
-         pvalues, tolerances, resid.max, numeric.all, X1.new,
+function(nm, dname, fun_call, res_rows, pred_rows, res_sort,
+         digits_d, results, explain, interpret, document, code,
+         pvalues, tolerances, resid.max, numeric.all, X1_new,
          new.val=matrix(nrow=n.vars-1, ncol=2, byrow=TRUE)) {
 
-  fncl <- .fun.call.deparse(fun.call) 
+  fncl <- .fun_call.deparse(fun_call) 
   if (regexec("Rmd", fncl)[1] > 0) fc <- .rm.arg("Rmd", fncl) 
   if (regexec("explain", fc)[1] > 0) fc <- .rm.arg.ns("explain", fc) 
   if (regexec("interpret", fc)[1] > 0) fc <- .rm.arg.ns("interpret", fc) 
@@ -17,7 +17,7 @@ function(nm, dname, fun.call, res.rows, pred.rows, res.sort,
   # set parameters
   n.vars <- length(nm)
   n.pred <- n.vars - 1
-  d <- digits.d
+  d <- digits_d
   Y <- nm[1]
   pred <- character(length=0)
   for (i in 1:n.pred) pred[i] <- nm[i+1]
@@ -627,7 +627,7 @@ sep="")
 "`r all.vars(r$formula)[r$n.vars]`, is the same for both the ANOVA ",
 "table and its regression slope coefficient because in both ",
 "situations the effects of all other predictor variables are ",
-"partialled out. ",
+"partialled out_ ",
 sep="")
 
   if (explain && n.pred > 1) tx[length(tx)+1] <- paste("\n",
@@ -727,7 +727,7 @@ sep="")
 "number of predictor variables relative to the number of rows of data ",
 "(cases). Accomplish this adjustment with the degrees of freedom, ",
 "to transform each Sum of Squares ",
-"to the corresponding Mean Squares. ",
+"to the corresponding Mean Squares_ ",
 sep="")
 
   if (explain) tx[length(tx)+1] <- "$$R^2_{adj} = "
@@ -1130,14 +1130,14 @@ sep="")
 
 
   
-  if (res.rows >0) {
+  if (res_rows >0) {
 
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- "## Analysis of Residuals and Influence"
 
     if (explain) tx[length(tx)+1] <- paste(
 "Values of ", Y, " fitted by the estimated model do not generally ",
-"equal the corresponding data values. Which cases (rows of data) ",
+"equal the corresponding data values_ Which cases (rows of data) ",
 "contribute the most to this lack of fit? ",
 sep="")
 
@@ -1167,22 +1167,22 @@ sep="")
       tx[length(tx)+1] <- "```"
     }
 
-    if (res.sort != "off") {
+    if (res_sort != "off") {
       cv[1] <- paste("`r xP(r$resid.max[1],2)`", sep="")
       for (i in 2:4)
         cv <- paste(cv, ", `r xP(r$resid.max[", i, "],2)`", sep="")
       cv <- paste(cv, " and `r xP(r$resid.max[5],2)`.", sep="")
       
 
-      if (res.sort == "cooks") txt <- "Cook's distances"
-      else if (res.sort == "rstudent") txt <- "Studentized residuals" 
-      else if (res.sort == "dffits") txt <- "dffits values" 
+      if (res_sort == "cooks") txt <- "Cook's distances"
+      else if (res_sort == "rstudent") txt <- "Studentized residuals" 
+      else if (res_sort == "dffits") txt <- "dffits values" 
  
       if (results) tx[length(tx)+1] <- paste(
 "From this analysis the five largest ", txt, ": ", cv,
 sep="")
 
-      if (interpret  && res.sort == "cooks") tx[length(tx)+1] <- paste("\n",
+      if (interpret  && res_sort == "cooks") tx[length(tx)+1] <- paste("\n",
 "An informal criterion ",
 "for evaluating the size of Cook\'s distance is a cutoff value of 1 ",
 "to indicate too large of a large size. ",
@@ -1194,7 +1194,7 @@ sep="")
       hh <- " has a value"
   
     lbl <- xRow(resid.max)
-    if (interpret  && res.sort == "cooks"  && (length(which(resid.max > 1)) > 0))
+    if (interpret  && res_sort == "cooks"  && (length(which(resid.max > 1)) > 0))
       tx[length(tx)+1] <- paste(
 "The following case", hh, " more than the ", 
 "cutoff of 1: ", xAnd(lbl[which(resid.max > 1)]), ". ",
@@ -1207,19 +1207,19 @@ sep="")
 sep="")
 
 
-    if (interpret  && res.sort == "cooks"  && (length(which(resid.max > 1)) == 0))
+    if (interpret  && res_sort == "cooks"  && (length(which(resid.max > 1)) == 0))
       tx[length(tx)+1] <- paste(
 "No cases have a Cook's distance larger than 1 in this analysis. ", 
 sep="")
 
 
-    }  # res.sort is on
+    }  # res_sort is on
 
-  }  # res.rows > 0
+  }  # res_rows > 0
 
 
 
-  if (pred.rows > 0) {
+  if (pred_rows > 0) {
 
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- "## Prediction Intervals"
@@ -1228,7 +1228,7 @@ sep="")
 "Ultimately the analysis moves beyond the training sample. ",
 "Prediction is from _new_ data values of ", X, ", what may be ",
 "called the _prediction sample_. Applying these new data values ",
-"to the estimated model yields the predicted values. ",
+"to the estimated model yields the predicted values_ ",
 "For data values from the training sample, the fitted value and ",
 "predicted value are the same, ",
 "calculated from the same estimated model, but are ",
@@ -1270,7 +1270,7 @@ sep="")
 
 
 
-  if (n.pred <= 6  &&  numeric.all  &&  is.null(X1.new)) {
+  if (n.pred <= 6  &&  numeric.all  &&  is.null(X1_new)) {
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- "### Prediction Intervals from the Training Data"
   }
@@ -1324,7 +1324,7 @@ sep="")
 
 
 
-  if (n.pred <= 6  &&  numeric.all  &&  is.null(X1.new)) {
+  if (n.pred <= 6  &&  numeric.all  &&  is.null(X1_new)) {
 
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- "### Prediction Intervals from New Data"
@@ -1333,7 +1333,7 @@ sep="")
       tx[length(tx)+1] <- paste("\n",
 "New data values from which to obtain ",
 "a forecast, different from the training data, can be entered with ",
-"the options X1.new, X2.new, up to X6.new, where each option name refers to ",
+"the options X1_new, X2_new, up to X6_new, where each option name refers to ",
 "the position of the corresponding predictor variable in the specification ",
 "of the regression model. ", 
 "Any number of values can be specified for each predictor variable. ",
@@ -1353,7 +1353,7 @@ sep="")
     if (document) {
       tx[length(tx)+1] <- paste("\n",
 "Re-run the analysis to obtain the prediction intervals with these ",
-"specified values. ",
+"specified values_ ",
 sep="")
     }
 
@@ -1361,7 +1361,7 @@ sep="")
     cv <- ",\n        "
     for (i in 1:n.pred)
       cv <- paste(cv,
-" X", i, ".new=c(", new.val[i,1], ",", new.val[i,2], ")",
+" X", i, "_new=c(", new.val[i,1], ",", new.val[i,2], ")",
 ifelse(i == n.pred, "", ","), 
 sep="")
     cv <- paste(cv, ",\n         graphics = FALSE", sep="")
@@ -1378,13 +1378,13 @@ sep="")
       if (n.pred > 1)
         tx[length(tx)+1] <- paste("\n",
 "The new data values are specified for each variable separately, but ",
-"a row of data consists of data values for all the predictor values. ",
+"a row of data consists of data values for all the predictor values_ ",
 "Accordingly, calculate a prediction interval for each combination ",
 "of the specified new values for each predictor variable. ",
 sep="")
     else
       tx[length(tx)+1] <- paste("\n",
-"Calculate the piction intervals only for the new data values. ",
+"Calculate the piction intervals only for the new data values_ ",
 sep="")
     }
 

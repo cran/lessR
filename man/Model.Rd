@@ -1,28 +1,28 @@
 \name{Model}
 \alias{Model}
 \alias{model}
-\alias{model.brief}
+\alias{model_brief}
 
 
 \title{Regression Analysis, ANOVA or t-test}
 
 \description{
-Abbreviation: \code{model}, \code{model.brief}
+Abbreviation: \code{model}, \code{model_brief}
 
 Automatically selects and then provides an analysis of a linear model: OLS regression, Logistic regression, ANOVA, or a t-test depending on the proprieties of the data. Comprehensive regression analysis with graphics from a single, simple function call with many default settings, each of which can be re-specified.  By default the data exists as a data frame with the default name of \code{d}, such as data read by the \code{lessR} \code{rad} function.  Specify the model in the function call according to an R \code{\link{formula}}, that is, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign.  
 }
 
 \usage{
-Model(my.formula, data=d, brief=getOption("brief"), xlab=NULL, \ldots)
+Model(my_formula, data=d, brief=getOption("brief"), xlab=NULL, \ldots)
 
-model.brief(\ldots, brief=TRUE) 
+model_brief(\ldots, brief=TRUE) 
 
 model(\ldots) 
 }
 
 
 \arguments{
-  \item{my.formula}{Standard R \code{\link{formula}} for specifying a model.  For
+  \item{my_formula}{Standard R \code{\link{formula}} for specifying a model.  For
        example, for a response variable named Y and two predictor variables, X1 and 
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
   \item{data}{The default name of the data frame that contains the data for analysis 

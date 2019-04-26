@@ -1,5 +1,5 @@
 .ss.numeric <-
-function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
+function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
          x.name=NULL, ...) {
 
   # get variable labels if exist
@@ -30,20 +30,20 @@ function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     vectors <- split(x, by)
   }
 
-  if (is.null(digits.d)) {
-    dig.dec <- .max.dd(x) + 1
-    if (dig.dec == 1) dig.dec <- 2
+  if (is.null(digits_d)) {
+    digits_d <- .max.dd(x) + 1
+    if (digits_d == 1) digits_d <- 2
   }
   else
-    dig.dec <- digits.d
-  options(digits.d=dig.dec)
-  if (dig.dec > 10  && is.null(digits.d)) {
-    cat("\nThese data values contain ", dig.dec, " decimal digits. To enhance\n",
+    digits_d <- digits_d
+  options(digits_d=digits_d)
+  if (digits_d > 10  && is.null(digits_d)) {
+    cat("\nThese data values contain ", digits_d, " decimal digits. To enhance\n",
         "the readability of the output, only 4 decimal digits are\n",
-        "displayed.  To customize this setting, use the digits.d  parameter.\n",
-        "Example for Variables Y and X:  > ss(Y, by=X, digits.d=3)\n\n",
+        "displayed.  To customize this setting, use the digits_d  parameter.\n",
+        "Example for Variables Y and X:  > ss(Y, by=X, digits_d=3)\n\n",
         sep="")
-    dig.dec <- 4
+    digits_d <- 4
   }
 
   # get maximum chars in 1st three columns
@@ -75,10 +75,10 @@ function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     m <- mean(xx, na.rm=TRUE)
     s <- sd(xx, na.rm=TRUE)
     if (is.na(s) || is.null(s))
-      n.ln <- nchar(as.character(round(m, dig.dec))) + dig.dec
+      n.ln <- nchar(as.character(round(m, digits_d))) + digits_d
     else
-      n.ln <- max(nchar(as.character(round(m, dig.dec))), 
-                  nchar(as.character(round(s, dig.dec)))) + dig.dec
+      n.ln <- max(nchar(as.character(round(m, digits_d))), 
+                  nchar(as.character(round(s, digits_d)))) + digits_d
     if (n.ln > max.ln) max.ln <- n.ln
   }
   if (max.ln < 5) max.ln <- max.ln + 1
@@ -150,7 +150,7 @@ function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
       nbuf <- ifelse (n.lines == 1, 2, 4)
 
       n.lbl <- .fmtc("n", nchar(as.character(n))+nbuf+max.lv-1)
-      miss.lbl <- .fmtc("miss", nchar(as.character(n.miss))+5)
+      miss_lbl <- .fmtc("miss", nchar(as.character(n.miss))+5)
       m.lbl <- .fmtc("mean", max.ln)
       s.lbl <- .fmtc("sd", max.ln)
       mn.lbl <- .fmtc("min", max.ln)
@@ -158,7 +158,7 @@ function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
       mx.lbl <- .fmtc("max", max.ln)
 
       if (brief)
-        tx[length(tx)+1] <- paste(n.lbl, miss.lbl, m.lbl, s.lbl, mn.lbl,
+        tx[length(tx)+1] <- paste(n.lbl, miss_lbl, m.lbl, s.lbl, mn.lbl,
                                  md.lbl, mx.lbl) 
       else {
         sk.lbl <- .fmtc("skew", max.ln)
@@ -166,7 +166,7 @@ function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
         q1.lbl <- .fmtc("qrt1", max.ln)
         q3.lbl <- .fmtc("qrt3", max.ln)
         qr.lbl <- .fmtc("IQR", max.ln)
-        tx[length(tx)+1] <- paste(n.lbl, miss.lbl, m.lbl, s.lbl, sk.lbl,
+        tx[length(tx)+1] <- paste(n.lbl, miss_lbl, m.lbl, s.lbl, sk.lbl,
               kt.lbl, mn.lbl, q1.lbl, md.lbl, q3.lbl, mx.lbl, qr.lbl)
       }
     }  # end first line, labels
@@ -174,31 +174,31 @@ function(x, by=NULL, digits.d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     # write values
     lvl <- .fmtc(p.lv, max.lv)
     n.c <- .fmti(n, max.n+1)
-    miss.c <- .fmti(n.miss, max.nm+5)
+    miss_c <- .fmti(n.miss, max.nm+5)
 
     if (n == 0) 
-      tx[length(tx)+1] <- paste(lvl, n.c, miss.c)
+      tx[length(tx)+1] <- paste(lvl, n.c, miss_c)
 
     else if (n == 1) {
-        m.c <- .fmt(m, dig.dec, max.ln)
-        tx[length(tx)+1] <- paste(lvl, n.c, miss.c, m.c)
+        m.c <- .fmt(m, digits_d, max.ln)
+        tx[length(tx)+1] <- paste(lvl, n.c, miss_c, m.c)
     }
     else if (n > 1) {
-      m.c <- .fmt(m, dig.dec, max.ln)
-      s.c <- .fmt(s, dig.dec, max.ln)
-      mn.c <- .fmt(mn, dig.dec, max.ln)
-      md.c <- .fmt(md, dig.dec, max.ln)
-      mx.c <- .fmt(mx, dig.dec, max.ln)
+      m.c <- .fmt(m, digits_d, max.ln)
+      s.c <- .fmt(s, digits_d, max.ln)
+      mn.c <- .fmt(mn, digits_d, max.ln)
+      md.c <- .fmt(md, digits_d, max.ln)
+      mx.c <- .fmt(mx, digits_d, max.ln)
 
       if (brief)
-        tx[length(tx)+1] <- paste(lvl, n.c, miss.c, m.c, s.c, mn.c, md.c, mx.c)
+        tx[length(tx)+1] <- paste(lvl, n.c, miss_c, m.c, s.c, mn.c, md.c, mx.c)
       else {
-        sk.c <- .fmt(sk, dig.dec, max.ln)
-        kt.c <- .fmt(kt, dig.dec, max.ln)
-        q1.c <- .fmt(q1, dig.dec, max.ln)
-        q3.c <- .fmt(q3, dig.dec, max.ln)
-        qr.c <- .fmt(qr, dig.dec, max.ln)
-        tx[length(tx)+1] <- paste(lvl, n.c, miss.c, m.c, s.c, sk.c, kt.c,
+        sk.c <- .fmt(sk, digits_d, max.ln)
+        kt.c <- .fmt(kt, digits_d, max.ln)
+        q1.c <- .fmt(q1, digits_d, max.ln)
+        q3.c <- .fmt(q3, digits_d, max.ln)
+        qr.c <- .fmt(qr, digits_d, max.ln)
+        tx[length(tx)+1] <- paste(lvl, n.c, miss_c, m.c, s.c, sk.c, kt.c,
              mn.c, q1.c, md.c, q3.c, mx.c, qr.c)
       }
     }

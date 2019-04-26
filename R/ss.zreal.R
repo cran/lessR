@@ -1,6 +1,6 @@
 .ss.real <-
-function(x, y=NULL, by=NULL, digits.d=NULL, x.name, y.name=NULL, by.name=NULL,
-         x.lbl=NULL, y.lbl=NULL, label.max=20, ...)  {
+function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
+         x.lbl=NULL, y.lbl=NULL, label_max=20, ...)  {
 
 
   n.dim <- length(dim(x))
@@ -11,9 +11,9 @@ function(x, y=NULL, by=NULL, digits.d=NULL, x.name, y.name=NULL, by.name=NULL,
 
     # potential abbreviation of column labels
     mx.chr <- max(nchar(colnames(x)), na.rm=TRUE)
-    if (mx.chr > label.max) {
+    if (mx.chr > label_max) {
       c.nm <- colnames(x)
-      colnames(x) <- .abbrev(colnames(x), label.max)
+      colnames(x) <- .abbrev(colnames(x), label_max)
     }
 
     # width of column 1
@@ -62,7 +62,7 @@ function(x, y=NULL, by=NULL, digits.d=NULL, x.name, y.name=NULL, by.name=NULL,
     rwnm <- paste(" ", rownames(x)[i])
     tx[length(tx)+1] <- format(rwnm, width=max.c1, justify="left")
     for (j in 1:ncol(x)) {
-      tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i,j], d=digits.d,
+      tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i,j], d=digits_d,
              w=max.ln[j]), sep="")
     }
   }
@@ -77,9 +77,9 @@ function(x, y=NULL, by=NULL, digits.d=NULL, x.name, y.name=NULL, by.name=NULL,
 
     # potential abbreviation of column labels
     mx.chr <- max(nchar(names(x)), na.rm=TRUE)
-    if (mx.chr > label.max) {
+    if (mx.chr > label_max) {
       c.nm <- names(x)
-      names(x) <- .abbrev(names(x), label.max)
+      names(x) <- .abbrev(names(x), label_max)
     }
 
      names(x)[which(is.na(names(x)))] <- "<NA>"  # for y given, a missing x
@@ -103,7 +103,7 @@ function(x, y=NULL, by=NULL, digits.d=NULL, x.name, y.name=NULL, by.name=NULL,
 
       tx[length(tx)+1] <- ""
       for (i in 1:length(x))
-        tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i], d=digits.d,
+        tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i], d=digits_d,
              w=max.ln[i]+1), sep="")
 
       txtbl <- tx

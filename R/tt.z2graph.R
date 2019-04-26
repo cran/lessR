@@ -1,7 +1,7 @@
 .TwoGraph <-
-function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
+function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits_d, brief,
          n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
-         clpct, tvalue, pvalue, ub, lb, x.lab, show.title) {
+         clpct, tvalue, pvalue, ub, lb, x.lab, show_title) {
 
   dYA <- suppressWarnings(density(YA, bw1))
   dYB <- suppressWarnings(density(YB, bw2))
@@ -9,8 +9,8 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   if (!brief) {
     cat("\n\n------ Graphics Smoothing Parameter ------\n\n")
     mytitle <- "Density bandwidth for "
-    cat(mytitle, Xnm, " ", X1nm, ": ", .fmt(dYA$bw,digits.d), sep="", "\n")
-    cat(mytitle, Xnm, " ", X2nm, ": ", .fmt(dYB$bw,digits.d), sep="", "\n")
+    cat(mytitle, Xnm, " ", X1nm, ": ", .fmt(dYA$bw,digits_d), sep="", "\n")
+    cat(mytitle, Xnm, " ", X2nm, ": ", .fmt(dYB$bw,digits_d), sep="", "\n")
   }
 
   # colors
@@ -36,27 +36,27 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   }
 
   # values needed for graph
-  min.x <- min(min(dYA$x),min(dYB$x))  # min x coordinate for graph
+  min_x <- min(min(dYA$x),min(dYB$x))  # min x coordinate for graph
   max.x <- max(max(dYA$x),max(dYB$x))  # max x coordinate for graph
   max.y <- max(max(dYA$y),max(dYB$y))  # max y coordinate
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
 
-  col.tx <- getOption("lab.color")
-  col.ln <- getOption("bar.color")
+  col.tx <- getOption("lab_color")
+  col.ln <- getOption("bar_color")
 
 
   # ------------------------------
   # plot: set up coordinate system
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  par(bg=getOption("window.fill"))
+  par(bg=getOption("window_fill"))
   par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1.1, cex.lab=1.35)
 
   plot.new()
-  plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
+  plot.window(xlim=c(min_x,max.x), ylim=c(0,max.y))
 
-  axis(1, col=getOption("axis.x.color"), col.axis=getOption("lab.color"))
-  box(col=getOption("panel.color"))
+  axis(1, col=getOption("axis_x_color"), col.axis=getOption("lab_color"))
+  box(col=getOption("panel_color"))
   if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
   title(xlab=x.lab, col.lab=col.tx)
 
@@ -84,7 +84,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   lines(dYB, col=col.2t, lty="solid", lwd=lwd.border)
 
   # minimum mean difference of practical importance
-  col.e <- getOption("lab.color")  # color for effect
+  col.e <- getOption("lab_color")  # color for effect
   if (!is.null(mmd) | !is.null(msmd)) {
     mid <- (m1 + m2) / 2
     lr <- mid + .5*mmd  # line right
@@ -100,32 +100,32 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   # legends with descriptive stats (m1 > m2)
   textR <- paste(Xnm,X1nm)
   nR <- n1
-  mR <- .fmt(m1,digits.d)
-  sR <- .fmt(s1,digits.d)
+  mR <- .fmt(m1,digits_d)
+  sR <- .fmt(s1,digits_d)
   col.R <- col.1
   aR <- 45
 
   textL <- paste(Xnm,X2nm)
   nL <- n2
-  mL <- .fmt(m2,digits.d)
-  sL <- .fmt(s2,digits.d)
+  mL <- .fmt(m2,digits_d)
+  sL <- .fmt(s2,digits_d)
   col.L <- col.2
   aL <- -45
 
   # legends
-  col.lgnd <- getOption("lab.color")
+  col.lgnd <- getOption("lab_color")
   cex.lgnd <- 1.1
 
-  radj <- xleft + .02*(max.x-min.x)
+  radj <- xleft + .02*(max.x-min_x)
   # legend("topleft", legend = textL, fill=col.L, density=20, angle=aL, bty="n",
       # text.col=col.lgnd, cex=cex.lgnd)
   text(radj, ytop-.05*max.y, label=c(paste(Xnm,X2nm)),
       adj=0, col=col.lgnd, cex=cex.lgnd)
   text(radj, ytop-.115*max.y, label=bquote(paste("n = ", .(nL))),
       adj=0, col=col.lgnd, cex=cex.lgnd)
-  text(radj, ytop-.170*max.y, label=bquote(paste("m = ", .(.fmtc(mL,digits.d)))),
+  text(radj, ytop-.170*max.y, label=bquote(paste("m = ", .(.fmtc(mL,digits_d)))),
       adj=0, col=col.lgnd, cex=cex.lgnd)
-  text(radj, ytop-.225*max.y, label=bquote(paste("s = ", .(.fmtc(sL,digits.d)))),
+  text(radj, ytop-.225*max.y, label=bquote(paste("s = ", .(.fmtc(sL,digits_d)))),
       adj=0, col=col.lgnd, cex=cex.lgnd)
 
   ladj <- xright - .02*(xright-xleft)
@@ -135,9 +135,9 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
       adj=1, col=col.lgnd, cex=cex.lgnd)
   text(ladj, ytop-.115*max.y, label=bquote(paste("n = ", .(nR))),
       adj=1, col=col.lgnd, cex=cex.lgnd)
-  text(ladj, ytop-.170*max.y, label=bquote(paste("m = ", .(.fmtc(mR,digits.d)))),
+  text(ladj, ytop-.170*max.y, label=bquote(paste("m = ", .(.fmtc(mR,digits_d)))),
       adj=1, col=col.lgnd, cex=cex.lgnd)
-  text(ladj, ytop-.225*max.y, label=bquote(paste("s = ", .(.fmtc(sR,digits.d)))),
+  text(ladj, ytop-.225*max.y, label=bquote(paste("s = ", .(.fmtc(sR,digits_d)))),
       adj=1, col=col.lgnd, cex=cex.lgnd)
 
   # scale for s-pooled, d, mdiff at top of graph
@@ -168,14 +168,14 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
   text((m1+m2)/2, ytop-.11*max.y, label="smd", col=col.d.unit, cex=.9)
 
   # print mdiff value towards bottom  
-  text((m1+m2)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d), col=col.d.unit, cex=.9)
+  text((m1+m2)/2, ybot+.11*max.y, label=.fmt(mdiff, digits_d), col=col.d.unit, cex=.9)
   # horiz bar connects means
   segments(mlow, ybot+.09*max.y, mhi, ybot+.09*max.y, col=col.d.unit, lwd=1)
   # print diff towards bottom
   text((m1+m2)/2, ybot+.07*max.y, label="diff", col=col.d.unit, cex=.9)
 
   # title area, above graph
-  if (show.title) {
+  if (show_title) {
     mtext(paste("Two-Group Plot with Means"), side=3, line=6.6, font=2,
           col=col.tx)
     mtext(paste("Compare",Ynm,"for",Xnm,X1nm,"and",X2nm), side=3, line=5.5,

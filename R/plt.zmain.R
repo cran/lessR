@@ -1,58 +1,58 @@
 .plt.main <-
-function(x, y, by=NULL, n.cat=getOption("n.cat"),
+function(x, y, by=NULL, n_cat=getOption("n_cat"),
          cat.x=FALSE, num.cat.x=FALSE, cat.y=FALSE, num.cat.y=FALSE,
          object="point", stat="data",
 
-         col.fill=getOption("pt.fill"),
-         area.fill=getOption("pt.fill"),
-         col.color=getOption("pt.color"),
+         col_fill=getOption("pt_fill"),
+         area_fill=getOption("pt_fill"),
+         col_color=getOption("pt_color"),
 
-         col.trans=NULL, col.segment=getOption("segment.color"),
+         col.trans=NULL, col.segment=getOption("segment_color"),
 
-         xy.ticks=TRUE,
-         xlab=NULL, ylab=NULL, main=NULL, main.cex=NULL, sub=NULL,
-         value.labels=NULL, label.max=20,
-         rotate.x=0, rotate.y=0, offset=0.5, prop=FALSE, origin.x=NULL,
+         xy_ticks=TRUE,
+         xlab=NULL, ylab=NULL, main=NULL, main_cex=NULL, sub=NULL,
+         value_labels=NULL, label_max=20,
+         rotate_x=0, rotate_y=0, offset=0.5, prop=FALSE, origin_x=NULL,
 
          size=NULL, shape="circle", means=TRUE,
-         segments.y=FALSE, segments.x=FALSE, ln.width=2,
+         segments_y=FALSE, segments_x=FALSE, ln.width=2,
 
-         smooth=FALSE, smooth.points=100, smooth.size=1,
-         smooth.exp=0.25, smooth.bins=128,
+         smooth=FALSE, smooth_points=100, smooth_size=1,
+         smooth_exp=0.25, smooth_bins=128,
 
-         radius=0.15, power=0.6, size.cut=TRUE,
-         bubble.text=getOption("bubble.text.color"),
+         radius=0.15, power=0.6, size_cut=TRUE,
+         bubble_text=getOption("bubble_text_color"),
          col.low=NULL, col.hi=NULL,
 
-         ID=NULL, ID.color="gray50", ID.size=0.75, out.ind,
-         out.fill, out.color, out.shape.miss,
+         ID=NULL, ID_color="gray50", ID_size=0.75, out_ind,
+         out_fill, out_color, out_shape.miss,
 
          fit.line="off", col.fit.line="gray55",
-         fit.lwd=getOption("fit.lw"),
-         fit.se=1, se.fill="gray80",
+         fit_lwd=getOption("fit.lw"),
+         fit_se=1, se_fill="gray80",
 
          ellipse=FALSE, col.ellipse="lightslategray",
-         ellipse.fill="off", ellipse.lwd,
+         ellipse_fill="off", ellipse_lwd,
 
-         center.line="default", show.runs=FALSE, stack=FALSE,
+         center_line="default", show_runs=FALSE, stack=FALSE,
 
-         freq.poly=FALSE, jitter.x=0, jitter.y=0,
+         freq.poly=FALSE, jitter_x=0, jitter_y=0,
 
-         xlab.adj=0, ylab.adj=0, bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
-         legend.title=NULL,
+         xlab_adj=0, ylab_adj=0, bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
+         legend_title=NULL, scale_x=NULL, scale_y=NULL,
 
          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
-         add.cex=NULL, add.lwd=1, add.lty="solid",
-         add.color=NULL, add.fill=NULL, add.trans=NULL,
+         add_cex=NULL, add_lwd=1, add_lty="solid",
+         add_color=NULL, add_fill=NULL, add_trans=NULL,
 
          quiet=getOption("quiet"), want.labels=TRUE, ...)  {
 
 
-  fill.bg <- getOption("panel.fill")
+  fill_bg <- getOption("panel_fill")
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
   size.pt <- size * .9  # size is set in Plot.R, reduce a bit for here
 
-  if (center.line == "default") if (date.ts) center.line <- "off"
+  if (center_line == "default") if (date.ts) center_line <- "off"
 
   # x and y come across here in their natural state, within each data frame
   # a time series has dates for x and numeric for y, factors are factors, etc
@@ -74,7 +74,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   nm.x <- names(x)
   if (is.factor(x[,1])) {
     x.lvl <- levels(x[,1])
-    if (!is.null(value.labels)) value.labels <- gsub(" ", "\n", x.lvl)
+    if (!is.null(value_labels)) value_labels <- gsub(" ", "\n", x.lvl)
     x <- as.matrix(as.integer(x[,1]))
   }
   else if (!date.ts) {
@@ -98,7 +98,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # dimensions
   n.xcol <- ncol(x)
   n.ycol <- ncol(y)
-  n.col <- max(n.xcol, n.ycol)
+  n_col <- max(n.xcol, n.ycol)
   nrows <- nrow(x)
 
   if (date.ts) {
@@ -107,7 +107,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
 
 
-  if (n.col > 1) center.line <- "off"   # no center.line for multiple plots
+  if (n_col > 1) center_line <- "off"   # no center_line for multiple plots
 
   if (is.null(x.lvl) && !is.null(y.lvl) && unique.y ||
       is.null(y.lvl) && !is.null(x.lvl) && unique.x) {
@@ -116,21 +116,21 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   else
     cleveland <- FALSE
 
-  # get lab.x.cex  lab.y.cex
-  lab.cex <- getOption("lab.cex")
-  lab.x.cex <- getOption("lab.x.cex")
-  lab.y.cex <- getOption("lab.y.cex")
-  lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
-  # adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
-  lab.y.cex <- ifelse(is.null(lab.y.cex), lab.cex, lab.y.cex)
-  # adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
+  # get lab_x_cex  lab_y_cex
+  lab_cex <- getOption("lab_cex")
+  lab_x_cex <- getOption("lab_x_cex")
+  lab_y_cex <- getOption("lab_y_cex")
+  lab_x_cex <- ifelse(is.null(lab_x_cex), lab_cex, lab_x_cex)
+  # adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
+  lab_y_cex <- ifelse(is.null(lab_y_cex), lab_cex, lab_y_cex)
+  # adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
 
   if (date.ts) xx.lab <- xlab
 # if (is.null(ylab))  # no ylab for Cleveland dot plot
 #   if (is.null(x.lvl) && !is.null(y.lvl) && unique.y) ylab <- ""
   if (want.labels) {
-    gl <- .getlabels(xlab, ylab, main, lab.x.cex=lab.x.cex,
-                     lab.y.cex=lab.y.cex)
+    gl <- .getlabels(xlab, ylab, main, lab_x_cex=lab_x_cex,
+                     lab_y_cex=lab_y_cex)
     x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
     y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
     main.lab <- gl$mb
@@ -152,26 +152,26 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     if (!is.null(x.lbl)) y.lab <- paste(x.name, ": ", x.lbl, sep="")
   }
 
-  if (is.null(col.fill)) col.fill <- "transparent"
+  if (is.null(col_fill)) col_fill <- "transparent"
 
-  # by default display center.line only if runs, so detect if a run
-  if (center.line == "default"  &&  !date.ts  &&  object == "both") {
+  # by default display center_line only if runs, so detect if a run
+  if (center_line == "default"  &&  !date.ts  &&  object == "both") {
     y.clean <- na.omit(y)
     m <- mean(y.clean)
     n.change <- 0
     for (i in 1:(length(y.clean)-1))
       if ((y.clean[i+1] > m) != (y.clean[i] > m)) n.change <- n.change+1
     if (n.change/(length(y.clean)-1) < .15)
-      center.line <- "off"
+      center_line <- "off"
     else
-      center.line <- "median"
+      center_line <- "median"
   }
   else  # default if not automatically assigned above
-    if (!(center.line %in% c("off", "mean"))) center.line <- "median"
+    if (!(center_line %in% c("off", "mean"))) center_line <- "median"
 
   # decimal digits
-  digits.d <- .max.dd(y[,1]) + 1
-  options(digits.d=digits.d)
+  digits_d <- .max.dd(y[,1]) + 1
+  options(digits_d=digits_d)
 
 
   # -------------------------
@@ -181,26 +181,26 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   # graphic system parameters
 
-  # x.val is either any value.labels or x.lvl, or NULL if x is numeric
+  # x.val is either any value_labels or x.lvl, or NULL if x is numeric
   mx.x.val.ln <- 1
   mx.y.val.ln <- 1
   if (!date.ts) {
     x.val <- NULL
     y.val <- y.lvl  # if not reset to x value labels
     max.lbl.y <- NULL
-    if (!is.null(value.labels)) {
-      x.val <- value.labels
+    if (!is.null(value_labels)) {
+      x.val <- value_labels
       if (length(unique(y[,1])) > 1) {  # see if set y axis values to those of x
         if (length(unique(na.omit(x[,1]))) == length(unique(na.omit(y[,1])))) {
           if (all(sort(unique(x[,1])) == sort(unique(y[,1])))) {
-            y.val <- value.labels
-            v <- unlist(strsplit(value.labels, "\n", fixed=TRUE))
+            y.val <- value_labels
+            v <- unlist(strsplit(value_labels, "\n", fixed=TRUE))
             max.lbl.y <- max(nchar(v))
           }
         }
       }
     }
-    else {  # is null value.labels
+    else {  # is null value_labels
       x.val <- x.lvl  # x.val is NULL if x is numeric, ignored
       y.val <- y.lvl  # y.val ignored if y is numeric
     }
@@ -224,19 +224,22 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     mx.y.val.ln <- stuff$mx.val.ln
   }
 
-  axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")),
-    getOption("axis.cex"), getOption("axis.y.cex"))
+  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
+    getOption("axis_cex"), getOption("axis_y_cex"))
 
   if (!is.null(y.val)) {  # y-axis labels are characters
     yv <- unlist(strsplit(y.val, "\n", fixed=TRUE))
-    max.y.width <- max(strwidth(yv, units="inches", cex=axis.y.cex))
+    max.y.width <- max(strwidth(yv, units="inches", cex=axis_y_cex))
     if (options("device") != "RStudioGD")  # not work in R, only RStudio
-      max.y.width <- .09 * axis.y.cex * max(nchar(yv))
+      max.y.width <- .09 * axis_y_cex * max(nchar(yv))
   }
   else {  # y-axis labels are numeric
+    mn.y <- min(y, na.rm=TRUE)
+    mx.y <- max(y, na.rm=TRUE)
+    prety <- pretty(c(mn.y, mx.y))
     prety <- max(pretty(c(min(y, na.rm=TRUE), max(y, na.rm=TRUE))))
     mx.num <-  ifelse (!prop, as.character(prety), .fmt(prety, 2))
-    max.y.width <- max(strwidth(mx.num, cex=axis.y.cex, units="inches"))
+    max.y.width <- max(strwidth(mx.num, cex=axis_y_cex, units="inches"))
   }
 
 
@@ -257,23 +260,23 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
 
   # set margins
-  margs <- .marg(max.y.width, y.lab, x.lab, main.lab, rotate.x,
+  margs <- .marg(max.y.width, y.lab, x.lab, main.lab, rotate_x,
                 mx.x.val.ln, mx.y.val.ln,
-                lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex)
+                lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex)
   mm <- margs$lm  # left margin, lm is linear model
   tm <- margs$tm
   rm <- margs$rm
   bm <- margs$bm
-  n.lab.x.ln <- margs$n.lab.x.ln
-  n.lab.y.ln <- margs$n.lab.y.ln
+  n.lab_x.ln <- margs$n.lab_x.ln
+  n.lab_y.ln <- margs$n.lab_y.ln
 
   if (n.xcol > 1  ||  n.ycol > 1  ||  !is.null(by)) {  # vertical legend room
-    new.adj <- .22  + (.65 * axis.y.cex)
+    new.adj <- .22  + (.65 * axis_y_cex)
     rm <- rm + new.adj 
-    if (axis.y.cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
+    if (axis_y_cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
   }
   if (object == "both")
-    if (center.line != "off") rm <- rm + .4  # room for center.line label
+    if (center_line != "off") rm <- rm + .4  # room for center_line label
 
   if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
@@ -288,7 +291,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
 
-  par(bg=getOption("window.fill"))
+  par(bg=getOption("window_fill"))
   par(mai=c(bm, mm, tm, rm))
 
 
@@ -316,6 +319,14 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     }
     mx.y <- max(yl)
   }
+  if (!is.null(scale_x)) {
+     mn.x <- min(mn.x, scale_x[1])
+     mx.x <- max(mx.x, scale_x[2])
+  }
+  if (!is.null(scale_y)) {
+     mn.y <- min(mn.y, scale_y[1])
+     mx.y <- max(mx.y, scale_y[2])
+  }
 
 
   if (!do.ellipse) {
@@ -329,15 +340,15 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       mx.y <- mx.y + .4
     }
 
-    if (is.null(origin.x)) {  # set default for minimum x-value displayed
+    if (is.null(origin_x)) {  # set default for minimum x-value displayed
       if (stat %in% c("count", "proportion", "%"))
-        origin.x <- 0
+        origin_x <- 0
       else
-        origin.x <- mn.x
+        origin_x <- mn.x
     }
     if (stat != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
 
-    region <- matrix(c(origin.x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
+    region <- matrix(c(origin_x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
 
 
   }  # no ellipse
@@ -364,7 +375,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # axis ticks and values
   if (cat.x) {
     if (!is.null(x.lvl)) axT1 <- 1:length(x.lvl)   # mark category values
-    if (!is.null(x.val)) x.val <- .abbrev(x.val, label.max)
+    if (!is.null(x.val)) x.val <- .abbrev(x.val, label_max)
     if (num.cat.x) axT1 <- sort(unique(x))  # x.lvl or x.val are NULL
   }
   else {
@@ -376,10 +387,14 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           n.best <- 4
         else
           n.best <- 5
-        axT1 <- pretty(origin.x:mx.x, n=n.best)
+        axT1 <- pretty(origin_x:mx.x, n=n.best)
       }
-      else
-        axT1 <- pretty(c(origin.x, x))  # else numeric, so all the ticks
+      else {
+        if (is.null(scale_x))
+          axT1 <- pretty(c(origin_x, x))  # else numeric, so all the ticks
+        else
+          axT1 <- axTicks(1, axp=scale_x)
+      }
     }
     else
       axT1 <-axTicks(1)  
@@ -387,18 +402,18 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   if (cat.y) {
     if (!is.null(y.lvl)) axT2 <- 1:length(y.lvl)
-    if (!is.null(y.val)) y.val <- .abbrev(y.val, label.max)
+    if (!is.null(y.val)) y.val <- .abbrev(y.val, label_max)
     if (num.cat.y) axT2 <- sort(unique(y))
   }
   else {
-    if (!date.ts)
-      axT2 <- pretty(y)
+    if (is.null(scale_y))
+      axT2 <- pretty(c(mn.y, mx.y))  # more extreme values than axTicks
     else
-      axT2 <- axTicks(2)
+      axT2 <- axTicks(2, axp=scale_y)
   }
 
   # background color
-  rect(usr[1], usr[3], usr[2], usr[4], col=fill.bg, border="transparent")
+  rect(usr[1], usr[3], usr[2], usr[4], col=fill_bg, border="transparent")
 
   # grid lines (put before box color around plot)
   .grid("v", axT1)
@@ -406,40 +421,40 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
   # box around plot
   rect(usr[1], usr[3], usr[2], usr[4],
-    col="transparent", border=getOption("panel.color"),
-    lwd=getOption("panel.lwd"), lty=getOption("panel.lty"))
+    col="transparent", border=getOption("panel_color"),
+    lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
 
   # axes
-  if (xy.ticks) {
+  if (xy_ticks) {
     if (!bubble1) {
       if (!date.ts) {  # get ticks for both axes
         .axes(x.val, y.val, axT1, axT2,
-              rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
+              rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
       }
       else {  # time
-        axis.x.color <- ifelse(is.null(getOption("axis.x.color")),
-          getOption("axis.color"), getOption("axis.x.color"))
-        axis.x.text.color <- ifelse(is.null(getOption("axis.x.text.color")),
-          getOption("axis.text.color"), getOption("axis.x.text.color"))
-        axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")),
-            getOption("axis.cex"), getOption("axis.x.cex"))
-        adj <- .RSadj(axis.cex=axis.x.cex); axis.x.cex <- adj$axis.cex
+        axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
+          getOption("axis_color"), getOption("axis_x_color"))
+        axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
+          getOption("axis_text_color"), getOption("axis_x_text_color"))
+        axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
+            getOption("axis_cex"), getOption("axis_x_cex"))
+        adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
         my.mgp <- par("mgp")  # save to restore
-        mgp2 <- -0.275 + (0.9 * axis.x.cex)  # adjust label to axis distance
+        mgp2 <- -0.275 + (0.9 * axis_x_cex)  # adjust label to axis distance
         par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
-        axis.Date(1, x.val, col=axis.x.color, cex.axis=axis.x.cex,
-                  col.axis=axis.x.text.color, tck=-.02, ...)  # x-axis
+        axis.Date(1, x.val, col=axis_x_color, cex.axis=axis_x_cex,
+                  col.axis=axis_x_text_color, tck=-.02, ...)  # x-axis
         par(mgp = my.mgp)  # restore back to previous value
         .axes(NULL, y.val, axT1, axT2,
-              rotate.x=rotate.x, rotate.y=rotate.y,
+              rotate_x=rotate_x, rotate_y=rotate_y,
               offset=offset, y.only=TRUE, ...)  # y-axis
       }
     }
     else  # bubble1: 1-D scatter plot of categorical variable
       .axes(x.val, NULL, axT1, NULL,
-            rotate.x=rotate.x, rotate.y=rotate.y, offset=offset, ...)
+            rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
 
-  }  # end xy.ticks
+  }  # end xy_ticks
 
   # axis labels
   if (is.null(max.lbl.y)) {  # could be set earlier when x.val = y.val
@@ -456,9 +471,9 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   }
 
   .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl.y,
-          x.val, xy.ticks, offset=offset,
-          lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex, main.cex,
-          n.lab.x.ln, n.lab.y.ln, xlab.adj, ylab.adj, ...)
+          x.val, xy_ticks, offset=offset,
+          lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex,
+          n.lab_x.ln, n.lab_y.ln, xlab_adj, ylab_adj, ...)
 
 
   # ---------------
@@ -468,28 +483,28 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     # ------
     # colors
 
-    n.clrs <- max(n.col, n.by)
+    n.clrs <- max(n_col, n.by)
 
-  # prepare col.fill and col.color, values that enter into the analysis
+  # prepare col_fill and col_color, values that enter into the analysis
   # convert any name of a color range to the colors, otherwise leave unchanged
   #   set NULL value to default
 
-  if (!is.null(col.fill)) {
-    if (length(col.fill) == 1) col.fill <- .color.range(col.fill, n.clrs)
+  if (!is.null(col_fill)) {
+    if (length(col_fill) == 1) col_fill <- .color_range(col_fill, n.clrs)
   }
   else 
-    col.fill <- getOption("pt.fill")  # default
+    col_fill <- getOption("pt_fill")  # default
 
-  color.miss <- ifelse (is.null(col.color), TRUE, FALSE)
-  if (!color.miss) {
-    if (length(col.color) == 1) col.color <- .color.range(col.color, n.clrs)
+  color_miss <- ifelse (is.null(col_color), TRUE, FALSE)
+  if (!color_miss) {
+    if (length(col_color) == 1) col_color <- .color_range(col_color, n.clrs)
   }
   else {
-    if (stack  &&  col.fill != "transparent") {
-      for (i in 1:n.clrs) col.color[i] <- "black"
+    if (stack  &&  col_fill != "transparent") {
+      for (i in 1:n.clrs) col_color[i] <- "black"
     }
     else
-      col.color <- getOption("pt.color")  # default
+      col_color <- getOption("pt_color")  # default
   }
 
 
@@ -503,20 +518,20 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
     for (i in 1:length(ltype)) ltype[i] <- "solid"
 
     if (n.clrs == 1) {
-      color[1] <- col.color[1]
-      fill[1] <- col.fill[1]
+      color[1] <- col_color[1]
+      fill[1] <- col_fill[1]
     }
 
 #   else if (n.clrs == 2) {
-#     color[1] <- col.color[1]
-#     color[2] <- ifelse (length(col.color) > 1, col.color[2], col.color[1])
-#     if (getOption("sub.theme") == "black") {
+#     color[1] <- col_color[1]
+#     color[2] <- ifelse (length(col_color) > 1, col_color[2], col_color[1])
+#     if (getOption("sub_theme") == "black") {
 #       if (getOption("theme") != "gray")
-#         color[2] <- getOption("bar.color")
+#         color[2] <- getOption("bar_color")
 #       else
-#         color[2] <- getOption("lab.color")
+#         color[2] <- getOption("lab_color")
 #     }
-#     if (col.fill == "transparent") fill[1] <- color[1]
+#     if (col_fill == "transparent") fill[1] <- color[1]
 #     if (object == "both") {
 #       ltype[2] <- "dotted"
 #       if (!(getOption("theme") %in% c("gray")))
@@ -527,81 +542,81 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 #       }
 #     }  # end object is both
 #     else { 
-#       if (length(col.fill) == 1)
+#       if (length(col_fill) == 1)
 #         fill[2] <- "transparent"
 #       else
-#         fill[2] <- col.fill[2]
+#         fill[2] <- col_fill[2]
 #     }
 #   }  # end n.clrs=2
 
     else { # n.clrs > 1 
-      if (length(col.fill) > 1) {
-        fill <- col.fill  # use given color vector
+      if (length(col_fill) > 1) {
+        fill <- col_fill  # use given color vector
       }
       else if (!is.ordered(by)) {
         if (getOption("theme") %in% c("gray", "white")) {
-          if (col.fill != "transparent") fill <- getColors("grays", n=n.clrs)
+          if (col_fill != "transparent") fill <- getColors("grays", n=n.clrs)
         }
         else {
-          if (col.fill != "transparent")
+          if (col_fill != "transparent")
             fill <- getColors("hues", n=n.clrs)
           else
             fill <- "transparent"
-          if (object == "both"  &&  color.miss  &&  fill != "transparent")
+          if (object == "both"  &&  color_miss  &&  fill != "transparent")
             color <- fill
         }
       }
       else {  # ordered default
-        fill <- .color.range(.get.fill(), n.clrs)  # see if range
+        fill <- .color_range(.get_fill(), n.clrs)  # see if range
       }
     } # end n.clrs > 1
 
     
     #  kludge needed for Plot(c(x1,x2), y)
-    if (length(col.color) < length(fill) &&  # more fill than color colors
-        col.color == getOption("pt.color"))  # default
+    if (length(col_color) < length(fill) &&  # more fill than color colors
+        col_color == getOption("pt_color"))  # default
       color <- fill 
     else {
-      color <- col.color  # color different than fill
+      color <- col_color  # color different than fill
     }
 
-    if (length(col.color) == 1  &&  n.clrs > 1)
-      if (!color.miss)
-        for (i in 1:n.clrs) color[i] <- col.color
+    if (length(col_color) == 1  &&  n.clrs > 1)
+      if (!color_miss)
+        for (i in 1:n.clrs) color[i] <- col_color
       else {
-        if (col.color != "transparent")
+        if (col_color != "transparent")
           color <- getColors("hues", n=n.clrs)
         else
           color <- "transparent"
       }
 
-    if (!stack  &&  color.miss  &&  fill != "transparent"  &&  n.clrs > 1)
+    if (!stack  &&  color_miss  &&  fill != "transparent"  &&  n.clrs > 1)
       color <- fill
 
 
-    trans.pts <- ifelse(is.null(col.trans),
-                        getOption("trans.pt.fill"), col.trans)  # default
+    trans_pts <- ifelse(is.null(col.trans),
+                        getOption("trans_pt_fill"), col.trans)  # default
 
     # see if trans is customized for this analysis
     if (is.null(col.trans))  # no change, so no trans for Cleveland dp
-      trans.pts <- ifelse (cleveland, 0, getOption("trans.pt.fill")) 
+      trans_pts <- ifelse (cleveland, 0, getOption("trans_pt_fill")) 
     else
-      trans.pts <- col.trans
-    if (trans.pts > 0  &&  fill[1] != "transparent")
-      fill <- .maketrans(fill, (1-trans.pts)*256)
+      trans_pts <- col.trans
+    if (trans_pts > 0  &&  fill[1] != "transparent")
+      fill <- .maketrans(fill, (1-trans_pts)*256)
 
     # if (object != "point"  ||  size == 0) fill <- color  # no fill in legend
     fill[which(fill == "off")] <- "transparent"
     color[which(color == "off")] <- "transparent"
 
-     if (area.fill == "on") area.fill <- getOption("violin.fill")
-     if (object == "both") if (area.fill == "transparent") area.fill <- fill
-     if (ln.width == 0) area.fill <- "transparent"
+     if (area_fill == "on") area_fill <- getOption("violin_fill")
+     if (object == "both") if (area_fill == "transparent") area_fill <- fill
+     if (ln.width == 0) area_fill <- "transparent"
 
 
 
     # ----------
-    # plot lines (and area.fill)
+    # plot lines (and area_fill)
     if (object == "both") {
 
       if (n.xcol == 1  &&  n.ycol == 1) {
@@ -615,7 +630,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
           if (fill[1] != "transparent") # fill area
             polygon(c(x[1],x,x[length(x)]), c(min(y[,1]),y[,1],min(y[,1])),
-                col=area.fill, border="transparent")
+                col=area_fill, border="transparent")
         }  # n.by is 1
 
         else {  # n.by > 1,  tidy format, all y data in same column
@@ -629,7 +644,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                 xx <- c(xl[1],xl,xl[length(xl)])
                 yy <- c(min(yl[,1]),yl[,1],min(yl[,1]))
                 if (fill[1] != "transparent")
-                  polygon(xx, yy, col=area.fill[1], border="transparent")
+                  polygon(xx, yy, col=area_fill[1], border="transparent")
               }
               if (i > 1) {
                 yl[,1] <- yl[,1] + yo[,1]
@@ -638,7 +653,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
                 yy <- c(c(min(yl[,1]),yl[,1],min(yl[,1])),
                            rev(c(min(yo[,1]),yo[,1],min(yo[,1]))))
                 if (fill[1] != "transparent")
-                 polygon(xx, yy, col=area.fill[i], border="transparent")
+                 polygon(xx, yy, col=area_fill[i], border="transparent")
               }
             }
 
@@ -659,7 +674,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
               xx <- c(x[1],x,x[length(x)])
               yy <- c(min(y[,1]),y[,1],min(y[,1]))
               if (fill[1] != "transparent")
-                polygon(xx, yy, col=area.fill[1], border="transparent")
+                polygon(xx, yy, col=area_fill[1], border="transparent")
             }
             if (i > 1) {
               y[,i] <- apply(y[,(i-1):i], 1, sum, na.rm=TRUE)  # sum for stacking
@@ -667,7 +682,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
               yy <- c( c(min(y[,i]),y[,i],min(y[,i])),
                          rev(c(min(y[,i-1]),y[,i-1],min(y[,i-1]))) )
               if (fill[1] != "transparent")
-                polygon(xx, yy, col=area.fill[i], border="transparent")
+                polygon(xx, yy, col=area_fill[i], border="transparent")
             }
           }
 
@@ -685,18 +700,18 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       }
 
       # plot center line
-      if (center.line != "off") {
-        if (center.line == "mean") {
+      if (center_line != "off") {
+        if (center_line == "mean") {
           m.y <- mean(y[,1], na.rm=TRUE)
           lbl <- " mean"
           lbl.cat <- "mean:"
         }
-        else if (center.line == "median") {
+        else if (center_line == "median") {
           m.y <- median(y[,1], na.rm=TRUE)
           lbl <- " medn"
           lbl.cat <- "median:"
         }
-        else if (center.line == "zero") {
+        else if (center_line == "zero") {
           m.y <- 0
           lbl <- ""
           lbl.cat <- "zero:"
@@ -705,9 +720,9 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
         abline(h=m.y, col="gray50", lty="dashed")  # draw center line
         mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
 
-        if (center.line == "zero") m.y <- median(y[,1], na.rm=TRUE)  # for runs
+        if (center_line == "zero") m.y <- median(y[,1], na.rm=TRUE)  # for runs
 
-      }  # end center.line
+      }  # end center_line
 
       else {
         lbl.cat <- "median: "
@@ -725,42 +740,42 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
         if (smooth) {  # 2-D kernel density plot
           # grid lines only plot after the sp, so no effect here
-         #abline(v=axT1, col=getOption("grid.x.color"),
-         #       lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+         #abline(v=axT1, col=getOption("grid_x_color"),
+         #       lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
          #if (!bubble1)
-         #  abline(h=axT2, col=getOption("grid.y.color"),
-         #         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
-          clr.den <- colorRampPalette(c(getOption("window.fill"),
-                                         getOption("bar.fill.ordered")))
-          smoothScatter(x, y, nrpoints=smooth.points, nbin=smooth.bins,
-                        transformation=function(x) x^(smooth.exp),
-                        colramp=clr.den, cex=smooth.size, add=TRUE)
+         #  abline(h=axT2, col=getOption("grid_y_color"),
+         #         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
+          clr.den <- colorRampPalette(c(getOption("window_fill"),
+                                         getOption("bar_fill_ordered")))
+          smoothScatter(x, y, nrpoints=smooth_points, nbin=smooth_bins,
+                        transformation=function(x) x^(smooth_exp),
+                        colramp=clr.den, cex=smooth_size, add=TRUE)
         }
 
         else if (size > 0) {  # plot the individual points, plus means, segments, etc.
 
-          if (jitter.x > 0)
-            x[,1] <- jitter(x[,1], factor=jitter.x)
-          if (jitter.y > 0)
-            y[,1] <- jitter(y[,1], factor=jitter.y)
+          if (jitter_x > 0)
+            x[,1] <- jitter(x[,1], factor=jitter_x)
+          if (jitter_y > 0)
+            y[,1] <- jitter(y[,1], factor=jitter_y)
 
           if (n.xcol == 1  &&  n.ycol == 1) {
 
-             if (length(out.ind) == 0)  # not outliers
+             if (length(out_ind) == 0)  # not outliers
                 points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
                        cex=size.pt, ...)
 
              else {  # display outliers separately
 
                 if (getOption("theme") == "gray")
-                  if (any(size.pt > 0.9)) if (out.shape.miss) out.shape <- 23
+                  if (any(size.pt > 0.9)) if (out_shape.miss) out_shape <- 23
 
-                points(x[-out.ind,1], y[-out.ind,1],
+                points(x[-out_ind,1], y[-out_ind,1],
                    pch=shape, col=color[1], bg=fill[1], cex=size.pt, ...)
-                points(x[out.ind,1], y[out.ind,1],
-                   pch=shape, col=out.color, bg=out.fill, cex=size.pt, ...)
-                text(x[out.ind], y[out.ind], labels=ID[out.ind],
-                   pos=1, offset=0.4, col=ID.color, cex=ID.size)
+                points(x[out_ind,1], y[out_ind,1],
+                   pch=shape, col=out_color, bg=out_fill, cex=size.pt, ...)
+                text(x[out_ind], y[out_ind], labels=ID[out_ind],
+                   pos=1, offset=0.4, col=ID_color, cex=ID_size)
              }
           }
 
@@ -782,24 +797,24 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
             }
           }
 
-          if (segments.y) {
+          if (segments_y) {
             if (n.xcol == 1) # line segments from points to axis
               segments(x0=0, y0=y, x1=x, y1=y,
                        lty=1, lwd=.75, col=col.segment)
               #segments(x0=min(pretty(x)), y0=y, x1=x, y1=y,
-                       #lty=1, lwd=.75, col=col.color)
+                       #lty=1, lwd=.75, col=col_color)
             else if (n.xcol == 2)  # line segments between points
               segments(x0=x[,1], y0=y[,1], x1=x[,2], y1=y[,1],
                        lty=1, lwd=.75, col=col.segment)
           }
 
           if (!(stat %in% c("count", "prop", "%"))) {
-            if (segments.x)
+            if (segments_x)
               segments(y0=par("usr")[3], x0=x, y1=y, x1=x, lty=1, lwd=.75,
                        col=col.segment)
           }
           else {
-            if (segments.x)
+            if (segments_x)
               if (n.xcol == 1)
                  segments(y0=0, x0=x, y1=y, x1=x, lty=1, lwd=1, col=col.segment)
           }
@@ -861,12 +876,12 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
         }
         if (fill[1] == "transparent") fill <- color
         if (stack) {
-          point.size <- 2.5 * axis.x.cex
-          .plt.by.legend(levels(by), color, fill, shp=22, trans.pts, fill.bg,
+          point.size <- 2.5 * axis_x_cex
+          .plt.by.legend(levels(by), color, fill, shp=22, trans_pts, fill_bg,
                        usr, pt.size=point.size)
         }
         else
-          .plt.by.legend(levels(by), color, fill, shp, trans.pts, fill.bg, usr)
+          .plt.by.legend(levels(by), color, fill, shp, trans_pts, fill_bg, usr)
 
         }  # end by
 
@@ -876,11 +891,11 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 #     if (stack) fill <- color  # fill can be very translucent
       if (fill[1] == "transparent") fill <- color
       if (n.xcol > 1)  # horizontal legend, on x-axis
-        .plt.legend(colnames(x), FALSE, color, fill, shape, fill.bg, usr,
-                    lab.cex=lab.x.cex, pt.size=1.25, legend.title)
+        .plt.legend(colnames(x), FALSE, color, fill, shape, fill_bg, usr,
+                    lab_cex=lab_x_cex, pt.size=1.25, legend_title)
       if (n.ycol > 1)  # vertical legend, on y-axis
-        .plt.legend(colnames(y), FALSE, color, fill, shape, fill.bg, usr,
-                    lab.cex=lab.y.cex, pt.size=1.25, legend.title)
+        .plt.legend(colnames(y), FALSE, color, fill, shape, fill_bg, usr,
+                    lab_cex=lab_y_cex, pt.size=1.25, legend_title)
 
     }  # object is point, line, both
 
@@ -891,16 +906,16 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
     # colors
     if (is.null(col.low) || is.null(col.hi) || !bubble1) {
-      if (col.fill[1] != "#46505A")  # default
-        clr <- col.fill
+      if (col_fill[1] != "#46505A")  # default
+        clr <- col_fill
       else
-        clr <- getOption("bar.fill.ordered")
-      clr.color <- col.color
+        clr <- getOption("bar_fill_ordered")
+      clr_color <- col_color
     }
     else {  # 1-var bubble plot and BPFM can have a color gradient
-      color.palette <- colorRampPalette(c(col.low, col.hi))
-      clr <- color.palette(length(unique(x)))
-      clr.color <- "gray70"
+      color_palette <- colorRampPalette(c(col.low, col.hi))
+      clr <- color_palette(length(unique(x)))
+      clr_color <- "gray70"
     }
 
     if (length(size) == 1) {  # no value for size specified, do counts
@@ -943,20 +958,20 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # can use xyTable instead, though does not have coordinates for count=0
   #cnt <- xyTable(x,y)
   #symbols(cnt$x, cnt$y, circles=sz, inches=radius,
-          #bg=clr, fg=clr.color, add=TRUE, ...)
+          #bg=clr, fg=clr_color, add=TRUE, ...)
 
       if (object == "bubble") {
         sz <- cords[,3]**power  # radius unscaled
         symbols(cords$xx, cords$yy, circles=sz, inches=radius,
-            bg=clr, fg=clr.color, add=TRUE, ...)
+            bg=clr, fg=clr_color, add=TRUE, ...)
         mxru <- max(sz)
         sz <- 2 * (sz/mxru) * radius  # scaled diameter (symbols does)
       }
 
       else if (object == "sunflower") {
         sunflowerplot(cords$xx, cords$yy, number=cords$count,
-            seg.col=col.color, col=col.fill,
-            col.axis=getOption("axis.x.color"),
+            seg.col=col_color, col=col_fill,
+            col.axis=getOption("axis_x_color"),
             xlab=x.lab, ylab=y.lab, add=TRUE)
       }
     }  # end length(size) == 1
@@ -974,17 +989,17 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       cords <- na.omit(cords)
       sz <- cords[,3]**power  # radius unscaled
       symbols(cords[,1], cords[,2], circles=sz,
-        inches=radius, bg=clr, fg=clr.color, add=TRUE, ...)
+        inches=radius, bg=clr, fg=clr_color, add=TRUE, ...)
       mxru <- max(sz)
       sz <- 2 * (sz/mxru) * radius  # scaled diameter
     }
 
 
-    if (size.cut  &&  object == "bubble") {
+    if (size_cut  &&  object == "bubble") {
 
       # get q.ind before setting too small bubbles for text at NA
-      if (size.cut > 1) {
-        by.prob <- 1 / (size.cut - 1)
+      if (size_cut > 1) {
+        by.prob <- 1 / (size_cut - 1)
         bub.probs <- seq(0, 1, by.prob)
         qnt <- quantile(cords[,3], probs=bub.probs, type=3, na.rm=TRUE)
         qnt.TF <- logical(length(cords))
@@ -998,7 +1013,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
       # should get size of each amount just for those displayed (q.ind)
       sz.cex <- numeric(length=nrow(cords))
       for (i in 1:nrow(cords)) {
-        sz.cex[i] <- getOption("axis.cex")  # cex target for text size
+        sz.cex[i] <- getOption("axis_cex")  # cex target for text size
        # target for text size
         sz.txt <- strwidth(cords[i,3], units="inches", cex=sz.cex[i])
         while ((sz.txt - sz[i]) > -.03) {
@@ -1018,16 +1033,16 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
       # write bubble text
       if (!prop) {
-        if (bubble.text != "transparent")
+        if (bubble_text != "transparent")
           text(cords[q.ind,1], cords[q.ind,2], cords[q.ind,3],
-            cex=sz.cex[q.ind], col=bubble.text)
+            cex=sz.cex[q.ind], col=bubble_text)
       }
       else {
         crd <- .fmt0(cords[,3],2)
         for (j in 1:length(crd))
           if (grepl("NA", crd[j], fixed=TRUE)) crd[j] <- " "
-        if (bubble.text != "transparent")
-          text(cords[,1], cords[,2], crd, cex=sz.cex, col=bubble.text)
+        if (bubble_text != "transparent")
+          text(cords[,1], cords[,2], crd, cex=sz.cex, col=bubble_text)
       }
     }  # end amount
 
@@ -1050,7 +1065,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           y.lv <- subset(y, by==levels(by)[i])
         }
 
-        if (n.col > 1) {  # multiple variable plots
+        if (n_col > 1) {  # multiple variable plots
           if (n.xcol > 1) {
             x.lv <- x[,i]
             y.lv <- y[,1]
@@ -1078,8 +1093,8 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
 
         e <- ellipse(corr, scale=c(s.x, s.y), centre=c(m.x, m.y),
                      level=ellipse[j])
-        polygon(e, border=col.border, col=ellipse.fill,
-                lwd=ellipse.lwd, lty=ln.type)
+        polygon(e, border=col.border, col=ellipse_fill,
+                lwd=ellipse_lwd, lty=ln.type)
       }  # jth ellipse
     }  # ith pattern
   }  # do.ellipse
@@ -1089,7 +1104,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # fit line option
   if (fit.line != "off") {
 
-    fit.remove <- ifelse (!is.null(out.ind), TRUE, FALSE)
+    fit.remove <- ifelse (!is.null(out_ind), TRUE, FALSE)
     do.remove <- FALSE
     for (i.rem in 1:(as.numeric(fit.remove)+1)) {
       if (fit.remove) if (i.rem == 2) do.remove <- TRUE  # 2nd pass
@@ -1113,7 +1128,7 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
             y.lv <- subset(y, by==levels(by)[i])
           }
 
-          if (n.col > 1) {  # multiple variable plots
+          if (n_col > 1) {  # multiple variable plots
             if (n.xcol > 1) {
               x.lv <- x[,i]
               y.lv <- y[,1]
@@ -1130,11 +1145,11 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
         ln.type <- "solid"
         if (n.clrs == 2 && i == 2) ln.type <- "dashed"
 
-        if (!is.null(out.ind)) if (do.remove) {
-          x.lv <- x.lv[-out.ind]
-          y.lv <- y.lv[-out.ind]
+        if (!is.null(out_ind)) if (do.remove) {
+          x.lv <- x.lv[-out_ind]
+          y.lv <- y.lv[-out_ind]
           ln.type <- ifelse (ln.type != "dashed", "dashed", "solid")
-          fit.se[1] <- 0  # for line w/o outliers, no se band
+          fit_se[1] <- 0  # for line w/o outliers, no se band
         }
 
         ok <- is.finite(x.lv) & is.finite(y.lv)
@@ -1151,19 +1166,19 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
           else if (fit.line == "lm")
             l.ln <- lm(y.lv ~ x.lv)
           f.ln <- fitted(l.ln, ...)
-          lines(x.lv, f.ln, col=clr, lwd=fit.lwd, lty=ln.type)
+          lines(x.lv, f.ln, col=clr, lwd=fit_lwd, lty=ln.type)
 
           # se bands about fit line
-          if (fit.se[1] != 0) {
-            for (j in 1:length(fit.se)) {
+          if (fit_se[1] != 0) {
+            for (j in 1:length(fit_se)) {
               p.ln <- predict(l.ln, se=TRUE)
-              prb <- (1 - fit.se[j]) / 2
+              prb <- (1 - fit_se[j]) / 2
               up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
               dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
               # lines(x.lv, up.ln, col=clr, lwd=0.5, lty=ln.type)
               # lines(x.lv, dn.ln, col=clr, lwd=0.5, lty=ln.type)
               polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
-                      col=getOption("se.fill"), border="transparent")
+                      col=getOption("se_fill"), border="transparent")
             }  # end for each se plot
           }
         }
@@ -1176,22 +1191,22 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   # add enhancements
 
   if (!is.null(add)) if (add[1] == "means") {
-    add[1] <- "v.line"
-    add[2] <- "h.line"
-    x1 <- "mean.x"
-    y1 <- "mean.y"
+    add[1] <- "v_line"
+    add[2] <- "h_line"
+    x1 <- "mean_x"
+    y1 <- "mean_y"
   }
 
   if (!is.null(x1)) {
     if (date.ts) x1 <- julian(x1)  # dates to date serial numbers
-    if (length(which(x1 == "mean.x")) > 0) {
-      x1[which(x1 == "mean.x")] <- mean(x, na.rm=TRUE)
+    if (length(which(x1 == "mean_x")) > 0) {
+      x1[which(x1 == "mean_x")] <- mean(x, na.rm=TRUE)
       x1 <- as.numeric(x1)
     }
   }
   if (!is.null(y1)) {
-    if (length(which(y1 == "mean.y")) > 0) {
-      y1[which(y1 == "mean.y")] <- mean(y, na.rm=TRUE)
+    if (length(which(y1 == "mean_y")) > 0) {
+      y1[which(y1 == "mean_y")] <- mean(y, na.rm=TRUE)
       y1 <- as.numeric(y1)
     }
   }
@@ -1199,10 +1214,10 @@ function(x, y, by=NULL, n.cat=getOption("n.cat"),
   if (!is.null(add)) {
       if (add[1] == "labels")
         text(x, y, labels=ID, pos=1, offset=0.4,
-           pch=shape, col=getOption("add.color"), cex=getOption("add.cex"))
+           pch=shape, col=getOption("add_color"), cex=getOption("add_cex"))
       else
         .plt.add (add, x1, x2, y1, y2,
-             add.cex, add.lwd, add.lty, add.color, add.fill, add.trans)
+             add_cex, add_lwd, add_lty, add_color, add_fill, add_trans)
   }
 
 

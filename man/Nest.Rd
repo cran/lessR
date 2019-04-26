@@ -11,23 +11,23 @@ A nested model has a subset of predictor variables from the corresponding full m
 }
 
 \usage{
-Nest(y, nested.model, full.model, method=c("lm", "logit"),
-         data=d, digits.d=NULL)
+Nest(y, nested_model, full_model, method=c("lm", "logit"),
+         data=d, digits_d=NULL, \ldots)
 
 nt(\ldots)
 }
 
 \arguments{
   \item{y}{Response variable.}
-  \item{nested.model}{Predictor variables in the nested model.}
-  \item{full.model}{Predictor variables in either the full model, or
+  \item{nested_model}{Predictor variables in the nested model.}
+  \item{full_model}{Predictor variables in either the full model, or
         just those that added to the reduced model to derive the
         full model.}
   \item{method}{Do a least squares analysis, \code{ls}, the default, or 
         set to \code{logit}.}
   \item{data}{The name of the data frame from which to create the subset, which
        is \code{d} by default.}
-  \item{digits.d}{Number of decimal digits, set by default to at least 2
+  \item{digits_d}{Number of decimal digits, set by default to at least 2
         or the largest number of digits in the values of the response variable
         plus 1.}
   \item{\dots}{The specified arguments.}
@@ -47,7 +47,7 @@ TEXT OUTPUT\cr
 \code{out_anova}: Analysis of variance or, for logit, analysis of deviance\cr
 
 STATISTICS\cr
-\code{fun.call}: Function call that generated the analysis\cr
+\code{fun_call}: Function call that generated the analysis\cr
 \code{anova_tested}: Term that is tested\cr
 \code{anova_residual}: Residual df, and either ss and ms or deviance for logit\cr
 \code{anova_total}: For logit, total df and deviance\cr
@@ -63,7 +63,7 @@ Although not typically needed for analysis, if the output is assigned to an obje
 
 \examples{
 
-d <- Read("Reading", in.lessR=TRUE)
+d <- Read("Reading", in_lessR=TRUE)
 
 # compare least-squares models
 # can specify all the variables in the full model
@@ -74,7 +74,7 @@ Nest(Reading, c(Absent), c(Verbal,Income))
 # compare logistic models, save results into an object
 # define the full model by adding just the variables
 #  not found in the reduced model
-d <- Read("BodyMeas", in.lessR=TRUE)
+d <- Read("BodyMeas", in_lessR=TRUE)
 n <- Nest(Gender, c(Weight, Hips, Hand, Shoe),
       c(Height, Waist, Chest), method="logit")
 # view the results

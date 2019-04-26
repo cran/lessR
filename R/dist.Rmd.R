@@ -1,9 +1,9 @@
 .dist.Rmd <-
-function(Y, dname, fun.call, d) {
+function(Y, dname, fun_call, d) {
 
   explain <- TRUE
 
-  fncl <- .fun.call.deparse(fun.call) 
+  fncl <- .fun_call.deparse(fun_call) 
   fc <- .rm.arg("Rmd", fncl) 
 
   if (explain) show <- "" else show <- ", echo=FALSE"

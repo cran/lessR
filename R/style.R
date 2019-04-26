@@ -3,103 +3,103 @@ function(
   theme=c("colors", "lightbronze", "dodgerblue", "darkred", "gray",
       "gold", "darkgreen", "blue", "red", "rose", "green", "purple",
       "sienna", "brown", "orange", "white"),
-  sub.theme=c("default", "black", "wsj"),
+  sub_theme=c("default", "black", "wsj"),
   set=NULL, get=FALSE, reset=TRUE,
 
-  window.fill=getOption("window.fill"),
-  panel.fill=getOption("panel.fill"),
-  panel.color=getOption("panel.color"),
-  panel.lwd=getOption("panel.lwd"),
-  panel.lty=getOption("panel.lty"),
+  window_fill=getOption("window_fill"),
+  panel_fill=getOption("panel_fill"),
+  panel_color=getOption("panel_color"),
+  panel_lwd=getOption("panel_lwd"),
+  panel_lty=getOption("panel_lty"),
 
   fill=NULL,
-  bar.fill=getOption("bar.fill"),
-  bar.fill.discrete=getOption("bar.fill.discrete"),
-  bar.fill.ordered=getOption("bar.fill.ordered"),
+  bar_fill=getOption("bar_fill"),
+  bar_fill_discrete=getOption("bar_fill_discrete"),
+  bar_fill_ordered=getOption("bar_fill_ordered"),
   trans=NULL,
-  trans.bar.fill=getOption("trans.bar.fill"),
+  trans_bar_fill=getOption("trans_bar_fill"),
   color=NULL,
-  bar.color=getOption("bar.color"),
-  bar.color.ordered=getOption("bar.color.ordered"),
-  bar.color.discrete=getOption("bar.color.discrete"),
+  bar_color=getOption("bar_color"),
+  bar_color_ordered=getOption("bar_color_ordered"),
+  bar_color_discrete=getOption("bar_color_discrete"),
   values=getOption("values"),
-  values.color=getOption("values.color"), 
-  values.size=getOption("values.size"),
-  values.digits=getOption("values.digits"),
-  values.position=getOption("values.position"),
+  values_color=getOption("values_color"), 
+  values_size=getOption("values_size"),
+  values_digits=getOption("values_digits"),
+  values_position=getOption("values_position"),
  
-  pt.fill=getOption("pt.fill"),
-  trans.pt.fill=getOption("trans.pt.fill"),
-  pt.color=getOption("pt.color"),
-  se.fill=getOption("se.fill"),
-  ellipse.fill=getOption("ellipse.fill"),
-  ellipse.color=getOption("ellipse.color"),
-  ellipse.lwd=getOption("ellipse.lwd"),
-  fit.color=getOption("fit.color"),
-  fit.lwd=getOption("fit.lwd"),
-  bubble.text.color=getOption("bubble.text.color"),
-  segment.color=getOption("segment.color"),
-  ID.color=getOption("ID.color"),
-  out.fill=getOption("out.fill"),
-  out.color=getOption("out.color"),
-  out2.fill=getOption("out2.fill"),
-  out2.color=getOption("out2.color"),
+  pt_fill=getOption("pt_fill"),
+  trans_pt_fill=getOption("trans_pt_fill"),
+  pt_color=getOption("pt_color"),
+  se_fill=getOption("se_fill"),
+  ellipse_fill=getOption("ellipse_fill"),
+  ellipse_color=getOption("ellipse_color"),
+  ellipse_lwd=getOption("ellipse_lwd"),
+  fit_color=getOption("fit_color"),
+  fit_lwd=getOption("fit_lwd"),
+  bubble_text_color=getOption("bubble_text_color"),
+  segment_color=getOption("segment_color"),
+  ID_color=getOption("ID_color"),
+  out_fill=getOption("out_fill"),
+  out_color=getOption("out_color"),
+  out2_fill=getOption("out2_fill"),
+  out2_color=getOption("out2_color"),
 
-  violin.fill=getOption("violin.fill"),
-  violin.color=getOption("violin.color"),
-  box.fill=getOption("box.fill"),
-  box.color=getOption("box.color"),
+  violin_fill=getOption("violin_fill"),
+  violin_color=getOption("violin_color"),
+  box_fill=getOption("box_fill"),
+  box_color=getOption("box_color"),
 
-  axis.color=getOption("axis.color"),
-  axis.x.color=getOption("axis.x.color"),
-  axis.y.color=getOption("axis.y.color"),
-  axis.lwd=getOption("axis.lwd"),
-  axis.x.lwd=getOption("axis.x.lwd"),
-  axis.y.lwd=getOption("axis.y.lwd"),
-  axis.lty=getOption("axis.lty"),
-  axis.x.lty=getOption("axis.x.lty"),
-  axis.y.lty=getOption("axis.y.lty"),
-  axis.cex=getOption("axis.cex"),
-  axis.x.cex=getOption("axis.x.cex"),
-  axis.y.cex=getOption("axis.y.cex"),
-  axis.text.color=getOption("axis.text.color"),
-  axis.x.text.color=getOption("axis.x.text.color"),
-  axis.y.text.color=getOption("axis.y.text.color"),
-  rotate.x=getOption("rotate.x"),
-  rotate.y=getOption("rotate.y"),
+  axis_color=getOption("axis_color"),
+  axis_x_color=getOption("axis_x_color"),
+  axis_y_color=getOption("axis_y_color"),
+  axis_lwd=getOption("axis_lwd"),
+  axis_x_lwd=getOption("axis_x_lwd"),
+  axis_y_lwd=getOption("axis_y_lwd"),
+  axis_lty=getOption("axis_lty"),
+  axis_x_lty=getOption("axis_x_lty"),
+  axis_y_lty=getOption("axis_y_lty"),
+  axis_cex=getOption("axis_cex"),
+  axis_x_cex=getOption("axis_x_cex"),
+  axis_y_cex=getOption("axis_y_cex"),
+  axis_text_color=getOption("axis_text_color"),
+  axis_x_text_color=getOption("axis_x_text_color"),
+  axis_y_text_color=getOption("axis_y_text_color"),
+  rotate_x=getOption("rotate_x"),
+  rotate_y=getOption("rotate_y"),
   offset=getOption("offset"),
 
-  lab.color=getOption("lab.color"),
-  lab.x.color=getOption("lab.x.color"),
-  lab.y.color=getOption("lab.y.color"),
-  lab.cex=getOption("lab.cex"),
-  lab.x.cex=getOption("lab.x.cex"),
-  lab.y.cex=getOption("lab.y.cex"),
-  main.color=getOption("main.color"),
-  main.cex=getOption("main.cex"),
+  lab_color=getOption("lab_color"),
+  lab_x_color=getOption("lab_x_color"),
+  lab_y_color=getOption("lab_y_color"),
+  lab_cex=getOption("lab_cex"),
+  lab_x_cex=getOption("lab_x_cex"),
+  lab_y_cex=getOption("lab_y_cex"),
+  main_color=getOption("main_color"),
+  main_cex=getOption("main_cex"),
 
-  grid.color=getOption("grid.color"),
-  grid.x.color=getOption("grid.x.color"),
-  grid.y.color=getOption("grid.y.color"),
-  grid.lwd=getOption("grid.lwd"),
-  grid.x.lwd=getOption("grid.x.lwd"),
-  grid.y.lwd=getOption("grid.y.lwd"),
-  grid.lty=getOption("grid.lty"),
-  grid.x.lty=getOption("grid.x.lty"),
-  grid.y.lty=getOption("grid.y.lty"),
+  grid_color=getOption("grid_color"),
+  grid_x_color=getOption("grid_x_color"),
+  grid_y_color=getOption("grid_y_color"),
+  grid_lwd=getOption("grid_lwd"),
+  grid_x_lwd=getOption("grid_x_lwd"),
+  grid_y_lwd=getOption("grid_y_lwd"),
+  grid_lty=getOption("grid_lty"),
+  grid_x_lty=getOption("grid_x_lty"),
+  grid_y_lty=getOption("grid_y_lty"),
 
-  strip.fill=getOption("strip.fill"),
-  strip.color=getOption("strip.color"),
-  strip.text.color=getOption("strip.text.color"),
+  strip_fill=getOption("strip_fill"),
+  strip_color=getOption("strip_color"),
+  strip_text_color=getOption("strip_text_color"),
 
-  add.fill=getOption("add.fill"),
-  add.trans=getOption("add.trans"),
-  add.color=getOption("add.color"),
-  add.cex=getOption("add.cex"),
-  add.lwd=getOption("add.lwd"),
-  add.lty=getOption("add.lty"),
+  add_fill=getOption("add_fill"),
+  add_trans=getOption("add_trans"),
+  add_color=getOption("add_color"),
+  add_cex=getOption("add_cex"),
+  add_lwd=getOption("add_lwd"),
+  add_lty=getOption("add_lty"),
 
-  n.cat=getOption("n.cat"), suggest=getOption("suggest"),
+  n_cat=getOption("n_cat"), suggest=getOption("suggest"),
   quiet=getOption("quiet"), brief=getOption("brief"),
 
   results=getOption("results"), explain=getOption("explain"),
@@ -108,22 +108,28 @@ function(
 
   width=120, show=FALSE, ...) {
 
+  # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      if (names(dots)[i] == "values.cex")  values.size <- dots[[i]]
+      if (names(dots)[i] == "values.cex")  values_size <- dots[[i]]
+      if (grepl(".", dots[[i]], fixed=TRUE)) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
     }
-  } 
+  }
 
   if (nargs() == 0) {
      theme <- "colors"
-     miss.theme <- FALSE    
+     miss_theme <- FALSE    
      cat("theme set to \"colors\"\n\n")
   }
   else {
-    miss.theme <- ifelse (missing(theme), TRUE, FALSE)
+    miss_theme <- ifelse (missing(theme), TRUE, FALSE)
   }
-  if (miss.theme)
+  if (miss_theme)
     theme <- getOption("theme")
   else
     theme <- match.arg(theme)
@@ -133,15 +139,15 @@ function(
   if (show || get) reset <- FALSE
 
 
-  miss.set <- ifelse (missing(set), TRUE, FALSE) 
-  miss.tr.bar.fill <- ifelse (missing(trans.bar.fill), TRUE, FALSE)
+  miss_set <- ifelse (missing(set), TRUE, FALSE) 
+  miss_tr.bar_fill <- ifelse (missing(trans_bar_fill), TRUE, FALSE)
 
-  miss.sub.theme <- ifelse (missing(sub.theme), TRUE, FALSE)
-  if (sub.theme[1] == "colors") {
+  miss_sub_theme <- ifelse (missing(sub_theme), TRUE, FALSE)
+  if (sub_theme[1] == "colors") {
   cat("\n"); stop(call.=FALSE, "\n","------\n",
       "\"colors\" now a theme, the default theme\n\n")
   }
-  sub.theme <- match.arg(sub.theme)
+  sub_theme <- match.arg(sub_theme)
   
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
@@ -153,11 +159,11 @@ function(
     }
     if (names(dots)[i] == "ghost") {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "invoke option  ghost  as style(sub.theme=\"black\")\n\n")
+          "invoke option  ghost  as style(sub_theme=\"black\")\n\n")
     }
     if (names(dots)[i] == "gray.black") {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "now invoke style(\"gray\", sub.theme=\"black\")\n\n")
+          "now invoke style(\"gray\", sub_theme=\"black\")\n\n")
     }
   }
 
@@ -166,98 +172,98 @@ function(
   if (!is.null(set)) {
 
     theme <- set$theme
-    sub.theme <- set$sub.theme
+    sub_theme <- set$sub_theme
 
-    window.fill <- set$window.fill
-    panel.fill <- set$panel$fill
-    panel.color <- set$panel$color
-    panel.lwd <- set$panel$lwd
-    panel.lty <- set$panel$lty
+    window_fill <- set$window_fill
+    panel_fill <- set$panel$fill
+    panel_color <- set$panel$color
+    panel_lwd <- set$panel$lwd
+    panel_lty <- set$panel$lty
 
-    bar.fill <- set$bar$fill
-    trans.bar.fill <- set$bar$trans.fill
-    bar.color <- set$bar$color
+    bar_fill <- set$bar$fill
+    trans_bar_fill <- set$bar$trans_fill
+    bar_color <- set$bar$color
 
     values <- set$bar$values
-    values.color <- set$bar$values.color
-    values.size <- set$bar$values.size
-    values.digits <- set$bar$values.digits
-    values.position <- set$bar$values.position
+    values_color <- set$bar$values_color
+    values_size <- set$bar$values_size
+    values_digits <- set$bar$values_digits
+    values_position <- set$bar$values_position
  
-    pt.fill <- set$pt$fill
-    trans.pt.fill <- set$pt$trans.fill
-    pt.color <- set$pt$color
-    out.fill <- set$pt$out.fill
-    out.color <- set$pt$out.color
-    out2.fill <- set$pt$out2.fill
-    out2.color <- set$pt$out2.color
+    pt_fill <- set$pt$fill
+    trans_pt_fill <- set$pt$trans_fill
+    pt_color <- set$pt$color
+    out_fill <- set$pt$out_fill
+    out_color <- set$pt$out_color
+    out2_fill <- set$pt$out2_fill
+    out2_color <- set$pt$out2_color
 
-    violin.fill <- set$VBS$violin.fill
-    violin.color <- set$VBS$violin.color
-    box.fill <- set$VBS$box.fill
-    box.color <- set$VBS$box.color
+    violin_fill <- set$VBS$violin_fill
+    violin_color <- set$VBS$violin_color
+    box_fill <- set$VBS$box_fill
+    box_color <- set$VBS$box_color
 
-    ellipse.fill <- set$ellipse$fill
-    ellipse.color <- set$ellipse$color
-    ellipse.lwd <- set$ellipse$lwd
+    ellipse_fill <- set$ellipse$fill
+    ellipse_color <- set$ellipse$color
+    ellipse_lwd <- set$ellipse$lwd
 
-    fit.color <- set$fit.color
-    fit.lwd <- set$fit.lwd
-    se.fill <- set$se.fill
-    bubble.text.color <- set$bubble.text.color
-    segment.color <- set$segment.color
-    ID.color <- set$ID.color
+    fit_color <- set$fit_color
+    fit_lwd <- set$fit_lwd
+    se_fill <- set$se_fill
+    bubble_text_color <- set$bubble_text_color
+    segment_color <- set$segment_color
+    ID_color <- set$ID_color
 
-    axis.color <- set$axis$color
-    axis.x.color <- set$axis.x$color
-    axis.y.color <- set$axis.y$color
-    axis.lwd <- set$axis$lwd
-    axis.x.lwd <- set$axis.x$lwd
-    axis.y.lwd <- set$axis.y$lwd
-    axis.lty <- set$axis$lty
-    axis.x.lty <- set$axis.x$lty
-    axis.y.lty <- set$axis.y$lty
-    axis.cex <- set$axis$cex
-    axis.x.cex <- set$axis.x$cex
-    axis.y.cex <- set$axis.y$cex
-    axis.text.color <- set$axis$text.color
-    axis.x.text.color <- set$axis.x$text.color
-    axis.y.text.color <- set$axis.y$text.color
-    rotate.x <- set$rotate$x
-    rotate.y <- set$rotate$y
+    axis_color <- set$axis$color
+    axis_x_color <- set$axis_x$color
+    axis_y_color <- set$axis_y$color
+    axis_lwd <- set$axis$lwd
+    axis_x_lwd <- set$axis_x$lwd
+    axis_y_lwd <- set$axis_y$lwd
+    axis_lty <- set$axis$lty
+    axis_x_lty <- set$axis_x$lty
+    axis_y_lty <- set$axis_y$lty
+    axis_cex <- set$axis$cex
+    axis_x_cex <- set$axis_x$cex
+    axis_y_cex <- set$axis_y$cex
+    axis_text_color <- set$axis$text_color
+    axis_x_text_color <- set$axis_x$text_color
+    axis_y_text_color <- set$axis_y$text_color
+    rotate_x <- set$rotate$x
+    rotate_y <- set$rotate$y
     offset <- set$rotate$offset
 
-    lab.color <- set$lab$color
-    lab.x.color <- set$lab.x$color
-    lab.y.color <- set$lab.y$color
-    lab.cex <- set$lab$cex
-    lab.x.cex <- set$lab.x$cex
-    lab.y.cex <- set$lab.y$cex
-    main.color <- set$main$color
-    main.cex <- set$main$cex
+    lab_color <- set$lab$color
+    lab_x_color <- set$lab_x$color
+    lab_y_color <- set$lab_y$color
+    lab_cex <- set$lab$cex
+    lab_x_cex <- set$lab_x$cex
+    lab_y_cex <- set$lab_y$cex
+    main_color <- set$main$color
+    main_cex <- set$main$cex
 
-    grid.color <- set$grid$color
-    grid.x.color <- set$grid.x$color
-    grid.y.color <- set$grid.y$color
-    grid.lwd <- set$grid$lwd
-    grid.x.lwd <- set$grid.x$lwd
-    grid.y.lwd <- set$grid.y$lwd
-    grid.lty <- set$grid$lty
-    grid.x.lty <- set$grid.x$lty
-    grid.y.lty <- set$grid.y$lty
+    grid_color <- set$grid$color
+    grid_x_color <- set$grid_x$color
+    grid_y_color <- set$grid_y$color
+    grid_lwd <- set$grid$lwd
+    grid_x_lwd <- set$grid_x$lwd
+    grid_y_lwd <- set$grid_y$lwd
+    grid_lty <- set$grid$lty
+    grid_x_lty <- set$grid_x$lty
+    grid_y_lty <- set$grid_y$lty
 
-    strip.fill <- set$strip$fill
-    strip.color <- set$strip$color
-    strip.text.color <- set$strip$text.color
+    strip_fill <- set$strip$fill
+    strip_color <- set$strip$color
+    strip_text_color <- set$strip$text_color
 
-    add.fill <- set$add$fill
-    add.trans <- set$add$trans
-    add.color <- set$add$color
-    add.cex <- set$add$cex
-    add.lwd <- set$add$lwd
-    add.lty <- set$add$lty
+    add_fill <- set$add$fill
+    add_trans <- set$add$trans
+    add_color <- set$add$color
+    add_cex <- set$add$cex
+    add_lwd <- set$add$lwd
+    add_lty <- set$add$lty
 
-    n.cat <- set$n.cat
+    n_cat <- set$n_cat
     suggest <- set$suggest
     quiet <- set$quiet
     brief <- set$brief
@@ -272,148 +278,148 @@ function(
         
   # reset all parameters to start-up condition for new theme
   if (reset) { 
-    if (!miss.theme) {
+    if (!miss_theme) {
       suppressPackageStartupMessages(.onAttach())
-      miss.theme <- FALSE
+      miss_theme <- FALSE
       theme <- match.arg(theme) 
       options(theme=theme)
-      options(trans.bar.fill=0.10)
-      options(trans.pt.fill=0.00) 
+      options(trans_bar_fill=0.10)
+      options(trans_pt_fill=0.00) 
     }
-    else if (miss.set)
+    else if (miss_set)
       theme <- getOption("theme")
 
-    if (!miss.sub.theme)
-      options(sub.theme=sub.theme)
+    if (!miss_sub_theme)
+      options(sub_theme=sub_theme)
     else
-      sub.theme <- getOption("sub.theme")
+      sub_theme <- getOption("sub_theme")
   }
 
 
   # inheritance
   if (!missing(trans)) {
-    trans.pt.fill <- trans
-    trans.bar.fill <- trans
+    trans_pt_fill <- trans
+    trans_bar_fill <- trans
   }
   if (!missing(fill)) {
-    pt.fill <- fill
-    bar.fill <- fill
+    pt_fill <- fill
+    bar_fill <- fill
   }
   if (!missing(color)) {
-    pt.color <- color
-    bar.color <- color
+    pt_color <- color
+    bar_color <- color
   }
-  if (!missing(axis.color)) {
-    axis.x.color <- axis.color
-    axis.y.color <- axis.color
+  if (!missing(axis_color)) {
+    axis_x_color <- axis_color
+    axis_y_color <- axis_color
   }
-  if (!missing(axis.cex)) {
-    axis.x.cex <- axis.cex
-    axis.y.cex <- axis.cex
+  if (!missing(axis_cex)) {
+    axis_x_cex <- axis_cex
+    axis_y_cex <- axis_cex
   }
-  if (!missing(lab.color)) {
-    lab.x.color <- lab.color
-    lab.y.color <- lab.color
+  if (!missing(lab_color)) {
+    lab_x_color <- lab_color
+    lab_y_color <- lab_color
   }
-  if (!missing(lab.cex)) {
-    lab.x.cex <- lab.cex
-    lab.y.cex <- lab.cex
+  if (!missing(lab_cex)) {
+    lab_x_cex <- lab_cex
+    lab_y_cex <- lab_cex
   }
-  if (!missing(grid.color)) {
-    grid.x.color <- grid.color
-    grid.y.color <- grid.color
+  if (!missing(grid_color)) {
+    grid_x_color <- grid_color
+    grid_y_color <- grid_color
   }
-  if (!missing(grid.lwd)) {
-    grid.x.lwd <- grid.lwd
-    grid.y.lwd <- grid.lwd;
+  if (!missing(grid_lwd)) {
+    grid_x_lwd <- grid_lwd
+    grid_y_lwd <- grid_lwd;
   }
-  if (!missing(grid.lty)) {
-    grid.x.lty <- grid.lty
-    grid.y.lty <- grid.lty
+  if (!missing(grid_lty)) {
+    grid_x_lty <- grid_lty
+    grid_y_lty <- grid_lty
   }
 
   # "off" is "transparent"
-  bar.fill[which(bar.fill == "off")] <- "transparent"
-  bar.fill.discrete[which(bar.fill.discrete == "off")] <- "transparent"
-  bar.fill.ordered[which(bar.fill.ordered == "off")] <- "transparent"
-  pt.fill[which(pt.fill == "off")] <- "transparent"
-  bar.color.discrete[which(bar.color.discrete == "off")] <- "transparent"
-  bar.color.ordered[which(bar.color.ordered == "off")] <- "transparent"
-  pt.color[which(pt.color == "off")] <- "transparent"
-  violin.fill[which(violin.fill == "off")] <- "transparent"
-  violin.color[which(violin.color == "off")] <- "transparent"
-  box.fill[which(box.fill == "off")] <- "transparent"
-  box.color[which(box.color == "off")] <- "transparent"
-  se.fill[which(se.fill == "off")] <- "transparent"
-  ellipse.fill[which(ellipse.fill == "off")] <- "transparent"
-  ellipse.color[which(ellipse.color == "off")] <- "transparent"
-  if (panel.fill == "off") panel.fill <- "transparent"
-  if (!is.null(grid.x.color))
-    if (grid.x.color == "off") grid.x.color <- "transparent"
-  if (!is.null(grid.y.color))
-    if (grid.y.color == "off") grid.y.color <- "transparent"
-  if (grid.lwd == "off") grid.lwd <- 0
-  if (grid.lty == "off") grid.lty <- "blank"
-  if (window.fill == "off") window.fill <- "white"
-  if (panel.color == "off") panel.color <- "transparent"
-  if (panel.lwd == "off") panel.lwd <- "transparent"
-  if (panel.lty == "off") panel.lty <- "transparent"
-  if (lab.color == "off") lab.color <- "transparent"
-  if (main.color == "off") main.color <- "transparent"
-  if (!is.null(axis.x.color))
-    if (axis.x.color == "off") axis.x.color <- "transparent"
-  if (!is.null(axis.y.color))
-    if (axis.y.color == "off") axis.y.color <- "transparent"
-  if (!is.null(lab.x.color))
-    if (lab.x.color == "off") lab.x.color <- "transparent"
-  if (!is.null(lab.y.color))
-    if (lab.y.color == "off") lab.y.color <- "transparent"
-  if (segment.color == "off") segment.color <- "transparent"
-  if (ID.color == "off") ID.color <- "transparent"
-  if (out.fill == "off") out.fill <- "transparent"
-  if (out.color == "off") out.color <- "transparent"
-  if (out2.fill == "off") out2.fill <- "transparent"
-  if (out2.color == "off") out2.color <- "transparent"
-  if (bubble.text.color == "off") bubble.text.color <- "transparent"
-  add.color[which(add.color == "off")] <- "transparent"
-  add.fill[which(add.fill == "off")] <- "transparent"
+  bar_fill[which(bar_fill == "off")] <- "transparent"
+  bar_fill_discrete[which(bar_fill_discrete == "off")] <- "transparent"
+  bar_fill_ordered[which(bar_fill_ordered == "off")] <- "transparent"
+  pt_fill[which(pt_fill == "off")] <- "transparent"
+  bar_color_discrete[which(bar_color_discrete == "off")] <- "transparent"
+  bar_color_ordered[which(bar_color_ordered == "off")] <- "transparent"
+  pt_color[which(pt_color == "off")] <- "transparent"
+  violin_fill[which(violin_fill == "off")] <- "transparent"
+  violin_color[which(violin_color == "off")] <- "transparent"
+  box_fill[which(box_fill == "off")] <- "transparent"
+  box_color[which(box_color == "off")] <- "transparent"
+  se_fill[which(se_fill == "off")] <- "transparent"
+  ellipse_fill[which(ellipse_fill == "off")] <- "transparent"
+  ellipse_color[which(ellipse_color == "off")] <- "transparent"
+  if (panel_fill == "off") panel_fill <- "transparent"
+  if (!is.null(grid_x_color))
+    if (grid_x_color == "off") grid_x_color <- "transparent"
+  if (!is.null(grid_y_color))
+    if (grid_y_color == "off") grid_y_color <- "transparent"
+  if (grid_lwd == "off") grid_lwd <- 0
+  if (grid_lty == "off") grid_lty <- "blank"
+  if (window_fill == "off") window_fill <- "white"
+  if (panel_color == "off") panel_color <- "transparent"
+  if (panel_lwd == "off") panel_lwd <- "transparent"
+  if (panel_lty == "off") panel_lty <- "transparent"
+  if (lab_color == "off") lab_color <- "transparent"
+  if (main_color == "off") main_color <- "transparent"
+  if (!is.null(axis_x_color))
+    if (axis_x_color == "off") axis_x_color <- "transparent"
+  if (!is.null(axis_y_color))
+    if (axis_y_color == "off") axis_y_color <- "transparent"
+  if (!is.null(lab_x_color))
+    if (lab_x_color == "off") lab_x_color <- "transparent"
+  if (!is.null(lab_y_color))
+    if (lab_y_color == "off") lab_y_color <- "transparent"
+  if (segment_color == "off") segment_color <- "transparent"
+  if (ID_color == "off") ID_color <- "transparent"
+  if (out_fill == "off") out_fill <- "transparent"
+  if (out_color == "off") out_color <- "transparent"
+  if (out2_fill == "off") out2_fill <- "transparent"
+  if (out2_color == "off") out2_color <- "transparent"
+  if (bubble_text_color == "off") bubble_text_color <- "transparent"
+  add_color[which(add_color == "off")] <- "transparent"
+  add_fill[which(add_fill == "off")] <- "transparent"
 
   # see if a pre-defined color range, if not return the calling color
-  if (length(bar.fill) == 0) bar.fill <- getOption("bar.fill.discrete")
-  bar.fill <- .color.range(bar.fill, 24)
-  if (length(bar.color) == 0) bar.colro <- getOption("bar.color.discrete")
-  bar.color <- .color.range(bar.color, 24)
-  if (length(pt.fill) == 0) pt.fill <- getOption("pt.fill")
-  pt.fill <- .color.range(pt.fill, 24)
-  if (length(pt.color) == 0) pt.color <- getOption("pt.color")
-  pt.color <- .color.range(pt.color, 24)
-  if (length(add.fill) == 0) add.fill <- getOption("add.fill")
-  if (length(add.color) == 0) add.color <- getOption("add.color")
-    add.color <- .color.range(add.color, 24)
+  if (length(bar_fill) == 0) bar_fill <- getOption("bar_fill_discrete")
+  bar_fill <- .color_range(bar_fill, 24)
+  if (length(bar_color) == 0) bar.colro <- getOption("bar_color_discrete")
+  bar_color <- .color_range(bar_color, 24)
+  if (length(pt_fill) == 0) pt_fill <- getOption("pt_fill")
+  pt_fill <- .color_range(pt_fill, 24)
+  if (length(pt_color) == 0) pt_color <- getOption("pt_color")
+  pt_color <- .color_range(pt_color, 24)
+  if (length(add_fill) == 0) add_fill <- getOption("add_fill")
+  if (length(add_color) == 0) add_color <- getOption("add_color")
+    add_color <- .color_range(add_color, 24)
 
   # default transparency levels
   if (reset) {
-    if (!is.null(trans.bar.fill)) {
-      options(trans.bar.fill=trans.bar.fill)
-      options(bar.fill = .maketrans(getOption("bar.fill"), 
-             .to256("trans.bar.fill")))
+    if (!is.null(trans_bar_fill)) {
+      options(trans_bar_fill=trans_bar_fill)
+      options(bar_fill = .maketrans(getOption("bar_fill"), 
+             .to256("trans_bar_fill")))
     }
-    if (!is.null(trans.pt.fill)) {
-      options(trans.pt.fill=trans.pt.fill)
-      options(pt.fill = .maketrans(getOption("pt.fill"), .to256("trans.pt.fill")))
+    if (!is.null(trans_pt_fill)) {
+      options(trans_pt_fill=trans_pt_fill)
+      options(pt_fill = .maketrans(getOption("pt_fill"), .to256("trans_pt_fill")))
     }
 
-    if (!is.null(bar.fill)) {
-      if (bar.fill[1] == "transparent")
-        options(bar.fill = bar.fill) 
+    if (!is.null(bar_fill)) {
+      if (bar_fill[1] == "transparent")
+        options(bar_fill = bar_fill) 
       else
-        options(bar.fill = .maketrans(bar.fill, .to256("trans.bar.fill")))
+        options(bar_fill = .maketrans(bar_fill, .to256("trans_bar_fill")))
     }
-    if (!is.null(pt.fill)) {
-      if (pt.fill[1] == "transparent")
-        options(pt.fill = pt.fill) 
+    if (!is.null(pt_fill)) {
+      if (pt_fill[1] == "transparent")
+        options(pt_fill = pt_fill) 
       else
-        options(pt.fill = .maketrans(pt.fill, .to256("trans.pt.fill")))
+        options(pt_fill = .maketrans(pt_fill, .to256("trans_pt_fill")))
     }
   }
 
@@ -423,98 +429,98 @@ function(
   if (reset) {
 
     options(theme = theme)
-    options(sub.theme = sub.theme)
+    options(sub_theme = sub_theme)
 
-    options(bar.fill = bar.fill) 
-    options(bar.fill.discrete = bar.fill.discrete) 
-    options(bar.fill.ordered = bar.fill.ordered) 
-    options(bar.color.discrete = bar.color.discrete) 
-    options(bar.color.ordered = bar.color.ordered) 
-    options(pt.color = pt.color) 
+    options(bar_fill = bar_fill) 
+    options(bar_fill_discrete = bar_fill_discrete) 
+    options(bar_fill_ordered = bar_fill_ordered) 
+    options(bar_color_discrete = bar_color_discrete) 
+    options(bar_color_ordered = bar_color_ordered) 
+    options(pt_color = pt_color) 
     
     options(values=values)
-    options(values.color=values.color)
-    options(values.size=values.size)
-    options(values.digits=values.digits)
-    options(values.position=values.position)
+    options(values_color=values_color)
+    options(values_size=values_size)
+    options(values_digits=values_digits)
+    options(values_position=values_position)
     
-    options(window.fill=window.fill)
-    options(panel.fill=panel.fill)
-    options(panel.color=panel.color)
-    options(panel.lwd=panel.lwd)
-    options(panel.lty=panel.lty)
+    options(window_fill=window_fill)
+    options(panel_fill=panel_fill)
+    options(panel_color=panel_color)
+    options(panel_lwd=panel_lwd)
+    options(panel_lty=panel_lty)
 
-    options(violin.fill=violin.fill)
-    options(violin.color=violin.color)
-    options(box.fill=box.fill)
-    options(box.color=box.color)
+    options(violin_fill=violin_fill)
+    options(violin_color=violin_color)
+    options(box_fill=box_fill)
+    options(box_color=box_color)
 
-    options(ellipse.fill=ellipse.fill)
-    options(ellipse.color=ellipse.color)
-    options(ellipse.lwd=ellipse.lwd)
-    options(fit.color=fit.color)
-    options(fit.lwd=fit.lwd)
-    options(se.fill=se.fill)
-    options(segment.color=segment.color)
-    options(ID.color=ID.color)
-    options(out.fill=out.fill)
-    options(out.color=out.color)
-    options(out2.fill=out2.fill)
-    options(out2.color=out2.color)
-    options(bubble.text.color=bubble.text.color)
+    options(ellipse_fill=ellipse_fill)
+    options(ellipse_color=ellipse_color)
+    options(ellipse_lwd=ellipse_lwd)
+    options(fit_color=fit_color)
+    options(fit_lwd=fit_lwd)
+    options(se_fill=se_fill)
+    options(segment_color=segment_color)
+    options(ID_color=ID_color)
+    options(out_fill=out_fill)
+    options(out_color=out_color)
+    options(out2_fill=out2_fill)
+    options(out2_color=out2_color)
+    options(bubble_text_color=bubble_text_color)
 
-    options(grid.color=grid.color)
-    options(grid.x.color=grid.x.color)
-    options(grid.y.color=grid.y.color)
-    options(grid.lwd=grid.lwd)
-    options(grid.x.lwd=grid.x.lwd)
-    options(grid.y.lwd=grid.y.lwd)
-    options(grid.lty=grid.lty)
-    options(grid.x.lty=grid.x.lty)
-    options(grid.y.lty=grid.y.lty)
+    options(grid_color=grid_color)
+    options(grid_x_color=grid_x_color)
+    options(grid_y_color=grid_y_color)
+    options(grid_lwd=grid_lwd)
+    options(grid_x_lwd=grid_x_lwd)
+    options(grid_y_lwd=grid_y_lwd)
+    options(grid_lty=grid_lty)
+    options(grid_x_lty=grid_x_lty)
+    options(grid_y_lty=grid_y_lty)
 
-    options(lab.color=lab.color)
-    options(lab.x.color=lab.x.color)
-    options(lab.y.color=lab.y.color)
-    options(lab.cex=lab.cex)
-    options(lab.x.cex=lab.x.cex)
-    options(lab.y.cex=lab.y.cex)
-    options(main.color=main.color)
-    options(main.cex=main.cex)
-    options(axis.color=axis.color)
-    options(axis.x.color=axis.x.color)
-    options(axis.y.color=axis.y.color)
-    options(axis.lwd=axis.lwd)
-    options(axis.x.lwd=axis.x.lwd)
-    options(axis.y.lwd=axis.y.lwd)
-    options(axis.lty=axis.lty)
-    options(axis.x.lty=axis.x.lty)
-    options(axis.y.lty=axis.y.lty)
+    options(lab_color=lab_color)
+    options(lab_x_color=lab_x_color)
+    options(lab_y_color=lab_y_color)
+    options(lab_cex=lab_cex)
+    options(lab_x_cex=lab_x_cex)
+    options(lab_y_cex=lab_y_cex)
+    options(main_color=main_color)
+    options(main_cex=main_cex)
+    options(axis_color=axis_color)
+    options(axis_x_color=axis_x_color)
+    options(axis_y_color=axis_y_color)
+    options(axis_lwd=axis_lwd)
+    options(axis_x_lwd=axis_x_lwd)
+    options(axis_y_lwd=axis_y_lwd)
+    options(axis_lty=axis_lty)
+    options(axis_x_lty=axis_x_lty)
+    options(axis_y_lty=axis_y_lty)
 
-    options(axis.cex=axis.cex)
-    options(axis.x.cex=axis.x.cex)
-    options(axis.y.cex=axis.y.cex)
-    options(axis.text.color=axis.text.color)
-    options(axis.x.text.color=axis.x.text.color)
-    options(axis.y.text.color=axis.y.text.color)
-    options(rotate.x=rotate.x)
-    options(rotate.y=rotate.y)
+    options(axis_cex=axis_cex)
+    options(axis_x_cex=axis_x_cex)
+    options(axis_y_cex=axis_y_cex)
+    options(axis_text_color=axis_text_color)
+    options(axis_x_text_color=axis_x_text_color)
+    options(axis_y_text_color=axis_y_text_color)
+    options(rotate_x=rotate_x)
+    options(rotate_y=rotate_y)
     options(offset=offset)
 
-    options(add.fill=add.fill)
-    options(add.trans=add.trans)
-    options(add.cex=add.cex)
-    options(add.lwd=add.lwd)
-    options(add.lty=add.lty)
-    options(add.color=add.color)
+    options(add_fill=add_fill)
+    options(add_trans=add_trans)
+    options(add_cex=add_cex)
+    options(add_lwd=add_lwd)
+    options(add_lty=add_lty)
+    options(add_color=add_color)
 
-    options(strip.fill=strip.fill)
-    options(strip.color=strip.color)
-    options(strip.text.color=strip.text.color)
+    options(strip_fill=strip_fill)
+    options(strip_color=strip_color)
+    options(strip_text_color=strip_text_color)
 
     options(quiet=quiet)
     options(brief=brief)
-    options(n.cat=n.cat)
+    options(n_cat=n_cat)
     options(suggest=suggest)
     options(width=width)
 
@@ -551,257 +557,257 @@ function(
   if (theme == "white") {clr1 <- "white"; clr2 <- "black"}
 
 
-  if (!miss.theme) {
+  if (!miss_theme) {
 
     if (theme == "white") {
-      window.fill = "white"
-      panel.fill = "white"
-      bar.fill = "white"
-      bar.fill.ordered = "white"
-      bar.fill.discrete = "white"
-      bar.color.discrete = "black"
-      bar.color.ordered = "black"      
-      values.color = "black"
-      pt.fill = "white"
-      pt.color = "black"
-      bubble.text.color = "black"
-      ellipse.fill = .maketrans("gray55", 55)
-      ellipse.color = "black"
-      fit.color = "gray15"
-      violin.fill = "white"
-      violin.color = "black"
-      box.fill = "white"
-      box.color = "black"
-      se.fill = .maketrans("gray10", 40)
-      grid.color = "gray85"
-      out.fill = "black"
-      out.color = "black"
-      out2.fill = "gray25"
-      out2.color = "gray25"
+      window_fill = "white"
+      panel_fill = "white"
+      bar_fill = "white"
+      bar_fill_ordered = "white"
+      bar_fill_discrete = "white"
+      bar_color_discrete = "black"
+      bar_color_ordered = "black"      
+      values_color = "black"
+      pt_fill = "white"
+      pt_color = "black"
+      bubble_text_color = "black"
+      ellipse_fill = .maketrans("gray55", 55)
+      ellipse_color = "black"
+      fit_color = "gray15"
+      violin_fill = "white"
+      violin_color = "black"
+      box_fill = "white"
+      box_color = "black"
+      se_fill = .maketrans("gray10", 40)
+      grid_color = "gray85"
+      out_fill = "black"
+      out_color = "black"
+      out2_fill = "gray25"
+      out2_color = "gray25"
     }
 
     else if (theme == "gray") {
-      window.fill = "white"
-      panel.fill = "white"
-      bar.fill = .maketrans("gray25", .to256("trans.bar.fill"))
-      bar.fill.discrete = .maketrans("gray25",.to256("trans.bar.fill"))
-      bar.fill.ordered = .maketrans("gray25", .to256("trans.bar.fill"))
-      bar.color.discrete = "gray60"
-      bar.color.ordered = "gray60"
-      pt.fill = "gray20"
-      trans.pt.fill = 0.00
-      pt.color = "gray20"
-      violin.fill=.maketrans("gray50", 40)
-      violin.color = "gray15" 
-      box.fill="gray75"
-      box.color = "gray15" 
-      ellipse.fill = .maketrans("gray35", 15)
-      fit.color = "black"
-      se.fill = .maketrans("gray10", 40) 
-      segment.color = "gray20"
-      grid.color = "gray85"
-      out.fill = "black"
-      out.color = "black"
-      out2.fill = "black"
-      out2.color = "black"
+      window_fill = "white"
+      panel_fill = "white"
+      bar_fill = .maketrans("gray25", .to256("trans_bar_fill"))
+      bar_fill_discrete = .maketrans("gray25",.to256("trans_bar_fill"))
+      bar_fill_ordered = .maketrans("gray25", .to256("trans_bar_fill"))
+      bar_color_discrete = "gray60"
+      bar_color_ordered = "gray60"
+      pt_fill = "gray20"
+      trans_pt_fill = 0.00
+      pt_color = "gray20"
+      violin_fill=.maketrans("gray50", 40)
+      violin_color = "gray15" 
+      box_fill="gray75"
+      box_color = "gray15" 
+      ellipse_fill = .maketrans("gray35", 15)
+      fit_color = "black"
+      se_fill = .maketrans("gray10", 40) 
+      segment_color = "gray20"
+      grid_color = "gray85"
+      out_fill = "black"
+      out_color = "black"
+      out2_fill = "black"
+      out2_color = "black"
     }
 
     else if (theme == "lightbronze") {
-      window.fill = rgb(247,242,230, maxColorValue=255)
-      panel.fill = rgb(247,242,230, maxColorValue=255)
-      #panel.fill = "transparent"
-      panel.color = rgb(222,217,205, maxColorValue=255)
-      #bar.fill = .maketrans("gray50", .to256("trans.bar.fill")))  # 230
-      bar.fill = rgb(123,140,150, maxColorValue=255)  
-      bar.fill.ordered = rgb(123,140,150, maxColorValue=255)  
-      bar.fill.discrete = rgb(123,140,150, maxColorValue=255)  
-      bar.color.discrete = "transparent"
-      bar.color.ordered = rgb(126,144,168, maxColorValue=255)
-      pt.fill = rgb(70,80,90, maxColorValue=255)
-      trans.pt.fill = 0.00
-      pt.color = rgb(70,80,90, maxColorValue=255)
-      ellipse.fill = .maketrans("gray50", 50)
-      ellipse.color = "gray20"
-      se.fill = .maketrans("gray10", 40) 
-      violin.fill = rgb(144,165,175, maxColorValue=255)
-      violin.color = "gray15" 
-      box.fill = .maketrans("gray15", 35) 
-      box.color = "gray15" 
-      strip.fill = .maketrans("gray55")
-      fit.color = "gray15"
-      main.color = "gray15"
-      lab.color = "gray15"
-      axis.color = "gray15"
-      axis.text.color = "gray15"
-      segment.color = "gray50" 
-      strip.color = "gray55" 
-      strip.text.color = "gray15" 
-      ellipse.color = "gray15"
-      bubble.text.color = rgb(247,242,230, maxColorValue=255)
-      grid.color = rgb(222,217,205, maxColorValue=255)
+      window_fill = rgb(247,242,230, maxColorValue=255)
+      panel_fill = rgb(247,242,230, maxColorValue=255)
+      #panel_fill = "transparent"
+      panel_color = rgb(222,217,205, maxColorValue=255)
+      #bar_fill = .maketrans("gray50", .to256("trans_bar_fill")))  # 230
+      bar_fill = rgb(123,140,150, maxColorValue=255)  
+      bar_fill_ordered = rgb(123,140,150, maxColorValue=255)  
+      bar_fill_discrete = rgb(123,140,150, maxColorValue=255)  
+      bar_color_discrete = "transparent"
+      bar_color_ordered = rgb(126,144,168, maxColorValue=255)
+      pt_fill = rgb(70,80,90, maxColorValue=255)
+      trans_pt_fill = 0.00
+      pt_color = rgb(70,80,90, maxColorValue=255)
+      ellipse_fill = .maketrans("gray50", 50)
+      ellipse_color = "gray20"
+      se_fill = .maketrans("gray10", 40) 
+      violin_fill = rgb(144,165,175, maxColorValue=255)
+      violin_color = "gray15" 
+      box_fill = .maketrans("gray15", 35) 
+      box_color = "gray15" 
+      strip_fill = .maketrans("gray55")
+      fit_color = "gray15"
+      main_color = "gray15"
+      lab_color = "gray15"
+      axis_color = "gray15"
+      axis_text_color = "gray15"
+      segment_color = "gray50" 
+      strip_color = "gray55" 
+      strip_text_color = "gray15" 
+      ellipse_color = "gray15"
+      bubble_text_color = rgb(247,242,230, maxColorValue=255)
+      grid_color = rgb(222,217,205, maxColorValue=255)
       trans = 0
     }
 
     else if (theme == "colors") {
-      panel.fill = "white"
-      window.fill = getOption("panel.fill")
-      bar.fill.discrete = "hues"
-      bar.fill.ordered = rgb(144,165,175, maxColorValue=255)
-      bar.color.discrete = "transparent"
-      bar.color.ordered = rgb(126,144,168, maxColorValue=255)
-      pt.fill = rgb(70,80,90, maxColorValue=255)
-      trans.pt.fill = 0.00
-      pt.color = rgb(70,80,90, maxColorValue=255)
-      box.fill = getColors("hues")
-      violin.fill = .maketrans(hcl(240,20,55), 90)
-      grid.color = rgb(222,217,205, maxColorValue=255)
+      panel_fill = "white"
+      window_fill = getOption("panel_fill")
+      bar_fill_discrete = "hues"
+      bar_fill_ordered = rgb(144,165,175, maxColorValue=255)
+      bar_color_discrete = "transparent"
+      bar_color_ordered = rgb(126,144,168, maxColorValue=255)
+      pt_fill = rgb(70,80,90, maxColorValue=255)
+      trans_pt_fill = 0.00
+      pt_color = rgb(70,80,90, maxColorValue=255)
+      box_fill = getColors("hues")
+      violin_fill = .maketrans(hcl(240,20,55), 90)
+      grid_color = rgb(222,217,205, maxColorValue=255)
       values = "%"
     }
 
     else {  # process the other theme colors
 
-      window.fill = "white"
-      panel.fill = "grey99"
-      bar.fill = .maketrans(clr1, .to256("trans.bar.fill"))
-      violin.fill = bar.fill
-      bar.fill.discrete = .maketrans(clr1, .to256("trans.bar.fill"))
-      bar.fill.ordered = .maketrans(clr1, .to256("trans.bar.fill"))
-      pt.fill = .maketrans(clr1, .to256("trans.pt.fill"))
-      bar.color.discrete = clr2
-      bar.color.ordered = clr2
-      pt.color = clr2
+      window_fill = "white"
+      panel_fill = "grey99"
+      bar_fill = .maketrans(clr1, .to256("trans_bar_fill"))
+      violin_fill = bar_fill
+      bar_fill_discrete = .maketrans(clr1, .to256("trans_bar_fill"))
+      bar_fill_ordered = .maketrans(clr1, .to256("trans_bar_fill"))
+      pt_fill = .maketrans(clr1, .to256("trans_pt_fill"))
+      bar_color_discrete = clr2
+      bar_color_ordered = clr2
+      pt_color = clr2
       if (theme %in% c("darkred", "red", "rose"))  # kludge until all HCL colors 
-        box.fill <- hcl(0,40,55) 
+        box_fill <- hcl(0,40,55) 
       else if (theme %in% c("dodgerblue", "blue"))
-        box.fill <- hcl(240,40,55)
+        box_fill <- hcl(240,40,55)
       else if (theme %in% c("darkgreen", "green"))
-        box.fill <- hcl(120,40,55)
+        box_fill <- hcl(120,40,55)
       else {
-        violin.fill = .maketrans(clr1, 125)  # smaller, more trans 
-        box.fill = .maketrans(clr1, 35)
+        violin_fill = .maketrans(clr1, 125)  # smaller, more trans 
+        box_fill = .maketrans(clr1, 35)
       }
-      violin.color = "gray15"
-      box.color = "gray15"
-      se.fill = .maketrans(clr1, 40)
-      ellipse.fill = .maketrans(clr1, 15)
-      if (ellipse.color[1] != "transparent")
-        ellipse.color = .maketrans(clr1, 200)
-      segment.color = clr1
-      bubble.text.color = "black"
-      strip.fill = .maketrans(clr1, 55) 
-      strip.color = clr2 
-      strip.text.color = clr2 
+      violin_color = "gray15"
+      box_color = "gray15"
+      se_fill = .maketrans(clr1, 40)
+      ellipse_fill = .maketrans(clr1, 15)
+      if (ellipse_color[1] != "transparent")
+        ellipse_color = .maketrans(clr1, 200)
+      segment_color = clr1
+      bubble_text_color = "black"
+      strip_fill = .maketrans(clr1, 55) 
+      strip_color = clr2 
+      strip_text_color = clr2 
     }
   }  # not miss theme 
 
 
-  # sub.theme
-  if (!miss.sub.theme) {
+  # sub_theme
+  if (!miss_sub_theme) {
 
-    if (sub.theme == "default") {
-      panel.fill = "grey95"
-      if (theme == "white") panel.fill = "white"
-      window.fill = "white"
-      grid.x.color = "white"
-      grid.y.color = "white"
-      lab.color = "black"
-      main.color = "black"
+    if (sub_theme == "default") {
+      panel_fill = "grey95"
+      if (theme == "white") panel_fill = "white"
+      window_fill = "white"
+      grid_x_color = "white"
+      grid_y_color = "white"
+      lab_color = "black"
+      main_color = "black"
     }
 
-    else if (sub.theme == "wsj")  {
+    else if (sub_theme == "wsj")  {
       if (!(theme %in% c("gray", "white"))) {
-        window.fill = rgb(247,242,230, maxColorValue=255)
-        panel.fill = rgb(247,242,230, maxColorValue=255)
+        window_fill = rgb(247,242,230, maxColorValue=255)
+        panel_fill = rgb(247,242,230, maxColorValue=255)
       }
       else {
-        window.fill = "gray93"
-        panel.fill = "gray93"
+        window_fill = "gray93"
+        panel_fill = "gray93"
       }
-  #   window.fill = getOption("panel.fill")
-      panel.color = "transparent"
-      axis.y.color = "transparent"
-      gxs <- ifelse (getOption("window.fill") == "#040404", "white", "#040404")
-      grid.y.color = gxs
-      grid.x.color = "transparent"
-      grid.lty = "dotted"
-      grid.lwd = 1
+  #   window_fill = getOption("panel_fill")
+      panel_color = "transparent"
+      axis_y_color = "transparent"
+      gxs <- ifelse (getOption("window_fill") == "#040404", "white", "#040404")
+      grid_y_color = gxs
+      grid_x_color = "transparent"
+      grid_lty = "dotted"
+      grid_lwd = 1
     }
    
-    else if (!miss.theme  &&  theme == "gray"  &&  sub.theme == "black") {
-      window.fill = "gray10"
-      panel.fill = "gray10"
-      panel.color = "gray80"
-      trans.bar.fill = 0.55
-      trans.pt.fill = 0.0
-      bar.fill = .maketrans("gray55", .to256("trans.bar.fill"))
-      bar.fill.discrete =
-        .maketrans("gray55", .to256("trans.bar.fill"))
-      bar.fill.ordered =
-        .maketrans("gray55", .to256("trans.bar.fill"))
-      bar.color.discrete = "gray20"
-      bar.color.ordered = "gray20"
-      pt.fill = .maketrans("gray75", .to256("trans.pt.fill"))
-      pt.color = "gray90"
-      violin.fill = .maketrans("gray85", 160)
-      violin.color = "gray15"
-      box.fill = .maketrans("gray15", 35)
-      box.color = "gray15"
-      ellipse.fill = .maketrans("gray55", 65)
-      fit.color = "gray75"
-      se.fill = .maketrans("gray55", 65)
-      strip.color = .maketrans(clr1, .to256n(0.40))
-      strip.text.color = "gray65"
-      segment.color = "gray65"
-      lab.color = "gray85"
-      main.color = "gray85"
-      axis.x.color = "gray85"
-      axis.y.color = "gray85"
-      axis.text.color = "gray85"
-      grid.color = "gray25"
-      add.color = "gray55"
-      values.color = "gray85"
+    else if (!miss_theme  &&  theme == "gray"  &&  sub_theme == "black") {
+      window_fill = "gray10"
+      panel_fill = "gray10"
+      panel_color = "gray80"
+      trans_bar_fill = 0.55
+      trans_pt_fill = 0.0
+      bar_fill = .maketrans("gray55", .to256("trans_bar_fill"))
+      bar_fill_discrete =
+        .maketrans("gray55", .to256("trans_bar_fill"))
+      bar_fill_ordered =
+        .maketrans("gray55", .to256("trans_bar_fill"))
+      bar_color_discrete = "gray20"
+      bar_color_ordered = "gray20"
+      pt_fill = .maketrans("gray75", .to256("trans_pt_fill"))
+      pt_color = "gray90"
+      violin_fill = .maketrans("gray85", 160)
+      violin_color = "gray15"
+      box_fill = .maketrans("gray15", 35)
+      box_color = "gray15"
+      ellipse_fill = .maketrans("gray55", 65)
+      fit_color = "gray75"
+      se_fill = .maketrans("gray55", 65)
+      strip_color = .maketrans(clr1, .to256n(0.40))
+      strip_text_color = "gray65"
+      segment_color = "gray65"
+      lab_color = "gray85"
+      main_color = "gray85"
+      axis_x_color = "gray85"
+      axis_y_color = "gray85"
+      axis_text_color = "gray85"
+      grid_color = "gray25"
+      add_color = "gray55"
+      values_color = "gray85"
       clr1 <- "gray55"
     }
   
-    else if (sub.theme == "black") {
+    else if (sub_theme == "black") {
 
-      window.fill = rgb(.015,.015,.015)
-      panel.fill = rgb(.015,.015,.015)
-      grid.color = "gray25"
-      panel.color = "gray80"
-      segment.color = "gray65"
-      lab.color = "gray85"
-      main.color = "gray85"
-      axis.x.color = "gray85"
-      axis.y.color = "gray85"
-      axis.text.color = "gray85"
-      add.color = "gray55"
-      values.color = "gray85"
+      window_fill = rgb(.015,.015,.015)
+      panel_fill = rgb(.015,.015,.015)
+      grid_color = "gray25"
+      panel_color = "gray80"
+      segment_color = "gray65"
+      lab_color = "gray85"
+      main_color = "gray85"
+      axis_x_color = "gray85"
+      axis_y_color = "gray85"
+      axis_text_color = "gray85"
+      add_color = "gray55"
+      values_color = "gray85"
 
-      if (sum(col2rgb(panel.fill)) < 370) {
-        strip.color = .maketrans(clr1, .to256n(0.40))
-        strip.text.color = "gray65"
+      if (sum(col2rgb(panel_fill)) < 370) {
+        strip_color = .maketrans(clr1, .to256n(0.40))
+        strip_text_color = "gray65"
       }
 
-      else if (theme ==  "orange"  &&  sub.theme == "black") {
-        if (miss.tr.bar.fill) trans.bar.fill = .05
-        bar.fill.discrete = rgb(139,69,0, alpha=.to256("trans.bar.fill"),
+      else if (theme ==  "orange"  &&  sub_theme == "black") {
+        if (miss_tr.bar_fill) trans_bar_fill = .05
+        bar_fill_discrete = rgb(139,69,0, alpha=.to256("trans_bar_fill"),
               maxColorValue=256)
-        bar.fill.ordered = rgb(139,69,0, alpha=.to256("trans.bar.fill"),
+        bar_fill_ordered = rgb(139,69,0, alpha=.to256("trans_bar_fill"),
               maxColorValue=256)
-        pt.fill = rgb(139,69,0, alpha=.to256("trans.pt.fill"),
+        pt_fill = rgb(139,69,0, alpha=.to256("trans_pt_fill"),
               maxColorValue=256)
-        bar.color.discrete = "orange4"
-        bar.color.ordered = "orange4"
-        pt.color = rgb(139,69,0, maxColorValue=256)
-        ellipse.fill = rgb(249,99,2, alpha=45, maxColorValue=256)
-        fit.color = rgb(209,87,3, maxColorValue=256)
-        segment.color = rgb(249,99,2, maxColorValue=256)
+        bar_color_discrete = "orange4"
+        bar_color_ordered = "orange4"
+        pt_color = rgb(139,69,0, maxColorValue=256)
+        ellipse_fill = rgb(249,99,2, alpha=45, maxColorValue=256)
+        fit_color = rgb(209,87,3, maxColorValue=256)
+        segment_color = rgb(249,99,2, maxColorValue=256)
         clr1 <- rgb(249,99,2, maxColorValue=256)
       }
     }
 
-  }  # end not miss sub.theme
+  }  # end not miss sub_theme
 
   if (show) {
     .style.show()
@@ -812,99 +818,99 @@ function(
   if (reset) {
 
     options(theme = theme)
-    options(sub.theme = sub.theme)
+    options(sub_theme = sub_theme)
 
-    options(bar.fill = bar.fill) 
-    options(bar.fill.discrete = bar.fill.discrete) 
-    options(bar.fill.ordered = bar.fill.ordered) 
-    options(bar.color.discrete = bar.color.discrete) 
-    options(bar.color.ordered = bar.color.ordered) 
-    options(pt.fill = pt.fill) 
-    options(pt.color = pt.color) 
+    options(bar_fill = bar_fill) 
+    options(bar_fill_discrete = bar_fill_discrete) 
+    options(bar_fill_ordered = bar_fill_ordered) 
+    options(bar_color_discrete = bar_color_discrete) 
+    options(bar_color_ordered = bar_color_ordered) 
+    options(pt_fill = pt_fill) 
+    options(pt_color = pt_color) 
     
     options(values=values)
-    options(values.color=values.color)
-    options(values.size=values.size)
-    options(values.digits=values.digits)
-    options(values.position=values.position)
+    options(values_color=values_color)
+    options(values_size=values_size)
+    options(values_digits=values_digits)
+    options(values_position=values_position)
     
-    options(window.fill=window.fill)
-    options(panel.fill=panel.fill)
-    options(panel.color=panel.color)
-    options(panel.lwd=panel.lwd)
-    options(panel.lty=panel.lty)
+    options(window_fill=window_fill)
+    options(panel_fill=panel_fill)
+    options(panel_color=panel_color)
+    options(panel_lwd=panel_lwd)
+    options(panel_lty=panel_lty)
 
-    options(violin.fill=violin.fill)
-    options(violin.color=violin.color)
-    options(box.fill=box.fill)
-    options(box.color=box.color)
+    options(violin_fill=violin_fill)
+    options(violin_color=violin_color)
+    options(box_fill=box_fill)
+    options(box_color=box_color)
 
-    options(ellipse.fill=ellipse.fill)
-    options(ellipse.color=ellipse.color)
-    options(ellipse.lwd=ellipse.lwd)
-    options(fit.color=fit.color)
-    options(fit.lwd=fit.lwd)
-    options(se.fill=se.fill)
-    options(segment.color=segment.color)
-    options(ID.color=ID.color)
-    options(out.fill=out.fill)
-    options(out.color=out.color)
-    options(out2.fill=out2.fill)
-    options(out2.color=out2.color)
-    options(bubble.text.color=bubble.text.color)
+    options(ellipse_fill=ellipse_fill)
+    options(ellipse_color=ellipse_color)
+    options(ellipse_lwd=ellipse_lwd)
+    options(fit_color=fit_color)
+    options(fit_lwd=fit_lwd)
+    options(se_fill=se_fill)
+    options(segment_color=segment_color)
+    options(ID_color=ID_color)
+    options(out_fill=out_fill)
+    options(out_color=out_color)
+    options(out2_fill=out2_fill)
+    options(out2_color=out2_color)
+    options(bubble_text_color=bubble_text_color)
 
-    options(grid.color=grid.color)
-    options(grid.x.color=grid.x.color)
-    options(grid.y.color=grid.y.color)
-    options(grid.lwd=grid.lwd)
-    options(grid.x.lwd=grid.x.lwd)
-    options(grid.y.lwd=grid.y.lwd)
-    options(grid.lty=grid.lty)
-    options(grid.x.lty=grid.x.lty)
-    options(grid.y.lty=grid.y.lty)
+    options(grid_color=grid_color)
+    options(grid_x_color=grid_x_color)
+    options(grid_y_color=grid_y_color)
+    options(grid_lwd=grid_lwd)
+    options(grid_x_lwd=grid_x_lwd)
+    options(grid_y_lwd=grid_y_lwd)
+    options(grid_lty=grid_lty)
+    options(grid_x_lty=grid_x_lty)
+    options(grid_y_lty=grid_y_lty)
 
-    options(lab.color=lab.color)
-    options(lab.x.color=lab.x.color)
-    options(lab.y.color=lab.y.color)
-    options(lab.cex=lab.cex)
-    options(lab.x.cex=lab.x.cex)
-    options(lab.y.cex=lab.y.cex)
-    options(main.color=main.color)
-    options(main.cex=main.cex)
-    options(axis.color=axis.color)
-    options(axis.x.color=axis.x.color)
-    options(axis.y.color=axis.y.color)
-    options(axis.lwd=axis.lwd)
-    options(axis.x.lwd=axis.x.lwd)
-    options(axis.y.lwd=axis.y.lwd)
-    options(axis.lty=axis.lty)
-    options(axis.x.lty=axis.x.lty)
-    options(axis.y.lty=axis.y.lty)
+    options(lab_color=lab_color)
+    options(lab_x_color=lab_x_color)
+    options(lab_y_color=lab_y_color)
+    options(lab_cex=lab_cex)
+    options(lab_x_cex=lab_x_cex)
+    options(lab_y_cex=lab_y_cex)
+    options(main_color=main_color)
+    options(main_cex=main_cex)
+    options(axis_color=axis_color)
+    options(axis_x_color=axis_x_color)
+    options(axis_y_color=axis_y_color)
+    options(axis_lwd=axis_lwd)
+    options(axis_x_lwd=axis_x_lwd)
+    options(axis_y_lwd=axis_y_lwd)
+    options(axis_lty=axis_lty)
+    options(axis_x_lty=axis_x_lty)
+    options(axis_y_lty=axis_y_lty)
 
-    options(axis.cex=axis.cex)
-    options(axis.x.cex=axis.x.cex)
-    options(axis.y.cex=axis.y.cex)
-    options(axis.text.color=axis.text.color)
-    options(axis.x.text.color=axis.x.text.color)
-    options(axis.y.text.color=axis.y.text.color)
-    options(rotate.x=rotate.x)
-    options(rotate.y=rotate.y)
+    options(axis_cex=axis_cex)
+    options(axis_x_cex=axis_x_cex)
+    options(axis_y_cex=axis_y_cex)
+    options(axis_text_color=axis_text_color)
+    options(axis_x_text_color=axis_x_text_color)
+    options(axis_y_text_color=axis_y_text_color)
+    options(rotate_x=rotate_x)
+    options(rotate_y=rotate_y)
     options(offset=offset)
 
-    options(add.fill=add.fill)
-    options(add.trans=add.trans)
-    options(add.cex=add.cex)
-    options(add.lwd=add.lwd)
-    options(add.lty=add.lty)
-    options(add.color=add.color)
+    options(add_fill=add_fill)
+    options(add_trans=add_trans)
+    options(add_cex=add_cex)
+    options(add_lwd=add_lwd)
+    options(add_lty=add_lty)
+    options(add_color=add_color)
 
-    options(strip.fill=strip.fill)
-    options(strip.color=strip.color)
-    options(strip.text.color=strip.text.color)
+    options(strip_fill=strip_fill)
+    options(strip_color=strip_color)
+    options(strip_text_color=strip_text_color)
 
     options(quiet=quiet)
     options(brief=brief)
-    options(n.cat=n.cat)
+    options(n_cat=n_cat)
     options(suggest=suggest)
     options(width=width)
 
@@ -922,122 +928,122 @@ function(
   if (get) {
 
     panel <- list(
-      fill = getOption("panel.fill"),
-      color = getOption("panel.color"),
-      lwd = getOption("panel.lwd"),
-      lty = getOption("panel.lty")
+      fill = getOption("panel_fill"),
+      color = getOption("panel_color"),
+      lwd = getOption("panel_lwd"),
+      lty = getOption("panel_lty")
     )
 
     bar <- list(
-      fill = getOption("bar.fill"),
-      bar.fill.discrete = getOption("bar.fill.discrete"),
-      bar.fill.ordered = getOption("bar.fill.ordered"),
-      trans.fill = getOption("trans.bar.fill"),
-      color = getOption("bar.color"),
+      fill = getOption("bar_fill"),
+      bar_fill_discrete = getOption("bar_fill_discrete"),
+      bar_fill_ordered = getOption("bar_fill_ordered"),
+      trans_fill = getOption("trans_bar_fill"),
+      color = getOption("bar_color"),
       values = getOption("values"),
-      values.color = getOption("values.color"),
-      values.size = getOption("values.size"),
-      values.digits = getOption("values.digits"),
-      values.position = getOption("values.position")
+      values_color = getOption("values_color"),
+      values_size = getOption("values_size"),
+      values_digits = getOption("values_digits"),
+      values_position = getOption("values_position")
     )
 
     pt <- list(
-      fill = getOption("pt.fill"),
-      trans.fill = getOption("trans.pt.fill"),
-      color = getOption("pt.color"),
-      out.fill=getOption("out.fill"),
-      out.color=getOption("out.color"),
-      out2.fill=getOption("out2.fill"),
-      out2.color=getOption("out2.color")
+      fill = getOption("pt_fill"),
+      trans_fill = getOption("trans_pt_fill"),
+      color = getOption("pt_color"),
+      out_fill=getOption("out_fill"),
+      out_color=getOption("out_color"),
+      out2_fill=getOption("out2_fill"),
+      out2_color=getOption("out2_color")
     )
 
     VBS <- list(
-      violin.fill = getOption("violin.fill"),
-      violin.color = getOption("violin.color"),
-      box.fill = getOption("box.fill"),
-      box.color = getOption("box.color")
+      violin_fill = getOption("violin_fill"),
+      violin_color = getOption("violin_color"),
+      box_fill = getOption("box_fill"),
+      box_color = getOption("box_color")
     )
 
     ellipse <- list(
-      fill = getOption("ellipse.fill"),
-      color = getOption("ellipse.color")
+      fill = getOption("ellipse_fill"),
+      color = getOption("ellipse_color")
     )
 
     axis <- list(
-      color = getOption("axis.color"),
-      lwd = getOption("axis.lwd"),
-      lty = getOption("axis.lty"),
-      cex = getOption("axis.cex"),
-      text.color = getOption("axis.text.color")
+      color = getOption("axis_color"),
+      lwd = getOption("axis_lwd"),
+      lty = getOption("axis_lty"),
+      cex = getOption("axis_cex"),
+      text_color = getOption("axis_text_color")
     )
-    axis.x <- list(
-      color = getOption("axis.x.color"),
-      lwd = getOption("axis.x.lwd"),
-      lty = getOption("axis.x.lty"),
-      cex = getOption("axis.x.cex"),
-      text.color = getOption("axis.x.text.color")
+    axis_x <- list(
+      color = getOption("axis_x_color"),
+      lwd = getOption("axis_x_lwd"),
+      lty = getOption("axis_x_lty"),
+      cex = getOption("axis_x_cex"),
+      text_color = getOption("axis_x_text_color")
     )
-    axis.y <- list(
-      color = getOption("axis.y.color"),
-      lwd = getOption("axis.y.lwd"),
-      lty = getOption("axis.y.lty"),
-      cex = getOption("axis.y.cex"),
-      text.color = getOption("axis.y.text.color")
+    axis_y <- list(
+      color = getOption("axis_y_color"),
+      lwd = getOption("axis_y_lwd"),
+      lty = getOption("axis_y_lty"),
+      cex = getOption("axis_y_cex"),
+      text_color = getOption("axis_y_text_color")
     )
 
     rotate <- list(
-      x = getOption("rotate.x"),
-      y = getOption("rotate.y"),
+      x = getOption("rotate_x"),
+      y = getOption("rotate_y"),
       offset = getOption("offset")
     )
 
     lab <- list(
-      color = getOption("lab.color"),
-      cex = getOption("lab.cex")
+      color = getOption("lab_color"),
+      cex = getOption("lab_cex")
     )
-    lab.x <- list(
-      color = getOption("lab.x.color"),
-      cex = getOption("lab.x.cex")
+    lab_x <- list(
+      color = getOption("lab_x_color"),
+      cex = getOption("lab_x_cex")
     )
-    lab.y <- list(
-      color = getOption("lab.y.color"),
-      cex = getOption("lab.y.cex")
+    lab_y <- list(
+      color = getOption("lab_y_color"),
+      cex = getOption("lab_y_cex")
     )
 
     main <- list(
-      color = getOption("main.color"),
-      cex = getOption("main.cex")
+      color = getOption("main_color"),
+      cex = getOption("main_cex")
     )
 
     grid <- list(
-      color = getOption("grid.color"),
-      lwd = getOption("grid.lwd"),
-      lty = getOption("grid.lty")
+      color = getOption("grid_color"),
+      lwd = getOption("grid_lwd"),
+      lty = getOption("grid_lty")
     )
-    grid.x <- list(
-      color = getOption("grid.x.color"),
-      lwd = getOption("grid.x.lwd"),
-      lty = getOption("grid.x.lty")
+    grid_x <- list(
+      color = getOption("grid_x_color"),
+      lwd = getOption("grid_x_lwd"),
+      lty = getOption("grid_x_lty")
     )
-    grid.y <- list(
-      color = getOption("grid.y.color"),
-      lwd = getOption("grid.y.lwd"),
-      lty = getOption("grid.y.lty")
+    grid_y <- list(
+      color = getOption("grid_y_color"),
+      lwd = getOption("grid_y_lwd"),
+      lty = getOption("grid_y_lty")
     )
 
     strip <- list(
-      fill = getOption("strip.fill"),
-      color = getOption("strip.color"),
-      text.color = getOption("strip.text.color")
+      fill = getOption("strip_fill"),
+      color = getOption("strip_color"),
+      text_color = getOption("strip_text_color")
     )
 
     add <- list(
-      fill = getOption("add.fill"),
-      trans = getOption("add.trans"),
-      color = getOption("add.color"),
-      cex = getOption("add.cex"),
-      lwd = getOption("add.lwd"),
-      lty = getOption("add.lty")
+      fill = getOption("add_fill"),
+      trans = getOption("add_trans"),
+      color = getOption("add_color"),
+      cex = getOption("add_cex"),
+      lwd = getOption("add_lwd"),
+      lty = getOption("add_lty")
     )
 
     output <- list(
@@ -1055,123 +1061,123 @@ function(
   # create sub-lists
 
   panel <- list(
-    fill = panel.fill,
-    color = panel.color,
-    lwd = panel.lwd,
-    lty = panel.lty
+    fill = panel_fill,
+    color = panel_color,
+    lwd = panel_lwd,
+    lty = panel_lty
   )
 
 
   bar <- list(
-    fill = bar.fill,
-    bar.fill.discrete = bar.fill.discrete,
-    bar.fill.ordered = bar.fill.ordered,
-    trans.fill = trans.bar.fill,
-    color = bar.color,
+    fill = bar_fill,
+    bar_fill_discrete = bar_fill_discrete,
+    bar_fill_ordered = bar_fill_ordered,
+    trans_fill = trans_bar_fill,
+    color = bar_color,
     values = values,
-    values.color = values.color,
-    values.size = values.size,
-    values.digits = values.digits,
-    values.position = values.position
+    values_color = values_color,
+    values_size = values_size,
+    values_digits = values_digits,
+    values_position = values_position
   )
 
   pt <- list(
-    fill = pt.fill,
-    trans.fill = trans.pt.fill,
-    color = pt.color,
-    out.fill=out.fill,
-    out.color=out.color,
-    out2.fill=out2.fill,
-    out2.color=out2.color
+    fill = pt_fill,
+    trans_fill = trans_pt_fill,
+    color = pt_color,
+    out_fill=out_fill,
+    out_color=out_color,
+    out2_fill=out2_fill,
+    out2_color=out2_color
   )
 
   VBS <- list(
-    violin.fill = violin.fill,
-    violin.color = violin.color,
-    box.fill = box.fill,
-    box.color = box.color
+    violin_fill = violin_fill,
+    violin_color = violin_color,
+    box_fill = box_fill,
+    box_color = box_color
   )
 
   ellipse <- list(
-    fill = ellipse.fill,
-    color = ellipse.color
+    fill = ellipse_fill,
+    color = ellipse_color
   )
 
   axis <- list(
-    color = axis.color,
-    lwd = axis.lwd,
-    lty = axis.lty,
-    cex = axis.cex,
-    text.color = axis.text.color
+    color = axis_color,
+    lwd = axis_lwd,
+    lty = axis_lty,
+    cex = axis_cex,
+    text_color = axis_text_color
   )
-  axis.x <- list(
-    color = axis.x.color,
-    lwd = axis.x.lwd,
-    lty = axis.x.lty,
-    cex = axis.x.cex,
-    text.color = axis.x.text.color
+  axis_x <- list(
+    color = axis_x_color,
+    lwd = axis_x_lwd,
+    lty = axis_x_lty,
+    cex = axis_x_cex,
+    text_color = axis_x_text_color
   )
-  axis.y <- list(
-    color = axis.y.color,
-    lwd = axis.y.lwd,
-    lty = axis.y.lty,
-    cex = axis.y.cex,
-    text.color = axis.y.text.color
+  axis_y <- list(
+    color = axis_y_color,
+    lwd = axis_y_lwd,
+    lty = axis_y_lty,
+    cex = axis_y_cex,
+    text_color = axis_y_text_color
   )
 
   rotate <- list(
-    x = rotate.x,
-    y = rotate.y,
+    x = rotate_x,
+    y = rotate_y,
     offset = offset
   )
 
   lab <- list(
-    color = lab.color,
-    cex = lab.cex
+    color = lab_color,
+    cex = lab_cex
   )
-  lab.x <- list(
-    color = lab.x.color,
-    cex = lab.x.cex
+  lab_x <- list(
+    color = lab_x_color,
+    cex = lab_x_cex
   )
-  lab.y <- list(
-    color = lab.y.color,
-    cex = lab.y.cex
+  lab_y <- list(
+    color = lab_y_color,
+    cex = lab_y_cex
   )
 
   main <- list(
-    color = main.color,
-    cex = main.cex
+    color = main_color,
+    cex = main_cex
   )
 
   grid <- list(
-    color = grid.color,
-    lwd = grid.lwd,
-    lty = grid.lty
+    color = grid_color,
+    lwd = grid_lwd,
+    lty = grid_lty
   )
-  grid.x <- list(
-    color = grid.x.color,
-    lwd = grid.x.lwd,
-    lty = grid.x.lty
+  grid_x <- list(
+    color = grid_x_color,
+    lwd = grid_x_lwd,
+    lty = grid_x_lty
   )
-  grid.y <- list(
-    color = grid.y.color,
-    lwd = grid.y.lwd,
-    lty = grid.y.lty
+  grid_y <- list(
+    color = grid_y_color,
+    lwd = grid_y_lwd,
+    lty = grid_y_lty
   )
 
   strip <- list(
-    fill = strip.fill,
-    color = strip.color,
-    text.color = strip.text.color
+    fill = strip_fill,
+    color = strip_color,
+    text_color = strip_text_color
   )
 
   add <- list(
-    fill = add.fill,
-    trans = add.trans,
-    color = add.color,
-    cex = add.cex,
-    lwd = add.lwd,
-    lty = add.lty
+    fill = add_fill,
+    trans = add_trans,
+    color = add_color,
+    cex = add_cex,
+    lwd = add_lwd,
+    lty = add_lty
   )
 
   output <- list(
@@ -1186,9 +1192,9 @@ function(
   # create main list
   gp <- list(
     theme = theme,
-    sub.theme = getOption("sub.theme"),
+    sub_theme = getOption("sub_theme"),
 
-    window.fill = getOption("window.fill"),
+    window_fill = getOption("window_fill"),
     panel = panel,
 
     bar = bar,
@@ -1197,32 +1203,32 @@ function(
     VBS = VBS,
     ellipse = ellipse,
 
-    fit.color = getOption("fit.color"),
-    fit.lwd = getOption("fit.lwd"),
-    se.fill = getOption("se.fill"),
-    bubble.text.color = getOption("bubble.text.color"),
-    segment.color = getOption("segment.color"),
-    ID.color=getOption("ID.color"),
+    fit_color = getOption("fit_color"),
+    fit_lwd = getOption("fit_lwd"),
+    se_fill = getOption("se_fill"),
+    bubble_text_color = getOption("bubble_text_color"),
+    segment_color = getOption("segment_color"),
+    ID_color=getOption("ID_color"),
 
     axis = axis,
-    axis.x = axis.x,
-    axis.y = axis.y,
+    axis_x = axis_x,
+    axis_y = axis_y,
     rotate = rotate,
 
     lab = lab,
-    lab.x = lab.x,
-    lab.y = lab.y,
+    lab_x = lab_x,
+    lab_y = lab_y,
     main = main,
 
     grid = grid,
-    grid.x = grid.x,
-    grid.y = grid.y,
+    grid_x = grid_x,
+    grid_y = grid_y,
 
     strip = strip,
 
     add = add,
 
-    n.cat = getOption("n.cat"),
+    n_cat = getOption("n_cat"),
     suggest = getOption("suggest"),
     quiet = getOption("quiet"),
     brief = getOption("brief"),

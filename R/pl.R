@@ -1,7 +1,7 @@
 pl <-
 function(...)
 
-  Plot(fun.call=match.call(), ...)
+  Plot(fun_call=match.call(), ...)
 
 
 

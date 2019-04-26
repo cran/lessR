@@ -1,18 +1,18 @@
 .logit3Residual <-
 function(lm.out, nm, d,
-         n.vars, n.pred, n.obs, n.keep, digits.d, pre, line,
-         res.sort, res.rows, cooks.cut) {
+         n.vars, n.pred, n.obs, n.keep, digits_d, pre, line,
+         res_sort, res_rows, cooks_cut) {
   
     cat( "\n\n\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
 
     cat("Data, Fitted, Residual, Studentized Residual, Dffits, Cook's Distance\n")
-    if (res.sort == "cooks") cat("   [sorted by Cook's Distance]\n")
-    if (res.sort == "rstudent")  
+    if (res_sort == "cooks") cat("   [sorted by Cook's Distance]\n")
+    if (res_sort == "rstudent")  
       cat("   [sorted by Studentized Residual, ignoring + or - sign]\n")
-   if (res.sort == "dffits")  
+   if (res_sort == "dffits")  
       cat("   [sorted by dffits, ignoring + or - sign]\n")
     txt <- "cases (rows) of data]"
-    cat("   [res.rows = ", res.rows, " out of ", n.keep, " ", txt, sep="", "\n")
+    cat("   [res_rows = ", res_rows, " out of ", n.keep, " ", txt, sep="", "\n")
     .dash(68)
 
     fit <- fitted(lm.out)
@@ -27,15 +27,15 @@ function(lm.out, nm, d,
     names(out)[n.vars+3] <- "rstudent"
     names(out)[n.vars+4] <- "dffits"
     names(out)[n.vars+5] <- "cooks"
-    if (res.sort != "off") {
-      if (res.sort == "cooks") o <- order(out$cooks, decreasing=TRUE)
-      if (res.sort == "rstudent") o <- order(abs(out$rstudent),
+    if (res_sort != "off") {
+      if (res_sort == "cooks") o <- order(out$cooks, decreasing=TRUE)
+      if (res_sort == "rstudent") o <- order(abs(out$rstudent),
         decreasing=TRUE)
-      if (res.sort == "dffits") o <- order(abs(out$dffits),
+      if (res_sort == "dffits") o <- order(abs(out$dffits),
         decreasing=TRUE)
       out <- out[o,]
     }
-    print(out[1:res.rows,], digits=digits.d)
+    print(out[1:res_rows,], digits=digits_d)
     rm(out)
 
 }

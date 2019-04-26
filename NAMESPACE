@@ -10,28 +10,28 @@ importFrom("robustbase", adjboxStats, mc)
 importFrom("colorspace", sequential_hcl, diverge_hcl)
 importFrom("viridisLite", viridis, cividis, magma, inferno, plasma)
 importFrom("wesanderson", wes_palette)
-importFrom("randomcoloR", distinctColorPalette)
 importFrom("rmarkdown", render, pandoc_available)
 #importFrom("MBESS", ci.smd)
+#importFrom("randomcoloR", distinctColorPalette)
 
 importFrom("graphics", abline, arrows, axis, axis.Date, barplot, box, boxplot, grconvertX, grconvertY, hist, legend, lines, mtext, pairs, par, pie, plot, plot.default, plot.new, plot.window, points, polygon, rasterImage, rect, rug, segments, stripchart, strwidth, sunflowerplot, symbols, text, title, axTicks, smoothScatter)
 
-importFrom("grDevices", "boxplot.stats", "col2rgb", "colorRampPalette", "colors", "dev.list", "dev.new", "dev.off", "dev.set", "gray", "heat.colors", "hcl", "palette", "pdf", "rainbow", "rgb", "terrain.colors", "as.graphicsAnnot")
+importFrom("grDevices", boxplot.stats, col2rgb, colorRampPalette, colors, dev.list, dev.new, dev.off, dev.set, gray, heat.colors, hcl, palette, pdf, rainbow, rgb, terrain.colors, as.graphicsAnnot)
 
-importFrom("stats", "confint.default", "IQR", "TukeyHSD", "addmargins", "anova", "aov", "as.formula", "bw.nrd0", "chisq.test", "coef", "complete.cases", "confint", "cooks.distance", "cor", "cor.test", "cov", "density", "dffits", "dlnorm", "dnorm", "dt", "dunif", "factanal", "fitted", "frequency", "glm", "heatmap", "interaction.plot", "lm", "lm.influence", "loadings", "loess", "lowess", "median", "mahalanobis", "na.omit", "pf", "pnorm", "power.t.test", "predict", "promax", "pt", "qnorm", "qt", "quantile", "rbinom", "replications", "residuals", "rlnorm", "rnorm", "rstandard", "rstudent", "runif", "sd", "shapiro.test", "start", "t.test", "terms.formula", "update", "var", "varimax", "is.ts", "time",  "weighted.mean", "fivenum", "as.dist", "hclust", "cutree")
+importFrom("stats", confint.default, IQR, TukeyHSD, addmargins, anova, aov, as.formula, bw.nrd0, chisq.test, coef, complete.cases, confint, cooks.distance, cor, cor.test, cov, density, dffits, dlnorm, dnorm, dt, dunif, factanal, fitted, frequency, glm, heatmap, interaction.plot, lm, lm.influence, loadings, loess, lowess, median, mahalanobis, na.omit, pf, pnorm, power.t.test, predict, promax, pt, qnorm, qt, quantile, rbinom, replications, residuals, rlnorm, rnorm, rstandard, rstudent, runif, sd, shapiro.test, start, t.test, terms.formula, update, var, varimax, is.ts, time,  weighted.mean, fivenum, as.dist, hclust, cutree)
 
-importFrom("utils", "head", "help", "packageVersion", "read.csv", "read.fwf", "read.table", "type.convert", "write.csv", "write.table", "browseURL")
+importFrom("utils", head, help, packageVersion, read.csv, read.fwf, read.table, type.convert, write.csv, write.table, browseURL)
 
-importFrom("methods", "hasArg")
+importFrom("methods", hasArg)
 
-importFrom("lattice", "xyplot", "histogram", "barchart", "panel.grid", "panel.xyplot", "panel.loess", "panel.lmline", "panel.densityplot", "panel.superpose", "panel.polygon",
-"trellis.par.get", "current.panel.limits", "panel.text",
-"panel.barchart", "panel.histogram", "panel.dotplot", "panel.points",
-"panel.segments", "panel.violin", "panel.bwplot", "panel.stripplot")
+importFrom("lattice", xyplot, histogram, barchart, panel.grid, panel.xyplot, panel.loess, panel.lmline, panel.densityplot, panel.superpose, panel.polygon,
+trellis.par.get, current.panel.limits, panel.text,
+panel.barchart, panel.histogram, panel.dotplot, panel.points,
+panel.segments, panel.violin, panel.bwplot, panel.stripplot)
 
-importFrom("latticeExtra", "layer", "panel.ellipse", "panel.xyarea")
+importFrom("latticeExtra", layer, panel.ellipse, panel.xyarea)
 
-#importFrom("colorspace", "polarLUV")
+#importFrom("colorspace", polarLUV)
 
 S3method(print, out_all)
 S3method(print, out)
@@ -45,10 +45,10 @@ S3method(print, out)
 
 export (
 
-  ANOVA, av, av.brief,
+  ANOVA, av, av.brief, av_brief,
   BarChart, bc,
   BoxPlot, bx,
-  Correlation, cr, cr.brief,
+  Correlation, cr, cr.brief, cr_brief,
   CountAll, ca,
   corCFA, cfa, scales,
   corRead, rd.cor,
@@ -65,28 +65,29 @@ export (
   LineChart, lc,
   Logit, lr,
   Merge, mrg,
-  Model, model, model.brief,
+  Model, model, model_brief,
   Nest,
   PieChart, pc,
   Plot, pl,
   print.out_all, print.out,
+  prob_norm, prob_znorm, prob_tcut,
   prob.norm, prob.znorm, prob.tcut,
   Read, rd, rd.brief, Read2,
-  Regression, reg, reg.brief, regPlot, 
+  Regression, reg, reg.brief, reg_brief, regPlot, 
   Recode, rec,
   set, showColors, showPalettes,
   simCImean, simCLT, simFlips, simMeans,
   ScatterPlot, sp, 
   Sort, srt,
   Subset, subs,
-  SummaryStats, ss, ss.brief,
+  SummaryStats, ss, ss.brief, ss_brief,
   style,
   to,
   Transform, trans,
-  ttest, tt, tt.brief,
+  ttest, tt, tt.brief, tt_brief,
   ttestPower, ttp,
   values, VariableLabels, vl, 
   ViolinPlot, vp,
-  Write, wrt, wrt.r, wrt.x,
+  Write, wrt, wrt_r, wrt_x,
   xAnd, xNum, xP, xRow, xU, xW
 )

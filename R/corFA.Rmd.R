@@ -1,8 +1,8 @@
 .corfa.Rmd <-
-function(mimm, nm.mimm=NULL, dname, fun.call, n.inds, n.factors, iter, item.cor, 
+function(mimm, nm.mimm=NULL, dname, fun_call, n.inds, n_factors, iter, item_cor, 
          explain, interpret, results) {
 
-  fncl <- .fun.call.deparse(fun.call) 
+  fncl <- .fun_call.deparse(fun_call) 
   fc <- .rm.arg("Rmd", fncl) 
 
   # set parameters
@@ -107,8 +107,8 @@ sep="")
   tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- "## Specified Model"
 
-  loc <- regexec("heat.map = FALSE", fc)
-  if (loc == -1) fc <- sub(")$", ", heat.map=FALSE)", fc)
+  loc <- regexec("heat_map = FALSE", fc)
+  if (loc == -1) fc <- sub(")$", ", heat_map=FALSE)", fc)
 
   if (results) {
     tx[length(tx)+1] <- ""
@@ -177,7 +177,7 @@ sep="")
   }
 
 
-    if (explain && item.cor) tx[length(tx)+1] <- paste(
+    if (explain && item_cor) tx[length(tx)+1] <- paste(
 "* _Item Correlation_: Correlation of two items with each other\n",
 "* _Communality_, in the diagonal of the item correlations: Proportion",
 "of the correlation of an item with itself that is due only to ",

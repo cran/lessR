@@ -1,4 +1,5 @@
-\name{prob.norm}
+\name{prob_norm}
+\alias{prob_norm}
 \alias{prob.norm}
 
 \title{Compute and Plot Normal Curve Probabilities over an Interval}
@@ -8,10 +9,12 @@ Calculate the probability of an interval for a normal distribution with specifie
 }
 
 \usage{
-prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black", 
-         fill.nrm="grey91", fill.int="slategray3", 
-         ylab="", y.axis=FALSE, z=TRUE, axis.size=.9,
-         pdf.file=NULL, width=5, height=5, \ldots)
+prob_norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm_color="black", 
+         fill_nrm="grey91", fill_int="slategray3", 
+         ylab="", y_axis=FALSE, z=TRUE, axis_size=.9,
+         pdf_file=NULL, width=5, height=5, \ldots)
+
+prob.norm(\ldots)
 }
 
 
@@ -20,16 +23,16 @@ prob.norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm.color="black",
   \item{hi}{Highest value in the interval for which to compute probability.}
   \item{mu}{Population mean of normal distribution.}
   \item{sigma}{Population standard deviation of normal distribution.}
-  \item{nrm.color}{Color of the border of the normal curve.}
-  \item{fill.nrm}{Fill color of the normal curve.}
-  \item{fill.int}{Fill color of the interval for which the probability is computed.}
-  \item{ylab}{Label for the optional vertical axis.}
-  \item{y.axis}{If \code{TRUE}, then a vertical axis is included.}
-  \item{z}{If \code{TRUE}, then include z-values on the horizontal-axis. Set to 
+  \item{nrm_color}{Color of the border of the normal curve.}
+  \item{fill_nrm}{Fill color of the normal curve.}
+  \item{fill_int}{Fill color of the interval for which the probability is computed.}
+  \item{ylab}{Label for the optional vertical axis_}
+  \item{y_axis}{If \code{TRUE}, then a vertical axis is included.}
+  \item{z}{If \code{TRUE}, then include z-values on the horizontal-axis_ Set to 
        \code{FALSE} if \code{mu=0} and \code{sigma=1}.}
-  \item{axis.size}{Magnification factor for the axis labels, the value of
-       \code{axis.cex}.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{axis_size}{Magnification factor for the axis labels, the value of
+       \code{axis_cex}.}
+  \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
   \item{\ldots}{Other parameter values for graphics.}
@@ -59,7 +62,7 @@ prob.norm(hi=2)
 prob.norm(lo=2)
 
 # Mu=100, Sigma=15: Change default fill color of plotted interval
-prob.norm(lo=115, hi=125, mu=100, sigma=15, fill.int="plum")
+prob.norm(lo=115, hi=125, mu=100, sigma=15, fill_int="plum")
 }
 
 

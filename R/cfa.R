@@ -1,5 +1,5 @@
 cfa <-
 function(...)
 
-  corCFA(fun.call=match.call(), ...)
+  corCFA(fun_call=match.call(), ...)
 

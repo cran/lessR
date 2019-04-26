@@ -11,11 +11,11 @@ In terms of workflow, use the function by itself to select a set of colors from 
 }
 
 \usage{
-  getColors(pal=NULL, end.pal=NULL,
+  getColors(pal=NULL, end_pal=NULL,
          n=12, h=0, h2=NULL, c=NULL, l=NULL, trans=0,
-         in.order=NULL, fixup=TRUE, power=NULL,
+         in_order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
-         main=NULL, labels=NULL, labels.cex=0.8, lty="solid",
+         main=NULL, labels=NULL, labels_cex=0.8, lty="solid",
          output=NULL, quiet=getOption("quiet"), \ldots)
 }
 
@@ -24,13 +24,13 @@ In terms of workflow, use the function by itself to select a set of colors from 
   specified colors, then the following parameters are not relevant. Can also
   be pre-defined color codes that trigger a sequence of colors from light to
   dark, such as \code{"blues"}.}
-  \item{end.pal}{If specified, then generate a color continuum that begins at
-   \code{pal} and ends at \code{end.pal}.}\cr
+  \item{end_pal}{If specified, then generate a color continuum that begins at
+   \code{pal} and ends at \code{end_pal}.}\cr
 
   \item{n}{Number of colors to display.}
   \item{h}{Beginning HCL hue, 0 to 360.}
   \item{h2}{Ending HCL hue, 0 to 360. Defaults to a value close to
-       360. Requires \code{in.order} to be \code{FALSE}.}
+       360. Requires \code{in_order} to be \code{FALSE}.}
   \item{c}{Value of HCL chroma (saturation). Respective default values
        for qualitative, sequential, and divergent scales are
        65, c(35,75), and 50.}
@@ -40,7 +40,7 @@ In terms of workflow, use the function by itself to select a set of colors from 
        55, c(80,25), and c(40,70).}
   \item{trans}{Transparency factor of the area of each slice from 0, no
         transparency to 1, full transparency.}
-  \item{in.order}{If \code{TRUE}, orders the colors in order of their
+  \item{in_order}{If \code{TRUE}, orders the colors in order of their
         HCL hue values, the default for a "wheel". Otherwise maximizes
         the difference between adjacent colors hues to prepare for
         inclusion in visualizations with qualitative, discrete color scales.}
@@ -60,7 +60,7 @@ In terms of workflow, use the function by itself to select a set of colors from 
   \item{main}{Title.}
   \item{labels}{If \code{TRUE}, then displayed. For HCL qualitative scale,
        default is \code{TRUE}, otherwise \code{FALSE}}.
-  \item{labels.cex}{Character expansion factor of labels relative to 1.}
+  \item{labels_cex}{Character expansion factor of labels relative to 1.}
   \item{lty}{Line type of the border.}\cr
 
   \item{output}{Default to evaluate if function call at top level, so produce
@@ -69,7 +69,7 @@ In terms of workflow, use the function by itself to select a set of colors from 
        do output. If set to \code{"off"} then do not do output.}
   \item{quiet}{If set to \code{TRUE}, no list of colors. Can change system default
        with \code{\link{style}} function.}
-  \item{\ldots}{Other parameter values.}
+  \item{\ldots}{Other parameter values_}
 }
 
 
@@ -78,14 +78,14 @@ In terms of workflow, use the function by itself to select a set of colors from 
 I. HCL COLORS\cr
 Generate a palette of colors according to the parameter \code{pal} in the form of a character string vector of their names, and also as a color wheel if not called from another function. The default value (for all but grayscale or white color themes) of \code{pal} is \code{"hues"}, which generates a qualitative palette of the specified number, \code{n}, of discrete HCL colors at the same chroma and luminance, respective default values of 65 and 55. With constant chroma and luminance the HCL color space provides a palette of colors with the same gray-scale intensities if desaturated. That means no brightness bias for viewing different colors that represent different areas, such as in a bar chart of two variables, or a pie chart. The primary qualification is that the HCL color space is not in a one-to-one correspondence with the RGB color space of computer monitors, so some HCL colors are approximated (with the default setting of the \code{fixup} parameter set to \code{TRUE}).
 
-For \code{"hues"}, the default, the hue values and associated colors are expressed as HEX and RGB values. The first 12 generated discrete colors are  blue (240), brown (60), green (120), red (0), purple (275), turquoise (180), rust (30), olive (90), aqua (210), mulberry (330), emerald (150), and violet (300).
+For \code{"hues"}, the default, the hue values and associated colors are expressed as HEX and RGB values_ The first 12 generated discrete colors are  blue (240), brown (60), green (120), red (0), purple (275), turquoise (180), rust (30), olive (90), aqua (210), mulberry (330), emerald (150), and violet (300).
 
-To have the generated colors be in the sequential order of hues, set \code{in.order} to \code{TRUE}, the default when \code{shape} is set to \code{"wheel"}. For about up to five or six colors adjacent values are still reasonably well distinguished even if in sequential order of hue number in the hcl space.\cr
+To have the generated colors be in the sequential order of hues, set \code{in_order} to \code{TRUE}, the default when \code{shape} is set to \code{"wheel"}. For about up to five or six colors adjacent values are still reasonably well distinguished even if in sequential order of hue number in the hcl space.\cr
 
 II. COLOR SEQUENCE\cr
-A second possibility is to generate a sequence of colors according to the value of \code{n} from a given start color to an ending color. To specify a custom range, set \code{pal} as the value of the first color, and then \code{end.pal} as the value of the last color in the color range. The colors in the sequence may or may not be of the same hue.
+A second possibility is to generate a sequence of colors according to the value of \code{n} from a given start color to an ending color_ To specify a custom range, set \code{pal} as the value of the first color, and then \code{end_pal} as the value of the last color in the color range. The colors in the sequence may or may not be of the same hue.
 
-Or, access implicit calls Zeileis (2009) \code{\link{sequential_hcl}} and \code{\link{diverge_hcl}} functions from the \code{colorspace} package to access pre-defined color ranges including \code{"grays"}, which is the default if the color theme is \code{"gray"} or  \code{"white"}. Other predefined sequences are shown in the following table. Also can invoke the standard R color ranges of \code{"heat"}, \code{"terrain"}, and \code{"rainbow"}. Can specify any value of hue with \code{h}. Can also provide custom values of chroma (c) and luminance (l), with either one a range of values defined as a vector of two values. Default values are \code{c=100} and \code{l=c(75,35)}. That is, the color sequence is generated according to the given hue, \code{h}, with a chroma of 100 and luminance varying from 75 to the darker 45.
+Or, access implicit calls Zeileis (2009) \code{\link{sequential_hcl}} and \code{\link{diverge_hcl}} functions from the \code{colorspace} package to access pre-defined color ranges including \code{"grays"}, which is the default if the color theme is \code{"gray"} or  \code{"white"}. Other predefined sequences are shown in the following table. Also can invoke the standard R color ranges of \code{"heat"}, \code{"terrain"}, and \code{"rainbow"}. Can specify any value of hue with \code{h}. Can also provide custom values of chroma (c) and luminance (l), with either one a range of values defined as a vector of two values_ Default values are \code{c=100} and \code{l=c(75,35)}. That is, the color sequence is generated according to the given hue, \code{h}, with a chroma of 100 and luminance varying from 75 to the darker 45.
 
 The predefined sequences consist of the following hues and color names, defined in 30 degree increments around the HCL color wheel. Visualize the color wheel with then discrete colors below with the lessR function \code{\link{getColors}}, specifically the function call \code{getColors(shape="wheel")}. Visualize sequential color scales for each of the colors below with the lessR function \code{\link{showPalettes}}.\cr
 
@@ -108,11 +108,11 @@ The predefined sequences consist of the following hues and color names, defined 
 ----------- \tab ----- \tab -----\cr
 }
 
-The predefined color name can be provided as the first argument of the function call, that is, the value of \code{pal}, or the corresponding value of \code{h} (or \code{c} for gray scale) can be specified. The specifications are equivalent. To specify a divergent color scale, provide both the value of \code{pal} as the beginning value and the value of \code{end.pal} as the last value, such that both values are one of the pre-specified color ranges. In either situation, of sequential or divergent color scales, custom values of \code{c} and \code{l} can be provided.\cr
+The predefined color name can be provided as the first argument of the function call, that is, the value of \code{pal}, or the corresponding value of \code{h} (or \code{c} for gray scale) can be specified. The specifications are equivalent. To specify a divergent color scale, provide both the value of \code{pal} as the beginning value and the value of \code{end_pal} as the last value, such that both values are one of the pre-specified color ranges. In either situation, of sequential or divergent color scales, custom values of \code{c} and \code{l} can be provided.\cr
 
 
 III. SPECIFIED COLORS\cr
-The third possibility is to generate a color wheel from a specified set of color values. Set the value of \code{pal} according to the vector of these values. Specify the values with R color names (see the lessR function \code{\link{showColors}}), RGB values according to the \code{rgb} function or from related R color space functions such as \code{hcl}, or as hexadecimal codes.\cr
+The third possibility is to generate a color wheel from a specified set of color values_ Set the value of \code{pal} according to the vector of these values_ Specify the values with R color names (see the lessR function \code{\link{showColors}}), RGB values according to the \code{rgb} function or from related R color space functions such as \code{hcl}, or as hexadecimal codes.\cr
 
 IV. OTHER INCLUDED COLOR PALETTES\cr
 The following palettes are from the viridis package: "viridis", "cividis", "magma", "inferno", "plasma".
@@ -120,7 +120,7 @@ The following palettes are from the viridis package: "viridis", "cividis", "magm
 Movie director Wes Anderson is known for is innovative color themes in his movies, which feature a combination of pastel colors and bold primary colors. The following palettes are from the wesanderson package, based the colors from his movies: "BottleRocket1", "BottleRocket2", "Rushmore1", "Rushmore", "Royal1", "Royal2", "Zissou1", "Darjeeling1", "Darjeeling2 ", "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2", "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2", "IsleofDogs1", "IsleofDogs2". The generation of the corresponding palettes are with \code{type} set to \code{"continuous"} to generalize to palettes of any length.
 
 FUNCTION USAGE\cr
-Use the function on its own, in which case the color rectangle/wheel visualization is generated as are the color values. The vector of color values may be saved in its own R object as the output of the function call. Or, use the function to set colors for other parameter values in other function calls. See the examples.
+Use the function on its own, in which case the color rectangle/wheel visualization is generated as are the color values_ The vector of color values may be saved in its own R object as the output of the function call. Or, use the function to set colors for other parameter values in other function calls. See the examples.
 }
 
 \value{
@@ -135,7 +135,7 @@ Colors are invisibly returned as a character string vector.
 \examples{
 # HCL color wheels/rectangles
 #----------------------------
-# set in.order to TRUE for hues ordered by their number
+# set in_order to TRUE for hues ordered by their number
 
 # color spectrum of 12 hcl colors presented in the order
 #  in which they are assigned to discrete levels of a
@@ -144,10 +144,10 @@ getColors()
 
 # color spectrum of 12 hcl colors ordered by hue from 0
 #   by intervals of 360/12 = 30 degrees
-getColors(in.order=TRUE)
+getColors(in_order=TRUE)
 
 # pastel hcl colors, set luminance to 85 from default of 55
-getColors(in.order=TRUE, l=85)
+getColors(in_order=TRUE, l=85)
 
 # color wheel of 36 ordered hues around the wheel
 getColors(n=36, shape="wheel", border="off")
@@ -155,7 +155,7 @@ getColors(n=36, shape="wheel", border="off")
 # ggplot qualitative colors, here for 3 colors generated
 #   in order of their hue numbers across the color wheel
 #   starting at a hue of 15 degrees and luminance of 60
-getColors(h=15, n=3, l=60, in.order=TRUE)
+getColors(h=15, n=3, l=60, in_order=TRUE)
 
 
 # HCL Qualitative Scale
@@ -207,33 +207,33 @@ getColors("rusts", "blues", n=7, c=45)
 getColors(c("black", "blue", "red"))
 
 # custom sequential range of colors
-getColors(pal="aliceblue", end.pal="blue")
+getColors(pal="aliceblue", end_pal="blue")
 
 
 # Plots
 # -----
-d <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in_lessR=TRUE)
 
 # default quantitative scale
-bc(Dept, fill=getColors())
+bc(d, Dept, fill=getColors())
 # or with implicit call to getColors
-bc(Dept, fill="hues")
+bc(d, Dept, fill="hues")
 # or an implicit call with the blues
-bc(Dept, fill="blues")
+bc(d, Dept, fill="blues")
 
 # even though we have a bar graph, also want the
 #  graph of the colors as well as the text listing of the colors
-bc(Dept, fill=getColors("blues", output="on"))
+bc(d, Dept, fill=getColors("blues", output="on"))
 
 # custom hue with different chroma levels (saturations)
-BarChart(Dept, fill=getColors(h=230, c=c(20,60), l=65, n=5))
+BarChart(d, Dept, fill=getColors(h=230, c=c(20,60), l=65, n=5))
 
 # custom hue with different luminance levels (brightness)
 # if explicitly calling getColors need to also specify n
 Histogram(Salary, fill=getColors(h=230, c=65, l=c(90,30), n=10))
 
 # use the default qualitative viridis color scale
-bc(Dept, fill="viridis")
+bc(d, Dept, fill="viridis")
 }
 
 

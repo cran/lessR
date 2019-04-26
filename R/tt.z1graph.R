@@ -1,21 +1,21 @@
 .OneGraph <-
-function(YA, bw1, Ynm, digits.d, brief,
+function(YA, bw1, Ynm, digits_d, brief,
          n1, m1, mu, mdiff, sw, smd, mmd, msmd,
-         clpct, tvalue,  pvalue, ub, lb, x.lab, show.title) {
+         clpct, tvalue,  pvalue, ub, lb, x.lab, show_title) {
 
   dYA <- suppressWarnings(density(YA, bw1))
 
   if (!brief) {
     cat("\n\n------ Graphics Smoothing Parameter ------\n\n")
     mytitle <- "Density bandwidth for "
-    cat(mytitle, .fmt(dYA$bw,digits.d), sep="", "\n")
+    cat(mytitle, .fmt(dYA$bw,digits_d), sep="", "\n")
   }
 
 
   cat("--------------------------------------------------\n")
 
   # values needed for graph
-  min.x <- min(min(dYA$x), mu)  # min x coordinate for graph
+  min_x <- min(min(dYA$x), mu)  # min x coordinate for graph
   max.x <- max(max(dYA$x), mu)  # max x coordinate for graph
   max.y <- max(dYA$y)  # max y coordinate
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
@@ -33,24 +33,24 @@ function(YA, bw1, Ynm, digits.d, brief,
   }
   col.2 <- rgb(.49,.56,.69)
 
-  col.1t <- getOption("bar.color")
-  col.1d <- getOption("ellipse.fill")
+  col.1t <- getOption("bar_color")
+  col.1d <- getOption("ellipse_fill")
 
-  col.tx <- getOption("lab.color")
-  col.ln <- getOption("bar.color")
+  col.tx <- getOption("lab_color")
+  col.ln <- getOption("bar_color")
 
 
   # ------------------------------ 
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  par(bg=getOption("window.fill"))
+  par(bg=getOption("window_fill"))
   par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
 
   plot.new()
-  plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
+  plot.window(xlim=c(min_x,max.x), ylim=c(0,max.y))
 
-  axis(1, col=getOption("axis.x.color"), col.axis=getOption("lab.color"))
-  box(col=getOption("panel.color"))
+  axis(1, col=getOption("axis_x_color"), col.axis=getOption("lab_color"))
+  box(col=getOption("panel_color"))
   if (length(x.lab) == 1)
     xl <- x.lab
   else
@@ -82,7 +82,7 @@ function(YA, bw1, Ynm, digits.d, brief,
   lines(dYA, col=col.1t, lty="solid", lwd=lwd.border)
 
   # minimum mean difference of practical importance
-  col.e <- getOption("lab.color")  # color for effect
+  col.e <- getOption("lab_color")  # color for effect
   if ( !is.null(mmd) | !is.null(msmd) ) {
     if (!is.null(mmd)) msmd <- mmd / sw
     if (!is.null(msmd)) mmd <- msmd * sw
@@ -125,14 +125,14 @@ function(YA, bw1, Ynm, digits.d, brief,
   text((m1+mu)/2, ytop-.11*max.y, label="d", col=col.d.unit, cex=.9)
 
   # print mdiff value towards bottom  
-  text((m1+mu)/2, ybot+.11*max.y, label=.fmt(mdiff, digits.d), col=col.d.unit, cex=.9)
+  text((m1+mu)/2, ybot+.11*max.y, label=.fmt(mdiff, digits_d), col=col.d.unit, cex=.9)
   # horiz bar connects means
   segments(mlow, ybot+.09*max.y, mhi, ybot+.09*max.y, col=col.d.unit, lwd=1)
   # print diff towards bottom
   text((m1+mu)/2, ybot+.07*max.y, label="diff", col=col.d.unit, cex=.9)
 
   # title area, above graph
-  if (show.title) {
+  if (show_title) {
     mtext(paste("One-Group Plot with Mean and Null Mean"), side=3, line=6.6, font=2,
           col=col.tx)
     mtext(paste("Analyze",Ynm), side=3, line=5.4, font=3, cex=.9,
@@ -144,7 +144,7 @@ function(YA, bw1, Ynm, digits.d, brief,
       .(.fmt(lb,3)), " to ", .(.fmt(ub,3)))), side=3, line=2.6, cex=.9, adj=0,
           col=col.tx)
     mtext(bquote(paste("  ", "n=", .(n1),
-       "   m=", .(.fmt(m1, digits.d)),"   s=", .(.fmt(sw, digits.d)))),
+       "   m=", .(.fmt(m1, digits_d)),"   s=", .(.fmt(sw, digits_d)))),
        side=3, line=1.3, cex=.9, adj=0, col=col.tx)
   }
 

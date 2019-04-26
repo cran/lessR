@@ -1,6 +1,6 @@
 .ANOVAz2 <- 
-function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
-         delim, rb.points, graphics, pdf, width, height) {
+function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
+         delim, rb_points, graphics, pdf, width, height) {
 
   if (grepl("*", delim, fixed=TRUE)) bet.grp  <- TRUE else bet.grp <- FALSE
   if (grepl("+", delim, fixed=TRUE)) wth.grp  <- TRUE else wth.grp <- FALSE
@@ -59,7 +59,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
             list(x1.values, x2.values ), mean, na.rm=TRUE)
       m <- as.table(m)
       #names(dimnames(m)) <- c(nm[2], nm[3])
-      tx2 <- .prntbl(t(m), digits.d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
+      tx2 <- .prntbl(t(m), digits_d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
       for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 
       txcm <- tx
@@ -78,13 +78,13 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     tx[length(tx)+1] <- nm[2]
     m1 <-  tapply(y.values, x1.values, mean, na.rm=TRUE)
     m1 <- data.frame(t(m1))
-    tx2 <- .prntbl(m1, digits.d)  # 1st treatment horizontal dimension
+    tx2 <- .prntbl(m1, digits_d)  # 1st treatment horizontal dimension
     for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- nm[3]
     m2 <-  tapply(y.values, x2.values, mean, na.rm=TRUE)
     m2 <- data.frame(t(m2))
-    tx2 <- .prntbl(m2, digits.d)  # 2nd treatment horizontal dimension
+    tx2 <- .prntbl(m2, digits_d)  # 2nd treatment horizontal dimension
     for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 
     txmm <- tx
@@ -98,7 +98,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     }
 
     mg <- mean(y.values, na.rm=TRUE)
-    tx[length(tx)+1] <- round(mg, digits.d+1)
+    tx[length(tx)+1] <- round(mg, digits_d+1)
 
     txgm <- tx
 
@@ -116,7 +116,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     s <-  tapply(y.values, 
           list(x1.values, x2.values ), sd, na.rm=TRUE)
     s <- as.table(s)
-    tx2 <- .prntbl(t(s), digits.d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
+    tx2 <- .prntbl(t(s), digits_d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
     for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 
     txcs <- tx
@@ -145,7 +145,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
   for (icol in 1:3) {
     max.num[icol] <- 0 
     for (i in 1:n.vars) {
-      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 2
+      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits_d + 2
       if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
     }
     if (icol != 1) if (max.num[icol] < 9L) max.num[icol] <- 9L 
@@ -163,10 +163,10 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
   for (i in 1:(n.vars)) {
     rlb <- .fmtc(rownames(smc)[i], buf)
     df <- format(sprintf("%i", smc[i,1]), width=max.num[1]-4, justify="right")
-    SS <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.num[2], justify="right")
-    MS <- format(sprintf("%7.*f", digits.d, smc[i,3]), width=max.num[3], justify="right")
+    SS <- format(sprintf("%7.*f", digits_d, smc[i,2]), width=max.num[2], justify="right")
+    MS <- format(sprintf("%7.*f", digits_d, smc[i,3]), width=max.num[3], justify="right")
     if (i < n.vars) {
-      fv <- format(sprintf("%7.*f", digits.d, smc[i,4]), width=9, justify="right")
+      fv <- format(sprintf("%7.*f", digits_d, smc[i,4]), width=9, justify="right")
       pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
       tx[length(tx)+1] <- paste(rlb, df, SS, MS, fv, pv) 
     }
@@ -244,18 +244,18 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     tx <- character(length = 0)
 
     HSD <- TukeyHSD(av.out)
-    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD, which="conf.level"))
+    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD, which="conf_level"))
     tx[length(tx)+1] <- paste("\nFactor:", nm[2])
 
-    txHSD <- .prntbl(HSD[[1]], digits.d)
+    txHSD <- .prntbl(HSD[[1]], digits_d)
     for (i in 1:length(txHSD)) tx[length(tx)+1] <- txHSD[i]
 
     if (bet.grp) {
       tx[length(tx)+1] <- paste("\nFactor:", nm[3])
-      txHSD <- .prntbl(HSD[[2]], digits.d)  # second factor
+      txHSD <- .prntbl(HSD[[2]], digits_d)  # second factor
       for (i in 1:length(txHSD)) tx[length(tx)+1] <- txHSD[i]
       tx[length(tx)+1] <- paste("\nCell Means")
-      txHSD <- .prntbl(HSD[[3]], digits.d)  # interaction
+      txHSD <- .prntbl(HSD[[3]], digits_d)  # interaction
       for (i in 1:length(txHSD)) tx[length(tx)+1] <- txHSD[i]
     }
 
@@ -274,15 +274,15 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     # interaction plots
     if (!pdf) {
       if (manage.gr) {
-        pdf.file <- NULL
+        pdf_file <- NULL
         if (bet.grp) .graphwin(1)
         if (wth.grp) .graphwin(2)
         dev.set(which=3)
       }
     }
     else { 
-      pdf.file <- "ANOVA_Interaction.pdf"
-      pdf(file=pdf.file, width=width, height=height)
+      pdf_file <- "ANOVA_Interaction.pdf"
+      pdf(file=pdf_file, width=width, height=height)
     }
 
     plt.i <- plt.i + 1
@@ -295,7 +295,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
     # pdf
     if (pdf) {
       dev.off()
-      .showfile(pdf.file, "interaction plot")
+      .showfile(pdf_file, "interaction plot")
     }
 
     # fitted interaction plots
@@ -307,8 +307,8 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
         }
       }
       else { 
-        pdf.file <- "ANOVA_FitInter.pdf"
-        pdf(file=pdf.file, width=width, height=height)
+        pdf_file <- "ANOVA_FitInter.pdf"
+        pdf(file=pdf_file, width=width, height=height)
       }
 
     plt.i <- plt.i + 1
@@ -319,16 +319,16 @@ function(av.out, y.values, x1.values, x2.values, nm, digits.d, brief,
       interaction.plot(x1.values, x2.values, 
                av.out$fitted, main=plt.title[plt.i],
                xlab=nm[2], ylab=nm[1], trace.label=nm[3], ylim=c(mn.y, mx.y))
-      if (rb.points) {
+      if (rb_points) {
         points(x1.values, y.values, pch=21, 
-               bg=rgb(.6, .6, .6, alpha=getOption("trans.pts"), maxColorValue = 1))
+               bg=rgb(.6, .6, .6, alpha=getOption("trans_pts"), maxColorValue = 1))
         segments(as.numeric(x1.values), av.out$fitted, as.numeric(x1.values), y.values)
       }
 
       # pdf
       if (pdf) {
         dev.off()
-        .showfile(pdf.file, "fitted values plot")
+        .showfile(pdf_file, "fitted values plot")
       }
     }
   }

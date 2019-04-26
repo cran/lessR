@@ -2,11 +2,12 @@
 \alias{ttest}
 \alias{tt}
 \alias{tt.brief}
+\alias{tt_brief}
 
 \title{Generic Method for t-test and Standardized Mean Difference with Enhanced Graphics}
 
 \description{
-Abbreviation: \code{tt}, \code{tt.brief}
+Abbreviation: \code{tt}, \code{tt_brief}, \code{tt.brief} [deprecated]
 
 Provides enhanced output from the standard \code{\link{t.test}} function applied to the analysis of the mean of a single variable, or the independent groups analysis of the mean difference, from either data or summary statistics. Includes the analysis of a dependent-groups analysis from the data. The data can be in the form of a data frame or separate vectors of data, one for each group. This output includes the basic descriptive statistics, analysis of assumptions and the hypothesis test and confidence interval. For two groups the output also includes the analysis for both with and without the assumption of homogeneous variances, the pooled or within-group standard deviation, and the standardized mean difference or Cohen's \emph{d} and its confidence interval.
 
@@ -23,16 +24,17 @@ ttest(x=NULL, y=NULL, data=d, rows=NULL, paired=FALSE,
 
          Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", xlab=NULL, 
 
-         brief=getOption("brief"), digits.d=NULL, conf.level=0.95,
-         alternative=c("two.sided", "less", "greater"),
+         brief=getOption("brief"), digits_d=NULL, conf_level=0.95,
+         alternative=c("two_sided", "less", "greater"),
          mmd=NULL, msmd=NULL, Edesired=NULL, 
 
-         show.title=TRUE, bw1="bcv", bw2="bcv",
+         show_title=TRUE, bw1="bcv", bw2="bcv",
 
-         graph=TRUE, line.chart=FALSE,
-         width=5, height=5, pdf.file=NULL, ...)       
+         graph=TRUE, line_chart=FALSE,
+         width=5, height=5, pdf_file=NULL, ...)       
 
-tt.brief(\ldots, brief=TRUE)
+tt.brief(\ldots)
+tt_brief(\ldots)
 
 tt(\ldots)
 }
@@ -68,9 +70,9 @@ tt(\ldots)
   \item{X2nm}{Value of grouping variable, the level that defines the second group.}
   \item{xlab}{x-axis label, defaults to variable name, or, if present, variable label.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{style}} function.}
-  \item{digits.d}{Number of decimal places for which to display numeric values. Suggestion only.}
-  \item{conf.level}{Confidence level of the interval, expressed as a proportion.}
-  \item{alternative}{Default is \code{"two.sided"}. Other values are \code{"less"}
+  \item{digits_d}{Number of decimal places for which to display numeric values_ Suggestion only.}
+  \item{conf_level}{Confidence level of the interval, expressed as a proportion.}
+  \item{alternative}{Default is \code{"two_sided"}. Other values are \code{"less"}
        and \code{"greater"}.}
   \item{mmd}{Minimum Mean Difference of practical importance, the difference of the
        response variable between two group means. The concept is optional, and only one of mmd
@@ -78,13 +80,13 @@ tt(\ldots)
   \item{msmd}{For the Standardized Mean Difference, Cohen's d, the Minimum value of
        practical importance. The concept is optional, and only one of mmd and msmd is provided.}
   \item{Edesired}{The desired margin of error for the needed sample size calculation for a 95\% confidence interval, based on Kupper and Hafner (1989).}
-  \item{show.title}{Show the title on the graph of the density functions for two groups.}
+  \item{show_title}{Show the title on the graph of the density functions for two groups.}
   \item{bw1}{Bandwidth for the computation of the densities for the first group.}
   \item{bw2}{Bandwidth for the computation of the densities for the second group.}
   \item{graph}{If \code{TRUE}, then display the graph of the overlapping density distributions.}
-  \item{line.chart}{Plot the run chart for the response variable for each group
+  \item{line_chart}{Plot the run chart for the response variable for each group
         in the analysis.}
-  \item{pdf.file}{Name of the pdf file to which the density graph is redirected. Also
+  \item{pdf_file}{Name of the pdf file to which the density graph is redirected. Also
        specifies to save the line charts with pre-assigned names if they are computed.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
@@ -93,7 +95,7 @@ tt(\ldots)
 
 \details{
 OVERVIEW\cr
-If \code{n} or \code{n1} are set to numeric values, then the analysis proceeds from the summary statistics, the sample size and mean and standard deviation of each group. Missing data are counted and then removed for further analysis of the non-missing data values.  Otherwise the analysis proceeds from data, which can be in a data frame, by default named \code{d}, with a grouping variable and response variable, or in two data vectors, one for each group.
+If \code{n} or \code{n1} are set to numeric values, then the analysis proceeds from the summary statistics, the sample size and mean and standard deviation of each group. Missing data are counted and then removed for further analysis of the non-missing data values_  Otherwise the analysis proceeds from data, which can be in a data frame, by default named \code{d}, with a grouping variable and response variable, or in two data vectors, one for each group.
 
 Following the format and syntax of the standard \code{\link{t.test}} function, to specify the two-group test with a formula, \code{\link{formula}}, the data must include a variable that has exactly two values, a grouping variable or factor generically referred to as X, and a numerical response variable, generically referred to as Y. The formula is of the form Y ~ X, with the names Y and X replaced by the actual variable names specific to a particular analysis.  The formula method automatically retrieves the names of the variables and data values for display on the resulting output.
 
@@ -112,13 +114,13 @@ PRACTICAL IMPORTANCE\cr
 The practical importance of the size of the mean difference is addressed when one of two parameter values are supplied, the minimum mean difference of practical importance, mmd, or the corresponding standardized version, msmd.  The  remaining value is calculated and both values are added to the graph and the console output.
 
 DECIMAL DIGITS\cr
-The number of decimal digits is determined by default from the largest number of decimal digits of the entered descriptive statistics.  The number of decimal digits is then set at that value, plus one more with a minimum of two decimal digits by default.  Or, override the default with the \code{digits.d} parameter.
+The number of decimal digits is determined by default from the largest number of decimal digits of the entered descriptive statistics.  The number of decimal digits is then set at that value, plus one more with a minimum of two decimal digits by default.  Or, override the default with the \code{digits_d} parameter.
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
 
 PDF OUTPUT\cr
-To obtain pdf output, use the \code{pdf.file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+To obtain pdf output, use the \code{pdf_file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 }
 
 \value{
@@ -148,7 +150,7 @@ Kupper and Hafner (1989). The American Statistician, 43(2):101-105.
 # tt for two groups, from a formula
 # ----------------------------------------------------------
 
-d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
 
 
 # analyze data with formula version
@@ -160,10 +162,12 @@ ttest(Salary ~ Gender)
 tt(Salary ~ Gender)
 
 # brief version of results
-tt.brief(Salary ~ Gender)
+tt_brief(Salary ~ Gender)
 
 # return the vectors group1 and group2 into the object t.out
 # separate the data values for the two groups and analyze separately
+Y <- rnorm(100)
+ttest(Y)
 t.out <- ttest(Salary ~ Gender)
 Histogram(group1, data=t.out)
 Histogram(group2, data=t.out)
@@ -175,7 +179,7 @@ t.test(d$Salary ~ d$Gender, var.equal=TRUE)
 ttest(Salary ~ Gender, msmd=.5)
 
 # obtain the line chart of the response variable for each group
-ttest(Salary ~ Gender, line.chart=TRUE)
+ttest(Salary ~ Gender, line_chart=TRUE)
 
 # variable of interest is in a data frame which is not the default d
 # access the data frame in the lessR dat.twogroup data set
@@ -235,11 +239,11 @@ tt(n=34, m=8.92, s=1.67, Ynm="Time")
 # confidence interval and hypothesis test, from descriptive stats
 # get rid of the data frame, analysis should still proceed
 rm(d)
-tt.brief(n=34, m=8.92, s=1.67, mu=9, conf.level=0.90)
+tt_brief(n=34, m=8.92, s=1.67, mu=9, conf_level=0.90)
 
 # two groups: sample size, mean and sd for each group
 # specify the briefer form of the output
-tt.brief(n1=19, m1=9.57, s1=1.45, n2=15, m2=8.09, s2=1.59)
+tt_brief(n1=19, m1=9.57, s1=1.45, n2=15, m2=8.09, s2=1.59)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

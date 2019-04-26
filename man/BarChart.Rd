@@ -7,52 +7,52 @@
 \description{
 Abbreviation: \code{bc}
 
-Plots a bar chart, one categorical variable, \code{x} against one numeric variable \code{y}, as well as an optional second categorical variable \code{by} with a provided legend. One option is to enter the reduced data table, which consists of each level of \code{x} paired with the corresponding numerical value of \code{y}, with the number of rows the number of levels. Or, transform the full data table of original measurements. If no value of \code{y} is specified, by default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables, which can be replaced with custom color scales. Or, if a \code{y} variable is specified, obtain the reduced data table from which the bar chart is computed by summarizing the value of \code{y} at each level of \code{x}, such as the mean or a variety of other summary statistics.
+Plots a bar chart, one categorical variable, \code{x} against one numeric variable \code{y}, as well as an optional second categorical variable \code{by} with a provided legend_ One option is to enter the reduced data table, which consists of each level of \code{x} paired with the corresponding numerical value of \code{y}, with the number of rows the number of levels. Or, transform the full data table of original measurements. If no value of \code{y} is specified, by default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables, which can be replaced with custom color scales. Or, if a \code{y} variable is specified, obtain the reduced data table from which the bar chart is computed by summarizing the value of \code{y} at each level of \code{x}, such as the mean or a variety of other summary statistics.
 
 Also displays the frequency table for one or two variables, Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. To activate Trellis graphics specify a \code{by1} variable. If the provided object to analyze is a set of multiple variables, including an entire data frame, then a bar chart is calculated for each non-numeric variable in the data frame.
 }
 
 \usage{
 BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
-        stat.x=c("count", "proportion"),
-        stat.yx=c("mean", "sum", "sd", "dev", "min", "median", "max"),
-        n.cat=getOption("n.cat"), one.plot=NULL,
+        stat_x=c("count", "proportion"),
+        stat_yx=c("mean", "sum", "sd", "dev", "min", "median", "max"),
+        n_cat=getOption("n_cat"), one_plot=NULL,
 
-        by1=NULL, n.row=NULL, n.col=NULL, aspect="fill",
+        by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
 
         horiz=FALSE, beside=FALSE, stack100=FALSE,
-        gap=NULL, scale.y=NULL,
+        gap=NULL, scale_y=NULL,
 
         theme=getOption("theme"),
         fill=NULL,
-        color=getOption("bar.color.discrete"),
-        trans=getOption("trans.bar.fill"),
-        fill.split=NULL,
+        color=getOption("bar_color_discrete"),
+        trans=getOption("trans_bar_fill"),
+        fill_split=NULL,
 
-        legend.title=NULL, legend.position="right.margin",
-        legend.labels=NULL, legend.horiz=FALSE,
-        legend.size=NULL,
+        legend_title=NULL, legend_position="right_margin",
+        legend_labels=NULL, legend_horiz=FALSE,
+        legend_size=NULL,
 
-        value.labels=NULL,
-        rotate.x=getOption("rotate.x"),
+        value_labels=NULL,
+        rotate_x=getOption("rotate_x"),
         offset=getOption("offset"),
-        break.x=NULL, sort=c("0", "-", "+"),
+        break_x=NULL, sort=c("0", "-", "+"),
 
-        label.max=100, out.size=80,
+        label_max=100, out_size=80,
 
         values=NULL,
-        values.color=getOption("values.color"),
-        values.size=getOption("values.size"),
-        values.digits=getOption("values.digits"),
-        values.position=getOption("values.position"),
-        values.cut=NULL,
+        values_color=getOption("values_color"),
+        values_size=getOption("values_size"),
+        values_digits=getOption("values_digits"),
+        values_position=getOption("values_position"),
+        values_cut=NULL,
 
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-        lab.adj=c(0,0), margin.adj=c(0,0,0,0), addtop=0.05,
+        lab_adj=c(0,0), margin_adj=c(0,0,0,0), add_top=0.05,
 
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-        eval.df=NULL, quiet=getOption("quiet"),
+        eval_df=NULL, quiet=getOption("quiet"),
         width=6.5, height=6, pdf=FALSE, \ldots)
 
 bc(\ldots)
@@ -65,38 +65,38 @@ bc(\ldots)
         \code{\link{c}} function, or an entire data frame. If not specified,
         then defaults to all non-numerical variables in the specified data
         frame, \code{d} by default.\cr
-        To manage large category values, unless \code{break.x} is \code{FALSE},
+        To manage large category values, unless \code{break_x} is \code{FALSE},
         any space in each category value is
         converted to new line for the corresponding axis label in the plot.
         To keep two (small) words on the same line, replace the space that
         separates them with an underscore, which is converted to a blank
         for the corresponding axis label.}
   \item{y}{Numeric variable for which the values are displayed on the vertical
-        axis. If not specified, then its value is the frequency of each
+        axis_ If not specified, then its value is the frequency of each
         category or joint category, automatically tabulated.}
   \item{by}{A categorical variable to provide a bar chart for
         each level of the numeric primary variables \code{x} and
         \code{y} on the \emph{same} plot, which applies to the panels of
         a Trellis plot if \code{by1} is specified.}
-  \item{data}{Optional data frame that contains the variables of interest, default
-       is \code{d}. Can contain data from which frequencies are computed, or
-       can contain values to plot on the y-axis instead of counts.}
+  \item{data}{Optional data frame that contains the variables of interest.
+       Can contain data from which frequencies are computed for the y-values,
+       or can contain values to plot on the y-axis instead of counts.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
-  \item{stat.x}{When there is no \code{y} variable, transform data table of
+  \item{stat_x}{When there is no \code{y} variable, transform data table of
        measurements into a simple table of paired levels of
        \code{x} with numerical values of \code{y}, height of each bar
        for each level of \code{x}.
        Transform according to  \code{"count"} or \code{"proportion"}.}
-  \item{stat.yx}{Statistics transformation of \code{y} by \code{x}.
+  \item{stat_yx}{Statistics transformation of \code{y} by \code{x}.
        Transform data table of measurements into a simple table of paired levels of
        \code{x} with numerical values of \code{y}. Apply specified transformation
        of \code{y} to the levels of \code{x}, that is,
        \code{"mean"}, \code{sd}, etc. Default is \code{"mean"}.}
-  \item{n.cat}{When analyzing all the variables in a data frame, specifies the largest
+  \item{n_cat}{When analyzing all the variables in a data frame, specifies the largest
        number of unique values of variable of a numeric data type for which the
        variable will be analyzed as a categorical. Default is 0.}
-  \item{one.plot}{For bar charts of multiple x-variables, indicates
+  \item{one_plot}{For bar charts of multiple x-variables, indicates
        if a bar plot is produced for each x-variable, or all are combined
        into a single plot, such as for items that all share common responses
        such as survey data with a common Likert scale across variables.
@@ -107,12 +107,12 @@ bc(\ldots)
         activates \bold{Trellis graphics}, from the lattice package, to provide
         a separate bar chart (panel) of numeric primary variables \code{x}
         and \code{y} for each level of the variable.}
-  \item{n.row}{Optional specification for the number of rows in the layout
+  \item{n_row}{Optional specification for the number of rows in the layout
         of a multi-panel display with Trellis graphics. Need not specify
-        \code{n.col}.}
-  \item{n.col}{Optional specification for the number of columns in the
+        \code{n_col}.}
+  \item{n_col}{Optional specification for the number of columns in the
         layout of a multi-panel display with
-        Trellis graphics. Need not specify \code{n.row}. If set to 1, then
+        Trellis graphics. Need not specify \code{n_row}. If set to 1, then
         the strip that labels each group locates to the left of each plot
         instead of the top.}
   \item{aspect}{Lattice parameter for the aspect ratio of the panels in
@@ -124,20 +124,20 @@ bc(\ldots)
         45 degrees.}\cr
 
   \item{horiz}{By default the value is \code{FALSE} so bars are vertical,
-       unless \code{one.plot} is \code{TRUE}.}
+       unless \code{one_plot} is \code{TRUE}.}
   \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
        first variable to be plotted as adjacent bars instead of stacked on each
        other.}
   \item{stack100}{100\% stacked bar chart when a \code{by} variable is present,
-       also activated by setting \code{stat.x} to \code{"proportion"} with a
+       also activated by setting \code{stat_x} to \code{"proportion"} with a
        \code{by} variable.}
   \item{gap}{Gap between bars.  Provides the value of the \code{space} option from
        the standard R \code{\link{barplot}} function with a default of 0.2 unless two
        variables are plotted and beside=\code{TRUE}, in which case the default is
        c(.1,1).}
-  \item{scale.y}{If specified, a vector of three values that define the
+  \item{scale_y}{If specified, a vector of three values that define the
         numerical values of the y-axis, the numerical axis, within the bounds of
-        plot region: starting, ending and number of intervals.}\cr
+        plot region: starting value, ending value, and number of intervals.}\cr
 
   \item{theme}{Color theme for this analysis. Make persistent across analyses
         with \code{\link{style}}.}
@@ -151,67 +151,67 @@ bc(\ldots)
         as \code{(count)} if tabulated from the data, or \code{(count.v)} for 
         viridis palette.
         See the details and examples sections. Default is
-        \code{bar.color.discrete} from the lessR \code{\link{style}} function 
+        \code{bar_color_discrete} from the lessR \code{\link{style}} function 
         except sequential ordered factors.}
   \item{color}{Border color of the bars, can be a vector
         to customize the color for each bar. Default is
-        \code{bar.color.discrete} from the lessR \code{\link{style}} function.}
+        \code{bar_color_discrete} from the lessR \code{\link{style}} function.}
   \item{trans}{Transparency factor of the area of each slice from 0, no
         transparency to 1, full transparency. Default is
-        \code{trans.bar.fill} from the lessR \code{\link{style}} function.}
-  \item{fill.split}{The value of the numeric variable \code{y} for which
-        bars that correspond to values of \code{y} <= \code{fill.split} are
+        \code{trans_bar_fill} from the lessR \code{\link{style}} function.}
+  \item{fill_split}{The value of the numeric variable \code{y} for which
+        bars that correspond to values of \code{y} <= \code{fill_split} are
         displayed in the first \code{fill} color and other values displayed
         in the second \code{fill} color, with the first two values of
         the default palette by default, or as specified by a vector of
         exactly two fill colors.}\cr
 
-  \item{legend.title}{Title of the legend, which is usually set by default except
+  \item{legend_title}{Title of the legend, which is usually set by default except
         when raw counts are entered as a matrix.  Then a title must be specified
-        to generate a legend.}
-  \item{legend.position}{When plotting two variables, location of the legend, with the
+        to generate a legend_}
+  \item{legend_position}{When plotting two variables, location of the legend, with the
         default in the right margin. Additional options from standard R are
         "topleft", "top", "topright" and others as shown in the help for the
         \code{\link{legend}} function.}
-  \item{legend.labels}{When plotting two variables, labels for the legend, which by
+  \item{legend_labels}{When plotting two variables, labels for the legend, which by
        default are the levels for the second or \code{by} variable.}
-  \item{legend.horiz}{By default the legend is vertical, but can be changed to
+  \item{legend_horiz}{By default the legend is vertical, but can be changed to
        horizontal.}
-  \item{legend.size}{Size of legend text.}\cr
+  \item{legend_size}{Size of legend text.}\cr
 
-  \item{value.labels}{For factors, default is the factor labels, and for
-        character variables, default is the character values.
+  \item{value_labels}{For factors, default is the factor labels, and for
+        character variables, default is the character values_
         Or, provide labels for the \code{x}-axis on the graph to override
-        these values. If the variable is a
-        factor and \code{value.labels} is not specified (is \code{NULL}), then the
-        value.labels are set to the factor levels with each space replaced by
+        these values_ If the variable is a
+        factor and \code{value_labels} is not specified (is \code{NULL}), then the
+        value_labels are set to the factor levels with each space replaced by
         a new line character. If \code{x} and \code{y}-axes have the same scale,
-        they also apply to the \code{y}-axis. Control the plotted size
-        with \code{axis.cex} and \code{axis.x.cex} from the lessR
+        they also apply to the \code{y}-axis_ Control the plotted size
+        with \code{axis_cex} and \code{axis_x_cex} from the lessR
         \code{\link{style} function.}}
-  \item{rotate.x}{Degrees that the axis values for the category values
+  \item{rotate_x}{Degrees that the axis values for the category values
         axis are rotated, usually to accommodate longer values,
         typically used in conjunction with \code{offset}. When equal 90
         the value labels are perpendicular to the x-axis and a different
         algorithm places the labels so that \code{offset} is not needed.}
-  \item{offset}{The amount of spacing between the axis values and the axis. Default
+  \item{offset}{The amount of spacing between the axis values and the axis_ Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when
         longer axis value names are rotated.}
-  \item{break.x}{Replace spaces in the category values with a new line
+  \item{break_x}{Replace spaces in the category values with a new line
        and replace underscores with a blank. By default, \code{TRUE} for 
-       vertical bar charts with \code{rotate.x} set to \code{0},
+       vertical bar charts with \code{rotate_x} set to \code{0},
        and \code{FALSE} otherwise.}
   \item{sort}{Sort the categories by their frequency for one variable and by
         the column sums if a \code{by} variable. Not applicable to Trellis plots.
         By default \code{"0"} for no sort, or sort descending \code{"-"} or
-        ascending \code{"+"}, unless \code{one.plot} is \code{TRUE}, then is
+        ascending \code{"+"}, unless \code{one_plot} is \code{TRUE}, then is
         set to \code{"+"}.}\cr
 
-  \item{label.max}{To improve readability, the maximum size of the value
+  \item{label_max}{To improve readability, the maximum size of the value
         labels before the labels are abbreviated for
         text output only. Not a literal maximum as preserving unique
         values may require a larger number of characters than specified.}
-  \item{out.size}{To improve the readability of the frequency distribution
+  \item{out_size}{To improve the readability of the frequency distribution
        of a single variable displayed at the console,
        the maximum number of characters on a
        line of output at the console for one variable before the frequency
@@ -225,48 +225,48 @@ bc(\ldots)
         the default is \code{"off"}. For tabulated
         counts, \code{"prop"} is also available for proportions as well as
         \code{"input"}.}
-  \item{values.color}{Color of the plotted text. Could be a vector to specify
+  \item{values_color}{Color of the plotted text. Could be a vector to specify
         a unique color for each value. If fewer colors are specified than
         the number of categories, the colors are recycled.}
-  \item{values.size}{Character expansion factor, the size, of the plotted text,
+  \item{values_size}{Character expansion factor, the size, of the plotted text,
         for which the default value is 0.95, or 0.9 of value if \code{beside}
-        is \code{TRUE} and \code{values.position} is \code{"in"} because bars are
+        is \code{TRUE} and \code{values_position} is \code{"in"} because bars are
         narrower.}
-  \item{values.digits}{Number of decimal digits for which to display the values.
+  \item{values_digits}{Number of decimal digits for which to display the values_
         Default is 0, round to the nearest integer for \code{"\%"},
         2 for \code{"prop"}, and if \code{"input"} and \code{y} is entered
         directly, display the literal value unless > 9999, in which case
         set to 0.}
-  \item{values.position}{Position of the plotted text. Default is inside the bar,
+  \item{values_position}{Position of the plotted text. Default is inside the bar,
         or, if \code{"out"}, as part of the label for each value
         outside of the bar.}
-  \item{values.cut}{Threshold for displaying the value. If \code{values.position}
+  \item{values_cut}{Threshold for displaying the value. If \code{values_position}
        equals \code{"out"}, then default is 0.028 unless there is a
        \code{by} variable or multiple x-variables on the same plot, then
        default is 0.040}\cr
 
-  \item{xlab}{Label for \code{x}-axis. If \code{xlab} is not specified, then
+  \item{xlab}{Label for \code{x}-axis_ If \code{xlab} is not specified, then
        the label becomes
        the name of the corresponding variable label if it exists, or, if not, the
-       variable name. If \code{xy.ticks} is \code{FALSE}, then no label is displayed.
+       variable name. If \code{xy_ticks} is \code{FALSE}, then no label is displayed.
        If no y variable is specified, then \code{xlab} is set to Index unless
        \code{xlab} has been specified.}
-  \item{ylab}{Label for \code{y}-axis.  If \code{xlab} is not specified, then
+  \item{ylab}{Label for \code{y}-axis_  If \code{xlab} is not specified, then
        the label becomes
        the name of the corresponding variable label if it exists, or, if not, the
-       variable name. If \code{xy.ticks} is \code{FALSE}, then no label displayed.}
+       variable name. If \code{xy_ticks} is \code{FALSE}, then no label displayed.}
   \item{main}{Label for the title of the graph.
-       Can set size with \code{main.cex} and color with \code{main.color} from the
+       Can set size with \code{main_cex} and color with \code{main_color} from the
        lessR \code{\link{style}} function.}
   \item{sub}{Sub-title of graph, below \code{xlab}.}
-  \item{lab.adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
+  \item{lab_adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
        the position of the axis labels in approximate inches. + values move
        the labels away from plot edge. Not applicable to Trellis graphics.}
-  \item{margin.adj}{Four-element vector -- top, right, bottom and left --
+  \item{margin_adj}{Four-element vector -- top, right, bottom and left --
        adjusts the margins of the plotted figure in approximate inches.
        + values move the corresponding margin away from plot edge. 
        Not applicable to Trellis graphics.}
-  \item{addtop}{In the same scale as the corresponding axis, puts
+  \item{add_top}{In the same scale as the corresponding axis, puts
        more space between the bars and the top of the plot area, usually to
        accommodate the legend when plotting two variables or a display
        of the values on top of the bars.}\cr
@@ -279,7 +279,7 @@ bc(\ldots)
        \code{"v.line"} (vertical line), and \code{"h.line"} (horizontal line).
        The value \code{"means"} is short-hand for vertical and horizontal lines
        at the respective means. Does not apply to Trellis graphics.
-       Customize with parameters such as \code{add.fill} and \code{add.color}
+       Customize with parameters such as \code{add_fill} and \code{add_color}
        from the \code{\link{style}} function.}
   \item{x1}{First x coordinate to be considered for each object.
            All coordinates vary from -1 to 1.}
@@ -289,7 +289,7 @@ bc(\ldots)
   \item{y2}{Second y coordinate to be considered for each object.
         Only used for \code{"rect"}, \code{"line"} and \code{arrow}.}\cr
 
-  \item{eval.df}{Determines if to check for existing data frame and
+  \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE}
         unless the \code{shiny} package is loaded then set to \code{FALSE} so
         that Shiny will run. Needs to be set to \code{FALSE} if using
@@ -351,7 +351,7 @@ The other statistical transformation is simply counting the number of occurrence
 }
 
 COLORS\cr
-For a one variable plot, set the default color of the bars by the current color theme according to \code{bar.fill.discrete} argument of the function \code{\link{style}}, which includes the default color theme \code{"hues"} that defines a qualitative HCL color scale, or set the bar color with the \code{fill} parameter, which references a specified vector of color specifications, such as generated by the lessR \code{\link{getColors}} function.
+For a one variable plot, set the default color of the bars by the current color theme according to \code{bar_fill_discrete} argument of the function \code{\link{style}}, which includes the default color theme \code{"hues"} that defines a qualitative HCL color scale, or set the bar color with the \code{fill} parameter, which references a specified vector of color specifications, such as generated by the lessR \code{\link{getColors}} function.
 
 Set \code{fill} to a single color or a color palette, of which there are many possibilities. Define a qualitative color palette with \code{"hues"} that provides HCL colors of the same chroma (saturation) and luminance (brightness). Also available are the pre-specified R color palettes \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. Pre-defined sequential and divergent color ranges are available as implicit calls to \code{\link{getColors}}. The full list of pre-defined color ranges (defined in 30 degree increments around the HCL color wheel): \code{"reds"}, \code{"rusts"}, \code{"browns"},
 \code{"olives"}, \code{"greens"}, \code{"emeralds"}, \code{"turquoises"}, \code{"aquas"}, \code{"blues"}, \code{"purples"},\code{"violets"}, \code{"magentas"}, and \code{"grays"}.
@@ -364,27 +364,27 @@ The values of another variable can be mapped into the fill color of the bars. To
 
 
 LEGEND\cr
-When two variables are plotted, a legend is produced, with values for each level of the second or \code{by} variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend.position} option, which, in addition to the \code{lessR} option of \code{right.margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend.
+When two variables are plotted, a legend is produced, with values for each level of the second or \code{by} variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend_position} option, which, in addition to the \code{lessR} option of \code{right_margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend_
 
 If the default right margin is retained, variable labels are also accommodated for the legend title.  To conserve horizontal space, the variable label is listed in multiple lines if needed. The legend title is constructed by forming lines of maximum length of 12 characters, with multiple words per line if possible. Any single word in the label of more than 12 characters is abbreviated to 12 characters with the R \code{\link{abbreviate}} function. Also, any value labels are abbreviated to a maximum of 6 characters.
 
-If the legend is not in the right margin, sometimes bars from the graph may intrude into the legend. One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{addtop} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend.horiz} option.
+If the legend is not in the right margin, sometimes bars from the graph may intrude into the legend_ One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{add_top} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend_horiz} option.
 
 LONG CATEGORY NAMES\cr
-For many plots, the names of the categories tend to be long. To adjust the plot for these long names, they can be rotated using the \code{rotate.x} and \code{rotate.y} parameters, in conjunction with \code{offset}, from the \code{\link{style}} function. The \code{offset} parameter moves the category name out from the axis to compensate for the rotation. The changes from \code{\link{style}} persist until further changes. To reset to the default after obtaining an analysis, use \code{style()}.
+For many plots, the names of the categories tend to be long. To adjust the plot for these long names, they can be rotated using the \code{rotate_x} and \code{rotate_y} parameters, in conjunction with \code{offset}, from the \code{\link{style}} function. The \code{offset} parameter moves the category name out from the axis to compensate for the rotation. The changes from \code{\link{style}} persist until further changes. To reset to the default after obtaining an analysis, use \code{style()}.
 
 Also, the following codes are used to adjust line spacing:\cr
 1. Any space in a category name is converted to a new line.\cr
 2. If the space should not be converted to a new line, the replace with an underscore, which will display as a space and no line break.\cr
 
-For the text output at the console, can specify the maximum number of characters in a label with \code{labels.max}. Longer value names are abbreviated to the specified length. This facilitates reading cross-tab tables. Also, a provided table pairs the abbreviated names with the actual names. For one variable frequency distributions, \code{out.size} provides the maximum number of characters for the text output before the horizontal display of the frequency distribution is shifted to a vertical presentation.
+For the text output at the console, can specify the maximum number of characters in a label with \code{labels.max}. Longer value names are abbreviated to the specified length. This facilitates reading cross-tab tables. Also, a provided table pairs the abbreviated names with the actual names. For one variable frequency distributions, \code{out_size} provides the maximum number of characters for the text output before the horizontal display of the frequency distribution is shifted to a vertical presentation.
 
 MULTIPLE BAR CHARTS ON THE SAME PANEL (PLOT)\cr
-For multiple x-variables, set the parameter \code{one.plot} to \code{TRUE} to specify that each bar chart should be produced on the same panel as all other bars. This is most meaningful when all items have the same set of responses, such as a common Likert scale found in survey data. By default the one panel plot is produced when a common response scale is detected.
+For multiple x-variables, set the parameter \code{one_plot} to \code{TRUE} to specify that each bar chart should be produced on the same panel as all other bars. This is most meaningful when all items have the same set of responses, such as a common Likert scale found in survey data. By default the one panel plot is produced when a common response scale is detected.
 
 The algorithm to detect if the response scale is common first identifies the first variable with the largest set of responses, then checks the responses of all other variables. If all responses to all other variables are contained within the set of responses to the reference variable, then the response scales are the same. This means that on a Likert scale, for example, some items may not contain all possible responses, such as no one selects Strongly Disagree for an item. However, for the response scales to be deemed the same, at least one item (variable) must contain all possible responses.
 
-Regardless, the \code{one.plot} parameter can be set to either \code{TRUE} or \code{FALSE} regardless of the commonality of responses. Setting this parameter explicitly saves some CPU time as the algorithm to evaluate the communality of responses need not be activated.
+Regardless, the \code{one_plot} parameter can be set to either \code{TRUE} or \code{FALSE} regardless of the commonality of responses. Setting this parameter explicitly saves some CPU time as the algorithm to evaluate the communality of responses need not be activated.
 
 
 ENTER NUMERIC VARIABLE DIRECTLY\cr
@@ -460,7 +460,7 @@ David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})
 \examples{
 
 # get the data
-d <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in_lessR=TRUE)
 
 # --------------------------------------------------------
 # bar chart from tabulating the data for a single variable
@@ -480,7 +480,7 @@ myOutput
 BarChart(Dept, rows=(Gender=="M" & Salary > 85000))
 
 # rotate and offset the axis labels, sort categories by frequencies
-BarChart(Dept, rotate.x=45, offset=1, sort="-")
+BarChart(Dept, rotate_x=45, offset=1, sort="-")
 
 # set bars to a single color of blue with some transparency
 BarChart(Dept, fill="blue", trans=0.3)
@@ -504,7 +504,7 @@ BarChart(Gender, fill=c("palegreen3","tan"))
 BarChart(Dept, fill=getColors(l=25), trans=0.4)
 
 # column proportions instead of frequencies
-BarChart(Gender, stat.x="proportion")
+BarChart(Gender, stat_x="proportion")
 
 # map value of tabulated count to bar fill
 BarChart(Dept, fill=(count))
@@ -512,11 +512,11 @@ BarChart(Dept, fill=(count))
 BarChart(Dept, fill=(count.v))
 
 # data with many values of categorical variable Make and large labels
-myd <- Read("Cars93", in.lessR=TRUE)
+myd <- Read("Cars93", in_lessR=TRUE)
 # perpendicular labels
-bc(Make, rotate.x=90, data=myd)
+bc(Make, rotate_x=90, data=myd)
 # manage size of horizontal value labels
-bc(Make, horiz=TRUE, label.max=4, data=myd)
+bc(Make, horiz=TRUE, label_max=4, data=myd)
 
 # wes anderson move theme palette
 # see getColors help file to see the full list of themes
@@ -524,11 +524,11 @@ BarChart(Dept, fill="GrandBudapest1", values="off")
 
 # display bars for values of count <= 10 in a different color
 #  than values above
-BarChart(Dept, sort="+", fill.split=10)
+BarChart(Dept, sort="+", fill_split=10)
 
 # read y variable, Salary, then bars are height of 
 #  corresponding mean Salary
-BarChart(Dept, Salary, stat.yx="mean")
+BarChart(Dept, Salary, stat_yx="mean")
 
 
 # ----------------------------------------------------
@@ -559,21 +559,21 @@ BarChart(Gender, by=Dept,
 # the levels of Dept are included within each respective bar
 # plot horizontally, display the value for each bar at the
 #   top of each bar
-BarChart(Gender, by=Dept, beside=TRUE, horiz=TRUE, values.position="out")
+BarChart(Gender, by=Dept, beside=TRUE, horiz=TRUE, values_position="out")
 
 # horizontal bar chart of two variables, put legend on the top
-BarChart(Gender, by=Dept, horiz=TRUE, legend.position="top")
+BarChart(Gender, by=Dept, horiz=TRUE, legend_position="top")
 
 # for more info on base R graphic options, enter:  help(par)
 # for lessR options, enter:  style(show=TRUE)
 # here fill is set in the style function instead of BarChart
 #   along with the others
-style(fill=c("coral3","seagreen3"), lab.color="wheat4", lab.cex=1.2,
-      panel.fill="wheat1", main.color="wheat4")
+style(fill=c("coral3","seagreen3"), lab_color="wheat4", lab_cex=1.2,
+      panel_fill="wheat1", main_color="wheat4")
 BarChart(Dept, by=Gender,
-         legend.position="topleft", legend.labels=c("Girls", "Boys"),
+         legend_position="topleft", legend_labels=c("Girls", "Boys"),
          xlab="Dept Level", main="Gender for Different Dept Levels",
-         value.labels=c("None", "Some", "Much", "Ouch!"))
+         value_labels=c("None", "Some", "Much", "Ouch!"))
 style()
 
 
@@ -582,10 +582,10 @@ style()
 # -----------------------------------------------------------------
 
 # bar charts for all non-numeric variables in the data frame called d
-#   and all numeric variables with a small number of values, < n.cat
-# BarChart(one.plot=FALSE)
+#   and all numeric variables with a small number of values, < n_cat
+# BarChart(one_plot=FALSE)
 
-d <- rd("Mach4", in.lessR=TRUE, quiet=TRUE)
+d <- rd("Mach4", in_lessR=TRUE, quiet=TRUE)
 
 # all on the same plot, bar charts for 20 6-pt Likert scale items
 # default scale is divergent from "browns" to "blues"
@@ -660,14 +660,14 @@ BarChart(Dept, Count, by=Gender)
 # annotations
 # -----------
 
-d <- rd("Employee", in.lessR=TRUE)
+d <- rd("Employee", in_lessR=TRUE)
 
 # Place a message in the center of the plot
 # \n indicates a new line
 BarChart(Dept, add="Employees by\nDepartment", x1=3, y1=10)
 
 # Use style to change some parameter values
-style(add.trans=.8, add.fill="gold", add.color="gold4", add.lwd=0.5)
+style(add_trans=.8, add_fill="gold", add_color="gold4", add_lwd=0.5)
 # Add a rectangle around the message centered at <3,10>
 BarChart(Dept, add=c("rect", "Employees by\nDepartment"),
                      x1=c(2,3), y1=c(11, 10), x2=4, y2=9)

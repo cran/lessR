@@ -1,4 +1,5 @@
-\name{prob.tcut}
+\name{prob_tcut}
+\alias{prob_tcut}
 \alias{prob.tcut}
 
 \title{Plot t-distribution Curve and Specified Cutoffs with Normal Curve}
@@ -8,23 +9,25 @@ Plot a specified t-distribution against the standardized normal curve with the c
 }
 
 \usage{
-prob.tcut(df, alpha=0.05, dig.dec=3, y.axis=FALSE,
-         fill="aliceblue", color.tail="palevioletred4",
-         nrm.color=gray(.7), color.t=gray(.08),
-         pdf.file=NULL, width=5, height=5, \ldots)
+prob_tcut(df, alpha=0.05, digits_d=3, y_axis=FALSE,
+         fill="aliceblue", color_tail="palevioletred4",
+         nrm_color=gray(.7), color_t=gray(.08),
+         pdf_file=NULL, width=5, height=5, \ldots)
+
+prob.tcut(\ldots)
 }
 
 
 \arguments{
   \item{df}{Degrees of freedom for t-distribution, must be 2 or larger.}
   \item{alpha}{Alpha to define the tail cutoff area.}
-  \item{dig.dec}{Number of decimal digits in the output.}
-  \item{y.axis}{If \code{FALSE}, then the y axis is not displayed.}
+  \item{digits_d}{Number of decimal digits in the output.}
+  \item{y_axis}{If \code{FALSE}, then the y axis is not displayed.}
   \item{fill}{Fill color for the interior of the t-distribution curve.}
-  \item{color.tail}{Color of the tail areas of the t-distribution.}
-  \item{nrm.color}{Color of the normal curve.}
-  \item{color.t}{Color of the t-distribution curve.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{color_tail}{Color of the tail areas of the t-distribution.}
+  \item{nrm_color}{Color of the normal curve.}
+  \item{color_t}{Color of the t-distribution curve.}
+  \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
   \item{\ldots}{Other parameter values for graphics.}

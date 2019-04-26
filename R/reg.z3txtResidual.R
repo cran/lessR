@@ -1,5 +1,5 @@
 .reg3txtResidual <-
-function(lm.out, cook, digits.d=NULL, res.sort="cooks", res.rows=NULL, show.R=FALSE) {
+function(lm.out, cook, digits_d=NULL, res_sort="cooks", res_rows=NULL, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -11,7 +11,7 @@ function(lm.out, cook, digits.d=NULL, res.sort="cooks", res.rows=NULL, show.R=FA
 # ----------------------------------------------
 # text output
 
-  if (show.R) {
+  if (show_R) {
     tx[length(tx)+1] <- .dash2(68)
     tx[length(tx)+1] <- paste("> ", "fitted(model)", sep="", "\n")
     tx[length(tx)+1] <- paste("> ", "resid(model)", sep="", "\n")
@@ -22,17 +22,17 @@ function(lm.out, cook, digits.d=NULL, res.sort="cooks", res.rows=NULL, show.R=FA
   }
 
   tx[length(tx)+1] <- "Data, Fitted, Residual, Studentized Residual, Dffits, Cook's Distance"
-  if (res.sort == "cooks")
+  if (res_sort == "cooks")
     tx[length(tx)+1] <- "   [sorted by Cook's Distance]"
-  if (res.sort == "rstudent")  
+  if (res_sort == "rstudent")  
     tx[length(tx)+1] <- "   [sorted by Studentized Residual, ignoring + or - sign]"
-  if (res.sort == "dffits")  
+  if (res_sort == "dffits")  
     tx[length(tx)+1] <- "   [sorted by dffits, ignoring + or - sign]"
-  if (res.rows < n.keep)
-    txt <- "rows of data, or do res.rows=\"all\"]"
+  if (res_rows < n.keep)
+    txt <- "rows of data, or do res_rows=\"all\"]"
   else
     txt="]"
-  tx[length(tx)+1] <- paste("   [res.rows = ", res.rows, ", out of ", n.keep, " ", txt, sep="")
+  tx[length(tx)+1] <- paste("   [res_rows = ", res_rows, ", out of ", n.keep, " ", txt, sep="")
 
 
   fit <- lm.out$fitted.values
@@ -50,37 +50,37 @@ function(lm.out, cook, digits.d=NULL, res.sort="cooks", res.rows=NULL, show.R=FA
   names(out)[n.vars+3] <- "rstdnt"
   names(out)[n.vars+4] <- "dffits"
   names(out)[n.vars+5] <- "cooks"
-  if (res.sort != "off") {
-    if (res.sort == "cooks") {
+  if (res_sort != "off") {
+    if (res_sort == "cooks") {
       o <- order(out$cooks, decreasing=TRUE)
       clmn <- 0L
     }
-    if (res.sort == "rstudent") {
+    if (res_sort == "rstudent") {
       o <- order(abs(out$rstdnt), decreasing=TRUE)
       clmn <- 2L
     }
-    if (res.sort == "dffits") {
+    if (res_sort == "dffits") {
       o <- order(abs(out$dffits), decreasing=TRUE)
       clmn <- 1L
     }
     out <- out[o,]
   }
 
-  tx2 <- .prntbl(out[1:res.rows,], digits.d)
+  tx2 <- .prntbl(out[1:res_rows,], digits_d)
   for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 
-  if (res.rows > 5  &&  res.sort != "off") {
+  if (res_rows > 5  &&  res_sort != "off") {
     label.top <- numeric(length=5)
-    out.top <- numeric(length=5)
+    out_top <- numeric(length=5)
     for (i in 1:5) {
       label.top[i] <- rownames(out)[i]
-      out.top[i] <- out[i,(ncol(out)-clmn)]
+      out_top[i] <- out[i,(ncol(out)-clmn)]
     }
-      names(out.top) <- label.top
+      names(out_top) <- label.top
   }
   else
-    out.top <- NA
+    out_top <- NA
 
-  return(list(tx=tx, resid.max=out.top))
+  return(list(tx=tx, resid.max=out_top))
 
 }

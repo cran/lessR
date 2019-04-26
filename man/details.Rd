@@ -11,23 +11,23 @@ Provides feedback regarding a data frame which includes the variable names, the 
 }
 
 \usage{
-details(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
-         miss.show=30, miss.matrix=FALSE, brief=getOption("brief"))
+details(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
+         miss_show=30, miss_matrix=FALSE, brief=getOption("brief"))
 
 db(\ldots, brief=TRUE)
 }
 
 \arguments{
   \item{data}{Data frame for which to provide the details.}
-  \item{n.mcut}{For the missing value analysis, list the row name and number of missing values
+  \item{n_mcut}{For the missing value analysis, list the row name and number of missing values
         if the number of missing exceeds or equals this cutoff.}
-  \item{miss.zero}{For the missing value analysis, list the variable name
+  \item{miss_zero}{For the missing value analysis, list the variable name
        or the row name even for values of 0. By default only variables and
        rows with missing data are listed.}
-  \item{max.lines}{Maximum number of lines to list of the data and labels.}
-  \item{miss.show}{For the missing value analysis, the number of rows, one
-       row per observation, that has as many or missing values as \code{n.mcut}.}
-  \item{miss.matrix}{For the missing value analysis, if there is any missing data, 
+  \item{max_lines}{Maximum number of lines to list of the data and labels.}
+  \item{miss_show}{For the missing value analysis, the number of rows, one
+       row per observation, that has as many or missing values as \code{n_mcut}.}
+  \item{miss_matrix}{For the missing value analysis, if there is any missing data, 
        list a version of the complete data table with a 0 for a non-missing]
         value and a 1 for a missing value.}
   \item{brief}{If \code{TRUE}, display only variable names table plus any
@@ -39,7 +39,7 @@ db(\ldots, brief=TRUE)
 
 \details{
 MISSING DATA\cr
-By default, \code{details} provides a list of each variable and each row with the display of the number of associated missing values, indicated by the standard R missing value code NA. To not list the variable name or row name of variables or rows without missing data, invoke the \code{miss.zero=FALSE} option, which can appreciably reduce the amount of output for large data sets. To view the entire data table in terms of 0's and 1's for non-missing and missing data, respectively, invoke the \code{miss.matrix=TRUE} option. 
+By default, \code{details} provides a list of each variable and each row with the display of the number of associated missing values, indicated by the standard R missing value code NA. To not list the variable name or row name of variables or rows without missing data, invoke the \code{miss_zero=FALSE} option, which can appreciably reduce the amount of output for large data sets. To view the entire data table in terms of 0's and 1's for non-missing and missing data, respectively, invoke the \code{miss_matrix=TRUE} option. 
 
 VARIABLE LABELS\cr
 Standard R does not provide for variable labels, but \code{lessR} does. Variable labels can be provided for some or all of the variables in the data frames.  One way to enter the variable labels is to read them from their own file with \code{details} with \code{labels} set to the full path name or \code{URL} of the labels file, or just the file name if the labels file is in the same directory as the data file.  Another method is to include the labels directly in the data file.  To to this, specify the file of variable labels with the \code{label="row2"} option. The web survey application Qualtrics downloads \code{csv} files in this format.
@@ -65,7 +65,7 @@ The \code{lessR} functions that provide analysis, such as \code{\link{Histogram}
 \examples{
 # read the built-in data set datEmployee
 # this provides an automatic call to details
-d <- Read("Employee", in.lessR=TRUE)
+d <- Read("Employee", in_lessR=TRUE)
 
 # manually request the details for d
 details()

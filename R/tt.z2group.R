@@ -1,23 +1,23 @@
 .TwoGroup <-
 function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
-         Ynm, Xnm, X1nm, X2nm, brief, digits.d,
-         conf.level, alternative, mmd, msmd, Edesired, bw1, bw2,
+         Ynm, Xnm, X1nm, X2nm, brief, digits_d,
+         conf_level, alternative, mmd, msmd, Edesired, bw1, bw2,
          graph, xlab,
-         line.chart, show.title, pdf.file, width, height, ...)  {        
+         line_chart, show_title, pdf_file, width, height, ...)  {        
  
   if ( brief  &&  (!is.null(mmd) || !is.null(msmd)) ) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "mmd and msmd do not work with the brief version.\n\n")
   }
 
-  # get lab.x.cex  lab.y.cex
-  lab.cex <- getOption("lab.cex")
-  lab.x.cex <- getOption("lab.x.cex")
-  lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
-  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+  # get lab_x_cex  lab_y_cex
+  lab_cex <- getOption("lab_cex")
+  lab_x_cex <- getOption("lab_x_cex")
+  lab_x_cex <- ifelse(is.null(lab_x_cex), lab_cex, lab_x_cex)
+  adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
 
   # get variable labels if exist plus axes labels
-  gl <- .getlabels(xlab=NULL, ylab=xlab, main=NULL, lab.x.cex=lab.x.cex,
+  gl <- .getlabels(xlab=NULL, ylab=xlab, main=NULL, lab_x_cex=lab_x_cex,
                    graph.win=FALSE)  # # graphics window not yet set-up
   x.name <- gl$yn; x.lbl <- gl$yl; x.lab <- gl$yb
 
@@ -60,9 +60,9 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     v2 <- s2^2
   }
 
-  if (from.data) dig.smr.d  <- digits.d  else dig.smr.d <- digits.d - 1
+  if (from.data) dig.smr.d  <- digits_d  else dig.smr.d <- digits_d - 1
 
-  clpct <- paste(toString(round((conf.level)*100, 2)), "%", sep="")
+  clpct <- paste(toString(round((conf_level)*100, 2)), "%", sep="")
   Xnmval <- paste(Xnm, X1nm)
   cat(Ynm, " for ", Xnmval, ":  ", sep="")
   if (from.data) cat("n.miss = ", n1.miss, ",  ", sep="")
@@ -184,17 +184,19 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   if (!brief) cat("\n\n------ Inference ------\n\n") else cat("\n---\n")
 
   # t-test
+  if (alternative == "two_sided") alt <- "two.sided"
+
   sterr <- sw * sqrt(1/n1 + 1/n2)
   df <- df1 + df2
-  if (alternative == "two.sided")
-    tcut <- qt((1-conf.level)/2, df=df, lower.tail=FALSE)
+  if (alternative == "two_sided")
+    tcut <- qt((1-conf_level)/2, df=df, lower.tail=FALSE)
   else if (alternative == "less")
-    tcut <- qt(1-conf.level, df=df, lower.tail=FALSE)
+    tcut <- qt(1-conf_level, df=df, lower.tail=FALSE)
   else if (alternative == "greater")
-    tcut <- qt(1-conf.level, df=df, lower.tail=TRUE)
+    tcut <- qt(1-conf_level, df=df, lower.tail=TRUE)
   if (from.data) {
-    ttest <- t.test(YA, YB, var.equal=TRUE, conf.level=conf.level,
-                    alternative=alternative)
+    ttest <- t.test(YA, YB, var.equal=TRUE, conf_level=conf_level,
+                    alternative=alt)
     lb <- ttest$conf[1]
     ub <- ttest$conf[2]
     E <- (ub-lb) / 2
@@ -207,7 +209,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     lb <- mdiff-E
     ub <- mdiff+E
     tvalue <- mdiff/sterr
-    if (alternative == "two.sided")
+    if (alternative == "two_sided")
       pvalue <- 2 * pt(abs(tvalue), df=df, lower.tail=FALSE)
     else if (alternative == "less")
       pvalue <- pt(abs(tvalue), df=df, lower.tail=FALSE)
@@ -232,16 +234,16 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     k2 <- v2/n2
     df.ne <- ((k1 + k2)^2) / ((k1^2)/(n1-1) + (k2^2)/(n2-1))
     sterr.ne <- sqrt(k1 + k2)
-    if (alternative == "two.sided")
-      tcut.ne <- qt((1-conf.level)/2, df=df.ne, lower.tail=FALSE)
+    if (alternative == "two_sided")
+      tcut.ne <- qt((1-conf_level)/2, df=df.ne, lower.tail=FALSE)
     else if (alternative == "less")
-      tcut.ne <- qt(1-conf.level, df=df.ne, lower.tail=FALSE)
+      tcut.ne <- qt(1-conf_level, df=df.ne, lower.tail=FALSE)
     else if (alternative == "greater")
-      tcut.ne <- qt(1-conf.level, df=df.ne, lower.tail=TRUE)
+      tcut.ne <- qt(1-conf_level, df=df.ne, lower.tail=TRUE)
 
     if (from.data) {
-      ttne <- t.test(YA, YB, var.equal=FALSE, conf.level=conf.level,
-                     alternative=alternative)
+      ttne <- t.test(YA, YB, var.equal=FALSE, conf_level=conf_level,
+                     alternative=alt)
       df.ne <- ttne$parameter
       lb.ne <- ttne$conf[1]
       ub.ne <- ttne$conf[2]
@@ -254,7 +256,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       lb.ne <- mdiff-E.ne
       ub.ne <- mdiff+E.ne
       tvalue.ne <- mdiff / sterr.ne
-    if (alternative == "two.sided")
+    if (alternative == "two_sided")
       pvalue.ne <- 2 * pt(abs(tvalue.ne), df=df.ne, lower.tail=FALSE)
     else if (alternative == "less")
       pvalue.ne <- pt(abs(tvalue.ne), df=df.ne, lower.tail=FALSE)
@@ -282,7 +284,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
         "Cohen's d:  ", .fmt(smd), sep="", "\n")
   }
 
-  #cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf.level=conf.level)  # MBESS function
+  #cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf_level=conf_level)  # MBESS function
   #deltaL <-cid$Lower.Conf.Limit.smd
   #deltaU <- cid$Upper.Conf.Limit.smd
   #if (!brief) cat("\n")
@@ -295,12 +297,12 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     if ( !is.null(mmd) | !is.null(msmd) ) {
       if (!is.null(mmd)) msmd <- mmd / sw
       if (!is.null(msmd)) mmd <- msmd * sw
-      cat("Compare mmd =", .fmt(mmd,digits.d), " to the obtained value of md = ",
+      cat("Compare mmd =", .fmt(mmd,digits_d), " to the obtained value of md = ",
         .fmt(mdiff), "\n")
       cat("Compare mmd to the confidence interval for md: ", .fmt(lb), " to ", 
           .fmt(ub), "\n\n")
       cat("Minimum Standardized Mean Difference of practical importance: msmd\n")
-      cat("Compare msmd = ", .fmt(msmd,digits.d),
+      cat("Compare msmd = ", .fmt(msmd,digits_d),
           " to the obtained value of smd = ", .fmt(smd),"\n")
       #if (!is.null(deltaL)) cat("Compare smd to the confidence interval for smd: ", 
           #.fmt(deltaL), " to ", .fmt(deltaU), "\n")
@@ -313,7 +315,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
   # needed sample size from Edesired
   if (!is.null(Edesired)) {
-    zcut <- qnorm((1-conf.level)/2)
+    zcut <- qnorm((1-conf_level)/2)
     ns <- 2*((zcut*sw)/Edesired)^2 
     n.needed <- ceiling(1.099*ns + 4.863) 
     cat("\n\n------ Needed Sample Size ------\n\n")
@@ -340,9 +342,9 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     plt.title  <- character(length=0)
     manage.gr <- .graphman()
 
-    if (is.null(pdf.file)) {
+    if (is.null(pdf_file)) {
       if (manage.gr) {
-        n.win <- ifelse (!line.chart, 1, 3)
+        n.win <- ifelse (!line_chart, 1, 3)
         .graphwin(n.win, width, height)
         i.win <- 2   # start first graphics window on 3
         orig.params <- par(no.readonly=TRUE)
@@ -350,9 +352,9 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
      }
     }
 
-    if (line.chart) { 
+    if (line_chart) { 
 
-      if (!is.null(pdf.file))
+      if (!is.null(pdf_file))
         pdf(file=paste("LineChart_",X1nm,".pdf",sep=""),
              width=width, height=height)
 
@@ -365,19 +367,19 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X1nm))
 
       .lc.main(YA, type=NULL,
-        col.line=getOption("pt.color"), col.area=NULL,
-        col.box=getOption("panel.color"),
-        col.color=getOption("pt.color"), 
-        col.fill=getOption("bar.fill.ordered"), shape.pts=21,
-        col.bg=getOption("panel.fill"), lab.cex=getOption("lab.cex"),
-        axis.cex=0.75, col.axis="gray30", rotate.x=0, rotate.y=0, offset=.5,
-        xy.ticks=TRUE, line.width=1.1,
+        col.line=getOption("pt_color"), col.area=NULL,
+        col.box=getOption("panel_color"),
+        col_color=getOption("pt_color"), 
+        col_fill=getOption("bar_fill_ordered"), shape_pts=21,
+        col.bg=getOption("panel_fill"), lab_cex=getOption("lab_cex"),
+        axis_cex=0.75, col.axis="gray30", rotate_x=0, rotate_y=0, offset=.5,
+        xy_ticks=TRUE, line_width=1.1,
         xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""),
         main=plt.title[plt.i], sub=NULL,
-        cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
-        center.line="default", quiet=TRUE)
+        cex=NULL, time_start=NULL, time_by=NULL, time_reverse=FALSE,
+        center_line="default", quiet=TRUE)
         
-      if (!is.null(pdf.file)) {
+      if (!is.null(pdf_file)) {
         dev.off()
         .showfile(paste("LineChart_", X1nm, ".pdf", sep=""), paste("line chart of", X1nm))
       }
@@ -391,19 +393,19 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X2nm))
  
      .lc.main(YB, type=NULL,
-       col.line=getOption("pt.color"), col.area=NULL,
-       col.box=getOption("panel.color"),
-       col.color=getOption("pt.color"), 
-       col.fill=getOption("bar.fill.ordered"), shape.pts=21,
-       col.bg=getOption("panel.fill"), lab.cex=getOption("lab.cex"),
-       axis.cex=0.85, col.axis="gray30", rotate.x=0, rotate.y=0, offset=.5,
-       xy.ticks=TRUE, line.width=1.1,
+       col.line=getOption("pt_color"), col.area=NULL,
+       col.box=getOption("panel_color"),
+       col_color=getOption("pt_color"), 
+       col_fill=getOption("bar_fill_ordered"), shape_pts=21,
+       col.bg=getOption("panel_fill"), lab_cex=getOption("lab_cex"),
+       axis_cex=0.85, col.axis="gray30", rotate_x=0, rotate_y=0, offset=.5,
+       xy_ticks=TRUE, line_width=1.1,
        xlab=NULL, ylab=paste(Ynm,": ",X2nm, sep=""),
        main=plt.title[plt.i], sub=NULL,
-       cex=NULL, time.start=NULL, time.by=NULL, time.reverse=FALSE,
-       center.line="default", quiet=TRUE)
+       cex=NULL, time_start=NULL, time_by=NULL, time_reverse=FALSE,
+       center_line="default", quiet=TRUE)
 
-      if (!is.null(pdf.file)) {
+      if (!is.null(pdf_file)) {
         dev.off()
         .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),
                   paste("line chart of", X2nm))
@@ -414,8 +416,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     # two density graphs
     # prepare graphics window, dev or pdf
 
-    if (!is.null(pdf.file))
-      .opendev(pdf.file, width, height)
+    if (!is.null(pdf_file))
+      .opendev(pdf_file, width, height)
     else {
       if (manage.gr) {
         i.win  <- i.win + 1 
@@ -426,15 +428,15 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     plt.i <- plt.i + 1
     plt.title[plt.i] <- "Two-Group Plot"
 
-    .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits.d, brief,
+    .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits_d, brief,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
-              clpct, tvalue, pvalue, ub, lb, x.lab, show.title)
+              clpct, tvalue, pvalue, ub, lb, x.lab, show_title)
 
     cat("\n")
 
-    if (!is.null(pdf.file)) {
+    if (!is.null(pdf_file)) {
       dev.off()
-      .showfile(pdf.file, paste("density plots of", Ynm, "for both groups"))
+      .showfile(pdf_file, paste("density plots of", Ynm, "for both groups"))
     }
 
     return(list(i=plt.i, ttl=plt.title))

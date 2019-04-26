@@ -1,7 +1,7 @@
 .ss.factor <-
-function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
-         x.lbl=NULL, y.lbl=NULL, label.max=20,
-         x.miss=NULL, by.miss=NULL, out.size=NULL, ...)  {
+function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
+         x.lbl=NULL, y.lbl=NULL, label_max=20,
+         x.miss=NULL, by.miss=NULL, out_size=NULL, ...)  {
 
 
 # print a cross-tabs
@@ -72,9 +72,9 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
 
     # potential abbreviation of column labels
     mx.chr <- max(nchar(colnames(x)))
-    if (mx.chr > label.max) {
+    if (mx.chr > label_max) {
       c.nm <- colnames(x)  # store for later use
-      colnames(x) <- .abbrev(colnames(x), label.max)
+      colnames(x) <- .abbrev(colnames(x), label_max)
     }
     
     # use for returned output, x is a 2-way table
@@ -112,8 +112,8 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
     tx <- character(length = 0)
     ch <- summary(as.table(x))
     if (!is.nan(ch$statistic)) {
-      min.rc <- min(nrow(x)-1, ncol(x)-1)
-      V <- sqrt(ch$statistic / (min.rc * ch$n.cases))
+      min_rc <- min(nrow(x)-1, ncol(x)-1)
+      V <- sqrt(ch$statistic / (min_rc * ch$n.cases))
       txt <- ifelse(ch$parameter == 1, " (phi)", "") 
       txt <- paste("Cramer\'s V", txt, ":", sep="")
       tx[length(tx)+1] <- paste(txt, .fmt(V,3))
@@ -225,9 +225,9 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       mx.chr <- max(nchar(names(x)))
 
       c.nm <- NULL
-      if (mx.chr > label.max) {
+      if (mx.chr > label_max) {
         c.nm <- names(x)  # store for later use
-        names(x) <- .abbrev(names(x), label.max)
+        names(x) <- .abbrev(names(x), label_max)
       }
 
        max.ln <- integer(length=0)      
@@ -262,7 +262,7 @@ function(x, by=NULL, brief=FALSE, digits.d=NULL, x.name, y.name=NULL,
       tx[length(tx)] <- paste(tx[length(tx)], .fmtc("1.000", w=w+6))
       txcnt <- tx
 
-      max.clmns <- ifelse (is.null(out.size), getOption("width"), out.size)
+      max.clmns <- ifelse (is.null(out_size), getOption("width"), out_size)
       if (col.width > max.clmns) {  # vertical display
         mx.nm <- max(nchar(names(x)), nchar("Total"))
         mx.fr <- nchar(sum(x)) + 2

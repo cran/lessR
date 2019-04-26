@@ -25,12 +25,12 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
 
   usr <- par("usr")
   rect(usr[1], usr[3], usr[2], usr[4],
-       col=getOption("panel.fill"), border=getOption("panel.color"))
+       col=getOption("panel_fill"), border=getOption("panel_color"))
 
-  abline(v=axTicks(1), col=getOption("grid.x.color"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
-  abline(h=axTicks(2), col=getOption("grid.y.color"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+  abline(v=axTicks(1), col=getOption("grid_x_color"),
+         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
+  abline(h=axTicks(2), col=getOption("grid_y_color"),
+         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
 
   .axes(NULL, NULL, axTicks(1), axTicks(2), col.axis="gray30")
 
@@ -40,10 +40,10 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   y.label <- "Power"
   .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
 
-  col.fill <- getOption("pt.fill")
-  col.color <- getOption("pt.color")
-  points(x.values, y.values, pch=21, type="l", col=col.color,
-         bg=col.fill, cex=0.8)
+  col_fill <- getOption("pt_fill")
+  col_color <- getOption("pt_color")
+  points(x.values, y.values, pch=21, type="l", col=col_color,
+         bg=col_fill, cex=0.8)
 
   abline(h=0, lwd=.5, col="gray50")
   # custom title (2 lines)

@@ -2,11 +2,12 @@
 \alias{ANOVA}
 \alias{av}
 \alias{av.brief}
+\alias{av_brief}
 
 \title{Analysis of Variance}
 
 \description{
-Abbreviation: \code{av}, \code{av.brief}
+Abbreviation: \code{av}, \code{av_brief}, \code{av.brief} [deprecated]
 
 Analysis of variance from the R \code{\link{aov}} function plus graphics and effect sizes. Permitted designs are one-way between groups, two-way between groups and randomized blocks with one treatment factor with one observation for each treatment and block combination. 
 
@@ -14,20 +15,21 @@ Output is generated into distinct segments by topic, organized and displayed in 
 }
 
 \usage{
-ANOVA(my.formula, data=d, rows=NULL,
-         brief=getOption("brief"), digits.d=NULL, 
+ANOVA(my_formula, data=d, rows=NULL,
+         brief=getOption("brief"), digits_d=NULL, 
          Rmd=NULL, graphics=TRUE,
-         rb.points=TRUE, res.rows=NULL, res.sort=c("zresid", "fitted", "off"),
-         pdf=FALSE, width=5, height=5, fun.call, \ldots)
+         rb_points=TRUE, res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
+         pdf=FALSE, width=5, height=5, fun_call, \ldots)
 
 av(\ldots)
 
 av.brief(\ldots, brief=TRUE) 
+av_brief(\ldots, brief=TRUE) 
 }
 
 
 \arguments{
-  \item{my.formula}{Standard R \code{\link{formula}} for specifying a model.}
+  \item{my_formula}{Standard R \code{\link{formula}} for specifying a model.}
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{d}, otherwise explicitly specify.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
@@ -35,7 +37,7 @@ av.brief(\ldots, brief=TRUE)
   \item{brief}{If set to \code{TRUE}, reduced text output with no Tukey multiple 
        comparison of means and no residuals. Can change system default
        with \code{\link{style}} function.}
-  \item{digits.d}{For the Basic Analysis, it provides the number of decimal digits.
+  \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
   \item{Rmd}{File name for the file of R Markdown instructions to be written,
         if specified. The file type is .Rmd, which automatically opens in RStudio,
@@ -44,14 +46,14 @@ av.brief(\ldots, brief=TRUE)
   \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{Rmd} can
         be useful to set to \code{FALSE} so that \code{\link{regPlot}} can be used
         to place the graphics within the output file.}
-  \item{rb.points}{For a randomized block design, a plot of the fitted value
-        for each cell is obtained as well as the individual data values. Set to
-        \code{FALSE} to suppress the data values.}
-  \item{res.rows}{Default is 20, which lists the first 20 rows of data and residuals
+  \item{rb_points}{For a randomized block design, a plot of the fitted value
+        for each cell is obtained as well as the individual data values_ Set to
+        \code{FALSE} to suppress the data values_}
+  \item{res_rows}{Default is 20, which lists the first 20 rows of data and residuals
        sorted by the specified sort criterion.  To disable residuals, specify a 
        value of 0. To see the residuals output for all observations, specify a 
        value of \code{"all"}.}
-  \item{res.sort}{Default is \code{"zresid"}, for specifying standardized residuals
+  \item{res_sort}{Default is \code{"zresid"}, for specifying standardized residuals
        as the sort criterion for the display of the rows of data and associated
        residuals. Other values are \code{"fitted"} for the fitted values and
       \code{"off"} to not sort the rows of data.}
@@ -59,7 +61,7 @@ av.brief(\ldots, brief=TRUE)
        instead of directed to the standard graphics windows.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
-  \item{fun.call}{Function call. Used with \code{Rmd} to pass the function call when
+  \item{fun_call}{Function call. Used with \code{Rmd} to pass the function call when
         obtained from the abbreviated function call \code{av}.}
   \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 
 }
@@ -82,7 +84,7 @@ BALANCED DESIGN\cr
 The design for the two-factor analyses must be balanced. A check is performed and processing ceases if not balanced. For unbalanced designs, consider the function  \code{lmer} in the \code{lme4} package.
 
 DECIMAL DIGITS\cr
-The number of decimal digits displayed on the output is, by default, the maximum number of decimal digits for all the data values of the response variable. Or, this value can be explicitly specified with the \code{digits.d} parameter.
+The number of decimal digits displayed on the output is, by default, the maximum number of decimal digits for all the data values of the response variable. Or, this value can be explicitly specified with the \code{digits_d} parameter.
 }
 
 
@@ -139,7 +141,7 @@ Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 7, NY: Routl
 # access the PlantGrowth data frame
 ANOVA(weight ~ group, data=PlantGrowth)
 #brief version
-av.brief(weight ~ group, data=PlantGrowth)
+av_brief(weight ~ group, data=PlantGrowth)
 
 # drop the second treatment, just control and 1 treatment
 ANOVA(weight ~ group, data=PlantGrowth, rows=(group != "trt2"))

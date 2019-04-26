@@ -1,5 +1,5 @@
 tt.brief <-
-function(..., brief=TRUE)
+function(...)
 
  ttest(..., brief=TRUE)
 

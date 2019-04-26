@@ -1,16 +1,16 @@
 bc.data.frame <-
-function(x, n.cat, within,
-         col.fill, col.color, col.trans, fill.split, theme,
-         horiz, addtop, gap, prop, scale.y,
+function(x, n_cat, within,
+         col_fill, col_color, col.trans, fill_spit, theme,
+         horiz, addtop, gap, prop, scale_y,
          xlab, ylab, main,
          labels, label.size, beside,
-         rotate.x, offset, break.x, sort.x,
-         values, values.color, values.cex, value.digits,
-         values.position, values.cut,
-         xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-         legend.title, legend.position, legend.labels,
-         legend.horiz, legend.size,
-         out.size, quiet, width, height, pdf, ...)  {
+         rotate_x, offset, break_x, sort_x,
+         values, values_color, values_cex, value.digits,
+         values_position, values_cut,
+         xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
+         legend_title, legend_position, legend_labels,
+         legend_horiz, legend_size,
+         out_size, quiet, width, height, pdf, ...)  {
 
 
   sug.keep <- getOption("suggest")
@@ -20,7 +20,7 @@ function(x, n.cat, within,
   if (manage.gr  &&  !pdf) {
     i.win <- 0
     for (i in 1:ncol(x)) {
-      if (is.numeric(x[,i])  &&  !.is.num.cat(x[,i], n.cat)) 
+      if (is.numeric(x[,i])  &&  !.is.num.cat(x[,i], n_cat)) 
         i.win <- i.win + 1
     }
     .graphwin(i.win, width, height)
@@ -34,7 +34,7 @@ function(x, n.cat, within,
 
     nu <- length(unique(na.omit(x[,i])))
 
-    if (!is.numeric(x[,i]) || .is.num.cat(x[,i],n.cat)) {
+    if (!is.numeric(x[,i]) || .is.num.cat(x[,i],n_cat)) {
  
       if (nlevels(factor(x[,i])) < length(x[,i])) {
 
@@ -63,17 +63,17 @@ function(x, n.cat, within,
         }
 
         .bc.main(x[,i], y=NULL, by=NULL, within,
-          col.fill, col.color, col.trans, fill.split, theme,
-          horiz, addtop, gap, prop, scale.y,
+          col_fill, col_color, col.trans, fill_spit, theme,
+          horiz, addtop, gap, prop, scale_y,
           xlab, ylab, main,
-          value.labels=NULL, label.size, beside,
-          rotate.x, offset, break.x, sort.x,
-          values, values.color, values.cex, value.digits,
-          values.position, values.cut,
-          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-          legend.title, legend.position, legend.labels,
-          legend.horiz, legend.size,
-          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out.size,
+          value_labels=NULL, label.size, beside,
+          rotate_x, offset, break_x, sort_x,
+          values, values_color, values_cex, value.digits,
+          values_position, values_cut,
+          xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
+          legend_title, legend_position, legend_labels,
+          legend_horiz, legend_size,
+          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out_size,
           quiet, ...)
 
         if (pdf) {
@@ -81,8 +81,8 @@ function(x, n.cat, within,
           if (!quiet) .showfile(pdf.fnm, "bar chart")
         }
 
-        if (.is.integer(x[,i]) && nu <= n.cat && !quiet)
-          .ncat("bar chart", x.name, nu, n.cat)
+        if (.is.integer(x[,i]) && nu <= n_cat && !quiet)
+          .ncat("bar chart", x.name, nu, n_cat)
 
         }  # end else
       }
@@ -105,7 +105,7 @@ function(x, n.cat, within,
     else {
       cat("No categorical variables, so no bar charts.\n\n",
           "If you have integer variables that are categorical,\n",
-          "  then set the n.cat parameter to the maximum\n",
+          "  then set the n_cat parameter to the maximum\n",
           "  number of integer values (categories),\n",
           "  or convert them to R factors.\n\n", sep="")
     }

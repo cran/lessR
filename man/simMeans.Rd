@@ -8,11 +8,11 @@ Show a sequence of sample means and data, all simulated from the same normal pop
 }
 
 \usage{
-simMeans(ns, n, mu=0, sigma=1, ylim.bound=NULL, 
-         show.title=TRUE, show.data=TRUE, max.data=10, 
+simMeans(ns, n, mu=0, sigma=1, ylim_bound=NULL, 
+         show_title=TRUE, show_data=TRUE, max_data=10, 
          grid="grey90", pause=FALSE,
-         sort=NULL, set.mu=FALSE, digits.d=2,
-         main=NULL, pdf.file=NULL, width=5, height=5, \ldots)
+         sort=NULL, set_mu=FALSE, digits_d=2,
+         main=NULL, pdf_file=NULL, width=5, height=5, \ldots)
 }
 
 
@@ -21,17 +21,17 @@ simMeans(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   \item{n}{Size of each sample.}
   \item{mu}{Population mean.}
   \item{sigma}{Population standard deviation.}
-  \item{ylim.bound}{Specify the maximum deviation of the mean in either direction for the extent of the vertical axis.}
-  \item{show.title}{Place a title on the graph that contains the parameter values.}
-  \item{show.data}{Show the data values on the text output.}
-  \item{max.data}{Maximum number of data values per sample on the text output.}
+  \item{ylim_bound}{Specify the maximum deviation of the mean in either direction for the extent of the vertical axis_}
+  \item{show_title}{Place a title on the graph that contains the parameter values_}
+  \item{show_data}{Show the data values on the text output.}
+  \item{max_data}{Maximum number of data values per sample on the text output.}
   \item{grid}{Color of the grid lines.}
   \item{pause}{Build the graph and the text output sample by sample.}
   \item{sort}{Sort the output by the means in ascending order. By default is \code{TRUE} unless \code{se.mu} or \code{pause} is \code{TRUE}}
-  \item{set.mu}{Have the program randomly set \code{mu} and \code{sigma}, usually to guess the correct value.}
-  \item{digits.d}{Sort the output by the means in ascending order.}
+  \item{set_mu}{Have the program randomly set \code{mu} and \code{sigma}, usually to guess the correct value.}
+  \item{digits_d}{Sort the output by the means in ascending order.}
   \item{main}{Title of graph.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Other parameter values, possibly invalid.} 
@@ -56,7 +56,7 @@ simMeans(8, 10)
 # 25 sample means with a sample size each of 100
 # mu=100, sigma=15
 # pause after each interval and show the data
-simMeans(25, 100, mu=100, sigma=15, show.data=FALSE)
+simMeans(25, 100, mu=100, sigma=15, show_data=FALSE)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

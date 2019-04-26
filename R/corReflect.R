@@ -1,8 +1,20 @@
 corReflect <- 
 function (R=mycor, vars,
-          main=NULL, heat.map=TRUE, bottom=3,right=3, 
-          pdf.file=NULL, width=5, height=5) {
+          main=NULL, heat_map=TRUE, bottom=3,right=3, 
+          pdf_file=NULL, width=5, height=5, ...) {
 
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (length(grep(".", names(dots)[i], fixed=TRUE)) > 0) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
   cor.nm <- deparse(substitute(R))
@@ -30,10 +42,10 @@ function (R=mycor, vars,
     }
   }
 
-  if (heat.map) {
+  if (heat_map) {
     if (is.null(main)) main <- "With Reflected Item Coefficients"
    .corcolors(R, NVOld, main, bottom, right, diag=0,
-              pdf.file, width, height)
+              pdf_file, width, height)
   }
 
   cat("\n")

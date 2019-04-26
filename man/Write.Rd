@@ -1,13 +1,13 @@
 \name{Write}
 \alias{Write}
 \alias{wrt}
-\alias{wrt.r}
-\alias{wrt.x}
+\alias{wrt_r}
+\alias{wrt_x}
 
 \title{Write the Contents of a Data Frame to an External File}
 
 \description{
-Abbreviation: \code{wrt}, \code{wrt.r}, \code{wrt.x}
+Abbreviation: \code{wrt}, \code{wrt_r}, \code{wrt_x}
 
 Writes the contents of the specified data frame, such as with the default \code{d}, to the current working directory as either the default \code{csv} data file, an Excel data table, or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels and variable units are automatically included in a native R data file.
 }
@@ -18,8 +18,8 @@ Write(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
 
 wrt(\ldots)
 
-wrt.r(\ldots, format="R")
-wrt.x(\ldots, format="Excel")
+wrt_r(\ldots, format="R")
+wrt_x(\ldots, format="Excel")
 }
 
 
@@ -67,17 +67,17 @@ d <- data.frame(X,Y)
 Write("GoodData")
 # short name
 # write the default data frame d to the R data file d.rda
-wrt.r()
+wrt_r()
 
 # write the data as an Excel data table in an Excel file
 Write("GoodData", format="Excel")
 # with abbreviation
-wrt.x("GoodData")
+wrt_x("GoodData")
 
 # access the R data frame warpbreaks
 data(warpbreaks)
 # write the file warpbreaks.rda
-wrt.r(data=warpbreaks)
+wrt_r(data=warpbreaks)
 
 }
 

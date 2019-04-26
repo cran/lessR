@@ -1,13 +1,13 @@
 .pc.main <- 
 function(x, y,
         fill, color, trans, 
-        radius, hole, hole.fill, edges, 
-        clockwise, init.angle, 
+        radius, hole, hole_fill, edges, 
+        clockwise, init_angle, 
         density, angle, lty, lwd,
-        values, values.position, values.color, values.cex, values.digits,
-        labels.cex, main.cex, main, main.miss,
+        values, values_position, values_color, values_cex, values_digits,
+        labels_cex, main_cex, main, main.miss,
         add, x1, x2, y1, y2,
-        quiet, pdf.file, width, height, ...)  {
+        quiet, pdf_file, width, height, ...)  {
 
   # get values for ... parameter values
   #stuff <- .getdots(...)
@@ -17,7 +17,7 @@ function(x, y,
 
   # set the labels
   # use variable label for main if it exists and main not specified
-  gl <- .getlabels(main=main, lab.cex=getOption("lab.cex"))
+  gl <- .getlabels(main=main, lab_cex=getOption("lab_cex"))
   x.name <- gl$xn; x.lbl <- gl$xl
   if (!is.null(main))
     main.lbl <- main
@@ -29,15 +29,15 @@ function(x, y,
   }
 
   # size the label for display
-# if (strwidth(main.lbl, units="figure", cex=main.cex) > .85) {
+# if (strwidth(main.lbl, units="figure", cex=main_cex) > .85) {
 #   brk <- nchar(main.lbl)
-#   while (strwidth(substr(main.lbl,1,brk), units="figure", cex=main.cex) > .85)
+#   while (strwidth(substr(main.lbl,1,brk), units="figure", cex=main_cex) > .85)
 #     brk <- brk-1 
 #   while (substr(main.lbl,brk,brk) != " ") brk <- brk-1
 #   main.lbl <- paste(substr(main.lbl,1,brk), "\n",
 #                     substr(main.lbl,brk+1,nchar(main.lbl)))
-#   while (strwidth(main.lbl, units="figure", cex=main.cex) > .85)
-#     main.cex <- main.cex-0.05
+#   while (strwidth(main.lbl, units="figure", cex=main_cex) > .85)
+#     main_cex <- main_cex-0.05
 # }
 
   # entered counts typically integers as entered but stored as type double
@@ -46,8 +46,8 @@ function(x, y,
     x <- as.table(x)
   if (!is.factor(x) && !is.table(x))
     x <- factor(x)
-  n.cat <- ifelse (!is.table(x), nlevels(x), length(x))
-  clr <- character(length=n.cat)  # slice colors
+  n_cat <- ifelse (!is.table(x), nlevels(x), length(x))
+  clr <- character(length=n_cat)  # slice colors
 
 
   # ------
@@ -57,17 +57,17 @@ function(x, y,
 
 # else {
 #   if (!is.ord)
-#     clr <- .color.range(fill, n.cat)  # see if range, otherwise NULL
+#     clr <- .color_range(fill, n_cat)  # see if range, otherwise NULL
 #   else {  # ordered factor, default to pre-set range
-#     clr <- .color.range(.get.fill(), n.cat)  # make a range 
-#     if (color == getOption("bar.color.discrete")) color <- "transparent"
+#     clr <- .color_range(.get_fill(), n_cat)  # make a range 
+#     if (color == getOption("bar_color_discrete")) color <- "transparent"
 #   }
 # }
 
   if (length(fill) > 1) {
     clr <- fill
     j <- 0
-    for (i in 1:(n.cat)) {
+    for (i in 1:(n_cat)) {
       j <- j + 1
       if (j > length(fill)) j <- 1  # recycle colors
       clr[i] <- fill[j]
@@ -76,18 +76,18 @@ function(x, y,
   else {
     if (is.null(fill)) {  # fill not specified
       if (!is.ord) {  # default qualitative for theme
-        clr <- getOption("bar.fill.discrete") 
-        if (!is.null(.color.range(clr, n.cat)))  
-          clr <- .color.range(clr, n.cat)
+        clr <- getOption("bar_fill_discrete") 
+        if (!is.null(.color_range(clr, n_cat)))  
+          clr <- .color_range(clr, n_cat)
       }
       else  # sequential palette based on theme
-        clr <- .color.range(.get.fill(), n.cat) 
+        clr <- .color_range(.get_fill(), n_cat) 
     }
     else {  # fill specified by user
-      if (is.null(.color.range(fill, n.cat)))
+      if (is.null(.color_range(fill, n_cat)))
         clr <- fill  # user assigned
       else 
-        clr <- .color.range(fill, n.cat)  # do default range, or user assigned
+        clr <- .color_range(fill, n_cat)  # do default range, or user assigned
     }
   }
 
@@ -96,7 +96,7 @@ function(x, y,
 # } # end fill is multiple values
 
   if (!is.null(trans)) 
-    for (i in 1:n.cat) clr[i] <- .maketrans(clr[i], (1-trans)*256) 
+    for (i in 1:n_cat) clr[i] <- .maketrans(clr[i], (1-trans)*256) 
 
 
   # ----------------
@@ -120,9 +120,9 @@ function(x, y,
     if (values == "input")
       x.txt <- as.character(x)
     else if (values == "%")
-      x.txt <- paste(.fmt(x/sum(x) * 100, values.digits), "%", sep="")
+      x.txt <- paste(.fmt(x/sum(x) * 100, values_digits), "%", sep="")
     else if (values == "prop")
-      x.txt <- .fmt(x/sum(x), values.digits)
+      x.txt <- .fmt(x/sum(x), values_digits)
   }
 
 
@@ -138,7 +138,7 @@ function(x, y,
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
   
-  par(bg=getOption("panel.fill"))
+  par(bg=getOption("panel_fill"))
   tm <- ifelse (is.null(main.lbl), .6, .8)
   par(mai=c(.4, .5, tm, .5))
   plot.new()
@@ -171,29 +171,29 @@ function(x, y,
   # get coordinates of a circle with specified radius
   twopi <- ifelse (clockwise, -2*pi, 2*pi)
   t2xy <- function(t, radius) {
-      t2p <- twopi * t + init.angle * pi/180
+      t2p <- twopi * t + init_angle * pi/180
       list(x = radius * cos(t2p), y = radius * sin(t2p))
   }
 
   # construct plot slice by slice
-  values.cl <- character(length=nx)
-  if (length(values.color) == 1)
-    for (i in 1:nx) values.cl[i] <- values.color[1]
-  if (length(values.color) == nx)
-    values.cl <- values.color
+  values_cl <- character(length=nx)
+  if (length(values_color) == 1)
+    for (i in 1:nx) values_cl[i] <- values_color[1]
+  if (length(values_color) == nx)
+    values_cl <- values_color
   else {  # recycle
     j <- 0
     for (i in 1:nx) {
       j <- j + 1
-      if (j > length(values.color)) j <- 1
-      values.cl[i] <- values.color[j]
+      if (j > length(values_color)) j <- 1
+      values_cl[i] <- values_color[j]
     }
   }
 
   if (options("device") != "RStudioGD") {
-    labels.cex <- labels.cex * 1.3
-    values.cex <- values.cex * 1.3
-    main.cex <- main.cex * 1.3
+    labels_cex <- labels_cex * 1.3
+    values_cex <- values_cex * 1.3
+    main_cex <- main_cex * 1.3
   }
 
   for (i in 1L:nx) { 
@@ -206,25 +206,25 @@ function(x, y,
     # plot label, optional values
     P <- t2xy(mean(x[i + 0:1]), radius)
     lab <- as.character(labels[i])
-    if (labels.cex > 0)
+    if (labels_cex > 0)
       if (!is.na(lab) && nzchar(lab)) {
         lines(c(1, 1.05)*P$x, c(1, 1.05)*P$y)  # tick marks
 
 
-      if (values != "off") if (values.position == "out")  # results to labels
+      if (values != "off") if (values_position == "out")  # results to labels
         labels[i] <- paste(labels[i], "\n", x.txt[i], sep="")
-      if (labels.cex > 0)
+      if (labels_cex > 0)
          text(1.1 * P$x, 1.175 * P$y, labels[i], xpd=TRUE, 
-           adj=ifelse(P$x < 0, 1, 0), cex=labels.cex, ...)  # labels
+           adj=ifelse(P$x < 0, 1, 0), cex=labels_cex, ...)  # labels
 
-      if (values != "off") if (values.position == "in") {
+      if (values != "off") if (values_position == "in") {
         cx <- 0.82;  cy <- 0.86  # scale factors to position labels
         if (hole < 0.65) {  # scale factor to slide text down for small hole
           cx <- cx * (1 - (.16 * (1-hole)))  # max slide is 0.84
           cy <- cy * (1 - (.16 * (1-hole)))
         }
-        text(cx*P$x, cy*P$y, x.txt[i], xpd=TRUE, col=values.cl[i],
-             cex=values.cex, ...)
+        text(cx*P$x, cy*P$y, x.txt[i], xpd=TRUE, col=values_cl[i],
+             cex=values_cex, ...)
       }
     }
 
@@ -232,9 +232,9 @@ function(x, y,
 
   # add centered hole over the top of the pie
   P <- t2xy(seq.int(0, 1, length.out=n*nx), hole)
-  polygon(P$x, P$y, col=hole.fill, border=color, lty=lty[1], lwd=lwd)
+  polygon(P$x, P$y, col=hole_fill, border=color, lty=lty[1], lwd=lwd)
 
-  title(main=main.lbl, cex.main=main.cex, col.main=getOption("main.color"),
+  title(main=main.lbl, cex.main=main_cex, col.main=getOption("main_color"),
         line=par("mgp")[1]-.5, ...)
 
   # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
@@ -289,15 +289,15 @@ function(x, y,
 
   if (!is.null(add)) {
 
-    add.cex <- getOption("add.cex")
-    add.lwd <- getOption("add.lwd")
-    add.lty <- getOption("add.lty")
-    add.color <- getOption("add.color")
-    add.fill <- getOption("add.fill")
-    add.trans <- getOption("add.trans")
+    add_cex <- getOption("add_cex")
+    add_lwd <- getOption("add_lwd")
+    add_lty <- getOption("add_lty")
+    add_color <- getOption("add_color")
+    add_fill <- getOption("add_fill")
+    add_trans <- getOption("add_trans")
 
     .plt.add (add, x1, x2, y1, y2,
-              add.cex, add.lwd, add.lty, add.color, add.fill, add.trans) 
+              add_cex, add_lwd, add_lty, add_color, add_fill, add_trans) 
   }
 
   cat("\n")

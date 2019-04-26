@@ -1,18 +1,18 @@
 .hst.stats <-
-function (h, len.x, fun.call) {
+function (h, len.x, fun_call) {
 
     # function call for suggestions
-    fncl <- .fun.call.deparse(fun.call) 
+    fncl <- .fun_call.deparse(fun_call) 
 
     tx <- character(length = 0)
     if (getOption("suggest")) {
      tx[length(tx)+1] <- ">>> Suggestions"
-     if (!grepl("bin.width", fncl))
-        tx[length(tx)+1] <- "bin.width: set the width of each bin"
-      if (!grepl("bin.start", fncl))
-        tx[length(tx)+1] <- "bin.start: set the start of the first bin"
-      if (!grepl("bin.end", fncl))
-        tx[length(tx)+1] <- "bin.end: set the end of the last bin"
+     if (!grepl("bin_width", fncl))
+        tx[length(tx)+1] <- "bin_width: set the width of each bin"
+      if (!grepl("bin_start", fncl))
+        tx[length(tx)+1] <- "bin_start: set the start of the first bin"
+      if (!grepl("bin_end", fncl))
+        tx[length(tx)+1] <- "bin_end: set the end of the last bin"
       txt <- "  # smoothed density curves plus histogram"
       tx[length(tx)+1] <- paste("Density(", getOption("xname"), ")", txt,
          sep="")      
@@ -26,9 +26,9 @@ function (h, len.x, fun.call) {
 
     tx <- character(length = 0)
     
-    bin.width <- h$breaks[2]-h$breaks[1]
+    bin_width <- h$breaks[2]-h$breaks[1]
     n.bins <- length(h$breaks)-1
-    tx[length(tx)+1] <- paste("Bin Width:", bin.width)
+    tx[length(tx)+1] <- paste("Bin Width:", bin_width)
     tx[length(tx)+1] <- paste("Number of Bins:", n.bins)
     tx[length(tx)+1] <- ""
 
@@ -85,7 +85,7 @@ function (h, len.x, fun.call) {
                                    w=max.ln[j]), sep="")
     }
 
-    return(list(txsug=txsug, tx=tx, bin.width=bin.width, n.bins=n.bins,
+    return(list(txsug=txsug, tx=tx, bin_width=bin_width, n.bins=n.bins,
                 prop=prop, counts_cum=cum.c, prop_cum=cum.p))
 
 }

@@ -13,8 +13,8 @@ Usually a prelude to a factor analysis, such as provided by \code{\link{corCFA}}
 
 \usage{
 corReflect(R=mycor, vars,
-          main=NULL, heat.map=TRUE, bottom=3,right=3, 
-          pdf.file=NULL, width=5, height=5)
+          main=NULL, heat_map=TRUE, bottom=3,right=3, 
+          pdf_file=NULL, width=5, height=5, \ldots)
 
 reflect(\ldots)
 }
@@ -24,14 +24,14 @@ reflect(\ldots)
   \item{vars}{List of the re-ordered variables, each variable listed by its ordinal
        position in the input correlation matrix.}
   \item{main}{Graph title. Set to \code{main=""} to turn off.}
-  \item{heat.map}{If \code{TRUE}, display a heat map of the item
+  \item{heat_map}{If \code{TRUE}, display a heat map of the item
         correlations with item communalities in the diagonal.}
   \item{bottom}{Number of lines of bottom margin.}
   \item{right}{Number of lines of right margin.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
-  \item{\dots}{Parameter values.}
+  \item{\dots}{Parameter values_}
 }
 
 \details{

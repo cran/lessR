@@ -7,11 +7,11 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.8.2     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.8.4     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
       "                           d: default data frame, no need for data=\n",
-      "2. l <- Read(\"\", var.labels=TRUE)   Read variable labels into l,\n",
+      "2. l <- Read(\"\", var_labels=TRUE)   Read variable labels into l,\n",
       "                           required name for data frame of labels\n",
       "3. Help()                  Get help, and, e.g., Help(Read)\n",
       "4. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
@@ -20,115 +20,119 @@ function(...) {
       "7. reg(Y ~ X, Rmd=\"eg\")    Regression with full interpretative output\n",
       "8. style(\"gray\")           Grayscale theme, + many others available\n",
       "   style(show=TRUE)        all color/style options and current values\n",
-      "9. getColors()             create many styles of color palettes\n")
+      "9. getColors()             create many styles of color palettes\n\n",
+      "All lessR parameter names now include _'s. Names with a period are\n",
+      "deprecated, but still work. Ex: bin_width instead of bin.width.\n")
+
+  options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 
   options(theme = "colors")
-  options(sub.theme = "default")
+  options(sub_theme = "default")
 
-  options(panel.fill = "white")
-  options(window.fill = getOption("panel.fill"))
-  options(panel.color = "gray60")  # rgb(222,217,205, maxColorValue=255)
-  options(panel.lwd = 1.0)
-  options(panel.lty = "solid")
+  options(panel_fill = "white")
+  options(window_fill = getOption("panel_fill"))
+  options(panel_color = "gray60")  # rgb(222,217,205, maxColorValue=255)
+  options(panel_lwd = 1.0)
+  options(panel_lty = "solid")
 
-  # .maketrans("gray50", .to256("trans.bar.fill"))
-  options(bar.fill = rgb(121,138,148, maxColorValue=255))  # relevant?
-  options(bar.fill.discrete = c("#2D8BC3", "#A57E08", "#51932E",
+  # .maketrans("gray50", .to256("trans_bar_fill"))
+  options(bar_fill = rgb(121,138,148, maxColorValue=255))  # relevant?
+  options(bar_fill_discrete = c("#2D8BC3", "#A57E08", "#51932E",
       "#C7657B", "#8E76C9", "#009B8B", "#BB714D", "#838A00",
       "#0097AD", "#C561A2", "#009962", "#B068BE"))  # getColors("hues")
-  options(bar.fill.ordered = rgb(144,165,175, maxColorValue=255))
-  options(trans.bar.fill = 0.0)
-  options(bar.color = rgb(126,144,168, maxColorValue=255))
-  options(bar.color.discrete = "transparent")
-  options(bar.color.ordered = rgb(126,144,168, maxColorValue=255))
+  options(bar_fill_ordered = rgb(144,165,175, maxColorValue=255))
+  options(trans_bar_fill = 0.0)
+  options(bar_color = rgb(126,144,168, maxColorValue=255))
+  options(bar_color_discrete = "transparent")
+  options(bar_color_ordered = rgb(126,144,168, maxColorValue=255))
   options(values = "%")
-  options(values.color = "white")
-  options(values.size = 0.75)
-  options(values.digits = NULL)
-  options(values.position = "in")
+  options(values_color = "white")
+  options(values_size = 0.75)
+  options(values_digits = NULL)
+  options(values_position = "in")
 
-#  options(pt.fill = rgb(121,138,148, maxColorValue=255))  # old: gray20
-  options(pt.fill = rgb(70,80,90, maxColorValue=255))
-  options(trans.pt.fill = 0.00)
-#  options(pt.color = rgb(121,138,148, maxColorValue=255))
-  options(pt.color = rgb(70,80,90, maxColorValue=255))
-  options(out.fill = "firebrick4")
-  options(out.color = "firebrick4")
-  options(out2.fill = "firebrick2")
-  options(out2.color = "firebrick2")
+#  options(pt_fill = rgb(121,138,148, maxColorValue=255))  # old: gray20
+  options(pt_fill = rgb(70,80,90, maxColorValue=255))
+  options(trans_pt_fill = 0.00)
+#  options(pt_color = rgb(121,138,148, maxColorValue=255))
+  options(pt_color = rgb(70,80,90, maxColorValue=255))
+  options(out_fill = "firebrick4")
+  options(out_color = "firebrick4")
+  options(out2_fill = "firebrick2")
+  options(out2_color = "firebrick2")
 
 
-  options(violin.fill = "#7485975A")  # .maketrans(hcl(240,20,55), 90)
-  options(violin.color = "gray15")
-  options(box.fill = c("#2D8BC3", "#A57E08", "#51932E", "#C7657B", "#8E76C9",
+  options(violin_fill = "#7485975A")  # .maketrans(hcl(240,20,55), 90)
+  options(violin_color = "gray15")
+  options(box_fill = c("#2D8BC3", "#A57E08", "#51932E", "#C7657B", "#8E76C9",
                        "#009B8B", "#BB714D", "#838A00", "#0097AD", "#C561A2",
                        "#009962", "#B068BE"))  # getColors("hues")
-  options(box.color = "gray15")
-  options(line.color = "gray15")
+  options(box_color = "gray15")
+  options(line_color = "gray15")
 
-  options(bubble.text.color = "#F7F2E6")  # rgb(247,242,230, maxColorValue=255)
-  options(ellipse.fill = "#8B8B8B37")   # .maketrans("gray55", 55)
-  options(ellipse.color = "gray20")
-  options(ellipse.lwd = 1)
-  options(se.fill = "#1A1A1A28")   # .maketrans("gray10", 40)
-  options(fit.color = "gray15")
-  options(fit.lwd = 2)
+  options(bubble_text_color = "#F7F2E6")  # rgb(247,242,230, maxColorValue=255)
+  options(ellipse_fill = "#8B8B8B37")   # .maketrans("gray55", 55)
+  options(ellipse_color = "gray20")
+  options(ellipse_lwd = 1)
+  options(se_fill = "#1A1A1A28")   # .maketrans("gray10", 40)
+  options(fit_color = "gray15")
+  options(fit_lwd = 2)
   options(heat = "gray30")
-  options(segment.color = "gray40")
-  options(ID.color = "gray50")
+  options(segment_color = "gray40")
+  options(ID_color = "gray50")
 
-  options(main.color = "gray15")
-  options(main.cex = 1)
-  options(lab.color = "gray15")
-  options(lab.x.color = NULL)
-  options(lab.y.color = NULL)
-  options(lab.cex = .95)
-  options(lab.x.cex = NULL)
-  options(lab.y.cex = NULL)
+  options(main_color = "gray15")
+  options(main_cex = 1)
+  options(lab_color = "gray15")
+  options(lab_x_color = NULL)
+  options(lab_y_color = NULL)
+  options(lab_cex = .95)
+  options(lab_x_cex = NULL)
+  options(lab_y_cex = NULL)
 
-  options(axis.color = "gray15")
-  options(axis.x.color = NULL)
-  options(axis.y.color = NULL)
-  options(axis.lwd = 1)
-  options(axis.x.lwd = NULL)
-  options(axis.y.lwd = NULL)
-  options(axis.lty = "solid")
-  options(axis.x.lty = NULL)
-  options(axis.y.lty = NULL)
-  options(axis.cex = 0.75)
-  options(axis.x.cex = NULL)
-  options(axis.y.cex = NULL)
-  options(axis.text.color = "gray15")
-  options(axis.x.text.color = NULL)
-  options(axis.y.text.color = NULL)
-  options(rotate.x = 0)
-  options(rotate.y = 0)
+  options(axis_color = "gray15")
+  options(axis_x_color = NULL)
+  options(axis_y_color = NULL)
+  options(axis_lwd = 1)
+  options(axis_x_lwd = NULL)
+  options(axis_y_lwd = NULL)
+  options(axis_lty = "solid")
+  options(axis_x_lty = NULL)
+  options(axis_y_lty = NULL)
+  options(axis_cex = 0.75)
+  options(axis_x_cex = NULL)
+  options(axis_y_cex = NULL)
+  options(axis_text_color = "gray15")
+  options(axis_x_text_color = NULL)
+  options(axis_y_text_color = NULL)
+  options(rotate_x = 0)
+  options(rotate_y = 0)
   options(offset = 0.5)
 
-  options(grid.color = "#DED9CD")  # rgb(222,217,205, maxColorValue=255)
-  options(grid.x.color = NULL)
-  options(grid.y.color = NULL)
-  options(grid.lwd = 0.5)
-  options(grid.x.lwd = NULL)
-  options(grid.y.lwd = NULL)
-  options(grid.lty = "solid")
-  options(grid.x.lty = NULL)
-  options(grid.y.lty = NULL)
+  options(grid_color = "#DED9CD")  # rgb(222,217,205, maxColorValue=255)
+  options(grid_x_color = NULL)
+  options(grid_y_color = NULL)
+  options(grid_lwd = 0.5)
+  options(grid_x_lwd = NULL)
+  options(grid_y_lwd = NULL)
+  options(grid_lty = "solid")
+  options(grid_x_lty = NULL)
+  options(grid_y_lty = NULL)
 
-  options(strip.fill = "#7F7F7F37")  # .maketrans("gray50", 55))
-  options(strip.color = "gray55")
-  options(strip.text.color = "gray15")
+  options(strip_fill = "#7F7F7F37")  # .maketrans("gray50", 55))
+  options(strip_color = "gray55")
+  options(strip_text_color = "gray15")
 
   #Plot(Years, Salary, bg="grey85", grid="grey77") on cheap Dell monitor
 
-  options(add.fill = "gray20")
-  options(add.trans = 0.0)
-  options(add.color = "gray30")
-  options(add.cex = 0.9)
-  options(add.lwd = 0.5)
-  options(add.lty = "solid")
+  options(add_fill = "gray20")
+  options(add_trans = 0.0)
+  options(add_color = "gray30")
+  options(add_cex = 0.9)
+  options(add_lwd = 0.5)
+  options(add_lty = "solid")
 
-  options(n.cat = 1)
+  options(n_cat = 1)
   options(suggest = TRUE)
   options(quiet = FALSE)
   options(brief = FALSE)
@@ -164,10 +168,10 @@ function(...) {
 }
 
 
-.getdigits <- function(x, min.digits) {
-  digits.d <- .max.dd(x) + 1
-  if (digits.d < min.digits) digits.d <- min.digits
-  return(digits.d)
+.getdigits <- function(x, min_digits) {
+  digits_d <- .max.dd(x) + 1
+  if (digits_d < min_digits) digits_d <- min_digits
+  return(digits_d)
 }
 
 # get number of decimal digits, trailing and leading 0's deleted
@@ -179,12 +183,12 @@ function(...) {
     return(0)
 }
 
-.fmt <- function(k, d=getOption("digits.d"), w=0) {
+.fmt <- function(k, d=getOption("digits_d"), w=0) {
   format(sprintf("%.*f", d, k), width=w, justify="right", scientific=FALSE)
 }
 
 
-.fmt0 <- function(k, d=getOption("digits.d"), w=0) {
+.fmt0 <- function(k, d=getOption("digits_d"), w=0) {
   a <- format(sprintf("%.*f", d, k), width=w, justify="right", scientific=FALSE)
   a <- substr(a,2,nchar(a))
 }
@@ -469,6 +473,20 @@ function(...) {
 
 .in.global <- function(var.name) {
 
+  # see if "variable" includes a $
+  for (i in 1:length(var.name)) {
+    if (grepl("$", var.name[i], fixed=TRUE))  {
+      txtA <- paste("A referenced variable in a lessR function just includes\n",
+                    "the variable name\n\n", sep="")
+      txtB <- paste("For example, for the Histogram function, this does not work:\n",
+                    "  > Histogram(d$Y)\n\n", sep="")
+      txtC <- "Instead do this:\n  > Histogram(Y, data=d)"
+      txtD <- "If you wish to specify a data table, use option: data"
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+                      txtA, txtB, txtC, "\n", txtD, "\n\n")
+    }
+  }
+
   to.expr <- parse(text=var.name)  # convert char string to expression
   var.nm <- all.vars(to.expr)  # get >= 1 variable names, 1st and last for :
 
@@ -491,7 +509,7 @@ function(...) {
     }
   }  # end for
   
-  if (any(in.global) && !all(in.global)) {
+  if (any(in.global) && !all(in.global)) {  # eval $ in .xcheck
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Some variables are in the user workspace,\n",
       "  and other variables are not. All must exist and\n",
@@ -524,18 +542,6 @@ function(...) {
                       txtA, txtB, txtC, "\n\n")
     }
 
-    # see if "variable" includes a $
-    if ( grepl("$", var.nm[i], fixed=TRUE))  {
-      txtA <- paste("A referenced variable in a lessR function just includes\n",
-                    "the variable name\n\n", sep="")
-      txtB <- paste("For example, for the Histogram function, this does not work:\n",
-                    "  > Histogram(d$Y)\n\n", sep="")
-      txtC <- "Instead do this:\n  > Histogram(Y, data=d)"
-      txtD <- "If you wish to specify a data table, use option: data"
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-                      txtA, txtB, txtC, "\n", txtD, "\n\n")
-    }
-
     # see if variable exists in the data frame
     ind <- which(nms == var.nm[i])
     if (length(ind) == 0) {
@@ -543,7 +549,7 @@ function(...) {
 
       txt1 <- ", the default name \n\n"
       txt2 <- "Either make sure to use the correct variable name, or\n"
-      txt3 <- "specify the data table that contains the variable with option:  data\n"
+      txt3 <- "specify the data table that contains the variable with: data=\n"
       txt <- ifelse (dname == "d",  paste(txt1, txt2, txt3, sep=""), "\n")
 
 #      nm <- eval(parse(text=paste("names(", dname,")")))
@@ -784,18 +790,18 @@ function(...) {
 # get variable labels if they exist
 .getlabels <- function(xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
                        y.nm=FALSE, by.nm=FALSE, by1.nm=FALSE,
-                       lab.x.cex=NULL, lab.y.cex=NULL, labels=l,
+                       lab_x_cex=NULL, lab_y_cex=NULL, labels=l,
                        graph.win=TRUE, flip=FALSE, ...) {
 
   if (graph.win) {  # do not open a graphics window if no plot
     fig.width <-  par("fin")[1]
     fig.ht <-  par("fin")[2]
     marg.x <- par("mai")[2] + par("mai")[4]
-    axis.x <- fig.width - marg.x
+    axis_x <- fig.width - marg.x
     marg.y <- par("mai")[1] + par("mai")[3]
-    axis.y <- fig.ht - marg.y
-    cut.x <- 0.90 * axis.x
-    cut.y <- 0.95 * axis.y
+    axis_y <- fig.ht - marg.y
+    cut.x <- 0.90 * axis_x
+    cut.y <- 0.95 * axis_y
   }
   else {
     cut.x <- 3.75
@@ -803,7 +809,7 @@ function(...) {
   }
 
 
-  # strwidth function not working in regular R, lab.cex has no affect
+  # strwidth function not working in regular R, lab_cex has no affect
   regR <- FALSE
   in.RStudio <- ifelse (options("device") != "RStudioGD", FALSE, TRUE)
   in.knitr <- ifelse (is.null(options()$knitr.in.progress), FALSE, TRUE)
@@ -870,7 +876,7 @@ function(...) {
 
   # ------------------------
   # get x.lab
-  st.nya <- ifelse (getOption("sub.theme") == "wsj", TRUE, FALSE)
+  st.nya <- ifelse (getOption("sub_theme") == "wsj", TRUE, FALSE)
   if (is.null(x.lbl) && is.null(xlab)) {
     x.lab <- x.name
   }
@@ -897,7 +903,7 @@ function(...) {
     temp <- ylab;  ylab <- xlab;  xlab <- temp
     temp <- y.lab;  y.lab <- x.lab;  x.lab <- temp
     temp <- y.lbl;  y.lbl <- x.lbl;  x.lbl <- temp
-    temp <- lab.y.cex;  lab.y.cex <- lab.x.cex;  lab.x.cex <- temp
+    temp <- lab_y_cex;  lab_y_cex <- lab_x_cex;  lab_x_cex <- temp
     temp <- y.name;  y.name <- x.name; #  x.name <- temp
   }
 
@@ -906,10 +912,10 @@ function(...) {
 
   if ((!is.null(x.lbl) || !is.null(xlab)) && !st.nya) {
     # power.ttest: len > 1;  # add var name to label?
-    if (length(x.lab) == 1  &&  !is.null(lab.x.cex)  &&  graph.win) {
+    if (length(x.lab) == 1  &&  !is.null(lab_x_cex)  &&  graph.win) {
       var.nm <- ifelse (is.null(x.lbl) && !is.null(x.name), FALSE, TRUE)
       if (!is.null(xlab)) var.nm <- FALSE  # xlab is the complete label
-      al <- .adjlbl(x.lab, lab.x.cex, cut=cut.x, x.name, var.nm, units="inches")
+      al <- .adjlbl(x.lab, lab_x_cex, cut=cut.x, x.name, var.nm, units="inches")
       x.lab <- al$lab
     }
   }  # end get x.lab
@@ -918,10 +924,10 @@ function(...) {
   # y-axis and legend labels
 
     if (!is.null(y.lab)  &&  !st.nya) { # power.ttest: len > 1
-    if (length(y.lab) == 1  &&  !is.null(lab.y.cex)  &&  graph.win) {
+    if (length(y.lab) == 1  &&  !is.null(lab_y_cex)  &&  graph.win) {
       var.nm <- ifelse (is.null(y.lbl) && !is.null(y.name), FALSE, TRUE)
       if (!is.null(ylab)) var.nm <- FALSE  # ylab is the complete label
-      al <- .adjlbl(y.lab, lab.y.cex, cut=cut.y, y.name, var.nm, units="inches")
+      al <- .adjlbl(y.lab, lab_y_cex, cut=cut.y, y.name, var.nm, units="inches")
       y.lab <- al$lab
     }
   }  # end process y-axis label
@@ -943,7 +949,7 @@ function(...) {
     sub.lab <- NULL
 
   return(list(xn=x.name, xl=x.lbl, xb=x.lab, yn=y.name, yl=y.lbl, yb=y.lab,
-     mb=main.lab, sb=sub.lab, lab.x.cex=lab.x.cex, lab.y.cex=lab.y.cex))
+     mb=main.lab, sb=sub.lab, lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex))
 }  # end .getlabels
 
 
@@ -963,14 +969,14 @@ function(lab, labcex, cut, nm, var.nm, units) {
 #     lab <- bquote(paste(italic(.(nm)), ": ", .(lab)))
   }
   strw <- strwidth(lab, units=units, cex=labcex)
-  n.lab.ln <- (strw %/% cut) + 1
-  if (n.lab.ln < 1) {
+  n.lab_ln <- (strw %/% cut) + 1
+  if (n.lab_ln < 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "No room for axis labels, readjust.\n\n")
   }
 
   if (strw > cut) {
-    line <- character(length=n.lab.ln)
+    line <- character(length=n.lab_ln)
     s <- unlist(strsplit(lab, " "))
     il <- 1
     for (iw in 1:(length(s))) {
@@ -979,7 +985,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
       line[il] <- paste(line[il], s[iw])
     }
     # trim a possible trailing blank line
-    if (line[n.lab.ln] == "") line <- line[1:(n.lab.ln-1)]
+    if (line[n.lab_ln] == "") line <- line[1:(n.lab_ln-1)]
 
     if (length(line) == 1 ) {
       lab <- line
@@ -1010,149 +1016,150 @@ function(dir, axT) {
 
   # possible inheritance
 
-  grid.x.color <- ifelse(is.null(getOption("grid.x.color")),
-    getOption("grid.color"), getOption("grid.x.color"))
-  grid.y.color <- ifelse(is.null(getOption("grid.y.color")),
-    getOption("grid.color"), getOption("grid.y.color"))
+  grid_x_color <- ifelse(is.null(getOption("grid_x_color")),
+    getOption("grid_color"), getOption("grid_x_color"))
+  grid_y_color <- ifelse(is.null(getOption("grid_y_color")),
+    getOption("grid_color"), getOption("grid_y_color"))
 
-  grid.x.lwd <- ifelse(is.null(getOption("grid.x.lwd")),
-    getOption("grid.lwd"), getOption("grid.x.lwd"))
-  grid.y.lwd <- ifelse(is.null(getOption("grid.y.lwd")),
-    getOption("grid.lwd"), getOption("grid.y.lwd"))
+  grid_x_lwd <- ifelse(is.null(getOption("grid_x_lwd")),
+    getOption("grid_lwd"), getOption("grid_x_lwd"))
+  grid_y_lwd <- ifelse(is.null(getOption("grid_y_lwd")),
+    getOption("grid_lwd"), getOption("grid_y_lwd"))
 
-  grid.x.lty <- ifelse(is.null(getOption("grid.x.lty")),
-    getOption("grid.lty"), getOption("grid.x.lty"))
-  grid.y.lty <- ifelse(is.null(getOption("grid.y.lty")),
-    getOption("grid.lty"), getOption("grid.y.lty"))
+  grid_x_lty <- ifelse(is.null(getOption("grid_x_lty")),
+    getOption("grid_lty"), getOption("grid_x_lty"))
+  grid_y_lty <- ifelse(is.null(getOption("grid_y_lty")),
+    getOption("grid_lty"), getOption("grid_y_lty"))
 
-  if (dir == "h") if (grid.y.lwd > 0)
-    abline(h=axT, col=grid.y.color, lwd=grid.y.lwd, lty=grid.y.lty)
+  if (dir == "h") if (grid_y_lwd > 0)
+    abline(h=axT, col=grid_y_color, lwd=grid_y_lwd, lty=grid_y_lty)
 
-  if (dir == "v") if (grid.x.lwd > 0)
-    abline(v=axT, col=grid.x.color, lwd=grid.x.lwd, lty=grid.x.lty)
+  if (dir == "v") if (grid_x_lwd > 0)
+    abline(v=axT, col=grid_x_color, lwd=grid_x_lwd, lty=grid_x_lty)
 
 }
 
 
 .axes <- function(x.lvl, y.lvl, axT1, axT2,
-         rotate.x=0, rotate.y=0, offset=0.5, y.only=FALSE, ...) {
+         rotate_x=0, rotate_y=0, offset=0.5, y.only=FALSE, ...) {
 
-  axis.x.color <- ifelse(is.null(getOption("axis.x.color")),
-    getOption("axis.color"), getOption("axis.x.color"))
-  axis.y.color <- ifelse(is.null(getOption("axis.y.color")),
-    getOption("axis.color"), getOption("axis.y.color"))
+  axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
+    getOption("axis_color"), getOption("axis_x_color"))
+  axis_y_color <- ifelse(is.null(getOption("axis_y_color")),
+    getOption("axis_color"), getOption("axis_y_color"))
 
-  axis.x.lwd <- ifelse(is.null(getOption("axis.x.lwd")),
-    getOption("axis.lwd"), getOption("axis.x.lwd"))
-  axis.y.lwd <- ifelse(is.null(getOption("axis.y.lwd")),
-    getOption("axis.lwd"), getOption("axis.y.lwd"))
+  axis_x_lwd <- ifelse(is.null(getOption("axis_x_lwd")),
+    getOption("axis_lwd"), getOption("axis_x_lwd"))
+  axis_y_lwd <- ifelse(is.null(getOption("axis_y_lwd")),
+    getOption("axis_lwd"), getOption("axis_y_lwd"))
 
-  axis.x.lty <- ifelse(is.null(getOption("axis.x.lty")),
-    getOption("axis.lty"), getOption("axis.x.lty"))
-  axis.y.lty <- ifelse(is.null(getOption("axis.y.lty")),
-    getOption("axis.lty"), getOption("axis.y.lty"))
+  axis_x_lty <- ifelse(is.null(getOption("axis_x_lty")),
+    getOption("axis_lty"), getOption("axis_x_lty"))
+  axis_y_lty <- ifelse(is.null(getOption("axis_y_lty")),
+    getOption("axis_lty"), getOption("axis_y_lty"))
 
-  axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")),
-    getOption("axis.cex"), getOption("axis.x.cex"))
-  adj <- .RSadj(axis.cex=axis.x.cex); axis.x.cex <- adj$axis.cex
-  axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")),
-    getOption("axis.cex"), getOption("axis.y.cex"))
-  adj <- .RSadj(axis.cex=axis.y.cex); axis.y.cex <- adj$axis.cex
+  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
+    getOption("axis_cex"), getOption("axis_x_cex"))
+  adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
+  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
+    getOption("axis_cex"), getOption("axis_y_cex"))
+  adj <- .RSadj(axis_cex=axis_y_cex); axis_y_cex <- adj$axis_cex
 
-  axis.x.text.color <- ifelse(is.null(getOption("axis.x.text.color")),
-    getOption("axis.text.color"), getOption("axis.x.text.color"))
-  axis.y.text.color <- ifelse(is.null(getOption("axis.y.text.color")),
-    getOption("axis.text.color"), getOption("axis.y.text.color"))
+# if (is.null(getOption("axis_text_color"))) options(axis_text_color = "gray15")
+  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
+    getOption("axis_text_color"), getOption("axis_x_text_color"))
+  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")),
+    getOption("axis_text_color"), getOption("axis_y_text_color"))
 
-  fnt <- ifelse (getOption("sub.theme") == "wsj", 2, 1) # bold
+  fnt <- ifelse (getOption("sub_theme") == "wsj", 2, 1) # bold
 
   usr <- par("usr")
 
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
     if (!y.only) {  # do x axis in calling routine for time series
-      axis(1, at=axT1, labels=FALSE, tck=-.01, col=axis.x.color,
-        lwd=axis.x.lwd, lty=axis.x.lty)
+      axis(1, at=axT1, labels=FALSE, tck=-.01, col=axis_x_color,
+        lwd=axis_x_lwd, lty=axis_x_lty)
       dec.d <- .getdigits(round(axT1,6),1) - 1
       axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
       text(x=axT, y=usr[3], labels=.fmt(axT,dec.d),
-           pos=1, xpd=TRUE, cex=axis.x.cex, col=axis.x.text.color,
-           srt=rotate.x, offset=offset, font=fnt, ...)
+           pos=1, xpd=TRUE, cex=axis_x_cex, col=axis_x_text_color,
+           srt=rotate_x, offset=offset, font=fnt, ...)
     }
   }
 
   else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
-    axis(1, at=axT1, labels=FALSE, tck=-.01, col=axis.x.color,
-        lwd=axis.x.lwd, lty=axis.x.lty)
+    axis(1, at=axT1, labels=FALSE, tck=-.01, col=axis_x_color,
+        lwd=axis_x_lwd, lty=axis_x_lty)
     text(x=axT1, y=usr[3], labels=x.lvl,
-         pos=1, xpd=TRUE, cex=axis.x.cex, col=axis.x.text.color,
-         srt=rotate.x, offset=offset, font=fnt, ...)
+         pos=1, xpd=TRUE, cex=axis_x_cex, col=axis_x_text_color,
+         srt=rotate_x, offset=offset, font=fnt, ...)
   }
 
   if (is.null(y.lvl)  &&  !is.null(axT2)) {
-    axis(2, at=axT2, labels=FALSE, tck=-.01, col=axis.y.color,
-        lwd=axis.y.lwd, lty=axis.y.lty)
+    axis(2, at=axT2, labels=FALSE, tck=-.01, col=axis_y_color,
+        lwd=axis_y_lwd, lty=axis_y_lty)
     dec.d <- .getdigits(round(axT2,6),1) - 1
     axT <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
     text(x=usr[1], y=axT, labels=.fmt(axT,dec.d),
-         pos=2, xpd=TRUE, cex=axis.y.cex, col=axis.y.text.color,
-         srt=rotate.y, font=fnt, ...)
+         pos=2, xpd=TRUE, cex=axis_y_cex, col=axis_y_text_color,
+         srt=rotate_y, font=fnt, ...)
   }
   else if (!is.null(y.lvl)) {
-    axis(2, at=axT2, labels=FALSE, tck=-.01, col=axis.y.color,
-        lwd=axis.y.lwd, lty=axis.y.lty)
+    axis(2, at=axT2, labels=FALSE, tck=-.01, col=axis_y_color,
+        lwd=axis_y_lwd, lty=axis_y_lty)
     text(x=usr[1], y=axT2, labels=y.lvl,
-         pos=2, xpd=TRUE, cex=axis.y.cex, col=axis.y.text.color,
-         srt=rotate.y, font=fnt, ...)
+         pos=2, xpd=TRUE, cex=axis_y_cex, col=axis_y_text_color,
+         srt=rotate_y, font=fnt, ...)
   }
 }
 
 
 # axis labels
 .axlabs <- function(x.lab, y.lab, main.lab, sub.lab, max.lbl.y,
-                    x.val=NULL, xy.ticks=TRUE, offset=0.5,
-                    lab.x.cex=NULL, lab.y.cex=NULL, main.cex=NULL,
-                    n.lab.x.ln=1, n.lab.y.ln=1, xlab.adj=0, ylab.adj=0,
+                    x.val=NULL, xy_ticks=TRUE, offset=0.5,
+                    lab_x_cex=NULL, lab_y_cex=NULL, main_cex=NULL,
+                    n.lab_x.ln=1, n.lab_y.ln=1, xlab_adj=0, ylab_adj=0,
                     ...) {
 
-  lab.x.color <- ifelse(is.null(getOption("lab.x.color")),
-    getOption("lab.color"), getOption("lab.x.color"))
-  lab.y.color <- ifelse(is.null(getOption("lab.y.color")),
-    getOption("lab.color"), getOption("lab.y.color"))
+  lab_x_color <- ifelse(is.null(getOption("lab_x_color")),
+    getOption("lab_color"), getOption("lab_x_color"))
+  lab_y_color <- ifelse(is.null(getOption("lab_y_color")),
+    getOption("lab_color"), getOption("lab_y_color"))
 
-  if (is.null(lab.x.cex)) {  # temp until all .axes calls provide lab.x.cex
-    lab.x.cex <- ifelse(is.null(getOption("lab.x.cex")),
-      getOption("lab.cex"), getOption("lab.x.cex"))
+  if (is.null(lab_x_cex)) {  # temp until all .axes calls provide lab_x_cex
+    lab_x_cex <- ifelse(is.null(getOption("lab_x_cex")),
+      getOption("lab_cex"), getOption("lab_x_cex"))
   }
-  if (is.null(lab.y.cex)) {
-    lab.y.cex <- ifelse(is.null(getOption("lab.y.cex")),
-      getOption("lab.cex"), getOption("lab.y.cex"))
+  if (is.null(lab_y_cex)) {
+    lab_y_cex <- ifelse(is.null(getOption("lab_y_cex")),
+      getOption("lab_cex"), getOption("lab_y_cex"))
   }
 
-  adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
-  adj <- .RSadj(lab.cex=lab.y.cex); lab.y.cex <- adj$lab.cex
+  adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
+  adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
   lblx.lns <- par("mar")[1] - 1.15
 
-# xlab.adj <- xlab.adj / ln.ht.x
+# xlab_adj <- xlab_adj / ln.ht.x
   # ylab positioning
-  ln.ht.y <- par('cin')[2] * lab.y.cex * par('lheight')  # line ht inches
+  ln.ht.y <- par('cin')[2] * lab_y_cex * par('lheight')  # line ht inches
   lby <- (.9*ln.ht.y) / 0.19
-  lbly.lns <- par("mar")[2] - (0.3 + 1*n.lab.y.ln) * lby  # mar 2: lm lines
-  ylab.adj <- ylab.adj / ln.ht.y
+  lbly.lns <- par("mar")[2] - (0.3 + 1*n.lab_y.ln) * lby  # mar 2: lm lines
+  ylab_adj <- ylab_adj / ln.ht.y
 
   regR <- FALSE  # regular R by itself adjustment
   in.RStudio <- ifelse (options("device") == "RStudioGD", TRUE, FALSE)
   in.knitr <- ifelse (!is.null(options()$knitr.in.progress), TRUE, FALSE)
   if (!in.RStudio && !in.knitr) regR <- TRUE
-  if (regR) ylab.adj <- ylab.adj + .2
+  if (regR) ylab_adj <- ylab_adj + .2
 
-  title(xlab=x.lab, line=lblx.lns-xlab.adj,
-        col.lab=lab.x.color, cex.lab=lab.x.cex, ...)
+  title(xlab=x.lab, line=lblx.lns-xlab_adj,
+        col.lab=lab_x_color, cex.lab=lab_x_cex, ...)
   title(sub=sub.lab, line=lblx.lns+1, cex.sub=0.76,
-        col.lab=lab.x.color, ...)
-  title(ylab=y.lab, line=lbly.lns-ylab.adj+.1,
-        col.lab=lab.y.color, cex.lab=lab.y.cex, ...)
-  title(main=main.lab, cex.main= getOption("main.cex"),
-        col.main=getOption("main.color"), ...)
+        col.lab=lab_x_color, ...)
+  title(ylab=y.lab, line=lbly.lns-ylab_adj+.1,
+        col.lab=lab_y_color, cex.lab=lab_y_cex, ...)
+  title(main=main.lab, cex.main= getOption("main_cex"),
+        col.main=getOption("main_color"), ...)
 
 }
 
@@ -1187,8 +1194,8 @@ function(dir, axT) {
 
 # margins
 .marg <- function(max.y.width, y.lab, x.lab, main,
-                  rotate.x=0, mx.x.val.ln=1, mx.y.val.ln=1,
-                  lab.x.cex=0.95, lab.y.cex=0.95, max.x.width=NULL) {
+                  rotate_x=0, mx.x.val.ln=1, mx.y.val.ln=1,
+                  lab_x_cex=0.95, lab_y_cex=0.95, max.x.width=NULL) {
 
   # top margin
   tm <- 0.15
@@ -1201,50 +1208,50 @@ function(dir, axT) {
   rm <- 0.1
 
   # bottom margin
-  n.lab.x.ln <- 0  # in case x.lab is null
+  n.lab_x.ln <- 0  # in case x.lab is null
   if (!is.null(x.lab)) {
     if (x.lab != "") {
       strn <- unlist(gregexpr("\n", x.lab, fixed=TRUE))
       if (strn[1] == -1) strn <- NULL  # return of -1 means no \n
-      n.lab.x.ln <- length(strn) + 1
+      n.lab_x.ln <- length(strn) + 1
     }
     else    # such as from default for time series
-      n.lab.x.ln <- -0.6 + (.1 * lab.x.cex)
+      n.lab_x.ln <- -0.6 + (.1 * lab_x_cex)
   }
 
-  ln.ht <- par('cin')[2] * lab.x.cex * par('lheight')  # lin ht inches
+  ln.ht <- par('cin')[2] * lab_x_cex * par('lheight')  # lin ht inches
 
-  # rotate.x==90 and horiz=TRUE not compatible, leads to NULL max.x.width
-  if (rotate.x != 90  ||  is.null(max.x.width))
-    bm <- ((n.lab.x.ln + mx.x.val.ln) * .70 * ln.ht) + 0.24  # inches
+  # rotate_x==90 and horiz=TRUE not compatible, leads to NULL max.x.width
+  if (rotate_x != 90  ||  is.null(max.x.width))
+    bm <- ((n.lab_x.ln + mx.x.val.ln) * .70 * ln.ht) + 0.24  # inches
   else
-    bm <- max.x.width + (ln.ht * n.lab.x.ln) + 0.25
+    bm <- max.x.width + (ln.ht * n.lab_x.ln) + 0.25
   tm <- ifelse (is.null(main), tm+.05, tm+.25)  #  adjust tm for increased bm
-  if (rotate.x != 0) bm <- bm + .15
-  if (lab.x.cex > 1.1) bm <- bm + .04  # actually should be axis.cex
+  if (rotate_x != 0) bm <- bm + .15
+  if (lab_x_cex > 1.1) bm <- bm + .04  # actually should be axis_cex
 
   # left margin
-  n.lab.y.ln <- 0  # in case x.lab is null
+  n.lab_y.ln <- 0  # in case x.lab is null
   if (!is.null(y.lab)) {
     if (y.lab != "") {
       strn <- unlist(gregexpr("\n", y.lab, fixed=TRUE))
       if (strn[1] == -1) strn <- NULL  # return of -1 means no \n
-      n.lab.y.ln <- length(strn) + 1
+      n.lab_y.ln <- length(strn) + 1
     }
   }
 
   mm <- max.y.width + 0.22
   if (max.y.width < .10) mm <- mm + .02
-  if (lab.y.cex > 1) mm <- mm + .10
-  if (!is.null(y.lab)) mm <- mm + (n.lab.y.ln * .20)
+  if (lab_y_cex > 1) mm <- mm + .10
+  if (!is.null(y.lab)) mm <- mm + (n.lab_y.ln * .20)
 
   return(list(lm=mm, tm=tm, rm=rm, bm=bm,
-              n.lab.x.ln=n.lab.x.ln, n.lab.y.ln=n.lab.y.ln))
+              n.lab_x.ln=n.lab_x.ln, n.lab_y.ln=n.lab_y.ln))
 }
 
 
 # enlarge scale for R
-.RSadj <- function(radius=0.25, axis.cex=NULL, cex.names=NULL, lab.cex=NULL) {
+.RSadj <- function(radius=0.25, axis_cex=NULL, cex.names=NULL, lab_cex=NULL) {
 
   if (is.null(radius)) radius <- 0.25
 
@@ -1257,17 +1264,17 @@ function(dir, axT) {
     radius <- radius*1.6
   }
 
-  if (!is.null(axis.cex))
-    size.axis <- ifelse (regR, axis.cex*1.3, axis.cex)
+  if (!is.null(axis_cex))
+    size.axis <- ifelse (regR, axis_cex*1.3, axis_cex)
   else
     size.axis <- NULL
 
-   if (!is.null(lab.cex))
-    size.lab <- ifelse (regR, lab.cex*1.3, lab.cex)
+   if (!is.null(lab_cex))
+    size.lab <- ifelse (regR, lab_cex*1.3, lab_cex)
   else
    size.lab <- NULL
 
-  return(list(radius=radius, axis.cex=size.axis, lab.cex=size.lab))
+  return(list(radius=radius, axis_cex=size.axis, lab_cex=size.lab))
 }
 
 
@@ -1290,7 +1297,8 @@ function(dir, axT) {
 
   tx <- character(length = 0)
 
-  tx[length(tx)+1] <- paste("The", txt, "written at the current working directory.")
+  txt.wrt <- "written at the current working directory." 
+  tx[length(tx)+1] <- paste("The", txt, txt.wrt)
   tx[length(tx)+1] <- paste("       ", fname, " in:  ", workdir)
 
   return(tx)
@@ -1298,7 +1306,7 @@ function(dir, axT) {
 }
 
 
-.band.width <- function(x, bw.iter=25, details=FALSE, ...) {
+.band.width <- function(x, bw_iter=25, details=FALSE, ...) {
 
   if (details) {
     cat("\n")
@@ -1321,7 +1329,7 @@ function(dir, axT) {
     flip <- 0
     for (j in 2:length(xd))
       if (sign(xd[j-1]) != sign(xd[j])) flip <- flip + 1
-    if (flip > 1  &&  irep <= bw.iter) {
+    if (flip > 1  &&  irep <= bw_iter) {
       bw <- 1.1 * bw
       if (details)
         cat(irep, "  flips:", .fmti(flip,3), "  bw: ", .fmt(bw,4), "\n", sep="")
@@ -1334,13 +1342,13 @@ function(dir, axT) {
 }
 
 
-.pdfname <- function(analysis, x.name, go.pdf, pdf.nm, pdf.file) {
+.pdfname <- function(analysis, x.name, go.pdf, pdf.nm, pdf_file) {
   if (go.pdf) {
     if (pdf.nm)
-      if (!grepl(".pdf", pdf.file))
-        pdf.fnm <- paste(pdf.file, ".pdf", sep="")
+      if (!grepl(".pdf", pdf_file))
+        pdf.fnm <- paste(pdf_file, ".pdf", sep="")
       else
-        pdf.fnm <- pdf.file
+        pdf.fnm <- pdf_file
     else
       pdf.fnm <- paste(analysis, "_", x.name, ".pdf", sep="")
   }
@@ -1372,9 +1380,9 @@ function(dir, axT) {
 
   # remove all open windows past device 2
   if (length(dl.more) > 0) {
-    min.dd <- dl.more[which(dl.more==min(dl.more))]
+    min_dd <- dl.more[which(dl.more==min(dl.more))]
     max.dd <- dl.more[which(dl.more==max(dl.more))]
-    for (i in min.dd:max.dd) dev.off(which=i)
+    for (i in min_dd:max.dd) dev.off(which=i)
   }
 
   off.two <- ifelse (length(dl2) == 0, TRUE, FALSE)
@@ -1412,13 +1420,13 @@ function(dir, axT) {
 
 
 # num.cat var is integer with small number of unique values
-.is.num.cat <- function(x, n.cat) {
+.is.num.cat <- function(x, n_cat) {
 
   x <- sort(unique(na.omit(x)))
 
   nu.x <- length(x)
 
-  if (.is.integer(x)  &&  nu.x <= n.cat) {
+  if (.is.integer(x)  &&  nu.x <= n_cat) {
     eq.int <- TRUE
     d.x <- diff(x)  # check for equal intervals
     if (nu.x > 2) {
@@ -1439,15 +1447,15 @@ function(dir, axT) {
 }
 
 
-.ncat <- function(analysis, x.name, nu, n.cat, brief=FALSE) {
+.ncat <- function(analysis, x.name, nu, n_cat, brief=FALSE) {
 
   cat("\n")
   cat(">>> ", x.name, " has only only ", nu, " equally spaced unique ",
-      "integer values <= n.cat=", n.cat, "\n",
+      "integer values <= n_cat=", n_cat, "\n",
       "    so treat as categorical, and perhaps convert to an R factor\n", sep="")
 
   if (!brief)
-    cat("    For numeric, set n.cat smaller than ", nu,
+    cat("    For numeric, set n_cat smaller than ", nu,
         " with ", analysis, " or globally with  style", sep="")
 
   cat("\n")
@@ -1456,7 +1464,7 @@ function(dir, axT) {
 
 
 .corcolors <- function(R, NItems, main, bm=3, rm=3, diag=NULL,
-                       pdf.file, width, height) {
+                       pdf_file, width, height) {
 
   if (!is.null(diag)) {
     for (i in 1:NItems) R[i,i] <- diag
@@ -1465,65 +1473,65 @@ function(dir, axT) {
         "      computing the heat map are set to 0.\n", sep="")
   }
 
-  .opendev(pdf.file, width, height)  # set up graphics
+  .opendev(pdf_file, width, height)  # set up graphics
 
-  fill.low <- NULL
-  fill.hi <- NULL
+  fill_low <- NULL
+  fill_hi <- NULL
 
-  if (is.null(fill.low)  &&  is.null(fill.hi)) {      
+  if (is.null(fill_low)  &&  is.null(fill_hi)) {      
     if (getOption("theme") %in% c("colors", "dodgerblue", "blue", 
                                   "lightbronze")) {
-      fill.low <- "rusts"
-      fill.hi <- "blues"
-      hmcols <- getColors(fill.low, fill.hi, l=c(10,90), n=100)
+      fill_low <- "rusts"
+      fill_hi <- "blues"
+      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
     }
     else if (getOption("theme") %in% c("darkred", "red", "rose")) {
-      fill.low <- "turquoises" 
-      fill.hi <- "reds"
-      hmcols <- getColors(fill.low, fill.hi, l=c(10,90), n=100)
+      fill_low <- "turquoises" 
+      fill_hi <- "reds"
+      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
     }
     else if (getOption("theme") %in% c("darkgreen", "green")) {
-      fill.low <- "violets" 
-      fill.hi <- "greens"
-      hmcols <- getColors(fill.low, fill.hi, l=c(10,90), n=100)
+      fill_low <- "violets" 
+      fill_hi <- "greens"
+      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
     }
     else if (getOption("theme") %in% c("gold", "brown", "sienna")) {
-      fill.low <- "blues" 
-      fill.hi <- "browns"
-      hmcols <- getColors(fill.low, fill.hi, l=c(10,90), n=100)
+      fill_low <- "blues" 
+      fill_hi <- "browns"
+      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
     }
     else if (getOption("theme") %in% c("gray", "white")) {
-      fill.low <- "white"
-      fill.hi <- "black"
+      fill_low <- "white"
+      fill_hi <- "black"
       hmcols <- colorRampPalette(c("white", "gray75", "black"))(100)
     }
   }
 
-  else if (is.null(fill.low) || is.null(fill.hi)) { 
-    fill.low <- "white"
-    fill.hi <- "gray20"
+  else if (is.null(fill_low) || is.null(fill_hi)) { 
+    fill_low <- "white"
+    fill_hi <- "gray20"
     hmcols <- colorRampPalette(c("white", "gray75", "black"))(100)
   }
 
-  # fill.low and fill.hi "blues", etc, then divergent, else sequential`
+  # fill_low and fill_hi "blues", etc, then divergent, else sequential`
 
-  axis.x.cex <- ifelse(is.null(getOption("axis.x.cex")),
-      getOption("axis.cex"), getOption("axis.x.cex"))
-  axis.y.cex <- ifelse(is.null(getOption("axis.y.cex")),
-      getOption("axis.cex"), getOption("axis.y.cex"))
+  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
+      getOption("axis_cex"), getOption("axis_x_cex"))
+  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
+      getOption("axis_cex"), getOption("axis_y_cex"))
 
   heatmap(R[1:NItems,1:NItems], Rowv=NA, Colv="Rowv", symm=TRUE,
     col=hmcols, margins=c(bm,rm), main=main,
-    cexRow=axis.x.cex, cexCol=axis.y.cex)
+    cexRow=axis_x_cex, cexCol=axis_y_cex)
 
-  if (!is.null(pdf.file)) {  # terminate pdf graphics
+  if (!is.null(pdf_file)) {  # terminate pdf graphics
     dev.off()
-    .showfile(pdf.file, "plot")
+    .showfile(pdf_file, "plot")
   }
 }
 
 
-.maketrans <- function(col.name, trans.level) {
+.maketrans <- function(col.name, trans_level) {
 
   col.trans <- numeric(length(col.name))
 
@@ -1532,7 +1540,7 @@ function(dir, axT) {
     g.tr <- col2rgb(col.name[i])[2]
     b.tr <- col2rgb(col.name[i])[3]
 
-    col.trans[i]  <- rgb(r.tr, g.tr, b.tr, alpha=trans.level, maxColorValue=256)
+    col.trans[i]  <- rgb(r.tr, g.tr, b.tr, alpha=trans_level, maxColorValue=256)
   }
 
   return(col.trans)
@@ -1540,7 +1548,7 @@ function(dir, axT) {
 
 
 # generate a pre-defined color range if requested
-.color.range <- function(fill, n.clr) {
+.color_range <- function(fill, n.clr) {
 
   # names of color palettes generated by getColors
   nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",
@@ -1606,11 +1614,11 @@ function(dir, axT) {
 
 
 # continuous color scale
-.getColC <- function(x, chroma=55, fill.name) {
+.getColC <- function(x, chroma=55, fill_name) {
 
   if (getOption("theme") %in% c("gray", "white")) chroma <- 0
 
-  if (!grepl(".v", fill.name, fixed=TRUE)) {
+  if (!grepl(".v", fill_name, fixed=TRUE)) {
 
     xp <- pretty(x)
     xp.mn <- min(xp)
@@ -1640,7 +1648,7 @@ function(dir, axT) {
 
 
 # link a pre-set range with the current theme
-.get.fill <- function(theme=getOption("theme"), seq.pal=TRUE) {
+.get_fill <- function(theme=getOption("theme"), seq.pal=TRUE) {
 
   # for ordinal variables, or color theme not default, get sequential palette
   # for not ordinal and default color theme, qualitative palette
@@ -1667,18 +1675,18 @@ function(dir, axT) {
 
 .to_rgb <- function(color) {
 
-  clr <- color[1]  # box.fill is qualitative color scale
+  clr <- color[1]  # box_fill is qualitative color scale
 
   if (is.null(color))
-    rgb.color <- "NULL"
+    rgb_color <- "NULL"
   else {  # preserve color name if it exists
     if (!(color[1] %in% colors()))
-      rgb.color <- col2rgb(clr, alpha=TRUE)
+      rgb_color <- col2rgb(clr, alpha=TRUE)
     else
-      rgb.color <- clr
+      rgb_color <- clr
   }
 
-  return(rgb.color)
+  return(rgb_color)
 
 }
 
@@ -1699,17 +1707,17 @@ function(dir, axT) {
 }
 
 
-.to256 <- function(trans.level)
-   trn <- (1-getOption(trans.level))*256
+.to256 <- function(trans_level)
+   trn <- (1-getOption(trans_level))*256
 
-.to256n <- function(trans.level)
-   trn <- (1-trans.level) * 256
+.to256n <- function(trans_level)
+   trn <- (1-trans_level) * 256
 
 
 # change class call to class character
-.fun.call.deparse <- function(fun.call) {
+.fun_call.deparse <- function(fun_call) {
 
-  fc.d <- deparse(fun.call)
+  fc.d <- deparse(fun_call)
   if (length(fc.d) > 1) {  # multiple lines
     fc <- fc.d[1]
     for (i in 2:length(fc.d)) fc <- paste(fc, fc.d[i], sep="")
@@ -1769,11 +1777,11 @@ function(dir, axT) {
     if (first.arg) stp <- stp + 2  # remove trailing comma and space
 
     remv <- substr(fc, start=strt, stop=stp)
-    fc.new <- sub(remv, "", fc, fixed=TRUE)
+    fc_new <- sub(remv, "", fc, fixed=TRUE)
 
   }
 
-  return(fc.new)
+  return(fc_new)
 }
 
 
@@ -1795,12 +1803,12 @@ function(dir, axT) {
     strt <- loc - 1
 
     remv <- substr(fc, start=strt, stop=stp)
-    fc.new <- sub(remv, "", fc, fixed=TRUE)
-    fc.new <- sub(",,", "", fc.new, fixed=TRUE)  # hack
+    fc_new <- sub(remv, "", fc, fixed=TRUE)
+    fc_new <- sub(",,", "", fc_new, fixed=TRUE)  # hack
 
   }
 
-  return(fc.new)
+  return(fc_new)
 }
 
 
@@ -1848,15 +1856,15 @@ function(dir, axT) {
     if (first.arg) stp <- stp + 2  # remove trailing comma and space
 
     remv <- substr(fc, start=strt, stop=stp)
-    fc.new <- sub(remv, "", fc, fixed=TRUE)
+    fc_new <- sub(remv, "", fc, fixed=TRUE)
 
-  return(fc.new)
+  return(fc_new)
   }
 
 }
 
 
-.prntbl <- function(x, digits.d=2, cut=0, cc="-", cors=FALSE,
+.prntbl <- function(x, digits_d=2, cut=0, cc="-", cors=FALSE,
                     brk=NULL, bnd=NULL, v1.nm=NULL, v2.nm=NULL) {
 
 # brk: ... replaces rows not printed
@@ -1886,7 +1894,7 @@ function(dir, axT) {
     if (is.numeric(x[,j])) {
       c.val <- 0
       for (i in 1:nrow(x)) {
-        i.val <- nchar(formatC(x[i,j], digits=digits.d, format="f"))
+        i.val <- nchar(formatC(x[i,j], digits=digits_d, format="f"))
         if (i.val > c.val) c.val <- i.val
       }
     }
@@ -1916,7 +1924,7 @@ function(dir, axT) {
     for (i in 1:ncol(x))
       nr.ind.lbl[i] <- ((nchar(colnames(x)[i]) + (max.ch-1)) %/% max.ch)
 
-    nr.lbl <- max(nr.ind.lbl)  # n row of labels
+    nr.lbl <- max(nr.ind.lbl)  # n_row of labels
     col.nm <- matrix(nrow=nr.lbl, ncol=ncol(x))
     for (i in 1:nrow(col.nm)) {
       for (j in 1:ncol(col.nm)) {
@@ -1991,12 +1999,12 @@ function(dir, axT) {
         if (cors) {
           if (max.ln[j] > 5) wd <- max(6, max.ln[j]+1) + 1
           else wd <- max(6, max.ln[j]+1)
-          cs <- .fmt(x[i,j], d=digits.d, w=wd)
+          cs <- .fmt(x[i,j], d=digits_d, w=wd)
           cs <- sub("0.", "", cs, fixed=TRUE)
           cs <- sub(" 1.00", "100", cs, fixed=TRUE)
         }
         else
-          cs <- .fmt(x[i,j], d=digits.d, w=wd)
+          cs <- .fmt(x[i,j], d=digits_d, w=wd)
         if (abs(x[i,j]) < cut) cs <- paste(rep(" ", wd-2), collapse="")
         tx[length(tx)] <- paste(tx[length(tx)], cs, sep="")
         if (!is.null(bnd)) if (j %in% bnd)

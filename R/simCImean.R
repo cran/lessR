@@ -1,10 +1,24 @@
 simCImean <- 
 function(ns, n, mu=0, sigma=1, cl=0.95, 
-         ylim.bound=NULL, show.data=FALSE, show.title=TRUE, 
-         miss.only=FALSE, color.hit="gray40", color.miss="red",
+         ylim_bound=NULL, show_data=FALSE, show_title=TRUE, 
+         miss_only=FALSE, color_hit="gray40", color_miss="red",
          grid="grey90", pause=FALSE,
-         main=NULL, pdf.file=NULL, width=5, height=5, ...) {
+         main=NULL, pdf_file=NULL, width=5, height=5, ...) {
 
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("ylim.bound", "show.data", "show.title", "miss.only",
+                "color.hit", "color.miss", "pdf.file")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   if (missing(ns)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -32,8 +46,8 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
     }
   }
 
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+  if (!is.null(pdf_file))
+    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
 
   alpha <- 1-cl
   tcut <- qt(1-alpha/2, df=n-1)
@@ -42,7 +56,7 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   # data generation
   data.raw <- rnorm(ns*n, mu, sigma)
   max.Y <- max(data.raw)
-  min.Y <- min(data.raw)
+  min_Y <- min(data.raw)
   data.byrep <- matrix(data.raw, ns, n)
 
   # summary stats
@@ -59,13 +73,13 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   missrate <- round((miss/ns)*100, 2)
 
   # keep mu centered with symmetric upper and lower limits on y-axis
-  if (is.null(ylim.bound)) {
-    if (!show.data) {
+  if (is.null(ylim_bound)) {
+    if (!show_data) {
       l <- min(lb)
       u <- max(ub)
     }
     else {
-      l <- min.Y
+      l <- min_Y
       u <- max.Y
     }
     max.dev <- max( abs(mu-l), abs(u-mu) )
@@ -73,22 +87,22 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
     u <- mu + max.dev
   }
   else {
-    l <- mu - ylim.bound
-    u <- mu + ylim.bound
+    l <- mu - ylim_bound
+    u <- mu + ylim_bound
   }
 
 
   # plot setup
 
   # set up graphics system
-  .opendev(pdf.file, width, height)
+  .opendev(pdf_file, width, height)
 
   orig.params <- par(no.readonly=TRUE)
   par(mar=c(2,2,1.75,2), mgp=c(1,.5,0))
 
   plot(lb, type = "n", ylim = c(l,u), xlab = "", ylab = "", cex.main=.95,
        cex.axis=.8)
-  if (show.title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=",
+  if (show_title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=",
      .(sigma), "  ", "cl=", .(clpct), "%  n=", .(n))), cex.main=1)
 
   mtext(bquote(paste(" ", mu)), side=4, cex=1.5, col="darkslateblue", las=2)
@@ -108,22 +122,22 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   cat("\nSample", "  Mean", " StdDev", " StdErr", "  Error", "     LB",
        "     UB", "\n")
   abline(h=mu, col="darkslateblue", lwd=1.5) # horizontal centerline at mu
-  dig.dec <- 3
+  digits_d <- 3
   max.ln <- 8
   for (i in 1:ns) {
     if (pause) invisible(readline())
-    if ( (mu>lb[i] && mu<ub[i]) ) linecol <- color.hit else linecol = color.miss
-    if (show.data) points(rep(i,n), data.byrep[i,], pch=21, col="gray75",cex=.3)
-    if ( !(miss.only && linecol==color.hit) ) {
+    if ( (mu>lb[i] && mu<ub[i]) ) linecol <- color_hit else linecol = color_miss
+    if (show_data) points(rep(i,n), data.byrep[i,], pch=21, col="gray75",cex=.3)
+    if ( !(miss_only && linecol==color_hit) ) {
       se <- Ysd[i]/sqrt(n)
       e <- tcut * se
       cat(format(i, width=5, justify="right", sep=""))
-      cat(.fmt(Ymean[i], dig.dec, w=max.ln))
-      cat(.fmt(Ysd[i], dig.dec, w=max.ln))
-      cat(.fmt(se, dig.dec, w=max.ln))
-      cat(.fmt(E[i], dig.dec, w=max.ln))
-      cat(.fmt(lb[i], dig.dec, w=max.ln))
-      cat(.fmt(ub[i], dig.dec, w=max.ln))
+      cat(.fmt(Ymean[i], digits_d, w=max.ln))
+      cat(.fmt(Ysd[i], digits_d, w=max.ln))
+      cat(.fmt(se, digits_d, w=max.ln))
+      cat(.fmt(E[i], digits_d, w=max.ln))
+      cat(.fmt(lb[i], digits_d, w=max.ln))
+      cat(.fmt(ub[i], digits_d, w=max.ln))
       if (linecol == "red")  cat("  *** MISS ***")
       if (!pause) cat("\n")
     }
@@ -136,9 +150,9 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
 
   # terminate pdf graphics system
   par(orig.params)        
-  if (!is.null(pdf.file)) {
+  if (!is.null(pdf_file)) {
     dev.off()
-    .showfile(pdf.file, "simulated confidence intervals")
+    .showfile(pdf_file, "simulated confidence intervals")
   }
 
   cat("\nStructure\n")
@@ -153,10 +167,10 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   cat("Number of Misses: ", miss, "\n")
   cat("Percent Misses  :", format(sprintf("%.*f", 2, missrate), width=5, justify="right", sep=""), "\n")
 
-  dig.dec <- dig.dec + 1
+  digits_d <- digits_d + 1
   cat("\nAnalysis of Sample Means\n")
-  cat("   Mean:", format(sprintf("%.*f", dig.dec, mean(Ymean)), width=max.ln, justify="right", sep=""), "\n")
-  cat("Std Dev:", format(sprintf("%.*f", dig.dec, sd(Ymean)), width=max.ln, justify="right", sep=""), "\n")
+  cat("   Mean:", format(sprintf("%.*f", digits_d, mean(Ymean)), width=max.ln, justify="right", sep=""), "\n")
+  cat("Std Dev:", format(sprintf("%.*f", digits_d, sd(Ymean)), width=max.ln, justify="right", sep=""), "\n")
 
   cat("\n")
 

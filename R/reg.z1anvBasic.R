@@ -1,11 +1,11 @@
 .reg1anvBasic <-
-function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
+function(lm.out, dname="d", digits_d=NULL, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
-  d <- digits.d
+  d <- digits_d
 
   tx <- character(length = 0)
 
@@ -13,7 +13,7 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
   smc <- anova(lm.out)
   SSE <- smc[n.vars,2]
 
-  if (show.R) {
+  if (show_R) {
     tx[length(tx)+1] <- ""
     .dash2(68)
     tx[length(tx)+1] <- paste("> ","anova(model)", "\n",sep="")
@@ -38,7 +38,7 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
     ln.nm <- nchar(colnames(smc)[i])
     max.ln[i] <- ln.nm + 1
     for (j in 1:nrow(smc)) {
-      xjc <- .fmt(smc[j,i], d=digits.d)
+      xjc <- .fmt(smc[j,i], d=digits_d)
       if (nchar(xjc) > max.ln[i]) max.ln[i] <- nchar(xjc)
     }
     max.ln[i] <- max.ln[i] + 1L
@@ -57,9 +57,9 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
     for (i in 1:(n.pred)) {
       rlb <- .fmtc(rownames(smc)[i], max.c1)
       df <- .fmti(smc[i,1], max.ln[1]-5)
-      SS <- .fmt(smc[i,2], digits.d, max.ln[2])
-      MS <- .fmt(smc[i,3], digits.d, max.ln[3])
-      fv <- .fmt(smc[i,4], digits.d, max.ln[4])
+      SS <- .fmt(smc[i,2], digits_d, max.ln[2])
+      MS <- .fmt(smc[i,3], digits_d, max.ln[3])
+      fv <- .fmt(smc[i,4], digits_d, max.ln[4])
       pv <- .fmt(smc[i,5], 3, 9)
       tx[length(tx)+1] <- paste(rlb, df, SS, MS, fv, pv)
     } 
@@ -76,13 +76,13 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
 
     mod.ss <- 0 
     for (i in 1:n.pred) mod.ss <- mod.ss + smc[i,2]
-    ms <- .fmt(mod.ss, digits.d, max.ln[2])
+    ms <- .fmt(mod.ss, digits_d, max.ln[2])
 
     mod.ms <- mod.ss/mod.df
-    mm <- .fmt(mod.ms, digits.d, max.ln[3])
+    mm <- .fmt(mod.ms, digits_d, max.ln[3])
 
     mod.f <- mod.ms/smc[n.vars, 3]
-    mf <- .fmt(mod.f, digits.d, max.ln[4])
+    mf <- .fmt(mod.f, digits_d, max.ln[4])
 
     mod.p <- pf(mod.f, mod.df, smc[n.vars,1], lower.tail=FALSE)
     mp <- .fmt(mod.p, 3, 9) 
@@ -97,8 +97,8 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
   # Residuals
   rlb <- .fmtc(rownames(smc)[n.vars], max.c1, j="left")
   df <- .fmti(smc[n.vars,1], max.ln[1]-5)
-  SS <- .fmt(smc[n.vars,2], digits.d, max.ln[2])
-  MS <- .fmt(smc[n.vars,3], digits.d, max.ln[3])
+  SS <- .fmt(smc[n.vars,2], digits_d, max.ln[2])
+  MS <- .fmt(smc[n.vars,3], digits_d, max.ln[3])
   MSW <- smc[n.vars,3]
   tx[length(tx)+1] <- paste(rlb, df, SS, MS) 
   if (n.pred > 1) tx[length(tx)+1] <- ""
@@ -115,10 +115,10 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
     td <- .fmti(tot.df, max.ln[1]-5) 
 
     tot.ss <- mod.ss + smc[n.vars,2]
-    ts <- .fmt(tot.ss, digits.d, max.ln[2])
+    ts <- .fmt(tot.ss, digits_d, max.ln[2])
 
     tot.ms <- tot.ss/tot.df
-    tm <- .fmt(tot.ms, digits.d, max.ln[3])
+    tm <- .fmt(tot.ms, digits_d, max.ln[3])
 
     tx[length(tx)+1] <- paste(rlb, td, ts, tm) 
 

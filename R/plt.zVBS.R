@@ -1,13 +1,13 @@
 .plt.VBS <-
 function(x, ID, by1, by1.miss, by0, by.miss,
-         bw, bw.miss, bw.iter, iter.details, lx, n.ux, 
-         k.iqr, box.adj, a, b,
-         x.name, by1.name, by.name, vbs.plot,
-         n.col.miss, n.row.miss,
-         size, j.x.miss, jitter.x, j.y.miss, jitter.y,
-         bin=FALSE, breaks=NULL, bin.start=NULL, bin.width=NULL,
-         bin.end=NULL, proportion=NULL, 
-         digits.d, quiet, fun.call=NULL, ...) {
+         bw, bw.miss, bw_iter, iter.details, lx, n.ux, 
+         k.iqr, box_adj, a, b,
+         x.name, by1.name, by.name, vbs_plot,
+         n_col.miss, n_row.miss,
+         size, j.x.miss, jitter_x, j.y.miss, jitter_y,
+         bin=FALSE, breaks=NULL, bin_start=NULL, bin_width=NULL,
+         bin_end=NULL, proportion=NULL, 
+         digits_d, quiet, fun_call=NULL, ...) {
 
 
   .get.dup <- function(mc.w, x.name, lvl) {
@@ -48,21 +48,21 @@ function(x, ID, by1, by1.miss, by0, by.miss,
   }
 
   # display current parameter values
-  .get.param <- function(size, jitter.y, jitter.x, bw) {
+  .get.param <- function(size, jitter_y, jitter_x, bw) {
     txprm <- ""
     tx <- character(length = 0)
     tx[length(tx)+1] <- "Parameter values (can be manually set)"
     tx[length(tx)+1] <- .dash2(55)
-    if (grepl("s", vbs.plot)) {
+    if (grepl("s", vbs_plot)) {
       tx[length(tx)+1] <- paste("size:", .fmt(size.pt,2),
           "     size of plotted points")
-      tx[length(tx)+1] <- paste("jitter.y:", .fmt(jitter.y,2),
+      tx[length(tx)+1] <- paste("jitter_y:", .fmt(jitter_y,2),
           " random vertical movement of points")
-      tx[length(tx)+1] <- paste("jitter.x:", .fmt(jitter.x,2),
+      tx[length(tx)+1] <- paste("jitter_x:", .fmt(jitter_x,2),
           " random horizontal movement of points")
               if (size.pt < 0.02) size.pt <- .02
     }
-    if (grepl("v", vbs.plot))
+    if (grepl("v", vbs_plot))
       tx[length(tx)+1] <- paste("bw:" , .fmt(bw,2),
         "    set bandwidth higher for smoother edges")
     txprm <- tx
@@ -81,7 +81,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
   # suggestions
   if (getOption("suggest") && !quiet) {
     # function call for suggestions
-    fncl <- .fun.call.deparse(fun.call) 
+    fncl <- .fun_call.deparse(fun_call) 
     fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
     fncl <- gsub(" = ", "=", fncl)
 
@@ -91,24 +91,24 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
     txts <- character(length=3)
     cmts <- character(length=3)
-    if (!grepl("out.cut", fncl)) {
-      txts[1] <- ", out.cut=2"
+    if (!grepl("out_cut", fncl)) {
+      txts[1] <- ", out_cut=2"
       cmts[1] <- "Label two outliers ..."
     }
     if (!grepl("fences", fncl)) {
       txts[2] <- ", fences=TRUE"
       if (cmts[1] == "") cmts[2] <- "Show inner fences"
     }
-    if (!grepl("vbs.mean", fncl)) {
-      txts[3] <- ", vbs.mean=TRUE"
+    if (!grepl("vbs_mean", fncl)) {
+      txts[3] <- ", vbs_mean=TRUE"
       if (cmts[1] == "") cmts[3] <- " Show mean"
     }
     if (any(txts != ""))
       txsug <- paste(txsug, "\n", fc, txts[1], txts[2], txts[3], ") # ",
         cmts[1], cmts[2], cmts[3], sep="")
 
-    if (!grepl("box.adj", fncl)) {
-      txt <- ", box.adj=TRUE)  # Adjust boxplot whiskers for asymmetry"
+    if (!grepl("box_adj", fncl)) {
+      txt <- ", box_adj=TRUE)  # Adjust boxplot whiskers for asymmetry"
       txsug <- paste(txsug, "\n", fc, txt, sep="")
     }
 
@@ -142,7 +142,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
 
   if (!is.factor(x)) if (bw.miss)
-    bw <- .band.width(na.omit(x), bw.iter, iter.details, ...) # initial bw
+    bw <- .band.width(na.omit(x), bw_iter, iter.details, ...) # initial bw
 #d.gen <- suppressWarnings(density(na.omit(x), bw, ...))
 #xd <- diff(d.gen$y)
 #cat("\n\n\n*** bw:", bw, "\n")
@@ -159,7 +159,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
   if (by1.miss && by.miss) { 
 
     # box plot outliers, stats
-    bx <- .bx.stats(x, ID, k.iqr, box.adj, a, b, digits.d)
+    bx <- .bx.stats(x, ID, k.iqr, box_adj, a, b, digits_d)
     txbox <- bx$txstat
     txotl <- bx$txotl
     class(txbox) <- "out"
@@ -194,28 +194,28 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     else
       size.pt <- size  # assign user specified value
 
-    if (j.x.miss) jitter.x <- 1.1 * (1-exp(-0.03*mx.c))
+    if (j.x.miss) jitter_x <- 1.1 * (1-exp(-0.03*mx.c))
     if (j.y.miss) {
       if (!reps) 
-         jitter.y <- ifelse (lx <= 10000,
+         jitter_y <- ifelse (lx <= 10000,
                          -1.644 + 0.579*log(lx), -16.567 + 2.163*log(lx))
       else
-         jitter.y <- -0.722 + 0.845*log(mx.c)
+         jitter_y <- -0.722 + 0.845*log(mx.c)
       jy.adj <- ifelse (rt < 0.18, 0.882 - 4.864*rt, 0)
-      jitter.y <- jitter.y + (jy.adj * jitter.y)   # increases jitter
+      jitter_y <- jitter_y + (jy.adj * jitter_y)   # increases jitter
     } 
 
-    if (grepl("v", vbs.plot) || grepl("s", vbs.plot)) 
-      txprm <- .get.param(size, jitter.y, jitter.x, bw)
+    if (grepl("v", vbs_plot) || grepl("s", vbs_plot)) 
+      txprm <- .get.param(size, jitter_y, jitter_x, bw)
     else
       txprm <- ""
 
     # get freq table for discrete, before jitter, not all x are unique
     txdst <- ""
     if (bin) {
-      h <- .hst.main(x, breaks=breaks, bin.start=bin.start,
-         bin.width=bin.width, bin.end=bin.end, prop=proportion, 
-         quite=quiet, fun.call=NULL, do.plot=FALSE, ...) 
+      h <- .hst.main(x, breaks=breaks, bin_start=bin_start,
+         bin_width=bin_width, bin_end=bin_end, prop=proportion, 
+         quite=quiet, fun_call=NULL, do_plot=FALSE, ...) 
       txdst <- h$ttx
       class(txdst) <- "out"
     }
@@ -228,7 +228,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
       class(txttl) <- "out"
       class(txfrq) <- "out"
       class(txXV) <- "out"
-      output <- list(type="VBS_Plot", call=fun.call,
+      output <- list(type="VBS_Plot", call=fun_call,
         out_title=txttl, out_text=txfrq, out_freq=txdst, out_XV=txXV,
         out_tx=txbox, out_outliers=txotl, out_parm=txprm)
     }
@@ -237,7 +237,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     if (!bin) txdst <- ""  # no freq distribution from histogram
 
     output <- list(type="Violin/Box/ScatterPlot",
-      call=fun.call,  
+      call=fun_call,  
       out_tx=txbox, out_outliers=txotl, out_freq=txdst,
       out_rep=txrep, out_parm=txprm)
     }
@@ -253,7 +253,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     lvl <- levels(by1)
 
     # max number of repetitions for a value of x within a Ycat category
-    # more jitter.x?
+    # more jitter_x?
     mc.w <- max(frq)  # max category within, largest cell size
     rep.t <- integer(length=ncol(frq))
     for (i in 1:ncol(frq)) {
@@ -266,11 +266,11 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
     b.name <- ifelse(by.miss, by1.name, by.name)
     ssstuff <- .ss.numeric(x, by=by1, y.name=b.name,
-                           digits.d=digits.d, brief=TRUE, by1.nm=TRUE)
+                           digits_d=digits_d, brief=TRUE, by1.nm=TRUE)
     txgrp <- ssstuff$tx
     class(txgrp) <- "out"
 
-    #if (n.col.miss && n.row.miss) n.col <- 1
+    #if (n_col.miss && n_row.miss) n_col <- 1
     mx.c <- max(tapply(x, by1, length))
     if (rep.prop > 0.15  &&  mc.w > (.05 * lx))  # many reps?
       reps <- TRUE
@@ -286,11 +286,11 @@ function(x, ID, by1, by1.miss, by0, by.miss,
       if (size.pt < 0.01) size.pt <- 0.01
 
       if (j.y.miss) {
-        jitter.y <-  -1.221 + 0.576*log(mx.c) + 0.032*n.lvl
-        if (jitter.y < 0.5) jitter.y <- 0.5
+        jitter_y <-  -1.221 + 0.576*log(mx.c) + 0.032*n.lvl
+        if (jitter_y < 0.5) jitter_y <- 0.5
       }
-      if (grepl("v", vbs.plot) || grepl("s", vbs.plot)) 
-        txprm <- .get.param(size, jitter.y, jitter.x, bw)
+      if (grepl("v", vbs_plot) || grepl("s", vbs_plot)) 
+        txprm <- .get.param(size, jitter_y, jitter_x, bw)
       else
         txprm <- ""
       output <- list(out_grp=txgrp, out_rep=txrep, out_parm=txprm)
@@ -301,7 +301,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
       if (!by1.miss) {
         mx.c <- max(table(x, by1))
         n.lvl <- nlevels(by1)
-        #if (n.col.miss) n.col <- 1
+        #if (n_col.miss) n_col <- 1
       }
 
       if (is.null(size))
@@ -311,14 +311,14 @@ function(x, ID, by1, by1.miss, by0, by.miss,
       if (size.pt < 0.01) size.pt <- 0.01
 
       if (j.y.miss) {
-        jitter.y <-  -6.261 + 2.012*log(rep.max) + 1.180*n.lvl
-        if (jitter.y < 1.0) jitter.y <- 1.0
+        jitter_y <-  -6.261 + 2.012*log(rep.max) + 1.180*n.lvl
+        if (jitter_y < 1.0) jitter_y <- 1.0
       }
-      if (j.x.miss) jitter.x <- 0.086 + 0.141*log(mx.c)
-      #if (j.x.miss) jitter.x <- 0.086 + 0.141*log(mc.w)
-      if (jitter.x < 0) jitter.x <- 0
-      if (grepl("v", vbs.plot) || grepl("s", vbs.plot)) 
-        txprm <- .get.param(size, jitter.y, jitter.x, bw)
+      if (j.x.miss) jitter_x <- 0.086 + 0.141*log(mx.c)
+      #if (j.x.miss) jitter_x <- 0.086 + 0.141*log(mc.w)
+      if (jitter_x < 0) jitter_x <- 0
+      if (grepl("v", vbs_plot) || grepl("s", vbs_plot)) 
+        txprm <- .get.param(size, jitter_y, jitter_x, bw)
       else
         txprm <- ""
 
@@ -345,7 +345,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
   adj.bx.ht <- ifelse(mx.c == 0, lx, 3*lx)  # adjust the height of the box
 
-  return(list(bw=bw, size.pt=size.pt, jitter.y=jitter.y, jitter.x=jitter.x,
+  return(list(bw=bw, size.pt=size.pt, jitter_y=jitter_y, jitter_x=jitter_x,
               adj.bx.ht=adj.bx.ht))
 
 }

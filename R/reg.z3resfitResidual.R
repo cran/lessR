@@ -1,5 +1,5 @@
 .reg3resfitResidual <-
-function(lm.out, cook, cooks.cut,
+function(lm.out, cook, cooks_cut,
          pdf=FALSE, width=5, height=5, manage.gr=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
@@ -12,19 +12,19 @@ function(lm.out, cook, cooks.cut,
 
   # get largest Cook's distance
   max.cook <- max(cook, na.rm=TRUE)
-  if (max.cook < cooks.cut) {
-    cooks.cut <- floor(max.cook*100)/100
+  if (max.cook < cooks_cut) {
+    cooks_cut <- floor(max.cook*100)/100
     txt <- paste("Largest Cook's Distance, ", .fmt(max.cook,2), 
       ", is highlighted", sep="")
   }
   else
-    txt <- paste("Points with Cook's Distance >", cooks.cut, "are highlighted")
+    txt <- paste("Points with Cook's Distance >", cooks_cut, "are highlighted")
 
 
   # pdf graphics option
   if (pdf) { 
-    pdf.file <- "RegResidFitted.pdf"
-    pdf(file=pdf.file, width=width, height=height)
+    pdf_file <- "RegResidFitted.pdf"
+    pdf(file=pdf_file, width=width, height=height)
   }
 
   # keep track of the plot in this routine
@@ -37,20 +37,20 @@ function(lm.out, cook, cooks.cut,
   # plot of residuals vs fitted
   ord <- order(fit)
   fit.ord <- fit[ord]
-  res.ord <- res[ord]
+  res_ord <- res[ord]
 
-  par(bg=getOption("window.fill"))
+  par(bg=getOption("window_fill"))
 
-  plot(fit.ord, res.ord, type="n", axes=FALSE, ann=FALSE)
+  plot(fit.ord, res_ord, type="n", axes=FALSE, ann=FALSE)
 
   usr <- par("usr")
   rect(usr[1], usr[3], usr[2], usr[4],
-       col=getOption("panel.fill"), border=getOption("panel.color"))
+       col=getOption("panel_fill"), border=getOption("panel_color"))
 
-  abline(v=axTicks(1), col=getOption("grid.x.color"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
-  abline(h=axTicks(2), col=getOption("grid.y.color"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+  abline(v=axTicks(1), col=getOption("grid_x_color"),
+         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
+  abline(h=axTicks(2), col=getOption("grid_y_color"),
+         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
 
   .axes(NULL, NULL, axTicks(1), axTicks(2))
 
@@ -60,23 +60,23 @@ function(lm.out, cook, cooks.cut,
   y.label <- "Residuals"
   .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
 
-  col.fill <- getOption("pt.fill")
-  col.color <- getOption("pt.color")
-  points(fit.ord, res.ord, pch=21, col=col.color, bg=col.fill, cex=0.8)
+  col_fill <- getOption("pt_fill")
+  col_color <- getOption("pt_color")
+  points(fit.ord, res_ord, pch=21, col=col_color, bg=col_fill, cex=0.8)
 
-  abline(h=0, lty="dotted", lwd=1.5, col=getOption("bar.fill.ordered"))
-  lines(lowess(fit.ord, res.ord, f=.9), col=getOption("pt.color"))
-  res.c <- res[which(cook >= cooks.cut)]
-  fit.c <- fit[which(cook >= cooks.cut)]
+  abline(h=0, lty="dotted", lwd=1.5, col=getOption("bar_fill_ordered"))
+  lines(lowess(fit.ord, res_ord, f=.9), col=getOption("pt_color"))
+  res_c <- res[which(cook >= cooks_cut)]
+  fit.c <- fit[which(cook >= cooks_cut)]
   if (length(fit.c) > 0) {
-    col.out <- getOption("pt.color")
-    points(fit.c, res.c, col=col.out, pch=19)
-    text(fit.c, res.c, names(fit.c), pos=1, cex=.8)
+    col.out <- getOption("pt_color")
+    points(fit.c, res_c, col=col.out, pch=19)
+    text(fit.c, res_c, names(fit.c), pos=1, cex=.8)
   }
 
   if (pdf) {
     dev.off()
-    .showfile(pdf.file, "residuals vs. fitted plot")
+    .showfile(pdf_file, "residuals vs. fitted plot")
   }
 
   return(list(i=plt.i, ttl=plt.title))

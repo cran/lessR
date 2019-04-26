@@ -1,9 +1,9 @@
 .reg5Plot <-
-function(lm.out, res.rows=NULL, pred.rows=NULL,
-         scatter.coef=FALSE, X1.new=NULL,
+function(lm.out, res_rows=NULL, pred_rows=NULL,
+         scatter_coef=FALSE, X1_new=NULL,
          numeric.all, in.data.frame, c.int, p.int,
          pdf=FALSE, width=5, height=5, manage.gr=FALSE,
-         scatter.3D, ...) {
+         scatter_3D, ...) {
 
          
   nm <- all.vars(lm.out$terms)  # names of vars in the model
@@ -11,16 +11,16 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
   n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
   n.keep <- nrow(lm.out$model)
-  if (is.null(pred.rows))
-    pred.rows <- ifelse (n.keep < 25, n.keep, 4)
-  if (pred.rows == "all") pred.rows <- n.keep  # no preds with pred.rows=0
+  if (is.null(pred_rows))
+    pred_rows <- ifelse (n.keep < 25, n.keep, 4)
+  if (pred_rows == "all") pred_rows <- n.keep  # no preds with pred_rows=0
 
 
   # pdf graphics option
   if (pdf) { 
-    pdf.file <- "RegScatterplot.pdf"
-    if (n.pred > 1) pdf.file <- "RegScatterMatrix.pdf"
-    pdf(file=pdf.file, width=width, height=height)
+    pdf_file <- "RegScatterplot.pdf"
+    if (n.pred > 1) pdf_file <- "RegScatterMatrix.pdf"
+    pdf(file=pdf_file, width=width, height=height)
   }
 
   # keep track of the plot in this routine
@@ -29,7 +29,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
 
   if (n.pred <= 1) {  # scatterplot, if one predictor variable
 
-    do.predint <- ifelse ((pred.rows==0) || !is.null(X1.new) || is.null(p.int),
+    do.predint <- ifelse ((pred_rows==0) || !is.null(X1_new) || is.null(p.int),
       FALSE, TRUE) 
     if (n.pred > 0) if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
 
@@ -56,12 +56,12 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     y.values <- lm.out$model[,nm[1]]
                
     # scale for regular R or RStudio
-    axis.cex <- 0.76
+    axis_cex <- 0.76
     radius <- 0.22
-    adj <- .RSadj(radius, axis.cex, lab.cex=getOption("lab.cex"))
+    adj <- .RSadj(radius, axis_cex, lab_cex=getOption("lab_cex"))
     radius <- adj$radius
-    size.lab <- getOption("lab.cex")
-    cex.txt <- getOption("axis.cex")
+    size.lab <- getOption("lab_cex")
+    cex.txt <- getOption("axis_cex")
     
     # size of points
     size.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
@@ -77,7 +77,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     rm <- margs$rm
     bm <- margs$bm
       
-    par(bg=getOption("window.fill"))
+    par(bg=getOption("window_fill"))
     par(mai=c(bm, lm, tm, rm))
     
     if (!is.numeric(x.values))
@@ -87,12 +87,12 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
 
     usr <- par("usr")
     rect(usr[1], usr[3], usr[2], usr[4],
-      col=getOption("panel.fill"), border=getOption("panel.color"))
+      col=getOption("panel_fill"), border=getOption("panel_color"))
 
-    abline(v=axTicks(1), col=getOption("grid.x.color"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
-    abline(h=axTicks(2), col=getOption("grid.y.color"),
-         lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+    abline(v=axTicks(1), col=getOption("grid_x_color"),
+         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
+    abline(h=axTicks(2), col=getOption("grid_y_color"),
+         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
 
     if (is.factor(x.values)) {
       x.lvl <- levels(x.values)
@@ -108,8 +108,8 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
         max.lbl.y=3, cex.lab=size.lab) 
 
-    col.fill <- getOption("bar.fill.ordered")
-    col.color <- getOption("pt.color")
+    col_fill <- getOption("bar_fill_ordered")
+    col_color <- getOption("pt_color")
     
     eq.int <- TRUE
     if (is.numeric(x.values)) {
@@ -118,8 +118,8 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
         if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
     }
 
-    if (length(unique(x.values)) > getOption("n.cat")  ||  !eq.int)
-      points(x.values, y.values, pch=21, col=col.color, bg=col.fill, cex=size.pt)
+    if (length(unique(x.values)) > getOption("n_cat")  ||  !eq.int)
+      points(x.values, y.values, pch=21, col=col_color, bg=col_fill, cex=size.pt)
 
     else {
       mytbl <- table(x.values, y.values)  # get the counts, all x-y combinations
@@ -146,7 +146,7 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       sz <- cords[,3]**power  # radius unscaled 
       radius <- 0.25
       symbols(cords$xx, cords$yy, circles=sz, inches=radius,
-          bg=col.fill, fg=col.color, add=TRUE, ...)
+          bg=col_fill, fg=col_color, add=TRUE, ...)
 
       q.ind <- 1:nrow(cords)  # all bubbles get text
       for (i in 1:nrow(cords)) if (cords[i,3] < 5) cords[i,3] <- NA 
@@ -164,12 +164,12 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
     else {  # plot reg line
       if (!is.factor(lm.out$model[,nm[2]])) {
         abline(lm.out$coefficients[1], lm.out$coefficients[2],
-               col=getOption("segment.color"), lwd=1)
+               col=getOption("segment_color"), lwd=1)
       }
     }
 
     if (do.predint) {
-      col.ci <- getOption("segment.color")
+      col.ci <- getOption("segment_color")
       col.pi <- "gray30"
 
       lines(x.values, c.int$lwr, col=col.ci, lwd=0.75)
@@ -183,11 +183,11 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
 
       yy <- c( c(min(c.int$upr),c.int$upr,min(c.int$upr)),
                  rev(c(min(c.int$lwr),c.int$lwr,min(c.int$lwr))) )
-      polygon(xx, yy, col=getOption("se.fill"), border="transparent")
+      polygon(xx, yy, col=getOption("se_fill"), border="transparent")
 
       yy <- c( c(min(p.int$upr),p.int$upr,min(p.int$upr)),
                  rev(c(min(p.int$lwr),p.int$lwr,min(p.int$lwr))) )
-      polygon(xx, yy, col=getOption("ellipse.fill"), border="transparent")
+      polygon(xx, yy, col=getOption("ellipse_fill"), border="transparent")
 
 
     }
@@ -198,9 +198,9 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
       plt.i <- plt.i + 1L
       plt.title[plt.i] <- "ScatterPlot Matrix"
 
-      panel.fill <- getOption("panel.fill")  
-      window.fill <- getOption("window.fill")  
-      bckg <- ifelse(panel.fill=="transparent", window.fill, panel.fill)
+      panel_fill <- getOption("panel_fill")  
+      window_fill <- getOption("window_fill")  
+      bckg <- ifelse(panel_fill=="transparent", window_fill, panel_fill)
       .plt.mat(lm.out$model[c(nm)], fit="lm", col.bg=bckg)
     }
     else {
@@ -214,15 +214,15 @@ function(lm.out, res.rows=NULL, pred.rows=NULL,
   if (pdf) {
     dev.off()
     if (n.pred == 1)
-      .showfile(pdf.file, "scatterplot")
+      .showfile(pdf_file, "scatterplot")
     else
-      .showfile(pdf.file, "scatterplot matrix")
+      .showfile(pdf_file, "scatterplot matrix")
     cat("\n\n")
   }
 
-  if (scatter.3D) {  # 3d scatterplot option for 2-predictor models
+  if (scatter_3D) {  # 3d scatterplot option for 2-predictor models
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "scatter.3D option disabled\n",
+      "scatter_3D option disabled\n",
       "car package no longer included because of dependencies issues\n\n",
       "If interested, directly call the scatter3d function from the car package\n",
       "First install the needed packages, then invoke the library function:\n",

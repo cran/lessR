@@ -1,10 +1,10 @@
 .av.Rmd <-
-function(nm, dname, fun.call, d) {
+function(nm, dname, fun_call, d) {
 
   explain <- TRUE
   results <- TRUE
 
-  fncl <- .fun.call.deparse(fun.call) 
+  fncl <- .fun_call.deparse(fun_call) 
   fc <- .rm.arg("Rmd", fncl) 
 
   if (explain) show <- "" else show <- ", echo=FALSE"

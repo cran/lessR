@@ -1,5 +1,5 @@
 .reg1modelBasic <-
-function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
+function(lm.out, dname="d", digits_d=NULL, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -15,7 +15,7 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
 # estimates, HTs 
   sm <- summary(lm.out)
 
-  if (show.R) {
+  if (show_R) {
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- .dash2(68)
     tx[length(tx)+1] <- "> summary(model)"
@@ -44,7 +44,7 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
   for (icol in 1:6) {
     max.num[icol] <- 0 
     for (i in 1:n.vars) {
-      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits.d + 1
+      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits_d + 1
       if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
     }
     if (max.num[icol] < 9) max.num[icol] <- 9L 
@@ -63,12 +63,12 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE) {
   # output: values row by row
   for (i in 1:(nrow(smc))) {
     rlb <- .fmtc(rownames(smc)[i], buf)
-    est <- .fmt(smc[i,1], digits.d, max.num[1])
-    ste <- .fmt(smc[i,2], digits.d, max.num[2]+1)
+    est <- .fmt(smc[i,1], digits_d, max.num[1])
+    ste <- .fmt(smc[i,2], digits_d, max.num[2]+1)
     tvl <- .fmt(smc[i,3], 3, 8)
     pvl <- .fmt(smc[i,4], 3, 8)
-    lb <- .fmt(smc[i,5], digits.d, max.num[5])
-    ub <- .fmt(smc[i,6], digits.d, max.num[6])
+    lb <- .fmt(smc[i,5], digits_d, max.num[5])
+    ub <- .fmt(smc[i,6], digits_d, max.num[6])
     tx[length(tx)+1] <- paste(rlb, est, ste, tvl, pvl, " ", lb, " ", ub)
   }
 

@@ -15,7 +15,7 @@ For both the one and two-group t-tests, power is calculated from a single sample
 \usage{
 ttestPower(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL, 
          mmd=NULL, msmd=NULL, mdp=.8, mu=NULL, 
-         pdf.file=NULL, width=5, height=5, \ldots)
+         pdf_file=NULL, width=5, height=5, \ldots)
 
 ttp(\ldots)
 }
@@ -36,10 +36,10 @@ ttp(\ldots)
        sufficient power. Default is 0.8. If changed to 0 then the concept is dropped from the analysis.}
   \item{mu}{Hypothesized mean, of which a provided value triggers a one-sample 
        analysis.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
-  \item{\ldots}{Other parameter values, such as \code{lwd} and \code{lab.cex} from \code{\link{plot}}
+  \item{\ldots}{Other parameter values, such as \code{lwd} and \code{lab_cex} from \code{\link{plot}}
         and \code{col.line} and \code{col.bg} from \code{\link{ScatterPlot}}.}
 }
 

@@ -1,33 +1,50 @@
 Regression <-
-function(my.formula, data=d,rows=NULL,
-         digits.d=NULL, standardize=FALSE,
+function(my_formula, data=d, rows=NULL,
+         digits_d=NULL, standardize=FALSE,
 
-         Rmd=NULL, Rmd.format="html", Rmd.browser=TRUE, 
+         Rmd=NULL, Rmd_browser=TRUE, 
+         Rmd_format=c("html", "word", "pdf", "odt", "rtf", "none"),
          results=getOption("results"), explain=getOption("explain"),
          interpret=getOption("interpret"), document=getOption("document"), 
          code=getOption("code"), 
 
-         text.width=120, brief=getOption("brief"), show.R=FALSE,
+         text_width=120, brief=getOption("brief"), show_R=FALSE,
 
-         res.rows=NULL, res.sort=c("cooks","rstudent","dffits","off"), 
-         pred.rows=NULL, pred.sort=c("predint", "off"),
-         subsets=NULL, cooks.cut=1, 
+         res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"), 
+         pred_rows=NULL, pred_sort=c("predint", "off"),
+         subsets=NULL, cooks_cut=1, 
 
-         scatter.coef=TRUE, graphics=TRUE, scatter.3D=FALSE,
+         scatter_coef=TRUE, graphics=TRUE, scatter_3D=FALSE,
 
-         X1.new=NULL, X2.new=NULL, X3.new=NULL, X4.new=NULL, 
-         X5.new=NULL, X6.new=NULL,
+         X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL, 
+         X5_new=NULL, X6_new=NULL,
 
          quiet=getOption("quiet"),
          pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
-         fun.call=NULL, ...) {
+         fun_call=NULL, ...) {
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("digits.d", "Rmd.format", "Rmd.browser", "text.width",
+                "res.rows", "res.sort", "pred.rows", "pred.sort",
+                "cooks.cut", "scatter.coef", "X1.new", "X2.new",
+                "X3.new", "X4.new", "X5.new", "X6.new", "fun.call")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
 
-  if (is.null(fun.call)) fun.call <- match.call()
+  if (is.null(fun_call)) fun_call <- match.call()
 
-  if (missing(my.formula)) {
+  if (missing(my_formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Specify a model by listing it first or specify with:  my.formula\n\n")
+      "Specify a model by listing it first or specify with:  my_formula\n\n")
   }
 
   if (!is.null(Rmd) && brief) {
@@ -79,22 +96,22 @@ function(my.formula, data=d,rows=NULL,
 
 
   # produce actual argument, such as from an abbreviation, and flag if not exist
-  res.sort <- match.arg(res.sort)
-  pred.sort <- match.arg(pred.sort)
+  res_sort <- match.arg(res_sort)
+  pred_sort <- match.arg(pred_sort)
 
   old.opt <- options()
   on.exit(options(old.opt))
 
-  options(width=text.width)
+  options(width=text_width)
 
-  max.new <- 6
+  max_new <- 6
 
   # output
   cor <- TRUE  # do even if only one pred variable
 
   if (brief) {
-    if (is.null(res.rows)) res.rows <- 0L
-    if (is.null(pred.rows)) pred.rows <- 0L
+    if (is.null(res_rows)) res_rows <- 0L
+    if (is.null(pred_rows)) pred_rows <- 0L
     relate <- FALSE
   }
   else
@@ -102,7 +119,7 @@ function(my.formula, data=d,rows=NULL,
 
   if (!mydata.ok) .nodf(df.name)  # does data frame exist?
 
-  nm <- all.vars(my.formula)  # names of vars in the model
+  nm <- all.vars(my_formula)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1L
 
@@ -120,7 +137,7 @@ function(my.formula, data=d,rows=NULL,
   .xcheck(nm, df.name, names(data))  # do variables exist?
 
   # check that variables are not function calls
-  v.str <- deparse(attr(terms.formula(my.formula), which="variables"))
+  v.str <- deparse(attr(terms.formula(my_formula), which="variables"))
   v.str <- substr(v.str, 6, nchar(v.str)-1)  # remove "list(" and ending ")"
   if (grepl("(", v.str, fixed=TRUE))  {
     txtA <- paste("The reference to a variable in the lessR Regression function can\n",
@@ -157,26 +174,26 @@ function(my.formula, data=d,rows=NULL,
         numeric.all <- FALSE
     }
   
-  if ( !is.null(X1.new)  &&  (n.pred) > max.new ) {
+  if ( !is.null(X1_new)  &&  (n.pred) > max_new ) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "No new data for prediction if more than", max.new,
+        "No new data for prediction if more than", max_new,
           "predictor variables.\n\n")
   }
   
-  if ( !is.null(X1.new) && !numeric.all ) {
+  if ( !is.null(X1_new) && !numeric.all ) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "All variables must be numeric to use new data for prediction.\n\n")
   }
 
   # check new.data option for consistency  
   new.data <- FALSE
-  if ( n.pred > 0  &&  n.pred <= max.new ) { 
+  if ( n.pred > 0  &&  n.pred <= max_new ) { 
     for (i in 1:(n.pred)) {
-      pp <- eval(parse(text=paste("X", toString(i),".new",sep="")))
+      pp <- eval(parse(text=paste("X", toString(i),"_new",sep="")))
       if (!is.null(pp)) new.data <- TRUE
     }
     if (new.data) for (i in 1:(n.pred)) {
-      pp <- eval(parse(text=paste("X", toString(i),".new",sep="")))
+      pp <- eval(parse(text=paste("X", toString(i),"_new",sep="")))
       if (is.null(pp)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Specified new data values for one predictor variable, so do for all.\n\n")
@@ -191,15 +208,15 @@ function(my.formula, data=d,rows=NULL,
     data <- data[o,]
   }
 
-  if (is.null(digits.d)) digits.d <- .getdigits(data[,nm[1]], 3)
-  options(digits.d=digits.d) 
+  if (is.null(digits_d)) digits_d <- .getdigits(data[,nm[1]], 3)
+  options(digits_d=digits_d) 
 
 
   # standardize option
   if (standardize) {
     stnd.flag <- TRUE
     for (i in 1:n.vars)
-      data[,nm[i]] <- round(scale(data[,nm[i]]), digits.d)
+      data[,nm[i]] <- round(scale(data[,nm[i]]), digits_d)
   }
   else
     stnd.flag <- FALSE
@@ -215,8 +232,8 @@ function(my.formula, data=d,rows=NULL,
   # reg analysis
   #   all analysis done on data in model construct lm.out$model
   #   this model construct contains only model vars, with Y listed first
-  #assign("lm.out", lm(my.formula, data=data), pos=.GlobalEnv)
-  lm.out <- lm(my.formula, data=data)
+  #assign("lm.out", lm(my_formula, data=data), pos=.GlobalEnv)
+  lm.out <- lm(my_formula, data=data)
 
   if (lm.out$rank < n.vars) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -224,7 +241,7 @@ function(my.formula, data=d,rows=NULL,
   }
  
   # replace a factor with indicator variables in data frame
-  #mm <- model.matrix(my.formula, data=data)
+  #mm <- model.matrix(my_formula, data=data)
   #mf.out <- data.frame(lm.out$model[,1], mm[,2:ncol(mm)])
   #names(mf.out)[1] <- nm[1]
       
@@ -233,20 +250,20 @@ function(my.formula, data=d,rows=NULL,
 
 
   title_bck <- "  BACKGROUND"
-  bck <- .reg1bckBasic(lm.out, df.name, digits.d, show.R, n.obs, n.keep, stnd.flag)
+  bck <- .reg1bckBasic(lm.out, df.name, digits_d, show_R, n.obs, n.keep, stnd.flag)
   tx1bck <- bck$tx
 
 
   title_basic <- "  BASIC ANALYSIS"
-  est <- .reg1modelBasic(lm.out, df.name, digits.d, show.R)
+  est <- .reg1modelBasic(lm.out, df.name, digits_d, show_R)
   tx1est <- est$tx
   sterrs <- est$sterrs
 
-  anv <- .reg1anvBasic(lm.out, df.name, digits.d, show.R)
+  anv <- .reg1anvBasic(lm.out, df.name, digits_d, show_R)
   tx1anv <- anv$tx 
   MSW <- anv$MSW
 
-  fit <- .reg1fitBasic(lm.out, df.name, anv$tot["ss"], digits.d, show.R)
+  fit <- .reg1fitBasic(lm.out, df.name, anv$tot["ss"], digits_d, show_R)
   tx1fit <- fit$tx
 
 
@@ -258,7 +275,7 @@ function(my.formula, data=d,rows=NULL,
       max.sublns <- subsets
       subsets <- TRUE
     }
-    rel <- .reg2Relations(lm.out, df.name, n.keep, show.R,
+    rel <- .reg2Relations(lm.out, df.name, n.keep, show_R,
          cor, collinear, subsets, max.sublns, numeric.all, in.data.frame,
          sterrs, MSW)
     tx2cor <- rel$txcor
@@ -274,16 +291,16 @@ function(my.formula, data=d,rows=NULL,
   
 
   title_res <- "  RESIDUALS AND INFLUENCE"
-  if (is.null(res.rows)) res.rows <- ifelse (n.keep < 20, n.keep, 20) 
-  if (res.rows == "all") res.rows <- n.keep  # turn off resids with res.rows=0
+  if (is.null(res_rows)) res_rows <- ifelse (n.keep < 20, n.keep, 20) 
+  if (res_rows == "all") res_rows <- n.keep  # turn off resids with res_rows=0
 
   cook <- round(cooks.distance(lm.out), 5)
 
   tx3res <- ""
   resid.max <- NA
-  if (res.rows > 0) {
+  if (res_rows > 0) {
 
-    res <- .reg3txtResidual(lm.out, cook, digits.d, res.sort, res.rows, show.R)
+    res <- .reg3txtResidual(lm.out, cook, digits_d, res_sort, res_rows, show_R)
     tx3res <- res$tx
     if (!is.na(res$resid.max[1])) resid.max <- round(res$resid.max,3)
 
@@ -302,35 +319,35 @@ function(my.formula, data=d,rows=NULL,
 
       
       if (manage.gr && !pdf) dev.set(which=4)
-      fr <- .reg3resfitResidual(lm.out, cook, cooks.cut,
+      fr <- .reg3resfitResidual(lm.out, cook, cooks_cut,
                  pdf, width, height, manage.gr)
       for (i in (plot.i+1):(plot.i+fr$i)) plot.title[i] <- fr$ttl[i-plot.i]
       crfitres <- fr$crfitres
       plot.i <- plot.i + fr$i
     } # graphics
 
-  }  # res.rows > 0
+  }  # res_rows > 0
 
  
   title_pred <- "  FORECASTING ERROR"
   # scatter plot(s)
-  if (is.null(pred.rows)) pred.rows <- ifelse (n.keep < 25, n.keep, 10) 
-  if (pred.rows == "all") pred.rows <- n.keep  # turn off preds with pred.rows=0
+  if (is.null(pred_rows)) pred_rows <- ifelse (n.keep < 25, n.keep, 10) 
+  if (pred_rows == "all") pred_rows <- n.keep  # turn off preds with pred_rows=0
 
   tx3prd <- ""
   predmm <- NA
-  if (pred.rows > 0) {
+  if (pred_rows > 0) {
     prd <- .reg4Pred(lm.out, brief,
-         n.keep, digits.d, show.R,
-         new.data, pred.sort, pred.rows, scatter.coef,
-         in.data.frame, X1.new, X2.new, X3.new, X4.new, X5.new, X6.new)
+         n.keep, digits_d, show_R,
+         new.data, pred_sort, pred_rows, scatter_coef,
+         in.data.frame, X1_new, X2_new, X3_new, X4_new, X5_new, X6_new)
     tx3prd <- prd$tx
     predmm <- prd$predmm
   }
 
     if (graphics) {
       if (manage.gr && !pdf) {
-        if (res.rows > 0  &&  n.pred > 0)  # already did two plots 
+        if (res_rows > 0  &&  n.pred > 0)  # already did two plots 
           dev.set(which=5) 
         else {
           .graphwin(1, width, height)  #  only plot is a scatterplot
@@ -339,9 +356,9 @@ function(my.formula, data=d,rows=NULL,
       }
    
       if ((numeric.all || n.pred==1) && in.data.frame) {
-        splt <- .reg5Plot(lm.out, res.rows, pred.rows, scatter.coef, 
-           X1.new, numeric.all, in.data.frame, prd$cint, prd$pint,
-           pdf, width, height, manage.gr, scatter.3D, ...)
+        splt <- .reg5Plot(lm.out, res_rows, pred_rows, scatter_coef, 
+           X1_new, numeric.all, in.data.frame, prd$cint, prd$pint,
+           pdf, width, height, manage.gr, scatter_3D, ...)
 
         for (i in (plot.i+1):(plot.i+splt$i)) plot.title[i] <- splt$ttl[i-plot.i]
         plot.i <- plot.i + splt$i
@@ -374,46 +391,82 @@ function(my.formula, data=d,rows=NULL,
 
   # R Markdown
   txRmd <- ""
+  txWeb <- ""
+  txWrd <- ""
+  txpdf <- ""
+  txodt <- ""
+  txrtf <- ""
   if (!is.null(Rmd)) {
-    new.val <- matrix(nrow=n.pred, ncol=2, byrow=TRUE)
 
-    # get some (generally) unique values for each pred to demo X1.new ...
-    if (n.pred <= max.new  &&  numeric.all  &&  is.null(X1.new)) {
+    # get some (generally) unique values for each pred to demo X1_new ...
+    new.val <- matrix(nrow=n.pred, ncol=2, byrow=TRUE)
+    if (n.pred <= max_new  &&  numeric.all  &&  is.null(X1_new)) {
       for (i in 1:n.pred) {
         v <- sort(data[,nm[i+1]])
 
         # get new lower value
-        min.v <- min(v, na.rm=TRUE)
+        min_v <- min(v, na.rm=TRUE)
         test.v <- round(quantile(v, prob=.25)[1])
         while(test.v %in% v)
-          if (test.v > min.v) test.v <- test.v - 1 else break 
-        new.val[i,1] <- ifelse (test.v == min.v, round(test.v - 1), round(test.v))
-        if (min.v==0  &&  test.v==0) new.val[i,1] <- 0  # don't go neg here
+          if (test.v > min_v) test.v <- test.v - 1 else break 
+        new.val[i,1] <- ifelse (test.v == min_v, round(test.v-1), round(test.v))
+        if (min_v==0  &&  test.v==0) new.val[i,1] <- 0  # don't go neg here
       
         # get new upper value
         max.v <- max(v, na.rm=TRUE)
         test.v <- round(quantile(v, prob=.75)[1])
         while(test.v %in% v) 
           if (test.v < max.v) test.v <- test.v + 1 else break 
-        new.val[i,2] <- ifelse (test.v == max.v, round(test.v + 1), round(test.v))
+        new.val[i,2] <- ifelse (test.v == max.v, round(test.v+1), round(test.v))
       }
-    }
+    }  # new.val
     
-    txknt <- .reg.Rmd(nm, df.name, fun.call, res.rows, pred.rows,
-        res.sort, digits.d, results, explain, interpret, document, code,
-        est$pvalues, tol,
-        resid.max, numeric.all, X1.new, new.val)
+    # generate and write Rmd file
+    txknt <- .reg.Rmd(nm, df.name, fun_call, res_rows, pred_rows,
+        res_sort, digits_d, results, explain, interpret, document, code,
+        est$pvalues, tol, resid.max, numeric.all, X1_new, new.val)
     if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
-    cat(txknt, file=Rmd, sep="\n")
+    cat(txknt, file=Rmd, sep="\n") 
     txRmd <- .showfile2(Rmd, "R Markdown file")
 
-    if (pandoc_available()) {
+    if (rmarkdown::pandoc_available()) {
       pandocYN <- TRUE
-      if (!grepl("_document", Rmd.format))
-        Rmd.format <- paste(Rmd.format, "_document", sep="")
-      render(Rmd, quiet=TRUE, output_format=Rmd.format)
-      if (Rmd.browser) browseURL(sub("Rmd", "html", Rmd, fixed=TRUE))
-    }
+      Rmd_format <- tolower(Rmd_format)
+
+      # render R markdown to current working dir for each specified doc type
+      for (i in 1:length(Rmd_format)) {
+        if (Rmd_format[i] != "none") {
+          Rmd_format[i] <- paste(Rmd_format[i], "_document", sep="")
+          rmarkdown::render(Rmd, quiet=TRUE, output_format=Rmd_format[i])
+        }
+        do_Web <- ifelse (grepl("html", Rmd_format[i]), TRUE, FALSE)
+        do_Wrd <- ifelse (grepl("word", Rmd_format[i]), TRUE, FALSE)
+        do_pdf <- ifelse (grepl("pdf", Rmd_format[i]), TRUE, FALSE)
+        do_odt <- ifelse (grepl("odt", Rmd_format[i]), TRUE, FALSE)
+        do_rtf <- ifelse (grepl("rtf", Rmd_format[i]), TRUE, FALSE)
+        if (do_Web) {
+          fname <- sub("Rmd", "html", Rmd, fixed=TRUE)
+          txWeb <- .showfile2(fname, "rendered HTML file for a web browser")
+          if (Rmd_browser) browseURL(fname)
+        }
+        if (do_Wrd) {
+          fname <- sub("Rmd", "docx", Rmd, fixed=TRUE)
+          txWrd <- .showfile2(fname, "rendered MS Word file")
+        }
+        if (do_pdf) {
+          fname <- sub("Rmd", "pdf", Rmd, fixed=TRUE)
+          txpdf <- .showfile2(fname, "rendered pdf file")
+        }
+        if (do_odt) {
+          fname <- sub("Rmd", "odt", Rmd, fixed=TRUE)
+          txodt <- .showfile2(fname, "rendered odt file")
+        }
+        if (do_rtf) {
+          fname <- sub("Rmd", "rtf", Rmd, fixed=TRUE)
+          txrtf <- .showfile2(fname, "rendered rtf file")
+        }
+      }
+    }  # is pandoc
     else {
       message("\n",
       "R Markdown (Rmd) file created\n",
@@ -434,7 +487,7 @@ function(my.formula, data=d,rows=NULL,
   txsug <- ""
   if (getOption("suggest")) {
     # function call for suggestions
-    fncl <- .fun.call.deparse(fun.call) 
+    fncl <- .fun_call.deparse(fun_call) 
     fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
     fncl <- gsub(" = ", "=", fncl)
     fncl <- gsub("reg.brief", "reg", fncl)
@@ -472,11 +525,15 @@ function(my.formula, data=d,rows=NULL,
   class(txplt) <- "out"
   class(txref) <- "out"
   class(txRmd) <- "out"
+  class(txWrd) <- "out"
+  class(txpdf) <- "out"
+  class(txodt) <- "out"
+  class(txrtf) <- "out"
   
   output <- list(
     out_suggest=txsug,
     
-    call=fun.call, formula=my.formula,
+    call=fun_call, formula=my_formula,
 
     out_title_bck=title_bck, out_background=tx1bck,
 
@@ -489,8 +546,8 @@ function(my.formula, data=d,rows=NULL,
     out_title_res=title_res, out_residuals=tx3res,
     out_title_pred=title_pred, out_predict=tx3prd,
 
-    out_ref=txref, out_Rmd=txRmd, out_plots=txplt,
-
+    out_ref=txref, out_Rmd=txRmd, out_Word=txWrd, out_pdf=txpdf,
+                   out_odt=txodt, out_rtf=txrtf, out_plots=txplt,
     n.vars=bck$n.vars, n.obs=bck$n.obs, n.keep=n.keep, 
     coefficients=est$estimates, sterrs=est$sterrs, tvalues=est$tvalues,
     pvalues=est$pvalues, cilb=est$cilb, ciub=est$ciub,

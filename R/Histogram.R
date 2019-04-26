@@ -1,42 +1,70 @@
 Histogram <-
 function(x=NULL, data=d, rows=NULL,
-         stat.x=c("count", "proportion"),
-         n.cat=getOption("n.cat"), Rmd=NULL,
+         stat_x=c("count", "proportion"),
+         n_cat=getOption("n_cat"), Rmd=NULL,
 
     by1=NULL, by2=NULL,
-    n.row=NULL, n.col=NULL, aspect="fill",
+    n_row=NULL, n_col=NULL, aspect="fill",
 
-    bin.start=NULL, bin.width=NULL, bin.end=NULL, breaks="Sturges",
+    bin_start=NULL, bin_width=NULL, bin_end=NULL, breaks="Sturges",
 
     theme=getOption("theme"),
-    fill=getOption("bar.fill.ordered"),
-    color=getOption("bar.color.ordered"),
-    trans=getOption("trans.bar.fill"),
+    fill=getOption("bar_fill_ordered"),
+    color=getOption("bar_color_ordered"),
+    trans=getOption("trans_bar_fill"),
 
     values=FALSE,
     reg="snow2", cumulate=c("off", "on", "both"),
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    lab.adj=c(0,0), margin.adj=c(0,0,0,0),
+    lab_adj=c(0,0), margin_adj=c(0,0,0,0),
 
-    rotate.x=getOption("rotate.x"), rotate.y=getOption("rotate.y"),
+    rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
-    scale.x=NULL, scale.y=NULL,
+    scale_x=NULL, scale_y=NULL,
 
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-    eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"), do.plot=TRUE,
+    eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"), do_plot=TRUE,
     width=6, height=6, pdf=FALSE, 
-    fun.call=NULL, ...) {
+    fun_call=NULL, ...) {
 
 
-  if (is.null(fun.call)) fun.call <- match.call()
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("stat.x", "stat.y", "n.cat", "n.row", "n.col",
+                "bin.start", "bin.width", "bin.end", "lab.adj", "margin.adj",
+                "rotate.x", "rotate.y", "scale.x", "scale.y",  
+                "digits.d", "fun.call", "do.plot")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (length(grep(".", names(dots)[i], fixed=TRUE)) > 0) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
+
+  if (is.null(fun_call)) fun_call <- match.call()
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumulate <- match.arg(cumulate)
 
-  stat.x <- match.arg(stat.x)
-  proportion <- ifelse (stat.x == "proportion", TRUE, FALSE)   # old signal
+  stat_x <- match.arg(stat_x)
+  proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -48,48 +76,48 @@ function(x=NULL, data=d, rows=NULL,
 
   if (theme != getOption("theme")) {
     sty <- style(theme, reset=FALSE)
-    fill <- sty$bar$bar.fill.ordered
-    color <- sty$bar$color.ordered
-    trans <- sty$bar$trans.fill
+    fill <- sty$bar$bar_fill_ordered
+    color <- sty$bar$color_ordered
+    trans <- sty$bar$trans_fill
   }
 
   if (missing(fill))
-    fill <- ifelse (is.null(getOption("bar.fill.ordered")), 
-      getOption("bar.fill"), getOption("bar.fill.ordered"))
+    fill <- ifelse (is.null(getOption("bar_fill_ordered")), 
+      getOption("bar_fill"), getOption("bar_fill_ordered"))
 
-  if (!is.null(scale.x)) if (length(scale.x) != 3)  {
+  if (!is.null(scale_x)) if (length(scale_x) != 3)  {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Starting value, ending value, and number of intervals\n",
-      "  must all be specified as a vector, e.g., scale.x=c(0, 9 , 5)\n\n")
+      "  must all be specified as a vector, e.g., scale_x=c(0, 9 , 5)\n\n")
   }
 
-  if (!is.null(scale.y)) if (length(scale.y) != 3)  {
+  if (!is.null(scale_y)) if (length(scale_y) != 3)  {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Starting value, ending value, and number of intervals\n",
-      "  must all be specified as a vector, e.g., scale.y=c(0, 9 , 5)\n\n")
+      "  must all be specified as a vector, e.g., scale_y=c(0, 9 , 5)\n\n")
   }
 
-  panel.fill <- getOption("panel.fill")
-  panel.color <- getOption("panel.color")
-  grid.color <- getOption("grid.color")
-  lab.color <- getOption("lab.color")
-  lab.cex <- getOption("lab.cex")
-  axis.cex <- getOption("axis.cex") 
+  panel_fill <- getOption("panel_fill")
+  panel_color <- getOption("panel_color")
+  grid_color <- getOption("grid_color")
+  lab_color <- getOption("lab_color")
+  lab_cex <- getOption("lab_cex")
+  axis_cex <- getOption("axis_cex") 
 
   fill[which(fill == "off")] <- "transparent"
   color[which(color == "off")] <- "transparent"
 
   Trellis <- ifelse(!missing(by1), TRUE, FALSE)
   
-  xlab.adj <- lab.adj[1];   ylab.adj <- lab.adj[2]
-  tm.adj <- margin.adj[1];  rm.adj <- margin.adj[2]
-  bm.adj <- margin.adj[3];  lm.adj <- margin.adj[4]
+  xlab_adj <- lab_adj[1];   ylab_adj <- lab_adj[2]
+  tm.adj <- margin_adj[1];  rm.adj <- margin_adj[2]
+  bm.adj <- margin_adj[3];  lm.adj <- margin_adj[4]
 
   .param.old(...)
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval.df))  # default values
-    eval.df <- ifelse (shiny, FALSE, TRUE)
+  if (is.null(eval_df))  # default values
+    eval_df <- ifelse (shiny, FALSE, TRUE)
 
   # get actual variable name before potential call of data$x
   if (!missing(x))  # can't do is.null or anything else with x until evaluated
@@ -137,7 +165,7 @@ function(x=NULL, data=d, rows=NULL,
 
     # x not in global env, in df, specify data= forces to data frame
     if (!x.in.global) {
-      if (eval.df) {
+      if (eval_df) {
         if(!mydata.ok) .nodf(df.name)  # check to see if data frame container exists 
         .xcheck(x.name, df.name, names(data))  # x-vars in df?
       }
@@ -247,12 +275,12 @@ function(x=NULL, data=d, rows=NULL,
   # ---------------
   # do the analysis
 
-  if (Trellis && do.plot) {
+  if (Trellis && do_plot) {
 
-    .bar.lattice(data.x[,1], by1.call, by2.call, n.row, n.col, aspect, 
+    .bar.lattice(data.x[,1], by1.call, by2.call, n_row, n_col, aspect, 
                  proportion, fill, color, trans, size.pt=NULL,
-                 xlab, ylab, main, rotate.x, offset,
-                 width, height, pdf, segments.x=NULL, breaks, c.type="hist",
+                 xlab, ylab, main, rotate_x, offset,
+                 width, height, pdf, segments_x=NULL, breaks, c.type="hist",
                  quiet)
   }
 
@@ -265,7 +293,7 @@ function(x=NULL, data=d, rows=NULL,
     if (manage.gr && !shiny) {
       i.win <- 0
       for (i in 1:ncol(data)) {
-        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat)) 
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n_cat)) 
           i.win <- i.win + 1
       }
       .graphwin(i.win, d.w=width, d.h=height)
@@ -290,7 +318,7 @@ function(x=NULL, data=d, rows=NULL,
 
       if (is.numeric(data[,i])) {
         # let 1 variable go through, even if num.cat
-        if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
+        if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n_cat)) {
 
         if (pdf) {
           pdf.fnm <- paste("Hist", "_", x.name, ".pdf", sep="") 
@@ -309,20 +337,20 @@ function(x=NULL, data=d, rows=NULL,
         }
 
         txss <- ""
-        ssstuff <- .ss.numeric(data[,i], digits.d=digits.d,
+        ssstuff <- .ss.numeric(data[,i], digits_d=digits_d,
           brief=TRUE)
         txss <- ssstuff$tx
 
         # nothing returned if quiet=TRUE
 
         stuff <- .hst.main(data[,i], fill, color, trans, reg,
-            rotate.x, rotate.y, offset,
-            breaks, bin.start, bin.width,
-            bin.end, proportion, values, cumulate, xlab, ylab, main, sub, 
-            xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+            rotate_x, rotate_y, offset,
+            breaks, bin_start, bin_width,
+            bin_end, proportion, values, cumulate, xlab, ylab, main, sub, 
+            xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
             add, x1, x2, y1, y2,
-            scale.x, scale.y,
-            quiet, do.plot, fun.call=fun.call, ...)
+            scale_x, scale_y,
+            quiet, do_plot, fun_call=fun_call, ...)
 
         txsug <- stuff$txsug
         if (is.null(txsug)) txsug <- ""
@@ -347,9 +375,9 @@ function(x=NULL, data=d, rows=NULL,
           if (!quiet) .showfile(pdf.fnm, "Histogram")
         }
 
-      }  # nu > n.cat
+      }  # nu > n_cat
       else
-        if (!quiet) .ncat("Histogram", x.name, nu, n.cat)
+        if (!quiet) .ncat("Histogram", x.name, nu, n_cat)
 
       }  # is.numeric(data[,i])
     }  # end for
@@ -369,7 +397,7 @@ function(x=NULL, data=d, rows=NULL,
       txkfl <- ""
       if (!is.null(Rmd)) {
         if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
-        txknt <- .dist.Rmd(x.name, df.name, fun.call, digits.d)
+        txknt <- .dist.Rmd(x.name, df.name, fun_call, digits_d)
         cat(txknt, file=Rmd, sep="\n")
         txkfl <- .showfile2(Rmd, "R Markdown instructions")
       }
@@ -381,10 +409,10 @@ function(x=NULL, data=d, rows=NULL,
       class(txkfl) <- "out"
 
       output <- list(type="Histogram",
-        call=fun.call, 
+        call=fun_call, 
         out_suggest=txsug, out_ss=txss, out_outliers=txotl, out_freq=txdst,
         out_file=txkfl,
-        bin.width=stuff$bin.width, n.bins=stuff$n.bins,
+        bin_width=stuff$bin_width, n.bins=stuff$n.bins,
         breaks=stuff$breaks,
         mids=stuff$mids, counts=stuff$counts, prop=stuff$prop,
         cumulate=stuff$counts_cum, cprop=stuff$prop_cum)
@@ -396,7 +424,7 @@ function(x=NULL, data=d, rows=NULL,
       stuff$out_outliers <- txotl  # after to class out for line breaks
       stuff$out_summary <- txss
       stuff$out_freq <- txdst
-      names(stuff) <- c("out_suggest", "out_freq", "bin.width", "n.bins",
+      names(stuff) <- c("out_suggest", "out_freq", "bin_width", "n.bins",
               "breaks", "mids", "counts", "prop", "cumulate", "cprop",
               "out_summary", "out_outliers")
       stuff <- c(stuff[1], stuff[11], stuff[2], stuff[12], stuff[3], stuff[4],

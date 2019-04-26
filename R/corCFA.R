@@ -6,31 +6,44 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
          labels=c("include", "exclude", "only"),
 
-         min.cor=.10, min.res=.05, iter=50, grid=TRUE, 
+         min_cor=.10, min_res=.05, iter=50, grid=TRUE, 
 
-         resid=TRUE, item.cor=TRUE, sort=TRUE,
+         resid=TRUE, item_cor=TRUE, sort=TRUE,
 
-         main=NULL, heat.map=TRUE, bottom=3, right=3, 
+         main=NULL, heat_map=TRUE, bottom=3, right=3, 
 
-         pdf.file=NULL, width=5, height=5,
+         pdf_file=NULL, width=5, height=5,
 
          F1=NULL, F2=NULL, F3=NULL, F4=NULL, F5=NULL,
          F6=NULL, F7=NULL, F8=NULL, F9=NULL, F10=NULL,
          F11=NULL, F12=NULL,
 
-         fun.call=NULL) {
+         fun_call=NULL, ...) {
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("min.cor", "min.res", "heat.map", "pdf.file")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   if (exists(deparse(substitute(data)), where=.GlobalEnv, inherits=FALSE)) 
     dname <- deparse(substitute(data))
   else
     dname <- NULL
 
-  if (is.null(fun.call)) fun.call <- match.call()
+  if (is.null(fun_call)) fun_call <- match.call()
 
   labels <- match.arg(labels)
 
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+  if (!is.null(pdf_file))
+    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
 
   max.fname <- 0
   if (!is.null(fac.names)) {
@@ -40,7 +53,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
   if (is.null(dname)  &&  !is.null(Rmd)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Need to read from the data table (frame) to generate a Rmd. \n\n")
+      "Need to read from the data table (frame) to generate a Rmd_ \n\n")
   }
 
   if (labels!="only") {
@@ -210,7 +223,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
   # re-order R matrix
 
   outR <- x[Label,Label]
-  nm.new <- colnames(outR)
+  nm_new <- colnames(outR)
 
   # get width of largest variable (item) name
   cc <- as.character(dimnames(outR)[[1]])
@@ -241,7 +254,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
   # assign factor names
   nm  <- character(length=NVTot)
-  nm <- c(nm.new, nmF)
+  nm <- c(nm_new, nmF)
   dimnames(out$R) <- list(nm, nm)
 
 
@@ -265,7 +278,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
     outR <- x[Label,Label]
 
-    nm.new <- colnames(outR)
+    nm_new <- colnames(outR)
 
     # expand R matrix to include rows/cols for factors
     rr <- matrix(rep(0, NF*NItems), nrow=NF)
@@ -286,15 +299,15 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
     # assign names
     nm  <- character(length=NVTot)
-    nm <- c(nm.new, nmF)
+    nm <- c(nm_new, nmF)
     dimnames(out$R) <- list(nm, nm)
   }
 
   # --------------------------------------------------------
-  if (heat.map) {
+  if (heat_map) {
     if (is.null(main)) main <- "Item Correlations/Communalities"
    .corcolors(out$R, NItems, main, bottom, right, diag=NULL,
-              pdf.file, width, height)
+              pdf_file, width, height)
   }
 
 
@@ -306,7 +319,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
   anyLabels <- FALSE
   for (i in 1:NItems) {
-    options(xname = nm.new[i])
+    options(xname = nm_new[i])
     if (!is.null(.getlabels()$xl)) anyLabels <- TRUE
   }
 
@@ -316,13 +329,13 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
       tx[length(tx)] <- paste(tx[length(tx)], " - ", fac.names[i], sep="")
     if (!anyLabels) { # horizontal
       for (j in LblCut[i,1]:LblCut[i,2])
-      tx[length(tx)] <- paste(tx[length(tx)], " ", nm.new[j])
+      tx[length(tx)] <- paste(tx[length(tx)], " ", nm_new[j])
     }
     else {  # vertical
       tx[length(tx)+1] <- .dash2(30)
       for (j in LblCut[i,1]:LblCut[i,2]) {   
-        options(xname = nm.new[j])
-        tx[length(tx)+1] <- paste(nm.new[j], ": ", xW(.getlabels()$xl), sep="")
+        options(xname = nm_new[j])
+        tx[length(tx)+1] <- paste(nm_new[j], ": ", xW(.getlabels()$xl), sep="")
       }
     }
     if (i < NF) tx[length(tx)+1] <- ""
@@ -399,7 +412,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
         else
           unq <- .fmt(Unique,3,7)
 
-        tx[length(tx)+1] <- paste(.fmtc(Fnm,3), .fmtc(nm.new[Item],max.chr),
+        tx[length(tx)+1] <- paste(.fmtc(Fnm,3), .fmtc(nm_new[Item],max.chr),
               .fmt(Lam,3,7), unq, "   ")
 
         if (Lam>0 && Unique>0) {
@@ -440,10 +453,10 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
   # print the solution
   if(grid) boundary <- LblCut[,2] else boundary <-  NULL
-  if (item.cor)
-    txcrs <- .prntbl(out$R, 2, cut=min.cor, cc=NULL, cors=TRUE, bnd=boundary)
+  if (item_cor)
+    txcrs <- .prntbl(out$R, 2, cut=min_cor, cc=NULL, cors=TRUE, bnd=boundary)
   else
-    txcrs <- .prntbl(out$R[1:NVTot,(NItems+1):NVTot], 2, cut=min.cor,
+    txcrs <- .prntbl(out$R[1:NVTot,(NItems+1):NVTot], 2, cut=min_cor,
                      cc=NULL, cors=TRUE, bnd=boundary)
   for (i in 1:length(txcrs)) tx[length(tx)+1] <- txcrs[i]
 
@@ -479,7 +492,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
     if (is.null(options()$knitr.in.progress))
       tx[length(tx)+1] <- "Item residuals\n"
 
-    txcrs <- .prntbl(res, 2, cut=min.res, cc=NULL, cors=TRUE, bnd=boundary)
+    txcrs <- .prntbl(res, 2, cut=min_res, cc=NULL, cors=TRUE, bnd=boundary)
     for (i in 1:length(txcrs)) tx[length(tx)+1] <- txcrs[i]
 
     txres <- tx
@@ -496,7 +509,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
         .fmtc(" ", max.chr+2), "-------   ---------", sep="")
 
     cc <- as.character(dimnames(res)[[1]])
-    res.avg <- double(length=NItems)
+    res_avg <- double(length=NItems)
 
     ssq.tot <- 0
     abv.tot <- 0
@@ -510,9 +523,9 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
         abv.all <- abv.all + abs(res[i,j])
       }
       ssq.tot <- ssq.tot + ssq
-      res.avg[i] <- abv / (NItems - 1)
+      res_avg[i] <- abv / (NItems - 1)
       tx[length(tx)+1] <- paste(.fmtc(cc[i],max.chr), "  ", .fmt(ssq,3), "  ",
-                                .fmt(res.avg[i],3))
+                                .fmt(res_avg[i],3))
     }
     abv.all.tot <- abv.all / (NItems^2 - NItems)
     tx[length(tx)+1] <- ""
@@ -551,9 +564,9 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
       for (j in LblCut[i,1]:LblCut[i,2]) {
         if (j == LblCut[i,1])
-          tx[length(tx)] <- paste(tx[length(tx)], " ", nm.new[j], sep="")
+          tx[length(tx)] <- paste(tx[length(tx)], " ", nm_new[j], sep="")
         else  
-          tx[length(tx)] <- paste(tx[length(tx)], "+", nm.new[j])
+          tx[length(tx)] <- paste(tx[length(tx)], "+", nm_new[j])
       }
     }
     tx[length(tx)+1] <- paste("\"\n")
@@ -584,8 +597,8 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
   txkfl <- ""
   if (!is.null(Rmd)) {
     if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
-    txknt <- .corfa.Rmd(mimm, nm.mimm, dname, fun.call, NItems, NF,
-                 iter, item.cor, explain, interpret, results)
+    txknt <- .corfa.Rmd(mimm, nm.mimm, dname, fun_call, NItems, NF,
+                 iter, item_cor, explain, interpret, results)
     cat(txknt, file=Rmd, sep="\n")
     txkfl <- .showfile2(Rmd, "R Markdown instructions")
   }
@@ -606,7 +619,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
   class(txkfl) <- "out"
 
   output <- list(
-    call=fun.call,
+    call=fun_call,
 
     out_title_scales=title_scales, out_labels=txlbl,
     out_title_rel=title_rel, out_reliability=txrel,

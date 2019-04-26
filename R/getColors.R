@@ -1,30 +1,43 @@
 getColors <-
-function(pal=NULL, end.pal=NULL,
+function(pal=NULL, end_pal=NULL,
          n=12, h=0, h2=NULL, c=NULL, l=NULL, trans=0,
-         in.order=NULL, fixup=TRUE, power=NULL,
+         in_order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
-         main=NULL, labels=NULL, labels.cex=0.8, lty="solid",
+         main=NULL, labels=NULL, labels_cex=0.8, lty="solid",
          output=NULL, quiet=getOption("quiet"), ...) {
 
 
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("end.pal", "in.order", "labels.cex")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
+
   shape <- match.arg(shape)
 
-  miss.h <- ifelse (missing(h), TRUE, FALSE)
-  miss.l <- ifelse (missing(l), TRUE, FALSE)
-  miss.c <- ifelse (missing(c), TRUE, FALSE)
+  miss_h <- ifelse (missing(h), TRUE, FALSE)
+  miss_l <- ifelse (missing(l), TRUE, FALSE)
+  miss_c <- ifelse (missing(c), TRUE, FALSE)
 
-  if (!is.null(end.pal) && length(pal) > 1) {
+  if (!is.null(end_pal) && length(pal) > 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "To specify a sequence of colors, only specify one beginning color\n\n")
   }
 
-  if (is.null(in.order))
-    in.order <- ifelse (shape == "wheel", TRUE, FALSE)  # for a wheel do in order
+  if (is.null(in_order))
+    in_order <- ifelse (shape == "wheel", TRUE, FALSE)  # for a wheel do in order
 
-  if (!missing(h2)  &&  in.order == FALSE) {
+  if (!missing(h2)  &&  in_order == FALSE) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
        "h2 only applies to generate a straight sequence of HCL colors\n",
-       "  so in.order must be TRUE\n\n")
+       "  so in_order must be TRUE\n\n")
   }
 
   if (border == "off") border <- NA
@@ -32,7 +45,7 @@ function(pal=NULL, end.pal=NULL,
   # default color scale
   ln.c <- length(c)
   ln.l <- length(l)
-  if (is.null(pal) && is.null(end.pal) && ln.c==1 && ln.l==1) {
+  if (is.null(pal) && is.null(end_pal) && ln.c==1 && ln.l==1) {
     if (getOption("theme") %in% c("gray", "white")) pal <- "grays"
       else
     pal <- "hues"
@@ -40,8 +53,8 @@ function(pal=NULL, end.pal=NULL,
 
   if (!is.null(pal[1]))
     if (pal[1] == "yellows") pal[1] <- "browns"  # as of 3.7.7
-  if (!is.null(end.pal))
-    if (end.pal == "yellows") end.pal <- "browns"
+  if (!is.null(end_pal))
+    if (end_pal == "yellows") end_pal <- "browns"
 
   nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",  
           "turquoises", "aquas", "blues", "purples", "violets",
@@ -62,7 +75,7 @@ function(pal=NULL, end.pal=NULL,
   if (!is.null(pal)) {  # at least one color specified
       if (pal[1] %in% nm) {
         kind <- "sequential"
-      if (!is.null(end.pal[1])) if (end.pal[1] %in% nm)
+      if (!is.null(end_pal[1])) if (end_pal[1] %in% nm)
         kind <- "divergent"
     }
     else if (pal[1] %in% nmR)
@@ -77,7 +90,7 @@ function(pal=NULL, end.pal=NULL,
       kind <- "distinct"
 
     else {  # pal[1] not in any nm vector
-      if (is.null(end.pal))  # no ending color specified
+      if (is.null(end_pal))  # no ending color specified
         kind <- "manual.q"  # manual qualitative sequence
       else
         kind <- "manual.s"  # manual sequential sequence
@@ -116,27 +129,27 @@ function(pal=NULL, end.pal=NULL,
       if (pal[1] == "magentas") h <- 330
       if (pal[1] == "grays") {
         c <- 0
-        miss.c <- FALSE
+        miss_c <- FALSE
       }
-      if (is.null(end.pal)) pal <- NULL
+      if (is.null(end_pal)) pal <- NULL
     }
-    if (!is.null(end.pal)) {
-      if (end.pal %in% nm  &&  !(end.pal %in% nmR)) {
-      if (end.pal == "reds") h2 <- 0
-      if (end.pal == "rusts") h2 <- 3
-      if (end.pal == "browns") h2 <- 60
-      if (end.pal == "olives") h2 <- 90
-      if (end.pal == "greens") h2 <- 120
-      if (end.pal == "emeralds") h2 <- 150
-      if (end.pal == "turquoises") h2 <- 180
-      if (end.pal == "aquas") h2 <- 210
-      if (end.pal == "blues") h2 <- 240
-      if (end.pal == "purples") h2 <- 270
-      if (end.pal == "violets") h2 <- 300
-      if (end.pal == "magentas") h2 <- 330
-      if (end.pal == "grays") {
+    if (!is.null(end_pal)) {
+      if (end_pal %in% nm  &&  !(end_pal %in% nmR)) {
+      if (end_pal == "reds") h2 <- 0
+      if (end_pal == "rusts") h2 <- 3
+      if (end_pal == "browns") h2 <- 60
+      if (end_pal == "olives") h2 <- 90
+      if (end_pal == "greens") h2 <- 120
+      if (end_pal == "emeralds") h2 <- 150
+      if (end_pal == "turquoises") h2 <- 180
+      if (end_pal == "aquas") h2 <- 210
+      if (end_pal == "blues") h2 <- 240
+      if (end_pal == "purples") h2 <- 270
+      if (end_pal == "violets") h2 <- 300
+      if (end_pal == "magentas") h2 <- 330
+      if (end_pal == "grays") {
           c <- 0
-          miss.c <- FALSE
+          miss_c <- FALSE
         }
         pal <- NULL
       }
@@ -151,19 +164,19 @@ function(pal=NULL, end.pal=NULL,
 
   # qualitative HCL colors at constant c and l
   if (kind == "qualitative") {
-    if (!miss.h) if (length(h) > 1) n <- length(h)
+    if (!miss_h) if (length(h) > 1) n <- length(h)
     if (is.null(h2)) h2 <- h + (360 * (n - 1) / n)
     if (n <= 24) {
-      if (!in.order) { # mixed hues
+      if (!in_order) { # mixed hues
         h <- c(240,60,120,0,275,180,30,90,210,330,150,300)
         h <- c(h, h+15)
       }
-      else  # in.order
+      else  # in_order
         h <- seq(h, h2, length=n)  # vary hue systematically 
     }
     else {  # n too big
       h <- seq(h, h2, length=n)  # the hcl hues
-      if (!in.order) {
+      if (!in_order) {
          o <- sample.int(n)
          h <- h[o]
       }
@@ -172,8 +185,8 @@ function(pal=NULL, end.pal=NULL,
     h[which(h >= 360)] <- h[which(h >= 360)] - 360
     h[which(h < 0)] <- h[which(h < 0)] + 360
 
-    if (miss.c) c <- 65
-    if (miss.l) l <- 55
+    if (miss_c) c <- 65
+    if (miss_l) l <- 55
     pal <- hcl(h, c, l, fixup=fixup)[1:n]  # generate the colors
     #pal <- hex(polarLUV(L=l, C=c, H=h), fixup=fixup, ...)
     lbl <- .fmt(h, 0)
@@ -183,7 +196,7 @@ function(pal=NULL, end.pal=NULL,
 
   # sequential HCL color palette
   else if (kind == "sequential") {
-    if (miss.c) c <- c(35,75)
+    if (miss_c) c <- c(35,75)
     txt.c <- .fmt(c[1],0)
     if (length(c) > 1)
       txt.c <- paste(txt.c, " to ", .fmt(c[2],0), sep="")
@@ -192,7 +205,7 @@ function(pal=NULL, end.pal=NULL,
     if (l.dk < 14) l.dk <- 14  # any darker and the hue is no longer true
     l.lt <- 48 + (5*n)  # lightest color
     if (l.lt > 92) l.lt <- 92
-    if (miss.l) l <- c(l.lt, l.dk)  # 2 -> 58, 3 -> 63, 6 -> 78, 8 -> 88
+    if (miss_l) l <- c(l.lt, l.dk)  # 2 -> 58, 3 -> 63, 6 -> 78, 8 -> 88
     txt.l <- .fmt(l[1],0)
     if (length(l) > 1)
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
@@ -211,12 +224,12 @@ function(pal=NULL, end.pal=NULL,
     if (length(h) > 1)
       txt.h <- paste(txt.h, " to ", .fmt(h[2],0), sep="") 
 
-    if (miss.c) c <- 50
+    if (miss_c) c <- 50
     txt.c <- .fmt(c,0)
     if (length(c) > 1)
       txt.c <- paste(txt.c, " to ", .fmt(c[2],0), sep="")
       
-    if (miss.l) l <- c(30,80)
+    if (miss_l) l <- c(30,80)
     txt.l <- .fmt(l[1],0)
     if (length(l) > 1)
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
@@ -241,16 +254,20 @@ function(pal=NULL, end.pal=NULL,
     pal <- wes_palette(pal[1], n, type="continuous")
   }
 
-  # random distinct colors
+# # random distinct colors
   else if (kind == "distinct") {
-    ttl <- paste("Random distinct colors:", pal[1], "\n") 
-    pal <- distinctColorPalette(n)
+    cat("The random colors package, randomcoloR, has a dependent\n",
+        "package V8 that sometimes did not properly install. So no\n",
+        "longer part of lessR. Install and load randomcoloR separately,\n",
+        "then generate the palette with the function: distinctColorPalette\n\n")
+#   ttl <- paste("Random distinct colors:", pal[1], "\n") 
+#   pal <- distinctColorPalette(n)
   }
 
   # custom color sequence
   else if (kind == "manual.s") {
-    color.palette <- colorRampPalette(c(pal, end.pal))
-    pal <- color.palette(n)
+    color_palette <- colorRampPalette(c(pal, end_pal))
+    pal <- color_palette(n)
     ttl <- "Custom Color Sequence"
   }
 
@@ -314,7 +331,7 @@ function(pal=NULL, end.pal=NULL,
 
     if (!labels) lbl <- NA
 
-    par(bg=getOption("panel.fill"))
+    par(bg=getOption("panel_fill"))
 
     if (shape == "wheel") {
       par(mai=c(.4, .5, .8, .5))
@@ -329,24 +346,24 @@ function(pal=NULL, end.pal=NULL,
       plot.window(xlim, ylim, "", asp=1)
 
       pie(rep(1, length(pal)), col=pal, radius=radius, labels=lbl,
-          border=border, lty=lty, cex=labels.cex)
+          border=border, lty=lty, cex=labels_cex)
     }  # end wheel
 
     else if (shape == "rectangle")  {
       if (labels) {
         if (kind == "qualitative") {
-          rotate.x <- 0
+          rotate_x <- 0
           bm <- 0.05
           bm.tx <- 0
         }
         else {
-          rotate.x <- 90
+          rotate_x <- 90
           bm <- 0.24
           bm.tx <- 0.10
         }
       }  # end label
       else {
-        rotate.x <- 0
+        rotate_x <- 0
         bm <- 0
         bm.tx <- 0
       }
@@ -354,13 +371,13 @@ function(pal=NULL, end.pal=NULL,
       plot(0, 0, type="n", xlim=c(0, 1), ylim=c(0, 1), axes=FALSE,
            xlab="", ylab="")
       rect(0:(n-1)/n, bm, 1:n/n, 1, col=pal, border=border)
-      text(0:(n-1)/n + 1/(2*n), bm.tx, labels=lbl[1:n], srt=rotate.x,
-           cex=labels.cex)
+      text(0:(n-1)/n + 1/(2*n), bm.tx, labels=lbl[1:n], srt=rotate_x,
+           cex=labels_cex)
     }  # end rectangle
 
     main.lab <- ifelse (is.null(main), ttl, main)
-    title(main=main.lab, cex.main= getOption("main.cex"),
-        col.main=getOption("main.color"), ...)
+    title(main=main.lab, cex.main= getOption("main_cex"),
+        col.main=getOption("main_color"), ...)
 
     # -----------
     # text output

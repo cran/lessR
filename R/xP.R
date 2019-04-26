@@ -1,21 +1,21 @@
 xP <- function(x, d=NULL, unit=NULL, semi=FALSE) {
 
   if (is.null(d))
-    digits.d <- getOption("digits.d")
+    digits_d <- getOption("digits_d")
   else
-    digits.d <- d
+    digits_d <- d
 
   if (!is.na(x)) {
 
     neg.flag <- FALSE
     if (!is.null(unit)) if (unit == "dollar"){
-      digits.d <- 2
+      digits_d <- 2
       if (x < 0) {
         neg.flag <- TRUE
         x <- abs(x)
     }
   }
-    tx <- formatC(x, digits=digits.d, big.mark=",", format="f")
+    tx <- formatC(x, digits=digits_d, big.mark=",", format="f")
 
     if (!is.null(unit)) {
       if (unit != "dollar") {  # No $ for display of the value

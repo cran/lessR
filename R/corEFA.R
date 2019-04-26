@@ -1,14 +1,28 @@
 corEFA <- 
-function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"), 
-          min.loading=.2, sort=TRUE, Rmd=NULL, ...) {
+function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"), 
+          min_loading=.2, sort=TRUE, Rmd=NULL, ...) {
+
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("n.factors", "min.loading")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   cl <- match.call()
 
   rotate <- match.arg(rotate)
 
-  if (missing(n.factors)) {
+  if (missing(n_factors)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "The number of factors must be specified with:  n.factors\n\n")
+      "The number of factors must be specified with:  n_factors\n\n")
   }
 
   # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
@@ -24,15 +38,15 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   if (is.null(options()$knitr.in.progress)) {
     tx <- character(length = 0)
     tx[length(tx)+1] <- "Extraction: maximum likelihood"
-    if (n.factors > 1)  tx[length(tx)+1] <- paste("Rotation:", rotate)
+    if (n_factors > 1)  tx[length(tx)+1] <- paste("Rotation:", rotate)
     txer <- tx
   }
 
   # EFA
-  fa2 <- factanal(covmat=x, factors=n.factors, rotation="none", ...)
-  if (rotate=="none" || n.factors==1) ld <- as.matrix(fa2$loadings)
+  fa2 <- factanal(covmat=x, factors=n_factors, rotation="none", ...)
+  if (rotate=="none" || n_factors==1) ld <- as.matrix(fa2$loadings)
 
-  if (n.factors>1  &&  rotate!="none") {
+  if (n_factors>1  &&  rotate!="none") {
     if (rotate == "promax") rtt <- promax(loadings(fa2))
     if (rotate == "varimax") rtt <- varimax(loadings(fa2))
     ld <- loadings(rtt)
@@ -44,16 +58,16 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   if (sort) {
     mx <- max.col(abs(ld))
     ind <- cbind(1L:n.ind, mx)
-    mx[abs(ld[ind]) < 0.5] <- n.factors + 1
+    mx[abs(ld[ind]) < 0.5] <- n_factors + 1
     ld.srt <- ld[order(mx, 1L:n.ind), ]
     ld.srt <- as.matrix(ld.srt)
   }
 
   # print loadings
   tx <- character(length = 0)
-  tx[length(tx)+1] <-  paste("Loadings (except -", min.loading, " to ",
-     min.loading, ")", sep="") 
-  txld <- .prntbl(ld.srt, digits.d=3, cut=min.loading)
+  tx[length(tx)+1] <-  paste("Loadings (except -", min_loading, " to ",
+     min_loading, ")", sep="") 
+  txld <- .prntbl(ld.srt, digits_d=3, cut=min_loading)
   for (i in 1:length(txld)) tx[length(tx)+1] <- txld[i]
   txld <- tx
 
@@ -61,7 +75,7 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   vx <- colSums(ld.srt^2)
   varex <- rbind(`SS loadings` = vx)
   varex <- rbind(varex, `Proportion Var` = vx/n.ind)
-  if (n.factors > 1) 
+  if (n_factors > 1) 
     varex <- rbind(varex, `Cumulative Var` = cumsum(vx/n.ind))
   tx <- character(length = 0)
   tx[length(tx)+1] <- "Sum of Squares"
@@ -74,14 +88,14 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
 
   # generate the MIMM code
   FacItems <- integer(length=n.ind)  # factor with highest loading for item
-  Fac <- integer(length=n.factors)
-  n.Fact <- integer(length=n.factors)
+  Fac <- integer(length=n_factors)
+  n.Fact <- integer(length=n_factors)
 
   for (i in 1:n.ind) {
     max.ld <- 0
     FacItems[i] <- 0
-    for (j in 1:n.factors) {
-      if (abs(ld[i,j]) > max.ld  &&  abs(ld[i,j]) > min.loading) {
+    for (j in 1:n_factors) {
+      if (abs(ld[i,j]) > max.ld  &&  abs(ld[i,j]) > min_loading) {
         max.ld <- ld[i,j]
         FacItems[i] <- j
       }
@@ -92,7 +106,7 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   tx <- character(length = 0)
 
   tx[length(tx)+1] <- "MeasModel <- "
-  for (i.fact in 1:n.factors) {
+  for (i.fact in 1:n_factors) {
     n.Fact[i.fact] <- 0
     k <- 0
     for (j.item in 1:n.ind) if (FacItems[j.item] == i.fact) {
@@ -113,7 +127,7 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
           tx[length(tx)] <- paste(tx[length(tx)], " + ", sep="")
       }
     }
-    if (i.fact == n.factors) tx[length(tx)] <- paste(tx[length(tx)], "\n\"")
+    if (i.fact == n_factors) tx[length(tx)] <- paste(tx[length(tx)], "\n\"")
   }
 
   tx[length(tx)+1] <- ""
@@ -136,8 +150,8 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   txdel <- ""
   tx <- character(length = 0)
   if (del.count > 0) {
-    tx[length(tx)+1] <- paste("Deletion threshold: min.loading = ", 
-        min.loading, sep="")
+    tx[length(tx)+1] <- paste("Deletion threshold: min_loading = ", 
+        min_loading, sep="")
     tx[length(tx)+1] <- "Deleted items: "
     for (i.item in 1:del.count)
       tx[length(tx)] <- paste(tx[length(tx)], colnames(x)[deleted[i.item]], " ", sep="")
@@ -149,7 +163,7 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
   txkfl <- ""
   if (!is.null(Rmd)) {
     if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
-    txknt <- .corfa.Rmd(n.ind, n.factors)
+    txknt <- .corfa.Rmd(n.ind, n_factors)
     cat(txknt, file=Rmd, sep="\n")
     txkfl <- .showfile2(Rmd, "R Markdown instructions")
   }
@@ -168,7 +182,7 @@ function (x=mycor, n.factors, rotate=c("promax", "varimax", "none"),
     out_title_cfa=title_cfa, out_cfa_code=txcfa,
     out_deleted=txdel,
 
-    converged=fa2$converged, n_factors=n.factors, ss_factors=vx,
+    converged=fa2$converged, n_factors=n_factors, ss_factors=vx,
     loadings=ld.srt, call=cl)
 
   class(output) <- "out_all"

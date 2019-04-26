@@ -1,5 +1,5 @@
 .reg1fitBasic <-
-function(lm.out, dname="d", TotSS, digits.d=NULL, show.R=FALSE) {
+function(lm.out, dname="d", TotSS, digits_d=NULL, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -17,15 +17,15 @@ function(lm.out, dname="d", TotSS, digits.d=NULL, show.R=FALSE) {
   }
 
   se <- sm$sigma
-  tx[length(tx)+1] <- paste("Standard deviation of residuals: ", .fmt(se,digits.d),
+  tx[length(tx)+1] <- paste("Standard deviation of residuals: ", .fmt(se,digits_d),
     "for", sm$df[2], "degrees of freedom")
 
   tcut <- -qt(0.025, df=sm$df[2])
   range <- 2*tcut*se
   #tx[length(tx)+1] <- "If normal, the approximate 95% range of residuals about each fitted"
-  #tx[length(tx)+1] <- paste("  value is 2*t-cutoff*", .fmt(se,digits.d), 
+  #tx[length(tx)+1] <- paste("  value is 2*t-cutoff*", .fmt(se,digits_d), 
     #", with a 95% interval t-cutoff of ", .fmt(tcut,3), sep="")
-  #tx[length(tx)+1] <- paste("95% range of variation: ", .fmt(range,digits.d), sep="")
+  #tx[length(tx)+1] <- paste("95% range of variation: ", .fmt(range,digits_d), sep="")
 
   # predicted residual sum of squares
   prs.terms <- residuals(lm.out)/(1 - lm.influence(lm.out)$hat)

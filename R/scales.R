@@ -1,6 +1,6 @@
 scales <-
-function(..., iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE, heat.map=FALSE)
+function(..., iter=0, resid=FALSE, item_cor=FALSE, sort=FALSE, heat_map=FALSE)
 
-  corCFA(..., iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE,
-              heat.map=FALSE, fun.call=match.call())
+  corCFA(..., iter=0, resid=FALSE, item_cor=FALSE, sort=FALSE,
+              heat_map=FALSE, fun_call=match.call())
 

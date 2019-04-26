@@ -1,10 +1,10 @@
 Model <-
-function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
+function(my_formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
 
 
-  if (missing(my.formula)) {
+  if (missing(my_formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Specify a model by listing it first or set according to:  my.formula\n\n")
+      "Specify a model by listing it first or set according to:  my_formula\n\n")
   }
 
   # let deprecated mydata work as default
@@ -14,7 +14,7 @@ function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
   dname <- deparse(substitute(data))  # get data frame name for cor before sort
   options(dname = dname)
 
-  nm <- all.vars(my.formula)  # names of vars in the model
+  nm <- all.vars(my_formula)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1
   n.obs <- nrow(data)
@@ -25,7 +25,7 @@ function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
     var.type[i] <- ""
     if (is.factor(data[,nm[i]])) var.type[i] <- "cat"
     n.unique[i] <- length(unique(data[,nm[i]]))
-    #if (n.unique[i] < n.cat) var.type[i] <- "cat" 
+    #if (n.unique[i] < n_cat) var.type[i] <- "cat" 
     #else 
     if (is.numeric(data[,nm[i]])) var.type[i] <- "num"
   }
@@ -49,7 +49,7 @@ function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
             "binary response variable ", nm[1], ".  \n", sep="")
         .dash(44)
         cat("\n")
-        Logit(my.formula, data, ...)
+        Logit(my_formula, data, ...)
       }
 
       else if (length(unique(data[,nm[1]])) == 2) {
@@ -65,7 +65,7 @@ function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
             ".  \n", sep="")
         .dash(60)
         cat("\n")
-        Regression(my.formula, data, ...)
+        Regression(my_formula, data, ...)
       }
     }
 
@@ -74,28 +74,28 @@ function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
       if (n.pred == 1  && (n.unique[2] == 2)) {  # t-test
         cat("\n")
         .dash(60)
-        cat("Predictor variable, ", nm[2], ", has exactly two values.\n",
+        cat("Predictor variable, ", nm[2], ", has exactly two values_\n",
             "Run the t-test function to compare the corresponding\n",
             "group means of response variable ", nm[1], ".\n", sep="")
         .dash(60)
         cat("\n")
-        f <- .tt.formula(my.formula, y, data, separate=FALSE,
+        f <- .tt.formula(my_formula, y, data, separate=FALSE,
                          Ynm, Xnm, X1nm, X2nm, ...)  # formula
         x <- f$x;  y <- f$y;
         Ynm <- f$Ynm;  Xnm <- f$Xnm;  X1nm <- f$X1nm;  X2nm <- f$X2nm 
 
-        digits.d <- .max.dd(x) + 1
-        if (digits.d == 1) digits.d <- 2
-        options(digits.d=digits.d)  # .fmt requires if not specified
+        digits_d <- .max.dd(x) + 1
+        if (digits_d == 1) digits_d <- 2
+        options(digits_d=digits_d)  # .fmt requires if not specified
 
-        # get lab.x.cex  lab.y.cex
-        lab.cex <- getOption("lab.cex")
-        lab.x.cex <- getOption("lab.x.cex")
-        lab.x.cex <- ifelse(is.null(lab.x.cex), lab.cex, lab.x.cex)
-        adj <- .RSadj(lab.cex=lab.x.cex); lab.x.cex <- adj$lab.cex
+        # get lab_x_cex  lab_y_cex
+        lab_cex <- getOption("lab_cex")
+        lab_x_cex <- getOption("lab_x_cex")
+        lab_x_cex <- ifelse(is.null(lab_x_cex), lab_cex, lab_x_cex)
+        adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
 
         # get variable labels if exist plus axes labels
-        gl <- .getlabels(xlab=NULL, ylab=xlab, main=NULL, lab.x.cex=lab.x.cex,
+        gl <- .getlabels(xlab=NULL, ylab=xlab, main=NULL, lab_x_cex=lab_x_cex,
                          graph.win=FALSE)  # # graphics window not yet set-up
         x.lab <- gl$yb
         #x.name <- gl$yn; x.lbl <- gl$yl; x.lab <- gl$yb
@@ -105,12 +105,12 @@ function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
           out <- .TwoGroup(x, y,
             n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
-            brief=FALSE, digits.d, 
-            conf.level=0.95, alternative="two.sided",
+            brief=FALSE, digits_d, 
+            conf_level=0.95, alternative="two_sided",
             mmd=NULL, msmd=NULL, Edesired=NULL, 
             bw1="nrd", bw2="nrd", graph=TRUE, xlab=xlab,
-            line.chart=FALSE, show.title=TRUE,
-            pdf.file=NULL, width=5, height=5, ...)
+            line_chart=FALSE, show_title=TRUE,
+            pdf_file=NULL, width=5, height=5, ...)
         else {  # switch
           Xtmp <- X2nm
           X2nm <- X1nm
@@ -118,12 +118,12 @@ function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
           out <- .TwoGroup(x, y,
             n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
             from.data=TRUE, Ynm, Xnm, X1nm, X2nm, 
-            brief=FALSE, digits.d, 
-            conf.level=0.95, alternative="two.sided",
+            brief=FALSE, digits_d, 
+            conf_level=0.95, alternative="two_sided",
             mmd=NULL, msmd=NULL, Edesired=NULL, 
             bw1="nrd", bw2="nrd", graph=TRUE, xlab=xlab,
-            line.chart=FALSE, show.title=TRUE,
-            pdf.file=NULL, width=5, height=5, ...)
+            line_chart=FALSE, show_title=TRUE,
+            pdf_file=NULL, width=5, height=5, ...)
         }
       }
 
@@ -133,7 +133,7 @@ function(my.formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
         cat("Run the ANOVA function to compare the corresponding \n",
             "group means of response variable ", nm[1], ".\n", sep="")
         .dash(60)
-        ANOVA(my.formula, data, brief=brief, ...)
+        ANOVA(my_formula, data, brief=brief, ...)
       }
     }  # all preds are categorical
 

@@ -1,5 +1,5 @@
 .ANOVAz1 <- 
-function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
+function(av.out, y.values, x.values, nm, n.obs, digits_d, brief,
          graphics, pdf, width, height) {
 
   p <- length(unique(na.omit(x.values)))
@@ -16,10 +16,10 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
   for (i in 1:p) {
     nch.lv <- nchar(as.character(levels(x.values)[i]))
     nch.n <- nchar(as.character(n[i]))
-    nch.m <- nchar(.fmt(m[i],digits.d))
-    nch.s <- nchar(.fmt(s[i],digits.d))
-    nch.mn <- nchar(.fmt(mn[i],digits.d))
-    nch.mx <- nchar(.fmt(mx[i],digits.d))
+    nch.m <- nchar(.fmt(m[i],digits_d))
+    nch.s <- nchar(.fmt(s[i],digits_d))
+    nch.mn <- nchar(.fmt(mn[i],digits_d))
+    nch.mx <- nchar(.fmt(mx[i],digits_d))
     if (nch.lv > max.lv) max.lv <- nch.lv
     if (nch.n > max.n) max.n <- nch.n
     if (nch.m > max.m) max.m <- nch.m
@@ -42,16 +42,16 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
   for (i in 1:p) {
     xval <- paste(format(levels(x.values)[i], width=max.lv, justify="left", sep="")) 
     nn <- format(n[i], width=max.n+1, justify="right", sep="") 
-    mm <- format(sprintf("%.*f", digits.d, m[i]), width=max.m+2, justify="right") 
-    ss <- format(sprintf("%.*f", digits.d, s[i]), width=max.s+2, justify="right") 
-    mnn <- format(sprintf("%.*f", digits.d, mn[i]), width=max.mn+2, justify="right") 
-    mxx <- format(sprintf("%.*f", digits.d, mx[i]), width=max.mx+2, justify="right") 
+    mm <- format(sprintf("%.*f", digits_d, m[i]), width=max.m+2, justify="right") 
+    ss <- format(sprintf("%.*f", digits_d, s[i]), width=max.s+2, justify="right") 
+    mnn <- format(sprintf("%.*f", digits_d, mn[i]), width=max.mn+2, justify="right") 
+    mxx <- format(sprintf("%.*f", digits_d, mx[i]), width=max.mx+2, justify="right") 
     tx[length(tx)+1] <- paste(xval, nn, mm, ss, mnn, mxx) 
   }
 
   mg <-  mean(y.values, na.rm=TRUE)
   tx[length(tx)+1] <- ""
-  tx[length(tx)+1] <- paste("Grand Mean:", round(mg, digits.d+1))
+  tx[length(tx)+1] <- paste("Grand Mean:", round(mg, digits_d+1))
 
   txdes <- tx
 
@@ -71,8 +71,8 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
       }
     }
     else { 
-      pdf.file <- "ANOVA_Means.pdf"
-      pdf(file=pdf.file, width=width, height=height)
+      pdf_file <- "ANOVA_Means.pdf"
+      pdf(file=pdf_file, width=width, height=height)
     }
 
     plt.i <- plt.i + 1
@@ -82,15 +82,15 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
-    col.bg <- getOption("panel.fill")
+    col.bg <- getOption("panel_fill")
     rect(usr[1], usr[3], usr[2], usr[4],
-         col=getOption("panel.fill"), border=getOption("panel.color"))
+         col=getOption("panel_fill"), border=getOption("panel_color"))
 
     axT1 <- 1:length(unique(x.values))
-    abline(v=axT1, col=getOption("grid.x.color"),
-                        lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
-    abline(h=axTicks(2), col=getOption("grid.y.color"),
-                        lwd=getOption("grid.lwd"), lty=getOption("grid.lty"))
+    abline(v=axT1, col=getOption("grid_x_color"),
+                        lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
+    abline(h=axTicks(2), col=getOption("grid_y_color"),
+                        lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
 
     .axes(levels(x.values), NULL, axT1, axTicks(2))
 
@@ -100,9 +100,9 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     y.label <- nm[1]
     .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3) 
 
-    col.fill <- getOption("pt.fill")
-    col.color <- getOption("pt.color")
-    points(x.values, y.values, pch=21, col=col.color, bg=col.fill, cex=0.8)
+    col_fill <- getOption("pt_fill")
+    col_color <- getOption("pt_color")
+    points(x.values, y.values, pch=21, col=col_color, bg=col_fill, cex=0.8)
 
     # plot cell means
     pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
@@ -117,7 +117,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
 
     if (pdf) {
       dev.off()
-      .showfile(pdf.file, "means chart")
+      .showfile(pdf_file, "means chart")
     }
   }
 
@@ -147,7 +147,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
     ln.nm <- nchar(colnames(smc)[i])
     max.ln[i] <- ln.nm + 1
     for (j in 1:nrow(smc)) {
-      xjc <- .fmt(smc[j,i], d=digits.d)
+      xjc <- .fmt(smc[j,i], d=digits_d)
       if (nchar(xjc) > max.ln[i]) max.ln[i] <- nchar(xjc)
     }
     max.ln[i] <- max.ln[i] + 1L
@@ -164,10 +164,10 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
   for (i in 1:n.vars) {
     rlb <- .fmtc(rownames(smc)[i], max.c1, j="left")
     df <- format(sprintf("%i", smc[i,1]), width=max.ln[1]-4, justify="right")
-    SS <- format(sprintf("%7.*f", digits.d, smc[i,2]), width=max.ln[2], justify="right")
-    MS <- format(sprintf("%7.*f", digits.d, smc[i,3]), width=max.ln[3], justify="right")
+    SS <- format(sprintf("%7.*f", digits_d, smc[i,2]), width=max.ln[2], justify="right")
+    MS <- format(sprintf("%7.*f", digits_d, smc[i,3]), width=max.ln[3], justify="right")
     if (i < n.vars) {
-      fv <- format(sprintf("%7.*f", digits.d, smc[i,4]), width=9, justify="right")
+      fv <- format(sprintf("%7.*f", digits_d, smc[i,4]), width=9, justify="right")
       pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
       tx[length(tx)+1] <- paste(rlb, df, SS, MS, fv, pv)
     }
@@ -214,8 +214,8 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
 
     HSD <- TukeyHSD(av.out)
     HSD <- TukeyHSD(av.out, which=nm[2])
-    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD, which="conf.level"))
-    txHSD <- .prntbl(HSD[[1]], digits.d)
+    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD, which="conf_level"))
+    txHSD <- .prntbl(HSD[[1]], digits_d)
     for (i in 1:length(txHSD)) tx[length(tx)+1] <- txHSD[i]
 
     txhsd <- tx
@@ -226,8 +226,8 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
         if (manage.gr) dev.set(which=4) 
       }
       else { 
-        pdf.file <- "ANOVA_HSD.pdf"
-        pdf(file=pdf.file, width=width, height=height)
+        pdf_file <- "ANOVA_HSD.pdf"
+        pdf(file=pdf_file, width=width, height=height)
       }
 
       plt.i <- plt.i + 1
@@ -240,7 +240,7 @@ function(av.out, y.values, x.values, nm, n.obs, digits.d, brief,
 
       if (pdf) {
         dev.off()
-        .showfile(pdf.file, "Tukey HSD chart")
+        .showfile(pdf_file, "Tukey HSD chart")
         tx[length(tx)+1] <- ""
       }
     }

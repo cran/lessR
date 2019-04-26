@@ -1,4 +1,4 @@
 Read2 <- 
 function(..., sep=";", dec=",") 
          
-  Read(..., fun.call=match.call(), sep=";", dec=",")
+  Read(..., fun_call=match.call(), sep=";", dec=",")

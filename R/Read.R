@@ -1,18 +1,32 @@
 Read <-
-function(from=NULL, format=NULL, in.lessR=FALSE,
+function(from=NULL, format=NULL, in_lessR=FALSE,
 
-         var.labels=FALSE, widths=NULL, stringsAsFactors=FALSE,
-         missing="", n.mcut=1,
+         var_labels=FALSE, widths=NULL, stringsAsFactors=FALSE,
+         missing="", n_mcut=1,
 
-         miss.show=30, miss.zero=FALSE, miss.matrix=FALSE,
+         miss_show=30, miss_zero=FALSE, miss_matrix=FALSE,
 
-         max.lines=30, sheet=1,
+         max_lines=30, sheet=1,
 
          brief=TRUE, quiet=getOption("quiet"),
 
-         fun.call=NULL, ...) {
+         fun_call=NULL, ...) {
 
-  if (is.null(fun.call)) fun.call <- match.call()
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("in.lessR", "var.labels", "n.mcut", "miss.show", "miss.zero",
+                "miss.matrix", "max.lines", "fun.call")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
+
+  if (is.null(fun_call)) fun_call <- match.call()
 
   if (!is.null(from))
     if (nchar(from) == 0) from <- NULL  #  "" to NULL
@@ -21,7 +35,7 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
      cat("\n"); stop(call.=FALSE, "\n","------\n",
          ">>> To read a csv or Excel file of variable labels, each row a\n",
          "    variable name and then variable label, just set\n",
-         "    var.labels=TRUE in the Read statement\n\n")
+         "    var_labels=TRUE in the Read statement\n\n")
   }
 
   .param.old(...)
@@ -54,14 +68,14 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
     fncl2 <- paste("Read(", "from = \"", from,  "\")", sep="")
   }
   else {
-    fncl <- .fun.call.deparse(fun.call)
-    fncl2 <- .fun.call.deparse(fun.call)  # for read_excel currency bug
+    fncl <- .fun_call.deparse(fun_call)
+    fncl2 <- .fun_call.deparse(fun_call)  # for read_excel currency bug
   }
 
   options(read.call=fncl)  # save for knitr run
 
   if (miss.format) {
-         if (in.lessR) format <- "lessR"
+         if (in_lessR) format <- "lessR"
     else if (!is.null(widths)) format <- "fwd"
     else if (grepl(".csv$", from)) format <- "csv"
     else if (grepl(".tsv$", from)) format <- "csv"
@@ -71,7 +85,7 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
     else if (grepl(".rda$", from)) format <- "R"
     else if (grepl(".xls$", from) || grepl(".xlsx$", from)) format <- "Excel"
   }
-  if (var.labels && format=="R") {
+  if (var_labels && format=="R") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "An R data file should already contain labels before it was created.\n",
         "Or add them manually with the lessR function: label\n\n")
@@ -90,13 +104,13 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
     }
 
     # function call for suggestions
-    fncl <- .fun.call.deparse(fun.call)
+    fncl <- .fun_call.deparse(fun_call)
 
     if (getOption("suggest")) {
-      if (brief || !grepl("var.labels", fncl))
+      if (brief || !grepl("var_labels", fncl))
         cat("\n>>> Suggestions\n")
-      if (!grepl("var.labels", fncl)  &&  format != "lessR")
-        cat("To read a csv or Excel file of variable labels, var.labels=TRUE\n",
+      if (!grepl("var_labels", fncl)  &&  format != "lessR")
+        cat("To read a csv or Excel file of variable labels, var_labels=TRUE\n",
             "  Each row of the file:  Variable Name, Variable Label\n")
       if (brief) {
         cat("Details about your data, Enter:  details()  for d, or",
@@ -127,7 +141,7 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
       }
       else
         delim <- ","
-      if (!var.labels)
+      if (!var_labels)
         d <- read.csv(file=from, na.strings=missing, sep=delim,
                       stringsAsFactors=stringsAsFactors, ...)
       else
@@ -140,7 +154,7 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
 
   else if (format == "Excel") {
 
-    if (!var.labels)
+    if (!var_labels)
       d <- openxlsx::read.xlsx(from, sheet=sheet, detectDates=TRUE, ...)
     else {
       d <- openxlsx::read.xlsx(from, sheet=sheet,
@@ -169,7 +183,7 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
   }  # end (format == "Excel")
 
   else if (format == "SPSS")  # data and any labels
-    d <- read.spss(file=from, to.data.frame=TRUE, use.value.labels=TRUE, ...)
+    d <- read.spss(file=from, to.data.frame=TRUE, use.value_labels=TRUE, ...)
 
   else if (format == "SAS") { # data
     d <- read.sas7bdat(file=from, ...)
@@ -209,7 +223,7 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
   if (format %in% c("csv", "Excel")) {
     dg <- character(length=10)
     for (i in 0:9) dg[i+1] <- as.character(i)
-    ltr <- c(letters, LETTERS, dg, "_", ".", "(", ")")
+    legal <- c(letters, LETTERS, dg, "_", ".", "(", ")")
 
     # get rid of variables that are not named (NA's)
     nm.miss <- is.na(names(d))
@@ -218,16 +232,22 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
     badchar <- FALSE
     for (i in 1:length(names(d))) {
       cc <- names(d)[i]
-      if (!is.na(cc)) for (j in 1:nchar(cc)) {
-        if (!(substr(cc,j,j) %in% ltr)) {
-          badchar <- TRUE
-          names(d)[i] <- gsub(substr(cc,j,j), "", names(d)[i])
-          if (substr(cc,j,j) == " ")
-            txt <- "Removed the blank space,"
-          else
-            txt <- paste("Removed the character, ", substr(cc,j,j), ",", sep="")
-          cat(txt, "new variable name: ", names(d)[i], "\n")
-        }
+      if (!is.na(cc)) {
+        for (j in 1:nchar(cc)) {
+          if (!(substr(cc,j,j) %in% legal)) {
+            badchar <- TRUE
+            names(d)[i] <- gsub(substr(cc,j,j), "", names(d)[i])
+            if (substr(cc,j,j) == " ")
+              txt <- "Removed the blank space,"
+            else
+              txt <- paste("Removed character, ", substr(cc,j,j), ",", sep="")
+            cat(txt, "new variable name: ", names(d)[i], "\n")
+          }  # char not legal  
+        }  # sequence through characters of ith name
+      }  # cc cannot be missing
+      if (substr(cc,1,1) == ".") {  # remove any beginning .
+         while(substr(cc,1,1) == ".") cc <- substr(cc, 2, nchar(cc))
+         cat("\nRemoved leading dots of variable name:", names(d)[i], "\n")
       }
     }
     if (badchar)
@@ -238,8 +258,8 @@ function(from=NULL, format=NULL, in.lessR=FALSE,
   # feedback
   # --------
   if (!quiet  &&  is.data.frame(d))
-    details(d, n.mcut, miss.zero, max.lines, miss.show,
-                      miss.matrix, brief)
+    details(d, n_mcut, miss_zero, max_lines, miss_show,
+                      miss_matrix, brief)
   else
     cat("\n")
 

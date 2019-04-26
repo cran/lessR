@@ -1,14 +1,28 @@
 corReorder <-
 function (R=mycor, order=c("hclust", "chain", "manual"),
-          hclust.type = c("complete", "ward.D", "ward.D2", "single",
+          hclust_type = c("complete", "ward.D", "ward.D2", "single",
                           "average", "mcquitty", "median", "centroid"),
-          n.clusters=NULL, vars=NULL, chain.first=0,
-          heat.map=TRUE, diagonal.new=TRUE,
+          n_clusters=NULL, vars=NULL,chain_first=0,
+          heat_map=TRUE, diagonal_new=TRUE,
           main=NULL, bottom=3, right=3,
-          pdf.file=NULL, width=5, height=5) {
+          pdf_file=NULL, width=5, height=5, ...) {
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("n.clusters", "chain.first", "heat.map",
+                "diagonal.new", "pdf.file")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   order <- match.arg(order)
-  hclust.type <- match.arg(hclust.type)
+  hclust_type <- match.arg(hclust_type)
 
   # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
   cor.nm <- deparse(substitute(R))
@@ -35,12 +49,12 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
 
   else if (order == "hclust") {
     dst <- as.dist(1-R)
-    ord <- hclust(dst, method=hclust.type)
+    ord <- hclust(dst, method=hclust_type)
     Label <- ord$order
 
-    if (!is.null(n.clusters)) {
-     clt <- sort(cutree(ord, k=n.clusters)) 
-     ttl <- paste(as.character(n.clusters), " Cluster Solution", sep="")
+    if (!is.null(n_clusters)) {
+     clt <- sort(cutree(ord, k=n_clusters)) 
+     ttl <- paste(as.character(n_clusters), " Cluster Solution", sep="")
      cat("\n", ttl, "\n")
      .dash(nchar(ttl) + 1)  
      print(clt)
@@ -49,7 +63,7 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
 
   else if (order == "chain") {  # Hunter 1973
 
-    i.first <- as.integer(chain.first)
+    i.first <- as.integer(chain_first)
 
     nv <- nvc
 
@@ -114,7 +128,7 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
   for (i in 1:nv) Rdiag[i] <- R[i,i]
 
   # diagonal is based on adjacent values
-  if (diagonal.new) {
+  if (diagonal_new) {
       R[1,1] <- R[1,2]
     if (nv > 2) {
       for (i in 1: nv) {
@@ -128,12 +142,12 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
     
   }
 
-  if (heat.map)
+  if (heat_map)
      .corcolors(R, nrow(R), main, bottom, right, diag=NULL,
-                pdf.file, width, height)
+                pdf_file, width, height)
 
   # restore diagonal if changed
-  if (diagonal.new)
+  if (diagonal_new)
     for (i in 1:nv) R[i,i] <- Rdiag[i]
     
 

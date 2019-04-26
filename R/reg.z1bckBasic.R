@@ -1,5 +1,5 @@
 .reg1bckBasic <-
-function(lm.out, dname="d", digits.d=NULL, show.R=FALSE, n.obs, n.keep,
+function(lm.out, dname="d", digits_d=NULL, show_R=FALSE, n.obs, n.keep,
          stnd.flag) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
@@ -12,7 +12,7 @@ function(lm.out, dname="d", digits.d=NULL, show.R=FALSE, n.obs, n.keep,
 
   tx <- character(length=0)
 
-  if(show.R) {
+  if(show_R) {
     cv <- paste(nm[1]," ~ ", sep="")
     cv <- paste(cv, nm[2], sep="")
     if (n.vars > 2) for (i in 3:n.vars) cv <- paste(cv, " + ", nm[i], "", sep="")

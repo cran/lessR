@@ -1,59 +1,85 @@
 PieChart <-
 function(x, y=NULL, data=d, rows=NULL,
 
-         radius=1, hole=0.65, hole.fill=getOption("panel.fill"),
+         radius=1, hole=0.65, hole_fill=getOption("panel_fill"),
 
          fill=NULL, 
          color="lightgray",
-         trans=getOption("trans.bar.fill"),
+         trans=getOption("trans_bar_fill"),
 
          density=NULL, angle=45,
          lty="solid", lwd=1, edges=200,
 
-         clockwise=FALSE, init.angle=ifelse (clockwise, 90, 0), 
+         clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0), 
 
          values=getOption("values"),
-         values.color=getOption("values.color"), 
-         values.size=getOption("values.size"),
-         values.digits=getOption("values.digits"),
-         values.position=getOption("values.position"),
+         values_color=getOption("values_color"), 
+         values_size=getOption("values_size"),
+         values_digits=getOption("values_digits"),
+         values_position=getOption("values_position"),
 
-         main=NULL, main.cex=1.2, labels.cex=0.9, cex,
+         main=NULL, main_cex=1.2, labels_cex=0.9, cex,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-         eval.df=NULL, quiet=getOption("quiet"),
-         width=6.5, height=6, pdf.file=NULL, ...) {
+         eval_df=NULL, quiet=getOption("quiet"),
+         width=6.5, height=6, pdf_file=NULL, ...) {
 
 
-  if (!missing(cex)) {
-    main.cex <- cex * main.cex
-    labels.cex <- cex * labels.cex
-    values.size <- cex * values.size
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("hole.fill", "init.angle", "values.color", "values.size",
+                "values.digits", "values.position", "eval.df")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
   }
 
-  fill.miss <- ifelse (missing(fill), TRUE, FALSE)
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (length(grep(".", names(dots)[i], fixed=TRUE)) > 0) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
+
+  if (!missing(cex)) {
+    main_cex <- cex * main_cex
+    labels_cex <- cex * labels_cex
+    values_size <- cex * values_size
+  }
+
+  fill_miss <- ifelse (missing(fill), TRUE, FALSE)
   main.miss <- ifelse (missing(main), TRUE, FALSE)
 
   color[which(color == "off")] <- "transparent"
 
-  if (is.null(values.digits)) {
-    if (values == "%") values.digits <- 0
-    if (values == "prop") values.digits <- 2
+  if (is.null(values_digits)) {
+    if (values == "%") values_digits <- 0
+    if (values == "prop") values_digits <- 2
   }
 
-  if (missing(values) && (!missing(values.color) || !missing(values.size)
-      || !missing(values.digits) || !missing(values.position)))
+  if (missing(values) && (!missing(values_color) || !missing(values_size)
+      || !missing(values_digits) || !missing(values_position)))
     values <- "%"
 
-  if (is.null(values.digits)) {
-    if (values == "%") values.digits <- 0
-    if (values == "prop") values.digits <- 2
+  if (is.null(values_digits)) {
+    if (values == "%") values_digits <- 0
+    if (values == "prop") values_digits <- 2
   }
 
-  if (missing(values.color)) {
-    values.color <- "white" 
-    if (values.position == "out") values.color <- getOption("axis.text.color")
+  if (missing(values_color)) {
+    values_color <- "white" 
+    if (values_position == "out") values_color <- getOption("axis_text_color")
   }
 
   if (missing(x)) {
@@ -75,8 +101,8 @@ function(x, y=NULL, data=d, rows=NULL,
 
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval.df))  # default values
-    eval.df <- ifelse (shiny, FALSE, TRUE)
+  if (is.null(eval_df))  # default values
+    eval_df <- ifelse (shiny, FALSE, TRUE)
 
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x))  # could be a list of var names
@@ -118,7 +144,7 @@ function(x, y=NULL, data=d, rows=NULL,
   # establish if a data frame, if not then identify variable(s)
 
   if (!x.in.global) {
-    if (eval.df) {
+    if (eval_df) {
       if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
       .xcheck(x.name, df.name, names(data))  # x-var in df?
     }
@@ -177,31 +203,31 @@ function(x, y=NULL, data=d, rows=NULL,
 
   # evaluate fill (NULL, numeric constant or a variable)
   #--------------
-  if (!fill.miss) {
-    fill.name <- deparse(substitute(fill))
-    in.df <- ifelse (exists(fill.name, where=data), TRUE, FALSE)
+  if (!fill_miss) {
+    fill_name <- deparse(substitute(fill))
+    in.df <- ifelse (exists(fill_name, where=data), TRUE, FALSE)
 
     # only works for y given, not tabulated
     if (in.df) {
-      fill.val <- eval(substitute(data$fill))
-      fill <- .getColC(fill.val)
+      fill_val <- eval(substitute(data$fill))
+      fill <- .getColC(fill_val)
     }
 
     # or do a tabulation to get value of y
-    if (substr(fill.name, 1, 6) == "(count") {
+    if (substr(fill_name, 1, 6) == "(count") {
       xtb <- table(x.call)
-      fill <- .getColC(xtb, fill.name=fill.name)
+      fill <- .getColC(xtb, fill_name=fill_name)
     }  # end .count 
-  }  # end !fill.miss
+  }  # end !fill_miss
 
-  if (!is.null(pdf.file)) {
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
-    .opendev(pdf.file, width, height)
+  if (!is.null(pdf_file)) {
+    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
+    .opendev(pdf_file, width, height)
   }
   else {
     if (!shiny) {  # not dev.new for shiny
       pdf.fnm <- NULL
-      .opendev(pdf.file, width, height)
+      .opendev(pdf_file, width, height)
     }
   }
 
@@ -212,18 +238,18 @@ function(x, y=NULL, data=d, rows=NULL,
    hole <- hole * radius
   .pc.main(x.call, y.call, 
         fill, color, trans, 
-        radius, hole, hole.fill, edges, 
-        clockwise, init.angle, 
+        radius, hole, hole_fill, edges, 
+        clockwise, init_angle, 
         density, angle, lty, lwd,
-        values, values.position, values.color, values.size, values.digits,
-        labels.cex, main.cex, main, main.miss,
+        values, values_position, values_color, values_size, values_digits,
+        labels_cex, main_cex, main, main.miss,
         add, x1, x2, y1, y2,
-        quiet, pdf.file, width, height, ...)
+        quiet, pdf_file, width, height, ...)
 
   # terminate pdf graphics system
-  if (!is.null(pdf.file)) {
+  if (!is.null(pdf_file)) {
     dev.off()
-    .showfile(pdf.file, "pie chart")
+    .showfile(pdf_file, "pie chart")
   }
 
 }

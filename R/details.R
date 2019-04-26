@@ -1,13 +1,13 @@
 details <-
-function(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
-         miss.show=30, miss.matrix=FALSE, brief=getOption("brief")) {
+function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
+         miss_show=30, miss_matrix=FALSE, brief=getOption("brief")) {
 
   dname <- deparse(substitute(data))  # from read is called data
 
   # feedback regarding data
   n.var <- ncol(data)
   n.obs <- nrow(data)
-  max.lines <- min(max.lines, nrow(data))  #  max.lines now actual lines
+  max_lines <- min(max_lines, nrow(data))  #  max_lines now actual lines
 
   nu <- integer(length(n.var))
 
@@ -132,32 +132,32 @@ function(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
       .dash(75)
     }
 
-    n.cat <- getOption("n.cat")
+    n_cat <- getOption("n_cat")
     num.cat <- FALSE
-    n.cat.temp  <- 4
+    n_cat.temp  <- 4
     for (j in 1:n.var) {
-      if (is.double(data[,j]) && nu[j] <= n.cat.temp) num.cat <- TRUE
+      if (is.double(data[,j]) && nu[j] <= n_cat.temp) num.cat <- TRUE
     }
     if (num.cat) {
       cat("\n\n")
       cat("Each of these variables has numeric values, but has less than ",
-          n.cat.temp, "\n",
-          "unique values. Perhaps these variables are categorical. Consider\n",
+          n_cat.temp, "\n",
+          "unique values_ Perhaps these variables are categorical. Consider\n",
           "to transform each variable into a factor with the Transform and\n",
           "factor functions. To see examples enter:  > ?Transform\n", 
-          "Or, specify a value for n.cat, ",
-          "such as:  > style(n.cat=4)\n", sep="")
+          "Or, specify a value for n_cat, ",
+          "such as:  > style(n_cat=4)\n", sep="")
       .dash(63)
-      for (j in 1:n.var) if (is.double(data[,j]) && nu[j] <= n.cat.temp)
+      for (j in 1:n.var) if (is.double(data[,j]) && nu[j] <= n_cat.temp)
         cat(names(data)[j], "\n")
       .dash(63)
     }
     
     cat("\n\n")
 
-    n.miss.tot <- sum(is.na(data))
+    n.miss_tot <- sum(is.na(data))
     
-    if (n.miss.tot > 0) {
+    if (n.miss_tot > 0) {
       cat("Missing Data Analysis\n")
       .dash(52)
       
@@ -167,25 +167,25 @@ function(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
       while ( i<n.obs && n.lines>=0 ) {
         i <- i + 1
         n.miss <- sum(is.na((data)[i, ]))
-        if ( (n.miss >= n.mcut  || miss.zero) && (n.lines < miss.show) ) {
+        if ( (n.miss >= n_mcut  || miss_zero) && (n.lines < miss_show) ) {
           n.lines <- n.lines + 1
           cat(n.miss, "     ", row.names((data)[i, ]), "\n")
         }
-        if (n.lines == miss.show) {
+        if (n.lines == miss_show) {
           n.lines <- -1
-          cat("\nMore data rows have at least this many missing values: ", n.mcut, "\n",
-            "Specify n.mcut=2 to see just those lines with 2 missing values, etc,",
-            "Or increase the default value of miss.show=30 to show more lines.\n")
+          cat("\nMore data rows have at least this many missing values: ", n_mcut, "\n",
+            "Specify n_mcut=2 to see just those lines with 2 missing values, etc,",
+            "Or increase the default value of miss_show=30 to show more lines.\n")
         }
       }
       cat("\n")
 
       cat("Total number of cells in data table: ", n.var*n.obs,"\n")
-      cat("Total number of cells with the value missing: ", n.miss.tot,"\n")
+      cat("Total number of cells with the value missing: ", n.miss_tot,"\n")
       .dash(52)
       cat("\n")
 
-      if (miss.matrix && n.miss.tot>0) {
+      if (miss_matrix && n.miss_tot>0) {
         cat("\n\nTable of Missing Values, 1 means missing\nn")
         print(matrix(as.double(is.na(data)), nrow=n.obs, ncol=n.var,
         dimnames = list(row.names(data), as.character(1:n.var)) ))
@@ -204,8 +204,8 @@ function(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
 
   if (!is.null(l)) {
     cat("\nVariable Names   Variable Labels\n")
-    n.rows <- length(l)
-    n.lines <- min(max.lines, n.rows)
+    n_rows <- length(l)
+    n.lines <- min(max_lines, n_rows)
 
     mx.nm <- 0
     for (i in 1:n.lines) {  # width of var names
@@ -231,8 +231,8 @@ function(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
     }
     .dash(width.ln)
 
-    if (n.rows > n.lines) {
-      cat("To see all the variable labels set max.lines =", n.rows, "\n")
+    if (n_rows > n.lines) {
+      cat("To see all the variable labels set max_lines =", n_rows, "\n")
       .dash(64)
     }
   }
@@ -247,7 +247,7 @@ function(data=d, n.mcut=1, miss.zero=FALSE, max.lines=30,
   if (!is.null(myunits)) {
     cat("\nVariable Names   Variable Units\n")
     n.units <- length(myunits)
-    n.lines <- min(max.lines, n.units)
+    n.lines <- min(max_lines, n.units)
 
     width.ln <- width.nm
     for (i in 1:n.lines)  # get width of largest line

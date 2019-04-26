@@ -1,14 +1,14 @@
 .plt.legend <-
-function(colnms, horiz, color, fill, shape, col.bg, usr, lab.cex=0.8,
-         pt.size=1.25, legend.title=NULL) {
+function(colnms, horiz, color, fill, shape, col.bg, usr, lab_cex=0.8,
+         pt.size=1.25, legend_title=NULL) {
 
   par(xpd=NA) 
   
   # text color
-  the.clr <- getOption("lab.color")
+  the.clr <- getOption("lab_color")
 
-  text.cex <- ifelse(is.null(getOption("axis.x.cex")),
-      getOption("axis.cex"), getOption("axis.x.cex"))
+  text.cex <- ifelse(is.null(getOption("axis_x_cex")),
+      getOption("axis_cex"), getOption("axis_x_cex"))
   if (text.cex > 0.99) text.cex <- .95 * text.cex
 
   ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
@@ -23,14 +23,14 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab.cex=0.8,
     ytop <- usr[3] - (bm.user - (2.6 * bm.user/5))
     # ytop <- usr[3] - (bm.user - bm.user/5 + ll$rect$h) 
 
-    axis.horiz <- usr[2] - usr[1]
+    axis_horiz <- usr[2] - usr[1]
     lgnd.hhalf <- (ll$rect$w) / 2
-    xleft <- usr[1] + axis.horiz/2 - lgnd.hhalf
+    xleft <- usr[1] + axis_horiz/2 - lgnd.hhalf
 
     legend(xleft, ytop, legend=colnms, horiz=TRUE, box.lwd=.5, 
            box.col="transparent", cex=text.cex, pt.cex=pt.size,
            pt.bg=fill, bg=col.bg,
-           col=color, pch=shape, text.col=the.clr, title=legend.title) 
+           col=color, pch=shape, text.col=the.clr, title=legend_title) 
   }
 
   else {  # vertical
@@ -42,11 +42,11 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab.cex=0.8,
     #dv <- ifelse (options("device") == "RStudioGD", 1, 3)
     epsilon <- (size[1] - ll$rect$w) / 2
 
-    axis.vert <- usr[4] - usr[3]
+    axis_vert <- usr[4] - usr[3]
     xleft <- usr[2] + epsilon   # usr[2] user coordinate of right axis
     lgnd.vhalf <- ll$rect$h / 2
-    axis.cntr <- axis.vert / 2  + usr[3]
-    ytop <- axis.cntr + lgnd.vhalf  # user coordinate of legend top
+    axis_cntr <- axis_vert / 2  + usr[3]
+    ytop <- axis_cntr + lgnd.vhalf  # user coordinate of legend top
 
     xi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
     yi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
@@ -55,7 +55,7 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab.cex=0.8,
            box.col="transparent", cex=text.cex, pt.cex=pt.size,
            pt.bg=fill, bg=col.bg,
            col=color, pch=shape, text.col=the.clr,
-           x.intersp=xi, y.intersp=yi, title=legend.title)  # display legend
+           x.intersp=xi, y.intersp=yi, title=legend_title)  # display legend
   }
 
   par(xpd=FALSE)  # cancel drawing outside of plot region (need for RStudio)

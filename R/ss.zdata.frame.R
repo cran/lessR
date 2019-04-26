@@ -1,5 +1,5 @@
 .ss.data.frame <-
-function(x, n.cat, brief, ...)  {
+function(x, n_cat, brief, ...)  {
 
   for (i in 1:ncol(x)) {
     cat("\n\n")
@@ -9,7 +9,7 @@ function(x, n.cat, brief, ...)  {
     x.name <- names(x)[i]
     options(xname = x.name)
 
-    if (is.numeric(x[,i]) && nu > n.cat) {
+    if (is.numeric(x[,i]) && nu > n_cat) {
       stuff <- .ss.numeric(x[,i], brief=brief, ...)
       txsts <- stuff$tx
       txotl <- .bx.stats(x[,i])$txotl
@@ -21,7 +21,7 @@ function(x, n.cat, brief, ...)  {
     }
 
     else if (is.factor(x[,i]) || is.character(x[,i]) ||
-             (.is.num.cat(x[,i], n.cat))) {
+             (.is.num.cat(x[,i], n_cat))) {
       gl <- .getlabels()
       x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
       stats <- .ss.factor(x[,i], x.name=x.name, x.lbl=x.lbl, ...)
@@ -35,10 +35,10 @@ function(x, n.cat, brief, ...)  {
       class(output) <- "out_all"
       print(output)      
 
-      if (is.numeric(x[,i]) && nu <= n.cat)
-        cat("\n>>> Variable is numeric, but only has", nu, "<= n.cat =", n.cat, "levels,",
+      if (is.numeric(x[,i]) && nu <= n_cat)
+        cat("\n>>> Variable is numeric, but only has", nu, "<= n_cat =", n_cat, "levels,",
         "so treat as categorical.\n",
-        "   To obtain the numeric summary, decrease  n.cat  to indicate a lower\n",
+        "   To obtain the numeric summary, decrease  n_cat  to indicate a lower\n",
         "   number of unique values such as with function: set.\n", 
         "   Perhaps make this variable a factor with the R factor function.\n")
     }

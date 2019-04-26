@@ -1,18 +1,18 @@
 .bx.stats <-
-function(x, ID=NULL, k.iqr=1.5, box.adj=FALSE, a=-4, b=3, digits.d=2, ...) {      
+function(x, ID=NULL, k.iqr=1.5, box_adj=FALSE, a=-4, b=3, digits_d=2, ...) {      
 
   x.name <- getOption("xname")
 
   tx=""
-  if (is.null(digits.d)) {
-    digits.d <- .max.dd(x) + 1
-    if (digits.d == 1) digits.d <- 2
+  if (is.null(digits_d)) {
+    digits_d <- .max.dd(x) + 1
+    if (digits_d == 1) digits_d <- 2
   }
-  options(digits.d=digits.d)
+  options(digits_d=digits_d)
 
 
   # summarize data
-  if (!box.adj)
+  if (!box_adj)
     bv <- boxplot.stats(x, coef=k.iqr)
   else
     bv <- adjboxStats(x, coef=k.iqr, a=a, b=b)
@@ -43,7 +43,7 @@ function(x, ID=NULL, k.iqr=1.5, box.adj=FALSE, a=-4, b=3, digits.d=2, ...) {
       x.lo <- x.lo[ord]
       ID.lo <- ID.lo[ord] 
       xc.lo <- character(length=length(x.lo))
-      for (i in 1:length(x.lo)) xc.lo[i] <- .fmt(x.lo[i], d=digits.d-1)  
+      for (i in 1:length(x.lo)) xc.lo[i] <- .fmt(x.lo[i], d=digits_d-1)  
       ID.lo <- as.character(ID.lo)
       max.lo <- max(nchar(xc.lo))
       max.ID.lo <- max(nchar(as.character(ID.lo)))
@@ -65,7 +65,7 @@ function(x, ID=NULL, k.iqr=1.5, box.adj=FALSE, a=-4, b=3, digits.d=2, ...) {
       x.hi <- x.hi[ord]
       ID.hi <- ID.hi[ord] 
       xc.hi <- character(length=length(x.hi))
-      for (i in 1:length(x.hi)) xc.hi[i] <- .fmt(x.hi[i], d=digits.d-1)  
+      for (i in 1:length(x.hi)) xc.hi[i] <- .fmt(x.hi[i], d=digits_d-1)  
       max.hi <- max(nchar(xc.hi))
       max.ID.hi <- max(nchar(as.character(ID.hi)))
     }
@@ -130,16 +130,16 @@ function(x, ID=NULL, k.iqr=1.5, box.adj=FALSE, a=-4, b=3, digits.d=2, ...) {
   n <- sum(!is.na(x))
   n.miss <- sum(is.na(x))
   mn <- .fmt(min(x, na.rm=TRUE))
-  lw <- .fmt(bv$stats[1], digits.d)
-  lh <- .fmt(bv$stats[2], digits.d)
-  md <- .fmt(bv$stats[3], digits.d)
-  uh <- .fmt(bv$stats[4], digits.d)
-  uw <- .fmt(bv$stats[5], digits.d)
-  mx <- .fmt(max(x, na.rm=TRUE), digits.d) 
-  IQR <- .fmt(IQR(x, na.rm=TRUE), digits.d)
-  avg <- .fmt(mean(x, na.rm=TRUE), digits.d)
-  std <- .fmt(sd(x, na.rm=TRUE), digits.d)
-  mc <- .fmt(mc(x, na.rm=TRUE), digits.d)
+  lw <- .fmt(bv$stats[1], digits_d)
+  lh <- .fmt(bv$stats[2], digits_d)
+  md <- .fmt(bv$stats[3], digits_d)
+  uh <- .fmt(bv$stats[4], digits_d)
+  uw <- .fmt(bv$stats[5], digits_d)
+  mx <- .fmt(max(x, na.rm=TRUE), digits_d) 
+  IQR <- .fmt(IQR(x, na.rm=TRUE), digits_d)
+  avg <- .fmt(mean(x, na.rm=TRUE), digits_d)
+  std <- .fmt(sd(x, na.rm=TRUE), digits_d)
+  mc <- .fmt(mc(x, na.rm=TRUE), digits_d)
 
   tx <- character(length = 0)
   tx <- txlbl
@@ -155,11 +155,11 @@ function(x, ID=NULL, k.iqr=1.5, box.adj=FALSE, a=-4, b=3, digits.d=2, ...) {
   tx[length(tx)+1] <- paste("Minimum      :", mn)
   tx[length(tx)+1] <- paste("Lower Whisker:", lw) 
   tx[length(tx)+1] <- paste("1st Quartile :",
-     .fmt(quantile(x, na.rm=TRUE)[2], digits.d))
+     .fmt(quantile(x, na.rm=TRUE)[2], digits_d))
   #tx[length(tx)+1] <- paste("Lower Hinge  :", lh) 
   tx[length(tx)+1] <- paste("Median       :", md) 
   tx[length(tx)+1] <- paste("3rd Quartile :",
-     .fmt(quantile(x, na.rm=TRUE)[4], digits.d))
+     .fmt(quantile(x, na.rm=TRUE)[4], digits_d))
   #tx[length(tx)+1] <- paste("Upper Hinge  :", uh) 
   tx[length(tx)+1] <- paste("Upper Whisker:", uw) 
   tx[length(tx)+1] <- paste("Maximum      :", mx )

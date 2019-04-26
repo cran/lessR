@@ -1,7 +1,7 @@
 regPlot <- 
-function(out, type, digits.d=NULL, pred.intervals=TRUE,
-         res.sort=c("cooks","rstudent","dffits","off"),
-         res.rows=NULL, cooks.cut=1, scatter.coef=NULL,
+function(out, type, digits_d=NULL, pred.intervals=TRUE,
+         res_sort=c("cooks","rstudent","dffits","off"),
+         res_rows=NULL, cooks_cut=1, scatter_coef=NULL,
          pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
 
 
@@ -14,7 +14,7 @@ function(out, type, digits.d=NULL, pred.intervals=TRUE,
 
 
     # need: out$fitted.values, out$residuals
-    if (type == 3) .reg3resfitResidual(out, out$cooks.distance, cooks.cut,
+    if (type == 3) .reg3resfitResidual(out, out$cooks.distance, cooks_cut,
                    pdf=FALSE, width=5, height=5, manage.gr=FALSE)
 
 
@@ -57,17 +57,17 @@ function(out, type, digits.d=NULL, pred.intervals=TRUE,
     else {
       c.int <- NULL
       p.int <- NULL
-      pred.rows <- 0
+      pred_rows <- 0
     }
 
-    if (!is.null(scatter.coef))
-      s.c <- scatter.coef
+    if (!is.null(scatter_coef))
+      s.c <- scatter_coef
     else
       s.c <- TRUE
 
 
-    .reg5Plot(out, res.rows=NULL, pred.rows=NULL,
-         scatter.coef=s.c, scatter.3D=FALSE, X1.new=NULL,
+    .reg5Plot(out, res_rows=NULL, pred_rows=NULL,
+         scatter_coef=s.c, scatter_3D=FALSE, X1_new=NULL,
          numeric.all, in.data.frame, c.int, p.int,
          pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...)
 

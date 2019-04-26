@@ -1,34 +1,51 @@
 Density <-
 function(x, data=d, rows=NULL,
-         n.cat=getOption("n.cat"), Rmd=NULL,
+         n_cat=getOption("n_cat"), Rmd=NULL,
 
        bw=NULL, type=c("both", "general", "normal"),
-       histogram=TRUE, bin.start=NULL, bin.width=NULL,
+       histogram=TRUE, bin_start=NULL, bin_width=NULL,
 
-       color.nrm="black", color.gen="black",
-       fill.nrm=NULL, fill.gen=NULL,
+       color_nrm="black", color_gen="black",
+       fill_nrm=NULL, fill_gen=NULL,
 
-       axis.text.color="gray30", rotate.x=0, rotate.y=0, offset=0.5,
+       axis_text_color="gray30", rotate_x=0, rotate_y=0, offset=0.5,
 
-       x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y.axis=FALSE,
+       x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y_axis=FALSE,
        x.min=NULL, x.max=NULL,
-       rug=FALSE, color.rug="black", size.rug=0.5,
+       rug=FALSE, color_rug="black", size.rug=0.5,
 
-       eval.df=NULL, digits.d=NULL, quiet=getOption("quiet"),
+       eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
        width=4.5, height=4.5, pdf=FALSE,
-       fun.call=NULL, ...) {
+       fun_call=NULL, ...) {
+
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("n.cat", "bin.start", "bin,width", "color.nrm", "color.gen",
+                "fill.nrm", "fill.gen", "axis.text.color", "rotate.x",
+                "rotate.y", "y.axis", "color.rug", "size.rug", "eval.df", 
+                "digits.d", "fun.call")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
 
   type <- match.arg(type)
-  if (is.null(fun.call)) fun.call <- match.call()
+  if (is.null(fun_call)) fun_call <- match.call()
 
-  fill <- getOption("se.fill")
-  panel.fill <- getOption("panel.fill")
-  panel.color <- getOption("panel.color")
-  lab.cex <- getOption("lab.cex")
-  axis.cex <- getOption("axis.cex")
+  fill <- getOption("se_fill")
+  panel_fill <- getOption("panel_fill")
+  panel_color <- getOption("panel_color")
+  lab_cex <- getOption("lab_cex")
+  axis_cex <- getOption("axis_cex")
 
-  if (!missing(color.rug) || !missing(size.rug)) rug <- TRUE
+  if (!missing(color_rug) || !missing(size.rug)) rug <- TRUE
 
   bw.miss <- ifelse (missing(bw), TRUE, FALSE)
 
@@ -43,26 +60,26 @@ function(x, data=d, rows=NULL,
 #   else
 #     fill <- "gray86"
 
-  if (missing(fill.nrm)) {
-      fill.nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
+  if (missing(fill_nrm)) {
+      fill_nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
     if (clr == "gray" ||
-       (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black")) {
-      fill.nrm <- "transparent"
+       (getOption("theme") == "gray"  &&  getOption("sub_theme") == "black")) {
+      fill_nrm <- "transparent"
     }
   }
 
-  if (missing(fill.gen)) {
-      fill.gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
+  if (missing(fill_gen)) {
+      fill_gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
     if (clr == "gray" ||
-       (getOption("theme") == "gray"  &&  getOption("sub.theme") == "black")) {
-      fill.gen <- rgb(.75,.75,.75, .5)
+       (getOption("theme") == "gray"  &&  getOption("sub_theme") == "black")) {
+      fill_gen <- rgb(.75,.75,.75, .5)
     }
   }
 
   
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval.df))  # default values
-    eval.df <- ifelse (shiny, FALSE, TRUE)
+  if (is.null(eval_df))  # default values
+    eval_df <- ifelse (shiny, FALSE, TRUE)
   # get actual variable name before potential call of data$x
   if (!missing(x))  # can't do is.null or anything else with x until evaluated
     x.name <- deparse(substitute(x))  # could be a list of var names
@@ -115,7 +132,7 @@ function(x, data=d, rows=NULL,
 
     # x not in global env, in df, specify data= forces to data frame
     if (!x.in.global) {
-      if (eval.df) {
+      if (eval_df) {
         if (!mydata.ok) .nodf(df.name)  # check to see if data frame container exists
         .xcheck(x.name, df.name, names(data))  # var in df?, vars lists not checked
       }
@@ -165,20 +182,20 @@ function(x, data=d, rows=NULL,
     if (manage.gr  &&  !pdf  && !shiny) {
       i.win <- 0
       for (i in 1:ncol(data)) {
-        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n.cat))
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n_cat))
           i.win <- i.win + 1
       }
       .graphwin(i.win, width, height)
     }
     open.win <- 2
 
-    if (is.null(digits.d)) {
-      dig.dec <- .max.dd(data[,1]) + 1
-      if (dig.dec == 1) dig.dec <- 2
+    if (is.null(digits_d)) {
+      digits_d <- .max.dd(data[,1]) + 1
+      if (digits_d == 1) digits_d <- 2
     }
     else
-      dig.dec <- digits.d
-    options(digits.d=dig.dec)
+      digits_d <- digits_d
+    options(digits_d=digits_d)
 
 
   for (i in 1:ncol(data)) {
@@ -190,7 +207,7 @@ function(x, data=d, rows=NULL,
 
     if (is.numeric(data[,i])) {  # has to be a numeric variable
       # do not do num.cat vars, unless only 1 variable to analyze
-      if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n.cat)) {
+      if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n_cat)) {
 
       if (pdf) {
         pdf.fnm <- paste("Density", "_", x.name, ".pdf", sep="")
@@ -219,12 +236,12 @@ function(x, data=d, rows=NULL,
       # get bandwidth
       if (bw.miss) bw <- .band.width(data[,i], ...)
 
-      stuff <- .dn.main(data[,i], bw, type, histogram, bin.start, bin.width,
-            fill, panel.fill, panel.color,
-            color.nrm, color.gen, fill.nrm, fill.gen,
-            lab.cex, axis.cex, axis.text.color, rotate.x, rotate.y, offset,
-            x.pt, xlab, main, sub, y.axis, x.min, x.max,
-            rug, color.rug, size.rug, quiet, ...)
+      stuff <- .dn.main(data[,i], bw, type, histogram, bin_start, bin_width,
+            fill, panel_fill, panel_color,
+            color_nrm, color_gen, fill_nrm, fill_gen,
+            lab_cex, axis_cex, axis_text_color, rotate_x, rotate_y, offset,
+            x.pt, xlab, main, sub, y_axis, x.min, x.max,
+            rug, color_rug, size.rug, quiet, ...)
 
       txdst <- ""
       txotl <- ""
@@ -252,9 +269,9 @@ function(x, data=d, rows=NULL,
         if (!quiet) .showfile(pdf.fnm, "density curve")
       }
 
-    }  # nu > n.cat
+    }  # nu > n_cat
     else
-      if (!quiet) .ncat("Density curve", x.name, nu, n.cat)
+      if (!quiet) .ncat("Density curve", x.name, nu, n_cat)
 
     }  # is.numeric(data[,i])
   }  # for (i in 1:ncol(data)), cycle through all the variables
@@ -270,13 +287,13 @@ function(x, data=d, rows=NULL,
 
 
   # now further processing if only a single numerical variable to process
-  if (ncol(data) == 1  &&  nu > n.cat) {
+  if (ncol(data) == 1  &&  nu > n_cat) {
 
     # R Markdown
     txkfl <- ""
     if (!is.null(Rmd)) {
       if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
-      txknt <- .dist.Rmd(x.name, df.name, fun.call, digits.d)
+      txknt <- .dist.Rmd(x.name, df.name, fun_call, digits_d)
       cat(txknt, file=Rmd, sep="\n")
       txkfl <- .showfile2(Rmd, "R Markdown instructions")
     }

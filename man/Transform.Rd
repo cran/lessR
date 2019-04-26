@@ -66,7 +66,7 @@ newdata <- Transform(Status=Status-1)
 d <- Transform(Status=factor(Status, labels=c("OK","Hurts","Painful","Yikes")))
 
 # read lessR data set dataEmployee into data frame d
-d <- Read("Employee", in.lessR=TRUE)
+d <- Read("Employee", in_lessR=TRUE)
 # multiple transformations in one statement
 #  Months is a new variable
 #  Salary is a new version of the old Salary
@@ -97,7 +97,7 @@ d <- Transform(JobSat=
 #   with the Transform and factor functions
 # using Recode destroys the factor attribute, converting to
 #   character strings instead, so Recode does not allow
-d <- Read("Employee", in.lessR=TRUE)
+d <- Read("Employee", in_lessR=TRUE)
 d <- Transform(
     Gender=factor(Gender, levels=c("F", "M"), labels=c("Female", "Male"))
 )
@@ -114,7 +114,7 @@ d <- Recode(Gender, old=c(1,2), new=c(0,1))
 # recode integer values to levels of a factor with value labels
 #   with the Transform function instead of Recode
 # here Gender has values 0 and 1 in the data
-d <- Read("Mach4", in.lessR=TRUE)
+d <- Read("Mach4", in_lessR=TRUE)
 d <- Transform(
       Gender=factor(Gender, levels=c(0,1), labels=c("Male","Female"))
       )

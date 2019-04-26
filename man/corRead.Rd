@@ -21,7 +21,7 @@ rd.cor(\ldots)
         or a full path name or web URL, included in quotes.  A URL
         begins with \code{http://}.}
   \item{names}{The names of the variables in the matrix.}
-  \item{\dots}{Parameter values.}
+  \item{\dots}{Parameter values_}
 }
 
 \details{

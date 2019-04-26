@@ -1,12 +1,25 @@
 Recode <-
-function(old.vars, new.vars=NULL, old, new, data=d,
-         quiet=getOption("quiet")) {
+function(old_vars, new_vars=NULL, old, new, data=d,
+         quiet=getOption("quiet"), ...) {
 
 
-  if (missing(old.vars)) {
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("new.vars", "old.vars")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
+
+  if (missing(old_vars)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify the variable to be recoded by listing it\n",
-      "first or set according to:  old.vars\n\n")
+      "first or set according to:  old_vars\n\n")
   }
 
   if (missing(old)) {
@@ -22,17 +35,17 @@ function(old.vars, new.vars=NULL, old, new, data=d,
 
   my.vars <- as.list(seq_along(data))
   names(my.vars) <- names(data)
-  vars <- eval(substitute(old.vars), envir=my.vars, enclos=parent.frame())
+  vars <- eval(substitute(old_vars), envir=my.vars, enclos=parent.frame())
 
-  if (!is.null(new.vars)) {
-    old.vars.len <- 
-      length(eval(substitute(old.vars), envir=my.vars, enclos=parent.frame()))
-    new.vars.len <-
-       length(eval(substitute(new.vars), envir=my.vars, enclos=parent.frame()))
-    if (old.vars.len != new.vars.len) { 
+  if (!is.null(new_vars)) {
+    old_vars.len <- 
+      length(eval(substitute(old_vars), envir=my.vars, enclos=parent.frame()))
+    new_vars.len <-
+       length(eval(substitute(new_vars), envir=my.vars, enclos=parent.frame()))
+    if (old_vars.len != new_vars.len) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Number of specified existing variables: ", old.vars.len, "\n",
-        "Number of specified transformed variables: ", new.vars.len, "\n\n",
+        "Number of specified existing variables: ", old_vars.len, "\n",
+        "Number of specified transformed variables: ", new_vars.len, "\n\n",
         "The same number of variables must be specified for both\n",
         "existing and transformed variables.\n\n")
     }
@@ -70,7 +83,7 @@ function(old.vars, new.vars=NULL, old, new, data=d,
     in.style <- xs$ig 
 
     if (in.style)
-      if (is.function(old.vars)) 
+      if (is.function(old_vars)) 
         x.call <- as.vector(eval(substitute(data[,vars[ivar]])))
       else {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -83,8 +96,8 @@ function(old.vars, new.vars=NULL, old, new, data=d,
     x.call <- as.vector(eval(substitute(data[,vars[ivar]])))
 
     n.obs <- nrow(data)
-    new.var <- new.vars[ivar]
-    new.x <- .rec.main(x.call, x.name, new.vars[ivar], old, new, ivar,
+    new.var <- new_vars[ivar]
+    new.x <- .rec.main(x.call, x.name, new_vars[ivar], old, new, ivar,
                         n.obs, dname, quiet)
 
     # insert transformation into data
@@ -99,10 +112,10 @@ function(old.vars, new.vars=NULL, old, new, data=d,
   }  # recode loop
 
   if (!quiet) {
-    nn <- length(new.vars)
+    nn <- length(new_vars)
     new.index <- integer(length=nn)
     if (nn > 0) for (i in 1:nn)
-      new.index[i] <- which(names(data)==new.vars[i])
+      new.index[i] <- which(names(data)==new_vars[i])
     cat("\n\n")
     .dash(48)
     cat("First four rows of recoded data\n")

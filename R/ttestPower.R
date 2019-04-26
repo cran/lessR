@@ -1,7 +1,20 @@
 ttestPower <- 
 function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL, 
          mmd=NULL, msmd=NULL, mdp=.8, mu=NULL, 
-         pdf.file=NULL, width=5, height=5, ...) {
+         pdf_file=NULL, width=5, height=5, ...) {
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("pdf.file")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
       
   cat("\n")
   
@@ -115,11 +128,11 @@ function(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL,
   
 
   # set up graphics system
-  .opendev(pdf.file, width, height)
+  .opendev(pdf_file, width, height)
   
   .ttp2graph(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...)
 
-  if (!is.null(pdf.file)) .showfile(pdf.file, "power curve")
+  if (!is.null(pdf_file)) .showfile(pdf_file, "power curve")
 
   cat("\n")
     

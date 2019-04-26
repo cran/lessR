@@ -1,23 +1,23 @@
 ViolinPlot <-
 function(...) {
 
-  vp.fill <- getOption("violin.fill")
+  vp_fill <- getOption("violin_fill")
   do.sub <- FALSE
 
-  #  allow fill parameter to pass to violin.fill
+  #  allow fill parameter to pass to violin_fill
   lst <- as.list(match.call()) 
   if (!is.null(names(lst))) {  # at least one named argument
     for (i in 1:length(lst)) {
       if (names(lst[i]) == "fill") {
-        vp.fill <- lst[[i]]
+        vp_fill <- lst[[i]]
         do.sub <- TRUE
       }
     }
   }
 
   if (!do.sub)
-    Plot(fun.call=match.call(), vbs.plot="v",  ...)
+    Plot(fun_call=match.call(), vbs_plot="v",  ...)
   else
-    Plot(fun.call=match.call(), vbs.plot="v", violin.fill=vp.fill, ...)
+    Plot(fun_call=match.call(), vbs_plot="v", violin_fill=vp_fill, ...)
 
 }

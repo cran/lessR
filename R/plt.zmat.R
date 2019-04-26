@@ -1,25 +1,25 @@
 .plt.mat <-
 function(x, cor.coef=TRUE, fit="loess",
-         col.fill=getOption("pt.fill"), col.color=getOption("pt.color"),
-         col.fit=getOption("fit.color"), col.bg=getOption("panel.fill"),
-         col.box=getOption("panel.color")) {
+         col_fill=getOption("pt_fill"), col_color=getOption("pt_color"),
+         col.fit=getOption("fit_color"), col.bg=getOption("panel_fill"),
+         col.box=getOption("panel_color")) {
 
 
   if (is.null(fit)) fit <- "loess"
 
-  if (getOption("sub.theme") == "black") col.color <- getOption("lab.color")
+  if (getOption("sub_theme") == "black") col_color <- getOption("lab_color")
 
   n.var <- ncol(x)
 
-  par(bg=getOption("window.fill"))
+  par(bg=getOption("window_fill"))
 
   panel.smooth <- function(x, y, fit.line=fit, pch=par("pch"), cex=.76,
-    col.pt=col.color, col.smooth=col.fit, span=2/3, iter=3, ...)
+    col.pt=col_color, col.smooth=col.fit, span=2/3, iter=3, ...)
  {
     usr <- par("usr")          
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
     cex.adj <- 0.86 - 0.045*n.var
-    points(x, y, pch=21, col=col.pt, bg=col.fill, cex=cex.adj)
+    points(x, y, pch=21, col=col.pt, bg=col_fill, cex=cex.adj)
 
     ok <- is.finite(x) & is.finite(y)
     if (any(ok)) {
@@ -41,7 +41,7 @@ function(x, cor.coef=TRUE, fit="loess",
         up.ln <- f.ln + (qt(prb,length(x[ok])-1) * p.ln$se.fit)
         dn.ln <- f.ln - (qt(prb,length(x[ok])-1) * p.ln$se.fit)
         polygon(c(x[ok], rev(x[ok])), c(dn.ln, rev(up.ln)),
-          col=getOption("se.fill"), border="transparent") #
+          col=getOption("se_fill"), border="transparent") #
       }
     }
   }
@@ -55,18 +55,18 @@ function(x, cor.coef=TRUE, fit="loess",
     txt <- .fmt(r, 2)
     txt <- paste(prefix, txt, sep="")
     cex.adj <- 2.25 - (0.10*n.var)  # adjust size of displayed r
-    text(0.5, 0.5, txt, cex=cex.adj, col=col.color)  # or cex=cex.cor * r
+    text(0.5, 0.5, txt, cex=cex.adj, col=col_color)  # or cex=cex.cor * r
   }
 
   text.diag <- function(x, y, nm, ...) {  # nm from calling routine
     usr <- par("usr")          
-    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("ellipse.fill"),
+    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("ellipse_fill"),
          border=col.box)
     #rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
     txt <-  nm  # nm from parameter list, so adjusts for each panel
     cex.adj <- 2.25 - (0.10*n.var)  # adjust size of displayed r
     #cex.adj <- ifelse (n.var < 8, 1.8, 1.5)  # adjust size of displayed r
-    text(0.5, 0.5, txt, cex=cex.adj, col=getOption("lab.color"))
+    text(0.5, 0.5, txt, cex=cex.adj, col=getOption("lab_color"))
   }
 
   # -----

@@ -1,8 +1,19 @@
 SummaryStats <-
-function(x=NULL, by=NULL, data=d, n.cat=getOption("n.cat"), 
-    digits.d=NULL, brief=getOption("brief"), label.max=20, ...)  {
+function(x=NULL, by=NULL, data=d, n_cat=getOption("n_cat"), 
+    digits_d=NULL, brief=getOption("brief"), label_max=20, ...)  {
 
-  # let deprecated mydata work as default
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("n.cat", "digits.d", "label.max")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }  # let deprecated mydata work as default
   dfs <- .getdfs() 
   mydata.ok <- FALSE
   if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
@@ -127,10 +138,10 @@ function(x=NULL, by=NULL, data=d, n.cat=getOption("n.cat"),
   if (ncol(data) == 1) {
     x.call <- data[,1]
 
-    num.cat <- .is.num.cat(x.call, n.cat)
+    num.cat <- .is.num.cat(x.call, n_cat)
     nu <- length(unique(na.omit(x.call)))
 
-    if (!num.cat && is.integer(x.call) && nu <= n.cat) {
+    if (!num.cat && is.integer(x.call) && nu <= n_cat) {
       cat("\n")
       cat(">>> ", x.name, " has only only ", nu, " unique ",
           "integer values, but not equally spaced,\n",
@@ -141,12 +152,12 @@ function(x=NULL, by=NULL, data=d, n.cat=getOption("n.cat"),
 
     if (num.cat || is.character(x.call)) {
       x.call <- as.factor(x.call)
-     .ncat("summary statistics", x.name, nu, n.cat)
+     .ncat("summary statistics", x.name, nu, n_cat)
     }
   }
 
   if (ncol(data) > 1)
-    .ss.data.frame(data, n.cat, brief, ...) 
+    .ss.data.frame(data, n_cat, brief, ...) 
 
   else if (!is.factor(x.call)) {  # numeric analysis
 
@@ -155,7 +166,7 @@ function(x=NULL, by=NULL, data=d, n.cat=getOption("n.cat"),
       nm <- y.name
     else
       nm <- NULL
-    stuff <- .ss.numeric(x.call, y.call, digits.d, brief, y.name=nm, ...)
+    stuff <- .ss.numeric(x.call, y.call, digits_d, brief, y.name=nm, ...)
     txsts <- stuff$tx
     txotl <- .bx.stats(x.call)$txotl
   }
@@ -167,8 +178,8 @@ function(x=NULL, by=NULL, data=d, n.cat=getOption("n.cat"),
     x.name <- gl$xn; x.lab <- gl$xb; x.lbl <- gl$xl
     y.name <- gl$yn; y.lab <- gl$yb; y.lbl <- gl$yl
 
-    stuff <- .ss.factor(x.call, y.call, brief, digits.d,
-                      x.name, y.name, x.lbl, y.lbl, label.max, ...)
+    stuff <- .ss.factor(x.call, y.call, brief, digits_d,
+                      x.name, y.name, x.lbl, y.lbl, label_max, ...)
 
     n.dim <- stuff$n.dim
     if (n.dim == 1) {

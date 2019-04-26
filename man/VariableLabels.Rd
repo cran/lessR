@@ -7,7 +7,7 @@
 \description{
 Assign and/or display variable labels stored in the data frame \code{l}. Variable labels enhance output of analyses either as text output at the console or as graphics, such as an axis label on a graph.  The variable labels can be assigned individually, or for some or all variables. 
 
-NOTE: Mostly deprecated. Can just set \code{var.labels=TRUE} on for a call to 
+NOTE: Mostly deprecated. Can just set \code{var_labels=TRUE} on for a call to 
 \code{\link{Read}} to read a file of variable labels, and assign the output to \code{l}. Still needed to pull labels out of data frame from an SPSS read, or to read units to generate Rmd files from \code{\link{Regression}} .
 }
 

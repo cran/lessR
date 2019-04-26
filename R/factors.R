@@ -1,9 +1,21 @@
 factors <-
 function (x, levels, labels=NULL, data=d, ordered=FALSE,
-          new=FALSE, suffix=".f", var.labels=FALSE, ...) {
+          new=FALSE, suffix="_f", var_labels=FALSE, ...) {
 
-  if (var.labels) new <- TRUE
-  if (missing(levels) && var.labels) levels <- NULL
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% c("var.labels")) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
+
+  if (var_labels) new <- TRUE
+  if (missing(levels) && var_labels) levels <- NULL
   if (is.null(labels)) labels <- as.character(levels)
 
   # get ind, the indices of selected variables
@@ -11,8 +23,8 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
   names(data.vars) <- names(data)
   ind <- eval(substitute(x), envir=data.vars, parent.frame())
 
-  n.col <- ncol(data)
-  n.row <- nrow(data)
+  n_col <- ncol(data)
+  n_row <- nrow(data)
 
   # create new variables for factor versions
   if (new) {
@@ -22,15 +34,15 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
     new.names <- paste(names(data)[ind], suffix, sep="")
     all.names <- c(names(data), new.names)
 
-    if (!var.labels) { # do the conversion to factors
+    if (!var_labels) { # do the conversion to factors
       # get old df + new df
       new.mat <- matrix(nrow=nrow(data), ncol=n.add)
       data <- cbind(data, new.mat)
       names(data) <- all.names
 
       # convert
-      new.i.start <- n.col + 1
-      new.i.end <- n.col + n.add
+      new.i.start <- n_col + 1
+      new.i.end <- n_col + n.add
       data[, new.i.start:new.i.end] <-
       lapply(data[, ind, drop=FALSE], factor,
              levels=levels, labels=labels, ordered=ordered)
@@ -39,7 +51,7 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
 
   # replace existing values
   else {
-    if (!var.labels) {
+    if (!var_labels) {
       data[, ind] <-
         lapply(data[, ind, drop=FALSE], factor,
                levels=levels, labels=labels, ordered=ordered)
@@ -48,7 +60,7 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
 
 
   # copy the variable labels to the newly created .f vars
-  if (var.labels) {
+  if (var_labels) {
 
     l.name <- "l"
     if (exists(l.name, where=.GlobalEnv)) {
@@ -65,14 +77,14 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
     new.mat2 <- data.frame(matrix(nrow=n.add, ncol=1))
     names(new.mat2) <- "label"
 
-    row.start <- n.col + 1
-    row.end <- n.col + n.add
+    row.start <- n_col + 1
+    row.end <- n_col + n.add
     rownames(new.mat2)[1:n.add] <- all.names[(row.start):(row.end)]
     new.mat2[, 1] <- new.lbls
     new.labels <- rbind(l, new.mat2)
   }
 
-  if (!var.labels)
+  if (!var_labels)
     return(data=as.data.frame(data))
   else
     return(new.labels)

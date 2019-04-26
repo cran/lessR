@@ -16,7 +16,7 @@ Now just applies to the \code{lessR} \code{\link{Regression}} function.
 
 \arguments{
   \item{x}{The piece of output to display, a character vector or a list of character vectors.}
-  \item{\dots}{Other parameter values.}
+  \item{\dots}{Other parameter values_}
 }
 
 \references{
@@ -31,7 +31,7 @@ Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, N
 
 \examples{
 # read internal data set
-d <- rd("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- rd("Employee", in_lessR=TRUE, quiet=TRUE)
 # do the summary statistics
 s <- ss.brief(Salary)
 # print the piece of output, print function is implicit

@@ -25,23 +25,23 @@ corCFA(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
          labels=c("include", "exclude", "only"),
 
-         min.cor=.10, min.res=.05, iter=50, grid=TRUE, 
+         min_cor=.10, min_res=.05, iter=50, grid=TRUE, 
 
-         resid=TRUE, item.cor=TRUE, sort=TRUE,
+         resid=TRUE, item_cor=TRUE, sort=TRUE,
 
-         main=NULL, heat.map=TRUE, bottom=3, right=3, 
+         main=NULL, heat_map=TRUE, bottom=3, right=3, 
 
-         pdf.file=NULL, width=5, height=5,
+         pdf_file=NULL, width=5, height=5,
 
          F1=NULL, F2=NULL, F3=NULL, F4=NULL, F5=NULL,
          F6=NULL, F7=NULL, F8=NULL, F9=NULL, F10=NULL,
          F11=NULL, F12=NULL,
 
-         fun.call=NULL)
+         fun_call=NULL, \ldots)
 
 cfa(\ldots)
 
-scales(\ldots, iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE, heat.map=FALSE)
+scales(\ldots, iter=0, resid=FALSE, item_cor=FALSE, sort=FALSE, heat_map=FALSE)
 }
 
 \arguments{
@@ -70,23 +70,23 @@ scales(\ldots, iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE, heat.map=FALSE)
        (if available) or not, organized by the items within each factor.
        If "only" then no data analysis performed, only the display of the
        labels by factor.}
-  \item{min.cor}{Minimum correlation to display. To display all, set to 0.}
-  \item{min.res}{Minimum residual to display. To display all, set to 0.}
+  \item{min_cor}{Minimum correlation to display. To display all, set to 0.}
+  \item{min_res}{Minimum residual to display. To display all, set to 0.}
   \item{iter}{Number of iterations for communality estimates.}
   \item{grid}{If \code{TRUE}, then separate items in different factors
         by a grid of horizontal and vertical lines in the output 
         correlation matrix.}
   \item{resid}{If \code{TRUE}, then calculate and print the residuals.}
-  \item{item.cor}{If \code{TRUE}, display the indicator correlations.}
+  \item{item_cor}{If \code{TRUE}, display the indicator correlations.}
   \item{sort}{If \code{TRUE}, re-order the output correlation matrix so that
         indicators within each factor are sorted by their factor loadings on
         their own factor.}
   \item{main}{Graph title of heat map. Set to \code{main=""} to turn off.}
-  \item{heat.map}{If \code{TRUE}, display a heat map of the indicator
+  \item{heat_map}{If \code{TRUE}, display a heat map of the indicator
         correlations with indicator communalities in the diagonal.}
   \item{bottom}{Number of lines of bottom margin of heat map.}
   \item{right}{Number of lines of right margin of heat map.}
-  \item{pdf.file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
   \item{F1}{Variables that define Factor 1.}
@@ -101,10 +101,10 @@ scales(\ldots, iter=0, resid=FALSE, item.cor=FALSE, sort=FALSE, heat.map=FALSE)
   \item{F10}{Variables that define Factor 10.}
   \item{F11}{Variables that define Factor 11.}
   \item{F12}{Variables that define Factor 12.}
-  \item{fun.call}{Function call. Used internally with \code{knitr} to pass the 
+  \item{fun_call}{Function call. Used internally with \code{knitr} to pass the 
         function call when obtained from the abbreviated function call \code{cfa}.
         Not usually invoked by the user.}
-  \item{\dots}{Parameter values.}
+  \item{\dots}{Parameter values_}
 }
 
 \details{
@@ -127,7 +127,7 @@ VARIABLE LABELS\cr
 To display the indicator content, first read the indicators as variable labels with the \code{lessR} function \code{\link{Read}}.  If this labels data frame exists, then the corresponding variable labels, such as the actual items on a survey, are listed by factor. For more information, see \code{\link{Read}}.
 
 HEAT MAP\cr
-To help visualize the overall pattering of the correlations, the corresponding heat map of the item correlation matrix with communalities is produced when \code{heat.map=TRUE}, the default. As is true of the output correlation matrix, the correlations illustrated in the heat map are also sorted by their ordering within each factor. The corresponding color scheme is dictated by the system setting, according to the \code{lessR} function \code{\link{style}}.  The default color scheme is \code{blue}.
+To help visualize the overall pattering of the correlations, the corresponding heat map of the item correlation matrix with communalities is produced when \code{heat_map=TRUE}, the default. As is true of the output correlation matrix, the correlations illustrated in the heat map are also sorted by their ordering within each factor. The corresponding color scheme is dictated by the system setting, according to the \code{lessR} function \code{\link{style}}.  The default color scheme is \code{blue}.
 
 ESTIMATION PROCEDURE\cr
 The estimation procedure is centroid factor analysis, which defines each factor, parallel to the definition of each scale score, as the unweighted composite of the corresponding items for that scale.  The latent variables are obtained by replacing the 1's in the diagonal of the indicator variable correlation matrix with communality estimates.  These estimates are obtained by iterating the solution to the specified number of iterations according to \code{iter}, which defaults to 50.
@@ -233,7 +233,7 @@ style("gray")
 corCFA(F1=X1:X3, F2=X4:X6)
 
 # access the lessR data set called datMach4, with variable labels
-d <- Read("Mach4", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Mach4", in_lessR=TRUE, quiet=TRUE)
 # calculate the correlations and store in mycor
 mycor <- cr(m01:m20)
 # specify measurement model in Lavaan notation

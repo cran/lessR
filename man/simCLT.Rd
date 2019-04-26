@@ -10,7 +10,7 @@ Show the distribution of sample means and relevant summary statistics, such as t
 \usage{
 simCLT(ns, n, p1=0, p2=1,
        type=c("normal", "uniform", "lognormal", "antinormal"),
-       fill="lightsteelblue3", n.display=2, digits.d=3, 
+       fill="lightsteelblue3", n_display=2, digits_d=3, 
        subtitle=TRUE, pop=TRUE, 
        main=NULL, pdf=FALSE, width=5, height=5, \ldots)
 }
@@ -23,8 +23,8 @@ simCLT(ns, n, p1=0, p2=1,
   \item{p2}{Second parameter value for the population distribution, the standard deviation, maximum or sdlog for the normal, uniform and lognormal populations, respectively. Is the maximum for the anti-normal, usually left at the default value of 1.}
   \item{type}{The general population distribution.}
   \item{fill}{Fill color of the graphs.}
-  \item{n.display}{Number of samples for which to display the sample mean and data values.}
-  \item{digits.d}{Number of decimal digits to display on the output.}
+  \item{n_display}{Number of samples for which to display the sample mean and data values_}
+  \item{digits_d}{Number of decimal digits to display on the output.}
   \item{subtitle}{If \code{TRUE}, then display the specific parameter values of the population or sample, depending on the graph.}
   \item{pop}{If \code{TRUE}, then display the graph of the population from which the data are sampled.}
   \item{main}{Title of graph.}
@@ -61,7 +61,7 @@ simCLT(ns=1000, n=2)
 # plot of the uniform dist from 0 to 4
 #  and corresponding sampling distribution with 10000 samples
 #  each of size 2
-simCLT(ns=1000, n=2, p1=0, p2=4, type="uniform", bin.width=0.01)
+simCLT(ns=1000, n=2, p1=0, p2=4, type="uniform", bin_width=0.01)
 
 # save the population and sample distributions to pdf files
 simCLT(100, 10, pdf=TRUE)

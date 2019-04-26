@@ -32,17 +32,17 @@ function(rows, columns, data=d, holdout=FALSE,
         "Cannot specify both rows, to retain or exclude, and random.\n\n")
     }
     if (random > 1)
-      n.obs.new <- round(random,0)
+      n.obs_new <- round(random,0)
     else
-      n.obs.new <- round(random*n.obs,0)
+      n.obs_new <- round(random*n.obs,0)
     if (!quiet) {
       cat("\n")
       cat("Rows of data randomly extracted\n")
       .dash(42)
       if (random <= 1) cat("Proportion of randomly retained rows: ", random, "\n")
-      cat("Number of randomly retained rows: ", n.obs.new, "\n")
+      cat("Number of randomly retained rows: ", n.obs_new, "\n")
     }
-    rand.rows <- sample(1:n.obs, size=n.obs.new, replace=FALSE)
+    rand.rows <- sample(1:n.obs, size=n.obs_new, replace=FALSE)
     rand.rows <- sort(rand.rows)
     rows <- logical(length=n.obs)  # initial default is FALSE
     j <- 1

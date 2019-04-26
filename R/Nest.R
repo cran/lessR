@@ -1,6 +1,19 @@
 Nest <-
-function(y, nested.model, full.model, method=c("lm", "logit"),
-         data=d, digits.d=NULL) {
+function(y, nested_model, full_model, method=c("lm", "logit"),
+         data=d, digits_d=NULL, ...) {
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("nested.model", "full.model", "digits.d")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   method <- match.arg(method)
 
@@ -12,8 +25,8 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
   rv <- eval(substitute(y), envir=my.vars, enclos=parent.frame())
   y.name <-  names(my.vars)[rv]
 
-  if (is.null(digits.d)) digits.d <- .getdigits(data[,y.name], 2)
-  options(digits.d=digits.d) 
+  if (is.null(digits_d)) digits_d <- .getdigits(data[,y.name], 2)
+  options(digits_d=digits_d) 
 
   if (method == "logit") {
     is.bin <- TRUE
@@ -34,7 +47,7 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
   }
 
   # get nested model
-  nest.vars <- eval(substitute(nested.model), envir=my.vars, enclos=parent.frame())
+  nest.vars <- eval(substitute(nested_model), envir=my.vars, enclos=parent.frame())
   n.pred <- length(nest.vars)
   x.name <- character(length=n.pred)
   for (ivar in 1:n.pred) {
@@ -48,7 +61,7 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
 
 
   # get full model and analyze
-  full.vars <- eval(substitute(full.model), envir=my.vars, enclos=parent.frame())
+  full.vars <- eval(substitute(full_model), envir=my.vars, enclos=parent.frame())
   full.vars <- union(nest.vars, full.vars)
   n.pred <- length(full.vars)
 
@@ -93,7 +106,7 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
     mf.df <- av$Res.Df[2]; mf.ss <- av$RSS[2]; mf.ms <- mf.ss/mf.df
 
     # width of columns
-    d <- digits.d
+    d <- digits_d
     max.ln <- integer(length=0)
     max.ln[1] <- max(nchar(.fmti(mr.df)),nchar(.fmti(mf.df)),nchar("df"))
     max.ln[2] <- max(nchar(.fmt(mr.ss,d)),nchar(.fmt(mf.ss,d)),nchar("Sum Sq")) 
@@ -112,9 +125,9 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
       rlb <- .fmtc("Tested", max.c1, j="left")
 
       md <- .fmti(mr.df, max.ln[1]) 
-      ms <- .fmt(mr.ss, digits.d, max.ln[2])
-      mm <- .fmt(mr.ms, digits.d, max.ln[3])
-      mf <- .fmt(mr.f, digits.d, max.ln[4]+2)
+      ms <- .fmt(mr.ss, digits_d, max.ln[2])
+      mm <- .fmt(mr.ms, digits_d, max.ln[3])
+      mf <- .fmt(mr.f, digits_d, max.ln[4]+2)
       mp <- .fmt(mr.p, 3, 9) 
 
       tx[length(tx)+1] <- paste(rlb, md, ms, mm, mf, mp)
@@ -125,8 +138,8 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
     # Residuals
     rlb <- .fmtc("Residual", max.c1, j="left")
     df <- .fmti(mf.df, max.ln[1])
-    SS <- .fmt(mf.ss, digits.d, max.ln[2])
-    MS <- .fmt(mf.ms, digits.d, max.ln[3])
+    SS <- .fmt(mf.ss, digits_d, max.ln[2])
+    MS <- .fmt(mf.ms, digits_d, max.ln[3])
 
     tx[length(tx)+1] <- paste(rlb, df, SS, MS) 
 
@@ -167,7 +180,7 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
     mt.df <- av$`Resid. Df`[1]; mt.dv <- av$`Resid. Dev`[1];
 
     # width of columns
-    d <- digits.d
+    d <- digits_d
     max.ln <- integer(length=0)
     max.ln[1] <- max(nchar(.fmti(mr.df)),nchar(.fmti(mf.df)),nchar("df"))
     max.ln[2] <- nchar(.fmt(mr.dv,d)) + 2
@@ -182,7 +195,7 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
       rlb <- .fmtc("Tested", max.c1, j="left")
 
       md <- .fmti(mr.df, max.ln[1]) 
-      dv <- .fmt(mr.dv, digits.d, max.ln[2])
+      dv <- .fmt(mr.dv, digits_d, max.ln[2])
       mp <- .fmt(mr.p, 3, 9) 
 
       tx[length(tx)+1] <- paste(rlb, md, dv, mp)
@@ -193,7 +206,7 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
     # Residuals
     rlb <- .fmtc("Residual", max.c1, j="left")
     df <- .fmti(mf.df, max.ln[1])
-    dev <- .fmt(mf.dv, digits.d, max.ln[2])
+    dev <- .fmt(mf.dv, digits_d, max.ln[2])
 
     tx[length(tx)+1] <- paste(rlb, df, dev) 
 
@@ -203,7 +216,7 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
     # Total
     rlb <- .fmtc("Total", max.c1, j="left")
     df <- .fmti(mt.df, max.ln[1])
-    dev <- .fmt(mt.dv, digits.d, max.ln[2])
+    dev <- .fmt(mt.dv, digits_d, max.ln[2])
 
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- paste(rlb, df, dev) 
@@ -222,7 +235,7 @@ function(y, nested.model, full.model, method=c("lm", "logit"),
   class(txtbl) <- "out"
   
   output <- list(
-    fun.call=match.call(), out_models=txtmdl, out_anova=txtbl,
+    fun_call=match.call(), out_models=txtmdl, out_anova=txtbl,
     anova_tested=tst, anova_residual=rsd, anova_total=tot
   )
 

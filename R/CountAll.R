@@ -34,7 +34,7 @@ function(x=d, quiet=FALSE, ...)  {
     .dash(37,"+")
   }
 
-  Histogram(data=x, quiet=quiet, eval.df=FALSE, ...)
+  Histogram(data=x, quiet=quiet, eval_df=FALSE, ...)
   
   if (!quiet) {
     cat("\n\n\n")
@@ -42,6 +42,6 @@ function(x=d, quiet=FALSE, ...)  {
     cat("Bar Chart for Each Non-numeric Variable\n")
     .dash(39,"+")
   }
-  BarChart(data=x, quiet=quiet, eval.df=FALSE, one.plot=FALSE, ...)
+  BarChart(data=x, quiet=quiet, eval_df=FALSE, one_plot=FALSE, ...)
   
 }

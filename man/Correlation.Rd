@@ -2,11 +2,12 @@
 \alias{Correlation}
 \alias{cr}
 \alias{cr.brief}
+\alias{cr_brief}
 
 \title{Correlation Analysis}
 
 \description{
-Abbreviation: \code{cr, cr.brief}
+Abbreviation: \code{cr, cr_brief, cr.brief [deprecated]}
 
 For two variables yields the correlation coefficient with hypothesis test and confidence interval. For a data frame or list of variables from a data frame, yields the correlation matrix. The default computed coefficient(s) are the standard Pearson's product-moment correlation, with Spearman and Kendall coefficients available. For the default missing data technique of pairwise deletion, an analysis of missing data for each computed correlation coefficient is provided. For a correlation matrix a statistical summary of the missing data across all cells is provided.
 
@@ -16,13 +17,14 @@ Versions of this function from \code{lessR} 3.3 or earlier returned just a corre
 \usage{
 Correlation(x, y, data=d,
          miss=c("pairwise", "listwise", "everything"),
-         fill.low=NULL, fill.hi=NULL,
-         show.n=NULL, brief=FALSE,
-         digits.d=NULL, heat.map=TRUE,
+         fill_low=NULL, fill_hi=NULL,
+         show_n=NULL, brief=FALSE,
+         digits_d=NULL, heat_map=TRUE,
          main=NULL, bottom=3, right=3,
          pdf=FALSE, width=5, height=5, \ldots)
 
 cr.brief(\ldots, brief=TRUE) 
+cr_brief(\ldots, brief=TRUE) 
 
 cr(\ldots) 
 }
@@ -33,16 +35,16 @@ cr(\ldots)
   \item{y}{Second variable or not specified if the first argument is a list.}
   \item{data}{Optional data frame that contains the variables of interest,
        default is \code{d}.}
-  \item{miss}{Basis for deleting missing data values.}
-  \item{fill.low}{Starting color for a custom sequential palette.}
-  \item{fill.hi}{Ending color for a custom sequential palette.}
-  \item{show.n}{For pairwise deletion, show the matrix of sample sizes for each
+  \item{miss}{Basis for deleting missing data values_}
+  \item{fill_low}{Starting color for a custom sequential palette.}
+  \item{fill_hi}{Ending color for a custom sequential palette.}
+  \item{show_n}{For pairwise deletion, show the matrix of sample sizes for each
        correlation coefficient, regardless of sample size.}
   \item{brief}{Pertains to a single correlation coefficient analysis. If 
        \code{FALSE}, then the sample covariance and number of non-missing
        and missing observations are displayed.}
-  \item{digits.d}{Specifies the number of decimal digits to display in the output.}
-  \item{heat.map}{If \code{TRUE}, generate a heat map.}
+  \item{digits_d}{Specifies the number of decimal digits to display in the output.}
+  \item{heat_map}{If \code{TRUE}, generate a heat map.}
   \item{main}{Graph title of heat map. Set to \code{main=""} to turn off.}
   \item{bottom}{Number of lines of bottom margin of heat map.}
   \item{right}{Number of lines of right margin of heat map.}
@@ -61,7 +63,7 @@ When two variables are specified, both \code{x} and y, the output is the correla
 
 In place of two variables \code{x} and \code{y}, \code{x} can be a complete data frame, either specified with the name of a data frame, or blank to rely upon the default data frame \code{d}. Or, \code{x} can be a list of variables from the input data frame. In these situations \code{y} is missing. Any non-numeric variables in the data frame or specified variable list are automatically deleted from the analysis. 
 
-When \code{heat.map=TRUE}, generate a heat map to standard graphics windows. Set \code{pdf=TRUE} to generate these graphics but have them directed to their respective pdf files.
+When \code{heat_map=TRUE}, generate a heat map to standard graphics windows. Set \code{pdf=TRUE} to generate these graphics but have them directed to their respective pdf files.
 
 For treating missing data, the default is \code{pairwise}, which means that an observation is deleted only for the computation of a specific correlation coefficient if one or both variables are missing the value for the relevant variable(s).  For \code{listwise} deletion, the entire observation is deleted from the analysis if any of its data values are missing.  For the more extreme \code{everything} option, any missing data values for a variable result in all correlations for that variable reported as missing.
 }
@@ -124,7 +126,7 @@ Correlation(x1, x2)
 # short name
 cr(x1, x2)
 # brief form of output
-cr.brief(x1, x2)
+cr_brief(x1, x2)
 
 # Spearman rank correlation, one-sided test
 Correlation(x1, x2, method="spearman", alternative="less")
@@ -135,8 +137,8 @@ mycor <- Correlation()
 # correlation matrix of Kendall's tau coefficients
 mycor <- cr(method="kendall")
 
-# correlation matrix of specified variables in mycor with heat.map
-mycor <- Correlation(x1:x3, heat.map=TRUE)
+# correlation matrix of specified variables in mycor with heat_map
+mycor <- Correlation(x1:x3, heat_map=TRUE)
 
 # analysis with data not from data frame mycor
 data(attitude)

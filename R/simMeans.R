@@ -1,10 +1,24 @@
 simMeans <- 
-function(ns, n, mu=0, sigma=1, ylim.bound=NULL, 
-         show.title=TRUE, show.data=TRUE, max.data=10, 
+function(ns, n, mu=0, sigma=1, ylim_bound=NULL, 
+         show_title=TRUE, show_data=TRUE, max_data=10, 
          grid="grey90", pause=FALSE,
-         sort=NULL, set.mu=FALSE, digits.d=2,
-         main=NULL, pdf.file=NULL, width=5, height=5, ...) {
+         sort=NULL, set_mu=FALSE, digits_d=2,
+         main=NULL, pdf_file=NULL, width=5, height=5, ...) {
 
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("ylim.bound", "show.title", "show.data",
+                "max.data", "set_mu", "digits.d", "pdf.file")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
   if (missing(ns)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -32,17 +46,17 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
       "Standard deviation, sigma, cannot be negative.\n\n")
   }
 
-  if (!is.null(pdf.file))
-    if (!grepl(".pdf", pdf.file)) pdf.file <- paste(pdf.file, ".pdf", sep="")
+  if (!is.null(pdf_file))
+    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
 
   if (is.null(sort)) if (pause) sort <- FALSE else sort <- TRUE
 
-  if (set.mu) {
+  if (set_mu) {
     mu <- sample(0:100, size=1)
     sigma <- sample(1:25, size=1)
   }
    
-  if (!set.mu && !pause) {
+  if (!set_mu && !pause) {
     cat("\nPopulation mean, mu:", mu, "\n")
     cat("Pop std dev, sigma :", sigma, "\n")
   }
@@ -57,7 +71,7 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   Ymean <- apply(data.rep, 1, mean)
   Ysd <- apply(data.rep, 1, sd)
   max.Y <- max(Ymean)
-  min.Y <- min(Ymean)
+  min_Y <- min(Ymean)
 
   # sort
   if (sort) {
@@ -69,23 +83,23 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   else o <- 1:ns
 
   # keep mu centered with symmetric upper and lower limits on y-axis
-  if (is.null(ylim.bound)) {
-    l <- min.Y
+  if (is.null(ylim_bound)) {
+    l <- min_Y
     u <- max.Y
     max.dev <- max( abs(mu-l), abs(u-mu) )
     l <- mu - max.dev
     u <- mu + max.dev
   }
   else {
-    l <- mu - ylim.bound
-    u <- mu + ylim.bound
+    l <- mu - ylim_bound
+    u <- mu + ylim_bound
   }
 
 
   # plot 
 
   # set up graphics system
-  .opendev(pdf.file, width, height)
+  .opendev(pdf_file, width, height)
 
   orig.params <- par(no.readonly=TRUE)
   par(mar=c(3,3,1.75,2), mgp=c(1.75,.5,0))
@@ -103,8 +117,8 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   abline(v=seq(vx[1],vx[length(vx)],vx[2]-vx[1]), col=grid, lwd=.5)
   abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=grid, lwd=.5)
 
-  if (!set.mu && !pause) {
-    if (show.title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma), 
+  if (!set_mu && !pause) {
+    if (show_title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma), 
         "  ", "  n=", .(n))), cex.main=1)
     mtext(bquote(paste(" ", mu)), side=4, cex=1.5, col="darkslateblue", las=2)
     abline(h=mu, col="darkslateblue", lwd=1.5) # horizontal centerline at mu
@@ -122,29 +136,29 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   max.ln <- max.ln + 2
 
   # output
-  if (n <= max.data) maxd <- n else maxd <- max.data
+  if (n <= max_data) maxd <- n else maxd <- max_data
   cat("\nSample", "  Mean   ", "  SD   ")
-  if (show.data) for (i in 1:maxd) cat(format(toString(i), width=max.ln,
+  if (show_data) for (i in 1:maxd) cat(format(toString(i), width=max.ln,
                                        justify="right", sep=""))
   cat("\n")
   for (i in 1:ns) {
     if (pause) invisible(readline())
     cat(format(o[i], width=5, justify="right", sep=""))
-    cat(format(sprintf("%.*f", digits.d, Ymean[i]), width=max.ln,
+    cat(format(sprintf("%.*f", digits_d, Ymean[i]), width=max.ln,
                justify="right", sep=""))
-    cat(format(sprintf("%.*f", digits.d, Ysd[i]), width=max.ln,
+    cat(format(sprintf("%.*f", digits_d, Ysd[i]), width=max.ln,
                justify="right", sep=""))
     cat("   ")
-    if (show.data) for (j in 1:maxd) 
-      cat(format(sprintf("%.*f", digits.d, data.rep[i,j]), width=max.ln,
+    if (show_data) for (j in 1:maxd) 
+      cat(format(sprintf("%.*f", digits_d, data.rep[i,j]), width=max.ln,
           justify="right", sep=""))
-    if (n > max.data) cat(" ...")
+    if (n > max_data) cat(" ...")
     cat("\n")
     points(i, Ymean[i], pch=21, col="darkblue", bg="plum")
   }
 
   if (!pause) {
-    if (show.title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma), 
+    if (show_title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma), 
         "  ", "  n=", .(n))), cex.main=1)
     mtext(bquote(paste(" ", mu)), side=4, cex=1.5, col="darkslateblue", las=2)
     abline(h=mu, col="darkslateblue", lwd=1.5) # horizontal centerline at mu
@@ -153,8 +167,8 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   if (pause) cat("\n")
 
   cat("\nAnalysis of Sample Means\n")
-  cat("   Mean:", format(sprintf("%.*f", digits.d, mean(Ymean)), width=max.ln, justify="right", sep=""), "\n")
-  cat("Std Dev:", format(sprintf("%.*f", digits.d, sd(Ymean)), width=max.ln, justify="right", sep=""))
+  cat("   Mean:", format(sprintf("%.*f", digits_d, mean(Ymean)), width=max.ln, justify="right", sep=""), "\n")
+  cat("Std Dev:", format(sprintf("%.*f", digits_d, sd(Ymean)), width=max.ln, justify="right", sep=""))
   cat("    Direct estimate of the standard error of the sample mean\n")
 
   if (pause) {
@@ -167,9 +181,9 @@ function(ns, n, mu=0, sigma=1, ylim.bound=NULL,
   par(orig.params)
 
   # terminate pdf graphics system
-  if (!is.null(pdf.file)) {
+  if (!is.null(pdf_file)) {
     dev.off()
-    .showfile(pdf.file, "mean plot")
+    .showfile(pdf_file, "mean plot")
   }
 
 }

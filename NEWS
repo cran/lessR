@@ -6,6 +6,47 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
  
  
+>>>>>> Changes for lessR version 3.8.4 (2019-04-25) <<<<<<
+
+-------------
+Updates 3.8.4
+-------------
+
+all data analysis functions
+  period in parameter names deprecated, replaced with _
+
+BarChart
+  for consistency, parameter addtop deprecated, changed to add_top
+
+getColors
+  removed the random color option with function distinct from
+    the randomcoloR package because one of its dependent
+    packages, V8, would sometimes not properly install
+
+Regression
+  R markdown file now can be rendered into multiple formats
+  R markdown file additional formats available: odt and rtf
+
+Plot
+  scale.x and scale.y parameters added for control of the numerical
+    values of the respective axis: start value, end value, n increments
+  fit line possible now for run charts
+
+Read
+  leading dots (periods) if present removed from beginning of
+    variable names
+
+ttest
+  minimum default number of digits in summary statistics now 3
+    to provide less rounding error in hand computations
+
+
+---------------
+Bug Fixes 3.8.4
+--------------- 
+
+
+ 
 >>>>>> Changes for lessR version 3.8.2 (2019-03-28) <<<<<<
 
 -------------

@@ -2,13 +2,14 @@
 \alias{SummaryStats}
 \alias{ss}
 \alias{ss.brief}
+\alias{ss_brief}
 
 \title{Summary Statistics for One or Two Variables}
 
 \description{
 Abbreviation: \code{ss}, \code{ss.brief}
 
-Descriptive or summary statistics for a numeric variable or a factor, one at a time or for all numeric and factor variables in the data frame.  For a single variable, there is also an option for summary statistics at each level of a second, usually categorical variable or factor, with a relatively few number of levels.  For a numeric variable, output includes the sample mean, standard deviation, skewness, kurtosis, minimum, 1st quartile, median, third quartile and maximum, as well as the number of non-missing and missing values. For a categorical variable, the output includes the table of counts for each value of a factor, the total sample size, and the corresponding proportions.  
+Descriptive or summary statistics for a numeric variable or a factor, one at a time or for all numeric and factor variables in the data frame.  For a single variable, there is also an option for summary statistics at each level of a second, usually categorical variable or factor, with a relatively few number of levels.  For a numeric variable, output includes the sample mean, standard deviation, skewness, kurtosis, minimum, 1st quartile, median, third quartile and maximum, as well as the number of non-missing and missing values_ For a categorical variable, the output includes the table of counts for each value of a factor, the total sample size, and the corresponding proportions.  
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
 
@@ -16,10 +17,11 @@ When output is assigned into an object, such as \code{s} in \code{s <- ss(Y)}, t
 }
 
 \usage{
-SummaryStats(x=NULL, by=NULL, data=d, n.cat=getOption("n.cat"), 
-         digits.d=NULL, brief=getOption("brief"), label.max=20, \ldots)
+SummaryStats(x=NULL, by=NULL, data=d, n_cat=getOption("n_cat"), 
+         digits_d=NULL, brief=getOption("brief"), label_max=20, \ldots)
 
 ss.brief(\dots, brief=TRUE)
+ss_brief(\dots, brief=TRUE)
 
 ss(\dots)
 }
@@ -33,10 +35,10 @@ ss(\dots)
         \code{d} by default.}
   \item{by}{Applies to an analysis of a numeric variable, which is then analyzed at each level of the \code{by} variable. The variable is coerced to a factor.}
   \item{data}{Optional data frame that contains the variable of interest, default is \code{d}.}
-  \item{n.cat}{Specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Default is off, set to 0.}
-  \item{digits.d}{Specifies the number of decimal digits to display in the output.}
+  \item{n_cat}{Specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Default is off, set to 0.}
+  \item{digits_d}{Specifies the number of decimal digits to display in the output.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{style}} function.}
-  \item{label.max}{Maximum size of labels for the values of a variable.
+  \item{label_max}{Maximum size of labels for the values of a variable.
         Not a literal maximum as preserving unique values may require a larger number
         of characters than specified.}
 
@@ -47,7 +49,7 @@ ss(\dots)
 OVERVIEW\cr
 The \code{by} option specifies a categorical variable or factor, with a relatively few number of values called levels. The variable of interest is analyzed at each level of the factor. 
 
-The \code{digits.d} parameter specifies the number of decimal digits in the output.  It must follow the formula specification when used with the formula version. By default the number of decimal digits displayed for the analysis of a variable is one more than the largest number of decimal digits in the data for that variable.
+The \code{digits_d} parameter specifies the number of decimal digits in the output.  It must follow the formula specification when used with the formula version. By default the number of decimal digits displayed for the analysis of a variable is one more than the largest number of decimal digits in the data for that variable.
 
 Reported outliers are based on the boxplot criterion.  The determination of an outlier is based on the length of the box, which corresponds, but may not equal exactly, the interquartile range.  A value is reported as an outlier if it is more than 1.5 box lengths away from the box.
 
@@ -130,8 +132,8 @@ names(s)
 SummaryStats(X)
 
 # Only a subset of available summary statistics
-ss.brief(Y)
-ss.brief(X, label.max=3)
+ss_brief(Y)
+ss_brief(X, label_max=3)
 
 # Reference the summary stats in the object: stats
 stats <- ss(Y)
@@ -139,7 +141,7 @@ my.mean <- stats$mean
 
 # Get the summary statistics for Y at each level of X
 # Specify 2 decimal digits for each statistic displayed
-SummaryStats(Y, by=X, digits.d=2)
+SummaryStats(Y, by=X, digits_d=2)
 
 
 # ----------
@@ -154,10 +156,10 @@ SummaryStats()
 # Analyze all variables in data frame d at once
 # Any variables with a numeric data type and 7 or less
 #  unique values will be analyzed as a categorical variable
-SummaryStats(n.cat=7)
+SummaryStats(n_cat=7)
 
 # analyze just a subset of a data frame
-d <- Read("Employee", in.lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
 SummaryStats(c(Salary,Years))
 
 

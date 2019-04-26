@@ -1,56 +1,76 @@
 BarChart <-
 function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
-        stat.x=c("count", "proportion"),
-        stat.yx=c("mean", "sum", "sd", "dev", "min", "median", "max"),
-        n.cat=getOption("n.cat"), one.plot=NULL,
+        stat_x=c("count", "proportion"),
+        stat_yx=c("mean", "sum", "sd", "dev", "min", "median", "max"),
+        n_cat=getOption("n_cat"), one_plot=NULL,
 
-        by1=NULL, n.row=NULL, n.col=NULL, aspect="fill",
+        by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
 
         horiz=FALSE, beside=FALSE, stack100=FALSE,
-        gap=NULL, scale.y=NULL,
+        gap=NULL, scale_y=NULL,
 
         theme=getOption("theme"),
         fill=NULL,
-        color=getOption("bar.color.discrete"),
-        trans=getOption("trans.bar.fill"),
-        fill.split=NULL,
+        color=getOption("bar_color_discrete"),
+        trans=getOption("trans_bar_fill"),
+        fill_split=NULL,
 
-        legend.title=NULL, legend.position="right.margin",
-        legend.labels=NULL, legend.horiz=FALSE,
-        legend.size=NULL,
+        legend_title=NULL, legend_position="right_margin",
+        legend_labels=NULL, legend_horiz=FALSE,
+        legend_size=NULL,
 
-        value.labels=NULL,
-        rotate.x=getOption("rotate.x"),
+        value_labels=NULL,
+        rotate_x=getOption("rotate_x"),
         offset=getOption("offset"),
-        break.x=NULL, sort=c("0", "-", "+"),
+        break_x=NULL, sort=c("0", "-", "+"),
 
-        label.max=100, out.size=80,
+        label_max=100, out_size=80,
 
         values=NULL,
-        values.color=getOption("values.color"),
-        values.size=getOption("values.size"),
-        values.digits=getOption("values.digits"),
-        values.position=getOption("values.position"),
-        values.cut=NULL,
+        values_color=getOption("values_color"),
+        values_size=getOption("values_size"),
+        values_digits=getOption("values_digits"),
+        values_position=getOption("values_position"),
+        values_cut=NULL,
 
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-        lab.adj=c(0,0), margin.adj=c(0,0,0,0), addtop=0.05,
+        lab_adj=c(0,0), margin_adj=c(0,0,0,0), add_top=0.05,
 
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-        eval.df=NULL, quiet=getOption("quiet"),
+        eval_df=NULL, quiet=getOption("quiet"),
         width=6.5, height=6, pdf=FALSE, ...)  {
+
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    change <- c("stat.x", "stat.yx", "n.cat", "n.row", "n.col", "scale.y",
+                "fill.split", "legend.title", "legend.labels", "legend.size",
+                "value.labels", "break.x", "label.max", "out.size",
+                "values.color", "values.size", "values.digits",
+                "values.position", "values.cut", "lab.adj", "margin.adj",
+                "eval.df")
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "addtop") add_top <- dots[[i]] 
+      if (names(dots)[i] %in% change) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+        assign(nm, dots[[i]])
+        get(nm)
+      }
+    }
+  }
 
 
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   color.miss <- ifelse (missing(color), TRUE, FALSE)
   horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
 
-  stat.x <- match.arg(stat.x)
-  proportion <- ifelse (stat.x == "proportion", TRUE, FALSE)   # old signal
+  stat_x <- match.arg(stat_x)
+  proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
 
-  stat.yx.miss <- ifelse (missing(stat.yx), TRUE, FALSE)
-  stat.yx <- match.arg(stat.yx)
+  stat_yx.miss <- ifelse (missing(stat_yx), TRUE, FALSE)
+  stat_yx <- match.arg(stat_yx)
 
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
   sort <- match.arg(sort)
@@ -64,8 +84,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   if (is.null(values)) values <- "eval.later"
 
-  if (missing(break.x)) 
-    break.x <- ifelse (!horiz  &&  rotate.x == 0, TRUE, FALSE)
+  if (missing(break_x)) 
+    break_x <- ifelse (!horiz  &&  rotate_x == 0, TRUE, FALSE)
 
   if (sort[1] %in% c("off", "up", "down")) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -77,9 +97,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   options(yname = NULL)
   options(byname = NULL)
 
-  xlab.adj <- lab.adj[1];   ylab.adj <- lab.adj[2]
-  tm.adj <- margin.adj[1];  rm.adj <- margin.adj[2]
-  bm.adj <- margin.adj[3];  lm.adj <- margin.adj[4]
+  xlab.adj <- lab_adj[1];   ylab.adj <- lab_adj[2]
+  tm.adj <- margin_adj[1];  rm.adj <- margin_adj[2]
+  bm.adj <- margin_adj[3];  lm.adj <- margin_adj[4]
 
   lm.adj <- lm.adj + .1  # pull these margins back a bit for bc
   bm.adj <- bm.adj + .1
@@ -99,20 +119,20 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
     }
 
-    if (missing(values.color)) {
-      values.color <- "white"
-      if (values.position == "out") values.color <- getOption("axis.text.color")
+    if (missing(values_color)) {
+      values_color <- "white"
+      if (values_position == "out") values_color <- getOption("axis.text.color")
     }
 
-  if (values.position == "out"  &&  !missing(by)  &&  !beside) {
+  if (values_position == "out"  &&  !missing(by)  &&  !beside) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "values.position=\"out\" not meaningful for a  by  variable\n",
+      "values_position=\"out\" not meaningful for a  by  variable\n",
       "  without beside=TRUE\n\n")
   }
 
-  if (!(values.position %in% c("in", "out"))) {
+  if (!(values_position %in% c("in", "out"))) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "values.position  must be set to \"in\", \"out\"\n\n")
+      "values_position  must be set to \"in\", \"out\"\n\n")
   }
 
   #if (missing(color))  # default black border unless dark bg
@@ -129,24 +149,22 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
       if (nms[i] == "proportion") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  proportion  now  stat.x=\"proportion\"\n\n")
+          "option  proportion  now  stat_x=\"proportion\"\n\n")
       }
     }
   }
 
-  .param.old(...)
-
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE)
-  if (is.null(eval.df))  # default values
-    eval.df <- ifelse (shiny, FALSE, TRUE)
+  if (is.null(eval_df))  # default values
+    eval_df <- ifelse (shiny, FALSE, TRUE)
 
   # get actual variable name before potential call of data$x
   if (!missing(x))  # can't do is.null or anything else with x until evaluated
     x.name <- deparse(substitute(x))  # could be a list of var names
   else
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
-    options(xname = x.name)
+  options(xname = x.name)
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -200,7 +218,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   else if (!missing(x)) {
 
     if (!x.in.global) {
-      if (eval.df) {
+      if (eval_df) {
         if (!mydata.ok) .nodf(df.name)  # check to see if df exists
         .xcheck(x.name, df.name, names(data))  # x-vars in df?
       }
@@ -222,7 +240,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         if (exists(x.name, where=.GlobalEnv)) if (is.matrix(x)) {
           x.name <- xlab
           xlab <- NULL
-          by.name <- legend.title
+          by.name <- legend_title
           options(xname = x.name)
           options(byname = by.name)
         }
@@ -265,7 +283,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       #if (exists(by.name, where=.GlobalEnv)) in.global <- TRUE
 
       # see if var exists in data frame, if x not in global Env or function call
-      if (eval.df) if (!in.global) .xcheck(by.name, df.name, names(data))
+      if (eval_df) if (!in.global) .xcheck(by.name, df.name, names(data))
       if (!in.global)
         by.call <- eval(substitute(data$by))
       else {  # vars that are function names get assigned to global
@@ -291,7 +309,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       in.global <- xs$ig
 
       # see if var exists in data frame, if x not in global Env or function call
-      if (eval.df) if (!in.global) .xcheck(y.name, df.name, names(data))
+      if (eval_df) if (!in.global) .xcheck(y.name, df.name, names(data))
       if (!in.global)
         y.call <- eval(substitute(data$y))
       else {  # vars that are function names get assigned to global
@@ -366,7 +384,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
         xtb <- xtb[order(xtb, decreasing=srt.dwn)]
       }
-      fill <- .getColC(xtb, fill.name=fill.name)
+      fill <- .getColC(xtb, fill_name=fill.name)
          
     }  # end .count 
   }  # end !fill.miss
@@ -377,17 +395,17 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   # do the analysis
 
-  # if data table is raw data, them default stat.yx is "mean"
-  if (stat.yx.miss) {
-    stat.yx <- "data"  # default, no transformation
+  # if data table is raw data, them default stat_yx is "mean"
+  if (stat_yx.miss) {
+    stat_yx <- "data"  # default, no transformation
     if (!is.null(y.call)) {
       lx.u <- length(unique(na.omit(x.call)))
       lb.u <- ifelse(is.null(by.call), 1, length(unique(na.omit(by.call))))
-        if (nrow(data) > lx.u*lb.u) stat.yx <- "mean"
+        if (nrow(data) > lx.u*lb.u) stat_yx <- "mean"
     }
   }
 
-  if (stat.yx != "data"  &&  is.null(y.call)) {
+  if (stat_yx != "data"  &&  is.null(y.call)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "To do a transformation of y for each level of ", x.name, "\n",
       " need a numerical y variable\n\n")
@@ -396,12 +414,28 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   if (Trellis && do.plot) {
 
-    .bar.lattice(x.call, by1.call, by2=NULL, n.row, n.col, aspect,
+           if (stat_yx == "sum")
+        ylab <- paste("Sum of", y.name)
+      else if (stat_yx == "mean")
+        ylab <- paste("Mean of", y.name)
+      else if (stat_yx == "sd")
+        ylab <- paste("Standard Deviation of", y.name)
+      else if (stat_yx == "dev")
+        ylab <- paste("Mean Deviations of", y.name)
+      else if (stat_yx == "min")
+        ylab <- paste("Minimum of", y.name)
+      else if (stat_yx == "median")
+        ylab <- paste("Median of", y.name)
+      else if (stat_yx == "max")
+        ylab <- paste("Maximum of", y.name)
+
+
+    .bar.lattice(x.call, by1.call, by2=NULL, n_row, n_col, aspect,
                  prop=FALSE, 
                  fill, color, trans, size.pt=NULL, xlab, ylab, main,
-                 rotate.x, offset,
+                 rotate_x, offset,
                  width, height, pdf,
-                 segments.x=NULL, breaks=NULL, c.type="bar", quiet)
+                 segments_x=NULL, breaks=NULL, c.type="bar", quiet)
   }
 
   else {  # not Trellis
@@ -422,9 +456,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
     }
 
-    if (stat.yx %in% c("mean", "sum", "sd", "dev", "min", "median", "max")) {
+    if (stat_yx %in% c("mean", "sum", "sd", "dev", "min", "median", "max")) {
 
-      n.cat <- 0
+      n_cat <- 0
       means <- FALSE
 
       # do stats console output before reducing data
@@ -454,32 +488,32 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
 
     # set up new x.call and y.call for stats
-      if (stat.yx == "sum") {
+      if (stat_yx == "sum") {
         ylab <- paste("Sum of", y.name)
         out <- tapply(y.call, x.call, sum, na.rm=TRUE)
       }
-      if (stat.yx == "mean") {
+      if (stat_yx == "mean") {
         ylab <- paste("Mean of", y.name)
         out <- tapply(y.call, x.call, mean, na.rm=TRUE)
       }
-      if (stat.yx == "sd") {
+      if (stat_yx == "sd") {
         ylab <- paste("Standard Deviation of", y.name)
         out <- tapply(y.call, x.call, sd, na.rm=TRUE)
       }
-      if (stat.yx == "dev") {
+      if (stat_yx == "dev") {
         ylab <- paste("Mean Deviations of", y.name)
         out <- tapply(y.call, x.call, mean, na.rm=TRUE)
         out <- out - mean(out, na.rm=TRUE)
       }
-      if (stat.yx == "min") {
+      if (stat_yx == "min") {
         ylab <- paste("Minimum of", y.name)
         out <- tapply(y.call, x.call, min, na.rm=TRUE)
       }
-      if (stat.yx == "median") {
+      if (stat_yx == "median") {
         ylab <- paste("Median of", y.name)
         out <- tapply(y.call, x.call, median, na.rm=TRUE)
       }
-      if (stat.yx == "max") {
+      if (stat_yx == "max") {
         ylab <- paste("Maximum of", y.name)
         out <- tapply(y.call, x.call, max, na.rm=TRUE)
       }
@@ -503,17 +537,17 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
 
       bc <- .bc.main(x.call, y.call, by.call, stack100,
-            fill, color, trans, fill.split, theme,
-            horiz, addtop, gap, proportion, scale.y,
+            fill, color, trans, fill_split, theme,
+            horiz, add_top, gap, proportion, scale_y,
             xlab, ylab, main,
-            value.labels, label.max, beside,
-            rotate.x, offset, break.x, sort,
-            values, values.color, values.size, values.digits,
-            values.position, values.cut,
+            value_labels, label_max, beside,
+            rotate_x, offset, break_x, sort,
+            values, values_color, values_size, values_digits,
+            values_position, values_cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-            legend.title, legend.position, legend.labels,
-            legend.horiz, legend.size,
-            add, x1, x2, y1, y2, out.size, quiet, ...)
+            legend_title, legend_position, legend_labels,
+            legend_horiz, legend_size,
+            add, x1, x2, y1, y2, out_size, quiet, ...)
 
         if (pdf) {
           dev.off()
@@ -535,18 +569,18 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
     }
 
     # if values not assigned, do default
-#   if (is.null(values) || (!missing(values.color) || !missing(values.size)
-#     || !missing(values.digits) || !missing(values.position))) 
+#   if (is.null(values) || (!missing(values_color) || !missing(values_size)
+#     || !missing(values_digits) || !missing(values_position))) 
     if (is.null(values)) 
         values <- ifelse (missing(y), getOption("values"), "input")
 
-    if (is.null(values.digits)) {
-      if (values == "%") values.digits <- 0
-      if (values == "prop") values.digits <- 2
+    if (is.null(values_digits)) {
+      if (values == "%") values_digits <- 0
+      if (values == "prop") values_digits <- 2
     }
 
-    if (is.null(one.plot)) {  # see if one.plot
-      one.plot <- TRUE
+    if (is.null(one_plot)) {  # see if one_plot
+      one_plot <- TRUE
 
       mx.ln <- 0  # get variable with the most unique responses
       for (i in 1:ncol(data)) {
@@ -562,20 +596,20 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       # all elements of smaller response set should be in full response set
       for (i in 1:ncol(data)) {
         if (length(setdiff(na.omit(unique(data[,i])), uq)) > 0) {
-          one.plot <- FALSE
+          one_plot <- FALSE
           break;
         }
       }
-    }  # end determine one.plot
+    }  # end determine one_plot
 
-    if (one.plot) {  # one.plot all x's into a single plot, BPFM for bars
+    if (one_plot) {  # one_plot all x's into a single plot, BPFM for bars
       y.call <- NULL
       by.call <- NULL
-      legend.title <- "Title"
+      legend_title <- "Title"
       options(byname = "Responses")
       if (is.null(xlab)) xlab <- ""
       if (is.null(ylab)) ylab <- ""
-      if (missing(values.size)) values.size <- 0.8 - (0.008 * ncol(data))
+      if (missing(values_size)) values_size <- 0.8 - (0.008 * ncol(data))
       if (sort.miss) sort <- "+"
       if (horiz.miss) horiz <- TRUE
 
@@ -609,37 +643,37 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
       
       bc <- .bc.main(data, y.call, by.call, stack100,
-            fill, color, trans, fill.split, theme,
-            horiz, addtop, gap, proportion, scale.y,
+            fill, color, trans, fill_split, theme,
+            horiz, add_top, gap, proportion, scale_y,
             xlab, ylab, main,
-            value.labels, label.max, beside,
-            rotate.x, offset, break.x, sort,
-            values, values.color, values.size, values.digits,
-            values.position, values.cut,
+            value_labels, label_max, beside,
+            rotate_x, offset, break_x, sort,
+            values, values_color, values_size, values_digits,
+            values_position, values_cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-            legend.title, legend.position, legend.labels,
-            legend.horiz, legend.size,
-            add, x1, x2, y1, y2, out.size, quiet, ...)
+            legend_title, legend_position, legend_labels,
+            legend_horiz, legend_size,
+            add, x1, x2, y1, y2, out_size, quiet, ...)
       
       if (pdf) {
         dev.off()
         if (!quiet) .showfile(pdf.fnm, "BarChart")
       }
-    }  # end one.plot
+    }  # end one_plot
 
     else {  # analyze each x column separately
-      bc.data.frame(data, n.cat, stack100,
-        fill, color, trans, fill.split, theme,
-        horiz, addtop, gap, proportion, scale.y,
+      bc.data.frame(data, n_cat, stack100,
+        fill, color, trans, fill_split, theme,
+        horiz, add_top, gap, proportion, scale_y,
         xlab, ylab, main,
-        value.labels, label.max, beside,
-        rotate.x, offset, break.x, sort,
-        values, values.color, values.size, values.digits,
-        values.position, values.cut,
+        value_labels, label_max, beside,
+        rotate_x, offset, break_x, sort,
+        values, values_color, values_size, values_digits,
+        values_position, values_cut,
         xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-        legend.title, legend.position, legend.labels,
-        legend.horiz, legend.size,
-        out.size, quiet, width, height, pdf, ...)
+        legend_title, legend_position, legend_labels,
+        legend_horiz, legend_size,
+        out_size, quiet, width, height, pdf, ...)
     }
   }
 

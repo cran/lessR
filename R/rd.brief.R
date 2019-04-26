@@ -1,5 +1,5 @@
 rd.brief <-
 function(..., brief=TRUE)
 
- Read(..., fun.call=match.call(), brief=TRUE)
+ Read(..., fun_call=match.call(), brief=TRUE)
 
