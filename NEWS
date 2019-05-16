@@ -6,6 +6,38 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
  
  
+>>>>>> Changes for lessR version 3.8.5 (2019-05-16) <<<<<<
+
+-------------
+Updates 3.8.5
+-------------
+
+BarChart
+  updated legend spacing to accommodate larger labels
+
+Plot
+  correlation analysis now done for line charts with points
+  plotted label size for points now has smaller default
+
+Regression
+  X1.new, etc. parameters now work for reg_brief()
+  scatterplot of a single X with Y now has points that are similar
+    in aesthetics to those from a Plot() scatterplot
+
+
+---------------
+Bug Fixes 3.8.5
+--------------- 
+
+BarChart
+  fixed bug introduced in 3.8.4 that prevented legend from display
+
+Plot
+  fixed crash in Plot regarding assignment of NULL to an output chunk
+
+
+ 
+ 
 >>>>>> Changes for lessR version 3.8.4 (2019-04-25) <<<<<<
 
 -------------

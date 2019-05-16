@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.8.4     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.8.5     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
       "                           d: default data frame, no need for data=\n",
@@ -21,7 +21,7 @@ function(...) {
       "8. style(\"gray\")           Grayscale theme, + many others available\n",
       "   style(show=TRUE)        all color/style options and current values\n",
       "9. getColors()             create many styles of color palettes\n\n",
-      "All lessR parameter names now include _'s. Names with a period are\n",
+      "lessR parameter names now include _'s. Names with a period are\n",
       "deprecated, but still work. Ex: bin_width instead of bin.width.\n")
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
@@ -128,7 +128,7 @@ function(...) {
   options(add_fill = "gray20")
   options(add_trans = 0.0)
   options(add_color = "gray30")
-  options(add_cex = 0.9)
+  options(add_cex = 0.75)
   options(add_lwd = 0.5)
   options(add_lty = "solid")
 
@@ -564,10 +564,11 @@ function(...) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "You are attempting to analyze the variable ", var.nm[i], " in the\n",
           "  data table called ", dname, txtDef, "\n",
-          "Unfortunately, variable ", var.nm[i], " does not exist in ", dname, "\n\n",
-          "The following variables are currently in the ", dname, " data table,\n",
-          "  available for analysis:\n\n",
-          "  ", nm,  "\n\n")
+          "Unfortunately, variable ", var.nm[i], " does not exist in ", dname,
+          "\n\n",
+          "The following variables are currently in the ", dname,
+          " data table,\n",
+          "  available for analysis:\n\n", "  ", nm, "\n\n")
       }
 
       else if (length(dfs) > 1) {
@@ -578,7 +579,8 @@ function(...) {
           "You are attempting to analyze the variable ", var.nm[i], " in the\n",
           "  data table called ", dname, txtDef, "\n",
           "Unfortunately, variable ", var.nm[i], " does not exist in ", dname, "\n\n",
-          "The following variables are currently in the ", dname, " data table,\n",
+          "The following variables are currently in the ", dname,
+          " data table,\n",
           "  available for analysis:\n\n",
           "  ", nm,  "\n\n",
           "You do have another data table, but it is named ", dfs[1], "\n",

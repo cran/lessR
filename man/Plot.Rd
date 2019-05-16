@@ -51,7 +51,7 @@ Plot(x, y=NULL, data=d, rows=NULL,
          sort_yx=c("0", "-", "+"), segments_y=FALSE, segments_x=FALSE,
          jitter_x=0, jitter_y=0,
 
-         ID="row.name", ID_size=0.85,
+         ID="row.name", ID_size=0.7,
          MD.cut=0, out_cut=0, out_shape="circle", out_size=1,
 
          vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
@@ -231,10 +231,11 @@ vp(\ldots)
         computed formula, or can be explicitly specified.}\cr
 
 
-  \item{ID}{Name of variable to provide the \bold{labels for the plotted points},
-       row names of data table (frame) by default.}
-  \item{ID_size}{Size of the plotted labels, with a default of 0.75 according
-       to the R parameter \code{cex}.
+  \item{ID}{Name of variable to provide the \bold{labels for the selected
+       plotted points for outlier identification}, row names of data frame
+       by default. To label all
+       the points use the \code{add} parameter described later.}
+  \item{ID_size}{Size of the plotted labels.
         Modify text color of the labels with the \code{\link{style}} function 
         parameter \code{ID_color}.}
   \item{MD.cut}{Mahalanobis distance cutoff to define an outlier in a 2-variable
@@ -452,7 +453,8 @@ vp(\ldots)
   \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
        on the plot.
        Possible values are any text to be written, the first argument, which is
-       \code{"text"}, or, to indicate a figure,
+       \code{"text"}, or,
+       \code{"labels"} to label each point with the row name, or, 
        \code{"rect"} (rectangle), \code{"line"}, \code{"arrow"},
        \code{"v_line"} (vertical line), and \code{"h_line"} (horizontal line).
        The value \code{"means"} is short-hand for vertical and horizontal lines

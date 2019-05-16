@@ -1,5 +1,5 @@
 .reg4Pred <-
-function(lm.out, brief, 
+function(lm.out, 
          n.keep, digits_d, show_R,
          new.data, pred_sort, pred_rows, scatter_coef,
          in.data.frame, X1_new, X2_new, X3_new, X4_new, X5_new, X6_new) {
@@ -23,7 +23,8 @@ function(lm.out, brief,
     tx[length(tx)+1] <- .dash2(68)
   }
 
-  tx[length(tx)+1] <- "Data, Predicted, Standard Error of Forecast, 95% Prediction Intervals"
+  tx[length(tx)+1] <- paste("Data, Predicted, Standard Error of Forecast,",
+                      "95% Prediction Intervals")
   tx[length(tx)+1] <- "   [sorted by lower bound of prediction interval]"
   if (pred_rows < n.keep  &&  !new.data) 
     tx[length(tx)+1] <- "   [to see all intervals do pred_rows=\"all\"]"

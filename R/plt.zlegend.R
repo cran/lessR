@@ -9,6 +9,7 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab_cex=0.8,
 
   text.cex <- ifelse(is.null(getOption("axis_x_cex")),
       getOption("axis_cex"), getOption("axis_x_cex"))
+  text.cex <- 1.1 * text.cex
   if (text.cex > 0.99) text.cex <- .95 * text.cex
 
   ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,

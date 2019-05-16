@@ -1228,7 +1228,7 @@ sep="")
 "Ultimately the analysis moves beyond the training sample. ",
 "Prediction is from _new_ data values of ", X, ", what may be ",
 "called the _prediction sample_. Applying these new data values ",
-"to the estimated model yields the predicted values_ ",
+"to the estimated model yields the predicted values. ",
 "For data values from the training sample, the fitted value and ",
 "predicted value are the same, ",
 "calculated from the same estimated model, but are ",

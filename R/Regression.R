@@ -111,7 +111,7 @@ function(my_formula, data=d, rows=NULL,
 
   if (brief) {
     if (is.null(res_rows)) res_rows <- 0L
-    if (is.null(pred_rows)) pred_rows <- 0L
+    if (is.null(pred_rows)  &&  is.null(X1_new)) pred_rows <- 0L
     relate <- FALSE
   }
   else
@@ -189,14 +189,15 @@ function(my_formula, data=d, rows=NULL,
   new.data <- FALSE
   if ( n.pred > 0  &&  n.pred <= max_new ) { 
     for (i in 1:(n.pred)) {
-      pp <- eval(parse(text=paste("X", toString(i),"_new",sep="")))
+      pp <- eval(parse(text=paste("X", toString(i), "_new", sep="")))
       if (!is.null(pp)) new.data <- TRUE
     }
     if (new.data) for (i in 1:(n.pred)) {
-      pp <- eval(parse(text=paste("X", toString(i),"_new",sep="")))
+      pp <- eval(parse(text=paste("X", toString(i), "_new", sep="")))
       if (is.null(pp)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Specified new data values for one predictor variable, so do for all.\n\n")
+          "Specified new data values for one predictor variable,\n",
+          " so do for all.\n\n")
       }
     }
   }
@@ -336,8 +337,8 @@ function(my_formula, data=d, rows=NULL,
 
   tx3prd <- ""
   predmm <- NA
-  if (pred_rows > 0) {
-    prd <- .reg4Pred(lm.out, brief,
+  if (pred_rows > 0  ||  !is.null(X1_new)) {  # if requested, do X1_new, etc.
+    prd <- .reg4Pred(lm.out,
          n.keep, digits_d, show_R,
          new.data, pred_sort, pred_rows, scatter_coef,
          in.data.frame, X1_new, X2_new, X3_new, X4_new, X5_new, X6_new)

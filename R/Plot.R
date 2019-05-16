@@ -16,7 +16,7 @@ function(x, y=NULL, data=d, rows=NULL,
          sort_yx=c("0", "-", "+"), segments_y=FALSE, segments_x=FALSE,
          jitter_x=0, jitter_y=0,
 
-         ID="row.name", ID_size=0.85,
+         ID="row.name", ID_size=0.7,
          MD.cut=0, out_cut=0, out_shape="circle", out_size=1,
 
          vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,

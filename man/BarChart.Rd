@@ -549,12 +549,6 @@ BarChart(Gender, by=JobSat, fill="reds", values="off")
 # specify two fill colors for Gender
 BarChart(Dept, by=Gender, fill=getColors(c("deepskyblue", "black")))
 
-# specify an ordered customized blue palette of colors for Dept
-# colors can be named or customized with rgb function
-# here "azure" is a single color instead of a range (ends in s)
-BarChart(Gender, by=Dept,
-         fill=getColors("azure", end.clr=rgb(100,110,200,max=255)))
-
 # display bars beside each other instead of stacked, Female and Male
 # the levels of Dept are included within each respective bar
 # plot horizontally, display the value for each bar at the

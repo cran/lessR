@@ -5,15 +5,14 @@ function(x, y, values, object, n_cat,
        center_line, prop, size, show_runs, radius, digits_d, 
        fun_call=NULL, txdif=NULL) {
 
+  date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
 
-date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
+  if (date.ts) center_line <- "off"
 
-if (date.ts) center_line <- "off"
+  # x and y come across here in their natural state, within each data frame
+  # a time series has dates for x and numeric for y, factors are factors, etc
 
-# x and y come across here in their natural state, within each data frame
-# a time series has dates for x and numeric for y, factors are factors, etc
-
-bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
+  bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
 
   unique.x <- ifelse(length(unique(x[,1])) == length(x[,1]), TRUE, FALSE)
   unique.y <- ifelse(length(unique(y[,1])) == length(y[,1]), TRUE, FALSE)
@@ -99,13 +98,13 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
   # by default display center_line only if runs, so detect if a run
   if (n_col > 1) center_line <- "off"   # no center_line for multiple plots
   if (center_line == "default"  &&  !date.ts  &&  object == "both") {
-    y <- (!is.na(y))
+#   y <- (!is.na(y))
+    y <- na.omit(y)
     m <- mean(y)
     n.change <- 0
     for (i in 1:(length(y)-1))
       if ((y[i+1] > m) != (y[i] > m)) n.change <- n.change+1
     if (n.change/(length(y)-1) < .15)
-
       center_line <- "off" 
     else 
       center_line <- "median"
@@ -153,13 +152,12 @@ bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
     txsug <- paste(txsug, "\n", fc, sep="")
   }
 
-
   if (values == "data") {
 
-    if (!(object %in% c("line", "both"))) {
+    if (!(object %in% c("line"))) {
     
       # traditional two-var numeric var scatter plot
-      if (!cat.x  &&  !cat.y  &&  object %in% c("point", "bubble")) {
+      if (!cat.x  &&  !cat.y  &&  object %in% c("point", "bubble", "both")) {
         txsug <- ""
   
         if (getOption("suggest")) {

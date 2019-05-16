@@ -64,9 +64,9 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     cex.txt <- getOption("axis_cex")
     
     # size of points
-    size.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
-    if (options("device") == "RStudioGD")
-      size.pt <- ifelse (.Platform$OS == "windows", size.pt*1.05, size.pt*1.13)
+    size.pt <- ifelse (.Platform$OS == "windows", 0.85, 0.70)
+#   if (options("device") == "RStudioGD")
+#     size.pt <- ifelse (.Platform$OS == "windows", size.pt*0.9, size.pt*0.9)
       
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
@@ -76,6 +76,8 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     tm <- margs$tm
     rm <- margs$rm
     bm <- margs$bm
+
+    lm <- lm + 0.08
       
     par(bg=getOption("window_fill"))
     par(mai=c(bm, lm, tm, rm))
@@ -108,7 +110,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
         max.lbl.y=3, cex.lab=size.lab) 
 
-    col_fill <- getOption("bar_fill_ordered")
+    col_fill <- getOption("pt_fill")
     col_color <- getOption("pt_color")
     
     eq.int <- TRUE

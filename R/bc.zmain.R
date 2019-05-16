@@ -11,7 +11,7 @@ function(x, y, by, stack100,
          legend_title, legend_position, legend_labels,
          legend_horiz, legend_size,
          add, x1, x2, y1, y2, out_size, quiet, ...) {
-   
+
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
   y.given <- ifelse (!is.null(y), TRUE, FALSE)
   is.ord <- ifelse (is.ordered(x), TRUE, FALSE)
@@ -524,9 +524,12 @@ function(x, y, by, stack100,
   else 
     if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
-  if (legend_position == "right.margin"  &&  (is.matrix(x))) {
+  if (legend_position == "right_margin"  &&  (is.matrix(x))) {
     exp.coef <- 0.065 + 0.45 * axis_x_cex
-    rm <- rm + (.52 + (exp.coef * axis_x_cex))
+    rm <- rm + (.50 + (exp.coef * axis_x_cex))
+    mx.ch <- max(c(nchar(legend_labels), nchar(by.name) - 3))
+    if (mx.ch > 7) rm <- rm + .06
+    if (mx.ch > 9) rm <- rm + .04
   }
 
   if (legend_position == "top") tm <- tm + (-0.08 + (0.446 * lab_cex))
@@ -855,7 +858,7 @@ function(x, y, by, stack100,
         legend_size <- axis_x_cex 
     }
 
-    # default right.margin option
+    # default right_margin option
     if (legend_position == "right_margin") {
 
       options(byname = getOption("byname"))
