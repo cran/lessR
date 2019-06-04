@@ -21,7 +21,7 @@ Regression(my_formula, data=d, rows=NULL,
            digits_d=NULL, standardize=FALSE,
 
          Rmd=NULL, Rmd_browser=TRUE, 
-         Rmd_format=c("html", "word", "pdf", "odt", "rtf", "none"),
+         Rmd_format=c("html", "word", "pdf", "odt", "none"),
          results=getOption("results"), explain=getOption("explain"),
          interpret=getOption("interpret"), document=getOption("document"),
          code=getOption("code"),
@@ -70,7 +70,7 @@ reg_brief(\ldots, brief=TRUE)
   \item{Rmd_format}{Format of one or more rendered R Markdown file formats,
         expressed in any
         combination of uppercase and lowercase letters. Default is \code{"html"},
-        with a browser view automatic, or \code{"word"}, \code{"odt"}, \code{"rtf"},
+        with a browser view automatic, or \code{"word"}, \code{"odt"}, 
         \code{"pdf"} (if LaTeX is available), or \code{"none"}.
         Requires \code{pandoc} installed, such as from \code{RStudio}.}
   \item{results}{By default TRUE. If set to \code{FALSE} the results
@@ -292,7 +292,7 @@ Xie, Y. (2013). Dynamic Documents with R and knitr, Chapman & Hall/CRC The R Ser
 
 \examples{
 # read internal data set
-d <- rd("Reading", in_lessR=TRUE, quiet=TRUE)
+d <- rd("Reading", quiet=TRUE)
 # do not need all this data, so take only 30% to reduce CPU time
 d <- Subset(random=.3)
 
@@ -320,10 +320,10 @@ r$out_estimates
 #   can be knit to generate dynamic output to a Word document,
 #   pdf file or html file, as well as automatically rendered
 # Here knit into an html file, but do not display
-reg(Reading ~ Verbal + Absent, Rmd="read", Rmd_browser=FALSE)
+#reg(Reading ~ Verbal + Absent, Rmd="read", Rmd_browser=FALSE)
 
-# generate interpretative  R markdown file and render Word and rtf
-reg(Reading ~ Verbal + Absent, Rmd="eg", Rmd_format=c("word", "rtf"))
+# generate interpretative  R markdown file and render Word and odt
+#reg(Reading ~ Verbal + Absent, Rmd="eg", Rmd_format=c("word", "odt"))
 
 # just for incomes > 100000 and less than 5 days absent 
 Regression(Reading ~ Verbal, rows=(Income > 100 & Absent < 5))
@@ -346,7 +346,7 @@ Regression(mpg ~ hp + wt, data=mtcars,
   X1_new=seq(50,350,50), X2_new=c(2,3))
 
 # Indicator (dummy) variable
-#d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
+#d <- Read("Employee", quiet=TRUE)
 #reg(Salary ~ Dept)
 }
 

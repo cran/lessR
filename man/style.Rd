@@ -370,7 +370,7 @@ Wickham, Hadley, (2009), ggplot2: Elegant Graphics for Data Analysis, 2nd editio
 \examples{
 
 # some data
-d <- rd("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- rd("Employee", quiet=TRUE)
 
 # gold colors embedded in a black background
 style("gold", sub_theme="black")

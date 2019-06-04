@@ -6,6 +6,49 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
  
  
+>>>>>> Changes for lessR version 3.8.6 (2019-06-03) <<<<<<
+
+-------------
+Updates 3.8.6
+-------------
+
+BarChart
+  data to console from reading values of Y displayed vertically
+    if horizontal display does not fit within the width of the
+    R console
+  output to object: n.dim, n.miss, freq.df changed to n_dim, n_miss, freq
+  ordered by variable also default triggers sequential palette
+
+Read
+  reading units in a variable labels files now done with 
+    var_labels=TRUE, reading into a separate label file l
+  rd.lbl() function added to abbreviate for var_labels=TRUE
+  if no format specified and no valid filetype specified, presume
+    a built-in lessR data file, e.g., Read("Employee")
+  in_lessR parameter removed as no longer needed
+
+Regression
+  variable labels/units now must be read into a separate
+    label file named l to apply to generated R markdown
+  scatterplot of a single predictor with response variable now a 
+    bubble plot of counts if less than 10 responses on x-variable
+
+
+---------------
+Bug Fixes 3.8.6
+--------------- 
+
+BarChart
+  bar_fill in style now detected and applied
+
+Regression
+  html file format is properly the default rendering format for
+    the Rmd option
+  if label file read after data file, original data file properly 
+    referenced in knitting of markdown file
+ 
+
+ 
 >>>>>> Changes for lessR version 3.8.5 (2019-05-16) <<<<<<
 
 -------------
@@ -30,10 +73,16 @@ Bug Fixes 3.8.5
 --------------- 
 
 BarChart
-  fixed bug introduced in 3.8.4 that prevented legend from display
+  fixed bug introduced in 3.8.4 that prevented legend from displaying
 
 Plot
   fixed crash in Plot regarding assignment of NULL to an output chunk
+
+Regression
+  html file format is properly the default rendering format for
+    the Rmd option
+  if label file read after data file, original data file properly 
+    reference in knitting of markdown file
 
 
  

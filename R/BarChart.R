@@ -395,7 +395,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   # do the analysis
 
-  # if data table is raw data, them default stat_yx is "mean"
+  # if data table is raw data, then default stat_yx is "mean"
   if (stat_yx.miss) {
     stat_yx <- "data"  # default, no transformation
     if (!is.null(y.call)) {

@@ -118,7 +118,7 @@ Following the standard \code{R} function \code{\link{glm}}, invisibly returns an
 
 \examples{
 # Gender has values of "M" and "F"
-d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", quiet=TRUE)
 # logit regression
 Logit(Gender ~ Years)
 
@@ -148,7 +148,7 @@ Logit(Gender ~ Years, pdf_file="MyModel.pdf",
 # Specify new values of the predictor variables to calculate
 #  forecasted values
 # Specify an input data frame other than d
-d <- Read("Cars93", in_lessR=TRUE)
+d <- Read("Cars93")
 Logit(Source ~ HP + MidPrice, X1_new=seq(100,250,50), X2_new=c(10,60,10))
 }
 

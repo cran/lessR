@@ -31,7 +31,7 @@ Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, N
 
 \examples{
 # read internal data set
-d <- rd("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- rd("Employee", quiet=TRUE)
 # do the summary statistics
 s <- ss.brief(Salary)
 # print the piece of output, print function is implicit

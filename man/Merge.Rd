@@ -57,7 +57,7 @@ The merged data frame is returned, usually assigned the name of \code{d} as in t
 \examples{
 # Horizontal
 #-----------
-d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", quiet=TRUE)
 Emp1a <- Subset(1:4, columns = c("Years", "Gender", "Dept", "Salary"))
 Emp1b <- Subset(1:4, columns = c("JobSat", "Plan"))
 # horizontal merge
@@ -67,7 +67,7 @@ d <- Merge(Emp1a, Emp1b, by="row.names", quiet=TRUE)
 
 # Vertical
 #---------
-d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", quiet=TRUE)
 Emp2a <- Subset(1:4)
 Emp2b <- Subset(7:10)
 # vertical merge

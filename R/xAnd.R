@@ -1,3 +1,4 @@
+# insert  commas  and an  and  between the elements of a character vector  
 xAnd <- function(x) {
 
   n <- length(x)

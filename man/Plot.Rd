@@ -678,7 +678,7 @@ Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springe
 
 \examples{
 # read the data
-d <- rd("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- rd("Employee", quiet=TRUE)
 d <- Subset(random=.6, quiet=TRUE)  # less computationally intensive
 
 #---------------------------------------------------
@@ -858,7 +858,7 @@ style()
 
 # trigger a time series with a Date variable specified first
 # stock prices for three companies by month:  Apple, IBM, Intel
-d <- rd("StockPrice", in_lessR=TRUE)
+d <- rd("StockPrice")
 # only plot Apple
 Plot(date, Price, rows=(Company=="Apple"))
 # Trellis plots, one for each company
@@ -870,7 +870,7 @@ Plot(date, Price, by=Company, color="blues")
 #------------------------------------------
 # analysis of a single categorical variable
 #------------------------------------------
-d <- rd("Employee", in_lessR=TRUE)
+d <- rd("Employee")
 
 # default 1-D bubble plot
 # frequency plot, replaces bar chart 
@@ -949,7 +949,7 @@ Plot(Years, Salary, add=c("rect", "rect"),
 # analysis of two categorical variables (Likert data)
 #----------------------------------------------------
 
-d <- rd("Mach4", in_lessR=TRUE, quiet=TRUE)  # Likert data, 0 to 5
+d <- rd("Mach4", quiet=TRUE)  # Likert data, 0 to 5
 
 # size of each plotted point (bubble) depends on its joint frequency
 # triggered by default when replication of joint values and

@@ -212,7 +212,7 @@ getColors(pal="aliceblue", end_pal="blue")
 
 # Plots
 # -----
-d <- rd("Employee", in_lessR=TRUE)
+d <- rd("Employee")
 
 # default quantitative scale
 bc(d, Dept, fill=getColors())

@@ -14,7 +14,7 @@ function(x, y, by, stack100,
 
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
   y.given <- ifelse (!is.null(y), TRUE, FALSE)
-  is.ord <- ifelse (is.ordered(x), TRUE, FALSE)
+  is.ord <- ifelse (is.ordered(x) || is.ordered(by), TRUE, FALSE)
 
   if (stack100) prop <- TRUE
   if (!is.null(by)  &&  prop) stack100 <- TRUE  # prop deprecated
@@ -203,11 +203,15 @@ function(x, y, by, stack100,
     }
 
     else {  # a by variable
+
       x.temp <- x
+      unq.x <- unique(x)
+      unq.by <- unique(by)
+
       do.row <- ifelse (x[1] == x[2], FALSE, TRUE)  # x is outer loop
       m <- matrix(y, nrow=length(unique(by)), byrow=do.row)
-      colnames(m) <- unique(x) 
-      rownames(m) <- unique(by) 
+      colnames(m) <- unq.x
+      rownames(m) <- unq.by
       m <- as.table(m, dnn=c(by.name, x.name))
       names(dimnames(m)) <- c(by.name, x.name) 
       x <- m
@@ -333,11 +337,16 @@ function(x, y, by, stack100,
   # allow for assigned diverging color scale
   if (is.null(fill)) {  # fill not specified
     if (!is.ord) {  # default qualitative for theme
-      if (theme == getOption("theme")) {  # the default theme
+      bar_fill <- getOption("bar_fill")
+      if (!is.null(bar_fill))
+        options("bar_fill_discrete" = bar_fill)
+      if (theme == getOption("theme")) {  # default theme operative
         if (is.null(by)) 
           clr <- getOption("bar_fill_discrete")  # default theme 
         else 
+{
            clr <- .color_range(.get_fill(theme, FALSE), n.levels)
+}
       }
       else {  # not the default theme
         sty <- style(theme, reset=FALSE)
@@ -349,9 +358,9 @@ function(x, y, by, stack100,
         clr <- .color_range(clr, n.levels)
       if (beside) clr <- clr[1:n.levels]  # longer vector OK if !beside
     }
-    else  # ordered factor, so sequential palette
+    else  # ordered factor, so sequential palette (not allow fill= )
       clr <- .color_range(.get_fill(theme), n.levels) 
-  }
+  }  # end null fill
 
   else {  # fill specified by user
     if (is.null(.color_range(fill, n.levels)))
@@ -918,7 +927,7 @@ function(x, y, by, stack100,
   }
 
   dd <- .getdigits(x, min_digits=0) - 1
-  n.dim <- length(dim(x))
+  n_dim <- length(dim(x))
   stats <- ""
   
   if (multi) {
@@ -997,7 +1006,7 @@ function(x, y, by, stack100,
 
   # x is a table, could be real values or integers <0 if y is specified
   # no by variable, dim == 0 if x<-x.temp 
-  else if (n.dim == 1) {
+  else if (n_dim == 1) {
     if (.is.integer(x)  &&  all(x >= 0)) {  # x is table of count-like values
 
       txsug <- ""
@@ -1042,11 +1051,11 @@ function(x, y, by, stack100,
       }
 
     # names and order of components per documentation in BarChart.Rd
-      stats$n.miss <- x.miss
+      stats$n_miss <- x.miss
       stats$p_value <- .fmt(stats$p_value, 3)
-      names(stats) <- c("n.dim", "out_title", "out_counts", "out_miss",
-                        "out_chi", "out_lbl", "freq", "freq.df", "prop",
-                         "p_value", "n.miss")
+      names(stats) <- c("n_dim", "out_title", "out_counts", "out_miss",
+                        "out_chi", "out_lbl", "freq", "freq_df", "prop",
+                         "p_value", "n_miss")
       stats <- c(stats[2], stats[6], stats[3], stats[5], stats[4],
                  stats[1], stats[10], stats[8], stats[7], stats[9], stats[11])
     }  # end counts or count-like
@@ -1066,16 +1075,15 @@ function(x, y, by, stack100,
       txtbl <- stats$txtbl 
       class(txsug) <- "out"
       class(txtbl) <- "out"
-      output <- list(out_suggest=txsug, out_txt=txtbl)
+      output <- list(out_suggest=txsug, out_txt=txtbl, values=stats$values)
 
       class(output) <- "out_all"
       if (!quiet) print(output)         
-
-      names(stats) <- c("n.dim", "out_y")
-      stats <- c(stats[2], stats[1])
+      names(stats) <- c("n_dim", "out_y", "values")
+      stats <- c(stats[2], stats[1], stats[3])
     }
 
-  }  # if (n.dim == 1)
+  }  # end if (n_dim == 1)
 
   # -------------
   # a by variable
@@ -1121,9 +1129,9 @@ function(x, y, by, stack100,
       class(output) <- "out_all"
       if (!quiet) print(output)
 
-      names(stats) <- c("n.dim", "out_title", "out_lbl", "out_counts",
+      names(stats) <- c("n_dim", "out_title", "out_lbl", "out_counts",
                         "out_chi", "out_prop", "out_row",
-                        "out_col", "freq.df", "p_value")
+                        "out_col", "freq", "p_value")
       stats <- c(stats[2], stats[3], stats[4], stats[5], stats[6],
                  stats[7], stats[8], stats[1], stats[9], stats[10])
     }  # end is.null(y)
@@ -1138,7 +1146,7 @@ function(x, y, by, stack100,
       class(output) <- "out_all"
       if (!quiet) print(output)
 
-      names(stats) <- c("n.dim", "out_y")
+      names(stats) <- c("n_dim", "out_y")
       stats <- c(stats[2], stats[1])
     }
 

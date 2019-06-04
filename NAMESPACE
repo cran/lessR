@@ -72,7 +72,7 @@ export (
   print.out_all, print.out,
   prob_norm, prob_znorm, prob_tcut,
   prob.norm, prob.znorm, prob.tcut,
-  Read, rd, rd.brief, Read2,
+  Read, rd, rd.brief, rd_brief, rd_lbl, Read2,
   Regression, reg, reg.brief, reg_brief, regPlot, 
   Recode, rec,
   set, showColors, showPalettes,

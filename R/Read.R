@@ -1,9 +1,9 @@
 Read <-
-function(from=NULL, format=NULL, in_lessR=FALSE,
+function(from=NULL, format=NULL,
 
          var_labels=FALSE, widths=NULL, stringsAsFactors=FALSE,
-         missing="", n_mcut=1,
 
+         missing="", n_mcut=1,
          miss_show=30, miss_zero=FALSE, miss_matrix=FALSE,
 
          max_lines=30, sheet=1,
@@ -12,6 +12,7 @@ function(from=NULL, format=NULL, in_lessR=FALSE,
 
          fun_call=NULL, ...) {
 
+        
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
@@ -34,7 +35,8 @@ function(from=NULL, format=NULL, in_lessR=FALSE,
   if (hasArg(labels)) {
      cat("\n"); stop(call.=FALSE, "\n","------\n",
          ">>> To read a csv or Excel file of variable labels, each row a\n",
-         "    variable name and then variable label, just set\n",
+         "    variable name and then variable label, and then optionally\n",
+         "    a variable unit in the third column, just set\n",
          "    var_labels=TRUE in the Read statement\n\n")
   }
 
@@ -55,7 +57,7 @@ function(from=NULL, format=NULL, in_lessR=FALSE,
           "Cannot browse for a data file that is part of lessR.\n",
           "Specify the file name.\n\n")
     }
-  }
+  }  # end !is.null(format)
 
   # option to browse for data file, and then display file name
   browse <- FALSE
@@ -65,18 +67,17 @@ function(from=NULL, format=NULL, in_lessR=FALSE,
     browse <- TRUE
     from <- file.choose()
     fncl <- paste("Read(", "from = \"", from,  "\", quiet = TRUE)", sep="")
-    fncl2 <- paste("Read(", "from = \"", from,  "\")", sep="")
+#   fncl2 <- paste("Read(", "from = \"", from,  "\")", sep="")
   }
   else {
     fncl <- .fun_call.deparse(fun_call)
-    fncl2 <- .fun_call.deparse(fun_call)  # for read_excel currency bug
+#   fncl2 <- .fun_call.deparse(fun_call)  # for read_excel currency bug
   }
 
-  options(read.call=fncl)  # save for knitr run
+  if (!var_labels) options(read.call=fncl)  # save only data file for knitr run
 
   if (miss.format) {
-         if (in_lessR) format <- "lessR"
-    else if (!is.null(widths)) format <- "fwd"
+         if (!is.null(widths)) format <- "fwd"
     else if (grepl(".csv$", from)) format <- "csv"
     else if (grepl(".tsv$", from)) format <- "csv"
     else if (grepl(".txt$", from)) format <- "csv"
@@ -84,7 +85,21 @@ function(from=NULL, format=NULL, in_lessR=FALSE,
     else if (grepl(".sas7bdat$", from)) format <- "SAS"
     else if (grepl(".rda$", from)) format <- "R"
     else if (grepl(".xls$", from) || grepl(".xlsx$", from)) format <- "Excel"
-  }
+
+    if (is.null(format)) {
+      if (from %in% c("BodyMeas", "Cars93",
+                      "Employee", "Employee_lbl", "Mach4", "Mach4_lbl",
+                      "Jackets", "Learn", "Reading", "StockPrice")) {
+        format <- "lessR"  # presume exact name not exist in current wd
+      }
+      else { 
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "Need to specify  format  or specify the name of\n",
+            "  a built-in lessR data file.\n\n")
+      }
+    }
+  }  # end miss format
+
   if (var_labels && format=="R") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         "An R data file should already contain labels before it was created.\n",
@@ -125,7 +140,7 @@ function(from=NULL, format=NULL, in_lessR=FALSE,
 
 
   # read the data (into object d)
-  # ---------------------__------
+  # -----------------------------
 
   if (format %in% c("fwd", "csv")) {  # text file
 
@@ -133,6 +148,8 @@ function(from=NULL, format=NULL, in_lessR=FALSE,
       d <- read.fwf(file=from, widths=widths, ...)
 
     else if (format=="csv") {
+
+      # get delimiter
       line1 <- scan(from, what="character", nlines=1, sep="\t", quiet=TRUE)
       if (length(line1) > 1) {
         message(">>> A tab character detected in the first row of the\n",
@@ -141,32 +158,44 @@ function(from=NULL, format=NULL, in_lessR=FALSE,
       }
       else
         delim <- ","
+
+      # read data or labels/units  
       if (!var_labels)
         d <- read.csv(file=from, na.strings=missing, sep=delim,
                       stringsAsFactors=stringsAsFactors, ...)
-      else
+      else {
         d <- read.csv(file=from, header=FALSE,
-                  row.names=1, col.names=c("x", "label"),
+                  row.names=1, 
                   sep=delim, stringsAsFactors=FALSE, ...)
-    }
+        names(d)[1] <- "label" 
+        if (ncol(d) == 2) names(d)[2] <- "unit" 
+      }
+   }  # end csv
 
-  }  # end text file
+ }  # end text file
 
   else if (format == "Excel") {
 
     if (!var_labels)
       d <- openxlsx::read.xlsx(from, sheet=sheet, detectDates=TRUE, ...)
+
     else {
       d <- openxlsx::read.xlsx(from, sheet=sheet,
                                colNames=FALSE, rowNames=TRUE)
-      names(d) <- "label" 
+      names(d)[1] <- "label" 
+      for (i in 1:nrow(d)) if (is.na(d[i,1])) d[i,2] <- ""
+
+      if (ncol(d) == 2) {
+         names(d)[2] <- "unit" 
+         for (i in 1:nrow(d)) if (is.na(d[i,2])) d[i,2] <- ""
+      }
     }
 #     fnu.col <- logical(length=ncol(d))  # reset to FALSE
 #     for (i in 1:ncol(d)) if (.is.date(d[,i])) fnu.col[i] <- TRUE
 #     d[fnu.col] <- lapply(d[fnu.col], function(x) x <- x+1)  # read.xlsx bug?
-    # d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
+#     d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
 
-    # d <- readxl::read_excel(path=from, sheet=sheet)
+#     d <- readxl::read_excel(path=from, sheet=sheet)
     if (!is.null(list(...)$row.names))  # add any row.names to data frame
       d <- data.frame(d, row.names=list(...)$row.names)
     # class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
@@ -207,7 +236,7 @@ function(from=NULL, format=NULL, in_lessR=FALSE,
     if (!file.exists(path.name)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "No lessR data file with that name.\n\n",
-        "To view the list of data files, enter  > Help(lessR)\n",
+        "To view the list of lessR data files, enter  > Help(lessR)\n",
         "The data file names begin with  'data.'\n\n")
     }
 

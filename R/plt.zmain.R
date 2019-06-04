@@ -24,7 +24,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          bubble_text=getOption("bubble_text_color"),
          col.low=NULL, col.hi=NULL,
 
-         ID=NULL, ID_color="gray50", ID_size=0.75, out_ind,
+         ID=NULL, ID_color="gray50", ID_size=0.75, out_ind=NULL,
          out_fill, out_color, out_shape.miss,
 
          fit.line="off", col.fit.line="gray55",
@@ -590,9 +590,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           color <- "transparent"
       }
 
-    if (!stack  &&  color_miss  &&  fill != "transparent"  &&  n.clrs > 1)
+    if (!stack  &&  color_miss  &&  fill[1] != "transparent"  &&  n.clrs > 1)
       color <- fill
-
 
     trans_pts <- ifelse(is.null(col.trans),
                         getOption("trans_pt_fill"), col.trans)  # default
@@ -612,7 +611,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
      if (area_fill == "on") area_fill <- getOption("violin_fill")
      if (object == "both") if (area_fill == "transparent") area_fill <- fill
      if (ln.width == 0) area_fill <- "transparent"
-
 
 
     # ----------

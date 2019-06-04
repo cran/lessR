@@ -3,10 +3,10 @@
 \alias{dataEmployee_lbl}
 \title{VariableLabels: Employee Data Set}
 
-\description{For the data on 37 employees with 6 variablesc, includes the variable labels and variable units.}
+\description{For the data on 37 employees with 6 variables, includes the variable labels and variable units.}
 
 \usage{data(dataEmployee_lbl)}
-\format{Variable labels.
+\format{Variable labels, and some unites..
 
 Years,"Years Employed in the Company"\cr
 Gender,"Male or Female"\cr

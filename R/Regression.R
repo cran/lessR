@@ -3,7 +3,7 @@ function(my_formula, data=d, rows=NULL,
          digits_d=NULL, standardize=FALSE,
 
          Rmd=NULL, Rmd_browser=TRUE, 
-         Rmd_format=c("html", "word", "pdf", "odt", "rtf", "none"),
+         Rmd_format=c("html", "word", "pdf", "odt", "none"),
          results=getOption("results"), explain=getOption("explain"),
          interpret=getOption("interpret"), document=getOption("document"), 
          code=getOption("code"), 
@@ -22,6 +22,11 @@ function(my_formula, data=d, rows=NULL,
          quiet=getOption("quiet"),
          pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
          fun_call=NULL, ...) {
+
+
+  # allow for more than one value, so cannot use match.arg
+  # then all 5 get selected, then default to "html"
+  if (missing(Rmd_format)  &&  length(Rmd_format) == 5) Rmd_format <- "html"
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -133,8 +138,9 @@ function(my_formula, data=d, rows=NULL,
   predictors <- character(length=n.pred)
   for (i in 2:n.vars) predictors[i-1] <- nm[i]
 
-  #  for (i in 1:n.vars) .xcheck(nm[i], df.name, names(data))  # do variables exist?
-  .xcheck(nm, df.name, names(data))  # do variables exist?
+  # do variables nm exist in df.name?
+  # for (i in 1:n.vars) .xcheck(nm[i], df.name, names(data)) 
+  .xcheck(nm, df.name, names(data)) 
 
   # check that variables are not function calls
   v.str <- deparse(attr(terms.formula(my_formula), which="variables"))

@@ -29,13 +29,19 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
 
   if (n.pred <= 1) {  # scatterplot, if one predictor variable
 
+    if (n.pred > 0)
+      x.values <- lm.out$model[,nm[2]]
+    else
+      x.values <- 1:n.obs
+    y.values <- lm.out$model[,nm[1]]
+
     do.predint <- ifelse ((pred_rows==0) || !is.null(X1_new) || is.null(p.int),
       FALSE, TRUE) 
     if (n.pred > 0) if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
 
-    if (!do.predint) {
+    if (!do.predint  ||  !is.numeric(x.values)) {
       ctitle <- "Scatterplot"
-      if (n.pred > 0) if (!is.factor(lm.out$model[,nm[2]]))
+      if (n.pred > 0  &&  is.numeric(x.values))
         ctitle <- paste(ctitle, "and Regression Line")
       y.min <- min(lm.out$model[,nm[1]])
       y.max <- max(lm.out$model[,nm[1]])
@@ -48,12 +54,6 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
 
     plt.i <- plt.i + 1L
     plt.title[plt.i] <- gsub(pattern="\n", replacement=" ", x=ctitle)
-
-    if (n.pred > 0)
-      x.values <- lm.out$model[,nm[2]]
-    else
-      x.values <- 1:n.obs
-    y.values <- lm.out$model[,nm[1]]
                
     # scale for regular R or RStudio
     axis_cex <- 0.76
@@ -95,7 +95,6 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
          lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
     abline(h=axTicks(2), col=getOption("grid_y_color"),
          lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
-
     if (is.factor(x.values)) {
       x.lvl <- levels(x.values)
       axT1 <- 1:length(x.lvl)   # mark category values
@@ -117,12 +116,15 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     if (is.numeric(x.values)) {
       d.x <- diff(x.values) 
       for (i in 2:(length(d.x)))
-        if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
+        if ((abs(d.x[i-1] - d.x[i]) > 1.0000000001)) eq.int <- FALSE
     }
-
-    if (length(unique(x.values)) > getOption("n_cat")  ||  !eq.int)
-      points(x.values, y.values, pch=21, col=col_color, bg=col_fill, cex=size.pt)
-
+    # getOption("n_cat") = 1
+    ux <- length(unique(x.values))
+    uy <- length(unique(y.values))
+    if ( (ux > 10  &&  uy > 10)  ||  !eq.int  || !is.numeric(x.values)) {
+      points(x.values, y.values, pch=21, col=col_color, bg=col_fill,
+             cex=size.pt)
+    }
     else {
       mytbl <- table(x.values, y.values)  # get the counts, all x-y combinations
       n.count <- nrow(mytbl) * ncol(mytbl)
@@ -148,7 +150,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       sz <- cords[,3]**power  # radius unscaled 
       radius <- 0.25
       symbols(cords$xx, cords$yy, circles=sz, inches=radius,
-          bg=col_fill, fg=col_color, add=TRUE, ...)
+          bg=.maketrans(col_fill, 110), fg=col_color, add=TRUE, ...)
 
       q.ind <- 1:nrow(cords)  # all bubbles get text
       for (i in 1:nrow(cords)) if (cords[i,3] < 5) cords[i,3] <- NA 
@@ -164,13 +166,13 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       lines(x.values, mv, lwd=0.75)
     }
     else {  # plot reg line
-      if (!is.factor(lm.out$model[,nm[2]])) {
+      if (!is.factor(x.values)) {
         abline(lm.out$coefficients[1], lm.out$coefficients[2],
                col=getOption("segment_color"), lwd=1)
       }
     }
 
-    if (do.predint) {
+    if (!is.factor(x.values)  &&  do.predint) {
       col.ci <- getOption("segment_color")
       col.pi <- "gray30"
 

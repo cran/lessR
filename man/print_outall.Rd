@@ -25,7 +25,7 @@ Displays all the results saved as an \code{R} list into an object from a \code{l
 
 \examples{
 # read internal data set
-d <- rd("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- rd("Employee", quiet=TRUE)
 # do the summary statistics
 s <- ss_brief(Salary)
 # display all the output, print function is implicit

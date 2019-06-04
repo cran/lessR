@@ -1,3 +1,5 @@
+# convert numbers 1 through 12 to words
+# round off to integer larger values
 xNum <- function(x) {
  
   x <- as.integer(round(x,0))

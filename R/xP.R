@@ -1,3 +1,5 @@
+# express x in terms of units
+# includes conversion to dollars
 xP <- function(x, d=NULL, unit=NULL, semi=FALSE) {
 
   if (is.null(d))
@@ -8,13 +10,16 @@ xP <- function(x, d=NULL, unit=NULL, semi=FALSE) {
   if (!is.na(x)) {
 
     neg.flag <- FALSE
-    if (!is.null(unit)) if (unit == "dollar"){
-      digits_d <- 2
-      if (x < 0) {
-        neg.flag <- TRUE
-        x <- abs(x)
+    if (!is.null(unit)) {
+      if (unit == "dollar"){
+        digits_d <- 2
+        if (x < 0) {
+          neg.flag <- TRUE
+          x <- abs(x)  # remove minus sign
+        }
+      }
     }
-  }
+
     tx <- formatC(x, digits=digits_d, big.mark=",", format="f")
 
     if (!is.null(unit)) {
@@ -32,7 +37,7 @@ xP <- function(x, d=NULL, unit=NULL, semi=FALSE) {
         }
     }
     
-  }
+  }  # end not missing x
 
   else
     tx <- ""

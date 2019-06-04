@@ -71,11 +71,11 @@ data(dataEmployee)
 d <- Sort(Gender, data=dataEmployee)
 
 # sort by row names in ascending order
-d <- Read("Employee", in_lessR=TRUE)
+d <- Read("Employee")
 d <- Sort(row.names)
 
 # randomly re-shuffle the rows of data
-d <- Read("Employee", in_lessR=TRUE)
+d <- Read("Employee")
 d <- Sort(random)
 }
 

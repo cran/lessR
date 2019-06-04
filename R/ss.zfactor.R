@@ -5,7 +5,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
 
 
 # print a cross-tabs
-.prnfreq <- function(x, type, max.ln, max.c1, n.dash, ttl) {
+.prnfreq <- function(x, type, max.ln, max.c1, n.dash, ttl, msg=FALSE) {
   tx <- character(length = 0)
 
   # title
@@ -22,20 +22,64 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i], w=max.ln[i]),
       sep="")
 
-  # values
-  for (i in 1:nrow(x)) {
-    rwnm <- paste(" ", rownames(x)[i])
-    tx[length(tx)+1] <-  format(rwnm, width=max.c1, justify="left")
-    for (j in 1:ncol(x)) {
-      if (type=="r") {
-        tx[length(tx)] <- paste(tx[length(tx)], .fmt(x[i,j], d=3, w=max.ln[j]),
-          sep="")
+  if (max(nchar(tx)) < getOption("width")) {  # horizontal layout
+
+    # values
+    for (i in 1:nrow(x)) {
+      rwnm <- paste(" ", rownames(x)[i])
+      tx[length(tx)+1] <-  format(rwnm, width=max.c1, justify="left")
+      for (j in 1:ncol(x)) {
+        if (type=="r") {
+          tx[length(tx)] <- paste(tx[length(tx)],
+             .fmt(x[i,j], d=3, w=max.ln[j]), sep="")
+        }
+        else if (type=="i")
+          tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j], w=max.ln[j]),
+            sep="")
       }
-      else if (type=="i")
-        tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j], w=max.ln[j]),
-          sep="")
     }
   }
+
+  else {  # vertical layout
+
+    tx <- ""
+
+    if (nrow(x) * (ncol(x)-1) > 20) { 
+      if (msg)
+        message("Table output is vertical to fit in window, but > 20 rows\n",
+                "To view the complete table, save the output\n",
+                "  to an object, e.g., b <- BarChart(...)\n",
+                "  then b$freq\n")
+    }
+
+    else {  # write
+        
+      mx.cx <- max(nchar(x.name), max(nchar(colnames(x))))
+      mx.c3 <- max(nchar(.fmt(x, d=3))) + 1
+      by.name <- getOption("byname")
+
+      tx[length(tx)+1] <- paste(
+         .fmtc(x.name, w=mx.cx, j="left"),
+         .fmtc(by.name, w=max.c1+1, j="left"),
+         .fmtc("Count", w=mx.c3, j="right"))
+        for (i in 1:ncol(x)) {
+          for (j in 1:nrow(x)) {
+             tx[length(tx)+1] <- paste(
+                .fmtc(colnames(x)[i], w=mx.cx, j="left"), 
+                .fmtc(rownames(x)[j], w=max.c1, j="left"))
+               # .fmt(x[j,i], d=digits_d, w=max.ln-3))
+          if (type=="r") {
+            tx[length(tx)] <- paste(tx[length(tx)],
+               .fmt(x[j,i], d=3, w=mx.c3), sep="")
+          }
+          else if (type=="i")
+            tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[j,i], w=mx.c3),
+              sep="")
+          }  # end j
+        }  # end i
+      }  # write
+    }
+
 
   return(tx)
 }  # end .prnfreq
@@ -78,7 +122,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     }
     
     # use for returned output, x is a 2-way table
-    freq.df <- as.data.frame(x)
+    freq_df <- as.data.frame(t(x))
 
     xx <- addmargins(x)
 
@@ -107,7 +151,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
 
     # cell frequencies
     txfrq <- .prnfreq(xx, "i", max.ln, max.c1, n.dash=30,
-                      ttl="Joint and Marginal Frequencies")
+                      ttl="Joint and Marginal Frequencies", msg=TRUE)
 
     tx <- character(length = 0)
     ch <- summary(as.table(x))
@@ -134,7 +178,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
 
     if (brief)
       return(list(n.dim=n.dim, txttl=txttl, txfrq=txfrq, txXV=txXV,
-                  freq.df=freq.df, pvalue=ch$p.value))
+                  freq_df=freq_df, pvalue=ch$p.value))
 
 
     # full analysis
@@ -192,7 +236,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     # back to ss or ss data frame
     return(list(n.dim=n.dim, txttl=txttl, txlbl=txlbl, txfrq=txfrq,
                 txXV=txXV, txprp=txprp, txcol=txrow, txrow=txcol,
-                freq.df=freq.df, pvalue=ch$p.value))
+                freq_df=freq_df, pvalue=ch$p.value))
     # end full analysis
 
   }  # end two variable
@@ -213,7 +257,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
           "If so, use  row.names=n  option for Read, where n refers to the ",
           "nth column\n\n", sep="")
       return(list(n.dim=1, title="", counts="", miss="", 
-                  chi="", lbl="", freq=x, freq.df="", prop="",
+                  chi="", lbl="", freq=x, freq_df="", prop="",
                   pvalue=""))
     }
 
@@ -313,11 +357,11 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
         txlbl <- tx
       }
 
-      freq.df <- as.data.frame(x)
-      names(freq.df)[1] <- x.name
+      freq_df <- as.data.frame(x)
+      names(freq_df)[1] <- x.name
 
       return(list(n.dim=n.dim, title=txttl, counts=txcnt, miss=txmis, 
-                  chi=txchi, lbl=txlbl, freq=x, freq.df=freq.df, prop=xp,
+                  chi=txchi, lbl=txlbl, freq=x, freq_df=freq_df, prop=xp,
                   pvalue=ch$p.value))
     }
   }  # one variable

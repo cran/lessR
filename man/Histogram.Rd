@@ -282,7 +282,7 @@ Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springe
 
 \examples{
 # get the data
-d <- rd("Employee", in_lessR=TRUE)
+d <- rd("Employee")
 
 
 # make sure default style is active
@@ -405,7 +405,7 @@ Histogram(c(X,Y))
 # annotations
 # -----------
 
-d <- rd("Employee", in_lessR=TRUE)
+d <- rd("Employee")
 
 # Place a message in the top-right of the graph
 # Use \n to indicate a new line

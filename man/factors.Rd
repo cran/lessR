@@ -43,7 +43,7 @@ Returns the entire data frame if applied to one or more variables in a data fram
 \examples{
 # get the data, variables Gender plus m01 through m20, 20 Mach IV items
 # coded as integers from 0 to 5 on 6-pt Likert scales
-d <- rd("Mach4", in_lessR=TRUE, quiet=TRUE)
+d <- rd("Mach4", quiet=TRUE)
 
 # single variable converted to a factor
 d <- factors(Gender, 0:1, c("Male", "Female"))
@@ -56,8 +56,8 @@ LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
 d <- factors(m01:m20, levels=0:5, labels=LikertCats)
 
 # read the data again and this time also the variable labels
-d <- rd("Mach4", in_lessR=TRUE, quiet=TRUE)
-l <- rd("dataMach4_lbl", in_lessR=TRUE)
+d <- rd("Mach4", quiet=TRUE)
+l <- rd("Mach4_lbl")
 
 # convert specified variables to factors according to the given vector
 #   of three variables only

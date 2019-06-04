@@ -86,16 +86,16 @@ myd <- Subset(-c(1,4))
 d <- Subset(wool=="A" & tension=="L", columns=breaks, data=warpbreaks)
 
 # delete Years and Salary 
-d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", quiet=TRUE)
 d <- Subset(columns=-c(Years, Salary))
 
 # locate, display only, a specified row by its row.name
-d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", quiet=TRUE)
 Subset(row.names(d)=="Fulton, Scott")
 
 # randomly extract 60\% of the data
 # generate code to create the hold out sample of the rest
-d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", quiet=TRUE)
 mysubset <- Subset(random=.6, holdout=TRUE)
 }
 

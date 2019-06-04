@@ -63,7 +63,7 @@ Although not typically needed for analysis, if the output is assigned to an obje
 
 \examples{
 
-d <- Read("Reading", in_lessR=TRUE)
+d <- Read("Reading")
 
 # compare least-squares models
 # can specify all the variables in the full model
@@ -74,7 +74,7 @@ Nest(Reading, c(Absent), c(Verbal,Income))
 # compare logistic models, save results into an object
 # define the full model by adding just the variables
 #  not found in the reduced model
-d <- Read("BodyMeas", in_lessR=TRUE)
+d <- Read("BodyMeas")
 n <- Nest(Gender, c(Weight, Hips, Hand, Shoe),
       c(Height, Waist, Chest), method="logit")
 # view the results

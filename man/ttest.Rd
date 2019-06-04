@@ -150,7 +150,7 @@ Kupper and Hafner (1989). The American Statistician, 43(2):101-105.
 # tt for two groups, from a formula
 # ----------------------------------------------------------
 
-d <- Read("Employee", in_lessR=TRUE, quiet=TRUE)
+d <- Read("Employee", quiet=TRUE)
 
 
 # analyze data with formula version

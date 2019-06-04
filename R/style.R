@@ -280,6 +280,7 @@ function(
   if (reset) { 
     if (!miss_theme) {
       suppressPackageStartupMessages(.onAttach())
+      bar_fill <- getOption("bar_fill")
       miss_theme <- FALSE
       theme <- match.arg(theme) 
       options(theme=theme)
@@ -401,8 +402,9 @@ function(
   if (reset) {
     if (!is.null(trans_bar_fill)) {
       options(trans_bar_fill=trans_bar_fill)
-      options(bar_fill = .maketrans(getOption("bar_fill"), 
-             .to256("trans_bar_fill")))
+      if (!is.null(bar_fill))
+        options(bar_fill = .maketrans(bar_fill, 
+                .to256("trans_bar_fill")))
     }
     if (!is.null(trans_pt_fill)) {
       options(trans_pt_fill=trans_pt_fill)

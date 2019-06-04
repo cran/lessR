@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.8.5     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.8.6     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
       "                           d: default data frame, no need for data=\n",
@@ -21,8 +21,8 @@ function(...) {
       "8. style(\"gray\")           Grayscale theme, + many others available\n",
       "   style(show=TRUE)        all color/style options and current values\n",
       "9. getColors()             create many styles of color palettes\n\n",
-      "lessR parameter names now include _'s. Names with a period are\n",
-      "deprecated, but still work. Ex: bin_width instead of bin.width.\n")
+      "lessR parameter names now use _'s. Names with a period are deprecated.\n",
+      "Ex:  bin_width  instead of  bin.width\n")
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 
@@ -36,7 +36,7 @@ function(...) {
   options(panel_lty = "solid")
 
   # .maketrans("gray50", .to256("trans_bar_fill"))
-  options(bar_fill = rgb(121,138,148, maxColorValue=255))  # relevant?
+  options(bar_fill = NULL)
   options(bar_fill_discrete = c("#2D8BC3", "#A57E08", "#51932E",
       "#C7657B", "#8E76C9", "#009B8B", "#BB714D", "#838A00",
       "#0097AD", "#C561A2", "#009962", "#B068BE"))  # getColors("hues")
@@ -183,8 +183,8 @@ function(...) {
     return(0)
 }
 
-.fmt <- function(k, d=getOption("digits_d"), w=0) {
-  format(sprintf("%.*f", d, k), width=w, justify="right", scientific=FALSE)
+.fmt <- function(k, d=getOption("digits_d"), w=0, j="right") {
+  format(sprintf("%.*f", d, k), width=w, justify=j, scientific=FALSE)
 }
 
 
@@ -546,7 +546,6 @@ function(...) {
     ind <- which(nms == var.nm[i])
     if (length(ind) == 0) {
       dfs <- .getdfs()  # data frames in style
-
       txt1 <- ", the default name \n\n"
       txt2 <- "Either make sure to use the correct variable name, or\n"
       txt3 <- "specify the data table that contains the variable with: data=\n"
@@ -795,7 +794,7 @@ function(...) {
                        lab_x_cex=NULL, lab_y_cex=NULL, labels=l,
                        graph.win=TRUE, flip=FALSE, ...) {
 
-  if (graph.win) {  # do not open a graphics window if no plot
+  if (graph.win) {
     fig.width <-  par("fin")[1]
     fig.ht <-  par("fin")[2]
     marg.x <- par("mai")[2] + par("mai")[4]
@@ -805,7 +804,7 @@ function(...) {
     cut.x <- 0.90 * axis_x
     cut.y <- 0.95 * axis_y
   }
-  else {
+  else {  # do not open a graphics window if no plot
     cut.x <- 3.75
     cut.y <- 3.75
   }
@@ -830,7 +829,7 @@ function(...) {
   x.lbl <- NULL
   y.lbl <- NULL
 
-  # let deprecated mydata work as default
+  # let deprecated mylabels work as default
   dfs <- .getdfs() 
   mylabels.ok <- FALSE
   if (!is.null(dfs)) {
@@ -1658,7 +1657,8 @@ function(dir, axT) {
     if (seq.pal)
       clrs <- "blues"
     else
-      clrs <- "hues"
+      clrs <- getOption("bar_fill_discrete")
+      #clrs <- "hues"
   }
 
   else if (theme %in% c("gray", "white")) clrs <- "grays"

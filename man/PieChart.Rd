@@ -236,7 +236,7 @@ Instead, do the following:
 
 \examples{
 # get the data from a file included with lessR
-d <- rd("Employee", in_lessR=TRUE)
+d <- rd("Employee")
 
 # --------------------------------------------------------
 # pie (doughnut) chart from the data for a single variable
@@ -320,7 +320,7 @@ rm(Salary)
 # annotations
 # -----------
 
-d <- rd("Employee", in_lessR=TRUE)
+d <- rd("Employee")
 
 # Place a message in the center of the pie
 # Use \n to indicate a new line

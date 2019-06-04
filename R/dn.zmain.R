@@ -187,7 +187,8 @@ function(x,
           p.val, sep="")
       }
       else 
-        tx[length(tx)+1] <- "Sample size out of range for Shapiro-Wilk normality test."
+        tx[length(tx)+1] <- paste("Sample size out of range for Shapiro-Wilk",
+                            " normality test.")
     }
 
   return(list(tx=tx, bw=d.gen$bw, n=n, n.miss=n.miss, W=W, pvalue=p.val))
