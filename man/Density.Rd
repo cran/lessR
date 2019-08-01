@@ -18,17 +18,17 @@ When output is assigned into an object, such as \code{d} in \code{d <- dn(Y)}, t
 Density(x, data=d, rows=NULL,
         n_cat=getOption("n_cat"), Rmd=NULL, 
 
- bw=NULL, type=c("both", "general", "normal"),
+       bw=NULL, type=c("general", "normal", "both"),
        histogram=TRUE, bin_start=NULL, bin_width=NULL,
 
-       color_nrm="black", color_gen="black",
+       color_nrm="gray20", color_gen="gray20",
        fill_nrm=NULL, fill_gen=NULL,
 
-       axis_text_color="gray30", rotate_x=0, rotate_y=0, offset=0.5,
+       rotate_x=0, rotate_y=0, offset=0.5,
 
        x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y_axis=FALSE,
        x.min=NULL, x.max=NULL,
-       rug=FALSE, color_rug="black", size.rug=0.5,
+       rug=FALSE, color_rug="black", size_rug=0.5,
 
        eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
        width=4.5, height=4.5, pdf=FALSE,
@@ -58,8 +58,9 @@ dn(\ldots)
 
   \item{bw}{Bandwidth of kernel estimation. Initial value is "nrd0", but unless
        specified, then may be iterated upward to create a smoother curve.}
-  \item{type}{Type of density curve plotted.  By default, both the general
-       density and the normal density are plotted.}
+  \item{type}{Type of density curve plotted.  By default, the general
+       density is plotted, though can request the normal density and
+       both densities.}
   \item{histogram}{If \code{TRUE} overlay the density plot over a histogram.}
   \item{bin_start}{Optional specified starting value of the bins.}
   \item{bin_width}{Optional specified bin width, which can be specified with or
@@ -73,7 +74,6 @@ dn(\ldots)
         partially transparent light red as the default, and a light transparent
         gray for the gray theme.}\cr
 
-  \item{axis_text_color}{Color of the font used to label the axis values_}
   \item{rotate_x}{Degrees that the \code{x}-axis values are rotated, usually to
         accommodate longer values, typically used in conjunction with \code{offset}.}
   \item{rotate_y}{Degrees that the \code{y}-axis values are rotated.}
@@ -97,7 +97,7 @@ dn(\ldots)
   \item{rug}{If \code{TRUE}, add a rug plot, a direct display of density in the
         form of a narrow band beneath the density curve.}
   \item{color_rug}{Color of the rug ticks.}
-  \item{size.rug}{Line width of the rug ticks.}\cr
+  \item{size_rug}{Line width of the rug ticks.}\cr
 
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE} 
@@ -197,13 +197,13 @@ names(d) <- c("X","Y","Z","C")
 
 # normal curve and general density curves superimposed over histogram
 # all defaults
-Density(Y)
+Density(Y, type="both")
 
 # short name
 dn(Y)
 
 # save the density plot to a pdf file
-Density(Y, pdf=TRUE)
+#Density(Y, pdf=TRUE)
 
 # specify (non-transparent) colors for the curves,
 # to make transparent, need alpha option for the rgb function
@@ -216,14 +216,14 @@ Density(Y, color_rug="steelblue", size.rug=1)
 #  so do not display the estimated normal curve
 # specify the bandwidth for the general density curve,
 #  use the standard bw option for the density function
-Density(Y, type="general", bw=.6)
+Density(Y, bw=.6)
 
 # display only the general estimated density and a corresponding
 #  interval of unit width around x.pt
-Density(Y, type="general", x.pt=2)
+Density(Y, x.pt=2)
 
 # generate R markdown file to be "knit" such as in RStudio
-dn(Y, Rmd="myout")
+#dn(Y, Rmd="myout")
 
 # variable of interest is in a data frame which is not the default d
 # access the breaks variable in the R provided warpbreaks data set

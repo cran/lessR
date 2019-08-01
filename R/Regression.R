@@ -4,6 +4,7 @@ function(my_formula, data=d, rows=NULL,
 
          Rmd=NULL, Rmd_browser=TRUE, 
          Rmd_format=c("html", "word", "pdf", "odt", "none"),
+         Rmd_data=NULL,
          results=getOption("results"), explain=getOption("explain"),
          interpret=getOption("interpret"), document=getOption("document"), 
          code=getOption("code"), 
@@ -431,7 +432,7 @@ function(my_formula, data=d, rows=NULL,
     # generate and write Rmd file
     txknt <- .reg.Rmd(nm, df.name, fun_call, res_rows, pred_rows,
         res_sort, digits_d, results, explain, interpret, document, code,
-        est$pvalues, tol, resid.max, numeric.all, X1_new, new.val)
+        est$pvalues, tol, resid.max, numeric.all, X1_new, new.val, Rmd_data)
     if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
     cat(txknt, file=Rmd, sep="\n") 
     txRmd <- .showfile2(Rmd, "R Markdown file")

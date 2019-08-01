@@ -72,7 +72,8 @@ bc(\ldots)
         separates them with an underscore, which is converted to a blank
         for the corresponding axis label.}
   \item{y}{Numeric variable for which the values are displayed on the vertical
-        axis. If specified, then data frame is summary data. See example to create
+        axis. If specified, then data frame is summary data (i.e., aggregated).
+        See later example to create
         with R \code{link{aggregate}} function. If not specified, then 
         its value is automatically tabulated as the frequency of each
         category or joint category.}

@@ -261,7 +261,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
 
   top.pad <- ifelse (is.null(main), 0, 1)
   if (!is.null(by1)) top.pad <- 1
-  axs.top <- ifelse (is.null(main), .5, 1)
+  axs.top <- ifelse (is.null(main), 0, 1)  # old: .5, 1
 
   p <- update(p,
          strip=strp, strip.left=strp.lft, aspect=asp,

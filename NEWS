@@ -6,6 +6,59 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
  
  
+>>>>>> Changes for lessR version 3.8.7 (2019-07-31) <<<<<<
+
+-------------
+Updates 3.8.7
+-------------
+
+BarChart
+  error message added for when reading y directly as aggregate data and
+    there is missing aggregate data in x, by, and/or y (otherwise 
+    an indecipherable internal R error message)
+
+factors
+  deprecated name doFactors removed
+
+Histogram
+  parameter density added, if TRUE then density plot from Density
+    presented, essentially obviating the need for a separate function
+  other density parameters also added
+  summary stats output added for density option
+
+Density
+  default for parameter type changed to "general", former default
+   "both" for general and normal density continues to work if
+   specified
+  default fill colors of general and normal density curves switched 
+  background histogram a little darker ("violin_fill")
+  color of density curve a little lighter, "gray20" instead of "black"
+
+Plot
+  default fit line and ellipse fill changed to a dark blue from gray
+  scatterplot matrix lettering made smaller
+  add_trans parameter now only applies to fill
+
+Regression
+  Rmd_data parameter added to explicitly specify the path name of the
+    data file to be read when running the generated R markdown file,
+    otherwise rely upon the default, the last file read by Read
+
+
+---------------
+Bug Fixes 3.8.7
+--------------- 
+
+Density
+  left margin room sized for longer density values on y-axis
+
+Plot
+ scatterplot matrix displays scatterplots when x specified as
+   a vector of variables (as reg always did)
+ more room for right margin for legend with longer variable names
+
+
+ 
 >>>>>> Changes for lessR version 3.8.6 (2019-06-03) <<<<<<
 
 -------------
@@ -40,6 +93,9 @@ Bug Fixes 3.8.6
 
 BarChart
   bar_fill in style now detected and applied
+
+Density
+  missing data works if not specifying bin_start
 
 Regression
   html file format is properly the default rendering format for

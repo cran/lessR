@@ -64,7 +64,7 @@ simCLT(ns=1000, n=2)
 simCLT(ns=1000, n=2, p1=0, p2=4, type="uniform", bin_width=0.01)
 
 # save the population and sample distributions to pdf files
-simCLT(100, 10, pdf=TRUE)
+# simCLT(100, 10, pdf=TRUE)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

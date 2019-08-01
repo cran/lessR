@@ -23,9 +23,9 @@ function(add, x1, x2, y1, y2,
     i.cex <- i.cex + 1;  if (i.cex > n.cex) i.cex <- 1
     i.trn <- i.trn + 1;  if (i.trn > n.trn) i.trn <- 1
 
-    if (!is.null(add_trans[i.trn])) {
-      if (add[i] %in% c("text", "line", "v_line", "h_line", "arrow"))
-        add_color[i.stk] <- .maketrans(add_color[i.stk], (1-add_trans[i.trn])*256)
+    if (!is.null(add_trans[i.trn])) {  # fill only
+#     if (add[i] %in% c("text", "line", "v_line", "h_line", "arrow"))
+#       add_color[i.stk] <- .maketrans(add_color[i.stk], (1-add_trans[i.trn])*256)
       if (add[i] %in% c("rect"))
         add_fill[i.fll] <- .maketrans(add_fill[i.fll], (1-add_trans[i.trn])*256)
     }

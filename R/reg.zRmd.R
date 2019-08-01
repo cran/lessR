@@ -2,7 +2,7 @@
 function(nm, dname, fun_call, res_rows, pred_rows, res_sort,
          digits_d, results, explain, interpret, document, code,
          pvalues, tolerances, resid.max, numeric.all, X1_new,
-         new.val=matrix(nrow=n.vars-1, ncol=2, byrow=TRUE)) {
+         new.val=matrix(nrow=n.vars-1, ncol=2, byrow=TRUE), Rmd_data) {
 
   fncl <- .fun_call.deparse(fun_call) 
   if (regexec("Rmd", fncl)[1] > 0) fc <- .rm.arg("Rmd", fncl) 
@@ -134,16 +134,18 @@ sep="")
 
 
 
-
-
   tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- "## The Data"
 
-  rdcall <- getOption("read.call")  # the last Read statement
+  if (is.null(Rmd_data)) 
+    rdcall <- getOption("read.call")  # the last Read statement
+  else 
+    rdcall <- paste("Read(\"", Rmd_data, "\")", sep="")
   if (is.null(rdcall)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
        "To generate an R markdown file, first read the data for this\n",
-       "regression analysis with the lessR function Read.\n\n",
+       "regression analysis with the lessR function Read, or\n",
+       "specify a path name for  Rmd_data.\n\n",
        "ex:  d <- Read(\"\")\n\n")
   }
 

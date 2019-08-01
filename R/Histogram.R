@@ -23,6 +23,13 @@ function(x=NULL, data=d, rows=NULL,
     offset=getOption("offset"),
     scale_x=NULL, scale_y=NULL,
 
+    density=FALSE, dn.hist=TRUE,
+    bw=NULL, type=c("general", "normal", "both"),
+    color_nrm="gray20", color_gen="gray20",
+    fill_hist=getOption("violin_fill"), fill_nrm=NULL, fill_gen=NULL,
+    x.pt=NULL, y_axis=FALSE,
+    rug=FALSE, color_rug="black", size_rug=0.5,
+
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
     eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"), do_plot=TRUE,
@@ -62,9 +69,15 @@ function(x=NULL, data=d, rows=NULL,
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumulate <- match.arg(cumulate)
+  type <- match.arg(type)
 
   stat_x <- match.arg(stat_x)
   proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
+
+  histogram <- ifelse (density, FALSE, TRUE)
+
+  bw.miss <- ifelse (missing(bw), TRUE, FALSE)
+
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -116,15 +129,14 @@ function(x=NULL, data=d, rows=NULL,
   .param.old(...)
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval_df))  # default values
-    eval_df <- ifelse (shiny, FALSE, TRUE)
+  if (is.null(eval_df)) eval_df <- ifelse (shiny, FALSE, TRUE)
 
   # get actual variable name before potential call of data$x
-  if (!missing(x))  # can't do is.null or anything else with x until evaluated
+  if (!missing(x))  # no is.null or anything else with x until evaluated
     x.name <- deparse(substitute(x))  # could be a list of var names
   else
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
-    options(xname = x.name)
+  options(xname = x.name)
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -148,7 +160,8 @@ function(x=NULL, data=d, rows=NULL,
    }
   }
 
-  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
+  # force evaluation (not lazy) if data not specified but relies on default d
+  if ((missing(data) && shiny))  
     data <- eval(substitute(data), envir=parent.frame())
 
   if (!is.null(x.name))
@@ -284,7 +297,7 @@ function(x=NULL, data=d, rows=NULL,
                  quiet)
   }
 
-  else {
+  else {  # not Trellis
 
     if (!missing(x)) data <- data.x
 
@@ -320,55 +333,119 @@ function(x=NULL, data=d, rows=NULL,
         # let 1 variable go through, even if num.cat
         if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n_cat)) {
 
-        if (pdf) {
-          pdf.fnm <- paste("Hist", "_", x.name, ".pdf", sep="") 
-          .opendev(pdf.fnm, width, height)
-        }
-        else {
-          pdf.fnm <- NULL
-          if (ncol(data) > 1) {
-            plot.i <- plot.i + 1
-            plot.title[plot.i] <- paste("Histogram of ", x.name, sep="")
-            if (manage.gr) {
-              open.win <- open.win + 1
-              dev.set(which = open.win)
+          if (pdf) {
+            pdf.fnm <- paste("Hist", "_", x.name, ".pdf", sep="") 
+            .opendev(pdf.fnm, width, height)
+          }
+          else {
+            pdf.fnm <- NULL
+            if (ncol(data) > 1) {
+              plot.i <- plot.i + 1
+              plot.title[plot.i] <- paste("Histogram of ", x.name, sep="")
+              if (manage.gr) {
+                open.win <- open.win + 1
+                dev.set(which = open.win)
+              }
             }
           }
-        }
 
-        txss <- ""
-        ssstuff <- .ss.numeric(data[,i], digits_d=digits_d,
-          brief=TRUE)
-        txss <- ssstuff$tx
+          txss <- ""
+          ssstuff <- .ss.numeric(data[,i], digits_d=digits_d, brief=TRUE)
+          txss <- ssstuff$tx
 
-        # nothing returned if quiet=TRUE
+          if (histogram) {
 
-        stuff <- .hst.main(data[,i], fill, color, trans, reg,
-            rotate_x, rotate_y, offset,
-            breaks, bin_start, bin_width,
-            bin_end, proportion, values, cumulate, xlab, ylab, main, sub, 
-            xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
-            add, x1, x2, y1, y2,
-            scale_x, scale_y,
-            quiet, do_plot, fun_call=fun_call, ...)
+            # nothing returned if quiet=TRUE
 
-        txsug <- stuff$txsug
-        if (is.null(txsug)) txsug <- ""
-        txdst <- stuff$ttx
-        if (is.null(txdst)) txdst <- ""
+            stuff <- .hst.main(data[,i], fill, color, trans, reg,
+                rotate_x, rotate_y, offset,
+                breaks, bin_start, bin_width,
+                bin_end, proportion, values, cumulate, xlab, ylab, main, sub, 
+                xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
+                add, x1, x2, y1, y2,
+                scale_x, scale_y,
+                quiet, do_plot, fun_call=fun_call, ...)
 
-        txotl <- ""
-          txotl <- .bx.stats(data[,i])$txotl
-          if (txotl[1] == "") txotl <- "No (Box plot) outliers"
+            txsug <- stuff$txsug
+            if (is.null(txsug)) txsug <- ""
+            txdst <- stuff$ttx
+            if (is.null(txdst)) txdst <- ""
 
-        if (ncol(data) > 1  &&  !quiet) {  # for var range, print text output
-          class(txss) <- "out"
-          class(txdst) <- "out"
-          class(txotl) <- "out"
-          output <- list(out_ss=txss, out_freq=txdst, out_outliers=txotl)
-          class(output) <- "out_all"
-          if (!quiet) print(output)
-        }
+            txotl <- ""
+              txotl <- .bx.stats(data[,i])$txotl
+              if (txotl[1] == "") txotl <- "No (Box plot) outliers"
+
+            if (ncol(data) > 1  &&  !quiet) {  # for var range, print text output
+              class(txss) <- "out"
+              class(txdst) <- "out"
+              class(txotl) <- "out"
+              output <- list(out_ss=txss, out_freq=txdst, out_outliers=txotl)
+              class(output) <- "out_all"
+              if (!quiet) print(output)
+            }
+          } # end histogram
+
+          else {  # density
+
+            if (bw.miss) bw <- .band.width(data[,i], ...)  # band width
+
+            clr <- getOption("theme")  # color theme not used except for monochrome
+
+            if (!missing(color_rug)  ||  !missing(size_rug)) rug <- TRUE
+
+            if (missing(fill_nrm)) {
+                fill_nrm <- rgb(250,210,230, alpha=80, maxColorValue=255)
+              if (clr == "gray" ||
+                 (getOption("theme") == "gray"  &&
+                  getOption("sub_theme") == "black")) {
+                fill_nrm <- "transparent"
+              }
+            }
+
+            if (missing(fill_gen)) {
+                fill_gen <- rgb(80,150,200, alpha=80, maxColorValue=255)
+              if (clr == "gray" ||
+                 (getOption("theme") == "gray"  &&
+                  getOption("sub_theme") == "black")) {
+                fill_gen <- rgb(.75,.75,.75, .5)
+              }
+            }
+
+            x.min <- NULL
+            x.max <- NULL
+            if (!is.null(scale_x)) {
+              x.min <- scale_x[1]
+              x.max <- scale_x[2]
+            }
+
+          stuff <- .dn.main(data[,i], bw, type, dn.hist, bin_start, bin_width,
+                fill_hist, color_nrm, color_gen, fill_nrm, fill_gen,
+                rotate_x, rotate_y, offset,
+                x.pt, xlab, main, sub, y_axis, x.min, x.max,
+                rug, color_rug, size_rug, quiet, ...)
+
+          txdst <- ""
+          txotl <- ""
+          if (!quiet) {
+            txdst <- stuff$tx
+
+            txotl <- .bx.stats(data[,i])$txotl
+            if (txotl[1] == "") txotl <- "No (Box plot) outliers"
+
+            class(txdst) <- "out"
+            class(txotl) <- "out"
+          }
+          gl <- .getlabels()
+          x.name <- gl$xn; x.lbl <- gl$xl;
+          y.name <- gl$yn; y.lbl <- gl$yl
+          if (!quiet  &&  ncol(data) > 1) {
+            ttlns <- .title2(x.name, y.name, x.lbl, y.lbl, TRUE)
+            ttlns <- paste(" ", "\n", ttlns, sep="")
+          }
+          else
+            ttlns <- ""
+
+        }  # end density
 
         if (pdf) {
           dev.off()
@@ -380,7 +457,7 @@ function(x=NULL, data=d, rows=NULL,
         if (!quiet) .ncat("Histogram", x.name, nu, n_cat)
 
       }  # is.numeric(data[,i])
-    }  # end for
+    }  # end for i from 1 to ncol
 
     if (ncol(data) > 1) {
       options(suggest = sug)
@@ -401,36 +478,53 @@ function(x=NULL, data=d, rows=NULL,
         cat(txknt, file=Rmd, sep="\n")
         txkfl <- .showfile2(Rmd, "R Markdown instructions")
       }
-   
-      class(txsug) <- "out"
-      class(txss) <- "out"
-      class(txdst) <- "out"
-      class(txotl) <- "out"
-      class(txkfl) <- "out"
 
-      output <- list(type="Histogram",
-        call=fun_call, 
-        out_suggest=txsug, out_ss=txss, out_outliers=txotl, out_freq=txdst,
-        out_file=txkfl,
-        bin_width=stuff$bin_width, n.bins=stuff$n.bins,
-        breaks=stuff$breaks,
-        mids=stuff$mids, counts=stuff$counts, prop=stuff$prop,
-        cumulate=stuff$counts_cum, cprop=stuff$prop_cum)
+      if (histogram) {   
+        class(txsug) <- "out"
+        class(txss) <- "out"
+        class(txdst) <- "out"
+        class(txotl) <- "out"
+        class(txkfl) <- "out"
 
-      class(output) <- "out_all"
-      if (!quiet) print(output)
+        output <- list(type="Histogram",
+          call=fun_call, 
+          out_suggest=txsug, out_ss=txss, out_outliers=txotl, out_freq=txdst,
+          out_file=txkfl,
+          bin_width=stuff$bin_width, n.bins=stuff$n.bins,
+          breaks=stuff$breaks,
+          mids=stuff$mids, counts=stuff$counts, prop=stuff$prop,
+          cumulate=stuff$counts_cum, cprop=stuff$prop_cum)
 
-      # names and order of components per documentation in BarChart.Rd
-      stuff$out_outliers <- txotl  # after to class out for line breaks
-      stuff$out_summary <- txss
-      stuff$out_freq <- txdst
-      names(stuff) <- c("out_suggest", "out_freq", "bin_width", "n.bins",
-              "breaks", "mids", "counts", "prop", "cumulate", "cprop",
-              "out_summary", "out_outliers")
-      stuff <- c(stuff[1], stuff[11], stuff[2], stuff[12], stuff[3], stuff[4],
-                 stuff[5], stuff[6], stuff[7], stuff[8], stuff[9], stuff[10])
-      invisible(stuff)
+        class(output) <- "out_all"
+        if (!quiet) print(output)
 
+        # names and order of components per documentation in BarChart.Rd
+        stuff$out_outliers <- txotl  # after to class out for line breaks
+        stuff$out_summary <- txss
+        stuff$out_freq <- txdst
+        names(stuff) <- c("out_suggest", "out_freq", "bin_width", "n.bins",
+                "breaks", "mids", "counts", "prop", "cumulate", "cprop",
+                "out_summary", "out_outliers")
+        stuff <- c(stuff[1], stuff[11], stuff[2], stuff[12], stuff[3], stuff[4],
+                   stuff[5], stuff[6], stuff[7], stuff[8], stuff[9], stuff[10])
+        invisible(stuff)
+      }
+
+      else {  # density
+          class(txss) <- "out"
+          class(txkfl) <- "out"
+
+          output <- list(type="Density",
+            out_title=ttlns,  # out_stats=txdst,
+            out_ss=txss, # out_outliers=txotl,
+            out_file=txkfl,
+            bw=stuff$bw, n=stuff$n, n.miss=stuff$n.miss, W=stuff$W,
+               pvalue=stuff$pvalue)
+
+          class(output) <- "out_all"
+
+          return(output)
+      }
 
     }  # end ncol(data) == 1
 

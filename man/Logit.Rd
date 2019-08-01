@@ -142,8 +142,8 @@ reduced_model <- Logit(Gender ~ Years)
 anova(reduced_model, full_model)
 
 # Save the three plots as pdf files 4 inches square, gray scale
-Logit(Gender ~ Years, pdf_file="MyModel.pdf",
-      width=4, height=4, colors="gray")
+#Logit(Gender ~ Years, pdf_file="MyModel.pdf",
+#      width=4, height=4, colors="gray")
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values

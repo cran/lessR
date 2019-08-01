@@ -36,7 +36,9 @@ wrt_x(\ldots, format="Excel")
   \item{ExcelTable}{If \code{TRUE}, write the Excel file as an Excel table.}
   \item{ExcelColWidth}{On by default but calculation of column widths for
        large files takes more time, so option to turn off.}
-  \item{...}{Other parameter values consistent with the usual \code{\link{write.table}}.}
+  \item{...}{Other parameter values for \code{csv} files consistent with the
+       usual \code{\link{write.table}}, including \code{na=""} to write missing
+       data to a \code{csv} file as blanks instead of \code{NA}.}
 }
 
 
@@ -64,20 +66,20 @@ Y <- rnorm(n=n, mean=50, sd=10)
 d <- data.frame(X,Y)
 
 # write the current contents of default data frame d to GoodData.csv
-Write("GoodData")
+# Write("GoodData")
 # short name
 # write the default data frame d to the R data file d.rda
-wrt_r()
+#  wrt_r()
 
 # write the data as an Excel data table in an Excel file
-Write("GoodData", format="Excel")
+# Write("GoodData", format="Excel")
 # with abbreviation
-wrt_x("GoodData")
+# wrt_x("GoodData")
 
 # access the R data frame warpbreaks
-data(warpbreaks)
+# data(warpbreaks)
 # write the file warpbreaks.rda
-wrt_r(data=warpbreaks)
+# wrt_r(data=warpbreaks)
 
 }
 

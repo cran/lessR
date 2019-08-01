@@ -332,8 +332,9 @@ vp(\ldots)
         indicated by \code{"lm"}. If
         potential outliers are identified according to \code{out_cut},
         a second (dashed) fit line is displayed calculated \emph{without}
-        the outliers. Modify the color from with the 
-        \code{\link{style}} function parameter \code{fit_color}.}
+        the outliers. Modify the line color from with the 
+        \code{\link{style}} function parameter \code{fit_color}, and the
+        line width with \code{fit_lwd}.}
   \item{fit_se}{Confidence level for the error band displayed around the
        line of best fit. On by default at 0.95 if a fit line is specified.
        Can be a vector to display multiple ranges. Set to 0 to turn off.}\cr
@@ -540,7 +541,7 @@ The \code{rows} parameter subsets rows (cases) of the input data frame according
 VALUE LABELS\cr
 The value labels for each axis can be over-ridden from their values in the data to user supplied values with the \code{value_labels} option. This option is particularly useful for Likert-style data coded as integers. Then, for example, a 0 in the data can be mapped into a "Strongly Disagree" on the plot. These value labels apply to integer categorical variables, and also to factor variables. To enhance the readability of the labels on the graph, any blanks in a value label translate into a new line in the resulting plot. Blanks are also transformed as such for the labels of factor variables. 
 
-However, the lessR function \code{\link{doFactors}} allows for the easy creation of factors, one variable or a vector of variables, in a single statement, and is generally recommended as the method for providing value labels for the variables.
+However, the lessR function \code{\link{factors}} allows for the easy creation of factors, one variable or a vector of variables, in a single statement, and is generally recommended as the method for providing value labels for the variables.
 
 VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} can store the labels in the data frame with the data, obtained from the \code{\link{Read}} function or \code{\link{VariableLabels}}.  If variable labels exist, then the corresponding variable label is by default listed as the label for the corresponding axis and on the text output. 

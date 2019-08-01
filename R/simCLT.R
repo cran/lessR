@@ -192,12 +192,10 @@ function(ns, n, p1=0, p2=1,
   }
 
   .dn.main(Ymean, type="normal", xlab="", 
-         col_fill=fill, 
-         col.bg=getOption("panel_fill"),
-         col.box=getOption("panel_color"),
+         fill_hist=fill, 
          col.nrm="black", col.gen="black",
-         col_fill_nrm="transparent",
-         col_fill_gen="transparent",
+         fill_nrm="transparent",
+         fill_gen="transparent",
          quiet=TRUE, pdf_file=NULL)
   if (subtitle) 
     txt <- paste(toString(sprintf("%i", ns)), "samples, each of size", toString(n), "from", type)

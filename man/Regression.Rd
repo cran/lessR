@@ -22,6 +22,7 @@ Regression(my_formula, data=d, rows=NULL,
 
          Rmd=NULL, Rmd_browser=TRUE, 
          Rmd_format=c("html", "word", "pdf", "odt", "none"),
+         Rmd_data=NULL,
          results=getOption("results"), explain=getOption("explain"),
          interpret=getOption("interpret"), document=getOption("document"),
          code=getOption("code"),
@@ -53,7 +54,10 @@ reg_brief(\ldots, brief=TRUE)
        example, for a response variable named Y and two predictor variables, X1 and
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
   \item{data}{The default name of the data frame that contains the data for analysis
-       is \code{d}, otherwise explicitly specify.}
+       is \code{d}, otherwise explicitly specify. If knitting and rendering the
+       generated R~Markdown for an interpretative output as specified by the
+       \code{Rmd} parameter, then this data frame must first be read by the
+       \code{lessR} function \code{\link{Read}}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits,
@@ -73,6 +77,12 @@ reg_brief(\ldots, brief=TRUE)
         with a browser view automatic, or \code{"word"}, \code{"odt"}, 
         \code{"pdf"} (if LaTeX is available), or \code{"none"}.
         Requires \code{pandoc} installed, such as from \code{RStudio}.}
+  \item{Rmd_data}{The default file reference
+        of the data file when running the generated
+        R Markdown file is the last data file as read by \code{\link{Read}} 
+        (with the unabbreviated version of the function name). To refer
+        to a different file to read
+        specify the path name or web URL of the file.}
   \item{results}{By default TRUE. If set to \code{FALSE} the results
         are not provided in the R Markdown document, relying upon the interpretations.
         Can set globally with \code{style(results=FALSE)}.}
@@ -163,7 +173,7 @@ The purpose of \code{Regression} is to combine the following function calls into
 The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of a linear model, \code{\link{lm}}. The output of the analysis of \code{\link{lm}} is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Regression} function. By default \code{reg} automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The correlation matrix of the model variables is obtained with \code{\link{cor}} function. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard R function \code{\link{predict}}, once with the argument \code{interval="confidence"} and once with \code{interval="prediction"}. The \code{lessR} \code{\link{Density}} function provides the histogram and density plots for the residuals and the \code{\link{ScatterPlot}} function provides the scatter plots of the residuals with the fitted values and of the data for the one-predictor model. The \code{pairs} function provides the scatterplot matrix of all the variables in the model. Thomas Lumley's \code{leaps} package contains the \code{leaps} function that provides the analysis of the fit of all possible model subsets.
 
 INPUT DATA FRAME\cr
-The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{d}.
+The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not complete.  Specify the name of the data frame for analysis with the \code{data} option if the name is not the default \code{d}.
        
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -173,8 +183,10 @@ The output is produced in pieces by topic (see \code{values} below), automatical
 The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values_ Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg_brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit, and if \code{X1_new}, etc. are requested, the relevant rows of forecasted values:w
 .
 
-knitr\cr
-A file ready for input into \code{knitr} can be obtained by specifying a value for \code{Rmd}. For the specified file name, the directory to which the file is written is displayed on the console text output, and the file type \code{.Rmd} is automatically appended to the specified name if it is not included in the specification. Process with the \code{knitr} button in \code{RStudio}, or with the \code{knit} function from the \code{knitr} package and the \code{render} function from the \code{rmarkdown} package.
+R MARKDOWN\cr
+An R~Markdown file ready for knitting and rendering into one of several formats can be obtained by specifying a value for \code{Rmd}. For the specified file name, the directory to which the file is written is displayed on the console text output, and the file type \code{.Rmd} is automatically appended to the specified name if it is not included in the specification. 
+
+To access the same data file for the regression analysis from running \code{Regression} from the R console, and that accomplished by knitting the generated R~Markdown, first read the data into R with the lessR \code{\link{Read}} function. That function stores the name of the last data file read so that it can be accessed via R as the markdown is knit and then rendered into the specified format. The default rendering is to \code{HTML}, but other formats can be specified with \code{Rmd_format}. 
 
 The output from \code{Rmd} is conceptually partitioned into five parts:  results, explanations of the results, interpretations of the results, documentation o the code, and the code itself. By default all available output is generated but the flags \code{results}, \code{explain}, \code{interpret}, \code{document}, \code{code} can be set to \code{FALSE} to reduce the output. The options can be specified in a specific function all or set globally, such as with \code{options(explain=FALSE)}. Turning off all five flags leaves just the outline of the potential output and a bare minimum of results.
 
@@ -330,8 +342,8 @@ Regression(Reading ~ Verbal, rows=(Income > 100 & Absent < 5))
 
 # Multiple regression model
 # Save the three output plots as pdf files 4 inches square
-Regression(Reading ~ Verbal + Absent + Income, pdf=TRUE,
-   width=4, height=4)
+#Regression(Reading ~ Verbal + Absent + Income, pdf=TRUE,
+#   width=4, height=4)
 
 # Compare nested models
 # Reduced model:  Reading ~ Verbal

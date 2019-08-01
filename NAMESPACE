@@ -57,7 +57,7 @@ export (
   corScree, scree, corEFA, efa,
   Density, dn,
   details, db,
-  factors, doFactors,
+  factors, 
   getColors,
   Help,
   Histogram, hs,

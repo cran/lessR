@@ -1402,10 +1402,7 @@ if (is.null(out_size)) out_size <- size.pt
   else if (spmat && do_plot) {
     bckg <- ifelse(panel_fill=="transparent",
                    getOption("window_fill"), panel_fill)
-    nm <- names(data.x)
-    .plt.mat(data.x, cor.coef=TRUE, fit=fit,
-             col_fill=pt_fill, col_color=pt_color,
-             col.fit=fit_color, col.bg=bckg, col.box=panel_color)
+    .plt.mat(data.x, fit=fit, col.bg=bckg)
   }
 
   else {  # all the other analyses

@@ -21,11 +21,9 @@ function(lm.out, pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
 
   # frequency distribution of residuals
   .dn.main(lm.out$residuals, 
-    col_fill=getOption("ellipse_fill"),
-    col.bg=getOption("panel_fill"), 
-    col.box=getOption("panel_color"),
+    fill_hist=getOption("ellipse_fill"),
     col.nrm="gray40", col.gen="gray40",
-    col_fill_nrm="transparent", col_fill_gen="transparent",
+    fill_nrm="transparent", fill_gen="transparent",
     xlab="Residuals", quiet=TRUE)
 
   if (pdf) {

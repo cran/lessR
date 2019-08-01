@@ -250,7 +250,7 @@ MeasModel <-
 # Output file will be m4.Rmd, a simple text file that can
 #   be edited with any text editor including RStudio, from which it
 #   can be knit to generate dynamic output such as to a Word document
-c <- cfa(MeasModel, Rmd="m4")
+#c <- cfa(MeasModel, Rmd="m4")
 # view all the output
 c
 # view just the scale reliabilities

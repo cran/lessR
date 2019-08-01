@@ -181,7 +181,7 @@ function(x, y, by, stack100,
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "y-values, those from the 2nd unlabeled variable, ", yn, ",",
           " must be\n", " numeric\n\n",
-          "A  by  variable is categorical, with a small number of values\n",
+          "A  by  variable is categorical, with only several unique values\n",
           "It appears that ", yn, " is a by variable\n",
           "As of lessR 3.5.6 to specify a  by  variable in the function call\n",
           "  precede its name with:  by=", "\n\n")
@@ -203,7 +203,6 @@ function(x, y, by, stack100,
     }
 
     else {  # a by variable
-
       x.temp <- x
       unq.x <- unique(x)
       unq.by <- unique(by)

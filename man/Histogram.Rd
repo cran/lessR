@@ -39,6 +39,13 @@ Histogram(x=NULL, data=d, rows=NULL,
     offset=getOption("offset"),
     scale_x=NULL, scale_y=NULL,
 
+    density=FALSE, dn.hist=TRUE,
+    bw=NULL, type=c("general", "normal", "both"),
+    color_nrm="gray20", color_gen="gray20",
+    fill_hist=getOption("violin_fill"), fill_nrm=NULL, fill_gen=NULL,
+    x.pt=NULL, y_axis=FALSE,
+    rug=FALSE, color_rug="black", size_rug=0.5,
+
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
     eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"), do_plot=TRUE,
@@ -162,6 +169,35 @@ hs(\ldots)
         numerical values of the x-axis: starting, ending and
         number of intervals, within the bounds of plot region.}
   \item{scale_y}{Applies to the y-axis_ See \code{scale_x}.}\cr
+
+  \item{density}{If \code{TRUE}, plot the smoothed \bold{kernel density}
+        estimate.}
+  \item{dn.hist}{When \code{density} is \code{TRUE}, plot a histogram
+       behind the density curve.}
+  \item{bw}{Bandwidth of \bold{kernel density} estimation. Initial value
+       is "nrd0", but unless
+       specified, then may be iterated upward to create a smoother curve.}
+  \item{type}{Type of density curve plotted.  By default, the general
+       density is plotted, though can request the normal density and
+       both densities.}
+  \item{color_nrm}{Color of the normal curve.}
+  \item{color_gen}{Color of the general density curve.}
+  \item{fill_hist}{Fill color for the histogram behind density curve,
+       defaults to light gray.} 
+  \item{fill_nrm}{Fill color for the estimated normal curve, with a partially 
+       transparent blue as the default, and transparent for the gray theme.}
+  \item{fill_gen}{Fill color for the estimated general density curve, with a
+        partially transparent light red as the default, and a light transparent
+        gray for the gray theme.}
+  \item{x.pt}{Value of the point on the x-axis for which to draw a unit interval
+        around illustrating the corresponding area under the general density curve.
+        Only applies when requesting \code{type=general}.}
+  \item{y_axis}{Specifies if the y-axis, the density axis, should be included.}
+  \item{rug}{If \code{TRUE}, add a rug plot, a direct display of density in the
+        form of a narrow band beneath the density curve.}
+  \item{color_rug}{Color of the rug ticks.}
+  \item{size_rug}{Line width of the rug ticks.}\cr
+
 
   \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
        on the plot.
@@ -367,6 +403,9 @@ Histogram(Salary, cumulate="both")
 
 # cumulative histogram plus regular histogram
 Histogram(Salary, cumulate="both", reg="mistyrose")
+
+# density
+Histogram(Salary, density=TRUE)
 
 
 # -------------------------------------------------

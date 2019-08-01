@@ -425,10 +425,10 @@ style(set=mystyle)
 # create a gray-scale with a sub-theme of wsj
 # save, and then at a later session read back in
 grayWSJ <- style("gray", sub_theme="wsj")
-Write("grayWSJ", data=grayWSJ, format="R")
+# Write("grayWSJ", data=grayWSJ, format="R")
 # ...
-mystyle <- Read("grayWSJ.rda")  # read grayWSJ.rda
-style(set=mystyle)
+#mystyle <- Read("grayWSJ.rda")  # read grayWSJ.rda
+#style(set=mystyle)
 
 
 

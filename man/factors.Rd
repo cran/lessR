@@ -1,6 +1,5 @@
 \name{factors}
 \alias{factors}
-\alias{doFactors}
 
 \title{Create Factor Variables Across a Sequential Range or Vector of Variables}
 
@@ -10,8 +9,6 @@
 \usage{
 factors(x, levels, labels=NULL, data=d, ordered=FALSE,
           new=FALSE, suffix="_f", var_labels=FALSE, \dots)
-
-doFactors(\dots)
 }
 
 

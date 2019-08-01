@@ -156,11 +156,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE)
-  if (is.null(eval_df))  # default values
-    eval_df <- ifelse (shiny, FALSE, TRUE)
+  if (is.null(eval_df)) eval_df <- ifelse (shiny, FALSE, TRUE)
 
   # get actual variable name before potential call of data$x
-  if (!missing(x))  # can't do is.null or anything else with x until evaluated
+  if (!missing(x))  # no is.null or anything else with x until evaluated
     x.name <- deparse(substitute(x))  # could be a list of var names
   else
     x.name <- NULL  # otherwise is actually set to "NULL" if NULL
@@ -297,6 +296,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
 
     # evaluate y
+    # if not missing, then must be aggregate data
     #-------------
     if (!missing(y)) {
 
@@ -399,8 +399,18 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   if (stat_yx.miss) {
     stat_yx <- "data"  # default, no transformation
     if (!is.null(y.call)) {
-      lx.u <- length(unique(na.omit(x.call)))
-      lb.u <- ifelse(is.null(by.call), 1, length(unique(na.omit(by.call))))
+
+      if (sum(is.na(x.call))  > 0 ||
+          sum(is.na(by.call)) > 0 ||
+          sum(is.na(y.call))  > 0)   {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "When reading the value of y directly, from aggregate data,\n",
+          "  missing aggregated data not allowed\n",
+          "Use the  na.omit()  function before aggregating the data\n\n")
+      }
+      
+      lx.u <- length(unique(x.call))
+      lb.u <- ifelse(is.null(by.call), 1, length(unique(by.call)))
         if (nrow(data) > lx.u*lb.u) stat_yx <- "mean"
     }
   }
@@ -410,7 +420,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       "To do a transformation of y for each level of ", x.name, "\n",
       " need a numerical y variable\n\n")
   }
-
 
   if (Trellis && do.plot) {
 
@@ -439,6 +448,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   }
 
   else {  # not Trellis
+
 
     if (is.null(by.call))
       f.name <- x.name

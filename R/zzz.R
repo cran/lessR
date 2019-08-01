@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.8.6     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.8.8     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
       "                           d: default data frame, no need for data=\n",
@@ -71,11 +71,11 @@ function(...) {
   options(line_color = "gray15")
 
   options(bubble_text_color = "#F7F2E6")  # rgb(247,242,230, maxColorValue=255)
-  options(ellipse_fill = "#8B8B8B37")   # .maketrans("gray55", 55)
+  options(ellipse_fill = "#00008A1E")   # old .maketrans("gray55", 55)
   options(ellipse_color = "gray20")
   options(ellipse_lwd = 1)
-  options(se_fill = "#1A1A1A28")   # .maketrans("gray10", 40)
-  options(fit_color = "gray15")
+  options(se_fill = "#1A1A1A19")  # old .maketrans("gray10", 40) "darkblue", 25
+  options(fit_color = "darkblue")  # old "gray15" 
   options(fit_lwd = 2)
   options(heat = "gray30")
   options(segment_color = "gray40")
@@ -102,7 +102,7 @@ function(...) {
   options(axis_cex = 0.75)
   options(axis_x_cex = NULL)
   options(axis_y_cex = NULL)
-  options(axis_text_color = "gray15")
+  options(axis_text_color = "gray20")
   options(axis_x_text_color = NULL)
   options(axis_y_text_color = NULL)
   options(rotate_x = 0)
@@ -1199,7 +1199,7 @@ function(dir, axT) {
                   lab_x_cex=0.95, lab_y_cex=0.95, max.x.width=NULL) {
 
   # top margin
-  tm <- 0.15
+  tm <- 0.05  # old is 0.15
   if (!is.null(main)) tm <- tm + .25
   # if (options("device") == "RStudioGD") {
     # tm <- ifelse(.Platform$OS == "windows", tm-.15, 0)

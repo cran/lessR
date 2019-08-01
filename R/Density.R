@@ -2,17 +2,17 @@ Density <-
 function(x, data=d, rows=NULL,
          n_cat=getOption("n_cat"), Rmd=NULL,
 
-       bw=NULL, type=c("both", "general", "normal"),
+       bw=NULL, type=c("general", "normal", "both"),
        histogram=TRUE, bin_start=NULL, bin_width=NULL,
 
-       color_nrm="black", color_gen="black",
+       color_nrm="gray20", color_gen="gray20",
        fill_nrm=NULL, fill_gen=NULL,
 
-       axis_text_color="gray30", rotate_x=0, rotate_y=0, offset=0.5,
+       rotate_x=0, rotate_y=0, offset=0.5,
 
        x.pt=NULL, xlab=NULL, main=NULL, sub=NULL, y_axis=FALSE,
        x.min=NULL, x.max=NULL,
-       rug=FALSE, color_rug="black", size.rug=0.5,
+       rug=FALSE, color_rug="black", size_rug=0.5,
 
        eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
        width=4.5, height=4.5, pdf=FALSE,
@@ -22,7 +22,7 @@ function(x, data=d, rows=NULL,
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("n.cat", "bin.start", "bin,width", "color.nrm", "color.gen",
+    change <- c("n.cat", "bin.start", "bin.width", "color.nrm", "color.gen",
                 "fill.nrm", "fill.gen", "axis.text.color", "rotate.x",
                 "rotate.y", "y.axis", "color.rug", "size.rug", "eval.df", 
                 "digits.d", "fun.call")
@@ -39,29 +39,18 @@ function(x, data=d, rows=NULL,
   type <- match.arg(type)
   if (is.null(fun_call)) fun_call <- match.call()
 
-  fill <- getOption("se_fill")
-  panel_fill <- getOption("panel_fill")
-  panel_color <- getOption("panel_color")
-  lab_cex <- getOption("lab_cex")
-  axis_cex <- getOption("axis_cex")
+  fill_hist <- getOption("violin_fill")
 
-  if (!missing(color_rug) || !missing(size.rug)) rug <- TRUE
+  if (!missing(color_rug)  ||  !missing(size_rug)) rug <- TRUE
 
-  bw.miss <- ifelse (missing(bw), TRUE, FALSE)
 
   # see if dated parameter values
   .param.old(...)
 
   clr <- getOption("theme")  # color theme not used except for monochrome
 
-# if (missing(fill))
-#   if (.Platform$OS == "windows")
-#     fill <- "gray80"
-#   else
-#     fill <- "gray86"
-
   if (missing(fill_nrm)) {
-      fill_nrm <- rgb(80,150,200, alpha=70, maxColorValue=255)
+      fill_nrm <- rgb(250,210,230, alpha=70, maxColorValue=255)
     if (clr == "gray" ||
        (getOption("theme") == "gray"  &&  getOption("sub_theme") == "black")) {
       fill_nrm <- "transparent"
@@ -69,12 +58,14 @@ function(x, data=d, rows=NULL,
   }
 
   if (missing(fill_gen)) {
-      fill_gen <- rgb(250,210,230, alpha=70, maxColorValue=255)
+      fill_gen <- rgb(80,150,200, alpha=70, maxColorValue=255)
     if (clr == "gray" ||
        (getOption("theme") == "gray"  &&  getOption("sub_theme") == "black")) {
       fill_gen <- rgb(.75,.75,.75, .5)
     }
   }
+
+  bw.miss <- ifelse (missing(bw), TRUE, FALSE)
 
   
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
@@ -237,11 +228,10 @@ function(x, data=d, rows=NULL,
       if (bw.miss) bw <- .band.width(data[,i], ...)
 
       stuff <- .dn.main(data[,i], bw, type, histogram, bin_start, bin_width,
-            fill, panel_fill, panel_color,
-            color_nrm, color_gen, fill_nrm, fill_gen,
-            lab_cex, axis_cex, axis_text_color, rotate_x, rotate_y, offset,
+            fill_hist, color_nrm, color_gen, fill_nrm, fill_gen,
+            rotate_x, rotate_y, offset,
             x.pt, xlab, main, sub, y_axis, x.min, x.max,
-            rug, color_rug, size.rug, quiet, ...)
+            rug, color_rug, size_rug, quiet, ...)
 
       txdst <- ""
       txotl <- ""
@@ -309,7 +299,7 @@ function(x, data=d, rows=NULL,
 
     return(output)
 
-  }
+  }  # end ncol == 1
 
   # dev.set(which=2)  # reset graphics window for standard R functions
 

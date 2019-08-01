@@ -178,7 +178,7 @@ LineChart(Y)
 lc(Y)
 
 # save run chart to a pdf file
-LineChart(Y, pdf=TRUE)
+#LineChart(Y, pdf=TRUE)
 
 # LineChart in gray scale, then back to default theme
 style("gray")

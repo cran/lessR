@@ -54,7 +54,7 @@ function(x, cor.coef=TRUE, fit="loess",
     r <- cor(x, y)
     txt <- .fmt(r, 2)
     txt <- paste(prefix, txt, sep="")
-    cex.adj <- 2.25 - (0.10*n.var)  # adjust size of displayed r
+    cex.adj <- 2.25 - (0.20*n.var)  # adjust size of displayed r
     text(0.5, 0.5, txt, cex=cex.adj, col=col_color)  # or cex=cex.cor * r
   }
 
@@ -64,7 +64,7 @@ function(x, cor.coef=TRUE, fit="loess",
          border=col.box)
     #rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
     txt <-  nm  # nm from parameter list, so adjusts for each panel
-    cex.adj <- 2.25 - (0.10*n.var)  # adjust size of displayed r
+    cex.adj <- 2.25 - (0.22*n.var)  # adjust size of displayed r
     #cex.adj <- ifelse (n.var < 8, 1.8, 1.5)  # adjust size of displayed r
     text(0.5, 0.5, txt, cex=cex.adj, col=getOption("lab_color"))
   }

@@ -271,8 +271,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   n.lab_y.ln <- margs$n.lab_y.ln
 
   if (n.xcol > 1  ||  n.ycol > 1  ||  !is.null(by)) {  # vertical legend room
-    new.adj <- .22  + (.65 * axis_y_cex)
-    rm <- rm + new.adj 
+    if (n.xcol > 1) nm.v <- nm.x
+    if (n.ycol > 1) nm.v <- nm.y
+    if (!is.null(by)) nm.v <- by.name
+    big.nm <- max(nchar(nm.v))
+    if (big.nm > 6) rm <- rm + (.05 * (big.nm - 6))
+    rm <- rm + .25  + (.65 * axis_y_cex)
     if (axis_y_cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
   }
   if (object == "both")
@@ -293,7 +297,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   par(bg=getOption("window_fill"))
   par(mai=c(bm, mm, tm, rm))
-
 
   # -----------------------
   # setup coordinate system only with plot and type="n"
