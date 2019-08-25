@@ -108,7 +108,7 @@ function(from=NULL, format=NULL,
 
   if (!quiet) {
     max.chr <- nchar(from)
-    if (format == "Excel") {
+    if (format == "Excel"  &&  !quiet) {
       txt <- "Alexander Walker's openxlsx package]"
       cat("[with the read.xlsx function from", txt, "\n")
     }
@@ -214,7 +214,7 @@ function(from=NULL, format=NULL,
   else if (format == "SPSS")  # data and any labels
     d <- read.spss(file=from, to.data.frame=TRUE, use.value_labels=TRUE, ...)
 
-  else if (format == "SAS") { # data
+  else if (format == "SAS"  &&  !quiet) { # data
     d <- read.sas7bdat(file=from, ...)
     txt <- "Matt Shotwell's sas7bdat package]"
     cat("[with the read.sas7bdat function from", txt, "\n")

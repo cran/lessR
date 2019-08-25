@@ -1,5 +1,5 @@
 .reg1anvBasic <-
-function(lm.out, dname="d", digits_d=NULL, show_R=FALSE) {
+function(lm.out, digits_d=NULL, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)

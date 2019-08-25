@@ -1,5 +1,5 @@
 .reg1fitBasic <-
-function(lm.out, dname="d", TotSS, digits_d=NULL, show_R=FALSE) {
+function(lm.out, TotSS, digits_d=3, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)

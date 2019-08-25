@@ -1,5 +1,5 @@
 Plot <-
-function(x, y=NULL, data=d, rows=NULL,
+function(x, y=NULL, data=d, rows=NULL, enhance=FALSE, 
          stat_x=c("data", "count", "proportion", "%"),
          stat_yx=c("data", "sum", "mean", "sd", "dev", "min", "median", "max"),
          n_cat=getOption("n_cat"),
@@ -17,7 +17,7 @@ function(x, y=NULL, data=d, rows=NULL,
          jitter_x=0, jitter_y=0,
 
          ID="row.name", ID_size=0.7,
-         MD.cut=0, out_cut=0, out_shape="circle", out_size=1,
+         MD_cut=0, out_cut=0, out_shape="circle", out_size=1,
 
          vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
          violin_fill=getOption("violin_fill"), 
@@ -51,7 +51,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-         enhance=FALSE, eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
+         eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
          do_plot=TRUE, width=NULL, height=NULL, pdf_file=NULL, 
          fun_call=NULL, ...) {
 
@@ -166,7 +166,7 @@ function(x, y=NULL, data=d, rows=NULL,
   seg.x.miss <- ifelse (missing(segments_x), TRUE, FALSE)
   ellipse.miss <- ifelse (missing(ellipse), TRUE, FALSE)
   fit.miss <- ifelse (missing(fit), TRUE, FALSE)
-  MD.miss <- ifelse (missing(MD.cut), TRUE, FALSE)
+  MD.miss <- ifelse (missing(MD_cut), TRUE, FALSE)
   ID.miss <- ifelse (missing(ID), TRUE, FALSE)
   lwd.miss <- ifelse (missing(lwd), TRUE, FALSE)
   out_shape.miss <- ifelse (missing(out_shape), TRUE, FALSE)
@@ -195,7 +195,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
   if (enhance) {
     if (ellipse.miss) ellipse <- 0.95
-    if (MD.miss) MD.cut <- 6
+    if (MD.miss) MD_cut <- 6
     if (add_miss) add <- "means"
     if (fit.miss) fit <- "lm"
   }
@@ -295,7 +295,7 @@ function(x, y=NULL, data=d, rows=NULL,
   # see if dated or inconsistent parameter values
   .param.old(...)
   .plt.bad(x.miss, y.miss, stat_yx, breaks, bin_start, n_row, n_col,
-           MD.cut, out_cut, fit_se, ...)
+           MD_cut, out_cut, fit_se, ...)
 
   # ---------------------------------
   # get variable and data frame names
@@ -454,7 +454,7 @@ function(x, y=NULL, data=d, rows=NULL,
       eq.int <- TRUE
       d.x <- diff(x.call[,1]) 
       eq.int <- ifelse (any(is.na(x.call[,1])), FALSE, TRUE)
-      if (eq.int) {  # no missing allowed
+      if (eq.int  &&  length(d.x) > 2) {  # no missing allowed
         for (i in 2:(length(d.x)))
           if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
 
@@ -796,7 +796,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
   if (is.logical(ellipse))
     ellipse <- ifelse (ellipse, 0.95, 0.00)
-  if (ellipse[1] > 0  &&  !Trellis) {
+  if (ellipse[1] > 0  &&  !Trellis  &&  !quiet) {
     txt <- "[Ellipse with Murdoch and Chow's function ellipse"
     cat(txt, "from the ellipse package]\n")
   } 
@@ -925,7 +925,7 @@ function(x, y=NULL, data=d, rows=NULL,
   get.ID <- FALSE
   if (y.miss && !cat.x) get.ID <- TRUE  # VBS plot 
   if (!is.null(add)) if (add[1] == "labels") get.ID <- TRUE 
-  if (!y.miss) if (!cat.x && !cat.y && (MD.cut>0 || out_cut>0))
+  if (!y.miss) if (!cat.x && !cat.y && (MD_cut>0 || out_cut>0))
     get.ID <- TRUE 
   ID.name <- noquote(deparse(substitute(ID)))  # puts quotes around the name
   ID.name <- gsub("\"", "", ID.name)
@@ -1578,8 +1578,8 @@ if (is.null(out_size)) out_size <- size.pt
       out_ind <- NULL
       txout <- ""
       if (!y.miss && !Trellis) if(n.x_var == 1  &&  n.y_var == 1)
-        if (MD.cut > 0  ||  out_cut > 0) {
-          otl <- .plt.MD(x.call[,1], y.call[,1], ID.call, MD.cut, out_cut)  
+        if (MD_cut > 0  ||  out_cut > 0) {
+          otl <- .plt.MD(x.call[,1], y.call[,1], ID.call, MD_cut, out_cut)  
           txout <- otl$tx
           out_ind <- otl$out_ind
       }

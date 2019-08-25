@@ -5,11 +5,46 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
  
+
  
->>>>>> Changes for lessR version 3.8.7 (2019-07-31) <<<<<<
+ 
+>>>>>> Changes for lessR version 3.8.9 (2019-08-25) <<<<<<
 
 -------------
-Updates 3.8.7
+Updates 3.8.9
+-------------
+
+BarChart
+  internal aggregation now with a by variable for raw data,
+    not just pre-aggregated data, such as the mean of Salary
+    over categorical variables Dept and Gender,
+    BarChart(Dept, Salary, by=Gender, stat_yx="mean")
+
+getColors
+  palette "distinct" revised with a custom qualitative sequence of 20
+    colors, of which the first five are from the default HCL
+    qualitative sequence
+  default hues palette changed from c=65, l=55 to c=60, l=50
+
+Regression
+  K-fold cross-validation option added with kfold parameter
+
+
+---------------
+Bug Fixes 3.8.9
+--------------- 
+
+Plot
+  scatterplot with only two points can now be produced
+  MD_cut now properly named, instead of deprecated MD.cut
+
+
+
+ 
+>>>>>> Changes for lessR version 3.8.8 (2019-07-31) <<<<<<
+
+-------------
+Updates 3.8.8
 -------------
 
 BarChart

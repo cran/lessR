@@ -17,7 +17,7 @@ Output is generated into distinct segments by topic, organized and displayed in 
 }
 
 \usage{
-Regression(my_formula, data=d, rows=NULL,
+Regression(my_formula, data=d, rows=NULL, kfold=0,
            digits_d=NULL, standardize=FALSE,
 
          Rmd=NULL, Rmd_browser=TRUE, 
@@ -60,6 +60,7 @@ reg_brief(\ldots, brief=TRUE)
        \code{lessR} function \code{\link{Read}}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
+  \item{kfold}{Number of K-fold cross-validations.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits,
         set by default to at least 2 or the largest number of digits in the values
         of the response variable plus 1.}
@@ -274,6 +275,9 @@ STATISTICS\cr
 \code{Rsqadj}: adjusted R-squared\cr
 \code{PRESS}: PRESS sum of squares\cr
 \code{RsqPRESS}: PRESS R-squared\cr
+\code{m_se}: K-fold average of the standard deviation of residuals.
+\code{m_MSE}: K-fold average of the MSE.
+\code{m_Rsq}: K-fold average of R-squared.
 \code{cor}: correlation matrix of all variables in the model\cr
 \code{tolerances}: tolerance of each predictor variable for collinearity analysis\cr
 \code{VIF}: variance inflation factor for each predictor variable\cr
@@ -312,8 +316,9 @@ d <- Subset(random=.3)
 # Provide all default analyses including scatterplot etc.
 # Can abbreviate Regression with reg
 Regression(Reading ~ Verbal)
-# Provide only the brief analysis on the standardized variables
-reg_brief(Reading ~ Verbal, standardize=TRUE)
+# Provide only the brief analysis on standardized variables
+#  with 3-fold cross-validations
+reg_brief(Reading ~ Verbal, standardize=TRUE, kfold=3)
 
 # Access the pieces of output, here in an object named \code{r}
 r <- reg(Reading ~ Verbal + Absent + Income)

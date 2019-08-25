@@ -647,6 +647,9 @@ BarChart(Dept, Salary)
 d <- Read("Employee")
 a <- aggregate(Salary ~ Dept + Gender, data=d, FUN=mean)
 BarChart(Dept, Salary, by=Gender, data=a)
+# do so just with BarChart, display bars in grayscale
+# How does average salary vary by gender across the various departments?
+BarChart(Dept, Salary, by=Gender, stat_yx="mean", data=d, fill="grays")
 
 
 # -----------

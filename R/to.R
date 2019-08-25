@@ -20,7 +20,7 @@ function(prefix, until, from=1, same.size=TRUE) {
   cstr <- character(length=0)
   for (ichar in (from:until)) {
 
-    if (same.size) inum <- until else inum <- ichar
+    inum <- ifelse (same.size, until, ichar)
     nc <- nchar(as.character(inum))
 
     cc <- as.character(.fmtc(ichar, w=nc))

@@ -254,14 +254,23 @@ function(pal=NULL, end_pal=NULL,
     pal <- wes_palette(pal[1], n, type="continuous")
   }
 
-# # random distinct colors
+# # pre-specified distinct colors
   else if (kind == "distinct") {
-    cat("The random colors package, randomcoloR, has a dependent\n",
-        "package V8 that sometimes did not properly install. So no\n",
-        "longer part of lessR. Install and load randomcoloR separately,\n",
-        "then generate the palette with the function: distinctColorPalette\n\n")
-#   ttl <- paste("Random distinct colors:", pal[1], "\n") 
-#   pal <- distinctColorPalette(n)
+
+    ttl <- paste("Colors Palette", pal[1], "\n") 
+    pal <- c(getColors(c=90, l=50, n=5),
+             "goldenrod2", "gray45", "yellowgreen", "orchid3", "skyblue",
+             "darkgray", "lightcoral", "navajowhite4", "cyan3", "darkorange3",
+             "maroon3", "mediumaquamarine", "royalblue1", "mistyrose4",
+             "thistle3")
+    if (n <= 20)
+      pal <- pal[1:n]
+    else {
+      print(pal[1:20])
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+         "Only 20 distinct colors available.\n",
+         "Can start with a vector of the above 20 colors, then add more.\n\n")
+    }
   }
 
   # custom color sequence

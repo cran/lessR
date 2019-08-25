@@ -12,6 +12,7 @@ function(x, y, by, stack100,
          legend_horiz, legend_size,
          add, x1, x2, y1, y2, out_size, quiet, ...) {
 
+
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
   y.given <- ifelse (!is.null(y), TRUE, FALSE)
   is.ord <- ifelse (is.ordered(x) || is.ordered(by), TRUE, FALSE)
@@ -165,7 +166,7 @@ function(x, y, by, stack100,
 
 
   # -------------------------------------------
-  # get Y variable, either directly or tabulate
+  # get y variable, either directly or tabulate
 
   # y is provided, no tabulation
   if (!is.null(y)) {
@@ -204,8 +205,8 @@ function(x, y, by, stack100,
 
     else {  # a by variable
       x.temp <- x
-      unq.x <- unique(x)
-      unq.by <- unique(by)
+      unq.x <- na.omit(unique(x))
+      unq.by <- na.omit(unique(by))
 
       do.row <- ifelse (x[1] == x[2], FALSE, TRUE)  # x is outer loop
       m <- matrix(y, nrow=length(unique(by)), byrow=do.row)

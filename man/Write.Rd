@@ -14,7 +14,8 @@ Writes the contents of the specified data frame, such as with the default \code{
 
 \usage{
 Write(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
-         ExcelTable=FALSE, ExcelColWidth=TRUE, \ldots)
+         ExcelTable=FALSE, ExcelColWidth=TRUE,
+         quiet=getOption("quiet"), \ldots)
 
 wrt(\ldots)
 
@@ -36,6 +37,8 @@ wrt_x(\ldots, format="Excel")
   \item{ExcelTable}{If \code{TRUE}, write the Excel file as an Excel table.}
   \item{ExcelColWidth}{On by default but calculation of column widths for
        large files takes more time, so option to turn off.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
+       \code{\link{style}} function.}
   \item{...}{Other parameter values for \code{csv} files consistent with the
        usual \code{\link{write.table}}, including \code{na=""} to write missing
        data to a \code{csv} file as blanks instead of \code{NA}.}

@@ -6,8 +6,8 @@ function(x, by1, by2, nrows, ncols, asp, prop,
          width, height, pdf_file,
          segments_x, breaks, c.type, quiet) {
 
-
-  cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n")
+  if (!quiet)
+    cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n")
 
   panel_fill <- getOption("panel_fill")
   panel_color <- getOption("panel_color")

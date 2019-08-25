@@ -1,5 +1,5 @@
 Regression <-
-function(my_formula, data=d, rows=NULL,
+function(my_formula, data=d, rows=NULL, kfold=0,
          digits_d=NULL, standardize=FALSE,
 
          Rmd=NULL, Rmd_browser=TRUE, 
@@ -101,7 +101,7 @@ function(my_formula, data=d, rows=NULL,
   }
 
 
-  # produce actual argument, such as from an abbreviation, and flag if not exist
+  # produce actual argument, such as from an abbreviation, flag if not exist
   res_sort <- match.arg(res_sort)
   pred_sort <- match.arg(pred_sort)
 
@@ -256,23 +256,34 @@ function(my_formula, data=d, rows=NULL,
 
   n.keep <- nrow(lm.out$model)  # lm.out$model is the data with deleted
 
-
   title_bck <- "  BACKGROUND"
   bck <- .reg1bckBasic(lm.out, df.name, digits_d, show_R, n.obs, n.keep, stnd.flag)
   tx1bck <- bck$tx
 
 
   title_basic <- "  BASIC ANALYSIS"
-  est <- .reg1modelBasic(lm.out, df.name, digits_d, show_R)
+  est <- .reg1modelBasic(lm.out, digits_d, show_R)
   tx1est <- est$tx
   sterrs <- est$sterrs
 
-  anv <- .reg1anvBasic(lm.out, df.name, digits_d, show_R)
+  anv <- .reg1anvBasic(lm.out, digits_d, show_R)
   tx1anv <- anv$tx 
   MSW <- anv$MSW
 
-  fit <- .reg1fitBasic(lm.out, df.name, anv$tot["ss"], digits_d, show_R)
+  fit <- .reg1fitBasic(lm.out, anv$tot["ss"], digits_d, show_R)
   tx1fit <- fit$tx
+
+
+  txkfl <- ""
+  title_kfold <- "  K-FOLD CROSS-VALIDATION"
+  m_se <- NA;  m_MSE <- NA;  m_Rsq <- NA
+
+  if (kfold > 0) {
+    Kfld <- .regKfold(data, my_formula, kfold, nm, predictors, n.vars,
+                      n.keep, digits_d, show_R)
+    txkfl <- Kfld$tx
+    m_se <- Kfld$m_se; m_MSE <- Kfld$m_MSE; m_Rsq <- Kfld$m_Rsq
+  }
 
 
   title_rel <- "  RELATIONS AMONG THE VARIABLES"
@@ -518,6 +529,8 @@ function(my_formula, data=d, rows=NULL,
   class(txsug) <- "out"
   class(title_bck) <- "out"
   class(tx1bck) <- "out"
+  class(title_kfold) <- "out"
+  class(txkfl) <- "out"
   class(title_basic) <- "out"
   class(tx1est) <- "out"
   class(tx1fit) <- "out"
@@ -548,6 +561,8 @@ function(my_formula, data=d, rows=NULL,
     out_title_basic=title_basic, out_estimates=tx1est,
     out_fit=tx1fit, out_anova=tx1anv,
 
+    out_title_kfold=title_kfold, out_kfold=txkfl,
+
     out_title_rel=title_rel, out_cor=tx2cor, out_collinear=tx2cln,
     out_subsets=tx2all,
 
@@ -562,6 +577,7 @@ function(my_formula, data=d, rows=NULL,
     anova_model=anv$mdl, anova_residual=anv$rsd, anova_total=anv$tot, 
     se=fit$se, resid_range=fit$range,
     Rsq=fit$Rsq, Rsqadj=fit$Rsqadj, PRESS=fit$PRESS, RsqPRESS=fit$RsqPRESS,
+    m_se=m_se, m_MSE=m_MSE, m_Rsq=m_Rsq,
     cor=crs, tolerances=tol, vif=vif,
     resid.max=resid.max, pred_min_max=predmm, 
     residuals=lm.out$residuals, fitted=lm.out$fitted, 

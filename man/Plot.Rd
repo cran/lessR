@@ -34,7 +34,7 @@ Represent the influence of additional categorical variables with \code{by1} or \
 }
 
 \usage{
-Plot(x, y=NULL, data=d, rows=NULL,
+Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          stat_x=c("data", "count", "proportion", "\%"),
          stat_yx=c("data", "sum", "mean", "sd", "dev", "min", "median", "max"),
          n_cat=getOption("n_cat"),
@@ -52,7 +52,7 @@ Plot(x, y=NULL, data=d, rows=NULL,
          jitter_x=0, jitter_y=0,
 
          ID="row.name", ID_size=0.7,
-         MD.cut=0, out_cut=0, out_shape="circle", out_size=1,
+         MD_cut=0, out_cut=0, out_shape="circle", out_size=1,
 
          vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
          violin_fill=getOption("violin_fill"), 
@@ -86,7 +86,7 @@ Plot(x, y=NULL, data=d, rows=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-         enhance=FALSE, eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
+         eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
          do_plot=TRUE, width=NULL, height=NULL, pdf_file=NULL, 
          fun_call=NULL, \ldots)
 
@@ -118,6 +118,13 @@ vp(\ldots)
         \code{y}. Default data frame is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
+  \item{enhance}{For a two-variable scatterplot, if \code{TRUE},
+        automatically add the 0.95 data ellipse, 
+        labeling of outliers beyond a Mahalanobis distance of 6 from the 
+        ellipse center, the best-fitting least squares line of all the data,
+        the best-fitting least squares line of the regular data without the
+        outliers, and a horizontal and vertical line to represent the mean of
+        each of the two variables.}
   \item{stat_x}{Transform data for categorical variable \code{x}
        into a simple table of paired levels of
        \code{x} with numerical values of \code{y}, height of each bar.
@@ -238,7 +245,7 @@ vp(\ldots)
   \item{ID_size}{Size of the plotted labels.
         Modify text color of the labels with the \code{\link{style}} function 
         parameter \code{ID_color}.}
-  \item{MD.cut}{Mahalanobis distance cutoff to define an outlier in a 2-variable
+  \item{MD_cut}{Mahalanobis distance cutoff to define an outlier in a 2-variable
        scatterplot.}
   \item{out_cut}{Count or proportion of plotted points to label, in order of their 
        distance from the scatterplot center (means), counting down from
@@ -473,13 +480,6 @@ vp(\ldots)
        \code{"mean_y"}.  Only used for \code{"rect"}, \code{"line"} and
        \code{arrow}.}\cr
 
-  \item{enhance}{For a two-variable scatterplot, if \code{TRUE},
-        automatically add the 0.95 data ellipse, 
-        labeling of outliers beyond a Mahalanobis distance of 6 from the 
-        ellipse center, the best-fitting least squares line of all the data,
-        the best-fitting least squares line of the regular data without the
-        outliers, and a horizontal and vertical line to represent the mean of
-        each of the two variables.}
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE} 
         unless the \code{shiny} package is loaded then set to \code{FALSE} so
@@ -648,7 +648,7 @@ Instead, do the following:
 
 
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. The output here is just for the outlier analysis of the two-variable scatterplot with continuous variables. The outlier identification must be activated for the analysis, such as from parameter \code{MD.cut}.
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. The output here is just for the outlier analysis of the two-variable scatterplot with continuous variables. The outlier identification must be activated for the analysis, such as from parameter \code{MD_cut}.
 
 READABLE OUTPUT\cr
 code{out_outlier}: Mahalanobis Distance of each outlier.\cr
@@ -708,7 +708,7 @@ Plot(Years, Salary, rows=(Gender=="M" & Years > 5))
 #   outliers defined by a Mahalanobis Distance larger than 6 
 # save outliers into R object out, then remove from d
 d[1, "Salary"] <- 200000
-out <- Plot(Years, Salary, ellipse=0.95, MD.cut=6)
+out <- Plot(Years, Salary, ellipse=0.95, MD_cut=6)
 d <- d[-out$outlier_indices,]
 
 # new shape and point size, no grid or background color

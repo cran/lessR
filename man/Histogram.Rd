@@ -41,7 +41,7 @@ Histogram(x=NULL, data=d, rows=NULL,
 
     density=FALSE, dn.hist=TRUE,
     bw=NULL, type=c("general", "normal", "both"),
-    color_nrm="gray20", color_gen="gray20",
+    color_gen="gray20", color_nrm="gray20",
     fill_hist=getOption("violin_fill"), fill_nrm=NULL, fill_gen=NULL,
     x.pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
@@ -180,8 +180,8 @@ hs(\ldots)
   \item{type}{Type of density curve plotted.  By default, the general
        density is plotted, though can request the normal density and
        both densities.}
-  \item{color_nrm}{Color of the normal curve.}
   \item{color_gen}{Color of the general density curve.}
+  \item{color_nrm}{Color of the normal curve.}
   \item{fill_hist}{Fill color for the histogram behind density curve,
        defaults to light gray.} 
   \item{fill_nrm}{Fill color for the estimated normal curve, with a partially 

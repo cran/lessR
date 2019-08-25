@@ -1,5 +1,5 @@
 .reg1modelBasic <-
-function(lm.out, dname="d", digits_d=NULL, show_R=FALSE) {
+function(lm.out, digits_d=NULL, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -7,6 +7,7 @@ function(lm.out, dname="d", digits_d=NULL, show_R=FALSE) {
   n.obs <- nrow(lm.out$model)
 
   tx <- character(length = 0)
+
 
 # --------------
 # Basic Analysis
@@ -42,11 +43,7 @@ function(lm.out, dname="d", digits_d=NULL, show_R=FALSE) {
 
   max.num <- integer(length=6)
   for (icol in 1:6) {
-    max.num[icol] <- 0 
-    for (i in 1:n.vars) {
-      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits_d + 1
-      if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
-    }
+    max.num[icol] <- max(nchar(as.character(trunc(smc[,icol]))) + digits_d + 1)
     if (max.num[icol] < 9) max.num[icol] <- 9L 
   }
 

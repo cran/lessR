@@ -1,6 +1,7 @@
 Write <- 
 function(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
-         ExcelTable=FALSE, ExcelColWidth=TRUE, ...) {
+         ExcelTable=FALSE, ExcelColWidth=TRUE,
+         quiet=getOption("quiet"), ...) {
 
   format <- match.arg(format)
 
@@ -67,7 +68,7 @@ function(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
 
     saveWorkbook(wb, file=file.data, overwrite=TRUE)
     txt <- "Alexander Walker's openxlsx package]"
-    if (ExcelTable)
+    if (ExcelTable  &&  !quiet)
       cat("[with the writeDataTable function from", txt, "\n")
     else
       cat("[with the writeData function from", txt, "\n")

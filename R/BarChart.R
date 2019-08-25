@@ -395,7 +395,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   # do the analysis
 
-  # if data table is raw data, then default stat_yx is "mean"
+  # if data table is raw data, then default stat_yx is "data"
   if (stat_yx.miss) {
     stat_yx <- "data"  # default, no transformation
     if (!is.null(y.call)) {
@@ -500,32 +500,56 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
     # set up new x.call and y.call for stats
       if (stat_yx == "sum") {
         ylab <- paste("Sum of", y.name)
-        out <- tapply(y.call, x.call, sum, na.rm=TRUE)
+        if (is.null(by.call))
+          out <- tapply(y.call, x.call, sum, na.rm=TRUE)
+        else 
+          out <- aggregate(y.call ~ x.call +  by.call, FUN=sum)
       }
       if (stat_yx == "mean") {
         ylab <- paste("Mean of", y.name)
-        out <- tapply(y.call, x.call, mean, na.rm=TRUE)
+        if (is.null(by.call))
+          out <- tapply(y.call, x.call, mean, na.rm=TRUE)
+        else 
+          out <- aggregate(y.call ~ x.call +  by.call, FUN=mean)
       }
       if (stat_yx == "sd") {
         ylab <- paste("Standard Deviation of", y.name)
-        out <- tapply(y.call, x.call, sd, na.rm=TRUE)
+        if (is.null(by.call))
+          out <- tapply(y.call, x.call, sd, na.rm=TRUE)
+        else 
+          out <- aggregate(y.call ~ x.call +  by.call, FUN=sd)
       }
       if (stat_yx == "dev") {
         ylab <- paste("Mean Deviations of", y.name)
-        out <- tapply(y.call, x.call, mean, na.rm=TRUE)
-        out <- out - mean(out, na.rm=TRUE)
+        if (is.null(by.call)) {
+          out <- tapply(y.call, x.call, mean, na.rm=TRUE)
+          out <- out - mean(out, na.rm=TRUE)
+        }
+        else { 
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "dev option not meaningful with a by variable\n\n")
+        }
       }
       if (stat_yx == "min") {
         ylab <- paste("Minimum of", y.name)
-        out <- tapply(y.call, x.call, min, na.rm=TRUE)
+        if (is.null(by.call))
+          out <- tapply(y.call, x.call, min, na.rm=TRUE)
+        else 
+          out <- aggregate(y.call ~ x.call + by.call, FUN=min)
       }
       if (stat_yx == "median") {
         ylab <- paste("Median of", y.name)
-        out <- tapply(y.call, x.call, median, na.rm=TRUE)
+        if (is.null(by.call))
+          out <- tapply(y.call, x.call, median, na.rm=TRUE)
+        else 
+          out <- aggregate(y.call ~ x.call +  by.call, FUN=median)
       }
       if (stat_yx == "max") {
         ylab <- paste("Maximum of", y.name)
-        out <- tapply(y.call, x.call, max, na.rm=TRUE)
+        if (is.null(by.call))
+          out <- tapply(y.call, x.call, max, na.rm=TRUE)
+        else 
+          out <- aggregate(y.call ~ x.call +  by.call, FUN=max)
       }
 
     #if (is.factor(x.call))  # preserve ordering, will lose order attribute
@@ -537,14 +561,21 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         #x.call <- factor(names(out), levels=m1:m2)  # get entire numeric range
       #}
       #else
-      x.call <- factor(names(out))
+      if (is.null(by.call)) {
+        x.call <- factor(names(out))
+        y.call <- as.vector(out)
+      }
+      else {
+        x.call <- out[,1]
+        by.call <- out[,2]
     #}
-      y.call <- as.vector(out)
+        y.call <- out[,3]
+        beside = TRUE
+      }
 
 #     x.call <- data.frame(x.call)
 #     y.call <- data.frame(y.call)
     }  # sum, mean, sd, min, median, max
-
 
       bc <- .bc.main(x.call, y.call, by.call, stack100,
             fill, color, trans, fill_split, theme,

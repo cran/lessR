@@ -25,7 +25,7 @@ function(x=NULL, data=d, rows=NULL,
 
     density=FALSE, dn.hist=TRUE,
     bw=NULL, type=c("general", "normal", "both"),
-    color_nrm="gray20", color_gen="gray20",
+    color_gen="gray20", color_nrm="gray20",
     fill_hist=getOption("violin_fill"), fill_nrm=NULL, fill_gen=NULL,
     x.pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
@@ -38,20 +38,20 @@ function(x=NULL, data=d, rows=NULL,
 
 
   # a dot in a parameter name to an underscore
-  dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("stat.x", "stat.y", "n.cat", "n.row", "n.col",
-                "bin.start", "bin.width", "bin.end", "lab.adj", "margin.adj",
-                "rotate.x", "rotate.y", "scale.x", "scale.y",  
-                "digits.d", "fun.call", "do.plot")
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-        assign(nm, dots[[i]])
-        get(nm)
-      }
-    }
-  }
+# dots <- list(...)
+# if (!is.null(dots)) if (length(dots) > 0) {
+#   change <- c("stat.x", "stat.y", "n.cat", "n.row", "n.col",
+#               "bin.start", "bin.width", "bin.end", "lab.adj", "margin.adj",
+#               "rotate.x", "rotate.y", "scale.x", "scale.y",  
+#               "digits.d", "fun.call", "do.plot")
+#   for (i in 1:length(dots)) {
+#     if (names(dots)[i] %in% change) {
+#       nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+#       assign(nm, dots[[i]])
+#       get(nm)
+#     }
+#   }
+# }
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -70,14 +70,10 @@ function(x=NULL, data=d, rows=NULL,
   # limit actual argument to alternatives, perhaps abbreviated
   cumulate <- match.arg(cumulate)
   type <- match.arg(type)
-
   stat_x <- match.arg(stat_x)
   proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
-
   histogram <- ifelse (density, FALSE, TRUE)
-
   bw.miss <- ifelse (missing(bw), TRUE, FALSE)
-
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -154,10 +150,12 @@ function(x=NULL, data=d, rows=NULL,
   }
  
   # if a tibble convert to data frame
-  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-   if (any(grepl("tbl", class(data), fixed=TRUE))) {
-      data <- data.frame(data, stringsAsFactors=FALSE)
-   }
+  if (!is.null(dfs)) {
+    if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
+     if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data, stringsAsFactors=FALSE)
+     }
+    }
   }
 
   # force evaluation (not lazy) if data not specified but relies on default d

@@ -1,5 +1,5 @@
 if (getRversion() >= "2.15.1")
-  globalVariables(c("d", "mydata", "mylabels", "mycor", "P1", "P2", "P3"))
+  globalVariables(c("d", "mydata", "l", "mylabels", "mycor", "P1", "P2", "P3"))
 # Pn is for latticeExtra layer function
 
 
@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.8.8     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.8.9     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
       "                           d: default data frame, no need for data=\n",
@@ -37,9 +37,9 @@ function(...) {
 
   # .maketrans("gray50", .to256("trans_bar_fill"))
   options(bar_fill = NULL)
-  options(bar_fill_discrete = c("#2D8BC3", "#A57E08", "#51932E",
-      "#C7657B", "#8E76C9", "#009B8B", "#BB714D", "#838A00",
-      "#0097AD", "#C561A2", "#009962", "#B068BE"))  # getColors("hues")
+  options(bar_fill_discrete = c("#257EB2", "#957200", "#488527", "#B55B6F",
+          "#806AB7", "#008D7E", "#AA6644", "#777D00", "#00889D", "#B35693",
+          "#008B57", "#A05DAD"))  # getColors("hues")
   options(bar_fill_ordered = rgb(144,165,175, maxColorValue=255))
   options(trans_bar_fill = 0.0)
   options(bar_color = rgb(126,144,168, maxColorValue=255))
