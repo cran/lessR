@@ -89,7 +89,8 @@ function(x,
   
   # normal density curve, no plot
   xx <- seq(x.min, x.max, length=200)
-  if (fill_nrm == "transparent") lw <- 2 else lw <- 1
+  #if (fill_nrm == "transparent") lw <- 2 else lw <- 1
+  lw  <- 2
   d.nrm <- dnorm(xx,mean(x),sd(x))
 
   # max y coordinate for graph

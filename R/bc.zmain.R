@@ -1,6 +1,6 @@
 .bc.main <- 
 function(x, y, by, stack100, 
-         fill, col_color, col.trans, fill_spit, theme,
+         fill, col_color, col.trans, fill_split, theme,
          horiz, add_top, gap, prop, scale_y,
          xlab, ylab, main,
          value_labels, label_max, beside,
@@ -371,7 +371,7 @@ function(x, y, by, stack100,
 
 # if (beside && !is.null(by)) clr <- clr[1:n.levels]
 
-  if (!is.null(fill_spit)) {
+  if (!is.null(fill_split)) {
     chroma <- ifelse (theme %in% c("gray", "white"), 0, 55)
     hue <- .get.h(theme)
     if (is.null(fill))
@@ -383,7 +383,7 @@ function(x, y, by, stack100,
       fill[2] <- hcl(hue, chroma, l=70) 
     }
     for (i in 1:length(x))
-      clr[i] <- ifelse (x[i] <= fill_spit, fill[1], fill[2])
+      clr[i] <- ifelse (x[i] <= fill_split, fill[1], fill[2])
   }
 
   if (!is.null(col.trans)) 
@@ -558,12 +558,12 @@ function(x, y, by, stack100,
 
 
   # rescale to control bar width for small number of bars
-  # set rescale 
-  if (class(x) == "numeric"  &&  entered) x <- as.table(x)
+  # set rescale
+  if ("numeric" %in% class(x)  &&  entered) x <- as.table(x)
   rescale <- 0
   if (is.null(by)) if (nrow(x) <= 4) rescale <- nrow(x)
-  if (is.matrix(x) && !beside) if (ncol(x) <= 4) rescale <- ncol(x)
-  if (class(x) == "matrix" && entered) rescale <- 0  # turned off for now
+  if (is.matrix(x)  &&  !beside) if (ncol(x) <= 4) rescale <- ncol(x)
+  if ("matrix" %in% class(x)  &&  entered) rescale <- 0  # turned off for now
   # set width.bars, gap
   if (rescale == 4) width.bars <- .17
   if (rescale == 3) width.bars <- .22
@@ -641,7 +641,10 @@ function(x, y, by, stack100,
         values <- ifelse (y.given, "input", getOption("values"))
     }
 
-  if (beside  &&  values_pos != "out") values_size <- .9 * values_size
+  if (beside) {
+     values_size <- .75 * values_size
+     values_cut <- 0.01
+  }
 
     if (values != "off") {
       if (is.null(values_cut)) {

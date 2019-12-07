@@ -1,6 +1,6 @@
 .plt.bad <-
 function (x.miss, y.miss, stat, breaks, bin_start, n_row, n_col,
-          MD.cut, out_cut, fit_se, ...) {
+          MD_cut, out_cut, fit_se, ...) {
 
   # check for inconsistent parameters
   
@@ -9,9 +9,9 @@ function (x.miss, y.miss, stat, breaks, bin_start, n_row, n_col,
       "Must specify at least one variable to analyze\n\n")
   }
   
-  if (MD.cut > 0  &&  out_cut > 0) {
+  if (MD_cut > 0  &&  out_cut > 0) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Choose MD.cut or out_cut to specify outliers, but not both\n\n")
+      "Choose MD_cut or out_cut to specify outliers, but not both\n\n")
   }
   
   if (fit_se[1] > 0.999) {

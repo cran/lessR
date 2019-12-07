@@ -1,8 +1,6 @@
 BarChart <-
-function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
-        stat_x=c("count", "proportion"),
-        stat_yx=c("mean", "sum", "sd", "dev", "min", "median", "max"),
-        n_cat=getOption("n_cat"), one_plot=NULL,
+function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
+        stat=NULL, n_cat=getOption("n_cat"), one_plot=NULL,
 
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
 
@@ -53,6 +51,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
                 "eval.df")
     for (i in 1:length(dots)) {
       if (names(dots)[i] == "addtop") add_top <- dots[[i]] 
+      if (names(dots)[i] == "stat_x") stat <- dots[[i]]
+      if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
       if (names(dots)[i] %in% change) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
@@ -66,14 +66,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   color.miss <- ifelse (missing(color), TRUE, FALSE)
   horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
 
-  stat_x <- match.arg(stat_x)
-  proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
-
-  stat_yx.miss <- ifelse (missing(stat_yx), TRUE, FALSE)
-  stat_yx <- match.arg(stat_yx)
-
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
   sort <- match.arg(sort)
+
+  proportion <- FALSE
 
   if (theme != getOption("theme")) {  # not the default theme
     sty <- style(theme, reset=FALSE)
@@ -113,9 +109,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   }
 
     if (values != "eval.later") {
-      if (!(values %in% c("off", "%", "prop", "input"))) {
+      if (!(values %in% c("off", "%", "proportion", "input"))) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "values  must be set to \"off\", \"%\", \"prop\" or \"input\"\n\n")
+          "set  values  to \"off\", \"%\", \"proportion\" or \"input\"\n\n")
       }
     }
 
@@ -147,9 +143,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "option by2 not applicable to BarChart\n\n")
       }
-      if (nms[i] == "proportion") {
+      if (nms[i] %in% c("proportion", "prop")) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  proportion  now  stat_x=\"proportion\"\n\n")
+          "option  proportion  now  stat=\"proportion\"\n\n")
       }
     }
   }
@@ -208,7 +204,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   x.call <- NULL
 
   if (is.null(x.name)) x.name <- ""
-  if (x.name == "row.names") {
+  if (x.name %in% c("row_names", "row.names")) {
     # retain order of row names, otherwise will be alphabetical
     x.call <- factor(row.names(data), levels=row.names(data))
     if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
@@ -224,8 +220,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
       ind <- eval(substitute(x), envir=data.vars)  # col num of each var
-      if (!missing(rows)) {  # subset rows
-        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+      if (!missing(filter)) {  # subset rows
+        r <- eval(substitute(filter), envir=data, enclos=parent.frame())
         r <- r & !is.na(r)  # set missing for a row to FALSE
         data <- data[r,,drop=FALSE]
       }
@@ -393,11 +389,21 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   # -----------  x, y, and by variables established ------------
   # ------------------------------------------------------------
 
+  # if no y, if !proportion, then count
+  # if y, proportion implies stack100
+  if (!is.null(stat)) {
+    proportion <- ifelse (stat == "proportion", TRUE, FALSE)   # old signal
+    if (proportion) stat <- "data"
+    if (!is.null(y.call)) stat <- stat
+  }
+  else {  # defaults
+    stat <- "data"  # applicable if y present
+  }
+
   # do the analysis
 
-  # if data table is raw data, then default stat_yx is "data"
-  if (stat_yx.miss) {
-    stat_yx <- "data"  # default, no transformation
+  # if data table is raw data, then default stat is "data"
+  if (is.null(stat)) {
     if (!is.null(y.call)) {
 
       if (sum(is.na(x.call))  > 0 ||
@@ -411,36 +417,36 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       
       lx.u <- length(unique(x.call))
       lb.u <- ifelse(is.null(by.call), 1, length(unique(by.call)))
-        if (nrow(data) > lx.u*lb.u) stat_yx <- "mean"
+        if (nrow(data) > lx.u*lb.u) stat <- "mean"
     }
   }
 
-  if (stat_yx != "data"  &&  is.null(y.call)) {
+  if (stat != "data"  &&  is.null(y.call)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "To do a transformation of y for each level of ", x.name, "\n",
-      " need a numerical y variable\n\n")
+      " need to provide a numerical y variable\n\n")
   }
 
   if (Trellis && do.plot) {
 
-           if (stat_yx == "sum")
+           if (stat == "sum")
         ylab <- paste("Sum of", y.name)
-      else if (stat_yx == "mean")
+      else if (stat == "mean")
         ylab <- paste("Mean of", y.name)
-      else if (stat_yx == "sd")
+      else if (stat == "sd")
         ylab <- paste("Standard Deviation of", y.name)
-      else if (stat_yx == "dev")
+      else if (stat == "dev")
         ylab <- paste("Mean Deviations of", y.name)
-      else if (stat_yx == "min")
+      else if (stat == "min")
         ylab <- paste("Minimum of", y.name)
-      else if (stat_yx == "median")
+      else if (stat == "median")
         ylab <- paste("Median of", y.name)
-      else if (stat_yx == "max")
+      else if (stat == "max")
         ylab <- paste("Maximum of", y.name)
 
 
     .bar.lattice(x.call, by1.call, by2=NULL, n_row, n_col, aspect,
-                 prop=FALSE, 
+                 proportion, 
                  fill, color, trans, size.pt=NULL, xlab, ylab, main,
                  rotate_x, offset,
                  width, height, pdf,
@@ -466,7 +472,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
     }
 
-    if (stat_yx %in% c("mean", "sum", "sd", "dev", "min", "median", "max")) {
+    if (stat %in% c("mean", "sum", "sd", "dev", "min", "median", "max")) {
 
       n_cat <- 0
       means <- FALSE
@@ -498,28 +504,28 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
 
     # set up new x.call and y.call for stats
-      if (stat_yx == "sum") {
+      if (stat == "sum") {
         ylab <- paste("Sum of", y.name)
         if (is.null(by.call))
           out <- tapply(y.call, x.call, sum, na.rm=TRUE)
         else 
           out <- aggregate(y.call ~ x.call +  by.call, FUN=sum)
       }
-      if (stat_yx == "mean") {
+      if (stat == "mean") {
         ylab <- paste("Mean of", y.name)
         if (is.null(by.call))
           out <- tapply(y.call, x.call, mean, na.rm=TRUE)
         else 
           out <- aggregate(y.call ~ x.call +  by.call, FUN=mean)
       }
-      if (stat_yx == "sd") {
+      if (stat == "sd") {
         ylab <- paste("Standard Deviation of", y.name)
         if (is.null(by.call))
           out <- tapply(y.call, x.call, sd, na.rm=TRUE)
         else 
           out <- aggregate(y.call ~ x.call +  by.call, FUN=sd)
       }
-      if (stat_yx == "dev") {
+      if (stat == "dev") {
         ylab <- paste("Mean Deviations of", y.name)
         if (is.null(by.call)) {
           out <- tapply(y.call, x.call, mean, na.rm=TRUE)
@@ -530,21 +536,21 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
           "dev option not meaningful with a by variable\n\n")
         }
       }
-      if (stat_yx == "min") {
+      if (stat == "min") {
         ylab <- paste("Minimum of", y.name)
         if (is.null(by.call))
           out <- tapply(y.call, x.call, min, na.rm=TRUE)
         else 
           out <- aggregate(y.call ~ x.call + by.call, FUN=min)
       }
-      if (stat_yx == "median") {
+      if (stat == "median") {
         ylab <- paste("Median of", y.name)
         if (is.null(by.call))
           out <- tapply(y.call, x.call, median, na.rm=TRUE)
         else 
-          out <- aggregate(y.call ~ x.call +  by.call, FUN=median)
+          out <- aggregate(y.call ~ x.call + by.call, FUN=median)
       }
-      if (stat_yx == "max") {
+      if (stat == "max") {
         ylab <- paste("Maximum of", y.name)
         if (is.null(by.call))
           out <- tapply(y.call, x.call, max, na.rm=TRUE)
@@ -570,7 +576,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         by.call <- out[,2]
     #}
         y.call <- out[,3]
-        beside = TRUE
+#       beside <- TRUE
       }
 
 #     x.call <- data.frame(x.call)

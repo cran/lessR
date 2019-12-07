@@ -13,11 +13,11 @@ Provides a regression analysis with extensive output, including graphics, from a
 
 By default the data exists as a data frame with the default name of \code{d}, or specify explicitly with the \code{data} option.  Specify the model in the function call as an R \code{\link{formula}}, that is, for a basic model, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign, such as \code{reg(Y ~ X1 + X2)}.
 
-Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document -- either html, pdf or Word -- by default with explanation and interpretation. Generate a complete  R~Markdown file with filetype (\code{.Rmd}) from the \code{Rmd} option. Simply specify the option with a file name in quotes, then run the Regression analysis to create the markdown file. Open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results plus interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information.
+Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{r} in \code{r <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document -- either html, pdf or Word -- by default with explanation and interpretation. Generate a complete R~Markdown file with filetype (\code{.Rmd}) from the \code{Rmd} option. Simply specify the option with a file name in quotes, then run the Regression analysis to create the markdown file. Open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results plus interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information.
 }
 
 \usage{
-Regression(my_formula, data=d, rows=NULL, kfold=0,
+Regression(my_formula, data=d, filter=NULL, kfold=0,
            digits_d=NULL, standardize=FALSE,
 
          Rmd=NULL, Rmd_browser=TRUE, 
@@ -58,7 +58,7 @@ reg_brief(\ldots, brief=TRUE)
        generated R~Markdown for an interpretative output as specified by the
        \code{Rmd} parameter, then this data frame must first be read by the
        \code{lessR} function \code{\link{Read}}.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+  \item{filter}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{kfold}{Number of K-fold cross-validations.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits,
@@ -113,20 +113,19 @@ reg_brief(\ldots, brief=TRUE)
   \item{res_sort}{Default is \code{"cooks"}, for specifying Cook's distance as the
        sort criterion for the display of the rows of data and associated residuals.
        Other values are \code{"rstudent"} for externally Studentized residuals,
-       \code{"dffits"} for dffits
-       and \code{"off"} to not sort the rows of data.}
+       \code{"dffits"} for dffits and \code{"off"} to not sort the rows of data.}
   \item{pred_rows}{Default is 3, which lists prediction intervals only for the
        first, middle and last 3 rows of data, unless there are 25 or less
        rows of data when all rows are displayed.  To disable prediction intervals,
        specify a value of 0.  To see the output for rows of data, specify a value of
        \code{"all"}.}
-  \item{pred_sort}{Default is \code{"predint"}, which sorts the rows of data and associated
-       intervals by the lower bound of each prediction interval.  Turn off this sort by
-       specifying a value of \code{"off"}.}
+  \item{pred_sort}{Default is \code{"predint"}, which sorts the rows of data
+        and associated intervals by the lower bound of each prediction interval.
+        Turn off this sort by specifying a value of \code{"off"}.}
   \item{subsets}{Default is to produce the analysis of the fit based on adjusted R-squared
        for all possible model subsets of size 10 for each number of predictors, from the
        \code{leaps} package. Set to \code{FALSE} to turn off. Defaults lists a maximum of
-       the first 50 values_ Specify an integer to change the maximum.}
+       the first 50 values. Specify an integer to change the maximum.}
   \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a larger value
        are flagged in red and labeled in the resulting scatterplot of Residuals and Fitted
        Values.  Default value is 1.0.}\cr
@@ -176,12 +175,12 @@ The basic analysis successively invokes several standard R functions beginning w
 INPUT DATA FRAME\cr
 The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not complete.  Specify the name of the data frame for analysis with the \code{data} option if the name is not the default \code{d}.
        
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 TEXT OUTPUT\cr
 The output is produced in pieces by topic (see \code{values} below), automatically collated by default in the final output. But the pieces are available for later reference if the output of the function is directed toward an object, such as \code{r} in \code{r <- reg(Y ~ X)}. This is especially useful if the pieces are accessed within \code{knitr} or individual pieces are displayed at the console.
 
-The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values_ Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg_brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit, and if \code{X1_new}, etc. are requested, the relevant rows of forecasted values:w
+The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values. Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg_brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit, and if \code{X1_new}, etc. are requested, the relevant rows of forecasted values:w
 .
 
 R MARKDOWN\cr
@@ -213,7 +212,7 @@ By default the residual analysis lists the data and fitted value for each observ
 PREDICTION INTERVALS\cr
 The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, the lower and upper bounds for the confidence interval and the prediction interval, and the wide of the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are 25 or more observations then the information for only the first three, the middle three and the last three observations is displayed. To turn off the analysis of prediction intervals, specify \code{pred_rows=0}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
 
-The data for the default analysis of the prediction intervals is for the values of the predictor variables for each observation, that is, for each row of the data. New values of the predictor variables can be specified for the calculation of the prediction intervals by providing values for the options \code{X1_new} for the values of the first listed predictor variable in the model, \code{X2_new} for the second listed predictor variable, and so forth for up to five predictor variables, and all predictor variables are numeric. To provide these values, use functions such as \code{\link{seq}} for specifying a sequence of values and \code{\link{c}} for specifying a vector of values_ For multiple regression models, all combinations of the specified new values for all of the predictor variables are analyzed.
+The data for the default analysis of the prediction intervals is for the values of the predictor variables for each observation, that is, for each row of the data. New values of the predictor variables can be specified for the calculation of the prediction intervals by providing values for the options \code{X1_new} for the values of the first listed predictor variable in the model, \code{X2_new} for the second listed predictor variable, and so forth for up to five predictor variables, and all predictor variables are numeric. To provide these values, use functions such as \code{\link{seq}} for specifying a sequence of values and \code{\link{c}} for specifying a vector of values. For multiple regression models, all combinations of the specified new values for all of the predictor variables are analyzed.
 
 RELATIONS AMONG THE VARIABLES\cr
 By default the correlation matrix of all the variables in the model is displayed, and, for multiple regression models, collinearity analysis is provided. Also provided are the first 50 models with the largest R squared adjusted from each possible model from an analysis of all possible subsets of the predictor variables.  This all subsets analysis requires the \code{leaps} function from the \code{leaps} package. These contributed packages are automatically loaded if available.  To turn off the all possible sets option, set \code{subsets=FALSE}.
@@ -343,7 +342,7 @@ r$out_estimates
 #reg(Reading ~ Verbal + Absent, Rmd="eg", Rmd_format=c("word", "odt"))
 
 # just for incomes > 100000 and less than 5 days absent 
-Regression(Reading ~ Verbal, rows=(Income > 100 & Absent < 5))
+Regression(Reading ~ Verbal, filter=(Income > 100 & Absent < 5))
 
 # Multiple regression model
 # Save the three output plots as pdf files 4 inches square

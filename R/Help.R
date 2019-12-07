@@ -138,7 +138,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   "
 
   t2 <- "
-  The lessR function Read can read data files in many file formats,
+  The lessR function Read() can read data files in many file formats,
   including MS Excel. The most generic format is the csv format, for
   \"comma separated values\". A csv file is a text file with commas
   that separate adjacent values in each row. Usually the variable
@@ -166,7 +166,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   t1 <- "
   Browse for a csv, tab-delimited, Excel, R, SAS, or SPSS data file on 
   your file system and read the information into the specified data table
-  with Read, or its abbreviation, rd. To browse, use an empty (\"\").
+  with Read(), or its abbreviation, rd(). To browse, use an empty (\"\").
       > d <- Read(\"\")
   The  <-, the assignment operator, instructs R to assign what was read
   to the data table, here named d (for data). This is the default name
@@ -188,7 +188,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   To read a text file in which each column of data values assigned a
   specific width, add the widths option that specifies the width of each
   column according to the order of the variables.  Enclose the list
-  with the c function, here read two variables with widths of 4 and 1.
+  with the c() function, here read two variables with widths of 4 and 1.
       > d <- Read(widths=c(4,1), col.names=c(\"ID\", \"Gender\"))
   "
 
@@ -209,23 +209,23 @@ function(topic=NULL, width=4.5, height=4.5) {
     "  Write a data file called d into an R data frame"))
 
   t1 <- "
-  The name of the entire rectangular table of data, called a data frame in R, 
-  can be named d within R.  This is the default name of the data table
-  assumed by the lessR data analysis functions.
+  The name of the entire rectangular table of data, called a data frame
+  in R, can be named d within R.  This is the default name of the data
+  table assumed by the lessR data analysis functions.
 
-  Here write the file with specified name in csv format.
+  Here write the csv file with given name, with lessR Write(), or wrt().
       > Write(\"mybestdata\")
   The file type of .csv is automatically appended to the file name. Relies
-  upon the base R write.table, which is is quite general, with many
+  upon the base R write.table(), which is is quite general, with many
   options.  For more information, enter ?write.table.
 
   To write a data file in Excel format, use the format=\"Excel\" option.
       > Write(\"mybestdata\", format=Excel)
-  Abbreviation, not needing the format parameter, is wrt_x. Relies upon
-  the openxlsx function read.xlsx.
+  Abbreviation, not needing the format parameter, is wrt_x(). Relies upon
+  the openxlsx function read.xlsx().
 
   To write a data file in native R format, use the format=\"R\" option,
-  or the abbreviation for the function name  wrt_r.
+  or the abbreviation for the function name  wrt_r().
       > wrt_r(\"mybestdata\")
 "
 
@@ -290,19 +290,19 @@ function(topic=NULL, width=4.5, height=4.5) {
   f5 <- bquote(paste(bold("Subset"), "  Extract a subset of data, variables (columns) and/or rows"))
 
   t1 <- "
-  R function fix provides a graphical/mouse interface for editing data.
+  R function fix() provides a graphical/mouse interface for editing data.
       > fix(d)
-  lessR function Transform creates a new variable or rewrites over existing.
+  lessR function Transform() creates a new variable or rewrites over existing.
       > d <- Transform(SalaryDiv=Salary/1000)
-  lessR function Recode changes individual values_ 
+  lessR function Recode() changes individual values_ 
       > d <- Recode(Scores, old=c(1:4), new=c(10,15,20,25))
-  R function factor creates a new variable with non-numeric categories.
+  R function factor() creates a new variable with non-numeric categories.
   Severity was encoded with a 1 for Mild, 2 for Moderate and 3 for Severe.
       > d <- Transform(ordered=TRUE, Severity.f= 
                factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
   Here the values of the new variable are also ordered, from Mild to Severe. 
-  Extract subsets of data from a data frame with the lessR Subset function.
-      > d <- Subset(rows=Gender==\"M\", columns=c(Years, Salary))
+  Extract subsets of data from a data frame with lessR function Subset().
+      > d <- Subset(filter=(Gender==\"M\"), columns=c(Years, Salary))
   The data frame, d, now consists only of data for Males limited to
   the variables Years and Salary. To display a subset, drop the d <-.
   "
@@ -329,7 +329,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   f3 <- bquote(paste(bold("showPalettes"), "  lessR function to illustrate color palettes"))
 
   t1 <- "
-  The lessR function style provides style settings for lessR functions.
+  The lessR style() provides style settings for lessR functions.
   The default color style is \"colors\", with many other available. Set a
   new theme to reset all attributes. Other changes cumulate until reset.]
   For example, to convert  to gray scale, 
@@ -373,8 +373,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   f3 <- bquote(paste(bold("Plot, ScatterPlot, sp"), "  Violin/Box/Scatterplot"))
 
   t1 <- "
-  Plot a distribution of data values for a continuous variable with the current
-  color theme, here for variable Y. Traditionally, use Histogram or hs.
+  Plot a distribution of data values for a continuous variable with current
+  color theme, here for variable Y. Traditionally, use Histogram() or hs().
       > Histogram(Y)
   Specify the gray-scale color theme, a title, and a label for the x-axis_
       > style(\"gray\")
@@ -392,8 +392,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   Density curve superimposed on the underlying histogram, or dn.
       > Density(Y) 
 
-  These functions, except sp, can also replace the variable name such as Y 
-  with a list of multiple variables, such as c(Salary, Years) or Salary:Years,
+  These functions, except sp(), can also replace the variable name with
+  a list of multiple variables, such as c(Salary, Years) or Salary:Years,
   or an entire d data frame by passing no argument.
       > Histogram()
   "
@@ -418,15 +418,15 @@ function(topic=NULL, width=4.5, height=4.5) {
   f3 <- bquote(paste(bold("pareto.chart"), "  Produce a Pareto chart"))
 
   t1 <- "
-  Default bar chart with lessR function BarChart, or bc, as well as the
-  frequency table, for one or two variables, here Y and X.
+  Default bar chart with lessR function BarChart(), or bc(), as well as
+  the frequency table, for one or two variables, here Y and X.
       > BarChart(Y)
       > BarChart(Y, by=X)
       
-  With lessR function PieChart or pc, generate a pie chart.
+  With lessR function PieChart() or pc(), generate a ring or pie chart.
       > PieChart(Y)
       
-  The pareto.chart function is part of the external library called gcc
+  The pareto.chart() function is part of the external library called gcc
   (see Help(\"libraries\"). This function is not from lessR, so the name
   of the variable must be preceded by the data frame name and a $. 
       > library(gcc)
@@ -458,9 +458,9 @@ function(topic=NULL, width=4.5, height=4.5) {
   f1 <- bquote(paste(bold("LineChart, lc"), "  A line chart, such as a run chart or time series chart"))
 
   t1 <- "
-  The lessR function LineChart, or lc, generates a line chart with values
-  ordered along some dimension such as time_ If the data do not have a 
-  pronounced trend, a center line is automatically provided.
+  The lessR function LineChart(), or lc(), generates a line chart with
+  values ordered along some dimension such as time_ If the data do not
+  have a pronounced trend, a center line is automatically provided.
       > LineChart(Y)
   or,
       > Plot(Y, run=TRUE)
@@ -473,8 +473,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   title, points and lines. 
 
   Color themes are available with the theme option, which can be invoked
-  from a specific call to LineChart or system wide for all graphics output with
-  the function style Here all subsequent graphics output is in gray scale.
+  from a specific call to LineChart() or system wide for all graphics output
+  with the function style Here all subsequent graphics output is in gray scale.
       > style(\"gray\")
       > LineChart(Y)
 
@@ -500,9 +500,9 @@ function(topic=NULL, width=4.5, height=4.5) {
   f1 <- bquote(paste(bold("Plot, sp"), "  A scatterplot (and more) for one or two variables"))
 
   t1 <- "
-  Plot, or sp, generates a scatter plot for any combination of continuous
-  or categorical variables with the current color theme. For two continuous
-  variables, can have an optional data ellipse and fit line and more.
+  Plot(), or sp(), generates a scatter plot for any combination of
+  continuous or categorical variables with the current color theme.
+  Can have an optional data ellipse, fit line, and more.
       > Plot(X, Y, enhance=TRUE)
   For sorted values of X, a function plot results so that the points are
   not individually displayed and are connected by line segments_ If the
@@ -540,7 +540,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   f1 <- bquote(paste(bold("SummaryStats, ss"), "  Summarize the values of a variable"))
 
   t1 <- "
-  Summarize the variable Y with lessR SummaryStats, or just ss.  If numerical, 
+  Summarize the variable Y with lessR SummaryStats(), or ss().  If numerical, 
   sample size, number of  missing data values, mean, sd, skew, kurtosis,
   minimum, maximum, quartiles and interquartile range are provided. If
   categorical, includes cell counts and proportions, plus the chi-square test.
@@ -582,21 +582,21 @@ function(topic=NULL, width=4.5, height=4.5) {
   proportion of a value of a categorical variable with a hypothesis
   test and confidence interval.
 
-  This example uses the lessR function ttest, or tt, to evaluate a variable
+  Here use the lessR function ttest(), or tt(), to evaluate a variable
   named Y and a null hypothesis of mu=100. The brief version is tt.brief.
       > ttest(Y, mu=100)
 
-  This example uses ttest to do the analysis from the sample statistics.
+  This example uses ttest() to do the analysis from the sample statistics.
       > ttest(n=20, m=47.2, s=8.5, mu=50)
       
   Here test for a fair coin after getting 53 out of 100 Heads. The R function
-  binom.test is based on the exact binomial distribution.  The R prop.test
-  function returns a chi-square value based on the normal approximation
-  of the binomial.
+  binom.test() is based on the exact binomial distribution, and prop.test()
+  returns a chi-square value based on the normal approximation of the
+  binomial.
       > binom.test(53,100, p=.5)
       > prop.test(53,100, p=.5)
 
-  The prop.test function can be specified with or without the Yate's
+  The prop.test() function can be specified with or without the Yate's
   correction for continuity factor. The default is to include the correction."
 
   set.up.plot(3)
@@ -615,7 +615,7 @@ function(topic=NULL, width=4.5, height=4.5) {
                         "two-groups", "mean difference")) {
   t0 <- "Compare Two Group Means"
 
-  f1 <- bquote(paste(bold("ttest, tt"), "  An enhanced version of R t.test to compare two group means"))
+  f1 <- bquote(paste(bold("ttest, tt"), "  An enhanced version of R t.test() to compare two group means"))
   f2 <- bquote(paste(bold("Model, model"), "  The t-test if Y is numerical and X has two values"))
 
   t1 <- "
@@ -625,7 +625,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   is Gender, with two values, M and F.
 
   Here the numerical response variable is named Y and the grouping
-  variable, also called a factor, is named X, with exactly two values_
+  variable is named X, with exactly two values_
       >  ttest(Y ~ X)
   The tilde, ~, expresses the relationship between two or more variables.
   R refers to this expression as a formula, read as: Y is described by X.
@@ -656,16 +656,16 @@ function(topic=NULL, width=4.5, height=4.5) {
   f1 <- bquote(paste(bold("ANOVA, av"), "  Analysis of variance to compare two or more group means"))
   t1 <- "
   When responses to a variable are organized into exactly two groups,
-  either the t-test function, ttest, or the lessR analysis of variance
-  function, ANOVA, or simply av, can compare the group means. With
+  either the t-test function, ttest(), or the lessR analysis of variance
+  function, ANOVA(), or simply av(), can compare the group means. With
   more than two groups, ANOVA is required. Here the numerical response
   variable is named Y and the grouping variable, or factor, is X. 
       > ANOVA(Y ~ X)
   This is called one-way ANOVA because there is only a single factor, X.
 
-  If the ANOaVA with more than two levels is significant, then a post-hoc
+  If the ANOVA with more than two levels is significant, then a post-hoc
   examination of the mean differences with a controlled error rate will help
-  uncover where the differences occurred. The ANOVA function relies
+  uncover where the differences occurred. The ANOVA() function relies
   upon the Tukey HSD procedure, providing both text and graphics output.
 
   For a randomized block ANOVA invoke a blocking factor with a + .
@@ -692,17 +692,17 @@ function(topic=NULL, width=4.5, height=4.5) {
   f1 <- bquote(paste(bold("ttestPower, ttp"), "  Power analysis of the t-test"))
 
   t1 <- "
-  The lessR function, ttestPower, uses the standard R function, power.t.test, to 
-  calculate a range of power values and automatically provide a power curve. 
+  The lessR function, ttestPower(), uses the standard R function, power.t.test(),
+  to calculate a range of power values and automatically provide a power curve. 
 
-  To obtain a power curve with power.t.test requires setting up the range of
+  To obtain a power curve with power.t.test() requires setting up the range of
   alternative mean or mean difference values, usually by trial and error, 
-  invoking ttestPower, saving the results, and then invoking the plot function,
+  invoking ttestPower(), saving the results, and then invoking plot(),
   including the labeling of each axis_ Then to analyze related results such 
-  as power at a different sample size, the ttestPower function must be run
-   several more times. 
+  as power at a different sample size, the ttestPower() function must be run
+  several more times. 
 
-  The enhanced function, ttestPower, does all of this automatically for one 
+  The enhanced function, ttestPower(), does all of this automatically for one 
   or two sample t-tests, and also plots the power curve in color_ This example is 
   for the default power curve for a sample size of 20 in each group and 
   a within-group or pooled standard deviation of 5.
@@ -726,7 +726,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   f3 <- bquote(paste(bold("Plot, sp"), "  Graphics, generate a scatterplot for two or more variables"))
 
   t1 <- "
-  The lessR function Correlation, or cr, computes a correlation for two
+  The lessR function Correlation(), or cr(), computes a correlation for two
   variables, or from a data frame, d by default, the correlation matrix
   with default pairwise deletion of missing data. A heat map and scatter plot
   matrix follow from graphics=TRUE. The matrix is displayed and also is
@@ -766,14 +766,14 @@ function(topic=NULL, width=4.5, height=4.5) {
   f2 <- bquote(paste(bold("Model, model"), "  Regression analysis if the variables are numerical"))
 
   t1 <- "
-  The full text output of Regression, or reg, is comprehensive. Here
-  specify a multiple regression of response Y and two predictors,
-  X1 and X2.
+  The full text output of Regression(), or reg(), is comprehensive.
+  Here specify a multiple regression of response Y and two
+  predictors, X1 and X2.
        > Regression(Y ~ X1 + X2)
   Obtain abbreviated output with brief=TRUE, or use the abbreviation,
        > reg.brief(Y ~ X1 + X2)
 
-  Specify a file name with the Rmd parameter and obtain full interpretative
+  Specify a file name with the Rmd parameter to obtain full interpretative
   output from generated R Markdown instructions right to a web browser.
        > r <- reg(Y ~ X1 + X2, Rmd=\"reg_out\")
        > r                       # to see all the output
@@ -785,8 +785,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   
   To obtain specified prediction intervals for new data, for example,
        > reg(Y ~ X1 + X2, X1_new=c(10,20), X2_new=c(100:110))
-  X1_new, X2_new, etc. always specify the values of the predictor
-  variables for the prediction intervals regardless of their names."
+  X1_new, X2_new, etc. specify the values of the predictor variables
+  for the prediction intervals regardless of their names."
 
   set.up.plot(1)
   text(50,100, label=t0, font=4)
@@ -805,16 +805,16 @@ function(topic=NULL, width=4.5, height=4.5) {
   f2 <- bquote(paste(bold("Model, model"), "  Logit analysis if a binary response variable"))
 
   t1 <- "
-  Logit preforms a logit analysis. This example specifies a multiple
+  Logit() preforms a logit analysis. This example specifies a multiple
   regression model with a response variable named Y that has only two
   values, and two predictor variables, X1 and X2.
       > Logit(Y ~ X1 + X2)
-  The standard R formula function specifies the model, which uses the
+  The standard R formula() function specifies the model, which uses the
   tilde, ~, to mean 'depends on', and then the plus sign, +, to
   separate terms.
 
   The input values are not limited to 0 and 1. The output follows the
-  general format of the Regression function, but also includes the
+  general format of the Regression() function, but also includes the
   classification table of correct and incorrect predictions.
 
   The abbreviated form of the function is lr, such as
@@ -843,19 +843,19 @@ function(topic=NULL, width=4.5, height=4.5) {
 
   t1 <- "
   Several lessR functions analyze data in the form of a correlation matrix,
-  by default called: mycor.  Read mycor with corRead, often with the lessR
+  by default called: mycor.  Read mycor with corRead(), often with the lessR
   function, to, which names a string of sequential variables (items).
       > corRead(names=to(\"m\",20))
   Here browse for the file that contains the matrix, name the 20 variables
   from m01, m02 to m20. Can also compute mycor with Correlation.
 
-  The function corCFA, or cfa, does a confirmatory factor analysis of a
+  The function corCFA(), or cfa(), does a confirmatory factor analysis of a
   multiple indicator measurement model. Use lavaan notation, or specify each
   group of items by listing the factor name, Fn, and the corresponding 
   variable names, with items separated by commas or a colon.
       > cfa(F1=V1:V3, F2=V4:V6)
 
-  Accomplish exploratory factor analysis with CorEFA, or just efa.
+  Accomplish exploratory factor analysis with CorEFA(), or just efa().
       > efa(n.fact=2)
   The output includes a specification of the multiple indicator measurement
   model derived from the analysis, plus the corCFA code to analyze.
@@ -885,10 +885,10 @@ function(topic=NULL, width=4.5, height=4.5) {
 
 
   t1 <- "
-  By default, the lessR function prob.norm, provides the corresponding probability
-  of obtaining a randomly sampled normal value, Y, in a range of specified values, as
-  well as a plot of the normal curve. The R function pt provides the corresponding
-  probability for the t-distribution.
+  By default, the lessR function prob.norm(), provides the corresponding probability
+  of obtaining a randomly sampled normal value, Y, in a range of specified values,
+  as well as a plot of the normal curve. The R function pt() provides the
+  corresponding probability for the t-distribution.
 
   Upper tail probability for t=1.627, df=24:  > pt(1.627, df=24, lower.tail=FALSE)
   Two-tailed p-value for  t=1.627, df=24:     > 2*pt(1.627, df=24, lower.tail=FALSE)
@@ -963,7 +963,7 @@ function(topic=NULL, width=4.5, height=4.5) {
   f1 <- bquote(paste(bold("sample"), "  Generate random samples"))
 
   t1 <- "
-  To use the sample function, first specify the population from which to randomly 
+  To use the sample() function, specify the population from which to randomly 
   sample. The population can be defined from the values of a specified variable,
   or the values can be directly listed. Next specify the size to specify the
   number of elements to sample. By default, sampling is done without replacement,

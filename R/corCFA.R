@@ -59,7 +59,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
   if (labels!="only") {
     cor.nm <- deparse(substitute(x))
     .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
-    if (class(x) == "out_all")
+    if ("out_all" %in% class(x))  # R 4.0 results in two values: matrix, array
       x <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
   }
   else  # if only labels, then need the data 

@@ -1,5 +1,5 @@
 Histogram <-
-function(x=NULL, data=d, rows=NULL,
+function(x=NULL, data=d, filter=NULL,
          stat_x=c("count", "proportion"),
          n_cat=getOption("n_cat"), Rmd=NULL,
 
@@ -26,7 +26,7 @@ function(x=NULL, data=d, rows=NULL,
     density=FALSE, dn.hist=TRUE,
     bw=NULL, type=c("general", "normal", "both"),
     color_gen="gray20", color_nrm="gray20",
-    fill_hist=getOption("violin_fill"), fill_nrm=NULL, fill_gen=NULL,
+    fill_hist=getOption("se_fill"), fill_nrm=NULL, fill_gen=NULL,
     x.pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
 
@@ -183,8 +183,8 @@ function(x=NULL, data=d, rows=NULL,
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
       ind <- eval(substitute(x), envir=data.vars)  # col num of each var     
-      if (!missing(rows)) {  # subset rows
-        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+      if (!missing(filter)) {  # subset rows
+        r <- eval(substitute(filter), envir=data, enclos=parent.frame())
         r <- r & !is.na(r)  # set missing for a row to FALSE
         data <- data[r,,drop=FALSE]
       }

@@ -1,8 +1,6 @@
 Plot <-
-function(x, y=NULL, data=d, rows=NULL, enhance=FALSE, 
-         stat_x=c("data", "count", "proportion", "%"),
-         stat_yx=c("data", "sum", "mean", "sd", "dev", "min", "median", "max"),
-         n_cat=getOption("n_cat"),
+function(x, y=NULL, data=d, filter=NULL, enhance=FALSE, 
+         stat="data", n_cat=getOption("n_cat"),
 
          by=NULL, by1=NULL, by2=NULL,
          n_row=NULL, n_col=NULL, aspect="fill",
@@ -72,6 +70,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
                 "scale.x", "scale.y",  "eval.df", "digits.d", "fun.call",
                 "do.plot", "pdf.file")
     for (i in 1:length(dots)) {
+      if (names(dots)[i] == "stat_x") stat <- dots[[i]]
+      if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
       if (names(dots)[i] %in% change) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
@@ -90,17 +90,15 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   if (is.null(fun_call)) fun_call <- match.call()
    
   # limit actual argument to alternatives, perhaps abbreviated
-  stat_yx.miss <- ifelse (missing(stat_yx), TRUE, FALSE)
   sort_yx.miss <- ifelse (missing(sort_yx), TRUE, FALSE)
   sort_yx <- match.arg(sort_yx)
 
-  stat_x <- match.arg(stat_x)
-  stat_yx <- match.arg(stat_yx)
   center_line <- match.arg(center_line)
-  data.do <- ifelse ((stat_x == "data") && (stat_yx == "data"), TRUE, FALSE)
 
-  proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
-  prop <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal (Trellis)
+  data.do <- ifelse ((stat == "data"), TRUE, FALSE)
+
+  proportion <- FALSE  # old signal, adjusted below if needed
+  if (stat == "proportion") proportion <- TRUE
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
   if (is.null(eval_df))  # default values
@@ -177,8 +175,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   n_row.miss <- ifelse (missing(n_row), TRUE, FALSE)
   add_miss <- ifelse (missing(add), TRUE, FALSE)
 
-
-  stat <- ifelse(y.miss, stat_x, stat_yx) 
 
   if (!missing(a) || !missing(b)) box_adj <- TRUE
 
@@ -294,7 +290,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # ------
   # see if dated or inconsistent parameter values
   .param.old(...)
-  .plt.bad(x.miss, y.miss, stat_yx, breaks, bin_start, n_row, n_col,
+  .plt.bad(x.miss, y.miss, stat, breaks, bin_start, n_row, n_col,
            MD_cut, out_cut, fit_se, ...)
 
   # ---------------------------------
@@ -309,6 +305,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   if (!is.null(dfs)) {
     if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
       d <- mydata
+      rm(mydata)
       df.name <- "mydata"
       mydata.ok <- TRUE
       options(dname = df.name)
@@ -322,8 +319,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
  
   # if a tibble convert to data frame
   if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  # tibble to df
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+    if (df.name %in% dfs) {  
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {  # tibble to df
         data <- data.frame(data, stringsAsFactors=FALSE)
       }
     }
@@ -342,7 +339,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   #  get data to be analyzed into data.x data frame
 
   # process row.names if specified
-  if (x.name == "row.names") {
+  if (x.name %in% c("row_names", "row.names")) {
     # retain order of row names, otherwise will be alphabetical
     data.x <- data.frame(factor(row.names(data), levels=row.names(data)))
     if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
@@ -359,8 +356,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     names(data.vars) <- names(data)
     x.col <- eval(substitute(x), envir=data.vars)  # col num of each var
     
-    if (!missing(rows)) {  # subset rows
-      r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+    if (!missing(filter)) {  # subset rows
+      r <- eval(substitute(filter), envir=data, enclos=parent.frame())
       r <- r & !is.na(r)  # set missing for a row to FALSE
       data <- data[r,,drop=FALSE]
     }
@@ -549,7 +546,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   
     y.in.global <- .in.global(y.name)  # see if in global, includes vars lists
 
-    if (deparse(substitute(y)) == "row.names") {
+    # row.names deprecated
+    if (deparse(substitute(y)) %in% c("row_names", "row.names")) {
       # retain order of row names, otherwise will be alphabetical
       y.call <- factor(row.names(data), levels=row.names(data))
       if (is.null(ylab)) ylab <- ""  # unless specified, drop the axis label
@@ -1049,7 +1047,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       object <- "point"
       if (data.do) if (cat.x && cat.y) object <- "bubble"
     }
-    else if (stat_x %in% c("count", "proportion", "%")) {
+    else if (stat %in% c("count", "proportion", "%")) {
       object <- "point"
     }
     else {
@@ -1073,7 +1071,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         names(x.call) <- "Index"
       }
 
-      else if (stat_x %in% c("count", "proportion", "%")) {  # frequency polygon
+      else if (stat %in% c("count", "proportion", "%")) {  # frequency polygon
 
         ssstuff <- .ss.numeric(x.call[,1], digits_d=digits_d, brief=TRUE)
        
@@ -1090,7 +1088,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         n_cat <- 0  # not many midpoints, do not want to trigger num.cat
         x.call <- h$mids
         y.call <- h$counts
-        if (stat_x == "count")
+        if (stat == "count")
           ylab <- paste("Count of", x.name)
         else {
           y.call <- y.call / sum(y.call)
@@ -1163,11 +1161,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
     else {  # cat.x
       # just x variable, so set y.call to plot points for count and prop
-      if (stat_x %in% c("count", "proportion", "%")) {
+      if (stat %in% c("count", "proportion", "%")) {
         if (Trellis) {  # follow dot plot format and do horizontal plot
           cat.y <- FALSE
           if (seg.x.miss) segments_x <- TRUE
-          ylab <- ifelse (stat_x == "count", "Count of", "Proportion of")
+          ylab <- ifelse (stat == "count", "Count of", "Proportion of")
           ylab <- paste(ylab, x.name)
           x.call <- data.frame(x.call)
         }  # end if Trellis
@@ -1175,17 +1173,17 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         else {  # not Trellis, so manually flip to match dot plot style
           cat.x <- FALSE
           if (seg.y.miss) segments_y <- TRUE
-          if (stat_x == "count")
+          if (stat == "count")
             xlab <- "Count of"
-          else if (stat_x == "proportion")
+          else if (stat == "proportion")
             xlab <- "Proportion of"
           else 
             xlab <- "Percentage of"
           xlab <- paste(xlab, x.name)
           ylab <- NULL
           frq <- table(x.call)
-          if (stat_x == "proportion") frq <- frq / sum(frq)
-          if (stat_x == "%") frq <- (frq / sum(frq)) * 100
+          if (stat == "proportion") frq <- frq / sum(frq)
+          if (stat == "%") frq <- (frq / sum(frq)) * 100
           if (is.factor(x.call))  # preserve ordering, will lose order attribute
             y.call <- factor(names(frq), levels=levels(x.call))
           else
@@ -1357,7 +1355,7 @@ if (is.null(out_size)) out_size <- size.pt
 
       if (seg.x.miss) segments_x <- TRUE
       .bar.lattice(x.call[,1], by1.call, by2=NULL, n_row, n_col, aspect,
-                   prop, pt_fill, pt_color,
+                   proportion, pt_fill, pt_color,
                    pt.trans, size.pt, xlab, ylab, main,
                    rotate_x, offset,
                    width, height, pdf_file,
@@ -1407,7 +1405,7 @@ if (is.null(out_size)) out_size <- size.pt
 
   else {  # all the other analyses
 
-    if (stat_yx %in% c("sum", "mean", "sd", "dev", "min", "median", "max")) {
+    if (stat %in% c("sum", "mean", "sd", "dev", "min", "median", "max")) {
 
       n_cat <- 0
       means <- FALSE
@@ -1442,32 +1440,32 @@ if (is.null(out_size)) out_size <- size.pt
       }
 
     # set up new x.call and y.call for stats
-      if (stat_yx == "sum") {
+      if (stat == "sum") {
         ylab <- paste("Sum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], sum, na.rm=TRUE)
       }
-      if (stat_yx == "mean") {
+      if (stat == "mean") {
         ylab <- paste("Mean of", y.name)
         out <- tapply(y.call[,1], x.call[,1], mean, na.rm=TRUE)
       }
-      if (stat_yx == "sd") {
+      if (stat == "sd") {
         ylab <- paste("Standard Deviation of", y.name)
         out <- tapply(y.call[,1], x.call[,1], sd, na.rm=TRUE)
       }
-      if (stat_yx == "dev") {
+      if (stat == "dev") {
         ylab <- paste("Mean Deviations of", y.name)
         out <- tapply(y.call[,1], x.call[,1], mean, na.rm=TRUE)
         out <- out - mean(out, na.rm=TRUE)
       }
-      if (stat_yx == "min") {
+      if (stat == "min") {
         ylab <- paste("Minimum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], min, na.rm=TRUE)
       }
-      if (stat_yx == "median") {
+      if (stat == "median") {
         ylab <- paste("Median of", y.name)
         out <- tapply(y.call[,1], x.call[,1], median, na.rm=TRUE)
       }
-      if (stat_yx == "max") {
+      if (stat == "max") {
         ylab <- paste("Maximum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], max, na.rm=TRUE)
       }

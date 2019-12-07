@@ -15,7 +15,7 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, c
 }
 
 \usage{
-Histogram(x=NULL, data=d, rows=NULL,
+Histogram(x=NULL, data=d, filter=NULL,
           stat_x=c("count", "proportion"),
           n_cat=getOption("n_cat"), Rmd=NULL,
 
@@ -42,7 +42,7 @@ Histogram(x=NULL, data=d, rows=NULL,
     density=FALSE, dn.hist=TRUE,
     bw=NULL, type=c("general", "normal", "both"),
     color_gen="gray20", color_nrm="gray20",
-    fill_hist=getOption("violin_fill"), fill_nrm=NULL, fill_gen=NULL,
+    fill_hist=getOption("se_fill"), fill_nrm=NULL, fill_gen=NULL,
     x.pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
 
@@ -64,8 +64,8 @@ hs(\ldots)
         frame, \code{d} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{d}.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
-       to analyze.}
+  \item{filter}{A logical expression that specifies a subset of rows of
+       the data frame to analyze.}
   \item{stat_x}{Bin and transform values of variable \code{x} into
        \code{"counts"} by default or \code{"proportion"} if specified,
        that is, frequencies or relative frequencies.}
@@ -183,7 +183,7 @@ hs(\ldots)
   \item{color_gen}{Color of the general density curve.}
   \item{color_nrm}{Color of the normal curve.}
   \item{fill_hist}{Fill color for the histogram behind density curve,
-       defaults to light gray.} 
+       defaults to a light gray.} 
   \item{fill_nrm}{Fill color for the estimated normal curve, with a partially 
        transparent blue as the default, and transparent for the gray theme.}
   \item{fill_gen}{Fill color for the estimated general density curve, with a
@@ -255,7 +255,7 @@ The data may either be a vector from the global environment, the user's workspac
 
 To obtain a histogram of each numerical variable in the \code{d} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{color_bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{lightbronze}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub_theme="black")} for a black background and partial transparency of plotted colors. 
@@ -350,7 +350,7 @@ Histogram(Salary, color="off")
 #Histogram(Salary, pdf=TRUE)
 
 # just males employed more than 5 years
-Histogram(Salary, rows=(Gender=="M" & Years > 5))
+Histogram(Salary, filter=(Gender=="M" & Years > 5))
 
 # histogram with red bars, black background, and black border
 style(panel_fill="black", fill="red", panel_color="black")

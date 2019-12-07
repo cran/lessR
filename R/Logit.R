@@ -1,11 +1,11 @@
 Logit <-
-function(my_formula, data=d, rows=NULL,
+function(my_formula, data=d, filter=NULL,
          digits_d=4, text_width=120, 
 
          brief=getOption("brief"),
 
          res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"), 
-         pred=TRUE, pred_all=FALSE, cooks_cut=1, 
+         pred=TRUE, pred_all=FALSE, prob_cut=0.5, cooks_cut=1, 
 
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL, 
          X5_new=NULL, X6_new=NULL, 
@@ -112,8 +112,8 @@ function(my_formula, data=d, rows=NULL,
   n.vars <- length(nm)
   n.pred <- n.vars - 1
 
-  if (!missing(rows)) {  # subset rows
-    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+  if (!missing(filter)) {  # subset rows
+    r <- eval(substitute(filter), envir=data, enclos=parent.frame())
     r <- r & !is.na(r)  # set missing for a row to FALSE
     data <- data[r,,drop=FALSE]
   }
@@ -328,7 +328,7 @@ function(my_formula, data=d, rows=NULL,
   if (pred)
     .logit4Pred(lm.out, nm, df.name, my_formula, brief, res_rows,
          n.vars, n.pred, n.obs, n.keep, digits_d, pre, line,
-         new.data, pred, pred_all, 
+         new.data, pred, pred_all, prob_cut, 
          numeric.all, in.data.frame, X1_new, 
          X2_new, X3_new, X4_new, X5_new, X6_new,
          pdf_file, width, height)

@@ -21,9 +21,9 @@ The \code{lessR} function \code{\link{corRead}} reads a correlation matrix.
 }
 
 \usage{
-Read(from=NULL, format=NULL,
+Read(from=NULL, format=NULL, var_labels=FALSE,
 
-         var_labels=FALSE, widths=NULL, stringsAsFactors=FALSE,
+         widths=NULL, stringsAsFactors=FALSE,
 
          missing="", n_mcut=1,
          miss_show=30, miss_zero=FALSE, miss_matrix=FALSE, 

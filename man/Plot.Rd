@@ -34,10 +34,8 @@ Represent the influence of additional categorical variables with \code{by1} or \
 }
 
 \usage{
-Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
-         stat_x=c("data", "count", "proportion", "\%"),
-         stat_yx=c("data", "sum", "mean", "sd", "dev", "min", "median", "max"),
-         n_cat=getOption("n_cat"),
+Plot(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
+         stat="data", n_cat=getOption("n_cat"),
 
          by=NULL, by1=NULL, by2=NULL,
          n_row=NULL, n_col=NULL, aspect="fill",
@@ -116,7 +114,7 @@ vp(\ldots)
         Can be in a data frame or defined in the global environment.} 
   \item{data}{Optional data frame that contains one or both of \code{x} and
         \code{y}. Default data frame is \code{d}.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+  \item{filter}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{enhance}{For a two-variable scatterplot, if \code{TRUE},
         automatically add the 0.95 data ellipse, 
@@ -125,17 +123,13 @@ vp(\ldots)
         the best-fitting least squares line of the regular data without the
         outliers, and a horizontal and vertical line to represent the mean of
         each of the two variables.}
-  \item{stat_x}{Transform data for categorical variable \code{x}
+  \item{stat}{Transform data for categorical variable \code{x}
        into a simple table of paired levels of
-       \code{x} with numerical values of \code{y}, height of each bar.
+       \code{x} with numerical values of \code{y}.
        Apply specified transformation such as \code{"count"}
-       to each of the levels of \code{x}. Dot plot analogous to a bar chart.}
-  \item{stat_yx}{Transformation of \code{y} for each level of \code{x}.
-       Transform data into a simple table of paired levels of
-       \code{x} with numerical values of \code{y}. Apply specified transformation
-       of \code{y} to the levels of \code{x}, that is,
-       \code{"mean"}, \code{sd}, etc.}
-
+       to each of the levels of \code{x}, and, for a provided numerical
+       variable $y$, transformations such as \code{"mean"}, \code{sd}, etc.
+       The resulting dot plot is analogous to a bar chart.}
   \item{n_cat}{Number of categories, specifies the largest number of
         unique, equally spaced integer values of a variable for which
         the variable will be analyzed as categorical instead of continuous.
@@ -446,7 +440,7 @@ vp(\ldots)
         Not a literal maximum as preserving unique values may require a larger number
         of characters than specified.}
   \item{origin_x}{Origin of \code{x}-axis_ Starting value of \code{x}, by
-       default the minimum value of \code{x}, except when \code{stat_x}
+       default the minimum value of \code{x}, except when \code{stat}
        is set to \code{"count"} or related  where the origin is zero
        by default, but can be modified.}
   \item{legend_title}{Title of the legend for a multiple-variable \code{x}
@@ -534,9 +528,9 @@ A scatterplot of Likert type data is problematic because there are so few possib
 DATA\cr
 The default input data frame is \code{d}. Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{d$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment.
 
-The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis_ For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin_width}, to override default values_ The \code{stat_x} or \code{stat_yx} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
+The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis_ For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin_width}, to override default values_ The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
        
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 VALUE LABELS\cr
 The value labels for each axis can be over-ridden from their values in the data to user supplied values with the \code{value_labels} option. This option is particularly useful for Likert-style data coded as integers. Then, for example, a 0 in the data can be mapped into a "Strongly Disagree" on the plot. These value labels apply to integer categorical variables, and also to factor variables. To enhance the readability of the labels on the graph, any blanks in a value label translate into a new line in the resulting plot. Blanks are also transformed as such for the labels of factor variables. 
@@ -702,7 +696,7 @@ Plot(Years, Salary, scale_x=c(-10, 35, 10), scale_y=c(0,200000,10))
 \donttest{
 
 # just males employed more than 5 years
-Plot(Years, Salary, rows=(Gender=="M" & Years > 5))
+Plot(Years, Salary, filter=(Gender=="M" & Years > 5))
 
 # plot 0.95 data ellipse with the points identified that represent
 #   outliers defined by a Mahalanobis Distance larger than 6 
@@ -825,7 +819,7 @@ BoxPlot(Salary, by1=Dept)
 # ----------------------------
 # bin the values of Salary to plot counts as a frequency polygon
 # the counts are plotted as points instead of the data
-Plot(Salary, stat_x="count")  # bin the values
+Plot(Salary, stat="count")  # bin the values
 
 # time charts
 #------------
@@ -861,7 +855,7 @@ style()
 # stock prices for three companies by month:  Apple, IBM, Intel
 d <- rd("StockPrice")
 # only plot Apple
-Plot(date, Price, rows=(Company=="Apple"))
+Plot(date, Price, filter=(Company=="Apple"))
 # Trellis plots, one for each company
 Plot(date, Price, by1=Company, n_col=1)
 # all three plots on the same panel, three shades of blue
@@ -883,7 +877,7 @@ Plot(Dept)
 Plot(Dept, label_max=2)
 
 # plot of frequencies for each category (level), replaces bar chart 
-Plot(Dept, stat_x="count")
+Plot(Dept, stat="count")
 
 
 #----------------------------------------------------
@@ -902,13 +896,13 @@ style()
 #-------------------
 
 # row.names on the y-axis
-Plot(Salary, row.names)
+Plot(Salary, row_names)
 
 # standard scatterplot
-Plot(Salary, row.names, sort_yx="0", segments_y=FALSE)
+Plot(Salary, row_names, sort_yx="0", segments_y=FALSE)
 
 # Cleveland dot plot with two x-variables
-Plot(c(Pre, Post), row.names)
+Plot(c(Pre, Post), row_names)
 
 
 #------------
@@ -969,7 +963,7 @@ style()  # reset theme
 \donttest{
 
 # proportions within each level of the other variable
-Plot(m06, m07, stat_x="proportion", n_cat=6)
+Plot(m06, m07, stat="proportion", n_cat=6)
 
 # get correlation analysis instead of cross-tab analysis
 # rely upon the default value of n_cat=0 so that integer

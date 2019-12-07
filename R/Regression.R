@@ -1,5 +1,5 @@
 Regression <-
-function(my_formula, data=d, rows=NULL, kfold=0,
+function(my_formula, data=d, filter=NULL, kfold=0,
          digits_d=NULL, standardize=FALSE,
 
          Rmd=NULL, Rmd_browser=TRUE, 
@@ -129,8 +129,8 @@ function(my_formula, data=d, rows=NULL, kfold=0,
   n.vars <- length(nm)
   n.pred <- n.vars - 1L
 
-  if (!missing(rows)) {  # subset rows
-    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+  if (!missing(filter)) {  # subset filter
+    r <- eval(substitute(filter), envir=data, enclos=parent.frame())
     r <- r & !is.na(r)  # set missing for a row to FALSE
     data <- data[r,,drop=FALSE]
   }

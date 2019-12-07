@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.8.9     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.9.0     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
       "                           d: default data frame, no need for data=\n",

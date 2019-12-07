@@ -15,7 +15,7 @@ When output is assigned into an object, such as \code{d} in \code{d <- dn(Y)}, t
 }
 
 \usage{
-Density(x, data=d, rows=NULL,
+Density(x, data=d, filter=NULL,
         n_cat=getOption("n_cat"), Rmd=NULL, 
 
        bw=NULL, type=c("general", "normal", "both"),
@@ -46,7 +46,7 @@ dn(\ldots)
         frame, \code{d} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{d}.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+  \item{filter}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{n_cat}{For the analysis of multiple variables, such as a data frame,
         specifies the largest number of unique values of variable of a numeric data
@@ -136,7 +136,7 @@ If \code{x.pt} is specified, then \code{type} is set to general and \code{y_axis
 DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{d}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{d$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
        
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than.
 
 COLOR THEME\cr
 Individual colors in the plot can be manipulated with options such as \code{color_bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{blue}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub_theme="black")} for a black background and partial transparency of plotted colors. 

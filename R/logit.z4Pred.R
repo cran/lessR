@@ -1,10 +1,12 @@
 .logit4Pred <-
 function(lm.out, nm, d, my_formula, brief, res_rows,
          n.vars, n.pred, n.obs, n.keep, digits_d, pre, line,
-         new.data, pred, pred_all, 
+         new.data, pred, pred_all, prob_cut, 
          numeric.all, in.data.frame, X1_new, 
          X2_new, X3_new, X4_new, X5_new, X6_new,
          pdf_file, width, height, ...) {
+
+# table(CarData$rating,predict(logisticModel,type='response')>=0.5)
 
   pred_sort <- TRUE  # data must be sorted to find cases close to fitted=0.5
 
@@ -26,7 +28,7 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     # classification
     prd <- integer(length=nrow(p.int))
     for (i in 1:nrow(p.int))
-      if (p.int$fit[i]<0.5) prd[i] <- 0 else prd[i] <- 1
+      if (p.int$fit[i] < prob_cut) prd[i] <- 0 else prd[i] <- 1
 
     if (all(prd == 0)  ||  all(prd==1)) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -96,9 +98,14 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     if (is.factor(lm.out$model[,nm[1]]))
       cat(" 0: ", levels(lm.out$model[,nm[1]])[1], "\n",
           " 1: ", levels(lm.out$model[,nm[1]])[2], "\n", sep="")
+    cat("\n")
+    cat("Probability threshold for predicting ",
+        levels(lm.out$model[,nm[1]])[2], ":", " ", prob_cut, "\n", sep="")
+    cat("\n")
     cat(.fmtc(" ",ln+8), "Baseline         Predicted", "\n")
     .dash(51)
     cat(.fmtc(" ",ln+7), "Total  %Tot        0      1  %Correct", "\n")
+    .dash(51)
     cat(.fmtc(" ",ln), "  0  ", .fmti(tot0,6), .fmt(100*per0G,1,5), " ",
         .fmti(hit0,6), .fmti(mis0,6), "   ",
         .fmt(100*per0,1), "\n")
@@ -108,6 +115,16 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     .dash(51)
     cat(.fmtc(" ",ln), "Total", .fmti(totG,6), .fmtc(" ",25),
         .fmt(100*perT,1), "\n")
+    cat("\n")
+
+    hit1 <- hitT - hit0
+    mis1 <- tot1 - hit1
+    accuracy <- ((hit0 + hit1) / (hit0 + hit1 + mis0 + mis1)) * 100
+    recall <- ((hit1) / (hit1 + mis1)) * 100
+    precision <- ((hit1) / (hit1 + mis0)) * 100
+    cat("Accuracy:", .fmt(accuracy,2), "\n")
+    cat("Recall:", .fmt(recall,2), "\n")
+    cat("Precision:", .fmt(precision,2), "\n")
     cat("\n")
   }
 

@@ -19,7 +19,7 @@ function (R=mycor, vars,
   # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
   cor.nm <- deparse(substitute(R))
   .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
-  if (class(R) == "out_all")
+  if ("out_all" %in% class(R))    # R 4.0 results in two values: matrix, array
     R <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
 
 

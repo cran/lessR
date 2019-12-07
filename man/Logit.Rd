@@ -15,13 +15,13 @@ Can also be called from the more general \code{\link{model}} function.
 }
 
 \usage{
-Logit(my_formula, data=d, rows=NULL,
+Logit(my_formula, data=d, filter=NULL,
       digits_d=4, text_width=120, 
 
      brief=getOption("brief"),
 
      res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"), 
-     pred=TRUE, pred_all=FALSE, cooks_cut=1, 
+     pred=TRUE, pred_all=FALSE, prob_cut=0.5, cooks_cut=1, 
 
      X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL, 
      X5_new=NULL, X6_new=NULL,
@@ -38,13 +38,15 @@ lr(\ldots)
        X2, specify the corresponding linear model as Y ~ X1 + X2.}
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{d}, otherwise explicitly specify.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+  \item{filter}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits.
         For the rest of the output, it is a suggestion only.}
-  \item{text_width}{Width of the text output at the console.}
+  \item{text_width}{Width of the text output at the console.}\cr
+
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
-       with \code{\link{style}} function.}
+       with \code{\link{style}} function.}\cr
+
   \item{res_rows}{Default is 25, which lists the first 25 rows of data sorted by the
        specified sort criterion.  To turn this option off, specify a value of 0.  To see 
        the output for all observations, specify a value of \code{"all"}.}
@@ -56,9 +58,12 @@ lr(\ldots)
        for each row, or selected rows, of data.}
   \item{pred_all}{Default is \code{FALSE}, which produces prediction intervals only for the
        first, middle and last five rows of data.}
+  \item{prob_cut}{Probability threshold for classifying an observation into the
+        reference group (1) or not (0).}
   \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a larger value 
        are flagged in red and labeled in the resulting scatterplot of Residuals and Fitted 
-       Values.  Default value is 1.0.}
+       Values.  Default value is 1.0.}\cr
+
   \item{X1_new}{Values of the first listed predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{X2_new}{Values of the second listed predictor variable for which forecasted values
@@ -70,10 +75,12 @@ lr(\ldots)
   \item{X5_new}{Values of the fifth listed predictor variable for which forecasted values
         and corresponding prediction intervals are calculated.}
   \item{X6_new}{Values of the sixth listed predictor variable for which forecasted values
-        and corresponding prediction intervals are calculated.}
+        and corresponding prediction intervals are calculated.}\cr
+
   \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
-  \item{height}{Height of the pdf file in inches.}
+  \item{height}{Height of the pdf file in inches.}\cr
+
   \item{\dots}{Other parameter values for R function \code{\link{glm}} which provides the core computations.} 
 }
 
@@ -88,7 +95,7 @@ The default analysis provides the model's parameter estimates and corresponding 
 DATA\cr
 The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{d}.
 
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 GRAPHICS\cr
 For models with a single predictor variable, a scatter plot of the data is produced, which also includes the fitted values_ As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. If more than a single predictor variable, then a scatter plot matrix is produced. 
@@ -119,7 +126,7 @@ Following the standard \code{R} function \code{\link{glm}}, invisibly returns an
 \examples{
 # Gender has values of "M" and "F"
 d <- Read("Employee", quiet=TRUE)
-# logit regression
+# logit regression, rely upon default parameter value: data=d
 Logit(Gender ~ Years)
 
 # short name
@@ -129,11 +136,14 @@ lr(Gender ~ Years)
 Logit(Gender ~ Years, res_row=8, res_sort="rstudent", digits_d=8, pred=FALSE)
 
 # just for employees who have worked more than 5 years at the firm
-Logit(Gender ~ Years, rows=(Years > 5))
+Logit(Gender ~ Years, filter=(Years > 5))
 
 # Multiple logistic regression model
 # Provide all default analyses
 Logit(Gender ~ Years + Salary)
+
+# change the prediction probability threshold from 0.5
+Logit(Gender ~ Years + Salary, prob_cut=.7)
 
 # compare nested models
 # easier and better treatment of missing data to use lessR function:  Nest
@@ -147,7 +157,6 @@ anova(reduced_model, full_model)
 
 # Specify new values of the predictor variables to calculate
 #  forecasted values
-# Specify an input data frame other than d
 d <- Read("Cars93")
 Logit(Source ~ HP + MidPrice, X1_new=seq(100,250,50), X2_new=c(10,60,10))
 }

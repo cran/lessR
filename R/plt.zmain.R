@@ -286,6 +286,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   rm <- rm + 0.10  # make room when the last axis date > last data value
 
+  if ((options("device") != "RStudioGD")  &&  !is.null(by)) rm <- rm + .3
+
   # user manual adjustment
   bm <- bm + bm.adj
   mm <- mm + lm.adj
@@ -510,9 +512,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       col_color <- getOption("pt_color")  # default
   }
 
-
-
-
   if (object %in% c("point", "both")) {
 
     color <- character(length=length(n.clrs))
@@ -573,7 +572,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         fill <- .color_range(.get_fill(), n.clrs)  # see if range
       }
     } # end n.clrs > 1
-
     
     #  kludge needed for Plot(c(x1,x2), y)
     if (length(col_color) < length(fill) &&  # more fill than color colors
@@ -1189,7 +1187,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }  # fit.line
 
 
-  # add enhancements
+  # annotations 
 
   if (!is.null(add)) if (add[1] == "means") {
     add[1] <- "v_line"

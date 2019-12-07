@@ -8,6 +8,54 @@ Update History for Package 'lessR'
 
  
  
+>>>>>> Changes for lessR version 3.9.0 (2019-12-07) <<<<<<
+
+-------------
+Updates 3.9.0
+-------------
+
+BarChart
+  values written to more bars if beside=TRUE
+
+BarChart, Plot
+  row names variable now row_names instead of row.names
+
+BarChart, Histogram, Plot
+  row parameter for filtering rows changed from rows to filter
+  stat_x and stat_yx parameters merged into stat, old still work
+
+Histogram
+  default fill color of histogram, fill_hist, darkened a bit, from
+    violin_fill to se_fill
+
+Logit
+  prob_cut probability threshold parameter added so default of 0.5
+    can be changed for predicting (classifying) group membership
+  in addition to accuracy, recall and precision fit indices added
+
+Plot
+  stat_x and stat_yx parameters merged into stat, old still work
+  rm extended by 0.3 inches for by plots
+
+Regression
+  scatterplot matrix text display font size better optimized
+
+
+---------------
+Bug Fixes 3.9.0
+--------------- 
+
+Plot
+  trellis dot plot works, for both "count" and "proportion"
+
+Sort
+  direction parameter works
+
+tt_test
+  correct variable listed on the horizontal axis for two-group plot
+ 
+ 
+
 >>>>>> Changes for lessR version 3.8.9 (2019-08-25) <<<<<<
 
 -------------

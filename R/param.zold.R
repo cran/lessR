@@ -58,6 +58,17 @@ function (...) {
           "option  area=TRUE  renamed  fill=\"on\" or area_fill=\"on\"\n\n")
       }
 
+
+      if (names(dots)[i] == "rows") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  rows  renamed  filter\n\n")
+      }
+
+      if (names(dots)[i] == "area") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "option  area=TRUE  renamed  fill=\"on\" or area_fill=\"on\"\n\n")
+      }
+
       if (names(dots)[i] == "ref") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "option  ref  renamed  from  or  to  for Read and Write\n\n")
@@ -192,7 +203,7 @@ function (...) {
       }
       if (names(dots)[i] == "values") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  values  renamed  stat_x  or  stat_yx\n\n")
+          "option  values  renamed  stat\n\n")
       }
       if (names(dots)[i] == "type") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",

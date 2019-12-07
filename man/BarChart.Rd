@@ -13,10 +13,8 @@ Also displays the frequency table for one or two variables, Cramer's V associati
 }
 
 \usage{
-BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
-        stat_x=c("count", "proportion"),
-        stat_yx=c("mean", "sum", "sd", "dev", "min", "median", "max"),
-        n_cat=getOption("n_cat"), one_plot=NULL,
+BarChart(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
+        stat=NULL, n_cat=getOption("n_cat"), one_plot=NULL,
 
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
 
@@ -84,18 +82,11 @@ bc(\ldots)
   \item{data}{Optional data frame that contains the variables of interest.
        Can contain data from which frequencies are computed for the y-values,
        or can contain values to plot on the y-axis instead of counts.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+  \item{filter}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
-  \item{stat_x}{When there is no \code{y} variable, transform data table of
-       measurements into a simple table of paired levels of
-       \code{x} with numerical values of \code{y}, height of each bar
-       for each level of \code{x}.
-       Transform according to  \code{"count"} or \code{"proportion"}.}
-  \item{stat_yx}{Statistics transformation of \code{y} by \code{x}.
-       Transform data table of measurements into a simple table of paired levels of
-       \code{x} with numerical values of \code{y}. Apply specified transformation
-       of \code{y} to the levels of \code{x}, that is,
-       \code{"mean"}, \code{sd}, etc. Default is \code{"mean"}.}
+  \item{stat}{Statistical transformation of the data. If no \code{y} variable,
+       then \code{"count"} or \code{"proportion"}, otherwise 
+       \code{"mean"}, \code{"sd"}, etc.}
   \item{n_cat}{When analyzing all the variables in a data frame, specifies the largest
        number of unique values of variable of a numeric data type for which the
        variable will be analyzed as a categorical. Default is 0.}
@@ -132,7 +123,7 @@ bc(\ldots)
        first variable to be plotted as adjacent bars instead of stacked on each
        other.}
   \item{stack100}{100\% stacked bar chart when a \code{by} variable is present,
-       also activated by setting \code{stat_x} to \code{"proportion"} with a
+       also activated by setting \code{stat} to \code{"proportion"} with a
        \code{by} variable.}
   \item{gap}{Gap between bars.  Provides the value of the \code{space} option from
        the standard R \code{\link{barplot}} function with a default of 0.2 unless two
@@ -166,8 +157,7 @@ bc(\ldots)
   \item{fill_split}{The value of the numeric variable \code{y} for which
         bars that correspond to values of \code{y} <= \code{fill_split} are
         displayed in the first \code{fill} color and other values displayed
-        in the second \code{fill} color, with the first two values of
-        the default palette by default, or as specified by a vector of
+        in the second \code{fill} color, or as specified by a vector of
         exactly two fill colors.}\cr
 
   \item{legend_title}{Title of the legend, which is usually set by default except
@@ -198,8 +188,8 @@ bc(\ldots)
         typically used in conjunction with \code{offset}. When equal 90
         the value labels are perpendicular to the x-axis and a different
         algorithm places the labels so that \code{offset} is not needed.}
-  \item{offset}{The amount of spacing between the axis values and the axis_ Default
-        is 0.5. Larger values such as 1.0 are used to create space for the label when
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
+        is 0.5. Larger values such as 1.0 create space for the label when
         longer axis value names are rotated.}
   \item{break_x}{Replace spaces in the category values with a new line
        and replace underscores with a blank. By default, \code{TRUE} for 
@@ -326,13 +316,13 @@ Plot a bar chart with default colors for one or two categorical variables, that 
 DATA\cr
 Ultimately the bar chart is constructed from a simple table in which each row consists of a level of the categorical variable \code{x} paired with the corresponding value of the numerical variable, \code{y}, with as many rows as the number of levels of \code{x}. A data table of this form can be read by specifying the variable \code{x} and the variable \code{y}. Alternatively, read a data table in the form in which the data are typically gathered, with many replications of the levels of the categorical variable \code{x}. In this situation, with just the specification of the variable \code{x}, the corresponding numerical variable is the tabulation of the counts of the number of occurrences for each level of \code{x}. Or, specify a numerical variable from a data table of this form and reduce to the smaller data table via statistical transformation of the values of \code{y} for each level of \code{x}, such as the mean. 
 
-The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{d}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{d$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function.
+The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{d}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names.
 
 If the name of the vector is in the global environment and of a variable in the input data frame has the same name, the vector from the global environment is analyzed, unless the data name frame is explicitly provided, not relying upon the default \code{d}. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment.
 
 To obtain a bar chart of each categorical variable in the \code{d} data frame, invoke \code{BarChart()}.  Or, for a data frame with a different name, insert the data frame name between the parentheses as the first listed parameter value. To analyze a subset of the variables in a data frame, specify the variable list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not. Use the standard R relational operators as described in \code{\link{Comparison}}. Examples include \code{==} for logical equality, \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 The form of the entered data, the first variable, categorical \code{x}, and optionally a second variable, numerical \code{y}, is flexible.  The data may be entered as factors, numeric values, characters, or a matrix. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.
 
@@ -482,7 +472,7 @@ myOutput <- BarChart(Dept)
 myOutput
 
 # just males with salaries larger than 75,000 USD
-BarChart(Dept, rows=(Gender=="M" & Salary > 85000))
+BarChart(Dept, filter=(Gender=="M" & Salary > 85000))
 
 # rotate and offset the axis labels, sort categories by frequencies
 BarChart(Dept, rotate_x=45, offset=1, sort="-")
@@ -509,7 +499,7 @@ BarChart(Gender, fill=c("palegreen3","tan"))
 BarChart(Dept, fill=getColors(l=25), trans=0.4)
 
 # column proportions instead of frequencies
-BarChart(Gender, stat_x="proportion")
+BarChart(Gender, stat="proportion")
 
 # map value of tabulated count to bar fill
 BarChart(Dept, fill=(count))
@@ -533,7 +523,7 @@ BarChart(Dept, sort="+", fill_split=10)
 
 # read y variable, Salary, then bars are height of 
 #  corresponding mean Salary
-BarChart(Dept, Salary, stat_yx="mean")
+BarChart(Dept, Salary, stat="mean")
 
 
 # ----------------------------------------------------
@@ -544,7 +534,7 @@ BarChart(Dept, Salary, stat_yx="mean")
 BarChart(Dept, by=Gender)
 
 # at each level of Dept, show the row proportions of the Gender levels
-#   i.e., proportional stacked bar graph
+#   i.e., 100% stacked bar graph
 BarChart(Dept, by=Gender, stack100=TRUE)
 
 # at each level of Gender, show the frequencies of the Dept levels
@@ -649,7 +639,7 @@ a <- aggregate(Salary ~ Dept + Gender, data=d, FUN=mean)
 BarChart(Dept, Salary, by=Gender, data=a)
 # do so just with BarChart, display bars in grayscale
 # How does average salary vary by gender across the various departments?
-BarChart(Dept, Salary, by=Gender, stat_yx="mean", data=d, fill="grays")
+BarChart(Dept, Salary, by=Gender, stat="mean", data=d, fill="grays")
 
 
 # -----------

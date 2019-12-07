@@ -25,7 +25,7 @@ mrg(\ldots)
   \item{data2}{The name of the second data frame from which to create the merged 
        data frame.}
   \item{by}{If specified, then signals a horizontal merge and the ID field by
-        which the data frames are merged. Specify \code{"row.names"} for merging
+        which the data frames are merged. Specify \code{"row_names"} for merging
         according to the row names.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}

@@ -1,5 +1,5 @@
 .plt.MD <- 
-function(x, y, ID, MD.cut, out_cut) {
+function(x, y, ID, MD_cut, out_cut) {
 
   m.x <- mean(x, na.rm=TRUE)
   m.y <- mean(y, na.rm=TRUE)
@@ -10,8 +10,8 @@ function(x, y, ID, MD.cut, out_cut) {
   for (i in 1:length(x))
     dst[i] <- mahalanobis(c(x[i], y[i]), center, cov.mat)
 
-  if (MD.cut > 0)
-    out_ind <- which(dst >= MD.cut)  # absolute threshold
+  if (MD_cut > 0)
+    out_ind <- which(dst >= MD_cut)  # absolute threshold
   else if (out_cut > 0  && out_cut < 1)  # a proportion
     out_ind <- which(dst > quantile(dst, 1-out_cut, na.rm=TRUE))
   else if (out_cut >= 1)  { # a count

@@ -41,10 +41,10 @@ function(x, x.name, new.var, old, new, ivar, n.obs, dname, quiet) {
     old.unique <- sort(unique(x))
     n.unique <- length(old.unique)
     cat("---  Recode:", x.name, "---------------------------------\n")
-
-    if (class(x) == "numeric")
+    
+    if ("numeric" %in% class(x))  # R 4.0 results in two values: matrix, array
       cat("Unique values of", x.name, "in the data:", old.unique, "\n")
-    else if (class(x) == "factor")
+    else if ("factor" %in% class(x))
       cat("Unique values of", x.name, "in the data:", levels(x), "\n")
     cat("Number of unique values of", x.name, "in the data:", n.unique, "\n")
 
@@ -64,7 +64,7 @@ function(x, x.name, new.var, old, new, ivar, n.obs, dname, quiet) {
     if (!is.null(new.var)) cat("Recode to variable:", new.var, "\n")
   }  # end text 
 
-  if (class(x) == "factor") x <- as.character(x)
+  if ("factor" %in% class(x)) x <- as.character(x)
 
   new.x <- x
 
