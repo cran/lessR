@@ -123,6 +123,13 @@ function(my_formula, data=d, filter=NULL, kfold=0,
   else
     relate <- TRUE
 
+  if (kfold > 0) {
+    graphics <- FALSE
+    relate <- FALSE 
+    res_rows <- 0
+    pred_rows <- 0
+  }
+
   if (!mydata.ok) .nodf(df.name)  # does data frame exist?
 
   nm <- all.vars(my_formula)  # names of vars in the model
@@ -247,31 +254,34 @@ function(my_formula, data=d, filter=NULL, kfold=0,
       cat("\n"); stop(call.=FALSE, "\n","------\n",
        "The attempted solution is singular. Too much linear dependence.\n\n")
   }
+
+  n.keep <- nrow(lm.out$model)  # lm.out$model is the data with deleted
  
   # replace a factor with indicator variables in data frame
   #mm <- model.matrix(my_formula, data=data)
   #mf.out <- data.frame(lm.out$model[,1], mm[,2:ncol(mm)])
   #names(mf.out)[1] <- nm[1]
-      
-
-  n.keep <- nrow(lm.out$model)  # lm.out$model is the data with deleted
-
-  title_bck <- "  BACKGROUND"
-  bck <- .reg1bckBasic(lm.out, df.name, digits_d, show_R, n.obs, n.keep, stnd.flag)
-  tx1bck <- bck$tx
 
 
-  title_basic <- "  BASIC ANALYSIS"
-  est <- .reg1modelBasic(lm.out, digits_d, show_R)
-  tx1est <- est$tx
-  sterrs <- est$sterrs
+  if (kfold == 0) {
+    title_bck <- "  BACKGROUND"
+    bck <- .reg1bckBasic(lm.out, df.name, digits_d, show_R, n.obs, n.keep,
+                         stnd.flag)
+    tx1bck <- bck$tx
 
-  anv <- .reg1anvBasic(lm.out, digits_d, show_R)
-  tx1anv <- anv$tx 
-  MSW <- anv$MSW
 
-  fit <- .reg1fitBasic(lm.out, anv$tot["ss"], digits_d, show_R)
-  tx1fit <- fit$tx
+    title_basic <- "  BASIC ANALYSIS"
+    est <- .reg1modelBasic(lm.out, digits_d, show_R)
+    tx1est <- est$tx
+    sterrs <- est$sterrs
+
+    anv <- .reg1anvBasic(lm.out, digits_d, show_R)
+    tx1anv <- anv$tx 
+    MSW <- anv$MSW
+
+    fit <- .reg1fitBasic(lm.out, anv$tot["ss"], digits_d, show_R)
+    tx1fit <- fit$tx
+  }
 
 
   txkfl <- ""
@@ -313,12 +323,13 @@ function(my_formula, data=d, filter=NULL, kfold=0,
   if (is.null(res_rows)) res_rows <- ifelse (n.keep < 20, n.keep, 20) 
   if (res_rows == "all") res_rows <- n.keep  # turn off resids with res_rows=0
 
-  cook <- round(cooks.distance(lm.out), 5)
 
   tx3res <- ""
   resid.max <- NA
+  cook <- NA
   if (res_rows > 0) {
 
+    cook <- round(cooks.distance(lm.out), 5)
     res <- .reg3txtResidual(lm.out, cook, digits_d, res_sort, res_rows, show_R)
     tx3res <- res$tx
     if (!is.na(res$resid.max[1])) resid.max <- round(res$resid.max,3)
@@ -364,25 +375,25 @@ function(my_formula, data=d, filter=NULL, kfold=0,
     predmm <- prd$predmm
   }
 
-    if (graphics) {
-      if (manage.gr && !pdf) {
-        if (res_rows > 0  &&  n.pred > 0)  # already did two plots 
-          dev.set(which=5) 
-        else {
-          .graphwin(1, width, height)  #  only plot is a scatterplot
-          dev.set(which=3)
-        }
+  if (graphics) {
+    if (manage.gr && !pdf) {
+      if (res_rows > 0  &&  n.pred > 0)  # already did two plots 
+        dev.set(which=5) 
+      else {
+        .graphwin(1, width, height)  #  only plot is a scatterplot
+        dev.set(which=3)
       }
-   
-      if ((numeric.all || n.pred==1) && in.data.frame) {
-        splt <- .reg5Plot(lm.out, res_rows, pred_rows, scatter_coef, 
-           X1_new, numeric.all, in.data.frame, prd$cint, prd$pint,
-           pdf, width, height, manage.gr, scatter_3D, ...)
-
-        for (i in (plot.i+1):(plot.i+splt$i)) plot.title[i] <- splt$ttl[i-plot.i]
-        plot.i <- plot.i + splt$i
-      } 
     }
+ 
+    if ((numeric.all || n.pred==1) && in.data.frame) {
+      splt <- .reg5Plot(lm.out, res_rows, pred_rows, scatter_coef, 
+         X1_new, numeric.all, in.data.frame, prd$cint, prd$pint,
+         pdf, width, height, manage.gr, scatter_3D, ...)
+
+      for (i in (plot.i+1):(plot.i+splt$i)) plot.title[i] <- splt$ttl[i-plot.i]
+      plot.i <- plot.i + splt$i
+    } 
+  }
 
 
 
@@ -525,64 +536,73 @@ function(my_formula, data=d, filter=NULL, kfold=0,
     }
   }
 
-
-  class(txsug) <- "out"
-  class(title_bck) <- "out"
-  class(tx1bck) <- "out"
-  class(title_kfold) <- "out"
-  class(txkfl) <- "out"
-  class(title_basic) <- "out"
-  class(tx1est) <- "out"
-  class(tx1fit) <- "out"
-  class(tx1anv) <- "out"
-  class(title_rel) <- "out"
-  class(tx2cor) <- "out"
-  class(tx2cln) <- "out"
-  class(tx2all) <- "out"
-  class(title_res) <- "out"
-  class(tx3res) <- "out"
-  class(title_pred) <- "out"
-  class(tx3prd) <- "out"
-  class(txplt) <- "out"
-  class(txref) <- "out"
-  class(txRmd) <- "out"
-  class(txWrd) <- "out"
-  class(txpdf) <- "out"
-  class(txodt) <- "out"
-  class(txrtf) <- "out"
   
-  output <- list(
-    out_suggest=txsug,
+  if (kfold == 0) { 
+
+    class(txsug) <- "out"
+    class(title_bck) <- "out"
+    class(tx1bck) <- "out"
+    class(title_kfold) <- "out"
+    class(txkfl) <- "out"
+    class(title_basic) <- "out"
+    class(tx1est) <- "out"
+    class(tx1fit) <- "out"
+    class(tx1anv) <- "out"
+    class(title_rel) <- "out"
+    class(tx2cor) <- "out"
+    class(tx2cln) <- "out"
+    class(tx2all) <- "out"
+    class(title_res) <- "out"
+    class(tx3res) <- "out"
+    class(title_pred) <- "out"
+    class(tx3prd) <- "out"
+    class(txplt) <- "out"
+    class(txref) <- "out"
+    class(txRmd) <- "out"
+    class(txWrd) <- "out"
+    class(txpdf) <- "out"
+    class(txodt) <- "out"
+    class(txrtf) <- "out"
     
-    call=fun_call, formula=my_formula,
+    output <- list(
+      out_suggest=txsug,
+      
+      call=fun_call, formula=my_formula,
 
-    out_title_bck=title_bck, out_background=tx1bck,
+      out_title_bck=title_bck, out_background=tx1bck,
 
-    out_title_basic=title_basic, out_estimates=tx1est,
-    out_fit=tx1fit, out_anova=tx1anv,
+      out_title_basic=title_basic, out_estimates=tx1est,
+      out_fit=tx1fit, out_anova=tx1anv,
 
-    out_title_kfold=title_kfold, out_kfold=txkfl,
+      out_title_kfold=title_kfold, out_kfold=txkfl,
 
-    out_title_rel=title_rel, out_cor=tx2cor, out_collinear=tx2cln,
-    out_subsets=tx2all,
+      out_title_rel=title_rel, out_cor=tx2cor, out_collinear=tx2cln,
+      out_subsets=tx2all,
 
-    out_title_res=title_res, out_residuals=tx3res,
-    out_title_pred=title_pred, out_predict=tx3prd,
+      out_title_res=title_res, out_residuals=tx3res,
+      out_title_pred=title_pred, out_predict=tx3prd,
 
-    out_ref=txref, out_Rmd=txRmd, out_Word=txWrd, out_pdf=txpdf,
-                   out_odt=txodt, out_rtf=txrtf, out_plots=txplt,
-    n.vars=bck$n.vars, n.obs=bck$n.obs, n.keep=n.keep, 
-    coefficients=est$estimates, sterrs=est$sterrs, tvalues=est$tvalues,
-    pvalues=est$pvalues, cilb=est$cilb, ciub=est$ciub,
-    anova_model=anv$mdl, anova_residual=anv$rsd, anova_total=anv$tot, 
-    se=fit$se, resid_range=fit$range,
-    Rsq=fit$Rsq, Rsqadj=fit$Rsqadj, PRESS=fit$PRESS, RsqPRESS=fit$RsqPRESS,
-    m_se=m_se, m_MSE=m_MSE, m_Rsq=m_Rsq,
-    cor=crs, tolerances=tol, vif=vif,
-    resid.max=resid.max, pred_min_max=predmm, 
-    residuals=lm.out$residuals, fitted=lm.out$fitted, 
-    cooks.distance=cook, model=lm.out$model, terms=lm.out$terms
-  )
+      out_ref=txref, out_Rmd=txRmd, out_Word=txWrd, out_pdf=txpdf,
+                     out_odt=txodt, out_rtf=txrtf, out_plots=txplt,
+      n.vars=bck$n.vars, n.obs=bck$n.obs, n.keep=n.keep, 
+      coefficients=est$estimates, sterrs=est$sterrs, tvalues=est$tvalues,
+      pvalues=est$pvalues, cilb=est$cilb, ciub=est$ciub,
+      anova_model=anv$mdl, anova_residual=anv$rsd, anova_total=anv$tot, 
+      se=fit$se, resid_range=fit$range,
+      Rsq=fit$Rsq, Rsqadj=fit$Rsqadj, PRESS=fit$PRESS, RsqPRESS=fit$RsqPRESS,
+      m_se=m_se, m_MSE=m_MSE, m_Rsq=m_Rsq,
+      cor=crs, tolerances=tol, vif=vif,
+      resid.max=resid.max, pred_min_max=predmm, 
+      residuals=lm.out$residuals, fitted=lm.out$fitted, 
+      cooks.distance=cook, model=lm.out$model, terms=lm.out$terms
+    )
+  }
+
+  # kfold > 0
+  else {
+    class(txkfl) <- "out"
+    output <- list(out_title_kfold=title_kfold, out_kfold=txkfl)
+  }
 
   class(output) <- "out_all"
 
@@ -592,7 +612,6 @@ function(my_formula, data=d, filter=NULL, kfold=0,
   else
     if (!quiet) return(output)
 
-  
   
   cat("\n")
   

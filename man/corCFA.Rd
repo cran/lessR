@@ -232,10 +232,13 @@ scales(F1=X1:X3, F2=X4:X6)
 style("gray")
 corCFA(F1=X1:X3, F2=X4:X6)
 
-# access the lessR data set called datMach4, with variable labels
+# access the lessR data set called datMach4
+# read the optional variable labels
 d <- Read("Mach4", quiet=TRUE)
+l <- Read("Mach4_lbl", var_labels=TRUE)
 # calculate the correlations and store in mycor
 mycor <- cr(m01:m20)
+R <- mycor$R
 # specify measurement model in Lavaan notation
 MeasModel <- 
 " 
@@ -250,14 +253,14 @@ MeasModel <-
 # Output file will be m4.Rmd, a simple text file that can
 #   be edited with any text editor including RStudio, from which it
 #   can be knit to generate dynamic output such as to a Word document
-#c <- cfa(MeasModel, Rmd="m4")
+#c <- cfa(MeasModel, R, Rmd="m4")
 # view all the output
-c
+#c
 # view just the scale reliabilities
-c$out_reliability
+#c$out_reliability
 
 # analysis of item content only
-cfa(MeasModel, data=d, labels="only")
+cfa(MeasModel, labels="only")
 
 
 # bad fitting model to illustrate indicator diagnostics

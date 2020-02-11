@@ -1,6 +1,7 @@
 simFlips <-
-function(n, prob=.5, show_title=TRUE,
-         show_flips=TRUE, grid="grey90", pause=FALSE,
+function(n, prob=.5, seed=NULL,
+         show_title=TRUE, show_flips=TRUE,
+         grid="grey90", pause=FALSE,
          main=NULL, pdf_file=NULL, width=5, height=5, ...) {
 
 
@@ -37,7 +38,10 @@ function(n, prob=.5, show_title=TRUE,
     if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
 
   # set up graphics system
-  .opendev(pdf_file, width, height)
+  if (!is.null(pdf_file)) {
+    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
+    .opendev(pdf_file, width, height)
+  }
 
   # plot the individual flips and the running mean
   orig.params <- par(no.readonly=TRUE)
@@ -57,11 +61,12 @@ function(n, prob=.5, show_title=TRUE,
   abline(h=prob, col="lightsteelblue", lwd=2)
 
   # do the n coin flips and calculate the running mean, ybar
+  if (!is.null(seed)) set.seed(seed)
   flips = rbinom(n, 1, prob)  # flip one coin n times
   ybar <- cumsum(flips)/(1:n)
 
   if (!pause) {
-    lines(ybar, type="l", lwd=3, col="coral3")
+    lines(ybar, type="l", lwd=3, col="gray40")
     if (show_flips) 
       points(1:n, flips, col="lightsteelblue", pch=23, bg="darkblue", cex=.7)
   }
@@ -71,14 +76,15 @@ function(n, prob=.5, show_title=TRUE,
       if (show_flips)
         points(i, flips[i], col="lightsteelblue", pch=23, bg="darkblue", cex=.7)
       invisible(readline())
-      segments(i, ybar[i], i+1, ybar[i+1], lwd=3, col="coral3")
+      segments(i, ybar[i], i+1, ybar[i+1], lwd=3, col="gray40")
     }
 
   }
 
   if (show_title) {
-    mainlabel <- paste("Sample Mean after", toString(n), "Coin Flips:", toString(.fmt(ybar[n],3)), sep=" ")
-   title(main=mainlabel, cex.main=.85)
+    mainlabel <- paste("Sample Mean after", toString(n), "Coin Flips:",
+      toString(.fmt(ybar[n],3)), sep=" ")
+    title(main=mainlabel, cex.main=.85)
   }
   n.heads <- sum(flips)
   mtext(bquote(paste(" ", mu, "=", .(prob))), side=4, cex=.85,

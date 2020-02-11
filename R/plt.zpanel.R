@@ -140,7 +140,7 @@ function (x, y, jitter_data=FALSE, factor=0.5, amount=NULL,
 
     panel.xyplot(x=x, y=y[1:length(x)], jitter_x=jitter_data && !horizontal, 
         jitter_y=jitter_data && horizontal, factor=factor, 
-        amount=amount, horizontal=horizontal, 
+        amount=amount, horizontal=horizontal,
         ..., identifier=identifier)
 }
 

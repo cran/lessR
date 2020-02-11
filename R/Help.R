@@ -582,8 +582,8 @@ function(topic=NULL, width=4.5, height=4.5) {
   proportion of a value of a categorical variable with a hypothesis
   test and confidence interval.
 
-  Here use the lessR function ttest(), or tt(), to evaluate a variable
-  named Y and a null hypothesis of mu=100. The brief version is tt.brief.
+  Here use the lessR function ttest(), or tt(), to evaluate variable Y
+  with a null hypothesis of mu=100. The brief version is tt.brief().
       > ttest(Y, mu=100)
 
   This example uses ttest() to do the analysis from the sample statistics.

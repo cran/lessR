@@ -1,7 +1,7 @@
 simMeans <- 
-function(ns, n, mu=0, sigma=1, ylim_bound=NULL, 
+function(ns, n, mu=0, sigma=1, seed=NULL, 
          show_title=TRUE, show_data=TRUE, max_data=10, 
-         grid="grey90", pause=FALSE,
+         grid="grey90", ylim_bound=NULL, pause=FALSE,
          sort=NULL, set_mu=FALSE, digits_d=2,
          main=NULL, pdf_file=NULL, width=5, height=5, ...) {
 
@@ -46,9 +46,6 @@ function(ns, n, mu=0, sigma=1, ylim_bound=NULL,
       "Standard deviation, sigma, cannot be negative.\n\n")
   }
 
-  if (!is.null(pdf_file))
-    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
-
   if (is.null(sort)) if (pause) sort <- FALSE else sort <- TRUE
 
   if (set_mu) {
@@ -64,6 +61,7 @@ function(ns, n, mu=0, sigma=1, ylim_bound=NULL,
   cat("Size of each sample:", n, "\n")
    
   # data generation
+  if (!is.null(seed)) set.seed(seed)
   data.raw <- rnorm(ns*n, mu, sigma)
   data.rep <- matrix(data.raw, ns, n)
 
@@ -99,17 +97,27 @@ function(ns, n, mu=0, sigma=1, ylim_bound=NULL,
   # plot 
 
   # set up graphics system
-  .opendev(pdf_file, width, height)
+
+  if (!is.null(pdf_file)) {
+    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
+    .opendev(pdf_file, width, height)
+  }
 
   orig.params <- par(no.readonly=TRUE)
   par(mar=c(3,3,1.75,2), mgp=c(1.75,.5,0))
 
-  plot(0, type = "n", xlim=c(1,ns), ylim = c(l,u), xlab = "", ylab = "Sample Mean", 
+  plot(0, type = "n", xlim=c(1,ns), ylim = c(l,u), xlab="", ylab="Sample Mean", 
        cex.main=.95, cex.axis=.8)
 
-  # colored plotting area
+  # background color
   usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
+  rect(usr[1], usr[3], usr[2], usr[4],
+       col=getOption("panel_fill"), border="transparent")
+
+  # box around plot
+  rect(usr[1], usr[3], usr[2], usr[4],
+    col="transparent", border=getOption("panel_color"),
+    lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
 
   # grid lines
   vx <- pretty(c(usr[1],usr[2]))
@@ -118,8 +126,9 @@ function(ns, n, mu=0, sigma=1, ylim_bound=NULL,
   abline(h=seq(vy[1],vy[length(vy)],vy[2]-vy[1]), col=grid, lwd=.5)
 
   if (!set_mu && !pause) {
-    if (show_title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma), 
-        "  ", "  n=", .(n))), cex.main=1)
+    if (show_title)
+      title(main = bquote(paste(mu, "=", .(mu), "  ",
+            sigma, "=", .(sigma), "  ", "  n=", .(n))), cex.main=1)
     mtext(bquote(paste(" ", mu)), side=4, cex=1.5, col="darkslateblue", las=2)
     abline(h=mu, col="darkslateblue", lwd=1.5) # horizontal centerline at mu
   }
@@ -138,9 +147,19 @@ function(ns, n, mu=0, sigma=1, ylim_bound=NULL,
   # output
   if (n <= max_data) maxd <- n else maxd <- max_data
   cat("\nSample", "  Mean   ", "  SD   ")
-  if (show_data) for (i in 1:maxd) cat(format(toString(i), width=max.ln,
-                                       justify="right", sep=""))
+  if (show_data)
+    for (i in 1:maxd)
+      cat(format(toString(i), width=max.ln, justify="right", sep=""))
   cat("\n")
+
+  if (!pause) {
+    if (show_title)
+      title(main = bquote(paste(mu, "=", .(mu), "  ",
+            sigma, "=", .(sigma), "  ", "  n=", .(n))), cex.main=1)
+    mtext(bquote(paste(" ", mu)), side=4, cex=1.5, col="darkslateblue", las=2)
+    abline(h=mu, col="gray75", lwd=1.5) # horizontal centerline at mu
+  }
+
   for (i in 1:ns) {
     if (pause) invisible(readline())
     cat(format(o[i], width=5, justify="right", sep=""))
@@ -154,21 +173,18 @@ function(ns, n, mu=0, sigma=1, ylim_bound=NULL,
           justify="right", sep=""))
     if (n > max_data) cat(" ...")
     cat("\n")
-    points(i, Ymean[i], pch=21, col="darkblue", bg="plum")
+    points(i, Ymean[i], pch=21,
+           col=getOption("pt_color"), bg=getOption("pt_fill"))
   }
 
-  if (!pause) {
-    if (show_title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=", .(sigma), 
-        "  ", "  n=", .(n))), cex.main=1)
-    mtext(bquote(paste(" ", mu)), side=4, cex=1.5, col="darkslateblue", las=2)
-    abline(h=mu, col="darkslateblue", lwd=1.5) # horizontal centerline at mu
-  }
 
   if (pause) cat("\n")
 
   cat("\nAnalysis of Sample Means\n")
-  cat("   Mean:", format(sprintf("%.*f", digits_d, mean(Ymean)), width=max.ln, justify="right", sep=""), "\n")
-  cat("Std Dev:", format(sprintf("%.*f", digits_d, sd(Ymean)), width=max.ln, justify="right", sep=""))
+  cat("   Mean:", format(sprintf("%.*f", digits_d, mean(Ymean)), width=max.ln,
+      justify="right", sep=""), "\n")
+  cat("Std Dev:", format(sprintf("%.*f", digits_d, sd(Ymean)), width=max.ln,
+      justify="right", sep=""))
   cat("    Direct estimate of the standard error of the sample mean\n")
 
   if (pause) {

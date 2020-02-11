@@ -1,8 +1,8 @@
 simCImean <- 
-function(ns, n, mu=0, sigma=1, cl=0.95, 
-         ylim_bound=NULL, show_data=FALSE, show_title=TRUE, 
+function(ns, n, mu=0, sigma=1, cl=0.95, seed=NULL, 
+         show_data=FALSE, show_title=TRUE, 
          miss_only=FALSE, color_hit="gray40", color_miss="red",
-         grid="grey90", pause=FALSE,
+         grid="grey90", ylim_bound=NULL, pause=FALSE,
          main=NULL, pdf_file=NULL, width=5, height=5, ...) {
 
 
@@ -46,17 +46,16 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
     }
   }
 
-  if (!is.null(pdf_file))
-    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
 
-  alpha <- 1-cl
+  alpha <- 1 - cl
   tcut <- qt(1-alpha/2, df=n-1)
   clpct <- round((cl)*100, 2)
 
   # data generation
+  if (!is.null(seed)) set.seed(seed)
   data.raw <- rnorm(ns*n, mu, sigma)
   max.Y <- max(data.raw)
-  min_Y <- min(data.raw)
+  min.Y <- min(data.raw)
   data.byrep <- matrix(data.raw, ns, n)
 
   # summary stats
@@ -79,7 +78,7 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
       u <- max(ub)
     }
     else {
-      l <- min_Y
+      l <- min.Y
       u <- max.Y
     }
     max.dev <- max( abs(mu-l), abs(u-mu) )
@@ -95,7 +94,10 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
   # plot setup
 
   # set up graphics system
-  .opendev(pdf_file, width, height)
+  if (!is.null(pdf_file)) {
+    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
+    .opendev(pdf_file, width, height)
+  }
 
   orig.params <- par(no.readonly=TRUE)
   par(mar=c(2,2,1.75,2), mgp=c(1,.5,0))
@@ -155,6 +157,7 @@ function(ns, n, mu=0, sigma=1, cl=0.95,
     .showfile(pdf_file, "simulated confidence intervals")
   }
 
+  # output stats
   cat("\nStructure\n")
   cat("Population mean, mu :", mu, "\n")
   cat("Pop std dev, sigma  :", sigma, "\n")

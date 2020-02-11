@@ -55,24 +55,35 @@ function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"),
   n.ind <- nrow(ld)
 
   # sort option
+  # mx: # factor with highest factor loading for each item
   if (sort) {
-    mx <- max.col(abs(ld))
-    ind <- cbind(1L:n.ind, mx)
-    mx[abs(ld[ind]) < 0.5] <- n_factors + 1
-    ld.srt <- ld[order(mx, 1L:n.ind), ]
-    ld.srt <- as.matrix(ld.srt)
+    mx <- max.col(abs(ld))  
+    ld <- ld[order(mx), ]  # group items on same factor together
+
+    fn <- max.col(abs(ld))  # each item, factor with its highest loading
+    ld <- data.frame(cbind(fn, ld))
+
+    ld.new <- matrix(nrow=0, ncol=1+n_factors)
+    for (i in 1:n_factors) {
+      lf <- ld[ld$fn==i,]  # extract items for ith factor
+      ord <- order(abs(lf[[i+1]]), decreasing=TRUE)
+      lf <- lf[ord,]
+      ld.new <- rbind(ld.new,lf)  # preserves row names 
+    }
+    ld <- ld.new[,-1]  # remove fn column
   }
 
   # print loadings
+  # from_efa lets .prntbl adjust column widths differently 
   tx <- character(length = 0)
-  tx[length(tx)+1] <-  paste("Loadings (except -", min_loading, " to ",
+  tx[length(tx)+1] <- paste("Loadings (except -", min_loading, " to ",
      min_loading, ")", sep="") 
-  txld <- .prntbl(ld.srt, digits_d=3, cut=min_loading)
+  txld <- .prntbl(ld, digits_d=3, cut=min_loading, from_efa=TRUE)
   for (i in 1:length(txld)) tx[length(tx)+1] <- txld[i]
   txld <- tx
 
   # print sum of squares by factor
-  vx <- colSums(ld.srt^2)
+  vx <- colSums(ld^2)
   varex <- rbind(`SS loadings` = vx)
   varex <- rbind(varex, `Proportion Var` = vx/n.ind)
   if (n_factors > 1) 
@@ -154,7 +165,8 @@ function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"),
         min_loading, sep="")
     tx[length(tx)+1] <- "Deleted items: "
     for (i.item in 1:del.count)
-      tx[length(tx)] <- paste(tx[length(tx)], colnames(x)[deleted[i.item]], " ", sep="")
+      tx[length(tx)] <- paste(tx[length(tx)], colnames(x)[deleted[i.item]],
+                              " ", sep="")
     txdel <- tx
   }
 
@@ -183,7 +195,7 @@ function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"),
     out_deleted=txdel,
 
     converged=fa2$converged, n_factors=n_factors, ss_factors=vx,
-    loadings=ld.srt, call=cl)
+    loadings=ld, call=cl)
 
   class(output) <- "out_all"
   return(output)

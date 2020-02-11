@@ -53,6 +53,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
          do_plot=TRUE, width=NULL, height=NULL, pdf_file=NULL, 
          fun_call=NULL, ...) {
 
+#/ccat("ncols start:", ncols, "\n")
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -79,10 +80,10 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
       }
     }
   }
-  if (!is.null(x1)) if (x1 == "mean.x") x1 <- "mean_x"
-  if (!is.null(y1)) if (y1 == "mean.y") y1 <- "mean_y"
-  if (!is.null(add)) if (add[1] == "h.line")  add[1] <- "h_line"
-  if (!is.null(add)) if (add[1] == "v.line")  add[1] <- "v_line"
+  if (!is.null(x1)) if ("mean.x" %in% x1) x1 <- "mean_x"
+  if (!is.null(y1)) if ("mean.y" %in% y1) y1 <- "mean_y"
+  if (!is.null(add)) if ("h.line" %in% add[1])  add[1] <- "h_line"
+  if (!is.null(add)) if ("v.line" %in% add[1])  add[1] <- "v_line"
 
 
 # Note: stat is both object (dot plot) and statistic   
@@ -530,7 +531,6 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
   else
     nrows <- nrow(data.x)
 
-
   if (nrows > 2499) if (missing(smooth)) smooth <- TRUE
 
   if(date.ts) object <- "both"
@@ -740,7 +740,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
             if (box) {
               cat("\n"); stop(call.=FALSE, "\n","------\n",
                 "Currently, Trellis box plots not available for a \n",
-                "y categorical variable, set to  by1  instead\n\n")
+                "y categorical variable, set y variable to  by1  instead\n\n")
             }
             Trellis <- TRUE  # cat-cont
             c.type <- "con_cat"

@@ -56,18 +56,6 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
       "Need to read from the data table (frame) to generate a Rmd_ \n\n")
   }
 
-  if (labels!="only") {
-    cor.nm <- deparse(substitute(x))
-    .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
-    if ("out_all" %in% class(x))  # R 4.0 results in two values: matrix, array
-      x <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
-  }
-  else  # if only labels, then need the data 
-    if (is.null(dname)) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "No data table (frame) exists from which to get the labels\n\n")
-    }
-
 
   df.name <- deparse(substitute(data))
   options(dname = df.name)
@@ -331,10 +319,10 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
       for (j in LblCut[i,1]:LblCut[i,2])
       tx[length(tx)] <- paste(tx[length(tx)], " ", nm_new[j])
     }
-    else {  # vertical
+    else {  # vertical with variable labels
       tx[length(tx)+1] <- .dash2(30)
       for (j in LblCut[i,1]:LblCut[i,2]) {   
-        options(xname = nm_new[j])
+        options(xname = nm_new[j])  # sets the variable name for the label
         tx[length(tx)+1] <- paste(nm_new[j], ": ", xW(.getlabels()$xl), sep="")
       }
     }
@@ -419,15 +407,18 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
           for (I in 1:NF)
             if (abs(out$R[NItems+I,Item]) > Lam) Bad[length(Bad)+1] <- I
           if (length(Bad) > 0) for (IBad in 1:length(Bad))
-            tx[length(tx)] <- paste(tx[length(tx)], paste("F", Bad[IBad], " ", sep=""))
+            tx[length(tx)] <- paste(tx[length(tx)], paste("F", Bad[IBad], " ",
+                                    sep=""))
         }
         else if (Lam <= 0)
-          tx[length(tx)] <- paste(tx[length(tx)], '** Negative Loading on Own Factor **')
+          tx[length(tx)] <- paste(tx[length(tx)],
+                                  '** Negative Loading on Own Factor **')
         else if (Unique <= 0) {
           if (LblCut[IFac,2]-LblCut[IFac,1] > 0)
             tx[length(tx)] <- paste(tx[length(tx)], '** Improper Loading **')
           else
-            tx[length(tx)] <- paste(tx[length(tx)], '** Factor Defined by Only One Item **')
+            tx[length(tx)] <- paste(tx[length(tx)],
+                                    '** Factor Defined by Only One Item **')
         }
 
         Bad <- rep(0, NItems)

@@ -1,7 +1,7 @@
 simCLT <- 
-function(ns, n, p1=0, p2=1,
+function(ns, n, p1=0, p2=1, seed=NULL,
          type=c("normal", "uniform", "lognormal", "antinormal"),
-         fill="lightsteelblue3", n_display=2, digits_d=3, 
+         fill="lightsteelblue3", n_display=0, digits_d=3, 
          subtitle=TRUE, pop=TRUE, 
          main=NULL, pdf=FALSE, width=5, height=5, ...) {
 
@@ -47,6 +47,8 @@ function(ns, n, p1=0, p2=1,
   max.ln <- 8
    
   # data generation and plot population
+  if (!is.null(seed)) set.seed(seed)
+
   if (type == "normal") {
     mu <- p1
     sigma <- p2
@@ -102,7 +104,8 @@ function(ns, n, p1=0, p2=1,
       rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
       polygon(c(0, x, x.max), c(0, y, 0), col="lightsteelblue3", border="black")
       if (subtitle) 
-        txt <- paste("meanlog=", toString(meanlog), " sdlog=", toString(sdlog), sep="") 
+        txt <- paste("meanlog=", toString(meanlog), " sdlog=",
+                     toString(sdlog), sep="") 
       else txt=""  
       title(xlab="Lognormal Population", sub=txt)
     }
@@ -112,7 +115,7 @@ function(ns, n, p1=0, p2=1,
 
     if (p1 != 0) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Minimum value of anti-normal distribution must be 0.\n\n")
+          "Minimum value of anti-normal distribution must be 0.\n\n")
     }
     x.max <- p2
 
@@ -134,11 +137,13 @@ function(ns, n, p1=0, p2=1,
       usr <- par("usr")
       rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
       lines(x1,y1)
-      polygon(c(0, x1, x.max/2), c(0, y1, 0), col="lightsteelblue3", border="black")
+      polygon(c(0, x1, x.max/2), c(0, y1, 0), col="lightsteelblue3",
+              border="black")
       x2 <- seq(x.max/2, x.max, length=250)
       y2 <- dtriangle(x2, a=x.max/2, b=x.max, c=x.max-.01)
       lines(x2,y2)
-      polygon(c(x.max/2, x2, x.max), c(0, y2, 0), col="lightsteelblue3", border="black")
+      polygon(c(x.max/2, x2, x.max), c(0, y2, 0), col="lightsteelblue3",
+              border="black")
       if (subtitle) 
         txt <- paste("min=", toString(0), " max=", toString(x.max), sep="") 
       else txt=""  

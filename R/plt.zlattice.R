@@ -1,5 +1,5 @@
 .plt.lattice <- 
-function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
+function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
          fill, color, panel_fill, panel_color,
          trans, size.pt, size.ln,
          xlab, ylab, main, shape, lab_cex, axis_cex,
@@ -13,7 +13,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
          ID, out_cut, ID_color, ID_size,
          rotate_x, rotate_y, width, height, pdf_file, c.type, ...) {
 
-    
+
   if (object == "both")
     area <- fill
    else
@@ -109,6 +109,17 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
 
   n.groups <- ifelse (is.null(by), 1, nlevels(by))
 
+  # by parameter not working for a single variable plot, but also
+  #   not so meaningful, so convert to Trellis
+  if (c.type == "cont"  &&  is.null(y)  &&  n.groups > 1) {
+     message("Parameter  by  generally not meaningful for a single variable\n",
+             "Too many points overlap, so parameter  by  converted to  by1\n",
+             "  for a Trellis (facet) plot")
+     n.groups <- 1
+     by1 <- by
+     by <- NULL
+  }
+
   col_color <- character(length=length(n.groups))
   col_fill <- character(length=length(n.groups))
   ltype <- character(length=n.groups)
@@ -152,25 +163,29 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     if (n.panels == 0) n.panels <- 1
 
     if (c.type %in% c("cont", "contcont")) {
-      if (is.null(ncols) && is.null(nrows)) {
-        ncols <- ifelse (n.panels < 5, 1, 2) 
+      if (is.null(n_col) && is.null(n_row)) {
+        n_col <- ifelse (n.panels < 5, 1, 2)
+        if ((c.type == "cont")  &&  !is.null(by2)) {
+          n_col <- length(unique(na.omit(by1)))
+          n_row <- length(unique(na.omit(by2)))
+        }
       }
     }
   }
 
   # customize layout cols and rows, only specify one
-  # if ncols or nrows specified, compute the other
+  # if n_col or n_row specified, compute the other
   if (n.panels > 1) {
-    if (!is.null(nrows)  ||  !is.null(ncols)) {
-      if (is.null(ncols)) ncols <- (n.panels %/% nrows) + (n.panels %% nrows > 0)
-      if (is.null(nrows)) nrows <- (n.panels %/% ncols) + (n.panels %% ncols > 0)
+    if (!is.null(n_row)  ||  !is.null(n_col)) {
+      if (is.null(n_col)) n_col <- (n.panels %/% n_row) + (n.panels %% n_row > 0)
+      if (is.null(n_row)) n_row <- (n.panels %/% n_col) + (n.panels %% n_col > 0)
     }
   }
 
   # move strip to left for a single column
   strp <- TRUE;  strp.lft <- FALSE
-  if (!is.null(ncols)) {
-    if (ncols == 1) {
+  if (!is.null(n_col)) {
+    if (n_col == 1) {
       strp <- FALSE;  strp.lft <- TRUE
     }
   }
@@ -217,7 +232,8 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
     }
   }  # end cont
 
-  p <- update(p, layout=c(ncols, nrows))
+  p <- update(p, layout=c(n_col, n_row))
+# p <- update(p, layout=c(n_col, n_row))
 
 
   # scale down the point size, grid line width for the multi-panel dot plots
@@ -251,9 +267,9 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
   if (l.y_color == "transparent") l.y_color <- lab_x_color
 
   # separate the axis from the axis labels unless too many rows
-  if (is.null(nrows)) nrows <- 1
-  if (nrows < 7) { 
-    pad <- 2.08 - 0.56*log(nrows)
+  if (is.null(n_row)) n_row <- 1
+  if (n_row < 7) { 
+    pad <- 2.08 - 0.56*log(n_row)
     p <- update(p,
          par.settings=list(
            layout_heights=list(axis_xlab_padding=pad)))
@@ -432,7 +448,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
                 varwidth=vw, box.width=vbs_size, bw=bw)
            }
 
-          if (box) {
+          if (box  || size.pt > 0) {
 
             n.lvl <- ifelse (is.null(by1), 1, nlevels(by1))
             n <- adj.bx.ht
@@ -440,14 +456,16 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
             denom <- int - 0.5*n.lvl
             if (denom < 1.5) denom <- 1.5
 
-            if (!box_adj)
-              .panel.bwplot(x=x, ..., pch="|", vbs_mean=vbs_mean, fences=fences,
-                  box.ratio=vbs_size/denom, mean_color=out_fill, 
-                  stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE) 
-            else
-              .panel.bwplot(x=x, ...,  pch="|", vbs_mean=vbs_mean, fences=fences,
-                  box.ratio=vbs_size/denom, mean_color=out_fill, 
-                  stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE) 
+            if (box) {  # could just be a scatterplot with red outlier points
+              if (!box_adj)
+                .panel.bwplot(x=x, ..., pch="|", vbs_mean=vbs_mean, fences=fences,
+                    box.ratio=vbs_size/denom, mean_color=out_fill, 
+                    stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE) 
+              else
+                .panel.bwplot(x=x, ...,  pch="|", vbs_mean=vbs_mean, fences=fences,
+                    box.ratio=vbs_size/denom, mean_color=out_fill, 
+                    stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE) 
+           }
 
            # plotting a subset of x requires adjusting y, in .panel.strip
             i.out <- which(x<fnc.out[1] | x>fnc.out[2])
@@ -476,8 +494,8 @@ function(x, y, by1, by2, by, adj.bx.ht, object, nrows, ncols, asp,
             }
 
             # plot outliers
-            .panel.stripplot(x= x[i.out],
-              cex=out_size, col=out_color, fill=fill_out, pch=out_shape, ...)
+            .panel.stripplot(x=x[i.out],
+               cex=out_size, col=out_color, fill=fill_out, pch=out_shape, ...)
 
             # label outliers
             if (out_cut > 0) {

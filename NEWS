@@ -8,7 +8,62 @@ Update History for Package 'lessR'
 
  
  
->>>>>> Changes for lessR version 3.9.0 (2019-12-07) <<<<<<
+>>>>>> Changes for lessR version 3.9.2 (2020-02-10) <<<<<<
+
+-------------
+Updates 3.9.2
+-------------
+
+corEFA
+  items within each factor sorted by loading
+  items with factor loadings < 0.5 no longer separate from other items
+
+corRead
+  now can pass read.table() parameters such as sep="," for csv format
+  var_names new name for names parameter
+
+Logit
+  prob_cut can be a vector, displaying multiple confusion matrices
+
+Plot
+  better arrangement of Trellis plots with by1 and by2 variables
+  single variable plot with  by  converted to  by1, more meaningful
+  1-D scatterplot identifies box plot outliers in red by default
+
+Regression
+  when k-fold > 0, only cross-validation results reported
+   
+simCImean, simCLT, simFlips, simMeans
+  seed parameter added to set seed for reproducible results
+
+simCLT
+  default number of samples of data, n_display, changed to 0 from 2
+
+simFlips
+  line segments plotted in "gray40" instead of "coral3"
+
+
+---------------
+Bug Fixes 3.9.2
+---------------  
+
+BarChart
+  when reading the value of Y, for the display of the values at the console,
+    label according to the name of the variable instead of Count
+
+corCFA
+  properly display variable labels that have been read into data frame l
+
+corEFA
+  for display of factor loadings, columns line up with min_loading > 0
+
+corRead
+  if var_names not specified, default names X01, X02, ... properly assigned
+
+
+
+ 
+>>>>>> Changes for lessR version 3.9.0 (2019-12-13) <<<<<<
 
 -------------
 Updates 3.9.0

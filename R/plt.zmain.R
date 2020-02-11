@@ -485,10 +485,10 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # plot the values
   # ---------------
 
-    # ------
-    # colors
+  # ------
+  # colors
 
-    n.clrs <- max(n_col, n.by)
+  n.clrs <- max(n_col, n.by)
 
   # prepare col_fill and col_color, values that enter into the analysis
   # convert any name of a color range to the colors, otherwise leave unchanged

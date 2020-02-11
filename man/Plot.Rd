@@ -692,6 +692,8 @@ Plot(Years, Salary, enhance=TRUE)
 # extend x and y axes
 Plot(Years, Salary, scale_x=c(-10, 35, 10), scale_y=c(0,200000,10))
 
+Plot(Years, Salary, add="Hi", x1=c(12, 16, 18), y1=c(80000, 100000, 60000))
+
 
 \donttest{
 
@@ -768,7 +770,10 @@ Plot(Years, Salary, by1=Gender)
 
 \donttest{
 
-# all three by variables
+# two Trellis classification variables with a single continuous
+Plot(Salary, by1=Dept, by2=Gender)
+
+# all three by (categorical) variables
 Plot(Years, Salary, by1=Dept, by2=Gender, by=Plan)
 
 # vary both shape and color with a least-squares fit line for each group

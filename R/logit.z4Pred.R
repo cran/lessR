@@ -13,124 +13,118 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
 # ----------
 # prediction
 # ----------
+
+  # first iteration through loop, generate output
+  # if length of prob_cut > 1, additional values for confusion matrix only
+  if (length(prob_cut) == 1)
+    p.cut <- prob_cut
+  else
+    p.cut <- c(0.5, prob_cut)   # 0.5for output, rest for confusion matrices
+    
+  for (i in 1:length(p.cut)) {
+    
+    # get output table, with label
+    if (!new.data) {
+      p.int <- data.frame(predict(lm.out, type="response", se.fit=TRUE))
+
+      # classify
+      label <- integer(length=nrow(p.int))
+      for (irow in 1:nrow(p.int))
+        label[irow] <- ifelse (p.int$fit[irow] < p.cut[i], 0, 1)
+
+      if (all(label == 0)  ||  all(label == 1)) { 
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "For threshold ", p.cut[i], ", all predicted values are ", label[1],
+          "\n\n")
+      }
+
+      out <- cbind(lm.out$model[c(nm[seq(2,n.vars)], nm[1])], label, 
+                   p.int$fit, p.int$se.fit)
+    }
+
+    else {
+      Xnew.val <- list(X1_new)
+      if (n.vars > 2) for (i in 2:(n.pred)) {
+        pp <- eval(parse(text=paste("X", toString(i),"_new",sep="")))
+        Xnew.val <- c(Xnew.val, list(pp))
+      }
+      Xnew <- expand.grid(Xnew.val)
+      for (i in 1:(n.pred)) names(Xnew)[i] <- nm[i+1]
+
+      p.int <- data.frame(predict(lm.out, type="response",
+                          se.fit=TRUE, newdata=Xnew))
+      label <- integer(length=nrow(p.int))
+      for (i in 1:nrow(p.int))
+        label[i] <- ifelse (p.int$fit[i] < p.cut[i], 0, 1)
+
+      Ynew <- character(length=nrow(Xnew))
+      Ynew <- ""
+      out <- cbind(Xnew, Ynew, label, p.int$fit,p.int$se.fit)
+    }
+
+    # display output only if on first iteration
+    if (i == 1) {
      
-  cat( "\n\n", "  FORECASTS", "\n\n")
+      cat( "\n\n", "  FORECASTS", "\n\n")
 
-  cat("Data, Fitted Values, Standard Errors\n")
-  cat("   [sorted by fitted value]\n")
-  if (n.keep > 50 && pred_all == FALSE && !new.data) 
-    cat("   [to save space only some intervals printed, pred_all=TRUE to see all]\n")
-  .dash(68)
-  
-  if (!new.data) {
-    p.int <- data.frame(predict(lm.out, type="response", se.fit=TRUE))
+      cat("Probability threshold for predicting ",
+          levels(lm.out$model[,nm[1]])[2], ":", " ", p.cut[1], "\n\n", sep="")
 
-    # classification
-    prd <- integer(length=nrow(p.int))
-    for (i in 1:nrow(p.int))
-      if (p.int$fit[i] < prob_cut) prd[i] <- 0 else prd[i] <- 1
+      if (is.factor(lm.out$model[,nm[1]]))
+        cat(" 0: ", levels(lm.out$model[,nm[1]])[1], "\n",
+            " 1: ", levels(lm.out$model[,nm[1]])[2], "\n", sep="")
+      cat("\n")
 
-    if (all(prd == 0)  ||  all(prd==1)) { 
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "All predicted values are ", prd[1], ".\n",
-        "Something is wrong here.\n\n", sep="")
+      cat("Data, Fitted Values, Standard Errors\n")
+      cat("   [sorted by fitted value]\n")
+      if (n.keep > 50 && pred_all == FALSE && !new.data) 
+        cat("   [to save space only some intervals printed, ",
+            " pred_all=TRUE to see all]\n")
+
+      names(out)[n.vars+1] <- "predict"
+      names(out)[n.vars+2] <- "fitted"
+      names(out)[n.vars+3] <- "std.err"
+      out <- data.frame(out)
+      if (pred_sort) {
+        o <- order(out[,n.vars+2])  # fitted value
+        out <- out[o,]
+      }
+
+      .dash(68)
+      if (n.keep < 25  || pred_all == TRUE || new.data)
+        print(out, digits=digits_d)
+      else {
+        print(out[1:4,], digits=digits_d)
+        cat("\n... for the rows of data where fitted is close to 0.5 ...\n\n")
+        i.mid <- which.min(abs(0.5-sort(p.int$fit)))  # requires out sorted by fit
+        print(out[(i.mid-2):(i.mid+2),], digits=digits_d)
+        cat("\n... for the last 4 rows of sorted data ...\n\n")
+        print(out[(n.keep-3):n.keep,], digits=digits_d)
+      }
+      .dash(68)
+
+      cat("\n\nConfusion Matrix for", nm[1], "\n\n")
+
+    } 
+
+    else {
+      cat("\n\n")
+      if (i == 2) {
+        cat("---------------------------------------\n")
+        cat("Additional specified confusion matrices\n")
+        cat("---------------------------------------\n")
+        cat("\n")
+      }
     }
+   
+    # confusion matrix
+    .logit5Confuse(lm.out, out, n.vars, nm, new.data, p.cut[i])
 
-    out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],prd,p.int$fit,p.int$se.fit)
-  }
-
-  else {
-    Xnew.val <- list(X1_new)
-    if (n.vars > 2) for (i in 2:(n.pred)) {
-      pp <- eval(parse(text=paste("X", toString(i),"_new",sep="")))
-      Xnew.val <- c(Xnew.val, list(pp))
-    }
-    Xnew <- expand.grid(Xnew.val)
-    for (i in 1:(n.pred)) names(Xnew)[i] <- nm[i+1]
-
-    p.int <- data.frame(predict(lm.out, type="response", se.fit=TRUE, newdata=Xnew))
-    prd <- integer(length=nrow(p.int))
-    for (i in 1:nrow(p.int))
-      if (p.int$fit[i]<0.5) prd[i] <- 0 else prd[i] <- 1
-
-    Ynew <- character(length = nrow(Xnew))
-    Ynew <- ""
-    out <- cbind(Xnew, Ynew, prd, p.int$fit,p.int$se.fit)
-  }
-
-  names(out)[n.vars+1] <- "predict"
-  names(out)[n.vars+2] <- "fitted"
-  names(out)[n.vars+3] <- "std.err"
-  out <- data.frame(out)
-  if (pred_sort) {
-    o <- order(out[,n.vars+2])  # fitted value
-    out <- out[o,]
-  }
-
-
-  if (n.keep < 25  || pred_all == TRUE || new.data)
-    print(out, digits=digits_d)
-  else {
-    print(out[1:4,], digits=digits_d)
-    cat("\n... for the rows of data where fitted is close to 0.5 ...\n\n")
-    i.mid <- which.min(abs(0.5-sort(p.int$fit)))  # requires out is sorted by fit
-    print(out[(i.mid-2):(i.mid+2),], digits=digits_d)
-    cat("\n... for the last 4 rows of sorted data ...\n\n")
-    print(out[(n.keep-3):n.keep,], digits=digits_d)
-  }
-  .dash(68)
-
-  # classification table
-  if (!new.data) {
-    mytable <- table(out[,n.vars], out[,n.vars+1])
-    hit0 <- mytable[1,1]; hit1 <- mytable[2,2]
-    mis0 <- mytable[1,2]; mis1 <- mytable[2,1]
-    per0 <- hit0 / (hit0 + mis0); per1 <- hit1 / (hit1 + mis1)
-    hitT <- hit0 + hit1
-    tot0 <- mytable[1,1] + mytable[1,2]
-    tot1 <- mytable[2,1] + mytable[2,2]
-    totG <- tot0 + tot1
-    perT <- hitT / totG
-    per0G <- tot0 / totG
-    per1G <- tot1 / totG
-    ln <- nchar(nm[1])
-    cat("\n\nClassification Table for", nm[1], "\n\n")
-    if (is.factor(lm.out$model[,nm[1]]))
-      cat(" 0: ", levels(lm.out$model[,nm[1]])[1], "\n",
-          " 1: ", levels(lm.out$model[,nm[1]])[2], "\n", sep="")
-    cat("\n")
-    cat("Probability threshold for predicting ",
-        levels(lm.out$model[,nm[1]])[2], ":", " ", prob_cut, "\n", sep="")
-    cat("\n")
-    cat(.fmtc(" ",ln+8), "Baseline         Predicted", "\n")
-    .dash(51)
-    cat(.fmtc(" ",ln+7), "Total  %Tot        0      1  %Correct", "\n")
-    .dash(51)
-    cat(.fmtc(" ",ln), "  0  ", .fmti(tot0,6), .fmt(100*per0G,1,5), " ",
-        .fmti(hit0,6), .fmti(mis0,6), "   ",
-        .fmt(100*per0,1), "\n")
-    cat(.fmtc(nm[1],ln), "  1  ", .fmti(tot1,6), .fmt(100*per1G,1,5), " ",
-        .fmti(mis1,6), .fmti(hit1,6), "   ",
-        .fmt(100*per1,1), "\n")
-    .dash(51)
-    cat(.fmtc(" ",ln), "Total", .fmti(totG,6), .fmtc(" ",25),
-        .fmt(100*perT,1), "\n")
-    cat("\n")
-
-    hit1 <- hitT - hit0
-    mis1 <- tot1 - hit1
-    accuracy <- ((hit0 + hit1) / (hit0 + hit1 + mis0 + mis1)) * 100
-    recall <- ((hit1) / (hit1 + mis1)) * 100
-    precision <- ((hit1) / (hit1 + mis0)) * 100
-    cat("Accuracy:", .fmt(accuracy,2), "\n")
-    cat("Recall:", .fmt(recall,2), "\n")
-    cat("Precision:", .fmt(precision,2), "\n")
-    cat("\n")
   }
 
 
   # graphics
-  if (pred && n.pred==1 && !is.factor(lm.out$model[,nm[2]]) && is.null(X1_new)) {
+  if (pred && n.pred==1 && !is.factor(lm.out$model[,nm[2]]) && is.null(X1_new)){
 
     .opendev(pdf_file, width, height)
 

@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.9.0     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
+      "lessR 3.9.2     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
       "---------------------------------------------------------------------\n",
       "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
       "                           d: default data frame, no need for data=\n",
@@ -240,7 +240,7 @@ function(...) {
 # is date function
 .is.date <- function(x) {
 
-  isdate <- ifelse(class(x) == "Date", TRUE, FALSE)
+  isdate <- ifelse("Date" %in% class(x), TRUE, FALSE)
 
   if (!isdate[1])  # ordered factor has more than 1 class
     isdate <- ifelse(grepl("POSIX",  class(x), fixed=TRUE)[1], TRUE, FALSE)
@@ -1867,7 +1867,8 @@ function(dir, axT) {
 
 
 .prntbl <- function(x, digits_d=2, cut=0, cc="-", cors=FALSE,
-                    brk=NULL, bnd=NULL, v1.nm=NULL, v2.nm=NULL) {
+                    brk=NULL, bnd=NULL, v1.nm=NULL, v2.nm=NULL,
+                    from_efa=FALSE) {
 
 # brk: ... replaces rows not printed
 # bnd: boundary between groups
@@ -2007,7 +2008,8 @@ function(dir, axT) {
         }
         else
           cs <- .fmt(x[i,j], d=digits_d, w=wd)
-        if (abs(x[i,j]) < cut) cs <- paste(rep(" ", wd-2), collapse="")
+        wd2 <- ifelse (!from_efa, wd-2, wd)
+        if (abs(x[i,j]) < cut) cs <- paste(rep(" ", wd2), collapse="")
         tx[length(tx)] <- paste(tx[length(tx)], cs, sep="")
         if (!is.null(bnd)) if (j %in% bnd)
           tx[length(tx)] <- paste(tx[length(tx)], "|", sep="")

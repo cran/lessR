@@ -89,8 +89,8 @@ function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
     n.miss <- sum(is.na(data[,i]))
 
     the.class <- class(data[,i])[1]  # could be an ordered factor
-    if (the.class == "ordered") the.class <- "ordfactor"
-    if (the.class == "numeric") the.class <- "double"
+    if ("ordered" %in% the.class) the.class <- "ordfactor"
+    if ("numeric" %in% the.class) the.class <- "double"
 
     cat(.fmti(i,2), .fmtc(x.name,pad-1), .fmtc(the.class,9), .fmti(n,6),
         .fmti(n.miss,7), .fmti(nu[i],7))

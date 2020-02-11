@@ -274,7 +274,7 @@ function(x, y, values, object, n_cat,
             
             fc <- ""
             if (!grepl("values", fncl)) {
-              fc <- paste(fc, ", values=\"mean\"", sep="")
+              fc <- paste(fc, ", stat=\"mean\"", sep="")
               if (grepl("means", fncl)) fncl <- .rm.arg.l("means", fncl) 
             }
             if (nzchar(fc)) {

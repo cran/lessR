@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{scree}
 
-Plots the successive eigenvalues of an input correlation matrix. Also plots the successive differences of the eigenvalues_ The purpose is usually to help determine the number of factors that explain the correlations in a correlation matrix. So usually a prelude to an exploratory factor analysis, such as provided by the \code{lessR} function \code{\link{corEFA}}. This program relies upon the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis.
+Plots the successive eigenvalues of an input correlation matrix. Also plots the successive differences of the eigenvalues. The purpose is usually to help determine the number of factors that explain the correlations in a correlation matrix. So usually a prelude to an exploratory factor analysis, such as provided by the \code{lessR} function \code{\link{corEFA}}. This program relies upon the standard R exploratory factor analysis \code{\link{factanal}}, which requires the specified number of factors as an input to the analysis.
 }
 
 \usage{

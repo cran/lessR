@@ -60,7 +60,8 @@ reg_brief(\ldots, brief=TRUE)
        \code{lessR} function \code{\link{Read}}.}
   \item{filter}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
-  \item{kfold}{Number of K-fold cross-validations.}
+  \item{kfold}{Number of K-fold cross-validations. If conducted, only the
+       cross-validation output shown.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits,
         set by default to at least 2 or the largest number of digits in the values
         of the response variable plus 1.}

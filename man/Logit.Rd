@@ -33,33 +33,36 @@ lr(\ldots)
 
 
 \arguments{
-  \item{my_formula}{Standard R \code{\link{formula}} for specifying a model.  For
-       example, for a response variable named Y and two predictor variables, X1 and 
-       X2, specify the corresponding linear model as Y ~ X1 + X2.}
-  \item{data}{The default name of the data frame that contains the data for analysis 
-       is \code{d}, otherwise explicitly specify.}
-  \item{filter}{A logical expression that specifies a subset of rows of the data frame
-       to analyze.}
-  \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits.
-        For the rest of the output, it is a suggestion only.}
+  \item{my_formula}{Standard R \code{\link{formula}} for specifying a model.
+       For example, for a response variable named Y and two predictor variables,
+       X1 and X2, specify the corresponding linear model as Y ~ X1 + X2.}
+  \item{data}{The default name of the data frame that contains the data
+       for analysis is \code{d}, otherwise explicitly specify.}
+  \item{filter}{A logical expression that specifies a subset of rows of
+       the data frame to analyze.}
+  \item{digits_d}{For the Basic Analysis, it provides the number of decimal
+       digits. For the rest of the output, it is a suggestion only.}
   \item{text_width}{Width of the text output at the console.}\cr
 
-  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
-       with \code{\link{style}} function.}\cr
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system
+       default with \code{\link{style}} function.}\cr
 
-  \item{res_rows}{Default is 25, which lists the first 25 rows of data sorted by the
-       specified sort criterion.  To turn this option off, specify a value of 0.  To see 
-       the output for all observations, specify a value of \code{"all"}.}
-  \item{res_sort}{Default is \code{"cooks"}, for specifying Cook's distance as the sort
-       criterion for the display of the rows of data and associated residuals. Other values 
-       are \code{"rstudent"} for Studentized residuals, and \code{"off"} to not provide the
-       analysis.}
-  \item{pred}{Default is \code{TRUE}, which, produces confidence and prediction intervals 
-       for each row, or selected rows, of data.}
-  \item{pred_all}{Default is \code{FALSE}, which produces prediction intervals only for the
-       first, middle and last five rows of data.}
+  \item{res_rows}{Default is 25, which lists the first 25 rows of data sorted
+       by the specified sort criterion.  To turn this option off, specify a
+       value of 0. To see the output for all observations, specify a value of
+       \code{"all"}.}
+  \item{res_sort}{Default is \code{"cooks"}, for specifying Cook's distance as
+       the sort criterion for the display of the rows of data and associated
+       residuals. Other values are \code{"rstudent"} for Studentized residuals,
+       and \code{"off"} to not provide the analysis.}
+  \item{pred}{Default is \code{TRUE}, which, produces confidence and prediction
+       intervals for each row, or selected rows, of data.}
+  \item{pred_all}{Default is \code{FALSE}, which produces prediction intervals
+       only for the first, middle and last five rows of data.}
   \item{prob_cut}{Probability threshold for classifying an observation into the
-        reference group (1) or not (0).}
+       reference group (1) or not (0). Can be a vector, in which case the
+       forecasts and first confusion matrix are for a threshold of 0.5, then
+       the specified values.}
   \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a larger value 
        are flagged in red and labeled in the resulting scatterplot of Residuals and Fitted 
        Values.  Default value is 1.0.}\cr
@@ -142,8 +145,8 @@ Logit(Gender ~ Years, filter=(Years > 5))
 # Provide all default analyses
 Logit(Gender ~ Years + Salary)
 
-# change the prediction probability threshold from 0.5
-Logit(Gender ~ Years + Salary, prob_cut=.7)
+# Specify additional probability thresholds than 0.5
+Logit(Gender ~ Years + Salary, prob_cut=c(.4, .7))
 
 # compare nested models
 # easier and better treatment of missing data to use lessR function:  Nest

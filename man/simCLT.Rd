@@ -8,9 +8,9 @@ Show the distribution of sample means and relevant summary statistics, such as t
 }
 
 \usage{
-simCLT(ns, n, p1=0, p2=1,
+simCLT(ns, n, p1=0, p2=1, seed=NULL,
        type=c("normal", "uniform", "lognormal", "antinormal"),
-       fill="lightsteelblue3", n_display=2, digits_d=3, 
+       fill="lightsteelblue3", n_display=0, digits_d=3, 
        subtitle=TRUE, pop=TRUE, 
        main=NULL, pdf=FALSE, width=5, height=5, \ldots)
 }
@@ -19,20 +19,34 @@ simCLT(ns, n, p1=0, p2=1,
 \arguments{
   \item{ns}{Number of samples, that is, repetitions of the experiment.}
   \item{n}{Size of each sample.}
-  \item{p1}{First parameter value for the population distribution, the mean, minimum or meanlog for the normal, uniform and lognormal populations, respectively. Must be 0, the minimum, for the anti-normal distribution.}
-  \item{p2}{Second parameter value for the population distribution, the standard deviation, maximum or sdlog for the normal, uniform and lognormal populations, respectively. Is the maximum for the anti-normal, usually left at the default value of 1.}
+  \item{p1}{First parameter value for the population distribution, the mean,
+        minimum or meanlog for the normal, uniform, and lognormal populations,
+        respectively. Must be 0, the minimum, for the anti-normal distribution.}
+  \item{p2}{Second parameter value for the population distribution, the standard
+        deviation, maximum or sdlog for the normal, uniform and lognormal
+        populations, respectively. Is the maximum for the anti-normal,
+        usually left at the default value of 1.}
+  \item{seed}{Default seed is the R default. Enter a positive integer value
+       to obtain a reproducible result, the same result for the same seed.}\cr
+
   \item{type}{The general population distribution.}
   \item{fill}{Fill color of the graphs.}
-  \item{n_display}{Number of samples for which to display the sample mean and data values_}
+  \item{n_display}{Number of samples for which to display the sample mean
+        and data values.}
   \item{digits_d}{Number of decimal digits to display on the output.}
-  \item{subtitle}{If \code{TRUE}, then display the specific parameter values of the population or sample, depending on the graph.}
-  \item{pop}{If \code{TRUE}, then display the graph of the population from which the data are sampled.}
-  \item{main}{Title of graph.}
+  \item{subtitle}{If \code{TRUE}, then display the specific parameter values
+        of the population or sample, depending on the graph.}
+  \item{pop}{If \code{TRUE}, then display the graph of the population from
+        which the data are sampled.}
+  \item{main}{Title of graph.}\cr
+
   \item{pdf}{Indicator as to if the graphic files should be saved as pdf files
        instead of directed to the standard graphics windows.}
   \item{width}{Width of the pdf file in inches.}
-  \item{height}{Height of the pdf file in inches.}
-  \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 
+  \item{height}{Height of the pdf file in inches.}\cr
+
+  \item{\dots}{Other parameter values for R function \code{\link{lm}}
+        which provides the core computations.} 
 }
 
 

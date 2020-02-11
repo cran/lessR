@@ -7,29 +7,29 @@
 \description{
 Abbreviation: \code{rd.cor}
 
-Read a correlation matrix into R. The resulting matrix is named \code{mycor}. All coefficients for each variable must be on one row.  No variable names are in the file to be read.
+A wrapper for base~R \code{\link{read.table}}. Read a correlation matrix into R. All coefficients for each variable must be on one physical row.  No variable names are in the file to be read.
 }
 
 \usage{
-corRead(ref=NULL, names=NULL)
+corRead(from=NULL, var_names=NULL, \dots)
 
 rd.cor(\ldots)
 }
 
 \arguments{
-  \item{ref}{File reference, either omitted to browse for the data file,
+  \item{from}{File reference, either omitted to browse for the data file,
         or a full path name or web URL, included in quotes.  A URL
         begins with \code{http://}.}
-  \item{names}{The names of the variables in the matrix.}
-  \item{\dots}{Parameter values_}
+  \item{var_names}{The names of the variables in the matrix.}
+  \item{\dots}{Parameter values for base R \code{\link{read.table}.}}
 }
 
 \details{
-Read a correlation, or any square, matrix into R. The resulting matrix is named \code{mycor}. All coefficients for each variable must be on one row.  No variable names are in the file to be read. The coefficients within each row, that is, for a single variable, are delimited by a white space, such as one or more blanks. 
+Read a correlation, or any square, matrix into R. All coefficients for each variable must be on one row.  No variable names are in the file to be read. The coefficients within each row, that is, for a single variable, are delimited by a white space, such as one or more blanks. 
 
-The standard R function used to read the matrix is \code{\link{read.table}}.
+The standard R function that reads the matrix is \code{\link{read.table}}.
 
-By default the variables are named V1, V2, etc.  If the \code{names} option is invoked, then the specified names are attached to the respective rows and columns of the matrix.  Here it may be convenient to name the variables with the \code{lessR} function \code{\link{to}}.
+By default the variables are named X1, X2, etc.  If the \code{var_names} option is invoked, then the specified names refer to the respective rows and columns of the matrix.  Here it may be convenient to name the variables with the \code{lessR} function \code{\link{to}}.
 
 The alternative is to calculate the correlations from the data, such as with the \code{lessR} function \code{\link{Correlation}} or the standard R function \code{\link{cor}}.
 }
@@ -47,11 +47,11 @@ Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 8, NY: Routl
 \examples{
 # browse for the data file because ref is omitted
 # name the variables with the lessR function to
-# mycor <- corRead(names=to("m",20))
+# mycor <- corRead(var_names=to("m",20))
 
 # abbreviated form
 # read a matrix with 4 variables and specify the names
-# mycor <- rd.cor(names=c("m06","m07","m09","m10"))
+# mycor <- rd.cor(var_names=c("m06","m07","m09","m10"))
 }
 
 
