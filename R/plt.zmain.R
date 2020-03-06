@@ -945,7 +945,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
       }
       if (prop) count <- round(count, 2)
-      cords <- data.frame(xx, yy, count)
+      cords <- data.frame(xx, yy, count, stringsAsFactors=TRUE)
 
 
       if (is.null(radius)) radius <- .22
@@ -983,7 +983,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       adj <- .RSadj(radius=radius)  # reg R multiply by 1.6
       radius <- adj$radius
 
-      cords <- data.frame(x, y, size)
+      cords <- data.frame(x, y, size, stringsAsFactors=TRUE)
 
       cords <- na.omit(cords)
       sz <- cords[,3]**power  # radius unscaled

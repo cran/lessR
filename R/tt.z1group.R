@@ -116,7 +116,7 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     }
   }     
 
-  cat("t-cutoff: tcut = ", .fmt(tcut,3), "\n") 
+  cat("t-cutoff for 95% range of variation: tcut = ", .fmt(tcut,3), "\n") 
   cat("Standard Error of Mean: SE = ", .fmt(sterr), "\n\n")
 
   if (!is.null(mu)) {

@@ -197,7 +197,7 @@ function(from=NULL, format=NULL, var_labels=FALSE,
 
 #     d <- readxl::read_excel(path=from, sheet=sheet)
     if (!is.null(list(...)$row.names))  # add any row.names to data frame
-      d <- data.frame(d, row.names=list(...)$row.names)
+      d <- data.frame(d, row.names=list(...)$row.names, stringsAsFactors=TRUE)
     # class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
 
       # if true integer, then convert from type double to integer

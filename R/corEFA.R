@@ -61,7 +61,7 @@ function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"),
     ld <- ld[order(mx), ]  # group items on same factor together
 
     fn <- max.col(abs(ld))  # each item, factor with its highest loading
-    ld <- data.frame(cbind(fn, ld))
+    ld <- data.frame(cbind(fn, ld), stringsAsFactors=TRUE)
 
     ld.new <- matrix(nrow=0, ncol=1+n_factors)
     for (i in 1:n_factors) {

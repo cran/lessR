@@ -104,12 +104,12 @@ function(x=NULL, by=NULL, data=d, n_cat=getOption("n_cat"),
       if (!("list" %in% class(data))) {
         data <- data[, x.col]
         if (length(x.col) == 1) {  # x is 1 var
-          data <- data.frame(data)
+          data <- data.frame(data, stringsAsFactors=TRUE)
           names(data) <- x.name
          }
       }
       else {  # class of data is "list"
-        data <- data.frame(data[[x.col]])
+        data <- data.frame(data[[x.col]], stringsAsFactors=TRUE)
         names(data) <- x.name
       }
     }
@@ -120,9 +120,9 @@ function(x=NULL, by=NULL, data=d, n_cat=getOption("n_cat"),
       else {  # x a vector in style
         .xstatus(x.name, df.name)  # var in df?, vars lists not checked
         if (!is.function(x))
-          data <- data.frame(x)  # x is 1 var
-        else
-          data <- data.frame(eval(substitute(data$x)))  # x is 1 var
+          data <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
+        else  # x is 1 var
+          data <- data.frame(eval(substitute(data$x)), stringsAsFactors=TRUE)
         names(data) <- x.name
       }
     }

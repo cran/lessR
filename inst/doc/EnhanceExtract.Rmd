@@ -1,0 +1,45 @@
+---
+title: "Enhance Extract"
+author: "David Gerbing"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ic, ir}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r}
+library("lessR")
+```
+
+
+The most general way to subset a matrix by rows and columns is the base R `Extract` function, called by `d[rows, columms]`, where _d_ is the data frame. Ultimately, to use this function, for the _rows_ parameter, pass the row names of the selected rows, the indices or actual names. For the _cols_ parameter, pass the column indices of the selected columns. 
+
+In many uses, perhaps most uses, the indices are not directly provided, but obtained through some logical specification. The annoying feature of the _rows_ parameter is that any reference to the variables in the logical specification must contain the name of the data frame followed by a \$. But this name has already been specified in the function call, and now is simply repeated for every variable reference.
+
+The column specification is usually provided as a variable list. Here the annoying aspect is that all variable names must be quoted, and no variable ranges are permitted. Quite clumsy.
+
+To address these deficiencies, __lessR__ provides two functions, `ir()` for index rows, and `ic()` for index columns. The general form of the subsetting includes these two functions.
+```
+d[ir(), ic()]
+```
+Both functions, only callable within the `Extract` function, use what R refers to as non-standard evaluation. That basically means that the annoying restrictions are removed.
+
+To illustrate, use the Employee data set contained in __lessR__, here read into the _d_ data frame.
+
+```{r}
+d <- Read("Employee", quiet=TRUE)
+```
+
+Subset the data frame by only listing observations with a _Gender_ of "M" with scores on _Post_ larger than 90. Only list columns for the variables in the range from _Years_ to _Salary_, and _Post_. Referring back to the output of `Read()`, the variable range includes _Years_, _Gender_, _Dept_, and _Salary_.
+
+```{r}
+d[ir(Gender=="M" & Post>90), ic(Years:Salary, Post)]
+```
+
+Following is the traditional R call for subsetting.
+
+```{r}
+d[d$Gender=="M" & d$Post>90, c("Years", "Gender", "Dept", "Salary", "Post")]
+```
+

@@ -74,7 +74,7 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
     nm.vars <- names(data)[ind]
     new.lbls <- l[which(row.names(l) %in% nm.vars), ]
 
-    new.mat2 <- data.frame(matrix(nrow=n.add, ncol=1))
+    new.mat2 <- data.frame(matrix(nrow=n.add, ncol=1), stringsAsFactors=TRUE)
     names(new.mat2) <- "label"
 
     row.start <- n_col + 1
@@ -85,7 +85,7 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
   }
 
   if (!var_labels)
-    return(data=as.data.frame(data))
+    return(data=as.data.frame(data, stringsAsFactors=TRUE))
   else
     return(new.labels)
 

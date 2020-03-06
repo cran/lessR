@@ -41,8 +41,9 @@ function(lm.out, cook, digits_d=NULL, res_sort="cooks", res_rows=NULL,
   #cook <- cooks.distance(lm.out)
   
   # text output
-  out <- data.frame(fit, res, rstudent(lm.out), dffits(lm.out), cook)
-  out <- data.frame(lm.out$model[nm[1]], out)
+  out <- data.frame(fit, res, rstudent(lm.out), dffits(lm.out), cook,
+                    stringsAsFactors=TRUE)
+  out <- data.frame(lm.out$model[nm[1]], out, stringsAsFactors=TRUE)
   if (n.pred > 0) out <- data.frame(lm.out$model[c(nm[seq(2,n.vars)])], out)
 
   #out <- data.frame(out)

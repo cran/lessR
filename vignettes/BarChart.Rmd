@@ -1,0 +1,65 @@
+---
+title: "Bar Charts"
+author: "David Gerbing"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{bar chart}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r}
+library("lessR")
+```
+
+
+## Bar Charts
+
+One of the most frequently encountered visualizations is the bar chart.
+
+>_Bar chart_: Plots a number associated with each category of a categorical variable as the height of the corresponding bars.
+
+A call to a function to create a bar chart has to contain the name of the variable that contains the categories to be plotted. With the `BarChart()` function, that variable name is the first argument passed to the function, and often, as in this example, the _only_ argument passed to the function. In that situation, the numerical value associated with each bar is the corresponding count of the number of occurrences.
+
+
+First read the Employee data included as part of __lessR__.
+
+```{r read}
+d <- Read("Employee")
+```
+
+To illustrate, consider the categorical variable _Dept_ in the Employee data table.  Use `BarChart()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_.
+
+```{r bcEx, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Bar chart of tablulated counts of employees in each department."}
+BarChart(Dept)
+```
+
+The `BarChart()` function provides a default color theme, and labels each bar with the associated numerical value. The function also provides the corresponding frequency distribution, the table that lists the count of each category, from which the bar chart is constructed.
+
+## Pie Charts
+
+An alternative to the bar chart for a single categorical variable is the pie chart.
+
+>_Pie Chart_: Relates each level of a categorical variable to the area of a circle (pie) scaled according to the value of an associated numerical variable.
+
+Here the presented version of a pie chart is the doughnut or ring chart.
+
+```{r, echo=FALSE, include=FALSE}
+d <- Read("Employee")
+```
+
+```{r pc1}
+PieChart(Dept)
+```
+
+``
+
+The doughnut or ring chart appears easier to read than a standard bar chart. But the _lessR_ function `PieChart()` also can create the "old-fashioned" pie chart. We have seen the summary statistics several times now, so turn off the output to the R console here with the `quiet` parameter.
+
+
+```{r hole0, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Standard pie chart of variable _Dept_ in the _d_ data frame."}
+PieChart(Dept, hole=0, quiet=TRUE)
+```
+
+Set the size of the hole in the doughnut or ring chart with the parameter `hole`, which specifies the proportion of the pie occupied by the hole. The default hole size is 0.65. Set that value to 0 to close the hole.
+

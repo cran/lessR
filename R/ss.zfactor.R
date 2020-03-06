@@ -122,7 +122,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     }
     
     # use for returned output, x is a 2-way table
-    freq_df <- as.data.frame(t(x))
+    freq_df <- data.frame(t(x), stringsAsFactors=TRUE)
 
     xx <- addmargins(x)
 
@@ -261,6 +261,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
                   pvalue=""))
     }
 
+
     else {  # table not of unique values, so proceed
       n.dim <- 1
 
@@ -337,27 +338,32 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
         txmis <- tx    
       }
 
-      tx <- character(length = 0)
-      ch <- suppressWarnings(chisq.test(x))  # provide own warning of small n
-      tx[length(tx)+1] <- 
-        "Chi-squared test of null hypothesis of equal probabilities"
-      tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ", df = ",
-        ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
-      if (any(ch$expected < 5)) 
-        tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
-            "so chi-squared approximation may not be accurate", "\n")
-      txchi <- tx
-      
+      txchi <- ""
       txlbl <- ""
-      tx <- character(length = 0)
-      if (!is.null(c.nm)) {
-        tx[length(tx)+1] <- "Unabbreviated labels"
-        tx[length(tx)+1] <- "--------------------"
-        tx[length(tx)+1] <- paste(c.nm, sep="", collapse="\n")
-        txlbl <- tx
+      ch <- NULL
+      if (nrow(x) > 1) {
+        tx <- character(length = 0)
+        ch <- suppressWarnings(chisq.test(x))  # provide own warning of small n
+        tx[length(tx)+1] <- 
+          "Chi-squared test of null hypothesis of equal probabilities"
+        tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ", df = ",
+          ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
+        if (any(ch$expected < 5)) 
+          tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
+              "so chi-squared approximation may not be accurate", "\n")
+        txchi <- tx
+        
+        txlbl <- ""
+        tx <- character(length = 0)
+        if (!is.null(c.nm)) {
+          tx[length(tx)+1] <- "Unabbreviated labels"
+          tx[length(tx)+1] <- "--------------------"
+          tx[length(tx)+1] <- paste(c.nm, sep="", collapse="\n")
+          txlbl <- tx
+        }
       }
 
-      freq_df <- as.data.frame(x)
+      freq_df <- data.frame(x, stringsAsFactors=TRUE)
       names(freq_df)[1] <- x.name
 
       return(list(n.dim=n.dim, title=txttl, counts=txcnt, miss=txmis, 

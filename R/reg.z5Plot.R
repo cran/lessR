@@ -144,7 +144,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
           }
         }
       }
-      cords <- data.frame(xx, yy, count)
+      cords <- data.frame(xx, yy, count, stringsAsFactors=TRUE)
 
       power <- 0.6
       sz <- cords[,3]**power  # radius unscaled 

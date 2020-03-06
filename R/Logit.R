@@ -292,7 +292,7 @@ function(my_formula, data=d, filter=NULL,
         m.f <- paste("Y ~", nm[2])
         if (n.pred > 1)
           for (i in 2:n.pred) m.f <- paste(m.f, "+", nm[i+1])
-        m.d <- data.frame(Y, data)
+        m.d <- data.frame(Y, data, stringsAsFactors=TRUE)
       }
       else {
         m.f <- my_formula

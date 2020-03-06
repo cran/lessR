@@ -65,11 +65,18 @@ function(nm, dname, fun_call, res_rows, pred_rows, res_sort,
 
   tx <- character(length = 0)
 
+
+
   tx[length(tx)+1] <- "---"
   tx[length(tx)+1] <- "output:"
   tx[length(tx)+1] <- "  html_document:"
   tx[length(tx)+1] <- "    fig_height: 4.5"
   tx[length(tx)+1] <- "    fig_width: 5.5"
+# tx[length(tx)+1] <- ""
+  if (n.pred > 1)
+    tx[length(tx)+1] <- paste("title: \"Multiple Regression of ", Y, "\"", sep="")
+  else
+    tx[length(tx)+1] <- paste("title: \"Regression of ", Y, " on ", X, "\"", sep="")
   tx[length(tx)+1] <- "---"
 
 
@@ -90,13 +97,6 @@ sep="")
   tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- "***"
 
-
-
-  tx[length(tx)+1] <- ""
-  if (n.pred > 1)
-    tx[length(tx)+1] <- paste("# Multiple Regression of ", Y, sep="")
-  else
-    tx[length(tx)+1] <- paste("# Regression of ", Y, " on ", X, sep="")
 
   tx[length(tx)+1] <- "```{r echo=FALSE}"
   tx[length(tx)+1] <- "suppressPackageStartupMessages(library(lessR))  # lessR"

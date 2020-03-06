@@ -30,16 +30,17 @@ function(lm.out,
     tx[length(tx)+1] <- "   [to see all intervals do pred_rows=\"all\"]"
   
   if (!new.data) {
-    c.int <- data.frame(predict(lm.out, interval="confidence"))
+    c.int <- data.frame(predict(lm.out, interval="confidence"),
+                        stringsAsFactors=TRUE)
     p.int <- suppressWarnings(predict(lm.out,
-                                         interval="prediction", se.fit=TRUE))
+                                      interval="prediction", se.fit=TRUE))
     s.prederr <- sqrt(p.int$residual.scale^2 + p.int$se.fit^2)
     p.width <- p.int$fit[,"upr"] - p.int$fit[,"lwr"]
     out <- cbind(lm.out$model[nm[1]],
              p.int$fit[,"fit"], s.prederr, p.int$fit[,"lwr"],
              p.int$fit[,"upr"], p.width)
     if (n.pred > 0) out <- cbind(lm.out$model[c(nm[seq(2,n.vars)])], out)
-    out <- data.frame(out)
+    out <- data.frame(out, stringsAsFactors=TRUE)
   }
   else {
     Xnew.val <- list(X1_new)
@@ -49,7 +50,8 @@ function(lm.out,
     }
     Xnew <- expand.grid(Xnew.val)
     for (i in 1:(n.pred)) names(Xnew)[i] <- nm[i+1]
-    c.int <- data.frame(predict(lm.out, interval="confidence", newdata=Xnew))
+    c.int <- data.frame(predict(lm.out, interval="confidence", newdata=Xnew),
+                        stringsAsFactors=TRUE)
     p.int <- predict(lm.out, interval="prediction", newdata=Xnew,
                                  se.fit=TRUE)
     s.prederr <- sqrt(p.int$residual.scale^2 + p.int$se.fit^2)
@@ -133,7 +135,8 @@ function(lm.out,
   for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 
 
-  p.int <- data.frame(cbind(p.int$fit[,"lwr"], p.int$fit[,"upr"]))
+  p.int <- data.frame(cbind(p.int$fit[,"lwr"], p.int$fit[,"upr"]),
+                      stringsAsFactors=TRUE)
   names(p.int) <- c("lwr", "upr")
 
   return(list(cint=c.int, pint=p.int, tx=tx, predmm=predmm))  # need in 5Plot next

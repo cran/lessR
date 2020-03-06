@@ -51,8 +51,10 @@ function(out, type, digits_d=NULL, pred.intervals=TRUE,
         data <- data[o,]
       }
       r2.out <- lm(out$formula, data=data)
-      c.int <- data.frame(predict(r2.out, interval="confidence"))
-      p.int <- data.frame(suppressWarnings(predict(r2.out, interval="prediction")))
+      c.int <- data.frame(predict(r2.out, interval="confidence"),
+                          stringsAsFactors=TRUE)
+      p.int <- data.frame(suppressWarnings(predict(r2.out,
+                          interval="prediction")), stringsAsFactors=TRUE)
     }
     else {
       c.int <- NULL

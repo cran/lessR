@@ -1,5 +1,5 @@
 Sort <-
-function(by, direction=NULL, data=d, quiet=getOption("quiet"), ...) {
+function(data=d, by, direction=NULL, quiet=getOption("quiet"), ...) {
 
 
   if (missing(by)) {
@@ -15,7 +15,6 @@ function(by, direction=NULL, data=d, quiet=getOption("quiet"), ...) {
 
   if (!quiet) {
     cat("\nSort Specification\n")
-    .dash(31)
   }
 
   if (deparse(substitute(by)) == "row.names") {
@@ -26,8 +25,9 @@ function(by, direction=NULL, data=d, quiet=getOption("quiet"), ...) {
       else if (direction[1] == "-") txt <- "descending"
       else {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Value of direction, the sort direction specification: ", direction[1], "\n\n",
-        "Only permissible values are + for ascending and - for descending.\n\n")
+        "Value of direction, the sort direction specification: ", direction[1],
+        "\n\n",
+        "Permissible values are + for ascending and - for descending.\n\n")
       }
     }
     else 
@@ -66,13 +66,14 @@ function(by, direction=NULL, data=d, quiet=getOption("quiet"), ...) {
     # console output
     if (!quiet) {
       for (i in 1:n.sort) {
-        cat(" ", names(data)[by.col[i]], "-->")
+        cat(" ", by.col[i], "-->")
         if (direction[i] == "+") txt <- "ascending"
         else if (direction[i] == "-") txt <- "descending"
         else {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Value of direction, the sort direction specification: ", direction[i], "\n\n",
-          "Only permissible values are + for ascending and - for descending.\n\n")
+          "Value of direction, the sort direction specification: ",
+          direction[i], "\n\n",
+          "Permissible values are + for ascending and - for descending.\n\n")
         }
         cat(" ", txt, "\n") 
       }
@@ -110,7 +111,6 @@ function(by, direction=NULL, data=d, quiet=getOption("quiet"), ...) {
 
 
   # finish the console output
-  if (!quiet) .dash(31)
   cat("\n")
 
 
@@ -118,16 +118,7 @@ function(by, direction=NULL, data=d, quiet=getOption("quiet"), ...) {
   o <- eval(parse(text=ord))
   d <- data[o, ]
 
-  if (!quiet) {
-    cat("\n")
-    .dash(68)
-    cat("After the Sort, first four rows of data ")
-    cat( "\n")
-    .dash(68)
-    print(head(d, n=4))
-    cat("\n")
-  }
-
   return(d)
 
 }
+

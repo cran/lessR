@@ -77,13 +77,13 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
     tx[length(tx)+1] <- nm[2]
     m1 <-  tapply(y.values, x1.values, mean, na.rm=TRUE)
-    m1 <- data.frame(t(m1))
+    m1 <- data.frame(t(m1), stringsAsFactors=TRUE)
     tx2 <- .prntbl(m1, digits_d)  # 1st treatment horizontal dimension
     for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- nm[3]
     m2 <-  tapply(y.values, x2.values, mean, na.rm=TRUE)
-    m2 <- data.frame(t(m2))
+    m2 <- data.frame(t(m2), stringsAsFactors=TRUE)
     tx2 <- .prntbl(m2, digits_d)  # 2nd treatment horizontal dimension
     for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 

@@ -364,10 +364,10 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
     }
     if (!("list" %in% class(data))) {
       data.x <- data[, x.col]
-      data.x <- data.frame(data.x)
+      data.x <- data.frame(data.x, stringsAsFactors=TRUE)
     }      
     else {  # class of data is "list"
-       data.x <- data.frame(data[[x.col]])
+       data.x <- data.frame(data[[x.col]], stringsAsFactors=TRUE)
     }
     if (is.numeric(x.col))
       names(data.x) <- names(data.vars)[x.col]
@@ -385,7 +385,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
   }
       
   else if (is.ts(x)) {  # time series in global # just the dates for x var
-    data.x <- data.frame(.ts.dates(x))
+    data.x <- data.frame(.ts.dates(x), stringsAsFactors=TRUE)
     names(data.x) <- "date"
     date.ts <- TRUE
     if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
@@ -398,7 +398,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
       y.call <- x[,1]
       if (nc > 1) for (i in 2:nc) y.call <- cbind(y.call, x[,i])
     }
-    y.call <- data.frame(y.call)
+    y.call <- data.frame(y.call, stringsAsFactors=TRUE)
     y.col <- ncol(y.call)
     cat.y <- FALSE
     if (nc == 1) {
@@ -414,9 +414,9 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
       
   else {  # x a not ts vector in global
     if (!is.function(x))
-      data.x <- data.frame(x)  # x is 1 var
+      data.x <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
     else
-      data.x <- data.frame(eval(substitute(data$x)))  # x is 1 var
+      data.x <- data.frame(eval(substitute(data$x)), stringsAsFactors=TRUE)  # x is 1 var
     names(data.x) <- x.name
   }
     
@@ -552,7 +552,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
       y.call <- factor(row.names(data), levels=row.names(data))
       if (is.null(ylab)) ylab <- ""  # unless specified, drop the axis label
       cat.y <- TRUE
-      data.y <- data.frame(y.call)
+      data.y <- data.frame(y.call, stringsAsFactors=TRUE)
     }
       
     # y not in global env, in df, specify data= forces to data frame
@@ -564,10 +564,10 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
         
         if (!("list" %in% class(data))) {
           data.y <- data[, y.col]
-          data.y <- data.frame(data.y)
+          data.y <- data.frame(data.y, stringsAsFactors=TRUE)
        }      
        else {  # class of data is "list"
-          data.y <- data.frame(data[[y.col]])
+          data.y <- data.frame(data[[y.col]], stringsAsFactors=TRUE)
         }
       if (is.numeric(y.col))
         names(data.y) <- names(data.vars)[y.col]
@@ -575,7 +575,8 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
         names(data.y) <- y.col
       }  # end global y
 
-      else if (is.data.frame(y)){ # y is in the global env (vector or data frame)
+      # y is in the global env (vector or data frame)
+      else if (is.data.frame(y)) {
           # y a data frame
           data.y <- y
       }
@@ -583,10 +584,11 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
       else {  # y a vector in global
         if (!is.function(y)) {
           .xstatus(y.name, df.name, quiet)  # in global note
-          data.y <- data.frame(y)  # y is 1 var
+          data.y <- data.frame(y, stringsAsFactors=TRUE)  # y is 1 var
         }
         else
-          data.y <- data.frame(eval(substitute(data$y)))  # y is 1 var
+          # y is 1 var
+          data.y <- data.frame(eval(substitute(data$y)), stringsAsFactors=TRUE)
         names(data.y) <- y.name
       }
 
@@ -997,7 +999,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
   # prep 1-variable bubble plot to call regular scatter plot function
   # y.call to 0
   if (is.null(y.call)  &&  cat.x  &&  n.x_var == 1  &&  data.do) {
-    y.call <- data.frame(rep(0, nrow(x.call)))
+    y.call <- data.frame(rep(0, nrow(x.call)), stringsAsFactors=TRUE)
     cat.y <- FALSE
     if (object == "default") object <- "bubble"
   }
@@ -1037,7 +1039,8 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
         rm(d.y)
       }  # also no y missing
 
-      if (!is.unsorted(y.call) && eq.int && sum(is.na(x))==0) object <- "both"
+      if (!is.unsorted(y.call) && eq.int && sum(is.na(x))==0)
+        object <- "both"
     }
   }
 
@@ -1067,7 +1070,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
         options(yname=x.name)
         
         options(xname="Index")
-        x.call <- data.frame(1:nrow(x.call))
+        x.call <- data.frame(1:nrow(x.call), stringsAsFactors=TRUE)
         names(x.call) <- "Index"
       }
 
@@ -1153,8 +1156,8 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
           print(output)
         }
 
-        x.call <- data.frame(x.call)
-        y.call <- data.frame(y.call)
+        x.call <- data.frame(x.call, stringsAsFactors=TRUE)
+        y.call <- data.frame(y.call, stringsAsFactors=TRUE)
 
       }  # end freq polygon
     }  # end !cat.x
@@ -1167,7 +1170,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
           if (seg.x.miss) segments_x <- TRUE
           ylab <- ifelse (stat == "count", "Count of", "Proportion of")
           ylab <- paste(ylab, x.name)
-          x.call <- data.frame(x.call)
+          x.call <- data.frame(x.call, stringsAsFactors=TRUE)
         }  # end if Trellis
 
         else {  # not Trellis, so manually flip to match dot plot style
@@ -1191,8 +1194,8 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
           cat.y <- TRUE
           num.cat.y <- TRUE
           options(yname=x.name)
-          y.call <- data.frame(y.call)
-          x.call <- data.frame(as.vector(frq))
+          y.call <- data.frame(y.call, stringsAsFactors=TRUE)
+          x.call <- data.frame(as.vector(frq), stringsAsFactors=TRUE)
         }
       }  # end values in
     }  # end cat.x
@@ -1483,8 +1486,8 @@ if (is.null(out_size)) out_size <- size.pt
       #}
       y.call <- as.vector(out)
 
-      x.call <- data.frame(x.call)
-      y.call <- data.frame(y.call)
+      x.call <- data.frame(x.call, stringsAsFactors=TRUE)
+      y.call <- data.frame(y.call, stringsAsFactors=TRUE)
 
     # switch
       temp.call <- x.call

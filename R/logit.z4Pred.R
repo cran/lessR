@@ -25,7 +25,8 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     
     # get output table, with label
     if (!new.data) {
-      p.int <- data.frame(predict(lm.out, type="response", se.fit=TRUE))
+      p.int <- data.frame(predict(lm.out, type="response", se.fit=TRUE),
+                          stringsAsFactors=TRUE)
 
       # classify
       label <- integer(length=nrow(p.int))
@@ -52,7 +53,7 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       for (i in 1:(n.pred)) names(Xnew)[i] <- nm[i+1]
 
       p.int <- data.frame(predict(lm.out, type="response",
-                          se.fit=TRUE, newdata=Xnew))
+                          se.fit=TRUE, newdata=Xnew), stringsAsFactors=TRUE)
       label <- integer(length=nrow(p.int))
       for (i in 1:nrow(p.int))
         label[i] <- ifelse (p.int$fit[i] < p.cut[i], 0, 1)
@@ -84,7 +85,7 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       names(out)[n.vars+1] <- "predict"
       names(out)[n.vars+2] <- "fitted"
       names(out)[n.vars+3] <- "std.err"
-      out <- data.frame(out)
+      out <- data.frame(out, stringsAsFactors=TRUE)
       if (pred_sort) {
         o <- order(out[,n.vars+2])  # fitted value
         out <- out[o,]

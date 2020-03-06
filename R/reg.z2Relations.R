@@ -112,13 +112,14 @@ function(lm.out, dname, n.keep, show_R,
     }
 
     if (numeric.all) {
-      X <- data.frame(lm.out$model[nm[seq(2,n.vars)]])
+      X <- data.frame(lm.out$model[nm[seq(2,n.vars)]], stringsAsFactors=TRUE)
       Y <- numeric(length=n.keep)  # convert response to an atomic vector for leaps
       for (i in 1:n.keep) Y[i] <- lm.out$model[nm[1]][i,1]
       lp.out <- leaps(X, Y, method="adjr2")  # leaps function
       md <- lp.out$which  # md is logical
       rownames(md) <- 1:nrow(md)  # matrix md does not have proper row names
-      models <- data.frame(md, lp.out$adjr2, lp.out$size-1)  # gives 0, 1
+      # gives 0, 1
+      models <- data.frame(md, lp.out$adjr2, lp.out$size-1, stringsAsFactors=TRUE)
       names(models) <- c(names(X), "R2adj", "X's")
       mod.srt <- models[order(models$R2adj, decreasing=TRUE),]
       names(mod.srt)[ncol(mod.srt)-1L] <- "   R2adj"

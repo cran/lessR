@@ -37,7 +37,7 @@ function(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
 
     l <- attr(data, which="variable.labels") # save variable labels
     if (!is.null(l)) {
-      l <- data.frame(l)
+      l <- data.frame(l, stringsAsFactors=TRUE)
       file.lbl <- substr(file.data,1,nchar(file.data)-4)
       file.lbl <- paste(paste(file.lbl,"_lbl",sep=""), ".csv" ,sep="")
       write.table(l, file=file.lbl, col.names=FALSE, dec=".", sep=",")

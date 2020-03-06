@@ -287,11 +287,11 @@ function(x, y=NULL, ...) {
         if (!paired)
           if (y.l == 0) {  # 1-group
             plt <- tt.setup(x, ...)
-            data <- data.frame(x)
+            data <- data.frame(x, stringsAsFactors=TRUE)
           }
           else  {# 2-group
             plt <- tt.setup(x, y,  ...)
-            data <- data.frame(x, y)
+            data <- data.frame(x, y, stringsAsFactors=TRUE)
           }
         else {  # paired
           if (length(x)!=length(y))  {
@@ -300,7 +300,7 @@ function(x, y=NULL, ...) {
           }
           diff <- y - x
           plt <- tt.setup(diff, ...)
-          data <- data.frame(x, y)
+          data <- data.frame(x, y, stringsAsFactors=TRUE)
         }
       }
     }
@@ -385,7 +385,7 @@ function(x, y=NULL, ...) {
     plot.title[plot.i] <- "Differences from Equality"
 
     # construct x.call
-    x.call <- data.frame(x.values, y.values)
+    x.call <- data.frame(x.values, y.values, stringsAsFactors=TRUE)
     names(x.call) <- c(x.name, y.name)
     x.call <- data.matrix(x.call, rownames.force=FALSE)
 
@@ -405,8 +405,9 @@ function(x, y=NULL, ...) {
     }
 
     # Cleveland two-variable dot plot
-    .plt.main(data.frame(x.call), data.frame(y.call), cat.y=TRUE,
-       shape=21, size=.8, ylab="", segments_y=TRUE, quiet=TRUE)
+    .plt.main(data.frame(x.call, stringsAsFactors=TRUE),
+              data.frame(y.call, stringsAsFactors=TRUE), cat.y=TRUE,
+              shape=21, size=.8, ylab="", segments_y=TRUE, quiet=TRUE)
 
     if (!is.null(pdf_file)) {
       dev.off()

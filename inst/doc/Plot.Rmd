@@ -1,0 +1,78 @@
+---
+title: "Scatter Plots"
+author: "David Gerbing"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{scatter plots}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r}
+library("lessR")
+```
+
+
+First read the Employee data included as part of __lessR__.
+
+```{r read}
+d <- Read("Employee")
+```
+
+__lessR__ does many versions of a scatter plot with its `Plot()` function.
+
+
+## Two Variables
+
+The regular scatterplot.
+
+```{r sp}
+Plot(Years, Salary)
+```
+
+
+The enhanced scatterplot with parameter `enhance`. 
+
+```{r spEnhance}
+Plot(Years, Salary, enhance=TRUE)
+```
+
+
+Map variable _Pre_ to the points with the `size` parameter, a bubble plot.
+
+```{r size}
+Plot(Years, Salary, size=Pre)
+```
+
+Plot against levels of categorical variable _Gender_ with the `by` parameter.
+
+```{r by}
+Plot(Years, Salary, by=Gender)
+```
+
+
+Two categorical variables result in a bubble plot of their joint frequencies.
+
+```{r}
+Plot(Dept, Gender)
+```
+
+
+## Distribution of a Single Variable
+
+The default plot for a single continuous variable includes not only the scatterplot, but also the violin plot and box plot, with outliers identified. Call this plot the VBS plot.
+
+```{r}
+Plot(Salary)
+```
+
+
+For a single categorical variable, get the corresponding bubble plot of frequencies.
+
+```{r}
+Plot(Dept)
+```
+
+
+
+

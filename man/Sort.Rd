@@ -11,19 +11,19 @@ Sorts the values of a data frame according to the values of one or more variable
 }
 
 \usage{
-Sort(by, direction=NULL, data=d, quiet=getOption("quiet"), ...)
+Sort(data=d, by, direction=NULL, quiet=getOption("quiet"), ...)
 
 srt(\ldots)
 }
 
 \arguments{
+  \item{data}{The name of the data frame from which to create the subset, which
+       is \code{d} by default.}
   \item{by}{One or more variables to be sorted, or just the character string 
        \code{row.names} or \code{random}.}
   \item{direction}{Default is ascending for all variables listed in \code{by}.
        Or, specify a list of \code{"+"} for ascending and \code{"-"} for
        descending, one for each variable to be sorted.}
-  \item{data}{The name of the data frame from which to create the subset, which
-       is \code{d} by default.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}
   \item{\dots}{Parameter values_}
@@ -57,26 +57,24 @@ d <- read.table(text="Severity Description
 
 # sort the data frame called d according to Severity
 #   in ascending order
-d <- Sort(Severity)
+d <- Sort(d, Severity)
 
 # abbreviated form, replace original with sorted
-d <- srt(Severity)
+d <- srt(d, Severity)
 
 # sort Description in descending order, sort Severity within
 #  each level of Description in ascending order
-d <- Sort(c(Description, Severity), direction=c("-", "+"))  
+d <- Sort(d, c(Description, Severity), direction=c("-", "+"))  
 
 # data in a different data frame than d
-data(dataEmployee)
-d <- Sort(Gender, data=dataEmployee)
+d <- Read("Employee")
+d <- Sort(d, Gender)
 
 # sort by row names in ascending order
-d <- Read("Employee")
-d <- Sort(row.names)
+d <- Sort(d, row.names)
 
 # randomly re-shuffle the rows of data
-d <- Read("Employee")
-d <- Sort(random)
+d <- Sort(d, random)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -230,7 +230,7 @@ function(my_formula, data=d, filter=NULL,
     res <- residuals(av.out)
     sres <- rstandard(av.out)
     out <- cbind(av.out$model[c(nm[seq(2,n.vars)],nm[1])], fit, res, sres)
-    out <- data.frame(out)
+    out <- data.frame(out, stringsAsFactors=TRUE)
     names(out)[n.vars+1] <- "fitted"
     names(out)[n.vars+2] <- "residual"
     names(out)[n.vars+3] <- "zresid"

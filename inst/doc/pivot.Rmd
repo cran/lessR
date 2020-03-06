@@ -1,0 +1,58 @@
+---
+title: "Pivot Table"
+author: "David Gerbing"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{pivot table}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r}
+library("lessR")
+```
+
+
+`pivot()` uses base R `aggregate()` to generate a pivot table (Excel terminology). Express the categorical variables over which to pivot as a vector with the `c())` function.
+
+`pivot()` provides two additional features than `aggregate()` provides. First is the inclusion of the sample size for each cell. Second is that the data parameter is listed first in the parameter list, which facilitates the use of the pipe operator from the __magrittr__ package. 
+
+Presently, there is only a single variable for the aggregation, the parameter _value_. Variable ranges in the specification of _by_ as not needed in general. Only a small number of grouping variables generally define the cells for the aggregation.
+
+To illustrate, use the Employee data set included in __lessR__, here read into the _d_ data frame.
+
+```{r}
+d <- Read("Employee", quiet=TRUE)
+```
+
+Two categorical variables are _Dept_ and _Salary_. A continuous variable is _Salary_. Create the pivot table that expresses the mean of _Salary_ for all combinations of _Dept_ and _Salary_.
+```{r}
+pivot(data=d, compute=mean, value=Salary, by=c(Dept, Gender))
+```
+
+
+The output of `pivot()` is a data frame of the aggregated variables. This can be saved for further analysis. Here, list the parameter values in order without the parameter names.
+
+```{r}
+a <- pivot(d, mean, Salary, c(Dept, Gender))
+```
+
+Because the output of `pivot()` is a standard R data frame, typical operations such as sorting can be applied, here using the __lessR__ function `Sort()`. Here change the sort order.
+
+```{r}
+Sort(a, by=Dept)
+```
+
+
+Here, filter the rows so that the analysis applies only to the men in the full data set.
+
+```{r}
+pivot(d, mean, Salary, c(Dept, Gender), filter=(Gender=="M"))
+```
+
+For two `by` categorical variables, have the option of displaying results as a two-dimensional table.
+
+```{r}
+pivot(d, mean, Salary, c(Dept, Gender), table_2d=TRUE)
+```
+

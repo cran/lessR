@@ -182,12 +182,12 @@ function(x=NULL, data=d, filter=NULL,
       }
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
-      ind <- eval(substitute(x), envir=data.vars)  # col num of each var     
       if (!missing(filter)) {  # subset rows
         r <- eval(substitute(filter), envir=data, enclos=parent.frame())
         r <- r & !is.na(r)  # set missing for a row to FALSE
         data <- data[r,,drop=FALSE]
       }
+      ind <- eval(substitute(x), envir=data.vars)  # col num of each var     
       if (!("list" %in% class(data))) {
         data.x <- data[, ind]
         if (length(ind) == 1) {  # x is 1 var
@@ -199,12 +199,12 @@ function(x=NULL, data=d, filter=NULL,
               "or\n",
               "  BarChart(", x.name, ")\n\n", sep="")
           }
-          data.x <- data.frame(data.x)
+          data.x <- data.frame(data.x, stringsAsFactors=TRUE)
           names(data.x) <- x.name
         }
       }
       else {  # class of data is "list"
-        data.x <- data.frame(data[[ind]])
+        data.x <- data.frame(data[[ind]], stringsAsFactors=TRUE)
         names(data.x) <- x.name
       }
     }  # x not in global
@@ -215,9 +215,9 @@ function(x=NULL, data=d, filter=NULL,
       else {  # x a vector in global
         .xstatus(x.name, df.name, quiet)
         if (!is.function(x))
-          data.x <- data.frame(x)  # x is 1 var
-        else
-          data.x <- data.frame(eval(substitute(data$x)))  # x is 1 var
+          data.x <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
+        else  # x is 1 var
+          data.x <- data.frame(eval(substitute(data$x)), stringsAsFactors=TRUE)
         names(data.x) <- x.name
       }
     }  # x is in global

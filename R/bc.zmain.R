@@ -541,8 +541,8 @@ function(x, y, by, stack100,
     if (mx.ch > 9) rm <- rm + .04
   }
 
-  if (legend_position == "top") tm <- tm + (-0.08 + (0.446 * lab_cex))
-  #if (legend_position == "top") tm <- tm + .45
+  if (legend_position == "top")
+    tm <- tm + (.25 + (0.446 * lab_cex))  # tm <- tm + .45
 
   # user manual adjustment
   bm <- bm + bm.adj
@@ -568,7 +568,9 @@ function(x, y, by, stack100,
   if (rescale == 4) width.bars <- .17
   if (rescale == 3) width.bars <- .22
   if (rescale == 2) width.bars <- .28
+  if (rescale == 1) width.bars <- .30  # for only one category
   if (rescale > 0) gap <- 0.246 + (0.687 * width.bars)
+
 
   # barplot run here only to establish usr coordinates, axTick values
   #  otherwise usr is just 0,1 for both axes

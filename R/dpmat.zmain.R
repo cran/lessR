@@ -98,7 +98,7 @@ function(x, l, sort_yx,
       yy[k] <- i
     }
   }
-  cords <- data.frame(xx, yy, count)
+  cords <- data.frame(xx, yy, count, stringsAsFactors=TRUE)
 
   c <- cords$count  # 0 plots to a single pixel, so remove
   for (i in 1:length(c)) if (c[i]==0) c[i] <- NA

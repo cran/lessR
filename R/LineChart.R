@@ -137,12 +137,12 @@ function(x, data=d, filter=NULL,
       if (!("list" %in% class(data))) {
         data <- data[, ind]
         if (length(ind) == 1) {
-          data <- data.frame(data)  # x is 1 var
+          data <- data.frame(data, stringsAsFactors=TRUE)  # x is 1 var
           names(data) <- x.name
          }
       }
       else {
-        data <- data.frame(data[[ind]])
+        data <- data.frame(data[[ind]], stringsAsFactors=TRUE)
         names(data) <- x.name
       }
     }
@@ -151,7 +151,7 @@ function(x, data=d, filter=NULL,
         data <- x
       else {  # x a vector in global
         .xstatus(x.name, df.name, quiet)
-        data <- data.frame(x)  # x is 1 var
+        data <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
         names(data) <- x.name
       }
     }

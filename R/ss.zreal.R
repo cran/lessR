@@ -163,7 +163,7 @@ function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
 
       txtbl <- tx
 
-    values <- data.frame(x)
+    values <- data.frame(x, stringsAsFactors=TRUE)
     names(values) <- c(x.name, "values")
     return(list(n_dim=n_dim, txtbl=tx, values=values))
 

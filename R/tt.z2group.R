@@ -23,7 +23,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
 
   cat("Compare", Ynm, "across", Xnm, "levels", X1nm, "and", X2nm, "\n")
-  cat("--------------------------------------------------------------\n\n")
+# cat("--------------------------------------------------------------\n\n")
 
   # get variable labels if exist
   options(xname = Xnm)
@@ -39,7 +39,11 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   }
   if (is.null(y.lbl)) y.lbl <- Ynm
 
-  if (!brief) cat("\n------ Description ------\n\n")
+  if (!brief)
+     cat("\n------ Describe ------\n\n")
+  else
+    cat("\n --- Describe ---\n\n")
+
 
   if (from.data) {
     n1 <- sum(!is.na(YA))
@@ -77,7 +81,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
   # sample mean difference
   mdiff <- m1 - m2
-  cat("Sample Mean Difference of ", Ynm, ":  " , .fmt(mdiff), sep="", "\n")
+  cat("Mean Difference of ", Ynm, ":  " , .fmt(mdiff), sep="", "\n")
   if (!brief) cat("\n")
 
 # sw
@@ -85,12 +89,12 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   df2 <- n2 - 1
   swsq <- (df1*v1 + df2*v2) / (df1 + df2)
   sw <- sqrt(swsq)
-  if (!brief) cat("Within-group Standard Deviation:  ", .fmt(sw), "\n")
+  cat("Weighted Average Standard Deviation:  ", .fmt(sw), "\n")
 
   smd <- mdiff/sw
   if (brief) 
-    cat("Standardized Mean Difference of ", Ynm, ", ",
-        "Cohen's d:  ", .fmt(smd), sep="", "\n")
+    cat("Standardized Mean Difference of ", Ynm, ": ",
+        .fmt(smd), sep="", "\n")
 
   if (!brief) {
 
@@ -98,17 +102,20 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
     cat("Note: These hypothesis tests can perform poorly, and the", "\n")
     cat("      t-test is typically robust to violations of assumptions.", "\n")
-    cat("      Use as heuristic guides instead of interpreting literally.", "\n\n")
+    cat("      Use as heuristic guides instead of interpreting literally.",
+        "\n\n")
 
 
     if (from.data) {
 
   # Normality
-      cat("Null hypothesis, for each group, is a normal distribution of ", sep="")
+      cat("Null hypothesis, for each group, is a normal distribution of ",
+          sep="")
       cat(Ynm, ".", sep="", "\n")
       if (n1 > 30) {
         cat("Group " , X1nm, ": ", sep="")
-        cat("Sample mean assumed normal because n>30, so no test needed.", sep="", "\n")
+        cat("Sample mean assumed normal because n>30, so no test needed.", 
+            sep="", "\n")
       }
       else {
         cat("Group", X1nm, " ")
@@ -124,7 +131,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     }  
     if (n2 > 30) {
       cat("Group " , X2nm, ": ", sep="")
-      cat("Sample mean assumed normal because n>30, so no test needed.", sep="", "\n")
+      cat("Sample mean assumed normal because n>30, so no test needed.",
+          sep="", "\n")
     }
     else {
       cat("Group", X2nm, " ")
@@ -181,7 +189,11 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 }
 
 
-  if (!brief) cat("\n\n------ Inference ------\n\n") else cat("\n---\n")
+  if (!brief)
+    cat("\n\n------ Infer ------\n\n")
+  else {
+    cat("\n --- Infer ---\n\n")
+  }
 
   # t-test
   if (alternative == "two_sided") alt <- "two.sided"
@@ -218,16 +230,18 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   }
 
   if (!brief)
-    cat("--- Assume equal population variances of", Ynm, "for each", Xnm, "\n\n")
-  cat("t-cutoff: tcut = ", .fmt(tcut,3), "\n") 
+    cat("--- Assume equal population variances of", Ynm, "for each", Xnm,
+        "\n\n")
+  cat("t-cutoff for 95% range of variation: tcut = ", .fmt(tcut,3), "\n") 
   cat("Standard Error of Mean Difference: SE = ", .fmt(sterr), "\n")
  
   mytitle <- "\nHypothesis Test of 0 Mean Diff:  t = "
   cat(mytitle, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3),
       sep="", "\n\n")
-  cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="", "\n")
-  cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb), " to ", .fmt(ub), 
-      sep="", "\n\n")
+  cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="",
+      "\n")
+  cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb), " to ",
+      .fmt(ub), sep="", "\n\n")
 
   if (!brief) {
     k1 <- v1/n1
@@ -264,27 +278,31 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       pvalue.ne <- pt(abs(tvalue.ne), df=df.ne, lower.tail=TRUE)
     }
 
-    cat("\n--- Do not assume equal population variances of", Ynm, "for each", Xnm, "\n\n")
+    cat("\n--- Do not assume equal population variances of", Ynm, "for each",
+        Xnm, "\n\n")
     cat("t-cutoff: tcut = ", .fmt(tcut.ne,3), "\n") 
     cat("Standard Error of Mean Difference: SE = ", .fmt(sterr.ne), "\n")
     mytitle <- "\nHypothesis Test of 0 Mean Diff:  t = "
     cat(mytitle, .fmt(tvalue.ne,3), ",  df = ", .fmt(df.ne,3), 
         ", p-value = ", .fmt(pvalue.ne,3), sep="", "\n\n")
-    cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E.ne), sep="", "\n")
-    cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb.ne), " to ",
-        .fmt(ub.ne), sep="", "\n")
+    cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E.ne),
+        sep="", "\n")
+    cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb.ne),
+        " to ", .fmt(ub.ne), sep="", "\n")
 
   }
 
   # mean difference and standardized mean difference
   if (!brief) {
     cat("\n\n------ Effect Size ------\n\n")
-    cat("--- Assume equal population variances of", Ynm, "for each", Xnm, "\n\n")
+    cat("--- Assume equal population variances of", Ynm, "for each", Xnm,
+        "\n\n")
     cat("Standardized Mean Difference of ", Ynm, ", ",
         "Cohen's d:  ", .fmt(smd), sep="", "\n")
   }
 
-  #cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf_level=conf_level)  # MBESS function
+  # MBESS function
+  #cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf_level=conf_level)  
   #deltaL <-cid$Lower.Conf.Limit.smd
   #deltaU <- cid$Upper.Conf.Limit.smd
   #if (!brief) cat("\n")
@@ -297,8 +315,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     if ( !is.null(mmd) | !is.null(msmd) ) {
       if (!is.null(mmd)) msmd <- mmd / sw
       if (!is.null(msmd)) mmd <- msmd * sw
-      cat("Compare mmd =", .fmt(mmd,digits_d), " to the obtained value of md = ",
-        .fmt(mdiff), "\n")
+      cat("Compare mmd =", .fmt(mmd,digits_d),
+          " to the obtained value of md = ", .fmt(mdiff), "\n")
       cat("Compare mmd to the confidence interval for md: ", .fmt(lb), " to ", 
           .fmt(ub), "\n\n")
       cat("Minimum Standardized Mean Difference of practical importance: msmd\n")
@@ -381,7 +399,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
         
       if (!is.null(pdf_file)) {
         dev.off()
-        .showfile(paste("LineChart_", X1nm, ".pdf", sep=""), paste("line chart of", X1nm))
+        .showfile(paste("LineChart_", X1nm, ".pdf", sep=""),
+                  paste("line chart of", X1nm))
       }
 
       if (manage.gr) {

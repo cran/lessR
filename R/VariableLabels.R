@@ -91,8 +91,8 @@ function(x, value=NULL, quiet=getOption("quiet")) {
       if (ncol(l) == 2) names(l) <- c("label", "unit")
     }
     else {
-      l <- as.data.frame(read.xlsx(x, colNames=FALSE))
-      l <- as.data.frame(l, row.names=l[,1])
+      l <- as.data.frame(read.xlsx(x, colNames=FALSE), stringsAsFactors=TRUE)
+      l <- as.data.frame(l, row.names=l[,1], stringsAsFactors=TRUE)
       l <- l[, -1, drop=FALSE]  # keep as a data frame with drop
       if (ncol(l) == 1) names(l) <- "label"
       if (ncol(l) == 2) names(l) <- c("label", "unit")

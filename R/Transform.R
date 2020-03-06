@@ -1,5 +1,5 @@
 Transform <-
-function(data=d, quiet=getOption("quiet"), ...) {
+  function(data=d, quiet=getOption("quiet"), ...) {
 
   # save variable labels (NULL if no labels) 
   l <- attr(data, which="variable.labels")
@@ -16,14 +16,6 @@ function(data=d, quiet=getOption("quiet"), ...) {
     cat("\n")
     cat("Number of variables of", dname, "to transform:", n.tvars, "\n")
     cat("Number of cases (rows) of ", dname, ": ", n.obs, "\n", sep="")
-
-    cat("\n")
-    .dash(69)
-    cat("Before Transformation, First four rows of data for",
-        "data frame:", dname, "\n")
-    .dash(69)
-    print(head(get(dname, pos=.GlobalEnv), n=4))
-    cat("\n")
 
     trs.all <- deparse(substitute(list(...)))[[1]]
     trs.all <- substr(trs.all, 6, nchar(trs.all)-1)
@@ -43,21 +35,14 @@ function(data=d, quiet=getOption("quiet"), ...) {
 
   if (!quiet) {
     cat("\n")
-    .dash(22)
-    cat("Transformation Summary\n")
-    .dash(22)
-    #if (!no.break || n.tvars==1) {
-      #for (i in 1:n.tvars) {
-        #if (!is.na(inx[i])) txt <- "rewrite existing" else txt <- "      create new"
-        #cat(txt, "variable: ", trs[i], "\n")
-      #}
-    #}
-    #else {  # parsing too difficult, so just include variable names
-       for (i in 1:n.tvars) {
-        if (!is.na(inx[i])) txt <- "rewrite existing" else txt <- "      create new"
-        cat(txt, "variable: ", names(e)[i], "\n")
-      }
-    #}
+    cat("Transformation\n")
+    for (i in 1:n.tvars) {
+      if (!is.na(inx[i]))
+        txt <- "rewrite existing"
+      else
+        txt <- "      create new"
+      cat(txt, "variable: ", names(e)[i], "\n")
+    }
   }
 
   # logical vector, TRUE if transformed var already exists, otherwise FALSE
@@ -72,16 +57,6 @@ function(data=d, quiet=getOption("quiet"), ...) {
   # add new var transformations to data
   if (!all(existing))  # at least one new var created
     data <- do.call("data.frame", c(list(data), e[!existing]))
-
-  if (!quiet) {
-    cat("\n\n")
-    .dash(65)
-    cat("After, First four rows of transformed data ")
-    cat( "\n")
-    .dash(65)
-    print(head(data[, names(e), drop=FALSE], n=4))
-    cat("\n")
-  }
  
   # restore any variable labels
   if (!is.null(l)) attr(data, which="variable.labels") <- l

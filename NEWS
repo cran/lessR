@@ -8,6 +8,52 @@ Update History for Package 'lessR'
 
  
  
+>>>>>> Changes for lessR version 3.9.3 (2020-02-29) <<<<<<
+
+-------------
+Updates 3.9.3
+-------------
+
+ic
+  new function that selects columns in a base R Extract subsetting
+
+ir
+  new function that selects rows in a base R Extract subsetting
+
+pivot
+  new function to create a pivot table based on base R aggregate
+
+Merge, Sort, Transform
+  listing of beginning of modified data frame dropped
+
+Regression
+  title added to Rmd output, avoids warning, moved from 1st level header
+
+Sort
+  data frame moved to first position in parameter list to facilitate
+    pipe operator from magrittr package
+
+ttest
+  for brief output, within-group pooled standard deviation added
+
+Note: bar chart vignette added
+
+
+---------------
+Bug Fixes 3.9.3
+---------------  
+
+BarChart
+  for legend_position = "top", the top margin has more space
+
+BarChart, SummaryStats
+  a categorical variable with only one category now works
+
+Sort
+  names of sorted variables correctly appear on output
+
+
+ 
 >>>>>> Changes for lessR version 3.9.2 (2020-02-10) <<<<<<
 
 -------------
