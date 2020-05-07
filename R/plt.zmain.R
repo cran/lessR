@@ -24,22 +24,24 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          bubble_text=getOption("bubble_text_color"),
          col.low=NULL, col.hi=NULL,
 
-         ID=NULL, ID_color="gray50", ID_size=0.75, out_ind=NULL,
+         ID=NULL, ID_color="gray50", ID_size=0.60, out_ind=NULL,
          out_fill, out_color, out_shape.miss,
 
-         fit.line="off", col.fit.line="gray55",
+         fit.line="off", fit_color="gray55",
          fit_lwd=getOption("fit.lw"),
          fit_se=1, se_fill="gray80",
 
-         ellipse=FALSE, col.ellipse="lightslategray",
+         ellipse=FALSE, ellipse_color="lightslategray",
          ellipse_fill="off", ellipse_lwd,
 
-         center_line="default", show_runs=FALSE, stack=FALSE,
+         run=FALSE, center_line="off", show_runs=FALSE, stack=FALSE,
 
          freq.poly=FALSE, jitter_x=0, jitter_y=0,
 
-         xlab_adj=0, ylab_adj=0, bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
-         legend_title=NULL, scale_x=NULL, scale_y=NULL,
+         xlab_adj=0, ylab_adj=0, bm.adj=0, lm.adj=0,
+         tm.adj=0, rm.adj=0,
+         scale_x=NULL, scale_y=NULL, pad_x=0, pad_y=0,
+         legend_title=NULL, 
 
          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
          add_cex=NULL, add_lwd=1, add_lty="solid",
@@ -51,8 +53,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   fill_bg <- getOption("panel_fill")
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
   size.pt <- size * .9  # size is set in Plot.R, reduce a bit for here
-
-  if (center_line == "default") if (date.ts) center_line <- "off"
 
   # x and y come across here in their natural state, within each data frame
   # a time series has dates for x and numeric for y, factors are factors, etc
@@ -153,21 +153,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
 
   if (is.null(col_fill)) col_fill <- "transparent"
-
-  # by default display center_line only if runs, so detect if a run
-  if (center_line == "default"  &&  !date.ts  &&  object == "both") {
-    y.clean <- na.omit(y)
-    m <- mean(y.clean)
-    n.change <- 0
-    for (i in 1:(length(y.clean)-1))
-      if ((y.clean[i+1] > m) != (y.clean[i] > m)) n.change <- n.change+1
-    if (n.change/(length(y.clean)-1) < .15)
-      center_line <- "off"
-    else
-      center_line <- "median"
-  }
-  else  # default if not automatically assigned above
-    if (!(center_line %in% c("off", "mean"))) center_line <- "median"
 
   # decimal digits
   digits_d <- .max.dd(y[,1]) + 1
@@ -356,7 +341,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     region <- matrix(c(origin_x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
 
 
-  }  # no ellipse
+  }  # end no ellipse
 
   else {  # set plot with sufficient room for ellipse and data
     cxy <- cor(x[,1],y[,1], use="complete.obs")
@@ -366,6 +351,34 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     region <- ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y), level=lvl)
     region <- rbind(region, c(mn.x, mn.y), c(mx.x, mx.y))
   }
+
+  # revise min and max for x and y axes considering the ellipse
+  mx.x <- max(region[,1])
+  mn.x <- min(region[,1])
+  mx.y <- max(region[,2])
+  mn.y <- min(region[,2])
+
+  if (is.null(origin_x)) {
+    origin_x <- mn.x
+    if (stat %in% c("count", "proportion", "%")) origin_x <- 0
+  }
+
+  # add padding on all four sides
+  add.lab <- FALSE
+  if (pad_x == 0) {  # pad extra for labels in 2-D plot
+    if (!is.null(add)) {
+      add.lab <- ifelse ("labels" %in% add, TRUE, FALSE) 
+    }
+    if (add.lab  ||  length(out_ind) > 0 ) {
+      pad_x <- 0.06
+      pad_y <- 0.02
+    }  
+  }
+  xp <- pretty(c(mn.x, mx.x))
+  yp <- pretty(c(mn.y, mx.y))
+  x.adj <- pad_x * (xp[length(xp)] - xp[1])
+  y.adj <- pad_y * (yp[length(yp)] - yp[1])
+  region <- rbind(region, c(mn.x-x.adj, mn.y-y.adj), c(mx.x+x.adj, mx.y+y.adj))
 
   # plot: setup the coordinate system
   plot(region, type="n", axes=FALSE, ann=FALSE, ...)
@@ -676,7 +689,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                 polygon(xx, yy, col=area_fill[1], border="transparent")
             }
             if (i > 1) {
-              y[,i] <- apply(y[,(i-1):i], 1, sum, na.rm=TRUE)  # sum for stacking
+              y[,i] <- apply(y[,(i-1):i], 1, sum, na.rm=TRUE)  # sum to stack
               xx <- c( c(x[1],x,x[length(x)]), rev(c(x[1],x,x[length(x)])) )
               yy <- c( c(min(y[,i]),y[,i],min(y[,i])),
                          rev(c(min(y[,i-1]),y[,i-1],min(y[,i-1]))) )
@@ -686,7 +699,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           }
 
           if (ln.width > 0) {
-              lines(x[,1], y[,i], col=color[i], lty=ltype[i], lwd=ln.width, ...)
+            lines(x[,1], y[,i], col=color[i], lty=ltype[i], lwd=ln.width, ...)
           }  # end ln.width > 0
 
         }  # end i loop
@@ -751,7 +764,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                         colramp=clr.den, cex=smooth_size, add=TRUE)
         }
 
-        else if (size > 0) {  # plot the individual points, plus means, segments, etc.
+        else if (size > 0) {  # plot the points, plus means, segments, etc.
 
           if (jitter_x > 0)
             x[,1] <- jitter(x[,1], factor=jitter_x)
@@ -765,7 +778,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                        cex=size.pt, ...)
 
              else {  # display outliers separately
-
                 if (getOption("theme") == "gray")
                   if (any(size.pt > 0.9)) if (out_shape.miss) out_shape <- 23
 
@@ -820,7 +832,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
           if (means  &&  stat == "data") {
             pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
-            bck.g <- ifelse(getOption("theme")!="gray", "gray15", "gray30")
+            bck.g <- ifelse(getOption("theme")!="gray", "gray50", "gray40")
             if (grepl(".black", getOption("theme"), fixed=TRUE))
               bck.g <- "gray85"
 
@@ -831,7 +843,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
               for (i in (1:length(x.lvl)))
                 m.lvl[i] <- mean(y[x==i], na.rm=TRUE)
               abline(h=m.lvl, col="gray50", lwd=.5)
-              points(m.lvl, pch=pch.avg, bg=bck.g)
+              points(m.lvl, pch=pch.avg, bg=bck.g, col=bck.g, cex=size.pt*2)
             }
 
             # plot means for num x, factor y
@@ -839,7 +851,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
               for (i in (1:length(y.lvl)))
                 m.lvl[i] <- mean(x[y==i], na.rm=TRUE)
               abline(v=m.lvl, col="gray50", lwd=.5)
-              points(m.lvl, 1:length(y.lvl), pch=pch.avg, bg=bck.g)
+              points(m.lvl, 1:length(y.lvl), pch=pch.avg, bg=bck.g, col=bck.g,
+                     cex=size.pt*2)
             }
           }  # means
         }  # end not smooth
@@ -1088,7 +1101,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
         ln.type <- ifelse (n.clrs == 2 && i == 2, "dashed", "solid")
         corr <- ifelse (n.clrs == 1, cxy, cxy[1,1])
-        col.border <- ifelse (n.clrs == 1, col.ellipse, clr)
+        col.border <- ifelse (n.clrs == 1, ellipse_color, clr)
 
         e <- ellipse(corr, scale=c(s.x, s.y), centre=c(m.x, m.y),
                      level=ellipse[j])
@@ -1117,7 +1130,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             x.lv <- as.numeric(x.val)
             y.lv <- as.numeric(y[,i])
           }
-          clr <- col.fit.line
+          clr <- fit_color
         }
 
         else {  # multiple, pull out subset
@@ -1165,7 +1178,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           else if (fit.line == "lm")
             l.ln <- lm(y.lv ~ x.lv)
           f.ln <- fitted(l.ln, ...)
-          lines(x.lv, f.ln, col=clr, lwd=fit_lwd, lty=ln.type)
 
           # se bands about fit line
           if (fit_se[1] != 0) {
@@ -1180,6 +1192,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                       col=getOption("se_fill"), border="transparent")
             }  # end for each se plot
           }
+
+          # plot fit line on top of se bands
+          lines(x.lv, f.ln, col=clr, lwd=fit_lwd, lty=ln.type)
         }
 
       }  # ith pattern

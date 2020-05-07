@@ -13,7 +13,7 @@ Also displays the frequency table for one or two variables, Cramer's V associati
 }
 
 \usage{
-BarChart(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
+BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         stat=NULL, n_cat=getOption("n_cat"), one_plot=NULL,
 
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
@@ -46,7 +46,8 @@ BarChart(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         values_cut=NULL,
 
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-        lab_adj=c(0,0), margin_adj=c(0,0,0,0), add_top=0.05,
+        lab_adj=c(0,0), margin_adj=c(0,0,0,0),
+        pad_y_min=0, pad_y_max=0,
 
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
@@ -82,7 +83,7 @@ bc(\ldots)
   \item{data}{Optional data frame that contains the variables of interest.
        Can contain data from which frequencies are computed for the y-values,
        or can contain values to plot on the y-axis instead of counts.}
-  \item{filter}{A logical expression that specifies a subset of rows of the data frame
+  \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{stat}{Statistical transformation of the data. If no \code{y} variable,
        then \code{"count"} or \code{"proportion"}, otherwise 
@@ -260,10 +261,10 @@ bc(\ldots)
        adjusts the margins of the plotted figure in approximate inches.
        + values move the corresponding margin away from plot edge. 
        Not applicable to Trellis graphics.}
-  \item{add_top}{In the same scale as the corresponding axis, puts
-       more space between the bars and the top of the plot area, usually to
-       accommodate the legend when plotting two variables or a display
-       of the values on top of the bars.}\cr
+  \item{pad_y_min}{Proportion of padding added to the left side of
+       the \code{y}-axis. Value from 0 to 1.}
+  \item{pad_y_max}{Proportion of padding added to the right side of
+       the \code{y}-axis. Value from 0 to 1.}\cr
 
   \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
        on the plot.
@@ -322,7 +323,7 @@ If the name of the vector is in the global environment and of a variable in the 
 
 To obtain a bar chart of each categorical variable in the \code{d} data frame, invoke \code{BarChart()}.  Or, for a data frame with a different name, insert the data frame name between the parentheses as the first listed parameter value. To analyze a subset of the variables in a data frame, specify the variable list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
-The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not. Use the standard R relational operators as described in \code{\link{Comparison}}. Examples include \code{==} for logical equality, \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not. Use the standard R relational operators as described in \code{\link{Comparison}}. Examples include \code{==} for logical equality, \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 The form of the entered data, the first variable, categorical \code{x}, and optionally a second variable, numerical \code{y}, is flexible.  The data may be entered as factors, numeric values, characters, or a matrix. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.
 
@@ -472,7 +473,7 @@ myOutput <- BarChart(Dept)
 myOutput
 
 # just males with salaries larger than 75,000 USD
-BarChart(Dept, filter=(Gender=="M" & Salary > 85000))
+BarChart(Dept, rows=(Gender=="M" & Salary > 85000))
 
 # rotate and offset the axis labels, sort categories by frequencies
 BarChart(Dept, rotate_x=45, offset=1, sort="-")
@@ -481,6 +482,9 @@ BarChart(Dept, rotate_x=45, offset=1, sort="-")
 BarChart(Dept, fill="blue", trans=0.3)
 # progressive (sequential) color scale of blues
 BarChart(Dept, fill="blues")
+
+# viridis palate
+BarChart(Dept, fill="viridis")
 
 # change the theme just for this analysis, as opposed to style()
 BarChart(Dept, theme="darkgreen")
@@ -513,13 +517,9 @@ bc(Make, rotate_x=90, data=myd)
 # manage size of horizontal value labels
 bc(Make, horiz=TRUE, label_max=4, data=myd)
 
-# wes anderson move theme palette
-# see getColors help file to see the full list of themes
-BarChart(Dept, fill="GrandBudapest1", values="off")
-
-# display bars for values of count <= 10 in a different color
+# display bars for values of count <= 0 in a different color
 #  than values above
-BarChart(Dept, sort="+", fill_split=10)
+BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
 
 # read y variable, Salary, then bars are height of 
 #  corresponding mean Salary
@@ -633,9 +633,9 @@ BarChart(Dept, Salary)
 # when reading y values directly, must be a summary table,
 #   one row of data for each combination of levels with
 #   a numerical value of y
-# use base R aggregate function to get summary table
+# use lessR pivot function to get summary table
 d <- Read("Employee")
-a <- aggregate(Salary ~ Dept + Gender, data=d, FUN=mean)
+a <- pivot(d, mean, Salary, c(Dept,Gender))
 BarChart(Dept, Salary, by=Gender, data=a)
 # do so just with BarChart, display bars in grayscale
 # How does average salary vary by gender across the various departments?

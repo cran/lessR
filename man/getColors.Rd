@@ -77,9 +77,9 @@ In terms of workflow, use the function by itself to select a set of colors from 
 \details{
 
 I. HCL COLORS\cr
-Generate a palette of colors according to the parameter \code{pal} in the form of a character string vector of their names, and also as a color wheel if not called from another function. The default value (for all but grayscale or white color themes) of \code{pal} is \code{"hues"}, which generates a qualitative palette of the specified number, \code{n}, of discrete HCL colors at the same chroma and luminance, respective default values of 60 and 50. With constant chroma and luminance the HCL color space provides a palette of colors with the same gray-scale intensities if desaturated. That means no brightness bias for viewing different colors that represent different areas, such as in a bar chart of two variables, or a pie chart. The primary qualification is that the HCL color space is not in a one-to-one correspondence with the RGB color space of computer monitors, so some HCL colors are approximated (with the default setting of the \code{fixup} parameter set to \code{TRUE}).
+Generate a palette of colors according to the parameter \code{pal} in the form of a character string vector of their names, and also as a color wheel if not called from another function. The default value (for all but grayscale or white color themes) of \code{pal} is \code{"colors"}, which generates a qualitative palette of the specified number, \code{n}, of discrete HCL colors at the same chroma and luminance, respective default values of 60 and 50. With constant chroma and luminance the HCL color space provides a palette of colors with the same gray-scale intensities if desaturated. That means no brightness bias for viewing different colors that represent different areas, such as in a bar chart of two variables, or a pie chart. The primary qualification is that the HCL color space is not in a one-to-one correspondence with the RGB color space of computer monitors, so some HCL colors are approximated (with the default setting of the \code{fixup} parameter set to \code{TRUE}).
 
-For \code{"hues"}, the default, the hue values and associated colors are expressed as HEX and RGB values_ The first 12 generated discrete colors are  blue (240), brown (60), green (120), red (0), purple (275), turquoise (180), rust (30), olive (90), aqua (210), mulberry (330), emerald (150), and violet (300).
+For \code{"colors"}, the default, the hue values and associated colors are expressed as HEX and RGB values_ The first 12 generated discrete colors are  blue (240), brown (60), green (120), red (0), purple (275), turquoise (180), rust (30), olive (90), aqua (210), mulberry (330), emerald (150), and violet (300).
 
 To have the generated colors be in the sequential order of hues, set \code{in_order} to \code{TRUE}, the default when \code{shape} is set to \code{"wheel"}. For about up to five or six colors adjacent values are still reasonably well distinguished even if in sequential order of hue number in the hcl space.\cr
 
@@ -118,7 +118,7 @@ The third possibility is to generate a color wheel from a specified set of color
 IV. OTHER INCLUDED COLOR PALETTES\cr
 The following palettes are from the viridis package: "viridis", "cividis", "magma", "inferno", "plasma".
 
-Movie director Wes Anderson is known for is innovative color themes in his movies, which feature a combination of pastel colors and bold primary colors. The following palettes are from the wesanderson package, based the colors from his movies: "BottleRocket1", "BottleRocket2", "Rushmore1", "Rushmore", "Royal1", "Royal2", "Zissou1", "Darjeeling1", "Darjeeling2 ", "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2", "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2", "IsleofDogs1", "IsleofDogs2". The generation of the corresponding palettes are with \code{type} set to \code{"continuous"} to generalize to palettes of any length.
+Movie director Wes Anderson is known for is innovative color themes in his movies, which feature a combination of pastel colors and bold primary colors. The following palettes are from the wesanderson package, based the colors from his movies: "BottleRocket1", "BottleRocket2", "Rushmore1", "Rushmore", "Royal1", "Royal2", "Zissou1", "Darjeeling1", "Darjeeling2 ", "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2", "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2", "IsleofDogs1", "IsleofDogs2". The generation of the corresponding palettes are with \code{type} set to \code{"continuous"} to generalize to palettes of any length. Note that this package is suggested, which means to use the package for the first time you will be prompted to install the package.
 
 The palette \code{"distinct"} specifies a sequence of 20 colors manually chosen for the distinctiveness. The first five colors are from the qualitative sequence of \code{hcl} colors with \code{c=90} and \code{l=50}. To maximise color separation, the remaining 15 colors do not satisfy constance levels of \code{c} and \code{l}. Use such as for plotting with a \code{by} variable with up to 20 levels.
 
@@ -191,8 +191,8 @@ getColors(h=230, n=6, l=c(96,30), c=c(5,80))
 # a standard R color sequence
 getColors("heat")
 
-# from Wes Anderson
-getColors("Moonrise2", n=12)
+# from viridis
+getColors("viridis", n=12)
 
 # maximally distinct
 getColors("distinct", n=20)
@@ -223,7 +223,7 @@ d <- rd("Employee")
 # default quantitative scale
 bc(d, Dept, fill=getColors())
 # or with implicit call to getColors
-bc(d, Dept, fill="hues")
+bc(d, Dept, fill="colors")
 # or an implicit call with the blues
 bc(d, Dept, fill="blues")
 

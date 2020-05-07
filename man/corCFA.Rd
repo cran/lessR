@@ -35,7 +35,8 @@ corCFA(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
          F1=NULL, F2=NULL, F3=NULL, F4=NULL, F5=NULL,
          F6=NULL, F7=NULL, F8=NULL, F9=NULL, F10=NULL,
-         F11=NULL, F12=NULL,
+         F11=NULL, F12=NULL, F13=NULL, F14=NULL, F15=NULL,
+         F16=NULL, F17=NULL, F18=NULL, F19=NULL, F20=NULL,
 
          fun_call=NULL, \ldots)
 
@@ -54,10 +55,12 @@ scales(\ldots, iter=0, resid=FALSE, item_cor=FALSE, sort=FALSE, heat_map=FALSE)
        variable labels, usually indicator (item) content. This is not to
        calculate correlations, which is separately provided for by the
        \code{lessR} function \code{\link{Correlation}}.}
-  \item{fac.names}{Optional factor names for the original, non-lavaan model specification.}
-  \item{Rmd}{File name for the file of R Markdown instructions to be written, if specified.
-        The file type is .Rmd, which automatically opens in RStudio, but it is a simple
-        text file that can be edited with any text editor, including RStudio.}
+  \item{fac.names}{Optional factor names for the original, non-lavaan
+        model specification.}
+  \item{Rmd}{File name for the file of R Markdown instructions to be written,
+        if specified. The file type is .Rmd, which automatically opens in
+        RStudio, but it is a simple text file that can be edited with any text
+        editor, including RStudio.}
   \item{explain}{If set to \code{FALSE} the explanations of the results are not
         provided in the R~Markdown file. Set globally with options(explain=FALSE).}
   \item{interpret}{If set to \code{FALSE} the interpretations
@@ -101,6 +104,14 @@ scales(\ldots, iter=0, resid=FALSE, item_cor=FALSE, sort=FALSE, heat_map=FALSE)
   \item{F10}{Variables that define Factor 10.}
   \item{F11}{Variables that define Factor 11.}
   \item{F12}{Variables that define Factor 12.}
+  \item{F13}{Variables that define Factor 13.}
+  \item{F14}{Variables that define Factor 14.}
+  \item{F15}{Variables that define Factor 15.}
+  \item{F16}{Variables that define Factor 16.}
+  \item{F17}{Variables that define Factor 17.}
+  \item{F18}{Variables that define Factor 18.}
+  \item{F19}{Variables that define Factor 19.}
+  \item{F20}{Variables that define Factor 20.}
   \item{fun_call}{Function call. Used internally with \code{knitr} to pass the 
         function call when obtained from the abbreviated function call \code{cfa}.
         Not usually invoked by the user.}
@@ -118,7 +129,7 @@ For versions of \code{lessR} after 3.3, the correlation matrix computed by \code
 
 The data frame from which the correlation matrix was computed is required only if any associated variable labels are listed, organized by the items within each factor. By default, \code{labels="include"}, these labels are listed as part of the analysis if they are available.
 
-Define the constituent variables, the indicators, of each factor with a listing of each variable by its name in the correlation matrix. Each of the up to 12 factors is named F1, F2, etc. If the specified variables of a factor are in consecutive order in the input correlation matrix, the list can be specified by listing the first variable, a colon, and then the last variable.  To specify multiple variables, a single variable or a list, separate each by a comma, then invoke the R combine or \code{\link{c}} function, preceded by the factor's name and an equals sign. For example, if the first factor is defined by variables in the input correlation matrix from m02 through m05, and the variable Anxiety, then define the factor in the \code{corCFA} function call according to \code{F1=c(m02:m05,Anxiety)}. 
+Define the constituent variables, the indicators, of each factor with a listing of each variable by its name in the correlation matrix. Each of the up to 20 factors is named by default F1, F2, etc. If the specified variables of a factor are in consecutive order in the input correlation matrix, the list can be specified by listing the first variable, a colon, and then the last variable.  To specify multiple variables, a single variable or a list, separate each by a comma, then invoke the R combine or \code{\link{c}} function, preceded by the factor's name and an equals sign. For example, if the first factor is defined by variables in the input correlation matrix from m02 through m05, and the variable Anxiety, then define the factor in the \code{corCFA} function call according to \code{F1=c(m02:m05,Anxiety)}. 
 
 OUTPUT\cr
 The result of the analysis is the correlation matrix of the indicator variables and resulting factors, plus the reliability analysis of the observed total scores or scale that corresponds to each factor.  Each scale is defined as an unweighted composite. The corresponding code to analyze the model with the \code{cfa} function from the \code{lavaan} package is also provided with the default maximum likelihood estimation procedure. The comparable \code{lavaan} solution appears in the column that represents the fully standardized solution, factors and indicators, \code{Std.all}, the last column of the solution output. If the \code{lavaan} library is loaded, then explicitly refer to the \code{lessR} function \code{cfa} with \code{lessR::cfa} and the corresponding \code{lavaan} function with \code{lavaan::cfa}.  

@@ -34,7 +34,7 @@ Represent the influence of additional categorical variables with \code{by1} or \
 }
 
 \usage{
-Plot(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
+Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          stat="data", n_cat=getOption("n_cat"),
 
          by=NULL, by1=NULL, by2=NULL,
@@ -49,7 +49,7 @@ Plot(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
          sort_yx=c("0", "-", "+"), segments_y=FALSE, segments_x=FALSE,
          jitter_x=0, jitter_y=0,
 
-         ID="row.name", ID_size=0.7,
+         ID="row.name", ID_size=0.60,
          MD_cut=0, out_cut=0, out_shape="circle", out_size=1,
 
          vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
@@ -70,7 +70,7 @@ Plot(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
          breaks="Sturges", cumulate=FALSE,
 
          run=FALSE, lwd=2, area_fill="transparent", area_origin=0, 
-         center_line=c("default", "mean", "median", "zero", "off"),
+         center_line=c("off", "mean", "median", "zero"),
          show_runs=FALSE, stack=FALSE,
          
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -80,7 +80,8 @@ Plot(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
          offset=getOption("offset"),
 
          xy_ticks=TRUE, value_labels=NULL, label_max=20, origin_x=NULL,
-         legend_title=NULL, scale_x=NULL, scale_y=NULL,
+         scale_x=NULL, scale_y=NULL, pad_x=0, pad_y=0,
+         legend_title=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
@@ -114,7 +115,7 @@ vp(\ldots)
         Can be in a data frame or defined in the global environment.} 
   \item{data}{Optional data frame that contains one or both of \code{x} and
         \code{y}. Default data frame is \code{d}.}
-  \item{filter}{A logical expression that specifies a subset of rows of the data frame
+  \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{enhance}{For a two-variable scatterplot, if \code{TRUE},
         automatically add the 0.95 data ellipse, 
@@ -198,11 +199,11 @@ vp(\ldots)
        of the sizing variable for selected bubbles in the center of
        the bubbles, unless the bubble is too small.
        If \code{FALSE}, no value is displayed.
-      If a number greater than 1, then display the value only for the
-      indicated number of values, such as just the max and min for a setting of 2,
-      the default value when bubbles represent a size
-      variable.  Color of the displayed text set by \code{bubble_text} from
-      the \code{\link{style}} function.}
+       If a number greater than 1, then display the value only for the
+       indicated number of values, such as just the max and min for a setting
+       of 2, the default value when bubbles represent a size
+       variable.  Color of the displayed text set by \code{bubble_text} from
+       the \code{\link{style}} function.}
   \item{shape}{The plot character(s). The default value is a circle with both an
        color and filled interior, specified with \code{color} and \code{fill}.
        Possible values are \code{circle}, \code{square}, \code{diamond},
@@ -211,12 +212,12 @@ vp(\ldots)
        The numbers 21 through 25 as defined by the R \code{\link{points}} function
        also apply. If plotting levels according to \code{by}, then list one
        shape for each level to be plotted.}
-  \item{means}{If the one variable is categorical the other variable continuous,
-       then if \code{TRUE}, by default, plot means with the scatterplot. Also
-       applies to a 1-D scatterplot.}
+  \item{means}{If the one variable is categorical, expressed as a factor, and
+       the other variable continuous, then if \code{TRUE}, by default,
+       plot means with the scatterplot. Also applies to a 1-D scatterplot.}
   \item{sort_yx}{Sort the values of \code{y} by the values of \code{x}, such as
         for a Cleveland dot plot, that is, a numeric \code{x}-variable paired
-        with a categorical \code{y}-variable with unique values_ If a \code{x}
+        with a categorical \code{y}-variable with unique values. If a \code{x}
         is a vector of two variables, sort by their difference.}
   \item{segments_y}{For one \code{x}-variable, draw a line segment from the
         \code{y}-axis to
@@ -386,11 +387,11 @@ vp(\ldots)
   \item{area_origin}{Origin for the filled area under the time series line. Values
        less than this value are below the corresponding reference line, values
        larger are above the line.}
-  \item{center_line}{Plots a dashed line through the middle of a run chart.  The two
-        possible values for the line are \code{"mean"} and \code{"median"}.
+  \item{center_line}{Plots a dashed line through the middle of a run chart.
         Provides a center line for the \code{"median"} by default, when the values
-        randomly vary about the mean. A value of \code{"zero"} specifies the center
-        line should go through zero. Currently does not apply to Trellis plots.}
+        randomly vary about the mean. \code{"mean"} and \code{"zero"} specify that
+        the center line goes through the mean or zero, respectively.
+        Currently does not apply to Trellis plots.}
   \item{show_runs}{If \code{TRUE}, display the individual runs in the run analysis.
         Also, sets \code{run} to \code{TRUE}.}
   \item{stack}{If \code{TRUE}, multiple time plots are stacked on each other, with
@@ -399,9 +400,9 @@ vp(\ldots)
   \item{xlab, ylab}{\bold{Axis label} for \code{x}-axis or \code{y}-axis_
        If not specified, then the label becomes
        the name of the corresponding variable label if it exists, or, if not, the
-       variable name. If \code{xy_ticks} is \code{FALSE}, no \code{ylab} is displayed.
-       Customize these and related parameters with parameters such as
-       \code{lab_color} from the \code{\link{style}} function.}
+       variable name. If \code{xy_ticks} is \code{FALSE}, no \code{ylab}
+       is displayed. Customize these and related parameters with parameters
+       such as \code{lab_color} from the \code{\link{style}} function.}
   \item{main}{Label for the title of the graph.  If the corresponding variable
        labels exist,
        then the title is set by default from the corresponding variable labels.}
@@ -443,14 +444,18 @@ vp(\ldots)
        default the minimum value of \code{x}, except when \code{stat}
        is set to \code{"count"} or related  where the origin is zero
        by default, but can be modified.}
-  \item{legend_title}{Title of the legend for a multiple-variable \code{x}
-       or \code{y} plot.}
   \item{scale_x}{If specified, a vector of three values that define the
         x-axis with numerical values: starting value, ending value, and number
         of intervals.}
   \item{scale_y}{If specified, a vector of three values that define the
         y-axis with numerical values: starting value, ending value, and number
-        of intervals.}\cr
+        of intervals.}
+  \item{pad_x}{Proportion of padding added to both sides of
+       the \code{x}-axis. Value from 0 to 1.}
+  \item{pad_y}{Proportion of padding added to both sides of
+       the \code{y}-axis. Value from 0 to 1.}
+  \item{legend_title}{Title of the legend for a multiple-variable \code{x}
+       or \code{y} plot.}\cr
 
   \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
        on the plot.
@@ -530,7 +535,7 @@ The default input data frame is \code{d}. Specify another name with the \code{da
 
 The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis_ For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin_width}, to override default values_ The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
        
-The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 VALUE LABELS\cr
 The value labels for each axis can be over-ridden from their values in the data to user supplied values with the \code{value_labels} option. This option is particularly useful for Likert-style data coded as integers. Then, for example, a 0 in the data can be mapped into a "Strongly Disagree" on the plot. These value labels apply to integer categorical variables, and also to factor variables. To enhance the readability of the labels on the graph, any blanks in a value label translate into a new line in the resulting plot. Blanks are also transformed as such for the labels of factor variables. 
@@ -698,7 +703,7 @@ Plot(Years, Salary, add="Hi", x1=c(12, 16, 18), y1=c(80000, 100000, 60000))
 \donttest{
 
 # just males employed more than 5 years
-Plot(Years, Salary, filter=(Gender=="M" & Years > 5))
+Plot(Years, Salary, rows=(Gender=="M" & Years > 5))
 
 # plot 0.95 data ellipse with the points identified that represent
 #   outliers defined by a Mahalanobis Distance larger than 6 
@@ -860,7 +865,7 @@ style()
 # stock prices for three companies by month:  Apple, IBM, Intel
 d <- rd("StockPrice")
 # only plot Apple
-Plot(date, Price, filter=(Company=="Apple"))
+Plot(date, Price, rows=(Company=="Apple"))
 # Trellis plots, one for each company
 Plot(date, Price, by1=Company, n_col=1)
 # all three plots on the same panel, three shades of blue

@@ -250,13 +250,17 @@ function(pal=NULL, end_pal=NULL,
 
   # Wes Anderson sequence
   else if (kind == "wes") {
+    if (!requireNamespace("wesanderson", quietly=TRUE)) {
+      stop("Package \"wesanderson\" needed for these colors\n",
+           "Please install it:  install.packages(\"wesanderson\")\n\n",
+           call. = FALSE)
+    }
     ttl <- paste("A Wes Anderson Color Palette for:", pal[1], "\n") 
-    pal <- wes_palette(pal[1], n, type="continuous")
+    pal <- wesanderson::wes_palette(pal[1], n, type="continuous")
   }
 
 # # pre-specified distinct colors
   else if (kind == "distinct") {
-
     ttl <- paste("Colors Palette", pal[1], "\n") 
     pal <- c(getColors(c=90, l=50, n=5),
              "goldenrod2", "gray45", "yellowgreen", "orchid3", "skyblue",

@@ -1,13 +1,14 @@
 .bc.main <- 
 function(x, y, by, stack100, 
          fill, col_color, col.trans, fill_split, theme,
-         horiz, add_top, gap, prop, scale_y,
+         horiz, gap, prop, scale_y,
          xlab, ylab, main,
          value_labels, label_max, beside,
          rotate_x, offset, break_x, sort_x,
          values, values_color, values_size, values_digits,
          values_pos, values_cut,
          xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
+         pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
          legend_horiz, legend_size,
          add, x1, x2, y1, y2, out_size, quiet, ...) {
@@ -400,6 +401,7 @@ function(x, y, by, stack100,
   # -------------
   # preliminaries
 
+  add_top <- 0.05  # old version of pad_y_max, no longer a parameter
   if (length(values_pos > 0))
     if (values_pos == "out") add_top <- add_top + .06
   # a 2-D table is an instance of a matrix, a 1-D table is not
@@ -407,11 +409,11 @@ function(x, y, by, stack100,
   max.y <- max.y + (add_top * max.y)
 
   if (any(x < 0, na.rm = TRUE)) {
-    min_y <- ifelse (is.matrix(x) && !beside, min(colSums(x)), min(x))
-    min_y <- min_y - abs(add_top * min_y)
+    min.y <- ifelse (is.matrix(x) && !beside, min(colSums(x)), min(x))
+    min.y <- min.y - abs(add_top * min.y)
   }
   else
-    min_y <- 0
+    min.y <- 0
 
   if (is.null(legend_labels)) legend_labels <- row.names(x)
   if (beside) legend_horiz <- FALSE
@@ -479,7 +481,7 @@ function(x, y, by, stack100,
   # set max.val.width to get max width of y-axis labels for lm adjustment
   lblval.y <- character(length=0)
   if (is.null(scale_y)) {
-    prety <- max(pretty(c(min_y, max.y)))
+    prety <- max(pretty(c(min.y, max.y)))
     mx.num <-  ifelse (!prop, as.character(prety), .fmt(prety, 2))
     max.y.width <- max(strwidth(mx.num, cex=axis_y_cex, units="inches"))
 
@@ -571,6 +573,11 @@ function(x, y, by, stack100,
   if (rescale == 1) width.bars <- .30  # for only one category
   if (rescale > 0) gap <- 0.246 + (0.687 * width.bars)
 
+  yp <- pretty(c(min.y, max.y))
+  y.adj_min <- pad_y_min * (yp[length(yp)] - yp[1])
+  y.adj_max <- pad_y_max * (yp[length(yp)] - yp[1])
+  min.y <- min.y - y.adj_min
+  max.y <- max.y + y.adj_max
 
   # barplot run here only to establish usr coordinates, axTick values
   #  otherwise usr is just 0,1 for both axes
@@ -578,23 +585,23 @@ function(x, y, by, stack100,
   if (rescale == 0) {
     if (!horiz)
       barplot(x, col="transparent", border="transparent", 
-        ylim=c(min_y,max.y), axisnames=FALSE,
+        ylim=c(min.y,max.y), axisnames=FALSE,
         beside=beside, space=gap, axes=FALSE, ...)
     else
       barplot(x, col="transparent", border="transparent", horiz=TRUE,
         axisnames=FALSE,
-        beside=beside, space=gap, axes=FALSE, xlim=c(min_y, max.y), ...)
+        beside=beside, space=gap, axes=FALSE, xlim=c(min.y, max.y), ...)
   }
   else { # rescale, need (0,1) limit on_cat axis for re-scale to work
     if (!horiz)
       barplot(x, col="transparent", border="transparent",
-        ylim=c(min_y,max.y), axisnames=FALSE,
+        ylim=c(min.y,max.y), axisnames=FALSE,
         beside=beside, space=gap, width=width.bars, xlim=c(0,1),
         axes=FALSE, ...)
     else
       barplot(x, col="transparent", border="transparent", horiz=TRUE,
         axisnames=FALSE,
-        beside=beside, space=gap, width=width.bars, xlim=c(min_y, max.y),
+        beside=beside, space=gap, width=width.bars, xlim=c(min.y, max.y),
         ylim=c(0,1), axes=FALSE, ...)
   }
 
@@ -633,15 +640,15 @@ function(x, y, by, stack100,
   # display text labels of values on or above the bars
   # --------------------------------------------------
 
-    # need n.levels for this evaluation
-    if (values == "eval.later") {
-      is_int <- TRUE
-      if (!is.null(y)) if (!.is.integer(y)) is_int <- FALSE
-      if (n.levels > 14  || !is_int) 
-        values <- "off"
-      else
-        values <- ifelse (y.given, "input", getOption("values"))
-    }
+  # need n.levels for this evaluation
+  if (values == "eval.later") {
+    is_int <- TRUE
+    if (!is.null(y)) if (!.is.integer(y)) is_int <- FALSE
+    if (n.levels > 14  || !is_int) 
+      values <- "off"
+    else
+      values <- ifelse (y.given, "input", getOption("values"))
+  }
 
   if (beside) {
      values_size <- .75 * values_size
@@ -656,7 +663,7 @@ function(x, y, by, stack100,
 
     if (is.null(values_digits)) {  # if too large for "input", get in bc.main
       if (values == "%") values_digits <- 0
-      else if (values == "prop") values_digits <- 2
+      else if (values == "proportion") values_digits <- 2
       else if (values == "input") values_digits <- 0
     }
 
@@ -671,7 +678,7 @@ function(x, y, by, stack100,
         x.txt <- .fmt(x, values_digits)   # as.char not accurate for dec dig
       else if (values == "%")
         x.txt <- paste(.fmt(x.prop * 100, values_digits), "%", sep="")
-      else if (values == "prop")
+      else if (values == "proportion")
         x.txt <- .fmt(x.prop, values_digits)
 
       if (is.matrix(x))
@@ -721,8 +728,10 @@ function(x, y, by, stack100,
         usr.y.inch <- diff(grconvertY(0:1, 'inches', 'user'))
         if (values_pos == "in")
           ycrd <- x/2
-        else
-          ycrd <- x + 0.17*usr.y.inch
+        else {
+          slope <- 0.0 + (0.15*values_size)
+          ycrd <- ifelse(x > 0, x + slope*usr.y.inch, x - slope*usr.y.inch)
+        }
         text(x.coords, ycrd, labels=x.txt, col=values_color, cex=values_size)
       }  # no by
       else {  # 2 variables
@@ -753,8 +762,10 @@ function(x, y, by, stack100,
         usr.x.inch <- diff(grconvertX(0:1, 'inches', 'user'))
         if (values_pos == "in")
           ycrd <- x/2
-        else
-          ycrd <- x + 0.17*usr.x.inch
+        else { # out, adjust for label font size
+          slope <- 0.024 + (0.192*values_size)
+          ycrd <- ifelse(x > 0, x + slope*usr.x.inch, x - slope*usr.x.inch)
+        }
         text(ycrd, x.coords, labels=x.txt, col=values_color, cex=values_size)
       }  # end no by
       else {  # by variable
@@ -1060,7 +1071,7 @@ function(x, y, by, stack100,
       stats$p_value <- .fmt(stats$p_value, 3)
       names(stats) <- c("n_dim", "out_title", "out_counts", "out_miss",
                         "out_chi", "out_lbl", "freq", "freq_df", "prop",
-                         "p_value", "n_miss")
+                        "p_value", "n_miss")
       stats <- c(stats[2], stats[6], stats[3], stats[5], stats[4],
                  stats[1], stats[10], stats[8], stats[7], stats[9], stats[11])
     }  # end counts or count-like

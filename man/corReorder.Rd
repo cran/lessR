@@ -14,7 +14,8 @@ Re-arranges the order of the variables in the input correlation matrix.  If no v
 corReorder(R=mycor, order=c("hclust", "chain", "manual"),
           hclust_type = c("complete", "ward.D", "ward.D2", "single",
                           "average", "mcquitty", "median", "centroid"),
-          n_clusters=NULL, vars=NULL,chain_first=0,
+          dist_type=c("R", "dist"),
+          n_clusters=NULL, vars=NULL, chain_first=0,
           heat_map=TRUE, diagonal_new=TRUE,
           main=NULL, bottom=3, right=3,
           pdf_file=NULL, width=5, height=5, \ldots)
@@ -27,6 +28,8 @@ reord(\ldots)
   \item{order}{Source of ordering (seriation): Hierarchical cluster matrix,
        Hunter(1973) chain method, or manually specified with \code{vars}.}
   \item{hclust_type}{Type of hierarchical cluster analysis.}
+  \item{dist_type}{Default is a correlation matrix of similarities, otherwise
+       a distance matrix.}
   \item{n_clusters}{For a hierarchical cluster analysis, get the cluster
        membership for the specified number of clusters.}
   \item{vars}{List of the re-ordered variables, each variable listed by its ordinal
@@ -53,7 +56,7 @@ Reorder and/or delete variables in the input correlation matrix.
 
 Define the constituent variables, the items, with a listing of each variable by its name in the correlation matrix. If the specified variables are in consecutive order in the input correlation matrix, the list can be specified by listing the first variable, a colon, and then the last variable.  To specify multiple variables, a single variable or a list, separate each by a comma, then invoke the R combine or \code{\link{c}} function. For example, if the list of variables in the input correlation matrix is from m02 through m05, and the variable Anxiety, then define the list in the \code{corReorder} function call according to \code{vars=c(m02:m05,Anxiety)}. 
 
-Or, define the ordering with a hierarchical cluster analysis from the base R function \code{hclust()}. The same default type of \code{"complete"} is provided, though this can be changed with the parameter \code{hclust_type} according to \code{\link{hclust}}.
+Or, define the ordering with a hierarchical cluster analysis from the base R function \code{hclust()}. The same default type of \code{"complete"} is provided, though this can be changed with the parameter \code{hclust_type} according to \code{\link{hclust}}. Default input is a correlation matrix, converted to a matrix of dissimilarities by subtracting each element from 1.
 
 Or, use the Hunter (1973) chain method. Define the ordering of the variables according to the following algorithm. If no variable list is specified then the variables are re-ordered such that the first variable is that which has the largest sum of squared correlations of all the variables, then the variable that has the highest correlation with the first variable, and so forth.
 

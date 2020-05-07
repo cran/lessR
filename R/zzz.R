@@ -7,22 +7,21 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.9.3     feedback: gerbing@pdx.edu     web: lessRstats.com/new\n",
-      "---------------------------------------------------------------------\n",
-      "1. d <- Read(\"\")           Read text, Excel, SPSS, SAS or R data file\n",
-      "                           d: default data frame, no need for data=\n",
-      "2. l <- Read(\"\", var_labels=TRUE)   Read variable labels into l,\n",
-      "                           required name for data frame of labels\n",
-      "3. Help()                  Get help, and, e.g., Help(Read)\n",
-      "4. hs(), bc(), or ca()     All histograms, all bar charts, or both\n",
-      "5. Plot(X) or Plot(X,Y)    For continuous and categorical variables\n",
-      "6. by1= , by2=             Trellis graphics, a plot for each by1, by2\n",
-      "7. reg(Y ~ X, Rmd=\"eg\")    Regression with full interpretative output\n",
-      "8. style(\"gray\")           Grayscale theme, + many others available\n",
-      "   style(show=TRUE)        all color/style options and current values\n",
-      "9. getColors()             create many styles of color palettes\n\n",
-      "lessR parameter names now use _'s. Names with a period are deprecated.\n",
-      "Ex:  bin_width  instead of  bin.width\n")
+      "lessR 3.9.4    feedback: gerbing@pdx.edu    web: lessRstats.com/new\n",
+      "-------------------------------------------------------------------\n",
+      "> d <- Read(\"\")          Read text, Excel, SPSS, SAS or R data file\n",
+      "                          d: default data frame, no need for data=\n",
+      "> l <- Read(\"\", var_labels=TRUE)   Read variable labels into l,\n",
+      "                          required name for data frame of labels\n",
+      "> Help()                 Get help, and, e.g., Help(Read)\n",
+      "> hs(), bc(), or ca()    All histograms, all bar charts, or both\n",
+      "> Plot(X) or Plot(X,Y)   For continuous and categorical variables\n",
+      "> by1= , by2=            Trellis graphics, a plot for each by1, by2\n",
+      "> reg(Y ~ X, Rmd=\"eg\")   Regression with full interpretative output\n",
+      "> style(\"gray\")          Grayscale theme, + many others available\n",
+      "> style(show=TRUE)       all color/style options and current values\n",
+      "> getColors()            create many styles of color palettes\n",
+      "> d[.(rows), .(cols)]    subset with . more flexible than base R\n\n")
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 
@@ -40,7 +39,7 @@ function(...) {
   options(bar_fill_discrete = c("#257EB2", "#957200", "#488527", "#B55B6F",
           "#806AB7", "#008D7E", "#AA6644", "#777D00", "#00889D", "#B35693",
           "#008B57", "#A05DAD"))  # getColors("hues")
-  options(bar_fill_ordered = rgb(144,165,175, maxColorValue=255))
+  options(bar_fill_ordered = rgb(144,165,195, maxColorValue=255))
   options(trans_bar_fill = 0.0)
   options(bar_color = rgb(126,144,168, maxColorValue=255))
   options(bar_color_discrete = "transparent")
@@ -1580,7 +1579,7 @@ function(dir, axT) {
         clrs <- getColors(fill[1], n=n.clr)  # generate sequential palette
       }
       else {
-          clrs <- fill
+        clrs <- fill
       }
 
       if (length(fill == 2)) {  # divergent
@@ -1598,7 +1597,7 @@ function(dir, axT) {
 
 
 # match a hue to the color theme
-.get.h <- function(theme= getOption("theme")) {
+.get.h <- function(theme=getOption("theme")) {
 
        if (theme %in% c("gray", "white")) h=0  # any value for h works
   else if (theme %in% c("colors", "lightbronze", "dodgerblue", "blue")) h <- 240

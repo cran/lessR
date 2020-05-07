@@ -148,7 +148,12 @@ function(topic=NULL, width=4.5, height=4.5) {
   "
 
   set.up.plot(0)
-  img <- readPNG(system.file("img", "DataExcel.png", package="lessR"))
+  if (!requireNamespace("rmarkdown", quietly=TRUE)) {
+    stop("Package \"rmarkdown\" needed for this regression output\n",
+         "Please install it:  install.packages(\"rmarkdown\")\n\n",
+         call. = FALSE)
+  }
+  img <- png::readPNG(system.file("img", "DataExcel.png", package="lessR"))
   rasterImage(img, 8, 39 ,48, 66)
   text(50,100, label=t0, font=4)
   text(0,82, label=t1, adj=0)
@@ -302,7 +307,7 @@ function(topic=NULL, width=4.5, height=4.5) {
                factor(Severity, levels=c(1,2,3), labels=c(\"Mild\", \"Mod\", \"Severe\")))
   Here the values of the new variable are also ordered, from Mild to Severe. 
   Extract subsets of data from a data frame with lessR function Subset().
-      > d <- Subset(filter=(Gender==\"M\"), columns=c(Years, Salary))
+      > d <- Subset(rows=(Gender==\"M\"), columns=c(Years, Salary))
   The data frame, d, now consists only of data for Males limited to
   the variables Years and Salary. To display a subset, drop the d <-.
   "

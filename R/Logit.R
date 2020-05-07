@@ -1,5 +1,5 @@
 Logit <-
-function(my_formula, data=d, filter=NULL,
+function(my_formula, data=d, rows=NULL,
          digits_d=4, text_width=120, 
 
          brief=getOption("brief"),
@@ -112,8 +112,8 @@ function(my_formula, data=d, filter=NULL,
   n.vars <- length(nm)
   n.pred <- n.vars - 1
 
-  if (!missing(filter)) {  # subset rows
-    r <- eval(substitute(filter), envir=data, enclos=parent.frame())
+  if (!missing(rows)) {  # subset rows
+    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
     r <- r & !is.na(r)  # set missing for a row to FALSE
     data <- data[r,,drop=FALSE]
   }

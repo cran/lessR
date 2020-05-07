@@ -1,5 +1,5 @@
 ttest <-
-function(x=NULL, y=NULL, data=d, filter=NULL, paired=FALSE,
+function(x=NULL, y=NULL, data=d, rows=NULL, paired=FALSE,
 
          n=NULL, m=NULL, s=NULL, mu=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
@@ -234,8 +234,8 @@ function(x, y=NULL, ...) {
     }
   }
 
-  if (!missing(filter)) {  # subset rows
-    r <- eval(substitute(filter), envir=data, enclos=parent.frame())
+  if (!missing(rows)) {  # subset rows
+    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
     r <- r & !is.na(r)  # set missing for a row to FALSE
     data <- data[r,,drop=FALSE]
   }

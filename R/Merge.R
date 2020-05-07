@@ -1,14 +1,14 @@
 Merge <-
-  function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
+function(data1, data2, by=NULL, quiet=getOption("quiet"), ...) {
 
   if (missing(data1)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Specify first data frame (table) to merge with:  data1\n\n")
+      "Specify first data frame (table) to merge:  data1\n\n")
   }
 
   if (missing(data2)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Specify second data frame (table) to merge with:  data2\n\n")
+      "Specify second data frame (table) to merge:  data2\n\n")
   }
 
   dname1 <- deparse(substitute(data1))
@@ -16,7 +16,7 @@ Merge <-
 
 
   # do the merge
-  if (missing(by)) {
+  if (by == "rows") {
     if (!identical(names(data1), names(data2))) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "To do a vertical merge, both data sets must have the same variables.",

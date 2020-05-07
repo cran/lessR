@@ -11,7 +11,16 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
 
   # ANOVA 
   smc <- anova(lm.out)
-  SSE <- smc[n.vars,2]
+  n.terms <- nrow(smc) - 1
+  nt1 <- n.terms + 1
+
+# kable experimentation
+# k <- kable(smc, digits=digits_d)
+# k <- gsub("|", " ", k, fixed=TRUE)
+# k[1] <- gsub("Pr(>F)", "p-value", k[1], fixed=TRUE)
+# k[length(k)] <- gsub("NA", "  ", k[length(k)], fixed=TRUE)
+
+  SSE <- smc[nt1,2]
 
   if (show_R) {
     tx[length(tx)+1] <- ""
@@ -26,8 +35,8 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   }
 
   # width of column 1
-  max.c1 <- max(nchar("Model"), nchar(nm[1]))
-  for (i in 1:n.vars) {
+  max.c1 <- max(nchar("Model"), nchar(nm))
+  for (i in 1:nt1) {
     c1 <- nchar(rownames(smc)[i])
     if (c1 > max.c1) max.c1 <- c1 
    }
@@ -52,9 +61,10 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   tx[length(tx)+1] <- paste(eval(format("", width=max.c1-5)), df.lbl, SS.lbl,
                              MS.lbl, fv.lbl, "   p-value", sep="")
 
-  # predictors
+  # predictors (terms, including interactions)
   if (n.pred > 1) {
-    for (i in 1:(n.pred)) {
+    #for (i in 1:(n.pred)) {
+    for (i in 1:n.terms) {
       rlb <- .fmtc(rownames(smc)[i], max.c1)
       df <- .fmti(smc[i,1], max.ln[1]-5)
       SS <- .fmt(smc[i,2], digits_d, max.ln[2])
@@ -64,6 +74,8 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
       tx[length(tx)+1] <- paste(rlb, df, SS, MS, fv, pv)
     } 
   }
+  if (n.pred > 1) tx[length(tx)+1] <- ""
+
 
   # Model term in ANOVA table
   mdl <- NA
@@ -71,39 +83,39 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
     rlb <- .fmtc("Model", max.c1, j="left")
 
     mod.df <- 0
-    for (i in 1:n.pred) mod.df <- mod.df + smc[i,1]
+    for (i in 1:n.terms) mod.df <- mod.df + smc[i,1]
     md <- .fmti(mod.df, max.ln[1]-5) 
 
     mod.ss <- 0 
-    for (i in 1:n.pred) mod.ss <- mod.ss + smc[i,2]
+    for (i in 1:n.terms) mod.ss <- mod.ss + smc[i,2]
     ms <- .fmt(mod.ss, digits_d, max.ln[2])
 
     mod.ms <- mod.ss/mod.df
     mm <- .fmt(mod.ms, digits_d, max.ln[3])
 
-    mod.f <- mod.ms/smc[n.vars, 3]
+    mod.f <- mod.ms/smc[nt1, 3]
     mf <- .fmt(mod.f, digits_d, max.ln[4])
 
-    mod.p <- pf(mod.f, mod.df, smc[n.vars,1], lower.tail=FALSE)
+    mod.p <- pf(mod.f, mod.df, smc[nt1,1], lower.tail=FALSE)
     mp <- .fmt(mod.p, 3, 9) 
 
     tx[length(tx)+1] <- paste(rlb, md, ms, mm, mf, mp)
-    if (n.pred > 1) tx[length(tx)+1] <- ""
+#   if (n.pred > 1) tx[length(tx)+1] <- ""
 
     mdl <- c(mod.df, mod.ss, mod.ms, mod.f, mod.p)
     names(mdl) <- c("df", "ss", "ms", "fvalue", "pvalue")
   }
 
   # Residuals
-  rlb <- .fmtc(rownames(smc)[n.vars], max.c1, j="left")
-  df <- .fmti(smc[n.vars,1], max.ln[1]-5)
-  SS <- .fmt(smc[n.vars,2], digits_d, max.ln[2])
-  MS <- .fmt(smc[n.vars,3], digits_d, max.ln[3])
-  MSW <- smc[n.vars,3]
+  rlb <- .fmtc(rownames(smc)[nt1], max.c1, j="left")
+  df <- .fmti(smc[nt1,1], max.ln[1]-5)
+  SS <- .fmt(smc[nt1,2], digits_d, max.ln[2])
+  MS <- .fmt(smc[nt1,3], digits_d, max.ln[3])
+  MSW <- smc[nt1,3]
   tx[length(tx)+1] <- paste(rlb, df, SS, MS) 
-  if (n.pred > 1) tx[length(tx)+1] <- ""
+# if (n.pred > 1) tx[length(tx)+1] <- ""
 
-  rsd <- c(smc[n.vars,1], smc[n.vars,2], smc[n.vars,3])
+  rsd <- c(smc[nt1,1], smc[nt1,2], smc[nt1,3])
   names(rsd) <- c("df", "ss", "ms")
 
   # Total
@@ -111,10 +123,10 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   if (n.pred > 0) {
     rlb <- .fmtc(nm[1], max.c1, j="left")
 
-    tot.df <- mod.df + smc[n.vars,1]
+    tot.df <- mod.df + smc[nt1,1]
     td <- .fmti(tot.df, max.ln[1]-5) 
 
-    tot.ss <- mod.ss + smc[n.vars,2]
+    tot.ss <- mod.ss + smc[nt1,2]
     ts <- .fmt(tot.ss, digits_d, max.ln[2])
 
     tot.ms <- tot.ss/tot.df

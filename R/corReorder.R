@@ -1,8 +1,9 @@
 corReorder <-
 function (R=mycor, order=c("hclust", "chain", "manual"),
-          hclust_type = c("complete", "ward.D", "ward.D2", "single",
+          hclust_type=c("complete", "ward.D", "ward.D2", "single",
                           "average", "mcquitty", "median", "centroid"),
-          n_clusters=NULL, vars=NULL,chain_first=0,
+          dist_type=c("R", "dist"),
+          n_clusters=NULL, vars=NULL, chain_first=0,
           heat_map=TRUE, diagonal_new=TRUE,
           main=NULL, bottom=3, right=3,
           pdf_file=NULL, width=5, height=5, ...) {
@@ -23,6 +24,7 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
 
   order <- match.arg(order)
   hclust_type <- match.arg(hclust_type)
+  dist_type <- match.arg(dist_type)
 
   # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
   cor.nm <- deparse(substitute(R))
@@ -48,7 +50,10 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
   }
 
   else if (order == "hclust") {
-    dst <- as.dist(1-R)
+    if (dist_type == "R")
+      dst <- as.dist(1-R)
+    else if (dist_type == "dist")
+      dst <- as.dist(R)
     ord <- hclust(dst, method=hclust_type)
     Label <- ord$order
 

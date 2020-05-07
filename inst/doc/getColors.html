@@ -8,12 +8,12 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="David Gerbing" />
 
 
-<title>Enhance Extract</title>
+<title>Color Palettes</title>
 
 
 
@@ -116,9 +116,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -287,7 +284,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -300,38 +298,53 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<h1 class="title toc-ignore">Enhance Extract</h1>
+<h1 class="title toc-ignore">Color Palettes</h1>
 <h4 class="author">David Gerbing</h4>
 
 
+<div id="TOC">
+<ul>
+<li><a href="#qualitative-scales">Qualitative Scales</a></li>
+<li><a href="#sequential-scales">Sequential Scales</a></li>
+<li><a href="#divergent-scales">Divergent Scales</a></li>
+<li><a href="#manual-specification-of-colors">Manual Specification of Colors</a></li>
+</ul>
+</div>
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;lessR&quot;</span>)</a></code></pre></div>
-<p>The most general way to subset a matrix by rows and columns is the base R <code>Extract</code> function, called by <code>d[rows, columms]</code>, where <em>d</em> is the data frame. Ultimately, to use this function, for the <em>rows</em> parameter, pass the row names of the selected rows, the indices or actual names. For the <em>cols</em> parameter, pass the column indices of the selected columns.</p>
-<p>In many uses, perhaps most uses, the indices are not directly provided, but obtained through some logical specification. The annoying feature of the <em>rows</em> parameter is that any reference to the variables in the logical specification must contain the name of the data frame followed by a $. But this name has already been specified in the function call, and now is simply repeated for every variable reference.</p>
-<p>The column specification is usually provided as a variable list. Here the annoying aspect is that all variable names must be quoted, and no variable ranges are permitted. Quite clumsy.</p>
-<p>To address these deficiencies, <strong>lessR</strong> provides two functions, <code>ir()</code> for index rows, and <code>ic()</code> for index columns. The general form of the subsetting includes these two functions.</p>
-<pre><code>d[ir(), ic()]</code></pre>
-<p>Both functions, only callable within the <code>Extract</code> function, use what R refers to as non-standard evaluation. That basically means that the annoying restrictions are removed.</p>
-<p>To illustrate, use the Employee data set contained in <strong>lessR</strong>, here read into the <em>d</em> data frame.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">d &lt;-<span class="st"> </span><span class="kw">Read</span>(<span class="st">&quot;Employee&quot;</span>, <span class="dt">quiet=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<p>Subset the data frame by only listing observations with a <em>Gender</em> of “M” with scores on <em>Post</em> larger than 90. Only list columns for the variables in the range from <em>Years</em> to <em>Salary</em>, and <em>Post</em>. Referring back to the output of <code>Read()</code>, the variable range includes <em>Years</em>, <em>Gender</em>, <em>Dept</em>, and <em>Salary</em>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">d[<span class="kw">ir</span>(Gender<span class="op">==</span><span class="st">&quot;M&quot;</span> <span class="op">&amp;</span><span class="st"> </span>Post<span class="op">&gt;</span><span class="dv">90</span>), <span class="kw">ic</span>(Years<span class="op">:</span>Salary, Post)]</a></code></pre></div>
-<pre><code>##                   Years Gender Dept    Salary Post
-## Ritchie, Darnell      7      M ADMN  53788.26   92
-## Hoang, Binh          15      M SALE 111074.86   97
-## Pham, Scott          13      M SALE  81871.05   94
-## Correll, Trevon      21      M SALE 134419.23   94
-## Langston, Matthew     5      M SALE  49188.96   93
-## Anderson, David       9      M ACCT  69547.60   91</code></pre>
-<p>Following is the traditional R call for subsetting.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">d[d<span class="op">$</span>Gender<span class="op">==</span><span class="st">&quot;M&quot;</span> <span class="op">&amp;</span><span class="st"> </span>d<span class="op">$</span>Post<span class="op">&gt;</span><span class="dv">90</span>, <span class="kw">c</span>(<span class="st">&quot;Years&quot;</span>, <span class="st">&quot;Gender&quot;</span>, <span class="st">&quot;Dept&quot;</span>, <span class="st">&quot;Salary&quot;</span>, <span class="st">&quot;Post&quot;</span>)]</a></code></pre></div>
-<pre><code>##                   Years Gender Dept    Salary Post
-## Ritchie, Darnell      7      M ADMN  53788.26   92
-## Hoang, Binh          15      M SALE 111074.86   97
-## Pham, Scott          13      M SALE  81871.05   94
-## Correll, Trevon      21      M SALE 134419.23   94
-## Langston, Matthew     5      M SALE  49188.96   93
-## Anderson, David       9      M ACCT  69547.60   91</code></pre>
+<p>The <code>getColors()</code> function can generate a variety of color palates. Use them to, for example, fill the bars in a histogram or bar chart with the <code>fill</code> parameter.</p>
+<div id="qualitative-scales" class="section level2">
+<h2>Qualitative Scales</h2>
+<p>The default is a color spectrum of 12 hcl colors presented in the order in which they are assigned to discrete levels of a categorical variable.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">getColors</span>()</a></code></pre></div>
+<p>Display the color spectrum of 12 hcl colors ordered by hue from 0 by intervals of 360/12 = 30 degrees.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">getColors</span>(<span class="dt">in_order=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<p>Get a color wheel of 36 ordered hues around the wheel.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">getColors</span>(<span class="dt">n=</span><span class="dv">36</span>, <span class="dt">shape=</span><span class="st">&quot;wheel&quot;</span>, <span class="dt">border=</span><span class="st">&quot;off&quot;</span>)</a></code></pre></div>
+<p>Obtain deep rich colors for HCL qualitative scale.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">getColors</span>(<span class="dt">c=</span><span class="dv">90</span>, <span class="dt">l=</span><span class="dv">45</span>)</a></code></pre></div>
+</div>
+<div id="sequential-scales" class="section level2">
+<h2>Sequential Scales</h2>
+<p>Generate an hcl blue sequence with <code>c=60</code> and vary <code>l</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">getColors</span>(<span class="st">&quot;blues&quot;</span>, <span class="dt">labels=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<p>Vary chroma for a yellow hcl sequence.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">getColors</span>(<span class="st">&quot;browns&quot;</span>, <span class="dt">c=</span><span class="kw">c</span>(<span class="dv">20</span>,<span class="dv">90</span>), <span class="dt">l=</span><span class="dv">60</span>)</a></code></pre></div>
+</div>
+<div id="divergent-scales" class="section level2">
+<h2>Divergent Scales</h2>
+<p>Generate seven colors from rust to blue.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">getColors</span>(<span class="st">&quot;rusts&quot;</span>, <span class="st">&quot;blues&quot;</span>, <span class="dt">n=</span><span class="dv">7</span>)</a></code></pre></div>
+<p>Add a custom value of chroma, <code>c</code>, to make less saturated.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">getColors</span>(<span class="st">&quot;rusts&quot;</span>, <span class="st">&quot;blues&quot;</span>, <span class="dt">n=</span><span class="dv">7</span>, <span class="dt">c=</span><span class="dv">45</span>)</a></code></pre></div>
+</div>
+<div id="manual-specification-of-colors" class="section level2">
+<h2>Manual Specification of Colors</h2>
+<p>Individually specify colors.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">getColors</span>(<span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>))</a></code></pre></div>
+<p>Generate a custom sequential range of colors.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">getColors</span>(<span class="dt">pal=</span><span class="st">&quot;aliceblue&quot;</span>, <span class="dt">end_pal=</span><span class="st">&quot;blue&quot;</span>)</a></code></pre></div>
+</div>
 
 
 

@@ -1,5 +1,5 @@
 BarChart <-
-function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
+function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         stat=NULL, n_cat=getOption("n_cat"), one_plot=NULL,
 
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
@@ -32,7 +32,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         values_cut=NULL,
 
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-        lab_adj=c(0,0), margin_adj=c(0,0,0,0), add_top=0.05,
+        lab_adj=c(0,0), margin_adj=c(0,0,0,0), 
+        pad_y_min=0, pad_y_max=0,
 
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
@@ -50,7 +51,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
                 "values.position", "values.cut", "lab.adj", "margin.adj",
                 "eval.df")
     for (i in 1:length(dots)) {
-      if (names(dots)[i] == "addtop") add_top <- dots[[i]] 
+      if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]] 
+      if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]] 
       if (names(dots)[i] == "stat_x") stat <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
       if (names(dots)[i] %in% change) {
@@ -220,8 +222,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
       ind <- eval(substitute(x), envir=data.vars)  # col num of each var
-      if (!missing(filter)) {  # subset rows
-        r <- eval(substitute(filter), envir=data, enclos=parent.frame())
+      if (!missing(rows)) {  # subset rows
+        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
         r <- r & !is.na(r)  # set missing for a row to FALSE
         data <- data[r,,drop=FALSE]
       }
@@ -389,18 +391,12 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   # -----------  x, y, and by variables established ------------
   # ------------------------------------------------------------
 
-  # if no y, if !proportion, then count
-  # if y, proportion implies stack100
-  if (!is.null(stat)) {
-    proportion <- ifelse (stat == "proportion", TRUE, FALSE)   # old signal
-    if (proportion) stat <- "data"
-    if (!is.null(y.call)) stat <- stat
-  }
-  else {  # defaults
-    stat <- "data"  # applicable if y present
-  }
-
   # do the analysis
+  # data means raw_data
+  if (!is.null(stat)) {
+    if (stat == "proportion") proportion <- TRUE
+    if (stat %in% c("count", "proportion")) stat <- "data"
+  }
 
   # if data table is raw data, then default stat is "data"
   if (is.null(stat)) {
@@ -417,7 +413,13 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       
       lx.u <- length(unique(x.call))
       lb.u <- ifelse(is.null(by.call), 1, length(unique(by.call)))
-        if (nrow(data) > lx.u*lb.u) stat <- "mean"
+      if (nrow(data) > lx.u*lb.u)
+        stat <- "mean"
+      else
+        stat <- "data"
+    }
+    else  {# no y variable
+      stat <- "data"
     }
   }
 
@@ -472,7 +474,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       }
     }
 
-    if (stat %in% c("mean", "sum", "sd", "dev", "min", "median", "max")) {
+
+    unq.x <- ifelse (length(x.call) == length(unique(x.call)), TRUE, FALSE)
+    stat.val <- c("mean", "sum", "sd", "dev", "min", "median", "max")
+
+    if ((stat %in% stat.val)  &&  (!unq.x)) {
 
       n_cat <- 0
       means <- FALSE
@@ -585,13 +591,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
       bc <- .bc.main(x.call, y.call, by.call, stack100,
             fill, color, trans, fill_split, theme,
-            horiz, add_top, gap, proportion, scale_y,
+            horiz, gap, proportion, scale_y,
             xlab, ylab, main,
             value_labels, label_max, beside,
             rotate_x, offset, break_x, sort,
             values, values_color, values_size, values_digits,
             values_position, values_cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+            pad_y_min, pad_y_max,
             legend_title, legend_position, legend_labels,
             legend_horiz, legend_size,
             add, x1, x2, y1, y2, out_size, quiet, ...)
@@ -691,13 +698,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       
       bc <- .bc.main(data, y.call, by.call, stack100,
             fill, color, trans, fill_split, theme,
-            horiz, add_top, gap, proportion, scale_y,
+            horiz, gap, proportion, scale_y,
             xlab, ylab, main,
             value_labels, label_max, beside,
             rotate_x, offset, break_x, sort,
             values, values_color, values_size, values_digits,
             values_position, values_cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+            pad_y_min, pad_y_max,
             legend_title, legend_position, legend_labels,
             legend_horiz, legend_size,
             add, x1, x2, y1, y2, out_size, quiet, ...)
@@ -711,13 +719,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     else {  # analyze each x column separately
       bc.data.frame(data, n_cat, stack100,
         fill, color, trans, fill_split, theme,
-        horiz, add_top, gap, proportion, scale_y,
+        horiz, gap, proportion, scale_y,
         xlab, ylab, main,
         value_labels, label_max, beside,
         rotate_x, offset, break_x, sort,
         values, values_color, values_size, values_digits,
         values_position, values_cut,
         xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+        pad_y_min, pad_y_max,
         legend_title, legend_position, legend_labels,
         legend_horiz, legend_size,
         out_size, quiet, width, height, pdf, ...)

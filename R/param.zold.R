@@ -61,7 +61,7 @@ function (...) {
 
       if (names(dots)[i] == "rows") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  rows  renamed  filter\n\n")
+          "option  rows  renamed  rows\n\n")
       }
 
       if (names(dots)[i] == "area") {

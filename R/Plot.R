@@ -1,5 +1,5 @@
 Plot <-
-function(x, y=NULL, data=d, filter=NULL, enhance=FALSE, 
+function(x, y=NULL, data=d, rows=NULL, enhance=FALSE, 
          stat="data", n_cat=getOption("n_cat"),
 
          by=NULL, by1=NULL, by2=NULL,
@@ -14,7 +14,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
          sort_yx=c("0", "-", "+"), segments_y=FALSE, segments_x=FALSE,
          jitter_x=0, jitter_y=0,
 
-         ID="row.name", ID_size=0.7,
+         ID="row.name", ID_size=0.60,
          MD_cut=0, out_cut=0, out_shape="circle", out_size=1,
 
          vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
@@ -35,7 +35,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
          breaks="Sturges", cumulate=FALSE, 
 
          run=FALSE, lwd=2, area_fill="transparent", area_origin=0, 
-         center_line=c("default", "mean", "median", "zero", "off"),
+         center_line=c("off", "mean", "median", "zero"),
          show_runs=FALSE, stack=FALSE,
 
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -45,7 +45,8 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
          offset=getOption("offset"),
 
          xy_ticks=TRUE, value_labels=NULL, label_max=20, origin_x=NULL,
-         legend_title=NULL, scale_x=NULL, scale_y=NULL,
+         scale_x=NULL, scale_y=NULL, pad_x=0, pad_y=0,
+         legend_title=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
@@ -53,7 +54,6 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
          do_plot=TRUE, width=NULL, height=NULL, pdf_file=NULL, 
          fun_call=NULL, ...) {
 
-#/ccat("ncols start:", ncols, "\n")
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -94,6 +94,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
   sort_yx.miss <- ifelse (missing(sort_yx), TRUE, FALSE)
   sort_yx <- match.arg(sort_yx)
 
+  cl.miss <- ifelse (missing(center_line), TRUE, FALSE)
   center_line <- match.arg(center_line)
 
   data.do <- ifelse ((stat == "data"), TRUE, FALSE)
@@ -207,6 +208,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
   freq.poly <- FALSE  # default is not a frequency polygon
 
   if (show_runs) run <- TRUE
+  if (run) if (cl.miss) center_line <- "default"
 
   if (!missing(fit_se)) if (missing(fit))  fit <- "loess"
   if (is.logical(fit))
@@ -357,8 +359,8 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
     names(data.vars) <- names(data)
     x.col <- eval(substitute(x), envir=data.vars)  # col num of each var
     
-    if (!missing(filter)) {  # subset rows
-      r <- eval(substitute(filter), envir=data, enclos=parent.frame())
+    if (!missing(rows)) {  # subset rows
+      r <- eval(substitute(rows), envir=data, enclos=parent.frame())
       r <- r & !is.na(r)  # set missing for a row to FALSE
       data <- data[r,,drop=FALSE]
     }
@@ -531,7 +533,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
   else
     nrows <- nrow(data.x)
 
-  if (nrows > 2499) if (missing(smooth)) smooth <- TRUE
+  if (nrows > 2499  &&  !missing(y)) if (missing(smooth)) smooth <- TRUE
 
   if(date.ts) object <- "both"
 
@@ -739,13 +741,17 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
             }
           }
           else {
-            if (box) {
-              cat("\n"); stop(call.=FALSE, "\n","------\n",
-                "Currently, Trellis box plots not available for a \n",
-                "y categorical variable, set y variable to  by1  instead\n\n")
+ #          if (box) {
+ #            cat("\n"); stop(call.=FALSE, "\n","------\n",
+ #              "Currently, Trellis box plots not available for a \n",
+ #              "y categorical variable, set y variable to  by1  instead\n\n")
+ #          }
+            if (!by1.miss) {
+              Trellis <- TRUE  # cat-cont
+              c.type <- "con_cat"
             }
-            Trellis <- TRUE  # cat-cont
-            c.type <- "con_cat"
+            else
+              Trellis <- FALSE
           }
         }
       }
@@ -925,7 +931,8 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
   get.ID <- FALSE
   if (y.miss && !cat.x) get.ID <- TRUE  # VBS plot 
   if (!is.null(add)) if (add[1] == "labels") get.ID <- TRUE 
-  if (!y.miss) if (!cat.x && !cat.y && (MD_cut>0 || out_cut>0))
+# if (!y.miss) if (!cat.x && !cat.y && (MD_cut>0 || out_cut>0))
+  if (!y.miss) if (MD_cut>0 || out_cut>0)  # 3.9.4 set TRUE for cat
     get.ID <- TRUE 
   ID.name <- noquote(deparse(substitute(ID)))  # puts quotes around the name
   ID.name <- gsub("\"", "", ID.name)
@@ -1064,7 +1071,7 @@ function(x, y=NULL, data=d, filter=NULL, enhance=FALSE,
     if (!cat.x) { 
 
       # run chart prep of x.call and y.call
-      if (object == "both"  &&  data.do) {  # run chart
+      if (run) {  # run chart
         y.call <- x.call
         cat.y <- cat.x
         options(yname=x.name)
@@ -1596,13 +1603,31 @@ if (is.null(out_size)) out_size <- size.pt
             "  use the  remove function, e.g., remove(x)\n\n")
         }
 
-  if (run) if (lwd == 0) fill <- getOption("violin_fill")
-  if (object == "both"  &&  nn_col > 1) {
-#    stack <- TRUE  # meaningless otherwise
-     if (fill == "on") fill <- getOption("violin_fill")  # change to multi later
-  }
+      if (run) if (lwd == 0) fill <- getOption("violin_fill")
+      if (object == "both"  &&  nn_col > 1) {
+    #    stack <- TRUE  # meaningless otherwise
+         # change to multi later
+         if (fill == "on") fill <- getOption("violin_fill")
+      }
 
  
+
+      if (!quiet) {  # text output
+
+        # by default display center_line only if runs about a mean
+        if (run  &&  center_line == "default") {
+          y.clean <- y.call[complete.cases(y.call), 1]  # converts df to vector 
+          m <- mean(y.clean)
+          n.change <- 0
+          for (i in 1:(length(y.clean)-1))
+            if ((y.clean[i+1] > m) != (y.clean[i] > m)) n.change <- n.change+1
+          if (n.change/(length(y.clean)-1) < .15)
+            center_line <- "off"
+          else
+            center_line <- "median"
+        }
+
+
         .plt.main(x.call, y.call, by.call, n_cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
           object, stat,
@@ -1618,22 +1643,20 @@ if (is.null(out_size)) out_size <- size.pt
           out_fill, out_color, out_shape.miss,
           fit.ln, fit_color, fit_lwd, fit_se, se_fill,
           ellipse, ellipse_color, ellipse_fill, ellipse_lwd,
-          center_line, show_runs, stack,
+          run, center_line, show_runs, stack,
           freq.poly, jitter_x, jitter_y,
           xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
-          legend_title, scale_x, scale_y,
+          scale_x, scale_y, pad_x, pad_y, legend_title, 
           add, x1, x2, y1, y2, add_cex, add_lwd, add_lty,
           add_color, add_fill, add_trans,
           quiet, ...)
       }
 
-      if (!quiet) {  # text output
-
         .plt.txt(x.call, y.call, stat, object, n_cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
           xlab, ylab,
-          smooth, box_adj, center_line, proportion, size,
-          show_runs, radius, digits_d, fun_call, txdif)
+          smooth, box_adj, run, center_line, show_runs,
+          proportion, size, radius, digits_d, fun_call, txdif)
 
        if (!y.miss && !Trellis) if (n.x_var == 1  &&  n.y_var == 1) {
           class(txout) <- "out"  # MD outlier analysis

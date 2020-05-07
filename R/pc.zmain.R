@@ -73,14 +73,14 @@ function(x, y,
       clr[i] <- fill[j]
     }
   }
-  else {
+  else {  # length(fill) == 0
     if (is.null(fill)) {  # fill not specified
-      if (!is.ord) {  # default qualitative for theme
-        clr <- getOption("bar_fill_discrete") 
+      if (!is.ord) {  # hues for nominal 
+        clr <- getColors(n=n_cat)
         if (!is.null(.color_range(clr, n_cat)))  
           clr <- .color_range(clr, n_cat)
       }
-      else  # sequential palette based on theme
+      else  # sequential palette for ordinal based on theme
         clr <- .color_range(.get_fill(), n_cat) 
     }
     else {  # fill specified by user

@@ -96,13 +96,12 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     if (is.null(by)) 
       x <- table(x, dnn=NULL)  # if missing data
     else
-      x <- table(by,x, dnn=c(y.name,x.name)) 
+      x <- table(by, x, dnn=c(y.name, x.name)) 
   }
 
   # no title if two vars and no labels
   txttl <- ""
   dims <- length(dim(x))
-#cat("x.name:", x.name, "\n")
   if (dims == 1 || (!is.null(x.lbl) || !is.null(y.lbl))) {  #  one var or labels
     txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=TRUE)
   }

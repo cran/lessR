@@ -1,5 +1,5 @@
 LineChart <-
-function(x, data=d, filter=NULL,
+function(x, data=d, rows=NULL,
          n_cat=getOption("n_cat"), type=NULL, 
 
          line_color=getOption("pt_color"), area=NULL, 
@@ -129,8 +129,8 @@ function(x, data=d, filter=NULL,
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
       ind <- eval(substitute(x), envir=data.vars)  # col num of each var      
-      if (!missing(filter)) {  # subset rows
-        r <- eval(substitute(filter), envir=data, enclos=parent.frame())
+      if (!missing(rows)) {  # subset rows
+        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
         r <- r & !is.na(r)  # set missing for a row to FALSE
         data <- data[r,,drop=FALSE]
       }

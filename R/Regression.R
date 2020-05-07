@@ -1,5 +1,5 @@
 Regression <-
-function(my_formula, data=d, filter=NULL, kfold=0,
+function(my_formula, data=d, rows=NULL, kfold=0,
          digits_d=NULL, standardize=FALSE,
 
          Rmd=NULL, Rmd_browser=TRUE, 
@@ -136,8 +136,8 @@ function(my_formula, data=d, filter=NULL, kfold=0,
   n.vars <- length(nm)
   n.pred <- n.vars - 1L
 
-  if (!missing(filter)) {  # subset filter
-    r <- eval(substitute(filter), envir=data, enclos=parent.frame())
+  if (!missing(rows)) {  # subset rows
+    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
     r <- r & !is.na(r)  # set missing for a row to FALSE
     data <- data[r,,drop=FALSE]
   }
@@ -154,8 +154,10 @@ function(my_formula, data=d, filter=NULL, kfold=0,
   v.str <- deparse(attr(terms.formula(my_formula), which="variables"))
   v.str <- substr(v.str, 6, nchar(v.str)-1)  # remove "list(" and ending ")"
   if (grepl("(", v.str, fixed=TRUE))  {
-    txtA <- paste("The reference to a variable in the lessR Regression function can\n",
-      "only be a variable name that refers to a variable in a data frame.\n\n", sep="")
+    txtA <- paste("The reference to a variable in the lessR Regression ",
+                  "function can\n",
+      "only be a variable name that refers to a variable in a data frame.\n\n",
+      sep="")
     txtB <- "For example, this does not work:\n  > reg(Salary ~ log(Years))\n\n"
     txtC <- "Instead use Transform to first add the new variable to d:\n"
     txtD <- "  > d <- Transform(YearsLog = log(Years))\n"
@@ -181,12 +183,12 @@ function(my_formula, data=d, filter=NULL, kfold=0,
     }
   }
 
-  # check for all numeric vars  in.data.frame <- TRUE
+  # check for all numeric vars in data.frame <- TRUE
   numeric.all <- TRUE
   for (i in 1:n.vars) {
-      if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])]))
-        numeric.all <- FALSE
-    }
+    if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])]))
+      numeric.all <- FALSE
+  }
   
   if ( !is.null(X1_new)  &&  (n.pred) > max_new ) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -459,6 +461,11 @@ function(my_formula, data=d, filter=NULL, kfold=0,
     cat(txknt, file=Rmd, sep="\n") 
     txRmd <- .showfile2(Rmd, "R Markdown file")
 
+    if (!requireNamespace("rmarkdown", quietly=TRUE)) {
+      stop("Package \"rmarkdown\" needed for this regression output\n",
+           "Please install it:  install.packages(\"rmarkdown\")\n\n",
+           call. = FALSE)
+    }
     if (rmarkdown::pandoc_available()) {
       pandocYN <- TRUE
       Rmd_format <- tolower(Rmd_format)

@@ -2,7 +2,7 @@ style <-
 function(
   theme=c("colors", "lightbronze", "dodgerblue", "darkred", "gray",
       "gold", "darkgreen", "blue", "red", "rose", "green", "purple",
-      "sienna", "brown", "orange", "white"),
+      "sienna", "brown", "orange", "white", "light"),
   sub_theme=c("default", "black", "wsj"),
   set=NULL, get=FALSE, reset=TRUE,
 
@@ -111,7 +111,7 @@ function(
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("window.fill", "panel.fill", "panel.color",
+    change <- c("sub.theme, window.fill", "panel.fill", "panel.color",
                 "panel.lwd", "panel.lty", "bar.fill", "bar.fill.discrete",
                 "bar.fill.ordered", "trans.bar.fill", "bar.color",
                 "bar.color.ordered", "bar.color.discrete",
@@ -419,7 +419,7 @@ function(
   # see if a pre-defined color range, if not return the calling color
   if (length(bar_fill) == 0) bar_fill <- getOption("bar_fill_discrete")
   bar_fill <- .color_range(bar_fill, 24)
-  if (length(bar_color) == 0) bar.colro <- getOption("bar_color_discrete")
+  if (length(bar_color) == 0) bar.color <- getOption("bar_color_discrete")
   bar_color <- .color_range(bar_color, 24)
   if (length(pt_fill) == 0) pt_fill <- getOption("pt_fill")
   pt_fill <- .color_range(pt_fill, 24)
@@ -588,6 +588,7 @@ function(
   if (theme == "brown") {clr1 <- "rosybrown4"; clr2 <- "rosybrown3"}
   if (theme == "orange") {clr1 <- "orange"; clr2 <- "orange3"}
   if (theme == "white") {clr1 <- "white"; clr2 <- "black"}
+  if (theme == "light") {clr1 <- "white"; clr2 <- "black"}
 
 
   if (!miss_theme) {
@@ -614,6 +615,7 @@ function(
       se_fill = .maketrans("gray10", 40)
       grid_color = "gray85"
       out_fill = "black"
+      out_fill = "black"
       out_color = "black"
       out2_fill = "gray25"
       out2_color = "gray25"
@@ -639,6 +641,7 @@ function(
       se_fill = .maketrans("gray10", 40) 
       segment_color = "gray20"
       grid_color = "gray85"
+      ID_color = "black"
       out_fill = "black"
       out_color = "black"
       out2_fill = "black"
@@ -678,6 +681,7 @@ function(
       ellipse_color = "gray15"
       bubble_text_color = rgb(247,242,230, maxColorValue=255)
       grid_color = rgb(222,217,205, maxColorValue=255)
+      ID_color = "gray15"
       trans = 0
     }
 
@@ -685,7 +689,7 @@ function(
       panel_fill = "white"
       window_fill = getOption("panel_fill")
       bar_fill_discrete = "hues"
-      bar_fill_ordered = rgb(144,165,175, maxColorValue=255)
+      bar_fill_ordered = rgb(144,165,195, maxColorValue=255)
       bar_color_discrete = "transparent"
       bar_color_ordered = rgb(126,144,168, maxColorValue=255)
       pt_fill = rgb(70,80,90, maxColorValue=255)
@@ -694,7 +698,20 @@ function(
       box_fill = getColors("hues")
       violin_fill = .maketrans(hcl(240,20,55), 90)
       grid_color = rgb(222,217,205, maxColorValue=255)
+      ID_color = "gray50"
       values = "%"
+    }
+
+    else if (theme == "light") {
+      se_fill = rgb(229,229,248,170,maxColorValue=255)
+      ellipse_color = rgb(103,103,176,maxColorValue=255)
+      ellipse_fill = "transparent"
+      out_fill = rgb(193,36,36,maxColorValue=255)
+      out_color = rgb(193,36,36,maxColorValue=255)
+      pt_fill = rgb(60,170,225,maxColorValue=255)
+      pt_color = rgb(70,78,161,maxColorValue=255)
+      grid_color = rgb(229,229,248,150,maxColorValue=255)
+      fit_color = "gray50"
     }
 
     else {  # process the other theme colors
@@ -730,6 +747,7 @@ function(
       strip_fill = .maketrans(clr1, 55) 
       strip_color = clr2 
       strip_text_color = clr2 
+      ID_color = "gray50"
     }
   }  # not miss theme 
 
@@ -788,6 +806,7 @@ function(
       ellipse_fill = .maketrans("gray55", 65)
       fit_color = "gray75"
       se_fill = .maketrans("gray55", 65)
+      ID_color = "gray90"
       strip_color = .maketrans(clr1, .to256n(0.40))
       strip_text_color = "gray65"
       segment_color = "gray65"
@@ -807,6 +826,7 @@ function(
       window_fill = rgb(.015,.015,.015)
       panel_fill = rgb(.015,.015,.015)
       grid_color = "gray25"
+      ID_color = "white"
       panel_color = "gray80"
       segment_color = "gray65"
       lab_color = "gray85"
@@ -816,6 +836,14 @@ function(
       axis_text_color = "gray85"
       add_color = "gray55"
       values_color = "gray85"
+      strip_text_color = "white"
+      fit_color <- ifelse (theme == "light", "gray40", "gray75")
+      if (theme == "colors") {
+        ellipse_color <- "gray75"
+        se_fill <- rgb(240,240,240, alpha=45, maxColorValue=256)
+        pt_fill <- "royalblue1"
+        pt_color <- "royalblue1"
+      }
 
       if (sum(col2rgb(panel_fill)) < 370) {
         strip_color = .maketrans(clr1, .to256n(0.40))
@@ -834,8 +862,9 @@ function(
         bar_color_ordered = "orange4"
         pt_color = rgb(139,69,0, maxColorValue=256)
         ellipse_fill = rgb(249,99,2, alpha=45, maxColorValue=256)
-        fit_color = rgb(209,87,3, maxColorValue=256)
+#       fit_color = rgb(209,87,3, maxColorValue=256)
         segment_color = rgb(249,99,2, maxColorValue=256)
+        ID_color = "orange4"
         clr1 <- rgb(249,99,2, maxColorValue=256)
       }
     }

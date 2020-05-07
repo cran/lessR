@@ -1,5 +1,5 @@
 PieChart <-
-function(x, y=NULL, data=d, filter=NULL,
+function(x, y=NULL, data=d, rows=NULL,
 
          radius=1, hole=0.65, hole_fill=getOption("panel_fill"),
 
@@ -27,18 +27,18 @@ function(x, y=NULL, data=d, filter=NULL,
 
 
   # a dot in a parameter name to an underscore
-  dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("hole.fill", "init.angle", "values.color", "values.size",
-                "values.digits", "values.position", "eval.df")
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-        assign(nm, dots[[i]])
-        get(nm)
-      }
-    }
-  }
+# dots <- list(...)
+# if (!is.null(dots)) if (length(dots) > 0) {
+#   change <- c("hole.fill", "init.angle", "values.color", "values.size",
+#               "values.digits", "values.position", "eval.df")
+#   for (i in 1:length(dots)) {
+#     if (names(dots)[i] %in% change) {
+#       nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
+#       assign(nm, dots[[i]])
+#       get(nm)
+#     }
+#   }
+# }
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -151,8 +151,8 @@ function(x, y=NULL, data=d, filter=NULL,
     data.vars <- as.list(seq_along(data))
     names(data.vars) <- names(data)
     ind <- eval(substitute(x), envir=data.vars)  # col num of each var
-    if (!missing(filter)) {  # subset rows
-      r <- eval(substitute(filter), envir=data, enclos=parent.frame())
+    if (!missing(rows)) {  # subset rows
+      r <- eval(substitute(rows), envir=data, enclos=parent.frame())
       r <- r & !is.na(r)  # set missing for a row to FALSE
       data <- data[r,,drop=FALSE]
     }

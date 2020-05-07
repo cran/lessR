@@ -1,7 +1,9 @@
 ---
 title: "Bar Charts"
 author: "David Gerbing"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{bar chart}
   %\VignetteEngine{knitr::rmarkdown}
@@ -13,7 +15,7 @@ library("lessR")
 ```
 
 
-## Bar Charts
+## Bar Chart of One Variable
 
 One of the most frequently encountered visualizations is the bar chart.
 
@@ -36,7 +38,67 @@ BarChart(Dept)
 
 The `BarChart()` function provides a default color theme, and labels each bar with the associated numerical value. The function also provides the corresponding frequency distribution, the table that lists the count of each category, from which the bar chart is constructed.
 
-## Pie Charts
+Specify a single fill color with the `fill` parameter, and a horizontal bar chart with base R parameter `horiz`. Turn off console output with the parameter `quiet`. Turn off the displayed value on each bar with the parameter `values`.
+
+```{r}
+BarChart(Dept, fill="darkred", horiz=TRUE, values="off", quiet=TRUE)
+```
+
+Use the `theme` parameter to change the entire color theme: "colors", "lightbronze", "dodgerblue", "darkred", "gray", "gold", "darkgreen", "blue", "red", "rose", "green", "purple", "sienna", "brown", "orange", "white", and "light".
+
+Or, can use `style()` to change the theme for subsequent visualizations as well.
+
+```{r}
+BarChart(Dept, theme="darkred")
+```
+
+Dept is not an ordinal variable, but to illustrate, can choose many different sequential palettes from `getColors()`: "reds", "rusts", "browns", "olives", "greens", "emeralds", "turquoises", "aquas", "blues", "purples", "violets", "magentas", and "grays". 
+
+```{r}
+BarChart(Dept, fill="reds")
+```
+
+
+
+Rotate and offset the axis labels with `rotate_x` and `offset` parameters. Do a descending sort of the categories by frequencies with the `sort` parameter.
+
+
+```{r}
+BarChart(Dept, rotate_x=45, offset=1, sort="-")
+```
+
+
+Map the value of tabulated count to bar fill.  This way, the color of the bars reflects the bar height.
+
+```{r}
+BarChart(Dept, fill=(count))
+```
+
+```
+
+
+Specify both the categorical variable, $x$, as well as the numerical variable that specifies the height of the bars, $y$. Then can do a statistical transformation of $y$. Set the bars proportional to the height of the corresponding mean deviations of $y$ with the `stat` parameter. Possible values of `stat`: "sum", "mean", "sd", "dev", "min", "median", and "max". The "dev" value displays the mean deviations to further facilitate a comparison among levels.
+
+Here the $x$ is Dept and $y$ is Salary.
+
+Display bars for values of dev <= 0 in a different color than values above with the `fill_split` parameter. Do an ascending sort with the `sort` parameter.
+
+```{r}
+BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
+```
+
+
+Can annotate a plot with the `add` parameter. Here add a rectangle around the message centered at <3,10>. First lighten the fill color of the annotation with the `add_fill` parameter for the `style()` function.
+
+```{r}
+style(add_fill="aliceblue")
+BarChart(Dept, add=c("rect", "Employees by\nDepartment"),
+                     x1=c(1.75,3), y1=c(11, 10), x2=4.25, y2=9)
+```
+
+
+
+## Pie Chart
 
 An alternative to the bar chart for a single categorical variable is the pie chart.
 
@@ -52,8 +114,6 @@ d <- Read("Employee")
 PieChart(Dept)
 ```
 
-``
-
 The doughnut or ring chart appears easier to read than a standard bar chart. But the _lessR_ function `PieChart()` also can create the "old-fashioned" pie chart. We have seen the summary statistics several times now, so turn off the output to the R console here with the `quiet` parameter.
 
 
@@ -62,4 +122,25 @@ PieChart(Dept, hole=0, quiet=TRUE)
 ```
 
 Set the size of the hole in the doughnut or ring chart with the parameter `hole`, which specifies the proportion of the pie occupied by the hole. The default hole size is 0.65. Set that value to 0 to close the hole.
+
+
+## Bar Chart of Two Variables
+
+Specify the second categorical variable with the `by` parameter.
+
+```{r, fig.width=4}
+BarChart(Dept, by=Gender)
+```
+
+The stacked version is default, but the values of the second categorical variable an also be represented with bars, more helpful to compare the values with each other.
+
+```{r, fig.width=5}
+BarChart(Dept, by=Gender, beside=TRUE)
+```
+
+Obtain the 100% stacked version with the `stack100` parameter.
+
+```{r, fig.width=4}
+BarChart(Dept, by=Gender, stack100=TRUE)
+```
 

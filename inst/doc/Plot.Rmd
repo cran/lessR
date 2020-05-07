@@ -1,7 +1,9 @@
 ---
 title: "Scatter Plots"
 author: "David Gerbing"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{scatter plots}
   %\VignetteEngine{knitr::rmarkdown}
@@ -19,7 +21,7 @@ First read the Employee data included as part of __lessR__.
 d <- Read("Employee")
 ```
 
-__lessR__ does many versions of a scatter plot with its `Plot()` function.
+__lessR__ provides many versions of a scatter plot with its `Plot()` function.
 
 
 ## Two Variables
@@ -74,5 +76,24 @@ Plot(Dept)
 ```
 
 
+## Cleveland Dot Plot
+
+The Cleveland dot plot, here for a single variable, has row names on the y-axis. The default plots sorts by the value plotted.
+
+```{r}
+Plot(Salary, row_names)
+```
+
+The standard scatterplot version of a Cleveland dot plot.
+
+```{r}
+Plot(Salary, row_names, sort_yx="0", segments_y=FALSE)
+```
+
+This Cleveland dot plot has two x-variables, indicated as a standard R vector with the `c()` function. In this situation the two points on each row are connected with a line segment. By default the rows are sorted by distance between the successive points.
+
+```{r}
+Plot(c(Pre, Post), row_names)
+```
 
 

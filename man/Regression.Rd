@@ -17,7 +17,7 @@ Output is generated into distinct segments by topic, organized and displayed in 
 }
 
 \usage{
-Regression(my_formula, data=d, filter=NULL, kfold=0,
+Regression(my_formula, data=d, rows=NULL, kfold=0,
            digits_d=NULL, standardize=FALSE,
 
          Rmd=NULL, Rmd_browser=TRUE, 
@@ -58,7 +58,7 @@ reg_brief(\ldots, brief=TRUE)
        generated R~Markdown for an interpretative output as specified by the
        \code{Rmd} parameter, then this data frame must first be read by the
        \code{lessR} function \code{\link{Read}}.}
-  \item{filter}{A logical expression that specifies a subset of rows of the data frame
+  \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{kfold}{Number of K-fold cross-validations. If conducted, only the
        cross-validation output shown.}
@@ -176,7 +176,7 @@ The basic analysis successively invokes several standard R functions beginning w
 INPUT DATA FRAME\cr
 The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not complete.  Specify the name of the data frame for analysis with the \code{data} option if the name is not the default \code{d}.
        
-The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 TEXT OUTPUT\cr
 The output is produced in pieces by topic (see \code{values} below), automatically collated by default in the final output. But the pieces are available for later reference if the output of the function is directed toward an object, such as \code{r} in \code{r <- reg(Y ~ X)}. This is especially useful if the pieces are accessed within \code{knitr} or individual pieces are displayed at the console.
@@ -343,7 +343,7 @@ r$out_estimates
 #reg(Reading ~ Verbal + Absent, Rmd="eg", Rmd_format=c("word", "odt"))
 
 # just for incomes > 100000 and less than 5 days absent 
-Regression(Reading ~ Verbal, filter=(Income > 100 & Absent < 5))
+Regression(Reading ~ Verbal, rows=(Income > 100 & Absent < 5))
 
 # Multiple regression model
 # Save the three output plots as pdf files 4 inches square

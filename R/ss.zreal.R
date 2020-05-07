@@ -135,7 +135,6 @@ function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
         tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(x[i]), w=max.ln[i]))
 
       if (max(nchar(tx)) < getOption("width")) {  # horizontal layout
-
         # values
         tx[length(tx)+1] <- ""
         for (i in 1:length(x))

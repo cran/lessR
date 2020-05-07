@@ -17,7 +17,7 @@ Can also be called from the more general \code{\link{model}} function.
 }
 
 \usage{
-ttest(x=NULL, y=NULL, data=d, filter=NULL, paired=FALSE,
+ttest(x=NULL, y=NULL, data=d, rows=NULL, paired=FALSE,
 
          n=NULL, m=NULL, s=NULL, mu=NULL, 
          n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
@@ -48,7 +48,7 @@ tt(\ldots)
   \item{y}{If \code{x} is not a formula, the responses for the second group,
         otherwise \code{NULL}.}
   \item{data}{Data frame that contains the variable of interest, default is \code{d}.}
-  \item{filter}{A logical expression that specifies a subset of rows of the data frame
+  \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{paired}{Set to \code{TRUE} for a dependent-samples t-test with two data
         vectors or variables from a data frame, with the difference computed
@@ -199,7 +199,7 @@ ttest(Salary)
 ttest(Salary, mu=52000)
 
 # just with employees with salaries less than $100,000
-ttest(Salary, mu=52000, filter=(Salary < 100000))
+ttest(Salary, mu=52000, rows=(Salary < 100000))
 
 
 # -------------------------------------------------------

@@ -15,7 +15,7 @@ Can also be called from the more general \code{\link{model}} function.
 }
 
 \usage{
-Logit(my_formula, data=d, filter=NULL,
+Logit(my_formula, data=d, rows=NULL,
       digits_d=4, text_width=120, 
 
      brief=getOption("brief"),
@@ -38,7 +38,7 @@ lr(\ldots)
        X1 and X2, specify the corresponding linear model as Y ~ X1 + X2.}
   \item{data}{The default name of the data frame that contains the data
        for analysis is \code{d}, otherwise explicitly specify.}
-  \item{filter}{A logical expression that specifies a subset of rows of
+  \item{rows}{A logical expression that specifies a subset of rows of
        the data frame to analyze.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal
        digits. For the rest of the output, it is a suggestion only.}
@@ -98,7 +98,7 @@ The default analysis provides the model's parameter estimates and corresponding 
 DATA\cr
 The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{d}.
 
-The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 GRAPHICS\cr
 For models with a single predictor variable, a scatter plot of the data is produced, which also includes the fitted values_ As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. If more than a single predictor variable, then a scatter plot matrix is produced. 
@@ -139,7 +139,7 @@ lr(Gender ~ Years)
 Logit(Gender ~ Years, res_row=8, res_sort="rstudent", digits_d=8, pred=FALSE)
 
 # just for employees who have worked more than 5 years at the firm
-Logit(Gender ~ Years, filter=(Years > 5))
+Logit(Gender ~ Years, rows=(Years > 5))
 
 # Multiple logistic regression model
 # Provide all default analyses

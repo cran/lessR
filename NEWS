@@ -4,7 +4,111 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
+
  
+ 
+>>>>>> Changes for lessR version 3.9.4 (2020-05-07) <<<<<<
+
+-------------
+Updates 3.9.4
+-------------
+
+. 
+  new name (a single dot) for a single function for extracting
+    rows and then columns of a data table with the base R Extract 
+    function data[ , ], which replaces the ir and ic functions 
+  random(n), where n is an integer < nrow(data) to do a random
+    selection of rows from data, expresses as the criterion for
+    rows for use within the .() function for the rows parameter
+    in base R Extract
+  rows in which a specified variable was missing not included in
+    output, eg., d[.(Dept == "SALE"),] does not include rows in 
+    which Dept is NA, consistent with the logical specification
+  rows= and cols= as names of character strings passed to .()
+  error checking if logical condition uses = instead of ==
+
+BarChart, Histogram, Plot
+  filter parameter changed back to rows to be consistent with the
+    d[.(rows),.(cols)] format of the base R Extract function with
+    new function .()
+
+BarChart
+  add_top parameter replaced with pad_y_max to be consistent with
+    and scaled the same as pad_y from Plot
+  pay_y_min parameter added
+  when values are written on the top (or bottom) of a bar, spacing
+    now adjusted according to font size
+
+corReorder
+  new parameter dist_type to allow to input a standard distance
+    matrix, not just a correlation matrix
+
+Histogram
+  default color made more blue, less gray
+
+Merge
+  by="rows" now for a vertical merge, that is, stack one data frame
+    on top the other
+
+pivot
+  for aggregation, enhanced with
+    1. multiple value variables possible to summarize over
+    2. missing data analysis, with parameters na_value and na_by, and 
+    3. parameter na.remove to removing missing data for value variables,
+       the values on which the aggregation is computed
+    4. specify tabulate as the function, no value parameter needed, to just
+       obtain counts of each cell
+    5. by parameter becomes rows_by, cols_by is a new parameter,
+       by variables specifies as cols_by creates a table with these columns
+    6. digits_d parameter to round aggregated values to specified value
+
+Plot
+  for sub_theme set to "black", new color defaults:
+     fit_color is "gray75" and
+     se_fill is a partially transparent "gray75"
+     pt_fill and pt_color is "royalblue1"
+  pad_x and pad_y parameters added to provide optional additional
+    padding beyond the default 0 padding of the x- and y-axes
+  when an ellipse, axes labeled out to the edges of the ellipse
+  default plotted means of a categorical variable vs. continuous
+    enlarged and a lighter shade of gray
+  padding added if labeling points
+  descriptive stats added for run=TRUE
+  no stat output if multiple run charts specified
+
+see
+  new function to view the top-left and bottom-right corners of a
+    data frame, especially appropriate for large data frames
+
+style
+  new theme "light" to generate the cover of 
+      R Visualization: Derive Meaning from Data, CRC Press, May, 2020
+  to work in conjunction with sub_theme="black"
+
+ 
+---------------
+Bug Fixes 3.9.4
+---------------  
+
+BarChart
+  when displaying values outside of the bars, when a value is negative,
+    now properly displays at the bottom of the bar
+  stat="count" works properly
+  values="proportion" works properly for labeling the bars
+
+PieChart
+  colors correctly display if more than 12 categories plotted
+
+Plot
+  lattice plot, color of text on the Trellis strips now displays
+    when changed in style(), parameter strip_text_color
+  strip_text_color set to white for black sub_theme
+  Cleveland dot plot displays correctly for large sample sizes (no smooth)
+  numeric x with factor y, now plots
+  plotting three run charts specified as a vector now works
+  
+Regression
+  ANOVA table correctly displays for models with interaction terms
 
  
  

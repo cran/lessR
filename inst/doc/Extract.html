@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="David Gerbing" />
+
+
+<title>Subset a Data Frame</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Subset a Data Frame</h1>
+<h4 class="author">David Gerbing</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#subset-a-data-frame-with-base-r-extract">Subset a Data Frame with <strong>Base R</strong> <code>Extract</code></a></li>
+<li><a href="#annoying-features-of-base-r-extract">Annoying Features of <strong>Base R</strong> <code>Extract</code></a></li>
+<li><a href="#more-flexible-use-of-extract">More Flexible Use of <code>Extract</code></a></li>
+<li><a href="#missing-data">Missing Data</a></li>
+<li><a href="#random-selection-of-rows">Random Selection of Rows</a></li>
+</ul>
+</div>
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;lessR&quot;</span>)</a></code></pre></div>
+<div id="subset-a-data-frame-with-base-r-extract" class="section level2">
+<h2>Subset a Data Frame with <strong>Base R</strong> <code>Extract</code></h2>
+<p>The most general way to subset a data frame by rows and/or columns is the base R <code>Extract</code> function, called by <code>d[rows, columms]</code>, where <em>d</em> is the data frame. To use this function, for the <em>rows</em> parameter, pass the row names of the selected rows, the indices or actual names, or pass a logical statement that, when evaluated, results in these names. For the <em>cols</em> parameter, pass the column indices of the selected columns, or pass a list of variable names that reduces to these indices.</p>
+<p>In the logical expression of rows, use the standard R operators.</p>
+<table>
+<thead>
+<tr class="header">
+<th>operator</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>&amp;</td>
+<td>and</td>
+</tr>
+<tr class="even">
+<td>|</td>
+<td>or</td>
+</tr>
+<tr class="odd">
+<td>!</td>
+<td>not</td>
+</tr>
+<tr class="even">
+<td>==</td>
+<td>is equal to</td>
+</tr>
+<tr class="odd">
+<td>!=</td>
+<td>is not equal to</td>
+</tr>
+<tr class="even">
+<td>%in%</td>
+<td>is in a vector</td>
+</tr>
+</tbody>
+</table>
+<p>For the column specification, specify a variable range of contiguous variables with a colon, <code>:</code>.</p>
+</div>
+<div id="annoying-features-of-base-r-extract" class="section level2">
+<h2>Annoying Features of <strong>Base R</strong> <code>Extract</code></h2>
+<p>When <code>Extract</code> evaluates the row or column specifications to obtain the indices, there are several limitations.</p>
+<ol style="list-style-type: decimal">
+<li><code>rows</code>: Any reference to the variables in the data frame for this specification must contain the name of the data frame followed by a $. But this name has already been specified in the function call, and now is redundant, simply repeated for every variable reference.</li>
+<li><code>cols</code>: Usually specified with a vector of variable names.</li>
+</ol>
+<ul>
+<li>All variable names in in the provided vector of names must be quoted, and no variable ranges are permitted.</li>
+<li>No variable ranges.</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>No character strings for values passed to <code>rows</code> and <code>cols</code>. Instead enter the conditions for both rows and columns, which can make the entire expression quite large.</li>
+</ol>
+</div>
+<div id="more-flexible-use-of-extract" class="section level2">
+<h2>More Flexible Use of <code>Extract</code></h2>
+<p>To address the first two deficiencies, one possibility is the base R <code>subset()</code> function. To use <code>Extract</code> directly, <strong>lessR</strong> provides the function <code>.()</code> for obtaining the indices of selected rows and of selected columns. This function is only callable within the base R <code>Extract</code> function, with what R refers to as non-standard evaluation. That basically means that the annoying restrictions are removed, though in some advanced uses the <code>.()</code> may not apply.</p>
+<p>The general form of the subsetting follows.</p>
+<pre><code>d[.(rows), .(columns)]</code></pre>
+<p>That is, call the <code>Extract</code> function as before, but now wrap the row and column expressions with <code>.()</code>.</p>
+<p>To illustrate, use the Employee data set contained in <strong>lessR</strong>, here read into the <em>d</em> data frame.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">d &lt;-<span class="st"> </span><span class="kw">Read</span>(<span class="st">&quot;Employee&quot;</span>)</a></code></pre></div>
+<pre><code>## 
+## &gt;&gt;&gt; Suggestions
+## Details about your data, Enter:  details()  for d, or  details(name)
+## 
+## Data Types
+## ------------------------------------------------------------
+## character: Non-numeric data values
+## integer: Numeric data values, integers only
+## double: Numeric data values with decimal digits
+## ------------------------------------------------------------
+## 
+##     Variable                  Missing  Unique 
+##         Name     Type  Values  Values  Values   First and last values
+## ------------------------------------------------------------------------------------------
+##  1     Years   integer     36       1      16   7  NA  15 ... 1  2  10
+##  2    Gender character     37       0       2   M  M  M ... F  F  M
+##  3      Dept character     36       1       5   ADMN  SALE  SALE ... MKTG  SALE  FINC
+##  4    Salary    double     37       0      37   53788.26  94494.58 ... 56508.32  57562.36
+##  5    JobSat character     35       2       3   med  low  low ... high  low  high
+##  6      Plan   integer     37       0       3   1  1  3 ... 2  2  1
+##  7       Pre   integer     37       0      27   82  62  96 ... 83  59  80
+##  8      Post   integer     37       0      22   92  74  97 ... 90  71  87
+## ------------------------------------------------------------------------------------------</code></pre>
+<p>Subset the data frame by only listing observations with a <em>Gender</em> of “M” with scores on <em>Post</em> larger than 90. Only list columns for the variables in the range from <em>Years</em> to <em>Salary</em>, and <em>Post</em>. Referring back to the output of <code>Read()</code>, the variable range includes <em>Years</em>, <em>Gender</em>, <em>Dept</em>, and <em>Salary</em>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">d[.(Gender<span class="op">==</span><span class="st">&quot;M&quot;</span> <span class="op">&amp;</span><span class="st"> </span>Post<span class="op">&gt;</span><span class="dv">90</span>), .(Years<span class="op">:</span>Salary, Post)]</a></code></pre></div>
+<pre><code>##                   Years Gender Dept    Salary Post
+## Ritchie, Darnell      7      M ADMN  53788.26   92
+## Hoang, Binh          15      M SALE 111074.86   97
+## Pham, Scott          13      M SALE  81871.05   94
+## Correll, Trevon      21      M SALE 134419.23   94
+## Langston, Matthew     5      M SALE  49188.96   93
+## Anderson, David       9      M ACCT  69547.60   91</code></pre>
+<p>Following is the traditional R call to <code>Extract</code> for subsetting.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">d[d<span class="op">$</span>Gender<span class="op">==</span><span class="st">&quot;M&quot;</span> <span class="op">&amp;</span><span class="st"> </span>d<span class="op">$</span>Post<span class="op">&gt;</span><span class="dv">90</span>, <span class="kw">c</span>(<span class="st">&quot;Years&quot;</span>, <span class="st">&quot;Gender&quot;</span>, <span class="st">&quot;Dept&quot;</span>, <span class="st">&quot;Salary&quot;</span>, <span class="st">&quot;Post&quot;</span>)]</a></code></pre></div>
+<pre><code>##                   Years Gender Dept    Salary Post
+## Ritchie, Darnell      7      M ADMN  53788.26   92
+## Hoang, Binh          15      M SALE 111074.86   97
+## Pham, Scott          13      M SALE  81871.05   94
+## Correll, Trevon      21      M SALE 134419.23   94
+## Langston, Matthew     5      M SALE  49188.96   93
+## Anderson, David       9      M ACCT  69547.60   91</code></pre>
+<p>To negate a row selection, add a <code>!</code> to the beginning of the logical condition passed to <code>.()</code>, within the call to <code>.()</code>. To exclude the specified variables, place a <code>-</code>, in front of the call to <code>.()</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">d[.(<span class="op">!</span>(Gender<span class="op">==</span><span class="st">&quot;M&quot;</span> <span class="op">&amp;</span><span class="st"> </span>Post<span class="op">&gt;</span><span class="dv">90</span>)), <span class="op">-</span>.(Dept<span class="op">:</span>Plan, Pre)]</a></code></pre></div>
+<pre><code>##                     Years Gender Post
+## Wu, James              NA      M   74
+## Jones, Alissa           5      F   62
+## Downs, Deborah          7      F   86
+## Afshari, Anbar          6      F  100
+## Knox, Michael          18      M   84
+## Campagna, Justin        8      M   84
+## Kimball, Claire         8      F   92
+## Cooper, Lindsay         4      F   91
+## Saechao, Suzanne        8      F  100
+## Tian, Fang              9      F   61
+## Bellingar, Samantha    10      F   72
+## Sheppard, Cory         14      M   73
+## Kralik, Laura          10      F   71
+## Skrotzki, Sara         18      F   61
+## James, Leslie          18      F   70
+## Osterman, Pascal        5      M   70
+## Adib, Hassan           14      M   69
+## Gvakharia, Kimberly     3      F   79
+## Stanley, Grayson        9      M   73
+## Link, Thomas           10      M   83
+## Portlock, Ryan         13      M   73
+## Stanley, Emma           3      F   84
+## Singh, Niral            2      F   59
+## Fulton, Scott          13      M   73
+## Korhalkar, Jessica      2      F   87
+## LaRoe, Maria           10      F   86
+## Billing, Susan          4      F   90
+## Capelle, Adam          24      M   81
+## Hamide, Bita            1      F   90
+## Anastasiou, Crystal     2      F   71
+## Cassinelli, Anastis    10      M   87</code></pre>
+<p>Can still provide the indices directly for one or both of the expressions as the base R <code>Extract</code> function is unmodified.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">d[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, .(Years<span class="op">:</span>Salary, Post)]</a></code></pre></div>
+<pre><code>##                  Years Gender Dept    Salary Post
+## Ritchie, Darnell     7      M ADMN  53788.26   92
+## Wu, James           NA      M SALE  94494.58   74
+## Hoang, Binh         15      M SALE 111074.86   97</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">d[.(Gender<span class="op">==</span><span class="st">&quot;M&quot;</span> <span class="op">&amp;</span><span class="st"> </span>Post<span class="op">&gt;</span><span class="dv">90</span>), <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</a></code></pre></div>
+<pre><code>##                   Years Gender Dept
+## Ritchie, Darnell      7      M ADMN
+## Hoang, Binh          15      M SALE
+## Pham, Scott          13      M SALE
+## Correll, Trevon      21      M SALE
+## Langston, Matthew     5      M SALE
+## Anderson, David       9      M ACCT</code></pre>
+<p>To enhance readability, store the specified row or column conditions as character strings. Each string must be named <code>rows</code> or <code>cols</code>, essentially a kind of pseudo-parameter. Because the entire expression is a character string, differentiate between single and double quotes as needed. For example, use single quotes within the string and double quotes to define the entire string, as illustrated next.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">rows &lt;-<span class="st"> &quot;Gender=='M' &amp; Post&gt;93&quot;</span></a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">cols &lt;-<span class="st"> &quot;Gender:Salary, Post&quot;</span></a></code></pre></div>
+<p>To subset, pass the respective character strings, <code>rows</code> and <code>cols</code>, to <code>.()</code>, respectively.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">d[.(rows), .(cols)]</a></code></pre></div>
+<pre><code>##                 Gender Dept    Salary Post
+## Hoang, Binh          M SALE 111074.86   97
+## Pham, Scott          M SALE  81871.05   94
+## Correll, Trevon      M SALE 134419.23   94</code></pre>
+<p>To negate, as with the literal expressions, use <code>!</code> for the rows and <code>-</code> for the columns. Notice their placement.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">d[.(<span class="op">!</span>rows), <span class="op">-</span>.(cols)]</a></code></pre></div>
+<pre><code>##                     Years JobSat Plan Pre
+## Ritchie, Darnell        7    med    1  82
+## Wu, James              NA    low    1  62
+## Jones, Alissa           5   &lt;NA&gt;    1  65
+## Downs, Deborah          7   high    2  90
+## Afshari, Anbar          6   high    2 100
+## Knox, Michael          18    med    3  81
+## Campagna, Justin        8    low    1  76
+## Kimball, Claire         8   high    2  93
+## Cooper, Lindsay         4   high    1  78
+## Saechao, Suzanne        8    med    1  98
+## Tian, Fang              9    med    2  60
+## Bellingar, Samantha    10    med    1  67
+## Sheppard, Cory         14    low    3  66
+## Kralik, Laura          10    med    2  74
+## Skrotzki, Sara         18    med    2  63
+## James, Leslie          18    low    3  70
+## Osterman, Pascal        5   high    3  69
+## Adib, Hassan           14    med    2  71
+## Gvakharia, Kimberly     3    med    2  83
+## Stanley, Grayson        9    low    1  74
+## Link, Thomas           10    low    1  83
+## Portlock, Ryan         13    low    1  72
+## Langston, Matthew       5    low    3  94
+## Stanley, Emma           3   high    2  86
+## Singh, Niral            2   high    2  59
+## Anderson, David         9    low    1  94
+## Fulton, Scott          13    low    1  72
+## Korhalkar, Jessica      2   &lt;NA&gt;    2  74
+## LaRoe, Maria           10   high    2  80
+## Billing, Susan          4    med    2  91
+## Capelle, Adam          24    med    2  83
+## Hamide, Bita            1   high    2  83
+## Anastasiou, Crystal     2    low    2  59
+## Cassinelli, Anastis    10   high    1  80</code></pre>
+</div>
+<div id="missing-data" class="section level2">
+<h2>Missing Data</h2>
+<p>The variable <em>Dept</em> is missing for the fourth row of data.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">d[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,]</a></code></pre></div>
+<pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
+## Ritchie, Darnell     7      M ADMN  53788.26    med    1  82   92
+## Wu, James           NA      M SALE  94494.58    low    1  62   74
+## Hoang, Binh         15      M SALE 111074.86    low    3  96   97
+## Jones, Alissa        5      F &lt;NA&gt;  53772.58   &lt;NA&gt;    1  65   62
+## Downs, Deborah       7      F FINC  57139.90   high    2  90   86</code></pre>
+<p>Here with the traditional use of <code>Extract</code>, specify rows of data only when the value of <em>Dept</em> is <em>ADMIN</em>.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">d[d<span class="op">$</span>Dept<span class="op">==</span><span class="st">&quot;ADMN&quot;</span>, <span class="kw">c</span>(<span class="st">'Gender'</span>, <span class="st">'Dept'</span>, <span class="st">'Salary'</span>)]</a></code></pre></div>
+<pre><code>##                  Gender Dept    Salary
+## Ritchie, Darnell      M ADMN  53788.26
+## NA                 &lt;NA&gt; &lt;NA&gt;        NA
+## Afshari, Anbar        F ADMN  69441.93
+## James, Leslie         F ADMN 122563.38
+## Singh, Niral          F ADMN  61055.44
+## Billing, Susan        F ADMN  72675.26
+## Capelle, Adam         M ADMN 108138.43</code></pre>
+<p>The result provides what was asked for, and also when <em>Dept</em> is <code>&lt;NA&gt;</code>, which was not asked for. The requested value of <em>ADMIN</em> is not <code>&lt;NA&gt;</code>.</p>
+<p>The <code>.()</code> function provides what was requested.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">d[.(Dept<span class="op">==</span><span class="st">&quot;ADMN&quot;</span>), .(Gender<span class="op">:</span>Salary)]</a></code></pre></div>
+<pre><code>##                  Gender Dept    Salary
+## Ritchie, Darnell      M ADMN  53788.26
+## Afshari, Anbar        F ADMN  69441.93
+## James, Leslie         F ADMN 122563.38
+## Singh, Niral          F ADMN  61055.44
+## Billing, Susan        F ADMN  72675.26
+## Capelle, Adam         M ADMN 108138.43</code></pre>
+<p>If rows with the value of the variable missing are also requested, then <code>.()</code> provides that information only when requested, such as from the base R function <code>is.na()</code>.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">d[.(Dept<span class="op">==</span><span class="st">&quot;ADMN&quot;</span> <span class="op">|</span><span class="st"> </span><span class="kw">is.na</span>(Dept)), .(Gender<span class="op">:</span>Salary)]</a></code></pre></div>
+<pre><code>##                  Gender Dept    Salary
+## Ritchie, Darnell      M ADMN  53788.26
+## Jones, Alissa         F &lt;NA&gt;  53772.58
+## Afshari, Anbar        F ADMN  69441.93
+## James, Leslie         F ADMN 122563.38
+## Singh, Niral          F ADMN  61055.44
+## Billing, Susan        F ADMN  72675.26
+## Capelle, Adam         M ADMN 108138.43</code></pre>
+</div>
+<div id="random-selection-of-rows" class="section level2">
+<h2>Random Selection of Rows</h2>
+<p>The function <code>.()</code> also provides for random selection of rows. To randomly select the specified number of rows from the data frame to subset, specify the <code>random()</code> function for the logical criterion of the <code>rows</code>. The value passed to <code>random()</code> can either be the actual number of rows to select, as below, or, the proportion of rows to select.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">d[.(<span class="kw">random</span>(<span class="dv">5</span>)), .(Years<span class="op">:</span>Salary)]</a></code></pre></div>
+<pre><code>##                  Years Gender Dept   Salary
+## Wu, James           NA      M SALE 94494.58
+## Afshari, Anbar       6      F ADMN 69441.93
+## Link, Thomas        10      M FINC 66312.89
+## Campagna, Justin     8      M SALE 72321.36
+## Stanley, Grayson     9      M SALE 69624.87</code></pre>
+<p>Here specify a proportion of rows to select.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">d[.(<span class="kw">random</span>(<span class="fl">0.1</span>)), .(Years<span class="op">:</span>Salary)]</a></code></pre></div>
+<pre><code>##              Years Gender Dept    Salary
+## Pham, Scott     13      M SALE  81871.05
+## Hoang, Binh     15      M SALE 111074.86
+## Adib, Hassan    14      M SALE  83014.43
+## Tian, Fang       9      F ACCT  71084.02</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

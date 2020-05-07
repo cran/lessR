@@ -14,7 +14,7 @@ The color and style attributes of each plot can be set as a general theme, or in
 style(
   theme=c("colors", "lightbronze", "dodgerblue", "darkred", "gray",
       "gold", "darkgreen", "blue", "red", "rose", "green", "purple",
-	    "sienna", "brown", "orange", "white"),
+	    "sienna", "brown", "orange", "white", "light"),
   sub_theme=c("default", "black", "wsj"),
   set=NULL, get=FALSE, reset=TRUE,
 
@@ -341,6 +341,7 @@ Available themes:\cr
 "brown"\cr
 "orange"\cr
 "white"\cr
+"light"\cr
 
 The \code{"gray"} color theme is based on the colors used in Hadley Wickham's \code{ggplot2} package. The \code{"lightbronze"} theme, especially with the \code{wsj} sub-theme, is based on Jeffrey Arnold's \code{wsj} theme from his ggthemes package.
 

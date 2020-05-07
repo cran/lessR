@@ -16,7 +16,8 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
          F1=NULL, F2=NULL, F3=NULL, F4=NULL, F5=NULL,
          F6=NULL, F7=NULL, F8=NULL, F9=NULL, F10=NULL,
-         F11=NULL, F12=NULL,
+         F11=NULL, F12=NULL, F13=NULL, F14=NULL, F15=NULL,
+         F16=NULL, F17=NULL, F18=NULL, F19=NULL, F20=NULL,
 
          fun_call=NULL, ...) {
 
@@ -60,7 +61,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
-  NFmax <- 12
+  NFmax <- 20
 
 
   # translate variable names into column positions
@@ -113,6 +114,14 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
     F10n <- eval(parse(text=vars[10]), vars.all, parent.frame())
     F11n <- eval(parse(text=vars[11]), vars.all, parent.frame())
     F12n <- eval(parse(text=vars[12]), vars.all, parent.frame())
+    F13n <- eval(parse(text=vars[13]), vars.all, parent.frame())
+    F14n <- eval(parse(text=vars[14]), vars.all, parent.frame())
+    F15n <- eval(parse(text=vars[15]), vars.all, parent.frame())
+    F16n <- eval(parse(text=vars[16]), vars.all, parent.frame())
+    F17n <- eval(parse(text=vars[17]), vars.all, parent.frame())
+    F18n <- eval(parse(text=vars[18]), vars.all, parent.frame())
+    F19n <- eval(parse(text=vars[19]), vars.all, parent.frame())
+    F20n <- eval(parse(text=vars[20]), vars.all, parent.frame())
 
     for (i in 1:NFmax) {
       fnum <- eval(parse(text=paste("F", toString(i), "n", sep="")))
@@ -133,6 +142,14 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
     F10n <- eval(substitute(F10), vars.all, parent.frame())
     F11n <- eval(substitute(F11), vars.all, parent.frame())
     F12n <- eval(substitute(F12), vars.all, parent.frame())
+    F13n <- eval(substitute(F13), vars.all, parent.frame())
+    F14n <- eval(substitute(F14), vars.all, parent.frame())
+    F15n <- eval(substitute(F15), vars.all, parent.frame())
+    F16n <- eval(substitute(F16), vars.all, parent.frame())
+    F17n <- eval(substitute(F17), vars.all, parent.frame())
+    F18n <- eval(substitute(F18), vars.all, parent.frame())
+    F19n <- eval(substitute(F19), vars.all, parent.frame())
+    F20n <- eval(substitute(F20), vars.all, parent.frame())
 
     # get NF, number of factors
     NF <- 0
@@ -142,7 +159,8 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
     }
   }
 
-  Label <- c(F1n,F2n,F3n,F4n,F5n,F6n,F7n,F8n,F9n,F10n,F11n,F12n)
+  Label <- c(F1n,F2n,F3n,F4n,F5n,F6n,F7n,F8n,F9n,F10n,F11n,F12n,
+             F13n,F14n,F15n,F16n,F17n,F18n,F19n,F20)
 
   if (NF == 0) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",

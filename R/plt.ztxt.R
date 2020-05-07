@@ -2,7 +2,7 @@
 function(x, y, values, object, n_cat,
        cat.x, num.cat.x, cat.y, num.cat.y,
        xlab, ylab, smooth, box_adj,
-       center_line, prop, size, show_runs, radius, digits_d, 
+       run, center_line, show_runs, prop, size, radius, digits_d, 
        fun_call=NULL, txdif=NULL) {
 
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
@@ -14,8 +14,8 @@ function(x, y, values, object, n_cat,
 
   bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
 
-  unique.x <- ifelse(length(unique(x[,1])) == length(x[,1]), TRUE, FALSE)
-  unique.y <- ifelse(length(unique(y[,1])) == length(y[,1]), TRUE, FALSE)
+  unique.x <- ifelse (length(unique(x[,1])) == length(x[,1]), TRUE, FALSE)
+  unique.y <- ifelse (length(unique(y[,1])) == length(y[,1]), TRUE, FALSE)
 
   # all processing in terms of numeric variables
   # convert factors to numeric, save levels, so x and y are always numeric
@@ -95,39 +95,22 @@ function(x, y, values, object, n_cat,
 
   size.pt <- ifelse (is.null(size), 1, size)  # dummy non-zero value
     
-  # by default display center_line only if runs, so detect if a run
   if (n_col > 1) center_line <- "off"   # no center_line for multiple plots
-  if (center_line == "default"  &&  !date.ts  &&  object == "both") {
-#   y <- (!is.na(y))
-    y <- na.omit(y)
-    m <- mean(y)
-    n.change <- 0
-    for (i in 1:(length(y)-1))
-      if ((y[i+1] > m) != (y[i] > m)) n.change <- n.change+1
-    if (n.change/(length(y)-1) < .15)
-      center_line <- "off" 
-    else 
-      center_line <- "median"
-  }
-  else  # default if not automatically assigned above
-    if (!(center_line %in% c("off", "mean"))) center_line <- "median"
 
-  if (center_line != "off") {
-    if (center_line == "mean") {
-      m.y <- mean(y[,1], na.rm=TRUE)
-      lbl <- " mean"
-      lbl.cat <- "mean:"
-    }
-    else if (center_line == "median") {
-      m.y <- median(y[,1], na.rm=TRUE)
-      lbl <- " medn"
-      lbl.cat <- "median:"
-    }
-    else if (center_line == "zero") {
-      m.y <- 0
-      lbl <- ""
-      lbl.cat <- "zero:"
-    }
+  if (center_line == "mean") {
+    m.y <- mean(y[,1], na.rm=TRUE)
+    lbl <- " mean"
+    lbl.cat <- "mean:"
+  }
+  else if (center_line == "median"  ||  center_line == "off") {
+    m.y <- median(y[,1], na.rm=TRUE)
+    lbl <- " medn"
+    lbl.cat <- "median:"
+  }
+  else if (center_line == "zero") {
+    m.y <- 0
+    lbl <- ""
+    lbl.cat <- "zero:"
   }
 
 
@@ -154,10 +137,11 @@ function(x, y, values, object, n_cat,
 
   if (values == "data") {
 
-    if (!(object %in% c("line"))) {
+    if (object != "line"  &&  !run) {
     
       # traditional two-var numeric var scatter plot
-      if (!cat.x  &&  !cat.y  &&  object %in% c("point", "bubble", "both")) {
+      if (!cat.x  &&  !cat.y  && 
+          object %in% c("point", "bubble", "both")  && !run) {
         txsug <- ""
   
         if (getOption("suggest")) {
@@ -256,7 +240,8 @@ function(x, y, values, object, n_cat,
 
       # --------------------------------
       # categorical var with numeric var for means plot or bubble-1D plot
-      else if ((cat.x && !cat.y && !unique.x) || (!cat.x && cat.y && !unique.y)) {
+      else if ((cat.x && !cat.y && !unique.x) ||
+               (!cat.x && cat.y && !unique.y)) {
    
         if (!bubble1) {  # means plot
 
@@ -517,7 +502,7 @@ function(x, y, values, object, n_cat,
       
     }
     
-    else {  # line chart (object is "both")
+    else {  # line, run chart (object is "both")
   
       txsug <- ""
       if (getOption("suggest")) {
@@ -566,24 +551,29 @@ function(x, y, values, object, n_cat,
       class(output) <- "out_all"
       print(output)
       
-      # analyze runs
-      if (!date.ts  &&  center_line != "off") {
-        cat("n:", nrows, "\n")
-        n.miss <- sum(is.na(y))
-        cat("missing:", n.miss, "\n")
-        cat(lbl.cat, round(m.y,digits_d), "\n")
-        cat("\n")
+      # analyze runs if a singly y
+      if (run && n.ycol==1) {
+
+        txss <- ""
+        ssstuff <- .ss.numeric(y, digits_d=digits_d, x.name="*NONE*",
+                               brief=TRUE)
+        txss <- ssstuff$tx
+        class(txss) <- "out"
+        output <- list(out_ss=txss)
+        class(output) <- "out_all"
+        print(output)
+
         .dash(12); cat("Run Analysis\n"); .dash(12)
         run <- integer(length=0)  # length of ith run in run[i]
         n.runs <- 1  # total number of runs
         run[n.runs] <- 1
         line.out <- "    1"
-        cat("\n")
         for (i in 2:length(y)) {  # find the runs
           if (y[i] != m.y) {  # throw out values that equal m.y
             if (sign(y[i]-m.y) != sign(y[i-1]-m.y)) {  # new run
               if (show_runs) {
-                if (n.runs < 10) buf <- "  " else buf <- " "
+                if (i == 2) cat("\n")
+                buf <- ifelse (n.runs < 10,  "  ", " ")
                   if (run[n.runs] > 1)  # print only if run of size 2 or more
                     cat("size=", run[n.runs], "  Run", buf, n.runs, ":",
                       line.out, "\n", sep="")
@@ -598,8 +588,9 @@ function(x, y, values, object, n_cat,
           line.out <- paste(line.out, buf, i)
         }  # end find the runs
         if (run[n.runs] > 1)  # print only if run has at least 2 elements
-          cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out,
-              "\n", sep="")
+          if (show_runs)
+            cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out,
+                "\n", sep="")
         eq.ctr <- which(y==m.y)
         cat("\nTotal number of runs:", n.runs, "\n")
         txt <- "Total number of values that do not equal the "
@@ -612,9 +603,10 @@ function(x, y, values, object, n_cat,
             cat("Total number of values ignored:", length(eq.ctr), "\n")
           }
         }
-        else 
+        else { 
           cat("Total number of values ignored that equal the", lbl.cat, 
               length(eq.ctr), "\n")
+        }
       }  # end analyze runs
      
     }  # end line chart

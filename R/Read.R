@@ -82,9 +82,9 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     else if (grepl(".tsv$", from)) format <- "csv"
     else if (grepl(".txt$", from)) format <- "csv"
     else if (grepl(".sav$", from)) format <- "SPSS"
-    else if (grepl(".sas7bdat$", from)) format <- "SAS"
     else if (grepl(".rda$", from)) format <- "R"
     else if (grepl(".xls$", from) || grepl(".xlsx$", from)) format <- "Excel"
+    else if (grepl(".sas7bdat$", from)) format <- "SAS"
 
     if (is.null(format)) {
       if (from %in% c("BodyMeas", "Cars93",
@@ -215,7 +215,12 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     d <- read.spss(file=from, to.data.frame=TRUE, use.value_labels=TRUE, ...)
 
   else if (format == "SAS"  &&  !quiet) { # data
-    d <- read.sas7bdat(file=from, ...)
+    if (!requireNamespace("sas7bdat", quietly=TRUE)) {
+      stop("Package \"sas7bdat\" needed for these colors\n",
+           "Please install it:  install.packages(\"sas7bdat\")\n\n",
+           call. = FALSE)
+    }
+    d <- sas7bdat::read.sas7bdat(file=from, ...)
     txt <- "Matt Shotwell's sas7bdat package]"
     cat("[with the read.sas7bdat function from", txt, "\n")
   }

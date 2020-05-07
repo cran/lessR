@@ -44,6 +44,11 @@ function(palette="hcl", n=12, border="transparent", file=NULL) {
   }
 
   if (palette == "wesanderson") {
+    if (!requireNamespace("wesanderson", quietly=TRUE)) {
+      stop("Package \"wesanderson\" needed for these colors\n",
+           "Please install it:  install.packages(\"wesanderson\")\n\n",
+           call. = FALSE)
+    }
     pal("BottleRocket1", getColors("BottleRocket1", n=n))
     pal("BottleRocket2", getColors("BottleRocket2", n=n))
     pal("Rushmore1", getColors("Rushmore1", n=n))

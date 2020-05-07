@@ -96,6 +96,8 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     txlbl[2] <- sub("\n", "", txlbl[2])
   txlbl[length(txlbl)+1] <- ""
   tx <- txlbl
+  advance <- ifelse (x.name != "*NONE*", 1, 0)
+  if (x.name == "*NONE*") tx <- ""
   # --------------------------------
   # the stats loop
   for (i in 1:n.lines) {
@@ -144,7 +146,6 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
 
 
     if (i == 1) { # heading labels 
-
       if (max.ln < 4) max.ln <- max.ln + 2
       if (max.ln < 8) max.ln <- max.ln + 1
       nbuf <- ifelse (n.lines == 1, 2, 4)
@@ -158,8 +159,8 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
       mx.lbl <- .fmtc("max", max.ln)
 
       if (brief)
-        tx[length(tx)+1] <- paste(n.lbl, miss_lbl, m.lbl, s.lbl, mn.lbl,
-                                 md.lbl, mx.lbl) 
+        tx[length(tx)+advance] <- paste(n.lbl, miss_lbl, m.lbl, s.lbl, mn.lbl,
+                                        md.lbl, mx.lbl) 
       else {
         sk.lbl <- .fmtc("skew", max.ln)
         kt.lbl <- .fmtc("krts", max.ln)

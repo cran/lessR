@@ -279,9 +279,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   if (!is.null(by1)) top.pad <- 1
   axs.top <- ifelse (is.null(main), 0, 1)  # old: .5, 1
 
+  # get full list of lattice parameters: trellis.par.get()
   p <- update(p,
          strip=strp, strip.left=strp.lft, aspect=asp,
-         par.strip_text=list(cex=axis_x_cex, col=getOption("strip_text_color")),
+         par.strip.text=list(cex=axis_x_cex, col=getOption("strip_text_color")),
          xlab=list(label=x.lab, cex=lab_x_cex, col=l.x_color),
          ylab=list(label=y.lab, cex=lab_y_cex, col=l.y_color),
          main=list(label=main.lab, col=getOption("lab_color")), 

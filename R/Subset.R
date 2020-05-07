@@ -1,5 +1,5 @@
 Subset <-
-function(filter, columns, data=d, holdout=FALSE,
+function(rows, columns, data=d, holdout=FALSE,
     random=0, quiet=getOption("quiet"), ...) {
 
   # save variable labels, units (NULL if no labels, units) 
@@ -27,7 +27,7 @@ function(filter, columns, data=d, holdout=FALSE,
 
   # set rows parameter by a random selection
   if (random > 0) {
-    if (!missing(filter)) {
+    if (!missing(rows)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Cannot specify both rows, to retain or exclude, and random.\n\n")
     }
@@ -44,11 +44,11 @@ function(filter, columns, data=d, holdout=FALSE,
     }
     rand.rows <- sample(1:n.obs, size=n.obs_new, replace=FALSE)
     rand.rows <- sort(rand.rows)
-    filter <- logical(length=n.obs)  # initial default is FALSE
+    rows <- logical(length=n.obs)  # initial default is FALSE
     j <- 1
     for (i in 1:n.obs) {
       if (i == rand.rows[j]) {
-        filter[i] <- TRUE 
+        rows[i] <- TRUE 
         if (j < length(rand.rows)) j <- j + 1
       }
     }
@@ -57,10 +57,10 @@ function(filter, columns, data=d, holdout=FALSE,
   
   # r is the logical vector or row to retain
   # set r by default to all or by specification
-  if (missing(filter))
+  if (missing(rows))
     r <- TRUE  # retain all rows
   else {  # if numeric, read directly from rows
-    r <- eval(substitute(filter), envir=data, enclos=parent.frame())
+    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
 
   if (all(!r)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -73,13 +73,13 @@ function(filter, columns, data=d, holdout=FALSE,
   }
 
   if (is.numeric(r)) {
-    if (length(filter) == 1) {
-      if ((filter > 0)  &&  (filter < 1)) {
+    if (length(rows) == 1) {
+      if ((rows > 0)  &&  (rows < 1)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Behavior has changed from previous documentation.\n",
           "Now use this parameter to draw a random subset:  random\n\n")
       }
-      else if (filter > 1) {
+      else if (rows > 1) {
         cat("\n"); warning(call.=FALSE, "\n","------\n",
           "Behavior has changed from previous documentation.\n",
           "Now use this parameter to draw a random subset:  random\n\n",

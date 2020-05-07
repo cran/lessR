@@ -1,7 +1,9 @@
 ---
 title: "Pivot Table"
 author: "David Gerbing"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{pivot table}
   %\VignetteEngine{knitr::rmarkdown}
@@ -10,49 +12,165 @@ vignette: >
 
 ```{r}
 library("lessR")
+library("knitr")
 ```
 
 
-`pivot()` uses base R `aggregate()` to generate a pivot table (Excel terminology). Express the categorical variables over which to pivot as a vector with the `c())` function.
+## __lessR__ `pivot()` vs __Base R__ `aggregate()`
 
-`pivot()` provides two additional features than `aggregate()` provides. First is the inclusion of the sample size for each cell. Second is that the data parameter is listed first in the parameter list, which facilitates the use of the pipe operator from the __magrittr__ package. 
+Aggregation is the process forming groups of data based on the levels of categorical variables, such as Gender and Department, then computing some statistical value, such as a mean, for each group on a numeric variable. Refer to each group, the cross-classification of all the specified categorical variables, as a _cell_.  The __lessR__ `pivot()` performs this aggregation. `pivot()` relies upon the __base R__ function `aggregate()` to generate a long-form data frame pivot table (Excel terminology). By default the levels for all the grouping variables are listed in the rows, but if there are specified column grouping variables, `pivot()` relies upon base R `reshape()` to form a 2-d table. 
 
-Presently, there is only a single variable for the aggregation, the parameter _value_. Variable ranges in the specification of _by_ as not needed in general. Only a small number of grouping variables generally define the cells for the aggregation.
+`pivot()` provides additional features than `aggregate()` provides. 
 
-To illustrate, use the Employee data set included in __lessR__, here read into the _d_ data frame.
+1. If only one `value` over which to aggregate, the sample size for each cell is provided with the number of missing values.
+1. Missing data analysis by cell or by `value` aggregated. 
+1. The aggregated computations can be displayed as a 2-d table, not just a long-form data frame.
+1. The data parameter is listed first in the parameter list, which facilitates the use of the pipe operator from the __magrittr__ package. 
+
+Also, there is a different interface as the \code{by} variables, for rows and columns, are each specified as a vector.
+
+The following table lists many of the available statistical functions by which to aggregate over the cells.
+
+Statistic | Meaning
+----------- | ------------------------
+`sum` | sum
+`mean` | arithmetic mean
+`median` | median
+`min` | minimum
+`max` | maximum
+`sd` | standard deviation
+`var` | variance
+`IQR` | inter-quartile range
+`mad` | mean absolute deviation
+`tabulate` | count of each cell only
+
+Some statistical functions are available that return multiple values.
+
+Statistic | Meaning
+----------- | -----------------
+`range` | minimum, maximum
+`quantile` | range + quartiles
+`summary` | quantile + mean
+
+These three functions output their values as an R matrix, which then replaces the values of the variable that is aggregated in the resulting output data frame.
+
+
+## Parameters
+
+Following are the `pivot()` parameters the specify the data and the statistic for the aggregation, the value(s) over which to aggregate, and the corresponding the cells that contain the aggregated values. The first four parameter values listed below are required.
+
+1. `data`: The data frame that includes the variables of interest.
+1. `compute`: The function for which to perform the aggregation.
+1. `value`: The variable(s) for which to summarize, i.e., aggregate. 
+1. `rows_by`: The categorical variable(s) that define the sub-groups or cells for which to compute the aggregated values. 
+1. `cols_by`: The optional categorical variable(s) that define the sub-groups or cells for which to compute the aggregated values, listed as columns in a two-dimensional table. 
+
+Multiple values of parameters `value`, `rows_by`, and up to two `cols_by` variables may be specified. Express the multiple categorical variables over which to pivot as a vector, such as with the `c()` function. If `cols_by` is not specified, the result is a linear table as a long-form data frame that can be input into other data analysis procedures.
+
+By default, missing values are eliminated from the aggregation. If there are no values for a cell for which to perform the aggregation, and it is desired to have the aggregated value listed as missing, then specify `na_value` as `TRUE`. If any of the levels of the `by` variables are missing, to report those missing cells, specify `na_by` as `TRUE`. Set `na_remove` to `TRUE` to have any aggregated value defined as missing if any individual data cell for `value` is missing.
+
+
+## Examples
+
+To illustrate, use the Employee data set included in __lessR__, here read into the _d_ data frame. Begin with no missing data.
 
 ```{r}
-d <- Read("Employee", quiet=TRUE)
+d <- Read("Employee")
 ```
 
-Two categorical variables are _Dept_ and _Salary_. A continuous variable is _Salary_. Create the pivot table that expresses the mean of _Salary_ for all combinations of _Dept_ and _Salary_.
+
+### Output as a long-form data frame
+
+Two categorical variables in the _d_ data frame are _Dept_ and _Salary_. A continuous variable is _Salary_. Create the long-form pivot table as a data frame that expresses the mean of _Salary_ for all combinations of _Dept_ and _Salary_.
 ```{r}
-pivot(data=d, compute=mean, value=Salary, by=c(Dept, Gender))
+pivot(data=d, compute=mean, value=Salary, rows_by=c(Dept, Gender))
 ```
 
 
-The output of `pivot()` is a data frame of the aggregated variables. This can be saved for further analysis. Here, list the parameter values in order without the parameter names.
+The output of `pivot()` is a data frame of the aggregated variables. This can be saved for further analysis. Here, perform the same analysis, but list the required parameter values in order without the parameter names.
 
 ```{r}
 a <- pivot(d, mean, Salary, c(Dept, Gender))
 ```
 
-Because the output of `pivot()` is a standard R data frame, typical operations such as sorting can be applied, here using the __lessR__ function `Sort()`. Here change the sort order.
+Because the output of `pivot()` with no `cols_by` variables is a standard R data frame, typical operations such as sorting can be applied, here using the __lessR__ function `Sort()`. 
 
 ```{r}
 Sort(a, by=Dept)
 ```
 
-
-Here, filter the rows so that the analysis applies only to the men in the full data set.
+Multiple `value` variables for which to aggregate over can also be specified. Round the numerical aggregated results to two decimal digits.
 
 ```{r}
-pivot(d, mean, Salary, c(Dept, Gender), filter=(Gender=="M"))
+pivot(d, mean, c(Years, Salary), c(Dept, Gender), digits_d=2)
 ```
 
-For two `by` categorical variables, have the option of displaying results as a two-dimensional table.
+
+The following illustrates the pipe operator from the __magrittr__ package with `pivot()`. The package is not included with __lessR__, so separately load with `library()`, either by itself or as part of the __tidyverse__ package. As such, the following code is not run.
+
+Perform the pivot computations on the _d_ data frame. Then output the aggregated results to the _a_ data frame.
 
 ```{r}
-pivot(d, mean, Salary, c(Dept, Gender), table_2d=TRUE)
+# d %>% pivot(mean, Salary, c(Dept, Gender)) %>% -> a
+```
+
+
+
+### Output as a 2-d Table
+
+Specify up to two `cols_by` categorical variables, to create a two-dimensional table with the specified columns. First, one `cols_by` variable, Gender. Specifying one or two categorical variables as `cols_by` variables moves them from their default position in the rows to the columns, which changes the output structure from a long-form data frame to a cross-classification table with categorical variables in the rows and columns. 
+
+```{r}
+pivot(d, mean, Salary, Dept, Gender)
+```
+
+Here two `cols_by` variables, specified as a vector.
+
+```{r}
+pivot(d, mean, Salary, Dept, c(Gender, Plan))
+```
+
+
+### Tabulation
+
+Tabulation is counting. With tabulation there is no `value` variable per se. Instead, the number of data values in each cell are tabulated, that  is, counted.
+
+```{r}
+pivot(d, tabulate, c(Dept, Gender))
+```
+
+
+### Missing Data
+
+The pivot table follows with the missing data analysis when there is only one numerical value over which to aggregate. The variable Years has one missing value.
+
+```{r}
+pivot(d, mean, Years, Dept)
+```
+
+Set `na_remove` to `FALSE` to _not_ remove any missing data in a cell with values to be aggregated. The resulting aggregated value will be missing if any of the constituent data values are missing. The corresponding level does not appear because cells with aggregated missing values are not shown. 
+
+```{r}
+pivot(d, mean, Years, Dept, na_remove=FALSE)
+```
+
+The `na_remove` parameter specifies the value of the base R parameter `na.rm` for computations such as for the `mean`. See `?mean` for its definition. 
+
+Here include all the cells, even those with a missing aggregated value.
+
+```{r}
+pivot(d, mean, Years, Dept, na_remove=FALSE, na_value=TRUE)
+```
+
+To account for missing values of the categorical `by` variables, set `na_by` to `TRUE`.
+
+```{r}
+pivot(d, mean, Years, c(Dept, Gender), na_by=TRUE)
+```
+
+Specify the count for levels that include missing cells, invoking `na_by` for tabulation.
+
+```{r}
+pivot(d, tabulate, c(Dept, Gender), na_by=TRUE)
 ```
 
