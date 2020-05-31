@@ -22,7 +22,7 @@ function(x, y, brief, ...) {
       c.type <- "kendall" 
       sym <- names(ct$estimate)
     }
-    if (c.type == "pearson") sym.pop <- "correlation" else sym.pop <- sym
+    if (c.type == "pearson") sym.pop <- "Correlation" else sym.pop <- sym
 
     if (ct$alternative == "two.sided")
       h.txt <- "not equal to"
@@ -30,6 +30,17 @@ function(x, y, brief, ...) {
       h.txt <- "less than"
     else if (ct$alternative == "greater")
       h.txt <- "greater than"
+
+    tvalue <-  round(ct$statistic, 3)
+    df <-  ct$parameter
+    pvalue <-  round(ct$p.value, 3)
+    coef <- round(ct$estimate, 3)
+    null <- ct$null.value
+    if (c.type == "pearson") {
+      lb <- round(ct$conf.int[1], 3)
+      ub <- round(ct$conf.int[2], 3)
+      clpct <- "95%"
+    }
 
     # background
     tx <- character(length = 0)
@@ -87,25 +98,13 @@ function(x, y, brief, ...) {
     # inferential
     tx <- character(length = 0)
 
-    tx[length(tx)+1] <- paste("Alternative Hypothesis: True", sym.pop,
-      "is", h.txt, "0")
-    tx[length(tx)+1] <- paste("  ", names(ct$statistic), "-value: ",
-      .fmt(ct$statistic,3), sep="")
-    if (c.type == "pearson")
-        tx[length(tx)] <- paste(tx[length(tx)], ",  df: ",
-          ct$parameter, sep="") 
-    tx[length(tx)] <- paste(tx[length(tx)], ",  p-value: ",
-      .fmt(ct$p.value,3), sep="")
+    mytitle <- paste("Hypothesis Test of 0 ", sym.pop, ":  t = ", sep="")
+    tx[length(tx)+1] <- paste(mytitle, .fmt(tvalue,3), ",  df = ", df,
+        ",  p-value = ", .fmt(pvalue,3), sep="")
 
     if (c.type == "pearson") {
-      tx[length(tx)+1] <- ""
-      tx[length(tx)+1] <- "95% Confidence Interval of Population Correlation"
-      tx[length(tx)+1] <- paste("  Lower Bound:", .fmt(ct$conf.int,3)[1])
-      tx[length(tx)] <- paste(tx[length(tx)], "     Upper Bound:",
-        .fmt(ct$conf.int,3)[2])
-      df <- round(ct$parameter,0)
-      lb <- round(ct$conf.int,3)[1]
-      ub <- round(ct$conf.int,3)[2]
+      tx[length(tx)+1] <- paste(clpct," Confidence Interval for Correlation:  ",
+           .fmt(lb), " to ", .fmt(ub), sep="")
     }
     else {
       df <- NA; lb <- NA; ub <- NA

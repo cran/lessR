@@ -47,7 +47,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          add_cex=NULL, add_lwd=1, add_lty="solid",
          add_color=NULL, add_fill=NULL, add_trans=NULL,
 
-         quiet=getOption("quiet"), want.labels=TRUE, ...)  {
+         want.labels=TRUE, ...)  {
 
 
   fill_bg <- getOption("panel_fill")

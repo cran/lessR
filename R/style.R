@@ -693,6 +693,7 @@ function(
       bar_color_discrete = "transparent"
       bar_color_ordered = rgb(126,144,168, maxColorValue=255)
       pt_fill = rgb(70,80,90, maxColorValue=255)
+      trans_bar_fill = 0.00
       trans_pt_fill = 0.00
       pt_color = rgb(70,80,90, maxColorValue=255)
       box_fill = getColors("hues")
@@ -887,8 +888,9 @@ function(
     options(bar_fill_ordered = bar_fill_ordered) 
     options(bar_color_discrete = bar_color_discrete) 
     options(bar_color_ordered = bar_color_ordered) 
-    options(pt_fill = pt_fill) 
     options(pt_color = pt_color) 
+    options(trans_bar_fill = trans_bar_fill)
+    options(trans_pt_fill = trans_pt_fill)
     
     options(values=values)
     options(values_color=values_color)

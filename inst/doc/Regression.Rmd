@@ -1,0 +1,117 @@
+---
+title: "Regression"
+author: "David Gerbing"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{regression analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r}
+library("lessR")
+```
+
+The `Regression()` function performs multiple facets of a complete regression analysis. Abbreviate with `reg()`.
+
+
+To illustrate, first read the Employee data included as part of __lessR__.
+
+```{r read}
+d <- Read("Employee")
+```
+
+
+## Default Analysis 
+
+### Brief output
+
+The brief version provides just the basic analysis, what Excel provides, plus a scatterplot with the regression line.
+
+```{r}
+reg_brief(Salary ~ Years + Pre)
+```
+
+### Full output
+
+The full output is extensive: Summary of the analysis, estimated model,  fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals.
+
+```{r}
+reg(Salary ~ Years + Pre)
+```
+
+### k-fold cross-validation
+
+The standard output includes $R^2_{press}, the value of $R^2$ when applied to new, previously unseen data. Still, a cross-validation option is also offered with the `kfold` parameter. Here specify three folds.
+
+```{r}
+reg(Salary ~ Years, kfold=3)
+```
+
+
+
+## Output as a Stored Object
+
+The output of `Regression()` can be stored into an R object, here named _r_. The output object consists of various components.
+
+```{r}
+r <- reg(Salary ~ Years + Pre)
+```
+
+Entering the name of the object displays the full output.
+
+```{r}
+r
+```
+
+Or, work with the components individually. Use the base R `names()` function to identify all of the components. Component names that begin with `out_` are part of the standard output. Other components include just data and statistics designed to be input in additional procedures.
+
+```{r}
+names(r)
+```
+
+Here just display the estimates as part of the standard output.
+
+```{r}
+r$out_estimates
+```
+
+
+Here display the coefficients.
+
+```{r}
+r$coefficients
+```
+
+
+## Interpreted Output
+
+The parameter `Rmd` creates an R markdown file that is automatically generated and  html document from knitting the various output components together with full interpretation. A new, much more complete form of computer output.
+
+```
+reg(Salary ~ Years + Pre, Rmd="eg")
+```
+
+## Logistic Regression
+
+```{r}
+Logit(Gender ~ Salary)
+```
+
+Specify multiple logistic regression with the usual R formula syntax. Specify additional probability thresholds beyond just the default 0.5 with the `prob_cut` parameter.
+
+```{r
+Logit(Gender ~ Years + Salary, prob_cut=c(.3, .5 .7))
+```
+
+
+## Full Manual
+
+Use the base R `help()` function to view the full manual for `Regression()`. Simply enter a question mark followed by the name of the function, or its abbreviation.
+
+```
+?reg
+```
+

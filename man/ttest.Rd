@@ -159,7 +159,7 @@ d <- Read("Employee", quiet=TRUE)
 ttest(Salary ~ Gender)
 
 # short form
-tt(Salary ~ Gender)
+#tt(Salary ~ Gender)
 
 # brief version of results
 tt_brief(Salary ~ Gender)
@@ -182,7 +182,7 @@ ttest(Salary ~ Gender, msmd=.5)
 ttest(Salary ~ Gender, line_chart=TRUE)
 
 # variable of interest is in a data frame which is not the default d
-# access the data frame in the lessR dat.twogroup data set
+# access the data frame in the lessR dataLearn data set
 # although data not attached, access the variables directly by their name
 data(dataLearn)
 ttest(Score ~ StudyType, data=dataLearn)
@@ -192,7 +192,7 @@ ttest(Score ~ StudyType, data=dataLearn)
 # tt for a single group, from data
 # ----------------------------------------------------------
 
-# confidence interval only, from data
+# summary statistics, confidence interval only, from data
 ttest(Salary)
 
 # confidence interval and hypothesis test, from data

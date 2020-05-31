@@ -8,6 +8,9 @@ d <- Read("Employee")
 BarChart(Dept)
 
 ## -----------------------------------------------------------------------------
+getColors("hues")
+
+## -----------------------------------------------------------------------------
 BarChart(Dept, fill="darkred", horiz=TRUE, values="off", quiet=TRUE)
 
 ## -----------------------------------------------------------------------------
@@ -23,6 +26,14 @@ BarChart(Dept, rotate_x=45, offset=1, sort="-")
 BarChart(Dept, fill=(count))
 
 ## -----------------------------------------------------------------------------
+d <- rd("Mach4", quiet=TRUE)
+l <- rd("dataMach4_lbl", format="lessR", quiet=TRUE)
+LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
+                     "Slightly Agree", "Agree", "Strongly Agree")
+d <- factors(c(m06,m07,m09,m10), levels=0:5, labels=LikertCats, ordered=TRUE, new=TRUE)
+
+## -----------------------------------------------------------------------------
+d <- Read("Employee", quiet=TRUE)
 BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
 
 ## ---------------------------------------------------------------------------------------------------------------------
@@ -44,6 +55,12 @@ BarChart(Dept, by=Gender)
 
 ## ---- fig.width=5-----------------------------------------------------------------------------------------------------
 BarChart(Dept, by=Gender, beside=TRUE)
+
+## ---- fig.width=4-----------------------------------------------------------------------------------------------------
+BarChart(Dept, by1=Gender)
+
+## ---------------------------------------------------------------------------------------------------------------------
+BarChart(Dept, by1=Gender, n_col=1, quiet=TRUE)
 
 ## ---- fig.width=4-----------------------------------------------------------------------------------------------------
 BarChart(Dept, by=Gender, stack100=TRUE)

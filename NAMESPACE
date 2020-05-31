@@ -46,10 +46,10 @@ S3method(print, out)
 
 export (
 
-  ANOVA, av, av.brief, av_brief,
+  ANOVA, av, av_brief,
   BarChart, bc,
   BoxPlot, bx,
-  Correlation, cr, cr.brief, cr_brief,
+  Correlation, cr, cr_brief,
   CountAll, ca,
   corCFA, cfa, scales,
   corRead, rd.cor,
@@ -74,7 +74,7 @@ export (
   print.out_all, print.out,
   prob_norm, prob_znorm, prob_tcut,
   prob.norm, prob.znorm, prob.tcut,
-  Read, rd, rd.brief, rd_brief, rd_lbl, Read2,
+  Read, rd, rd_lbl, Read2,
   Regression, reg, reg.brief, reg_brief, regPlot, 
   Recode, rec,
   set, showColors, showPalettes,

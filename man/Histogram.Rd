@@ -111,7 +111,8 @@ hs(\ldots)
   \item{breaks}{The method for calculating the bins, or an explicit specification
        of the bins, such as with the standard R \code{\link{seq}} function or
        other options provided by the \code{\link{hist}} function that include
-       the default \code{"Sturges"} plus \code{"Scott"} and \code{"FD"}.}\cr
+       the default \code{"Sturges"} plus \code{"Scott"} and \code{"FD"}. Not
+       applicable and so not allowed if \code{density} is \code{TRUE}.}\cr
 
   \item{theme}{Color theme for this analysis. Make persistent across analyses
         with \code{\link{style}}.}
@@ -306,6 +307,8 @@ STATISTICS\cr
 \references{
 Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 5, NY: Routledge.
 
+Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 4, NY: CRC Press.
+
 Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springer. http://lmdvr.r-forge.r-project.org/
 }
 
@@ -424,11 +427,6 @@ Histogram(X)
 #  except for numeric variables with unique values < n_cat
 # d is the default name, so does not need to be specified with data
 Histogram()
-
-# variable of interest is in a data frame which is not the default d
-# access the breaks variable in the R provided warpbreaks data set
-# although data not attached, access the variable directly by its name
-Histogram(breaks, data=warpbreaks)
 
 # histogram with specified options, including red axis labels
 style(fill="palegreen1", panel_fill="ivory", axis_color="red") 

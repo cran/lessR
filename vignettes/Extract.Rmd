@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{.}
+  %\VignetteIndexEntry{subset a data frame}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -35,11 +35,11 @@ For the column specification, specify a variable range of contiguous variables w
 
 When `Extract` evaluates the row or column specifications to obtain the indices, there are several limitations.
 
-1. `rows`: Any reference to the variables in the data frame for this specification must contain the name of the data frame followed by a \$. But this name has already been specified in the function call, and now is redundant, simply repeated for every variable reference.
+1. `rows`: Any reference to the variables in the data frame for this specification must contain the name of the data frame followed by a \$. But this name has already been specified in the function call, and now is redundant, repeated for every variable reference.
 2. `cols`: Usually specified with a vector of variable names.
-  + All variable names in in the provided vector of names must be quoted, and no variable ranges are permitted. 
+  + All variable names in in the provided vector of names must be quoted. 
   + No variable ranges.
-3. No character strings for values passed to `rows` and `cols`. Instead enter the conditions for both rows and columns, which can make the entire expression quite large.
+3. No character strings that store the values passed to `rows` and `cols`. Instead directly enter the conditions for both rows and columns, which can make the entire expression quite large.
 
 
 ## More Flexible Use of `Extract`
@@ -85,7 +85,7 @@ d[1:3, .(Years:Salary, Post)]
 d[.(Gender=="M" & Post>90), 1:3]
 ```
 
-To enhance readability, store the specified row or column conditions as character strings. Each string must be named `rows` or `cols`, essentially a kind of pseudo-parameter. Because the entire expression is a character string, differentiate between single and double quotes as needed. For example, use single quotes within the string and double quotes to define the entire string, as illustrated next.
+To enhance readability, store the specified row or column conditions as character strings. Each string must be named `rows` or `cols`. Because the entire expression is a character string, differentiate between single and double quotes as needed. For example, use single quotes within the string and double quotes to define the entire string, as illustrated next.
 
 ```{r}
 rows <- "Gender=='M' & Post>93"
@@ -112,21 +112,21 @@ The variable _Dept_ is missing for the fourth row of data.
 d[1:5,]
 ```
 
-Here with the traditional use of `Extract`, specify rows of data only when the value of _Dept_ is _ADMIN_. 
+Here with the traditional use of `Extract`, specify rows of data only when the value of _Dept_ is _ADMN_. 
 
 ```{r}
 d[d$Dept=="ADMN", c('Gender', 'Dept', 'Salary')]
 ```
 
-The result provides what was asked for, and also when _Dept_ is `<NA>`, which was not asked for. The requested value of _ADMIN_ is not `<NA>`.
+The result provides what was requested, and also when _Dept_ is `<NA>`, which is not requested. The requested value of _ADMN_ is not the same as `<NA>`.
 
-The `.()` function provides what was requested.
+Use the `.()` function to obtain what is requested, rows of data in which the value of _Dept_ is _ADMN_.
 
 ```{r}
 d[.(Dept=="ADMN"), .(Gender:Salary)]
 ```
 
-If rows with the value of the variable missing are also requested, then `.()` provides that information only when requested, such as from the base R function `is.na()`.
+If rows with the value of the variable missing are desired, then `.()` provides that information only when requested, such as with the base R function `is.na()`.
 ```{r}
 d[.(Dept=="ADMN" | is.na(Dept)), .(Gender:Salary)]
 ```
@@ -134,7 +134,9 @@ d[.(Dept=="ADMN" | is.na(Dept)), .(Gender:Salary)]
 
 ## Random Selection of Rows
 
-The function `.()` also provides for random selection of rows. To randomly select the specified number of rows from the data frame to subset, specify the `random()` function for the logical criterion of the `rows`. The value passed to `random()` can either be the actual number of rows to select, as below, or, the proportion of rows to select.
+The function `.()` also provides for random selection of rows. To randomly select the specified number of rows from the data frame to subset, specify the `random()` function for the logical criterion of the `rows`. The value passed to `random()` can either be the actual number of rows to select, or the proportion of rows to select.
+
+Here randomly select five rows of data from the _d_ data frame.
 
 ```{r}
 d[.(random(5)), .(Years:Salary)]

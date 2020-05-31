@@ -366,11 +366,11 @@ If the default right margin is retained, variable labels are also accommodated f
 If the legend is not in the right margin, sometimes bars from the graph may intrude into the legend_ One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{add_top} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend_horiz} option.
 
 LONG CATEGORY NAMES\cr
-For many plots, the names of the categories tend to be long. To adjust the plot for these long names, they can be rotated using the \code{rotate_x} and \code{rotate_y} parameters, in conjunction with \code{offset}, from the \code{\link{style}} function. The \code{offset} parameter moves the category name out from the axis to compensate for the rotation. The changes from \code{\link{style}} persist until further changes. To reset to the default after obtaining an analysis, use \code{style()}.
+For many plots, the names of the categories are too long. To adjust the plot for these long names, they can be rotated using the \code{rotate_x} and \code{rotate_y} parameters, in conjunction with \code{offset}. The \code{offset} parameter moves the category name out from the axis to compensate for the rotation. The changes can also be specified from \code{\link{style}} to persist until further changes. To reset to the default after obtaining an analysis, use \code{style()}.
 
 Also, the following codes are used to adjust line spacing:\cr
 1. Any space in a category name is converted to a new line.\cr
-2. If the space should not be converted to a new line, the replace with an underscore, which will display as a space and no line break.\cr
+2. If the space should not be converted to a new line, then replace with a tilde, ~, which will display as a space without a line break.\cr
 
 For the text output at the console, can specify the maximum number of characters in a label with \code{labels.max}. Longer value names are abbreviated to the specified length. This facilitates reading cross-tab tables. Also, a provided table pairs the abbreviated names with the actual names. For one variable frequency distributions, \code{out_size} provides the maximum number of characters for the text output before the horizontal display of the frequency distribution is shifted to a vertical presentation.
 
@@ -442,6 +442,8 @@ Numerical variable y read from data\cr
 
 \references{
 Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 4, NY: Routledge.
+
+Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 3, NY: CRC Press.
 }
 
 \author{

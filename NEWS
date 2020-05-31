@@ -7,6 +7,42 @@ Update History for Package 'lessR'
 
  
  
+>>>>>> Changes for lessR version 3.9.5 (2020-05-30) <<<<<<
+
+-------------
+Updates 3.9.5
+-------------
+
+ANOVA, Correlation
+  deprecated av.brief() and cr.brief() removed in favor of av_brief()
+    and cr_brief()
+
+BarChart
+  for long value labels, use a ~ instead of a _ to display as a space
+    without going to a new line, which allows _ to be a legitimate
+    character in the value label
+
+Read
+  read_brief() and read.brief() removed as no longer needed given that
+    brief is now the default, use details() to see the full analysis
+
+style
+  "hues" palette hues and transparency aligned with the initial
+    default after reset`
+
+SummaryStats
+  rows parameter from BarChart(), etc.,  added to select rows
+ 
+
+---------------
+Bug Fixes 3.9.5
+---------------  
+
+Plot
+  quiet=TRUE works properly
+
+ 
+ 
 >>>>>> Changes for lessR version 3.9.4 (2020-05-07) <<<<<<
 
 -------------
@@ -3654,3 +3690,4 @@ plt  [in 2.3 also named Plot]
 reg  [in 2.3 also named Regression]
    allow missing data
 
+                                                                                                                                                                                                                                                                                                                                        

@@ -1,0 +1,146 @@
+---
+title: "Custom Colors"
+author: "David Gerbing"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{custom features}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.width=4, fig.height=3.5)
+```
+
+```{r}
+library("lessR")
+```
+
+
+## `getcolors()`
+
+The `getColors()` function can generate a variety of color palates. Use them to, for example, fill the bars in a histogram or bar chart with the  `fill` parameter.
+
+
+
+### Qualitative Scales
+
+The default is a color spectrum of 12 `hcl` colors presented in the order in which they are assigned to discrete levels of a categorical variable. For clarity, the `pal` or _palette_ parameter is set to `"hues"`. The colors are generated with the base R `hcl()` function. To maintain equal brightness/intensity across the colors, all colors are based on chroma set at `c=65` and luminance set at `l=55`. 
+
+```{r}
+getColors("hues")
+```
+
+Display the color spectrum of 12 `hcl` colors ordered by hue from 0 by intervals of 360/12 = 30 degrees.
+
+```{r}
+getColors(in_order=TRUE)
+```
+
+Display a color wheel of 36 ordered hues around the wheel.
+
+```{r}
+getColors(n=36, shape="wheel", border="off")
+```
+
+
+Obtain deep rich colors for HCL qualitative scale.
+
+```{r}
+getColors(c=90, l=45)
+```
+
+
+
+### Scales
+
+Generate an hcl blue sequence with `c=60` and vary `l`.
+```{r}
+getColors("blues", labels=FALSE)
+```
+
+
+Vary chroma for a yellow hcl sequence.
+
+```{r}
+getColors("browns", c=c(20,90), l=60)
+```
+
+
+
+### Divergent Scales
+
+Generate seven colors from rust to blue.
+
+```{r}
+getColors("rusts", "blues", n=7)
+```
+
+Add a custom value of chroma, `c`, to make less saturated.
+```{r}
+getColors("rusts", "blues", n=7, c=45)
+```
+
+Apply to a bar chart. Any call to `getColors()`, for example, can be applied to the standard `fill` parameter.
+
+```{r}
+d <- Read("Employee")
+BarChart(Dept, fill=getColors(c=90, l=45))
+```
+
+### Manual Specification of Colors
+
+Individually specify colors.
+
+```{r}
+getColors(c("black", "blue", "red"))
+```
+
+Generate a custom sequential range of colors.
+
+```{r}
+getColors(pal="aliceblue", end_pal="blue")
+```
+
+
+## `style()`
+
+The `style()` function specifies broad color themes, as well as individual characteristics of a visualization. Changes are persistent across subsequent visualizations unless again modified.
+
+```{r}
+style("darkred")
+BarChart(Dept)
+```
+
+Return to the default `colors` for the `theme` parameter by either explicitly specifying, or just go with no specification.
+
+```{r}
+style()
+```
+
+Individual characteristics of a visualization can also be specified. Here change the background color of the visualization window.
+
+```{r}
+style(window_fill="aliceblue")
+BarChart(Dept)
+```
+
+View all modifiable individual characteristics with the `show` parameter, set to `TRUE`.
+
+```{r}
+style(show=TRUE)
+```
+
+
+
+## Full Manual
+
+Use the base R `help()` function to view the full manual for `getColors()` or `style()`. Simply enter a question mark followed by the name of the function.
+
+```
+?getColors
+?style
+```
+

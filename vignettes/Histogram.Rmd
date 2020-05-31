@@ -76,3 +76,14 @@ A more modern version of the density plot combines the violin plot, box plot, an
 ```{r VBS, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="VBS plot."}
 Plot(Salary)
 ```
+
+
+
+## Full Manual
+
+Use the base R `help()` function to view the full manual for `Histogram()`. Simply enter a question mark followed by the name of the function.
+
+```
+?Histogram
+```
+

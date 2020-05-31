@@ -1,17 +1,16 @@
 \name{ANOVA}
 \alias{ANOVA}
 \alias{av}
-\alias{av.brief}
 \alias{av_brief}
 
 \title{Analysis of Variance}
 
 \description{
-Abbreviation: \code{av}, \code{av_brief}, \code{av.brief} [deprecated]
+Abbreviation: \code{av}, \code{av_brief}
 
-Analysis of variance from the R \code{\link{aov}} function plus graphics and effect sizes. Permitted designs are one-way between groups, two-way between groups and randomized blocks with one treatment factor with one observation for each treatment and block combination. 
+Analysis of variance from the R \code{\link{aov}} function plus graphics and effect sizes. Included designs are one-way between groups, two-way between groups and randomized blocks with one treatment factor with one observation for each treatment and block combination. 
 
-Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{a} in \code{a <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation, run from R directly or from within \code{RStudio}. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown. Doing a \code{knitr} analysis is to "knit" these comments and subsequent output together so that the \code{R} output is embedded in the resulting document, either html, pdf or Word, by default with explanation and interpretation. Generate a complete, though preliminary at this time, R Markdown document from the \code{Rmd} option ready to knit. Simply specify the option with a file name, run the ANOVA function to create the file. Then open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information. 
+Output is generated into distinct segments by topic, organized and displayed in sequence by default. When the output is assigned to an object, such as \code{a} in \code{a <- reg(Y ~ X)}, the full or partial output can be accessed for later analysis and/or viewing. A primary such analysis is with \code{knitr} for dynamic report generation. The input instructions to \code{knitr} are written comments and interpretation with embedded \code{R} code, called R~Markdown.  Generate a complete, though preliminary at this time, R Markdown document from the \code{Rmd} option ready to knit. Simply specify the option with a file name, run the ANOVA function to create the file. Then open the newly created \code{.Rmd} file in \code{RStudio} and click the \code{knit} button to create a formatted document that consists of the statistical results and interpretative comments. See the sections \code{arguments}, \code{value} and \code{examples} for more information. 
 }
 
 \usage{
@@ -23,7 +22,6 @@ ANOVA(my_formula, data=d, rows=NULL,
 
 av(\ldots)
 
-av.brief(\ldots, brief=TRUE) 
 av_brief(\ldots, brief=TRUE) 
 }
 
@@ -152,8 +150,29 @@ ANOVA(weight ~ group, data=PlantGrowth, rows=(group != "trt2"))
 ANOVA(breaks ~ wool * tension, data=warpbreaks)
 
 # randomized blocks design with the second term the blocking factor
-# use short name
-av(breaks ~ wool + tension, data=warpbreaks)
+#   data from Gerbing(2014, Sec 7.3.1)
+
+# Each person is a block. Each person takes four weight-training 
+#   supplements on different days and then count the repetitions
+#   of the bench presses.
+d <- read.csv(header=TRUE, text="
+Person,sup1,sup2,sup3,sup4
+p1,2,4,4,3
+p2,2,5,4,6
+p3,8,6,7,9
+p4,4,3,5,7
+p5,2,1,2,3
+p6,5,5,6,8
+p7,2,3,2,4")
+
+# reshape data from wide form to long form
+# do not need the row names
+d <- reshape(d, direction="long",
+        idvar="Person", v.names="Reps",
+        varying=list(2:5), timevar="Supplement")
+rownames(data) <- NULL
+
+ANOVA(Reps ~ Supplement + Person)
 }
 
 

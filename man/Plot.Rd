@@ -607,7 +607,7 @@ Use the \code{add} and related parameters to annotate the plot with text and/or 
 \tabular{lll}{
 Value \tab Object \tab Required Coordinates\cr
 ----------- \tab ------------------- \tab ----------------\cr
-\code{"\emph{text}"} \tab text \tab x1, y1\cr
+\code{"text"} \tab text \tab x1, y1\cr
 \code{"rect"} \tab rectangle \tab x1, y1, x2, y2\cr
 \code{"line"} \tab line segment \tab x1, y1, x2, y2\cr
 \code{"arrow"} \tab arrow \tab x1, y1, x2, y2\cr
@@ -663,6 +663,8 @@ Brys, G., Hubert, M., & Struyf, A. (2004). A robust measure of skewness. Journal
 Murdoch, D, and  Chow, E. D. (2013).  \code{ellipse} function from the \code{ellipse} package package. 
 
 Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 8, NY: Routledge.
+
+Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 5, NY: CRC Press.
 
 Hubert, M. and Vandervieren, E. (2008). An adjusted boxplot for skewed distributions, Computational Statistics and Data Analysis 52, 51865201.
 

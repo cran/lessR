@@ -120,7 +120,7 @@ function(x, y, values, object, n_cat,
 
   if (getOption("suggest")) {
     # function call for suggestions
-    fncl <- .fun_call.deparse(fun_call) 
+    fncl <- .fun_call.deparse(fun_call)  # class call to class character
     fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
     fncl <- gsub(" = ", "=", fncl)
   }
@@ -159,20 +159,20 @@ function(x, y, values, object, n_cat,
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
 
-          if (!grepl("ellipse", fncl)) {
-            txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
-            txsug <- paste(txsug, "\n", fc, txt, sep="")
-          }
+ #        if (!grepl("ellipse", fncl)) {
+ #          txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
+ #          txsug <- paste(txsug, "\n", fc, txt, sep="")
+ #        }
 
           if (!grepl("enhance", fncl)) {
-            txt <- ", enhance=TRUE)  # many options, including the above"
+            txt <- ", enhance=TRUE)  # many options"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
 
-          if (!grepl("smooth", fncl)) {
-            txt <- ", shape=\"diamond\")  # change plot character"
-            txsug <- paste(txsug, "\n", fc, txt, sep="")
-          }
+#         if (!grepl("smooth", fncl)) {
+#           txt <- ", shape=\"diamond\")  # change plot character"
+#           txsug <- paste(txsug, "\n", fc, txt, sep="")
+#         }
           
 
           if (object == "bubble") {
@@ -199,6 +199,7 @@ function(x, y, values, object, n_cat,
           }  # end bubble
 
         }  # end suggest
+
 
         for (i in 1:n_col) {
 

@@ -1,13 +1,12 @@
 \name{Correlation}
 \alias{Correlation}
 \alias{cr}
-\alias{cr.brief}
 \alias{cr_brief}
 
 \title{Correlation Analysis}
 
 \description{
-Abbreviation: \code{cr, cr_brief, cr.brief [deprecated]}
+Abbreviation: \code{cr}, \code{cr_brief}
 
 For two variables yields the correlation coefficient with hypothesis test and confidence interval. For a data frame or list of variables from a data frame, yields the correlation matrix. The default computed coefficient(s) are the standard Pearson's product-moment correlation, with Spearman and Kendall coefficients available. For the default missing data technique of pairwise deletion, an analysis of missing data for each computed correlation coefficient is provided. For a correlation matrix a statistical summary of the missing data across all cells is provided.
 
@@ -23,7 +22,6 @@ Correlation(x, y, data=d,
          main=NULL, bottom=3, right=3,
          pdf=FALSE, width=5, height=5, \ldots)
 
-cr.brief(\ldots, brief=TRUE) 
 cr_brief(\ldots, brief=TRUE) 
 
 cr(\ldots) 

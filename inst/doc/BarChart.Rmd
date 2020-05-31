@@ -19,9 +19,9 @@ library("lessR")
 
 One of the most frequently encountered visualizations is the bar chart.
 
->_Bar chart_: Plots a number associated with each category of a categorical variable as the height of the corresponding bars.
+>_Bar chart_: Plot a number associated with each category of a categorical variable as the height of the corresponding bars.
 
-A call to a function to create a bar chart has to contain the name of the variable that contains the categories to be plotted. With the `BarChart()` function, that variable name is the first argument passed to the function, and often, as in this example, the _only_ argument passed to the function. In that situation, the numerical value associated with each bar is the corresponding count of the number of occurrences.
+A call to a function to create a bar chart contains the name of the variable that contains the categories to be plotted. With the `BarChart()` function, that variable name is the first argument passed to the function, and often, as in this example, the _only_ argument passed to the function. In that situation, the numerical value associated with each bar is the corresponding count of the number of occurrences.
 
 
 First read the Employee data included as part of __lessR__.
@@ -30,13 +30,25 @@ First read the Employee data included as part of __lessR__.
 d <- Read("Employee")
 ```
 
+### Default bar chart
+
 To illustrate, consider the categorical variable _Dept_ in the Employee data table.  Use `BarChart()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_.
 
 ```{r bcEx, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Bar chart of tablulated counts of employees in each department."}
 BarChart(Dept)
 ```
 
+The default color theme, `colors`, fills the bars in the bar chart with the __lessR__ qualitative palette of different hues called `"hues"`. Explained more in the vignette _Customize_, here are the hues, all at the same level of brightness (chroma=65, luminance=55).
+
+```{r}
+getColors("hues")
+```
+
 The `BarChart()` function provides a default color theme, and labels each bar with the associated numerical value. The function also provides the corresponding frequency distribution, the table that lists the count of each category, from which the bar chart is constructed.
+
+
+### Custom colors
+
 
 Specify a single fill color with the `fill` parameter, and a horizontal bar chart with base R parameter `horiz`. Turn off console output with the parameter `quiet`. Turn off the displayed value on each bar with the parameter `values`.
 
@@ -59,6 +71,7 @@ BarChart(Dept, fill="reds")
 ```
 
 
+### Long value labels
 
 Rotate and offset the axis labels with `rotate_x` and `offset` parameters. Do a descending sort of the categories by frequencies with the `sort` parameter.
 
@@ -68,27 +81,40 @@ BarChart(Dept, rotate_x=45, offset=1, sort="-")
 ```
 
 
-Map the value of tabulated count to bar fill.  This way, the color of the bars reflects the bar height.
+Instead of setting the value of the interior color of the bars with the `fill` parameter, map the value of tabulated count to bar fill.  With mapping, the color of the bars reflects the bar height. The higher the bar, the darker the color.
 
 ```{r}
 BarChart(Dept, fill=(count))
 ```
 
+
+Long _value labels_ on the horizontal axis are also addressed by moving to a new line whenever a space is encountered in the label. Here also read _variable labels_ into the _l_ data frame. Convert the specified four Mach items to new factor variables named m06_f, etc. with the __lessR__ function `factors()`.
+
+```{r}
+d <- rd("Mach4", quiet=TRUE)
+l <- rd("dataMach4_lbl", format="lessR", quiet=TRUE)
+LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
+                     "Slightly Agree", "Agree", "Strongly Agree")
+d <- factors(c(m06,m07,m09,m10), levels=0:5, labels=LikertCats, ordered=TRUE, new=TRUE)
 ```
 
+### Statistical transformation
 
 Specify both the categorical variable, $x$, as well as the numerical variable that specifies the height of the bars, $y$. Then can do a statistical transformation of $y$. Set the bars proportional to the height of the corresponding mean deviations of $y$ with the `stat` parameter. Possible values of `stat`: "sum", "mean", "sd", "dev", "min", "median", and "max". The "dev" value displays the mean deviations to further facilitate a comparison among levels.
 
 Here the $x$ is Dept and $y$ is Salary.
 
-Display bars for values of dev <= 0 in a different color than values above with the `fill_split` parameter. Do an ascending sort with the `sort` parameter.
+Display bars for values of `dev` <= 0 in a different color than values above with the `fill_split` parameter. Do an ascending sort with the `sort` parameter.
 
 ```{r}
+d <- Read("Employee", quiet=TRUE)
 BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
 ```
 
 
-Can annotate a plot with the `add` parameter. Here add a rectangle around the message centered at <3,10>. First lighten the fill color of the annotation with the `add_fill` parameter for the `style()` function.
+### Annotation
+
+Can annotate a plot with the `add` parameter. To add a rectangle around the message (here centered at <3,10>), specify two corners of the rectangle, `<x1,y1>` and `<x2,y2>`. Specify the beginning coordinate of the text with `<x1,y1>`. Because in the `add` parameter, the message follows the specification of `rect`, the coordinates of the text message follows the coordinates for the rectangle. First lighten the fill color of the annotation with the `add_fill` parameter for the `style()` function.
 
 ```{r}
 style(add_fill="aliceblue")
@@ -102,7 +128,7 @@ BarChart(Dept, add=c("rect", "Employees by\nDepartment"),
 
 An alternative to the bar chart for a single categorical variable is the pie chart.
 
->_Pie Chart_: Relates each level of a categorical variable to the area of a circle (pie) scaled according to the value of an associated numerical variable.
+>_Pie Chart_: Relate each level of a categorical variable to the area of a circle (pie) scaled according to the value of an associated numerical variable.
 
 Here the presented version of a pie chart is the doughnut or ring chart.
 
@@ -126,21 +152,50 @@ Set the size of the hole in the doughnut or ring chart with the parameter `hole`
 
 ## Bar Chart of Two Variables
 
+
+### Standard bar charts
+
 Specify the second categorical variable with the `by` parameter.
 
 ```{r, fig.width=4}
 BarChart(Dept, by=Gender)
 ```
 
-The stacked version is default, but the values of the second categorical variable an also be represented with bars, more helpful to compare the values with each other.
+The stacked version is default, but the values of the second categorical variable can also be represented with bars, more helpful to compare the values with each other.
 
 ```{r, fig.width=5}
 BarChart(Dept, by=Gender, beside=TRUE)
 ```
 
-Obtain the 100% stacked version with the `stack100` parameter.
+### Trellis plots
+
+Can also do a Trellis chart with the `by1` parameter.
+
+```{r, fig.width=4}
+BarChart(Dept, by1=Gender)
+```
+
+Or, stack the charts vertically by specifying one column with the `n_col` parameter. Turn off text output to the console with the `quiet` parameter set to `TRUE`.
+
+```{r}
+BarChart(Dept, by1=Gender, n_col=1, quiet=TRUE)
+```
+
+
+### 100% stacked bar chart
+
+Obtain the 100% stacked version with the `stack100` parameter. This visualization is most useful for comparing levels of the `by` variable across levels of the `x` variable, here Dept, when the frequencies in each level of the `x` variable differ. The comparisons are done with the percentage in each category instead of the count.
 
 ```{r, fig.width=4}
 BarChart(Dept, by=Gender, stack100=TRUE)
+```
+
+
+## Full Manual
+
+Use the base R `help()` function to view the full manual for `BarChart()`. Simply enter a question mark followed by the name of the function.
+
+```
+?BarChart
 ```
 

@@ -1,21 +1,19 @@
 \name{Read}
 \alias{Read}
 \alias{rd}
-\alias{rd.brief}
-\alias{rd_brief}
 \alias{rd_lbl}
 \alias{Read2}
 
 \title{Read Contents of a Data File with Optional Variable Labels and Feedback}
 
 \description{
-Abbreviation: \code{rd},  \code{rd_brief}, \code{rd_lbl},  \code{rd.brief} [deprecated], \code{Read2}
+Abbreviation: \code{rd}, \code{rd_lbl}, code{Read2}
 
 Reads the contents of the specified data file into an R data table, what R calls a data frame.  By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls} or \code{.xlsx} using Alexander Walker's \code{\link{openxlsx}} package.  Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL (except for .Rda files which must be on the local computer system).
 
 Any variable labels in a native SPSS of native R file are automatically included in the data file. See the \code{details} section below for more information. Variable labels can also be added and modified individually with the \code{lessR} function \code{\link{label}}, and more comprehensively with the \code{\link{VariableLabels}} function.
 
-The function provides feedback regarding the data that is read by invoking the \code{lessR} function \code{\link{details}}. The brief form of this function invoked by default only lists the input files, the variable name table, and any variable labels.
+The function provides feedback regarding the data that is read by invoking the \code{lessR} function \code{\link{details}}. The default brief form of this function invoked by default only lists the input files, the variable name table, and any variable labels.
 
 The \code{lessR} function \code{\link{corRead}} reads a correlation matrix.
 }
@@ -35,11 +33,7 @@ Read(from=NULL, format=NULL, var_labels=FALSE,
          fun_call=NULL, \dots)
 
 rd(\ldots) 
-
-rd.brief(\ldots, brief=TRUE)
-rd_brief(\ldots, brief=TRUE)
 rd_lbl(\ldots, var_labels=TRUE)
-
 Read2(\ldots, sep=";", dec=",")
 }
 
@@ -172,14 +166,12 @@ Alexander Walker (2018). openxlsx: Read, Write and Edit XLSX Files. R package ve
 # d <- Read()
 # abbreviated name
 # d <- rd()
-# reduced output to the console
-# d <- rd.brief()
 
-# browse for a file and then read the variable labels from
+# read the variable labels from
 #  the specified label file, here a Excel file with two columns,
 #  the first column of variable names and the second column the 
 #  corresponding labels
-# l <- rd.lbl("employee_lbl.xlsx")
+# l <- Read("Employee_lbl", var_labels=TRUE)
 
 # read a csv data file from the web
 # d <- Read("http://web.pdx.edu/~gerbing/data/twogroup.csv")

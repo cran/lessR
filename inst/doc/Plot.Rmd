@@ -10,12 +10,17 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.width=4, fig.height=3.5)
+```
+
 ```{r}
 library("lessR")
 ```
 
 
-First read the Employee data included as part of __lessR__.
+To illustrate, first read the Employee data included as part of __lessR__.
 
 ```{r read}
 d <- Read("Employee")
@@ -48,8 +53,15 @@ Plot(Years, Salary, size=Pre)
 
 Plot against levels of categorical variable _Gender_ with the `by` parameter.
 
-```{r by}
+```{r by, fig.width=5}
 Plot(Years, Salary, by=Gender)
+```
+
+
+The categorical variable can also generate Trellis plots with the `by` parameter.
+
+```{r, fig.height=4}
+Plot(Years, Salary, by1=Gender)
 ```
 
 
@@ -80,20 +92,67 @@ Plot(Dept)
 
 The Cleveland dot plot, here for a single variable, has row names on the y-axis. The default plots sorts by the value plotted.
 
-```{r}
+```{r, fig.height=5.5}
 Plot(Salary, row_names)
 ```
 
 The standard scatterplot version of a Cleveland dot plot.
 
-```{r}
+```{r, fig.height=5.5}
 Plot(Salary, row_names, sort_yx="0", segments_y=FALSE)
 ```
 
 This Cleveland dot plot has two x-variables, indicated as a standard R vector with the `c()` function. In this situation the two points on each row are connected with a line segment. By default the rows are sorted by distance between the successive points.
 
-```{r}
+```{r, fig.width=5, fig.height=5.5}
 Plot(c(Pre, Post), row_names)
 ```
 
+
+## Time Series
+
+Read time series data of stock _Price_ for three companies: Apple, IBM, and Intel. The data table is in long form, part of __lessR__.
+
+
+```{r}
+d <- Read("StockPrice")
+d[1:5,]
+```
+
+
+Activate a time series plot by setting the $x$-variable to a variable of R type `Date`, which is true of the variable _date_ in this data set. Here plot just for _Apple_.
+
+```{r}
+Plot(date, Price, rows=(Company=="Apple"))
+```
+
+With the `by` parameter, plot all three companies on the same panel.
+
+```{r, fig.width=5}
+Plot(date, Price, by=Company)
+```
+
+
+With the `by1` parameter, plot all three companies on the different panels, a Trellis plot.
+
+```{r, fig.width=4.5}
+Plot(date, Price, by1=Company)
+```
+
+Now do the Trellis plot with some color.
+
+```{r, fig.width=4.5}
+style(sub_theme="black", trans=.55,
+      window_fill="gray10", grid_color="gray25")
+Plot(date, Price, by1=Company, n.col=1,  fill="darkred", color="red")
+```
+
+
+## Full Manual
+
+Use the base R `help()` function to view the full manual for `Plot()`. Simply enter a question mark followed by the name of the function.
+
+```
+?Plot
+```
 

@@ -19,9 +19,9 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -31,14 +31,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -47,9 +49,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -315,11 +317,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </ul>
 </div>
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;lessR&quot;</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(<span class="st">&quot;knitr&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&quot;lessR&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(<span class="st">&quot;knitr&quot;</span>)</span></code></pre></div>
 <div id="lessr-pivot-vs-base-r-aggregate" class="section level2">
 <h2><strong>lessR</strong> <code>pivot()</code> vs <strong>Base R</strong> <code>aggregate()</code></h2>
-<p>Aggregation is the process forming groups of data based on the levels of categorical variables, such as Gender and Department, then computing some statistical value, such as a mean, for each group on a numeric variable. Refer to each group, the cross-classification of all the specified categorical variables, as a <em>cell</em>. The <strong>lessR</strong> <code>pivot()</code> performs this aggregation. <code>pivot()</code> relies upon the <strong>base R</strong> function <code>aggregate()</code> to generate a long-form data frame pivot table (Excel terminology). By default the levels for all the grouping variables are listed in the rows, but if there are specified column grouping variables, <code>pivot()</code> relies upon base R <code>reshape()</code> to form a 2-d table.</p>
+<p>Aggregation is the process forming groups of data based on the levels of categorical variables, then computing some statistical value, such as a mean, for each group on a numeric variable. For example, compute the mean Salary for each combination of the levels of Gender and Department. Refer to each group, the cross-classification of all the specified categorical variables, as a <em>cell</em>.</p>
+<p>The <strong>lessR</strong> <code>pivot()</code> function performs this aggregation by relying upon the <strong>base R</strong> function <code>aggregate()</code>. By default, <code>pivot()</code> generates a long-form data frame pivot table (Excel terminology), which can then be directly input into analysis functions as a standard data frame. The levels for all the grouping variables are listed in the rows, but if there are specified column grouping variables, <code>pivot()</code> relies upon base R <code>reshape()</code> to form a 2-d table for direct viewing instead of a data table to input into further analysis functions.</p>
 <p><code>pivot()</code> provides additional features than <code>aggregate()</code> provides.</p>
 <ol style="list-style-type: decimal">
 <li>If only one <code>value</code> over which to aggregate, the sample size for each cell is provided with the number of missing values.</li>
@@ -402,11 +405,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tr>
 </tbody>
 </table>
-<p>These three functions output their values as an R matrix, which then replaces the values of the variable that is aggregated in the resulting output data frame.</p>
+<p>These later three functions output their values as an R matrix, which then replaces the values of the variable that is aggregated in the resulting output data frame.</p>
 </div>
 <div id="parameters" class="section level2">
 <h2>Parameters</h2>
-<p>Following are the <code>pivot()</code> parameters the specify the data and the statistic for the aggregation, the value(s) over which to aggregate, and the corresponding the cells that contain the aggregated values. The first four parameter values listed below are required.</p>
+<p>The following <code>pivot()</code> parameters specify the data, the statistic for the aggregation, the value(s) over which to aggregate, and the corresponding cells that contain the aggregated values. The first four parameter values listed below are required.</p>
 <ol style="list-style-type: decimal">
 <li><code>data</code>: The data frame that includes the variables of interest.</li>
 <li><code>compute</code>: The function for which to perform the aggregation.</li>
@@ -420,7 +423,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="examples" class="section level2">
 <h2>Examples</h2>
 <p>To illustrate, use the Employee data set included in <strong>lessR</strong>, here read into the <em>d</em> data frame. Begin with no missing data.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">d &lt;-<span class="st"> </span><span class="kw">Read</span>(<span class="st">&quot;Employee&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>d &lt;-<span class="st"> </span><span class="kw">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Suggestions
 ## Details about your data, Enter:  details()  for d, or  details(name)
@@ -447,7 +450,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="output-as-a-long-form-data-frame" class="section level3">
 <h3>Output as a long-form data frame</h3>
 <p>Two categorical variables in the <em>d</em> data frame are <em>Dept</em> and <em>Salary</em>. A continuous variable is <em>Salary</em>. Create the long-form pivot table as a data frame that expresses the mean of <em>Salary</em> for all combinations of <em>Dept</em> and <em>Salary</em>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">pivot</span>(<span class="dt">data=</span>d, <span class="dt">compute=</span>mean, <span class="dt">value=</span>Salary, <span class="dt">rows_by=</span><span class="kw">c</span>(Dept, Gender))</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">pivot</span>(<span class="dt">data=</span>d, <span class="dt">compute=</span>mean, <span class="dt">value=</span>Salary, <span class="dt">rows_by=</span><span class="kw">c</span>(Dept, Gender))</span></code></pre></div>
 <pre><code>##    Dept Gender  n miss   Salary
 ## 1  ACCT      F  3    0 63237.16
 ## 2  ADMN      F  4    0 81434.00
@@ -460,9 +463,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 9  MKTG      M  1    0 99062.66
 ## 10 SALE      M 10    0 86150.97</code></pre>
 <p>The output of <code>pivot()</code> is a data frame of the aggregated variables. This can be saved for further analysis. Here, perform the same analysis, but list the required parameter values in order without the parameter names.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">a &lt;-<span class="st"> </span><span class="kw">pivot</span>(d, mean, Salary, <span class="kw">c</span>(Dept, Gender))</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>a &lt;-<span class="st"> </span><span class="kw">pivot</span>(d, mean, Salary, <span class="kw">c</span>(Dept, Gender))</span></code></pre></div>
 <p>Because the output of <code>pivot()</code> with no <code>cols_by</code> variables is a standard R data frame, typical operations such as sorting can be applied, here using the <strong>lessR</strong> function <code>Sort()</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">Sort</span>(a, <span class="dt">by=</span>Dept)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">Sort</span>(a, <span class="dt">by=</span>Dept)</span></code></pre></div>
 <pre><code>## 
 ## Sort Specification
 ##   1 --&gt;  ascending</code></pre>
@@ -478,7 +481,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 5  SALE      F  5    0 64188.25
 ## 10 SALE      M 10    0 86150.97</code></pre>
 <p>Multiple <code>value</code> variables for which to aggregate over can also be specified. Round the numerical aggregated results to two decimal digits.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">pivot</span>(d, mean, <span class="kw">c</span>(Years, Salary), <span class="kw">c</span>(Dept, Gender), <span class="dt">digits_d=</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">pivot</span>(d, mean, <span class="kw">c</span>(Years, Salary), <span class="kw">c</span>(Dept, Gender), <span class="dt">digits_d=</span><span class="dv">2</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender  n miss Years   Salary
 ## 1  ACCT      F  3    0  4.67 63237.16
 ## 2  ADMN      F  4    0  7.50 81434.00
@@ -492,12 +495,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 10 SALE      M 10    0 12.33 86150.97</code></pre>
 <p>The following illustrates the pipe operator from the <strong>magrittr</strong> package with <code>pivot()</code>. The package is not included with <strong>lessR</strong>, so separately load with <code>library()</code>, either by itself or as part of the <strong>tidyverse</strong> package. As such, the following code is not run.</p>
 <p>Perform the pivot computations on the <em>d</em> data frame. Then output the aggregated results to the <em>a</em> data frame.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># d %&gt;% pivot(mean, Salary, c(Dept, Gender)) %&gt;% -&gt; a</span></a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># d %&gt;% pivot(mean, Salary, c(Dept, Gender)) %&gt;% -&gt; a</span></span></code></pre></div>
 </div>
 <div id="output-as-a-2-d-table" class="section level3">
 <h3>Output as a 2-d Table</h3>
 <p>Specify up to two <code>cols_by</code> categorical variables, to create a two-dimensional table with the specified columns. First, one <code>cols_by</code> variable, Gender. Specifying one or two categorical variables as <code>cols_by</code> variables moves them from their default position in the rows to the columns, which changes the output structure from a long-form data frame to a cross-classification table with categorical variables in the rows and columns.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">pivot</span>(d, mean, Salary, Dept, Gender)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">pivot</span>(d, mean, Salary, Dept, Gender)</span></code></pre></div>
 <pre><code>Table: mean of Salary 
 
  Gender  F          M               
@@ -509,7 +512,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
    MKTG   64496.02   99062.66
    SALE   64188.25   86150.97</code></pre>
 <p>Here two <code>cols_by</code> variables, specified as a vector.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">pivot</span>(d, mean, Salary, Dept, <span class="kw">c</span>(Gender, Plan))</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">pivot</span>(d, mean, Salary, Dept, <span class="kw">c</span>(Gender, Plan))</span></code></pre></div>
 <pre><code>Table: mean of Salary 
 
  Gender  F                                M                                      
@@ -525,7 +528,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="tabulation" class="section level3">
 <h3>Tabulation</h3>
 <p>Tabulation is counting. With tabulation there is no <code>value</code> variable per se. Instead, the number of data values in each cell are tabulated, that is, counted.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">pivot</span>(d, tabulate, <span class="kw">c</span>(Dept, Gender))</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">pivot</span>(d, tabulate, <span class="kw">c</span>(Dept, Gender))</span></code></pre></div>
 <pre><code>##    Dept Gender  n
 ## 1  ACCT      F  3
 ## 2  ADMN      F  4
@@ -540,8 +543,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="missing-data" class="section level3">
 <h3>Missing Data</h3>
-<p>The pivot table follows with the missing data analysis when there is only one numerical value over which to aggregate. The variable Years has one missing value.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">pivot</span>(d, mean, Years, Dept)</a></code></pre></div>
+<p>The pivot table follows with the missing data analysis when there is only one numerical value over which to aggregate. The variable <em>Years</em> has one missing value.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">pivot</span>(d, mean, Years, Dept)</span></code></pre></div>
 <pre><code>##     by  n miss     Years
 ## 1 ACCT  5    0  5.600000
 ## 2 ADMN  6    0 10.166667
@@ -549,7 +552,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 4 MKTG  6    0  9.833333
 ## 5 SALE 14    1 10.285714</code></pre>
 <p>Set <code>na_remove</code> to <code>FALSE</code> to <em>not</em> remove any missing data in a cell with values to be aggregated. The resulting aggregated value will be missing if any of the constituent data values are missing. The corresponding level does not appear because cells with aggregated missing values are not shown.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">pivot</span>(d, mean, Years, Dept, <span class="dt">na_remove=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">pivot</span>(d, mean, Years, Dept, <span class="dt">na_remove=</span><span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>##     by n miss     Years
 ## 1 ACCT 5    0  5.600000
 ## 2 ADMN 6    0 10.166667
@@ -557,7 +560,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 4 MKTG 6    0  9.833333</code></pre>
 <p>The <code>na_remove</code> parameter specifies the value of the base R parameter <code>na.rm</code> for computations such as for the <code>mean</code>. See <code>?mean</code> for its definition.</p>
 <p>Here include all the cells, even those with a missing aggregated value.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="kw">pivot</span>(d, mean, Years, Dept, <span class="dt">na_remove=</span><span class="ot">FALSE</span>, <span class="dt">na_value=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">pivot</span>(d, mean, Years, Dept, <span class="dt">na_remove=</span><span class="ot">FALSE</span>, <span class="dt">na_value=</span><span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>##     by  n miss     Years
 ## 1 ACCT  5    0  5.600000
 ## 2 ADMN  6    0 10.166667
@@ -565,7 +568,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 4 MKTG  6    0  9.833333
 ## 5 SALE 14    1        NA</code></pre>
 <p>To account for missing values of the categorical <code>by</code> variables, set <code>na_by</code> to <code>TRUE</code>.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw">pivot</span>(d, mean, Years, <span class="kw">c</span>(Dept, Gender), <span class="dt">na_by=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">pivot</span>(d, mean, Years, <span class="kw">c</span>(Dept, Gender), <span class="dt">na_by=</span><span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender n miss     Years
 ## 1  ACCT      F 3    0  4.666667
 ## 2  ADMN      F 4    0  7.500000
@@ -578,8 +581,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 9  FINC      M 3    0 11.333333
 ## 10 MKTG      M 1    0 18.000000
 ## 11 SALE      M 9    1 12.333333</code></pre>
-<p>Specify the count for levels that include missing cells, invoking <code>na_by</code> for tabulation.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="kw">pivot</span>(d, tabulate, <span class="kw">c</span>(Dept, Gender), <span class="dt">na_by=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<p>Specify the count for levels that include missing cells. Invoke <code>na_by</code> for tabulation.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="kw">pivot</span>(d, tabulate, <span class="kw">c</span>(Dept, Gender), <span class="dt">na_by=</span><span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender  n
 ## 1  ACCT      F  3
 ## 2  ADMN      F  4

@@ -18,7 +18,9 @@ library("knitr")
 
 ## __lessR__ `pivot()` vs __Base R__ `aggregate()`
 
-Aggregation is the process forming groups of data based on the levels of categorical variables, such as Gender and Department, then computing some statistical value, such as a mean, for each group on a numeric variable. Refer to each group, the cross-classification of all the specified categorical variables, as a _cell_.  The __lessR__ `pivot()` performs this aggregation. `pivot()` relies upon the __base R__ function `aggregate()` to generate a long-form data frame pivot table (Excel terminology). By default the levels for all the grouping variables are listed in the rows, but if there are specified column grouping variables, `pivot()` relies upon base R `reshape()` to form a 2-d table. 
+Aggregation is the process forming groups of data based on the levels of categorical variables, then computing some statistical value, such as a mean, for each group on a numeric variable. For example, compute the mean Salary for each combination of the levels of Gender and Department. Refer to each group, the cross-classification of all the specified categorical variables, as a _cell_.  
+
+The __lessR__ `pivot()` function performs this aggregation by relying upon the __base R__ function `aggregate()`. By default, `pivot()` generates a long-form data frame pivot table (Excel terminology), which can then be directly input into analysis functions as a standard data frame. The levels for all the grouping variables are listed in the rows, but if there are specified column grouping variables, `pivot()` relies upon base R `reshape()` to form a 2-d table for direct viewing instead of a data table to input into further analysis functions. 
 
 `pivot()` provides additional features than `aggregate()` provides. 
 
@@ -52,12 +54,12 @@ Statistic | Meaning
 `quantile` | range + quartiles
 `summary` | quantile + mean
 
-These three functions output their values as an R matrix, which then replaces the values of the variable that is aggregated in the resulting output data frame.
+These later three functions output their values as an R matrix, which then replaces the values of the variable that is aggregated in the resulting output data frame.
 
 
 ## Parameters
 
-Following are the `pivot()` parameters the specify the data and the statistic for the aggregation, the value(s) over which to aggregate, and the corresponding the cells that contain the aggregated values. The first four parameter values listed below are required.
+The following `pivot()` parameters specify the data, the statistic for the aggregation, the value(s) over which to aggregate, and the corresponding cells that contain the aggregated values. The first four parameter values listed below are required.
 
 1. `data`: The data frame that includes the variables of interest.
 1. `compute`: The function for which to perform the aggregation.
@@ -133,7 +135,7 @@ pivot(d, mean, Salary, Dept, c(Gender, Plan))
 
 ### Tabulation
 
-Tabulation is counting. With tabulation there is no `value` variable per se. Instead, the number of data values in each cell are tabulated, that  is, counted.
+Tabulation is counting. With tabulation there is no `value` variable per se. Instead, the number of data values in each cell are tabulated, that is, counted.
 
 ```{r}
 pivot(d, tabulate, c(Dept, Gender))
@@ -142,7 +144,7 @@ pivot(d, tabulate, c(Dept, Gender))
 
 ### Missing Data
 
-The pivot table follows with the missing data analysis when there is only one numerical value over which to aggregate. The variable Years has one missing value.
+The pivot table follows with the missing data analysis when there is only one numerical value over which to aggregate. The variable _Years_ has one missing value.
 
 ```{r}
 pivot(d, mean, Years, Dept)
@@ -168,7 +170,7 @@ To account for missing values of the categorical `by` variables, set `na_by` to 
 pivot(d, mean, Years, c(Dept, Gender), na_by=TRUE)
 ```
 
-Specify the count for levels that include missing cells, invoking `na_by` for tabulation.
+Specify the count for levels that include missing cells. Invoke `na_by` for tabulation.
 
 ```{r}
 pivot(d, tabulate, c(Dept, Gender), na_by=TRUE)

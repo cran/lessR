@@ -17,7 +17,7 @@ When output is assigned into an object, such as \code{s} in \code{s <- ss(Y)}, t
 }
 
 \usage{
-SummaryStats(x=NULL, by=NULL, data=d, n_cat=getOption("n_cat"), 
+SummaryStats(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"), 
          digits_d=NULL, brief=getOption("brief"), label_max=20, \ldots)
 
 ss.brief(\dots, brief=TRUE)
@@ -33,11 +33,18 @@ ss(\dots)
         \code{\link{c}} function, or an entire data frame. If not specified,
         then defaults to all variables in the specified data frame,
         \code{d} by default.}
-  \item{by}{Applies to an analysis of a numeric variable, which is then analyzed at each level of the \code{by} variable. The variable is coerced to a factor.}
-  \item{data}{Optional data frame that contains the variable of interest, default is \code{d}.}
-  \item{n_cat}{Specifies the largest number of unique values of variable of a numeric data type for which the variable will be analyzed as a categorical. Default is off, set to 0.}
+  \item{by}{Applies to an analysis of a numeric variable, which is then analyzed at
+       each level of the \code{by} variable. The variable is coerced to a factor.}
+  \item{data}{Optional data frame that contains the variable of interest, default
+       is \code{d}.}
+  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+       to analyze.}
+  \item{n_cat}{Specifies the largest number of unique values of variable of a numeric
+       data type for which the variable will be analyzed as a categorical. Default is
+       off, set to 0.}
   \item{digits_d}{Specifies the number of decimal digits to display in the output.}
-  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default with \code{\link{style}} function.}
+  \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
+       with \code{\link{style}} function.}
   \item{label_max}{Maximum size of labels for the values of a variable.
         Not a literal maximum as preserving unique values may require a larger number
         of characters than specified.}

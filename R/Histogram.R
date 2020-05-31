@@ -37,21 +37,11 @@ function(x=NULL, data=d, rows=NULL,
     fun_call=NULL, ...) {
 
 
-  # a dot in a parameter name to an underscore
-# dots <- list(...)
-# if (!is.null(dots)) if (length(dots) > 0) {
-#   change <- c("stat.x", "stat.y", "n.cat", "n.row", "n.col",
-#               "bin.start", "bin.width", "bin.end", "lab.adj", "margin.adj",
-#               "rotate.x", "rotate.y", "scale.x", "scale.y",  
-#               "digits.d", "fun.call", "do.plot")
-#   for (i in 1:length(dots)) {
-#     if (names(dots)[i] %in% change) {
-#       nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-#       assign(nm, dots[[i]])
-#       get(nm)
-#     }
-#   }
-# }
+  if (missing(fill))
+    fill <- ifelse (is.null(getOption("bar_fill_ordered")), 
+      getOption("bar_fill"), getOption("bar_fill_ordered"))
+  breaks.miss <- ifelse (missing(breaks), TRUE, FALSE)
+  bw.miss <- ifelse (missing(bw), TRUE, FALSE)
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -73,7 +63,6 @@ function(x=NULL, data=d, rows=NULL,
   stat_x <- match.arg(stat_x)
   proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
   histogram <- ifelse (density, FALSE, TRUE)
-  bw.miss <- ifelse (missing(bw), TRUE, FALSE)
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -90,9 +79,11 @@ function(x=NULL, data=d, rows=NULL,
     trans <- sty$bar$trans_fill
   }
 
-  if (missing(fill))
-    fill <- ifelse (is.null(getOption("bar_fill_ordered")), 
-      getOption("bar_fill"), getOption("bar_fill_ordered"))
+  if (!breaks.miss && density)  {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "When plotting density, parameter  breaks  is ignored.\n",
+      "Bins must be equal width, but can use bin_start and bin_width.\n\n")
+  }
 
   if (!is.null(scale_x)) if (length(scale_x) != 3)  {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -153,7 +144,7 @@ function(x=NULL, data=d, rows=NULL,
   if (!is.null(dfs)) {
     if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
      if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data, stringsAsFactors=FALSE)
+        data <- data.frame(data)
      }
     }
   }

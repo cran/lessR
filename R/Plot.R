@@ -324,7 +324,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   if (!is.null(dfs)) {
     if (df.name %in% dfs) {  
       if (any(grepl("tbl", class(data), fixed=TRUE))) {  # tibble to df
-        data <- data.frame(data, stringsAsFactors=FALSE)
+        data <- data.frame(data)
       }
     }
   }
@@ -1592,6 +1592,7 @@ if (is.null(out_size)) out_size <- size.pt
           out_ind <- otl$out_ind
       }
 
+
       if (do_plot) {
 
         if (nrow(x.call) != nrow(y.call))  {
@@ -1603,16 +1604,12 @@ if (is.null(out_size)) out_size <- size.pt
             "  use the  remove function, e.g., remove(x)\n\n")
         }
 
-      if (run) if (lwd == 0) fill <- getOption("violin_fill")
-      if (object == "both"  &&  nn_col > 1) {
-    #    stack <- TRUE  # meaningless otherwise
-         # change to multi later
-         if (fill == "on") fill <- getOption("violin_fill")
-      }
-
- 
-
-      if (!quiet) {  # text output
+        if (run) if (lwd == 0) fill <- getOption("violin_fill")
+        if (object == "both"  &&  nn_col > 1) {
+        # stack <- TRUE  # meaningless otherwise
+           # change to multi later
+           if (fill == "on") fill <- getOption("violin_fill")
+        }
 
         # by default display center_line only if runs about a mean
         if (run  &&  center_line == "default") {
@@ -1626,7 +1623,6 @@ if (is.null(out_size)) out_size <- size.pt
           else
             center_line <- "median"
         }
-
 
         .plt.main(x.call, y.call, by.call, n_cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
@@ -1648,22 +1644,23 @@ if (is.null(out_size)) out_size <- size.pt
           xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
           scale_x, scale_y, pad_x, pad_y, legend_title, 
           add, x1, x2, y1, y2, add_cex, add_lwd, add_lty,
-          add_color, add_fill, add_trans,
-          quiet, ...)
-      }
+          add_color, add_fill, add_trans, ...)
 
-        .plt.txt(x.call, y.call, stat, object, n_cat,
-          cat.x, num.cat.x, cat.y, num.cat.y,
-          xlab, ylab,
-          smooth, box_adj, run, center_line, show_runs,
-          proportion, size, radius, digits_d, fun_call, txdif)
+        if (!quiet) {  # text output
 
-       if (!y.miss && !Trellis) if (n.x_var == 1  &&  n.y_var == 1) {
-          class(txout) <- "out"  # MD outlier analysis
-          output <- list(out_outlier=txout, outlier_indices=out_ind)
-          class(output) <- "out_all"
-        }
-      }
+          .plt.txt(x.call, y.call, stat, object, n_cat,
+            cat.x, num.cat.x, cat.y, num.cat.y,
+            xlab, ylab,
+            smooth, box_adj, run, center_line, show_runs,
+            proportion, size, radius, digits_d, fun_call, txdif)
+
+          if (!y.miss && !Trellis) if (n.x_var == 1  &&  n.y_var == 1) {
+            class(txout) <- "out"  # MD outlier analysis
+            output <- list(out_outlier=txout, outlier_indices=out_ind)
+            class(output) <- "out_all"
+          }
+        }  # end !quiet
+      }  # end do_plot
 
     }  # end 2-variable scatter plot
 
@@ -1683,6 +1680,6 @@ if (is.null(out_size)) out_size <- size.pt
   options(by2name=NULL)
   options(byname=NULL)
 
-  if (!y.miss && !Trellis) if(n.x_var == 1  &&  n.y_var == 1)
+  if (!y.miss && !Trellis) if (n.x_var == 1  &&  n.y_var == 1)
     if (!quiet) return(output)
 }

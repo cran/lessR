@@ -7,21 +7,19 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.9.4    feedback: gerbing@pdx.edu    web: lessRstats.com/new\n",
-      "-------------------------------------------------------------------\n",
-      "> d <- Read(\"\")          Read text, Excel, SPSS, SAS or R data file\n",
-      "                          d: default data frame, no need for data=\n",
-      "> l <- Read(\"\", var_labels=TRUE)   Read variable labels into l,\n",
-      "                          required name for data frame of labels\n",
-      "> Help()                 Get help, and, e.g., Help(Read)\n",
-      "> hs(), bc(), or ca()    All histograms, all bar charts, or both\n",
-      "> Plot(X) or Plot(X,Y)   For continuous and categorical variables\n",
-      "> by1= , by2=            Trellis graphics, a plot for each by1, by2\n",
-      "> reg(Y ~ X, Rmd=\"eg\")   Regression with full interpretative output\n",
-      "> style(\"gray\")          Grayscale theme, + many others available\n",
-      "> style(show=TRUE)       all color/style options and current values\n",
-      "> getColors()            create many styles of color palettes\n",
-      "> d[.(rows), .(cols)]    subset with . more flexible than base R\n\n")
+      "lessR 3.9.5  feedback: gerbing@pdx.edu    web: lessRstats.com/new\n",
+      "-----------------------------------------------------------------\n",
+      "> d <- Read(\"\")   Read text, Excel, SPSS, SAS or R data file\n",
+      "  d is default data frame, no need for data= in analysis routines\n",
+      "\n",
+      "> vignette(\"topic\") for help on the following topics\n",
+      "   \"Data\": read data and variable labels, write data to a file\n",
+      "   \"BarChart\", \"Histogram\", \"Plot\": visualizations\n",
+      "   \"Means\": analyze means with t-tests and ANOVA\n", 
+      "   \"Regression\": least-squares, logistic regression\n", 
+      "   \"Customize\": custom color palettes and more customization\n",
+      "   \"Extract\": general, simple data frame subsetting\n",
+      "   \"pivot\": 1-d and 2-d simply created pivot tables\n") 
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 
@@ -36,9 +34,9 @@ function(...) {
 
   # .maketrans("gray50", .to256("trans_bar_fill"))
   options(bar_fill = NULL)
-  options(bar_fill_discrete = c("#257EB2", "#957200", "#488527", "#B55B6F",
-          "#806AB7", "#008D7E", "#AA6644", "#777D00", "#00889D", "#B35693",
-          "#008B57", "#A05DAD"))  # getColors("hues")
+  options(bar_fill_discrete = c("#2D8BC3", "#A57E08", "#51932E", "#C7657B",
+           "#8E76C9", "#009B8B", "#BB714D", "#838A00", "#0097AD", "#C561A2",
+           "#009962", "#B068BE" ))  # getColors("hues")
   options(bar_fill_ordered = rgb(144,165,195, maxColorValue=255))
   options(trans_bar_fill = 0.0)
   options(bar_color = rgb(126,144,168, maxColorValue=255))
@@ -1172,7 +1170,7 @@ function(dir, axT) {
   for (i in seq_along(val.lab)) {
     if (!is.na(val.lab[i])) {
       val.lab[i] <- gsub(" ", "\n", val.lab[i])  # space to new line
-      val.lab[i] <- gsub("_", " ", val.lab[i])  # underline to space
+      val.lab[i] <- gsub("~", " ", val.lab[i])  # ~ to space
       ln.br <- 0
       for (j in 1:nchar(val.lab[i]))
         if (substr(val.lab[i], j, j)=="\n") ln.br <- ln.br + 1

@@ -130,6 +130,10 @@ Use the function on its own, in which case the color rectangle/wheel visualizati
 Colors are invisibly returned as a character string vector.
 }
 
+\references{
+Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 10, NY: CRC Press.
+}
+
 \seealso{
 \code{\link{hcl}}, \code{\link{showColors}}
 }

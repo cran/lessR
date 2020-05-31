@@ -1,5 +1,5 @@
 SummaryStats <-
-function(x=NULL, by=NULL, data=d, n_cat=getOption("n_cat"), 
+function(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"), 
     digits_d=NULL, brief=getOption("brief"), label_max=20, ...)  {
 
   # a dot in a parameter name to an underscore
@@ -36,7 +36,6 @@ function(x=NULL, by=NULL, data=d, n_cat=getOption("n_cat"),
     mydata.ok <- TRUE
     options(dname = df.name)
   }
-
   if (!mydata.ok) {
     df.name <- deparse(substitute(data))  # get name of data table
     options(dname = df.name)
@@ -50,7 +49,7 @@ function(x=NULL, by=NULL, data=d, n_cat=getOption("n_cat"),
   # if a tibble convert to data frame
   if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
    if (any(grepl("tbl", class(data), fixed=TRUE))) {
-      data <- data.frame(data, stringsAsFactors=FALSE)
+      data <- data.frame(data)
    }
   }
 
@@ -100,16 +99,21 @@ function(x=NULL, by=NULL, data=d, n_cat=getOption("n_cat"),
       .xcheck(x.name, df.name, names(data))  # var in df?, vars lists not checked
       all.vars <- as.list(seq_along(data))  # even if only a single var
       names(all.vars) <- names(data)  # all data in data frame
-      x.col <- eval(substitute(x), envir=all.vars)  # col num selected vars
+      ind <- eval(substitute(x), envir=all.vars)  # col num selected vars
+      if (!missing(rows)) {  # subset rows
+        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+        r <- r & !is.na(r)  # set missing for a row to FALSE
+        data <- data[r,,drop=FALSE]
+      }
       if (!("list" %in% class(data))) {
-        data <- data[, x.col]
-        if (length(x.col) == 1) {  # x is 1 var
+        data <- data[, ind]
+        if (length(ind) == 1) {  # x is 1 var
           data <- data.frame(data, stringsAsFactors=TRUE)
           names(data) <- x.name
          }
       }
       else {  # class of data is "list"
-        data <- data.frame(data[[x.col]], stringsAsFactors=TRUE)
+        data <- data.frame(data[[ind]], stringsAsFactors=TRUE)
         names(data) <- x.name
       }
     }

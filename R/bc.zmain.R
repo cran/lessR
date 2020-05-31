@@ -445,6 +445,7 @@ function(x, y, by, stack100,
   # ------------
   # value labels
 
+  # set val.lab as the working value_labels vector
   if (!is.null(value_labels)) {
     val.lab <- value_labels
   }
@@ -459,11 +460,10 @@ function(x, y, by, stack100,
 
   # for each value label, partition into mx.x.val.ln lines if (break_x)
   mx.x.val.ln <- 1
-  ln.val <- integer(length=length(val.lab))
   if (!break_x) {
     for (i in seq_along(val.lab)) {
       if (!is.na(val.lab[i])) {
-        val.lab[i] <- gsub(" ", "_", val.lab[i])  # retain space
+        val.lab[i] <- gsub(" ", "~", val.lab[i])  # ~ , so no \n
       }
     }
   }

@@ -52,7 +52,8 @@ function(x,
       breaks <- seq(bin_start, seq.end, bin_width)
     }
   }
-  else breaks="Sturges"
+  else
+    breaks="Sturges"
 
 
   if (is.null(main)) {

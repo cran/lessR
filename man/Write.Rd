@@ -63,10 +63,10 @@ When writing the data frame in native R format, the specified name of the result
 
 \examples{
 # create data frame called d
-n <- 12
-X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
-Y <- rnorm(n=n, mean=50, sd=10)
-d <- data.frame(X,Y)
+#n <- 12
+#X <- sample(c("Group1","Group2"), size=n, replace=TRUE)
+#Y <- rnorm(n=n, mean=50, sd=10)
+#d <- data.frame(X,Y)
 
 # write the current contents of default data frame d to GoodData.csv
 # Write("GoodData")

@@ -226,6 +226,9 @@ Instead, do the following:
     > PieChart(Y)     # directly reference Y}
 }
 
+\references{
+Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 3, NY: CRC Press.
+}
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 

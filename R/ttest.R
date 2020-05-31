@@ -407,7 +407,7 @@ function(x, y=NULL, ...) {
     # Cleveland two-variable dot plot
     .plt.main(data.frame(x.call, stringsAsFactors=TRUE),
               data.frame(y.call, stringsAsFactors=TRUE), cat.y=TRUE,
-              shape=21, size=.8, ylab="", segments_y=TRUE, quiet=TRUE)
+              shape=21, size=.8, ylab="", segments_y=TRUE)
 
     if (!is.null(pdf_file)) {
       dev.off()
