@@ -44,8 +44,8 @@ function(data, compute, value, rows_by, cols_by=NULL,
     nms.c <- ""
     for (i in 1:n.c.by) nms.c <- paste(nms.c, names(d)[ind.c.by[i]])
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Specified column by variables: ", nms.c, "\n",
-      "Only two column by variables permitted\n\n")
+      "Specified column  by  variables: ", nms.c, "\n",
+      "Only two column  by  variables permitted\n\n")
   }
 
   # collapse by variables to a single by for aggregation into long form

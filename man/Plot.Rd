@@ -80,7 +80,7 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          offset=getOption("offset"),
 
          xy_ticks=TRUE, value_labels=NULL, label_max=20, origin_x=NULL,
-         scale_x=NULL, scale_y=NULL, pad_x=0, pad_y=0,
+         scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
          legend_title=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
@@ -450,10 +450,14 @@ vp(\ldots)
   \item{scale_y}{If specified, a vector of three values that define the
         y-axis with numerical values: starting value, ending value, and number
         of intervals.}
-  \item{pad_x}{Proportion of padding added to both sides of
-       the \code{x}-axis. Value from 0 to 1.}
-  \item{pad_y}{Proportion of padding added to both sides of
-       the \code{y}-axis. Value from 0 to 1.}
+  \item{pad_x}{Proportion of padding added to left and right sides of the
+       \code{x}-axis, respectively. Value from 0 to 1 for each of the two 
+       elements. If only one element specified, value is applied to both
+       sides.}
+  \item{pad_y}{Proportion of padding added to bottom and top sides of the
+       \code{y}-axis, respectively. Value from 0 to 1 for each of the two 
+       elements. If only one element specified, value is applied to both
+       sides.}
   \item{legend_title}{Title of the legend for a multiple-variable \code{x}
        or \code{y} plot.}\cr
 

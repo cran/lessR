@@ -44,25 +44,18 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("stat.x", "stat.yx", "n.cat", "n.row", "n.col", "scale.y",
-                "fill.split", "legend.title", "legend.labels", "legend.size",
-                "value.labels", "break.x", "label.max", "out.size",
-                "values.color", "values.size", "values.digits",
-                "values.position", "values.cut", "lab.adj", "margin.adj",
-                "eval.df")
     for (i in 1:length(dots)) {
       if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]] 
       if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]] 
       if (names(dots)[i] == "stat_x") stat <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
-      if (names(dots)[i] %in% change) {
+      if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
         get(nm)
       }
     }
   }
-
 
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   color.miss <- ifelse (missing(color), TRUE, FALSE)

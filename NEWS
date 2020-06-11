@@ -7,6 +7,31 @@ Update History for Package 'lessR'
 
  
  
+>>>>>> Changes for lessR version 3.9.5 (2020-06-09) <<<<<<
+
+-------------
+Updates 3.9.6
+-------------
+
+Plot
+  pad_x and pad_y now take an optional second element so that padding
+   can be customized for left/right and bottom/top, respectively
+
+Read
+  SPSS and SAS files now read with read_spss() and read_sas() from the
+    haven package, with SPSS value labels retained as well as numerical
+    values into two separate variables
+  Stata files read added with read_stata()
+
+
+---------------
+Bug Fixes 3.9.6
+---------------  
+
+foreign package dropped, lessR no longer requires at least R 4.0.0 
+
+
+ 
 >>>>>> Changes for lessR version 3.9.5 (2020-05-30) <<<<<<
 
 -------------

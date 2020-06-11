@@ -111,40 +111,9 @@ function(
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("sub.theme, window.fill", "panel.fill", "panel.color",
-                "panel.lwd", "panel.lty", "bar.fill", "bar.fill.discrete",
-                "bar.fill.ordered", "trans.bar.fill", "bar.color",
-                "bar.color.ordered", "bar.color.discrete",
-                "values.color", "values.size", "values.digits",
-                "values.position", "pt.fill", "trans.pt.fill", 
-                "pt.color", "se.fill", "ellipse.fill", "ellipse.lwd",
-                "fit.color", "fit.lwd", "bubble.text.color", "segment.color",
-                "ID.color", "out.fill", "out.color", "out2.fill", "out2.color",
-                "violin.fill", "violin.color", "box.fill", "box.color",
-                "axis.color", "axis.x.color", "axis.y.color", "axis.lwd",
-                "axis.x.lwd", "axis.y.lwd", "axis.lty", "axis.x.lty",
-                "axis.y.lty", "axis.cex", "axis.x.cex", "axis.y.cex",
-                "axis.text.color", "axis.x.text.color", "axis.y.text.color",
-                "rotate.x", "rotate.y", "offset", "lab.color", "lab.x.color",
-                "lab.y.color", "lab.cex", "lab.x.cex", "lab.y.cex",
-                "main.color", "main.cex", "grid.color", "grid.x.color",
-                "grid.y.color", "grid.lwd", "grid.x.lwd", "grid.y.lwd",
-                "grid.lty", "grid.x.lty", "grid.y.lty", "strip.fill", 
-                "strip.color", "strip.text.color", "add.fill", "add.trans",
-                "add.color", "add.cex", "add.lwd", "add.lty", "n.cat")
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-        assign(nm, dots[[i]])
-        get(nm)
-      }
-    }
-  }
-  dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
       if (names(dots)[i] == "values.cex")  values_size <- dots[[i]]
-      if (grepl(".", dots[[i]], fixed=TRUE)) {
+      if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
         get(nm)

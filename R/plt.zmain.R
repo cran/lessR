@@ -40,7 +40,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
          xlab_adj=0, ylab_adj=0, bm.adj=0, lm.adj=0,
          tm.adj=0, rm.adj=0,
-         scale_x=NULL, scale_y=NULL, pad_x=0, pad_y=0,
+         scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
          legend_title=NULL, 
 
          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
@@ -363,9 +363,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     if (stat %in% c("count", "proportion", "%")) origin_x <- 0
   }
 
-  # add padding on all four sides
+  # add padding to x and y axes
   add.lab <- FALSE
-  if (pad_x == 0) {  # pad extra for labels in 2-D plot
+  if (all(pad_x == 0)) {  # pad extra for labels in 2-D plot
     if (!is.null(add)) {
       add.lab <- ifelse ("labels" %in% add, TRUE, FALSE) 
     }
@@ -376,9 +376,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
   xp <- pretty(c(mn.x, mx.x))
   yp <- pretty(c(mn.y, mx.y))
-  x.adj <- pad_x * (xp[length(xp)] - xp[1])
-  y.adj <- pad_y * (yp[length(yp)] - yp[1])
-  region <- rbind(region, c(mn.x-x.adj, mn.y-y.adj), c(mx.x+x.adj, mx.y+y.adj))
+  ln.xp <- length(xp)
+  xP <- pad_x[2] * (xp[ln.xp] - xp[1])
+  xN <- pad_x[1] * (xp[ln.xp] - xp[1])
+  yP <- pad_y[2] * (yp[ln.xp] - yp[1])
+  yN <- pad_y[1] * (yp[ln.xp] - yp[1])
+  region <- rbind(region, c(mn.x-xN, mn.y-yN), c(mx.x+xP, mx.y+yP))
 
   # plot: setup the coordinate system
   plot(region, type="n", axes=FALSE, ann=FALSE, ...)

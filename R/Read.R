@@ -82,6 +82,8 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     else if (grepl(".tsv$", from)) format <- "csv"
     else if (grepl(".txt$", from)) format <- "csv"
     else if (grepl(".sav$", from)) format <- "SPSS"
+    else if (grepl(".zsav$", from)) format <- "SPSS"
+    else if (grepl(".dta$", from)) format <- "Stata"
     else if (grepl(".rda$", from)) format <- "R"
     else if (grepl(".xls$", from) || grepl(".xlsx$", from)) format <- "Excel"
     else if (grepl(".sas7bdat$", from)) format <- "SAS"
@@ -117,30 +119,19 @@ function(from=NULL, format=NULL, var_labels=FALSE,
       cat("\n")
       cat("Data File:  ", from, "\n")
     }
-
-    # function call for suggestions
-    fncl <- .fun_call.deparse(fun_call)
-
-    if (getOption("suggest")) {
-      if (brief || !grepl("var_labels", fncl))
-        cat("\n>>> Suggestions\n")
-      if (!grepl("var_labels", fncl)  &&  format != "lessR")
-        cat("To read a csv or Excel file of variable labels, var_labels=TRUE\n",
-            "  Each row of the file:  Variable Name, Variable Label\n")
-      if (brief) {
-        cat("Details about your data, Enter:  details()  for d, or",
-           " details(name)\n")
-        if (options("device") == "RStudioGD")
-          cat("To view your data, Enter:  View(name)  such as ",
-          " View(d)\n")
-      }
-      cat("\n")
-    }
   }
 
 
   # read the data (into object d)
   # -----------------------------
+
+  if (format %in% c("SPSS", "SAS", "Stata")) {
+    if (!requireNamespace("haven", quietly=TRUE)) {
+      stop("Package \"haven\" needed to read this file\n",
+           "Please install it:  install.packages(\"haven\")\n\n",
+           call. = FALSE)
+    }
+  }
 
   if (format %in% c("fwd", "csv")) {  # text file
 
@@ -195,34 +186,65 @@ function(from=NULL, format=NULL, var_labels=FALSE,
 #     d[fnu.col] <- lapply(d[fnu.col], function(x) x <- x+1)  # read.xlsx bug?
 #     d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
 
-#     d <- readxl::read_excel(path=from, sheet=sheet)
     if (!is.null(list(...)$row.names))  # add any row.names to data frame
       d <- data.frame(d, row.names=list(...)$row.names, stringsAsFactors=TRUE)
-    # class(d) <- "data.frame"  # otherwise nonstandard class from read_excel
 
-      # if true integer, then convert from type double to integer
-      rows <- min(50, nrow(d))  # save some time scanning
-      fnu.col <- logical(length=ncol(d))
-      for (i in 1:ncol(d))
-        if (is.double(d[,i]))
-          if (is.integer(type.convert(as.character(d[1:rows,i]))))
-            fnu.col[i] <- TRUE
-       d[fnu.col] <- lapply(d[fnu.col], as.integer) # move to integer
+    # if true integer, then convert from type double to integer
+    rows <- min(50, nrow(d))  # save some time scanning
+    fnu.col <- logical(length=ncol(d))
+    for (i in 1:ncol(d))
+      if (.is.integer(d[1:rows,i]))
+        fnu.col[i] <- TRUE
+     d[fnu.col] <- lapply(d[fnu.col], as.integer) # move to integer
 
   }  # end (format == "Excel")
 
-  else if (format == "SPSS")  # data and any labels
-    d <- read.spss(file=from, to.data.frame=TRUE, use.value_labels=TRUE, ...)
+  else if (format == "SPSS") {  # data and any labels
+    cat("[with read_spss() from the haven package]\n")
+    dt <- haven::read_spss(file=from, ...)  # a tibble with label attribute
+    d <- data.frame(row.names=1:nrow(dt))
+    d <- d[1:nrow(dt), ]
+    i.new <- 0
+    for (i in 1:ncol(dt)) {
+      i.new <- i.new + 1
+      d[[i.new]] <- dt[[i]]
+      names(d)[i.new] <- names(dt)[i]
+      if ("haven_labelled" %in% class(dt[[i]])) {
+        if (.is.integer(d[[i.new]]))
+          d[[i.new]] <- as.integer(d[[i.new]])  # to standard R integer var
+        else
+          d[[i.new]] <- as.numeric(d[[i.new]])
+        i.new <- i.new + 1
+        d[[i.new]] <- haven::as_factor(dt[[i]])   # labels to a factor var
+        names(d)[i.new] <- paste(names(dt)[i], "_f", sep="")
+      }
+    }
+    haven <- FALSE
+    for (i in 1:ncol(dt)) if  ("haven_labelled" %in% class(dt[[i]]))
+      haven <- TRUE
+    if (haven) {
+      cat("\nVariable and Variable Label  --> See vignette(\"Read\"),",
+          "SPSS section\n")
+      cat(.dash(27))
+      for (i in 1:ncol(dt)) {
+        if ("haven_labelled" %in% class(dt[[i]])) {
+          lbl <- attr((dt[[i]]), "label")
+          cat(paste(names(dt)[i], ", ", sep=""), lbl, "\n")
+          cat(paste(names(dt)[i], "_f, ", sep=""), lbl, "\n")
+        }
+      }
+    }  # end haven
+    rm(dt)  # no longer need the tibble that was read
+  }  # end SPSS
 
   else if (format == "SAS"  &&  !quiet) { # data
-    if (!requireNamespace("sas7bdat", quietly=TRUE)) {
-      stop("Package \"sas7bdat\" needed for these colors\n",
-           "Please install it:  install.packages(\"sas7bdat\")\n\n",
-           call. = FALSE)
-    }
-    d <- sas7bdat::read.sas7bdat(file=from, ...)
-    txt <- "Matt Shotwell's sas7bdat package]"
-    cat("[with the read.sas7bdat function from", txt, "\n")
+    cat("[with read_stata() from the haven package]\n")
+    d <- haven::read_sas(data_file=from, ...)
+  }
+
+  else if (format == "Stata"  &&  !quiet) { # data
+    cat("[with read_stata() from the haven package]\n")
+    d <- haven::read_stata(file=from, ...)
   }
 
   else if (format == "R") {  # data and any labels
@@ -241,7 +263,8 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     if (!file.exists(path.name)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "No lessR data file with that name.\n\n",
-        "To view the list of lessR data files, enter  > Help(lessR)\n",
+        "To view the list of lessR data files,\n",
+        "    enter  > help(package=lessR)\n",
         "The data file names begin with  'data.'\n\n")
     }
 
@@ -251,7 +274,6 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     dname <- paste(txt, from, sep="")
     d <- get(dname, pos=x.env)
   }  # end (format == "lessR")
-
 
   # check for valid characters in the variable names
   if (format %in% c("csv", "Excel")) {
@@ -286,6 +308,23 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     }
     if (badchar)
       cat("\nR only allows letters, digits and . or  _ in variable names\n\n")
+  }
+
+
+  # function call for suggestions
+  fncl <- .fun_call.deparse(fun_call)
+
+  if (getOption("suggest")) {
+    if (brief || !grepl("var_labels", fncl))
+      cat("\n>>> Suggestions\n")
+    if (!grepl("var_labels", fncl)  &&  format != "lessR")
+      cat("To read a csv or Excel file of variable labels, var_labels=TRUE\n",
+          "  Each row of the file:  Variable Name, Variable Label\n")
+    if (brief) {
+      cat("Details about your data, Enter:  details()  for d, or",
+         " details(name)\n")
+    }
+    cat("\n")
   }
 
 

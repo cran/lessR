@@ -171,6 +171,7 @@ Write("GoodData")
 Write the data as a Excel data table in an Excel file.
 
 ```
+o
 Write("GoodData", format="Excel")
 ```
 
@@ -193,6 +194,64 @@ wrt_r("GoodData")
 ```
 
 The output of `Write()` indicates the full path name of the written file.
+
+
+## Read SPSS Files
+
+The __haven__ package has an excellent function for reading SPSS files, `read_spss()`. In particular, the SPSS variable labels and value labels are preserved. `Read()` invokes this function to read SPSS files, with the default filetype of `.sav`.
+
+
+### Value labels
+
+Within SPSS, an (usually) integer scored variable can have value labels. An example is Likert scaled data with 1 representing a Strongly Disagree to 5 a Strongly Agree. The corresponding SPSS variable has integer values but displays the more informative value labels such as in bar charts. This type of categorical variable corresponds to a `factor` in the R system. 
+
+The `read_spss()` function preserves the value labels with a special variable type called `haven_labels`. These variables can be converted to an R factor for processing in the R system with the __haven__ function `as_factor()`. `Read()` performs this conversion automatically for each relevant variable.
+
+One problem is that the factor conversion preserves the value labels listed in the correct order, but looses the original integer scoring information. To preserve both the labels as a standard R factor, and to preserve the original scoring, `Read()` converts the original read variable with the labels (type `haven_labels`) into two variables. The first variable, an integer variable with the original integer scoring, has the name of the read variable. The corresponding factor variable has the same name as the read variable with the suffix `\_f`.
+
+For example, the use of `read_spss()` results the folling, showing just the first four lines of data. The variable _region_ contains both the integer scoring and the value label that are part of the SPSS data file that was read.
+
+```
+# A tibble: 4 x 4
+  city                         region growth income
+  <chr>                     <dbl+lbl>  <dbl>  <dbl>
+1 ALBANY-SCHNTADY-TROY,N.Y.    1 [NE]    -71   3313
+2 ATLANTA,GA.                  2 [SE]    264   3153
+3 BALTIMORE,MD.                1 [NE]     38   3540
+4 BIRMINGHAM,ALA.              2 [SE]   -178   2528
+```
+
+With `Read()`, obtain the following standard R data frame. The variable _region_ is now a standard R integer variable, and *region_f* is the corrsponding factor.
+
+```
+                       city region region_f growth income
+1 ALBANY-SCHNTADY-TROY,N.Y.      1       NE    -71   3313
+2               ATLANTA,GA.      2       SE    264   3153
+3             BALTIMORE,MD.      1       NE     38   3540
+4           BIRMINGHAM,ALA.      2       SE   -178   2528
+```
+
+With these data, the analyst may accomplish a numerical analysis with the integer variable, and for analsyses such as a bar chart, instead display the corresponding value labels.
+
+
+### Variable labels
+
+ __lessR__ automatically accesses variable labels stored in a data frame named _l_, and then displays with the variable name in text and visualization output. Usually the variable labels are stored in an Excel or `.csv` file with two columns, the variable name and the variable label. There are no column titles, just the names and labels. Then read into the _l_ data frame with the `var_labels` parameter set to `TRUE`.
+
+```
+l <- Read(file_reference, var_labels=TRUE)
+```
+
+`Read()` also processes the variable labels of these (usually) integer-scored variables with value labels in the SPSS data file. The overseers of the R system do not permit package authors to create stored data structures from internal R code. Only the user can create these structures. As such, `Read()` lists each variable name, a comma, and then the corresponding label. This example only has one such relevant variable, _region_ and its factor equivalent.
+
+```
+Variable and Variable Label  --> See vignette("Read"), SPSS section
+---------------------------
+region,  region of US 
+region_f,  region of US
+``` 
+
+To access these labels, copy the names and labels, paste into a text file, and then save as a file. Then read the file of names/labels into R with the preceding `Read()` statement.
 
 
 

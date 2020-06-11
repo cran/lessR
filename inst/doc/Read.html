@@ -315,6 +315,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </ul></li>
 <li><a href="#read-variable-labels">Read Variable Labels</a></li>
 <li><a href="#write-the-data-table-to-a-file">Write the Data Table to a File</a></li>
+<li><a href="#read-spss-files">Read SPSS Files</a><ul>
+<li><a href="#value-labels">Value labels</a></li>
+<li><a href="#variable-labels">Variable labels</a></li>
+</ul></li>
 <li><a href="#full-manual">Full Manual</a></li>
 </ul>
 </div>
@@ -459,7 +463,8 @@ Structure of a data table.
 <p>Write the current contents of default data frame <em>d</em> to GoodData.csv.</p>
 <pre><code>Write(&quot;GoodData&quot;)</code></pre>
 <p>Write the data as a Excel data table in an Excel file.</p>
-<pre><code>Write(&quot;GoodData&quot;, format=&quot;Excel&quot;)</code></pre>
+<pre><code>o
+Write(&quot;GoodData&quot;, format=&quot;Excel&quot;)</code></pre>
 <p>Can also use the abbreviation for an Excel file, <code>wrt_x()</code>.</p>
 <pre><code>wrt_x(&quot;GoodData&quot;)</code></pre>
 <p>Write the data as a R data table.</p>
@@ -467,6 +472,42 @@ Structure of a data table.
 <p>Can also use the abbreviation for an R file, <code>wrt_r()</code>.</p>
 <pre><code>wrt_r(&quot;GoodData&quot;)</code></pre>
 <p>The output of <code>Write()</code> indicates the full path name of the written file.</p>
+</div>
+<div id="read-spss-files" class="section level2">
+<h2>Read SPSS Files</h2>
+<p>The <strong>haven</strong> package has an excellent function for reading SPSS files, <code>read_spss()</code>. In particular, the SPSS variable labels and value labels are preserved. <code>Read()</code> invokes this function to read SPSS files, with the default filetype of <code>.sav</code>.</p>
+<div id="value-labels" class="section level3">
+<h3>Value labels</h3>
+<p>Within SPSS, an (usually) integer scored variable can have value labels. An example is Likert scaled data with 1 representing a Strongly Disagree to 5 a Strongly Agree. The corresponding SPSS variable has integer values but displays the more informative value labels such as in bar charts. This type of categorical variable corresponds to a <code>factor</code> in the R system.</p>
+<p>The <code>read_spss()</code> function preserves the value labels with a special variable type called <code>haven_labels</code>. These variables can be converted to an R factor for processing in the R system with the <strong>haven</strong> function <code>as_factor()</code>. <code>Read()</code> performs this conversion automatically for each relevant variable.</p>
+<p>One problem is that the factor conversion preserves the value labels listed in the correct order, but looses the original integer scoring information. To preserve both the labels as a standard R factor, and to preserve the original scoring, <code>Read()</code> converts the original read variable with the labels (type <code>haven_labels</code>) into two variables. The first variable, an integer variable with the original integer scoring, has the name of the read variable. The corresponding factor variable has the same name as the read variable with the suffix <code>\_f</code>.</p>
+<p>For example, the use of <code>read_spss()</code> results the folling, showing just the first four lines of data. The variable <em>region</em> contains both the integer scoring and the value label that are part of the SPSS data file that was read.</p>
+<pre><code># A tibble: 4 x 4
+  city                         region growth income
+  &lt;chr&gt;                     &lt;dbl+lbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+1 ALBANY-SCHNTADY-TROY,N.Y.    1 [NE]    -71   3313
+2 ATLANTA,GA.                  2 [SE]    264   3153
+3 BALTIMORE,MD.                1 [NE]     38   3540
+4 BIRMINGHAM,ALA.              2 [SE]   -178   2528</code></pre>
+<p>With <code>Read()</code>, obtain the following standard R data frame. The variable <em>region</em> is now a standard R integer variable, and <em>region_f</em> is the corrsponding factor.</p>
+<pre><code>                       city region region_f growth income
+1 ALBANY-SCHNTADY-TROY,N.Y.      1       NE    -71   3313
+2               ATLANTA,GA.      2       SE    264   3153
+3             BALTIMORE,MD.      1       NE     38   3540
+4           BIRMINGHAM,ALA.      2       SE   -178   2528</code></pre>
+<p>With these data, the analyst may accomplish a numerical analysis with the integer variable, and for analsyses such as a bar chart, instead display the corresponding value labels.</p>
+</div>
+<div id="variable-labels" class="section level3">
+<h3>Variable labels</h3>
+<p><strong>lessR</strong> automatically accesses variable labels stored in a data frame named <em>l</em>, and then displays with the variable name in text and visualization output. Usually the variable labels are stored in an Excel or <code>.csv</code> file with two columns, the variable name and the variable label. There are no column titles, just the names and labels. Then read into the <em>l</em> data frame with the <code>var_labels</code> parameter set to <code>TRUE</code>.</p>
+<pre><code>l &lt;- Read(file_reference, var_labels=TRUE)</code></pre>
+<p><code>Read()</code> also processes the variable labels of these (usually) integer-scored variables with value labels in the SPSS data file. The overseers of the R system do not permit package authors to create stored data structures from internal R code. Only the user can create these structures. As such, <code>Read()</code> lists each variable name, a comma, and then the corresponding label. This example only has one such relevant variable, <em>region</em> and its factor equivalent.</p>
+<pre><code>Variable and Variable Label  --&gt; See vignette(&quot;Read&quot;), SPSS section
+---------------------------
+region,  region of US 
+region_f,  region of US</code></pre>
+<p>To access these labels, copy the names and labels, paste into a text file, and then save as a file. Then read the file of names/labels into R with the preceding <code>Read()</code> statement.</p>
+</div>
 </div>
 <div id="full-manual" class="section level2">
 <h2>Full Manual</h2>

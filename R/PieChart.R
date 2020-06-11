@@ -27,20 +27,6 @@ function(x, y=NULL, data=d, rows=NULL,
 
 
   # a dot in a parameter name to an underscore
-# dots <- list(...)
-# if (!is.null(dots)) if (length(dots) > 0) {
-#   change <- c("hole.fill", "init.angle", "values.color", "values.size",
-#               "values.digits", "values.position", "eval.df")
-#   for (i in 1:length(dots)) {
-#     if (names(dots)[i] %in% change) {
-#       nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-#       assign(nm, dots[[i]])
-#       get(nm)
-#     }
-#   }
-# }
-
-  # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {

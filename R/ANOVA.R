@@ -9,10 +9,8 @@ function(my_formula, data=d, rows=NULL,
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("my.formula", "digits.d", "rb.points",
-                "res.rows", "res.sort", "fun.call")
     for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
+      if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
         get(nm)

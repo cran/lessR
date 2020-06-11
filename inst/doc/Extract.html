@@ -560,19 +560,19 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>The function <code>.()</code> also provides for random selection of rows. To randomly select the specified number of rows from the data frame to subset, specify the <code>random()</code> function for the logical criterion of the <code>rows</code>. The value passed to <code>random()</code> can either be the actual number of rows to select, or the proportion of rows to select.</p>
 <p>Here randomly select five rows of data from the <em>d</em> data frame.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>d[.(<span class="kw">random</span>(<span class="dv">5</span>)), .(Years<span class="op">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                   Years Gender Dept    Salary
-## Langston, Matthew     5      M SALE  49188.96
-## Campagna, Justin      8      M SALE  72321.36
-## Capelle, Adam        24      M ADMN 108138.43
-## Adib, Hassan         14      M SALE  83014.43
-## Sheppard, Cory       14      M FINC  95027.55</code></pre>
+<pre><code>##                  Years Gender Dept    Salary
+## Stanley, Grayson     9      M SALE  69624.87
+## Fulton, Scott       13      M SALE  87785.51
+## Hoang, Binh         15      M SALE 111074.86
+## Anderson, David      9      M ACCT  69547.60
+## Ritchie, Darnell     7      M ADMN  53788.26</code></pre>
 <p>Here specify a proportion of rows to select.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>d[.(<span class="kw">random</span>(<span class="fl">0.1</span>)), .(Years<span class="op">:</span>Salary)]</span></code></pre></div>
 <pre><code>##                  Years Gender Dept   Salary
-## Hamide, Bita         1      F MKTG 51036.85
-## Stanley, Grayson     9      M SALE 69624.87
-## Ritchie, Darnell     7      M ADMN 53788.26
-## Skrotzki, Sara      18      F MKTG 91352.33</code></pre>
+## Osterman, Pascal     5      M ACCT 49704.79
+## Jones, Alissa        5      F &lt;NA&gt; 53772.58
+## Sheppard, Cory      14      M FINC 95027.55
+## LaRoe, Maria        10      F MKTG 61961.29</code></pre>
 </div>
 
 

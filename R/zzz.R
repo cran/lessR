@@ -7,13 +7,13 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.9.5  feedback: gerbing@pdx.edu    web: lessRstats.com/new\n",
+      "lessR 3.9.6  feedback: gerbing@pdx.edu    web: lessRstats.com/new\n",
       "-----------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS or R data file\n",
       "  d is default data frame, no need for data= in analysis routines\n",
       "\n",
       "> vignette(\"topic\") for help on the following topics\n",
-      "   \"Data\": read data and variable labels, write data to a file\n",
+      "   \"Read\": read data and variable labels, write data to a file\n",
       "   \"BarChart\", \"Histogram\", \"Plot\": visualizations\n",
       "   \"Means\": analyze means with t-tests and ANOVA\n", 
       "   \"Regression\": least-squares, logistic regression\n", 
@@ -297,6 +297,7 @@ function(...) {
 
 
 .is.integer <- function(x, tol= .Machine$double.eps^0.5) {
+  #if (is.integer(type.convert(as.character(d[1:rows,i]))))
 
   if (is.numeric(x)) {
     x <- na.omit(x)

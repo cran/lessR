@@ -45,7 +45,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          offset=getOption("offset"),
 
          xy_ticks=TRUE, value_labels=NULL, label_max=20, origin_x=NULL,
-         scale_x=NULL, scale_y=NULL, pad_x=0, pad_y=0,
+         scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
          legend_title=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
@@ -58,28 +58,17 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("stat.x", "stat.y", "n.cat", "n.row", "n.col", "size.cut",
-                "sort.yx", "segments.x", "segments.y", "jitter.x", "jitter.y",
-                "MD.cut", "out.cut", "out.shape", "out.size",
-                "vbs.plot", "vbs.size", "bw.iter", "violin.fill", "box.fill",
-                "vbs.pt.fill", "vbs.mean", "box.adj", "low.fill", "hi.fill",
-                "smooth.points", "smooth.size", "smooth.exp", "smooth.bins",
-                "fit.se", "bin.start", "bin.width", "bin.end",
-                "center.line", "show.runs", "lab.adj", "margin.adj",
-                "rotate.x", "rotate.y", "xy.ticks", "value.labels", 
-                "label.max", "origin.x", "legend.title",
-                "scale.x", "scale.y",  "eval.df", "digits.d", "fun.call",
-                "do.plot", "pdf.file")
     for (i in 1:length(dots)) {
       if (names(dots)[i] == "stat_x") stat <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
-      if (names(dots)[i] %in% change) {
+      if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
         get(nm)
       }
     }
   }
+
   if (!is.null(x1)) if ("mean.x" %in% x1) x1 <- "mean_x"
   if (!is.null(y1)) if ("mean.y" %in% y1) y1 <- "mean_y"
   if (!is.null(add)) if ("h.line" %in% add[1])  add[1] <- "h_line"
@@ -101,6 +90,19 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   proportion <- FALSE  # old signal, adjusted below if needed
   if (stat == "proportion") proportion <- TRUE
+
+  if (length(pad_x) == 1) {  # only the first element of pad_x specified
+    temp <- pad_x
+    pad_x <- double(length=2)
+    pad_x[1] <- temp  
+    pad_x[2] <- temp
+  }
+  if (length(pad_y) == 1) {
+    temp <- pad_y
+    pad_y <- double(length=2)
+    pad_y[1] <- temp
+    pad_y[2] <- temp
+  }
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
   if (is.null(eval_df))  # default values

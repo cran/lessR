@@ -110,7 +110,7 @@ Specify the file as with the \code{\link{Read}} function for reading the data in
 Given a csv data file, or tab-delimited text file, read the data into an R data frame called \code{d} with \code{\link{Read}}. Because \code{\link{Read}} calls the standard R function \code{read.csv}, which serves as a wrapper for \code{read.table}, the usual options that work with \code{read.table}, such as \code{row.names}, also can be passed through the call to \code{Read}. 
 
 SPSS DATA\cr
-Relies upon \code{\link{read.spss}} from the \code{foreign} package. To read data in the SPSS \code{.sav} format.  If the file has a file type of \code{.sav}, that is, the file specification ends in \code{.sav}, then the \code{format} is automatically set to \code{"SPSS"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="SPSS"}. Any variable labels in the SPSS file are read and stored in the resulting \code{R} data table (frame). However, SPSS allows value labels for integer variables, so to preserve the variable labels in R the resulting variable is typed as a factor. To preserve the integer type, invoke the \code{\link{read.spss}} option \code{use.value_labels=FALSE}.
+Relies upon \code{read_spss} from the \code{haven} package to read data in the SPSS \code{.sav} or \code{.zsav} format.  If the file has a file type of \code{.sav}, that is, the file specification ends in \code{.sav}, then the \code{format} is automatically set to \code{"SPSS"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="SPSS"}. Each (usually) integer variable with value labels is converted into two R variables: the original numeric code with the original variable name, and also the corresponding factor with the variable labels named with the original name plus the suffix \code{_f}. The variable labels are also displayed for copying into a variable label file. See the SPSS section from \code{vignette("Read")}. 
 
 R DATA\cr
 Relies upon the standard R function \code{load}. By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{d}, with the \code{lessR} function \code{\link{Write}}.
@@ -146,14 +146,14 @@ The read data frame is returned, usually assigned the name of \code{d} as in the
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \references{
-Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 2, NY: Routledge.
+Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 1, NY: CRC Press.
 
 Alexander Walker (2018). openxlsx: Read, Write and Edit XLSX Files. R package version 4.1.0. https://CRAN.R-project.org/package=openxlsx
 }
 
 
 \seealso{
-\code{\link{read.csv}}, \code{\link{read.spss}}, \code{\link{read.xlsx}},  
+\code{\link{read.csv}}, \code{\link{read.xlsx}},  
 \code{\link{read.fwf}}, \code{\link{corRead}}, \code{\link{label}},
  \code{\link{details}}, \code{\link{VariableLabels}}.
 }

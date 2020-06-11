@@ -8,13 +8,13 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
           main=NULL, bottom=3, right=3,
           pdf_file=NULL, width=5, height=5, ...) {
 
+
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("n.clusters", "chain.first", "heat.map",
-                "diagonal.new", "pdf.file")
     for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
+      if (names(dots)[i] == "values.cex")  values_size <- dots[[i]]
+      if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
         get(nm)
