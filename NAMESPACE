@@ -75,7 +75,7 @@ export (
   prob.norm, prob.znorm, prob.tcut,
   Read, rd, rd_lbl, Read2,
   Regression, reg, reg.brief, reg_brief, regPlot, 
-  Recode, rec,
+  Recode, rec, Rescale,
   set, showColors, showPalettes,
   simCImean, simCLT, simFlips, simMeans,
   ScatterPlot, sp, 

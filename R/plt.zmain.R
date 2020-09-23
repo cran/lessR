@@ -14,8 +14,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          value_labels=NULL, label_max=20,
          rotate_x=0, rotate_y=0, offset=0.5, prop=FALSE, origin_x=NULL,
 
-         size=NULL, shape="circle", means=TRUE,
-         segments_y=FALSE, segments_x=FALSE, ln.width=2,
+         size=NULL, ln.width=2, shape=21, means=TRUE,
+         segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
          smooth=FALSE, smooth_points=100, smooth_size=1,
          smooth_exp=0.25, smooth_bins=128,
@@ -41,7 +41,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          xlab_adj=0, ylab_adj=0, bm.adj=0, lm.adj=0,
          tm.adj=0, rm.adj=0,
          scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
-         legend_title=NULL, 
+         legend_title=NULL,
 
          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
          add_cex=NULL, add_lwd=1, add_lty="solid",
@@ -52,7 +52,16 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   fill_bg <- getOption("panel_fill")
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
+  if (is.null(size)) size <- 1
   size.pt <- size * .9  # size is set in Plot.R, reduce a bit for here
+
+  # by.bub means that size is a variable to be plotted in by levels
+  if(length(size) > 1  &&  !is.null(by)) {
+    by.bub <- TRUE
+    object <- "point"  # change from bubble to plot to get to by code
+  }
+  else
+    by.bub <- FALSE
 
   # x and y come across here in their natural state, within each data frame
   # a time series has dates for x and numeric for y, factors are factors, etc
@@ -105,7 +114,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     x.val <- x[,1]
     x <- as.matrix(x.val, ncol=1)
   }
-
 
   if (n_col > 1) center_line <- "off"   # no center_line for multiple plots
 
@@ -227,7 +235,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     max.y.width <- max(strwidth(mx.num, cex=axis_y_cex, units="inches"))
   }
 
-
   # set title for bubble plot if proportions
   if (object == "bubble"  &&  prop  &&  is.null(main)  &&  cat.y) {
     main.lab <- paste("Percentage of", y.name, "\nwithin each level of", x.name)
@@ -236,7 +243,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
 # if (!date.ts) if (is.null(x.lab)) if (n.xcol > 1) x.lab <- NULL
   if (!is.null(x.lab)) if (n.xcol > 1  &&  substr(x.lab, 1, 2) == "c(")
-      x.lab <- NULL   # e.g., get rid of x.lab == "c(Female,Male)" 
+      x.lab <- NULL   # e.g., get rid of x.lab == "c(Female,Male)"
 
   if (length(size) > 1) {  # size is a variable
     sz.nm <- getOption("sizename")
@@ -318,16 +325,15 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
      mx.y <- max(mx.y, scale_y[2])
   }
 
-
   if (!do.ellipse) {
 
     if (cat.x) {
-      mn.x <- mn.x - .4
-      mx.x <- mx.x + .4
+      mn.x <- mn.x - .2  # .4 values for 3.9.6 and before
+      mx.x <- mx.x + .2
     }
     if (cat.y) {
-      mn.y <- mn.y - .4
-      mx.y <- mx.y + .4
+      mn.y <- mn.y - .2
+      mx.y <- mx.y + .2
     }
 
     if (is.null(origin_x)) {  # set default for minimum x-value displayed
@@ -364,23 +370,25 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
 
   # add padding to x and y axes
-  add.lab <- FALSE
+  add.pad_lab <- FALSE
   if (all(pad_x == 0)) {  # pad extra for labels in 2-D plot
     if (!is.null(add)) {
-      add.lab <- ifelse ("labels" %in% add, TRUE, FALSE) 
+      add.pad_lab <- ifelse ("labels" %in% add, TRUE, FALSE)
     }
-    if (add.lab  ||  length(out_ind) > 0 ) {
-      pad_x <- 0.06
-      pad_y <- 0.02
-    }  
+    if (add.pad_lab || (length(out_ind) > 0)) {
+      if (all(pad_x == 0)) pad_x <- c(0.05, 0.05)
+      if (all(pad_y == 0)) pad_y <- c(0.03, 0.03)
+    }
   }
+
   xp <- pretty(c(mn.x, mx.x))
   yp <- pretty(c(mn.y, mx.y))
-  ln.xp <- length(xp)
-  xP <- pad_x[2] * (xp[ln.xp] - xp[1])
-  xN <- pad_x[1] * (xp[ln.xp] - xp[1])
-  yP <- pad_y[2] * (yp[ln.xp] - yp[1])
-  yN <- pad_y[1] * (yp[ln.xp] - yp[1])
+  xP <- pad_x[2] * (xp[length(xp)] - xp[1])
+  yp <- pretty(c(mn.y, mx.y))
+  xN <- pad_x[1] * (xp[length(xp)] - xp[1])
+  yP <- pad_y[2] * (yp[length(yp)] - yp[1])
+  yN <- pad_y[1] * (yp[length(yp)] - yp[1])
+
   region <- rbind(region, c(mn.x-xN, mn.y-yN), c(mx.x+xP, mx.y+yP))
 
   # plot: setup the coordinate system
@@ -418,7 +426,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       }
     }
     else
-      axT1 <-axTicks(1)  
+      axT1 <-axTicks(1)
   }
 
   if (cat.y) {
@@ -513,7 +521,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   if (!is.null(col_fill)) {
     if (length(col_fill) == 1) col_fill <- .color_range(col_fill, n.clrs)
   }
-  else 
+  else
     col_fill <- getOption("pt_fill")  # default
 
   color_miss <- ifelse (is.null(col_color), TRUE, FALSE)
@@ -528,8 +536,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       col_color <- getOption("pt_color")  # default
   }
 
-  if (object %in% c("point", "both")) {
-
+  # -----------------------------------
+  # -----------------------------------
     color <- character(length=length(n.clrs))
     fill <- character(length=length(n.clrs))
     ltype <- character(length=n.clrs)
@@ -559,7 +567,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 #         color[2] <- rgb(.15,.15,.15)
 #       }
 #     }  # end object is both
-#     else { 
+#     else {
 #       if (length(col_fill) == 1)
 #         fill[2] <- "transparent"
 #       else
@@ -567,7 +575,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 #     }
 #   }  # end n.clrs=2
 
-    else { # n.clrs > 1 
+    else { # n.clrs > 1
       if (length(col_fill) > 1) {
         fill <- col_fill  # use given color vector
       }
@@ -588,11 +596,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         fill <- .color_range(.get_fill(), n.clrs)  # see if range
       }
     } # end n.clrs > 1
-    
+
     #  kludge needed for Plot(c(x1,x2), y)
     if (length(col_color) < length(fill) &&  # more fill than color colors
         col_color == getOption("pt_color"))  # default
-      color <- fill 
+      color <- fill
     else {
       color <- col_color  # color different than fill
     }
@@ -612,26 +620,28 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
     trans_pts <- ifelse(is.null(col.trans),
                         getOption("trans_pt_fill"), col.trans)  # default
-
     # see if trans is customized for this analysis
     if (is.null(col.trans))  # no change, so no trans for Cleveland dp
-      trans_pts <- ifelse (cleveland, 0, getOption("trans_pt_fill")) 
+      trans_pts <- ifelse (cleveland, 0, getOption("trans_pt_fill"))
     else
       trans_pts <- col.trans
     if (trans_pts > 0  &&  fill[1] != "transparent")
       fill <- .maketrans(fill, (1-trans_pts)*256)
+    col_fill <- fill  # likely do not need both
 
     # if (object != "point"  ||  size == 0) fill <- color  # no fill in legend
     fill[which(fill == "off")] <- "transparent"
     color[which(color == "off")] <- "transparent"
 
-     if (area_fill == "on") area_fill <- getOption("violin_fill")
-     if (object == "both") if (area_fill == "transparent") area_fill <- fill
-     if (ln.width == 0) area_fill <- "transparent"
+    if (area_fill == "on") area_fill <- getOption("violin_fill")
+    if (object == "both") if (area_fill == "transparent") area_fill <- fill
+    if (ln.width == 0) area_fill <- "transparent"
 
 
     # ----------
     # plot lines (and area_fill)
+  if (object %in% c("point", "both")) {
+
     if (object == "both") {
 
       if (n.xcol == 1  &&  n.ycol == 1) {
@@ -858,7 +868,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                      cex=size.pt*2)
             }
           }  # means
-        }  # end not smooth
+        }  # end not smooth, plot points with no by
 
 
       }  # end is null by
@@ -872,13 +882,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           for (i in 1:n.by) clr[i] <- color  # all levels get same color
         else
           clr <- color
-
         shp <- integer(length(n.by))
         if (length(shape) == 1)
           for (i in 1:n.by) shp[i] <- shape
         else
           shp <- shape
-
         shape.dft <- c(21,23,22,24,25,7:14)  # shape defaults
         if (length(color)==1 && length(fill) == 1 && length(shape)==1)
           for (i in 1:n.by) shp[i] <- shape.dft[i]  #  default shapes
@@ -886,8 +894,22 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         for (i in 1:n.by) {
           x.lv <- subset(x, by==levels(by)[i])
           y.lv <- subset(y, by==levels(by)[i])
-          points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i], cex=size.pt,
-                 lwd=0.75, ...)
+          if (!by.bub) { 
+            points(x.lv, y.lv[,1], pch=shp[i], col=fill[i], bg=fill[i],
+                   cex=size.pt, lwd=0.75, ...)
+          }
+          else {  # size is a variable
+            if (is.null(radius)) radius <- .11
+            size.lv <- subset(size, by==levels(by)[i])
+            .plt.bubble(x.lv, y.lv, size.lv, radius, power, fill[i], fill[i],
+                        size_cut, prop, bubble_text, object)
+          }      
+          if (segments) {  # designed for interaction plot of means
+            for (j in 1:(nrow(x.lv)-1))
+              segments(x0=x.lv[j,1], y0=y.lv[j,1],
+                       x1=x.lv[j+1,1], y1=y.lv[j+1,1],
+                       lty=1, lwd=.75, col=fill[i])
+          }
         }
         if (fill[1] == "transparent") fill <- color
         if (stack) {
@@ -916,6 +938,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
 
   else if (object %in% c("bubble", "sunflower")) {
+
+    if (!is.null(by)) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Parameter  by  not valid for bubble plot\n\n")
+    }
 
     n.clrs <- 1  # for fit.line
 
@@ -952,115 +979,27 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       k <- 0
       for (i in 1:nrow(mytbl)) {
         for (j in 1:ncol(mytbl)) {
-          if (mytbl[i,j] != 0) {  # 0 plots to a single pixel, so remove
+#         if (mytbl[i,j] != 0) {  # 0 plots to a single pixel, so remove
             k <- k + 1
             count[k] <- mytbl[i,j]
+            if (count[k] == 0) count[k] <- NA  # 0 count not plotted
             xx[k] <- as.numeric(rownames(mytbl)[i])  # row names are factors
             yy[k] <- as.numeric(colnames(mytbl)[j])
           }
-        }
+#       }
       }
       if (prop) count <- round(count, 2)
-      cords <- data.frame(xx, yy, count, stringsAsFactors=TRUE)
-
-
       if (is.null(radius)) radius <- .22
+      .plt.bubble(xx, yy, count, radius, power, clr, clr_color,
+                  size_cut, prop, bubble_text, object)
 
-  # scale for regular R or RStudio
-  adj <- .RSadj(radius=radius)  # reg R multiply by 1.6
-  radius <- adj$radius
-
-  # can use xyTable instead, though does not have coordinates for count=0
-  #cnt <- xyTable(x,y)
-  #symbols(cnt$x, cnt$y, circles=sz, inches=radius,
-          #bg=clr, fg=clr_color, add=TRUE, ...)
-
-      if (object == "bubble") {
-        sz <- cords[,3]**power  # radius unscaled
-        symbols(cords$xx, cords$yy, circles=sz, inches=radius,
-            bg=clr, fg=clr_color, add=TRUE, ...)
-        mxru <- max(sz)
-        sz <- 2 * (sz/mxru) * radius  # scaled diameter (symbols does)
-      }
-
-      else if (object == "sunflower") {
-        sunflowerplot(cords$xx, cords$yy, number=cords$count,
-            seg.col=col_color, col=col_fill,
-            col.axis=getOption("axis_x_color"),
-            xlab=x.lab, ylab=y.lab, add=TRUE)
-      }
     }  # end length(size) == 1
 
     else {  # size is a variable (unless size is constant and bubble specified)
-
-      if (is.null(radius)) radius <- .1
-
-      # scale for regular R or RStudio
-      adj <- .RSadj(radius=radius)  # reg R multiply by 1.6
-      radius <- adj$radius
-
-      cords <- data.frame(x, y, size, stringsAsFactors=TRUE)
-
-      cords <- na.omit(cords)
-      sz <- cords[,3]**power  # radius unscaled
-      symbols(cords[,1], cords[,2], circles=sz,
-        inches=radius, bg=clr, fg=clr_color, add=TRUE, ...)
-      mxru <- max(sz)
-      sz <- 2 * (sz/mxru) * radius  # scaled diameter
+      if (is.null(radius)) radius <- .12
+      .plt.bubble(x, y, size, radius, power, clr, clr_color,
+                  size_cut, prop, bubble_text, object)
     }
-
-
-    if (size_cut  &&  object == "bubble") {
-
-      # get q.ind before setting too small bubbles for text at NA
-      if (size_cut > 1) {
-        by.prob <- 1 / (size_cut - 1)
-        bub.probs <- seq(0, 1, by.prob)
-        qnt <- quantile(cords[,3], probs=bub.probs, type=3, na.rm=TRUE)
-        qnt.TF <- logical(length(cords))
-        for (i in 1:nrow(cords))
-            qnt.TF[i] <- ifelse(cords[i,3] %in% qnt, TRUE, FALSE)
-        q.ind <- which(qnt.TF)
-      }
-      else
-        q.ind <- 1:nrow(cords)  # all bubbles get text
-
-      # should get size of each amount just for those displayed (q.ind)
-      sz.cex <- numeric(length=nrow(cords))
-      for (i in 1:nrow(cords)) {
-        sz.cex[i] <- getOption("axis_cex")  # cex target for text size
-       # target for text size
-        sz.txt <- strwidth(cords[i,3], units="inches", cex=sz.cex[i])
-        while ((sz.txt - sz[i]) > -.03) {
-          if (sz.cex[i] > 0.5) {  # need cex larger than 0.5
-            sz.cex[i] <- sz.cex[i] - 0.05
-            # actual
-            sz.txt <- strwidth(cords[i,3], units="inches", cex=sz.cex[i])
-          }
-          else {
-            cords[i,3] <- NA
-            break;
-          }
-        }
-        if (options("device") != "RStudioGD")
-          sz.cex[i] <- sz.cex[i] * 1.3
-      }
-
-      # write bubble text
-      if (!prop) {
-        if (bubble_text != "transparent")
-          text(cords[q.ind,1], cords[q.ind,2], cords[q.ind,3],
-            cex=sz.cex[q.ind], col=bubble_text)
-      }
-      else {
-        crd <- .fmt0(cords[,3],2)
-        for (j in 1:length(crd))
-          if (grepl("NA", crd[j], fixed=TRUE)) crd[j] <- " "
-        if (bubble_text != "transparent")
-          text(cords[,1], cords[,2], crd, cex=sz.cex, col=bubble_text)
-      }
-    }  # end amount
-
   }  # end bubble/sunflower
 
 
@@ -1205,7 +1144,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }  # fit.line
 
 
-  # annotations 
+  # annotations
 
   if (!is.null(add)) if (add[1] == "means") {
     add[1] <- "v_line"
@@ -1233,7 +1172,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         text(x, y, labels=ID, pos=1, offset=0.4,
            pch=shape, col=getOption("add_color"), cex=getOption("add_cex"))
       else
-        .plt.add (add, x1, x2, y1, y2,
+        .plt.add(add, x1, x2, y1, y2,
              add_cex, add_lwd, add_lty, add_color, add_fill, add_trans)
   }
 

@@ -11,14 +11,14 @@ Plots the successive eigenvalues of an input correlation matrix. Also plots the 
 }
 
 \usage{
-corScree(x=mycor, 
+corScree(R=mycor, 
           main=NULL, pdf=FALSE, width=5, height=5, \ldots)
 
 scree(\ldots)
 }
 
 \arguments{
-  \item{x}{Correlation matrix.}
+  \item{R}{Correlation matrix.}
   \item{main}{Graph title, which is blank by default.}
   \item{pdf}{Indicator as to if the graphic files should be saved as pdf files
        instead of directed to the standard graphics windows.}

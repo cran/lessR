@@ -1,20 +1,24 @@
 corScree <- 
-function (x=mycor, 
+function (R=mycor, 
           main=NULL, pdf=FALSE, width=5, height=5, ...) {
 
-
-  # cor matrix:  mycor as class out_all, mycor$cors, or stand-alone matrix
-  cor.nm <- deparse(substitute(x))
-  .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
-  if ("out_all" %in% class(x))  # R 4.0 results in two values: matrix, array
-    x <- eval(parse(text=paste(cor.nm, "$cors", sep="")))  # go to $cors 
-
+  if (!("matrix" %in% class(R))) { # R is a matrix, can be called indirectly
+    # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
+    cor.nm <- deparse(substitute(R))
+    .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
+    if ("out_all" %in% class(R))    # R 4.0 results in two values: matrix, array
+      R <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R
+  }
+  else
+    cor.nm <- "Correlation Matrix"
   
   # extract eigenvectors
-  eig <- eigen(x, symmetric=TRUE, only.values=TRUE)
+  eig <- eigen(R, symmetric=TRUE, only.values=TRUE)
   ev <- eig$values
 
-  # see if graphics are to be managed
+  # manage graphics
+  # ---------------
+  # see if graphics are to be managed (not needed for RStudio)
   manage.gr <- .graphman()
 
   # if manage, set up graphics system for 2 windows default
@@ -41,6 +45,7 @@ function (x=mycor,
 
   plot.i <- plot.i + 1
   plot.title[plot.i] <- "Eigenvalues"
+  # ---------------
 
   # scree plot
   .lc.main(ev, type=NULL, 
@@ -58,6 +63,8 @@ function (x=mycor,
          time_start=NULL, time_by=NULL, time_reverse=FALSE,
          center_line="off", quiet=TRUE, ...)
 
+  # manage graphics
+  # ---------------
   if (pdf) {
     dev.off()
     .showfile(pdf_file, "scree chart")
@@ -73,11 +80,12 @@ function (x=mycor,
     pdf(file=pdf_file, width=width, height=height)
   }
 
-  # differences scree plot
-  ev.diff <- -diff(ev)
-
   plot.i <- plot.i + 1
   plot.title[plot.i] <- "Differences of Successive Eigenvalues"
+  # ---------------
+
+  # differences scree plot
+  ev.diff <- -diff(ev)
 
   .lc.main(ev.diff, type=NULL, 
          col.line=col.ln,
@@ -99,11 +107,14 @@ function (x=mycor,
    for (i in 1:n.dregs) dregs[i] <- ev.diff[length(ev.diff)-(i-1)] 
    abline(h=mean(dregs), col="gray50", lwd=2)
 
+  # manage graphics
+  # ---------------
   if (pdf) {
     dev.off()
     .showfile(pdf_file, "scree difference chart")
     cat("\n\n")
   }
+  # ---------------
 
   cat("\n")
   cat("Eigenvalues of", cor.nm, "\n")

@@ -4,9 +4,9 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
                           "average", "mcquitty", "median", "centroid"),
           dist_type=c("R", "dist"),
           n_clusters=NULL, vars=NULL, chain_first=0,
-          heat_map=TRUE, diagonal_new=TRUE,
-          main=NULL, bottom=3, right=3,
-          pdf_file=NULL, width=5, height=5, ...) {
+          heat_map=TRUE, dendrogram=TRUE, diagonal_new=TRUE,
+          main=NULL, bottom=NULL, right=NULL,
+          pdf=FALSE, width=5, height=5, ...) {
 
 
   # a dot in a parameter name to an underscore
@@ -26,17 +26,46 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
   hclust_type <- match.arg(hclust_type)
   dist_type <- match.arg(dist_type)
 
-  # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
-  cor.nm <- deparse(substitute(R))
-  .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
-  if ("out_all" %in% class(R))    # R 4.0 results in two values: matrix, array
-    R <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
+
+  if (!("matrix" %in% class(R))) { # R is a matrix, can be called indirectly
+    # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
+    cor.nm <- deparse(substitute(R))
+    .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
+    if ("out_all" %in% class(R))    # R 4.0 results in two values: matrix, array
+      R <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R
+  }
+
+ 
+  # manage graphics
+  # ---------------
+  # see if graphics are to be managed (not needed for RStudio)
+  manage.gr <- .graphman()
+
+  # if manage, set up graphics system for 2 windows default
+  if (!pdf) {
+    if (manage.gr) {
+      n.graphs <- ifelse (order == "hclust", 2, 1)  # for hclust, plot tree
+      .graphwin(n.graphs)
+      dev.set(which=3)
+    }
+  }
+  else { 
+    pdf_file <- ifelse (order == "hclust", "Dendrogram.pdf", "Reordered.pdf")
+    pdf(file=pdf_file, width=width, height=height)
+  }
+
+  # keep track of generated graphics
+  plot.i <- 0
+  plot.title  <- character(length=0)
+  # ---------------
+
 
   NVOld <- nrow(R)
   nvc <- as.integer(NVOld)
   Label <- integer(length=NVOld)
 
   if (!missing(vars)) order <- "manual"
+
 
   # -----
   # ORDER
@@ -55,13 +84,13 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
     else if (dist_type == "dist")
       dst <- as.dist(R)
     ord <- hclust(dst, method=hclust_type)
-    Label <- ord$order
+    Label <- ord$order  # indices of new order, ord$labels gives labels
 
     if (!is.null(n_clusters)) {
-     clt <- sort(cutree(ord, k=n_clusters)) 
+     clt <- sort(cutree(ord, k=n_clusters))
      ttl <- paste(as.character(n_clusters), " Cluster Solution", sep="")
      cat("\n", ttl, "\n")
-     .dash(nchar(ttl) + 1)  
+     .dash(nchar(ttl) + 1)
      print(clt)
     }
   }
@@ -144,24 +173,59 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
       }
       R[nv,nv] <- R[nv,nv-1]
     }  # end > 2
-    
+
   }
 
-  if (heat_map)
-     .corcolors(R, nrow(R), main, bottom, right, diag=NULL,
-                pdf_file, width, height)
+
+  # graphics
+  if (order == "hclust") {
+    if (dendrogram) {
+      if (pdf) {
+        .showfile(pdf_file, "Cluster Dendrogram")
+        pdf("Dendrogram.pdf", width=width, height=height)
+        plot(ord, main="")
+        dev.off()
+      }
+      else {
+        plot.i <- plot.i + 1
+        plot.title[plot.i] <- "Cluster Dendrogram"
+        plot(ord, main="")
+      }
+    }
+  }
+
+  if (heat_map) {
+    if (!pdf) {
+      if (manage.gr) {
+        dev.set(which=4) 
+      }
+    }
+    else { 
+      pdf(file="Reordered.pdf", width=width, height=height)
+    }
+
+    plot.i <- plot.i + 1
+    plot.title[plot.i] <- "Reordered Matrix" 
+    if (pdf)
+      pdf_file <- "Reordered Matrix"
+    else
+      pdf_file <- NULL
+    .corcolors(R, nrow(R), main, bottom, right, diag=NULL,
+               pdf_file, width, height)
+  }  # end heat map
+
+  if (is.null(options()$knitr.in.progress))
+    .plotList(plot.i, plot.title)
+
 
   # restore diagonal if changed
   if (diagonal_new)
     for (i in 1:nv) R[i,i] <- Rdiag[i]
-    
+
 
   # finish
   cat("\n")
   invisible(R)
+
 }
-
-
-
-
 

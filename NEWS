@@ -3,11 +3,65 @@
 Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
-------------------------------------------------------------------------
+ 
+>>>>>> Changes for lessR version 3.9.7 (2020-09-23) <<<<<<
+
+-------------
+Updates 3.9.7
+-------------
+
+ANOVA
+  lessR Plot now does the cell mean (interaction) plot
+
+corEFA, corProp, corReflect, corReorder, corScree
+  can pass the correlation matrix from a user-supplied function
+
+corEFA, corProp, corReflect, corReorder
+  heat matrix now has computed default spacing for margins, can
+    set manually with bottom and right parameters
+
+corEFA, corScree
+  correlation matrix parameter name changed from x to R
+
+corReorder
+  for a hierarchical cluster analysis, also display the dendrogram
+
+Plot
+  new segments parameter specifies to connect each pair of successive
+    points with a line segment, intended for interaction plots of means
+    in conjunction with the by parameter and a discrete x variable
+  for categorical x-variable, space between first and last categories
+    and the horizontal plot boundaries reduced
+  add parameter can now annotate with points of specified size, color
+  size=x, where x is a variable, now plots x=0 values as a small point
+
+Regression
+  if a non-numeric response variable, error message generated
+  minmax and robust scaling added to standardization option
+  standardization parameter changed to rescale, with "z" as a value
+  rescaling properly applied to k-fold validation, separately for
+    training and testing data to avoid data leakage
+  seed parameter added for reproducing the same folds with kfold>0
+
+Rescale
+  new function to rescale a variable: z-score, from 0 to 1, robust
+
+style
+  note parameter added to turn off, similar to suggest parameter
+
+
+---------------
+Bug Fixes 3.9.7
+---------------
+
+Plot
+  pad_y now works correctly
+  by with size a third variable for a bubble plot now works
+  for plot of two categorical variables, 0 does not plot
 
  
  
->>>>>> Changes for lessR version 3.9.5 (2020-06-09) <<<<<<
+>>>>>> Changes for lessR version 3.9.6 (2020-06-09) <<<<<<
 
 -------------
 Updates 3.9.6

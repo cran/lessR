@@ -1,0 +1,143 @@
+---
+title: "Factor Analysis"
+author: "David Gerbing"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{factor analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r}
+library("lessR")
+```
+
+## Data
+
+
+Access the lessR data set called `datMach4` for the analysis of 351 people to the Mach IV scale. Read the optional variable labels. Including the item contents as variable labels means that the output of the confirmatory factor analysis contains the item content grouped by factor.
+
+```{r}
+d <- Read("Mach4", quiet=TRUE)
+l <- Read("Mach4_lbl", var_labels=TRUE)
+```
+
+Calculate the correlations and store in here in *mycor*, a data structure that contains the computed correlation matrix with the name R. Extract R from *mycor*.
+
+```{r fig.width=4.5, fig.height=4.5}
+mycor <- cr(m01:m20)
+R <- mycor$R
+```
+
+The correlation matrix for analysis is named R. The item (observed variable) correlation matrix is the numerical input into the confirmatory factor analysis.
+
+
+## Exploratory Factor Analysis
+Here do the default two-factor solution with `"promax"` rotation. The default correlation matrix is *mycor*. The abbreviation for `corEFA()` is `efa()`.
+
+``` {r}
+efa(R, n_factors=4)
+```
+
+
+
+## Confirmatory Factor Analysis
+
+The confirmatory factor analysis is of multiple-indicator measurement scales, that is, each item (observed variable) is assigned to only one factor. Solution method is centroid factor analysis.
+
+Specify the measurement model for the analysis in Lavaan notation. Define four factors: Deceit, Trust, Cynicism, and Flattery.
+
+```{r}
+MeasModel <- 
+" 
+   Deceit =~ m07 + m06 + m10 + m09 
+   Trust =~ m12 + m05 + m13 + m01 
+   Cynicism =~ m11 + m16 + m04 
+   Flattery =~ m15 + m02 
+"
+```
+
+Do the confirmatory factor analysis of 4-factor solution of Mach IV scale, Hunter, Gerbing and Boster (1982). By default output goes to the console, or, can store the output into an object, here *cfa_out*, which can then be displayed as a whole, or piecemeal. 
+
+The abbreviation for `corCFA()` is `cfa()`.
+
+```{r fig.width=4.5, fig.height=4.5}
+cfa_out <- cfa(MeasModel, R)
+cfa_out
+```
+
+Or, view pieces. See the names of all the output components. The output includes:
+
+- Heat map: Ordered correlation matrix, items within factors
+- Item content: Items within factors
+- Reliability analysis: Coefficient alpha and omega
+- Solution: Factor pattern coefficients, indicator diagnostics
+- Residual matrix: Items within factors
+- Item Diagnostics: Sum of squares and average sum of squares by item
+- Lavaan code: Run the model in Lavaan for maximum likelihood solution
+
+```{r}
+names(cfa_out)
+```
+
+Here just view just the scale reliabilities.
+
+```{r}
+cfa_out$out_reliability
+```
+
+Can also just analysis item content, without the factor analysis. 
+
+```{r}
+cfa(MeasModel, labels="only")
+```
+
+Generate R Markdown instructions of the confirmation factor analysis with the option: `Rmd`.  Output file in this example will be m4.Rmd, a simple text file that can be edited with any text editor including RStudio, from which it can be knit to generate dynamic output such as to a Word document.
+
+```
+c <- cfa(MeasModel, R, Rmd="m4")
+```
+
+## Re-order the Correlation Matrix
+
+### Hierarchical Cluster Analysis
+
+Re-order the correlation matrix and display its heat map according to a hierarchical cluster analysis, indicated by the default parameter of the `order` parameter, `hclust`. Default input correlation matrix is the *mycor* structure, from which *R* will be extracted automatically. 
+
+The optional `n_clusters` parameter indicates to display corresponding cluster membership according to the specified number of clusters from the hierarchical tree. Although a four-factor solution, choose five clusters to allow for a "garbage" cluster.
+
+```{r fig.width=4.5, fig.height=4.5}
+corReorder(n_clusters=5)
+```
+
+Use the `hclust_type` parameter to specify the type of cluster analysis provided by base R beyond the default of `"complete"`. Other possibilities include `"ward.D"`, `"ward.D2"`, `"single"`, `"average"`.
+
+### Manual Reorder
+
+The variables in the correlation matrix can be re-ordered manually, including sub-setting the matrix. Do so with the `vars` parameter, specifying the index (ordinal positioning) of each variable in the re-ordered matrix.
+
+Here, subset six variables from the original correlation matrix. Specifying the `vars` parameter automatically sets `order` to `manual`, so no need to separately specify.
+
+```{r}
+R2 <- corReorder(vars=c(6,7,9,10,15,2))
+R2
+```
+
+
+## Full Manual
+
+Use the base R `help()` function to view the full manual for the factor analysis and correlation matrix functions. Simply enter a question mark followed by the name of the function.
+
+```
+?corCFA
+?corEFA
+?corScree
+?corProp
+?corRead
+?corReflect
+?corReorder
+?Correlation
+```
+

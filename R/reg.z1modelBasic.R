@@ -43,7 +43,8 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
 
   max.num <- integer(length=6)
   for (icol in 1:6) {
-    max.num[icol] <- max(nchar(as.character(trunc(smc[,icol]))) + digits_d + 1)
+    max.num[icol] <- max(nchar(as.character(floor(smc[,icol]))) + digits_d + 1)
+#   max.num[icol] <- max(nchar(as.character(trunc(smc[,icol]))) + digits_d + 1)
     if (max.num[icol] < 9) max.num[icol] <- 9L 
   }
 

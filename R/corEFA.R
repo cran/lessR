@@ -1,5 +1,5 @@
 corEFA <- 
-function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"), 
+function (R=mycor, n_factors, rotate=c("promax", "varimax", "none"), 
           min_loading=.2, sort=TRUE, Rmd=NULL, ...) {
 
 
@@ -22,15 +22,16 @@ function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"),
 
   if (missing(n_factors)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "The number of factors must be specified with:  n_factors\n\n")
+      "Specify the number of factors with:  n_factors=\n\n")
   }
 
-  # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
-  cor.nm <- deparse(substitute(x))
-  .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
-  if ("out_all" %in% class(x))  # R 4.0 results in two values: matrix, array
-    x <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
-    
+  if (!("matrix" %in% class(R))) { # R is a matrix, can be called indirectly
+    # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
+    cor.nm <- deparse(substitute(R))
+    .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
+    if ("out_all" %in% class(R))  # R 4.0 results in two values: matrix, array
+      R <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
+  }
 
   title_efa <- "  EXPLORATORY FACTOR ANALYSIS"
 
@@ -43,7 +44,7 @@ function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"),
   }
 
   # EFA
-  fa2 <- factanal(covmat=x, factors=n_factors, rotation="none", ...)
+  fa2 <- factanal(covmat=R, factors=n_factors, rotation="none", ...)
   if (rotate=="none" || n_factors==1) ld <- as.matrix(fa2$loadings)
 
   if (n_factors>1  &&  rotate!="none") {
@@ -133,7 +134,7 @@ function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"),
       tx[length(tx)], "  F", as.character(i.fact), " =~ ", sep="")
     if (n.Fact[i.fact] > 0) {
       for (i in 1:n.Fact[i.fact]) {
-        tx[length(tx)] <- paste(tx[length(tx)], colnames(x)[Fac[i]], sep="")
+        tx[length(tx)] <- paste(tx[length(tx)], colnames(R)[Fac[i]], sep="")
         if (i < n.Fact[i.fact])
           tx[length(tx)] <- paste(tx[length(tx)], " + ", sep="")
       }
@@ -165,7 +166,7 @@ function (x=mycor, n_factors, rotate=c("promax", "varimax", "none"),
         min_loading, sep="")
     tx[length(tx)+1] <- "Deleted items: "
     for (i.item in 1:del.count)
-      tx[length(tx)] <- paste(tx[length(tx)], colnames(x)[deleted[i.item]],
+      tx[length(tx)] <- paste(tx[length(tx)], colnames(R)[deleted[i.item]],
                               " ", sep="")
     txdel <- tx
   }

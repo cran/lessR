@@ -7,18 +7,19 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.9.6  feedback: gerbing@pdx.edu    web: lessRstats.com/new\n",
-      "-----------------------------------------------------------------\n",
-      "> d <- Read(\"\")   Read text, Excel, SPSS, SAS or R data file\n",
-      "  d is default data frame, no need for data= in analysis routines\n",
+      "lessR 3.9.7  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
+      "---------------------------------------------------------------\n",
+      "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
+      "  d is default data frame, data= in analysis routines optional\n",
       "\n",
       "> vignette(\"topic\") for help on the following topics\n",
-      "   \"Read\": read data and variable labels, write data to a file\n",
-      "   \"BarChart\", \"Histogram\", \"Plot\": visualizations\n",
-      "   \"Means\": analyze means with t-tests and ANOVA\n", 
-      "   \"Regression\": least-squares, logistic regression\n", 
-      "   \"Customize\": custom color palettes and more customization\n",
-      "   \"Extract\": general, simple data frame subsetting\n",
+      "   \"Read\": Read data and variable labels, write data\n",
+      "   \"BarChart\", \"Histogram\", \"Plot\": Visualizations\n",
+      "   \"Means\": Analyze means with t-tests and ANOVA\n", 
+      "   \"Regression\": Least-squares, logistic regression\n", 
+      "   \"Factor Analysis\": Exploratory and confirmatory\n", 
+      "   \"Customize\": Custom color palettes, more customization\n",
+      "   \"Extract\": General, simple data frame subsetting\n",
       "   \"pivot\": 1-d and 2-d simply created pivot tables\n") 
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
@@ -131,6 +132,7 @@ function(...) {
 
   options(n_cat = 1)
   options(suggest = TRUE)
+  options(note = TRUE)
   options(quiet = FALSE)
   options(brief = FALSE)
 
@@ -1462,7 +1464,7 @@ function(dir, axT) {
 }
 
 
-.corcolors <- function(R, NItems, main, bm=3, rm=3, diag=NULL,
+.corcolors <- function(R, NItems, main, bm=NULL, rm=NULL, diag=NULL,
                        pdf_file, width, height) {
 
   if (!is.null(diag)) {
@@ -1472,40 +1474,37 @@ function(dir, axT) {
         "      computing the heat map are set to 0.\n", sep="")
   }
 
-  .opendev(pdf_file, width, height)  # set up graphics
-
   fill_low <- NULL
   fill_hi <- NULL
 
-  if (is.null(fill_low)  &&  is.null(fill_hi)) {      
-    if (getOption("theme") %in% c("colors", "dodgerblue", "blue", 
-                                  "lightbronze")) {
+  thm <- (getOption("theme"))
+  if (is.null(fill_low) && is.null(fill_hi)) {      
+    if (thm %in% c("colors", "dodgerblue", "blue", "lightbronze")) {
       fill_low <- "rusts"
       fill_hi <- "blues"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
     }
-    else if (getOption("theme") %in% c("darkred", "red", "rose")) {
+    else if (thm %in% c("darkred", "red", "rose")) {
       fill_low <- "turquoises" 
       fill_hi <- "reds"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
     }
-    else if (getOption("theme") %in% c("darkgreen", "green")) {
+    else if (thm %in% c("darkgreen", "green")) {
       fill_low <- "violets" 
       fill_hi <- "greens"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
     }
-    else if (getOption("theme") %in% c("gold", "brown", "sienna")) {
+    else if (thm %in% c("gold", "brown", "sienna")) {
       fill_low <- "blues" 
       fill_hi <- "browns"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
     }
-    else if (getOption("theme") %in% c("gray", "white")) {
+    else if (thm %in% c("gray", "white")) {
       fill_low <- "white"
       fill_hi <- "black"
       hmcols <- colorRampPalette(c("white", "gray75", "black"))(100)
     }
   }
-
   else if (is.null(fill_low) || is.null(fill_hi)) { 
     fill_low <- "white"
     fill_hi <- "gray20"
@@ -1519,9 +1518,17 @@ function(dir, axT) {
   axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
       getOption("axis_cex"), getOption("axis_y_cex"))
 
+  cnm <- colnames(R)
+  max.num <- max(nchar(cnm))
+  mrg <- 1.3 + .38*max.num
+  if (is.null(bm)) bm <- mrg
+  if (is.null(rm)) rm <- mrg
+  if (axis_x_cex > 0.75) axis_x_cex <- axis_x_cex + 1  # hack
+  if (axis_y_cex > 0.75) axis_y_cex <- axis_y_cex + 1
+
   heatmap(R[1:NItems,1:NItems], Rowv=NA, Colv="Rowv", symm=TRUE,
     col=hmcols, margins=c(bm,rm), main=main,
-    cexRow=axis_x_cex, cexCol=axis_y_cex)
+    cexRow=axis_x_cex+.1, cexCol=axis_y_cex+.1)
 
   if (!is.null(pdf_file)) {  # terminate pdf graphics
     dev.off()
@@ -2025,3 +2032,19 @@ function(dir, axT) {
   return(tx)
 
 }  # end .prntbl
+
+
+# debug cat
+p <- function(x) {
+
+  xstr <- deparse(substitute(x))
+  cat(paste(xstr,":", sep=""), x, "\n")
+
+}
+
+pn <- function(x) {
+
+  xstr <- deparse(substitute(x))
+  cat("\n", paste(xstr,":", sep=""), x, "\n")
+
+}

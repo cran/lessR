@@ -18,7 +18,7 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
   if (missing(levels) && var_labels) levels <- NULL
   if (is.null(labels)) labels <- as.character(levels)
 
-  # get ind, the indices of selected variables
+  # get ind, the indices of selected variables in the data frame
   data.vars <- as.list(seq_along(data))
   names(data.vars) <- names(data)
   ind <- eval(substitute(x), envir=data.vars, parent.frame())

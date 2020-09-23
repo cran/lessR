@@ -1,6 +1,6 @@
 corReflect <- 
 function (R=mycor, vars,
-          main=NULL, heat_map=TRUE, bottom=3,right=3, 
+          main=NULL, heat_map=TRUE, bottom=NULL,right=NULL, 
           pdf_file=NULL, width=5, height=5, ...) {
 
 
@@ -16,12 +16,13 @@ function (R=mycor, vars,
     }
   }
 
-  # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
-  cor.nm <- deparse(substitute(R))
-  .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
-  if ("out_all" %in% class(R))    # R 4.0 results in two values: matrix, array
-    R <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R 
-
+  if (!("matrix" %in% class(R))) { # R is a matrix, can be called indirectly
+    # cor matrix:  mycor as class out_all, mycor$R, or stand-alone matrix
+    cor.nm <- deparse(substitute(R))
+    .cor.exists(cor.nm)  # see if matrix exists in one of the 3 locations
+    if ("out_all" %in% class(R))    # R 4.0 results in two values: matrix, array
+      R <- eval(parse(text=paste(cor.nm, "$R", sep="")))  # go to $R
+  }
 
   # translate variable names into column positions
   vars.all <- as.list(seq_along(as.data.frame(R)))
@@ -44,8 +45,9 @@ function (R=mycor, vars,
 
   if (heat_map) {
     if (is.null(main)) main <- "With Reflected Item Coefficients"
-   .corcolors(R, NVOld, main, bottom, right, diag=0,
-              pdf_file, width, height)
+    .opendev(pdf_file, width, height)  # set up graphics
+    .corcolors(R, NVOld, main, bottom, right, diag=0,
+               pdf_file, width, height)
   }
 
   cat("\n")

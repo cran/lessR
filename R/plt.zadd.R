@@ -24,13 +24,14 @@ function(add, x1, x2, y1, y2,
     i.trn <- i.trn + 1;  if (i.trn > n.trn) i.trn <- 1
 
     if (!is.null(add_trans[i.trn])) {  # fill only
-      if (add[i] %in% c("rect"))
+      if (add[i] %in% c("rect", "point"))
         add_fill[i.fll] <- .maketrans(add_fill[i.fll], (1-add_trans[i.trn])*256)
     }
 
-    if (!(add[i] %in% c("rect", "line", "v_line", "h_line", "arrow"))) {  # text
+    geom <- c("rect", "line", "v_line", "h_line", "arrow", "point") 
+    if (!(add[i] %in% geom)) {  # text
       if (n.obj == 1) {
-        xx <- x1; yy <- y1  # same object, mult locations
+        xx <- x1; yy <- y1  # same object, multiple locations
       }  
       else {
         x1i <- x1i + 1;  y1i <- y1i + 1
@@ -53,7 +54,7 @@ function(add, x1, x2, y1, y2,
     else if (add[i] == "h_line") {
       y1i <- y1i + 1
       yy <- y1[y1i]  # multiple objects, multiple locations
-      if (n.obj == 1) yy <- y1  # same object, mult locations
+      if (n.obj == 1) yy <- y1  # same object, multiple locations
       segments(usr[1], yy, usr[2], yy, col=add_color[i.clr],
                lwd=add_lwd[i.lwd], lty=add_lty[i.lty], ...)
     }
@@ -75,6 +76,18 @@ function(add, x1, x2, y1, y2,
       if (add[i] == "arrow")
         arrows(xx1, yy1, xx2, yy2, col=add_color[i.clr], 
              lwd=add_lwd[i.lwd], lty=add_lty[i.lty], ...)
+    }
+
+    else if (add[i] %in% c("point")) {  # 2 coordinates
+      if (n.obj == 1) {
+        xx1 <- x1;  yy1 <- y1;
+      } 
+      else {
+        x1i <- x1i + 1; y1i <- y1i + 1;
+        xx1 <- x1[x1i]; yy1 <- y1[y1i];
+      }
+      points(xx1, yy1, col=add_color[i.clr], bg=add_fill[i.fll],
+                       cex=add_cex[i.cex], pch=21)
     }
 
   }  # end i in 1:n.obj

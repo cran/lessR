@@ -15,6 +15,22 @@
 
 <title>Subset a Data Frame</title>
 
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -560,19 +576,19 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>The function <code>.()</code> also provides for random selection of rows. To randomly select the specified number of rows from the data frame to subset, specify the <code>random()</code> function for the logical criterion of the <code>rows</code>. The value passed to <code>random()</code> can either be the actual number of rows to select, or the proportion of rows to select.</p>
 <p>Here randomly select five rows of data from the <em>d</em> data frame.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>d[.(<span class="kw">random</span>(<span class="dv">5</span>)), .(Years<span class="op">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                  Years Gender Dept    Salary
-## Stanley, Grayson     9      M SALE  69624.87
-## Fulton, Scott       13      M SALE  87785.51
-## Hoang, Binh         15      M SALE 111074.86
-## Anderson, David      9      M ACCT  69547.60
-## Ritchie, Darnell     7      M ADMN  53788.26</code></pre>
+<pre><code>##                    Years Gender Dept   Salary
+## Afshari, Anbar         6      F ADMN 69441.93
+## Osterman, Pascal       5      M ACCT 49704.79
+## Pham, Scott           13      M SALE 81871.05
+## Korhalkar, Jessica     2      F ACCT 72502.50
+## Portlock, Ryan        13      M SALE 77714.85</code></pre>
 <p>Here specify a proportion of rows to select.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>d[.(<span class="kw">random</span>(<span class="fl">0.1</span>)), .(Years<span class="op">:</span>Salary)]</span></code></pre></div>
 <pre><code>##                  Years Gender Dept   Salary
+## Kralik, Laura       10      F SALE 92681.19
 ## Osterman, Pascal     5      M ACCT 49704.79
 ## Jones, Alissa        5      F &lt;NA&gt; 53772.58
-## Sheppard, Cory      14      M FINC 95027.55
-## LaRoe, Maria        10      F MKTG 61961.29</code></pre>
+## Skrotzki, Sara      18      F MKTG 91352.33</code></pre>
 </div>
 
 

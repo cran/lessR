@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{reord}
 
-Re-arranges the order of the variables in the input correlation matrix.  If no variable list is specified then the variables are re-ordered according to hierarchical clustering or the Hunter (2973) chain method in which the first variable is the variable with the largest sum of squared correlations of all the variables, then the variable that has the highest correlation with the first variable, and so forth.
+Re-arranges the order of the variables in the input correlation matrix.  If no variable list is specified then by default the variables are re-ordered according to hierarchical clustering. Or, re-order with the Hunter (1973) chain method in which the first variable is the variable with the largest sum of squared correlations of all the variables, then the next variable is that with the highest correlation with the first variable, and so forth. Or, re-order manually.
 }
 
 \usage{
@@ -16,21 +16,23 @@ corReorder(R=mycor, order=c("hclust", "chain", "manual"),
                           "average", "mcquitty", "median", "centroid"),
           dist_type=c("R", "dist"),
           n_clusters=NULL, vars=NULL, chain_first=0,
-          heat_map=TRUE, diagonal_new=TRUE,
-          main=NULL, bottom=3, right=3,
-          pdf_file=NULL, width=5, height=5, \ldots)
+          heat_map=TRUE, dendrogram=TRUE, diagonal_new=TRUE,
+          main=NULL, bottom=NULL, right=NULL,
+          pdf=FALSE, width=5, height=5, \ldots)
 
 reord(\ldots)
 }
 
 \arguments{
   \item{R}{Correlation matrix.}
-  \item{order}{Source of ordering (seriation): Hierarchical cluster matrix,
+  \item{order}{Source of ordering (seriation): Default of hierarchical cluster
+       analysis,
        Hunter(1973) chain method, or manually specified with \code{vars}.}
   \item{hclust_type}{Type of hierarchical cluster analysis.}
   \item{dist_type}{Default is a correlation matrix of similarities, otherwise
        a distance matrix.}
-  \item{n_clusters}{For a hierarchical cluster analysis, get the cluster
+  \item{n_clusters}{For a hierarchical cluster analysis, optionally specify
+       the cluster
        membership for the specified number of clusters.}
   \item{vars}{List of the re-ordered variables, each variable listed by its ordinal
        position in the input correlation matrix. If this is set, then
@@ -38,14 +40,17 @@ reord(\ldots)
   \item{chain_first}{The first variable listed in the ordered matrix with
        the chain method.}
   \item{main}{Graph title. Set to \code{main=""} to turn off.}
-  \item{heat_map}{If \code{TRUE}, display a heat map of the item
-        correlations.}
+  \item{heat_map}{If \code{TRUE}, display a heat map of the item correlations.}
+  \item{dendrogram}{If \code{TRUE}, display a heat map of the item correlations
+       for a hierarchical cluster analysis.}
   \item{diagonal_new}{If \code{TRUE}, replace diagonal for the heat map only
        with an average of the correlation of item on the diagonal with the two
        adjacent items.}
   \item{bottom}{Number of lines of bottom margin.}
   \item{right}{Number of lines of right margin.}
-  \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
+  \item{pdf}{Set to \code{TRUE} if graphics files written to pdf, the heat map
+        of the re-ordered matrix, and, if an hierarchical cluster analysis, the
+        dendrogram.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
   \item{\dots}{Parameter values_}

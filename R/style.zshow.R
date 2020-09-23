@@ -203,6 +203,8 @@ function() {
         getOption("brief"), "\n")
     cat("suggest ... Suggestions for enhanced input ..............",
         getOption("suggest"), "\n")
+    cat("note ... Notes for enhanced input ..............",
+        getOption("note"), "\n")
     cat("width ..... Column width ................................",
         getOption("width"), "\n")
     cat("n_cat ..... Largest number of unique, equally spaced\n",

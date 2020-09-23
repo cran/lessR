@@ -11,16 +11,16 @@ A maximum likelihood exploratory factor analysis of an input correlation matrix,
 }
 
 \usage{
-corEFA(x=mycor, n_factors, rotate=c("promax", "varimax", "none"), 
+corEFA(R=mycor, n_factors, rotate=c("promax", "varimax", "none"), 
           min_loading=.2, sort=TRUE, Rmd=NULL, \ldots)
 
 efa(\ldots)
 }
 
 \arguments{
-  \item{x}{Correlation matrix.}
+  \item{R}{Correlation matrix.}
   \item{n_factors}{Number of factors.}
-  \item{rotate}{Rotation method, if any.}
+  \item{rotate}{Rotation method, if any. Choices are promax or varimax.}
   \item{min_loading}{Minimum loading to include in suggested factor for
         confirmatory analysis and for the display of the loadings for the
         exploratory analysis. To ignore, set to 0.}

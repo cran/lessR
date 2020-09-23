@@ -46,7 +46,7 @@ ttest(n=37, m=73795.557, s=21799.533, Ynm="Salary", mu=52000)
 ## Two-Samples t-test
 
 
-### Independent groups
+### Independent Groups
 
 Full analysis with `ttest()` function, abbreviated as `tt()`, with formula mode.
 
@@ -62,7 +62,7 @@ tt_brief(Salary ~ Gender)
 
 
 
-### Dependent groups
+### Dependent Groups
 
 ```{r, fig.height=4.25, fig.width=5}
 tt_brief(Pre, Post)
@@ -79,36 +79,46 @@ The data for these examples is the _warpbreaks_ data set included with the R __d
 Because _warpbreaks_ is not the default data frame, specify with the `data` parameter (or set _d_ equal to _warpbreaks_). 
 
 
-### One-way independent groups
+### One-way Independent Groups
 
 First, for illustrative purposes, ignore the type of wool and only examine the impact of tension on breaks.
 
 The output includes descriptive statistics, ANOVA table, effect size indices, Tukey's multiple comparisons of means, and residuals, as well as the scatterplot of the response variable with the levels of the independent variable, and a visualization of the mean comparisons.
 
-```{r}
+```{r fig.width=5}
 ANOVA(breaks ~ tension, data=warpbreaks)
 ```
 
 The brief version forgoes the multiple comparisons and the residuals.
 
-```{r}
+```{r fig.width=5}
 av_brief(breaks ~ tension, data=warpbreaks)
 ```
 
 
 
-### Two-way independent groups
+### Two-way Independent Groups
 
-Specify the second independent variable preceded by a `*` sign.
+Specify the second independent variable preceded by a `*` sign. The plot of the cell means is generated automatically.
+
+```{r fig.width=5}
+ANOVA(breaks ~ tension * wool, data=warpbreaks)
+```
+
+Can also obtain the cell mean plot directly from the means. Here use __lessR__ `pivot()` to compute the cell means of _breaks_ across _tension_ and _wool_.
 
 ```{r}
-ANOVA(breaks ~ tension * wool, data=warpbreaks)
-
+data(warpbreaks)
+dm <- pivot(warpbreaks, mean, breaks, c(tension, wool))
+Plot(tension, breaks, by=wool, segments=TRUE, size=2, data=dm, main="Cell Means")
 ```
 
 
-### Randomized block design
+### Randomized Block Design
 
+The randomized block design has a treatment variable, usually administered over time, and a blocking variable. The values of the treatment variable are measured across each instance of the blocking variable. In this example, repetitions are measured across four different workout sessions. The person takes one of four supplements before each session. Person is the blocking variable, and Supplement is the treatment variable. Repetitions is the response variable.
+
+The data are presented in a wide-form data table, a single row for each person.
 
 ```{r}
 d <- read.csv(header=TRUE, text="
@@ -122,31 +132,44 @@ p6,5,5,6,8
 p7,2,3,2,4")
 ```
 
-Reshape data from wide form to long form with base R `reshape()` according to the following parameters. (R refers to time, which is only one specific application.)
+The ANOVA, however, requires data to be in long-form. Reshape data from wide form to long form with base R `reshape()` according to the following parameters. With each parameter, either _identify_ existing variables in the given wide-form data, or _name_ newly created variables in the long-form. This R function refers to a time-variable, which in the context of ANOVA is the treatment variable, of which the values occur over time: first treatment, second treatment, etc. 
 
-- `idvar`: Identify the blocking variable in the wide form data
-- `varying`: Identify the variables in wide format gathered into a single variable in long format
-- `v.names`: Name the response variable in the long form
-- `timevar`: Name the corresponding long form variable
-- `times`: Name the values of the corresponding long form variable, otherwise numbered consecutively
+The reshaping from a wide-form to a long-form data table creates two new variables: the variable whose values are collected over time, here the blocking variable, Supplement, and the response variable, here Reps.
 
-Do not need the row names.
+- `idvar`: Identify the existing blocking (within) variable in the wide-form data
+- `varying`: Identify the wide-form variables, which occur over time, to be gathered into a single variable in long-format
+- `timevar`: Name the corresponding treatment (factor) variable in the created long-form 
+- `v.names`: Name the response variable in the created long-form
+
+There are many ways to identify the names of the wide-form variables to be gathered into a single time-oriented long-form variable. The most general is to specify a vector of the names, here
+
+```
+c("sup1", "sup2" "sup3", "sup4")
+```
+In this example use the __lessR__ `to` function to create that vector without needed to individual list each variable.
+
+```{r}
+to("sup", 4)
+```
+
 
 ```{r}
 d <- reshape(d, direction="long",
-        idvar="Person", v.names="Reps",
-        varying=list(2:5), timevar="Supplement", times=names(d)[2:5])
-row.names(d) <- NULL
+        idvar="Person", varying=list(to("sup", 4)), 
+        timevar="Supplement", v.names="Reps")
 ```
 
 
+Do not need the row names, so remove before displaying new long-form data.
+
 ```{r}
+row.names(d) <- NULL
 d[1:10,]
 ```
 
-Specify the blocking variable preceded by a `+` sign.
+To run the ANOVA, specify the blocking variable preceded by a `+` sign.
 
-```{r}
+```{r fig.width=6}
 ANOVA(Reps ~ Supplement + Person)
 ```
 

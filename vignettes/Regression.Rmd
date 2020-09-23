@@ -30,7 +30,7 @@ d <- Read("Employee")
 
 The brief version provides just the basic analysis, what Excel provides, plus a scatterplot with the regression line.
 
-```{r}
+```{r fig.width=4.5, fig.height=4.5}
 reg_brief(Salary ~ Years + Pre)
 ```
 
@@ -41,6 +41,13 @@ The full output is extensive: Summary of the analysis, estimated model,  fit ind
 ```{r}
 reg(Salary ~ Years + Pre)
 ```
+
+Brief output with standardization of all variables in the model.
+
+```{r}
+reg_brief(Salary ~ Years + Pre, rescale="z")
+```
+
 
 ### k-fold cross-validation
 
@@ -89,6 +96,8 @@ r$coefficients
 ## Interpreted Output
 
 The parameter `Rmd` creates an R markdown file that is automatically generated and  html document from knitting the various output components together with full interpretation. A new, much more complete form of computer output.
+
+Not run here.
 
 ```
 reg(Salary ~ Years + Pre, Rmd="eg")

@@ -11,7 +11,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          trans=getOption("trans_pt_fill"),
 
          size=NULL, size_cut=NULL, shape="circle", means=TRUE,
-         sort_yx=c("0", "-", "+"), segments_y=FALSE, segments_x=FALSE,
+         sort_yx=c("0", "-", "+"), 
+         segments=FALSE, segments_y=FALSE, segments_x=FALSE,
          jitter_x=0, jitter_y=0,
 
          ID="row.name", ID_size=0.60,
@@ -659,8 +660,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       "Fit line only applicable if only one x variable, if y is present\n\n")
   }
 
-
-  if (!y.miss) if (cat.x && !cat.y) {
+  if (!y.miss && !quiet && getOption("note")) if (cat.x && !cat.y) {
     cat("\n>>> Note\n",
         "The integrated Violin/Box/Scatterplot (VBS) for ", y.name, "\n",
         "at each level of ", x.name, " is only obtained if the categorical\n",
@@ -1285,7 +1285,6 @@ if (is.null(out_size)) out_size <- size.pt
     fncl <- gsub(" = ", "=", fncl)
   }
 
-
   if (Trellis && do_plot) {
 
     if (c.type != "dot") {
@@ -1452,6 +1451,7 @@ if (is.null(out_size)) out_size <- size.pt
       }
 
     # set up new x.call and y.call for stats
+    # only does overall stat, so not applicable if a by parameter
       if (stat == "sum") {
         ylab <- paste("Sum of", y.name)
         out <- tapply(y.call[,1], x.call[,1], sum, na.rm=TRUE)
@@ -1634,7 +1634,8 @@ if (is.null(out_size)) out_size <- size.pt
           xy_ticks, xlab, ylab, main, main_cex,
           sub, value_labels, label_max,
           rotate_x, rotate_y, offset, proportion, origin_x,
-          size.pt, shape, means, segments_y, segments_x, size.ln,
+          size.pt, size.ln, shape, means, 
+          segments, segments_y, segments_x,
           smooth, smooth_points, smooth_size, smooth_exp, smooth_bins,
           radius, power, size_cut, bubble_text, low_fill, hi_fill,
           ID.call, ID_color, ID_size, out_ind,

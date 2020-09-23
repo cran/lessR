@@ -1,6 +1,6 @@
 Regression <-
-function(my_formula, data=d, rows=NULL, kfold=0,
-         digits_d=NULL, standardize=FALSE,
+function(my_formula, data=d, rows=NULL,
+         digits_d=NULL,
 
          Rmd=NULL, Rmd_browser=TRUE, 
          Rmd_format=c("html", "word", "pdf", "odt", "none"),
@@ -15,47 +15,43 @@ function(my_formula, data=d, rows=NULL, kfold=0,
          pred_rows=NULL, pred_sort=c("predint", "off"),
          subsets=NULL, cooks_cut=1, 
 
-         scatter_coef=TRUE, graphics=TRUE, scatter_3D=FALSE,
+         scatter_coef=TRUE, scatter_3D=FALSE,
 
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL, 
          X5_new=NULL, X6_new=NULL,
 
+         kfold=0, seed=NULL, rescale=c("none", "z", "0to1", "robust"),
+
          quiet=getOption("quiet"),
-         pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
+         graphics=TRUE, pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
          fun_call=NULL, ...) {
 
+
+  # produce actual argument, such as from an abbreviation, flag if not exist
+  res_sort <- match.arg(res_sort)
+  pred_sort <- match.arg(pred_sort)
+  rescale <- match.arg(rescale)
+
+  old.opt <- options()
+  on.exit(options(old.opt))
+
+  options(width=text_width)
 
   # allow for more than one value, so cannot use match.arg
   # then all 5 get selected, then default to "html"
   if (missing(Rmd_format)  &&  length(Rmd_format) == 5) Rmd_format <- "html"
 
+
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("digits.d", "Rmd.format", "Rmd.browser", "text.width",
-                "res.rows", "res.sort", "pred.rows", "pred.sort",
-                "cooks.cut", "scatter.coef", "X1.new", "X2.new",
-                "X3.new", "X4.new", "X5.new", "X6.new", "fun.call")
     for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
+      if (length(grep(".", names(dots)[i], fixed=TRUE)) > 0) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
         get(nm)
       }
     }
-  }
-
-
-  if (is.null(fun_call)) fun_call <- match.call()
-
-  if (missing(my_formula)) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Specify a model by listing it first or specify with:  my_formula\n\n")
-  }
-
-  if (!is.null(Rmd) && brief) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "To create an R Markdown File requires the full version of Regression\n\n")
   }
 
   dots <- list(...)  # check for deprecated parameters
@@ -71,6 +67,19 @@ function(my_formula, data=d, rows=NULL, kfold=0,
           "quiet  option not available for Regression\n\n")
       }
     }
+  }
+
+
+  if (is.null(fun_call)) fun_call <- match.call()
+
+  if (missing(my_formula)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specify a model by listing it first or specify with:  my_formula\n\n")
+  }
+
+  if (!is.null(Rmd) && brief) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "To create an R Markdown File requires the full version of Regression\n\n")
   }
 
 
@@ -100,15 +109,6 @@ function(my_formula, data=d, rows=NULL, kfold=0,
     }
   }
 
-
-  # produce actual argument, such as from an abbreviation, flag if not exist
-  res_sort <- match.arg(res_sort)
-  pred_sort <- match.arg(pred_sort)
-
-  old.opt <- options()
-  on.exit(options(old.opt))
-
-  options(width=text_width)
 
   max_new <- 6
 
@@ -189,14 +189,24 @@ function(my_formula, data=d, rows=NULL, kfold=0,
     if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])]))
       numeric.all <- FALSE
   }
-  
-  if ( !is.null(X1_new)  &&  (n.pred) > max_new ) {
+    
+  if (nrow(data) < 3) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Need more than ", nrow(data), " rows of data.\n\n", sep="")
+  } 
+
+  if (!is.null(X1_new)  &&  (n.pred > max_new)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "No new data for prediction if more than", max_new,
           "predictor variables.\n\n")
   }
-  
-  if ( !is.null(X1_new) && !numeric.all ) {
+   
+  if (!is.numeric(data[,nm[1]])) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Response variable, ", nm[1], ", must be numeric.\n\n", sep="")
+  }
+ 
+  if (!is.null(X1_new) && !numeric.all) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "All variables must be numeric to use new data for prediction.\n\n")
   }
@@ -220,30 +230,39 @@ function(my_formula, data=d, rows=NULL, kfold=0,
  
   # sort values of the one predictor variable for scatterplot
   #   so that the prediction/confidence intervals can be drawn
-  if (n.pred == 1) { 
-    o <- order(data[,nm[2]], decreasing=FALSE)
-    data <- data[o,]
-  }
+  if (n.pred == 1)
+    data <- data[order(data[,nm[2]], decreasing=FALSE), ]
 
   if (is.null(digits_d)) digits_d <- .getdigits(data[,nm[1]], 3)
   options(digits_d=digits_d) 
 
 
-  # standardize option
-  if (standardize) {
-    stnd.flag <- TRUE
-    for (i in 1:n.vars)
-      data[,nm[i]] <- round(scale(data[,nm[i]]), digits_d)
+  # rescale option (if not K-Fold)
+  stnd.flag <- FALSE
+  minmax.flag <- FALSE
+  robust.flag <- FALSE
+  if (rescale != "none") {
+    if (rescale == "z") stnd.flag <- TRUE
+    if (rescale == "0to1") minmax.flag <- TRUE
+    if (rescale == "robust") robust.flag <- TRUE
+      if (kfold == 0) {
+        for (i in 1:n.vars)  {
+          data[,nm[i]] <- Rescale(data[,nm[i]], data=NULL,
+                                  kind=rescale, digits_d)
+        }
+      cat("\nRescaled Data, First Six Rows\n")
+      print(data[1:6, nm])
+      cat("\n")
+      }
   }
-  else
-    stnd.flag <- FALSE
 
   # keep track of generated graphic, see if manage graphics
-    if (graphics) {
-      plot.i <- 0L
-      plot.title  <- character(length=0)
-      manage.gr <- .graphman()
-    }
+  if (graphics) {
+    plot.i <- 0L
+    plot.title  <- character(length=0)
+    manage.gr <- .graphman()
+  }
+
 
   # --------------------------------------------------------
   # reg analysis
@@ -283,98 +302,101 @@ function(my_formula, data=d, rows=NULL, kfold=0,
 
     fit <- .reg1fitBasic(lm.out, anv$tot["ss"], digits_d, show_R)
     tx1fit <- fit$tx
-  }
 
+    txkfl <- ""
+    title_kfold <- "  K-FOLD CROSS-VALIDATION"
+    m_se <- NA;  m_MSE <- NA;  m_Rsq <- NA
+
+    title_rel <- "  RELATIONS AMONG THE VARIABLES"
+    tx2rel <- ""; tx2cor <- ""; tx2cln <- ""; tx2all <- ""
+    if (relate  &&  n.pred > 0) {
+      max.sublns <- 50
+      if (subsets > 1) {
+        max.sublns <- subsets
+        subsets <- TRUE
+      }
+      rel <- .reg2Relations(lm.out, df.name, n.keep, show_R,
+           cor, collinear, subsets, max.sublns, numeric.all, in.data.frame,
+           sterrs, MSW)
+      tx2cor <- rel$txcor
+      tx2cln <- rel$txcln
+      tx2all <- rel$txall
+      if (is.matrix(rel$crs)) crs <- round(rel$crs,3) else crs <- NA
+      if (is.vector(rel$tol)) tol <- round(rel$tol,3) else tol <- NA
+      if (is.vector(rel$vif)) vif <- round(rel$vif,3) else vif <- NA
+    }
+    else { # not relate and n.pred > 0
+      crs <- NA_real_; tol <- NA; vif <- NA
+    }
+  
+
+    title_res <- "  RESIDUALS AND INFLUENCE"
+    if (is.null(res_rows)) res_rows <- ifelse (n.keep < 20, n.keep, 20) 
+    if (res_rows == "all") res_rows <- n.keep  # turn off resids with res_rows=0
+
+    tx3res <- ""
+    resid.max <- NA
+    cook <- NA
+    if (res_rows > 0) {
+
+      cook <- round(cooks.distance(lm.out), 5)
+      res <- .reg3txtResidual(lm.out, cook, digits_d, res_sort, res_rows,
+                              show_R)
+      tx3res <- res$tx
+      if (!is.na(res$resid.max[1])) resid.max <- round(res$resid.max,3)
+
+      if (graphics  &&  n.pred > 0) {
+        if (!pdf && manage.gr) {  # set up graphics system
+          if (numeric.all || n.pred==1)
+            .graphwin(3, width, height) 
+          else
+            .graphwin(2, width, height)  # no sp matrix if not all numeric
+        }
+
+        if (manage.gr && !pdf) dev.set(which=3)
+        plt <- .reg3dnResidual(lm.out, pdf, width, height, manage.gr, ...)
+        for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
+        plot.i <- plot.i + plt$i 
+
+        
+        if (manage.gr && !pdf) dev.set(which=4)
+        fr <- .reg3resfitResidual(lm.out, cook, cooks_cut,
+                   pdf, width, height, manage.gr)
+        for (i in (plot.i+1):(plot.i+fr$i)) plot.title[i] <- fr$ttl[i-plot.i]
+        crfitres <- fr$crfitres
+        plot.i <- plot.i + fr$i
+      } # graphics
+
+    }  # res_rows > 0
+
+   
+    title_pred <- "  FORECASTING ERROR"
+    # scatter plot(s)
+    if (is.null(pred_rows)) pred_rows <- ifelse (n.keep < 25, n.keep, 10) 
+    if (pred_rows == "all") pred_rows <- n.keep  # turn off preds with pred_rows=0
+
+    tx3prd <- ""
+    predmm <- NA
+    if (pred_rows > 0  ||  !is.null(X1_new)) {  # if requested, do X1_new, etc.
+      prd <- .reg4Pred(lm.out,
+           n.keep, digits_d, show_R,
+           new.data, pred_sort, pred_rows, scatter_coef,
+           in.data.frame, X1_new, X2_new, X3_new, X4_new, X5_new, X6_new)
+      tx3prd <- prd$tx
+      predmm <- prd$predmm
+    }
+  }  # end kfold==0
 
   txkfl <- ""
   title_kfold <- "  K-FOLD CROSS-VALIDATION"
   m_se <- NA;  m_MSE <- NA;  m_Rsq <- NA
 
   if (kfold > 0) {
-    Kfld <- .regKfold(data, my_formula, kfold, nm, predictors, n.vars,
-                      n.keep, digits_d, show_R)
+    Kfld <- .regKfold(data[,nm], my_formula, kfold, rescale,
+                      nm, predictors, n.vars,
+                      n.keep, seed, digits_d, show_R)
     txkfl <- Kfld$tx
     m_se <- Kfld$m_se; m_MSE <- Kfld$m_MSE; m_Rsq <- Kfld$m_Rsq
-  }
-
-
-  title_rel <- "  RELATIONS AMONG THE VARIABLES"
-  tx2rel <- ""; tx2cor <- ""; tx2cln <- ""; tx2all <- ""
-  if (relate  &&  n.pred > 0) {
-    max.sublns <- 50
-    if (subsets > 1) {
-      max.sublns <- subsets
-      subsets <- TRUE
-    }
-    rel <- .reg2Relations(lm.out, df.name, n.keep, show_R,
-         cor, collinear, subsets, max.sublns, numeric.all, in.data.frame,
-         sterrs, MSW)
-    tx2cor <- rel$txcor
-    tx2cln <- rel$txcln
-    tx2all <- rel$txall
-    if (is.matrix(rel$crs)) crs <- round(rel$crs,3) else crs <- NA
-    if (is.vector(rel$tol)) tol <- round(rel$tol,3) else tol <- NA
-    if (is.vector(rel$vif)) vif <- round(rel$vif,3) else vif <- NA
-  }
-  else { # not relate and n.pred > 0
-    crs <- NA_real_; tol <- NA; vif <- NA
-  }
-  
-
-  title_res <- "  RESIDUALS AND INFLUENCE"
-  if (is.null(res_rows)) res_rows <- ifelse (n.keep < 20, n.keep, 20) 
-  if (res_rows == "all") res_rows <- n.keep  # turn off resids with res_rows=0
-
-
-  tx3res <- ""
-  resid.max <- NA
-  cook <- NA
-  if (res_rows > 0) {
-
-    cook <- round(cooks.distance(lm.out), 5)
-    res <- .reg3txtResidual(lm.out, cook, digits_d, res_sort, res_rows, show_R)
-    tx3res <- res$tx
-    if (!is.na(res$resid.max[1])) resid.max <- round(res$resid.max,3)
-
-    if (graphics  &&  n.pred > 0) {
-      if (!pdf && manage.gr) {  # set up graphics system
-        if (numeric.all || n.pred==1)
-          .graphwin(3, width, height) 
-        else
-          .graphwin(2, width, height)  # no sp matrix if not all numeric
-      }
-
-      if (manage.gr && !pdf) dev.set(which=3)
-      plt <- .reg3dnResidual(lm.out, pdf, width, height, manage.gr, ...)
-      for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
-      plot.i <- plot.i + plt$i 
-
-      
-      if (manage.gr && !pdf) dev.set(which=4)
-      fr <- .reg3resfitResidual(lm.out, cook, cooks_cut,
-                 pdf, width, height, manage.gr)
-      for (i in (plot.i+1):(plot.i+fr$i)) plot.title[i] <- fr$ttl[i-plot.i]
-      crfitres <- fr$crfitres
-      plot.i <- plot.i + fr$i
-    } # graphics
-
-  }  # res_rows > 0
-
- 
-  title_pred <- "  FORECASTING ERROR"
-  # scatter plot(s)
-  if (is.null(pred_rows)) pred_rows <- ifelse (n.keep < 25, n.keep, 10) 
-  if (pred_rows == "all") pred_rows <- n.keep  # turn off preds with pred_rows=0
-
-  tx3prd <- ""
-  predmm <- NA
-  if (pred_rows > 0  ||  !is.null(X1_new)) {  # if requested, do X1_new, etc.
-    prd <- .reg4Pred(lm.out,
-         n.keep, digits_d, show_R,
-         new.data, pred_sort, pred_rows, scatter_coef,
-         in.data.frame, X1_new, X2_new, X3_new, X4_new, X5_new, X6_new)
-    tx3prd <- prd$tx
-    predmm <- prd$predmm
   }
 
   if (graphics) {

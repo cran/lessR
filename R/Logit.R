@@ -218,7 +218,7 @@ function(my_formula, data=d, rows=NULL,
   for (icol in 1:6) {
     max.num[icol] <- 0 
     for (i in 1:n.vars) {
-      ln.nm <- nchar(as.character(trunc(smc[i,icol]))) + digits_d + 1
+      ln.nm <- nchar(as.character(floor(smc[i,icol]))) + digits_d + 1
       if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
     }
     if (max.num[icol] < 9) max.num[icol] <- 9 

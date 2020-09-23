@@ -103,17 +103,17 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       "Sort not applicable to Trellis plots\n\n")
   }
 
-    if (values != "eval.later") {
-      if (!(values %in% c("off", "%", "proportion", "input"))) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "set  values  to \"off\", \"%\", \"proportion\" or \"input\"\n\n")
-      }
+  if (values != "eval.later") {
+    if (!(values %in% c("off", "%", "proportion", "input"))) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "set  values  to \"off\", \"%\", \"proportion\" or \"input\"\n\n")
     }
+  }
 
-    if (missing(values_color)) {
-      values_color <- "white"
-      if (values_position == "out") values_color <- getOption("axis.text.color")
-    }
+  if (missing(values_color)) {
+    values_color <- "white"
+    if (values_position == "out") values_color <- getOption("axis.text.color")
+  }
 
   if (values_position == "out"  &&  !missing(by)  &&  !beside) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",

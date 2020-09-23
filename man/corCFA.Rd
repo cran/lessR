@@ -18,7 +18,7 @@ Output is generated into distinct pieces by topic, organized and displayed in se
 }
 
 \usage{
-corCFA(mimm=NULL, x=mycor, data=d, fac.names=NULL, 
+corCFA(mimm=NULL, R=mycor, data=d, fac.names=NULL, 
 
          Rmd=NULL, explain=getOption("explain"),
          interpret=getOption("interpret"), results=getOption("results"),
@@ -29,7 +29,7 @@ corCFA(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
          resid=TRUE, item_cor=TRUE, sort=TRUE,
 
-         main=NULL, heat_map=TRUE, bottom=3, right=3, 
+         main=NULL, heat_map=TRUE, bottom=NULL, right=NULL, 
 
          pdf_file=NULL, width=5, height=5,
 
@@ -50,7 +50,7 @@ scales(\ldots, iter=0, resid=FALSE, item_cor=FALSE, sort=FALSE, heat_map=FALSE)
         specification of each factor on a separate line: the factor
         name, an equals sign, and the indicators separated by plus signs. 
         Each indicator is assigned to only one factor.}
-  \item{x}{Correlation matrix to be analyzed.}
+  \item{R}{Correlation matrix to be analyzed.}
   \item{data}{Data frame of the original data to be checked for any
        variable labels, usually indicator (item) content. This is not to
        calculate correlations, which is separately provided for by the

@@ -144,7 +144,29 @@ Now do the Trellis plot with some color.
 ```{r, fig.width=4.5}
 style(sub_theme="black", trans=.55,
       window_fill="gray10", grid_color="gray25")
-Plot(date, Price, by1=Company, n.col=1,  fill="darkred", color="red")
+Plot(date, Price, by1=Company, n_col=1,  fill="darkred", color="red")
+```
+
+
+## Annotation
+
+```{r}
+d <- Read("Employee")
+```
+
+Add three different text blocks at three different specified locations.
+
+```{r fig.width=4.5}
+Plot(Years, Salary, add=c("Hi", "Bye", "Wow"), x1=c(12, 16, 18),
+  y1=c(80000, 100000, 60000))
+```
+
+
+A rectangle requires two points, four coordinates, <x1,y1> and <x2,y2>.
+
+```{r fig.width=4.5}
+style(add_trans=.8, add_fill="gold", add_color="gold4", add_lwd=0.5)
+Plot(Years, Salary, add="rect", x1=12, y1=80000, x2=16, y2=115000)
 ```
 
 

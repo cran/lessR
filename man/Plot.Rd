@@ -16,7 +16,7 @@ Abbreviation:\cr
 \verb{  }Box Plot only: \code{bx}, \code{BoxPlot}\cr
 \verb{  }Scatter Plot only: \code{sp}, \code{ScatterPlot}\cr
 
-A scatterplot displays the values of a distribution, or the relationship between the two distributions in terms of their joint values, as a set of points in an \emph{n}-dimensional coordinate system, in which the coordinates of each point are the values of \emph{n} variables for a single observation (row of data). From the identical syntax, from any combination of continuous or categorical variables variables \code{x} and \code{y}, \code{Plot(x)} or \code{Plot(x,y)}, where \code{x} or \code{y} can be a vector, by default generates a family of related 1- or 2-variable scatterplots, possibly enhanced, as well as related statistical analyses. A categorical variable is either non-numeric, such as an R factor, or may be defined to consist of a small number of equally spaced integer values_ The maximum number of such values to define such an integer variable as categorical is set by the \code{n_cat} parameter, with a default value of 0, that is, by default, all variables with numerical values are defined as continuous variables. 
+A scatterplot displays the values of a distribution, or the relationship between the two distributions in terms of their joint values, as a set of points in an \emph{n}-dimensional coordinate system, in which the coordinates of each point are the values of \emph{n} variables for a single observation (row of data). From the identical syntax, from any combination of continuous or categorical variables variables \code{x} and \code{y}, \code{Plot(x)} or \code{Plot(x,y)}, where \code{x} or \code{y} can be a vector, by default generates a family of related 1- or 2-variable scatterplots, possibly enhanced, as well as related statistical analyses. A categorical variable is either non-numeric, such as an R factor, or may be defined to consist of a small number of equally spaced integer values. The maximum number of such values to define such an integer variable as categorical is set by the \code{n_cat} parameter, with a default value of 0, that is, by default, all variables with numerical values are defined as continuous variables. 
 
 \code{Plot} is a general function, which produces a wide variety of scatterplots, which, for a single variable, can be in the context of violin plots and box plots, as outlined in the following list. The parameter definitions that follow this list are grouped, with parameters that relate to the same type of plot defined in the same group.
 
@@ -46,7 +46,8 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          trans=getOption("trans_pt_fill"),
 
          size=NULL, size_cut=NULL, shape="circle", means=TRUE,
-         sort_yx=c("0", "-", "+"), segments_y=FALSE, segments_x=FALSE,
+         sort_yx=c("0", "-", "+"), 
+         segments=FALSE, segments_y=FALSE, segments_x=FALSE,
          jitter_x=0, jitter_y=0,
 
          ID="row.name", ID_size=0.60,
@@ -105,13 +106,13 @@ vp(\ldots)
         continuous or categorical, cross-sectional or a time series.
         If \code{x} is sorted, with equal intervals
         separating the values, or is a time series, then by default
-        plots the points sequentially, joined by line segments_
+        plots the points sequentially, joined by line segments.
         Can specify multiple \code{x}-variables or multiple \code{y}-variables
         as vectors, but not both. Can be in a data frame or defined
         in the global environment.}
   \item{y}{An optional second \emph{primary variable.} Variable with values
         to be mapped to coordinates of points in
-        the plot on the vertical axis_ Can be continuous or categorical.
+        the plot on the vertical axis. Can be continuous or categorical.
         Can be in a data frame or defined in the global environment.} 
   \item{data}{Optional data frame that contains one or both of \code{x} and
         \code{y}. Default data frame is \code{d}.}
@@ -219,6 +220,9 @@ vp(\ldots)
         for a Cleveland dot plot, that is, a numeric \code{x}-variable paired
         with a categorical \code{y}-variable with unique values. If a \code{x}
         is a vector of two variables, sort by their difference.}
+  \item{segments}{Designed for interaction plots of means, connects each pair of
+        successive points with a line segment. Pass a data frame of the means,
+        such as from \code{\link{pivot}}.}
   \item{segments_y}{For one \code{x}-variable, draw a line segment from the
         \code{y}-axis to
         each plotted point, such as for the Cleveland dot plot. For two
@@ -280,7 +284,7 @@ vp(\ldots)
   \item{box_fill}{Fill color for a box plot.}
   \item{vbs_pt_fill}{Points in a VBS scatterplot are black by default because
         the background is the violin, which is based on the current theme
-        color_ To use the values for \code{pt_fill} and \code{pt_color} 
+        color. To use the values for \code{pt_fill} and \code{pt_color} 
         specified by the \code{\link{style}} function, set to \code{"default"}.
         Or set to any desired color_}
   \item{vbs_mean}{Show the mean on the box plot with a strip the color
@@ -376,11 +380,11 @@ vp(\ldots)
         are sorted with equal intervals or a single variable is a time series.
         Customize the color of the line segments with \code{segments_color}
         with function \code{\link{style}}.}
-  \item{lwd}{Width of the line segments_ Set to zero to remove the line
+  \item{lwd}{Width of the line segments. Set to zero to remove the line
         segments_}       
   \item{area_fill}{Parameter \code{fill} applies to points if only points and
        if only a run chart or time series chart, then to area under
-       line segments_ But \code{area_fill} takes precedence over \code{fill}
+       line segments. But \code{area_fill} takes precedence over \code{fill}
        for the area under the line segments, which is needed to provide both
        fill for points and this area. Like \code{fill}, the value of \code{"on"}
        sets the default fill color for points.}
@@ -423,7 +427,7 @@ vp(\ldots)
   \item{rotate_y}{Degrees that the axis values for the value labels on
         the \code{y}-axis are rotated, usually to accommodate longer values,
         typically used in conjunction with \code{offset}.}
-  \item{offset}{The amount of spacing between the axis values and the axis_ Default
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 are used to create space for the label when
         longer axis value names are rotated.}\cr
 
@@ -440,7 +444,7 @@ vp(\ldots)
   \item{label_max}{Maximum size of labels for the values of a categorical variable.
         Not a literal maximum as preserving unique values may require a larger number
         of characters than specified.}
-  \item{origin_x}{Origin of \code{x}-axis_ Starting value of \code{x}, by
+  \item{origin_x}{Origin of \code{x}-axis. Starting value of \code{x}, by
        default the minimum value of \code{x}, except when \code{stat}
        is set to \code{"count"} or related  where the origin is zero
        by default, but can be modified.}
@@ -517,9 +521,9 @@ vp(\ldots)
 
 \details{
 VARIABLES and TRELLIS PLOTS\cr
-There is at least one primary variable, \code{x}, which defines the coordinate system for plotting in terms of the \code{x}-axis, the horizontal axis_ Plots may also specify a second primary variable, \code{y}, which defines the \code{y}-axis of the coordinate system. One of these primary variables may be a vector. The simplest plot is from the specification of only one or two primary variables, each as a single variable, which generates a single scatterplot of either one or two variables, necessarily on a single plot, called a panel, defined by a single \code{x}-axis and usually a single \code{y}-axis_
+There is at least one primary variable, \code{x}, which defines the coordinate system for plotting in terms of the \code{x}-axis, the horizontal axis. Plots may also specify a second primary variable, \code{y}, which defines the \code{y}-axis of the coordinate system. One of these primary variables may be a vector. The simplest plot is from the specification of only one or two primary variables, each as a single variable, which generates a single scatterplot of either one or two variables, necessarily on a single plot, called a panel, defined by a single \code{x}-axis and usually a single \code{y}-axis_
 
-For numeric primary variables, a single panel may also contain multiple plots of two types. Form the first type from subsets of observations (rows of data) based on values of a categorical variable. Specify this plot with the \code{by} parameter, which identifies the grouping variable to generate a scatterplot of the primary variables for each of its levels. The points for each group are plotted with a different shape and/or color_ By default, the colors vary, though to maintain the color scheme, if there are only two levels of the grouping variable, the points for one level are filled with the current theme color and the points for the second level are plotted with transparent interiors. 
+For numeric primary variables, a single panel may also contain multiple plots of two types. Form the first type from subsets of observations (rows of data) based on values of a categorical variable. Specify this plot with the \code{by} parameter, which identifies the grouping variable to generate a scatterplot of the primary variables for each of its levels. The points for each group are plotted with a different shape and/or color. By default, the colors vary, though to maintain the color scheme, if there are only two levels of the grouping variable, the points for one level are filled with the current theme color and the points for the second level are plotted with transparent interiors. 
 
 Or, obtain multiple scatterplots on the same panel with multiple numeric \code{x}-variables, or multiple \code{y}-variables. To obtain this graph, specify one of the primary variables as a vector of multiple variables. 
 
@@ -528,16 +532,16 @@ Trellis graphics, from Deepayan Sarkar's (2009) \code{\link{lattice}} package, m
 Control the panel dimensions and the overall size of the Trellis plot with the following parameters: \code{width} and \code{height} for the physical dimensions of the plot window, \code{n_row} and \code{n_col} for the number of rows and columns of panels, and \code{aspect} for the ratio of the height to the width of each panel. The plot window is the standard graphics window that displays on the screen, or it can be specified as a pdf file with the \code{pdf_file} parameter. 
 
 CATEGORICAL VARIABLES\cr
-Conceptually, there are continuous variables and categorical variables. Categorical variables have relatively few unique data values_ However, categorical variables can be defined with non-numeric values, but also with numeric values, such as responses to a five-point Likert scale from Strongly Disagree to Strongly Agree, with responses coded 1 to 5. The three \code{by} --variables -- \code{by1}, \code{by2} and \code{by} -- only apply to graphs created with numeric \code{x} and/or \code{y} variables, continuous or categorical.
+Conceptually, there are continuous variables and categorical variables. Categorical variables have relatively few unique data values. However, categorical variables can be defined with non-numeric values, but also with numeric values, such as responses to a five-point Likert scale from Strongly Disagree to Strongly Agree, with responses coded 1 to 5. The three \code{by} --variables -- \code{by1}, \code{by2} and \code{by} -- only apply to graphs created with numeric \code{x} and/or \code{y} variables, continuous or categorical.
 
-The standard and most general way to define a categorical variable is as an R factor, such as created with the lessR \code{\link{factors}} function. \code{lessR} provides the option to define an integer variable with equally spaced values as categorical based on the value of \code{n_cat}, which can be set locally or globally with the \code{\link{style}} function. For example, for a variable with data values from 5-point Likert scale, a value of \code{n_cat} of 5 will define the define the variable as categorical. The default value is 0. To explicitly analyze the values as categorical, set \code{n_cat} to a value larger than 0, at least the size of the number of unique integer values_ Can also annotate a graph of the values of an integer categorical variable with \code{value_labels} option.  
+The standard and most general way to define a categorical variable is as an R factor, such as created with the lessR \code{\link{factors}} function. \code{lessR} provides the option to define an integer variable with equally spaced values as categorical based on the value of \code{n_cat}, which can be set locally or globally with the \code{\link{style}} function. For example, for a variable with data values from 5-point Likert scale, a value of \code{n_cat} of 5 will define the define the variable as categorical. The default value is 0. To explicitly analyze the values as categorical, set \code{n_cat} to a value larger than 0, at least the size of the number of unique integer values. Can also annotate a graph of the values of an integer categorical variable with \code{value_labels} option.  
 
-A scatterplot of Likert type data is problematic because there are so few possibilities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 26 possible paired values to plot, so most of the plotted points overlap with others. In this situation, that is, when a single variable or two variables with Likert response scales are specified, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values_ To request a sunflower plot in lieu of the bubble plot, set the \code{shape} to \code{"sunflower"}.
+A scatterplot of Likert type data is problematic because there are so few possibilities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 26 possible paired values to plot, so most of the plotted points overlap with others. In this situation, that is, when a single variable or two variables with Likert response scales are specified, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values. To request a sunflower plot in lieu of the bubble plot, set the \code{shape} to \code{"sunflower"}.
 
 DATA\cr
 The default input data frame is \code{d}. Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{d$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment.
 
-The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis_ For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin_width}, to override default values_ The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
+The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin_width}, to override default values. The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
        
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -558,7 +562,7 @@ The plot can also be obtained as a bubble plot of frequencies for a categorical 
 TWO VARIABLE PLOT\cr
 When two variables are specified to plot, by default if the values of the first variable, \code{x}, are unsorted, or if there are unequal intervals between adjacent values, or if there is missing data for either variable, a scatterplot is produced from a call to the standard R \code{\link{plot}} function. By default, sorted values with equal intervals between adjacent values of the first of the two specified variables yields a function plot if there is no missing data for either variable, that is, a call to the standard R \code{\link{plot}} function with \code{type="l"}, which connects each adjacent pair of points with a line segment.
 
-Specifying multiple, continuous \code{x}-variables against a single y variable, or vice versa, results in multiple plots on the same graph. The color of the points of the second variable is the same as that of the first variable, but with a transparent fill_ For more than two \code{x}-variables, multiple colors are displayed, one for each \code{x}-variable.
+Specifying multiple, continuous \code{x}-variables against a single y variable, or vice versa, results in multiple plots on the same graph. The color of the points of the second variable is the same as that of the first variable, but with a transparent fill. For more than two \code{x}-variables, multiple colors are displayed, one for each \code{x}-variable.
 
 BUBBLE PLOT FREQUENCY MATRIX (BPFM)\cr
 Multiple categorical variables for \code{x} may be specified in the absence of a \code{y} variable. A bubble plot results that illustrates the frequency of each response for each of the variables in a common figure in which the \code{x}-axis contains all of the unique labels for all of the variables plotted. Each line of information, the bubbles and counts for a single variable, replaces the standard bar chart in a more compact display. Usually the most meaningful when each variable in the matrix has the same response categories, that is, levels, such as for a set of shared Likert scales. The BPFM is considerably condensed presentation of frequencies for a set of variables than are the corresponding bar charts.
@@ -576,7 +580,7 @@ To explicitly vary the shapes, use \code{shape} and a list of shape values in th
 Shapes beyond the standard list of named shapes, such as \code{"circle"}, are also available as single characters.  Any single letter, uppercase or lowercase, any single digit, and the characters \code{"+"}, \code{"*"} and \code{"#"} are available, as illustrated in the examples. In the use of \code{shape}, either use standard named shapes, or individual characters, but not both in a single specification.
 
 SCATTERPLOT ELLIPSE\cr
-For a scatterplot of two numeric variables, the \code{ellipse=TRUE} option draws the .95 data ellipse as computed by the \code{ellipse} function, written by Duncan Murdoch and E. D. Chow, from the \code{ellipse} package. The axes are automatically lengthened to provide space for the entire ellipse that extends beyond the maximum and minimum data values_ The specific level of the ellipse can be specified with a numerical value in the form of a proportion. Multiple numerical values of \code{ellipse} may also be specified to obtain multiple ellipses. 
+For a scatterplot of two numeric variables, the \code{ellipse=TRUE} option draws the .95 data ellipse as computed by the \code{ellipse} function, written by Duncan Murdoch and E. D. Chow, from the \code{ellipse} package. The axes are automatically lengthened to provide space for the entire ellipse that extends beyond the maximum and minimum data values. The specific level of the ellipse can be specified with a numerical value in the form of a proportion. Multiple numerical values of \code{ellipse} may also be specified to obtain multiple ellipses. 
 
 BOXPLOTS\cr
 For a single variable the preferred plot is the integrated violin/box/scatter plot or VBS plot. Only the violin or box plot can be obtained with the corresponding aliases \code{\link{ViolinPlot}} and \code{\link{BoxPlot}}, or by setting \code{vbs_plot} to \code{"v"} or \code{"b"}. To view a box plot of a continuous variable (Y) across the levels of a categorical variable (X), either as part of the full VBS plot, or by itself, there are two possibilities:\cr
@@ -590,12 +594,13 @@ All colors are displayed at the same level of gray-scale saturation and brightne
 The second possibility with \code{by1} produces the different box plots on a separate panel, that is, a Trellis chart. These box plots are displayed with a single hue, the first color, blue, in the default qualitative sequence.
 
 TIME CHARTS\cr
-Specifying one or more \code{x}-variables with no \code{y}-variables, and \code{run=TRUE} plots the \code{x}-variables in a run chart. The values of the specified \code{x}-variable are plotted on the \code{y}-axis, with Index on the \code{x}-axis_ Index is the ordinal position of each data value, from 1 to the number of values_ 
+Specifying one or more \code{x}-variables with no \code{y}-variables, and \code{run=TRUE} plots the \code{x}-variables in a run chart. The values of the specified \code{x}-variable are plotted on the \code{y}-axis, with Index on the \code{x}-axis. Index is the ordinal position of each data value, from 1 to the number of values. 
 
 If the specified \code{x}-variable is of type \code{Date}, or is a time series, a time series plot is generated for each specified variable. If a formal R time-series, univariate or multivariate, specify as the \code{x}-variable. Or, specify the \code{x}-variable of type Date, and then specify the  \code{y}-variable as one or more time series to plot. The \code{y}-variable can be formatted as tidy data with all the values in a single column, or as wide-formatted data with the time-series variables in separate columns. 
 
 2-D KERNEL DENSITY\cr
-With \code{smooth=TRUE}, the R function \code{\link{smoothScatter}} is invoked according to the current color theme. Useful for very large data sets. The \code{smooth_points} parameter plots points from the regions of the lowest density. The \code{smooth_bins} parameter specifies the number of bins in both directions for the density estimation. The \code{smooth_exp} parameter specifies the exponent in the function that maps the density scale to the color scale to allow customization of the intensity of the plotted gradient colors. Higher values result in less color saturation, de-emphasizing points from regions of lessor density. These parameters are respectively passed directly to the \code{\link{smoothScatter}} \code{nrpoints}, \code{nbin} and \code{transformation} parameters. Grid lines are turned off, but can be displayed by setting the \code{grid_color} parameter.
+With \code{smooth=TRUE}, the R function \code{\link{smoothScatter}} is invoked according to the current color theme. Useful for very large data sets. The \code{smooth_points} parameter plots points from the regions of the lowest density. The \code{smooth_bins} parameter specifies the number of bins in both directions for the density estimation. The \code{smooth_exp} parameter specifies the exponent in the function that maps the density scale to the color scale to allow customization of the intensity of the plotted gradient colors. Higher values result in less color saturation, de-emphasizing points from regions of lessor density. These parameters are respectively passed directly to the \code{\link{smoothScatter}} \code{nrpoints}, \code{nbin} and \code{transformation} parameters. Grid lines are turned off,
+by default, but can be displayed by setting the \code{grid_color} parameter.
 
 COLORS\cr
 A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{"lightbronze"}. A gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"sienna"} and \code{"darkred"}. Use the option \code{style(sub_theme="black")} for a black background and partial transparency of plotted colors. 
@@ -606,12 +611,13 @@ For the color options, such as \code{violin_color}, the value of \code{"off"} is
 \cr
 
 ANNOTATIONS\cr
-Use the \code{add} and related parameters to annotate the plot with text and/or geometric figures_ Each object is placed according from one to four corresponding coordinates, the required coordinates to plot that object, as shown in the following table. \code{x}-coordinates may have the value of \code{"mean_x"} and \code{y}-coordinates may have the value of \code{"mean_y"}.\cr
+Use the \code{add} and related parameters to annotate the plot with text and/or geometric figures. Each object is placed according from one to four corresponding coordinates, the required coordinates to plot that object, as shown in the following table. \code{x}-coordinates may have the value of \code{"mean_x"} and \code{y}-coordinates may have the value of \code{"mean_y"}.\cr
 
 \tabular{lll}{
 Value \tab Object \tab Required Coordinates\cr
 ----------- \tab ------------------- \tab ----------------\cr
 \code{"text"} \tab text \tab x1, y1\cr
+\code{"point"} \tab text \tab x1, y1\cr
 \code{"rect"} \tab rectangle \tab x1, y1, x2, y2\cr
 \code{"line"} \tab line segment \tab x1, y1, x2, y2\cr
 \code{"arrow"} \tab arrow \tab x1, y1, x2, y2\cr

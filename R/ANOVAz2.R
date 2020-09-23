@@ -37,6 +37,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
   txcn <- ""
   txcm <- ""
   if (bet.grp) {
+
     l <-  tapply(y.values, 
           list(x1.values, x2.values), length)
     l <- as.table(l)
@@ -47,26 +48,33 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
       tx[length(tx)+1] <- paste("Cell Sample Size:", l[1,1])
       txcn <- tx
 
-
       tx <- character(length = 0)
-
       if (is.null(options()$knitr.in.progress)) {
         tx[length(tx)+1] <- "Cell Means"
         tx[length(tx)+1] <- ""
       }
 
       m <-  tapply(y.values, 
-            list(x1.values, x2.values ), mean, na.rm=TRUE)
-      m <- as.table(m)
+            list(x1.values, x2.values), mean, na.rm=TRUE)
       #names(dimnames(m)) <- c(nm[2], nm[3])
       tx2 <- .prntbl(t(m), digits_d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
       for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
+
+      m <- as.table(m)
 
       txcm <- tx
 
     }  # !brief
   }  # bet.grp
 
+  else {  # get means, a 2-d matrix, then table
+    m <-  tapply(y.values, 
+                 list(x1.values, x2.values), mean, na.rm=TRUE)
+    m <- as.table(m)
+  }
+
+  m <- data.frame(m)  # converts table of means to long form
+  names(m) <- c(nm[2], nm[3], nm[1])
 
     tx <- character(length = 0)
 
@@ -91,7 +99,6 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
 
     tx <- character(length = 0)
-
     if (is.null(options()$knitr.in.progress)) {
       tx[length(tx)+1] <- "Grand Mean"
       tx[length(tx)+1] <- ""
@@ -104,7 +111,6 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
 
   tx <- character(length = 0)
-
   if (is.null(options()$knitr.in.progress)) {
     tx[length(tx)+1] <- "Cell Standard Deviations"
     tx[length(tx)+1] <- ""
@@ -112,13 +118,11 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
   txcs <- ""
   if (bet.grp) {
-
     s <-  tapply(y.values, 
-          list(x1.values, x2.values ), sd, na.rm=TRUE)
+                 list(x1.values, x2.values), sd, na.rm=TRUE)
     s <- as.table(s)
     tx2 <- .prntbl(t(s), digits_d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
     for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
-
     txcs <- tx
   }  # end between groups
 
@@ -150,6 +154,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
     }
     if (icol != 1) if (max.num[icol] < 9L) max.num[icol] <- 9L 
   }
+
   df.lbl <- .fmtc("     df", max.num[1]+2)
   SS.lbl <- .fmtc(" Sum Sq", max.num[2]+1)
   MS.lbl <- .fmtc("Mean Sq", max.num[3]+1)
@@ -163,10 +168,13 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
   for (i in 1:(n.vars)) {
     rlb <- .fmtc(rownames(smc)[i], buf)
     df <- format(sprintf("%i", smc[i,1]), width=max.num[1]-4, justify="right")
-    SS <- format(sprintf("%7.*f", digits_d, smc[i,2]), width=max.num[2], justify="right")
-    MS <- format(sprintf("%7.*f", digits_d, smc[i,3]), width=max.num[3], justify="right")
+    SS <- format(sprintf("%7.*f", digits_d, smc[i,2]), width=max.num[2],
+                 justify="right")
+    MS <- format(sprintf("%7.*f", digits_d, smc[i,3]), width=max.num[3],
+                 justify="right")
     if (i < n.vars) {
-      fv <- format(sprintf("%7.*f", digits_d, smc[i,4]), width=9, justify="right")
+      fv <- format(sprintf("%7.*f", digits_d, smc[i,4]), width=9,
+                   justify="right")
       pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
       tx[length(tx)+1] <- paste(rlb, df, SS, MS, fv, pv) 
     }
@@ -216,22 +224,26 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
   if (omsq.A > 0) {
     fA.cohen <- sqrt( (omsq.A/(1-omsq.A)) )
-    tx[length(tx)+1] <- paste("Cohen's f for ", nm[2], ": ", .fmt(fA.cohen, 2), sep="")
+    tx[length(tx)+1] <- paste("Cohen's f for ", nm[2], ": ",
+                              .fmt(fA.cohen, 2), sep="")
   }
   if (bet.grp) {
     if(omsq.B > 0) {
       fB.cohen <- sqrt( (omsq.B/(1-omsq.B)) )
-      tx[length(tx)+1] <- paste("Cohen's f for ", nm[3], ": ", .fmt(fB.cohen, 2), sep="")
+      tx[length(tx)+1] <- paste("Cohen's f for ", nm[3], ": ",
+                                .fmt(fB.cohen, 2), sep="")
     }
     if (omsq.AB > 0) {
       fAB.cohen <- sqrt( (omsq.AB/(1-omsq.AB)) )
-      tx[length(tx)+1] <- paste("Cohen's f for ", nm[2], "_&_", nm[3], ": ", .fmt(fAB.cohen, 2), sep="")
+      tx[length(tx)+1] <- paste("Cohen's f for ", nm[2], "_&_", nm[3], ": ",
+                                 .fmt(fAB.cohen, 2), sep="")
     }
   }
   if (wth.grp) {
     if (intra.B > 0) {
       fB.cohen <- sqrt( (intra.B/(1-intra.B)) )
-      tx[length(tx)+1] <- paste("Cohen's f for ", nm[3], ": ", .fmt(fB.cohen, 2), sep="")
+      tx[length(tx)+1] <- paste("Cohen's f for ", nm[3], ": ",
+                                .fmt(fB.cohen, 2), sep="")
     }
   }
 
@@ -244,7 +256,8 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
     tx <- character(length = 0)
 
     HSD <- TukeyHSD(av.out)
-    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD, which="conf_level"))
+    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD,
+                              which="conf_level"))
     tx[length(tx)+1] <- paste("\nFactor:", nm[2])
 
     txHSD <- .prntbl(HSD[[1]], digits_d)
@@ -261,7 +274,6 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
     txhsd <- tx
   }
-
 
 
   # ------------------------------------
@@ -288,9 +300,12 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
     plt.i <- plt.i + 1
     plt.title[plt.i] <- "Interaction Plot"
 
-    interaction.plot(x1.values, x2.values, y.values,
-                     xlab=nm[2], ylab=nm[1], trace.label=nm[3],
-                     main=plt.title[plt.i])
+    options(byname = nm[3])
+    .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], segments=TRUE,
+              cat.x=TRUE, xlab=nm[2], ylab=nm[1], main="Cell Means", size=2)
+#   interaction.plot(x1.values, x2.values, y.values,
+#                    xlab=nm[2], ylab=nm[1], trace.label=nm[3],
+#                    main=plt.title[plt.i])
 
     # pdf
     if (pdf) {
@@ -311,18 +326,30 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
         pdf(file=pdf_file, width=width, height=height)
       }
 
-    plt.i <- plt.i + 1
-    plt.title[plt.i] <- "Fitted Values"
+      plt.i <- plt.i + 1
+      plt.title[plt.i] <- "Fitted Values"
 
-      mn.y <- min(y.values, av.out$fitted)
-      mx.y <- max(y.values, av.out$fitted)
-      interaction.plot(x1.values, x2.values, 
-               av.out$fitted, main=plt.title[plt.i],
-               xlab=nm[2], ylab=nm[1], trace.label=nm[3], ylim=c(mn.y, mx.y))
-      if (rb_points) {
+     if (!rb_points) {
+      m <-  tapply(av.out$fitted, 
+                   list(x1.values, x2.values), mean, na.rm=TRUE)
+      m <- as.table(m)
+      m <- data.frame(m)
+      names(m) <- c(nm[2], nm[3], nm[1])
+      options(byname = nm[3])
+      .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], segments=TRUE,
+                cat.x=TRUE, xlab=nm[2], ylab=nm[1], main="Fitted Means")
+      }
+      else {  # plot the individual points with the fitted means
+        mn.y <- min(y.values, av.out$fitted)
+        mx.y <- max(y.values, av.out$fitted)
+        interaction.plot(x1.values, x2.values, av.out$fitted,
+                 main=plt.title[plt.i],
+                 xlab=nm[2], ylab=nm[1], trace.label=nm[3], ylim=c(mn.y, mx.y))
         points(x1.values, y.values, pch=21, 
-               bg=rgb(.6, .6, .6, alpha=getOption("trans_pts"), maxColorValue = 1))
-        segments(as.numeric(x1.values), av.out$fitted, as.numeric(x1.values), y.values)
+               bg=rgb(.6, .6, .6, alpha=getOption("trans_pts"),
+               maxColorValue = 1))
+#       segments(as.numeric(x1.values), av.out$fitted, as.numeric(x1.values),
+#                y.values)
       }
 
       # pdf
@@ -330,8 +357,8 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
         dev.off()
         .showfile(pdf_file, "fitted values plot")
       }
-    }
-  }
+    }  # end within group
+  }  # end grahpics
 
   return(list(
     txbck2=txbck2, 

@@ -13,7 +13,7 @@ Usually a prelude to a factor analysis, such as provided by \code{\link{corCFA}}
 
 \usage{
 corReflect(R=mycor, vars,
-          main=NULL, heat_map=TRUE, bottom=3,right=3, 
+          main=NULL, heat_map=TRUE, bottom=NULL,right=NULL, 
           pdf_file=NULL, width=5, height=5, \ldots)
 
 reflect(\ldots)

@@ -314,17 +314,19 @@ function(from=NULL, format=NULL, var_labels=FALSE,
   # function call for suggestions
   fncl <- .fun_call.deparse(fun_call)
 
-  if (getOption("suggest")) {
-    if (brief || !grepl("var_labels", fncl))
-      cat("\n>>> Suggestions\n")
-    if (!grepl("var_labels", fncl)  &&  format != "lessR")
-      cat("To read a csv or Excel file of variable labels, var_labels=TRUE\n",
-          "  Each row of the file:  Variable Name, Variable Label\n")
-    if (brief) {
-      cat("Details about your data, Enter:  details()  for d, or",
-         " details(name)\n")
+  if (!quiet) {
+    if (getOption("suggest")) {
+      if (brief || !grepl("var_labels", fncl))
+        cat("\n>>> Suggestions\n")
+      if (!grepl("var_labels", fncl)  &&  format != "lessR")
+        cat("To read a csv or Excel file of variable labels, var_labels=TRUE\n",
+            "  Each row of the file:  Variable Name, Variable Label\n")
+      if (brief) {
+        cat("Details about your data, Enter:  details()  for d, or",
+           " details(name)\n")
+      }
+      cat("\n")
     }
-    cat("\n")
   }
 
 

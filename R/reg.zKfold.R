@@ -1,6 +1,8 @@
 .regKfold <-
-function(data, my_formula, kfold, nm, predictors, n.vars,
-         n.keep, digits_d=NULL, show_R) {
+function(data, my_formula, kfold, rescale, nm, predictors, n.vars,
+         n.keep, seed, digits_d=NULL, show_R) {
+
+  dd <- data  # store original in case rescaling each fold
 
   tx <- character(length = 0)
 
@@ -21,17 +23,27 @@ function(data, my_formula, kfold, nm, predictors, n.vars,
 
   # define folds on the basis of the remainders of the
   #   scrambled integers of the row numbers of the data
+  if (!is.null(seed))
+    set.seed(seed)
   nk <- sample(1:n.keep, n.keep) %% kfold
 
   for (i in 1:kfold) {
-    train <- which(nk != (i-1))
-    test <- which(nk == (i-1))
+    train <- which(nk != (i-1)) # combine all other folds
+    test <- which(nk == (i-1))  # one test fold
+    if (rescale != "none") {  # separate rescaling for train and test data
+      for (j in 1:n.vars)  {
+        dd[train,nm[j]] <- Rescale(data[train,nm[j]], data=NULL,
+                                kind=rescale, digits_d)
+        dd[test,nm[j]] <- Rescale(data[test,nm[j]], data=NULL,
+                                kind=rescale, digits_d)
+      }  # end for (i in 1:n.vars)
+    }  # end rescale != "none"
 
-    d_test = na.omit(data[test, nm])
+    d_test = na.omit(dd[test, nm])
     k_n[i] <- nrow(d_test)
 
-    # training data solution for this fold
-    lm.sol <- lm(my_formula, data=data[train, ])
+    # training data solution
+    lm.sol <- lm(my_formula, data=dd[train, ])
     t_n[i] <- nrow(lm.sol$model)
     if (is.null(digits_d)) digits_d <- 3
     anv <- .reg1anvBasic(lm.sol, digits_d, show_R)
@@ -54,19 +66,24 @@ function(data, my_formula, kfold, nm, predictors, n.vars,
     k_se[i] <- sqrt(k_MSE[i])
     SSY <- sum((y - mean(y))^2)
     k_Rsq[i] <- 1 - (SSE / SSY)
-  }
+  }  # end for (i in 1:kfold)
+
 
   # ------------------------------------------
   # display result for each fold and the means
 
+print(k_Rsq)
+print(trunc(k_Rsq))
+print(floor(k_Rsq))
+p(digits_d)
   # get column widths
   max.num <- integer(length=6)
-  max.num[1] <- max(nchar(as.character(trunc(t_se))) + digits_d + 1)
-  max.num[2] <- max(nchar(as.character(trunc(t_MSE))) + digits_d + 1)
-  max.num[3] <- max(nchar(as.character(trunc(t_Rsq))) + digits_d + 1)
-  max.num[4] <- max(nchar(as.character(trunc(k_se))) + digits_d + 1)
-  max.num[5] <- max(nchar(as.character(trunc(k_MSE))) + digits_d + 1)
-  max.num[6] <- max(nchar(as.character(trunc(k_Rsq))) + digits_d + 1)
+  max.num[1] <- max(nchar(as.character(floor(t_se))) + digits_d + 1)
+  max.num[2] <- max(nchar(as.character(floor(t_MSE))) + digits_d + 1)
+  max.num[3] <- max(nchar(as.character(floor(t_Rsq))) + digits_d + 1)
+  max.num[4] <- max(nchar(as.character(floor(k_se))) + digits_d + 1)
+  max.num[5] <- max(nchar(as.character(floor(k_MSE))) + digits_d + 1)
+  max.num[6] <- max(nchar(as.character(floor(k_Rsq))) + digits_d + 1)
   max.num[which(max.num < 6)] <- 6
 
   # heading labels

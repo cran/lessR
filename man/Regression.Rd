@@ -17,8 +17,8 @@ Output is generated into distinct segments by topic, organized and displayed in 
 }
 
 \usage{
-Regression(my_formula, data=d, rows=NULL, kfold=0,
-           digits_d=NULL, standardize=FALSE,
+Regression(my_formula, data=d, rows=NULL,
+         digits_d=NULL,
 
          Rmd=NULL, Rmd_browser=TRUE, 
          Rmd_format=c("html", "word", "pdf", "odt", "none"),
@@ -33,13 +33,15 @@ Regression(my_formula, data=d, rows=NULL, kfold=0,
          pred_rows=NULL, pred_sort=c("predint", "off"),
          subsets=NULL, cooks_cut=1,
 
-         scatter_coef=TRUE, graphics=TRUE, scatter_3D=FALSE,
+         scatter_coef=TRUE, scatter_3D=FALSE,
 
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL,
          X5_new=NULL, X6_new=NULL,
 
+         kfold=0, seed=NULL, rescale=c("none", "z", "0to1", "robust"),
+
          quiet=getOption("quiet"),
-         pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
+         graphics=TRUE, pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
          fun_call=NULL, \ldots)
 
 reg(\ldots)
@@ -60,13 +62,9 @@ reg_brief(\ldots, brief=TRUE)
        \code{lessR} function \code{\link{Read}}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
-  \item{kfold}{Number of K-fold cross-validations. If conducted, only the
-       cross-validation output shown.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits,
         set by default to at least 2 or the largest number of digits in the values
-        of the response variable plus 1.}
-  \item{standardize}{Standardize each of the variables in the regression model before
-        conducting the analysis.}\cr
+        of the response variable plus 1.} \cr
 
   \item{Rmd}{File name for the automatically generated R Markdown file, if specified.
         The file type is .Rmd, a simple text file that can be edited with
@@ -133,27 +131,43 @@ reg_brief(\ldots, brief=TRUE)
 
   \item{scatter_coef}{Display the correlation coefficients in the upper triangle of the
         scatterplot matrix.}
-  \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{knitr} can be useful
-       to set to \code{FALSE} so that \code{\link{regPlot}} can be used to place
-       the graphics within the output file.}
-  \item{scatter_3D}{De-activated because car package no longer linked, but if set to
-       \code{TRUE}, directions are provided to use the car scatter3d function directly.}\cr
+  \item{scatter_3D}{De-activated because car package no longer linked, but
+       if set to \code{TRUE}, directions are provided to use the car
+       \code{scatter3d} function directly.}\cr
 
-  \item{X1_new}{Values of the first listed numeric predictor variable for which forecasted values
+  \item{X1_new}{Values of the first listed numeric predictor variable for
+        which forecasted values
         and corresponding prediction intervals are calculated.}
-  \item{X2_new}{Values of the second listed numeric predictor variable for which forecasted values
+  \item{X2_new}{Values of the second listed numeric predictor variable for
+        which forecasted values
         and corresponding prediction intervals are calculated.}
-  \item{X3_new}{Values of the third listed numeric predictor variable for which forecasted values
+  \item{X3_new}{Values of the third listed numeric predictor variable for
+        which forecasted values
         and corresponding prediction intervals are calculated.}
-  \item{X4_new}{Values of the fourth listed numeric predictor variable for which forecasted values
+  \item{X4_new}{Values of the fourth listed numeric predictor variable for
+        which forecasted values
         and corresponding prediction intervals are calculated.}
-  \item{X5_new}{Values of the fifth listed numeric predictor variable for which forecasted values
+  \item{X5_new}{Values of the fifth listed numeric predictor variable for
+        which forecasted values
         and corresponding prediction intervals are calculated.}
-  \item{X6_new}{Values of the sixth listed numeric predictor variable for which forecasted values
+  \item{X6_new}{Values of the sixth listed numeric predictor variable 
+        for which forecasted values
         and corresponding prediction intervals are calculated.}\cr
+
+  \item{kfold}{Number of K-fold cross-validations. If conducted, only the
+       cross-validation output shown.}
+  \item{seed}{Parameter \code{kfold} generates random partitions, folds, of data.
+       Set the seed to an integer to recover the same random partitions on
+       subsequent runs.}
+  \item{rescale}{Transform the variables to the same metric before
+        conducting the analysis. Applies to \code{kfold} separately to the
+        training and testing folds as well to avoid data leakage.}\cr
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}
+  \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{knitr}
+       can be useful to set to \code{FALSE} so that \code{\link{regPlot}}
+       can be used to place the graphics within the output file.}
   \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
@@ -339,11 +353,15 @@ r$out_estimates
 # Here knit into an html file, but do not display
 #reg(Reading ~ Verbal + Absent, Rmd="read", Rmd_browser=FALSE)
 
-# generate interpretative  R markdown file and render Word and odt
+# generate interpretative R markdown file and render Word and odt
 #reg(Reading ~ Verbal + Absent, Rmd="eg", Rmd_format=c("word", "odt"))
 
 # just for incomes > 100000 and less than 5 days absent 
 Regression(Reading ~ Verbal, rows=(Income > 100 & Absent < 5))
+
+# standardize
+Regression(Reading ~ Verbal, rescale="z")
+
 
 # Multiple regression model
 # Save the three output plots as pdf files 4 inches square

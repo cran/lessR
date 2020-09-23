@@ -1,5 +1,5 @@
 corCFA <- 
-function(mimm=NULL, x=mycor, data=d, fac.names=NULL, 
+function(mimm=NULL, R=mycor, data=d, fac.names=NULL, 
 
          Rmd=NULL, explain=getOption("explain"),
          interpret=getOption("interpret"), results=getOption("results"),
@@ -10,7 +10,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
          resid=TRUE, item_cor=TRUE, sort=TRUE,
 
-         main=NULL, heat_map=TRUE, bottom=3, right=3, 
+         main=NULL, heat_map=TRUE, bottom=NULL, right=NULL, 
 
          pdf_file=NULL, width=5, height=5,
 
@@ -64,12 +64,13 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
   NFmax <- 20
 
 
+  # access R
   # translate variable names into column positions
   if (labels!="only") {
-    NVOld <- as.integer(nrow(x))
-    vars.all <- as.list(seq_along(as.data.frame(x)))
-    names(vars.all) <- names(as.data.frame(x))
-    nm <- dimnames(x)[[1]]
+    NVOld <- as.integer(nrow(R))
+    vars.all <- as.list(seq_along(as.data.frame(R)))
+    names(vars.all) <- names(as.data.frame(R))
+    nm <- dimnames(R)[[1]]
   }
   else {
     NVOld <- nrow(data)
@@ -171,7 +172,8 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
   if (!is.null(fac.names)) if (length(fac.names) < NF) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Only ", length(fac.names), " factor names entered for ", NF, " factors\n\n")
+      "Only ", length(fac.names), " factor names entered for ", NF,
+      " factors\n\n")
   }
 
   # get the ordinal position of the first and last vars in Group i
@@ -228,7 +230,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
   # --------------------------------------------------------
   # re-order R matrix
 
-  outR <- x[Label,Label]
+  outR <- R[Label,Label]
   nm_new <- colnames(outR)
 
   # get width of largest variable (item) name
@@ -282,7 +284,7 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
     }
     Label <- newLabel
 
-    outR <- x[Label,Label]
+    outR <- R[Label,Label]
 
     nm_new <- colnames(outR)
 
@@ -311,9 +313,10 @@ function(mimm=NULL, x=mycor, data=d, fac.names=NULL,
 
   # --------------------------------------------------------
   if (heat_map) {
-    if (is.null(main)) main <- "Item Correlations/Communalities"
-   .corcolors(out$R, NItems, main, bottom, right, diag=NULL,
-              pdf_file, width, height)
+    if (is.null(main)) main <- ""
+    .opendev(pdf_file, width, height)  # set up graphics
+    .corcolors(out$R, NItems, main, bottom, right, diag=NULL,
+               pdf_file, width, height)
   }
 
 

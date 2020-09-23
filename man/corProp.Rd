@@ -12,7 +12,7 @@ In the population, indicators of the same factor or latent variable have paralle
 
 \usage{
 corProp(R=mycor, 
-          main=NULL, heat_map=TRUE, bottom=3, right=3, 
+          main=NULL, heat_map=TRUE, bottom=NULL, right=NULL, 
           pdf_file=NULL, width=5, height=5, \ldots)
 
 prop(\ldots)

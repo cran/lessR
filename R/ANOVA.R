@@ -2,7 +2,7 @@ ANOVA <-
 function(my_formula, data=d, rows=NULL,
          brief=getOption("brief"), digits_d=NULL, 
          Rmd=NULL, graphics=TRUE,
-         rb_points=TRUE, res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
+         rb_points=FALSE, res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
          pdf=FALSE, width=5, height=5, fun_call=NULL, ...) {  
 
 
@@ -97,7 +97,6 @@ function(my_formula, data=d, rows=NULL,
   for (i in 2:n.vars) {  # all IVs must be factors
       nms <- which(names(data) == nm[i])
       if (in.data.frame && !is.factor(data[ , nms])) {
-        cat("\n>>> Note: Converting", nm[i], "to a factor for this analysis only.\n")
         data[ ,nms] <- as.factor(data[ ,nms])
       }
     }  
