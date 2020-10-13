@@ -97,7 +97,7 @@ function(from=NULL, format=NULL, var_labels=FALSE,
       else { 
         cat("\n"); stop(call.=FALSE, "\n","------\n",
             "Need to specify  format  or specify the name of\n",
-            "  a built-in lessR data file.\n\n")
+            "  a built-in lessR data file without the data prefix.\n\n")
       }
     }
   }  # end miss format

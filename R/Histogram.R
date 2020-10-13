@@ -154,7 +154,7 @@ function(x=NULL, data=d, rows=NULL,
     data <- eval(substitute(data), envir=parent.frame())
 
   if (!is.null(x.name))
-    x.in.global <- .in.global(x.name)  # see if in global, includes vars list
+    x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
   else
     x.in.global <- FALSE
     

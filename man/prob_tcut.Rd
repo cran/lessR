@@ -1,6 +1,5 @@
 \name{prob_tcut}
 \alias{prob_tcut}
-\alias{prob.tcut}
 
 \title{Plot t-distribution Curve and Specified Cutoffs with Normal Curve}
 
@@ -13,8 +12,6 @@ prob_tcut(df, alpha=0.05, digits_d=3, y_axis=FALSE,
          fill="aliceblue", color_tail="palevioletred4",
          nrm_color=gray(.7), color_t=gray(.08),
          pdf_file=NULL, width=5, height=5, \ldots)
-
-prob.tcut(\ldots)
 }
 
 
@@ -48,7 +45,7 @@ Replaces a t-table by providing the corresponding t-cutoff, the critical value b
 
 \examples{
 # t-distribution with 0.025 cutoffs for degrees of freedom of 15
-prob.tcut(15)
+prob_tcut(15)
 }
 
 

@@ -2,29 +2,18 @@
 function(x, y, size, radius, power, clr, clr_color,
          size_cut, prop, bubble_text, object) {
 
-  if (object == "point") object <- "bubble"
+  cords <- data.frame(x, y, size, stringsAsFactors=TRUE)
+  cords <- na.omit(cords)
 
-  if (object == "bubble") {
+  # scale for regular R or RStudio
+  adj <- .RSadj(radius=radius)  # reg R multiply by 1.6
+  radius <- adj$radius
 
-    # scale for regular R or RStudio
-    adj <- .RSadj(radius=radius)  # reg R multiply by 1.6
-    radius <- adj$radius
-
-    cords <- data.frame(x, y, size, stringsAsFactors=TRUE)
-    cords <- na.omit(cords)
-    sz <- cords[,3]**power  # radius unscaled
-    symbols(cords[,1], cords[,2], circles=sz, inches=radius,
-            bg=clr, fg=clr_color, add=TRUE)
-    mxru <- max(sz)
-    sz <- 2 * (sz/mxru) * radius  # scaled diameter
-  }
-
-  else if (object == "sunflower") {
-    sunflowerplot(cords$xx, cords$yy, number=cords$count,
-        seg.col=clr_color, col=clr,
-        col.axis=getOption("axis_x_color"), add=TRUE)
-#       xlab=x.lab, ylab=y.lab, add=TRUE)
-  }
+  sz <- cords[,3]**power  # radius unscaled
+  symbols(cords[,1], cords[,2], circles=sz, inches=radius,
+          bg=clr, fg=clr_color, add=TRUE)
+  mxru <- max(sz)
+  sz <- 2 * (sz/mxru) * radius  # scaled diameter
 
   # text on the bubbles
   if (size_cut  &&  object == "bubble") {  

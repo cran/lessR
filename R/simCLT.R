@@ -55,7 +55,7 @@ function(ns, n, p1=0, p2=1, seed=NULL,
     data.raw <- rnorm(ns*n, mu, sigma)
 
     if (pop) {
-      prob.znorm(mu=mu, sigma=sigma, xlab="Normal Population", 
+      prob_znorm(mu=mu, sigma=sigma, xlab="Normal Population", 
                  r=0.535, g=0.610, b=0.704)
     }
   }

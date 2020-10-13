@@ -11,7 +11,7 @@ Re-arranges the order of the variables in the input correlation matrix.  If no v
 }
 
 \usage{
-corReorder(R=mycor, order=c("hclust", "chain", "manual"),
+corReorder(R=mycor, order=c("hclust", "chain", "manual", "as_is"),
           hclust_type = c("complete", "ward.D", "ward.D2", "single",
                           "average", "mcquitty", "median", "centroid"),
           dist_type=c("R", "dist"),
@@ -27,7 +27,8 @@ reord(\ldots)
   \item{R}{Correlation matrix.}
   \item{order}{Source of ordering (seriation): Default of hierarchical cluster
        analysis,
-       Hunter(1973) chain method, or manually specified with \code{vars}.}
+       Hunter(1973) chain method, manually specified with \code{vars}, or left
+       \code{"as_is"}.}
   \item{hclust_type}{Type of hierarchical cluster analysis.}
   \item{dist_type}{Default is a correlation matrix of similarities, otherwise
        a distance matrix.}

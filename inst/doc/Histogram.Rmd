@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{histogram}
+  %\VignetteIndexEntry{2. Visualize: Histogram}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -15,22 +15,28 @@ library("lessR")
 ```
 
 
-## Histogram
 
-One of the most frequently encountered visualizations for continuous variables is the histogram.
+## Data
 
->_Histogram_: Bin similar values into a group, then plot the frequency of occurrence of the data values in each bin as the height of the corresponding bar.
-
-A call to a function to create a histogram has to contain the name of the variable that creates the bins and then tabulates the counts. With the `Histogram()` function, that variable name is the first argument passed to the function, and often, as in this example, the _only_ argument passed to the function. 
-
-
-First read the Employee data included as part of __lessR__.
+Most of the examples are an analysis of data in the _Employee_ data set, included with __lessR__. First read the _Employee_ data into the data frame _d_. See the `Read and Write` vignette for more details.
 
 ```{r read}
 d <- Read("Employee")
 ```
 
-To illustrate, consider the continuous variable _Salary_ in the Employee data table.  Use `Histogram()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_.
+## Histogram
+
+One of the most frequently encountered visualizations for continuous variables is the histogram, which outlines the general shape the underlying distribution.
+
+>_Histogram_: Bin similar values into a group, then plot the frequency of occurrence of the data values in each bin as the height of the corresponding bar.
+
+A call to a function to create a histogram contains the name of the continuous variable that contains the values to be plotted. With the `Histogram()` function, that variable name is the first argument passed to the function. In this example, the _only_ argument passed to the function is the variable name as the data frame is named _d_, the default value. The following illustrates the call to `Histogram()` with a continuous variable named $x$. 
+
+```{r hsform, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center'}
+knitr::include_graphics(system.file("img", "hsExplain.png", package="lessR"))
+```
+
+To illustrate, consider the continuous variable _Salary_ in the Employee data table.  Use `Histogram()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_ so the `data=` parameter is not needed.
 
 ```{r hs, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Histogram of tablulated counts for the bins of Salary."}
 Histogram(Salary)
@@ -87,3 +93,8 @@ Use the base R `help()` function to view the full manual for `Histogram()`. Simp
 ?Histogram
 ```
 
+## More
+
+More on Histograms and other visualizations from __lessR__ and other packages such as __ggplot2__ at:
+
+Gerbing, D., _R Visualizations: Derive Meaning from Data_, CRC Press, May, 2020, ISBN 978-1138599635.

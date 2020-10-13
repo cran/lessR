@@ -30,7 +30,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          smooth=FALSE, smooth_points=100, smooth_size=1,
          smooth_exp=0.25, smooth_bins=128,
 
-         fit="off", fit_se=0.95, ellipse=0, 
+         fit="off", fit_se=0.95, plot_errors=FALSE, ellipse=0, 
 
          bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
          breaks="Sturges", cumulate=FALSE, 
@@ -56,6 +56,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          fun_call=NULL, ...) {
 
 
+  if (is.null(fun_call)) fun_call <- match.call()
+
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
@@ -76,9 +78,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   if (!is.null(add)) if ("v.line" %in% add[1])  add[1] <- "v_line"
 
 
-# Note: stat is both object (dot plot) and statistic   
-
-  if (is.null(fun_call)) fun_call <- match.call()
+  # Note: stat is both object (dot plot) and statistic   
    
   # limit actual argument to alternatives, perhaps abbreviated
   sort_yx.miss <- ifelse (missing(sort_yx), TRUE, FALSE)
@@ -91,6 +91,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   proportion <- FALSE  # old signal, adjusted below if needed
   if (stat == "proportion") proportion <- TRUE
+
+  if (plot_errors)
+    if (fit == "off") fit <- "lm"
 
   if (length(pad_x) == 1) {  # only the first element of pad_x specified
     temp <- pad_x
@@ -165,6 +168,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   size.miss <- ifelse (missing(size), TRUE, FALSE)
   fill_miss <- ifelse (missing(fill), TRUE, FALSE)
   color_miss <- ifelse (missing(color), TRUE, FALSE)
+  seg.miss <- ifelse (missing(segments), TRUE, FALSE)
   seg.y.miss <- ifelse (missing(segments_y), TRUE, FALSE)  # for Cleveland plot
   seg.x.miss <- ifelse (missing(segments_x), TRUE, FALSE)
   ellipse.miss <- ifelse (missing(ellipse), TRUE, FALSE)
@@ -217,9 +221,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   if (is.logical(fit))
     fit.ln <- ifelse (fit, "loess", "off")
   if (is.character(fit)) {
-    if (!(fit %in% c("loess", "lm", "off", "ls"))) {  # "ls" deprecated
+    if (!(fit %in% c("loess", "lm", "off", "ls", "null"))) {  # "ls" deprecated
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "fit applies only for  loess  or  lm  (linear model)\n\n")
+        "fit only for loess, lm (linear model), or null (null model)\n\n")
     }
     fit.ln <- fit  # fit.ln passed to .plt.main
   }
@@ -339,7 +343,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
 
-  x.in.global <- .in.global(x.name)  # see if in global, includes vars lists
+  x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars lists
 
   
   #  get data to be analyzed into data.x data frame
@@ -538,7 +542,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   if (nrows > 2499  &&  !missing(y)) if (missing(smooth)) smooth <- TRUE
 
-  if(date.ts) object <- "both"
+  if (date.ts) object <- "both"
 
 
   #-----------
@@ -549,7 +553,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     y.name <- deparse(substitute(y))
     options(yname = y.name)
   
-    y.in.global <- .in.global(y.name)  # see if in global, includes vars lists
+    y.in.global <- .in.global(y.name, quiet)  # in global?, includes vars lists
 
     # row.names deprecated
     if (deparse(substitute(y)) %in% c("row_names", "row.names")) {
@@ -1027,7 +1031,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
       if(!is.unsorted(x.call) && eq.int && sum(is.na(y.call))==0) {
         object <- "both"
-        if (is.null(size)) size <- 0  # by default, just plot a line w/o points
+        if (!seg.miss && !segments) object <- "point"
+        if (is.null(size)) size <- 0  # by default, just plot line w/o points
       }
     }
   }
@@ -1640,7 +1645,7 @@ if (is.null(out_size)) out_size <- size.pt
           radius, power, size_cut, bubble_text, low_fill, hi_fill,
           ID.call, ID_color, ID_size, out_ind,
           out_fill, out_color, out_shape.miss,
-          fit.ln, fit_color, fit_lwd, fit_se, se_fill,
+          fit.ln, fit_color, fit_lwd, fit_se, se_fill, plot_errors,
           ellipse, ellipse_color, ellipse_fill, ellipse_lwd,
           run, center_line, show_runs, stack,
           freq.poly, jitter_x, jitter_y,

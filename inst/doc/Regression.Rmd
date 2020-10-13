@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{regression analysis}
+  %\VignetteIndexEntry{3. Models: Least-Squares, Logistic}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -28,7 +28,7 @@ d <- Read("Employee")
 
 ### Brief output
 
-The brief version provides just the basic analysis, what Excel provides, plus a scatterplot with the regression line.
+The brief version provides just the basic analysis, what Excel provides, plus a scatterplot with the regression line, which becomes a scatterplot matrix with multiple regression.
 
 ```{r fig.width=4.5, fig.height=4.5}
 reg_brief(Salary ~ Years + Pre)
@@ -36,16 +36,16 @@ reg_brief(Salary ~ Years + Pre)
 
 ### Full output
 
-The full output is extensive: Summary of the analysis, estimated model,  fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals.
+The full output is extensive: Summary of the analysis, estimated model, fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals.
 
 ```{r}
 reg(Salary ~ Years + Pre)
 ```
 
-Brief output with standardization of all variables in the model.
+Brief output with standardization of all variables in the model. Plot the residuals as a line connecting each data point to the corresponding point on the regression line.
 
-```{r}
-reg_brief(Salary ~ Years + Pre, rescale="z")
+```{r, fig.width=4.5, fig.height=4}
+reg_brief(Salary ~ Years, rescale="z", plot_errors=TRUE)
 ```
 
 
@@ -61,7 +61,7 @@ reg(Salary ~ Years, kfold=3)
 
 ## Output as a Stored Object
 
-The output of `Regression()` can be stored into an R object, here named _r_. The output object consists of various components.
+The output of `Regression()` can be stored into an R object, here named _r_. The output object consists of various components, what R calls a _list_ object.
 
 ```{r}
 r <- reg(Salary ~ Years + Pre)
@@ -93,6 +93,35 @@ r$coefficients
 ```
 
 
+## Contrasts
+
+Because `reg()` accomplishes its computations with base R functions `lm()`, can pass `lm()` parameters to `reg()`, which then passes their values to `lm()`. Here first use base R function `contr.sum()` to calculate an effect coding contrast matrix for a categorical variable with three levels, such as the variable _Plan_ in the _Employee_ data set.
+
+```{r}
+cnt <- contr.sum(n=3)
+cnt
+```
+
+Now use the `lm()` parameter `contrasts` to define the effect coding for _Plan_, passed to `reg_brief()`. Contrasts only apply to factors, so first convert _Plan_ to a factor.
+
+```{r fig.width=4.5, fig.height=4}
+d$Plan <- factor(d$Plan)
+reg_brief(Salary ~ Plan, contrasts=list(Plan=cnt))
+```
+
+
+## Null Model
+
+The $R^2$ fit statistic compares the sum of the squared errors of the model with the X predictor variables to the sum of squared errors of the null model.  The baseline of comparison, the null model, is a model with no X variables such that the fitted value for each set of X values is the mean of response variable $y$. The corresponding slope intercept is the mean of $y$, and the standard deviation of the residuals is the standard deviation of $y$.
+
+The following submits the null model for _Salary_, and plots the errors. Compare the standard deviation of the residuals to a regression model of _Salary_ with one or more predictor variables.
+
+```{r fig.width=5}
+reg_brief(Salary ~ 1, plot_errors=TRUE)
+```
+
+
+
 ## Interpreted Output
 
 The parameter `Rmd` creates an R markdown file that is automatically generated and  html document from knitting the various output components together with full interpretation. A new, much more complete form of computer output.
@@ -105,7 +134,7 @@ reg(Salary ~ Years + Pre, Rmd="eg")
 
 ## Logistic Regression
 
-```{r}
+```{r fig.width=4, fig.height=4}
 Logit(Gender ~ Salary)
 ```
 

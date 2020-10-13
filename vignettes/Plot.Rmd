@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{scatter plots}
+  %\VignetteIndexEntry{2. Visualize: Scatter Plots}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -17,6 +17,7 @@ knitr::opts_chunk$set(fig.width=4, fig.height=3.5)
 
 ```{r}
 library("lessR")
+style()
 ```
 
 
@@ -31,23 +32,31 @@ __lessR__ provides many versions of a scatter plot with its `Plot()` function.
 
 ## Two Variables
 
-The regular scatterplot.
+The regular scatterplot of two continuous variables.
 
-```{r sp}
+```{r sp, fig.width=4.5}
 Plot(Years, Salary)
 ```
 
 
 The enhanced scatterplot with parameter `enhance`. 
 
-```{r spEnhance}
+```{r spEnhance, fig.width=4.5}
 Plot(Years, Salary, enhance=TRUE)
+```
+
+Plot the scatterplot with the non-linear best fit `"loess"` line. The three available values for the `fit` line are `"loess"` for non-linear, `"lm"` for linear, and `"null"` for the null model line, the flat line at the mean of $y$. Also, setting `fit` to `TRUE` sets `fit` to`"loess"`.
+
+For emphasis set `plot_errors` to `TRUE` to plot the residuals from the line.
+
+```{r sploess, fig.width=4.5}
+Plot(Years, Salary, fit="loess", plot_errors=TRUE)
 ```
 
 
 Map variable _Pre_ to the points with the `size` parameter, a bubble plot.
 
-```{r size}
+```{r size, fig.width=4.5}
 Plot(Years, Salary, size=Pre)
 ```
 
@@ -60,7 +69,7 @@ Plot(Years, Salary, by=Gender)
 
 The categorical variable can also generate Trellis plots with the `by` parameter.
 
-```{r, fig.height=4}
+```{r, , fig.width=4.5, fig.height=4}
 Plot(Years, Salary, by1=Gender)
 ```
 
@@ -92,13 +101,13 @@ Plot(Dept)
 
 The Cleveland dot plot, here for a single variable, has row names on the y-axis. The default plots sorts by the value plotted.
 
-```{r, fig.height=5.5}
+```{r, fig.height=5.5, fig.width=4.5}
 Plot(Salary, row_names)
 ```
 
 The standard scatterplot version of a Cleveland dot plot.
 
-```{r, fig.height=5.5}
+```{r, fig.height=5.5, fig.width=4.5}
 Plot(Salary, row_names, sort_yx="0", segments_y=FALSE)
 ```
 
@@ -148,6 +157,12 @@ Plot(date, Price, by1=Company, n_col=1,  fill="darkred", color="red")
 ```
 
 
+With `style()` many themes can be selected, such as `"lightbronze"`, `"dodgerblue"`, `"darkred"`, such as `"gray"`. When no `theme` is specified, return to the default theme, `colors`. 
+
+```{r}
+style()
+```
+
 ## Annotation
 
 ```{r}
@@ -178,3 +193,9 @@ Use the base R `help()` function to view the full manual for `Plot()`. Simply en
 ?Plot
 ```
 
+
+## More
+
+More on Scatterplots and other visualizations from __lessR__ and other packages such as __ggplot2__ at:
+
+Gerbing, D., _R Visualizations: Derive Meaning from Data_, CRC Press, May, 2020, ISBN 978-1138599635.

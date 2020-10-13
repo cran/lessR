@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{read, write data}
+  %\VignetteIndexEntry{0. Data: Read, Write}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -26,7 +26,7 @@ The data table in the following figure, formatted as an Excel file, contains fou
 
 
 ```{r dataTable, echo=FALSE, out.width='50%', fig.asp=.7, fig.align='center', fig.cap="Structure of a data table."}
-knitr::include_graphics(system.file("img", "DataExcel.png", package="lessR"))
+knitr::include_graphics(system.file("img", "DataTable.png", package="lessR"))
 ```
 
 
@@ -44,7 +44,7 @@ Two data values in this section of the data table are missing. The number of yea
 
 >_Case_: Each row of the data table, the data for a specific instance of a single person, organization, place, event, or whatever is being studied.
 
-Encode the data table in one of a variety of computer file formats. The formats we encounter are Excel files, indicated by a file type of `.xlsx`, and text files in the form of comma-separated value files (csv). Identify a text file with one of several potential file types, such as `.txt`, but usually `.csv`.
+Encode the data table in one of a variety of computer file formats. Common formats include Excel files, indicated by a file type of `.xlsx`, and text files in the form of comma-separated value files (csv). Identify a text file with one of several potential file types, such as `.txt`, or more informatively, `.csv`.
 
 Analysis of data can only proceed with the data table identified and the relevant variables identified by their name.
 

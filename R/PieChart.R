@@ -123,7 +123,7 @@ function(x, y=NULL, data=d, rows=NULL,
   if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
     data <- eval(substitute(data), envir=parent.frame())
 
-  x.in.global <- .in.global(x.name)  # see if in global, includes vars list
+  x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
 
 
   # -----------------------------------------------------------

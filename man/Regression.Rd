@@ -1,13 +1,12 @@
 \name{Regression}
 \alias{Regression}
 \alias{reg}
-\alias{reg.brief}
 \alias{reg_brief}
 
 \title{Regression Analysis}
 
 \description{
-Abbreviation: \code{reg}, \code{reg.brief}
+Abbreviation: \code{reg}, \code{reg_brief}
 
 Provides a regression analysis with extensive output, including graphics, from a single, simple function call with many default settings, each of which can be re-specified. The computations are obtained from the \code{R} function \code{\link{lm}} and related \code{R} regression functions. The outputs of these functions are re-arranged and collated.
 
@@ -28,6 +27,7 @@ Regression(my_formula, data=d, rows=NULL,
          code=getOption("code"),
 
          text_width=120, brief=getOption("brief"), show_R=FALSE,
+         plot_errors,
 
          res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"),
          pred_rows=NULL, pred_sort=c("predint", "off"),
@@ -45,8 +45,6 @@ Regression(my_formula, data=d, rows=NULL,
          fun_call=NULL, \ldots)
 
 reg(\ldots)
-
-reg.brief(\ldots, brief=TRUE)
 reg_brief(\ldots, brief=TRUE)
 }
 
@@ -104,7 +102,10 @@ reg_brief(\ldots, brief=TRUE)
         with \code{\link{style}} function.}
   \item{show_R}{Display the R instructions that yielded the \code{lessR} output,
         albeit without the additional formatting of the results such as combining
-        output of different functions into a table.}\cr
+        output of different functions into a table.}
+  \item{plot_errors}{For a one-predictor model, plot the line segment that
+        joins each point to the regression line, illustrating the size of the
+        residuals.}\cr
 
   \item{res_rows}{Default is 20, which lists the first 20 rows of data sorted by the
        specified sort criterion.  To disable residuals, specify a value of 0.  To see
@@ -212,7 +213,7 @@ The default analysis provides as text output to the console the model's paramete
 DECIMAL DIGITS\cr
 The number of decimal digits displayed on the output is, by default, the maximum number of decimal digits for all the data values of the response variable. Or, this value can be explicitly specified with the \code{digits_d} parameter.
 
-GRAPHICS OUTPUT\cr
+Visualizations\cr
 Three default graphs are provided. When running \code{R} by itself, by default the graphs are written to separate graphics windows (which may overlap each other completely, in which case move the top graphics windows). Or, the \code{pdf} option may be invoked to save the graphs to a single pdf file called \code{regOut.pdf}. Within \code{RStudio} the graphs are successively written to the \code{Plots} window. Within \code{knitr} from \code{RStudio} the graphics will all appear by default at the beginning of the output. Or set to \code{graphics=FALSE}, and generate them individually with the accompanying function \code{\link{regPlot}} at the desired location within the file.
 
 1. A histogram of the residuals includes the superimposed normal and general density plots from the \code{\link{Density}} function included in this \code{lessR} package.  The overlapping density plots, which both overlap the histogram, are filled with semi-transparent colors to enhance readability.
@@ -332,7 +333,7 @@ d <- Subset(random=.3)
 Regression(Reading ~ Verbal)
 # Provide only the brief analysis on standardized variables
 #  with 3-fold cross-validations
-reg_brief(Reading ~ Verbal, standardize=TRUE, kfold=3)
+reg_brief(Reading ~ Verbal, rescale="z", kfold=3)
 
 # Access the pieces of output, here in an object named \code{r}
 r <- reg(Reading ~ Verbal + Absent + Income)

@@ -187,7 +187,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
 
   if (!is.null(x.name))
-    x.in.global <- .in.global(x.name)  # see if in global, includes vars list
+    x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
   else
     x.in.global <- FALSE
     

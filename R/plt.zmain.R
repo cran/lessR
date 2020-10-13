@@ -29,7 +29,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
          fit.line="off", fit_color="gray55",
          fit_lwd=getOption("fit.lw"),
-         fit_se=1, se_fill="gray80",
+         fit_se=1, se_fill="gray80", plot_errors=FALSE,
 
          ellipse=FALSE, ellipse_color="lightslategray",
          ellipse_fill="off", ellipse_lwd,
@@ -48,7 +48,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          add_color=NULL, add_fill=NULL, add_trans=NULL,
 
          want.labels=TRUE, ...)  {
-
 
   fill_bg <- getOption("panel_fill")
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
@@ -102,8 +101,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     colnames(y) <- nm.y
   }
 
-  #if (bubble1) for (i in 1:length(y[,1])) y[i,1] <- x[i,1] %% 6
-
   # dimensions
   n.xcol <- ncol(x)
   n.ycol <- ncol(y)
@@ -134,8 +131,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
 
   if (date.ts) xx.lab <- xlab
-# if (is.null(ylab))  # no ylab for Cleveland dot plot
-#   if (is.null(x.lvl) && !is.null(y.lvl) && unique.y) ylab <- ""
   if (want.labels) {
     gl <- .getlabels(xlab, ylab, main, lab_x_cex=lab_x_cex,
                      lab_y_cex=lab_y_cex)
@@ -241,7 +236,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     main <- "not null"
   }
 
-# if (!date.ts) if (is.null(x.lab)) if (n.xcol > 1) x.lab <- NULL
   if (!is.null(x.lab)) if (n.xcol > 1  &&  substr(x.lab, 1, 2) == "c(")
       x.lab <- NULL   # e.g., get rid of x.lab == "c(Female,Male)"
 
@@ -271,8 +265,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     rm <- rm + .25  + (.65 * axis_y_cex)
     if (axis_y_cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
   }
-  if (object == "both")
-    if (center_line != "off") rm <- rm + .4  # room for center_line label
+  if (center_line != "off") rm <- rm + .4  # room for center_line label
 
   if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
@@ -638,8 +631,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     if (ln.width == 0) area_fill <- "transparent"
 
 
-    # ----------
-    # plot lines (and area_fill)
+  # ----------
+  # plot lines (and area_fill)
   if (object %in% c("point", "both")) {
 
     if (object == "both") {
@@ -724,36 +717,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           lines(as.numeric(x.val),y[,1], col=fill[i], lwd=ln.width, ...)
       }
 
-      # plot center line
-      if (center_line != "off") {
-        if (center_line == "mean") {
-          m.y <- mean(y[,1], na.rm=TRUE)
-          lbl <- " mean"
-          lbl.cat <- "mean:"
-        }
-        else if (center_line == "median") {
-          m.y <- median(y[,1], na.rm=TRUE)
-          lbl <- " medn"
-          lbl.cat <- "median:"
-        }
-        else if (center_line == "zero") {
-          m.y <- 0
-          lbl <- ""
-          lbl.cat <- "zero:"
-        }
-
-        abline(h=m.y, col="gray50", lty="dashed")  # draw center line
-        mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
-
-        if (center_line == "zero") m.y <- median(y[,1], na.rm=TRUE)  # for runs
-
-      }  # end center_line
-
-      else {
-        lbl.cat <- "median: "
-        m.y <- median(y[,1], na.rm=TRUE)
-      }
-
     }  # end both
 
 
@@ -784,24 +747,24 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           if (jitter_y > 0)
             y[,1] <- jitter(y[,1], factor=jitter_y)
 
-          if (n.xcol == 1  &&  n.ycol == 1) {
+          if (n.xcol == 1  &&  n.ycol == 1) {  # one x and one y variable
 
-             if (length(out_ind) == 0)  # not outliers
-                points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
+            if (length(out_ind) == 0)  # no outliers
+              points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
                        cex=size.pt, ...)
 
-             else {  # display outliers separately
-                if (getOption("theme") == "gray")
-                  if (any(size.pt > 0.9)) if (out_shape.miss) out_shape <- 23
+            else {  # display outliers separately
+              if (getOption("theme") == "gray")
+                if (any(size.pt > 0.9)) if (out_shape.miss) out_shape <- 23
 
-                points(x[-out_ind,1], y[-out_ind,1],
-                   pch=shape, col=color[1], bg=fill[1], cex=size.pt, ...)
-                points(x[out_ind,1], y[out_ind,1],
-                   pch=shape, col=out_color, bg=out_fill, cex=size.pt, ...)
-                text(x[out_ind], y[out_ind], labels=ID[out_ind],
-                   pos=1, offset=0.4, col=ID_color, cex=ID_size)
-             }
-          }
+              points(x[-out_ind,1], y[-out_ind,1],
+                 pch=shape, col=color[1], bg=fill[1], cex=size.pt, ...)
+              points(x[out_ind,1], y[out_ind,1],
+                 pch=shape, col=out_color, bg=out_fill, cex=size.pt, ...)
+              text(x[out_ind], y[out_ind], labels=ID[out_ind],
+                 pos=1, offset=0.4, col=ID_color, cex=ID_size)
+            }
+        }
 
           else if (n.ycol == 1) {  # one y
             for (i in 1:n.xcol) {  # one to many x's
@@ -869,6 +832,35 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             }
           }  # means
         }  # end not smooth, plot points with no by
+      # plot center line
+      if (center_line != "off") {
+        if (center_line == "mean") {
+          m.y <- mean(y[,1], na.rm=TRUE)
+          lbl <- " mean"
+          lbl.cat <- "mean:"
+        }
+        else if (center_line == "median") {
+          m.y <- median(y[,1], na.rm=TRUE)
+          lbl <- " medn"
+          lbl.cat <- "median:"
+        }
+        else if (center_line == "zero") {
+          m.y <- 0
+          lbl <- ""
+          lbl.cat <- "zero:"
+        }
+
+        abline(h=m.y, col="gray50", lty="dashed")  # draw center line
+        mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
+
+        if (center_line == "zero") m.y <- median(y[,1], na.rm=TRUE)  # for runs
+
+      }  # end center_line
+
+      else {
+        lbl.cat <- "median: "
+        m.y <- median(y[,1], na.rm=TRUE)
+      }
 
 
       }  # end is null by
@@ -925,7 +917,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       }  # end plot points object is point or both
 
 
-#     if (stack) fill <- color  # fill can be very translucent
       if (fill[1] == "transparent") fill <- color
       if (n.xcol > 1)  # horizontal legend, on x-axis
         .plt.legend(colnames(x), FALSE, color, fill, shape, fill_bg, usr,
@@ -979,19 +970,27 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       k <- 0
       for (i in 1:nrow(mytbl)) {
         for (j in 1:ncol(mytbl)) {
-#         if (mytbl[i,j] != 0) {  # 0 plots to a single pixel, so remove
-            k <- k + 1
-            count[k] <- mytbl[i,j]
-            if (count[k] == 0) count[k] <- NA  # 0 count not plotted
-            xx[k] <- as.numeric(rownames(mytbl)[i])  # row names are factors
-            yy[k] <- as.numeric(colnames(mytbl)[j])
-          }
-#       }
+          k <- k + 1
+          count[k] <- mytbl[i,j]
+          if (count[k] == 0) count[k] <- NA  # 0 count not plotted
+          xx[k] <- as.numeric(rownames(mytbl)[i])  # row names are factors
+          yy[k] <- as.numeric(colnames(mytbl)[j])
+        }
       }
       if (prop) count <- round(count, 2)
-      if (is.null(radius)) radius <- .22
-      .plt.bubble(xx, yy, count, radius, power, clr, clr_color,
-                  size_cut, prop, bubble_text, object)
+      if (object == "bubble") {
+        if (is.null(radius)) radius <- .22
+        .plt.bubble(xx, yy, count, radius, power, clr, clr_color,
+                    size_cut, prop, bubble_text, object)
+      }
+      else if (object == "sunflower") {
+        cords <- data.frame(xx, yy, count, stringsAsFactors=TRUE)
+        cords <- na.omit(cords)
+        sunflowerplot(cords$xx, cords$yy, number=cords$count,
+            seg.col=clr_color, col=clr,
+            col.axis=getOption("axis_x_color"), add=TRUE)
+      }
+
 
     }  # end length(size) == 1
 
@@ -1119,6 +1118,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             l.ln <- loess(y.lv ~ x.lv)
           else if (fit.line == "lm")
             l.ln <- lm(y.lv ~ x.lv)
+          else if (fit.line == "null")
+            l.ln <- lm(y.lv ~ 1)
           f.ln <- fitted(l.ln, ...)
 
           # se bands about fit line
@@ -1128,8 +1129,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
               prb <- (1 - fit_se[j]) / 2
               up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
               dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
-              # lines(x.lv, up.ln, col=clr, lwd=0.5, lty=ln.type)
-              # lines(x.lv, dn.ln, col=clr, lwd=0.5, lty=ln.type)
               polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
                       col=getOption("se_fill"), border="transparent")
             }  # end for each se plot
@@ -1137,7 +1136,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
           # plot fit line on top of se bands
           lines(x.lv, f.ln, col=clr, lwd=fit_lwd, lty=ln.type)
-        }
+
+          # plot residuals
+          if (plot_errors) 
+            segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv, col="darkred", lwd=1) 
+        }  # end any(ok)
 
       }  # ith pattern
     }  # fit.remove

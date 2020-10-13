@@ -10,6 +10,7 @@ function(my_formula, data=d, rows=NULL,
          code=getOption("code"), 
 
          text_width=120, brief=getOption("brief"), show_R=FALSE,
+         plot_errors=FALSE,
 
          res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"), 
          pred_rows=NULL, pred_sort=c("predint", "off"),
@@ -82,7 +83,6 @@ function(my_formula, data=d, rows=NULL,
       "To create an R Markdown File requires the full version of Regression\n\n")
   }
 
-
   # let deprecated mydata work as default
   dfs <- .getdfs() 
   mydata.ok <- FALSE
@@ -134,7 +134,7 @@ function(my_formula, data=d, rows=NULL,
 
   nm <- all.vars(my_formula)  # names of vars in the model
   n.vars <- length(nm)
-  n.pred <- n.vars - 1L
+  n.pred <- n.vars - 1L  # n.pred==0 means null model, y ~ 1
 
   if (!missing(rows)) {  # subset rows
     r <- eval(substitute(rows), envir=data, enclos=parent.frame())
@@ -269,7 +269,7 @@ function(my_formula, data=d, rows=NULL,
   #   all analysis done on data in model construct lm.out$model
   #   this model construct contains only model vars, with Y listed first
   #assign("lm.out", lm(my_formula, data=data), pos=.GlobalEnv)
-  lm.out <- lm(my_formula, data=data)
+  lm.out <- lm(my_formula, data=data, ...)
 
   if (lm.out$rank < n.vars) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -411,7 +411,7 @@ function(my_formula, data=d, rows=NULL,
  
     if ((numeric.all || n.pred==1) && in.data.frame) {
       splt <- .reg5Plot(lm.out, res_rows, pred_rows, scatter_coef, 
-         X1_new, numeric.all, in.data.frame, prd$cint, prd$pint,
+         X1_new, numeric.all, in.data.frame, prd$cint, prd$pint, plot_errors,
          pdf, width, height, manage.gr, scatter_3D, ...)
 
       for (i in (plot.i+1):(plot.i+splt$i)) plot.title[i] <- splt$ttl[i-plot.i]

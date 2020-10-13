@@ -1,6 +1,5 @@
 \name{prob_norm}
 \alias{prob_norm}
-\alias{prob.norm}
 
 \title{Compute and Plot Normal Curve Probabilities over an Interval}
 
@@ -13,8 +12,6 @@ prob_norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm_color="black",
          fill_nrm="grey91", fill_int="slategray3", 
          ylab="", y_axis=FALSE, z=TRUE, axis_size=.9,
          pdf_file=NULL, width=5, height=5, \ldots)
-
-prob.norm(\ldots)
 }
 
 
@@ -53,16 +50,16 @@ Calculate the normal curve probability for the specified interval and normal cur
 
 \examples{
 # Mu=0, Sigma=1: Standard normal prob, values between 0 and 2
-prob.norm(0,2)
+prob_norm(0,2)
 
 # Mu=0, Sigma=1: Standard normal prob, values lower than 2
-prob.norm(hi=2)
+prob_norm(hi=2)
 
 # Mu=0, Sigma=1: Standard normal prob, values larger than 2
-prob.norm(lo=2)
+prob_norm(lo=2)
 
 # Mu=100, Sigma=15: Change default fill color of plotted interval
-prob.norm(lo=115, hi=125, mu=100, sigma=15, fill_int="plum")
+prob_norm(lo=115, hi=125, mu=100, sigma=15, fill_int="plum")
 }
 
 

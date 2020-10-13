@@ -7,20 +7,16 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.9.7  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
+      "lessR 3.9.8  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
       "---------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
       "\n",
-      "> vignette(\"topic\") for help on the following topics\n",
-      "   \"Read\": Read data and variable labels, write data\n",
-      "   \"BarChart\", \"Histogram\", \"Plot\": Visualizations\n",
-      "   \"Means\": Analyze means with t-tests and ANOVA\n", 
-      "   \"Regression\": Least-squares, logistic regression\n", 
-      "   \"Factor Analysis\": Exploratory and confirmatory\n", 
-      "   \"Customize\": Custom color palettes, more customization\n",
-      "   \"Extract\": General, simple data frame subsetting\n",
-      "   \"pivot\": 1-d and 2-d simply created pivot tables\n") 
+      "Access many vignettes to show by example how to use lessR.\n",
+      "To learn about reading, writing, & manipulating data, graphics,\n",
+      "  means & models, factor analysis, & customization:\n",
+      "enter,  browseVignettes(\"lessR\")  or\n",
+      "visit,  https://CRAN.R-project.org/package=lessR\n") 
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 
@@ -412,12 +408,12 @@ function(...) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "An analysis is of data values for one or more variables found\n",
         "  in a rectangular data table, with the data values for a \n",
-        "  variable located in a column\n\n",
+        "  variable located in a column.\n\n",
         "You have not yet read data into a data table for analysis,\n",
         "  so the data table called ", dname, txtA, "is\n",
-        "  not available for analysis\n\n",
+        "  not available for analysis.\n\n",
         "Read the data into an R data table with the Read function, usually\n",
-        "  reading the data into an R data table called d\n\n",
+        "  reading the data into an R data table called d.\n\n",
         "To read a data file on your computer system into the d data\n",
         "  table, in which you browse your file folders to locate the\n",
         "  desired date file, enter:\n",
@@ -427,7 +423,7 @@ function(...) {
         "  or \n",
         "     d <- Read(\"web address\") \n",
         "In the web address include the http:// at the beginning\n",
-        "  and also include the quotes around the web address\n\n")
+        "  and also include the quotes around the web address.\n\n")
     }
 
     else if (length(dfs) == 1) {
@@ -471,14 +467,14 @@ function(...) {
 }
 
 
-.in.global <- function(var.name) {
+.in.global <- function(var.name, quiet) {
 
   # see if "variable" includes a $
   for (i in 1:length(var.name)) {
     if (grepl("$", var.name[i], fixed=TRUE))  {
       txtA <- paste("A referenced variable in a lessR function just includes\n",
                     "the variable name\n\n", sep="")
-      txtB <- paste("For example, for the Histogram function, this does not work:\n",
+      txtB <- paste("e.g., for the Histogram function, this does not work:\n",
                     "  > Histogram(d$Y)\n\n", sep="")
       txtC <- "Instead do this:\n  > Histogram(Y, data=d)"
       txtD <- "If you wish to specify a data table, use option: data"
@@ -500,11 +496,11 @@ function(...) {
     }
     
     if (length(.getdfs()) > 0) {  # if not data frame, no point to message
-      if (in.global[i])
+      if (in.global[i] && !quiet)
          cat(">>> Note:", var.nm[i], "is from the workspace, not in",
          "a data frame (table)\n")
       else
-        if (any(in.global))
+        if (any(in.global) && !quiet)
           cat(">>> Note:", var.nm[i], "is NOT in the workspace\n")
     }
   }  # end for
@@ -532,10 +528,10 @@ function(...) {
 
   for (i in 1:length(var.nm)) {  # each variable one at a time
     # see if "variable" is an expression
-    if (grepl("(", var.nm[i], fixed=TRUE) ||  grepl("[", var.nm[i], fixed=TRUE))  {
+    if (grepl("(", var.nm[i], fixed=TRUE) || grepl("[", var.nm[i],fixed=TRUE)) {
       txtA <- paste("A referenced variable in a lessR function can only be\n",
                     "a variable name\n\n", sep="")
-      txtB <- paste("For example, for the Histogram function, this does not work:\n",
+      txtB <- paste("e.g., for the Histogram function, this does not work:\n",
                     "  > Histogram(rnorm(50))\n\n", sep="")
       txtC <- "Instead do this:\n  > Y <- rnorm(50)\n  > Histogram(Y)"
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -577,13 +573,15 @@ function(...) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "You are attempting to analyze the variable ", var.nm[i], " in the\n",
           "  data table called ", dname, txtDef, "\n",
-          "Unfortunately, variable ", var.nm[i], " does not exist in ", dname, "\n\n",
+          "Unfortunately, variable ", var.nm[i], " does not exist in ",
+          dname, "\n\n",
           "The following variables are currently in the ", dname,
           " data table,\n",
           "  available for analysis:\n\n",
           "  ", nm,  "\n\n",
           "You do have another data table, but it is named ", dfs[1], "\n",
-          "The following variables are currently in the ", dfs[1], " data table,\n",
+          "The following variables are currently in the ", dfs[1],
+          " data table,\n",
           "  available for analysis:\n\n",
           "  ", nm2,  "\n\n",
           "If a data table is not named the default d, then to\n",
@@ -1528,7 +1526,7 @@ function(dir, axT) {
 
   heatmap(R[1:NItems,1:NItems], Rowv=NA, Colv="Rowv", symm=TRUE,
     col=hmcols, margins=c(bm,rm), main=main,
-    cexRow=axis_x_cex+.1, cexCol=axis_y_cex+.1)
+    cexRow=axis_x_cex+.2, cexCol=axis_y_cex+.2)
 
   if (!is.null(pdf_file)) {  # terminate pdf graphics
     dev.off()

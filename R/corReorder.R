@@ -1,5 +1,5 @@
 corReorder <-
-function (R=mycor, order=c("hclust", "chain", "manual"),
+function (R=mycor, order=c("hclust", "chain", "manual", "as_is"),
           hclust_type=c("complete", "ward.D", "ward.D2", "single",
                           "average", "mcquitty", "median", "centroid"),
           dist_type=c("R", "dist"),
@@ -93,6 +93,11 @@ function (R=mycor, order=c("hclust", "chain", "manual"),
      .dash(nchar(ttl) + 1)
      print(clt)
     }
+  }
+
+  else if (order == "as_is") { 
+    diagonal_new <- FALSE
+    Label <- 1:NVOld  # current indices
   }
 
   else if (order == "chain") {  # Hunter 1973

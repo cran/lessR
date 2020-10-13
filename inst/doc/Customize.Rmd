@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{custom features}
+  %\VignetteIndexEntry{5. Customize: Custom Features}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -125,6 +125,11 @@ Individual characteristics of a visualization can also be specified. Here change
 ```{r}
 style(window_fill="aliceblue")
 BarChart(Dept)
+```
+
+Return to the default theme, `"colors"`.
+```{r}
+style()
 ```
 
 View all modifiable individual characteristics with the `show` parameter, set to `TRUE`.

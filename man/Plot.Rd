@@ -1,6 +1,5 @@
 \name{Plot}
 \alias{Plot}
-\alias{pl}
 \alias{ScatterPlot}
 \alias{sp}
 \alias{BoxPlot}
@@ -65,7 +64,7 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          smooth=FALSE, smooth_points=100, smooth_size=1,
          smooth_exp=0.25, smooth_bins=128,
 
-         fit="off", fit_se=0.95, ellipse=0, 
+         fit="off", fit_se=0.95, plot_errors=FALSE, ellipse=0, 
 
          bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
          breaks="Sturges", cumulate=FALSE,
@@ -90,7 +89,6 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          do_plot=TRUE, width=NULL, height=NULL, pdf_file=NULL, 
          fun_call=NULL, \ldots)
 
-pl(\ldots)
 ScatterPlot(\ldots)
 sp(\ldots)
 BoxPlot(\ldots)
@@ -178,7 +176,7 @@ vp(\ldots)
         Can also set with the lessR function \code{\link{getColors}} to
         select from a variety of color palettes. For points, default is
         \code{pt_fill} and for area under a line chart, \code{violin_fill}.
-        For a line chart, set to \code{"on"} for default color_}
+        For a line chart, set to \code{"on"} for default color.}
   \item{color}{Border color of the points or line_color for line plot,
         can be a vector to customize the color for each point or a color
         range such as "blues" (see \code{\link{getColors}}. Default is
@@ -222,7 +220,8 @@ vp(\ldots)
         is a vector of two variables, sort by their difference.}
   \item{segments}{Designed for interaction plots of means, connects each pair of
         successive points with a line segment. Pass a data frame of the means,
-        such as from \code{\link{pivot}}.}
+        such as from \code{\link{pivot}}. To turn off connecting line segments
+        for sorted, equal intervals data, set to \code{FALSE}.}
   \item{segments_y}{For one \code{x}-variable, draw a line segment from the
         \code{y}-axis to
         each plotted point, such as for the Cleveland dot plot. For two
@@ -286,12 +285,12 @@ vp(\ldots)
         the background is the violin, which is based on the current theme
         color. To use the values for \code{pt_fill} and \code{pt_color} 
         specified by the \code{\link{style}} function, set to \code{"default"}.
-        Or set to any desired color_}
+        Or set to any desired color.}
   \item{vbs_mean}{Show the mean on the box plot with a strip the color
         of \code{out_fill}, which can be changed with the 
         \code{\link{style}} function.}
   \item{fences}{If \code{TRUE}, draw the inner upper and lower fences as
-        dotted line segments_}
+        dotted line segments.}
   \item{k}{IQR multiplier for the basis of calculating the distance of the 
         whiskers of the box plot from the box. Default is Tukey's setting
         of 1.5.}
@@ -317,10 +316,10 @@ vp(\ldots)
         between the variables.}
   \item{low_fill}{For a categorical variable and the resulting bubble plot,
         or a matrix of these plots, sets a color gradient of the fill color
-        beginning with this color_}
+        beginning with this color.}
   \item{hi_fill}{For a categorical variable and the resulting bubble plot,
         or a matrix of these plots, sets a color gradient of the fill color
-        ending with this color_}\cr
+        ending with this color.}\cr
   
   \item{smooth}{\bold{Smoothed density plot} for two numerical variables. By 
         default, set to \code{TRUE} for 2500 or more rows of data.}
@@ -334,8 +333,8 @@ vp(\ldots)
         estimation.}\cr
 
   \item{fit}{The \bold{best fit line}.  Default value is \code{"off"}, with
-        options for non-linear\code{"loess"} and for linear least squares,
-        indicated by \code{"lm"}. If
+        options \code{"loess"} for non-linear fit, \code{"lm"} linear 
+        least squares, and \code{"null"} for the null model. If
         potential outliers are identified according to \code{out_cut},
         a second (dashed) fit line is displayed calculated \emph{without}
         the outliers. Modify the line color from with the 
@@ -343,8 +342,10 @@ vp(\ldots)
         line width with \code{fit_lwd}.}
   \item{fit_se}{Confidence level for the error band displayed around the
        line of best fit. On by default at 0.95 if a fit line is specified.
-       Can be a vector to display multiple ranges. Set to 0 to turn off.}\cr
- 
+       Can be a vector to display multiple ranges. Set to 0 to turn off.}
+  \item{plot_errors}{Plot the line segment that joins each point to the 
+        regression line, "loess" or "lm", illustrating the size of the
+        residuals.}
   \item{ellipse}{Confidence level of a \bold{data ellipse} for a scatterplot 
         of only a single
         \code{x}-variable and a single \code{y}-variable according to the
@@ -375,13 +376,14 @@ vp(\ldots)
   \item{run}{If set to \code{TRUE}, generate a \bold{run chart}, i.e., line chart,
         in which
         points are plotted in the sequential order of occurrence in the data table.
-        By default, the points are connected by line
-        segments to form a run chart. Set by default when the \code{x}-values
+        By default, the points are connected by line. Set by default when the \code{x}-values
         are sorted with equal intervals or a single variable is a time series.
+        To turn off connecting line segments for sorted, equal intervals data, set
+        to \code{FALSE}.
         Customize the color of the line segments with \code{segments_color}
         with function \code{\link{style}}.}
   \item{lwd}{Width of the line segments. Set to zero to remove the line
-        segments_}       
+        segments.}       
   \item{area_fill}{Parameter \code{fill} applies to points if only points and
        if only a run chart or time series chart, then to area under
        line segments. But \code{area_fill} takes precedence over \code{fill}
@@ -440,7 +442,7 @@ vp(\ldots)
         factor and \code{value_labels} is not specified (is \code{NULL}), then the
         value_labels are set to the factor levels with each space replaced by
         a new line character. If \code{x} and \code{y}-axes have the same scale,
-        they also apply to the \code{y}-axis_}
+        they also apply to the \code{y}-axis.}
   \item{label_max}{Maximum size of labels for the values of a categorical variable.
         Not a literal maximum as preserving unique values may require a larger number
         of characters than specified.}
@@ -640,8 +642,8 @@ Commonly used graphical parameters that are available to the standard R function
 \describe{
 \item{cex.main, col.lab, font.sub, etc.}{Settings for main- and sub-title and axis annotation, see \code{\link{title}} and \code{\link{par}}.}
 \item{main}{Title of the graph, see \code{\link{title}}.}
-\item{xlim}{The limits of the plot on the \code{x}-axis, expressed as c(x1,x2), where \code{x1} and \code{x2} are the limits. Note that \code{x1 > x2} is allowed and leads to a reversed axis_}
-\item{ylim}{The limits of the plot on the \code{y}-axis_}
+\item{xlim}{The limits of the plot on the \code{x}-axis, expressed as c(x1,x2), where \code{x1} and \code{x2} are the limits. Note that \code{x1 > x2} is allowed and leads to a reversed axis.}
+\item{ylim}{The limits of the plot on the \code{y}-axis.}
 }
 
 ONLY VARIABLES ARE REFERENCED\cr
@@ -815,8 +817,8 @@ Plot(Salary)
 \donttest{
 
 # by variable, different colors for different values of the variable
-# all on one panel
-Plot(Salary, by=Dept)
+# two panels
+Plot(Salary, by1=Dept)
 
 # large sample size
 x <- rnorm(10000)

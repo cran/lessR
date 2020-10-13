@@ -4,6 +4,9 @@ library("lessR")
 ## ----read-------------------------------------------------------------------------------------------------------------
 d <- Read("Employee")
 
+## ----hsform, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center'-----------------------------------
+knitr::include_graphics(system.file("img", "hsExplain.png", package="lessR"))
+
 ## ----hs, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Histogram of tablulated counts for the bins of Salary."----
 Histogram(Salary)
 

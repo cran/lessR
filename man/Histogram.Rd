@@ -133,7 +133,7 @@ hs(\ldots)
         \code{trans_bar_fill} from the lessR \code{\link{style}} function.}\cr
 
   \item{values}{Replaces standard R \code{labels} options, which has multiple
-       definitions in R. Specifies to display the count of each bin_}
+       definitions in R. Specifies to display the count of each bin.}
   \item{reg}{The color of the superimposed, regular histogram when
         \code{cumulate="both"}.}
   \item{cumulate}{Specify a cumulative histogram. The value of \code{"on"} displays the 
@@ -148,7 +148,7 @@ hs(\ldots)
   \item{main}{Label for the title of the graph.
        Can set size with \code{main_cex} and color with \code{main_color} from the
        lessR \code{\link{style}} function.}
-  \item{sub}{Sub-title of graph, below xlab_}
+  \item{sub}{Sub-title of graph, below xlab.}
   \item{lab_adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
        the position of the axis labels in approximate inches. + values move
        the labels away from plot edge. Not applicable to Trellis graphics.}

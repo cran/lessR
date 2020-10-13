@@ -1,7 +1,7 @@
 .reg5Plot <-
 function(lm.out, res_rows=NULL, pred_rows=NULL,
          scatter_coef=FALSE, X1_new=NULL,
-         numeric.all, in.data.frame, c.int, p.int,
+         numeric.all, in.data.frame, c.int, p.int, plot_errors=FALSE,
          pdf=FALSE, width=5, height=5, manage.gr=FALSE,
          scatter_3D, ...) {
 
@@ -27,22 +27,29 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
   plt.i <- 0L
   plt.title  <- character(length=0)
 
-  if (n.pred <= 1) {  # scatterplot, if one predictor variable
+  if (n.pred <= 1) {  # scatterplot, if one (or no) predictor variable
 
     if (n.pred > 0)
       x.values <- lm.out$model[,nm[2]]
-    else
+    else {  # null model
       x.values <- 1:n.obs
+      nm[2] <- "Index"
+      x.lab <- nm[2] 
+    }
     y.values <- lm.out$model[,nm[1]]
 
-    do.predint <- ifelse ((pred_rows==0) || !is.null(X1_new) || is.null(p.int),
+    do.predint <- ifelse (pred_rows==0 || !is.null(X1_new) || is.null(p.int),
       FALSE, TRUE) 
-    if (n.pred > 0) if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
+    if (n.pred > 0)
+      if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
 
-    if (!do.predint  ||  !is.numeric(x.values)) {
+    if (!do.predint || !is.numeric(x.values)) {
       ctitle <- "Scatterplot"
-      if (n.pred > 0  &&  is.numeric(x.values))
-        ctitle <- paste(ctitle, "and Regression Line")
+      if (is.numeric(x.values)) {
+        if (n.pred == 0)
+          ctitle <- paste(ctitle, "and Null Model")
+        ctitle <- paste(ctitle, "and Least-Squares Line")
+      }
       y.min <- min(lm.out$model[,nm[1]])
       y.max <- max(lm.out$model[,nm[1]])
     }
@@ -118,14 +125,17 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       for (i in 2:(length(d.x)))
         if ((abs(d.x[i-1] - d.x[i]) > 1.0000000001)) eq.int <- FALSE
     }
-    # getOption("n_cat") = 1
+
+    # Plot points
+    # -----------
     ux <- length(unique(x.values))
     uy <- length(unique(y.values))
-    if ( (ux > 10  &&  uy > 10)  ||  !eq.int  || !is.numeric(x.values)) {
+    if ((ux>10 && uy>10) || !eq.int || is.numeric(x.values) ||
+         is.numeric(y.values)) {
       points(x.values, y.values, pch=21, col=col_color, bg=col_fill,
              cex=size.pt)
     }
-    else {
+    else {  # bubble plot
       mytbl <- table(x.values, y.values)  # get the counts, all x-y combinations
       n.count <- nrow(mytbl) * ncol(mytbl)
       count <- integer(length=n.count)
@@ -148,7 +158,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
 
       power <- 0.6
       sz <- cords[,3]**power  # radius unscaled 
-      radius <- 0.25
+      radius <- 0.18
       symbols(cords$xx, cords$yy, circles=sz, inches=radius,
           bg=.maketrans(col_fill, 110), fg=col_color, add=TRUE, ...)
 
@@ -157,7 +167,6 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       text(cords[q.ind,1], cords[q.ind,2], cords[q.ind,3], cex=0.8)
 
     }  # end bubble plot
-
 
     if (n.pred == 0) {
       m <- lm.out$coefficients[1]  # mean of Y
@@ -171,8 +180,11 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
                col=getOption("segment_color"), lwd=1)
       }
     }
+    if (plot_errors) 
+      segments(y0=lm.out$fitted.values, y1=lm.out$model[,1],
+               x0=x.values, x1=x.values, col="darkred", lwd=1) 
 
-    if (!is.factor(x.values)  &&  do.predint) {
+    if (!is.factor(x.values) && do.predint) {
       col.ci <- getOption("segment_color")
       col.pi <- "gray30"
 

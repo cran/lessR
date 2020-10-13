@@ -4,39 +4,37 @@ library("lessR")
 ## ----read---------------------------------------------------------------------
 d <- Read("Employee")
 
+## ----bc1, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center'----
+knitr::include_graphics(system.file("img", "bcExplain.png", package="lessR"))
+
 ## ----bcEx, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Bar chart of tablulated counts of employees in each department."----
 BarChart(Dept)
 
-## -----------------------------------------------------------------------------
-getColors("hues")
+## ---------------------------------------------------------------------------------------------------------------------
+style(quiet=TRUE)
 
-## -----------------------------------------------------------------------------
-BarChart(Dept, fill="darkred", horiz=TRUE, values="off", quiet=TRUE)
+## ----fig.width=4, fig.align='center'----------------------------------------------------------------------------------
+BarChart(Dept, fill="darkred", horiz=TRUE, values="off")
 
-## -----------------------------------------------------------------------------
-BarChart(Dept, theme="darkred")
+## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
+BarChart(Dept, theme="gray")
 
-## -----------------------------------------------------------------------------
+## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
 BarChart(Dept, fill="reds")
 
-## -----------------------------------------------------------------------------
+## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
 BarChart(Dept, rotate_x=45, offset=1, sort="-")
 
-## -----------------------------------------------------------------------------
+## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
 BarChart(Dept, fill=(count))
 
-## -----------------------------------------------------------------------------
-d <- rd("Mach4", quiet=TRUE)
-l <- rd("dataMach4_lbl", format="lessR", quiet=TRUE)
-LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
-                     "Slightly Agree", "Agree", "Strongly Agree")
-d <- factors(c(m06,m07,m09,m10), levels=0:5, labels=LikertCats, ordered=TRUE, new=TRUE)
+## ----bcXY, dataTable, echo=FALSE, out.width='35%', fig.asp=.7, fig.align='center'-------------------------------------
+knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
 
-## -----------------------------------------------------------------------------
-d <- Read("Employee", quiet=TRUE)
+## ---- fig.width=4, fig.height=3.5, fig.align='center'-----------------------------------------------------------------
 BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
 
-## ---------------------------------------------------------------------------------------------------------------------
+## ---- fig.width=4, fig.height=3.5, fig.align='center'-----------------------------------------------------------------
 style(add_fill="aliceblue")
 BarChart(Dept, add=c("rect", "Employees by\nDepartment"),
                      x1=c(1.75,3), y1=c(11, 10), x2=4.25, y2=9)
@@ -44,24 +42,41 @@ BarChart(Dept, add=c("rect", "Employees by\nDepartment"),
 ## ---- echo=FALSE, include=FALSE---------------------------------------------------------------------------------------
 d <- Read("Employee")
 
-## ----pc1--------------------------------------------------------------------------------------------------------------
+## ----pc1, fig.align='center'------------------------------------------------------------------------------------------
 PieChart(Dept)
 
 ## ----hole0, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Standard pie chart of variable _Dept_ in the _d_ data frame."----
 PieChart(Dept, hole=0, quiet=TRUE)
 
-## ---- fig.width=4-----------------------------------------------------------------------------------------------------
+## ----bc2var, dataTable, echo=FALSE, out.width='34%', fig.asp=.7, fig.align='center'-----------------------------------
+knitr::include_graphics(system.file("img", "bc2Explain.png", package="lessR"))
+
+## ---- fig.width=4, fig.align='center'---------------------------------------------------------------------------------
 BarChart(Dept, by=Gender)
 
-## ---- fig.width=5-----------------------------------------------------------------------------------------------------
+## ---- fig.width=5, fig.align='center'---------------------------------------------------------------------------------
 BarChart(Dept, by=Gender, beside=TRUE)
 
-## ---- fig.width=4-----------------------------------------------------------------------------------------------------
+## ---- fig.width=4, fig.align='center'---------------------------------------------------------------------------------
 BarChart(Dept, by1=Gender)
 
-## ---------------------------------------------------------------------------------------------------------------------
+## ---- fig.align='center'----------------------------------------------------------------------------------------------
 BarChart(Dept, by1=Gender, n_col=1, quiet=TRUE)
 
-## ---- fig.width=4-----------------------------------------------------------------------------------------------------
+## ---- fig.width=4, fig.align='center'---------------------------------------------------------------------------------
 BarChart(Dept, by=Gender, stack100=TRUE)
+
+## ---------------------------------------------------------------------------------------------------------------------
+d <- rd("Mach4", quiet=TRUE)
+
+## ---------------------------------------------------------------------------------------------------------------------
+l <- rd("Mach4_lbl", quiet=TRUE)
+
+## ---------------------------------------------------------------------------------------------------------------------
+LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
+                     "Slightly Agree", "Agree", "Strongly Agree")
+d <- factors(c(m06,m07,m09,m10), levels=0:5, labels=LikertCats, ordered=TRUE)
+
+## ----fig.width=5, fig.height=4, fig.align='center'--------------------------------------------------------------------
+BarChart(m06, by=m07, quiet=FALSE)
 

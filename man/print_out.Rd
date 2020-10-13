@@ -33,7 +33,7 @@ Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, N
 # read internal data set
 d <- rd("Employee", quiet=TRUE)
 # do the summary statistics
-s <- ss.brief(Salary)
+s <- ss_brief(Salary)
 # print the piece of output, print function is implicit
 s$outliers
 }

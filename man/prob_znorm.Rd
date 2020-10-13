@@ -1,6 +1,5 @@
 \name{prob_znorm}
 \alias{prob_znorm}
-\alias{prob.znorm}
 
 \title{Plot a Normal Curve with Shaded Intervals by Standard Deviation}
 
@@ -14,8 +13,6 @@ prob_znorm(mu=0, sigma=1, color_border="gray10",
          xlab="", ylab="", main="", 
          y_axis=FALSE, z=TRUE, axis_size=.9,
          pdf_file=NULL, width=5, height=5, \ldots)
-
-prob.znorm(\ldots)
 }
 
 
@@ -58,13 +55,13 @@ The normal densities are calculated with \code{\link{dnorm}} and plotted with \c
 
 \examples{
 # Mu=0, Sigma=1: Standard normal 
-prob.znorm()
+prob_znorm()
 
 # distribution for height of American women, mu=65.5, sigma=2.5
-prob.znorm(65.5, 2.5, xlab="Height of American Women")
+prob_znorm(65.5, 2.5, xlab="Height of American Women")
 
 # do a red fill color
-prob.znorm(65.5, 2.5, r=.9, xlab="Height of American Women")
+prob_znorm(65.5, 2.5, r=.9, xlab="Height of American Women")
 }
 
 

@@ -4,6 +4,53 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
  
+>>>>>> Changes for lessR version 3.9.8 (2020-10-13) <<<<<<
+
+-------------
+Updates 3.9.8
+-------------
+
+corReorder
+  "as_is" option for parameter order added to display the heat map 
+     but not reorder the matrix
+
+Plot
+  if x is sorted with equal intervals, to turn off default connecting
+    line segments, set run=FALSE or segments=FALSE
+   plot_errors parameter plots the segment that connects each point
+     to the fitted line, "loess" or "lm"
+   new value for fit, "null", to plot null model regression line
+   abbreviation pl removed from lack of use
+
+prob_norm, prob_tcut, prob_znorm
+  deprecated prob.norm(), prob.tcut(), and prob.znorm() removed
+
+Regression
+  for models with a single predictor variable, plot_errors parameter 
+    plots the segment that connects each point to the line
+  specify a contrast matrix with the base R lm() function
+    contrast parameter
+  a model of y ~ 1 yields the null model 
+  deprecated reg.brief() removed
+
+SummaryStats
+  deprecated ss.brief() removed
+
+---------------
+Bug Fixes 3.9.8
+---------------
+
+Plot
+  center_line plots even if only points are plotted without
+    connecting line segments
+  if quiet=TRUE, notes are not displayed
+  sunflower plots work
+
+Regression
+  bubble plot sometimes incorrectly plotted in place of regular plot
+
+
+
 >>>>>> Changes for lessR version 3.9.7 (2020-09-23) <<<<<<
 
 -------------

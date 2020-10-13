@@ -163,7 +163,7 @@ bc(\ldots)
 
   \item{legend_title}{Title of the legend, which is usually set by default except
         when raw counts are entered as a matrix.  Then a title must be specified
-        to generate a legend_}
+        to generate a legend.}
   \item{legend_position}{When plotting two variables, location of the legend, with the
         default in the right margin. Additional options from standard R are
         "topleft", "top", "topright" and others as shown in the help for the

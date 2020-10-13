@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{pivot table}
+  %\VignetteIndexEntry{1. Data: Pivot Table}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -16,20 +16,7 @@ library("knitr")
 ```
 
 
-## __lessR__ `pivot()` vs __Base R__ `aggregate()`
-
 Aggregation is the process forming groups of data based on the levels of categorical variables, then computing some statistical value, such as a mean, for each group on a numeric variable. For example, compute the mean Salary for each combination of the levels of Gender and Department. Refer to each group, the cross-classification of all the specified categorical variables, as a _cell_.  
-
-The __lessR__ `pivot()` function performs this aggregation by relying upon the __base R__ function `aggregate()`. By default, `pivot()` generates a long-form data frame pivot table (Excel terminology), which can then be directly input into analysis functions as a standard data frame. The levels for all the grouping variables are listed in the rows, but if there are specified column grouping variables, `pivot()` relies upon base R `reshape()` to form a 2-d table for direct viewing instead of a data table to input into further analysis functions. 
-
-`pivot()` provides additional features than `aggregate()` provides. 
-
-1. If only one `value` over which to aggregate, the sample size for each cell is provided with the number of missing values.
-1. Missing data analysis by cell or by `value` aggregated. 
-1. The aggregated computations can be displayed as a 2-d table, not just a long-form data frame.
-1. The data parameter is listed first in the parameter list, which facilitates the use of the pipe operator from the __magrittr__ package. 
-
-Also, there is a different interface as the \code{by} variables, for rows and columns, are each specified as a vector.
 
 The following table lists many of the available statistical functions by which to aggregate over the cells.
 
@@ -84,6 +71,9 @@ d <- Read("Employee")
 ### Output as a long-form data frame
 
 Two categorical variables in the _d_ data frame are _Dept_ and _Salary_. A continuous variable is _Salary_. Create the long-form pivot table as a data frame that expresses the mean of _Salary_ for all combinations of _Dept_ and _Salary_.
+
+This example includes the parameter names for emphasis, but if the parameters are entered in this order, the names are not necessary.
+
 ```{r}
 pivot(data=d, compute=mean, value=Salary, rows_by=c(Dept, Gender))
 ```
@@ -176,3 +166,16 @@ Specify the count for levels that include missing cells. Invoke `na_by` for tabu
 pivot(d, tabulate, c(Dept, Gender), na_by=TRUE)
 ```
 
+
+## __lessR__ `pivot()` vs __Base R__ `aggregate()`
+
+The __lessR__ `pivot()` function relies upon the __base R__ function `aggregate()` for aggregation. By default, `pivot()` generates a long-form data frame pivot table (Excel terminology), which can then be directly input into analysis functions as a standard data frame. The levels for all the grouping variables are listed in the rows, but if there are specified column grouping variables, `pivot()` relies upon base R `reshape()` to form a 2-d table for direct viewing instead of a data table to input into further analysis functions. 
+
+`pivot()` provides additional features than `aggregate()` provides. 
+
+1. If only one `value` over which to aggregate, the sample size for each cell is provided with the number of missing values.
+1. Missing data analysis by cell or by `value` aggregated. 
+1. The aggregated computations can be displayed as a 2-d table, not just a long-form data frame.
+1. The data parameter is listed first in the parameter list, which facilitates the use of the pipe operator from the __magrittr__ package. 
+
+Also, there is a different interface as the \code{by} variables, for rows and columns, are each specified as a vector.
