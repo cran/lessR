@@ -32,6 +32,12 @@ r$out_estimates
 r$coefficients
 
 ## ---------------------------------------------------------------------------------------------------------------------
+r <- reg(Salary ~ Years, pred_rows="all", graphics=FALSE)
+r$out_predict = sub(", ", ",", r$out_predict, fixed=TRUE)
+dp <- read.table(text=r$out_predict)
+dp[.(row.names(dp) == "Pham,Scott"),]
+
+## ---------------------------------------------------------------------------------------------------------------------
 cnt <- contr.sum(n=3)
 cnt
 
@@ -44,4 +50,7 @@ reg_brief(Salary ~ 1, plot_errors=TRUE)
 
 ## ----fig.width=4, fig.height=4----------------------------------------------------------------------------------------
 Logit(Gender ~ Salary)
+
+## ---------------------------------------------------------------------------------------------------------------------
+Logit(Gender ~ Years + Salary, prob_cut=c(.3, .5, .7))
 

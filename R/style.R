@@ -100,7 +100,7 @@ function(
   add_lty=getOption("add_lty"),
 
   n_cat=getOption("n_cat"), suggest=getOption("suggest"),
-  note=getOption("note"),
+  notes=getOption("notes"),
   quiet=getOption("quiet"), brief=getOption("brief"),
 
   results=getOption("results"), explain=getOption("explain"),
@@ -266,7 +266,7 @@ function(
 
     n_cat <- set$n_cat
     suggest <- set$suggest
-    note <- set$note
+    notes <- set$notes
     quiet <- set$quiet
     brief <- set$brief
 
@@ -526,7 +526,7 @@ function(
     options(brief=brief)
     options(n_cat=n_cat)
     options(suggest=suggest)
-    options(note=note)
+    options(notes=notes)
     options(width=width)
 
     options(results=results)
@@ -948,7 +948,7 @@ function(
     options(brief=brief)
     options(n_cat=n_cat)
     options(suggest=suggest)
-    options(note=note)
+    options(notes=notes)
     options(width=width)
 
     options(results=results)
@@ -1267,7 +1267,7 @@ function(
 
     n_cat = getOption("n_cat"),
     suggest = getOption("suggest"),
-    note = getOption("note"),
+    notes = getOption("notes"),
     quiet = getOption("quiet"),
     brief = getOption("brief"),
 

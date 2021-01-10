@@ -19,11 +19,11 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
   if (length(prob_cut) == 1)
     p.cut <- prob_cut
   else
-    p.cut <- c(0.5, prob_cut)   # 0.5for output, rest for confusion matrices
+    p.cut <- 0.5   # 0.5 for pred output, rest for confusion matrices
     
-  for (i in 1:length(p.cut)) {
+  for (i in 1:length(prob_cut)) {
     
-    # get output table, with label
+    # get output pred table, with label
     if (!new.data) {
       p.int <- data.frame(predict(lm.out, type="response", se.fit=TRUE),
                           stringsAsFactors=TRUE)
@@ -31,12 +31,12 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       # classify
       label <- integer(length=nrow(p.int))
       for (irow in 1:nrow(p.int))
-        label[irow] <- ifelse (p.int$fit[irow] < p.cut[i], 0, 1)
+        label[irow] <- ifelse (p.int$fit[irow] < p.cut, 0, 1)
 
       if (all(label == 0)  ||  all(label == 1)) { 
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "For threshold ", p.cut[i], ", all predicted values are ", label[1],
-          "\n\n")
+          "For threshold ", p.cut, ", all predicted values are ",
+          label[1], "\n\n")
       }
 
       out <- cbind(lm.out$model[c(nm[seq(2,n.vars)], nm[1])], label, 
@@ -56,20 +56,20 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
                           se.fit=TRUE, newdata=Xnew), stringsAsFactors=TRUE)
       label <- integer(length=nrow(p.int))
       for (i in 1:nrow(p.int))
-        label[i] <- ifelse (p.int$fit[i] < p.cut[i], 0, 1)
+        label[i] <- ifelse (p.int$fit[i] < p.cut, 0, 1)
 
       Ynew <- character(length=nrow(Xnew))
       Ynew <- ""
       out <- cbind(Xnew, Ynew, label, p.int$fit,p.int$se.fit)
     }
 
-    # display output only if on first iteration
+    # display pred output only if on first iteration
     if (i == 1) {
      
       cat( "\n\n", "  FORECASTS", "\n\n")
 
       cat("Probability threshold for predicting ",
-          levels(lm.out$model[,nm[1]])[2], ":", " ", p.cut[1], "\n\n", sep="")
+          levels(lm.out$model[,nm[1]])[2], ":", " ", p.cut, "\n\n", sep="")
 
       if (is.factor(lm.out$model[,nm[1]]))
         cat(" 0: ", levels(lm.out$model[,nm[1]])[1], "\n",
@@ -104,24 +104,20 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       }
       .dash(68)
 
-      cat("\n\nConfusion Matrix for", nm[1], "\n\n")
+#     cat("\n\nConfusion Matrix for", nm[1], "\n\n")
 
-    } 
-
-    else {
       cat("\n\n")
-      if (i == 2) {
-        cat("---------------------------------------\n")
-        cat("Additional specified confusion matrices\n")
-        cat("---------------------------------------\n")
-        cat("\n")
-      }
-    }
-   
-    # confusion matrix
-    .logit5Confuse(lm.out, out, n.vars, nm, new.data, p.cut[i])
+      cat("----------------------------\n")
+      cat("Specified confusion matrices\n")
+      cat("----------------------------\n")
+      cat("\n")
+    }  # end (i == 1)  # pred output
 
-  }
+    # confusion matrix
+    if (i > 1) cat("\n\n")
+    .logit5Confuse(lm.out, out, n.vars, nm, new.data, prob_cut[i])
+
+  }  # end (i in 1:length(p.cut))
 
 
   # graphics

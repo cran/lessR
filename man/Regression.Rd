@@ -122,10 +122,11 @@ reg_brief(\ldots, brief=TRUE)
   \item{pred_sort}{Default is \code{"predint"}, which sorts the rows of data
         and associated intervals by the lower bound of each prediction interval.
         Turn off this sort by specifying a value of \code{"off"}.}
-  \item{subsets}{Default is to produce the analysis of the fit based on adjusted R-squared
-       for all possible model subsets of size 10 for each number of predictors, from the
-       \code{leaps} package. Set to \code{FALSE} to turn off. Defaults lists a maximum of
-       the first 50 values. Specify an integer to change the maximum.}
+  \item{subsets}{Default is to produce the analysis of the fit based on
+       adjusted R-squared for all possible model subsets of size 10 for
+       each number of predictors, from the \code{leaps} package. Set to
+       \code{FALSE} to turn off. Defaults lists a maximum of the first 50 values.
+       Specify an integer to change the maximum.}
   \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a larger value
        are flagged in red and labeled in the resulting scatterplot of Residuals and Fitted
        Values.  Default value is 1.0.}\cr
@@ -160,9 +161,10 @@ reg_brief(\ldots, brief=TRUE)
   \item{seed}{Parameter \code{kfold} generates random partitions, folds, of data.
        Set the seed to an integer to recover the same random partitions on
        subsequent runs.}
-  \item{rescale}{Transform the variables to the same metric before
-        conducting the analysis. Applies to \code{kfold} separately to the
-        training and testing folds as well to avoid data leakage.}\cr
+  \item{rescale}{Transform the variables to the specified metric before
+       conducting the analysis, \code{"z"}, \code{"0to1"}, or \code{"robust"}.
+       Applies to \code{kfold} separately to the
+       training and testing folds as well to avoid data leakage.}\cr
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}

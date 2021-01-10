@@ -85,7 +85,7 @@ function (x, levels, labels=NULL, data=d, ordered=FALSE,
   }
 
   if (!var_labels)
-    return(data=as.data.frame(data, stringsAsFactors=TRUE))
+    return(data)
   else
     return(new.labels)
 

@@ -1,7 +1,7 @@
 pivot <-
 function(data, compute, value, rows_by, cols_by=NULL,
          na_value=FALSE, na_by=FALSE, na_remove=TRUE,
-         digits_d=NULL) {
+         factors=FALSE, digits_d=NULL) {
 
   # length(x) is count_n(x) + count_NA(x)
   count_n <- function(x) sum(!is.na(x))
@@ -28,6 +28,9 @@ function(data, compute, value, rows_by, cols_by=NULL,
     ind.r.by <- ind.smry  # for tabulate do not need by vars
   }
   n.r.by <- length(ind.r.by)
+  # save original variable types because aggregate makes factors
+  cls <- character(length=n.r.by)
+  for (i in 1:n.r.by) cls[i] <- class(data[,ind.r.by[i]])
 
   # get indices of cols_by variable(s)
   if (!missing(cols_by)) {
@@ -42,7 +45,7 @@ function(data, compute, value, rows_by, cols_by=NULL,
 
   if (n.c.by > 2)  {
     nms.c <- ""
-    for (i in 1:n.c.by) nms.c <- paste(nms.c, names(d)[ind.c.by[i]])
+    for (i in 1:n.c.by) nms.c <- paste(nms.c, names(data)[ind.c.by[i]])
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specified column  by  variables: ", nms.c, "\n",
       "Only two column  by  variables permitted\n\n")
@@ -74,7 +77,7 @@ function(data, compute, value, rows_by, cols_by=NULL,
     names(a)[ncol(a)] <- "n"
   }
 
-  # aggregate over a numerical variable
+  # aggregate over a numerical variable (by vars become factors)
   else {
     a <- aggregate(data[,ind.smry], by=by.vars, drop=FALSE, FUN=compute,
                    na.rm=na_remove)  # compute for a cell even if a missing
@@ -84,7 +87,14 @@ function(data, compute, value, rows_by, cols_by=NULL,
     if (length(ind.smry) == 1)
       names(a)[ncol(a)] <- deparse(substitute(value))
     if (length(ind.by) == 1)
-      names(a)[1] <- deparse(substitute(by))
+      names(a)[1] <- deparse(substitute(rows_by))
+    if (!factors) {  # retain original variable type
+      for (i in 1:n.r.by) {
+        if (cls[i] == "Date") a[,i] <- as.Date(as.character(a[,i]))
+        if (cls[i] == "character") a[,i] <- as.character(a[,i])
+        if (cls[i] == "integer") a[,i] <- as.integer(as.character(a[,i]))
+      }
+    }
 
     a <- cbind(a[,1:n.by, drop=FALSE],
                n[,ncol(n), drop=FALSE],
@@ -98,7 +108,7 @@ function(data, compute, value, rows_by, cols_by=NULL,
     }
 
     # round if specified
-    i.s <- which(names(a) %in% names(d)[ind.smry])
+    i.s <- which(names(a) %in% names(data)[ind.smry])
     if (!is.null(digits_d)) a[, i.s] <- round(a[, i.s], digits_d)
 
     if (!na_value) a <- na.omit(a)
@@ -114,9 +124,9 @@ function(data, compute, value, rows_by, cols_by=NULL,
     a <- a[, -c(n.ind, miss.ind)]
 
     # re-reference pivot variables in aggregated data frame a
-    i.s <- which(names(a) %in% names(d)[ind.smry])
-    i.r <- which(names(a) %in% names(d)[ind.r.by])
-    i.c <- which(names(a) %in% names(d)[ind.c.by])
+    i.s <- which(names(a) %in% names(data)[ind.smry])
+    i.r <- which(names(a) %in% names(data)[ind.r.by])
+    i.c <- which(names(a) %in% names(data)[ind.c.by])
 
     # first column by variable
     if (n.c.by == 1) {
@@ -142,6 +152,7 @@ function(data, compute, value, rows_by, cols_by=NULL,
                     timevar=names(a)[i2.c])
     }
     rownames(w) <- c()  # remove row names
+
 
   # headings
   # --------

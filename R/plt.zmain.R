@@ -83,7 +83,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   if (is.factor(x[,1])) {
     x.lvl <- levels(x[,1])
     if (!is.null(value_labels)) value_labels <- gsub(" ", "\n", x.lvl)
-    x <- as.matrix(as.integer(x[,1]))
+    x <- as.matrix(as.integer(unclass(x[,1])))
   }
   else if (!date.ts) {
     x <- as.matrix(x)
@@ -93,7 +93,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   nm.y <- names(y)
   if (is.factor(y[,1])) {
     y.lvl <- levels(y[,1])  # gets put into alphabetical order
-    y <- as.matrix(as.integer(y[,1]))
+    y <- as.matrix(as.integer(unclass(y[,1])))
   }
   else if (!date.ts) {
     nm.y <- names(y)
@@ -1120,7 +1120,48 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             l.ln <- lm(y.lv ~ x.lv)
           else if (fit.line == "null")
             l.ln <- lm(y.lv ~ 1)
-          f.ln <- fitted(l.ln, ...)
+          if (fit.line %in% c("loess", "lm", "null"))
+            f.ln <- fitted(l.ln, ...)
+
+          if (fit.line == "exp") {  # exponential model
+            fi <- which(y.lv <= 0)
+            if (length(fi) > 0) {
+              y.lv <- y.lv[-fi]
+              x.lv <- x.lv[-fi]
+            }
+            l.ln <- lm(log(y.lv) ~ x.lv)
+            f.ln <- exp(l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))
+            ok <- is.finite(f.ln)
+            if (length(ok) > 0) {
+              f.ln <- f.ln[ok]
+              x.lv <- x.lv[ok]
+            }
+          }
+
+          if (fit.line == "sqrt") {  # sqrt model
+            l.ln <- lm(sqrt(y.lv) ~ x.lv)
+            f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))^2
+          }
+
+          if (fit.line == "reciprocal") {  # reciprocal model
+            if (any(y.lv < 0))
+              message("\n>>> Need values of y to be + for meaningful plot\n")
+            fi <- which(y.lv == 0)  # no reciprocal of 0
+            if (length(fi) > 0) {
+              y.lv <- y.lv[-fi]
+              x.lv <- x.lv[-fi]
+            }
+            l.ln <- lm(1/y.lv ~ x.lv)
+            f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))
+            fi <- which(f.ln > max(y.lv)  | f.ln <= min(y.lv))
+            if (length(fi) > 0) {  # keep plot within the range of the plot
+              f.ln <- f.ln[-fi]
+              x.lv <- x.lv[-fi]
+             }
+          }
+
+          if (fit.line %in% c("exp", "sqrt", "reciprocal", "null"))
+            fit_se[1] <- 0
 
           # se bands about fit line
           if (fit_se[1] != 0) {

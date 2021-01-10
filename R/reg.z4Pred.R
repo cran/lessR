@@ -23,12 +23,6 @@ function(lm.out,
     tx[length(tx)+1] <- .dash2(68)
   }
 
-  tx[length(tx)+1] <- paste("Data, Predicted, Standard Error of Forecast,",
-                      "95% Prediction Intervals")
-  tx[length(tx)+1] <- "   [sorted by lower bound of prediction interval]"
-  if (pred_rows < n.keep  &&  !new.data) 
-    tx[length(tx)+1] <- "   [to see all intervals do pred_rows=\"all\"]"
-  
   if (!new.data) {
     c.int <- data.frame(predict(lm.out, interval="confidence"),
                         stringsAsFactors=TRUE)
@@ -71,8 +65,8 @@ function(lm.out,
 
   names(out)[n.vars+1] <- "pred"
   names(out)[n.vars+2] <- "sf"
-  names(out)[n.vars+3] <- "pi:lwr"
-  names(out)[n.vars+4] <- "pi:upr"
+  names(out)[n.vars+3] <- "pi.lwr"
+  names(out)[n.vars+4] <- "pi.upr"
   names(out)[n.vars+5] <- "width"
 
   # manually do calc for pi:upr to verify
@@ -100,7 +94,7 @@ function(lm.out,
 
     if (pred_rows == nrow(out)) {
       r <- 1:nrow(out)
-      tx2 <- .prntbl(out[r,], digits_d)
+      tx2 <- .prntbl(out[r,], digits_d, cc=NULL)
     }
 
     else {
@@ -124,9 +118,8 @@ function(lm.out,
       r <- c(r1,r2,r3)
       b1 <- which(r == r2[1])
       b2 <- which(r == r3[1])
-      tx2 <- .prntbl(out[r,], digits_d, brk=c(b1,b2))
+      tx2 <- .prntbl(out[r,], digits_d, brk=c(b1,b2), cc=NULL)
     }
-
   }
 
   else   # new data 

@@ -173,9 +173,10 @@ The __lessR__ `pivot()` function relies upon the __base R__ function `aggregate(
 
 `pivot()` provides additional features than `aggregate()` provides. 
 
-1. If only one `value` over which to aggregate, the sample size for each cell is provided with the number of missing values.
+1. If only one `value` over which to aggregate, the sample size for each cell is provided along with the number of missing values.
 1. Missing data analysis by cell or by `value` aggregated. 
 1. The aggregated computations can be displayed as a 2-d table, not just a long-form data frame.
+1. `rows_by` variables of type `Date`, `character` and `integer` retain the same variable type in the summary table instead of each converted to a `factor` (set `factors=TRUE` to get factors instead).
 1. The data parameter is listed first in the parameter list, which facilitates the use of the pipe operator from the __magrittr__ package. 
 
 Also, there is a different interface as the \code{by} variables, for rows and columns, are each specified as a vector.

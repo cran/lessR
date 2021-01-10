@@ -13,6 +13,9 @@ function(my_formula, data=d, rows=NULL,
          pdf_file=NULL, width=5, height=5, ...) {
  
 
+  # produce actual argument, such as from an abbreviation, and flag if not exist
+  res_sort <- match.arg(res_sort)
+
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
@@ -61,18 +64,6 @@ function(my_formula, data=d, rows=NULL,
   }
 
 
-  # convert character variables to factors (for DV)
-  n_col <- apply(data, 2, function(x) sum(!is.na(x)))  # num values per variable
-  nu.col <- apply(data, 2, function(x) length(unique(na.omit(x))))  # num unique
-  fnu.col <- logical(length=ncol(data))  # logical vector, initial values to FALSE
-
-  for (i in 1:ncol(data)) 
-    if (is.character(data[,i])) if (nu.col[i] != n_col[i]) fnu.col[i] <- TRUE 
-  data[fnu.col] <- lapply(data[fnu.col], as.factor) 
-
-  # produce actual argument, such as from an abbreviation, and flag if not exist
-  res_sort <- match.arg(res_sort)
-
   max_new <- 6
 
   show_R <- FALSE
@@ -93,16 +84,28 @@ function(my_formula, data=d, rows=NULL,
     show_R <- FALSE
    }
    else relate <- TRUE
+
+  # convert character variables to factors (for DV)
+  n_col <- apply(data, 2, function(x) sum(!is.na(x)))  # num values per variable
+  nu.col <- apply(data, 2, function(x) length(unique(na.omit(x))))  # num unique
+  fnu.col <- logical(length=ncol(data))  # logical, initial values to FALSE
+
+  for (i in 1:ncol(data)) {
+    if (is.character(data[,i]))
+      if (nu.col[i] != n_col[i]) fnu.col[i] <- TRUE
+  } 
+  data[fnu.col] <- lapply(data[fnu.col], as.factor) 
+
       
   pre <- "> "
   line <- "--------------------------------------------------------------------\n"
   
   if (!exists(df.name)) {
-    txtC <- "Function reg requires the data exist in a data frame\n"
+    txtC <- "Function Logit() requires the data exist in a data frame\n"
     if (df.name == "d") 
       txtA <- ", the default data frame name, " else txtA <- " "
-    txtB1 <- "Either create the data frame, such as with data.frame function, or\n"
-    txtB2 <- "  specify the actual data frame with the parameter: data\n"
+    txtB1 <- "Either create the data frame, such as with data.frame function,\n"
+    txtB2 <- "  or specify the actual data frame with the parameter: data\n"
     txtB <- paste(txtB1, txtB2, sep="")
     cat("\n"); stop(call.=FALSE, "\n","------\n",
         txtC, "Data frame ", df.name, txtA, "does not exist\n\n", txtB, "\n")
@@ -119,13 +122,14 @@ function(my_formula, data=d, rows=NULL,
   }
   n.obs <- nrow(data)
   
-  if (n.pred > 1) collinear <- TRUE else collinear <- FALSE
+  collinear <- ifelse (n.pred > 1, TRUE, FALSE)
 
+  # check response variable for two values, only 0 and 1 if numeric
   is.bin <- TRUE
   if (is.factor(data[,nm[1]])) { 
      if (nlevels(data[,nm[1]]) != 2) is.bin  <- FALSE
   }
-  else {
+  else {  # numeric y
     for (i in 1:n.obs)
       if (!is.na(data[i,nm[1]]))
         if (data[i,nm[1]]!=0 && data[i,nm[1]]!=1) is.bin <- FALSE
@@ -154,7 +158,8 @@ function(my_formula, data=d, rows=NULL,
       pp <- eval(parse(text=paste("X", toString(i),"_new",sep="")))
       if (is.null(pp)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "Specified new data values for one predictor variable, so do for all.\n\n")
+          "Specified new data values for one predictor variable,",
+          " so do for all.\n\n")
       }
     }
   }
@@ -178,7 +183,7 @@ function(my_formula, data=d, rows=NULL,
   # logit analysis
   #   all subsequent analysis done on data in model construct lm.out$model
   #   this model construct contains only model vars, with Y listed first
-  lm.out <- glm(my_formula, data=data, family="binomial")
+  lm.out <- glm(my_formula, data=data, family="binomial", ...)
   # -----------------------------------------------------------
 
   n.keep <- nrow(lm.out$model)
@@ -332,6 +337,7 @@ function(my_formula, data=d, rows=NULL,
          numeric.all, in.data.frame, X1_new, 
          X2_new, X3_new, X4_new, X5_new, X6_new,
          pdf_file, width, height)
+  # Also calls .logit5Confuse.R
 
   invisible(lm.out)
 

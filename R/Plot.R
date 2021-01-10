@@ -217,13 +217,18 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   if (show_runs) run <- TRUE
   if (run) if (cl.miss) center_line <- "default"
 
-  if (!missing(fit_se)) if (missing(fit))  fit <- "loess"
+  fit_se.miss <- ifelse (missing(fit_se), TRUE, FALSE) 
+  if (!fit_se.miss) if (missing(fit))  fit <- "loess"
+  if (fit_se.miss && plot_errors) fit_se <- 0  # default for plot_errors
+
   if (is.logical(fit))
     fit.ln <- ifelse (fit, "loess", "off")
   if (is.character(fit)) {
-    if (!(fit %in% c("loess", "lm", "off", "ls", "null"))) {  # "ls" deprecated
+    if (!(fit %in% c("loess", "lm", "off", "ls", "null", "exp", "sqrt",
+                     "reciprocal", "log"))) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "fit only for loess, lm (linear model), or null (null model)\n\n")
+        "fit only for loess (non-linear), lm (linear), or null (null model),\n",
+        "exp (exponential), log (log), sqrt (sq root) or reciprocal\n\n")
     }
     fit.ln <- fit  # fit.ln passed to .plt.main
   }
@@ -561,7 +566,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       y.call <- factor(row.names(data), levels=row.names(data))
       if (is.null(ylab)) ylab <- ""  # unless specified, drop the axis label
       cat.y <- TRUE
-      data.y <- data.frame(y.call, stringsAsFactors=TRUE)
+      data.y <- data.frame(y.call)
+      #data.y <- data.frame(y.call, stringsAsFactors=TRUE)
     }
       
     # y not in global env, in df, specify data= forces to data frame
@@ -603,8 +609,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
       n.y_var <- ncol(data.y)  # number of y-variables
       y.call <- data.y
-    # end get data.y
- 
 
       if (ncol(y.call) == 1) { # y is one variable
         # y.call <- data.y[,1]
@@ -1538,7 +1542,7 @@ if (is.null(out_size)) out_size <- size.pt
       if (sort_yx != "0") {
         srt.dwn <- ifelse (sort_yx == "-", TRUE, FALSE)
         if (n.x_var == 1) {  # one x-variable
-          ord <- order(x.call, decreasing=srt.dwn)
+          ord <- order(x.call[,1], decreasing=srt.dwn)
         }
         else if (n.x_var == 2) {  # two x-vars, sort on diffs
           difs <- x.call[,2] - x.call[,1] 
@@ -1554,7 +1558,7 @@ if (is.null(out_size)) out_size <- size.pt
         y.call[,1] <- y.c
 
       }  # end sort_yx
-      else {
+      else { # sort_yx==0
         if (n.x_var == 2  &&  ncol(x.call) == 2) {  # run==TRUE only 1-col
           ord <- 1:nrow(x.call)
           difs <- x.call[,2] - x.call[,1] 

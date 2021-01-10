@@ -209,7 +209,7 @@ The `read_spss()` function preserves the value labels with a special variable ty
 
 One problem is that the factor conversion preserves the value labels listed in the correct order, but looses the original integer scoring information. To preserve both the labels as a standard R factor, and to preserve the original scoring, `Read()` converts the original read variable with the labels (type `haven_labels`) into two variables. The first variable, an integer variable with the original integer scoring, has the name of the read variable. The corresponding factor variable has the same name as the read variable with the suffix `\_f`.
 
-For example, the use of `read_spss()` results the folling, showing just the first four lines of data. The variable _region_ contains both the integer scoring and the value label that are part of the SPSS data file that was read.
+For example, the use of `read_spss()` results in the following, here showing just the first four lines of data. The variable _region_ contains both the integer scoring and the value label that are part of the SPSS data file that was read.
 
 ```
 # A tibble: 4 x 4

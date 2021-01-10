@@ -12,15 +12,15 @@ Summarize, that is, aggregate, a numerical variable (\code{value}) over one or m
 \usage{
 pivot(data, compute, value, rows_by, cols_by=NULL,
          na_value=FALSE, na_by=FALSE, na_remove=TRUE,
-         digits_d=NULL)
+         factors=FALSE, digits_d=NULL)
 }
 
 \arguments{
   \item{data}{Data frame that contains the variables.}
   \item{compute}{The statistic, defined as a function, to aggregate
        over the combinations of the values of the categorical variables.}
-  \item{value}{Numerical response variable that is aggregated, i.e.,
-       summarized across the groups.}
+  \item{value}{One or more numerical response variables that are aggregated,
+       i.e., summarized across the groups.}
   \item{rows_by}{Categorical variables that define the groups (cells) listed
        in the rows of the output long-form data frame, available to input
        into other data analysis routines. Not used if function to compute
@@ -34,6 +34,10 @@ pivot(data, compute, value, rows_by, cols_by=NULL,
   \item{na_remove}{Sets base R parameter \code{na.rm}, which, if \code{TRUE},
        removes missing values from the \code{value} variables. Otherwise,
        the aggregation for a cell with missing data returns \code{NA}.}
+  \item{factors}{For \code{rows_by} variables of type \code{Date}, 
+        \code{character}, and \code{integer}, the variable type is retained
+        in the summary table. If \code{TRUE}, then the \code{rows_by} variables
+        become factors.}
   \item{digits_d}{Number of significant digits for each of the displayed summary
         statistics.}
 }

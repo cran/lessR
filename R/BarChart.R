@@ -381,6 +381,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   }  # end !fill.miss
 
 
+  # ------------------------------------------------------------
   # -----------  x, y, and by variables established ------------
   # ------------------------------------------------------------
 
@@ -395,13 +396,12 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   if (is.null(stat)) {
     if (!is.null(y.call)) {
 
-      if (sum(is.na(x.call))  > 0 ||
+     if (sum(is.na(x.call))  > 0 ||
           sum(is.na(by.call)) > 0 ||
           sum(is.na(y.call))  > 0)   {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "When reading the value of y directly, from aggregate data,\n",
-          "  missing aggregated data not allowed\n",
-          "Use the  na.omit()  function before aggregating the data\n\n")
+          "When reading values of y directly, missing data not allowed.\n",
+          "First use the  na.omit()  function on the data frame.\n\n")
       }
       
       lx.u <- length(unique(x.call))

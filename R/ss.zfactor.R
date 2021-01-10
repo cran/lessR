@@ -44,9 +44,9 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
 
     tx <- ""
 
-    if (nrow(x) * (ncol(x)-1) > 20) { 
-      if (msg)
-        message("Table output is vertical to fit in window, but > 20 rows\n",
+    if (nrow(x) * (ncol(x)-1) > 30) { 
+      if (msg  &&  getOption("notes"))
+        message("Table output is vertical to fit in window, but > 30 rows\n",
                 "To view the complete table, save the output\n",
                 "  to an object, e.g., b <- BarChart(...)\n",
                 "  then b$freq\n")

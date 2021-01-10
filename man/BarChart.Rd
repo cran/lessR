@@ -218,8 +218,8 @@ bc(\ldots)
         a \code{y}-variable explicitly provided, unless there are more than
         15 levels or \code{y} is present and non-integer in which case
         the default is \code{"off"}. For tabulated
-        counts, \code{"prop"} is also available for proportions as well as
-        \code{"input"}.}
+        counts, \code{"prop"} is also available for proportions, as well as
+        \code{"input"} to show the computed values such as counts.}
   \item{values_color}{Color of the plotted text. Could be a vector to specify
         a unique color for each value. If fewer colors are specified than
         the number of categories, the colors are recycled.}

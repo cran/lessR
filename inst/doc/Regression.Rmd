@@ -17,7 +17,7 @@ library("lessR")
 The `Regression()` function performs multiple facets of a complete regression analysis. Abbreviate with `reg()`.
 
 
-To illustrate, first read the Employee data included as part of __lessR__.
+To illustrate, first read the Employee data included as part of __lessR__. Read into the default __lessR__ data frame _d_.
 
 ```{r read}
 d <- Read("Employee")
@@ -34,9 +34,10 @@ The brief version provides just the basic analysis, what Excel provides, plus a 
 reg_brief(Salary ~ Years + Pre)
 ```
 
+
 ### Full output
 
-The full output is extensive: Summary of the analysis, estimated model, fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals.
+The full output is extensive: Summary of the analysis, estimated model, fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals. The idea is to provide all of the information you need for a proper regression analysis.
 
 ```{r}
 reg(Salary ~ Years + Pre)
@@ -51,17 +52,18 @@ reg_brief(Salary ~ Years, rescale="z", plot_errors=TRUE)
 
 ### k-fold cross-validation
 
-The standard output includes $R^2_{press}, the value of $R^2$ when applied to new, previously unseen data. Still, a cross-validation option is also offered with the `kfold` parameter. Here specify three folds.
+Specify a cross-validation with the `kfold` parameter. Here specify three folds. The funciton automatically creates the training and testing data sets.
 
 ```{r}
 reg(Salary ~ Years, kfold=3)
 ```
 
+The standard output also includes $R^2_{press}$, the value of $R^2$ when applied to new, previously unseen data, a value comparable to the average $R^2$ on test data. 
 
 
 ## Output as a Stored Object
 
-The output of `Regression()` can be stored into an R object, here named _r_. The output object consists of various components, what R calls a _list_ object.
+The output of `Regression()` can be stored into an R object, here named _r_. The output object consists of various components that together define a comprehensive regression analysis. R calls the resulting output structure a _list_ object.
 
 ```{r}
 r <- reg(Salary ~ Years + Pre)
@@ -73,29 +75,40 @@ Entering the name of the object displays the full output.
 r
 ```
 
-Or, work with the components individually. Use the base R `names()` function to identify all of the components. Component names that begin with `out_` are part of the standard output. Other components include just data and statistics designed to be input in additional procedures.
+Or, work with the components individually. Use the base R `names()` function to identify all of the components. Component names that begin with `out_` are part of the standard output. Other components include just data and statistics designed to be input in additional procedures, including R markdown documents.
 
 ```{r}
 names(r)
 ```
 
-Here just display the estimates as part of the standard output.
+Here just display the estimates as part of the standard text output.
 
 ```{r}
 r$out_estimates
 ```
 
 
-Here display the coefficients.
+Here display the coefficients as numeric values.
 
 ```{r}
 r$coefficients
 ```
 
+Do a regression and request all prediction intervals. Then convert that output segment to a data frame named _dp_ with base R `read.table()`. As a data frame, do a standard search for an individual row for a specific prediction interval (see the Subset a Data Frame vignette). 
+
+This particular conversion to a data frame requires one more step. One more spaces delimit adjacent columns, but the names in this data set are formatted with a comma followed by a space. Use base R `sub()` to remove the space after the comma before converting to a data frame.
+
+```{r}
+r <- reg(Salary ~ Years, pred_rows="all", graphics=FALSE)
+r$out_predict = sub(", ", ",", r$out_predict, fixed=TRUE)
+dp <- read.table(text=r$out_predict)
+dp[.(row.names(dp) == "Pham,Scott"),]
+```
+
 
 ## Contrasts
 
-Because `reg()` accomplishes its computations with base R functions `lm()`, can pass `lm()` parameters to `reg()`, which then passes their values to `lm()`. Here first use base R function `contr.sum()` to calculate an effect coding contrast matrix for a categorical variable with three levels, such as the variable _Plan_ in the _Employee_ data set.
+Because `reg()` accomplishes its computations with base R function `lm()`, can pass `lm()` parameters to `reg()`, which then passes their values to `lm()`. Here first use base R function `contr.sum()` to calculate an effect coding contrast matrix for a categorical variable with three levels, such as the variable _Plan_ in the _Employee_ data set.
 
 ```{r}
 cnt <- contr.sum(n=3)
@@ -120,11 +133,12 @@ The following submits the null model for _Salary_, and plots the errors. Compare
 reg_brief(Salary ~ 1, plot_errors=TRUE)
 ```
 
+Can also get the null model output from the __lessR__ function `Plot()` with the `fit` parameter set to `"null"`.
 
 
 ## Interpreted Output
 
-The parameter `Rmd` creates an R markdown file that is automatically generated and  html document from knitting the various output components together with full interpretation. A new, much more complete form of computer output.
+The parameter `Rmd` creates an R markdown file that is automatically generated and then the corresponding html document from knitting the various output components together with full interpretation. A new, much more complete form of computer output.
 
 Not run here.
 
@@ -134,14 +148,22 @@ reg(Salary ~ Years + Pre, Rmd="eg")
 
 ## Logistic Regression
 
+Specify multiple logistic regression with the usual R formula syntax applied to the __lessR__ function `Logit()`. The output includes the confusion matrix and various classification fit indices. 
+
+
+### Default Analysis
+
 ```{r fig.width=4, fig.height=4}
 Logit(Gender ~ Salary)
 ```
 
-Specify multiple logistic regression with the usual R formula syntax. Specify additional probability thresholds beyond just the default 0.5 with the `prob_cut` parameter.
 
-```{r
-Logit(Gender ~ Years + Salary, prob_cut=c(.3, .5 .7))
+### Change Classifiation Threshold
+
+Specify additional probability thresholds for classification beyond just the default 0.5 with the `prob_cut` parameter.
+
+```{r}
+Logit(Gender ~ Years + Salary, prob_cut=c(.3, .5, .7))
 ```
 
 

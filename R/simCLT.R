@@ -113,6 +113,12 @@ function(ns, n, p1=0, p2=1, seed=NULL,
 
   if (type == "antinormal") {
 
+    if (!requireNamespace("triangle", quietly=TRUE)) {
+      stop("Package \"triangle\" needed for these simulations\n",
+           "Please install it:  install.packages(\"triangle\")\n\n",
+           call. = FALSE)
+    }
+
     if (p1 != 0) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Minimum value of anti-normal distribution must be 0.\n\n")
@@ -124,13 +130,13 @@ function(ns, n, p1=0, p2=1, seed=NULL,
     data.raw <- numeric(length=0)
     for (i in 1:(ns*n))
       if (runif(1) < 0.5) 
-        data.raw[i] <- rtriangle(1, a=0, b=x.max/2, c=0+.01)
+        data.raw[i] <- triangle::rtriangle(1, a=0, b=x.max/2, c=0+.01)
       else 
-        data.raw[i] <- rtriangle(1, a=x.max/2, b=x.max, c=x.max-.01)
+        data.raw[i] <- triangle::rtriangle(1, a=x.max/2, b=x.max, c=x.max-.01)
 
     if (pop) {
       x1 <- seq(0, x.max/2, length=250)
-      y1 <- dtriangle(x1, a=0, b=x.max/2, c=0+.01)  # triangle function
+      y1 <- triangle::dtriangle(x1, a=0, b=x.max/2, c=0+.01)  # triangle function
       plot(0, type="n", axes=FALSE, xlim=c(0-.5, x.max+.5),
            ylim=c(0,max(y1)+.1), xlab="", ylab="")
       axis(1)
@@ -140,7 +146,7 @@ function(ns, n, p1=0, p2=1, seed=NULL,
       polygon(c(0, x1, x.max/2), c(0, y1, 0), col="lightsteelblue3",
               border="black")
       x2 <- seq(x.max/2, x.max, length=250)
-      y2 <- dtriangle(x2, a=x.max/2, b=x.max, c=x.max-.01)
+      y2 <- triangle::dtriangle(x2, a=x.max/2, b=x.max, c=x.max-.01)
       lines(x2,y2)
       polygon(c(x.max/2, x2, x.max), c(0, y2, 0), col="lightsteelblue3",
               border="black")

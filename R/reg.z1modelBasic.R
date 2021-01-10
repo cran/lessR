@@ -26,7 +26,7 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   
   # output: header
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- "Estimated Model"
+    tx[length(tx)+1] <- paste("Estimated Model for", nm[1])
     tx[length(tx)+1] <- ""
   }
 
@@ -56,7 +56,7 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   lb.lbl <- .fmtc("Lower 95%", max.num[5]+3)
   ub.lbl <- .fmtc("Upper 95%", max.num[6]+3)
   tx[length(tx)+1] <- paste(format("", width=buf), est.lbl, ste.lbl,
-                           t.lbl, p.lbl, lb.lbl, ub.lbl, sep="")
+                            t.lbl, p.lbl, lb.lbl, ub.lbl, sep="")
 
   # output: values row by row
   for (i in 1:(nrow(smc))) {

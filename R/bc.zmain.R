@@ -300,7 +300,6 @@ function(x, y, by, stack100,
   }  # end !entered so tabulated
     
 
-
   if (prop) {
     if (any(is.nan(x))) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",

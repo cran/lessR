@@ -113,7 +113,7 @@ style(
   add_lty=getOption("add_lty"),
 
   n_cat=getOption("n_cat"), suggest=getOption("suggest"),
-  note=getOption("note"),
+  notes=getOption("notes"),
   quiet=getOption("quiet"), brief=getOption("brief"),
 
   results=getOption("results"), explain=getOption("explain"),
@@ -301,7 +301,7 @@ set(\ldots)
         \code{\link{SummaryStats}}, and also to the functions such as 
         \code{\link{Histogram}} when processing multiple graphs.}
   \item{suggest}{If \code{TRUE}, then provide suggestions for alternative analyses.}
-  \item{note}{If \code{TRUE}, then provide notes.}
+  \item{notes}{If \code{TRUE}, then provide notes.}
   \item{quiet}{If \code{TRUE} then some functions suppress console output.}
   \item{brief}{If set to \code{TRUE}, reduced text output.}\cr
 

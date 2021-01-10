@@ -7,16 +7,16 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.9.8  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
+      "lessR 3.9.9  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
       "---------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
       "\n",
-      "Access many vignettes to show by example how to use lessR.\n",
-      "To learn about reading, writing, & manipulating data, graphics,\n",
-      "  means & models, factor analysis, & customization:\n",
-      "enter,  browseVignettes(\"lessR\")  or\n",
-      "visit,  https://CRAN.R-project.org/package=lessR\n") 
+      "Many vignettes show by example how to use lessR. Topics are\n",
+      "read, write, & manipulate data, graphics, means & models,\n",
+      "  factor analysis, & customization. Two ways to view.\n",
+      "Enter:  browseVignettes(\"lessR\")\n",
+      "Visit:  https://CRAN.R-project.org/package=lessR\n") 
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 
@@ -1214,7 +1214,7 @@ function(dir, axT) {
       if (strn[1] == -1) strn <- NULL  # return of -1 means no \n
       n.lab_x.ln <- length(strn) + 1
     }
-    else    # such as from default for time series
+    else  # such as from default for time series
       n.lab_x.ln <- -0.6 + (.1 * lab_x_cex)
   }
 
@@ -1225,6 +1225,9 @@ function(dir, axT) {
     bm <- ((n.lab_x.ln + mx.x.val.ln) * .70 * ln.ht) + 0.24  # inches
   else
     bm <- max.x.width + (ln.ht * n.lab_x.ln) + 0.25
+  if (mx.x.val.ln == 3) bm <- bm + .09
+  if (mx.x.val.ln == 4) bm <- bm + .17
+  if (mx.x.val.ln >= 5) bm <- bm + .26
   tm <- ifelse (is.null(main), tm+.05, tm+.25)  #  adjust tm for increased bm
   if (rotate_x != 0) bm <- bm + .15
   if (lab_x_cex > 1.1) bm <- bm + .04  # actually should be axis_cex
@@ -1639,10 +1642,10 @@ function(dir, axT) {
   }
 
   else {  # (count.v) so do viridis scaling
-    vir <- viridis(100)
+    vir <- viridisLite::viridis(100)
     x.nrm <- x / max(x)
     cc <- double(length=length(x.nrm))
-    for (i in 1:length(cc)) cc[i] <- viridis(1, begin=x.nrm[i]) 
+    for (i in 1:length(cc)) cc[i] <-  viridisLite::viridis(1, begin=x.nrm[i]) 
     clr <- cc
   }
 
@@ -1922,7 +1925,8 @@ function(dir, axT) {
     if (max.ln[j] < 4) max.ln[j] <- 4
   }
 
-  if (!is.null(cc)) tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1, cc=cc)
+  if (!is.null(cc))
+    tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1, cc=cc)
 
   # matrix for potentially multi-row column names
   if (max.ch > 0) {

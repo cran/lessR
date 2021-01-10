@@ -334,14 +334,17 @@ vp(\ldots)
 
   \item{fit}{The \bold{best fit line}.  Default value is \code{"off"}, with
         options \code{"loess"} for non-linear fit, \code{"lm"} linear 
-        least squares, and \code{"null"} for the null model. If
+        least squares, \code{"null"} for the null model, \code{"exp"} for the
+        exponential model, \code{"sqrt"} for the square root model, and
+        \code{"reciprocal"} for the reciprocal model. If
         potential outliers are identified according to \code{out_cut},
         a second (dashed) fit line is displayed calculated \emph{without}
         the outliers. Modify the line color from with the 
         \code{\link{style}} function parameter \code{fit_color}, and the
         line width with \code{fit_lwd}.}
   \item{fit_se}{Confidence level for the error band displayed around the
-       line of best fit. On by default at 0.95 if a fit line is specified.
+       line of best fit. On by default at 0.95 if a fit line is specified, 
+       but turned off if \code{plot_errors=TRUE}.
        Can be a vector to display multiple ranges. Set to 0 to turn off.}
   \item{plot_errors}{Plot the line segment that joins each point to the 
         regression line, "loess" or "lm", illustrating the size of the
@@ -694,6 +697,7 @@ Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springe
 # read the data
 d <- rd("Employee", quiet=TRUE)
 d <- Subset(random=.6, quiet=TRUE)  # less computationally intensive
+dd=d
 
 #---------------------------------------------------
 # traditional scatterplot with two numeric variables
@@ -713,6 +717,11 @@ Plot(Years, Salary, scale_x=c(-10, 35, 10), scale_y=c(0,200000,10))
 
 Plot(Years, Salary, add="Hi", x1=c(12, 16, 18), y1=c(80000, 100000, 60000))
 
+Plot(Salary, row_names)
+
+d <- factors(Gender, levels=c("M", "F"))
+Plot(Years, Salary, by1=Gender)
+d <- dd
 
 \donttest{
 
@@ -783,8 +792,9 @@ Plot(c(Salary, Years, Pre), fit="lm")
 
 # Trellis plot with condition on 1-variable
 # optionally re-order default alphabetical R ordering by converting
-#   to a factor with lessR factors (which also does multiple variables
-d$Gender <- factors(Gender, levels=c("M", "F"))
+#   to a factor with lessR factors (which also does multiple variables)
+# always save to the full data frame with factors
+d <- factors(Gender, levels=c("M", "F"))
 Plot(Years, Salary, by1=Gender)
 
 \donttest{

@@ -4,7 +4,55 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
  
->>>>>> Changes for lessR version 3.9.8 (2020-10-13) <<<<<<
+>>>>>> Changes for lessR version 3.9.9 (2021-01-09) <<<<<<
+
+-------------
+Updates 3.9.9
+-------------
+
+BarChart
+  more space for value labels of 3 to 5+ lines
+
+Logit
+  accepts GLM parameter contrasts for custom contrasts
+
+pivot
+  original variable type for Date, character, and integer are retained
+    in the aggregate summary file instead of left as factors, the 
+    standard output of the base R aggregate function
+  column of a single by variables now the original variable name
+
+Plot
+  specify plot_errors=TRUE turns off confidence interval about the reg line
+    by default
+  fit option now includes "log", "sqrt" and "reciprocal" transformations
+
+Regression
+  for out_predict, the prediction intervals output, title instead of
+    the primary output now includes the descriptive text that describes
+    the output, which allows for easier conversion to a data frame to
+    search output by rows when pred_rows="all"
+  presentation of model estimates now includes the name of the target
+
+style
+  parameter note changed to notes
+
+
+---------------
+Bug Fixes 3.9.9
+---------------
+
+Logit
+  for multiple prob_cut values, no longer always starts with 0.5
+    as the classification probability threshold
+
+pivot
+  works for any data frame name, not just d
+  
+Plot
+  Plot(x, row_names) works for versions of R beyond 4.0.3
+
+
 
 -------------
 Updates 3.9.8
@@ -28,13 +76,13 @@ prob_norm, prob_tcut, prob_znorm
 Regression
   for models with a single predictor variable, plot_errors parameter 
     plots the segment that connects each point to the line
-  specify a contrast matrix with the base R lm() function
-    contrast parameter
+  specify contrast matrix with base R lm() function contrast parameter
   a model of y ~ 1 yields the null model 
-  deprecated reg.brief() removed
+  deprecated reg.brief() removed in favor of reg_brief()
 
 SummaryStats
-  deprecated ss.brief() removed
+  deprecated ss.brief() removed in favor of ss_brief()
+
 
 ---------------
 Bug Fixes 3.9.8
@@ -104,7 +152,7 @@ Bug Fixes 3.9.7
 Plot
   pad_y now works correctly
   by with size a third variable for a bubble plot now works
-  for plot of two categorical variables, 0 does not plot
+  for plot of two categorical variables, the value of 0 does not plot
 
  
  

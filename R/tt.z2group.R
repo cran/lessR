@@ -144,7 +144,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
             .fmt(p.val2,3), sep="", "\n")
       }
       else
-      cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
+        cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
     }  
     cat("\n")
   } 

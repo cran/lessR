@@ -58,6 +58,12 @@ function(my_formula, data=d, rows=NULL,
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
     for (i in 1:length(dots)) {
+      if (names(dots)[i] == "standardize") {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "standardized  parameter  no longer used\n\n",
+          "Instead use  recode=\"z\" . Also have \"0to1\" and\n",
+          "  \"robust\" (median and IQR replace mean and sd) options.\n")
+      }
       if (names(dots)[i] == "knitr.file") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "knitr.file  no longer used\n",
@@ -117,11 +123,9 @@ function(my_formula, data=d, rows=NULL,
 
   if (brief) {
     if (is.null(res_rows)) res_rows <- 0L
-    if (is.null(pred_rows)  &&  is.null(X1_new)) pred_rows <- 0L
-    relate <- FALSE
+    if (is.null(pred_rows) && is.null(X1_new)) pred_rows <- 0L
   }
-  else
-    relate <- TRUE
+  relate <- ifelse (brief, FALSE, TRUE)
 
   if (kfold > 0) {
     graphics <- FALSE
@@ -369,11 +373,19 @@ function(my_formula, data=d, rows=NULL,
 
     }  # res_rows > 0
 
-   
-    title_pred <- "  FORECASTING ERROR"
-    # scatter plot(s)
     if (is.null(pred_rows)) pred_rows <- ifelse (n.keep < 25, n.keep, 10) 
-    if (pred_rows == "all") pred_rows <- n.keep  # turn off preds with pred_rows=0
+    if (pred_rows == "all") pred_rows <- n.keep  # no preds with pred_rows=0
+
+    a <- "  FORECASTING ERROR"
+    if (pred_rows > 0) {
+      a <- paste(a, "\n\nData, Predicted, Standard Error of Forecast,",
+                          "\n95% Prediction Intervals")
+      a <- paste(a, "\n   [sorted by lower bound of prediction interval]")
+      if (pred_rows < n.keep  &&  !new.data) 
+        a <- paste(a, "\n   [to see all intervals do pred_rows=\"all\"]")
+      a <- paste(a, "\n", .dash2(46))
+    }
+    title_pred <- a
 
     tx3prd <- ""
     predmm <- NA
@@ -564,10 +576,8 @@ function(my_formula, data=d, rows=NULL,
       }
     }
   }
-
   
   if (kfold == 0) { 
-
     class(txsug) <- "out"
     class(title_bck) <- "out"
     class(tx1bck) <- "out"
@@ -592,7 +602,7 @@ function(my_formula, data=d, rows=NULL,
     class(txpdf) <- "out"
     class(txodt) <- "out"
     class(txrtf) <- "out"
-    
+
     output <- list(
       out_suggest=txsug,
       
@@ -641,7 +651,4 @@ function(my_formula, data=d, rows=NULL,
   else
     if (!quiet) return(output)
 
-  
-  cat("\n")
-  
 }
