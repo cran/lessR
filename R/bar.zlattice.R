@@ -244,8 +244,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
 
   # display
 # if (is.null(pdf_file)) pdf_file <- FALSE
-  pdf_file <- FALSE   # NOTE:  don't take the chance
-  if (pdf_file) {
+  if (!is.null(pdf_file)) {
     cat("\n>>> pdf_file does not work for Trellis graphics, manually save\n\n")
 #   pdf(pdf_file, width=width, height=height)
 #   print(p)

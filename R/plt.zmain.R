@@ -14,7 +14,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          value_labels=NULL, label_max=20,
          rotate_x=0, rotate_y=0, offset=0.5, prop=FALSE, origin_x=NULL,
 
-         size=NULL, ln.width=2, shape=21, means=TRUE,
+         size=NULL, ln.width=1, shape=21, means=TRUE,
          segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
          smooth=FALSE, smooth_points=100, smooth_size=1,
@@ -48,6 +48,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          add_color=NULL, add_fill=NULL, add_trans=NULL,
 
          want.labels=TRUE, ...)  {
+
 
   fill_bg <- getOption("panel_fill")
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
@@ -148,14 +149,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     x.name <- NULL
   }
 
-  if (date.ts  &&  is.null(xx.lab)) x.lab <- ""
+  if (date.ts && is.null(xx.lab)) x.lab <- ""
 
   if (!is.null(x.name)) if (x.name == "Index") {
     if (n.ycol > 1) y.lab <- ""
     if (!is.null(x.lbl)) y.lab <- paste(x.name, ": ", x.lbl, sep="")
   }
 
-  if (is.null(col_fill)) col_fill <- "transparent"
+  if (is.null(col_fill) && !run) col_fill <- "transparent"
 
   # decimal digits
   digits_d <- .max.dd(y[,1]) + 1
@@ -188,7 +189,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
       }
     }
-    else {  # is null value_labels
+    else {  # is date.ts, null value_labels
       x.val <- x.lvl  # x.val is NULL if x is numeric, ignored
       y.val <- y.lvl  # y.val ignored if y is numeric
     }
@@ -246,7 +247,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
 
   # set margins
-  margs <- .marg(max.y.width, y.lab, x.lab, main.lab, rotate_x,
+  margs <- .marg(max.y.width, y.lab, x.lab, main.lab, sub.lab, rotate_x,
                 mx.x.val.ln, mx.y.val.ln,
                 lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex)
   mm <- margs$lm  # left margin, lm is linear model
@@ -418,7 +419,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           axT1 <- axTicks(1, axp=scale_x)
       }
     }
-    else
+    else  # is date.ts
       axT1 <-axTicks(1)
   }
 
@@ -453,7 +454,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         .axes(x.val, y.val, axT1, axT2,
               rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
       }
-      else {  # time
+      else {  # date.ts
         axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
           getOption("axis_color"), getOption("axis_x_color"))
         axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
@@ -470,8 +471,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         .axes(NULL, y.val, axT1, axT2,
               rotate_x=rotate_x, rotate_y=rotate_y,
               offset=offset, y.only=TRUE, ...)  # y-axis
-      }
-    }
+      }  # end date.ts
+    }  # end !bubble1
+
     else  # bubble1: 1-D scatter plot of categorical variable
       .axes(x.val, NULL, axT1, NULL,
             rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
@@ -512,7 +514,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   #   set NULL value to default
 
   if (!is.null(col_fill)) {
-    if (length(col_fill) == 1) col_fill <- .color_range(col_fill, n.clrs)
+    if (length(col_fill) == 1) col_fill[1] <- .color_range(col_fill, n.clrs)
   }
   else
     col_fill <- getOption("pt_fill")  # default
@@ -522,7 +524,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     if (length(col_color) == 1) col_color <- .color_range(col_color, n.clrs)
   }
   else {
-    if (stack  &&  col_fill != "transparent") {
+    if (stack  &&  col_fill[1] != "transparent") {
       for (i in 1:n.clrs) col_color[i] <- "black"
     }
     else
@@ -574,21 +576,41 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       }
       else if (!is.ordered(by)) {
         if (getOption("theme") %in% c("gray", "white")) {
-          if (col_fill != "transparent") fill <- getColors("grays", n=n.clrs)
+          if (col_fill[1] != "transparent")
+            fill <- getColors("grays", n=n.clrs)
         }
         else {
-          if (col_fill != "transparent")
+          if (col_fill[1] != "transparent") {
             fill <- getColors("hues", n=n.clrs)
+            if (!is.null(col.trans))
+              fill <- .maketrans(fill, (1-col.trans)*256)
+          }
           else
             fill <- "transparent"
-          if (object == "both"  &&  color_miss  &&  fill != "transparent")
+          if (object == "both"  &&  color_miss  &&  all(fill != "transparent"))
             color <- fill
         }
       }
       else {  # ordered default
         fill <- .color_range(.get_fill(), n.clrs)  # see if range
       }
+      if (area_fill[1] != "transparent") {
+        area_fill <- .color_range(area_fill, n.clrs)
+        if (!is.null(col.trans))
+          area_fill <- .maketrans(area_fill, (1-col.trans)*256)
+      }
+      else
+        if (stack) area_fill <- fill
+      if (object == "both"  &&  color_miss  &&  all(fill != "transparent"))
+        color <- area_fill
     } # end n.clrs > 1
+
+    if (size.pt[1]==0  &&  (area_fill[1] == "transparent")  && stack==TRUE) {
+      area_fill <- col_fill
+      area_fill <- .color_range(area_fill, n.clrs)
+      if (!is.null(col.trans))
+        area_fill <- .maketrans(area_fill, (1-col.trans)*256)
+    }
 
     #  kludge needed for Plot(c(x1,x2), y)
     if (length(col_color) < length(fill) &&  # more fill than color colors
@@ -608,9 +630,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           color <- "transparent"
       }
 
-    if (!stack  &&  color_miss  &&  fill[1] != "transparent"  &&  n.clrs > 1)
-      color <- fill
-
     trans_pts <- ifelse(is.null(col.trans),
                         getOption("trans_pt_fill"), col.trans)  # default
     # see if trans is customized for this analysis
@@ -622,13 +641,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       fill <- .maketrans(fill, (1-trans_pts)*256)
     col_fill <- fill  # likely do not need both
 
-    # if (object != "point"  ||  size == 0) fill <- color  # no fill in legend
     fill[which(fill == "off")] <- "transparent"
     color[which(color == "off")] <- "transparent"
-
-    if (area_fill == "on") area_fill <- getOption("violin_fill")
-    if (object == "both") if (area_fill == "transparent") area_fill <- fill
-    if (ln.width == 0) area_fill <- "transparent"
 
 
   # ----------
@@ -646,7 +660,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                 lines(as.numeric(x[,1]), y[,1], col=color[1], lwd=ln.width,
                       ...)
 
-          if (fill[1] != "transparent") # fill area
+          if (area_fill[1] != "transparent") # fill area
             polygon(c(x[1],x,x[length(x)]), c(min(y[,1]),y[,1],min(y[,1])),
                 col=area_fill, border="transparent")
         }  # n.by is 1
@@ -727,12 +741,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       if (is.null(by)) {
 
         if (smooth) {  # 2-D kernel density plot
-          # grid lines only plot after the sp, so no effect here
-         #abline(v=axT1, col=getOption("grid_x_color"),
-         #       lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
-         #if (!bubble1)
-         #  abline(h=axT2, col=getOption("grid_y_color"),
-         #         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
+          # grid lines only plot after the sp
           clr.den <- colorRampPalette(c(getOption("window_fill"),
                                          getOption("bar_fill_ordered")))
           smoothScatter(x, y, nrpoints=smooth_points, nbin=smooth_bins,
@@ -740,7 +749,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                         colramp=clr.den, cex=smooth_size, add=TRUE)
         }
 
-        else if (size > 0) {  # plot the points, plus means, segments, etc.
+        else if (size.pt[1] > 0) {  # plot the points, plus means, segments, etc.
 
           if (jitter_x > 0)
             x[,1] <- jitter(x[,1], factor=jitter_x)
@@ -832,6 +841,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             }
           }  # means
         }  # end not smooth, plot points with no by
+
       # plot center line
       if (center_line != "off") {
         if (center_line == "mean") {
@@ -906,8 +916,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         if (fill[1] == "transparent") fill <- color
         if (stack) {
           point.size <- 2.5 * axis_x_cex
-          .plt.by.legend(levels(by), color, fill, shp=22, trans_pts, fill_bg,
-                       usr, pt.size=point.size)
+          .plt.by.legend(levels(by), color, area_fill, shp=22, trans_pts,
+                         fill_bg, usr, pt.size=point.size)
         }
         else
           .plt.by.legend(levels(by), color, fill, shp, trans_pts, fill_bg, usr)
@@ -922,8 +932,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         .plt.legend(colnames(x), FALSE, color, fill, shape, fill_bg, usr,
                     lab_cex=lab_x_cex, pt.size=1.25, legend_title)
       if (n.ycol > 1)  # vertical legend, on y-axis
-        .plt.legend(colnames(y), FALSE, color, fill, shape, fill_bg, usr,
-                    lab_cex=lab_y_cex, pt.size=1.25, legend_title)
+        if (stack) 
+          .plt.legend(colnames(y), FALSE, color, area_fill, shape, fill_bg, usr,
+                      lab_cex=lab_y_cex, pt.size=1.25, legend_title)
+        else
+          .plt.legend(colnames(y), FALSE, color, fill, shape, fill_bg, usr,
+                      lab_cex=lab_y_cex, pt.size=1.25, legend_title)
 
     }  # object is point, line, both
 
@@ -1067,7 +1081,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             x.lv <- x[,1]
             y.lv <- y[,1]
           }
-          else {
+          else {  # date.ts
             x.lv <- as.numeric(x.val)
             y.lv <- as.numeric(y[,i])
           }
@@ -1171,7 +1185,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
               up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
               dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
               polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
-                      col=getOption("se_fill"), border="transparent")
+                      col=se_fill, border="transparent")
             }  # end for each se plot
           }
 

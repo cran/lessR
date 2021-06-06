@@ -21,7 +21,7 @@ function(lm.out, pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
 
   # frequency distribution of residuals
   .dn.main(lm.out$residuals, 
-    fill_hist=getOption("ellipse_fill"),
+    fill_hist=getOption("se_fill"),
     col.nrm="gray40", col.gen="gray40",
     fill_nrm="transparent", fill_gen="transparent",
     xlab="Residuals", quiet=TRUE)
@@ -31,6 +31,6 @@ function(lm.out, pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
     .showfile(pdf_file, "residuals plot")
   }
 
-  invisible(list(i=plt.i, ttl=plt.title))
+  return(invisible(list(i=plt.i, ttl=plt.title)))
 
 }

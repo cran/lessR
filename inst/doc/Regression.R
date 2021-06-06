@@ -48,6 +48,10 @@ reg_brief(Salary ~ Plan, contrasts=list(Plan=cnt))
 ## ----fig.width=5------------------------------------------------------------------------------------------------------
 reg_brief(Salary ~ 1, plot_errors=TRUE)
 
+## ----likert, fig.width=4.5, fig.height=4.5----------------------------------------------------------------------------
+dd <- Read("Mach4")
+reg_brief(m10 ~ m02, data=dd)
+
 ## ----fig.width=4, fig.height=4----------------------------------------------------------------------------------------
 Logit(Gender ~ Salary)
 

@@ -129,7 +129,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     # set margins
     max.width <- strwidth(as.character(max(pretty(h$counts))), units="inches")
     
-    margs <- .marg(max.width, y.lab, x.lab, main.lab, rotate_x)
+    margs <- .marg(max.width, y.lab, x.lab, main.lab, sub.lab, rotate_x)
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm

@@ -1,5 +1,5 @@
 prop <-
 function(...)
 
-  corProp(...)
+  Prop_test(...)
 

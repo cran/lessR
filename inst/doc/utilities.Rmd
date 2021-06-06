@@ -1,0 +1,169 @@
+---
+title: "Utilities for Data Manipulation"
+author: "David Gerbing"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{1. Data: Utilities}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r}
+library("lessR")
+```
+
+
+## Recode Data Values
+
+Data transformations for continuous variables are straightforward, just enter the arithmetic expression for the transformation. For each variable identify the corresponding data frame that contains the variable if there is one. For example, the following creates a new variable _xsq_ that is the square of the values of a variable _x_ in the _d_ data frame.
+
+```
+d$xsq <- d$x^2
+```
+
+Or, use the base R `transform()` function to accomplish the same, plus other functions from other packages that accomplish the same result.
+
+For variables that define discrete categories, however, the transformation may not be so straightforward with base R functions such as a nested string of `ifelse()` functions. An alternative is the __lessR__ function `recode()`. 
+
+To use `recode()`, specify the variable to be recoded with the `old_vars` parameter, the first parameter in the function call. Specify values to be recoded with the required `old` parameter. Specify the corresponding recoded values with the required `new` parameter. There must be a 1-to-1 correspondence between the two sets of values, such as 0:5 recoded to 5:0, six items in the `old` set and six items in the `new` set. 
+
+### Examples
+
+To illustrate, construct the following small data frame.
+
+```{r}
+d <- read.table(text="Severity Description
+1 Mild
+4 Moderate
+3 Moderate
+2 Mild
+1 Severe", header=TRUE, stringsAsFactors=FALSE)
+
+d
+```
+
+Now change the integer values of the variable _Severity_ from 1 through 4 to 10 through 40. Because the parameter `old_vars` is the first parameter in the definition of `recode()`, and because it is listed first, the parameter name need not be specified. The default data frame is _d_, otherwise specify with the `data` parameter.
+
+```{r}
+d <- recode(Severity, old=1:4, new=c(10,20,30,40))
+d
+```
+
+In the previous example, the values of the variable were overwritten with the new values. In the following example, instead write the recoded values to a new variable with the `new_vars` parameter, here _SevereNew_.
+
+```{r}
+d <- recode(Severity, new_vars="SevereNew", old=1:4, new=c(10,20,30,40))
+```
+
+A convenient application of `recode()` is to Likert data, with responses scored to items on a survey such as from 0 for Strongly Disagree to 5 for Strongly Agree. To encourage responders to carefully read the items, some items are written in the opposite direction so that disagreement indicates agreement with the overall attitude being assessed.
+
+As an example, reverse score Items m01, m02, m03, and m10 from survey responses to the 20-item Mach IV scale. That is, score a 0 as a 5 and so forth. The responses are included as part of __lessR__ and so can be directly read.
+
+```{r}
+d <- Read("Mach4")
+d <- recode(c(m01:m03,m10), old=0:5, new=5:0)
+```
+
+### Missing Data
+
+The function also addresses missing data. Existing data values can be converted to an R missing value. In this example, all values of 1 for the variable _Plan_ are considered missing.
+
+```{r}
+d <- Read("Employee")
+newdata <- recode(Plan, old=1, new="missing")
+```
+
+Now values of 1 for _Plan_ are missing, having the value of `NA` for not available, as shown by listing the first six rows of data with the base R function `head()`.
+
+```{r}
+head(d)
+```
+
+The procedure can be reversed in which values that are missing according to the R code `NA` are converted to non-missing values. To illustrate with the _Employee_ data set, examine the first six rows of data. The value of `Years` is missing in the second row of data. 
+
+```{r}
+d <- Read("Employee")
+head(d)
+```
+
+Here convert all missing data values for the variables _Years_ and _Salary_ to the value of 99.
+
+```{r}
+d <- recode(c(Years, Salary), old="missing", new=99)
+head(d)
+```
+
+Now the value of _Years_ in the second row of data is 99.
+
+
+## Sort Rows of Data
+
+Sorts the values of a data frame according to the values of one or more variables contained in the data frame, or the row names.  Variable types include numeric and factor variables.  Factors are sorted by the ordering of their values, which, by default is alphabetical. Sorting by row names is also possible.
+
+To illustrate, use the __lessR__ _Employee_ data set, here just the first 12 rows of data to save space.
+
+```{r}
+d <- Read("Employee")
+d <- d[1:12,]
+```
+
+
+```{r}
+d <- Sort(d, Gender)
+d
+```
+
+
+```{r}
+d <- Sort(d, c(Gender, Salary), direction=c("+", "-"))
+d
+```
+
+Sort by row names in ascending order.
+
+```{r}
+d <- Sort(d, row.names)
+d
+```
+
+Randomize the order of the data values.
+
+```{r}
+d <- Sort(d, random)
+d
+```
+
+
+## Rescale Data
+
+
+```{r}
+rescale(Salary)
+```
+
+
+## Create Factor Variables
+
+
+```{r}
+d <- rd("Mach4", quiet=TRUE)
+l <- rd("Mach4_lbl")
+LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
+                "Slightly Agree", "Agree", "Strongly Agree")
+```
+
+
+```{r}
+d <- factors(m01:m20, levels=0:5, labels=LikertCats)
+```
+Convert the specified variables to factors according to the given vector of three variables only. Leave the original variables unmodified, create new variables.
+```{r}
+d <- factors(c(m06, m07, m20), levels=0:5, labels=LikertCats, new=TRUE)
+```
+Now copy the variable labels from the original integer variables to the newly created factor variables.
+
+```{r}
+l <- factors(c(m06, m07, m20), var_labels=TRUE)
+```

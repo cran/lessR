@@ -1,8 +1,8 @@
 style <-
 function(
   theme=c("colors", "lightbronze", "dodgerblue", "darkred", "gray",
-      "gold", "darkgreen", "blue", "red", "rose", "green", "purple",
-      "sienna", "brown", "orange", "white", "light"),
+      "gold", "darkgreen", "blue", "red", "rose", "slatered", "green",
+      "purple", "sienna", "brown", "orange", "white", "light"),
   sub_theme=c("default", "black", "wsj"),
   set=NULL, get=FALSE, reset=TRUE,
 
@@ -546,6 +546,7 @@ function(
   if (theme == "dodgerblue") {clr1 <- "dodgerblue3"; clr2 <- "steelblue4"}
   if (theme == "darkred") {clr1 <- "darkred"; clr2 <- rgb(80,0,0,
            maxColorValue=256)}
+  if (theme == "slatered") {clr1 <- rgb(.64,.34,.39); clr2 <- "darkred"}
   if (theme == "gray") {clr1 <- "gray25"}
   if (theme == "gold") {clr1 <- "goldenrod3"; clr2 <- "goldenrod4"}
   if (theme == "darkgreen") {
@@ -563,7 +564,7 @@ function(
   if (theme == "light") {clr1 <- "white"; clr2 <- "black"}
 
 
-  if (!miss_theme) {
+  if (!miss_theme) {  # process the theme colors
 
     if (theme == "white") {
       window_fill = "white"
@@ -634,13 +635,13 @@ function(
       pt_fill = rgb(70,80,90, maxColorValue=255)
       trans_pt_fill = 0.00
       pt_color = rgb(70,80,90, maxColorValue=255)
-      ellipse_fill = .maketrans("gray50", 50)
       ellipse_color = "gray20"
       se_fill = .maketrans("gray10", 40) 
       violin_fill = rgb(144,165,175, maxColorValue=255)
       violin_color = "gray15" 
       box_fill = .maketrans("gray15", 35) 
       box_color = "gray15" 
+      ellipse_fill = .maketrans("gray50", 50)
       strip_fill = .maketrans("gray55")
       fit_color = "gray15"
       main_color = "gray15"
@@ -665,11 +666,12 @@ function(
       bar_color_discrete = "transparent"
       bar_color_ordered = rgb(126,144,168, maxColorValue=255)
       pt_fill = rgb(70,80,90, maxColorValue=255)
+      pt_color = rgb(70,80,90, maxColorValue=255)
       trans_bar_fill = 0.00
       trans_pt_fill = 0.00
-      pt_color = rgb(70,80,90, maxColorValue=255)
       box_fill = getColors("hues")
       violin_fill = .maketrans(hcl(240,20,55), 90)
+      ellipse_fill = .maketrans(hcl(50,20,55), 40)
       grid_color = rgb(222,217,205, maxColorValue=255)
       ID_color = "gray50"
       values = "%"
@@ -692,25 +694,17 @@ function(
       window_fill = "white"
       panel_fill = "grey99"
       bar_fill = .maketrans(clr1, .to256("trans_bar_fill"))
-      violin_fill = bar_fill
+      violin_fill = .maketrans(clr1, 30)
+      violin_color = "gray15"
+      box_fill = .maketrans(clr1, 65)
+      box_color = "gray15"
       bar_fill_discrete = .maketrans(clr1, .to256("trans_bar_fill"))
       bar_fill_ordered = .maketrans(clr1, .to256("trans_bar_fill"))
       pt_fill = .maketrans(clr1, .to256("trans_pt_fill"))
       bar_color_discrete = clr2
       bar_color_ordered = clr2
+      pt_fill <- clr1
       pt_color = clr2
-      if (theme %in% c("darkred", "red", "rose"))  # kludge until all HCL colors 
-        box_fill <- hcl(0,40,55) 
-      else if (theme %in% c("dodgerblue", "blue"))
-        box_fill <- hcl(240,40,55)
-      else if (theme %in% c("darkgreen", "green"))
-        box_fill <- hcl(120,40,55)
-      else {
-        violin_fill = .maketrans(clr1, 125)  # smaller, more trans 
-        box_fill = .maketrans(clr1, 35)
-      }
-      violin_color = "gray15"
-      box_color = "gray15"
       se_fill = .maketrans(clr1, 40)
       ellipse_fill = .maketrans(clr1, 15)
       if (ellipse_color[1] != "transparent")
@@ -822,7 +816,6 @@ function(
         strip_color = .maketrans(clr1, .to256n(0.40))
         strip_text_color = "gray65"
       }
-
       else if (theme ==  "orange"  &&  sub_theme == "black") {
         if (miss_tr.bar_fill) trans_bar_fill = .05
         bar_fill_discrete = rgb(139,69,0, alpha=.to256("trans_bar_fill"),
@@ -860,6 +853,7 @@ function(
     options(bar_fill_ordered = bar_fill_ordered) 
     options(bar_color_discrete = bar_color_discrete) 
     options(bar_color_ordered = bar_color_ordered) 
+    options(pt_fill = pt_fill) 
     options(pt_color = pt_color) 
     options(trans_bar_fill = trans_bar_fill)
     options(trans_pt_fill = trans_pt_fill)
@@ -880,7 +874,6 @@ function(
     options(violin_color=violin_color)
     options(box_fill=box_fill)
     options(box_color=box_color)
-
     options(ellipse_fill=ellipse_fill)
     options(ellipse_color=ellipse_color)
     options(ellipse_lwd=ellipse_lwd)
@@ -958,7 +951,6 @@ function(
     options(code=code)
   }
   
-
   # ---------------------------------------
   # get current parameter values
   # create a list of sub-lists
@@ -1242,7 +1234,8 @@ function(
 
     fit_color = getOption("fit_color"),
     fit_lwd = getOption("fit_lwd"),
-    se_fill = getOption("se_fill"),
+#   se_fill = getOption("se_fill"),
+    se_fill = se_fill,
     bubble_text_color = getOption("bubble_text_color"),
     segment_color = getOption("segment_color"),
     ID_color=getOption("ID_color"),
@@ -1275,6 +1268,6 @@ function(
     
   )
 
-  invisible(gp)
+  return(invisible(gp))
 
 }

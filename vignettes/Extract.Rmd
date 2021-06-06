@@ -14,11 +14,16 @@ vignette: >
 library("lessR")
 ```
 
-## Subset a Data Frame with __Base R__ `Extract`
+## Subset a Data Frame with __Base R__ `Extract[]`
 
-The most general way to subset a data frame by rows and/or columns is the base R `Extract` function, called by `d[rows, columms]`, where _d_ is the data frame. To use this function, for the _rows_ parameter, pass the row names of the selected rows, the indices or actual names, or pass a logical statement that, when evaluated, results in these names. For the _cols_ parameter, pass the column indices of the selected columns, or pass a list of variable names that reduces to these indices. 
+The most general way to subset a data frame by rows and/or columns is the base R `Extract[]` function, indicated by double square brackets instead of the usual matched parentheses. For a data frame named _d_ the general format is  `d[rows, columms]`. 
 
-In the logical expression of rows, use the standard R operators. 
+For the `rows` parameter, pass either
+
+- the row names of the selected rows, the indices such as 1, 2, etc., or actual row names 
+- a logical statement that, when evaluated, reduces to the row indices
+
+To specify a logical expression for the `rows` parameter, use the standard R operators. 
 
 operator  | meaning
 -------- | --------
@@ -29,30 +34,43 @@ operator  | meaning
 != | is not equal to
 %in% | is in a vector
 
-For the column specification, specify a variable range of contiguous variables with a colon, `:`. 
+For example, to obtain a subset of the data frame that consists of only those who report a value of the _Gender_ variable as Female, specify a logical condition such as
+
+```
+Gender=="Female"
+```
+
+For the `cols` parameter, pass either 
+
+- the column indices of the selected columns
+- a list of variable names that reduces to the column indices 
+
+If subsetting is to be done by only rows or only columns, then leave the other value blank. For example, to subset the _d_ data frame only by rows, the general form reduces to `d[rows,]`. Similarly, to subset only by columns, `d[,cols]`.
+
 
 ## Annoying Features of __Base R__ `Extract`
 
-When `Extract` evaluates the row or column specifications to obtain the indices, there are several limitations.
+When `Extract[]` evaluates the row or column specifications to obtain the indices, there are several annoying properties.
 
-1. `rows`: Any reference to the variables in the data frame for this specification must contain the name of the data frame followed by a \$. But this name has already been specified in the function call, and now is redundant, repeated for every variable reference.
+1. `rows`: Any reference to the variables in the data frame for this specification must contain the name of the data frame followed by a \$. But this name has already been specified in the call to `Extract[]` by listing the data frame name in front of the square brackets, so now is redundant, repeated for every variable reference.
 2. `cols`: Usually specified with a vector of variable names.
   + All variable names in in the provided vector of names must be quoted. 
-  + No variable ranges.
+  + No variable ranges specified with a colon `:` such as m01:m10 to specify 10 variables: m01, m02, ..., up to m10.
 3. No character strings that store the values passed to `rows` and `cols`. Instead directly enter the conditions for both rows and columns, which can make the entire expression quite large.
+4. When specifying a value of a variable for a row selection, any missing values for the variable are also provided even though the missing data values are not the requested value of the variable.
 
 
-## More Flexible Use of `Extract`
+## More Flexible Use of `Extract[]`
 
-To address the first two deficiencies, one possibility is the base R `subset()` function. To use `Extract` directly,  __lessR__ provides the function `.()` for obtaining the indices of selected rows and of selected columns. This function is only callable within the base R `Extract` function, with what R refers to as non-standard evaluation. That basically means that the annoying restrictions are removed, though in some advanced uses the `.()` may not apply.
+To address the first two deficiencies, one possibility is the base R `subset()` function. To address all three deficiencies and still use `Extract[]` directly,  __lessR__ provides the function `.()` for obtaining the indices of selected rows and of selected columns. This function is only callable within the base R `Extract[]` function, with what R refers to as non-standard evaluation. That basically means that the annoying restrictions are removed, though in some advanced programming uses the `.()` may not apply.
 
-The general form of the subsetting follows.
+The general form of the subsetting follows with the `.()` function follows.
 
 ```
 d[.(rows), .(columns)]
 ```
 
-That is, call the `Extract` function as before, but now wrap the row and column expressions with `.()`.
+That is, call the same `Extract[]` function with reference to `rows` and `cols`, but now wrap the row and column expressions with the __lessR__ function call `.()`.
 
 To illustrate, use the Employee data set contained in __lessR__, here read into the _d_ data frame.
 
@@ -66,26 +84,27 @@ Subset the data frame by only listing observations with a _Gender_ of "M" with s
 d[.(Gender=="M" & Post>90), .(Years:Salary, Post)]
 ```
 
-Following is the traditional R call to `Extract` for subsetting.
+Following is the traditional R call to `Extract[]` to obtain the same subsetting.
 
 ```{r}
 d[d$Gender=="M" & d$Post>90, c("Years", "Gender", "Dept", "Salary", "Post")]
 ```
 
-To negate a row selection, add a `!` to the beginning of the logical condition passed to `.()`, within the call to `.()`. To exclude the specified variables, place a `-`, in front of the call to `.()`.
+
+A row selection is a logical condition. To negate a row selection, add a `!` to the beginning of the condition passed to `.()`, within the call to `.()`. To exclude the specified variables, place a `-`, in front of the call to `.()`.
 
 ```{r}
 d[.(!(Gender=="M" & Post>90)), -.(Dept:Plan, Pre)]
 ```
 
-Can still provide the indices directly for one or both of the expressions as the base R `Extract` function is unmodified.
+Can still provide the indices directly for one or both of the expressions as the base R `Extract[]` function is unmodified with the use of `.()`. The purpose of `.()` is simply to return the row or column row indices to identify specific rows or columns of the specified data frame. You can either specify the indices directory for the rows or columns, or let `.()` identify them for you.
 
 ```{r}
 d[1:3, .(Years:Salary, Post)]
 d[.(Gender=="M" & Post>90), 1:3]
 ```
 
-To enhance readability, store the specified row or column conditions as character strings. Each string must be named `rows` or `cols`. Because the entire expression is a character string, differentiate between single and double quotes as needed. For example, use single quotes within the string and double quotes to define the entire string, as illustrated next.
+To enhance readability, can store the specified row or column conditions as character strings. Each string must be named either `rows` or `cols`. Because the entire expression for `rows` or `cols` is a character string, differentiate between single and double quotes as needed. For example, use single quotes within the string and double quotes to define the entire string, illustrated here.
 
 ```{r}
 rows <- "Gender=='M' & Post>93"
@@ -98,11 +117,12 @@ To subset, pass the respective character strings, `rows` and `cols`, to `.()`, r
 d[.(rows), .(cols)]
 ```
 
-To negate, as with the literal expressions, use `!` for the rows and `-` for the columns. Notice their placement.
+To negate, as with the literal expressions, use `!` for the logical expression that defines the rows and `-` for the columns. Notice their placement, where the `!` is inside the call to `.()`, and the `-` is outside the call.
 
 ```{r}
 d[.(!rows), -.(cols)]
 ```
+
 
 ## Missing Data
 
@@ -112,13 +132,13 @@ The variable _Dept_ is missing for the fourth row of data.
 d[1:5,]
 ```
 
-Here with the traditional use of `Extract`, specify rows of data only when the value of _Dept_ is _ADMN_. 
+Here with the traditional use of `Extract[]`, specify rows of data only when the value of _Dept_ is _ADMN_. 
 
 ```{r}
 d[d$Dept=="ADMN", c('Gender', 'Dept', 'Salary')]
 ```
 
-The result provides what was requested, and also when _Dept_ is `<NA>`, which is not requested. The requested value of _ADMN_ is not the same as `<NA>`.
+The result provides what is requested, and also when _Dept_ is `<NA>`, which is not requested. The requested value of _ADMN_ is not the same as `<NA>`.
 
 Use the `.()` function to obtain what is requested, rows of data in which the value of _Dept_ is _ADMN_.
 
@@ -126,10 +146,7 @@ Use the `.()` function to obtain what is requested, rows of data in which the va
 d[.(Dept=="ADMN"), .(Gender:Salary)]
 ```
 
-If rows with the value of the variable missing are desired, then `.()` provides that information only when requested, such as with the base R function `is.na()`.
-```{r}
-d[.(Dept=="ADMN" | is.na(Dept)), .(Gender:Salary)]
-```
+
 
 
 ## Random Selection of Rows

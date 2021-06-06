@@ -21,7 +21,7 @@ function(my_formula, data=d, rows=NULL,
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL, 
          X5_new=NULL, X6_new=NULL,
 
-         kfold=0, seed=NULL, rescale=c("none", "z", "0to1", "robust"),
+         kfold=0, seed=NULL, new_scale=c("none", "z", "0to1", "robust"),
 
          quiet=getOption("quiet"),
          graphics=TRUE, pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
@@ -31,7 +31,7 @@ function(my_formula, data=d, rows=NULL,
   # produce actual argument, such as from an abbreviation, flag if not exist
   res_sort <- match.arg(res_sort)
   pred_sort <- match.arg(pred_sort)
-  rescale <- match.arg(rescale)
+  new_scale <- match.arg(new_scale)
 
   old.opt <- options()
   on.exit(options(old.opt))
@@ -245,14 +245,14 @@ function(my_formula, data=d, rows=NULL,
   stnd.flag <- FALSE
   minmax.flag <- FALSE
   robust.flag <- FALSE
-  if (rescale != "none") {
-    if (rescale == "z") stnd.flag <- TRUE
-    if (rescale == "0to1") minmax.flag <- TRUE
-    if (rescale == "robust") robust.flag <- TRUE
+  if (new_scale != "none") {
+    if (new_scale == "z") stnd.flag <- TRUE
+    if (new_scale == "0to1") minmax.flag <- TRUE
+    if (new_scale == "robust") robust.flag <- TRUE
       if (kfold == 0) {
         for (i in 1:n.vars)  {
-          data[,nm[i]] <- Rescale(data[,nm[i]], data=NULL,
-                                  kind=rescale, digits_d)
+          data[,nm[i]] <- rescale(data[,nm[i]], data=NULL,
+                                  kind=new_scale, digits_d)
         }
       cat("\nRescaled Data, First Six Rows\n")
       print(data[1:6, nm])
@@ -404,7 +404,7 @@ function(my_formula, data=d, rows=NULL,
   m_se <- NA;  m_MSE <- NA;  m_Rsq <- NA
 
   if (kfold > 0) {
-    Kfld <- .regKfold(data[,nm], my_formula, kfold, rescale,
+    Kfld <- .regKfold(data[,nm], my_formula, kfold, new_scale,
                       nm, predictors, n.vars,
                       n.keep, seed, digits_d, show_R)
     txkfl <- Kfld$tx

@@ -49,7 +49,7 @@ Histogram(x=NULL, data=d, rows=NULL,
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
     eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"), do_plot=TRUE,
-    width=6, height=6, pdf=FALSE, 
+    width=6, height=6, pdf_file=NULL, 
     fun_call=NULL, \ldots)
 
 hs(\ldots)
@@ -148,7 +148,7 @@ hs(\ldots)
   \item{main}{Label for the title of the graph.
        Can set size with \code{main_cex} and color with \code{main_color} from the
        lessR \code{\link{style}} function.}
-  \item{sub}{Sub-title of graph, below xlab.}
+  \item{sub}{Sub-title of graph, below xlab. Not yet implemented.}
   \item{lab_adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
        the position of the axis labels in approximate inches. + values move
        the labels away from plot edge. Not applicable to Trellis graphics.}
@@ -230,7 +230,8 @@ hs(\ldots)
   \item{do_plot}{If \code{TRUE}, the default, then generate the plot.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
-  \item{pdf}{If \code{TRUE}, graphics are to be redirected to a pdf file.}
+  \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
+        the pdf file.}
   \item{fun_call}{Function call. Used with \code{knitr} to pass the function call
         when obtained from the abbreviated function call \code{hs}.}\cr
 
@@ -281,7 +282,7 @@ ERROR DETECTION\cr
 A somewhat relatively common error by beginning users of the base R \code{\link{hist}} function may encounter is to manually specify a sequence of bins with the \code{seq} function that does not fully span the range of specified data values_ The result is a rather cryptic error message and program termination.  Here, \code{Histogram} detects this problem before attempting to generate the histogram with \code{\link{hist}}, and then informs the user of the problem with a more detailed and explanatory error message. Moreover, the entire range of bins need not be specified to customize the bins.  Instead, just a bin width need be specified, \code{bin_width}, and/or a value that begins the first bin, \code{bin_start}.  If a starting value is specified without a bin width, the default Sturges method provides the bin width.
 
 PDF OUTPUT\cr
-To obtain pdf output, use the \code{pdf} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+To obtain pdf output, use the \code{pdf_file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 }
 
 \value{

@@ -2,10 +2,10 @@
 \alias{Transform}
 \alias{trans}
 
-\title{Transform the Values of an Integer or Factor Variable}
+\title{Deprecated: Transform the Values of an Integer or Factor Variable}
 
 \description{
-Abbreviation: \code{trans}
+This function is deprecated. Instead use base R  transform() function or just enter the transformation formula directly. Example, \code{d$Xsq <- d$X^2} to create a squared version of Variable X in the d data frame.
 
 A wrapper for the base R \code{\link{transform}} function that defaults to the d data frame and provides output regarding the specified transformation(s). 
 }
@@ -109,7 +109,7 @@ d <- Transform(
 #    Recode to change this if desired, such as to 0 and 1
 # Gender is now a factor to illustrate
 d <- Transform(Gender=as.numeric(Gender))
-d <- Recode(Gender, old=c(1,2), new=c(0,1))
+d <- recode(Gender, old=c(1,2), new=c(0,1))
 
 # recode integer values to levels of a factor with value labels
 #   with the Transform function instead of Recode

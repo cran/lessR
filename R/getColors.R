@@ -425,6 +425,6 @@ function(pal=NULL, end_pal=NULL,
     cat("\n")
   }  # called directly
 
-  invisible(pal)
+  return(invisible(pal))
 }
 

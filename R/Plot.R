@@ -35,7 +35,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
          breaks="Sturges", cumulate=FALSE, 
 
-         run=FALSE, lwd=2, area_fill="transparent", area_origin=0, 
+         run=FALSE, lwd=1.5, area_fill="transparent", area_origin=0, 
          center_line=c("off", "mean", "median", "zero"),
          show_runs=FALSE, stack=FALSE,
 
@@ -159,6 +159,17 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   add_fill <- getOption("add_fill")
   add_trans <- getOption("add_trans")
 
+  if (theme != getOption("theme")) {  # not the default theme
+    sty <- style(theme, reset=FALSE)
+    trans <- sty$pt$trans_filll
+    fill <- sty$pt$fill
+    pt_color <- sty$pt$fill  # just solid color points
+    ellipse_fill <- sty$ellipse$fill
+    violin_fill <- sty$VBS$violin_fill
+    box_fill <- sty$VBS$box_fill
+    se_fill <- sty$se_fill
+  }
+
   # missing function only reliable if arg not modified, so capture 
   x.miss <- ifelse (missing(x), TRUE, FALSE)
   y.miss <- ifelse (missing(y), TRUE, FALSE)
@@ -166,13 +177,15 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   by2.miss <- ifelse (missing(by2), TRUE, FALSE)
   by.miss <- ifelse (missing(by), TRUE, FALSE)
   size.miss <- ifelse (missing(size), TRUE, FALSE)
-  fill_miss <- ifelse (missing(fill), TRUE, FALSE)
+  fill.miss <- ifelse (missing(fill), TRUE, FALSE)
+  area_fill.miss <- ifelse (missing(area_fill), TRUE, FALSE)
   color_miss <- ifelse (missing(color), TRUE, FALSE)
   seg.miss <- ifelse (missing(segments), TRUE, FALSE)
   seg.y.miss <- ifelse (missing(segments_y), TRUE, FALSE)  # for Cleveland plot
   seg.x.miss <- ifelse (missing(segments_x), TRUE, FALSE)
   ellipse.miss <- ifelse (missing(ellipse), TRUE, FALSE)
   fit.miss <- ifelse (missing(fit), TRUE, FALSE)
+  fit_se.miss <- ifelse (missing(fit_se), TRUE, FALSE)
   MD.miss <- ifelse (missing(MD_cut), TRUE, FALSE)
   ID.miss <- ifelse (missing(ID), TRUE, FALSE)
   lwd.miss <- ifelse (missing(lwd), TRUE, FALSE)
@@ -183,7 +196,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   n_col.miss <- ifelse (missing(n_col), TRUE, FALSE)
   n_row.miss <- ifelse (missing(n_row), TRUE, FALSE)
   add_miss <- ifelse (missing(add), TRUE, FALSE)
-
 
   if (!missing(a) || !missing(b)) box_adj <- TRUE
 
@@ -202,8 +214,16 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (ellipse.miss) ellipse <- 0.95
     if (MD.miss) MD_cut <- 6
     if (add_miss) add <- "means"
-    if (fit.miss) fit <- "lm"
+    if (fill.miss) fit <- "lm"
   }
+
+  if (fill.miss && run) {
+    fill <- "gray20"
+    color <- "gray60"
+  }
+
+  # presume text output to the console, could turn off at end of function
+  outp <- TRUE
 
   txdif <- ""  # used to transfer output for diffs of two vars Cleveland sp
   
@@ -217,9 +237,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   if (show_runs) run <- TRUE
   if (run) if (cl.miss) center_line <- "default"
 
-  fit_se.miss <- ifelse (missing(fit_se), TRUE, FALSE) 
   if (!fit_se.miss) if (missing(fit))  fit <- "loess"
   if (fit_se.miss && plot_errors) fit_se <- 0  # default for plot_errors
+  if (!by.miss && fit_se.miss && fit!="off") fit_se <- 0  # default for by 
 
   if (is.logical(fit))
     fit.ln <- ifelse (fit, "loess", "off")
@@ -238,7 +258,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       !missing(bin_end))
     bin <- TRUE
 
-  if (stack) if (fill_miss) fill <- getOption("violin_fill")  # default 
+  if (stack) if (fill.miss) fill <- getOption("violin_fill")  # default 
 
   if (!is.null(pdf_file))
     if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
@@ -251,8 +271,15 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   }
   else
     object <- "default"
-  if (run) object <- "both"
-
+  if (run) {
+    object <- "both"
+    n.y_var <- 1 
+#   if (area_fill != "transparent")  {  # allow fill to apply to points
+#     cat("\n"); stop(call.=FALSE, "\n","------\n",
+#       "Filling the area under the curve only works with time series,\n",
+#       "  not run charts.\n\n")
+#   }
+  }
 
   # --------------
   # process shapes
@@ -341,9 +368,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     }
   }
 
-  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
+  # force evaluation (not lazy) if data not specified
+  if ((missing(data) && shiny)) 
     data <- eval(substitute(data), envir=parent.frame())
-
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
@@ -398,21 +425,24 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         "not a full data frame\n\n")
   }
       
-  else if (is.ts(x)) {  # time series in global # just the dates for x var
-    data.x <- data.frame(.ts.dates(x), stringsAsFactors=TRUE)
+  # time series in global env, deconstruct to just the dates for x var
+  else if (is.ts(x)) { 
+    data.x <- data.frame(.ts.dates(x))
     names(data.x) <- "date"
     date.ts <- TRUE
     if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
 
     # flip x to y
     nc <- ifelse (is.matrix(x), ncol(x), 1)
+    n.y_var <- nc
     if (nc == 1)
       y.call <- x
     else {
       y.call <- x[,1]
       if (nc > 1) for (i in 2:nc) y.call <- cbind(y.call, x[,i])
     }
-    y.call <- data.frame(y.call, stringsAsFactors=TRUE)
+    y.call <- data.frame(y.call)
+#   y.call <- data.frame(y.call, stringsAsFactors=TRUE)
     y.col <- ncol(y.call)
     cat.y <- FALSE
     if (nc == 1) {
@@ -429,8 +459,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   else {  # x a not ts vector in global
     if (!is.function(x))
       data.x <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
-    else
-      data.x <- data.frame(eval(substitute(data$x)), stringsAsFactors=TRUE)  # x is 1 var
+    else  # x is 1 var
+      data.x <- data.frame(eval(substitute(data$x)), stringsAsFactors=TRUE)  
     names(data.x) <- x.name
   }
     
@@ -668,20 +698,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       "Fit line only applicable if only one x variable, if y is present\n\n")
   }
 
-  if (!y.miss && !quiet && getOption("note")) if (cat.x && !cat.y) {
-    cat("\n>>> Note\n",
-        "The integrated Violin/Box/Scatterplot (VBS) for ", y.name, "\n",
-        "at each level of ", x.name, " is only obtained if the categorical\n",
-        "variable is the variable listed second, that is, the y-variable.\n\n",
-        "This ordering with ", x.name, " listed first yields the\n",
-        "scatterplot and the associated means, but no VBS plot.\n", sep="")
-  }
 
-
-  # ------------------------------------------
-  # ------------------------------------------
-  # master control funnel for type of analysis
-  # ------------------------------------------
+  # ---------------------------------------
+  # ---------------------------------------
+  # master control funnel for analysis type
+  # ---------------------------------------
 
   lx <- length(x.call[,1])
   ly <- length(y.call[,1])
@@ -967,6 +988,41 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # -----------  x, y, by and size variables established ------------
   # -----------------------------------------------------------------
 
+      # If plotting a time plot with a Date, make sure x is sorted
+      if (date.ts) {
+        b.name <- NULL
+        sort_flag <- NULL
+        if (!is.null(by.call)) if (!is.null(by.name)) {
+          b.name <- by.name
+          sort_flag <- ifelse (is.unsorted(by.call), FALSE, TRUE)
+        }
+        if (!is.null(by1.call)) if (!is.null(by1.name)) {
+          b.name <- by1.name
+          sort_flag <- ifelse (is.unsorted(by1.call), FALSE, TRUE)
+        }
+
+        # is.unsorted() flags sorted but in descending order
+        if (is.unsorted(x.call[,1])) {
+          if (is.null(b.name)) {  # not evaluated for by var
+            message(">>> Warning\n",
+              "The  Date  variable is not sorted in Increasing Order.\n\n",
+              "For a data frame named d, enter: \n    ", 
+               paste("d <- Sort(d, ", x.name, ")", sep=""), "\n",
+            "Enter  ?Sort  for more information and examples.\n\n")
+          }
+          else {  # a by variable
+            if (!sort_flag) {
+              message(">>> Warning\n",
+                "The  by  variable is not sorted in Increasing Order.\n\n",
+                "For a data frame named d, enter: \n    ", 
+                paste("d <- Sort(d, by=c(", b.name, ", ", x.name, "))", 
+                    sep=""), "\n",
+                    "Enter  ?Sort  for more information and examples.\n\n")
+            }
+          }
+        }  # end is.unsorted
+      }  # if plotting a Date variable
+
     #get n.levels
     n.xcol <- ncol(x.call)
     n.ycol <- ifelse (y.miss, 0, ncol(y.call))
@@ -1070,6 +1126,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     }
     else if (stat %in% c("count", "proportion", "%")) {
       object <- "point"
+      n.y_var <- 1
     }
     else {
       if (data.do) object <- ifelse (cat.x, "bubble", "point")
@@ -1234,19 +1291,18 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # windows line too thin at 1, but no increments allowed, and 2 is too thick
   if (fit.ln != "off") if (is.null(fit_lwd)) fit_lwd <- getOption("fit_lwd") 
   #   fit_lwd <- ifelse(.Platform$OS == "windows", 2, 1.5)
+  
+  if (is.null(pt_fill)) pt_fill <- getOption("pt_fill")
 
   # size of points
   if (size.miss) {  # size.pt not set yet
     scale.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
     size.pt <- scale.pt
-  #   if (options("device") == "RStudioGD") size.pt <- size.pt*1.10
 
-if (is.null(out_size)) out_size <- size.pt
+  if (is.null(out_size)) out_size <- size.pt
 
   if (getOption("theme") == "gray")
     if (any(size.pt > 0.9)) if (out_shape.miss) out_shape <- 23
-  
-  if (is.null(pt_fill)) pt_fill <- "transparent"
 
   }
   else {  # size had been set
@@ -1258,29 +1314,59 @@ if (is.null(out_size)) out_size <- size.pt
   }
 
   # object: "both", "point", "bubble", or "sunflower"
-  if (fill_miss) {
+  if (fill.miss) {
     if (object == "both"  &&  !stack)   # line chart
       fill[1] <- "transparent"
     else
-      fill[1] <- getOption("pt_fill") 
-  }
-  else if (fill[1] == "on")  # default color
-    if (object == "both")   # line chart
-      fill[1] <- getOption("violin_fill")
+      if (stack) fill[1] <- getOption("violin_fill") 
     else
-      fill[1] <- getOption("pt_fill") 
+      fill[1] <- pt_fill
+  }
 
-  if (size.miss) {
+  if (size.miss) {  # size.pt is a scaler
     if (object == "both") {
       size.pt <- 0.77 * size.pt  # default pt size for lines
-      if (fill[1] != "transparent")  # default no points if area shown
-        size.pt <- 0
+      if (fill[1] != "transparent"  &&  area_fill != "transparent")  
+        size.pt[1] <- 0  # default no points if area shown
       else if (nrows > 50) {
         size.pt <- .9 - 0.002*nrows
         if (size.pt < 0.10) size.pt <- 0
       }
     }
   }
+
+  if (area_fill != "transparent" ||  fill != "transparent") {  # default color
+    if (!stack && n.ycol > 1 && (object=="both" || object=="line"))  {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Filling area under a curve with color only makes sense\n",
+        "if the curves are stacked on each other, so set:  stack=TRUE.\n\n")
+    }
+    if (area_fill == "on") {
+      if (n.y_var == 1) 
+        area_fill <- getOption("violin_fill") 
+      else
+        area_fill <- .get_fill()
+      }
+    if (fill == "on") {
+      if (n.y_var == 1) 
+        fill <- getOption("violin_fill") 
+      else
+        fill <- .get_fill()
+    }
+    if (!fill.miss && area_fill.miss && any(size.pt==0))
+      area_fill <- fill
+  }
+  if (stack && area_fill.miss && fill.miss)  # default stack colors to be set
+    area_fill <- "transparent"
+  if (any(size.pt>0)  && area_fill.miss && !fill.miss)  # do default stack colors
+    area_fill <- "transparent"
+  if (any(size.pt>0) && fill.miss) {
+    if (n.by == 0)
+      fill <- getOption("pt_fill")
+    else
+      fill <- getColors("hues", n=n.by)
+  }
+    if (size.ln == 0) area_fill[1] <- "transparent"
 
 
   # ------------------------------------------------
@@ -1310,7 +1396,6 @@ if (is.null(out_size)) out_size <- size.pt
         cat(paste(txt, "graphics from Deepayan Sarkar's lattice package]\n"))
 
       if (y.miss && !run) {  # VBS plot
-
         if (vbs_pt_fill == "black") {
           pt_fill <- "black"
           pt.trans <- 0
@@ -1342,19 +1427,22 @@ if (is.null(out_size)) out_size <- size.pt
         bw <- VBS$bw
         adj.bx.ht <- VBS$adj.bx.ht
  
-      }
+      }  # end VBS plot
+
       else
-        adj.bx.ht <- nrows  # this is here just to adjust box height
+        adj.bx.ht <- nrows  # just to adjust box height
 
       if (jitter_x > 0)  # not available in stripplot
         x.call[,1] <- jitter(x.call[,1], factor=jitter_x) 
 
       # n_col is null for at Plot(x), Plot(x, by=), Plot(x, by1=)
-      if (!grepl("s", vbs_plot)) size.pt <- 0  # gets rescaled if earlier
+      if (!missing(vbs_plot)) 
+        if (!grepl("s", vbs_plot)) size.pt <- 0  # gets rescaled if earlier
       if (is.null(pt_color)) pt_color <- getOption("pt_color")
+
       .plt.lattice(x.call[,1], y.call[,1], by1.call, by2.call, by.call,
                    adj.bx.ht, object, n_row, n_col, aspect,
-                   fill, pt_color, panel_fill, panel_color,
+                   fill, area_fill, pt_color, panel_fill, panel_color,
                    pt.trans, size.pt, size.ln, 
                    xlab, ylab, main, shape, lab_cex, axis_cex,
                    max(ellipse), ellipse_color, ellipse_lwd,
@@ -1370,7 +1458,6 @@ if (is.null(out_size)) out_size <- size.pt
 
     }  # end c.type != "dot"
 
-
     else {  # dot plot
 
       if (seg.x.miss) segments_x <- TRUE
@@ -1382,7 +1469,7 @@ if (is.null(out_size)) out_size <- size.pt
                    segments_x, breaks=NULL, c.type, quiet, ...)
     }
 
-  }  # end Trellis && do_plot
+}  # end Trellis && do_plot
 
 
   # -----------------------------------
@@ -1540,7 +1627,7 @@ if (is.null(out_size)) out_size <- size.pt
      # sort y by x option (intended for Cleveland dot plot)
       tx <- character(length=0)
       if (sort_yx != "0") {
-        srt.dwn <- ifelse (sort_yx == "-", TRUE, FALSE)
+        srt.dwn <- ifelse (sort_yx == "-", FALSE, TRUE)
         if (n.x_var == 1) {  # one x-variable
           ord <- order(x.call[,1], decreasing=srt.dwn)
         }
@@ -1615,11 +1702,10 @@ if (is.null(out_size)) out_size <- size.pt
             "  use the  remove function, e.g., remove(x)\n\n")
         }
 
-        if (run) if (lwd == 0) fill <- getOption("violin_fill")
         if (object == "both"  &&  nn_col > 1) {
         # stack <- TRUE  # meaningless otherwise
            # change to multi later
-           if (fill == "on") fill <- getOption("violin_fill")
+           if (area_fill == "on") fill <- getOption("violin_fill")
         }
 
         # by default display center_line only if runs about a mean
@@ -1658,20 +1744,24 @@ if (is.null(out_size)) out_size <- size.pt
           add, x1, x2, y1, y2, add_cex, add_lwd, add_lty,
           add_color, add_fill, add_trans, ...)
 
-        if (!quiet) {  # text output
+        if (!is.null(by.call)) outp <- FALSE 
 
-          .plt.txt(x.call, y.call, stat, object, n_cat,
-            cat.x, num.cat.x, cat.y, num.cat.y,
-            xlab, ylab,
-            smooth, box_adj, run, center_line, show_runs,
-            proportion, size, radius, digits_d, fun_call, txdif)
+        if (outp) {
+          if (!quiet)  {  # text output
 
-          if (!y.miss && !Trellis) if (n.x_var == 1  &&  n.y_var == 1) {
-            class(txout) <- "out"  # MD outlier analysis
-            output <- list(out_outlier=txout, outlier_indices=out_ind)
-            class(output) <- "out_all"
-          }
-        }  # end !quiet
+            .plt.txt(x.call, y.call, stat, object, n_cat,
+              cat.x, num.cat.x, cat.y, num.cat.y,
+              xlab, ylab,
+              smooth, box_adj, run, center_line, show_runs,
+              proportion, size, radius, digits_d, fun_call, txdif)
+
+              {
+              class(txout) <- "out"  # MD outlier analysis
+              output <- list(out_outlier=txout, outlier_indices=out_ind)
+              class(output) <- "out_all"
+            }
+          }  # end !quiet
+        }
       }  # end do_plot
 
     }  # end 2-variable scatter plot
@@ -1682,7 +1772,7 @@ if (is.null(out_size)) out_size <- size.pt
   # terminate pdf graphics system if used
   if (!is.null(pdf_file)) {
     dev.off()
-    .showfile(pdf_file, "plot")
+    if (!quiet) .showfile(pdf_file, "Plot")
   }
 
   # reset
@@ -1692,6 +1782,8 @@ if (is.null(out_size)) out_size <- size.pt
   options(by2name=NULL)
   options(byname=NULL)
 
-  if (!y.miss && !Trellis) if (n.x_var == 1  &&  n.y_var == 1)
-    if (!quiet) return(output)
+  # display text output from Plot() unless turned off
+  if (Trellis) outp <- FALSE  # output is from lattice
+  if (n.x_var > 1  &&  y.miss) outp <- FALSE  # scatterplot matrix
+  if (outp) if (!quiet) return(output)
 }

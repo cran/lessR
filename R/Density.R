@@ -15,7 +15,7 @@ function(x, data=d, rows=NULL,
        rug=FALSE, color_rug="black", size_rug=0.5,
 
        eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
-       width=4.5, height=4.5, pdf=FALSE,
+       width=4.5, height=4.5, pdf_file=NULL,
        fun_call=NULL, ...) {
 
 
@@ -170,7 +170,7 @@ function(x, data=d, rows=NULL,
     plot.i <- 0  # keep track of generated graphics
     plot.title  <- character(length=0)
     manage.gr <- .graphman()  # see if graphics are to be managed
-    if (manage.gr  &&  !pdf  && !shiny) {
+    if (manage.gr  &&  is.null(pdf_file)  && !shiny) {
       i.win <- 0
       for (i in 1:ncol(data)) {
         if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n_cat))
@@ -200,12 +200,14 @@ function(x, data=d, rows=NULL,
       # do not do num.cat vars, unless only 1 variable to analyze
       if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n_cat)) {
 
-      if (pdf) {
-        pdf.fnm <- paste("Density", "_", x.name, ".pdf", sep="")
-        .opendev(pdf.fnm, width, height)
+      if (!is.null(pdf_file))  {
+        if (!grepl(".pdf", pdf_file))
+           pdf_file <- paste(pdf_file, ".pdf", sep="")
+        pdf_file <- paste("Density", "_", x.name, ".pdf", sep="")
+        .opendev(pdf_file, width, height)
       }
       else {
-        pdf.fnm <- NULL
+        pdf_file <- NULL
         plot.i <- plot.i + 1
         plot.title[plot.i] <- paste("Density of ", x.name, sep="")
         if (manage.gr && !shiny) {
@@ -254,9 +256,9 @@ function(x, data=d, rows=NULL,
         print(output)
       }
 
-      if (pdf) {
+      if (!is.null(pdf_file)) {
         dev.off()
-        if (!quiet) .showfile(pdf.fnm, "density curve")
+        if (!quiet) .showfile(pdf_file, "density curve")
       }
 
     }  # nu > n_cat
@@ -268,8 +270,9 @@ function(x, data=d, rows=NULL,
 
 
   if (ncol(data) > 1) {
-    if (!pdf) if (is.null(options()$knitr.in.progress)) if (plot.i > 0)
-      .plotList(plot.i, plot.title)
+    if (is.null(pdf_file)) if (is.null(options()$knitr.in.progress))
+      if (plot.i > 0)
+        .plotList(plot.i, plot.title)
   }
 
   if (!shiny)

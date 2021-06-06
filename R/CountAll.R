@@ -3,7 +3,7 @@ function(x=d, quiet=FALSE, ...)  {
 
   manage.gr <- .graphman()  # see if graphics are to be managed
   if (manage.gr)
-    cat("\n>>> Note: Must have pdf=TRUE or run in RStudio.\n\n")
+    cat("\n>>> Note: Must have pdf_file specified or run in RStudio.\n\n")
 
 
   # let deprecated mydata work as default

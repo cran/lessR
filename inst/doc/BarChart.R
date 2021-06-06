@@ -4,7 +4,7 @@ library("lessR")
 ## ----read---------------------------------------------------------------------
 d <- Read("Employee")
 
-## ----bc1, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center'----
+## ----bc1, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center', out.extra='style="border-style: none"'----
 knitr::include_graphics(system.file("img", "bcExplain.png", package="lessR"))
 
 ## ----bcEx, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Bar chart of tablulated counts of employees in each department."----
@@ -13,11 +13,11 @@ BarChart(Dept)
 ## ---------------------------------------------------------------------------------------------------------------------
 style(quiet=TRUE)
 
-## ----fig.width=4, fig.align='center'----------------------------------------------------------------------------------
-BarChart(Dept, fill="darkred", horiz=TRUE, values="off")
+## ----fig.width=4, fig.height=3.75, fig.align='center'-----------------------------------------------------------------
+BarChart(Dept, fill="darkred", color="black", trans=.8, values_color="black")
 
 ## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
-BarChart(Dept, theme="gray")
+BarChart(Dept, theme="gray", values="off", horiz=TRUE)
 
 ## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
 BarChart(Dept, fill="reds")
@@ -28,8 +28,15 @@ BarChart(Dept, rotate_x=45, offset=1, sort="-")
 ## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
 BarChart(Dept, fill=(count))
 
-## ----bcXY, dataTable, echo=FALSE, out.width='35%', fig.asp=.7, fig.align='center'-------------------------------------
+## ----a----------------------------------------------------------------------------------------------------------------
+a <- pivot(d, mean, Salary, Dept)
+a
+
+## ----bcXY, dataTable, echo=FALSE, out.width='35%', fig.asp=.7, fig.align='center', out.extra='style="border-style: none"'----
 knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
+
+## ----xy, fig.width=4, fig.height=3.5, fig.align='center'--------------------------------------------------------------
+BarChart(Dept, Salary_mn, data=a)
 
 ## ---- fig.width=4, fig.height=3.5, fig.align='center'-----------------------------------------------------------------
 BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
@@ -45,23 +52,29 @@ d <- Read("Employee")
 ## ----pc1, fig.align='center'------------------------------------------------------------------------------------------
 PieChart(Dept)
 
-## ----hole0, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Standard pie chart of variable _Dept_ in the _d_ data frame."----
+## ----hole0, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Standard pie chart of variable Dept in the _d_ data frame."----
 PieChart(Dept, hole=0, quiet=TRUE)
 
-## ----bc2var, dataTable, echo=FALSE, out.width='34%', fig.asp=.7, fig.align='center'-----------------------------------
+## ----bc2var, dataTable, echo=FALSE, out.width='34%', fig.asp=.7, fig.align='center', out.extra='style="border-style: none"'----
 knitr::include_graphics(system.file("img", "bc2Explain.png", package="lessR"))
 
 ## ---- fig.width=4, fig.align='center'---------------------------------------------------------------------------------
 BarChart(Dept, by=Gender)
 
+## ---- fig.width=4, fig.align='center'---------------------------------------------------------------------------------
+BarChart(Dept, by=Gender, fill=c("deepskyblue", "black"))
+
 ## ---- fig.width=5, fig.align='center'---------------------------------------------------------------------------------
-BarChart(Dept, by=Gender, beside=TRUE)
+BarChart(Dept, by=Gender, beside=TRUE, values_position="out")
+
+## ---- fig.width=6-----------------------------------------------------------------------------------------------------
+BarChart(Gender, by=Dept, horiz=TRUE)
 
 ## ---- fig.width=4, fig.align='center'---------------------------------------------------------------------------------
 BarChart(Dept, by1=Gender)
 
 ## ---- fig.align='center'----------------------------------------------------------------------------------------------
-BarChart(Dept, by1=Gender, n_col=1, quiet=TRUE)
+BarChart(Dept, by1=Gender, n_col=1)
 
 ## ---- fig.width=4, fig.align='center'---------------------------------------------------------------------------------
 BarChart(Dept, by=Gender, stack100=TRUE)

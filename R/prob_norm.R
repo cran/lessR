@@ -103,5 +103,6 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, nrm_color="black",
   }
 
   cat("Probability: ", prob, "\n")
+  return(invisible(prob))
 
 }

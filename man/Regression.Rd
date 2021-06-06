@@ -38,7 +38,7 @@ Regression(my_formula, data=d, rows=NULL,
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL,
          X5_new=NULL, X6_new=NULL,
 
-         kfold=0, seed=NULL, rescale=c("none", "z", "0to1", "robust"),
+         kfold=0, seed=NULL, new_scale=c("none", "z", "0to1", "robust"),
 
          quiet=getOption("quiet"),
          graphics=TRUE, pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
@@ -161,7 +161,7 @@ reg_brief(\ldots, brief=TRUE)
   \item{seed}{Parameter \code{kfold} generates random partitions, folds, of data.
        Set the seed to an integer to recover the same random partitions on
        subsequent runs.}
-  \item{rescale}{Transform the variables to the specified metric before
+  \item{new_scale}{Transform the variables to the specified metric before
        conducting the analysis, \code{"z"}, \code{"0to1"}, or \code{"robust"}.
        Applies to \code{kfold} separately to the
        training and testing folds as well to avoid data leakage.}\cr
@@ -335,7 +335,7 @@ d <- Subset(random=.3)
 Regression(Reading ~ Verbal)
 # Provide only the brief analysis on standardized variables
 #  with 3-fold cross-validations
-reg_brief(Reading ~ Verbal, rescale="z", kfold=3)
+reg_brief(Reading ~ Verbal, new_scale="z", kfold=3)
 
 # Access the pieces of output, here in an object named \code{r}
 r <- reg(Reading ~ Verbal + Absent + Income)
@@ -363,7 +363,7 @@ r$out_estimates
 Regression(Reading ~ Verbal, rows=(Income > 100 & Absent < 5))
 
 # standardize
-Regression(Reading ~ Verbal, rescale="z")
+Regression(Reading ~ Verbal, new_scale="z")
 
 
 # Multiple regression model

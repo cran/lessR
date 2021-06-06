@@ -1,6 +1,6 @@
 .plt.lattice <- 
 function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
-         fill, color, panel_fill, panel_color,
+         fill, area_fill, color, panel_fill, panel_color,
          trans, size.pt, size.ln,
          xlab, ylab, main, shape, lab_cex, axis_cex,
          lvl=0, ellipse_color=NULL, ellipse_lwd=NULL,
@@ -14,16 +14,14 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
          rotate_x, rotate_y, width, height, pdf_file, c.type, ...) {
 
 
-  if (object == "both")
-    area <- fill
-   else
-    area <- "transparent"
-
   date.ts <- FALSE
   if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
   if (date.ts) xx.lab <- xlab
   
   if (size.pt == 0) object <- "line"
+
+  if (!is.null(area_fill)) if (area_fill == "on")
+    area_fill <- getOption("violin_fill")
 
   grid_x_color <- ifelse(is.null(getOption("grid_x_color")), 
     getOption("grid_color"), getOption("grid_x_color"))
@@ -149,8 +147,9 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
     }
   }
 
-  if (object != "point") if (area != "transparent")
-    if (col_fill[1] != area) col_fill[1] <- .maketrans(area, (1-trans)*256)
+  if (object != "point") if (area_fill != "transparent")
+    if (col_fill[1] != area_fill)
+      col_fill[1] <- .maketrans(fill[1], (1-trans)*256)
 
   legend_title <- abbreviate(getOption("byname"), 7)
   leg.cex.title <- 0.85  # abbreviate only returns of type character
@@ -190,7 +189,6 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
     }
   }
   if (is.null(by1)) strp <- FALSE
-
 
   # ---------------------------------
   if (c.type == "contcont") {  # cont - cont
@@ -233,8 +231,6 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   }  # end cont
 
   p <- update(p, layout=c(n_col, n_row))
-# p <- update(p, layout=c(n_col, n_row))
-
 
   # scale down the point size, grid line width for the multi-panel dot plots
   n.pnl <- length(levels(by1))
@@ -321,8 +317,8 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
                         lwd=grid_x_lwd, lty=grid_x_lty)
              panel.grid(h=-1, v=0, g.y_color,
                         lwd=grid_y_lwd, lty=grid_y_lty)
-             if (area != "transparent")
-               panel.xyarea(x, y, origin=origin, col=col_fill)
+             if (area_fill != "transparent")  # fill under the line
+               panel.xyarea(x, y, origin=origin, col=area_fill)
              if (object == "point")
                tp <- "p" 
              else if (object == "both")

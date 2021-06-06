@@ -10,11 +10,6 @@ function(x, l, sort_yx,
          do_plot, fun_call=NULL, ...)  {
 
   col.area <- col_fill  # kludge
-
-  # scale for regular R or RStudio
-  adj <- .RSadj(radius)
-  radius <- adj$radius
-
   size.txt <- ifelse (options("device") == "RStudioGD", 0.8, 0.7)
 
   if (!is.null(value_labels)) value_labels <- gsub(" ", "\n", value_labels) 
@@ -140,7 +135,8 @@ function(x, l, sort_yx,
       x.lvl <- value_labels
       x.lvl <- gsub(" ", "\n", x.lvl) 
 
-    .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,
+#   .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,  # axTicks(1) not work if binary
+    .axes(x.lvl, y.lvl, 1:length(x.lvl), 1:n.var,
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
 
     # axis labels 
@@ -185,6 +181,17 @@ function(x, l, sort_yx,
       for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans_pts)*256)
     }
 
+  # scale for regular R or RStudio
+  nch <- nchar(as.character(max(cords)))
+  if (is.null(radius)) {
+    radius <- -.35 + (.2*nch)
+    if (radius < .22) radius <- .22
+  }
+  adj <- .RSadj(radius)
+  radius <- adj$radius
+  if (!quiet) cat("Adjust bubble size with parameter: radius.",
+                  "Current value: radius =", radius, "\n")
+
     symbols(cords$xx, cords$yy, circles=c, bg=clr, 
             fg=col_color, inches=radius, add=TRUE, ...)
 
@@ -217,7 +224,7 @@ function(x, l, sort_yx,
       txsug <- ">>> Suggestions"
       fc <- ""
       if (!grepl("radius", fncl))
-        fc <- paste(fc, ", radius=0.2", sep="")
+        fc <- paste(fc, ", radius=0.3", sep="")
       if (nzchar(fc)) {
         fc <- paste(fncl, fc, ") ", sep="")
         txsug <- paste(txsug,"\n", fc, sep="")
@@ -229,12 +236,15 @@ function(x, l, sort_yx,
 
     # display variable labels
     txlbl <- ""
-    l <- l[rownames(mytbl),]
+    l <- l[rownames(mytbl),]  # l is a data frame
     if (!is.null(l)) {
       tx <- character(length = 0)
       tx[length(tx)+1] <- ">>> Labels"
       for (i in 1:length(rownames(mytbl))) {
-        ml <- l[i]
+        if (is.data.frame(l)) 
+          ml <- l[i,]
+        else
+          ml <- l[i]
         if (!is.na(ml))
           tx[length(tx)+1] <- paste(rownames(mytbl)[i], ": ", ml, sep="")
       }

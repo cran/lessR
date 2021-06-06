@@ -8,6 +8,8 @@
 \description{
 Abbreviation: \code{ss}
 
+The summary statistics aspect for continuous variables is deprecated. Use \code{\link{pivot}} instead.
+
 Descriptive or summary statistics for a numeric variable or a factor, one at a time or for all numeric and factor variables in the data frame.  For a single variable, there is also an option for summary statistics at each level of a second, usually categorical variable or factor, with a relatively few number of levels.  For a numeric variable, output includes the sample mean, standard deviation, skewness, kurtosis, minimum, 1st quartile, median, third quartile and maximum, as well as the number of non-missing and missing values_ For a categorical variable, the output includes the table of counts for each value of a factor, the total sample size, and the corresponding proportions.  
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.

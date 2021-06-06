@@ -51,5 +51,5 @@ function (R=mycor, vars,
   }
 
   cat("\n")
-  invisible(R)
+  return(invisible(R))
 }

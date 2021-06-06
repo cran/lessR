@@ -8,7 +8,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         gap=NULL, scale_y=NULL,
 
         theme=getOption("theme"),
-        fill=NULL,
+        fill=getOption("bar_fill_discrete"),
         color=getOption("bar_color_discrete"),
         trans=getOption("trans_bar_fill"),
         fill_split=NULL,
@@ -38,8 +38,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
         eval_df=NULL, quiet=getOption("quiet"),
-        width=6.5, height=6, pdf=FALSE, ...)  {
+        width=6.5, height=6, pdf_file=NULL, ...)  {
 
+  fill.name <- deparse(substitute(fill))
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -77,6 +78,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   if (missing(break_x)) 
     break_x <- ifelse (!horiz  &&  rotate_x == 0, TRUE, FALSE)
+
+  if (horiz) {
+    if (sort == "+") sort <- "-" 
+    if (sort == "-") sort <- "+" 
+  }
 
   if (sort[1] %in% c("off", "up", "down")) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -347,17 +353,18 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   #--------------
   if (!fill.miss) {
     fill.name <- deparse(substitute(fill))
-
-    if (exists(df.name, where=.GlobalEnv))
-      in.df <- ifelse (exists(fill.name, where=data), TRUE, FALSE)
-    else
-      in.df <- FALSE
+    if (length(fill.name) == 1) {
+      if (exists(df.name, where=.GlobalEnv))
+        in.df <- ifelse (exists(fill.name, where=data), TRUE, FALSE)
+      else
+        in.df <- FALSE
+    }
+      else in.df <- FALSE
 
     # only works for y given, not tabulated
     if (in.df) {
       fill.val <- eval(substitute(data$fill))
       fill <- .getColC(fill.val)
-
       if (sort != "0") {
         srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
         fill <- fill[order(fill.val, decreasing=srt.dwn)]
@@ -368,7 +375,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       color[which(color == "off")] <- "transparent"
     }
 
-    # or do a tabulation to get value of y
+    # or do a tabulation to get value of y for (count)
     if (substr(fill.name, 1, 6) == "(count") {
       xtb <- table(x.call)
       if (sort != "0") {
@@ -376,10 +383,20 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         xtb <- xtb[order(xtb, decreasing=srt.dwn)]
       }
       fill <- .getColC(xtb, fill_name=fill.name)
-         
     }  # end .count 
+
   }  # end !fill.miss
 
+  # add the n= to a getColors call
+  # getColors is evaluated at the time of the function call
+  # re-evaluate here by setting fill with the specified value of n
+  if (substr(fill.name, 1, 9) == "getColors") {
+    lx.u <- length(na.omit(unique(x.call)))  # do not include NA's
+    gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
+    txt <- paste("fill <- getColors(", gc.args, ", n=", lx.u, ")", sep="")
+    pp <- parse(text=txt)
+    eval(pp)
+  }
 
   # ------------------------------------------------------------
   # -----------  x, y, and by variables established ------------
@@ -396,9 +413,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   if (is.null(stat)) {
     if (!is.null(y.call)) {
 
-     if (sum(is.na(x.call))  > 0 ||
+     if (sum(is.na(x.call)) > 0 ||
           sum(is.na(by.call)) > 0 ||
-          sum(is.na(y.call))  > 0)   {
+          sum(is.na(y.call)) > 0)   {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "When reading values of y directly, missing data not allowed.\n",
           "First use the  na.omit()  function on the data frame.\n\n")
@@ -444,7 +461,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
                  proportion, 
                  fill, color, trans, size.pt=NULL, xlab, ylab, main,
                  rotate_x, offset,
-                 width, height, pdf,
+                 width, height, pdf_file,
                  segments_x=NULL, breaks=NULL, c.type="bar", quiet)
   }
 
@@ -455,15 +472,15 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       f.name <- x.name
     else
       f.name <- paste(x.name, "x", by.name, sep="")
-      
-    if (pdf) {
-      pdf.fnm <- paste("BarChart", "_", f.name, ".pdf", sep="") 
-      .opendev(pdf.fnm, width, height)
+
+    if (!is.null(pdf_file)) {
+      if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
+      .opendev(pdf_file, width, height)
     }
     else {
       if (!shiny) {  # not dev.new for shiny
-        pdf.fnm <- NULL
-        .opendev(pdf.fnm, width, height)
+        pdf_file <- NULL
+        .opendev(pdf_file, width, height)
       }
     }
 
@@ -508,21 +525,21 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         if (is.null(by.call))
           out <- tapply(y.call, x.call, sum, na.rm=TRUE)
         else 
-          out <- aggregate(y.call ~ x.call +  by.call, FUN=sum)
+          out <- aggregate(y.call ~ x.call + by.call, FUN=sum)
       }
       if (stat == "mean") {
         ylab <- paste("Mean of", y.name)
         if (is.null(by.call))
           out <- tapply(y.call, x.call, mean, na.rm=TRUE)
         else 
-          out <- aggregate(y.call ~ x.call +  by.call, FUN=mean)
+          out <- aggregate(y.call ~ x.call + by.call, FUN=mean)
       }
       if (stat == "sd") {
         ylab <- paste("Standard Deviation of", y.name)
         if (is.null(by.call))
           out <- tapply(y.call, x.call, sd, na.rm=TRUE)
         else 
-          out <- aggregate(y.call ~ x.call +  by.call, FUN=sd)
+          out <- aggregate(y.call ~ x.call + by.call, FUN=sd)
       }
       if (stat == "dev") {
         ylab <- paste("Mean Deviations of", y.name)
@@ -554,7 +571,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         if (is.null(by.call))
           out <- tapply(y.call, x.call, max, na.rm=TRUE)
         else 
-          out <- aggregate(y.call ~ x.call +  by.call, FUN=max)
+          out <- aggregate(y.call ~ x.call + by.call, FUN=max)
       }
 
     #if (is.factor(x.call))  # preserve ordering, will lose order attribute
@@ -596,12 +613,12 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
             legend_horiz, legend_size,
             add, x1, x2, y1, y2, out_size, quiet, ...)
 
-        if (pdf) {
+        if (!is.null(pdf_file)) {
           dev.off()
-          if (!quiet) .showfile(pdf.fnm, "BarChart")
+          if (!quiet) .showfile(pdf_file, "BarChart")
         }
         
-      invisible(bc)
+      return(invisible(bc))
     }  # not Trellis
 
   }  # end x is a single var
@@ -663,13 +680,13 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       if (color.miss) color <- "transparent"
       if (fill.miss) {  # define divergent palette
         if ((theme %in% c("gray", "white"))) {
-          fill <- c("grays","grays")
+          fill <- c("grays", "grays")
           color <- c("gray50")
         }
         else if ((theme %in% c("hues", "lightbronze", "dodgerblue", "blue",
                                 "gold", "brown", "sienna", "orange")))
           fill <- c("browns", "blues")
-        else if ((theme %in% c("darkred", "red", "rose")))
+        else if ((theme %in% c("darkred", "red", "rose", "slatered")))
           fill <- c("turquoises", "reds")
         else if ((theme %in% c("darkgreen", "green", "purple")))
           fill <- c("violets", "greens")
@@ -677,15 +694,15 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
           fill <- c("browns", "blues")
       }  # end fill.miss
         
-      if (pdf) {
-        f.name <- sub(":", "_", x.name, fixed=TRUE)
-        pdf.fnm <- paste("BarChart", "_", f.name, ".pdf", sep="") 
-        .opendev(pdf.fnm, width, height)
+      if (!is.null(pdf_file)) {
+        if (!grepl(".pdf", pdf_file))
+          pdf_file <- paste(pdf_file, ".pdf", sep="")
+        .opendev(pdf_file, width, height)
       }
       else {
         if (!shiny) {  # not dev.new for shiny
-          pdf.fnm <- NULL
-          .opendev(pdf.fnm, width, height)
+          pdf_file <- NULL
+          .opendev(pdf_file, width, height)
         }
       }
       
@@ -703,9 +720,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
             legend_horiz, legend_size,
             add, x1, x2, y1, y2, out_size, quiet, ...)
       
-      if (pdf) {
+      if (!is.null(pdf_file)) {
         dev.off()
-        if (!quiet) .showfile(pdf.fnm, "BarChart")
+        if (!quiet) .showfile(pdf_file, "BarChart")
       }
     }  # end one_plot
 
@@ -722,7 +739,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         pad_y_min, pad_y_max,
         legend_title, legend_position, legend_labels,
         legend_horiz, legend_size,
-        out_size, quiet, width, height, pdf, ...)
+        out_size, quiet, width, height, pdf_file, ...)
     }
   }
 

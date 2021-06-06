@@ -34,7 +34,10 @@ ANOVA(breaks ~ tension * wool, data=warpbreaks)
 ## ---------------------------------------------------------------------------------------------------------------------
 data(warpbreaks)
 dm <- pivot(warpbreaks, mean, breaks, c(tension, wool))
-Plot(tension, breaks, by=wool, segments=TRUE, size=2, data=dm, main="Cell Means")
+dm
+
+## ---------------------------------------------------------------------------------------------------------------------
+Plot(tension, breaks_mn, by=wool, segments=TRUE, size=2, data=dm, main="Cell Means")
 
 ## ---------------------------------------------------------------------------------------------------------------------
 d <- read.csv(header=TRUE, text="

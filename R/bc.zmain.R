@@ -13,7 +13,6 @@ function(x, y, by, stack100,
          legend_horiz, legend_size,
          add, x1, x2, y1, y2, out_size, quiet, ...) {
 
-
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
   y.given <- ifelse (!is.null(y), TRUE, FALSE)
   is.ord <- ifelse (is.ordered(x) || is.ordered(by), TRUE, FALSE)
@@ -67,6 +66,7 @@ function(x, y, by, stack100,
   x.name <- gl$xn;  x.lbl <- gl$xl;  y.lbl <- gl$yl
   x.lab <- ifelse (horiz, gl$yb, gl$xb)
   main.lab <- gl$mb
+  sub.lab <- gl$sb
   by.name <- y.lbl
   if (!is.null(by) || is.data.frame(x))
     by.name <- getOption("byname")
@@ -79,7 +79,7 @@ function(x, y, by, stack100,
     if (!is.vector(x)) {
       txt <- "Proportion"
       if (!is.null(by) && prop && !beside) {
-        txt <- paste("Cell Proportion within")
+        txt <- paste("Cell % within")
       }
       if (is.null(y))
          if (!prop) ylab <- "Count" else ylab <- txt
@@ -140,9 +140,6 @@ function(x, y, by, stack100,
           l.lab <- paste(by.name, ": ", y.lbl, sep="")
       }
     }
-
-  # title
-  main.lbl <- ifelse (!is.null(main), main, "")
 
 
   # --------------------------
@@ -296,7 +293,7 @@ function(x, y, by, stack100,
         x <- x[,m.o]
         wm <- wm[m.o]
       }
-    }
+    }  # x is a data frame
   }  # end !entered so tabulated
     
 
@@ -344,9 +341,7 @@ function(x, y, by, stack100,
         if (is.null(by)) 
           clr <- getOption("bar_fill_discrete")  # default theme 
         else 
-{
            clr <- .color_range(.get_fill(theme, FALSE), n.levels)
-}
       }
       else {  # not the default theme
         sty <- style(theme, reset=FALSE)
@@ -519,7 +514,7 @@ function(x, y, by, stack100,
   # ----------------
   # set up plot area
 
-  margs <- .marg(max.y.width, y.lab, x.lab, main.lab,
+  margs <- .marg(max.y.width, y.lab, x.lab, main.lab, sub.lab,
                 rotate_x, mx.x.val.ln, mx.y.val.ln,
                 lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, max.x.width)
   lm <- margs$lm
@@ -558,19 +553,19 @@ function(x, y, by, stack100,
   par(mai=c(bm, lm, tm, rm))
 
 
-  # rescale to control bar width for small number of bars
-  # set rescale
+  # new_scale to control bar width for small number of bars
+  # set new_scale
   if ("numeric" %in% class(x)  &&  entered) x <- as.table(x)
-  rescale <- 0
-  if (is.null(by)) if (nrow(x) <= 4) rescale <- nrow(x)
-  if (is.matrix(x)  &&  !beside) if (ncol(x) <= 4) rescale <- ncol(x)
-  if ("matrix" %in% class(x)  &&  entered) rescale <- 0  # turned off for now
+  new_scale <- 0
+  if (is.null(by)) if (nrow(x) <= 4) new_scale <- nrow(x)
+  if (is.matrix(x)  &&  !beside) if (ncol(x) <= 4) new_scale <- ncol(x)
+  if ("matrix" %in% class(x)  &&  entered) new_scale <- 0  # turned off for now
   # set width.bars, gap
-  if (rescale == 4) width.bars <- .17
-  if (rescale == 3) width.bars <- .22
-  if (rescale == 2) width.bars <- .28
-  if (rescale == 1) width.bars <- .30  # for only one category
-  if (rescale > 0) gap <- 0.246 + (0.687 * width.bars)
+  if (new_scale == 4) width.bars <- .17
+  if (new_scale == 3) width.bars <- .22
+  if (new_scale == 2) width.bars <- .28
+  if (new_scale == 1) width.bars <- .30  # for only one category
+  if (new_scale > 0) gap <- 0.246 + (0.687 * width.bars)
 
   yp <- pretty(c(min.y, max.y))
   y.adj_min <- pad_y_min * (yp[length(yp)] - yp[1])
@@ -581,7 +576,7 @@ function(x, y, by, stack100,
   # barplot run here only to establish usr coordinates, axTick values
   #  otherwise usr is just 0,1 for both axes
   # the barplot itself is not retained
-  if (rescale == 0) {
+  if (new_scale == 0) {
     if (!horiz)
       barplot(x, col="transparent", border="transparent", 
         ylim=c(min.y,max.y), axisnames=FALSE,
@@ -591,17 +586,24 @@ function(x, y, by, stack100,
         axisnames=FALSE,
         beside=beside, space=gap, axes=FALSE, xlim=c(min.y, max.y), ...)
   }
-  else { # rescale, need (0,1) limit on_cat axis for re-scale to work
+  else { # new_scale, need (0,1) limit on_cat axis for re-scale to work
     if (!horiz)
       barplot(x, col="transparent", border="transparent",
         ylim=c(min.y,max.y), axisnames=FALSE,
         beside=beside, space=gap, width=width.bars, xlim=c(0,1),
         axes=FALSE, ...)
-    else
+    else {
+      # when x is binary for a BPFM equivalent ylim may need extension
+      x.coords <- barplot(x, col="transparent", border="transparent", horiz=TRUE,
+        axisnames=FALSE,
+        beside=beside, space=gap, width=width.bars, xlim=c(min.y, max.y),
+        ylim=c(0,1), axes=FALSE, plot=FALSE, ...)
+      up.lim <- ifelse (max(x.coords) > 1, max(x.coords) + .1, 1)
       barplot(x, col="transparent", border="transparent", horiz=TRUE,
         axisnames=FALSE,
         beside=beside, space=gap, width=width.bars, xlim=c(min.y, max.y),
-        ylim=c(0,1), axes=FALSE, ...)
+        ylim=c(0,up.lim), axes=FALSE, ...)
+    }
   }
 
   ax.num <- ifelse (horiz, 1, 2)  # location of numerical axis
@@ -612,9 +614,9 @@ function(x, y, by, stack100,
   ## PLOT
 
   usr <- par("usr")
+  col.bg <- getOption("panel_fill")
 
   # panel fill
-  col.bg <- getOption("panel_fill")
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
 
   # grid lines for y-axis only
@@ -626,7 +628,7 @@ function(x, y, by, stack100,
        lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
 
   # the bars
-  if (rescale == 0)
+  if (new_scale == 0)
     x.coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col_color, las=las.value, 
           space=gap, axisnames=FALSE, ...)
@@ -634,7 +636,6 @@ function(x, y, by, stack100,
     x.coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=col_color, las=las.value, 
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
-
 
   # display text labels of values on or above the bars
   # --------------------------------------------------
@@ -799,11 +800,12 @@ function(x, y, by, stack100,
   axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")), 
     getOption("axis_text_color"), getOption("axis_y_text_color"))
   adj1 <- ifelse (!horiz, 0.5, -1.0)
-  if (is.null(scale_y))  # if scale_y defined, can evaluate earlier
+  if (is.null(scale_y)) {  # if scale_y defined, can evaluate earlier
     if (!prop)
       lblval.y <- as.character(y.coords)
     else
       lblval.y <- .fmt(y.coords,2)
+  }
   axis(ax.num, col=axis_y_color,   # maybe split off the text like with x axis?
        col.axis=axis_y_text_color, cex.axis=axis_y_cex, las=las.value,
        tck=-.02, padj=adj1,  at=y.coords, labels=lblval.y, ...) 
@@ -855,6 +857,8 @@ function(x, y, by, stack100,
   lblx.lns <- par("mar")[1] - 1.3   # par("mar")[1] is bm in lines
   title(xlab=x.lab, line=lblx.lns-xlab_adj, cex.lab=lab_x_cex,
         col.lab=lab_x_color)
+
+  # need sub.lab processing here
 
   # ylab positioning (based on .axlabs function)
   lab_y_color <- ifelse(is.null(getOption("lab_y_color")), 
@@ -958,7 +962,10 @@ function(x, y, by, stack100,
       if (!is.null(mylabs)) {
         tx <- character(length = 0)
         for (i in 1:length(colnames(x))) {
-          ml <- mylabs[i]
+          if (is.data.frame(mylabs))
+            ml <- mylabs[i,]
+          else  # if a different l label frame exists, ml is NA
+            ml <- mylabs[i]
           if (!is.na(ml))
             tx[length(tx)+1] <- paste(colnames(x)[i], ": ", ml, sep="")
         }

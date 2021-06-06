@@ -75,7 +75,7 @@ function(n, prob=.5, seed=NULL,
     for (i in 1:(n)) {
       if (show_flips)
         points(i, flips[i], col="lightsteelblue", pch=23, bg="darkblue", cex=.7)
-      invisible(readline())
+      return(invisible(readline()))
       segments(i, ybar[i], i+1, ybar[i+1], lwd=3, col="gray40")
     }
 

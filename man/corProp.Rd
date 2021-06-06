@@ -1,11 +1,11 @@
 \name{corProp}
 \alias{corProp}
-\alias{prop}
+\alias{cp}
 
 \title{Proportionality Coefficients from Correlations}
 
 \description{
-Abbreviation: \code{prop}
+Abbreviation: \code{cp}
 
 In the population, indicators of the same factor or latent variable have parallel correlations with all other variables. Of course, in the presence of sampling error, this parallelism will only be approximate. To assess this parallelism, proportionality coefficients are computed for each pair of variables in the input correlation matrix.  Also output is a heat map of the resulting matrix of proportionality coefficients. Each graph is based on a default color theme. The original default is \code{lightbronze}, but other color palettes can be generated as well.
 }
@@ -15,7 +15,7 @@ corProp(R=mycor,
           main=NULL, heat_map=TRUE, bottom=NULL, right=NULL, 
           pdf_file=NULL, width=5, height=5, \ldots)
 
-prop(\ldots)
+cp(\ldots)
 }
 
 \arguments{
@@ -67,7 +67,7 @@ rownames(mycor) <- colnames(mycor)
 corProp()
 
 # abbreviated form
-prop()
+cp()
 
 # calculate and store proportionality coefficients in myprop
 # order the proportionality coefficients to help identify factors

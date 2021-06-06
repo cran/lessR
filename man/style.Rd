@@ -13,8 +13,8 @@ The color and style attributes of each plot can be set as a general theme, or in
 \usage{
 style(
   theme=c("colors", "lightbronze", "dodgerblue", "darkred", "gray",
-      "gold", "darkgreen", "blue", "red", "rose", "green", "purple",
-	    "sienna", "brown", "orange", "white", "light"),
+      "gold", "darkgreen", "blue", "red", "rose", "slatered", "green",
+      "purple", "sienna", "brown", "orange", "white", "light"),
   sub_theme=c("default", "black", "wsj"),
   set=NULL, get=FALSE, reset=TRUE,
 

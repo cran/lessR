@@ -242,7 +242,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
       out_rep=txrep, out_parm=txprm)
     }
 
-  }  # one var
+  }  # end one var
 
   # -------
   # TWO VAR: x-variable with a Y categorical variable, by1

@@ -11,14 +11,14 @@ function(x, n_cat, within,
          pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
          legend_horiz, legend_size,
-         out_size, quiet, width, height, pdf, ...)  {
+         out_size, quiet, width, height, pdf_file, ...)  {
 
 
   sug.keep <- getOption("suggest")
   options(suggest = FALSE)
 
   manage.gr <- .graphman()  # see if graphics are to be managed
-  if (manage.gr  &&  !pdf) {
+  if (manage.gr && is.null(pdf_file)) {
     i.win <- 0
     for (i in 1:ncol(x)) {
       if (is.numeric(x[,i])  &&  !.is.num.cat(x[,i], n_cat)) 
@@ -49,12 +49,13 @@ function(x, n_cat, within,
 
         else {
 
-        if (pdf) {
-          pdf.fnm <- paste("BarChart_", x.name, ".pdf", sep="") 
-          .opendev(pdf.fnm, width, height)
-        } 
+        if (!is.null(pdf_file))  {
+          if (!grepl(".pdf", pdf_file))
+            pdf_file <- paste(pdf_file, ".pdf", sep="")
+          .opendev(pdf_file, width, height)
+        }
         else {
-          pdf.fnm <- NULL
+          pdf_file <- NULL
           plot.i <- plot.i + 1
           plot.title[plot.i] <- paste("BarChart of ", x.name, sep="")
           if (manage.gr) {
@@ -78,9 +79,9 @@ function(x, n_cat, within,
           add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out_size,
           quiet, ...)
 
-        if (pdf) {
+        if (!is.null(pdf_file)) {
           dev.off()
-          if (!quiet) .showfile(pdf.fnm, "bar chart")
+          if (!quiet) .showfile(pdf_file, "bar chart")
         }
 
         if (.is.integer(x[,i]) && nu <= n_cat && !quiet)
@@ -99,7 +100,7 @@ function(x, n_cat, within,
 
   options(suggest = sug.keep)
 
-  if (!pdf) {  # no evaluation for pdf is TRUE
+  if (is.null(pdf_file)) {  # no evaluation
     if (plot.i > 0) {
       if (is.null(options()$knitr.in.progress))
         .plotList(plot.i, plot.title)

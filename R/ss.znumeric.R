@@ -119,21 +119,13 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     xx <- na.omit(xx)
     if (n>0) m <- mean(xx)
     if (n>1) s <- sd(xx)
+
     # skewness:  adjusted Fisher-Pearson standardized moment coefficient
-    if (n>2) {
-      sk.coef <- n / ((n-1)*(n-2))
-      sk.sum <- 0
-      for (j in 1:n) sk.sum <- sk.sum + (( (xx[j]-m) / s)^3) 
-      sk <- sk.coef * sk.sum
-    }
+    sk <- skew(xx)
+
     # kurtosis
-    if (n>3) {
-      kt.coef1 <- (n*(n+1)) / ((n-1)*(n-2)*(n-3))
-      kt.coef2 <- 3 * ( ((n-1)^2) / ((n-2)*(n-3)) )
-      kt.sum <- 0
-      for (j in 1:n) kt.sum <- kt.sum + ( (xx[j]-m)^4 )
-      kt <- ( kt.coef1 * (kt.sum/(var(xx)^2)) ) - kt.coef2
-    }
+    kt <- kurtosis(xx)
+
     # order stats
     if (n > 0) {
       mn <- min(xx)

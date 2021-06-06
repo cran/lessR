@@ -1,5 +1,0 @@
-subs <-
-function(...)
-
-  Subset(...)
-

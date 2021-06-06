@@ -69,7 +69,7 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
          breaks="Sturges", cumulate=FALSE,
 
-         run=FALSE, lwd=2, area_fill="transparent", area_origin=0, 
+         run=FALSE, lwd=1.5, area_fill="transparent", area_origin=0, 
          center_line=c("off", "mean", "median", "zero"),
          show_runs=FALSE, stack=FALSE,
          
@@ -391,8 +391,8 @@ vp(\ldots)
        if only a run chart or time series chart, then to area under
        line segments. But \code{area_fill} takes precedence over \code{fill}
        for the area under the line segments, which is needed to provide both
-       fill for points and this area. Like \code{fill}, the value of \code{"on"}
-       sets the default fill color for points.}
+       fill for points and this area. If \code{stack} is \code{TRUE}, then
+       default fill is gradation from default color range, e.g., \code{"blues"}.}
   \item{area_origin}{Origin for the filled area under the time series line. Values
        less than this value are below the corresponding reference line, values
        larger are above the line.}
@@ -415,7 +415,7 @@ vp(\ldots)
   \item{main}{Label for the title of the graph.  If the corresponding variable
        labels exist,
        then the title is set by default from the corresponding variable labels.}
-  \item{sub}{Sub-title of graph, below \code{xlab}.}
+  \item{sub}{Sub-title of graph, below \code{xlab}. Not yet implemented.}
   \item{lab_adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
        the position of the axis labels in approximate inches. + values move
        the labels away from plot edge. Not applicable to Trellis graphics.}
@@ -508,7 +508,8 @@ vp(\ldots)
         1-D scatterplots and when in RStudio.}
   \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
         the pdf file.}
-  \item{fun_call}{Function call. Used with \code{knitr} to pass the function call when
+  \item{fun_call}{Function call. Used with \code{knitr} to pass the function
+        call when
         obtained from the abbreviated function call \code{sp}.}\cr
 
   \item{\ldots}{Other parameter values for non-Trellis graphics as defined by and

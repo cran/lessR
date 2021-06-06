@@ -72,7 +72,7 @@ Model(Y ~ X1 + X2)
 
 # Logit analysis
 # Y is binary, 0 or 1
-d <- Recode(Ybin, old=c(1,2), new=c(0,1), quiet=TRUE)
+d <- recode(Ybin, old=c(1,2), new=c(0,1), quiet=TRUE)
 Model(Ybin ~ X1)
 
 # t-test

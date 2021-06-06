@@ -136,6 +136,17 @@ reg_brief(Salary ~ 1, plot_errors=TRUE)
 Can also get the null model output from the __lessR__ function `Plot()` with the `fit` parameter set to `"null"`.
 
 
+## Likert Type Data
+
+When both variables consists of less than 10 unique integer values, the scatterplot is displayed as a bubble plot. This way there is no overprinting of the same point so that the number of values that represent a point is displayed.
+
+```{r likert, fig.width=4.5, fig.height=4.5}
+dd <- Read("Mach4")
+reg_brief(m10 ~ m02, data=dd)
+```
+
+
+
 ## Interpreted Output
 
 The parameter `Rmd` creates an R markdown file that is automatically generated and then the corresponding html document from knitting the various output components together with full interpretation. A new, much more complete form of computer output.

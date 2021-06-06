@@ -78,7 +78,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
     
-    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=ctitle)
+    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=ctitle, sub=NULL)
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm
@@ -119,19 +119,21 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     col_fill <- getOption("pt_fill")
     col_color <- getOption("pt_color")
     
-    eq.int <- TRUE
-    if (is.numeric(x.values)) {
-      d.x <- diff(x.values) 
-      for (i in 2:(length(d.x)))
-        if ((abs(d.x[i-1] - d.x[i]) > 1.0000000001)) eq.int <- FALSE
-    }
+# using the eq.int criterion for bubble plot does not account for missing data
+#   eq.int <- TRUE
+#   if (is.numeric(x.values)) {
+#     d.x <- diff(x.values) 
+#     for (i in 2:length(d.x))
+#       if ((abs(d.x[i-1] - d.x[i]) > 1.0000000001)) eq.int <- FALSE
+#   }
 
     # Plot points
     # -----------
     ux <- length(unique(x.values))
     uy <- length(unique(y.values))
-    if ((ux>10 && uy>10) || !eq.int || is.numeric(x.values) ||
-         is.numeric(y.values)) {
+    if ((ux>10 && uy>10) || !.is.integer(x.values) || !.is.integer(y.values)) {
+#   if ((ux>10 && uy>10) || !eq.int || is.numeric(x.values) ||
+#        is.numeric(y.values)) {
       points(x.values, y.values, pch=21, col=col_color, bg=col_fill,
              cex=size.pt)
     }
@@ -154,7 +156,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
           }
         }
       }
-      cords <- data.frame(xx, yy, count, stringsAsFactors=TRUE)
+      cords <- data.frame(xx, yy, count)
 
       power <- 0.6
       sz <- cords[,3]**power  # radius unscaled 
@@ -256,6 +258,6 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
   }
 
   # just generated plot
-  invisible(list(i=plt.i, ttl=plt.title))
+  return(invisible(list(i=plt.i, ttl=plt.title)))
 
 }

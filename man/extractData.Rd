@@ -54,7 +54,7 @@ d[1:3, .(Years:Salary, Post)]
 #  include first three rows and delete the specified variables
 d[1:3, -.(Years:Salary, Post)]
 
-# rows and columns
+# select rows and columns
 d[.(Gender=="M" & Post>90), .(Years:Salary, Post)]
 
 # because of the default for the base R Extract function [ ],

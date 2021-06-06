@@ -79,8 +79,9 @@ Read2(\ldots, sep=";", dec=",")
   \item{sep}{Character that separates adjacent values in a text file of data.}
   \item{dec}{Character that serves as the decimal separator in a number.}
   \item{max_lines}{Maximum number of lines to list of the data and labels.}
-  \item{sheet}{For Excel files, specifies the work sheet to read. The default is the
-        first work sheet.}
+  \item{sheet}{For Excel files, specifies the work sheet to read. Provide either
+       the worksheet number according to its position, or its name enclosed in
+       quotes. The default is the first work sheet.}
   \item{brief}{If \code{TRUE}, display only variable names table plus any variable
        labels.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change the corresponding
@@ -116,7 +117,7 @@ R DATA\cr
 Relies upon the standard R function \code{load}. By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{d}, with the \code{lessR} function \code{\link{Write}}.
 
 Excel DATA\cr
-Relies upon the function \code{\link{read.xlsx}} from Alexander Walker's \code{openxlsx} package. Files with a file type of \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The \code{read.xlsx} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file, with a default value of 1. The \code{row.names} parameter can only have a value of 1. Dates stored in Excel as an Excel date type are automatically read as an R Date type.  
+Relies upon the function \code{\link{read.xlsx}} from Alexander Walker's \code{openxlsx} package. Files with a file type of \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The \code{read.xlsx} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file, with a default value of 1. The \code{row.names} parameter can only have a value of 1. Dates stored in Excel as an Excel date type are automatically read as an R Date type. See the help file for \code{\link{read.xlsx}} for additional parameters, such as \code{sheet} for the name or number of the worksheet to read and \code{startRow} for the row number for which to start reading data.  
 
 lessR DATA\cr
 \code{lessR} has some data sets included with the package: "BodyMeas", "Cars93", "Employee", "Jackets", "Learn", "Mach4", "Reading", and "StockPrice".  \code{Read} reads each such data set by specifying its name, such as \code{Read("Employee")}. No specificaiton of \code{format} and no provided filetype, just enter the name of the data set. 

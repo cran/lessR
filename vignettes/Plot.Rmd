@@ -12,40 +12,39 @@ vignette: >
 
 
 ```{r, include=FALSE}
-knitr::opts_chunk$set(fig.width=4, fig.height=3.5)
+knitr::opts_chunk$set(fig.width=4.5, fig.height=4)
 ```
 
 ```{r}
 library("lessR")
-style()
 ```
 
 
-To illustrate, first read the Employee data included as part of __lessR__.
+__lessR__ provides many versions of a scatter plot with its `Plot()` function. To illustrate, first read the Employee data included as part of __lessR__.
 
 ```{r read}
 d <- Read("Employee")
 ```
 
-__lessR__ provides many versions of a scatter plot with its `Plot()` function.
-
 
 ## Two Variables
 
-The regular scatterplot of two continuous variables.
+### Continuous Variables
+
+The typical scatterplot of two continuous variables.
 
 ```{r sp, fig.width=4.5}
 Plot(Years, Salary)
 ```
 
 
-The enhanced scatterplot with parameter `enhance`. 
+The enhanced scatterplot with parameter `enhance`. The visualization includes the mean of each variable indicated by the respective line through the scatterplot, the 95% confidence ellipse, labeled outliers, least-squares regression line with 95% confidence interval, and the corresponding regression line with the outliers removed. 
 
 ```{r spEnhance, fig.width=4.5}
 Plot(Years, Salary, enhance=TRUE)
 ```
 
-Plot the scatterplot with the non-linear best fit `"loess"` line. The three available values for the `fit` line are `"loess"` for non-linear, `"lm"` for linear, and `"null"` for the null model line, the flat line at the mean of $y$. Also, setting `fit` to `TRUE` sets `fit` to`"loess"`.
+Plot the scatterplot with the non-linear best fit `"loess"` line. The three available values for the `fit` line are `"loess"` for non-linear, `"lm"` for linear, and `"null"` for the null model line, the flat line at the mean of $y$. Also, setting `fit` to `TRUE` plots the `"loess"` line.
 
 For emphasis set `plot_errors` to `TRUE` to plot the residuals from the line.
 
@@ -54,25 +53,7 @@ Plot(Years, Salary, fit="loess", plot_errors=TRUE)
 ```
 
 
-Map variable _Pre_ to the points with the `size` parameter, a bubble plot.
-
-```{r size, fig.width=4.5}
-Plot(Years, Salary, size=Pre)
-```
-
-Plot against levels of categorical variable _Gender_ with the `by` parameter.
-
-```{r by, fig.width=5}
-Plot(Years, Salary, by=Gender)
-```
-
-
-The categorical variable can also generate Trellis plots with the `by` parameter.
-
-```{r, , fig.width=4.5, fig.height=4}
-Plot(Years, Salary, by1=Gender)
-```
-
+### Categorical Variables
 
 Two categorical variables result in a bubble plot of their joint frequencies.
 
@@ -80,13 +61,91 @@ Two categorical variables result in a bubble plot of their joint frequencies.
 Plot(Dept, Gender)
 ```
 
+A categorical variable plotted with a continuous variable results in the mean of the continuous variable displayed at each level of the categorical variable.
 
-## Distribution of a Single Variable
+```{r}
+Plot(Gender, Salary)
+```
+
+
+
+## Three Plus Variables
+
+Map a continuous variable, such as _Pre_, to the points with the `size` parameter, a bubble plot.
+
+```{r size, fig.width=4.5}
+Plot(Years, Salary, size=Pre)
+```
+
+Plot levels of categorical variable _Gender_ with the `by` parameter.
+
+```{r by, fig.width=6}
+Plot(Years, Salary, by=Gender)
+```
+
+
+The categorical variable can also generate Trellis plots with the `by1` parameter.
+
+```{r, fig.width=4.5, fig.height=4}
+Plot(Years, Salary, by1=Gender)
+```
+
+
+Can have a second categorical variable in the Trellis plot with a `by2` parameter. Can also combine with the `by` parameter. Here also request the linear model fit line with `fit` set to `"lm"`.
+
+```{r, fig.width=6, fig.height=5}
+Plot(Years, Salary, by1=Dept, by2=Gender, by=Plan, fit="lm")
+```
+
+
+Indicate multiple variables to plot along either axis with a vector defined according to the base R function `c()`. Plot the linear model for each variable according to the `fit` parameter set to `"lm"`. Turn off the confidence interval by setting the standard errors to zero with `fit_se` set to `0`.
+
+```{r three, fig.width=5, fig.height=4}
+Plot(c(Pre, Post), Salary, fit="lm", fit_se=0)
+```
+
+
+## Scatterplot Matrix
+
+Three or more variables can plot as a scatterplot matrix. For the first parameter value, pass a single vector such as defined by `c()`. Request the non-linear fit line by specifying `TRUE` or `loess` for the `fit` parameter. Request a linear fit line with the value of `"lm"`.
+
+```{r spmat, , fig.width=5, fig.height=5}
+Plot(c(Salary, Years, Pre, Post), fit=TRUE)
+```
+
+
+## Smoothed Scatterplot
+
+For more than 2500 points, `Plot()` smooths the scatterplot by default. Generate random data with base R `rnorm()`, then plot. `Plot()` also plots these variables from the global environment (workspace) instead of from a data frame.
+
+```{r}
+x <- rnorm(5000)
+y <- rnorm(5000)
+Plot(x, y)
+```
+
+The individual points superimposed on the smoothed plot are potential outliers. The default number plotted is 100. Turn off completely by setting parameter `smooth_points` to `0`.
+
+Another option is to turn smoothing off, with the `smooth` parameter set to `FALSE`, and then turn on a high level of transparency, setting `trans` to `0.97`. Here change the theme for this plot to `slatered` with the `theme` parameter.
+
+```{r}
+Plot(x, y, smooth=FALSE, trans=.97, theme="slatered")
+```
+
+
+## One Variable
 
 The default plot for a single continuous variable includes not only the scatterplot, but also the violin plot and box plot, with outliers identified. Call this plot the VBS plot.
 
 ```{r}
 Plot(Salary)
+```
+
+Meaningful if the data value for a numerical variable are ordered sequentially, such as by time, can also plot a run chart of a single variable according to the parameter `run`. Analogous to a time series visualization, the run chart plots the data values sequentially, but without dates or times.
+
+
+```{r}
+Plot(Salary, run=TRUE)
 ```
 
 
@@ -95,6 +154,7 @@ For a single categorical variable, get the corresponding bubble plot of frequenc
 ```{r}
 Plot(Dept)
 ```
+
 
 
 ## Cleveland Dot Plot
@@ -120,6 +180,11 @@ Plot(c(Pre, Post), row_names)
 
 ## Time Series
 
+`Plot()` can plot from three different forms of the data: long-form, wide-form, and a time-series object.
+
+
+### Long-Format Data
+
 Read time series data of stock _Price_ for three companies: Apple, IBM, and Intel. The data table is in long form, part of __lessR__.
 
 
@@ -129,7 +194,9 @@ d[1:5,]
 ```
 
 
-Activate a time series plot by setting the $x$-variable to a variable of R type `Date`, which is true of the variable _date_ in this data set. Here plot just for _Apple_.
+Activate a time series plot by setting the $x$-variable to a variable of R type `Date`, which is true of the variable _date_ in this data set. Can also plot a time series by passing a time series object, created with the base R function `ts()` as the variable to plot.
+
+Here plot just for _Apple_, with the two variables _date_ and _Price_, stock price. The parameter `rows` specifies what rows of the input data frame to retain for the analysis.
 
 ```{r}
 Plot(date, Price, rows=(Company=="Apple"))
@@ -141,6 +208,12 @@ With the `by` parameter, plot all three companies on the same panel.
 Plot(date, Price, by=Company)
 ```
 
+Stack the plots.
+
+```{r, fig.width=5}
+Plot(date, Price, by=Company, stack=TRUE)
+```
+
 
 With the `by1` parameter, plot all three companies on the different panels, a Trellis plot.
 
@@ -148,12 +221,44 @@ With the `by1` parameter, plot all three companies on the different panels, a Tr
 Plot(date, Price, by1=Company)
 ```
 
-Now do the Trellis plot with some color.
+Do the Trellis plot with some color. Then return to the default style.
 
 ```{r, fig.width=4.5}
-style(sub_theme="black", trans=.55,
-      window_fill="gray10", grid_color="gray25")
-Plot(date, Price, by1=Company, n_col=1,  fill="darkred", color="red")
+style(sub_theme="black", window_fill="gray10")
+Plot(date, Price, by1=Company, n_col=1,  fill="darkred", color="red", trans=.55)
+style()
+```
+
+Stack the three time series, fill under each curve with a version of the __lessR__ sequential range `"emeralds"`.
+
+```{r, fig.wdith=6.5}
+Plot(date, Price, by=Company, trans=0.4, stack=TRUE, area_fill="emeralds")
+```
+
+### Wide-Format Data
+
+`Plot()` also reads wide-format data. First convert the long form as read to the wide form. In the wide form, the three companies each have their own column of data, repeated for each date.
+
+```{r}
+dw <- reshape(d, direction = "wide",
+        idvar = "date", timevar = "Company",
+        varying = list(c("Apple", "IBM", "Intel")))
+head(dw)
+```
+
+Now the analysis, which repeats a previous analysis, but with wide-form data. Because the data frame is not the default _d_, explicitly indicate with the `data` parameter.
+
+```{r, fig.wdith=6.5}
+Plot(date, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
+```
+
+### Time-Series Object Data
+
+Can also plot directly from an R time series object, created with the base R `ts()` function.
+
+```{r, fig.wdith=5}
+a1.ts <- ts(dw$Apple, frequency=12, start=c(1980, 12))
+Plot(a1.ts)
 ```
 
 
@@ -163,10 +268,11 @@ With `style()` many themes can be selected, such as `"lightbronze"`, `"dodgerblu
 style()
 ```
 
+
 ## Annotation
 
 ```{r}
-d <- Read("Employee")
+d <- Read("Employee", quiet=TRUE)
 ```
 
 Add three different text blocks at three different specified locations.

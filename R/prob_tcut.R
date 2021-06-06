@@ -88,7 +88,7 @@ function(df, alpha=0.05, digits_d=3, y_axis=FALSE,
 
   # Right Tail
   x2min <- qt(1-tail.area, df=df)
-  qntl <- x2min
+  cutoff <- x2min
   x <- seq(x2min,x2max,by=.01)
   y <- dt(x,df=df)
   polygon(c(x2min,x,x2max), c(0,y,0), col=color_tail, border=nrm_color)
@@ -133,7 +133,8 @@ function(df, alpha=0.05, digits_d=3, y_axis=FALSE,
     .showfile(pdf_file, "t-curve probability")
   }
 
-  cat("Probability: ", qntl, "\n")
+  cat("Probability: ", cutoff, "\n")
+  return(invisible(cutoff))
 
 }
 

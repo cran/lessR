@@ -1,5 +1,0 @@
-srt <-
-function(...)
-
-  Sort(...)
-

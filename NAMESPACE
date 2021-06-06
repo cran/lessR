@@ -14,11 +14,12 @@ importFrom("viridisLite", viridis, cividis, magma, inferno, plasma)
 #importFrom("MBESS", ci.smd)
 #importFrom("randomcoloR", distinctColorPalette)
 
+
 importFrom("graphics", abline, arrows, axis, axis.Date, barplot, box, boxplot, grconvertX, grconvertY, hist, legend, lines, mtext, pairs, par, pie, plot, plot.default, plot.new, plot.window, points, polygon, rasterImage, rect, rug, segments, stripchart, strwidth, sunflowerplot, symbols, text, title, axTicks, smoothScatter)
 
 importFrom("grDevices", boxplot.stats, col2rgb, colorRampPalette, colors, dev.list, dev.new, dev.off, dev.set, gray, heat.colors, hcl, palette, pdf, rainbow, rgb, terrain.colors, as.graphicsAnnot)
 
-importFrom("stats", confint.default, IQR, TukeyHSD, addmargins, anova, aov, as.formula, bw.nrd0, chisq.test, coef, complete.cases, confint, cooks.distance, cor, cor.test, cov, density, dffits, dlnorm, dnorm, dt, dunif, factanal, fitted, frequency, glm, heatmap, interaction.plot, lm, lm.influence, loadings, loess, lowess, median, mahalanobis, na.omit, pf, pnorm, power.t.test, predict, promax, pt, qnorm, qt, quantile, rbinom, replications, residuals, rlnorm, rnorm, reshape, rstandard, rstudent, runif, sd, shapiro.test, start, t.test, terms.formula, update, var, varimax, is.ts, time,  weighted.mean, fivenum, as.dist, hclust, cutree, aggregate)
+importFrom("stats", binom.test, confint.default, IQR, TukeyHSD, addmargins, anova, aov, as.formula, bw.nrd0, chisq.test, coef, complete.cases, confint, cooks.distance, cor, cor.test, cov, density, dffits, dlnorm, dnorm, dt, dunif, factanal, fitted, frequency, glm, heatmap, interaction.plot, lm, lm.influence, loadings, loess, lowess, median, mahalanobis, na.omit, pf, pnorm, prop.test, power.t.test, predict, promax, pt, qnorm, qt, quantile, rbinom, replications, residuals, rlnorm, rnorm, reshape, rstandard, rstudent, runif, sd, shapiro.test, start, t.test, terms.formula, update, var, varimax, is.ts, time,  weighted.mean, fivenum, as.dist, hclust, cutree, aggregate)
 
 importFrom("utils", head, help, packageVersion, read.csv, read.fwf, read.table, type.convert, write.csv, write.table, browseURL)
 
@@ -53,7 +54,7 @@ export (
   corCFA, cfa, scales,
   corRead, rd.cor,
   corReorder, reord, 
-  corReflect, reflect, corProp, prop, corRead,
+  corReflect, reflect, corProp, cp, corRead,
   corScree, scree, corEFA, efa,
   Density, dn,
   details, db,
@@ -61,6 +62,7 @@ export (
   getColors,
   Help,
   Histogram, hs,
+  kurtosis,
   label,
   LineChart, lc,
   Logit, lr,
@@ -72,15 +74,16 @@ export (
   Plot, 
   print.out_all, print.out,
   prob_norm, prob_znorm, prob_tcut,
+  Prop_test, prop,
   Read, rd, rd_lbl, Read2,
   Regression, reg, reg_brief, regPlot, 
-  Recode, rec, Rescale,
+  recode, rescale,
   set, showColors, showPalettes,
   simCImean, simCLT, simFlips, simMeans,
   ScatterPlot, sp, 
-  see,
-  Sort, srt,
-  Subset, subs,
+  see, skew,
+  Sort,
+  Subset,
   SummaryStats, ss, ss_brief,
   style,
   to,

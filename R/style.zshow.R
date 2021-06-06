@@ -4,8 +4,8 @@ function() {
     cat("\nAvailable Themes\n")
     cat("----------------\n")
     cat("colors", "lightbronze",  "dodgerblue", "darkred", "gray", "gold",
-        "darkgreen", "blue", "red", "rose", "green", "purple", "sienna",
-        "brown", "orange", "white", "light", "\n")
+        "darkgreen", "blue", "red", "rose", "slatered", "green", "purple",
+        "sienna", "brown", "orange", "white", "light", "\n")
 
     cat("\nAvailable Sub-themes\n")
     cat("--------------------\n")
@@ -203,7 +203,7 @@ function() {
         getOption("brief"), "\n")
     cat("suggest ... Suggestions for enhanced input ..............",
         getOption("suggest"), "\n")
-    cat("note ... Notes for enhanced input ..............",
+    cat("note ...... Notes for enhanced input ....................",
         getOption("note"), "\n")
     cat("width ..... Column width ................................",
         getOption("width"), "\n")

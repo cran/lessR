@@ -1,6 +1,12 @@
 Transform <-
   function(data=d, quiet=getOption("quiet"), ...) {
 
+
+  message("This function is deprecated, instead use base R  transform\n",
+          "or just enter the transformation formula directly\n",
+          "Example,  d$Xsq <- d$X^2\n",
+          "  to create a squared version of Variable X in the d data frame\n")
+
   # save variable labels (NULL if no labels) 
   l <- attr(data, which="variable.labels")
 

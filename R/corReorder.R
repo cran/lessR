@@ -230,7 +230,7 @@ function (R=mycor, order=c("hclust", "chain", "manual", "as_is"),
 
   # finish
   cat("\n")
-  invisible(R)
+  return(invisible(R))
 
 }
 

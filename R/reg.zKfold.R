@@ -1,5 +1,5 @@
 .regKfold <-
-function(data, my_formula, kfold, rescale, nm, predictors, n.vars,
+function(data, my_formula, kfold, new_scale, nm, predictors, n.vars,
          n.keep, seed, digits_d=NULL, show_R) {
 
   dd <- data  # store original in case rescaling each fold
@@ -30,14 +30,14 @@ function(data, my_formula, kfold, rescale, nm, predictors, n.vars,
   for (i in 1:kfold) {
     train <- which(nk != (i-1)) # combine all other folds
     test <- which(nk == (i-1))  # one test fold
-    if (rescale != "none") {  # separate rescaling for train and test data
+    if (new_scale != "none") {  # separate rescaling for train and test data
       for (j in 1:n.vars)  {
-        dd[train,nm[j]] <- Rescale(data[train,nm[j]], data=NULL,
-                                kind=rescale, digits_d)
-        dd[test,nm[j]] <- Rescale(data[test,nm[j]], data=NULL,
-                                kind=rescale, digits_d)
+        dd[train,nm[j]] <- rescale(data[train,nm[j]], data=NULL,
+                                kind=new_scale, digits_d)
+        dd[test,nm[j]] <- rescale(data[test,nm[j]], data=NULL,
+                                kind=new_scale, digits_d)
       }  # end for (i in 1:n.vars)
-    }  # end rescale != "none"
+    }  # end new_scale != "none"
 
     d_test = na.omit(dd[test, nm])
     k_n[i] <- nrow(d_test)

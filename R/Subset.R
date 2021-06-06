@@ -2,6 +2,10 @@ Subset <-
 function(rows, columns, data=d, holdout=FALSE,
     random=0, quiet=getOption("quiet"), ...) {
 
+  message("This Subset() function is deprecated\n",
+          "Instead use .() or base R subset()\n",
+          "For more information, enter:  ?.")
+
   # save variable labels, units (NULL if no labels, units) 
   l <- attr(data, which="variable.labels")
   myunits <- attr(data, which="variable.units")

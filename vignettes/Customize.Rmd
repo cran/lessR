@@ -1,5 +1,5 @@
 ---
-title: "Custom Colors"
+title: "Customize"
 author: "David Gerbing"
 output: 
   rmarkdown::html_vignette:
@@ -16,10 +16,11 @@ knitr::opts_chunk$set(fig.width=4, fig.height=3.5)
 
 ```{r}
 library("lessR")
+d <- Read("Employee")
 ```
 
 
-## `getcolors()`
+## Color Palates
 
 The `getColors()` function can generate a variety of color palates. Use them to, for example, fill the bars in a histogram or bar chart with the  `fill` parameter.
 
@@ -49,44 +50,65 @@ getColors(n=36, shape="wheel", border="off")
 Obtain deep rich colors for HCL qualitative scale.
 
 ```{r}
-getColors(c=90, l=45)
+BarChart(Dept, fill=getColors(c=90, l=45))
 ```
 
 
 
-### Scales
+### Sequential Scales
 
-Generate an hcl blue sequence with `c=60` and vary `l`.
-```{r}
-getColors("blues", labels=FALSE)
-```
+__lessR__ provides pre-defined sequential color scales across the range of hues around the color wheel: `"reds"`, `"rusts"`, `"browns"`, `"olives"`, `"greens"`, `"emeralds"`, `"turqoises"`, `"aquas"`, `"blues"`, `"purples"`, `"biolets"`, `"magentas"`, and `"grays"`.
 
 
-Vary chroma for a yellow hcl sequence.
+To view the scales, use the function `showPalettes()`. Here it is commented out by the `#` sign in the first column because it writes the output to a pdf.
 
 ```{r}
-getColors("browns", c=c(20,90), l=60)
+#showPalettes()
+```  
+
+Generate a bar chart with blue hues.
+
+```{r}
+BarChart(Dept, fill=getColors("blues"))
 ```
 
+Generate an `hcl` blue sequence with `c=60` and vary `l`.
+
+```{r}
+BarChart(Dept, fill=getColors("blues", c=60, l=c(30,80)))
+```
+
+
+Vary chroma for a yellow `hcl` sequence.
+
+```{r}
+BarChart(Dept, fill=getColors("browns", c=c(20,90), l=60))
+```
+
+Stack the three time series, fill under each curve with a version of the sequential range `"reds"` with some transparency.
+
+```{r, fig.width=6}
+d <- Read("StockPrice", quiet=TRUE)
+Plot(date, Price, by=Company, trans=0.4, stack=TRUE, area_fill="reds")
+d <- Read("Employee", quiet=TRUE)
+```
 
 
 ### Divergent Scales
 
-Generate seven colors from rust to blue.
+Generate colors from rust to blue.
 
 ```{r}
-getColors("rusts", "blues", n=7)
+BarChart(Dept, fill=getColors("rusts", "blues"))
 ```
 
 Add a custom value of chroma, `c`, to make less saturated.
 ```{r}
-getColors("rusts", "blues", n=7, c=45)
+BarChart(Dept, fill=getColors("rusts", "blues", c=45))
 ```
 
-Apply to a bar chart. Any call to `getColors()`, for example, can be applied to the standard `fill` parameter.
 
 ```{r}
-d <- Read("Employee")
 BarChart(Dept, fill=getColors(c=90, l=45))
 ```
 
@@ -105,7 +127,7 @@ getColors(pal="aliceblue", end_pal="blue")
 ```
 
 
-## `style()`
+## Visualization Themes
 
 The `style()` function specifies broad color themes, as well as individual characteristics of a visualization. Changes are persistent across subsequent visualizations unless again modified.
 
@@ -132,7 +154,7 @@ Return to the default theme, `"colors"`.
 style()
 ```
 
-View all modifiable individual characteristics with the `show` parameter, set to `TRUE`.
+View all modifiable individual characteristics with the `show` parameter set to `TRUE`.
 
 ```{r}
 style(show=TRUE)

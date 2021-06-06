@@ -4,7 +4,7 @@ function(x, cor.coef=TRUE, fit="loess",
          col.fit=getOption("fit_color"), col.bg=getOption("panel_fill"),
          col.box=getOption("panel_color")) {
 
-
+  if (is.logical(fit)) if (fit) fit <- "loess"
   if (is.null(fit)) fit <- "loess"
 
   if (getOption("sub_theme") == "black") col_color <- getOption("lab_color")
@@ -60,7 +60,7 @@ function(x, cor.coef=TRUE, fit="loess",
 
   text.diag <- function(x, y, nm, ...) {  # nm from calling routine
     usr <- par("usr")          
-    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("ellipse_fill"),
+    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("se_fill"),
          border=col.box)
     #rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
     txt <-  nm  # nm from parameter list, so adjusts for each panel

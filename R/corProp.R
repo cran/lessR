@@ -101,6 +101,6 @@ function (R=mycor,
 
   # finish
   cat("\n")
-  invisible(round(R,2))
+  return(invisible(round(R,2)))
 
 }

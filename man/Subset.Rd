@@ -1,11 +1,12 @@
 \name{Subset}
 \alias{Subset}
-\alias{subs}
 
 \title{Subset the Values of One or More Variables}
 
 \description{
 Abbreviation: \code{subs}
+
+Deprecated, use \code{\link{.}} instead in conjunction with base R \code{link{Extract}}.
 
 Based directly on the standard R \code{\link{subset}} function to only include or exclude specified rows or data, and for specified columns of data.  Output provides feedback and guidance regarding the specified subset operations. Rows of data may be randomly extracted, and also with the code provided to generate a hold out validation sample created. The hold out sample is created from the original data frame, usually named d, so the subset data frame must be directed to a data frame with a new name or the data re-read to construct the holdout sample. Any existing variable labels are retained in the subset data frame.
 
@@ -14,8 +15,6 @@ Based directly on the standard R \code{\link{subset}} function to only include o
 \usage{
 Subset(rows, columns, data=d, holdout=FALSE,
        random=0, quiet=getOption("quiet"), \ldots)
-
-subs(\ldots)
 }
 
 \arguments{
@@ -67,8 +66,6 @@ d <- read.table(text="Severity Description
 
 # only include those with a value of Moderate for Description
 d <- Subset(rows=Description=="Moderate")
-# use abbreviation and do not need the rows= for the first argument
-d <- subs(Description=="Moderate")
 
 # locate, that is, display only, the 2nd and 4th rows of data
 Subset(row.names(d)=="2" | row.names(d)=="4")

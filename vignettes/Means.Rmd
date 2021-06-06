@@ -110,7 +110,13 @@ Can also obtain the cell mean plot directly from the means. Here use __lessR__ `
 ```{r}
 data(warpbreaks)
 dm <- pivot(warpbreaks, mean, breaks, c(tension, wool))
-Plot(tension, breaks, by=wool, segments=TRUE, size=2, data=dm, main="Cell Means")
+dm
+```
+
+The aggregated data is stored in the data frame named _dm_, so explicitly identify with the `data` parameter. The computed mean of _breaks_ variable in the _dm_ data frame from the previous call to `pivot()` is named *breaks_mn* by default.
+
+```{r}
+Plot(tension, breaks_mn, by=wool, segments=TRUE, size=2, data=dm, main="Cell Means")
 ```
 
 

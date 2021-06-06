@@ -1,7 +1,6 @@
-Recode <-
+recode <-
 function(old_vars, new_vars=NULL, old, new, data=d,
          quiet=getOption("quiet"), ...) {
-
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -34,7 +33,7 @@ function(old_vars, new_vars=NULL, old, new, data=d,
 
 
   my.vars <- as.list(seq_along(data))
-  names(my.vars) <- names(data)
+  names(my.vars) <- names(data)  # vars is ordinal position of variables in d
   vars <- eval(substitute(old_vars), envir=my.vars, enclos=parent.frame())
 
   if (!is.null(new_vars)) {
@@ -57,7 +56,7 @@ function(old_vars, new_vars=NULL, old, new, data=d,
         "Variable to recode is a factor: ", names(data)[vars[ivar]], "\n",
         "Doing this recode would remove the factor attribute.\n\n",
         "Instead, recode with the levels argument of the function: factor.\n",
-        "Enter  ?Recode  and see last example to illustrate.\n\n")
+        "Enter  ?recode  and see last example to illustrate.\n\n")
     }
   }
 
@@ -96,11 +95,11 @@ function(old_vars, new_vars=NULL, old, new, data=d,
     x.call <- as.vector(eval(substitute(data[,vars[ivar]])))
 
     n.obs <- nrow(data)
-    new.var <- new_vars[ivar]
     new.x <- .rec.main(x.call, x.name, new_vars[ivar], old, new, ivar,
                         n.obs, dname, quiet)
 
     # insert transformation into data
+    new.var <- new_vars[ivar]
     nm <- names(data)
     if (is.null(new.var))
       data[, which(nm == x.name)] <- new.x

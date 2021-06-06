@@ -1,19 +1,14 @@
 \name{Sort}
 \alias{Sort}
-\alias{srt}
 
 \title{Sort the Rows of a Data Frame}
 
 \description{
-Abbreviation: \code{srt}
-
 Sorts the values of a data frame according to the values of one or more variables contained in the data frame, or the row names.  Variable types include numeric and factor variables.  Factors are sorted by the ordering of their values, which, by default is alphabetical. Sorting by row names is also possible.
 }
 
 \usage{
 Sort(data=d, by, direction=NULL, quiet=getOption("quiet"), ...)
-
-srt(\ldots)
 }
 
 \arguments{
@@ -59,16 +54,9 @@ d <- read.table(text="Severity Description
 #   in ascending order
 d <- Sort(d, Severity)
 
-# abbreviated form, replace original with sorted
-d <- srt(d, Severity)
-
 # sort Description in descending order, sort Severity within
 #  each level of Description in ascending order
 d <- Sort(d, c(Description, Severity), direction=c("-", "+"))  
-
-# data in a different data frame than d
-d <- Read("Employee")
-d <- Sort(d, Gender)
 
 # sort by row names in ascending order
 d <- Sort(d, row.names)

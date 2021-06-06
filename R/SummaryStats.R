@@ -2,6 +2,13 @@ SummaryStats <-
 function(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"), 
     digits_d=NULL, brief=getOption("brief"), label_max=20, ...)  {
 
+  message(">>> Deprecated<<<\n\n",
+      "New, more flexible replacement is the pivot() function.\n",
+      "For inferential tests of proportions, the Prop_test() function.\n",
+      "For explanation see the vignettes.\n\n",
+      "Enter: browseVignettes(\"lessR\")\n",
+      "Select: Summary Statistics with a Pivot Table\n",
+      "Select: Proportion Inference\n\n")
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -176,6 +183,13 @@ function(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"),
     stuff <- .ss.numeric(x.call, y.call, digits_d, brief, y.name=nm, ...)
     txsts <- stuff$tx
     txotl <- .bx.stats(x.call)$txotl
+
+  message("The analysis of a numeric variable with this function",
+          "is deprecated\n",
+          "Instead use the more comprehensive function pivot()\n\n",
+          "For more information, enter  browseVignettes(\"lessR\") and\n",
+          "select the Pivot Table vignette\n")
+
   }
 
   # ordered factors have two attributes, "ordered" and "factor"

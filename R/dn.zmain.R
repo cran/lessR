@@ -98,7 +98,7 @@ function(x,
   max.y <- max(max(d.nrm), max(d.gen$y), max(h$density))
 
   # set margins
-  margs <- .marg(0, y.lab=NULL, x.lab, main, lab_x_cex=lab_x_cex)
+  margs <- .marg(0, y.lab=NULL, x.lab, main, sub, lab_x_cex=lab_x_cex)
   lm <- margs$lm
   tm <- margs$tm
   rm <- margs$rm

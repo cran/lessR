@@ -9,7 +9,6 @@ Useful for large data frame. View the top-left corner of the specified data fram
 
 \usage{
 see(data, n_row=min(nrow(data), 5), n_col=min(ncol(data), 8))
-
 }
 
 \arguments{

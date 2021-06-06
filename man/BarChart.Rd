@@ -22,7 +22,7 @@ BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         gap=NULL, scale_y=NULL,
 
         theme=getOption("theme"),
-        fill=NULL,
+        fill=getOption("bar_fill_discrete"),
         color=getOption("bar_color_discrete"),
         trans=getOption("trans_bar_fill"),
         fill_split=NULL,
@@ -52,7 +52,7 @@ BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
         eval_df=NULL, quiet=getOption("quiet"),
-        width=6.5, height=6, pdf=FALSE, \ldots)
+        width=6.5, height=6, pdf_file=NULL, \ldots)
 
 bc(\ldots)
 }
@@ -136,7 +136,7 @@ bc(\ldots)
 
   \item{theme}{Color theme for this analysis. Make persistent across analyses
         with \code{\link{style}}.}
-  \item{fill}{Fill color of the bars, override the default with a vector
+  \item{fill}{Fill color of the bars. Override the default with a vector
         of colors: names, rgb, hex or hcl and many other possibilities from
         palettes such as viridis.
         Can generate these colors with pre-defined qualitative, sequential and
@@ -232,9 +232,9 @@ bc(\ldots)
         2 for \code{"prop"}, and if \code{"input"} and \code{y} is entered
         directly, display the literal value unless > 9999, in which case
         set to 0.}
-  \item{values_position}{Position of the plotted text. Default is inside the bar,
-        or, if \code{"out"}, as part of the label for each value
-        outside of the bar.}
+  \item{values_position}{Position of the plotted text. Default is \code{"in"} for
+        inside the bar, or, if \code{"out"}, the label for each value is placed
+        outside of the bar, on top.}
   \item{values_cut}{Threshold for displaying the value. If \code{values_position}
        equals \code{"out"}, then default is 0.028 unless there is a
        \code{by} variable or multiple x-variables on the same plot, then
@@ -253,7 +253,7 @@ bc(\ldots)
   \item{main}{Label for the title of the graph.
        Can set size with \code{main_cex} and color with \code{main_color} from the
        lessR \code{\link{style}} function.}
-  \item{sub}{Sub-title of graph, below \code{xlab}.}
+  \item{sub}{Sub-title of graph, below \code{xlab}. Not yet implemented.}
   \item{lab_adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
        the position of the axis labels in approximate inches. + values move
        the labels away from plot edge. Not applicable to Trellis graphics.}
@@ -293,9 +293,8 @@ bc(\ldots)
        \code{\link{style}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
-  \item{pdf}{If \code{TRUE}, indicate to direct pdf graphics
-       for each specified variable to a pdf file named BarChart_name.pdf
-       where \code{name} is the variable name.}
+  \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
+        the pdf file.}\cr
 
   \item{\dots}{Other parameter values for graphics as defined
       by \code{\link{barplot}}, \code{\link{legend}}, and \code{\link{par}} including
@@ -395,7 +394,7 @@ VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is listed as the label for the horizontal axis unless xlab is specified in the function call. If there are two variables to plot, the title of the resulting plot is based on the two variable labels, unless a specific title is listed with the \code{main} option. The variable label is also listed in the text output, next to the variable name. If the analysis is for two variables, then labels for both variables are included.
 
 PDF OUTPUT\cr
-To obtain pdf output, set the \code{pdf} option to \code{TRUE}, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
+To obtain pdf output, use the \code{pdf_file} option, perhaps with the optional \code{width} and \code{height} options. These files are written to the default working directory, which can be explicitly specified with the R \code{\link{setwd}} function.
 
 ONLY VARIABLES ARE REFERENCED\cr
 The referenced variable in a \code{lessR} function can only be a variable name (or list of variable names). This referenced variable must exist in either the referenced data frame, such as the default \code{d}, or in the user's workspace, more formally called the global environment. That is, expressions cannot be directly evaluated. For example:
@@ -544,7 +543,7 @@ BarChart(Dept, by=Gender, stack100=TRUE)
 BarChart(Gender, by=JobSat, fill="reds", values="off")
 
 # specify two fill colors for Gender
-BarChart(Dept, by=Gender, fill=getColors(c("deepskyblue", "black")))
+BarChart(Dept, by=Gender, fill=c("deepskyblue", "black"))
 
 # display bars beside each other instead of stacked, Female and Male
 # the levels of Dept are included within each respective bar
@@ -586,7 +585,7 @@ BarChart(m01:m20, horiz=TRUE, values="off", sort="+")
 \donttest{
 
 # custom scale with explicit call to getColors, HCL chroma at 50
-clrs <- getColors("greens", "purples", n=6, c=50)
+clrs <- getColors("greens", "purples", c=50)
 BarChart(m01:m20, horiz=TRUE, values="off", sort="+", fill=clrs)
 
 # custom divergent scale with pre-defined color palettes
@@ -638,7 +637,7 @@ BarChart(Dept, Salary)
 # use lessR pivot function to get summary table
 d <- Read("Employee")
 a <- pivot(d, mean, Salary, c(Dept,Gender))
-BarChart(Dept, Salary, by=Gender, data=a)
+BarChart(Dept, Salary_mn, by=Gender, data=a)
 # do so just with BarChart, display bars in grayscale
 # How does average salary vary by gender across the various departments?
 BarChart(Dept, Salary, by=Gender, stat="mean", data=d, fill="grays")

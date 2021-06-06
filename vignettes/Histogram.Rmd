@@ -32,7 +32,7 @@ One of the most frequently encountered visualizations for continuous variables i
 
 A call to a function to create a histogram contains the name of the continuous variable that contains the values to be plotted. With the `Histogram()` function, that variable name is the first argument passed to the function. In this example, the _only_ argument passed to the function is the variable name as the data frame is named _d_, the default value. The following illustrates the call to `Histogram()` with a continuous variable named $x$. 
 
-```{r hsform, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center'}
+```{r hsform, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center', out.extra='style="border-style: none"'}
 knitr::include_graphics(system.file("img", "hsExplain.png", package="lessR"))
 ```
 

@@ -161,7 +161,7 @@ function(ns, n, mu=0, sigma=1, seed=NULL,
   }
 
   for (i in 1:ns) {
-    if (pause) invisible(readline())
+    if (pause) return(invisible(readline()))
     cat(format(o[i], width=5, justify="right", sep=""))
     cat(format(sprintf("%.*f", digits_d, Ymean[i]), width=max.ln,
                justify="right", sep=""))

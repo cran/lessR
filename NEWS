@@ -4,7 +4,131 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
  
->>>>>> Changes for lessR version 3.9.9 (2021-01-09) <<<<<<
+>>>>>> Changes for lessR version 4.0.0 (2021-06-06) <<<<<<
+
+-------------
+Updates 4.0.0
+-------------
+
+BarChart
+  when fill or color set with getColors(), the value of n, the
+    number of colors, is provided according to the number of bars
+  when horiz is TRUE, order of sort changed so that "-" starts at top
+  space to separate the x-axis label when several lines revised
+  parameter pdf to pdf_file
+
+corProp
+  alias changed from prop to cp, so prop for new function Proportion
+
+Density
+  parameter pdf to pdf_file
+
+Histogram
+  parameter pdf to pdf_file
+
+kurtosis
+  new function for computing kurtosis, available for the pivot function
+
+pivot
+  choose any two of the following three parameters: multiple compute
+    functions, multiple values over which to compute, and multiple
+    grouping (by) variables
+  no by variables imply to do grand total(s) without an aggregation
+  sort parameter applies for a single aggregated numerical variable
+  sort_var parameter specifies the variable or column number to sort
+  for each non-decimal digit variable with unique data values, display
+    the variable name and the unique values to better label the output
+    when drilling down into levels of one or more categorical variables
+  compute quantiles function provides a standard data frame
+  compute table function provides a cross-classification table for a
+    discrete aggregated variable
+  table frequencies can be converted to proportions, and row and 
+    column proportions
+  out_names parameter to custom-name aggregated variables
+  parameter na_by renamed to na_by_show to better communicate its meaning
+  skew and kurtosis added to the list of available descriptive statistics
+  parameter q_num specifies number of intervals for quantiles 
+  parameter rows subsets rows of the data frame for analysis
+  parameter value changed to parameter variable
+  parameters rows_by and cols_by changed to by and by_cols
+
+Plot
+  scatterplot matrix does a loess fit if fit=TRUE
+  if multiple x or y variables, text correlation analysis displayed
+    for each combination
+  if a by variable, then text correlation for each level not yet
+    available, so not displayed 
+  default for plotting a fit line with by groups is to not plot the
+    standard errors because the plot becomes overcrowded
+  warning displayed if the date field or a by/by1 field is not ordered
+  stacked time series chart of different shades of same hue, such as
+    "blues" now have each sub-plot with a black border
+  Trellis plot distinguishes area_fill under a line from
+    fill for a point
+  radius value for bubble plot frequency matrix dependent on size of
+    largest frequency
+  radius value displayed for bubble plot frequency matrix
+
+prob_norm
+  probability is returned as the value of the function, not just printed
+
+prob_tcut
+  cutoff is returned as the value of the function, not just printed
+
+Prop_test
+  new function for the analysis of proportions: test of homogeneity for
+    one or more samples based on the proportion of successes for a specific
+    value of a variable, and for a single sample, goodness-of-fit for a 
+    single categorical variable and test of independence for two categorical
+    variables 
+  prop is alias
+  
+recode
+  changed to lower case function name 
+
+rescale
+  changed to lower case function name
+
+Regression
+  bubble plot form of a scatterplot for integer variables with less than 
+    10 unique values and a single predictor variable
+
+skew
+  new function for computing skew, available for the pivot function
+
+style
+  slatered theme added
+  ellipse_fill for default "colors" theme now a pale brown instead of blue
+
+
+---------------
+Bug Fixes 4.0.0
+---------------
+
+BarChart
+  with more than 30 categories, a message to indicate how to retrieve
+    now properly displays instead of crashing
+  fill=(count) would fail for a large number of levels
+  stacked bars from multiple items now works with variable labels
+  stacked bars from multiple items now works for binary responses
+
+Extract
+  now works if name of data frame is a function in another context
+  now works even if one variable name is embedded in another name
+
+Plot
+  forcing an evaluation of a scalar logical on a vector fixed
+  theme parameter works for most common parameters
+  bubble plot frequency matrix text output works with labels
+  bubble plot frequency matrix plot x-axis works with binary response
+  area_fill works correctly
+ 
+ttest
+  for paired analysis, x-axis properly labeled Difference
+
+
+
+>>>>>> Changes for lessR version 3.9.9 (2021-01-10) <<<<<<
 
 -------------
 Updates 3.9.9
@@ -20,7 +144,7 @@ pivot
   original variable type for Date, character, and integer are retained
     in the aggregate summary file instead of left as factors, the 
     standard output of the base R aggregate function
-  column of a single by variables now the original variable name
+  column of a single by variable now the original variable name
 
 Plot
   specify plot_errors=TRUE turns off confidence interval about the reg line
@@ -177,7 +301,7 @@ Read
 Bug Fixes 3.9.6
 ---------------  
 
-foreign package dropped, lessR no longer requires at least R 4.0.0 
+Package foreign is dropped, lessR no longer requires at least R 4.0.0 
 
 
  
@@ -199,6 +323,7 @@ BarChart
 Read
   read_brief() and read.brief() removed as no longer needed given that
     brief is now the default, use details() to see the full analysis
+    of the data file
 
 style
   "hues" palette hues and transparency aligned with the initial

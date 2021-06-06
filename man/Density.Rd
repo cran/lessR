@@ -31,7 +31,7 @@ Density(x, data=d, rows=NULL,
        rug=FALSE, color_rug="black", size_rug=0.5,
 
        eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
-       width=4.5, height=4.5, pdf=FALSE,
+       width=4.5, height=4.5, pdf_file=NULL,
        fun_call=NULL, \ldots)
 
 dn(\ldots)
@@ -110,7 +110,8 @@ dn(\ldots)
         with \code{\link{style}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
-  \item{pdf}{If \code{TRUE}, graphics are to be redirected to a pdf file.}
+  \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
+        the pdf file.}
   \item{fun_call}{Function call. Used with \code{knitr} to pass the function call when
         obtained from the abbreviated function call \code{dn}.}\cr
 
@@ -161,16 +162,16 @@ Instead, do the following:
 The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Redesigned in \code{lessR} version 3.3 to provide two different types of components: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for reading. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the R~Markdown document (see \code{examples}).
 
 READABLE OUTPUT\cr
-code{out_title}: Title of output\cr
-code{out_stats}: Statistics\cr
-code{out_file}: Name and location of optional R markdown file\cr
+\code{out_title}: Title of output\cr
+\code{out_stats}: Statistics\cr
+\code{out_file}: Name and location of optional R markdown file\cr
 
 STATISTICS\cr
-code{bw}: Bandwidth parameter\cr
-code{n}: Number of data values analyzed\cr
-code{n.miss}: Number of missing data values\cr
-code{W}: W statistic for Shapiro-Wilk normality test\cr
-code{pvalue}: p-value for W statistic\cr
+\code{bw}: Bandwidth parameter\cr
+\code{n}: Number of data values analyzed\cr
+\code{n.miss}: Number of missing data values\cr
+\code{W}: W statistic for Shapiro-Wilk normality test\cr
+\code{pvalue}: p-value for W statistic\cr
 
 Although not typically needed, if the output is assigned to an object named, for example, \code{h}, then the contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(h)}.
 }

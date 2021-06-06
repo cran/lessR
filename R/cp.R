@@ -1,0 +1,5 @@
+cp <-
+function(...)
+
+  corProp(...)
+

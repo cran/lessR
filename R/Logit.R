@@ -339,6 +339,6 @@ function(my_formula, data=d, rows=NULL,
          pdf_file, width, height)
   # Also calls .logit5Confuse.R
 
-  invisible(lm.out)
+  return(invisible(lm.out))
 
 }

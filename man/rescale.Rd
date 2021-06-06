@@ -1,5 +1,5 @@
-\name{Rescale}
-\alias{Rescale}
+\name{rescale}
+\alias{rescale}
 
 \title{Rescale a Variable}
 
@@ -8,7 +8,7 @@ Rescale a variable to either z-scores with a mean of 0 and standard deviation of
 }
 
 \usage{
-Rescale(x, data=d, kind="z", digits_d=3)
+rescale(x, data=d, kind="z", digits_d=3)
 }
 
 \arguments{
@@ -40,7 +40,7 @@ The rescaled data.
 d <- Read("Employee")
 
 d[, .("Salary")] 
-x <- Rescale(Salary)
+x <- rescale(Salary)
 x
 }
 

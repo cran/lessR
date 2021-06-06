@@ -45,7 +45,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     tx <- ""
 
     if (nrow(x) * (ncol(x)-1) > 30) { 
-      if (msg  &&  getOption("notes"))
+      if (msg  &&  getOption("note"))
         message("Table output is vertical to fit in window, but > 30 rows\n",
                 "To view the complete table, save the output\n",
                 "  to an object, e.g., b <- BarChart(...)\n",
@@ -241,9 +241,10 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
   }  # end two variable
 
 
-  else {  # one variable
+  # one variable
+  else { 
     lnx <- length(names(x))
-    if (lnx == sum(x)) {  # x is a vector of the counts
+    if (lnx == sum(x)) {  # x is a vector of the counts, if unique
       if (length(x) > 100)
         cat("\nOnly the first 100 value out of", lnx, "listed.\n\n")
       nms <- character(length=0)
@@ -260,115 +261,114 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
                   pvalue=""))
     }
 
+    # table not of unique values, so proceed
+    n.dim <- 1
 
-    else {  # table not of unique values, so proceed
-      n.dim <- 1
+    # potential abbreviation of column labels
+    #  if (is.na(names(x)[length(x)])) names(x)[length(x)] <- "missing"
+    mx.chr <- max(nchar(names(x)))
 
-      # potential abbreviation of column labels
-      #  if (is.na(names(x)[length(x)])) names(x)[length(x)] <- "missing"
-      mx.chr <- max(nchar(names(x)))
-
-      c.nm <- NULL
-      if (mx.chr > label_max) {
-        c.nm <- names(x)  # store for later use
-        names(x) <- .abbrev(names(x), label_max)
-      }
-
-       max.ln <- integer(length=0)      
-       for (i in 1:length(x)) {
-         ln.nm <- nchar(names(x[i]))
-         ln.vl <- nchar(as.character(x[i]))
-         max.ln[i] <- max(ln.nm, ln.vl) + 1
-         if (max.ln[i] < 6) max.ln[i] <- 6
-       }
-
-      tx <- character(length=0)
-
-      tx[length(tx)+1] <- format("", width=13)
-      w <- nchar(as.character(sum(x)))
-
-      for (i in 1:length(x))
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(x[i]), w=max.ln[i]))
-      tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Total", w=w+6))
-      col.width <- nchar(tx[length(tx)])
-
-      tx[length(tx)+1] <- "Frequencies: "
-      for (i in 1:length(x))
-        tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i], w=max.ln[i]))
-      tx[length(tx)] <- paste(tx[length(tx)], .fmti(sum(x), w=w+6))
-
-      tx[length(tx)+1] <- "Proportions: "
-      sum.x <- sum(x)
-      xp <- numeric(length=0)
-      xp <- x/sum.x
-      for (i in 1:length(x))
-        tx[length(tx)] <- paste(tx[length(tx)], .fmt(xp[i], 3, max.ln[i]))
-      tx[length(tx)] <- paste(tx[length(tx)], .fmtc("1.000", w=w+6))
-      txcnt <- tx
-
-      max.clmns <- ifelse (is.null(out_size), getOption("width"), out_size)
-      if (col.width > max.clmns) {  # vertical display
-        mx.nm <- max(nchar(names(x)), nchar("Total"))
-        mx.fr <- nchar(sum(x)) + 2
-        tx <- character(length=0)
-        xnm <- ifelse (nchar(x.name) > 13, .abbrev(x.name, 13), x.name)
-        tx[length(tx)+1] <- .fmtc(xnm, w=mx.nm)
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Count", w=mx.fr))
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Prop", w=6))
-
-        tx[length(tx)+1] <- .dash2(mx.nm + mx.fr + 9)
-        for (i in 1:length(x)) {
-          tx[length(tx)+1] <- .fmtc(names(x[i]), w=mx.nm)
-          tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i], w=mx.fr)) 
-          tx[length(tx)] <- paste(tx[length(tx)], .fmt(xp[i], 3, w=7)) 
-        }
-        tx[length(tx)+1] <- .dash2(mx.nm + mx.fr + 9)
-        tx[length(tx)+1] <- .fmtc("Total", w=mx.nm)
-        tx[length(tx)] <- paste(tx[length(tx)], .fmti(sum(x), w=mx.fr))
-        tx[length(tx)] <- paste(tx[length(tx)],  .fmtc("1.000", w=7))
-        txcnt <- tx
-      }
-
-      txmis <- NULL
-      if (!is.null(x.miss)) {
-        tx <- character(length = 0)
-        txt <- paste("Missing Values of ", x.name, ":", sep="")
-        tx[length(tx)+1] <- paste(txt, x.miss) 
-        txmis <- tx    
-      }
-
-      txchi <- ""
-      txlbl <- ""
-      ch <- NULL
-      if (nrow(x) > 1) {
-        tx <- character(length = 0)
-        ch <- suppressWarnings(chisq.test(x))  # provide own warning of small n
-        tx[length(tx)+1] <- 
-          "Chi-squared test of null hypothesis of equal probabilities"
-        tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ", df = ",
-          ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
-        if (any(ch$expected < 5)) 
-          tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
-              "so chi-squared approximation may not be accurate", "\n")
-        txchi <- tx
-        
-        txlbl <- ""
-        tx <- character(length = 0)
-        if (!is.null(c.nm)) {
-          tx[length(tx)+1] <- "Unabbreviated labels"
-          tx[length(tx)+1] <- "--------------------"
-          tx[length(tx)+1] <- paste(c.nm, sep="", collapse="\n")
-          txlbl <- tx
-        }
-      }
-
-      freq_df <- data.frame(x, stringsAsFactors=TRUE)
-      names(freq_df)[1] <- x.name
-
-      return(list(n.dim=n.dim, title=txttl, counts=txcnt, miss=txmis, 
-                  chi=txchi, lbl=txlbl, freq=x, freq_df=freq_df, prop=xp,
-                  pvalue=ch$p.value))
+    c.nm <- NULL
+    if (mx.chr > label_max) {
+      c.nm <- names(x)  # store for later use
+      names(x) <- .abbrev(names(x), label_max)
     }
+
+     max.ln <- integer(length=0)      
+     for (i in 1:length(x)) {
+       ln.nm <- nchar(names(x[i]))
+       ln.vl <- nchar(as.character(x[i]))
+       max.ln[i] <- max(ln.nm, ln.vl) + 1
+       if (max.ln[i] < 6) max.ln[i] <- 6
+     }
+
+    tx <- character(length=0)
+
+    tx[length(tx)+1] <- format("", width=13)
+    w <- nchar(as.character(sum(x)))
+
+    for (i in 1:length(x))
+      tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(x[i]), w=max.ln[i]))
+    tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Total", w=w+6))
+    col.width <- nchar(tx[length(tx)])
+
+    tx[length(tx)+1] <- "Frequencies: "
+    for (i in 1:length(x))
+      tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i], w=max.ln[i]))
+    tx[length(tx)] <- paste(tx[length(tx)], .fmti(sum(x), w=w+6))
+
+    tx[length(tx)+1] <- "Proportions: "
+    sum.x <- sum(x)
+    xp <- numeric(length=0)
+    xp <- x / sum.x
+    for (i in 1:length(x))
+      tx[length(tx)] <- paste(tx[length(tx)], .fmt(xp[i], 3, max.ln[i]))
+    tx[length(tx)] <- paste(tx[length(tx)], .fmtc("1.000", w=w+6))
+    txcnt <- tx
+
+    max.clmns <- ifelse (is.null(out_size), getOption("width"), out_size)
+    if (col.width > max.clmns) {  # vertical display
+      mx.nm <- max(nchar(names(x)), nchar("Total"))
+      mx.fr <- nchar(sum(x)) + 2
+      tx <- character(length=0)
+      xnm <- ifelse (nchar(x.name) > 13, .abbrev(x.name, 13), x.name)
+      tx[length(tx)+1] <- .fmtc(xnm, w=mx.nm)
+      tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Count", w=mx.fr))
+      tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Prop", w=6))
+
+      tx[length(tx)+1] <- .dash2(mx.nm + mx.fr + 9)
+      for (i in 1:length(x)) {
+        tx[length(tx)+1] <- .fmtc(names(x[i]), w=mx.nm)
+        tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i], w=mx.fr)) 
+        tx[length(tx)] <- paste(tx[length(tx)], .fmt(xp[i], 3, w=7)) 
+      }
+      tx[length(tx)+1] <- .dash2(mx.nm + mx.fr + 9)
+      tx[length(tx)+1] <- .fmtc("Total", w=mx.nm)
+      tx[length(tx)] <- paste(tx[length(tx)], .fmti(sum(x), w=mx.fr))
+      tx[length(tx)] <- paste(tx[length(tx)],  .fmtc("1.000", w=7))
+      txcnt <- tx
+    }
+
+    txmis <- NULL
+    if (!is.null(x.miss)) {
+      tx <- character(length = 0)
+      txt <- paste("Missing Values of ", x.name, ":", sep="")
+      tx[length(tx)+1] <- paste(txt, x.miss) 
+      txmis <- tx    
+    }
+
+    txchi <- ""
+    txlbl <- ""
+    ch <- NULL
+
+    if (nrow(x) > 1) {  # nrow(x) is the number of levels of table x
+      tx <- character(length = 0)
+      ch <- suppressWarnings(chisq.test(x))  # provide own warning of small n
+      tx[length(tx)+1] <- 
+        "Chi-squared test of null hypothesis of equal probabilities"
+      tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ", df = ",
+        ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
+      if (any(ch$expected < 5)) 
+        tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
+            "so chi-squared approximation may not be accurate", "\n")
+      txchi <- tx
+      
+      txlbl <- ""
+      tx <- character(length = 0)
+      if (!is.null(c.nm)) {
+        tx[length(tx)+1] <- "Unabbreviated labels"
+        tx[length(tx)+1] <- "--------------------"
+        tx[length(tx)+1] <- paste(c.nm, sep="", collapse="\n")
+        txlbl <- tx
+      }
+    }
+
+    freq_df <- data.frame(x)  #  a pivot result, two vars, Cats and Freq
+    names(freq_df)[1] <- x.name
+
+    return(list(n.dim=n.dim, title=txttl, counts=txcnt, miss=txmis, 
+                chi=txchi, lbl=txlbl, freq=x, freq_df=freq_df, prop=xp,
+                pvalue=ch$p.value))
   }  # one variable
 
 }

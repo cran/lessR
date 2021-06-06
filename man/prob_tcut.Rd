@@ -34,6 +34,10 @@ prob_tcut(df, alpha=0.05, digits_d=3, y_axis=FALSE,
 Replaces a t-table by providing the corresponding t-cutoff, the critical value based on the corresponding quantile, as well as a plot that illustrates the tail probabilities. Also compare to the standardized normal curve.
 }
 
+\value{
+\code{cutoff}: Cutoff-value, the corresponding quantile.
+}
+
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 

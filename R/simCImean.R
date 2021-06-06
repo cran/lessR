@@ -127,7 +127,7 @@ function(ns, n, mu=0, sigma=1, cl=0.95, seed=NULL,
   digits_d <- 3
   max.ln <- 8
   for (i in 1:ns) {
-    if (pause) invisible(readline())
+    if (pause) return(invisible(readline()))
     if ( (mu>lb[i] && mu<ub[i]) ) linecol <- color_hit else linecol = color_miss
     if (show_data) points(rep(i,n), data.byrep[i,], pch=21, col="gray75",cex=.3)
     if ( !(miss_only && linecol==color_hit) ) {

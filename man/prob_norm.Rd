@@ -40,6 +40,10 @@ Calculate the normal curve probability for the specified interval and normal cur
 }
 
 
+\value{
+\code{prob}: Calculated probability.
+}
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 

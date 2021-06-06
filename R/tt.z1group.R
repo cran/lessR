@@ -209,7 +209,8 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
 
       if (!is.null(pdf_file)) {
         dev.off()
-        .showfile(paste("LineChart_", Ynm, ".pdf", sep=""), paste("line chart of", Ynm))
+        .showfile(paste("LineChart_", Ynm, ".pdf", sep=""),
+                  paste("line chart of", Ynm))
       }
 
     }
@@ -224,6 +225,8 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
 
     plt.i <- plt.i + 1
     plt.title[plt.i] <- "One-Group Plot"
+
+    if (paired) x.lab <- "Difference"
 
     .OneGraph(Y, bw1, Ynm, digits_d, brief,
          n, m, mu, mdiff, s, smd, mmd, msmd,

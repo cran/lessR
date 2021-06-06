@@ -1,4 +1,4 @@
-Rescale <-
+rescale <-
 function(x, data=d, kind="z", digits_d=3) {
 
   # let deprecated mydata work as default

@@ -7,16 +7,18 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 3.9.9  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
+      "lessR 4.0.0  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
       "---------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
       "\n",
-      "Many vignettes show by example how to use lessR. Topics are\n",
-      "read, write, & manipulate data, graphics, means & models,\n",
-      "  factor analysis, & customization. Two ways to view.\n",
-      "Enter:  browseVignettes(\"lessR\")\n",
-      "Visit:  https://CRAN.R-project.org/package=lessR\n") 
+      "Learn about reading, writing, and manipulating data, graphics,\n",
+      "testing means and proportions, regression, factor analysis,\n",
+      "customization, and descriptive statistics from pivot tables.\n",
+      "  Enter:  browseVignettes(\"lessR\")\n\n",
+      "View changes in this new version of lessR.\n",
+      "  Enter: help(package=lessR)  Click: Package NEWS\n") 
+
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 
@@ -65,7 +67,7 @@ function(...) {
   options(line_color = "gray15")
 
   options(bubble_text_color = "#F7F2E6")  # rgb(247,242,230, maxColorValue=255)
-  options(ellipse_fill = "#00008A1E")   # old .maketrans("gray55", 55)
+  options(ellipse_fill = "#92806F28")   # .maketrans(hcl(50,20,55), 40)
   options(ellipse_color = "gray20")
   options(ellipse_lwd = 1)
   options(se_fill = "#1A1A1A19")  # old .maketrans("gray10", 40) "darkblue", 25
@@ -140,7 +142,6 @@ function(...) {
 
   options(show.signif.stars = FALSE)
   options(scipen = 30)
-
 }
 
 
@@ -299,7 +300,7 @@ function(...) {
 
   if (is.numeric(x)) {
     x <- na.omit(x)
-    int.flg <- ifelse (abs(x - round(x)) < tol, TRUE, FALSE)  # each i of vector
+    int.flg <- ifelse (abs(x-round(x)) < tol, TRUE, FALSE)  # each i of vector
     result.flg <- ifelse (all(int.flg), TRUE, FALSE)
   }
   else
@@ -942,7 +943,7 @@ function(...) {
     main.lab <- NULL
 
   if (!missing(sub)) {
-    if (!is.null(sub)) sub.lab <- sub else sub.lab <- NULL
+    sub.lab <- ifelse (!is.null(sub), sub, NULL)
   }
   else
     sub.lab <- NULL
@@ -1192,9 +1193,10 @@ function(dir, axT) {
 
 
 # margins
-.marg <- function(max.y.width, y.lab, x.lab, main,
+.marg <- function(max.y.width, y.lab, x.lab, main, sub,
                   rotate_x=0, mx.x.val.ln=1, mx.y.val.ln=1,
                   lab_x_cex=0.95, lab_y_cex=0.95, max.x.width=NULL) {
+# not processing sub at this time
 
   # top margin
   tm <- 0.05  # old is 0.15
@@ -1222,12 +1224,10 @@ function(dir, axT) {
 
   # rotate_x==90 and horiz=TRUE not compatible, leads to NULL max.x.width
   if (rotate_x != 90  ||  is.null(max.x.width))
-    bm <- ((n.lab_x.ln + mx.x.val.ln) * .70 * ln.ht) + 0.24  # inches
+    bm <- ((n.lab_x.ln + mx.x.val.ln) * .70 * ln.ht) + 0.30  # inches
   else
-    bm <- max.x.width + (ln.ht * n.lab_x.ln) + 0.25
-  if (mx.x.val.ln == 3) bm <- bm + .09
-  if (mx.x.val.ln == 4) bm <- bm + .17
-  if (mx.x.val.ln >= 5) bm <- bm + .26
+    bm <- max.x.width + (ln.ht * n.lab_x.ln) + 0.28
+  bm <- bm + (-0.065 +(.055* n.lab_x.ln))
   tm <- ifelse (is.null(main), tm+.05, tm+.25)  #  adjust tm for increased bm
   if (rotate_x != 0) bm <- bm + .15
   if (lab_x_cex > 1.1) bm <- bm + .04  # actually should be axis_cex
@@ -1242,7 +1242,7 @@ function(dir, axT) {
     }
   }
 
-  mm <- max.y.width + 0.22
+  mm <- max.y.width + 0.24
   if (max.y.width < .10) mm <- mm + .02
   if (lab_y_cex > 1) mm <- mm + .10
   if (!is.null(y.lab)) mm <- mm + (n.lab_y.ln * .20)
@@ -1485,7 +1485,7 @@ function(dir, axT) {
       fill_hi <- "blues"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
     }
-    else if (thm %in% c("darkred", "red", "rose")) {
+    else if (thm %in% c("darkred", "red", "rose", "slatered")) {
       fill_low <- "turquoises" 
       fill_hi <- "reds"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
@@ -1610,7 +1610,7 @@ function(dir, axT) {
   else if (theme %in% c("colors", "lightbronze", "dodgerblue", "blue")) h <- 240
   else if (theme %in% c("gold", "brown", "sienna")) h <- 60
   else if (theme == "orange") h <- 30
-  else if (theme %in% c("darkred", "red", "rose")) h <- 0
+  else if (theme %in% c("darkred", "red", "rose", "slatered")) h <- 0
   else if (theme %in% c("darkgreen", "green")) h <- 120
   else if (theme == "purple") h <- 300
   else h <- 240
@@ -1626,7 +1626,6 @@ function(dir, axT) {
   if (getOption("theme") %in% c("gray", "white")) chroma <- 0
 
   if (!grepl(".v", fill_name, fixed=TRUE)) {
-
     xp <- pretty(x)
     xp.mn <- min(xp)
     xp.mx <- max(xp)
@@ -1636,9 +1635,11 @@ function(dir, axT) {
 
     lum <- 100 - (100*x.nrm)  # scale each value, light to dark flip
     expn <- (82 + (2 * length(x))) / 100
+    if (expn > .96) expn <- .96  # hack
     lum <- (lum**expn) + 9  # compress, which darkens, then lighten a bit
     cc <- hcl(h=.get.h(), c=chroma, l=lum)
-    clr <- getColors(cc)
+    clr <- cc
+#   clr <- getColors(cc)
   }
 
   else {  # (count.v) so do viridis scaling
@@ -1671,7 +1672,7 @@ function(dir, axT) {
   else if (theme %in% c("lightbronze", "dodgerblue", "blue")) clrs <- "blues"
   else if (theme %in% c("gold", "brown", "sienna")) clrs <- "browns"
   else if (theme == "orange") clrs <- "rusts"
-  else if (theme %in% c("darkred", "red", "rose")) clrs <- "reds"
+  else if (theme %in% c("darkred", "red", "rose", "slatered")) clrs <- "reds"
   else if (theme %in% c("darkgreen", "green")) clrs <- "greens"
   else if (theme == "purple") clrs <- "violets"
   else clrs <- "blues"

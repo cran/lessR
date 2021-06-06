@@ -425,9 +425,9 @@ function(x, y=NULL, ...) {
 
   if (is.frml) {
     if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
-      invisible(list(value1=X1nm, group1=x, value2=X2nm, group2=y))
+      return(invisible(list(value1=X1nm, group1=x, value2=X2nm, group2=y)))
     else
-      invisible(list(value1=X2nm, group1=y, value2=X1nm, group2=x))
+      return(invisible(list(value1=X2nm, group1=y, value2=X1nm, group2=x)))
   }
 
 }
