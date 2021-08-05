@@ -2,14 +2,19 @@
 
 .plt.by.legend <-
 function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
-         pt.size=1.25, pt.lwd=0.5, legend_size=NULL) {
+         pt.size=1.25, pt.lwd=0.5, legend_size=NULL,
+         legend_abbrev=0, legend_adj=0) {
 
   par(xpd=NA)  # allow drawing outside of plot region
 
   n.levels <- length(mylevels)
   by.name <- getOption("byname")
 
-  legend_labels <- abbreviate(mylevels,10)
+  if (legend_abbrev == 0)
+    legend_labels <- mylevels
+  else 
+    if (!is.null(mylevels))
+      legend_labels <- abbreviate(mylevels, legend_abbrev)
 
   wt <- 10
   legend_title  <- abbreviate(by.name, wt)
@@ -21,6 +26,7 @@ function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
   size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
 
   epsilon <- (size[1] - ll$rect$w) / 2
+  if (epsilon < 0) epsilon <- .04  # do not have label overlap plot
 
   axis_vert <- usr[4] - usr[3]
   xleft <- usr[2] + epsilon - .01 # usr[2] user coordinate of right axis
@@ -46,11 +52,12 @@ function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
     adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
     legend_size <- axis_x_cex
   }
+
   legend_size <- 1.1 * legend_size
 
   # fill=length(legend_labels):1  puts the legend labels in the correct
   #   order, but only for inflexible boxes that cannot be resized with pt.cex
-  legend(xleft, ytop, legend=legend_labels, title=legend_title, 
+  legend(xleft+legend_adj, ytop, legend=legend_labels, title=legend_title, 
          pch=shp, horiz=FALSE, cex=legend_size, pt.cex=pt.size, pt.lwd=pt.lwd,
          bg=col.bg, col=color, pt.bg=fill,
          text.col=the.clr, y.intersp=yi, bty="n")

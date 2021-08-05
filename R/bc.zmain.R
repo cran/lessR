@@ -1,5 +1,5 @@
-.bc.main <- 
-function(x, y, by, stack100, 
+.bc.main <-
+function(x, y, by, stack100,
          fill, col_color, col.trans, fill_split, theme,
          horiz, gap, prop, scale_y,
          xlab, ylab, main,
@@ -10,7 +10,7 @@ function(x, y, by, stack100,
          xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
          pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
-         legend_horiz, legend_size,
+         legend_horiz, legend_size, legend_abbrev, legend_adj,
          add, x1, x2, y1, y2, out_size, quiet, ...) {
 
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
@@ -36,8 +36,8 @@ function(x, y, by, stack100,
   # if x is integer, not labeled correctly, set to factor
   if (!is.data.frame(x))
     if (length(unique(x)) != length(x)) if (!is.factor(x)) x <- factor(x)
-  
-  if ( (is.table(x) || is.matrix(x)) && is.null(legend_title) ) { 
+
+  if ( (is.table(x) || is.matrix(x)) && is.null(legend_title) ) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
     "Need to specify a value for:  legend_title\n\n")
   }
@@ -46,9 +46,9 @@ function(x, y, by, stack100,
   # axis values, axis labels, legend setup
 
   # get axis_x_cex, axis_y_cex
-  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")), 
+  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
     getOption("axis_cex"), getOption("axis_x_cex"))
-  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")), 
+  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
     getOption("axis_cex"), getOption("axis_y_cex"))
 # adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
 # adj <- .RSadj(axis_cex=axis_y_cex); axis_y_cex <- adj$axis_cex
@@ -61,7 +61,7 @@ function(x, y, by, stack100,
   lab_y_cex <- ifelse(is.null(lab_y_cex), lab_cex, lab_y_cex)
 # adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
 # adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
-  gl <- .getlabels(xlab, ylab, main, by.nm=TRUE, lab_x_cex=lab_x_cex, 
+  gl <- .getlabels(xlab, ylab, main, by.nm=TRUE, lab_x_cex=lab_x_cex,
                    lab_y_cex=lab_y_cex, flip=horiz)
   x.name <- gl$xn;  x.lbl <- gl$xl;  y.lbl <- gl$yl
   x.lab <- ifelse (horiz, gl$yb, gl$xb)
@@ -93,7 +93,7 @@ function(x, y, by, stack100,
   if (is.null(ylab))
     done <- FALSE
   else
-    done <- ifelse (grepl("of", ylab, fixed=TRUE), TRUE, FALSE) 
+    done <- ifelse (grepl("of", ylab, fixed=TRUE), TRUE, FALSE)
 
   if (!ylab_keep) {
     if ((!prop || is.null(by)) && is.null(y) && !done &&
@@ -122,7 +122,7 @@ function(x, y, by, stack100,
 
   # get legend title, l.lab
   if (!is.null(legend_title))
-    l.lab <- legend_title 
+    l.lab <- legend_title
   else
     if (horiz) {
       if (!is.null(by)) if (exists("x.lbl")) {
@@ -143,7 +143,7 @@ function(x, y, by, stack100,
 
 
   # --------------------------
-  # get missing, data entered? 
+  # get missing, data entered?
 
   x.miss <- sum(is.na(x))
   by.miss <- NULL
@@ -157,7 +157,7 @@ function(x, y, by, stack100,
   if (is.matrix(x) && !is.null(rownames(x))) entered.pre <- TRUE
   entered <- ifelse (!is.integer(x) && is.double(x) && entered.pre, TRUE, FALSE)
 
-  if (is.null(by) && beside && !entered) { 
+  if (is.null(by) && beside && !entered) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
     "beside=TRUE  is not valid for analysis of only one variable.\n\n")
   }
@@ -171,7 +171,7 @@ function(x, y, by, stack100,
     entered <- TRUE
 
     if (horiz) {
-      tmp <- y.lab; y.lab <- x.lab;  x.lab <- tmp 
+      tmp <- y.lab; y.lab <- x.lab;  x.lab <- tmp
     }
 
     if (is.null(by)) {  # no by variable
@@ -184,12 +184,12 @@ function(x, y, by, stack100,
           "It appears that ", yn, " is a by variable\n",
           "As of lessR 3.5.6 to specify a  by  variable in the function call\n",
           "  precede its name with:  by=", "\n\n")
-      } 
+      }
 
       if (anyDuplicated(names(x)) > 0) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "The data contain duplicated values of variable: ", x.name, "\n\n")
-      } 
+      }
 
       x.temp <- x
       x <- y
@@ -211,7 +211,7 @@ function(x, y, by, stack100,
       colnames(m) <- unq.x
       rownames(m) <- unq.by
       m <- as.table(m, dnn=c(by.name, x.name))
-      names(dimnames(m)) <- c(by.name, x.name) 
+      names(dimnames(m)) <- c(by.name, x.name)
       x <- m
       if (stack100) {
         x.count <- x  # save table of counts for possible bar display
@@ -240,7 +240,7 @@ function(x, y, by, stack100,
         else {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
           x.name, " and ", by.name, " must be of the same size\n\n",
-          "Size of ", x.name, ": ", length(x), "\n", 
+          "Size of ", x.name, ": ", length(x), "\n",
           "Size of ", by.name, ": ", length(by), "\n\n", sep="")
         }
         x <- x.temp
@@ -250,7 +250,7 @@ function(x, y, by, stack100,
         }
       }
     }   # end single x value
-    
+
     else {  # x is a data frame, so combine x's
       if (!is.factor(x[,1])) {
         resp <- unique(x[,1])
@@ -268,7 +268,7 @@ function(x, y, by, stack100,
       colnames(frq) <- names(x)
 
       # maybe an x not has a value in full set
-      for (i in 1:ncol(x)) {  
+      for (i in 1:ncol(x)) {
         tblx.i <- table(x[,i])
         k <- 0
         for (j in 1:n.resp) {
@@ -278,7 +278,7 @@ function(x, y, by, stack100,
           }
         }
       }  # end col i of x
-      
+
       x <- as.table(frq)
       if (is.numeric(resp))
         wt <- resp
@@ -295,7 +295,7 @@ function(x, y, by, stack100,
       }
     }  # x is a data frame
   }  # end !entered so tabulated
-    
+
 
   if (prop) {
     if (any(is.nan(x))) {
@@ -338,9 +338,9 @@ function(x, y, by, stack100,
       if (!is.null(bar_fill))
         options("bar_fill_discrete" = bar_fill)
       if (theme == getOption("theme")) {  # default theme operative
-        if (is.null(by)) 
-          clr <- getOption("bar_fill_discrete")  # default theme 
-        else 
+        if (is.null(by))
+          clr <- getOption("bar_fill_discrete")  # default theme
+        else
            clr <- .color_range(.get_fill(theme, FALSE), n.levels)
       }
       else {  # not the default theme
@@ -349,18 +349,18 @@ function(x, y, by, stack100,
         color <- sty$bar$color
         trans <- sty$bar$trans_fill
       }
-      if (!is.null(.color_range(clr, n.levels)))  # if a color range 
+      if (!is.null(.color_range(clr, n.levels)))  # if a color range
         clr <- .color_range(clr, n.levels)
       if (beside) clr <- clr[1:n.levels]  # longer vector OK if !beside
     }
     else  # ordered factor, so sequential palette (not allow fill= )
-      clr <- .color_range(.get_fill(theme), n.levels) 
+      clr <- .color_range(.get_fill(theme), n.levels)
   }  # end null fill
 
   else {  # fill specified by user
     if (is.null(.color_range(fill, n.levels)))
       clr <- fill  # user assigned
-    else 
+    else
       clr <- .color_range(fill, n.levels)  # do default range
   }  # end null fill
 
@@ -374,19 +374,19 @@ function(x, y, by, stack100,
     else
       getfill <- ifelse (length(fill) != 2, TRUE, FALSE)
     if (getfill) {
-      fill[1] <- hcl(hue, chroma, l=30) 
-      fill[2] <- hcl(hue, chroma, l=70) 
+      fill[1] <- hcl(hue, chroma, l=30)
+      fill[2] <- hcl(hue, chroma, l=70)
     }
     for (i in 1:length(x))
       clr[i] <- ifelse (x[i] <= fill_split, fill[1], fill[2])
   }
 
-  if (!is.null(col.trans)) 
-   for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-col.trans)*256) 
+  if (!is.null(col.trans))
+   for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-col.trans)*256)
 
   # by default, no color borders if a range
   if (identical(col_color, getOption("bar_color_discrete")))
-    col_color <- "transparent"  
+    col_color <- "transparent"
   # see if apply a pre-defined color range to **color**
   col.clr <- .color_range(col_color, n.levels)  # see if range, NULL if not
   if (!is.null(col.clr)) col_color <- col.clr
@@ -435,7 +435,7 @@ function(x, y, by, stack100,
   las.value <- 1
   if (horiz  &&  max(nchar(the.names), na.rm=TRUE) > 5) las.value <- 0
 
-  
+
   # ------------
   # value labels
 
@@ -462,7 +462,7 @@ function(x, y, by, stack100,
     }
   }
   stuff <- .get.val.ln(val.lab, x.name)
-  val.lab <- stuff$val.lab 
+  val.lab <- stuff$val.lab
   mx.x.val.ln <- stuff$mx.val.ln
 
   mx.y.val.ln <- 1
@@ -508,7 +508,7 @@ function(x, y, by, stack100,
       else
         max.x.width <- max(nchar(val.split)) / (11 / axis_x_cex)
     }
-  } 
+  }
 
 
   # ----------------
@@ -526,15 +526,14 @@ function(x, y, by, stack100,
 
   if (horiz)
     rm <- rm + 0.1  # sometimes the max axis value goes off the plot
-  else 
+  else
     if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
   if (legend_position == "right_margin"  &&  (is.matrix(x))) {
     exp.coef <- 0.065 + 0.45 * axis_x_cex
     rm <- rm + (.50 + (exp.coef * axis_x_cex))
     mx.ch <- max(c(nchar(legend_labels), nchar(by.name) - 3))
-    if (mx.ch > 7) rm <- rm + .06
-    if (mx.ch > 9) rm <- rm + .04
+    rm <- rm + (0.04 + 0.036*mx.ch)  # legend also moves over
   }
 
   if (legend_position == "top")
@@ -552,7 +551,7 @@ function(x, y, by, stack100,
   par(bg=getOption("window_fill"))
   par(mai=c(bm, lm, tm, rm))
 
-
+#p(par("din")[1]-par("pin")[1])
   # new_scale to control bar width for small number of bars
   # set new_scale
   if ("numeric" %in% class(x)  &&  entered) x <- as.table(x)
@@ -578,7 +577,7 @@ function(x, y, by, stack100,
   # the barplot itself is not retained
   if (new_scale == 0) {
     if (!horiz)
-      barplot(x, col="transparent", border="transparent", 
+      barplot(x, col="transparent", border="transparent",
         ylim=c(min.y,max.y), axisnames=FALSE,
         beside=beside, space=gap, axes=FALSE, ...)
     else
@@ -620,7 +619,7 @@ function(x, y, by, stack100,
   rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
 
   # grid lines for y-axis only
-  .grid(ifelse(horiz, "v", "h"), y.coords) 
+  .grid(ifelse(horiz, "v", "h"), y.coords)
 
   # box around plot
   rect(usr[1], usr[3], usr[2], usr[4], col="transparent",
@@ -630,11 +629,11 @@ function(x, y, by, stack100,
   # the bars
   if (new_scale == 0)
     x.coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
-          axes=FALSE, ann=FALSE, border=col_color, las=las.value, 
+          axes=FALSE, ann=FALSE, border=col_color, las=las.value,
           space=gap, axisnames=FALSE, ...)
   else
     x.coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
-          axes=FALSE, ann=FALSE, border=col_color, las=las.value, 
+          axes=FALSE, ann=FALSE, border=col_color, las=las.value,
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
 
   # display text labels of values on or above the bars
@@ -644,7 +643,7 @@ function(x, y, by, stack100,
   if (values == "eval.later") {
     is_int <- TRUE
     if (!is.null(y)) if (!.is.integer(y)) is_int <- FALSE
-    if (n.levels > 14  || !is_int) 
+    if (n.levels > 14  || !is_int)
       values <- "off"
     else
       values <- ifelse (y.given, "input", getOption("values"))
@@ -683,7 +682,7 @@ function(x, y, by, stack100,
 
       if (is.matrix(x))
           x.txt <- matrix(x.txt, nrow=nrow(x))
-        
+
       if (values_pos != "out") {
         if (is.null(by)) {
           if (!y.given) {
@@ -692,12 +691,12 @@ function(x, y, by, stack100,
           }
         }
         else {  # by variable
-          for (i in 1:nrow(x.prop)) for (j in 1:ncol(x.prop)) 
+          for (i in 1:nrow(x.prop)) for (j in 1:ncol(x.prop))
             x.txt[i,j] <- ifelse (x.prop[i,j] >= values_cut, x.txt[i,j], "")
         }
       }
     }
-    
+
     else {  # prop
       if (values == "input")
         x.txt <- as.character(x.count)
@@ -705,7 +704,7 @@ function(x, y, by, stack100,
         x.txt <- paste(.fmt(x * 100, values_digits), "%", sep="")
       else if (values == "prop")
         x.txt <- .fmt(x, values_digits)
-      
+
       if (is.matrix(x))
           x.txt <- matrix(x.txt, nrow=nrow(x))
 
@@ -716,7 +715,7 @@ function(x, y, by, stack100,
         }
         else {  # by variable
           # as.numeric & as.character convert table to vector: re-convert
-          for (i in 1:nrow(x)) for (j in 1:ncol(x)) 
+          for (i in 1:nrow(x)) for (j in 1:ncol(x))
             x.txt[i,j] <- ifelse (x[i,j] >= values_cut, x.txt[i,j], "")
         }
       }
@@ -739,7 +738,7 @@ function(x, y, by, stack100,
           for (i in 1:ncol(x)) {
             ycrd <- cumsum(x[,i]) - (x[,i] / 2)
             text(x.coords[i], ycrd, labels=x.txt[,i],
-                 col=values_color, cex=values_size) 
+                 col=values_color, cex=values_size)
           }
         }  # end !beside
         else {  # beside
@@ -750,7 +749,7 @@ function(x, y, by, stack100,
             ycrd <- x + 0.10*usr.y.inch
           for (i in 1:ncol(x)) {
             text(x.coords[,i], ycrd[,i], labels=x.txt[,i],
-                 col=values_color, cex=values_size) 
+                 col=values_color, cex=values_size)
           }
         }  # end beside
       }  # end 2 variables
@@ -773,7 +772,7 @@ function(x, y, by, stack100,
         for (i in 1:ncol(x)) {  # each level of by
           ycrd <- cumsum(x[,i]) - (x[,i] / 2)
           text(ycrd, x.coords[i], labels=x.txt[,i],
-             col=values_color, cex=values_size) 
+             col=values_color, cex=values_size)
         }
       }
       else {  # beside chart
@@ -784,20 +783,20 @@ function(x, y, by, stack100,
           ycrd <- x + 0.17*usr.x.inch
           for (i in 1:ncol(x)) {
             text(ycrd[,i], x.coords[,i], labels=x.txt[,i],
-                 col=values_color, cex=values_size) 
+                 col=values_color, cex=values_size)
           }
         }  # end beside
       }  # end by
     }  # end horiz bars
 
   }  # end display values
-  
+
 
   # y-axis is the numerical axis
   if (!horiz) las.value <- 1
-  axis_y_color <- ifelse(is.null(getOption("axis_y_color")), 
+  axis_y_color <- ifelse(is.null(getOption("axis_y_color")),
     getOption("axis_color"), getOption("axis_y_color"))
-  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")), 
+  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")),
     getOption("axis_text_color"), getOption("axis_y_text_color"))
   adj1 <- ifelse (!horiz, 0.5, -1.0)
   if (is.null(scale_y)) {  # if scale_y defined, can evaluate earlier
@@ -808,13 +807,13 @@ function(x, y, by, stack100,
   }
   axis(ax.num, col=axis_y_color,   # maybe split off the text like with x axis?
        col.axis=axis_y_text_color, cex.axis=axis_y_cex, las=las.value,
-       tck=-.02, padj=adj1,  at=y.coords, labels=lblval.y, ...) 
-       #tck=-.03, padj=adj1,  at=axTicks(ax.num, axp=scale_y), ...) 
-  
+       tck=-.02, padj=adj1,  at=y.coords, labels=lblval.y, ...)
+       #tck=-.03, padj=adj1,  at=axTicks(ax.num, axp=scale_y), ...)
+
   # x-axis is the category value axis
-  axis_x_color <- ifelse(is.null(getOption("axis_x_color")), 
+  axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
     getOption("axis_color"), getOption("axis_x_color"))
-  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")), 
+  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
     getOption("axis_text_color"), getOption("axis_x_text_color"))
 
   if (beside) x.coords <- apply(x.coords, 2, mean)  # one label per group
@@ -840,7 +839,7 @@ function(x, y, by, stack100,
          xpd=TRUE, cex=axis_x_cex, col=axis_x_text_color,
          srt=rotate_x, offset=offset, ...)
   }
-  else if (rotate_x == 90)  # 90 degrees rotate 
+  else if (rotate_x == 90)  # 90 degrees rotate
     axis(ax.value, at=x.coords, labels=val.lab, tck=-.02, col=axis_x_color,
          cex.axis=axis_x_cex, las=2, ...)
 
@@ -848,7 +847,7 @@ function(x, y, by, stack100,
   title(main=main.lab, cex.main=getOption("main_cex"),
         col.main=getOption("main_color"))
 
-  lab_x_color <- ifelse(is.null(getOption("lab_x_color")), 
+  lab_x_color <- ifelse(is.null(getOption("lab_x_color")),
     getOption("lab_color"), getOption("lab_x_color"))
 
   # xlab positioning
@@ -861,7 +860,7 @@ function(x, y, by, stack100,
   # need sub.lab processing here
 
   # ylab positioning (based on .axlabs function)
-  lab_y_color <- ifelse(is.null(getOption("lab_y_color")), 
+  lab_y_color <- ifelse(is.null(getOption("lab_y_color")),
   getOption("lab_color"), getOption("lab_y_color"))
   ln.ht.y <- par('cin')[2] * lab_y_cex * par('lheight')  # line ht inches
   ylab_adj <- ylab_adj / ln.ht.y
@@ -883,7 +882,7 @@ function(x, y, by, stack100,
       if (legend_position == "top")
         legend_size <- getOption("lab_cex")
       else
-        legend_size <- axis_x_cex 
+        legend_size <- axis_x_cex
     }
 
     # default right_margin option
@@ -893,7 +892,8 @@ function(x, y, by, stack100,
       trans_pts <- .6  # dummy value
       point.size <- 2.5 * axis_x_cex
       .plt.by.legend(legend_labels, col_color, clr, shp=22, trans_pts,
-                     col.bg, usr, pt.size=point.size, pt.lwd=0, legend_size)
+                     col.bg, usr, pt.size=point.size, pt.lwd=0, legend_size,
+                     legend_abbrev, legend_adj)
 
     }  # end right margin
 
@@ -928,7 +928,7 @@ function(x, y, by, stack100,
     add_trans <- getOption("add_trans")
 
     .plt.add (add, x1, x2, y1, y2,
-              add_cex, add_lwd, add_lty, add_color, add_fill, add_trans) 
+              add_cex, add_lwd, add_lty, add_color, add_fill, add_trans)
   }
 
 
@@ -939,7 +939,7 @@ function(x, y, by, stack100,
   if (prop) {
     if (is.null(y)) {
       if (!is.null(by) || is.matrix(x))
-        x  <- x.temp 
+        x  <- x.temp
       else
         x <- table(x.temp)
     }
@@ -948,11 +948,11 @@ function(x, y, by, stack100,
   dd <- .getdigits(x, min_digits=0) - 1
   n_dim <- length(dim(x))
   stats <- ""
-  
+
   if (multi) {
-  
+
     txsug <- ""
-    
+
     # display variable labels
     txlbl <- ""
     l.name <- "l"
@@ -975,7 +975,7 @@ function(x, y, by, stack100,
         blnk <- " "
       }
     }
-    
+
     # display frequencies and means of each variable
     txttl <- "Frequencies of Responses by Variable"
     tx <- character(length = 0)
@@ -986,7 +986,7 @@ function(x, y, by, stack100,
       rownames(x) <- .abbrev(rownames(x), mx.len)
     }
     x <- t(x)
-    
+
     txtbl <- .prntbl(x, 0, cc=NULL)
     mx <- max(nchar(round(wm,2)))
     txtbl[1] <- paste(txtbl[1], " ", .fmtc("Mean", w=mx+1))
@@ -994,7 +994,7 @@ function(x, y, by, stack100,
     for (i in 1:n.var)
       txtbl[i+1] <- paste(txtbl[i+1], " ", .fmt(wm[i],3,w=mx+1))
      txtbl[2:length(txtbl)] <- rev(txtbl[2:length(txtbl)])
-    
+
     if (mx.chr > mx.len) {
       txtbl[n.var+2] <- ""
       txtbl[n.var+3] <- ""
@@ -1012,22 +1012,22 @@ function(x, y, by, stack100,
     class(txsug) <- "out"
     class(txtbl) <- "out"
     class(txttl) <- "out"
-    
+
     if (nzchar(txsug))
       output <- list(out_suggest=txsug,
                      out_text=txlbl, out_title=txttl, out_text=txtbl)
     else
       output <- list(out_text=txlbl,
                      out_title=txttl, out_text=txtbl)
-                     
+
     class(output) <- "out_all"
     if (!quiet) print(output)
-    
+
   }  # end multi
 
 
   # x is a table, could be real values or integers <0 if y is specified
-  # no by variable, dim == 0 if x<-x.temp 
+  # no by variable, dim == 0 if x<-x.temp
   else if (n_dim == 1) {
     if (.is.integer(x)  &&  all(x >= 0)) {  # x is table of count-like values
 
@@ -1048,7 +1048,7 @@ function(x, y, by, stack100,
                     ", stat=\"count\")  # lollipop plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
       }
-      
+
       stats <- .ss.factor(x, by=NULL, brief=TRUE, digits_d=NULL,
                           x.name, by.name, x.lbl, y.lbl, label_max,
                           x.miss, by.miss, out_size)
@@ -1069,7 +1069,7 @@ function(x, y, by, stack100,
         output <- list(out_suggest=txsug, out_title=txttl, out_miss=miss,
                        out_lbl=lbl, out_counts=counts, out_chi=chi)
         class(output) <- "out_all"
-        if (!quiet) print(output)      
+        if (!quiet) print(output)
       }
 
     # names and order of components per documentation in BarChart.Rd
@@ -1093,14 +1093,14 @@ function(x, y, by, stack100,
       }
 
       stats <- .ss.real(x, by, digits_d=dd,
-                   x.name, getOption("yname"), by.name, x.lbl, y.lbl, label_max) 
-      txtbl <- stats$txtbl 
+                   x.name, getOption("yname"), by.name, x.lbl, y.lbl, label_max)
+      txtbl <- stats$txtbl
       class(txsug) <- "out"
       class(txtbl) <- "out"
       output <- list(out_suggest=txsug, out_txt=txtbl, values=stats$values)
 
       class(output) <- "out_all"
-      if (!quiet) print(output)         
+      if (!quiet) print(output)
       names(stats) <- c("n_dim", "out_y", "values")
       stats <- c(stats[2], stats[1], stats[3])
     }
@@ -1128,7 +1128,7 @@ function(x, y, by, stack100,
 
       # need brief=FALSE for row proportions
       stats <- .ss.factor(x, by, brief=FALSE, digits_d=NULL,
-                        x.name, by.name, x.lbl, y.lbl, label_max) 
+                        x.name, by.name, x.lbl, y.lbl, label_max)
       txttl <- stats$txttl
       txfrq <- stats$txfrq
       txXV <- stats$txXV
@@ -1160,8 +1160,8 @@ function(x, y, by, stack100,
 
     else {  # y is present
       stats <- .ss.real(x, y, by, digits_d=3, x.name,
-                        getOption("yname"), by.name, x.lbl, y.lbl, label_max) 
-      txtbl <- stats$txtbl 
+                        getOption("yname"), by.name, x.lbl, y.lbl, label_max)
+      txtbl <- stats$txtbl
       class(txtbl) <- "out"
       output <- list(out_txt=txtbl)
 

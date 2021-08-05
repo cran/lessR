@@ -10,8 +10,8 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-```{r}
-library("lessR")
+```{r include=FALSE}
+suppressPackageStartupMessages(library("lessR"))
 ```
 
 

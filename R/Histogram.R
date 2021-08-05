@@ -282,8 +282,8 @@ function(x=NULL, data=d, rows=NULL,
     .bar.lattice(data.x[,1], by1.call, by2.call, n_row, n_col, aspect, 
                  proportion, fill, color, trans, size.pt=NULL,
                  xlab, ylab, main, rotate_x, offset,
-                 width, height, pdf_file, segments_x=NULL, breaks,
-                 c.type="hist", quiet)
+                 width, height, pdf_file, segments_x=NULL, breaks, c.type="hist",
+                 quiet)
   }
 
   else {  # not Trellis
@@ -322,13 +322,12 @@ function(x=NULL, data=d, rows=NULL,
         # let 1 variable go through, even if num.cat
         if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n_cat)) {
 
-        if (!is.null(pdf_file))  {
-          if (!grepl(".pdf", pdf_file))
-             pdf_file <- paste(pdf_file, ".pdf", sep="")
-          .opendev(pdf_file, width, height)
+          if (!is.null(pdf_file)) {
+            if (!grepl(".pdf", pdf_file))
+              pdf_file <- paste(pdf_file, ".pdf", sep="")
+            .opendev(pdf_file, width, height)
           }
           else {
-            pdf_file <- NULL
             if (ncol(data) > 1) {
               plot.i <- plot.i + 1
               plot.title[plot.i] <- paste("Histogram of ", x.name, sep="")
@@ -437,6 +436,11 @@ function(x=NULL, data=d, rows=NULL,
 
         }  # end density
 
+        if (!is.null(pdf_file)) {
+          dev.off()
+          if (!quiet) .showfile(pdf_file, "Histogram")
+        }
+
       }  # nu > n_cat
       else
         if (!quiet) .ncat("Histogram", x.name, nu, n_cat)
@@ -446,7 +450,7 @@ function(x=NULL, data=d, rows=NULL,
 
     if (ncol(data) > 1) {
       options(suggest = sug)
-      if (!is.null(pdf_file)  &&  plot.i > 0)
+      if (is.null(pdf_file)  &&  plot.i > 0)
         if (is.null(options()$knitr.in.progress))
           .plotList(plot.i, plot.title)
     }
@@ -484,7 +488,7 @@ function(x=NULL, data=d, rows=NULL,
         class(output) <- "out_all"
         if (!quiet) print(output)
 
-        # names and order of components per documentation in Histogram.Rd
+        # names and order of components per documentation in BarChart.Rd
         stuff$out_outliers <- txotl  # after to class out for line breaks
         stuff$out_summary <- txss
         stuff$out_freq <- txdst
@@ -493,32 +497,26 @@ function(x=NULL, data=d, rows=NULL,
                 "out_summary", "out_outliers")
         stuff <- c(stuff[1], stuff[11], stuff[2], stuff[12], stuff[3], stuff[4],
                    stuff[5], stuff[6], stuff[7], stuff[8], stuff[9], stuff[10])
-        return(invisible(stuff))
+        invisible(stuff)
       }
 
       else {  # density
-        class(txss) <- "out"
-        class(txkfl) <- "out"
+          class(txss) <- "out"
+          class(txkfl) <- "out"
 
-        output <- list(type="Density",
-          out_title=ttlns,  # out_stats=txdst,
-          out_ss=txss, # out_outliers=txotl,
-          out_file=txkfl,
-          bw=stuff$bw, n=stuff$n, n.miss=stuff$n.miss, W=stuff$W,
-             pvalue=stuff$pvalue)
+          output <- list(type="Density",
+            out_title=ttlns,  # out_stats=txdst,
+            out_ss=txss, # out_outliers=txotl,
+            out_file=txkfl,
+            bw=stuff$bw, n=stuff$n, n.miss=stuff$n.miss, W=stuff$W,
+               pvalue=stuff$pvalue)
 
-        class(output) <- "out_all"
+          class(output) <- "out_all"
 
-        return(output)
+          return(output)
       }
 
     }  # end ncol(data) == 1
-
-    # terminate pdf graphics system if used
-    if (!is.null(pdf_file)) {
-      dev.off()
-      if (!quiet) .showfile(pdf_file, "Histogram")
-    }
 
   }  # else not Trellis
 

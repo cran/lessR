@@ -163,7 +163,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 </div>
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;lessR&quot;</span>)</span></code></pre></div>
 <div id="data-table" class="section level2">
 <h2>Data Table</h2>
 <p>Analyze the data values for at least one variable, such as the annual salaries of employees at a company. Organize the data values into a specific kind of structure from which analysis proceeds.</p>
@@ -235,7 +234,7 @@ Structure of a data table.
 <p>The <code>Read()</code> function displays useful output. Because R organizes analyses by variable name, it is crucial to know the exact variable names, including the pattern of capitalization.</p>
 <p>In addition to the variable names, <code>Read()</code> also displays the type of each variable as stored in the computer, as numbers with or without decimal digits, or as character strings. Also listed are the number of complete and missing values for each variable, the number of unique values for each variable, and sample data values.</p>
 <p>The following lists the output from reading from a data file downloaded with <strong>lessR</strong>. All that is needed to read these data files is the name. A file on the web cannot be specified here because you may not have web access when this file is generated.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Suggestions
 ## Details about your data, Enter:  details()  for d, or  details(name)
@@ -279,7 +278,7 @@ Structure of a data table.
 <p>A variable label is a longer description of the the corresponding variable than that of the variable name. The variable label displays in conjunction with the variable name on the text and visualization output to further clarify the interpretability of the output.</p>
 <p>The variable label file has two columns. The the first column lists the variable names and the second column the corresponding labels. The file can be of type <code>.csv</code>, or <code>.xlsx</code>, or contained within <strong>lessR</strong>, as with the following example.</p>
 <p>The variable labels must be read into the data frame <em>l</em>. Specify the <code>var_labels</code> parameter as <code>TRUE</code> to instruct the <code>Read()</code> function to read variable labels instead of data.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee_lbl&quot;</span>, <span class="at">var_labels=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee_lbl&quot;</span>, <span class="at">var_labels=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Suggestions
 ## Details about your data, Enter:  details()  for d, or  details(name)

@@ -144,27 +144,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <div id="TOC">
 <ul>
+<li><a href="#test-of-a-specified-proportion">Test of a Specified Proportion</a>
+<ul>
 <li><a href="#single-proportion">Single Proportion</a></li>
 <li><a href="#multiple-proportions">Multiple Proportions</a></li>
+</ul></li>
+<li><a href="#tests-without-a-specified-proportion">Tests without a Specified Proportion</a>
+<ul>
 <li><a href="#goodness-of-fit">Goodness-of-Fit</a></li>
 <li><a href="#independence">Independence</a></li>
+</ul></li>
 </ul>
 </div>
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;lessR&quot;</span>)</span></code></pre></div>
 <p>The analysis of proportions is of two primary types.</p>
 <ul>
-<li>For one or more samples of data, focus on a single value of a categorical variable, traditionally called a “success”. Analyze the resulting proportion of occurrence for a single sample or compare proportions of occurrence of a success across distinct samples of data, what is called a test of <em>homogeneity</em>.</li>
-<li>For a single sample, compare proportions across the values of one or more categorical variables, called a <em>goodness-of-fit</em> test for a single variable and a test of <em>independence</em> for multiple variables.</li>
+<li>Focus on a single value of a categorical variable, termed a “success” when it occurs, for one or more samples of data. Analyze the resulting proportion of occurrence for a single sample or compare proportions of successes across distinct data samples for a single variable, a <em>homogeneity</em> test.</li>
+<li>Compare the obtained proportions across the values of one or more categorical variables for a single sample, a <em>goodness-of-fit</em> test for a single variable, and a test of <em>independence</em> for multiple variables to evaluate a potential relationship between the variables.</li>
 </ul>
-<p>From standard base R functions, the <strong>lessR</strong> function <code>Prop_test()</code>, abbreviated <code>prop()</code>, provides for either type of the analysis for proportions. To use, enter either the original data from which the sample proportions are computed, or directly enter already computed sample proportions.</p>
-<p>When analyzing the original data, an entered value for the parameter <code>success</code> for the categorical variable of interest, indicated by parameter <code>variable</code>, triggers the test of homogeneity. If the proportions are entered directly, indicate the number of successes and the total number of trials with the <code>n_succ</code> and <code>n_tot</code> parameters, each as a single value for a single sample or as vectors of multiple values for multiple samples. Without a value for <code>success</code> or <code>n_succ</code> the analysis is of goodness-of-fit or independence.</p>
-<div id="single-proportion" class="section level2">
-<h2>Single Proportion</h2>
-<p>Consider a single proportion for a value of a variable of interest, analyzed from a single sample. What is the proportion of occurrences of a designated value of variable? That tradition is to call that value a <code>success</code>. All other values are failures. Success or failure in this context does not necessarily mean good or bad, desired or undesired, but simply that a designated value occurred or it did not occur.</p>
-<p>The example below is the same example given in the documentation for the base R <code>binom.test()</code>, with the same result as <code>Prop_test()</code>, which relies upon that base R function for this analysis.</p>
-<p>For a given categorical variable of interest, in this case a type of plant, consider two values, either “giant” or “dwarf”. From a sample of 925 plants, the specified value of “giant” occurred 682 times, and did not occur 243 times. The null hypothesis tested is the specified value occurs for 3/4 of the population according to the <code>p0</code> parameter.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_succ=</span><span class="dv">682</span>, <span class="at">n_fail=</span><span class="dv">243</span>, <span class="at">p0=</span>.<span class="dv">75</span>)</span></code></pre></div>
+<p>From standard base R functions, the <strong>lessR</strong> function <code>Prop_test()</code>, abbreviated <code>prop()</code>, provides either type of analysis. To use, generally enter either the original data from which to compute the sample proportions or enter already computed sample proportions. For the analysis of multiple categorical variables, the test of <em>homogeneity</em> and the test of <em>independence</em> yield the identical statistical result.</p>
+<div id="test-of-a-specified-proportion" class="section level2">
+<h2>Test of a Specified Proportion</h2>
+<p>When the focus is on a designated value of the variable value, call such an occurrence a <code>success</code>. All other values of the variable are failures. Success or failure in this context does not necessarily mean good or bad, desired or undesired, but instead, a designated value either occurred or did not.</p>
+<p>When analyzing proportions from data for a single categorical variable, indicate the variable’s name with the parameter <code>variable</code>. Entering a value of the variable for the parameter <code>success</code> triggers the test of homogeneity. When entering proportions directly, indicate the number of successes and the total number of trials with the <code>n_succ</code> and <code>n_tot</code> parameters. Enter the value of each parameter either as a single value for one sample or as a vector of multiple values for multiple samples. Without a value for <code>success</code> or <code>n_succ</code> the analysis is of goodness-of-fit or independence.</p>
+<div id="single-proportion" class="section level3">
+<h3>Single Proportion</h3>
+<p>The example below is from the documentation for the base R function <code>binom.test()</code>, which provides the exact test of a null hypothesis regarding the probability of success. <code>Prop_test()</code>, which uses that base R function to compare a sample proportion to a hypothesized population value, yields the same result.</p>
+<div id="from-input-frequencies" class="section level4">
+<h4>From Input Frequencies</h4>
+<p>For a given categorical variable of interest, a type of plant, consider two values, either “giant” or “dwarf”. From a sample of 925 plants, the specified value of “giant” occurred 682 times and did not occur 243 times. The null hypothesis tested is that the specified value occurs for 3/4 of the population according to the <code>p0</code> parameter.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_succ=</span><span class="dv">682</span>, <span class="at">n_fail=</span><span class="dv">243</span>, <span class="at">p0=</span>.<span class="dv">75</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Exact binomial test of a proportion &lt;&lt;&lt; 
 ## 
@@ -179,8 +188,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 
 ## Hypothesis test for null of 0.75, p-value: 0.382
 ## 95% Confidence interval: 0.708 to 0.765</code></pre>
-<p>To illustrate with data, read the Employee data included as part of <strong>lessR</strong>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
+</div>
+<div id="from-data" class="section level4">
+<h4>From Data</h4>
+<p>To illustrate with data, read the <em>Jackets</em> data file included with <strong>lessR</strong> into the data frame <em>d</em>. The file contains two categorical variables. The variable <em>Bike</em> represents two different types of motorcycle: BMW and Honda. The second variable is <em>Jacket</em> with three values of jacket thickness: Lite, Med, and Thick.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Jackets&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Suggestions
 ## Details about your data, Enter:  details()  for d, or  details(name)
@@ -188,95 +200,48 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Data Types
 ## ------------------------------------------------------------
 ## character: Non-numeric data values
-## integer: Numeric data values, integers only
-## double: Numeric data values with decimal digits
 ## ------------------------------------------------------------
 ## 
 ##     Variable                  Missing  Unique 
 ##         Name     Type  Values  Values  Values   First and last values
 ## ------------------------------------------------------------------------------------------
-##  1     Years   integer     36       1      16   7  NA  15 ... 1  2  10
-##  2    Gender character     37       0       2   M  M  M ... F  F  M
-##  3      Dept character     36       1       5   ADMN  SALE  SALE ... MKTG  SALE  FINC
-##  4    Salary    double     37       0      37   53788.26  94494.58 ... 56508.32  57562.36
-##  5    JobSat character     35       2       3   med  low  low ... high  low  high
-##  6      Plan   integer     37       0       3   1  1  3 ... 2  2  1
-##  7       Pre   integer     37       0      27   82  62  96 ... 83  59  80
-##  8      Post   integer     37       0      22   92  74  97 ... 90  71  87
+##  1      Bike character   1025       0       2   BMW  Honda  Honda ... Honda  Honda  BMW
+##  2    Jacket character   1025       0       3   Lite  Lite  Lite ... Lite  Med  Lite
 ## ------------------------------------------------------------------------------------------</code></pre>
-<p>For the <code>variable</code> <em>Gender</em> in the default <em>d</em> data frame, in this example parameter <code>success</code> defines a success for the value of <em>Gender</em> of <em>“F”</em>. Analyze the proportion of successes, that is, those reporting a <em>Gender</em> of <em>“F”</em>. The default null hypothesis is a population value of 0.5.</p>
-<p>Here include the parameter names, but not necessary in this example as the parameters are listed in the order that they are defined in the definition of the <code>Prop_test()</code> function.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">variable=</span>Gender, <span class="at">success=</span><span class="st">&quot;F&quot;</span>)</span></code></pre></div>
+<p>For the <code>variable</code> <em>Bike</em> from the default <em>d</em> data frame, the parameter <code>success</code> applies to the <em>“BMW”</em> value of <em>Bike</em> in following example. Analyze the proportion of successes, those reporting a <em>Bike</em> of <em>“BMW”</em>. The default null hypothesis is a population value of 0.5, but here explicitly specify.</p>
+<p>For clarity, the following example includes the parameter names listed with their corresponding values. These names are unnecessary in this example because the values are listed in the same order of their definition of the <code>Prop_test()</code> function.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">variable=</span>Bike, <span class="at">success=</span><span class="st">&quot;BMW&quot;</span>, <span class="at">p0=</span><span class="fl">0.5</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Exact binomial test of a proportion &lt;&lt;&lt; 
 ## 
-## Variable: Gender 
-## success: F 
+## Variable: Bike 
+## success: BMW 
 ## 
 ## ------ Description ------
 ## 
 ## Number of missing values: 0 
-## Number of successes: 19 
-## Number of failures: 18 
-## Number of trials: 37 
-## Sample proportion: 0.514 
+## Number of successes: 418 
+## Number of failures: 607 
+## Number of trials: 1025 
+## Sample proportion: 0.408 
 ## 
 ## ------ Inference ------
 ## 
-## Hypothesis test for null of 0.5, p-value: 1.000
-## 95% Confidence interval: 0.344 to 0.681</code></pre>
-<p>The null hypothesis is not rejected, with a <span class="math inline">\(p\)</span>-value of 1. The sample result of <span class="math inline">\(p=0.514\)</span> is considered close to the default hypothesized value of <span class="math inline">\(0.5\)</span> for the proportion of <code>&quot;F&quot;</code> values for <em>Gender</em>.</p>
-<p>In this next example, change the null hypothesis with the parameter <code>p0</code> to 0.6. Use the abbreviation <code>prop()</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop</span>(Gender, <span class="st">&quot;F&quot;</span>, <span class="at">p0=</span><span class="fl">0.6</span>)</span></code></pre></div>
-<pre><code>## 
-## &gt;&gt;&gt; Exact binomial test of a proportion &lt;&lt;&lt; 
-## 
-## Variable: Gender 
-## success: F 
-## 
-## ------ Description ------
-## 
-## Number of missing values: 0 
-## Number of successes: 19 
-## Number of failures: 18 
-## Number of trials: 37 
-## Sample proportion: 0.514 
-## 
-## ------ Inference ------
-## 
-## Hypothesis test for null of 0.6, p-value: 0.315
-## 95% Confidence interval: 0.344 to 0.681</code></pre>
-<p>The null hypothesis of <span class="math inline">\(p_0=0.6\)</span> is also not rejected as the <span class="math inline">\(p\)</span>-value is well above <span class="math inline">\(\alpha=005\)</span>.</p>
+## Hypothesis test for null of 0.5, p-value: 0.000
+## 95% Confidence interval: 0.378 to 0.439</code></pre>
+<p>Reject the null hypothesis, with a <span class="math inline">\(p\)</span>-value of 0.000, less than <span class="math inline">\(\alpha = 0.05\)</span>. The sample result of the sample proportion <span class="math inline">\(p=0.408\)</span> is considered far from the hypothesized value of <span class="math inline">\(0.5\)</span> for the proportion of <code>&quot;BMW&quot;</code> values for <em>Bike</em>. Conclude that the data were sampled from a population with a population proportion of BMW different from 0.5.</p>
 </div>
-<div id="multiple-proportions" class="section level2">
-<h2>Multiple Proportions</h2>
-<p>The next example is the same in the documentation for the base R <code>prop.test()</code>, with the same result as <code>Prop_test()</code>, which relies upon that base R function for the comparison of proportions across different groups. To indicate multiple proportions, specified across groups, when inputting proportions provide multiple values for the <code>n_succ</code> and <code>n_tot</code> parameters.</p>
-<p>The null hypothesis is that the four populations of patients from which the samples were drawn have the same population proportion of smokers. The alternative is that at least one population proportion is different.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>smokers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">83</span>, <span class="dv">90</span>, <span class="dv">129</span>, <span class="dv">70</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">86</span>, <span class="dv">93</span>, <span class="dv">136</span>, <span class="dv">82</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_succ=</span>smokers, <span class="at">n_tot=</span>patients)</span></code></pre></div>
-<pre><code>## 
-## &gt;&gt;&gt; 4-sample test for equality of proportions without continuity correction  &lt;&lt;&lt; 
-## 
-## 
-## &gt;&gt;&gt; Description
-## 
-##                   1       2       3       4
-## -----------  ------  ------  ------  ------
-## n_               83      90     129      70
-## n_total          86      93     136      82
-## proportion    0.965   0.968   0.949   0.854
-## 
-## &gt;&gt;&gt; Inference
-## 
-## Chi-square statistic: 12.600 
-## Degrees of freedom: 3 
-## Hypothesis test of equal population proportions: p-value = 0.006</code></pre>
-<p>Can also label the groups in the output by providing a named vector for the successes.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>smokers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">83</span>, <span class="dv">90</span>, <span class="dv">129</span>, <span class="dv">70</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(smokers) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Group1&quot;</span>,<span class="st">&quot;Group2&quot;</span>,<span class="st">&quot;Group3&quot;</span>,<span class="st">&quot;Group4&quot;</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">86</span>, <span class="dv">93</span>, <span class="dv">136</span>, <span class="dv">82</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_succ=</span>smokers, <span class="at">n_tot=</span>patients)</span></code></pre></div>
+</div>
+<div id="multiple-proportions" class="section level3">
+<h3>Multiple Proportions</h3>
+<p>The following example is the same in the base R <code>prop.test()</code> documentation. <code>Prop_test()</code> relies upon that base R function to compare proportions across different groups and yield the same result. To indicate multiple proportions across groups, provide multiple values for the <code>n_succ</code> and <code>n_tot</code> parameters.</p>
+<div id="from-input-frequencies-1" class="section level4">
+<h4>From Input Frequencies</h4>
+<p>The null hypothesis in this example is that the four populations of <em>patients</em> from which the samples were drawn have the same population proportion of <em>smokers</em>. The alternative is that at least one population proportion is different. Label the groups in the output by providing a named vector for the successes.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>smokers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">83</span>, <span class="dv">90</span>, <span class="dv">129</span>, <span class="dv">70</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(smokers) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Group1&quot;</span>,<span class="st">&quot;Group2&quot;</span>,<span class="st">&quot;Group3&quot;</span>,<span class="st">&quot;Group4&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">86</span>, <span class="dv">93</span>, <span class="dv">136</span>, <span class="dv">82</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_succ=</span>smokers, <span class="at">n_tot=</span>patients)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; 4-sample test for equality of proportions without continuity correction  &lt;&lt;&lt; 
 ## 
@@ -294,16 +259,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Chi-square statistic: 12.600 
 ## Degrees of freedom: 3 
 ## Hypothesis test of equal population proportions: p-value = 0.006</code></pre>
-<p>Here duplicate these results from data. First create the data frame <em>d</em> according to the proportions of smokers and non-smokers.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sm1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;smoke&quot;</span>, <span class="dv">83</span>), <span class="fu">rep</span>(<span class="st">&quot;nosmoke&quot;</span>, <span class="dv">3</span>))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sm2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;smoke&quot;</span>, <span class="dv">90</span>), <span class="fu">rep</span>(<span class="st">&quot;nosmoke&quot;</span>, <span class="dv">3</span>))</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>sm3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;smoke&quot;</span>, <span class="dv">129</span>), <span class="fu">rep</span>(<span class="st">&quot;nosmoke&quot;</span>, <span class="dv">7</span>))</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>sm4 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;smoke&quot;</span>, <span class="dv">70</span>), <span class="fu">rep</span>(<span class="st">&quot;nosmoke&quot;</span>, <span class="dv">12</span>))</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>sm <span class="ot">&lt;-</span> <span class="fu">c</span>(sm1, sm2, sm3, sm4)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>grp <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;A&quot;</span>,<span class="dv">86</span>), <span class="fu">rep</span>(<span class="st">&quot;B&quot;</span>,<span class="dv">93</span>), <span class="fu">rep</span>(<span class="st">&quot;C&quot;</span>,<span class="dv">136</span>), <span class="fu">rep</span>(<span class="st">&quot;D&quot;</span>,<span class="dv">82</span>))</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(sm, grp)</span></code></pre></div>
+<p>The result of the test is that the <span class="math inline">\(p\)</span>-value <span class="math inline">\(=0.006 &lt; \alpha=0.05\)</span>, so reject the null hypothesis of equal probabilities across the corresponding four populations. At least one of the population proportions of smokers differ.</p>
+</div>
+<div id="from-data-1" class="section level4">
+<h4>From Data</h4>
+<p>In the following example, duplicate the previous results from data. To illustrate, create the data frame <em>d</em> according to the proportions of smokers and non-smokers. Of course, in actual data analysis the data would already be available.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sm1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;smoke&quot;</span>, <span class="dv">83</span>), <span class="fu">rep</span>(<span class="st">&quot;nosmoke&quot;</span>, <span class="dv">3</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sm2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;smoke&quot;</span>, <span class="dv">90</span>), <span class="fu">rep</span>(<span class="st">&quot;nosmoke&quot;</span>, <span class="dv">3</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>sm3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;smoke&quot;</span>, <span class="dv">129</span>), <span class="fu">rep</span>(<span class="st">&quot;nosmoke&quot;</span>, <span class="dv">7</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>sm4 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;smoke&quot;</span>, <span class="dv">70</span>), <span class="fu">rep</span>(<span class="st">&quot;nosmoke&quot;</span>, <span class="dv">12</span>))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>sm <span class="ot">&lt;-</span> <span class="fu">c</span>(sm1, sm2, sm3, sm4)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>grp <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;A&quot;</span>,<span class="dv">86</span>), <span class="fu">rep</span>(<span class="st">&quot;B&quot;</span>,<span class="dv">93</span>), <span class="fu">rep</span>(<span class="st">&quot;C&quot;</span>,<span class="dv">136</span>), <span class="fu">rep</span>(<span class="st">&quot;D&quot;</span>,<span class="dv">82</span>))</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(sm, grp)</span></code></pre></div>
 <p>Examine the first six rows and last six rows of the data frame <em>d</em>. Indicate the variable of interest, <em>sm</em>, with values <em>“smoke”</em> and <em>“nosmoke”</em>.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code></pre></div>
 <pre><code>##      sm grp
 ## 1 smoke   A
 ## 2 smoke   A
@@ -311,7 +280,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 4 smoke   A
 ## 5 smoke   A
 ## 6 smoke   A</code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(d)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(d)</span></code></pre></div>
 <pre><code>##          sm grp
 ## 392 nosmoke   D
 ## 393 nosmoke   D
@@ -319,9 +288,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 395 nosmoke   D
 ## 396 nosmoke   D
 ## 397 nosmoke   D</code></pre>
-<p>To indicate a comparison across groups, retain the format for a single proportion, providing a categorical <code>variable</code> of interest. Define a success by the value <em>“smoke”</em>. What is added for this analysis is to indicate the comparison across the four groups with a grouping variable that contains a label that identifies the corresponding group, Specify the grouping variable with the <code>by</code> parameter. The grouping variable in this example is <em>grp</em>, with values the first four uppercase letters of the alphabet.</p>
-<p>The relevant parameters <code>variable</code>, <code>success</code>, and <code>by</code> are listed in their given order in this example, so the parameter names are not necessary. They are listed here for completeness. .</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">variable=</span>sm, <span class="at">success=</span><span class="st">&quot;smoke&quot;</span>, <span class="at">by=</span>grp)</span></code></pre></div>
+<p>To indicate a comparison across groups, retain the format for a single proportion based on a value of a categorical <code>variable</code> of interest. Define success by the value of this variable, here <em>“smoke”</em>. This analysis indicates the comparison across the four groups with a grouping variable that contains a label that identifies the corresponding group. Specify the grouping variable with the <code>by</code> parameter. The grouping variable in this example is <em>grp</em>, with values the first four uppercase letters of the alphabet.</p>
+<p>The relevant parameters <code>variable</code>, <code>success</code>, and <code>by</code> are listed in their given order in this example, so the parameter names are unnecessary. They are listed here for completeness.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">variable=</span>sm, <span class="at">success=</span><span class="st">&quot;smoke&quot;</span>, <span class="at">by=</span>grp)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; 4-sample test for equality of proportions without continuity correction  &lt;&lt;&lt; 
 ## 
@@ -342,101 +311,121 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Chi-square statistic: 12.600 
 ## Degrees of freedom: 3 
 ## Hypothesis test of equal population proportions: p-value = 0.006</code></pre>
-<p>The analysis, of courses, provides the same results as providing the proportions directly.</p>
+<p>The analysis of data that matches the previously input proportions provides the same results as providing the proportions directly.</p>
 </div>
-<div id="goodness-of-fit" class="section level2">
-<h2>Goodness-of-Fit</h2>
-<p>For the goodness-of-fit test to a uniform distribution, provide the frequencies for five cells for the parameter <code>n_tot</code>. The default null hypothesis is that the proportions of the different categories of a categorical variable are equal.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">15</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_tot=</span>x)</span></code></pre></div>
-<pre><code>## 
-## &gt;&gt;&gt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
-## 
-## 
-## &gt;&gt;&gt; Description
-## 
-##                  1        2        3        4       5
-## ---------  -------  -------  -------  -------  ------
-## observed         5        6        4        6      15
-## expected     7.200    7.200    7.200    7.200   7.200
-## residual    -0.820   -0.447   -1.193   -0.447   2.907
-## stdn res    -0.917   -0.500   -1.333   -0.500   3.250
-## 
-## &gt;&gt;&gt; Inference
-## 
-## Chi-square statistic: 10.944 
-## Degrees of freedom: 4 
-## Hypothesis test of equal population proportions: p-value = 0.027</code></pre>
-<p>Make the <code>n_tot</code> parameter a named vector to label the output accordingly.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">15</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;ACCT&quot;</span>, <span class="st">&quot;ADMN&quot;</span>, <span class="st">&quot;FINC&quot;</span>,<span class="st">&quot;MKTG&quot;</span>,<span class="st">&quot;SALE&quot;</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_tot=</span>x)</span></code></pre></div>
-<pre><code>## 
-## &gt;&gt;&gt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
-## 
-## 
-## &gt;&gt;&gt; Description
-## 
-##               ACCT     ADMN     FINC     MKTG    SALE
-## ---------  -------  -------  -------  -------  ------
-## observed         5        6        4        6      15
-## expected     7.200    7.200    7.200    7.200   7.200
-## residual    -0.820   -0.447   -1.193   -0.447   2.907
-## stdn res    -0.917   -0.500   -1.333   -0.500   3.250
-## 
-## &gt;&gt;&gt; Inference
-## 
-## Chi-square statistic: 10.944 
-## Degrees of freedom: 4 
-## Hypothesis test of equal population proportions: p-value = 0.027</code></pre>
-<p>Next the same analysis but from the data.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(Dept)</span></code></pre></div>
-<pre><code>## 
-## &gt;&gt;&gt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
-## 
-## Variable: Dept 
-## 
-## &gt;&gt;&gt; Description
-## 
-##               ACCT     ADMN     FINC     MKTG    SALE
-## ---------  -------  -------  -------  -------  ------
-## observed         5        6        4        6      15
-## expected     7.200    7.200    7.200    7.200   7.200
-## residual    -0.820   -0.447   -1.193   -0.447   2.907
-## stdn res    -0.917   -0.500   -1.333   -0.500   3.250
-## 
-## &gt;&gt;&gt; Inference
-## 
-## Chi-square statistic: 10.944 
-## Degrees of freedom: 4 
-## Hypothesis test of equal population proportions: p-value = 0.027</code></pre>
 </div>
-<div id="independence" class="section level2">
-<h2>Independence</h2>
-<p>To do the <span class="math inline">\(\chi^2\)</span> test of independence, specify two categorical variables. The first variable listed in this example is the value of the parameter <code>variable</code>, so does not need the parameter name. The second variable listed must include the parameter name <code>by</code>.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(Dept, <span class="at">by=</span>Gender)</span></code></pre></div>
+</div>
+<div id="tests-without-a-specified-proportion" class="section level2">
+<h2>Tests without a Specified Proportion</h2>
+<div id="goodness-of-fit" class="section level3">
+<h3>Goodness-of-Fit</h3>
+<p>For the previously discussed test of homogeneity of the values of a single categorical variable, the proportion of occurrences for a specific value across different samples is of interest. Here, the proportion of occurrence for each value is instead calculated against the total number of occurrences, as one sample from a single population.</p>
+<div id="from-input-frequencies-2" class="section level4">
+<h4>From Input Frequencies</h4>
+<p>For the goodness-of-fit test to a uniform distribution, provide the frequencies for each group for the parameter <code>n_tot</code>. The default null hypothesis is that the proportions of the different categories of a categorical variable are equal.</p>
+<p>In this example, enter five frequencies as a vector for the value of the <code>n_tot</code> parameter. Make the vector a named vector to label the output accordingly.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">372</span>, <span class="dv">342</span>, <span class="dv">311</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;Lite&quot;</span>, <span class="st">&quot;Med&quot;</span>, <span class="st">&quot;Thick&quot;</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_tot=</span>x)</span></code></pre></div>
+<pre><code>## 
+## &gt;&gt;&gt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
+## 
+## 
+## &gt;&gt;&gt; Description
+## 
+##                Lite       Med     Thick
+## ---------  --------  --------  --------
+## observed        372       342       311
+## expected    341.667   341.667   341.667
+## residual      1.641     0.018    -1.659
+## stdn res      2.010     0.022    -2.032
+## 
+## &gt;&gt;&gt; Inference
+## 
+## Chi-square statistic: 5.446 
+## Degrees of freedom: 2 
+## Hypothesis test of equal population proportions: p-value = 0.066</code></pre>
+</div>
+<div id="from-data-2" class="section level4">
+<h4>From Data</h4>
+<p>The same analysis follows from the data.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Jackets&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(Jacket)</span></code></pre></div>
+<pre><code>## 
+## &gt;&gt;&gt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
+## 
+## Variable: Jacket 
+## 
+## &gt;&gt;&gt; Description
+## 
+##                Lite       Med     Thick
+## ---------  --------  --------  --------
+## observed        372       342       311
+## expected    341.667   341.667   341.667
+## residual      1.641     0.018    -1.659
+## stdn res      2.010     0.022    -2.032
+## 
+## &gt;&gt;&gt; Inference
+## 
+## Chi-square statistic: 5.446 
+## Degrees of freedom: 2 
+## Hypothesis test of equal population proportions: p-value = 0.066</code></pre>
+</div>
+</div>
+<div id="independence" class="section level3">
+<h3>Independence</h3>
+<p>Tests of goodness of fit and independence evaluated here rely upon a contingency table of one or two dimensions. Due to the awkwardness of entering a table of frequencies, <code>Prop_test()</code> relies upon computing the contingency table from the data, using the base R <code>chisq.test()</code> function. However, as shown next, there is a way to enter frequencies if comparing just two levels of a categorical variable.</p>
+<div id="from-input-frequencies-3" class="section level4">
+<h4>From Input Frequencies</h4>
+<p>The <em>smokers</em> and <em>patients</em> vectors presented in a previous example together contain the information needed to construct the corresponding full contingency table. In that example, the <em>smokers</em> vector represents the frequencies of patients who smoked.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>smokers</span></code></pre></div>
+<pre><code>## Group1 Group2 Group3 Group4 
+##     83     90    129     70</code></pre>
+<p>The <em>patients</em> vector represents the total number of patients in each of the four groups.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>patients</span></code></pre></div>
+<pre><code>## [1]  86  93 136  82</code></pre>
+<p>The previous analysis of the separate vectors is equivalent to the analysis of the full 2 x 4 contingency table of smokers and non-smokers according to the test of independence illustrated in the next section. Conceptually the tests are distinct, but computationally identical.</p>
+<p>The construction of the following contingency table is not part of the input to <code>Prop_test()</code>. This illustration is included here solely to illustrate the equivalence of information provided by the two vectors and the full contingency table.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>cont_tbl <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">83</span>, <span class="dv">86-83</span>, <span class="dv">90</span>, <span class="dv">93-90</span>, <span class="dv">129</span>, <span class="dv">136-129</span>, <span class="dv">70</span>, <span class="dv">82-70</span>), <span class="at">nrow=</span><span class="dv">2</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dimnames</span>(cont_tbl) <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">Smoke =</span> <span class="fu">c</span>(<span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>),</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">Group =</span> <span class="fu">c</span>(<span class="st">&quot;G1&quot;</span>,<span class="st">&quot;G2&quot;</span>,<span class="st">&quot;G3&quot;</span>,<span class="st">&quot;G4&quot;</span>))</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">addmargins</span>(cont_tbl)</span></code></pre></div>
+<pre><code>##      Group
+## Smoke G1 G2  G3 G4 Sum
+##   Yes 83 90 129 70 372
+##   No   3  3   7 12  25
+##   Sum 86 93 136 82 397</code></pre>
+<p>If comparing more than two levels of a categorical variable, and only the proportions and not the data are available, then follow the form of the previous construction of the contingency table from the given proportions. Then directly use the base R function <code>chisq.test()</code> to do the analysis.</p>
+</div>
+<div id="from-data-3" class="section level4">
+<h4>From Data</h4>
+<p>The <span class="math inline">\(\chi^2\)</span> test of independence evaluated here for two categorical variables. The first variable listed in this example is the value of the parameter <code>variable</code>, so does not need the parameter name. The second variable listed must include the parameter name <code>by</code>.</p>
+<p>The question for the analysis is if the observed frequencies of <em>Jacket</em> thickness and <em>Bike</em> ownership are so different from the frequencies expected by the null hypothesis that we conclude the variables are related?</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(Jacket, <span class="at">by=</span>Bike)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Pearson&#39;s Chi-squared test  &lt;&lt;&lt; 
 ## 
-## Variable: Dept 
-## by: Gender 
+## Variable: Jacket 
+## by: Bike 
 ## 
 ## &gt;&gt;&gt; Description
 ## 
-##       Dept
-## Gender ACCT ADMN FINC MKTG SALE Sum
-##    F      3    4    1    5    5  18
-##    M      2    2    3    1   10  18
-##    Sum    5    6    4    6   15  36
+##        Jacket
+## Bike    Lite  Med Thick  Sum
+##   BMW     89  135   194  418
+##   Honda  283  207   117  607
+##   Sum    372  342   311 1025
 ## 
-## Cramer&#39;s V: 0.415 
+## Cramer&#39;s V: 0.319 
 ## 
 ## &gt;&gt;&gt; Inference
 ## 
-## Chi-square statistic: 6.200 
-## Degrees of freedom: 4 
-## Hypothesis test of independence: p-value = 0.185</code></pre>
+## Chi-square statistic: 104.083 
+## Degrees of freedom: 2 
+## Hypothesis test of independence: p-value = 0.000</code></pre>
+<p>The result of this test is that the <span class="math inline">\(p\)</span>-value = 0.000 <span class="math inline">\(&lt; \alpha=0.05\)</span>, so reject the null hypothesis of independence. Conclude that the type of <em>Bike</em> a person rides and the thickness of their <em>Jacket</em> are related.</p>
+</div>
+</div>
 </div>
 
 

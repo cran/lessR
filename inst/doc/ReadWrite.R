@@ -1,5 +1,5 @@
-## ---------------------------------------------------------------------------------------------------------------------
-library("lessR")
+## ----include=FALSE----------------------------------------------------------------------------------------------------
+suppressPackageStartupMessages(library("lessR"))
 
 ## ----dataTable, echo=FALSE, out.width='50%', fig.asp=.7, fig.align='center', fig.cap="Structure of a data table."-----
 knitr::include_graphics(system.file("img", "DataTable.png", package="lessR"))

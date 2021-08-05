@@ -4,6 +4,38 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
  
+>>>>>> Changes for lessR version 4.0.2 (2021-08-05) <<<<<<
+
+-------------
+Updates 4.0.2
+-------------
+ 
+BarChart
+  for a two categorical variable bar chart, the legend labels are by
+    default no longer abbreviated, instead sufficient room is generated
+    by the plot
+  new parameter legend_abbrev allows for the specification of the
+    maximum number of characters to display for the legend labels
+  for a two categorical variable bar chart:
+    better default placement of the legend
+    new parameter legend_adj allows for horizontal adjustment of the legend
+
+
+---------------
+Bug Fixes 4.0.2
+---------------
+
+BarChart
+  first variable x is a vector works again
+
+Histogram
+  pdf_file works
+
+Plot
+  enhance=TRUE correctly prints least-squares line when fill changed
+
+
+
 >>>>>> Changes for lessR version 4.0.0 (2021-06-06) <<<<<<
 
 -------------

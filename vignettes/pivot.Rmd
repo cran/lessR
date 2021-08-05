@@ -11,9 +11,11 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+
 ```{r include=FALSE}
-library("lessR")
+suppressPackageStartupMessages(library("lessR"))
 ```
+
 
 ## Overview
 
@@ -287,7 +289,7 @@ One data analysis strategy examines the values of a variable, such as Sales for 
 
 >_Data drill down_: Examine the values of a variable when holding the values of one or more categorical variables constant.
 
-If drilling down into the data, `pivot()` indicates the drill-down with a  display of all categorical variables with unique values that precedes the primary output. Initiate the drill-down by a previous subset of the data frame, or by `pivot()` directly. As with other _lessR_ analysis functions, the `rows` parameter specifies a logical condition for which to subset rows of the data frame for analysis.
+If drilling down into the data, `pivot()` indicates the drill-down with a  display of all categorical variables with unique values that precedes the primary output. Initiate the drill-down by a previous subset of the data frame, or by `pivot()` directly. As with other __lessR__ analysis functions, the `rows` parameter specifies a logical condition for which to subset rows of the data frame for analysis.
 
 In this example, compute the mean of _Salary_ for each level of _Dept_ for just those rows of data with the value of _Gender_ equal to "F".
 
@@ -295,7 +297,7 @@ In this example, compute the mean of _Salary_ for each level of _Dept_ for just 
 pivot(d, mean, Salary, Dept, rows=(Gender=="F"))
 ```
 
-The parentheses for the `rows` parameter are not necessary, but do enhance readability.
+The parentheses for the `rows` parameter are not necessary, but does enhance readability.
 
 Can also drill down by subsetting the data frame with a logical condition directly in the data parameter in the call to `pivot()`. Here drill down with base R `Extract[ ]` in conjunction with the __lessR__ function `.()` to simplify the syntax (explained in the vignette Subset a Data Frame). The `Extract[ ]` function specifies the rows of the data frame to extract before the comma, and the columns to extract after the comma. Here select only those rows of data with _Gender_ declared as Female. There is no information after the comma, so no columns are specified, which means to retain all columns, the variables in the data frame.
 
@@ -340,7 +342,7 @@ To avoid problems installing this version of __lessR__ from source with a previo
 
 ### Output as a 2-D Table
 
-Specify up to two `by_cols` categorical variables to create a two-dimensional table with the specified columns. Specifying one or two categorical variables as `by_cols` variables moves them from their default position in the rows to the columns, which changes the output structure from a long-form data frame to a cross-classification table with categorical variables in the rows and columns. 
+Specify up to two `by_cols` categorical variables to create a two-dimensional table with the specified columns. Specifying one or two categorical variables as `by_cols` variables moves them from their default position in the rows to the columns, which changes the output structure from a long-form data frame to a cross-tabulation table with categorical variables in the rows and columns. 
 
 In this example, specify by `by_cols` variable, _Gender_.
 

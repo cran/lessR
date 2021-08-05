@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{bc}
 
-Plots a bar chart, one categorical variable, \code{x} against one numeric variable \code{y}, as well as an optional second categorical variable \code{by} with a provided legend_ One option is to enter the reduced data table, which consists of each level of \code{x} paired with the corresponding numerical value of \code{y}, with the number of rows the number of levels. Or, transform the full data table of original measurements. If no value of \code{y} is specified, by default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables, which can be replaced with custom color scales. Or, if a \code{y} variable is specified, obtain the reduced data table from which the bar chart is computed by summarizing the value of \code{y} at each level of \code{x}, such as the mean or a variety of other summary statistics.
+Plots a bar chart, one categorical variable, \code{x} against one numeric variable \code{y}, as well as an optional second categorical variable \code{by} with a provided legend. One option is to enter the reduced data table, which consists of each level of \code{x} paired with the corresponding numerical value of \code{y}, with the number of rows the number of levels. Or, transform the full data table of original measurements. If no value of \code{y} is specified, by default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables, which can be replaced with custom color scales. Or, if a \code{y} variable is specified, obtain the reduced data table from which the bar chart is computed by summarizing the value of \code{y} at each level of \code{x}, such as the mean or a variety of other summary statistics.
 
 Also displays the frequency table for one or two variables, Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. To activate Trellis graphics specify a \code{by1} variable. If the provided object to analyze is a set of multiple variables, including an entire data frame, then a bar chart is calculated for each non-numeric variable in the data frame.
 }
@@ -29,7 +29,7 @@ BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
         legend_title=NULL, legend_position="right_margin",
         legend_labels=NULL, legend_horiz=FALSE,
-        legend_size=NULL,
+        legend_size=NULL, legend_abbrev=0, legend_adj=0,
 
         value_labels=NULL,
         rotate_x=getOption("rotate_x"),
@@ -172,16 +172,20 @@ bc(\ldots)
        default are the levels for the second or \code{by} variable.}
   \item{legend_horiz}{By default the legend is vertical, but can be changed to
        horizontal.}
-  \item{legend_size}{Size of legend text.}\cr
+  \item{legend_size}{Size of legend text.}
+  \item{legend_abbrev}{Abbreviate legend labels to the specified number of
+       the maximum number of characters.}
+  \item{legend_adj}{Shift legend for a two-categorical bar chart. A positive
+       number shifts the legend to the right from its default placement.}\cr
 
   \item{value_labels}{For factors, default is the factor labels, and for
-        character variables, default is the character values_
+        character variables, default is the character values.
         Or, provide labels for the \code{x}-axis on the graph to override
-        these values_ If the variable is a
+        these values. If the variable is a
         factor and \code{value_labels} is not specified (is \code{NULL}), then the
         value_labels are set to the factor levels with each space replaced by
         a new line character. If \code{x} and \code{y}-axes have the same scale,
-        they also apply to the \code{y}-axis_ Control the plotted size
+        they also apply to the \code{y}-axis. Control the plotted size
         with \code{axis_cex} and \code{axis_x_cex} from the lessR
         \code{\link{style} function.}}
   \item{rotate_x}{Degrees that the axis values for the category values
@@ -227,7 +231,7 @@ bc(\ldots)
         for which the default value is 0.95, or 0.9 of value if \code{beside}
         is \code{TRUE} and \code{values_position} is \code{"in"} because bars are
         narrower.}
-  \item{values_digits}{Number of decimal digits for which to display the values_
+  \item{values_digits}{Number of decimal digits for which to display the values.
         Default is 0, round to the nearest integer for \code{"\%"},
         2 for \code{"prop"}, and if \code{"input"} and \code{y} is entered
         directly, display the literal value unless > 9999, in which case
@@ -240,13 +244,13 @@ bc(\ldots)
        \code{by} variable or multiple x-variables on the same plot, then
        default is 0.040}\cr
 
-  \item{xlab}{Label for \code{x}-axis_ If \code{xlab} is not specified, then
+  \item{xlab}{Label for \code{x}-axis. If \code{xlab} is not specified, then
        the label becomes
        the name of the corresponding variable label if it exists, or, if not, the
        variable name. If \code{xy_ticks} is \code{FALSE}, then no label is displayed.
        If no y variable is specified, then \code{xlab} is set to Index unless
        \code{xlab} has been specified.}
-  \item{ylab}{Label for \code{y}-axis_  If \code{xlab} is not specified, then
+  \item{ylab}{Label for \code{y}-axis.  If \code{xlab} is not specified, then
        the label becomes
        the name of the corresponding variable label if it exists, or, if not, the
        variable name. If \code{xy_ticks} is \code{FALSE}, then no label displayed.}
@@ -362,7 +366,7 @@ When two variables are plotted, a legend is produced, with values for each level
 
 If the default right margin is retained, variable labels are also accommodated for the legend title.  To conserve horizontal space, the variable label is listed in multiple lines if needed. The legend title is constructed by forming lines of maximum length of 12 characters, with multiple words per line if possible. Any single word in the label of more than 12 characters is abbreviated to 12 characters with the R \code{\link{abbreviate}} function. Also, any value labels are abbreviated to a maximum of 6 characters.
 
-If the legend is not in the right margin, sometimes bars from the graph may intrude into the legend_ One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{add_top} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend_horiz} option.
+If the legend is not in the right margin, sometimes bars from the graph may intrude into the legend. One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{add_top} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend_horiz} option.
 
 LONG CATEGORY NAMES\cr
 For many plots, the names of the categories are too long. To adjust the plot for these long names, they can be rotated using the \code{rotate_x} and \code{rotate_y} parameters, in conjunction with \code{offset}. The \code{offset} parameter moves the category name out from the axis to compensate for the rotation. The changes can also be specified from \code{\link{style}} to persist until further changes. To reset to the default after obtaining an analysis, use \code{style()}.

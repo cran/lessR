@@ -214,7 +214,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (ellipse.miss) ellipse <- 0.95
     if (MD.miss) MD_cut <- 6
     if (add_miss) add <- "means"
-    if (fill.miss) fit <- "lm"
+    if (fit.miss) fit <- "lm"
   }
 
   if (fill.miss && run) {

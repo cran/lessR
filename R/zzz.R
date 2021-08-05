@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.0.0  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
+      "lessR 4.0.2  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
       "---------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -140,7 +140,7 @@ function(...) {
   options(document = TRUE)
   options(code = TRUE)
 
-  options(show.signif.stars = FALSE)
+  options(show.signifstars = FALSE)
   options(scipen = 30)
 }
 
@@ -1405,9 +1405,9 @@ function(dir, axT) {
 }
 
 
-.opendev <- function(pdf.fnm, width, height) {
+.opendev <- function(pdf_file, width, height) {
 
-  if (is.null(pdf.fnm)) {
+  if (is.null(pdf_file)) {
     if (options("device") != "RStudioGD" &&
         is.null(options()$knitr.in.progress)) {
       .graphwin(1, d.w=width, d.h=height)
@@ -1416,7 +1416,7 @@ function(dir, axT) {
     }
   }
   else  # windows puts a blank first page without onefile=FALSE
-    pdf(file=pdf.fnm, width=width, height=height, onefile=FALSE)
+    pdf(file=pdf_file, width=width, height=height, onefile=FALSE)
 
 }
 

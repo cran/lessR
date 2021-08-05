@@ -10,9 +10,11 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-```{r}
-library("lessR")
+
+```{r include=FALSE}
+suppressPackageStartupMessages(library("lessR"))
 ```
+
 
 First read the Employee data included as part of __lessR__.
 

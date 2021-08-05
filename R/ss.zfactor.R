@@ -3,7 +3,6 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
          x.lbl=NULL, y.lbl=NULL, label_max=20,
          x.miss=NULL, by.miss=NULL, out_size=NULL, ...)  {
 
-
 # print a cross-tabs
 .prnfreq <- function(x, type, max.ln, max.c1, n.dash, ttl, msg=FALSE) {
   tx <- character(length = 0)

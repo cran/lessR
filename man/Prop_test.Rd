@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{prop}
 
-Analyze proportions.
+Analyze proportions, either of a single proportion against a fixed alternative, a set of proportions evaluated for equality, or a goodness-of-fit test for a single categorical variable or a test of independence for multiple variables.
 }
 
 \usage{
@@ -35,7 +35,15 @@ prop(\ldots)
 
 
 \details{
-Do the test of a proportion with the exact binomial test, either by provided the \code{variable} to analyze and the \code{value} to consider a success, or provide the number of success and either the total number of trials or the number of failures.
+The analysis of proportions is of two primary types.
+
+For one or more samples of data, focus on a single value of a categorical variable, traditionally called a success. Analyze the resulting proportion of occurrence for a single sample or compare proportions of occurrence of a success across distinct samples of data, what is called a test of homogeneity.
+
+For a single sample, compare proportions from a contingency table. These tests are called a goodness-of-fit test for a single variable and a test of independence for multiple variables.
+
+From standard base R functions, the lessR function \code{Prop_test()}, abbreviated \code{prop()}, provides for either type of the analysis for proportions. To use, enter either the original data from which the sample proportions are computed, or directly enter already computed sample proportions.
+
+When analyzing the original data, an entered value for the parameter success for the categorical variable of interest, indicated by parameter variable, triggers the test of homogeneity. For a single proportion the analysis is the exact binomial test. If the proportions are entered directly, indicate the number of successes and the total number of trials with the n_succ and n_tot parameters, each as a single value for a single sample or as vectors of multiple values for multiple samples. Without a value for success or n_succ the analysis is of goodness-of-fit or independence.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -46,12 +54,27 @@ Do the test of a proportion with the exact binomial test, either by provided the
 }
 
 \examples{
-d <- Read("Employee")
-Prop_test(Gender, "F")
-Prop_test(Gender, "F", by=Dept)
+
+# generate data
+Classvalues <- c("Freshman", "Sophomore", "Junior", "Senior")
+Goodvalues <- c("Nice", "OK", "Mean")
+
+Class <- sample(Classvalues, size=250, replace=TRUE)
+Goodness <- sample(Goodvalues, size=250, replace=TRUE)
+d <- data.frame(Class, Goodness)
+
+# Test a single proportion
+Prop_test(variable=Goodness, success="Nice")
+
+# Test multiple proportions, one each for each level of Plan
+Prop_test(Goodness, "Nice", by=Class)
+
+# Test of independence
+Prop_test(Goodness, by=Class)
 
 # Same example as for the base R binom.test
 Prop_test(n_succ=682, n_fail=243, p=.75, digits_d=2)
+
 }
 
 

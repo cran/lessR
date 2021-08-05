@@ -15,7 +15,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
         legend_title=NULL, legend_position="right_margin",
         legend_labels=NULL, legend_horiz=FALSE,
-        legend_size=NULL,
+        legend_size=NULL, legend_abbrev=0, legend_adj=0,
 
         value_labels=NULL,
         rotate_x=getOption("rotate_x"),
@@ -474,7 +474,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       f.name <- paste(x.name, "x", by.name, sep="")
 
     if (!is.null(pdf_file)) {
-      if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
+      if (!grepl(".pdf", pdf_file))
+        pdf_file <- paste(pdf_file, ".pdf", sep="")
       .opendev(pdf_file, width, height)
     }
     else {
@@ -595,8 +596,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 #       beside <- TRUE
       }
 
-#     x.call <- data.frame(x.call)
-#     y.call <- data.frame(y.call)
     }  # sum, mean, sd, min, median, max
 
       bc <- .bc.main(x.call, y.call, by.call, stack100,
@@ -610,7 +609,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
             pad_y_min, pad_y_max,
             legend_title, legend_position, legend_labels,
-            legend_horiz, legend_size,
+            legend_horiz, legend_size, legend_abbrev, legend_adj,
             add, x1, x2, y1, y2, out_size, quiet, ...)
 
         if (!is.null(pdf_file)) {
@@ -717,7 +716,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
             pad_y_min, pad_y_max,
             legend_title, legend_position, legend_labels,
-            legend_horiz, legend_size,
+            legend_horiz, legend_size, legend_abbrev, legend_adj,
             add, x1, x2, y1, y2, out_size, quiet, ...)
       
       if (!is.null(pdf_file)) {
@@ -738,7 +737,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
         pad_y_min, pad_y_max,
         legend_title, legend_position, legend_labels,
-        legend_horiz, legend_size,
+        legend_horiz, legend_size, legend_abbrev, legend_adj,
         out_size, quiet, width, height, pdf_file, ...)
     }
   }

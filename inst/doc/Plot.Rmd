@@ -15,9 +15,11 @@ vignette: >
 knitr::opts_chunk$set(fig.width=4.5, fig.height=4)
 ```
 
-```{r}
-library("lessR")
+
+```{r include=FALSE}
+suppressPackageStartupMessages(library("lessR"))
 ```
+
 
 
 __lessR__ provides many versions of a scatter plot with its `Plot()` function. To illustrate, first read the Employee data included as part of __lessR__.

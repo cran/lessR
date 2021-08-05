@@ -332,6 +332,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     for (i in 2:n.cmp) {
       ac <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE,
                FUN=compute[[i]], na.rm=na_remove)
+      names(ac)[ncol(ac)] <- paste(names(ac)[ncol(ac)], i, sep="")  # no dups
       a <- merge(a, ac, by=names(by.vars), sort=FALSE)
     }
   }
@@ -399,7 +400,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       names(a)[k+1] <- paste("n", "_", nm.var.d[1], sep="")
       names(a)[k+2] <- paste("na", "_", nm.var.d[1], sep="")
       for (i in 1:n.cmp) {
-        names(a)[k+2+i] <- nm.var.d[1]  # here all agg vars get the var name
+        names(a)[k+2+i] <- nm.var.d[1]  # all agg vars get the var name
       }
     }  # end n.cmp > 1 and n.var==1
 
@@ -429,7 +430,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       names(by.v) <- nm.row.by
       a2=aggregate(dtmp[,ind.var.d], by=by.v, drop=FALSE, FUN=count_n)
       for (j in 1:nrow(a2)) if (is.na(a2[j,ncol(a2)])) a2[j,ncol(a2)] <- 0
-      amd <- merge(amd,a2, by=names(by.vars), sort=FALSE)
+      amd <- merge(amd, a2, by=names(by.vars), sort=FALSE)
       if (out.nm.miss)
         l.nm <-lvl[i]
 #       l.nm <- paste(abbreviate(nm.var.d[1], 3), "_", lvl[i], sep="")
