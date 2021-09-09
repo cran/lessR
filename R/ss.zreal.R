@@ -44,7 +44,7 @@ function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
     tx <- character(length = 0)
 
     # title
-    tx[length(tx)+1] <- paste("Data Table of", y.name) 
+    tx[length(tx)+1] <- paste("Summary Table of", y.name) 
     tx[length(tx)+1] <- .dash2(nchar(tx[length(tx)]))
     tx[length(tx)+1] <- ""
 
@@ -59,8 +59,7 @@ function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
 
     if (max(nchar(tx)) < getOption("width")) {  # horizontal layout
 
-      # values
-      for (i in 1:nrow(x)) {
+      for (i in 1:nrow(x)) {  # values
         rwnm <- paste(" ", rownames(x)[i])
         tx[length(tx)+1] <- format(rwnm, width=max.c1, justify="left")
         for (j in 1:ncol(x)) {

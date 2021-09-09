@@ -12,8 +12,8 @@ Analyze proportions, either of a single proportion against a fixed alternative, 
 
 \usage{
 Prop_test(variable=NULL, success=NULL, by=NULL, data=d,
-          n_succ=NULL, n_fail=NULL, n_tot=NULL,
-          p0=NULL, digits_d=3)
+          n_succ=NULL, n_fail=NULL, n_tot=NULL, n_table=NULL,
+          Yates=FALSE, p0=NULL, digits_d=3)
 
 prop(\ldots)
 }
@@ -27,6 +27,9 @@ prop(\ldots)
   \item{n_succ}{Number of successes.}
   \item{n_fail}{Number of trials, either provide this or \code{n}.}
   \item{n_tot}{Number of trials, either provide this or \code{q}.}
+  \item{n_table}{Path name of the file that contains a frequency table.}
+  \item{Yates}{Set to \code{TRUE} to implement Yate's correction factor
+        where applicable.}
   \item{p0}{Value of null hypothesized probability.}
   \item{digits_d}{Number of significant digits for each of the displayed summary
         statistics.}
@@ -41,9 +44,21 @@ For one or more samples of data, focus on a single value of a categorical variab
 
 For a single sample, compare proportions from a contingency table. These tests are called a goodness-of-fit test for a single variable and a test of independence for multiple variables.
 
-From standard base R functions, the lessR function \code{Prop_test()}, abbreviated \code{prop()}, provides for either type of the analysis for proportions. To use, enter either the original data from which the sample proportions are computed, or directly enter already computed sample proportions.
+From standard base R functions, the lessR function \code{Prop_test()}, abbreviated \code{prop()}, provides for either type of the analysis for proportions. To use, enter either the original data from which the sample proportions are computed, or directly enter already computed sample frequencies from which the proportions are computed.
 
-When analyzing the original data, an entered value for the parameter success for the categorical variable of interest, indicated by parameter variable, triggers the test of homogeneity. For a single proportion the analysis is the exact binomial test. If the proportions are entered directly, indicate the number of successes and the total number of trials with the n_succ and n_tot parameters, each as a single value for a single sample or as vectors of multiple values for multiple samples. Without a value for success or n_succ the analysis is of goodness-of-fit or independence.
+TEST OF HOMOGENEITY\cr
+When analyzing the original data, an entered value for the parameter \code{success} for the categorical variable of interest, indicated by parameter \code{variable}, triggers the test of homogeneity. For a single proportion the analysis is the exact binomial test. If the proportions are entered directly, indicate the number of successes and the total number of trials with the \code{n_succ} and \code{n_tot} parameters, each as a single value for a single sample or as vectors of multiple values for multiple samples. 
+
+TEST OF UNIFORM GOODNESS-OF-FIT\cr
+To test for goodness-of-fit from the original data, just enter the name of the categorical variable. To test from the proportions, specify the proportions as a vector with the \code{n_tot} parameter.
+
+TEST OF INDEPENDENCE\cr
+Without a value for \code{success} or \code{n_succ} the analysis is of goodness-of-fit or independence. For the test of independence, to enter the joint frequency table directly, store the frequencies in a file accessible from your computer system. One possibility is to enter the numbers into a text file with file type `.csv` or `.txt`. Enter the numbers with a text editor, or with a word processor saving the file as a text file. With this file format, separate the adjacent values in each row with a comma, as indicated below. Or, enter the numbers into an MS Excel formatted file with file type `.xlsx`. Enter only the numeric frequencies, no labels. Use the parameter \code{n_table} to indicate the path name to the file, enclosed in quotes. Or, leave the quotes empty to browse for the joint frequency table. 
+
+To conduct the test from the data, enter the names of the two categorical variables. The variable listed first is the parameter `variable`. The second listed variable is for the parameter `by`, the name of which must be included in the function call.
+
+See the corresponding vignette for more detail and examples.\cr
+Enter \code{browseVignettes("lessR")}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -58,7 +73,6 @@ When analyzing the original data, an entered value for the parameter success for
 # generate data
 Classvalues <- c("Freshman", "Sophomore", "Junior", "Senior")
 Goodvalues <- c("Nice", "OK", "Mean")
-
 Class <- sample(Classvalues, size=250, replace=TRUE)
 Goodness <- sample(Goodvalues, size=250, replace=TRUE)
 d <- data.frame(Class, Goodness)

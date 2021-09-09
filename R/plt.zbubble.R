@@ -9,7 +9,7 @@ function(x, y, size, radius, power, clr, clr_color,
   adj <- .RSadj(radius=radius)  # reg R multiply by 1.6
   radius <- adj$radius
 
-  sz <- cords[,3]**power  # radius unscaled
+  sz <- cords[,3]**power  # radius unscaled for all the points
   symbols(cords[,1], cords[,2], circles=sz, inches=radius,
           bg=clr, fg=clr_color, add=TRUE)
   mxru <- max(sz)
@@ -24,7 +24,7 @@ function(x, y, size, radius, power, clr, clr_color,
       bub.probs <- seq(0, 1, by.prob)
       qnt <- quantile(cords[,3], probs=bub.probs, type=3, na.rm=TRUE)
       qnt.TF <- logical(length(cords))
-      for (i in 1:nrow(cords))
+      for (i in 1:nrow(cords))  # 3rd column of cords is size
           qnt.TF[i] <- ifelse(cords[i,3] %in% qnt, TRUE, FALSE)
       q.ind <- which(qnt.TF)
     }
@@ -35,12 +35,11 @@ function(x, y, size, radius, power, clr, clr_color,
     sz.cex <- numeric(length=nrow(cords))
     for (i in 1:nrow(cords)) {
       sz.cex[i] <- getOption("axis_cex")  # cex target for text size
-     # target for text size
+      # target for text size
       sz.txt <- strwidth(cords[i,3], units="inches", cex=sz.cex[i])
-      while ((sz.txt - sz[i]) > -.03) {
-        if (sz.cex[i] > 0.5) {  # need cex larger than 0.5
-          sz.cex[i] <- sz.cex[i] - 0.05
-          # actual
+      while ((sz.txt - sz[i]) > -.01) {
+        if (sz.cex[i] > 0.45) {  # need cex larger than 0.45
+          sz.cex[i] <- sz.cex[i] - 0.02
           sz.txt <- strwidth(cords[i,3], units="inches", cex=sz.cex[i])
         }
         else {

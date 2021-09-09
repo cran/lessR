@@ -11,10 +11,10 @@ Compute one or more designated descriptive statistics (\code{compute} over one o
 
 \usage{
 pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
-         na_by_show=TRUE, na_remove=TRUE, sort=NULL,
-         out_names=NULL, factors=FALSE, q_num=4,
-         table_prop=c("none", "all", "row", "col"),
-         show_n=TRUE, digits_d=3, quiet=getOption("quiet"))
+         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, out_names=NULL, 
+         sort=NULL, sort_var=NULL,  
+         table_prop=c("none", "all", "row", "col"), table_long=FALSE,
+         factors=FALSE, q_num=4, digits_d=3, quiet=getOption("quiet"))
 }
 
 \arguments{
@@ -27,39 +27,45 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
        i.e., summarized across the groups.}
   \item{by}{Categorical variables that define the groups (cells) listed
        in the rows of the output long-form data frame, available to input
-       into other data analysis routines. Not used if function to compute
-       is \code{tabulate}. Ignore to compute over the variables for all the
-       data, e.g., the grand mean.}
+       into other data analysis routines. Ignore to compute over the variables
+       for all the data, e.g., the grand mean.}
   \item{by_cols}{Up to two categorical variables that define the groups
        displayed as columns in a two dimensional table.} 
   \item{rows}{Subset, i.e., filter, rows of the input data frame for analysis.}\cr
 
+  \item{show_n}{By default, show the sample size and number missing for each
+        computed summary statistic. If \code{FALSE}, delete all variables
+        from the output data frame that begin with \code{n_} or \code{na_}.}
   \item{na_by_show}{If \code{TRUE}, show missing levels of the grouping
        variables with \code{n} set to 0.}
   \item{na_remove}{Sets base R parameter \code{na.rm}, which, if \code{TRUE},
        removes missing values from the \code{value} variables and then reports
        how many values were missing. Otherwise, the aggregation for a cell
        with any missing data returns \code{NA}.}
+  \item{out_names}{Custom names for the aggregated variables. If more than one,
+        list in the same order as specified in \code{variable}.}\cr
+
   \item{sort}{Set to \code{"+"} for an ascending sort or \code{"-"} for
        a descending sort according to the last variable in the output data
        frame.}
-  \item{out_names}{Custom names for the aggregated variables. If more than one,
-        list in the same order as specified in \code{variable}.}
+  \item{sort_var}{Either the name of the variable in the output data frame
+       to sort, or its column number. Default is the last column.}\cr
+
+  \item{table_prop}{Applies to a created \code{table} for the value of
+        \code{compute}. Default value of \code{"none"} leaves frequencies.
+        Value of \code{"all"} converts to cell proportions based on the
+        grand total. Values of \code{"row"} and \code{"col"} provide
+        proportions based on row and column sums.}
+  \item{table_long}{Applies to the value of \code{compute} of \code{table}.
+        If set to \code{TRUE}, then the cross-tabs table is output in
+        long form, one count per row.}\cr
+
   \item{factors}{For \code{by} variables of type \code{Date}, 
         \code{character}, and \code{integer}, the variable type is retained
         in the summary table. If \code{TRUE}, then the \code{by} variables
         become factors.}
   \item{q_num}{For the computation of quantiles, number of intervals. Default
         value of 4 provides quartiles.}
-  \item{table_prop}{Applies to a created \code{table} for the value of
-        \code{compute}. Default value of \code{"none"} leaves frequencies.
-        Value of \code{"all"} converts to cell proportions based on the
-        grand total. Values of \code{"row"} and \code{"col"} provide
-        proportions based on row and column sums.}
-  \item{show_n}{By default, show the sample size and number missing for each
-        computed summary statistic. If \code{FALSE}, delete all variables
-        from the output data frame that begin with \code{n_} or \code{na_}.}\cr
-
   \item{digits_d}{Number of significant digits for each of the displayed summary
         statistics.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
@@ -75,9 +81,7 @@ The second is that the data parameter is listed first in the parameter list, whi
 
 Variable ranges in the specification of \code{by} are not needed in general. Only a small number of grouping variables generally define the cells for the aggregation.
 
-The following table lists available single summary statistics. The list is not necessarily exhaustive.
-
-The unique function is \code{tabulate}, which does not refer to the base R function of that name, but an indicator to just provide cell counts, no other statistics, generalizing the \code{pivot} function to cover more cases. Accordingly, the \code{vaiable} and \code{by} parameters are redundant, so the \code{by} parameter is not needed.
+The following table lists available single summary statistics. The list is not necessarily exhaustive as the references are to functions provided by base R, including any not listed below.
 
 \tabular{ll}{
 Statistic \tab Meaning\cr
@@ -93,8 +97,6 @@ Statistic \tab Meaning\cr
 \code{kurtosis} \tab kurtosis\cr
 \code{IQR} \tab inter-quartile range\cr
 \code{mad} \tab mean absolute deviation\cr
-\cr
-\code{tabulate} \tab count of each cell only\cr
 ----------- \tab --------------------------------\cr
 }
 
@@ -109,7 +111,7 @@ Statistic \tab Meaning\cr
 \code{table}    \tab frequencies or proportions\cr
 ----------- \tab --------------------------------\cr
 }
-The \code{table} computation applies to an aggregated variable that consists of discrete categories, such as the numbers 1 through 5 for responses to a 5-pt Likert scale. The result is a table of frequencies or proportions, referred to for two or more variables as either a contingency table, a cross-tabulation table, or a joint frequency distribution. Only the \code{table} computation applies to non-numeric as well as numeric variables, though only meaningful if the aggregated variable consists of a relatively small set of discrete values.
+The \code{table} computation applies to an aggregated variable that consists of discrete categories, such as the numbers 1 through 5 for responses to a 5-pt Likert scale. The result is a table of frequencies or proportions, a contingency table, referred to for two or more variables as a cross-tabulation table or a joint frequency distribution. Other statistical functions can be simultaneously computed with \code{table}, though only meaningful if the aggregated variable consists of a relatively small set of discrete, numeric values. 
 
 The default quantiles for \code{quantile} are quartiles. Specify a custom number of quantiles with the \code{q_num} parameter, which has the default value of 4 for quartiles.
 
@@ -134,7 +136,7 @@ The number of missing elements of the \code{value} variable is provided as the v
 library(knitr)  # for kable() called from pivot()
 d <- Read("Employee", quiet=TRUE)
 
-# parameter values by name
+# parameter values named
 pivot(data=d, compute=mean, variable=Salary, by=c(Dept, Gender))
 
 # visualize the aggregation
@@ -145,11 +147,13 @@ BarChart(Dept, Salary_mn, by=Gender, data=a)
 # parameter values by position
 pivot(d, mean, c(Years, Salary), c(Dept, Gender))
 
-# output as a 2-d table
+# output as a 2-d cross-tabulation table
 pivot(d, mean, Salary, Dept, Gender)
 
-# tabulate group counts only
-pivot(d, tabulate, c(Dept, Gender))
+# cross-tabulation table
+pivot(d, table, Dept, Gender)
+# long form
+pivot(d, table, Dept, Gender, table_long=TRUE)
 
 # multiple functions for which to aggregate
 pivot(d, c(mean,sd,median,IQR), Years, c(Gender,Dept), digits_d=2)

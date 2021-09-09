@@ -522,13 +522,10 @@ bc(Make, rotate_x=90, data=myd)
 # manage size of horizontal value labels
 bc(Make, horiz=TRUE, label_max=4, data=myd)
 
+# read y variable, Salary
 # display bars for values of count <= 0 in a different color
 #  than values above
 BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
-
-# read y variable, Salary, then bars are height of 
-#  corresponding mean Salary
-BarChart(Dept, Salary, stat="mean")
 
 
 # ----------------------------------------------------
@@ -537,6 +534,9 @@ BarChart(Dept, Salary, stat="mean")
 
 # at each level of Dept, show the frequencies of the Gender levels
 BarChart(Dept, by=Gender)
+
+# Trellis (facet) plot
+BarChart(Dept, by1=Gender)
 
 # at each level of Dept, show the row proportions of the Gender levels
 #   i.e., 100% stacked bar graph

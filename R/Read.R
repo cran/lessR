@@ -67,11 +67,9 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     browse <- TRUE
     from <- file.choose()
     fncl <- paste("Read(", "from = \"", from,  "\", quiet = TRUE)", sep="")
-#   fncl2 <- paste("Read(", "from = \"", from,  "\")", sep="")
   }
   else {
     fncl <- .fun_call.deparse(fun_call)
-#   fncl2 <- .fun_call.deparse(fun_call)  # for read_excel currency bug
   }
 
   if (!var_labels) options(read.call=fncl)  # save only data file for knitr run
@@ -91,7 +89,8 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     if (is.null(format)) {
       if (from %in% c("BodyMeas", "Cars93",
                       "Employee", "Employee_lbl", "Mach4", "Mach4_lbl",
-                      "Jackets", "Learn", "Reading", "StockPrice")) {
+                      "Jackets", "Learn", "Reading", "StockPrice",
+                      "FreqTable")) {
         format <- "lessR"  # presume exact name not exist in current wd
       }
       else { 
@@ -111,13 +110,13 @@ function(from=NULL, format=NULL, var_labels=FALSE,
   if (!quiet) {
     max.chr <- nchar(from)
     if (format == "Excel"  &&  !quiet) {
-      txt <- "Alexander Walker's openxlsx package]"
+      txt <- "Schauberger and Walker's openxlsx package]"
       cat("[with the read.xlsx function from", txt, "\n")
     }
 
     if (browse) {
       cat("\n")
-      cat("Data File:  ", from, "\n")
+      cat("Data File:  ", from, "\n\n")
     }
   }
 
@@ -257,7 +256,6 @@ function(from=NULL, format=NULL, var_labels=FALSE,
   else if (format == "lessR") {  # data and any labels
     txt <- ifelse (substr(from,1,4) == "data", "", "data")
     file.name <- paste(txt, from, ".rda", sep="")
-
     path.name <- paste(find.package("lessR"), "/data/",  file.name, sep="")
 
     if (!file.exists(path.name)) {

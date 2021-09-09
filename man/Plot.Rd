@@ -29,7 +29,9 @@ A scatterplot displays the values of a distribution, or the relationship between
 \code{Plot(X)}: one vector of continuous variables, with no \code{y}-variable, results in a scatterplot matrix\cr
 \code{Plot(X)}: one vector of categorical \code{x}-variables, with no \code{y}-variable, generalizes to a matrix of 1-dimensional bubble plots, here called the bubble plot frequency matrix, to replace a series of bar charts\cr
 
-Represent the influence of additional categorical variables with \code{by1} or \code{by2} to generate Trellis plots conditioned on one or two variables from implicit calls to functions from Deepayan Sarkar's (2009) lattice package. Use \code{by} to group multiple variables on the same plot, or on multiple panels if Trellis graphics are activated. For a third variable, which is continuous, specify \code{size} for a bubble plot. By default, the \code{values} of analysis that generate the plotted points is \code{data}, or choose other values to plot, which are statistics computed from the data such as \code{mean}.
+Use \code{by} to group separate plots for multiple categorical variables on the same plot. Shift the plots to multiple panels for multiple categorical variables with \code{by1} or \code{by2}. The plots are Trellis (or facet) plots conditioned on one or two variables from implicit calls to functions from Deepayan Sarkar's (2009) lattice package. If plotting a single continuous variable, the resulting plots are superimposed violin, box, and scatter plots, called here VBS plots.
+
+For a third variable, which is continuous, specify \code{size} for a bubble plot. By default, the \code{values} of analysis that generate the plotted points is \code{data}, or choose other values to plot, which are statistics computed from the data such as \code{mean}.
 }
 
 \usage{
@@ -79,7 +81,7 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
          offset=getOption("offset"),
 
-         xy_ticks=TRUE, value_labels=NULL, label_max=20, origin_x=NULL,
+         xy_ticks=TRUE, value_labels=NULL, origin_x=NULL,
          scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
          legend_title=NULL,
 
@@ -153,8 +155,8 @@ vp(\ldots)
         with \code{by2} as the row variable, which yields a scatterplot (panel)
         for \emph{each} cross-classification of the levels of numeric \code{x} and
         \code{y} variables.}
-  \item{n_row}{Optional specification for the number of rows in the layout
-        of a multi-panel display with Trellis graphics. Specify
+  \item{n_row}{Optional specification for the number of rows and columns
+        in the layout of a multi-panel display with Trellis graphics. Specify
         \code{n_col} or \code{n_row}, but not both.}
   \item{n_col}{Optional specification for the number of columns in the
         layout of a multi-panel display with
@@ -177,8 +179,8 @@ vp(\ldots)
         select from a variety of color palettes. For points, default is
         \code{pt_fill} and for area under a line chart, \code{violin_fill}.
         For a line chart, set to \code{"on"} for default color.}
-  \item{color}{Border color of the points or line_color for line plot,
-        can be a vector to customize the color for each point or a color
+  \item{color}{Border color of the points or line_color for line plot.
+        Can be a vector to customize the color for each point or a color
         range such as "blues" (see \code{\link{getColors}}. Default is
         \code{pt_color} from the lessR \code{\link{style}} function.}
   \item{trans}{Transparency factor of the fill color of each point.
@@ -187,17 +189,18 @@ vp(\ldots)
 
   \item{size}{When set to a constant, the scaling factor for \bold{standard points}
       (not bubbles) or a line, with default of 1.0 for points and 2.0 for a line.
-       Set to 0 to not plot the points or lines. When set to a variable, activates a 
+       Set to 0 to not plot the points or lines. If \code{area_fill} for a line
+       chart, then default is 0. When set to a variable, activates a 
        bubble plot with the size of each bubble further determined
        by the value of \code{radius}. Applies to the standard two-variable
        scatterplot as well as to the scatterplot component of the
        integrated Violin-Box-Scatterplot (VBS) of a single continuous variable.}
-  \item{size_cut}{If \code{TRUE} (or \code{1}), then for a bubble plot in which the
+  \item{size_cut}{If \code{1} (or \code{TRUE}), then for a bubble plot in which the
        bubble sizes are defined by a
        \code{size} variable, show the value
        of the sizing variable for selected bubbles in the center of
        the bubbles, unless the bubble is too small.
-       If \code{FALSE}, no value is displayed.
+       If \code{0} (or \code{FALSE}), no value is displayed.
        If a number greater than 1, then display the value only for the
        indicated number of values, such as just the max and min for a setting
        of 2, the default value when bubbles represent a size
@@ -205,12 +208,14 @@ vp(\ldots)
        the \code{\link{style}} function.}
   \item{shape}{The plot character(s). The default value is a circle with both an
        color and filled interior, specified with \code{color} and \code{fill}.
-       Possible values are \code{circle}, \code{square}, \code{diamond},
-       \code{triup} (triangle up), \code{tridown} (triangle down), all
+       Other possible values with fillable interiors 
+       are \code{circle}, \code{square}, \code{diamond},
+       \code{triup} (triangle up), and \code{tridown} (triangle down). Other
+       characters include all
        uppercase and lowercase letters, all digits, and most punctuation characters.
-       The numbers 21 through 25 as defined by the R \code{\link{points}} function
-       also apply. If plotting levels according to \code{by}, then list one
-       shape for each level to be plotted.}
+       The numbers 0 through 25 as defined by the R \code{\link{points}} function
+       also apply. See \code{"points"} for the symbols. If plotting levels
+       according to \code{by}, then list one shape for each level to be plotted.}
   \item{means}{If the one variable is categorical, expressed as a factor, and
        the other variable continuous, then if \code{TRUE}, by default,
        plot means with the scatterplot. Also applies to a 1-D scatterplot.}
@@ -279,7 +284,7 @@ vp(\ldots)
   \item{bw_iter}{Number of iterations used to modify default R bandwidth
         to further smooth the obtained density estimate. When set, also
         displays the iterations and corresponding results.}
-  \item{violin_fill}{Fill color for a \bold{violin plot}.}
+  \item{violin_fill}{Fill color for a violin plot.}
   \item{box_fill}{Fill color for a box plot.}
   \item{vbs_pt_fill}{Points in a VBS scatterplot are black by default because
         the background is the violin, which is based on the current theme
@@ -349,7 +354,7 @@ vp(\ldots)
   \item{plot_errors}{Plot the line segment that joins each point to the 
         regression line, "loess" or "lm", illustrating the size of the
         residuals.}
-  \item{ellipse}{Confidence level of a \bold{data ellipse} for a scatterplot 
+  \item{ellipse}{Confidence level of a data ellipse for a scatterplot 
         of only a single
         \code{x}-variable and a single \code{y}-variable according to the
         contours of the corresponding bivariate normal density function. Can
@@ -379,7 +384,8 @@ vp(\ldots)
   \item{run}{If set to \code{TRUE}, generate a \bold{run chart}, i.e., line chart,
         in which
         points are plotted in the sequential order of occurrence in the data table.
-        By default, the points are connected by line. Set by default when the \code{x}-values
+        By default, the points are connected by line. Set by default when the
+        \code{x}-values
         are sorted with equal intervals or a single variable is a time series.
         To turn off connecting line segments for sorted, equal intervals data, set
         to \code{FALSE}.
@@ -387,12 +393,12 @@ vp(\ldots)
         with function \code{\link{style}}.}
   \item{lwd}{Width of the line segments. Set to zero to remove the line
         segments.}       
-  \item{area_fill}{Parameter \code{fill} applies to points if only points and
-       if only a run chart or time series chart, then to area under
-       line segments. But \code{area_fill} takes precedence over \code{fill}
-       for the area under the line segments, which is needed to provide both
-       fill for points and this area. If \code{stack} is \code{TRUE}, then
-       default fill is gradation from default color range, e.g., \code{"blues"}.}
+  \item{area_fill}{Specifies the area under the line segments, if present.
+       If \code{stack} is \code{TRUE}, then
+       default is gradation from default color range, e.g., \code{"blues"}.
+       If not specified, and \code{fill} is specified with no plotted points
+       and \code{area_fill} is not specified,,
+       then \code{fill} generally specifies the area under the line segments.}
   \item{area_origin}{Origin for the filled area under the time series line. Values
        less than this value are below the corresponding reference line, values
        larger are above the line.}
@@ -424,8 +430,8 @@ vp(\ldots)
        + values move the corresponding margin away from plot edge. 
        Not applicable to Trellis graphics.}\cr
 
-  \item{rotate_x}{Degrees that the axis values for the value labels on
-        the \code{x}-axis are rotated, usually to accommodate longer values,
+  \item{rotate_x}{\bold{Rotation in degrees of the value labels} on
+        the \code{x}-axis, usually to accommodate longer values,
         typically used in conjunction with \code{offset}. When equal 90
         the value labels are perpendicular to the x-axis and a different
         algorithm places the labels so that \code{offset} is not needed.}
@@ -436,8 +442,8 @@ vp(\ldots)
         is 0.5. Larger values such as 1.0 are used to create space for the label when
         longer axis value names are rotated.}\cr
 
-  \item{xy_ticks}{Flag that indicates if tick marks and associated \bold{axis values}
-        on the axes are to be displayed. To rotate the axis values, use
+  \item{xy_ticks}{Flag that indicates if tick marks and associated \bold{value
+        labels} on the axes are to be displayed. To rotate the axis values, use
         \code{rotate_x}, \code{rotate_y}, and \code{offset} from the
         \code{\link{style}} function.}
   \item{value_labels}{Labels for the \code{x}-axis on the graph to override 
@@ -445,10 +451,8 @@ vp(\ldots)
         factor and \code{value_labels} is not specified (is \code{NULL}), then the
         value_labels are set to the factor levels with each space replaced by
         a new line character. If \code{x} and \code{y}-axes have the same scale,
-        they also apply to the \code{y}-axis.}
-  \item{label_max}{Maximum size of labels for the values of a categorical variable.
-        Not a literal maximum as preserving unique values may require a larger number
-        of characters than specified.}
+        they also apply to the \code{y}-axis. No need to use if categorical
+        variables are declared as factors.}
   \item{origin_x}{Origin of \code{x}-axis. Starting value of \code{x}, by
        default the minimum value of \code{x}, except when \code{stat}
        is set to \code{"count"} or related  where the origin is zero
@@ -470,7 +474,7 @@ vp(\ldots)
   \item{legend_title}{Title of the legend for a multiple-variable \code{x}
        or \code{y} plot.}\cr
 
-  \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
+  \item{add}{\bold{Overlay one or more objects}, text or a geometric figures,
        on the plot.
        Possible values are any text to be written, the first argument, which is
        \code{"text"}, or,
@@ -515,11 +519,8 @@ vp(\ldots)
   \item{\ldots}{Other parameter values for non-Trellis graphics as defined by and
       processed by standard R functions \code{\link{plot}} and \code{\link{par}},
       including\cr
-      \code{xlim} and \code{ylim} for setting the range of the \code{x} and
-      \code{y}-axes\cr
       \code{cex.main} for the size of the title\cr
       \code{col.main} for the color of the title\cr
-      \code{cex} for the size of the axis value labels\cr
       \code{sub} and \code{col.sub} for a subtitle and its color
   }
 }
@@ -533,7 +534,7 @@ For numeric primary variables, a single panel may also contain multiple plots of
 
 Or, obtain multiple scatterplots on the same panel with multiple numeric \code{x}-variables, or multiple \code{y}-variables. To obtain this graph, specify one of the primary variables as a vector of multiple variables. 
 
-Trellis graphics, from Deepayan Sarkar's (2009) \code{\link{lattice}} package, may be implemented in which multiple panels for one numeric \code{x}-variable and one numeric \code{y}-variable are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by} is a conditioning variable that results in a Trellis plot, the scatterplot of \code{x} and \code{y} produced at \emph{each} level of the \code{by1} variable. The inclusion of a second conditioning variable, \code{by2}, results in a separate scatterplot panel for \emph{each} combination of cross-classified values of both \code{by1} and \code{by2}. A grouping variable according to \code{by} may also be specified, which is then applied to each panel.
+Trellis graphics (facets), from Deepayan Sarkar's (2009) \code{\link{lattice}} package, may be implemented in which multiple panels for one numeric \code{x}-variable and one numeric \code{y}-variable are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by} is a conditioning variable that results in a Trellis plot, the scatterplot of \code{x} and \code{y} produced at \emph{each} level of the \code{by1} variable. The inclusion of a second conditioning variable, \code{by2}, results in a separate scatterplot panel for \emph{each} combination of cross-classified values of both \code{by1} and \code{by2}. A grouping variable according to \code{by} may also be specified, which is then applied to each panel.
 
 Control the panel dimensions and the overall size of the Trellis plot with the following parameters: \code{width} and \code{height} for the physical dimensions of the plot window, \code{n_row} and \code{n_col} for the number of rows and columns of panels, and \code{aspect} for the ratio of the height to the width of each panel. The plot window is the standard graphics window that displays on the screen, or it can be specified as a pdf file with the \code{pdf_file} parameter. 
 
@@ -907,9 +908,6 @@ d <- rd("Employee")
 Plot(Dept)
 
 \donttest{
-
-# abbreviated category labels
-Plot(Dept, label_max=2)
 
 # plot of frequencies for each category (level), replaces bar chart 
 Plot(Dept, stat="count")

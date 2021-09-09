@@ -2,20 +2,13 @@
 function(x, cor.coef=TRUE, fit="loess",
          col_fill=getOption("pt_fill"), col_color=getOption("pt_color"),
          col.fit=getOption("fit_color"), col.bg=getOption("panel_fill"),
-         col.box=getOption("panel_color")) {
+         col.box=getOption("panel_color"),
+         col_trans=getOption("trans_pt_fill")) {
 
-  if (is.logical(fit)) if (fit) fit <- "loess"
-  if (is.null(fit)) fit <- "loess"
-
-  if (getOption("sub_theme") == "black") col_color <- getOption("lab_color")
-
-  n.var <- ncol(x)
-
-  par(bg=getOption("window_fill"))
 
   panel.smooth <- function(x, y, fit.line=fit, pch=par("pch"), cex=.76,
-    col.pt=col_color, col.smooth=col.fit, span=2/3, iter=3, ...)
- {
+    col.pt=col_color, col.smooth=col.fit, span=2/3, iter=3, ...) {
+
     usr <- par("usr")          
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
     cex.adj <- 0.86 - 0.045*n.var
@@ -46,31 +39,41 @@ function(x, cor.coef=TRUE, fit="loess",
     }
   }
 
-  panel.cor <- function(x, y, digits=2, prefix="", cex.cor, ...)
-  {
+
+  panel.cor <- function(x, y, ...) {
     usr <- par("usr"); on.exit(par(usr))
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
     par(usr=c(0, 1, 0, 1))
     r <- cor(x, y)
     txt <- .fmt(r, 2)
-    txt <- paste(prefix, txt, sep="")
+    # maybe use par("fin")[1] / n.var to get size of each cell
     cex.adj <- 1.274 - (0.033*n.var)  # adjust size of displayed r
-    text(0.5, 0.5, txt, cex=cex.adj, col=col_color)  # or cex=cex.cor * r
+    text(0.5, 0.5, txt, cex=cex.adj, col="black")  # or cex=cex.cor * r
   }
+
 
   text.diag <- function(x, y, nm, ...) {  # nm from calling routine
     usr <- par("usr")          
     rect(usr[1], usr[3], usr[2], usr[4], col=getOption("se_fill"),
          border=col.box)
-    #rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
-    txt <-  nm  # nm from parameter list, so adjusts for each panel
-    cex.adj <- 1.274 - (0.033*n.var)  # adjust size of displayed r
-    #cex.adj <- ifelse (n.var < 8, 1.8, 1.5)  # adjust size of displayed r
-    text(0.5, 0.5, txt, cex=cex.adj, col=getOption("lab_color"))
+    cex.adj <- 1.274 - (0.033*n.var)  # adjust size of displayed var name
+    text(0.5, 0.5, nm, cex=cex.adj, col=getOption("lab_color"))
   }
 
   # -----
   # begin
+
+  if (is.logical(fit)) if (fit) fit <- "loess"
+
+  if (getOption("sub_theme") == "black")
+     col_color <- getOption("lab_color")
+
+  n.var <- ncol(x)
+
+  par(bg=getOption("window_fill"))
+
+  if (!is.null(col_trans))
+    col_fill <- .maketrans(col_fill, (1-col_trans)*256)
 
   if (cor.coef)  # no missing data
     pairs(na.omit(x), lower.panel=panel.smooth, upper.panel=panel.cor,

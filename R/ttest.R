@@ -405,8 +405,13 @@ function(x, y=NULL, ...) {
     }
 
     # Cleveland two-variable dot plot
+    theme <- getOption("theme")
+    qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
+    pt_fill <- getColors(qual_pal, n=2, output=FALSE)
+    pt_color <- getColors(qual_pal, n=2, output=FALSE)
     .plt.main(data.frame(x.call, stringsAsFactors=TRUE),
               data.frame(y.call, stringsAsFactors=TRUE), cat.y=TRUE,
+              fill=pt_fill, color=pt_color,
               shape=21, size=.8, ylab="", segments_y=TRUE)
 
     if (!is.null(pdf_file)) {

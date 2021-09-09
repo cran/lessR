@@ -76,7 +76,7 @@ function(x, y,
   else {  # length(fill) == 0
     if (is.null(fill)) {  # fill not specified
       if (!is.ord) {  # hues for nominal 
-        clr <- getColors(n=n_cat)
+        clr <- getColors(n=n_cat, output=FALSE)
         if (!is.null(.color_range(clr, n_cat)))  
           clr <- .color_range(clr, n_cat)
       }

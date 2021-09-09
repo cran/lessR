@@ -200,6 +200,7 @@ function(x, y, values, object, n_cat,
 
         }  # end suggest
 
+
         for (i in 1:n_col) {
 
           if (n.xcol > 1) {
@@ -644,7 +645,5 @@ function(x, y, values, object, n_cat,
     }  # end values not data
     
   }
-    
-  cat("\n")
 
 }

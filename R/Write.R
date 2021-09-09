@@ -67,7 +67,7 @@ function(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
     }
 
     saveWorkbook(wb, file=file.data, overwrite=TRUE)
-    txt <- "Alexander Walker's openxlsx package]"
+    txt <- "Schauberger and  Walker's openxlsx package]"
     if (ExcelTable  &&  !quiet)
       cat("[with the writeDataTable function from", txt, "\n")
     else

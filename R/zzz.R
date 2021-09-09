@@ -1,13 +1,12 @@
-if (getRversion() >= "2.15.1")
-  globalVariables(c("d", "mydata", "l", "mylabels", "mycor", "P1", "P2", "P3"))
-# Pn is for latticeExtra layer function
+if (getRversion() >= "3.5.0")
+  globalVariables(c("d", "mydata", "l", "mylabels", "mycor"))
 
 
 .onAttach <-
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.0.2  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
+      "lessR 4.0.3  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
       "---------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -27,15 +26,15 @@ function(...) {
 
   options(panel_fill = "white")
   options(window_fill = getOption("panel_fill"))
-  options(panel_color = "gray60")  # rgb(222,217,205, maxColorValue=255)
+  options(panel_color = "gray45")  # lattice
   options(panel_lwd = 1.0)
   options(panel_lty = "solid")
 
   # .maketrans("gray50", .to256("trans_bar_fill"))
   options(bar_fill = NULL)
-  options(bar_fill_discrete = c("#2D8BC3", "#A57E08", "#51932E", "#C7657B",
-           "#8E76C9", "#009B8B", "#BB714D", "#838A00", "#0097AD", "#C561A2",
-           "#009962", "#B068BE" ))  # getColors("hues")
+  options(bar_fill_discrete = c("#4398D0", "#B28B2A", "#5FA140", "#D57388",
+           "#9A84D6", "#00A898", "#C97E5B", "#909711", "#00A3BA", "#D26FAF",
+           "#00A76F", "#BD76CB" ))  # getColors("hues")
   options(bar_fill_ordered = rgb(144,165,195, maxColorValue=255))
   options(trans_bar_fill = 0.0)
   options(bar_color = rgb(126,144,168, maxColorValue=255))
@@ -47,22 +46,17 @@ function(...) {
   options(values_digits = NULL)
   options(values_position = "in")
 
-#  options(pt_fill = rgb(121,138,148, maxColorValue=255))  # old: gray20
-  options(pt_fill = rgb(70,80,90, maxColorValue=255))
+  options(pt_fill = rgb(45,88,105, maxColorValue=255))
   options(trans_pt_fill = 0.00)
-#  options(pt_color = rgb(121,138,148, maxColorValue=255))
-  options(pt_color = rgb(70,80,90, maxColorValue=255))
+  options(pt_color = rgb(45,88,105, maxColorValue=255))  # old 70 80 90
   options(out_fill = "firebrick4")
   options(out_color = "firebrick4")
   options(out2_fill = "firebrick2")
   options(out2_color = "firebrick2")
 
-
   options(violin_fill = "#7485975A")  # .maketrans(hcl(240,20,55), 90)
   options(violin_color = "gray15")
-  options(box_fill = c("#2D8BC3", "#A57E08", "#51932E", "#C7657B", "#8E76C9",
-                       "#009B8B", "#BB714D", "#838A00", "#0097AD", "#C561A2",
-                       "#009962", "#B068BE"))  # getColors("hues")
+  options(box_fill = rgb(65,155,210, maxColorValue=255)) # old getColors("hues")
   options(box_color = "gray15")
   options(line_color = "gray15")
 
@@ -71,7 +65,7 @@ function(...) {
   options(ellipse_color = "gray20")
   options(ellipse_lwd = 1)
   options(se_fill = "#1A1A1A19")  # old .maketrans("gray10", 40) "darkblue", 25
-  options(fit_color = "darkblue")  # old "gray15" 
+  options(fit_color = rgb(125,120,110, maxColorValue = 255))
   options(fit_lwd = 2)
   options(heat = "gray30")
   options(segment_color = "gray40")
@@ -82,7 +76,7 @@ function(...) {
   options(lab_color = "gray15")
   options(lab_x_color = NULL)
   options(lab_y_color = NULL)
-  options(lab_cex = .95)
+  options(lab_cex = .88)
   options(lab_x_cex = NULL)
   options(lab_y_cex = NULL)
 
@@ -116,7 +110,7 @@ function(...) {
   options(grid_y_lty = NULL)
 
   options(strip_fill = "#7F7F7F37")  # .maketrans("gray50", 55))
-  options(strip_color = "gray55")
+  options(strip_color = "gray40")
   options(strip_text_color = "gray15")
 
   #Plot(Years, Salary, bg="grey85", grid="grey77") on cheap Dell monitor
@@ -1483,22 +1477,22 @@ function(dir, axT) {
     if (thm %in% c("colors", "dodgerblue", "blue", "lightbronze")) {
       fill_low <- "rusts"
       fill_hi <- "blues"
-      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
+      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
     else if (thm %in% c("darkred", "red", "rose", "slatered")) {
       fill_low <- "turquoises" 
       fill_hi <- "reds"
-      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
+      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
     else if (thm %in% c("darkgreen", "green")) {
       fill_low <- "violets" 
       fill_hi <- "greens"
-      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
+      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
     else if (thm %in% c("gold", "brown", "sienna")) {
       fill_low <- "blues" 
       fill_hi <- "browns"
-      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100)
+      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
     else if (thm %in% c("gray", "white")) {
       fill_low <- "white"
@@ -1547,14 +1541,39 @@ function(dir, axT) {
     g.tr <- col2rgb(col.name[i])[2]
     b.tr <- col2rgb(col.name[i])[3]
 
-    col.trans[i]  <- rgb(r.tr, g.tr, b.tr, alpha=trans_level, maxColorValue=256)
+    col.trans[i] <- rgb(r.tr, g.tr, b.tr, alpha=trans_level, maxColorValue=256)
   }
 
   return(col.trans)
 }
 
 
-# generate a pre-defined color range if requested
+# get the name of a pre-set color range that links with the current theme
+.get_fill <- function(theme=getOption("theme"), seq.pal=TRUE) {
+
+  # for ordinal variables, or color theme not default, get sequential palette
+  # for not ordinal and default color theme, qualitative palette
+  if (theme == "colors" ) {
+    if (seq.pal)
+      clrs <- "blues"
+    else
+      clrs <- getOption("bar_fill_discrete")
+  }
+  else if (theme %in% c("gray", "white")) clrs <- "grays"
+  else if (theme %in% c("lightbronze", "dodgerblue", "blue")) clrs <- "blues"
+  else if (theme %in% c("gold", "brown", "sienna")) clrs <- "browns"
+  else if (theme == "orange") clrs <- "rusts"
+  else if (theme %in% c("darkred", "red", "rose", "slatered")) clrs <- "reds"
+  else if (theme %in% c("darkgreen", "green")) clrs <- "greens"
+  else if (theme == "purple") clrs <- "violets"
+  else clrs <- "blues"
+
+  return(clrs)
+
+}
+
+
+# generate a color palette from a pre-defined name
 .color_range <- function(fill, n.clr) {
 
   # names of color palettes generated by getColors
@@ -1578,12 +1597,12 @@ function(dir, axT) {
   # or evaluate the character string fill
   else {
     if (!is.null(fill[1])) {
-      if (fill[1] == "colors") fill[1] <- "hues" 
-      if (fill[1] == "yellows")  fill[1] <- "browns"  # new range name for 3.7.7
+      if (fill[1] == "colors") fill[1] <- "hues"   # new names
+      if (fill[1] == "yellows")  fill[1] <- "browns" 
 
       if (fill[1] %in% nm  ||  fill[1] %in% nmR  ||  fill[1] %in% nmV  ||
           fill[1] %in% nmW  ||  fill[1] %in% nmD) {
-        clrs <- getColors(fill[1], n=n.clr)  # generate sequential palette
+        clrs <- getColors(fill[1], n=n.clr, output=FALSE)  # sequential palette
       }
       else {
         clrs <- fill
@@ -1591,7 +1610,7 @@ function(dir, axT) {
 
       if (length(fill == 2)) {  # divergent
         if (fill[2] %in% nm)
-          clrs <- getColors(fill[1], fill[2], n=n.clr)
+          clrs <- getColors(fill[1], fill[2], n=n.clr, output=FALSE)
       }
     }  # fill[1] not NULL
 
@@ -1639,7 +1658,6 @@ function(dir, axT) {
     lum <- (lum**expn) + 9  # compress, which darkens, then lighten a bit
     cc <- hcl(h=.get.h(), c=chroma, l=lum)
     clr <- cc
-#   clr <- getColors(cc)
   }
 
   else {  # (count.v) so do viridis scaling
@@ -1651,33 +1669,6 @@ function(dir, axT) {
   }
 
   return(clr)
-
-}
-
-
-# link a pre-set range with the current theme
-.get_fill <- function(theme=getOption("theme"), seq.pal=TRUE) {
-
-  # for ordinal variables, or color theme not default, get sequential palette
-  # for not ordinal and default color theme, qualitative palette
-  if (theme == "colors" ) {
-    if (seq.pal)
-      clrs <- "blues"
-    else
-      clrs <- getOption("bar_fill_discrete")
-      #clrs <- "hues"
-  }
-
-  else if (theme %in% c("gray", "white")) clrs <- "grays"
-  else if (theme %in% c("lightbronze", "dodgerblue", "blue")) clrs <- "blues"
-  else if (theme %in% c("gold", "brown", "sienna")) clrs <- "browns"
-  else if (theme == "orange") clrs <- "rusts"
-  else if (theme %in% c("darkred", "red", "rose", "slatered")) clrs <- "reds"
-  else if (theme %in% c("darkgreen", "green")) clrs <- "greens"
-  else if (theme == "purple") clrs <- "violets"
-  else clrs <- "blues"
-
-  return(clrs)
 
 }
 

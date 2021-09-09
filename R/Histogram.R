@@ -282,7 +282,7 @@ function(x=NULL, data=d, rows=NULL,
     .bar.lattice(data.x[,1], by1.call, by2.call, n_row, n_col, aspect, 
                  proportion, fill, color, trans, size.pt=NULL,
                  xlab, ylab, main, rotate_x, offset,
-                 width, height, pdf_file, segments_x=NULL, breaks, c.type="hist",
+                 width, height, pdf_file, segments_x=NULL, breaks, T.type="hist",
                  quiet)
   }
 

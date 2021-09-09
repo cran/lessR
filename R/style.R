@@ -539,7 +539,6 @@ function(
 
   # only run if theme is specified, resets all parameters
 
-
   # set colors
   if (theme == "colors") {clr1 <- "dodgerblue3"; clr2 <- "steelblue4"}
   if (theme == "lightbronze") {clr1 <- rgb(247,242,230, maxColorValue=255)}
@@ -566,7 +565,27 @@ function(
 
   if (!miss_theme) {  # process the theme colors
 
-    if (theme == "white") {
+    if (theme == "colors") {
+      panel_fill = "white"
+      window_fill = getOption("panel_fill")
+      bar_fill_discrete = "hues"
+      bar_fill_ordered = rgb(144,165,195, maxColorValue=255)
+      bar_color_discrete = "transparent"
+      bar_color_ordered = rgb(126,144,168, maxColorValue=255)
+      pt_fill = rgb(60,106,130, maxColorValue=255)
+      pt_color = rgb(60,106,130, maxColorValue=255)
+      trans_bar_fill = 0.00
+      trans_pt_fill = 0.00
+      box_fill = "#419BD2"  # getColors("hues", output=FALSE)
+      violin_fill = "#7485975A"
+      ellipse_fill = .maketrans(hcl(50,20,55), 40)
+      grid_color = rgb(222,217,205, maxColorValue=255)
+      ID_color = "gray50"
+      fit_color = rgb(125,120,110, maxColorValue = 255)
+      values = "%"
+    }
+
+    else if (theme == "white") {
       window_fill = "white"
       panel_fill = "white"
       bar_fill = "white"
@@ -607,7 +626,7 @@ function(
       pt_color = "gray20"
       violin_fill=.maketrans("gray50", 40)
       violin_color = "gray15" 
-      box_fill="gray75"
+      box_fill="gray65"
       box_color = "gray15" 
       ellipse_fill = .maketrans("gray35", 15)
       fit_color = "black"
@@ -637,9 +656,10 @@ function(
       pt_color = rgb(70,80,90, maxColorValue=255)
       ellipse_color = "gray20"
       se_fill = .maketrans("gray10", 40) 
-      violin_fill = rgb(144,165,175, maxColorValue=255)
+      violin_fill = "#7485975A"
+#     violin_fill = rgb(144,165,175, maxColorValue=255)
       violin_color = "gray15" 
-      box_fill = .maketrans("gray15", 35) 
+      box_fill = .maketrans("gray15", 170) 
       box_color = "gray15" 
       ellipse_fill = .maketrans("gray50", 50)
       strip_fill = .maketrans("gray55")
@@ -656,25 +676,6 @@ function(
       grid_color = rgb(222,217,205, maxColorValue=255)
       ID_color = "gray15"
       trans = 0
-    }
-
-    else if (theme == "colors") {
-      panel_fill = "white"
-      window_fill = getOption("panel_fill")
-      bar_fill_discrete = "hues"
-      bar_fill_ordered = rgb(144,165,195, maxColorValue=255)
-      bar_color_discrete = "transparent"
-      bar_color_ordered = rgb(126,144,168, maxColorValue=255)
-      pt_fill = rgb(70,80,90, maxColorValue=255)
-      pt_color = rgb(70,80,90, maxColorValue=255)
-      trans_bar_fill = 0.00
-      trans_pt_fill = 0.00
-      box_fill = getColors("hues")
-      violin_fill = .maketrans(hcl(240,20,55), 90)
-      ellipse_fill = .maketrans(hcl(50,20,55), 40)
-      grid_color = rgb(222,217,205, maxColorValue=255)
-      ID_color = "gray50"
-      values = "%"
     }
 
     else if (theme == "light") {
@@ -694,9 +695,11 @@ function(
       window_fill = "white"
       panel_fill = "grey99"
       bar_fill = .maketrans(clr1, .to256("trans_bar_fill"))
-      violin_fill = .maketrans(clr1, 30)
+      violin_fill = "#7485975A"
+#     violin_fill = .maketrans(clr1, 30)
       violin_color = "gray15"
-      box_fill = .maketrans(clr1, 65)
+      box_fill = .maketrans(clr1, 160)  # larger number, more opaque
+#     box_fill = .maketrans(clr1, 65)
       box_color = "gray15"
       bar_fill_discrete = .maketrans(clr1, .to256("trans_bar_fill"))
       bar_fill_ordered = .maketrans(clr1, .to256("trans_bar_fill"))
@@ -766,9 +769,9 @@ function(
       bar_color_ordered = "gray20"
       pt_fill = .maketrans("gray75", .to256("trans_pt_fill"))
       pt_color = "gray90"
-      violin_fill = .maketrans("gray85", 160)
+      violin_fill = "gray80"
       violin_color = "gray15"
-      box_fill = .maketrans("gray15", 35)
+      box_fill = .maketrans("gray15", 180)
       box_color = "gray15"
       ellipse_fill = .maketrans("gray55", 65)
       fit_color = "gray75"
@@ -792,6 +795,8 @@ function(
 
       window_fill = rgb(.015,.015,.015)
       panel_fill = rgb(.015,.015,.015)
+      violin_fill = "gray80"
+      violin_color = "gray15"
       grid_color = "gray25"
       ID_color = "white"
       panel_color = "gray80"
@@ -805,6 +810,7 @@ function(
       values_color = "gray85"
       strip_text_color = "white"
       fit_color <- ifelse (theme == "light", "gray40", "gray75")
+
       if (theme == "colors") {
         ellipse_color <- "gray75"
         se_fill <- rgb(240,240,240, alpha=45, maxColorValue=256)
@@ -1234,7 +1240,6 @@ function(
 
     fit_color = getOption("fit_color"),
     fit_lwd = getOption("fit_lwd"),
-#   se_fill = getOption("se_fill"),
     se_fill = se_fill,
     bubble_text_color = getOption("bubble_text_color"),
     segment_color = getOption("segment_color"),

@@ -40,6 +40,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         eval_df=NULL, quiet=getOption("quiet"),
         width=6.5, height=6, pdf_file=NULL, ...)  {
 
+  # Note: if contains getColors() call, fill already evaluated
   fill.name <- deparse(substitute(fill))
 
   # a dot in a parameter name to an underscore
@@ -67,10 +68,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   proportion <- FALSE
 
-  if (theme != getOption("theme")) {  # not the default theme
+  if (theme != getOption("theme")) {  # not the current theme
     sty <- style(theme, reset=FALSE)
-    #fill <- sty$bar$bar.fill.discrete
-    #color <- sty$bar$color
+    fill <- sty$bar$bar.fill.discrete
+    color <- sty$bar$color
     trans <- sty$bar$trans.fill
   }
 
@@ -121,6 +122,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
     if (values_position == "out") values_color <- getOption("axis.text.color")
   }
 
+  if (is.null(values_digits)) {
+    if (values == "%") values_digits <- 0
+    if (values == "prop") values_digits <- 2
+  }
+
   if (values_position == "out"  &&  !missing(by)  &&  !beside) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "values_position=\"out\" not meaningful for a  by  variable\n",
@@ -135,7 +141,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   #if (missing(color))  # default black border unless dark bg
     #if (sum(col2rgb(panel.fill))/3 > 80) color <- "black"
 
-  # this gets parameter names passed with vars, does not evaluate the arg
+  # get parameter names passed with vars, does not evaluate the arg
   # more robust than list(...) which dies with by2=Gender
   nms <- names(as.list(match.call()))
   if (!is.null(nms)) {
@@ -191,12 +197,12 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   if ((missing(data) && shiny))
     data <- eval(substitute(data), envir=parent.frame())
 
-
   if (!is.null(x.name))
     x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
   else
     x.in.global <- FALSE
     
+
   # -----------------------------------------------------------
   # establish if a data frame, if not then identify variable(s)
   # x can be missing entirely, with a data frame passed instead
@@ -371,8 +377,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
     }
     else if (substr(fill.name, 1, 6) != "(count") {
-      fill[which(fill == "off")] <- "transparent"
-      color[which(color == "off")] <- "transparent"
+      if (length(which(fill == "off")) > 0)
+        fill[which(fill == "off")] <- "transparent"
+      if (length(which(color == "off")) > 0)
+        color[which(color == "off")] <- "transparent"
     }
 
     # or do a tabulation to get value of y for (count)
@@ -385,93 +393,98 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       fill <- .getColC(xtb, fill_name=fill.name)
     }  # end .count 
 
-  }  # end !fill.miss
-
   # add the n= to a getColors call
-  # getColors is evaluated at the time of the function call
+  # evaluate getColors at the time of the function call
   # re-evaluate here by setting fill with the specified value of n
   if (substr(fill.name, 1, 9) == "getColors") {
-    lx.u <- length(na.omit(unique(x.call)))  # do not include NA's
-    gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
-    txt <- paste("fill <- getColors(", gc.args, ", n=", lx.u, ")", sep="")
-    pp <- parse(text=txt)
-    eval(pp)
+    if (!grepl("output", fill.name, fixed=TRUE)) {  # "output" does not exist
+      lx.u <- length(na.omit(unique(x.call)))  # do not include NA's
+      gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
+      txt <- paste("fill <- getColors(", gc.args, ", n=", lx.u,
+                   ", output=FALSE)", sep="")
+      pp <- parse(text=txt)
+      eval(pp)
+    }
   }
+  }  # end !fill.miss
 
   # ------------------------------------------------------------
   # -----------  x, y, and by variables established ------------
   # ------------------------------------------------------------
 
-  # do the analysis
-  # data means raw_data
-  if (!is.null(stat)) {
-    if (stat == "proportion") proportion <- TRUE
-    if (stat %in% c("count", "proportion")) stat <- "data"
-  }
+  # -----------------------
+  # process stat parameter
 
-  # if data table is raw data, then default stat is "data"
-  if (is.null(stat)) {
-    if (!is.null(y.call)) {
+  if (is.null(y.call)) {  # no y variable present
+      if (!is.null(stat)) {  # no y then no stat
+        if (!(stat %in% c("count", "proportion"))) {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "To compute a summary table, must first provide\n",
+            "  a numerical y variable from which to calculate\n",
+            "  a statistic such as the mean. List this variable second\n",
+            "  or prefix its name with  y=  .\n\n")
+        }
+     }
+   }
+
+   else {  # a y variable present
+    lx.u <- length(unique(x.call))  # includes NA values
+    lb.u <- ifelse(is.null(by.call), 1, length(unique(by.call)))
+    if (nrow(data) == lx.u*lb.u) {  # a summary table
+
+      if (!is.null(stat)) { # y and a summary table, then no stat
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "The data are a summary table, so do not specify a value of  stat\n",
+          "  as the data transformation has already been done\n\n")
+      }      
 
      if (sum(is.na(x.call)) > 0 ||
           sum(is.na(by.call)) > 0 ||
           sum(is.na(y.call)) > 0)   {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "When reading values of y directly, missing data not allowed.\n",
+          "When reading a summary table, missing data not allowed.\n",
           "First use the  na.omit()  function on the data frame.\n\n")
       }
-      
-      lx.u <- length(unique(x.call))
-      lb.u <- ifelse(is.null(by.call), 1, length(unique(by.call)))
-      if (nrow(data) > lx.u*lb.u)
-        stat <- "mean"
-      else
-        stat <- "data"
-    }
-    else  {# no y variable
-      stat <- "data"
-    }
+    }  # end summary table
+
+    else {  # raw data
+      if (is.null(stat)) {  # if y, then must have stat
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "To transform y=", y.name, " to compute a summary table, must\n",
+          " first provide a value of  stat  to define the transformation\n\n")
+      }
+    }  # end raw data
+
+  }  # a y variable
+
+  # stat not assigned and passed the error conditions, so assign
+  if (is.null(stat))
+    stat <- "data"
+  else {
+    if (stat == "proportion") proportion <- TRUE
+    if (stat %in% c("count", "proportion")) stat <- "data"
   }
 
-  if (stat != "data"  &&  is.null(y.call)) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "To do a transformation of y for each level of ", x.name, "\n",
-      " need to provide a numerical y variable\n\n")
-  }
 
+  # -----------------------
   if (Trellis && do.plot) {
 
-           if (stat == "sum")
-        ylab <- paste("Sum of", y.name)
-      else if (stat == "mean")
-        ylab <- paste("Mean of", y.name)
-      else if (stat == "sd")
-        ylab <- paste("Standard Deviation of", y.name)
-      else if (stat == "dev")
-        ylab <- paste("Mean Deviations of", y.name)
-      else if (stat == "min")
-        ylab <- paste("Minimum of", y.name)
-      else if (stat == "median")
-        ylab <- paste("Median of", y.name)
-      else if (stat == "max")
-        ylab <- paste("Maximum of", y.name)
-
+  if (stat != "data") {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Only the original data work with Trellis plots,",
+      " no data transformations. Use  by  instead of  by1.\n\n")
+  }
 
     .bar.lattice(x.call, by1.call, by2=NULL, n_row, n_col, aspect,
                  proportion, 
                  fill, color, trans, size.pt=NULL, xlab, ylab, main,
                  rotate_x, offset,
                  width, height, pdf_file,
-                 segments_x=NULL, breaks=NULL, c.type="bar", quiet)
+                 segments_x=NULL, breaks=NULL, T.type="bar", quiet)
   }
 
+  # -----------------------
   else {  # not Trellis
-
-
-    if (is.null(by.call))
-      f.name <- x.name
-    else
-      f.name <- paste(x.name, "x", by.name, sep="")
 
     if (!is.null(pdf_file)) {
       if (!grepl(".pdf", pdf_file))
@@ -484,7 +497,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         .opendev(pdf_file, width, height)
       }
     }
-
 
     unq.x <- ifelse (length(x.call) == length(unique(x.call)), TRUE, FALSE)
     stat.val <- c("mean", "sum", "sd", "dev", "min", "median", "max")
@@ -499,13 +511,16 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         digits.d <- getOption("digits.d")
 
         if (!missing(y)) {
-          options(yname = x.name)  # reverse order of x and y for .ss.numeric
-          options(xname = y.name)
-          stats <- .ss.numeric(y.call, by=x.call,
-                               digits.d=digits.d, brief=TRUE, y.name=x.name)
-          txout <- stats$tx
-          options(xname = x.name)  # reverse back
-          options(yname = y.name)
+          txout <- ""
+          if (missing(by)) {  # do not show stats for one var when a by var
+            options(yname = x.name)  # reverse order of x and y for .ss.numeric
+            options(xname = y.name)
+            stats <- .ss.numeric(y.call, by=x.call,
+                                 digits.d=digits.d, brief=TRUE, y.name=x.name)
+            txout <- stats$tx
+            options(xname = x.name)  # reverse back
+            options(yname = y.name)
+          }
         }
         else  {
           stats <- .ss.factor(x.call, digits.d=digits.d, x.name=x.name,
@@ -520,70 +535,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         print(output)
       }
 
-    # set up new x.call and y.call for stats
-      if (stat == "sum") {
-        ylab <- paste("Sum of", y.name)
-        if (is.null(by.call))
-          out <- tapply(y.call, x.call, sum, na.rm=TRUE)
-        else 
-          out <- aggregate(y.call ~ x.call + by.call, FUN=sum)
-      }
-      if (stat == "mean") {
-        ylab <- paste("Mean of", y.name)
-        if (is.null(by.call))
-          out <- tapply(y.call, x.call, mean, na.rm=TRUE)
-        else 
-          out <- aggregate(y.call ~ x.call + by.call, FUN=mean)
-      }
-      if (stat == "sd") {
-        ylab <- paste("Standard Deviation of", y.name)
-        if (is.null(by.call))
-          out <- tapply(y.call, x.call, sd, na.rm=TRUE)
-        else 
-          out <- aggregate(y.call ~ x.call + by.call, FUN=sd)
-      }
-      if (stat == "dev") {
-        ylab <- paste("Mean Deviations of", y.name)
-        if (is.null(by.call)) {
-          out <- tapply(y.call, x.call, mean, na.rm=TRUE)
-          out <- out - mean(out, na.rm=TRUE)
-        }
-        else { 
-          cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "dev option not meaningful with a by variable\n\n")
-        }
-      }
-      if (stat == "min") {
-        ylab <- paste("Minimum of", y.name)
-        if (is.null(by.call))
-          out <- tapply(y.call, x.call, min, na.rm=TRUE)
-        else 
-          out <- aggregate(y.call ~ x.call + by.call, FUN=min)
-      }
-      if (stat == "median") {
-        ylab <- paste("Median of", y.name)
-        if (is.null(by.call))
-          out <- tapply(y.call, x.call, median, na.rm=TRUE)
-        else 
-          out <- aggregate(y.call ~ x.call + by.call, FUN=median)
-      }
-      if (stat == "max") {
-        ylab <- paste("Maximum of", y.name)
-        if (is.null(by.call))
-          out <- tapply(y.call, x.call, max, na.rm=TRUE)
-        else 
-          out <- aggregate(y.call ~ x.call + by.call, FUN=max)
-      }
+      # get the summary table according to the stat parameter
+      stat_out <- .bc.stat(x.call, y.call, by.call, stat, y.name)
+      out <- stat_out$out
+      ylab <- stat_out$ylab
 
-    #if (is.factor(x.call))  # preserve ordering, will lose order attribute
-      #x.call <- factor(names(out), levels=levels(x.call))
-    #else {
-      #if (is.numeric(x.call)) {
-        #m1 <- min(sort(unique(x.call[,1])))
-        #m2 <- max(sort(unique(x.call[,1])))
-        #x.call <- factor(names(out), levels=m1:m2)  # get entire numeric range
-      #}
-      #else
       if (is.null(by.call)) {
         x.call <- factor(names(out))
         y.call <- as.vector(out)
@@ -591,12 +547,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       else {
         x.call <- out[,1]
         by.call <- out[,2]
-    #}
         y.call <- out[,3]
-#       beside <- TRUE
       }
 
-    }  # sum, mean, sd, min, median, max
+    }  # end sum, mean, sd, min, median, max
 
       bc <- .bc.main(x.call, y.call, by.call, stack100,
             fill, color, trans, fill_split, theme,
@@ -623,23 +577,18 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   }  # end x is a single var
 
 
-  # -----------------------------------------------
-  else {  # x is a data frame of multiple variables
-
+  # x is a data frame of multiple variables
+  # ---------------------------------------
+  else {
     if (!is.null(by) || !is.null(by1)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "by and by1 variables not available for multiple x variables\n\n")
     }
 
     # if values not assigned, do default
-#   if (is.null(values) || (!missing(values_color) || !missing(values_size)
-#     || !missing(values_digits) || !missing(values_position))) 
-    if (is.null(values)) 
-        values <- ifelse (missing(y), getOption("values"), "input")
-
-    if (is.null(values_digits)) {
-      if (values == "%") values_digits <- 0
-      if (values == "prop") values_digits <- 2
+    if (is.null(values)) { 
+        values <- getOption("values")
+        if (values != "off") if (missing(y)) values <- "input"
     }
 
     if (is.null(one_plot)) {  # see if one_plot
@@ -725,7 +674,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
     }  # end one_plot
 
-    else {  # analyze each x column separately
+
+    # --------------------------------
+    # analyze each x column separately
+
+    else {
       bc.data.frame(data, n_cat, stack100,
         fill, color, trans, fill_split, theme,
         horiz, gap, proportion, scale_y,

@@ -111,7 +111,7 @@ function(ns, n, mu=0, sigma=1, cl=0.95, seed=NULL,
 
   # color the plot region between the axes
   usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
+  rect(usr[1], usr[3], usr[2], usr[4], col="gray98", border="black")
 
   # grid lines
   vy <- pretty(c(usr[3],usr[4]))

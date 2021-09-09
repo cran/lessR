@@ -40,11 +40,11 @@ function() {
         .to_str(getOption("values")), "\n")
     cat("values_color ..... Color of bar or pie values .",
         .to_rgb(getOption("values_color")), "\n")
-    cat("values_cex ....... Size of values on bars, pie ",
+    cat("values_size ..... Size of values on bars, pie ",
         .to_num(getOption("values_cex")), "\n")
     cat("values_digits .... Decimal digits on bars, pie ",
         .to_num(getOption("values_digits")), "\n")
-    cat("values_position ....... Position of values ...... ..",
+    cat("values_position .... Position of values ...... ..",
         .to_str(getOption("values_position")), "\n")
 
     cat("\n")

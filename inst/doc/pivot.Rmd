@@ -21,11 +21,11 @@ suppressPackageStartupMessages(library("lessR"))
 
 ### Descriptive Statistics
 
-Descriptive summarize characteristics of the sample data values for one or more variables. The __lessR__ `pivot()` function computes descriptive statistics for one or more variables, either for the entire data set at once or separately for different groups of data. MS Excel refers to the resulting statistical summaries a _pivot table_.
+Descriptive summarize characteristics of the sample data values for one or more variables. The __lessR__ `pivot()` function serves as a single source for a wide variety and types of descriptive statistics for one or more variables. Statistics are computed either for the entire data set at once or separately for different groups of data. MS Excel refers to the resulting statistical summaries as a _pivot table_.
 
 >_Aggregation_: Form groups of data according to the levels of one or more categorical variables, then compute some statistical value of a numeric variable, such as a mean, for each group.
 
-As an example of aggregation, compute the mean Salary for each combination of the levels of Gender and Department of employment. Alternatively, compute the mean Salary for all of the available data.
+As an example of aggregation, compute the mean Salary for each combination of the levels of _Gender_ and _Dept_ (department) of employment. Alternatively, compute the mean _Salary_ for all of the available data.
 
 This `pivot()` function computes statistics for three classes of variables:
 
@@ -48,18 +48,17 @@ Statistic | Meaning
 `kurtosis` | kurtosis
 `IQR` | inter-quartile range
 `mad` | mean absolute deviation
-`tabulate` | count of each cell
 
-The statistics `skew` and `kurtosis` are provided by  __lessR__ as they have no counterparts in base R. Computations of all other statistics follow from base R functions. The `tabulate` statistic is unlike the others in that it provides the count of the number of rows of data for each group without reference to a another variable to analyze. 
+The statistics `skew` and `kurtosis` have no counterparts in base R, so are provided by __lessR__ . Computations of all other statistics follow from base R functions. 
 
 The `quantile` and `table` computations return multiple values.
 
 Statistic | Meaning
 ----------- | -------------------------
 `quantile` | min, quartiles, max
-`table`    | frequencies or proportions
+`table`    | cell counts or proportions
 
-The `table` computation applies to an aggregated variable that consists of discrete categories, such as the numbers 1 through 5 for responses to a 5-pt Likert scale. The result is a table of frequencies or proportions, referred to for two or more variables as either a contingency table, a cross-tabulation table, or a joint frequency distribution. Only the `table` computation applies to non-numeric as well as numeric variables, though only meaningful if the aggregated variable consists of a relatively small set of discrete values.
+The `table` computation applies to an aggregated variable that consists of discrete categories, such as the numbers 1 through 5 for responses to a 5-pt Likert scale. The result is a table of frequencies or proportions, referred to for two or more variables as either a contingency table, a cross-tabulation table, or a joint frequency distribution. Only the `table` computation applies to non-numeric as well as numeric variables, though only meaningful if the aggregated variable consists of a relatively small set of discrete values, character strings or numeric.
 
 The default quantiles for `quantile` are quartiles. Specify a custom number of quantiles with the `q_num` parameter, which has the default value of 4 for quartiles.
 
@@ -92,7 +91,8 @@ The output follows one of three general forms.
 
 - The classic form is a data frame with the categorical variables in the analysis listed as columns first, followed by the numerical variables, ready for input into data analysis procedures. Each row of the output data frame consists of the corresponding values for the levels of the categorical variables and the corresponding values of the aggregated statistics. 
 - If one or two categorical variables are specified with the `by_cols` parameter, the output is a table with the specified categorical variables in the columns, amenable for viewing.
-- If there is no aggregation specified, no `by` variables, the corresponding statistics are computed over the entire data frame defined as a single group. Because there may be many variables to summarize, such as all the items on a multi-item scale from a survey analysis, the output is a data frame with the statistics the variable names and the rows defined by the variables
+- If there is no aggregation specified, no `by` variables, the corresponding statistics are computed over the entire data frame defined as a single group. 
+- There may be many variables to summarize, such as all the items on a multi-item scale from a survey analysis, so the output is a data frame with variable names that each indicate the corresponding computed statistic and the rows defined by the combinations of levels of the `by` variables.
 
 
 ## Examples
@@ -188,7 +188,7 @@ pivot(d, mean, c(Years, Salary), Dept, digits_d=2,
 
 #### Compute over All Data
 
-Aggregation computes one or more statistics for one or more variables across groups defined by the possible combinations of the levels of one or more categorical variables. A related computation computes the variables for each statistic for all the data, a group size of 1. To compute over all the rows of data, do not specify groups, that is, drop the `by` parameter. 
+Aggregation computes one or more statistics for one or more variables across groups defined by the possible combinations of the levels of one or more categorical variables. A related computation computes the variables for each statistic for all the data. To compute over all the rows of data, do not specify groups, that is, drop the `by` parameter. 
 
 Get the grand mean of Years, that is, for all the data.
 
@@ -206,7 +206,7 @@ pivot(d, mean, c(Years, Salary), digits_d=2, out_names=c("MeanYear", "MeanSalary
 Consider an example with more variables. Analyze the 6-pt Likert scale responses to the Mach IV scale that assesses Machiavellianism. Items are scored from 0 to 5, Strongly Disagree to Strongly Agree. The data are included with __lessR__ as the _Mach4_ data file. 
 
 Suppress output when reading by setting `quiet` to `TRUE`. 
-Calculate the mean, standard deviation, skew, and kurtosis for all of the data for all 20 items on the scale. With this specification, the form of a data frame is statistics in the columns and the variables in the rows. The result are the specified summary statistics for the specified variables over the entire data set.
+Calculate the mean, standard deviation, skew, and kurtosis for all of the data for each of the 20 items on the scale. With this specification, the form of a data frame is statistics in the columns and the variables in the rows. The result are the specified summary statistics for the specified variables over the entire data set.
 
 
 ```{r}
@@ -215,30 +215,45 @@ pivot(d, c(mean,sd,skew,kurtosis), m01:m20)
 ```
 
 
-#### Cross-Tabulation Tables
+#### Frequency Tables
 
-The `table` value of `compute` specifies to compute the frequency table for a discrete aggregated `variable` across all combinations of the `by` variables. Only one aggregated `variable` is possible. Here compute a two-way cross-tabulation table with the levels of  `variable` _m06_ as columns and the levels of the `by` categorical variable _m07_ as rows.
+Aggregating a statistical computation of a continuous variable over groups with `pivot()`, such as computing the mean for each combination of _Dept_ and _Gender_, by default includes the tabulation for each group (cell). A tabulation can be requested with no analysis of a numerical variable, instead only a counting of the available levels of the specified categorical variables.
+
+The `table` value of `compute` specifies to compute the frequency table for a categorical aggregated `variable` across all combinations of the `by` variables. Specify one categorical `variable` with the remaining categorical variables specified with the `by` parameter. Missing values for each combination of the levels of the grouping variables are displayed.
+
+
+Begin with a one-way frequency table computed over the entire data set.
+
+```{r}
+pivot(d, table, m06)
+```
+
+In this example, compute a two-way cross-tabulation table with the levels of  `variable` _m06_ as columns and the levels of the `by` categorical variable _m07_ as rows.
+
 
 ```{r}
 pivot(d, table, m06, m07)
 ```
 
-If interested in the inferential analysis of the cross-tabulation table, access the __lessR__ function `Prop_test()` obtain get both the descriptive and inferential results, though limited to a one- or two-way table. The default data table is _d_, but included explicitly in this example to illustrate the `data parameter.
+To output the data in long form, one tabulation per row, set the `table_long` parameter to TRUE.
+
+If interested in the inferential analysis of the cross-tabulation table, access the __lessR__ function `Prop_test()` to obtain both the descriptive and inferential results, though limited to a one- or two-way table. 
+
+The default data table is _d_, but included explicitly in the following example to illustrate the `data` parameter.
 
 ```{r}
 Prop_test(m06, by=m07, data=d)
 ```
 
-
-Can also include other statistics in addition to the frequency table, though, of course, only meaningful if the aggregated variable is numerical. Here create a 3-way cross-tabulation table with responses to Item _m06_ in the column and responses to Items _m07_ and _m10_ in the rows. 
+Can also aggregate other statistics simultaneously in addition to the frequency table, though, of course, only meaningful if the aggregated variable is numerical. Here, create a 3-way cross-tabulation table with responses to `variable` _m06_ in the column and responses to `by` variables _m07_ and _m10_ in the rows, plus the mean and standard deviation of each combination of _m07_ and _m10_ across levels of _m06_. 
 
 ```{r}
 pivot(d, c(mean,sd,table), m06, c(m07, m10))
 ```
 
-To convert the frequencies into proportions, invoke the `table_prop` parameter. The value of `"all"` computes cell frequencies across the entire table. The values of `"row"` and `"col"` compute the proportions with either row sums or column sums.
+Can also express the frequencies as proportions. To convert the frequencies into proportions, invoke the `table_prop` parameter. The value of `"all"` computes cell frequencies across the entire table. The values of `"row"` and `"col"` compute the proportions with either row sums or column sums.
 
-In this example of a two-way cross-tabulation table, convert the table counts to row proportions, that is, the proportion of each level of _m06_ for each combination of levels for _m07_. 
+In this example of a two-way cross-tabulation table, convert the table counts to row proportions, that is, the proportion of each level of _m06_ for each combination of levels for _m07_. The sum of the proportions in each row is 1.0.
 
 ```{r}
 pivot(d, table, m06, m07, table_prop="row")
@@ -270,16 +285,6 @@ pivot(d, c(mean,sd,quantile), c(Years,Salary), q_num=5, digits_d=2)
 ```
 
 
-### Tabulation
-
-Tabulation is counting. Aggregating a statistical computation of a continuous variable over groups with `pivot()`, such as computing the mean for each combination of _Dept_ and _Gender_, automatically includes the tabulation for each group. A tabulation can be requested with no analysis of a numerical variable, instead a counting of the available levels of the specified categorical variables.
-
-With tabulation there is no `variable` to aggregate. The variables in the tabulation are the grouping variables. If the categorical variables are indicated as the third parameter value in the function call to `pivot()`, the `variable` parameter, the variables are processed internally as the grouping variable(s). Missing values for each combination of the levels of the grouping variables are displayed.
-
-```{r}
-pivot(d, tabulate, c(Dept, Gender))
-```
-
 
 ### Other Features
 
@@ -309,20 +314,27 @@ pivot(d[.(Gender=="F"),], mean, Salary, Dept)
 
 #### Sort Output
 
-Specify the sort as part of the call to `pivot()` with the parameter `sort`. This internal sort works for a single `value` variable, or, more generally, the last column in the output data frame. Set to `"-"` for a descending sort. Set to `"+"` for an ascending sort.
+Specify the sort as part of the call to `pivot()` with the parameter `sort`. This internal sort works for a single `value` variable, by default the last column in the output data frame. Set to `"-"` for a descending sort. Set to `"+"` for an ascending sort.
 
 ```{r}
 pivot(d, mean, Salary, c(Dept, Gender), sort="-")
 ```
 
-Because the output of `pivot()` with no `by_cols` variables is a standard R data frame, the external call to the __lessR__ function `Sort()` is available for custom sorting by one or more variables. Sort in the specified direction with the `direction` parameter. Here access the data frame `a`, output from a previous example of `pivot()`.
+Specify the `sort_var` parameter to specify the name or the column number of the variable to sort.
 
 ```{r}
+pivot(d, c(mean, median), Salary, c(Gender,Dept), out_names=c("MeanSalary", "MedianSalary"),
+      sort="-", sort_var="MeanSalary")
+```
+
+Because the output of `pivot()` with no `by_cols` variables is a standard R data frame, the external call to the __lessR__ function `Sort()` is available for custom sorting by one or more variables. Sort in the specified direction with the `direction` parameter. 
+
+```{r}
+a <- pivot(d, mean, Salary, c(Dept, Gender))
 Sort(a, by=Salary_mn, direction="-")
 ```
 
 Specify multiple variables to sort with a vector of variable names, and a corresponding vector of `"+"` and `"-"` signs of the same length for the `directions` parameter.
-
 
 
 #### Pipe Operator
@@ -360,7 +372,7 @@ pivot(d, mean, Salary, Dept, c(Gender, Plan))
 
 ### Missing Data
 
-Several possibilities exist when missing data are present. There are different types of missing data in the aggregation: missing values of one or more `by` variables and missing values for one or more `variable`s. 
+Several possibilities exist when missing data are present. There are different types of missing data in the aggregation: missing values of one or more `by` variables and missing values for one or more aggregated `variable`s. 
 
 - `na_by_show=TRUE`: If any of the levels of the `by` variables are missing, show those missing cells with a reported value of computed variable _n_ as 0 [default is `TRUE`]. 
 - `na_remove=TRUE`: Remove any missing data from a value of the `variable`, perform the aggregation on the remaining variables, and then report how many values were missing. [default is `TRUE`].
@@ -372,7 +384,7 @@ The pivot table follows with the listed missing data for each group. The variabl
 
 The `na_remove` parameter specifies the value of the base R parameter `na.rm` for computations such as for the `mean`. See `?mean` for its definition. 
 
-Here include all the cells, even those with a missing aggregated value. The default value is `TRUE`, so the `na_remove` parameter need not be specified.
+Here, include all the cells, even those with a missing aggregated value. The default value is `TRUE`, so the `na_remove` parameter need not be specified if this is the appropriate value.
 
 
 ```{r}
@@ -388,7 +400,7 @@ pivot(d, mean, Years, Dept, na_remove=FALSE)
 
 #### Missing Data Values for `by` Variables
 
-To account for missing values of the categorical `by` variables, first use base R `Extract[]` with __lessR__ `.()` to filter some missing data by dropping the one male in sales. Save the result into the _dd_ data frame.
+To account for missing values of the categorical `by` variables, first use base R `Extract[]` with __lessR__ `.()` to filter some missing data by dropping the one male in the Sales department. Save the result into the _dd_ data frame.
 
 ```{r}
 dd <- d[.(!(Gender=="M" & Dept=="SALE")), ]
@@ -409,7 +421,7 @@ pivot(dd, c(mean,median), Years, c(Dept, Gender), na_by_show=FALSE)
 
 ## __lessR__ `pivot()` vs __Base R__ `aggregate()`
 
-The __lessR__ `pivot()` function relies upon the __base R__ function `aggregate()` for aggregation. By default, `pivot()` generates a long-form data frame pivot table (Excel terminology), which can then be directly input into analysis and visualization functions as a standard data frame. The levels across all the grouping variables are listed in the rows, but if there are specified column grouping variables, `pivot()` relies upon base R `reshape()` to form a 2-d table for direct viewing instead of a data table to input into further analysis functions. 
+The __lessR__ `pivot()` function relies upon the __base R__ function `aggregate()` for aggregation. By default, except for the `table` computation, `pivot()` generates a long-form data frame pivot table (Excel terminology), which can then be directly input into analysis and visualization functions as a standard data frame. The levels across all the `by` grouping variables are listed in the rows. If there are specified column grouping variables according to `by_cols`, `pivot()` relies upon base R `reshape()` to form a 2-d table for direct viewing instead of a data table to input into further analysis functions. 
 
 `pivot()` provides additional features than `aggregate()` provides. 
 

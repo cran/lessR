@@ -5,9 +5,9 @@
 
 \description{
 
-Generates vectors colors including HCL colors for qualitative and sequential color scales and displays colors, both those generated and also arbitrary colors manually specified. To avoid bias in the comparison of differently colored regions of a visualization, generates HCL colors by default with fixed values of chroma (saturation) and luminance (brightness) for a range of hues, by default ordered so that adjacent colors are as separated as possible. Also generates a sequence of HCL colors according to any chosen hue value in which chroma and luminance can be varied by implicit calls to Zeileis's et al. \code{sequential_hcl} function from Ihaka's et al. \code{colorspace} package, and also with pre-defined values such as \code{"blues"}. Also processes any arbitrarily specified set of colors that are specified, or generated from a custom range according to a beginning and ending specified color, and includes color palettes from the viridis and wesanderson packages.
+Generates color vectors, including HCL colors for qualitative and sequential color scales, and displays these internally generated as well as manually specified arbitrary colors. To avoid bias in comparing differently colored regions of a visualization, generates HCL colors by default with fixed values of chroma (saturation) and luminance (brightness) for a range of hues, by default ordered so that adjacent colors are as separated as possible. Also generates a sequence of HCL colors according to any chosen hue value in which implicit calls can vary chroma and luminance to Zeileis's et al. \code{sequential_hcl} function from Ihaka's et al. \code{colorspace} package, and also with pre-defined values such as \code{"blues"}. The function also processes any arbitrarily specified set of colors or colors generated from a custom range according to a beginning and ending specified color. The function also includes color palettes from the \code{viridis} and \code{wesanderson} packages.
 
-In terms of workflow, use the function by itself to select a set of colors from the resulting color rectangle/wheel. The function outputs the colors so that the function call can serve as an argument to parameters in other functions that require a sequence of one or more colors as input, in which case the visualization of the color wheel or rectangle is not generated. So after the colors are selected, pass to an argument for a visualization function such as for the \code{fill} parameter.
+In terms of workflow, use the function to select a set of colors from the resulting color rectangle/wheel. The function outputs the colors so that the function call can serve as an argument to parameters in other functions that require a sequence of one or more colors as input. The visualization of the color wheel or rectangle is not generated in this situation. After selecting the colors, pass to an argument for a visualization function such as for the \code{fill} parameter.
 }
 
 \usage{
@@ -16,7 +16,7 @@ In terms of workflow, use the function by itself to select a set of colors from 
          in_order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
          main=NULL, labels=NULL, labels_cex=0.8, lty="solid",
-         output=NULL, quiet=getOption("quiet"), \ldots)
+         output=TRUE, quiet=getOption("quiet"), \ldots)
 }
 
 \arguments{
@@ -64,12 +64,10 @@ In terms of workflow, use the function by itself to select a set of colors from 
   \item{labels_cex}{Character expansion factor of labels relative to 1.}
   \item{lty}{Line type of the border.}\cr
 
-  \item{output}{Default to evaluate if function call at top level, so produce
-       text and graphics output, or embedded in another function call,
-       so do not produce that output. If set to \code{"on"}, then 
-       do output. If set to \code{"off"} then do not do output.}
-  \item{quiet}{If set to \code{TRUE}, no list of colors. Can change system default
-       with \code{\link{style}} function.}
+  \item{output}{Default to produce text and graphics output when called
+       directly but not when called from a visualization function.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
+       \code{\link{style}} function.}
   \item{\ldots}{Other parameter values_}
 }
 
@@ -225,25 +223,25 @@ getColors(pal="aliceblue", end_pal="blue")
 d <- rd("Employee")
 
 # default quantitative scale
-bc(d, Dept, fill=getColors())
+bc(Dept, fill=getColors())
 # or with implicit call to getColors
-bc(d, Dept, fill="colors")
+bc(Dept, fill="colors")
 # or an implicit call with the blues
-bc(d, Dept, fill="blues")
+bc(Dept, fill="blues")
 
 # even though we have a bar graph, also want the
 #  graph of the colors as well as the text listing of the colors
-bc(d, Dept, fill=getColors("blues", output="on"))
+bc(Dept, fill=getColors("blues", output=TRUE))
 
 # custom hue with different chroma levels (saturations)
-BarChart(d, Dept, fill=getColors(h=230, c=c(20,60), l=60, n=5))
+BarChart(Dept, fill=getColors(h=230, c=c(20,60), l=60))
 
 # custom hue with different luminance levels (brightness)
 # if explicitly calling getColors need to also specify n
 Histogram(Salary, fill=getColors(h=230, c=60, l=c(90,30), n=10))
 
 # use the default qualitative viridis color scale
-bc(d, Dept, fill="viridis")
+bc(Dept, fill="viridis")
 }
 
 

@@ -25,25 +25,34 @@ Most of the examples are an analysis of data in the _Employee_ data set, include
 d <- Read("Employee")
 ```
 
+As an option, also read the table of variable labels. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need be entered into the table. The table can be a `csv` file or an Excel file.
+
+Currently, read the label file into the _l_ data frame. The labels will be displayed on both the text and visualization output. Each displayed label is the variable name juxtaposed with the corresponding label.
+
+```{r labels}
+l <- rd("Employee_lbl")
+```
+
+
 ## Histogram
 
-One of the most frequently encountered visualizations for continuous variables is the histogram, which outlines the general shape the underlying distribution.
+One of the most frequently encountered visualizations for continuous variables is the histogram, which outlines the general shape of the underlying distribution.
 
 >_Histogram_: Bin similar values into a group, then plot the frequency of occurrence of the data values in each bin as the height of the corresponding bar.
 
-A call to a function to create a histogram contains the name of the continuous variable that contains the values to be plotted. With the `Histogram()` function, that variable name is the first argument passed to the function. In this example, the _only_ argument passed to the function is the variable name as the data frame is named _d_, the default value. The following illustrates the call to `Histogram()` with a continuous variable named $x$. 
+A call to a function to create a histogram contains the name of the continuous variable that contains the plotted values. With the `Histogram()` function, that variable name is the first argument passed to the function. In this example, the _only_ argument passed to the function is the variable name as the data frame is named _d_, the default value. The following illustrates the call to `Histogram()` with a continuous variable named $x$. 
 
 ```{r hsform, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center', out.extra='style="border-style: none"'}
 knitr::include_graphics(system.file("img", "hsExplain.png", package="lessR"))
 ```
 
-To illustrate, consider the continuous variable _Salary_ in the Employee data table.  Use `Histogram()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_ so the `data=` parameter is not needed.
+To illustrate, consider the continuous variable _Salary_ in the Employee data table.  Use `Histogram()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_, so the `data=` parameter is not needed.
 
 ```{r hs, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Histogram of tablulated counts for the bins of Salary."}
 Histogram(Salary)
 ```
 
-The `Histogram()` function provides a default color theme. The function also provides the corresponding frequency distribution, summary statistics, the table that lists the count of each category, from which the histogram is constructed, as well as an outlier analysis based on Tukey's rules for box plots.
+By default, the `Histogram()` function provides a color theme according to the current, active theme. The function also provides the corresponding frequency distribution, summary statistics, the table that lists the count of each category, from which the histogram is constructed, as well as an outlier analysis based on Tukey's rules for box plots.
 
 ## Customize the Histogram
 
@@ -53,7 +62,7 @@ The parameters `bin_start`, `bin_width`, and `bin_end` are available to customiz
 Histogram(Salary, bin_start=35000, bin_width=14000)
 ```
 
-Easy to change the color, either by changing the color theme with `style()`, or just change the fill color with `fill`. Can refer to standard R colors, as shown with **lessR** function `showColors()`, or implicitly invoke the **lessR** color palette generating function `getColors()`. Each 30 degrees of the color wheel is named, such as `"greens"`, `"rusts"`, etc, and implements a sequential color palette. 
+Easy to change the color, either by changing the color theme with `style()`, or just change the fill color with `fill`. Can refer to standard R colors, as shown with __lessR__ function `showColors()`, or implicitly invoke the __lessR__ color palette generating function `getColors()`. Each 30 degrees of the color wheel is named, such as `"greens"`, `"rusts"`, etc, and implements a sequential color palette. 
 
 Use the `color` parameter to set the border color, here turned off.
 
@@ -64,7 +73,7 @@ Histogram(Salary, fill="reds", color="transparent")
 
 ## Density Plot
 
-The histogram portrays a continuous distribution with discrete bins.
+The histogram portrays a continuous distribution with discrete bins, with more modern visualizations available that directly display the estimated underlying smooth curve.
 
 >_Density plot_: A smooth curve that estimates the underlying continuous distribution.  
 
@@ -78,7 +87,7 @@ Histogram(Salary, density=TRUE)
 
 ## VBS Plot
 
-A more modern version of the density plot combines the violin plot, box plot, and scatter plot into a single visualization, called here the VBS plot.
+A more modern version of the density plot combines the violin plot, box plot, and scatter plot into a single visualization, here called here the VBS plot.
 
 ```{r VBS, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="VBS plot."}
 Plot(Salary)

@@ -25,12 +25,13 @@ importFrom("utils", head, help, packageVersion, read.csv, read.fwf, read.table, 
 
 importFrom("methods", hasArg)
 
-importFrom("lattice", xyplot, histogram, barchart, panel.grid, panel.xyplot, panel.loess, panel.lmline, panel.densityplot, panel.superpose, panel.polygon,
+importFrom("lattice", xyplot, histogram, barchart, panel.grid, panel.xyplot, panel.loess, panel.lmline, panel.densityplot, panel.superpose, 
 trellis.par.get, current.panel.limits, panel.text,
-panel.barchart, panel.histogram, panel.dotplot, panel.points,
-panel.segments, panel.violin, panel.bwplot, panel.stripplot)
+panel.barchart, panel.histogram, panel.dotplot, panel.points, panel.polygon,
+panel.segments, panel.violin, panel.bwplot, panel.stripplot, panel.number,
+panel.lines)
 
-importFrom("latticeExtra", layer, panel.ellipse, panel.xyarea)
+importFrom("latticeExtra", panel.ellipse, panel.xyarea)
 
 #importFrom("colorspace", polarLUV)
 

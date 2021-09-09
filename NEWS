@@ -4,6 +4,105 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
  
+>>>>>> Changes for lessR version 4.0.3 (2021-09-09) <<<<<<
+
+-------------
+Updates 4.0.3
+-------------
+
+BarChart
+  if stat not specified, there is now no default if the y variable
+    is specified without an indication of what statistic to compute
+  gentle termination with a message if stats specifies a transform
+    that results in missing data in the computed summary table
+  for analysis of computing a summary table with the stat parameter,
+    no longer display the summary stats for the x variable when
+    a by variable is present
+
+getColors
+  default qualitative color palette softened a bit by increasing
+    luminance from 55 to 60
+  by default, now does not generate output when called 
+    from visualization parameters fill and color for BarChart, etc.
+  output parameter values changed to logical, TRUE and FALSE
+
+pivot
+  new parameter table_long allows the table computation for a
+    cross-tabs table be output in long form
+  tabulate computation continues to work, though no longer documented
+    as it is superseded by the new table_long parameter for table
+  new parameter sort_var that specifies either the name of the variable
+    in the output data frame to sort, or its column number
+ 
+Plot
+  for Trellis (facet) plots
+    default number of columns set to 1
+    added fit line options: 
+      "exp", "sqrt", "reciprocal", and "null"
+    fit_se parameter added for standard error plots added to fitted
+     "loess" and "lm" lines 
+    darkened the color of the lines that separate panels
+    plot_errors parameter added
+  for VBS plots
+    default point fill is now black
+    by and by1 parameters can now be simultaneous
+    minimum point size increased to 0.025 from 0.01
+    box_fill colors now varied over default qualitative palette, "hues" 
+      for non-ordered variables or sequential palette for ordered factors,
+      or can be specified, for other color themes fill takes the theme color 
+    if not box plots specified and violin plots specified, then the
+      violin plots filled with the colors from box_fill
+  jitter default added for plots of a categorical variable with a
+    continuous variable, including with a by variable
+  size of outlier points adjusted downward and consistent with the 
+    size of the regular points
+  default smoothing for n > 2499 turned off, default is now always FALSE
+  for two by groups, fit lines and ellipses now are both solid edged
+    when the colors for the two groups differ
+  plotting a continuous vs categorical variable, the points for the
+    means are a very dark red (except for grayscale) instead of gray
+    and 1.5 the size of the regular points instead of twice the size
+  default point fill and color lightened a bit with a slight blue cast
+  all numerically specified symbols, 0 through 25, now available as
+    defined in the help file for points(), obtained by ?points
+  abbreviation of value labels and its associated parameter max_labels
+    removed as better implementation of label spacing obviates the need
+  bubble plot text overlay of the count over each bubble fine-tuned to
+    more consistently and properly display each bubble's text unless the
+    bubble is very small
+  fit line default color for default theme "colors" now a slight red
+
+Prop_test
+  allows input of cross-tabulation table for test of independence
+
+style
+  default value of lab_cex lessened from 0.95 to 0.88 for
+    the size of graph labels
+
+
+---------------
+Bug Fixes 4.0.3
+---------------
+
+BarChart
+  further adjustment to accommodate very large legend labels for
+    two variable plots
+  if the y values are input, the display of the values will be properly
+    turned off if the style option for values is set to "off"
+
+Plot
+  default jitter for 1-D scatterplot works again in VBS plots
+  by parameter works again for VBS plots, multiple plots on same panel
+  color parameter now works in conjunction with the by parameter 
+    applied to a scatterplot of two continuous variables
+  if color is set to "off" (or "transparent"), a requested fit line
+    still displays
+  means are now properly plotted for a scatterplot of a continuous and
+     categorical variable when jitter is applied to the plotted points
+  default outlier shape in gray scale changes to diamond as documented
+
+
+
 >>>>>> Changes for lessR version 4.0.2 (2021-08-05) <<<<<<
 
 -------------

@@ -42,5 +42,4 @@ function(x, y, ID, MD_cut, out_cut) {
 
   return(list(tx.otl=tx, out_ind=out_ind))
 
-
 }

@@ -4,7 +4,7 @@ function(pal=NULL, end_pal=NULL,
          in_order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
          main=NULL, labels=NULL, labels_cex=0.8, lty="solid",
-         output=NULL, quiet=getOption("quiet"), ...) {
+         output=TRUE, quiet=getOption("quiet"), ...) {
 
 
   # a dot in a parameter name to an underscore
@@ -22,9 +22,11 @@ function(pal=NULL, end_pal=NULL,
 
   shape <- match.arg(shape)
 
-  miss_h <- ifelse (missing(h), TRUE, FALSE)
-  miss_l <- ifelse (missing(l), TRUE, FALSE)
-  miss_c <- ifelse (missing(c), TRUE, FALSE)
+  h.miss <- ifelse (missing(h), TRUE, FALSE)
+  l.miss <- ifelse (missing(l), TRUE, FALSE)
+  c.miss <- ifelse (missing(c), TRUE, FALSE)
+
+  output.miss <- ifelse (missing(output), TRUE, FALSE)
 
   if (!is.null(end_pal) && length(pal) > 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -129,14 +131,14 @@ function(pal=NULL, end_pal=NULL,
       if (pal[1] == "magentas") h <- 330
       if (pal[1] == "grays") {
         c <- 0
-        miss_c <- FALSE
+        c.miss <- FALSE
       }
       if (is.null(end_pal)) pal <- NULL
     }
     if (!is.null(end_pal)) {
       if (end_pal %in% nm  &&  !(end_pal %in% nmR)) {
       if (end_pal == "reds") h2 <- 0
-      if (end_pal == "rusts") h2 <- 3
+      if (end_pal == "rusts") h2 <- 30
       if (end_pal == "browns") h2 <- 60
       if (end_pal == "olives") h2 <- 90
       if (end_pal == "greens") h2 <- 120
@@ -149,7 +151,7 @@ function(pal=NULL, end_pal=NULL,
       if (end_pal == "magentas") h2 <- 330
       if (end_pal == "grays") {
           c <- 0
-          miss_c <- FALSE
+          c.miss <- FALSE
         }
         pal <- NULL
       }
@@ -164,7 +166,7 @@ function(pal=NULL, end_pal=NULL,
 
   # qualitative HCL colors at constant c and l
   if (kind == "qualitative") {
-    if (!miss_h) if (length(h) > 1) n <- length(h)
+    if (!h.miss) if (length(h) > 1) n <- length(h)
     if (is.null(h2)) h2 <- h + (360 * (n - 1) / n)
     if (n <= 24) {
       if (!in_order) { # mixed hues
@@ -185,8 +187,8 @@ function(pal=NULL, end_pal=NULL,
     h[which(h >= 360)] <- h[which(h >= 360)] - 360
     h[which(h < 0)] <- h[which(h < 0)] + 360
 
-    if (miss_c) c <- 65
-    if (miss_l) l <- 55
+    if (c.miss) c <- 65
+    if (l.miss) l <- 60
     pal <- hcl(h, c, l, fixup=fixup)[1:n]  # generate the colors
     #pal <- hex(polarLUV(L=l, C=c, H=h), fixup=fixup, ...)
     lbl <- .fmt(h, 0)
@@ -196,7 +198,7 @@ function(pal=NULL, end_pal=NULL,
 
   # sequential HCL color palette
   else if (kind == "sequential") {
-    if (miss_c) c <- c(35,75)
+    if (c.miss) c <- c(35,75)
     txt.c <- .fmt(c[1],0)
     if (length(c) > 1)
       txt.c <- paste(txt.c, " to ", .fmt(c[2],0), sep="")
@@ -205,7 +207,7 @@ function(pal=NULL, end_pal=NULL,
     if (l.dk < 14) l.dk <- 14  # any darker and the hue is no longer true
     l.lt <- 48 + (5*n)  # lightest color
     if (l.lt > 92) l.lt <- 92
-    if (miss_l) l <- c(l.lt, l.dk)  # 2 -> 58, 3 -> 63, 6 -> 78, 8 -> 88
+    if (l.miss) l <- c(l.lt, l.dk)  # 2 -> 58, 3 -> 63, 6 -> 78, 8 -> 88
     txt.l <- .fmt(l[1],0)
     if (length(l) > 1)
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
@@ -224,12 +226,12 @@ function(pal=NULL, end_pal=NULL,
     if (length(h) > 1)
       txt.h <- paste(txt.h, " to ", .fmt(h[2],0), sep="") 
 
-    if (miss_c) c <- 50
+    if (c.miss) c <- 50
     txt.c <- .fmt(c,0)
     if (length(c) > 1)
       txt.c <- paste(txt.c, " to ", .fmt(c[2],0), sep="")
       
-    if (miss_l) l <- c(30,80)
+    if (l.miss) l <- c(30,80)
     txt.l <- .fmt(l[1],0)
     if (length(l) > 1)
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
@@ -317,27 +319,17 @@ function(pal=NULL, end_pal=NULL,
   # set lbl except for hcl which provides the hues
   if (lbl[1] == "") lbl <- pal
 
-  # evaluate if text and graphics output
-  # sys.nframe(): depth of function call,  sys.calls(): the calls
-  go.out <- NULL
-  if (!is.null(output)) {
-    if (output == "on") go.out <- TRUE 
-    if (output == "off") go.out <- FALSE
-  }
-  if (is.null(go.out)) {
-    if (is.null(options()$knitr.in.progress))  # not in knitr
-      go.out <- ifelse (sys.nframe() == 1, TRUE, FALSE)
-    else  # in knitr (generates 1st 18 function calls)
-      go.out <- ifelse (sys.nframe() == 19, TRUE, FALSE)
-  } 
-
   if (trans > 0) 
    for (i in 1:length(pal)) pal[i] <- .maketrans(pal[i], (1-trans)*256) 
 
-  # -------------
-  # plot and text
+  # --------------------
+  # plot and text output
 
-  if (go.out) { 
+  # sys.nframe(): depth of function call
+  if (sys.nframe() > 1) if (output.miss)
+    output <- FALSE  # output only for a direct call
+
+  if (output) { 
 
     # ----
     # plot
@@ -423,7 +415,7 @@ function(pal=NULL, end_pal=NULL,
       }
     }
     cat("\n")
-  }  # called directly
+  }  # do output
 
   return(invisible(pal))
 }

@@ -1,0 +1,199 @@
+---
+title: "Plots of Data Collected over Time"
+author: "David Gerbing"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{2. Visualize: Time Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.width=4.5, fig.height=4)
+```
+
+
+```{r include=FALSE}
+suppressPackageStartupMessages(library("lessR"))
+```
+
+Plot ordered data values collected over time in one of two ways that correspond to how label the values are labeled. 
+
+- Run Chart: Label the data values from 1 to the number of values ordered by their time of collection.
+- Time Series Chart: Label the data values by the time and/or date of at which each data value was collected.
+
+
+## Run Chart
+
+Meaningful for sequentially ordered numerical data values such as by time, plot a run chart of a single variable according to the parameter `run`. Analogous to a time series visualization, the run chart plots the data values sequentially, but without dates or times. An analysis of the runs is also provided.
+
+Illustrate with the __lessR__ _Employee_ data.
+
+```{r}
+d <- Read("Employee")
+```
+
+The variable _Salary_ is not actually collected over time, but for illustration, here create a run chart of _Salary_ as if the data were collected over time. The indices, the sequence of integers from 1 to the last data value, are created by `Plot()`. Only the data values are specified. Invoke the `run` parameter to instruct `Plot()` to plot as a run chart.
+
+```{r}
+Plot(Salary, run=TRUE)
+```
+
+The default run chart displays the plotted points in a small size with connecting line segments. Change the size of the points with the parameter `size`, here set to zero to remove the points entirely. Fill the area under the line segments with the parameter `area_fill`, here set to the default `on` but can express any color. Remove the center line with the parameter `center_line` set to `off`. 
+
+```{r}
+Plot(Salary, run=TRUE, size=0, area_fill="on", center_line="off")
+```
+
+
+## Time Series Chart
+
+`Plot()` can plot a time series from three different forms of the data: 
+
+- long-form
+- wide-form 
+- time-series object
+
+ as well as a run chart in which it generates the index values sequentially ordered. A time series requires two variables, the time/date of the corresponding measured value to be plotted.
+
+Plotting a variable of type Date as the x-variable in a scatterplot automatically creates a time series visualization. Plot() draws the connecting line segments, without the points at each time period (size=0). To add the area fill, for
+__lessR__ set the area parameter to `TRUE` for the default color from the current color theme. Or, set to a specific color.
+
+
+### Long-Format Data
+
+Read time series data of stock _Price_ for three companies: Apple, IBM, and Intel. The data table is in long form, part of __lessR__.
+
+
+```{r}
+d <- Read("StockPrice")
+d[1:5,]
+```
+
+
+Activate a time series plot by setting the $x$-variable to a variable of R type `Date`, which is true of the variable _date_ in this data set. Can also plot a time series by passing a time series object, created with the base R function `ts()` as the variable to plot.
+
+Here plot just for _Apple_, with the two variables _date_ and _Price_, stock price. The parameter `rows` specifies what rows of the input data frame to retain for the analysis.
+
+```{r}
+Plot(date, Price, rows=(Company=="Apple"))
+```
+
+Here, add the default fill color by setting the `area_fill` parameter to `"on"`. Can also specify a custom color.
+
+```{r}
+Plot(date, Price, rows=(Company=="Apple"), area_fill="on")
+```
+
+With the `by` parameter, plot all three companies on the same panel.
+
+```{r, fig.width=5}
+Plot(date, Price, by=Company)
+```
+
+Stack the plots.
+
+```{r, fig.width=5}
+Plot(date, Price, by=Company, stack=TRUE)
+```
+
+
+With the `by1` parameter, plot all three companies on the different panels, a Trellis plot.
+
+```{r, fig.width=5}
+Plot(date, Price, by1=Company)
+```
+
+Do the Trellis plot with some color. 
+
+```{r, fig.width=5}
+style(sub_theme="black", window_fill="gray10")
+Plot(date, Price, by1=Company, n_col=1, fill="darkred", color="red", trans=.55)
+```
+
+Return to the default style, then turn off text output for subsequent analyses.
+
+```{r}
+style()
+style(quiet=TRUE)
+```
+
+Set a baseline of 25 with the `area_origin` parameter for a Trellis plot, with default fill color.
+
+```{r, fig.width=5}
+Plot(date, Price, by1=Company, xlab="", area_fill="on", area_origin=25)
+```
+
+Change the aspect ratio with the `aspect` parameter defined as height divided by width.
+
+```{r, fig.width=5}
+Plot(date, Price, by1=Company, aspect=.5, area_fill="slategray3")
+```
+
+Stack the three time series, fill under each curve with a version of the __lessR__ sequential range `"emeralds"`.
+
+```{r, fig.width=6}
+Plot(date, Price, by=Company, trans=0.4, stack=TRUE, area_fill="emeralds")
+```
+
+### Wide-Format Data
+
+`Plot()` also reads wide-format data. First convert the long form as read to the wide form. In the wide form, the three companies each have their own column of data, repeated for each date.
+
+```{r}
+dw <- reshape(d, direction = "wide",
+        idvar = "date", timevar = "Company",
+        varying = list(c("Apple", "IBM", "Intel")))
+head(dw)
+```
+
+Now the analysis, which repeats a previous analysis, but with wide-form data. Because the data frame is not the default _d_, explicitly indicate with the `data` parameter.
+
+```{r, fig.width=6}
+Plot(date, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
+```
+
+### Time-Series Object Data
+
+Can also plot directly from an R time series object, created with the base R `ts()` function.
+
+```{r, fig.wdith=6}
+a1.ts <- ts(dw$Apple, frequency=12, start=c(1980, 12))
+Plot(a1.ts)
+```
+
+
+With `style()` many themes can be selected, such as `"lightbronze"`, `"dodgerblue"`, `"darkred"`, and `"gray"` for gray scale. When no `theme` or any other parameter value is specified, return to the default theme, `colors`. 
+
+```{r}
+style()
+```
+
+
+## Annotation
+
+The annotations in the following visualization consist of the text field "iPhone" with an arrowhead that points to the time that the first iPhone became available. With __lessR__, list each component of the annotation as a vector for add. Any value listed that is not a keyword such as "rect" or "arrow" is interpreted as a text field. Then, in order of their occurrence in the vector for add, list the needed coordinates for the objects. To place the text field "iPhone" requires one coordinate, `<x1,y1>`. To place an "arrow" requires two coordinates, `<x1,y1>` and `<x2,y2>`. For example, the second element of the `y1` vector is the `y1` value for the "arrow". The text field does not require a second coordinate, so specify `x2` and `y2` as single elements instead of vectors.
+
+```{r fig.width=4.5}
+x <- as.Date("2007-06-01")
+Plot(date, Price, rows=(Company == "Apple"), fill="on", add=c("iPhone", "arrow"), x1=c(x,x), y1=c(100,90), x2=x, y2=30)
+```
+
+
+## Full Manual
+
+Use the base R `help()` function to view the full manual for `Plot()`. Simply enter a question mark followed by the name of the function.
+
+```
+?Plot
+```
+
+
+## More
+
+More on Scatterplots, Time Series plots, and other visualizations from __lessR__ and other packages such as __ggplot2__ at:
+
+Gerbing, D., _R Visualizations: Derive Meaning from Data_, CRC Press, May, 2020, ISBN 978-1138599635.

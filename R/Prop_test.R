@@ -1,19 +1,23 @@
 Prop_test <-
 function (variable=NULL, success=NULL, by=NULL, data=d,
-          n_succ=NULL, n_fail=NULL, n_tot=NULL,
-          p0=NULL, digits_d=3) {
-
-  do_data <- is.null(n_succ) && is.null(n_tot) 
+          n_succ=NULL, n_fail=NULL, n_tot=NULL, n_table=NULL,
+          Yates=FALSE, p0=NULL, digits_d=3) {
 
   # length(x) is count_n(x) + count_NA(x)
   count_n <- function(x) sum(!is.na(x))
   count_NA <- function(x) sum(is.na(x))
 
+  # classify analysis by (a) if data or freqs and (b) by type
+  # ---------------------------------------------------------
+  # data or not
+  do_data <- is.null(n_succ) && is.null(n_tot) && is.null(n_table) 
+
   # type of analysis
-  pm <- FALSE  # compare proportions over groups
   p1 <- FALSE  # analyze a single proportion
-  gf <- FALSE  # goodness-of-fit test
-  ct <- FALSE  # cross-tabs, independence of two categorical variables
+  pm <- FALSE  # compare proportions over groups
+  gf <- FALSE  # goodness-of-fit
+  ct <- FALSE  # cross-tabs independence
+  # ---------------------------------------------------------
 
   # option to provide raw data from which to compute proportion information
   # two potential variables: variable and by
@@ -32,28 +36,29 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
       null_by <- TRUE
 
     # discover the type of do_data analysis
-    if (is.null(success) && null_by) gf <- TRUE
-    if (is.null(success) && !null_by) ct <- TRUE
     if (!is.null(success) && null_by) p1 <- TRUE
     if (!is.null(success) && !null_by) pm <- TRUE
+    if (is.null(success) && null_by) gf <- TRUE
+    if (!is.null(n_table)) ct <- TRUE
+    if (is.null(success) && !null_by) ct <- TRUE
   }  # end do_data
 
   # provide proportion information directly
   else {
-
     if (!is.null(n_succ) && (is.null(n_tot) && is.null(n_fail)))  {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "When providing the number of successes, need the\n",
         "  corresponding number of trials, n_tot, or failures, n_fail.\n\n")
     }
+    miss.n_table <- ifelse (is.null(n_table), TRUE, FALSE)
 
-    l.ns <- length(n_succ)
-    l.nt <- length(n_tot)
     if (!is.null(n_fail)) n_tot <- n_succ + n_fail
-    if (l.nt > 1 && is.null(n_fail) && is.null(n_succ)) gf <- TRUE
-    if (l.ns == 1 && !is.null(n_tot)) p1 <- TRUE
-    if (l.ns > 1 && !is.null(n_tot)) pm <- TRUE
+    if (length(n_succ) == 1 && !is.null(n_tot)) p1 <- TRUE
+    if (length(n_succ) > 1 && !is.null(n_tot)) pm <- TRUE
+    if (is.null(n_succ) && miss.n_table) gf <- TRUE
+    if (!is.null(n_table)) ct <- TRUE
   }
+
 
   # --------------
   # one proportion
@@ -97,15 +102,16 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
   if (pm) {
 
     if (do_data) {
-      if (length(unique(data[,ind.var])) > 2) {
+      # if more than 2 levels, reduce to 2 levels
+      if (length(unique(data[,ind.var])) > 2) {  
         for (i in 1:nrow(data))
-          data[i,ind.var] <- ifelse (data[i,ind.var]==success, success, "z")
+          data[i,ind.var] <- ifelse (data[i,ind.var]==success, success, "fail")
       }
 
       # two-column table, Successes and Failures
       tbl <- table(data[,ind.grp], data[,ind.var]) 
 
-      # if needed, re-order the two tbl columns, success are in 1st column
+      # if needed, re-order the two tbl columns, success in 1st column
       ind <- which(colnames(tbl) == success)
       if (ind != 1) {
         tbln <- tbl
@@ -129,7 +135,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     }
 
     # do the analysis
-    out <- prop.test(tbl)
+    out <- prop.test(tbl, correct=Yates)
     rn <- rownames(tbl)
     for (i in 1:length(rn))
       names(out$estimate)[i] <- rownames(tbl)[i]
@@ -166,6 +172,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     return(invisible(out))
   }
 
+
   # ---------------
   # goodness-of-fit
   if (gf) {
@@ -182,6 +189,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
         nms <- names(n_tot)
     }
 
+    # do the analysis
     out <- chisq.test(tbl)
 
     obs <- .fmt(out$observed, 0)
@@ -191,9 +199,8 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
 
     cat("\n")
     cat(paste(">>>", out$method, " <<<", "\n\n"))
-    if (do_data) {
+    if (do_data)
       cat("Variable:", nm.var, "\n")
-    }
 
     cat("\n")
     cat(">>> Description")
@@ -214,44 +221,92 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     return(invisible(out))
   }  # end gf
 
+
   # -----------------------
   # cross-tabs independence
   if (ct) {
+
     if (do_data) {
       tbl <- table(data[,ind.grp], data[,ind.var])
       names(attributes(tbl)$dimnames) <- c(nm.grp, nm.var)
-      out <- chisq.test(tbl)   
 
-      n.cases <- sum(rowSums(tbl))
-      min_rc <- min(nrow(tbl)-1, ncol(tbl)-1)
-      V <- sqrt(out$statistic / (min_rc * n.cases))
-      txt <- ifelse(out$parameter == 1, " (phi)", "") 
-      txt <- paste("Cramer\'s V", txt, ":", sep="")
-
-      cat("\n")
-      cat(paste(">>>", out$method, " <<<", "\n\n"))
-      if (do_data) {
-        cat("Variable:", nm.var, "\n")
-        cat("by:", nm.grp, "\n")
-      }
-
-      cat("\n")
-      cat(">>> Description")
-      cat("\n\n")
-      tbl.m <- addmargins(tbl)
-      print(tbl.m)
-      cat("\n")
-      cat(txt, .fmt(V,3), "\n")
-
-      cat("\n")
-      cat(">>> Inference\n\n")
-      cat("Chi-square statistic:", .fmt(out$statistic, digits_d), "\n")
-      cat("Degrees of freedom:", .fmt(out$parameter, 0), "\n")
-      cat("Hypothesis test of independence: p-value = ",
-          .fmt(out$p.value,digits_d), sep="", "\n")
-
-      return(invisible(out))
+      cat("variable:", nm.var, "\n")
+      cat("by:", nm.grp, "\n")
     }  # end do_data
+
+    else {  # freq input
+      # read the cross-tab table
+      if (nchar(n_table) == 0) {
+        n_table <- file.choose()
+        cat("File: ", n_table, "\n\n")
+      }
+      if (grepl(".csv$", n_table) || grepl(".txt$", n_table)) 
+        tbl <- read.csv(n_table, header=FALSE)
+      else if (grepl(".xlsx$", n_table)) 
+        tbl <- openxlsx::read.xlsx(n_table)
+      else if (grepl("FreqTable99$", n_table)) { 
+        f.nm <- "dataFreqTable99.rda"
+        path.name <- paste(find.package("lessR"), "/data/",  f.nm, sep="")
+        x.env <- new.env()  # scratch environment
+        load(path.name, envir=x.env)
+        dname <- "dataFreqTable99"
+        tbl <- get(dname, pos=x.env)
+      }
+      else {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "Frequency table file must be of file type\n",
+          "  .csv for a Comma Separated Value text file or\n",
+          "  .xlsx for an Excel file.\n\n")
+      }
+      nms <- 1:ncol(tbl)
+      suppressWarnings(names(tbl) <- rep("", ncol(tbl)))
+    }  # end freq input
+
+    # analysis
+    out <- chisq.test(tbl, correct=Yates)   
+
+    n.cases <- sum(rowSums(tbl))
+    min_rc <- min(nrow(tbl)-1, ncol(tbl)-1)
+    V <- sqrt(out$statistic / (min_rc * n.cases))
+    txt <- ifelse(out$parameter == 1, " (phi)", "") 
+    txt <- paste("Cramer\'s V", txt, ":", sep="")
+
+    out <- chisq.test(tbl, correct=Yates)
+    obs <- .fmt(out$observed, 0)
+    exp <- .fmt(out$expected, digits_d)
+    res <- .fmt(out$residuals, digits_d)
+    std <- .fmt(out$stdres, digits_d)
+
+    k <- data.frame(row.names=1:(nrow(tbl)*ncol(tbl)))
+    k[,1] <- rep(1:nrow(tbl), ncol(tbl))
+    k[,2] <- rep(1:ncol(tbl), each=nrow(tbl))
+    k[,3] <- obs; k[,4] <- exp;  k[,5] <- res;  k[,6] <- std
+    names(k) <- c("Row", "Col", "Observed", "Expected", "Residual", "Stnd Res")
+    k$Residual <- as.numeric(k$Observed) - as.numeric(k$Expected)
+    k <- k[order(k[,1]),]  # display by row
+
+    cat("\n")
+    cat(paste(">>>", out$method, " <<<", "\n\n"))
+
+    cat(">>> Description\n\n")
+    if (do_data)
+      print(addmargins(tbl))
+    else {
+      cat("Cell Frequencies")
+      print(tbl, row.names=FALSE)
+    }
+    cat("\n", txt, .fmt(V,3), "\n\n")
+    print(k, row.names=FALSE)
+
+    cat("\n")
+    cat(">>> Inference\n\n")
+    cat("Chi-square statistic:", .fmt(out$statistic, digits_d), "\n")
+    cat("Degrees of freedom:", .fmt(out$parameter, 0), "\n")
+    cat("Hypothesis test of equal population proportions: p-value = ",
+        .fmt(out$p.value,digits_d), sep="", "\n")
+
+    return(invisible(out))
+
   }  # end ct
 
 }

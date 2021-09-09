@@ -10,13 +10,12 @@ function (x, y, box.ratio=1, vbs_size=box.ratio/(1 + box.ratio),
 
     stats.nm <- deparse(substitute(stats))
 
-#cat("\n\nIn panel.bwplot*************\n")
-#print(x)
-#print(y)
+#   requireNamespace(lattice, quietly=TRUE)  # lattice function panel.number()
+
     x <- as.numeric(x)
     y <- as.numeric(y)  # could be a factor, need numeric version
-#print(y)
 
+    # trellis.par.get("box.rectangle")
     box.rectangle <- trellis.par.get("box.rectangle")
     box.umbrella <- trellis.par.get("box.umbrella")
     plot.symbol <- trellis.par.get("plot.symbol")
@@ -27,20 +26,12 @@ function (x, y, box.ratio=1, vbs_size=box.ratio/(1 + box.ratio),
 
     if (horizontal) {
       if (stats.nm == "boxplot.stats")
-{
         blist <- tapply(x, factor(y, levels=levels.fos), stats, 
           coef=k.iqr, do.out=do.out)
-#cat("\nlevels.fos\n")
-#print(levels.fos)
-#cat("\nblist\n")
-#print(blist)
-}
       if (stats.nm == "adjboxStats")
         blist <- tapply(x, factor(y, levels=levels.fos), stats, 
           coef=k.iqr, a=a, b=b, do.out=do.out)
       blist.stats <- t(sapply(blist, "[[", "stats"))
-#cat("\nblist.stats\n")
-#print(blist.stats)
       blist.out <- lapply(blist, "[[", "out")
       blist.height <- vbs_size
       if (varwidth) {
@@ -64,10 +55,13 @@ function (x, y, box.ratio=1, vbs_size=box.ratio/(1 + box.ratio),
       ys <- cbind(ybnd, NA_real_)
 
       # box
-      panel.polygon(t(xs), t(ys), lwd=box.rectangle$lwd, 
-          lty=box.rectangle$lty, col=fill, alpha=box.rectangle$alpha, 
+      # col parameter specifies fill, only accepts one color, ignores others
+      # panel.xxx is basically a do-loop, iterating over panels
+       panel.polygon(t(xs), t(ys), lwd=box.rectangle$lwd, 
+          lty=box.rectangle$lty, col=fill[panel.number()],
+          alpha=box.rectangle$alpha, 
           border=box.rectangle$col,
-         identifier=paste(identifier, "box", sep="."))
+          identifier=paste(identifier, "box", sep="."))
 
       # stems
       panel.segments(
@@ -138,8 +132,8 @@ function (x, y, box.ratio=1, vbs_size=box.ratio/(1 + box.ratio),
 function (x, y, jitter_data=FALSE, factor=0.5, amount=NULL, 
     horizontal=TRUE, groups=NULL, ..., identifier="stripplot") {
 
-    panel.xyplot(x=x, y=y[1:length(x)], jitter_x=jitter_data && !horizontal, 
-        jitter_y=jitter_data && horizontal, factor=factor, 
+    panel.xyplot(x=x, y=y[1:length(x)], jitter.x=jitter_data && !horizontal, 
+        jitter.y=jitter_data && horizontal, factor=factor, 
         amount=amount, horizontal=horizontal,
         ..., identifier=identifier)
 }

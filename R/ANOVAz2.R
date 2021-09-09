@@ -301,11 +301,13 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
     plt.title[plt.i] <- "Interaction Plot"
 
     options(byname = nm[3])
-    .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], segments=TRUE,
+    theme <- getOption("theme")
+    qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
+    pt_fill <- getColors(qual_pal, n=2, output=FALSE)
+    pt_color <- getColors(qual_pal, n=2, output=FALSE)
+    .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], 
+              fill=pt_fill, color=pt_color, segments=TRUE,
               cat.x=TRUE, xlab=nm[2], ylab=nm[1], main="Cell Means", size=2)
-#   interaction.plot(x1.values, x2.values, y.values,
-#                    xlab=nm[2], ylab=nm[1], trace.label=nm[3],
-#                    main=plt.title[plt.i])
 
     # pdf
     if (pdf) {

@@ -346,6 +346,7 @@ function(x, y, by, stack100,
       else {  # not the default theme
         sty <- style(theme, reset=FALSE)
         clr <- sty$bar$bar_fill_discrete
+        fill <- clr
         color <- sty$bar$color
         trans <- sty$bar$trans_fill
       }
@@ -534,6 +535,7 @@ function(x, y, by, stack100,
     rm <- rm + (.50 + (exp.coef * axis_x_cex))
     mx.ch <- max(c(nchar(legend_labels), nchar(by.name) - 3))
     rm <- rm + (0.04 + 0.036*mx.ch)  # legend also moves over
+    if (mx.ch > 18) rm <- rm + ((mx.ch - 18) * .06)
   }
 
   if (legend_position == "top")
@@ -645,8 +647,10 @@ function(x, y, by, stack100,
     if (!is.null(y)) if (!.is.integer(y)) is_int <- FALSE
     if (n.levels > 14  || !is_int)
       values <- "off"
-    else
-      values <- ifelse (y.given, "input", getOption("values"))
+    else {
+      values <- getOption("values")
+      if (values != "off") if (y.given) values <- "input"
+    }
   }
 
   if (beside) {
@@ -1128,7 +1132,7 @@ function(x, y, by, stack100,
 
       # need brief=FALSE for row proportions
       stats <- .ss.factor(x, by, brief=FALSE, digits_d=NULL,
-                        x.name, by.name, x.lbl, y.lbl, label_max)
+                          x.name, by.name, x.lbl, y.lbl, label_max)
       txttl <- stats$txttl
       txfrq <- stats$txfrq
       txXV <- stats$txXV

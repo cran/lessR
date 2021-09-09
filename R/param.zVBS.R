@@ -1,10 +1,11 @@
-.plt.VBS <-
+.param.VBS <-
 function(x, ID, by1, by1.miss, by0, by.miss,
          bw, bw.miss, bw_iter, iter.details, lx, n.ux, 
          k.iqr, box_adj, a, b,
          x.name, by1.name, by.name, vbs_plot,
          n_col.miss, n_row.miss,
-         size, j.x.miss, jitter_x, j.y.miss, jitter_y,
+         size, out_size, out_size.miss,
+         j.x.miss, jitter_x, j.y.miss, jitter_y,
          bin=FALSE, breaks=NULL, bin_start=NULL, bin_width=NULL,
          bin_end=NULL, proportion=NULL, 
          digits_d, quiet, fun_call=NULL, ...) {
@@ -54,17 +55,18 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     tx[length(tx)+1] <- "Parameter values (can be manually set)"
     tx[length(tx)+1] <- .dash2(55)
     if (grepl("s", vbs_plot)) {
-      tx[length(tx)+1] <- paste("size:", .fmt(size.pt,2),
+      tx[length(tx)+1] <- paste("size:", .fmt(pt.size,2),
           "     size of plotted points")
+      tx[length(tx)+1] <- paste("out_size:", .fmt(out_size,2),
+          " size of plotted outlier points")
       tx[length(tx)+1] <- paste("jitter_y:", .fmt(jitter_y,2),
-          " random vertical movement of points")
+          "random vertical movement of points")
       tx[length(tx)+1] <- paste("jitter_x:", .fmt(jitter_x,2),
           " random horizontal movement of points")
-              if (size.pt < 0.02) size.pt <- .02
     }
     if (grepl("v", vbs_plot))
       tx[length(tx)+1] <- paste("bw:" , .fmt(bw,2),
-        "    set bandwidth higher for smoother edges")
+        "      set bandwidth higher for smoother edges")
     txprm <- tx
     class(txprm) <- "out"
     return(txprm)
@@ -140,17 +142,8 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
   }
 
-
   if (!is.factor(x)) if (bw.miss)
     bw <- .band.width(na.omit(x), bw_iter, iter.details, ...) # initial bw
-#d.gen <- suppressWarnings(density(na.omit(x), bw, ...))
-#xd <- diff(d.gen$y)
-#cat("\n\n\n*** bw:", bw, "\n")
-#xd2 <- diff(xd)
-#cat("\n\nxd2:\n")
-#print(as.numeric(.fmt(xd2,7)))
-#cat("\n\nxd2 sorted:\n")
-#print(sort(as.numeric(.fmt(xd2,7))))
   rep.prop <- (lx - n.ux) / lx
 
 
@@ -184,15 +177,17 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
     if (is.null(size)) {
       if (!reps)
-        size.pt <- ifelse (lx < 2535,  # at this value both equations equal
+        pt.size <- ifelse (lx < 2535,  # at this value both equations equal
           1.096 - 0.134*log(lx), 0.226 - 0.023*log(lx))
       else
-        size.pt <- 0.842 - 0.109*log(mx.c)
-      if (size.pt < 0.01) size.pt <- ifelse (lx < 25000, 0.015, 0.006) 
-      if (rt < 0.18) size.pt <- (0.147 + 4.490*rt) * size.pt  # decrease size
+        pt.size <- 0.842 - 0.109*log(mx.c)
+      if (pt.size < 0.01) pt.size <- ifelse (lx < 25000, 0.015, 0.006) 
+      if (rt < 0.18) pt.size <- (0.147 + 4.490*rt) * pt.size  # decrease size
     }
     else
-      size.pt <- size  # assign user specified value
+      pt.size <- size  # assign user specified value
+
+    if (out_size.miss) out_size <- 0.58 + 0.40*pt.size
 
     if (j.x.miss) jitter_x <- 1.1 * (1-exp(-0.03*mx.c))
     if (j.y.miss) {
@@ -270,7 +265,6 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     txgrp <- ssstuff$tx
     class(txgrp) <- "out"
 
-    #if (n_col.miss && n_row.miss) n_col <- 1
     mx.c <- max(tapply(x, by1, length))
     if (rep.prop > 0.15  &&  mc.w > (.05 * lx))  # many reps?
       reps <- TRUE
@@ -280,10 +274,12 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     # continuous variable with a categorical variable
     if (!reps) {  # reps-cat
       if (is.null(size))
-        size.pt <- 0.926 - 0.108*log(mx.c) - 0.023*n.lvl
+        pt.size <- 0.926 - 0.108*log(mx.c) - 0.023*n.lvl
       else
-        size.pt <- size  # assign user specified value
-      if (size.pt < 0.01) size.pt <- 0.01
+        pt.size <- size  # assign user specified value
+      if (pt.size < 0.025) pt.size <- 0.025
+
+      if (out_size.miss) out_size <- 0.58 + 0.40*pt.size
 
       if (j.y.miss) {
         jitter_y <-  -1.221 + 0.576*log(mx.c) + 0.032*n.lvl
@@ -300,22 +296,21 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     else {  # discrete-cat, by1, yields the same
       if (!by1.miss) {
         mx.c <- max(table(x, by1))
-        n.lvl <- nlevels(by1)
-        #if (n_col.miss) n_col <- 1
       }
 
       if (is.null(size))
-        size.pt <- 0.841 - 0.124*log(mc.w) 
+        pt.size <- 0.72 - 0.124*log(mc.w)
       else
-        size.pt <- size  # assign user specified value
-      if (size.pt < 0.01) size.pt <- 0.01
+        pt.size <- size  # assign user specified value
+      if (pt.size < 0.025) pt.size <- 0.025
+
+      if (out_size.miss) out_size <- 0.58 + 0.40*pt.size
 
       if (j.y.miss) {
-        jitter_y <-  -6.261 + 2.012*log(rep.max) + 1.180*n.lvl
+        jitter_y <-  -8 + 2.012*log(rep.max) + 0.9*n.lvl
         if (jitter_y < 1.0) jitter_y <- 1.0
       }
       if (j.x.miss) jitter_x <- 0.086 + 0.141*log(mx.c)
-      #if (j.x.miss) jitter_x <- 0.086 + 0.141*log(mc.w)
       if (jitter_x < 0) jitter_x <- 0
       if (grepl("v", vbs_plot) || grepl("s", vbs_plot)) 
         txprm <- .get.param(size, jitter_y, jitter_x, bw)
@@ -339,13 +334,11 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
   }  # end two.var
 
-
   class(output) <- "out_all"
-  if (!quiet) print(output)
 
   adj.bx.ht <- ifelse(mx.c == 0, lx, 3*lx)  # adjust the height of the box
 
-  return(list(bw=bw, size.pt=size.pt, jitter_y=jitter_y, jitter_x=jitter_x,
-              adj.bx.ht=adj.bx.ht))
+  return(list(bw=bw, pt.size=pt.size, jitter_y=jitter_y, jitter_x=jitter_x,
+              adj.bx.ht=adj.bx.ht, out_size=out_size, output=output))
 
 }

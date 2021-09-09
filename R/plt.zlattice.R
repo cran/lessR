@@ -4,15 +4,14 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
          trans, size.pt, size.ln,
          xlab, ylab, main, shape, lab_cex, axis_cex,
          lvl=0, ellipse_color=NULL, ellipse_lwd=NULL,
-         fit="off", fit_color=NULL, fit_lwd=NULL,
-         origin=NULL, jitter,
+         fit="off", fit_color=NULL, fit_lwd=NULL, fit_se,
+         plot_errors=FALSE, origin=NULL, jitter,
          violin, violin_fill, box, box_fill, 
          bw, vbs_size, box_adj, a, b, k.iqr, fences, vbs_mean,
          out_shape, out_size,
          out_fill, out_color, out2_fill, out2_color,
          ID, out_cut, ID_color, ID_size,
-         rotate_x, rotate_y, width, height, pdf_file, c.type, ...) {
-
+         rotate_x, rotate_y, width, height, pdf_file, T.type, ...) {
 
   date.ts <- FALSE
   if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
@@ -37,25 +36,6 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
     getOption("grid_lty"), getOption("grid_x_lty"))
   grid_y_lty <- ifelse(is.null(getOption("grid_y_lty")), 
     getOption("grid_lty"), getOption("grid_y_lty"))
-
-  axis_x_color <- ifelse(is.null(getOption("axis_x_color")), 
-    getOption("axis_color"), getOption("axis_x_color"))
-  axis_y_color <- ifelse(is.null(getOption("axis_y_color")), 
-    getOption("axis_color"), getOption("axis_y_color"))
-
-  # axis color is panel_color unless axis_color is changed from default
-  theme <- getOption("theme")
-  sub_theme <- getOption("sub_theme")
-  if (sub_theme != "black")  {  
-     panel_color <- ifelse (axis_x_color != "gray15", axis_x_color, "#DED9CD")
-     if (panel_color == "#DED9CD")
-       panel_color <- ifelse (axis_y_color != "gray15", axis_y_color, "#DED9CD")
-  }
-  else {
-     panel_color <- ifelse (axis_x_color != "gray55", axis_x_color, "gray55")
-     if (panel_color == "gray55")
-       panel_color <- ifelse (axis_y_color != "gray55", axis_y_color, "gray55")
-  }
 
   axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")), 
     getOption("axis_text_color"), getOption("axis_x_text_color"))
@@ -102,54 +82,14 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
   if (date.ts  &&  is.null(xx.lab)) x.lab <- NULL
 
-  if (trans > 0) fill <- .maketrans(fill, (1-trans)*256)
   col.bg <- ifelse(sum(col2rgb(panel_fill)) < 370, "transparent", panel_fill)
 
   n.groups <- ifelse (is.null(by), 1, nlevels(by))
 
-  # by parameter not working for a single variable plot, but also
-  #   not so meaningful, so convert to Trellis
-  if (c.type == "cont"  &&  is.null(y)  &&  n.groups > 1) {
-     message("Parameter  by  generally not meaningful for a single variable\n",
-             "Too many points overlap, so parameter  by  converted to  by1\n",
-             "  for a Trellis (facet) plot")
-     n.groups <- 1
-     by1 <- by
-     by <- NULL
-  }
-
-  col_color <- character(length=length(n.groups))
-  col_fill <- character(length=length(n.groups))
+  pt.fill <- fill
+  pt.color <- color
   ltype <- character(length=n.groups)
-
-  # set colors
-  if (n.groups == 1) {
-    col_fill <- fill[1]
-    col_color <- color[1]
-  }
-  else if (n.groups == 2) {
-      col_fill[1] <- fill[1]
-      col_fill[2] <- "gray70"
-      col_color[1] <- color[1]
-      col_color[2] <- "black"
-      ltype[1] <- "solid"
-      if (object == "both") ltype[2] <- "dotted"
-  }  
-  else  {  # n.groups > 2
-    if (getOption("theme") %in% c("gray", "white"))
-      col_color <- getColors("grays", n=n.groups)
-    else
-      col_color <- getColors("hues", n=n.groups)
-    for (i in 1:n.groups) {
-      col_fill[i] <- col_color[i]
-      col_fill[i] <- .maketrans(col_fill[i], (1-trans)*256)
-      ltype[i] <- "solid"
-    }
-  }
-
-  if (object != "point") if (area_fill != "transparent")
-    if (col_fill[1] != area_fill)
-      col_fill[1] <- .maketrans(fill[1], (1-trans)*256)
+  for (j in 1:n.groups) ltype[j] <- "solid"
 
   legend_title <- abbreviate(getOption("byname"), 7)
   leg.cex.title <- 0.85  # abbreviate only returns of type character
@@ -161,10 +101,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
     n.panels <- ifelse (is.null(by2), nlevels(by1), nlevels(by1)*nlevels(by2))
     if (n.panels == 0) n.panels <- 1
 
-    if (c.type %in% c("cont", "contcont")) {
+    if (T.type %in% c("cont", "cont_cont")) {
       if (is.null(n_col) && is.null(n_row)) {
         n_col <- ifelse (n.panels < 5, 1, 2)
-        if ((c.type == "cont")  &&  !is.null(by2)) {
+        if ((T.type == "cont")  &&  !is.null(by2)) {
           n_col <- length(unique(na.omit(by1)))
           n_row <- length(unique(na.omit(by2)))
         }
@@ -191,7 +131,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   if (is.null(by1)) strp <- FALSE
 
   # ---------------------------------
-  if (c.type == "contcont") {  # cont - cont
+  if (T.type == "cont_cont") {  # cont - cont
     # set 1 or 2 conditioning variables
     if (is.null(by2)) {
       p <- lattice::xyplot(y ~ x | by1, groups=by, ...)
@@ -201,7 +141,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
     }
   }
 
-  else if (c.type == "con_cat") {  # cont - cat
+  else if (T.type == "con_cat") {  # cont - cat
       jitter <- .4 * jitter
       if (is.null(by1)  &&  is.null(by2)) {
         p <- lattice::bwplot(y ~ x, groups=by, ...)
@@ -214,7 +154,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
       }
   }  # end con_cat
 
-  else if (c.type == "cont") {  # cont
+  else if (T.type == "cont") {  # cont
     # set 0, 1 or 2 conditioning variables
     if (is.null(by1)  &&  is.null(by2)) {  # 0 cond var
       p <- lattice::stripplot(~ x, groups=by, subscripts=TRUE, ...)
@@ -242,8 +182,9 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   size.pt <- size.pt * size.mult
 
   # separate panels with a border even if turned off when only one plot
+  panel_color <- getOption("panel_color")
   panel_frame_color <- ifelse(panel_color == "transparent",
-                              "gray50", panel_color)
+                              "gray30", panel_color)
 
   # even if no axis in single plot, multi-panel needs an axis to separate
   # scales, as currently configured, does not separate values from the axis
@@ -285,25 +226,26 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
          par.settings=list(
            background=list(col=getOption("window_fill")),
            panel.background=list(col=panel_fill),
-           layout_heights=list(top.padding=top.pad, axis_top=axs.top),
-           axis_line=list(col=panel_frame_color,
+           layout.heights=list(top.padding=top.pad, axis.top=axs.top),
+           axis.line=list(col=panel_frame_color,
              lty=getOption("axis_lty"), lwd=getOption("axis_lwd")), 
-           strip.border=list(col=getOption("strip_color"), lwd=0.5),
+           strip.border=list(col=getOption("strip_color"), lwd=1),
            strip.background=list(col=getOption("strip_fill")),
+           strip.color=list(col=getOption("strip_color")),  # ???
            plot.polygon=list(col=getOption("violin_color"), 
              fill=violin_fill, lty="solid", lwd=1),
-           plot.line=list(col=col_color, lty="solid", lwd=1),
-           plot.symbol=list(pch=shape, cex=size.pt, col=col_color,
-             fill=col_fill),
+           plot.line=list(col=pt.color, lty="solid", lwd=1),
+           plot.symbol=list(pch=shape, cex=size.pt, col=pt.color,
+             fill=pt.fill),
            superpose.symbol=list(pch=shape, cex=size.pt,
-             col=col_color, fill=col_fill),
-           superpose.line=list(col=col_color, lty=ltype)),
+             col=pt.color, fill=pt.fill),
+           superpose.line=list(col=pt.color, lty=ltype)),
          scales=list(
            x = list(cex=axis_x_cex, rot=rotate_x, col=a.x.text_color),
            y = list(cex=axis_y_cex, rot=rotate_y, col=a.y.text_color))
   )
 
-  if (c.type == "contcont") {
+  if (T.type == "cont_cont") {
     # specify plot attributes
     p <- update(p,
          auto.key=list(
@@ -312,40 +254,110 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
            border=TRUE, background=col.bg,
            title=legend_title, cex.title=leg.cex.title),
 
-         panel = function(x, y, ...) {
-             panel.grid(h=0, v=-1, col=g.x_color,
-                        lwd=grid_x_lwd, lty=grid_x_lty)
-             panel.grid(h=-1, v=0, g.y_color,
-                        lwd=grid_y_lwd, lty=grid_y_lty)
-             if (area_fill != "transparent")  # fill under the line
-               panel.xyarea(x, y, origin=origin, col=area_fill)
-             if (object == "point")
-               tp <- "p" 
-             else if (object == "both")
-               tp <- "b"
-             else if (object == "line")
-               tp <- "l"
-             panel.xyplot(x, y, type=tp, col=col_color, fill=col_fill,
-                          lwd=size.ln, ...)
-          }
-        )
+        panel = function(x, y, ...) {
+          panel.grid(h=0, v=-1, col=g.x_color,
+                     lwd=grid_x_lwd, lty=grid_x_lty)
+          panel.grid(h=-1, v=0, g.y_color,
+                     lwd=grid_y_lwd, lty=grid_y_lty)
+          if (area_fill != "transparent")  # fill under the line
+            panel.xyarea(x, y, origin=origin, col=area_fill)
 
-    # fit line
-    if (fit == "loess")
-      p <- p + latticeExtra::layer(panel.loess(x, y, col=P1, lwd=P2),
-                     data=list(P1=fit_color, P2=fit_lwd))
-    else if (fit == "lm")
-      p <- p + latticeExtra::layer(panel.lmline(x, y, col=P1, lwd=P2),
-                     data=list(P1=fit_color, P2=fit_lwd))
+          if (object == "point")
+            tp <- "p" 
+          else if (object == "both")
+            tp <- "b"
+          else if (object == "line")
+            tp <- "l"
+          panel.xyplot(x, y, type=tp, col=pt.color, fill=pt.fill,
+                       lwd=size.ln, ...)
 
-    # ellipse
-    if (lvl > 0)
-      p <- p + latticeExtra::layer(panel.ellipse(x, y, center.cex=0,
-                       level=P2, col=P1, lwd=P3),
-                     data=list(P1=ellipse_color, P2=lvl, P3=ellipse_lwd))
-  }  # end contcont 
+          if (fit != "off"  &&  n.groups == 1) {
+            ok <- is.finite(x) & is.finite(y)
+            x <- x[ok]
+            y <- y[ok]
+            ord <- order(x)
+            x <- x[ord]
+            y <- y[ord]
 
-  else if (c.type %in% c("con_cat", "cont")) {
+            if (fit == "loess")
+              l.ln <- loess(y ~ x)
+            else if (fit == "lm")
+              l.ln <- lm(y ~ x)
+            else if (fit == "null")
+              l.ln <- lm(y ~ 1)
+            if (fit %in% c("loess", "lm", "null"))
+              f.ln <- fitted(l.ln, ...)
+
+            if (fit == "exp") {
+              if (any(y < 0))
+                message("\n>>> Only non-negative values of y used.\n")
+              fi <- which(y < 0)
+              if (length(fi) > 0) {
+                y <- y[-fi]
+                x <- x[-fi]
+              }
+              l.ln <- lm(log(y) ~ x)
+              f.ln <- exp(l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
+              ok <- is.finite(f.ln)
+              if (length(ok) > 0) {
+                f.ln <- f.ln[ok]
+                x <- x[ok]
+              }
+            }  # end fit == "exp"
+
+            if (fit == "sqrt") {  # sqrt model
+              l.ln <- lm(sqrt(y) ~ x)
+              f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))^2
+            }
+
+            if (fit == "reciprocal") {  # reciprocal model
+              if (any(y == 0))
+                message("\n>>> Zero value of y is undefined.\n")
+              fi <- which(y == 0)  # no reciprocal of 0
+              if (length(fi) > 0) {
+                y <- y[-fi]
+                x <- x[-fi]
+              }
+              l.ln <- lm(1/y ~ x)
+              f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
+              fi <- which(f.ln > max(y)  | f.ln <= min(y))
+              if (length(fi) > 0) {  # keep plot within the range of the plot
+                f.ln <- f.ln[-fi]
+                x <- x[-fi]
+               }
+            }
+
+            if (fit %in% c("exp", "sqrt", "reciprocal", "null"))
+              fit_se[1] <- 0
+            se_fill <- getOption("se_fill")
+            nrows <- length(f.ln)
+            for (j in 1:length(fit_se)) {
+              p.ln <- predict(l.ln, se=TRUE)
+              prb <- (1 - fit_se[j]) / 2
+              up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
+              dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
+              panel.polygon(c(x, rev(x)), c(up.ln, rev(dn.ln)),
+                            col=se_fill, border="transparent")
+            }
+ 
+            panel.lines(x, f.ln, col=fit_color, lwd=fit_lwd)
+
+            if (plot_errors)
+              panel.segments(y0=f.ln, y1=y, x0=x, x1=x, col="darkred", lwd=1) 
+
+          }  # end fit != "off"
+
+          if (lvl > 0)
+            panel.ellipse(x, y, center.cex=0,
+                          level=lvl, col=ellipse_color, lwd=ellipse_lwd)
+
+        }  # end panel function
+      )  # end update
+
+  }  # end cont_cont 
+
+
+  else if (T.type %in% c("con_cat", "cont")) {
 
     #myboxStats <- function(...) 
       #if (!box_adj)
@@ -378,25 +390,11 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
        )
     }  # end fences
 
-
-#cat("n.groups:", n.groups, "\n")
-    if (n.groups > 1) {  # cex refers to the text, not the points
-      c_color <- character(length=length(n.groups))
-      if (n.groups == 2) {
-        c_color[1] <- col_fill[1]  
-        c_color[2] <- "black"
-      }
-      else
-        c_color <- col_fill
-    }
-    else
-      c_color <- col_fill
-
     if (n.groups > 1) {
       legend_lbl.cex <- ifelse (in.RStudio, .75, .66) 
       p <- update(p, key=list(space="top", columns=n.groups,
              text=list(levels(by), cex=legend_lbl.cex), 
-             points=list(pch=21, fill=col_fill, col=c_color, cex=1),
+             points=list(pch=21, fill=pt.fill, col=pt.color, cex=1),
              border="gray80", background=col.bg, padding.text=2))
     }
 
@@ -439,13 +437,17 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
 
           if (violin) {
             # to get a violin plot, cannot have y and by1
+            # just Plot(x) gives a VBS plot with no groups and only 1 panel
+            # a giant do loop that iterates over groups, i.e., panel.number()
             vw <- ifelse (!is.null(y) && !is.null(by1), FALSE, TRUE) 
-            panel.violin(x=x, ...,
-                col=violin_fill, border=getOption("violin_color"),
-                varwidth=vw, box.width=vbs_size, bw=bw)
-           }
+            vf <- ifelse (n.panels>1, violin_fill[panel.number()], violin_fill)
+              panel.violin(x=x, ...,
+                  col=vf,
+                  border=getOption("violin_color"),
+                  varwidth=vw, box.width=vbs_size, bw=bw)
+            }
 
-          if (box  || size.pt > 0) {
+          if (box  ||  size.pt > 0) {
 
             n.lvl <- ifelse (is.null(by1), 1, nlevels(by1))
             n <- adj.bx.ht
@@ -454,12 +456,14 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
             if (denom < 1.5) denom <- 1.5
 
             if (box) {  # could just be a scatterplot with red outlier points
-              if (!box_adj)
-                .panel.bwplot(x=x, ..., pch="|", vbs_mean=vbs_mean, fences=fences,
+              if (!box_adj)  # did the panel.number() access in .panel.bwplot()
+                .panel.bwplot(x=x, ..., pch="|", vbs_mean=vbs_mean,
+                    fences=fences,
                     box.ratio=vbs_size/denom, mean_color=out_fill, 
                     stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE) 
               else
-                .panel.bwplot(x=x, ...,  pch="|", vbs_mean=vbs_mean, fences=fences,
+                .panel.bwplot(x=x, ...,  pch="|", vbs_mean=vbs_mean,
+                    fences=fences,
                     box.ratio=vbs_size/denom, mean_color=out_fill, 
                     stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE) 
            }
@@ -472,7 +476,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
             }
             else {
               i.out_clr <- as.numeric(groups[i.out])
-              fill_out <- col_fill[i.out_clr]
+              fill_out <- pt.fill[i.out_clr]
             }
 
             # plot extreme outliers
@@ -487,7 +491,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
             }
             else {
               i.out_clr <- as.numeric(groups[i.out])
-              fill_out <- col_fill[i.out_clr]
+              fill_out <- pt.fill[i.out_clr]
             }
 
             # plot outliers
@@ -530,22 +534,18 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               i.out <- which(x>=fnc.in[1] & x<=fnc.in[2])
               if (n.groups == 1) {
                 i.out_clr <- 1
-                fill_out <- col_fill
+                fill_out <- pt.fill
               }
               else {
                 i.out_clr <- as.numeric(groups[i.out])
-                fill_out <- col_fill[i.out_clr]
+                fill_out <- pt.fill[i.out_clr]
               }
             }  # end box
-            else {
+            else
               i.out <- 1:length(x)
-              fill_out <- "black"
-              #fill_out <- col_fill
-            }
-            color_out <- fill_out
-            if (n.groups == 2) color_out <- "black"
+
             .panel.stripplot(x=x[i.out], 
-               cex=s.pt, pch=shape, col=color_out, fill=fill_out,
+               cex=s.pt, pch=shape, col=pt.color, fill=pt.fill,
                jitter_data=jitter_data, factor=jitter, ...)
           }
 

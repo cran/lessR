@@ -1,5 +1,5 @@
 ---
-title: "Regression"
+title: "Regression Analysis"
 author: "David Gerbing"
 output: 
   rmarkdown::html_vignette:
@@ -14,7 +14,7 @@ vignette: >
 library("lessR")
 ```
 
-The `Regression()` function performs multiple facets of a complete regression analysis. Abbreviate with `reg()`.
+The `Regression()` function performs multiple aspects of a complete regression analysis. Abbreviate with `reg()`.
 
 
 To illustrate, first read the Employee data included as part of __lessR__. Read into the default __lessR__ data frame _d_.
@@ -23,12 +23,19 @@ To illustrate, first read the Employee data included as part of __lessR__. Read 
 d <- Read("Employee")
 ```
 
+As an option, also read the table of variable labels. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need to be entered into the table. The table can be a `csv` file or an Excel file.
+
+Currently, read the label file into the _l_ data frame. The labels are displayed on both the text and visualization output. Each displayed label consists of the variable name juxtaposed with the corresponding label.
+
+```{r labels}
+l <- rd("Employee_lbl")
+```
 
 ## Default Analysis 
 
 ### Brief output
 
-The brief version provides just the basic analysis, what Excel provides, plus a scatterplot with the regression line, which becomes a scatterplot matrix with multiple regression.
+The brief version provides just the basic analysis, what Excel provides, plus a scatterplot with the regression line, which becomes a scatterplot matrix with multiple regression. Because _d_ is the default name of the data frame that contains the variables for analysis, the `data` parameter that names the input data frame need not be specified.
 
 ```{r fig.width=4.5, fig.height=4.5}
 reg_brief(Salary ~ Years + Pre)
@@ -37,13 +44,13 @@ reg_brief(Salary ~ Years + Pre)
 
 ### Full output
 
-The full output is extensive: Summary of the analysis, estimated model, fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals. The idea is to provide all of the information you need for a proper regression analysis.
+The full output is extensive: Summary of the analysis, estimated model, fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals. The motivation is to provide virtually all of the information needed for a proper regression analysis.
 
 ```{r}
 reg(Salary ~ Years + Pre)
 ```
 
-Brief output with standardization of all variables in the model. Plot the residuals as a line connecting each data point to the corresponding point on the regression line.
+Request a briefer output with the `reg_brief()` version of the function. Standardize the variables in the model by setting the `rescale` parameter to `"z"`. Plot the residuals as a line connecting each data point to the corresponding point on the regression line as specified with the `plot_errors` parameter.
 
 ```{r, fig.width=4.5, fig.height=4}
 reg_brief(Salary ~ Years, rescale="z", plot_errors=TRUE)
@@ -52,7 +59,7 @@ reg_brief(Salary ~ Years, rescale="z", plot_errors=TRUE)
 
 ### k-fold cross-validation
 
-Specify a cross-validation with the `kfold` parameter. Here specify three folds. The funciton automatically creates the training and testing data sets.
+Specify a cross-validation with the `kfold` parameter. Here, specify three folds. The function automatically creates the training and testing data sets.
 
 ```{r}
 reg(Salary ~ Years, kfold=3)
@@ -69,26 +76,26 @@ The output of `Regression()` can be stored into an R object, here named _r_. The
 r <- reg(Salary ~ Years + Pre)
 ```
 
-Entering the name of the object displays the full output.
+Entering the name of the object displays the full output, the default output when the output is directed to the R console instead of saving into an R object.
 
 ```{r}
 r
 ```
 
-Or, work with the components individually. Use the base R `names()` function to identify all of the components. Component names that begin with `out_` are part of the standard output. Other components include just data and statistics designed to be input in additional procedures, including R markdown documents.
+Or, work with the components individually. Use the base R `names()` function to identify all of the output components. Component names that begin with `out_` are part of the standard output. Other components include just data and statistics designed to be input in additional procedures, including R markdown documents.
 
 ```{r}
 names(r)
 ```
 
-Here just display the estimates as part of the standard text output.
+Here, only display the estimates as part of the standard text output.
 
 ```{r}
 r$out_estimates
 ```
 
 
-Here display the coefficients as numeric values.
+Here, display the numeric values of the coefficients.
 
 ```{r}
 r$coefficients
@@ -108,14 +115,14 @@ dp[.(row.names(dp) == "Pham,Scott"),]
 
 ## Contrasts
 
-Because `reg()` accomplishes its computations with base R function `lm()`, can pass `lm()` parameters to `reg()`, which then passes their values to `lm()`. Here first use base R function `contr.sum()` to calculate an effect coding contrast matrix for a categorical variable with three levels, such as the variable _Plan_ in the _Employee_ data set.
+Because `reg()` accomplishes its computations with base R function `lm()`, `lm()` parameters can be passed to `reg()`, which then passes their values to `lm()`. Here, first use base R function `contr.sum()` to calculate an effect coding contrast matrix for a categorical variable with three levels, such as the variable _Plan_ in the _Employee_ data set.
 
 ```{r}
 cnt <- contr.sum(n=3)
 cnt
 ```
 
-Now use the `lm()` parameter `contrasts` to define the effect coding for _Plan_, passed to `reg_brief()`. Contrasts only apply to factors, so first convert _Plan_ to a factor.
+Now use the `lm()` parameter `contrasts` to define the effect coding for _Plan_, passed to `reg_brief()`. Contrasts only apply to factors, so convert _Plan_ to an R factor before the regression analysis.
 
 ```{r fig.width=4.5, fig.height=4}
 d$Plan <- factor(d$Plan)
@@ -138,7 +145,7 @@ Can also get the null model output from the __lessR__ function `Plot()` with the
 
 ## Likert Type Data
 
-When both variables consists of less than 10 unique integer values, the scatterplot is displayed as a bubble plot. This way there is no overprinting of the same point so that the number of values that represent a point is displayed.
+The scatterplot is displayed as a bubble plot when both variables consist of less than 10 unique integer values. With the bubble plot, there is no overprinting of the same point so that the number of values that represent a point is displayed.
 
 ```{r likert, fig.width=4.5, fig.height=4.5}
 dd <- Read("Mach4")
@@ -169,7 +176,7 @@ Logit(Gender ~ Salary)
 ```
 
 
-### Change Classifiation Threshold
+### Change Classification Threshold
 
 Specify additional probability thresholds for classification beyond just the default 0.5 with the `prob_cut` parameter.
 

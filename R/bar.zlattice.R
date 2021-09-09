@@ -4,7 +4,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
          trans, size.pt, xlab, ylab, main,
          rotate_x, offset,
          width, height, pdf_file,
-         segments_x, breaks, c.type, quiet) {
+         segments_x, breaks, T.type, quiet) {
 
   if (!quiet)
     cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n")
@@ -96,7 +96,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
   lab_y_cex <- gl$lab_y_cex
 
   # lattice does horizontal bar or dot chart, so reverse axis labels
-  if (c.type %in% c("bar", "dot")) {
+  if (T.type %in% c("bar", "dot")) {
     tmp.lab <- x.lab
     x.lab <- y.lab
     y.lab <- tmp.lab
@@ -118,7 +118,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
 
   h.type <- ifelse(prop, "percent", "count")  # histogram type
   #h.type <- "density"   # need to integrate density as a 3rd option
-  if (c.type == "hist") {
+  if (T.type == "hist") {
     if (is.null(by2))
       p <- lattice::histogram(~ x | by1, type=h.type)
     else
@@ -128,7 +128,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
     n.bar <- unlist(p)$panel.args.common.nint
   }
 
-  else if (c.type %in% c("bar", "dot")) {
+  else if (T.type %in% c("bar", "dot")) {
     mytab <- table(x, by1)
     if (prop) mytab <- prop.table(mytab, margin=2)
     mytabDF <- as.data.frame.table(mytab, responseName="Count")
@@ -216,7 +216,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
          panel = function(x, y, ...) {
             panel.grid(h=0, v=-1, col=g.x_color,
                         lwd=grid_x_lwd, lty=grid_x_lty)
-            if (c.type == "hist") {
+            if (T.type == "hist") {
               panel.grid(h=-1, v=0, g.y_color,
                          lwd=grid_y_lwd, lty=grid_y_lty)
               panel.histogram(x, col=fill, border=color, ...)
@@ -225,7 +225,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
               #panel.mathdensity(dmath = dnorm, col.line = "grey60",
                            #args = list(mean=mean(x),sd=sd(x)), ...)
             }
-            if (c.type == "dot") {
+            if (T.type == "dot") {
               if (segments_x) {
                 panel.points(x, y, pch=21, cex=size.pt,
                    col=getOption("pt_fill"), fill=getOption("pt_fill"), ...)
@@ -236,7 +236,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
                    col.line=fill, ...)  # called from Plot 
               }
             }
-            else if (c.type == "bar")
+            else if (T.type == "bar")
               panel.barchart(x, y, col=fill, border=color, ...)
           }
         )
@@ -257,7 +257,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
   # text output
   if (!quiet) {
 
-    if (c.type == "hist"  &&  is.null(by2)) {
+    if (T.type == "hist"  &&  is.null(by2)) {
       stuff <- .ss.numeric(x, by1, digits_d=getOption("digits_d"), 
                            brief=TRUE, y.name=getOption("by1name"))
       txsts <- stuff$tx
@@ -267,7 +267,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
       print(output)
     }
 
-    else if (c.type == "bar"  &&  is.null(by2)) {
+    else if (T.type == "bar"  &&  is.null(by2)) {
         stats <- .ss.factor(x, by=by1, brief=TRUE, digits_d=getOption("digits_d"),
                             x.name=x.name, y.name=getOption("by1name"),
                             x.lbl=x.lbl, y.lbl=y.lbl)

@@ -22,10 +22,19 @@ First read the Employee data included as part of __lessR__.
 d <- Read("Employee")
 ```
 
+As an option, also read the table of variable labels. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need to be entered into the table. The table can be a `csv` file or an Excel file.
+
+Currently, read the label file into the _l_ data frame. The labels are displayed on both the text and visualization output. Each displayed label consists of the variable name juxtaposed with the corresponding label.
+
+```{r labels}
+l <- rd("Employee_lbl")
+```
+
+
 
 ## One-Sample t-test
 
-Obtain the summary statistics and 95% confidence interval for a single variable by specifying that variable with `ttest()`.
+Obtain the summary statistics and 95% confidence interval for a single variable by specifying that variable with `ttest()`. Because _d_ is the default name of the data frame that contains the variables for analysis, the `data` parameter that names the input data frame need not be specified.
 
 ```{r}
 ttest(Salary)
@@ -115,9 +124,9 @@ dm <- pivot(warpbreaks, mean, breaks, c(tension, wool))
 dm
 ```
 
-The aggregated data is stored in the data frame named _dm_, so explicitly identify with the `data` parameter. The computed mean of _breaks_ variable in the _dm_ data frame from the previous call to `pivot()` is named *breaks_mn* by default.
+Store the aggregated data in the data frame named _dm_, so explicitly identify with the `data` parameter. The computed mean of _breaks_ variable in the _dm_ data frame from the previous call to `pivot()` is named *breaks_mn* by default.
 
-```{r}
+```{r fig.width=5}
 Plot(tension, breaks_mn, by=wool, segments=TRUE, size=2, data=dm, main="Cell Means")
 ```
 

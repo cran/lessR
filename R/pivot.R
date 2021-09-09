@@ -1,9 +1,9 @@
 pivot <-
 function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
-         na_by_show=TRUE, na_remove=TRUE, sort=NULL, 
-         out_names=NULL, factors=FALSE, q_num=4,
-         table_prop=c("none", "all", "row", "col"),
-         show_n=TRUE, digits_d=3, quiet=getOption("quiet")) {
+         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, out_names=NULL, 
+         sort=NULL, sort_var=NULL,  
+         table_prop=c("none", "all", "row", "col"), table_long=FALSE,
+         factors=FALSE, q_num=4, digits_d=3, quiet=getOption("quiet")) {
 
   table_prop <- match.arg(table_prop)
   out.nm.miss <- missing(out_names)
@@ -22,7 +22,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   data.vars <- as.list(seq_along(data))
   names(data.vars) <- names(data)
 
-  # subset rows of input data frame
+  # subset any specified rows of input data frame
   ind <- eval(substitute(variable), envir=data.vars)  # col num of each var
   if (!missing(rows)) {  # subset rows
     r <- eval(substitute(rows), envir=data, enclos=parent.frame())
@@ -58,13 +58,21 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   }
 
   tflag <- FALSE
-  if ("table" %in% nm.cmpt) {  # remove and process quantile separately
-    tflag <- TRUE
-    n.cmp <- n.cmp - 1
-    if (n.cmp > 0) {
-      ipos <- which(nm.cmpt %in% "table")
-      nm.cmpt <- nm.cmpt[-ipos]  # remove from name list
-      compute <- compute[-ipos]  # remove from function list
+  to_tabu <- FALSE
+  if ("table" %in% nm.cmpt) {  # remove and process table separately
+    if (!table_long) {
+      tflag <- TRUE
+      n.cmp <- n.cmp - 1
+      if (n.cmp > 0) {
+        ipos <- which(nm.cmpt %in% "table")
+        nm.cmpt <- nm.cmpt[-ipos]  # remove from name list
+        compute <- compute[-ipos]  # remove from function list
+      }
+    }
+    else {
+      to_tabu <- TRUE
+      nm.cmpt <- "tabulate"
+      n.cmp <- 1
     }
   }
 
@@ -85,7 +93,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   nm.var.d <- names(data)[ind.var.d]
   if (is.null(out_names))
     out_names <- paste(nm.var.d, "_", fun.vec[nm.cmpt], sep="")
-
 
   # ------- 
   # by vars
@@ -130,6 +137,11 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       by.vars <- list(data[, ind.by])
       names(by.vars) <- deparse(substitute(by))
     }
+    if (to_tabu) {
+      n.by <- n.by + 1
+      n.r.by <- n.by
+      ind.by <- c(ind.by, ind.var.d)
+    }
   }  # end by is specified or tabulate
 
   else {
@@ -146,7 +158,17 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       "Cannot have more than one statistic specified\n",
       "  when computing a frequency table over all the data.\n\n")
   }
-
+  if (tflag && n.c.by>0)  {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Cannot specify a  by_cols  parameter value, ", nm.col.by, ",\n",
+      "  when using table to compute a frequency table. The values\n",
+      "  of the variable listed first goes across the columns.\n\n")
+  }
+  if (tflag && n.var > 1)  {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Cannot have more than one variable to aggregate\n",
+      "  when computing a frequency table.\n\n")
+  }
   if (n.c.by > 2)  {
     nms.c <- ""
     for (i in 1:n.c.by) nms.c <- paste(nms.c, names(data)[ind.c.by[i]])
@@ -154,17 +176,11 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       "Specified column  by  variables: ", nms.c, "\n",
       "Only two column  by  variables permitted\n\n")
   }
-  if (tflag && n.var > 1)  {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Cannot have more than one variable to aggregate\n",
-      "  when computing a frequency table.\n\n")
-  }
   if (n.var > 1 && n.cmp > 1 && n.by > 0)  {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Cannot have multiple compute functions, multiple variables, \n",
       "  and do aggregation with a by variable.\n\n")
   }
-
   if (!is.null(sort)) {
     if (!(sort %in% c( "+", "-"))) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -283,15 +299,15 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     # sort
     if (!is.null(sort)) {
       direction <- ifelse (sort=="+", FALSE, TRUE)
-#     if (!is.null(sort_var)) {
-#       if (is.numeric(sort_var))
-#         s.col <- sort_var
-#       else
-#         s.col <- which(names(a) == sort_var)
-#     }
-#     else
-        s.col <- ncol(a)
-      a <- a[order(a[,s.col], decreasing=direction), ]
+      if (!is.null(sort_var)) {
+        if (is.numeric(sort_var))
+          s.col <- sort_var
+        else
+          s.col <- which(names(a) == sort_var)
+      }
+      else
+        s.col <- ncol(a)  # s.col is the number of the sort column
+      a <- a[order(a[[s.col]], decreasing=direction), ]
     }
 
     return(a)
@@ -304,7 +320,13 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     if (nm.cmpt[1] == "tabulate") {
       use_na <- ifelse (!na_by_show, "no", "ifany")
       a <- table(data[, ind.by], useNA=use_na)
-      a <- as.data.frame(a)
+      if (n.c.by != 0) {
+        if (table_prop == "all") a <- round(prop.table(a), digits_d) 
+        if (table_prop == "row") a <- round(prop.table(a, 1), digits_d) 
+        if (table_prop == "col") a <- round(prop.table(a, 2), digits_d) 
+      }
+      else
+        a <- as.data.frame(a)
       if (n.by == 1) names(a)[1] <- deparse(substitute(variable))
       names(a)[ncol(a)] <- "n"
 
@@ -433,7 +455,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       amd <- merge(amd, a2, by=names(by.vars), sort=FALSE)
       if (out.nm.miss)
         l.nm <-lvl[i]
-#       l.nm <- paste(abbreviate(nm.var.d[1], 3), "_", lvl[i], sep="")
       else
         l.nm <- out_names[i]
       names(amd)[ncol(amd)] <- l.nm # lvl[i]
@@ -465,6 +486,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       amd <- amd[,-not.n]  # remove what will be redundant columns
       a <- cbind(a,amd[(n.by+1):ncol(amd)])
     }
+    if (is.factor(d[,ind.var.d]))
+      names(a)[(n.by+3):ncol(a)] <- levels(d[,ind.var.d])
   }  # end tflag
 
 
@@ -522,21 +545,21 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
   # round if specified
   ind.var <- (n.by+1):ncol(a)
-  i.s <- which(names(a) %in% names(a)[ind.var])
-  if (!is.null(digits_d)) a[,i.s] <- round(a[,i.s], digits_d)
+  i.v <- which(names(a) %in% names(a)[ind.var])
+  if (!is.null(digits_d)) a[,i.v] <- round(a[,i.v], digits_d)
 
   # sort if specified
   if (!is.null(sort)) {
     direction <- ifelse (sort=="+", FALSE, TRUE)
-#   if (!is.null(sort_var)) {
-#     if (is.numeric(sort_var))
-#       s.col <- sort_var
-#     else
-#       s.col <- which(names(a) == sort_var)
-#   }
-#   else
-      s.col <- ncol(a)
-    a <- a[order(a[,s.col], decreasing=direction), ]
+    if (!is.null(sort_var)) {
+      if (is.numeric(sort_var))
+        s.col <- sort_var
+      else
+        s.col <- which(names(a) == sort_var)
+    }
+    else
+      s.col <- ncol(a)  # s.col is the number of the sort column
+    a <- a[order(a[[s.col]], decreasing=direction), ]
   }
 
 
@@ -558,13 +581,13 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
     nm.var.a <- names(a)[ind.var]  # preserve original names
 
-    # delete unneeded variables
+    # delete variables n_ and na_
     n.ind <- which(substr(names(a),1,2) == "n_")
     miss.ind <- which(substr(names(a),1,3) == "na_")
     a <- a[, -c(n.ind, miss.ind)]
 
     # re-reference pivot variables in aggregated data frame a
-    i.s <- which(names(a) %in% nm.var.a)
+    i.v <- which(names(a) %in% nm.var.a)
     i.r <- which(names(a) %in% nm.row.by)
     i.c <- which(names(a) %in% nm.col.by)
 
@@ -580,21 +603,37 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       i1.c <- i.c[2]
     }
 
+    # convert a data frame to reshaped w data frame
     # reshape only works on one col by variable at a time
-    w <- reshape(a, direction="wide", idvar=c(names(a)[i1.r]),
-                    timevar=names(a)[i1.c], v.names=names(a)[i.s])
-
+    # reshape adds verbose variable names
+    w <- reshape(a, direction="wide", idvar=names(a)[i1.r],
+                    timevar=names(a)[i1.c], v.names=names(a)[i.v])
    # second column by variable
     if (n.c.by == 2) {
       i2.r <- i.r
       i2.c <- i.c[1]
-    w <- reshape(w, direction="wide", idvar=c(names(a)[i2.r]),
+    w <- reshape(w, direction="wide", idvar=names(a)[i2.r],
                     timevar=names(a)[i2.c])
     }
     rownames(w) <- c()  # remove row names
-
+    # drop cols with all NA
+    # current set up is for complete crossing of all levels
+    # if drop all NA cols, need to have separate levels 2 for each level 1
+    no_col_na=FALSE
+    if (no_col_na) {
+      drp <- integer(length=0)
+      k <- 0
+      for(i in (n.c.by+1):ncol(w)) {
+        if (all(is.na(w[,i]))) {
+          k <- k + 1
+          drp[k] <- i
+        }
+      }
+      w <- w[, -drp]
+    }
 
   # headings
+  # move reshaped data frame w to a kable character vector
   # --------
 
     # if var by_cols names larger than by row name, pad with "|"
@@ -607,9 +646,11 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       names(w)[1] <- nm.buf
     }
 
-    # remove all by names, get " -" locations from kable
+    # convert reshaped w to kable k, vector of lines of characters
+    # remove all by names from w, get " -" locations from kable
     for (i in (n.r.by+1):length(names(w))) names(w)[i] <- " "
     k <- kable(w, format="pandoc", digits=2, caption=" ", align="r")
+    # get starting positions of columns for labels from k --- line
     g <- gregexpr(" -", k[4], fixed=TRUE)
     g <- unlist(g)
 
@@ -631,22 +672,22 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       }
     }
 
-    # fill level labels for two by_cols vars
     else if (n.c.by == 2) {
       lvl1 <- levels(a[,i.c[1]])
       lvl2 <- levels(a[,i.c[2]])
 
-      ln2 <- paste(rep(" ", nc), sep="", collapse="")  # blank line
-      ln2 <- paste(" ", names(a)[i.c[2]], ln2, sep="") # add var name
-
-      # labels for first by_cols var
+      # line with labels for first by_cols var (1st level line)
+      # for each lvl1 item, skip lvl2 cols for placement
       for (i in 1:length(lvl1)) {
         start <- g[n.r.by + (i-1)*length(lvl2)] + 1
         stop <- start + nchar(lvl1[i])
         substr(ln1, start, stop) <- lvl1[i]
       }
 
-      # labels for second by_cols var
+      ln2 <- paste(rep(" ", nc), sep="", collapse="")  # blank line
+      ln2 <- paste(" ", names(a)[i.c[2]], ln2, sep="") # add var name
+
+      # line with labels for second by_cols var
       c2.nm <- names(a)[i.c[2]]
       substr(ln2, 2, 2 + nchar(c2.nm)) <- c2.nm
       for (k in 1:length(lvl1)) {

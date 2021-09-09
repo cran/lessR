@@ -18,22 +18,35 @@ suppressPackageStartupMessages(library("lessR"))
 
 The analysis of proportions is of two primary types. 
 
-- Focus on a single value of a categorical variable, termed a "success" when it occurs, for one or more samples of data. Analyze the resulting proportion of occurrence for a single sample or compare proportions of successes across distinct data samples for a single variable, a _homogeneity_ test.
-- Compare the obtained proportions across the values of one or more categorical variables for a single sample, a _goodness-of-fit_ test for a single variable, and a test of _independence_ for multiple variables to evaluate a potential relationship between the variables.
+- Focus on a single value of a categorical variable, termed a "success" when it occurs, for one or more samples of data. Analyze the resulting proportion of occurrence for a single sample, or compare proportions of successes across distinct data samples for a single variable, a _homogeneity_ test.
+- Compare the obtained proportions across the values of one or more categorical variables for a single sample. Applied to a single variable, the analysis is a _goodness-of-fit_. Or, evaluate a potential relationship between two categorical variables, a test of _independence_.
 
-From standard base R functions, the __lessR__ function `Prop_test()`, abbreviated `prop()`, provides either type of analysis. To use, generally enter either the original data from which to compute the sample proportions or enter already computed sample proportions. For the analysis of multiple categorical variables, the test of _homogeneity_ and the test of _independence_ yield the identical statistical result.
+From standard base R functions, the __lessR__ function `Prop_test()`, abbreviated `prop()`, provides either type of analysis. To use, generally enter either the original data from which to compute the frequencies and then the sample proportions, or enter already computed frequencies. For the analysis of multiple categorical variables across two levels of one of the variables, the test of _homogeneity_ and the test of _independence_ yield the identical statistical result.
+
+The following table summarizes the values of the `Prop_test()` parameters for different analyses of proportions. Each function call begins with the name of a categorical variable, generically referred to as `X`. The value of `X` is the first parameter in the function definition, and so does not need its parameter name, `variable`. If needed, indicate a second categorical variable, generically referred to as `Y`, with the `by` parameter. If focused on a specific value of `X` as a success, referred to as `X_value`, indicate that value with the `success` parameter. 
+
+Run each analysis either directly from pre-computed values of the sample proportions, or from the original data from which the sample proportions are calculated.
+
+Evaluate              |  Data Parameters    |  Count Parameters
+----------------- | ------------ | -------------
+A hypothesized proportion | X, `success`=X_value | `n_succ`, `n_tot` [scalars]
+Equal proportions across samples | X, `success`=X_value, `by`=Y | `n_succ`, `n_tot` [vectors] 
+Uniform goodness-of-fit | X | `ntot` [vector]
+Independence of two variables | X, `by`=Y | `n_table`
+
+The remainder of this vignette illustrates these applications of `Prop_test()`.
 
 
-## Test of a Specified Proportion
+## Test a Specified Proportion
 
-When the focus is on a designated value of the variable value, call such an occurrence a `success`. All other values of the variable are failures. Success or failure in this context does not necessarily mean good or bad, desired or undesired, but instead, a designated value either occurred or did not. 
+Refer to the occurrence of a designated value of the `variable` as a `success`. Define all other values of the variable as failures. Success or failure in this context does not necessarily mean good or bad, desired or undesired, but instead, a designated value either occurred or did not. 
 
-When analyzing proportions from data for a single categorical variable, indicate the variable's name with the parameter `variable`. Entering a value of the variable for the parameter `success` triggers the test of homogeneity. When entering proportions directly, indicate the number of successes and the total number of trials with the `n_succ` and `n_tot` parameters. Enter the value of each parameter either as a single value for one sample or as a vector of multiple values for multiple samples. Without a value for `success` or `n_succ` the analysis is of goodness-of-fit or independence.
+When analyzing proportions from data, first indicate the categorical variable,  the value of the parameter `variable`. Next, indicate the value of `variable` for the parameter `success`. When entering proportions directly, indicate the number of successes and the total number of trials with the `n_succ` and `n_tot` parameters. Enter the value of each parameter either as a single value for one sample or as a vector of multiple values for multiple samples. Without a value for `success` or `n_succ` the analysis is of goodness-of-fit or independence.
 
 
 ### Single Proportion
 
-The example below is from the documentation for the base R function `binom.test()`, which provides the exact test of a null hypothesis regarding the probability of success. `Prop_test()`, which uses that base R function to compare a sample proportion to a hypothesized population value, yields the same result. 
+The example below is from the documentation for the base R function `binom.test()`, which provides the exact test of a null hypothesis regarding the probability of success. `Prop_test()` uses that base R function to compare a sample proportion to a hypothesized population value. 
 
 #### From Input Frequencies
 
@@ -46,15 +59,15 @@ Prop_test(n_succ=682, n_fail=243, p0=.75)
 
 #### From Data
 
-To illustrate with data, read the _Jackets_ data file included with __lessR__ into the data frame _d_. The file contains two categorical variables. The variable _Bike_ represents two different types of motorcycle: BMW and Honda. The second variable is _Jacket_ with three values of jacket thickness: Lite, Med, and Thick.
+To illustrate with data, read the _Jackets_ data file included with __lessR__ into the data frame _d_. The file contains two categorical variables. The variable _Bike_ represents two different types of motorcycle: BMW and Honda. The second variable is _Jacket_ with three values of jacket thickness: Lite, Med, and Thick.  Because _d_ is the default name of the data frame that contains the variables for analysis, the `data` parameter that names the input data frame need not be specified.
 
 ```{r read}
 d <- Read("Jackets")
 ```
 
-For the `variable` _Bike_ from the default _d_ data frame, the parameter `success` applies to the _"BMW"_ value of _Bike_ in following example. Analyze the proportion of successes, those reporting a _Bike_ of _"BMW"_. The default null hypothesis is a population value of 0.5, but here explicitly specify. 
+In following example, for the `variable` _Bike_ from the default _d_ data frame, define the parameter `success` as the value _"BMW"_. The default null hypothesis is a population value of 0.5, but here explicitly specify with the parameter `p0`. 
 
-For clarity, the following example includes the parameter names listed with their corresponding values. These names are unnecessary in this example because the values are listed in the same order of their definition of the `Prop_test()` function.
+For clarity, the following example includes the parameter names listed with their corresponding values. These names are unnecessary in this example, however, because the values are listed in the same order of their definition of the `Prop_test()` function.
 
 ```{r}
 Prop_test(variable=Bike, success="BMW", p0=0.5)
@@ -65,12 +78,14 @@ Reject the null hypothesis, with a $p$-value of 0.000, less than $\alpha = 0.05$
 
 ### Multiple Proportions
 
-The following example is the same in the base R `prop.test()` documentation. `Prop_test()` relies upon that base R function to compare proportions across different groups and yield the same result. To indicate multiple proportions across groups, provide multiple values for the `n_succ` and `n_tot` parameters.
+The following example is from the base R `prop.test()` documentation, which the __lessR__ `Prop_test()` relies upon to compare proportions across different groups. 
 
 
 #### From Input Frequencies
 
 The null hypothesis in this example is that the four populations of _patients_ from which the samples were drawn have the same population proportion of _smokers_. The alternative is that at least one population proportion is different. Label the groups in the output by providing a named vector for the successes.
+
+To indicate multiple proportions across groups, provide multiple values for the `n_succ` and `n_tot` parameters. Optionally, name the groups.
 
 ```{r}
 smokers <- c(83, 90, 129, 70)
@@ -79,12 +94,12 @@ patients <- c(86, 93, 136, 82)
 Prop_test(n_succ=smokers, n_tot=patients)
 ```
 
-The result of the test is that the $p$-value $=0.006 < \alpha=0.05$, so reject the null hypothesis of equal probabilities across the corresponding four populations. At least one of the population proportions of smokers differ.
+The result of the test is $p$-value $=0.006 < \alpha=0.05$, so reject the null hypothesis of equal probabilities across the corresponding four populations. Conclude that at least one of the population proportions of smokers differ.
 
 
 #### From Data
 
-In the following example, duplicate the previous results from data. To illustrate, create the data frame _d_ according to the proportions of smokers and non-smokers. Of course, in actual data analysis the data would already be available.
+In the following example, duplicate the previous results, but in this example from data. To illustrate, create the data frame _d_ according to the proportions of smokers and non-smokers with respective values "smoke" and "nosmoke". Of course, in actual data analysis the data would already be available.
 
 ```{r}
 sm1 <- c(rep("smoke", 83), rep("nosmoke", 3))
@@ -96,36 +111,37 @@ grp <- c(rep("A",86), rep("B",93), rep("C",136), rep("D",82))
 d <- data.frame(sm, grp)
 ```
 
-Examine the first six rows and last six rows of the data frame _d_. Indicate the variable of interest, _sm_, with values _"smoke"_ and _"nosmoke"_.
+To test if the different groups have the same population proportion of `success`, retain the syntax for a single proportion for the categorical `variable` of interest. Define success by the value of this variable, here _"smoke"_. However, an additional parameter `by` indicates the variable that defines the groups, a variable that contains a label that identifies the corresponding group for each row of data. The grouping variable in this example is _grp_, with values the first four uppercase letters of the alphabet. The first five rows of data are shown below.
 
 ```{r}
 head(d)
-tail(d)
 ```
 
-To indicate a comparison across groups, retain the format for a single proportion based on a value of a categorical `variable` of interest. Define success by the value of this variable, here _"smoke"_. This analysis indicates the comparison across the four groups with a grouping variable that contains a label that identifies the corresponding group. Specify the grouping variable with the `by` parameter. The grouping variable in this example is _grp_, with values the first four uppercase letters of the alphabet.
 
-The relevant parameters `variable`, `success`, and `by` are listed in their given order in this example, so the parameter names are unnecessary. They are listed here for completeness.
+The relevant parameters `variable`, `success`, and `by` are listed in their given order in this example, so the parameter names are unnecessary. List the names for clarity.
 
 ```{r}
 Prop_test(variable=sm, success="smoke", by=grp)
 ```
 
-The analysis of data that matches the previously input proportions provides the same results as providing the proportions directly. 
+The analysis of data that matches the previously input proportions, of course, provides the same results as providing the proportions directly. 
 
 
 ## Tests without a Specified Proportion
 
 ### Goodness-of-Fit
 
-For the previously discussed test of homogeneity of the values of a single categorical variable, the proportion of occurrences for a specific value across different samples is of interest. Here, the proportion of occurrence for each value is instead calculated against the total number of occurrences, as one sample from a single population.
+For the previously discussed test of homogeneity of the values of a single categorical variable, the proportion of occurrences for a specific value across different samples is of interest. Here, instead calculate the proportion of occurrence for each value from the total number of occurrences, as one sample from a single population. In addition to the inference test, the following are also reported:
+- The observed and expected frequencies
+- The residual of expected from observed
+- The standardized version of the residual
 
 
 #### From Input Frequencies
 
-For the goodness-of-fit test to a uniform distribution, provide the frequencies for each group for the parameter `n_tot`. The default null hypothesis is that the proportions of the different categories of a categorical variable are equal.
+For the goodness-of-fit test to a uniform distribution, provide the frequencies for each group for the parameter `n_tot`. The default null hypothesis is that the proportions of the different categories of a categorical variable are equal. 
 
-In this example, enter five frequencies as a vector for the value of the `n_tot` parameter. Make the vector a named vector to label the output accordingly.
+In this example, enter three frequencies as a vector for the `n_tot` parameter value. Optionally, make the vector a named vector to label the output accordingly.  
 
 ```{r}
 x = c(372, 342, 311)
@@ -133,10 +149,12 @@ names(x) = c("Lite", "Med", "Thick")
 Prop_test(n_tot=x)
 ```
 
+This example does not quite attain significance at the customary 5\% level, with $p$-value $= 0.066 > \alpha = 0.05$. A difference of the corresponding population proportions was not detected.
+
 
 #### From Data
 
-The same analysis follows from the data.
+The same analysis follows from the data. Just specify the name of the categorical `variable` of interest.
 
 ```{r}
 d <- Read("Jackets", quiet=TRUE)
@@ -146,45 +164,69 @@ Prop_test(Jacket)
 
 ### Independence
 
-Tests of goodness of fit and independence evaluated here rely upon a contingency table of one or two dimensions. Due to the awkwardness of entering a table of frequencies, `Prop_test()` relies upon computing the contingency table from the data, using the base R `chisq.test()` function. However, as shown next, there is a way to enter frequencies if comparing just two levels of a categorical variable.
+Tests of independence evaluated here rely upon a contingency table of two dimensions also called a cross-tabulation table or joint frequency table. Enter the joint frequencies directly or compute from the data. The corresponding analysis provides the chi-square test for the null hypothesis of independence.
+
+Also provided is Cramer's V to indicate the extent of the relationship of the two categorical variables. For each cell frequency, the expected value given the independence assumption is provided, along with the corresponding residual from the observed frequency and the corresponding standardized residual.
 
 
 #### From Input Frequencies
 
-The _smokers_ and _patients_ vectors presented in a previous example together contain the information needed to construct the corresponding full contingency table. In that example, the _smokers_ vector represents the frequencies of patients who smoked.
+To enter the joint frequency table directly, store the frequencies in a file accessible from your computer system. One possibility is to enter the numbers into a text file with file type `.csv` or `.txt`. Enter the numbers with a text editor, or with a word processor saving the file as a text file. This file format separates the adjacent values in each row with a comma, as indicated below. Or, enter the numbers into an MS Excel formatted file with file type `.xlsx`. Enter only the numeric frequencies, no labels. 
 
+For example, consider the following joint frequency table with four levels of the column variable and four levels of the row variable, here in `csv` format. 
+
+```
+3,58,6,105
+41,79,9,207
+86,179,27,484
+143,214,31,824
+ ```
+
+After saving the file, call `Prop_test()` using the parameter `n_table` to indicate the path name to the file, enclosed in quotes. Or, leave the quotes empty to browse for the joint frequency table.
+
+This table is included in a file downloaded with __lessR__ with the name _FreqTable99_. That name triggers an internal process that locates the file within the _lessR_ installation without needing to construct a rather complicated path name as part of this example. That also means that the name becomes a reserved key word with its use always triggering the following example.
+
+In general, replace _FreqTable99_ in this example with your own path name to your file of joint frequencies, or just delete the name leaving only the two quotes to indicate to browse for the file.
+ 
 ```{r}
-smokers
+Prop_test(n_table="FreqTable99")
 ```
 
-The _patients_ vector represents the total number of patients in each of the four groups. 
+Do not have the path name to your file readily available? Then browse for the file. The following example is not run as it cannot run in this vignette.
 
-```{r}
-patients
+```
+Prop_test(n_table="")
 ```
 
-The previous analysis of the separate vectors is equivalent to the analysis of the full 2 x 4 contingency table of smokers and non-smokers according to the test of independence illustrated in the next section. Conceptually the tests are distinct, but computationally identical.
-
-The construction of the following contingency table is not part of the input to `Prop_test()`. This illustration is included here solely to illustrate the equivalence of information provided by the two vectors and the full contingency table.
-
-```{r}
-cont_tbl <- matrix(c(83, 86-83, 90, 93-90, 129, 136-129, 70, 82-70), nrow=2)
-dimnames(cont_tbl) <- list(Smoke = c("Yes", "No"),
-                           Group = c("G1","G2","G3","G4"))
-addmargins(cont_tbl)
-```
-
-If comparing more than two levels of a categorical variable, and only the proportions and not the data are available, then follow the form of the previous construction of the contingency table from the given proportions. Then directly use the base R function `chisq.test()` to do the analysis. 
+The full path name for the file is provided as part of the output.
 
 
 #### From Data
 
-The $\chi^2$ test of independence evaluated here for two categorical variables. The first variable listed in this example is the value of the parameter `variable`, so does not need the parameter name. The second variable listed must include the parameter name `by`. 
+The $\chi^2$ test of independence evaluated here applies to two categorical variables. The first categorical variable listed in this example is the value of the parameter `variable`, the first parameter in the function definition, so does not need the parameter name. The second categorical variable listed must include the parameter name `by`. 
 
-The question for the analysis is if the observed frequencies of _Jacket_ thickness and _Bike_ ownership are so different from the frequencies expected by the null hypothesis that we conclude the variables are related?
+The question for the analysis is if the observed frequencies of _Jacket_ thickness and _Bike_ ownership sufficiently differ from the frequencies expected by the null hypothesis that we conclude the variables are related.
 
 ```{r}
 Prop_test(Jacket, by=Bike)
 ```
 
 The result of this test is that the $p$-value = 0.000 $< \alpha=0.05$, so reject the null hypothesis of independence. Conclude that the type of _Bike_ a person rides and the thickness of their _Jacket_ are related.
+
+To visualize the relationship of the two variables, use the same function call syntax, but now to `BarChart()` instead of `Prop_test()`. The visualization is accompanied by the same $\chi^2$ test of independence.
+
+
+```{r, fig.width=5}
+BarChart(Jacket, by=Bike)
+```
+
+The visualization depicts the relationship between motorcycle and jacket: Honda riders prefer thinner jackets, and BMW riders prefer thicker jackets. To speculate, perhaps because the BMW bikes are sportier, their riders are more concerned with going down on the pavement.
+
+This relationship becomes even clearer to visualize with the corresponding 100% stack bar graph. Each bar representing a jacket choice in this visualization shows the percentage of riders with each type of motorcycle for that jacket.
+
+
+```{r, fig.width=5}
+BarChart(Jacket, by=Bike, stack100=TRUE)
+```
+
+From this visualization we see that 24\% of Lite jacket owners are BMW riders, and, in contrast, 62% of the owners of Heavy jackets are  BMW riders.
