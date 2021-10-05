@@ -1,9 +1,10 @@
 ANOVA <-
 function(my_formula, data=d, rows=NULL,
          brief=getOption("brief"), digits_d=NULL, 
-         Rmd=NULL, graphics=TRUE,
-         rb_points=FALSE, res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
-         pdf=FALSE, width=5, height=5, fun_call=NULL, ...) {  
+         Rmd=NULL, jitter_x=0.4, rb_points=FALSE,
+         res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
+         graphics=TRUE, pdf=FALSE, width=5, height=5,
+         fun_call=NULL, ...) {  
 
 
   # a dot in a parameter name to an underscore
@@ -160,8 +161,9 @@ function(my_formula, data=d, rows=NULL,
   }
 
   if (n.pred == 1)  {
+
     plt1 <- .ANOVAz1(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
-        nm, n.obs, digits_d, brief, graphics, pdf, width, height)
+        nm, n.obs, jitter_x, digits_d, brief, graphics, pdf, width, height)
     title_des <- plt1$title_des
     txdes <- plt1$txdes
     title_basic <- plt1$title_basic

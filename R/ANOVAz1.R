@@ -1,6 +1,6 @@
 .ANOVAz1 <- 
-function(av.out, y.values, x.values, nm, n.obs, digits_d, brief,
-         graphics, pdf, width, height) {
+function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
+         brief, graphics, pdf, width, height) {
 
   p <- length(unique(na.omit(x.values)))
 
@@ -87,33 +87,34 @@ function(av.out, y.values, x.values, nm, n.obs, digits_d, brief,
          col=getOption("panel_fill"), border=getOption("panel_color"))
 
     axT1 <- 1:length(unique(x.values))
-    abline(v=axT1, col=getOption("grid_x_color"),
-                        lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
-    abline(h=axTicks(2), col=getOption("grid_y_color"),
-                        lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
-
     .axes(levels(x.values), NULL, axT1, axTicks(2))
+    .grid("v", axT1)
+    .grid("h", axTicks(2))
 
     main.lab <- plt.title[plt.i]
-    sub.lab <- NULL
     x.label <- nm[2]
     y.label <- nm[1]
-    .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3) 
+    .axlabs(x.label, y.label, main.lab, sub.lab=NULL,
+            xlab_adj=1.2, ylab_adj=.2) 
 
     col_fill <- getOption("pt_fill")
     col_color <- getOption("pt_color")
-    points(x.values, y.values, pch=21, col=col_color, bg=col_fill, cex=0.8)
+    xn.values <-  data.frame(  # factor to integer for jitter
+        levels(x.values), 1:length(levels(x.values)), row.names = 1)[x.values, 1]
+    xn.values <- jitter(xn.values, factor=jitter_x)
+    points(xn.values, y.values, pch=21, col=col_color, bg=col_fill, cex=0.7)
 
     # plot cell means
     pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
-    bck.g <- ifelse(getOption("theme")!="gray", "gray15", "gray30")
+    bck.g <- ifelse(getOption("theme")!="gray", rgb(140,90,70,
+                    maxColorValue=255), "gray40")
     if (grepl(".black", getOption("theme"), fixed=TRUE)) bck.g <- "gray85"
-
     m.lvl <- numeric(length = 0)
     for (i in (1:length(levels(x.values))))
-      m.lvl[i] <- mean(y.values[which(x.values==levels(x.values)[i])], na.rm=TRUE)
+      m.lvl[i] <- mean(y.values[which(x.values==levels(x.values)[i])],
+                       na.rm=TRUE)
     abline(h=m.lvl, col="gray50", lwd=.5)
-    points(m.lvl, pch=pch.avg, bg=bck.g)
+    points(m.lvl, pch=pch.avg, bg=bck.g, col="transparent", cex=1.3)
 
     if (pdf) {
       dev.off()
@@ -164,10 +165,13 @@ function(av.out, y.values, x.values, nm, n.obs, digits_d, brief,
   for (i in 1:n.vars) {
     rlb <- .fmtc(rownames(smc)[i], max.c1, j="left")
     df <- format(sprintf("%i", smc[i,1]), width=max.ln[1]-4, justify="right")
-    SS <- format(sprintf("%7.*f", digits_d, smc[i,2]), width=max.ln[2], justify="right")
-    MS <- format(sprintf("%7.*f", digits_d, smc[i,3]), width=max.ln[3], justify="right")
+    SS <- format(sprintf("%7.*f", digits_d, smc[i,2]), width=max.ln[2],
+                 justify="right")
+    MS <- format(sprintf("%7.*f", digits_d, smc[i,3]), width=max.ln[3],
+                 justify="right")
     if (i < n.vars) {
-      fv <- format(sprintf("%7.*f", digits_d, smc[i,4]), width=9, justify="right")
+      fv <- format(sprintf("%7.*f", digits_d, smc[i,4]), width=9,
+                   justify="right")
       pv <- format(sprintf("%6.4f", smc[i,5]), width=9, justify="right")
       tx[length(tx)+1] <- paste(rlb, df, SS, MS, fv, pv)
     }
@@ -214,7 +218,8 @@ function(av.out, y.values, x.values, nm, n.obs, digits_d, brief,
 
     HSD <- TukeyHSD(av.out)
     HSD <- TukeyHSD(av.out, which=nm[2])
-    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD, which="conf_level"))
+    tx[length(tx)+1] <- paste("Family-wise Confidence Level:",
+                              attr(HSD, which="conf_level"))
     txHSD <- .prntbl(HSD[[1]], digits_d)
     for (i in 1:length(txHSD)) tx[length(tx)+1] <- txHSD[i]
 

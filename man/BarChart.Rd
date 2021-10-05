@@ -68,7 +68,7 @@ bc(\ldots)
         any space in each category value is
         converted to new line for the corresponding axis label in the plot.
         To keep two (small) words on the same line, replace the space that
-        separates them with an underscore, which is converted to a blank
+        separates them with a tilde, which displays as a blank
         for the corresponding axis label.}
   \item{y}{Numeric variable for which the values are displayed on the vertical
         axis. If specified, then data frame is summary data (i.e., aggregated).
@@ -197,7 +197,8 @@ bc(\ldots)
         is 0.5. Larger values such as 1.0 create space for the label when
         longer axis value names are rotated.}
   \item{break_x}{Replace spaces in the category values with a new line
-       and replace underscores with a blank. By default, \code{TRUE} for 
+       and replace tildes with a blank so that there is no separate of words
+       joined by a tilde. By default, \code{TRUE} for 
        vertical bar charts with \code{rotate_x} set to \code{0},
        and \code{FALSE} otherwise.}
   \item{sort}{Sort the categories by their frequency for one variable and by

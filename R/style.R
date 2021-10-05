@@ -572,8 +572,8 @@ function(
       bar_fill_ordered = rgb(144,165,195, maxColorValue=255)
       bar_color_discrete = "transparent"
       bar_color_ordered = rgb(126,144,168, maxColorValue=255)
-      pt_fill = rgb(60,106,130, maxColorValue=255)
-      pt_color = rgb(60,106,130, maxColorValue=255)
+      pt_fill = rgb(50,78,92, maxColorValue=255)
+      pt_color = rgb(50,78,92, maxColorValue=255)
       trans_bar_fill = 0.00
       trans_pt_fill = 0.00
       box_fill = "#419BD2"  # getColors("hues", output=FALSE)
@@ -581,7 +581,7 @@ function(
       ellipse_fill = .maketrans(hcl(50,20,55), 40)
       grid_color = rgb(222,217,205, maxColorValue=255)
       ID_color = "gray50"
-      fit_color = rgb(125,120,110, maxColorValue = 255)
+      fit_color = rgb(92,64,50, maxColorValue = 255)
       values = "%"
     }
 

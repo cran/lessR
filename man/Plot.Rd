@@ -66,7 +66,7 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          smooth=FALSE, smooth_points=100, smooth_size=1,
          smooth_exp=0.25, smooth_bins=128,
 
-         fit="off", fit_se=0.95, plot_errors=FALSE, ellipse=0, 
+         fit="off", fit_power=1, fit_se=0.95, plot_errors=FALSE, ellipse=0, 
 
          bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
          breaks="Sturges", cumulate=FALSE,
@@ -340,13 +340,18 @@ vp(\ldots)
   \item{fit}{The \bold{best fit line}.  Default value is \code{"off"}, with
         options \code{"loess"} for non-linear fit, \code{"lm"} linear 
         least squares, \code{"null"} for the null model, \code{"exp"} for the
-        exponential model, \code{"sqrt"} for the square root model, and
+        exponential model,  \code{"root"} for the general root model,
+        \code{"sqrt"} for the specific root value of 0.5, and
         \code{"reciprocal"} for the reciprocal model. If
         potential outliers are identified according to \code{out_cut},
         a second (dashed) fit line is displayed calculated \emph{without}
         the outliers. Modify the line color from with the 
         \code{\link{style}} function parameter \code{fit_color}, and the
         line width with \code{fit_lwd}.}
+  \item{fit_power}{Power to apply to response variable before a transformation.
+       Optionally, applies to \code{fit} values \code{"exp"}, \code{"reciprocal"},
+       and is needed for \code{"root"} to specify the value of the root beyond 
+       0.5 for the square root.} 
   \item{fit_se}{Confidence level for the error band displayed around the
        line of best fit. On by default at 0.95 if a fit line is specified, 
        but turned off if \code{plot_errors=TRUE}.

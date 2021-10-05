@@ -25,15 +25,20 @@ Descriptive summarize characteristics of the sample data values for one or more 
 
 >_Aggregation_: Form groups of data according to the levels of one or more categorical variables, then compute some statistical value of a numeric variable, such as a mean, for each group.
 
-As an example of aggregation, compute the mean Salary for each combination of the levels of _Gender_ and _Dept_ (department) of employment. Alternatively, compute the mean _Salary_ for all of the available data.
+As an example of aggregation, compute the mean Years worked for each combination of the levels of _Gender_ and _Dept_ (department) of employment. To introduce the ease of use of `pivot()`, and provide context for the following discussion this function call listed below includes the parameter names (in red) for emphasis, but if the parameters are entered in this order, listing their names is not necessary. Enter multiple values, such as for _Gender_ and _Dept_ as an R vector, defined such as with the base R combine `c()` function. The output of the analysis is shown later.
 
-This `pivot()` function computes statistics for three classes of variables:
+```{r pivot, dataTable, echo=FALSE, out.width='92%', fig.align='center', out.extra='style="border-style: none"'}
+knitr::include_graphics(system.file("img", "pivot.png", package="lessR"))
+```
+
+
+The `pivot()` function computes statistics for three classes of variables:
 
 - Numerical variables that represent continuity such as time, money, and weight.
 - Numerical variables that represent ordered categories, such as Likert scale responses Strongly Disagree to Strongly Agree on a 5-pt scale coded 1 to 5.
 - Non-numerical categorical variables such as Gender encoded as Male, Female, and Other, even if coded numerically but without numerical properties, such as 0, 1, and 2 for three values of Gender.
 
-The following table lists many available statistical functions that summarize data. One should be aware of the present and missing (not available) data that underlies each computed statistic, so `pivot()` automatically provides the count of each group in the aggregation.
+Any function that processes a single vector of data, such as a column of data values for a variable in a data frame, and outputs a single computed value, can be passed `pivot()`. The phrase "any function" is quite general, including any function in any active package as well as user-defined functions that satisfy these criteria. Typically the function accessed by `pivot()` is one of the many available R statistical functions that summarize data, including those in the following table.
 
 Statistic | Meaning
 ----------- | ------------------------
@@ -49,9 +54,9 @@ Statistic | Meaning
 `IQR` | inter-quartile range
 `mad` | mean absolute deviation
 
-The statistics `skew` and `kurtosis` have no counterparts in base R, so are provided by __lessR__ . Computations of all other statistics follow from base R functions. 
+The statistics `skew` and `kurtosis` have no counterparts in base R, so are provided by __lessR__. Computations of all other statistics follow from base R functions. 
 
-The `quantile` and `table` computations return multiple values.
+The `quantile` and `table` computations return multiple values, and so are accessible to `pivot()` only because of internal programming that recognizes these functions and then processes the resulting multiple output values. 
 
 Statistic | Meaning
 ----------- | -------------------------
@@ -61,6 +66,8 @@ Statistic | Meaning
 The `table` computation applies to an aggregated variable that consists of discrete categories, such as the numbers 1 through 5 for responses to a 5-pt Likert scale. The result is a table of frequencies or proportions, referred to for two or more variables as either a contingency table, a cross-tabulation table, or a joint frequency distribution. Only the `table` computation applies to non-numeric as well as numeric variables, though only meaningful if the aggregated variable consists of a relatively small set of discrete values, character strings or numeric.
 
 The default quantiles for `quantile` are quartiles. Specify a custom number of quantiles with the `q_num` parameter, which has the default value of 4 for quartiles.
+
+When calculating a statistic, the analyst should be aware of the present and missing (not available) data that underlies the computed statistic. Accordingly, `pivot()` by default provides the sample size information for each calculation. Turn off the display of information with the `show_n` parameter.
 
 
 ### Parameters
@@ -95,7 +102,8 @@ The output follows one of three general forms.
 - There may be many variables to summarize, such as all the items on a multi-item scale from a survey analysis, so the output is a data frame with variable names that each indicate the corresponding computed statistic and the rows defined by the combinations of levels of the `by` variables.
 
 
-## Examples
+
+## Output as a Long-Form Data Frame
 
 To illustrate, use the 37-row Employee data set included with __lessR__, here read into the _d_ data frame.
 
@@ -106,31 +114,22 @@ d <- Read("Employee")
 Two categorical variables in the _d_ data frame are _Dept_ and _Gender_. Continuous variables include _Years_ worked at the company and annual _Salary_.
 
 
-### Output as a Long-Form Data Frame
+### Multiple Grouping Variables
 
-#### Multiple Grouping Variables
+This example does the analysis previously illustrated. The name of the computed mean of _Years_  by default is *Years_mn*. 
 
-Create the long-form pivot table as a data frame that expresses the mean of _Salary_ aggregated across all combinations of _Dept_ and _Salary_.
-
-This example includes the parameter names (in red) for emphasis, but if the parameters are entered in this order, listing their names is not necessary. The name of the computed mean of _Years_  by default is *Years_mn*.
-
-```{r pivot, dataTable, echo=FALSE, out.width='92%', fig.align='center', out.extra='style="border-style: none"'}
-knitr::include_graphics(system.file("img", "pivot.png", package="lessR"))
-```
-
-
-```{r echo=FALSE}
+```{r}
 pivot(data=d, compute=mean, variable=Years, by=c(Dept, Gender))
 ```
 
-With no `by_cols` variables, the output of `pivot()` is a data frame of the aggregated variables. This output can be saved for further analysis, as the data frame _a_ in this example. Next, perform the same analysis, but with the `variable` _Salary_, and list the parameter values in order without the parameter names.
+With no `by_cols` variables, the output of `pivot()` is a data frame of the aggregated variables. This output can be saved for further analysis, as the data frame _a_ in this example. Next, perform the same analysis, but with the `variable` _Salary_, the parameter values listed in order without the parameter names.
 
 ```{r}
 a <- pivot(d, mean, Salary, c(Dept, Gender))
 a
 ```
 
-Visualize the aggregation with a bar chart generated by the __lessR__ function `BarChart()`. The function can do the aggregation internally, but another option provides a data table that consists of categories with each category paired with a numerical value, that is, the output of `pivot()`. Each category defines a bar with its height based on the value of the numerical variable (see the  __lessR__ vignette for `BarChart()` for more details). 
+Visualize the aggregation with a bar chart generated by the __lessR__ function `BarChart()`. The function can do the aggregation internally, but another option provides a data table that consists of sets og categories with each set paired with a numerical value, that is, the output of `pivot()`. Each category of one variable defines a bar with its height based on the value of the numerical variable (see the  __lessR__ vignette for `BarChart()` for more details). 
 
 In this example, plot the pivot table from the analysis of the mean of _Salary_ across levels of _Dept_ and _Gender_. By default, `BarChart()` also displays the pivot table from which the bar chart is created.
 
@@ -149,7 +148,7 @@ In this example, create an Excel file called _MyPivotTable.xlsx_ from the pivot 
 The abbreviation `wrt_x()` for the function name simplifies the preceding expression, with the `format` parameter dropped.
 
 
-#### Aggregate with Multiple Statistics
+### Aggregate with Multiple Statistics
 
 In this next example, specify multiple statistics for which to aggregate for each group for the specified value variable _Salary_. For each group, compare the mean to the median, and the standard deviation to the interquartile range. By default, each column of an aggregated statistic is the `variable` name, here _Salary_, followed by a "\_", then either the name of the statistic or an abbreviation. The respective abbreviations for `mean` and `median` are `mn` and `md`. 
 
@@ -157,7 +156,7 @@ In this next example, specify multiple statistics for which to aggregate for eac
 pivot(d, c(mean, median, sd, IQR), Salary, Dept)
 ```
 
-Also have available two functions that are not part of base R: `skew()` and `kurtosis()`.
+Also have available two functions provided by __lessR__ that are not part of base R: `skew()` and `kurtosis()`.
 
 ```{r}
 pivot(d, c(mean,sd,skew,kurtosis), Salary, Dept, digits_d=3)
@@ -170,7 +169,7 @@ pivot(d, c(mean, median), Salary, c(Gender,Dept), out_names=c("MeanSalary", "Med
 ```
 
 
-#### Aggregate Multiple Variables
+### Aggregate Multiple Variables
 
 The `pivot()` function can also aggregate over multiple `variables`. Here, aggregate _Years_ and _Salary_. Round the numerical aggregated results to the nearest integer with the `digits_d` parameter, which specifies the number of decimal digits in the output. Different variables can have different amounts of missing data, so the sample size, _n_, and number missing, the number of values Not Available, _na_, are listed separately for each aggregated variable.
 
@@ -186,7 +185,7 @@ pivot(d, mean, c(Years, Salary), Dept, digits_d=2,
 ```
 
 
-#### Compute over All Data
+### Compute over All Data
 
 Aggregation computes one or more statistics for one or more variables across groups defined by the possible combinations of the levels of one or more categorical variables. A related computation computes the variables for each statistic for all the data. To compute over all the rows of data, do not specify groups, that is, drop the `by` parameter. 
 
@@ -195,7 +194,6 @@ Get the grand mean of Years, that is, for all the data.
 ```{r}
 pivot(d, mean, Years)
 ```
-
 
 Get the grand mean of Years and Salary. Specify custom names for the results.
 
@@ -215,7 +213,7 @@ pivot(d, c(mean,sd,skew,kurtosis), m01:m20)
 ```
 
 
-#### Frequency Tables
+### Frequency Tables
 
 Aggregating a statistical computation of a continuous variable over groups with `pivot()`, such as computing the mean for each combination of _Dept_ and _Gender_, by default includes the tabulation for each group (cell). A tabulation can be requested with no analysis of a numerical variable, instead only a counting of the available levels of the specified categorical variables.
 
@@ -266,7 +264,7 @@ d <- Read("Employee", quiet=TRUE)
 ```
 
 
-#### Quantiles
+### Quantiles
 
 One way to understand the characteristics of a distribution of data values of a continuous variable is to sort the values and then split into equal-sized groups. The simplest example is the median, which splits a distribution into two groups, the bottom lowest values and the top highest values. Quartiles divide the distribution into four groups. The first quartile is the smallest 25% of the data values, etc. 
 
@@ -286,9 +284,9 @@ pivot(d, c(mean,sd,quantile), c(Years,Salary), q_num=5, digits_d=2)
 
 
 
-### Other Features
+## Other Features
 
-#### Drill-Down
+### Drill-Down
 
 One data analysis strategy examines the values of a variable, such as Sales for a business or Mortality for an epidemiology study, at progressively finer levels of detail. Examine by Country or State or City or whatever level of granularity is appropriate.
 
@@ -312,7 +310,7 @@ pivot(d[.(Gender=="F"),], mean, Salary, Dept)
 
 
 
-#### Sort Output
+### Sort Output
 
 Specify the sort as part of the call to `pivot()` with the parameter `sort`. This internal sort works for a single `value` variable, by default the last column in the output data frame. Set to `"-"` for a descending sort. Set to `"+"` for an ascending sort.
 
@@ -337,7 +335,7 @@ Sort(a, by=Salary_mn, direction="-")
 Specify multiple variables to sort with a vector of variable names, and a corresponding vector of `"+"` and `"-"` signs of the same length for the `directions` parameter.
 
 
-#### Pipe Operator
+### Pipe Operator
 
 The following illustrates as of R 4.1.0 the base R pipe operator `|>` with `pivot()`. The pipe operator by default inserts the object on the left-hand side of an expression into the first parameter value for the function on the right-hand side. 
 
@@ -352,7 +350,7 @@ To avoid problems installing this version of __lessR__ from source with a previo
 
 
 
-### Output as a 2-D Table
+## Output as a 2-D Table
 
 Specify up to two `by_cols` categorical variables to create a two-dimensional table with the specified columns. Specifying one or two categorical variables as `by_cols` variables moves them from their default position in the rows to the columns, which changes the output structure from a long-form data frame to a cross-tabulation table with categorical variables in the rows and columns. 
 
@@ -370,37 +368,34 @@ pivot(d, mean, Salary, Dept, c(Gender, Plan))
 ```
 
 
-### Missing Data
+## Missing Data
 
-Several possibilities exist when missing data are present. There are different types of missing data in the aggregation: missing values of one or more `by` variables and missing values for one or more aggregated `variable`s. 
+There are two different levels of missing data in an aggregation: _some_ missing values for one or more aggregated `variable`s for which the statistic is computed, and _all_ missing values for the `variable` so that the group (cell) defined by one or more `by` variables has no data values. Accordingly, there are two different missing data parameters with `pivot()`.  
 
-- `na_by_show=TRUE`: If any of the levels of the `by` variables are missing, show those missing cells with a reported value of computed variable _n_ as 0 [default is `TRUE`]. 
-- `na_remove=TRUE`: Remove any missing data from a value of the `variable`, perform the aggregation on the remaining variables, and then report how many values were missing. [default is `TRUE`].
+- `na_remove=TRUE`: Remove any missing data from a value of the `variable` that leaves remaining values, then perform the aggregation on the remaining values, reporting how many values are missing, otherwise report the computed statistic as NA (missing). [default is `TRUE`].
+- `na_by_show=TRUE`: If all values of `variable` are missing for a group so that the entire level of the `by` variables is missing, show those missing cells with a reported value of computed variable _n_ as 0, otherwise delete from the output [default is `TRUE`]. 
 
 
-#### Missing Data Values for Aggregated Variables
+### Missing Data Values for Aggregated Variables
 
-The pivot table follows with the listed missing data for each group. The variable _Years_ has one missing value, which occurs in the sales department.
+By default, the data frame output of `pivot()` lists the number of occurrences of missing data for each group of the variable over which the statistic is computed. The `na_remove` parameter specifies the value of the base R parameter `na.rm` for computations such as for the `mean`. The parameter value is either `TRUE` or `FALSE`, indicating if NA (missing) values of the variable should be removed before the computation proceeds. The default value `na_remove` is `TRUE`, so the missing values are removed, their number of occurrences reported, and then the computed statistic displayed.
 
-The `na_remove` parameter specifies the value of the base R parameter `na.rm` for computations such as for the `mean`. See `?mean` for its definition. 
-
-Here, include all the cells, even those with a missing aggregated value. The default value is `TRUE`, so the `na_remove` parameter need not be specified if this is the appropriate value.
-
+In this example, the variable _Years_ has one missing value, which occurs in the Sales department.
 
 ```{r}
 pivot(d, mean, Years, Dept)
 ```
 
-Set `na_remove` to `FALSE` to _not_ remove any missing data in a cell with values to be aggregated. The resulting aggregated value will be missing if any of the constituent data values are missing.  
+Set `na_remove` to `FALSE` to _not_ remove any missing data in a cell with values to be aggregated. According to the way in which R functions process the data with missing values entered into the function, the resulting computed value will be missing if any of the constituent data values are missing.  
 
 ```{r}
 pivot(d, mean, Years, Dept, na_remove=FALSE)
 ```
 
 
-#### Missing Data Values for `by` Variables
+### Missing Data Values for `by` Variables
 
-To account for missing values of the categorical `by` variables, first use base R `Extract[]` with __lessR__ `.()` to filter some missing data by dropping the one male in the Sales department. Save the result into the _dd_ data frame.
+To account for missing values of the categorical `by` variables for which there are no non-missing data values, for this example first create a cell with no values in the data aggregation. Use base R `Extract[]` with __lessR__ `.()` to drop the one male in the Sales department, leaving no data values for that group. Save the result into the _dd_ data frame.
 
 ```{r}
 dd <- d[.(!(Gender=="M" & Dept=="SALE")), ]
@@ -412,10 +407,25 @@ Explicitly set `na_by_show` to `TRUE`, the default value. The group for male sal
 pivot(dd, c(mean,median), Years, c(Dept, Gender), na_by_show=TRUE)
 ```
 
-Drop the groups from the output with missing data for a `by` variable. To do so, set `na_by_show` to `FALSE`. Now the group for the non-existent male sales employee does not show.
+Drop the groups from the output with missing data for a `by` variable. To do so, set `na_by_show` to `FALSE`. Now the group for the non-existent male sales employee does not display.
 
 ```{r}
 pivot(dd, c(mean,median), Years, c(Dept, Gender), na_by_show=FALSE)
+```
+
+
+## Build Your Own Function
+
+Any function that processes a single column of data and returns a single value can be accessed with `pivot()`. In this example, define a function named _mnmd_ that computes the difference between the `mean` and `median` of a distribution of data values, here represented by `x`. For technical reasons, need to include the `NA` remove parameter, `na.rm`, in the function definition. Usually set to the value of `na.rm` to `TRUE` to allow for missing data to be dropped. If missing data are to be dropped in internal function calls, then the base R parameter `na.rm` needs to be set for each component function as well.
+
+```{r}
+mnmd = function(x, na.rm=TRUE)  mean(x, na.rm=na.rm) - median(x, na.rm=na.rm)
+```
+
+Invoke `pivot()` to compute the mean, the median, and their difference for each group in the aggregation of the variable _Years_.
+
+```{r}
+pivot(d, c(mean, median, mnmd), Years, by=Dept)
 ```
 
 

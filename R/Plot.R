@@ -30,7 +30,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          smooth=FALSE, smooth_points=100, smooth_size=1,
          smooth_exp=0.25, smooth_bins=128,
 
-         fit="off", fit_se=0.95, plot_errors=FALSE, ellipse=0, 
+         fit="off", fit_power=1, fit_se=0.95, plot_errors=FALSE, ellipse=0, 
 
          bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
          breaks="Sturges", cumulate=FALSE, 
@@ -109,7 +109,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   }
 
   shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval_df))  # default values
+  if (is.null(eval_df))  # default value
     eval_df <- ifelse (shiny, FALSE, TRUE) 
 
   vbs_plot <- tolower(vbs_plot)
@@ -250,10 +250,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     fit.ln <- ifelse (fit, "loess", "off")
   if (is.character(fit)) {
     if (!(fit %in% c("loess", "lm", "off", "ls", "null", "exp", "sqrt",
-                     "reciprocal", "log"))) { 
+                     "root", "reciprocal", "log"))) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "fit only for loess (non-linear), lm (linear), or null (null model),\n",
-        "exp (exponential), log (log), sqrt (sq root) or reciprocal\n\n")
+        "exp (exponential), log (log), sqrt (sq root), root, or reciprocal\n\n")
     }
     fit.ln <- fit  # fit.ln passed to .plt.main
   }
@@ -300,7 +300,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
 
-
   # let deprecated mydata work as default
   dfs <- .getdfs() 
   mydata.ok <- FALSE
@@ -314,8 +313,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     }
   }
 
+  # get name of data table
   if (!mydata.ok) {
-    df.name <- deparse(substitute(data))  # get name of data table
+    df.name <- deparse(substitute(data))
     options(dname = df.name)
   }
  
@@ -377,7 +377,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       names(data.x) <- names(data.vars)[x.col]
     else
       names(data.x) <- x.col  # if x a vector, x.col can return names
-    #data.miss <- FALSE  # use d even if not specified (default)
   }  # end x in df
 
   # x is in the global environment (vector or data frame)
@@ -710,9 +709,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     by.name <- deparse(substitute(by))
     options(byname = by.name)
 
+    in.global <- .in.global(by.name, quiet)  # in global?
+
     # get conditions and check for data existing
-    xs <- .xstatus(by.name, df.name, quiet)
-    in.global <- xs$ig
+    if (eval_df) .xstatus(by.name, df.name, quiet)
 
     # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
@@ -741,9 +741,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     by1.name <- deparse(substitute(by1))
     options(by1name = by1.name)
 
+    in.global <- .in.global(by1.name, quiet)  # in global?
+
     # get conditions and check for data existing
-    xs <- .xstatus(by1.name, df.name, quiet)
-    in.global <- xs$ig
+    if (eval_df) xs <- .xstatus(by1.name, df.name, quiet)
 
     # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
@@ -772,9 +773,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     by2.name <- deparse(substitute(by2))
     options(by2name = by2.name)
 
+    in.global <- .in.global(by2.name, quiet)  # in global?
+
     # get conditions and check for data existing
-    xs <- .xstatus(by2.name, df.name, quiet)
-    in.global <- xs$ig
+    if (eval_df) .xstatus(by2.name, df.name, quiet)
 
     # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
@@ -1315,7 +1317,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
                    pt.trans, pt.size, size.ln, 
                    xlab, ylab, main, shape, lab_cex, axis_cex,
                    max(ellipse), ellipse_color, ellipse_lwd,
-                   fit.ln, fit_color, fit_lwd, fit_se,
+                   fit.ln, fit_power, fit_color, fit_lwd, fit_se,
                    plot_errors, area_origin, jitter_y,
                    violin, violin_fill, box, box_fill, 
                    bw, vbs_size, box_adj, a, b, k.iqr, fences, vbs_mean,
@@ -1615,7 +1617,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           radius, power, size_cut, bubble_text, low_fill, hi_fill,
           ID.call, ID_color, ID_size, out_ind,
           out_fill, out_color, out_shape, out_shape.miss,
-          fit.ln, fit_color, fit_lwd, fit_se, se_fill, plot_errors,
+          fit.ln, fit_power, fit_color, fit_lwd,
+          fit_se, se_fill, plot_errors,
           ellipse, ellipse_color, ellipse_fill, ellipse_lwd,
           run, center_line, show_runs, stack,
           freq.poly, jitter_x, j.x.miss, jitter_y, j.y.miss, 
@@ -1664,7 +1667,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
           .plt.txt(x.call, y.call, stat, object, n_cat,
             cat.x, num.cat.x, cat.y, num.cat.y,
-            xlab, ylab,
+            xlab, ylab, fit,
             smooth, box_adj, run, center_line, show_runs,
             proportion, size, radius, digits_d, fun_call, txdif)
 

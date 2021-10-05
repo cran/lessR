@@ -27,7 +27,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          ID=NULL, ID_color="gray50", ID_size=0.60, out_ind=NULL,
          out_fill, out_color, out_shape, out_shape.miss,
 
-         fit.line="off", fit_color="gray55",
+         fit.line="off", fit_power=1, fit_color="gray55",
          fit_lwd=getOption("fit.lw"),
          fit_se=1, se_fill="gray80", plot_errors=FALSE,
 
@@ -480,20 +480,20 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }  # end xy_ticks
 
   # axis labels
-  if (is.null(max.lbl.y)) {  # could be set earlier when x.val = y.val
-    if (!is.null(y.lvl)) {
-      max.lbl.y <- max(nchar(y.lvl))
-    }
-    else
-      max.lbl.y <- max(nchar(axTicks(2)))
-  }
+# if (is.null(max.lbl.y)) {  # could be set earlier when x.val = y.val
+#   if (!is.null(y.lvl)) {
+#     max.lbl.y <- max(nchar(y.lvl))
+#   }
+#   else
+#     max.lbl.y <- max(nchar(axTicks(2)))
+# }
 
   if (bubble1) {
     y.lab <- ""
-    max.lbl.y <- 0
+#   max.lbl.y <- 0
   }
 
-  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl.y,
+  .axlabs(x.lab, y.lab, main.lab, sub.lab,
           x.val, xy_ticks, offset=offset,
           lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex,
           n.lab_x.ln, n.lab_y.ln, xlab_adj, ylab_adj, ...)
@@ -700,8 +700,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
           # get colors
             pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
-            bck.g <- ifelse(getOption("theme")!="gray", rgb(120,90,70,
-                              maxColorValue=255), "gray40")
+            bck.g <- ifelse(getOption("theme")!="gray", rgb(130,90,70,
+                            maxColorValue=255), "gray40")
             if (grepl(".black", getOption("theme"), fixed=TRUE))
               bck.g <- "gray85"
 
@@ -1061,7 +1061,10 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
               y.lv <- y.lv[-fi]
               x.lv <- x.lv[-fi]
             }
-            l.ln <- lm(log(y.lv) ~ x.lv)
+            if (fit_power == 1)
+              l.ln <- lm(log(y.lv) ~ x.lv)
+            else
+              l.ln <- lm(log(y.lv^fit_power) ~ x.lv)
             f.ln <- exp(l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))
             ok <- is.finite(f.ln)
             if (length(ok) > 0) {
@@ -1070,9 +1073,15 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             }
           }
 
-          if (fit.line == "sqrt") {  # sqrt model
-            l.ln <- lm(sqrt(y.lv) ~ x.lv)
-            f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))^2
+          if (fit.line %in% c("sqrt", "root")) {  # sqrt model
+            if (fit.line == "sqrt") {
+              l.ln <- lm(sqrt(y.lv) ~ x.lv)
+              fit_power <- 0.5
+            }
+            else
+              l.ln <- lm((y.lv^fit_power) ~ x.lv)
+            pw.bck <- 1 / fit_power 
+            f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))^pw.bck
           }
 
           if (fit.line == "reciprocal") {  # reciprocal model
@@ -1083,13 +1092,21 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
               y.lv <- y.lv[-fi]
               x.lv <- x.lv[-fi]
             }
-            l.ln <- lm(1/y.lv ~ x.lv)
+            if (fit_power == 1)
+              l.ln <- lm(1/(y.lv) ~ x.lv)
+            else
+              l.ln <- lm(1/(y.lv^fit_power) ~ x.lv)
             f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))
-            fi <- which(f.ln > max(y.lv)  | f.ln <= min(y.lv))
-            if (length(fi) > 0) {  # keep plot within the range of the plot
-              f.ln <- f.ln[-fi]
-              x.lv <- x.lv[-fi]
-             }
+          }
+
+          e.lv <- y.lv - f.ln
+          sse <- sum(e.lv^2)
+          if (!quiet) {
+            cat("\n")
+#           cat("intercept:", l.ln$coefficients[1], "\n")
+#           cat("slope:", l.ln$coefficients[2], "\n")
+            sse.pn <- prettyNum(sse, big.mark = ",", scientific = FALSE)
+            cat("Sum of Squared Errors:", sse.pn, "\n")
           }
 
           if (fit.line %in% c("exp", "sqrt", "reciprocal", "null"))
@@ -1118,7 +1135,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
           # plot residuals
           if (plot_errors) 
-            segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv, col="darkred", lwd=1) 
+            segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv, 
+                     col=rgb(130,40,35, maxColorValue=255), lwd=1) 
         }  # end any(ok)
 
       }  # ith pattern

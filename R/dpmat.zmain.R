@@ -140,14 +140,14 @@ function(x, l, sort_yx,
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
 
     # axis labels 
-    if (!is.null(y.lvl))
-      max.lbl <- max(nchar(y.lvl))
-    else
-      max.lbl <- max(nchar(axTicks(2)))
-      y.lab <- ""
-      max.lbl <- 0
+#   if (!is.null(y.lvl))
+#     max.lbl <- max(nchar(y.lvl))
+#   else
+#     max.lbl <- max(nchar(axTicks(2)))
+#     y.lab <- ""
+#     max.lbl <- 0
 
-    .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
+    .axlabs(x.lab, y.lab, main.lab, sub.lab,
             xy_ticks=TRUE, offset=offset, ...) 
 
     usr <- par("usr")

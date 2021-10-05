@@ -3,7 +3,61 @@
 Update History for Package 'lessR'
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
+
+
+>>>>>> Changes for lessR version 4.0.5 (2021-10-04) <<<<<<
+
+-------------
+Updates 4.0.5
+-------------
  
+ANOVA
+  scatterplot for 1-way ANOVA:
+    now has grid lines and jitter
+    jitter_x parameter added to customize the jitter level
+    means plotted in a dark red instead of a dark gray
+
+BarChart
+  tilde removed from each label if for a by variable in the legend
+    where it is nonfunctional
+ 
+pivot
+  user defined functions accounted for and named in the output
+  when analysis of all data values, dropped the Grand_Stat label
+
+Plot
+  point color and fit line now a little darker and complements
+    of each other, plot_errors segments a little darker as well
+  for fit="reciprocal", fit line present for all values of x, even
+    if plot window does not accommodate the full range, can adjust
+    range with parameter pad_y
+  root parameter added for general root transformation beyond the
+    value of 0.5 for the square root
+  fit_power parameter added to raise y to the designated power for
+    the exp, root, and reciprocal transformations
+  correlational analysis no longer displayed for a non-linear fit line
+  SSE displayed for corresponding fit line (curve)
+
+
+---------------
+Bug Fixes 4.0.5
+---------------
+ 
+BarChart
+  two variable chart with parameters x and by specified now correctly
+    displays a color range when the style is not the default theme
+  base R text function misleadingly displays text at size 1 if a value
+    of 0 is entered, lessR functions that rely on the R text function
+    now fixed by changing an input value of 0 to 0.01
+
+pivot
+  output variables now properly named
+
+Plot
+  Trellis plots with by1 and by2 parameters work in Shiny environment
+
+
+
 >>>>>> Changes for lessR version 4.0.3 (2021-09-09) <<<<<<
 
 -------------

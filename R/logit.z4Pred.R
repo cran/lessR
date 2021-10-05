@@ -157,7 +157,7 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
 
     main.lab <- "Logistic Fit and Scatterplot"
     sub.lab <- NULL
-    .axlabs(nm[2], y.label, main.lab, sub.lab, max.lbl.y=3,
+    .axlabs(nm[2], y.label, main.lab, sub.lab, 
             cex.lab=getOption("lab_cex"), cex.main=1.0, ...) 
 
     col_fill <- getOption("pt_fill")

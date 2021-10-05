@@ -23,7 +23,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   names(data.vars) <- names(data)
 
   # subset any specified rows of input data frame
-  ind <- eval(substitute(variable), envir=data.vars)  # col num of each var
   if (!missing(rows)) {  # subset rows
     r <- eval(substitute(rows), envir=data, enclos=parent.frame())
     r <- r & !is.na(r)  # set missing for a row to FALSE
@@ -82,7 +81,14 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   names(fun.vec) <- c("sum", "mean", "median", "min", "max",
                       "sd", "var", "IQR", "mad", "range", "quantile",
                       "skew", "kurtosis", "table")
-
+  user_def <- logical(length=length(nm.cmpt)) 
+  for (i in 1:length(user_def)) {
+    if (!(nm.cmpt[i] %in% names(fun.vec))) {
+      user_def[i] <- TRUE 
+      if (!quiet) cat("User defined function (or typing error):", nm.cmpt[i],
+                      "\n\n")
+    }
+  }
 
   # ---------
   # variables
@@ -91,8 +97,21 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   ind.var.d <- eval(substitute(variable), envir=data.vars, parent.frame())
   n.var <- length(ind.var.d)  # n of variables
   nm.var.d <- names(data)[ind.var.d]
-  if (is.null(out_names))
-    out_names <- paste(nm.var.d, "_", fun.vec[nm.cmpt], sep="")
+  if (is.null(out_names)) {
+    out_names <- character(length=length(nm.var.d))
+    k <- 0
+    for (i in 1:length(nm.cmpt)) {  # for each function
+      for (j in 1:length(nm.var.d)) {  # for each var to aggregate
+        k <- k + 1
+        if (!user_def[i]) {
+          out_names[k] <- paste(nm.var.d[j], "_", fun.vec[nm.cmpt[i]], sep="")
+        }
+        else {
+          out_names[k] <- paste(nm.var.d[j], "_", nm.cmpt[i], sep="")
+        }
+      }
+    }
+  }  # end is.null out_names
 
   # ------- 
   # by vars
@@ -235,7 +254,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
         txt <- ifelse (n.cmp == 1, nm.cmpt[1], "Stat")
         if (!(txt %in% c("Stat", "sd")))
           substr(txt,1,1) <- toupper(substr(txt,1,1))
-        row.names(a)[1] <- paste("Grand_", txt, sep="")
+        row.names(a)[1] <- ""
+#       row.names(a)[1] <- paste("Grand_", txt, sep="")
       }  # end just one of compute or variables
 
       # do both multiple computes and multiple variables with tabular format
@@ -337,6 +357,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   # --------------- aggregate ----------------
 
   # aggregate over a numerical variable (by vars become factors)
+  # na.action is the NA parameter for aggregate, but does not work the
+  #   same as na.rm, which is used here and is a parameter of mean(), etc.   
   if (n.cmp == 1) {
     if (qflag || tflag) 
       a <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=compute[[1]],
@@ -486,8 +508,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       amd <- amd[,-not.n]  # remove what will be redundant columns
       a <- cbind(a,amd[(n.by+1):ncol(amd)])
     }
-    if (is.factor(d[,ind.var.d]))
-      names(a)[(n.by+3):ncol(a)] <- levels(d[,ind.var.d])
+    if (is.factor(data[,ind.var.d]))
+      names(a)[(n.by+3):ncol(a)] <- levels(data[,ind.var.d])
   }  # end tflag
 
 

@@ -185,8 +185,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
 
     # axis labels
-    max.lbl <- max(nchar(axTicks(2)))
-    .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl,
+    .axlabs(x.lab, y.lab, main.lab, sub.lab, 
             xy_ticks=TRUE, offset=offset, 
             lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex=NULL,
             n.lab_x.ln=n.lab_x.ln, n.lab_y.ln=n.lab_y.ln,

@@ -38,7 +38,7 @@ function(myxlab, mytitle, n, s, mdp, mmd, msmd, mytype, H0, ...) {
   sub.lab <- NULL
   x.label <- myxlab
   y.label <- "Power"
-  .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
+  .axlabs(x.label, y.label, main.lab, sub.lab, cex.lab=0.85) 
 
   col_fill <- getOption("pt_fill")
   col_color <- getOption("pt_color")

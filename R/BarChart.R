@@ -62,6 +62,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   color.miss <- ifelse (missing(color), TRUE, FALSE)
   horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
+  by.miss <- ifelse (missing(by), TRUE, FALSE)
 
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
   sort <- match.arg(sort)
@@ -78,7 +79,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   if (is.null(values)) values <- "eval.later"
 
   if (missing(break_x)) 
-    break_x <- ifelse (!horiz  &&  rotate_x == 0, TRUE, FALSE)
+    break_x <- ifelse (!horiz && rotate_x==0, TRUE, FALSE)
 
   if (horiz) {
     if (sort == "+") sort <- "-" 
@@ -551,6 +552,13 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       }
 
     }  # end sum, mean, sd, min, median, max
+
+  is.range.nm <- ifelse (length(.color_range(fill, 5)) > 1, TRUE, FALSE)
+  if (!is.range.nm && !by.miss && !fill.miss) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "For custom fill for a two-variable bar chart,\n",
+      " must specify a color range such as \"blues\" or \"grays\", \n\n")
+  }
 
       bc <- .bc.main(x.call, y.call, by.call, stack100,
             fill, color, trans, fill_split, theme,

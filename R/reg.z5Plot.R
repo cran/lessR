@@ -114,7 +114,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     .axes(x.lvl, NULL, axT1, axTicks(2))
 
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
-        max.lbl.y=3, cex.lab=size.lab) 
+            cex.lab=size.lab) 
 
     col_fill <- getOption("pt_fill")
     col_color <- getOption("pt_color")

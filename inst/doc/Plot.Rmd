@@ -22,18 +22,29 @@ suppressPackageStartupMessages(library("lessR"))
 
 
 
-__lessR__ provides many versions of a scatter plot with its `Plot()` function, all accessible with the same simple syntax. Illustrate with the Employee data included as part of __lessR__.
+__lessR__ provides many versions of a scatter plot with its `Plot()` function for one or two variables with an option to provide a separate scatterplot for each level of one or two categorical variables. Access all scatterplots with the same simple syntax. The first variable listed without a parameter name, the `x` parameter, is plotted along the x-axis. Any second variable listed without a parameter name, the `y` parameter, is plotted along the y-axis. Each parameter may be represented by a continuous or categorical variable, a single variable or a vector of variables.
+
+
+## The Data
+
+Illustrate with the Employee data included as part of __lessR__.
 
 ```{r read}
 d <- Read("Employee")
 ```
 
-As an option, also read the table of variable labels. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need to be entered into the table. The table can be a `csv` file or an Excel file.
+As an option, __lessR__ also supports variable labels. The labels are displayed on both the text and visualization output. Each displayed label consists of the variable name juxtaposed with the corresponding label. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need to be entered into the table. The table can be stored as either a `csv` file or an Excel file.
 
-Currently, read the label file into the _l_ data frame. The labels are displayed on both the text and visualization output. Each displayed label consists of the variable name juxtaposed with the corresponding label.
+Read the variable label file into the _l_ data frame, currently the only permissible name for the label file. 
 
 ```{r labels}
 l <- rd("Employee_lbl")
+```
+
+Display the available labels.
+
+```{r}
+l
 ```
 
 
@@ -41,7 +52,9 @@ l <- rd("Employee_lbl")
 
 ### Two Variables
 
-The typical scatterplot visualizes the relationship of two continuous variables, here _Years_ worked at a company, and annual _Salary_. Following is the function call to `Plot()` for the default visualization. Because _d_ is the default name of the data frame that contains the variables for analysis, the `data` parameter that names the input data frame need not be specified.
+A typical scatterplot visualizes the relationship of two continuous variables, here _Years_ worked at a company, and annual _Salary_. Following is the function call to `Plot()` for the default visualization.
+
+Because _d_ is the default name of the data frame that contains the variables for analysis, the `data` parameter that names the input data frame need not be specified. That is, no need to specify `data=d`, though this parameter can be explicitly included in the function call if desired.
 
 ```{r sp, fig.width=4.5}
 Plot(Years, Salary)
@@ -53,20 +66,21 @@ Enhance the default scatterplot with parameter `enhance`. The visualization incl
 Plot(Years, Salary, enhance=TRUE)
 ```
 
-A variety of fit lines can be plotted. The available values: `"loess"` for general non-linear fit, `"lm"` for linear least squares, `"null"` for the null (flat line) model, `"exp"` for the exponential model, `"sqrt"` for the square root model, and `"reciprocal"` for the reciprocal model. Setting `fit` to `TRUE` plots the `"loess"` line.
+A variety of fit lines can be plotted. The available values: `"loess"` for general non-linear fit, `"lm"` for linear least squares, `"null"` for the null (flat line) model, `"exp"` for the exponential model, `"sqrt"` for the square root model, `root` for the general root beyond 0.5 for the square root, and `"reciprocal"` for the reciprocal model. Setting `fit` to `TRUE` plots the `"loess"` line. With the value of `root`, specify the value of the root with parameter `fit_power`.
 
-Here, plot general non-linear fit. For emphasis set `plot_errors` to `TRUE` to plot the residuals from the line.
+Here, plot the general non-linear fit. For emphasis set `plot_errors` to `TRUE` to plot the residuals from the line. The sum of the squared errors is displayed to facilitate the comparison of different models.
 
 ```{r sploess, fig.width=4.5}
 Plot(Years, Salary, fit="loess", plot_errors=TRUE)
 ```
 
-Next, plot the exponential fit and show the residuals from the exponential curve. These data are approximately linear so the exponential curve does not vary far fom a straight line.
+Next, plot the exponential fit and show the residuals from the exponential curve. These data are approximately linear so the exponential curve does not vary far from a straight line. The function displays the corresponding sum of squared errors to assist in comparing various models to each other.
 
 ```{r exp, fig.width=4.5}
 Plot(Years, Salary, fit="exp", plot_errors=TRUE)
 ```
 
+Besides the application to the `root` value of `fit`, the parameter `fit_power` also applies to the `exp` and `reciprocal` values, The parameter transforms the _y_ variable to the specified power from the default of `1` before doing the regression analysis. The availability of this parameter provides for a wide range of modifications to the underlying functional form of the fit curve.
 
 ### Three Plus Variables
 
@@ -76,7 +90,7 @@ Map a continuous variable, such as _Pre_, to the plotted points with the `size` 
 Plot(Years, Salary, size=Pre)
 ```
 
-Indicate multiple variables to plot along either axis with a vector defined according to the base R function `c()`. Plot the linear model for each variable according to the `fit` parameter set to `"lm"`. Turn off the confidence interval by setting the standard errors to zero with `fit_se` set to `0`.
+Indicate multiple variables to plot along either axis with a vector defined according to the base R function `c()`. Plot the linear model for each variable according to the `fit` parameter set to `"lm"`. By default, when multiple lines are plotted on the same panel, the confidence interval is turned off by internally setting the standard errors to zero with `fit_se` set to `0`. Explicitly override this parameter value as needed.
 
 ```{r three, fig.width=5, fig.height=4}
 Plot(c(Pre, Post), Salary, fit="lm", fit_se=0)
@@ -85,16 +99,16 @@ Plot(c(Pre, Post), Salary, fit="lm", fit_se=0)
 
 ### Scatterplot Matrix
 
-Three or more variables for the first parameter value plot as a scatterplot matrix. Pass a single vector, such as defined by `c()`. Request the non-linear fit line and corresponding confidence interval by specifying `TRUE` or `loess` for the `fit` parameter. Request a linear fit line with the value of `"lm"`.
+Multiple variables for the first parameter value, `x`,  and no values for `y`, plot as a scatterplot matrix. Pass a single vector, such as defined by `c()`. Request the non-linear fit line and corresponding confidence interval by specifying `TRUE` or `loess` for the `fit` parameter. Request a linear fit line with the value of `"lm"`.
 
 ```{r spmat, fig.width=5, fig.height=5}
-Plot(c(Salary, Years, Pre, Post), fit=TRUE)
+Plot(c(Salary, Years, Pre, Post), fit="lm")
 ```
 
 
 ### Smoothed Scatterplot
 
-Generate random data with base R `rnorm()`, then plot. `Plot()` first checks the presence of the specified variables in the global environment (workspace). If not there, then from a data frame, of which the default value is _d_. Here, generate values for _x_ and _y_ in the workspace. 
+To obtain a larger data set, generate random data with base R `rnorm()`, then plot. `Plot()` first checks the presence of the specified variables in the global environment (workspace). If not there, then from a data frame, of which the default value is _d_. Here, generate values for _x_ and _y_ in the workspace. 
 
 ```{r}
 x <- rnorm(4000)
@@ -102,7 +116,7 @@ y <- rnorm(4000)
 Plot(x, y)
 ```
 
-With large data sets, even for continuous variables there can be much over-plotting of points. One strategy to address this issue smooths the scatterplot. The individual points superimposed on the smoothed plot are potential outliers. The default number plotted is 100. Turn off completely by setting parameter `smooth_points` to `0`.
+With large data sets, even for continuous variables there can be much over-plotting of points. One strategy to address this issue smooths the scatterplot by turning on the `smooth` parameter. The individual points superimposed on the smoothed plot are potential outliers. The default number of plotted outliers is 100. Turn off the plotting of outliers completely by setting parameter `smooth_points` to `0`.
 
 ```{r}
 Plot(x, y, smooth=TRUE)
@@ -134,13 +148,13 @@ Plot(Salary, vbs_plot="b")
 
 ### Cleveland Dot Plot
 
-Create a Cleveland dot plot when one of the variables has unique (ID) values. In this example, for a single variable, row names are on the y-axis. The default plots sorts by the value plotted.
+Create a Cleveland dot plot when one of the variables has unique (ID) values. In this example, for a single variable, row names are on the y-axis. The default plots sorts by the value plotted with the default value of parameter `sort_yx` of `"+"` for an ascending plot. Set to `"-"` for a descending plot and `"0"` for no sorting.
 
 ```{r, fig.height=5.5, fig.width=5.5}
 Plot(Salary, row_names)
 ```
 
-The standard scatterplot version of a Cleveland dot plot.
+The standard scatterplot version of a Cleveland dot plot follows, with no sorting and no line segments.
 
 ```{r, fig.height=5.75, fig.width=5.5}
 Plot(Salary, row_names, sort_yx="0", segments_y=FALSE)
@@ -185,7 +199,7 @@ Plot(Years, Salary, by=Gender, size=2, fit="lm",
 
 Change the plotted shapes with the `shape` parameter.
 
-A Trellis plot, or facet plot, creates a separate panel for the plot of each level of the categorical variable. Generate Trellis plots with the `by1` parameter. In this example, plot the best-fit linear model for the data in each panel according to the `fit` parameter. By default, the 95% confidence interval for each line is also displayed. 
+A Trellis (facet) plot creates a separate panel for the plot of each level of the categorical variable. Generate Trellis plots with the `by1` parameter. In this example, plot the best-fit linear model for the data in each panel according to the `fit` parameter. By default, the 95% confidence interval for each line is also displayed. 
 
 ```{r, fig.width=4.5, fig.height=4}
 Plot(Years, Salary, by1=Gender, fit="lm")
@@ -195,9 +209,9 @@ Turn off the confidence interval by setting the parameter `fit_se` to 0 for the 
 
 ### One Continuous, One Categorical
 
-A categorical variable plotted with a continuous variable results in a traditional scatterplot though, of course, the scatter is confined to the straight lines that represent the levels of the categorical variable, its values.  In addition, by default the mean of the continuous variable is displayed at each level of the categorical variable, as well in the text output. To avoid point overlap, by default some some horizontal jitter for each plotted point is added, which can be adjusted with either the `jitter_x` or `jitter_y` parameter.
+A categorical variable plotted with a continuous variable results in a traditional scatterplot though, of course, the scatter is confined to the straight lines that represent the levels of the categorical variable, its values. To avoid point overlap, by default some some horizontal jitter for each plotted point is added, which can be adjusted with either the `jitter_x` or `jitter_y` parameter. In addition, by default the mean of the continuous variable is displayed at each level of the categorical variable, as well in the text output.
 
-The first two parameters of `Plot()` are _x_ and _y_. In this example, the categorical variable, _Dept_, listed second, specifies the _y_ variable, as in _y=Dept_. There is no distinction in this function call for two continues variables or one continuous and one categorical. The `Plot()` function evaluates each variable for continuity and responds appropriately. 
+The first two parameters of `Plot()` are `x` and `y`. In this example, the categorical variable, _Dept_, listed second, specifies the `y` variable, as in _y=Dept_. There is no distinction in this function call for two continues variables or one continuous and one categorical. The `Plot()` function evaluates each variable for continuity and responds appropriately. 
 
 ```{r}
 Plot(Salary, Dept)
@@ -206,13 +220,13 @@ Adding some horizontal jitter for each plotted point is particularly useful for 
 
 Another helpful technique for large data sets is to add some fill transparency with the `trans` parameter, with values such as 0.8 and 0.9. The combination of jitter and transparency allows for plotting many thousands of points. 
 
-To move from a traditional scatterplot, plus means, to a superimposed violin, box, and scatter plot, a VBS plot, invoke the `by` parameter. Here, plot _Salary_ across the levels of _Dept_ on the same panel. 
+An alternative display f the distribution of a continuous variable and a categorical variable is a superimposed violin, box, and scatter plot, a VBS plot. To plot the points in different colors according to the level of the categorical variable, invoke the `by` parameter. Here, plot _Salary_ across the levels of _Dept_ on the same panel. 
 
 ```{r, figwidth=6, fig.height=2.75}
 Plot(Salary, by=Dept)
 ```
 
-Alternatively, move from a traditional scatterplot, plus means, to a Trellis plot that consists of a VBS plot on a separate panel for each level. Accomplish the Trellis plot with the `by1` parameter. Here, plot _Salary_ across the levels of _Dept_. Again, specify one, two, or, by default, all three superimposed plots: violin, box, and scatter. In this example, the categorical variable, _Dept_ specifies the _by1_ variable. 
+Or, create a Trellis plot that consists of a VBS plot on a separate panel for each level of the categorical variable. Accomplish the Trellis plot with the `by1` parameter. Here, plot _Salary_ across the levels of _Dept_. Again, specify one, two, or, by default, all three superimposed plots: violin, box, and scatter. In this example, the categorical variable, _Dept_ specifies the _by1_ variable. 
 
 ```{r, figwidth=6, fig.height=4}
 Plot(Salary, by1=Dept)
@@ -222,29 +236,23 @@ The default coloring of the boxes for variables other than an ordered factor fol
 
 Just show the box plots according to the `vbs_plot` parameter, which has a default setting of `vbs` for the superimposed violin, box, and scatter plots. Set `vbs_plot` to `"b"`.  Or, use the alias `BoxPlot()`. Change the fill color of each box with the `box_fill` parameter. In addition to the traditional median for a box plot, show the mean as well as  with the `vbs_mean` parameter. If specifying just one fill color, then all boxes are filled with that color.
 
-Or, drop the box plot and only plot the violins and the scatter plots. Without the boxes, the violins take on the default colors. Specify a value of `"vs"` for the `vbs_plot` parameter. If only plotting the violins, then can also use the alias `ViolinPlot()`.
+Or, drop the box plot and only plot the violins and the scatter plots. Without the boxes, the violins take on the default colors. Specify a value of `"vs"` for the `vbs_plot` parameter. If only plotting the violins, then can also use the alias `ViolinPlot()`. Change the fill color of the violins with parameter `violin_fill`.
+
 
 ```{r, fig.height=4}
 Plot(Salary, by1=Dept, vbs_plot="vs")
 ```
 
+The following plot uses the alias `BoxPlot` to generate a Trellis plot of boxplots only across the levels of _Gender_.
 
 ```{r, figwidth=6}
 BoxPlot(Salary, by1=Gender, vbs_mean=TRUE, box_fill="lightgoldenrod")
 ```
 
-For the violin plot, change the fill color with parameter `violin_fill`.
-
-Show the different distributions of the continuous variable across the levels of the categorical variable. Here, show the distribution of _Salary_ for Males and Females across the various departments.
+Show the different distributions of the continuous variable across the levels of the categorical variable with a scatterplot. Here, show the distribution of _Salary_ for Males and Females across the various departments.
 
 ```{r, figwidth=6}
 Plot(Salary, Dept, by=Gender)
-```
-
-Plot a second categorical variable in the Trellis plot with the `by2` parameter. Can also combine the `by1` and `by2` parameters with the `by` parameter. Here, also request the linear model fit line with `fit` set to `"lm"`. Obtain the scatterplots of all combinations of the levels of _Dept_ and _Gender_, showing the three levels of _Plan_ for each scatterplot.
-
-```{r, fig.width=6, fig.height=4}
-Plot(Years, Salary, by1=Dept, by2=Gender, by=Plan, fit="lm")
 ```
 
 
@@ -268,7 +276,7 @@ Plot(Salary, by1=Dept, by=Gender)
 
 ## Categorical Variables
 
-Plotting two categorical variables result in a bubble plot of their joint frequencies.
+To avoid over-plotting, the plott of two categorical variables results in a bubble plot of their joint frequencies.
 
 ```{r, fig.height=3}
 Plot(Dept, Gender)

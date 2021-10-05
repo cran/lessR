@@ -1,7 +1,6 @@
 values <-
 function(x, data=d, ...) {
 
-
   # get actual variable name before potential call of data$x
   x.name <- deparse(substitute(x)) 
 

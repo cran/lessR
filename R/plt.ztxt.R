@@ -1,7 +1,7 @@
 .plt.txt <- 
 function(x, y, values, object, n_cat,
        cat.x, num.cat.x, cat.y, num.cat.y,
-       xlab, ylab, smooth, box_adj,
+       xlab, ylab, fit, smooth, box_adj,
        run, center_line, show_runs, prop, size, radius, digits_d, 
        fun_call=NULL, txdif=NULL) {
 
@@ -201,40 +201,42 @@ function(x, y, values, object, n_cat,
         }  # end suggest
 
 
-        for (i in 1:n_col) {
+        if (fit %in% c("off", "lm")) {
+          for (i in 1:n_col) {
 
-          if (n.xcol > 1) {
-            options(xname = colnames(x)[i])
-            stuff <- .cr.main(x[,i], y[,1], brief=TRUE) 
-          }
-          else {
-            options(yname = colnames(y)[i])
-            stuff <- .cr.main(x[,1], y[,i], brief=TRUE) 
-          }
+            if (n.xcol > 1) {
+              options(xname = colnames(x)[i])
+              stuff <- .cr.main(x[,i], y[,1], brief=TRUE) 
+            }
+            else {
+              options(yname = colnames(y)[i])
+              stuff <- .cr.main(x[,1], y[,i], brief=TRUE) 
+            }
 
-          txbck <- stuff$txb
-          txdsc <- stuff$txd
-          txinf <- stuff$txi
+            txbck <- stuff$txb
+            txdsc <- stuff$txd
+            txinf <- stuff$txi
 
-          class(txsug) <- "out"
-          class(txbck) <- "out"
-          class(txdsc) <- "out"
-          class(txinf) <- "out"
+            class(txsug) <- "out"
+            class(txbck) <- "out"
+            class(txdsc) <- "out"
+            class(txinf) <- "out"
 
-          if (nzchar(txsug)  &&  i == 1)
-            output <- list(out_suggest=txsug, out_background=txbck,
-              out_describe=txdsc, out_inference=txinf,
-              r=stuff$r, tvalue=stuff$tvalue, df=stuff$df, pvalue=stuff$pvalue,
-              lb=stuff$lb, ub=stuff$ub)
-          else
-            output <- list(out_background=txbck,
-              out_describe=txdsc, out_inference=txinf,
-              r=stuff$r, tvalue=stuff$tvalue, df=stuff$df, pvalue=stuff$pvalue,
-              lb=stuff$lb, ub=stuff$ub)
+            if (nzchar(txsug)  &&  i == 1)
+              output <- list(out_suggest=txsug, out_background=txbck,
+                out_describe=txdsc, out_inference=txinf,
+                r=stuff$r, tvalue=stuff$tvalue, df=stuff$df,
+                pvalue=stuff$pvalue, lb=stuff$lb, ub=stuff$ub)
+            else
+              output <- list(out_background=txbck,
+                out_describe=txdsc, out_inference=txinf,
+                r=stuff$r, tvalue=stuff$tvalue, df=stuff$df,
+                pvalue=stuff$pvalue, lb=stuff$lb, ub=stuff$ub)
 
-          class(output) <- "out_all"
-          print(output)
-        }  # end for i
+            class(output) <- "out_all"
+            print(output)
+          }  # end for i
+        }
 
       }  # end traditional 2-way scatter plot
 

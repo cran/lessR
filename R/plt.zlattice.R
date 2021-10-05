@@ -4,7 +4,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
          trans, size.pt, size.ln,
          xlab, ylab, main, shape, lab_cex, axis_cex,
          lvl=0, ellipse_color=NULL, ellipse_lwd=NULL,
-         fit="off", fit_color=NULL, fit_lwd=NULL, fit_se,
+         fit="off", fit_power=1, fit_color=NULL, fit_lwd=NULL, fit_se,
          plot_errors=FALSE, origin=NULL, jitter,
          violin, violin_fill, box, box_fill, 
          bw, vbs_size, box_adj, a, b, k.iqr, fences, vbs_mean,
@@ -296,7 +296,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
                 y <- y[-fi]
                 x <- x[-fi]
               }
-              l.ln <- lm(log(y) ~ x)
+              if (fit_power == 1)
+                l.ln <- lm(log(y) ~ x)
+              else
+                l.ln <- lm(log(y^fit_power) ~ x)
               f.ln <- exp(l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
               ok <- is.finite(f.ln)
               if (length(ok) > 0) {
@@ -305,9 +308,15 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               }
             }  # end fit == "exp"
 
-            if (fit == "sqrt") {  # sqrt model
-              l.ln <- lm(sqrt(y) ~ x)
-              f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))^2
+            if (fit %in% c("sqrt", "root")) {  # sqrt model
+              if (fit == "sqrt") {
+                l.ln <- lm(sqrt(y) ~ x)
+                fit_power <- 0.5
+              }
+              else
+                l.ln <- lm((y^fit_power) ~ x)
+              pw.bck <- 1 / fit_power 
+              f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))^pw.bck
             }
 
             if (fit == "reciprocal") {  # reciprocal model
@@ -318,14 +327,18 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
                 y <- y[-fi]
                 x <- x[-fi]
               }
+            if (fit_power == 1)
               l.ln <- lm(1/y ~ x)
+            else
+              l.ln <- lm(1/(y^fit_power) ~ x)
               f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
-              fi <- which(f.ln > max(y)  | f.ln <= min(y))
-              if (length(fi) > 0) {  # keep plot within the range of the plot
-                f.ln <- f.ln[-fi]
-                x <- x[-fi]
-               }
             }
+
+            e <- y - f.ln
+            sse <- sum(e^2)
+            sse.pn <- prettyNum(sse, big.mark = ",", scientific = FALSE)
+            cat("\nSum of Squared Errors, Panel ", panel.number(), ": ",
+                sse.pn, sep="", "\n")
 
             if (fit %in% c("exp", "sqrt", "reciprocal", "null"))
               fit_se[1] <- 0
@@ -447,7 +460,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
                   varwidth=vw, box.width=vbs_size, bw=bw)
             }
 
-          if (box  ||  size.pt > 0) {
+          if (box || size.pt>0) {
 
             n.lvl <- ifelse (is.null(by1), 1, nlevels(by1))
             n <- adj.bx.ht

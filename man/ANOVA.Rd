@@ -16,9 +16,10 @@ Output is generated into distinct segments by topic, organized and displayed in 
 \usage{
 ANOVA(my_formula, data=d, rows=NULL,
          brief=getOption("brief"), digits_d=NULL, 
-         Rmd=NULL, graphics=TRUE,
-         rb_points=FALSE, res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
-         pdf=FALSE, width=5, height=5, fun_call, \ldots)
+         Rmd=NULL, jitter_x=0.4, rb_points=FALSE,
+         res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
+         graphics=TRUE, pdf=FALSE, width=5, height=5,
+         fun_call=NULL, \ldots)
 
 av(\ldots)
 
@@ -27,7 +28,10 @@ av_brief(\ldots, brief=TRUE)
 
 
 \arguments{
-  \item{my_formula}{Standard R \code{\link{formula}} for specifying a model.}
+  \item{my_formula}{Standard R \code{\link{formula}} for specifying a model.
+       Use an asterisk, \code{*}, separating the two factors for a two-way ANOVA,
+       and a plus, \code{+}, separating the factors for a randomized blocks ANOVA
+       with the blocking factor listed second.}
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{d}, otherwise explicitly specify.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
@@ -41,9 +45,8 @@ av_brief(\ldots, brief=TRUE)
         if specified. The file type is .Rmd, which automatically opens in RStudio,
         but it is a simple text file that can be edited with any text editor,
         including RStudio.}
-  \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{Rmd} can
-        be useful to set to \code{FALSE} so that \code{\link{regPlot}} can be used
-        to place the graphics within the output file.}
+  \item{jitter_x}{Amount of horizontal jitter for points in the scatterplot
+        of levels and response variable for a one-way ANOVA.}
   \item{rb_points}{For a randomized block design, add the individual data values
         to a plot of the fitted value for each cell is obtained.}
   \item{res_rows}{Default is 20, which lists the first 20 rows of data and residuals
@@ -54,6 +57,9 @@ av_brief(\ldots, brief=TRUE)
        as the sort criterion for the display of the rows of data and associated
        residuals. Other values are \code{"fitted"} for the fitted values and
       \code{"off"} to not sort the rows of data.}
+  \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{Rmd} can
+        be useful to set to \code{FALSE} so that \code{\link{regPlot}} can be used
+        to place the graphics within the output file.}
   \item{pdf}{Indicator as to if the graphic files should be saved as pdf files
        instead of directed to the standard graphics windows.}
   \item{width}{Width of the pdf file in inches.}

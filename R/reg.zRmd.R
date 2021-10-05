@@ -723,7 +723,7 @@ sep="")
 
     if (interpret) tx[length(tx)+1] <- paste("\n",
 "This range of the residuals for the fitted values is the lower limit ",
-"of the range of forecasting error presented later. ",
+"of the range of prediction error presented later. ",
 sep="")
 
   if (explain) {
@@ -789,8 +789,8 @@ sep="")
 
     tx[length(tx)+1] <- paste("\n",
 "Both $R^2$ and $R^2_{adj}$ describe the fit of the model to the training ",
-"data. To generalize to forecasting accuracy on _new_ data, evaluate the fit ",
-"of the model to forecasts using the _predictive residual_ (PRE). ",
+"data. To generalize to prediction accuracy on _new_ data, evaluate the fit ",
+"of the model to predict using the _predictive residual_ (PRE). ",
 "To calculate the predictive residual for a row of data (case), first ",
 "estimate the model with that case deleted, that is, from all the ",
 "remaining cases in the training data, ",
@@ -815,7 +815,7 @@ sep="")
 "Because an estimated model at least to some extent overfits the training ",
 "data, $R^2_{PRESS}$ = `r xP(r$RsqPRESS,3)` is lower than both $R^2$ and ",
 "$R^2_{adj}$. The value is lower, but is the more appropriate value to ",
-"understand how well the model forecasts new values beyond the training ",
+"understand how well the model predicts new values beyond the training ",
 "from which it was estimated. ",
 sep="")
 
@@ -1036,7 +1036,7 @@ sep="")
 "predictor variables -- ", X, " -- linearly depend upon each other, ",
 "which in the simplest case is a high pairwise correlation. ",
 "Although collinearity diminishes neither the fit of the model, ",
-"nor forecasting efficacy, it ",
+"nor predictive efficacy, it ",
 "typically indicates an overly complex model. ",
 "The effects of collinear variables cannot be easily disentangled ",
 "without a large sample size, so they have relatively large ",
@@ -1276,7 +1276,7 @@ sep="")
 "Unfortunately, prediction is not perfect. ",
 "The range of values likely to contain the ",
 "actual data value for ", Y, " predicted from specific values of ", X, " ",
-"quantifies the _forecasting error_. ",
+"quantifies the _prediction error_. ",
 "The standard deviation of the residuals, $s_e$, assumed to be the same ",
 "for all sets of values of the predictor variables, specifies the ",
 "_modeling error_ of the fitted values from the training data, error ",
@@ -1285,8 +1285,8 @@ sep="")
 "are collected. So sampling ",
 "error of a value on the regression line, ",
 "indicated with $s_{\\hat Y}$, must also be considered in the ",
-"assessment of forecasting error. Consideration of both sources of ",
-"error results in the _standard error of forecast_. ",
+"assessment of prediction error. Consideration of both sources of ",
+"error results in the _standard error of prediction (or forecast) ",
 sep="")
 
     if (explain) tx[length(tx)+1] <- paste("\n",
@@ -1316,7 +1316,7 @@ sep="")
 "The analysis provides each row of data values, _as if_ they were  ",
 "new data, with a predicted value based ",
 "on the model estimated ",
-"from the training data, as well as the standard error of forecast. From ",
+"from the training data, as well as the standard error of prediction. From ",
 "these values obtain the lower and upper bounds of the corresponding ",
 "95% prediction interval. By default, only the first three, middle three ",
 "and last three rows of data are presented, sufficient to indicate the ",
@@ -1369,14 +1369,14 @@ sep="")
     if (document) {
       tx[length(tx)+1] <- paste("\n",
 "New data values from which to obtain ",
-"a forecast, different from the training data, can be entered with ",
+"a prediction, different from the training data, can be entered with ",
 "the options X1_new, X2_new, up to X6_new, where each option name refers to ",
 "the position of the corresponding predictor variable in the specification ",
 "of the regression model. ", 
 "Any number of values can be specified for each predictor variable. ",
 "Suppose, for example, that there are two values of interest ",
 " for ", et, "predictor variable ",
-"from which to make a forecast, listed below. ",
+"from which to make a prediction, listed below. ",
 sep="")
     }
     

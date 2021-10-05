@@ -376,7 +376,7 @@ function(my_formula, data=d, rows=NULL,
     if (is.null(pred_rows)) pred_rows <- ifelse (n.keep < 25, n.keep, 10) 
     if (pred_rows == "all") pred_rows <- n.keep  # no preds with pred_rows=0
 
-    a <- "  FORECASTING ERROR"
+    a <- "  PREDICTION ERROR"
     if (pred_rows > 0) {
       a <- paste(a, "\n\nData, Predicted, Standard Error of Forecast,",
                           "\n95% Prediction Intervals")

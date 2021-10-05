@@ -58,7 +58,7 @@ function(lm.out, cook, cooks_cut,
   sub.lab <- "Largest Cook's Distance Highlighted"
   x.label <- "Fitted Values"
   y.label <- "Residuals"
-  .axlabs(x.label, y.label, main.lab, sub.lab, max.lbl.y=3, cex.lab=0.85) 
+  .axlabs(x.label, y.label, main.lab, sub.lab, cex.lab=0.85) 
 
   col_fill <- getOption("pt_fill")
   col_color <- getOption("pt_color")

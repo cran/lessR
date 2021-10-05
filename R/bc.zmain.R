@@ -13,6 +13,7 @@ function(x, y, by, stack100,
          legend_horiz, legend_size, legend_abbrev, legend_adj,
          add, x1, x2, y1, y2, out_size, quiet, ...) {
 
+
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
   y.given <- ifelse (!is.null(y), TRUE, FALSE)
   is.ord <- ifelse (is.ordered(x) || is.ordered(by), TRUE, FALSE)
@@ -332,40 +333,16 @@ function(x, y, by, stack100,
 
   # is the value for fill a user-specified color range?
   # allow for assigned diverging color scale
-  if (is.null(fill)) {  # fill not specified
-    if (!is.ord) {  # default qualitative for theme
-      bar_fill <- getOption("bar_fill")
-      if (!is.null(bar_fill))
-        options("bar_fill_discrete" = bar_fill)
-      if (theme == getOption("theme")) {  # default theme operative
-        if (is.null(by))
-          clr <- getOption("bar_fill_discrete")  # default theme
-        else
-           clr <- .color_range(.get_fill(theme, FALSE), n.levels)
-      }
-      else {  # not the default theme
-        sty <- style(theme, reset=FALSE)
-        clr <- sty$bar$bar_fill_discrete
-        fill <- clr
-        color <- sty$bar$color
-        trans <- sty$bar$trans_fill
-      }
-      if (!is.null(.color_range(clr, n.levels)))  # if a color range
-        clr <- .color_range(clr, n.levels)
-      if (beside) clr <- clr[1:n.levels]  # longer vector OK if !beside
-    }
-    else  # ordered factor, so sequential palette (not allow fill= )
-      clr <- .color_range(.get_fill(theme), n.levels)
-  }  # end null fill
 
-  else {  # fill specified by user
-    if (is.null(.color_range(fill, n.levels)))
-      clr <- fill  # user assigned
-    else
-      clr <- .color_range(fill, n.levels)  # do default range
-  }  # end null fill
-
-# if (beside && !is.null(by)) clr <- clr[1:n.levels]
+  # fill often specified from BarChart(), unless theme is a parameter
+  # need a color range if fill is a color range name or if ordinal or by active
+  is.range.nm <- ifelse (length(.color_range(fill, n.levels)) > 1, TRUE, FALSE)
+  if (is.range.nm)
+    clr <- .color_range(fill, n.levels)  # do default range of given name
+  else if (is.ord || !is.null(by))
+    clr <- .color_range(.get_fill(theme), n.levels)  # do default range
+  else
+    clr <- fill
 
   if (!is.null(fill_split)) {
     chroma <- ifelse (theme %in% c("gray", "white"), 0, 55)
@@ -411,6 +388,8 @@ function(x, y, by, stack100,
     min.y <- 0
 
   if (is.null(legend_labels)) legend_labels <- row.names(x)
+  for (i in 1:length(legend_labels))
+    legend_labels[i] <- gsub("~", " ", legend_labels[i], fixed=TRUE)
   if (beside) legend_horiz <- FALSE
   if (is.matrix(x) && !beside) legend_horiz <- TRUE
 
@@ -724,6 +703,9 @@ function(x, y, by, stack100,
         }
       }
     }
+
+    # R text function sets cex at 1 if input value is 0
+    if (values_size == 0) values_size <- 0.01
 
     # vertical bars
     if (!horiz) {
@@ -1042,7 +1024,7 @@ function(x, y, by, stack100,
                     ", horiz=TRUE)  # horizontal bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("BarChart(", x.name,
-                 ", fill=\"greens\")  # sequential green bars", sep="")
+                 ", fill=\"reds\")  # red bars of varying lightness", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("PieChart(", x.name, ")  # doughnut (ring) chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")

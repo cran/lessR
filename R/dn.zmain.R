@@ -127,8 +127,7 @@ function(x,
 
   # axis value labels
   if (!y_axis) y.lab="" else y.lab="Density"
-  max.lbl <- max(nchar(axTicks(2)))
-  .axlabs(x.lab, y.lab=NULL, main.lab, sub.lab, max.lbl, 
+  .axlabs(x.lab, y.lab=NULL, main.lab, sub.lab,
           xy_ticks=TRUE, offset=offset, ...) 
 
   # colored background for plotting area

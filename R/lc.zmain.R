@@ -162,8 +162,7 @@ function(y, type,
   }
 
   # axis labels
-  max.lbl <- max(nchar(axTicks(2)))
-  .axlabs(x.lab, y.lab, main.lab, sub.lab, max.lbl, 
+  .axlabs(x.lab, y.lab, main.lab, sub.lab,
           x.val=NULL, xy_ticks=TRUE, offset=offset,
           lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex,
           main_cex=getOption("main_cex"),
