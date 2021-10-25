@@ -23,14 +23,6 @@ function(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"),
     }
   }
 
-  # let deprecated mydata work as default
-  dfs <- .getdfs() 
-  mydata.ok <- FALSE
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
-    d <- mydata 
-    mydata.ok <- TRUE
-  }
-
   # get variable name before potential call of data$x
   x.name <- deparse(substitute(x))  # could be a vars list
   options(xname = x.name)
@@ -183,12 +175,6 @@ function(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"),
     stuff <- .ss.numeric(x.call, y.call, digits_d, brief, y.name=nm, ...)
     txsts <- stuff$tx
     txotl <- .bx.stats(x.call)$txotl
-
-  message("The analysis of a numeric variable with this function",
-          "is deprecated\n",
-          "Instead use the more comprehensive function pivot()\n\n",
-          "For more information, enter  browseVignettes(\"lessR\") and\n",
-          "select the Pivot Table vignette\n")
 
   }
 

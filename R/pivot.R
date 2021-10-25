@@ -11,7 +11,17 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   # length(x) is count_n(x) + count_NA(x)
   count_n <- function(x) sum(!is.na(x))
   count_NA <- function(x) sum(is.na(x))
-
+ 
+  # if a tibble convert to data frame
+  dfs <- .getdfs() 
+  df.name <- deparse(substitute(data))  # get name of data table
+  if (!is.null(dfs)) {
+    if (df.name %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data)
+      }
+    }
+  }
 
   # -----------------------------------------------------------
   # ---- identify the compute functions, variable and by variables
@@ -76,7 +86,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   }
 
   # abbreviation dictionary for function names
-  fun.vec <- c("sum", "mn", "md", "min", "max", "sd", "var", "IQR", "mad",
+  fun.vec <- c("sum", "mean", "md", "min", "max", "sd", "var", "IQR", "mad",
                "", "", "sk", "kt", "tbl")
   names(fun.vec) <- c("sum", "mean", "median", "min", "max",
                       "sd", "var", "IQR", "mad", "range", "quantile",
@@ -238,8 +248,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
             a.l = length(a)
             if (j==1) {  # first (possibly only) compute function
                 a <- c(a, n, na, out[j])
-                names(a)[a.l+1] <- paste("n_",nm.var.d[i],sep="")
-                names(a)[a.l+2] <- paste("na_",nm.var.d[i],sep="")
+                names(a)[a.l+1] <- paste(nm.var.d[i], "_n" ,sep="")
+                names(a)[a.l+2] <- paste(nm.var.d[i], "_na", sep="")
                 names(a)[a.l+3] <- out_names[i]
             }
             else {  # j > 1, so multiple compute functions
@@ -255,7 +265,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
         if (!(txt %in% c("Stat", "sd")))
           substr(txt,1,1) <- toupper(substr(txt,1,1))
         row.names(a)[1] <- ""
-#       row.names(a)[1] <- paste("Grand_", txt, sep="")
       }  # end just one of compute or variables
 
       # do both multiple computes and multiple variables with tabular format
@@ -283,8 +292,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
         a2 <- quantile(data[,nm.var.d[i]], na.rm=TRUE, probs=seq(0,1,1/q_num))
         a2 <- c(n, na, a2)
         a2 <- data.frame(t(a2))
-        names(a2)[n.by+1] <- "n_"
-        names(a2)[n.by+2] <- "na_"
+        names(a2)[n.by+1] <- "_n"
+        names(a2)[n.by+2] <- "_na"
         if (i == 1)
           aq <- a2
         else
@@ -295,12 +304,10 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
         if (substr(nm, nchar(nm), nchar(nm)) == ".")
           names(aq)[i] <- substr(nm, 1, nchar(nm)-1)
       }
-      names(aq) <- gsub("X", "p_", names(aq), fixed=TRUE) 
+      names(aq) <- gsub("X", "p", names(aq), fixed=TRUE) 
       row.names(aq) <- nm.var.d
-    }  # end qflag
 
     # quant and non-quant done separately, here set final a
-    if (qflag) {
       if (n.cmp == 0)
         a <- aq
       else 
@@ -309,7 +316,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
     if (!show_n) {
       not.n <- which(c(substr(names(a),1,2)) == "n_")
-      not.n <- c(not.n, which(c(substr(names(a),1,3)) == "na_"))
+      not.n <- c(not.n, which(c(substr(names(a),1,3)) == "_na"))
       a <- a[,-not.n]
     }
        
@@ -382,7 +389,9 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   }
 
   n <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=count_n)
+  if (ncol(n) == 2) names(n)[2] <- nm.var.d[1]  # 1 var, aggregate names x
   n_NA <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=count_NA)
+  if (ncol(n_NA) == 2) names(n_NA)[2] <- nm.var.d[1]
   # merge columns to form complete aggregate data frame: a
   # pull by vars and aggregated var from original a
   if (n.cmp > 0) {
@@ -416,8 +425,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
         if (n.var == 1)  # by position
           col.val <- rbind(col.val, c(n.by+1,n.by+2,n.by+3))  # next 3 cols
         else  # by name, agg structure includes names
-          col.val <- rbind(col.val, which(grepl(nm.var.d[i], names(a),
-                           fixed=TRUE)))
+          col.val <- rbind(col.val, 
+                           which(grepl(nm.var.d[i], names(a), fixed=TRUE)))
       }
       # add columns to temp a2 data frame
       for (i in 1:n.var) {
@@ -428,8 +437,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
       k <- n.by
       for (i in 1:n.var) {  # for each variable, cover n, na, aggregated stat
-        names(a)[k+1] <- paste("n", "_", nm.var.d[i], sep="")
-        names(a)[k+2] <- paste("na", "_", nm.var.d[i], sep="")
+        names(a)[k+1] <- paste(nm.var.d[i], "_n", sep="")
+        names(a)[k+2] <- paste(nm.var.d[i], "_na", sep="")
         names(a)[k+3] <- nm.var.d[i]
         k <- k + 3
       }
@@ -441,8 +450,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       a <- a2
 
       k <- n.by
-      names(a)[k+1] <- paste("n", "_", nm.var.d[1], sep="")
-      names(a)[k+2] <- paste("na", "_", nm.var.d[1], sep="")
+      names(a)[k+1] <- paste(nm.var.d[1], "_n", sep="")
+      names(a)[k+2] <- paste(nm.var.d[1], "_na", sep="")
       for (i in 1:n.cmp) {
         names(a)[k+2+i] <- nm.var.d[1]  # all agg vars get the var name
       }
@@ -456,12 +465,12 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   # if there is a table computation
   if (tflag) {
 
-    # get n_ and na_ variables
+    # get _n and _na variables
     a1 <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=count_n)
     a2 <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=count_NA)
     amd <- merge(a1, a2, by=names(by.vars), sort=FALSE)
-    names(amd)[n.by+1] <- paste("n", "_", nm.var.d[1], sep="")
-    names(amd)[n.by+2] <- paste("na", "_", nm.var.d[1], sep="")
+    names(amd)[n.by+1] <- paste(nm.var.d[1], "_n", sep="")
+    names(amd)[n.by+2] <- paste(nm.var.d[1], "_na", sep="")
 
     # calculate the freqs level by level of the aggregation variable
     lvl <- sort(unique(data[,ind.var.d]))
@@ -503,8 +512,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     if (n.cmp == 0)  
       a <- amd
     else {  # more than just table already processed
-      not.n <- which(c(substr(names(amd),1,2)) == "n_")
-      not.n <- c(not.n, which(c(substr(names(amd),1,3)) == "na_"))
+      not.n <- which(grepl("_n", names(a), fixed=TRUE))
+      not.n <- c(not.n, which(grepl("_na", names(a), fixed=TRUE)))
       amd <- amd[,-not.n]  # remove what will be redundant columns
       a <- cbind(a,amd[(n.by+1):ncol(amd)])
     }
@@ -520,8 +529,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
                    prob=seq(0,1,by_i), na.rm=na_remove) 
     am <- as.matrix(aq)  # convert aggregation to a data frame
     amd <- data.frame(am)
-    nm.v <- paste(nm.var.d[1], "_", sep="")
-    names(amd) <- gsub("x.", nm.v, names(amd), fixed=TRUE) 
+    nm.v <- nm.var.d[1]
+    names(amd) <- gsub("x.", "p", names(amd), fixed=TRUE) 
     for (i in 1:length(names(amd))) {   # delete ending . in var names
       nm <- names(amd)[i]
       if (substr(nm, nchar(nm), nchar(nm)) == ".")
@@ -531,8 +540,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     if (n.cmp == 0) {  # quantile is only specified compute function
       ss <- merge(n, n_NA, by=names(by.vars), sort=FALSE)
       a <- merge(ss, amd, by=names(by.vars), sort=FALSE)
-      names(a)[n.by+1] <- "n_"
-      names(a)[n.by+2] <- "na_"
+      names(a)[n.by+1] <- paste(nm.v, "_n", sep="")
+      names(a)[n.by+2] <- paste(nm.v, "_na", sep="")
     }
     else {  # more than just quantiles already processed
       a <- cbind(a,amd[(n.by+1):ncol(amd)])
@@ -543,7 +552,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   # ----- post-computation processing -----
 
   # missing by variables data: set n to 0 or remove if specified
-  n_.ind <- which(substr(names(a), 1,2) == "n_")
+  n_.ind <- which(grepl("_n", names(a), fixed=TRUE))
   nm.n_.var <- names(a)[n_.ind]
   nm.na_.var <- names(a)[n_.ind+1] 
   ind0 <- logical(nrow(a))  # initializes to FALSE
@@ -560,8 +569,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
   # drop n_ and na_ columns if specified
   if (!show_n) {
-    not.n <- which(c(substr(names(a),1,2)) == "n_")
-    not.n <- c(not.n, which(c(substr(names(a),1,3)) == "na_"))
+    not.n <- which(c(grepl("_n", names(a), fixed=TRUE)))
+    not.n <- c(not.n, which(c(grepl("_na", names(a), fixed=TRUE))))
     a <- a[,-not.n]
   }
 
@@ -593,7 +602,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
     if (n.cmp > 1)  {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Cannot have both more than 1 compute function for making a table.\n\n")
+        "Cannot have more than 1 compute function for making a table.\n\n")
     }
 
     if (n.var > 1)  {
@@ -603,9 +612,9 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
     nm.var.a <- names(a)[ind.var]  # preserve original names
 
-    # delete variables n_ and na_
-    n.ind <- which(substr(names(a),1,2) == "n_")
-    miss.ind <- which(substr(names(a),1,3) == "na_")
+    # delete variables _n and _na
+    n.ind <- which(grepl("_n", names(a), fixed=TRUE))
+    miss.ind <- which(grepl("_na", names(a), fixed=TRUE))
     a <- a[, -c(n.ind, miss.ind)]
 
     # re-reference pivot variables in aggregated data frame a

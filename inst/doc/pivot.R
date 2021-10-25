@@ -15,7 +15,7 @@ a <- pivot(d, mean, Salary, c(Dept, Gender))
 a
 
 ## ---- fig.width=5-----------------------------------------------------------------------------------------------------
-BarChart(Dept, Salary_mn, by=Gender, data=a)
+BarChart(Dept, Salary_mean, by=Gender, data=a)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 #Write("MyPivotTable", data=a, format="Excel")
@@ -33,8 +33,7 @@ pivot(d, c(mean, median), Salary, c(Gender,Dept), out_names=c("MeanSalary", "Med
 pivot(d, mean, c(Years, Salary), c(Dept, Gender), digits_d=0)
 
 ## ---------------------------------------------------------------------------------------------------------------------
-pivot(d, mean, c(Years, Salary), Dept, digits_d=2,
-     out_names=c("YearsMean", "SalaryMean"), show_n=FALSE)
+pivot(d, mean, c(Years, Salary), Dept, digits_d=2, show_n=FALSE)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 pivot(d, mean, Years)
@@ -85,7 +84,7 @@ pivot(d, c(mean, median), Salary, c(Gender,Dept), out_names=c("MeanSalary", "Med
 
 ## ---------------------------------------------------------------------------------------------------------------------
 a <- pivot(d, mean, Salary, c(Dept, Gender))
-Sort(a, by=Salary_mn, direction="-")
+Sort(a, by=Salary_mean, direction="-")
 
 ## ---------------------------------------------------------------------------------------------------------------------
 #d |> pivot(mean, Salary, c(Dept, Gender)) -> a

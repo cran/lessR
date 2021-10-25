@@ -33,6 +33,8 @@ panel.lines)
 
 importFrom("latticeExtra", panel.ellipse, panel.xyarea)
 
+#importFrom("shiny", runApp)
+
 #importFrom("colorspace", polarLUV)
 
 S3method(print, out_all)
@@ -63,6 +65,7 @@ export (
   getColors,
   Help,
   Histogram, hs,
+  interact,
   kurtosis,
   label,
   LineChart, lc,

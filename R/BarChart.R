@@ -67,6 +67,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
   sort <- match.arg(sort)
 
+  if (horiz) {
+    if (sort == "+") sort <- "-" 
+    else if (sort == "-") sort <- "+" 
+  }
+
   proportion <- FALSE
 
   if (theme != getOption("theme")) {  # not the current theme
@@ -80,11 +85,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   if (missing(break_x)) 
     break_x <- ifelse (!horiz && rotate_x==0, TRUE, FALSE)
-
-  if (horiz) {
-    if (sort == "+") sort <- "-" 
-    if (sort == "-") sort <- "+" 
-  }
 
   if (sort[1] %in% c("off", "up", "down")) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -269,26 +269,22 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       # get actual variable name before potential call of data$x
       by.name <- deparse(substitute(by))
       options(byname = by.name)
-
-      # see if y exists from a function call
-      # indicate a function call with sys.nframe returns larger than 1
-      # if (exists(y.name, where=parent.frame(n=1)) && sys.nframe() > 1)
-      # in.call <- TRUE else in.call <- FALSE
-
       # get conditions and check for data existing
-      #if (!in.call) {
-      xs <- .xstatus(by.name, df.name, quiet)
-      in.global <- xs$ig
-      #}
-      #else in.global <- FALSE
-      # if y is in global, sys.nframe() returns two, in.call is TRUE,
-      #   which leads to in.global FALSE
-      #if (exists(by.name, where=.GlobalEnv)) in.global <- TRUE
+      if (!shiny) {
+        xs <- .xstatus(by.name, df.name, quiet)
+        in.global <- xs$ig
+      }
+      else
+        in.global <- FALSE
 
       # see if var exists in data frame, if x not in global Env or function call
-      if (eval_df) if (!in.global) .xcheck(by.name, df.name, names(data))
-      if (!in.global)
+#     if (eval_df)
+#       if (!in.global) .xcheck(by.name, df.name, names(data))
+      if (!in.global) {
+        if (eval_df)
+          .xcheck(by.name, df.name, names(data))
         by.call <- eval(substitute(data$by))
+      }
       else {  # vars that are function names get assigned to global
         by.call <- by
         if (is.function(by.call)) by.call <- eval(substitute(data$by))

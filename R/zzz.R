@@ -9,7 +9,7 @@ if (getRversion() >= "3.5.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.0.5  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
+      "lessR 4.0.6  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
       "---------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -19,8 +19,15 @@ function(...) {
       "customization, and descriptive statistics from pivot tables.\n",
       "  Enter:  browseVignettes(\"lessR\")\n\n",
       "View changes in this new version of lessR.\n",
-      "  Enter: help(package=lessR)  Click: Package NEWS\n") 
+      "  Enter: help(package=lessR)  Click: Package NEWS\n", 
+      "  Enter: interact()  for access to interactive graphics\n") 
 
+
+  # imports shiny loads the package, but prefer not have loaded until
+  #   actually run, such as with interact()
+  # the reason is that there is less data frame and variable error checking
+  #   when shiny is loaded
+  unloadNamespace("shiny")
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 

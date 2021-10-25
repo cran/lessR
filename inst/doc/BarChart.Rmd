@@ -132,7 +132,7 @@ knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
 The bar chart follows, with the aggregated data stored in the data frame named _a_, so explicitly identify with the `data` parameter. The computed mean of _Salary_ variable in the _a_ data frame from the previous call to `pivot()` is named *Salary_mn* by default.
 
 ```{r xy, fig.width=4, fig.height=3.5, fig.align='center'}
-BarChart(Dept, Salary_mn, data=a)
+BarChart(Dept, Salary_mean, data=a)
 ```
 
 ### Statistical Transformation of $y$
@@ -279,6 +279,15 @@ Because the factors are defined as ordered in the `factors()` function, the colo
 BarChart(m06, by=m07, quiet=FALSE)
 ```
 
+## Interactive Bar Chart
+
+An interactive visualization lets the user in real time change parameter values to change characteristics of the visualization. To create an interactive bar chart that displays the corresponding parameters, run the function `interact()` with `"BarChart"` specified. 
+
+```
+interact("BarChart")
+```
+
+The function is not run here because interactivity requires to run directly from the R console.
 
 ## Full Manual
 

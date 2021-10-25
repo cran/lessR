@@ -39,7 +39,7 @@ a
 knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
 
 ## ----xy, fig.width=4, fig.height=3.5, fig.align='center'--------------------------------------------------------------
-BarChart(Dept, Salary_mn, data=a)
+BarChart(Dept, Salary_mean, data=a)
 
 ## ---- fig.width=4, fig.height=3.5, fig.align='center'-----------------------------------------------------------------
 BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)

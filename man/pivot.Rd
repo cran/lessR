@@ -141,7 +141,7 @@ pivot(data=d, compute=mean, variable=Salary, by=c(Dept, Gender))
 
 # visualize the aggregation
 a <- pivot(d, mean, Salary, c(Dept, Gender))
-BarChart(Dept, Salary_mn, by=Gender, data=a)
+BarChart(Dept, Salary_mean, by=Gender, data=a)
 
 # calculate mean of Years and Salary for each combination of Dept and Gender
 # parameter values by position

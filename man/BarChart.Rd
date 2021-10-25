@@ -642,7 +642,7 @@ BarChart(Dept, Salary)
 # use lessR pivot function to get summary table
 d <- Read("Employee")
 a <- pivot(d, mean, Salary, c(Dept,Gender))
-BarChart(Dept, Salary_mn, by=Gender, data=a)
+BarChart(Dept, Salary_mean, by=Gender, data=a)
 # do so just with BarChart, display bars in grayscale
 # How does average salary vary by gender across the various departments?
 BarChart(Dept, Salary, by=Gender, stat="mean", data=d, fill="grays")

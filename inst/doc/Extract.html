@@ -395,19 +395,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The function <code>.()</code> also provides for random selection of rows. To randomly select the specified number of rows from the data frame to subset, specify the <code>random()</code> function for the logical criterion of the <code>rows</code>. The value passed to <code>random()</code> can either be the actual number of rows to select, or the proportion of rows to select.</p>
 <p>Here randomly select five rows of data from the <em>d</em> data frame.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="dv">5</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                     Years Gender Dept   Salary
-## Singh, Niral            2      F ADMN 61055.44
-## Billing, Susan          4      F ADMN 72675.26
-## Gvakharia, Kimberly     3      F SALE 49868.68
-## Downs, Deborah          7      F FINC 57139.90
-## Kralik, Laura          10      F SALE 92681.19</code></pre>
+<pre><code>##                     Years Gender Dept    Salary
+## Anastasiou, Crystal     2      F SALE  56508.32
+## Correll, Trevon        21      M SALE 134419.23
+## Cassinelli, Anastis    10      M FINC  57562.36
+## Pham, Scott            13      M SALE  81871.05
+## Portlock, Ryan         13      M SALE  77714.85</code></pre>
 <p>Here specify a proportion of rows to select.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="fl">0.1</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                    Years Gender Dept   Salary
-## Korhalkar, Jessica     2      F ACCT 72502.50
-## Wu, James             NA      M SALE 94494.58
-## Tian, Fang             9      F ACCT 71084.02
-## LaRoe, Maria          10      F MKTG 61961.29</code></pre>
+<pre><code>##                     Years Gender Dept   Salary
+## Anastasiou, Crystal     2      F SALE 56508.32
+## LaRoe, Maria           10      F MKTG 61961.29
+## Bellingar, Samantha    10      F SALE 66337.83
+## Stanley, Grayson        9      M SALE 69624.87</code></pre>
 </div>
 
 

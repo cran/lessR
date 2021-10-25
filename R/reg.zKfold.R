@@ -72,10 +72,6 @@ function(data, my_formula, kfold, new_scale, nm, predictors, n.vars,
   # ------------------------------------------
   # display result for each fold and the means
 
-print(k_Rsq)
-print(trunc(k_Rsq))
-print(floor(k_Rsq))
-p(digits_d)
   # get column widths
   max.num <- integer(length=6)
   max.num[1] <- max(nchar(as.character(floor(t_se))) + digits_d + 1)

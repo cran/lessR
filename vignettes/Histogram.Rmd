@@ -94,6 +94,16 @@ Plot(Salary)
 ```
 
 
+## Interactive Histogram
+
+An interactive visualization lets the user in real time change parameter values to change characteristics of the visualization. To create an interactive histogram that displays the corresponding parameters, run the function `interact()` with `"Histogram"` specified. 
+
+```
+interact("Histogram")
+```
+
+The function is not run here because interactivity requires to run directly from the R console.
+
 
 ## Full Manual
 

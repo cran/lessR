@@ -5,6 +5,44 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 4.0.6 (2021-10-24) <<<<<<
+
+-------------
+Updates 4.0.6
+-------------
+ 
+interact
+  new function for running one of the following shiny apps for
+    interactive visualizations:
+    "BarChart1", "BarChart2", "Histogram", "ScatterPlot", "Trellis",
+    e.g., interact("BarChart1")
+
+pivot
+  read tidyverse tibbles in addition to standard R data frames
+  when naming variables, for variable y, now y_mean instead of y_mn
+
+Plot
+  for x=categorical and y=continuous, or vice versa, no jitter added
+    if there are no duplications of y at each level of x, plus more
+    jitter added for larger sample size if jitter is needed
+
+
+---------------
+Bug Fixes 4.0.6
+---------------
+
+BarChart
+  sort now works properly with a horizontal plot
+
+pivot
+  now can have one variable to aggregate and one aggregation variable
+    named x
+
+Regression
+  debugging code removed from the k-fold cross-validation analysis
+
+
+
 >>>>>> Changes for lessR version 4.0.5 (2021-10-04) <<<<<<
 
 -------------

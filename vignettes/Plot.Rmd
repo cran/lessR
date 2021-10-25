@@ -209,14 +209,14 @@ Turn off the confidence interval by setting the parameter `fit_se` to 0 for the 
 
 ### One Continuous, One Categorical
 
-A categorical variable plotted with a continuous variable results in a traditional scatterplot though, of course, the scatter is confined to the straight lines that represent the levels of the categorical variable, its values. To avoid point overlap, by default some some horizontal jitter for each plotted point is added, which can be adjusted with either the `jitter_x` or `jitter_y` parameter. In addition, by default the mean of the continuous variable is displayed at each level of the categorical variable, as well in the text output.
+A categorical variable plotted with a continuous variable results in a traditional scatterplot though, of course, the scatter is confined to the straight lines that represent the levels of the categorical variable, its values. 
 
 The first two parameters of `Plot()` are `x` and `y`. In this example, the categorical variable, _Dept_, listed second, specifies the `y` variable, as in _y=Dept_. There is no distinction in this function call for two continues variables or one continuous and one categorical. The `Plot()` function evaluates each variable for continuity and responds appropriately. 
 
 ```{r}
 Plot(Salary, Dept)
 ```
-Adding some horizontal jitter for each plotted point is particularly useful for larger data sets. With enough jitter, the points that align with each level of the categorical variable plot in the shape of a bar, displaying the density of values along the continuous variable axis.
+To avoid point overlap, if there is at least one duplicated value of continuous `y` for any level of categorical `x`, by default some some horizontal jitter for each plotted point is added, which was not needed in this example. Manually adjust the jitter with either parameter `jitter_x` or, if `x` is continuous and `y` categorical, the `jitter_y` parameter. In addition, if the categorical variable is an R `factor` or a variable of type `character`, by default the mean of the continuous variable is displayed at each level of the categorical variable, as well in the text output. If the categorical variable is numeric, better to convert the variable to a factor to have just the categories on the axis and not a continuous scale. For example, `d$Gender <- factor(d$Gender)`.
 
 Another helpful technique for large data sets is to add some fill transparency with the `trans` parameter, with values such as 0.8 and 0.9. The combination of jitter and transparency allows for plotting many thousands of points. 
 
@@ -303,6 +303,21 @@ Plotting a single categorical variable yields the corresponding bubble plot of f
 Plot(Dept)
 ```
 
+
+## Interactive Plots
+
+An interactive visualization lets the user in real time change parameter values to change characteristics of the visualization. To create an interactive two-variable scatterplot of continuous variables that displays the corresponding parameters, run the function `interact()` with `"ScatterPlot"` specified. 
+
+```
+interact("ScatterPlot")
+```
+To create an interactive Trellis plot as a combined violion, box, and scatter plot with the five values of Dept that displays the corresponding parameters, run the function `interact()` with `"Trellis"` specified.
+
+```
+interact("Trellis")
+```
+
+The functions are not run here because interactivity requires to run directly from the R console.
 
 
 ## Full Manual

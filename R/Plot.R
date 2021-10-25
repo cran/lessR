@@ -1592,14 +1592,43 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
             center_line <- "median"
         }
           
-        if (pt.size[1] > 0) {
-          if (!quiet) {  # default jitter for cat-cont scatter plot
-            if (cat.x && !cat.y && stat!="mean") if (j.x.miss) {
-              jitter_x <- 0.6
+        # default jitter for cat-cont scatterplot
+        num.c.x <- FALSE
+        num.c.y <- FALSE
+        if (pt.size[1]>0 && n.x_var==1 && stat!="mean") {
+
+          if (is.factor(x.call[,1]))
+            unq.x <- levels(x.call[,1])
+          else
+            unq.x <- unique(x.call[,1])
+          nx.unq <- length(unq.x)
+          if (nx.unq <= 12) num.c.x <- TRUE
+          max.dup <- 0
+          if ((cat.x || num.c.x) && !cat.y) if (j.x.miss) {
+            for (i in 1:nx.unq) {
+              wx <- which(x.call[,1] == unq.x[i])
+              dps <- sum(duplicated(na.omit(y.call[,1][wx])))
+              if (dps > max.dup) max.dup <- dps
             }
-            if (!cat.x && cat.y && stat!="mean") if (j.y.miss) {
-              jitter_y <- 0.6
+            if (max.dup > 0) jitter_x <- 0.20 + (0.014*max.dup)
+            if (jitter_x > 1) jitter_x <- 1
+          }
+                
+          if (is.factor(y.call[,1]))
+            unq.y <- levels(y.call[,1])
+          else
+            unq.y <- unique(y.call[,1])
+          ny.unq <- length(unq.y)
+          if (ny.unq <= 12) num.c.y <- TRUE
+          max.dup <- 0
+          if (!cat.x && (cat.y || num.c.y)) if (j.y.miss) {
+            for (i in 1:ny.unq) {
+              wy <- which(y.call[,1] == unq.y[i])
+              dps <- sum(duplicated(na.omit(x.call[,1][wy])))
+              if (dps > max.dup) max.dup <- dps
             }
+            if (max.dup > 0) jitter_y <- 0.20 + (0.014*max.dup)
+            if (jitter_y > 1) jitter_y <- 1
           }
         }
 
@@ -1631,7 +1660,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
           txprm <- ""
 
-          if (xor(cat.x, cat.y)) {  # primarily to show jitter
+          if (xor(cat.x, cat.y) || xor(num.c.x, num.c.y)) {  # show jitter
             tx <- character(length = 0)
             tx[length(tx)+1] <- "Some Parameter values (can be manually set)"
             tx[length(tx)+1] <- .dash2(55)

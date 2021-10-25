@@ -308,7 +308,7 @@ function(my_formula, data=d, rows=NULL,
     tx1fit <- fit$tx
 
     txkfl <- ""
-    title_kfold <- "  K-FOLD CROSS-VALIDATION"
+    title_kfold <- paste("  K-FOLD CROSS-VALIDATION", sep="")
     m_se <- NA;  m_MSE <- NA;  m_Rsq <- NA
 
     title_rel <- "  RELATIONS AMONG THE VARIABLES"
@@ -399,9 +399,11 @@ function(my_formula, data=d, rows=NULL,
     }
   }  # end kfold==0
 
-  txkfl <- ""
-  title_kfold <- "  K-FOLD CROSS-VALIDATION"
-  m_se <- NA;  m_MSE <- NA;  m_Rsq <- NA
+  else {
+    txkfl <- ""
+    title_kfold <- paste("  ", kfold, "-FOLD CROSS-VALIDATION", sep="")
+    m_se <- NA;  m_MSE <- NA;  m_Rsq <- NA
+  }
 
   if (kfold > 0) {
     Kfld <- .regKfold(data[,nm], my_formula, kfold, new_scale,

@@ -135,7 +135,7 @@ vp(\ldots)
   \item{n_cat}{Number of categories, specifies the largest number of
         unique, equally spaced integer values of a variable for which
         the variable will be analyzed as categorical instead of continuous.
-        Default is 0. Use to specify that such variables  are to be analyzed
+        Default is 0. Use to specify that such variables are to be analyzed
         as categorical, a kind of informal R factor.}\cr
 
   \item{by}{A categorical variable to provide a scatterplot for
