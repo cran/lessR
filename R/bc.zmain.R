@@ -1,6 +1,6 @@
 .bc.main <-
 function(x, y, by, stack100,
-         fill, col_color, col.trans, fill_split, theme,
+         fill, color, col.trans, fill_split, theme,
          horiz, gap, prop, scale_y,
          xlab, ylab, main,
          value_labels, label_max, beside,
@@ -307,6 +307,20 @@ function(x, y, by, stack100,
     }
   }
 
+  if (!is.null(fill_split)) {
+    if (sort_x != "0") {
+      srt.dwn <- ifelse (sort_x == "-", TRUE, FALSE)
+      x <- x[order(x, decreasing=srt.dwn)]
+    }
+    fill <- character(length=length(x))  # fill starts over
+    f.c <- character(length=2)
+    chroma <- ifelse (theme %in% c("gray", "white"), 0, 55)
+    hue <- .get.h(theme)
+    f.c[1] <- hcl(hue, chroma, l=30)
+    f.c[2] <- hcl(hue, chroma, l=70)
+    for (i in 1:length(x))
+      fill[i] <- ifelse (x[i] <= fill_split, f.c[1], f.c[2])
+  }
 
   # ------------
   # sort options
@@ -322,52 +336,7 @@ function(x, y, by, stack100,
     }
   }
 
-
-  # ------
-  # colors
-  # fill is input and usually words, clr are actual colors
-
   n.levels <- ifelse (is.matrix(x), nrow(x), length(x))
-
-  # see if apply a pre-defined color range to **fill**
-
-  # is the value for fill a user-specified color range?
-  # allow for assigned diverging color scale
-
-  # fill often specified from BarChart(), unless theme is a parameter
-  # need a color range if fill is a color range name or if ordinal or by active
-  is.range.nm <- ifelse (length(.color_range(fill, n.levels)) > 1, TRUE, FALSE)
-  if (is.range.nm)
-    clr <- .color_range(fill, n.levels)  # do default range of given name
-  else if (is.ord || !is.null(by))
-    clr <- .color_range(.get_fill(theme), n.levels)  # do default range
-  else
-    clr <- fill
-
-  if (!is.null(fill_split)) {
-    chroma <- ifelse (theme %in% c("gray", "white"), 0, 55)
-    hue <- .get.h(theme)
-    if (is.null(fill))
-      getfill <- TRUE
-    else
-      getfill <- ifelse (length(fill) != 2, TRUE, FALSE)
-    if (getfill) {
-      fill[1] <- hcl(hue, chroma, l=30)
-      fill[2] <- hcl(hue, chroma, l=70)
-    }
-    for (i in 1:length(x))
-      clr[i] <- ifelse (x[i] <= fill_split, fill[1], fill[2])
-  }
-
-  if (!is.null(col.trans))
-   for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-col.trans)*256)
-
-  # by default, no color borders if a range
-  if (identical(col_color, getOption("bar_color_discrete")))
-    col_color <- "transparent"
-  # see if apply a pre-defined color range to **color**
-  col.clr <- .color_range(col_color, n.levels)  # see if range, NULL if not
-  if (!is.null(col.clr)) col_color <- col.clr
 
 
   # -------------
@@ -609,12 +578,12 @@ function(x, y, by, stack100,
 
   # the bars
   if (new_scale == 0)
-    x.coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
-          axes=FALSE, ann=FALSE, border=col_color, las=las.value,
+    x.coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
+          axes=FALSE, ann=FALSE, border=color, las=las.value,
           space=gap, axisnames=FALSE, ...)
   else
-    x.coords <- barplot(x, add=TRUE, col=clr, beside=beside, horiz=horiz,
-          axes=FALSE, ann=FALSE, border=col_color, las=las.value,
+    x.coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
+          axes=FALSE, ann=FALSE, border=color, las=las.value,
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
 
   # display text labels of values on or above the bars
@@ -877,7 +846,7 @@ function(x, y, by, stack100,
       options(byname = getOption("byname"))
       trans_pts <- .6  # dummy value
       point.size <- 2.5 * axis_x_cex
-      .plt.by.legend(legend_labels, col_color, clr, shp=22, trans_pts,
+      .plt.by.legend(legend_labels, color, fill, shp=22, trans_pts,
                      col.bg, usr, pt.size=point.size, pt.lwd=0, legend_size,
                      legend_abbrev, legend_adj)
 
@@ -887,19 +856,19 @@ function(x, y, by, stack100,
     else if (legend_position == "top") {
       ll <- legend("top", legend=legend_labels, plot=FALSE,
              title=l.lab, xpd=NA, x.intersp=.15,
-             fill=clr, border="transparent",
+             fill=fill, border="transparent",
              horiz=legend_horiz, cex=legend_size, bty="n", text.col=col.txt)
       fct <- (-0.043 + (0.257 * lab_cex))  # more cushion for large cex
       legend(ll$rect$left, usr[4]+(fct*(usr[4])), legend=legend_labels,
              title=l.lab, xpd=NA, x.intersp=.15, pt.cex=10,
-             fill=clr, border="transparent",
+             fill=fill, border="transparent",
              horiz=legend_horiz, cex=legend_size, bty="n", text.col=col.txt)
     }
 
     # everything else, not so consistent
     else
       legend(legend_position, legend=legend_labels, title=l.lab,
-             fill=clr, border="transparent", x.intersp=.15,
+             fill=fill, border="transparent", x.intersp=.15,
              horiz=legend_horiz, cex=legend_size, bty="n", text.col=col.txt)
 
   } # end legend

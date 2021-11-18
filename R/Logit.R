@@ -235,7 +235,8 @@ function(my_formula, data=d, rows=NULL,
   p.lbl <-  "  p-value"
   lb.lbl <- .fmtc("Lower 95%", max.num[5]+3)
   ub.lbl <- .fmtc("Upper 95%", max.num[6]+3)
-  cat("\n", rep(" ", buf), est.lbl, ste.lbl, t.lbl, p.lbl, lb.lbl, ub.lbl, sep="", "\n")
+  cat("\n", rep(" ", buf), est.lbl, ste.lbl, t.lbl, p.lbl,
+                           lb.lbl, ub.lbl, sep="", "\n")
   for (i in 1:(nrow(smc))) {
     rlb <- .fmtc(rownames(smc)[i], buf)
     ub <- .fmt(smc[i,6], digits_d, max.num[6])
@@ -322,7 +323,8 @@ function(my_formula, data=d, rows=NULL,
       print(round(out,3))
  
     }
-    else cat("\n>>> No collinearity analysis because not all variables are numeric.\n")
+    else cat("\n>>> No collinearity analysis\n",
+                   "Not all variables are numeric.\n")
   }
  
   if (res_rows > 0)

@@ -5,6 +5,98 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 4.0.8 (2021-11-18) <<<<<<
+
+-------------
+Updates 4.0.8
+-------------
+
+ANOVA
+  randomized blocks fitted means visualizations enhanced
+  rb_points parameter removed
+
+Histogram
+  for grayscale with a black background, histogram bars have no
+    transparency and are lighter
+
+interact
+  "PieChart" option added for interactive, Shiny display
+
+Logit
+  grid lines added to logit plot for a single predictor
+  transparency of 0.7 added to the points in the logit plot
+
+pivot
+  if n=0 for an output row or column, then converting to proportions
+    returns 0's instead of NaN's
+  new parameter show_group_na with default of TRUE that will list NA
+    for missing data of a grouping variable as a level on the output
+
+PieChart
+  labels proper size outside of RStudio
+
+Plot
+  plot_errors now plots the connecting segments from each point to
+    the fitted line with gray if style("gray")
+  parameter value size for size of points now applies to a
+    scatterplot matrix
+  fill color for points and bubbles lightened slightly for gray scale
+  Trellis line plots increase slightly the width of the lines
+
+recode
+  transformed variables converted to be consistent with their type
+    ex: convert a character variable to integer, but before was
+        still character
+
+Regression
+  for parameter new_scale, new option is "centered"
+  for all rescaling, now default is only predictor numeric variables
+    and only for numerical variables with more than two values
+  if rescaling, set new parameter rescale_response to TRUE to also
+    rescale the response variable
+  for model fit, standard deviation and min and max of the target
+    variable displayed along with the 95% range of variation of
+    the residuals, with values displayed with commas for large numbers
+  fitted vs residuals plot more efficiently sized and largest
+    Cook's Distance value displayed as a sub-title
+  Summary stats of response variable added to Basic Analysis
+
+Sort
+  feedback includes names of sorted variables in place of their index
+
+ttest
+  for one group t-test, density curve now has dark gray border and value
+    of smd added to the top text display over the visualization
+
+
+---------------
+Bug Fixes 4.0.8
+---------------
+
+ANOVA
+  randomized blocks ANOVA displays correct visualizations
+
+BarChart
+  ordinal factors properly display as color gradients, e.g., "blues"
+
+PieChart
+  theme other than default now implemented
+
+Plot
+  for plotting a Trellis plot with a by variable, all levels
+    correctly plotted and legend correct
+  if x or y is categorical and the other continuous, if a by variable
+    then fill and color colors properly displayed at end of display
+
+Sort
+  internal coding simplified for improved functionality and
+    generality
+
+ttest
+  pdf_file now works for one group t-test of the mean
+
+
+
 >>>>>> Changes for lessR version 4.0.6 (2021-10-24) <<<<<<
 
 -------------

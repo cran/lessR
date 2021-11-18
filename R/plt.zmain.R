@@ -55,6 +55,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
   if (is.null(size)) size <- 1
   size.pt <- size * .9  # size is set in Plot.R, reduce a bit for here
+  theme <- getOption("theme")
 
   # by.bub means that size is a variable to be plotted in by levels
   if(length(size) > 1  &&  !is.null(by)) {
@@ -640,7 +641,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             if (length(out_ind) == 0)  # no outliers
               points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
                        cex=size.pt, ...)
-
             else {  # display outliers separately
               points(x[-out_ind,1], y[-out_ind,1],
                  pch=shape, col=color[1], bg=fill[1], cex=size.pt, ...)
@@ -653,7 +653,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
           else if (n.ycol == 1) {  # one y
             for (i in 1:n.xcol) {  # one to many x's
-                if (getOption("theme") %in% c("gray", "white"))
+                if (theme %in% c("gray", "white"))
                   if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
                 points(x[,i], y[,1], pch=shape, col=color[i], bg=fill[i],
                        cex=size.pt, ...)
@@ -662,7 +662,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
           else  if (n.xcol == 1) {  # one x
             for (i in 1:n.ycol) {  # one to many y's
-                if (getOption("theme") %in% c("gray", "white"))
+                if (theme %in% c("gray", "white"))
                   if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
                 points(x[,1],y[,i], pch=shape, col=color[i], bg=fill[i],
                        cex=size.pt, ...)  # one x
@@ -699,10 +699,10 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           if (means  &&  stat == "data") {
 
           # get colors
-            pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
-            bck.g <- ifelse(getOption("theme")!="gray", rgb(130,90,70,
+            pch.avg <- ifelse(theme!="gray", 21, 23)
+            bck.g <- ifelse(theme!="gray", rgb(130,90,70,
                             maxColorValue=255), "gray40")
-            if (grepl(".black", getOption("theme"), fixed=TRUE))
+            if (grepl(".black", theme, fixed=TRUE))
               bck.g <- "gray85"
 
             # restore un-jittered data
@@ -791,13 +791,17 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           for (i in 1:n.by) shp[i] <- shape
         else
           shp <- shape
-        shape.dft <- c(21,23,22,24,25,7:14)  # shape defaults
+        if (n.by <= 5)  # R presents only five filled points
+          shape.dft <- c(21,23,22,24,25)  # shape defaults
+        else
+          shape.dft <- c(1,0,5,2,6,7:14)  # shape defaults
         if (length(color)==1 && length(fill) == 1 && length(shape)==1)
           for (i in 1:n.by) shp[i] <- shape.dft[i]  #  default shapes
 
         for (i in 1:n.by) {
           x.lv <- subset(x, by==levels(by)[i])
           y.lv <- subset(y, by==levels(by)[i])
+
           if (!by.bub) { 
             points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i],
                    cex=size.pt, lwd=0.75, ...)
@@ -807,11 +811,13 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             .plt.bubble(x.lv, y.lv, size.lv, radius, power, clr[i], fill[i],
                         size_cut, prop, bubble_text, object)
           }      
+
           if (segments) {  # designed for interaction plot of means
-            for (j in 1:(nrow(x.lv)-1))
+            for (j in 1:(nrow(x.lv)-1)) {   # ex: 3 segments connect 4 pts
               segments(x0=x.lv[j,1], y0=y.lv[j,1],
                        x1=x.lv[j+1,1], y1=y.lv[j+1,1],
-                       lty=1, lwd=.75, col=fill[i])
+                       lty="solid", lwd=.75, col=getOption("box_fill"))
+            }
           }
         }  # end 1:n.by
 
@@ -1134,9 +1140,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             lines(x.lv, f.ln, col=fill[i], lwd=fit_lwd, lty=ln.type)
 
           # plot residuals
-          if (plot_errors) 
+          if (plot_errors) { 
+            red <- rgb(130,40,35, maxColorValue=255) 
+            pe.clr <- ifelse (theme %in% c("gray", "white"), "gray58", red)
             segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv, 
-                     col=rgb(130,40,35, maxColorValue=255), lwd=1) 
+                     col=pe.clr, lwd=1) 
+            }
         }  # end any(ok)
 
       }  # ith pattern

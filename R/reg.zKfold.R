@@ -1,6 +1,6 @@
 .regKfold <-
-function(data, my_formula, kfold, new_scale, nm, predictors, n.vars,
-         n.keep, seed, digits_d=NULL, show_R) {
+function(data, my_formula, kfold, new_scale, scale_response, nm,
+         predictors, n.vars, n.keep, seed, digits_d=NULL, show_R) {
 
   dd <- data  # store original in case rescaling each fold
 
@@ -31,11 +31,15 @@ function(data, my_formula, kfold, new_scale, nm, predictors, n.vars,
     train <- which(nk != (i-1)) # combine all other folds
     test <- which(nk == (i-1))  # one test fold
     if (new_scale != "none") {  # separate rescaling for train and test data
-      for (j in 1:n.vars)  {
-        dd[train,nm[j]] <- rescale(data[train,nm[j]], data=NULL,
-                                kind=new_scale, digits_d)
-        dd[test,nm[j]] <- rescale(data[test,nm[j]], data=NULL,
-                                kind=new_scale, digits_d)
+      i.start <- ifelse (scale_response, 1, 2)
+      for (j in i.start:n.vars)  {
+        unq.x <- length(unique(data[,nm[j]])) 
+        if (unq.x > 2  &&  is.numeric(data[,nm[j]])) {
+          dd[train,nm[j]] <- rescale(data[train,nm[j]], data=NULL,
+                                  kind=new_scale, digits_d)
+          dd[test,nm[j]] <- rescale(data[test,nm[j]], data=NULL,
+                                  kind=new_scale, digits_d)
+        }
       }  # end for (i in 1:n.vars)
     }  # end new_scale != "none"
 
@@ -51,7 +55,7 @@ function(data, my_formula, kfold, new_scale, nm, predictors, n.vars,
     fit <- .reg1fitBasic(lm.sol, anv$tot["ss"], digits_d, show_R)
     t_se[i] <- fit$se
     t_Rsq[i] <- fit$Rsq
-    est <- .reg1modelBasic(lm.sol, digits_d, show_R)
+    est <- .reg1modelBasic(lm.sol, NULL, NULL, NULL, NULL, digits_d, show_R)
     coefs = as.matrix(est$estimates)
     
     # testing data analysis

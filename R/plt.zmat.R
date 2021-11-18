@@ -3,7 +3,8 @@ function(x, cor.coef=TRUE, fit="loess",
          col_fill=getOption("pt_fill"), col_color=getOption("pt_color"),
          col.fit=getOption("fit_color"), col.bg=getOption("panel_fill"),
          col.box=getOption("panel_color"),
-         col_trans=getOption("trans_pt_fill")) {
+         col_trans=getOption("trans_pt_fill"),
+         pt.size=pt.size, size.miss=size.miss) {
 
 
   panel.smooth <- function(x, y, fit.line=fit, pch=par("pch"), cex=.76,
@@ -11,7 +12,7 @@ function(x, cor.coef=TRUE, fit="loess",
 
     usr <- par("usr")          
     rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
-    cex.adj <- 0.86 - 0.045*n.var
+    cex.adj <- ifelse(size.miss, 0.80 - 0.048*n.var, pt.size)
     points(x, y, pch=21, col=col.pt, bg=col_fill, cex=cex.adj)
 
     ok <- is.finite(x) & is.finite(y)

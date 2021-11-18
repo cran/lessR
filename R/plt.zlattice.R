@@ -18,9 +18,15 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   if (date.ts) xx.lab <- xlab
   
   if (size.pt == 0) object <- "line"
+  size.ln <- size.ln + 0.5  # Trellis plot lines are narrower
 
   if (!is.null(area_fill)) if (area_fill == "on")
     area_fill <- getOption("violin_fill")
+
+  # if applicable, open graphics window of specified dimensions
+  in.RStudio <- ifelse (options("device") != "RStudioGD", FALSE, TRUE)
+  in.knitr <- ifelse (is.null(options()$knitr.in.progress), FALSE, TRUE)
+  if (!in.RStudio && !in.knitr) dev.new(width=width, height=height)
 
   grid_x_color <- ifelse(is.null(getOption("grid_x_color")), 
     getOption("grid_color"), getOption("grid_x_color"))
@@ -55,11 +61,6 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   lab_y_color <- ifelse(is.null(getOption("lab_y_color")), 
     getOption("lab_color"), getOption("lab_y_color"))
 
-  # if applicable, open graphics window of specified dimensions
-  in.RStudio <- ifelse (options("device") != "RStudioGD", FALSE, TRUE)
-  in.knitr <- ifelse (is.null(options()$knitr.in.progress), FALSE, TRUE)
-  if (!in.RStudio && !in.knitr) dev.new(width=width, height=height)
-
   # get lab_x_cex  lab_y_cex
   lab_cex <- getOption("lab_cex")
   lab_x_cex <- getOption("lab_x_cex")
@@ -93,7 +94,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   legend_title <- abbreviate(getOption("byname"), 7)
   leg.cex.title <- 0.85  # abbreviate only returns of type character
-  if (!is.null(by)) by <- factor(abbreviate(by, 5), levels(by))  # retain order
+# BAD if (!is.null(by)) by <- factor(abbreviate(by, 5), levels(by)) 
 
   if (is.null(by1) && is.null(by2))
     n.panels <- 1
@@ -246,14 +247,29 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   )
 
   if (T.type == "cont_cont") {
-    # specify plot attributes
-    p <- update(p,
-         auto.key=list(
-           cex=0.85,
-           space="right", rows=length(unique(by)),
-           border=TRUE, background=col.bg,
-           title=legend_title, cex.title=leg.cex.title),
 
+    if (n.groups > 1) {  # lattice groups is lessR by
+      if (object %in% c("point", "both")) {
+        p <- update(p,
+             key=list(
+               cex=0.85, space="right",
+               text=list(levels(by)),  # by is always a factor at this point
+               border="gray80", background=col.bg, 
+               points=list(cex=.80, pch=21, fill=fill, col=fill),
+               title=legend_title, cex.title=leg.cex.title))
+      }
+      else {  # lines
+        p <- update(p,
+             key=list(
+               cex=0.85, space="right",
+               text=list(levels(by)),  # by is always a factor at this point
+               border="gray80", background=col.bg, 
+               lines=list(lwd=size.ln, col=fill),
+               title=legend_title, cex.title=leg.cex.title))
+      }
+    }
+
+    p <- update(p,
         panel = function(x, y, ...) {
           panel.grid(h=0, v=-1, col=g.x_color,
                      lwd=grid_x_lwd, lty=grid_x_lty)
@@ -351,7 +367,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
               panel.polygon(c(x, rev(x)), c(up.ln, rev(dn.ln)),
                             col=se_fill, border="transparent")
-            }
+            }  # end fit_se
  
             panel.lines(x, f.ln, col=fit_color, lwd=fit_lwd)
 
@@ -359,6 +375,15 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               panel.segments(y0=f.ln, y1=y, x0=x, x1=x, col="darkred", lwd=1) 
 
           }  # end fit != "off"
+
+# Not working
+#         if (segments) { 
+#           panel.superpose(x, y, pan
+#           for (j in 1:(length(x)-1)) {   # ex: 3 segments connect 4 pts
+#             panel.segments(x0=x[j], y0=y[j],
+#                      x1=x[j+1], y1=y[j+1],
+#                      lty="solid", lwd=.75, col=pt.color[group.number])
+#           }
 
           if (lvl > 0)
             panel.ellipse(x, y, center.cex=0,

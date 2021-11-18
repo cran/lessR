@@ -62,7 +62,11 @@ function(x, data=d, kind="z", digits_d=3) {
 
 
   if (kind == "z")  {
-    x.call <- round(scale(x.call), digits_d)
+    x.call <- round(scale(x.call, center=TRUE, scale=TRUE), digits_d)
+  }
+
+  else if (kind == "center")  {
+    x.call <- round(scale(x.call, center=TRUE, scale=FALSE), digits_d)
   }
   
   else if (kind == "0to1") {

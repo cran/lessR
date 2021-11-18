@@ -190,11 +190,11 @@ function(x, y,
     }
   }
 
-  if (options("device") != "RStudioGD") {
-    labels_cex <- labels_cex * 1.3
-    values_cex <- values_cex * 1.3
-    main_cex <- main_cex * 1.3
-  }
+# if (options("device") != "RStudioGD") {
+#   labels_cex <- labels_cex * 1.3
+#   values_cex <- values_cex * 1.3
+#   main_cex <- main_cex * 1.3
+# }
 
   for (i in 1L:nx) { 
     # plot slice
@@ -209,7 +209,6 @@ function(x, y,
     if (labels_cex > 0)
       if (!is.na(lab) && nzchar(lab)) {
         lines(c(1, 1.05)*P$x, c(1, 1.05)*P$y)  # tick marks
-
 
       if (values != "off") if (values_position == "out")  # results to labels
         labels[i] <- paste(labels[i], "\n", x.txt[i], sep="")

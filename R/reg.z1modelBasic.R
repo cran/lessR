@@ -1,5 +1,5 @@
 .reg1modelBasic <-
-function(lm.out, digits_d=NULL, show_R=FALSE) {
+function(lm.out, my, sy, min.y, max.y, digits_d=NULL, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -24,6 +24,17 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
     tx[length(tx)+1] <- .dash2(68)
   }
   
+  if (!is.null(sy)) {  # assigned NULL in reg.zKfold.R)
+    tx[length(tx)+1] <- paste(nm[1], ":",
+    "  Mean = ", .fmt_cm(my,digits_d),
+    "   SD = ", .fmt_cm(sy,digits_d), sep="")
+    nc.y <- nchar(nm[1])
+    buf <- " "; for (i in 1:nc.y) buf=paste(buf, " ", sep="")
+    tx[length(tx)+1] <- paste(buf, 
+    "  Min = ", .fmt_cm(min.y,digits_d),
+    "   Max = ", .fmt_cm(max.y,digits_d), "\n\n", sep="")
+  }
+  
   # output: header
   if (is.null(options()$knitr.in.progress)) {
     tx[length(tx)+1] <- paste("Estimated Model for", nm[1])
@@ -44,7 +55,6 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   max.num <- integer(length=6)
   for (icol in 1:6) {
     max.num[icol] <- max(nchar(as.character(floor(smc[,icol]))) + digits_d + 1)
-#   max.num[icol] <- max(nchar(as.character(trunc(smc[,icol]))) + digits_d + 1)
     if (max.num[icol] < 9) max.num[icol] <- 9L 
   }
 

@@ -274,11 +274,38 @@ Plot(Salary, by1=Dept, by=Gender)
 ```
 
 
+### Two Continuous, Three Categorical
+
+The relationships for up to five variables can be displayed by `Plot()`. The two primary variables, _x_ and _y_, that form the basis of the scatter plot, are continuous. Usually these two variables are listed first in the function call and so do not need their parameter names specified. Indicate two categorical variables that form the Trellis panels with parameters `by1` and `by2`. Call these two variables the Trellis variables, which define a Trellis panel for each combination of their values. Finally, there can be a categorical grouping variable, the `by` variable, which plots different groups within each Trellis panel. 
+
+To illustrate, first, the data. Use the Cars93 data set that is installed with __lessR__, which describes characteristics of 1993 cars. 
+
+```{r}
+d <- Read("Cars93")
+```
+
+The categorical variables are integer coded 0 and 1, so recode to R factors to obtain more descriptive labels.
+
+```{r}
+d$Transmission <- factor(d$Manual, levels=0:1, labels=c("Auto", "Manual"))
+d$Source <- factor(d$Source, levels=0:1, labels=c("Foreign", "Domestic"))
+```
+
+Plot MPGcity according to Weight. Specify the number of Cylinders and Manual transmission or not as Trellis conditioning variables to form the Trellis plot. Specify the Source of the vehicle, Foreign or Domestic as a grouping variable to plot with separate colors on each panel.
+
+```{r, fig.height=7, fig.width=6}
+Plot(Weight, MPGcity, by1=Cylinders, by2=Transmission, by=Source)
+```
+
+From the visualization the patterns emerge. As Weight increases city MPG decreases. Domestic cars tend to weigh more. Foreign cars tend to have fewer cylinders, which also leads to better fuel mileage.
+
+
 ## Categorical Variables
 
 To avoid over-plotting, the plott of two categorical variables results in a bubble plot of their joint frequencies.
 
 ```{r, fig.height=3}
+d <- Read("Employee", quiet=TRUE)
 Plot(Dept, Gender)
 ```
 

@@ -17,9 +17,11 @@ function(data=d, by, direction=NULL, quiet=getOption("quiet"), ...) {
     cat("\nSort Specification\n")
   }
 
+  # do special keywords: row.names, random
   if (deparse(substitute(by)) == "row.names") {
     ord <- "order(row.names(data)"
     cat(" ", "row.names", "-->")
+
     if (!is.null(direction)) {
       if (direction[1] == "+") txt <- "ascending"
       else if (direction[1] == "-") txt <- "descending"
@@ -32,6 +34,7 @@ function(data=d, by, direction=NULL, quiet=getOption("quiet"), ...) {
     }
     else 
       txt <- "ascending"
+
     ord.txt <- "decreasing=FALSE"
     if (txt =="descending") ord.txt <- "decreasing=TRUE"
     ord <- paste(ord, ",", ord.txt, ",...)", sep="")
@@ -42,7 +45,7 @@ function(data=d, by, direction=NULL, quiet=getOption("quiet"), ...) {
     cat(" ", "random\n")
     rand.rows <- sample(1:n.obs, size=n.obs, replace=FALSE)
     ord <- paste("order(", "rand.rows", ", ...)", sep="")
-  }
+  }  # end sort random
 
   else {  # sort variable(s)
 
@@ -66,7 +69,8 @@ function(data=d, by, direction=NULL, quiet=getOption("quiet"), ...) {
     # console output
     if (!quiet) {
       for (i in 1:n.sort) {
-        cat(" ", by.col[i], "-->")
+        nm <- names(data)[by.col[i]]
+        cat(" ", nm, "-->")
         if (direction[i] == "+") txt <- "ascending"
         else if (direction[i] == "-") txt <- "descending"
         else {
@@ -79,45 +83,23 @@ function(data=d, by, direction=NULL, quiet=getOption("quiet"), ...) {
       }
     }
 
-    fvar <- matrix(nrow=n.obs, ncol=n.sort)  # max num of factors is n.sort
-    i.fvar <- 0
-
     # construct the call to the order function
     ord <- ""
-    for (i in 1:n.sort) { 
-      if (is.character(data[, by.col[i]]))
-        data[, by.col[i]] <- as.factor(data[, by.col[i]])  # sort char not work
+    for (i in 1:n.sort) {  # xtfrm() needed for factors
+      ord <- paste(ord, direction[i], 
+                   "xtfrm(data[,by.col[", toString(i),"]])", sep="")
+      if (i < n.sort) ord <- paste(ord, ",", sep="")
+        
     }
-
-    for (i in 1:n.sort) { 
-      if ("factor" %in% class(data[, by.col[i]])) {  # 2 attributes if ordered
-        i.fvar <- i.fvar + 1  # another factor variable
-        fvar[, i.fvar] <- as.character(data[, by.col[i]])
-        for (i.row in 1:n.obs)  # replace value with factor integer prefixed 
-          fvar[i.row, i.fvar] <- 
-             paste(toString(as.numeric(data[, by.col[i]])[i.row]), 
-                   as.character(fvar[i.row, i.fvar]), sep="")
-        ord <- paste(ord, direction[i], "xtfrm(fvar[, ", toString(i.fvar), "]), ",
-                     sep="")
-      }
-      else   # variable not a factor
-{
-        ord <- paste(ord, direction[i], 
-                     "data[, by.col[", toString(i), "]], ", sep="")
-}
-    }
-    ord <- paste("order(", ord, "...)", sep="")
-  }
-
-
-  # finish the console output
-  cat("\n")
+    ord <- paste("order(", ord, ")", sep="")
+  }  # end sort variables
 
 
   # do the sort
   o <- eval(parse(text=ord))
   d <- data[o, ]
 
+  cat("\n")
   return(d)
 
 }

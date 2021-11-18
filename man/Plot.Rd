@@ -226,7 +226,8 @@ vp(\ldots)
   \item{segments}{Designed for interaction plots of means, connects each pair of
         successive points with a line segment. Pass a data frame of the means,
         such as from \code{\link{pivot}}. To turn off connecting line segments
-        for sorted, equal intervals data, set to \code{FALSE}.}
+        for sorted, equal intervals data, set to \code{FALSE}. Currently, does
+        not apply to Trellis plots.}
   \item{segments_y}{For one \code{x}-variable, draw a line segment from the
         \code{y}-axis to
         each plotted point, such as for the Cleveland dot plot. For two

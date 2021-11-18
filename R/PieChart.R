@@ -3,6 +3,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
          radius=1, hole=0.65, hole_fill=getOption("panel_fill"),
 
+         theme=getOption("theme"),
          fill=NULL, 
          color="lightgray",
          trans=getOption("trans_bar_fill"),
@@ -44,10 +45,21 @@ function(x, y=NULL, data=d, rows=NULL,
     values_size <- cex * values_size
   }
 
-  fill_miss <- ifelse (missing(fill), TRUE, FALSE)
+  fill.miss <- ifelse (missing(fill), TRUE, FALSE)
+  color.miss <- ifelse (missing(color), TRUE, FALSE)
+  trans.miss <- ifelse (missing(trans), TRUE, FALSE)
   main.miss <- ifelse (missing(main), TRUE, FALSE)
 
   color[which(color == "off")] <- "transparent"
+
+  if (theme != getOption("theme")) {  # not the current theme
+    sty <- style(theme, reset=FALSE)
+    if (fill.miss) fill <- sty$bar$bar.fill.discrete
+    if (color.miss) color <- sty$bar$color
+    if (trans.miss) trans <- sty$bar$trans.fill
+  }
+  else
+    if (fill.miss) fill <- .get_fill(theme)
 
   if (is.null(values_digits)) {
     if (values == "%") values_digits <- 0
@@ -189,7 +201,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
   # evaluate fill (NULL, numeric constant or a variable)
   #--------------
-  if (!fill_miss) {
+  if (!fill.miss) {
     fill_name <- deparse(substitute(fill))
     in.df <- ifelse (exists(fill_name, where=data), TRUE, FALSE)
 
@@ -204,7 +216,7 @@ function(x, y=NULL, data=d, rows=NULL,
       xtb <- table(x.call)
       fill <- .getColC(xtb, fill_name=fill_name)
     }  # end .count 
-  }  # end !fill_miss
+  }  # end !fill.miss
 
   if (!is.null(pdf_file)) {
     if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")

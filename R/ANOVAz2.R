@@ -1,6 +1,6 @@
 .ANOVAz2 <- 
 function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
-         delim, rb_points, graphics, pdf, width, height) {
+         delim, graphics, pdf, width, height) {
 
   if (grepl("*", delim, fixed=TRUE)) bet.grp  <- TRUE else bet.grp <- FALSE
   if (grepl("+", delim, fixed=TRUE)) wth.grp  <- TRUE else wth.grp <- FALSE
@@ -283,83 +283,104 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
   if (graphics) {
     manage.gr <- .graphman()
 
-    # interaction plots
-    if (!pdf) {
-      if (manage.gr) {
-        pdf_file <- NULL
-        if (bet.grp) .graphwin(1)
-        if (wth.grp) .graphwin(2)
-        dev.set(which=3)
-      }
-    }
-    else { 
-      pdf_file <- "ANOVA_Interaction.pdf"
-      pdf(file=pdf_file, width=width, height=height)
-    }
+    if (bet.grp) {
 
-    plt.i <- plt.i + 1
-    plt.title[plt.i] <- "Interaction Plot"
-
-    options(byname = nm[3])
-    theme <- getOption("theme")
-    qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
-    pt_fill <- getColors(qual_pal, n=2, output=FALSE)
-    pt_color <- getColors(qual_pal, n=2, output=FALSE)
-    .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], 
-              fill=pt_fill, color=pt_color, segments=TRUE,
-              cat.x=TRUE, xlab=nm[2], ylab=nm[1], main="Cell Means", size=2)
-
-    # pdf
-    if (pdf) {
-      dev.off()
-      .showfile(pdf_file, "interaction plot")
-    }
-
-    # fitted interaction plots
-    if (wth.grp) {
-
+      # interaction plots
       if (!pdf) {
         if (manage.gr) {
-          dev.set(which=4)
+          if (bet.grp) .graphwin(1)
+          dev.set(which=2)
         }
       }
       else { 
-        pdf_file <- "ANOVA_FitInter.pdf"
+        pdf_file <- "ANOVA_Interaction.pdf"
         pdf(file=pdf_file, width=width, height=height)
       }
 
       plt.i <- plt.i + 1
+      plt.title[plt.i] <- "Interaction Plot"
+
+      options(byname = nm[3])
+      theme <- getOption("theme")
+      qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
+      pt_fill <- getColors(qual_pal, n=2, output=FALSE)
+      pt_color <- getColors(qual_pal, n=2, output=FALSE)
+      txt <- paste("Cell Means of", nm[1])
+      .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], 
+                fill=pt_fill, color=pt_color, segments=TRUE,
+                cat.x=TRUE, xlab=nm[2], ylab=txt, size=2)
+
+      if (pdf) {
+        dev.off()
+        .showfile(pdf_file, "interaction plot")
+      }
+    }  # end bet.grp
+
+    # fitted plots
+    if (wth.grp) {
+
+      fit.out <- data.frame(av.out$fitted.values)
+      names(fit.out) <- "Fitted"
+      m <- cbind(av.out$model, fit.out)
+      nm <- names(m)
+      options(byname = nm[3])
+      options(yname = nm[1])
+
+      # -----------
+
+  # if manage, set up graphics system for 2 windows default
+  if (!pdf) {
+    if (manage.gr) {
+#     .graphwin(2)
+      dev.set(which=2)
+    }
+  }
+  else { 
+    pdf_file <- "ANOVA_Data.pdf"
+    pdf(file=pdf_file, width=width, height=height)
+  }
+
+      plt.i <- plt.i + 1
+      plt.title[plt.i] <- "Data Values"
+
+      # .plt.main replacement for interaction.plot of data not quite working
+      interaction.plot(x1.values, x2.values, m[,1],
+                       xlab=nm[2], ylab=nm[1], trace.label=nm[3])
+#     .plt.main(m[,2,drop=FALSE], m[,1,drop=FALSE], by=m[,3], segments=TRUE,
+#               size=0, cat.x=TRUE, xlab=nm[2], ylab=nm[1])
+
+      if (pdf) {
+        dev.off()
+        .showfile(pdf_file, "Data values plot")
+      }
+
+      # -----------
+
+  if (!pdf) {
+    if (manage.gr) {
+#     .graphwin(2)
+      dev.set(which=3)
+    }
+  }
+  else { 
+    pdf_file <- "ANOVA_Fitted.pdf"
+    pdf(file=pdf_file, width=width, height=height)
+  }
+
+      plt.i <- plt.i + 1
       plt.title[plt.i] <- "Fitted Values"
 
-     if (!rb_points) {
-      m <-  tapply(av.out$fitted, 
-                   list(x1.values, x2.values), mean, na.rm=TRUE)
-      m <- as.table(m)
-      m <- data.frame(m)
-      names(m) <- c(nm[2], nm[3], nm[1])
-      options(byname = nm[3])
-      .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], segments=TRUE,
-                cat.x=TRUE, xlab=nm[2], ylab=nm[1], main="Fitted Means")
-      }
-      else {  # plot the individual points with the fitted means
-        mn.y <- min(y.values, av.out$fitted)
-        mx.y <- max(y.values, av.out$fitted)
-        interaction.plot(x1.values, x2.values, av.out$fitted,
-                 main=plt.title[plt.i],
-                 xlab=nm[2], ylab=nm[1], trace.label=nm[3], ylim=c(mn.y, mx.y))
-        points(x1.values, y.values, pch=21, 
-               bg=rgb(.6, .6, .6, alpha=getOption("trans_pts"),
-               maxColorValue = 1))
-#       segments(as.numeric(x1.values), av.out$fitted, as.numeric(x1.values),
-#                y.values)
-      }
+      .plt.main(m[,2,drop=FALSE], m[,4,drop=FALSE], by=m[,3], segments=TRUE,
+              cat.x=TRUE, xlab=nm[2], ylab=nm[4])
 
       # pdf
       if (pdf) {
         dev.off()
-        .showfile(pdf_file, "fitted values plot")
+        .showfile(pdf_file, "Fitted values plot")
       }
+
     }  # end within group
+
   }  # end grahpics
 
   return(list(

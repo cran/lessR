@@ -19,6 +19,9 @@ function(lm.out, pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
   plt.i <- plt.i + 1L
   plt.title[plt.i] <- "Distribution of Residuals"
 
+  lab_cex <- getOption("lab_cex")
+  options(lab_cex=0.9)
+
   # frequency distribution of residuals
   .dn.main(lm.out$residuals, 
     fill_hist=getOption("se_fill"),
@@ -31,6 +34,7 @@ function(lm.out, pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
     .showfile(pdf_file, "residuals plot")
   }
 
+  options(lab_cex=lab_cex)
   return(invisible(list(i=plt.i, ttl=plt.title)))
 
 }

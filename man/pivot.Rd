@@ -11,8 +11,8 @@ Compute one or more designated descriptive statistics (\code{compute} over one o
 
 \usage{
 pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
-         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, out_names=NULL, 
-         sort=NULL, sort_var=NULL,  
+         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, show_group_na=TRUE,
+         out_names=NULL, sort=NULL, sort_var=NULL,  
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
          factors=FALSE, q_num=4, digits_d=3, quiet=getOption("quiet"))
 }
@@ -36,12 +36,14 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   \item{show_n}{By default, show the sample size and number missing for each
         computed summary statistic. If \code{FALSE}, delete all variables
         from the output data frame that begin with \code{n_} or \code{na_}.}
-  \item{na_by_show}{If \code{TRUE}, show missing levels of the grouping
-       variables with \code{n} set to 0.}
+  \item{na_by_show}{Applicable to one or more grouping variables. If \code{TRUE},
+       show missing levels of the grouping variables with \code{n} set to 0.}
   \item{na_remove}{Sets base R parameter \code{na.rm}, which, if \code{TRUE},
        removes missing values from the \code{value} variables and then reports
        how many values were missing. Otherwise, the aggregation for a cell
        with any missing data returns \code{NA}.}
+  \item{show_group_na}{If \code{TRUE}, by default, display NA for missing
+       data of a grouping variable as a level for that variable.}
   \item{out_names}{Custom names for the aggregated variables. If more than one,
         list in the same order as specified in \code{variable}.}\cr
 
@@ -140,7 +142,10 @@ d <- Read("Employee", quiet=TRUE)
 pivot(data=d, compute=mean, variable=Salary, by=c(Dept, Gender))
 
 # visualize the aggregation
-a <- pivot(d, mean, Salary, c(Dept, Gender))
+# when reading a table of coordinates, a, BarChart cannot deal with
+#   with missing data so do not show groups that are missing as
+#   another level
+a <- pivot(d, mean, Salary, c(Dept, Gender), show_group_na=FALSE)
 BarChart(Dept, Salary_mean, by=Gender, data=a)
 
 # calculate mean of Years and Salary for each combination of Dept and Gender

@@ -54,7 +54,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       y.max <- max(lm.out$model[,nm[1]])
     }
     else {
-      ctitle <- "Reg Line, Confidence and Prediction Intervals"
+      ctitle <- "Reg Line, Confidence & Prediction Intervals"
       y.min <- min(p.int$lwr)
       y.max <- max(max(p.int$upr),  max(lm.out$model[,nm[1]]) )
     }
@@ -72,9 +72,18 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     
     # size of points
     size.pt <- ifelse (.Platform$OS == "windows", 0.85, 0.70)
-#   if (options("device") == "RStudioGD")
-#     size.pt <- ifelse (.Platform$OS == "windows", size.pt*0.9, size.pt*0.9)
-      
+
+#   fill <- getOption("pt_fill")
+#   color <- getOption("pt_color")
+#   cat.x <- ifelse (length(unique(x.values)) < 8, TRUE, FALSE)
+#   if (cat.x) x.values <- factor(x.values)
+#   cat.y <- ifelse (length(unique(y.values)) < 8, TRUE, FALSE)
+#   if (cat.y) y.values <- factor(y.values)
+#   x.vl <- data.frame(x.values)
+#   y.vl <- data.frame(y.values)
+#   .plt.main(x.vl, y.vl, fill=fill, color=color, cat.x=cat.x,
+#             x.lab=nm[2], y.lab=nm[1], size=size.pt, cat.y=cat.y)
+ 
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
     
@@ -84,11 +93,11 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     rm <- margs$rm
     bm <- margs$bm
 
-    lm <- lm + 0.08
-      
     par(bg=getOption("window_fill"))
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
     par(mai=c(bm, lm, tm, rm))
-    
+
     if (!is.numeric(x.values))
       if (!is.factor(x.values)) x.values <- as.factor(x.values)
 
@@ -114,10 +123,10 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     .axes(x.lvl, NULL, axT1, axTicks(2))
 
     .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
-            cex.lab=size.lab) 
+            lab_x_cex=0.9, lab_y_cex=0.9) 
 
-    col_fill <- getOption("pt_fill")
-    col_color <- getOption("pt_color")
+    fill <- getOption("pt_fill")
+    color <- getOption("pt_color")
     
 # using the eq.int criterion for bubble plot does not account for missing data
 #   eq.int <- TRUE
@@ -132,10 +141,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     ux <- length(unique(x.values))
     uy <- length(unique(y.values))
     if ((ux>10 && uy>10) || !.is.integer(x.values) || !.is.integer(y.values)) {
-#   if ((ux>10 && uy>10) || !eq.int || is.numeric(x.values) ||
-#        is.numeric(y.values)) {
-      points(x.values, y.values, pch=21, col=col_color, bg=col_fill,
-             cex=size.pt)
+      points(x.values, y.values, pch=21, col=color, bg=fill, cex=size.pt)
     }
     else {  # bubble plot
       mytbl <- table(x.values, y.values)  # get the counts, all x-y combinations
@@ -162,7 +168,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       sz <- cords[,3]**power  # radius unscaled 
       radius <- 0.18
       symbols(cords$xx, cords$yy, circles=sz, inches=radius,
-          bg=.maketrans(col_fill, 110), fg=col_color, add=TRUE, ...)
+          bg=.maketrans(fill, 110), fg=color, add=TRUE, ...)
 
       q.ind <- 1:nrow(cords)  # all bubbles get text
       for (i in 1:nrow(cords)) if (cords[i,3] < 5) cords[i,3] <- NA 
@@ -182,9 +188,13 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
                col=getOption("segment_color"), lwd=1)
       }
     }
-    if (plot_errors) 
+    if (plot_errors)  {
+      theme <- getOption("theme")
+      red <- rgb(130,40,35, maxColorValue=255) 
+      pe.clr <- ifelse (theme %in% c("gray", "white"), "gray58", red)
       segments(y0=lm.out$fitted.values, y1=lm.out$model[,1],
-               x0=x.values, x1=x.values, col="darkred", lwd=1) 
+               x0=x.values, x1=x.values, col=pe.clr, lwd=1) 
+    }
 
     if (!is.factor(x.values) && do.predint) {
       col.ci <- getOption("segment_color")
@@ -206,9 +216,8 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       yy <- c( c(min(p.int$upr),p.int$upr,min(p.int$upr)),
                  rev(c(min(p.int$lwr),p.int$lwr,min(p.int$lwr))) )
       polygon(xx, yy, col=getOption("ellipse_fill"), border="transparent")
-
-
     }
+
   }  # end n.pred<=1
 
   else {  # scatterplot matrix for multiple regression
@@ -219,7 +228,8 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       panel_fill <- getOption("panel_fill")  
       window_fill <- getOption("window_fill")  
       bckg <- ifelse(panel_fill=="transparent", window_fill, panel_fill)
-      .plt.mat(lm.out$model[c(nm)], fit="lm", col.bg=bckg)
+      .plt.mat(lm.out$model[c(nm)], fit="lm", col.bg=bckg, 
+               pt.size=TRUE, size.miss=TRUE)
     }
     else {
       cat("\n>>> No scatterplot matrix reported because not all variables are ")

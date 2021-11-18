@@ -86,10 +86,22 @@ BarChart(Dept, theme="gray", values="off", horiz=TRUE)
 
 Or, can use `style()` to change the theme for subsequent visualizations as well. See the `Customize` vignette.
 
-Dept is not an ordinal variable (i.e., with ordered values set by the base R `factor()` function). Ordinal varaibles plot by default with a range of the same hue from light to dark. To illustrate, can choose many different sequential palettes from `getColors()`: "reds", "rusts", "browns", "olives", "greens", "emeralds", "turquoises", "aquas", "blues", "purples", "violets", "magentas", and "grays". 
+Dept is not an ordinal variable (i.e., with ordered values set by the base R `factor()` function). Ordinal variables plot by default with a range of the same hue from light to dark. To illustrate, can choose many different sequential palettes from `getColors()`: "reds", "rusts", "browns", "olives", "greens", "emeralds", "turquoises", "aquas", "blues", "purples", "violets", "magentas", and "grays". 
 
 ```{r fig.width=4, fig.height=3.5, fig.align='center'}
 BarChart(Dept, fill="reds")
+```
+
+The color-blind family of viridis palettes are also available: "viridis", "cividis", "magma", "inferno", "plasma". The bar graph below indicates the primary viridis palette.
+
+```{r fig.width=4, fig.height=3.5, fig.align='center'}
+BarChart(Dept, fill="viridis")
+```
+
+For something different, many Wes Anderson movie themes are available: "BottleRocket1", "BottleRocket2", "Rushmore1", "Rushmore", "Royal1", "Royal2", "Zissou1", "Darjeeling1", "Darjeeling2", "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2", "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2", "IsleofDogs1", "IsleofDogs2".
+
+```{r fig.width=4, fig.height=3.5, fig.align='center'}
+BarChart(Dept, fill="GrandBudapest1")
 ```
 
 
@@ -128,10 +140,10 @@ The general syntax follows for processing this form of the data follows.
 knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
 ```
 
-
-The bar chart follows, with the aggregated data stored in the data frame named _a_, so explicitly identify with the `data` parameter. The computed mean of _Salary_ variable in the _a_ data frame from the previous call to `pivot()` is named *Salary_mn* by default.
+The bar chart follows, with the aggregated data stored in the data frame named _a_, so explicitly identify with the `data` parameter. The computed mean of _Salary_ variable in the _a_ data frame from the previous call to `pivot()` is named *Salary_mn* by default. The output data frame, _a_, contains a row of missing data for the grouping variable, which needs to first be removed before reading the table of means into `BarChart()`, here with the `na.omit()` function.
 
 ```{r xy, fig.width=4, fig.height=3.5, fig.align='center'}
+a <- na.omit(a)
 BarChart(Dept, Salary_mean, data=a)
 ```
 
@@ -166,22 +178,22 @@ BarChart(Dept, add=c("rect", "Employees by\nDepartment"),
 
 An alternative to the bar chart for a single categorical variable is the pie chart.
 
->_Pie Chart_: Relate each level of a categorical variable to the area of a circle (pie) scaled according to the value of an associated numerical variable.
+> _Pie Chart_: Relate each level of a categorical variable to the area of a circle (pie) scaled according to the value of an associated numerical variable.
 
-Here the presented version of a pie chart is the doughnut or ring chart.
+The __lessR__ default version of a pie chart is the doughnut or ring chart.
 
 ```{r, echo=FALSE, include=FALSE}
 d <- Read("Employee")
 ```
 
-```{r pc1, fig.align='center'}
+```{r pc1, fig.align='center', fig.width=3.5, fig.height=3.5}
 PieChart(Dept)
 ```
 
 The doughnut or ring chart appears easier to read than a standard bar chart. But the __lessR__ function `PieChart()` also can create the "old-fashioned" pie chart by setting the value of `hole` to `0`. We have seen the summary statistics several times now, so turn off the output to the R console here with the `quiet` parameter.
 
 
-```{r hole0, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Standard pie chart of variable Dept in the _d_ data frame."}
+```{r hole0, fig.width=3.5, fig.height=3.5, fig.align='center', fig.cap="Standard pie chart of variable Dept in the _d_ data frame."}
 PieChart(Dept, hole=0, quiet=TRUE)
 ```
 
@@ -273,11 +285,25 @@ d <- factors(c(m06,m07,m09,m10), levels=0:5, labels=LikertCats, ordered=TRUE)
 ```
 
 
-Because the factors are defined as ordered in the `factors()` function, the colors are plotted in a sequential scale, from light to dark. Because output to the console has been turned off in general, turn back on just for this analysis because of new data.
+Because the factors are defined as ordered with the `factors()` function, the colors are plotted in a sequential scale, from light to dark. Because output to the console has been turned off in general, turn back on just for this analysis because of new data. 
 
-```{r fig.width=5, fig.height=4, fig.align='center'}
+```{r fig.width=6, fig.height=4.5, fig.align='center'}
 BarChart(m06, by=m07, quiet=FALSE)
 ```
+
+If the categorical variable is not a factor, use a plural `fill` parameter color such as `"blues"`, `"reds"`, or `"emaralds"` to assign a gradient . See the Customize vignette for more details on color palettes. 
+
+
+## Multiple Variable Bar Chart
+
+A single bar chart can be constructed for multiple variables. This visualization is particularly useful when all the variables are measured on the same scale, such as self-report responses to 6-pt Likert items as shown in the previous example of the 20-item Mach 4 scale. By default the individual variables are sorted by their respective means.
+
+```{r mult, fig.width=6, fig.height=5}
+d <- rd("Mach4", quiet=TRUE)
+BarChart(m01:m20)
+```
+
+
 
 ## Interactive Bar Chart
 

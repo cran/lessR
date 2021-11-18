@@ -17,15 +17,15 @@ function(lm.out, TotSS, digits_d=3, show_R=FALSE) {
   }
 
   se <- sm$sigma
-  tx[length(tx)+1] <- paste("Standard deviation of residuals: ", .fmt(se,digits_d),
-    "for", sm$df[2], "degrees of freedom")
+  tx[length(tx)+1] <- paste("Standard deviation of residuals: ",
+                            .fmt_cm(se,digits_d),
+                            "for", sm$df[2], "degrees of freedom")
 
   tcut <- -qt(0.025, df=sm$df[2])
   range <- 2*tcut*se
-  #tx[length(tx)+1] <- "If normal, the approximate 95% range of residuals about each fitted"
-  #tx[length(tx)+1] <- paste("  value is 2*t-cutoff*", .fmt(se,digits_d), 
-    #", with a 95% interval t-cutoff of ", .fmt(tcut,3), sep="")
-  #tx[length(tx)+1] <- paste("95% range of variation: ", .fmt(range,digits_d), sep="")
+  tx[length(tx)+1] <- paste("95% range of residual variation:  ",
+          .fmt_cm(range,digits_d),
+          " = 2 * (", .fmt(tcut,3), " * ", .fmt_cm(se,digits_d), ")", sep="")
 
   # predicted residual sum of squares
   prs.terms <- residuals(lm.out)/(1 - lm.influence(lm.out)$hat)
@@ -38,7 +38,8 @@ function(lm.out, TotSS, digits_d=3, show_R=FALSE) {
     tx[length(tx)+1] <- paste("R-squared: ", .fmt(sm$r.squared,3), 
       "   Adjusted R-squared: ", .fmt(sm$adj.r.squared,3),
       "   PRESS R-squared: ", .fmt(RsqPRESS,3))
-    tx[length(tx)+1] <- paste("\n", "Null hypothesis that all population slope coefficients are 0:\n", 
+    tx[length(tx)+1] <- paste("\n", 
+        "Null hypothesis of all 0 population slope coefficients:\n", 
         "  F-statistic: ", .fmt(sm$fstatistic[1],3),
         "     df: ", sm$fstatistic[2], " and ", sm$fstatistic[3],
         "     p-value:", .fmt(pvl, 3, 7), sep="")

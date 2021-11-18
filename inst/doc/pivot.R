@@ -8,14 +8,8 @@ knitr::include_graphics(system.file("img", "pivot.png", package="lessR"))
 d <- Read("Employee")
 
 ## ---------------------------------------------------------------------------------------------------------------------
-pivot(data=d, compute=mean, variable=Years, by=c(Dept, Gender))
-
-## ---------------------------------------------------------------------------------------------------------------------
-a <- pivot(d, mean, Salary, c(Dept, Gender))
+a <- pivot(data=d, compute=mean, variable=Years, by=c(Dept, Gender))
 a
-
-## ---- fig.width=5-----------------------------------------------------------------------------------------------------
-BarChart(Dept, Salary_mean, by=Gender, data=a)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 #Write("MyPivotTable", data=a, format="Excel")

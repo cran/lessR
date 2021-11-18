@@ -80,6 +80,8 @@ function(x, x.name, new.var, old, new, ivar, n.obs, dname, quiet) {
     } 
   }
 
+  new.x <- type.convert(new.x)  # new values are consistent with their type
+
   return(new.x)
  
 }

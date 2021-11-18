@@ -8,7 +8,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         gap=NULL, scale_y=NULL,
 
         theme=getOption("theme"),
-        fill=getOption("bar_fill_discrete"),
+        fill=NULL,
         color=getOption("bar_color_discrete"),
         trans=getOption("trans_bar_fill"),
         fill_split=NULL,
@@ -74,11 +74,12 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   proportion <- FALSE
 
-  if (theme != getOption("theme")) {  # not the current theme
+  if (theme != getOption("theme")) {  # given theme not the current theme
     sty <- style(theme, reset=FALSE)
     fill <- sty$bar$bar.fill.discrete
     color <- sty$bar$color
     trans <- sty$bar$trans.fill
+    if (is.null(trans)) trans <- 0.1  # kludge, should not be NULL
   }
 
   if (is.null(values)) values <- "eval.later"
@@ -105,6 +106,12 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
   Trellis <- ifelse (!missing(by1), TRUE, FALSE)
   do.plot <- TRUE
+
+  if (!is.null(fill_split)  &&  !fill.miss) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "fill_split assigns its own color based on the theme\n",
+      "  either drop  fill_split  or drop  fill  parameter values\n\n")
+  }
 
   if (Trellis  &&  sort != "0") {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -260,7 +267,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       if (nchar(x.call[1]) > 5) x.call <- trimws(x.call, which="left")
   }  # !missing x
 
-  # x is a single var, not a data frame
+
+  # x is a single var, not a data frame or a var list
   if (!is.null(x.call)) {
 
     # evaluate by
@@ -317,7 +325,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         if (is.function(y.call)) y.call <- eval(substitute(data$y))
       }
 
-    }
+    }  # end !missing(y)
     else
       y.call <- NULL
 
@@ -390,24 +398,54 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       fill <- .getColC(xtb, fill_name=fill.name)
     }  # end .count 
 
-  # add the n= to a getColors call
-  # evaluate getColors at the time of the function call
-  # re-evaluate here by setting fill with the specified value of n
-  if (substr(fill.name, 1, 9) == "getColors") {
-    if (!grepl("output", fill.name, fixed=TRUE)) {  # "output" does not exist
-      lx.u <- length(na.omit(unique(x.call)))  # do not include NA's
-      gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
-      txt <- paste("fill <- getColors(", gc.args, ", n=", lx.u,
-                   ", output=FALSE)", sep="")
-      pp <- parse(text=txt)
-      eval(pp)
+    # add the n= to a getColors call
+    # evaluate getColors at the time of the function call
+    # re-evaluate here by setting fill with the specified value of n
+    if (substr(fill.name, 1, 9) == "getColors") {
+      if (!grepl("output", fill.name, fixed=TRUE)) {  # "output" does not exist
+        lx.u <- length(na.omit(unique(x.call)))  # do not include NA's
+        gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
+        txt <- paste("fill <- getColors(", gc.args, ", n=", lx.u,
+                     ", output=FALSE)", sep="")
+        pp <- parse(text=txt)
+        eval(pp)
+      }
     }
-  }
   }  # end !fill.miss
+
 
   # ------------------------------------------------------------
   # -----------  x, y, and by variables established ------------
   # ------------------------------------------------------------
+
+  n.x <- length(unique(x.call))
+  n.by <- ifelse (!by.miss, length(unique(by.call)), 0)
+  n.levels <- ifelse (by.miss, n.x, n.by)
+
+  is.ord <- ifelse (is.ordered(x.call) || is.ordered(by.call), TRUE, FALSE)
+
+
+  # -------------
+  # assign colors
+  # fill_split done in sub call
+
+  if (fill.miss) {
+    ordYN <- ifelse (is.ord, TRUE, FALSE)
+    fill <- .color_range(.get_fill(theme, ordYN), n.levels)  # do default range
+  }
+  else
+    fill <- .color_range(fill, n.levels)
+
+  if (trans > 0)
+   for (i in 1:length(fill)) fill[i] <- .maketrans(fill[i], (1-trans)*256)
+
+  # by default, no color borders if a range
+  if (identical(color, getOption("bar_color_discrete")))
+    color <- "transparent"
+  # see if apply a pre-defined color range to **color**
+  col.clr <- .color_range(color, n.levels)  # see if range, NULL if not
+  if (!is.null(col.clr)) color <- col.clr
+
 
   # -----------------------
   # process stat parameter
@@ -440,7 +478,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
           sum(is.na(y.call)) > 0)   {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "When reading a summary table, missing data not allowed.\n",
-          "First use the  na.omit()  function on the data frame.\n\n")
+          "First do  d <- na.omit(d)  on the data frame, here named d.\n\n")
       }
     }  # end summary table
 
@@ -549,6 +587,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
 
     }  # end sum, mean, sd, min, median, max
 
+
   is.range.nm <- ifelse (length(.color_range(fill, 5)) > 1, TRUE, FALSE)
   if (!is.range.nm && !by.miss && !fill.miss) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -581,8 +620,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   }  # end x is a single var
 
 
-  # x is a data frame of multiple variables
-  # ---------------------------------------
+  # x is a data frame or var list of multiple variables
+  # ---------------------------------------------------
   else {
     if (!is.null(by) || !is.null(by1)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -645,7 +684,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         else
           fill <- c("browns", "blues")
       }  # end fill.miss
-        
+      fill <-.color_range(fill, uq.ln)  # translate color names to colors       
+
       if (!is.null(pdf_file)) {
         if (!grepl(".pdf", pdf_file))
           pdf_file <- paste(pdf_file, ".pdf", sep="")

@@ -1,0 +1,65 @@
+library(shiny)
+
+ui <- fluidPage(  # Define UI for app that draws the bar chart
+
+  titlePanel("Pie Chart"),  # App title
+
+  sidebarLayout(  # Sidebar layout with input and output definitions
+
+    sidebarPanel(  # Sidebar panel for inputs
+
+    selectInput(inputId = "myFill",
+                label = "fill",
+                choices = list(
+                  "colors",
+                  "reds", "rusts", "yellows",
+                  "olives", "greens", "emeralds", "turquoises",
+                  "aquas", "blues", "purples", "violets",
+                  "magentas", "grays")
+      ),
+
+      selectInput(inputId = "myColor",
+                  label = "color",
+                  choices = list("off", "darkgray", "black", "gold",
+                                 "steelblue", "darkred", "green3")
+      ),
+
+      sliderInput(inputId = "myTrans",
+                  label = "trans",
+                  min=0, max=1, value=0
+      ),
+
+    sliderInput(inputId = "myHole",
+                    label = "hole",
+                    min=0, max=1, value=0.65
+      ),
+
+      selectInput(inputId = "myValues",
+                  label = "values",
+                  choices = list("%", "input", "off")
+      ),
+
+      selectInput(inputId = "myValuesColor",
+                  label = "values_color",
+                  choices = list("white", "gray", "darkgray", "black")
+      ),
+
+
+      selectInput(inputId = "myValuesPosition",
+                  label = "values_position",
+                  choices = list("in", "out")
+      ),
+
+      sliderInput(inputId = "myValuesSize",
+                  label = "values_size",
+                  min=0, max=2, value=0.9, step=0.1
+      )
+
+    ),
+
+    mainPanel(  # Main panel for displaying outputs
+      plotOutput(outputId = "myPlot")  # Output
+    )
+
+  )
+)

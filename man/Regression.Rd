@@ -38,7 +38,9 @@ Regression(my_formula, data=d, rows=NULL,
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL,
          X5_new=NULL, X6_new=NULL,
 
-         kfold=0, seed=NULL, new_scale=c("none", "z", "0to1", "robust"),
+         kfold=0, seed=NULL,
+         new_scale=c("none", "z", "center", "0to1", "robust"),
+         scale_response=FALSE,
 
          quiet=getOption("quiet"),
          graphics=TRUE, pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
@@ -127,9 +129,9 @@ reg_brief(\ldots, brief=TRUE)
        each number of predictors, from the \code{leaps} package. Set to
        \code{FALSE} to turn off. Defaults lists a maximum of the first 50 values.
        Specify an integer to change the maximum.}
-  \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a larger value
-       are flagged in red and labeled in the resulting scatterplot of Residuals and Fitted
-       Values.  Default value is 1.0.}\cr
+  \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a
+       larger value are flagged in red and labeled in the resulting scatterplot
+       of Residuals and Fitted Values. Default value is 1.0.}\cr
 
   \item{scatter_coef}{Display the correlation coefficients in the upper triangle of the
         scatterplot matrix.}
@@ -161,10 +163,14 @@ reg_brief(\ldots, brief=TRUE)
   \item{seed}{Parameter \code{kfold} generates random partitions, folds, of data.
        Set the seed to an integer to recover the same random partitions on
        subsequent runs.}
-  \item{new_scale}{Transform the variables to the specified metric before
-       conducting the analysis, \code{"z"}, \code{"0to1"}, or \code{"robust"}.
-       Applies to \code{kfold} separately to the
-       training and testing folds as well to avoid data leakage.}\cr
+  \item{new_scale}{Transform numeric predictor variables with more than two
+       unique values to the specified metric before
+       conducting the analysis, \code{"z"}, \code{"center"}, \code{"0to1"},
+       or \code{"robust"}. Applies to \code{kfold} separately to the
+       training and testing folds as well to avoid data leakage.}
+  \item{scale_response}{If doing a rescale with \code{new_scale}, by default
+       do not scale the response variable, or set to \code{TRUE} to
+       rescale along with the predictor variables.}\cr
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}
@@ -234,6 +240,11 @@ The data for the default analysis of the prediction intervals is for the values 
 
 RELATIONS AMONG THE VARIABLES\cr
 By default the correlation matrix of all the variables in the model is displayed, and, for multiple regression models, collinearity analysis is provided. Also provided are the first 50 models with the largest R squared adjusted from each possible model from an analysis of all possible subsets of the predictor variables.  This all subsets analysis requires the \code{leaps} function from the \code{leaps} package. These contributed packages are automatically loaded if available.  To turn off the all possible sets option, set \code{subsets=FALSE}.
+
+RECODE PREDICTOR VARIABLES\cr
+The \code{new_scale} parameter provides for recoding the values of the predictor variables according to several different transformations:  \code{"z"}, \code{"center"}, \code{"0to1"}, or \code{"robust"}. The later is a robust version of classic standardization in which the mean is replaced by the median and the standard deviation by the IQR. All numeric predictor variables with more than two values are standardized. 
+
+So any numeric variable with more than two values that is a categorical variable should be first converted to an R factor. If there are some numeric predictor variables that should not be standardized, such as an interaction term with centered variables that define the interaction, then the rescaling should be done separately, such as with base~R function \code{\link{scale}} or lessR  \code{\link{rescale}}. 
 
 
 INVOKED R OPTIONS\cr

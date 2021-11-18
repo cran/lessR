@@ -154,6 +154,38 @@ getColors("rusts", "blues", c=75, output=TRUE)
 ```
 
 
+### Other Scales
+
+The family of color-friendly viridis scales are available: "viridis", "cividis", "magma", "inferno", and "plasma".
+```{r}
+getColors("viridis")
+```
+
+```{r echo=FALSE}
+getColors("viridis", output=TRUE)
+```
+
+For something different, can use palettes based on many of Wes Anderson's movies: "BottleRocket1", "BottleRocket2", "Rushmore1", "Rushmore", "Royal1", "Royal2", "Zissou1", "Darjeeling1", "Darjeeling2", "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2", "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2", "IsleofDogs1", and "IsleofDogs2".
+
+```{r}
+getColors("Royal1")
+```
+
+```{r echo=FALSE}
+getColors("Royal1", output=TRUE)
+```
+
+To maximilly differentiate colors based on hue, use the pre-defined palette "distinct".
+
+```{r}
+getColors("distinct")
+```
+
+```{r echo=FALSE}
+getColors("distinct", output=TRUE)
+```
+
+
 ### Manual Specification of Colors
 
 Consider an item on an attitude survey that is assessed on a 7-point Likert scale with responses that range from Strongly Disagree to Neutral to Strongly Agree. The goal is to create a bar chart with different sequential color palettes for the Disagree and Agree sides of the responses, with gray for the Neutral response. First, simulate some data for the item responses. Of course, these steps are not part of the usual data analysis because you would have your data, the responses to the item of interest.

@@ -21,7 +21,9 @@ function(my_formula, data=d, rows=NULL,
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL, 
          X5_new=NULL, X6_new=NULL,
 
-         kfold=0, seed=NULL, new_scale=c("none", "z", "0to1", "robust"),
+         kfold=0, seed=NULL,
+         new_scale=c("none", "z", "center", "0to1", "robust"),
+         scale_response=FALSE,
 
          quiet=getOption("quiet"),
          graphics=TRUE, pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
@@ -217,7 +219,7 @@ function(my_formula, data=d, rows=NULL,
 
   # check new.data option for consistency  
   new.data <- FALSE
-  if ( n.pred > 0  &&  n.pred <= max_new ) { 
+  if (n.pred > 0  &&  n.pred <= max_new) { 
     for (i in 1:(n.pred)) {
       pp <- eval(parse(text=paste("X", toString(i), "_new", sep="")))
       if (!is.null(pp)) new.data <- TRUE
@@ -241,18 +243,20 @@ function(my_formula, data=d, rows=NULL,
   options(digits_d=digits_d) 
 
 
-  # rescale option (if not K-Fold)
-  stnd.flag <- FALSE
-  minmax.flag <- FALSE
-  robust.flag <- FALSE
+  # rescale option (if not K-Fold, then do in reg.zKfold.R)
+  transf <- NULL  # string to label output in .reg1bckBasic
   if (new_scale != "none") {
-    if (new_scale == "z") stnd.flag <- TRUE
-    if (new_scale == "0to1") minmax.flag <- TRUE
-    if (new_scale == "robust") robust.flag <- TRUE
+    if (new_scale == "z") transf <- "Standardized"
+    if (new_scale == "center") transf <- "Centered"
+    if (new_scale == "0to1") transf <- "Min-Max (0 to 1)"
+    if (new_scale == "robust") transf <- "Robust Version of Standardized"
       if (kfold == 0) {
-        for (i in 1:n.vars)  {
-          data[,nm[i]] <- rescale(data[,nm[i]], data=NULL,
-                                  kind=new_scale, digits_d)
+        i.start <- ifelse (scale_response, 1, 2)
+        for (i in 1:n.vars)  {  # do not rescale y
+          unq.x <- length(unique(data[,nm[i]])) 
+          if (unq.x > 2  &&  is.numeric(data[,nm[i]]))
+            data[,nm[i]] <- rescale(data[,nm[i]], data=NULL,
+                                    kind=new_scale, digits_d)
         }
       cat("\nRescaled Data, First Six Rows\n")
       print(data[1:6, nm])
@@ -291,12 +295,16 @@ function(my_formula, data=d, rows=NULL,
   if (kfold == 0) {
     title_bck <- "  BACKGROUND"
     bck <- .reg1bckBasic(lm.out, df.name, digits_d, show_R, n.obs, n.keep,
-                         stnd.flag)
+                         transf)
     tx1bck <- bck$tx
 
 
     title_basic <- "  BASIC ANALYSIS"
-    est <- .reg1modelBasic(lm.out, digits_d, show_R)
+    my <- mean(data[,nm[1]], na.rm=TRUE)
+    sy <- sd(data[,nm[1]], na.rm=TRUE)
+    min.y <- min(data[,nm[1]], na.rm=TRUE)
+    max.y <- max(data[,nm[1]], na.rm=TRUE)
+    est <- .reg1modelBasic(lm.out, my, sy, min.y, max.y, digits_d, show_R)
     tx1est <- est$tx
     sterrs <- est$sterrs
 
@@ -333,7 +341,6 @@ function(my_formula, data=d, rows=NULL,
       crs <- NA_real_; tol <- NA; vif <- NA
     }
   
-
     title_res <- "  RESIDUALS AND INFLUENCE"
     if (is.null(res_rows)) res_rows <- ifelse (n.keep < 20, n.keep, 20) 
     if (res_rows == "all") res_rows <- n.keep  # turn off resids with res_rows=0
@@ -406,7 +413,7 @@ function(my_formula, data=d, rows=NULL,
   }
 
   if (kfold > 0) {
-    Kfld <- .regKfold(data[,nm], my_formula, kfold, new_scale,
+    Kfld <- .regKfold(data[,nm], my_formula, kfold, new_scale, scale_response,
                       nm, predictors, n.vars,
                       n.keep, seed, digits_d, show_R)
     txkfl <- Kfld$tx

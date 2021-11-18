@@ -19,7 +19,7 @@ rescale(x, data=d, kind="z", digits_d=3)
 }
 
 \details{
-The default rescaling is standardization to z-scores, explicit with \code{kind} set to \code{"z"}. For the min-max normalization to a range from 0 to 1, set \code{kind} to \code{"0to1"}. For the robust equivalent of standardization, set \code{kind} to \code{"robust"}. 
+The default rescaling is standardization to z-scores, explicit with \code{kind} set to \code{"z"}, or just centering about the mean with \code{"center"}. For the min-max normalization to a range from 0 to 1, set \code{kind} to \code{"0to1"}. For the robust equivalent of standardization, set \code{kind} to \code{"robust"}. 
 
 If \code{x} is a vector in the global environment, then set \code{data} to \code{NULL}.
 }

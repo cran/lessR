@@ -102,10 +102,14 @@ function (R=mycor,
          x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
          time_start=NULL, time_by=NULL, time_reverse=FALSE,
          center_line="off", quiet=TRUE, ...)
-   n.dregs <- ceiling(length(ev.diff)/1.35)  # get bottom sequence of ev differences
-   dregs <- numeric(length=n.dregs)
-   for (i in 1:n.dregs) dregs[i] <- ev.diff[length(ev.diff)-(i-1)] 
-   abline(h=mean(dregs), col="gray50", lwd=2)
+
+# does not work, maybe because using .lc.main instead of .plt.main
+#  n.dregs <- 5
+#  l.dregs <- length(ev.diff)
+#  i.start <- l.dregs-n.dregs
+#  dregs <- numeric(length=n.dregs)
+#  for (i in 1:n.dregs) dregs[i] <- ev.diff[i+i.start] 
+#  abline(h=mean(dregs), col="red", lwd=1)
 
   # manage graphics
   # ---------------

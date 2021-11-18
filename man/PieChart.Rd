@@ -15,6 +15,7 @@ PieChart(x, y=NULL, data=d, rows=NULL,
 
          radius=1, hole=0.65, hole_fill=getOption("panel_fill"),
 
+         theme=getOption("theme"),
          fill=NULL, 
          color="lightgray",
          trans=getOption("trans_bar_fill"),
@@ -63,6 +64,7 @@ pc(\ldots)
        the \code{\link{style}} function.} \cr
 
 
+  \item{theme}{Selected color theme, change with \code{\link{style}} function.}
   \item{fill}{Specified color of each slice. Default is the discrete 
         scale with, with fixed
         chroma (50) and luminance (75) for unbiased comparison 

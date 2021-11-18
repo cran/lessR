@@ -176,7 +176,7 @@ function(x, miss, show_n, digits_d,
         fill_hi <- "browns"
       }
       else if (getOption("theme") %in% c("gray", "white")) {
-        fill_low <- "white"
+        fill_low <- "gray90"
         fill_hi <- "black"
       }
     }
@@ -190,7 +190,7 @@ function(x, miss, show_n, digits_d,
 #   if (getOption("theme") %in% c("gray", "white"))
 #     hmcols <- getColors("grays", "grays", l=c(10,100))
 #   else
-      hmcols <- getColors(fill_low, fill_hi, l=c(10,90))
+      hmcols <- getColors(fill_low, fill_hi, l=c(20,80))
 #   hmcols <- colorRampPalette(c(fill_low, fill_hi))(256)
 
     axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
@@ -198,10 +198,11 @@ function(x, miss, show_n, digits_d,
     axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
         getOption("axis_cex"), getOption("axis_y_cex"))
 
+    for (i in 1:nrow(crs)) crs[i,i] <- 0
     heatmap(crs[1:ncol(crs),1:ncol(crs)], Rowv=NA, Colv="Rowv", symm=TRUE,
       col=hmcols, margins=c(bottom, right), main=main,
       cexRow=axis_x_cex, cexCol=axis_y_cex)
-
+    for (i in 1:nrow(crs)) crs[i,i] <- 1.0
 
     if (pdf) {  # terminate pdf graphics
       dev.off()

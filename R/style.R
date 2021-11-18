@@ -621,9 +621,9 @@ function(
       bar_fill_ordered = .maketrans("gray25", .to256("trans_bar_fill"))
       bar_color_discrete = "gray60"
       bar_color_ordered = "gray60"
-      pt_fill = "gray20"
+      pt_fill = "gray30"
       trans_pt_fill = 0.00
-      pt_color = "gray20"
+      pt_color = "gray30"
       violin_fill=.maketrans("gray50", 40)
       violin_color = "gray15" 
       box_fill="gray65"
@@ -758,13 +758,13 @@ function(
       window_fill = "gray10"
       panel_fill = "gray10"
       panel_color = "gray80"
-      trans_bar_fill = 0.55
+      trans_bar_fill = 0.0
       trans_pt_fill = 0.0
-      bar_fill = .maketrans("gray55", .to256("trans_bar_fill"))
+      bar_fill = .maketrans("gray58", .to256("trans_bar_fill"))
       bar_fill_discrete =
-        .maketrans("gray55", .to256("trans_bar_fill"))
+        .maketrans("gray58", .to256("trans_bar_fill"))
       bar_fill_ordered =
-        .maketrans("gray55", .to256("trans_bar_fill"))
+        .maketrans("gray58", .to256("trans_bar_fill"))
       bar_color_discrete = "gray20"
       bar_color_ordered = "gray20"
       pt_fill = .maketrans("gray75", .to256("trans_pt_fill"))

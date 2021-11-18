@@ -1,7 +1,7 @@
 pivot <-
 function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
-         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, out_names=NULL, 
-         sort=NULL, sort_var=NULL,  
+         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, show_group_na=TRUE,
+         out_names=NULL, sort=NULL, sort_var=NULL,  
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
          factors=FALSE, q_num=4, digits_d=3, quiet=getOption("quiet")) {
 
@@ -80,17 +80,17 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     }
     else {
       to_tabu <- TRUE
-      nm.cmpt <- "tabulate"
+      nm.cmpt <- "tabulate"  # retain  tabulate  when table_long
       n.cmp <- 1
     }
   }
 
   # abbreviation dictionary for function names
   fun.vec <- c("sum", "mean", "md", "min", "max", "sd", "var", "IQR", "mad",
-               "", "", "sk", "kt", "tbl")
+               "", "", "sk", "kt", "tbl", "tbl")
   names(fun.vec) <- c("sum", "mean", "median", "min", "max",
                       "sd", "var", "IQR", "mad", "range", "quantile",
-                      "skew", "kurtosis", "table")
+                      "skew", "kurtosis", "table", "tabulate")
   user_def <- logical(length=length(nm.cmpt)) 
   for (i in 1:length(user_def)) {
     if (!(nm.cmpt[i] %in% names(fun.vec))) {
@@ -157,12 +157,13 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     ind.by <- c(ind.r.by, ind.c.by)
 
     # convert by variables to factors
+    exc <- ifelse (show_group_na, "", NA)
     if (n.by > 1) {
-      data[, ind.by] <- lapply(data[, ind.by], factor)
+      data[, ind.by] <- lapply(data[, ind.by], factor, exclude=exc)
       by.vars <- as.list(data[, ind.by])
     }
     else {
-      data[, ind.by] <- factor(data[, ind.by])
+      data[, ind.by] <- factor(data[, ind.by], exclude=exc)
       by.vars <- list(data[, ind.by])
       names(by.vars) <- deparse(substitute(by))
     }
@@ -223,7 +224,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
   # if table over all the data, then a single freq dist
   if (missing(by) && nm.cmpt[1] == "table") {
-    tbl <- table(data[,ind.var.d])
+    exc <- ifelse (show_group_na, "ifany", "no")
+    tbl <- table(data[,ind.var.d], useNA=exc)
     a <- data.frame(tbl)
     names(a)[1] <- nm.var.d[1]
     a$Prop <- round(a$Freq / sum(tbl), digits_d)
@@ -342,15 +344,15 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
 
   # ------------------------------------------
-  # --------------- tabulate -----------------
+  # --------------- tabulate (deprecated) ---- 
 
     if (nm.cmpt[1] == "tabulate") {
       use_na <- ifelse (!na_by_show, "no", "ifany")
       a <- table(data[, ind.by], useNA=use_na)
       if (n.c.by != 0) {
-        if (table_prop == "all") a <- round(prop.table(a), digits_d) 
-        if (table_prop == "row") a <- round(prop.table(a, 1), digits_d) 
-        if (table_prop == "col") a <- round(prop.table(a, 2), digits_d) 
+        if (table_prop == "all") a <- round(proportions(a), digits_d) 
+        if (table_prop == "row") a <- round(proportions(a, 1), digits_d) 
+        if (table_prop == "col") a <- round(proportions(a, 2), digits_d) 
       }
       else
         a <- as.data.frame(a)
@@ -462,7 +464,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   }  # end n.cmp>0
 
 
-  # if there is a table computation
+  # table computation
   if (tflag) {
 
     # get _n and _na variables
@@ -481,8 +483,9 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       else
         by.v <- list(dtmp[,ind.by])
       names(by.v) <- nm.row.by
-      a2=aggregate(dtmp[,ind.var.d], by=by.v, drop=FALSE, FUN=count_n)
-      for (j in 1:nrow(a2)) if (is.na(a2[j,ncol(a2)])) a2[j,ncol(a2)] <- 0
+      a2 <- aggregate(dtmp[,ind.var.d], by=by.v, drop=FALSE, FUN=count_n)
+      for (j in 1:nrow(a2))
+        if (is.na(a2[j,ncol(a2)])) a2[j,ncol(a2)] <- 0
       amd <- merge(amd, a2, by=names(by.vars), sort=FALSE)
       if (out.nm.miss)
         l.nm <-lvl[i]
@@ -502,12 +505,15 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       if (table_prop == "row") tdb <- proportions(tdb,1)
       if (table_prop == "col") tdb <- proportions(tdb,2)
 
+      # if no row or col entries, proportions leaves a NaN, so make 0
+      tdb <- replace(tdb, is.nan(tdb), 0)
+
       if (!quiet) {
         txt <- ifelse (table_prop=="col", "column", table_prop)
         cat("\nProportions computed over", txt, "cells\n\n")
       }
       amd <- cbind(amd[,1:(nca-ll)], tdb)  # replace freqs with props
-    }
+    }  # end table_prop
 
     if (n.cmp == 0)  
       a <- amd
@@ -522,7 +528,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   }  # end tflag
 
 
-  # if there is a quantile computation
+  # quantile computation
   if (qflag) {
     by_i <- 1 / q_num
     aq <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=quantile,
@@ -550,6 +556,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
 
   # ----- post-computation processing -----
+  # ---------------------------------------
 
   # missing by variables data: set n to 0 or remove if specified
   n_.ind <- which(grepl("_n", names(a), fixed=TRUE))
@@ -595,8 +602,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
 
 
-  # --------------------------------------------------
   # --- option to reshape long form a to wide form ---
+  # --------------------------------------------------
 
   if (n.c.by > 0) {
 

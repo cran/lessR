@@ -228,15 +228,21 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
 
     if (paired) x.lab <- "Difference"
 
+    if (!is.null(pdf_file)) {
+      if (!grepl(".pdf", pdf_file))
+        pdf_file <- paste(pdf_file, ".pdf", sep="")
+      .opendev(pdf_file, width, height)
+    }
+
     .OneGraph(Y, bw1, Ynm, digits_d, brief,
          n, m, mu, mdiff, s, smd, mmd, msmd,
          clpct, tvalue, pvalue, ub, lb, x.lab, show_title)
 
-      if (!is.null(pdf_file)) {
-        dev.off()
-        .showfile(pdf_file, paste("density plot of", Ynm))
-      }
+    if (!is.null(pdf_file)) {
+      dev.off()
+      .showfile(pdf_file, paste("density plot of", Ynm))
     }
+  }
 
     return(list(i=plt.i, ttl=plt.title))
   }  # end if graph

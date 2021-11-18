@@ -14,11 +14,12 @@ function(lm.out, cook, cooks_cut,
   max.cook <- max(cook, na.rm=TRUE)
   if (max.cook < cooks_cut) {
     cooks_cut <- floor(max.cook*100)/100
-    txt <- paste("Largest Cook's Distance, ", .fmt(max.cook,2), 
-      ", is highlighted", sep="")
+    sub.lab <- paste("Point with largest Cook's Distance of",
+                     .fmt(max.cook,2), "is labeled")
   }
   else
-    txt <- paste("Points with Cook's Distance >", cooks_cut, "are highlighted")
+    sub.lab <- paste("Points with Cook's Distance >",
+                     cooks_cut, "are labeled")
 
 
   # pdf graphics option
@@ -39,7 +40,18 @@ function(lm.out, cook, cooks_cut,
   fit.ord <- fit[ord]
   res_ord <- res[ord]
 
+  bm <- .9; tm <- .25;  rm <- .25
+  # get left margin to adapt to size of axis numbers
+  ctitle <- ""
+  max.width <- strwidth(as.character(max(pretty(res_ord))), units="inches")
+  margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=ctitle, sub=NULL)
+  lm <- margs$lm
   par(bg=getOption("window_fill"))
+
+  orig.params <- par(no.readonly=TRUE)
+  on.exit(par(orig.params))
+  par(mai=c(bm, lm, tm, rm))
+
 
   plot(fit.ord, res_ord, type="n", axes=FALSE, ann=FALSE)
 
@@ -55,22 +67,21 @@ function(lm.out, cook, cooks_cut,
   .axes(NULL, NULL, axTicks(1), axTicks(2))
 
   main.lab <- NULL
-  sub.lab <- "Largest Cook's Distance Highlighted"
   x.label <- "Fitted Values"
   y.label <- "Residuals"
-  .axlabs(x.label, y.label, main.lab, sub.lab, cex.lab=0.85) 
+  .axlabs(x.label, y.label, main.lab, sub.lab, lab_x_cex=0.9, lab_y_cex=0.9,
+          xlab_adj=1.4)
 
-  col_fill <- getOption("pt_fill")
-  col_color <- getOption("pt_color")
-  points(fit.ord, res_ord, pch=21, col=col_color, bg=col_fill, cex=0.8)
+  fill <- getOption("pt_fill")
+  color <- getOption("pt_color")
+  points(fit.ord, res_ord, pch=21, col=color, bg=fill, cex=0.76)
 
   abline(h=0, lty="dotted", lwd=1.5, col=getOption("bar_fill_ordered"))
   lines(lowess(fit.ord, res_ord, f=.9), col=getOption("pt_color"))
   res_c <- res[which(cook >= cooks_cut)]
   fit.c <- fit[which(cook >= cooks_cut)]
   if (length(fit.c) > 0) {
-    col.out <- getOption("pt_color")
-    points(fit.c, res_c, col=col.out, pch=19)
+    points(fit.c, res_c, col=color, pch=19)
     text(fit.c, res_c, names(fit.c), pos=1, cex=.8)
   }
 

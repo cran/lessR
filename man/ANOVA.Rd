@@ -16,7 +16,7 @@ Output is generated into distinct segments by topic, organized and displayed in 
 \usage{
 ANOVA(my_formula, data=d, rows=NULL,
          brief=getOption("brief"), digits_d=NULL, 
-         Rmd=NULL, jitter_x=0.4, rb_points=FALSE,
+         Rmd=NULL, jitter_x=0.4,
          res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
          graphics=TRUE, pdf=FALSE, width=5, height=5,
          fun_call=NULL, \ldots)
@@ -47,8 +47,6 @@ av_brief(\ldots, brief=TRUE)
         including RStudio.}
   \item{jitter_x}{Amount of horizontal jitter for points in the scatterplot
         of levels and response variable for a one-way ANOVA.}
-  \item{rb_points}{For a randomized block design, add the individual data values
-        to a plot of the fitted value for each cell is obtained.}
   \item{res_rows}{Default is 20, which lists the first 20 rows of data and residuals
        sorted by the specified sort criterion.  To disable residuals, specify a 
        value of 0. To see the residuals output for all observations, specify a 

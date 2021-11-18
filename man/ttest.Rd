@@ -7,7 +7,7 @@
 \title{Generic Method for t-test and Standardized Mean Difference with Enhanced Graphics}
 
 \description{
-Abbreviation: \code{tt}, \code{tt_brief}, \code{tt.brief} [deprecated]
+Abbreviation: \code{tt}, \code{tt_brief}
 
 Provides enhanced output from the standard \code{\link{t.test}} function applied to the analysis of the mean of a single variable, or the independent groups analysis of the mean difference, from either data or summary statistics. Includes the analysis of a dependent-groups analysis from the data. The data can be in the form of a data frame or separate vectors of data, one for each group. This output includes the basic descriptive statistics, analysis of assumptions and the hypothesis test and confidence interval. For two groups the output also includes the analysis for both with and without the assumption of homogeneous variances, the pooled or within-group standard deviation, and the standardized mean difference or Cohen's \emph{d} and its confidence interval.
 

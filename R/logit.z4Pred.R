@@ -25,8 +25,7 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     
     # get output pred table, with label
     if (!new.data) {
-      p.int <- data.frame(predict(lm.out, type="response", se.fit=TRUE),
-                          stringsAsFactors=TRUE)
+      p.int <- data.frame(predict(lm.out, type="response", se.fit=TRUE))
 
       # classify
       label <- integer(length=nrow(p.int))
@@ -53,7 +52,7 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       for (i in 1:(n.pred)) names(Xnew)[i] <- nm[i+1]
 
       p.int <- data.frame(predict(lm.out, type="response",
-                          se.fit=TRUE, newdata=Xnew), stringsAsFactors=TRUE)
+                          se.fit=TRUE, newdata=Xnew))
       label <- integer(length=nrow(p.int))
       for (i in 1:nrow(p.int))
         label[i] <- ifelse (p.int$fit[i] < p.cut, 0, 1)
@@ -132,38 +131,63 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     }
     else {
       y.values <- as.numeric(lm.out$model[,nm[1]])
-      min_y <- min(y.values)
+      min.y <- min(y.values, na.rm=TRUE)
       y.label <- paste(nm[1], " ",
          "(0=", levels(lm.out$model[,nm[1]])[1], ",",
          " 1=", levels(lm.out$model[,nm[1]])[2], ")", sep="")
       for (i in 1:length(y.values))
-        if (y.values[i] == min_y) y.values[i] <- 0 else y.values[i] <- 1
+        if (y.values[i] == min.y) y.values[i] <- 0 else y.values[i] <- 1
     }
+ 
+    # set margins
+    max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
+    
+    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
+    lm <- margs$lm + 0.1
+    tm <- margs$tm
+    rm <- margs$rm
+    bm <- margs$bm
 
     par(bg=getOption("window_fill"))
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+    par(mai=c(bm, lm, tm, rm))
 
     # plot
     plot(x.values,y.values, type="n", axes=FALSE, ann=FALSE,
          ylim=c(-.10,1.10), ...)
     usr <- par("usr")
-    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("panel_fill"),
-         border=getOption("panel_color"))
 
-    col.grid <- getOption("grid_x_color")
-    abline(v=axTicks(1), col=col.grid, lwd=.5)
-    abline(h=axTicks(2), col=col.grid, lwd=.5)
+    # background color
+    fill_bg <- getOption("panel_fill")
+    rect(usr[1], usr[3], usr[2], usr[4], col=fill_bg, border="transparent")
+
+    # grid lines
+    min.x <- min(x.values, na.rm=TRUE)
+    max.x <- max(x.values, na.rm=TRUE)
+    axT1 <- pretty(c(min.x, max.x))
+    axT2 <- seq(0,1,.2)
+    .grid("v", axT1)
+    .grid("h", axT2)
+
+    # box around plot
+    rect(usr[1], usr[3], usr[2], usr[4],
+      col="transparent", border=getOption("panel_color"),
+      lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
 
     .axes(NULL, NULL, axTicks(1), axTicks(2))
 
-    main.lab <- "Logistic Fit and Scatterplot"
+    main.lab <- NULL
     sub.lab <- NULL
     .axlabs(nm[2], y.label, main.lab, sub.lab, 
             cex.lab=getOption("lab_cex"), cex.main=1.0, ...) 
 
-    col_fill <- getOption("pt_fill")
-    col_color <- getOption("pt_color")
-    points(x.values,y.values, pch=21, col=col_color, bg=col_fill, cex=0.8)
-    lines(x.values, p.int$fit, col=col_color, lwd=2)
+    fill <- getOption("pt_fill")
+    trans <- .7
+    fill <- .maketrans(fill, (1-trans)*256)
+    color <- getOption("pt_color")
+    points(x.values,y.values, pch=21, col=color, bg=fill, cex=0.8)
+    lines(x.values, p.int$fit, col=color, lwd=2)
 
     if (!is.null(pdf_file)) {
       dev.off()

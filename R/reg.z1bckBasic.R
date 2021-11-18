@@ -1,6 +1,6 @@
 .reg1bckBasic <-
 function(lm.out, dname="d", digits_d=NULL, show_R=FALSE, n.obs, n.keep,
-         stnd.flag) {
+         transf) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -29,12 +29,11 @@ function(lm.out, dname="d", digits_d=NULL, show_R=FALSE, n.obs, n.keep,
     for (j in 1:length(txbck)) tx[length(tx)+1] <- txbck[j] 
   }
 
-  if (stnd.flag) {
+  if (!is.null(transf)) {
     tx[length(tx)+1] <- ""
-    tx[length(tx)+1] <- "Data are Standardized"
+    tx[length(tx)+1] <- paste("Data are", transf)
   }
   
-
   return(list(tx=tx, n.vars=n.vars, n.obs=n.obs, n.keep=n.keep))
 
 }

@@ -462,7 +462,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
 
         if (!num.cat.x && is.integer(x.call[,1]) &&
-            !date.ts && nu<= n_cat && eq.int) {
+            !date.ts && nu <= n_cat && eq.int) {
           cat("\n")
           cat(">>> ", x.name, " has only only ", nu, " unique ",
               "integer values, but not equally spaced,\n",
@@ -493,7 +493,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       is.nmb <- logical(length=length(x.col))
       for (i in 1:length(x.col)) {  # see if variables are all categorical
         nu <- nrow(unique(na.omit(data.x[,i])))
-
         num.cat <- .is.num.cat(data.x[,i], n_cat)
         is.string <- is.factor(data.x[,i]) || is.character(data.x[,i])
         is.cat[i] <- ifelse (num.cat || is.string, TRUE, FALSE)
@@ -1382,9 +1381,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   else if (spmat && do_plot) {
     bckg <- ifelse(panel_fill=="transparent",
                    getOption("window_fill"), panel_fill)
-
     .plt.mat(data.x, fit=fit, col_fill=pt.fill, col_color=pt.color,
-                     col.bg=bckg, col_trans=pt.trans)
+                     col.bg=bckg, col_trans=pt.trans,
+                     pt.size=pt.size, size.miss=size.miss)
   }
   
 
@@ -1660,13 +1659,23 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
           txprm <- ""
 
+         # if pt.fill or pt.color are vectors, then a warning message otherwise
+         if (length(pt.fill) == 1)
+            pnt.f <- pt.fill
+          else
+            pnt.f <- paste(pt.fill, collapse=" ")
+          if (length(pt.color) == 1)
+            pnt.c <- pt.color
+          else
+            pnt.c <- paste(pt.color, collapse=" ")
+ 
           if (xor(cat.x, cat.y) || xor(num.c.x, num.c.y)) {  # show jitter
             tx <- character(length = 0)
             tx[length(tx)+1] <- "Some Parameter values (can be manually set)"
             tx[length(tx)+1] <- .dash2(55)
-            tx[length(tx)+1] <- paste("fill:", pt.fill,
+            tx[length(tx)+1] <- paste("fill:", pnt.f,
                 "  filled color of the points")
-            tx[length(tx)+1] <- paste("color:", pt.color,
+            tx[length(tx)+1] <- paste("color:", pnt.c,
                 " edge color of the points")
             tx[length(tx)+1] <- paste("size:", .fmt(pt.size,2),
                 " size of plotted points")

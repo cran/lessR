@@ -1,7 +1,7 @@
 ANOVA <-
 function(my_formula, data=d, rows=NULL,
          brief=getOption("brief"), digits_d=NULL, 
-         Rmd=NULL, jitter_x=0.4, rb_points=FALSE,
+         Rmd=NULL, jitter_x=0.4,
          res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
          graphics=TRUE, pdf=FALSE, width=5, height=5,
          fun_call=NULL, ...) {  
@@ -56,10 +56,12 @@ function(my_formula, data=d, rows=NULL,
   }
  
   # if a tibble convert to data frame
-  if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-   if (any(grepl("tbl", class(data), fixed=TRUE))) {
-      data <- data.frame(data, stringsAsFactors=FALSE)
-   }
+  if (!is.null(dfs)) {
+    if (df.name %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data)
+      }
+    }
   }
 
  
@@ -180,7 +182,7 @@ function(my_formula, data=d, rows=NULL,
   if (n.pred == 2) {
     plt2 <- .ANOVAz2(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
         av.out$model[,nm[3]], nm, digits_d, brief, as.character(my_formula)[3],
-        rb_points, graphics, pdf, width, height)
+        graphics, pdf, width, height)
     txbck2 <- plt2$txbck2
     for (i in 1:length(txbck2)) tx[length(txbck)+1] <- txbck2[i]
     title_des <- plt2$title_des
