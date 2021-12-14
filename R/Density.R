@@ -19,6 +19,8 @@ function(x, data=d, rows=NULL,
        fun_call=NULL, ...) {
 
 
+  message("\n>>> Deprecated, instead use:  Histogram(..., density=TRUE)\n")
+
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
@@ -233,7 +235,7 @@ function(x, data=d, rows=NULL,
             fill_hist, color_nrm, color_gen, fill_nrm, fill_gen,
             rotate_x, rotate_y, offset,
             x.pt, xlab, main, sub, y_axis, x.min, x.max,
-            rug, color_rug, size_rug, quiet, ...)
+            rug, color_rug, size_rug, quiet, fncl=fun_call, ...)
 
       txdst <- ""
       txotl <- ""

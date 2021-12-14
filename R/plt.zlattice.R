@@ -117,8 +117,8 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   # if n_col or n_row specified, compute the other
   if (n.panels > 1) {
     if (!is.null(n_row)  ||  !is.null(n_col)) {
-      if (is.null(n_col)) n_col <- (n.panels %/% n_row) + (n.panels %% n_row > 0)
-      if (is.null(n_row)) n_row <- (n.panels %/% n_col) + (n.panels %% n_col > 0)
+      if (is.null(n_col)) n_col <- (n.panels %/% n_row) + (n.panels %% n_row>0)
+      if (is.null(n_row)) n_row <- (n.panels %/% n_col) + (n.panels %% n_col>0)
     }
   }
 
@@ -218,6 +218,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   axs.top <- ifelse (is.null(main), 0, 1)  # old: .5, 1
 
   # get full list of lattice parameters: trellis.par.get()
+
   p <- update(p,
          strip=strp, strip.left=strp.lft, aspect=asp,
          par.strip.text=list(cex=axis_x_cex, col=getOption("strip_text_color")),
@@ -353,8 +354,9 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
             e <- y - f.ln
             sse <- sum(e^2)
             sse.pn <- prettyNum(sse, big.mark = ",", scientific = FALSE)
-            cat("\nSum of Squared Errors, Panel ", panel.number(), ": ",
-                sse.pn, sep="", "\n")
+            if (panel.number() == 1) cat("\n")
+            cat("Sum of Squared Errors about Fit Line, Panel ",
+                panel.number(), ": ", sse.pn, sep="", "\n")
 
             if (fit %in% c("exp", "sqrt", "reciprocal", "null"))
               fit_se[1] <- 0

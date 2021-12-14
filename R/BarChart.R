@@ -237,6 +237,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       ind <- eval(substitute(x), envir=data.vars)  # col num of each var
       if (!missing(rows)) {  # subset rows
         r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+        if (!any(r)) {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "No rows of data with the specified value of\n",
+            "rows = ", deparse(substitute(rows)), "\n\n")
+        }
         r <- r & !is.na(r)  # set missing for a row to FALSE
         data <- data[r,,drop=FALSE]
       }
@@ -422,19 +427,23 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
   n.by <- ifelse (!by.miss, length(unique(by.call)), 0)
   n.levels <- ifelse (by.miss, n.x, n.by)
 
-  is.ord <- ifelse (is.ordered(x.call) || is.ordered(by.call), TRUE, FALSE)
-
-
   # -------------
   # assign colors
   # fill_split done in sub call
 
+  is.ord <- ifelse (is.ordered(x.call) || is.ordered(by.call), TRUE, FALSE)
+
   if (fill.miss) {
-    ordYN <- ifelse (is.ord, TRUE, FALSE)
-    fill <- .color_range(.get_fill(theme, ordYN), n.levels)  # do default range
-  }
+    if (is.ord || !is.null(by.call))
+      fill <- .color_range(.get_fill(theme, is.ord), n.levels)  # default range
+    else {
+      fill <- getOption("bar_fill_discrete")  # to begin, already "hues" colors
+      if (fill[1] == "hues")  # if invoke style(), then colors are "hues"
+        fill <- .color_range("hues", n.levels)  # convert to actual colors
+    }
+  }  # end missing fill
   else
-    fill <- .color_range(fill, n.levels)
+    fill <- .color_range(fill, n.levels)  # get actual colors
 
   if (trans > 0)
    for (i in 1:length(fill)) fill[i] <- .maketrans(fill[i], (1-trans)*256)

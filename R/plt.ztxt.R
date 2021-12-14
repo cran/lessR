@@ -1,12 +1,11 @@
 .plt.txt <- 
 function(x, y, values, object, n_cat,
        cat.x, num.cat.x, cat.y, num.cat.y,
-       xlab, ylab, fit, smooth, box_adj,
+       xlab, ylab, fit, n.by, sse, by.cat, smooth, box_adj,
        run, center_line, show_runs, prop, size, radius, digits_d, 
        fun_call=NULL, txdif=NULL) {
 
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
-
   if (date.ts) center_line <- "off"
 
   # x and y come across here in their natural state, within each data frame
@@ -149,25 +148,46 @@ function(x, y, values, object, n_cat,
 
           fc <- paste("Plot(", x.name, ", ", y.name, sep="")
 
-          if (!grepl("fit", fncl)) {
-            txt <- ", fit=\"lm\", fit_se=c(.90,.99))  # fit line, standard errors"
+          if (!grepl("enhance", fncl)) {
+            txt <- ", enhance=TRUE)  # many options"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
 
-          if (!grepl("out_cut", fncl)) {
-            txt <- ", out_cut=.10)  # label top 10% potential outliers"
+          if (runif(1) > 0.5) {
+            if (!grepl("fill", fncl)) {
+              txt <- ", fill=\"skyblue\")  # interior fill color of points"
+              txsug <- paste(txsug, "\n", fc, txt, sep="")
+            }
+          }
+          else {
+            if (!grepl("color", fncl)) {
+              txt <- ", color=\"red\")  # exterior edge color of points"
+              txsug <- paste(txsug, "\n", fc, txt, sep="")
+            }
+          }
+
+          if (!grepl("fit", fncl)) {
+            txt <- ", fit=\"lm\", fit_se=c(.90,.99))  # fit line, stnd errors"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
+          }
+
+          if (runif(1) > 0.5) {
+            if (!grepl("out_cut", fncl)) {
+              txt <- ", out_cut=.10)  # label top 10% from center as outliers"
+              txsug <- paste(txsug, "\n", fc, txt, sep="")
+            }
+          }
+          else {
+            if (!grepl("MD_cut", fncl)) {
+              txt <- ", MD_cut=6)  # label Mahalanobis dist > 6 as outliers"
+              txsug <- paste(txsug, "\n", fc, txt, sep="")
+            }
           }
 
  #        if (!grepl("ellipse", fncl)) {
  #          txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
  #          txsug <- paste(txsug, "\n", fc, txt, sep="")
  #        }
-
-          if (!grepl("enhance", fncl)) {
-            txt <- ", enhance=TRUE)  # many options"
-            txsug <- paste(txsug, "\n", fc, txt, sep="")
-          }
 
 #         if (!grepl("smooth", fncl)) {
 #           txt <- ", shape=\"diamond\")  # change plot character"
@@ -201,41 +221,100 @@ function(x, y, values, object, n_cat,
         }  # end suggest
 
 
+        # ------------------------------
+        # traditional 2-way scatter plot
+        blank <- ""
+        class(blank) <- "out"  # a blank line when needed
+
+        # output correlation info if no fit line or lm fit only
         if (fit %in% c("off", "lm")) {
+
           for (i in 1:n_col) {
-
-            if (n.xcol > 1) {
-              options(xname = colnames(x)[i])
-              stuff <- .cr.main(x[,i], y[,1], brief=TRUE) 
-            }
-            else {
-              options(yname = colnames(y)[i])
-              stuff <- .cr.main(x[,1], y[,i], brief=TRUE) 
-            }
-
-            txbck <- stuff$txb
-            txdsc <- stuff$txd
-            txinf <- stuff$txi
-
             class(txsug) <- "out"
-            class(txbck) <- "out"
-            class(txdsc) <- "out"
-            class(txinf) <- "out"
 
-            if (nzchar(txsug)  &&  i == 1)
-              output <- list(out_suggest=txsug, out_background=txbck,
-                out_describe=txdsc, out_inference=txinf,
-                r=stuff$r, tvalue=stuff$tvalue, df=stuff$df,
-                pvalue=stuff$pvalue, lb=stuff$lb, ub=stuff$ub)
-            else
-              output <- list(out_background=txbck,
-                out_describe=txdsc, out_inference=txinf,
-                r=stuff$r, tvalue=stuff$tvalue, df=stuff$df,
-                pvalue=stuff$pvalue, lb=stuff$lb, ub=stuff$ub)
+            #  no output correlation if a by variable 
+            if (n.by == 0) {
+              if (n.xcol > 1) {
+                x.nm <- colnames(x)[i]
+                x.nm <- paste("\nVariable:", x.nm, "with",  colnames(y)[1])
+                class(x.nm) <- "out"
+                if (exists("output"))
+                  output <- c(output, list(out_name=x.nm))
+                else
+                  output <- list(out_name=x.nm)
+                options(xname = colnames(x)[i])
+                stuff <- .cr.main(x[,i], y[,1], brief=TRUE) 
+              }
+              else {
+                options(yname = colnames(y)[i])
+                stuff <- .cr.main(x[,1], y[,i], brief=TRUE) 
+              }
 
+              txbck <- stuff$txb
+              txdsc <- stuff$txd
+              txinf <- stuff$txi
+
+              txcor <- c(txbck, txdsc, " ", txinf)
+              class(txcor) <- "out"
+
+              out.piece <- list(out_cor=txcor)  # console display
+#             out.piece <- list(out_cor=txcor,
+#               r=stuff$r, tvalue=stuff$tvalue, df=stuff$df,
+#               pvalue=stuff$pvalue, lb=stuff$lb, ub=stuff$ub)
+              if (exists("output"))
+                output <- c(output, out.piece)
+               else
+                output <- out.piece
+            }  # end n.by is 0 
+
+          }  # end for i through n_col
+        }  # end output cor info
+
+        # output suggestions
+        if (nzchar(txsug)) {
+          if (exists("output")) {
+            output <- c(list(out_suggest=txsug), output)  
+#             if (is.null(sse)) {  # hack to get a blank line if not fit
+#               output <- c(list(out_blank=blank), output)
+#             }
+          }
+          else
+            output <- list(out_suggest=txsug)  
+        }
+
+        # output sse, triggered by a fit line
+        if (!is.null(sse)  &&  n.xcol == 1) {  # SSE not reported for all
+          txt <- character(length=n.by)
+          if (n.by > 0) {
+            for (i in 1:n.by) {
+              by.name <- getOption("byname")
+              txt[i] <- paste(by.name, " ", by.cat[i], ":  ", sep="") 
+              sse.pn <- prettyNum(sse[i], big.mark=",", scientific=FALSE)
+              txt[i] = paste(txt[i], "Sum of Squared Errors about Fit Line= ",
+                             sse.pn, sep="")
+            }  # end for n.by
+            txsee <- txt
+          }  # end n.by > 0
+          else {  # no by vars
+            sse.pn <- prettyNum(sse[1], big.mark=",", scientific=FALSE)
+            txsee <- paste("Sum of Squared Errors about Fit Line = ",
+                     sse.pn, sep="")
+          } 
+          class(txsee) <- "out"
+          if (any(nzchar(txsee))) {
+              if (exists("output"))
+                output <- c(output, list(out_see=txsee))
+              else
+                output <- c(list(out_see=txsee))
+          }
+        }  # end !is.null(sse)
+
+        # do the output if there is something to output
+        if (exists("output")) {
+          if (any(nzchar(output))) {
             class(output) <- "out_all"
             print(output)
-          }  # end for i
+          }
         }
 
       }  # end traditional 2-way scatter plot

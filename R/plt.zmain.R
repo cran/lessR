@@ -994,10 +994,18 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   if (fit.line != "off") {
 
+    # if outliers noted then also do line w/o outliers
     fit.remove <- ifelse (!is.null(out_ind), TRUE, FALSE)
     do.remove <- FALSE
     for (i.rem in 1:(as.numeric(fit.remove)+1)) {
-      if (fit.remove) if (i.rem == 2) do.remove <- TRUE  # 2nd pass
+      if (fit.remove) {
+        fit_se[1] <- 0  # for line w/o outliers, no se band
+        fit_lwd <- 1.5
+        if (i.rem == 2) do.remove <- TRUE  # 2nd pass
+      }
+
+      sse <- double(length=n.clrs)
+      by.cat <- character(length=n.clrs)
       for (i in 1:n.clrs) {
         if (n.clrs == 1) {  # one plot, all the data
           if (!date.ts) {
@@ -1038,7 +1046,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           x.lv <- x.lv[-out_ind]
           y.lv <- y.lv[-out_ind]
           ln.type <- ifelse (ln.type != "dashed", "dashed", "solid")
-          fit_se[1] <- 0  # for line w/o outliers, no se band
         }
 
         ok <- is.finite(x.lv) & is.finite(y.lv)
@@ -1105,14 +1112,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))
           }
 
-          e.lv <- y.lv - f.ln
-          sse <- sum(e.lv^2)
+          # the only stat computed in .plt.main, sse
           if (!quiet) {
-            cat("\n")
-#           cat("intercept:", l.ln$coefficients[1], "\n")
-#           cat("slope:", l.ln$coefficients[2], "\n")
-            sse.pn <- prettyNum(sse, big.mark = ",", scientific = FALSE)
-            cat("Sum of Squared Errors:", sse.pn, "\n")
+            e.lv <- y.lv - f.ln
+            sse[i] <- sum(e.lv^2)
+            if (n.by > 0)
+              by.cat[i] <- levels(by)[i]
           }
 
           if (fit.line %in% c("exp", "sqrt", "reciprocal", "null"))
@@ -1150,6 +1155,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
       }  # ith pattern
     }  # fit.remove
+
+    if (!quiet) cat ("\n")
   }  # fit.line
 
 
@@ -1187,6 +1194,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
   # end annotations
 
+  if (fit.line != "off"  &&  !quiet) 
+    return(list(sse=sse, by.cat=by.cat))
 
 }  # end plt.main
 

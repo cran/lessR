@@ -55,7 +55,7 @@ function(data, my_formula, kfold, new_scale, scale_response, nm,
     fit <- .reg1fitBasic(lm.sol, anv$tot["ss"], digits_d, show_R)
     t_se[i] <- fit$se
     t_Rsq[i] <- fit$Rsq
-    est <- .reg1modelBasic(lm.sol, NULL, NULL, NULL, NULL, digits_d, show_R)
+    est <- .reg1modelBasic(lm.sol, digits_d, show_R)
     coefs = as.matrix(est$estimates)
     
     # testing data analysis

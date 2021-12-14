@@ -48,9 +48,10 @@ function(pal=NULL, end_pal=NULL,
   ln.c <- length(c)
   ln.l <- length(l)
   if (is.null(pal) && is.null(end_pal) && ln.c==1 && ln.l==1) {
-    if (getOption("theme") %in% c("gray", "white")) pal <- "grays"
-      else
-    pal <- "hues"
+    if (getOption("theme") %in% c("gray", "white"))
+      pal <- "grays"
+    else
+      pal <- "hues"
   }
 
   if (!is.null(pal[1]))
@@ -205,7 +206,7 @@ function(pal=NULL, end_pal=NULL,
 
     l.dk <- 36 - (3*n)  # darkest color
     if (l.dk < 14) l.dk <- 14  # any darker and the hue is no longer true
-    l.lt <- 48 + (5*n)  # lightest color
+    l.lt <- 52 + (5*n)  # lightest color
     if (l.lt > 92) l.lt <- 92
     if (l.miss) l <- c(l.lt, l.dk)  # 2 -> 58, 3 -> 63, 6 -> 78, 8 -> 88
     txt.l <- .fmt(l[1],0)
@@ -213,7 +214,7 @@ function(pal=NULL, end_pal=NULL,
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
 
     if (is.null(power)) power <- 1
-    pal <- sequential_hcl(n, h=h, c.=c, l=l, power=power,
+    pal <- colorspace::sequential_hcl(n, h=h, c.=c, l=l, power=power,
                           fixup=fixup, alpha=1)
     ttl <- paste("Sequential Colors for\n", "h=", .fmt(h,0),
                   ", c=", txt.c, ",  l=", txt.l, sep="")

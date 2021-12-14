@@ -175,6 +175,11 @@ function(x=NULL, data=d, rows=NULL,
       names(data.vars) <- names(data)
       if (!missing(rows)) {  # subset rows
         r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+        if (!any(r)) {
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "No rows of data with the specified value of\n",
+            "rows = ", deparse(substitute(rows)), "\n\n")
+        }
         r <- r & !is.na(r)  # set missing for a row to FALSE
         data <- data[r,,drop=FALSE]
       }
@@ -364,7 +369,7 @@ function(x=NULL, data=d, rows=NULL,
               txotl <- .bx.stats(data[,i])$txotl
               if (txotl[1] == "") txotl <- "No (Box plot) outliers"
 
-            if (ncol(data) > 1  &&  !quiet) {  # for var range, print text output
+            if (ncol(data) > 1  &&  !quiet) { # for var range, print text output
               class(txss) <- "out"
               class(txdst) <- "out"
               class(txotl) <- "out"
@@ -378,7 +383,7 @@ function(x=NULL, data=d, rows=NULL,
 
             if (bw.miss) bw <- .band.width(data[,i], ...)  # band width
 
-            clr <- getOption("theme")  # color theme not used except for monochrome
+            clr <- getOption("theme")  # color theme not used except monochrome
 
             if (!missing(color_rug)  ||  !missing(size_rug)) rug <- TRUE
 
@@ -411,18 +416,22 @@ function(x=NULL, data=d, rows=NULL,
                 fill_hist, color_nrm, color_gen, fill_nrm, fill_gen,
                 rotate_x, rotate_y, offset,
                 x.pt, xlab, main, sub, y_axis, x.min, x.max,
-                rug, color_rug, size_rug, quiet, ...)
+                rug, color_rug, size_rug, quiet, fncl=fun_call, ...)
 
           txdst <- ""
           txotl <- ""
+          txsug <- ""
           if (!quiet) {
             txdst <- stuff$tx
 
             txotl <- .bx.stats(data[,i])$txotl
             if (txotl[1] == "") txotl <- "No (Box plot) outliers"
 
+            txsug <- stuff$txsug
+
             class(txdst) <- "out"
             class(txotl) <- "out"
+            class(txsug) <- "out"
           }
           gl <- .getlabels()
           x.name <- gl$xn; x.lbl <- gl$xl;
@@ -469,18 +478,19 @@ function(x=NULL, data=d, rows=NULL,
         txkfl <- .showfile2(Rmd, "R Markdown instructions")
       }
 
+      class(txsug) <- "out"
+      class(txss) <- "out"
+      class(txdst) <- "out"
+      class(txotl) <- "out"
+      class(txkfl) <- "out"
+
       if (histogram) {   
-        class(txsug) <- "out"
-        class(txss) <- "out"
-        class(txdst) <- "out"
-        class(txotl) <- "out"
-        class(txkfl) <- "out"
 
         output <- list(type="Histogram",
           call=fun_call, 
           out_suggest=txsug, out_ss=txss, out_outliers=txotl, out_freq=txdst,
           out_file=txkfl,
-          bin_width=stuff$bin_width, n.bins=stuff$n.bins,
+          bin_width=stuff$bin_width, n_bins=stuff$n.bins,
           breaks=stuff$breaks,
           mids=stuff$mids, counts=stuff$counts, prop=stuff$prop,
           cumulate=stuff$counts_cum, cprop=stuff$prop_cum)
@@ -488,33 +498,32 @@ function(x=NULL, data=d, rows=NULL,
         class(output) <- "out_all"
         if (!quiet) print(output)
 
-        # names and order of components per documentation in BarChart.Rd
+        # names and order of components per documentation in Histogram.Rd
         stuff$out_outliers <- txotl  # after to class out for line breaks
         stuff$out_summary <- txss
         stuff$out_freq <- txdst
-        names(stuff) <- c("out_suggest", "out_freq", "bin_width", "n.bins",
+        names(stuff) <- c("out_suggest", "out_freq", "bin_width", "n_bins",
                 "breaks", "mids", "counts", "prop", "cumulate", "cprop",
-                "out_summary", "out_outliers")
-        stuff <- c(stuff[1], stuff[11], stuff[2], stuff[12], stuff[3], stuff[4],
+                "out_outliers", "out_summary"
+                )
+        stuff <- c(stuff[1], stuff[12], stuff[2], stuff[11], stuff[3], stuff[4],
                    stuff[5], stuff[6], stuff[7], stuff[8], stuff[9], stuff[10])
         invisible(stuff)
-      }
+      }  # end histogram
 
       else {  # density
-          class(txss) <- "out"
-          class(txkfl) <- "out"
 
           output <- list(type="Density",
-            out_title=ttlns,  # out_stats=txdst,
-            out_ss=txss, # out_outliers=txotl,
+            out_suggewt=txsug, out_title=ttlns, out_stats=txdst,
+            out_ss=txss, out_outliers=txotl,
             out_file=txkfl,
-            bw=stuff$bw, n=stuff$n, n.miss=stuff$n.miss, W=stuff$W,
+            bw=stuff$bw, n=stuff$n, n_miss=stuff$n.miss, W=stuff$W,
                pvalue=stuff$pvalue)
 
           class(output) <- "out_all"
 
           return(output)
-      }
+      }  # end density
 
     }  # end ncol(data) == 1
 

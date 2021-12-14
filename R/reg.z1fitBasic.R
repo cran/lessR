@@ -1,5 +1,5 @@
 .reg1fitBasic <-
-function(lm.out, TotSS, digits_d=3, show_R=FALSE) {
+function(lm.out, TotSS, sy, digits_d=3, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -15,6 +15,12 @@ function(lm.out, TotSS, digits_d=3, show_R=FALSE) {
     tx[length(tx)+1] <- "Model Fit"
     tx[length(tx)+1] <- ""
   }
+  
+  if (!is.null(sy)) {  # assigned NULL in reg.zKfold.R)
+    tx[length(tx)+1] <- paste("Standard deviation of ", nm[1], ": ",
+    .fmt_cm(sy,digits_d), sep="")
+    tx[length(tx)+1] <- ""
+  }  
 
   se <- sm$sigma
   tx[length(tx)+1] <- paste("Standard deviation of residuals: ",

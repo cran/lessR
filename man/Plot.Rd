@@ -161,7 +161,7 @@ vp(\ldots)
   \item{n_col}{Optional specification for the number of columns in the
         layout of a multi-panel display with
         Trellis graphics. Specify \code{n_col} or \code{n_row}, but 
-        not both. If set to 1, then
+        not both. If set to 1, the default, then
         the strip that labels each group locates to the left of each plot
         instead of the top.}
   \item{aspect}{Lattice parameter for the aspect ratio of the panels,
@@ -338,10 +338,11 @@ vp(\ldots)
   \item{smooth_bins}{Number of bins in both directions for the density
         estimation.}\cr
 
-  \item{fit}{The \bold{best fit line}.  Default value is \code{"off"}, with
-        options \code{"loess"} for non-linear fit, \code{"lm"} linear 
+  \item{fit}{The \bold{best fit line}. Default value is \code{"off"}, with
+        options \code{"loess"} for non-linear fit, \code{"lm"} linear model 
         least squares, \code{"null"} for the null model, \code{"exp"} for the
-        exponential model,  \code{"root"} for the general root model,
+        exponential model, \code{"root"} for the general root model in conjunction
+        with \code{fit_power},
         \code{"sqrt"} for the specific root value of 0.5, and
         \code{"reciprocal"} for the reciprocal model. If
         potential outliers are identified according to \code{out_cut},

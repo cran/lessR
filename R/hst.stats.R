@@ -13,9 +13,9 @@ function (h, len.x, fun_call) {
         tx[length(tx)+1] <- "bin_start: set the start of the first bin"
       if (!grepl("bin_end", fncl))
         tx[length(tx)+1] <- "bin_end: set the end of the last bin"
-      txt <- "  # smoothed density curves plus histogram"
-      tx[length(tx)+1] <- paste("Density(", getOption("xname"), ")", txt,
-         sep="")      
+      txt <- "  # smoothed curve + histogram"
+      tx[length(tx)+1] <- paste("Histogram(", getOption("xname"),
+         ", density=TRUE)", txt, sep="")      
       txt <- "  # Violin/Box/Scatterplot (VBS) plot"
       tx[length(tx)+1] <- paste("Plot(", getOption("xname"), ")", txt,
          sep="")      
@@ -28,7 +28,7 @@ function (h, len.x, fun_call) {
     
     bin_width <- h$breaks[2]-h$breaks[1]
     n.bins <- length(h$breaks)-1
-    tx[length(tx)+1] <- paste("Bin Width:", bin_width)
+    tx[length(tx)+1] <- paste("\nBin Width:", bin_width)
     tx[length(tx)+1] <- paste("Number of Bins:", n.bins)
     tx[length(tx)+1] <- ""
 

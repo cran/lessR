@@ -296,7 +296,7 @@ READABLE OUTPUT\cr
 
 STATISTICS\cr
 \code{bin_width}: Bin width\cr
-\code{n.bins}: Number of bins\cr
+\code{n_bins}: Number of bins\cr
 \code{breaks}: Breaks of the bins\cr
 \code{mids}: Bin midpoints\cr
 \code{counts}: Bin counts\cr

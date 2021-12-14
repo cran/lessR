@@ -64,10 +64,10 @@ pivot(d, quantile, Years, c(Dept, Gender))
 pivot(d, c(mean,sd,quantile), c(Years,Salary), q_num=5, digits_d=2)
 
 ## ---------------------------------------------------------------------------------------------------------------------
-pivot(d, mean, Salary, Dept, rows=(Gender=="F"))
+pivot(d, mean, Salary, Dept, rows=(Gender=="W"))
 
 ## ---------------------------------------------------------------------------------------------------------------------
-pivot(d[.(Gender=="F"),], mean, Salary, Dept)
+pivot(d[.(Gender=="W"),], mean, Salary, Dept)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 pivot(d, mean, Salary, c(Dept, Gender), sort="-")

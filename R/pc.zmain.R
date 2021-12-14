@@ -53,17 +53,6 @@ function(x, y,
   # ------
   # colors
 
-  # see if a pre-defined color range
-
-# else {
-#   if (!is.ord)
-#     clr <- .color_range(fill, n_cat)  # see if range, otherwise NULL
-#   else {  # ordered factor, default to pre-set range
-#     clr <- .color_range(.get_fill(), n_cat)  # make a range 
-#     if (color == getOption("bar_color_discrete")) color <- "transparent"
-#   }
-# }
-
   if (length(fill) > 1) {
     clr <- fill
     j <- 0
@@ -81,7 +70,7 @@ function(x, y,
           clr <- .color_range(clr, n_cat)
       }
       else  # sequential palette for ordinal based on theme
-        clr <- .color_range(.get_fill(), n_cat) 
+        clr <- .color_range(.get_fill(seq.pal=TRUE), n_cat) 
     }
     else {  # fill specified by user
       if (is.null(.color_range(fill, n_cat)))
@@ -190,12 +179,6 @@ function(x, y,
     }
   }
 
-# if (options("device") != "RStudioGD") {
-#   labels_cex <- labels_cex * 1.3
-#   values_cex <- values_cex * 1.3
-#   main_cex <- main_cex * 1.3
-# }
-
   for (i in 1L:nx) { 
     # plot slice
     n <- max(2, floor(edges * dx[i]))
@@ -230,13 +213,10 @@ function(x, y,
   }  # end slice by slice
 
   # add centered hole over the top of the pie
-  P <- t2xy(seq.int(0, 1, length.out=n*nx), hole)
+  P <- t2xy(seq.int(0, 1, length.out=125), hole)
   polygon(P$x, P$y, col=hole_fill, border=color, lty=lty[1], lwd=lwd)
 
-  title(main=main.lbl, cex.main=main_cex, col.main=getOption("main_color"),
-        line=par("mgp")[1]-.5, ...)
-
-  # legend("bottom", legend=unique(na.omit(x)), horiz=TRUE, cex=0.8, fill=col)
+  title(main=main.lbl, cex.main=main_cex, col.main=getOption("main_color"))
 
 
   # -----------

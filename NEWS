@@ -5,6 +5,68 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 4.1.4 (2021-12-14) <<<<<<
+
+-------------
+Updates 4.1.4
+-------------
+
+ANOVA, BarChart, Histogram, pivot, Plot, Regression, ttest
+  informative error message added if a subset with the rows parameter
+    returns no rows to subset
+
+getColors
+  little more differentiation between default sequential colors by
+    lightening a bit more the lightest color
+
+Histogram
+  output objects n.bins and n.miss updated to n_bins and n_miss
+  density=TRUE output provides more summary statistics and suggestions
+
+Plot
+  when specifying a fit line with a by categorical variable the sum of
+    squared errors for each category are better labeled
+  for a by categorical variable, no longer is the correlational analysis
+    done for all the data, but the SSE is reported for each group
+  pairwise correlation output takes up fewer lines
+  variable labels for y-axis made a little longer and still fit without
+    breaking into an additional line
+  some suggestions now change depending on random "coin flip"
+  Trellis plot default changed from n_col=1 to n_row=1
+
+Regression
+  Standard deviation of response variable added to fit information,
+    other stats removed
+  fit_line width set at 1.5 if plotting w/o outlier line also and no
+    standard error region for original line
+
+to
+  parameter same.size updated to same_size, old value still works
+
+
+---------------
+Bug Fixes 4.1.4
+---------------
+
+BarChart
+  for theme other than "hues", fill colors the same by default unless
+    an ordered factor, then a sequential palette
+
+Correlation
+  pairwise correlation analysis properly returns lower and upper bounds
+    of confidence interval about the sample correlation coefficient
+  pairwise correlation when called from Correlation function works
+
+PieChart
+  default colors with default color theme, "colors", now has 
+    qualitative color palette "hues", the same as bar chart,
+    for a non-ordinal categorical variable
+  inner circle that creates the hole now with higher resolution
+    so as to make a smoother circle
+  better placement of the plot title if there is one
+
+
+
 >>>>>> Changes for lessR version 4.0.8 (2021-11-18) <<<<<<
 
 -------------

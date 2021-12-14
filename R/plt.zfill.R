@@ -13,7 +13,7 @@ function(geom_clr, geom_clr.miss, ord.by.call, n.by1, n.lvl, theme) {
         for (i in 1:n.lvl) geom_clr[i] <- geom_clr[1] 
     }
     else
-      geom_clr <- .color_range(.get_fill(), n.lvl)  # ordinal
+      geom_clr <- .color_range(.get_fill(seq.pal=TRUE), n.lvl)  # ordinal
     geom_clr.miss <- FALSE
   } 
 
@@ -28,6 +28,5 @@ function(geom_clr, geom_clr.miss, ord.by.call, n.by1, n.lvl, theme) {
   }
 
   return(geom_clr)
-
 }
 

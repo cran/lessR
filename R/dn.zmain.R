@@ -6,9 +6,8 @@ function(x,
          rotate_x=0, rotate_y=0, offset=0.5, 
          x.pt=NULL, xlab=NULL, main=NULL, sub=NULL,
          y_axis=FALSE, x.min=NULL, x.max=NULL,
-         band=FALSE, color_rug="gray40", size_rug=0.5, quiet, ...)  {
-
-         #lab_cex=1.0, axis_cex=0.75, col.axis="gray30",
+         band=FALSE, color_rug="gray40", size_rug=0.5, quiet,
+         fncl=NULL, ...)  {
 
   if (!is.null(x.pt)) {
     y_axis <- TRUE
@@ -175,16 +174,31 @@ function(x,
   if (!quiet) {
 
     tx <- character(length = 0)
+    if (getOption("suggest")) {
+  
+      # function call for suggestions
+      fncl <- .fun_call.deparse(fncl) 
+      fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
+      fncl <- gsub(" = ", "=", fncl)
 
-    tx[length(tx)+1] <- paste("Sample Size: ", n)
-    tx[length(tx)+1] <- paste("Missing Values: ", n.miss)
- 
-    tx[length(tx)+1] <- ""
+      tx[length(tx)+1] <- ">>> Suggestions"
+        tx[length(tx)+1] <- "bin_width: set the width of each bin"
+      txt <- "  # histogram only"
+      tx[length(tx)+1] <- paste("Histogram(", getOption("xname"),
+         ")", txt, sep="")      
+      txt <- "  # Violin/Box/Scatterplot (VBS) plot"
+      tx[length(tx)+1] <- paste("Plot(", getOption("xname"), ")", txt,
+         sep="")      
+    }
+    txsug <- tx
+    if (length(txsug) == 0) txsug <- ""
+
+    tx <- character(length = 0)
+
     tx[length(tx)+1] <- paste("Density bandwidth for general curve: ",
       .fmt(d.gen$bw,4), sep="")
     tx[length(tx)+1] <- "For a smoother curve, increase bandwidth with option: bw"
 
-    tx[length(tx)+1] <- ""
     W <- NA; p.val <- NA
     if (type == "normal" || type == "both") {
       digits_d <- 3
@@ -192,6 +206,7 @@ function(x,
         nrm <- shapiro.test(x)
         W <- .fmt(nrm$statistic,min(4,digits_d+1))
         p.val <- .fmt(nrm$p.value,min(4,digits_d+1))
+        tx[length(tx)+1] <- " "
         tx[length(tx)+1] <- paste("Null hypothesis is a normal population")
         tx[length(tx)+1] <- paste(nrm$method, ":  W = ", W, ",  p-value = ",
           p.val, sep="")
@@ -201,7 +216,8 @@ function(x,
                             " normality test.")
     }
 
-  return(list(tx=tx, bw=d.gen$bw, n=n, n.miss=n.miss, W=W, pvalue=p.val))
+  return(list(tx=tx, txsug=txsug, 
+              bw=d.gen$bw, n=n, n.miss=n.miss, W=W, pvalue=p.val))
 
   }
 

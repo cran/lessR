@@ -58,8 +58,6 @@ function(x, y=NULL, data=d, rows=NULL,
     if (color.miss) color <- sty$bar$color
     if (trans.miss) trans <- sty$bar$trans.fill
   }
-  else
-    if (fill.miss) fill <- .get_fill(theme)
 
   if (is.null(values_digits)) {
     if (values == "%") values_digits <- 0
@@ -229,6 +227,14 @@ function(x, y=NULL, data=d, rows=NULL,
     }
   }
 
+  n.levels <- length(unique(x.call))
+  if (fill.miss) {
+    is.ord <- ifelse (is.ordered(x.call), TRUE, FALSE)
+    ordYN <- ifelse (is.ord, TRUE, FALSE)
+    fill <- .color_range(.get_fill(theme, ordYN), n.levels)  # do default range
+  }
+  else
+    fill <- .color_range(fill, n.levels)
 
   # if (!shiny)
   #   dev.set(which=2)  # reset graphics window for standard R functions

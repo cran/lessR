@@ -31,6 +31,7 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
   }
   
   x.name <- deparse(substitute(x))
+  options(xname = x.name)
 
   is.df <- FALSE  # is data frame
 

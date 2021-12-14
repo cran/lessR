@@ -163,7 +163,7 @@ There are many ways to identify the names of the wide-form variables to be gathe
 ```
 c("sup1", "sup2" "sup3", "sup4")
 ```
-In this example use the __lessR__ `to` function to create that vector without needed to individual list each variable.
+In this example use the __lessR__ `to` function to create that vector without needed to individually list each variable.
 
 ```{r}
 to("sup", 4)

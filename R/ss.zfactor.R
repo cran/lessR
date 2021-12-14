@@ -98,11 +98,11 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
       x <- table(by, x, dnn=c(y.name, x.name)) 
   }
 
-  # no title if two vars and no labels
+  # title only if one var and var labels
   txttl <- ""
   dims <- length(dim(x))
   if (dims == 1 || (!is.null(x.lbl) || !is.null(y.lbl))) {  #  one var or labels
-    txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=TRUE)
+    txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=FALSE)
   }
 
 
@@ -286,7 +286,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     tx[length(tx)+1] <- format("", width=13)
     w <- nchar(as.character(sum(x)))
 
-    for (i in 1:length(x))
+    for (i in 1:length(x))  # level names + Total
       tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(x[i]), w=max.ln[i]))
     tx[length(tx)] <- paste(tx[length(tx)], .fmtc("Total", w=w+6))
     col.width <- nchar(tx[length(tx)])
@@ -305,8 +305,9 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     tx[length(tx)] <- paste(tx[length(tx)], .fmtc("1.000", w=w+6))
     txcnt <- tx
 
+    # potential vertical display
     max.clmns <- ifelse (is.null(out_size), getOption("width"), out_size)
-    if (col.width > max.clmns) {  # vertical display
+    if (col.width > max.clmns) {
       mx.nm <- max(nchar(names(x)), nchar("Total"))
       mx.fr <- nchar(sum(x)) + 2
       tx <- character(length=0)

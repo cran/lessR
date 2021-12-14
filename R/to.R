@@ -1,6 +1,9 @@
 to <-
-function(prefix, until, from=1, same.size=TRUE) {
+function(prefix, until, from=1, same_size=TRUE, ...) {
 
+
+  # to("m",20, same_size=FALSE)
+  # paste("m", 1:20, sep="")
 
   if (missing(prefix)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -17,10 +20,18 @@ function(prefix, until, from=1, same.size=TRUE) {
        "The value of  until  must be greater than the value of  from .\n\n")
   }
 
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "same.size") same_size <- dots[[i]] 
+      }
+  }
+
   cstr <- character(length=0)
   for (ichar in (from:until)) {
 
-    inum <- ifelse (same.size, until, ichar)
+    inum <- ifelse (same_size, until, ichar)
     nc <- nchar(as.character(inum))
 
     cc <- as.character(.fmtc(ichar, w=nc))

@@ -144,6 +144,11 @@ function(my_formula, data=d, rows=NULL,
 
   if (!missing(rows)) {  # subset rows
     r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+    if (!any(r)) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "No rows of data with the specified value of\n",
+        "rows = ", deparse(substitute(rows)), "\n\n")
+    }
     r <- r & !is.na(r)  # set missing for a row to FALSE
     data <- data[r,,drop=FALSE]
   }
@@ -300,11 +305,7 @@ function(my_formula, data=d, rows=NULL,
 
 
     title_basic <- "  BASIC ANALYSIS"
-    my <- mean(data[,nm[1]], na.rm=TRUE)
-    sy <- sd(data[,nm[1]], na.rm=TRUE)
-    min.y <- min(data[,nm[1]], na.rm=TRUE)
-    max.y <- max(data[,nm[1]], na.rm=TRUE)
-    est <- .reg1modelBasic(lm.out, my, sy, min.y, max.y, digits_d, show_R)
+    est <- .reg1modelBasic(lm.out, digits_d, show_R)
     tx1est <- est$tx
     sterrs <- est$sterrs
 
@@ -312,7 +313,8 @@ function(my_formula, data=d, rows=NULL,
     tx1anv <- anv$tx 
     MSW <- anv$MSW
 
-    fit <- .reg1fitBasic(lm.out, anv$tot["ss"], digits_d, show_R)
+    sy <- sd(data[,nm[1]], na.rm=TRUE)
+    fit <- .reg1fitBasic(lm.out, anv$tot["ss"], sy, digits_d, show_R)
     tx1fit <- fit$tx
 
     txkfl <- ""

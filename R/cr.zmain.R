@@ -47,7 +47,8 @@ function(x, y, brief, ...) {
     if (!brief) {
       txt <- paste("Correlation Analysis for Variables", x.name, "and", y.name)
       tx[length(tx)+1] <- txt
-      tx[length(tx)+1] <- .dash2(nchar(txt))
+      tx[length(tx)+1] <- " "
+#     tx[length(tx)+1] <- .dash2(nchar(txt))
     }
 
     tx[length(tx)+1] <- paste(">>> ",ct$method, sep="")
@@ -104,7 +105,7 @@ function(x, y, brief, ...) {
 
     if (c.type == "pearson") {
       tx[length(tx)+1] <- paste(clpct," Confidence Interval for Correlation:  ",
-           .fmt(lb), " to ", .fmt(ub), sep="")
+           .fmt(lb,3), " to ", .fmt(ub,3), sep="")
     }
     else {
       df <- NA; lb <- NA; ub <- NA
@@ -116,6 +117,6 @@ function(x, y, brief, ...) {
 
   return(list(txb=txb, txd=txd, txi=txi,
     r=round(ct$estimate,3), tvalue=round(ct$statistic,3),
-    df=df, pvalue=round(ct$p.value,3), lb, ub))
+    df=df, pvalue=round(ct$p.value,3), lb=lb, ub=ub))
 
 }

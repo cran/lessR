@@ -5,7 +5,7 @@ importFrom("openxlsx", read.xlsx, addWorksheet, createStyle, createWorkbook, sav
 importFrom("robustbase", adjboxStats, mc)
 importFrom("colorspace", sequential_hcl, diverge_hcl)
 importFrom("knitr", engine_output, "kable")
-importFrom("viridisLite", viridis, cividis, magma, inferno, plasma)
+ importFrom("viridisLite", viridis, cividis, magma, inferno, plasma)
 #importFrom("triangle", dtriangle, rtriangle)
 #importFrom("sas7bdat", read.sas7bdat)
 #importFrom("png", readPNG)

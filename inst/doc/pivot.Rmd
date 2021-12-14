@@ -282,7 +282,7 @@ If drilling down into the data, `pivot()` indicates the drill-down with a  displ
 In this example, compute the mean of _Salary_ for each level of _Dept_ for just those rows of data with the value of _Gender_ equal to "F".
 
 ```{r}
-pivot(d, mean, Salary, Dept, rows=(Gender=="F"))
+pivot(d, mean, Salary, Dept, rows=(Gender=="W"))
 ```
 
 The parentheses for the `rows` parameter are not necessary, but does enhance readability.
@@ -290,7 +290,7 @@ The parentheses for the `rows` parameter are not necessary, but does enhance rea
 Can also drill down by subsetting the data frame with a logical condition directly in the data parameter in the call to `pivot()`. Here drill down with base R `Extract[ ]` in conjunction with the __lessR__ function `.()` to simplify the syntax (explained in the vignette Subset a Data Frame). The `Extract[ ]` function specifies the rows of the data frame to extract before the comma, and the columns to extract after the comma. Here select only those rows of data with _Gender_ declared as Female. There is no information after the comma, so no columns are specified, which means to retain all columns, the variables in the data frame.
 
 ```{r}
-pivot(d[.(Gender=="F"),], mean, Salary, Dept)
+pivot(d[.(Gender=="W"),], mean, Salary, Dept)
 ```
 
 

@@ -363,6 +363,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     
     if (!missing(rows)) {  # subset rows
       r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+      if (!any(r)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "No rows of data with the specified value of\n",
+          "rows = ", deparse(substitute(rows)), "\n\n")
+      }
       r <- r & !is.na(r)  # set missing for a row to FALSE
       data <- data[r,,drop=FALSE]
     }
@@ -1187,7 +1192,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # analysis
   # ------------------------------------------------
   
-  if (getOption("suggest")) {
+  if (getOption("suggest")) {  # already did this at line 1045
     # function call for suggestions
     fncl <- .fun_call.deparse(fun_call) 
     fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
@@ -1308,7 +1313,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
       # n_col is null for at Plot(x), Plot(x, by=), Plot(x, by1=)
       if (n_col.miss && n_row.miss && !is.null(by1.call))
-        n_col <- 1  # default n_col for Trellis
+        n_row <- 1  # default n_row for Trellis
 
       .plt.lattice(x.call[,1], y.call[,1], by1.call, by2.call, by.call,
                    adj.bx.ht, object, n_row, n_col, aspect,
@@ -1631,7 +1636,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           }
         }
 
-        .plt.main(x.call, y.call, by.call, n_cat,
+        sumsq <- .plt.main(x.call, y.call, by.call, n_cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
           object, stat,
           pt.fill, area_fill, pt.color,
@@ -1654,6 +1659,15 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           scale_x, scale_y, pad_x, pad_y, legend_title, 
           add, x1, x2, y1, y2, add_cex, add_lwd, add_lty,
           add_color, add_fill, add_trans, quiet, ...)
+
+        if (fit.ln != "off") {
+          sse <- sumsq$sse
+          by.cat <- sumsq$by.cat
+        }
+        else {
+          sse <- NULL
+          by.cat <- NULL
+        }
 
         if (outp && !quiet) {  # text output
 
@@ -1702,10 +1716,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           }
 
           class(txprm) <- "out"
-
           .plt.txt(x.call, y.call, stat, object, n_cat,
             cat.x, num.cat.x, cat.y, num.cat.y,
-            xlab, ylab, fit,
+            xlab, ylab, fit, n.by, sse, by.cat,
             smooth, box_adj, run, center_line, show_runs,
             proportion, size, radius, digits_d, fun_call, txdif)
 

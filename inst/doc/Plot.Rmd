@@ -201,7 +201,7 @@ Change the plotted shapes with the `shape` parameter.
 
 A Trellis (facet) plot creates a separate panel for the plot of each level of the categorical variable. Generate Trellis plots with the `by1` parameter. In this example, plot the best-fit linear model for the data in each panel according to the `fit` parameter. By default, the 95% confidence interval for each line is also displayed. 
 
-```{r, fig.width=4.5, fig.height=4}
+```{r, fig.width=7, fig.height=3.5}
 Plot(Years, Salary, by1=Gender, fit="lm")
 ```
 Turn off the confidence interval by setting the parameter `fit_se` to 0 for the value of the confidence level.
@@ -220,16 +220,16 @@ To avoid point overlap, if there is at least one duplicated value of continuous 
 
 Another helpful technique for large data sets is to add some fill transparency with the `trans` parameter, with values such as 0.8 and 0.9. The combination of jitter and transparency allows for plotting many thousands of points. 
 
-An alternative display f the distribution of a continuous variable and a categorical variable is a superimposed violin, box, and scatter plot, a VBS plot. To plot the points in different colors according to the level of the categorical variable, invoke the `by` parameter. Here, plot _Salary_ across the levels of _Dept_ on the same panel. 
+An alternative display f the distribution of a continuous variable and a categorical variable is a superimposed violin, box, and scatter plot, a VBS plot. To plot the points in different colors according to the level of the categorical variable, invoke the `by` parameter. Here, plot _Salary_ across the levels of _Gender_ on the same panel. 
 
-```{r, figwidth=6, fig.height=2.75}
-Plot(Salary, by=Dept)
+```{r, fig.width=5, fig.height=2.75}
+Plot(Salary, by=Gender)
 ```
 
-Or, create a Trellis plot that consists of a VBS plot on a separate panel for each level of the categorical variable. Accomplish the Trellis plot with the `by1` parameter. Here, plot _Salary_ across the levels of _Dept_. Again, specify one, two, or, by default, all three superimposed plots: violin, box, and scatter. In this example, the categorical variable, _Dept_ specifies the _by1_ variable. 
+Or, create a Trellis plot that consists of a VBS plot on a separate panel for each level of the categorical variable. Accomplish the Trellis plot with the `by1` parameter. Here, plot _Salary_ across the levels of _Dept_. Again, specify one, two, or, by default, all three superimposed plots: violin, box, and scatter. In this example, the categorical variable, _Gender_ specifies the _by1_ variable. 
 
-```{r, figwidth=6, fig.height=4}
-Plot(Salary, by1=Dept)
+```{r, fig.width=7, fig.height=2.75}
+Plot(Salary, by1=Gender)
 ```
 
 The default coloring of the boxes for variables other than an ordered factor follows the default qualitative palette, `"hues"`. For an ordered factor, the fill color follows the default sequential palette of the corresponding theme, such as `"blues"`. Customize colors with the `box_fill` parameter.
@@ -239,29 +239,29 @@ Just show the box plots according to the `vbs_plot` parameter, which has a defau
 Or, drop the box plot and only plot the violins and the scatter plots. Without the boxes, the violins take on the default colors. Specify a value of `"vs"` for the `vbs_plot` parameter. If only plotting the violins, then can also use the alias `ViolinPlot()`. Change the fill color of the violins with parameter `violin_fill`.
 
 
-```{r, fig.height=4}
-Plot(Salary, by1=Dept, vbs_plot="vs")
+```{r, fig.width=7, fig.height=2.75}
+Plot(Salary, by1=Gender, vbs_plot="vs")
 ```
 
 The following plot uses the alias `BoxPlot` to generate a Trellis plot of boxplots only across the levels of _Gender_.
 
-```{r, figwidth=6}
+```{r, fig.width=7, fig.height=2.75}
 BoxPlot(Salary, by1=Gender, vbs_mean=TRUE, box_fill="lightgoldenrod")
 ```
 
 Show the different distributions of the continuous variable across the levels of the categorical variable with a scatterplot. Here, show the distribution of _Salary_ for Males and Females across the various departments.
 
-```{r, figwidth=6}
+```{r, fig.width=6}
 Plot(Salary, Dept, by=Gender)
 ```
 
 
 ### One Continuous, Two Categorical
 
-To do a Trellis plot with two categorical variables, invoke the `by2` parameter in addition to the `by1` parameter. By default, the box fill colors are unique for each level of the `by1` variable, and then the colors cycle through all the values of the `by2` variable. 
+To do a Trellis plot with two categorical variables, invoke the `by2` parameter in addition to the `by1` parameter. By default, the box fill colors are unique for each level of the `by1` variable, and then the colors cycle through all the values of the `by2` variable. With so many panels to plot, set them in a single column by setting parameter `n_col` to `1` instead of relying upon the default of `n_row=1`.
 
-```{r, fig.width=6, fig.height=7}
-Plot(Salary, by1=Gender, by2=Dept)
+```{r, fig.width=5, fig.height=7}
+Plot(Salary, by1=Gender, by2=Dept, n_col=1)
 ```
 
 To specify custom colors with the `box_fill` parameter, specify the number of colors according to the number of levels of the `by1` variable. The colors for `by1` then cycle over the `by2` values.
@@ -269,8 +269,8 @@ To specify custom colors with the `box_fill` parameter, specify the number of co
 
 Alternatively, invoke the `by` parameter and the `by1` parameter. The values of the `by` variable plot as separate panels, the Trellis part, and the `by` variable plot for each panel.
 
-```{r, fig.width=6, fig.height=4}
-Plot(Salary, by1=Dept, by=Gender)
+```{r, fig.width=5, fig.height=5}
+Plot(Salary, by1=Dept, by=Gender, n_col=1)
 ```
 
 
@@ -294,7 +294,7 @@ d$Source <- factor(d$Source, levels=0:1, labels=c("Foreign", "Domestic"))
 Plot MPGcity according to Weight. Specify the number of Cylinders and Manual transmission or not as Trellis conditioning variables to form the Trellis plot. Specify the Source of the vehicle, Foreign or Domestic as a grouping variable to plot with separate colors on each panel.
 
 ```{r, fig.height=7, fig.width=6}
-Plot(Weight, MPGcity, by1=Cylinders, by2=Transmission, by=Source)
+Plot(Weight, MPGcity, by1=Cylinders, by2=Transmission, by=Source, n_col=1)
 ```
 
 From the visualization the patterns emerge. As Weight increases city MPG decreases. Domestic cars tend to weigh more. Foreign cars tend to have fewer cylinders, which also leads to better fuel mileage.
@@ -314,7 +314,7 @@ The parameter `radius` scales the size of the bubbles according to the size of t
 In this example, increase the absolute size of the bubbles as well as the relative discrepancy in their sizes. If the bubbles become to large so that the largest bubbles become truncated, increase the spacing of the respective axes with the `pad_x` and/or `pad_y` parameters.
 
 
-```{r, fig.height=4, fig.width=6}
+```{r, fig.height=3.5, fig.width=6}
 Plot(Dept, Gender, radius=.6, power=0.8, pad_x=0.05, pad_y=0.05)
 ```
 
@@ -333,12 +333,12 @@ Plot(Dept)
 
 ## Interactive Plots
 
-An interactive visualization lets the user in real time change parameter values to change characteristics of the visualization. To create an interactive two-variable scatterplot of continuous variables that displays the corresponding parameters, run the function `interact()` with `"ScatterPlot"` specified. 
+An interactive visualization lets the user in real time change parameter values to change characteristics of the visualization. To create an interactive two-variable scatterplot of continuous variables with the employee data that displays the corresponding parameters, run the function `interact()` with `"ScatterPlot"` specified. 
 
 ```
 interact("ScatterPlot")
 ```
-To create an interactive Trellis plot as a combined violion, box, and scatter plot with the five values of Dept that displays the corresponding parameters, run the function `interact()` with `"Trellis"` specified.
+To create an interactive Trellis plot as a combined violin, box, and scatter plot with the five values of Dept from the Employee data set that displays the corresponding parameters, run the function `interact()` with `"Trellis"` specified.
 
 ```
 interact("Trellis")

@@ -32,6 +32,7 @@ function(x, ID=NULL, k.iqr=1.5, box_adj=FALSE, a=-4, b=3, digits_d=2, ...) {
 
   if (length(outliers>0) && length(unique(na.omit(x)>3))) {
 
+    tx[length(tx)+1] <- " "
     tx[length(tx)+1] <- paste("(Box plot) Outliers:", n.out)
 
     ind.lo <- which(x < lo.whisker)  # lower outliers
