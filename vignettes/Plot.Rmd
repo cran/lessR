@@ -201,7 +201,7 @@ Change the plotted shapes with the `shape` parameter.
 
 A Trellis (facet) plot creates a separate panel for the plot of each level of the categorical variable. Generate Trellis plots with the `by1` parameter. In this example, plot the best-fit linear model for the data in each panel according to the `fit` parameter. By default, the 95% confidence interval for each line is also displayed. 
 
-```{r, fig.width=7, fig.height=3.5}
+```{r, fig.width=5, fig.height=3.5}
 Plot(Years, Salary, by1=Gender, fit="lm")
 ```
 Turn off the confidence interval by setting the parameter `fit_se` to 0 for the value of the confidence level.
@@ -228,7 +228,7 @@ Plot(Salary, by=Gender)
 
 Or, create a Trellis plot that consists of a VBS plot on a separate panel for each level of the categorical variable. Accomplish the Trellis plot with the `by1` parameter. Here, plot _Salary_ across the levels of _Dept_. Again, specify one, two, or, by default, all three superimposed plots: violin, box, and scatter. In this example, the categorical variable, _Gender_ specifies the _by1_ variable. 
 
-```{r, fig.width=7, fig.height=2.75}
+```{r, fig.width=5, fig.height=2.75}
 Plot(Salary, by1=Gender)
 ```
 
@@ -239,13 +239,13 @@ Just show the box plots according to the `vbs_plot` parameter, which has a defau
 Or, drop the box plot and only plot the violins and the scatter plots. Without the boxes, the violins take on the default colors. Specify a value of `"vs"` for the `vbs_plot` parameter. If only plotting the violins, then can also use the alias `ViolinPlot()`. Change the fill color of the violins with parameter `violin_fill`.
 
 
-```{r, fig.width=7, fig.height=2.75}
+```{r, fig.width=5, fig.height=2.75}
 Plot(Salary, by1=Gender, vbs_plot="vs")
 ```
 
 The following plot uses the alias `BoxPlot` to generate a Trellis plot of boxplots only across the levels of _Gender_.
 
-```{r, fig.width=7, fig.height=2.75}
+```{r, fig.width=5, fig.height=2.75}
 BoxPlot(Salary, by1=Gender, vbs_mean=TRUE, box_fill="lightgoldenrod")
 ```
 
@@ -302,7 +302,7 @@ From the visualization the patterns emerge. As Weight increases city MPG decreas
 
 ## Categorical Variables
 
-To avoid over-plotting, the plott of two categorical variables results in a bubble plot of their joint frequencies.
+To avoid over-plotting, the plot of two categorical variables results in a bubble plot of their joint frequencies.
 
 ```{r, fig.height=3}
 d <- Read("Employee", quiet=TRUE)

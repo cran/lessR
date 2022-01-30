@@ -216,7 +216,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     }
 
     if (n.ux < 9  &&  n.ux < length(x)) {  # x is discrete 
-      ssstuff <- .ss.factor(x, x.name=x.name, ...)
+      ssstuff <- .ss.factor(x, x.name=x.name, digits_d=digits_d, ...)
       txttl <- ssstuff$title
       txfrq <- ssstuff$counts
       txXV <- ssstuff$chi

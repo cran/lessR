@@ -2,6 +2,7 @@
 function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
          x.name=NULL, ...) {
 
+
   # get variable labels if exist
   # graph.win=FALSE turns off call to par, so blank window in R not produced
   gl <- .getlabels(graph.win=FALSE)

@@ -80,14 +80,14 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
       cat("success:", success, "\n")
       cat("\n")
     }
-    cat("------ Description ------\n\n")
+    cat("------ Describe ------\n\n")
     if (do_data) cat("Number of missing values:", n_NA, "\n")
     cat("Number of successes:", out$statistic, "\n")
     cat("Number of failures:", n_tot - n_succ, "\n")
     cat("Number of trials:", out$parameter, "\n")
     cat("Sample proportion:", .fmt(out$estimate, digits_d), "\n")
     cat("\n")
-    cat("------ Inference ------\n\n")
+    cat("------ Infer ------\n\n")
     cat("Hypothesis test for null of ", p0, ", p-value: ",
         .fmt(out$p.value,digits_d), sep="", "\n")
     cat("95% Confidence interval:", .fmt(out$conf.int[1],digits_d), "to",

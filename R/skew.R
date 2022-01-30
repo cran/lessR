@@ -9,12 +9,10 @@
       m <- mean(x)
       s <- sd(x)
 
-      sk.sum <- 0
-      for (j in 1:n)
-        sk.sum <- sk.sum + (( (x[j]-m) / s)^3) 
+      g1 <- sum(((x-m) / s)^3)
 
       sk.coef <- n / ((n-1)*(n-2))
-      sk <- sk.coef * sk.sum
+      sk <- sk.coef * g1
     }
 
     else

@@ -30,8 +30,10 @@ function(y, nested_model, full_model, method=c("lm", "logit"),
 
   if (method == "logit") {
     is.bin <- TRUE
+    if (is.character(data[,y.name]))
+      data[,y.name] <- factor(data[,y.name])
     if (is.factor(data[,y.name])) { 
-       if (nlevels(data[,y.name]) != 2) is.bin  <- FALSE
+      if (nlevels(data[,y.name]) != 2) is.bin  <- FALSE
     }
     else {
       for (i in 1:nrow(data))

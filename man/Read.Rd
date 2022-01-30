@@ -9,9 +9,9 @@
 \description{
 Abbreviation: \code{rd}, \code{rd_lbl}, code{Read2}
 
-Reads the contents of the specified data file into an R data table, what R calls a data frame.  By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls} or \code{.xlsx} using Alexander Walker's \code{\link{openxlsx}} package.  Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL (except for .Rda files which must be on the local computer system).
+Reads the contents of the specified data file into an R data table, what R calls a data frame.  By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls}, \code{.xlsx} using Alexander Walker's \code{\link{openxlsx}} package, or \code{.ods} using Gerrit-Jan Schutten and Chung-hong Chan plus other contributor's \code{readODS} package. Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL (except for .Rda files which must be on the local computer system).
 
-Any variable labels in a native SPSS of native R file are automatically included in the data file. See the \code{details} section below for more information. Variable labels can also be added and modified individually with the \code{lessR} function \code{\link{label}}, and more comprehensively with the \code{\link{VariableLabels}} function.
+Any variable labels in a native SPSS are automatically included in the data file. See the \code{details} section below for more information. Variable labels can also be added and modified individually with the \code{lessR} function \code{\link{label}}, and more comprehensively with the \code{\link{VariableLabels}} function.
 
 The function provides feedback regarding the data that is read by invoking the \code{lessR} function \code{\link{details}}. The default brief form of this function invoked by default only lists the input files, the variable name table, and any variable labels.
 
@@ -26,7 +26,7 @@ Read(from=NULL, format=NULL, var_labels=FALSE,
          missing="", n_mcut=1,
          miss_show=30, miss_zero=FALSE, miss_matrix=FALSE, 
       
-         max_lines=30, sheet=1,
+         max_lines=30, sheet=1, row_names=NULL,
 
          brief=TRUE, quiet=getOption("quiet"),
 
@@ -45,7 +45,8 @@ Read2(\ldots, sep=";", dec=",")
   \item{format}{Format of the data in the file, not usually specified because set
         by default according to the
         file type of the file to read: \code{.csv}, \code{.tsv} or \code{.txt}
-        read as a text file, \code{.xls} or \code{.xlsx} read as an Excel file, 
+        read as a text file, \code{.xls}, \code{.xlsx} read as an Excel file, or
+        \code{.ods} as an OpenDocument Spreadsheet file.
         \code{.sav} reads as an SPSS file, which also reads the variable labels
         if present, \code{.sas7bdat} reads as a SAS file, and \code{.rda} reads as a
         native R data file. If the data file is not identified by one of these
@@ -82,6 +83,11 @@ Read2(\ldots, sep=";", dec=",")
   \item{sheet}{For Excel files, specifies the work sheet to read. Provide either
        the worksheet number according to its position, or its name enclosed in
        quotes. The default is the first work sheet.}
+  \item{row_names}{\code{FALSE} by default so no row names from the input data.
+       Set to \code{TRUE} to convert the first column of input data to row names.
+       For reading \code{.csv} files, can also set to the integer number of the
+       column to convert to row names. For Excel and ODS files, only acceptable
+       value is 1 for the first column.}
   \item{brief}{If \code{TRUE}, display only variable names table plus any variable
        labels.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change the corresponding

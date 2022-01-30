@@ -1,7 +1,12 @@
 Write <- 
-function(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
+function(data=d, to=NULL, format=c("csv", "R", "Excel", "ODS", "SPSS"),
+         rowNames=NULL,
+
          ExcelTable=FALSE, ExcelColWidth=TRUE,
+
          quiet=getOption("quiet"), ...) {
+
+  message(">>> Note:  data  is now the first parameter,  to  is second\n")
 
   format <- match.arg(format)
 
@@ -19,7 +24,7 @@ function(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
   }
 
   if (is.null(rowNames)) {  # if just consecutive integers, ignore row names
-    if (format %in% c("csv", "Excel")) {
+    if (format %in% c("csv", "Excel", "ODS")) {
       rn <- length(setdiff(row.names(data), as.character(1:nrow(data))))
       rowNames <- ifelse (rn == 0, FALSE, TRUE) 
     } 
@@ -45,6 +50,42 @@ function(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
     }
   }
   
+  else if (format == "SPSS") {
+    if (is.null(to))
+      file.data <- paste(df.name, ".sav", sep="")
+    else {
+      txt <- ifelse (grepl(".sav", to), "", ".sav")
+      file.data <- paste(to, txt, sep="")
+    }
+
+    haven::write_sav(data, file.data)
+
+    txt <- "Wickham and Miller's haven package]"
+    if (!quiet)
+      cat("[with the write_sav() function from", txt, "\n")
+    cat("\n")
+    .showfile(file.data, c(df.name, "data values"))
+    cat("\n")
+  }
+  
+  else if (format == "ODS") {
+    if (is.null(to))
+      file.data <- paste(df.name, ".ods", sep="")
+    else {
+      txt <- ifelse (grepl(".ods", to), "", ".ods")
+      file.data <- paste(to, txt, sep="")
+    }
+
+    readODS::write_ods(data, file.data)
+
+    txt <- "Schutten and Chan's readODS package]"
+    if (!quiet)
+      cat("[with the write_ods() function from", txt, "\n")
+    cat("\n")
+    .showfile(file.data, c(df.name, "data values"))
+    cat("\n")
+  }
+
   else if (format == "Excel") {
     if (is.null(to))
       file.data <- paste(df.name, ".xlsx", sep="")
@@ -54,19 +95,19 @@ function(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
     }
 
     wb <- createWorkbook()
-    addWorksheet(wb, df.name)
+    openxlsx::addWorksheet(wb, df.name)
     if (ExcelColWidth)
-      setColWidths(wb, sheet=1, cols=1:ncol(data), widths="auto") 
+      openxlsx::setColWidths(wb, sheet=1, cols=1:ncol(data), widths="auto") 
     if (ExcelTable)
-      writeDataTable(wb, df.name, x=data, colNames=TRUE,
+      openxlsx::writeDataTable(wb, df.name, x=data, colNames=TRUE,
            xy=c("A",1), rowNames=rowNames, tableStyle="TableStyleLight9")
     else {
-      hsl <- createStyle(fgFill="gray85", border="bottom")
-      writeData(wb, df.name, x=data, colNames=TRUE, xy=c("A",1),
+      hsl <- openxlsx::createStyle(fgFill="gray85", border="bottom")
+      openxlsx::writeData(wb, df.name, x=data, colNames=TRUE, xy=c("A",1),
                 rowNames=rowNames, headerStyle=hsl)
     }
 
-    saveWorkbook(wb, file=file.data, overwrite=TRUE)
+    openxlsx::saveWorkbook(wb, file=file.data, overwrite=TRUE)
     txt <- "Schauberger and  Walker's openxlsx package]"
     if (ExcelTable  &&  !quiet)
       cat("[with the writeDataTable function from", txt, "\n")

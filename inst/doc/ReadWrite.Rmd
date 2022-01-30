@@ -23,7 +23,7 @@ Analyze the data values for at least one variable, such as the annual salaries o
 
 >_Data Table_: Organize data values into a rectangular data table with the data values for each variable in a column, and the name of the variable at the top of the column.
   
-Store the structured data values within a computer file, such as an Excel formatted file or text file. This file can be stored on your computer, an accessible local network, or the world wide web.
+Store the structured data values within a computer file, such as an Excel or OpenDocument Spreadsheet (ODS) formatted file or text file. This file can be stored on your computer, an accessible local network, or the world wide web.
 The data table in the following figure, formatted as an Excel file, contains four variables: _Years_, _Gender_, _Dept_, and _Salary_ plus an ID field called _Name_ for a total of five columns.
 
 
@@ -46,7 +46,7 @@ Two data values in this section of the data table are missing. The number of yea
 
 >_Case_: Each row of the data table, the data for a specific instance of a single person, organization, place, event, or whatever is being studied.
 
-Encode the data table in one of a variety of computer file formats. Common formats include Excel files, indicated by a file type of `.xlsx`, and text files in the form of comma-separated value files (csv). Identify a text file with one of several potential file types, such as `.txt`, or more informatively, `.csv`.
+Encode the data table in one of a variety of computer file formats. Common formats include Excel files (`.xlsx`), OpenDocument Spreadsheet files (`.ods`), and text files the form of comma-separated value files (`.csv`) or tab-delimited text files (`.txt`). 
 
 Analysis of data can only proceed with the data table identified and the relevant variables identified by their name.
 
@@ -145,7 +145,7 @@ Sometimes that distinction gets a little confusing because variables with intege
 
 ## Read Variable Labels
 
-A variable label is a longer description of the the corresponding variable than that of the variable name. The variable label displays in conjunction with the variable name on the text and visualization output to further clarify the interpretability of the output.
+A variable label is a longer description of the corresponding variable than that of the variable name. The variable label displays in conjunction with the variable name on the text and visualization output to further clarify the interpretability of the output.
 
 The variable label file has two columns. The the first column lists the variable names and the second column the corresponding labels. The file can be of type `.csv`, or `.xlsx`, or contained within __lessR__, as with the following example.
 
@@ -158,54 +158,56 @@ l <- Read("Employee_lbl", var_labels=TRUE)
 
 ## Write the Data Table to a File
 
-__lessR__ can write data with function `Write()` in three formats: csv, Excel, and native R format. The R format preserves a binary copy of the data frame as it is stored within R. A recommended procedure is to begin the analysis with data in `.csv` or `.xlsx` format. Then proceed with data cleaning and prepration, including needed transformations and re-coding. When the data is ready for analysis, save the cleaned, prepared data as a native R file of format `.rda`. This format is the most efficient for size and for speed of reading back into R, with all data preparations already completed. Sometimes also write the data in a format such as Excel so that those on the team not using R can also access.
+Relying upon the __have__ package, __lessR__ can write data with function `Write()` in formats: csv, Excel, ODS, and native R and native SPSS formats. The R format preserves a binary copy of the data frame as it is stored within R, as does the SPSS format for native SPSS files. The Excel and ODS formats yield worksheets. The csv format yields a comma separated value text file.
 
-The input data frame name defaults to _d_, consistent with __lessR__ analysis functions, otherwise invoke the `data` parameter to specify the input data frame. With the `Write()` function, specify the name of the file for the output, as well as the type of file with the `format` parameter, with the default of `.csv`.
+A recommended procedure begins the analysis with data in `.csv`, `.xlsx`, or `.ods` format. Then proceed with data cleaning and preparation, including needed transformations and re-coding. When the data is ready for analysis, save the cleaned, prepared data as a native R file of format `.rda`. This format is the most efficient for size and for speed of reading back into R, with all data preparations already completed. Can also write the data in a format such as Excel so that those on the team not using R can also access.
 
-The following R statements that call `Write()` are not run here as the intent is not to create additional files. 
+With the `Write()` function, specify the name of the file for the output, as well as the type of file with the `format` parameter, with the default of `.csv`. The following R statements that call `Write()` are not run here as the intent is not to create additional files. 
 
 Write the current contents of default data frame _d_ to GoodData.csv.
 
 ```
-Write("GoodData")
+Write(d, "GoodData")
 ```
 
 Write the data as a Excel data table in an Excel file.
 
 ```
-o
-Write("GoodData", format="Excel")
+Write(d, "GoodData", format="Excel")
 ```
 
 Can also use the abbreviation for an Excel file, `wrt_x()`.
 
 ```
-wrt_x("GoodData")
+wrt_x(d, "GoodData")
 ```
 
 Write the data as a R data table.
 
 ```
-Write("GoodData", format="R")
+Write(d, "GoodData", format="R")
 ```
 
 Can also use the abbreviation for an R file, `wrt_r()`.
 
 ```
-wrt_r("GoodData")
+wrt_r(d, "GoodData")
 ```
+
+Use `format="ODS"` to specify to write to the OpenDocument Spreadsheet format with file type `.ods`.
+Use `format="SPSS"` to specify to write to the SPSS format with file type `.sav`.
 
 The output of `Write()` indicates the full path name of the written file.
 
 
-## Read SPSS Files
+## Read SPSS (and SAS and Stata) Files
 
-The __haven__ package has an excellent function for reading SPSS files, `read_spss()`. In particular, the SPSS variable labels and value labels are preserved. `Read()` invokes this function to read SPSS files, with the default filetype of `.sav`.
+The __haven__ package has an excellent function for reading SPSS files, `read_spss()`. `Read()` adds to the given functionality by preserving the SPSS variable labels and value labels. `Read()` invokes this function to read SPSS files, with the default file types of `.sav` and `zsav`. The functionality of __haven__ also allows for reading SAS and Stata data files.
 
 
 ### Value labels
 
-Within SPSS, an (usually) integer scored variable can have value labels. An example is Likert scaled data with 1 representing a Strongly Disagree to 5 a Strongly Agree. The corresponding SPSS variable has integer values but displays the more informative value labels such as in bar charts. This type of categorical variable corresponds to a `factor` in the R system. 
+Within SPSS, an integer scored variable can have value labels. An example is Likert scaled data with 1 representing a Strongly Disagree to 5 a Strongly Agree. The corresponding SPSS variable has integer values but displays the more informative value labels such as in bar charts. This type of categorical variable corresponds to a `factor` in the R system. 
 
 The `read_spss()` function preserves the value labels with a special variable type called `haven_labels`. These variables can be converted to an R factor for processing in the R system with the __haven__ function `as_factor()`. `Read()` performs this conversion automatically for each relevant variable.
 

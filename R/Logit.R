@@ -96,7 +96,6 @@ function(my_formula, data=d, rows=NULL,
   } 
   data[fnu.col] <- lapply(data[fnu.col], as.factor) 
 
-      
   pre <- "> "
   line <- "--------------------------------------------------------------------\n"
   
@@ -145,6 +144,28 @@ function(my_formula, data=d, rows=NULL,
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "No new data for prediction if more than", max_new,
           "predictor variables.\n\n")
+  }
+
+  # if a single pred, make sure to have a + slope
+  if (is.bin) {
+#   x.values <- data[,nm[2:n.vars]]
+#   if (!is.factor(data[,nm[1]])) {
+#     y.values <- data[,nm[1]] 
+#     y.label <- nm[1]
+#   }
+#   else if (n.pred==1) {
+
+    if (n.pred==1) {
+      if (is.numeric(data[,nm[2]]) && is.numeric(data[,nm[2]])) {
+        avg <- tapply(data[,nm[2]], data[,nm[1]], mean, na.rm=TRUE)
+        if (avg[1] > avg[2]) {  # switch order 0 and 1 for response
+          lv1 <- levels(data[,nm[1]])[1]
+          lv2 <- levels(data[,nm[1]])[2]
+          data[,nm[1]] <- factor(data[,nm[1]], levels=c(lv2,lv1))
+        }
+  #     y.values <- ifelse (data[,nm[1]]==lv2, 1, 0) 
+      }
+    }
   }
 
   # check new.data option for consistency  
@@ -214,7 +235,7 @@ function(my_formula, data=d, rows=NULL,
   smc <- cbind(sm1, ci)
 
   buf <- 0 
-  for (i in 1:length(n.vars)) {
+  for (i in 1:nrow(smc)) {
     lng.lbl <- nchar(rownames(smc)[i])
     if (lng.lbl > buf) buf <- lng.lbl 
    }
@@ -222,7 +243,7 @@ function(my_formula, data=d, rows=NULL,
   max.num <- integer(length=0)
   for (icol in 1:6) {
     max.num[icol] <- 0 
-    for (i in 1:n.vars) {
+    for (i in 1:nrow(smc)) {
       ln.nm <- nchar(as.character(floor(smc[i,icol]))) + digits_d + 1
       if (ln.nm > max.num[icol]) max.num[icol] <- ln.nm
     }
@@ -257,7 +278,7 @@ function(my_formula, data=d, rows=NULL,
   OR.lbl <- .fmtc("Odds Ratio", max.num+1)
   lb.lbl <- .fmtc("Lower 95%", max.num+3)
   ub.lbl <- .fmtc("Upper 95%", max.num+3)
-  cat(rep(" ",13), OR.lbl, lb.lbl, ub.lbl, sep="", "\n")
+  cat(rep(" ", buf+2), OR.lbl, lb.lbl, ub.lbl, sep="", "\n")
   for (i in 1:(nrow(orci))) {
     rlb <- .fmtc(rownames(orci)[i], buf)
     or.est <- .fmt(orci[i,1], digits_d, max.num)
@@ -281,7 +302,7 @@ function(my_formula, data=d, rows=NULL,
   numeric.all <- TRUE
   for (i in 2:n.vars) {
     if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
-      cat("\n\n\n>>> Note: ", nm[i], "is not a numeric variable.\n")
+      cat("\n>>> Note: ", nm[i], "is not a numeric variable.\n")
       numeric.all <- FALSE
     }
   }
@@ -292,7 +313,7 @@ function(my_formula, data=d, rows=NULL,
     cat("\n")
     if (numeric.all) {
 
-    # need to run reg on a numeric of Y to get usual 
+    # need to run logistic reg on a numeric of Y to get usual 
       if (is.factor(data[,nm[1]]))  {
         Y <- as.numeric(data[,nm[1]])
         m.f <- paste("Y ~", nm[2])

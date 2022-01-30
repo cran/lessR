@@ -11,7 +11,8 @@ ui <- fluidPage(  # Define UI for app that draws the bar chart
     selectInput(inputId = "myFill",
                 label = "fill",
                 choices = list(
-                  "colors", "darkred", "slategray3", "magenta3", "darkseagreen2",
+                  "colors", "darkred", "gray45", "gray75", "slategray3",
+                  "magenta3", "darkseagreen2", "purple",
                   "reds", "rusts", "yellows",
                   "olives", "greens", "emeralds", "turquoises",
                   "aquas", "blues", "purples", "violets",
@@ -34,10 +35,10 @@ ui <- fluidPage(  # Define UI for app that draws the bar chart
                     value = FALSE
       ),
 
-    selectInput(inputId = "mySort",
-                label = "sort",
-                choices = list("0", "+", "-")
-    ),
+      selectInput(inputId = "mySort",
+                  label = "sort",
+                  choices = list("0", "+", "-")
+      ),
 
       selectInput(inputId = "myValues",
                   label = "values",

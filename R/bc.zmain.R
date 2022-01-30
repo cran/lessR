@@ -11,7 +11,7 @@ function(x, y, by, stack100,
          pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
          legend_horiz, legend_size, legend_abbrev, legend_adj,
-         add, x1, x2, y1, y2, out_size, quiet, ...) {
+         add, x1, x2, y1, y2, out_size, digits_d, quiet, ...) {
 
 
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
@@ -900,7 +900,7 @@ function(x, y, by, stack100,
     }
   }
 
-  dd <- .getdigits(x, min_digits=0) - 1
+  dd <- ifelse (is.null(digits_d), 3, digits_d)
   n_dim <- length(dim(x))
   stats <- ""
 
@@ -1004,7 +1004,7 @@ function(x, y, by, stack100,
         txsug <- paste(txsug, "\n", fc, sep="")
       }
 
-      stats <- .ss.factor(x, by=NULL, brief=TRUE, digits_d=NULL,
+      stats <- .ss.factor(x, by=NULL, brief=TRUE, digits_d=dd,
                           x.name, by.name, x.lbl, y.lbl, label_max,
                           x.miss, by.miss, out_size)
 
@@ -1082,7 +1082,7 @@ function(x, y, by, stack100,
     if (is.null(y) && .is.integer(x)) {
 
       # need brief=FALSE for row proportions
-      stats <- .ss.factor(x, by, brief=FALSE, digits_d=NULL,
+      stats <- .ss.factor(x, by, brief=FALSE, digits_d=dd,
                           x.name, by.name, x.lbl, y.lbl, label_max)
       txttl <- stats$txttl
       txfrq <- stats$txfrq
@@ -1114,7 +1114,7 @@ function(x, y, by, stack100,
     }  # end is.null(y)
 
     else {  # y is present
-      stats <- .ss.real(x, y, by, digits_d=3, x.name,
+      stats <- .ss.real(x, y, by, digits_d=dd, x.name,
                         getOption("yname"), by.name, x.lbl, y.lbl, label_max)
       txtbl <- stats$txtbl
       class(txtbl) <- "out"

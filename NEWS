@@ -5,6 +5,108 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 4.1.5 (2022-01-29) <<<<<<
+
+-------------
+Updates 4.1.5
+-------------
+
+BarChart
+  digits_d parameter added for text output to control number
+    of decimal digits for two categorical variable output
+  default gray fill color for the bars lightened slightly
+
+data
+  dataStockPrice updated to Jan 1, 2022
+  dataEmployee_lbl updated
+  dataWeightLoss data file added
+  dataAnova_1way data file added
+  dataAnova_rb data file added
+  dataAnova_2way data file added
+
+factors
+  now processes tidyverse tibble version of a data frame
+
+Help
+  deprecated function removed, replaced by vignettes
+
+interact
+  when prompting for valid names by passing no arguments, no longer
+    displays an error message
+  more colors added to choice of fill colors for interactive displays
+
+Logit
+  for a single predictor variable, if the response Y is non-numeric,
+    then the value set at 1 has the highest mean, for a positive difference
+  for a single predictor variable, logistic curve better labeled 
+
+Nest
+  if response variable is a character variable, automatically converted
+    to a factor to allow to run without an error
+
+Plot
+  for Trellis plots, default changed to a single column (n_col=1)
+
+Read
+  if specified a lessR data file improperly, the list of valid
+    data files is displayed
+  read data files in the Open Document Spreadsheet format, .ods
+  new parameter row_names for consistent interface across the 
+    various file formats, for csv files R row.names still works
+  report of variables with all unique values moved to brief report
+
+Regression
+  if X is a factor with two levels, the regression line plotted in the
+    scatterplot
+  scatterplot can now have customized axis labels size, set by style()
+
+reshape_long
+  new function that is a simple wrapper for Base R reshape() with 
+    sensible parameter names and sensible defaults, and allow
+    for variable ranges of columns to transfer from wide to long
+
+reshape_wide
+  new function that is a simple wrapper for Base R reshape() with 
+      sensible parameter names to convert a long-form data frame to
+      a wide-form
+
+Write
+  parameters -- data and to -- switched to a more natural order with
+    data now the first parameter:  Write(data=, to=, ...)
+  write data frames in the Open Document Spreadsheet format, .ods,
+    with format="ODS"
+  write data frames in the SPSS format, .sav, with format="SPSS"
+
+
+---------------
+Bug Fixes 4.1.5
+---------------
+
+ANOVA
+  Family-wise confidence level now reported in output
+
+BarChart
+  formatting so that columns do not run together for some output
+    with integers represented as integers instead of double
+  specifying one_plot=TRUE and multiple variables now works
+  custom ylab now works when the stat parameter is activated
+
+Histogram
+  for density=TRUE, quiet=TRUE now works
+
+Logit
+  if many variables, such as from created dummy variables, columns
+    of estimated coefficients now align correctly
+
+PieChart
+  test now responds to corresponding style parameter: 
+    lab_cex, main_cex=1.5, and values_size
+
+Plot
+  if a by or by1 variable, misleading warning message sort order deleted
+
+
+
 >>>>>> Changes for lessR version 4.1.4 (2021-12-14) <<<<<<
 
 -------------

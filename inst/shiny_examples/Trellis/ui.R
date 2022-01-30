@@ -11,14 +11,16 @@ ui <- fluidPage(  # Define UI for app that draws a histogram
       selectInput(inputId = "myFill",
                   label = "fill",
                   choices = list(
-                    "black", "red", "darkred", "slategray3", "magenta3",
+                    "black", "off", "red", "darkred", "gray45", "gray75",
+                    "slategray3", "steelblue", "purple", "magenta3",
                     "darkseagreen2", "sienna", "gold")
       ),
 
       selectInput(inputId = "myColor",
                   label = "color",
                   choices = list("off",
-                                 "black", "red", "darkred", "slategray3", "magenta3",
+                                 "black", "red", "darkred", "slategray3",
+                                 "magenta3",
                                  "darkseagreen2", "sienna", "gold")
       ),
 

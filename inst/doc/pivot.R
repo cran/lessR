@@ -106,7 +106,7 @@ pivot(dd, c(mean,median), Years, c(Dept, Gender), na_by_show=TRUE)
 pivot(dd, c(mean,median), Years, c(Dept, Gender), na_by_show=FALSE)
 
 ## ---------------------------------------------------------------------------------------------------------------------
-mnmd = function(x, na.rm=TRUE)  mean(x, na.rm=na.rm) - median(x, na.rm=na.rm)
+mnmd <- function(x, na.rm=TRUE)  mean(x, na.rm=na.rm) - median(x, na.rm=na.rm)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 pivot(d, c(mean, median, mnmd), Years, by=Dept)

@@ -401,10 +401,10 @@ pivot(dd, c(mean,median), Years, c(Dept, Gender), na_by_show=FALSE)
 
 ## Build Your Own Function
 
-Any function that processes a single column of data and returns a single value can be accessed with `pivot()`. In this example, define a function named _mnmd_ that computes the difference between the `mean` and `median` of a distribution of data values, here represented by `x`. For technical reasons, need to include the `NA` remove parameter, `na.rm`, in the function definition. Usually set to the value of `na.rm` to `TRUE` to allow for missing data to be dropped. If missing data are to be dropped in internal function calls, then the base R parameter `na.rm` needs to be set for each component function as well.
+Any function that processes a single column of data and returns a single value can be accessed with `pivot()`. In this example, define a function named _mnmd()_ that computes the difference between the `mean` and `median` of a distribution of data values, here represented by `x`. For technical reasons, need to include the `NA` remove parameter, `na.rm`, in the function definition. Usually set to the value of `na.rm` to `TRUE` to allow for missing data to be dropped. If missing data values are to be dropped in internal function calls, then the base R parameter `na.rm` needs to be set for each component function as well.
 
 ```{r}
-mnmd = function(x, na.rm=TRUE)  mean(x, na.rm=na.rm) - median(x, na.rm=na.rm)
+mnmd <- function(x, na.rm=TRUE)  mean(x, na.rm=na.rm) - median(x, na.rm=na.rm)
 ```
 
 Invoke `pivot()` to compute the mean, the median, and their difference for each group in the aggregation of the variable _Years_.

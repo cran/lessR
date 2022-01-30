@@ -19,7 +19,8 @@ function(x, y=NULL, data=d, rows=NULL,
          values_digits=getOption("values_digits"),
          values_position=getOption("values_position"),
 
-         main=NULL, main_cex=1.2, labels_cex=0.9, cex,
+         main=NULL, main_cex=getOption("main_cex"),
+         labels_cex=getOption("lab_cex"), cex,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 

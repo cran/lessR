@@ -128,7 +128,7 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
   tx <- character(length = 0)
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("Summary Table")
+    tx[length(tx)+1] <- paste("ANOVA Summary Table")
     tx[length(tx)+1] <- ""
   }
 
@@ -219,7 +219,7 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
     HSD <- TukeyHSD(av.out)
     HSD <- TukeyHSD(av.out, which=nm[2])
     tx[length(tx)+1] <- paste("Family-wise Confidence Level:",
-                              attr(HSD, which="conf_level"))
+                              attr(HSD, which="conf.level"))
     txHSD <- .prntbl(HSD[[1]], digits_d)
     for (i in 1:length(txHSD)) tx[length(tx)+1] <- txHSD[i]
 

@@ -13,7 +13,7 @@ Also displays the frequency table for one or two variables, Cramer's V associati
 }
 
 \usage{
-BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
+BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         stat=NULL, n_cat=getOption("n_cat"), one_plot=NULL,
 
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
@@ -85,6 +85,9 @@ bc(\ldots)
        or can contain values to plot on the y-axis instead of counts.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
+  \item{digits_d}{Provides the number of decimal digits,
+        set by default to at least 2 or the largest number of digits in the values
+        of the response variable plus 1.} \cr
   \item{stat}{Statistical transformation of the data. If no \code{y} variable,
        then \code{"count"} or \code{"proportion"}, otherwise 
        \code{"mean"}, \code{"sd"}, etc.}
@@ -294,8 +297,8 @@ bc(\ldots)
         unless the \code{shiny} package is loaded then set to \code{FALSE} so
         that Shiny will run. Needs to be set to \code{FALSE} if using
         the pipe \code{\%\>\%} notation.}
-  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
-       \code{\link{style}} function.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+        with \code{\link{style}} function.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
   \item{pdf_file}{Indicate to direct pdf graphics to the specified name of

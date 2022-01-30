@@ -872,7 +872,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     }
 
     # is.unsorted() flags sorted but in descending order
-    if (is.unsorted(x.call[,1])) {
+    if (is.unsorted(x.call[,1]) && is.null(by.call) && is.null(by1.call)) {
       if (is.null(b.name)) {  # not evaluated for by var
         message(">>> Warning\n",
           "The  Date  variable is not sorted in Increasing Order.\n\n",
@@ -1313,7 +1313,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
       # n_col is null for at Plot(x), Plot(x, by=), Plot(x, by1=)
       if (n_col.miss && n_row.miss && !is.null(by1.call))
-        n_row <- 1  # default n_row for Trellis
+        n_col <- 1  # default n_col for Trellis
 
       .plt.lattice(x.call[,1], y.call[,1], by1.call, by2.call, by.call,
                    adj.bx.ht, object, n_row, n_col, aspect,

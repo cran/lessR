@@ -9,12 +9,15 @@
 \description{
 Abbreviation: \code{wrt}, \code{wrt_r}, \code{wrt_x}
 
-Writes the contents of the specified data frame, such as with the default \code{d}, to the current working directory as either the default \code{csv} data file, an Excel data table, or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels and variable units are automatically included in a native R data file.
+Writes the contents of the specified data frame, such as with the default \code{d}, to the current working directory as either the default \code{csv} data file, an Excel data table, an OpenDocument Spreadsheet file, or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels and variable units are automatically included in a native R data file.
 }
 
 \usage{
-Write(to=NULL, data=d, format=c("csv", "R", "Excel"), rowNames=NULL,
+Write(data=d, to=NULL, format=c("csv", "R", "Excel", "ODS", "SPSS"),
+         rowNames=NULL,
+
          ExcelTable=FALSE, ExcelColWidth=TRUE,
+
          quiet=getOption("quiet"), \ldots)
 
 wrt(\ldots)
@@ -33,10 +36,12 @@ wrt_x(\ldots, format="Excel")
   \item{format}{Format of file to be written with \code{.csv} as the default.}
   \item{rowNames}{Format of file to be written with \code{.csv} as the default.
        Set to \code{TRUE} by default unless writing to Excel or csv file
-       and row names are just the integers from 1 to the number of rows.}
+       and row names are just the integers from 1 to the number of rows.}\cr
+
   \item{ExcelTable}{If \code{TRUE}, write the Excel file as an Excel table.}
-  \item{ExcelColWidth}{On by default but calculation of column widths for
-       large files takes more time, so option to turn off.}
+  \item{ExcelColWidth}{\code{TRUE} by default but calculation of column widths for
+       large files takes more time, so option to turn off.}\cr
+
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
        \code{\link{style}} function.}
   \item{...}{Other parameter values for \code{csv} files consistent with the
@@ -69,20 +74,20 @@ When writing the data frame in native R format, the specified name of the result
 #d <- data.frame(X,Y)
 
 # write the current contents of default data frame d to GoodData.csv
-# Write("GoodData")
+# Write(d, "GoodData")
 # short name
 # write the default data frame d to the R data file d.rda
 #  wrt_r()
 
 # write the data as an Excel data table in an Excel file
-# Write("GoodData", format="Excel")
+# Write(d, "GoodData", format="Excel")
 # with abbreviation
-# wrt_x("GoodData")
+# wrt_x(d, "GoodData")
 
 # access the R data frame warpbreaks
+#   then, write the file warpbreaks.rda
 # data(warpbreaks)
-# write the file warpbreaks.rda
-# wrt_r(data=warpbreaks)
+# wrt_r(warpbreaks)
 
 }
 

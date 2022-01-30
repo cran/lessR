@@ -1,5 +1,5 @@
 BarChart <-
-function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
+function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         stat=NULL, n_cat=getOption("n_cat"), one_plot=NULL,
 
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
@@ -560,14 +560,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
             options(yname = x.name)  # reverse order of x and y for .ss.numeric
             options(xname = y.name)
             stats <- .ss.numeric(y.call, by=x.call,
-                                 digits.d=digits.d, brief=TRUE, y.name=x.name)
+                                 digits_d=digits_d, brief=TRUE, y.name=x.name)
             txout <- stats$tx
             options(xname = x.name)  # reverse back
             options(yname = y.name)
           }
         }
         else  {
-          stats <- .ss.factor(x.call, digits.d=digits.d, x.name=x.name,
+          stats <- .ss.factor(x.call, digits_d=digits_d, x.name=x.name,
                               brief=TRUE)
           txout <- stats$counts
         }
@@ -582,7 +582,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
       # get the summary table according to the stat parameter
       stat_out <- .bc.stat(x.call, y.call, by.call, stat, y.name)
       out <- stat_out$out
-      ylab <- stat_out$ylab
+      if (is.null(ylab)) ylab <- stat_out$ylab
 
       if (is.null(by.call)) {
         x.call <- factor(names(out))
@@ -597,31 +597,31 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
     }  # end sum, mean, sd, min, median, max
 
 
-  is.range.nm <- ifelse (length(.color_range(fill, 5)) > 1, TRUE, FALSE)
-  if (!is.range.nm && !by.miss && !fill.miss) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "For custom fill for a two-variable bar chart,\n",
-      " must specify a color range such as \"blues\" or \"grays\", \n\n")
-  }
+    is.range.nm <- ifelse (length(.color_range(fill, 5)) > 1, TRUE, FALSE)
+    if (!is.range.nm && !by.miss && !fill.miss) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "For custom fill for a two-variable bar chart,\n",
+        " must specify a color range such as \"blues\" or \"grays\", \n\n")
+    }
 
-      bc <- .bc.main(x.call, y.call, by.call, stack100,
-            fill, color, trans, fill_split, theme,
-            horiz, gap, proportion, scale_y,
-            xlab, ylab, main,
-            value_labels, label_max, beside,
-            rotate_x, offset, break_x, sort,
-            values, values_color, values_size, values_digits,
-            values_position, values_cut,
-            xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-            pad_y_min, pad_y_max,
-            legend_title, legend_position, legend_labels,
-            legend_horiz, legend_size, legend_abbrev, legend_adj,
-            add, x1, x2, y1, y2, out_size, quiet, ...)
+    bc <- .bc.main(x.call, y.call, by.call, stack100,
+          fill, color, trans, fill_split, theme,
+          horiz, gap, proportion, scale_y,
+          xlab, ylab, main,
+          value_labels, label_max, beside,
+          rotate_x, offset, break_x, sort,
+          values, values_color, values_size, values_digits,
+          values_position, values_cut,
+          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+          pad_y_min, pad_y_max,
+          legend_title, legend_position, legend_labels,
+          legend_horiz, legend_size, legend_abbrev, legend_adj,
+          add, x1, x2, y1, y2, out_size, digits_d, quiet, ...)
 
-        if (!is.null(pdf_file)) {
-          dev.off()
-          if (!quiet) .showfile(pdf_file, "BarChart")
-        }
+      if (!is.null(pdf_file)) {
+        dev.off()
+        if (!quiet) .showfile(pdf_file, "BarChart")
+      }
         
       return(invisible(bc))
     }  # not Trellis
@@ -643,7 +643,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
         if (values != "off") if (missing(y)) values <- "input"
     }
 
-    if (is.null(one_plot)) {  # see if one_plot
+    if (is.null(one_plot) || one_plot) {  # see if one_plot was specified
       one_plot <- TRUE
 
       mx.ln <- 0  # get variable with the most unique responses
@@ -719,7 +719,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL,
             pad_y_min, pad_y_max,
             legend_title, legend_position, legend_labels,
             legend_horiz, legend_size, legend_abbrev, legend_adj,
-            add, x1, x2, y1, y2, out_size, quiet, ...)
+            add, x1, x2, y1, y2, out_size, digits_d, quiet, ...)
       
       if (!is.null(pdf_file)) {
         dev.off()

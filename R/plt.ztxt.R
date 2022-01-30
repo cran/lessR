@@ -558,7 +558,7 @@ function(x, y, values, object, n_cat,
         else
           y.fac <- y
 
-        stats <- .ss.factor(x.fac, y.fac, brief=FALSE, digits_d=NULL,
+        stats <- .ss.factor(x.fac, y.fac, digits_d=3, brief=FALSE,
                             x.name, y.name, x.lbl, y.lbl)
 
         txttl <- stats$txttl

@@ -522,7 +522,7 @@ function(x=NULL, data=d, rows=NULL,
 
           class(output) <- "out_all"
 
-          return(output)
+          invisible(output)
       }  # end density
 
     }  # end ncol(data) == 1

@@ -36,7 +36,7 @@ function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
         ln.nm <- nchar(colnames(x)[i])
       for (j in 1:nrow(x))
         ln.vl <- nchar(as.character(x[j,i]))
-      max.ln[i] <- max(ln.nm, ln.vl) + 3
+      max.ln[i] <- max(ln.nm, ln.vl) + digits_d + 3
       if (max.ln[i] < 4) max.ln[i] <- 4
     }
 

@@ -11,7 +11,8 @@ ui <- fluidPage(  # Define UI for app that draws the bar chart
     selectInput(inputId = "myFill",
                 label = "fill",
                 choices = list(
-                  "colors",
+                  "colors", "darkred", "gray45", "gray75", "slategray3",
+                  "magenta3", "darkseagreen2",
                   "reds", "rusts", "yellows",
                   "olives", "greens", "emeralds", "turquoises",
                   "aquas", "blues", "purples", "violets",

@@ -20,7 +20,8 @@ efa(\ldots)
 \arguments{
   \item{R}{Correlation matrix.}
   \item{n_factors}{Number of factors.}
-  \item{rotate}{Rotation method, if any. Choices are promax or varimax.}
+  \item{rotate}{Rotation method, if any. Choices are promax (obique) or
+       varimax (orthogonal.}
   \item{min_loading}{Minimum loading to include in suggested factor for
         confirmatory analysis and for the display of the loadings for the
         exploratory analysis. To ignore, set to 0.}

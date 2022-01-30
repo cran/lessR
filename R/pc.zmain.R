@@ -192,7 +192,6 @@ function(x, y,
     if (labels_cex > 0)
       if (!is.na(lab) && nzchar(lab)) {
         lines(c(1, 1.05)*P$x, c(1, 1.05)*P$y)  # tick marks
-
       if (values != "off") if (values_position == "out")  # results to labels
         labels[i] <- paste(labels[i], "\n", x.txt[i], sep="")
       if (labels_cex > 0)

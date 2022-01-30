@@ -127,23 +127,22 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     x.values <- lm.out$model[,nm[2]]
     if (!is.factor(lm.out$model[,nm[1]])) {
       y.values <- lm.out$model[,nm[1]] 
-      y.label <- nm[1]
+      y.label <- paste("Probability of", nm[1])
     }
     else {
       y.values <- as.numeric(lm.out$model[,nm[1]])
       min.y <- min(y.values, na.rm=TRUE)
-      y.label <- paste(nm[1], " ",
-         "(0=", levels(lm.out$model[,nm[1]])[1], ",",
-         " 1=", levels(lm.out$model[,nm[1]])[2], ")", sep="")
+      y.label <- paste("Probability ", nm[1], " = ",
+        levels(lm.out$model[,nm[1]])[2], sep="")
       for (i in 1:length(y.values))
-        if (y.values[i] == min.y) y.values[i] <- 0 else y.values[i] <- 1
+        y.values[i] <- ifelse (y.values[i]==min.y, 0, 1) 
     }
  
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
     
     margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
-    lm <- margs$lm + 0.1
+    lm <- margs$lm + 0.2
     tm <- margs$tm
     rm <- margs$rm
     bm <- margs$bm

@@ -3,7 +3,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
          x.lbl=NULL, y.lbl=NULL, label_max=20,
          x.miss=NULL, by.miss=NULL, out_size=NULL, ...)  {
 
-# print a cross-tabs
+
 .prnfreq <- function(x, type, max.ln, max.c1, n.dash, ttl, msg=FALSE) {
   tx <- character(length = 0)
 
@@ -16,12 +16,14 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
   if (!is.null(x.name))
     tx[length(tx)+1] <-  .fmtc(x.name, w=max.c1+3)
   tx[length(tx)+1] <- format(y.name, width=max.c1, justify="left")
-  w <- nchar(as.character(sum(x)))
-  for (i in 1:ncol(x))
-    tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i], w=max.ln[i]),
-      sep="")
 
-  if (max(nchar(tx)) < getOption("width")) {  # horizontal layout
+  buf1 <- ifelse (type == "r", digits_d-3, 0)  # adjust for decimal digits
+  for (i in 1:ncol(x))
+    tx[length(tx)] <- paste(tx[length(tx)], .fmtc(colnames(x)[i],
+       w=max.ln[i]+buf1), sep="")
+
+  # horizontal layout
+  if (max(nchar(tx)) < getOption("width")) {
 
     # values
     for (i in 1:nrow(x)) {
@@ -30,7 +32,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
       for (j in 1:ncol(x)) {
         if (type=="r") {
           tx[length(tx)] <- paste(tx[length(tx)],
-             .fmt(x[i,j], d=3, w=max.ln[j]), sep="")
+             .fmt(x[i,j], d=digits_d, w=max.ln[j]+buf1), sep="")
         }
         else if (type=="i")
           tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j], w=max.ln[j]),
@@ -39,7 +41,8 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     }
   }
 
-  else {  # vertical layout
+  # vertical layout
+  else {
 
     tx <- ""
 
@@ -69,7 +72,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
                # .fmt(x[j,i], d=digits_d, w=max.ln-3))
           if (type=="r") {
             tx[length(tx)] <- paste(tx[length(tx)],
-               .fmt(x[j,i], d=3, w=mx.c3), sep="")
+               .fmt(x[j,i], d=digits_d, w=mx.c3), sep="")
           }
           else if (type=="i")
             tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[j,i], w=mx.c3),
@@ -77,7 +80,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
           }  # end j
         }  # end i
       }  # write
-    }
+    }  # end vertical layout
 
 
   return(tx)
@@ -188,7 +191,10 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
 
     # cell proportions and marginals
     xx <- round(addmargins(prop.table(x)),3)
-    txprp <- .prnfreq(xx, "r", max.ln, max.c1, n.dash=30,
+    mx.ln <- max(max.ln)
+    buf <- digits_d - 3  # 3 decimal digits already accounted for
+    if (buf < max.c1) buf <- mx.ln - 4
+    txprp <- .prnfreq(xx, "r", max.ln+buf, max.c1, n.dash=30,
                       ttl="Cell Proportions and Marginals")
 
     # cell proportions within each column
@@ -198,10 +204,13 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
       Sum[i] <- sum(x.col[,i])
       if (is.nan(Sum[i])) nan.flag <- TRUE
     }
-    x.col2 <- round(rbind(x.col,Sum),3)
+    x.col2 <- round(rbind(x.col,Sum),digits_d)
     names(dimnames(x.col2)) <- names(dimnames(x.col))
 
-    txcol <- .prnfreq(x.col2, "r", max.ln, max.c1, n.dash=35,
+    buf <- digits_d - 3  # 3 decimal digits already accounted for
+    mx.ln <- max(max.ln)
+    if (buf < max.c1) buf <- mx.ln - 4
+    txcol <- .prnfreq(x.col2, "r", max.ln+buf, max.c1, n.dash=35,
                       ttl="Cell Proportions within Each Column")
 
     # cell proportions within each row

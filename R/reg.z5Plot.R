@@ -11,6 +11,8 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
   n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
   n.keep <- nrow(lm.out$model)
+  b0 <- lm.out$coefficients[1]
+  b1 <- lm.out$coefficients[2]
   if (is.null(pred_rows))
     pred_rows <- ifelse (n.keep < 25, n.keep, 4)
   if (pred_rows == "all") pred_rows <- n.keep  # no preds with pred_rows=0
@@ -43,11 +45,20 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     if (n.pred > 0)
       if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
 
+    # non-numeric, non-factor concert to factor
+    if (!is.numeric(x.values))
+      if (!is.factor(x.values)) x.values <- as.factor(x.values)
+ 
+    # title
     if (!do.predint || !is.numeric(x.values)) {
       ctitle <- "Scatterplot"
       if (is.numeric(x.values)) {
         if (n.pred == 0)
           ctitle <- paste(ctitle, "and Null Model")
+        else
+          ctitle <- paste(ctitle, "and Least-Squares Line")
+      }
+      else if (is.factor(x.values) && n.pred==1 && nlevels(x.values)==2) {
         ctitle <- paste(ctitle, "and Least-Squares Line")
       }
       y.min <- min(lm.out$model[,nm[1]])
@@ -98,9 +109,6 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     on.exit(par(orig.params))
     par(mai=c(bm, lm, tm, rm))
 
-    if (!is.numeric(x.values))
-      if (!is.factor(x.values)) x.values <- as.factor(x.values)
-
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
 
     usr <- par("usr")
@@ -122,8 +130,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       
     .axes(x.lvl, NULL, axT1, axTicks(2))
 
-    .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL,
-            lab_x_cex=0.9, lab_y_cex=0.9) 
+    .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL)
 
     fill <- getOption("pt_fill")
     color <- getOption("pt_color")
@@ -176,18 +183,30 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
 
     }  # end bubble plot
 
+
+    # Plot Line
+    # ---------
     if (n.pred == 0) {
       m <- lm.out$coefficients[1]  # mean of Y
       mv <- rep(m, n.obs)
       names(mv) <- NULL
       lines(x.values, mv, lwd=0.75)
     }
-    else {  # plot reg line
-      if (!is.factor(x.values)) {
-        abline(lm.out$coefficients[1], lm.out$coefficients[2],
-               col=getOption("segment_color"), lwd=1)
-      }
+    else if (!is.factor(x.values)) {
+        abline(b0, b1, col=getOption("segment_color"), lwd=1)
     }
+    else if (is.factor(x.values) && n.pred==1 && nlevels(x.values)==2) {
+      y0 <- b0 + (b1*0)
+      y1 <- b0 + (b1*1)
+      abline(v=1, col="gray60", lwd=.5) 
+      abline(v=2, col="gray60", lwd=.5) 
+      abline(h=y0, col="gray60", lwd=.5) 
+      abline(h=y1, col="gray60", lwd=.5) 
+      segments(y0=y0, y1=y1, x0=1, x1=2, col="black", lwd=1) 
+    }
+
+    # Plot Errors
+    # -----------
     if (plot_errors)  {
       theme <- getOption("theme")
       red <- rgb(130,40,35, maxColorValue=255) 
@@ -196,6 +215,8 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
                x0=x.values, x1=x.values, col=pe.clr, lwd=1) 
     }
 
+    # Plot Intervals
+    # --------------
     if (!is.factor(x.values) && do.predint) {
       col.ci <- getOption("segment_color")
       col.pi <- "gray30"

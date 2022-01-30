@@ -125,7 +125,7 @@ function(
   if (nargs() == 0) {
      theme <- "colors"
      miss_theme <- FALSE    
-     cat("theme set to \"colors\"\n\n")
+     if (!quiet) cat("theme set to \"colors\"\n\n")
   }
   else {
     miss_theme <- ifelse (missing(theme), TRUE, FALSE)
@@ -617,8 +617,8 @@ function(
       window_fill = "white"
       panel_fill = "white"
       bar_fill = .maketrans("gray25", .to256("trans_bar_fill"))
-      bar_fill_discrete = .maketrans("gray25",.to256("trans_bar_fill"))
-      bar_fill_ordered = .maketrans("gray25", .to256("trans_bar_fill"))
+      bar_fill_discrete = .maketrans("gray35",.to256("trans_bar_fill"))
+      bar_fill_ordered = .maketrans("gray35", .to256("trans_bar_fill"))
       bar_color_discrete = "gray60"
       bar_color_ordered = "gray60"
       pt_fill = "gray30"

@@ -172,6 +172,12 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   }  # end cont
 
   p <- update(p, layout=c(n_col, n_row))
+  if (xor(is.null(n_col), is.null(n_row))) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "If you specify  n_col  or  n_row  then \n",
+      "  specify parameter  by1  not parameter  by.\n\n")
+  }
+
 
   # scale down the point size, grid line width for the multi-panel dot plots
   n.pnl <- length(levels(by1))

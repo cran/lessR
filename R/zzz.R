@@ -1,4 +1,4 @@
-# need d as global because data=d in function def does not 
+# need d as global because data=d in function def does not
 #  have a value assigned to d, d <- mydata does do that, even if conditional
 #  generates a Note
 if (getRversion() >= "3.5.0")
@@ -9,7 +9,7 @@ if (getRversion() >= "3.5.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.1.3  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
+      "lessR 4.1.5  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
       "---------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -19,8 +19,9 @@ function(...) {
       "customization, and descriptive statistics from pivot tables.\n",
       "  Enter:  browseVignettes(\"lessR\")\n\n",
       "View changes in this new version of lessR.\n",
-      "  Enter: help(package=lessR)  Click: Package NEWS\n", 
-      "  Enter: interact()  for access to interactive graphics\n") 
+      "  Enter: help(package=lessR)  Click: Package NEWS\n",
+      "  Enter: interact()  for access to interactive graphics\n",
+      "  New function: reshape_long() to move data from wide to long\n")
 
 
   # imports shiny loads the package, but prefer not have loaded until
@@ -353,10 +354,10 @@ function(...) {
   }
 
   # let deprecated mydata work as default
-  dfs <- .getdfs() 
+  dfs <- .getdfs()
   mydata.ok <- FALSE
   if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
-    d <- mydata 
+    d <- mydata
     mydata.ok <- TRUE
   }
   if (!mydata.ok) if (!in.global && from.data) .nodf(dname)
@@ -367,7 +368,7 @@ function(...) {
 
 # get list of data frames in global environment
 # include both R data frames and tidyverse tibbles
-.getdfs <- function() { 
+.getdfs <- function() {
 
   objs <- function(x) class(get(x))
 
@@ -379,7 +380,7 @@ function(...) {
       if (any(class(get(inGlb[i])) == "data.frame")) {
         k <- k + 1
         dfs[k] <- inGlb[i]
-      } 
+      }
     }
 
 #   mylbl <- which(dfs == "l")
@@ -503,7 +504,7 @@ function(...) {
         if (!is.function(eval(parse(text=var.nm[i])))) in.global[i] <- TRUE
       }
     }
-    
+
     if (length(.getdfs()) > 0) {  # if not data frame, no point to message
       if (in.global[i] && !quiet)
          cat(">>> Note:", var.nm[i], "is not in a data frame (table)\n")
@@ -512,17 +513,17 @@ function(...) {
           cat(">>> Note:", var.nm[i], "is NOT in the workspace\n")
     }
   }  # end for
-  
+
   if (any(in.global) && !all(in.global)) {  # eval $ in .xcheck
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Some variables are in a data frame,\n",
       "  and other variables are not. All must exist and\n",
       "  be in a data frame or not.\n\n")
   }
-  
+
   in.global <- ifelse (all(in.global), TRUE, FALSE)
-  
-  return(in.global)    
+
+  return(in.global)
 }
 
 
@@ -802,7 +803,7 @@ function(...) {
     axis_x <- fig.width - marg.x
     marg.y <- par("mai")[1] + par("mai")[3]
     axis_y <- fig.ht - marg.y
-    cut.x <- 0.90 * axis_x
+    cut.x <- 0.94 * axis_x
     cut.y <- 1.10 * axis_y  # multiplier empirically derived
   }
   else {  # do not open a graphics window if no plot
@@ -831,7 +832,7 @@ function(...) {
   y.lbl <- NULL
 
   # let deprecated mylabels work as default
-  dfs <- .getdfs() 
+  dfs <- .getdfs()
   mylabels.ok <- FALSE
   if (!is.null(dfs)) {
     if ("mylabels" %in% dfs  &&  !("l" %in% dfs)) {
@@ -1117,7 +1118,7 @@ function(dir, axT) {
 
 
 # axis labels
-.axlabs <- function(x.lab, y.lab, main.lab, sub.lab, 
+.axlabs <- function(x.lab, y.lab, main.lab, sub.lab,
                     x.val=NULL, xy_ticks=TRUE, offset=0.5,
                     lab_x_cex=NULL, lab_y_cex=NULL, main_cex=NULL,
                     n.lab_x.ln=1, n.lab_y.ln=1, xlab_adj=0, ylab_adj=0,
@@ -1157,12 +1158,12 @@ function(dir, axT) {
 
   title(xlab=x.lab, line=lblx.lns-xlab_adj,
         col.lab=lab_x_color, cex.lab=lab_x_cex, ...)
-  if (!is.null(sub.lab)) 
+  if (!is.null(sub.lab))
     title(sub=sub.lab, line=lblx.lns+1-xlab_adj, cex.sub=0.75,
           col.lab=lab_x_color, ...)
   title(ylab=y.lab, line=lbly.lns-ylab_adj+.1,
         col.lab=lab_y_color, cex.lab=lab_y_cex, ...)
-  if (!is.null(main.lab)) 
+  if (!is.null(main.lab))
     title(main=main.lab, cex.main= getOption("main_cex"),
           col.main=getOption("main_color"), ...)
 
@@ -1304,7 +1305,7 @@ function(dir, axT) {
 
   tx <- character(length = 0)
 
-  txt.wrt <- "written at the current working directory." 
+  txt.wrt <- "written at the current working directory."
   tx[length(tx)+1] <- paste("\nThe", txt, txt.wrt)
   tx[length(tx)+1] <- paste("       ", fname, " in:  ", workdir)
 
@@ -1484,24 +1485,24 @@ function(dir, axT) {
   fill_hi <- NULL
 
   thm <- (getOption("theme"))
-  if (is.null(fill_low) && is.null(fill_hi)) {      
+  if (is.null(fill_low) && is.null(fill_hi)) {
     if (thm %in% c("colors", "dodgerblue", "blue", "lightbronze")) {
       fill_low <- "rusts"
       fill_hi <- "blues"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
     else if (thm %in% c("darkred", "red", "rose", "slatered")) {
-      fill_low <- "turquoises" 
+      fill_low <- "turquoises"
       fill_hi <- "reds"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
     else if (thm %in% c("darkgreen", "green")) {
-      fill_low <- "violets" 
+      fill_low <- "violets"
       fill_hi <- "greens"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
     else if (thm %in% c("gold", "brown", "sienna")) {
-      fill_low <- "blues" 
+      fill_low <- "blues"
       fill_hi <- "browns"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
@@ -1511,7 +1512,7 @@ function(dir, axT) {
       hmcols <- colorRampPalette(c("white", "gray75", "black"))(100)
     }
   }
-  else if (is.null(fill_low) || is.null(fill_hi)) { 
+  else if (is.null(fill_low) || is.null(fill_hi)) {
     fill_low <- "white"
     fill_hi <- "gray20"
     hmcols <- colorRampPalette(c("white", "gray75", "black"))(100)
@@ -1559,7 +1560,7 @@ function(dir, axT) {
 }
 
 
-# from the theme, get the sequential or hues palette name for each color theme 
+# from the theme, get the sequential or hues palette name for each color theme
 .get_fill <- function(theme=getOption("theme"), seq.pal=FALSE) {
 
   # for ordinal variables, or color theme not default, get sequential palette
@@ -1611,7 +1612,7 @@ function(dir, axT) {
   else {
     if (!is.null(fill[1])) {
       if (fill[1] == "colors") fill[1] <- "hues"   # new names
-      if (fill[1] == "yellows")  fill[1] <- "browns" 
+      if (fill[1] == "yellows")  fill[1] <- "browns"
 
       if (fill[1] %in% nm  ||  fill[1] %in% nmR  ||  fill[1] %in% nmV  ||
           fill[1] %in% nmW  ||  fill[1] %in% nmD) {
@@ -1682,7 +1683,7 @@ function(dir, axT) {
     vir <- viridisLite::viridis(100)
     x.nrm <- x / max(x)
     cc <- double(length=length(x.nrm))
-    for (i in 1:length(cc)) cc[i] <-  viridisLite::viridis(1, begin=x.nrm[i]) 
+    for (i in 1:length(cc)) cc[i] <-  viridisLite::viridis(1, begin=x.nrm[i])
     clr <- cc
   }
 

@@ -25,7 +25,7 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     cat("\n")
   }
 
-  if (!brief) cat("\n------ Description ------\n\n")
+  if (!brief) cat("\n------ Describe ------\n\n")
 
   if (from.data) {
     n <- sum(!is.na(Y))
@@ -65,7 +65,7 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
         if (n > 2 && n < 5000) {
           nrm1 <- shapiro.test(Y)
           W.1 <- round(nrm1$statistic,min(4,digits_d+1))
-          p.val1 <- round(nrm1$p.value,min(4,digits_d+1))
+          p.val1 <- round(nrm1$p.value,min(4,digits_d))
           cat(nrm1$method, ":  W = ", W.1, ",  p-value = ", p.val1,
               sep="", "\n")
         }
@@ -75,7 +75,7 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     } 
   }
 
-  if (!brief) cat("\n\n------ Inference ------\n\n")
+  if (!brief) cat("\n\n------ Infer ------\n\n")
 
   # t-test
   if (alternative == "two_sided") alt <- "two.sided"

@@ -1,5 +1,5 @@
 bc.data.frame <-
-function(x, n_cat, within,
+function(x, n_cat, stack100,
          col_fill, col_color, col.trans, fill_spit, theme,
          horiz, gap, prop, scale_y,
          xlab, ylab, main,
@@ -62,7 +62,7 @@ function(x, n_cat, within,
           }
         }
 
-        .bc.main(x[,i], y=NULL, by=NULL, within,
+        .bc.main(x[,i], y=NULL, by=NULL, stack100,
           col_fill, col_color, col.trans, fill_spit, theme,
           horiz, gap, prop, scale_y,
           xlab, ylab, main,
@@ -75,7 +75,7 @@ function(x, n_cat, within,
           legend_title, legend_position, legend_labels,
           legend_horiz, legend_size, legend_abbrev, legend_adj,
           add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out_size,
-          quiet, ...)
+          digits_d=3, quiet, ...)
 
         if (!is.null(pdf_file)) {
           dev.off()

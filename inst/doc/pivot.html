@@ -496,35 +496,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2>Output as a Long-Form Data Frame</h2>
 <p>To illustrate, use the 37-row Employee data set included with <strong>lessR</strong>, here read into the <em>d</em> data frame.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
-<pre><code>## 
-## &gt;&gt;&gt; Suggestions
-## Details about your data, Enter:  details()  for d, or  details(name)
-## 
-## Data Types
-## ------------------------------------------------------------
-## character: Non-numeric data values
-## integer: Numeric data values, integers only
-## double: Numeric data values with decimal digits
-## ------------------------------------------------------------
-## 
-##     Variable                  Missing  Unique 
-##         Name     Type  Values  Values  Values   First and last values
-## ------------------------------------------------------------------------------------------
-##  1     Years   integer     36       1      16   7  NA  7 ... 1  2  10
-##  2    Gender character     37       0       2   M  M  W ... W  W  M
-##  3      Dept character     36       1       5   ADMN  SALE  FINC ... MKTG  SALE  FINC
-##  4    Salary    double     37       0      37   53788.26  94494.58 ... 56508.32  57562.36
-##  5    JobSat character     35       2       3   med  low  high ... high  low  high
-##  6      Plan   integer     37       0       3   1  1  2 ... 2  2  1
-##  7       Pre   integer     37       0      27   82  62  90 ... 83  59  80
-##  8      Post   integer     37       0      22   92  74  86 ... 90  71  87
-## ------------------------------------------------------------------------------------------</code></pre>
 <p>Two categorical variables in the <em>d</em> data frame are <em>Dept</em> and <em>Gender</em>. Continuous variables include <em>Years</em> worked at the company and annual <em>Salary</em>.</p>
 <div id="multiple-grouping-variables" class="section level3">
 <h3>Multiple Grouping Variables</h3>
 <p>This example does the analysis previously illustrated. The name of the computed mean of <em>Years</em> by default is <em>Years_mean</em>. With no <code>by_cols</code> variables, the output of <code>pivot()</code> is a data frame of the aggregated variables. Optionally save this output for further analysis, as the data frame <em>a</em> in this example.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">pivot</span>(<span class="at">data=</span>d, <span class="at">compute=</span>mean, <span class="at">variable=</span>Years, <span class="at">by=</span><span class="fu">c</span>(Dept, Gender))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>a</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">pivot</span>(<span class="at">data=</span>d, <span class="at">compute=</span>mean, <span class="at">variable=</span>Years, <span class="at">by=</span><span class="fu">c</span>(Dept, Gender))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a</span></code></pre></div>
 <pre><code>##    Dept Gender Years_n Years_na Years_mean
 ## 1  ACCT      M       2        0      7.000
 ## 2  ADMN      M       2        0     15.500
@@ -540,13 +517,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 12 &lt;NA&gt;      W       1        0      5.000</code></pre>
 <p>Using the <strong>lessR</strong> function <code>Read()</code>, can read the original data table from which the pivot table was constructed, such as in the form of an Excel worksheet. For many analyses, easier to read the Excel data into R and do the analysis in R than in Excel. The result can also be written back into an Excel file with the <strong>lessR</strong> function <code>Write()</code>.</p>
 <p>In this example, create an Excel file called <em>MyPivotTable.xlsx</em> from the pivot table stored in the <em>a</em> data frame. To avoid creating this file in this example, the function call is commented out with the <code>#</code> symbol in the first column.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Write(&quot;MyPivotTable&quot;, data=a, format=&quot;Excel&quot;)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Write(&quot;MyPivotTable&quot;, data=a, format=&quot;Excel&quot;)</span></span></code></pre></div>
 <p>The abbreviation <code>wrt_x()</code> for the function name simplifies the preceding expression, with the <code>format</code> parameter dropped.</p>
 </div>
 <div id="aggregate-with-multiple-statistics" class="section level3">
 <h3>Aggregate with Multiple Statistics</h3>
 <p>In this next example, specify multiple statistics for which to aggregate for each group for the specified value variable <em>Salary</em>. For each group, compare the mean to the median, and the standard deviation to the interquartile range. By default, each column of an aggregated statistic is the <code>variable</code> name, here <em>Salary</em>, followed by a “_”, then either the name of the statistic or an abbreviation. The respective abbreviations for <code>mean</code> and <code>median</code> are <code>mn</code> and <code>md</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median, sd, IQR), Salary, Dept)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median, sd, IQR), Salary, Dept)</span></code></pre></div>
 <pre><code>##   Dept Salary_n Salary_na Salary_mean Salary_md Salary_sd Salary_IQR
 ## 1 ACCT        5         0    61792.78  69547.60  12774.61   21379.23
 ## 2 ADMN        6         0    81277.12  71058.60  27585.15   36120.57
@@ -555,7 +532,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 5 SALE       15         0    78830.07  77714.85  23476.84   28810.28
 ## 6 &lt;NA&gt;        1         0    53772.58  53772.58        NA       0.00</code></pre>
 <p>Also have available two functions provided by <strong>lessR</strong> that are not part of base R: <code>skew()</code> and <code>kurtosis()</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,skew,kurtosis), Salary, Dept, <span class="at">digits_d=</span><span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,skew,kurtosis), Salary, Dept, <span class="at">digits_d=</span><span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##   Dept Salary_n Salary_na Salary_mean Salary_sd Salary_sk Salary_kt
 ## 1 ACCT        5         0    61792.78  12774.61    -0.623    -3.032
 ## 2 ADMN        6         0    81277.12  27585.15     0.835    -1.185
@@ -564,7 +541,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 5 SALE       15         0    78830.07  23476.84     0.863     0.856
 ## 6 &lt;NA&gt;        1         0    53772.58        NA        NA        NA</code></pre>
 <p>Can also specify the variable names of the aggregated statistics with the <code>out_names</code> parameter. Here calculate the mean and median <em>Salary</em> for each group defined by each combination of levels for <em>Gender</em> and <em>Dept</em>.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median), Salary, <span class="fu">c</span>(Gender,Dept), <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanSalary&quot;</span>, <span class="st">&quot;MedianSalary&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median), Salary, <span class="fu">c</span>(Gender,Dept), <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanSalary&quot;</span>, <span class="st">&quot;MedianSalary&quot;</span>))</span></code></pre></div>
 <pre><code>##    Gender Dept Salary_n Salary_na MeanSalary MedianSalary
 ## 1       M ACCT        2         0   59626.19     59626.19
 ## 2       W ACCT        3         0   63237.16     71084.02
@@ -582,7 +559,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="aggregate-multiple-variables" class="section level3">
 <h3>Aggregate Multiple Variables</h3>
 <p>The <code>pivot()</code> function can also aggregate over multiple <code>variables</code>. Here, aggregate <em>Years</em> and <em>Salary</em>. Round the numerical aggregated results to the nearest integer with the <code>digits_d</code> parameter, which specifies the number of decimal digits in the output. Different variables can have different amounts of missing data, so the sample size, <em>n</em>, and number missing, the number of values Not Available, <em>na</em>, are listed separately for each aggregated variable.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, <span class="fu">c</span>(Years, Salary), <span class="fu">c</span>(Dept, Gender), <span class="at">digits_d=</span><span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, <span class="fu">c</span>(Years, Salary), <span class="fu">c</span>(Dept, Gender), <span class="at">digits_d=</span><span class="dv">0</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender Years_n Years_na Years_mean Salary_n Salary_na Salary_mean
 ## 1  ACCT      M       2        0          7        2         0       59626
 ## 2  ADMN      M       2        0         16        2         0       80963
@@ -597,7 +574,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 11 SALE      W       5        0          7        5         0       64188
 ## 12 &lt;NA&gt;      W       1        0          5        1         0       53773</code></pre>
 <p>Turn off the display of the sample size and number of missing values for each group by setting the parameter <code>show_n</code> to <code>FALSE</code>.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, <span class="fu">c</span>(Years, Salary), Dept, <span class="at">digits_d=</span><span class="dv">2</span>, <span class="at">show_n=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, <span class="fu">c</span>(Years, Salary), Dept, <span class="at">digits_d=</span><span class="dv">2</span>, <span class="at">show_n=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>##   Dept Years_mean Salary_mean
 ## 1 ACCT       5.60    61792.78
 ## 2 ADMN      10.17    81277.12
@@ -610,17 +587,17 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h3>Compute over All Data</h3>
 <p>Aggregation computes one or more statistics for one or more variables across groups defined by the possible combinations of the levels of one or more categorical variables. A related computation computes the variables for each statistic for all the data. To compute over all the rows of data, do not specify groups, that is, drop the <code>by</code> parameter.</p>
 <p>Get the grand mean of Years, that is, for all the data.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years)</span></code></pre></div>
 <pre><code>##  Years_n Years_na Years_mean
 ##       36        1      9.389</code></pre>
 <p>Get the grand mean of Years and Salary. Specify custom names for the results.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, <span class="fu">c</span>(Years, Salary), <span class="at">digits_d=</span><span class="dv">2</span>, <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanYear&quot;</span>, <span class="st">&quot;MeanSalary&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, <span class="fu">c</span>(Years, Salary), <span class="at">digits_d=</span><span class="dv">2</span>, <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanYear&quot;</span>, <span class="st">&quot;MeanSalary&quot;</span>))</span></code></pre></div>
 <pre><code>##  Years_n Years_na MeanYear Salary_n Salary_na MeanSalary
 ##       36        1     9.39       37         0   73795.56</code></pre>
 <p>Consider an example with more variables. Analyze the 6-pt Likert scale responses to the Mach IV scale that assesses Machiavellianism. Items are scored from 0 to 5, Strongly Disagree to Strongly Agree. The data are included with <strong>lessR</strong> as the <em>Mach4</em> data file.</p>
 <p>Suppress output when reading by setting <code>quiet</code> to <code>TRUE</code>. Calculate the mean, standard deviation, skew, and kurtosis for all of the data for each of the 20 items on the scale. With this specification, the form of a data frame is statistics in the columns and the variables in the rows. The result are the specified summary statistics for the specified variables over the entire data set.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Mach4&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,skew,kurtosis), m01<span class="sc">:</span>m20)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Mach4&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,skew,kurtosis), m01<span class="sc">:</span>m20)</span></code></pre></div>
 <pre><code>##       n na  mean    sd   skew kurtosis
 ## m01 351  0 1.279 1.286  0.984    0.356
 ## m02 351  0 1.746 1.480  0.475   -0.784
@@ -648,7 +625,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>Aggregating a statistical computation of a continuous variable over groups with <code>pivot()</code>, such as computing the mean for each combination of <em>Dept</em> and <em>Gender</em>, by default includes the tabulation for each group (cell). A tabulation can be requested with no analysis of a numerical variable, instead only a counting of the available levels of the specified categorical variables.</p>
 <p>The <code>table</code> value of <code>compute</code> specifies to compute the frequency table for a categorical aggregated <code>variable</code> across all combinations of the <code>by</code> variables. Specify one categorical <code>variable</code> with the remaining categorical variables specified with the <code>by</code> parameter. Missing values for each combination of the levels of the grouping variables are displayed.</p>
 <p>Begin with a one-way frequency table computed over the entire data set.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06)</span></code></pre></div>
 <pre><code>##   m06 Freq  Prop
 ## 1   0   18 0.051
 ## 2   1   47 0.134
@@ -657,7 +634,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 5   4  121 0.345
 ## 6   5   58 0.165</code></pre>
 <p>In this example, compute a two-way cross-tabulation table with the levels of <code>variable</code> <em>m06</em> as columns and the levels of the <code>by</code> categorical variable <em>m07</em> as rows.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06, m07)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06, m07)</span></code></pre></div>
 <pre><code>##   m07 m06_n m06_na 0  1  2  3  4  5
 ## 1   0    17      0 4  3  2  3  3  2
 ## 2   1    64      0 7 24  7  6 18  2
@@ -668,7 +645,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>To output the data in long form, one tabulation per row, set the <code>table_long</code> parameter to TRUE.</p>
 <p>If interested in the inferential analysis of the cross-tabulation table, access the <strong>lessR</strong> function <code>Prop_test()</code> to obtain both the descriptive and inferential results, though limited to a one- or two-way table.</p>
 <p>The default data table is <em>d</em>, but included explicitly in the following example to illustrate the <code>data</code> parameter.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(m06, <span class="at">by=</span>m07, <span class="at">data=</span>d)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(m06, <span class="at">by=</span>m07, <span class="at">data=</span>d)</span></code></pre></div>
 <pre><code>## variable: m06 
 ## by: m07 
 ## 
@@ -732,7 +709,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Degrees of freedom: 25 
 ## Hypothesis test of equal population proportions: p-value = 0.000</code></pre>
 <p>Can also aggregate other statistics simultaneously in addition to the frequency table, though, of course, only meaningful if the aggregated variable is numerical. Here, create a 3-way cross-tabulation table with responses to <code>variable</code> <em>m06</em> in the column and responses to <code>by</code> variables <em>m07</em> and <em>m10</em> in the rows, plus the mean and standard deviation of each combination of <em>m07</em> and <em>m10</em> across levels of <em>m06</em>.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,table), m06, <span class="fu">c</span>(m07, m10))</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,table), m06, <span class="fu">c</span>(m07, m10))</span></code></pre></div>
 <pre><code>##    m07 m10 m06_n m06_na m06_mean m06_sd 0 1 2 3  4  5
 ## 1    0   0     1      0    0.000     NA 1 0 0 0  0  0
 ## 2    1   0     1      0    1.000     NA 0 1 0 0  0  0
@@ -772,9 +749,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 36   5   5    42      0    4.452  1.234 1 2 1 1  5 32</code></pre>
 <p>Can also express the frequencies as proportions. To convert the frequencies into proportions, invoke the <code>table_prop</code> parameter. The value of <code>&quot;all&quot;</code> computes cell frequencies across the entire table. The values of <code>&quot;row&quot;</code> and <code>&quot;col&quot;</code> compute the proportions with either row sums or column sums.</p>
 <p>In this example of a two-way cross-tabulation table, convert the table counts to row proportions, that is, the proportion of each level of <em>m06</em> for each combination of levels for <em>m07</em>. The sum of the proportions in each row is 1.0.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06, m07, <span class="at">table_prop=</span><span class="st">&quot;row&quot;</span>)</span></code></pre></div>
-<pre><code>## 
-## Proportions computed over row cells</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06, m07, <span class="at">table_prop=</span><span class="st">&quot;row&quot;</span>)</span></code></pre></div>
 <pre><code>##   m07 m06_n m06_na     0     1     2     3     4     5
 ## 1   0    17      0 0.235 0.176 0.118 0.176 0.176 0.118
 ## 2   1    64      0 0.109 0.375 0.109 0.094 0.281 0.031
@@ -783,7 +758,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 5   4    93      0 0.000 0.032 0.140 0.054 0.602 0.172
 ## 6   5    47      0 0.021 0.043 0.021 0.021 0.170 0.723</code></pre>
 <p>Return to the <em>Employee</em> data set for the remaining examples.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="quantiles" class="section level3">
 <h3>Quantiles</h3>
@@ -792,7 +767,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p><em>Quantiles</em>: Numeric values, not necessarily data values, that divide a distribution of sorted data values into <em>n</em> groups of equal size.</p>
 </blockquote>
 <p>By default, calling the quantile function computes quartiles. Here calculate the quartiles for <em>Years</em> aggregated across levels of <em>Dept</em> and <em>Gender</em>.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, quantile, Years, <span class="fu">c</span>(Dept, Gender))</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, quantile, Years, <span class="fu">c</span>(Dept, Gender))</span></code></pre></div>
 <pre><code>##    Dept Gender Years_n Years_na p0   p25  p50   p75 p100
 ## 1  ACCT      M       2        0  5  6.00  7.0  8.00    9
 ## 2  ADMN      M       2        0  7 11.25 15.5 19.75   24
@@ -807,7 +782,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 11 SALE      W       5        0  2  3.00  8.0 10.00   10
 ## 12 &lt;NA&gt;      W       1        0  5  5.00  5.0  5.00    5</code></pre>
 <p>To compute other than quartiles, invoke the <code>q_num</code> parameter, the number of quantile intervals. The default value is 4 for quartiles. In the following example, compute the quintiles for <em>Years</em> and <em>Salary</em>, plus the mean and standard deviation. No specification of <code>by</code>, so these descriptive statistics are computed over the entire data set for both specified variables.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,quantile), <span class="fu">c</span>(Years,Salary), <span class="at">q_num=</span><span class="dv">5</span>, <span class="at">digits_d=</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,quantile), <span class="fu">c</span>(Years,Salary), <span class="at">q_num=</span><span class="dv">5</span>, <span class="at">digits_d=</span><span class="dv">2</span>)</span></code></pre></div>
 <pre><code>##         n na     mean       sd       p0      p20      p40      p60      p80     p100
 ## Years  36  1     9.39     5.72     1.00     4.00     8.00    10.00    14.00     24.0
 ## Salary 37  0 73795.56 21799.53 46124.97 55737.86 63701.93 72430.04 92415.42 134419.2</code></pre>
@@ -823,7 +798,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </blockquote>
 <p>If drilling down into the data, <code>pivot()</code> indicates the drill-down with a display of all categorical variables with unique values that precedes the primary output. Initiate the drill-down by a previous subset of the data frame, or by <code>pivot()</code> directly. As with other <strong>lessR</strong> analysis functions, the <code>rows</code> parameter specifies a logical condition for which to subset rows of the data frame for analysis.</p>
 <p>In this example, compute the mean of <em>Salary</em> for each level of <em>Dept</em> for just those rows of data with the value of <em>Gender</em> equal to “F”.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, <span class="at">rows=</span>(Gender<span class="sc">==</span><span class="st">&quot;W&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, <span class="at">rows=</span>(Gender<span class="sc">==</span><span class="st">&quot;W&quot;</span>))</span></code></pre></div>
 <pre><code>## Gender: W</code></pre>
 <pre><code>##   Dept Salary_n Salary_na Salary_mean
 ## 1 ACCT        3         0    63237.16
@@ -834,7 +809,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 6 &lt;NA&gt;        1         0    53772.58</code></pre>
 <p>The parentheses for the <code>rows</code> parameter are not necessary, but does enhance readability.</p>
 <p>Can also drill down by subsetting the data frame with a logical condition directly in the data parameter in the call to <code>pivot()</code>. Here drill down with base R <code>Extract[ ]</code> in conjunction with the <strong>lessR</strong> function <code>.()</code> to simplify the syntax (explained in the vignette Subset a Data Frame). The <code>Extract[ ]</code> function specifies the rows of the data frame to extract before the comma, and the columns to extract after the comma. Here select only those rows of data with <em>Gender</em> declared as Female. There is no information after the comma, so no columns are specified, which means to retain all columns, the variables in the data frame.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d[.(Gender<span class="sc">==</span><span class="st">&quot;W&quot;</span>),], mean, Salary, Dept)</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d[.(Gender<span class="sc">==</span><span class="st">&quot;W&quot;</span>),], mean, Salary, Dept)</span></code></pre></div>
 <pre><code>## Gender: W</code></pre>
 <pre><code>##   Dept Salary_n Salary_na Salary_mean
 ## 1 ACCT        3         0    63237.16
@@ -847,7 +822,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="sort-output" class="section level3">
 <h3>Sort Output</h3>
 <p>Specify the sort as part of the call to <code>pivot()</code> with the parameter <code>sort</code>. This internal sort works for a single <code>value</code> variable, by default the last column in the output data frame. Set to <code>&quot;-&quot;</code> for a descending sort. Set to <code>&quot;+&quot;</code> for an ascending sort.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">sort=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">sort=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender Salary_n Salary_na Salary_mean
 ## 4  MKTG      M        1         0    99062.66
 ## 5  SALE      M       10         0    86150.97
@@ -862,8 +837,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 12 &lt;NA&gt;      W        1         0    53772.58
 ## 6  &lt;NA&gt;      M        0         0        0.00</code></pre>
 <p>Specify the <code>sort_var</code> parameter to specify the name or the column number of the variable to sort.</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median), Salary, <span class="fu">c</span>(Gender,Dept), <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanSalary&quot;</span>, <span class="st">&quot;MedianSalary&quot;</span>),</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort=</span><span class="st">&quot;-&quot;</span>, <span class="at">sort_var=</span><span class="st">&quot;MeanSalary&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median), Salary, <span class="fu">c</span>(Gender,Dept), <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanSalary&quot;</span>, <span class="st">&quot;MedianSalary&quot;</span>),</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort=</span><span class="st">&quot;-&quot;</span>, <span class="at">sort_var=</span><span class="st">&quot;MeanSalary&quot;</span>)</span></code></pre></div>
 <pre><code>##    Gender Dept Salary_n Salary_na MeanSalary MedianSalary
 ## 7       M MKTG        1         0   99062.66     99062.66
 ## 9       M SALE       10         0   86150.97     82442.74
@@ -878,11 +853,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 12      W &lt;NA&gt;        1         0   53772.58     53772.58
 ## 11      M &lt;NA&gt;        0         0       0.00           NA</code></pre>
 <p>Because the output of <code>pivot()</code> with no <code>by_cols</code> variables is a standard R data frame, the external call to the <strong>lessR</strong> function <code>Sort()</code> is available for custom sorting by one or more variables. Sort in the specified direction with the <code>direction</code> parameter.</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">pivot</span>(d, mean, Salary, <span class="fu">c</span>(Dept, Gender))</span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Sort</span>(a, <span class="at">by=</span>Salary_mean, <span class="at">direction=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
-<pre><code>## 
-## Sort Specification
-##   Salary_mean --&gt;  descending</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">pivot</span>(d, mean, Salary, <span class="fu">c</span>(Dept, Gender))</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Sort</span>(a, <span class="at">by=</span>Salary_mean, <span class="at">direction=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender Salary_n Salary_na Salary_mean
 ## 4  MKTG      M        1         0    99062.66
 ## 5  SALE      M       10         0    86150.97
@@ -903,15 +875,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>The following illustrates as of R 4.1.0 the base R pipe operator <code>|&gt;</code> with <code>pivot()</code>. The pipe operator by default inserts the object on the left-hand side of an expression into the first parameter value for the function on the right-hand side.</p>
 <p>In this example, input the <em>d</em> data frame into the first parameter of <code>pivot()</code>, the <code>data</code> parameter. Then direct the output to the data frame <em>a</em> with the standard R assignment statement, though written pointing to the right hand side of the expression.</p>
 <p>To avoid problems installing this version of <strong>lessR</strong> from source with a previous version of R, the code is commented out with a <code>#</code> sign in the first column.</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co">#d |&gt; pivot(mean, Salary, c(Dept, Gender)) -&gt; a</span></span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="co">#a</span></span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co">#d |&gt; pivot(mean, Salary, c(Dept, Gender)) -&gt; a</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="co">#a</span></span></code></pre></div>
 </div>
 </div>
 <div id="output-as-a-2-d-table" class="section level2">
 <h2>Output as a 2-D Table</h2>
 <p>Specify up to two <code>by_cols</code> categorical variables to create a two-dimensional table with the specified columns. Specifying one or two categorical variables as <code>by_cols</code> variables moves them from their default position in the rows to the columns, which changes the output structure from a long-form data frame to a cross-tabulation table with categorical variables in the rows and columns.</p>
 <p>In this example, specify by <code>by_cols</code> variable, <em>Gender</em>.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, Gender)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, Gender)</span></code></pre></div>
 <pre><code>Table: mean of Salary 
 
  Gender  M          W               
@@ -924,7 +896,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
    SALE   86150.97   64188.25
      NA       0.00   53772.58</code></pre>
 <p>Here two <code>by_cols</code> variables, specified as a vector. There is much missing data for this three-way classification as there is not much data in each group, with many groups having no data.</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, <span class="fu">c</span>(Gender, Plan))</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, <span class="fu">c</span>(Gender, Plan))</span></code></pre></div>
 <pre><code>Table: mean of Salary 
 
  Gender  M                                 W                                     
@@ -949,7 +921,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h3>Missing Data Values for Aggregated Variables</h3>
 <p>By default, the data frame output of <code>pivot()</code> lists the number of occurrences of missing data for each group of the variable over which the statistic is computed. The <code>na_remove</code> parameter specifies the value of the base R parameter <code>na.rm</code> for computations such as for the <code>mean</code>. The parameter value is either <code>TRUE</code> or <code>FALSE</code>, indicating if NA (missing) values of the variable should be removed before the computation proceeds. The default value <code>na_remove</code> is <code>TRUE</code>, so the missing values are removed, their number of occurrences reported, and then the computed statistic displayed.</p>
 <p>In this example, the variable <em>Years</em> has one missing value, which occurs in the Sales department.</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years, Dept)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years, Dept)</span></code></pre></div>
 <pre><code>##   Dept Years_n Years_na Years_mean
 ## 1 ACCT       5        0      5.600
 ## 2 ADMN       6        0     10.167
@@ -958,7 +930,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 5 SALE      14        1     10.286
 ## 6 &lt;NA&gt;       1        0      5.000</code></pre>
 <p>Set <code>na_remove</code> to <code>FALSE</code> to <em>not</em> remove any missing data in a cell with values to be aggregated. According to the way in which R functions process the data with missing values entered into the function, the resulting computed value will be missing if any of the constituent data values are missing.</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years, Dept, <span class="at">na_remove=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years, Dept, <span class="at">na_remove=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>##   Dept Years_n Years_na Years_mean
 ## 1 ACCT       5        0      5.600
 ## 2 ADMN       6        0     10.167
@@ -970,9 +942,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="missing-data-values-for-by-variables" class="section level3">
 <h3>Missing Data Values for <code>by</code> Variables</h3>
 <p>Another possibility is to account for missing values of the categorical <code>by</code> variables for which there are no values for that cell, all values are missing. For this example, first create a cell with no values in the data aggregation. Use base R <code>Extract[]</code> with <strong>lessR</strong> <code>.()</code> to drop the one male in the Sales department, leaving no data values for that group. Save the result into the <em>dd</em> data frame.</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>dd <span class="ot">&lt;-</span> d[.(<span class="sc">!</span>(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Dept<span class="sc">==</span><span class="st">&quot;SALE&quot;</span>)), ]</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>dd <span class="ot">&lt;-</span> d[.(<span class="sc">!</span>(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Dept<span class="sc">==</span><span class="st">&quot;SALE&quot;</span>)), ]</span></code></pre></div>
 <p>Explicitly set <code>na_by_show</code> to <code>TRUE</code>, the default value. The group for male sales employees is shown with the values of the computed variables <em>n_</em> and <em>na_</em> set to 0 and the values of all other variables necessarily missing.</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(dd, <span class="fu">c</span>(mean,median), Years, <span class="fu">c</span>(Dept, Gender), <span class="at">na_by_show=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(dd, <span class="fu">c</span>(mean,median), Years, <span class="fu">c</span>(Dept, Gender), <span class="at">na_by_show=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender Years_n Years_na Years_mean Years_md
 ## 1  ACCT      M       2        0      7.000      7.0
 ## 2  ADMN      M       2        0     15.500     15.5
@@ -987,7 +959,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 11 SALE      W       5        0      6.600      8.0
 ## 12 &lt;NA&gt;      W       1        0      5.000      5.0</code></pre>
 <p>Drop the groups from the output with missing data for a <code>by</code> variable. To do so, set <code>na_by_show</code> to <code>FALSE</code>. Now the group for the non-existent male sales employee does not display.</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(dd, <span class="fu">c</span>(mean,median), Years, <span class="fu">c</span>(Dept, Gender), <span class="at">na_by_show=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(dd, <span class="fu">c</span>(mean,median), Years, <span class="fu">c</span>(Dept, Gender), <span class="at">na_by_show=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender Years_n Years_na Years_mean Years_md
 ## 1  ACCT      M       2        0      7.000      7.0
 ## 2  ADMN      M       2        0     15.500     15.5
@@ -1003,11 +975,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="build-your-own-function" class="section level2">
 <h2>Build Your Own Function</h2>
-<p>Any function that processes a single column of data and returns a single value can be accessed with <code>pivot()</code>. In this example, define a function named <em>mnmd</em> that computes the difference between the <code>mean</code> and <code>median</code> of a distribution of data values, here represented by <code>x</code>. For technical reasons, need to include the <code>NA</code> remove parameter, <code>na.rm</code>, in the function definition. Usually set to the value of <code>na.rm</code> to <code>TRUE</code> to allow for missing data to be dropped. If missing data are to be dropped in internal function calls, then the base R parameter <code>na.rm</code> needs to be set for each component function as well.</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>mnmd <span class="ot">=</span> <span class="cf">function</span>(x, <span class="at">na.rm=</span><span class="cn">TRUE</span>)  <span class="fu">mean</span>(x, <span class="at">na.rm=</span>na.rm) <span class="sc">-</span> <span class="fu">median</span>(x, <span class="at">na.rm=</span>na.rm)</span></code></pre></div>
+<p>Any function that processes a single column of data and returns a single value can be accessed with <code>pivot()</code>. In this example, define a function named <em>mnmd()</em> that computes the difference between the <code>mean</code> and <code>median</code> of a distribution of data values, here represented by <code>x</code>. For technical reasons, need to include the <code>NA</code> remove parameter, <code>na.rm</code>, in the function definition. Usually set to the value of <code>na.rm</code> to <code>TRUE</code> to allow for missing data to be dropped. If missing data values are to be dropped in internal function calls, then the base R parameter <code>na.rm</code> needs to be set for each component function as well.</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>mnmd <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">na.rm=</span><span class="cn">TRUE</span>)  <span class="fu">mean</span>(x, <span class="at">na.rm=</span>na.rm) <span class="sc">-</span> <span class="fu">median</span>(x, <span class="at">na.rm=</span>na.rm)</span></code></pre></div>
 <p>Invoke <code>pivot()</code> to compute the mean, the median, and their difference for each group in the aggregation of the variable <em>Years</em>.</p>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median, mnmd), Years, <span class="at">by=</span>Dept)</span></code></pre></div>
-<pre><code>## User defined function (or typing error): mnmd</code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median, mnmd), Years, <span class="at">by=</span>Dept)</span></code></pre></div>
 <pre><code>##   Dept Years_n Years_na Years_mean Years_md Years_mnmd
 ## 1 ACCT       5        0      5.600      5.0      0.600
 ## 2 ADMN       6        0     10.167      6.5      3.667

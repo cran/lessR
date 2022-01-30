@@ -119,19 +119,17 @@ function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
   }
   .dash(90)
 
+  if (colm.ID > 0) {
+    cat("\n\n")
+    txt <- maybe.ID
+    cat(
+"For the column ", txt, ", each row of data is unique. Are these values\n",
+"a unique ID for each row? To implement, perhaps re-read a worksheet or text\n",
+"file with the following setting added to your Read statement: row_names=", 
+        toString(colm.ID), sep="")
+  }
 
   if (!brief) {
-    if (colm.ID > 0) {
-      cat("\n\n")
-      cat("For the following 'variable', each row of data is unique. Do these values\n",
-          "specify a unique ID for each row? To implement, re-read (if a text or Excel\n",
-          "file) with the following setting added to your Read statement: row.names=", 
-          toString(colm.ID), sep="", "\n")
-      .dash(75)
-      cat(maybe.ID, "\n")
-      .dash(75)
-    }
-
     n_cat <- getOption("n_cat")
     num.cat <- FALSE
     n_cat.temp  <- 4
@@ -173,9 +171,10 @@ function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
         }
         if (n.lines == miss_show) {
           n.lines <- -1
-          cat("\nMore data rows have at least this many missing values: ", n_mcut, "\n",
-            "Specify n_mcut=2 to see just those lines with 2 missing values, etc,",
-            "Or increase the default value of miss_show=30 to show more lines.\n")
+          cat("\nMore data rows have at least this many missing values: ",
+              n_mcut, "\n",
+            "Specify n_mcut=2 to see those lines with 2 missing values, etc,",
+            "Or increase the default value of miss_show=30 to show more.\n")
         }
       }
       cat("\n")

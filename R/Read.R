@@ -6,17 +6,17 @@ function(from=NULL, format=NULL, var_labels=FALSE,
          missing="", n_mcut=1,
          miss_show=30, miss_zero=FALSE, miss_matrix=FALSE,
 
-         max_lines=30, sheet=1,
+         max_lines=30, sheet=1, row_names=NULL, 
 
          brief=TRUE, quiet=getOption("quiet"),
 
          fun_call=NULL, ...) {
 
-        
+
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("in.lessR", "var.labels", "n.mcut", "miss.show", "miss.zero",
+    change <- c("var.labels", "n.mcut", "miss.show", "miss.zero",
                 "miss.matrix", "max.lines", "fun.call")
     for (i in 1:length(dots)) {
       if (names(dots)[i] %in% change) {
@@ -26,7 +26,7 @@ function(from=NULL, format=NULL, var_labels=FALSE,
       }
     }
   }
-
+  
   if (is.null(fun_call)) fun_call <- match.call()
 
   if (!is.null(from))
@@ -43,7 +43,7 @@ function(from=NULL, format=NULL, var_labels=FALSE,
   .param.old(...)
 
   miss.format <- ifelse (missing(format), TRUE, FALSE)
-  fmts <- c("text", "csv", "tsv", "Excel", "R", "SPSS", "SAS")
+  fmts <- c("text", "csv", "tsv", "Excel", "ODS", "R", "SPSS", "SAS", "Stata")
   if (!is.null(format)) {
     if (!(format %in% c(fmts, "lessR"))) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -83,20 +83,23 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     else if (grepl(".zsav$", from)) format <- "SPSS"
     else if (grepl(".dta$", from)) format <- "Stata"
     else if (grepl(".rda$", from)) format <- "R"
-    else if (grepl(".xls$", from) || grepl(".xlsx$", from)) format <- "Excel"
     else if (grepl(".sas7bdat$", from)) format <- "SAS"
+    else if (grepl(".ods", from)) format <- "ODS"
+    else if (grepl(".xls$", from) || grepl(".xlsx$", from)) format <- "Excel"
 
     if (is.null(format)) {
-      if (from %in% c("BodyMeas", "Cars93",
-                      "Employee", "Employee_lbl", "Mach4", "Mach4_lbl",
-                      "Jackets", "Learn", "Reading", "StockPrice",
-                      "FreqTable")) {
-        format <- "lessR"  # presume exact name not exist in current wd
-      }
-      else { 
+      df <- list.files(system.file("data", package="lessR"))
+      df <- df[!(df %in%"dataFreqTable99.rda")]
+      df <- gsub(".rda", "", df, fixed=FALSE)
+      df <- gsub("data", "", df, fixed=FALSE)
+      if (from %in% df)
+        format <- "lessR"
+      else {
+        df <- paste(" ", df)
         cat("\n"); stop(call.=FALSE, "\n","------\n",
             "Need to specify  format  or specify the name of\n",
-            "  a built-in lessR data file without the data prefix.\n\n")
+            "  a built-in lessR data file without the data prefix.\n\n",
+            "Available lessR data files:\n\n", df, "\n\n")
       }
     }
   }  # end miss format
@@ -109,9 +112,13 @@ function(from=NULL, format=NULL, var_labels=FALSE,
 
   if (!quiet) {
     max.chr <- nchar(from)
-    if (format == "Excel"  &&  !quiet) {
+    if (format == "Excel") {
       txt <- "Schauberger and Walker's openxlsx package]"
-      cat("[with the read.xlsx function from", txt, "\n")
+      cat("[with the read.xlsx() function from", txt, "\n")
+    }
+    if (format == "ODS") {
+      txt <- "Schutten and Chan's readODS package]"
+      cat("[with the read_ods() function from", txt, "\n")
     }
 
     if (browse) {
@@ -128,6 +135,14 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     if (!requireNamespace("haven", quietly=TRUE)) {
       stop("Package \"haven\" needed to read this file\n",
            "Please install it:  install.packages(\"haven\")\n\n",
+           call. = FALSE)
+    }
+  }
+
+  if (format == "ODS") {
+    if (!requireNamespace("readODS", quietly=TRUE)) {
+      stop("Package \"readODS\" needed to read this file\n",
+           "Please install it:  install.packages(\"readODS\")\n\n",
            call. = FALSE)
     }
   }
@@ -149,41 +164,82 @@ function(from=NULL, format=NULL, var_labels=FALSE,
       else
         delim <- ","
 
-      # read data or labels/units  
-      if (!var_labels)
-        d <- read.csv(file=from, na.strings=missing, sep=delim,
-                      stringsAsFactors=stringsAsFactors, ...)
+      # read data or labels/units
+      if (!var_labels) {
+        if (missing(row_names)) {
+          row.names <- NULL
+          d <- read.csv(file=from, na.strings=missing, sep=delim,
+                        stringsAsFactors=stringsAsFactors, ...)
+        }
+        else {
+          if (is.logical(row_names)) {  # can specify as TRUE
+            if (row_names) row.names <- 1
+          }
+          else
+            row.names <- row_names
+          d <- read.csv(file=from, na.strings=missing, sep=delim,
+                        stringsAsFactors=stringsAsFactors,
+                        row.names=row.names, ...)
+        }
+      }
+
       else {
         d <- read.csv(file=from, header=FALSE,
-                  row.names=1, 
+                  row.names=1,
                   sep=delim, stringsAsFactors=FALSE, ...)
-        names(d)[1] <- "label" 
-        if (ncol(d) == 2) names(d)[2] <- "unit" 
+        names(d)[1] <- "label"
+        if (ncol(d) == 2) names(d)[2] <- "unit"
       }
    }  # end csv
 
  }  # end text file
 
+  else if (format == "ODS") {
+
+    if (!var_labels) {
+      if (missing(row_names))
+        row_names <- FALSE
+      else {
+        if (row_names == 1) row_names <- TRUE 
+      }
+      if (row_names)
+        d <- readODS::read_ods(from, sheet=sheet, row_names=TRUE, ...)
+      else
+        d <- readODS::read_ods(from, sheet=sheet, row_names=FALSE, ...)
+    }
+
+    else {
+      d <- readODS::read_ods(from, sheet=sheet,
+                               col_names=FALSE, row_names=TRUE)
+      names(d)[1] <- "label"
+      for (i in 1:nrow(d)) if (is.na(d[i,1])) d[i,2] <- ""
+
+      if (ncol(d) == 2) {
+         names(d)[2] <- "unit"
+         for (i in 1:nrow(d)) if (is.na(d[i,2])) d[i,2] <- ""
+      }
+    }
+  }   # end (format == "ODS")
+
   else if (format == "Excel") {
 
-    if (!var_labels)
-      d <- openxlsx::read.xlsx(from, sheet=sheet, detectDates=TRUE, ...)
+    if (!var_labels) {
+      row.names <- ifelse (missing(row_names), FALSE, TRUE)
+      d <- openxlsx::read.xlsx(from, sheet=sheet, detectDates=TRUE, 
+              rowNames=row.names, ...)
+    }
 
     else {
       d <- openxlsx::read.xlsx(from, sheet=sheet,
                                colNames=FALSE, rowNames=TRUE)
-      names(d)[1] <- "label" 
+      names(d)[1] <- "label"
       for (i in 1:nrow(d)) if (is.na(d[i,1])) d[i,2] <- ""
 
       if (ncol(d) == 2) {
-         names(d)[2] <- "unit" 
+         names(d)[2] <- "unit"
          for (i in 1:nrow(d)) if (is.na(d[i,2])) d[i,2] <- ""
       }
     }
-#     fnu.col <- logical(length=ncol(d))  # reset to FALSE
-#     for (i in 1:ncol(d)) if (.is.date(d[,i])) fnu.col[i] <- TRUE
-#     d[fnu.col] <- lapply(d[fnu.col], function(x) x <- x+1)  # read.xlsx bug?
-#     d[fnu.col] <- lapply(d[fnu.col], type.convert) # as in read.csv
 
     if (!is.null(list(...)$row.names))  # add any row.names to data frame
       d <- data.frame(d, row.names=list(...)$row.names, stringsAsFactors=TRUE)
@@ -237,7 +293,7 @@ function(from=NULL, format=NULL, var_labels=FALSE,
   }  # end SPSS
 
   else if (format == "SAS"  &&  !quiet) { # data
-    cat("[with read_stata() from the haven package]\n")
+    cat("[with read_sas() from the haven package]\n")
     d <- haven::read_sas(data_file=from, ...)
   }
 
@@ -258,12 +314,20 @@ function(from=NULL, format=NULL, var_labels=FALSE,
     file.name <- paste(txt, from, ".rda", sep="")
     path.name <- paste(find.package("lessR"), "/data/",  file.name, sep="")
 
-    if (!file.exists(path.name)) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "No lessR data file with that name.\n\n",
-        "To view the list of lessR data files,\n",
-        "    enter  > help(package=lessR)\n",
-        "The data file names begin with  'data.'\n\n")
+    if (!file.exists(path.name)) {  # manually had specified  format="lessR"
+      df <- list.files(system.file("data", package="lessR"))
+      df <- df[!(df %in%"dataFreqTable99.rda")]
+      df <- gsub(".rda", "", df, fixed=FALSE)
+      df <- gsub("data", "", df, fixed=FALSE)
+      if (from %in% df)
+        format <- "lessR"  # presume exact name not exist in current wd
+      else {
+        df <- paste(" ", df)
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "Need to specify  format  or specify the name of\n",
+            "  a built-in lessR data file without the data prefix.\n\n",
+            "Available lessR data files:\n\n", df, "\n\n")
+      }
     }
 
     x.env <- new.env()  # scratch environment
@@ -296,7 +360,7 @@ function(from=NULL, format=NULL, var_labels=FALSE,
             else
               txt <- paste("Removed character, ", substr(cc,j,j), ",", sep="")
             cat(txt, "new variable name: ", names(d)[i], "\n")
-          }  # char not legal  
+          }  # char not legal
         }  # sequence through characters of ith name
       }  # cc cannot be missing
       if (substr(cc,1,1) == ".") {  # remove any beginning .
