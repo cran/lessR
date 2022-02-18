@@ -63,10 +63,6 @@ Plot(c(Pre, Post), row_names)
 ## ----by, fig.width=6--------------------------------------------------------------------------------------------------
 Plot(Years, Salary, by=Gender)
 
-## ----byordered, fig.width=6-------------------------------------------------------------------------------------------
-d$Gender.f <- factor(d$Gender, ordered=TRUE)
-Plot(Years, Salary, by=Gender.f)
-
 ## ----bycolors, fig.width=6--------------------------------------------------------------------------------------------
 Plot(Years, Salary, by=Gender, size=2, fit="lm",
      fill=c("olivedrab3", "gold1"), 

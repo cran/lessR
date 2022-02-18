@@ -210,7 +210,6 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
   txeft <- tx
 
 
-
   txhsd <- ""
   title_tukey <- "  TUKEY MULTIPLE COMPARISONS OF MEANS"
   if (!brief) {
@@ -227,6 +226,20 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
 
 
     if (graphics) {
+
+      # get left margin size
+      mnc <- max(nchar(levels(x.values)))  # 1st highest nchar
+      wm.ind <- which.max(nchar(levels(x.values)))
+      xv <- levels(x.values)[-wm.ind]
+      mnc.xv <- max(nchar(xv))  # 2nd highest nchar
+      tot <- mnc + mnc.xv
+      lm <- 3.2 + (0.27 * tot)
+      if (lm < 2.8) lm <- 2.8
+
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+      par(mar=c(5.1,lm,4.1,1.5))
+
       if (!pdf) { 
         if (manage.gr) dev.set(which=4) 
       }
@@ -238,9 +251,6 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
       plt.i <- plt.i + 1
       plt.title[plt.i] <- "95% family-wise confidence level"
 
-      orig.params <- par(no.readonly=TRUE)
-      on.exit(par(orig.params))
-      par(mar=c(5.1,6.1,4.1,1.5))
       plot(HSD, cex.axis=0.8, col.axis="gray30", las=1)
 
       if (pdf) {

@@ -12,15 +12,17 @@ Provides feedback regarding a data frame which includes the variable names, the 
 
 \usage{
 details(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
-         miss_show=30, miss_matrix=FALSE, brief=getOption("brief"))
+         miss_show=30, miss_matrix=FALSE, var_labels=FALSE,
+         brief=getOption("brief"))
 
 db(\ldots, brief=TRUE)
 }
 
 \arguments{
   \item{data}{Data frame for which to provide the details.}
-  \item{n_mcut}{For the missing value analysis, list the row name and number of missing values
-        if the number of missing exceeds or equals this cutoff.}
+  \item{n_mcut}{For the missing value analysis, list the row name and number
+        of missing values if the number of missing exceeds or equals this
+        cutoff.}
   \item{miss_zero}{For the missing value analysis, list the variable name
        or the row name even for values of 0. By default only variables and
        rows with missing data are listed.}
@@ -30,6 +32,8 @@ db(\ldots, brief=TRUE)
   \item{miss_matrix}{For the missing value analysis, if there is any missing data, 
        list a version of the complete data table with a 0 for a non-missing]
         value and a 1 for a missing value.}
+  \item{var_labels}{The data frame consists of variable labels if \code{TRUE}, 
+       so the message about a column of unique values is not displayed.}
   \item{brief}{If \code{TRUE}, display only variable names table plus any
         variable labels. The default for ``details brief'' abbreviation \code{db}.}
   \item{\dots}{Further arguments to be passed to or from methods consistent

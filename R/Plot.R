@@ -644,8 +644,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (!y.miss) if (is.matrix(y.call)) many.y <- TRUE
     if ((ncol(data.x)>1 || many.y)  ||  cat.x  ||  cat.y) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "An ellipse only applies to analysis of a single y-variable \n",
-        "  which is continuous\n\n")
+        "An ellipse only applies to an analysis of a single,",
+        "continuous y-variable\n\n")
     }
     if (y.miss) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",

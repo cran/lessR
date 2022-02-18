@@ -6,26 +6,32 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
          X2_new, X3_new, X4_new, X5_new, X6_new,
          pdf_file, width, height, ...) {
 
-# table(CarData$rating,predict(logisticModel,type='response')>=0.5)
 
   pred_sort <- TRUE  # data must be sorted to find cases close to fitted=0.5
 
-# ----------
-# prediction
-# ----------
+  # ----------
+  # prediction
+  # ----------
 
-  # first iteration through loop, generate output
-  # if length of prob_cut > 1, additional values for confusion matrix only
-  if (length(prob_cut) == 1)
-    p.cut <- prob_cut
-  else
-    p.cut <- 0.5   # 0.5 for pred output, rest for confusion matrices
-    
-  for (i in 1:length(prob_cut)) {
-    
+  for (i.cut in 1:length(prob_cut)) {
+
+    # if length of prob_cut > 1, additional values for confusion matrix only
+    # p.cut  for pred output, equal to prob_cut if only 1 value
+    # prob_cut for confusion matrices
+    if (i.cut == 1) {
+
+      if (length(prob_cut) == 1)
+        p.cut <- prob_cut[1]
+      else
+        p.cut <- 0.5
+    }
+    else
+      p.cut <- prob_cut[i.cut]
+
     # get output pred table, with label
     if (!new.data) {
       p.int <- data.frame(predict(lm.out, type="response", se.fit=TRUE))
+
 
       # classify
       label <- integer(length=nrow(p.int))
@@ -34,15 +40,15 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
 
       if (all(label == 0)  ||  all(label == 1)) { 
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "For threshold ", p.cut, ", all predicted values are ",
+          "For threshold ", p.cut, ", all labeled values are ",
           label[1], "\n\n")
       }
 
       out <- cbind(lm.out$model[c(nm[seq(2,n.vars)], nm[1])], label, 
                    p.int$fit, p.int$se.fit)
-    }
+    }  # end !new.data
 
-    else {
+    else {  # new data
       Xnew.val <- list(X1_new)
       if (n.vars > 2) for (i in 2:(n.pred)) {
         pp <- eval(parse(text=paste("X", toString(i),"_new",sep="")))
@@ -53,6 +59,8 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
 
       p.int <- data.frame(predict(lm.out, type="response",
                           se.fit=TRUE, newdata=Xnew))
+
+      # classify
       label <- integer(length=nrow(p.int))
       for (i in 1:nrow(p.int))
         label[i] <- ifelse (p.int$fit[i] < p.cut, 0, 1)
@@ -62,12 +70,12 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       out <- cbind(Xnew, Ynew, label, p.int$fit,p.int$se.fit)
     }
 
-    # display pred output only if on first iteration
-    if (i == 1) {
+    # display pred output only if on first iteration of prob_cut
+    if (i.cut == 1) {
      
-      cat( "\n\n", "  FORECASTS", "\n\n")
+      cat("\n\n", "  PREDICTION", "\n\n")
 
-      cat("Probability threshold for predicting ",
+      cat("Probability threshold for classification ",
           levels(lm.out$model[,nm[1]])[2], ":", " ", p.cut, "\n\n", sep="")
 
       if (is.factor(lm.out$model[,nm[1]]))
@@ -78,10 +86,9 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       cat("Data, Fitted Values, Standard Errors\n")
       cat("   [sorted by fitted value]\n")
       if (n.keep > 50 && pred_all == FALSE && !new.data) 
-        cat("   [to save space only some intervals printed, ",
-            " pred_all=TRUE to see all]\n")
+        cat("   [pred_all=TRUE to see all intervals displayed]\n")
 
-      names(out)[n.vars+1] <- "predict"
+      names(out)[n.vars+1] <- "label"
       names(out)[n.vars+2] <- "fitted"
       names(out)[n.vars+3] <- "std.err"
       out <- data.frame(out, stringsAsFactors=TRUE)
@@ -96,25 +103,38 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       else {
         print(out[1:4,], digits=digits_d)
         cat("\n... for the rows of data where fitted is close to 0.5 ...\n\n")
-        i.mid <- which.min(abs(0.5-sort(p.int$fit)))  # requires out sorted by fit
+        i.mid <- which.min(abs(0.5-sort(p.int$fit)))  # need out sorted by fit
+        if (i.mid < 3) i.mid <- 3  # i.mid cannot be less than 3
         print(out[(i.mid-2):(i.mid+2),], digits=digits_d)
         cat("\n... for the last 4 rows of sorted data ...\n\n")
         print(out[(n.keep-3):n.keep,], digits=digits_d)
       }
       .dash(68)
 
-#     cat("\n\nConfusion Matrix for", nm[1], "\n\n")
+      if (!new.data) {
+        cat("\n\n")
+        cat("----------------------------\n")
+        cat("Specified confusion matrices\n")
+        cat("----------------------------\n")
+        cat("\n")
+      }
+    }  # end (i.cut == 1)  # pred output
 
-      cat("\n\n")
-      cat("----------------------------\n")
-      cat("Specified confusion matrices\n")
-      cat("----------------------------\n")
-      cat("\n")
-    }  # end (i == 1)  # pred output
 
-    # confusion matrix
-    if (i > 1) cat("\n\n")
-    .logit5Confuse(lm.out, out, n.vars, nm, new.data, prob_cut[i])
+    # confusion matrix, based on prob_cut directly
+    if (i.cut > 1) cat("\n\n")
+    if (!new.data) {
+      if (n.vars == 2) {
+        b0 <- lm.out$coefficients[1]
+        b1 <- lm.out$coefficients[2]
+        x.cut <- (log(prob_cut[i.cut] / (1-prob_cut[i.cut])) - b0) / b1
+      }
+      else
+        x.cut <- NULL
+      .logit5Confuse(lm.out, out, n.vars, nm, prob_cut[i.cut], x.cut)
+    }
+    else  # new.data
+      cat("\n\nWith X1_new, etc., no confusion matrix.\n")
 
   }  # end (i in 1:length(p.cut))
 
@@ -125,18 +145,16 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     .opendev(pdf_file, width, height)
 
     x.values <- lm.out$model[,nm[2]]
-    if (!is.factor(lm.out$model[,nm[1]])) {
-      y.values <- lm.out$model[,nm[1]] 
-      y.label <- paste("Probability of", nm[1])
-    }
-    else {
-      y.values <- as.numeric(lm.out$model[,nm[1]])
-      min.y <- min(y.values, na.rm=TRUE)
-      y.label <- paste("Probability ", nm[1], " = ",
-        levels(lm.out$model[,nm[1]])[2], sep="")
-      for (i in 1:length(y.values))
-        y.values[i] <- ifelse (y.values[i]==min.y, 0, 1) 
-    }
+
+    if (!is.factor(lm.out$model[,nm[1]])) 
+      lm.out$model[,nm[1]] <- factor(lm.out$model[,nm[1]], levels=0:1)
+
+    y.values <- as.numeric(lm.out$model[,nm[1]])
+    min.y <- min(y.values, na.rm=TRUE)
+    y.label <- paste("Probability ", nm[1], " = ", 
+      levels(lm.out$model[,nm[1]])[2], sep="")
+    for (i in 1:length(y.values))
+      y.values[i] <- ifelse (y.values[i]==min.y, 0, 1) 
  
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
@@ -146,6 +164,16 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     tm <- margs$tm
     rm <- margs$rm
     bm <- margs$bm
+
+    nc <- nchar(levels(lm.out$model[,nm[1]]))
+
+    if (max(nc)==1)
+      buf <- 0.06*nc
+    else
+      buf <- 0.10*nc
+    rm <- rm + max(buf) + .3
+    rm <- rm - .05*max(nc)
+    if (max(nc) > 10) buf <- buf + 0.1
 
     par(bg=getOption("window_fill"))
     orig.params <- par(no.readonly=TRUE)
@@ -176,16 +204,34 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
 
     .axes(NULL, NULL, axTicks(1), axTicks(2))
 
+    # right axis, two values of response variable
+    ax <- .axes_dim()
+    axis_y_color <- ax$axis_y_color
+    axis_y_lwd <- ax$axis_y_lwd
+    axis_y_lty <- ax$axis_y_lty
+    axis_y_cex <- ax$axis_y_cex
+    axis_y_text_color <- ax$axis_y_text_color
+    axis(4, at=c(0,1), labels=FALSE,
+        col=axis_y_color, lwd=axis_y_lwd, lty=axis_y_lty) 
+    text(x=usr[2]+.45+buf/1.15, y=c(0,1), labels=levels(lm.out$model[,nm[1]]),
+         pos=4, xpd=TRUE, cex=axis_y_cex, col=axis_y_text_color)
+
     main.lab <- NULL
     sub.lab <- NULL
-    .axlabs(nm[2], y.label, main.lab, sub.lab, 
+    .axlabs(nm[2], y.label, labels=FALSE, main.lab, sub.lab, 
             cex.lab=getOption("lab_cex"), cex.main=1.0, ...) 
 
     fill <- getOption("pt_fill")
     trans <- .7
     fill <- .maketrans(fill, (1-trans)*256)
     color <- getOption("pt_color")
-    points(x.values,y.values, pch=21, col=color, bg=fill, cex=0.8)
+    if (n.vars == 2  &&  length(prob_cut) == 1) {
+      pc <- prob_cut[1]
+      segments(usr[1], pc, usr[2], pc, col="gray35", lty="dashed", lwd=0.5)  
+      segments(x.cut, usr[3], x.cut, usr[4], col="gray35", lty="dashed", lwd=0.5)  
+#     polygon(c(x.cut, usr[2], usr[2], x.cut), c(1,1,0,0), col="gray98")
+    }
+    points(x.values, y.values, pch=21, col=color, bg=fill, cex=0.8)
     lines(x.values, p.int$fit, col=color, lwd=2)
 
     if (!is.null(pdf_file)) {
@@ -225,6 +271,5 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       if (!numeric.all) cat("numeric.\n")
     }
   }
-
 
 }

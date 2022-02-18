@@ -180,13 +180,6 @@ Plot a scatterplot of two continuous variables for each level of a categorical v
 Plot(Years, Salary, by=Gender)
 ```
 
-If the `by` variable is an ordered factor, the default color palette is sequential according to the underlying theme, such as `"blues"` for the default theme of `"colors"`. Change the general theme with the `style()` function.
-
-```{r byordered, fig.width=6}
-d$Gender.f <- factor(d$Gender, ordered=TRUE)
-Plot(Years, Salary, by=Gender.f)
-```
-
 
 Change the plot colors with the `fill` (interior) and `color` (exterior or edge) parameters. Because there are two levels of the `by` variable, specify two fill colors and two edge colors each with an R vector defined by the `c()` function. Also include the regression line for each group and increase the size of the plotted points. 
 

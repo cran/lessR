@@ -29,7 +29,7 @@ function(lm.out, dname, n.keep, show_R,
       }
 
       if (is.null(options()$knitr.in.progress))
-        tx[length(tx)+1] <- "Correlation Matrix\n"
+        tx[length(tx)+1] <- "-- Correlation Matrix\n"
       crs <- cor(lm.out$model[c(nm)])
       txcrs <- .prntbl(crs, 2, cc=NULL)
       for (i in 1:length(txcrs)) tx[length(tx)+1] <- txcrs[i]
@@ -60,7 +60,7 @@ function(lm.out, dname, n.keep, show_R,
     tx <- character(length = 0)
 
     if (is.null(options()$knitr.in.progress)) {
-      tx[length(tx)+1] <- "Collinearity"
+      tx[length(tx)+1] <- "-- Collinearity"
       tx[length(tx)+1] <- ""
     }
 
@@ -105,7 +105,7 @@ function(lm.out, dname, n.keep, show_R,
     tx <- character(length = 0)
 
     if (is.null(options()$knitr.in.progress)) {
-      tx[length(tx)+1] <- "Best Subset Regression Models"
+      tx[length(tx)+1] <- "-- Best Subset Regression Models"
       if (n.pred > 5)
         tx[length(tx)+1] <- "for up to 10 subsets of each number of predictors"
       tx[length(tx)+1] <- ""

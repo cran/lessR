@@ -17,7 +17,7 @@ Can also be called from the more general \code{\link{model}} function.
 }
 
 \usage{
-Logit(my_formula, data=d, rows=NULL,
+Logit(my_formula, data=d, rows=NULL, ref=NULL,
       digits_d=4, text_width=120,
 
      brief=getOption("brief"),
@@ -42,6 +42,10 @@ lr(\ldots)
        for analysis is \code{d}, otherwise explicitly specify.}
   \item{rows}{A logical expression that specifies a subset of rows of
        the data frame to analyze.}
+  \item{ref}{Value of the response variable that is the reference group, 
+       otherwise set by default as the value that yields a \code{+} slope
+       for one predictor variable or the largest alphabetical/numerical
+       value if more than one predictor.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal
        digits. For the rest of the output, it is a suggestion only.}
   \item{text_width}{Width of the text output at the console.}\cr
@@ -62,9 +66,12 @@ lr(\ldots)
   \item{pred_all}{Default is \code{FALSE}, which produces prediction intervals
        only for the first, middle and last five rows of data.}
   \item{prob_cut}{Probability threshold for classifying an observation into the
-       reference group (1) or not (0). Can be a vector, in which case the
-       forecasts and first confusion matrix are for a threshold of 0.5, then
-       the specified values.}
+       reference group (1) or not (0), applied to the forecasts with prediction
+       intervals as well as to the confusion matrix. Can be a vector, in which
+       case if multiple predictors, the forecasts are for a threshold of 0.5,
+       then the confusion matrices according to the specified values. If a single
+       specified value, then both the forecasts and the one confusion matrix are
+       computed with that value.}
   \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a
        larger value are flagged in red and labeled in the resulting scatterplot
        of Residuals and Fitted Values. Default value is 1.0.}\cr
@@ -145,7 +152,7 @@ Logit(Gender ~ Years)
 # Multiple logistic regression model with specified probability thresholds
 #  for classification into the reference group
 # just for employees who have worked more than 5 years at the firm
-Logit(Gender ~ Years + Salary, prob_cut=c(.4, .7), rows=(Years > 5))
+Logit(Gender ~ Years + Salary, prob_cut=c(.4, .7), rows=(Years > 3))
 
 # Custom contrasts for categorical predictor with glm parameter contrasts
 cnt <- contr.treatment(n=3, base=2)

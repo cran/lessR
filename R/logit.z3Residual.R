@@ -3,7 +3,7 @@ function(lm.out, nm, d,
          n.vars, n.pred, n.obs, n.keep, digits_d, pre, line,
          res_sort, res_rows, cooks_cut) {
   
-    cat( "\n\n\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
+    cat( "\n", "  ANALYSIS OF RESIDUALS AND INFLUENCE", "\n")
 
     cat("Data, Fitted, Residual, Studentized Residual, Dffits, Cook's Distance\n")
     if (res_sort == "cooks") cat("   [sorted by Cook's Distance]\n")

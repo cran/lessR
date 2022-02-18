@@ -218,19 +218,22 @@ function(my_formula, data=d, rows=NULL,
     tx <- character(length=0)
 
     n.keep <- nrow(av.out$model)
-    if (is.null(res_rows)) if (n.keep < 20) res_rows <- n.keep else res_rows <- 20 
+    if (is.null(res_rows)) 
+      if (n.keep < 20) res_rows <- n.keep else res_rows <- 20 
     if (res_rows == "all") res_rows <- n.keep  # turn off resids with res_rows=0
 
     tx[length(tx)+1] <- "Fitted Values, Residuals, Standardized Residuals"
     if (res_sort == "zresid")
-      tx[length(tx)+1] <- "   [sorted by Standardized Residuals, ignoring + or - sign]"
+      tx[length(tx)+1] <- 
+        "   [sorted by Standardized Residuals, ignoring + or - sign]"
     if (res_sort == "fitted")  
       tx[length(tx)+1] <- "   [sorted by Fitted Value, ignoring + or - sign]"
     if (res_rows < n.keep)
       txt <- "cases (rows) of data, or res_rows=\"all\"]"
     else
       txt="]"
-    tx[length(tx)+1] <- paste("   [res_rows = ", res_rows, ", out of ", n.keep, " ", txt, sep="")
+    tx[length(tx)+1] <- paste("   [res_rows = ", res_rows, ", out of ", n.keep,
+                              " ", txt, sep="")
 
     fit <- fitted(av.out)
     res <- residuals(av.out)

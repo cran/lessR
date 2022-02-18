@@ -5,7 +5,56 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
->>>>>> Changes for lessR version 4.1.5 (2022-01-29) <<<<<<
+>>>>>> Changes for lessR version 4.1.6 (2022-02-18) <<<<<<
+
+-------------
+Updates 4.1.6
+-------------
+
+ANOVA
+  better calculation of size of left-margin for pairwise mean
+    differences plot
+
+Logit
+  for a single predictor:
+    for a given probability classification
+      threshold, the x-cutoff value now provided
+    annotations added to the sigmoid curve
+  ref parameter for designating the value of the response variable
+    that is the reference group instead of relying upon defaults
+  rows in the classification table reversed to correspond to 
+    sigmoid curve plot
+
+pivot
+  for consistency with other na parameters, show_group_na parameter
+    changed to na_show_group
+
+Plot
+  boxplot median line width increased to 2 for better visibility in
+    the presence of an embedded scatterplot
+  
+
+---------------
+Bug Fixes 4.1.6
+---------------
+
+Logit
+  bug fixed that occurred for 50% of the analyses when the response variable
+    has integer input values of 0,1 instead of a factor such as Man/Woman
+  fitted values now properly displayed when X1_new, etc. specified
+  edge condition that crashed with very little variance among
+    fitted probabilities now fixed
+
+Plot
+  by1 parameter now works when x is categorical
+
+Regression
+  the table of estimates now properly displayed for indicator variables
+    with large number of characters for the variable names
+
+
+
+>>>>>> Changes for lessR version 4.1.5 (2022-02-02) <<<<<<
 
 -------------
 Updates 4.1.5

@@ -92,8 +92,10 @@ function(from=NULL, format=NULL, var_labels=FALSE,
       df <- df[!(df %in%"dataFreqTable99.rda")]
       df <- gsub(".rda", "", df, fixed=FALSE)
       df <- gsub("data", "", df, fixed=FALSE)
-      if (from %in% df)
+      if (from %in% df) {
         format <- "lessR"
+        if (grepl("lbl", from, fixed=TRUE)) var_labels <- TRUE
+      }
       else {
         df <- paste(" ", df)
         cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -396,7 +398,7 @@ function(from=NULL, format=NULL, var_labels=FALSE,
   # --------
   if (!quiet  &&  is.data.frame(d))
     details(d, n_mcut, miss_zero, max_lines, miss_show,
-                      miss_matrix, brief)
+                      miss_matrix, var_labels, brief)
   else
     cat("\n")
 

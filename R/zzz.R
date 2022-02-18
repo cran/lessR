@@ -9,7 +9,7 @@ if (getRversion() >= "3.5.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.1.5  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
+      "lessR 4.1.6  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
       "---------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -18,7 +18,7 @@ function(...) {
       "testing means and proportions, regression, factor analysis,\n",
       "customization, and descriptive statistics from pivot tables.\n",
       "  Enter:  browseVignettes(\"lessR\")\n\n",
-      "View changes in this new version of lessR.\n",
+      "View changes in this or recent versions of lessR.\n",
       "  Enter: help(package=lessR)  Click: Package NEWS\n",
       "  Enter: interact()  for access to interactive graphics\n",
       "  New function: reshape_long() to move data from wide to long\n")
@@ -1043,8 +1043,7 @@ function(dir, axT) {
 }
 
 
-.axes <- function(x.lvl, y.lvl, axT1, axT2,
-         rotate_x=0, rotate_y=0, offset=0.5, y.only=FALSE, ...) {
+.axes_dim <- function() {
 
   axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
     getOption("axis_color"), getOption("axis_x_color"))
@@ -1068,11 +1067,35 @@ function(dir, axT) {
     getOption("axis_cex"), getOption("axis_y_cex"))
   adj <- .RSadj(axis_cex=axis_y_cex); axis_y_cex <- adj$axis_cex
 
-# if (is.null(getOption("axis_text_color"))) options(axis_text_color = "gray15")
   axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
     getOption("axis_text_color"), getOption("axis_x_text_color"))
   axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")),
     getOption("axis_text_color"), getOption("axis_y_text_color"))
+
+  return(list(axis_x_color=axis_x_color, axis_y_color=axis_y_color,
+              axis_x_lwd=axis_x_lwd, axis_y_lwd=axis_y_lwd,
+              axis_x_lty=axis_x_lty, axis_y_lty=axis_y_lty,
+              axis_x_cex=axis_x_cex, axis_y_cex=axis_y_cex,
+              axis_x_text_color=axis_x_color, axis_y_text_color=axis_y_color))
+}
+
+
+.axes <- function(x.lvl, y.lvl, axT1, axT2,
+         rotate_x=0, rotate_y=0, offset=0.5, y.only=FALSE, ...) {
+
+  ax <- .axes_dim()
+  axis_x_color <- ax$axis_x_color
+  axis_x_lwd <- ax$axis_x_lwd
+  axis_x_lty <- ax$axis_x_lty
+  axis_x_cex <- ax$axis_x_cex
+  axis_x_text_color <- ax$axis_x_text_color
+  axis_y_color <- ax$axis_y_color
+  axis_y_lwd <- ax$axis_y_lwd
+  axis_y_lty <- ax$axis_y_lty
+  axis_y_cex <- ax$axis_y_cex
+  axis_y_text_color <- ax$axis_y_text_color
+
+# if (is.null(getOption("axis_text_color"))) options(axis_text_color = "gray15")
 
   fnt <- ifelse (getOption("sub_theme") == "wsj", 2, 1) # bold
 
@@ -1157,12 +1180,12 @@ function(dir, axT) {
   if (regR) ylab_adj <- ylab_adj + .2
 
   title(xlab=x.lab, line=lblx.lns-xlab_adj,
-        col.lab=lab_x_color, cex.lab=lab_x_cex, ...)
+        col.lab=lab_x_color, cex.lab=lab_x_cex)
   if (!is.null(sub.lab))
     title(sub=sub.lab, line=lblx.lns+1-xlab_adj, cex.sub=0.75,
           col.lab=lab_x_color, ...)
   title(ylab=y.lab, line=lbly.lns-ylab_adj+.1,
-        col.lab=lab_y_color, cex.lab=lab_y_cex, ...)
+        col.lab=lab_y_color, cex.lab=lab_y_cex)
   if (!is.null(main.lab))
     title(main=main.lab, cex.main= getOption("main_cex"),
           col.main=getOption("main_color"), ...)

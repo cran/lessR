@@ -1,6 +1,6 @@
 pivot <-
 function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
-         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, show_group_na=TRUE,
+         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, na_show_group=TRUE,
          out_names=NULL, sort=NULL, sort_var=NULL,  
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
          factors=FALSE, q_num=4, digits_d=3, quiet=getOption("quiet")) {
@@ -162,7 +162,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     ind.by <- c(ind.r.by, ind.c.by)
 
     # convert by variables to factors
-    exc <- ifelse (show_group_na, "", NA)
+    exc <- ifelse (na_show_group, "", NA)
     if (n.by > 1) {
       data[, ind.by] <- lapply(data[, ind.by], factor, exclude=exc)
       by.vars <- as.list(data[, ind.by])
@@ -229,7 +229,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
   # if table over all the data, then a single freq dist
   if (missing(by) && nm.cmpt[1] == "table") {
-    exc <- ifelse (show_group_na, "ifany", "no")
+    exc <- ifelse (na_show_group, "ifany", "no")
     tbl <- table(data[,ind.var.d], useNA=exc)
     a <- data.frame(tbl)
     names(a)[1] <- nm.var.d[1]

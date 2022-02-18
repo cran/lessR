@@ -290,14 +290,14 @@ function(x, y, values, object, n_cat,
               by.name <- getOption("byname")
               txt[i] <- paste(by.name, " ", by.cat[i], ":  ", sep="") 
               sse.pn <- prettyNum(sse[i], big.mark=",", scientific=FALSE)
-              txt[i] = paste(txt[i], "Sum of Squared Errors about Fit Line= ",
-                             sse.pn, sep="")
+              txt[i] = paste(txt[i], 
+                "Sum of Squared Errors about Fit Line, SSE = ", sse.pn, sep="")
             }  # end for n.by
             txsee <- txt
           }  # end n.by > 0
           else {  # no by vars
             sse.pn <- prettyNum(sse[1], big.mark=",", scientific=FALSE)
-            txsee <- paste("Sum of Squared Errors about Fit Line = ",
+            txsee <- paste("Sum of Squared Errors about Fit Line, SSE = ",
                      sse.pn, sep="")
           } 
           class(txsee) <- "out"

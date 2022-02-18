@@ -234,7 +234,7 @@ function(x, y,
         fc <- paste("PieChart(", x.name,
                     ", values=\"%\")  # display %'s on the chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("BarChart(", x.name, ")  # bar chart", sep="")
+        fc <- paste("PieChart(", x.name, ")  # bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")

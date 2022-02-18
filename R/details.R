@@ -1,6 +1,7 @@
 details <-
 function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
-         miss_show=30, miss_matrix=FALSE, brief=getOption("brief")) {
+         miss_show=30, miss_matrix=FALSE, var_labels=FALSE,
+         brief=getOption("brief")) {
 
   dname <- deparse(substitute(data))  # from read is called data
 
@@ -119,7 +120,7 @@ function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
   }
   .dash(90)
 
-  if (colm.ID > 0) {
+  if (colm.ID > 0  &&  !var_labels) {
     cat("\n\n")
     txt <- maybe.ID
     cat(

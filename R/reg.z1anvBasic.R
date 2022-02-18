@@ -30,7 +30,7 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   }
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- "Analysis of Variance"
+    tx[length(tx)+1] <- "-- Analysis of Variance"
     tx[length(tx)+1] <- ""
   }
 
@@ -54,6 +54,7 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
     if (max.ln[i] < 9L) max.ln[i] <- 9L
   }
 
+  # header
   df.lbl <- .fmtc("     df", max.ln[1]+1)
   SS.lbl <- .fmtc(" Sum Sq", max.ln[2]+1)
   MS.lbl <- .fmtc("Mean Sq", max.ln[3]+1)
@@ -137,7 +138,6 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
     tot <- c(tot.df, tot.ss, tot.ms)
     names(tot) <- c("df", "ss", "ms")
   }
-
 
   return(list(tx=tx, mdl=mdl, rsd=rsd, tot=tot, MSW=MSW))
 

@@ -361,7 +361,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
             sse <- sum(e^2)
             sse.pn <- prettyNum(sse, big.mark = ",", scientific = FALSE)
             if (panel.number() == 1) cat("\n")
-            cat("Sum of Squared Errors about Fit Line, Panel ",
+            cat("Sum of Squared Errors about Fit Line, SSE, for Panel ",
                 panel.number(), ": ", sse.pn, sep="", "\n")
 
             if (fit %in% c("exp", "sqrt", "reciprocal", "null"))
@@ -447,7 +447,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
     p <- update(p,
 
        par.settings=list(  # col option does not work directly on panel.bwplot
-         box.rectangle=list(fill=box_fill,
+         box.rectangle=list(fill=box_fill, lwd=2,
                             col=getOption("box_color")),
          box.umbrella=list(col=getOption("box_color"), lty="solid")
        ),

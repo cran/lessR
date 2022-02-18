@@ -90,6 +90,8 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
   # begin
   # ---------------------------------
 
+  if (is.null(digits_d)) digits_d <- getOption("digits_d")
+
   # maximum number of output text columns
   c.nm <- NULL  # storage for full value labels when they are abbreviated
 

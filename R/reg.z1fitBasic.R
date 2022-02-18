@@ -12,7 +12,7 @@ function(lm.out, TotSS, sy, digits_d=3, show_R=FALSE) {
   sm <- summary(lm.out)
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- "Model Fit"
+    tx[length(tx)+1] <- "-- Model Fit"
     tx[length(tx)+1] <- ""
   }
   

@@ -26,7 +26,7 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
 
   # output: header
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("Estimated Model for", nm[1])
+    tx[length(tx)+1] <- paste("-- Estimated Model for", nm[1])
     tx[length(tx)+1] <- ""
   }
 
@@ -36,7 +36,7 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   smc <- cbind(sm1, sm2)
 
   buf <- 0
-  for (i in 1:n.vars) {
+  for (i in 1:nrow(sm$coefficients)) {  # allows for indicator variables
     lng.lbl <- nchar(rownames(smc)[i])
     if (lng.lbl > buf) buf <- lng.lbl 
    }

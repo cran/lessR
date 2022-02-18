@@ -1,5 +1,5 @@
 Logit <-
-function(my_formula, data=d, rows=NULL,
+function(my_formula, data=d, rows=NULL, ref=NULL,
          digits_d=4, text_width=120, 
 
          brief=getOption("brief"),
@@ -62,7 +62,6 @@ function(my_formula, data=d, rows=NULL,
       }
     }
   }
-
 
   max_new <- 6
 
@@ -155,18 +154,30 @@ function(my_formula, data=d, rows=NULL,
 #   }
 #   else if (n.pred==1) {
 
+    lv1 <- levels(data[,nm[1]])[1]
+    lv2 <- levels(data[,nm[1]])[2]
     if (n.pred==1) {
-      if (is.numeric(data[,nm[2]]) && is.numeric(data[,nm[2]])) {
+      if (is.numeric(data[,nm[2]])) {
         avg <- tapply(data[,nm[2]], data[,nm[1]], mean, na.rm=TRUE)
-        if (avg[1] > avg[2]) {  # switch order 0 and 1 for response
-          lv1 <- levels(data[,nm[1]])[1]
-          lv2 <- levels(data[,nm[1]])[2]
-          data[,nm[1]] <- factor(data[,nm[1]], levels=c(lv2,lv1))
-        }
-  #     y.values <- ifelse (data[,nm[1]]==lv2, 1, 0) 
+        if (avg[1] > avg[2])  # switch order 0 and 1 for response
+          if (is.factor(data[,nm[1]]))
+            data[,nm[1]] <- factor(data[,nm[1]], levels=c(lv2,lv1))
       }
-    }
+    }  # end n.pred=1
   }
+
+  # second level of Y, nm[1], is the reference group
+  if (!is.null(ref)) {
+    if (lv1 != ref  &&  lv2 != ref)  {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Values of response ", nm[1], ": ",
+        levels(data[,nm[1]])[1], " ", levels(data[,nm[1]])[2], "\n",
+        "You specified a non-existent value, ref = ", ref, "\n\n")
+    }
+    if (lv2 != ref)
+      data[,nm[1]] <- factor(data[,nm[1]], levels=c(lv2,lv1))
+  }
+    
 
   # check new.data option for consistency  
   new.data <- FALSE
@@ -224,9 +235,9 @@ function(my_formula, data=d, rows=NULL,
   }
   
   
-  cat( "\n\n\n", "  BASIC ANALYSIS", "\n\n")
+  cat( "\n\n", "  BASIC ANALYSIS", "\n\n")
 
-  cat("Model Coefficients\n")
+  cat("Estimated Model for the Logit of Reference Group Membership\n")
 
   sm <- summary(lm.out)
   sm1 <- sm$coefficients

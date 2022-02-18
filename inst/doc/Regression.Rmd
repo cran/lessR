@@ -25,10 +25,11 @@ d <- Read("Employee")
 
 As an option, also read the table of variable labels. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need to be entered into the table. The table can be a `csv` file or an Excel file.
 
-Currently, read the label file into the _l_ data frame. The labels are displayed on both the text and visualization output. Each displayed label consists of the variable name juxtaposed with the corresponding label.
+Currently, read the label file into the _l_ data frame. The labels are displayed on both the text and visualization output. Each displayed label consists of the variable name juxtaposed with the corresponding label, as shown in the display of the label file.
 
 ```{r labels}
 l <- rd("Employee_lbl")
+l
 ```
 
 ## Default Analysis 
@@ -103,7 +104,7 @@ r$coefficients
 
 Do a regression and request all prediction intervals. Then convert that output segment to a data frame named _dp_ with base R `read.table()`. As a data frame, do a standard search for an individual row for a specific prediction interval (see the Subset a Data Frame vignette). 
 
-This particular conversion to a data frame requires one more step. One more spaces delimit adjacent columns, but the names in this data set are formatted with a comma followed by a space. Use base R `sub()` to remove the space after the comma before converting to a data frame.
+This particular conversion to a data frame requires one more step. One or more spaces delimit adjacent columns, but the names in this data set are formatted with a comma followed by a space. Use base R `sub()` to remove the space after the comma before converting to a data frame.
 
 ```{r}
 r <- reg(Salary ~ Years, pred_rows="all", graphics=FALSE)
@@ -140,7 +141,7 @@ The following submits the null model for _Salary_, and plots the errors. Compare
 reg_brief(Salary ~ 1, plot_errors=TRUE)
 ```
 
-Can also get the null model output from the __lessR__ function `Plot()` with the `fit` parameter set to `"null"`.
+Can also get the null model plot from the __lessR__ function `Plot()` with the `fit` parameter set to `"null"`.
 
 
 ## Likert Type Data
@@ -166,13 +167,14 @@ reg(Salary ~ Years + Pre, Rmd="eg")
 
 ## Logistic Regression
 
-Specify multiple logistic regression with the usual R formula syntax applied to the __lessR__ function `Logit()`. The output includes the confusion matrix and various classification fit indices. 
+For a model with a binary response variable, $y$, specify multiple logistic regression with the usual R formula syntax applied to the __lessR__ function `Logit()`. The output includes the confusion matrix and various classification fit indices. 
 
 
 ### Default Analysis
 
-```{r fig.width=4, fig.height=4}
-Logit(Gender ~ Salary)
+```{r, fig.width=5, fig.height=4}
+d <- Read("BodyMeas")
+Logit(Gender ~ Hand)
 ```
 
 
@@ -180,8 +182,8 @@ Logit(Gender ~ Salary)
 
 Specify additional probability thresholds for classification beyond just the default 0.5 with the `prob_cut` parameter.
 
-```{r}
-Logit(Gender ~ Years + Salary, prob_cut=c(.3, .5, .7))
+```{r, fig.width=5, fig.height=4}
+Logit(Gender ~ Hand, prob_cut=c(.3, .5, .7))
 ```
 
 
