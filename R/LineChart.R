@@ -38,7 +38,7 @@ function(x, data=d, rows=NULL,
 
   center_line <- match.arg(center_line)
 
-  fill <- getOption("bar_fill_ordered") 
+  fill <- getOption("bar_fill_cont") 
   color <- getOption("pt_color_ordered")
   panel_fill <- getOption("panel_fill")
   panel_color <- getOption("panel_color")

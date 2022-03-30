@@ -9,8 +9,8 @@ function(x=NULL, data=d, rows=NULL,
     bin_start=NULL, bin_width=NULL, bin_end=NULL, breaks="Sturges",
 
     theme=getOption("theme"),
-    fill=getOption("bar_fill_ordered"),
-    color=getOption("bar_color_ordered"),
+    fill=getOption("bar_fill_cont"),
+    color=getOption("bar_color_cont"),
     trans=getOption("trans_bar_fill"),
 
     values=FALSE,
@@ -38,8 +38,8 @@ function(x=NULL, data=d, rows=NULL,
 
 
   if (missing(fill))
-    fill <- ifelse (is.null(getOption("bar_fill_ordered")), 
-      getOption("bar_fill"), getOption("bar_fill_ordered"))
+    fill <- ifelse (is.null(getOption("bar_fill_cont")), 
+      getOption("bar_fill"), getOption("bar_fill_cont"))
   breaks.miss <- ifelse (missing(breaks), TRUE, FALSE)
   bw.miss <- ifelse (missing(bw), TRUE, FALSE)
 
@@ -74,7 +74,7 @@ function(x=NULL, data=d, rows=NULL,
 
   if (theme != getOption("theme")) {
     sty <- style(theme, reset=FALSE)
-    fill <- sty$bar$bar_fill_ordered
+    fill <- sty$bar$bar_fill_cont
     color <- sty$bar$color_ordered
     trans <- sty$bar$trans_fill
   }

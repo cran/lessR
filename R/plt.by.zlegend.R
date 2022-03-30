@@ -3,22 +3,24 @@
 .plt.by.legend <-
 function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
          pt.size=1.25, pt.lwd=0.5, legend_size=NULL,
-         legend_abbrev=0, legend_adj=0) {
+         legend_abbrev=NULL, legend_adj=0) {
 
   par(xpd=NA)  # allow drawing outside of plot region
 
   n.levels <- length(mylevels)
-  by.name <- getOption("byname")
+  legend_title <- getOption("byname")
 
-  if (legend_abbrev == 0)
+  if (is.null(legend_abbrev))
     legend_labels <- mylevels
-  else 
+  else {
     if (!is.null(mylevels))
       legend_labels <- abbreviate(mylevels, legend_abbrev)
+  }
 
-  wt <- 10
-  legend_title  <- abbreviate(by.name, wt)
-  mx.ch <- max(c(nchar(legend_labels), nchar(legend_title) - 3))
+  # abbreviate title if too large
+  if (!is.null(legend_abbrev))
+    legend_title  <- abbreviate(legend_title, legend_abbrev)
+  mx.ch <- max(c(max(nchar(legend_labels)), nchar(legend_title)-2))
 
   ll <- legend(0,0, legend=legend_labels, title=legend_title, cex=.7,
                pt.cex=pt.size, pt.lwd=pt.lwd, plot=FALSE)

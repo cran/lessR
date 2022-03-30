@@ -5,6 +5,67 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 4.1.7 (2022-03-30) <<<<<<
+
+-------------
+Updates 4.1.7
+-------------
+
+ANOVA
+  2-way factorial analysis provides Type II sum of squares
+    for unbalanced designs
+  R-squared and related indices now reported to three decimal digits
+  plotted point in interaction plot a little smaller
+  scatterplot title removed for more room for the plot, labels adjusted
+  scatterplot moved to the first plot displayed
+
+BarChart
+  right-margin legend for two variable chart no longer defaults to
+    abbreviations for title and values, use legend_abbrev to specify
+
+Histogram
+  bars slightly more gray and slightly less blue
+
+Plot
+  for by and fit parameters together, equation, MSE, and R2 given for 
+    each fit line
+
+Regression
+  analysis of covariance with one categorical variable and one continuous
+    variable displays the ...
+    1. regression line and equation for each level of the categorical
+       variable superimposed over the scatterplot
+    2. Type II SS for the ANOVA table
+    3. test of the interaction of the covariate with the grouping variable 
+  n_cat parameter added to allow integer variables to be treated as 
+    categorical without declaring as a formal R factor
+  kfold parameter now applies to models with categorical variables with
+    dummy variables created automatically
+  extra line of spacing between major sections of output
+  grid lines added to scatterplot
+  title removed from scatterplot, remains in text console output
+  parameter best_sub provides the value "Cp" for Mallow's "Cp" statistic
+    in addition to the default value "adjr2" for adjusted R-squared
+
+rename
+  new utility function for renaming a variable in the specified data frame
+
+
+---------------
+Bug Fixes 4.1.7
+---------------
+
+ANOVA
+  interaction plot for 2-way factorial generalizes better beyond 2 levels
+  brief output works more reliably for 2-way factorial
+
+Regression
+  scale_response parameter now works, applicable when new_scale is
+    implemented, FALSE by default but if TRUE then the response variable
+    Y is also rescaled
+
+
+
 >>>>>> Changes for lessR version 4.1.6 (2022-02-18) <<<<<<
 
 -------------

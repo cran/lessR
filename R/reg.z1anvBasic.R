@@ -1,5 +1,5 @@
 .reg1anvBasic <-
-function(lm.out, digits_d=NULL, show_R=FALSE) {
+function(lm.out, ancova, digits_d=NULL, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -7,7 +7,25 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   n.obs <- nrow(lm.out$model)
   d <- digits_d
 
-  tx <- character(length = 0)
+  x.cat <- 0
+  x.cont <- 0
+  balance <- TRUE
+  if (ancova) {
+    if (is.numeric(lm.out$model[,nm[2]]) && is.factor(lm.out$model[,nm[3]])) {
+      x.cat <- 3
+      x.cont <- 2
+    }
+    if (is.numeric(lm.out$model[,nm[3]]) && is.factor(lm.out$model[,nm[2]])) {
+      x.cat <- 2
+      x.cont <- 3
+    }
+    lvl <- levels(lm.out$model[,x.cat])
+    tbl <- table(lm.out$model[,x.cat])
+#   n.cell <- tbl[1]
+#   for (i in 2:length(lvl)) {
+#     if (n.cell != tbl[i]) balance <- FALSE
+#   } 
+  }  # end ancova
 
   # ANOVA 
   smc <- anova(lm.out)
@@ -22,16 +40,25 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
 
   SSE <- smc[nt1,2]
 
+  tx <- character(length=0)
+
+  if (is.null(options()$knitr.in.progress)) {
+  }
+
+  tx[length(tx)+1] <- "-- Analysis of Variance"
+  if (ancova) {
+    tx[length(tx)] <-  paste(tx[length(tx)],
+                            "from Type II Sums of Squares")
+    lm2.out <- lm(lm.out$model[,1] ~ lm.out$model[,3] + lm.out$model[,2])
+    smc[1,] <- anova(lm2.out)[2,]  # replace original first line of ANOVA table
+  }
+  tx[length(tx)+1] <- ""
+
   if (show_R) {
     tx[length(tx)+1] <- ""
     .dash2(68)
     tx[length(tx)+1] <- paste("> ","anova(model)", "\n",sep="")
     tx[length(tx)+1] <-.dash2(68)
-  }
-
-  if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- "-- Analysis of Variance"
-    tx[length(tx)+1] <- ""
   }
 
   # width of column 1
@@ -75,12 +102,12 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
       tx[length(tx)+1] <- paste(rlb, df, SS, MS, fv, pv)
     } 
   }
-  if (n.pred > 1) tx[length(tx)+1] <- ""
+  if (n.pred > 1  &&  !ancova) tx[length(tx)+1] <- ""
 
 
-  # Model term in ANOVA table
+  # Model term in ANOVA table (not applicable to Type II SS from ancova)
   mdl <- NA
-  if (n.pred > 0) {
+  if (n.pred > 0  &&  !ancova) {
     rlb <- .fmtc("Model", max.c1, j="left")
 
     mod.df <- 0
@@ -114,14 +141,13 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   MS <- .fmt(smc[nt1,3], digits_d, max.ln[3])
   MSW <- smc[nt1,3]
   tx[length(tx)+1] <- paste(rlb, df, SS, MS) 
-# if (n.pred > 1) tx[length(tx)+1] <- ""
 
   rsd <- c(smc[nt1,1], smc[nt1,2], smc[nt1,3])
   names(rsd) <- c("df", "ss", "ms")
 
   # Total
   tot <- NA
-  if (n.pred > 0) {
+  if (n.pred > 0  &&  !ancova) {
     rlb <- .fmtc(nm[1], max.c1, j="left")
 
     tot.df <- mod.df + smc[nt1,1]

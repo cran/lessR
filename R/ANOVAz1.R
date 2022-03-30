@@ -28,7 +28,7 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
     if (nch.mx > max.mx) max.mx <- nch.mx
   }
 
-  title_des <- "  DESCRIPTIVE STATISTICS "
+  title_des <- "\n  DESCRIPTIVE STATISTICS "
 
   tx <- character(length = 0)
 
@@ -56,79 +56,12 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
   txdes <- tx
 
 
-  # set up graphics system for 2 windows
-  plt.i <- 0
-  plt.title  <- character(length=0)
-  if (graphics) {
-
-  # keep track of the number of plots, see if manage graphics
-    manage.gr <- .graphman()
-
-    if (!pdf) {
-      if (manage.gr) {
-        if (!brief) .graphwin(2) else .graphwin(1)
-        dev.set(which=3)
-      }
-    }
-    else { 
-      pdf_file <- "ANOVA_Means.pdf"
-      pdf(file=pdf_file, width=width, height=height)
-    }
-
-    plt.i <- plt.i + 1
-    plt.title[plt.i] <- "Scatterplot with Cell Means"
-
-    # scatter plot
-    plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
-
-    usr <- par("usr")
-    col.bg <- getOption("panel_fill")
-    rect(usr[1], usr[3], usr[2], usr[4],
-         col=getOption("panel_fill"), border=getOption("panel_color"))
-
-    axT1 <- 1:length(unique(x.values))
-    .axes(levels(x.values), NULL, axT1, axTicks(2))
-    .grid("v", axT1)
-    .grid("h", axTicks(2))
-
-    main.lab <- plt.title[plt.i]
-    x.label <- nm[2]
-    y.label <- nm[1]
-    .axlabs(x.label, y.label, main.lab, sub.lab=NULL,
-            xlab_adj=1.2, ylab_adj=.2) 
-
-    col_fill <- getOption("pt_fill")
-    col_color <- getOption("pt_color")
-    xn.values <-  data.frame(  # factor to integer for jitter
-        levels(x.values), 1:length(levels(x.values)), row.names = 1)[x.values, 1]
-    xn.values <- jitter(xn.values, factor=jitter_x)
-    points(xn.values, y.values, pch=21, col=col_color, bg=col_fill, cex=0.7)
-
-    # plot cell means
-    pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
-    bck.g <- ifelse(getOption("theme")!="gray", rgb(140,90,70,
-                    maxColorValue=255), "gray40")
-    if (grepl(".black", getOption("theme"), fixed=TRUE)) bck.g <- "gray85"
-    m.lvl <- numeric(length = 0)
-    for (i in (1:length(levels(x.values))))
-      m.lvl[i] <- mean(y.values[which(x.values==levels(x.values)[i])],
-                       na.rm=TRUE)
-    abline(h=m.lvl, col="gray50", lwd=.5)
-    points(m.lvl, pch=pch.avg, bg=bck.g, col="transparent", cex=1.3)
-
-    if (pdf) {
-      dev.off()
-      .showfile(pdf_file, "means chart")
-    }
-  }
-
-
-  title_basic <- "  BASIC ANALYSIS"
+  title_basic <- "\n  ANOVA"
 
   tx <- character(length = 0)
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("ANOVA Summary Table")
+    tx[length(tx)+1] <- paste("-- Summary Table")
     tx[length(tx)+1] <- ""
   }
 
@@ -191,34 +124,40 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
   tx <- character(length = 0)
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("Association and Effect Size")
+    tx[length(tx)+1] <- paste("-- Association and Effect Size")
     tx[length(tx)+1] <- ""
   }
 
   rsq <- ssb / sst
-  tx[length(tx)+1] <- paste("R Squared:", .fmt(rsq, 2))
+  tx[length(tx)+1] <- paste("R Squared:", .fmt(rsq, 3))
   rsq.adj <-  1 - ( ((n.obs-1)/(n.obs-p)) * (1-rsq) )
-  tx[length(tx)+1] <- paste("R Sq Adjusted:", .fmt(rsq.adj, 2))
+  tx[length(tx)+1] <- paste("R Sq Adjusted:", .fmt(rsq.adj, 3))
   omsq <- (ssb - ((p-1)*msw)) / ((ssb + p*(mean(n)-1)*msw) + msw)
-  tx[length(tx)+1] <- paste("Omega Squared:", .fmt(omsq, 2))
+  tx[length(tx)+1] <- paste("Omega Squared:", .fmt(omsq, 3))
   if (omsq > 0) {
     tx[length(tx)+1] <- ""
     f.cohen <- sqrt( (omsq/(1-omsq)) )
-    tx[length(tx)+1] <- paste("Cohen's f:", .fmt(f.cohen, 2))
+    tx[length(tx)+1] <- paste("Cohen's f:", .fmt(f.cohen, 3))
   }
 
   txeft <- tx
 
+  # keep track of the number of plots for 2 windows, see if manage graphics
+  if (graphics) {
+      plt.i <- 0
+      plt.title  <- character(length=0)
+      manage.gr <- .graphman()
+  }
 
   txhsd <- ""
-  title_tukey <- "  TUKEY MULTIPLE COMPARISONS OF MEANS"
+  title_tukey <- "\n  TUKEY MULTIPLE COMPARISONS OF MEANS"
   if (!brief) {
     tx <- character(length = 0)
 
     HSD <- TukeyHSD(av.out)
     HSD <- TukeyHSD(av.out, which=nm[2])
     tx[length(tx)+1] <- paste("Family-wise Confidence Level:",
-                              attr(HSD, which="conf.level"))
+                              attributes(HSD)$conf.level)
     txHSD <- .prntbl(HSD[[1]], digits_d)
     for (i in 1:length(txHSD)) tx[length(tx)+1] <- txHSD[i]
 
@@ -258,8 +197,82 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
         .showfile(pdf_file, "Tukey HSD chart")
         tx[length(tx)+1] <- ""
       }
-    }
+    }  # end graphics
   }  # !brief
+
+  # scatterplot with cell means
+  if (graphics) {
+    if (!pdf) {
+      if (manage.gr) {
+        if (!brief) .graphwin(2) else .graphwin(1)
+        dev.set(which=3)
+      }
+    }
+    else { 
+      pdf_file <- "ANOVA_Means.pdf"
+      pdf(file=pdf_file, width=width, height=height)
+    }
+
+    plt.i <- plt.i + 1
+    plt.title[plt.i] <- "Scatterplot with Cell Means"
+
+    # set margins
+    max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
+    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
+    lm <- margs$lm
+    tm <- margs$tm
+    rm <- margs$rm
+    bm <- margs$bm
+    
+    par(bg=getOption("window_fill"))
+    orig.params <- par(no.readonly=TRUE)
+    on.exit(par(orig.params))
+    par(mai=c(bm, lm, tm, rm))
+
+    # scatter plot
+    plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
+
+    usr <- par("usr")
+    col.bg <- getOption("panel_fill")
+    rect(usr[1], usr[3], usr[2], usr[4],
+         col=getOption("panel_fill"), border=getOption("panel_color"))
+
+    axT1 <- 1:length(unique(x.values))
+    .axes(levels(x.values), NULL, axT1, axTicks(2))
+    .grid("v", axT1)
+    .grid("h", axTicks(2))
+
+    main.lab <- plt.title[plt.i]  # not used
+    x.label <- nm[2]
+    y.label <- nm[1]
+    .axlabs(x.label, y.label, main.lab=NULL, sub.lab=NULL,
+            xlab_adj=0.4, ylab_adj=.05) 
+
+    col_fill <- getOption("pt_fill")
+    col_color <- getOption("pt_color")
+    xn.values <-  data.frame(  # factor to integer for jitter
+        levels(x.values), 1:length(levels(x.values)), row.names = 1)[x.values, 1]
+    xn.values <- jitter(xn.values, factor=jitter_x)
+    points(xn.values, y.values, pch=21, col=col_color, bg=col_fill, cex=0.7)
+
+    # plot cell means
+    pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)
+    bck.g <- ifelse(getOption("theme")!="gray", rgb(140,90,70,
+                    maxColorValue=255), "gray40")
+    if (grepl(".black", getOption("theme"), fixed=TRUE)) bck.g <- "gray85"
+    m.lvl <- numeric(length = 0)
+    for (i in (1:length(levels(x.values))))
+      m.lvl[i] <- mean(y.values[which(x.values==levels(x.values)[i])],
+                       na.rm=TRUE)
+    abline(h=m.lvl, col="gray50", lwd=.5)
+    points(m.lvl, pch=pch.avg, bg=bck.g, col="transparent", cex=1.3)
+
+    if (pdf) {
+      dev.off()
+      .showfile(pdf_file, "scatterplot and means chart")
+    }
+  }  # graphics scatterplot
+
 
   return(list(
     title_des=title_des, txdes=txdes,

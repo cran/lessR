@@ -61,6 +61,11 @@ d
 rescale(Salary)
 
 ## ---------------------------------------------------------------------------------------------------------------------
+names(d)
+d <- rename(d, Salary, AnnualSalary)
+names(d)
+
+## ---------------------------------------------------------------------------------------------------------------------
 d <- rd("Mach4", quiet=TRUE)
 l <- rd("Mach4_lbl")
 LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",

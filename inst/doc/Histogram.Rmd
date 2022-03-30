@@ -19,7 +19,7 @@ suppressPackageStartupMessages(library("lessR"))
 
 ## Data
 
-Most of the examples are an analysis of data in the _Employee_ data set, included with __lessR__. First read the _Employee_ data into the data frame _d_. See the `Read and Write` vignette for more details.
+Most of the following examples are an analysis of data in the _Employee_ data set, included with __lessR__. First read the _Employee_ data into the data frame _d_. See the `Read and Write` vignette for more details.
 
 ```{r read}
 d <- Read("Employee")
@@ -27,10 +27,11 @@ d <- Read("Employee")
 
 As an option, also read the table of variable labels. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need be entered into the table. The table can be a `csv` file or an Excel file.
 
-Currently, read the label file into the _l_ data frame. The labels will be displayed on both the text and visualization output. Each displayed label is the variable name juxtaposed with the corresponding label.
+Read the label file into the _l_ data frame, currently the only permitted name. The labels will be displayed on both the text and visualization output. Each displayed label is the variable name juxtaposed with the corresponding label, as shown in the following output.
 
 ```{r labels}
 l <- rd("Employee_lbl")
+l
 ```
 
 
@@ -38,9 +39,9 @@ l <- rd("Employee_lbl")
 
 One of the most frequently encountered visualizations for continuous variables is the histogram, which outlines the general shape of the underlying distribution.
 
->_Histogram_: Bin similar values into a group, then plot the frequency of occurrence of the data values in each bin as the height of the corresponding bar.
+>_Histogram_: Bin similar values into a group, then plot the frequency of occurrence of the data values in each bin proportional to the height of the corresponding bar.
 
-A call to a function to create a histogram contains the name of the continuous variable that contains the plotted values. With the `Histogram()` function, that variable name is the first argument passed to the function. In this example, the _only_ argument passed to the function is the variable name as the data frame is named _d_, the default value. The following illustrates the call to `Histogram()` with a continuous variable named $x$. 
+A call to a function to create a histogram contains the name of the continuous variable that contains the plotted values. With the `Histogram()` function, that variable name is the first parameter value passed to the function. In this example, the _only_ parameter value passed to the function is the variable name. The data frame is named _d_, the default value. The following illustrates the call to `Histogram()` with a continuous variable named $x$. 
 
 ```{r hsform, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center', out.extra='style="border-style: none"'}
 knitr::include_graphics(system.file("img", "hsExplain.png", package="lessR"))
@@ -52,11 +53,11 @@ To illustrate, consider the continuous variable _Salary_ in the Employee data ta
 Histogram(Salary)
 ```
 
-By default, the `Histogram()` function provides a color theme according to the current, active theme. The function also provides the corresponding frequency distribution, summary statistics, the table that lists the count of each category, from which the histogram is constructed, as well as an outlier analysis based on Tukey's rules for box plots.
+By default, the `Histogram()` function provides a color theme according to the current, active theme. The function also provides the corresponding frequency distribution, summary statistics, the table that lists the count of each category, from which the histogram is constructed, as well as an outlier analysis based on Tukey's outlier detection rules for box plots.
 
 ## Customize the Histogram
 
-The parameters `bin_start`, `bin_width`, and `bin_end` are available to customize the histogram.
+Use the parameters `bin_start`, `bin_width`, and `bin_end` to customize the histogram.
 
 ```{r binwidth, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Customized histogram."}
 Histogram(Salary, bin_start=35000, bin_width=14000)
@@ -77,7 +78,7 @@ The histogram portrays a continuous distribution with discrete bins, with more m
 
 >_Density plot_: A smooth curve that estimates the underlying continuous distribution.  
 
-To invoke, add the `density` parameter. The result is the filled density curve superimposed on the histogram.
+To invoke a density plot, add the `density` parameter. The result is the filled density curve superimposed on the histogram.
 
 
 ```{r density, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Histogram with density plot."}
@@ -87,7 +88,7 @@ Histogram(Salary, density=TRUE)
 
 ## VBS Plot
 
-A more modern version of the density plot combines the violin plot, box plot, and scatter plot into a single visualization, here called here the VBS plot.
+A more modern version of the density plot combines the violin plot, box plot, and scatter plot into a single visualization, here called the VBS plot.
 
 ```{r VBS, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="VBS plot."}
 Plot(Salary)
@@ -96,13 +97,13 @@ Plot(Salary)
 
 ## Interactive Histogram
 
-An interactive visualization lets the user in real time change parameter values to change characteristics of the visualization. To create an interactive histogram that displays the corresponding parameters, run the function `interact()` with `"Histogram"` specified. 
+An interactive visualization lets the user in real time change parameter values to change characteristics of the visualization. To create an interactive histogram of the variable _Salary_ that displays the corresponding parameters, run the function `interact()` with `"Histogram"` specified. 
 
 ```
 interact("Histogram")
 ```
 
-The function is not run here because interactivity requires to run directly from the R console.
+The `interact()` function is not run here because interactivity requires to run directly from the R console.
 
 
 ## Full Manual

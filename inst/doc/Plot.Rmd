@@ -82,7 +82,7 @@ Plot(Years, Salary, fit="exp", plot_errors=TRUE)
 
 Besides the application to the `root` value of `fit`, the parameter `fit_power` also applies to the `exp` and `reciprocal` values, The parameter transforms the _y_ variable to the specified power from the default of `1` before doing the regression analysis. The availability of this parameter provides for a wide range of modifications to the underlying functional form of the fit curve.
 
-### Three Plus Variables
+### Three Variables
 
 Map a continuous variable, such as _Pre_, to the plotted points with the `size` parameter, a bubble plot.
 
@@ -90,7 +90,7 @@ Map a continuous variable, such as _Pre_, to the plotted points with the `size` 
 Plot(Years, Salary, size=Pre)
 ```
 
-Indicate multiple variables to plot along either axis with a vector defined according to the base R function `c()`. Plot the linear model for each variable according to the `fit` parameter set to `"lm"`. By default, when multiple lines are plotted on the same panel, the confidence interval is turned off by internally setting the standard errors to zero with `fit_se` set to `0`. Explicitly override this parameter value as needed.
+Indicate multiple variables to plot along either axis with a vector defined according to the base R function `c()`. Plot the linear model for each variable according to the `fit` parameter set to `"lm"`. By default, when multiple lines are plotted on the same panel, the confidence interval is turned off by internally setting the parameter `fit_se` set to `0`. Explicitly override this parameter value as needed.
 
 ```{r three, fig.width=5, fig.height=4}
 Plot(c(Pre, Post), Salary, fit="lm", fit_se=0)
@@ -108,7 +108,7 @@ Plot(c(Salary, Years, Pre, Post), fit="lm")
 
 ### Smoothed Scatterplot
 
-To obtain a larger data set, generate random data with base R `rnorm()`, then plot. `Plot()` first checks the presence of the specified variables in the global environment (workspace). If not there, then from a data frame, of which the default value is _d_. Here, generate values for _x_ and _y_ in the workspace. 
+To obtain a larger data set, in this example generate random data with base R `rnorm()`, then plot. `Plot()` first checks the presence of the specified variables in the global environment (workspace). If not there, then from a data frame, of which the default value is _d_. Here, generate values for _x_ and _y_ in the workspace. 
 
 ```{r}
 x <- rnorm(4000)
@@ -122,7 +122,7 @@ With large data sets, even for continuous variables there can be much over-plott
 Plot(x, y, smooth=TRUE)
 ```
 
-Another strategy for alleviating over-plotting makes the fill color mostly transparent with the `trans` parameter, or turn off completely by setting to `fill` to `"off"`. The closer the value of `trans` is to 1, the more transparent is the fill. 
+Another strategy for alleviating over-plotting makes the fill color mostly transparent with the `trans` parameter, or turn off completely by setting `fill` to `"off"`. The closer the value of `trans` is to 1, the more transparent is the fill. 
 
 ```{r}
 Plot(x, y, trans=0.95)
@@ -138,7 +138,7 @@ The default plot for a single continuous variable includes not only the scatterp
 Plot(Salary)
 ```
 
-Control the choice of the three superimposed plots -- violin, box, and scatter -- with the `vbs_plot` parameter. The default setting is `vbs` for all three plots. Here, for example, obtain just the box plot. Or, use the alias `BoxPlot()` in place of `Plot()`.
+Control the choice of the three superimposed plots -- violin, box, and scatter -- with the `vbs_plot` parameter. The default setting is `"vbs"` for all three plots. Here, for example, obtain just the box plot. Or, use the alias `BoxPlot()` in place of `Plot()`.
 
 ```{r, fig.height=2.75}
 Plot(Salary, vbs_plot="b")
@@ -181,7 +181,7 @@ Plot(Years, Salary, by=Gender)
 ```
 
 
-Change the plot colors with the `fill` (interior) and `color` (exterior or edge) parameters. Because there are two levels of the `by` variable, specify two fill colors and two edge colors each with an R vector defined by the `c()` function. Also include the regression line for each group and increase the size of the plotted points. 
+Change the plot colors with the `fill` (interior) and `color` (exterior or edge) parameters. Because there are two levels of the `by` variable, specify two fill colors and two edge colors each with an R vector defined by the `c()` function. Also, include the regression line for each group with the `fit` parameter and increase the size of the plotted points with the `size` parameter. 
 
 ```{r bycolors, fig.width=6}
 Plot(Years, Salary, by=Gender, size=2, fit="lm",
@@ -190,7 +190,7 @@ Plot(Years, Salary, by=Gender, size=2, fit="lm",
 )
 ```
 
-Change the plotted shapes with the `shape` parameter.
+Change the plotted shapes with the `shape` parameter. The default value is `"circle"` with both an exterior color and filled interior, specified with `"color"` and `"fill"`. Other possible values, with fillable interiors,  are `"circle"`, `"square"`, `"diamond"`, `"triup"` (triangle up), and `"tridown"` (triangle down). Other possible values include all uppercase and lowercase letters, all digits, and most punctuation characters. The numbers 0 through 25 defined by the R `points()` function also apply. If plotting levels according to `by`, then list one shape for each level to be plotted.
 
 A Trellis (facet) plot creates a separate panel for the plot of each level of the categorical variable. Generate Trellis plots with the `by1` parameter. In this example, plot the best-fit linear model for the data in each panel according to the `fit` parameter. By default, the 95% confidence interval for each line is also displayed. 
 
@@ -209,11 +209,11 @@ The first two parameters of `Plot()` are `x` and `y`. In this example, the categ
 ```{r}
 Plot(Salary, Dept)
 ```
-To avoid point overlap, if there is at least one duplicated value of continuous `y` for any level of categorical `x`, by default some some horizontal jitter for each plotted point is added, which was not needed in this example. Manually adjust the jitter with either parameter `jitter_x` or, if `x` is continuous and `y` categorical, the `jitter_y` parameter. In addition, if the categorical variable is an R `factor` or a variable of type `character`, by default the mean of the continuous variable is displayed at each level of the categorical variable, as well in the text output. If the categorical variable is numeric, better to convert the variable to a factor to have just the categories on the axis and not a continuous scale. For example, `d$Gender <- factor(d$Gender)`.
+To avoid point overlap, if there is at least one duplicated value of continuous `y` for any level of categorical `x`, by default some horizontal jitter for each plotted point is added, which was not needed in this example. Manually adjust the jitter with either parameter `jitter_x` or, if `x` is continuous and `y` categorical, the `jitter_y` parameter. In addition, if the categorical variable is an R `factor` or a variable of type `character`, by default the mean of the continuous variable is displayed at each level of the categorical variable, as well in the text output. If the categorical variable is numeric, better to convert the variable to a factor to have just the categories on the axis and not a continuous scale. For example, `d$Gender <- factor(d$Gender)`.
 
 Another helpful technique for large data sets is to add some fill transparency with the `trans` parameter, with values such as 0.8 and 0.9. The combination of jitter and transparency allows for plotting many thousands of points. 
 
-An alternative display f the distribution of a continuous variable and a categorical variable is a superimposed violin, box, and scatter plot, a VBS plot. To plot the points in different colors according to the level of the categorical variable, invoke the `by` parameter. Here, plot _Salary_ across the levels of _Gender_ on the same panel. 
+An alternative display of the distribution of a continuous variable and a categorical variable is a superimposed violin, box, and scatter plot, a VBS plot. To plot the points in different colors according to the level of the categorical variable, invoke the `by` parameter. Here, plot _Salary_ across the levels of _Gender_ on the same panel. 
 
 ```{r, fig.width=5, fig.height=2.75}
 Plot(Salary, by=Gender)
@@ -236,7 +236,7 @@ Or, drop the box plot and only plot the violins and the scatter plots. Without t
 Plot(Salary, by1=Gender, vbs_plot="vs")
 ```
 
-The following plot uses the alias `BoxPlot` to generate a Trellis plot of boxplots only across the levels of _Gender_.
+The following plot uses the alias `BoxPlot()` to generate a Trellis plot of boxplots only across the levels of _Gender_.
 
 ```{r, fig.width=5, fig.height=2.75}
 BoxPlot(Salary, by1=Gender, vbs_mean=TRUE, box_fill="lightgoldenrod")
@@ -251,7 +251,7 @@ Plot(Salary, Dept, by=Gender)
 
 ### One Continuous, Two Categorical
 
-To do a Trellis plot with two categorical variables, invoke the `by2` parameter in addition to the `by1` parameter. By default, the box fill colors are unique for each level of the `by1` variable, and then the colors cycle through all the values of the `by2` variable. With so many panels to plot, set them in a single column by setting parameter `n_col` to `1` instead of relying upon the default of `n_row=1`.
+To do a Trellis plot with two categorical variables, invoke the `by2` parameter in addition to the `by1` parameter. By default, the box fill colors are unique for each level of the `by1` variable, and then the colors cycle through all the values of the `by2` variable. With so many panels to plot, explicitly set them in a single column by setting parameter `n_col` to `1`. The corresponding row parameter is `n_row`.
 
 ```{r, fig.width=5, fig.height=7}
 Plot(Salary, by1=Gender, by2=Dept, n_col=1)
@@ -269,7 +269,7 @@ Plot(Salary, by1=Dept, by=Gender, n_col=1)
 
 ### Two Continuous, Three Categorical
 
-The relationships for up to five variables can be displayed by `Plot()`. The two primary variables, _x_ and _y_, that form the basis of the scatter plot, are continuous. Usually these two variables are listed first in the function call and so do not need their parameter names specified. Indicate two categorical variables that form the Trellis panels with parameters `by1` and `by2`. Call these two variables the Trellis variables, which define a Trellis panel for each combination of their values. Finally, there can be a categorical grouping variable, the `by` variable, which plots different groups within each Trellis panel. 
+`Plot()` can display the relationships for up to five variables. The two primary variables, _x_ and _y_, that form the basis of the scatter plot, are continuous. Usually these two variables are listed first in the function call and so do not need their parameter names specified. Indicate two categorical variables that form the Trellis panels with parameters `by1` and `by2`. Call these two variables the Trellis variables, which define a Trellis panel for each combination of their values. Finally, there can be a categorical grouping variable, the `by` variable, which plots different groups within each Trellis panel. 
 
 To illustrate, first, the data. Use the Cars93 data set that is installed with __lessR__, which describes characteristics of 1993 cars. 
 
@@ -304,7 +304,7 @@ Plot(Dept, Gender)
 
 The parameter `radius` scales the size of the bubbles according to the size of the largest displayed bubble in inches. The `power` parameter sets the relative size of the bubbles. The default `power` value of 0.5 scales the bubbles so that the area of each bubble is the value of the corresponding sizing variable. A value of 1 scales so the radius of each bubble is the value of the sizing variable, increasing the discrepancy of size between the variables. 
 
-In this example, increase the absolute size of the bubbles as well as the relative discrepancy in their sizes. If the bubbles become to large so that the largest bubbles become truncated, increase the spacing of the respective axes with the `pad_x` and/or `pad_y` parameters.
+In this example, increase the absolute size of the bubbles as well as the relative discrepancy in their sizes. If the bubbles become too large, so that the largest bubbles become truncated, increase the spacing of the respective axes with the `pad_x` and/or `pad_y` parameters.
 
 
 ```{r, fig.height=3.5, fig.width=6}

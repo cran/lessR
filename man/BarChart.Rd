@@ -29,7 +29,7 @@ BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
         legend_title=NULL, legend_position="right_margin",
         legend_labels=NULL, legend_horiz=FALSE,
-        legend_size=NULL, legend_abbrev=0, legend_adj=0,
+        legend_size=NULL, legend_abbrev=NULL, legend_adj=0,
 
         value_labels=NULL,
         rotate_x=getOption("rotate_x"),
@@ -176,10 +176,10 @@ bc(\ldots)
   \item{legend_horiz}{By default the legend is vertical, but can be changed to
        horizontal.}
   \item{legend_size}{Size of legend text.}
-  \item{legend_abbrev}{Abbreviate legend labels to the specified number of
-       the maximum number of characters.}
+  \item{legend_abbrev}{If specified, abbreviate legend title and legend labels
+        to the specified number of the maximum number of characters.}
   \item{legend_adj}{Shift legend for a two-categorical bar chart. A positive
-       number shifts the legend to the right from its default placement.}\cr
+        number shifts the legend to the right from its default placement.}\cr
 
   \item{value_labels}{For factors, default is the factor labels, and for
         character variables, default is the character values.
@@ -210,8 +210,8 @@ bc(\ldots)
         ascending \code{"+"}, unless \code{one_plot} is \code{TRUE}, then is
         set to \code{"+"}.}\cr
 
-  \item{label_max}{To improve readability, the maximum size of the value
-        labels before the labels are abbreviated for
+  \item{label_max}{To improve readability of text output, the maximum size
+        of the value labels before the labels are abbreviated for
         text output only. Not a literal maximum as preserving unique
         values may require a larger number of characters than specified.}
   \item{out_size}{To improve the readability of the frequency distribution
@@ -367,11 +367,9 @@ The values of another variable can be mapped into the fill color of the bars. To
 Also available are the pre-specified R color palettes \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. The pre-defined palette \code{"distinct"} maximally separates colors by hue. The family of color-blind family of viridis palettes are available as \code{"viridis"}, \code{"cividis"}, \code{"magma"}, \code{"inferno"}, and \code{"plasma"}. Pre-defined color palettes are available from many of Wes Anderson's movies such as \code{"Moonrise1"}, \code{"Royal1"}, \code{"GrandBudapest1"}, \code{"Darjeeling1"} and \code{"BottleRocket1"}. Can substitute a \code{2} for a \code{1} in the preceding references, and sometimes a \code{3}. 
 
 LEGEND\cr
-When two variables are plotted, a legend is produced, with values for each level of the second or \code{by} variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend_position} option, which, in addition to the \code{lessR} option of \code{right_margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend_
+When two variables are plotted, a legend is produced, with values for each level of the second or \code{by} variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend_position} option, which, in addition to the \code{lessR} option of \code{right_margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend.
 
-If the default right margin is retained, variable labels are also accommodated for the legend title.  To conserve horizontal space, the variable label is listed in multiple lines if needed. The legend title is constructed by forming lines of maximum length of 12 characters, with multiple words per line if possible. Any single word in the label of more than 12 characters is abbreviated to 12 characters with the R \code{\link{abbreviate}} function. Also, any value labels are abbreviated to a maximum of 6 characters.
-
-If the legend is not in the right margin, sometimes bars from the graph may intrude into the legend. One response is to re-run the analysis with the legend in a new location.  Another response is to invoke the \code{add_top} option to place more space between the top bar in the graph and the top of the graph.  This option only applies for the default vertical bars. Also, the legend is displayed vertically by default, but can be changed to horizontal with the \code{legend_horiz} option.
+The legend title can be abbreviated with the \code{legend_abbrev} parameter. Specify the maximum number of characters of the title. The legend is displayed vertically by default, but can be changed to horizontal with the \code{legend_horiz} option.
 
 LONG CATEGORY NAMES\cr
 For many plots, the names of the categories are too long. To adjust the plot for these long names, they can be rotated using the \code{rotate_x} and \code{rotate_y} parameters, in conjunction with \code{offset}. The \code{offset} parameter moves the category name out from the axis to compensate for the rotation. The changes can also be specified from \code{\link{style}} to persist until further changes. To reset to the default after obtaining an analysis, use \code{style()}.
@@ -452,6 +450,9 @@ Numerical variable y read from data\cr
 Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 4, NY: Routledge.
 
 Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 3, NY: CRC Press.
+
+Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871. 
+
 }
 
 \author{

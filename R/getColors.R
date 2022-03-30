@@ -204,7 +204,7 @@ function(pal=NULL, end_pal=NULL,
     if (length(c) > 1)
       txt.c <- paste(txt.c, " to ", .fmt(c[2],0), sep="")
 
-    l.dk <- 36 - (3*n)  # darkest color
+    l.dk <- 35 - (3*n)  # darkest color
     if (l.dk < 14) l.dk <- 14  # any darker and the hue is no longer true
     l.lt <- 52 + (5*n)  # lightest color
     if (l.lt > 92) l.lt <- 92

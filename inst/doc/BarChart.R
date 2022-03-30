@@ -6,6 +6,7 @@ d <- Read("Employee")
 
 ## ----labels-------------------------------------------------------------------
 l <- rd("Employee_lbl")
+l
 
 ## ----bc1, dataTable, echo=FALSE, out.width='28%', fig.asp=.7, fig.align='center', out.extra='style="border-style: none"'----
 knitr::include_graphics(system.file("img", "bcExplain.png", package="lessR"))

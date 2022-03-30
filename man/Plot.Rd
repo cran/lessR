@@ -206,15 +206,16 @@ vp(\ldots)
        of 2, the default value when bubbles represent a size
        variable.  Color of the displayed text set by \code{bubble_text} from
        the \code{\link{style}} function.}
-  \item{shape}{The plot character(s). The default value is a circle with both an
-       color and filled interior, specified with \code{color} and \code{fill}.
-       Other possible values with fillable interiors 
-       are \code{circle}, \code{square}, \code{diamond},
-       \code{triup} (triangle up), and \code{tridown} (triangle down). Other
-       characters include all
+  \item{shape}{The plot character(s). The default value is \code{"circle"}
+       with both an exterior
+       color and filled interior, specified with \code{"color"} and \code{"fill"}.
+       Other possible values, with fillable interiors, 
+       are \code{"circle"}, \code{"square"}, \code{"diamond"},
+       \code{"triup"} (triangle up), and \code{"tridown"} (triangle down). Other
+       possible values include all
        uppercase and lowercase letters, all digits, and most punctuation characters.
        The numbers 0 through 25 as defined by the R \code{\link{points}} function
-       also apply. See \code{"points"} for the symbols. If plotting levels
+       also apply. If plotting levels
        according to \code{by}, then list one shape for each level to be plotted.}
   \item{means}{If the one variable is categorical, expressed as a factor, and
        the other variable continuous, then if \code{TRUE}, by default,
@@ -690,6 +691,8 @@ Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 8, NY: Routl
 
 Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 5, NY: CRC Press.
 
+Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871. 
+
 Hubert, M. and Vandervieren, E. (2008). An adjusted boxplot for skewed distributions, Computational Statistics and Data Analysis 52, 51865201.
 
 Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springer. http://lmdvr.r-forge.r-project.org/
@@ -705,12 +708,16 @@ Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springe
 \examples{
 # read the data
 d <- rd("Employee", quiet=TRUE)
-d <- Subset(random=.6, quiet=TRUE)  # less computationally intensive
+d <- d[.(random(0.6)),]  # less computationally intensive
 dd=d
 
 #---------------------------------------------------
 # traditional scatterplot with two numeric variables
 #---------------------------------------------------
+
+Plot(Years, Salary, by=Gender, size=2, fit="lm",
+     fill=c("olivedrab3", "gold1"), 
+     color=c("darkgreen", "gold4"))
 
 # scatterplot with all defaults
 Plot(Years, Salary)
@@ -832,6 +839,10 @@ Plot(Years, Salary, by=Gender, ellipse=.50)
 # -----------------------
 # integrated Violin/Box/Scatterplot, a VBS plot
 Plot(Salary)
+
+Plot(Years, Salary, by=Gender, size=2, fit="lm",
+     fill=c("olivedrab3", "gold1"), 
+     color=c("darkgreen", "gold4"))
 
 \donttest{
 

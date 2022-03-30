@@ -38,4 +38,17 @@ Christie, R., & Geis, F. L., (1970).  Studies in Machiavellianism.  New York:  A
 Hunter, J. E., Gerbing, D. W., and Boster, F. J. (1982). Machiavellian beliefs and personality: The construct invalidity of the Machiavellian dimension. Journal of Personality 
 }
 
+\examples{
+# Read data and variable labels (items)
+d <- Read("Mach4")
+l <- Read("Mach4_lbl")
+
+# Convert to factors, i.e., categorical with value labels
+d <- factors(m01:m20,
+            levels=0:5,
+            labels=c("Strongly Disagree", "Disagree", "Slightly Disagree",
+                     "Slightly Agree", "Agree", "Strongly Agree"))
+
+}
+
 \keyword{datasets}

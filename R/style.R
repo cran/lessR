@@ -15,12 +15,12 @@ function(
   fill=NULL,
   bar_fill=getOption("bar_fill"),
   bar_fill_discrete=getOption("bar_fill_discrete"),
-  bar_fill_ordered=getOption("bar_fill_ordered"),
+  bar_fill_cont=getOption("bar_fill_cont"),
   trans=NULL,
   trans_bar_fill=getOption("trans_bar_fill"),
   color=NULL,
   bar_color=getOption("bar_color"),
-  bar_color_ordered=getOption("bar_color_ordered"),
+  bar_color_cont=getOption("bar_color_cont"),
   bar_color_discrete=getOption("bar_color_discrete"),
   values=getOption("values"),
   values_color=getOption("values_color"), 
@@ -344,10 +344,10 @@ function(
   # "off" is "transparent"
   bar_fill[which(bar_fill == "off")] <- "transparent"
   bar_fill_discrete[which(bar_fill_discrete == "off")] <- "transparent"
-  bar_fill_ordered[which(bar_fill_ordered == "off")] <- "transparent"
+  bar_fill_cont[which(bar_fill_cont == "off")] <- "transparent"
   pt_fill[which(pt_fill == "off")] <- "transparent"
   bar_color_discrete[which(bar_color_discrete == "off")] <- "transparent"
-  bar_color_ordered[which(bar_color_ordered == "off")] <- "transparent"
+  bar_color_cont[which(bar_color_cont == "off")] <- "transparent"
   pt_color[which(pt_color == "off")] <- "transparent"
   violin_fill[which(violin_fill == "off")] <- "transparent"
   violin_color[which(violin_color == "off")] <- "transparent"
@@ -437,9 +437,9 @@ function(
 
     options(bar_fill = bar_fill) 
     options(bar_fill_discrete = bar_fill_discrete) 
-    options(bar_fill_ordered = bar_fill_ordered) 
+    options(bar_fill_cont = bar_fill_cont) 
     options(bar_color_discrete = bar_color_discrete) 
-    options(bar_color_ordered = bar_color_ordered) 
+    options(bar_color_cont = bar_color_cont) 
     options(pt_color = pt_color) 
     
     options(values=values)
@@ -569,9 +569,9 @@ function(
       panel_fill = "white"
       window_fill = getOption("panel_fill")
       bar_fill_discrete = "hues"
-      bar_fill_ordered = rgb(144,165,195, maxColorValue=255)
+      bar_fill_cont = rgb(150,170,195, maxColorValue=255)
       bar_color_discrete = "transparent"
-      bar_color_ordered = rgb(126,144,168, maxColorValue=255)
+      bar_color_cont = rgb(132,150,175, maxColorValue=255)
       pt_fill = rgb(50,78,92, maxColorValue=255)
       pt_color = rgb(50,78,92, maxColorValue=255)
       trans_bar_fill = 0.00
@@ -589,10 +589,10 @@ function(
       window_fill = "white"
       panel_fill = "white"
       bar_fill = "white"
-      bar_fill_ordered = "white"
+      bar_fill_cont = "white"
       bar_fill_discrete = "white"
       bar_color_discrete = "black"
-      bar_color_ordered = "black"      
+      bar_color_cont = "black"      
       values_color = "black"
       pt_fill = "white"
       pt_color = "black"
@@ -618,9 +618,9 @@ function(
       panel_fill = "white"
       bar_fill = .maketrans("gray25", .to256("trans_bar_fill"))
       bar_fill_discrete = .maketrans("gray35",.to256("trans_bar_fill"))
-      bar_fill_ordered = .maketrans("gray35", .to256("trans_bar_fill"))
+      bar_fill_cont = .maketrans("gray35", .to256("trans_bar_fill"))
       bar_color_discrete = "gray60"
-      bar_color_ordered = "gray60"
+      bar_color_cont = "gray60"
       pt_fill = "gray30"
       trans_pt_fill = 0.00
       pt_color = "gray30"
@@ -647,10 +647,10 @@ function(
       panel_color = rgb(222,217,205, maxColorValue=255)
       #bar_fill = .maketrans("gray50", .to256("trans_bar_fill")))  # 230
       bar_fill = rgb(123,140,150, maxColorValue=255)  
-      bar_fill_ordered = rgb(123,140,150, maxColorValue=255)  
+      bar_fill_cont = rgb(123,140,150, maxColorValue=255)  
       bar_fill_discrete = rgb(123,140,150, maxColorValue=255)  
       bar_color_discrete = "transparent"
-      bar_color_ordered = rgb(126,144,168, maxColorValue=255)
+      bar_color_cont = rgb(126,144,168, maxColorValue=255)
       pt_fill = rgb(70,80,90, maxColorValue=255)
       trans_pt_fill = 0.00
       pt_color = rgb(70,80,90, maxColorValue=255)
@@ -702,10 +702,10 @@ function(
 #     box_fill = .maketrans(clr1, 65)
       box_color = "gray15"
       bar_fill_discrete = .maketrans(clr1, .to256("trans_bar_fill"))
-      bar_fill_ordered = .maketrans(clr1, .to256("trans_bar_fill"))
+      bar_fill_cont = .maketrans(clr1, .to256("trans_bar_fill"))
       pt_fill = .maketrans(clr1, .to256("trans_pt_fill"))
       bar_color_discrete = clr2
-      bar_color_ordered = clr2
+      bar_color_cont = clr2
       pt_fill <- clr1
       pt_color = clr2
       se_fill = .maketrans(clr1, 40)
@@ -763,10 +763,10 @@ function(
       bar_fill = .maketrans("gray58", .to256("trans_bar_fill"))
       bar_fill_discrete =
         .maketrans("gray58", .to256("trans_bar_fill"))
-      bar_fill_ordered =
+      bar_fill_cont =
         .maketrans("gray58", .to256("trans_bar_fill"))
       bar_color_discrete = "gray20"
-      bar_color_ordered = "gray20"
+      bar_color_cont = "gray20"
       pt_fill = .maketrans("gray75", .to256("trans_pt_fill"))
       pt_color = "gray90"
       violin_fill = "gray80"
@@ -826,12 +826,12 @@ function(
         if (miss_tr.bar_fill) trans_bar_fill = .05
         bar_fill_discrete = rgb(139,69,0, alpha=.to256("trans_bar_fill"),
               maxColorValue=256)
-        bar_fill_ordered = rgb(139,69,0, alpha=.to256("trans_bar_fill"),
+        bar_fill_cont = rgb(139,69,0, alpha=.to256("trans_bar_fill"),
               maxColorValue=256)
         pt_fill = rgb(139,69,0, alpha=.to256("trans_pt_fill"),
               maxColorValue=256)
         bar_color_discrete = "orange4"
-        bar_color_ordered = "orange4"
+        bar_color_cont = "orange4"
         pt_color = rgb(139,69,0, maxColorValue=256)
         ellipse_fill = rgb(249,99,2, alpha=45, maxColorValue=256)
 #       fit_color = rgb(209,87,3, maxColorValue=256)
@@ -856,9 +856,9 @@ function(
 
     options(bar_fill = bar_fill) 
     options(bar_fill_discrete = bar_fill_discrete) 
-    options(bar_fill_ordered = bar_fill_ordered) 
+    options(bar_fill_cont = bar_fill_cont) 
     options(bar_color_discrete = bar_color_discrete) 
-    options(bar_color_ordered = bar_color_ordered) 
+    options(bar_color_cont = bar_color_cont) 
     options(pt_fill = pt_fill) 
     options(pt_color = pt_color) 
     options(trans_bar_fill = trans_bar_fill)
@@ -972,7 +972,7 @@ function(
     bar <- list(
       fill = getOption("bar_fill"),
       bar_fill_discrete = getOption("bar_fill_discrete"),
-      bar_fill_ordered = getOption("bar_fill_ordered"),
+      bar_fill_cont = getOption("bar_fill_cont"),
       trans_fill = getOption("trans_bar_fill"),
       color = getOption("bar_color"),
       values = getOption("values"),
@@ -1106,7 +1106,7 @@ function(
   bar <- list(
     fill = bar_fill,
     bar_fill_discrete = bar_fill_discrete,
-    bar_fill_ordered = bar_fill_ordered,
+    bar_fill_cont = bar_fill_cont,
     trans_fill = trans_bar_fill,
     color = bar_color,
     values = values,

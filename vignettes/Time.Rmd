@@ -12,7 +12,7 @@ vignette: >
 
 
 ```{r, include=FALSE}
-knitr::opts_chunk$set(fig.width=4.5, fig.height=4)
+knitr::opts_chunk$set(fig.width=5, fig.height=4)
 ```
 
 
@@ -20,10 +20,10 @@ knitr::opts_chunk$set(fig.width=4.5, fig.height=4)
 suppressPackageStartupMessages(library("lessR"))
 ```
 
-Plot ordered data values collected over time in one of two ways that correspond to how label the values are labeled. 
+Plot ordered data values collected over time in one of two ways that correspond to how the values are labeled. 
 
 - Run Chart: Label the data values from 1 to the number of values ordered by their time of collection.
-- Time Series Chart: Label the data values by the time and/or date of at which each data value was collected.
+- Time Series Chart: Label the data values by the time and/or date each data value was collected.
 
 
 ## Run Chart
@@ -36,7 +36,7 @@ Illustrate with the __lessR__ _Employee_ data.
 d <- Read("Employee")
 ```
 
-The variable _Salary_ is not actually collected over time, but for illustration, here create a run chart of _Salary_ as if the data were collected over time. The indices, the sequence of integers from 1 to the last data value, are created by `Plot()`. Only the data values are specified. Invoke the `run` parameter to instruct `Plot()` to plot as a run chart.
+The data values for the variable _Salary_ are not actually collected over time, but for illustration, here create a run chart of _Salary_ as if the data were collected over time. The indices, the sequence of integers from 1 to the last data value, are created by `Plot()`. Only the data values are specified. Invoke the `run` parameter to instruct `Plot()` to plot the data in sequential order as a run chart.
 
 ```{r}
 Plot(Salary, run=TRUE)
@@ -57,7 +57,7 @@ Plot(Salary, run=TRUE, size=0, area_fill="on", center_line="off")
 - wide-form 
 - time-series object
 
- as well as a run chart in which it generates the index values sequentially ordered. A time series requires two variables, the time/date of the corresponding measured value to be plotted.
+`Plot()` can also similarly plot a run chart in which it generates the index values sequentially ordered. A time series requires two variables, the time/date and each corresponding measured value to be plotted.
 
 Plotting a variable of type Date as the x-variable in a scatterplot automatically creates a time series visualization. Plot() draws the connecting line segments, without the points at each time period (size=0). To add the area fill, for
 __lessR__ set the area parameter to `TRUE` for the default color from the current color theme. Or, set to a specific color.
@@ -94,7 +94,7 @@ With the `by` parameter, plot all three companies on the same panel.
 Plot(date, Price, by=Company)
 ```
 
-Stack the plots.
+Stack the plots by setting the parameter `stack` to `TRUE`.
 
 ```{r, fig.width=5}
 Plot(date, Price, by=Company, stack=TRUE)
@@ -107,7 +107,7 @@ With the `by1` parameter, plot all three companies on the different panels, a Tr
 Plot(date, Price, by1=Company)
 ```
 
-Do the Trellis plot with some color. 
+Do the Trellis plot with some color. Learn more about customizing visualizations in the vignette `utlities`. 
 
 ```{r, fig.width=5}
 style(sub_theme="black", window_fill="gray10")
@@ -141,19 +141,17 @@ Plot(date, Price, by=Company, trans=0.4, stack=TRUE, area_fill="emeralds")
 
 ### Wide-Format Data
 
-`Plot()` also reads wide-format data. First convert the long form as read to the wide form. In the wide form, the three companies each have their own column of data, repeated for each date.
+`Plot()` also reads wide-format data. We have no available wide form time data with __lessR__, so first convert the long form as read to the wide form. In the wide form, the three companies each have their own column of data, repeated for each date. Use the __lessR__ function `reshape_wide()` to do the conversion.
 
 ```{r}
-dw <- reshape(d, direction = "wide",
-        idvar = "date", timevar = "Company",
-        varying = list(c("Apple", "IBM", "Intel")))
+dw <- reshape_wide(d, group="Company", response="Price", ID="date")
 head(dw)
 ```
 
 Now the analysis, which repeats a previous analysis, but with wide-form data. Because the data frame is not the default _d_, explicitly indicate with the `data` parameter.
 
 ```{r, fig.width=6}
-Plot(date, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
+Plot(date, c(HP, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
 ```
 
 ### Time-Series Object Data
@@ -179,7 +177,9 @@ The annotations in the following visualization consist of the text field "iPhone
 
 ```{r fig.width=4.5}
 x <- as.Date("2007-06-01")
-Plot(date, Price, rows=(Company == "Apple"), fill="on", add=c("iPhone", "arrow"), x1=c(x,x), y1=c(100,90), x2=x, y2=30)
+Plot(date, Price, rows=(Company == "Apple"), fill="on",
+            add=c("iPhone", "arrow"), 
+            x1=c(x,x), y1=c(100,90), x2=x, y2=30)
 ```
 
 

@@ -260,7 +260,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   n.lab_x.ln <- margs$n.lab_x.ln
   n.lab_y.ln <- margs$n.lab_y.ln
 
-  if (n.xcol > 1  ||  n.ycol > 1  ||  !is.null(by)) {  # vertical legend room
+  # vertical legend room
+  if (n.xcol > 1  ||  n.ycol > 1  ||  !is.null(by)) {
     if (n.xcol > 1) nm.v <- nm.x
     if (n.ycol > 1) nm.v <- nm.y
     if (!is.null(by)) nm.v <- by.name
@@ -269,6 +270,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     rm <- rm + .25  + (.65 * axis_y_cex)
     if (axis_y_cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
   }
+
   if (center_line != "off") rm <- rm + .4  # room for center_line label
 
   if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
@@ -624,7 +626,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         if (smooth) {  # 2-D kernel density plot
           # grid lines only plot after the sp
           clr.den <- colorRampPalette(c(getOption("window_fill"),
-                                         getOption("bar_fill_ordered")))
+                                         getOption("bar_fill_cont")))
           smoothScatter(x, y, nrpoints=smooth_points, nbin=smooth_bins,
                         transformation=function(x) x^(smooth_exp),
                         colramp=clr.den, cex=smooth_size, add=TRUE)
@@ -795,7 +797,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           shape.dft <- c(21,23,22,24,25)  # shape defaults
         else
           shape.dft <- c(1,0,5,2,6,7:14)  # shape defaults
-        if (length(color)==1 && length(fill) == 1 && length(shape)==1)
+        if (length(color)==1 && length(fill)==1 && length(shape)==1)
           for (i in 1:n.by) shp[i] <- shape.dft[i]  #  default shapes
 
         for (i in 1:n.by) {
@@ -813,12 +815,13 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           }      
 
           if (segments) {  # designed for interaction plot of means
-            for (j in 1:(nrow(x.lv)-1)) {   # ex: 3 segments connect 4 pts
+            for (j in 1:(nrow(x.lv)-1)) {
               segments(x0=x.lv[j,1], y0=y.lv[j,1],
                        x1=x.lv[j+1,1], y1=y.lv[j+1,1],
-                       lty="solid", lwd=.75, col=getOption("box_fill"))
+                       lty="solid", lwd=.75, col=col.segment[i])
             }
-          }
+          }  # end segments
+
         }  # end 1:n.by
 
         if (fill[1] == "transparent") fill <- color
@@ -873,7 +876,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       if (fill[1] != "#46505A")  # default
         clr <- fill
       else
-        clr <- getOption("bar_fill_ordered")
+        clr <- getOption("bar_fill_cont")
       clr_color <- color
     }
     else {  # 1-var bubble plot and BPFM can have a color gradient
@@ -1005,6 +1008,10 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       }
 
       sse <- double(length=n.clrs)
+      mse <- double(length=n.clrs)
+      b0 <- double(length=n.clrs)
+      b1 <- double(length=n.clrs)
+      Rsq <- double(length=n.clrs)
       by.cat <- character(length=n.clrs)
       for (i in 1:n.clrs) {
         if (n.clrs == 1) {  # one plot, all the data
@@ -1048,6 +1055,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           ln.type <- ifelse (ln.type != "dashed", "dashed", "solid")
         }
 
+        b00 <- NULL
+        b11 <- NULL
+        Rsqq <- NULL
         ok <- is.finite(x.lv) & is.finite(y.lv)
         if (any(ok)) {
           x.lv <- x.lv[ok]
@@ -1065,6 +1075,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             l.ln <- lm(y.lv ~ 1)
           if (fit.line %in% c("loess", "lm", "null"))
             f.ln <- fitted(l.ln, ...)
+          if (fit.line %in% c("lm", "null")) {
+            b00 <- l.ln$coefficients[1] 
+            b11 <- l.ln$coefficients[2] 
+            Rsqq <- summary(l.ln)$r.squared
+          }
 
           if (fit.line == "exp") {  # exponential model
             if (any(y.lv < 0))
@@ -1112,10 +1127,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))
           }
 
-          # the only stat computed in .plt.main, sse
+          # need to compute sse here because anova() only applies to lm 
           if (!quiet) {
             e.lv <- y.lv - f.ln
             sse[i] <- sum(e.lv^2)
+            mse[i] <- sse[i] / (length(e.lv) - 2)
+            b0[i] <- ifelse (is.null(b00), NA, b00) 
+            b1[i] <- ifelse (is.null(b11), NA, b11) 
+            Rsq[i] <- ifelse (is.null(Rsqq), NA, Rsqq) 
             if (n.by > 0)
               by.cat[i] <- levels(by)[i]
           }
@@ -1144,7 +1163,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           else
             lines(x.lv, f.ln, col=fill[i], lwd=fit_lwd, lty=ln.type)
 
-          # plot residuals
+          # plot residuals option
           if (plot_errors) { 
             red <- rgb(130,40,35, maxColorValue=255) 
             pe.clr <- ifelse (theme %in% c("gray", "white"), "gray58", red)
@@ -1195,7 +1214,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # end annotations
 
   if (fit.line != "off"  &&  !quiet) 
-    return(list(sse=sse, by.cat=by.cat))
+    return(list(mse=mse, b0=b0, b1=b1, Rsq=Rsq, by.cat=by.cat))
 
 }  # end plt.main
 

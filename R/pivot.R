@@ -786,7 +786,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     }
     for (i in 1:ncol(data)) {
       dval <- data[1,i]
-      if (class(data[1,i]) == "Date") dval <- as.character(data[1,i])
+      if (class(data[1,i]) == class(Sys.Date()))  # == "Date" is flagged no
+        dval <- as.character(data[1,i])
       if (is.factor(data[1,i])) dval <- as.character(data[1,i])
       if (nm.TF[i])
         cat(names(data)[i], ": ", dval, sep="", "\n")

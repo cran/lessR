@@ -15,7 +15,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
         legend_title=NULL, legend_position="right_margin",
         legend_labels=NULL, legend_horiz=FALSE,
-        legend_size=NULL, legend_abbrev=0, legend_adj=0,
+        legend_size=NULL, legend_abbrev=NULL, legend_adj=0,
 
         value_labels=NULL,
         rotate_x=getOption("rotate_x"),

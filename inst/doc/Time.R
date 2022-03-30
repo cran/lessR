@@ -1,5 +1,5 @@
 ## ---- include=FALSE---------------------------------------------------------------------------------------------------
-knitr::opts_chunk$set(fig.width=4.5, fig.height=4)
+knitr::opts_chunk$set(fig.width=5, fig.height=4)
 
 ## ----include=FALSE----------------------------------------------------------------------------------------------------
 suppressPackageStartupMessages(library("lessR"))
@@ -50,13 +50,11 @@ Plot(date, Price, by1=Company, aspect=.5, area_fill="slategray3")
 Plot(date, Price, by=Company, trans=0.4, stack=TRUE, area_fill="emeralds")
 
 ## ---------------------------------------------------------------------------------------------------------------------
-dw <- reshape(d, direction = "wide",
-        idvar = "date", timevar = "Company",
-        varying = list(c("Apple", "IBM", "Intel")))
+dw <- reshape_wide(d, group="Company", response="Price", ID="date")
 head(dw)
 
 ## ---- fig.width=6-----------------------------------------------------------------------------------------------------
-Plot(date, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
+Plot(date, c(HP, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
 
 ## ---- fig.wdith=6-----------------------------------------------------------------------------------------------------
 a1.ts <- ts(dw$Apple, frequency=12, start=c(1980, 12))
@@ -67,5 +65,7 @@ style()
 
 ## ----fig.width=4.5----------------------------------------------------------------------------------------------------
 x <- as.Date("2007-06-01")
-Plot(date, Price, rows=(Company == "Apple"), fill="on", add=c("iPhone", "arrow"), x1=c(x,x), y1=c(100,90), x2=x, y2=30)
+Plot(date, Price, rows=(Company == "Apple"), fill="on",
+            add=c("iPhone", "arrow"), 
+            x1=c(x,x), y1=c(100,90), x2=x, y2=30)
 

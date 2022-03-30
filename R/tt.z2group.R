@@ -235,7 +235,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   cat("t-cutoff for 95% range of variation: tcut = ", .fmt(tcut,3), "\n") 
   cat("Standard Error of Mean Difference: SE = ", .fmt(sterr), "\n")
  
-  mytitle <- "\nHypothesis Test of 0 Mean Diff:  t = "
+  mytitle <- "\nHypothesis Test of 0 Mean Diff:  t-value = "
   cat(mytitle, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3),
       sep="", "\n\n")
   cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="",
@@ -388,7 +388,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
         col.line=getOption("pt_color"), col.area=NULL,
         col.box=getOption("panel_color"),
         col_color=getOption("pt_color"), 
-        col_fill=getOption("bar_fill_ordered"), shape_pts=21,
+        col_fill=getOption("bar_fill_cont"), shape_pts=21,
         col.bg=getOption("panel_fill"), lab_cex=getOption("lab_cex"),
         axis_cex=0.75, col.axis="gray30", rotate_x=0, rotate_y=0, offset=.5,
         xy_ticks=TRUE, line_width=1.1,
@@ -415,7 +415,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
        col.line=getOption("pt_color"), col.area=NULL,
        col.box=getOption("panel_color"),
        col_color=getOption("pt_color"), 
-       col_fill=getOption("bar_fill_ordered"), shape_pts=21,
+       col_fill=getOption("bar_fill_cont"), shape_pts=21,
        col.bg=getOption("panel_fill"), lab_cex=getOption("lab_cex"),
        axis_cex=0.85, col.axis="gray30", rotate_x=0, rotate_y=0, offset=.5,
        xy_ticks=TRUE, line_width=1.1,

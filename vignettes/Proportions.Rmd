@@ -39,9 +39,9 @@ The remainder of this vignette illustrates these applications of `Prop_test()`.
 
 ## Test a Specified Proportion
 
-Refer to the occurrence of a designated value of the `variable` as a `success`. Define all other values of the variable as failures. Success or failure in this context does not necessarily mean good or bad, desired or undesired, but instead, a designated value either occurred or did not. 
+Define the occurrence of a designated value of the `variable` as a `success`. Define all other values of the variable as failures. Of course, success or failure in this context does not necessarily mean good or bad, desired or undesired, but instead, a designated value either occurred or did not. 
 
-When analyzing proportions from data, first indicate the categorical variable,  the value of the parameter `variable`. Next, indicate the value of `variable` for the parameter `success`. When entering proportions directly, indicate the number of successes and the total number of trials with the `n_succ` and `n_tot` parameters. Enter the value of each parameter either as a single value for one sample or as a vector of multiple values for multiple samples. Without a value for `success` or `n_succ` the analysis is of goodness-of-fit or independence.
+When analyzing proportions from data, first indicate the categorical variable, the value of the parameter `variable`. Next, indicate the designated value of `variable` with the parameter `success`. When entering proportions directly, indicate the number of successes and the total number of trials with the `n_succ` and `n_tot` parameters. Enter the value of each parameter either as a single value for one sample or as a vector of multiple values for multiple samples. Without a value for `success` or `n_succ` the analysis is of goodness-of-fit or independence.
 
 
 ### Single Proportion

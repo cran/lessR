@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{3. Models: Least-Squares, Logistic}
+  %\VignetteIndexEntry{3. Models: Regression, Least-Squares and Logistic}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -14,10 +14,7 @@ vignette: >
 library("lessR")
 ```
 
-The `Regression()` function performs multiple aspects of a complete regression analysis. Abbreviate with `reg()`.
-
-
-To illustrate, first read the Employee data included as part of __lessR__. Read into the default __lessR__ data frame _d_.
+The `Regression()` function performs multiple aspects of a complete regression analysis. Abbreviate with `reg()`. To illustrate, first read the Employee data included as part of __lessR__. Read into the default __lessR__ data frame _d_.
 
 ```{r read}
 d <- Read("Employee")
@@ -25,7 +22,7 @@ d <- Read("Employee")
 
 As an option, also read the table of variable labels. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need to be entered into the table. The table can be a `csv` file or an Excel file.
 
-Currently, read the label file into the _l_ data frame. The labels are displayed on both the text and visualization output. Each displayed label consists of the variable name juxtaposed with the corresponding label, as shown in the display of the label file.
+Read the label file into the _l_ data frame, currently the only permitted name. The labels are displayed on both the text and visualization output. Each displayed label consists of the variable name juxtaposed with the corresponding label, as shown in the display of the label file.
 
 ```{r labels}
 l <- rd("Employee_lbl")
@@ -34,16 +31,16 @@ l
 
 ## Default Analysis 
 
-### Brief output
+### Brief Output
 
-The brief version provides just the basic analysis, what Excel provides, plus a scatterplot with the regression line, which becomes a scatterplot matrix with multiple regression. Because _d_ is the default name of the data frame that contains the variables for analysis, the `data` parameter that names the input data frame need not be specified.
+The brief version provides just the basic analysis, what Excel provides, plus a scatterplot with the regression line, which becomes a scatterplot matrix with multiple regression. Because _d_ is the default name of the data frame that contains the variables for analysis, the `data` parameter that names the input data frame need not be specified. Here, specify _Salary_ as the target or response variable with features, or predictor variables, _Years_ and _Pre_.
 
 ```{r fig.width=4.5, fig.height=4.5}
 reg_brief(Salary ~ Years + Pre)
 ```
 
 
-### Full output
+### Full Output
 
 The full output is extensive: Summary of the analysis, estimated model, fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals. The motivation is to provide virtually all of the information needed for a proper regression analysis.
 
@@ -51,14 +48,16 @@ The full output is extensive: Summary of the analysis, estimated model, fit indi
 reg(Salary ~ Years + Pre)
 ```
 
-Request a briefer output with the `reg_brief()` version of the function. Standardize the variables in the model by setting the `rescale` parameter to `"z"`. Plot the residuals as a line connecting each data point to the corresponding point on the regression line as specified with the `plot_errors` parameter.
+### Standardize the Variables
+
+Request a briefer output with the `reg_brief()` version of the function. Standardize the predictor variables in the model by setting the `new_scale` parameter to `"z"`. Plot the residuals as a line connecting each data point to the corresponding point on the regression line as specified with the `plot_errors` parameter. To also standardize the response variable, set parameter `scale_response` to `TRUE`.
 
 ```{r, fig.width=4.5, fig.height=4}
-reg_brief(Salary ~ Years, rescale="z", plot_errors=TRUE)
+reg_brief(Salary ~ Years, new_scale="z", plot_errors=TRUE)
 ```
 
 
-### k-fold cross-validation
+### k-fold Cross-validation
 
 Specify a cross-validation with the `kfold` parameter. Here, specify three folds. The function automatically creates the training and testing data sets.
 
@@ -71,7 +70,7 @@ The standard output also includes $R^2_{press}$, the value of $R^2$ when applied
 
 ## Output as a Stored Object
 
-The output of `Regression()` can be stored into an R object, here named _r_. The output object consists of various components that together define a comprehensive regression analysis. R calls the resulting output structure a _list_ object.
+The output of `Regression()` can be stored into an R object, here named _r_. The output object consists of various components that together define the output of a comprehensive regression analysis. R refers to the resulting output structure as a _list_ object.
 
 ```{r}
 r <- reg(Salary ~ Years + Pre)
@@ -89,7 +88,7 @@ Or, work with the components individually. Use the base R `names()` function to 
 names(r)
 ```
 
-Here, only display the estimates as part of the standard text output.
+Here, only display the estimates and their inferential analysis as part of the standard text output.
 
 ```{r}
 r$out_estimates
@@ -102,9 +101,9 @@ Here, display the numeric values of the coefficients.
 r$coefficients
 ```
 
-Do a regression and request all prediction intervals. Then convert that output segment to a data frame named _dp_ with base R `read.table()`. As a data frame, do a standard search for an individual row for a specific prediction interval (see the Subset a Data Frame vignette). 
+An analysis of hundreds or thousands of rows of data can make it difficult to locate a specific prediction interval of interest. To initiate a search for a specific row, first do the regression and request all prediction intervals with parameter `pred_rows`. Then convert that output to a data frame named _dp_ with base R `read.table()`. As a data frame, do a standard search for an individual row for a specific prediction interval (see the Subset a Data Frame vignette for directions to subset). 
 
-This particular conversion to a data frame requires one more step. One or more spaces delimit adjacent columns, but the names in this data set are formatted with a comma followed by a space. Use base R `sub()` to remove the space after the comma before converting to a data frame.
+This particular conversion to a data frame requires one more step. One or more spaces in the `out_predict` output delimit adjacent columns, but the names in this data set are formatted with a comma followed by a space. Use base R `sub()` to remove the space after the comma before converting to a data frame.
 
 ```{r}
 r <- reg(Salary ~ Years, pred_rows="all", graphics=FALSE)
@@ -116,7 +115,7 @@ dp[.(row.names(dp) == "Pham,Scott"),]
 
 ## Contrasts
 
-Because `reg()` accomplishes its computations with base R function `lm()`, `lm()` parameters can be passed to `reg()`, which then passes their values to `lm()`. Here, first use base R function `contr.sum()` to calculate an effect coding contrast matrix for a categorical variable with three levels, such as the variable _Plan_ in the _Employee_ data set.
+Because `reg()` accomplishes its computations with base R function `lm()`, `lm()` parameters can be passed to `reg()`, which then passes the values to `lm()`. Here, first use base R function `contr.sum()` to calculate an effect coding contrast matrix for a categorical variable with three levels, such as the variable _Plan_ in the _Employee_ data set.
 
 ```{r}
 cnt <- contr.sum(n=3)
@@ -135,7 +134,7 @@ reg_brief(Salary ~ Plan, contrasts=list(Plan=cnt))
 
 The $R^2$ fit statistic compares the sum of the squared errors of the model with the X predictor variables to the sum of squared errors of the null model.  The baseline of comparison, the null model, is a model with no X variables such that the fitted value for each set of X values is the mean of response variable $y$. The corresponding slope intercept is the mean of $y$, and the standard deviation of the residuals is the standard deviation of $y$.
 
-The following submits the null model for _Salary_, and plots the errors. Compare the standard deviation of the residuals to a regression model of _Salary_ with one or more predictor variables.
+The following submits the null model for _Salary_, and plots the errors. Compare the variability of the residuals to a regression model of _Salary_ with one or more predictor variables. To the extent that the inclusion of one or more predictor variables in the model reduces the variability of the data about the regression line compared to the null model, the model fits the data.
 
 ```{r fig.width=5}
 reg_brief(Salary ~ 1, plot_errors=TRUE)
@@ -153,17 +152,26 @@ dd <- Read("Mach4")
 reg_brief(m10 ~ m02, data=dd)
 ```
 
+## Analysis of Covariance
+
+Obtain an ANCOVA by entering categorical and continuous variables as predictor variables. For a single categorical variable and a single continuous variable, `Regression()` displays the regression line for each level of the categorical variable.
+
+The ANCOVA assumes that the slopes for the different levels of the categorical variable are the same for the pairing of the continuous predictor variable and continuous response variable. Visually evaluate this assumption by plotting each separate slope and scatterplot.
 
 
-## Interpreted Output
-
-The parameter `Rmd` creates an R markdown file that is automatically generated and then the corresponding html document from knitting the various output components together with full interpretation. A new, much more complete form of computer output.
-
-Not run here.
-
+```{r, fig.width=5, fig.height=4}
+Plot(Salary, Years, by=Dept, fit="lm")
 ```
-reg(Salary ~ Years + Pre, Rmd="eg")
+
+Then, if the slopes are not too dissimilar, run the ANCOVA. The categorical variable must be interpretable as a categorical variable, either as an R variable type `factor` or as a non-numerical type `character` string. If the categorical variable is coded numerically, convert to a `factor`, such as `d$CatVar <- factor(d$CatVar)` which retains the original numerical values as the value labels.
+
+The ANCOVA displays the appropriate Type II Sum of Squares in its ANOVA table for properly evaluating the group effect that corresponds to the entered categorical variable. Note that this SS is only displayed for an ANOVA with a single categorical variable and a single covariate 
+
+```{r, fig.width=5, fig.height=4}
+reg_brief(Salary ~ Dept + Years)
 ```
+
+
 
 ## Logistic Regression
 
@@ -184,6 +192,17 @@ Specify additional probability thresholds for classification beyond just the def
 
 ```{r, fig.width=5, fig.height=4}
 Logit(Gender ~ Hand, prob_cut=c(.3, .5, .7))
+```
+
+
+## Interpreted Output
+
+The parameter `Rmd` creates an R markdown file that is automatically generated and then the corresponding html document from knitting the various output components together with full interpretation. A new, much more complete form of computer output.
+
+Not run here.
+
+```
+reg(Salary ~ Years + Pre, Rmd="eg")
 ```
 
 

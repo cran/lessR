@@ -15,7 +15,7 @@ reg_brief(Salary ~ Years + Pre)
 reg(Salary ~ Years + Pre)
 
 ## ---- fig.width=4.5, fig.height=4-------------------------------------------------------------------------------------
-reg_brief(Salary ~ Years, rescale="z", plot_errors=TRUE)
+reg_brief(Salary ~ Years, new_scale="z", plot_errors=TRUE)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 reg(Salary ~ Years, kfold=3)
@@ -55,6 +55,12 @@ reg_brief(Salary ~ 1, plot_errors=TRUE)
 ## ----likert, fig.width=4.5, fig.height=4.5----------------------------------------------------------------------------
 dd <- Read("Mach4")
 reg_brief(m10 ~ m02, data=dd)
+
+## ---- fig.width=5, fig.height=4---------------------------------------------------------------------------------------
+Plot(Salary, Years, by=Dept, fit="lm")
+
+## ---- fig.width=5, fig.height=4---------------------------------------------------------------------------------------
+reg_brief(Salary ~ Dept + Years)
 
 ## ---- fig.width=5, fig.height=4---------------------------------------------------------------------------------------
 d <- Read("BodyMeas")

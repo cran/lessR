@@ -1370,7 +1370,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (is.null(xlab)) xlab <- ""  # suppress x-axis label if not specified
 
     .dpmat.main(data[,x.col], mylabs, sort_yx,
-      getOption("bar_fill_ordered"), pt.color, panel_fill,
+      getOption("bar_fill_cont"), pt.color, panel_fill,
       pt.trans, shape, panel_color,
       low_fill, hi_fill,
       xy_ticks, xlab, ylab, main, sub, size,
@@ -1636,7 +1636,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           }
         }
 
-        sumsq <- .plt.main(x.call, y.call, by.call, n_cat,
+        reg <- .plt.main(x.call, y.call, by.call, n_cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
           object, stat,
           pt.fill, area_fill, pt.color,
@@ -1661,11 +1661,14 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           add_color, add_fill, add_trans, quiet, ...)
 
         if (fit.ln != "off") {
-          sse <- sumsq$sse
-          by.cat <- sumsq$by.cat
+          mse <- reg$mse
+          b0 <- reg$b0
+          b1 <- reg$b1
+          Rsq <- reg$Rsq
+          by.cat <- reg$by.cat
         }
         else {
-          sse <- NULL
+          mse <- NULL
           by.cat <- NULL
         }
 
@@ -1718,7 +1721,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           class(txprm) <- "out"
           .plt.txt(x.call, y.call, stat, object, n_cat,
             cat.x, num.cat.x, cat.y, num.cat.y,
-            xlab, ylab, fit, n.by, sse, by.cat,
+            xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat,
             smooth, box_adj, run, center_line, show_runs,
             proportion, size, radius, digits_d, fun_call, txdif)
 

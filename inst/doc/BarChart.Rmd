@@ -26,10 +26,11 @@ d <- Read("Employee")
 
 As an option, also read the table of variable labels. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need be entered into the table. The table can be a `csv` file or an Excel file.
 
-Currently, read the label file into the _l_ data frame. The labels will be displayed on both the text and visualization output. Each displayed label is the variable name juxtaposed with the corresponding label.
+Read the label file into the _l_ data frame, currently the only permitted name.Currently, necessarily read the label file into the _l_ data frame. The labels will be displayed on both the text and visualization output. Each displayed label is the variable name juxtaposed with the corresponding label, as shown in the following output.
 
 ```{r labels}
 l <- rd("Employee_lbl")
+l
 ```
 
 
@@ -39,7 +40,7 @@ One of the most frequently encountered visualizations is the bar chart, created 
 
 >_Bar chart_: Plot a bar for each level of a categorical variable with its height scaled according to the value of an associated numerical variable.
 
-A call to a function to create a bar chart contains the name of the categorical variable with the categories to be plotted. With the `BarChart()` function, that variable name is the first argument passed to the function. In this example, the _only_ argument passed to the function is the variable name as the data frame is named _d_, the __lessR__ default value. Or, specify the data frame that contains the variable(s) of interest with the `data` parameter.
+A call to a bar chart function contains, at a minimum, the name of the categorical variable with the categories to be plotted. With the `BarChart()` function, that variable name is the first argument passed to the function. In this example, the _only_ argument passed to the function is the variable name as the data frame is named _d_, the __lessR__ default value. Or, specify the data frame that contains the variable(s) of interest with the `data` parameter.
 
 The following illustrates the call to `BarChart()` with a categorical variable named $x$. 
 
@@ -47,20 +48,20 @@ The following illustrates the call to `BarChart()` with a categorical variable n
 knitr::include_graphics(system.file("img", "bcExplain.png", package="lessR"))
 ```
 
-When only a single categorical variable is passed to `BarChart()`, the numerical value associated with each bar is the corresponding count of the number of occurrences, automatically computed.
+If only a single categorical variable is passed to `BarChart()`, the numerical value associated with each bar is the corresponding count of the number of occurrences, automatically computed.
 
 
 ### Default Bar Chart
 
-Consider the categorical variable Dept in the Employee data table.  Use `BarChart()` to tabulate and display the visualization of the number of employees in each department, here relying upon the default data frame (table) named _d_. Otherwise add the `data=` option if the data frame has another name.
+Consider the categorical variable Dept in the Employee data table.  Use `BarChart()` to tabulate and display the visualization of the number of employees in each department, here relying upon the default data frame (table) named _d_. Otherwise add the `data=` option for a data frame with another name.
 
 ```{r bcEx, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Bar chart of tablulated counts of employees in each department."}
 BarChart(Dept)
 ```
 
-The default color theme, `"colors"`, fills the bars in the bar chart with with different hues. See more explanation of this and related color palettes more in the vignette _Customize_.
+The default color theme, `"colors"`, fills the bars in the bar chart with with different hues (according to the default qualitative palette). See more explanation of this and related color palettes in the vignette _Customize_.
 
-The `BarChart()` function also labels each bar with the associated numerical value. The function also provides the corresponding frequency distribution, the table that lists the count of each category, from which the bar chart is constructed.
+`BarChart()` also labels each bar with the associated numerical value. The function provides the corresponding frequency distribution, the table that lists the count of each category, from which the bar chart is constructed.
 
 We do not need to see this output to the R console repeated again for different bar charts of the same data, so turn off for now with the parameter `quiet` set to `TRUE`. Can set this option for each call to `BarChart()`, or can set as the default for subsequent analyses with the `style()` function.
 
@@ -72,13 +73,13 @@ style(quiet=TRUE)
 
 ### Custom Colors
 
-Specify a single fill color with the `fill` parameter, the edge color of the bars with `color`. Set transparency level with `trans`. Against a lighter background, display the value for each bar with a darker color using the `values_color` parameter. To specify a color, use color names, specify a color with either its `rgb()` or `hcl()` color space coordinates, or use the __lessR__ custom color palette function `getColors()`.
+Specify a single fill color with the `fill` parameter, the edge color of the bars with `color`. Set the transparency level with `trans`. Against a lighter background, display the value for each bar with a darker color using the `values_color` parameter. To specify a color, use color names, specify a color with either its `rgb()` or `hcl()` color space coordinates, or use the __lessR__ custom color palette function `getColors()`.
 
 ```{r fig.width=4, fig.height=3.75, fig.align='center'}
 BarChart(Dept, fill="darkred", color="black", trans=.8, values_color="black")
 ```
 
-Use the `theme` parameter to change the entire color theme: "colors", "lightbronze", "dodgerblue", "darkred", "gray", "gold", "darkgreen", "blue", "red", "rose", "green", "purple", "sienna", "brown", "orange", "white", and "light". In this example, changing the full theme accomplishes th same as changing the fill color. Turn off the displayed value on each bar with the parameter `values` set to `off`. Specify a horizontal bar chart with base R parameter `horiz`.
+Use the `theme` parameter to change the entire color theme: "colors", "lightbronze", "dodgerblue", "slatered", "darkred", "gray", "gold", "darkgreen", "blue", "red", "rose", "green", "purple", "sienna", "brown", "orange", "white", and "light". In this example, changing the full theme accomplishes the same as changing the fill color. Turn off the displayed value on each bar with the parameter `values` set to `off`. Specify a horizontal bar chart with base R parameter `horiz`.
 
 ```{r fig.width=4, fig.height=3.5, fig.align='center'}
 BarChart(Dept, theme="gray", values="off", horiz=TRUE)
@@ -140,7 +141,7 @@ The general syntax follows for processing this form of the data follows.
 knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
 ```
 
-The bar chart follows, with the aggregated data stored in the data frame named _a_, so explicitly identify with the `data` parameter. The computed mean of _Salary_ variable in the _a_ data frame from the previous call to `pivot()` is named *Salary_mn* by default. The output data frame, _a_, contains a row of missing data for the grouping variable, which needs to first be removed before reading the table of means into `BarChart()`, here with the `na.omit()` function.
+The bar chart follows, with the aggregated data stored in the data frame named _a_, so explicitly identify with the `data` parameter. The computed mean of _Salary_ variable in the _a_ data frame from the previous call to `pivot()` is named *Salary_mean* by default. The output data frame, _a_, contains a row of missing data for the grouping variable, which needs to first be removed before reading the table of means into `BarChart()`, here with the `na.omit()` function.
 
 ```{r xy, fig.width=4, fig.height=3.5, fig.align='center'}
 a <- na.omit(a)
@@ -149,7 +150,7 @@ BarChart(Dept, Salary_mean, data=a)
 
 ### Statistical Transformation of $y$
 
-Can also do a statistical transformation of the numerical value of $y$ with the `stat` parameter. Possible values of `stat`: `"sum"`, `"mean"`, `"sd"`, `"dev"`, `"min"`, `"median"`, and `"max"`. The `"dev"` value displays the mean deviations to further facilitate a comparison among levels.
+As seen, by default in the absence of other information, `BarChart()` defines the numerical variable plotted as the count the occurrence of each level. Can define other statistical transformations of the numerical value of $y$ with the `stat` parameter. Possible values of `stat`: `"sum"`, `"mean"`, `"sd"`, `"dev"`, `"min"`, `"median"`, and `"max"`. The `"dev"` value displays the mean deviations to further facilitate a comparison among levels.
 
 Here the $x$-variable is Dept, and $y$-variable is _Salary_. Display bars for values of `dev` <= 0 in a different color than values above with the `fill_split` parameter set at `0`. Do an ascending sort with the `sort` parameter set at `"+"`.
 
@@ -162,7 +163,7 @@ Compare this visualization of the mean deviations with the previous visualizatio
 
 ### Annotation
 
-Annotate a plot with the `add` parameter. To add a rectangle use the `"rect"` value of `add`. Here set the rectangle around the message centered at <3,10>. To specify a rectangle requires two corners of the rectangle, `<x1,y1>` and `<x2,y2>`. To specify text requires just a single coordinate, `<x1,y1>`. Because with the `add` parameter, the message follows the specification of `"rect"`, the coordinates of the text message follow the coordinates for the rectangle. 
+Annotate a plot with the `add` parameter. To add a rectangle use the `"rect"` value of `add`. Here set the rectangle around the message centered at <3,10>. To specify a rectangle requires two corners of the rectangle, `<x1,y1>` and `<x2,y2>`. To specify text requires just a single coordinate, `<x1,y1>`. With the `add` parameter, the message follows the specification of `"rect"`, so the coordinates of the text message follow the coordinates for the rectangle. 
 
 First lighten the fill color of the annotation with the `add_fill` parameter for the `style()` function.
 
@@ -190,7 +191,7 @@ d <- Read("Employee")
 PieChart(Dept)
 ```
 
-The doughnut or ring chart appears easier to read than a standard bar chart. But the __lessR__ function `PieChart()` also can create the "old-fashioned" pie chart by setting the value of `hole` to `0`. We have seen the summary statistics several times now, so turn off the output to the R console here with the `quiet` parameter.
+The doughnut or ring chart appears easier to read than a standard pie chart. But the __lessR__ function `PieChart()` also can create the "old-fashioned" pie chart by setting the value of parameter `hole` to `0`. We have seen the summary statistics several times now, so turn off the output to the R console here with the `quiet` parameter.
 
 
 ```{r hole0, fig.width=3.5, fig.height=3.5, fig.align='center', fig.cap="Standard pie chart of variable Dept in the _d_ data frame."}
@@ -223,7 +224,7 @@ Specify two custom fill colors for _Gender_.
 BarChart(Dept, by=Gender, fill=c("deepskyblue", "black"))
 ```
 
-The stacked version is default, but the values of the second categorical variable can also be represented with bars, more helpful to compare the values with each other. Here put the legend on the top with the `values_position` parameter set to `"out"`.
+The stacked version is default, but the values of the second categorical variable can also be represented with bars, more helpful to compare the values with each other. Here, put the legend on the top with the `values_position` parameter set to `"out"`.
 
 ```{r, fig.width=5, fig.align='center'}
 BarChart(Dept, by=Gender, beside=TRUE, values_position="out")
@@ -270,13 +271,13 @@ Long _value labels_ on the horizontal axis are also addressed by moving to a new
 d <- rd("Mach4", quiet=TRUE)
 ```
 
-Also read _variable labels_ into the _l_ data frame, which are then used to automatically label the output, both the visualization and text output to the console.
+Also, read _variable labels_ into the _l_ data frame, which are then used to automatically label the output, both the visualization and text output to the console.
 
 ```{r}
 l <- rd("Mach4_lbl", quiet=TRUE)
 ```
 
-Convert the specified four Mach items to factors with the __lessR__ function `factors()`. A response of 0 is a Strongly Disagree, etc.
+Convert the specified four Mach items to ordered factors with the __lessR__ function `factors()`. This function implements the base R function `factor()` across a range of variables instead of a single variable (without needing other function calls). A response of 0 is a Strongly Disagree, etc.
  
 ```{r}
 LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
@@ -291,7 +292,7 @@ Because the factors are defined as ordered with the `factors()` function, the co
 BarChart(m06, by=m07, quiet=FALSE)
 ```
 
-If the categorical variable is not a factor, use a plural `fill` parameter color such as `"blues"`, `"reds"`, or `"emaralds"` to assign a gradient . See the Customize vignette for more details on color palettes. 
+If the categorical variable is not a factor, use a parameter `fill` plural color such as `"blues"`, `"reds"`, or `"emaralds"` to assign a gradient. See the Customize vignette for more details on color palettes. 
 
 
 ## Multiple Variable Bar Chart
@@ -307,7 +308,7 @@ BarChart(m01:m20)
 
 ## Interactive Bar Chart
 
-An interactive visualization lets the user in real time change parameter values to change characteristics of the visualization. To create an interactive bar chart that displays the corresponding parameters, run the function `interact()` with `"BarChart"` specified. 
+An interactive visualization lets the user in real time change parameter values to change characteristics of the visualization. To create an interactive bar chart that displays the corresponding parameters, run the function `interact()` with the value `"BarChart"` specified. 
 
 ```
 interact("BarChart")

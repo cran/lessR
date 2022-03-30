@@ -1,7 +1,7 @@
 .reg2Relations <- 
 function(lm.out, dname, n.keep, show_R,
-         cor, collinear, subsets, max.sublns, numeric.all, in.data.frame,
-         sterrs, MSW) {
+         cor, collinear, subsets, best_sub, max.sublns, numeric.all,
+         in.data.frame, sterrs, MSW) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -13,9 +13,7 @@ function(lm.out, dname, n.keep, show_R,
   # -------------------------
   tx <- character(length = 0)
 
-
   # correlations
-  txall <- ""
   if (cor) {
   
     if (numeric.all && in.data.frame) {
@@ -24,7 +22,8 @@ function(lm.out, dname, n.keep, show_R,
         cv <- paste("\"",nm[1],"\"", sep="")
         for (i in 2:n.vars) cv <- paste(cv, ",\"", nm[i], "\"", sep="")
         tx[length(tx)+1] <- .dash2(68)
-        tx[length(tx)+1] <- paste("> ", "cor(", dname, "[c(", cv, ")])", "\n", sep="")
+        tx[length(tx)+1] <- paste("> ",
+                   "cor(", dname, "[c(", cv, ")])", "\n", sep="")
         tx[length(tx)+1] <- .dash2(68)
       }
 
@@ -35,16 +34,16 @@ function(lm.out, dname, n.keep, show_R,
       for (i in 1:length(txcrs)) tx[length(tx)+1] <- txcrs[i]
     }
 
-  else {  # not all numeric
-    tx[length(tx)+1] <- ">>> No correlations reported, not all variables are"
-    if (!in.data.frame)
-      tx[length(tx)] <- paste(tx[length(tx)], "in the data frame.")
-    if (!numeric.all) tx[length(tx)] <- paste(tx[length(tx)], "numeric.")
-    crs <- numeric(length=0)
-    crs <- NA
-  }
+    else {  # not all numeric
+      tx[length(tx)+1] <- ">>> No correlations reported, some variables not"
+      if (!in.data.frame)
+        tx[length(tx)] <- paste(tx[length(tx)], "in the data frame.")
+      if (!numeric.all) tx[length(tx)] <- paste(tx[length(tx)], "numeric.")
+      crs <- numeric(length=0)
+      crs <- NA
+    }
   
-  txcor <- tx
+    txcor <- tx
 
   }  # cor
 
@@ -59,12 +58,12 @@ function(lm.out, dname, n.keep, show_R,
   if (collinear) {
     tx <- character(length = 0)
 
-    if (is.null(options()$knitr.in.progress)) {
-      tx[length(tx)+1] <- "-- Collinearity"
-      tx[length(tx)+1] <- ""
-    }
-
     if (numeric.all) {
+
+      if (is.null(options()$knitr.in.progress)) {
+        tx[length(tx)+1] <- "-- Collinearity"
+        tx[length(tx)+1] <- ""
+      }
 
       vif <- numeric(length = 0)
       tol <- numeric(length = 0)
@@ -84,7 +83,8 @@ function(lm.out, dname, n.keep, show_R,
     }
 
     else { 
-      tx[length(tx)+1] <- ">>> No collinearity analysis, not all variables are numeric.\n"
+      tx[length(tx)+1] <-
+        ">>> No collinearity analysis, some variables not numeric"
       vif <- NA
       tol <- NA
     }
@@ -99,30 +99,37 @@ function(lm.out, dname, n.keep, show_R,
 
   # -------------------------
   # all possible subsets of predictor variables    
-  txall <- ""
-
+  txsbs <- ""
   if (subsets) {
     tx <- character(length = 0)
 
-    if (is.null(options()$knitr.in.progress)) {
-      tx[length(tx)+1] <- "-- Best Subset Regression Models"
-      if (n.pred > 5)
-        tx[length(tx)+1] <- "for up to 10 subsets of each number of predictors"
-      tx[length(tx)+1] <- ""
-    }
-
     if (numeric.all) {
-      X <- data.frame(lm.out$model[nm[seq(2,n.vars)]], stringsAsFactors=TRUE)
-      Y <- numeric(length=n.keep)  # convert response to an atomic vector for leaps
+
+      if (is.null(options()$knitr.in.progress)) {
+        tx[length(tx)+1] <- "-- Best Subset Regression Models"
+        if (n.pred > 5)
+          tx[length(tx)+1] <- "up to 10 subsets of each number of predictors"
+        tx[length(tx)+1] <- ""
+      }
+
+      X <- data.frame(lm.out$model[nm[seq(2,n.vars)]])
+      Y <- numeric(length=n.keep)  # convert response to atomic vector for leaps
       for (i in 1:n.keep) Y[i] <- lm.out$model[nm[1]][i,1]
-      lp.out <- leaps(X, Y, method="adjr2")  # leaps function
+      lp.out <- leaps(X, Y, method=best_sub)  # leaps function
       md <- lp.out$which  # md is logical
       rownames(md) <- 1:nrow(md)  # matrix md does not have proper row names
       # gives 0, 1
-      models <- data.frame(md, lp.out$adjr2, lp.out$size-1, stringsAsFactors=TRUE)
-      names(models) <- c(names(X), "R2adj", "X's")
-      mod.srt <- models[order(models$R2adj, decreasing=TRUE),]
-      names(mod.srt)[ncol(mod.srt)-1L] <- "   R2adj"
+      if (best_sub == "adjr2") {
+        models <- data.frame(md, lp.out$adjr2, lp.out$size-1)
+        names(models) <- c(names(X), "R2adj", "X's")
+        mod.srt <- models[order(models$R2adj, decreasing=TRUE),]
+      }
+      else {
+        models <- data.frame(md, lp.out$Cp, lp.out$size-1)
+        names(models) <- c(names(X), "   Cp", "X's")
+        mod.srt <- models[order(models$'   Cp', decreasing=FALSE),]
+      }
+      names(mod.srt)[ncol(mod.srt)-1L] <- paste("   ", best_sub, sep="")
       lines <- min(max.sublns, nrow(mod.srt))
 
       # width of data columns
@@ -147,7 +154,6 @@ function(lm.out, dname, n.keep, show_R,
                                 w=ww), sep="")
       }
 
-
       for (i in 1:lines) {
         if (lines > 40) if (i %% 30 == 0) tx[length(tx)+1] <- nms
         tx[length(tx)+1] <- ""
@@ -168,16 +174,14 @@ function(lm.out, dname, n.keep, show_R,
       tx[length(tx)+1] <- ""
       tx[length(tx)+1] <- paste("[based on Thomas Lumley's leaps function",
                           "from the leaps package]")
-      tx[length(tx)+1] <- ""
-
     }
 
     else  # not numeric.all
-      tx[length(tx)+1] <- ">>> No subset analysis, not all variables are numeric.\n"
+      tx[length(tx)+1] <- ">>> No subset analysis, some variables not numeric"
 
-    txall <- tx
-  }
+    txsbs <- tx
+  }  # end subsets
 
-  return(list(txcor=txcor, txcln=txcln, txall=txall, crs=crs, tol=tol, vif=vif))
+  return(list(txcor=txcor, txcln=txcln, txsbs=txsbs, crs=crs, tol=tol, vif=vif))
 
 }

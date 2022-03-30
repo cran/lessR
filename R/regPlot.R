@@ -1,5 +1,5 @@
 regPlot <- 
-function(out, type, digits_d=NULL, pred.intervals=TRUE,
+function(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
          res_sort=c("cooks","rstudent","dffits","off"),
          res_rows=NULL, cooks_cut=1, scatter_coef=NULL,
          pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
@@ -69,9 +69,10 @@ function(out, type, digits_d=NULL, pred.intervals=TRUE,
 
 
     .reg5Plot(out, res_rows=NULL, pred_rows=NULL,
-         scatter_coef=s.c, scatter_3D=FALSE, X1_new=NULL,
+         scatter_coef=s.c, X1_new=NULL, ancova,
          numeric.all, in.data.frame, c.int, p.int,
-         pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...)
+         digits_d=getOption("digits_d"), n_cat=getOption("n_cat"),
+         pdf=FALSE, width=5, height=5, manage.gr=FALSE, scatter_3D=FALSE, ...)
 
     } # end type == 1
 

@@ -25,8 +25,8 @@ Histogram(x=NULL, data=d, rows=NULL,
     bin_start=NULL, bin_width=NULL, bin_end=NULL, breaks="Sturges",
 
     theme=getOption("theme"),
-    fill=getOption("bar_fill_ordered"),
-    color=getOption("bar_color_ordered"),
+    fill=getOption("bar_fill_cont"),
+    color=getOption("bar_color_cont"),
     trans=getOption("trans_bar_fill"),
 
     values=FALSE,
@@ -309,6 +309,8 @@ STATISTICS\cr
 Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 5, NY: Routledge.
 
 Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 4, NY: CRC Press.
+
+Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871. 
 
 Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R, Springer. http://lmdvr.r-forge.r-project.org/
 }

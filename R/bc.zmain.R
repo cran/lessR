@@ -478,10 +478,17 @@ function(x, y, by, stack100,
   else
     if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
+  if (!exists("byname"))
+    byname <- getOption("byname")
   if (legend_position == "right_margin"  &&  (is.matrix(x))) {
+    if (!is.null(legend_abbrev)) {
+      byname  <- abbreviate(byname, legend_abbrev)
+      if (!is.null(legend_labels))
+        legend_labels <- abbreviate(legend_labels, legend_abbrev)
+    }
+    mx.ch <- max(c(max(nchar(legend_labels)), nchar(byname)-2))
     exp.coef <- 0.065 + 0.45 * axis_x_cex
-    rm <- rm + (.50 + (exp.coef * axis_x_cex))
-    mx.ch <- max(c(nchar(legend_labels), nchar(by.name) - 3))
+    rm <- rm + (.34 + (exp.coef * axis_x_cex))
     rm <- rm + (0.04 + 0.036*mx.ch)  # legend also moves over
     if (mx.ch > 18) rm <- rm + ((mx.ch - 18) * .06)
   }
@@ -840,7 +847,7 @@ function(x, y, by, stack100,
         legend_size <- axis_x_cex
     }
 
-    # default right_margin option
+    # default right_margin option location
     if (legend_position == "right_margin") {
 
       options(byname = getOption("byname"))

@@ -25,7 +25,7 @@ Eliminates the need to prepend the data frame name and a \$ to each variable nam
 
 Can create a character string called \code{rows} that expresses the logic of row selection. Can create a character string called \code{cols} that expresses the logic of column (variable) selection. To negate the \code{rows} expression, \code{.(!rows)}. Use \code{-.(cols)} to exclude designated variables. 
 
-Select a random selection of rows with the containing function \code{random(n)}, where \code{n} is the specified number of random rows to select from the full data frame.
+Select a random selection of rows with the containing function \code{random(n)}, where \code{n} is the specified number of random rows to select from the full data frame and \code{.n} is the proportion of random rows to select.
 }
 
 \value{

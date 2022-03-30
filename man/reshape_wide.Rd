@@ -53,7 +53,7 @@ reshape \tab reshape_wide\cr
 d <- Read("Anova_rb")  # already in wide-form
 dl <- reshape_long(d, sup1:sup4)  # convert to long-form
 
-# convert back to long form 
+# convert back to wide form 
 reshape_wide(dl, group="Group", response="Value", ID="Person")
 
 # with the name of the response prefixed to the column names

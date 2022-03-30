@@ -1,6 +1,6 @@
 .ANOVAz2 <- 
 function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
-         delim, graphics, pdf, width, height) {
+         delim, balance, graphics, pdf, width, height) {
 
   if (grepl("*", delim, fixed=TRUE)) bet.grp  <- TRUE else bet.grp <- FALSE
   if (grepl("+", delim, fixed=TRUE)) wth.grp  <- TRUE else wth.grp <- FALSE
@@ -25,43 +25,52 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
     tx[length(tx)+1] <- paste("  Blocking Factor:    ", nm[3])
     tx[length(tx)+1] <- ""
     tx[length(tx)+1] <- paste(
-        "Note: For the resulting F statistic for", nm[2], "to be distributed as F,\n",
+        "Note: For the resulting F statistic for", nm[2], 
+        "to be distributed as F,\n",
         "     the population covariances of", nm[1], "must be spherical.")
   }
 
   txbck2 <- tx
 
 
-  title_des <- "  DESCRIPTIVE STATISTICS "
+  title_des <- "\n  DESCRIPTIVE STATISTICS "
 
   txcn <- ""
   txcm <- ""
   if (bet.grp) {
 
-    l <-  tapply(y.values, 
+    n <-  tapply(y.values, 
           list(x1.values, x2.values), length)
-    l <- as.table(l)
+    n <- as.table(n)
+
+    m <-  tapply(y.values, 
+          list(x1.values, x2.values), mean, na.rm=TRUE)
+    m <- as.table(m)
 
     if (!brief) {
 
       tx <- character(length = 0)
-      tx[length(tx)+1] <- paste("Cell Sample Size:", l[1,1])
+      if (is.null(options()$knitr.in.progress))
+        tx[length(tx)+1] <- "-- Cell Sample Sizes"
+      tx[length(tx)+1] <- ""
+      if (balance) 
+        tx[length(tx)+1] <- "Equal cell sizes, so balanced design"
+      else {
+        tx[length(tx)+1] <- "Unequal cell sizes, so unbalanced design" 
+        tx[length(tx)+1] <- "ANOVA based on Type II Sums of Squares" 
+      }
+      tx[length(tx)+1] <- ""
+      tx2 <- .prntbl(t(n), digits_d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
+      for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
       txcn <- tx
 
       tx <- character(length = 0)
       if (is.null(options()$knitr.in.progress)) {
-        tx[length(tx)+1] <- "Cell Means"
+        tx[length(tx)+1] <- "-- Cell Means"
         tx[length(tx)+1] <- ""
       }
-
-      m <-  tapply(y.values, 
-            list(x1.values, x2.values), mean, na.rm=TRUE)
-      #names(dimnames(m)) <- c(nm[2], nm[3])
       tx2 <- .prntbl(t(m), digits_d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
       for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
-
-      m <- as.table(m)
-
       txcm <- tx
 
     }  # !brief
@@ -73,46 +82,40 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
     m <- as.table(m)
   }
 
-  m <- data.frame(m)  # converts table of means to long form
+  # convert table of means to long form
+  tx <- character(length = 0)
+  if (is.null(options()$knitr.in.progress)) {
+    tx[length(tx)+1] <- "-- Marginal Means"
+    tx[length(tx)+1] <- ""
+  }
+
+  m <- data.frame(m)
   names(m) <- c(nm[2], nm[3], nm[1])
 
-    tx <- character(length = 0)
+  tx[length(tx)+1] <- nm[2]
+  m1 <- tapply(y.values, x1.values, mean, na.rm=TRUE)
+  m1 <- data.frame(t(m1))
+  tx2 <- .prntbl(m1, digits_d)  # 1st treatment horizontal dimension
+  for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
+  tx[length(tx)+1] <- ""
+  tx[length(tx)+1] <- nm[3]
+  m2 <-  tapply(y.values, x2.values, mean, na.rm=TRUE)
+  m2 <- data.frame(t(m2))
+  tx2 <- .prntbl(m2, digits_d)  # 2nd treatment horizontal dimension
+  for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
+  txmm <- tx
 
-    if (is.null(options()$knitr.in.progress)) {
-      tx[length(tx)+1] <- "Marginal Means"
-      tx[length(tx)+1] <- ""
-    }
-
-    tx[length(tx)+1] <- nm[2]
-    m1 <-  tapply(y.values, x1.values, mean, na.rm=TRUE)
-    m1 <- data.frame(t(m1), stringsAsFactors=TRUE)
-    tx2 <- .prntbl(m1, digits_d)  # 1st treatment horizontal dimension
-    for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
-    tx[length(tx)+1] <- ""
-    tx[length(tx)+1] <- nm[3]
-    m2 <-  tapply(y.values, x2.values, mean, na.rm=TRUE)
-    m2 <- data.frame(t(m2), stringsAsFactors=TRUE)
-    tx2 <- .prntbl(m2, digits_d)  # 2nd treatment horizontal dimension
-    for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
-
-    txmm <- tx
-
-
-    tx <- character(length = 0)
-    if (is.null(options()$knitr.in.progress)) {
-      tx[length(tx)+1] <- "Grand Mean"
-      tx[length(tx)+1] <- ""
-    }
-
-    mg <- mean(y.values, na.rm=TRUE)
-    tx[length(tx)+1] <- round(mg, digits_d+1)
-
-    txgm <- tx
+  tx <- character(length = 0)
+  mg <- mean(y.values, na.rm=TRUE)
+  if (is.null(options()$knitr.in.progress)) {
+    tx[length(tx)+1] <- paste("-- Grand Mean:", round(mg, digits_d+1))
+  }
+  txgm <- tx
 
 
   tx <- character(length = 0)
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- "Cell Standard Deviations"
+    tx[length(tx)+1] <- "-- Cell Standard Deviations"
     tx[length(tx)+1] <- ""
   }
 
@@ -128,18 +131,26 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
 
 
-  title_basic <- "  BASIC ANALYSIS"
-
-  tx <- character(length = 0)
-
-  if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("Summary Table")
-    tx[length(tx)+1] <- ""
-  }
+  title_basic <- "\n  ANOVA"
 
   if(bet.grp) n.vars <- 4
   if(wth.grp) n.vars <- 3
   smc <- anova(av.out)
+
+  tx <- character(length = 0)
+
+  if (is.null(options()$knitr.in.progress)) {
+    tx[length(tx)+1] <- paste("-- Summary Table")
+
+    if (!balance) {
+       tx[length(tx)] <-  paste(tx[length(tx)],
+                                "from Type II Sums of Squares")
+       av2.out <- aov(y.values ~ x2.values * x1.values)
+       smc[1,] <- anova(av2.out)[2,]
+    }
+  }
+  tx[length(tx)+1] <- ""
+
   buf <- 0 
   for (i in 1:n.vars) {
     lng.lbl <- nchar(rownames(smc)[i])
@@ -188,7 +199,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
   tx <- character(length = 0)
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("Association and Effect Size")
+    tx[length(tx)+1] <- paste("-- Association and Effect Size")
     tx[length(tx)+1] <- ""
   }
 
@@ -201,7 +212,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
   FB <- sm[[1]][2,4]
   if (bet.grp) {
     FAB <- sm[[1]][3,4]
-    n <- l[1,1]
+    n <- n[1,1]
   }
 
   omsq.A <- ((p-1)*(FA-1)) / ((p-1)*(FA-1) + n*p*q)
@@ -210,40 +221,40 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
   if (bet.grp) omsq.AB <- ((p-1)*(q-1)*(FAB-1)) / ((p-1)*(q-1)*(FAB-1) + n*p*q)
 
   tx[length(tx)+1] <- paste("Partial Omega Squared for ", nm[2],
-      ": ", .fmt(omsq.A, 2), sep="")
+      ": ", .fmt(omsq.A, 3), sep="")
   if (bet.grp)
     tx[length(tx)+1] <- paste("Partial Omega Squared for ", nm[3],
-        ": ", .fmt(omsq.B, 2), sep="")
+        ": ", .fmt(omsq.B, 3), sep="")
   if (wth.grp)
     tx[length(tx)+1] <- paste("Partial Intraclass Correlation for ", nm[3],
-        ": ", .fmt(intra.B, 2), sep="")
+        ": ", .fmt(intra.B, 3), sep="")
   if (bet.grp)
     tx[length(tx)+1] <- paste("Partial Omega Squared for ", nm[2], " & ", nm[3],
-        ": ", .fmt(omsq.AB, 2), sep="")
+        ": ", .fmt(omsq.AB, 3), sep="")
   tx[length(tx)+1] <- ""
 
   if (omsq.A > 0) {
     fA.cohen <- sqrt( (omsq.A/(1-omsq.A)) )
     tx[length(tx)+1] <- paste("Cohen's f for ", nm[2], ": ",
-                              .fmt(fA.cohen, 2), sep="")
+                              .fmt(fA.cohen, 3), sep="")
   }
   if (bet.grp) {
     if(omsq.B > 0) {
       fB.cohen <- sqrt( (omsq.B/(1-omsq.B)) )
       tx[length(tx)+1] <- paste("Cohen's f for ", nm[3], ": ",
-                                .fmt(fB.cohen, 2), sep="")
+                                .fmt(fB.cohen, 3), sep="")
     }
     if (omsq.AB > 0) {
       fAB.cohen <- sqrt( (omsq.AB/(1-omsq.AB)) )
       tx[length(tx)+1] <- paste("Cohen's f for ", nm[2], "_&_", nm[3], ": ",
-                                 .fmt(fAB.cohen, 2), sep="")
+                                 .fmt(fAB.cohen, 3), sep="")
     }
   }
   if (wth.grp) {
     if (intra.B > 0) {
       fB.cohen <- sqrt( (intra.B/(1-intra.B)) )
       tx[length(tx)+1] <- paste("Cohen's f for ", nm[3], ": ",
-                                .fmt(fB.cohen, 2), sep="")
+                                .fmt(fB.cohen, 3), sep="")
     }
   }
 
@@ -251,13 +262,13 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
 
   txhsd <- ""
-  title_tukey <- "  TUKEY MULTIPLE COMPARISONS OF MEANS"
+  title_tukey <- "\n TUKEY MULTIPLE COMPARISONS OF MEANS"
   if (!brief) {
     tx <- character(length = 0)
 
     HSD <- TukeyHSD(av.out)
-    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", attr(HSD,
-                              which="conf_level"))
+    tx[length(tx)+1] <- paste("Family-wise Confidence Level:", 
+                              attributes(HSD)$conf.level)
     tx[length(tx)+1] <- paste("\nFactor:", nm[2])
 
     txHSD <- .prntbl(HSD[[1]], digits_d)
@@ -277,6 +288,8 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
 
   # ------------------------------------
+  # visualizations
+
   # keep track of the number of plots, see if manage graphics
   plt.i <- 0
   plt.title  <- character(length=0)
@@ -300,15 +313,16 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
       plt.i <- plt.i + 1
       plt.title[plt.i] <- "Interaction Plot"
 
+      # p is num of levels on x-axis
+      # q is num of levels for legend, each curve
       options(byname = nm[3])
       theme <- getOption("theme")
       qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
-      pt_fill <- getColors(qual_pal, n=2, output=FALSE)
-      pt_color <- getColors(qual_pal, n=2, output=FALSE)
+      pt_fill <- getColors(qual_pal, n=q, output=FALSE)
       txt <- paste("Cell Means of", nm[1])
       .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], 
-                fill=pt_fill, color=pt_color, segments=TRUE,
-                cat.x=TRUE, xlab=nm[2], ylab=txt, size=2)
+                fill=pt_fill, color=pt_fill, segments=TRUE,
+                col.segment=pt_fill, cat.x=TRUE, xlab=nm[2], ylab=txt, size=1.5)
 
       if (pdf) {
         dev.off()

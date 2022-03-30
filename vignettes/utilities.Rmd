@@ -144,6 +144,17 @@ rescale(Salary)
 ```
 
 
+## Rename a Variable in a Data Frame
+
+List the name of the data frame, the existing variable name, and the new name, in that order.
+
+```{r}
+names(d)
+d <- rename(d, Salary, AnnualSalary)
+names(d)
+```
+
+
 ## Create Factor Variables
 
 

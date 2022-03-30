@@ -8,7 +8,7 @@ Following a call to the \code{lessR} function \code{\link{Regression}}, in which
 }
 
 \usage{
-regPlot(out, type, digits_d=NULL, pred.intervals=TRUE,
+regPlot(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
          res_sort=c("cooks","rstudent","dffits","off"),
          res_rows=NULL, cooks_cut=1, scatter_coef=NULL, 
          pdf=FALSE, width=5, height=5, manage.gr=FALSE, \ldots)
@@ -22,6 +22,8 @@ regPlot(out, type, digits_d=NULL, pred.intervals=TRUE,
         scatter plot, then the confidence and prediction intervals are included. 2
         plots the density and histogram of residuals and 3 plots a scatter plot of
         the residuals with the fitted values_}
+  \item{ancova}{If \code{TRUE}, then an ANCOVA design with 1 grouping variable
+       and 1 covariate.}
   \item{digits_d}{For the Basic Analysis, the number of decimal digits,
         set by default to at least 3 or the largest number of digits in the values 
         of the response variable plus 1.}

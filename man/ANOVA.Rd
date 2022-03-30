@@ -127,6 +127,8 @@ Although not typically needed for analysis, if the output is assigned to an obje
 
 \references{
 Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 7, NY: Routledge.
+
+Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871. 
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

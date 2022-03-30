@@ -1,5 +1,5 @@
 .reg.Rmd <-
-function(nm, dname, fun_call, res_rows, pred_rows, res_sort,
+function(nm, dname, fun_call, res_rows, pred_rows, res_sort, ancova,
          digits_d, results, explain, interpret, document, code,
          pvalues, tolerances, resid.max, numeric.all, X1_new,
          new.val=matrix(nrow=n.vars-1, ncol=2, byrow=TRUE), Rmd_data) {
@@ -1019,9 +1019,9 @@ sep="")
       tx[length(tx)+1] <- ""
       tx[length(tx)+1] <- paste("```{r", show, "}", sep="")
       if (n.pred > 1)
-        tx[length(tx)+1] <- "regPlot(r, 1)  # 1: scatter plot matrix"
+        tx[length(tx)+1] <- "regPlot(r, 1, ancova)  # 1: scatter plot matrix"
       else
-        tx[length(tx)+1] <- "regPlot(r, 1, pred.intervals=FALSE)  # 1: scatter plot "
+        tx[length(tx)+1] <- "regPlot(r, 1, ancova, p, red.intervals=FALSE)  # 1: scatter plot "
       tx[length(tx)+1] <- "```"
     }
 

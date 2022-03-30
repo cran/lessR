@@ -1,9 +1,9 @@
 .reg5Plot <-
 function(lm.out, res_rows=NULL, pred_rows=NULL,
-         scatter_coef=FALSE, X1_new=NULL,
+         scatter_coef=FALSE, X1_new=NULL, ancova,
          numeric.all, in.data.frame, c.int, p.int, plot_errors=FALSE,
-         pdf=FALSE, width=5, height=5, manage.gr=FALSE,
-         scatter_3D, ...) {
+         digits_d, n_cat, pdf=FALSE, width=5, height=5, manage.gr=FALSE,
+         scatter_3D, quiet, ...) {
 
          
   nm <- all.vars(lm.out$terms)  # names of vars in the model
@@ -17,37 +17,57 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     pred_rows <- ifelse (n.keep < 25, n.keep, 4)
   if (pred_rows == "all") pred_rows <- n.keep  # no preds with pred_rows=0
 
-
   # pdf graphics option
   if (pdf) { 
     pdf_file <- "RegScatterplot.pdf"
     if (n.pred > 1) pdf_file <- "RegScatterMatrix.pdf"
     pdf(file=pdf_file, width=width, height=height)
   }
-
   # keep track of the plot in this routine
   plt.i <- 0L
   plt.title  <- character(length=0)
 
-  if (n.pred <= 1) {  # scatterplot, if one (or no) predictor variable
+  x.cat <- 0
+  x.cont <- 0
+  do.sp <- ifelse (n.pred < 2, TRUE, FALSE) 
+  if (ancova) {
+    if (is.numeric(lm.out$model[,nm[2]]) && is.factor(lm.out$model[,nm[3]])) {
+      x.cat <- 3
+      x.cont <- 2
+      do.sp <- TRUE
+    }
+    if (is.numeric(lm.out$model[,nm[3]]) && is.factor(lm.out$model[,nm[2]])) {
+      x.cat <- 2
+      x.cont <- 3
+      do.sp <- TRUE
+    }
+    plot_errors <- FALSE
+    lvl <- levels(lm.out$model[,nm[x.cat]])
+  }
 
-    if (n.pred > 0)
-      x.values <- lm.out$model[,nm[2]]
-    else {  # null model
+  txeqs <- NULL
+
+  # ----------------------------------------------------
+  # scatterplot, if one (or no) pred variables or ancova
+  if (do.sp) {
+
+    if (n.pred %in% 1:2) {
+      if (!ancova)
+        x.values <- lm.out$model[,nm[2]]
+      else
+        x.values <- lm.out$model[,nm[x.cont]]
+    }
+    else if (n.pred == 0) {  # null model
       x.values <- 1:n.obs
       nm[2] <- "Index"
       x.lab <- nm[2] 
     }
     y.values <- lm.out$model[,nm[1]]
 
-    do.predint <- ifelse (pred_rows==0 || !is.null(X1_new) || is.null(p.int),
-      FALSE, TRUE) 
+    do.predint <- ifelse (pred_rows==0 || !is.null(X1_new) || is.null(p.int)
+      || ancova, FALSE, TRUE) 
     if (n.pred > 0)
       if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
-
-    # non-numeric, non-factor concert to factor
-    if (!is.numeric(x.values))
-      if (!is.factor(x.values)) x.values <- as.factor(x.values)
  
     # title
     if (!do.predint || !is.numeric(x.values)) {
@@ -57,6 +77,8 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
           ctitle <- paste(ctitle, "and Null Model")
         else
           ctitle <- paste(ctitle, "and Least-Squares Line")
+        if (ancova)
+          ctitle <- paste(ctitle, "s", sep="")
       }
       else if (is.factor(x.values) && n.pred==1 && nlevels(x.values)==2) {
         ctitle <- paste(ctitle, "and Least-Squares Line")
@@ -84,25 +106,20 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     # size of points
     size.pt <- ifelse (.Platform$OS == "windows", 0.85, 0.70)
 
-#   fill <- getOption("pt_fill")
-#   color <- getOption("pt_color")
-#   cat.x <- ifelse (length(unique(x.values)) < 8, TRUE, FALSE)
-#   if (cat.x) x.values <- factor(x.values)
-#   cat.y <- ifelse (length(unique(y.values)) < 8, TRUE, FALSE)
-#   if (cat.y) y.values <- factor(y.values)
-#   x.vl <- data.frame(x.values)
-#   y.vl <- data.frame(y.values)
-#   .plt.main(x.vl, y.vl, fill=fill, color=color, cat.x=cat.x,
-#             x.lab=nm[2], y.lab=nm[1], size=size.pt, cat.y=cat.y)
- 
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
-    
-    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=ctitle, sub=NULL)
+
+    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm
     bm <- margs$bm
+    
+    if (ancova) {
+      big.nm <- max(nchar(lvl))
+      if (big.nm > 6) rm <- rm + (.05 * (big.nm - 6))
+      rm <- rm + .30  + (.65 * getOption("axis_cex"))  # better if axis_y_cex
+    }
 
     par(bg=getOption("window_fill"))
     orig.params <- par(no.readonly=TRUE)
@@ -115,10 +132,6 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     rect(usr[1], usr[3], usr[2], usr[4],
       col=getOption("panel_fill"), border=getOption("panel_color"))
 
-    abline(v=axTicks(1), col=getOption("grid_x_color"),
-         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
-    abline(h=axTicks(2), col=getOption("grid_y_color"),
-         lwd=getOption("grid_lwd"), lty=getOption("grid_lty"))
     if (is.factor(x.values)) {
       x.lvl <- levels(x.values)
       axT1 <- 1:length(x.lvl)   # mark category values
@@ -127,30 +140,59 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       x.lvl <- NULL
       axT1 <- axTicks(1)  # else numeric, so all the ticks
     }
+    axT2 <- axTicks(2)  # else numeric, so all the ticks
+
+    .grid("v", axT1)
+    .grid("h", axT2)
       
     .axes(x.lvl, NULL, axT1, axTicks(2))
 
-    .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=ctitle, sub.lab=NULL)
+    theme <- getOption("theme")
+    if (!ancova) {
+      .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=NULL, sub.lab=NULL)
+      fill <- getOption("pt_fill")
+      color <- getOption("pt_color")
+    }
+    else {
+      .axlabs(x.lab=nm[x.cont], y.lab=nm[1], main.lab=NULL, sub.lab=NULL)
+      clr <- .get_fill(theme)
+      fill <- getColors(clr, n=length(lvl))
+      color <- getColors(clr, n=length(lvl))
+    }
 
-    fill <- getOption("pt_fill")
-    color <- getOption("pt_color")
+    # Plot legend for ancova
+    if (ancova) {
+      pts_trans <- 0
+      shp <- 21
+      fill_bg <- "transparent"
+      options(byname = nm[x.cat])
+      .plt.by.legend(lvl, color, fill, shp, pts_trans, fill_bg, usr)
+    }
     
-# using the eq.int criterion for bubble plot does not account for missing data
-#   eq.int <- TRUE
-#   if (is.numeric(x.values)) {
-#     d.x <- diff(x.values) 
-#     for (i in 2:length(d.x))
-#       if ((abs(d.x[i-1] - d.x[i]) > 1.0000000001)) eq.int <- FALSE
-#   }
-
     # Plot points
     # -----------
     ux <- length(unique(x.values))
     uy <- length(unique(y.values))
-    if ((ux>10 && uy>10) || !.is.integer(x.values) || !.is.integer(y.values)) {
-      points(x.values, y.values, pch=21, col=color, bg=fill, cex=size.pt)
-    }
-    else {  # bubble plot
+    n_cat <- 10
+    discrete <- ifelse (ux>n_cat && uy>n_cat || !.is.integer(x.values) ||
+                        !.is.integer(y.values), FALSE, TRUE)
+
+    if (!discrete)  {
+      n.iter <- ifelse(ancova, nlevels(lm.out$model[,nm[x.cat]]), 1)
+
+      for (i in 1:n.iter) {  # iter > 1 only for ancova, levels of cat var
+        if (!ancova)
+          ind <- 1:length(x.values)
+        else
+          ind <- which(lm.out$model[,nm[x.cat]] == lvl[i])
+
+        points(x.values[ind], y.values[ind],
+               pch=21, col=color[i], bg=fill[i], cex=size.pt)
+      }  # end 1:n.iter
+
+    }  # end !discrete
+
+    if (discrete) {  # bubble plot, not for ancova
       mytbl <- table(x.values, y.values)  # get the counts, all x-y combinations
       n.count <- nrow(mytbl) * ncol(mytbl)
       count <- integer(length=n.count)
@@ -180,29 +222,55 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       q.ind <- 1:nrow(cords)  # all bubbles get text
       for (i in 1:nrow(cords)) if (cords[i,3] < 5) cords[i,3] <- NA 
       text(cords[q.ind,1], cords[q.ind,2], cords[q.ind,3], cex=0.8)
-
     }  # end bubble plot
 
 
     # Plot Line
     # ---------
+
     if (n.pred == 0) {
       m <- lm.out$coefficients[1]  # mean of Y
       mv <- rep(m, n.obs)
       names(mv) <- NULL
       lines(x.values, mv, lwd=0.75)
     }
-    else if (!is.factor(x.values)) {
+
+    else if (n.pred == 1) {
+      if (!is.factor(x.values)) {
         abline(b0, b1, col=getOption("segment_color"), lwd=1)
+      }
+      else if (nlevels(x.values)==2) {
+        y0 <- b0 + (b1*0)
+        y1 <- b0 + (b1*1)
+        abline(v=1, col="gray60", lwd=.5) 
+        abline(v=2, col="gray60", lwd=.5) 
+        abline(h=y0, col="gray60", lwd=.5) 
+        abline(h=y1, col="gray60", lwd=.5) 
+        segments(y0=y0, y1=y1, x0=1, x1=2, col="black", lwd=1.5) 
+      }
     }
-    else if (is.factor(x.values) && n.pred==1 && nlevels(x.values)==2) {
-      y0 <- b0 + (b1*0)
-      y1 <- b0 + (b1*1)
-      abline(v=1, col="gray60", lwd=.5) 
-      abline(v=2, col="gray60", lwd=.5) 
-      abline(h=y0, col="gray60", lwd=.5) 
-      abline(h=y1, col="gray60", lwd=.5) 
-      segments(y0=y0, y1=y1, x0=1, x1=2, col="black", lwd=1) 
+
+    else if (ancova) {
+      coefs <- lm.out$coefficients
+      n.lvl <- nlevels(lm.out$model[,nm[x.cat]])
+      b.cont <- ifelse (x.cont == 2, coefs[2], coefs[1+n.lvl])
+      if (x.cat == 2)
+        b.cat <- coefs[2:n.lvl] 
+      else
+        b.cat <- coefs[3:(1+(n.lvl))] 
+
+      tx <- character(length = 0)
+      for (i.coef in 0:length(b.cat)) {
+        if (i.coef == 0)
+          b00 <- b0
+        else
+          b00 <- b0 + b.cat[i.coef] 
+        abline(b00, b.cont, col=fill[i.coef+1], lwd=1.5)
+        tx[length(tx)+1] <- paste("Level ",lvl[i.coef+1], ": y^_", nm[1],
+            " = ", .fmt(b00, digits_d), " + ", .fmt(b.cont, digits_d),
+            "(x_", nm[x.cont], ")", sep="")
+      }
+      txeqs <- tx
     }
 
     # Plot Errors
@@ -239,7 +307,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       polygon(xx, yy, col=getOption("ellipse_fill"), border="transparent")
     }
 
-  }  # end n.pred<=1
+  }  # end do.sp, a single scatterplot
 
   else {  # scatterplot matrix for multiple regression
     if (numeric.all && in.data.frame) {
@@ -252,43 +320,46 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       .plt.mat(lm.out$model[c(nm)], fit="lm", col.bg=bckg, 
                pt.size=TRUE, size.miss=TRUE)
     }
-    else {
+    else if (!quiet) {
       cat("\n>>> No scatterplot matrix reported because not all variables are ")
       if (!in.data.frame) cat("in the data frame.\n")
       if (!numeric.all) cat("numeric.\n")
-      dev.off()
+      if (dev.cur() > 1) dev.off()  # 1 is the null device
     }
   }
 
   if (pdf) {
-    dev.off()
-    if (n.pred == 1)
-      .showfile(pdf_file, "scatterplot")
-    else
-      .showfile(pdf_file, "scatterplot matrix")
-    cat("\n\n")
+    if (dev.cur() > 1) {
+      dev.off()
+      if (n.pred==1 || ancova)
+        .showfile(pdf_file, "scatterplot")
+      else
+        .showfile(pdf_file, "scatterplot matrix")
+      cat("\n\n")
+    }
   }
 
   if (scatter_3D) {  # 3d scatterplot option for 2-predictor models
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "scatter_3D option disabled\n",
       "car package no longer included because of dependencies issues\n\n",
-      "If interested, directly call the scatter3d function from the car package\n",
-      "First install the needed packages, then invoke the library function:\n",
+      "To run, directly call the scatter3d function from the car package\n",
       "  install.packages(\"rgl\", \"car\")\n",
       "  library(car)\n\n",
       "Example\n ",
-      "  scatter3d(Ozone ~ Wind + Temp, id.method=\"identify\", data=airquality)\n\n",
-      "Directions\n",
+      "  scatter3d(Ozone ~ Wind + Temp, id.method=\"identify\",
+         data=airquality)\n\n", "Directions\n",
       "  Can re-size the plot window, click and drag to rotate plot\n",
-      "  Press the right mouse button and drag a rectangle around any points to be\n",
-      "    identified, and then release\n",
-      "  To exit, right-click in a blank area of the 3d-scatterplot\n\n", sep="")
+      "  Press the right mouse button and drag a rectangle around any\n",
+      "  points to be identified, and then release\n",
+      "  To exit, right-click in a blank area of the 3d-scatterplot\n\n",
+         sep="")
 
       #suppressMessages(scatter3d(lm.out$terms, id.method="identify", data=lm.out$model))  # car
   }
 
   # just generated plot
-  return(invisible(list(i=plt.i, ttl=plt.title)))
+  return(invisible(list(i=plt.i, ttl=plt.title, txeqs=txeqs,
+                        cat=nm[x.cat], cont=nm[x.cont])))
 
 }

@@ -16,7 +16,7 @@ suppressPackageStartupMessages(library("lessR"))
 
 ## Subset a Data Frame with __Base R__ `Extract[]`
 
-The most general way to subset a data frame by rows and/or columns is the base R `Extract[]` function, indicated by double square brackets instead of the usual matched parentheses. For a data frame named _d_ the general format is  `d[rows, columms]`. 
+The most general way to subset a data frame by rows and/or columns is the base R `Extract[]` function, indicated by matched square brackets instead of the usual matched parentheses. For a data frame named _d_ the general format is  `d[rows, columms]`. 
 
 For the `rows` parameter, pass either
 
@@ -34,7 +34,7 @@ operator  | meaning
 != | is not equal to
 %in% | is in a vector
 
-For example, to obtain a subset of the data frame that consists of only those who report a value of the _Gender_ variable as Female, specify a logical condition such as
+For example, to obtain a subset of the data frame that consists of only those who report a value of the _Gender_ variable as Female, specify a logical condition such as:
 
 ```
 Gender=="Female"

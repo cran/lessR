@@ -225,6 +225,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   # get full list of lattice parameters: trellis.par.get()
 
+#print(trellis.par.get("superimpose.symbol"))
   p <- update(p,
          strip=strp, strip.left=strp.lft, aspect=asp,
          par.strip.text=list(cex=axis_x_cex, col=getOption("strip_text_color")),

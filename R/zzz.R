@@ -9,8 +9,8 @@ if (getRversion() >= "3.5.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.1.6  feedback: gerbing@pdx.edu  web: lessRstats.com/new\n",
-      "---------------------------------------------------------------\n",
+      "lessR 4.1.7                         feedback: gerbing@pdx.edu \n",
+      "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
       "\n",
@@ -46,11 +46,11 @@ function(...) {
   options(bar_fill_discrete = c("#4398D0", "#B28B2A", "#5FA140", "#D57388",
            "#9A84D6", "#00A898", "#C97E5B", "#909711", "#00A3BA", "#D26FAF",
            "#00A76F", "#BD76CB" ))  # getColors("hues")
-  options(bar_fill_ordered = rgb(144,165,195, maxColorValue=255))
+  options(bar_fill_cont = rgb(150,170,195, maxColorValue=255))
   options(trans_bar_fill = 0.0)
-  options(bar_color = rgb(126,144,168, maxColorValue=255))
+  options(bar_color = rgb(132,150,175, maxColorValue=255))
   options(bar_color_discrete = "transparent")
-  options(bar_color_ordered = rgb(126,144,168, maxColorValue=255))
+  options(bar_color_cont = rgb(132,150,175, maxColorValue=255))
   options(values = "%")
   options(values_color = "white")
   options(values_size = 0.75)

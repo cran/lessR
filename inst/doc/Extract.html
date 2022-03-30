@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
     </style>
 
 
+
 <style type="text/css">
   code {
     white-space: pre;
@@ -336,23 +337,35 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <div id="TOC">
 <ul>
-<li><a href="#subset-a-data-frame-with-base-r-extract">Subset a Data Frame with <strong>Base R</strong> <code>Extract[]</code></a></li>
-<li><a href="#annoying-features-of-base-r-extract">Annoying Features of <strong>Base R</strong> <code>Extract</code></a></li>
-<li><a href="#more-flexible-use-of-extract">More Flexible Use of <code>Extract[]</code></a></li>
+<li><a href="#subset-a-data-frame-with-base-r-extract">Subset a Data
+Frame with <strong>Base R</strong> <code>Extract[]</code></a></li>
+<li><a href="#annoying-features-of-base-r-extract">Annoying Features of
+<strong>Base R</strong> <code>Extract</code></a></li>
+<li><a href="#more-flexible-use-of-extract">More Flexible Use of
+<code>Extract[]</code></a></li>
 <li><a href="#missing-data">Missing Data</a></li>
-<li><a href="#random-selection-of-rows">Random Selection of Rows</a></li>
+<li><a href="#random-selection-of-rows">Random Selection of
+Rows</a></li>
 </ul>
 </div>
 
 <div id="subset-a-data-frame-with-base-r-extract" class="section level2">
-<h2>Subset a Data Frame with <strong>Base R</strong> <code>Extract[]</code></h2>
-<p>The most general way to subset a data frame by rows and/or columns is the base R <code>Extract[]</code> function, indicated by double square brackets instead of the usual matched parentheses. For a data frame named <em>d</em> the general format is <code>d[rows, columms]</code>.</p>
+<h2>Subset a Data Frame with <strong>Base R</strong>
+<code>Extract[]</code></h2>
+<p>The most general way to subset a data frame by rows and/or columns is
+the base R <code>Extract[]</code> function, indicated by matched square
+brackets instead of the usual matched parentheses. For a data frame
+named <em>d</em> the general format is
+<code>d[rows, columms]</code>.</p>
 <p>For the <code>rows</code> parameter, pass either</p>
 <ul>
-<li>the row names of the selected rows, the indices such as 1, 2, etc., or actual row names</li>
-<li>a logical statement that, when evaluated, reduces to the row indices</li>
+<li>the row names of the selected rows, the indices such as 1, 2, etc.,
+or actual row names</li>
+<li>a logical statement that, when evaluated, reduces to the row
+indices</li>
 </ul>
-<p>To specify a logical expression for the <code>rows</code> parameter, use the standard R operators.</p>
+<p>To specify a logical expression for the <code>rows</code> parameter,
+use the standard R operators.</p>
 <table>
 <thead>
 <tr class="header">
@@ -387,33 +400,69 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tr>
 </tbody>
 </table>
-<p>For example, to obtain a subset of the data frame that consists of only those who report a value of the <em>Gender</em> variable as Female, specify a logical condition such as</p>
+<p>For example, to obtain a subset of the data frame that consists of
+only those who report a value of the <em>Gender</em> variable as Female,
+specify a logical condition such as:</p>
 <pre><code>Gender==&quot;Female&quot;</code></pre>
 <p>For the <code>cols</code> parameter, pass either</p>
 <ul>
 <li>the column indices of the selected columns</li>
 <li>a list of variable names that reduces to the column indices</li>
 </ul>
-<p>If subsetting is done by only rows or only columns, then leave the other value blank. For example, to subset the <em>d</em> data frame only by rows, the general form reduces to <code>d[rows,]</code>. Similarly, to subset only by columns, <code>d[,cols]</code>.</p>
+<p>If subsetting is done by only rows or only columns, then leave the
+other value blank. For example, to subset the <em>d</em> data frame only
+by rows, the general form reduces to <code>d[rows,]</code>. Similarly,
+to subset only by columns, <code>d[,cols]</code>.</p>
 </div>
 <div id="annoying-features-of-base-r-extract" class="section level2">
-<h2>Annoying Features of <strong>Base R</strong> <code>Extract</code></h2>
-<p>When <code>Extract[]</code> evaluates the row or column specifications to obtain the indices, there are several annoying properties.</p>
+<h2>Annoying Features of <strong>Base R</strong>
+<code>Extract</code></h2>
+<p>When <code>Extract[]</code> evaluates the row or column
+specifications to obtain the indices, there are several annoying
+properties.</p>
 <ol style="list-style-type: decimal">
-<li><code>rows</code>: Any reference to the variables in the data frame for this specification must contain the name of the data frame followed by a $. But this name has already been specified in the call to <code>Extract[]</code> by listing the data frame name in front of the square brackets, so now is redundant, repeated for every variable reference.</li>
-<li><code>rows</code>: When specifying a value of a variable for a row selection, any missing values for the variable are also provided even though the missing data values are not the requested value of the variable.</li>
-<li><code>cols</code>: Usually specified with a vector of variable names but all variable names in in the provided vector of names must be quoted.</li>
-<li><code>cols</code>: No variable ranges specified with a colon <code>:</code> such as m01:m10 to specify 10 variables: m01, m02, …, up to m10.</li>
-<li>No character strings that store the values passed to <code>rows</code> and <code>cols</code>. Instead directly enter the conditions for both rows and columns, which can make the entire expression quite large.</li>
+<li><code>rows</code>: Any reference to the variables in the data frame
+for this specification must contain the name of the data frame followed
+by a $. But this name has already been specified in the call to
+<code>Extract[]</code> by listing the data frame name in front of the
+square brackets, so now is redundant, repeated for every variable
+reference.</li>
+<li><code>rows</code>: When specifying a value of a variable for a row
+selection, any missing values for the variable are also provided even
+though the missing data values are not the requested value of the
+variable.</li>
+<li><code>cols</code>: Usually specified with a vector of variable names
+but all variable names in in the provided vector of names must be
+quoted.</li>
+<li><code>cols</code>: No variable ranges specified with a colon
+<code>:</code> such as m01:m10 to specify 10 variables: m01, m02, …, up
+to m10.</li>
+<li>No character strings that store the values passed to
+<code>rows</code> and <code>cols</code>. Instead directly enter the
+conditions for both rows and columns, which can make the entire
+expression quite large.</li>
 </ol>
 </div>
 <div id="more-flexible-use-of-extract" class="section level2">
 <h2>More Flexible Use of <code>Extract[]</code></h2>
-<p>To address the first two deficiencies, one possibility is the base R <code>subset()</code> function. To address these deficiencies and still use <code>Extract[]</code> directly, <strong>lessR</strong> provides the function <code>.()</code> for obtaining the indices of selected rows and of selected columns. This function is only callable within the base R <code>Extract[]</code> function, with what R refers to as non-standard evaluation. That basically means that the annoying restrictions are removed, though in some advanced programming uses the <code>.()</code> may not apply.</p>
-<p>The general form of the subsetting with the <code>.()</code> function follows.</p>
+<p>To address the first two deficiencies, one possibility is the base R
+<code>subset()</code> function. To address these deficiencies and still
+use <code>Extract[]</code> directly, <strong>lessR</strong> provides the
+function <code>.()</code> for obtaining the indices of selected rows and
+of selected columns. This function is only callable within the base R
+<code>Extract[]</code> function, with what R refers to as non-standard
+evaluation. That basically means that the annoying restrictions are
+removed, though in some advanced programming uses the <code>.()</code>
+may not apply.</p>
+<p>The general form of the subsetting with the <code>.()</code> function
+follows.</p>
 <pre><code>d[.(rows), .(columns)]</code></pre>
-<p>That is, call the same <code>Extract[]</code> function with reference to <code>rows</code> and <code>cols</code>, but now wrap the row and column expressions with the <strong>lessR</strong> function call <code>.()</code>.</p>
-<p>To illustrate, use the Employee data set contained in <strong>lessR</strong>, here read into the <em>d</em> data frame.</p>
+<p>That is, call the same <code>Extract[]</code> function with reference
+to <code>rows</code> and <code>cols</code>, but now wrap the row and
+column expressions with the <strong>lessR</strong> function call
+<code>.()</code>.</p>
+<p>To illustrate, use the Employee data set contained in
+<strong>lessR</strong>, here read into the <em>d</em> data frame.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Suggestions
@@ -438,7 +487,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ##  7       Pre   integer     37       0      27   82  62  90 ... 83  59  80
 ##  8      Post   integer     37       0      22   92  74  86 ... 90  71  87
 ## ------------------------------------------------------------------------------------------</code></pre>
-<p>Subset the data frame by only listing observations with a <em>Gender</em> of “M” with scores on <em>Post</em> larger than 90. Only list columns for the variables in the range from <em>Years</em> to <em>Salary</em>, and <em>Post</em>. Referring back to the output of <code>Read()</code>, the variable range includes <em>Years</em>, <em>Gender</em>, <em>Dept</em>, and <em>Salary</em>.</p>
+<p>Subset the data frame by only listing observations with a
+<em>Gender</em> of “M” with scores on <em>Post</em> larger than 90. Only
+list columns for the variables in the range from <em>Years</em> to
+<em>Salary</em>, and <em>Post</em>. Referring back to the output of
+<code>Read()</code>, the variable range includes <em>Years</em>,
+<em>Gender</em>, <em>Dept</em>, and <em>Salary</em>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>d[.(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Post<span class="sc">&gt;</span><span class="dv">90</span>), .(Years<span class="sc">:</span>Salary, Post)]</span></code></pre></div>
 <pre><code>##                   Years Gender Dept    Salary Post
 ## Ritchie, Darnell      7      M ADMN  53788.26   92
@@ -447,7 +501,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Correll, Trevon      21      M SALE 134419.23   94
 ## Langston, Matthew     5      M SALE  49188.96   93
 ## Anderson, David       9      M ACCT  69547.60   91</code></pre>
-<p>Following is the traditional R call to <code>Extract[]</code> to obtain the same subsetting.</p>
+<p>Following is the traditional R call to <code>Extract[]</code> to
+obtain the same subsetting.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>d[d<span class="sc">$</span>Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> d<span class="sc">$</span>Post<span class="sc">&gt;</span><span class="dv">90</span>, <span class="fu">c</span>(<span class="st">&quot;Years&quot;</span>, <span class="st">&quot;Gender&quot;</span>, <span class="st">&quot;Dept&quot;</span>, <span class="st">&quot;Salary&quot;</span>, <span class="st">&quot;Post&quot;</span>)]</span></code></pre></div>
 <pre><code>##                   Years Gender Dept    Salary Post
 ## Ritchie, Darnell      7      M ADMN  53788.26   92
@@ -456,7 +511,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Correll, Trevon      21      M SALE 134419.23   94
 ## Langston, Matthew     5      M SALE  49188.96   93
 ## Anderson, David       9      M ACCT  69547.60   91</code></pre>
-<p>A row selection is a logical condition. To negate a row selection, add a <code>!</code> to the beginning of the condition passed to <code>.()</code>, within the call to <code>.()</code>. To exclude the specified variables, place a <code>-</code>, in front of the call to <code>.()</code>.</p>
+<p>A row selection is a logical condition. To negate a row selection,
+add a <code>!</code> to the beginning of the condition passed to
+<code>.()</code>, within the call to <code>.()</code>. To exclude the
+specified variables, place a <code>-</code>, in front of the call to
+<code>.()</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="sc">!</span>(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Post<span class="sc">&gt;</span><span class="dv">90</span>)), <span class="sc">-</span>.(Dept<span class="sc">:</span>Plan, Pre)]</span></code></pre></div>
 <pre><code>##                     Years Gender Post
 ## Wu, James              NA      M   74
@@ -490,7 +549,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Hamide, Bita            1      W   90
 ## Anastasiou, Crystal     2      W   71
 ## Cassinelli, Anastis    10      M   87</code></pre>
-<p>Can still provide the indices directly for one or both of the expressions as the base R <code>Extract[]</code> function is unmodified with the use of <code>.()</code>. The purpose of <code>.()</code> is simply to return the row or column row indices to identify specific rows or columns of the specified data frame. You can either specify the indices directory for the rows or columns, or let <code>.()</code> identify them for you.</p>
+<p>Can still provide the indices directly for one or both of the
+expressions as the base R <code>Extract[]</code> function is unmodified
+with the use of <code>.()</code>. The purpose of <code>.()</code> is
+simply to return the row or column row indices to identify specific rows
+or columns of the specified data frame. You can either specify the
+indices directory for the rows or columns, or let <code>.()</code>
+identify them for you.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>d[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, .(Years<span class="sc">:</span>Salary, Post)]</span></code></pre></div>
 <pre><code>##                  Years Gender Dept   Salary Post
 ## Ritchie, Darnell     7      M ADMN 53788.26   92
@@ -504,16 +569,27 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Correll, Trevon      21      M SALE
 ## Langston, Matthew     5      M SALE
 ## Anderson, David       9      M ACCT</code></pre>
-<p>To enhance readability, store the specified row or column conditions as character strings. Each string must be named either <code>rows</code> or <code>cols</code>. Because the entire expression for <code>rows</code> or <code>cols</code> is a character string, differentiate between single and double quotes as needed. For example, use single quotes within the string and double quotes to define the entire string, illustrated here.</p>
+<p>To enhance readability, store the specified row or column conditions
+as character strings. Each string must be named either <code>rows</code>
+or <code>cols</code>. Because the entire expression for
+<code>rows</code> or <code>cols</code> is a character string,
+differentiate between single and double quotes as needed. For example,
+use single quotes within the string and double quotes to define the
+entire string, illustrated here.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rows <span class="ot">&lt;-</span> <span class="st">&quot;Gender==&#39;M&#39; &amp; Post&gt;93&quot;</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="st">&quot;Gender:Salary, Post&quot;</span></span></code></pre></div>
-<p>To subset, pass the respective character strings, <code>rows</code> and <code>cols</code>, to <code>.()</code>, respectively.</p>
+<p>To subset, pass the respective character strings, <code>rows</code>
+and <code>cols</code>, to <code>.()</code>, respectively.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>d[.(rows), .(cols)]</span></code></pre></div>
 <pre><code>##                 Gender Dept    Salary Post
 ## Hoang, Binh          M SALE 111074.86   97
 ## Pham, Scott          M SALE  81871.05   94
 ## Correll, Trevon      M SALE 134419.23   94</code></pre>
-<p>To negate, as with the literal expressions, use <code>!</code> for the logical expression that defines the rows and <code>-</code> for the columns. Notice their placement, where the <code>!</code> is inside the call to <code>.()</code>, and the <code>-</code> is outside the call.</p>
+<p>To negate, as with the literal expressions, use <code>!</code> for
+the logical expression that defines the rows and <code>-</code> for the
+columns. Notice their placement, where the <code>!</code> is inside the
+call to <code>.()</code>, and the <code>-</code> is outside the
+call.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="sc">!</span>rows), <span class="sc">-</span>.(cols)]</span></code></pre></div>
 <pre><code>##                     Years JobSat Plan Pre
 ## Ritchie, Darnell        7    med    1  82
@@ -561,7 +637,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Downs, Deborah       7      W FINC  57139.90   high    2  90   86
 ## Hoang, Binh         15      M SALE 111074.86    low    3  96   97
 ## Jones, Alissa        5      W &lt;NA&gt;  53772.58   &lt;NA&gt;    1  65   62</code></pre>
-<p>Here with the traditional use of <code>Extract[]</code>, specify rows of data only when the value of <em>Dept</em> is <em>ADMN</em>.</p>
+<p>Here with the traditional use of <code>Extract[]</code>, specify rows
+of data only when the value of <em>Dept</em> is <em>ADMN</em>.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>d[d<span class="sc">$</span>Dept<span class="sc">==</span><span class="st">&quot;ADMN&quot;</span>, <span class="fu">c</span>(<span class="st">&#39;Gender&#39;</span>, <span class="st">&#39;Dept&#39;</span>, <span class="st">&#39;Salary&#39;</span>)]</span></code></pre></div>
 <pre><code>##                  Gender Dept    Salary
 ## Ritchie, Darnell      M ADMN  53788.26
@@ -571,8 +648,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Singh, Niral          W ADMN  61055.44
 ## Billing, Susan        W ADMN  72675.26
 ## Capelle, Adam         M ADMN 108138.43</code></pre>
-<p>The result provides what is requested, and also when <em>Dept</em> is <code>&lt;NA&gt;</code>, which is not requested. The requested value of <em>ADMN</em> is not the same as <code>&lt;NA&gt;</code>.</p>
-<p>Use the <code>.()</code> function to obtain what is requested, rows of data in which the value of <em>Dept</em> is <em>ADMN</em>.</p>
+<p>The result provides what is requested, and also when <em>Dept</em> is
+<code>&lt;NA&gt;</code>, which is not requested. The requested value of
+<em>ADMN</em> is not the same as <code>&lt;NA&gt;</code>.</p>
+<p>Use the <code>.()</code> function to obtain what is requested, rows
+of data in which the value of <em>Dept</em> is <em>ADMN</em>.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>d[.(Dept<span class="sc">==</span><span class="st">&quot;ADMN&quot;</span>), .(Gender<span class="sc">:</span>Salary)]</span></code></pre></div>
 <pre><code>##                  Gender Dept    Salary
 ## Ritchie, Darnell      M ADMN  53788.26
@@ -584,22 +664,28 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="random-selection-of-rows" class="section level2">
 <h2>Random Selection of Rows</h2>
-<p>The function <code>.()</code> also provides for random selection of rows. To randomly select the specified number of rows from the data frame to subset, specify the <code>random()</code> function for the logical criterion of the <code>rows</code>. The value passed to <code>random()</code> can either be the actual number of rows to select, or the proportion of rows to select.</p>
-<p>Here randomly select five rows of data from the <em>d</em> data frame.</p>
+<p>The function <code>.()</code> also provides for random selection of
+rows. To randomly select the specified number of rows from the data
+frame to subset, specify the <code>random()</code> function for the
+logical criterion of the <code>rows</code>. The value passed to
+<code>random()</code> can either be the actual number of rows to select,
+or the proportion of rows to select.</p>
+<p>Here randomly select five rows of data from the <em>d</em> data
+frame.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="dv">5</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                  Years Gender Dept   Salary
-## Kimball, Claire      8      W MKTG 61356.69
-## Knox, Michael       18      M MKTG 99062.66
-## Saechao, Suzanne     8      W SALE 55545.25
-## Jones, Alissa        5      W &lt;NA&gt; 53772.58
-## Fulton, Scott       13      M SALE 87785.51</code></pre>
+<pre><code>##                    Years Gender Dept   Salary
+## Tian, Fang             9      W ACCT 71084.02
+## Kimball, Claire        8      W MKTG 61356.69
+## Langston, Matthew      5      M SALE 49188.96
+## Korhalkar, Jessica     2      W ACCT 72502.50
+## LaRoe, Maria          10      W MKTG 61961.29</code></pre>
 <p>Here specify a proportion of rows to select.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="fl">0.1</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                  Years Gender Dept   Salary
-## LaRoe, Maria        10      W MKTG 61961.29
-## Ritchie, Darnell     7      M ADMN 53788.26
-## Cooper, Lindsay      4      W MKTG 56772.95
-## Stanley, Grayson     9      M SALE 69624.87</code></pre>
+<pre><code>##                     Years Gender Dept   Salary
+## Sheppard, Cory         14      M FINC 95027.55
+## Campagna, Justin        8      M SALE 72321.36
+## Bellingar, Samantha    10      W SALE 66337.83
+## Anderson, David         9      M ACCT 69547.60</code></pre>
 </div>
 
 

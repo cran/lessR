@@ -19,7 +19,7 @@ suppressPackageStartupMessages(library("lessR"))
 
 ## Data Table
 
-Analyze the data values for at least one variable, such as the annual salaries of employees at a company. Organize the data values into a specific kind of structure from which analysis proceeds.
+Analyze the data values for at least one variable, such as the annual salaries of employees at a company. Typically have available the data for multiple variables. Organize the data values into a specific kind of structure from which analysis proceeds.
 
 >_Data Table_: Organize data values into a rectangular data table with the data values for each variable in a column, and the name of the variable at the top of the column.
   
@@ -30,7 +30,6 @@ The data table in the following figure, formatted as an Excel file, contains fou
 ```{r dataTable, echo=FALSE, out.width='50%', fig.asp=.7, fig.align='center', fig.cap="Structure of a data table."}
 knitr::include_graphics(system.file("img", "DataTable.png", package="lessR"))
 ```
-
 
 Describe the data table by its columns, rows, and cell entries.
 
@@ -44,13 +43,13 @@ Two data values in this section of the data table are missing. The number of yea
 
 >_Variable name_: A short, concise word or abbreviation that identifies a column of data values in a data table. 
 
->_Case_: Each row of the data table, the data for a specific instance of a single person, organization, place, event, or whatever is being studied.
+>_Instance_ or Example or Sample or Case: Each row of the data table, the data for a specific instance of a single person, organization, place, event, or whatever is being studied.
 
 Encode the data table in one of a variety of computer file formats. Common formats include Excel files (`.xlsx`), OpenDocument Spreadsheet files (`.ods`), and text files the form of comma-separated value files (`.csv`) or tab-delimited text files (`.txt`). 
 
 Analysis of data can only proceed with the data table identified and the relevant variables identified by their name.
 
->All R functions analyze the data values for one or more specified variables, identified by their names, such as _Salary_.
+>R data analysis functions analyze the data values for one or more specified variables, identified by their names, such as _Salary_.
 
 Analysis requires the correct spelling of each variable name, including the same pattern of capitalization.
 
@@ -59,13 +58,13 @@ Analysis requires the correct spelling of each variable name, including the same
 ## Read the Data into R
 
 Your data organized as a data table exists somewhere as a data file stored on a computer system. 
-To analyze data in a data table stored in a computer file, first read the data table from the computer file into a corresponding data table within a running R session. R refers to data tables within R with its own name.
+To analyze data in a data table stored in a computer file, first read the data table from the computer file into a corresponding data table within a running R session.
 
 >_Data frame_: A data table stored _within_ an R session, referenced by its name.
 
-Each variable in a data table has a name, and so does the data table itself. Reference the data table stored on your computer system by its file name and location. When read into R, name the data table, the R data frame, with a name of your choice. Regardless of the file name on your computer system, typically name the data table _within_ the active R session, the data frame, as simply _d_ for data. Not only is _d_ easy to type, but it is also the _lessR_ default data frame name for the data processed by its various analysis functions. 
+Each variable in a data table has a name, and so does the data table itself. Initially reference the data table stored on your computer system by its file name and location. When read into R, name the data table, the R data frame, with a name of your choice. Regardless of the file name on your computer system, typically name the data table _within_ the active R session, the data frame, as _d_ for data. Not only is _d_ easy to type, but it is also the _lessR_ default data frame name for the data processed by its various analysis functions. 
 
-When analyzing data read into R, the same data exists in two different locations: as a computer file on your computer system, and as an R data frame within a running R app. Different locations, different names: _same_ data. On your computer system, identify the data table by its file name and location. Within a running R app, identify the same data by the name of the data frame, such as _d_, within which the data from the computer file was read.
+When analyzing data read into R, the same data exists in two different locations: a computer file on your computer system, and an R data frame within a running R app. Different locations, different names: _same_ data. On your computer system, identify the data table by its file name and location. Within a running R app, identify the same data by the name of the data frame, such as _d_, within which the data from the computer file was read.
 
 To read the data from a file into a data frame of a running R application, as with every other task in R, accomplish the task with a function. The R ecosystem, base R and its many packages, presents many such functions. We use the _lessR_ function `Read()` for its simplicity and for its useful output that helps understanding the data that was read.
 
@@ -80,7 +79,7 @@ _comma separated values_. Read() also reads SPSS and SAS data files, as well as 
 To read the data, direct R to the location of the data file.")` R cannot read the data file until it knows where the data is stored. 
 One option has you locate the data file on your computer system by browsing for it, navigating your file system until you locate the file. 
 
->To locate your data file by browsing through your file system, call the `Read()` function with an empty file reference, `("")`, literally nothing between the quotes.
+>To locate your data file by browsing through your file system, call the `Read()` function with an empty file reference `("")`, literally nothing between the quotes.
 
 The following `Read()` statement reads the data stored as a rectangular data table from an external file stored on your computer system into an R data frame called _d_. The empty quotes indicate to R to open your file browser for you to locate the data file that already exists somewhere on your computer system).
 
@@ -96,7 +95,7 @@ The `<-` indicates to assign what is on the right of the expression, here the da
 
 ### Specify location of the data file
 
-Also can explicitly specify the location of the data file to be read within the quotes and parentheses. Specify either the full path name of a file on your computer system, or specify a web address that locates the data table on the web. Again, read the data into the _d_ data frame.\
+Specify either the full path name of a file on your computer system, or specify a web address that locates the data table on the web. Also can explicitly select the location of the data file to be read within the quotes and parentheses. Specify either the full path name of a file on your computer system, or specify a web address that locates the data table on the web. Again, read the data into the _d_ data frame.\
 
 ```
 d <- Read("path name" or "web address")
@@ -110,14 +109,14 @@ d <- Read("http://web.pdx.edu/~gerbing/data/employee.xlsx")
 ```
 This example reads a data file on the web. To specify a location on your computer, provide the full path name of your data file, its name and location. To obtain this path name, first browse for the file with `Read("")`. The resulting output displays the path name of the identified file. Copy this path name and insert between the quotes of `Read("")`, save this and other R function calls in a text file, and then run the code in the future to directly read the data file for future analyses without needing to browse for its location.
 
-In summary, with the `Read()` function, either put nothing between the quotes to browse for a data file, or specify the location of the data file on your computer system or the web. Direct the data read from a file into an R data frame, usually named _d_, but can choose any valid name.
+With the `Read()` function, put nothing between the quotes to browse for a data file, or specify the location of the data file on your computer system or the web. Direct the data read from a file into an R data frame, usually named _d_, but can choose any valid name.
 
 
 ### Output of `Read()`
 
 The `Read()` function displays useful output. Because R organizes analyses by variable name, it is crucial to know the exact variable names, including the pattern of capitalization.
 
-In addition to the variable names, `Read()` also displays the type of each variable as stored in the computer, as numbers with or without decimal digits, or as character strings. Also listed are the number of complete and missing values for each variable, the number of unique values for each variable, and sample data values.  
+In addition to the variable names, `Read()` displays each variable's type as stored in the computer, as numbers with or without decimal digits, or as character strings.  Also listed are the number of complete and missing values for each variable, the number of unique values for each variable, and sample data values.  
 
 The following lists the output from reading from a data file downloaded with __lessR__. All that is needed to read these data files is the name. A file on the web cannot be specified here because you may not have web access when this file is generated.
 
@@ -235,12 +234,12 @@ With `Read()`, obtain the following standard R data frame. The variable _region_
 4           BIRMINGHAM,ALA.      2       SE   -178   2528
 ```
 
-With these data, the analyst may accomplish a numerical analysis with the integer variable, and for analsyses such as a bar chart, instead display the corresponding value labels.
+With these data, the analyst may accomplish a numerical analysis with the integer variable, and for analyses such as a bar chart, instead, display the corresponding value labels.
 
 
 ### Variable labels
 
- __lessR__ automatically accesses variable labels stored in a data frame named _l_, and then displays with the variable name in text and visualization output. Usually the variable labels are stored in an Excel or `.csv` file with two columns, the variable name and the variable label. There are no column titles, just the names and labels. Then read into the _l_ data frame with the `var_labels` parameter set to `TRUE`.
+ __lessR__ automatically accesses variable labels stored in a data frame named _l_, and then displays with the variable name in text and visualization output. Usually, the variable labels are stored in an Excel or `.csv` file with two columns, the variable name, and the variable label. There are no column titles, just the names and labels. Then read into the _l_ data frame with the `var_labels` parameter set to `TRUE`.
 
 ```
 l <- Read(file_reference, var_labels=TRUE)

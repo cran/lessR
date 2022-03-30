@@ -17,7 +17,7 @@ Output is generated into distinct segments by topic, organized and displayed in 
 
 \usage{
 Regression(my_formula, data=d, rows=NULL,
-         digits_d=NULL,
+         digits_d=NULL, n_cat=getOption("n_cat"),
 
          Rmd=NULL, Rmd_browser=TRUE, 
          Rmd_format=c("html", "word", "pdf", "odt", "none"),
@@ -31,7 +31,7 @@ Regression(my_formula, data=d, rows=NULL,
 
          res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"),
          pred_rows=NULL, pred_sort=c("predint", "off"),
-         subsets=NULL, cooks_cut=1,
+         subsets=NULL, best_sub=c("adjr2", "Cp"), cooks_cut=1,
 
          scatter_coef=TRUE, scatter_3D=FALSE,
 
@@ -64,7 +64,12 @@ reg_brief(\ldots, brief=TRUE)
        to analyze.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits,
         set by default to at least 2 or the largest number of digits in the values
-        of the response variable plus 1.} \cr
+        of the response variable plus 1.} 
+  \item{n_cat}{Number of categories, specifies the largest number of
+        unique, equally spaced integer values of a variable for which
+        the variable will be analyzed as categorical instead of continuous.
+        Default is 0. Use to specify that such variables are to be analyzed
+        as categorical, a kind of informal R factor.}\cr
 
   \item{Rmd}{File name for the automatically generated R Markdown file, if specified.
         The file type is .Rmd, a simple text file that can be edited with
@@ -129,6 +134,8 @@ reg_brief(\ldots, brief=TRUE)
        each number of predictors, from the \code{leaps} package. Set to
        \code{FALSE} to turn off. Defaults lists a maximum of the first 50 values.
        Specify an integer to change the maximum.}
+  \item{best_sub}{Criterion for selecting best subsets of predictor variables,
+       with default of \code{"adjr2"} or choose Mallow's \code{"Cp"} statistic.}
   \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a
        larger value are flagged in red and labeled in the resulting scatterplot
        of Residuals and Fitted Values. Default value is 1.0.}\cr
@@ -324,6 +331,8 @@ Although not typically needed for analysis, if the regression output is assigned
 Lumley, T., \code{leaps} function from the \code{leaps} package.\cr
 
 Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, NY: Routledge.
+
+Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871. 
 
 Xie, Y. (2013). Dynamic Documents with R and knitr, Chapman & Hall/CRC The R Series.
 }

@@ -1,7 +1,7 @@
 .plt.txt <- 
 function(x, y, values, object, n_cat,
        cat.x, num.cat.x, cat.y, num.cat.y,
-       xlab, ylab, fit, n.by, sse, by.cat, smooth, box_adj,
+       xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat, smooth, box_adj,
        run, center_line, show_runs, prop, size, radius, digits_d, 
        fun_call=NULL, txdif=NULL) {
 
@@ -274,7 +274,7 @@ function(x, y, values, object, n_cat,
         if (nzchar(txsug)) {
           if (exists("output")) {
             output <- c(list(out_suggest=txsug), output)  
-#             if (is.null(sse)) {  # hack to get a blank line if not fit
+#             if (is.null(mse)) {  # hack to get a blank line if not fit
 #               output <- c(list(out_blank=blank), output)
 #             }
           }
@@ -282,32 +282,56 @@ function(x, y, values, object, n_cat,
             output <- list(out_suggest=txsug)  
         }
 
-        # output sse, triggered by a fit line
-        if (!is.null(sse)  &&  n.xcol == 1) {  # SSE not reported for all
-          txt <- character(length=n.by)
+        # output mse, triggered by a fit line
+        if (!is.null(mse)  &&  n.xcol == 1) {  # mse not reported for all
           if (n.by > 0) {
+            txt <- character(length=n.by)
             for (i in 1:n.by) {
               by.name <- getOption("byname")
-              txt[i] <- paste(by.name, " ", by.cat[i], ":  ", sep="") 
-              sse.pn <- prettyNum(sse[i], big.mark=",", scientific=FALSE)
-              txt[i] = paste(txt[i], 
-                "Sum of Squared Errors about Fit Line, SSE = ", sse.pn, sep="")
+              txt[i] <- paste(by.name, ": ", by.cat[i], ",  ", sep="") 
+              mse.pn <- prettyNum(mse[i], big.mark=",", scientific=FALSE,
+                                  format="f", digits=digits_d)
+              b0.pn <- .fmt(b0[i], digits_d)
+              b1.pn <- .fmt(b1[i], digits_d)
+              Rsq.pn <- .fmt(Rsq[i], 3)
+              if (!is.na(b1[i])) {  # linear function
+                txt[i] = paste(txt[i], 
+                  "Line: b0 = ", b0.pn, "   b1 = ", b1.pn,
+                  "   Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
+                  "\n", sep="")
+              }
+              else {
+                txt[i] = paste(txt[i], 
+                  " Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
+              }
             }  # end for n.by
-            txsee <- txt
           }  # end n.by > 0
           else {  # no by vars
-            sse.pn <- prettyNum(sse[1], big.mark=",", scientific=FALSE)
-            txsee <- paste("Sum of Squared Errors about Fit Line, SSE = ",
-                     sse.pn, sep="")
+            mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
+                                format="f", digits=digits_d)
+            b0.pn <- .fmt(b0[1], digits_d)
+            b1.pn <- .fmt(b1[1], digits_d)
+            Rsq.pn <- .fmt(Rsq[1], 3)
+            if (!is.na(b1)) {  # linear function
+              txt = paste(
+                    "Line: b0 = ", b0.pn, "  b1 = ", b1.pn,
+                    "   Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
+                    "\n", sep="")
+            }
+            else {
+              txt = paste( 
+                "Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
+            }
           } 
-          class(txsee) <- "out"
-          if (any(nzchar(txsee))) {
+          txreg <- txt
+          class(txreg) <- "out"
+          if (any(nzchar(txreg))) {
               if (exists("output"))
-                output <- c(output, list(out_see=txsee))
+                output <- c(output, list(out_reg=txreg))
               else
-                output <- c(list(out_see=txsee))
+                output <- c(list(out_reg=txreg))
           }
-        }  # end !is.null(sse)
+        }  # end !is.null(mse)
 
         # do the output if there is something to output
         if (exists("output")) {

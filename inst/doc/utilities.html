@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
     </style>
 
 
+
 <style type="text/css">
   code {
     white-space: pre;
@@ -343,19 +344,38 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </ul></li>
 <li><a href="#sort-rows-of-data">Sort Rows of Data</a></li>
 <li><a href="#rescale-data">Rescale Data</a></li>
+<li><a href="#rename-a-variable-in-a-data-frame">Rename a Variable in a
+Data Frame</a></li>
 <li><a href="#create-factor-variables">Create Factor Variables</a></li>
-<li><a href="#reshape-data-wide-to-long">Reshape Data Wide to Long</a></li>
+<li><a href="#reshape-data-wide-to-long">Reshape Data Wide to
+Long</a></li>
 </ul>
 </div>
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;lessR&quot;</span>)</span></code></pre></div>
 <div id="recode-data-values" class="section level2">
 <h2>Recode Data Values</h2>
-<p>Data transformations for continuous variables are straightforward, just enter the arithmetic expression for the transformation. For each variable identify the corresponding data frame that contains the variable if there is one. For example, the following creates a new variable <em>xsq</em> that is the square of the values of a variable <em>x</em> in the <em>d</em> data frame.</p>
+<p>Data transformations for continuous variables are straightforward,
+just enter the arithmetic expression for the transformation. For each
+variable identify the corresponding data frame that contains the
+variable if there is one. For example, the following creates a new
+variable <em>xsq</em> that is the square of the values of a variable
+<em>x</em> in the <em>d</em> data frame.</p>
 <pre><code>d$xsq &lt;- d$x^2</code></pre>
-<p>Or, use the base R <code>transform()</code> function to accomplish the same, plus other functions from other packages that accomplish the same result.</p>
-<p>For variables that define discrete categories, however, the transformation may not be so straightforward with base R functions such as a nested string of <code>ifelse()</code> functions. An alternative is the <strong>lessR</strong> function <code>recode()</code>.</p>
-<p>To use <code>recode()</code>, specify the variable to be recoded with the <code>old_vars</code> parameter, the first parameter in the function call. Specify values to be recoded with the required <code>old</code> parameter. Specify the corresponding recoded values with the required <code>new</code> parameter. There must be a 1-to-1 correspondence between the two sets of values, such as 0:5 recoded to 5:0, six items in the <code>old</code> set and six items in the <code>new</code> set.</p>
+<p>Or, use the base R <code>transform()</code> function to accomplish
+the same, plus other functions from other packages that accomplish the
+same result.</p>
+<p>For variables that define discrete categories, however, the
+transformation may not be so straightforward with base R functions such
+as a nested string of <code>ifelse()</code> functions. An alternative is
+the <strong>lessR</strong> function <code>recode()</code>.</p>
+<p>To use <code>recode()</code>, specify the variable to be recoded with
+the <code>old_vars</code> parameter, the first parameter in the function
+call. Specify values to be recoded with the required <code>old</code>
+parameter. Specify the corresponding recoded values with the required
+<code>new</code> parameter. There must be a 1-to-1 correspondence
+between the two sets of values, such as 0:5 recoded to 5:0, six items in
+the <code>old</code> set and six items in the <code>new</code> set.</p>
 <div id="examples" class="section level3">
 <h3>Examples</h3>
 <p>To illustrate, construct the following small data frame.</p>
@@ -373,7 +393,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 3        3    Moderate
 ## 4        2        Mild
 ## 5        1      Severe</code></pre>
-<p>Now change the integer values of the variable <em>Severity</em> from 1 through 4 to 10 through 40. Because the parameter <code>old_vars</code> is the first parameter in the definition of <code>recode()</code>, and because it is listed first, the parameter name need not be specified. The default data frame is <em>d</em>, otherwise specify with the <code>data</code> parameter.</p>
+<p>Now change the integer values of the variable <em>Severity</em> from
+1 through 4 to 10 through 40. Because the parameter
+<code>old_vars</code> is the first parameter in the definition of
+<code>recode()</code>, and because it is listed first, the parameter
+name need not be specified. The default data frame is <em>d</em>,
+otherwise specify with the <code>data</code> parameter.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">recode</span>(Severity, <span class="at">old=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">new=</span><span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">30</span>,<span class="dv">40</span>))</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>##   Severity Description
@@ -382,19 +407,34 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 3       30    Moderate
 ## 4       20        Mild
 ## 5       10      Severe</code></pre>
-<p>In the previous example, the values of the variable were overwritten with the new values. In the following example, instead write the recoded values to a new variable with the <code>new_vars</code> parameter, here <em>SevereNew</em>.</p>
+<p>In the previous example, the values of the variable were overwritten
+with the new values. In the following example, instead write the recoded
+values to a new variable with the <code>new_vars</code> parameter, here
+<em>SevereNew</em>.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">recode</span>(Severity, <span class="at">new_vars=</span><span class="st">&quot;SevereNew&quot;</span>, <span class="at">old=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">new=</span><span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">30</span>,<span class="dv">40</span>))</span></code></pre></div>
-<p>A convenient application of <code>recode()</code> is to Likert data, with responses scored to items on a survey such as from 0 for Strongly Disagree to 5 for Strongly Agree. To encourage responders to carefully read the items, some items are written in the opposite direction so that disagreement indicates agreement with the overall attitude being assessed.</p>
-<p>As an example, reverse score Items m01, m02, m03, and m10 from survey responses to the 20-item Mach IV scale. That is, score a 0 as a 5 and so forth. The responses are included as part of <strong>lessR</strong> and so can be directly read.</p>
+<p>A convenient application of <code>recode()</code> is to Likert data,
+with responses scored to items on a survey such as from 0 for Strongly
+Disagree to 5 for Strongly Agree. To encourage responders to carefully
+read the items, some items are written in the opposite direction so that
+disagreement indicates agreement with the overall attitude being
+assessed.</p>
+<p>As an example, reverse score Items m01, m02, m03, and m10 from survey
+responses to the 20-item Mach IV scale. That is, score a 0 as a 5 and so
+forth. The responses are included as part of <strong>lessR</strong> and
+so can be directly read.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Mach4&quot;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">recode</span>(<span class="fu">c</span>(m01<span class="sc">:</span>m03,m10), <span class="at">old=</span><span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">new=</span><span class="dv">5</span><span class="sc">:</span><span class="dv">0</span>)</span></code></pre></div>
 </div>
 <div id="missing-data" class="section level3">
 <h3>Missing Data</h3>
-<p>The function also addresses missing data. Existing data values can be converted to an R missing value. In this example, all values of 1 for the variable <em>Plan</em> are considered missing.</p>
+<p>The function also addresses missing data. Existing data values can be
+converted to an R missing value. In this example, all values of 1 for
+the variable <em>Plan</em> are considered missing.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="ot">&lt;-</span> <span class="fu">recode</span>(Plan, <span class="at">old=</span><span class="dv">1</span>, <span class="at">new=</span><span class="st">&quot;missing&quot;</span>)</span></code></pre></div>
-<p>Now values of 1 for <em>Plan</em> are missing, having the value of <code>NA</code> for not available, as shown by listing the first six rows of data with the base R function <code>head()</code>.</p>
+<p>Now values of 1 for <em>Plan</em> are missing, having the value of
+<code>NA</code> for not available, as shown by listing the first six
+rows of data with the base R function <code>head()</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
 ## Ritchie, Darnell     7      M ADMN  53788.26    med    1  82   92
@@ -403,7 +443,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Hoang, Binh         15      M SALE 111074.86    low    3  96   97
 ## Jones, Alissa        5      W &lt;NA&gt;  53772.58   &lt;NA&gt;    1  65   62
 ## Afshari, Anbar       6      W ADMN  69441.93   high    2 100  100</code></pre>
-<p>The procedure can be reversed in which values that are missing according to the R code <code>NA</code> are converted to non-missing values. To illustrate with the <em>Employee</em> data set, examine the first six rows of data. The value of <code>Years</code> is missing in the second row of data.</p>
+<p>The procedure can be reversed in which values that are missing
+according to the R code <code>NA</code> are converted to non-missing
+values. To illustrate with the <em>Employee</em> data set, examine the
+first six rows of data. The value of <code>Years</code> is missing in
+the second row of data.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
@@ -413,7 +457,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Hoang, Binh         15      M SALE 111074.86    low    3  96   97
 ## Jones, Alissa        5      W &lt;NA&gt;  53772.58   &lt;NA&gt;    1  65   62
 ## Afshari, Anbar       6      W ADMN  69441.93   high    2 100  100</code></pre>
-<p>Here convert all missing data values for the variables <em>Years</em> and <em>Salary</em> to the value of 99.</p>
+<p>Here convert all missing data values for the variables <em>Years</em>
+and <em>Salary</em> to the value of 99.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">recode</span>(<span class="fu">c</span>(Years, Salary), <span class="at">old=</span><span class="st">&quot;missing&quot;</span>, <span class="at">new=</span><span class="dv">99</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
@@ -428,8 +473,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="sort-rows-of-data" class="section level2">
 <h2>Sort Rows of Data</h2>
-<p>Sorts the values of a data frame according to the values of one or more variables contained in the data frame, or the row names. Variable types include numeric and factor variables. Factors are sorted by the ordering of their values, which, by default is alphabetical. Sorting by row names is also possible.</p>
-<p>To illustrate, use the <strong>lessR</strong> <em>Employee</em> data set, here just the first 12 rows of data to save space.</p>
+<p>Sorts the values of a data frame according to the values of one or
+more variables contained in the data frame, or the row names. Variable
+types include numeric and factor variables. Factors are sorted by the
+ordering of their values, which, by default is alphabetical. Sorting by
+row names is also possible.</p>
+<p>To illustrate, use the <strong>lessR</strong> <em>Employee</em> data
+set, here just the first 12 rows of data to save space.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d[<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>,]</span></code></pre></div>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Sort</span>(d, Gender)</span></code></pre></div>
@@ -485,41 +535,60 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
 ## Jones, Alissa        5      W &lt;NA&gt;  53772.58   &lt;NA&gt;    1  65   62
-## Knox, Michael       18      M MKTG  99062.66    med    3  81   84
-## Downs, Deborah       7      W FINC  57139.90   high    2  90   86
+## Saechao, Suzanne     8      W SALE  55545.25    med    1  98  100
+## Ritchie, Darnell     7      M ADMN  53788.26    med    1  82   92
 ## Afshari, Anbar       6      W ADMN  69441.93   high    2 100  100
+## Cooper, Lindsay      4      W MKTG  56772.95   high    1  78   91
+## Pham, Scott         13      M SALE  81871.05   high    2  90   94
+## Downs, Deborah       7      W FINC  57139.90   high    2  90   86
+## Knox, Michael       18      M MKTG  99062.66    med    3  81   84
 ## Kimball, Claire      8      W MKTG  61356.69   high    2  93   92
 ## Wu, James           NA      M SALE  94494.58    low    1  62   74
-## Cooper, Lindsay      4      W MKTG  56772.95   high    1  78   91
-## Saechao, Suzanne     8      W SALE  55545.25    med    1  98  100
-## Pham, Scott         13      M SALE  81871.05   high    2  90   94
-## Hoang, Binh         15      M SALE 111074.86    low    3  96   97
 ## Campagna, Justin     8      M SALE  72321.36    low    1  76   84
-## Ritchie, Darnell     7      M ADMN  53788.26    med    1  82   92</code></pre>
+## Hoang, Binh         15      M SALE 111074.86    low    3  96   97</code></pre>
 </div>
 <div id="rescale-data" class="section level2">
 <h2>Rescale Data</h2>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rescale</span>(Salary)</span></code></pre></div>
-<pre><code>##  [1] -0.926  1.347 -0.757 -0.139 -0.545  1.118 -0.775 -0.837  0.484  1.950  0.005 -0.925</code></pre>
+<pre><code>##  [1] -0.926 -0.837 -0.925 -0.139 -0.775  0.484 -0.757  1.347 -0.545  1.118  0.005  1.950</code></pre>
+</div>
+<div id="rename-a-variable-in-a-data-frame" class="section level2">
+<h2>Rename a Variable in a Data Frame</h2>
+<p>List the name of the data frame, the existing variable name, and the
+new name, in that order.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(d)</span></code></pre></div>
+<pre><code>## [1] &quot;Years&quot;  &quot;Gender&quot; &quot;Dept&quot;   &quot;Salary&quot; &quot;JobSat&quot; &quot;Plan&quot;   &quot;Pre&quot;    &quot;Post&quot;</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">rename</span>(d, Salary, AnnualSalary)</span></code></pre></div>
+<pre><code>## Change name of variable Salary to AnnualSalary in data frame d</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(d)</span></code></pre></div>
+<pre><code>## [1] &quot;Years&quot;        &quot;Gender&quot;       &quot;Dept&quot;         &quot;AnnualSalary&quot; &quot;JobSat&quot;       &quot;Plan&quot;         &quot;Pre&quot;         
+## [8] &quot;Post&quot;</code></pre>
 </div>
 <div id="create-factor-variables" class="section level2">
 <h2>Create Factor Variables</h2>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;Mach4&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;Mach4_lbl&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>LikertCats <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Strongly Disagree&quot;</span>, <span class="st">&quot;Disagree&quot;</span>, <span class="st">&quot;Slightly Disagree&quot;</span>,</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Slightly Agree&quot;</span>, <span class="st">&quot;Agree&quot;</span>, <span class="st">&quot;Strongly Agree&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">factors</span>(m01<span class="sc">:</span>m20, <span class="at">levels=</span><span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">labels=</span>LikertCats)</span></code></pre></div>
-<p>Convert the specified variables to factors according to the given vector of three variables only. Leave the original variables unmodified, create new variables.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">factors</span>(<span class="fu">c</span>(m06, m07, m20), <span class="at">levels=</span><span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">labels=</span>LikertCats, <span class="at">new=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p>Now copy the variable labels from the original integer variables to the newly created factor variables.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">factors</span>(<span class="fu">c</span>(m06, m07, m20), <span class="at">var_labels=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;Mach4&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;Mach4_lbl&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>LikertCats <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Strongly Disagree&quot;</span>, <span class="st">&quot;Disagree&quot;</span>, <span class="st">&quot;Slightly Disagree&quot;</span>,</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Slightly Agree&quot;</span>, <span class="st">&quot;Agree&quot;</span>, <span class="st">&quot;Strongly Agree&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">factors</span>(m01<span class="sc">:</span>m20, <span class="at">levels=</span><span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">labels=</span>LikertCats)</span></code></pre></div>
+<p>Convert the specified variables to factors according to the given
+vector of three variables only. Leave the original variables unmodified,
+create new variables.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">factors</span>(<span class="fu">c</span>(m06, m07, m20), <span class="at">levels=</span><span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">labels=</span>LikertCats, <span class="at">new=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Now copy the variable labels from the original integer variables to
+the newly created factor variables.</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">factors</span>(<span class="fu">c</span>(m06, m07, m20), <span class="at">var_labels=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="reshape-data-wide-to-long" class="section level2">
 <h2>Reshape Data Wide to Long</h2>
-<p>A wide-form data table has multiple measurements from the same unit of analysis (e.g., person) across the row of data, usually repeated over time. The conversion to long-form forms three new columns from the input wide-form: the name of the grouping variable, the name of the values, and the name of the ID field.</p>
+<p>A wide-form data table has multiple measurements from the same unit
+of analysis (e.g., person) across the row of data, usually repeated over
+time. The conversion to long-form forms three new columns from the input
+wide-form: the name of the grouping variable, the name of the values,
+and the name of the ID field.</p>
 <p>Read the data.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Anova_rb&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Anova_rb&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>##   Person sup1 sup2 sup3 sup4
 ## 1     p1    2    4    4    3
 ## 2     p2    2    5    4    6
@@ -529,7 +598,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 6     p6    5    5    6    8
 ## 7     p7    2    3    2    4</code></pre>
 <p>Go with the default variable names in the long-form.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape_long</span>(d, <span class="fu">c</span>(<span class="st">&quot;sup1&quot;</span>, <span class="st">&quot;sup2&quot;</span>, <span class="st">&quot;sup3&quot;</span>, <span class="st">&quot;sup4&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape_long</span>(d, <span class="fu">c</span>(<span class="st">&quot;sup1&quot;</span>, <span class="st">&quot;sup2&quot;</span>, <span class="st">&quot;sup3&quot;</span>, <span class="st">&quot;sup4&quot;</span>))</span></code></pre></div>
 <pre><code>##    Person Group Value
 ## 1      p1  sup1     2
 ## 2      p2  sup1     2
@@ -560,7 +629,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 27     p6  sup4     8
 ## 28     p7  sup4     4</code></pre>
 <p>Specify custom variable names in the long-form.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape_long</span>(d, sup1<span class="sc">:</span>sup4, <span class="at">group=</span><span class="st">&quot;Supplement&quot;</span>, <span class="at">response=</span><span class="st">&quot;Reps&quot;</span>, <span class="at">ID=</span><span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape_long</span>(d, sup1<span class="sc">:</span>sup4, <span class="at">group=</span><span class="st">&quot;Supplement&quot;</span>, <span class="at">response=</span><span class="st">&quot;Reps&quot;</span>, <span class="at">ID=</span><span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
 <pre><code>##    Person Supplement Reps
 ## 1      p1       sup1    2
 ## 2      p2       sup1    2

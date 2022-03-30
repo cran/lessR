@@ -39,7 +39,6 @@ function(my_formula, data=d, rows=NULL,
     }
   }
 
-
   # let deprecated mydata work as default
   dfs <- .getdfs() 
   mydata.ok <- FALSE
@@ -112,7 +111,7 @@ function(my_formula, data=d, rows=NULL,
   # ANOVA
   #   all analysis done on data in model construct av.out$model
   #   this model construct contains only model vars, with Y listed first
-  #assign("av.out", aov(my_formula, data=data), pos=.GlobalEnv)
+  # assign("av.out", aov(my_formula, data=data), pos=.GlobalEnv)
   if (!mydata.ok) .nodf(df.name)
   av.out <- aov(my_formula, data=data)
 
@@ -125,7 +124,7 @@ function(my_formula, data=d, rows=NULL,
 # Background
 # ----------
 
-  title_bck <- "  BACKGROUND"
+  title_bck <- "\n  BACKGROUND"
 
   tx <- character(length=0)
 
@@ -139,18 +138,6 @@ function(my_formula, data=d, rows=NULL,
     tx2 <- .varlist2(n.pred, ind, nm[i], "Factor", n.obs,
                      n.keep, levels(data[,nm[i]]))
     for (j in 1:length(tx2)) tx[length(tx)+1] <- tx2[j]
-  }
-
-  if (n.pred == 2) {
-    if (!is.list(replications(my_formula, data=data))) {
-      tx[length(tx)+1] <- ""
-      tx[length(tx)+1] <- "The design is balanced"
-    }
-    else {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "The design is not balanced. The results would be invalid.\n",
-        "Consider function  lmer  in the  lme4  package.\n\n")
-    }
   }
 
   txbck <- tx
@@ -185,9 +172,11 @@ function(my_formula, data=d, rows=NULL,
   }
 
   if (n.pred == 2) {
+    balance <- ifelse (!is.list(replications(my_formula, data=data)),
+                       TRUE, FALSE)
     plt2 <- .ANOVAz2(av.out, av.out$model[,nm[1]], av.out$model[,nm[2]],
         av.out$model[,nm[3]], nm, digits_d, brief, as.character(my_formula)[3],
-        graphics, pdf, width, height)
+        balance, graphics, pdf, width, height)
     txbck2 <- plt2$txbck2
     for (i in 1:length(txbck2)) tx[length(txbck)+1] <- txbck2[i]
     title_des <- plt2$title_des
@@ -211,7 +200,7 @@ function(my_formula, data=d, rows=NULL,
 
   # residuals
   txres <- ""
-  title_res <- "  RESIDUALS" 
+  title_res <- "\n  RESIDUALS" 
   res <- ""
   fit <- ""
   if (!brief) {
