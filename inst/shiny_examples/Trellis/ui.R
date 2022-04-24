@@ -45,6 +45,23 @@ ui <- fluidPage(  # Define UI for app that draws a histogram
                   min = 0.5, max = 10, value = 1.25
       ),
 
+      selectInput(inputId = "myViolin",
+                  label = "violin fill",
+                  choices = list("ivory3", "slategray3",
+                                 "indianred3", "darkred",
+                                 "darkseagreen2", "sienna", "gold",
+                                 "lavender", "magenta3")
+      ),
+
+      selectInput(inputId = "myBox",
+                  label = "box fill",
+                  choices = list("slategray3", "burlywood2", "palegoldenrod",
+                                 "gold", "lemonchiffon",
+                                 "indianred3", "darkred", "",
+                                 "rosybrown", "seashell1", "magenta3",
+                                 "darkseagreen2", "sienna", "black")
+      ),
+
       selectInput(inputId = "myVBS",
                   label = "vbs_plot",
                   choices = list("vbs", "vb", "vs", "v", "bs", "b", "s")

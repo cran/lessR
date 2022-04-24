@@ -1,6 +1,5 @@
 \name{Transform}
 \alias{Transform}
-\alias{trans}
 
 \title{Deprecated: Transform the Values of an Integer or Factor Variable}
 
@@ -12,8 +11,6 @@ A wrapper for the base R \code{\link{transform}} function that defaults to the d
 
 \usage{
 Transform(data=d, quiet=getOption("quiet"), \ldots)
-
-trans(\ldots)
 }
 
 \arguments{
@@ -29,7 +26,7 @@ The first five rows of the data frame are listed before the transformation, and 
 
 Guidance and feedback regarding the transformations are provided by default. The first five lines of the input data frame are listed before the transformation, then the specified transformations are listed, followed by the first five lines of the transformed data frame.
 
-Multiple transformations can be defined with a single statement. Note that a newly created transformed variable cannot then be used to define another transformed variable in the same \code{Transform} statement.  Instead, the transformed variable that depends on an earlier created transformed variable must be defined in its own \code{Transform} statement.
+Multiple transformations can be defined with a single statement. Note that a newly created transformed variable cannot then be used to define another transformed variable in the same \code{Transform()} function call.  Instead, the transformed variable that depends on an earlier created transformed variable must be defined in its own \code{Transform()} function call.
 }
 
 \value{
@@ -52,9 +49,6 @@ d <- read.table(text="Status Severity
 
 # replace Status with a transformed version
 d <- Transform(Status=Status-1)
-
-# abbreviated form
-d <- trans(StatusNew=Status-1)
 
 # replace Status with a transformed version
 # leave input d unmodified

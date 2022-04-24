@@ -180,7 +180,9 @@ l <- factors(c(m06, m07, m20), var_labels=TRUE)
 ```
 
 
-## Reshape Data Wide to Long
+## Reshape Data
+
+### Reshape Data Wide to Long
 
 A wide-form data table has multiple measurements from the same unit of analysis (e.g., person) across the row of data, usually repeated over time. The conversion to long-form forms three new columns from the input wide-form: the name of the grouping variable, the name of the values, and the name of the ID field.
 
@@ -197,8 +199,38 @@ Go with the default variable names in the long-form.
 reshape_long(d, c("sup1", "sup2", "sup3", "sup4"))
 ```
 
-Specify custom variable names in the long-form.
+Specify custom variable names in the long-form, take advantage of the usual organization that the columns to be transformed are all sequential in the data frame. Use the ordering `sup1:sup4` to identify the variables. Only the first two parameter values are required, the data frame that contains the variables and the variables to be transformed.
 
 ```{r}
-reshape_long(d, sup1:sup4, group="Supplement", response="Reps", ID="Person")
+reshape_long(d, sup1:sup4, 
+             group="Supplement", response="Reps", ID="Person", prefix="P")
 ```
+
+### Reshape Data Long to Wide
+
+Can also reshape a long-form data frame to wide-form.
+
+
+Here, begin with a wide-form data frame and convert to long-form.
+
+```{r}
+d <- Read("Anova_rb")
+d
+dl <- reshape_long(d, sup1:sup4)  # convert to long-form
+```
+
+
+Convert back to wide form. 
+
+```{r}
+reshape_wide(dl, group="Group", response="Value", ID="Person")
+```
+
+Here covert with the name of the response prefixed to the column names.
+
+```{r}
+reshape_wide(dl, group="Group", response="Value", ID="Person",
+             prefix=TRUE, sep=".")
+```
+
+

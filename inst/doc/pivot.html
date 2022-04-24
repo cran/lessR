@@ -1170,7 +1170,7 @@ much data in each group, with many groups having no data.</p>
    FINC   61937.62        0.00   95027.55       0.00   57139.90        0.0
    MKTG       0.00        0.00   99062.66   56772.95   66426.79        0.0
    SALE   89393.40    82442.74   80131.91   60941.54   66352.73        0.0
-     NA       0.00        0.00       0.00         NA         NA         NA</code></pre>
+     NA       0.00        0.00       0.00   53772.58       0.00        0.0</code></pre>
 </div>
 <div id="missing-data" class="section level2">
 <h2>Missing Data</h2>
@@ -1331,11 +1331,11 @@ statistic(s) for each <code>variable</code> across the entire data
 set.</li>
 <li>The aggregated computations can be displayed as a 2-d table, not
 just a long-form data frame.</li>
-<li><code>by</code> variables of type <code>Date</code>,
-<code>character</code> and <code>integer</code> retain the same variable
-type in the summary table instead of each converted to a
-<code>factor</code> (set <code>factors=TRUE</code> to get factors
-instead).</li>
+<li><code>by</code> variables of type <code>Date</code> retain the same
+variable type in the summary table instead of each converted to a
+<code>factor</code> (set <code>factors=FALSE</code> to not convert
+<code>integer</code> and <code>character</code> variables to
+factors).</li>
 <li>The list of parameters lists the <code>data</code> parameter first,
 which facilitates the use of the pipe operator, such as from base R as
 of Version 4.1.0 or the <strong>magrittr</strong> package.</li>

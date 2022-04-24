@@ -10,8 +10,8 @@ function(x, cor.coef=TRUE, fit="loess",
   panel.smooth <- function(x, y, fit.line=fit, pch=par("pch"), cex=.76,
     col.pt=col_color, col.smooth=col.fit, span=2/3, iter=3, ...) {
 
-    usr <- par("usr")          
-    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
+    my.usr <- par("usr")          
+    rect(my.usr[1], my.usr[3], my.usr[2], my.usr[4], col=col.bg, border=col.box)
     cex.adj <- ifelse(size.miss, 0.80 - 0.048*n.var, pt.size)
     points(x, y, pch=21, col=col.pt, bg=col_fill, cex=cex.adj)
 
@@ -42,8 +42,8 @@ function(x, cor.coef=TRUE, fit="loess",
 
 
   panel.cor <- function(x, y, ...) {
-    usr <- par("usr"); on.exit(par(usr))
-    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border=col.box)
+    my.usr <- par("usr"); on.exit(par(usr = my.usr))
+    rect(my.usr[1], my.usr[3], my.usr[2], my.usr[4], col=col.bg, border=col.box)
     par(usr=c(0, 1, 0, 1))
     r <- cor(x, y)
     txt <- .fmt(r, 2)
@@ -54,8 +54,8 @@ function(x, cor.coef=TRUE, fit="loess",
 
 
   text.diag <- function(x, y, nm, ...) {  # nm from calling routine
-    usr <- par("usr")          
-    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("se_fill"),
+    my.usr <- par("usr")          
+    rect(my.usr[1], my.usr[3], my.usr[2], my.usr[4], col=getOption("se_fill"),
          border=col.box)
     cex.adj <- 1.274 - (0.033*n.var)  # adjust size of displayed var name
     text(0.5, 0.5, nm, cex=cex.adj, col=getOption("lab_color"))

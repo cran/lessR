@@ -19,9 +19,8 @@ reshape_wide <-
   sep.nm <- sep
   pattern <- paste(response, sep.nm, sep="")
 
-  group_vals <- data[, group]
   if (is.null(prefix)) {
-    if (!is.numeric(group_vals))
+    if (!is.numeric(data[, group]))
       prefix <- FALSE
     else
       prefix <- TRUE

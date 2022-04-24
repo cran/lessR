@@ -14,7 +14,7 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
          show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, na_show_group=TRUE,
          out_names=NULL, sort=NULL, sort_var=NULL,  
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
-         factors=FALSE, q_num=4, digits_d=3, quiet=getOption("quiet"))
+         factors=TRUE, q_num=4, digits_d=3, quiet=getOption("quiet"))
 }
 
 \arguments{
@@ -62,10 +62,12 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
         If set to \code{TRUE}, then the cross-tabs table is output in
         long form, one count per row.}\cr
 
-  \item{factors}{For \code{by} variables of type \code{Date}, 
-        \code{character}, and \code{integer}, the variable type is retained
-        in the summary table. If \code{TRUE}, then the \code{by} variables
-        become factors.}
+  \item{factors}{For \code{by} variables of type
+        \code{character} and \code{integer}, converted to factors
+        in the summary table by default, except for \code{Date}
+        variables that always retain their type. If \code{FALSE}, then
+        the \code{by} variables retain their original character or 
+        integer type.}
   \item{q_num}{For the computation of quantiles, number of intervals. Default
         value of 4 provides quartiles.}
   \item{digits_d}{Number of significant digits for each of the displayed summary

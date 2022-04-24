@@ -60,16 +60,15 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
         tx[length(tx)+1] <- "ANOVA based on Type II Sums of Squares" 
       }
       tx[length(tx)+1] <- ""
-      tx2 <- .prntbl(t(n), digits_d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
+      tx2 <- .prntbl(t(n), digits_d, cc=" ", v1.nm=nm[2], v2.nm=nm[3])
       for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
       txcn <- tx
 
       tx <- character(length = 0)
       if (is.null(options()$knitr.in.progress)) {
         tx[length(tx)+1] <- "-- Cell Means"
-        tx[length(tx)+1] <- ""
       }
-      tx2 <- .prntbl(t(m), digits_d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
+      tx2 <- .prntbl(t(m), digits_d, cc=" ", v1.nm=nm[2], v2.nm=nm[3])
       for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
       txcm <- tx
 
@@ -95,13 +94,13 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
   tx[length(tx)+1] <- nm[2]
   m1 <- tapply(y.values, x1.values, mean, na.rm=TRUE)
   m1 <- data.frame(t(m1))
-  tx2 <- .prntbl(m1, digits_d)  # 1st treatment horizontal dimension
+  tx2 <- .prntbl(m1, digits_d, cc= " ")  # 1st treatment horizontal dimension
   for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
   tx[length(tx)+1] <- ""
   tx[length(tx)+1] <- nm[3]
   m2 <-  tapply(y.values, x2.values, mean, na.rm=TRUE)
   m2 <- data.frame(t(m2))
-  tx2 <- .prntbl(m2, digits_d)  # 2nd treatment horizontal dimension
+  tx2 <- .prntbl(m2, digits_d, cc= " ")  # 2nd treatment horizontal dimension
   for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
   txmm <- tx
 
@@ -112,11 +111,9 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
   }
   txgm <- tx
 
-
   tx <- character(length = 0)
   if (is.null(options()$knitr.in.progress)) {
     tx[length(tx)+1] <- "-- Cell Standard Deviations"
-    tx[length(tx)+1] <- ""
   }
 
   txcs <- ""
@@ -124,7 +121,7 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
     s <-  tapply(y.values, 
                  list(x1.values, x2.values), sd, na.rm=TRUE)
     s <- as.table(s)
-    tx2 <- .prntbl(t(s), digits_d, cc=NULL, v1.nm=nm[2], v2.nm=nm[3])
+    tx2 <- .prntbl(t(s), digits_d, cc=" ", v1.nm=nm[2], v2.nm=nm[3])
     for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
     txcs <- tx
   }  # end between groups
@@ -317,8 +314,9 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
       # q is num of levels for legend, each curve
       options(byname = nm[3])
       theme <- getOption("theme")
-      qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
-      pt_fill <- getColors(qual_pal, n=q, output=FALSE)
+#     qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
+#     pt_fill <- getColors(qual_pal, n=q, output=FALSE)
+      pt_fill <- .color_range(.get_fill(), q)  # see if range
       txt <- paste("Cell Means of", nm[1])
       .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], 
                 fill=pt_fill, color=pt_fill, segments=TRUE,

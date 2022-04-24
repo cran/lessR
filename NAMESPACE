@@ -92,7 +92,7 @@ export (
   SummaryStats, ss, ss_brief,
   style,
   to,
-  Transform, trans,
+  Transform,
   ttest, tt, tt.brief, tt_brief,
   ttestPower, ttp,
   values, VariableLabels, vl, 

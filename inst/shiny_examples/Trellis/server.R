@@ -10,8 +10,10 @@ server <- function(input, output) {
 
      Plot(Salary, by1=Dept,
           fill=input$myFill, color=input$myColor, trans=input$myTrans,
-          size=input$mySize, shape=input$myShape, vbs_plot=input$myVBS,
-          vbs_mean=input$myMean, fences=input$myFences, out_size=input$myOutSize,
+          size=input$mySize, shape=input$myShape,
+          vbs_plot=input$myVBS, vbs_mean=input$myMean, fences=input$myFences,              out_size=input$myOutSize,
+          violin_fill=input$myViolin,
+          box_fill=input$myBox,
           quiet=TRUE)
   })
 

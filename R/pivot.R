@@ -3,7 +3,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
          show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, na_show_group=TRUE,
          out_names=NULL, sort=NULL, sort_var=NULL,  
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
-         factors=FALSE, q_num=4, digits_d=3, quiet=getOption("quiet")) {
+         factors=TRUE, q_num=4, digits_d=3, quiet=getOption("quiet")) {
 
   table_prop <- match.arg(table_prop)
   out.nm.miss <- missing(out_names)
@@ -415,9 +415,12 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     if (length(ind.by) == 1)
       names(a)[1] <- deparse(substitute(by))
 
+    # Dates never go to factors
+    for (i in 1:n.r.by)
+      if (cls[i] == "Date") a[,i] <- as.Date(as.character(a[,i]))
+
     if (!factors) {  # retain original variable type of by vars
       for (i in 1:n.r.by) {
-        if (cls[i] == "Date") a[,i] <- as.Date(as.character(a[,i]))
         if (cls[i] == "character") a[,i] <- as.character(a[,i])
         if (cls[i] == "integer") a[,i] <- as.integer(as.character(a[,i]))
         if (cls[i] == "logical") a[,i] <- as.logical(as.character(a[,i]))

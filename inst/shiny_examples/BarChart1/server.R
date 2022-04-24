@@ -8,9 +8,12 @@ server <- function(input, output) {
 
   output$myPlot <- renderPlot({
 
-     BarChart(Dept, fill=input$myFill, color=input$myColor, trans=input$myTrans,
-              horiz=input$myHoriz, sort=input$mySort,
-              values=input$myValues, values_color=input$myValuesColor,
+     BarChart(Dept, 
+              fill=input$myFill, color=input$myColor, trans=input$myTrans,
+              horiz=input$myHoriz,
+              sort=input$mySort,
+              values=input$myValues,
+              values_color=input$myValuesColor,
               values_position=input$myValuesPosition,
               values_size=input$myValuesSize,
               quiet=TRUE)

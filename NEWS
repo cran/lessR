@@ -5,6 +5,66 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 4.1.8 (2022-04-23) <<<<<<
+
+-------------
+Updates 4.1.8
+-------------
+
+ANOVA
+  interaction plot for 2-way factorial reflects color theme
+
+BarChart
+  appropriate error message if by and by1 parameters both specified
+    as only one for one function call is allowed
+  bar chart from a pivot table for two vars now possible with NA column
+
+data sets
+  dataAnova_rbf data set for randomized block factorial ANOVA added
+  dataAnova_sp data set for split-plot design ANOVA added
+
+interact
+  more colors added
+  Trellis plot has added violin_fill and box_fill parameters
+
+pivot
+  by variables except for Date variables by default now converted to 
+    factors, though controlled with parameter: factors
+
+reshape_long
+  if needed, an ID variable is now provided by default
+  generated ID variable now has a prefix in front of the integer ID
+    by default, can be changed with the parameter: prefix
+  sep parameter specifies a separator between the prefix and
+     the ID integer
+  output data frame has ID variable listed first
+
+Transform
+  previously deprecated, its abbreviation trans() now removed
+
+
+---------------
+Bug Fixes 4.1.8
+---------------
+
+details
+  now properly reports details of a tibble version of a data frame
+
+interact
+  Histogram fill now set properly
+
+Plot
+  panels in Trellis plots with no data now properly display as
+    blank with grid lines instead of showing an error message
+  interaction plot with segments=TRUE of a pivot table now has all
+    segments
+  can now plot one continuous variable with violin/box/scatter plots
+    with by, by1, and by2 variables
+  bubble plot transparency option now works with parameter trans
+  bubble plot fill and color now properly specified
+
+
+
 >>>>>> Changes for lessR version 4.1.7 (2022-03-30) <<<<<<
 
 -------------
@@ -14,7 +74,7 @@ Updates 4.1.7
 ANOVA
   2-way factorial analysis provides Type II sum of squares
     for unbalanced designs
-  R-squared and related indices now reported to three decimal digits
+  RTransmn-squared and related indices now reported to three decimal digits
   plotted point in interaction plot a little smaller
   scatterplot title removed for more room for the plot, labels adjusted
   scatterplot moved to the first plot displayed
@@ -166,8 +226,8 @@ Read
   report of variables with all unique values moved to brief report
 
 Regression
-  if X is a factor with two levels, the regression line plotted in the
-    scatterplot
+  if X is a factor with two levels, the regression line is plotted
+    in the scatterplot
   scatterplot can now have customized axis labels size, set by style()
 
 reshape_long
@@ -193,7 +253,7 @@ Bug Fixes 4.1.5
 ---------------
 
 ANOVA
-  Family-wise confidence level now reported in output
+  family-wise confidence level now reported in output
 
 BarChart
   formatting so that columns do not run together for some output
@@ -209,7 +269,7 @@ Logit
     of estimated coefficients now align correctly
 
 PieChart
-  test now responds to corresponding style parameter: 
+  text now responds to corresponding style parameter: 
     lab_cex, main_cex=1.5, and values_size
 
 Plot

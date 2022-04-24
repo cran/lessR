@@ -166,7 +166,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
       y.lab <- getOption("by1name")
     }
     else  {  # 2 cond var
-      p <- lattice::stripplot(~ x | by1 * by2, subscripts=TRUE, ...)
+      p <- lattice::stripplot(~ x | by1 * by2, groups=by, subscripts=TRUE, ...)
       y.lab <- ""
     }
   }  # end cont
@@ -224,8 +224,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   axs.top <- ifelse (is.null(main), 0, 1)  # old: .5, 1
 
   # get full list of lattice parameters: trellis.par.get()
-
-#print(trellis.par.get("superimpose.symbol"))
+  #print(trellis.par.get("superimpose.symbol"))
   p <- update(p,
          strip=strp, strip.left=strp.lft, aspect=asp,
          par.strip.text=list(cex=axis_x_cex, col=getOption("strip_text_color")),
@@ -256,6 +255,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   if (T.type == "cont_cont") {
 
+    # set legend
     if (n.groups > 1) {  # lattice groups is lessR by
       if (object %in% c("point", "both")) {
         p <- update(p,
@@ -275,129 +275,131 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
                lines=list(lwd=size.ln, col=fill),
                title=legend_title, cex.title=leg.cex.title))
       }
+    }  # n.groups > 1
+
+    # need to get working
+    if (n.groups > 1 &&  fit != "off")  {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "If by parameter used, then currently no fitted lines by group.\n\n")
     }
 
     p <- update(p,
         panel = function(x, y, ...) {
+
           panel.grid(h=0, v=-1, col=g.x_color,
                      lwd=grid_x_lwd, lty=grid_x_lty)
           panel.grid(h=-1, v=0, g.y_color,
                      lwd=grid_y_lwd, lty=grid_y_lty)
-          if (area_fill != "transparent")  # fill under the line
-            panel.xyarea(x, y, origin=origin, col=area_fill)
 
-          if (object == "point")
-            tp <- "p" 
-          else if (object == "both")
-            tp <- "b"
-          else if (object == "line")
-            tp <- "l"
-          panel.xyplot(x, y, type=tp, col=pt.color, fill=pt.fill,
-                       lwd=size.ln, ...)
+          if (length(x) > 0) {  # plot only if data for panel
 
-          if (fit != "off"  &&  n.groups == 1) {
-            ok <- is.finite(x) & is.finite(y)
-            x <- x[ok]
-            y <- y[ok]
-            ord <- order(x)
-            x <- x[ord]
-            y <- y[ord]
+            if (area_fill != "transparent")  # fill under the line
+              panel.xyarea(x, y, origin=origin, col=area_fill)
 
-            if (fit == "loess")
-              l.ln <- loess(y ~ x)
-            else if (fit == "lm")
-              l.ln <- lm(y ~ x)
-            else if (fit == "null")
-              l.ln <- lm(y ~ 1)
-            if (fit %in% c("loess", "lm", "null"))
-              f.ln <- fitted(l.ln, ...)
+            if (object == "point")
+              tp <- "p" 
+            else if (object == "both")
+              tp <- "b"
+            else if (object == "line")
+              tp <- "l"
+            panel.xyplot(x, y, type=tp, col=pt.color, fill=pt.fill,
+                         lwd=size.ln, ...)
 
-            if (fit == "exp") {
-              if (any(y < 0))
-                message("\n>>> Only non-negative values of y used.\n")
-              fi <- which(y < 0)
-              if (length(fi) > 0) {
-                y <- y[-fi]
-                x <- x[-fi]
+            if (fit != "off"  &&  n.groups == 1) {
+              ok <- is.finite(x) & is.finite(y)
+              x <- x[ok]
+              y <- y[ok]
+              ord <- order(x)
+              x <- x[ord]
+              y <- y[ord]
+
+              if (fit == "loess")
+                l.ln <- loess(y ~ x)
+              else if (fit == "lm")
+                l.ln <- lm(y ~ x)
+              else if (fit == "null")
+                l.ln <- lm(y ~ 1)
+              if (fit %in% c("loess", "lm", "null"))
+                f.ln <- fitted(l.ln, ...)
+
+              if (fit == "exp") {
+                if (any(y < 0))
+                  message("\n>>> Only non-negative values of y used.\n")
+                fi <- which(y < 0)
+                if (length(fi) > 0) {
+                  y <- y[-fi]
+                  x <- x[-fi]
+                }
+                if (fit_power == 1)
+                  l.ln <- lm(log(y) ~ x)
+                else
+                  l.ln <- lm(log(y^fit_power) ~ x)
+                f.ln <- exp(l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
+                ok <- is.finite(f.ln)
+                if (length(ok) > 0) {
+                  f.ln <- f.ln[ok]
+                  x <- x[ok]
+                }
+              }  # end fit == "exp"
+
+              if (fit %in% c("sqrt", "root")) {  # sqrt model
+                if (fit == "sqrt") {
+                  l.ln <- lm(sqrt(y) ~ x)
+                  fit_power <- 0.5
+                }
+                else
+                  l.ln <- lm((y^fit_power) ~ x)
+                pw.bck <- 1 / fit_power 
+                f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))^pw.bck
               }
+
+              if (fit == "reciprocal") {  # reciprocal model
+                if (any(y == 0))
+                  message("\n>>> Zero value of y is undefined.\n")
+                fi <- which(y == 0)  # no reciprocal of 0
+                if (length(fi) > 0) {
+                  y <- y[-fi]
+                  x <- x[-fi]
+                }
               if (fit_power == 1)
-                l.ln <- lm(log(y) ~ x)
+                l.ln <- lm(1/y ~ x)
               else
-                l.ln <- lm(log(y^fit_power) ~ x)
-              f.ln <- exp(l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
-              ok <- is.finite(f.ln)
-              if (length(ok) > 0) {
-                f.ln <- f.ln[ok]
-                x <- x[ok]
+                l.ln <- lm(1/(y^fit_power) ~ x)
+                f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
               }
-            }  # end fit == "exp"
 
-            if (fit %in% c("sqrt", "root")) {  # sqrt model
-              if (fit == "sqrt") {
-                l.ln <- lm(sqrt(y) ~ x)
-                fit_power <- 0.5
-              }
-              else
-                l.ln <- lm((y^fit_power) ~ x)
-              pw.bck <- 1 / fit_power 
-              f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))^pw.bck
-            }
+              e <- y - f.ln
+              sse <- sum(e^2)
+              sse.pn <- prettyNum(sse, big.mark = ",", scientific = FALSE)
+              if (panel.number() == 1) cat("\n")
+              cat("Sum of Squared Errors about Fit Line, SSE, for Panel ",
+                  panel.number(), ": ", sse.pn, sep="", "\n")
 
-            if (fit == "reciprocal") {  # reciprocal model
-              if (any(y == 0))
-                message("\n>>> Zero value of y is undefined.\n")
-              fi <- which(y == 0)  # no reciprocal of 0
-              if (length(fi) > 0) {
-                y <- y[-fi]
-                x <- x[-fi]
-              }
-            if (fit_power == 1)
-              l.ln <- lm(1/y ~ x)
-            else
-              l.ln <- lm(1/(y^fit_power) ~ x)
-              f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
-            }
+              if (fit %in% c("exp", "sqrt", "reciprocal", "null"))
+                fit_se[1] <- 0
+              se_fill <- getOption("se_fill")
+              nrows <- length(f.ln)
+              for (j in 1:length(fit_se)) {
+                p.ln <- predict(l.ln, se=TRUE)
+                prb <- (1 - fit_se[j]) / 2
+                up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
+                dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
+                panel.polygon(c(x, rev(x)), c(up.ln, rev(dn.ln)),
+                              col=se_fill, border="transparent")
+              }  # end fit_se
+   
+              panel.lines(x, f.ln, col=fit_color, lwd=fit_lwd)
 
-            e <- y - f.ln
-            sse <- sum(e^2)
-            sse.pn <- prettyNum(sse, big.mark = ",", scientific = FALSE)
-            if (panel.number() == 1) cat("\n")
-            cat("Sum of Squared Errors about Fit Line, SSE, for Panel ",
-                panel.number(), ": ", sse.pn, sep="", "\n")
+              if (plot_errors)
+                panel.segments(y0=f.ln, y1=y, x0=x, x1=x, col="darkred", lwd=1) 
 
-            if (fit %in% c("exp", "sqrt", "reciprocal", "null"))
-              fit_se[1] <- 0
-            se_fill <- getOption("se_fill")
-            nrows <- length(f.ln)
-            for (j in 1:length(fit_se)) {
-              p.ln <- predict(l.ln, se=TRUE)
-              prb <- (1 - fit_se[j]) / 2
-              up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
-              dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
-              panel.polygon(c(x, rev(x)), c(up.ln, rev(dn.ln)),
-                            col=se_fill, border="transparent")
-            }  # end fit_se
- 
-            panel.lines(x, f.ln, col=fit_color, lwd=fit_lwd)
+            }  # end fit != "off"
 
-            if (plot_errors)
-              panel.segments(y0=f.ln, y1=y, x0=x, x1=x, col="darkred", lwd=1) 
+            if (lvl > 0)
+              panel.ellipse(x, y, center.cex=0,
+                            level=lvl, col=ellipse_color, lwd=ellipse_lwd)
 
-          }  # end fit != "off"
-
-# Not working
-#         if (segments) { 
-#           panel.superpose(x, y, pan
-#           for (j in 1:(length(x)-1)) {   # ex: 3 segments connect 4 pts
-#             panel.segments(x0=x[j], y0=y[j],
-#                      x1=x[j+1], y1=y[j+1],
-#                      lty="solid", lwd=.75, col=pt.color[group.number])
-#           }
-
-          if (lvl > 0)
-            panel.ellipse(x, y, center.cex=0,
-                          level=lvl, col=ellipse_color, lwd=ellipse_lwd)
-
+          }  # end length > 0 
         }  # end panel function
       )  # end update
 
@@ -456,146 +458,152 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
        panel=function(x=x, box.ratio, wID=ID, ...,
                       groups=groups, subscripts=subscripts) {
 
-          jitter_data <- ifelse (jitter > 0, TRUE, FALSE)
-          size.pt <- size.pt * 1.2  # lattice adjustment
-
-          num5 <- fivenum(x, na.rm=TRUE)
-          q1 <- num5[2]
-          q3 <- num5[4]
-          iqr <- q3 - q1
-          fnc.in <- rep(NA_real_, 2)   # inner fences
-          fnc.out <- rep(NA_real_, 2)  # outer fences
-
-          m.c <- ifelse(box_adj, mc(x, na.rm=TRUE), 0)
-          if (m.c >= 0) {
-            fnc.in[1] <- q1 - (k.iqr * exp(a*m.c) * iqr)
-            fnc.in[2] <- q3 + (k.iqr * exp(b*m.c) * iqr)
-            fnc.out[1] <- q1 - (2 * k.iqr * exp(a*m.c) * iqr)
-            fnc.out[2] <- q3 + (2 * k.iqr * exp(b*m.c) * iqr)
-          }
-          else {  # m.c < 0
-            fnc.in[1] <- q1 - (k.iqr * exp(-b*m.c) * iqr)
-            fnc.in[2] <- q3 + (k.iqr * exp(-a*m.c) * iqr)
-            fnc.out[1] <- q1 - (2 * k.iqr * exp(-b*m.c) * iqr)
-            fnc.out[2] <- q3 + (2 * k.iqr * exp(-a*m.c) * iqr)
-          } 
-
           panel.grid(h=0, v=-1, col=g.x_color, lwd=grid_x_lwd, lty=grid_x_lty)
 
-          if (violin) {
-            # to get a violin plot, cannot have y and by1
-            # just Plot(x) gives a VBS plot with no groups and only 1 panel
-            # a giant do loop that iterates over groups, i.e., panel.number()
-            vw <- ifelse (!is.null(y) && !is.null(by1), FALSE, TRUE) 
-            vf <- ifelse (n.panels>1, violin_fill[panel.number()], violin_fill)
-              panel.violin(x=x, ...,
-                  col=vf,
-                  border=getOption("violin_color"),
-                  varwidth=vw, box.width=vbs_size, bw=bw)
+          if (length(x) > 0) {  # plot only if data for panel
+
+            jitter_data <- ifelse (jitter > 0, TRUE, FALSE)
+            size.pt <- size.pt * 1.2  # lattice adjustment
+
+            num5 <- fivenum(x, na.rm=TRUE)
+            q1 <- num5[2]
+            q3 <- num5[4]
+            iqr <- q3 - q1
+            fnc.in <- rep(NA_real_, 2)   # inner fences
+            fnc.out <- rep(NA_real_, 2)  # outer fences
+
+            m.c <- ifelse(box_adj, mc(x, na.rm=TRUE), 0)
+            if (m.c >= 0) {
+              fnc.in[1] <- q1 - (k.iqr * exp(a*m.c) * iqr)
+              fnc.in[2] <- q3 + (k.iqr * exp(b*m.c) * iqr)
+              fnc.out[1] <- q1 - (2 * k.iqr * exp(a*m.c) * iqr)
+              fnc.out[2] <- q3 + (2 * k.iqr * exp(b*m.c) * iqr)
+            }
+            else {  # m.c < 0
+              fnc.in[1] <- q1 - (k.iqr * exp(-b*m.c) * iqr)
+              fnc.in[2] <- q3 + (k.iqr * exp(-a*m.c) * iqr)
+              fnc.out[1] <- q1 - (2 * k.iqr * exp(-b*m.c) * iqr)
+              fnc.out[2] <- q3 + (2 * k.iqr * exp(-a*m.c) * iqr)
+            } 
+
+            if (violin) {
+              # to get a violin plot, cannot have y and by1
+              # just Plot(x) gives a VBS plot with no groups and only 1 panel
+              # a giant do loop that iterates over groups, i.e., panel.number()
+              vw <- ifelse (!is.null(y) && !is.null(by1), FALSE, TRUE) 
+              vf <- ifelse (n.panels>1, violin_fill[panel.number()], violin_fill)
+                panel.violin(x=x, ...,
+                    col=vf,
+                    border=getOption("violin_color"),
+                    varwidth=vw, box.width=vbs_size, bw=bw)
             }
 
-          if (box || size.pt>0) {
+            if (box || size.pt>0) {
 
-            n.lvl <- ifelse (is.null(by1), 1, nlevels(by1))
-            n <- adj.bx.ht
-            int <- ifelse (n <= 25000, 4.10 - 0.000065*n, 3.25 - 0.00003*n)
-            denom <- int - 0.5*n.lvl
-            if (denom < 1.5) denom <- 1.5
+              n.lvl <- ifelse (is.null(by1), 1, nlevels(by1))
+              n <- adj.bx.ht
+              int <- ifelse (n <= 25000, 4.10 - 0.000065*n, 3.25 - 0.00003*n)
+              denom <- int - 0.5*n.lvl
+              if (denom < 1.5) denom <- 1.5
 
-            if (box) {  # could just be a scatterplot with red outlier points
-              if (!box_adj)  # did the panel.number() access in .panel.bwplot()
-                .panel.bwplot(x=x, ..., pch="|", vbs_mean=vbs_mean,
-                    fences=fences,
-                    box.ratio=vbs_size/denom, mean_color=out_fill, 
-                    stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE) 
-              else
-                .panel.bwplot(x=x, ...,  pch="|", vbs_mean=vbs_mean,
-                    fences=fences,
-                    box.ratio=vbs_size/denom, mean_color=out_fill, 
-                    stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE) 
-           }
+              if (box) {  # could just be a scatterplot with red outlier points
+                if (!box_adj)  # did the panel.number() access in .panel.bwplot()
+                  .panel.bwplot(x=x, ..., pch="|", vbs_mean=vbs_mean,
+                      fences=fences,
+                      box.ratio=vbs_size/denom, mean_color=out_fill, 
+                      stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE) 
+                else
+                  .panel.bwplot(x=x, ...,  pch="|", vbs_mean=vbs_mean,
+                      fences=fences,
+                      box.ratio=vbs_size/denom, mean_color=out_fill, 
+                      stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE) 
+             }
 
-           # plotting a subset of x requires adjusting y, in .panel.strip
-            i.out <- which(x<fnc.out[1] | x>fnc.out[2])
-            if (n.groups == 1) {
-              i.out_clr <- 1
-              fill_out <- out2_fill
-            }
-            else {
-              i.out_clr <- as.numeric(groups[i.out])
-              fill_out <- pt.fill[i.out_clr]
-            }
-
-            # plot extreme outliers
-            .panel.stripplot(x=x[i.out],
-              cex=out_size, col=out2_color, fill=fill_out, pch=out_shape, ...)
-
-            i.out <- which(x>=fnc.out[1] & x<fnc.in[1] |
-                            x>fnc.in[2] & x<=fnc.out[2])
-            if (n.groups == 1) {
-              i.out_clr <- 1
-              fill_out <- out_fill
-            }
-            else {
-              i.out_clr <- as.numeric(groups[i.out])
-              fill_out <- pt.fill[i.out_clr]
-            }
-
-            # plot outliers
-            .panel.stripplot(x=x[i.out],
-               cex=out_size, col=out_color, fill=fill_out, pch=out_shape, ...)
-
-            # label outliers
-            if (out_cut > 0) {
-              wwID <- wID[subscripts]
-
-              ind.lo <- which(x < fnc.in[1])
-              x.lo <- x[ind.lo]
-              ID.lo <- wwID[ind.lo]
-              ord <- order(x.lo, decreasing=FALSE)
-              x.lo <- x.lo[ord]
-              x.lo <- na.omit(x.lo[1:min(length(x.lo),out_cut)])
-              ID.lo <- ID.lo[ord] 
-              ID.lo <- na.omit(ID.lo[1:min(length(ID.lo),out_cut)]) 
-              
-              ind.hi <- which(x > fnc.in[2])
-              x.hi <- x[ind.hi]
-              ID.hi <- wwID[ind.hi]
-              ord <- order(x.hi, decreasing=TRUE)
-              x.hi <- x.hi[ord]
-              x.hi <- na.omit(x.hi[1:min(length(x.hi),out_cut)])
-              ID.hi <- ID.hi[ord] 
-              ID.hi <- na.omit(ID.hi[1:min(length(ID.hi),out_cut)]) 
-
-              x.out <- c(x.lo, x.hi)
-              ID.lbl <- union(ID.lo, ID.hi)  # combine factors
-
-              panel.text(x.out, y=1.08, labels=ID.lbl,
-                         col=ID_color, cex=ID_size, adj=0, srt=90)
-            }
-          }  # end box
-
-          if (size.pt > 0) {  # regular points
-            s.pt <- ifelse (n.groups > 1, size.pt*1.2, size.pt)
-            if (box) {
-              i.out <- which(x>=fnc.in[1] & x<=fnc.in[2])
+              # plotting a subset of x requires adjusting y, in .panel.strip
+              # identify extreme outliers, if any
+              x.out <- which(x<fnc.out[1] | x>fnc.out[2])
               if (n.groups == 1) {
-                i.out_clr <- 1
-                fill_out <- pt.fill
+                x.out_clr <- 1
+                fill_out <- out2_fill
               }
               else {
-                i.out_clr <- as.numeric(groups[i.out])
-                fill_out <- pt.fill[i.out_clr]
+                x.out_clr <- as.numeric(groups[x.out])
+                fill_out <- pt.fill[x.out_clr]
               }
-            }  # end box
-            else
-              i.out <- 1:length(x)
 
-            .panel.stripplot(x=x[i.out], 
-               cex=s.pt, pch=shape, col=pt.color, fill=pt.fill,
-               jitter_data=jitter_data, factor=jitter, ...)
-          }
+              # plot extreme outliers
+              .panel.stripplot(x=x[x.out],
+                cex=out_size, col=out2_color, fill=fill_out, pch=out_shape, ...)
 
+              # identify outliers, if any
+              x.out <- which(x>=fnc.out[1] & x<fnc.in[1] |
+                              x>fnc.in[2] & x<=fnc.out[2])
+              if (n.groups == 1) {
+                x.out_clr <- 1
+                fill_out <- out_fill
+              }
+              else {
+                x.out_clr <- as.numeric(groups[x.out])
+                fill_out <- pt.fill[x.out_clr]
+              }
+
+              # plot outliers
+              .panel.stripplot(x=x[x.out],
+                 cex=out_size, col=out_color, fill=fill_out, pch=out_shape, ...)
+
+              # label outliers
+              if (out_cut > 0) {
+                wwID <- wID[subscripts]
+
+                ind.lo <- which(x < fnc.in[1])
+                x.lo <- x[ind.lo]
+                ID.lo <- wwID[ind.lo]
+                ord <- order(x.lo, decreasing=FALSE)
+                x.lo <- x.lo[ord]
+                x.lo <- na.omit(x.lo[1:min(length(x.lo),out_cut)])
+                ID.lo <- ID.lo[ord] 
+                ID.lo <- na.omit(ID.lo[1:min(length(ID.lo),out_cut)]) 
+                
+                ind.hi <- which(x > fnc.in[2])
+                x.hi <- x[ind.hi]
+                ID.hi <- wwID[ind.hi]
+                ord <- order(x.hi, decreasing=TRUE)
+                x.hi <- x.hi[ord]
+                x.hi <- na.omit(x.hi[1:min(length(x.hi),out_cut)])
+                ID.hi <- ID.hi[ord] 
+                ID.hi <- na.omit(ID.hi[1:min(length(ID.hi),out_cut)]) 
+
+                x.out <- c(x.lo, x.hi)
+                ID.lbl <- union(ID.lo, ID.hi)  # combine factors
+
+                panel.text(x.out, y=1.08, labels=ID.lbl,
+                           col=ID_color, cex=ID_size, adj=0, srt=90)
+              }
+            }  # end box || size.pt > 0
+
+            # regular or all (no box)  points
+            if (size.pt > 0) {
+              s.pt <- ifelse (n.groups > 1, size.pt*1.2, size.pt)
+              if (box) {
+                x.out <- which(x>=fnc.in[1] & x<=fnc.in[2])
+                if (n.groups == 1) {
+                  x.out_clr <- 1
+                  fill_out <- pt.fill
+                }
+                else {
+                  x.out_clr <- as.numeric(groups[x.out])
+                  fill_out <- pt.fill[x.out_clr]
+                }
+              }  # end box
+              else  # all pts
+                x.out <- 1:length(x)
+
+              .panel.stripplot(x=x[x.out], 
+                 cex=s.pt, pch=shape, col=pt.color, fill=pt.fill,
+                 jitter_data=jitter_data, factor=jitter, ...)
+            }
+
+          }  # end length(x) > 0 
         }  # end panel function
       )  # end update
   }

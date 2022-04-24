@@ -347,8 +347,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="#rename-a-variable-in-a-data-frame">Rename a Variable in a
 Data Frame</a></li>
 <li><a href="#create-factor-variables">Create Factor Variables</a></li>
+<li><a href="#reshape-data">Reshape Data</a>
+<ul>
 <li><a href="#reshape-data-wide-to-long">Reshape Data Wide to
 Long</a></li>
+<li><a href="#reshape-data-long-to-wide">Reshape Data Long to
+Wide</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -534,23 +539,23 @@ set, here just the first 12 rows of data to save space.</p>
 <pre><code>##   random</code></pre>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
-## Jones, Alissa        5      W &lt;NA&gt;  53772.58   &lt;NA&gt;    1  65   62
-## Saechao, Suzanne     8      W SALE  55545.25    med    1  98  100
-## Ritchie, Darnell     7      M ADMN  53788.26    med    1  82   92
 ## Afshari, Anbar       6      W ADMN  69441.93   high    2 100  100
-## Cooper, Lindsay      4      W MKTG  56772.95   high    1  78   91
-## Pham, Scott         13      M SALE  81871.05   high    2  90   94
-## Downs, Deborah       7      W FINC  57139.90   high    2  90   86
+## Jones, Alissa        5      W &lt;NA&gt;  53772.58   &lt;NA&gt;    1  65   62
 ## Knox, Michael       18      M MKTG  99062.66    med    3  81   84
-## Kimball, Claire      8      W MKTG  61356.69   high    2  93   92
-## Wu, James           NA      M SALE  94494.58    low    1  62   74
+## Ritchie, Darnell     7      M ADMN  53788.26    med    1  82   92
+## Cooper, Lindsay      4      W MKTG  56772.95   high    1  78   91
 ## Campagna, Justin     8      M SALE  72321.36    low    1  76   84
-## Hoang, Binh         15      M SALE 111074.86    low    3  96   97</code></pre>
+## Saechao, Suzanne     8      W SALE  55545.25    med    1  98  100
+## Downs, Deborah       7      W FINC  57139.90   high    2  90   86
+## Hoang, Binh         15      M SALE 111074.86    low    3  96   97
+## Wu, James           NA      M SALE  94494.58    low    1  62   74
+## Kimball, Claire      8      W MKTG  61356.69   high    2  93   92
+## Pham, Scott         13      M SALE  81871.05   high    2  90   94</code></pre>
 </div>
 <div id="rescale-data" class="section level2">
 <h2>Rescale Data</h2>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rescale</span>(Salary)</span></code></pre></div>
-<pre><code>##  [1] -0.926 -0.837 -0.925 -0.139 -0.775  0.484 -0.757  1.347 -0.545  1.118  0.005  1.950</code></pre>
+<pre><code>##  [1] -0.139 -0.926  1.347 -0.925 -0.775  0.005 -0.837 -0.757  1.950  1.118 -0.545  0.484</code></pre>
 </div>
 <div id="rename-a-variable-in-a-data-frame" class="section level2">
 <h2>Rename a Variable in a Data Frame</h2>
@@ -579,8 +584,10 @@ create new variables.</p>
 the newly created factor variables.</p>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">factors</span>(<span class="fu">c</span>(m06, m07, m20), <span class="at">var_labels=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
-<div id="reshape-data-wide-to-long" class="section level2">
-<h2>Reshape Data Wide to Long</h2>
+<div id="reshape-data" class="section level2">
+<h2>Reshape Data</h2>
+<div id="reshape-data-wide-to-long" class="section level3">
+<h3>Reshape Data Wide to Long</h3>
 <p>A wide-form data table has multiple measurements from the same unit
 of analysis (e.g., person) across the row of data, usually repeated over
 time. The conversion to long-form forms three new columns from the input
@@ -599,66 +606,111 @@ and the name of the ID field.</p>
 ## 7     p7    2    3    2    4</code></pre>
 <p>Go with the default variable names in the long-form.</p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape_long</span>(d, <span class="fu">c</span>(<span class="st">&quot;sup1&quot;</span>, <span class="st">&quot;sup2&quot;</span>, <span class="st">&quot;sup3&quot;</span>, <span class="st">&quot;sup4&quot;</span>))</span></code></pre></div>
-<pre><code>##    Person Group Value
-## 1      p1  sup1     2
-## 2      p2  sup1     2
-## 3      p3  sup1     8
-## 4      p4  sup1     4
-## 5      p5  sup1     2
-## 6      p6  sup1     5
-## 7      p7  sup1     2
-## 8      p1  sup2     4
-## 9      p2  sup2     5
-## 10     p3  sup2     6
-## 11     p4  sup2     3
-## 12     p5  sup2     1
-## 13     p6  sup2     5
-## 14     p7  sup2     3
-## 15     p1  sup3     4
-## 16     p2  sup3     4
-## 17     p3  sup3     7
-## 18     p4  sup3     5
-## 19     p5  sup3     2
-## 20     p6  sup3     6
-## 21     p7  sup3     2
-## 22     p1  sup4     3
-## 23     p2  sup4     6
-## 24     p3  sup4     9
-## 25     p4  sup4     7
-## 26     p5  sup4     3
-## 27     p6  sup4     8
-## 28     p7  sup4     4</code></pre>
-<p>Specify custom variable names in the long-form.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape_long</span>(d, sup1<span class="sc">:</span>sup4, <span class="at">group=</span><span class="st">&quot;Supplement&quot;</span>, <span class="at">response=</span><span class="st">&quot;Reps&quot;</span>, <span class="at">ID=</span><span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
+<pre><code>##     ID Person Group Value
+## 1  ID1     p1  sup1     2
+## 2  ID2     p2  sup1     2
+## 3  ID3     p3  sup1     8
+## 4  ID4     p4  sup1     4
+## 5  ID5     p5  sup1     2
+## 6  ID6     p6  sup1     5
+## 7  ID7     p7  sup1     2
+## 8  ID1     p1  sup2     4
+## 9  ID2     p2  sup2     5
+## 10 ID3     p3  sup2     6
+## 11 ID4     p4  sup2     3
+## 12 ID5     p5  sup2     1
+## 13 ID6     p6  sup2     5
+## 14 ID7     p7  sup2     3
+## 15 ID1     p1  sup3     4
+## 16 ID2     p2  sup3     4
+## 17 ID3     p3  sup3     7
+## 18 ID4     p4  sup3     5
+## 19 ID5     p5  sup3     2
+## 20 ID6     p6  sup3     6
+## 21 ID7     p7  sup3     2
+## 22 ID1     p1  sup4     3
+## 23 ID2     p2  sup4     6
+## 24 ID3     p3  sup4     9
+## 25 ID4     p4  sup4     7
+## 26 ID5     p5  sup4     3
+## 27 ID6     p6  sup4     8
+## 28 ID7     p7  sup4     4</code></pre>
+<p>Specify custom variable names in the long-form, take advantage of the
+usual organization that the columns to be transformed are all sequential
+in the data frame. Use the ordering <code>sup1:sup4</code> to identify
+the variables. Only the first two parameter values are required, the
+data frame that contains the variables and the variables to be
+transformed.</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape_long</span>(d, sup1<span class="sc">:</span>sup4, </span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">group=</span><span class="st">&quot;Supplement&quot;</span>, <span class="at">response=</span><span class="st">&quot;Reps&quot;</span>, <span class="at">ID=</span><span class="st">&quot;Person&quot;</span>, <span class="at">prefix=</span><span class="st">&quot;P&quot;</span>)</span></code></pre></div>
 <pre><code>##    Person Supplement Reps
-## 1      p1       sup1    2
-## 2      p2       sup1    2
-## 3      p3       sup1    8
-## 4      p4       sup1    4
-## 5      p5       sup1    2
-## 6      p6       sup1    5
-## 7      p7       sup1    2
-## 8      p1       sup2    4
-## 9      p2       sup2    5
-## 10     p3       sup2    6
-## 11     p4       sup2    3
-## 12     p5       sup2    1
-## 13     p6       sup2    5
-## 14     p7       sup2    3
-## 15     p1       sup3    4
-## 16     p2       sup3    4
-## 17     p3       sup3    7
-## 18     p4       sup3    5
-## 19     p5       sup3    2
-## 20     p6       sup3    6
-## 21     p7       sup3    2
-## 22     p1       sup4    3
-## 23     p2       sup4    6
-## 24     p3       sup4    9
-## 25     p4       sup4    7
-## 26     p5       sup4    3
-## 27     p6       sup4    8
-## 28     p7       sup4    4</code></pre>
+## 1     Pp1       sup1    2
+## 2     Pp2       sup1    2
+## 3     Pp3       sup1    8
+## 4     Pp4       sup1    4
+## 5     Pp5       sup1    2
+## 6     Pp6       sup1    5
+## 7     Pp7       sup1    2
+## 8     Pp1       sup2    4
+## 9     Pp2       sup2    5
+## 10    Pp3       sup2    6
+## 11    Pp4       sup2    3
+## 12    Pp5       sup2    1
+## 13    Pp6       sup2    5
+## 14    Pp7       sup2    3
+## 15    Pp1       sup3    4
+## 16    Pp2       sup3    4
+## 17    Pp3       sup3    7
+## 18    Pp4       sup3    5
+## 19    Pp5       sup3    2
+## 20    Pp6       sup3    6
+## 21    Pp7       sup3    2
+## 22    Pp1       sup4    3
+## 23    Pp2       sup4    6
+## 24    Pp3       sup4    9
+## 25    Pp4       sup4    7
+## 26    Pp5       sup4    3
+## 27    Pp6       sup4    8
+## 28    Pp7       sup4    4</code></pre>
+</div>
+<div id="reshape-data-long-to-wide" class="section level3">
+<h3>Reshape Data Long to Wide</h3>
+<p>Can also reshape a long-form data frame to wide-form.</p>
+<p>Here, begin with a wide-form data frame and convert to long-form.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Anova_rb&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
+<pre><code>##   Person sup1 sup2 sup3 sup4
+## 1     p1    2    4    4    3
+## 2     p2    2    5    4    6
+## 3     p3    8    6    7    9
+## 4     p4    4    3    5    7
+## 5     p5    2    1    2    3
+## 6     p6    5    5    6    8
+## 7     p7    2    3    2    4</code></pre>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>dl <span class="ot">&lt;-</span> <span class="fu">reshape_long</span>(d, sup1<span class="sc">:</span>sup4)  <span class="co"># convert to long-form</span></span></code></pre></div>
+<p>Convert back to wide form.</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape_wide</span>(dl, <span class="at">group=</span><span class="st">&quot;Group&quot;</span>, <span class="at">response=</span><span class="st">&quot;Value&quot;</span>, <span class="at">ID=</span><span class="st">&quot;Person&quot;</span>)</span></code></pre></div>
+<pre><code>##    ID Person sup1 sup2 sup3 sup4
+## 1 ID1     p1    2    4    4    3
+## 2 ID2     p2    2    5    4    6
+## 3 ID3     p3    8    6    7    9
+## 4 ID4     p4    4    3    5    7
+## 5 ID5     p5    2    1    2    3
+## 6 ID6     p6    5    5    6    8
+## 7 ID7     p7    2    3    2    4</code></pre>
+<p>Here covert with the name of the response prefixed to the column
+names.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape_wide</span>(dl, <span class="at">group=</span><span class="st">&quot;Group&quot;</span>, <span class="at">response=</span><span class="st">&quot;Value&quot;</span>, <span class="at">ID=</span><span class="st">&quot;Person&quot;</span>,</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">prefix=</span><span class="cn">TRUE</span>, <span class="at">sep=</span><span class="st">&quot;.&quot;</span>)</span></code></pre></div>
+<pre><code>##    ID Person Value.sup1 Value.sup2 Value.sup3 Value.sup4
+## 1 ID1     p1          2          4          4          3
+## 2 ID2     p2          2          5          4          6
+## 3 ID3     p3          8          6          7          9
+## 4 ID4     p4          4          3          5          7
+## 5 ID5     p5          2          1          2          3
+## 6 ID6     p6          5          5          6          8
+## 7 ID7     p7          2          3          2          4</code></pre>
+</div>
 </div>
 
 

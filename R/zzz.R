@@ -9,7 +9,7 @@ if (getRversion() >= "3.5.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.1.7                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.1.8                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -2018,7 +2018,7 @@ function(dir, axT) {
     }
   }
   if (!is.null(bnd))
-    tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1+length(bnd), cc="-")
+    tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1+length(bnd), cc=" ")
 
   # factor vars to char vars
   if (is.data.frame(x)) {

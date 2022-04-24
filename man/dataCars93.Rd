@@ -11,7 +11,7 @@
 Variables\cr
 -------------------------------------------\cr
 Make: Model\cr
-Type: Small, Sporty, Compact, Midsize, Large\cr
+Type: Small, Sporty, Compact, Midsize, Large, Van\cr
 MinPrice: Minimum Price (in $1,000) - Price for basic version of this model\cr
 MidPrice: Midrange Price (in $1,000) - Average of Min and Max prices\cr
 MaxPrice: Maximum Price (in $1,000) - Price for a premium version\cr

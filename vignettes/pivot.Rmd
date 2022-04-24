@@ -426,7 +426,7 @@ The __lessR__ `pivot()` function relies upon the __base R__ function `aggregate(
 1. Missing data analysis by cell or by the `value` aggregated. 
 1. Aggregation not necessary, so can `compute` the specified statistic(s) for each `variable` across the entire data set.
 1. The aggregated computations can be displayed as a 2-d table, not just a long-form data frame.
-1. `by` variables of type `Date`, `character` and `integer` retain the same variable type in the summary table instead of each converted to a `factor` (set `factors=TRUE` to get factors instead).
+1. `by` variables of type `Date`  retain the same variable type in the summary table instead of each converted to a `factor` (set `factors=FALSE` to not convert `integer` and `character` variables to factors).
 1. The list of parameters lists the `data` parameter first, which facilitates the use of the pipe operator, such as from base R as of Version 4.1.0 or the __magrittr__ package. 
 1. Any non-numeric variables with unique values in the submitted `data` are listed with their corresponding data value, which identifies when drilling down into the data to study relevant rows.
 

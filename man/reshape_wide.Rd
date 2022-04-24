@@ -19,10 +19,10 @@ reshape_wide(data, group, response, ID, prefix=NULL, sep="_")
         long-form column.}
   \item{ID}{Name of the ID field in the long-form column.}
   \item{prefix}{If \code{TRUE}, prefix the column names in the wide form
-        of the levels of each corresponding level of the  
+        of each corresponding level of the  
         \code{group} variable with the name of the \code{response}. Unless
         the values of \code{group} are numeric, the default is \code{FALSE},
-        just using the levels as the column names.}
+        just using the level names as the column names.}
   \item{sep}{If \code{prefix} is \code{TRUE}, the separator between the
         name of the level and the name of the \code{response} variable, with
         default \code{"_"}.}

@@ -3,7 +3,18 @@ function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
          miss_show=30, miss_matrix=FALSE, var_labels=FALSE,
          brief=getOption("brief")) {
 
+  # get name of data table
   dname <- deparse(substitute(data))  # from read is called data
+
+  # if a tibble convert to data frame
+  dfs <- .getdfs()
+  if (!is.null(dfs)) {
+    if (dname %in% dfs) {  # tibble to df
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+        data <- data.frame(data)
+      }
+    }
+  }
 
   # feedback regarding data
   n.var <- ncol(data)

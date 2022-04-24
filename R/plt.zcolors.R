@@ -82,12 +82,8 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
   if (fill.miss) {
     if (n.clrs == 1)
       pt_fill <- getOption("pt_fill")
-    else {
-      if (!ord.by.call)
-        pt_fill <- getColors(qual_pal, n=n.clrs)
-      else
-        pt_fill <- .color_range(.get_fill(), n.clrs)  # see if range
-    }
+    else
+      pt_fill <- .color_range(.get_fill(), n.clrs)  # see if range
   }
   else
     pt_fill <- fill
@@ -100,7 +96,7 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
     if (n.clrs == 1)
       pt_color <- getOption("pt_color")
     else
-      pt_color <- getColors(qual_pal, n=n.clrs, output=FALSE)
+      pt_color <- .color_range(.get_fill(), n.clrs)  # see if range
   }
   else
     pt_color <- color

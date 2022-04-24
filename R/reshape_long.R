@@ -1,5 +1,6 @@
 reshape_long <-
-  function(data, transform, group="Group", response="Value", ID=NULL) {
+  function(data, transform, group="Group", response="Value", ID="ID",
+           prefix=ID, sep="") {
 
   # if a tibble convert to data frame
   df.name <- deparse(substitute(data))  # get name of data table
@@ -12,7 +13,7 @@ reshape_long <-
     }
   }
 
-  if (is.null(ID)) ID <- "xxQ7"
+  if (is.null(ID)) ID <- "xxQ7q"
 
   data.vars <- as.list(seq_along(data))
   names(data.vars) <- names(data)
@@ -25,7 +26,21 @@ reshape_long <-
 
   row.names(dl) <- 1:nrow(dl)
 
-  if (ID == "xxQ7") dl[,"xxQ7"] <- NULL
+  if (ID == "xxQ7q")
+    dl[,"xxQ7q"] <- NULL
+  else {
+    if (!is.null(prefix)) {
+      ind <- which(names(dl) == ID)
+      sp <- sep
+      dl[,ind] <- paste(prefix, sp, dl[,ind], sep="") 
+      # reorder with ID var first
+      old.ind <- 1:ncol(dl)
+      new.ind <- setdiff(old.ind, ind)
+      new.ind <- c(ind, new.ind) 
+      dl <- dl[,new.ind]
+    }
+  }
+
 
   return(dl)
 

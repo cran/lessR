@@ -85,7 +85,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   nm.x <- names(x)
   if (is.factor(x[,1])) {
     x.lvl <- levels(x[,1])
-    if (!is.null(value_labels)) value_labels <- gsub(" ", "\n", x.lvl)
+    if (!is.null(value_labels))
+      value_labels <- gsub(" ", "\n", x.lvl)
     x <- as.matrix(as.integer(unclass(x[,1])))
   }
   else if (!date.ts) {
@@ -672,7 +673,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           }
 
           # plot segments
-
           if (segments_y) {
             if (n.xcol == 1) # line segments from points to axis
               segments(x0=0, y0=y, x1=x, y1=y,
@@ -810,6 +810,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           }
           else {  # size is a variable
             size.lv <- subset(size, by==levels(by)[i])
+            fill[i] <- .maketrans(fill[i], (1-pts_trans)*256)
             .plt.bubble(x.lv, y.lv, size.lv, radius, power, clr[i], fill[i],
                         size_cut, prop, bubble_text, object)
           }      
@@ -818,7 +819,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             for (j in 1:(nrow(x.lv)-1)) {
               segments(x0=x.lv[j,1], y0=y.lv[j,1],
                        x1=x.lv[j+1,1], y1=y.lv[j+1,1],
-                       lty="solid", lwd=.75, col=col.segment[i])
+                       lty="solid", lwd=.75, col=fill[i])
             }
           }  # end segments
 

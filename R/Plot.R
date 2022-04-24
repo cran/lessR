@@ -722,8 +722,12 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (!missing(x) && !in.global)
       .xcheck(by.name, df.name, names(data))
 
-    if (!in.global)
-      by.call <- eval(substitute(data$by))
+    if (!in.global) {
+      data.vars <- as.list(seq_along(data))  # even if only a single var
+      names(data.vars) <- names(data)  # all data in data frame
+      by.col <- eval(substitute(by), envir=data.vars)  # col num selected vars
+      by.call <- data[, by.col]
+    }
     else {  # vars that are function names get assigned to global
       by.call <- by
       if (is.function(by.call)) by.call <- eval(substitute(data$by))

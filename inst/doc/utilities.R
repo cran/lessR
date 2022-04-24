@@ -88,5 +88,18 @@ d
 reshape_long(d, c("sup1", "sup2", "sup3", "sup4"))
 
 ## ---------------------------------------------------------------------------------------------------------------------
-reshape_long(d, sup1:sup4, group="Supplement", response="Reps", ID="Person")
+reshape_long(d, sup1:sup4, 
+             group="Supplement", response="Reps", ID="Person", prefix="P")
+
+## ---------------------------------------------------------------------------------------------------------------------
+d <- Read("Anova_rb")
+d
+dl <- reshape_long(d, sup1:sup4)  # convert to long-form
+
+## ---------------------------------------------------------------------------------------------------------------------
+reshape_wide(dl, group="Group", response="Value", ID="Person")
+
+## ---------------------------------------------------------------------------------------------------------------------
+reshape_wide(dl, group="Group", response="Value", ID="Person",
+             prefix=TRUE, sep=".")
 

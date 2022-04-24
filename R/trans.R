@@ -1,5 +1,0 @@
-trans <-
-function(...)
-
-  Transform(...)
-

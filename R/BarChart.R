@@ -51,6 +51,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]] 
       if (names(dots)[i] == "stat_x") stat <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
+      if (names(dots)[i] == "by2") {  # only works if arg quoted, by2="Plan"
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "by2 parameter not currently available for BarChart().\n\n")
+      }
       if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
@@ -63,10 +67,16 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
   color.miss <- ifelse (missing(color), TRUE, FALSE)
   horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
   by.miss <- ifelse (missing(by), TRUE, FALSE)
+  by1.miss <- ifelse (missing(by1), TRUE, FALSE)
 
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
   sort <- match.arg(sort)
 
+  if (!by.miss  &&  !by1.miss) {  # only works if arg quoted, by2="Plan"
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "by  and  by1  parameters not currently available at the same time.\n\n")
+  }
+  
   if (horiz) {
     if (sort == "+") sort <- "-" 
     else if (sort == "-") sort <- "+" 
@@ -519,6 +529,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       " no data transformations. Use  by  instead of  by1.\n\n")
   }
 
+    # by2 not currently available
     .bar.lattice(x.call, by1.call, by2=NULL, n_row, n_col, aspect,
                  proportion, 
                  fill, color, trans, size.pt=NULL, xlab, ylab, main,

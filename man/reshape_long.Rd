@@ -8,11 +8,12 @@ A simple wrapper for Base R \code{\link{reshape}} with sensible parameter names 
 }
 
 \usage{
-reshape_long(data, transform, group="Group", response="Value", ID=NULL)
+reshape_long(data, transform, group="Group", response="Value", ID="ID",
+           prefix=ID, sep="")
 }
 
 \arguments{
-  \item{data}{Data frame that contains the variables to analyze.}
+  \item{data}{Data frame that contains the variables to reshape.}
   \item{transform}{The wide-form column variable names to transform to a
         long-form single column.}
   \item{group}{Name of the grouping variable in the new
@@ -22,13 +23,16 @@ reshape_long(data, transform, group="Group", response="Value", ID=NULL)
   \item{ID}{Name of the newly created ID field in the new long-form
         column, the original row number from the wide-form. If \code{NULL},
         the default value, then not created.}
+  \item{prefix}{The prefix added to the value of ID for each row of data.}
+  \item{sep}{Any potential separator of the ID prefix from the given value
+       of the ID.}
 }
 
 \details{
 \code{reshape_long} takes the \code{transform} variables in the wide-form from
 which it creates three new columns, \code{group}, \code{response}, and \code{ID}.
 
-Here is the correspondence between the original  \code{\link{reshape}} parameter names and the \code{reshape_long} parameter names.
+The correspondence between the original  \code{\link{reshape}} parameter names and the \code{reshape_long} parameter names is shown in the following table.
 
 \tabular{ll}{
 reshape \tab reshape_long\cr

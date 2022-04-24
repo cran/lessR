@@ -33,7 +33,8 @@ function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
     # width of data columns
     max.ln <- integer(length=0)
     for (i in 1:ncol(x)) {
-        ln.nm <- nchar(colnames(x)[i])
+      if (is.na(colnames(x)[i])) colnames(x)[i] <- "<NA>"
+      ln.nm <- nchar(colnames(x)[i])
       for (j in 1:nrow(x))
         ln.vl <- nchar(as.character(x[j,i]))
       max.ln[i] <- max(ln.nm, ln.vl) + digits_d + 3
