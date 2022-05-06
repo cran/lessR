@@ -28,9 +28,9 @@ Logit(my_formula, data=d, rows=NULL, ref=NULL,
      X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL,
      X5_new=NULL, X6_new=NULL,
 
-     pdf_file=NULL, width=5, height=5, \ldots)
+     pdf_file=NULL, width=5, height=5, \dots)
 
-lr(\ldots)
+lr(\dots)
 }
 
 

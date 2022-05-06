@@ -3,7 +3,6 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
             color, color.miss, area_fill, area_fill.miss, trans, stack,
             n.ycol, n.y_var, ord.by.call, run, size.pt) {
 
-
   n.clrs <- max(nn_col, n.by)  # n_col goes to lattice
   qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
 
@@ -20,7 +19,7 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
       fill.miss <- TRUE
     }
 
-    if (area_fill == "on") {
+    if (area_fill[1] == "on") {  # "on" only applies to one value
       if (n.y_var == 1) 
         area_fill <- getOption("violin_fill") 
       else

@@ -54,7 +54,7 @@ function (h, len.x, fun_call) {
     prop <- h$counts / len.x
     cum.p <- cumsum(prop)
 
-    out <- data.frame(bn, stringsAsFactors=FALSE)
+    out <- data.frame(bn)
     out$x.mids <- x.mids
     out$counts <- formatC(h$counts, digits=0, format="f")
     out$prop <- formatC(prop, digits=2, format="f")

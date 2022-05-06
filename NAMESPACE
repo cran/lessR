@@ -92,6 +92,7 @@ export (
   SummaryStats, ss, ss_brief,
   style,
   to,
+  train_test,
   Transform,
   ttest, tt, tt.brief, tt_brief,
   ttestPower, ttp,

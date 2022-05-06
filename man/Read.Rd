@@ -32,9 +32,9 @@ Read(from=NULL, format=NULL, var_labels=FALSE,
 
          fun_call=NULL, \dots)
 
-rd(\ldots) 
-rd_lbl(\ldots, var_labels=TRUE)
-Read2(\ldots, sep=";", dec=",")
+rd(\dots) 
+rd_lbl(\dots, var_labels=TRUE)
+Read2(\dots, sep=";", dec=",")
 }
 
 
@@ -94,7 +94,7 @@ Read2(\ldots, sep=";", dec=",")
        system default with \code{\link{style}} function.}
   \item{fun_call}{Function call. Used with \code{Rmd} to pass the function call when
         obtained from the abbreviated function call \code{rd}.}
-  \item{...}{Other parameter values define with the R read functions, such as the
+  \item{\dots}{Other parameter values define with the R read functions, such as the
        \code{read.table} function for text files, with row.names and header.}
 }
 

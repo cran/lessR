@@ -11,7 +11,7 @@ Plot a specified t-distribution against the standardized normal curve with the c
 prob_tcut(df, alpha=0.05, digits_d=3, y_axis=FALSE,
          fill="aliceblue", color_tail="palevioletred4",
          nrm_color=gray(.7), color_t=gray(.08),
-         pdf_file=NULL, width=5, height=5, \ldots)
+         pdf_file=NULL, width=5, height=5, \dots)
 }
 
 
@@ -27,7 +27,7 @@ prob_tcut(df, alpha=0.05, digits_d=3, y_axis=FALSE,
   \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
-  \item{\ldots}{Other parameter values for graphics.}
+  \item{\dots}{Other parameter values for graphics.}
 }
 
 \details{

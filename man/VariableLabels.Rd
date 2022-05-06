@@ -13,6 +13,8 @@ NOTE: Mostly deprecated. Can just set \code{var_labels=TRUE} on for a call to
 
 \usage{
 VariableLabels(x, value=NULL, quiet=getOption("quiet"))
+
+vl(\dots)
 }
 
 
@@ -26,8 +28,8 @@ VariableLabels(x, value=NULL, quiet=getOption("quiet"))
   otherwise \code{NULL}.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system
     default with \code{\link{style}} function.}
+  \item{\dots}{Other parameter values.}
 
-vl{\ldots}
 }
 
 

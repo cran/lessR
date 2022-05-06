@@ -13,9 +13,9 @@ Analyze proportions, either of a single proportion against a fixed alternative, 
 \usage{
 Prop_test(variable=NULL, success=NULL, by=NULL, data=d,
           n_succ=NULL, n_fail=NULL, n_tot=NULL, n_table=NULL,
-          Yates=FALSE, p0=NULL, digits_d=3)
+          Yates=FALSE, pi=NULL, digits_d=3, \dots)
 
-prop(\ldots)
+prop(\dots)
 }
 
 \arguments{
@@ -30,7 +30,7 @@ prop(\ldots)
   \item{n_table}{Path name of the file that contains a frequency table.}
   \item{Yates}{Set to \code{TRUE} to implement Yate's correction factor
         where applicable.}
-  \item{p0}{Value of null hypothesized probability.}
+  \item{pi}{Value of null hypothesized probability.}
   \item{digits_d}{Number of significant digits for each of the displayed summary
         statistics.}
   \item{\dots}{Parameter values passed to \code{Prop_test}.} 

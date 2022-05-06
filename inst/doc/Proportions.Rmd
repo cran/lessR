@@ -50,10 +50,10 @@ The example below is from the documentation for the base R function `binom.test(
 
 #### From Input Frequencies
 
-For a given categorical variable of interest, a type of plant, consider two values, either "giant" or "dwarf". From a sample of 925 plants, the specified value of "giant" occurred 682 times and did not occur 243 times. The null hypothesis tested is that the specified value occurs for 3/4 of the population according to the `p0` parameter.
+For a given categorical variable of interest, a type of plant, consider two values, either "giant" or "dwarf". From a sample of 925 plants, the specified value of "giant" occurred 682 times and did not occur 243 times. The null hypothesis tested is that the specified value occurs for 3/4 of the population according to the `pi` parameter.
 
 ```{r}
-Prop_test(n_succ=682, n_fail=243, p0=.75)
+Prop_test(n_succ=682, n_fail=243, pi=.75)
 ```
 
 
@@ -65,12 +65,12 @@ To illustrate with data, read the _Jackets_ data file included with __lessR__ in
 d <- Read("Jackets")
 ```
 
-In following example, for the `variable` _Bike_ from the default _d_ data frame, define the parameter `success` as the value _"BMW"_. The default null hypothesis is a population value of 0.5, but here explicitly specify with the parameter `p0`. 
+In following example, for the `variable` _Bike_ from the default _d_ data frame, define the parameter `success` as the value _"BMW"_. The default null hypothesis is a population value of 0.5, but here explicitly specify with the parameter `pi`. 
 
 For clarity, the following example includes the parameter names listed with their corresponding values. These names are unnecessary in this example, however, because the values are listed in the same order of their definition of the `Prop_test()` function.
 
 ```{r}
-Prop_test(variable=Bike, success="BMW", p0=0.5)
+Prop_test(variable=Bike, success="BMW", pi=0.5)
 ```
 
 Reject the null hypothesis, with a $p$-value of 0.000, less than $\alpha = 0.05$. The sample result of the sample proportion $p=0.408$ is considered far from the hypothesized value of $0.5$ for the proportion of `"BMW"` values for _Bike_. Conclude that the data were sampled from a population with a population proportion of BMW different from 0.5.

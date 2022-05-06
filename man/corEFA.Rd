@@ -12,9 +12,9 @@ A maximum likelihood exploratory factor analysis of an input correlation matrix,
 
 \usage{
 corEFA(R=mycor, n_factors, rotate=c("promax", "varimax", "none"), 
-          min_loading=.2, sort=TRUE, Rmd=NULL, \ldots)
+          min_loading=.2, sort=TRUE, Rmd=NULL, \dots)
 
-efa(\ldots)
+efa(\dots)
 }
 
 \arguments{

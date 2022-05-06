@@ -120,9 +120,9 @@ style(
   interpret=getOption("interpret"), document=getOption("document"), 
   code=getOption("code"),
 
-  width=120, show=FALSE, \ldots)
+  width=120, show=FALSE, \dots)
 
-set(\ldots)
+set(\dots)
 }
 
 

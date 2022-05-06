@@ -13,11 +13,11 @@ Automatically selects and then provides an analysis of a linear model: OLS regre
 }
 
 \usage{
-Model(my_formula, data=d, brief=getOption("brief"), xlab=NULL, \ldots)
+Model(my_formula, data=d, brief=getOption("brief"), xlab=NULL, \dots)
 
-model_brief(\ldots, brief=TRUE) 
+model_brief(\dots, brief=TRUE) 
 
-model(\ldots) 
+model(\dots) 
 }
 
 

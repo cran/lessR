@@ -946,6 +946,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   if (do.ellipse) {
 
     for (i in 1:n.clrs) {
+
       if (n.clrs == 1) {  # one plot, all the data
           x.lv <- x[,1]
           y.lv <- y[,1]
@@ -954,8 +955,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       else {  # multiple, pull out subset
 
         if (!is.null(by)) {  # multiple by plots
-          x.lv <- subset(x, by==levels(by)[i])
-          y.lv <- subset(y, by==levels(by)[i])
+#         x.lv <- subset(x, by==levels(by)[i])
+#         y.lv <- subset(y, by==levels(by)[i])
+          ind <- which(by == levels(by)[i])
+          x.lv <- x[ind]
+          y.lv <- y[ind]
         }
 
         if (n_col > 1) {  # multiple variable plots
@@ -973,19 +977,18 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
       }  # end multiple
 
-      for (j in 1:length(ellipse)) {
-        cxy <- cor(x.lv, y.lv, use="complete.obs")
-        m.x <- mean(x.lv, na.rm=TRUE)
-        m.y <- mean(y.lv, na.rm=TRUE)
-        s.x <- sd(x.lv, na.rm=TRUE)
-        s.y <- sd(y.lv, na.rm=TRUE)
+      # ellipse stats
+      cxy <- cor(x.lv, y.lv, use="pairwise.complete.obs")
+      m.x <- mean(x.lv, na.rm=TRUE)
+      m.y <- mean(y.lv, na.rm=TRUE)
+      s.x <- sd(x.lv, na.rm=TRUE)
+      s.y <- sd(y.lv, na.rm=TRUE)
 
-        ln.type <- "solid"
-        corr <- ifelse (n.clrs == 1, cxy, cxy[1,1])
-        col.border <- ifelse (n.clrs == 1, ellipse_color, clr)
-
-        e <- ellipse(corr, scale=c(s.x, s.y), centre=c(m.x, m.y),
+      for (j in 1:length(ellipse)) { # for each ellipse for this by group 
+        e <- ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y),
                      level=ellipse[j])
+        ln.type <- "solid"
+        col.border <- ifelse (n.clrs == 1, ellipse_color, clr)
         polygon(e, border=col.border, col=ellipse_fill,
                 lwd=ellipse_lwd, lty=ln.type)
       }  # jth ellipse

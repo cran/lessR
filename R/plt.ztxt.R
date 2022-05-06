@@ -307,22 +307,27 @@ function(x, y, values, object, n_cat,
             }  # end for n.by
           }  # end n.by > 0
           else {  # no by vars
-            mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
-                                format="f", digits=digits_d)
-            b0.pn <- .fmt(b0[1], digits_d)
-            b1.pn <- .fmt(b1[1], digits_d)
-            Rsq.pn <- .fmt(Rsq[1], 3)
-            if (!is.na(b1)) {  # linear function
-              txt = paste(
-                    "Line: b0 = ", b0.pn, "  b1 = ", b1.pn,
-                    "   Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
-                    "\n", sep="")
-            }
-            else {
-              txt = paste( 
-                "Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
-            }
+            if (length(b1) == 1) {  # > 1 if y=c(y1, y2, ...)
+              mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
+                                  format="f", digits=digits_d)
+              b0.pn <- .fmt(b0[1], digits_d)
+              b1.pn <- .fmt(b1[1], digits_d)
+              Rsq.pn <- .fmt(Rsq[1], 3)
+              if (!is.na(b1)) {  # linear function
+                txt = paste(
+                      "Line: b0 = ", b0.pn, "  b1 = ", b1.pn,
+                      "   Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
+                      "\n", sep="")
+              }
+              else {
+                txt = paste( 
+                  "Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
+              }
+            } 
+            else
+              txt <- ""  # currently no reg output if length(b1) > 0
           } 
+
           txreg <- txt
           class(txreg) <- "out"
           if (any(nzchar(txreg))) {

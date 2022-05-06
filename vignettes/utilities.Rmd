@@ -184,7 +184,7 @@ l <- factors(c(m06, m07, m20), var_labels=TRUE)
 
 ### Reshape Data Wide to Long
 
-A wide-form data table has multiple measurements from the same unit of analysis (e.g., person) across the row of data, usually repeated over time. The conversion to long-form forms three new columns from the input wide-form: the name of the grouping variable, the name of the values, and the name of the ID field.
+A wide-form data table has multiple measurements from the same unit of analysis (e.g., person) across the row of data, usually repeated over time. The conversion to long-form forms three new columns from the input wide-form: the name of the grouping variable, the name of the response values, and the name of the ID field.
 
 Read the data.
 
@@ -233,4 +233,26 @@ reshape_wide(dl, group="Group", response="Value", ID="Person",
              prefix=TRUE, sep=".")
 ```
 
+
+### Create Training and Testing Data
+
+Get the data, the Employee data set.
+
+```{r}
+d <- Read("Employee", quiet=TRUE)
+```
+
+Create four component data frames: out$train_x, out$train_y, out$test_x, and out$test_y. Specify the response variable as Salary.
+
+```{r}
+out <- train_test(d, Salary)
+names(out)
+```
+
+Create two component data frames: out$train and out$test. All the variables in the original data frame are included in the component data frames.
+
+```{r}
+out <- train_test(d)
+names(out)
+```
 

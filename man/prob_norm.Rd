@@ -11,7 +11,7 @@ Calculate the probability of an interval for a normal distribution with specifie
 prob_norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm_color="black", 
          fill_nrm="grey91", fill_int="slategray3", 
          ylab="", y_axis=FALSE, z=TRUE, axis_size=.9,
-         pdf_file=NULL, width=5, height=5, \ldots)
+         pdf_file=NULL, width=5, height=5, \dots)
 }
 
 
@@ -32,7 +32,7 @@ prob_norm(lo=NULL, hi=NULL, mu=0, sigma=1, nrm_color="black",
   \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
-  \item{\ldots}{Other parameter values for graphics.}
+  \item{\dots}{Other parameter values for graphics.}
 }
 
 \details{

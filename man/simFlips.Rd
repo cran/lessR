@@ -11,7 +11,7 @@ Simulate a sequence of coin flips.
 simFlips(n, prob=.5, seed=NULL,
          show_title=TRUE, show_flips=TRUE,
          grid="grey90", pause=FALSE,
-         main=NULL, pdf_file=NULL, width=5, height=5, \ldots)
+         main=NULL, pdf_file=NULL, width=5, height=5, \dots)
 }
 
 

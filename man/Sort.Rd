@@ -8,7 +8,7 @@ Sorts the values of a data frame according to the values of one or more variable
 }
 
 \usage{
-Sort(data=d, by, direction=NULL, quiet=getOption("quiet"), ...)
+Sort(data=d, by, direction=NULL, quiet=getOption("quiet"), \dots)
 }
 
 \arguments{
@@ -21,7 +21,7 @@ Sort(data=d, by, direction=NULL, quiet=getOption("quiet"), ...)
        descending, one for each variable to be sorted.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
        with \code{\link{style}} function.}
-  \item{\dots}{Parameter values_}
+  \item{\dots}{Other parameter values.}
 }
 
 \details{

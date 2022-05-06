@@ -38,11 +38,11 @@ corCFA(mimm=NULL, R=mycor, data=d, fac.names=NULL,
          F11=NULL, F12=NULL, F13=NULL, F14=NULL, F15=NULL,
          F16=NULL, F17=NULL, F18=NULL, F19=NULL, F20=NULL,
 
-         fun_call=NULL, \ldots)
+         fun_call=NULL, \dots)
 
-cfa(\ldots)
+cfa(\dots)
 
-scales(\ldots, iter=0, resid=FALSE, item_cor=FALSE, sort=FALSE, heat_map=FALSE)
+scales(\dots, iter=0, resid=FALSE, item_cor=FALSE, sort=FALSE, heat_map=FALSE)
 }
 
 \arguments{

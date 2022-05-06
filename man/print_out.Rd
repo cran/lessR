@@ -10,13 +10,13 @@ Now just applies to the \code{lessR} \code{\link{Regression}} function.
 }
 
 \usage{
-\method{print}{out}(x, ...)
+\method{print}{out}(x, \dots)
 }
 
 
 \arguments{
   \item{x}{The piece of output to display, a character vector or a list of character vectors.}
-  \item{\dots}{Other parameter values_}
+  \item{\dots}{Other parameter values.}
 }
 
 \references{

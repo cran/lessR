@@ -19,11 +19,11 @@ ANOVA(my_formula, data=d, rows=NULL,
          Rmd=NULL, jitter_x=0.4,
          res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
          graphics=TRUE, pdf=FALSE, width=5, height=5,
-         fun_call=NULL, \ldots)
+         fun_call=NULL, \dots)
 
-av(\ldots)
+av(\dots)
 
-av_brief(\ldots, brief=TRUE) 
+av_brief(\dots, brief=TRUE) 
 }
 
 

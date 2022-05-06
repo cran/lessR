@@ -40,7 +40,7 @@ PieChart(x, y=NULL, data=d, rows=NULL,
          width=6.5, height=6, pdf_file=NULL,
          \dots)
 
-pc(\ldots)
+pc(\dots)
 }
 
 \arguments{
@@ -168,7 +168,7 @@ pc(\ldots)
         pdf file.}\cr
 
 
-  \item{...}{Other parameter values for graphics as defined processed 
+  \item{\dots}{Other parameter values for graphics as defined processed 
       by \code{\link{pie}} and \code{\link{par}} for general graphics,
       which includes \code{radius} of the pie, and \code{color_main} for
       the title of the graph.}

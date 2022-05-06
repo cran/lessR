@@ -44,10 +44,10 @@ Regression(my_formula, data=d, rows=NULL,
 
          quiet=getOption("quiet"),
          graphics=TRUE, pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
-         fun_call=NULL, \ldots)
+         fun_call=NULL, \dots)
 
-reg(\ldots)
-reg_brief(\ldots, brief=TRUE)
+reg(\dots)
+reg_brief(\dots, brief=TRUE)
 }
 
 

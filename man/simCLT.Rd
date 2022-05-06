@@ -12,7 +12,7 @@ simCLT(ns, n, p1=0, p2=1, seed=NULL,
        type=c("normal", "uniform", "lognormal", "antinormal"),
        fill="lightsteelblue3", n_display=0, digits_d=3, 
        subtitle=TRUE, pop=TRUE, 
-       main=NULL, pdf=FALSE, width=5, height=5, \ldots)
+       main=NULL, pdf=FALSE, width=5, height=5, \dots)
 }
 
 

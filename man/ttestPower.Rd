@@ -15,9 +15,9 @@ For both the one and two-group t-tests, power is calculated from a single sample
 \usage{
 ttestPower(n=NULL, s=NULL, n1=NULL, n2=NULL, s1=NULL, s2=NULL, 
          mmd=NULL, msmd=NULL, mdp=.8, mu=NULL, 
-         pdf_file=NULL, width=5, height=5, \ldots)
+         pdf_file=NULL, width=5, height=5, \dots)
 
-ttp(\ldots)
+ttp(\dots)
 }
 
 
@@ -39,7 +39,7 @@ ttp(\ldots)
   \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
-  \item{\ldots}{Other parameter values, such as \code{lwd} and \code{lab_cex} from \code{\link{plot}}
+  \item{\dots}{Other parameter values, such as \code{lwd} and \code{lab_cex} from \code{\link{plot}}
         and \code{col.line} and \code{col.bg} from \code{\link{ScatterPlot}}.}
 }
 

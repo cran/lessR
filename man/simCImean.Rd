@@ -12,7 +12,7 @@ simCImean(ns, n, mu=0, sigma=1, cl=0.95, seed=NULL,
          show_data=FALSE, show_title=TRUE, 
          miss_only=FALSE, color_hit="gray40", color_miss="red",
          grid="grey90", ylim_bound=NULL, pause=FALSE,
-         main=NULL, pdf_file=NULL, width=5, height=5, \ldots)
+         main=NULL, pdf_file=NULL, width=5, height=5, \dots)
 }
 
 

@@ -18,12 +18,12 @@ Write(data=d, to=NULL, format=c("csv", "R", "Excel", "ODS", "SPSS"),
 
          ExcelTable=FALSE, ExcelColWidth=TRUE,
 
-         quiet=getOption("quiet"), \ldots)
+         quiet=getOption("quiet"), \dots)
 
-wrt(\ldots)
+wrt(\dots)
 
-wrt_r(\ldots, format="R")
-wrt_x(\ldots, format="Excel")
+wrt_r(\dots, format="R")
+wrt_x(\dots, format="Excel")
 }
 
 
@@ -44,7 +44,7 @@ wrt_x(\ldots, format="Excel")
 
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
        \code{\link{style}} function.}
-  \item{...}{Other parameter values for \code{csv} files consistent with the
+  \item{\dots}{Other parameter values for \code{csv} files consistent with the
        usual \code{\link{write.table}}, including \code{na=""} to write missing
        data to a \code{csv} file as blanks instead of \code{NA}.}
 }

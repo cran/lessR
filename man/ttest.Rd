@@ -31,12 +31,12 @@ ttest(x=NULL, y=NULL, data=d, rows=NULL, paired=FALSE,
          show_title=TRUE, bw1="bcv", bw2="bcv",
 
          graph=TRUE, line_chart=FALSE,
-         width=5, height=5, pdf_file=NULL, ...)       
+         width=5, height=5, pdf_file=NULL, \dots)       
 
-tt.brief(\ldots)
-tt_brief(\ldots)
+tt.brief(\dots)
+tt_brief(\dots)
 
-tt(\ldots)
+tt(\dots)
 }
 
 \arguments{

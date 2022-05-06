@@ -11,7 +11,7 @@ There is no provision to recode integer values to character strings because that
 
 \usage{
 recode(old_vars, new_vars=NULL, old, new, data=d,
-       quiet=getOption("quiet"), \ldots)
+       quiet=getOption("quiet"), \dots)
 }
 
 \arguments{

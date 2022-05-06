@@ -14,9 +14,9 @@ The advantages of this \code{lessR} function is that it provides a single functi
 }
 
 \usage{
-Merge(data1, data2, by=NULL, quiet=getOption("quiet"), \ldots)
+Merge(data1, data2, by=NULL, quiet=getOption("quiet"), \dots)
 
-mrg(\ldots)
+mrg(\dots)
 }
 
 \arguments{

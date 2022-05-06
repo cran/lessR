@@ -8,7 +8,7 @@ Generates sequentially numbered variable names, all starting with the same prefi
 }
 
 \usage{
-to(prefix, until, from=1, same_size=TRUE, \ldots)
+to(prefix, until, from=1, same_size=TRUE, \dots)
 }
 
 

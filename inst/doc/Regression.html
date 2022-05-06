@@ -714,11 +714,11 @@ training and testing data sets.</p>
 ##        Model from Training Data              Applied to Testing Data 
 ##        ----------------------------------   ---------------------------------- 
 ## fold    n        se           MSE    Rsq     n        se           MSE    Rsq 
-##   1 | 24  8891.926  79066341.911  0.801 |  12 17798.606 316790374.824  0.591 
-##   2 | 24 12302.718 151356879.926  0.701 |  12 11114.895 123540891.494  0.776 
-##   3 | 24 12758.237 162772610.868  0.731 |  12 11534.267 133039313.105  0.577 
+##   1 | 24 11786.087 138911840.531  0.705 |  12 12756.847 162737133.219  0.742 
+##   2 | 24 12260.217 150312925.783  0.653 |  12 11722.219 137410415.473  0.804 
+##   3 | 24 10650.561 113434454.570  0.813 |  12 14890.224 221718756.961  0.281 
 ##       ----------------------------------    ---------------------------------- 
-## Mean     11317.627 131065277.568  0.744      13482.589 191123526.474  0.648</code></pre>
+## Mean     11565.622 134219740.295  0.723      13123.096 173955435.218  0.609</code></pre>
 <p>The standard output also includes <span class="math inline">\(R^2_{press}\)</span>, the value of <span class="math inline">\(R^2\)</span> when applied to new, previously
 unseen data, a value comparable to the average <span class="math inline">\(R^2\)</span> on test data.</p>
 </div>
@@ -1151,7 +1151,7 @@ this assumption by plotting each separate slope and scatterplot.</p>
 <pre><code>## 
 ## &gt;&gt;&gt; Suggestions
 ## Plot(Salary, Years, enhance=TRUE)  # many options
-## Plot(Salary, Years, fill=&quot;skyblue&quot;)  # interior fill color of points
+## Plot(Salary, Years, color=&quot;red&quot;)  # exterior edge color of points
 ## Plot(Salary, Years, MD_cut=6)  # label Mahalanobis dist &gt; 6 as outliers 
 ## 
 ## Dept: ACCT,  Line: b0 = -0.8   b1 = 0.0   Fit: MSE = 12   Rsq = 0.161

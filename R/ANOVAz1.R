@@ -219,10 +219,10 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
     margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
-    lm <- margs$lm
+    lm <- margs$lm + 0.075
     tm <- margs$tm
     rm <- margs$rm
-    bm <- margs$bm
+    bm <- margs$bm + 0.1
     
     par(bg=getOption("window_fill"))
     orig.params <- par(no.readonly=TRUE)

@@ -50,9 +50,9 @@ Histogram(x=NULL, data=d, rows=NULL,
 
     eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"), do_plot=TRUE,
     width=6, height=6, pdf_file=NULL, 
-    fun_call=NULL, \ldots)
+    fun_call=NULL, \dots)
 
-hs(\ldots)
+hs(\dots)
 }
 
 \arguments{

@@ -8,7 +8,7 @@ A simple wrapper for Base R \code{\link{reshape}} with sensible parameter names 
 }
 
 \usage{
-reshape_long(data, transform, group="Group", response="Value", ID="ID",
+reshape_long(data, transform, group="Group", response="Response", ID="ID",
            prefix=ID, sep="")
 }
 

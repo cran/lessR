@@ -8,7 +8,7 @@ List the values of a variable from the global environment or a data frame.
 }
 
 \usage{
-values(x, data=d, \ldots) 
+values(x, data=d, \dots) 
 }
 
 

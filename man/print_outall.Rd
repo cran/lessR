@@ -8,13 +8,13 @@ Displays all the results saved as an \code{R} list into an object from a \code{l
 }
 
 \usage{
-\method{print}{out_all}(x, ...)
+\method{print}{out_all}(x, \dots)
 }
 
 
 \arguments{
   \item{x}{The list of components to display.}
-  \item{\dots}{Other parameter values_}
+  \item{\dots}{Other parameter values.}
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

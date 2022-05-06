@@ -12,7 +12,7 @@ kurtosis(x, na.rm=TRUE)
 }
 
 \arguments{
-  \item{x}{Variable from which to compute kurtosisness.}
+  \item{x}{Variable from which to compute kurtosis.}
   \item{na.rm}{A logical value indicating whether NA values should be
        stripped before the computation proceeds.}
 }

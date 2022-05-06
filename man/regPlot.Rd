@@ -11,7 +11,7 @@ Following a call to the \code{lessR} function \code{\link{Regression}}, in which
 regPlot(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
          res_sort=c("cooks","rstudent","dffits","off"),
          res_rows=NULL, cooks_cut=1, scatter_coef=NULL, 
-         pdf=FALSE, width=5, height=5, manage.gr=FALSE, \ldots)
+         pdf=FALSE, width=5, height=5, manage.gr=FALSE, \dots)
 }
 
 

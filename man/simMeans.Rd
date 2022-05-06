@@ -12,7 +12,7 @@ simMeans(ns, n, mu=0, sigma=1, seed=NULL,
          show_title=TRUE, show_data=TRUE, max_data=10, 
          grid="grey90", ylim_bound=NULL, pause=FALSE,
          sort=NULL, set_mu=FALSE, digits_d=2,
-         main=NULL, pdf_file=NULL, width=5, height=5, \ldots)
+         main=NULL, pdf_file=NULL, width=5, height=5, \dots)
 }
 
 

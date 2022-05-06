@@ -52,9 +52,9 @@ BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
         eval_df=NULL, quiet=getOption("quiet"),
-        width=6.5, height=6, pdf_file=NULL, \ldots)
+        width=6.5, height=6, pdf_file=NULL, \dots)
 
-bc(\ldots)
+bc(\dots)
 }
 
 \arguments{

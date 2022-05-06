@@ -616,14 +616,14 @@ function(
     else if (theme == "gray") {
       window_fill = "white"
       panel_fill = "white"
-      bar_fill = .maketrans("gray25", .to256("trans_bar_fill"))
-      bar_fill_discrete = .maketrans("gray35",.to256("trans_bar_fill"))
-      bar_fill_cont = .maketrans("gray35", .to256("trans_bar_fill"))
+      bar_fill = .maketrans("gray42", .to256("trans_bar_fill"))
+      bar_fill_discrete = .maketrans("gray42",.to256("trans_bar_fill"))
+      bar_fill_cont = .maketrans("gray42", .to256("trans_bar_fill"))
       bar_color_discrete = "gray60"
       bar_color_cont = "gray60"
-      pt_fill = "gray30"
+      pt_fill = "gray42"
       trans_pt_fill = 0.00
-      pt_color = "gray30"
+      pt_color = "gray42"
       violin_fill=.maketrans("gray50", 40)
       violin_color = "gray15" 
       box_fill="gray65"

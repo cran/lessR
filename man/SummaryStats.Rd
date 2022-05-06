@@ -19,7 +19,7 @@ When output is assigned into an object, such as \code{s} in \code{s <- ss(Y)}, t
 
 \usage{
 SummaryStats(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"), 
-         digits_d=NULL, brief=getOption("brief"), label_max=20, \ldots)
+         digits_d=NULL, brief=getOption("brief"), label_max=20, \dots)
 
 ss_brief(\dots, brief=TRUE)
 

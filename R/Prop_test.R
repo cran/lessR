@@ -1,7 +1,15 @@
 Prop_test <-
 function (variable=NULL, success=NULL, by=NULL, data=d,
           n_succ=NULL, n_fail=NULL, n_tot=NULL, n_table=NULL,
-          Yates=FALSE, p0=NULL, digits_d=3) {
+          Yates=FALSE, pi=NULL, digits_d=3, ...) {
+
+  # a dot in a parameter name to an underscore
+  dots <- list(...)
+  if (!is.null(dots)) if (length(dots) > 0) {
+    for (i in 1:length(dots)) {
+      if (names(dots)[i] == "p0") pi <- dots[[i]]
+    }
+  }
 
   # length(x) is count_n(x) + count_NA(x)
   count_n <- function(x) sum(!is.na(x))
@@ -70,11 +78,11 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
       n_succ <- length(data[data[,ind.var]==success, ind.var])
     }
 
-    if (missing(p0)) p0 <- 0.5
-    out <- binom.test(n_succ, n_tot, p=p0)
+    if (missing(pi)) pi <- 0.5
+    out <- binom.test(n_succ, n_tot, p=pi)
 
     cat("\n")
-    cat(paste(">>>", out$method, "of a proportion <<<", "\n\n"))
+    cat(paste("<<<", out$method, "of a proportion", "\n\n"))
     if (do_data) {
       cat("Variable:", nm.var, "\n")
       cat("success:", success, "\n")
@@ -88,7 +96,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     cat("Sample proportion:", .fmt(out$estimate, digits_d), "\n")
     cat("\n")
     cat("------ Infer ------\n\n")
-    cat("Hypothesis test for null of ", p0, ", p-value: ",
+    cat("Hypothesis test for null of ", pi, ", p-value: ",
         .fmt(out$p.value,digits_d), sep="", "\n")
     cat("95% Confidence interval:", .fmt(out$conf.int[1],digits_d), "to",
         .fmt(out$conf.int[2],digits_d), "\n")
@@ -141,7 +149,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
       names(out$estimate)[i] <- rownames(tbl)[i]
 
     cat("\n")
-    cat(paste(">>>", out$method, " <<<", "\n\n"))
+    cat(paste("<<<", out$method, " <<<", "\n\n"))
     if (do_data) {
       cat("Variable:", nm.var, "\n")
       cat("success:", success, "\n")
@@ -149,7 +157,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     }
 
     cat("\n")
-    cat(">>> Description")
+    cat("--- Description")
     ns <- .fmt(tbl[,1], 0)
     nt <- .fmt(rowSums(tbl), 0)
     vals <- t(.fmt(out$estimate, digits_d))
@@ -163,7 +171,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     print(k)
 
     cat("\n")
-    cat(">>> Inference\n\n")
+    cat("--- Inference\n\n")
     cat("Chi-square statistic:", .fmt(out$statistic, digits_d), "\n")
     cat("Degrees of freedom:", .fmt(out$parameter, 0), "\n")
     cat("Hypothesis test of equal population proportions: p-value = ",
@@ -198,12 +206,12 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     std <- .fmt(out$stdres, digits_d)
 
     cat("\n")
-    cat(paste(">>>", out$method, " <<<", "\n\n"))
+    cat(paste("<<<", out$method, " <<<", "\n\n"))
     if (do_data)
       cat("Variable:", nm.var, "\n")
 
     cat("\n")
-    cat(">>> Description")
+    cat("--- Description")
     m <- matrix(c(obs,exp,res,std), byrow=TRUE, ncol=length(tbl))
     k <- data.frame(m)
     names(k) <- nms
@@ -212,7 +220,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     print(k)
 
     cat("\n")
-    cat(">>> Inference\n\n")
+    cat("--- Inference\n\n")
     cat("Chi-square statistic:", .fmt(out$statistic, digits_d), "\n")
     cat("Degrees of freedom:", .fmt(out$parameter, 0), "\n")
     cat("Hypothesis test of equal population proportions: p-value = ",
@@ -286,9 +294,9 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     k <- k[order(k[,1]),]  # display by row
 
     cat("\n")
-    cat(paste(">>>", out$method, " <<<", "\n\n"))
+    cat(paste("<<<", out$method, " <<<", "\n\n"))
 
-    cat(">>> Description\n\n")
+    cat("--- Description\n\n")
     if (do_data)
       print(addmargins(tbl))
     else {
@@ -299,7 +307,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     print(k, row.names=FALSE)
 
     cat("\n")
-    cat(">>> Inference\n\n")
+    cat("--- Inference\n\n")
     cat("Chi-square statistic:", .fmt(out$statistic, digits_d), "\n")
     cat("Degrees of freedom:", .fmt(out$parameter, 0), "\n")
     cat("Hypothesis test of equal population proportions: p-value = ",

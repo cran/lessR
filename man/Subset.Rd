@@ -14,7 +14,7 @@ Based directly on the standard R \code{\link{subset}} function to only include o
 
 \usage{
 Subset(rows, columns, data=d, holdout=FALSE,
-       random=0, quiet=getOption("quiet"), \ldots)
+       random=0, quiet=getOption("quiet"), \dots)
 }
 
 \arguments{

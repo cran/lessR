@@ -10,7 +10,7 @@ A wrapper for the base R \code{\link{transform}} function that defaults to the d
 }
 
 \usage{
-Transform(data=d, quiet=getOption("quiet"), \ldots)
+Transform(data=d, quiet=getOption("quiet"), \dots)
 }
 
 \arguments{

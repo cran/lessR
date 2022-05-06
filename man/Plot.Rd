@@ -89,14 +89,14 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
          eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
          do_plot=TRUE, width=NULL, height=NULL, pdf_file=NULL, 
-         fun_call=NULL, \ldots)
+         fun_call=NULL, \dots)
 
-ScatterPlot(\ldots)
-sp(\ldots)
-BoxPlot(\ldots)
-bx(\ldots)
-ViolinPlot(\ldots)
-vp(\ldots)
+ScatterPlot(\dots)
+sp(\dots)
+BoxPlot(\dots)
+bx(\dots)
+ViolinPlot(\dots)
+vp(\dots)
 }
 
 \arguments{
@@ -524,7 +524,7 @@ vp(\ldots)
         call when
         obtained from the abbreviated function call \code{sp}.}\cr
 
-  \item{\ldots}{Other parameter values for non-Trellis graphics as defined by and
+  \item{\dots}{Other parameter values for non-Trellis graphics as defined by and
       processed by standard R functions \code{\link{plot}} and \code{\link{par}},
       including\cr
       \code{cex.main} for the size of the title\cr
@@ -810,8 +810,9 @@ Plot(c(Salary, Years, Pre), fit="lm")
 # optionally re-order default alphabetical R ordering by converting
 #   to a factor with lessR factors (which also does multiple variables)
 # always save to the full data frame with factors
-d <- factors(Gender, levels=c("M", "F"))
+d <- factors(Gender, levels=c("M", "W"))
 Plot(Years, Salary, by1=Gender)
+d <- Read("Employee", quiet=TRUE)
 
 \donttest{
 

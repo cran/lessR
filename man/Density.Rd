@@ -32,9 +32,9 @@ Density(x, data=d, rows=NULL,
 
        eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
        width=4.5, height=4.5, pdf_file=NULL,
-       fun_call=NULL, \ldots)
+       fun_call=NULL, \dots)
 
-dn(\ldots)
+dn(\dots)
 }
 
 \arguments{

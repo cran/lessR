@@ -11,7 +11,7 @@ for a less annoying experience. With \code{.} to express a logical criterion to 
 }
 
 \usage{
-.(x, \ldots)
+.(x, \dots)
 
 }
 

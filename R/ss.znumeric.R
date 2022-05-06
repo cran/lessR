@@ -141,7 +141,7 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     if (i == 1) { # heading labels 
       if (max.ln < 4) max.ln <- max.ln + 2
       if (max.ln < 8) max.ln <- max.ln + 1
-      nbuf <- ifelse (n.lines == 1, 2, 4)
+      nbuf <- ifelse (n.lines == 1, 3, 5)
 
       n.lbl <- .fmtc("n", nchar(as.character(n))+nbuf+max.lv-1)
       miss_lbl <- .fmtc("miss", nchar(as.character(n.miss))+5)

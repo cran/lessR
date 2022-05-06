@@ -455,11 +455,11 @@ proportion to a hypothesized population value.</p>
 consider two values, either “giant” or “dwarf”. From a sample of 925
 plants, the specified value of “giant” occurred 682 times and did not
 occur 243 times. The null hypothesis tested is that the specified value
-occurs for 3/4 of the population according to the <code>p0</code>
+occurs for 3/4 of the population according to the <code>pi</code>
 parameter.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_succ=</span><span class="dv">682</span>, <span class="at">n_fail=</span><span class="dv">243</span>, <span class="at">p0=</span>.<span class="dv">75</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_succ=</span><span class="dv">682</span>, <span class="at">n_fail=</span><span class="dv">243</span>, <span class="at">pi=</span>.<span class="dv">75</span>)</span></code></pre></div>
 <pre><code>## 
-## &gt;&gt;&gt; Exact binomial test of a proportion &lt;&lt;&lt; 
+## &lt;&lt;&lt; Exact binomial test of a proportion 
 ## 
 ## ------ Describe ------
 ## 
@@ -503,14 +503,14 @@ parameter that names the input data frame need not be specified.</p>
 from the default <em>d</em> data frame, define the parameter
 <code>success</code> as the value <em>“BMW”</em>. The default null
 hypothesis is a population value of 0.5, but here explicitly specify
-with the parameter <code>p0</code>.</p>
+with the parameter <code>pi</code>.</p>
 <p>For clarity, the following example includes the parameter names
 listed with their corresponding values. These names are unnecessary in
 this example, however, because the values are listed in the same order
 of their definition of the <code>Prop_test()</code> function.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">variable=</span>Bike, <span class="at">success=</span><span class="st">&quot;BMW&quot;</span>, <span class="at">p0=</span><span class="fl">0.5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">variable=</span>Bike, <span class="at">success=</span><span class="st">&quot;BMW&quot;</span>, <span class="at">pi=</span><span class="fl">0.5</span>)</span></code></pre></div>
 <pre><code>## 
-## &gt;&gt;&gt; Exact binomial test of a proportion &lt;&lt;&lt; 
+## &lt;&lt;&lt; Exact binomial test of a proportion 
 ## 
 ## Variable: Bike 
 ## success: BMW 
@@ -555,10 +555,10 @@ Optionally, name the groups.</p>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">86</span>, <span class="dv">93</span>, <span class="dv">136</span>, <span class="dv">82</span>)</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_succ=</span>smokers, <span class="at">n_tot=</span>patients)</span></code></pre></div>
 <pre><code>## 
-## &gt;&gt;&gt; 4-sample test for equality of proportions without continuity correction  &lt;&lt;&lt; 
+## &lt;&lt;&lt; 4-sample test for equality of proportions without continuity correction  &lt;&lt;&lt; 
 ## 
 ## 
-## &gt;&gt;&gt; Description
+## --- Description
 ## 
 ##               Group1   Group2   Group3   Group4
 ## -----------  -------  -------  -------  -------
@@ -566,7 +566,7 @@ Optionally, name the groups.</p>
 ## n_total           86       93      136       82
 ## proportion     0.965    0.968    0.949    0.854
 ## 
-## &gt;&gt;&gt; Inference
+## --- Inference
 ## 
 ## Chi-square statistic: 12.600 
 ## Degrees of freedom: 3 
@@ -612,13 +612,13 @@ and <code>by</code> are listed in their given order in this example, so
 the parameter names are unnecessary. List the names for clarity.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">variable=</span>sm, <span class="at">success=</span><span class="st">&quot;smoke&quot;</span>, <span class="at">by=</span>grp)</span></code></pre></div>
 <pre><code>## 
-## &gt;&gt;&gt; 4-sample test for equality of proportions without continuity correction  &lt;&lt;&lt; 
+## &lt;&lt;&lt; 4-sample test for equality of proportions without continuity correction  &lt;&lt;&lt; 
 ## 
 ## Variable: sm 
 ## success: smoke 
 ## by: grp 
 ## 
-## &gt;&gt;&gt; Description
+## --- Description
 ## 
 ##                   A       B       C       D
 ## -----------  ------  ------  ------  ------
@@ -626,7 +626,7 @@ the parameter names are unnecessary. List the names for clarity.</p>
 ## n_total          86      93     136      82
 ## proportion    0.965   0.968   0.949   0.854
 ## 
-## &gt;&gt;&gt; Inference
+## --- Inference
 ## 
 ## Chi-square statistic: 12.600 
 ## Degrees of freedom: 3 
@@ -662,10 +662,10 @@ vector to label the output accordingly.</p>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;Lite&quot;</span>, <span class="st">&quot;Med&quot;</span>, <span class="st">&quot;Thick&quot;</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_tot=</span>x)</span></code></pre></div>
 <pre><code>## 
-## &gt;&gt;&gt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
+## &lt;&lt;&lt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
 ## 
 ## 
-## &gt;&gt;&gt; Description
+## --- Description
 ## 
 ##                Lite       Med     Thick
 ## ---------  --------  --------  --------
@@ -674,7 +674,7 @@ vector to label the output accordingly.</p>
 ## residual      1.641     0.018    -1.659
 ## stdn res      2.010     0.022    -2.032
 ## 
-## &gt;&gt;&gt; Inference
+## --- Inference
 ## 
 ## Chi-square statistic: 5.446 
 ## Degrees of freedom: 2 
@@ -690,11 +690,11 @@ categorical <code>variable</code> of interest.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Jackets&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(Jacket)</span></code></pre></div>
 <pre><code>## 
-## &gt;&gt;&gt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
+## &lt;&lt;&lt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
 ## 
 ## Variable: Jacket 
 ## 
-## &gt;&gt;&gt; Description
+## --- Description
 ## 
 ##                Lite       Med     Thick
 ## ---------  --------  --------  --------
@@ -703,7 +703,7 @@ categorical <code>variable</code> of interest.</p>
 ## residual      1.641     0.018    -1.659
 ## stdn res      2.010     0.022    -2.032
 ## 
-## &gt;&gt;&gt; Inference
+## --- Inference
 ## 
 ## Chi-square statistic: 5.446 
 ## Degrees of freedom: 2 
@@ -755,9 +755,9 @@ own path name to your file of joint frequencies, or just delete the name
 leaving only the two quotes to indicate to browse for the file.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_table=</span><span class="st">&quot;FreqTable99&quot;</span>)</span></code></pre></div>
 <pre><code>## 
-## &gt;&gt;&gt; Pearson&#39;s Chi-squared test  &lt;&lt;&lt; 
+## &lt;&lt;&lt; Pearson&#39;s Chi-squared test  &lt;&lt;&lt; 
 ## 
-## &gt;&gt;&gt; Description
+## --- Description
 ## 
 ## Cell Frequencies               
 ##    3  58  6 105
@@ -785,7 +785,7 @@ leaving only the two quotes to indicate to browse for the file.</p>
 ##    4   3       31   35.447   -4.447   -1.057
 ##    4   4      824  786.635   37.365    3.135
 ## 
-## &gt;&gt;&gt; Inference
+## --- Inference
 ## 
 ## Chi-square statistic: 41.732 
 ## Degrees of freedom: 9 
@@ -813,9 +813,9 @@ conclude the variables are related.</p>
 <pre><code>## variable: Jacket 
 ## by: Bike 
 ## 
-## &gt;&gt;&gt; Pearson&#39;s Chi-squared test  &lt;&lt;&lt; 
+## &lt;&lt;&lt; Pearson&#39;s Chi-squared test  &lt;&lt;&lt; 
 ## 
-## &gt;&gt;&gt; Description
+## --- Description
 ## 
 ##        Jacket
 ## Bike    Lite  Med Thick  Sum
@@ -833,7 +833,7 @@ conclude the variables are related.</p>
 ##    2   2      207  202.531    4.469    0.602
 ##    2   3      117  184.173  -67.173   -9.287
 ## 
-## &gt;&gt;&gt; Inference
+## --- Inference
 ## 
 ## Chi-square statistic: 104.083 
 ## Degrees of freedom: 2 

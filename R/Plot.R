@@ -334,13 +334,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   # ---------------
 
-
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
 
   x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars lists
 
-  
   #  get data to be analyzed into data.x data frame
 
   # process row.names if specified
@@ -409,7 +407,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       if (nc > 1) for (i in 2:nc) y.call <- cbind(y.call, x[,i])
     }
     y.call <- data.frame(y.call)
-#   y.call <- data.frame(y.call, stringsAsFactors=TRUE)
     y.col <- ncol(y.call)
     cat.y <- FALSE
     if (nc == 1) {

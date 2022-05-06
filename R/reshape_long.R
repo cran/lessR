@@ -1,5 +1,5 @@
 reshape_long <-
-  function(data, transform, group="Group", response="Value", ID="ID",
+  function(data, transform, group="Group", response="Response", ID="ID",
            prefix=ID, sep="") {
 
   # if a tibble convert to data frame
@@ -40,7 +40,6 @@ reshape_long <-
       dl <- dl[,new.ind]
     }
   }
-
 
   return(dl)
 

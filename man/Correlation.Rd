@@ -20,11 +20,11 @@ Correlation(x, y, data=d,
          show_n=NULL, brief=FALSE,
          digits_d=NULL, heat_map=TRUE,
          main=NULL, bottom=3, right=3,
-         pdf=FALSE, width=5, height=5, \ldots)
+         pdf=FALSE, width=5, height=5, \dots)
 
-cr_brief(\ldots, brief=TRUE) 
+cr_brief(\dots, brief=TRUE) 
 
-cr(\ldots) 
+cr(\dots) 
 }
 
 

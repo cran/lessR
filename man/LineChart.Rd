@@ -35,9 +35,9 @@ LineChart(x, data=d, rows=NULL,
 
          show_runs=FALSE, eval_df=NULL, quiet=getOption("quiet"),
          width=6, height=6, pdf=FALSE,
-         \ldots)
+         \dots)
 
-lc(\ldots)
+lc(\dots)
 }
 
 \arguments{

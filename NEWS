@@ -5,6 +5,44 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 4.1.9 (2022-05-04) <<<<<<
+
+-------------
+Updates 4.1.9
+-------------
+
+ANOVA
+  one-way, scatterplot labels separated more from plot
+
+Histogram
+  summary stats headings adjusted to better align with numerical values
+
+Prop_test
+  parameter p0 changed to pi for consistency with ttest, p0 still works
+
+reshape_long
+  default name of Response changed from "Value" to "Response"
+
+style
+  slightly lighten grayscale bars and points from "gray35" to "gray42"
+    and point fill and color from "gray30" to "gray42"
+
+train_test
+  new function to either create training and testing data from a
+    a data frame with x and y combined or separated
+
+
+
+---------------
+Bug Fixes 4.1.9
+---------------
+
+Plot
+  a --run-donttest test example was improperly configured, now works
+  plotting a vector for x or y with fit now works
+
+
+
 >>>>>> Changes for lessR version 4.1.8 (2022-04-23) <<<<<<
 
 -------------

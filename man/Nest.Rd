@@ -12,9 +12,9 @@ A nested model has a subset of predictor variables from the corresponding full m
 
 \usage{
 Nest(y, nested_model, full_model, method=c("lm", "logit"),
-         data=d, digits_d=NULL, \ldots)
+         data=d, digits_d=NULL, \dots)
 
-nt(\ldots)
+nt(\dots)
 }
 
 \arguments{

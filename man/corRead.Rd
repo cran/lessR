@@ -13,7 +13,7 @@ A wrapper for base~R \code{\link{read.table}}. Read a correlation matrix into R.
 \usage{
 corRead(from=NULL, var_names=NULL, \dots)
 
-rd.cor(\ldots)
+rd.cor(\dots)
 }
 
 \arguments{

@@ -114,7 +114,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       cat(Ynm, ".", sep="", "\n")
       if (n1 > 30) {
         cat("Group " , X1nm, ": ", sep="")
-        cat("Sample mean assumed normal because n>30, so no test needed.", 
+        cat("Sample mean assumed normal because n > 30, so no test needed.", 
             sep="", "\n")
       }
       else {
@@ -131,7 +131,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     }  
     if (n2 > 30) {
       cat("Group " , X2nm, ": ", sep="")
-      cat("Sample mean assumed normal because n>30, so no test needed.",
+      cat("Sample mean assumed normal because n > 30, so no test needed.",
           sep="", "\n")
     }
     else {

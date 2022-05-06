@@ -15,7 +15,7 @@ details(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
          miss_show=30, miss_matrix=FALSE, var_labels=FALSE,
          brief=getOption("brief"))
 
-db(\ldots, brief=TRUE)
+db(\dots, brief=TRUE)
 }
 
 \arguments{
