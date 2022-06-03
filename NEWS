@@ -5,6 +5,49 @@ Update History for Package 'lessR'
 ------------------------------------------------------------------------
 
 
+>>>>>> Changes for lessR version 4.2.0 (2022-06-03) <<<<<<
+
+-------------
+Updates 4.2.0
+-------------
+
+interact
+  each interactive display now shows the underlying function call 
+
+Plot
+  if x is equally spaced, a line chart not default if a fit line
+  parameter  sqrt  deprecated for  quad
+  parameter  root  deprecated for  power
+  fit_color parameter added to set directly, not just with style function
+  when curve fitting with fit parameter, b0 for b1 given for the
+    linearized line from nonlinear functions
+
+Prop_test
+  if the hypothesis test of a proportion is one-sided, the alternative
+    hypothesis is now provided
+
+
+---------------
+Bug Fixes 4.2.0
+---------------
+
+Histogram
+  density=TRUE properly generates console output
+
+Plot
+  for fit parameter, "reciprocal" option removed as better covered
+    with "exp" which also does exponential decay in place of reciprocal
+  if no by variable, fit_color now works for a fit line
+
+Prop_test
+  parameters such as alternative properly passed to R functions
+    binom.test, prop.test, and chisq.test
+
+ttest
+  one-tailed alternatives less and greater options work
+
+
+
 >>>>>> Changes for lessR version 4.1.9 (2022-05-04) <<<<<<
 
 -------------

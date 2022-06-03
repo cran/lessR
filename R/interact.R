@@ -13,9 +13,8 @@ function(app) {
   # if an invalid example is given, throw an error
   if (missing(app) || !nzchar(app) || !app %in% validApps) {
     message(
-      "Run `interact()` with a valid app name.\n",
-      "  ex: interact(\"BarChart1\")\n\n",
-      validAppsMsg, "\n")
+      "Run `interact()` with a valid app name, such as: ",
+      "interact(\"BarChart1\")\n\n", validAppsMsg, "\n")
   }
   else { # find and launch the app
     appDir <- system.file("shiny_examples", app, package="lessR")

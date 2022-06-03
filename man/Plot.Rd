@@ -66,7 +66,9 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          smooth=FALSE, smooth_points=100, smooth_size=1,
          smooth_exp=0.25, smooth_bins=128,
 
-         fit="off", fit_power=1, fit_se=0.95, plot_errors=FALSE, ellipse=0, 
+         fit="off", fit_power=1, fit_se=0.95,
+         fit_color=getOption("fit_color"),
+         plot_errors=FALSE, ellipse=0, 
 
          bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
          breaks="Sturges", cumulate=FALSE,
@@ -341,24 +343,24 @@ vp(\dots)
 
   \item{fit}{The \bold{best fit line}. Default value is \code{"off"}, with
         options \code{"loess"} for non-linear fit, \code{"lm"} linear model 
-        least squares, \code{"null"} for the null model, \code{"exp"} for the
-        exponential model, \code{"root"} for the general root model in conjunction
-        with \code{fit_power},
-        \code{"sqrt"} for the specific root value of 0.5, and
-        \code{"reciprocal"} for the reciprocal model. If
+        least squares, \code{"null"} for the null model, \code{"exp"} for 
+        exponential growth or decay, \code{"power"} for the general
+        power model in conjunction with \code{fit_power}, and
+        \code{"quad"} for an increasing or decreasing function for
+        the specific power value of 2. If
         potential outliers are identified according to \code{out_cut},
         a second (dashed) fit line is displayed calculated \emph{without}
         the outliers. Modify the line color from with the 
         \code{\link{style}} function parameter \code{fit_color}, and the
         line width with \code{fit_lwd}.}
-  \item{fit_power}{Power to apply to response variable before a transformation.
-       Optionally, applies to \code{fit} values \code{"exp"}, \code{"reciprocal"},
-       and is needed for \code{"root"} to specify the value of the root beyond 
-       0.5 for the square root.} 
+  \item{fit_power}{Power that describes response Y as a power function of the
+       predictor variable X, required for \code{"power"} .
+       Optionally, and experimentally, applies to \code{fit} values \code{"exp"}.} 
   \item{fit_se}{Confidence level for the error band displayed around the
        line of best fit. On by default at 0.95 if a fit line is specified, 
        but turned off if \code{plot_errors=TRUE}.
        Can be a vector to display multiple ranges. Set to 0 to turn off.}
+  \item{fit_color}{Color of the fit line.}
   \item{plot_errors}{Plot the line segment that joins each point to the 
         regression line, "loess" or "lm", illustrating the size of the
         residuals.}

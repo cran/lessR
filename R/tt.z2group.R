@@ -196,7 +196,10 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   }
 
   # t-test
-  if (alternative == "two_sided") alt <- "two.sided"
+  if (alternative == "two_sided")
+    alt <- "two.sided"
+  else
+    alt <- alternative
 
   sterr <- sw * sqrt(1/n1 + 1/n2)
   df <- df1 + df2
@@ -206,6 +209,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     tcut <- qt(1-conf_level, df=df, lower.tail=FALSE)
   else if (alternative == "greater")
     tcut <- qt(1-conf_level, df=df, lower.tail=TRUE)
+
   if (from.data) {
     ttest <- t.test(YA, YB, var.equal=TRUE, conf_level=conf_level,
                     alternative=alt)
@@ -236,6 +240,9 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   cat("Standard Error of Mean Difference: SE = ", .fmt(sterr), "\n")
  
   mytitle <- "\nHypothesis Test of 0 Mean Diff:  t-value = "
+  if (alt != "two.sided") 
+    cat("\nAlternative hypothesis: Population mean difference is", alt, 
+        "than 0")
   cat(mytitle, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3),
       sep="", "\n\n")
   cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="",
@@ -322,8 +329,6 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       cat("Minimum Standardized Mean Difference of practical importance: msmd\n")
       cat("Compare msmd = ", .fmt(msmd,digits_d),
           " to the obtained value of smd = ", .fmt(smd),"\n")
-      #if (!is.null(deltaL)) cat("Compare smd to the confidence interval for smd: ", 
-          #.fmt(deltaL), " to ", .fmt(deltaU), "\n")
     }
     else {
       cat("Minimum Standardized Mean Difference of practical importance: msmd\n")
@@ -449,7 +454,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
     .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits_d, brief,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
-              clpct, tvalue, pvalue, ub, lb, x.lab, show_title)
+              clpct, tvalue, pvalue, ub, lb, x.lab, alt, show_title)
 
     cat("\n")
 

@@ -1002,13 +1002,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   if (fit.line != "off") {
 
     # if outliers noted then also do line w/o outliers
-    fit.remove <- ifelse (!is.null(out_ind), TRUE, FALSE)
+    fit.remove <- ifelse (length(out_ind) > 0, TRUE, FALSE)
     do.remove <- FALSE
-    for (i.rem in 1:(as.numeric(fit.remove)+1)) {
+    n.loops <- ifelse (n.clrs > 1, 1, as.numeric(fit.remove)+1) 
+    for (i.remv in 1:n.loops) {
       if (fit.remove) {
         fit_se[1] <- 0  # for line w/o outliers, no se band
         fit_lwd <- 1.5
-        if (i.rem == 2) do.remove <- TRUE  # 2nd pass
+        if (i.remv == 2) do.remove <- TRUE  # 2nd pass
       }
 
       sse <- double(length=n.clrs)
@@ -1017,7 +1018,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       b1 <- double(length=n.clrs)
       Rsq <- double(length=n.clrs)
       by.cat <- character(length=n.clrs)
-      for (i in 1:n.clrs) {
+
+      for (i.clr in 1:n.clrs) {  # note: double looping with i.remv and i
         if (n.clrs == 1) {  # one plot, all the data
           if (!date.ts) {
             x.lv <- x[,1]
@@ -1025,30 +1027,30 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           }
           else {  # date.ts
             x.lv <- as.numeric(x.val)
-            y.lv <- as.numeric(y[,i])
+            y.lv <- as.numeric(y[,i.clr])
           }
           clr <- fit_color
-        }
+        }  # end n.clrs == 1
 
         else {  # multiple, pull out subset
 
           if (!is.null(by)) {  # multiple by plots
-            x.lv <- subset(x, by==levels(by)[i])
-            y.lv <- subset(y, by==levels(by)[i])
+            x.lv <- subset(x, by==levels(by)[i.clr])
+            y.lv <- subset(y, by==levels(by)[i.clr])
           }
 
           if (n_col > 1) {  # multiple variable plots
             if (n.xcol > 1) {
-              x.lv <- x[,i]
+              x.lv <- x[,i.clr]
               y.lv <- y[,1]
             }
             else {
               x.lv <- x[,1]
-              y.lv <- y[,i]
+              y.lv <- y[,i.clr]
             }
           }
 
-          clr <- ifelse (length(color) == 1, color, color[i])
+          clr <- ifelse (length(color) == 1, color, color[i.clr])
         }  # end multiple
 
         ln.type <- "solid"
@@ -1059,124 +1061,22 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           ln.type <- ifelse (ln.type != "dashed", "dashed", "solid")
         }
 
-        b00 <- NULL
-        b11 <- NULL
-        Rsqq <- NULL
-        ok <- is.finite(x.lv) & is.finite(y.lv)
-        if (any(ok)) {
-          x.lv <- x.lv[ok]
-          y.lv <- y.lv[ok]
-          od <- order(x.lv)
-          x.lv <- x.lv[od]
-          y.lv <- y.lv[od]
+        col.ln <- ifelse (n.clrs == 1, fit_color, fill[i.clr]) 
+        pf <- .plt.fit (x.lv, y.lv, fit.line, fit_power, fit_lwd, plot_errors, 
+                  fit_se, se_fill, fit_color, n.clrs, col.ln, i.clr, clr, color, 
+                  ln.type, theme)
 
-          # fit line
-          if (fit.line == "loess")
-            l.ln <- loess(y.lv ~ x.lv)
-          else if (fit.line == "lm")
-            l.ln <- lm(y.lv ~ x.lv)
-          else if (fit.line == "null")
-            l.ln <- lm(y.lv ~ 1)
-          if (fit.line %in% c("loess", "lm", "null"))
-            f.ln <- fitted(l.ln, ...)
-          if (fit.line %in% c("lm", "null")) {
-            b00 <- l.ln$coefficients[1] 
-            b11 <- l.ln$coefficients[2] 
-            Rsqq <- summary(l.ln)$r.squared
-          }
+      if (i.remv == 1) {  # if an outlier removal, only outlier line reported
+        mse[i.clr] <- pf$mse
+        b0[i.clr] <- pf$b0
+        b1[i.clr] <- pf$b1
+        Rsq[i.clr] <- pf$Rsq
+      }
 
-          if (fit.line == "exp") {  # exponential model
-            if (any(y.lv < 0))
-              message("\n>>> Only non-negative values of y used.\n")
-            fi <- which(y.lv < 0)
-            if (length(fi) > 0) {
-              y.lv <- y.lv[-fi]
-              x.lv <- x.lv[-fi]
-            }
-            if (fit_power == 1)
-              l.ln <- lm(log(y.lv) ~ x.lv)
-            else
-              l.ln <- lm(log(y.lv^fit_power) ~ x.lv)
-            f.ln <- exp(l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))
-            ok <- is.finite(f.ln)
-            if (length(ok) > 0) {
-              f.ln <- f.ln[ok]
-              x.lv <- x.lv[ok]
-            }
-          }
+        if (n.by > 0)
+          by.cat[i.clr] <- levels(by)[i.clr]
 
-          if (fit.line %in% c("sqrt", "root")) {  # sqrt model
-            if (fit.line == "sqrt") {
-              l.ln <- lm(sqrt(y.lv) ~ x.lv)
-              fit_power <- 0.5
-            }
-            else
-              l.ln <- lm((y.lv^fit_power) ~ x.lv)
-            pw.bck <- 1 / fit_power 
-            f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))^pw.bck
-          }
-
-          if (fit.line == "reciprocal") {  # reciprocal model
-            if (any(y.lv == 0))
-              message("\n>>> Zero value of y is undefined.\n")
-            fi <- which(y.lv == 0)  # no reciprocal of 0
-            if (length(fi) > 0) {
-              y.lv <- y.lv[-fi]
-              x.lv <- x.lv[-fi]
-            }
-            if (fit_power == 1)
-              l.ln <- lm(1/(y.lv) ~ x.lv)
-            else
-              l.ln <- lm(1/(y.lv^fit_power) ~ x.lv)
-            f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x.lv))
-          }
-
-          # need to compute sse here because anova() only applies to lm 
-          if (!quiet) {
-            e.lv <- y.lv - f.ln
-            sse[i] <- sum(e.lv^2)
-            mse[i] <- sse[i] / (length(e.lv) - 2)
-            b0[i] <- ifelse (is.null(b00), NA, b00) 
-            b1[i] <- ifelse (is.null(b11), NA, b11) 
-            Rsq[i] <- ifelse (is.null(Rsqq), NA, Rsqq) 
-            if (n.by > 0)
-              by.cat[i] <- levels(by)[i]
-          }
-
-          if (fit.line %in% c("exp", "sqrt", "reciprocal", "null"))
-            fit_se[1] <- 0
-
-          # se bands about each fit line
-          if (fit_se[1] != 0) {
-            for (j in 1:length(fit_se)) {
-              p.ln <- predict(l.ln, se=TRUE)
-              prb <- (1 - fit_se[j]) / 2
-              up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
-              dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
-              polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
-                      col=se_fill, border="transparent")
-            }  # end for each se plot
-          }
-
-          # plot fit line(s) on top of se bands
-          if (!("transparent" %in% clr)) {
-            if (n.clrs ==2  &&  (color[1] == color[2]))
-              ln.type <- ifelse (i == 2, "dashed", "solid")
-            lines(x.lv, f.ln, col=clr, lwd=fit_lwd, lty=ln.type)
-          }
-          else
-            lines(x.lv, f.ln, col=fill[i], lwd=fit_lwd, lty=ln.type)
-
-          # plot residuals option
-          if (plot_errors) { 
-            red <- rgb(130,40,35, maxColorValue=255) 
-            pe.clr <- ifelse (theme %in% c("gray", "white"), "gray58", red)
-            segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv, 
-                     col=pe.clr, lwd=1) 
-            }
-        }  # end any(ok)
-
-      }  # ith pattern
+      }  # ith pattern (clr)
     }  # fit.remove
 
     if (!quiet) cat ("\n")

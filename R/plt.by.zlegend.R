@@ -1,5 +1,4 @@
 # plot legend for by variables
-
 .plt.by.legend <-
 function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
          pt.size=1.25, pt.lwd=0.5, legend_size=NULL,

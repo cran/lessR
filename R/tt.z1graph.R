@@ -1,7 +1,7 @@
 .OneGraph <-
 function(YA, bw1, Ynm, digits_d, brief,
          n1, m1, mu, mdiff, sw, smd, mmd, msmd,
-         clpct, tvalue,  pvalue, ub, lb, x.lab, show_title) {
+         clpct, tvalue,  pvalue, ub, lb, x.lab, alt, show_title) {
 
   dYA <- suppressWarnings(density(YA, bw1))
 
@@ -10,9 +10,6 @@ function(YA, bw1, Ynm, digits_d, brief,
     mytitle <- "Density bandwidth for "
     cat(mytitle, .fmt(dYA$bw,digits_d), sep="", "\n")
   }
-
-
-  cat("--------------------------------------------------\n")
 
   # values needed for graph
   min_x <- min(min(dYA$x), mu)  # min x coordinate for graph
@@ -140,7 +137,9 @@ function(YA, bw1, Ynm, digits_d, brief,
                 font=2, col=col.tx)
     mtext(paste("Analyze",Ynm), side=3, line=5.4, font=3, cex=.9,
           col=col.tx)
-    mtext(bquote(paste("  t-test of mu=", .(mu), ":   t = ", .(.fmt(tvalue,3)), 
+    txt <- ifelse (alt == "two.sided", "", " One-tailed")
+    classic <- paste(txt, "Classic t-test of mu: ")
+    mtext(bquote(paste(" ", .(classic), .(mu), ":   t = ", .(.fmt(tvalue,3)), 
       ",  df = ", .(n1-1), ",   p-value = ", .(.fmt(pvalue,3)))), side=3, 
       line=3.7, cex=.9, adj=0, col=col.tx)
     mtext(bquote(paste("  ",.(clpct), " Confidence Interval for Mean:  ",

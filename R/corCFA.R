@@ -590,16 +590,14 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
     tx[length(tx)+1] <- ""
 
     tx[length(tx)+1] <- "--------"
-    tx[length(tx)+1] <- paste(">>> The preceding code fits the model from",
+    tx[length(tx)+1] <- paste("The preceding code fits the model from",
       "data frame:  d")
-    tx[length(tx)+1] <- paste(">>> To access the correlation matrix",
+    tx[length(tx)+1] <- paste("To access the correlation matrix",
       "directly without the data")
-    tx[length(tx)+1] <- paste(">>>   use the following fit statement instead.\n")
-    tx[length(tx)+1] <- paste("fit <- lavaan::cfa(", nm.mimm, 
-     ", sample.cov=mycor$R,", " sample.nobs=nnn, std.lv=TRUE)\n", sep="")
-    tx[length(tx)+1] <- ">>>   mycor: name of correlation matrix"
-    tx[length(tx)+1] <- ">>>   nnn: numeric, number of observations"
-
+    tx[length(tx)+1] <- paste("  replace the parameter  data  with the parameters")
+    tx[length(tx)+1] <- paste("        sample.cov  and  sample.nobs")
+    tx[length(tx)+1] <- paste("  These names refer to the name of the input",
+      "correlation matrix and sample size\n")
     txlvn <- tx
   }
 

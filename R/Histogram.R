@@ -517,12 +517,12 @@ function(x=NULL, data=d, rows=NULL,
             out_suggewt=txsug, out_title=ttlns, out_stats=txdst,
             out_ss=txss, out_outliers=txotl,
             out_file=txkfl,
-            bw=stuff$bw, n=stuff$n, n_miss=stuff$n.miss, W=stuff$W,
-               pvalue=stuff$pvalue)
+            bw=stuff$bw, n=stuff$n, n_miss=stuff$n.miss)
 
           class(output) <- "out_all"
 
-          invisible(output)
+        if (!quiet) print(output)
+        invisible(output)
       }  # end density
 
     }  # end ncol(data) == 1

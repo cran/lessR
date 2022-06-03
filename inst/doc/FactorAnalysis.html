@@ -615,14 +615,12 @@ which can then be displayed as a whole, or piecemeal.</p>
 ## summary(fit, fit.measures=TRUE) 
 ##  
 ## -------- 
-## &gt;&gt;&gt; The preceding code fits the model from data frame:  d 
-## &gt;&gt;&gt; To access the correlation matrix directly without the data 
-## &gt;&gt;&gt;   use the following fit statement instead.
-##  
-## fit &lt;- lavaan::cfa(MeasModel, sample.cov=mycor$R, sample.nobs=nnn, std.lv=TRUE)
-##  
-## &gt;&gt;&gt;   mycor: name of correlation matrix 
-## &gt;&gt;&gt;   nnn: numeric, number of observations</code></pre>
+## The preceding code fits the model from data frame:  d 
+## To access the correlation matrix directly without the data 
+##   replace the parameter  data  with the parameters 
+##         sample.cov  and  sample.nobs 
+##   These names refer to the name of the input correlation matrix and sample size
+## </code></pre>
 <p>Or, view pieces. See the names of all the output components. The
 output includes:</p>
 <ul>

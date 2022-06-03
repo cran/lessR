@@ -30,7 +30,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          smooth=FALSE, smooth_points=100, smooth_size=1,
          smooth_exp=0.25, smooth_bins=128,
 
-         fit="off", fit_power=1, fit_se=0.95, plot_errors=FALSE, ellipse=0, 
+         fit="off", fit_power=1, fit_se=0.95,
+         fit_color=getOption("fit_color"),
+         plot_errors=FALSE, ellipse=0, 
 
          bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
          breaks="Sturges", cumulate=FALSE, 
@@ -57,6 +59,19 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
 
   if (is.null(fun_call)) fun_call <- match.call()
+
+  if (fit == "sqrt") {
+    fit <- "quad"  # new value
+    message("parameter value  sqrt  replaced with  quad  for consistency\n")
+  }
+  if (fit == "reciprocal") {
+    fit <- "exp"  # new value
+    message("parameter value  reciprocal  replaced with  exp\n")
+  }
+  if (fit == "root") {
+    fit <- "power"  # new value
+    message("parameter value  root  replaced with  power  for consistency\n")
+  }
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -135,7 +150,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   ellipse_lwd <- getOption("ellipse_lwd")
 
   if (fit == "ls") fit <- "lm"  # new value
-  fit_color <- getOption("fit_color")
   fit_lwd <- getOption("fit_lwd")
   se_fill <- getOption("se_fill")
 
@@ -206,6 +220,12 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   if (missing(vbs_size)) if (!violin)  # wider box if no violin
     vbs_size <- ifelse (y.miss || by1.miss, vbs_size*3.75, vbs_size*5)
+
+  if (!MD.miss && (!by.miss || !by1.miss)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Outlier analysis works only with no  by  or  by1  groups\n\n")
+  }
+
  
   # "off" substitutes for official value of "transparent"
   fill[which(fill == "off")] <- "transparent"
@@ -249,11 +269,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   if (is.logical(fit))
     fit.ln <- ifelse (fit, "loess", "off")
   if (is.character(fit)) {
-    if (!(fit %in% c("loess", "lm", "off", "ls", "null", "exp", "sqrt",
-                     "root", "reciprocal", "log"))) { 
+    if (!(fit %in% c("loess", "lm", "off", "ls", "null", "exp", "quad",
+                     "power", "log"))) { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "fit only for loess (non-linear), lm (linear), or null (null model),\n",
-        "exp (exponential), log (log), sqrt (sq root), root, or reciprocal\n\n")
+        "exp (exponential), log (log), quad (quadratic), power (any power)\n\n")
     }
     fit.ln <- fit  # fit.ln passed to .plt.main
   }
@@ -806,7 +826,14 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   #--------------
   if (!size.miss) {
     size.name <- deparse(substitute(size))
-    in.df <- ifelse (exists(size.name, where=data), TRUE, FALSE)
+    in.df <- FALSE
+    if (missing(data)) {
+      if (exists("d")) {
+        if (!is.null(data)) {  # set data to NULL to make sure read from workspace 
+          in.df <- ifelse (exists(size.name, where=data), TRUE, FALSE)
+        }
+      }
+    }
 
     if (in.df) {
       size <- eval(substitute(data$size))
@@ -934,8 +961,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   }
 
   # if numeric x is sorted with equal intervals, set as line chart
+  #   unless doing a fit line as only want one line
   # x.call does not exist for BPFM
-  if (!cat.x) if (is.numeric(x.call[,1])  &&  nrows > 2) {
+  if (!cat.x && fit.ln=="off") if (is.numeric(x.call[,1])  &&  nrows > 2) {
     if (object == "default") {
       eq.int <- ifelse (any(is.na(x.call[,1])), FALSE, TRUE)
       if (eq.int) {
@@ -954,7 +982,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   }
 
   # if numeric y is sorted with equal intervals, line chart
-  if (is.numeric(y.call)  &&  nrows > 2) {
+  if (fit.ln == "off") if (is.numeric(y.call)  &&  nrows > 2) {
     if (object == "default") {
       if (sum(is.na(y.call)) > 0)
         eq.int <- FALSE  # missing data in x present

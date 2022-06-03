@@ -284,28 +284,61 @@ function(x, y, values, object, n_cat,
 
         # output mse, triggered by a fit line
         if (!is.null(mse)  &&  n.xcol == 1) {  # mse not reported for all
+          if (fit == "quad") {
+            op1 <- "sqrt()" 
+            op2 <- "square"
+          }
+          if (fit == "power") {
+            op1 <- "the root of the\n   reciprocal of the power" 
+            op2 <- "of the power"
+          }
+          if (fit == "exp") {
+            op1 <- "log()" 
+            op2 <- "exp()"
+          }
+          if (fit == "log") {
+            op1 <- "exp()" 
+            op2 <- "log()"
+          }
+          if (fit %in% c("quad", "power", "exp", "log")) {
+            msg <- paste(" Regression of linearized data by transforming the",
+                        "data values with", op1, "\n")
+            msg <- paste(msg, "Need back transformation", op2, 
+                        "of regression model",
+                        "to compute predicted values\n\n")
+          }
+          else
+            msg <- ""
+
           if (n.by > 0) {
             txt <- character(length=n.by)
+              
             for (i in 1:n.by) {
               by.name <- getOption("byname")
-              txt[i] <- paste(by.name, ": ", by.cat[i], ",  ", sep="") 
+              if (i > 1) msg <- ""
+              txt[i] <- paste(msg, by.name, ": ", by.cat[i], ",  ", sep="") 
               mse.pn <- prettyNum(mse[i], big.mark=",", scientific=FALSE,
                                   format="f", digits=digits_d)
               b0.pn <- .fmt(b0[i], digits_d)
               b1.pn <- .fmt(b1[i], digits_d)
               Rsq.pn <- .fmt(Rsq[i], 3)
               if (!is.na(b1[i])) {  # linear function
-                txt[i] = paste(txt[i], 
-                  "Line: b0 = ", b0.pn, "   b1 = ", b1.pn,
-                  "   Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
-                  "\n", sep="")
+                txt[i] <- paste(txt[i], 
+                  "Line: b0 =", b0.pn, "   b1 =", b1.pn,
+                  "   Fit: MSE =", mse.pn) 
+                  rsqu <- ifelse (is.na(Rsq[i]), "", paste("   Rsq =", Rsq.pn))
+                  txt[i] <- paste(txt[i], rsqu, "\n", sep="")
               }
               else {
-                txt[i] = paste(txt[i], 
+                txt[i] <- paste(txt[i], 
                   " Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
               }
+
+              # kludge, if removing outliers reg line info not correct,remove
+              if (b0[i]==0 && b1[i]==0 && mse[i]==0) txt <- ""
             }  # end for n.by
           }  # end n.by > 0
+
           else {  # no by vars
             if (length(b1) == 1) {  # > 1 if y=c(y1, y2, ...)
               mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
@@ -314,15 +347,19 @@ function(x, y, values, object, n_cat,
               b1.pn <- .fmt(b1[1], digits_d)
               Rsq.pn <- .fmt(Rsq[1], 3)
               if (!is.na(b1)) {  # linear function
-                txt = paste(
-                      "Line: b0 = ", b0.pn, "  b1 = ", b1.pn,
-                      "   Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
-                      "\n", sep="")
+                txt = paste(msg,
+                      "Line: b0 =", b0.pn, "  b1 =", b1.pn,
+                      "   Fit: MSE =", mse.pn) 
+                rsqu <- ifelse (is.na(Rsq[1]), "", paste("   Rsq =", Rsq.pn))
+                txt <- paste(txt, rsqu, "\n", sep="")
+
               }
               else {
                 txt = paste( 
                   "Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
               }
+              # kludge, if removing outliers reg line info not correct,remove
+              if (b0[1]==0 && b1[1]==0 && mse[1]==0) txt <- ""
             } 
             else
               txt <- ""  # currently no reg output if length(b1) > 0

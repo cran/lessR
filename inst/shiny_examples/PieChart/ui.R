@@ -2,7 +2,7 @@ library(shiny)
 
 ui <- fluidPage(  # Define UI for app that draws the bar chart
 
-  titlePanel("Pie Chart"),  # App title
+  titlePanel("PieChart(Dept)"),  # App title
 
   sidebarLayout(  # Sidebar layout with input and output definitions
 

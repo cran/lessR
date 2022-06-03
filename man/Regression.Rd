@@ -115,7 +115,7 @@ reg_brief(\dots, brief=TRUE)
         residuals.}\cr
 
   \item{res_rows}{Default is 20, which lists the first 20 rows of data sorted by the
-       specified sort criterion.  To disable residuals, specify a value of 0.  To see
+       specified sort criterion.  To disable residuals, specify a value of 0.  To view
        the output for all observations, specify a value of \code{"all"}.}
   \item{res_sort}{Default is \code{"cooks"}, for specifying Cook's distance as the
        sort criterion for the display of the rows of data and associated residuals.

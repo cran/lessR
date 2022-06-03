@@ -66,7 +66,7 @@ Enhance the default scatterplot with parameter `enhance`. The visualization incl
 Plot(Years, Salary, enhance=TRUE)
 ```
 
-A variety of fit lines can be plotted. The available values: `"loess"` for general non-linear fit, `"lm"` for linear least squares, `"null"` for the null (flat line) model, `"exp"` for the exponential model, `"sqrt"` for the square root model, `root` for the general root beyond 0.5 for the square root, and `"reciprocal"` for the reciprocal model. Setting `fit` to `TRUE` plots the `"loess"` line. With the value of `root`, specify the value of the root with parameter `fit_power`.
+A variety of fit lines can be plotted. The available values: `"loess"` for general non-linear fit, `"lm"` for linear least squares, `"null"` for the null (flat line) model, `"exp"` for the exponential growth and decay, `"quad"` for the quadratic model, and `power` for the general power beyond 2. Setting `fit` to `TRUE` plots the `"loess"` line. With the value of `power`, specify the value of the root with parameter `fit_power`.
 
 Here, plot the general non-linear fit. For emphasis set `plot_errors` to `TRUE` to plot the residuals from the line. The sum of the squared errors is displayed to facilitate the comparison of different models.
 
@@ -80,7 +80,7 @@ Next, plot the exponential fit and show the residuals from the exponential curve
 Plot(Years, Salary, fit="exp", plot_errors=TRUE)
 ```
 
-Besides the application to the `root` value of `fit`, the parameter `fit_power` also applies to the `exp` and `reciprocal` values, The parameter transforms the _y_ variable to the specified power from the default of `1` before doing the regression analysis. The availability of this parameter provides for a wide range of modifications to the underlying functional form of the fit curve.
+The parameter transforms the _y_ variable to the specified power from the default of `1` before doing the regression analysis. The availability of this parameter provides for a wide range of modifications to the underlying functional form of the fit curve.
 
 ### Three Variables
 

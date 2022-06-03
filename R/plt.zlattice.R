@@ -320,20 +320,26 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               else if (fit == "null")
                 l.ln <- lm(y ~ 1)
               if (fit %in% c("loess", "lm", "null"))
-                f.ln <- fitted(l.ln, ...)
+                f.ln <- fitted(l.ln)
+
+              if (fit %in% c("quad", "power")) {  # quad model
+                if (fit == "quad") {
+                  l.ln <- lm(sqrt(y) ~ x)
+                  fit_power <- 2
+                }
+                else
+                  l.ln <- lm((y^(1/fit_power)) ~ x)
+              b00 <- l.ln$coefficients[1]
+              b11 <- l.ln$coefficients[2]
+              f.ln <- (b00 + (b11*x))^fit_power
+
+              }
 
               if (fit == "exp") {
-                if (any(y < 0))
-                  message("\n>>> Only non-negative values of y used.\n")
-                fi <- which(y < 0)
-                if (length(fi) > 0) {
-                  y <- y[-fi]
-                  x <- x[-fi]
-                }
                 if (fit_power == 1)
                   l.ln <- lm(log(y) ~ x)
                 else
-                  l.ln <- lm(log(y^fit_power) ~ x)
+                  l.ln <- lm(log(y^(1/fit_power)) ~ x)
                 f.ln <- exp(l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
                 ok <- is.finite(f.ln)
                 if (length(ok) > 0) {
@@ -342,40 +348,36 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
                 }
               }  # end fit == "exp"
 
-              if (fit %in% c("sqrt", "root")) {  # sqrt model
-                if (fit == "sqrt") {
-                  l.ln <- lm(sqrt(y) ~ x)
-                  fit_power <- 0.5
+              if (fit == "log") {  # logarithmic model
+                if (fit_power == 1) {
+                  y.exp <- exp(y)
+                  if (any(is.infinite(y.exp))) {
+                    cat("\n"); stop(call.=FALSE, "\n","------\n",
+                      "Some values of y too large for exp(y). Rescale.\n\n")
+                  }
+                  l.ln <- lm(y.exp ~ x)
                 }
                 else
-                  l.ln <- lm((y^fit_power) ~ x)
-                pw.bck <- 1 / fit_power 
-                f.ln <- (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))^pw.bck
-              }
-
-              if (fit == "reciprocal") {  # reciprocal model
-                if (any(y == 0))
-                  message("\n>>> Zero value of y is undefined.\n")
-                fi <- which(y == 0)  # no reciprocal of 0
-                if (length(fi) > 0) {
-                  y <- y[-fi]
-                  x <- x[-fi]
+                  l.ln <- lm(exp(y^(1/fit_power)) ~ x)
+                b00 <- l.ln$coefficients[1]
+                b11 <- l.ln$coefficients[2]
+                f.ln <- log(b00 + (b11*x))
+                if (any(is.nan(f.ln))) {
+                  message("\n>>> Warning: ",
+                    "Some values of log() back transformation not defined.\n\n")
                 }
-              if (fit_power == 1)
-                l.ln <- lm(1/y ~ x)
-              else
-                l.ln <- lm(1/(y^fit_power) ~ x)
-                f.ln <- 1 / (l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
               }
 
               e <- y - f.ln
               sse <- sum(e^2)
-              sse.pn <- prettyNum(sse, big.mark = ",", scientific = FALSE)
+              mse <- sse / (length(e) - 2)
+              mse.pn <- prettyNum(mse, big.mark = ",", scientific = FALSE)
               if (panel.number() == 1) cat("\n")
-              cat("Sum of Squared Errors about Fit Line, SSE, for Panel ",
-                  panel.number(), ": ", sse.pn, sep="", "\n")
+              cat("Regression analysis of linearized data.\n")
+              cat("Mean of Squared Errors about Fit Line, MSE, for Panel ",
+                  panel.number(), ": ", mse.pn, sep="", "\n")
 
-              if (fit %in% c("exp", "sqrt", "reciprocal", "null"))
+              if (fit %in% c("exp", "log", "quad", "null"))
                 fit_se[1] <- 0
               se_fill <- getOption("se_fill")
               nrows <- length(f.ln)

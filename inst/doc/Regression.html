@@ -565,7 +565,7 @@ information needed for a proper regression analysis.</p>
 ##   Years     0.998     1.002 
 ##     Pre     0.998     1.002 
 ## 
-##  Years Pre    adjr2    X&#39;s 
+##  Years Pre    R2adj    X&#39;s 
 ##      1   0    0.718      1 
 ##      1   1    0.710      2 
 ##      0   1   -0.028      1 
@@ -713,12 +713,12 @@ training and testing data sets.</p>
 ## 
 ##        Model from Training Data              Applied to Testing Data 
 ##        ----------------------------------   ---------------------------------- 
-## fold    n        se           MSE    Rsq     n        se           MSE    Rsq 
-##   1 | 24 11786.087 138911840.531  0.705 |  12 12756.847 162737133.219  0.742 
-##   2 | 24 12260.217 150312925.783  0.653 |  12 11722.219 137410415.473  0.804 
-##   3 | 24 10650.561 113434454.570  0.813 |  12 14890.224 221718756.961  0.281 
+## fold    n        se           MSE    Rsq     n        sf           MSE    Rsq 
+##   1 | 24 11023.878 121525880.251  0.773 |  12 14323.438 205160884.497  0.505 
+##   2 | 24 11430.631 130659328.755  0.741 |  12 13159.352 173168538.347  0.686 
+##   3 | 24 12365.857 152914408.981  0.664 |  12 11382.625 129564143.740  0.790 
 ##       ----------------------------------    ---------------------------------- 
-## Mean     11565.622 134219740.295  0.723      13123.096 173955435.218  0.609</code></pre>
+## Mean     11606.788 135033205.996  0.726      12955.138 169297855.528  0.661</code></pre>
 <p>The standard output also includes <span class="math inline">\(R^2_{press}\)</span>, the value of <span class="math inline">\(R^2\)</span> when applied to new, previously
 unseen data, a value comparable to the average <span class="math inline">\(R^2\)</span> on test data.</p>
 </div>
@@ -795,7 +795,7 @@ into an R object.</p>
 ##   Years     0.998     1.002 
 ##     Pre     0.998     1.002 
 ## 
-##  Years Pre    adjr2    X&#39;s 
+##  Years Pre    R2adj    X&#39;s 
 ##      1   0    0.718      1 
 ##      1   1    0.710      2 
 ##      0   1   -0.028      1 
@@ -1154,15 +1154,15 @@ this assumption by plotting each separate slope and scatterplot.</p>
 ## Plot(Salary, Years, color=&quot;red&quot;)  # exterior edge color of points
 ## Plot(Salary, Years, MD_cut=6)  # label Mahalanobis dist &gt; 6 as outliers 
 ## 
-## Dept: ACCT,  Line: b0 = -0.8   b1 = 0.0   Fit: MSE = 12   Rsq = 0.161
+## Dept: ACCT,   Line: b0 = -0.8    b1 = 0.0    Fit: MSE = 12   Rsq = 0.161
 ##  
-## Dept: ADMN,  Line: b0 = -12.3   b1 = 0.0   Fit: MSE = 24   Rsq = 0.752
+## Dept: ADMN,   Line: b0 = -12.3    b1 = 0.0    Fit: MSE = 24   Rsq = 0.752
 ##  
-## Dept: FINC,  Line: b0 = 0.2   b1 = 0.0   Fit: MSE = 2   Rsq = 0.824
+## Dept: FINC,   Line: b0 = 0.2    b1 = 0.0    Fit: MSE = 2   Rsq = 0.824
 ##  
-## Dept: MKTG,  Line: b0 = -14.0   b1 = 0.0   Fit: MSE = 5   Rsq = 0.916
+## Dept: MKTG,   Line: b0 = -14.0    b1 = 0.0    Fit: MSE = 5   Rsq = 0.916
 ##  
-## Dept: SALE,  Line: b0 = -4.6   b1 = 0.0   Fit: MSE = 5   Rsq = 0.813
+## Dept: SALE,   Line: b0 = -4.6    b1 = 0.0    Fit: MSE = 5   Rsq = 0.813
 ## </code></pre>
 <p>Then, if the slopes are not too dissimilar, run the ANCOVA. The
 categorical variable must be interpretable as a categorical variable,

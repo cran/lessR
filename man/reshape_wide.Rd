@@ -54,10 +54,10 @@ d <- Read("Anova_rb")  # already in wide-form
 dl <- reshape_long(d, sup1:sup4)  # convert to long-form
 
 # convert back to wide form 
-reshape_wide(dl, group="Group", response="Value", ID="Person")
+reshape_wide(dl, group="Group", response="Response", ID="Person")
 
 # with the name of the response prefixed to the column names
-reshape_wide(dl, group="Group", response="Value", ID="Person",
+reshape_wide(dl, group="Group", response="Response", ID="Person",
              prefix=TRUE, sep=".")
 }
 

@@ -2,7 +2,7 @@ library(shiny)
 
 ui <- fluidPage(  # Define UI for app that draws a histogram
 
-  titlePanel("Histogram"),  # App title
+  titlePanel("Histogram(Salary)"),  # App title
 
   sidebarLayout(  # Sidebar layout with input and output definitions
 

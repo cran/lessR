@@ -356,9 +356,9 @@ Specified Proportion</a>
 <ul>
 <li>Focus on a single value of a categorical variable, termed a
 “success” when it occurs, for one or more samples of data. Analyze the
-resulting proportion of occurrence for a single sample, or compare
-proportions of successes across distinct data samples for a single
-variable, a <em>homogeneity</em> test.</li>
+resulting proportion of occurrence for a single sample, or for a test of
+<em>homogeneity</em>, compare proportions of successes across distinct
+data samples for a single variable.</li>
 <li>Compare the obtained proportions across the values of one or more
 categorical variables for a single sample. Applied to a single variable,
 the analysis is a <em>goodness-of-fit</em>. Or, evaluate a potential
@@ -512,7 +512,7 @@ of their definition of the <code>Prop_test()</code> function.</p>
 <pre><code>## 
 ## &lt;&lt;&lt; Exact binomial test of a proportion 
 ## 
-## Variable: Bike 
+## variable: Bike 
 ## success: BMW 
 ## 
 ## ------ Describe ------
@@ -555,7 +555,7 @@ Optionally, name the groups.</p>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>patients <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">86</span>, <span class="dv">93</span>, <span class="dv">136</span>, <span class="dv">82</span>)</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_succ=</span>smokers, <span class="at">n_tot=</span>patients)</span></code></pre></div>
 <pre><code>## 
-## &lt;&lt;&lt; 4-sample test for equality of proportions without continuity correction  &lt;&lt;&lt; 
+## &lt;&lt;&lt; 4-sample test for equality of proportions without continuity correction 
 ## 
 ## 
 ## --- Description
@@ -612,9 +612,9 @@ and <code>by</code> are listed in their given order in this example, so
 the parameter names are unnecessary. List the names for clarity.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">variable=</span>sm, <span class="at">success=</span><span class="st">&quot;smoke&quot;</span>, <span class="at">by=</span>grp)</span></code></pre></div>
 <pre><code>## 
-## &lt;&lt;&lt; 4-sample test for equality of proportions without continuity correction  &lt;&lt;&lt; 
+## &lt;&lt;&lt; 4-sample test for equality of proportions without continuity correction 
 ## 
-## Variable: sm 
+## variable: sm 
 ## success: smoke 
 ## by: grp 
 ## 
@@ -662,7 +662,7 @@ vector to label the output accordingly.</p>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;Lite&quot;</span>, <span class="st">&quot;Med&quot;</span>, <span class="st">&quot;Thick&quot;</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_tot=</span>x)</span></code></pre></div>
 <pre><code>## 
-## &lt;&lt;&lt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
+## &lt;&lt;&lt; Chi-squared test for given probabilities 
 ## 
 ## 
 ## --- Description
@@ -690,9 +690,9 @@ categorical <code>variable</code> of interest.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Jackets&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(Jacket)</span></code></pre></div>
 <pre><code>## 
-## &lt;&lt;&lt; Chi-squared test for given probabilities  &lt;&lt;&lt; 
+## &lt;&lt;&lt; Chi-squared test for given probabilities 
 ## 
-## Variable: Jacket 
+## variable: Jacket 
 ## 
 ## --- Description
 ## 
@@ -755,7 +755,7 @@ own path name to your file of joint frequencies, or just delete the name
 leaving only the two quotes to indicate to browse for the file.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Prop_test</span>(<span class="at">n_table=</span><span class="st">&quot;FreqTable99&quot;</span>)</span></code></pre></div>
 <pre><code>## 
-## &lt;&lt;&lt; Pearson&#39;s Chi-squared test  &lt;&lt;&lt; 
+## &lt;&lt;&lt; Pearson&#39;s Chi-squared test 
 ## 
 ## --- Description
 ## 
@@ -813,7 +813,7 @@ conclude the variables are related.</p>
 <pre><code>## variable: Jacket 
 ## by: Bike 
 ## 
-## &lt;&lt;&lt; Pearson&#39;s Chi-squared test  &lt;&lt;&lt; 
+## &lt;&lt;&lt; Pearson&#39;s Chi-squared test 
 ## 
 ## --- Description
 ## 

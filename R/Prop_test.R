@@ -79,12 +79,14 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     }
 
     if (missing(pi)) pi <- 0.5
-    out <- binom.test(n_succ, n_tot, p=pi)
+    out <- binom.test(n_succ, n_tot, p=pi, ...)
+    p.sample <- .fmt(out$estimate, digits_d)
+    alt <- out$alternative
 
     cat("\n")
     cat(paste("<<<", out$method, "of a proportion", "\n\n"))
     if (do_data) {
-      cat("Variable:", nm.var, "\n")
+      cat("variable:", nm.var, "\n")
       cat("success:", success, "\n")
       cat("\n")
     }
@@ -93,13 +95,17 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     cat("Number of successes:", out$statistic, "\n")
     cat("Number of failures:", n_tot - n_succ, "\n")
     cat("Number of trials:", out$parameter, "\n")
-    cat("Sample proportion:", .fmt(out$estimate, digits_d), "\n")
+    cat("Sample proportion:", p.sample, "\n")
     cat("\n")
+
     cat("------ Infer ------\n\n")
+    if (alt != "two.sided") 
+      cat("Alternative hypothesis: Population proportion is", alt, "than",
+          pi, "\n")
     cat("Hypothesis test for null of ", pi, ", p-value: ",
-        .fmt(out$p.value,digits_d), sep="", "\n")
-    cat("95% Confidence interval:", .fmt(out$conf.int[1],digits_d), "to",
-        .fmt(out$conf.int[2],digits_d), "\n")
+        .fmt(out$p.value, digits_d), sep="", "\n")
+    cat("95% Confidence interval:", .fmt(out$conf.int[1], digits_d), "to",
+        .fmt(out$conf.int[2], digits_d), "\n")
 
     return(invisible(out))
   }  # end p1
@@ -143,15 +149,15 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     }
 
     # do the analysis
-    out <- prop.test(tbl, correct=Yates)
+    out <- prop.test(tbl, correct=Yates, ...)
     rn <- rownames(tbl)
     for (i in 1:length(rn))
       names(out$estimate)[i] <- rownames(tbl)[i]
 
     cat("\n")
-    cat(paste("<<<", out$method, " <<<", "\n\n"))
+    cat(paste("<<<", out$method, "\n\n"))
     if (do_data) {
-      cat("Variable:", nm.var, "\n")
+      cat("variable:", nm.var, "\n")
       cat("success:", success, "\n")
       cat("by:", nm.grp, "\n")
     }
@@ -198,7 +204,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     }
 
     # do the analysis
-    out <- chisq.test(tbl)
+    out <- chisq.test(tbl, ...)
 
     obs <- .fmt(out$observed, 0)
     exp <- .fmt(out$expected, digits_d)
@@ -206,9 +212,9 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     std <- .fmt(out$stdres, digits_d)
 
     cat("\n")
-    cat(paste("<<<", out$method, " <<<", "\n\n"))
+    cat(paste("<<<", out$method, "\n\n"))
     if (do_data)
-      cat("Variable:", nm.var, "\n")
+      cat("variable:", nm.var, "\n")
 
     cat("\n")
     cat("--- Description")
@@ -271,7 +277,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     }  # end freq input
 
     # analysis
-    out <- chisq.test(tbl, correct=Yates)   
+    out <- chisq.test(tbl, correct=Yates, ...)   
 
     n.cases <- sum(rowSums(tbl))
     min_rc <- min(nrow(tbl)-1, ncol(tbl)-1)
@@ -279,7 +285,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     txt <- ifelse(out$parameter == 1, " (phi)", "") 
     txt <- paste("Cramer\'s V", txt, ":", sep="")
 
-    out <- chisq.test(tbl, correct=Yates)
+    out <- chisq.test(tbl, correct=Yates, ...)
     obs <- .fmt(out$observed, 0)
     exp <- .fmt(out$expected, digits_d)
     res <- .fmt(out$residuals, digits_d)
@@ -294,7 +300,7 @@ function (variable=NULL, success=NULL, by=NULL, data=d,
     k <- k[order(k[,1]),]  # display by row
 
     cat("\n")
-    cat(paste("<<<", out$method, " <<<", "\n\n"))
+    cat(paste("<<<", out$method, "\n\n"))
 
     cat("--- Description\n\n")
     if (do_data)

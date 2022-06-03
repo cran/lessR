@@ -2,7 +2,7 @@ library(shiny)
 
 ui <- fluidPage(  # Define UI for app that draws the bar chart
 
-  titlePanel("Bar Chart"),  # App title
+  titlePanel("BarChart(Dept, by=Gender)"),  # App title
 
   sidebarLayout(  # Sidebar layout with input and output definitions
 

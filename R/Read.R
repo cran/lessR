@@ -99,7 +99,8 @@ function(from=NULL, format=NULL, var_labels=FALSE,
       else {
         df <- paste(" ", df)
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-            "Need to specify  format  or specify the name of\n",
+            "Not a recognizable data file. Specify the  format parameter\n",
+            "  to identify the file type or specify the name of\n",
             "  a built-in lessR data file without the data prefix.\n\n",
             "Available lessR data files:\n\n", df, "\n\n")
       }

@@ -123,12 +123,14 @@ function(lm.out, dname, n.keep, show_R,
         models <- data.frame(md, lp.out$adjr2, lp.out$size-1)
         names(models) <- c(names(X), "R2adj", "X's")
         mod.srt <- models[order(models$R2adj, decreasing=TRUE),]
+
       }
       else {
         models <- data.frame(md, lp.out$Cp, lp.out$size-1)
         names(models) <- c(names(X), "   Cp", "X's")
         mod.srt <- models[order(models$'   Cp', decreasing=FALSE),]
       }
+      best_sub <- ifelse(best_sub == "adjr2", "R2adj", best_sub)
       names(mod.srt)[ncol(mod.srt)-1L] <- paste("   ", best_sub, sep="")
       lines <- min(max.sublns, nrow(mod.srt))
 
@@ -153,7 +155,6 @@ function(lm.out, dname, n.keep, show_R,
         tx[length(tx)] <- paste(tx[length(tx)], .fmtc(names(mod.srt)[n.pred+i],
                                 w=ww), sep="")
       }
-
       for (i in 1:lines) {
         if (lines > 40) if (i %% 30 == 0) tx[length(tx)+1] <- nms
         tx[length(tx)+1] <- ""

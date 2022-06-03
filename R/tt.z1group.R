@@ -78,7 +78,11 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
   if (!brief) cat("\n\n------ Infer ------\n\n")
 
   # t-test
-  if (alternative == "two_sided") alt <- "two.sided"
+  if (alternative == "two_sided")
+    alt <- "two.sided"
+  else
+    alt <- alternative
+
 
   if (!is.null(mu)) m.dist <- m - mu
   df <- n - 1
@@ -89,6 +93,7 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     tcut <- qt(1-conf_level, df=df, lower.tail=FALSE)
   else if (alternative == "greater")
     tcut <- qt(1-conf_level, df=df, lower.tail=TRUE)
+
   if (from.data) {
     if (!is.null(mu)) mu.null <- mu else mu.null <- 0
     ttest <- t.test(Y, conf.level=conf_level, alternative=alt, mu=mu.null)
@@ -120,6 +125,9 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
   cat("Standard Error of Mean: SE = ", .fmt(sterr), "\n\n")
 
   if (!is.null(mu)) {
+  if (alt != "two.sided") 
+    cat("\nAlternative hypothesis: Population mean difference is", alt, 
+        "than", mu.null, "\n")
     cat("Hypothesized Value H0: mu =", mu, "\n")
     txt <- "Hypothesis Test of Mean:  t-value = "
     cat(txt, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3),
@@ -216,33 +224,33 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
     }
 
 
-  if (!is.null(mu)) {
+    if (!is.null(mu)) {
 
-    if (manage.gr) {
-      i.win  <- i.win + 1 
-      dev.set(which=i.win)
+      if (manage.gr) {
+        i.win  <- i.win + 1 
+        dev.set(which=i.win)
+      }
+
+      plt.i <- plt.i + 1
+      plt.title[plt.i] <- "One-Group Plot"
+
+      if (paired) x.lab <- "Difference"
+
+      if (!is.null(pdf_file)) {
+        if (!grepl(".pdf", pdf_file))
+          pdf_file <- paste(pdf_file, ".pdf", sep="")
+        .opendev(pdf_file, width, height)
+      }
+
+      .OneGraph(Y, bw1, Ynm, digits_d, brief,
+           n, m, mu, mdiff, s, smd, mmd, msmd,
+           clpct, tvalue, pvalue, ub, lb, x.lab, alt, show_title)
+
+      if (!is.null(pdf_file)) {
+        dev.off()
+        .showfile(pdf_file, paste("density plot of", Ynm))
+      }
     }
-
-    plt.i <- plt.i + 1
-    plt.title[plt.i] <- "One-Group Plot"
-
-    if (paired) x.lab <- "Difference"
-
-    if (!is.null(pdf_file)) {
-      if (!grepl(".pdf", pdf_file))
-        pdf_file <- paste(pdf_file, ".pdf", sep="")
-      .opendev(pdf_file, width, height)
-    }
-
-    .OneGraph(Y, bw1, Ynm, digits_d, brief,
-         n, m, mu, mdiff, s, smd, mmd, msmd,
-         clpct, tvalue, pvalue, ub, lb, x.lab, show_title)
-
-    if (!is.null(pdf_file)) {
-      dev.off()
-      .showfile(pdf_file, paste("density plot of", Ynm))
-    }
-  }
 
     return(list(i=plt.i, ttl=plt.title))
   }  # end if graph

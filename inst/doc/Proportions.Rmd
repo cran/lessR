@@ -18,7 +18,7 @@ suppressPackageStartupMessages(library("lessR"))
 
 The analysis of proportions is of two primary types. 
 
-- Focus on a single value of a categorical variable, termed a "success" when it occurs, for one or more samples of data. Analyze the resulting proportion of occurrence for a single sample, or compare proportions of successes across distinct data samples for a single variable, a _homogeneity_ test.
+- Focus on a single value of a categorical variable, termed a "success" when it occurs, for one or more samples of data. Analyze the resulting proportion of occurrence for a single sample, or for a test of _homogeneity_, compare proportions of successes across distinct data samples for a single variable.
 - Compare the obtained proportions across the values of one or more categorical variables for a single sample. Applied to a single variable, the analysis is a _goodness-of-fit_. Or, evaluate a potential relationship between two categorical variables, a test of _independence_.
 
 From standard base R functions, the __lessR__ function `Prop_test()`, abbreviated `prop()`, provides either type of analysis. To use, generally enter either the original data from which to compute the frequencies and then the sample proportions, or enter already computed frequencies. For the analysis of multiple categorical variables across two levels of one of the variables, the test of _homogeneity_ and the test of _independence_ yield the identical statistical result.
