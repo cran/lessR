@@ -177,7 +177,7 @@ getColors("Royal1")
 getColors("Royal1", output=TRUE)
 ```
 
-To maximilly differentiate colors based on hue, use the pre-defined palette "distinct".
+To maximally differentiate colors based on hue, use the pre-defined palette "distinct".
 
 ```{r}
 getColors("distinct")

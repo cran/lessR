@@ -36,7 +36,7 @@ For a third variable, which is continuous, specify \code{size} for a bubble plot
 
 \usage{
 Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
-         stat="data", n_cat=getOption("n_cat"),
+         stat="data", n_cat=getOption("n_cat"), n_bins=1,
 
          by=NULL, by1=NULL, by2=NULL,
          n_row=NULL, n_col=NULL, aspect="fill",
@@ -138,7 +138,14 @@ vp(\dots)
         unique, equally spaced integer values of a variable for which
         the variable will be analyzed as categorical instead of continuous.
         Default is 0. Use to specify that such variables are to be analyzed
-        as categorical, a kind of informal R factor.}\cr
+        as categorical, a kind of informal R factor.}
+  \item{n_bins}{Specify the number of bins to bin a single numeric 
+       \code{x}-variable from which to compute the mean or median for a
+       numeric \code{y}-variable for each bin of \code{x}. Points are plotted
+       with the size dependent on the sample size for the bin, unless \code{size}
+       is specified at a constant value. Default value is 1 for no binning.
+       Available parameters include fill, color, trans, segments, scale_x, and
+       scale_y.}\cr
 
   \item{by}{A categorical variable to provide a scatterplot for
         each level of the numeric primary variables \code{x} and
@@ -342,7 +349,7 @@ vp(\dots)
         estimation.}\cr
 
   \item{fit}{The \bold{best fit line}. Default value is \code{"off"}, with
-        options \code{"loess"} for non-linear fit, \code{"lm"} linear model 
+        options \code{"loess"} for non-linear fit, \code{"lm"} for linear model 
         least squares, \code{"null"} for the null model, \code{"exp"} for 
         exponential growth or decay, \code{"power"} for the general
         power model in conjunction with \code{fit_power}, and
@@ -582,7 +589,7 @@ When two variables are specified to plot, by default if the values of the first 
 Specifying multiple, continuous \code{x}-variables against a single y variable, or vice versa, results in multiple plots on the same graph. The color of the points of the second variable is the same as that of the first variable, but with a transparent fill. For more than two \code{x}-variables, multiple colors are displayed, one for each \code{x}-variable.
 
 BUBBLE PLOT FREQUENCY MATRIX (BPFM)\cr
-Multiple categorical variables for \code{x} may be specified in the absence of a \code{y} variable. A bubble plot results that illustrates the frequency of each response for each of the variables in a common figure in which the \code{x}-axis contains all of the unique labels for all of the variables plotted. Each line of information, the bubbles and counts for a single variable, replaces the standard bar chart in a more compact display. Usually the most meaningful when each variable in the matrix has the same response categories, that is, levels, such as for a set of shared Likert scales. The BPFM is considerably condensed presentation of frequencies for a set of variables than are the corresponding bar charts.
+Multiple categorical variables for \code{x} may be specified in the absence of a \code{y} variable. (A categorical variable is either a \code{factor} variable or an integer variable with \code{n_cat} set at least at the number of unique values.) A bubble plot results that illustrates the frequency of each response for each of the variables in a common figure in which the \code{x}-axis contains all of the unique labels for all of the variables plotted. Each line of information, the bubbles and counts for a single variable, replaces the standard bar chart in a more compact display. Usually the most meaningful when each variable in the matrix has the same response categories, that is, levels, such as for a set of shared Likert scales. The BPFM is considerably condensed presentation of frequencies for a set of variables than are the corresponding bar charts.
 
 SCATTERPLOT MATRIX\cr
 A single vector of continuous variables specified as \code{x}, with no \code{y}-variable, generates a scatterplot matrix of the specified variable. A continuous variable is defined as a numeric variable with more than n_cat unique responses. To force an item with a small number of unique responses, such as from a 5-pt Likert scale, to be treated as continuous, set \code{n_cat} to a number lower than 5, such as \code{n_cat=0} in the function call. 
@@ -977,7 +984,7 @@ Plot(Years, Salary, add=c("Hi", "Bye", "Wow"), x1=c(12, 16, 18),
 Plot(Years, Salary, ellipse=0.95, add=c("v_line", "h_line"),
   x1="mean_x", y1="mean_y")
 # can be done also with the following short-hand
-Plot(Years, Salary, ellipse=0.95, add=c("means"))
+Plot(Years, Salary, ellipse=0.95, add="means")
  
 # a rectangle requires two points, four coordinates, <x1,y1> and <x2,y2>
 style(add_trans=.8, add_fill="gold", add_color="gold4", add_lwd=0.5)
@@ -1011,7 +1018,8 @@ Plot(m06, m07, n_cat=6)
 LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
    "Slightly Agree", "Agree", "Strongly Agree")
 style(fill="powderblue", color="blue", bubble_text="darkred")
-Plot(m06,  m07, value_labels=LikertCats, n_cat=6)
+d <- factors(m01:m20, 0:5, labels=LikertCats)
+Plot(m01:m10)
 style()  # reset theme
 
 \donttest{

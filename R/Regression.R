@@ -407,11 +407,11 @@ function(my_formula, data=d, rows=NULL,
 
     a <- "\n  PREDICTION ERROR"
     if (pred_rows > 0) {
-      a <- paste(a, "\n\nData, Predicted, Standard Error of Forecast,",
-                          "\n95% Prediction Intervals")
+      a <- paste(a, "\n\n-- Data, Predicted, Standard Error of Prediction,",
+                          "95% Prediction Intervals")
       a <- paste(a, "\n   [sorted by lower bound of prediction interval]")
       if (pred_rows < n.keep  &&  !new.data) 
-        a <- paste(a, "\n   [to see all intervals do pred_rows=\"all\"]")
+        a <- paste(a, "\n   [to see all intervals add pred_rows=\"all\"]")
       a <- paste(a, "\n", .dash2(46))
     }
     title_pred <- a

@@ -1,7 +1,5 @@
 .plt.fit <- 
-function(x.lv, y.lv, fit.line, fit_power, fit_lwd, plot_errors, 
-         fit_se, se_fill, fit_color, n.clrs, col.ln, i, clr, color,
-         ln.type, theme) {
+function(x.lv, y.lv, fit.line, fit_power) {
 
   b00 <- NULL
   b11 <- NULL
@@ -106,44 +104,10 @@ function(x.lv, y.lv, fit.line, fit_power, fit_lwd, plot_errors,
     b0 <- ifelse (is.null(b00), NA, b00) 
     b1 <- ifelse (is.null(b11), NA, b11) 
     Rsq <- ifelse (is.null(Rsqq), NA, Rsqq) 
-
-    if (fit.line %in% c("exp", "quad", "log", "null"))
-      fit_se[1] <- 0
-
-    # se bands about each eligible fit line
-    if (fit_se[1] != 0) {
-      for (j in 1:length(fit_se)) {
-        p.ln <- predict(l.ln, se=TRUE)
-        prb <- (1 - fit_se[j]) / 2
-        nrows <- length(y.lv)
-        up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
-        dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
-        polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
-                col=se_fill, border="transparent")
- 
-      }  # end for each se plot
-    }
-
-    # plot fit line(s) on top of se bands
-    if (!("transparent" %in% clr)) {
-      if (n.clrs ==2  &&  (color[1] == color[2]))
-        ln.type <- ifelse (i == 2, "dashed", "solid")
-      lines(x.lv, f.ln, col=clr, lwd=fit_lwd, lty=ln.type)
-    }
-    else {
-      lines(x.lv, f.ln, col=col.ln, lwd=fit_lwd, lty=ln.type)
-    }
-
-    # plot residuals option
-    if (plot_errors) { 
-      red <- rgb(130,40,35, maxColorValue=255) 
-      pe.clr <- ifelse (theme %in% c("gray", "white"), "gray58", red)
-      segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv, 
-               col=pe.clr, lwd=1) 
-    }
   }  # end any(ok)
 
-  return(list(mse=mse, b0=b0, b1=b1, Rsq=Rsq))
+  return(list(x.lv=x.lv, y.lv=y.lv, f.ln=f.ln, l.ln=l.ln,
+              mse=mse, b0=b0, b1=b1, Rsq=Rsq))
 
 }
 

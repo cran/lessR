@@ -195,6 +195,16 @@ Logit(Gender ~ Hand, prob_cut=c(.3, .5, .7))
 ```
 
 
+### Plot Conditional Means across Bins
+
+Categorize Hand size into six bins. Compute the conditional mean of Gender, scored as 0 and 1, at each level of Hand size. Both variables must be numeric. The visualization approximates the form of the sigmoid function from logistic regression. The point (bubble) size depends on the sample size for the corresponding bin.
+
+```{r, fig.width=5, fig.height=4}
+d$Gender <- ifelse (d$Gender == "M", 1, 0)
+Plot(Hand, Gender, n_bins=6)
+```
+
+
 ## Interpreted Output
 
 The parameter `Rmd` creates an R markdown file that is automatically generated and then the corresponding html document from knitting the various output components together with full interpretation. A new, much more complete form of computer output.

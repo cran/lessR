@@ -64,7 +64,7 @@ function(lm.out,
   }
 
   names(out)[n.vars+1] <- "pred"
-  names(out)[n.vars+2] <- "sf"
+  names(out)[n.vars+2] <- "s_pred"
   names(out)[n.vars+3] <- "pi.lwr"
   names(out)[n.vars+4] <- "pi.upr"
   names(out)[n.vars+5] <- "width"

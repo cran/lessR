@@ -54,7 +54,7 @@ dw <- reshape_wide(d, group="Company", response="Price", ID="date")
 head(dw)
 
 ## ---- fig.width=6-----------------------------------------------------------------------------------------------------
-Plot(date, c(HP, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
+Plot(date, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
 
 ## ---- fig.wdith=6-----------------------------------------------------------------------------------------------------
 a1.ts <- ts(dw$Apple, frequency=12, start=c(1980, 12))

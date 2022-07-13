@@ -295,9 +295,9 @@ sep="")
 
   if (explain) tx[length(tx)+1] <- paste("\n",
 "ANOVA is a kind of regression analysis. ",
-"As such, individual data values can be compared to their forecasted ", 
+"As such, individual data values can be compared to their predicted ", 
 "values, which for ANOVA are the corresponding cell means. ",
-"The difference between obtained and forecasted is the residual. ",
+"The difference between obtained and predicted is the residual. ",
 sep="")
 
   if (results) {

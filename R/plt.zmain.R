@@ -48,8 +48,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          add_cex=NULL, add_lwd=1, add_lty="solid",
          add_color=NULL, add_fill=NULL, add_trans=NULL,
 
-         quiet=FALSE, want.labels=TRUE, ...)  {
-
+         quiet=FALSE, want.labels=TRUE, bubble.title=TRUE, ...)  {
+ 
+ 
+  # preliminaries
+  # -------------------------
 
   fill_bg <- getOption("panel_fill")
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
@@ -96,7 +99,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   nm.y <- names(y)
   if (is.factor(y[,1])) {
-    y.lvl <- levels(y[,1])  # gets put into alphabetical order
+    y.lvl <- levels(y[,1])  #  put into alphabetical order
     y <- as.matrix(as.integer(unclass(y[,1])))
   }
   else if (!date.ts) {
@@ -125,6 +128,21 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   else
     cleveland <- FALSE
 
+  # set title for bubble plot if proportions
+  if (object == "bubble"  &&  prop  &&  is.null(main)  &&  cat.y) {
+    main.lab <- paste("Percentage of", y.name, "\nwithin each level of", x.name)
+    main <- "not null"
+  }
+
+  # size is a variable, these values passed to .plt.main
+  # bubble.title=FALSE passed from .plt.bins to suppress title
+  # bubble plot can be directly from object="point"
+  if (length(size) > 1  &&  bubble.title) {
+    sz.nm <- getOption("sizename")
+    main.lab <- bquote(paste(italic(.(sz.nm)), ": Bubble size from ",
+      .(min(size)), " to ", .(max(size)), sep=""))
+  }
+
   # get lab_x_cex  lab_y_cex
   lab_cex <- getOption("lab_cex")
   lab_x_cex <- getOption("lab_x_cex")
@@ -134,6 +152,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   lab_y_cex <- ifelse(is.null(lab_y_cex), lab_cex, lab_y_cex)
   # adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
 
+  # get x.lab and y.lab
   if (date.ts) xx.lab <- xlab
   if (want.labels) {
     gl <- .getlabels(xlab, ylab, main, lab_x_cex=lab_x_cex,
@@ -151,7 +170,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     sub.lab <- sub
     x.name <- NULL
   }
-
+  if (!is.null(x.lab)) if (n.xcol > 1  &&  substr(x.lab, 1, 2) == "c(")
+      x.lab <- NULL  # e.g., get rid of == "c(Female,Male)"
   if (date.ts && is.null(xx.lab)) x.lab <- ""
 
   if (!is.null(x.name)) if (x.name == "Index") {
@@ -198,6 +218,10 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     y.val <- NULL
   }
 
+
+  # set margins
+  # -----------
+
   # get max number of lines in x value labels
   if (!is.null(x.val)) {
     stuff <- .get.val.ln(x.val, x.name)
@@ -212,6 +236,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     mx.y.val.ln <- stuff$mx.val.ln
   }
 
+  # --------- get size of y-axis labels
   axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
     getOption("axis_cex"), getOption("axis_y_cex"))
 
@@ -225,34 +250,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     mn.y <- min(y, na.rm=TRUE)
     mx.y <- max(y, na.rm=TRUE)
     prety <- pretty(c(mn.y, mx.y))
-    prety <- max(pretty(c(min(y, na.rm=TRUE), max(y, na.rm=TRUE))))
-    mx.num <-  ifelse (!prop, as.character(prety), .fmt(prety, 2))
+    ind <- which(nchar(prety) == max(nchar(prety)))[1]  # get largest nchar
+    mx.num <-  ifelse (!prop, as.character(prety[ind]), .fmt(prety, 2))
     max.y.width <- max(strwidth(mx.num, cex=axis_y_cex, units="inches"))
   }
+  # ---------
 
-  # set title for bubble plot if proportions
-  if (object == "bubble"  &&  prop  &&  is.null(main)  &&  cat.y) {
-    main.lab <- paste("Percentage of", y.name, "\nwithin each level of", x.name)
-    main <- "not null"
-  }
-
-  # e.g., get rid of x.lab == "c(Female,Male)"
-  if (!is.null(x.lab)) if (n.xcol > 1  &&  substr(x.lab, 1, 2) == "c(")
-      x.lab <- NULL
-
-  # size is a variable
-  if (length(size) > 1) {
-    sz.nm <- getOption("sizename")
-    main.lab <- bquote(paste(italic(.(sz.nm)), ": Bubble size from ",
-      .(min(size)), " to ", .(max(size)), sep=""))
-  }
-
-
-  # set margins
-  # -----------
-
-  margs <- .marg(max.y.width, y.lab, x.lab, main.lab, sub.lab, rotate_x,
-                mx.x.val.ln, mx.y.val.ln,
+  margs <- .plt.marg(max.y.width, y.lab, x.lab, main.lab, sub.lab,
+                rotate_x, mx.x.val.ln, mx.y.val.ln,
                 lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex)
   mm <- margs$lm  # left margin, lm is linear model
   tm <- margs$tm
@@ -261,7 +266,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   n.lab_x.ln <- margs$n.lab_x.ln
   n.lab_y.ln <- margs$n.lab_y.ln
 
-  # vertical legend room
+  # room in rm for the vertical legend
   if (n.xcol > 1  ||  n.ycol > 1  ||  !is.null(by)) {
     if (n.xcol > 1) nm.v <- nm.x
     if (n.ycol > 1) nm.v <- nm.y
@@ -273,12 +278,10 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
 
   if (center_line != "off") rm <- rm + .4  # room for center_line label
+  rm <- rm + 0.10  # make room when the last axis date > last data value
+  if ((options("device") != "RStudioGD")  &&  !is.null(by)) rm <- rm + .3
 
   if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
-
-  rm <- rm + 0.10  # make room when the last axis date > last data value
-
-  if ((options("device") != "RStudioGD")  &&  !is.null(by)) rm <- rm + .3
 
   # user manual adjustment
   bm <- bm + bm.adj
@@ -380,6 +383,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     }
   }
 
+  # get plot region
   xp <- pretty(c(mn.x, mx.x))
   yp <- pretty(c(mn.y, mx.y))
   xP <- pad_x[2] * (xp[length(xp)] - xp[1])
@@ -387,7 +391,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   xN <- pad_x[1] * (xp[length(xp)] - xp[1])
   yP <- pad_y[2] * (yp[length(yp)] - yp[1])
   yN <- pad_y[1] * (yp[length(yp)] - yp[1])
-
   region <- rbind(region, c(mn.x-xN, mn.y-yN), c(mx.x+xP, mx.y+yP))
 
   # plot: setup the coordinate system
@@ -438,64 +441,35 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       axT2 <- axTicks(2, axp=scale_y)
   }
 
-  # background color
-  rect(usr[1], usr[3], usr[2], usr[4], col=fill_bg, border="transparent")
-
-  # grid lines (put before box color around plot)
-  .grid("v", axT1)
-  if (!bubble1) .grid("h", axT2)
-
-  # box around plot
-  rect(usr[1], usr[3], usr[2], usr[4],
-    col="transparent", border=getOption("panel_color"),
-    lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
-
-  # axes
-  if (xy_ticks) {
-    if (!bubble1) {
-      if (!date.ts) {  # get ticks for both axes
-        .axes(x.val, y.val, axT1, axT2,
-              rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
-      }
-      else {  # date.ts
-        axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
-          getOption("axis_color"), getOption("axis_x_color"))
-        axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
-          getOption("axis_text_color"), getOption("axis_x_text_color"))
-        axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
-            getOption("axis_cex"), getOption("axis_x_cex"))
-        adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
-        my.mgp <- par("mgp")  # save to restore
-        mgp2 <- -0.275 + (0.9 * axis_x_cex)  # adjust label to axis distance
-        par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
-        axis.Date(1, x.val, col=axis_x_color, cex.axis=axis_x_cex,
-                  col.axis=axis_x_text_color, tck=-.02, ...)  # x-axis
-        par(mgp = my.mgp)  # restore back to previous value
-        .axes(NULL, y.val, axT1, axT2,
-              rotate_x=rotate_x, rotate_y=rotate_y,
-              offset=offset, y.only=TRUE, ...)  # y-axis
-      }  # end date.ts
-    }  # end !bubble1
-
-    else  # bubble1: 1-D scatter plot of categorical variable
-      .axes(x.val, NULL, axT1, NULL,
-            rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
-
-  }  # end xy_ticks
-
-  # axis labels
-# if (is.null(max.lbl.y)) {  # could be set earlier when x.val = y.val
-#   if (!is.null(y.lvl)) {
-#     max.lbl.y <- max(nchar(y.lvl))
-#   }
-#   else
-#     max.lbl.y <- max(nchar(axTicks(2)))
-# }
-
-  if (bubble1) {
+  if (bubble1) {  # 1-D scatter plot of categorical variable
+    axT2 <- NULL
+    y.val <- NULL
     y.lab <- ""
-#   max.lbl.y <- 0
   }
+
+  .plt.bck(usr, axT1, axT2, do.h=!bubble1)
+
+  # axes value labels
+  if (xy_ticks) {
+    if (!date.ts) {  # get ticks for both axes
+      .axes(x.val, y.val, axT1, axT2,
+            rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
+    }
+    else {  # date.ts
+      # y-axis
+      .axes(NULL, y.val, axT1, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
+            offset=offset, y.only=TRUE, ...)  # y-axis
+      # x-axis, use base R axis.Date
+      my.mgp <- par("mgp")  # save to restore
+      ax <- .axes_dim()  # get axis value parameters
+      mgp2 <- -0.275 + (0.9 * ax$axis_x_cex)  # adjust label to axis distance
+      par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
+      adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
+      axis.Date(1, x.val, col=ax$axis_x_color, cex.axis=axis_x_cex,
+                col.axis=ax$axis_x_text_color, tck=-.02, ...)  # x-axis
+      par(mgp = my.mgp)  # restore back to previous value
+    }  # end date.ts
+  }  # end xy_ticks
 
   .axlabs(x.lab, y.lab, main.lab, sub.lab,
           x.val, xy_ticks, offset=offset,
@@ -622,6 +596,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           }
           # ----------------------
 
+      # no grouping variable
       if (is.null(by)) {
 
         if (smooth) {  # 2-D kernel density plot
@@ -641,6 +616,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           # plot points
 
           if (n.xcol == 1  &&  n.ycol == 1) {  # one x and one y variable
+            # does a bubble plot if size.pt is a variable
             if (length(out_ind) == 0)  # no outliers
               points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
                        cex=size.pt, ...)
@@ -697,12 +673,13 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
 
           # plot means
+          # ---------
 
           if (means  &&  stat == "data") {
 
           # get colors
-            pch.avg <- ifelse(theme!="gray", 21, 23)
-            bck.g <- ifelse(theme!="gray", rgb(130,90,70,
+            pch.avg <- ifelse (theme!="gray", 21, 23)
+            bck.g <- ifelse (theme!="gray", rgb(130,90,70,
                             maxColorValue=255), "gray40")
             if (grepl(".black", theme, fixed=TRUE))
               bck.g <- "gray85"
@@ -719,7 +696,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
             m.lvl <- numeric(length = 0)
 
-            # plot means for num y, factor x
+            # plot means for num y across levels of factor x
             if (!is.null(x.lvl) && is.null(y.lvl) && !unique.x) {
               for (i in (1:length(x.lvl)))
                 m.lvl[i] <- mean(y[x==i], na.rm=TRUE)
@@ -727,7 +704,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
               points(m.lvl, pch=pch.avg, bg=bck.g, col=bck.g, cex=size.pt*1.5)
             }
 
-            # plot means for num x, factor y
+            # plot means for num x across levels of factor y
             if (is.null(x.lvl) && !is.null(y.lvl) && !unique.y) {
               for (i in (1:length(y.lvl)))
                 m.lvl[i] <- mean(x[y==i], na.rm=TRUE)
@@ -739,7 +716,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
         }  # end not smooth, plot points with no by
         # -----------------------------------------
-
 
         # plot center line
 
@@ -771,6 +747,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           lbl.cat <- "median: "
           m.y <- median(y[,1], na.rm=TRUE)
         }
+
+        if (segments) {  # designed for interaction plot of means
+          for (j in 1:(nrow(x)-1)) {
+            segments(x0=x[j,1], y0=y[j,1],
+                     x1=x[j+1,1], y1=y[j+1,1],
+                     lty="solid", lwd=.75, col=fill[i])
+          }
+        }  # end segments
 
       }  # end is null by
 
@@ -1020,6 +1004,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       by.cat <- character(length=n.clrs)
 
       for (i.clr in 1:n.clrs) {  # note: double looping with i.remv and i
+
         if (n.clrs == 1) {  # one plot, all the data
           if (!date.ts) {
             x.lv <- x[,1]
@@ -1032,7 +1017,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           clr <- fit_color
         }  # end n.clrs == 1
 
-        else {  # multiple, pull out subset
+        else {  # multiple clrs, pull out subset
 
           if (!is.null(by)) {  # multiple by plots
             x.lv <- subset(x, by==levels(by)[i.clr])
@@ -1062,19 +1047,56 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
 
         col.ln <- ifelse (n.clrs == 1, fit_color, fill[i.clr]) 
-        pf <- .plt.fit (x.lv, y.lv, fit.line, fit_power, fit_lwd, plot_errors, 
-                  fit_se, se_fill, fit_color, n.clrs, col.ln, i.clr, clr, color, 
-                  ln.type, theme)
+        pf <- .plt.fit (x.lv, y.lv, fit.line, fit_power)
 
-      if (i.remv == 1) {  # if an outlier removal, only outlier line reported
-        mse[i.clr] <- pf$mse
-        b0[i.clr] <- pf$b0
-        b1[i.clr] <- pf$b1
-        Rsq[i.clr] <- pf$Rsq
-      }
+        x.lv <- pf$x.lv  # x and y get reduced in .plt.fit if NA
+        y.lv <- pf$y.lv
+        f.ln <- pf$f.ln
+        l.ln <- pf$l.ln
+        if (i.remv == 1) {  # if outlier removal, only outlier line reported
+          mse[i.clr] <- pf$mse
+          b0[i.clr] <- pf$b0
+          b1[i.clr] <- pf$b1
+          Rsq[i.clr] <- pf$Rsq
+        }
 
         if (n.by > 0)
           by.cat[i.clr] <- levels(by)[i.clr]
+
+        if (fit.line %in% c("exp", "quad", "log", "null"))
+          fit_se[1] <- 0
+
+        # se bands about each eligible fit line
+        if (fit_se[1] != 0) {
+          for (j in 1:length(fit_se)) {
+            p.ln <- predict(l.ln, se=TRUE)
+            prb <- (1 - fit_se[j]) / 2
+            nrows <- length(y.lv)
+            up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
+            dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
+            polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
+                    col=se_fill, border="transparent")
+     
+          }  # end for each se plot
+        }
+
+        # plot fit line(s) on top of se bands
+        if (!("transparent" %in% clr)) {
+          if (n.clrs ==2  &&  (color[1] == color[2]))
+            ln.type <- ifelse (i == 2, "dashed", "solid")
+          lines(x.lv, f.ln, col=clr, lwd=fit_lwd, lty=ln.type)
+        }
+        else {
+          lines(x.lv, f.ln, col=col.ln, lwd=fit_lwd, lty=ln.type)
+        }
+
+        # plot residuals option
+        if (plot_errors) { 
+          red <- rgb(130,40,35, maxColorValue=255) 
+          pe.clr <- ifelse (theme %in% c("gray", "white"), "gray58", red)
+          segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv, 
+                   col=pe.clr, lwd=1) 
+        }
 
       }  # ith pattern (clr)
     }  # fit.remove

@@ -37,13 +37,6 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       label <- integer(length=nrow(p.int))
       for (irow in 1:nrow(p.int))
         label[irow] <- ifelse (p.int$fit[irow] < p.cut, 0, 1)
-
-      if (all(label == 0)  ||  all(label == 1)) { 
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "For threshold ", p.cut, ", all labeled values are ",
-          label[1], "\n\n")
-      }
-
       out <- cbind(lm.out$model[c(nm[seq(2,n.vars)], nm[1])], label, 
                    p.int$fit, p.int$se.fit)
     }  # end !new.data
@@ -159,7 +152,7 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
     
-    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
+    margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
     lm <- margs$lm + 0.2
     tm <- margs$tm
     rm <- margs$rm
@@ -167,10 +160,7 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
 
     nc <- nchar(levels(lm.out$model[,nm[1]]))
 
-    if (max(nc)==1)
-      buf <- 0.06*nc
-    else
-      buf <- 0.10*nc
+    buf <- ifelse (max(nc)==1, 0.06*nc, 0.10*nc)
     rm <- rm + max(buf) + .3
     rm <- rm - .05*max(nc)
     if (max(nc) > 10) buf <- buf + 0.1
@@ -185,40 +175,20 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
          ylim=c(-.10,1.10), ...)
     usr <- par("usr")
 
-    # background color
-    fill_bg <- getOption("panel_fill")
-    rect(usr[1], usr[3], usr[2], usr[4], col=fill_bg, border="transparent")
-
-    # grid lines
     min.x <- min(x.values, na.rm=TRUE)
     max.x <- max(x.values, na.rm=TRUE)
-    axT1 <- pretty(c(min.x, max.x))
-    axT2 <- seq(0,1,.2)
-    .grid("v", axT1)
-    .grid("h", axT2)
-
-    # box around plot
-    rect(usr[1], usr[3], usr[2], usr[4],
-      col="transparent", border=getOption("panel_color"),
-      lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
+    .plt.bck(usr, pretty(c(min.x, max.x)), seq(0,1,.2))
 
     .axes(NULL, NULL, axTicks(1), axTicks(2))
 
     # right axis, two values of response variable
     ax <- .axes_dim()
-    axis_y_color <- ax$axis_y_color
-    axis_y_lwd <- ax$axis_y_lwd
-    axis_y_lty <- ax$axis_y_lty
-    axis_y_cex <- ax$axis_y_cex
-    axis_y_text_color <- ax$axis_y_text_color
     axis(4, at=c(0,1), labels=FALSE,
-        col=axis_y_color, lwd=axis_y_lwd, lty=axis_y_lty) 
+        col=ax$axis_y_color, lwd=ax$axis_y_lwd, lty=ax$axis_y_lty) 
     text(x=usr[2]+.45+buf/1.15, y=c(0,1), labels=levels(lm.out$model[,nm[1]]),
-         pos=4, xpd=TRUE, cex=axis_y_cex, col=axis_y_text_color)
+         pos=4, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color)
 
-    main.lab <- NULL
-    sub.lab <- NULL
-    .axlabs(nm[2], y.label, labels=FALSE, main.lab, sub.lab, 
+    .axlabs(nm[2], y.label, labels=FALSE, main.lab=NULL, sub.lab=NULL, 
             cex.lab=getOption("lab_cex"), cex.main=1.0, ...) 
 
     fill <- getOption("pt_fill")

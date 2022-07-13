@@ -1,9 +1,9 @@
 .plt.txt <- 
-function(x, y, values, object, n_cat,
-       cat.x, num.cat.x, cat.y, num.cat.y,
-       xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat, smooth, box_adj,
-       run, center_line, show_runs, prop, size, radius, digits_d, 
+function(x, y, values, object, cat.x,  cat.y,
+       xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat, 
+       center_line, run, show_runs, prop, size, radius, digits_d, 
        fun_call=NULL, txdif=NULL) {
+
 
   date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
   if (date.ts) center_line <- "off"
@@ -316,7 +316,7 @@ function(x, y, values, object, n_cat,
             for (i in 1:n.by) {
               by.name <- getOption("byname")
               if (i > 1) msg <- ""
-              txt[i] <- paste(msg, by.name, ": ", by.cat[i], ",  ", sep="") 
+              txt[i] <- paste(msg, by.name, ": ", by.cat[i], "  ", sep="") 
               mse.pn <- prettyNum(mse[i], big.mark=",", scientific=FALSE,
                                   format="f", digits=digits_d)
               b0.pn <- .fmt(b0[i], digits_d)

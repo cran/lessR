@@ -17,8 +17,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         legend_labels=NULL, legend_horiz=FALSE,
         legend_size=NULL, legend_abbrev=NULL, legend_adj=0,
 
-        value_labels=NULL,
-        rotate_x=getOption("rotate_x"),
+        value_labels=NULL, rotate_x=getOption("rotate_x"),
         offset=getOption("offset"),
         break_x=NULL, sort=c("0", "-", "+"),
 
@@ -79,7 +78,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
   
   if (horiz) {
     if (sort == "+") sort <- "-" 
-    else if (sort == "-") sort <- "+" 
+    if (sort == "-") sort <- "+" 
   }
 
   proportion <- FALSE
@@ -282,7 +281,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       if (nchar(x.call[1]) > 5) x.call <- trimws(x.call, which="left")
   }  # !missing x
 
-
   # x is a single var, not a data frame or a var list
   if (!is.null(x.call)) {
 
@@ -474,9 +472,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         if (!(stat %in% c("count", "proportion"))) {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
             "To compute a summary table, must first provide\n",
-            "  a numerical y variable from which to calculate\n",
-            "  a statistic such as the mean. List this variable second\n",
-            "  or prefix its name with  y=  .\n\n")
+            "  a numerical y variable from which to calculate a\n",
+            "  statistic such as the mean. List this variable\n",
+            "  second or prefix its name with  y=  .\n\n")
         }
      }
    }
@@ -489,15 +487,15 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       if (!is.null(stat)) { # y and a summary table, then no stat
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "The data are a summary table, so do not specify a value of  stat\n",
-          "  as the data transformation has already been done\n\n")
+          "  as the data transformation has already been done.\n\n")
       }      
 
      if (sum(is.na(x.call)) > 0 ||
           sum(is.na(by.call)) > 0 ||
           sum(is.na(y.call)) > 0)   {
+          ok <- is.finite(x.call) & is.finite(by.call) & is.finite(y.call)
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "When reading a summary table, missing data not allowed.\n",
-          "First do  d <- na.omit(d)  on the data frame, here named d.\n\n")
+          "When reading a summary table, missing data not allowed.\n\n")
       }
     }  # end summary table
 

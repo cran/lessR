@@ -136,8 +136,8 @@ function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
     txt <- maybe.ID
     cat(
 "For the column ", txt, ", each row of data is unique. Are these values\n",
-"a unique ID for each row? To implement, perhaps re-read a worksheet or text\n",
-"file with the following setting added to your Read statement: row_names=", 
+"a unique ID for each row? To define as a row name, re-read the data file\n",
+"with the following setting added to your Read() statement: row_names=", 
         toString(colm.ID), sep="")
   }
 

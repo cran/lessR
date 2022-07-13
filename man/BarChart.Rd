@@ -644,9 +644,10 @@ BarChart(Dept, Salary)
 # when reading y values directly, must be a summary table,
 #   one row of data for each combination of levels with
 #   a numerical value of y
-# use lessR pivot function to get summary table
+# use lessR pivot function to get summary table, cannot process missing data
+#   so set na_show_group to FALSE
 d <- Read("Employee")
-a <- pivot(d, mean, Salary, c(Dept,Gender))
+a <- pivot(d, mean, Salary, c(Dept,Gender), na_group_show=FALSE)
 BarChart(Dept, Salary_mean, by=Gender, data=a)
 # do so just with BarChart, display bars in grayscale
 # How does average salary vary by gender across the various departments?

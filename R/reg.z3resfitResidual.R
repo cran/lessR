@@ -44,7 +44,7 @@ function(lm.out, cook, cooks_cut,
   # get left margin to adapt to size of axis numbers
   ctitle <- ""
   max.width <- strwidth(as.character(max(pretty(res_ord))), units="inches")
-  margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=ctitle, sub=NULL)
+  margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=nm[2], main=ctitle, sub=NULL)
   lm <- margs$lm
   par(bg=getOption("window_fill"))
 

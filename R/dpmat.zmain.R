@@ -104,7 +104,7 @@ function(x, l, sort_yx,
     max.width <- strwidth(y.lvl[which.max(nchar(y.lvl))], units="inches")
   
     # here keep same bm if 1 or 2 line x labels
-    margs <- .marg(max.width, y.lab, x.lab, main, rotate_x) 
+    margs <- .plt.marg(max.width, y.lab, x.lab, main, rotate_x) 
     bm <- margs$bm
     lm <- margs$lm
     tm <- margs$tm
@@ -127,43 +127,21 @@ function(x, l, sort_yx,
          xlim=c(.5, n.resp+.5), ylim=c(.5, n.var+.5))
 
     # axis, axis ticks, value labels
-# NEED a bottom margin adjust for two lines of values
-# otherwise margin_adj=c(0,0,.2,0)
+    # NEED a bottom margin adjust for two lines of values
+    # otherwise margin_adj=c(0,0,.2,0)
     if (is.null(value_labels))
       x.lvl <- colnames(mytbl)
     else
       x.lvl <- value_labels
       x.lvl <- gsub(" ", "\n", x.lvl) 
 
-#   .axes(x.lvl, y.lvl, axTicks(1), 1:n.var,  # axTicks(1) not work if binary
+    .plt.bck(par("usr"), axTicks(1), 1:n.var)
+
     .axes(x.lvl, y.lvl, 1:length(x.lvl), 1:n.var,
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
 
-    # axis labels 
-#   if (!is.null(y.lvl))
-#     max.lbl <- max(nchar(y.lvl))
-#   else
-#     max.lbl <- max(nchar(axTicks(2)))
-#     y.lab <- ""
-#     max.lbl <- 0
-
     .axlabs(x.lab, y.lab, main.lab, sub.lab,
             xy_ticks=TRUE, offset=offset, ...) 
-
-    usr <- par("usr")
-
-    # color plotting area
-    rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
-
-    # grid lines
-    .grid("v", axTicks(1))
-    .grid("h", 1:n.var)
-    #abline(v=axTicks(1), col=grid_x_color, lwd=grid_x_lwd, lty=grid_x_lty)
-    #abline(h=1:n.var, col=grid_y_color, lwd=grid_x_lwd, lty=grid_y_lty)
- 
-    # box around plot
-    rect(usr[1], usr[3], usr[2], usr[4], col="transparent", border=col.box,
-      lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
 
     # colors
     if (is.null(col.low) || is.null(col.hi))

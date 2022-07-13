@@ -104,7 +104,7 @@ function(y, type,
   # set margins
   max.width <- strwidth(as.character(max(pretty(y))), units="inches")
   
-  margs <- .marg(max.width, y.lab, x.lab, main,
+  margs <- .plt.marg(max.width, y.lab, x.lab, main,
                  rotate_x=getOption("rotate_x"),
                  lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex)
   lm <- margs$lm

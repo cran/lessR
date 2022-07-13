@@ -463,7 +463,7 @@ function(x, y, by, stack100,
   # ----------------
   # set up plot area
 
-  margs <- .marg(max.y.width, y.lab, x.lab, main.lab, sub.lab,
+  margs <- .plt.marg(max.y.width, y.lab, x.lab, main.lab, sub.lab,
                 rotate_x, mx.x.val.ln, mx.y.val.ln,
                 lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, max.x.width)
   lm <- margs$lm
@@ -569,19 +569,8 @@ function(x, y, by, stack100,
   ## ----
   ## PLOT
 
-  usr <- par("usr")
-  col.bg <- getOption("panel_fill")
-
-  # panel fill
-  rect(usr[1], usr[3], usr[2], usr[4], col=col.bg, border="transparent")
-
-  # grid lines for y-axis only
-  .grid(ifelse(horiz, "v", "h"), y.coords)
-
-  # box around plot
-  rect(usr[1], usr[3], usr[2], usr[4], col="transparent",
-       border=getOption("panel_color"),
-       lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
+   usr <- par("usr")  # used elsewhere as well
+  .plt.bck(usr, y.coords, y.coords, do.v=horiz, do.h=!horiz)
 
   # the bars
   if (new_scale == 0)
@@ -837,6 +826,7 @@ function(x, y, by, stack100,
 
   if ( (!is.null(by) || is.matrix(x)) && !is.null(legend_position)) {
 
+    col.bg <- getOption("panel_fill")
     col.txt <- ifelse (sum(col2rgb(col.bg))/3 > 80, "black", rgb(.97,.97,.97))
 
     # evaluate in bc.main, under color, when n.levels is known
@@ -854,8 +844,8 @@ function(x, y, by, stack100,
       trans_pts <- .6  # dummy value
       point.size <- 2.5 * axis_x_cex
       .plt.by.legend(legend_labels, color, fill, shp=22, trans_pts,
-                     col.bg, usr, pt.size=point.size, pt.lwd=0, legend_size,
-                     legend_abbrev, legend_adj)
+                     col.bg, usr, pt.size=point.size, pt.lwd=0,
+                     legend_size, legend_abbrev, legend_adj)
 
     }  # end right margin
 

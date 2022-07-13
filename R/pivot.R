@@ -1,9 +1,9 @@
 pivot <-
 function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
-         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, na_show_group=TRUE,
+         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, na_group_show=TRUE,
          out_names=NULL, sort=NULL, sort_var=NULL,  
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
-         factors=TRUE, q_num=4, digits_d=3, quiet=getOption("quiet")) {
+         factors=TRUE, q_num=4, digits_d=NULL, quiet=getOption("quiet")) {
 
   table_prop <- match.arg(table_prop)
   out.nm.miss <- missing(out_names)
@@ -162,7 +162,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     ind.by <- c(ind.r.by, ind.c.by)
 
     # convert by variables to factors
-    exc <- ifelse (na_show_group, "", NA)
+    exc <- ifelse (na_group_show, "", NA)
     if (n.by > 1) {
       data[, ind.by] <- lapply(data[, ind.by], factor, exclude=exc)
       by.vars <- as.list(data[, ind.by])
@@ -229,11 +229,12 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
   # if table over all the data, then a single freq dist
   if (missing(by) && nm.cmpt[1] == "table") {
-    exc <- ifelse (na_show_group, "ifany", "no")
+    exc <- ifelse (na_group_show, "ifany", "no")
     tbl <- table(data[,ind.var.d], useNA=exc)
     a <- data.frame(tbl)
     names(a)[1] <- nm.var.d[1]
-    a$Prop <- round(a$Freq / sum(tbl), digits_d)
+    prp <- a$Freq / sum(tbl)
+    a$Prop <- .decdig(prp, digits_d)
     return(a) 
   }
 
@@ -328,7 +329,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     }
        
     # round, leaves true integers (1.00) displayed as an integer (1)
-    if (!is.null(digits_d)) a <- round(a, digits_d)
+    for (i.col in 1:ncol(a))
+      a[,i.col] <- .decdig(a[,i.col], digits_d)
 
     # sort
     if (!is.null(sort)) {
@@ -471,7 +473,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       names(a)[ind.var] <- out_names
   }  # end n.cmp>0
 
-
   # table computation
   if (tflag) {
 
@@ -566,16 +567,21 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   # ----- post-computation processing -----
   # ---------------------------------------
 
-  # missing by variables data: set n to 0 or remove if specified
-  n_.ind <- which(grepl("_n", names(a), fixed=TRUE))
-  nm.n_.var <- names(a)[n_.ind]
-  nm.na_.var <- names(a)[n_.ind+1] 
+  # missing by variables data: set NA for _n, _na to 0 or remove if specified
+  n_ind <- which(grepl("_n$", names(a)))
+  na_ind <- which(grepl("_na$", names(a)))
   ind0 <- logical(nrow(a))  # initializes to FALSE
   for (i in 1:nrow(a)) {
-    for (j in 1:length(nm.n_.var)) {
-      if (is.na(a[i,nm.na_.var[j]])) a[i,nm.na_.var[j]] <- 0
-      if (is.na(a[i,nm.n_.var[j]])) {
-        a[i,nm.n_.var[j]] <- 0
+    for (j in 1:length(n_ind)) {
+      if (is.na(a[i,n_ind[j]])) {
+        a[i,n_ind[j]] <- 0
+      }
+    }
+  }  # end 1:nrow(a)
+  for (i in 1:nrow(a)) {
+    for (j in 1:length(na_ind)) {
+      if (is.na(a[i,na_ind[j]])) {
+        a[i,na_ind[j]] <- 0
         ind0[i] <- TRUE
       }
     }
@@ -584,15 +590,15 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
   # drop n_ and na_ columns if specified
   if (!show_n) {
-    not.n <- which(c(grepl("_n", names(a), fixed=TRUE)))
-    not.n <- c(not.n, which(c(grepl("_na", names(a), fixed=TRUE))))
+    not.n <- c(n_ind, na_ind)
     a <- a[,-not.n]
   }
 
-  # round if specified
+  # get decimal digits to display column by column
   ind.var <- (n.by+1):ncol(a)
   i.v <- which(names(a) %in% names(a)[ind.var])
-  if (!is.null(digits_d)) a[,i.v] <- round(a[,i.v], digits_d)
+  for (i.col in i.v[1]:i.v[length(i.v)])
+    a[,i.col] <- .decdig(a[,i.col], digits_d)
 
   # sort if specified
   if (!is.null(sort)) {
@@ -607,7 +613,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       s.col <- ncol(a)  # s.col is the number of the sort column
     a <- a[order(a[[s.col]], decreasing=direction), ]
   }
-
 
 
   # --- option to reshape long form a to wide form ---
@@ -695,7 +700,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     # convert reshaped w to kable k, vector of lines of characters
     # remove all by names from w, get " -" locations from kable
     for (i in (n.r.by+1):length(names(w))) names(w)[i] <- " "
-    k <- kable(w, format="pandoc", digits=2, caption=" ", align="r")
+    k <- knitr::kable(w, format="pandoc", digits=2, caption=" ", align="r")
     # get starting positions of columns for labels from k --- line
     g <- gregexpr(" -", k[4], fixed=TRUE)
     g <- unlist(g)
@@ -747,7 +752,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
     # caption, with added blank line
     cpt <- paste(nm.cmpt[1], "of", names(data)[ind.var.d], "\n")
-    w <- kable(w, format="pandoc", digits=2, caption=cpt, align="r")
+    w <- knitr::kable(w, format="pandoc", digits=2, caption=cpt, align="r")
     # wc <- character(length=length(w))
     # for (i in 1:length(w)) wc[i] <- w[i]
 

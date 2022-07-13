@@ -69,3 +69,7 @@ Logit(Gender ~ Hand)
 ## ---- fig.width=5, fig.height=4---------------------------------------------------------------------------------------
 Logit(Gender ~ Hand, prob_cut=c(.3, .5, .7))
 
+## ---- fig.width=5, fig.height=4---------------------------------------------------------------------------------------
+d$Gender <- ifelse (d$Gender == "M", 1, 0)
+Plot(Hand, Gender, n_bins=6)
+

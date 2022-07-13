@@ -22,7 +22,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   x.name <- gl$yn; x.lbl <- gl$yl; x.lab <- gl$yb
 
 
-  cat("Compare", Ynm, "across", Xnm, "levels", X1nm, "and", X2nm, "\n")
+  cat("Compare", Ynm, "across", Xnm, "with levels", X1nm, "and", X2nm, "\n")
 # cat("--------------------------------------------------------------\n\n")
 
   # get variable labels if exist
@@ -169,7 +169,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   p.var <- 2 * min(p.var, 1-p.var)
 
   cat("Null hypothesis is equal variances of ")
-  cat(Ynm, ", i.e., homogeneous.", sep="", "\n")
+  cat(Ynm, ", homogeneous.", sep="", "\n")
 
   cat("Variance Ratio test:  F = ", vr, " = ", .fmt(vratio),
       ",  df = ", df.num, ";", 

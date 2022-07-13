@@ -20,6 +20,12 @@ function(x, data=d, rows=NULL,
          width=6, height=6, pdf=FALSE, ...) {
 
 
+  message(">>> Deprecated<<<\n\n",
+      "Instead use the  Plot()  function to plot line charts.\n",
+      "For explanation see the vignettes.\n",
+      "Enter: browseVignettes(\"lessR\")\n\n",
+      "See vignette: Visualize: Time Data.\n\n")
+
   # a dot in a parameter name to an underscore
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {

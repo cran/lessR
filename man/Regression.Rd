@@ -221,7 +221,7 @@ To access the same data file for the regression analysis from running \code{Regr
 
 The output from \code{Rmd} is conceptually partitioned into five parts:  results, explanations of the results, interpretations of the results, documentation o the code, and the code itself. By default all available output is generated but the flags \code{results}, \code{explain}, \code{interpret}, \code{document}, \code{code} can be set to \code{FALSE} to reduce the output. The options can be specified in a specific function all or set globally, such as with \code{options(explain=FALSE)}. Turning off all five flags leaves just the outline of the potential output and a bare minimum of results.
 
-Both any existing variable labels and variable units are included in the output to the R~Markdown file. Any variable units set as a dollar, are set as USD dollars and cents in the output, displayed with a \$.
+Both any existing variable labels and variable units are included in the output to the R~Markdown file. Any variable units set as a dollar, are set as USD dollars and cents in the output, displayed with a dollar sign.
 
 The default analysis provides as text output to the console the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, correlation matrix of the model's variables, analysis of residuals and influence as well as the confidence and prediction intervals for each observation in the model. Also provided, for multiple regression models, collinearity analysis of the predictor variables and adjusted R-squared for the corresponding models defined by each possible subset of the predictor variables.
 
@@ -265,7 +265,7 @@ If variable labels exist, then the corresponding variable label is by default li
 }
 
 \value{
-The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The motivation of these two types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a \$, can be inserted into the \code{knitr} document (see \code{examples}).
+The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3 into (a) pieces of text that form the readable output and (b) a variety of statistics. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent \code{knitr} document. The motivation of these two types of output is to facilitate \code{knitr} documents, as the name of each piece, preceded by the name of the saved object followed by a dollar sign, can be inserted into the \code{knitr} document (see \code{examples}).
 
 TEXT OUTPUT\cr
 \code{out_background}: variables in the model, rows of data and retained\cr

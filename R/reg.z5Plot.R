@@ -109,7 +109,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
 
-    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
+    margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm
@@ -127,10 +127,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     par(mai=c(bm, lm, tm, rm))
 
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
-
     usr <- par("usr")
-    rect(usr[1], usr[3], usr[2], usr[4],
-      col=getOption("panel_fill"), border=getOption("panel_color"))
 
     if (is.factor(x.values)) {
       x.lvl <- levels(x.values)
@@ -140,10 +137,8 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
       x.lvl <- NULL
       axT1 <- axTicks(1)  # else numeric, so all the ticks
     }
-    axT2 <- axTicks(2)  # else numeric, so all the ticks
 
-    .grid("v", axT1)
-    .grid("h", axT2)
+    .plt.bck(usr, axT1, axTicks(2))
       
     .axes(x.lvl, NULL, axT1, axTicks(2))
 

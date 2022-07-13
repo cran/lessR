@@ -218,7 +218,7 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
 
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
-    margs <- .marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
+    margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
     lm <- margs$lm + 0.075
     tm <- margs$tm
     rm <- margs$rm
@@ -231,29 +231,17 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
 
     # scatter plot
     plot(x.values, y.values, type="n", axes=FALSE, ann=FALSE)
-
-    usr <- par("usr")
-    col.bg <- getOption("panel_fill")
-    rect(usr[1], usr[3], usr[2], usr[4],
-         col=getOption("panel_fill"), border=getOption("panel_color"))
-
     axT1 <- 1:length(unique(x.values))
+    .plt.bck(par("usr"), axT1, axTicks(2))
     .axes(levels(x.values), NULL, axT1, axTicks(2))
-    .grid("v", axT1)
-    .grid("h", axTicks(2))
-
     main.lab <- plt.title[plt.i]  # not used
-    x.label <- nm[2]
-    y.label <- nm[1]
-    .axlabs(x.label, y.label, main.lab=NULL, sub.lab=NULL,
+    .axlabs(nm[2], nm[1], main.lab=NULL, sub.lab=NULL,
             xlab_adj=0.4, ylab_adj=.05) 
-
-    col_fill <- getOption("pt_fill")
-    col_color <- getOption("pt_color")
     xn.values <-  data.frame(  # factor to integer for jitter
-        levels(x.values), 1:length(levels(x.values)), row.names = 1)[x.values, 1]
+        levels(x.values), 1:length(levels(x.values)), row.names=1)[x.values, 1]
     xn.values <- jitter(xn.values, factor=jitter_x)
-    points(xn.values, y.values, pch=21, col=col_color, bg=col_fill, cex=0.7)
+    points(xn.values, y.values, pch=21, 
+           col=getOption("pt_color"), bg=getOption("pt_fill"), cex=0.7)
 
     # plot cell means
     pch.avg <- ifelse(getOption("theme")!="gray", 21, 23)

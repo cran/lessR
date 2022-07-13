@@ -9,7 +9,7 @@ if (getRversion() >= "3.5.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.2.0                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.2.2                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -147,9 +147,66 @@ function(...) {
 
   options(show.signifstars = FALSE)
   options(scipen = 30)
+
+  options(mc_doScale_quiet=TRUE)  # for mc() function in robustbase
 }
 
 
+# get maximum number of 0's to right of decimal point for variable x
+#   that is less than 1, locate the significant digits
+#   called only by .decdig
+.lead0 <- function(x) {
+  n.max.z <- 0
+  dec.pt <- getOption("OutDec")
+  
+  for (i in 1:length(x)) {
+    fx <- format(x[i])
+    nc <- nchar(fx)
+    loc <- regexpr(dec.pt, fx, fixed=TRUE)
+    if (loc > -1) {  # there is a decimal point in the ith value
+      n.z <- 0
+      for (j.value in (loc+1):nc) {  # process one value
+        if (substr(fx, j.value, j.value) == "0"  &&  x[i] < 1) {
+          n.z <- n.z + 1
+        }
+        else
+          break  # reached a non-0 value
+      }
+    if (n.z > n.max.z) n.max.z <- n.z
+    }
+  }
+  return(n.max.z)
+}
+
+# get decimal digits to display for variable x
+.decdig <- function(x, digits_d) {
+  dec.pt <- getOption("OutDec")
+  ok <- is.finite(x)  # get rid of missing data
+  x.var <- x[ok]  # evaluate digits on x.var w/o NA's
+  loc.d <- regexpr(dec.pt, trimws(format(x.var)), fixed=TRUE)
+
+  if (is.null(digits_d)) {
+    if (all(loc.d == -1))  # no ., so integer with no decimal digits
+       dgs <- 0 
+    else {
+      lead0 <- .lead0(x.var)  # n of 0's to right of . for x < 1
+      dgs <- ifelse (lead0>0, lead0+1, 3)  # 0's to right of .
+      if (min(loc.d) > 2) dgs <- 3  # multiple digits to left of .
+      x <- round(x, dgs)   # rounding removes trailing 0's
+    }  # end decimal digits
+  }  # end null digits_d
+
+  else {  # digits_d has been set
+    dgs <- ifelse (all(loc.d == -1), 0, digits_d)
+    x <- round(x, dgs) 
+  }
+
+  return(x)
+}
+
+
+# maximum number of decimal digits in the values of a variable
+# only called by .getdigits(), which follows
 .max.dd <- function(x) {
 
  n.dec <-function(xn) {
@@ -169,6 +226,7 @@ function(...) {
 }
 
 
+# used only in .axes
 .getdigits <- function(x, min_digits) {
   digits_d <- .max.dd(x) + 1
   if (digits_d < min_digits) digits_d <- min_digits
@@ -177,11 +235,12 @@ function(...) {
 
 # get number of decimal digits, trailing and leading 0's deleted
 # x a scalar
+# called by bc.main(), others???
 .num.dec <- function(x) {
-  if (abs(x - round(x)) > .Machine$double.eps^0.5)
-    nchar(strsplit(as.character(x), ".", fixed=TRUE)[[1]][[2]])
-  else
-    return(0)
+ if (abs(x - round(x)) > .Machine$double.eps^0.5)
+   nchar(strsplit(as.character(x), ".", fixed=TRUE)[[1]][[2]])
+ else
+   return(0)
 }
 
 .fmt <- function(k, d=getOption("digits_d"), w=0, j="right") {
@@ -1013,36 +1072,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
 }
 
 
-# plot a set of vertical or horizontal grid lines
-.grid <-
-function(dir, axT) {
-
-  # possible inheritance
-
-  grid_x_color <- ifelse(is.null(getOption("grid_x_color")),
-    getOption("grid_color"), getOption("grid_x_color"))
-  grid_y_color <- ifelse(is.null(getOption("grid_y_color")),
-    getOption("grid_color"), getOption("grid_y_color"))
-
-  grid_x_lwd <- ifelse(is.null(getOption("grid_x_lwd")),
-    getOption("grid_lwd"), getOption("grid_x_lwd"))
-  grid_y_lwd <- ifelse(is.null(getOption("grid_y_lwd")),
-    getOption("grid_lwd"), getOption("grid_y_lwd"))
-
-  grid_x_lty <- ifelse(is.null(getOption("grid_x_lty")),
-    getOption("grid_lty"), getOption("grid_x_lty"))
-  grid_y_lty <- ifelse(is.null(getOption("grid_y_lty")),
-    getOption("grid_lty"), getOption("grid_y_lty"))
-
-  if (dir == "h") if (grid_y_lwd > 0)
-    abline(h=axT, col=grid_y_color, lwd=grid_y_lwd, lty=grid_y_lty)
-
-  if (dir == "v") if (grid_x_lwd > 0)
-    abline(v=axT, col=grid_x_color, lwd=grid_x_lwd, lty=grid_x_lty)
-
-}
-
-
 .axes_dim <- function() {
 
   axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
@@ -1083,58 +1112,44 @@ function(dir, axT) {
 .axes <- function(x.lvl, y.lvl, axT1, axT2,
          rotate_x=0, rotate_y=0, offset=0.5, y.only=FALSE, ...) {
 
-  ax <- .axes_dim()
-  axis_x_color <- ax$axis_x_color
-  axis_x_lwd <- ax$axis_x_lwd
-  axis_x_lty <- ax$axis_x_lty
-  axis_x_cex <- ax$axis_x_cex
-  axis_x_text_color <- ax$axis_x_text_color
-  axis_y_color <- ax$axis_y_color
-  axis_y_lwd <- ax$axis_y_lwd
-  axis_y_lty <- ax$axis_y_lty
-  axis_y_cex <- ax$axis_y_cex
-  axis_y_text_color <- ax$axis_y_text_color
-
-# if (is.null(getOption("axis_text_color"))) options(axis_text_color = "gray15")
-
   fnt <- ifelse (getOption("sub_theme") == "wsj", 2, 1) # bold
-
   usr <- par("usr")
+  ax <- .axes_dim()  # get axis values parameters
 
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
     if (!y.only) {  # do x axis in calling routine for time series
-      axis(1, at=axT1, labels=FALSE, tck=-.01, col=axis_x_color,
-        lwd=axis_x_lwd, lty=axis_x_lty)
+      axis(1, at=axT1, labels=FALSE, tck=-.01, col=ax$axis_x_color,
+        lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
       dec.d <- .getdigits(round(axT1,6),1) - 1
       axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
       text(x=axT, y=usr[3], labels=.fmt(axT,dec.d),
-           pos=1, xpd=TRUE, cex=axis_x_cex, col=axis_x_text_color,
+           pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
            srt=rotate_x, offset=offset, font=fnt, ...)
     }
   }
 
   else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
-    axis(1, at=axT1, labels=FALSE, tck=-.01, col=axis_x_color,
-        lwd=axis_x_lwd, lty=axis_x_lty)
+    axis(1, at=axT1, labels=FALSE, tck=-.01, col=ax$axis_x_color,
+        lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
     text(x=axT1, y=usr[3], labels=x.lvl,
-         pos=1, xpd=TRUE, cex=axis_x_cex, col=axis_x_text_color,
+         pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
          srt=rotate_x, offset=offset, font=fnt, ...)
   }
 
   if (is.null(y.lvl)  &&  !is.null(axT2)) {
-    axis(2, at=axT2, labels=FALSE, tck=-.01, col=axis_y_color,
-        lwd=axis_y_lwd, lty=axis_y_lty)
+    axis(2, at=axT2, labels=FALSE, tck=-.01, col=ax$axis_y_color,
+        lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
     dec.d <- .getdigits(round(axT2,6),1) - 1
     axT <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
     text(x=usr[1], y=axT, labels=.fmt(axT,dec.d),
-         pos=2, xpd=TRUE, cex=axis_y_cex, col=axis_y_text_color,
+         pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
          srt=rotate_y, font=fnt, ...)
   }
   else if (!is.null(y.lvl)) {
-    axis(2, at=axT2, labels=FALSE, tck=-.01, col=axis_y_color,
-        lwd=axis_y_lwd, lty=axis_y_lty)
+    axis(2, at=axT2, labels=FALSE, tck=-.01, col=ax$axis_y_color,
+        lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
     text(x=usr[1], y=axT2, labels=y.lvl,
-         pos=2, xpd=TRUE, cex=axis_y_cex, col=axis_y_text_color,
+         pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
          srt=rotate_y, font=fnt, ...)
   }
 }
@@ -1166,7 +1181,7 @@ function(dir, axT) {
   adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
   lblx.lns <- par("mar")[1] - 1.15
 
-# xlab_adj <- xlab_adj / ln.ht.x
+  # xlab_adj <- xlab_adj / ln.ht.x
   # ylab positioning
   ln.ht.y <- par('cin')[2] * lab_y_cex * par('lheight')  # line ht inches
   lby <- (.9*ln.ht.y) / 0.19
@@ -1189,7 +1204,6 @@ function(dir, axT) {
   if (!is.null(main.lab))
     title(main=main.lab, cex.main= getOption("main_cex"),
           col.main=getOption("main_color"), ...)
-
 }
 
 
@@ -1218,66 +1232,6 @@ function(dir, axT) {
   }
 
   return(list(val.lab=val.lab, mx.val.ln=mx.val.ln))
-}
-
-
-# margins
-.marg <- function(max.y.width, y.lab, x.lab, main, sub,
-                  rotate_x=0, mx.x.val.ln=1, mx.y.val.ln=1,
-                  lab_x_cex=0.95, lab_y_cex=0.95, max.x.width=NULL) {
-# not processing sub at this time
-
-  # top margin
-  tm <- 0.05  # old is 0.15
-  if (!is.null(main)) tm <- tm + .25
-  # if (options("device") == "RStudioGD") {
-    # tm <- ifelse(.Platform$OS == "windows", tm-.15, 0)
-  # }
-
-  # right margin
-  rm <- 0.15
-
-  # bottom margin
-  n.lab_x.ln <- 0  # in case x.lab is null
-  if (!is.null(x.lab)) {
-    if (x.lab != "") {
-      strn <- unlist(gregexpr("\n", x.lab, fixed=TRUE))
-      if (strn[1] == -1) strn <- NULL  # return of -1 means no \n
-      n.lab_x.ln <- length(strn) + 1
-    }
-    else  # such as from default for time series
-      n.lab_x.ln <- -0.6 + (.1 * lab_x_cex)
-  }
-
-  ln.ht <- par('cin')[2] * lab_x_cex * par('lheight')  # lin ht inches
-
-  # rotate_x==90 and horiz=TRUE not compatible, leads to NULL max.x.width
-  if (rotate_x != 90  ||  is.null(max.x.width))
-    bm <- ((n.lab_x.ln + mx.x.val.ln) * .70 * ln.ht) + 0.30  # inches
-  else
-    bm <- max.x.width + (ln.ht * n.lab_x.ln) + 0.28
-  bm <- bm + (-0.065 +(.055* n.lab_x.ln))
-  tm <- ifelse (is.null(main), tm+.05, tm+.25)  #  adjust tm for increased bm
-  if (rotate_x != 0) bm <- bm + .15
-  if (lab_x_cex > 1.1) bm <- bm + .04  # actually should be axis_cex
-
-  # left margin
-  n.lab_y.ln <- 0  # in case x.lab is null
-  if (!is.null(y.lab)) {
-    if (y.lab != "") {
-      strn <- unlist(gregexpr("\n", y.lab, fixed=TRUE))
-      if (strn[1] == -1) strn <- NULL  # return of -1 means no \n
-      n.lab_y.ln <- length(strn) + 1
-    }
-  }
-
-  mm <- max.y.width + 0.24
-  if (max.y.width < .10) mm <- mm + .02
-  if (lab_y_cex > 1) mm <- mm + .10
-  if (!is.null(y.lab)) mm <- mm + (n.lab_y.ln * .20)
-
-  return(list(lm=mm, tm=tm, rm=rm, bm=bm,
-              n.lab_x.ln=n.lab_x.ln, n.lab_y.ln=n.lab_y.ln))
 }
 
 

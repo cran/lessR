@@ -284,7 +284,7 @@ function(my_formula, data=d, rows=NULL, ref=NULL,
   # odds ratios and 95% CI
   OR <- coef(lm.out)
   orci <- exp(cbind(OR, ci))
-  cat("\n\nOdds ratios and confidence intervals\n\n")
+  cat("\n\nOdds Ratios and Confidence Intervals\n\n")
   max.num <- 9
   OR.lbl <- .fmtc("Odds Ratio", max.num+1)
   lb.lbl <- .fmtc("Lower 95%", max.num+3)

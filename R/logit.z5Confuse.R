@@ -2,7 +2,7 @@
 function(lm.out, out, n.vars, nm, prob_cut, x.cut) {
 
   # confusion matrix
-  tbl <- table(out[,n.vars], out[,n.vars+1])  # actual and predicted label
+  tbl <- table(out[,n.vars], out[,n.vars+1], useNA="always")
 
   hit0 <- tbl[1,1]; hit1 <- tbl[2,2]
   mis0 <- tbl[1,2]; mis1 <- tbl[2,1]

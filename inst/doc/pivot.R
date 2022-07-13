@@ -85,7 +85,7 @@ Sort(a, by=Salary_mean, direction="-")
 #a
 
 ## ---------------------------------------------------------------------------------------------------------------------
-pivot(d, mean, Salary, Dept, Gender)
+pivot(d, mean, Salary, by=Dept, by_cols=Gender)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 pivot(d, mean, Salary, Dept, c(Gender, Plan))
@@ -100,10 +100,20 @@ pivot(d, mean, Years, Dept, na_remove=FALSE)
 dd <- d[.(!(Gender=="M" & Dept=="SALE")), ]
 
 ## ---------------------------------------------------------------------------------------------------------------------
-pivot(dd, c(mean,median), Years, c(Dept, Gender), na_by_show=TRUE)
+head(dd)
+dd <- dd[-3,]
 
 ## ---------------------------------------------------------------------------------------------------------------------
-pivot(dd, c(mean,median), Years, c(Dept, Gender), na_by_show=FALSE)
+pivot(dd, c(mean,median), Salary, c(Dept, Gender), na_by_show=TRUE)
+
+## ---------------------------------------------------------------------------------------------------------------------
+pivot(dd, c(mean,median), Salary, c(Dept, Gender), na_by_show=FALSE)
+
+## ---------------------------------------------------------------------------------------------------------------------
+pivot(d, c(mean,median), Salary, c(Dept, Gender), na_group_show=TRUE)
+
+## ---------------------------------------------------------------------------------------------------------------------
+pivot(d, c(mean,median), Salary, c(Dept, Gender), na_group_show=FALSE)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 mnmd <- function(x, na.rm=TRUE)  mean(x, na.rm=na.rm) - median(x, na.rm=na.rm)

@@ -22,7 +22,8 @@ function(lm.out, cook, digits_d=NULL, res_sort="cooks", res_rows=NULL,
     tx[length(tx)+1] <- .dash2(68)
   }
 
-  tx[length(tx)+1] <- "Data, Fitted, Residual, Studentized Residual, Dffits, Cook's Distance"
+  tx[length(tx)+1] <- paste("-- Data, Fitted, Residual, Studentized Residual,",
+                      "Dffits, Cook's Distance")
   if (res_sort == "cooks")
     tx[length(tx)+1] <- "   [sorted by Cook's Distance]"
   if (res_sort == "rstudent")  

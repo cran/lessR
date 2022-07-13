@@ -1,6 +1,6 @@
 Plot <-
 function(x, y=NULL, data=d, rows=NULL, enhance=FALSE, 
-         stat="data", n_cat=getOption("n_cat"),
+         stat="data", n_cat=getOption("n_cat"), n_bins=1,
 
          by=NULL, by1=NULL, by2=NULL,
          n_row=NULL, n_col=NULL, aspect="fill",
@@ -191,6 +191,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   by1.miss <- ifelse (missing(by1), TRUE, FALSE)
   by2.miss <- ifelse (missing(by2), TRUE, FALSE)
   size.miss <- ifelse (missing(size), TRUE, FALSE)
+  stat.miss <- ifelse (missing(stat), TRUE, FALSE)
   radius.miss <- ifelse (missing(radius), TRUE, FALSE)
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   color.miss <- ifelse (missing(color), TRUE, FALSE)
@@ -1420,6 +1421,20 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
                      pt.size=pt.size, size.miss=size.miss)
   }
   
+  else if (n_bins > 1) {  # bin the x-axis, compute mean or median of y by bin
+
+   if (stat.miss) stat <- "mean"
+   if (seg.miss) segments <- TRUE
+   if (size.miss) pt.size <- 1.1
+   if (is.null(digits_d)) digits_d <- 3
+   nm.x <- x.name
+   nm.y <- y.name
+   # size is NULL if not specified
+   .plt.bins(x.call[,1], y.call[,1], nm.x, nm.y, stat, n_bins, 
+             segments=segments, size=size, digits_d, scale_x, scale_y,
+             fill=pt.fill, color=pt.color, trans=pt.trans,
+             quiet=quiet)
+  }
 
   # all the other analyses
   # ----------------------
@@ -1747,17 +1762,18 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
             txprm <- tx
           }
 
-          class(txprm) <- "out"
-          .plt.txt(x.call, y.call, stat, object, n_cat,
-            cat.x, num.cat.x, cat.y, num.cat.y,
-            xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat,
-            smooth, box_adj, run, center_line, show_runs,
-            proportion, size, radius, digits_d, fun_call, txdif)
+          if (n_bins == 1) {  # if binning, .plt.bins does its own output
+            class(txprm) <- "out"
+            .plt.txt(x.call, y.call, stat, object, cat.x, cat.y,
+              xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat,
+              center_line, run, show_runs,
+              proportion, size, radius, digits_d, fun_call, txdif)
 
             class(txout) <- "out"  # MD outlier analysis
             output <- list(out_outlier=txout, outlier_indices=out_ind,
                            out_parm=txprm)
             class(output) <- "out_all"
+          }
         }  # end text output
 
       }  # end do_plot
@@ -1784,7 +1800,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # display text output from Plot() unless turned off
   # outp generally set TRUE when here, but not always
   # T.type is the type of Trellis plot, otherwise is NULL
-  if (!quiet) {
+  if (!quiet && n_bins==1) {
     if (Trellis) {  # only VBS plots have output processed here
       if (!(T.type %in% c("cont", "cont_cat"))) outp <- FALSE
     }

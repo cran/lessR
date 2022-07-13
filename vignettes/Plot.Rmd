@@ -106,26 +106,36 @@ Plot(c(Salary, Years, Pre, Post), fit="lm")
 ```
 
 
-### Smoothed Scatterplot
+### Smoothed and Binned Scatterplots
 
-To obtain a larger data set, in this example generate random data with base R `rnorm()`, then plot. `Plot()` first checks the presence of the specified variables in the global environment (workspace). If not there, then from a data frame, of which the default value is _d_. Here, generate values for _x_ and _y_ in the workspace. 
+Smoothing and binning are two procedures for visualizing a relationship with many data values.
+
+To obtain a larger data set, in this example generate random data with base R `rnorm()`, then plot. `Plot()` first checks the presence of the specified variables in the global environment (workspace). If not there, then from a data frame, of which the default value is _d_. Here, randomly generate values from normal populations for _x_ and _y_ in the workspace. 
 
 ```{r}
-x <- rnorm(4000)
-y <- rnorm(4000)
+set.seed(13)
+x=rnorm(4000)
+y= 8*x + rnorm(4000,1, 30)
 Plot(x, y)
 ```
 
-With large data sets, even for continuous variables there can be much over-plotting of points. One strategy to address this issue smooths the scatterplot by turning on the `smooth` parameter. The individual points superimposed on the smoothed plot are potential outliers. The default number of plotted outliers is 100. Turn off the plotting of outliers completely by setting parameter `smooth_points` to `0`.
+With large data sets, even for continuous variables there can be much over-plotting of points. One strategy to address this issue smooths the scatterplot by turning on the `smooth` parameter. The individual points superimposed on the smoothed plot are potential outliers. The default number of plotted outliers is 100. Turn off the plotting of outliers completely by setting parameter `smooth_points` to `0`. Show the linear trend with `fit` set to `"lm"`.
 
 ```{r}
-Plot(x, y, smooth=TRUE)
+Plot(x, y, smooth=TRUE, fit="lm")
 ```
 
 Another strategy for alleviating over-plotting makes the fill color mostly transparent with the `trans` parameter, or turn off completely by setting `fill` to `"off"`. The closer the value of `trans` is to 1, the more transparent is the fill. 
 
 ```{r}
 Plot(x, y, trans=0.95)
+```
+
+Another way to visualize a relationship when there are many data points is to bin the _x_-axis. Specify the number of bins with parameter `n_bins`. Plot() then computes the mean of _y_ for each bin and connects the means by line segments. This procedure plots the conditional means by default without any assumption of form such as linearity. Specify the `stat` parameter for `median` to compute the median of y for each bin. The standard `Plot()` parameters `fill`, `color`, `size` and `segments` also apply.
+
+
+```{r}
+Plot(x, y, n_bins=5)
 ```
 
 

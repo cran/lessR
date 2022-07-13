@@ -21,7 +21,7 @@ for a less annoying experience. With \code{.} to express a logical criterion to 
 }
 
 \details{
-Eliminates the need to prepend the data frame name and a \$ to each variable name in the specified logical expression to select rows. For columns, no quoting variables, allow variable ranges. 
+Eliminates the need to prepend the data frame name and a dollar sign to each variable name in the specified logical expression to select rows. For columns, no quoting variables, allow variable ranges. 
 
 Can create a character string called \code{rows} that expresses the logic of row selection. Can create a character string called \code{cols} that expresses the logic of column (variable) selection. To negate the \code{rows} expression, \code{.(!rows)}. Use \code{-.(cols)} to exclude designated variables. 
 

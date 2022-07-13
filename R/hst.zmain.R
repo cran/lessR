@@ -129,7 +129,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     # set margins
     max.width <- strwidth(as.character(max(pretty(h$counts))), units="inches")
     
-    margs <- .marg(max.width, y.lab, x.lab, main.lab, sub.lab, rotate_x)
+    margs <- .plt.marg(max.width, y.lab, x.lab, main.lab, sub.lab, rotate_x)
     lm <- margs$lm
     tm <- margs$tm
     rm <- margs$rm
@@ -156,28 +156,21 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 
     # set up plot 
     plot(h, freq=TRUE, axes=FALSE, ann=FALSE, ...)
-    
-    # color plotting background color
-    usr <- par("usr")          
-    rect(usr[1], usr[3], usr[2], usr[4], col=getOption("panel_fill"),
-         border="transparent")
 
-    # plot grid lines
-    if(is.null(scale_x))
+    # plot background
+    if (is.null(scale_x))
       vx <- h$breaks
     else
       vx <- axTicks(1, axp=scale_x)
-    .grid("v", seq(vx[1],vx[length(vx)],vx[2]-vx[1]))
-    if(is.null(scale_y))
+    axT1 <- seq(vx[1], vx[length(vx)], vx[2]-vx[1])
+    .plt.bck(par("usr"), axT1, NULL, do.h=FALSE)
+
+    if (is.null(scale_y))
       vy <- pretty(h$counts)
     else
       vy <- axTicks(2, axp=scale_y)
-    .grid("h", seq(vy[1],vy[length(vy)],vy[2]-vy[1]))
-
-    # box around plot
-    rect(usr[1], usr[3], usr[2], usr[4], col="transparent",
-      border=getOption("panel_color"),
-      lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
+    axT2 <- seq(vy[1], vy[length(vy)], vy[2]-vy[1])
+    .plt.bck(par("usr"), NULL, axT2, do.v=FALSE)
 
     # axis, axis ticks
     .axes(x.lvl=NULL, y.lvl=NULL,

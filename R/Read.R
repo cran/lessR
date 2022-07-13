@@ -62,8 +62,8 @@ function(from=NULL, format=NULL, var_labels=FALSE,
   # option to browse for data file, and then display file name
   browse <- FALSE
   if (is.null(from)) {
-    if (options("device") == "RStudioGD")
-      cat(">>> Browse window may be hidden behind RStudio window\n")
+#   if (options("device") == "RStudioGD")
+#     cat(">>> Browse window may be hidden behind RStudio window\n")
     browse <- TRUE
     from <- file.choose()
     fncl <- paste("Read(", "from = \"", from,  "\", quiet = TRUE)", sep="")
@@ -114,7 +114,6 @@ function(from=NULL, format=NULL, var_labels=FALSE,
   }
 
   if (!quiet) {
-    max.chr <- nchar(from)
     if (format == "Excel") {
       txt <- "Schauberger and Walker's openxlsx package]"
       cat("[with the read.xlsx() function from", txt, "\n")

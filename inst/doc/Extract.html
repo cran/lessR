@@ -673,19 +673,19 @@ or the proportion of rows to select.</p>
 <p>Here randomly select five rows of data from the <em>d</em> data
 frame.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="dv">5</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                  Years Gender Dept   Salary
-## Jones, Alissa        5      W &lt;NA&gt; 53772.58
-## Singh, Niral         2      W ADMN 61055.44
-## Saechao, Suzanne     8      W SALE 55545.25
-## Sheppard, Cory      14      M FINC 95027.55
-## Afshari, Anbar       6      W ADMN 69441.93</code></pre>
+<pre><code>##                    Years Gender Dept   Salary
+## Wu, James             NA      M SALE 94494.58
+## Kralik, Laura         10      W SALE 92681.19
+## Afshari, Anbar         6      W ADMN 69441.93
+## Korhalkar, Jessica     2      W ACCT 72502.50
+## Portlock, Ryan        13      M SALE 77714.85</code></pre>
 <p>Here specify a proportion of rows to select.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="fl">0.1</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                  Years Gender Dept   Salary
-## Saechao, Suzanne     8      W SALE 55545.25
-## Downs, Deborah       7      W FINC 57139.90
-## Cooper, Lindsay      4      W MKTG 56772.95
-## Wu, James           NA      M SALE 94494.58</code></pre>
+<pre><code>##                   Years Gender Dept    Salary
+## Capelle, Adam        24      M ADMN 108138.43
+## Stanley, Grayson      9      M SALE  69624.87
+## Langston, Matthew     5      M SALE  49188.96
+## Skrotzki, Sara       18      W MKTG  91352.33</code></pre>
 </div>
 
 

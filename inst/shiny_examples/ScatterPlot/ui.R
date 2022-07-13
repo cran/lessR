@@ -47,7 +47,7 @@ ui <- fluidPage(  # Define UI for app that draws a histogram
       selectInput(inputId = "myFit",
                   label = "fit",
                   choices = list("off", "loess", "lm", "exp", "sqrt",
-                                 "reciprocal", "null")
+                                 "null")
       ),
 
       checkboxInput(inputId = "myErrors",

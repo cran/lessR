@@ -306,79 +306,39 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
                          lwd=size.ln, ...)
 
             if (fit != "off"  &&  n.groups == 1) {
-              ok <- is.finite(x) & is.finite(y)
-              x <- x[ok]
-              y <- y[ok]
-              ord <- order(x)
-              x <- x[ord]
-              y <- y[ord]
 
-              if (fit == "loess")
-                l.ln <- loess(y ~ x)
-              else if (fit == "lm")
-                l.ln <- lm(y ~ x)
-              else if (fit == "null")
-                l.ln <- lm(y ~ 1)
-              if (fit %in% c("loess", "lm", "null"))
-                f.ln <- fitted(l.ln)
+              pf <- .plt.fit (x, y, fit, fit_power)
 
-              if (fit %in% c("quad", "power")) {  # quad model
-                if (fit == "quad") {
-                  l.ln <- lm(sqrt(y) ~ x)
-                  fit_power <- 2
-                }
-                else
-                  l.ln <- lm((y^(1/fit_power)) ~ x)
-              b00 <- l.ln$coefficients[1]
-              b11 <- l.ln$coefficients[2]
-              f.ln <- (b00 + (b11*x))^fit_power
+              x <- pf$x.lv  # x and y get reduced in .plt.fit if NA
+              y <- pf$y.lv
+              f.ln <- pf$f.ln
+              l.ln <- pf$l.ln
+              mse <- pf$mse
+              b0 <- pf$b0
+              b1 <- pf$b1
+              Rsq <- pf$Rsq
 
-              }
-
-              if (fit == "exp") {
-                if (fit_power == 1)
-                  l.ln <- lm(log(y) ~ x)
-                else
-                  l.ln <- lm(log(y^(1/fit_power)) ~ x)
-                f.ln <- exp(l.ln$coefficients[1] + (l.ln$coefficients[2]*x))
-                ok <- is.finite(f.ln)
-                if (length(ok) > 0) {
-                  f.ln <- f.ln[ok]
-                  x <- x[ok]
-                }
-              }  # end fit == "exp"
-
-              if (fit == "log") {  # logarithmic model
-                if (fit_power == 1) {
-                  y.exp <- exp(y)
-                  if (any(is.infinite(y.exp))) {
-                    cat("\n"); stop(call.=FALSE, "\n","------\n",
-                      "Some values of y too large for exp(y). Rescale.\n\n")
-                  }
-                  l.ln <- lm(y.exp ~ x)
-                }
-                else
-                  l.ln <- lm(exp(y^(1/fit_power)) ~ x)
-                b00 <- l.ln$coefficients[1]
-                b11 <- l.ln$coefficients[2]
-                f.ln <- log(b00 + (b11*x))
-                if (any(is.nan(f.ln))) {
-                  message("\n>>> Warning: ",
-                    "Some values of log() back transformation not defined.\n\n")
-                }
-              }
-
-              e <- y - f.ln
-              sse <- sum(e^2)
-              mse <- sse / (length(e) - 2)
               mse.pn <- prettyNum(mse, big.mark = ",", scientific = FALSE)
-              if (panel.number() == 1) cat("\n")
-              cat("Regression analysis of linearized data.\n")
-              cat("Mean of Squared Errors about Fit Line, MSE, for Panel ",
-                  panel.number(), ": ", mse.pn, sep="", "\n")
+              Rsq.pn <- .fmt(Rsq, 3)
+              b0.pn <- .fmt(b0, 3)
+              b1.pn <- .fmt(b1, 3)
+              cat("\n") 
+              if (panel.number() == 1) {
+                cat("Regression analysis of linearized data\n")
+                msg <- paste("Need back transformation of regression model",
+                            "to compute predicted values\n\n")
+                cat(msg)
+              }
+              by1.name <- getOption("by1name")
+              panel.n <- panel.number()
+              cat(by1.name, " ", panel.n, "  ",
+                  "Line: b0 = ", b0.pn, "  b1 = ", b1.pn, "   ",
+                  "Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
+                  sep="", "\n")
 
               if (fit %in% c("exp", "log", "quad", "null"))
                 fit_se[1] <- 0
+
               se_fill <- getOption("se_fill")
               nrows <- length(f.ln)
               for (j in 1:length(fit_se)) {

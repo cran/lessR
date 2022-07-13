@@ -151,7 +151,7 @@ head(dw)
 Now the analysis, which repeats a previous analysis, but with wide-form data. Because the data frame is not the default _d_, explicitly indicate with the `data` parameter.
 
 ```{r, fig.width=6}
-Plot(date, c(HP, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
+Plot(date, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
 ```
 
 ### Time-Series Object Data
