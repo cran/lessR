@@ -5,9 +5,14 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
          factors=TRUE, q_num=4, digits_d=NULL, quiet=getOption("quiet")) {
 
+
+  # -----------------------------------------------------------
+  # ---- preliminaries
+
   table_prop <- match.arg(table_prop)
   out.nm.miss <- missing(out_names)
 
+  # define functions
   # length(x) is count_n(x) + count_NA(x)
   count_n <- function(x) sum(!is.na(x))
   count_NA <- function(x) sum(is.na(x))
@@ -23,15 +28,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     }
   }
 
-  # -----------------------------------------------------------
-  # ---- identify the compute functions, variable and by variables
-
-  # missing variables in by vars, automatically dropped
-  # missing variables in vars, NA in aggregated output
-
-  data.vars <- as.list(seq_along(data))
-  names(data.vars) <- names(data)
-
   # subset any specified rows of input data frame
   if (!missing(rows)) {  # subset rows
     r <- eval(substitute(rows), envir=data, enclos=parent.frame())
@@ -43,6 +39,9 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     r <- r & !is.na(r)  # set missing for a row to FALSE
     data <- data[r,,drop=FALSE]
   }
+
+  # -----------------------------------------------------------
+  # ---- identify the compute functions, variables, and by variables
 
   # -----------------
   # compute functions
@@ -90,7 +89,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     }
   }
 
-  # abbreviation dictionary for function names
+  # abbreviation dictionary for function names, first 13 require numeric var
   fun.vec <- c("sum", "mean", "md", "min", "max", "sd", "var", "IQR", "mad",
                "", "", "sk", "kt", "tbl", "tbl")
   names(fun.vec) <- c("sum", "mean", "median", "min", "max",
@@ -107,6 +106,9 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
   # ---------
   # variables
+
+  data.vars <- as.list(seq_along(data))
+  names(data.vars) <- names(data)
 
   # get index of variable(s)
   ind.var.d <- eval(substitute(variable), envir=data.vars, parent.frame())
@@ -184,10 +186,29 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     n.c.by <- 0
   }
 
-
   # ------------
   # Not Possible
 
+  if (n.c.by > 0) {
+    if (n.cmp > 1)  {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Cannot have more than 1 compute function for making a table.\n\n")
+    }
+    if (n.var > 1)  {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Cannot have more than 1 variable to aggregate for making a table.\n\n")
+    }
+  }
+
+  num.cmpt <- ifelse (nm.cmpt %in% names(fun.vec)[1:13], TRUE, FALSE)
+  are.num <- logical(length(ind.var.d))
+  for (i in 1:length(ind.var.d))
+    if (is.numeric(data[,ind.var.d[i]])) are.num[i] <- TRUE
+  if (!all(are.num) && num.cmpt)  {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Specified computations: ", nm.cmpt, "\n",
+      "Not all specified variables are numeric: ", nm.var.d, "\n\n")
+  }
   if (tflag && n.cmp > 0 && missing(by))  {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Cannot have more than one statistic specified\n",
@@ -214,7 +235,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   if (n.var > 1 && n.cmp > 1 && n.by > 0)  {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Cannot have multiple compute functions, multiple variables, \n",
-      "  and do aggregation with a by variable.\n\n")
+      "  and do aggregation with a by variable. Choose two of the three\n\n")
   }
   if (!is.null(sort)) {
     if (!(sort %in% c( "+", "-"))) {
@@ -351,7 +372,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
 
   # ------------------------------------------
-  # --------------- tabulate (deprecated) ---- 
+  # --------------- tabulate -----------------
 
     if (nm.cmpt[1] == "tabulate") {
       use_na <- ifelse (!na_by_show, "no", "ifany")
@@ -618,17 +639,16 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   # --- option to reshape long form a to wide form ---
   # --------------------------------------------------
 
+  # function to abbreviate col headings for constructing a table (not a df)
+  abrev <- function (x, room) {  # preserve a space, abbreviate if needed
+    has.space <- ifelse (grepl(" ", x, fixed=TRUE), TRUE, FALSE)
+    if (has.space) x <- sub(" ", "`", x, fixed=TRUE) 
+    x <- abbreviate(x, room-2)
+    if (has.space) x <- sub("`", " ", x, fixed=TRUE) 
+    return(x)
+  }
+
   if (n.c.by > 0) {
-
-    if (n.cmp > 1)  {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Cannot have more than 1 compute function for making a table.\n\n")
-    }
-
-    if (n.var > 1)  {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "Cannot have more than 1 variable to aggregate for making a table.\n\n")
-    }
 
     nm.var.a <- names(a)[ind.var]  # preserve original names
 
@@ -700,7 +720,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     # convert reshaped w to kable k, vector of lines of characters
     # remove all by names from w, get " -" locations from kable
     for (i in (n.r.by+1):length(names(w))) names(w)[i] <- " "
-    k <- knitr::kable(w, format="pandoc", digits=2, caption=" ", align="r")
+    k <- knitr::kable(w, format="pandoc", caption=" ", align="r")
     # get starting positions of columns for labels from k --- line
     g <- gregexpr(" -", k[4], fixed=TRUE)
     g <- unlist(g)
@@ -716,20 +736,37 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       substr(ln1, 2, 2 + nchar(c1.nm)) <- c1.nm
       lvl1 <- levels(a[,i.c[1]])
 
+      for (i in 1:(length(lvl1)-1)) {
+        room <- g[i+1]-g[i]
+        if (nchar(lvl1[i]) > room-1)
+          lvl1[i] <- abrev(lvl1[i], room)
+      }
+
       for (i in 1:length(lvl1)) {
+        if (is.na(lvl1[i])) lvl1[i] <- "NA" 
         start <- g[n.r.by + (i-1)] + 1
         stop <- start + nchar(lvl1[i])
+        room <- stop - start
         substr(ln1, start, stop) <- lvl1[i]
       }
     }
 
+    # two by_cols vars
     else if (n.c.by == 2) {
       lvl1 <- levels(a[,i.c[1]])
       lvl2 <- levels(a[,i.c[2]])
 
+      for (i in 1:(length(lvl2))) {
+        room <- g[i+1]-g[i]
+        if (is.na(lvl2[i])) lvl2[i] <- "NA" 
+        if (nchar(lvl2[i]) > room-1)
+          lvl2[i] <- abrev(lvl2[i], room)
+      }
+
       # line with labels for first by_cols var (1st level line)
       # for each lvl1 item, skip lvl2 cols for placement
       for (i in 1:length(lvl1)) {
+        if (is.na(lvl1[i])) lvl1[i] <- "NA" 
         start <- g[n.r.by + (i-1)*length(lvl2)] + 1
         stop <- start + nchar(lvl1[i])
         substr(ln1, start, stop) <- lvl1[i]
@@ -743,6 +780,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       substr(ln2, 2, 2 + nchar(c2.nm)) <- c2.nm
       for (k in 1:length(lvl1)) {
         for (i in 1:length(lvl2)) {
+          if (is.na(lvl2[i])) lvl2[i] <- "NA" 
           start <- g[n.r.by + (k-1)*length(lvl2) + (i-1)] + 1
           stop <- start + nchar(lvl2[i])
           substr(ln2, start, stop) <- lvl2[i]
@@ -752,9 +790,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
     # caption, with added blank line
     cpt <- paste(nm.cmpt[1], "of", names(data)[ind.var.d], "\n")
-    w <- knitr::kable(w, format="pandoc", digits=2, caption=cpt, align="r")
-    # wc <- character(length=length(w))
-    # for (i in 1:length(w)) wc[i] <- w[i]
+    w <- knitr::kable(w, format="pandoc", caption=cpt, align="r")
 
     if (n.c.by == 1)  # set second line of table w
       w[2] <- ln1
@@ -770,7 +806,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       w[1] <- paste("```", "\n", w[1], sep="")
       w[length(w)] <- paste(w[length(w)], "\n", "```", sep="")
     }
-
     a <- w
   }  # end n.c.by > 0
   # ------------------------------------------

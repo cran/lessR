@@ -74,7 +74,11 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   gl <- .getlabels(xlab, ylab, main, y.nm=is.y, lab_x_cex=lab_x_cex, 
                      lab_y_cex=lab_y_cex, by1.nm=TRUE)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
-  y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
+  y.name <- gl$yn; y.lbl <- gl$yl; 
+  if (!is.null(gl$yb))
+    y.lab <- ifelse (is.null(ylab), gl$yb, "")
+  else
+    y.lab <- ifelse(is.null(ylab), "", ylab)
   main.lab <- gl$mb
   sub.lab <- gl$sb
 
@@ -163,7 +167,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
     }
     else if (is.null(by2)) {  # 1 cond var
       p <- lattice::stripplot(~ x | by1, groups=by, subscripts=TRUE, ...)
-      y.lab <- getOption("by1name")
+      y.lab <- ifelse (is.null(ylab), getOption("by1name"), ylab)
     }
     else  {  # 2 cond var
       p <- lattice::stripplot(~ x | by1 * by2, groups=by, subscripts=TRUE, ...)
@@ -573,9 +577,8 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   # display
   if (!is.null(pdf_file)) {
-    pdf(pdf_file, width=width, height=height)
+    pdf(pdf_file, width=width, height=height, onefile=FALSE)
     print(p)
-    dev.off()
   }
   else {
     print(p)

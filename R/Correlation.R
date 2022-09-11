@@ -78,9 +78,8 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
     options(dname = dname)
 
     # get conditions and check for data existing
-    xs <- .xstatus(x.name, dname)
-    is.frml <- xs$ifr
-    in.style <- xs$ig 
+    is.frml <- ifelse (grepl("~", x.name), TRUE, FALSE)
+    in.style <- .in.global(x.name, dname)
 
     # see if the variable exists in data frame, if x not in style Env 
     if (!in.style) .xcheck(x.name, dname, names(data))
@@ -101,10 +100,8 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
       in.call <- FALSE
 
       # get conditions and check for data existing
-      if (!in.call) {
-        xs <- .xstatus(y.name, dname)
-        in.style <- xs$ig 
-      }
+      if (!in.call)
+        in.style <- .in.global(y.name, dname)
       else in.style <- FALSE
 
       # see if var exists in data frame, if x not in style Env or function call 

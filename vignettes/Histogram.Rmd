@@ -78,12 +78,14 @@ The histogram portrays a continuous distribution with discrete bins, with more m
 
 >_Density plot_: A smooth curve that estimates the underlying continuous distribution.  
 
-To invoke a density plot, add the `density` parameter. The result is the filled density curve superimposed on the histogram.
+To create a density plot, add the `density` parameter. The result is the filled density curve superimposed on the histogram.
 
 
 ```{r density, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Histogram with density plot."}
 Histogram(Salary, density=TRUE)
 ```
+
+The `type` parameter indicates the type of density curve. The default is `"general"`. Options are `"normal"` for a normal density curve and `"both"` for both.   
 
 
 ## VBS Plot

@@ -46,9 +46,9 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
 
     tx <- ""
 
-    if (nrow(x) * (ncol(x)-1) > 30) { 
+    if (nrow(x) * (ncol(x)-1) > 50) { 
       if (msg  &&  getOption("note"))
-        message("Table output is vertical to fit in window, but > 30 rows\n",
+        message("Table output is vertical to fit in window, but > 50 rows\n",
                 "To view the complete table, save the output\n",
                 "  to an object, e.g., b <- BarChart(...)\n",
                 "  then b$freq\n")
@@ -343,7 +343,8 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     txmis <- NULL
     if (!is.null(x.miss)) {
       tx <- character(length = 0)
-      txt <- paste("Missing Values of ", x.name, ":", sep="")
+#     txt <- paste("Missing Values of ", x.name, ":", sep="")
+      txt <- paste("Missing Values:")
       tx[length(tx)+1] <- paste(txt, x.miss) 
       txmis <- tx    
     }

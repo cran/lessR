@@ -1,7 +1,5 @@
 Read <-
-function(from=NULL, format=NULL, var_labels=FALSE,
-
-         widths=NULL, stringsAsFactors=FALSE,
+function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL, 
 
          missing="", n_mcut=1,
          miss_show=30, miss_zero=FALSE, miss_matrix=FALSE,
@@ -36,8 +34,8 @@ function(from=NULL, format=NULL, var_labels=FALSE,
      cat("\n"); stop(call.=FALSE, "\n","------\n",
          ">>> To read a csv or Excel file of variable labels, each row a\n",
          "    variable name and then variable label, and then optionally\n",
-         "    a variable unit in the third column, just set\n",
-         "    var_labels=TRUE in the Read statement\n\n")
+         "    a variable unit in the third column, set  var_labels=TRUE \n",
+         "    in the Read statement and read into the l data frame\n\n")
   }
 
   .param.old(...)
@@ -135,8 +133,8 @@ function(from=NULL, format=NULL, var_labels=FALSE,
 
   if (format %in% c("SPSS", "SAS", "Stata")) {
     if (!requireNamespace("haven", quietly=TRUE)) {
-      stop("Package \"haven\" needed to read this file\n",
-           "Please install it:  install.packages(\"haven\")\n\n",
+      stop("Packages \"haven\" and \"tzdb\" needed to read this file\n",
+           "Please install them:  install.packages(c(\"haven\", \"tzdb\"))\n\n",
            call. = FALSE)
     }
   }
@@ -144,7 +142,7 @@ function(from=NULL, format=NULL, var_labels=FALSE,
   if (format == "ODS") {
     if (!requireNamespace("readODS", quietly=TRUE)) {
       stop("Package \"readODS\" needed to read this file\n",
-           "Please install it:  install.packages(\"readODS\")\n\n",
+           "Please install:  install.packages(\"readODS\")\n\n",
            call. = FALSE)
     }
   }
@@ -158,20 +156,21 @@ function(from=NULL, format=NULL, var_labels=FALSE,
 
       # get delimiter
       line1 <- scan(from, what="character", nlines=1, sep="\t", quiet=TRUE)
+      tab <- FALSE
       if (length(line1) > 1) {
         message(">>> A tab character detected in the first row of the\n",
             "     data file. Presume tab delimited data.\n", sep="")
-        delim <- "\t"
+        tab <- TRUE
       }
-      else
-        delim <- ","
 
       # read data or labels/units
       if (!var_labels) {
         if (missing(row_names)) {
           row.names <- NULL
-          d <- read.csv(file=from, na.strings=missing, sep=delim,
-                        stringsAsFactors=stringsAsFactors, ...)
+          if (!tab) 
+            d <- read.csv(file=from, na.strings=missing, ...)
+          else
+            d <- read.csv(file=from, na.strings=missing, sep="\t", ...)
         }
         else {
           if (is.logical(row_names)) {  # can specify as TRUE
@@ -179,16 +178,13 @@ function(from=NULL, format=NULL, var_labels=FALSE,
           }
           else
             row.names <- row_names
-          d <- read.csv(file=from, na.strings=missing, sep=delim,
-                        stringsAsFactors=stringsAsFactors,
+          d <- read.csv(file=from, na.strings=missing,
                         row.names=row.names, ...)
         }
       }
 
-      else {
-        d <- read.csv(file=from, header=FALSE,
-                  row.names=1,
-                  sep=delim, stringsAsFactors=FALSE, ...)
+      else {  # var_labels
+        d <- read.csv(file=from, header=FALSE, row.names=1, ...)
         names(d)[1] <- "label"
         if (ncol(d) == 2) names(d)[2] <- "unit"
       }
@@ -384,7 +380,8 @@ function(from=NULL, format=NULL, var_labels=FALSE,
         cat("\n>>> Suggestions\n")
       if (!grepl("var_labels", fncl)  &&  format != "lessR")
         cat("To read a csv or Excel file of variable labels, var_labels=TRUE\n",
-            "  Each row of the file:  Variable Name, Variable Label\n")
+            "  Each row of the file:  Variable Name, Variable Label\n",
+            "Read into a data frame named l  (the letter el)\n\n", sep="")
       if (brief) {
         cat("Details about your data, Enter:  details()  for d, or",
            " details(name)\n")

@@ -9,7 +9,7 @@ if (getRversion() >= "3.5.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.2.2                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.2.3                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -18,17 +18,10 @@ function(...) {
       "testing means and proportions, regression, factor analysis,\n",
       "customization, and descriptive statistics from pivot tables.\n",
       "  Enter:  browseVignettes(\"lessR\")\n\n",
-      "View changes in this or recent versions of lessR.\n",
-      "  Enter: help(package=lessR)  Click: Package NEWS\n",
-      "  Enter: interact()  for access to interactive graphics\n",
-      "  New function: reshape_long() to move data from wide to long\n")
-
-
-  # imports shiny loads the package, but prefer not have loaded until
-  #   actually run, such as with interact()
-  # the reason is that there is less data frame and variable error checking
-  #   when shiny is loaded
-  unloadNamespace("shiny")
+      "View changes in this and recent versions of lessR.\n",
+      "  Enter: news(package=\"lessR\")\n\n",
+      "**New Feature**: Interactive analysis of your data\n",
+      "  Enter: interact()\n")
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 
@@ -57,7 +50,7 @@ function(...) {
   options(values_digits = NULL)
   options(values_position = "in")
 
-  options(pt_fill = rgb(50,78,92, maxColorValue=255))
+  options(pt_fill = rgb(50,78,92, maxColorValue=255))  #  #324E5C
   options(trans_pt_fill = 0.00)
   options(pt_color = rgb(50,78,92, maxColorValue=255))  # old 70 80 90
   options(out_fill = "firebrick4")
@@ -178,7 +171,7 @@ function(...) {
   return(n.max.z)
 }
 
-# get decimal digits to display for variable x
+# get decimal digits to display for variable x, then apply
 .decdig <- function(x, digits_d) {
   dec.pt <- getOption("OutDec")
   ok <- is.finite(x)  # get rid of missing data
@@ -381,26 +374,9 @@ function(...) {
 }
 
 
-.xstatus <- function(var.name, dname, quiet=FALSE) {
+.in.global <- function(var.name, quiet) {
 
-  # see if analysis from data is based on a formula
-  is.frml <- ifelse (grepl("~", var.name), TRUE, FALSE)
-
-  # see if analysis is from descriptive stats or from data
-  from.data <- ifelse (var.name == "NULL", FALSE, TRUE)
-
-  # see if the variable exists in the global environment
-  in.global <- FALSE
-  if (nchar(var.name)>0) if (var.name %in% ls(name=.GlobalEnv)) {
-    in.global <- TRUE
-    # a style "var" could be the name of a function
-    # var.name is a character string, so convert to an object
-    if (!is.function(eval(parse(text=var.name)))) {
-      in.global <- TRUE
-    }
-  }
-
-  # see if "variable" is really an expression
+  # if "variable" is really an expression, then stop
   if ((grepl("(", var.name, fixed=TRUE) ||
       grepl("[", var.name, fixed=TRUE) ||
       grepl("$", var.name, fixed=TRUE)) && substr(var.name, 1, 1) != "c")  {
@@ -412,16 +388,42 @@ function(...) {
         txtA, txtB, txtC, "\n")
   }
 
-  # let deprecated mydata work as default
-  dfs <- .getdfs()
-  mydata.ok <- FALSE
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
-    d <- mydata
-    mydata.ok <- TRUE
-  }
-  if (!mydata.ok) if (!in.global && from.data) .nodf(dname)
+  expr <- parse(text=var.name)  # convert char string to expression
+  var.nm <- all.vars(expr)  # get >= 1 variable names, 1st and last for :
+  ge <- (ls(name=.GlobalEnv))
 
-  return(list(ifr=is.frml, fd=from.data, ig=in.global))
+  if (length(var.nm) > 0) {
+    in.global <- logical(length=length(var.nm))
+    for (i in 1:length(var.nm)) {  # each variable in var list one at a time
+      in.global[i] <- FALSE
+      if (!is.null(var.nm[i])) if (!is.na(var.nm[i])) if (nzchar(var.nm[i])) {
+        if (var.nm[i] %in% ls(name=.GlobalEnv)) {
+            in.global[i] <- TRUE
+        }
+      }
+
+      if (length(.getdfs()) > 0) {  # if not data frame, no point to message
+        if (in.global[i] && !quiet)
+           cat(">>> Note:", var.nm[i], "is not in a data frame (table)\n")
+        else
+          if (any(in.global) && !quiet)
+            cat(">>> Note:", var.nm[i], "is NOT in the workspace\n")
+      }
+    }  # end for
+  }
+  else
+    in.global <- TRUE
+
+  if (any(in.global) && !all(in.global)) {  # eval $ in .xcheck
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Some variables are in a data frame,\n",
+      "  and other variables are not. All must exist and\n",
+      "  be in a data frame or not.\n\n")
+  }
+
+  in.global <- ifelse (all(in.global), TRUE, FALSE)
+
+  return(in.global)
 }
 
 
@@ -536,63 +538,13 @@ function(...) {
 }
 
 
-.in.global <- function(var.name, quiet) {
-
-  # see if "variable" includes a $
-  for (i in 1:length(var.name)) {
-    if (grepl("$", var.name[i], fixed=TRUE))  {
-      txtA <- paste("A referenced variable in a lessR function just includes\n",
-                    "the variable name\n\n", sep="")
-      txtB <- paste("e.g., for the Histogram function, this does not work:\n",
-                    "  > Histogram(d$Y)\n\n", sep="")
-      txtC <- "Instead do this:\n  > Histogram(Y, data=d)"
-      txtD <- "If you wish to specify a data table, use option: data"
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-                      txtA, txtB, txtC, "\n", txtD, "\n\n")
-    }
-  }
-
-  to.expr <- parse(text=var.name)  # convert char string to expression
-  var.nm <- all.vars(to.expr)  # get >= 1 variable names, 1st and last for :
-
-  in.global <- logical(length=length(var.nm))
-  for (i in 1:length(var.nm)) {  # each variable in var list one at a time
-    in.global[i] <- FALSE
-    if (!is.null(var.nm[i])) if (!is.na(var.nm[i])) if (nchar(var.nm[i]) > 0) {
-      if (var.nm[i] %in% ls(name=.GlobalEnv)) {
-        if (!is.function(eval(parse(text=var.nm[i])))) in.global[i] <- TRUE
-      }
-    }
-
-    if (length(.getdfs()) > 0) {  # if not data frame, no point to message
-      if (in.global[i] && !quiet)
-         cat(">>> Note:", var.nm[i], "is not in a data frame (table)\n")
-      else
-        if (any(in.global) && !quiet)
-          cat(">>> Note:", var.nm[i], "is NOT in the workspace\n")
-    }
-  }  # end for
-
-  if (any(in.global) && !all(in.global)) {  # eval $ in .xcheck
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Some variables are in a data frame,\n",
-      "  and other variables are not. All must exist and\n",
-      "  be in a data frame or not.\n\n")
-  }
-
-  in.global <- ifelse (all(in.global), TRUE, FALSE)
-
-  return(in.global)
-}
-
-
 # check to see if var.name is just a single name
 # if yes, then see if it is in the data frame of dname
 # nms contains the variable names in dname
 .xcheck <- function(var.name, dname, nms) {
 
-  to.expr <- parse(text=var.name)  # convert char string to expression
-  var.nm <- all.vars(to.expr)  # get >= 1 variable names, 1st and last for :
+  expr <- parse(text=var.name)  # convert char string to expression
+  var.nm <- all.vars(expr)  # get >= 1 variable names, 1st and last for :
 
   for (i in 1:length(var.nm)) {  # each variable one at a time
     # see if "variable" is an expression
@@ -685,34 +637,6 @@ function(...) {
       "Either enter the correct name, or calculate with: Correlation\n",
       "Or read the correlation matrix with: corRead\n\n", sep="")
   }
-
-}
-
-
-# get values for passed par parameters because ... cannot be passed to title
-#   in calling routine as each title will invoke sub if active,
-#   and setting the line forces everything on the same line
-.getdots <- function(...) {
-
-  col.main <- NULL
-  col.lab <- NULL
-  sub.lab <- NULL
-  col.sub <- NULL
-  cex.main <- NULL
-
-  dots <- list(...)
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] == "col.main")  col.main <- dots[[i]]
-      if (names(dots)[i] == "col.lab")  col.lab <- dots[[i]]
-      if (names(dots)[i] == "sub.lab")  sub.lab <- dots[[i]]
-      if (names(dots)[i] == "col.sub")  col.sub <- dots[[i]]
-      if (names(dots)[i] == "cex.main")  cex.main <- dots[[i]]
-    }
-  }
-
-  return(list(col.main=col.main, col.lab=col.lab, sub.lab=sub.lab,
-              col.sub=col.sub, cex.main=cex.main))
 
 }
 
@@ -828,6 +752,7 @@ function(...) {
   if (!is.null(x.lbl)) txt1 <- paste(txt1, ": ", x.lbl, sep="")
 
   if (isnullby) {
+    txt1 <- ifelse ("shiny" %in% .packages(), "Summary Stats", x.name)
     txt1 <- paste("---", txt1, "---")
     if (new.ln) txt1 <- paste(txt1, "\n", sep="")
   }
@@ -1268,6 +1193,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
     workdir <- "top level (root) of your file system"
   else
     workdir <- getwd()
+
   cat("\nThe", txt, "written at the current working directory\n")
   cat("       ", fname, " in:  ", workdir, "\n")
   cat("\n")
@@ -1287,7 +1213,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
   tx[length(tx)+1] <- paste("       ", fname, " in:  ", workdir)
 
   return(tx)
-
 }
 
 
@@ -1727,7 +1652,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
   fc <- sub("  ", " ", fc, fixed=TRUE)
 
   return(fc)
-
 }
 
 
@@ -1857,7 +1781,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
   return(fc_new)
   }
-
 }
 
 
@@ -2039,3 +1962,4 @@ pn <- function(x) {
   cat("\n", paste(xstr,":", sep=""), x, "\n")
 
 }
+

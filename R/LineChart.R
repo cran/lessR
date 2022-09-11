@@ -156,7 +156,7 @@ function(x, data=d, rows=NULL,
       if (is.data.frame(x))  # x a data frame
         data <- x
       else {  # x a vector in global
-        .xstatus(x.name, df.name, quiet)
+        .in.global(x.name, quiet)  # x.name an expression?
         data <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
         names(data) <- x.name
       }

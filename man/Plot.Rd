@@ -684,10 +684,11 @@ Instead, do the following:
 The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. The output here is just for the outlier analysis of the two-variable scatterplot with continuous variables. The outlier identification must be activated for the analysis, such as from parameter \code{MD_cut}.
 
 READABLE OUTPUT\cr
-code{out_outlier}: Mahalanobis Distance of each outlier.\cr
+\code{out_stats}: Correlational analysis.\cr
+\code{out_outliers}: Mahalanobis Distance of each outlier.\cr
 
 STATISTICS\cr
-code{outliers_indices}: Location of the outliers in the x and y vectors.\cr
+\code{outliers}: Row numbers that contain the outliers.\cr
 }
 
 
@@ -755,10 +756,9 @@ Plot(Years, Salary, rows=(Gender=="M" & Years > 5))
 
 # plot 0.95 data ellipse with the points identified that represent
 #   outliers defined by a Mahalanobis Distance larger than 6 
-# save outliers into R object out, then remove from d
+# save outliers into R object out
 d[1, "Salary"] <- 200000
 out <- Plot(Years, Salary, ellipse=0.95, MD_cut=6)
-d <- d[-out$outlier_indices,]
 
 # new shape and point size, no grid or background color
 # then put style back to default

@@ -61,7 +61,7 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
   tx <- character(length = 0)
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("-- Summary Table")
+    tx[length(tx)+1] <- paste("-- Summary Table for", nm[1])
     tx[length(tx)+1] <- ""
   }
 
@@ -124,7 +124,7 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
   tx <- character(length = 0)
 
   if (is.null(options()$knitr.in.progress)) {
-    tx[length(tx)+1] <- paste("-- Association and Effect Size")
+    tx[length(tx)+1] <- paste("-- Association and Effect Size for", nm[1])
     tx[length(tx)+1] <- ""
   }
 

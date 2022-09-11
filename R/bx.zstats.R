@@ -15,7 +15,7 @@ function(x, ID=NULL, k.iqr=1.5, box_adj=FALSE, a=-4, b=3, digits_d=2, ...) {
   if (!box_adj)
     bv <- boxplot.stats(x, coef=k.iqr)
   else
-    bv <- adjboxStats(x, coef=k.iqr, a=a, b=b)
+    bv <- robustbase::adjboxStats(x, coef=k.iqr, a=a, b=b)
 
   lo.whisker <- bv$stats[1]
   hi.whisker <- bv$stats[5]
@@ -33,7 +33,7 @@ function(x, ID=NULL, k.iqr=1.5, box_adj=FALSE, a=-4, b=3, digits_d=2, ...) {
   if (length(outliers>0) && length(unique(na.omit(x)>3))) {
 
     tx[length(tx)+1] <- " "
-    tx[length(tx)+1] <- paste("(Box plot) Outliers:", n.out)
+    tx[length(tx)+1] <- paste("--- Outliers ---     from the box plot:", n.out)
 
     ind.lo <- which(x < lo.whisker)  # lower outliers
     if (length(ind.lo) > 0) {
@@ -140,7 +140,7 @@ function(x, ID=NULL, k.iqr=1.5, box_adj=FALSE, a=-4, b=3, digits_d=2, ...) {
   IQR <- .fmt(IQR(x, na.rm=TRUE), digits_d)
   avg <- .fmt(mean(x, na.rm=TRUE), digits_d)
   std <- .fmt(sd(x, na.rm=TRUE), digits_d)
-  mc <- .fmt(mc(x, na.rm=TRUE, doScale=FALSE), digits_d)
+  mc <- .fmt(robustbase::mc(x, na.rm=TRUE, doScale=FALSE), digits_d)
 
   tx <- character(length = 0)
   tx <- txlbl

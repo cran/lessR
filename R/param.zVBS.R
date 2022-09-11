@@ -150,7 +150,6 @@ function(x, ID, by1, by1.miss, by0, by.miss,
   # -------
   # ONE VAR VBS plot: # no by1, so x by itself
   if (by1.miss && by.miss) { 
-
     # box plot outliers, stats
     bx <- .bx.stats(x, ID, k.iqr, box_adj, a, b, digits_d)
     txbox <- bx$txstat

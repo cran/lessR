@@ -1,5 +1,5 @@
 .hst.stats <-
-function (h, len.x, fun_call) {
+function (h, len.x, mx.dd, fun_call) {
 
     # function call for suggestions
     fncl <- .fun_call.deparse(fun_call) 
@@ -43,8 +43,12 @@ function (h, len.x, fun_call) {
       j <- nchar(as.character(h$mids[i]))
       if (j>max.dg.mid && j<19) max.dg.mid <- j
     }
+
     x.breaks <- format(h$breaks, width=max.dg, justify="right", scientific=FALSE)
     x.mids <- format(h$mids, width=max.dg.mid, justify="right", scientific=FALSE)
+    # if bin_start < 0, a midpt approx 0, format() then has too many digits
+    if (.lead0(h$mids) > mx.dd) 
+      x.mids <- .fmt(h$mids, d=mx.dd)
 
     bn <- character(length=0)
     for (i in 1:(length(x.breaks)-1))
@@ -61,8 +65,8 @@ function (h, len.x, fun_call) {
     out$cum.c <- formatC(cum.c, digits=0, format="f")
     out$cum.p <- formatC(cum.p, digits=2, format="f")
     names(out) <- c("Bin", "Midpnt", "Count", "  Prop", "Cumul.c", "Cumul.p")
-    # width of columns
 
+    # width of columns
     max.ln <- integer(length=0)
     for (i in 1:ncol(out)) {
       ln.nm <- nchar(colnames(out)[i]) + 1

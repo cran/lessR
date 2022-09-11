@@ -257,12 +257,11 @@ function(x, y=NULL, ...) {
       }
     }
 
-    xs <- .xstatus(x.name, df.name)
-    is.frml <- xs$ifr
+    is.frml <- ifelse (grepl("~", x.name), TRUE, FALSE)
     if (is.frml) if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
-    from.data <- xs$fd
-    in.style <- xs$ig 
-    if (!missing(y)) .xstatus(y.name, df.name)  # just for a message on output 
+    from.data <- ifelse (x.name == "NULL", FALSE, TRUE)
+    in.style <- .in.global(x.name, quiet=TRUE) 
+    if (!missing(y)) .in.global(y.name, quiet=TRUE)  # y.name an expression? 
 
     # see if the variable exists in the data frame
     if (from.data && !in.style && !is.frml) .xcheck(x.name, df.name, names(data))

@@ -1,6 +1,6 @@
 Package: lessR
-Version: 4.2.2
-Date: 2022-07-12
+Version: 4.2.3
+Date: 2022-09-11
 Title: Less Code, More Results
 Author: David Gerbing, The School of Business, Portland State University
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
@@ -10,10 +10,10 @@ Imports: graphics, grDevices, stats, utils, methods, lattice,
         shiny, knitr, viridisLite
 Suggests: KernSmooth, rmarkdown, wesanderson, haven, readODS, triangle
 VignetteBuilder: knitr
-Description: Each function accomplishes the work of several or more standard R functions. For example, two function calls, Read() and CountAll(), read the data and generate summary statistics for all variables in the data frame, plus histograms and bar charts as appropriate. Other functions provide for descriptive statistics, a comprehensive regression analysis, analysis of variance and t-test, visualizations including the Violin/Box/Scatter plot for a numerical variable, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function call, variable labels, color themes, Trellis graphics, and comprehensive summary statistics via pivot tables. Also includes a confirmatory factor analysis of multiple indicator measurement models, pedagogical routines for data simulation such as for the Central Limit Theorem, and generation and rendering of R markdown instructions for interpretative output. 
+Description: Each function accomplishes the work of several or more standard R functions. For example, two function calls, Read() and CountAll(), read the data and generate summary statistics for all variables in the data frame, plus histograms and bar charts as appropriate. Other functions provide for comprehensive summary statistics via pivot tables, a comprehensive regression analysis, analysis of variance and t-test, visualizations including the Violin/Box/Scatter plot for a numerical variable, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function call, variable labels, color themes, and Trellis graphics. Also includes a confirmatory factor analysis of multiple indicator measurement models, pedagogical routines for data simulation such as for the Central Limit Theorem, generation and rendering of R markdown instructions for interpretative output, and interactive visualizations. 
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2022-07-13 01:33:01 UTC; dgerbing
+Packaged: 2022-09-11 21:29:59 UTC; dgerbing
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2022-07-13 06:50:05 UTC
+Date/Publication: 2022-09-11 22:12:54 UTC

@@ -15,10 +15,9 @@ function(x, value=NULL, data=d) {
   }
 
   # get conditions and check for data existing
-  xs <- .xstatus(x.name, dname)
-  in.style <- xs$ig 
 
   # see if the data frame exists, if x not in style Env or function call
+  in.style <- .in.global(x.name, dname)
   if (!in.style) {
     if (!exists(dname)) {
       if (dname == "d") 

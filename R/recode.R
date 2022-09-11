@@ -77,10 +77,7 @@ function(old_vars, new_vars=NULL, old, new, data=d,
     x.name <- names(my.vars)[vars[ivar]]
     options(xname = x.name)
 
-    # get conditions and check for data existing
-    xs <- .xstatus(x.name, dname, quiet)
-    in.style <- xs$ig 
-
+    in.style <- .in.global(x.name, quiet)
     if (in.style)
       if (is.function(old_vars)) 
         x.call <- as.vector(eval(substitute(data[,vars[ivar]])))

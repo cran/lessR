@@ -7,6 +7,8 @@
 \description{
 Abbreviation: \code{dn}
 
+<<<DEPRECATED in favor of Histogram(x, density=TRUE) >>>
+
 Plots a normal density curve and/or a general density curve superimposed over a histogram, all estimated from the data. Also reports the Shapiro-Wilk normality test and summary statistics.
 
 If the provided object to analyze is a set of multiple variables, including an entire data frame, then each non-numeric variable in the data frame is analyzed and the results written to the current graphics device or to a pdf file in the current working directory. The name of each output pdf file that contains a bar chart and its path are specified in the output.
@@ -196,38 +198,11 @@ style()
 d <- data.frame(rnorm(50), rnorm(50), rnorm(50), rep(c("A","B"),25))
 names(d) <- c("X","Y","Z","C")
 
-# normal curve and general density curves superimposed over histogram
-# all defaults
-Histogram(Y, density=TRUE, type="both")
+#  general density curves superimposed over histogram, all defaults
+Histogram(Y, density=TRUE)
 
-# specify (non-transparent) colors for the curves,
-# to make transparent, need alpha option for the rgb function
-Histogram(Y, density=TRUE, color_nrm="darkgreen", color_gen="plum")
+# see Histogram for more examples, also the corresponding vignette
 
-# rug with custom color and width of ticks
-Histogram(Y, density=TRUE, color_rug="steelblue", size.rug=1)
-
-# display only the general estimated density
-#  so do not display the estimated normal curve
-# specify the bandwidth for the general density curve,
-#  use the standard bw option for the density function
-Histogram(Y, density=TRUE, bw=.6)
-
-# display only the general estimated density and a corresponding
-#  interval of unit width around x.pt
-Histogram(Y, density=TRUE, x.pt=2)
-
-# generate R markdown file to be "knit" such as in RStudio
-#dn(Y, Rmd="myout")
-
-# variable of interest is in a data frame which is not the default d
-# access the breaks variable in the R provided warpbreaks data set
-# although data not attached, access the variable directly by its name
-Histogram(breaks, density=TRUE, data=warpbreaks)
-
-# densities for all specified numeric variables in a list of variables
-# e.g., use the combine or c function to specify a list of variables
-Histogram(c(X,Y), density=FALSE)
 }
 
 

@@ -1,6 +1,6 @@
 Plot <-
 function(x, y=NULL, data=d, rows=NULL, enhance=FALSE, 
-         stat="data", n_cat=getOption("n_cat"), n_bins=1,
+       stat="data", n_cat=getOption("n_cat"), n_bins=1,
 
          by=NULL, by1=NULL, by2=NULL,
          n_row=NULL, n_col=NULL, aspect="fill",
@@ -57,7 +57,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          do_plot=TRUE, width=NULL, height=NULL, pdf_file=NULL, 
          fun_call=NULL, ...) {
 
-
   if (is.null(fun_call)) fun_call <- match.call()
 
   if (fit == "sqrt") {
@@ -73,7 +72,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     message("parameter value  root  replaced with  power  for consistency\n")
   }
 
-  # a dot in a parameter name to an underscore
+  # a dot in a parameter name to an underscore and more
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
@@ -122,10 +121,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     pad_y[1] <- temp
     pad_y[2] <- temp
   }
-
-  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval_df))  # default value
-    eval_df <- ifelse (shiny, FALSE, TRUE) 
 
   vbs_plot <- tolower(vbs_plot)
   violin <- ifelse (grepl("v", vbs_plot), TRUE, FALSE)
@@ -194,7 +189,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   stat.miss <- ifelse (missing(stat), TRUE, FALSE)
   radius.miss <- ifelse (missing(radius), TRUE, FALSE)
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
+  if (is.null(fill)) fill.miss <- TRUE  # shiny sets fill at NULL if by var
   color.miss <- ifelse (missing(color), TRUE, FALSE)
+  clr.org <- color
   trans.miss <- ifelse (missing(trans), TRUE, FALSE)
   box_fill.miss <- ifelse (missing(box_fill), TRUE, FALSE)
   violin_fill.miss <- ifelse (missing(violin_fill), TRUE, FALSE)
@@ -216,17 +213,12 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   n_col.miss <- ifelse (missing(n_col), TRUE, FALSE)
   n_row.miss <- ifelse (missing(n_row), TRUE, FALSE)
   add_miss <- ifelse (missing(add), TRUE, FALSE)
+  ylab.miss <- ifelse (missing(ylab), TRUE, FALSE)
 
   if (!missing(a) || !missing(b)) box_adj <- TRUE
 
   if (missing(vbs_size)) if (!violin)  # wider box if no violin
     vbs_size <- ifelse (y.miss || by1.miss, vbs_size*3.75, vbs_size*5)
-
-  if (!MD.miss && (!by.miss || !by1.miss)) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Outlier analysis works only with no  by  or  by1  groups\n\n")
-  }
-
  
   # "off" substitutes for official value of "transparent"
   fill[which(fill == "off")] <- "transparent"
@@ -284,9 +276,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       !missing(bin_end))
     bin <- TRUE
 
-  if (!is.null(pdf_file))
-    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
-
   if (!data.do) if (is.null(pt.trans)) pt.trans <- 0  # trans, so dot plot
 
   # set object 
@@ -316,8 +305,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   .plt.bad(x.miss, y.miss, stat, breaks, bin_start, n_row, n_col,
            MD_cut, out_cut, fit_se, ...)
 
-  # ------------------
-  # process data frame
+
+  # --------- data frame stuff
   
   data.miss <- ifelse (missing(data), TRUE, FALSE) 
 
@@ -349,16 +338,29 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     }
   }
 
-  # force evaluation (not lazy) if data not specified
-  if ((missing(data) && shiny)) 
-    data <- eval(substitute(data), envir=parent.frame())
-
-  # ---------------
-
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
 
-  x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars lists
+    if (!is.null(x.name))
+      x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
+    else
+      x.in.global <- FALSE
+
+  if (!x.in.global)  {
+    if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
+      # force evaluation (not lazy) if data not specified, relies on default d
+      if (data.miss) {
+        if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
+        data <- eval(substitute(data), envir=parent.frame())
+      }
+    }
+    else # df.name is NULL (only for shiny)
+      x.in.global <- TRUE
+  }
+    
+  eval_df <- !x.in.global 
+
+  # ---------------
 
   #  get data to be analyzed into data.x data frame
 
@@ -441,7 +443,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     options(yname = y.name)
   }
       
-  else {  # x a not ts vector in global
+  else {  # x is a not ts vector in global
     if (!is.function(x))
       data.x <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
     else  # x is 1 var
@@ -567,7 +569,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     y.name <- deparse(substitute(y))
     options(yname = y.name)
   
-    y.in.global <- .in.global(y.name, quiet)  # in global?, includes vars lists
+    if (df.name != "NULL")
+      in.global <- .in.global(y.name, quiet)
+    else
+      in.global <- TRUE
 
     # row.names deprecated
     if (deparse(substitute(y)) %in% c("row_names", "row.names")) {
@@ -580,7 +585,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     }
       
     # y not in global env, in df, specify data= forces to data frame
-    else if (!y.in.global) {
+    else if (!in.global) {
       if (eval_df) .xcheck(y.name, df.name, names(data))  # var in df?
       data.vars <- as.list(seq_along(data))  # even if only a single var
       names(data.vars) <- names(data)  # all data in data frame
@@ -597,22 +602,18 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         names(data.y) <- names(data.vars)[y.col]
       else
         names(data.y) <- y.col
-    }  # end global y
+    }  # end not global y
 
-    # y is in the global env (vector or data frame)
-    else if (is.data.frame(y)) {
-        # y a data frame
+    # y is a data frame in the global env (vector or data frame)
+    else if (is.data.frame(y)) { # y a data frame
         data.y <- y
     }
      
     else {  # y a vector in global
-      if (!is.function(y)) {
-        .xstatus(y.name, df.name, quiet)  # in global note
+      if (!is.function(y))
         data.y <- data.frame(y, stringsAsFactors=TRUE)  # y is 1 var
-      }
-      else
-        # y is 1 var
-        data.y <- data.frame(eval(substitute(data$y)), stringsAsFactors=TRUE)
+      else  # y is 1 var
+        data.y <- data.frame(eval(substitute(data$y)), stringsAsFactors=TRUE)  
       names(data.y) <- y.name
     }
 
@@ -662,8 +663,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (!y.miss) if (is.matrix(y.call)) many.y <- TRUE
     if ((ncol(data.x)>1 || many.y)  ||  cat.x  ||  cat.y) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "An ellipse only applies to an analysis of a single,",
-        "continuous y-variable\n\n")
+        "An ellipse only applies to a scatterplot of two, ",
+        "continuous variable\n\n")
     }
     if (y.miss) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -717,7 +718,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   if (is.logical(ellipse))
     ellipse <- ifelse (ellipse, 0.95, 0.00)
-  if (ellipse[1] > 0  &&  !Trellis  &&  !quiet) {
+  if (ellipse[1] > 0  &&  !Trellis  &&  !quiet  &&  df.name != "NULL") {
     txt <- "[Ellipse with Murdoch and Chow's function ellipse"
     cat(txt, "from their ellipse package]\n")
   } 
@@ -725,17 +726,20 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   # evaluate by
   #------------
-  if (!by.miss) {
 
-    # get actual variable name before potential call of data$x
+  do.by <- TRUE
+  if (by.miss)
+    do.by <- FALSE
+  else {
     by.name <- deparse(substitute(by))
+    if (by.name == "NULL") do.by <- FALSE  # specified by=NULL in call
+    in.global <- ifelse (df.name!="NULL", .in.global(by.name, quiet), TRUE)
+    if (in.global) if (is.null(by)) do.by <- FALSE
+  }
+
+  if (do.by)  {
     options(byname = by.name)
-
-    in.global <- .in.global(by.name, quiet)  # in global?
-
-    # get conditions and check for data existing
-    if (eval_df) .xstatus(by.name, df.name, quiet)
-
+  
     # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
       .xcheck(by.name, df.name, names(data))
@@ -756,6 +760,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   else
     by.call <- NULL
+
   n.by <- ifelse (by.miss, 0, nlevels(by.call))
 
   
@@ -765,12 +770,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
     # get actual variable name before potential call of data$x
     by1.name <- deparse(substitute(by1))
+
     options(by1name = by1.name)
 
-    in.global <- .in.global(by1.name, quiet)  # in global?
-
-    # get conditions and check for data existing
-    if (eval_df) xs <- .xstatus(by1.name, df.name, quiet)
+    in.global <- ifelse (df.name!="NULL", .in.global(by1.name, quiet), TRUE)
 
     # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
@@ -780,15 +783,23 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       by1.call <- eval(substitute(data$by1))
     else {  # vars that are function names get assigned to global
       by1.call <- by1
+      if (length(by1.call) == 0) by1.call <- NULL
       if (is.function(by1.call)) by1.call <- eval(substitute(data$by1))
     }
 
-    if (!is.factor(by1.call)) by1.call <- factor(by1.call)
+    if (!is.null(by1.call)) if (!is.factor(by1.call)) by1.call <- factor(by1.call)
   }
 
   else
    by1.call <- NULL
 
+   if (is.null(by1.call)) by1.miss <- TRUE
+
+# if (!MD.miss && (!by.miss || !by1.miss)) {
+  if (MD_cut > 0 && (!by.miss || !by1.miss)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Outlier analysis works only with no  by  or  by1  groups\n\n")
+  }
 
 
   # evaluate by2
@@ -800,9 +811,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     options(by2name = by2.name)
 
     in.global <- .in.global(by2.name, quiet)  # in global?
-
-    # get conditions and check for data existing
-    if (eval_df) .xstatus(by2.name, df.name, quiet)
 
     # see if var exists in data frame, if x not in global Env or function call
     if (!missing(x) && !in.global)
@@ -823,36 +831,47 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
 
 
-  # evaluate size (NULL, numeric constant or a variable)
+  # evaluate size (NULL, numeric constant, or a variable)
   #--------------
+
+
   if (!size.miss) {
     size.name <- deparse(substitute(size))
-    in.df <- FALSE
-    if (missing(data)) {
-      if (exists("d")) {
-        if (!is.null(data)) {  # set data to NULL to make sure read from workspace 
-          in.df <- ifelse (exists(size.name, where=data), TRUE, FALSE)
-        }
-      }
-    }
+    if (size.name == "NULL") size.miss <-TRUE
+  }
 
-    if (in.df) {
-      size <- eval(substitute(data$size))
+  if (!size.miss) {
+    suppressWarnings(size.num <- as.numeric(size.name))  # number or variable?
+
+  if (is.na(size.num)) {  # size a variable (did not resolve to a number)
+      in.global <- ifelse (df.name!="NULL", .in.global(size.name, quiet), TRUE)
+    if (!in.global) {
+      data.vars <- as.list(seq_along(data))
+      names(data.vars) <- names(data)
+      size.col <- eval(substitute(size), envir=data.vars)  # col num of each var
+      size <- data[,size.col]
       if (!is.numeric(size)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "Variable ", size.name, " must be numeric\n\n",
           "Perhaps use: by=", size.name, "\n\n")
       }
       options(sizename = size.name) # for later access
-      object <- "bubble"
-      if (is.null(size_cut)) size_cut <- ifelse (cat.x, 1, 2)
-    }
+    }  # end not global
+  }  # end size is a variable
+    if (is.null(size[1])) size.miss <- TRUE
 
-    else  # size is not a variable
-      size_cut <- 0
+    if (length(size) > 1) {
+      object <- "bubble"
+      options(sizename = size.name) # for later access
+    }
+  }  # end not size.miss
+
+  if (is.null(size_cut)) {
+    if (length(size) > 1)
+      size_cut <- 2
+    else
+      size_cut <- ifelse (cat.x, 1, 2)
   }
-  else
-    if (missing(size_cut)) size_cut <- 1
 
   if (!grepl("s", vbs_plot)) size <- 0
 
@@ -875,7 +894,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     }
 
     else {  # allow a specified variable in data table to be the ID
-      .xstatus(ID.name, df.name, quiet)  # check for data existing
       .xcheck(ID.name, df.name, names(data))  # var exists in data frame?
       ID.call <- eval(substitute(data$ID))
     }
@@ -901,25 +919,27 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     }
 
     # is.unsorted() flags sorted but in descending order
-    if (is.unsorted(x.call[,1]) && is.null(by.call) && is.null(by1.call)) {
-      if (is.null(b.name)) {  # not evaluated for by var
-        message(">>> Warning\n",
-          "The  Date  variable is not sorted in Increasing Order.\n\n",
-          "For a data frame named d, enter: \n    ", 
-           paste("d <- Sort(d, ", x.name, ")", sep=""), "\n",
-        "Enter  ?Sort  for more information and examples.\n\n")
-      }
-      else {  # a by variable
-        if (!sort_flag) {
+    if (df.name != "NULL") {  # by var not detected at first with shiny
+      if (is.unsorted(x.call[,1]) && is.null(by.call) && is.null(by1.call)) {
+        if (is.null(b.name)) {  # not evaluated for by var
           message(">>> Warning\n",
-            "The  by  variable is not sorted in Increasing Order.\n\n",
+            "The  Date  variable is not sorted in Increasing Order.\n\n",
             "For a data frame named d, enter: \n    ", 
-            paste("d <- Sort(d, by=c(", b.name, ", ", x.name, "))", 
-                sep=""), "\n",
-                "Enter  ?Sort  for more information and examples.\n\n")
+             paste("d <- Sort(d, ", x.name, ")", sep=""), "\n",
+          "Enter  ?Sort  for more information and examples.\n\n")
         }
-      } 
-    }  # end is.unsorted
+        else {  # a by variable
+          if (!sort_flag) {
+            message(">>> Warning\n",
+              "The  by  variable is not sorted in Increasing Order.\n\n",
+              "For a data frame named d, enter: \n    ", 
+              paste("d <- Sort(d, by=c(", b.name, ", ", x.name, "))", 
+                  sep=""), "\n",
+                  "Enter  ?Sort  for more information and examples.\n\n")
+          }
+        }  # end else
+      }  # end is.unsorted
+    } # end df.name not "NULL"  
   }  # if plotting a Date variable
 
   if (!run)
@@ -945,9 +965,18 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
 
   # --------
-    # adjust by, manage regular-R or PDF graphics window size
-  if (!Trellis && !shiny)
-    .opendev(pdf_file, width, height)  # prepare plot window, dev or pdf
+    # adjust by, manage regular-R or PDF graphics
+  if (!Trellis) {
+    if (!is.null(pdf_file)) {
+      if (!grepl(".pdf", pdf_file))
+        pdf_file <- paste(pdf_file, ".pdf", sep="")
+      pdf(file=pdf_file, width=width, height=height, onefile=FALSE)
+    }
+    else {
+      if (df.name != "NULL")  # not dev.new for shiny
+          .opendev(pdf_file, width, height)
+    }
+  }
 
 
   # ------------------------------------------------
@@ -1129,8 +1158,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         if (Trellis) {  # follow dot plot format and do horizontal plot
           cat.y <- FALSE
           if (seg.x.miss) segments_x <- TRUE
-          ylab <- ifelse (stat == "count", "Count of", "Proportion of")
-          ylab <- paste(ylab, x.name)
+          if (ylab.miss) {
+            ylab <- ifelse (stat == "count", "Count of", "Proportion of")
+            ylab <- paste(ylab, x.name)
+          }
           x.call <- data.frame(x.call, stringsAsFactors=TRUE)
         }  # end if Trellis
 
@@ -1164,6 +1195,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   }  # end is null y.call
 
 
+  # ----------------------------------------------------------------
   # object now determined: "both", "point", "bubble", or "sunflower"
 
   # bubble size
@@ -1182,16 +1214,17 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # size of fit line
   # windows line too thin at 1, but no increments allowed, and 2 is too thick
   if (fit.ln != "off") if (is.null(fit_lwd)) fit_lwd <- getOption("fit_lwd") 
-  #   fit_lwd <- ifelse(.Platform$OS == "windows", 2, 1.5)
+  #   fit_lwd <- ifelse(.Platform$OS.type == "windows", 2, 1.5)
 
   # size of points
   if (size.miss)  # pt.size not set yet
-    pt.size <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
+    pt.size <- ifelse (.Platform$OS.type == "windows", 1.00, 0.80)
   else {  # size had been set
     if (length(size) == 1)
-      scale.pt <- ifelse (.Platform$OS == "windows", 1.00, 0.80)
-    else   # size var
+      scale.pt <- ifelse (.Platform$OS.type == "windows", 1.00, 0.80)
+    else {  # size var
       scale.pt <- 1  # forget Win/Mac scaling for size var, ruins size for Mac
+    }
     pt.size <- size * scale.pt
   }
 
@@ -1208,6 +1241,14 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   }
 
   # get fill and color
+  if (!is.null(clr.org))  # reset for shiny
+    if (df.name == "NULL"  &&  clr.org == "off") {
+      fill.miss <- TRUE
+      color.miss <- TRUE
+      color <- NULL
+      pt.size <- 0
+      size.ln <- 2
+    }
   ord.by.call <- is.ordered(by.call)
   fc <- .plt.colors(object, nn_col, n.by, theme, fill, fill.miss,
             color, color.miss, area_fill, area_fill.miss, trans, stack,
@@ -1229,7 +1270,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     fncl <- gsub(" = ", "=", fncl)
   }
 
-
   # Trellis plot
   # ------------
 
@@ -1237,7 +1277,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
     if (T.type %in% c("cont", "cont_cont", "cont_cat")) {
 
-      # VBS plot only lattice graphics that (currently) does not use Trellis
+      # VBS plot
       txt <- ifelse (!is.null(by1.call), "[Trellis", "[Violin/Box/Scatterplot")
       if (!quiet)
         cat(paste(txt, "graphics from Deepayan Sarkar's lattice package]\n"))
@@ -1252,10 +1292,12 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         if (xor(cat.x, cat.y)  &&  n.by1 > 1) {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
             "The way to submit this analysis is to have both categorical\n",
-            "  variables be   by1  and  by2  variables, respectively.\n\n")
+            "  variables be  by1  and  by2  variables, respectively.\n\n")
         }
       }
 
+      if (df.name == "NULL"  &&  box_fill == "#419BD2")   # proxy for in shiny
+        box_fill.miss <- TRUE
       box_fill <- .plt.fill(box_fill, box_fill.miss, ord.by.call,
                             n.by1, n.lvl, theme)
 
@@ -1309,7 +1351,12 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           if (color.miss) pt.color <- "black"
         } 
 
+        # shiny kludge, where jitter_y is set at 0.01 to allow for set to 0
+        # the issue with shiny is that parameter values are never missing
+        if (df.name == "NULL"  &&  jitter_y == 0.01) j.y.miss <- TRUE
+
         # get some VBS parameters
+        if (df.name == "NULL"  &&  out_size == 1) out_size.miss <- TRUE
         VBS <- .param.VBS(x.call[,1], ID.call, by1.call, by1.miss, by.call,
                 by.miss, bw, bw.miss, bw_iter, iter.details,
                 lx, n.ux, k.iqr, box_adj, a, b,
@@ -1595,19 +1642,22 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
               .fmt(difs[ord[k]], dd, mx.d), levels(y.call[,1])[k])
         }
         txdif <- tx  # a little hack, only display in .plt.txt
-      }
+      }  # end two var Cleveland dot plot
 
       # bigger point for scatterplot of stats (instead of data)
       if (!data.do  &&  object == "point")
         if (is.null(size)) pt.size <- 1.25
 
-      out_ind <- NULL
-      txout <- ""
-      if (!y.miss && !Trellis) if(n.x_var == 1  &&  n.y_var == 1)
-        if (MD_cut > 0  ||  out_cut > 0) {
-          otl <- .plt.MD(x.call[,1], y.call[,1], ID.call, MD_cut, out_cut)  
-          txout <- otl$tx
-          out_ind <- otl$out_ind
+      # outlier analysis, need before .plt.main
+      outlpts <- NULL
+      out_outliers <- ""
+      if (!y.miss && !Trellis) 
+        if (n.x_var==1 && n.y_var==1 
+             && is.numeric(x.call[,1]) && is.numeric(y.call[,1]))
+          if (MD_cut > 0  ||  out_cut > 0) {
+            otl <- .plt.MD(x.call[,1], y.call[,1], ID.call, MD_cut, out_cut)  
+            out_outliers <- otl$tx  # descriptive text
+            outlpts <- otl$outlpts  # the outliers
       }
 
 
@@ -1692,7 +1742,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           segments, segments_y, segments_x,
           smooth, smooth_points, smooth_size, smooth_exp, smooth_bins,
           radius, power, size_cut, bubble_text, low_fill, hi_fill,
-          ID.call, ID_color, ID_size, out_ind,
+          ID.call, ID_color, ID_size, outlpts,
           out_fill, out_color, out_shape, out_shape.miss,
           fit.ln, fit_power, fit_color, fit_lwd,
           fit_se, se_fill, plot_errors,
@@ -1763,23 +1813,47 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           }
 
           if (n_bins == 1) {  # if binning, .plt.bins does its own output
-            class(txprm) <- "out"
-            .plt.txt(x.call, y.call, stat, object, cat.x, cat.y,
+
+            o <- .plt.txt(x.call, y.call, stat, object, cat.x, cat.y,
               xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat,
               center_line, run, show_runs,
               proportion, size, radius, digits_d, fun_call, txdif)
 
-            class(txout) <- "out"  # MD outlier analysis
-            output <- list(out_outlier=txout, outlier_indices=out_ind,
-                           out_parm=txprm)
+              class(txprm) <- "out"  # parameter values
+              if (!is.null(out_outliers))
+                class(out_outliers) <- "out"  # MD outlier analysis
+
+              if (!is.null(outlpts)) class(outlpts) <- "out"  # MD outliers
+
+              output <- list(out_stats=o$out_stats)
+
+              if (length(o$out_reg) == 1) {
+                if (nzchar(o$out_reg))
+                  output <- c(output, list(out_reg=o$out_reg)) 
+              }
+              else if (length(o$out_reg) > 1)  # by activated
+                output <- c(output, list(out_reg=o$out_reg)) 
+
+              if (!is.null(o$out_XV)) if (length(o$out_XV) > 1)
+                output <- c(output, list(out_XV=o$out_XV)) 
+
+              if (length(out_outliers) > 1)  # source is here
+                output <- c(output, list(out_outliers=out_outliers)) 
+              if (length(o$out_outliers) > 1)  # source is .plt.txt
+                output <- c(output, list(out_outliers=o$out_outliers)) 
+
+              if (length(txprm) > 1)
+                output <- c(output, list(out_parm=txprm)) 
+
+              if (!is.null(outlpts)) if (length(outlpts) > 1)
+                output <- c(output, list(outliers=outlpts)) 
+
             class(output) <- "out_all"
-          }
-        }  # end text output
+          }  # end n_bins==1
+        }  #  end text output
 
-      }  # end do_plot
-
+      }  #  end do_plot
     }  # end 2-variable scatter plot, line plot, bubble plot
-
   }  # end all other analyses
   # -------------------------
 
@@ -1787,7 +1861,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # terminate pdf graphics system if used
   if (!is.null(pdf_file)) {
     dev.off()
-    if (!quiet) .showfile(pdf_file, "Plot")
+    if (!quiet && df.name!="NULL") .showfile(pdf_file, "Plot")
   }
 
   # reset
@@ -1805,6 +1879,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       if (!(T.type %in% c("cont", "cont_cat"))) outp <- FALSE
     }
     if (n.x_var > 1  &&  y.miss) outp <- FALSE  # scatterplot matrix
-    if (outp) return(output)
+    if (outp && !quiet) return(output)  # "prints"
   }
 }

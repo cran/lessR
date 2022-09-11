@@ -94,7 +94,7 @@ export (
   to,
   train_test,
   Transform,
-  ttest, tt, tt.brief, tt_brief,
+  ttest, tt, tt_brief,
   ttestPower, ttp,
   values, VariableLabels, vl, 
   ViolinPlot, vp,

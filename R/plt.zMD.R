@@ -40,6 +40,6 @@ function(x, y, ID, MD_cut, out_cut) {
   if (n.lines < length(x))
     tx[length(tx)+1] <- paste(.fmtc("...", max.MD-1), .fmtc("...", max.ID)) 
 
-  return(list(tx.otl=tx, out_ind=out_ind))
+  return(list(tx.otl=tx, outlpts=out_ind))
 
 }

@@ -1,7 +1,7 @@
 .dn.main <- 
 function(x, 
          bw="nrd0", type="both",
-         histogram=TRUE, bin_start=NULL, bin_width=NULL,
+         histo=TRUE, bin_start=NULL, bin_width=NULL,
          fill_hist, col.nrm, col.gen, fill_nrm, fill_gen,
          rotate_x=0, rotate_y=0, offset=0.5, 
          x.pt=NULL, xlab=NULL, main=NULL, sub=NULL,
@@ -40,7 +40,7 @@ function(x,
     if (is.null(bin_start))
        bin_start <- pretty(min(x, na.rm=TRUE):max(x, na.rm=TRUE))[1]
     if (is.null(bin_width)) {
-      h <- histogram(x, plot=FALSE, breaks="Sturges")
+      h <- hist(x, plot=FALSE, breaks="Sturges")
       bin_width <- h$breaks[2]-h$breaks[1]
     }
     max.x <- max(x, na.rm = TRUE)
@@ -50,10 +50,12 @@ function(x,
       seq.end <- seq.end + bin_width
       breaks <- seq(bin_start, seq.end, bin_width)
     }
+
   }
   else
     breaks="Sturges"
 
+    cat("\n")
 
   if (is.null(main)) {
     orig.params <- par(no.readonly=TRUE)
@@ -89,7 +91,6 @@ function(x,
   
   # normal density curve, no plot
   xx <- seq(x.min, x.max, length=200)
-  #if (fill_nrm == "transparent") lw <- 2 else lw <- 1
   lw  <- 2
   d.nrm <- dnorm(xx,mean(x),sd(x))
 
@@ -135,7 +136,7 @@ function(x,
     lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
   
   # plot the histogram
-  if (histogram)
+  if (histo)
     plot(h, add=TRUE, freq=FALSE, col=fill_hist, border="transparent")
 
   # plot the normal curve
@@ -171,7 +172,7 @@ function(x,
 
   # text output
   tx=""
-  if (!quiet) {
+# if (!quiet) {
 
     tx <- character(length = 0)
     if (getOption("suggest")) {
@@ -195,9 +196,8 @@ function(x,
 
     tx <- character(length = 0)
 
-    tx[length(tx)+1] <- paste("Density bandwidth for general curve: ",
-      .fmt(d.gen$bw,4), sep="")
-    tx[length(tx)+1] <- "For a smoother curve, increase bandwidth with option: bw"
+    tx[length(tx)+1] <- paste( "--- Bandwidth ---",
+           "     for general curve:", .fmt(d.gen$bw,4), "\n")
 
     W <- NA; p.val <- NA
     if (type == "normal" || type == "both") {
@@ -219,6 +219,6 @@ function(x,
   return(list(tx=tx, txsug=txsug, 
               bw=d.gen$bw, n=n, n.miss=n.miss, W=W, pvalue=p.val))
 
-  }
+# }  # not quiet
 
 } 

@@ -65,7 +65,9 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     max.nm <- nchar(as.character(sum(is.na(x))))
   }
 
-  max.ln <- 0  # get max.ln, maximum length of the individual fields
+  # get max.ln, maximum length of the individual fields
+  # (this computes the mean and sd twice for each line, also for output)
+  max.ln <- 0  
   for (i in 1:n.lines) {
     if (n.lines == 1)
       xx <- x

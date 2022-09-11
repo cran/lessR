@@ -36,7 +36,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-        eval_df=NULL, quiet=getOption("quiet"),
+        eval_df=NULL, quiet=getOption("quiet"), do_plot=TRUE,
         width=6.5, height=6, pdf_file=NULL, ...)  {
 
   # Note: if contains getColors() call, fill already evaluated
@@ -67,6 +67,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
   horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
   by.miss <- ifelse (missing(by), TRUE, FALSE)
   by1.miss <- ifelse (missing(by1), TRUE, FALSE)
+  if (color == "off") color <- "transparent"
 
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
   sort <- match.arg(sort)
@@ -77,8 +78,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
   }
   
   if (horiz) {
-    if (sort == "+") sort <- "-" 
+    if (sort == "+") sort <- "x" 
     if (sort == "-") sort <- "+" 
+    if (sort == "x") sort <- "-" 
   }
 
   proportion <- FALSE
@@ -174,16 +176,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
     }
   }
 
-
-  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE)
-  if (is.null(eval_df)) eval_df <- ifelse (shiny, FALSE, TRUE)
-
-  # get actual variable name before potential call of data$x
-  if (!missing(x))  # no is.null or anything else with x until evaluated
-    x.name <- deparse(substitute(x))  # could be a list of var names
-  else
-    x.name <- NULL  # otherwise is actually set to "NULL" if NULL
-  options(xname = x.name)
+ 
+  # --------- data frame stuff
+  
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -191,34 +187,50 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
   if (!is.null(dfs)) {
     if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
       d <- mydata
+      rm(mydata)
       df.name <- "mydata"
       mydata.ok <- TRUE
       options(dname = df.name)
     }
   }
+
+  # get name of data table
   if (!mydata.ok) {
-    df.name <- deparse(substitute(data))  # get name of data table
+    df.name <- deparse(substitute(data))
     options(dname = df.name)
   }
  
   # if a tibble convert to data frame
   if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  # tibble to df
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {
+    if (df.name %in% dfs) {  
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {  # tibble to df
         data <- data.frame(data)
       }
     }
   }
 
-  # force evaluation (not lazy) if data not specified but relies on default d
-  if ((missing(data) && shiny))
-    data <- eval(substitute(data), envir=parent.frame())
+  x.name <- deparse(substitute(x), width.cutoff = 120L)
+  options(xname = x.name)
 
-  if (!is.null(x.name))
-    x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
-  else
-    x.in.global <- FALSE
+    if (!is.null(x.name))
+      x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
+    else
+      x.in.global <- FALSE
+
+  if (!x.in.global)  {
+    if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
+      # force evaluation (not lazy) if data not specified, relies on default d
+      if (data.miss) {
+        if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
+        data <- eval(substitute(data), envir=parent.frame())
+      }
+    }
+    else # df.name is NULL
+      x.in.global <- TRUE
+  }
     
+  eval_df <- !x.in.global 
+ 
 
   # -----------------------------------------------------------
   # establish if a data frame, if not then identify variable(s)
@@ -279,28 +291,21 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         levels(x.call) <- trimws(levels(x.call), which="left")
     else if (is.character(x.call))
       if (nchar(x.call[1]) > 5) x.call <- trimws(x.call, which="left")
-  }  # !missing x
+    }  # !missing x
 
-  # x is a single var, not a data frame or a var list
-  if (!is.null(x.call)) {
+    # x is a single var, not a data frame or a var list
+    if (!is.null(x.call)) {
 
-    # evaluate by
-    if (!missing(by)) {
+
+  # evaluate by
+    if (!by.miss) {
 
       # get actual variable name before potential call of data$x
       by.name <- deparse(substitute(by))
       options(byname = by.name)
       # get conditions and check for data existing
-      if (!shiny) {
-        xs <- .xstatus(by.name, df.name, quiet)
-        in.global <- xs$ig
-      }
-      else
-        in.global <- FALSE
+      in.global <- ifelse (df.name!="NULL", .in.global(by.name, quiet), TRUE)
 
-      # see if var exists in data frame, if x not in global Env or function call
-#     if (eval_df)
-#       if (!in.global) .xcheck(by.name, df.name, names(data))
       if (!in.global) {
         if (eval_df)
           .xcheck(by.name, df.name, names(data))
@@ -312,6 +317,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       }
 
     }
+
     else  # end not missing by
       by.call <- NULL
 
@@ -326,11 +332,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       options(yname = y.name)
 
       # get conditions and check for data existing
-      xs <- .xstatus(y.name, df.name, quiet)
-      in.global <- xs$ig
+      in.global <- .in.global(y.name, quiet)
 
       # see if var exists in data frame, if x not in global Env or function call
-      if (eval_df) if (!in.global) .xcheck(y.name, df.name, names(data))
+      if (eval_df)
+        if (!in.global) .xcheck(y.name, df.name, names(data))
       if (!in.global)
         y.call <- eval(substitute(data$y))
       else {  # vars that are function names get assigned to global
@@ -352,8 +358,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       options(by1name = by1.name)
 
       # get conditions and check for data existing
-      xs <- .xstatus(by1.name, df.name, quiet)
-      in.global <- xs$ig
+      in.global <- .in.global(by1.name, quiet)
 
       # see if var exists in data frame, if x not in global Env or function call
       if (!missing(x) && !in.global)
@@ -375,6 +380,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
   # evaluate fill (NULL, numeric constant or a variable)
   #--------------
+# if (!fill.miss) {
+#     if (fill.name == "in.fill") fill.miss <- TRUE
+# }
+
   if (!fill.miss) {
     fill.name <- deparse(substitute(fill))
     if (length(fill.name) == 1) {
@@ -433,7 +442,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
   n.x <- length(unique(x.call))
   n.by <- ifelse (!by.miss, length(unique(by.call)), 0)
-  n.levels <- ifelse (by.miss, n.x, n.by)
+  n.levels <- ifelse (by.miss || is.null(by.call), n.x, n.by)
 
   # -------------
   # assign colors
@@ -539,16 +548,15 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
   # -----------------------
   else {  # not Trellis
 
+    # set up pdf_file if needed
     if (!is.null(pdf_file)) {
       if (!grepl(".pdf", pdf_file))
         pdf_file <- paste(pdf_file, ".pdf", sep="")
-      .opendev(pdf_file, width, height)
+      pdf(file=pdf_file, width=width, height=height, onefile=FALSE)
     }
     else {
-      if (!shiny) {  # not dev.new for shiny
-        pdf_file <- NULL
-        .opendev(pdf_file, width, height)
-      }
+      if (df.name != "NULL")  # not dev.new for shiny
+          .opendev(pdf_file, width, height)
     }
 
     unq.x <- ifelse (length(x.call) == length(unique(x.call)), TRUE, FALSE)
@@ -605,12 +613,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
     }  # end sum, mean, sd, min, median, max
 
-
-    is.range.nm <- ifelse (length(.color_range(fill, 5)) > 1, TRUE, FALSE)
-    if (!is.range.nm && !by.miss && !fill.miss) {
+    is.range.nm <- ifelse (length(.color_range(fill, n.clr=5)) > 1, TRUE, FALSE)
+    if (!is.range.nm && !by.miss && !fill.miss && !is.null(by.call)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "For custom fill for a two-variable bar chart,\n",
-        " must specify a color range such as \"blues\" or \"grays\", \n\n")
+        " must specify a color range such as \"colors\" or \"grays\", \n\n")
     }
 
     bc <- .bc.main(x.call, y.call, by.call, stack100,
@@ -625,12 +632,12 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
           pad_y_min, pad_y_max,
           legend_title, legend_position, legend_labels,
           legend_horiz, legend_size, legend_abbrev, legend_adj,
-          add, x1, x2, y1, y2, out_size, digits_d, quiet, ...)
+          add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet, ...)
 
-      if (!is.null(pdf_file)) {
-        dev.off()
-        if (!quiet) .showfile(pdf_file, "BarChart")
-      }
+  if (!is.null(pdf_file)) {
+    dev.off()
+    if (!quiet) .showfile(pdf_file, "BarChart")
+  }
         
       return(invisible(bc))
     }  # not Trellis
@@ -707,13 +714,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       if (!is.null(pdf_file)) {
         if (!grepl(".pdf", pdf_file))
           pdf_file <- paste(pdf_file, ".pdf", sep="")
-        .opendev(pdf_file, width, height)
+        pdf(file=pdf_file, width=width, height=height, onefile=FALSE)
       }
       else {
-        if (!shiny) {  # not dev.new for shiny
-          pdf_file <- NULL
-          .opendev(pdf_file, width, height)
-        }
+        if (df.name != "NULL")  # not dev.new for shiny
+            .opendev(pdf_file, width, height)
       }
       
       bc <- .bc.main(data, y.call, by.call, stack100,
@@ -728,7 +733,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
             pad_y_min, pad_y_max,
             legend_title, legend_position, legend_labels,
             legend_horiz, legend_size, legend_abbrev, legend_adj,
-            add, x1, x2, y1, y2, out_size, digits_d, quiet, ...)
+            add, x1, x2, y1, y2, out_size, digits_d, do_plot,  quiet, ...)
       
       if (!is.null(pdf_file)) {
         dev.off()
@@ -753,7 +758,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         pad_y_min, pad_y_max,
         legend_title, legend_position, legend_labels,
         legend_horiz, legend_size, legend_abbrev, legend_adj,
-        out_size, quiet, width, height, pdf_file, ...)
+        out_size, do_plot, quiet, width, height, pdf_file, ...)
     }
   }
 

@@ -9,10 +9,6 @@ function(x, y,
         add, x1, x2, y1, y2,
         quiet, pdf_file, width, height, ...)  {
 
-  # get values for ... parameter values
-  #stuff <- .getdots(...)
-  #col.main <- stuff$col.main
-
   is.ord <- ifelse (is.ordered(x), TRUE, FALSE)
 
   # set the labels
@@ -103,6 +99,7 @@ function(x, y,
   }
 
   x.tbl <- x  # save tabled values for text output
+
   labels <- names(x)
   x <- as.numeric(x)
   if (values != "off") {
@@ -135,10 +132,10 @@ function(x, y,
   pin <- par("pin")  # plot dimensions in inches
   xlim <- c(-1, 1)
   ylim <- c(-1, 1)
-  if (pin[1L] > pin[2L]) 
-    xlim <- (pin[1L]/pin[2L]) * xlim
+  if (pin[1] > pin[2]) 
+    xlim <- (pin[1]/pin[2]) * xlim
   else
-    ylim <- (pin[2L]/pin[1L]) * ylim
+    ylim <- (pin[2]/pin[1]) * ylim
   plot.window(xlim, ylim, "", asp=1)
 
   # set labels
@@ -179,41 +176,57 @@ function(x, y,
     }
   }
 
-  for (i in 1L:nx) { 
+  for (i in 1:nx) { # slice by slice 
     # plot slice
     n <- max(2, floor(edges * dx[i]))
-    P <- t2xy(seq.int(x[i], x[i + 1], length.out=n), radius)
-    polygon(c(P$x, 0), c(P$y, 0), density=density[i], angle=angle[i], 
+    p <- t2xy(seq.int(x[i], x[i + 1], length.out=n), radius)
+    polygon(c(p$x, 0), c(p$y, 0), density=density[i], angle=angle[i], 
         border=color[i], col=clr[i], lty=lty[i], lwd=lwd)
 
-    # plot label, optional values
-    P <- t2xy(mean(x[i + 0:1]), radius)
+    # plot values if "out"
+    p <- t2xy(mean(x[i + 0:1]), radius)
     lab <- as.character(labels[i])
     if (labels_cex > 0)
-      if (!is.na(lab) && nzchar(lab)) {
-        lines(c(1, 1.05)*P$x, c(1, 1.05)*P$y)  # tick marks
-      if (values != "off") if (values_position == "out")  # results to labels
-        labels[i] <- paste(labels[i], "\n", x.txt[i], sep="")
-      if (labels_cex > 0)
-         text(1.1 * P$x, 1.175 * P$y, labels[i], xpd=TRUE, 
-           adj=ifelse(P$x < 0, 1, 0), cex=labels_cex, ...)  # labels
+      if (nzchar(lab)) {
+        lines(c(1, 1.05)*p$x, c(1, 1.05)*p$y)  # tick marks
+      if (values != "off") if (values_position == "out") {
+        if (labels_cex > 0) {
+          cx <- 1.1;  cy <- 1.175
+          text(cx*p$x, (cy*p$y-.1), x.txt[i], xpd=TRUE, col=values_cl[i],
+               adj=ifelse(p$x < 0, 1, -.25), cex=values_cex, ...)
+        }
+      }  # end out
 
+
+      # plot the values if "in"
       if (values != "off") if (values_position == "in") {
         cx <- 0.82;  cy <- 0.86  # scale factors to position labels
         if (hole < 0.65) {  # scale factor to slide text down for small hole
           cx <- cx * (1 - (.16 * (1-hole)))  # max slide is 0.84
           cy <- cy * (1 - (.16 * (1-hole)))
         }
-        text(cx*P$x, cy*P$y, x.txt[i], xpd=TRUE, col=values_cl[i],
+        if (hole > 0.77) {  # scale factor to slide text down for small hole
+          cx <- cx * (1 - (-.42 * (1-hole)))  # max slide is 0.84
+          cy <- cy * (1 - (-.42 * (1-hole)))
+        }
+        if (hole > 0.89) {  # scale factor to slide text down for small hole
+          cx <- cx * (1 - (-.62 * (1-hole)))  # max slide is 0.84
+          cy <- cy * (1 - (-.62 * (1-hole)))
+        }
+        text(cx*p$x, cy*p$y, x.txt[i], xpd=TRUE, col=values_cl[i],
              cex=values_cex, ...)
-      }
-    }
+      }  # end "in"
 
+      # plot the labels
+      cx <- 1.1;  cy <- 1.175
+      text(cx * p$x, cy * p$y, labels[i], xpd=TRUE, 
+        adj=ifelse(p$x < 0, 1, 0), cex=labels_cex, ...)  # labels
+    }
   }  # end slice by slice
 
   # add centered hole over the top of the pie
-  P <- t2xy(seq.int(0, 1, length.out=125), hole)
-  polygon(P$x, P$y, col=hole_fill, border=color, lty=lty[1], lwd=lwd)
+  p <- t2xy(seq.int(0, 1, length.out=125), hole)
+  polygon(p$x, p$y, col=hole_fill, border=color, lty=lty[1], lwd=lwd)
 
   title(main=main.lbl, cex.main=main_cex, col.main=getOption("main_color"))
 
@@ -223,22 +236,22 @@ function(x, y,
   # -----------
 
   #if (length(dim(x)) == 1  && !quiet) {  # one variable
-  if (!quiet) { 
+# if (!quiet) { 
 
     txsug <- ""
     if (getOption("suggest")) {
-      txsug <- ">>> Suggestions"
-        fc <- paste("PieChart(", x.name,
+      txsug <- ">>> suggestions"
+        fc <- paste("piechart(", x.name,
                     ", hole=0)  # traditional pie chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("PieChart(", x.name,
+        fc <- paste("piechart(", x.name,
                     ", values=\"%\")  # display %'s on the chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("PieChart(", x.name, ")  # bar chart", sep="")
+        fc <- paste("piechart(", x.name, ")  # bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
+        fc <- paste("plot(", x.name, ")  # bubble plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("Plot(", x.name,
+        fc <- paste("plot(", x.name,
                     ", values=\"count\")  # lollipop plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
     }
@@ -262,8 +275,8 @@ function(x, y,
     }
 
     class(output) <- "out_all"
-    print(output)      
-  }
+    if (!quiet) print(output)      
+# }
 
   if (!is.null(add)) {
 
@@ -279,5 +292,6 @@ function(x, y,
   }
 
   cat("\n")
+  return(output)
 
 }  #  end pc.main

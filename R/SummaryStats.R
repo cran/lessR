@@ -71,11 +71,10 @@ function(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"),
       in.call <- TRUE else in.call <- FALSE
 
     # get conditions and check for data existing
-    if (!in.call) {
-      xs <- .xstatus(y.name, df.name)
-      in.style <- xs$ig 
-    }
-    else in.style <- FALSE
+    if (!in.call)
+      in.style <- .in.global(y.name, quiet=FALSE)
+    else
+      in.style <- FALSE
 
     # see if var exists in data frame, if x not in style Env or function call 
     if (!in.style && !in.call) .xcheck(y.name, df.name, names(data))
@@ -124,7 +123,7 @@ function(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"),
       if (is.data.frame(x))  # x a data frame
         data <- x
       else {  # x a vector in style
-        .xstatus(x.name, df.name)  # var in df?, vars lists not checked
+        .in.global(x.name, quiet=FALSE) 
         if (!is.function(x))
           data <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
         else  # x is 1 var

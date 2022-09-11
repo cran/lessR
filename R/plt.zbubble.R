@@ -1,5 +1,5 @@
 .plt.bubble <-
-function(x, y, size, radius, power, clr_color, clr,
+function(x, y, size, radius, power, fill, color,
          size_cut, prop, bubble_text, object) {
 
 
@@ -12,7 +12,7 @@ function(x, y, size, radius, power, clr_color, clr,
 
   sz <- cords[,3]**power  # radius unscaled for all the points
   symbols(cords[,1], cords[,2], circles=sz, inches=radius,
-          bg=clr_color, fg=clr, add=TRUE)
+          fg=color, bg=fill, add=TRUE)
   mxru <- max(sz)
   sz <- 2 * (sz/mxru) * radius  # scaled diameter
 

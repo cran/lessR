@@ -23,10 +23,10 @@ function(x=NULL, data=d, rows=NULL,
     offset=getOption("offset"),
     scale_x=NULL, scale_y=NULL,
 
-    density=FALSE, dn.hist=TRUE,
-    bw=NULL, type=c("general", "normal", "both"),
-    color_gen="gray20", color_nrm="gray20",
-    fill_hist=getOption("se_fill"), fill_nrm=NULL, fill_gen=NULL,
+    density=FALSE, show_histogram=TRUE,
+    bandwidth=NULL, type=c("general", "normal", "both"),
+    fill_general=NULL, fill_normal=NULL, fill_hist=getOption("se_fill"), 
+    color_general="gray20", color_normal="gray20",
     x.pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
 
@@ -41,12 +41,18 @@ function(x=NULL, data=d, rows=NULL,
     fill <- ifelse (is.null(getOption("bar_fill_cont")), 
       getOption("bar_fill"), getOption("bar_fill_cont"))
   breaks.miss <- ifelse (missing(breaks), TRUE, FALSE)
-  bw.miss <- ifelse (missing(bw), TRUE, FALSE)
+  bw.miss <- ifelse (missing(bandwidth), TRUE, FALSE)
 
-  # a dot in a parameter name to an underscore
+  # a dot in a parameter name to an underscore and more
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
+      if (names(dots)[i] == "dn.hist") show_histogram <- dots[[i]]
+      if (names(dots)[i] == "fill_gen") fill_general <- dots[[i]]
+      if (names(dots)[i] == "fill_nrm") fill_normal <- dots[[i]]
+      if (names(dots)[i] == "color_gen") color_general <- dots[[i]]
+      if (names(dots)[i] == "color_nrm") color_normal <- dots[[i]]
+      if (names(dots)[i] == "bw") bandwidth <- dots[[i]]
       if (length(grep(".", names(dots)[i], fixed=TRUE)) > 0) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
@@ -115,48 +121,61 @@ function(x=NULL, data=d, rows=NULL,
 
   .param.old(...)
 
-  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval_df)) eval_df <- ifelse (shiny, FALSE, TRUE)
 
-  # get actual variable name before potential call of data$x
-  if (!missing(x))  # no is.null or anything else with x until evaluated
-    x.name <- deparse(substitute(x))  # could be a list of var names
-  else
-    x.name <- NULL  # otherwise is actually set to "NULL" if NULL
-  options(xname = x.name)
+  # --------- data frame stuff
+  
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
   mydata.ok <- FALSE
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
-    d <- mydata
-    df.name <- "mydata"
-    mydata.ok <- TRUE
-    options(dname = df.name)
+  if (!is.null(dfs)) {
+    if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
+      d <- mydata
+      rm(mydata)
+      df.name <- "mydata"
+      mydata.ok <- TRUE
+      options(dname = df.name)
+    }
   }
 
+  # get name of data table
   if (!mydata.ok) {
-    df.name <- deparse(substitute(data))  # get name of data table
+    df.name <- deparse(substitute(data))
     options(dname = df.name)
   }
  
   # if a tibble convert to data frame
   if (!is.null(dfs)) {
-    if (df.name %in% ls(name=.GlobalEnv)) {  # tibble to df
-     if (any(grepl("tbl", class(data), fixed=TRUE))) {
+    if (df.name %in% dfs) {  
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {  # tibble to df
         data <- data.frame(data)
-     }
+      }
     }
   }
 
-  # force evaluation (not lazy) if data not specified but relies on default d
-  if ((missing(data) && shiny))  
-    data <- eval(substitute(data), envir=parent.frame())
+  x.name <- deparse(substitute(x), width.cutoff = 120L)
+  options(xname = x.name)
 
-  if (!is.null(x.name))
-    x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
-  else
-    x.in.global <- FALSE
+    if (!is.null(x.name))
+      x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
+    else
+      x.in.global <- FALSE
+
+  if (!x.in.global)  {
+    if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
+      # force evaluation (not lazy) if data not specified, relies on default d
+      if (data.miss) {
+        if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
+        data <- eval(substitute(data), envir=parent.frame())
+      }
+    }
+    else # df.name is NULL
+      x.in.global <- TRUE
+  }
+    
+  eval_df <- !x.in.global 
+
     
   # -----------------------------------------------------------
   # establish if a data frame, if not then identify variable(s)
@@ -203,16 +222,17 @@ function(x=NULL, data=d, rows=NULL,
         data.x <- data.frame(data[[ind]], stringsAsFactors=TRUE)
         names(data.x) <- x.name
       }
-    }  # x not in global
+    }  # end x not in global
 
-    else { # x is in the global environment (vector or data frame)
+    # x is in the global environment (vector or data frame)
+    else {
       if (is.data.frame(x))  # x a data frame
         data.x <- x
       else {  # x a vector in global
-        .xstatus(x.name, df.name, quiet)
+        .in.global(x.name, quiet)  # x.name is expression?
         if (!is.function(x))
           data.x <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
-        else  # x is 1 var
+        else
           data.x <- data.frame(eval(substitute(data$x)), stringsAsFactors=TRUE)
         names(data.x) <- x.name
       }
@@ -228,8 +248,7 @@ function(x=NULL, data=d, rows=NULL,
     options(by1name = by1.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(by1.name, df.name, quiet)
-    in.global <- xs$ig
+    in.global <- .in.global(by1.name, quiet)
 
     # see if var exists in df, if x not in global Env or function call
     if (!missing(x) && !in.global)
@@ -258,8 +277,7 @@ function(x=NULL, data=d, rows=NULL,
     options(by2name = by2.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(by2.name, df.name, quiet)
-    in.global <- xs$ig
+    in.global <- .in.global(by2.name, quiet)
 
     # var in data frame? if x not in global Env or function call
     if (!missing(x) && !in.global)
@@ -285,10 +303,9 @@ function(x=NULL, data=d, rows=NULL,
   if (Trellis && do_plot) {
 
     .bar.lattice(data.x[,1], by1.call, by2.call, n_row, n_col, aspect, 
-                 proportion, fill, color, trans, size.pt=NULL,
-                 xlab, ylab, main, rotate_x, offset,
-                 width, height, pdf_file, segments_x=NULL, breaks, T.type="hist",
-                 quiet)
+           proportion, fill, color, trans, size.pt=NULL,
+           xlab, ylab, main, rotate_x, offset, width, height, pdf_file,
+           segments_x=NULL, breaks, T.type="hist", quiet)
   }
 
   else {  # not Trellis
@@ -297,7 +314,7 @@ function(x=NULL, data=d, rows=NULL,
 
     # set up graphics
     manage.gr <- .graphman()  # manage graphics?
-    if (manage.gr && !shiny) {
+    if (manage.gr) {
       i.win <- 0
       for (i in 1:ncol(data)) {
         if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n_cat)) 
@@ -327,101 +344,111 @@ function(x=NULL, data=d, rows=NULL,
         # let 1 variable go through, even if num.cat
         if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n_cat)) {
 
-          if (!is.null(pdf_file)) {
-            if (!grepl(".pdf", pdf_file))
-              pdf_file <- paste(pdf_file, ".pdf", sep="")
-            .opendev(pdf_file, width, height)
+        if (!is.null(pdf_file)) {
+          if (!grepl(".pdf", pdf_file))
+            pdf_file <- paste(pdf_file, ".pdf", sep="")
+          pdf(file=pdf_file, width=width, height=height, onefile=FALSE)
+        }
+        else {
+          if (df.name != "NULL")  # not dev.new for shiny
+              .opendev(pdf_file, width, height)
+        }
+
+        txss <- ""
+        ssstuff <- .ss.numeric(data[,i], digits_d=digits_d, brief=TRUE)
+        txss <- ssstuff$tx
+
+        if (histogram) {
+
+          # nothing returned if quiet=TRUE
+
+          stuff <- .hst.main(data[,i], fill, color, trans, reg,
+              rotate_x, rotate_y, offset,
+              breaks, bin_start, bin_width,
+              bin_end, proportion, values, cumulate, xlab, ylab, main, sub, 
+              xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
+              add, x1, x2, y1, y2,
+              scale_x, scale_y,
+              quiet, do_plot, fun_call=fun_call, ...)
+
+          txsug <- stuff$txsug
+          if (is.null(txsug)) txsug <- ""
+          txdst <- stuff$ttx
+          if (is.null(txdst)) txdst <- ""
+
+          txotl <- ""
+            txotl <- .bx.stats(data[,i])$txotl
+            if (txotl[1] == "") txotl <- "No (Box plot) outliers"
+
+          if (ncol(data) > 1  &&  !quiet) { # for var range, print text output
+            class(txss) <- "out"
+            class(txdst) <- "out"
+            class(txotl) <- "out"
+            output <- list(out_ss=txss, out_freq=txdst, out_outliers=txotl)
+            class(output) <- "out_all"
+            if (!quiet) print(output)
           }
-          else {
-            if (ncol(data) > 1) {
-              plot.i <- plot.i + 1
-              plot.title[plot.i] <- paste("Histogram of ", x.name, sep="")
-              if (manage.gr) {
-                open.win <- open.win + 1
-                dev.set(which = open.win)
-              }
+        } # end histogram
+
+        else {  # density
+          if (bw.miss) bandwidth <- .band.width(data[,i], ...)  # band width
+
+          clr <- getOption("theme")  # color theme not used except monochrome
+
+          if (!missing(color_rug)  ||  !missing(size_rug)) rug <- TRUE
+
+          if (missing(fill_general)) {
+              fill_general <- rgb(80,150,200, alpha=80, maxColorValue=255)
+            if (clr == "gray" ||
+               (getOption("theme") == "gray"  &&
+                getOption("sub_theme") == "black")) {
+              fill_general <- rgb(.75,.75,.75, .5)
+            }
+          }
+          else {  # add some transparency to a named color
+            if (fill_general %in% colors()) {
+              fg.rgb <- col2rgb(fill_general) 
+              fill_general <- rgb(fg.rgb[1], fg.rgb[2], fg.rgb[3],
+                                  alpha=80, maxColorValue=255)
             }
           }
 
-          txss <- ""
-          ssstuff <- .ss.numeric(data[,i], digits_d=digits_d, brief=TRUE)
-          txss <- ssstuff$tx
-
-          if (histogram) {
-
-            # nothing returned if quiet=TRUE
-
-            stuff <- .hst.main(data[,i], fill, color, trans, reg,
-                rotate_x, rotate_y, offset,
-                breaks, bin_start, bin_width,
-                bin_end, proportion, values, cumulate, xlab, ylab, main, sub, 
-                xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
-                add, x1, x2, y1, y2,
-                scale_x, scale_y,
-                quiet, do_plot, fun_call=fun_call, ...)
-
-            txsug <- stuff$txsug
-            if (is.null(txsug)) txsug <- ""
-            txdst <- stuff$ttx
-            if (is.null(txdst)) txdst <- ""
-
-            txotl <- ""
-              txotl <- .bx.stats(data[,i])$txotl
-              if (txotl[1] == "") txotl <- "No (Box plot) outliers"
-
-            if (ncol(data) > 1  &&  !quiet) { # for var range, print text output
-              class(txss) <- "out"
-              class(txdst) <- "out"
-              class(txotl) <- "out"
-              output <- list(out_ss=txss, out_freq=txdst, out_outliers=txotl)
-              class(output) <- "out_all"
-              if (!quiet) print(output)
+          if (missing(fill_normal)) {
+              fill_normal <- rgb(250,210,230, alpha=80, maxColorValue=255)
+            if (clr == "gray" ||
+               (getOption("theme") == "gray"  &&
+                getOption("sub_theme") == "black")) {
+              fill_normal <- "transparent"
             }
-          } # end histogram
-
-          else {  # density
-
-            if (bw.miss) bw <- .band.width(data[,i], ...)  # band width
-
-            clr <- getOption("theme")  # color theme not used except monochrome
-
-            if (!missing(color_rug)  ||  !missing(size_rug)) rug <- TRUE
-
-            if (missing(fill_nrm)) {
-                fill_nrm <- rgb(250,210,230, alpha=80, maxColorValue=255)
-              if (clr == "gray" ||
-                 (getOption("theme") == "gray"  &&
-                  getOption("sub_theme") == "black")) {
-                fill_nrm <- "transparent"
-              }
+          }
+          else {  # add some transparency to a named color
+            if (fill_normal %in% colors()) { 
+              fg.rgb <- col2rgb(fill_normal) 
+              fill_normal <- rgb(fg.rgb[1], fg.rgb[2], fg.rgb[3],
+                                  alpha=80, maxColorValue=255)
             }
+          }
 
-            if (missing(fill_gen)) {
-                fill_gen <- rgb(80,150,200, alpha=80, maxColorValue=255)
-              if (clr == "gray" ||
-                 (getOption("theme") == "gray"  &&
-                  getOption("sub_theme") == "black")) {
-                fill_gen <- rgb(.75,.75,.75, .5)
-              }
-            }
+          x.min <- NULL
+          x.max <- NULL
+          if (!is.null(scale_x)) {
+            x.min <- scale_x[1]
+            x.max <- scale_x[2]
+          }
 
-            x.min <- NULL
-            x.max <- NULL
-            if (!is.null(scale_x)) {
-              x.min <- scale_x[1]
-              x.max <- scale_x[2]
-            }
-
-          stuff <- .dn.main(data[,i], bw, type, dn.hist, bin_start, bin_width,
-                fill_hist, color_nrm, color_gen, fill_nrm, fill_gen,
+          stuff <- .dn.main(data[,i], bandwidth, type, show_histogram,
+                bin_start, bin_width,
+                fill_hist, color_normal, color_general,
+                fill_normal, fill_general,
                 rotate_x, rotate_y, offset,
                 x.pt, xlab, main, sub, y_axis, x.min, x.max,
                 rug, color_rug, size_rug, quiet, fncl=fun_call, ...)
 
-          txdst <- ""
+
+          txdst <- ""  # should be named txbw
           txotl <- ""
           txsug <- ""
-          if (!quiet) {
+#         if (!quiet) {
             txdst <- stuff$tx
 
             txotl <- .bx.stats(data[,i])$txotl
@@ -432,7 +459,7 @@ function(x=NULL, data=d, rows=NULL,
             class(txdst) <- "out"
             class(txotl) <- "out"
             class(txsug) <- "out"
-          }
+#         }
           gl <- .getlabels()
           x.name <- gl$xn; x.lbl <- gl$xl;
           y.name <- gl$yn; y.lbl <- gl$yl
@@ -450,9 +477,19 @@ function(x=NULL, data=d, rows=NULL,
           if (!quiet) .showfile(pdf_file, "Histogram")
         }
 
-      }  # nu > n_cat
-      else
+      }  # end ncol(data) == 1 ... 
+
+      else { 
+        if (ncol(data) > 1) {
+          plot.i <- plot.i + 1
+          plot.title[plot.i] <- paste("Histogram of ", x.name, sep="")
+          if (manage.gr) {
+            open.win <- open.win + 1
+            dev.set(which = open.win)
+          }
+        }
         if (!quiet) .ncat("Histogram", x.name, nu, n_cat)
+      }
 
       }  # is.numeric(data[,i])
     }  # end for i from 1 to ncol
@@ -464,7 +501,7 @@ function(x=NULL, data=d, rows=NULL,
           .plotList(plot.i, plot.title)
     }
 
-    if (!shiny)
+    if (df.name != "NULL")  # not shiny
       dev.set(which=2)  # reset graphics window for standard R functions
 
     if (ncol(data) == 1) {
@@ -508,13 +545,13 @@ function(x=NULL, data=d, rows=NULL,
                 )
         stuff <- c(stuff[1], stuff[12], stuff[2], stuff[11], stuff[3], stuff[4],
                    stuff[5], stuff[6], stuff[7], stuff[8], stuff[9], stuff[10])
-        invisible(stuff)
+        return(invisible(stuff))
       }  # end histogram
 
       else {  # density
-
           output <- list(type="Density",
-            out_suggewt=txsug, out_title=ttlns, out_stats=txdst,
+#           out_suggest=txsug, out_title=ttlns, out_stats=txdst,
+            out_suggest=txsug, out_stats=txdst,
             out_ss=txss, out_outliers=txotl,
             out_file=txkfl,
             bw=stuff$bw, n=stuff$n, n_miss=stuff$n.miss)
@@ -522,7 +559,7 @@ function(x=NULL, data=d, rows=NULL,
           class(output) <- "out_all"
 
         if (!quiet) print(output)
-        invisible(output)
+        return(invisible(output))
       }  # end density
 
     }  # end ncol(data) == 1

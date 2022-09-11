@@ -1,7 +1,6 @@
 \name{ttest}
 \alias{ttest}
 \alias{tt}
-\alias{tt.brief}
 \alias{tt_brief}
 
 \title{Generic Method for t-test and Standardized Mean Difference with Enhanced Graphics}
@@ -33,7 +32,6 @@ ttest(x=NULL, y=NULL, data=d, rows=NULL, paired=FALSE,
          graph=TRUE, line_chart=FALSE,
          width=5, height=5, pdf_file=NULL, \dots)       
 
-tt.brief(\dots)
 tt_brief(\dots)
 
 tt(\dots)

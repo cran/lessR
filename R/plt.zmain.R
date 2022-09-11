@@ -49,7 +49,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          add_color=NULL, add_fill=NULL, add_trans=NULL,
 
          quiet=FALSE, want.labels=TRUE, bubble.title=TRUE, ...)  {
- 
+
  
   # preliminaries
   # -------------------------
@@ -142,6 +142,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     main.lab <- bquote(paste(italic(.(sz.nm)), ": Bubble size from ",
       .(min(size)), " to ", .(max(size)), sep=""))
   }
+  else
+    main.lab <- NULL
 
   # get lab_x_cex  lab_y_cex
   lab_cex <- getOption("lab_cex")
@@ -159,14 +161,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                      lab_y_cex=lab_y_cex)
     x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
     y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
-    main.lab <- gl$mb
+    if (is.null(main.lab)) main.lab <- gl$mb
     sub.lab <- gl$sb
     by.name <- getOption("byname")
   }
   else {
     x.lab <- xlab
     y.lab <- ylab
-    main.lab <- main
+    if (is.null(main.lab)) main.lab <- main
     sub.lab <- sub
     x.name <- NULL
   }
@@ -500,11 +502,10 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       if (n.xcol == 1  &&  n.ycol == 1) {
         if (n.by <= 1) {  # pure single panel, data in wide format
 
-          if (ln.width > 0)  # plot line(s)
-            if (date.ts || freq.poly || object == "both")  # object == "both"
-                #lines(as.numeric(x[,1]), y[,1], col=col.segment, lwd=ln.width,
-                lines(as.numeric(x[,1]), y[,1], col=color[1], lwd=ln.width,
-                      ...)
+          if (ln.width > 0) {  # plot line(s)
+            if (date.ts || freq.poly)  # object == "both"
+              lines(as.numeric(x[,1]), y[,1], col=color[1], lwd=ln.width, ...)
+          }
 
           if (area_fill[1] != "transparent") # fill area
             polygon(c(x[1],x,x[length(x)]), c(min(y[,1]),y[,1],min(y[,1])),
@@ -813,10 +814,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         if (stack) {
           point.size <- 2.5 * axis_x_cex
           .plt.by.legend(levels(by), color, area_fill, shp=22, pts_trans,
-                         fill_bg, usr, pt.size=point.size)
+                         fill_bg, usr, pt.size=point.size,
+                         legend_title=legend_title)
         }
         else
-          .plt.by.legend(levels(by), color, fill, shp, pts_trans, fill_bg, usr)
+          .plt.by.legend(levels(by), color, fill, shp, pts_trans,
+                         fill_bg, usr, legend_title=legend_title)
 
       }  # end by
 
@@ -848,7 +851,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # ----------------------------
 
   else if (object %in% c("bubble", "sunflower")) {
-
     if (!is.null(by)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Parameter  by  not valid for bubble plot\n\n")
@@ -969,7 +971,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       s.y <- sd(y.lv, na.rm=TRUE)
 
       for (j in 1:length(ellipse)) { # for each ellipse for this by group 
-        e <- ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y),
+        e <- ellipse::ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y),
                      level=ellipse[j])
         ln.type <- "solid"
         col.border <- ifelse (n.clrs == 1, ellipse_color, clr)

@@ -337,15 +337,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <div id="TOC">
 <ul>
-<li><a href="#subset-a-data-frame-with-base-r-extract">Subset a Data
-Frame with <strong>Base R</strong> <code>Extract[]</code></a></li>
-<li><a href="#annoying-features-of-base-r-extract">Annoying Features of
+<li><a href="#subset-a-data-frame-with-base-r-extract" id="toc-subset-a-data-frame-with-base-r-extract">Subset a Data Frame
+with <strong>Base R</strong> <code>Extract[]</code></a></li>
+<li><a href="#annoying-features-of-base-r-extract" id="toc-annoying-features-of-base-r-extract">Annoying Features of
 <strong>Base R</strong> <code>Extract</code></a></li>
-<li><a href="#more-flexible-use-of-extract">More Flexible Use of
+<li><a href="#more-flexible-use-of-extract" id="toc-more-flexible-use-of-extract">More Flexible Use of
 <code>Extract[]</code></a></li>
-<li><a href="#missing-data">Missing Data</a></li>
-<li><a href="#random-selection-of-rows">Random Selection of
-Rows</a></li>
+<li><a href="#missing-data" id="toc-missing-data">Missing Data</a></li>
+<li><a href="#random-selection-of-rows" id="toc-random-selection-of-rows">Random Selection of Rows</a></li>
 </ul>
 </div>
 
@@ -673,19 +672,19 @@ or the proportion of rows to select.</p>
 <p>Here randomly select five rows of data from the <em>d</em> data
 frame.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="dv">5</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                    Years Gender Dept   Salary
-## Wu, James             NA      M SALE 94494.58
-## Kralik, Laura         10      W SALE 92681.19
-## Afshari, Anbar         6      W ADMN 69441.93
-## Korhalkar, Jessica     2      W ACCT 72502.50
-## Portlock, Ryan        13      M SALE 77714.85</code></pre>
+<pre><code>##                  Years Gender Dept    Salary
+## Singh, Niral         2      W ADMN  61055.44
+## James, Leslie       18      W ADMN 122563.38
+## Ritchie, Darnell     7      M ADMN  53788.26
+## Billing, Susan       4      W ADMN  72675.26
+## Hoang, Binh         15      M SALE 111074.86</code></pre>
 <p>Here specify a proportion of rows to select.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="fl">0.1</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                   Years Gender Dept    Salary
-## Capelle, Adam        24      M ADMN 108138.43
-## Stanley, Grayson      9      M SALE  69624.87
-## Langston, Matthew     5      M SALE  49188.96
-## Skrotzki, Sara       18      W MKTG  91352.33</code></pre>
+<pre><code>##                  Years Gender Dept    Salary
+## Hoang, Binh         15      M SALE 111074.86
+## Stanley, Grayson     9      M SALE  69624.87
+## Saechao, Suzanne     8      W SALE  55545.25
+## Downs, Deborah       7      W FINC  57139.90</code></pre>
 </div>
 
 

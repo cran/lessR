@@ -46,7 +46,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
   # get breaks from user supplied bin width and/or supplied start value
   if (!is.null(bin_width)  || !is.null(bin_start) || !is.null(bin_end)) {
     if (is.null(bin_start)) 
-      bin_start <- pretty(min(x, na.rm = TRUE):max(x, na.rm = TRUE))[1]
+      bin_start <- pretty(c(min(x, na.rm = TRUE), max(x, na.rm = TRUE)))[1]
     if (is.null(bin_width)) {
       h <- suppressWarnings(hist(x, plot=FALSE, breaks="Sturges"))
       bin_width <- h$breaks[2]-h$breaks[1]
@@ -57,7 +57,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "bin_start: ", bin_start, "\n",
         "bin_end: ", bin_end, "\n",
-        "bin_end is larger than bin_start, make bin_end larger.\n\n")
+        "bin_end is smaller than bin_start, make bin_end larger.\n\n")
     }
     breaks <- seq(bin_start,bin_end,bin_width)
     seq.end <- bin_end
@@ -228,7 +228,8 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 # text output
 #------------
 
-    stats <- .hst.stats(h, length(x), fun_call)
+    mx.dd <- .max.dd(x)
+    stats <- .hst.stats(h, length(x), mx.dd, fun_call)
 
     txsug=stats$txsug
     tx=stats$tx

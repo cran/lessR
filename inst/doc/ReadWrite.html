@@ -337,26 +337,29 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <div id="TOC">
 <ul>
-<li><a href="#data-table">Data Table</a></li>
-<li><a href="#read-the-data-into-r">Read the Data into R</a>
+<li><a href="#data-table" id="toc-data-table">Data Table</a></li>
+<li><a href="#read-the-data-into-r" id="toc-read-the-data-into-r">Read
+the Data into R</a>
 <ul>
-<li><a href="#browse-for-the-data-file">Browse for the data
+<li><a href="#browse-for-the-data-file" id="toc-browse-for-the-data-file">Browse for the data file</a></li>
+<li><a href="#specify-location-of-the-data-file" id="toc-specify-location-of-the-data-file">Specify location of the data
 file</a></li>
-<li><a href="#specify-location-of-the-data-file">Specify location of the
-data file</a></li>
-<li><a href="#output-of-read">Output of <code>Read()</code></a></li>
-<li><a href="#two-types-of-variables">Two types of variables</a></li>
+<li><a href="#output-of-read" id="toc-output-of-read">Output of
+<code>Read()</code></a></li>
+<li><a href="#two-types-of-variables" id="toc-two-types-of-variables">Two types of variables</a></li>
 </ul></li>
-<li><a href="#read-variable-labels">Read Variable Labels</a></li>
-<li><a href="#write-the-data-table-to-a-file">Write the Data Table to a
+<li><a href="#read-variable-labels" id="toc-read-variable-labels">Read
+Variable Labels</a></li>
+<li><a href="#write-the-data-table-to-a-file" id="toc-write-the-data-table-to-a-file">Write the Data Table to a
 File</a></li>
-<li><a href="#read-spss-and-sas-and-stata-files">Read SPSS (and SAS and
-Stata) Files</a>
+<li><a href="#read-spss-and-sas-and-stata-files" id="toc-read-spss-and-sas-and-stata-files">Read SPSS (and SAS and Stata)
+Files</a>
 <ul>
-<li><a href="#value-labels">Value labels</a></li>
-<li><a href="#variable-labels">Variable labels</a></li>
+<li><a href="#value-labels" id="toc-value-labels">Value labels</a></li>
+<li><a href="#variable-labels" id="toc-variable-labels">Variable
+labels</a></li>
 </ul></li>
-<li><a href="#full-manual">Full Manual</a></li>
+<li><a href="#full-manual" id="toc-full-manual">Full Manual</a></li>
 </ul>
 </div>
 
@@ -456,10 +459,19 @@ such functions. We use the <em>lessR</em> function <code>Read()</code>
 for its simplicity and for its useful output that helps understanding
 the data that was read.</p>
 <p>The lessR function <code>Read()</code> can read data files in many
-file formats, including MS Excel. The most generic format is the csv
-format, for <em>comma separated values</em>. Read() also reads SPSS and
-SAS data files, as well as data files in R’s own native format, of type
-<code>.rda</code>.</p>
+file formats, including MS Excel. The most generic format is the
+<code>csv</code> format, for <em>comma separated values</em>. Read()
+also reads SPSS and SAS data files, as well as data files in R’s own
+native format, of type <code>.rda</code>.</p>
+<p>The <code>csv</code> text format applies to text files with a comma,
+<code>,</code>, delimiting adjacent data values and the decimal point
+represented by a period, <code>.</code>. If the data are in the form of
+a text file that follows the European and South American convention of
+using a comma <code>,</code> for the decimal point, and if adjacent
+values are delimited with a semicolon, <code>;</code>, then either use
+<code>Read2()</code>, or manually add the parameters
+<code>dec=&quot;,&quot;</code> and
+<code>sep=&quot;;&quot;. The __lessR__ function</code>Read2()<code>follows the form of base R</code>read.csv2()`.</p>
 <div id="browse-for-the-data-file" class="section level3">
 <h3>Browse for the data file</h3>
 <p>To read the data, direct R to the location of the data file.”)` R

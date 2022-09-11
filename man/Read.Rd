@@ -7,7 +7,7 @@
 \title{Read Contents of a Data File with Optional Variable Labels and Feedback}
 
 \description{
-Abbreviation: \code{rd}, \code{rd_lbl}, code{Read2}
+Abbreviation: \code{rd}, \code{rd_lbl}, \code{Read2}
 
 Reads the contents of the specified data file into an R data table, what R calls a data frame.  By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls}, \code{.xlsx} using Alexander Walker's \code{\link{openxlsx}} package, or \code{.ods} using Gerrit-Jan Schutten and Chung-hong Chan plus other contributor's \code{readODS} package. Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL (except for .Rda files which must be on the local computer system).
 
@@ -19,9 +19,7 @@ The \code{lessR} function \code{\link{corRead}} reads a correlation matrix.
 }
 
 \usage{
-Read(from=NULL, format=NULL, var_labels=FALSE,
-
-         widths=NULL, stringsAsFactors=FALSE,
+Read(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
 
          missing="", n_mcut=1,
          miss_show=30, miss_zero=FALSE, miss_matrix=FALSE, 
@@ -39,8 +37,9 @@ Read2(\dots, sep=";", dec=",")
 
 
 \arguments{
-  \item{from}{File reference, either omitted to browse for the data file, or (except
-       for .Rda files) a full path name or web URL, included in quotes. 
+  \item{from}{File reference included in quotes, either empty to browse 
+       for the data file, a full path name or web URL, or the name of a
+       data file included with lessR, such as \code{"Employee"}. 
        A URL begins with \code{http://}.}
   \item{format}{Format of the data in the file, not usually specified because set
         by default according to the
@@ -60,9 +59,7 @@ Read2(\dots, sep=";", dec=",")
        units in the third row if using \code{\link{Regression}} function to
        generate automatic markdown files of discursive text.}
   \item{widths}{Specifies the width of the successive columns for fixed width
-       formatted data.}
-  \item{stringsAsFactors}{Defaults to \code{FALSE}, so variables with at least
-        one non-numeric data value are read as character strings instead of factors.}\cr
+       formatted data.}\cr
 
   \item{missing}{Missing value code, which by default is literally a missing data
         value in the data table.}
@@ -100,16 +97,12 @@ Read2(\dots, sep=";", dec=",")
 
 
 \details{
-By default \code{Read} reads text data files which are either comma delimited, \code{csv}, or tab-delimited data files, native Excel files of type \code{.xls} or \code{.xlsx}, native R files with file type of \code{.rda}, native SAS files with file type \code{.sas7bdat}, and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide feedback regarding details of the data frame that was read. By default, variables defined by non-numeric variables are read as character strings. To read as \code{factors} specify \code{stringsAsFactors} as \code{FALSE}, unless all the values of a variable a non-numeric and unique, in which case the variable is classified as a character string.
+By default \code{Read} reads text data files which are either comma delimited, \code{csv}, or tab-delimited data files, native Excel files of type \code{.xls} or \code{.xlsx}, native ODS files of type \code{.ods}, native R files with file type of \code{.rda}, native SAS files with file type \code{.sas7bdat}, and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide feedback regarding details of the data frame that was read. By default, variables defined by non-numeric variables are read as character strings. To read as \code{factors} specify \code{stringsAsFactors} as \code{FALSE}, unless all the values of a variable a non-numeric and unique, in which case the variable is classified as a character string.
 
 CREATE csv FILE\cr
-One way to create a csv data file is to enter the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
+One way to create a csv data file is to enter the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc, or Apple Numbers.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
 
-All numeric data in the worksheet should be displayed in the General format, so that the only non-digit character for a numeric data value is a decimal point.  The General format removes all dollar signs and commas, for example, leaving only the pure number, stripped of these extra characters which R will not properly read as part of a numeric data value.
-
-To create the csv file from a standard worksheet application such as Microsoft Excel or LibreOffice Calc, first convert any numeric data to general format to remove characters such as dollar signs and commas, and then under the File option, do a Save As and choose the csv format.
-
-Call \code{help(read.table)} to view the other options that can also be implemented from \code{Read}.
+Call \code{help(read.table)} to view the other R options that can also be implemented from \code{Read}.
 
 MECHANICS\cr
 Specify the file as with the \code{\link{Read}} function for reading the data into a data frame.  If no arguments are passed to the function, then interactively browse for the file.

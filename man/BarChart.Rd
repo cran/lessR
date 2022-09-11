@@ -51,7 +51,7 @@ BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-        eval_df=NULL, quiet=getOption("quiet"),
+        eval_df=NULL, quiet=getOption("quiet"), do_plot=TRUE,
         width=6.5, height=6, pdf_file=NULL, \dots)
 
 bc(\dots)
@@ -87,7 +87,7 @@ bc(\dots)
        to analyze.}
   \item{digits_d}{Provides the number of decimal digits,
         set by default to at least 2 or the largest number of digits in the values
-        of the response variable plus 1.} \cr
+        of the response variable plus 1.} 
   \item{stat}{Statistical transformation of the data. If no \code{y} variable,
        then \code{"count"} or \code{"proportion"}, otherwise 
        \code{"mean"}, \code{"sd"}, etc.}
@@ -129,7 +129,7 @@ bc(\dots)
   \item{stack100}{100\% stacked bar chart when a \code{by} variable is present,
        also activated by setting \code{stat} to \code{"proportion"} with a
        \code{by} variable.}
-  \item{gap}{Gap between bars.  Provides the value of the \code{space} option from
+  \item{gap}{Gap between bars. Provides the value of the \code{space} option from
        the standard R \code{\link{barplot}} function with a default of 0.2 unless two
        variables are plotted and beside=\code{TRUE}, in which case the default is
        c(.1,1).}
@@ -137,8 +137,8 @@ bc(\dots)
         numerical values of the y-axis, the numerical axis, within the bounds of
         plot region: starting value, ending value, and number of intervals.}\cr
 
-  \item{theme}{Color theme for this analysis. Make persistent across analyses
-        with \code{\link{style}}.}
+  \item{theme}{Theme for the \bold{colors} for this analysis. Make persistent
+        across analyses with \code{\link{style}}.}
   \item{fill}{Fill color of the bars. Default is \code{"hues"} from default
         theme \code{"colors"} unless categorical variable(s) is(are) ordinal
         where the default is the \code{"blues"} sequential gradient. For any
@@ -164,9 +164,9 @@ bc(\dots)
         in the second \code{fill} color, or as specified by a vector of
         exactly two fill colors.}\cr
 
-  \item{legend_title}{Title of the legend, which is usually set by default except
-        when raw counts are entered as a matrix.  Then a title must be specified
-        to generate a legend.}
+  \item{legend_title}{Title of the \bold{legend}, which is usually set 
+        by default except when raw counts are entered as a matrix.  Then
+        a title must be specified to generate a legend.}
   \item{legend_position}{When plotting two variables, location of the legend, with the
         default in the right margin. Additional options from standard R are
         "topleft", "top", "topright" and others as shown in the help for the
@@ -299,6 +299,7 @@ bc(\dots)
         the pipe \code{\%\>\%} notation.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
         with \code{\link{style}} function.}
+  \item{do_plot}{If \code{TRUE}, the default, then generate the plot.}
   \item{width}{Width of the plot window in inches, defaults to 4.5.}
   \item{height}{Height of the plot window in inches, defaults to 4.5.}
   \item{pdf_file}{Indicate to direct pdf graphics to the specified name of

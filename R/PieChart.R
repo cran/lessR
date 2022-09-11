@@ -19,7 +19,7 @@ function(x, y=NULL, data=d, rows=NULL,
          values_digits=getOption("values_digits"),
          values_position=getOption("values_position"),
 
-         main=NULL, main_cex=getOption("main_cex"),
+         main=NULL, main_cex=getOption("main_cex")*1.2,
          labels_cex=getOption("lab_cex"), cex,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
@@ -86,7 +86,7 @@ function(x, y=NULL, data=d, rows=NULL,
 
   if (hole < 0  ||  hole >= 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "size of hole is a proportion, so must be between 0 and 1\n\n")
+      "Size of hole is a proportion, so must be between 0 and 1\n\n")
   }
 
   if (!(values %in% c("off", "%", "prop", "input"))) {
@@ -97,13 +97,9 @@ function(x, y=NULL, data=d, rows=NULL,
   .param.old(...)
 
 
-  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval_df))  # default values
-    eval_df <- ifelse (shiny, FALSE, TRUE)
-
-  # get actual variable name before potential call of data$x
-  x.name <- deparse(substitute(x))  # could be a list of var names
-  options(xname = x.name)
+  # --------- data frame stuff
+  
+  data.miss <- ifelse (missing(data), TRUE, FALSE) 
 
   # let deprecated mydata work as default
   dfs <- .getdfs() 
@@ -111,31 +107,48 @@ function(x, y=NULL, data=d, rows=NULL,
   if (!is.null(dfs)) {
     if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
       d <- mydata
+      rm(mydata)
       df.name <- "mydata"
       mydata.ok <- TRUE
       options(dname = df.name)
     }
   }
 
+  # get name of data table
   if (!mydata.ok) {
-    df.name <- deparse(substitute(data))  # get name of data table
+    df.name <- deparse(substitute(data))
     options(dname = df.name)
   }
  
   # if a tibble convert to data frame
   if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  # tibble to df
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data, stringsAsFactors=FALSE)
+    if (df.name %in% dfs) {  
+      if (any(grepl("tbl", class(data), fixed=TRUE))) {  # tibble to df
+        data <- data.frame(data)
       }
     }
   }
 
-  if ((missing(data) && shiny))  # force evaluation (not lazy) if data not specified
-    data <- eval(substitute(data), envir=parent.frame())
+  x.name <- deparse(substitute(x), width.cutoff = 120L)
+  options(xname = x.name)
 
-  x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
+    if (!is.null(x.name))
+      x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
+    else
+      x.in.global <- FALSE
 
+  if (!x.in.global)  {
+    if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
+    # force evaluation (not lazy) if data not specified but relies on default d
+    if (data.miss)
+        data <- eval(substitute(data), envir=parent.frame())
+    }
+    else # df.name is NULL
+      x.in.global <- TRUE
+  }
+    
+  eval_df <- !x.in.global 
+    
 
   # -----------------------------------------------------------
   # establish if a data frame, if not then identify variable(s)
@@ -160,7 +173,7 @@ function(x, y=NULL, data=d, rows=NULL,
     if (is.data.frame(x))  # x a data frame
       data <- x
     else {  # x a vector or matrix in global
-      .xstatus(x.name, df.name, quiet)
+      .in.global(x.name, quiet)  # x.name an expression?
       if (exists(x.name, where=.GlobalEnv)) if (is.matrix(x)) { 
         x.name <- xlab
         xlab <- NULL
@@ -181,13 +194,14 @@ function(x, y=NULL, data=d, rows=NULL,
     options(yname = y.name)
 
     # get conditions and check for data existing
-    xs <- .xstatus(y.name, df.name, quiet)
-    in.global <- xs$ig 
+    in.global <- .in.global(y.name, quiet)
 
-    # see if var exists in data frame, if x not in global Env or function call 
-    if (!in.global) .xcheck(y.name, df.name, names(data))
-    if (!in.global)
-      y.call <- eval(substitute(data$y))
+    # see if var exists in data frame, if y not in global Env or function call 
+      if (!in.global) {
+        if (eval_df)
+          .xcheck(y.name, df.name, names(data))
+        y.call <- eval(substitute(data$y))
+      }
     else {  # vars that are function names get assigned to global
       y.call <- y
       if (is.function(y.call)) y.call <- eval(substitute(data$y))
@@ -202,7 +216,8 @@ function(x, y=NULL, data=d, rows=NULL,
   #--------------
   if (!fill.miss) {
     fill_name <- deparse(substitute(fill))
-    in.df <- ifelse (exists(fill_name, where=data), TRUE, FALSE)
+#   in.df <- ifelse (exists(fill_name, where=data), TRUE, FALSE)
+    in.df <- FALSE
 
     # only works for y given, not tabulated
     if (in.df) {
@@ -217,15 +232,16 @@ function(x, y=NULL, data=d, rows=NULL,
     }  # end .count 
   }  # end !fill.miss
 
+
+  # set up pdf_file if needed
   if (!is.null(pdf_file)) {
-    if (!grepl(".pdf", pdf_file)) pdf_file <- paste(pdf_file, ".pdf", sep="")
-    .opendev(pdf_file, width, height)
+    if (!grepl(".pdf", pdf_file))
+      pdf_file <- paste(pdf_file, ".pdf", sep="")
+    pdf(file=pdf_file, width=width, height=height, onefile=FALSE)
   }
   else {
-    if (!shiny) {  # not dev.new for shiny
-      pdf.fnm <- NULL
-      .opendev(pdf_file, width, height)
-    }
+    if (df.name != "NULL")  # not dev.new for shiny
+        .opendev(pdf_file, width, height)
   }
 
   n.levels <- length(unique(x.call))
@@ -240,8 +256,8 @@ function(x, y=NULL, data=d, rows=NULL,
   # if (!shiny)
   #   dev.set(which=2)  # reset graphics window for standard R functions
 
-   hole <- hole * radius
-  .pc.main(x.call, y.call, 
+  hole <- hole * radius
+  pc <- .pc.main(x.call, y.call, 
         fill, color, trans, 
         radius, hole, hole_fill, edges, 
         clockwise, init_angle, 
@@ -254,7 +270,11 @@ function(x, y=NULL, data=d, rows=NULL,
   # terminate pdf graphics system
   if (!is.null(pdf_file)) {
     dev.off()
-    .showfile(pdf_file, "pie chart")
+    if (!quiet) .showfile(pdf_file, "PieChart")
   }
+
+  # if attached -- from interact() -- de-attach to be safe
+  if ("shiny" %in% .packages()) detach(package:shiny)
+  return(invisible(pc))
 
 }

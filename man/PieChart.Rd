@@ -26,12 +26,12 @@ PieChart(x, y=NULL, data=d, rows=NULL,
          clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0), 
 
          values=getOption("values"),
-         values_color=getOption("values_color"), 
-	 values_size=getOption("values_size"),
+         values_color=getOption("values_color"),
+         values_size=getOption("values_size"),
          values_digits=getOption("values_digits"),
          values_position=getOption("values_position"),
 
-         main=NULL, main_cex=getOption("main_cex"),
+         main=NULL, main_cex=getOption("main_cex")*1.2,
          labels_cex=getOption("lab_cex"), cex,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,

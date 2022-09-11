@@ -128,7 +128,7 @@ function(x, y, values, object, cat.x,  cat.y,
   # comment after the suggestion?
   cmt <- function(ct, mx.ch=88) {
     fc <- gsub(" = ", "=", fc)
-    nch <- nchar(paste(fncl, fc, ct))
+    nch <- nzchar(paste(fncl, fc, ct))
     if (nch > mx.ch) ct <- "" 
     fc <- paste(fncl, fc, ")  ", ct, sep="")
     txsug <- paste(txsug, "\n", fc, sep="")
@@ -138,11 +138,16 @@ function(x, y, values, object, cat.x,  cat.y,
 
     if (object != "line"  &&  !run) {
     
-      # traditional two-var numeric var scatter plot
+        # ---------------------------
+        # contcont 2-way scatter plot
+        # ---------------------------
+
       if (!cat.x  &&  !cat.y  && 
           object %in% c("point", "bubble", "both")  && !run) {
         txsug <- ""
   
+        # suggestions
+        # -----------
         if (getOption("suggest")) {
           txsug <- ">>> Suggestions"
 
@@ -220,13 +225,15 @@ function(x, y, values, object, cat.x,  cat.y,
 
         }  # end suggest
 
-
-        # ------------------------------
-        # traditional 2-way scatter plot
         blank <- ""
         class(blank) <- "out"  # a blank line when needed
 
+        txreg <- ""
+        txcor <- ""
+
         # output correlation info if no fit line or lm fit only
+        # -----------------------------------------------------
+
         if (fit %in% c("off", "lm")) {
 
           for (i in 1:n_col) {
@@ -254,35 +261,17 @@ function(x, y, values, object, cat.x,  cat.y,
               txdsc <- stuff$txd
               txinf <- stuff$txi
 
-              txcor <- c(txbck, txdsc, " ", txinf)
-              class(txcor) <- "out"
-
-              out.piece <- list(out_cor=txcor)  # console display
-#             out.piece <- list(out_cor=txcor,
-#               r=stuff$r, tvalue=stuff$tvalue, df=stuff$df,
-#               pvalue=stuff$pvalue, lb=stuff$lb, ub=stuff$ub)
-              if (exists("output"))
-                output <- c(output, out.piece)
-               else
-                output <- out.piece
+              # txcor contains the basic correlational text output
+              txcor <- c(txbck, txdsc, " ", txinf, " ")
             }  # end n.by is 0 
 
           }  # end for i through n_col
         }  # end output cor info
 
-        # output suggestions
-        if (nzchar(txsug)) {
-          if (exists("output")) {
-            output <- c(list(out_suggest=txsug), output)  
-#             if (is.null(mse)) {  # hack to get a blank line if not fit
-#               output <- c(list(out_blank=blank), output)
-#             }
-          }
-          else
-            output <- list(out_suggest=txsug)  
-        }
 
-        # output mse, triggered by a fit line
+        # output mse, triggered by a non-lm fit line
+        # ------------------------------------------
+
         if (!is.null(mse)  &&  n.xcol == 1) {  # mse not reported for all
           if (fit == "quad") {
             op1 <- "sqrt()" 
@@ -301,93 +290,100 @@ function(x, y, values, object, cat.x,  cat.y,
             op2 <- "log()"
           }
           if (fit %in% c("quad", "power", "exp", "log")) {
-            msg <- paste(" Regression of linearized data by transforming the",
+            msg <- paste(" Regressed linearized data of transformed",
                         "data values with", op1, "\n")
-            msg <- paste(msg, "Need back transformation", op2, 
-                        "of regression model",
-                        "to compute predicted values\n\n")
+            msg <- paste(msg, "For predicted values, back transform with",
+                         op2, "of regression model\n\n")
           }
           else
             msg <- ""
 
           if (n.by > 0) {
-            txt <- character(length=n.by)
+            tx <- character(length=n.by)
               
             for (i in 1:n.by) {
               by.name <- getOption("byname")
               if (i > 1) msg <- ""
-              txt[i] <- paste(msg, by.name, ": ", by.cat[i], "  ", sep="") 
+              tx[i] <- paste(msg, by.name, ": ", by.cat[i], "  ", sep="") 
               mse.pn <- prettyNum(mse[i], big.mark=",", scientific=FALSE,
                                   format="f", digits=digits_d)
               b0.pn <- .fmt(b0[i], digits_d)
               b1.pn <- .fmt(b1[i], digits_d)
               Rsq.pn <- .fmt(Rsq[i], 3)
               if (!is.na(b1[i])) {  # linear function
-                txt[i] <- paste(txt[i], 
+                tx[i] <- paste(tx[i], 
                   "Line: b0 =", b0.pn, "   b1 =", b1.pn,
                   "   Fit: MSE =", mse.pn) 
                   rsqu <- ifelse (is.na(Rsq[i]), "", paste("   Rsq =", Rsq.pn))
-                  txt[i] <- paste(txt[i], rsqu, "\n", sep="")
+                  tx[i] <- paste(tx[i], rsqu, "\n", sep="")
               }
               else {
-                txt[i] <- paste(txt[i], 
+                tx[i] <- paste(tx[i], 
                   " Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
               }
 
               # kludge, if removing outliers reg line info not correct,remove
-              if (b0[i]==0 && b1[i]==0 && mse[i]==0) txt <- ""
+              if (b0[i]==0 && b1[i]==0 && mse[i]==0) tx <- ""
             }  # end for n.by
           }  # end n.by > 0
 
           else {  # no by vars
             if (length(b1) == 1) {  # > 1 if y=c(y1, y2, ...)
-              mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
-                                  format="f", digits=digits_d)
-              b0.pn <- .fmt(b0[1], digits_d)
-              b1.pn <- .fmt(b1[1], digits_d)
+              if (mse[1] > 10000)
+                mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
+                                    format="f", digits=2)  # digits does not work
+              else
+                mse.pn <- .fmt(mse[1], 3)  # 3 dec digits for smaller numbers
+
+              if (!is.na(b0[1])) {  # missing in loess
+                n_digs <- ifelse(b0[1] > 10000, 2, digits_d)
+                if (n_digs == 1) n_digs <- 2
+                b0.pn <- .fmt(b0[1], n_digs)
+                if (abs(b0[1]) < 1) n_digs <- 4
+              }
+
+              if (!is.na(b1[1])) {
+                n_digs <- ifelse(b1[1] > 10000, 2, digits_d)
+                if (n_digs == 1) n_digs <- 2
+                if (abs(b1[1]) < 1) n_digs <- 4
+                b1.pn <- .fmt(b1[1], n_digs)
+              }
+
               Rsq.pn <- .fmt(Rsq[1], 3)
+
               if (!is.na(b1)) {  # linear function
-                txt = paste(msg,
+                tx = paste(msg,
                       "Line: b0 =", b0.pn, "  b1 =", b1.pn,
                       "   Fit: MSE =", mse.pn) 
                 rsqu <- ifelse (is.na(Rsq[1]), "", paste("   Rsq =", Rsq.pn))
-                txt <- paste(txt, rsqu, "\n", sep="")
+                tx <- paste(tx, rsqu, "\n", sep="")
 
               }
               else {
-                txt = paste( 
+                tx = paste( 
                   "Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
               }
               # kludge, if removing outliers reg line info not correct,remove
-              if (b0[1]==0 && b1[1]==0 && mse[1]==0) txt <- ""
+              if (b0[1]==0 && b1[1]==0 && mse[1]==0) tx <- ""
             } 
             else
-              txt <- ""  # currently no reg output if length(b1) > 0
+              tx <- ""  # currently no reg output if length(b1) > 0
           } 
 
-          txreg <- txt
-          class(txreg) <- "out"
-          if (any(nzchar(txreg))) {
-              if (exists("output"))
-                output <- c(output, list(out_reg=txreg))
-              else
-                output <- c(list(out_reg=txreg))
-          }
+          txreg <- tx
         }  # end !is.null(mse)
 
-        # do the output if there is something to output
-        if (exists("output")) {
-          if (any(nzchar(output))) {
-            class(output) <- "out_all"
-            print(output)
-          }
-        }
+          class(txcor) <- "out"
+          class(txreg) <- "out"
+          return(list(tipe="contcont", out_suggest=txsug,
+                      out_stats=txcor, out_reg=txreg))
 
       }  # end traditional 2-way scatter plot
 
 
       # --------------------------------
       # categorical var with numeric var for means plot or bubble-1D plot
+
       else if ((cat.x && !cat.y && !unique.x) ||
                (!cat.x && cat.y && !unique.y)) {
    
@@ -436,12 +432,13 @@ function(x, y, values, object, cat.x,  cat.y,
 
           }  # end suggest
 
+          # get stats
           if (cat.x && !cat.y) {
             if (!is.null(x.lvl))  # convert back to a factor if was one
               x.by <- factor(x, levels=1:length(x.lvl), labels=x.lvl)
             else
               x.by <- x
-            options(yname = x.name)  # reverse order of x and y for .ss.numeric
+            options(yname = x.name)  # reverse order x and y for .ss.numeric()
             options(xname = y.name)
             stats <- .ss.numeric(y, by=x.by, digits_d=digits_d,
                                  brief=TRUE, y.name=x.name)
@@ -454,13 +451,8 @@ function(x, y, values, object, cat.x,  cat.y,
             stats <- .ss.numeric(x, by=y.by, digits_d=digits_d, brief=TRUE)
           }
 
-          txout <- stats$tx
-
-          class(txout) <- "out"
-
-          output <- list(out_suggest=txsug, out_txt=txout)
-          class(output) <- "out_all"
-          print(output)
+          class(stats$tx) <- "out"
+          return(list(tipe="catcont", out_stats=stats$tx))
         }  # !bubble_1
 
         else {  # 1-D bubble plot of a factor var, y just a constant
@@ -485,7 +477,7 @@ function(x, y, values, object, cat.x,  cat.y,
 
             txsug <- .rm.arg.2(" x=", txsug) 
             txsug <- .rm.arg.2("(x=", txsug) 
-          }
+          }  # end suggest
         
           if (!is.null(x.lvl))
             x.by <- factor(x, levels=1:length(x.lvl), labels=x.lvl)
@@ -508,12 +500,11 @@ function(x, y, values, object, cat.x,  cat.y,
           class(output) <- "out_all"
           print(output)      
         }  # else
-      }
+      }  # end catcont
 
 
       # Cleveland dot plot
       else if (cleveland) { 
-
         txsug <- ""
         if (getOption("suggest")) {
           txsug <- ">>> Suggestions"
@@ -540,37 +531,34 @@ function(x, y, values, object, cat.x,  cat.y,
         else
           y.by <- y
 
-        txout <- ""
+        tx <- ""
         for (i in 1:n.xcol) {
           stats <- .ss.numeric(x[,i], digits_d=digits_d, brief=TRUE)
-          txout[length(txout)+1] <- paste("---", colnames(x)[i], "---")
-          for (j in 2:length(stats$tx)) txout[length(txout)+1] <- stats$tx[j]
+          tx[length(tx)+1] <- paste("---", colnames(x)[i], "---")
+          for (j in 2:length(stats$tx)) tx[length(tx)+1] <- stats$tx[j]
           if (i < n.xcol) {
-            txout[length(txout)+1] <- ""
-            txout[length(txout)+1] <- ""
+            tx[length(tx)+1] <- ""
+            tx[length(tx)+1] <- ""
           }
         }
-      
+        txstats <- tx
         txotl <- ""
         txotl <- .bx.stats(x)$txotl
         if (txotl[1] == "") txotl <- "No (Box plot) outliers"
 
           class(txsug) <- "out"
-          class(txout) <- "out"
+          class(txstats) <- "out"
           class(txotl) <- "out"
           class(txdif) <- "out"
 
-          if (nzchar(txsug))
-            output <- list(out_suggest=txsug, out_txt=txout, out_outliers=txotl,
-                           out_diff=txdif)
-          else
-            output <- list(out_txt=txout, out_outliers=txotl, out_diff=txdif)
-          class(output) <- "out_all"
-          print(output)
+            return(list(out_suggest=txsug, out_stats=txstats, out_outliers=txotl,
+                           out_diff=txdif))
       }  # end Cleveland
 
 
+      # ------------------------
       # categorical x and y vars
+      # ------------------------
 
       else if (cat.x  &&  cat.y) {
         txsug <- ""
@@ -607,7 +595,7 @@ function(x, y, values, object, cat.x,  cat.y,
    
           fc <- paste("\nSummaryStats(", x.name, ", ", y.name, 
                       ")  # or ss", sep="")
-                      
+ 
           txsug <- paste(txsug, fc, sep="")
           txsug <- .rm.arg.2(" x=", txsug) 
           txsug <- .rm.arg.2("(x=", txsug) 
@@ -635,20 +623,12 @@ function(x, y, values, object, cat.x,  cat.y,
         class(txttl) <- "out"
         class(txfrq) <- "out"
         class(txXV) <- "out"
-        if (!prop)
-          output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq,
-                         out_XV=txXV)
-        else {
-          txrow <- stats$txrow
-          class(txrow) <- "out"
-          output <- list(out_title=txttl, out_text=txfrq,
-                         out_row=txrow, out_XV=txXV)   }
 
-        class(output) <- "out_all"
-        print(output)
-      }
-      
-    }
+        return(list(tipe="catcat",
+                    out_title=txttl, out_stats=txfrq, out_XV=txXV))
+
+      }  # end catcat
+    }  # end object != "line"  &&  !run
     
     else {  # line, run chart (object is "both")
   

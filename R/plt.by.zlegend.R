@@ -2,12 +2,13 @@
 .plt.by.legend <-
 function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
          pt.size=1.25, pt.lwd=0.5, legend_size=NULL,
-         legend_abbrev=NULL, legend_adj=0) {
+         legend_abbrev=NULL, legend_adj=0, legend_title=NULL) {
 
   par(xpd=NA)  # allow drawing outside of plot region
 
   n.levels <- length(mylevels)
-  legend_title <- getOption("byname")
+  if (is.null(legend_title))
+    legend_title <- getOption("byname")
 
   if (is.null(legend_abbrev))
     legend_labels <- mylevels

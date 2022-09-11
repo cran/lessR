@@ -69,8 +69,10 @@ function(x, y, nm.x, nm.y, stat, n_bins=6,
   dbin <- data.frame(cbind(bins[,3], m))  # .plt.main input is data frames
   d.x <- dbin[,1, drop=FALSE]  # midpt
   d.y <- dbin[,2, drop=FALSE]  # mean or median
-  den <- max(n, na.rm=TRUE) / 4  # scaling factor so max pt.size is around 4
-  if (is.null(size)) size <- (n/den)^.5
+  if (is.null(size)) {
+    den <- max(n, na.rm=TRUE) / 4  # scaling factor so max pt.size is around 4
+    size <- (n/den)^.5
+  }
   .plt.main(d.x, d.y, xlab=nm.x, ylab=paste(stat, "of", nm.y), 
             segments=segments, fill=fill, color=color, size=size, 
             pts_trans=trans, scale_x=scale_x, scale_y=scale_y,
@@ -110,8 +112,8 @@ function(x, y, nm.x, nm.y, stat, n_bins=6,
     d.tbl <- t(d.tbl)
     row.names(d.tbl) <- 1:nrow(d.tbl)
     cpt <- paste(stat, "of", nm.y, "for levels of", nm.x)
-    w <- knitr::kable(d.tbl, format="pandoc", digits=2, caption=cpt, align="r",
-                      row.names=TRUE)
+    w <- knitr::kable(d.tbl, format="simple", digits=2, caption=cpt, align="r",
+                      row.names=TRUE, escape=FALSE, booktabs=TRUE)
     w <- c("",w)
     class(w) <- "out"
 

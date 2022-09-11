@@ -4,7 +4,6 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
             n.ycol, n.y_var, ord.by.call, run, size.pt) {
 
   n.clrs <- max(nn_col, n.by)  # n_col goes to lattice
-  qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
 
 
   ### area fill
@@ -37,8 +36,10 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
 
     if (n.clrs > 1) {
       if (!run) {  # area_fill for multiple run plots not meaningful
-        if ("transparent" %in% area_fill)
+        if ("transparent" %in% area_fill) {
+          qual_pal <- ifelse (theme %in% c("gray", "white"), "grays", "hues")
           area_fill <- getColors(qual_pal, n=n.clrs, output=FALSE)
+        }
         else
           area_fill <- .color_range(area_fill, n.clrs)  # interpret blues, etc
       }
@@ -54,7 +55,7 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
     if (trans > 0)
       area_fill <- .maketrans(area_fill, (1-trans)*256)
 
-  }  # end object %in% c("line", "both")
+  }  # end object %in% c("line", "both")  --- area_fill
 
 
   ### fill and color
@@ -77,28 +78,42 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
     }
   }
 
+  nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",
+          "turquoises", "aquas", "blues", "purples", "violets", "magentas",
+          "grays", "hues")
+
   # set pt_fill
+  color_done <- FALSE
   if (fill.miss) {
     if (n.clrs == 1)
       pt_fill <- getOption("pt_fill")
-    else
-      pt_fill <- .color_range(.get_fill(), n.clrs)  # see if range
+    else 
+      pt_fill <- .color_range(.get_fill(), n.clrs) 
   }
-  else
-    pt_fill <- fill
+  else {
+    if (!(fill[1] %in% nm))  # if a by var, then length(fill) > 1
+      pt_fill <- fill
+    else {
+      pt_fill <- .color_range(fill, n.clrs)  
+      pt_color <- rep("transparent", n.clrs)
+      color_done <- TRUE
+    }
+  }
 
   if (trans > 0)
     pt_fill <- .maketrans(pt_fill, (1-trans)*256)
 
   # set pt_color, could also be line color if time series
-  if (color.miss) {
-    if (n.clrs == 1)
-      pt_color <- getOption("pt_color")
+  if (!color_done) {
+    if (color.miss) {
+      if (n.clrs == 1)
+        pt_color <- getOption("pt_color")
+      else
+        pt_color <- .color_range(.get_fill(), n.clrs)  # see if range
+    }
     else
-      pt_color <- .color_range(.get_fill(), n.clrs)  # see if range
+      pt_color <- color
   }
-  else
-    pt_color <- color
 
   return(list(pt_fill=pt_fill, pt_color=pt_color, area_fill=area_fill))
 

@@ -39,10 +39,10 @@ Histogram(x=NULL, data=d, rows=NULL,
     offset=getOption("offset"),
     scale_x=NULL, scale_y=NULL,
 
-    density=FALSE, dn.hist=TRUE,
-    bw=NULL, type=c("general", "normal", "both"),
-    color_gen="gray20", color_nrm="gray20",
-    fill_hist=getOption("se_fill"), fill_nrm=NULL, fill_gen=NULL,
+    density=FALSE, show_histogram=TRUE,
+    bandwidth=NULL, type=c("general", "normal", "both"),
+    fill_general=NULL, fill_normal=NULL, fill_hist=getOption("se_fill"), 
+    color_general="gray20", color_normal="gray20",
     x.pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
 
@@ -173,23 +173,25 @@ hs(\dots)
 
   \item{density}{If \code{TRUE}, plot the smoothed \bold{kernel density}
         estimate.}
-  \item{dn.hist}{When \code{density} is \code{TRUE}, plot a histogram
+  \item{show_histogram}{When \code{density} is \code{TRUE}, plot a histogram
        behind the density curve.}
-  \item{bw}{Bandwidth of \bold{kernel density} estimation. Initial value
+  \item{bandwidth}{Bandwidth of kernel density estimation. Initial value
        is "nrd0", but unless
-       specified, then may be iterated upward to create a smoother curve.}
+       specified, may be automatically iterated upward to create a
+       smoother curve.}
   \item{type}{Type of density curve plotted.  By default, the general
        density is plotted, though can request the normal density and
        both densities.}
-  \item{color_gen}{Color of the general density curve.}
-  \item{color_nrm}{Color of the normal curve.}
+  \item{fill_general}{Fill color for the estimated general density curve, with a
+        partially transparent light red as the default, and a light transparent
+        gray for the gray theme. Supplied color names are automatically revised
+        with moderate transparency, the same level as the default.}
+  \item{fill_normal}{Fill color for the estimated normal curve, with a partially 
+       transparent blue as the default, and transparent for the gray theme.}
   \item{fill_hist}{Fill color for the histogram behind density curve,
        defaults to a light gray.} 
-  \item{fill_nrm}{Fill color for the estimated normal curve, with a partially 
-       transparent blue as the default, and transparent for the gray theme.}
-  \item{fill_gen}{Fill color for the estimated general density curve, with a
-        partially transparent light red as the default, and a light transparent
-        gray for the gray theme.}
+  \item{color_general}{Color of the general density curve border.}
+  \item{color_normal}{Color of the normal curve border.}
   \item{x.pt}{Value of the point on the x-axis for which to draw a unit interval
         around illustrating the corresponding area under the general density curve.
         Only applies when requesting \code{type=general}.}
@@ -247,7 +249,7 @@ hs(\dots)
 
 \details{
 OVERVIEW\cr
-Results are based on the standard R \code{\link{hist}} function to calculate and plot a histogram, or a multi-panel display of histograms with Trellis graphics, plus the additional provided color capabilities, a relative frequency histogram, summary statistics and outlier analysis. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}. To plot densities, use the \code{lessR} function \code{\link{Density}}.
+Results are based on the standard R \code{\link{hist}} function to calculate and plot a histogram, or a multi-panel display of histograms with Trellis graphics, plus the additional provided color capabilities, a relative frequency histogram, summary statistics and outlier analysis. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}. To plot densities, set the parameter \code{density} to \code{TRUE}.
 
 VARIABLES and TRELLIS PLOTS\cr
 At a minimum there is one primary variable, \code{x}, which results in a single histogram. Trellis graphics, from Deepayan Sarkar's \code{lattice} package, may be implemented in which multiple panels are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by1} is a conditioning variable that results in a Trellis plot, the histogram of \code{x} produced at \emph{each} level of the \code{by1} variable. Inclusion of a second conditioning variable, \code{by2}, results in a separate histogram for \emph{each} combination of cross-classified values of both \code{by1} and \code{by2}. 
@@ -410,8 +412,30 @@ Histogram(Salary, cumulate="both")
 # cumulative histogram plus regular histogram
 Histogram(Salary, cumulate="both", reg="mistyrose")
 
-# density
+# -------------
+# density plots
+# -------------
+
+# default density plot
 Histogram(Salary, density=TRUE)
+
+# normal curve and general density curves superimposed over histogram
+# all defaults
+Histogram(Salary, density=TRUE, type="both")
+
+# display only the general estimated density
+#  so do not display the estimated normal curve
+# specify the bandwidth for the general density curve,
+#  use the standard bandwidth option for the density function
+Histogram(Salary, density=TRUE, bandwidth=8000)
+
+# display only the general estimated density and a corresponding
+#  interval of unit width around x.pt
+Histogram(Salary, density=TRUE, x.pt=40000)
+
+# densities for all specified numeric variables in a list of variables
+# e.g., use the combine or c function to specify a list of variables
+Histogram(c(Years,Salary), density=TRUE)
 
 
 # -------------------------------------------------

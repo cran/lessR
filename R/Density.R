@@ -68,11 +68,11 @@ function(x, data=d, rows=NULL,
   }
 
   bw.miss <- ifelse (missing(bw), TRUE, FALSE)
-
   
-  shiny <- ifelse (isNamespaceLoaded("shiny"), TRUE, FALSE) 
-  if (is.null(eval_df))  # default values
-    eval_df <- ifelse (shiny, FALSE, TRUE)
+  # apparently no longer a need for !eval_df, but will retain for now
+  shiny <- ifelse ("shiny" %in% .packages(), TRUE, FALSE)
+  if (is.null(eval_df)) eval_df <- ifelse (shiny, FALSE, TRUE)
+
   # get actual variable name before potential call of data$x
   if (!missing(x))  # can't do is.null or anything else with x until evaluated
     x.name <- deparse(substitute(x))  # could be a list of var names
@@ -154,11 +154,12 @@ function(x, data=d, rows=NULL,
       if (is.data.frame(x))  # x a data frame
         data <- x
       else {  # x a vector in style
-        .xstatus(x.name, df.name, quiet)
+        .in.global(x.name, quiet)  # x.name an expression?
         if (!is.function(x))
           data <- data.frame(x, stringsAsFactors=TRUE)  # x is 1 var
         else
-          data <- data.frame(eval(substitute(data$x)), stringsAsFactors=TRUE)  # x is 1 var
+          data <- data.frame(eval(substitute(data$x)),
+                             stringsAsFactors=TRUE)  # x is 1 var
         names(data) <- x.name
       }
     }
@@ -301,6 +302,9 @@ function(x, data=d, rows=NULL,
          pvalue=stuff$pvalue)
 
     class(output) <- "out_all"
+
+    # if attached -- from interact() -- de-attach to be safe
+    if ("shiny" %in% .packages()) detach(package:shiny)
 
     return(output)
 

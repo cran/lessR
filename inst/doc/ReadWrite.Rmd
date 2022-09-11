@@ -69,8 +69,10 @@ When analyzing data read into R, the same data exists in two different locations
 To read the data from a file into a data frame of a running R application, as with every other task in R, accomplish the task with a function. The R ecosystem, base R and its many packages, presents many such functions. We use the _lessR_ function `Read()` for its simplicity and for its useful output that helps understanding the data that was read.
 
 The lessR function `Read()` can read data files in many file formats,
-including MS Excel. The most generic format is the csv format, for
+including MS Excel. The most generic format is the `csv` format, for
 _comma separated values_. Read() also reads SPSS and SAS data files, as well as data files in R's own native format, of type `.rda`. 
+
+The `csv` text format applies to text files with a comma, `,`, delimiting adjacent data values and the decimal point represented by a period, `.`. If the data are in the form of a text file that follows the European and South American convention of using a comma `,` for the decimal point, and if adjacent values are delimited with a semicolon, `;`, then either use `Read2()`, or manually add the parameters `dec=","` and `sep=";". The __lessR__ function `Read2()` follows the form of base R `read.csv2()`. 
 
 
 
