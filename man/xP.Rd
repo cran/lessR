@@ -7,13 +7,13 @@
 }
 
 \usage{
-xP(x, d=NULL, unit=NULL, semi=FALSE)
+xP(x, d_d=NULL, unit=NULL, semi=FALSE)
 }
 
 
 \arguments{
   \item{x}{The variable.}
-  \item{d}{The digits.}
+  \item{d_d}{The digits.}
   \item{unit}{Unit of measurement for the variable.}
   \item{semi}{Add a semicolon before the unit to add some horizontal spacing
         in math mode.}
@@ -27,7 +27,7 @@ Input is numeric, output is formatted text. A special unit is \code{"$"}, which 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \examples{
-xP(12345678.9, d=2, unit="$")
+xP(12345678.9, d_d=2, unit="$")
 
-xP(12345678.9, d=2, unit="lbs")
+xP(12345678.9, d_d=2, unit="lbs")
 }

@@ -1,6 +1,6 @@
 Package: lessR
-Version: 4.2.3
-Date: 2022-09-11
+Version: 4.2.4
+Date: 2022-12-07
 Title: Less Code, More Results
 Author: David Gerbing, The School of Business, Portland State University
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
@@ -13,7 +13,7 @@ VignetteBuilder: knitr
 Description: Each function accomplishes the work of several or more standard R functions. For example, two function calls, Read() and CountAll(), read the data and generate summary statistics for all variables in the data frame, plus histograms and bar charts as appropriate. Other functions provide for comprehensive summary statistics via pivot tables, a comprehensive regression analysis, analysis of variance and t-test, visualizations including the Violin/Box/Scatter plot for a numerical variable, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function call, variable labels, color themes, and Trellis graphics. Also includes a confirmatory factor analysis of multiple indicator measurement models, pedagogical routines for data simulation such as for the Central Limit Theorem, generation and rendering of R markdown instructions for interpretative output, and interactive visualizations. 
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2022-09-11 21:29:59 UTC; dgerbing
+Packaged: 2022-12-07 19:44:56 UTC; dgerbing
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2022-09-11 22:12:54 UTC
+Date/Publication: 2022-12-07 21:20:10 UTC

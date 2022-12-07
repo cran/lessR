@@ -12,7 +12,6 @@ citEntry(entry="article",
          volume = 29,
          number = 3,
          pages = "251--266",
-         url = "https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871",
          textVersion = paste(
            "David W. Gerbing. ", 
            "Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond. ", 

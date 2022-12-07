@@ -1,5 +1,5 @@
 Logit <-
-function(my_formula, data=d, rows=NULL, ref=NULL,
+function(my_formula, data=d, rows=NULL, ref_group=NULL,
          digits_d=4, text_width=120, 
 
          brief=getOption("brief"),
@@ -167,14 +167,14 @@ function(my_formula, data=d, rows=NULL, ref=NULL,
   }
 
   # second level of Y, nm[1], is the reference group
-  if (!is.null(ref)) {
-    if (lv1 != ref  &&  lv2 != ref)  {
+  if (!is.null(ref_group)) {
+    if (lv1 != ref_group  &&  lv2 != ref_group)  {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Values of response ", nm[1], ": ",
         levels(data[,nm[1]])[1], " ", levels(data[,nm[1]])[2], "\n",
-        "You specified a non-existent value, ref = ", ref, "\n\n")
+        "You specified a non-existent value, ref_group = ", ref_group, "\n\n")
     }
-    if (lv2 != ref)
+    if (lv2 != ref_group)
       data[,nm[1]] <- factor(data[,nm[1]], levels=c(lv2,lv1))
   }
     

@@ -272,15 +272,7 @@ server <- function(input, output, session) {
 
 # ---------- Density Bandwidth ------------
 # -----------------------------------------
-
-  # get default band width and min, max for input slider
-  observeEvent(input$myDens, {
-    if (input$myDens) {
-
-      x.name <- input$x.col
-      shiny::req(x.name)
-      x <- na.omit(data()[, x.name])
-
+  get_bw <- function(x) {
       bw <- bw.nrd0(x)
       irep <- 0
       repeat {  # iterated value of bw
@@ -296,9 +288,32 @@ server <- function(input, output, session) {
           break;
       }  # end repeat
 
-      vals$bndwd_def <- bw
-      vals$bndwd1 <- round(bw * 0.15, 2)
-      vals$bndwd2 <- round(bw * 1.5, 2)
+      vals$bndwd_def <- bw  # cutoff of 7 to keep bw*.15 > 1
+      vals$bndwd1 <- ifelse (bw>7, floor(bw*0.15), round(bw*0.15, 2))
+      if (vals$bndwd1 == 0) vals$bndwd1 <- 0.00001
+      vals$bndwd2 <- ifelse (bw>7, ceiling(bw*1.5), round(bw*1.5, 2))
+  }
+
+  observeEvent(input$x.col, {  # if switch variable
+    if (input$myDens) { 
+      x.name <- input$x.col
+      shiny::req(x.name)
+      x <- na.omit(data()[, x.name])
+      get_bw(x)
+
+      sld <- sliderInput(inputId="slider_bndwd", label="bandwidth",
+                         min=vals$bndwd1, max=vals$bndwd2, value=vals$bndwd_def)
+    }
+  })
+
+  # get default band width and min, max for input slider when
+  #  "view options" button is checked
+  observeEvent(input$myDens, {
+    if (input$myDens) {
+      x.name <- input$x.col
+      shiny::req(x.name)
+      x <- na.omit(data()[, x.name])
+      get_bw(x)
     }
   })
 

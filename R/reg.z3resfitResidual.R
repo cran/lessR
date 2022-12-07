@@ -71,11 +71,9 @@ function(lm.out, cook, cooks_cut,
   y.label <- "Residuals"
   .axlabs(x.label, y.label, main.lab, sub.lab, lab_x_cex=0.9, lab_y_cex=0.9,
           xlab_adj=1.4)
-
   fill <- getOption("pt_fill")
   color <- getOption("pt_color")
   points(fit.ord, res_ord, pch=21, col=color, bg=fill, cex=0.76)
-
   abline(h=0, lty="dotted", lwd=1.5, col=getOption("bar_fill_cont"))
   lines(lowess(fit.ord, res_ord, f=.9), col=getOption("pt_color"))
   res_c <- res[which(cook >= cooks_cut)]

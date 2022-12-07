@@ -90,7 +90,7 @@ ui <- fluidPage(
 
           checkboxInput("do_by", "add a by variable", FALSE),
           conditionalPanel(condition="input.do_by == true",
-            selectInput('by.col', 'by Variable', "", selected=""),
+            selectInput("by.col", "by Variable", "", selected=""),
             selectInput("myFill2", "fill",
               choices=list("Qualitative"=list("hues"), "Sequential"=clr.qual)),
           ),
@@ -104,8 +104,10 @@ ui <- fluidPage(
           h4(div("Colors, Size, & Shape", class="head")),
           checkboxInput("do_geom", "view options", FALSE),
           conditionalPanel(condition="input.do_geom == true",
-            selectInput("myFill", "fill", choices=clr.one),
-            selectInput("myColor", label="color", choices=clr.edge),
+            conditionalPanel(condition="input.do_by == false",
+              selectInput("myFill", "fill", choices=clr.one),
+              selectInput("myColor", label="color", choices=clr.edge),
+            ),
             sliderInput("myTrans", label="trans", min=0, max=1, value=0),
             conditionalPanel(condition="input.do_size == false",
               sliderInput("mySize", "size", min=0.0, max=5, value=1.25,
@@ -116,16 +118,22 @@ ui <- fluidPage(
 
           tags$hr(),
           h4(div("Fit Line, Ellipse, & Outliers", class="head")),
-          checkboxInput("do_fit", "view options", FALSE),
-          conditionalPanel(condition="input.do_fit == true",
-            checkboxInput("myEnhance", "enhance", value=FALSE),
+          checkboxInput("do_FlEO", "view options", FALSE),
+          conditionalPanel(condition="input.do_FlEO == true",
+            conditionalPanel(condition="input.do_by == false",
+              checkboxInput("myEnhance", "enhance", value=FALSE),
+            ),
+            checkboxInput("myErrors", "plot_errors", value=FALSE),
             selectInput("myFit", "fit",
               choices=list("off", "loess", "lm", "exp", "quad", "null")),
-            selectInput("myFitClr", "fit_color", choices=clr.fit),
-            sliderInput("myFitSE", "fit_se", min=0, max=0.99, value=0.95),
-            checkboxInput("myErrors", "plot_errors", value=FALSE),
+            conditionalPanel(condition="input.myFit != 'off'",
+              selectInput("myFitClr", "fit_color", choices=clr.fit),
+              sliderInput("myFitSE", "fit_se", min=0, max=0.99, value=0.95),
+            ),
             sliderInput("myEllipse", "ellipse", min=0, max=0.99, value=0),
-            sliderInput("myMDcut", "MD_cut", min=0, max=12, value=0),
+            conditionalPanel(condition="input.do_by == false",
+              sliderInput("myMDcut", "MD_cut", min=0, max=12, value=0),
+            ),
             checkboxInput("myAddMeans", "add=\"means\"", value=FALSE),
           ),
 
@@ -300,14 +308,15 @@ server <- function(input, output, session) {
     updateSliderInput(session, inputId="myEllipse", "ellipse",
          min=0, max=0.99, value=elp.val)
 
-    fit.val <- ifelse(input$myEnhance, "lm", "off")
+    fit.val <- ifelse (input$myEnhance, "lm", "off")
     updateSelectInput(session, inputId="myFit", "fit", 
          choices=list("off", "loess", "lm", "exp", "quad", "null"),
          selected=fit.val)
-
-    MDc.val <- ifelse (input$myEnhance, 6, 0)
-    updateSliderInput(session, inputId="myMDcut", "MD_cut",
-         min=0, max=12, value=MDc.val)
+    if (!input$do_by) {
+      MDc.val <- ifelse (input$myEnhance, 6, 0)
+      updateSliderInput(session, inputId="myMDcut", "MD_cut",
+           min=0, max=12, value=MDc.val)
+    }
   })
  
 
@@ -324,7 +333,7 @@ server <- function(input, output, session) {
     shiny::req(y.name)
     y <- data()[, y.name]
 
-    in.fill <- input$myFill
+    in.fill <- ifelse (nchar(input$by.col)==0, input$myFill, input$myFill2)
 
     by <- NULL
     lt <- NULL  # legend_title
@@ -354,7 +363,8 @@ server <- function(input, output, session) {
           rotate_x=input$myRttx, rotate_y=input$myRtty, offset=input$myOff,  
           xlab=x.name, ylab=y.name, legend_title=lt, quiet=FALSE)
 
-      p_fill <- input$myFill == "#324E5C"
+      p_fill <- ifelse (nchar(input$by.col)==0, in.fill == "#324E5C",
+                                                in.fill == "hues") 
       p_color <- input$myColor == "off"
       p_trans <- input$myTrans == 0
       p_size <- input$mySize == 1.25
@@ -387,7 +397,7 @@ server <- function(input, output, session) {
       else
         out <- paste("Plot(", x.name, ", ", y.name, sep="")
 
-      if (!p_fill) out <- paste(out, ", fill=\"", input$myFill, "\"", sep="")
+      if (!p_fill) out <- paste(out, ", fill=\"", in.fill, "\"", sep="")
       if (!p_color) out <- paste(out, ", color=\"", input$myColor, "\"", sep="")
       if (!p_trans) out <- paste(out, ", trans=", input$myTrans, sep="")
       if (!p_size) out <- paste(out, ", size=", input$mySize, sep="")

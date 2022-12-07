@@ -1,0 +1,62 @@
+
+`## Model`
+
+
+`### Specified Model`
+
+Express `Y` as a linear function of `W_n.pred` predictor variable`pl`: `X`. Within the context of the model, indicate the response variable with a Y subscripted by the variable name, $Y_{`Y`}$. Identify each predictor variable according to a subscript to an X for predictor variable or feature. From the training data compute $\hat Y_{`Y`}$, the _fitted value_ of the response variable from the model for a specific set of values for `X`.
+
+`eq.model_b`
+
+The _intercept_, $b_0$, indicates the fitted value of `Y` for values of `X` all equal to zero. `et.c` _slope coefficient_ $b_1$ `mult` is the average change in the value of response variable, `Y`, for a one-unit increase in the value of the corresponding predictor variable `cnst`. The values of these estimated coefficients only apply to the interpretation of the training data from which they were estimated. 
+
+To compute $\hat Y_{`Y`}$ from a specific set of values for `X`, requires the estimated values of the coefficients of the model, the values of each regression coefficient, $b_j$. This estimation procedure depends on the _residual_, the difference between the  actual value of `Y` for each row of data, and the corresponding value fitted by the model. Define the residual as a variable across all rows of data. Use the subscript _i_ to indicate the $i^{th}$ row of data to emphasize that the expression applies to _each_ row of training data. The name of the response variable in this notation is understood and so is omitted for simplicity.
+
+`eq.resid`
+
+Estimate the coefficients with ordinary least squares (OLS), which provides the one set of estimates that minimize the sum of the squared residuals, $\sum e^2_i$, across all the rows of the training data.
+
+
+
+Accomplish the estimation and related computations with the _lessR_ function _Regression()_, abbreviated as _reg()_. Keep graphics separate, so generate these later. 
+
+`in.reg`
+
+The output begins with a specification of the variables in the model and a brief description of the data.
+
+`out.bck`
+
+Of the `r r$n.obs` cases presented for analysis, `r r$n.keep` are retained. The number of deleted cases due to missing data is `r r$n.obs - r$n.keep`.
+
+
+
+
+`### Estimated Model`
+
+The analysis of the model begins with the estimation of each sample regression coefficient, $b_j$, what the machine, the estimation algorithm, learns from the training data. Of greater interest is each corresponding population value, $\beta_j$, in the _population model_.
+
+`eq.model_beta`
+
+The associated classical inferential analyses for the estimate of each $\beta_j$ are the hypothesis test and confidence interval.
+
+Each _t_-test evaluates the _null hypothesis_ that the corresponding _individual_ population regression coefficient is 0, here for the $j^{th}$ coefficient. 
+
+$$H_0: \beta_j=0$$
+$$H_1: \beta_j \ne 0$$
+
+Each _confidence interval_ provides the range of plausible values of the corresponding $\beta_j$. Each 95% confidence interval is the margin of error on either side of the corresponding estimated intercept or slope coefficient, $b_j$. If 0 lies within the interval, then the null hypothesis is supported as 0 is a plausible value of $\beta_j$, which would also result in the hypothesis test not rejecting the null. 
+
+% Model - Estimated Model, Results
+
+`out.estimates`
+
+% Model - Estimated Model, Interpretation
+
+This estimated model is the linear function with estimated numeric coefficients that yield a fitted value of `Y`, from the provided data value`pl` of `X`.
+
+`eq.model_est`
+
+
+`intr.CI_nosig`
+
+`intr.CI_sig`

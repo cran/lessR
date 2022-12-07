@@ -10,7 +10,7 @@ Following a call to the \code{lessR} function \code{\link{Regression}}, in which
 \usage{
 regPlot(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
          res_sort=c("cooks","rstudent","dffits","off"),
-         res_rows=NULL, cooks_cut=1, scatter_coef=NULL, 
+         n_res_rows=NULL, cooks_cut=1, scatter_coef=NULL, 
          pdf=FALSE, width=5, height=5, manage.gr=FALSE, \dots)
 }
 
@@ -27,25 +27,30 @@ regPlot(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
   \item{digits_d}{For the Basic Analysis, the number of decimal digits,
         set by default to at least 3 or the largest number of digits in the values 
         of the response variable plus 1.}
-  \item{pred.intervals}{If set to \code{FALSE}, the scatter plot for a single predictor
-        with the response does not contain prediction and confidence intervals.}
-  \item{res_sort}{Default is \code{"cooks"}, for specifying Cook's distance as the sort
-       criterion for the display of the rows of data and associated residuals. Other values 
-       are \code{"rstudent"} for externally Studentized residuals, \code{"dffits"} for dffits
+  \item{pred.intervals}{If set to \code{FALSE}, the scatter plot for a single
+        predictor with the response does not contain prediction and confidence
+        intervals.}
+  \item{res_sort}{Default is \code{"cooks"}, for specifying Cook's distance as
+       the sort criterion for the display of the rows of data and associated
+       residuals. Other values are \code{"rstudent"} for externally Studentized
+       residuals, \code{"dffits"} for dffits
        and \code{"off"} to not sort the rows of data.}
-  \item{res_rows}{Default is 20, which lists the first 20 rows of data sorted by the
-       specified sort criterion.  To disable residuals, specify a value of 0.  To see 
-       the output for all observations, specify a value of \code{"all"}.}
-  \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a larger value 
-       are flagged in red and labeled in the resulting scatterplot of Residuals and Fitted 
-       Values.  Default value is 1.0.}
-  \item{scatter_coef}{Display the correlation coefficients in the upper triangle of the
-        scatterplot matrix.}
+  \item{n_res_rows}{Default is 20, which lists the first 20 rows of data sorted
+       by the specified sort criterion.  To disable residuals, specify a value
+       of 0.  To see the output for all observations, specify a value of
+       \code{"all"}.}
+  \item{cooks_cut}{Cutoff value of Cook's Distance at which observations with a
+       larger value are flagged in red and labeled in the resulting scatterplot
+       of Residuals and Fitted Values.  Default value is 1.0.}
+  \item{scatter_coef}{Display the correlation coefficients in the upper triangle
+       of the scatterplot matrix.}
   \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
-  \item{manage.gr}{Usually leave \code{FALSE}. Refers to graphic management of the \code{lessR} system.}
-  \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the core computations.} 
+  \item{manage.gr}{Usually leave \code{FALSE}. Refers to graphic management of
+       the \code{lessR} system.}
+  \item{\dots}{Other parameter values for R function \code{\link{lm}} which
+       provides the core computations.} 
 }
 
 

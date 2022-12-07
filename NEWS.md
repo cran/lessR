@@ -1,3 +1,40 @@
+# lessR version 4.2.4, Dec 07, 2022
+
+## Updates
+
+* `ref_group` for `Logit()`, new, more explanatory name for `ref`, the level of the binary target variable explicitly defined as the reference group instead of relying on the default
+
+* `train_test()` has new parameter `matrix_out` which outputs the data structures as matrices instead of as data frames 
+
+* `Regression()`: For automatically generating and processing R markdown files, users can now 100% customize the output directly by creating their own input files, just one or all eight of the files
+
+* `Regression()`: Added parameters `Rmd_custom` to specify one or more custom input files and `Rmd_dir` to specify a custom directory where the files are stored
+
+* `Regression()`: For output, `vars` component added that is a vector of the variable names in the model beginning with the response variable
+
+* `Regression()`: Parameters `res_rows` and `pred_rows` changed to the more descriptive `n_res_rows` and `n_pred_rows`  
+
+## Bug Fixes
+
+* `interact("Histogram")`: The `bandwidth` slider for the `density` option now re-adjusts if a new variable is selected from the same data set
+
+* `interact("Plot")`: Points now plotted properly
+
+* `interact("Plot")`: Fill color properly set if a `by` variable is selected
+
+* `Plot()`: Transparency (trans parameter) now works when size as a variable and by are activated
+
+* `Plot()`: for a `fit` function, mse now properly computed
+ 
+* `recode()`: Entire data frame now not written to the console
+
+* `Regression()`: Text enlarged for scatterplot matrix
+
+* `Regression()`: Number of allowable terms in the model definition now greatly expanded
+
+* `Regression()`: When generating a markdown file with parameter `Rmd`, if reading a label file included with `lessR`, the correct data file is now properly listed instead of the label file
+
+
 # lessR version 4.2.3, Sept 11, 2022
 
 ## Primary Update

@@ -165,6 +165,6 @@ function(lm.out, ancova, digits_d=NULL, show_R=FALSE) {
     names(tot) <- c("df", "ss", "ms")
   }
 
-  return(list(tx=tx, mdl=mdl, rsd=rsd, tot=tot, MSW=MSW))
+  return(list(out_anova=tx, mdl=mdl, rsd=rsd, tot=tot, MSW=MSW))
 
 }

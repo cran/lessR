@@ -1,0 +1,19 @@
+
+`## Validity`
+
+The residuals should be independent, normal random variables with a mean of zero and constant variance.
+
+
+`### Distribution of Residuals`
+
+For the inferential analyses to be valid, the residuals should be normally distributed. Violation of normality does not bias the estimates, but it does render the inferential tests invalid.
+
+`plot.resids_dist`
+
+
+
+`### Fitted Values vs Residuals`
+
+The patterning of the residuals should represent random variation, free of any pattern or structure. They should satisfy the _homoscedasticity_ assumption, randomly scattered about 0, with approximately the same level of variability across the range of the fitted values within a horizontal band around the zero-line. Otherwise they demonstrate _heteroskedasticity_.
+
+`plot.fitted_resids`

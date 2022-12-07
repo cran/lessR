@@ -1,0 +1,11 @@
+
+`## Data`
+
+Read the data with the _lessR_ function _Read()_.
+
+`in.read`
+
+The corresponding data values for the variables in the model comprise the _training data_, from which the model is estimated.
+
+Data from the following variables are available for analysis: `r xAnd(names(data.in))`.
+

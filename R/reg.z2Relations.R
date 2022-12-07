@@ -183,6 +183,6 @@ function(lm.out, dname, n.keep, show_R,
     txsbs <- tx
   }  # end subsets
 
-  return(list(txcor=txcor, txcln=txcln, txsbs=txsbs, crs=crs, tol=tol, vif=vif))
+  return(list(out_cor=txcor, out_collinear=txcln, out_subsets=txsbs, crs=crs, tol=tol, vif=vif))
 
 }

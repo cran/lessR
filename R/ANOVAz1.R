@@ -137,7 +137,7 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
   if (omsq > 0) {
     tx[length(tx)+1] <- ""
     f.cohen <- sqrt( (omsq/(1-omsq)) )
-    tx[length(tx)+1] <- paste("Cohen's f:", .fmt(f.cohen, 3))
+    tx[length(tx)+1] <- paste("\nCohen's f:", .fmt(f.cohen, 3))
   }
 
   txeft <- tx

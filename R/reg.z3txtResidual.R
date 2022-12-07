@@ -1,5 +1,5 @@
 .reg3txtResidual <-
-function(lm.out, cook, digits_d=NULL, res_sort="cooks", res_rows=NULL,
+function(lm.out, cook, digits_d=NULL, res_sort="cooks", n_res_rows=NULL,
          show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
@@ -30,11 +30,11 @@ function(lm.out, cook, digits_d=NULL, res_sort="cooks", res_rows=NULL,
     tx[length(tx)+1] <- "   [sorted by Studentized Residual, ignoring + or - sign]"
   if (res_sort == "dffits")  
     tx[length(tx)+1] <- "   [sorted by dffits, ignoring + or - sign]"
-  if (res_rows < n.keep)
-    txt <- "rows of data, or do res_rows=\"all\"]"
+  if (n_res_rows < n.keep)
+    txt <- "rows of data, or do n_res_rows=\"all\"]"
   else
     txt="]"
-  tx[length(tx)+1] <- paste("   [res_rows = ", res_rows, ", out of ", n.keep, " ", txt, sep="")
+  tx[length(tx)+1] <- paste("   [n_res_rows = ", n_res_rows, ", out of ", n.keep, " ", txt, sep="")
 
 
   fit <- lm.out$fitted.values
@@ -69,13 +69,14 @@ function(lm.out, cook, digits_d=NULL, res_sort="cooks", res_rows=NULL,
     out <- out[o,]
   }
 
-  tx2 <- .prntbl(out[1:res_rows,], digits_d)
+  tx2 <- .prntbl(out[1:n_res_rows,], digits_d)
   for (i in 1:length(tx2)) tx[length(tx)+1] <- tx2[i]
 
-  if (res_rows > 5  &&  res_sort != "off") {
-    label.top <- numeric(length=5)
-    out_top <- numeric(length=5)
-    for (i in 1:5) {
+  num <- max(5, n_res_rows)
+  if (res_sort != "off") {
+    label.top <- numeric(length=num)
+    out_top <- numeric(length=num)
+    for (i in 1:num) {
       label.top[i] <- rownames(out)[i]
       out_top[i] <- out[i,(ncol(out)-clmn)]
     }
@@ -84,6 +85,6 @@ function(lm.out, cook, digits_d=NULL, res_sort="cooks", res_rows=NULL,
   else
     out_top <- NA
 
-  return(list(tx=tx, resid.max=out_top))
+  return(list(out_residuals=tx, resid.max=out_top))
 
 }

@@ -54,10 +54,12 @@ function(x.lv, y.lv, fit.line, fit_power) {
       }
       # log(neg y) generates a NaN, which reduces data for lm
       #  but does not hurt the exp function back transform
-      if (fit_power == 1)
+      if (fit_power == 1) {
         l.ln <- lm(log(y.lv) ~ x.lv)
-      else
+      }
+      else {
         l.ln <- lm(log(y.lv^(1/fit_power)) ~ x.lv)
+      }
       b00 <- l.ln$coefficients[1]
       b11 <- l.ln$coefficients[2]
       f.ln <- exp(b00 + (b11*x.lv))
@@ -97,10 +99,15 @@ function(x.lv, y.lv, fit.line, fit_power) {
       Rsqq <- summary(l.ln)$r.squared
     }
 
-    # need to compute sse here because anova() only applies to lm 
-    e.lv <- y.lv - f.ln
-    sse <- sum(e.lv^2)
-    mse <- sse / (length(e.lv) - 2)
+    if (fit.line != "loess") {
+      a <- anova(l.ln)
+      mse <- a[row.names(a) == "Residuals", ][3]
+    }
+    else {  # anova() only applies to lm
+      e.lv <- l.ln$residuals
+      sse <- sum(e.lv^2)
+      mse <- sse / (length(e.lv) - 2)  # only 1 pred var
+    }
     b0 <- ifelse (is.null(b00), NA, b00) 
     b1 <- ifelse (is.null(b11), NA, b11) 
     Rsq <- ifelse (is.null(Rsqq), NA, Rsqq) 

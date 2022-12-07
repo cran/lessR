@@ -2,7 +2,6 @@
 function(x, y, size, radius, power, fill, color,
          size_cut, prop, bubble_text, object) {
 
-
   cords <- data.frame(x, y, size, stringsAsFactors=TRUE)
   cords <- na.omit(cords)
 

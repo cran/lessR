@@ -1,7 +1,7 @@
 regPlot <- 
 function(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
          res_sort=c("cooks","rstudent","dffits","off"),
-         res_rows=NULL, cooks_cut=1, scatter_coef=NULL,
+         n_res_rows=NULL, cooks_cut=1, scatter_coef=NULL,
          pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
 
 
@@ -11,7 +11,6 @@ function(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
 
     # need: out$residuals
     if (type == 2) .reg3dnResidual(out, pdf, width, height, manage.gr)
-
 
     # need: out$fitted.values, out$residuals
     if (type == 3) .reg3resfitResidual(out, out$cooks.distance, cooks_cut,
@@ -59,7 +58,7 @@ function(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
     else {
       c.int <- NULL
       p.int <- NULL
-      pred_rows <- 0
+      n_pred_rows <- 0
     }
 
     if (!is.null(scatter_coef))
@@ -68,7 +67,7 @@ function(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
       s.c <- TRUE
 
 
-    .reg5Plot(out, res_rows=NULL, pred_rows=NULL,
+    .reg5Plot(out, n_res_rows=NULL, n_pred_rows=NULL,
          scatter_coef=s.c, X1_new=NULL, ancova,
          numeric.all, in.data.frame, c.int, p.int,
          digits_d=getOption("digits_d"), n_cat=getOption("n_cat"),

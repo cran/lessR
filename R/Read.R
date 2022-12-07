@@ -70,7 +70,10 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
     fncl <- .fun_call.deparse(fun_call)
   }
 
-  if (!var_labels) options(read.call=fncl)  # save only data file for knitr run
+  # save only data file for knitr run
+  # reading from "Employee_lbl" does not require var_labels
+  if (!var_labels && !grepl("_lbl", from, fixed=TRUE))
+    options(read.call=fncl) 
 
   if (miss.format) {
          if (!is.null(widths)) format <- "fwd"

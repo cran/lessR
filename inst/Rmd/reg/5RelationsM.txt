@@ -1,0 +1,39 @@
+% Analyze variable relations for multiple regression
+
+`## Relations`
+
+`### Scatter Plot Matrix`
+
+How do the variables in the model relate to each other? The correlation`pl` of response variable `Y` with predictor variable`pl` `X` should be relatively high.
+`if n.pred>1`
+The correlations of the predictor variables with each other should be relatively small.
+
+Visually summarize the relation between each pair of variables in the model with a scatterplot. Express the numeric variable linear relationships among the variables in the model with their correlations.
+
+This model has multiple predictor variables, `X`, to explain the values of the response variable `Y`. The different scatter plots between each pair of variables are presented in a _scatter plot matrix_. Each scatter plot in the matrix also contains the best-fitting regression line. The individual scatter plots appear below the main diagonal of the matrix and the corresponding correlations appear above the diagonal.
+
+
+`plot.scatter`
+
+
+`### Collinearity`
+
+The collinearity analysis assesses the extent that the predictor variables -- `X`  -- linearly depend upon each other, which in the simplest case is a high pairwise correlation. Although collinearity diminishes neither the fit of the model, nor predictive efficacy, it typically indicates an overly complex model. The effects of collinear variables cannot be easily disentangled without a large sample size, so they have relatively large standard errors of their estimated slope coefficients, which yield unstable estimates.
+
+To assess collinearity for predictor variable $X_j$, regress that predictor onto all of the remaining predictor variables. A high resulting $R^2_j$ indicates collinearity for that predictor. Usually express this result in terms of the _tolerance_ of the predictor, $1 - R^2_j$, the proportion of variance for $X_j$ _not_ due do the remaining predictor variables. Because each $R^2_j$ should be low, presumably at least less than 0.8, tolerance should be high, at least larger than approximately 0.20. An equivalent statistic is the _variance inflation factor_ (VIF), which indicates the extent collinearity inflates the variance of the estimated coefficient. VIF is the reciprocal of tolerance, so usually should be at least less than approximately 5.
+
+`out.collinear`
+ 
+`intr.tolerance`
+
+
+`### Subset Models`
+
+Especially when collinearity is present, can a simpler model be more, or at least almost, as effective as the current model? To investigate, assess the fit for the models that correspond to possible, effective combinations of the predictor variables. Each row of the analysis defines a different model. A 1 means the predictor variable is in the model, a 0 means it is excluded from the model.
+
+`out.subsets`
+
+The goal of choosing the best model from the available alternatives is _parsimony_, to obtain the most explanatory power, here assessed with $R^2_{adj}$, with the least number of predictor variables, presumably guided also by the content and meaningfulness of the variables in the model.
+
+Note that this analysis only describes the available data. This subset analysis is a descriptive heuristic that can effectively help eliminate unnecessary predictor variables from your model, but all resulting inferential statistics such as _p_-values are no longer valid. Ultimately a model revised from the training data requires cross-validation on a new data set.
+

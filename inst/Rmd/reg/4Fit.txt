@@ -1,0 +1,172 @@
+
+`## Fit`
+
+`### Extent of Minimization`
+
+
+% -----------------------------------------
+`if explain`
+
+An estimated model minimizes the sum of squared errors, SSE, but that minimization is not necessarily small enough for the model to be useful. A first consideration of usefulness is that the model fits the data from which it is estimated, the training data. To what extent do the values fitted by the model, $\hat Y_{`Y`}$, match the corresponding training data values $Y_{`Y`}$? Are the individual residuals, $e_i$, typically close to their mean of zero, or are they scattered much about the regression surface with relatively large positive values and negative values? If the model cannot adequately fit its own training data, it will not be able to successfully predict unknown values of `Y` from new, previously unencountered data.
+
+`end`
+% -----------------------------------------
+
+
+`### Partitioning Variance`
+
+% -----------------------------------------
+`if explain`
+
+The analysis of fit evaluates how well the proposed model accounts for the variability of the data values of the response variable, or target, `Y`. The core component of the assessment of the variability of data values is the corresponding _sum of squares_, _SS_, short for the sum of squared deviations of a variable. The sum of squares is an essential and central theme of many application of statistics to data analysis, which typically involves the analysis of variability. 
+
+Several different types of variability can be identified. The _total variability_ of $Y_{`Y`}$, as `Y` exists apart from a consideration of the model, depends on the deviations of its data values from its own mean, $Y_{`Y`} - \bar Y_{`Y`}$. Square these deviations, then sum the squared deviations to obtain the resulting sums of squares, $SS_{`Y`}$. The more variable the values of `Y`, the larger  $SS_{`Y`}$.
+
+The analysis of the residuals begins with the variable $e$ defined as $e = Y_{`Y`} - \hat Y_{`Y`}$. From this variable, compute the corresponding sum of squares, the value minimized by the least squares estimation procedure, which chooses the estimated coefficients of the model that yield $\sum e^2_i$ = $SS_{Residual}$. This residual sum of squares represents variation of $Y_{`Y`}$ that the model _fails_ to explain, $\hat Y_{`Y`}$. The complement to the residual sum of squares is the Model (or Regression) sum of squares, the deviations of the fitted values about their corresponding mean, $\hat Y_{`Y`} - \bar Y_{`Y`}$, the variability of `Y` that the model does explain.
+
+Partitioning the sums of squares of `Y` into what is explained by the model, and what is not explained, is fundamental to assessing the fit of the model, and generally to all supervised machine learning models such as from a regression analysis. The analysis of variance (ANOVA) partitions this Total sum of squares of `Y` into the Residual variability, $\sum e^2_i$, and the Model sum of squares, $SS_{Model}$. The ANOVA table displays these various sources of variation. The larger the explained variability of `Y` relative to the unexplained variability, the better the model fits the data. 
+
+`end`
+% -----------------------------------------
+
+
+% -----------------------------------------
+`if results`
+
+`out.ANOVA`
+
+`eq.decomp`
+
+This decomposition of the sums of squares of `Y`  into what is explained by the model, and what is _not_ explained, is fundamental to assessing the fit of the model.
+
+The ANOVA further partitions the overall model sums of squares by predictor variable.
+
+`eq.model_decomp`
+
+`end`
+% -----------------------------------------
+
+
+% -----------------------------------------
+`if explain`
+
+This fundamental relationship of these related sums of squares components provides the basis for assessing fit.
+
+`end`
+% -----------------------------------------
+
+
+
+`### Fit Indices`
+
+% -----------------------------------------
+`if explain`
+
+From the partitioning of the sum of squares in the ANOVA, derive two types of primary indicators of fit: standard deviation of the residuals and several $R^2$ statistics. To express these statistics, rely upon either the provided sum of squares terms or
+convert the relevant sums to means. To convert to a mean, divide each sum of squares by its corresponding degrees of freedom, _df_, to obtain the corresponding Mean Squared deviation, _MS_. 
+
+`end`
+% -----------------------------------------
+
+
+
+% -----------------------------------------
+`if results`
+
+`out.fit`
+
+
+
+`#### Standard Deviation of Residuals`
+
+How much scatter is there about each point on the regression line (surface)? As usual, assess variability with the standard deviation. Here, the _standard deviation of the residuals_, $s_e$, directly assesses the variability of the data values of `Y` about the corresponding fitted values for the training data, the data from which the model was estimated. Each mean square in the ANOVA table is a variance, a sum of squares divided by the corresponding degrees of freedom, _df_. By definition, the standard deviation of the residuals, $s_e$, is the square root of the mean square of the residuals.
+
+`eq.se`
+
+To interpret $s_e$ = `r xP(r$se, d_d)`, consider the estimated range of 95% of the values of a normally distributed variable, which depends on the corresponding 2.5% cutoff from the $t$-distribution for df=`r r$anova_residual[1]`: `r xP(-qt(0.025, df=r$anova_residual[1]),3)`.
+
+`eq.se_range`
+
+This range of the residuals for the fitted values is the lower limit of the range of prediction error presented later. 
+
+
+`#### $R^2$ Family`
+ 
+A second type of fit index is $R^2$, the proportion of the overall variability of response variable `Y` that is accounted for by the model, applied to the training data, expressed either in terms of $SS_{Residual}$ or $SS_{Model}$.
+
+`eq.R2`
+
+Unfortunately, when any new predictor variable is added to a model, useful or not, $R^2$ necessarily increases. Use the adjusted version, $R^2_{adj}$, to more appropriately compare models estimated from the same training data with different numbers of predictors. $R^2_{adj}$ helps to avoid overfitting a model because it only increases if a new predictor variable added to the model improves the fit more than would be expected by chance. The adjustment considers the number of predictor variables relative to the number of rows of data (cases). Accomplish this adjustment with the corresponding degrees of freedom, to transform each Sum of Squares to the corresponding Mean Squares.
+
+`eq.R2adj`
+
+
+From this analysis compare $R^2$ = `r xP(r$Rsq,3)` to the adjusted value of $R^2_{adj}$ = `r xP(r$Rsqadj,3)`, a difference of , 
+`r xP((r$Rsq-r$Rsqadj), 3)`. A large difference indicates that too many predictor variables in the model for the available data yielded an overfitted model.
+
+
+Both $R^2$ and $R^2_{adj}$ describe the fit of the model to the training data. To generalize to prediction accuracy on _new_ data, evaluate the fit of the model to predict using the _predictive residual_ (PRE). To calculate the predictive residual for a row of data (case), first estimate the model with that case deleted, that is, from all the remaining cases in the training data, an example of a _case-deletion_ statistic. Repeat for all rows of data. $SS_{PRE}$, or PRESS, is the sum of squares of all the predictive residuals in a data set. From $SS_{PRE}$ define the predictive $R^2$, $R^2_{PRESS}$.
+
+`eq.R2press`
+
+Because an estimated model at least to some extent overfits the training data, $R^2_{PRESS}$ = `r xP(r$RsqPRESS,3)` is lower than both $R^2$ and $R^2_{adj}$. The value is lower, but is the more appropriate value to understand how well the model predicts new values beyond the training data from which the machine (the programmed algorithm) learned the relationships among the predictor variables or features as they relate to the response variable or target.
+
+`end`
+% -----------------------------------------
+
+
+
+% -----------------------------------------
+`if explain, n.pred>2`
+
+`### Tests of Multiple Coefficients`
+
+The sum of squares for a predictor variable is called a _sequential sums of squares_. It represents the effect of a predictor variable, 
+after the effects of all previously entered variables in the model have already been accounted for. Unless the predictor variables are uncorrelated, its value depends on the sequence of the variables as specified in the model. Usually the interpretation of a sequential effect is more useful when the variables are entered in order of perceived importance.
+
+Progressing through the table of the sequential sums of squares for each predictor variable from the first entry, `r r$vars[2]`, through the last last entry, `r r$vars[r$n.vars]`, forms a sequence of increasingly larger _nested models_ that successively contain more variables. For example, the _p_-value of `r r$pvalues[r$n.vars]`, for the last variable entered into the model,
+`r r$vars[r$n.vars]` is the same for both the ANOVA table and its regression slope coefficient because in both situations the effects of all other predictor variables are partialled out.
+
+The ANOVA table provides for the overall hypothesis test that evaluates if _all_ the predictor variables as a set -- `X`  --  
+are related to `Y`  as specified by the model.
+
+`eq.multNull`
+
+From the sums of squares for the Model and Residuals with degrees of freedom of 
+`r as.integer(r$anova_model[1])` and `r as.integer(r$anova_residual[1])`,
+the test statistic is _F_ = `r round(r$anova_model[4], d_d)`, with a _p_-value of `r round(r$anova_model[5], d_d)`.
+
+To help identify predictors that contribute little beyond those variables previously included in the model, generally list the more important variables first in the model specification. Add together the sequential sum of squares from the ANOVA table , 
+for variables listed last in the table to form a nested model. Then test if the designated _subset_ of the regression coefficients are all equal to zero. To illustrate, consider the hypothesis test that the slope coefficients for the last two variables, `r r$vars[r$n.vars-1]` and `r r$vars[r$n.vars]` are both equal to zero.
+
+
+`eq.mult2Null`
+
+Compare two nested models with the _lessR_ function _Nest()_. Specify the response variable `Y`, the variables in the reduced model, and then the additional variables in the full model. _Nest()_ also ensures to compare the same data values when there is missing data that might otherwise leave more data in the analysis of the reduced model.
+
+
+`in.nest`
+
+First verify that the reduced and full models are properly specified.
+
+`out.nest`
+
+Compare nested models to evaluate if the additional variables in the full model provide a detectable increase in fit beyond that of the reduced model. Evidence for accepting the reduced model is to have the test _not_ be significant, which means that the evaluated coefficients from the additional variables in the full model are not detected to be different from 0, and so perhaps need not be included in the model.
+
+`out.av_nest`
+
+
+`r reject <- "Reject the null hypothesis of the tested regression coefficients equal to 0 because of the small _p_-value of"`
+
+`r accept <- "No difference of the coefficients from zero detected because of the relatively large _p_-value of"`
+
+
+`r if ((n$anova_tested[5]< 0.05)) reject else accept` `r xP(n$anova_tested[5],3)`
+
+Realize that if the reduced model was constructed solely from the regression output of the initial training data, and then analyzed from the same data, the analysis is _post-hoc_. The _p_-value in this situation is an interesting and perhaps useful heuristic, but not to be literally interpreted.
+
+
+`end`
+% -----------------------------------------
+
+

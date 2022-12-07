@@ -48,7 +48,7 @@ function(x, cor.coef=TRUE, fit="loess",
     r <- cor(x, y)
     txt <- .fmt(r, 2)
     # maybe use par("fin")[1] / n.var to get size of each cell
-    cex.adj <- 1.274 - (0.033*n.var)  # adjust size of displayed r
+    cex.adj <- 1.6 - (0.065*n.var)  # adjust size of displayed r   # 1.274
     text(0.5, 0.5, txt, cex=cex.adj, col="black")  # or cex=cex.cor * r
   }
 
@@ -57,7 +57,7 @@ function(x, cor.coef=TRUE, fit="loess",
     my.usr <- par("usr")          
     rect(my.usr[1], my.usr[3], my.usr[2], my.usr[4], col=getOption("se_fill"),
          border=col.box)
-    cex.adj <- 1.274 - (0.033*n.var)  # adjust size of displayed var name
+    cex.adj <- 1.6 - (0.065*n.var)  # adjust size of displayed var name
     text(0.5, 0.5, nm, cex=cex.adj, col=getOption("lab_color"))
   }
 

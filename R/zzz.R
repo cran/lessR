@@ -9,7 +9,7 @@ if (getRversion() >= "3.5.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.2.3                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.2.4                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -138,7 +138,7 @@ function(...) {
   options(document = TRUE)
   options(code = TRUE)
 
-  options(show.signifstars = FALSE)
+  options(out.signifstars = FALSE)
   options(scipen = 30)
 
   options(mc_doScale_quiet=TRUE)  # for mc() function in robustbase
@@ -634,8 +634,8 @@ function(...) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "No correlation matrix entered.\n\n",
       "No object called ", cor.nm, " exists.\n\n",
-      "Either enter the correct name, or calculate with: Correlation\n",
-      "Or read the correlation matrix with: corRead\n\n", sep="")
+      "Either enter the correct name, or calculate with: Correlation()\n",
+      "Or read the correlation matrix with: corRead()\n\n", sep="")
   }
 
 }
@@ -828,16 +828,17 @@ function(...) {
   if (!mylabels.ok)
     l.name <- deparse(substitute(labels))
 
+  # l has row names, with 1st var as "label" and, if present, 2nd as "unit"
   if (l.name %in% ls(name=.GlobalEnv)) {
     l <- get(l.name, pos=.GlobalEnv)
 
     i.row <- which(row.names(l) == x.name)
     if (length(i.row) > 0) if (is.numeric(i.row))
-      if (!is.na(l[i.row, ])) x.lbl <- l[i.row,1]
+      if (!is.na(l[i.row,1])) x.lbl <- l[i.row,1]
 
     i.row <- which(row.names(l) == y.name)
     if (length(i.row) > 0) if (is.numeric(i.row))
-      if (!is.na(l[i.row, ])) y.lbl <- l[i.row,1]
+      if (!is.na(l[i.row,1])) y.lbl <- l[i.row,1]
   }
 
   else {  # labels embedded in data
@@ -1432,8 +1433,8 @@ function(lab, labcex, cut, nm, var.nm, units) {
   mrg <- 1.3 + .38*max.num
   if (is.null(bm)) bm <- mrg
   if (is.null(rm)) rm <- mrg
-  if (axis_x_cex > 0.75) axis_x_cex <- axis_x_cex + 1  # hack
-  if (axis_y_cex > 0.75) axis_y_cex <- axis_y_cex + 1
+  if (axis_x_cex > 1) bm <- bm + .5  # hack
+  if (axis_y_cex > 1) rm <- rm + .5
 
   heatmap(R[1:NItems,1:NItems], Rowv=NA, Colv="Rowv", symm=TRUE,
     col=hmcols, margins=c(bm,rm), main=main,
@@ -1781,6 +1782,103 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
   return(fc_new)
   }
+}
+
+
+# parser called by .reg.Rmd() to process a file of marked text
+.toRmd <- function(f.name, path, n.pred=-1,
+                   explain=NULL, results=NULL, interpret=NULL,
+                   res_sort="") {
+# path <- getwd()
+  if (!is.null(path)) {  # a system file, spec includes full reference
+    f.name <- file.path(path, f.name) 
+  }
+  txt <- readLines(f.name, skipNul=TRUE)  # read all lines in the file
+
+  the.ln <- NULL
+  i.line <- 0
+  while (i.line < length(txt)) {
+    i.line <- i.line + 1
+    ln <- paste(txt[i.line], " ", sep="")  # the ith line of vector txt
+
+    if (substr(ln, 1, 1) == "%") { next }  # comment, skip and go to next line 
+
+    cl <- gregexec("`", ln)
+    if (cl[[1]][1] != -1) {  # at least 1 var found in the.ln
+      cols <- cl[[1]][1,]  # columns that contain vars marks
+      n.sym <- length(cols) / 2  # symbol mark comes in pairs
+      ind <- (1:length(cols)) %% 2
+      c.evn <- cols[ind==0]  # even indices cols
+      c.odd <- cols[ind==1]  # odd indices cols
+      c.beg <- c(1, c.evn+1)
+      c.end <- c(c.odd-1, nchar(ln))
+
+      # sym is symbol, whatever is between ` and `
+      for (i.sym in 1:n.sym) {  # process each var within the ith line
+        chr <- substr(ln, c.beg[i.sym], c.end[i.sym])
+        sym <- substr(ln, c.odd[i.sym]+1, c.evn[i.sym]-1)
+
+        if (substr(sym, 1, 3) == "end") { next }  # end if-block 
+
+        else  # a function
+          if (substr(sym, 1,3) == "eq." || substr(sym, 1,4) == "out." ||
+              substr(sym, 1,5) == "intr." || substr(sym, 1,5) == "plot." ||
+              substr(sym, 1,3) == "in.")
+            the.ln <- paste(the.ln, chr, eval.parent(as.name(sym), n=1)(),
+                            sep="")
+
+        else  # inline R expression
+          if (substr(sym, 1,2) == "r ") {
+            sym <- paste("`", sym, "`", sep="") 
+            the.ln <- paste(the.ln, chr, sym, sep="")
+          }
+
+        else  # assignment statement
+          if (grepl("<-", sym, fixed=TRUE))
+            the.ln <- paste(the.ln, "\n```{r echo=FALSE}\n", sym, "\n", "```",
+                            sep="")
+        
+        else  # header
+          if (substr(sym, 1,1) == "#")
+            the.ln <- paste(the.ln, chr, sym, "\n", sep="")
+
+        else  # if block
+          if (substr(sym, 1,2) == "if") {
+            delete <- FALSE
+            if (grepl("explain", sym)) if (!explain) delete <- TRUE
+            if (grepl("results", sym)) if (!results) delete <- TRUE
+            if (grepl("interpret", sym)) if (!interpret) delete <- TRUE
+            if (grepl("n.pred=1", sym)) if (n.pred>1) delete <- TRUE
+            if (grepl("n.pred>1", sym)) if (n.pred==1) delete <- TRUE
+            if (grepl("n.pred>2", sym)) if (n.pred<=2) delete <- TRUE
+            if (grepl("cooks", sym)) if (res_sort != "cooks") delete <- TRUE
+            if (delete) {
+              gone <- txt[i.line]
+              while (substr(gone, 1,4) != "`end") {
+                i.line <- i.line + 1
+                gone <- txt[i.line]
+              }
+            }
+          } 
+
+        else  # a variable with an assigned value, such as a variable name
+          the.ln <- paste(the.ln, chr, eval.parent(as.name(sym), n=1), sep="")
+
+        if (i.sym == n.sym) {  # get any text past the last sym
+          chr <- substr(ln, c.beg[n.sym+1], c.end[n.sym+1])
+          the.ln <- paste(the.ln, chr, sep="")
+         }
+
+      }  # end each var one at a time on indx
+    }  # end found vars on indx
+
+    else { # no vars in the line
+      if (ln == " ") ln <- "\n\n"
+      the.ln <- paste(the.ln, ln, sep="")
+    }
+  }  # end line-by-line processing
+
+  return(the.ln)
 }
 
 

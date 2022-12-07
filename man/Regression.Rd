@@ -21,16 +21,16 @@ Regression(my_formula, data=d, rows=NULL,
 
          Rmd=NULL, Rmd_browser=TRUE, 
          Rmd_format=c("html", "word", "pdf", "odt", "none"),
-         Rmd_data=NULL,
+         Rmd_data=NULL, Rmd_custom=NULL, Rmd_dir=path.expand("~/reg"),
+         Rmd_labels=FALSE,
          results=getOption("results"), explain=getOption("explain"),
-         interpret=getOption("interpret"), document=getOption("document"),
-         code=getOption("code"),
+         interpret=getOption("interpret"), code=getOption("code"), 
 
          text_width=120, brief=getOption("brief"), show_R=FALSE,
          plot_errors,
 
-         res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"),
-         pred_rows=NULL, pred_sort=c("predint", "off"),
+         n_res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"),
+         n_pred_rows=NULL, pred_sort=c("predint", "off"),
          subsets=NULL, best_sub=c("adjr2", "Cp"), cooks_cut=1,
 
          scatter_coef=TRUE, scatter_3D=FALSE,
@@ -88,6 +88,12 @@ reg_brief(\dots, brief=TRUE)
         (with the unabbreviated version of the function name). To refer
         to a different file to read
         specify the path name or web URL of the file.}
+  \item{Rmd_custom}{Vector of input text sections in the Rmd file for which
+        to convert.}
+  \item{Rmd_dir}{Directory where custom input text files are located
+        for the \code{Rmd} option.}
+  \item{Rmd_labels}{Label each section of the markdown output according to the
+        name of its input file.}
   \item{results}{By default TRUE. If set to \code{FALSE} the results
         are not provided in the R Markdown document, relying upon the interpretations.
         Can set globally with \code{style(results=FALSE)}.}
@@ -97,9 +103,6 @@ reg_brief(\dots, brief=TRUE)
   \item{interpret}{By default TRUE. If set to \code{FALSE} the interpretations
         of the results are not provided in the R Markdown document.  Can set globally
         with \code{style(interpret=FALSE)}.}
-  \item{document}{By default TRUE. If set to \code{FALSE} the R documentation
-        is not provided in the R Markdown file.  Can set globally with
-        \code{style(document=FALSE)}.}
   \item{code}{By default TRUE. If set to \code{FALSE} the R code that generates the
         results is not provided in the R Markdown file. Can set globally
         with \code{style(code=FALSE)}.}\cr
@@ -114,14 +117,14 @@ reg_brief(\dots, brief=TRUE)
         joins each point to the regression line, illustrating the size of the
         residuals.}\cr
 
-  \item{res_rows}{Default is 20, which lists the first 20 rows of data sorted by the
+  \item{n_res_rows}{Default is 20, which lists the first 20 rows of data sorted by the
        specified sort criterion.  To disable residuals, specify a value of 0.  To view
        the output for all observations, specify a value of \code{"all"}.}
   \item{res_sort}{Default is \code{"cooks"}, for specifying Cook's distance as the
        sort criterion for the display of the rows of data and associated residuals.
        Other values are \code{"rstudent"} for externally Studentized residuals,
        \code{"dffits"} for dffits and \code{"off"} to not sort the rows of data.}
-  \item{pred_rows}{Default is 3, which lists prediction intervals only for the
+  \item{n_pred_rows}{Default is 3, which lists prediction intervals only for the
        first, middle and last 3 rows of data, unless there are 25 or less
        rows of data when all rows are displayed.  To disable prediction intervals,
        specify a value of 0.  To see the output for rows of data, specify a value of
@@ -140,8 +143,8 @@ reg_brief(\dots, brief=TRUE)
        larger value are flagged in red and labeled in the resulting scatterplot
        of Residuals and Fitted Values. Default value is 1.0.}\cr
 
-  \item{scatter_coef}{Display the correlation coefficients in the upper triangle of the
-        scatterplot matrix.}
+  \item{scatter_coef}{Display the correlation coefficients in the upper triangle
+        of the scatterplot matrix.}
   \item{scatter_3D}{De-activated because car package no longer linked, but
        if set to \code{TRUE}, directions are provided to use the car
        \code{scatter3d} function directly.}\cr
@@ -187,13 +190,13 @@ reg_brief(\dots, brief=TRUE)
   \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
-  \item{refs}{If \code{TRUE}, then list the references for R and the packages used from
-        which functions were used to generate the output.}
+  \item{refs}{If \code{TRUE}, then list the references for R and the packages
+        used from which functions were used to generate the output.}
   \item{fun_call}{Function call. Used internally with \code{knitr} to pass the
         function call when obtained from the abbreviated function call \code{reg}.
         Not usually invoked by the user.}
-  \item{\dots}{Other parameter values for R function \code{\link{lm}} which provides the
-        core computations.}
+  \item{\dots}{Other parameter values for R function \code{\link{lm}} which
+       provides the core computations.}
 }
 
 
@@ -225,6 +228,11 @@ Both any existing variable labels and variable units are included in the output 
 
 The default analysis provides as text output to the console the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, correlation matrix of the model's variables, analysis of residuals and influence as well as the confidence and prediction intervals for each observation in the model. Also provided, for multiple regression models, collinearity analysis of the predictor variables and adjusted R-squared for the corresponding models defined by each possible subset of the predictor variables.
 
+The Markdown is produced from input files, one for each section of the rendered document. Find the default files and their names at:\\
+\code{system.file("Rmd/reg/", package="lessR")}\\
+The \code{Rmd_dir} option specifies a location for custom input files. The \code{Rmd_custom} parameter specifies which default files should be replaced by custom files, anywhere from any one of them to all eight. 
+
+
 DECIMAL DIGITS\cr
 The number of decimal digits displayed on the output is, by default, the maximum number of decimal digits for all the data values of the response variable. Or, this value can be explicitly specified with the \code{digits_d} parameter.
 
@@ -238,10 +246,10 @@ Three default graphs are provided. When running \code{R} by itself, by default t
 3. For models with a single predictor variable, a scatterplot of the data is produced, which also includes the regression line and corresponding confidence and prediction intervals. As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. For multiple regression models, a scatterplot matrix of the variables in the model with the \code{\link{lowess}} best-fit line of each constituent scatterplot is produced. If the \code{scatter_coef} option is invoked, each scatterplot in the upper-diagonal of the correlation matrix is replaced with its correlation coefficient.
 
 RESIDUAL ANALYSIS\cr
-By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual, Cook's distance and dffits, with the first 20 observations listed and sorted by Cook's distance.  The \code{res_sort} option provides for sorting by the Studentized residuals or not sorting at all.  The \code{res_rows} option provides for listing these rows of data and computed statistics statistics for any specified number of observations (rows).  To turn off the analysis of residuals, specify \code{res_rows=0}.
+By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual, Cook's distance and dffits, with the first 20 observations listed and sorted by Cook's distance.  The \code{res_sort} option provides for sorting by the Studentized residuals or not sorting at all.  The \code{n_res_rows} option provides for listing these rows of data and computed statistics statistics for any specified number of observations (rows).  To turn off the analysis of residuals, specify \code{n_res_rows=0}.
 
 PREDICTION INTERVALS\cr
-The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, the lower and upper bounds for the confidence interval and the prediction interval, and the wide of the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are 25 or more observations then the information for only the first three, the middle three and the last three observations is displayed. To turn off the analysis of prediction intervals, specify \code{pred_rows=0}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
+The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, the lower and upper bounds for the confidence interval and the prediction interval, and the wide of the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are 25 or more observations then the information for only the first three, the middle three and the last three observations is displayed. To turn off the analysis of prediction intervals, specify \code{n_pred_rows=0}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
 
 The data for the default analysis of the prediction intervals is for the values of the predictor variables for each observation, that is, for each row of the data. New values of the predictor variables can be specified for the calculation of the prediction intervals by providing values for the options \code{X1_new} for the values of the first listed predictor variable in the model, \code{X2_new} for the second listed predictor variable, and so forth for up to five predictor variables, and all predictor variables are numeric. To provide these values, use functions such as \code{\link{seq}} for specifying a sequence of values and \code{\link{c}} for specifying a vector of values. For multiple regression models, all combinations of the specified new values for all of the predictor variables are analyzed.
 
@@ -252,6 +260,11 @@ RECODE PREDICTOR VARIABLES\cr
 The \code{new_scale} parameter provides for recoding the values of the predictor variables according to several different transformations:  \code{"z"}, \code{"center"}, \code{"0to1"}, or \code{"robust"}. The later is a robust version of classic standardization in which the mean is replaced by the median and the standard deviation by the IQR. All numeric predictor variables with more than two values are standardized. 
 
 So any numeric variable with more than two values that is a categorical variable should be first converted to an R factor. If there are some numeric predictor variables that should not be standardized, such as an interaction term with centered variables that define the interaction, then the rescaling should be done separately, such as with base~R function \code{\link{scale}} or lessR  \code{\link{rescale}}. 
+
+ANCOVA\cr
+If there are two predictor variables, one categorical and one continuous, an analysis of covariance is performed. The resulting scatterplot is of the continuous response variable and predictor variable, at each level of the categorical variable. To address the unbalanced ANOVA design, the Type~II sums of squares are reported for each effect. The regression model for each level of the categorical variable are displayed.
+
+A categorical variable is defined as either an R \code{factor} or a non-numeric variable. If numeric and categorical, then explicitly define the categorical variable as a factor. 
 
 
 INVOKED R OPTIONS\cr
@@ -292,6 +305,7 @@ Separated from the rest of the text output are the major headings, which can be 
 STATISTICS\cr
 \code{call}: function call that generated the analysis\cr
 \code{formula}: model formula that specifies the model\cr
+\code{vars}: vector of variable names in the model\cr
 \code{n.vars}: number of variables in the model\cr
 \code{n.obs}: number of rows of data submitted for analysis\cr
 \code{n.keep}: number of rows of data retained in the analysis\cr

@@ -1,10 +1,9 @@
 .reg5Plot <-
-function(lm.out, res_rows=NULL, pred_rows=NULL,
+function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
          scatter_coef=FALSE, X1_new=NULL, ancova,
          numeric.all, in.data.frame, c.int, p.int, plot_errors=FALSE,
          digits_d, n_cat, pdf=FALSE, width=5, height=5, manage.gr=FALSE,
          scatter_3D, quiet, ...) {
-
          
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
@@ -13,9 +12,9 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
   n.keep <- nrow(lm.out$model)
   b0 <- lm.out$coefficients[1]
   b1 <- lm.out$coefficients[2]
-  if (is.null(pred_rows))
-    pred_rows <- ifelse (n.keep < 25, n.keep, 4)
-  if (pred_rows == "all") pred_rows <- n.keep  # no preds with pred_rows=0
+  if (is.null(n_pred_rows))
+    n_pred_rows <- ifelse (n.keep < 25, n.keep, 4)
+  if (n_pred_rows == "all") n_pred_rows <- n.keep  # no preds with n_pred_rows=0
 
   # pdf graphics option
   if (pdf) { 
@@ -64,7 +63,7 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
     }
     y.values <- lm.out$model[,nm[1]]
 
-    do.predint <- ifelse (pred_rows==0 || !is.null(X1_new) || is.null(p.int)
+    do.predint <- ifelse (n_pred_rows==0 || !is.null(X1_new) || is.null(p.int)
       || ancova, FALSE, TRUE) 
     if (n.pred > 0)
       if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
@@ -332,25 +331,6 @@ function(lm.out, res_rows=NULL, pred_rows=NULL,
         .showfile(pdf_file, "scatterplot matrix")
       cat("\n\n")
     }
-  }
-
-  if (scatter_3D) {  # 3d scatterplot option for 2-predictor models
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "scatter_3D option disabled\n",
-      "car package no longer included because of dependencies issues\n\n",
-      "To run, directly call the scatter3d function from the car package\n",
-      "  install.packages(\"rgl\", \"car\")\n",
-      "  library(car)\n\n",
-      "Example\n ",
-      "  scatter3d(Ozone ~ Wind + Temp, id.method=\"identify\",
-         data=airquality)\n\n", "Directions\n",
-      "  Can re-size the plot window, click and drag to rotate plot\n",
-      "  Press the right mouse button and drag a rectangle around any\n",
-      "  points to be identified, and then release\n",
-      "  To exit, right-click in a blank area of the 3d-scatterplot\n\n",
-         sep="")
-
-      #suppressMessages(scatter3d(lm.out$terms, id.method="identify", data=lm.out$model))  # car
   }
 
   # just generated plot

@@ -34,6 +34,6 @@ function(lm.out, dname="d", digits_d=NULL, show_R=FALSE, n.obs, n.keep,
     tx[length(tx)+1] <- paste("Data are", transf)
   }
   
-  return(list(tx=tx, n.vars=n.vars, n.obs=n.obs, n.keep=n.keep))
+  return(list(out_background=tx, n.vars=n.vars, n.obs=n.obs, n.keep=n.keep))
 
 }

@@ -1241,14 +1241,14 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   }
 
   # get fill and color
-  if (!is.null(clr.org))  # reset for shiny
-    if (df.name == "NULL"  &&  clr.org == "off") {
-      fill.miss <- TRUE
-      color.miss <- TRUE
-      color <- NULL
-      pt.size <- 0
-      size.ln <- 2
-    }
+# if (!is.null(clr.org))  # reset for shiny (clr.org <- color)
+#   if (df.name == "NULL"  &&  clr.org == "off") {
+#     fill.miss <- TRUE
+#     color.miss <- TRUE
+#     color <- NULL
+#     pt.size <- 0
+#     size.ln <- 2
+#   }
   ord.by.call <- is.ordered(by.call)
   fc <- .plt.colors(object, nn_col, n.by, theme, fill, fill.miss,
             color, color.miss, area_fill, area_fill.miss, trans, stack,

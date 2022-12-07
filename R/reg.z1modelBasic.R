@@ -69,7 +69,7 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
     tx[length(tx)+1] <- paste(rlb, est, ste, tvl, pvl, " ", lb, " ", ub)
   }
 
-  return(list(tx=tx, estimates=smc[,1], sterrs=smc[,2], tvalues=smc[,3],
+  return(list(out_estimates=tx, estimates=smc[,1], sterrs=smc[,2], tvalues=smc[,3],
      pvalues=round(smc[,4],3), cilb=smc[,5], ciub=smc[,6]))
 
 }

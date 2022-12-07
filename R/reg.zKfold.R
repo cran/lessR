@@ -153,7 +153,7 @@ function(data, my_formula, kfold, new_scale, scale_response, nm,
   t_se.lbl <- .fmtc("se", max.num[1]+1)
   t_MSE.lbl <- .fmtc("MSE", max.num[2]+1)
   t_Rsq.lbl <- .fmtc( "Rsq", max.num[3]+1)
-  k_se.lbl <-  .fmtc("sf", max.num[4]+1)
+  k_se.lbl <-  .fmtc("sp", max.num[4]+1)
   k_MSE.lbl <- .fmtc("MSE", max.num[5]+1)
   k_Rsq.lbl <- .fmtc("Rsq", max.num[6]+1)
   tx[length(tx)+1] <- paste("fold",

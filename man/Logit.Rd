@@ -17,7 +17,7 @@ Can also be called from the more general \code{\link{model}} function.
 }
 
 \usage{
-Logit(my_formula, data=d, rows=NULL, ref=NULL,
+Logit(my_formula, data=d, rows=NULL, ref_group=NULL,
       digits_d=4, text_width=120,
 
      brief=getOption("brief"),
@@ -42,7 +42,7 @@ lr(\dots)
        for analysis is \code{d}, otherwise explicitly specify.}
   \item{rows}{A logical expression that specifies a subset of rows of
        the data frame to analyze.}
-  \item{ref}{Value of the response variable that is the reference group, 
+  \item{ref_group}{Value of the response variable that is the reference group, 
        otherwise set by default as the value that yields a \code{+} slope
        for one predictor variable or the largest alphabetical/numerical
        value if more than one predictor.}

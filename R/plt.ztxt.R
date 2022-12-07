@@ -37,7 +37,6 @@ function(x, y, values, object, cat.x,  cat.y,
 
   }
   else if (!date.ts) {
-    nm.y <- names(y)
     y <- as.matrix(y)
     colnames(y) <- nm.y
   }
@@ -291,7 +290,7 @@ function(x, y, values, object, cat.x,  cat.y,
           }
           if (fit %in% c("quad", "power", "exp", "log")) {
             msg <- paste(" Regressed linearized data of transformed",
-                        "data values with", op1, "\n")
+                        "data values of", nm.y, "with", op1, "\n")
             msg <- paste(msg, "For predicted values, back transform with",
                          op2, "of regression model\n\n")
           }

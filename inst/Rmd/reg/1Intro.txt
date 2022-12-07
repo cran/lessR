@@ -1,0 +1,9 @@
+
+`d_d <- digits_d`
+
+`## Introduction`
+
+The variable of primary interest is the _response variable_ `Y``txtY`. The purpose of this analysis is to account for the values of `Y` from the information provided by the values of the _predictor variable`pl`_, `X` `txtX`.
+
+This regression analysis is an example of _supervised machine learning_. In the language of machine learning, the response variable is called the _target_ and each predictor variable is a _feature_. The machine learns the relationship between the target `Y` and the feature`pl`  `X` from the training data. Express this learning in the form of a regression model.
+

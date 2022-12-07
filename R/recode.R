@@ -120,6 +120,6 @@ function(old_vars, new_vars=NULL, old, new, data=d,
     cat("\n")
   } 
  
-  return(data)
+  invisible(data)
 
 }

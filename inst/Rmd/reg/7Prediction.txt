@@ -1,0 +1,54 @@
+
+`## Prediction`
+
+`### Prediction Error`
+
+Ultimately, the analysis moves beyond the training sample to predict the value of `Y` from values of `X` with the corresponding value of `Y` unknown. Nothing to predict in the training data because the value of `Y` for each row of data is already known. Prediction is from _new_ data values of `X`, what may be called the _test sample_. Applying these new data values to the estimated model yields the predicted values. For data values from the training sample, the fitted value and predicted value are the same, calculated from the same estimated model, but are different concepts with different interpretations. 
+
+Unfortunately, prediction is not perfect. The range of values likely to contain the actual data value for `Y` predicted from specific values of `X` quantifies the _prediction error_. The standard deviation of the residuals, $s_e$, assumed to be the same for all sets of values of the predictor variables, specifies the _modeling error_ of the fitted values from the training data, error due to imperfections in the model. However, for predictions of future values of `Y`, new data are collected. So sampling error of a value on the regression line, indicated with $s_{\hat Y}$, must also be considered in the assessment of prediction error. Consideration of both sources of error results in the _standard error of prediction_ (or forecast).
+
+`eq.s_pred`
+
+Unlike modeling error, the amount of sampling error varies depending on the values of the predictor variables, so each row of data has its own value, $s_{p,i}$.
+
+Each prediction interval is the margin of error, the _t_-cutoff multiplied by the corresponding $s_p$, added and subtracted on either side of $\hat Y_{`Y`}$.
+
+
+
+`### From Training Data`
+
+The analysis provides each row of data values, _as if_ they were new data, with a predicted value based on the model estimated from the training data, as well as the standard error of prediction. From these values obtain the lower and upper bounds of the corresponding 95% prediction interval. By default, only the first three, middle three and last three rows of data are presented, sufficient to indicate the ranges of prediction error encountered throughout the ranges of data values.
+
+`out.predict`
+
+The size of the prediction intervals for the range of data found in the input data table vary from a minimum of `r xP(r$pred_min_max[1], d_d, uYq)` for `r xAnd(xRow(r$pred_min_max[1]))` to a maximum of `r xP(r$pred_min_max[2], d_d, uYq)` for `r xAnd(xRow(r$pred_min_max[2]))`.
+
+
+`if n.pred=1`
+`plot.sp_pred`
+
+The confidence intervals for the points on the regression line and the much larger prediction intervals for the individual data points are illustrated with an enhancement of the original scatter plot.
+`end`
+
+
+`### From New Data`
+
+New data values from which to obtain a prediction, different from the training data, can be entered with the options X1_new, X2_new, up to X6_new, where each option name refers to the position of the corresponding predictor variable in the specification of the regression model. Any number of values can be specified for each predictor variable. Suppose, for example, that there are two values of interest  for `et` predictor variable from which to make a prediction, listed below.
+
+`in.new_data`
+
+Re-run the analysis to obtain the prediction intervals with these specified values.
+
+`in.reg_new`
+
+`if n.pred>1`
+The new data values are specified for each variable separately, but a row of data consists of data values for all the predictor values. Accordingly, calculate a prediction interval for each combination of the specified new values for each predictor variable.
+`end`
+
+`if n.pred=1`
+Calculate the prediction intervals only for the new data values.
+`end`
+
+`out.predict`
+
+The size of the prediction intervals for the range of data found in the newly specified values vary from a minimum of `r xP(r$pred_min_max[1], d_d, uYq)` for `r xAnd(xRow(r$pred_min_max[1]))` to a maximum of `r xP(r$pred_min_max[2], d_d, uYq)` for `r xAnd(xRow(r$pred_min_max[2]))`. The rows in the output display, however, are re-ordered according to the combinations of the ordered values of the predictor variables.

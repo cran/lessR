@@ -68,6 +68,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   else
     by.bub <- FALSE
 
+
   # x and y come across here in their natural state, within each data frame
   # a time series has dates for x and numeric for y, factors are factors, etc
 
@@ -497,6 +498,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   if (object %in% c("point", "both")) {
 
+
     if (object == "both") {
 
       if (n.xcol == 1  &&  n.ycol == 1) {
@@ -585,17 +587,17 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     # plot points
     if (object %in% c("point", "both")) {
 
-          # --- process jitter ---
-          # jitter converts factor integers to near whole numbers, so save
-          if (jitter_x > 0) {
-            x.temp <- x[,1]
-            x[,1] <- jitter(x[,1], factor=jitter_x)
-          }
-          if (jitter_y > 0) {
-            y.temp <- y[,1]
-            y[,1] <- jitter(y[,1], factor=jitter_y)
-          }
-          # ----------------------
+      # --- process jitter ---
+      # jitter converts factor integers to near whole numbers, so save
+      if (jitter_x > 0) {
+        x.temp <- x[,1]
+        x[,1] <- jitter(x[,1], factor=jitter_x)
+      }
+      if (jitter_y > 0) {
+        y.temp <- y[,1]
+        y[,1] <- jitter(y[,1], factor=jitter_y)
+      }
+      # ----------------------
 
       # no grouping variable
       if (is.null(by)) {
@@ -615,9 +617,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           # -----------------------------------------------
 
           # plot points
-
           if (n.xcol == 1  &&  n.ycol == 1) {  # one x and one y variable
-            # does a bubble plot if size.pt is a variable
             if (length(out_ind) == 0)  # no outliers
               points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
                        cex=size.pt, ...)
@@ -796,7 +796,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           else {  # size is a variable
             size.lv <- subset(size, by==levels(by)[i])
             fill[i] <- .maketrans(fill[i], (1-pts_trans)*256)
-            .plt.bubble(x.lv, y.lv, size.lv, radius, power, clr[i], fill[i],
+            # size is a var and a by var
+            .plt.bubble(x.lv, y.lv, size.lv, radius, power, fill[i], clr[i],
                         size_cut, prop, bubble_text, object)
           }      
 
@@ -847,10 +848,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }  # object is point, line, both
 
 
-  # --- bubble or sunflower plot
+  # --- bubble or sunflower plot -  no by var
   # ----------------------------
 
-  else if (object %in% c("bubble", "sunflower")) {
+# else if ((object %in% c("bubble", "sunflower"))  &&  length(size)==1) {
+  else if ((object %in% c("bubble", "sunflower"))) {
     if (!is.null(by)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Parameter  by  not valid for bubble plot\n\n")
@@ -902,7 +904,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       }
       if (prop) count <- round(count, 2)
 
-      # plot
+      # for categorical vars, size not a var
       if (object == "bubble") {
         .plt.bubble(xx, yy, count, radius, power, clr, clr_color,
                     size_cut, prop, bubble_text, object)
@@ -918,6 +920,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     }  # end length(size) == 1
 
     # size is a variable (unless size is constant and bubble specified)
+    # no by var 
     else {
       .plt.bubble(x, y, size, radius, power, clr, clr_color,
                   size_cut, prop, bubble_text, object)

@@ -1,0 +1,15 @@
+% Analyze variable relations for regression analysis for a single predictor
+
+`## Relations`
+
+`### Scatter Plot`
+
+How do the variables in the model relate to each other? The correlation`pl` of response variable `Y` with predictor variable`pl` `X` should be relatively high.
+The correlation of `Y` with `X` in the training data is $r$ = `r xP(r$cor[2,1],3)`.
+
+Visually summarize the relation between each pair of variables in the model with a scatterplot. Express the numeric variable linear relationships among the variables in the model with their correlations.
+
+`plot.scatter`
+
+%The correlation of `Y` with `X` in the training data is $r$ = `r xP(r$cor[2,1],3)`.
+

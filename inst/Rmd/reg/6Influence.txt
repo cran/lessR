@@ -1,0 +1,25 @@
+
+`## Influence`
+
+Values of `Y` fitted by the estimated model do not generally equal the corresponding data values of `Y`. Which cases (rows of data) contribute the most to this lack of fit? 
+
+The identification of cases that have a large residual and/or undue influence on the estimation of the model helps detect potential outliers. For each case, in addition to the data values, fitted value and corresponding residual, the analysis provides the following values: 
+
+- _residual_: Value of the response variable `Y` minus its fitted value, $e = Y_{`Y`} - \hat Y_{`Y`}$ 
+
+- _rstudent_: Externally Studentized residual, standardized value of the residual from a model estimated without the case present
+
+- _dffits_: Standardized difference between a fitted value with and without the case present
+
+- _cooks_: Cook's Distance, the aggregate influence of the case on all the fitted values with each fitted value calculated with the case deleted
+
+`out.residuals`
+
+`intr.max_influence`
+
+An informal, heuristic criterion for evaluating the size of Cook\'s distance is a cutoff value of 1 to indicate too large of a large size.
+`intr.threshold_influence`
+
+`if cooks`
+For larger sample sizes this threshold of Cook's Distance of 1 should be informally reduced as the influence of any case tends to diminish as the sample size increases. Also, compare the difference between the largest values, potential Cook's Distance outliers. The best basis for understanding a high Cooks distance value is to also consider the substantive nature of the underlying data values of the case to understand what values of the predictor variables lead to such discrepant values. Also, verify if the rows of data that lead to large values of Cook's Distance were sampled from the same population as the remaining cases.
+`end`

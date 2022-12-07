@@ -328,7 +328,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               b1.pn <- .fmt(b1, 3)
               cat("\n") 
               if (panel.number() == 1) {
-                cat("Regression analysis of linearized data\n")
+                cat("Regression analysis of linearized", y.name, "values\n")
                 msg <- paste("Need back transformation of regression model",
                             "to compute predicted values\n\n")
                 cat(msg)

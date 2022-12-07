@@ -51,7 +51,7 @@ function(lm.out, TotSS, sy, digits_d=3, show_R=FALSE) {
         "     p-value:", .fmt(pvl, 3, 7), sep="")
   }
 
-  return(list(tx=tx, se=sm$sigma, range=range, Rsq=sm$r.squared,
+  return(list(out_fit=tx, se=sm$sigma, range=range, Rsq=sm$r.squared,
     Rsqadj=sm$adj.r.squared, PRESS=PRESS, RsqPRESS=RsqPRESS))
  
 }

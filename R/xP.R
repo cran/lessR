@@ -1,11 +1,11 @@
 # express x in terms of units
 # includes conversion to dollars
-xP <- function(x, d=NULL, unit=NULL, semi=FALSE) {
+xP <- function(x, d_d=NULL, unit=NULL, semi=FALSE) {
 
-  if (is.null(d))
+  if (is.null(d_d))
     digits_d <- getOption("digits_d")
   else
-    digits_d <- d
+    digits_d <- d_d
 
   if (!is.na(x)) {
 

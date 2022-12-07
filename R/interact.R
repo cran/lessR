@@ -4,6 +4,8 @@ function(app) {
 # Thanks to
 #   Dean Attali at https://deanattali.com/2015/04/21/r-package-shiny-app/
 
+  if (app == "Plot") app <- "ScatterPlot"
+
   # locate all shiny app examples that exist, as folders in shiny_examples
   validApps <- list.files(system.file("shiny_apps", package="lessR"))
 
