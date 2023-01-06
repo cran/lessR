@@ -6,7 +6,7 @@ function(x, y=NULL, data=d, rows=NULL,
          theme=getOption("theme"),
          fill=NULL, 
          color="lightgray",
-         trans=getOption("trans_bar_fill"),
+         transparency=getOption("trans_bar_fill"),
 
          density=NULL, angle=45,
          lty="solid", lwd=1, edges=200,
@@ -45,6 +45,8 @@ function(x, y=NULL, data=d, rows=NULL,
     labels_cex <- cex * labels_cex
     values_size <- cex * values_size
   }
+
+  trans <- transparency
 
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   color.miss <- ifelse (missing(color), TRUE, FALSE)

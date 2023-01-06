@@ -11,7 +11,7 @@ xP <- function(x, d_d=NULL, unit=NULL, semi=FALSE) {
 
     neg.flag <- FALSE
     if (!is.null(unit)) {
-      if (unit == "dollar"){
+      if (unit %in% c("dollar", "dollars")){
         digits_d <- 2
         if (x < 0) {
           neg.flag <- TRUE

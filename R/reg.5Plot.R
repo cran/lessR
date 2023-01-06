@@ -3,7 +3,7 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
          scatter_coef=FALSE, X1_new=NULL, ancova,
          numeric.all, in.data.frame, c.int, p.int, plot_errors=FALSE,
          digits_d, n_cat, pdf=FALSE, width=5, height=5, manage.gr=FALSE,
-         scatter_3D, quiet, ...) {
+         quiet, ...) {
          
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)

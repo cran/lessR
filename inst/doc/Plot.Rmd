@@ -125,10 +125,10 @@ With large data sets, even for continuous variables there can be much over-plott
 Plot(x, y, smooth=TRUE, fit="lm")
 ```
 
-Another strategy for alleviating over-plotting makes the fill color mostly transparent with the `trans` parameter, or turn off completely by setting `fill` to `"off"`. The closer the value of `trans` is to 1, the more transparent is the fill. 
+Another strategy for alleviating over-plotting makes the fill color mostly transparent with the `transparency` parameter, or turn off completely by setting `fill` to `"off"`. The closer the value of `trans` is to 1, the more transparent is the fill. 
 
 ```{r}
-Plot(x, y, trans=0.95)
+Plot(x, y, transparency=0.95)
 ```
 
 Another way to visualize a relationship when there are many data points is to bin the _x_-axis. Specify the number of bins with parameter `n_bins`. Plot() then computes the mean of _y_ for each bin and connects the means by line segments. This procedure plots the conditional means by default without any assumption of form such as linearity. Specify the `stat` parameter for `median` to compute the median of y for each bin. The standard `Plot()` parameters `fill`, `color`, `size` and `segments` also apply.
@@ -221,7 +221,7 @@ Plot(Salary, Dept)
 ```
 To avoid point overlap, if there is at least one duplicated value of continuous `y` for any level of categorical `x`, by default some horizontal jitter for each plotted point is added, which was not needed in this example. Manually adjust the jitter with either parameter `jitter_x` or, if `x` is continuous and `y` categorical, the `jitter_y` parameter. In addition, if the categorical variable is an R `factor` or a variable of type `character`, by default the mean of the continuous variable is displayed at each level of the categorical variable, as well in the text output. If the categorical variable is numeric, better to convert the variable to a factor to have just the categories on the axis and not a continuous scale. For example, `d$Gender <- factor(d$Gender)`.
 
-Another helpful technique for large data sets is to add some fill transparency with the `trans` parameter, with values such as 0.8 and 0.9. The combination of jitter and transparency allows for plotting many thousands of points. 
+Another helpful technique for large data sets is to add some fill transparency with the `transparency` parameter, with values such as 0.8 and 0.9. The combination of jitter and transparency allows for plotting many thousands of points. 
 
 An alternative display of the distribution of a continuous variable and a categorical variable is a superimposed violin, box, and scatter plot, a VBS plot. To plot the points in different colors according to the level of the categorical variable, invoke the `by` parameter. Here, plot _Salary_ across the levels of _Gender_ on the same panel. 
 

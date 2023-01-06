@@ -119,14 +119,14 @@ function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
      for (i in 1:length(x)) {
        if (is.na(names(x[i]))) names(x[i]) <- "xxx"
        ln.nm <- nchar(names(x[i]))
-       ln.vl <- nchar(format(x[i]))
+       ln.vl <- nchar(.fmt(x[i], d=digits_d))
        max.ln[i] <- max(ln.nm, ln.vl) + 1
        if (max.ln[i] < 6) max.ln[i] <- 6
      }
 
       tx <- character(length=0)
 
-      tx <- paste(" Data for: ", y.name)
+      tx <- " Plotted Values"
       tx[length(tx)+1] <- paste(" ", .dash2(nchar(tx)-1), sep="")
 
       # col labels

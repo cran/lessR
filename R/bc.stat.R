@@ -22,15 +22,15 @@ function (x, y, by.var, stat, y.name) {
     else 
       out <- aggregate(y ~ x + by.var, FUN=sd)
   }
-  if (stat == "dev") {
-    ylab <- paste("Mean Deviations of", y.name)
+  if (stat == "deviation") {
+    ylab <- paste("Mean Deviation of", y.name)
     if (is.null(by.var)) {
       out <- tapply(y, x, mean, na.rm=TRUE)
       out <- out - mean(out, na.rm=TRUE)
     }
     else { 
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "dev option not meaningful with a by variable\n\n")
+      "deviation  value for  stat  not meaningful with a by variable\n\n")
     }
   }
   if (stat == "min") {
@@ -63,5 +63,4 @@ function (x, y, by.var, stat, y.name) {
   }      
 
   return(list(out=out, ylab=ylab))
-
 }

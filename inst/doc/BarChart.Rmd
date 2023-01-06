@@ -73,10 +73,11 @@ style(quiet=TRUE)
 
 ### Custom Colors
 
-Specify a single fill color with the `fill` parameter, the edge color of the bars with `color`. Set the transparency level with `trans`. Against a lighter background, display the value for each bar with a darker color using the `values_color` parameter. To specify a color, use color names, specify a color with either its `rgb()` or `hcl()` color space coordinates, or use the __lessR__ custom color palette function `getColors()`.
+Specify a single fill color with the `fill` parameter, the edge color of the bars with `color`. Set the transparency level with `transparency`. Against a lighter background, display the value for each bar with a darker color using the `values_color` parameter. To specify a color, use color names, specify a color with either its `rgb()` or `hcl()` color space coordinates, or use the __lessR__ custom color palette function `getColors()`.
 
 ```{r fig.width=4, fig.height=3.75, fig.align='center'}
-BarChart(Dept, fill="darkred", color="black", trans=.8, values_color="black")
+BarChart(Dept, fill="darkred", color="black", transparency=.8,
+         values_color="black")
 ```
 
 Use the `theme` parameter to change the entire color theme: "colors", "lightbronze", "dodgerblue", "slatered", "darkred", "gray", "gold", "darkgreen", "blue", "red", "rose", "green", "purple", "sienna", "brown", "orange", "white", and "light". In this example, changing the full theme accomplishes the same as changing the fill color. Turn off the displayed value on each bar with the parameter `values` set to `off`. Specify a horizontal bar chart with base R parameter `horiz`.
@@ -141,11 +142,10 @@ The general syntax follows for processing this form of the data follows.
 knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
 ```
 
-The bar chart follows, with the aggregated data stored in the data frame named _a_, so explicitly identify with the `data` parameter. The computed mean of _Salary_ variable in the _a_ data frame from the previous call to `pivot()` is named *Salary_mean* by default. The output data frame, _a_, contains a row of missing data for the grouping variable, which needs to first be removed before reading the table of means into `BarChart()`, here with the `na.omit()` function.
+The bar chart follows, with the aggregated data stored in the data frame named _a_, so explicitly identify with the `data` parameter. For only one variable analyzed, the computed mean of the _Salary_ variable in the _a_ data frame from the previous call to `pivot()` is named _mean_ by default. 
 
 ```{r xy, fig.width=4, fig.height=3.5, fig.align='center'}
-a <- na.omit(a)
-BarChart(Dept, Salary_mean, data=a)
+BarChart(Dept, mean, data=a)
 ```
 
 ### Statistical Transformation of $y$

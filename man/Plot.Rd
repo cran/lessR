@@ -44,7 +44,7 @@ Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          theme=getOption("theme"),
          fill=NULL,
          color=NULL,
-         trans=getOption("trans_pt_fill"),
+         transparency=getOption("trans_pt_fill"),
 
          size=NULL, size_cut=NULL, shape="circle", means=TRUE,
          sort_yx=c("0", "-", "+"), 
@@ -144,7 +144,7 @@ vp(\dots)
        numeric \code{y}-variable for each bin of \code{x}. Points are plotted
        with the size dependent on the sample size for the bin, unless \code{size}
        is specified at a constant value. Default value is 1 for no binning.
-       Available parameters include fill, color, trans, segments, scale_x, and
+       Available parameters include fill, color, transparency, segments, scale_x, and
        scale_y.}\cr
 
   \item{by}{A categorical variable to provide a scatterplot for
@@ -192,7 +192,7 @@ vp(\dots)
         Can be a vector to customize the color for each point or a color
         range such as "blues" (see \code{\link{getColors}}. Default is
         \code{pt_color} from the lessR \code{\link{style}} function.}
-  \item{trans}{Transparency factor of the fill color of each point.
+  \item{transparency}{Transparency factor of the fill color of each point.
         Default is
         \code{trans_pt_fill} from the lessR \code{\link{style}} function.}\cr
 
@@ -244,12 +244,11 @@ vp(\dots)
         \code{x}-variables, the line segments connect the two points.}
   \item{segments_x}{Draw a line segment from the \code{x}-axis for each
         plotted point.}
-  \item{jitter_x}{Randomly perturbs the plotted points of 
-        a scatterplot horizontally according to an internally 
-        computed formula, or can be explicitly specified.}
-  \item{jitter_y}{Randomly perturbs the plotted points of 
-        a scatterplot vertically according to an internally 
-        computed formula, or can be explicitly specified.}\cr
+  \item{jitter_x}{Randomly perturbs the plotted points of a scatterplot
+       horizontally within the limits of the explicitly specified value, or
+       set to \code{NULL} to rely upon the default value of the range of 
+       \code{x} divided by 50.}
+  \item{jitter_y}{Same as \code{jitter_x} except vertical jitter.}\cr
 
 
   \item{ID}{Name of variable to provide the \bold{labels for the selected
@@ -780,12 +779,12 @@ Plot(Years, Salary, size=Pre, size_cut=3)
 # plot 0.6 and 0.9 data ellipses with partially transparent points
 # change color theme to gold with black background
 style("gold", sub_theme="black")
-Plot(eruptions, waiting, trans=.5, ellipse=seq(.6,.9), data=faithful)
+Plot(eruptions, waiting, transparency=.5, ellipse=seq(.6,.9), data=faithful)
 
 # scatterplot with two x-variables, plotted against Salary
 # define a new style, then back to default
 style(window_fill=rgb(247,242,230, maxColorValue=255),
-  panel_fill="off", panel_color="off", pt_fill="black", trans=0,
+  panel_fill="off", panel_color="off", pt_fill="black", transparency=0,
   lab_color="black", axis_text_color="black",
   axis_y_color="off", grid_x_color="off", grid_y_color="black",
   grid_lty="dotted", grid_lwd=1)
@@ -904,7 +903,7 @@ Plot(oz.ts)
 
 # multiple time series plotted from dates and stacked
 # black background with translucent areas, then reset theme to default
-style(sub_theme="black", color="steelblue2", trans=.55, 
+style(sub_theme="black", color="steelblue2", transparency=.55, 
   window_fill="gray10", grid_color="gray25")
 date <- seq(as.Date("2013/1/1"), as.Date("2016/1/1"), by="quarter")
 x1 <- rnorm(13, 100, 15)

@@ -5,8 +5,6 @@ function(nm, dname, fun_call, n_res_rows, n_pred_rows, res_sort, ancova=FALSE,
          new.val=matrix(nrow=n.vars-1, ncol=2, byrow=TRUE),
          Rmd_data, Rmd_custom, Rmd_dir, Rmd_labels) {
 
-  r <- NULL  # somewhere R check complains of a global r w/o this assignment
-
   # simplify function call
   fncl <- .fun_call.deparse(fun_call) 
   if (regexec("Rmd", fncl)[1] > 0)     fc <- .rm.arg("Rmd", fncl) 
@@ -14,10 +12,13 @@ function(nm, dname, fun_call, n_res_rows, n_pred_rows, res_sort, ancova=FALSE,
   if (regexec("interpret", fc)[1] > 0) fc <- .rm.arg.ns("interpret", fc) 
   if (regexec("results", fc)[1] > 0)   fc <- .rm.arg.ns("results", fc) 
 
+  n.vars <- length(nm)
+  n.pred <- n.vars - 1
 
-# --------------------------
+
+# ---------------------------
 # functions to be interpreted
-# --------------------------
+# ---------------------------
 
 lbls <- function(the.lbl) {
   paste("\n------\n\n", "<span style='color:maroon;'>**", the.lbl,
@@ -292,6 +293,7 @@ eq.s_pred <- function() {
 }
 
 intr.tolerance <- function() {
+      out <- ""
       l20 <- length(which(tolerances < 0.20))
       if (l20 > 1)
         hh <- "s have tolerances"
@@ -537,19 +539,20 @@ sep="")
   # set values for symbols to be interpreted in input markdown
   # ----------------------------------------------------------
 
-  # input markdown is sent to .toRmd(), which processes the input
+  # input markdown is sent to .RmdParse(), which processes the input
   #  including providing the values for all defined symbols, and then
   #  returns the processed input to this function, which then outputs
   #  to the R markdown document
 
   uYq <- ""  # initialize in case interpret=FALSE, so not used
 
-  n.vars <- length(nm)
-  n.pred <- n.vars - 1
-  d_d <- digits_d  # see 1Intro.txt
-  Y <- nm[1]
+  # internal
+  d_d <- digits_d  # needed here for internal to function calls
   pred <- character(length=0)
   for (i in 1:n.pred) pred[i] <- nm[i+1]
+
+  # for users
+  Y <- nm[1]
   X <- xAnd(pred)
   W_n.vars <- xNum(n.vars)
   W_n.pred <- xNum(n.pred)
@@ -623,6 +626,7 @@ sep="")
   tx[length(tx)+1] <- "output:"
   tx[length(tx)+1] <- "  html_document:"
   tx[length(tx)+1] <- "    toc: true"
+  tx[length(tx)+1] <- "    toc_depth: 4"
   tx[length(tx)+1] <- "    fig_height: 4.5"
   tx[length(tx)+1] <- "    fig_width: 5.5"
 # tx[length(tx)+1] <- ""
@@ -689,10 +693,10 @@ sep="")
     if (Rmd_labels) tx[length(tx)+1] <- lbls("1Intro.txt")
     if (!alt1Intro) {
       sf <- system.file("Rmd/reg/1Intro.txt", package="lessR")
-      tx[length(tx)+1] <- .toRmd(sf, NULL, n.pred, explain, results, interpret)
+      tx[length(tx)+1] <- .RmdParse(sf, NULL, n.pred, explain, results, interpret)
     }
     else  # read and process alternate text
-      tx[length(tx)+1] <- .toRmd("1Intro.txt", Rmd_dir, n.pred,
+      tx[length(tx)+1] <- .RmdParse("1Intro.txt", Rmd_dir, n.pred,
                                  explain, results, interpret)
 
 
@@ -730,10 +734,10 @@ sep="")
   if (Rmd_labels) tx[length(tx)+1] <- lbls("2Data.txt")
   if (!alt2Data) {
     sf <- system.file("Rmd/reg/2Data.txt", package="lessR")
-    tx[length(tx)+1] <- .toRmd(sf, NULL, n.pred, explain, results, interpret)
+    tx[length(tx)+1] <- .RmdParse(sf, NULL, n.pred, explain, results, interpret)
   }
   else  # read and process alternate text
-    tx[length(tx)+1] <- .toRmd("2Data.txt", Rmd_dir, n.pred,
+    tx[length(tx)+1] <- .RmdParse("2Data.txt", Rmd_dir, n.pred,
                                explain, results, interpret)
 
 
@@ -744,10 +748,10 @@ sep="")
   if (!alt3Model) {
     if (Rmd_labels) tx[length(tx)+1] <- lbls("3Model.txt")
     sf <- system.file("Rmd/reg/3Model.txt", package="lessR")
-    tx[length(tx)+1] <- .toRmd(sf, NULL, n.pred, explain, results, interpret)
+    tx[length(tx)+1] <- .RmdParse(sf, NULL, n.pred, explain, results, interpret)
   }
   else
-    tx[length(tx)+1] <- .toRmd("3Model.txt", Rmd_dir, n.pred,
+    tx[length(tx)+1] <- .RmdParse("3Model.txt", Rmd_dir, n.pred,
                                explain, results, interpret)
 
 
@@ -758,10 +762,10 @@ sep="")
   if (Rmd_labels) tx[length(tx)+1] <- lbls("4Fit.txt")
   if (!alt4Fit) {
     sf <- system.file("Rmd/reg/4Fit.txt", package="lessR")
-    tx[length(tx)+1] <- .toRmd(sf, NULL, n.pred, explain, results, interpret)
+    tx[length(tx)+1] <- .RmdParse(sf, NULL, n.pred, explain, results, interpret)
   }
   else
-    tx[length(tx)+1] <- .toRmd("4Fit.txt", Rmd_dir, n.pred, explain,
+    tx[length(tx)+1] <- .RmdParse("4Fit.txt", Rmd_dir, n.pred, explain,
                                results, interpret)
 
 
@@ -778,10 +782,10 @@ sep="")
     if (Rmd_labels) tx[length(tx)+1] <- lbls("5Relations1.txt")
     if (!alt5Rel) {
       sf <- system.file("Rmd/reg/5Relations1.txt", package="lessR")
-      tx[length(tx)+1] <- .toRmd(sf, NULL, n.pred, explain, results, interpret)
+      tx[length(tx)+1] <- .RmdParse(sf, NULL, n.pred, explain, results, interpret)
     }
     else
-      tx[length(tx)+1] <- .toRmd("5Relations1.txt", Rmd_dir, n.pred,
+      tx[length(tx)+1] <- .RmdParse("5Relations1.txt", Rmd_dir, n.pred,
                                  explain, results, interpret)
   }
 
@@ -789,10 +793,10 @@ sep="")
     if (Rmd_labels) tx[length(tx)+1] <- lbls("5RelationsM.txt")
     if (!alt5Rel) {
       sf <- system.file("Rmd/reg/5RelationsM.txt", package="lessR")
-      tx[length(tx)+1] <- .toRmd(sf, NULL, n.pred, explain, results, interpret)
+      tx[length(tx)+1] <- .RmdParse(sf, NULL, n.pred, explain, results, interpret)
     }
     else
-      tx[length(tx)+1] <- .toRmd("5RelationsM.txt", Rmd_dir, n.pred,
+      tx[length(tx)+1] <- .RmdParse("5RelationsM.txt", Rmd_dir, n.pred,
                                  explain, results, interpret)
   }
 
@@ -813,7 +817,7 @@ sep="")
 # 6 - Influence
 # -------------
 
-    if (length(which(r$resid.max > 1)) > 1)
+    if (length(which(resid.max > 1)) > 1)
       hh <- "s have values"
     else
       hh <- " has a value"
@@ -821,11 +825,11 @@ sep="")
   if (Rmd_labels) tx[length(tx)+1] <- lbls("6Influence.txt")
   if (!alt6Infl) {
     sf <- system.file("Rmd/reg/6Influence.txt", package="lessR")
-    tx[length(tx)+1] <- .toRmd(sf, NULL, n.pred, explain, results, interpret,
+    tx[length(tx)+1] <- .RmdParse(sf, NULL, n.pred, explain, results, interpret,
                                res_sort=res_sort)
   }
   else
-    tx[length(tx)+1] <- .toRmd("6Influence.txt", Rmd_dir, n.pred,
+    tx[length(tx)+1] <- .RmdParse("6Influence.txt", Rmd_dir, n.pred,
                                explain, results, interpret,
                                res_sort=res_sort)
   }  # n_res_rows > 0
@@ -844,10 +848,10 @@ sep="")
     if (Rmd_labels) tx[length(tx)+1] <- lbls("7Prediction.txt")
     if (!alt7Pred) {
       sf <- system.file("Rmd/reg/7Prediction.txt", package="lessR")
-      tx[length(tx)+1] <- .toRmd(sf, NULL, n.pred, explain, results, interpret)
+      tx[length(tx)+1] <- .RmdParse(sf, NULL, n.pred, explain, results, interpret)
     }
     else
-      tx[length(tx)+1] <- .toRmd("7Prediction.txt", Rmd_dir, n.pred,
+      tx[length(tx)+1] <- .RmdParse("7Prediction.txt", Rmd_dir, n.pred,
                                  explain, results, interpret)
   }
 
@@ -859,10 +863,10 @@ sep="")
   if (Rmd_labels) tx[length(tx)+1] <- lbls("8Validity.txt")
   if (!alt8Valid) {
     sf <- system.file("Rmd/reg/8Validity.txt", package="lessR")
-    tx[length(tx)+1] <- .toRmd(sf, NULL, n.pred, explain, results, interpret)
+    tx[length(tx)+1] <- .RmdParse(sf, NULL, n.pred, explain, results, interpret)
   }
   else
-    tx[length(tx)+1] <- .toRmd("8Validity.txt", Rmd_dir, n.pred,
+    tx[length(tx)+1] <- .RmdParse("8Validity.txt", Rmd_dir, n.pred,
                                explain, results, interpret)
 
 

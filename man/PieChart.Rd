@@ -18,7 +18,7 @@ PieChart(x, y=NULL, data=d, rows=NULL,
          theme=getOption("theme"),
          fill=NULL, 
          color="lightgray",
-         trans=getOption("trans_bar_fill"),
+         transparency=getOption("trans_bar_fill"),
 
          density=NULL, angle=45,
          lty="solid", lwd=1, edges=200,
@@ -82,7 +82,7 @@ pc(\dots)
   \item{color}{Border color of sides and the pie, can be a vector
         to customize the color for each slice. Default is
         \code{bar_color} from the lessR \code{\link{style}} function.}
-  \item{trans}{Transparency factor of the area of each slice.
+  \item{transparency}{Transparency factor of the area of each slice.
         Default is
         \code{trans_bar_fill} from the lessR \code{\link{style}} function.}\cr
   
@@ -288,7 +288,7 @@ PieChart(Dept, values="input", values_size=0.75,
          values_color=getOption("window_fill"))
 
 # add transparency and custom color for the displayed values
-PieChart(Dept, trans=.6, values="\%", values_color=rgb(.3,.3,.3))
+PieChart(Dept, transparency=.6, values="\%", values_color=rgb(.3,.3,.3))
 
 # map counts of each level to the fill color of the corresponding slice
 PieChart(JobSat, fill=(count))

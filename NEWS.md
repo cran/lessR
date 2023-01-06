@@ -1,3 +1,46 @@
+# lessR version 4.2.5, Jan 5, 2023
+
+## Primary Update
+ 
+* `Histogram()`, `Plot()`, `Correlation()`, `ttest()`: Vastly speeded up for data sets much over 500 data values, substantial improvement on large data sets
+
+
+## Updates
+
+* `Plot()`: Parameters `jitter_x` and `jitter_y` are reset for the scatterplot (not VBS plot) to explicitly set the amount of jitter within the negative and positive values of their assigned values, or, set to `NULL` to activate the default value of the range of the variable divided by 50
+
+* `Plot()`: Text output for Mahalanobis distance more nicely formatted.
+
+* `interact()`: Reading of text files was not detecting blank data values for variables of type `character` as missing, which now it does
+
+* `interact()`: Various revisions of the interface styles and efficiency increases
+
+* `interact()`: A `Help` option added for each analysis, which, when clicked, displays a web page of explanation of the analysis and listing and definition of each presented parameter
+
+* `interact("BarChart")`: Numerical `y` variable and associated `stat` parameter added for analysis of means and related statistics across the levels of the categorical variable `x`
+
+* `interact("BarChart")`: The summary table of each category level paired with a number, to translate into bar height, can now be read as the input data table
+
+* `interact("Plot"): ID lableing of outliers added
+
+* `pivot()`: For a single `variable` to process, the variable name no longer repeated for each column of the output, one column per statistic computed
+
+
+## Bug Fixes
+
+* `BarChart()`: When plotting a statistics for a numerical variable, `y`, each plotted values are now displayed at the console with sufficient width
+
+* `interact("ScatterPlot")`: Parameter `enhance` now works
+
+* `interact("ScatterPlot")`: Choose parameter `enhance` then parameter `by` now works
+
+* `interact("ScatterPlot")`: Parameters `by` and `size` now work together and properly written to the R code file
+
+* `interact("Trellis")`: Single VBS now plotted without a `by1` variable for Trellis plots per se
+
+* `Regression()`: For parameter `Rmd`, collinearity issue fixed
+
+
 # lessR version 4.2.4, Dec 07, 2022
 
 ## Updates
@@ -13,6 +56,7 @@
 * `Regression()`: For output, `vars` component added that is a vector of the variable names in the model beginning with the response variable
 
 * `Regression()`: Parameters `res_rows` and `pred_rows` changed to the more descriptive `n_res_rows` and `n_pred_rows`  
+
 
 ## Bug Fixes
 

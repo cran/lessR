@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Trellis Plots with lessR</title>
+<link rel="stylesheet" href="help.css">
+</head>
+<body>
+
+<h2>The VBS Plot</h2>
+
+<p>
+The VBS plot is a superimposition of three plots: a violin plot, a box plot, and a 1D scatterplot. Its purpose is to visualize the distribution of a continuous variable. Unlike its primary competitor, the more traditional histogram, the VBS plot does not require binning of the values of the variable.
+</p>
+
+
+<h3>Box Plot</h3>
+
+<p>
+The box in a <em>box plot</em> of a continuous variable is based on the interquartile range or IQR, the positive difference between what is essentially the first and third quartiles, the range of data that contains the middle 50% of all the data values. The box’s width is the IQR, with a line through the median and perpendicular lines called <em>whiskers</em> extending out from the edges. The whiskers extend to the to respective small value and largest value that are not <em>outliers</em>, values considerable different from most remaining values of a distribution.
+</p>
+
+
+<h3>Violin Plot</h3>
+
+<p>
+The violin plot is an updated version of the boxplot that replaces the box with a density plot, a smoothed histogram, and its mirror image. The violin plot transforms the straight edges of the box into information that shows the concentration of data values along the horizontal axis. The general appearance of a density plot and its mirror image may sometimes resemble a violin, hence the name.
+</p>
+
+
+<h3>1D Scatterplot</h3>
+
+<p>
+The one-variable scatterplot plots a point for every data value along the same axis.
+</p>
+ 
+
+
+<h3>Parameters</h3>
+
+<p>
+For the full list of <code>Plot()</code> parameters, see the manual obtained by entering <code>?Plot</code>.  These listed parameters are those provided in the interactive session from <code>interact("Trellis")</code>.
+</p>
+
+
+<h4><code>x</code>-variable</h4>
+	<dd>The numerical variable from which to construct the VBS plot.</dd>
+
+<h4><code>by1</code>-variable</h4>
+<dl>
+	<dd>Optional categorical variable to create a Trellis for each level of the variable.</dd>
+</dl>
+
+
+<h4>Points</h4>
+<dl>
+	<dt>fill</dt>
+		<dd>interior color of a bar</dd>
+	<dt>color</dt>
+		<dd>exterior color of a bar, i.e., its border</dd>
+	<dt>transparency</dt>
+		<dd>transparency level of <code>0</code> (none) to <code>1</code> (completely transparent)</dd>
+	<dt>size</dt>
+		<dd>size of the plotted points</dd>
+	<dt>shape</dt>
+		<dd>shape of the plotted points</dd>
+</dl>
+
+
+<h4>Objects</h4>
+<dl>
+	<dt>vbs_plot</dt>
+		<dd>A character string that specifies the components of the integrated Violin-Box-Scatterplot (VBS) of a continuous variable. A <code>"v"</code> in the string indicates a violin plot, a <code>"b"</code> indicates a box plot with flagged outliers, and a <code>"s"</code> indicates a 1-variable scatterplot. Default value is <code>"vbs"</code>. The characters can be in any order and upper- or lower-case.</dd>
+	<dt>violin_fill</dt>
+		<dd>interior color of each violin in a violin plot</dd>
+	<dt>box_fill</dt>
+		<dd>interior color of each box in a box plot</dd>
+</dl>
+
+
+<h4>Jitter</h4>
+<dl>
+	<dt>jitter_y</dt>
+		<dd>jitter applied to the <code>y</code>-variable coordinates</dd>
+</dl>
+
+
+<h4>Save</h4>
+
+<dl>
+	<dt>width</dt>
+		<dd>width of saved pdf file, in inches</dd>
+	<dt>height</dt>
+		<dd>height of saved pdf file, in inches</dd>	
+</dl>
+
+</body>
+</html>

@@ -5,7 +5,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
          factors=TRUE, q_num=4, digits_d=NULL, quiet=getOption("quiet")) {
 
-
   # -----------------------------------------------------------
   # ---- preliminaries
 
@@ -90,8 +89,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   }
 
   # abbreviation dictionary for function names, first 13 require numeric var
-  fun.vec <- c("sum", "mean", "md", "min", "max", "sd", "var", "IQR", "mad",
-               "", "", "sk", "kt", "tbl", "tbl")
+  fun.vec <- c("sum", "mean", "mdn", "min", "max", "sd", "var", "IQR", "mad",
+               "", "", "skew", "kurt", "tbl", "tbl")
   names(fun.vec) <- c("sum", "mean", "median", "min", "max",
                       "sd", "var", "IQR", "mad", "range", "quantile",
                       "skew", "kurtosis", "table", "tabulate")
@@ -111,7 +110,12 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   names(data.vars) <- names(data)
 
   # get index of variable(s)
+  # if variable is a variable that contains the name instead of the
+  #  name directly, then ind.var.d is not the index but the name, 
+  # which is then assessed on the data frame to identify its column, index
   ind.var.d <- eval(substitute(variable), envir=data.vars, parent.frame())
+  if (!is.numeric(ind.var.d))  # ind.var.d is a var name, not a col index
+    ind.var.d <- which(names(data) == ind.var.d)
   n.var <- length(ind.var.d)  # n of variables
   nm.var.d <- names(data)[ind.var.d]
   if (is.null(out_names)) {
@@ -120,12 +124,10 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     for (i in 1:length(nm.cmpt)) {  # for each function
       for (j in 1:length(nm.var.d)) {  # for each var to aggregate
         k <- k + 1
-        if (!user_def[i]) {
-          out_names[k] <- paste(nm.var.d[j], "_", fun.vec[nm.cmpt[i]], sep="")
-        }
-        else {
-          out_names[k] <- paste(nm.var.d[j], "_", nm.cmpt[i], sep="")
-        }
+          if (!user_def[i]) 
+            out_names[k] <- paste(nm.var.d[j], "_", fun.vec[nm.cmpt[i]], sep="")
+          else
+            out_names[k] <- paste(nm.var.d[j], "_", nm.cmpt[i], sep="")
       }
     }
   }  # end is.null out_names
@@ -137,10 +139,12 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     # get indices of by variable(s)
     x <- str2lang(deparse(substitute(by)))  # char string to type calls
     ind.r.by <- eval(substitute(x), envir=data.vars, parent.frame())
+    if (!is.numeric(ind.r.by))
+      ind.r.by <- which(names(data) == ind.r.by)
     nm.row.by <- names(data)[ind.r.by]
 
     if (missing(by))
-      ind.r.by <- ind.var.d  # for tabulate do not have variables
+      ind.r.by <- ind.var.d  # for tabulate, do not have variables
 
     # save original variable types of by vars because aggregate makes factors
     n.r.by <- length(ind.r.by)
@@ -172,7 +176,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     else {
       data[, ind.by] <- factor(data[, ind.by], exclude=exc)
       by.vars <- list(data[, ind.by])
-      names(by.vars) <- deparse(substitute(by))
+#     names(by.vars) <- deparse(substitute(by))
+      names(by.vars) <- names(data)[ind.r.by]
     }
     if (to_tabu) {
       n.by <- n.by + 1
@@ -367,6 +372,11 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       a <- a[order(a[[s.col]], decreasing=direction), ]
     }
 
+    # if just one variable, drop the redundant variable names
+    if (length(nm.var.d) == 1) {
+      names(a) <- gsub(nm.var.d, "", names(a), fixed=TRUE)
+      names(a) <- gsub("_", "", names(a), fixed=TRUE)
+    }
     return(a)
   }  # no by specified and not tabulate
 
@@ -408,8 +418,10 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   }
 
   else if (n.cmp > 1) { 
+    # do the 1st computation
     a <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=compute[[1]],
                    na.rm=na_remove)  # compute for a cell even if a missing
+    # do the remaining computations
     for (i in 2:n.cmp) {
       ac <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE,
                FUN=compute[[i]], na.rm=na_remove)
@@ -436,7 +448,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     if (length(ind.var.d) == 1)
       names(a)[ncol(a)] <- deparse(substitute(variable))
     if (length(ind.by) == 1)
-      names(a)[1] <- deparse(substitute(by))
+#     names(a)[1] <- deparse(substitute(by))
+      names(a)[1] <- names(data)[ind.r.by]
 
     # Dates never go to factors
     for (i in 1:n.r.by)
@@ -838,5 +851,10 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     cat("\n")
   }
 
+  # if just one variable, drop the redundant variable names
+  if (length(nm.var.d) == 1) {
+    names(a) <- gsub(nm.var.d, "", names(a), fixed=TRUE)
+    names(a) <- gsub("_", "", names(a), fixed=TRUE)
+  }
   return(a)
 }

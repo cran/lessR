@@ -224,7 +224,7 @@ function(x, y, by, stack100,
 
   # x = tabulate for counts
 
-  if (!entered) {
+  if (!entered) {  # so tabulate
     if (!is.data.frame(x)) { # a single x variable
 
       if (is.null(by)) {
@@ -587,10 +587,10 @@ function(x, y, by, stack100,
   # --------------------------------------------------
 
   # need n.levels for this evaluation
-  if (values == "eval.later") {
-    is_int <- TRUE
-    if (!is.null(y)) if (!.is.integer(y)) is_int <- FALSE
-    if (n.levels > 14  || !is_int)
+  if (values == "eval.later") {  # values not user-specified
+    is.int <- TRUE
+    if (!is.null(y)) if (!.is.integer(y)) is.int <- FALSE
+    if (n.levels > 14  || !is.int)
       values <- "off"
     else {
       values <- getOption("values")
@@ -1006,7 +1006,6 @@ function(x, y, by, stack100,
       stats <- .ss.factor(x, by=NULL, brief=TRUE, digits_d=dd,
                           x.name, by.name, x.lbl, y.lbl, label_max,
                           x.miss, by.miss, out_size)
-
       if (!is.null(stats)) {
         txttl <- stats$title
         counts <- stats$count

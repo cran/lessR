@@ -2,7 +2,6 @@
 function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
          x.name=NULL, ...) {
 
-
   # get variable labels if exist
   # graph.win=FALSE turns off call to par, so blank window in R not produced
   gl <- .getlabels(graph.win=FALSE)
@@ -86,7 +85,6 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
   }
   if (max.ln < 5) max.ln <- max.ln + 1
   if (max.ln < 10) max.ln <- max.ln + 1
-
 
   tx <- character(length = 0)
 
@@ -201,10 +199,10 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
 
   }  # for each line
 
-     if (n.lines == 1)
-       return(list(txlbl=txlbl, tx=tx, n=n, n.miss=n.miss, m=m, s=s, sk=sk,
-                   kt=kt, mn=mn, q1=q1, md=md, q3=q3, mx=mx, qr=qr))
-     else
-       return(list(tx=tx))  # contains title with var labels and stats
+  if (n.lines == 1)
+    return(list(txlbl=txlbl, tx=tx, n=n, n.miss=n.miss, m=m, s=s, sk=sk,
+                kt=kt, mn=mn, q1=q1, md=md, q3=q3, mx=mx, qr=qr))
+  else
+    return(list(tx=tx))  # contains title with var labels and stats
 
 }

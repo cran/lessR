@@ -40,7 +40,7 @@ dm <- pivot(warpbreaks, mean, breaks, c(tension, wool))
 dm
 
 ## ----fig.width=5------------------------------------------------------------------------------------------------------
-Plot(tension, breaks_mean, by=wool, segments=TRUE, size=2, data=dm, main="Cell Means")
+Plot(tension, mean, by=wool, segments=TRUE, size=2, data=dm, main="Cell Means")
 
 ## ---------------------------------------------------------------------------------------------------------------------
 d <- read.csv(header=TRUE, text="

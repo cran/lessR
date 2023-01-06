@@ -16,7 +16,7 @@ function(my_formula, data=d, rows=NULL,
          n_pred_rows=NULL, pred_sort=c("predint", "off"),
          subsets=NULL, best_sub=c("adjr2", "Cp"), cooks_cut=1, 
 
-         scatter_coef=TRUE, scatter_3D=FALSE,
+         scatter_coef=TRUE, mod=NULL, 
 
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL, 
          X5_new=NULL, X6_new=NULL,
@@ -82,6 +82,11 @@ function(my_formula, data=d, rows=NULL,
 
 
   if (is.null(fun_call)) fun_call <- match.call()
+
+  if (!is.null(mod)) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Parameter  mod  not yet implemented. Coming soon.\n\n")
+  }
 
   if (missing(my_formula)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -459,7 +464,7 @@ function(my_formula, data=d, rows=NULL,
     ancovaOut <- .reg5Plot(lmo, n_res_rows, n_pred_rows, scatter_coef, 
        X1_new, ancova, numeric.all, in.data.frame, prd$cint, prd$pint,
        plot_errors, digits_d, n_cat, pdf, width, height, manage.gr,
-       scatter_3D, quiet, ...)
+       quiet, ...)
 
     tx <- ""
     if (!is.null(ancovaOut$txeqs)) {

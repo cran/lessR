@@ -71,7 +71,7 @@ function(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
          scatter_coef=s.c, X1_new=NULL, ancova,
          numeric.all, in.data.frame, c.int, p.int,
          digits_d=getOption("digits_d"), n_cat=getOption("n_cat"),
-         pdf=FALSE, width=5, height=5, manage.gr=FALSE, scatter_3D=FALSE, ...)
+         pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...)
 
     } # end type == 1
 

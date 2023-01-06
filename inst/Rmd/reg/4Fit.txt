@@ -37,9 +37,9 @@ Partitioning the sums of squares of `Y` into what is explained by the model, and
 
 `eq.decomp`
 
-This decomposition of the sums of squares of `Y`  into what is explained by the model, and what is _not_ explained, is fundamental to assessing the fit of the model.
+The total variation of `Y`, its sum of squared deviations about its mean, is that which is explained by the model, and that which is _not_ explained. This decomposition is fundamental to assessing the fit of the model, to understand how well the model accounts for the variation of `Y`.
 
-The ANOVA further partitions the overall model sums of squares by predictor variable.
+The ANOVA further partitions the overall sum of squares explained by the model, $SS_{model}$, $SS_{`Y`}$ in this example, according to each predictor variable.
 
 `eq.model_decomp`
 

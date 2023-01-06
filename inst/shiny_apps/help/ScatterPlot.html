@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Scatterplots with lessR</title>
+<link rel="stylesheet" href="help.css">
+</head>
+<body>
+
+<h2>The Scatterplot</h2>
+
+<h3>Concepts</h3>
+
+<p>
+A two-dimensional scatterplot displays the relationship between two distributions in terms of their joint values, as a set of points in an 2-dimensional coordinate system. The coordinates of each point are the values of two variables for a single observation (row of data). The classic scatterplot is of two continuous variables but any combination of continuous and categorical can be plotted. 
+</p>
+
+<p>
+If both variables are categorical, many pairs of values may be repeated in the data because of the limited number of values for each of the two variables. In that case the more informative plot is a bubble plot. Each point in the scatterplot is replaced by a circle or bubble, the size of which reflects the joint frequency for that combination of data values. Or, the size of the bubble can represent the magnitude of a third, continuous variable.
+</p>
+
+<p>
+The data values in a scatterplot can also be grouped according to the their values on a third, categorical variable. Differentiate the groups of points by a characteristic such as color. Usually after three or four levels of this categorical variable are all that can be meaningfully plotted.
+</p>
+
+
+
+<h3>Parameters</h3>
+
+<p>
+For the full list of <code>ScatterPlot()</code> parameters, see the manual obtained by entering <code>?Plot</code>.  These listed parameters are those provided in the interactive session from <code>interact("ScatterPlot")</code>.
+</p>
+
+
+<h4><code>x</code>-variable</h4>
+	<dd>The numerical variable for the <code>x</code>-axis from which construct the scatterplot.</dd>
+	
+<h4><code>y</code>-variable</h4>
+	<dd>The numerical variable for the <code>y</code>-axis from which construct the scatterplot.</dd>
+
+<h4><code>by</code>-variable</h4>
+<dl>
+	<dd>Optional categorical variable to group the points by color according to the level of the variable.</dd>
+</dl>
+
+
+<h4>Points</h4>
+<dl>
+	<dt>fill</dt>
+		<dd>interior color of a bar</dd>
+	<dt>color</dt>
+		<dd>exterior color of a bar, i.e., its border</dd>
+	<dt>transparency</dt>
+		<dd>transparency level of <code>0</code> (none) to <code>1</code> (completely transparent)</dd>
+	<dt>size</dt>
+		<dd>size of the plotted points</dd>
+	<dt>shape</dt>
+		<dd>shape of the plotted points</dd>
+</dl>
+
+<h4>Line, Ellipse, Outliers</h4>
+<dl>
+	<dt>enhance</dt>
+		<dd>if <code>TRUE</code>, automatically add the 0.95 data ellipse, labeling of outliers beyond a Mahalanobis distance of 6 from the ellipse center, the best-fitting least squares line of all the data, the best-fitting least squares line of the regular data without the outliers, and a horizontal and vertical line to represent the mean of each of the two variables.</dd>
+	<dt>add="means"</dt>
+		<dd>add a vertical line for the mean of <code>x</code> and a horizontal line for the mean of <code>y</code></dd>
+	<dt>fit</dt>
+		<dd>fit line. Default value is <code>"off"</code>, with options <code>"loess"</code> for non-linear fit, <code>"lm"</code> for linear model least squares, "null" for the null model, <code>"exp"</code> for exponential growth or decay, <code>"power"</code> for the general power model, and <code>"quad"</code> for an increasing or decreasing function for the specific power value of 2. If potential outliers are identified according to out_cut, a second (dashed) fit line is displayed calculated without the outliers.</dd>
+	<dt>ellipse</dt>
+		<dd>add an elipse with the specified confidence level</dd>
+	<dt>MD_cut</dt>
+		<dd>Mahalanobis distance that defines an outlier</dd>
+	<dt>ID</dt>
+		<dd>Name of variable for which to label outliers, must have unique values</dd>
+</dl>
+
+<h4>Jitter</h4>
+<dl>
+	<dt>jitter_x</dt>
+		<dd>jitter applied to the <code>x</code>-variable coordinates</dd>
+	<dt>jitter_y</dt>
+		<dd>jitter applied to the <code>y</code>-variable coordinates</dd>
+</dl>
+
+<h4>Rotate Labels</h4>
+<dl>
+	<dt>rotate_x</dt>
+		<dd>rotation in degrees applied to the <code>x</code>-axis value labels</dd>
+	<dt>rotate_y</dt>
+		<dd>rotation in degrees applied to the <code>y</code>-axis value labels</dd>
+	<dt>offset</dt>
+		<dd>amount of space the value labels are shifted off of the corresponding axis</dd>
+</dl>
+
+
+<h4>Save</h4>
+<dl>
+	<dt>width</dt>
+		<dd>width of saved pdf file, in inches</dd>
+	<dt>height</dt>
+		<dd>height of saved pdf file, in inches</dd>	
+</dl>
+
+</body>
+</html>

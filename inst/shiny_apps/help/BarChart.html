@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Bar Charts with lessR</title>
+<link rel="stylesheet" href="help.css">
+</head>
+<body>
+
+<h2>The Bar Chart</h2>
+
+<h3>Categorical Variables</h3>
+
+<p>
+A <em>categorical variable</em> has a relatively small number of unique values, called <em>levels</em>. For example, on a survey form, Gender can be assessed with three levels: Male, Female, and Other. Or, these values can be represented as integers: 1, 2, and 3. Wether the values are of type <code>character</code>, the R variable type for a categorical variable, type <code>factor</code>, or type <code>integer</code>, the corresponding variable Gender is categorical.
+</p>
+
+<p>
+The <em>bar chart</em> associates a number with each level of a categorical variable. A bar chart is constructed from this table with two columns, one column a level of the categorical variable and the second column the associated number. The chart consists of a bar for each level with a height proportional to that associated number. In general, the associated number can be any value but usually is the result of a statistical calculation.
+</p>
+
+
+<h3>Count the Values for Each Level</h3>
+
+<p>
+Probably the most common type of bar chart calculates the number associated with each level as the count of the number of values for the corresponding level of the categorical variable. This bar chart answers the question: How often did the values of each level of the categorical variable occur in the data? For example, how many students in the classroom term for homework assignment in on time, and how many turned in the assignment late? The only needed information for which to compute this type of bar chart are the values of the categorical variable. 
+</p>
+
+
+<h3>The Two-Variable Bar Chart</h3>
+
+<p>
+The two variable bar chart visualizes the relationship between two categorical variables. The corresponding cross tabulation table shows that same relationship in tabular form from which the bar chart visualization is derived.
+</p>
+
+<h3>Calculate a Statistic for a Numerical Variable</h3>
+
+<p>
+The number associated with each category or level of a categorical variable can also be computed as a statistic from the analysis of a numerical variable at each level or category. For example, calculate the average salary for for the people each department of a company, such as accounting, sales, etc.
+</p>
+
+<p>
+The possibility of reading a numerical variable also allows for the possibility reading the summary table from which the bar chart is constructed as the data for the analysis. As discussed, every bar chart is constructed from a summary table that associates each level of the categorical terrible with a number. Usually that number is calculated as either the counted values of a categorical variable for each level, or the calculation of a statistic for a numerical variable. Or, just enter that summary table directly as the given data, select the categorical variable, then select the corresponding numerical variable. This way the numerical variable can be anything at all, including constructing a bar chart for a published table without having access to the original data.
+</p>
+
+
+
+<h3>Parameters</h3>
+
+<p>
+For the full list of <code>BarChart()</code> parameters, see the manual obtained by entering <code>?BarChart</code>. These listed parameters are those provided in the interactive session from <code>interact("BarChart")</code>.
+</p>
+
+
+ 
+<h4><code>x</code>-variable</h4>
+	<dd>Categorical variable for which each level is associated with a number, proportional to the height of the corresponding bar on the bar chart.</dd>
+	
+	
+<h4><code>by</code>-variable</h4>
+<dl>
+	<dd>Optional categorical variable to create a two-variable a bar chart.</dd>
+</dl>
+
+
+<dl>
+	<dt>fill</dt>
+		<dd>interior color of a bar for each level of the <code>by</code>-variable</dd>
+		<dt>beside</dt>
+			<dd>Define a separate, adjacent bar for each level of the <code>by</code>-variable within the corresponding level of the <code>x</code>-variable </dd>
+	<dt>stack100</dt>
+		<dd>Create a 100% stacked bar chart in which each bar shows the relative percentage of items within each level or category</dd>
+</dl>
+
+
+<h4>y-variable</h4>
+<dl>
+	<dd>Optional numerical variable to compute a statistic across the levels of the categorical variable, such as the mean</dd>
+	</dl>
+<dl>
+	<dt>stat</dt>
+		<dd>The statistic computed across the levels of the categorical variable from which to compute the height of the bars</dd>
+</dl>
+
+<h4>Bars</h4>
+<dl>
+	<dt>fill</dt>
+		<dd>interior color of a bar</dd>
+	<dt>color</dt>
+		<dd>exterior color of a bar, i.e., its border</dd>
+	<dt>transparency</dt>
+		<dd>transparency level of 0 (none) to 1 (completely transparent)</dd>
+	<dt>sort</dt>
+		<dd>sort the levels of the x-variable, "0" for none, "+" for ascending, and "-" for descending</dd>
+	<dt>horiz</dt>
+		<dd>If <code>TRUE</code>, the box is checked, then the bars become horizontal</dd>		
+</dl>
+
+
+<h4>Values</h4>
+<dl>
+	<dt>values</dt>
+		<dd>type of value displayed, "%" for percent, "input" for entered data values, "off" for none</dd>
+	<dt>values_color</dt>
+		<dd>color of displayed values</dd>
+	<dt>values_position</dt>
+		<dd>position of displayed values, "in" the object or "out", on top</dd>
+	<dt>values_size</dt>
+		<dd>size of the displayed values</dd>	
+</dl>
+
+
+<h4>Save</h4>
+<dl>
+	<dt>width</dt>
+		<dd>width of saved pdf file, in inches</dd>
+	<dt>height</dt>
+		<dd>height of saved pdf file, in inches</dd>	
+</dl>
+
+</body>
+</html>

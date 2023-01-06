@@ -1,0 +1,9 @@
+label {font-size: 1em; font-weight: bold; color: #808080;}
+.checkbox label {color:#808080;}
+hr {border-top: .09em solid #808080; margin-bottom:0;}
+.nav-tabs {font-size: 1.1em;}
+.soft {margin-bottom:.25em; font-size:1em; font-style:italic; color:#6e6e6e;}
+#hp {color:#808080; font-size: .5em;}
+.head {font-size:.85em; margin-top: -1em; color:#8f8f8f}
+.view {color:#808080; font-style:italic; font-size: 1.15em; margin-top:0;}
+#nrows, #ncols {color: #6e6e6e; background-color: #eadac8; font-size: .92em;}

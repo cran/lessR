@@ -7,6 +7,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          area_fill="transparent",
          color=getOption("pt_color"),
 
+      #  if NULL, set default values
          pts_trans=0, col.segment=getOption("segment_color"),
 
          xy_ticks=TRUE,
@@ -587,15 +588,17 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     # plot points
     if (object %in% c("point", "both")) {
 
-      # --- process jitter ---
-      # jitter converts factor integers to near whole numbers, so save
+      # --- process jitter, NULL implies set default values ---
+     if (is.null(jitter_x)) jitter_x <- (diff(range(x[,1], na.rm=TRUE)) / 50)
+     if (is.null(jitter_y)) jitter_y <- (diff(range(y[,1], na.rm=TRUE)) / 50)
+
       if (jitter_x > 0) {
         x.temp <- x[,1]
-        x[,1] <- jitter(x[,1], factor=jitter_x)
+        x[,1] <- x + runif(length(x[,1]), -jitter_x, jitter_x)
       }
       if (jitter_y > 0) {
         y.temp <- y[,1]
-        y[,1] <- jitter(y[,1], factor=jitter_y)
+        y[,1] <- y + runif(length(y[,1]), -jitter_y, jitter_y)
       }
       # ----------------------
 

@@ -24,7 +24,7 @@ BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         theme=getOption("theme"),
         fill=NULL,
         color=getOption("bar_color_discrete"),
-        trans=getOption("trans_bar_fill"),
+        transparency=getOption("trans_bar_fill"),
         fill_split=NULL,
 
         legend_title=NULL, legend_position="right_margin",
@@ -70,21 +70,24 @@ bc(\dots)
         To keep two (small) words on the same line, replace the space that
         separates them with a tilde, which displays as a blank
         for the corresponding axis label.}
-  \item{y}{Numeric variable for which the values are displayed on the vertical
-        axis. If specified, then data frame is summary data (i.e., aggregated).
-        See later example to create
-        with R \code{link{aggregate}} function. If not specified, then 
+  \item{y}{Numeric variable with a value for each level of the categorical
+        variable with the value plotted proportional to the height of the 
+        corresponding bar. If specified for the original data table, then
+        the corresponding
+        \code{stat} parameter also must be set. If not specified, then 
         its value is automatically tabulated as the frequency of each
         category or joint category.}
-  \item{by}{A categorical variable to provide a bar chart for
+  \item{by}{A categorical variable to create a two-variable a bar chart for
         each level of the numeric primary variables \code{x} and
         \code{y} on the \emph{same} plot, which applies to the panels of
         a Trellis plot if \code{by1} is specified.}
   \item{data}{Optional data frame that contains the variables of interest.
-       Can contain data from which frequencies are computed for the y-values,
-       or can contain values to plot on the y-axis instead of counts.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
-       to analyze.}
+       Can contain data from which frequencies or other statistics for a
+       \code{y}-variable are computed, or can be a summary table that consists
+       of two columns: the level of a categorical variable paired with the
+       numeric value that determines the height of the corresponding bar.}
+  \item{rows}{A logical expression that specifies a subset of rows of the
+       data frame to analyze.}
   \item{digits_d}{Provides the number of decimal digits,
         set by default to at least 2 or the largest number of digits in the values
         of the response variable plus 1.} 
@@ -155,7 +158,7 @@ bc(\dots)
   \item{color}{Border color of the bars, can be a vector
         to customize the color for each bar. Default is
         \code{bar_color_discrete} from the lessR \code{\link{style}} function.}
-  \item{trans}{Transparency factor of the area of each slice from 0, no
+  \item{transparency}{Transparency factor of the area of each slice from 0, no
         transparency to 1, full transparency. Default is
         \code{trans_bar_fill} from the lessR \code{\link{style}} function.}
   \item{fill_split}{The value of the numeric variable \code{y} for which
@@ -491,7 +494,7 @@ BarChart(Dept, rows=(Gender=="M" & Salary > 85000))
 BarChart(Dept, rotate_x=45, offset=1, sort="-")
 
 # set bars to a single color of blue with some transparency
-BarChart(Dept, fill="blue", trans=0.3)
+BarChart(Dept, fill="blue", transparency=0.3)
 # progressive (sequential) color scale of blues
 BarChart(Dept, fill="blues")
 
@@ -512,7 +515,7 @@ BarChart(Gender, fill=c("palegreen3","tan"))
 
 # darken the colors with an explicit call to getColors,
 #   do a lower value of luminance, set to l=25
-BarChart(Dept, fill=getColors(l=25), trans=0.4)
+BarChart(Dept, fill=getColors(l=25), transparency=0.4)
 
 # column proportions instead of frequencies
 BarChart(Gender, stat="proportion")
@@ -649,7 +652,7 @@ BarChart(Dept, Salary)
 #   so set na_show_group to FALSE
 d <- Read("Employee")
 a <- pivot(d, mean, Salary, c(Dept,Gender), na_group_show=FALSE)
-BarChart(Dept, Salary_mean, by=Gender, data=a)
+BarChart(Dept, mean, by=Gender, data=a)
 # do so just with BarChart, display bars in grayscale
 # How does average salary vary by gender across the various departments?
 BarChart(Dept, Salary, by=Gender, stat="mean", data=d, fill="grays")

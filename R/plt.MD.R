@@ -30,15 +30,16 @@ function(x, y, ID, MD_cut, out_cut) {
   max.MD <- max(nchar(.fmt(dst.srt, d=2)))
   tx[length(tx)+1] <- ">>> Outlier analysis with Mahalanobis Distance"
   tx[length(tx)+1] <- ""
-  tx[length(tx)+1] <- paste(.fmtc("MD", max.MD), .fmtc(" ID", max.ID)) 
-  tx[length(tx)+1] <- paste(.fmtc("-----", max.MD), .fmtc("-----", max.ID)) 
+  tx[length(tx)+1] <- paste(.fmtc("MD", max.MD), .fmtc(" ID", max.ID+1)) 
+  tx[length(tx)+1] <- paste(.fmtc("-----", max.MD), .fmtc("-----", max.ID+1)) 
   for (i in 1:n.lines) {
     if (i == (length(out_ind)+1)  &&  length(out_ind) > 0)
       tx[length(tx)+1] <- ""
-    tx[length(tx)+1] <- paste(.fmt(dst.srt[i], 2), .fmtc(ID.srt[i], max.ID))
+    tx[length(tx)+1] <- paste(.fmt(dst.srt[i], 2, max.MD),
+                              .fmtc(ID.srt[i], max.ID+1))
   }
   if (n.lines < length(x))
-    tx[length(tx)+1] <- paste(.fmtc("...", max.MD-1), .fmtc("...", max.ID)) 
+    tx[length(tx)+1] <- paste(.fmtc("...", max.MD-1), .fmtc("...", max.ID+2)) 
 
   return(list(tx.otl=tx, outlpts=out_ind))
 

@@ -679,18 +679,18 @@ or the proportion of rows to select.</p>
 frame.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="dv">5</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
 <pre><code>##                     Years Gender Dept    Salary
-## Hoang, Binh            15      M SALE 111074.86
-## Kralik, Laura          10      W SALE  92681.19
-## Anderson, David         9      M ACCT  69547.60
-## Portlock, Ryan         13      M SALE  77714.85
-## Gvakharia, Kimberly     3      W SALE  49868.68</code></pre>
+## Stanley, Grayson        9      M SALE  69624.87
+## Downs, Deborah          7      W FINC  57139.90
+## Correll, Trevon        21      M SALE 134419.23
+## Gvakharia, Kimberly     3      W SALE  49868.68
+## Kimball, Claire         8      W MKTG  61356.69</code></pre>
 <p>Here specify a proportion of rows to select.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="fl">0.1</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                     Years Gender Dept   Salary
-## Fulton, Scott          13      M SALE 87785.51
-## Anastasiou, Crystal     2      W SALE 56508.32
-## Kimball, Claire         8      W MKTG 61356.69
-## Afshari, Anbar          6      W ADMN 69441.93</code></pre>
+<pre><code>##                  Years Gender Dept   Salary
+## Kimball, Claire      8      W MKTG 61356.69
+## Campagna, Justin     8      M SALE 72321.36
+## Stanley, Emma        3      W ACCT 46124.97
+## Anderson, David      9      M ACCT 69547.60</code></pre>
 </div>
 
 

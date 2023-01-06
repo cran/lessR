@@ -18,7 +18,8 @@ BarChart(Dept)
 style(quiet=TRUE)
 
 ## ----fig.width=4, fig.height=3.75, fig.align='center'-----------------------------------------------------------------
-BarChart(Dept, fill="darkred", color="black", trans=.8, values_color="black")
+BarChart(Dept, fill="darkred", color="black", transparency=.8,
+         values_color="black")
 
 ## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
 BarChart(Dept, theme="gray", values="off", horiz=TRUE)
@@ -46,8 +47,7 @@ a
 knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
 
 ## ----xy, fig.width=4, fig.height=3.5, fig.align='center'--------------------------------------------------------------
-a <- na.omit(a)
-BarChart(Dept, Salary_mean, data=a)
+BarChart(Dept, mean, data=a)
 
 ## ---- fig.width=4, fig.height=3.5, fig.align='center'-----------------------------------------------------------------
 BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)

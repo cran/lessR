@@ -155,7 +155,7 @@ pivot(data=d, compute=mean, variable=Salary, by=c(Dept, Gender))
 #   with missing data so do not show groups that are missing as
 #   another level
 a <- pivot(d, mean, Salary, c(Dept, Gender), na_group_show=FALSE)
-BarChart(Dept, Salary_mean, by=Gender, data=a)
+BarChart(Dept, mean, by=Gender, data=a)
 
 # calculate mean of Years and Salary for each combination of Dept and Gender
 # parameter values by position

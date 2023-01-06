@@ -33,7 +33,7 @@ Regression(my_formula, data=d, rows=NULL,
          n_pred_rows=NULL, pred_sort=c("predint", "off"),
          subsets=NULL, best_sub=c("adjr2", "Cp"), cooks_cut=1,
 
-         scatter_coef=TRUE, scatter_3D=FALSE,
+         scatter_coef=TRUE, mod=NULL, 
 
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL,
          X5_new=NULL, X6_new=NULL,
@@ -145,9 +145,8 @@ reg_brief(\dots, brief=TRUE)
 
   \item{scatter_coef}{Display the correlation coefficients in the upper triangle
         of the scatterplot matrix.}
-  \item{scatter_3D}{De-activated because car package no longer linked, but
-       if set to \code{TRUE}, directions are provided to use the car
-       \code{scatter3d} function directly.}\cr
+  \item{mod}{Declare a predictor variable a moderator variable in a two
+       predictor model. [Not yet implemented.]}\cr
 
   \item{X1_new}{Values of the first listed numeric predictor variable for
         which forecasted values

@@ -6,7 +6,7 @@
 \description{For the data on 37 employees with 6 variables, includes the variable labels and variable units.}
 
 \usage{data(dataEmployee_lbl)}
-\format{Variable labels, and some unites..
+\format{Variable labels, and some unites.
 
 Years,"Years Employed in the Company"\cr
 Gender,"Male or Female"\cr

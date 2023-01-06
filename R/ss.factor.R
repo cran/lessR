@@ -1,7 +1,8 @@
 .ss.factor <-
 function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
          x.lbl=NULL, y.lbl=NULL, label_max=20,
-         x.miss=NULL, by.miss=NULL, out_size=NULL, ...)  {
+         x.miss=NULL, by.miss=NULL,
+         out_size=NULL, is.smry_tbl=FALSE, ...)  {
 
 
 .prnfreq <- function(x, type, max.ln, max.c1, n.dash, ttl, msg=FALSE) {
@@ -82,11 +83,11 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
       }  # write
     }  # end vertical layout
 
-
   return(tx)
 }  # end .prnfreq
 
 
+  # ---------------------------------
   # begin
   # ---------------------------------
 
@@ -254,7 +255,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
   # one variable
   else { 
     lnx <- length(names(x))
-    if (lnx == sum(x)) {  # x is a vector of the counts, if unique
+    if (lnx == sum(x)  &&  is.smry_tbl) {  # x is vector of counts, if unique
       if (length(x) > 100)
         cat("\nOnly the first 100 value out of", lnx, "listed.\n\n")
       nms <- character(length=0)

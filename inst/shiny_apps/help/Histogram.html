@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Histograms with lessR</title>
+<link rel="stylesheet" href="help.css">
+</head>
+<body>
+
+
+<h2>The Histogram</h2>
+
+<h3>Bins</h3>
+
+<p>
+How to display the frequencies of the data values for a continuous variable such as Age, Salary, MPG, Gallons, or Height? In contrast to the relatively few unique values of a categorical value, a continuous variable has many potential unique values. How many potential values? Generally there are too many unique data values to plot each individually on a single visualization. The solution is to form <em>bins</em>, a sequence of adjacent, non-overlapping intervals, each generally of the same size. Each bin contains approximately equal data values. 
+</p>
+
+
+<h3>Construct the Histogram</h3>
+
+<p>
+Place each data value for a continuous variable into its corresponding bin. Construct the histogram as a set of adjacent bars, one bar per bin. The height of each bar is proportional to the frequency of its values. Adjacent bars of a histogram share a common side, no gaps between bars to indicate the underlying continuity.
+</p>
+
+
+<h3>Artifacts</h3>
+
+<p>
+The final choice of bin width is subjective, so different bin widths should generally be explored beyond whatever default bin width is provided by the computer. The most efficient way to set bin width manually is to first obtain a histogram with the default bin width, then manually modify the bin width.
+Select a bin width to display as much detail as possible for the sample size without excessive random noise. 
+</p>
+
+<p>
+The <em>bin width artifact</em> occurs when the change in the bin width of a histogram changes the shape of the histogram. The <em>bin shift artifact</em> occurs when the starting point of a histogram changes, and the shape of the histogram also changes.
+</p>
+
+
+<h3>Parameters</h3>
+
+<p>
+For the full list of <code>Histogram()</code> parameters, see the manual obtained by entering <code>?Histogram</code>.  These listed parameters are those provided in the interactive session from <code>interact("Histogram")</code>.
+</p>
+
+ 
+<h4><code>x</code>-variable</h4>
+	<dd>The numerical variable from which to compute the bins and construct the histogram.</dd>
+	
+
+<h4>Bins</h4>
+<dl>
+	<dt>bin_width</dt>
+		<dd>width of the bins</dd>
+	<dt>bin_start</dt>
+		<dd>starting value of the first bin</dd>	
+</dl>
+
+<h4>Colors</h4>
+<dl>
+	<dt>fill</dt>
+		<dd>interior color of a bar</dd>
+	<dt>color</dt>
+		<dd>exterior color of a bar, i.e., its border</dd>
+	<dt>transparency</dt>
+		<dd>transparency level of <code>0</code> (none) to <code>1</code> (completely transparent)</dd>	
+</dl>
+
+
+<h4>Values, Cumulate</h4>
+<dl>
+	<dt>values</dt>
+		<dd>type of value displayed, <code>"%"</code> for percent, <code>"input"</code> for entered data values, <code>"off"</code> for none</dd>
+	<dt>cumulate</dt>
+		<dd>specifies to display the cumulative histogram or both cumulative and regular histograms with values of <code>"off"</code>, <code>"on"</code>, and <code>"both"</code>.</dd>	
+</dl>
+
+<h4>Smooth</h4>
+<dl>
+	<dt>density</dt>
+		<dd>smoothed density curve, initially at a default bandwidth</dd>
+	<dt>show_histogram</dt>
+		<dd>if <code>TRUE</code>, show the histogram behind the density curve</dd>
+	<dt>rug</dt>
+		<dd>if <code>TRUE</code>, show a direct display of density as a narrow band beneath the density curve</dd>
+	<dt>type</dt>
+		<dd>general density, normal density, or both</dd>
+	<dt>bandwidth</dt>
+		<dd>determines the smoothness of the resulting density curve, larger values yield more smooth curves</dd>
+	<dt>fill_general</dt>
+		<dd>interior color of the general density curve</dd>
+	<dt>fill_normal</dt>
+		<dd>interior color of the normal density curve</dd>
+</dl>
+
+
+<h4>Save</h4>
+<dl>
+	<dt>width</dt>
+		<dd>width of saved pdf file, in inches</dd>
+	<dt>height</dt>
+		<dd>height of saved pdf file, in inches</dd>	
+</dl>
+
+
+</body>
+</html>

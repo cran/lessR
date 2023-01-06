@@ -11,7 +11,7 @@ function(x=NULL, data=d, rows=NULL,
     theme=getOption("theme"),
     fill=getOption("bar_fill_cont"),
     color=getOption("bar_color_cont"),
-    trans=getOption("trans_bar_fill"),
+    transparency=getOption("trans_bar_fill"),
 
     values=FALSE,
     reg="snow2", cumulate=c("off", "on", "both"),
@@ -62,6 +62,8 @@ function(x=NULL, data=d, rows=NULL,
   }
 
   if (is.null(fun_call)) fun_call <- match.call()
+
+  trans <- transparency
 
   # limit actual argument to alternatives, perhaps abbreviated
   cumulate <- match.arg(cumulate)
@@ -238,7 +240,7 @@ function(x=NULL, data=d, rows=NULL,
       }
     }  # x is in global
   }
-  
+
   # evaluate by1
   #-------------
   if (!missing(by1)) {
@@ -266,7 +268,6 @@ function(x=NULL, data=d, rows=NULL,
 
   else
     by1.call <- NULL
-
 
   # evaluate by2
   #-------------
@@ -323,7 +324,6 @@ function(x=NULL, data=d, rows=NULL,
       .graphwin(i.win, d.w=width, d.h=height)
       open.win <- 2
     }
-
     plot.i <- 0  # keep track of generated graphics
     plot.title  <- character(length=0)
 
@@ -333,8 +333,7 @@ function(x=NULL, data=d, rows=NULL,
       options(suggest = FALSE)
     }
 
-    for (i in 1:ncol(data)) {
-
+    for (i in 1:ncol(data)) {  # data only contains data to be analyzed
       nu <- length(unique(na.omit(data[,i])))
 
       x.name <- names(data)[i]
@@ -361,7 +360,6 @@ function(x=NULL, data=d, rows=NULL,
         if (histogram) {
 
           # nothing returned if quiet=TRUE
-
           stuff <- .hst.main(data[,i], fill, color, trans, reg,
               rotate_x, rotate_y, offset,
               breaks, bin_start, bin_width,
@@ -448,7 +446,6 @@ function(x=NULL, data=d, rows=NULL,
           txdst <- ""  # should be named txbw
           txotl <- ""
           txsug <- ""
-#         if (!quiet) {
             txdst <- stuff$tx
 
             txotl <- .bx.stats(data[,i])$txotl
@@ -459,7 +456,6 @@ function(x=NULL, data=d, rows=NULL,
             class(txdst) <- "out"
             class(txotl) <- "out"
             class(txsug) <- "out"
-#         }
           gl <- .getlabels()
           x.name <- gl$xn; x.lbl <- gl$xl;
           y.name <- gl$yn; y.lbl <- gl$yl

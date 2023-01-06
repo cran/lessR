@@ -10,7 +10,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         theme=getOption("theme"),
         fill=NULL,
         color=getOption("bar_color_discrete"),
-        trans=getOption("trans_bar_fill"),
+        transparency=getOption("trans_bar_fill"),
         fill_split=NULL,
 
         legend_title=NULL, legend_position="right_margin",
@@ -62,6 +62,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
     }
   }
 
+  trans <- transparency
+
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   color.miss <- ifelse (missing(color), TRUE, FALSE)
   horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
@@ -93,7 +95,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
     if (is.null(trans)) trans <- 0.1  # kludge, should not be NULL
   }
 
-  if (is.null(values)) values <- "eval.later"
+  if (is.null(values)) values <- "eval.later"  # values not specified
 
   if (missing(break_x)) 
     break_x <- ifelse (!horiz && rotate_x==0, TRUE, FALSE)
@@ -146,19 +148,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
     if (values == "prop") values_digits <- 2
   }
 
-  if (values_position == "out"  &&  !missing(by)  &&  !beside) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "values_position=\"out\" not meaningful for a  by  variable\n",
-      "  without beside=TRUE\n\n")
-  }
-
   if (!(values_position %in% c("in", "out"))) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "values_position  must be set to \"in\", \"out\"\n\n")
   }
-
-  #if (missing(color))  # default black border unless dark bg
-    #if (sum(col2rgb(panel.fill))/3 > 80) color <- "black"
 
   # get parameter names passed with vars, does not evaluate the arg
   # more robust than list(...) which dies with by2=Gender
@@ -196,7 +189,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
   # get name of data table
   if (!mydata.ok) {
-    df.name <- deparse(substitute(data))
+    df.name <- deparse(substitute(data))  # is NULL if from shiny
     options(dname = df.name)
   }
  
@@ -212,10 +205,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
 
-    if (!is.null(x.name))
-      x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
-    else
-      x.in.global <- FALSE
+  if (!is.null(x.name))
+    x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
+  else
+    x.in.global <- FALSE
 
   if (!x.in.global)  {
     if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
@@ -297,16 +290,20 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
     if (!is.null(x.call)) {
 
 
-  # evaluate by
+    # evaluate by
+    #------------
+    # cannot directly evaluate is.null(by) if by is present as a variable
+    # so instead process as below to either get by.call or it is NULL
+    # can get by.name
     if (!by.miss) {
 
-      # get actual variable name before potential call of data$x
+      # get variable name before potential call of data$x
       by.name <- deparse(substitute(by))
       options(byname = by.name)
       # get conditions and check for data existing
-      in.global <- ifelse (df.name!="NULL", .in.global(by.name, quiet), TRUE)
+      by.in.global <- ifelse (df.name!="NULL", .in.global(by.name, quiet), TRUE)
 
-      if (!in.global) {
+      if (!by.in.global) {
         if (eval_df)
           .xcheck(by.name, df.name, names(data))
         by.call <- eval(substitute(data$by))
@@ -316,28 +313,45 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         if (is.function(by.call)) by.call <- eval(substitute(data$by))
       }
 
-    }
+    }  # end not missing by
 
-    else  # end not missing by
+    else
       by.call <- NULL
+
+  if (values_position == "out"  &&  !is.null(by.call)  &&  !beside) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "values_position=\"out\" not meaningful for a  by  variable\n",
+      "  without beside=TRUE\n\n")
+  }
 
 
     # evaluate y
+    y.name <- deparse(substitute(y), width.cutoff = 120L)
+    options(yname = y.name)
+
+    if (!is.null(y.name))
+      y.in.global <- .in.global(y.name, quiet)  # in global?, includes vars list
+    else
+      y.in.global <- FALSE
+
+    if (!y.in.global)  {
+      if (df.name == "NULL")  {  # from shiny
+        y.in.global <- TRUE
+        # values no meaning for stat
+        if (!is.null(stat)) values <- "eval.later" 
+      }
+    }
+      
+    eval_df <- !y.in.global 
+
     # if not missing, then must be aggregate data
     #-------------
-    if (!missing(y)) {
+    if (!missing(y)) {  # assign y.call from data or from global
 
-      # get actual variable name before potential call of data$x
-      y.name <- deparse(substitute(y))
-      options(yname = y.name)
-
-      # get conditions and check for data existing
-      in.global <- .in.global(y.name, quiet)
-
-      # see if var exists in data frame, if x not in global Env or function call
+      # see if var exists in data frame, if y not in global Env or function call
       if (eval_df)
-        if (!in.global) .xcheck(y.name, df.name, names(data))
-      if (!in.global)
+        if (!y.in.global) .xcheck(y.name, df.name, names(data))
+      if (!y.in.global)
         y.call <- eval(substitute(data$y))
       else {  # vars that are function names get assigned to global
         y.call <- y
@@ -480,9 +494,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       if (!is.null(stat)) {  # no y then no stat
         if (!(stat %in% c("count", "proportion"))) {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
-            "To compute a summary table, must first provide\n",
-            "  a numerical y variable from which to calculate a\n",
-            "  statistic such as the mean. List this variable\n",
+            "To compute a statistic for each bar, must first provide\n",
+            "  a numerical y variable from which to calculate the\n",
+            "  statistic, such as the mean. List this variable\n",
             "  second or prefix its name with  y=  .\n\n")
         }
      }
@@ -491,30 +505,34 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
    else {  # a y variable present
     lx.u <- length(unique(x.call))  # includes NA values
     lb.u <- ifelse(is.null(by.call), 1, length(unique(by.call)))
-    if (nrow(data) == lx.u*lb.u) {  # a summary table
+    is.smry_tbl <- FALSE
+    if (df.name!="NULL" && ncol(data)==2) { 
+      if (nrow(data) == lx.u*lb.u) {  # a summary table
+        is.smry_tbl <- TRUE
 
-      if (!is.null(stat)) { # y and a summary table, then no stat
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "The data are a summary table, so do not specify a value of  stat\n",
-          "  as the data transformation has already been done.\n\n")
-      }      
+        if (!is.null(stat)) { # y and a summary table, then no stat
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "The data are a summary table, so do not specify a value of\n",
+            "  statistic  as the data transformation has already been done\n\n")
+        }      
 
-     if (sum(is.na(x.call)) > 0 ||
-          sum(is.na(by.call)) > 0 ||
-          sum(is.na(y.call)) > 0)   {
-          ok <- is.finite(x.call) & is.finite(by.call) & is.finite(y.call)
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "When reading a summary table, missing data not allowed.\n\n")
-      }
-    }  # end summary table
+       if (sum(is.na(x.call)) > 0 ||
+            sum(is.na(by.call)) > 0 ||
+            sum(is.na(y.call)) > 0)   {
+            ok <- is.finite(x.call) & is.finite(by.call) & is.finite(y.call)
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "When reading a summary table, missing data not allowed.\n\n")
+        }
+      }  # end summary table
 
-    else {  # raw data
-      if (is.null(stat)) {  # if y, then must have stat
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "To transform y=", y.name, " to compute a summary table, must\n",
-          " first provide a value of  stat  to define the transformation\n\n")
-      }
-    }  # end raw data
+      else {  # raw data
+        if (is.null(stat)) {  # if y, then must have stat
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "To transform y=", y.name, " to compute a summary table, must\n",
+            " first provide a value of  stat  to define the transformation\n\n")
+        }
+      }  # end raw data
+    }  
 
   }  # a y variable
 
@@ -560,14 +578,15 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
     }
 
     unq.x <- ifelse (length(x.call) == length(unique(x.call)), TRUE, FALSE)
-    stat.val <- c("mean", "sum", "sd", "dev", "min", "median", "max")
+    if (stat == "dev") stat <- "deviation"
+    stat.val <- c("mean", "sum", "sd", "deviation", "min", "median", "max")
 
     if ((stat %in% stat.val)  &&  (!unq.x)) {
 
       n_cat <- 0
       means <- FALSE
 
-      # do stats console output before reducing data
+      # do stats here to the console output before reducing data
       if (!quiet) {
         digits.d <- getOption("digits.d")
 
@@ -576,6 +595,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
           if (missing(by)) {  # do not show stats for one var when a by var
             options(yname = x.name)  # reverse order of x and y for .ss.numeric
             options(xname = y.name)
+
             stats <- .ss.numeric(y.call, by=x.call,
                                  digits_d=digits_d, brief=TRUE, y.name=x.name)
             txout <- stats$tx
@@ -585,7 +605,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         }
         else  {
           stats <- .ss.factor(x.call, digits_d=digits_d, x.name=x.name,
-                              brief=TRUE)
+                              brief=TRUE, is.smry_tbl=is.smry_tbl)
           txout <- stats$counts
         }
 
@@ -596,7 +616,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         print(output)
       }
 
-      # get the summary table according to the stat parameter
+      # get summary table from the data according to the stats parameter
       stat_out <- .bc.stat(x.call, y.call, by.call, stat, y.name)
       out <- stat_out$out
       if (is.null(ylab)) ylab <- stat_out$ylab
@@ -611,7 +631,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
         y.call <- out[,3]
       }
 
-    }  # end sum, mean, sd, min, median, max
+    }  # end sum, mean, sd, deviation, min, median, max
 
     is.range.nm <- ifelse (length(.color_range(fill, n.clr=5)) > 1, TRUE, FALSE)
     if (!is.range.nm && !by.miss && !fill.miss && !is.null(by.call)) {

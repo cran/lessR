@@ -59,16 +59,16 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
         "bin_end: ", bin_end, "\n",
         "bin_end is smaller than bin_start, make bin_end larger.\n\n")
     }
-    breaks <- seq(bin_start,bin_end,bin_width)
+    breaks <- seq(bin_start, bin_end, bin_width)
     seq.end <- bin_end
     while (max(breaks) < bin_end) {
       seq.end <- seq.end + bin_width
-      breaks <- seq(bin_start,seq.end,bin_width)
+      breaks <- seq(bin_start, seq.end, bin_width)
     }
   }
   
   # for user supplied bins, from seq function or bin_start, 
-  # make sure entire data range is spanned
+  #   make sure entire data range is spanned
   if (is.numeric(breaks)) {
     cc <- cut(x, breaks, dig.lab=6, ...)   # replace each data value with its bin
     labs <- levels(cc)  # get list of unique bins, ordered
@@ -184,16 +184,14 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
             n.lab_x.ln=n.lab_x.ln, n.lab_y.ln=n.lab_y.ln,
             xlab_adj=xlab_adj, ylab_adj=ylab_adj, ...) 
 
-
     # see if apply a pre-defined color range
     n.bins <- length(h$counts)
     clr <- NULL
     clr <- .color_range(fill, n.bins)
       
     # not a color range such as "hues" or "blues", so assign clr here
-    if (is.null(clr)) {
+    if (is.null(clr)) 
         clr <- fill  # user provided the colors
-    }
 
     # bar transparency
     if (!is.null(trans)) if (trans > 0)
@@ -221,7 +219,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
       .plt.add (add, x1, x2, y1, y2,
                 add_cex, add_lwd, add_lty, add_color, add_fill, add_trans) 
     }
-  }
+  }  # end do plot
  
 
 #------------

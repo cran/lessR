@@ -1,0 +1,7 @@
+body {margin: 1em;
+      color: rgb(70, 45, 0);  background-color: rgb(250, 250, 245); 
+      font-family:  Arial, Helvetica, sans-serif
+     }
+h2,h3 {color: rgb(107,17,17);}
+h2 {text-align: center;}
+dt {margin-top: .5em; font-style: italic;}

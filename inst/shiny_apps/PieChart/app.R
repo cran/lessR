@@ -1,82 +1,78 @@
-# ---------
-# PieChart1
-# ---------
+# --------
+# PieChart
+# --------
 
 library(shiny)
 library(lessR)
 style(lab_cex=1.2, axis_cex=1, main_cex=1.25, suggest=FALSE)
 
 clr.one <- list(
-  "#96AAC3", "dodgerblue3", "cornflowerblue", "darkblue", "pink2", "red3",
-  "darkred", "darkorange2", "lightcoral", "salmon", "ivory", "wheat3",
-  "burlywood4", "sienna", "goldenrod2", "yellow2", "darkseagreen2",
-  "springgreen3", "seagreen4", "violetred", "lavender", "thistle3",
-  "lightcoral", "magenta3", "mediumorchid",
-  "black", "gray45", "gray75", "gray95", "white")
+  "#96AAC3", "dodgerblue3", "cornflowerblue", "steelblue", "darkblue",
+  "pink2", "red3", "firebrick2", "darkred",
+  "violetred", "mediumorchid", "purple3",
+  "darkorange2", "salmon", "orange3", "sienna", "rosybrown", 
+  "wheat3", "goldenrod2", "khaki", "yellow2",
+  "darkseagreen2", "springgreen3", "seagreen4", "darkgreen",
+  "black", "gray45", "slategray4", "gray75", "snow3", "gray95",
+  "lavender", "ivory2", "aliceblue", "white")
 
-clr.edge <- list("off", "black", "gray50", "gray75", "white", 
-  "darkblue", "darkred", "darkgreen", "rosybrown2", "slategray2", "thistle1",
-  "coral", "gold", "ivory")
+clr.edge <- list("off", "black", "gray50", "gray75", "white", "ivory", 
+  "darkblue", "darkred", "darkgreen", "rosybrown2", "bisque", 
+  "slategray2", "aliceblue", "thistle1", "coral", "gold")
+
+clr.qual <- list("reds", "rusts", "browns", "olives", "greens",
+  "emeralds", "turquoises", "aquas", "blues", "purples", "violets",
+  "magentas", "grays")
 
 clr.hole <- list("white", "gray75", "gray95", "gray98", "aliceblue", 
   "antiquewhite", "ghostwhite", "whitesmoke", "ivory", "mintcream", 
   "mistyrose", "azure1", "seashell", 
   "beige", "cornsilk", "darkblue", "darkred", "darkgreen")
 
-clr.qual <- list("reds", "rusts", "browns", "olives", "greens",
-  "emeralds", "turquoises", "aquas", "blues", "purples", "violets",
-  "magentas", "grays")
+
+addResourcePath("shiny_dir", system.file("shiny_apps", package="lessR"))
 
 
 ui <- fluidPage(
-  tags$style(type='text/css', "
-             label {font-size: 1em; font-weight: bold;}           
-             hr {border-top: .10em solid #8f8f8f;}
-             .nav-tabs {font-size: 1.1em;}
-             .checkbox label {font-weight: bold;}
-             .soft {margin-bottom:.25em; font-size:1em; font-style:italic;}
-             .hp {color:#808080; font-size: .5em;}
-             .head {font-size:.85em; margin-top: -1em; color:#8f8f8f}
-             "),
-
-  titlePanel("Analysis"),
+tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
 
   tabsetPanel(
+
     tabPanel("Data",
-      headerPanel(div("Upload a text (.csv, .txt) or Excel file", class="hp")),
+      titlePanel(div("Upload a text (.csv, .txt) or Excel file", id="hp")),
 
       sidebarLayout(
         sidebarPanel(
-          radioButtons("fType", "Format", c("Excel"="Excel", "Text"="Text")),
+
+          radioButtons("fType", HTML("<h5 class='soft'>Format</h5>"), 
+                       c("Excel"="Excel", "Text"="Text")),
           conditionalPanel(condition="input.fType == 'Text'",
             radioButtons("sep", HTML("<h5 class='soft'>Separator</h5>"),
                          c(Comma=",", Semicolon=";", Tab="\t"), ","),
             radioButtons("decimal", HTML("<h5 class='soft'>Decimal</h5>"),
                          c("Point"=".", "Comma"=",")),
-            tags$br()
           ),
 
-          radioButtons("fSource", "Source", c("local"="local", "web"="web")),
+          radioButtons("fSource", HTML("<h5 class='soft'>Source</h5>"), 
+                       c("Local"="local", "Web"="web")),
           conditionalPanel(condition="input.fSource == 'local'",
             fileInput("myFile", "Locate your data file",
-                      accept=c(".csv", ".txt", ".xlsx", ".xlsm"))
+                      accept=c(".csv", ".txt", ".xlsx", ".xlsm")),
           ),
           conditionalPanel(condition="input.fSource == 'web'",
-            textInput("myURL", "web address"),
+            textInput("myURL", "Web address of data file"),
             actionButton("submitURL", "Submit")
           ),
 
-          textOutput("nrows"),
           textOutput("ncols"),
-          tags$br(),
-          radioButtons("show", "Rows to display",
-                       c("First 10"="head", "Last 10"="tail", "All"="all"))
+          textOutput("nrows"),
+          uiOutput("d.radio"),
 
         ),  # end sidbarPanel
 
         mainPanel(
-          tableOutput("contents"),
-          tags$style(type="text/css", "#contents {font-size: .95em;}")
+          tableOutput("d.table"),
+          tags$style(type="text/css", "#d.table {font-size: .95em;}")
         )
 
       )  # end sidbarLayout
@@ -85,36 +81,34 @@ ui <- fluidPage(
 
     tabPanel("PieChart",
       pageWithSidebar(
-        headerPanel(div("Pie Chart", class="hp")),
+        titlePanel(""),
 
         sidebarPanel(
           selectInput('x.col', 'x Variable', ""),
 
           tags$hr(),
-          h4(div("Colors", class="head")),
-          checkboxInput("do_geom", "view options", FALSE),
+          checkboxInput("do_geom", div("Colors", class="view"), FALSE),
           conditionalPanel(condition="input.do_geom == true",
             selectInput("myFill", "fill",
               choices=list("Qualitative"=list("hues"), "Sequential"=clr.qual)),
             selectInput("myColor", label="color", choices=clr.edge),
-            sliderInput("myTrans", label="trans", min=0, max=1, value=0),
+            sliderInput("myTrans", label="transparency", min=0, max=1, value=0),
           ),
 
           tags$hr(),
-          h4(div("Hole", class="head")),
-          checkboxInput("do_hole", "view options", FALSE),
+          checkboxInput("do_hole", div("Hole", class="view"), FALSE),
           conditionalPanel(condition="input.do_hole == true",
             sliderInput("myHole", "hole", min=0, max=1, value=0.65),
             selectInput("myHoleFill", label="hole_fill", choices=clr.hole),
           ),
 
           tags$hr(),
-          h4(div("Values Display", class="head")),
-          checkboxInput("do_values", "view options", FALSE),
+          checkboxInput("do_values", div("Values", class="view"), FALSE),
           conditionalPanel(condition="input.do_values == true",
             selectInput("myValues", "values", choices=list("%", "input", "off")),
             selectInput("myValuesColor", "values_color",
-               choices=list("white", "gray", "darkgray", "black", "red", "green3")),
+               choices=list("white", "gray", "darkgray", "black",
+                            "red", "green3")),
             selectInput("myValuesPos", "values_position",
                choices=list("in", "out")),
             sliderInput("myValuesSize", "values_size",
@@ -122,8 +116,7 @@ ui <- fluidPage(
           ),
 
           tags$hr(),
-          h4(div("Save", class="head")),
-          checkboxInput("do_pdf", "set up", FALSE),
+          checkboxInput("do_pdf", div("Save", class="view"), FALSE),
           conditionalPanel(condition="input.do_pdf == true",
             sliderInput("w", "width (inches):", min=3, max=20, value=8),
             sliderInput("h", "height (inches):", min=3, max=20, value=6),
@@ -131,13 +124,18 @@ ui <- fluidPage(
             actionButton(inputId="btn_pdf", "Save"),
             tags$p(div("Save pdf file and R code file",
                   style="margin-top:.25em;"))
-          )
+          ),
+
+          tags$hr(),
+          checkboxInput("do_help", div("Help", class="view"), FALSE),
+
         ),  # end sidebarPanel
 
       mainPanel(
-        plotOutput('myPlot'),
+        plotOutput("myPlot"),
         verbatimTextOutput("summary"),
-        plotOutput("saved_plot") 
+        plotOutput("saved_plot"), 
+        textOutput("help")
       )
 
     )  # end pageWithSidebar
@@ -148,7 +146,34 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
-  vals <- reactiveValues()
+  v <- reactiveValues()
+  # select categorical variables from read data frame
+
+  the.vars <- function(data, cats=TRUE) {
+
+    lu.x <- sapply(data, function(x) { length(unique(x)) }) 
+    is.cat <- logical(length=ncol(data))
+    nr <- min(nrow(data), 500)
+    for (i in 1:ncol(data)) {
+      is.cat[i] <- is.character(data[1:nr,i]) || is.factor(data[1:nr,i])
+      # numeric var is.cat if 10 or less unique values but not a summary tbl
+      if (is.numeric(data[1:nr,i]) && lu.x[i]<11)
+        if (nrow(data)>lu.x[i] && ncol(data)>2) is.cat[i] <- TRUE 
+    }
+
+    if (all(!is.cat)) {
+      message("A pie chart displays the values of a categorical variable.\n",
+              "Categorical variables have non-numeric values or, if numeric,\n",
+              "  defined here as 10 or fewer unique values.\n\n",
+              "There are no categorical variables in this data set.")
+      stopApp()
+    }
+
+    if (cats)
+      return(names(data)[is.cat])
+    else
+      return(names(data)[!is.cat])
+  }
 
 
 # ------- Read and Display Data -----------
@@ -163,14 +188,14 @@ server <- function(input, output, session) {
     if (input$fSource == "local") {
       shiny::req("input$myFile")
       myPath <- input$myFile$datapath
-      vals$theRead <- input$myFile$name
+      theRead <- input$myFile$name
     }
     if (input$fSource == "web") {
       url <- theURL()
       if (!(grepl("http://", url)))
         url <- paste("http://", url, sep="")
       myPath <- url
-       vals$theRead <- myPath
+       theRead <- myPath
     }
       
     shiny::req(myPath)
@@ -180,67 +205,72 @@ server <- function(input, output, session) {
         d <- read.xlsx(myPath)
       }
       else {
-        message("Excel file must have file type of .xlsx")
+        message("\n>>> Excel file must have file type of .xlsx <<<\n\n")
         stopApp()
       }
     }
       if (input$fType == "Text") { 
         if ((grepl(".csv", myPath, fixed=TRUE)) ||
             (grepl(".txt", myPath, fixed=TRUE))) {
-            d <- read.csv(myPath, sep=input$sep, dec=input$decimal)
+            d <- read.csv(myPath, sep=input$sep, dec=input$decimal,
+                          na.strings="")  # default is NOT a blank char missing
         }
         else {
-          message("Text file must have file type of .csv or .txt")
+          message("\n>>> Text file must have file type of .csv or .txt <<<\n\n")
           stopApp()
         }       
       }  # end fType is "Text"
 
-    is.cat <- sapply(d, function(x) {
-      lu.x <- length(unique(x))
-      x.char <- (is.character(x) || is.factor(x) || lu.x<11) && (lu.x<nrow(d))
-    })
-
-    if (all(!is.cat)) {
-      message("A pie chart displays the values of a categorical variable.\n",
-              "Categorical variables have non-numeric values or, if numeric,\n",
-              "  defined here as 10 or fewer unique values.\n\n",
-              "There are no categorical variables in this data set.")
-      stopApp()
-    }
-    the.cats <- names(d)[is.cat]
-
     updateSelectInput(session, inputId="x.col", label="x variable",
                       choices=c("Select a categorical variable" = "",
-                              names(d)[is.cat]))
-    
-    output$nrows <- renderText({paste("Number of rows of data:", nrow(d))})
-    output$ncols <- renderText({paste("Number of variables:", ncol(d))})
-
+                              the.vars(d, cats=TRUE)))
     return(d)
   })  # end reactive()
 
 
-  output$contents <- renderTable({
-    if (input$show == "all")
+  output$d.radio <- renderUI({
+    shiny::req(data())
+    output$nrows <- renderText({paste("Number of data rows:", nrow(data()))})
+    output$ncols <- renderText({paste("Number of variables:", ncol(data()))})
+    if (nrow(data()) > 10)
+      radioButtons("d.radio", HTML("<h5 class='soft'>Rows to display</h5>"),
+                   c("First 10"="head", "Last 10"="tail", "Random 10"="random",
+                     "All"="all"))
+  })
+
+  output$d.table <- renderTable({
+    if (is.null(input$d.radio)) 
       data()
-    else if (input$show == "head")
-      head(data(), n=10)
-    else if (input$show == "tail")
-      tail(data(), n=10)
-  })  # end renderTable
+    else {
+      nr <- min(11, nrow(data()))
+      if (nr == 11) {
+        if (input$d.radio == "all")
+          data()
+        else if (input$d.radio == "head")
+          head(data(), n=10)
+        else if (input$d.radio == "tail")
+          tail(data(), n=10)
+        else if (input$d.radio == "random") { 
+          dd <- data()
+          dd[.(random(10)), ]
+        }
+      }
+    }
+  }, striped=TRUE)  # end renderTable
+
 
 
 # ------------- The PieChart --------------
 # -----------------------------------------
 
   output$myPlot <- renderPlot({
-
     x.name <- input$x.col
     shiny::req(x.name)
     x <- data()[, x.name]
-     
-   vals$p <- PieChart(x, data=NULL,
-        fill=input$myFill, color=input$myColor, trans=input$myTrans,
+    # no summary table possible because that requires a y-variable
+
+   v$p <- PieChart(x, data=NULL,
+        fill=input$myFill, color=input$myColor, transparency=input$myTrans,
         hole=input$myHole, hole_fill=input$myHoleFill,
         values=input$myValues, values_color=input$myValuesColor,
         values_position=input$myValuesPos,
@@ -262,7 +292,7 @@ server <- function(input, output, session) {
 
       if (!p_fill) out <- paste(out, ", fill=\"", input$myFill, "\"", sep="")
       if (!p_color) out <- paste(out, ", color=\"", input$myColor, "\"", sep="")
-      if (!p_trans) out <- paste(out, ", trans=", input$myTrans, sep="")
+      if (!p_trans) out <- paste(out, ", transparency=", input$myTrans, sep="")
       if (!p_hole) out <- paste(out, ", hole=", input$myHole, sep="")
       if (!p_holefill) out <- paste(out, ", hole_fill=\"", 
                                         input$myHoleFill, "\"", sep="")
@@ -277,21 +307,23 @@ server <- function(input, output, session) {
 
       out <- paste(out, ")", sep="")
       cat(out, "\n")
-      vals$code <- out  # save the code for a pdf file
+      v$code <- out  # save the code for a pdf file
   })  # end renderPlot
+
 
   # print stats
   output$summary <- renderPrint({
-    shiny::req(vals$p)
-    p <- vals$p
+    shiny::req(v$p)
+    p <- v$p
     out2 <- c(p$out_txttl, " ", p$out_counts, " ", p$out_chi)
     for (i in 1:length(out2)) cat(out2[i], "\n")
   })
 
+
   # clicking on the Save button generates a pdf file 
   plotInput <- eventReactive(input$btn_pdf, {
 
-    code <- vals$code
+    code <- v$code
 
     x.name <- input$x.col
     shiny::req(x.name)
@@ -302,7 +334,7 @@ server <- function(input, output, session) {
     pdf.path <- file.path(path.expand("~"), pdf.fname)
 
    PieChart(x, data=NULL,
-        fill=input$myFill, color=input$myColor, trans=input$myTrans,
+        fill=input$myFill, color=input$myColor, transparency=input$myTrans,
         hole=input$myHole, hole_fill=input$myHoleFill,
         values=input$myValues, values_color=input$myValuesColor,
         values_position=input$myValuesPos,
@@ -323,47 +355,63 @@ server <- function(input, output, session) {
     message("---------------------------------------------")
     cat("\n")
 
-
-    if (input$do_cmt) {
-      cat("# The first line of any R/lessR session is always\n",
-          "library(\"lessR\")\n# Next read your data into R, then analysis\n\n",
-          file=r.path)
+    if (input$fSource == "web") {
+      url <- theURL()
+      if (!(grepl("http://", url)))
+        url <- paste("http://", url, sep="")
     }
-    read.path <- vals$theRead
-    txt <- ifelse (input$myRows, ", row_names=1", "")
-    read.code <- paste("d <- Read(\"", read.path, "\"", txt, ")", sep="")
+
+    read.path <- ifelse (input$fSource == "local", input$myFile$name, url)
+    read.code <- paste("d <- Read(\"", read.path, "\")", sep="")
     is.local <- !grepl("http://", read.path, fixed=TRUE)
-    if (is.local && input$do_cmt) {
-      read.path <- file.path("PATHtoFILE", read.path) 
-      read.code <- paste("d <- Read(\"", read.path, "\"", txt, ")", sep="")
-      cat("# For security, the path to your data file is",
-          "not available here\n", file=r.path, append=TRUE)
-      cat("# Either browse for the data file, with nothing",
-          "between the quotes,\n", file=r.path, append=TRUE)
-      cat("# or replace PATHtoFILE with the actual path\n\n",
-          file=r.path, append=TRUE)
-    }
-    cat("d <- Read(\"\")\n", file=r.path, append=(is.local && input$do_cmt))
-    if (is.local  &&  input$do_cmt) {
-      cat("#       or\n", file=r.path, append=TRUE)
-      cat(read.code, "\n\n", file=r.path, append=TRUE)
-    }
-    if (input$do_cmt) {
-      cat("# d is the default data frame name, otherwise\n", 
-          file=r.path, append=TRUE)
-      cat("# if reading into a data frame, with the specified name, add: ",
-          "data=\n\n", file=r.path, append=TRUE)
-    }
-    cat(code, "\n", file=r.path, append=TRUE)
-    if (input$do_cmt) {
-      cat("#       or\n", file=r.path, append=TRUE)
-      new.code <- sub(")", "", code, fixed=TRUE)
-      new.code <- paste(new.code, ", data=NAME)\n", sep="")
-      cat(new.code, file=r.path, append=TRUE)
-    }
 
+    if (input$do_cmt)
+      cat("# The pound sign, #, indicates a comment, not part of R coding\n\n",
+          "# Begin a R/lessR session by loading the lessR functions ",
+          "from the library\n", sep="", file=r.path)
+      cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
+
+    if (input$do_cmt) {
+      cat("# Now read your data into an R data table, the data frame, here d",
+          "\n", sep="", file=r.path, append=TRUE)
+      if (is.local)
+        cat("# To browse for the data file, include nothing between the quotes",
+            "\n", sep="", file=r.path, append=TRUE)
+    }
+    if (is.local && input$do_cmt)
+      cat("d <- Read(\"\")\n\n", file=r.path, append=TRUE)
+
+    if (is.local && input$do_cmt) {
+      cat("# For security, the path to your data file is not made available\n",
+          "# Another option replaces PATHtoFILE in the following with the path\n",
+          "# Remove the # sign in the first column and delete the previous ",
+          "Read()\n", sep="", file=r.path, append=TRUE)
+      read.path <- file.path("PATHtoFILE", read.path) 
+      read.code <- paste("# d <- Read(\"", read.path, "\")", sep="")
+    }
+    cat(read.code, "\n\n", file=r.path, append=TRUE)
+
+    if (input$do_cmt)
+      cat("# Create the pie chart and accompanying statistical analysis\n",
+          "# d is the default data frame name, so no need to specify\n",
+          sep="", file=r.path, append=TRUE)
+    cat(code, "\n\n", file=r.path, append=TRUE)
+
+    anlys <- "PieChart()"
+    if (input$do_cmt)
+      cat("# If accessing data with a name other than d, must add  data=NAME\n",
+          paste("#   to the", anlys, "call, where NAME is the name of your",
+          "data frame"), "\n", sep="", file=r.path, append=TRUE)
   })
   output$saved_plot <- renderPlot({ plotInput() })
+
+
+  # access web page help file
+  output$help <- eventReactive(input$do_help, {
+    shiny::req(input$do_help)
+    fp <- system.file("shiny_apps/help/PieChart.html", package="lessR")
+    browseURL(fp)
+  })
 
 }  # end server
 

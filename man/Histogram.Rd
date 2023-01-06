@@ -27,7 +27,7 @@ Histogram(x=NULL, data=d, rows=NULL,
     theme=getOption("theme"),
     fill=getOption("bar_fill_cont"),
     color=getOption("bar_color_cont"),
-    trans=getOption("trans_bar_fill"),
+    transparency=getOption("trans_bar_fill"),
 
     values=FALSE,
     reg="snow2", cumulate=c("off", "on", "both"),
@@ -128,7 +128,7 @@ hs(\dots)
   \item{color}{Border color of the bars, can be a vector
         to customize the color for each bar. Default is
         \code{bar_color} from the lessR \code{\link{style}} function.}
-  \item{trans}{Transparency factor of the area of each slice.
+  \item{transparency}{Transparency factor of the area of each slice.
         Default is
         \code{trans_bar_fill} from the lessR \code{\link{style}} function.}\cr
 
@@ -136,7 +136,8 @@ hs(\dots)
        definitions in R. Specifies to display the count of each bin.}
   \item{reg}{The color of the superimposed, regular histogram when
         \code{cumulate="both"}.}
-  \item{cumulate}{Specify a cumulative histogram. The value of \code{"on"} displays the 
+  \item{cumulate}{Specify a cumulative histogram. The value of \code{"on"}
+        displays the 
         cumulative histogram, with default of \code{"off"}. The value of
         \code{"both"} superimposes the regular histogram.}\cr
 
@@ -175,8 +176,9 @@ hs(\dots)
         estimate.}
   \item{show_histogram}{When \code{density} is \code{TRUE}, plot a histogram
        behind the density curve.}
-  \item{bandwidth}{Bandwidth of kernel density estimation. Initial value
-       is "nrd0", but unless
+  \item{bandwidth}{Bandwidth of kernel density estimation, which determines the
+       smoothness of the resulting density curve, larger values yield more
+       smooth curves. Initial value is "nrd0", but unless
        specified, may be automatically iterated upward to create a
        smoother curve.}
   \item{type}{Type of density curve plotted.  By default, the general
@@ -196,8 +198,8 @@ hs(\dots)
         around illustrating the corresponding area under the general density curve.
         Only applies when requesting \code{type=general}.}
   \item{y_axis}{Specifies if the y-axis, the density axis, should be included.}
-  \item{rug}{If \code{TRUE}, add a rug plot, a direct display of density in the
-        form of a narrow band beneath the density curve.}
+  \item{rug}{If \code{TRUE}, add a rug plot, a direct display of density as a
+       narrow band beneath the density curve.}
   \item{color_rug}{Color of the rug ticks.}
   \item{size_rug}{Line width of the rug ticks.}\cr
 
@@ -365,7 +367,7 @@ style(panel_fill="black", fill="red", panel_color="black")
 Histogram(Salary)
 # or use a lessR pre-defined sequential color palette
 #   with some transparency
-Histogram(Salary, fill="rusts", color="brown", trans=.1)
+Histogram(Salary, fill="rusts", color="brown", transparency=.1)
 
 # histogram with purple color theme, translucent gold bars
 style("purple", sub_theme="black")

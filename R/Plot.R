@@ -8,7 +8,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          theme=getOption("theme"),
          fill=NULL,
          color=NULL,
-         trans=getOption("trans_pt_fill"),
+         transparency=getOption("trans_pt_fill"),
 
          size=NULL, size_cut=NULL, shape="circle", means=TRUE,
          sort_yx=c("0", "-", "+"), 
@@ -91,6 +91,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   if (!is.null(add)) if ("h.line" %in% add[1])  add[1] <- "h_line"
   if (!is.null(add)) if ("v.line" %in% add[1])  add[1] <- "v_line"
 
+  trans <- transparency
 
   # Note: stat is both object (dot plot) and statistic   
    
@@ -182,7 +183,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # missing function only reliable if arg not modified, so capture 
   x.miss <- ifelse (missing(x), TRUE, FALSE)
   y.miss <- ifelse (missing(y), TRUE, FALSE)
-  by.miss <- ifelse (missing(by), TRUE, FALSE)
+  by.miss <- ifelse (missing(by), TRUE, FALSE)  # interact sets
   by1.miss <- ifelse (missing(by1), TRUE, FALSE)
   by2.miss <- ifelse (missing(by2), TRUE, FALSE)
   size.miss <- ifelse (missing(size), TRUE, FALSE)
@@ -305,6 +306,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   .plt.bad(x.miss, y.miss, stat, breaks, bin_start, n_row, n_col,
            MD_cut, out_cut, fit_se, ...)
 
+  # if x is in a data frame, then in the function call it is a name
+  # if x is in global, then in the function its name is a variable direct
 
   # --------- data frame stuff
   
@@ -471,7 +474,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (!date.ts) {
       nu <- length(unique(na.omit(x.call[,1])))
       num.cat.x <- .is.num.cat(x.call[,1], n_cat)  # small num of int values
-      if (jitter_x > 0) num.cat.x <- FALSE
+      if (!is.null(jitter_x)) if (jitter_x > 0) num.cat.x <- FALSE
     }
     else {  # process ts
       nu <- length(unique(x.call[,1]))
@@ -581,7 +584,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       if (is.null(ylab)) ylab <- ""  # unless specified, drop the axis label
       cat.y <- TRUE
       data.y <- data.frame(y.call)
-      #data.y <- data.frame(y.call, stringsAsFactors=TRUE)
     }
       
     # y not in global env, in df, specify data= forces to data frame
@@ -726,27 +728,32 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   # evaluate by
   #------------
+  # cannot directly evaluate is.null(by) if by is present as a variable
+  # so instead process as below to either get by.call or it is NULL
+  # can get by.name
 
   do.by <- TRUE
   if (by.miss)
     do.by <- FALSE
   else {
     by.name <- deparse(substitute(by))
-    if (by.name == "NULL") do.by <- FALSE  # specified by=NULL in call
-    in.global <- ifelse (df.name!="NULL", .in.global(by.name, quiet), TRUE)
-    if (in.global) if (is.null(by)) do.by <- FALSE
+    if (by.name == "NULL")
+      do.by <- FALSE  # specified by=NULL in call, including shiny
+    by.in.global <- ifelse (df.name!="NULL", .in.global(by.name, quiet), TRUE)
+    if (by.in.global) if (is.null(by))
+      do.by <- FALSE
   }
 
   if (do.by)  {
     options(byname = by.name)
   
     # see if var exists in data frame, if x not in global Env or function call
-    if (!missing(x) && !in.global)
+    if (!missing(x) && !by.in.global)
       .xcheck(by.name, df.name, names(data))
 
-    if (!in.global) {
+    if (!by.in.global) {  # get the variable's values from data frame col(s)
       data.vars <- as.list(seq_along(data))  # even if only a single var
-      names(data.vars) <- names(data)  # all data in data frame
+      names(data.vars) <- names(data)  # all var names in data frame
       by.col <- eval(substitute(by), envir=data.vars)  # col num selected vars
       by.call <- data[, by.col]
     }
@@ -755,13 +762,17 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       if (is.function(by.call)) by.call <- eval(substitute(data$by))
     }
 
-    if (!is.factor(by.call)) by.call <- factor(by.call)  # make a factor
+   # need by to be a factor
+   # .plt.by.legend, plt.main #818, needs levels(by)
+    if (!is.factor(by.call)) by.call <- factor(by.call) 
   }
 
-  else
+  else {
     by.call <- NULL
+    by.miss <- TRUE  # just need is.null(by.call) from here forward
+  }
 
-  n.by <- ifelse (by.miss, 0, nlevels(by.call))
+  n.by <- ifelse (is.null(by.call), 0, nlevels(by.call))
 
   
   # evaluate by1
@@ -787,16 +798,19 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       if (is.function(by1.call)) by1.call <- eval(substitute(data$by1))
     }
 
-    if (!is.null(by1.call)) if (!is.factor(by1.call)) by1.call <- factor(by1.call)
+    if (!is.null(by1.call)) {
+      if (!is.factor(by1.call)) by1.call <- factor(by1.call)
+    }
+    else
+      by1.miss <- TRUE
   }
 
-  else
+  else {
    by1.call <- NULL
+   by1.miss <- TRUE
+  }
 
-   if (is.null(by1.call)) by1.miss <- TRUE
-
-# if (!MD.miss && (!by.miss || !by1.miss)) {
-  if (MD_cut > 0 && (!by.miss || !by1.miss)) {
+  if (MD_cut > 0 && (!is.null(by.call) || !by1.miss)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Outlier analysis works only with no  by  or  by1  groups\n\n")
   }
@@ -826,14 +840,15 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (!is.factor(by2.call)) by2.call <- factor(by2.call)
   }
 
-  else
+  else {
    by2.call <- NULL
+   by2.miss <- TRUE
+  }
 
 
 
   # evaluate size (NULL, numeric constant, or a variable)
   #--------------
-
 
   if (!size.miss) {
     size.name <- deparse(substitute(size))
@@ -879,26 +894,41 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # evaluate ID 
   #------------
   get.ID <- FALSE
-  if (y.miss && !cat.x) get.ID <- TRUE  # VBS plot 
+# if (y.miss && !cat.x) get.ID <- TRUE  # VBS plot 
   if (!is.null(add)) if (add[1] == "labels") get.ID <- TRUE 
-  if (!y.miss) if (MD_cut>0 || out_cut>0)  # 3.9.4 set TRUE for cat
+  if (!y.miss) if (MD_cut>0 || out_cut>0)
     get.ID <- TRUE 
-  ID.name <- noquote(deparse(substitute(ID)))  # puts quotes around the name
-  ID.name <- gsub("\"", "", ID.name)
-  if (get.ID) {
-    if (ID.name == "row.name") {
-      if (df.name %in% ls(name=.GlobalEnv)  &&  !x.in.global)
-        ID.call <- factor(row.names(data), levels=row.names(data))
-      else
-        ID.call <- 1:nrows
-    }
 
-    else {  # allow a specified variable in data table to be the ID
+  if (get.ID) {
+    # ID.name is the actual var name if specified directly,
+    #  or the name of the var that contains the var name
+    ID.name <- deparse(substitute(ID)) 
+    ID.name <- gsub("\"", "", ID.name)  # remove extra quotes if "row.name"
+    if (ID.name == "row.names") ID.name <- "row.name"
+    if (!x.in.global) {
+  # if x is in a data frame, then in the function call it is a name
+  # if x is in global, then in the function its name is a variable direct
+  # ID.col is the actual var column if specified directly,
+  #  or the var name if a variable that contains the name was entered
+      if (ID.name != "row.name") {
+        ID.col <- eval(substitute(ID), envir=data.vars, parent.frame())
+        if (!is.numeric(ID.col)) {
+          ID.col <- which(names(data) == ID.col)
+          ID.name <- names(data)[ID.col]
+        }
       .xcheck(ID.name, df.name, names(data))  # var exists in data frame?
-      ID.call <- eval(substitute(data$ID))
+      ID.call <- data[, ID.col]
+      }  # end not row.name
+      else
+        ID.call <- 1:nrow(data)
+    } # end x.in.global
+
+    else {
+      ID.call <- eval(substitute(ID), parent.frame()) 
     }
-  }
-  else
+  }  # end get.ID
+
+  else  # no ID to get
     ID.call <- NULL
 
 
@@ -961,7 +991,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   }
 
   if (is.null(width)) width <- 6
-  if (!by.miss) width <- width + .85  # wider plot  
+  if (!is.null(by.call)) width <- width + .85  # wider plot  
 
 
   # --------
@@ -1784,10 +1814,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
             tx <- character(length = 0)
             tx[length(tx)+1] <- "Some Parameter values (can be manually set)"
             tx[length(tx)+1] <- .dash2(55)
-            tx[length(tx)+1] <- paste("fill:", pnt.f,
-                "  filled color of the points")
-            tx[length(tx)+1] <- paste("color:", pnt.c,
-                " edge color of the points")
             tx[length(tx)+1] <- paste("size:", .fmt(pt.size,2),
                 " size of plotted points")
             tx[length(tx)+1] <- paste("jitter_y:", .fmt(jitter_y,2),
@@ -1801,12 +1827,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
             tx <- character(length = 0)
             tx[length(tx)+1] <- "Some Parameter values (can be manually set)"
             tx[length(tx)+1] <- .dash2(55)
-            tx[length(tx)+1] <- paste("fill:", pt.fill,
-                "  filled color of the points")
-            tx[length(tx)+1] <- paste("color:", pt.color,
-                " edge color of the points")
             tx[length(tx)+1] <- paste("radius:", .fmt(radius,2),
-                "       size of largest bubble")
+                "   size of largest bubble")
             tx[length(tx)+1] <- paste("power:", .fmt(power,2),
                 "    relative bubble sizes")
             txprm <- tx
