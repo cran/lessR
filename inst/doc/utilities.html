@@ -495,7 +495,7 @@ row names is also possible.</p>
 set, here just the first 12 rows of data to save space.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d[<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>,]</span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Sort</span>(d, Gender)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">sort_by</span>(d, Gender)</span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
 ## Ritchie, Darnell     7      M ADMN  53788.26    med    1  82   92
@@ -510,7 +510,7 @@ set, here just the first 12 rows of data to save space.</p>
 ## Kimball, Claire      8      W MKTG  61356.69   high    2  93   92
 ## Cooper, Lindsay      4      W MKTG  56772.95   high    1  78   91
 ## Saechao, Suzanne     8      W SALE  55545.25    med    1  98  100</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Sort</span>(d, <span class="fu">c</span>(Gender, Salary), <span class="at">direction=</span><span class="fu">c</span>(<span class="st">&quot;+&quot;</span>, <span class="st">&quot;-&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">sort_by</span>(d, <span class="fu">c</span>(Gender, Salary), <span class="at">direction=</span><span class="fu">c</span>(<span class="st">&quot;+&quot;</span>, <span class="st">&quot;-&quot;</span>))</span></code></pre></div>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
 ## Hoang, Binh         15      M SALE 111074.86    low    3  96   97
@@ -526,7 +526,7 @@ set, here just the first 12 rows of data to save space.</p>
 ## Saechao, Suzanne     8      W SALE  55545.25    med    1  98  100
 ## Jones, Alissa        5      W &lt;NA&gt;  53772.58   &lt;NA&gt;    1  65   62</code></pre>
 <p>Sort by row names in ascending order.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Sort</span>(d, row.names)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">sort_by</span>(d, row.names)</span></code></pre></div>
 <pre><code>##   row.names --&gt;  ascending</code></pre>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
@@ -543,7 +543,7 @@ set, here just the first 12 rows of data to save space.</p>
 ## Saechao, Suzanne     8      W SALE  55545.25    med    1  98  100
 ## Wu, James           NA      M SALE  94494.58    low    1  62   74</code></pre>
 <p>Randomize the order of the data values.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Sort</span>(d, random)</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">sort_by</span>(d, random)</span></code></pre></div>
 <pre><code>##   random</code></pre>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post

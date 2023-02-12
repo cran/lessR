@@ -115,9 +115,10 @@ Separated from the rest of the text output are the major headings, which can the
 STATISTICS\cr
 \code{call}: function call that generated the analysis\cr
 \code{formula}: model formula that specifies the model\cr
-\code{n.vars}: number of variables in the model\cr
-\code{n.obs}: number of rows of data submitted for analysis\cr
-\code{n.keep}: number of rows of data retained in the analysis\cr
+\code{n_vars}: number of variables in the model\cr
+\code{n_obs}: number of rows of data submitted for analysis\cr
+\code{n_keep}: number of rows of data retained in the analysis\cr
+1-predictor: \code{p_value}: p-value for the overall F-test
 \code{residuals}: residuals\cr
 \code{fitted}: fitted values\cr
 
@@ -126,7 +127,7 @@ Although not typically needed for analysis, if the output is assigned to an obje
 
 
 \references{
-Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 7, NY: Routledge.
+Gerbing, D. W. (2023). \emph{R Data Analysis without Programming: Explanation and Interpretation}, 2nd edition, Chapters 8 and 9, NY: Routledge.
 
 Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871. 
 }

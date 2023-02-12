@@ -1,6 +1,6 @@
 getColors <-
 function(pal=NULL, end_pal=NULL,
-         n=12, h=0, h2=NULL, c=NULL, l=NULL, trans=0,
+         n=12, h=0, h2=NULL, c=NULL, l=NULL, transparency=0,
          in_order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
          main=NULL, labels=NULL, labels_cex=0.8, lty="solid",
@@ -42,7 +42,7 @@ function(pal=NULL, end_pal=NULL,
        "  so in_order must be TRUE\n\n")
   }
 
-  if (border == "off") border <- NA
+  if (border %in% c("off", "transparent")) border <- NA
 
   # default color scale
   ln.c <- length(c)
@@ -59,11 +59,14 @@ function(pal=NULL, end_pal=NULL,
   if (!is.null(end_pal))
     if (end_pal == "yellows") end_pal <- "browns"
 
+  if (!missing(pal)) if (pal[1] == "magma") pal[1] <- "plasma"  # approx magma
+
   nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",  
           "turquoises", "aquas", "blues", "purples", "violets",
           "magentas", "grays")
   nmR <- c("rainbow", "heat", "terrain")
-  nmV<- c("viridis", "cividis", "magma", "inferno", "plasma")
+  nmV<- c("viridis", "cividis", "plasma", "spectral")
+  nmO<- c("Okabe-Ito")
   nmD<- c("distinct")
   nmW<- c("BottleRocket1", "BottleRocket2", "Rushmore1", "Rushmore",
           "Royal1", "Royal2", "Zissou1", "Darjeeling1", "Darjeeling2",
@@ -72,8 +75,8 @@ function(pal=NULL, end_pal=NULL,
           "IsleofDogs1", "IsleofDogs2")
 
 
-  # set kind of analysis: qualitative, sequential, divergent,  or manual
-  # ---------------------------------------------------------------------
+  # set kind of analysis: qualitative, sequential, divergent, or manual
+  # -------------------------------------------------------------------
 
   if (!is.null(pal)) {  # at least one color specified
       if (pal[1] %in% nm) {
@@ -87,6 +90,8 @@ function(pal=NULL, end_pal=NULL,
       kind <- "qualitative"
     else if (pal[1] %in% nmV)
       kind <- "viridis"
+    else if (pal[1] %in% nmO)
+      kind <- "oi"
     else if (pal[1] %in% nmW)
       kind <- "wes"
     else if (pal[1] %in% nmD)
@@ -172,7 +177,7 @@ function(pal=NULL, end_pal=NULL,
     if (n <= 24) {
       if (!in_order) { # mixed hues
         h <- c(240,60,120,0,275,180,30,90,210,330,150,300)
-        h <- c(h, h+15)
+        h <- c(h, h+15)  # can do 12+15=27 unique colors
       }
       else  # in_order
         h <- seq(h, h2, length=n)  # vary hue systematically 
@@ -238,7 +243,7 @@ function(pal=NULL, end_pal=NULL,
       txt.l <- paste(txt.l, " to ", .fmt(l[2],0), sep="")
 
     if (is.null(power)) power <- 0.75
-    pal <- diverge_hcl(n, h=h, c=c, l=l, power=power,
+    pal <- colorspace::diverging_hcl(n, h=h, c=c, l=l, power=power,
                        fixup=fixup, alpha=1)
     ttl <- paste("Divergent Colors for\n", "h=", txt.h,
                   ", c=", txt.c, ",  l=", txt.l, sep="")
@@ -246,9 +251,24 @@ function(pal=NULL, end_pal=NULL,
 
   # viridis sequence
   else if (kind == "viridis") {
-    ttl <- paste("A viridis Color Palette for:", pal[1], "\n") 
-    fn <-  paste(pal[1], "(", n, ")", sep="")
-    pal <- eval(parse(text=fn))
+    ttl <- paste("Viridis Style Color Palette for:", pal[1], "\n") 
+    pal <- hcl.colors(n, palette = pal[1])
+  }
+
+# Okabe-Ito colors
+  else if (kind == "oi") {
+    ttl <- paste("Okabe-Ito Colors Palette", pal[1], "\n") 
+    pal <- pal <- palette.colors(n=9, palette="Okabe-Ito", alpha=1)[2:9]
+    pal[9] <- "#000000FF"  # put black at the end
+    if (missing(n)) n <- 9
+    if (n <= 9)
+      pal <- pal[1:n]
+    else {
+      print(pal[1:9])
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+         "Only 9 Okabe-Ito colors available.\n",
+         "Can start with a vector of the above 9 colors, then add more.\n\n")
+    }
   }
 
   # Wes Anderson sequence
@@ -262,7 +282,7 @@ function(pal=NULL, end_pal=NULL,
     pal <- wesanderson::wes_palette(pal[1], n, type="continuous")
   }
 
-# # pre-specified distinct colors
+# pre-specified distinct colors
   else if (kind == "distinct") {
     ttl <- paste("Colors Palette", pal[1], "\n") 
     pal <- c(getColors(c=90, l=50, n=5),
@@ -320,8 +340,8 @@ function(pal=NULL, end_pal=NULL,
   # set lbl except for hcl which provides the hues
   if (lbl[1] == "") lbl <- pal
 
-  if (trans > 0) 
-   for (i in 1:length(pal)) pal[i] <- .maketrans(pal[i], (1-trans)*256) 
+  if (transparency > 0) 
+   for (i in 1:length(pal)) pal[i] <- .maketrans(pal[i], (1-transparency)*256) 
 
   # --------------------
   # plot and text output

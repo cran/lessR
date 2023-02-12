@@ -5,3 +5,35 @@ body {margin: 1em;
 h2,h3 {color: rgb(107,17,17);}
 h2 {text-align: center;}
 dt {margin-top: .5em; font-style: italic;}
+code {font-size: 1.1em;}
+
+a {
+ color: rgb(107,17,17);
+  font-weight: 500;
+ -webkit-transition: color 0.2s;
+ transition: color 0.2s;
+ transition: transform 0.2s;
+ display: inline-block;
+ text-decoration-line: underline;
+ position: relative;
+ padding: 0 0.25em;
+ transition: .3s;
+ }
+ a::after {
+ position: absolute;
+ bottom: .3em;
+ left: 0;
+ content: '';
+ width: 100%;
+ height: 1px;
+ background-color: #987467;
+ opacity: 0;
+ transition: .3s;
+ }
+ a:hover::after {
+ bottom: 0;
+ opacity: 1;
+ }
+ a:hover {
+ color: #d04c3f;
+ }

@@ -143,9 +143,9 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
   txeft <- tx
 
   # keep track of the number of plots for 2 windows, see if manage graphics
+  plt.i <- 0
+  plt.title  <- character(length=0)
   if (graphics) {
-      plt.i <- 0
-      plt.title  <- character(length=0)
       manage.gr <- .graphman()
   }
 
@@ -261,12 +261,13 @@ function(av.out, y.values, x.values, nm, n.obs, jitter_x, digits_d,
     }
   }  # graphics scatterplot
 
+  pv <- anova(av.out)[1,5]
 
   return(list(
     title_des=title_des, txdes=txdes,
     title_basic=title_basic,
     title_tukey=title_tukey,
-    txanv=txanv, txeft=txeft, txhsd=txhsd,
+    txanv=txanv, txeft=txeft, txhsd=txhsd, pv=pv,
     i=plt.i, ttl=plt.title))
 
 }

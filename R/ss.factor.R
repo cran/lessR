@@ -166,8 +166,8 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
       txt <- paste("Cramer\'s V", txt, ":", sep="")
       tx[length(tx)+1] <- paste(txt, .fmt(V,3))
       tx[length(tx)+1] <- ""
-      tx[length(tx)+1] <- paste("Chi-square Test", 
-          ":  Chisq = ", .fmt(ch$statistic,3), ", df = ", ch$parameter,
+      tx[length(tx)+1] <- paste("Chi-square Test of Independence:\n", 
+          "     Chisq = ", .fmt(ch$statistic,3), ", df = ", ch$parameter,
           ", p-value = ", .fmt(ch$p.value,3), sep="")
       if (!ch$approx.ok) 
         tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",

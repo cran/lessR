@@ -2,10 +2,10 @@
 function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits_d,
          conf_level, alternative, mmd, msmd, Edesired, bw1, bw2,
-         graph, xlab,
-         line_chart, show_title, pdf_file, width, height, ...)  {        
+         graph, xlab, line_chart, show_title,
+         quiet, pdf_file, width, height, ...)  {        
  
-  if ( brief  &&  (!is.null(mmd) || !is.null(msmd)) ) { 
+  if ( brief  &&  !quiet  &&  (!is.null(mmd) || !is.null(msmd)) ) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "mmd and msmd do not work with the brief version.\n\n")
   }
@@ -21,28 +21,29 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
                    graph.win=FALSE)  # # graphics window not yet set-up
   x.name <- gl$yn; x.lbl <- gl$yl; x.lab <- gl$yb
 
-
-  cat("Compare", Ynm, "across", Xnm, "with levels", X1nm, "and", X2nm, "\n")
-# cat("--------------------------------------------------------------\n\n")
-
   # get variable labels if exist
   options(xname = Xnm)
   options(yname = Ynm)
   gl <- .getlabels(graph.win=FALSE)  # graphics window not yet set-up
   x.lbl <- gl$xl
   y.lbl <- gl$yl
-
-  if ( (!is.null(x.lbl)) || (!is.null(y.lbl)) ) {
-    cat("Response Variable:  ", Ynm, ", ", as.character(y.lbl), sep="", "\n")
-    cat("Grouping Variable:  ", Xnm, ", ", as.character(x.lbl), sep="", "\n")
-    cat("\n")
-  }
   if (is.null(y.lbl)) y.lbl <- Ynm
 
-  if (!brief)
-     cat("\n------ Describe ------\n\n")
-  else
-    cat("\n --- Describe ---\n\n")
+  if (!quiet) {
+    cat("Compare", Ynm, "across", Xnm, "with levels", X1nm, "and", X2nm, "\n")
+  # cat("--------------------------------------------------------------\n\n")
+
+    if ( (!is.null(x.lbl)) || (!is.null(y.lbl)) ) {
+      cat("Response Variable:  ", Ynm, ", ", as.character(y.lbl), sep="", "\n")
+      cat("Grouping Variable:  ", Xnm, ", ", as.character(x.lbl), sep="", "\n")
+      cat("\n")
+    }
+
+    if (!brief)
+       cat("\n------ Describe ------\n\n")
+    else
+      cat("\n --- Describe ---\n\n")
+  }  # end !quiet
 
 
   if (from.data) {
@@ -68,20 +69,27 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
   clpct <- paste(toString(round((conf_level)*100, 2)), "%", sep="")
   Xnmval <- paste(Xnm, X1nm)
-  cat(Ynm, " for ", Xnmval, ":  ", sep="")
-  if (from.data) cat("n.miss = ", n1.miss, ",  ", sep="")
-  cat("n = ", n1, sep="")
-  cat(",  mean = ", .fmt(m1,dig.smr.d), ",  sd = ", .fmt(s1,dig.smr.d), sep="", "\n")
+  if (!quiet) {
+    cat(Ynm, " for ", Xnmval, ":  ", sep="")
+    if (from.data) cat("n.miss = ", n1.miss, ",  ", sep="")
+    cat("n = ", n1, sep="")
+    cat(",  mean = ", .fmt(m1,dig.smr.d), ",  sd = ", .fmt(s1,dig.smr.d),
+        sep="", "\n")
+  }  # end !quiet
   Xnmval <- paste(Xnm, X2nm)
-  cat(Ynm, " for ", Xnmval, ":  ", sep="")
-  if (from.data) cat("n.miss = ", n2.miss, ",  ", sep="")
-  cat("n = ", n2, sep="")
-  cat(",  mean = ", .fmt(m2,dig.smr.d), ",  sd = ", .fmt(s2,dig.smr.d), sep="", "\n")
-  cat("\n")
+  if (!quiet) {
+    cat(Ynm, " for ", Xnmval, ":  ", sep="")
+    if (from.data) cat("n.miss = ", n2.miss, ",  ", sep="")
+    cat("n = ", n2, sep="")
+    cat(",  mean = ", .fmt(m2,dig.smr.d), ",  sd = ", .fmt(s2,dig.smr.d),
+        sep="", "\n")
+    cat("\n")
+  }  # end !quiet
 
   # sample mean difference
   mdiff <- m1 - m2
-  cat("Mean Difference of ", Ynm, ":  " , .fmt(mdiff), sep="", "\n")
+  if (!quiet)
+    cat("Mean Difference of ", Ynm, ":  " , .fmt(mdiff), sep="", "\n")
   if (!brief) cat("\n")
 
 # sw
@@ -89,64 +97,70 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   df2 <- n2 - 1
   swsq <- (df1*v1 + df2*v2) / (df1 + df2)
   sw <- sqrt(swsq)
-  cat("Weighted Average Standard Deviation:  ", .fmt(sw), "\n")
+  if (!quiet)
+    cat("Weighted Average Standard Deviation:  ", .fmt(sw), "\n")
 
   smd <- mdiff/sw
-  if (brief) 
+  if (brief && !quiet) 
     cat("Standardized Mean Difference of ", Ynm, ": ",
         .fmt(smd), sep="", "\n")
 
   if (!brief) {
 
-    cat("\n\n------ Assumptions ------\n\n")
+    if (!quiet) {
+      cat("\n\n------ Assumptions ------\n\n")
 
-    cat("Note: These hypothesis tests can perform poorly, and the", "\n")
-    cat("      t-test is typically robust to violations of assumptions.", "\n")
-    cat("      Use as heuristic guides instead of interpreting literally.",
-        "\n\n")
+      cat("Note: These hypothesis tests can perform poorly, and the", "\n")
+      cat("      t-test is typically robust to violations of assumptions.",
+                 "\n")
+      cat("      Use as heuristic guides instead of interpreting literally.",
+          "\n\n")
+    }  # end !quiet
 
 
     if (from.data) {
+      if (!quiet) {
 
-  # Normality
-      cat("Null hypothesis, for each group, is a normal distribution of ",
-          sep="")
-      cat(Ynm, ".", sep="", "\n")
-      if (n1 > 30) {
-        cat("Group " , X1nm, ": ", sep="")
-        cat("Sample mean assumed normal because n > 30, so no test needed.", 
+        # Normality
+        cat("Null hypothesis, for each group, is a normal distribution of ",
+            sep="")
+        cat(Ynm, ".", sep="", "\n")
+        if (n1 > 30) {
+          cat("Group " , X1nm, ": ", sep="")
+          cat("Sample mean assumed normal because n > 30, so no test needed.", 
+              sep="", "\n")
+        }
+        else {
+          cat("Group", X1nm, " ")
+          if (n1 > 2 && n1 < 5000) {
+            nrm1 <- shapiro.test(YA)
+            W.1 <- nrm1$statistic
+            p.val1 <- nrm1$p.value
+            cat(nrm1$method, ":  W = ", .fmt(W.1,3), ",  p-value = ",
+                .fmt(p.val1,3), sep="", "\n")
+          }
+        else
+        cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
+      }  
+      if (n2 > 30) {
+        cat("Group " , X2nm, ": ", sep="")
+        cat("Sample mean assumed normal because n > 30, so no test needed.",
             sep="", "\n")
       }
       else {
-        cat("Group", X1nm, " ")
-        if (n1 > 2 && n1 < 5000) {
-          nrm1 <- shapiro.test(YA)
-          W.1 <- nrm1$statistic
-          p.val1 <- nrm1$p.value
-          cat(nrm1$method, ":  W = ", .fmt(W.1,3), ",  p-value = ",
-              .fmt(p.val1,3), sep="", "\n")
+        cat("Group", X2nm, " ")
+        if (n2 > 2 && n2 < 5000) {
+          nrm2 <- shapiro.test(YB)
+          W.2 <- nrm2$statistic
+          p.val2 <- nrm2$p.value
+          cat(nrm2$method, ":  W = ", .fmt(W.2,3), ",  p-value = ",
+              .fmt(p.val2,3), sep="", "\n")
         }
-      else
-      cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
-    }  
-    if (n2 > 30) {
-      cat("Group " , X2nm, ": ", sep="")
-      cat("Sample mean assumed normal because n > 30, so no test needed.",
-          sep="", "\n")
-    }
-    else {
-      cat("Group", X2nm, " ")
-      if (n2 > 2 && n2 < 5000) {
-        nrm2 <- shapiro.test(YB)
-        W.2 <- nrm2$statistic
-        p.val2 <- nrm2$p.value
-        cat(nrm2$method, ":  W = ", .fmt(W.2,3), ",  p-value = ",
-            .fmt(p.val2,3), sep="", "\n")
-      }
-      else
-        cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
-    }  
-    cat("\n")
+        else
+          cat("Sample size out of range for Shapiro-Wilk normality test.", "\n")
+      }  
+      cat("\n")
+    }  # end !quiet 
   } 
 
   # Homogeneity of Variance
@@ -168,12 +182,14 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
   # adjust for two-sided test, results same as var.test{stats}
   p.var <- 2 * min(p.var, 1-p.var)
 
-  cat("Null hypothesis is equal variances of ")
-  cat(Ynm, ", homogeneous.", sep="", "\n")
+  if (!quiet) {
+    cat("Null hypothesis is equal variances of ")
+    cat(Ynm, ", homogeneous.", sep="", "\n")
 
-  cat("Variance Ratio test:  F = ", vr, " = ", .fmt(vratio),
-      ",  df = ", df.num, ";", 
-      df.den, ",  p-value = ",  .fmt(p.var,3), sep="", "\n")
+    cat("Variance Ratio test:  F = ", vr, " = ", .fmt(vratio),
+        ",  df = ", df.num, ";", 
+        df.den, ",  p-value = ",  .fmt(p.var,3), sep="", "\n")
+  }  # end !quiet
 
   if (from.data) { # Levene
     YAm <- abs(YA - median(YA))
@@ -182,18 +198,22 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       tvalue.bf <- t.bf$statistic
       df.bf <- t.bf$parameter
       pvalue.bf <- t.bf$p.value
-      cat("Levene's test, Brown-Forsythe:  t = ", .fmt(tvalue.bf,3),
-          ",  df = ", df.bf, sep="")
-      cat(",  p-value = ", .fmt(pvalue.bf,3), sep="", "\n")
+      if (!quiet) {
+        cat("Levene's test, Brown-Forsythe:  t = ", .fmt(tvalue.bf,3),
+            ",  df = ", df.bf, sep="")
+        cat(",  p-value = ", .fmt(pvalue.bf,3), sep="", "\n")
+      }  # end !quiet
   }
 }
 
 
-  if (!brief)
-    cat("\n\n------ Infer ------\n\n")
-  else {
-    cat("\n --- Infer ---\n\n")
-  }
+  if (!quiet) {
+    if (!brief)
+      cat("\n\n------ Infer ------\n\n")
+    else 
+      cat("\n --- Infer ---\n\n")
+  }  # end !quiet
+  
 
   # t-test
   if (alternative == "two_sided")
@@ -233,22 +253,24 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       pvalue <- pt(abs(tvalue), df=df, lower.tail=TRUE)
   }
 
-  if (!brief)
-    cat("--- Assume equal population variances of", Ynm, "for each", Xnm,
-        "\n\n")
-  cat("t-cutoff for 95% range of variation: tcut = ", .fmt(tcut,3), "\n") 
-  cat("Standard Error of Mean Difference: SE = ", .fmt(sterr), "\n")
- 
-  mytitle <- "\nHypothesis Test of 0 Mean Diff:  t-value = "
-  if (alt != "two.sided") 
-    cat("\nAlternative hypothesis: Population mean difference is", alt, 
-        "than 0")
-  cat(mytitle, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3),
-      sep="", "\n\n")
-  cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="",
-      "\n")
-  cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb), " to ",
-      .fmt(ub), sep="", "\n\n")
+  if (!quiet) {
+    if (!brief)
+      cat("--- Assume equal population variances of", Ynm, "for each", Xnm,
+          "\n\n")
+    cat("t-cutoff for 95% range of variation: tcut = ", .fmt(tcut,3), "\n") 
+    cat("Standard Error of Mean Difference: SE = ", .fmt(sterr), "\n")
+   
+    mytitle <- "\nHypothesis Test of 0 Mean Diff:  t-value = "
+    if (alt != "two.sided") 
+      cat("\nAlternative hypothesis: Population mean difference is", alt, 
+          "than 0")
+    cat(mytitle, .fmt(tvalue,3), ",  df = ", df, ",  p-value = ", .fmt(pvalue,3),
+        sep="", "\n\n")
+    cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E), sep="",
+        "\n")
+    cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb), " to ",
+        .fmt(ub), sep="", "\n\n")
+  }  # end !quiet
 
   if (!brief) {
     k1 <- v1/n1
@@ -285,28 +307,30 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       pvalue.ne <- pt(abs(tvalue.ne), df=df.ne, lower.tail=TRUE)
     }
 
-    cat("\n--- Do not assume equal population variances of", Ynm, "for each",
-        Xnm, "\n\n")
-    cat("t-cutoff: tcut = ", .fmt(tcut.ne,3), "\n") 
-    cat("Standard Error of Mean Difference: SE = ", .fmt(sterr.ne), "\n")
-    mytitle <- "\nHypothesis Test of 0 Mean Diff:  t = "
-    cat(mytitle, .fmt(tvalue.ne,3), ",  df = ", .fmt(df.ne,3), 
-        ", p-value = ", .fmt(pvalue.ne,3), sep="", "\n\n")
-    cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E.ne),
-        sep="", "\n")
-    cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb.ne),
-        " to ", .fmt(ub.ne), sep="", "\n")
+    if (!quiet) {
+      cat("\n--- Do not assume equal population variances of", Ynm, "for each",
+          Xnm, "\n\n")
+      cat("t-cutoff: tcut = ", .fmt(tcut.ne,3), "\n") 
+      cat("Standard Error of Mean Difference: SE = ", .fmt(sterr.ne), "\n")
+      mytitle <- "\nHypothesis Test of 0 Mean Diff:  t = "
+      cat(mytitle, .fmt(tvalue.ne,3), ",  df = ", .fmt(df.ne,3), 
+          ", p-value = ", .fmt(pvalue.ne,3), sep="", "\n\n")
+      cat("Margin of Error for ", clpct, " Confidence Level:  ", .fmt(E.ne),
+          sep="", "\n")
+      cat(clpct," Confidence Interval for Mean Difference:  ", .fmt(lb.ne),
+          " to ", .fmt(ub.ne), sep="", "\n")
+    }  # end !quiet
 
   }
 
   # mean difference and standardized mean difference
-  if (!brief) {
+  if (!brief  && !quiet) {
     cat("\n\n------ Effect Size ------\n\n")
     cat("--- Assume equal population variances of", Ynm, "for each", Xnm,
         "\n\n")
     cat("Standardized Mean Difference of ", Ynm, ", ",
         "Cohen's d:  ", .fmt(smd), sep="", "\n")
-  }
+  }  # end !quiet
 
   # MBESS function
   #cid <- ci.smd(smd=smd, n.1=n1, n.2=n2, conf_level=conf_level)  
@@ -317,11 +341,16 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       #.fmt(deltaL), " to ", .fmt(deltaU), sep="", "\n")
 
   if (!brief) {
-    cat("\n\n------ Practical Importance ------\n\n")
-    cat("Minimum Mean Difference of practical importance: mmd\n")
     if ( !is.null(mmd) | !is.null(msmd) ) {
       if (!is.null(mmd)) msmd <- mmd / sw
       if (!is.null(msmd)) mmd <- msmd * sw
+    }
+  }
+
+  if (!brief  && !quiet) {
+    cat("\n\n------ Practical Importance ------\n\n")
+    cat("Minimum Mean Difference of practical importance: mmd\n")
+    if ( !is.null(mmd) | !is.null(msmd) ) {
       cat("Compare mmd =", .fmt(mmd,digits_d),
           " to the obtained value of md = ", .fmt(mdiff), "\n")
       cat("Compare mmd to the confidence interval for md: ", .fmt(lb), " to ", 
@@ -341,20 +370,22 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     zcut <- qnorm((1-conf_level)/2)
     ns <- 2*((zcut*sw)/Edesired)^2 
     n.needed <- ceiling(1.099*ns + 4.863) 
-    cat("\n\n------ Needed Sample Size ------\n\n")
-    if (Edesired > E) {
-      cat("Note: Desired margin of error,", .fmt(Edesired), 
-         "is worse than what was obtained,", .fmt(E), "\n\n") 
-    }
-    cat("Desired Margin of Error: ", .fmt(Edesired), "\n")
-    cat("\n")
-    cat("For the following sample size there is a 0.9 probability of obtaining\n")
-    cat("the desired margin of error for the resulting 95% confidence interval.\n")
-    cat("-------\n")
-    cat("Needed sample size per group: ", n.needed, "\n")
-    cat("\n")
-    cat("Additional data values needed Group 1: ", n.needed-n1, "\n")
-    cat("Additional data values needed Group 2: ", n.needed-n2, "\n")
+    if (!quiet) {
+      cat("\n\n------ Needed Sample Size ------\n\n")
+      if (Edesired > E) {
+        cat("Note: Desired margin of error,", .fmt(Edesired), 
+           "is worse than what was obtained,", .fmt(E), "\n\n") 
+      }
+      cat("Desired Margin of Error: ", .fmt(Edesired), "\n")
+      cat("\n")
+      cat("For the following sample size there is a 0.9 probability of obtaining\n")
+      cat("the desired margin of error for the resulting 95% confidence interval.\n")
+      cat("-------\n")
+      cat("Needed sample size per group: ", n.needed, "\n")
+      cat("\n")
+      cat("Additional data values needed Group 1: ", n.needed-n1, "\n")
+      cat("Additional data values needed Group 2: ", n.needed-n2, "\n")
+    }  # end !quiet
   }
 
   # graphs
@@ -454,9 +485,9 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
     .TwoGraph(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits_d, brief,
               n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
-              clpct, tvalue, pvalue, ub, lb, x.lab, alt, show_title)
+              clpct, tvalue, pvalue, ub, lb, x.lab, alt, show_title, quiet)
 
-    cat("\n")
+    if (!quiet) cat("\n")
 
     if (!is.null(pdf_file)) {
       dev.off()

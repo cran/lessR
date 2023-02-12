@@ -132,5 +132,6 @@ function(lm.out,
                       stringsAsFactors=TRUE)
   names(p.int) <- c("lwr", "upr")
 
-  return(list(cint=c.int, pint=p.int, out_predict=tx, predmm=predmm))  # need in 5Plot next
+  # need in 5Plot next
+  return(list(cint=c.int, pint=p.int, out_predict=tx, predmm=predmm)) 
 }

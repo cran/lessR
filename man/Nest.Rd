@@ -55,6 +55,9 @@ STATISTICS\cr
 Although not typically needed for analysis, if the output is assigned to an object named, for example, \code{n}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(n)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out}.
 }
 
+\references{
+Gerbing, D. W. (2023). \emph{R Data Analysis without Programming: Explanation and Interpretation}, 2nd edition, Chapter 12, NY: Routledge.
+}
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{

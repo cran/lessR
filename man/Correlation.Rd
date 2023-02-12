@@ -99,7 +99,7 @@ Usually assign the name of \code{mycor} to the output matrix, as in following ex
 }
 
 \references{
-Gerbing, D. W. (2013). R Data Analysis without Programming, Chapter 8, NY: Routledge.
+Gerbing, D. W. (2023). \emph{R Data Analysis without Programming: Explanation and Interpretation}, 2nd edition, Chapter 10, NY: Routledge.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

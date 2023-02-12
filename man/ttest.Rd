@@ -29,7 +29,7 @@ ttest(x=NULL, y=NULL, data=d, rows=NULL, paired=FALSE,
 
          show_title=TRUE, bw1="bcv", bw2="bcv",
 
-         graph=TRUE, line_chart=FALSE,
+         graph=TRUE, line_chart=FALSE, quiet=getOption("quiet"),
          width=5, height=5, pdf_file=NULL, \dots)       
 
 tt_brief(\dots)
@@ -73,21 +73,27 @@ tt(\dots)
   \item{alternative}{Default is \code{"two_sided"}. Other values are \code{"less"}
        and \code{"greater"}.}
   \item{mmd}{Minimum Mean Difference of practical importance, the difference of the
-       response variable between two group means. The concept is optional, and only one of mmd
-       and msmd is provided.}
+       response variable between two group means. The concept is optional, and
+       only one of mmd and msmd is provided.}
   \item{msmd}{For the Standardized Mean Difference, Cohen's d, the Minimum value of
-       practical importance. The concept is optional, and only one of mmd and msmd is provided.}
-  \item{Edesired}{The desired margin of error for the needed sample size calculation for a 95\% confidence interval, based on Kupper and Hafner (1989).}
-  \item{show_title}{Show the title on the graph of the density functions for two groups.}
+       practical importance. The concept is optional, and only one of mmd and msmd
+       is provided.}
+  \item{Edesired}{The desired margin of error for the needed sample size
+       calculation for a 95\% confidence interval, based on Kupper and Hafner (1989).}
+  \item{show_title}{Show the title on the graph of the density functions for
+       two groups.}
   \item{bw1}{Bandwidth for the computation of the densities for the first group.}
   \item{bw2}{Bandwidth for the computation of the densities for the second group.}
   \item{graph}{If \code{TRUE}, then display the graph of the overlapping density distributions.}
   \item{line_chart}{Plot the run chart for the response variable for each group
         in the analysis.}
-  \item{pdf_file}{Name of the pdf file to which the density graph is redirected. Also
-       specifies to save the line charts with pre-assigned names if they are computed.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{style}} function.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
+  \item{pdf_file}{Name of the pdf file to which the density graph is redirected.
+       Also specifies to save the line charts with pre-assigned names if they
+       are computed.}
   \item{\dots}{Further arguments to be passed to or from methods.}
 }
 
@@ -131,7 +137,7 @@ Returned value is NULL except for a two-group analysis from a formula.  Then the
 
 
 \references{
-Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 8, NY: Routledge.
+Gerbing, D. W. (2023). \emph{R Data Analysis without Programming: Explanation and Interpretation}, 2nd edition, Chapters 6 and 7, NY: Routledge.
 
 Kupper and Hafner (1989). The American Statistician, 43(2):101-105.
 }

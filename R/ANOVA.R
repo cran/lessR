@@ -54,15 +54,11 @@ function(my_formula, data=d, rows=NULL,
     options(dname = df.name)
   }
  
-  # if a tibble convert to data frame
-  if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  # tibble to df
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data)
-      }
-    }
+  # if a tibble, convert to data frame
+  if (exists(df.name, envir=parent.frame())) {
+    if (any(grepl("tbl", class(data), fixed=TRUE)))
+      data <- data.frame(data)
   }
-
  
   op <- options()  # save current options to reset at end
 
@@ -165,6 +161,7 @@ function(my_formula, data=d, rows=NULL,
     txeft <- plt1$txeft
     title_tukey <- plt1$title_tukey
     txhsd <- plt1$txhsd
+    pv <- plt1$pv
     if (graphics) {
       for (i in (plot.i+1):(plot.i+plt1$i)) plot.title[i] <- plt1$ttl[i-plot.i]
       plot.i <- plot.i + plt1$i
@@ -312,7 +309,7 @@ function(my_formula, data=d, rows=NULL,
 
       out_plots=txplt,
 
-      n.vars=n.vars, n.obs=n.obs, n.keep=n.keep,
+      n.vars=n.vars, n.obs=n.obs, n.keep=n.keep, p_value=pv,
       residuals=res, fitted=fit
     )
   }
@@ -337,7 +334,7 @@ function(my_formula, data=d, rows=NULL,
 
       out_plots=txplt,
 
-      n.vars=n.vars, n.obs=n.obs, n.keep=n.keep,
+      n_vars=n.vars, n_obs=n.obs, n_keep=n.keep,
       residuals=res, fitted=fit
     )
   }

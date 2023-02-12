@@ -37,6 +37,11 @@ function(app) {
   }
 
   else { # find and launch the app
+    #first save original settings to restore in the regular apps
+    options(l.cex=getOption("lab_cex"))
+    options(l.axc=getOption("axis_cex"))
+
+    style(lab_cex=1.201, axis_cex=1.011, suggest=FALSE)
     appDir <- system.file("shiny_apps", app, package="lessR")
     shiny::runApp(appDir, display.mode="normal")
     # no return here to process any info after runApp() runs

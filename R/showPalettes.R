@@ -38,9 +38,8 @@ function(palette="hcl", n=12, border="transparent", file=NULL) {
   if (palette == "viridis") {
     pal("viridis", getColors("viridis", n=n))
     pal("cividis", getColors("cividis", n=n))
-    pal("magma", getColors("magma", n=n))
-    pal("inferno", getColors("inferno", n=n))
     pal("plasma", getColors("plasma", n=n))
+    pal("spectral", getColors("spectral", n=n))
   }
 
   if (palette == "wesanderson") {

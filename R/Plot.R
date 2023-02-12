@@ -194,6 +194,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   color.miss <- ifelse (missing(color), TRUE, FALSE)
   clr.org <- color
   trans.miss <- ifelse (missing(trans), TRUE, FALSE)
+  shape.miss <- ifelse (missing(shape), TRUE, FALSE)
   box_fill.miss <- ifelse (missing(box_fill), TRUE, FALSE)
   violin_fill.miss <- ifelse (missing(violin_fill), TRUE, FALSE)
   area_fill.miss <- ifelse (missing(area_fill), TRUE, FALSE)
@@ -236,10 +237,17 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (fit.miss) fit <- "lm"
   }
 
+  # run chart settings
   if (fill.miss && run) {
     fill <- "gray20"
     color <- "gray60"
   }
+  if (show_runs) run <- TRUE
+  if (run) {
+    if (cl.miss) center_line <- "default"
+    if (seg.miss) segments=TRUE
+  }
+
 
   # presume text output to the console, could turn off at end of function
   outp <- TRUE
@@ -252,9 +260,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   
   date.ts <- FALSE  # default is not a time series
   freq.poly <- FALSE  # default is not a frequency polygon
-
-  if (show_runs) run <- TRUE
-  if (run) if (cl.miss) center_line <- "default"
 
   if (!fit_se.miss) if (missing(fit))  fit <- "loess"
   if (fit_se.miss && plot_errors) fit_se <- 0  # default for plot_errors
@@ -290,16 +295,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     n.y_var <- 1 
   }
 
-  # --------------
-  # process shapes
-  if (shape[1] == "sunflower")
-    object <- "sunflower"
-  else {  # check for bad shapes, see if modify outlier shape 
-    shp <- .plt.shapes(shape, out_shape)
-    shape <- shp$shape
-    out_shape <- shp$out_shape
-  }
-
   # ------
   # see if dated or inconsistent parameter values
   .param.old(...)
@@ -332,13 +327,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     options(dname = df.name)
   }
  
-  # if a tibble convert to data frame
-  if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {  # tibble to df
-        data <- data.frame(data)
-      }
-    }
+  # if a tibble, convert to data frame
+  if (exists(df.name, envir=parent.frame())) {
+    if (any(grepl("tbl", class(data), fixed=TRUE)))
+      data <- data.frame(data)
   }
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
@@ -355,6 +347,16 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
       if (data.miss) {
         if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
         data <- eval(substitute(data), envir=parent.frame())
+        # the 1.201 comes from Shiny, need to reset
+        # l.cex and l.axc are set in interact() before shiny run
+        if (getOption("lab_cex") == 1.201) {
+         if (getOption("l.cex") != 1.201) {
+            style(lab_cex=getOption("l.cex"))
+            style(axis_cex=getOption("l.axc"))
+          }
+          else
+            style(quiet=TRUE)
+        }
       }
     }
     else # df.name is NULL (only for shiny)
@@ -765,9 +767,25 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
    # need by to be a factor
    # .plt.by.legend, plt.main #818, needs levels(by)
     if (!is.factor(by.call)) by.call <- factor(by.call) 
+
+    if (shape.miss) {
+      by.unq <- length(unique(by.call))
+      shp <- .plt.shapes(shape, out_shape, lvl=by.unq)
+      shape <- shp$shape
+    }
   }
 
   else {
+
+  # --------------
+    # process shapes (without a by var)
+    if (shape[1] == "sunflower")
+      object <- "sunflower"
+    else {  # get numeric code, check for bad shapes, maybe modify outlier shape 
+      shp <- .plt.shapes(shape, out_shape)
+      shape <- shp$shape
+      out_shape <- shp$out_shape
+    }
     by.call <- NULL
     by.miss <- TRUE  # just need is.null(by.call) from here forward
   }
@@ -1089,7 +1107,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         options(yname=x.name)
         
         options(xname="Index")
-        x.call <- data.frame(1:nrow(x.call), stringsAsFactors=TRUE)
+        x.call <- data.frame(1:nrow(x.call))
         names(x.call) <- "Index"
       }
 
@@ -1309,8 +1327,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
       # VBS plot
       txt <- ifelse (!is.null(by1.call), "[Trellis", "[Violin/Box/Scatterplot")
-      if (!quiet)
-        cat(paste(txt, "graphics from Deepayan Sarkar's lattice package]\n"))
+      if (!quiet) 
+        cat(paste(txt, "graphics from Deepayan Sarkar's lattice package]\n\n"))
 
       # box_fill and violin_fill
       n.by1 <- length(levels(by1.call))

@@ -111,27 +111,27 @@ d <- d[1:12,]
 
 
 ```{r}
-d <- Sort(d, Gender)
+d <- sort_by(d, Gender)
 d
 ```
 
 
 ```{r}
-d <- Sort(d, c(Gender, Salary), direction=c("+", "-"))
+d <- sort_by(d, c(Gender, Salary), direction=c("+", "-"))
 d
 ```
 
 Sort by row names in ascending order.
 
 ```{r}
-d <- Sort(d, row.names)
+d <- sort_by(d, row.names)
 d
 ```
 
 Randomize the order of the data values.
 
 ```{r}
-d <- Sort(d, random)
+d <- sort_by(d, random)
 d
 ```
 

@@ -143,7 +143,17 @@ function(x, y=NULL, data=d, rows=NULL,
     if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
     # force evaluation (not lazy) if data not specified but relies on default d
     if (data.miss)
-        data <- eval(substitute(data), envir=parent.frame())
+      data <- eval(substitute(data), envir=parent.frame())
+      # the 1.201 comes from Shiny, need to reset
+      # l.cex and l.axc are set in interact() before shiny run
+      if (getOption("lab_cex") == 1.201) {
+       if (getOption("l.cex") != 1.201) {
+          style(lab_cex=getOption("l.cex"))
+          style(axis_cex=getOption("l.axc"))
+        }
+        else
+          style()
+      }
     }
     else # df.name is NULL
       x.in.global <- TRUE

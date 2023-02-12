@@ -316,7 +316,7 @@ Because the output of `pivot()` with no `by_cols` variables is a standard R data
 
 ```{r}
 a <- pivot(d, mean, Salary, c(Dept, Gender))
-Sort(a, by=mean, direction="-")
+sort_by(a, by=mean, direction="-")
 ```
 
 Specify multiple variables to sort with a vector of variable names, and a corresponding vector of `"+"` and `"-"` signs of the same length for the `directions` parameter.

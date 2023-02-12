@@ -241,17 +241,17 @@ function(x, y,
     txsug <- ""
     if (getOption("suggest")) {
       txsug <- ">>> suggestions"
-        fc <- paste("piechart(", x.name,
+        fc <- paste("PieChart(", x.name,
                     ", hole=0)  # traditional pie chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("piechart(", x.name,
+        fc <- paste("PieChart(", x.name,
                     ", values=\"%\")  # display %'s on the chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("piechart(", x.name, ")  # bar chart", sep="")
+        fc <- paste("PieChart(", x.name, ")  # bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("plot(", x.name, ")  # bubble plot", sep="")
+        fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("plot(", x.name,
+        fc <- paste("Plot(", x.name,
                     ", values=\"count\")  # lollipop plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
     }

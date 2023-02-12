@@ -4,7 +4,6 @@
 
 library(shiny)
 library(lessR)
-style(lab_cex=1.2, axis_cex=1, suggest=FALSE)
 
 clr.one <- list(
   "#324E5C", "dodgerblue3", "cornflowerblue", "steelblue", "darkblue",
@@ -20,7 +19,9 @@ clr.edge <- list("off", "black", "gray50", "gray75", "white", "ivory",
   "darkblue", "darkred", "darkgreen", "rosybrown2", "bisque", 
   "slategray2", "aliceblue", "thistle1", "coral", "gold")
 
-clr.qual <- list("reds", "rusts", "browns", "olives", "greens",
+clr.qual <- c("hues", "Okabe-Ito", "viridis")
+
+clr.seq <- list("reds", "rusts", "browns", "olives", "greens",
   "emeralds", "turquoises", "aquas", "blues", "purples", "violets",
   "magentas", "grays")
 
@@ -106,10 +107,10 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
                         choices=list("vbs", "vb", "vs", "v", "bs", "b", "s")),
             selectInput("myViolin", "violin fill", choices=list(
                         "Constant"=c("#7485975A", clr.one[2:length(clr.one)]),
-                        "Qualitative"=list("hues"), "Sequential"=clr.qual)),
+                        "Qualitative"=clr.qual, "Sequential"=clr.seq)),
             selectInput("myBox", "box fill",
-             choices=list("Qualitative"=list("hues"),
-                          "Sequential"=clr.qual, "Constant"=clr.one)),
+             choices=list("Qualitative"=clr.qual, "Sequential"=clr.seq, 
+                          "Constant"=clr.one)),
             checkboxInput("myMean", "vbs_mean", value=FALSE),
             checkboxInput("myFences", "fences", value=FALSE),
           ),
@@ -395,13 +396,13 @@ server <- function(input, output, session) {
     is.local <- !grepl("http://", read.path, fixed=TRUE)
 
     if (input$do_cmt)
-      cat("# The pound sign, #, indicates a comment, not part of R coding\n\n",
-          "# Begin a R/lessR session by loading the lessR functions ",
+      cat("# The # symbol indicates a comment rather than an R instruction\n\n",
+          "# Begin the R session by loading the lessR functions ",
           "from the library\n", sep="", file=r.path)
       cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt) {
-      cat("# Now read your data into an R data table, the data frame, here d",
+      cat("# Read your data into an R data table, the data frame, here d",
           "\n", sep="", file=r.path, append=TRUE)
       if (is.local)
         cat("# To browse for the data file, include nothing between the quotes",
@@ -411,8 +412,8 @@ server <- function(input, output, session) {
       cat("d <- Read(\"\")\n\n", file=r.path, append=TRUE)
 
     if (is.local && input$do_cmt) {
-      cat("# For security, the path to your data file is not made available\n",
-          "# Another option replaces PATHtoFILE in the following with the path\n",
+      cat("# For security, the path to your data file is not available\n",
+          "# Can replace PATHtoFILE in the following with the path\n",
           "# Remove the # sign in the first column and delete the previous ",
           "Read()\n", sep="", file=r.path, append=TRUE)
       read.path <- file.path("PATHtoFILE", read.path) 
@@ -421,10 +422,12 @@ server <- function(input, output, session) {
     cat(read.code, "\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt)
-      cat("# Create the VBS plot and accompanying statistical analysis\n",
+      cat("# When you have your data table, do the VBS analysis of a\n",
+          "#   continuous variable in the data table\n",
           "# d is the default data frame name, so no need to specify\n",
           sep="", file=r.path, append=TRUE)
     cat(code, "\n\n", file=r.path, append=TRUE)
+
 
     anlys <- "Plot()"
     if (input$do_cmt)

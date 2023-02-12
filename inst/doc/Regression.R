@@ -62,6 +62,9 @@ Plot(Salary, Years, by=Dept, fit="lm")
 ## ---- fig.width=5, fig.height=4---------------------------------------------------------------------------------------
 reg_brief(Salary ~ Dept + Years)
 
+## ----mod, fig.width=4.5, fig.height=4.5-------------------------------------------------------------------------------
+reg_brief(Salary ~ Years + Pre, mod=Pre)
+
 ## ---- fig.width=5, fig.height=4---------------------------------------------------------------------------------------
 d <- Read("BodyMeas")
 Logit(Gender ~ Hand)

@@ -1106,7 +1106,7 @@ call to the <strong>lessR</strong> function <code>Sort()</code> is
 available for custom sorting by one or more variables. Sort in the
 specified direction with the <code>direction</code> parameter.</p>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">pivot</span>(d, mean, Salary, <span class="fu">c</span>(Dept, Gender))</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Sort</span>(a, <span class="at">by=</span>mean, <span class="at">direction=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sort_by</span>(a, <span class="at">by=</span>mean, <span class="at">direction=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender  n na     mean
 ## 4  MKTG      M  1  0 99062.66
 ## 5  SALE      M 10  0 86150.97

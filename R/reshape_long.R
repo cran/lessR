@@ -1,16 +1,13 @@
 reshape_long <-
   function(data, transform, group="Group", response="Response", ID="ID",
            prefix=ID, sep="") {
-
-  # if a tibble convert to data frame
-  df.name <- deparse(substitute(data))  # get name of data table
-  dfs <- .getdfs()
-  if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  # tibble to df
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data)
-      }
-    }
+ 
+ 
+  # if a tibble, convert to data frame
+  df.name <- deparse(substitute(data))  # is NULL if from shiny
+  if (exists(df.name, envir=parent.frame())) {
+    if (any(grepl("tbl", class(data), fixed=TRUE)))
+      data <- data.frame(data)
   }
 
   if (is.null(ID)) ID <- "xxQ7q"

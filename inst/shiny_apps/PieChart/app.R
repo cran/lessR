@@ -4,7 +4,6 @@
 
 library(shiny)
 library(lessR)
-style(lab_cex=1.2, axis_cex=1, main_cex=1.25, suggest=FALSE)
 
 clr.one <- list(
   "#96AAC3", "dodgerblue3", "cornflowerblue", "steelblue", "darkblue",
@@ -20,7 +19,9 @@ clr.edge <- list("off", "black", "gray50", "gray75", "white", "ivory",
   "darkblue", "darkred", "darkgreen", "rosybrown2", "bisque", 
   "slategray2", "aliceblue", "thistle1", "coral", "gold")
 
-clr.qual <- list("reds", "rusts", "browns", "olives", "greens",
+clr.qual <- c("hues", "Okabe-Ito", "viridis")
+
+clr.seq <- list("reds", "rusts", "browns", "olives", "greens",
   "emeralds", "turquoises", "aquas", "blues", "purples", "violets",
   "magentas", "grays")
 
@@ -90,7 +91,7 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
           checkboxInput("do_geom", div("Colors", class="view"), FALSE),
           conditionalPanel(condition="input.do_geom == true",
             selectInput("myFill", "fill",
-              choices=list("Qualitative"=list("hues"), "Sequential"=clr.qual)),
+              choices=list("Qualitative"=clr.qual, "Sequential"=clr.seq)),
             selectInput("myColor", label="color", choices=clr.edge),
             sliderInput("myTrans", label="transparency", min=0, max=1, value=0),
           ),
@@ -333,6 +334,10 @@ server <- function(input, output, session) {
     pdf.fname <- paste("pc_", x.name, ".pdf", sep="")
     pdf.path <- file.path(path.expand("~"), pdf.fname)
 
+    # styles before re-set in interact() were saved
+    style(lab_cex=getOption("l.cex"))
+    style(axis_cex=getOption("l.axc"))
+
    PieChart(x, data=NULL,
         fill=input$myFill, color=input$myColor, transparency=input$myTrans,
         hole=input$myHole, hole_fill=input$myHoleFill,
@@ -342,6 +347,9 @@ server <- function(input, output, session) {
         main=x.name, quiet=TRUE,
         pdf_file=pdf.path,
         width=as.numeric(input$w), height=as.numeric(input$h))
+
+    # reset back to shiny setting
+    style(lab_cex=1.201, axis_cex=1.011, suggest=FALSE)
 
     # R code
     r.fname <- paste("pc_", x.name, ".r", sep="")
@@ -366,13 +374,13 @@ server <- function(input, output, session) {
     is.local <- !grepl("http://", read.path, fixed=TRUE)
 
     if (input$do_cmt)
-      cat("# The pound sign, #, indicates a comment, not part of R coding\n\n",
-          "# Begin a R/lessR session by loading the lessR functions ",
+      cat("# The # symbol indicates a comment rather than an R instruction\n\n",
+          "# Begin the R session by loading the lessR functions ",
           "from the library\n", sep="", file=r.path)
       cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt) {
-      cat("# Now read your data into an R data table, the data frame, here d",
+      cat("# Read your data into an R data table, the data frame, here d",
           "\n", sep="", file=r.path, append=TRUE)
       if (is.local)
         cat("# To browse for the data file, include nothing between the quotes",
@@ -382,8 +390,8 @@ server <- function(input, output, session) {
       cat("d <- Read(\"\")\n\n", file=r.path, append=TRUE)
 
     if (is.local && input$do_cmt) {
-      cat("# For security, the path to your data file is not made available\n",
-          "# Another option replaces PATHtoFILE in the following with the path\n",
+      cat("# For security, the path to your data file is not available\n",
+          "# Can replace PATHtoFILE in the following with the path\n",
           "# Remove the # sign in the first column and delete the previous ",
           "Read()\n", sep="", file=r.path, append=TRUE)
       read.path <- file.path("PATHtoFILE", read.path) 
@@ -392,10 +400,12 @@ server <- function(input, output, session) {
     cat(read.code, "\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt)
-      cat("# Create the pie chart and accompanying statistical analysis\n",
+      cat("# When you have your data table, do the pie chart analysis of a\n",
+          "#   categorical variable in the data table\n",
           "# d is the default data frame name, so no need to specify\n",
           sep="", file=r.path, append=TRUE)
     cat(code, "\n\n", file=r.path, append=TRUE)
+
 
     anlys <- "PieChart()"
     if (input$do_cmt)

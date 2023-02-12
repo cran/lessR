@@ -1,11 +1,11 @@
 ---
-title: "Bar Charts"
+title: "Bar Chart, Pie Chart"
 author: "David Gerbing"
 output: 
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{2. Visualize: Bar Chart}
+  %\VignetteIndexEntry{2. Visualize: Bar Chart, Pie Chart}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---

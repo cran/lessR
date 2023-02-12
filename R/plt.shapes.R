@@ -1,24 +1,55 @@
 .plt.shapes <-
-function(shape, out_shape) {
+function(shape, out_shape, lvl=NULL) {
+
+  # first call from Plot(), #303, there is no level, just check for bad shapes
+  # second call there is a level if a by variable
 
   bad.shape <- NULL
 
   shapes.nm <- c("circle", "square", "diamond", "triup", "tridown")
-  shapes.all <- c(shapes.nm, 0:25, letters, LETTERS, "+", "*", "#",
-                  "%", "!", "=", "-", "&", "$", "?", "|", ">", "<", "@", ".")
+  shapes.pnt <- c("+", "*", "#", "%", "!", "=", "-", "&", "$",
+                 "?", "|", ">", "<", "@", ".", "/", ";", ":")
+  shapes.dgt <- as.character(0:9)
+  shapes.all <- c(shapes.nm, 0:19, letters, LETTERS, shapes.pnt, shapes.dgt)
 
+  if (!is.null(lvl)) {
+    # shiny does not get here, shape is never missing, from Plot #771
+    if (unique(lvl) > length(shapes.all)) {
+      cat("\n")
+      stop(call.=FALSE, "\n","------\n",
+      "Only ", length(shapes.all), " unique shapes to display\n",
+      "You specified a  by  variable with ", unique(lvl), " levels\n\n")
+    }
+
+    more <- c(8, 7, 9, 10, 12:14, 11, letters, LETTERS, shapes.pnt)
+    shapes.by <-  c("triup", "tridown", "circle", "square", "diamond", more)
+    shape <- shapes.by[1:lvl]
+  }
+
+  # convert named shape to its numeric code
   num.flag <- FALSE
   for (i in 1:length(shape)) {
     if (!(shape[i] %in% shapes.all)) {
       bad.shape <- shape[i]
     }
     else if (shape[i] %in% shapes.nm) {
-      shape[i] <- which(shape[i] == shapes.nm) + 20
+      shape[i] <- which(shape[i] == shapes.nm) + 20  # still char
+      num.flag <- TRUE
+    }
+    else if (shape[i] %in% LETTERS) {
+      shape[i] <- which(LETTERS == shape[i]) + 64
+      num.flag <- TRUE
+    }
+    else if (shape[i] %in% letters) {
+      shape[i] <- which(letters == shape[i]) + 96
       num.flag <- TRUE
     }
   }
-  if (num.flag) shape <- as.numeric(shape)
+  if (num.flag) {
+    shape <- as.numeric(shape)
+  }
 
+  # convert named out_shape to its numeric code
   num.flag <- FALSE
   if (!(out_shape %in% shapes.all))
     bad.shape <- out_shape 

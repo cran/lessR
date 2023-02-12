@@ -61,6 +61,12 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
   df.name <- deparse(substitute(data))
   options(dname = df.name)
 
+  # if a tibble, convert to data frame
+  if (exists(df.name, envir=parent.frame())) {
+    if (any(grepl("tbl", class(data), fixed=TRUE)))
+      data <- data.frame(data)
+  }
+
   NFmax <- 20
 
 

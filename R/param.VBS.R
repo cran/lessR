@@ -26,21 +26,22 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     tx[length(tx)+1] <- .dash2(30)    
 
     # display repetitions
-    for (i in 1:ncol(frq)) {
-      mc.col <- max(frq[,i])
-      val <- rownames(frq)[which(frq[,i]==mc.col) %% nrow(frq)]
+    for (i in 1:ncol(frq)) {  # frq is the freq table, x (rows) with by1 (cols)
+      max_f.col <- max(frq[,i])
+#     x.val <- rownames(frq)[which(frq[,i]==max_f.col) %% nrow(frq)]
+      x.val <- rownames(frq)[which(frq[,i]==max_f.col)]
       txt <- ""
-      if (length(val) > 8) {
-        val <- val[1:8]
+      if (length(x.val) > 8) {
+        x.val <- x.val[1:8]
         txt <- " ..."
       }
-      val <- paste0(val, collapse=" ")  # convert char to num
+      x.val <- paste0(x.val, collapse=" ")  # convert char to num
       lvl.c <- .fmtc(lvl[i], max(max.lvl,6), j="left")
-      if (mc.col > 1)
-        tx[length(tx)+1] <- paste(lvl.c, "    ",  .fmti(mc.col,3),
-          "     ", val, txt, sep="")
+      if (max_f.col > 1)  # replications
+        tx[length(tx)+1] <- paste(lvl.c, "    ",  .fmti(max_f.col,3),
+          "     ", x.val, txt, sep="")
       else 
-        tx[length(tx)+1] <- paste(lvl.c, "   0" )
+        tx[length(tx)+1] <- paste(lvl.c, "     0" )  # no reps
     }
 
     txrep <- tx 
@@ -76,7 +77,9 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
   # BEGIN
   # -----
-  
+
+  ceil.n <- 1001  # ceiling of unique x's to look for replicated values
+
   if (is.null(by0)) by.name <- ""
   if (is.null(by1)) by1.name <- ""
 
@@ -160,19 +163,26 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
     # check for repetitions of x values (as a single variable)
     # mx.c, max category, is max number of values of a value of x
-    frq <- as.matrix(table(x))
-    mx.c <- ifelse (n.ux == lx, 0, max(table(x))) 
-    if (mx.c > 1)
-      txrep <- .get.dup(mx.c, x.name, lvl=x.name)
-    else
-      txrep <- "Number of duplicated values: 0"
+    if (length(unique(x)) < ceil.n) {
+      frq <- as.matrix(table(x))
+      mx.c <- ifelse (n.ux == lx, 0, max(table(x))) 
+      if (mx.c > 1)
+        txrep <- .get.dup(mx.c, x.name, lvl=x.name)
+      else
+        txrep <- "Number of duplicated values: 0"
+      reps <- ifelse (rep.prop > 0.15  &&  mx.c > (.10*lx), TRUE, FALSE)
+     }
+     else {
+        txrep <- ""
+        reps <- FALSE
+        mx.c <- 0
+     }
+
 
     iqr <- IQR(x, na.rm=TRUE)
     mx <- max(x, na.rm=TRUE)
     mn <- min(x, na.rm=TRUE)
     rt <- iqr / (mx - mn)  # ratio (rt) of IQR to range, eval compression
-
-    reps <- ifelse (rep.prop > 0.15  &&  mx.c > (.10*lx), TRUE, FALSE)
 
     if (is.null(size)) {
       if (!reps)
@@ -256,7 +266,10 @@ function(x, ID, by1, by1.miss, by0, by.miss,
         if (frq[j,i] > 1) rep.t[i] <- rep.t[i] + (frq[j,i] - 1)
     }
     rep.max <- max(rep.t)
-    txrep <- .get.dup(mc.w, x.name, lvl)
+    if (length(unique(x)) < ceil.n) 
+      txrep <- .get.dup(mc.w, x.name, lvl)
+    else
+      txrep <- ""
 
     b.name <- ifelse(by.miss, by1.name, by.name)
     ssstuff <- .ss.numeric(x, by=by1, y.name=b.name,

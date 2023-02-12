@@ -1,22 +1,26 @@
 .plt.legend <-
-function(colnms, horiz, color, fill, shape, col.bg, usr, lab_cex=0.8,
-         pt.size=1.25, legend_title=NULL) {
+function(colnms, horiz, color, fill, shape, box.bg, usr, lab_cex=0.8,
+         pt.size=1.25, legend_title=NULL, line_type="solid") {
+# legend will have points or lines, shape="" for lines
 
   par(xpd=NA) 
   
   # text color
   the.clr <- getOption("lab_color")
 
-  text.cex <- ifelse(is.null(getOption("axis_x_cex")),
-      getOption("axis_cex"), getOption("axis_x_cex"))
-  text.cex <- 1.1 * text.cex
-  if (text.cex > 0.99) text.cex <- .95 * text.cex
-
-  ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
-               horiz=TRUE, plot=FALSE)  # get coordinates
+  if (missing(lab_cex)) {
+    text.cex <- ifelse(is.null(getOption("axis_x_cex")),
+        getOption("axis_cex"), getOption("axis_x_cex"))
+    text.cex <- 1.1 * text.cex
+    if (text.cex > 0.99) text.cex <- .95 * text.cex
+  }
+  else
+    text.cex <- lab_cex
 
   if (horiz) {
 
+    ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
+                 horiz=TRUE, plot=FALSE)  # get coordinates
     size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates, [2] is y 
 
     bm.user <- par("mai")[1] * size[2]  # size of bot margin in user coords
@@ -30,7 +34,7 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab_cex=0.8,
 
     legend(xleft, ytop, legend=colnms, horiz=TRUE, box.lwd=.5, 
            box.col="transparent", cex=text.cex, pt.cex=pt.size,
-           pt.bg=fill, bg=col.bg,
+           pt.bg=fill, bg=box.bg,
            col=color, pch=shape, text.col=the.clr, title=legend_title) 
   }
 
@@ -39,7 +43,6 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab_cex=0.8,
     ll <- legend(0,0, legend=colnms, cex=.7, pt.cex=0.9,
                  horiz, plot=FALSE)  # get coordinates
     size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
-
     #dv <- ifelse (options("device") == "RStudioGD", 1, 3)
     epsilon <- (size[1] - ll$rect$w) / 2
 
@@ -49,14 +52,16 @@ function(colnms, horiz, color, fill, shape, col.bg, usr, lab_cex=0.8,
     axis_cntr <- axis_vert / 2  + usr[3]
     ytop <- axis_cntr + lgnd.vhalf  # user coordinate of legend top
 
-    xi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
-    yi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
+#   xi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
+#   yi <- ifelse (options("device") == "RStudioGD", 1.4, 1)
 
-    legend(xleft, ytop, legend=colnms, horiz=FALSE, box.lwd=.5, 
-           box.col="transparent", cex=text.cex, pt.cex=pt.size,
-           pt.bg=fill, bg=col.bg,
+    # display legend
+    # lwd needed to draw a line
+    legend(xleft, ytop, legend=colnms, horiz=FALSE, lwd=1.5, lty=line_type,
+           box.lwd=.5, box.col="transparent", cex=text.cex, pt.cex=pt.size,
+           pt.bg=fill, bg=box.bg,
            col=color, pch=shape, text.col=the.clr,
-           x.intersp=xi, y.intersp=yi, title=legend_title)  # display legend
+           x.intersp=1, y.intersp=1, title=legend_title) 
   }
 
   par(xpd=FALSE)  # cancel drawing outside of plot region (need for RStudio)

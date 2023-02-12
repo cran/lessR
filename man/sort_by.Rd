@@ -1,14 +1,17 @@
-\name{Sort}
+\name{sort_by}
+\alias{sort_by}
 \alias{Sort}
 
-\title{Sort the Rows of a Data Frame}
+\title{sort_by the Rows of a Data Frame}
 
 \description{
 Sorts the values of a data frame according to the values of one or more variables contained in the data frame, or the row names.  Variable types include numeric and factor variables.  Factors are sorted by the ordering of their values, which, by default is alphabetical. Sorting by row names is also possible.
 }
 
 \usage{
-Sort(data=d, by, direction=NULL, quiet=getOption("quiet"), \dots)
+sort_by(data=d, by, direction=NULL, quiet=getOption("quiet"), \dots)
+
+Sort(\dots)
 }
 
 \arguments{
@@ -25,11 +28,11 @@ Sort(data=d, by, direction=NULL, quiet=getOption("quiet"), \dots)
 }
 
 \details{
-\code{Sort} sorts the rows of a data frame and lists the first five rows of the sorted data frame. Specify the values upon which to base the sort with the required \code{by} parameter. If not all sorted variables are sorted in ascending order, then also specify a sequence of \code{"+"} for ascending and \code{"-"} for descending, respectively, one for each variable to be sorted. If \code{row.names} or \code{random} is specified, then no other variables can be specified.
+\code{sort_by} sorts the rows of a data frame and lists the first five rows of the sorted data frame. Specify the values upon which to base the sort with the required \code{by} parameter. If not all sorted variables are sorted in ascending order, then also specify a sequence of \code{"+"} for ascending and \code{"-"} for descending, respectively, one for each variable to be sorted. If \code{row.names} or \code{random} is specified, then no other variables can be specified.
 
 A list of consecutive variables can be specified using the colon notation, such as Years:Salary  To specify a list of multiple variables, or \code{"+"} and \code{"-"} signs, or sets of variables, separate each set of variables or each sign by a comma, then invoke the R combine or \code{\link{c}} function. For example, if three variables are to be sorted, the first two ascending and the last descending, then specify, \code{direction=c("+","+","-")}.
 
-\code{Sort} is based on the standard R function \code{\link{order}}, though  the \code{Sort} function allows for the sorting of factors, whereas \code{\link{order}} does not.
+\code{sort_by} is based on the standard R function \code{\link{order}}, though  the \code{sort_by} function allows for the sorting of factors, whereas \code{\link{order}} does not.
 }
 
 \value{
@@ -52,17 +55,17 @@ d <- read.table(text="Severity Description
 
 # sort the data frame called d according to Severity
 #   in ascending order
-d <- Sort(d, Severity)
+d <- sort_by(d, Severity)
 
 # sort Description in descending order, sort Severity within
 #  each level of Description in ascending order
-d <- Sort(d, c(Description, Severity), direction=c("-", "+"))  
+d <- sort_by(d, c(Description, Severity), direction=c("-", "+"))  
 
 # sort by row names in ascending order
-d <- Sort(d, row.names)
+d <- sort_by(d, row.names)
 
 # randomly re-shuffle the rows of data
-d <- Sort(d, random)
+d <- sort_by(d, random)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

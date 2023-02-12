@@ -4,7 +4,6 @@
 
 library(shiny)
 library(lessR)
-style(lab_cex=1.2, axis_cex=1, suggest=FALSE)
 
 clr.one <- list(
   "#324E5C", "dodgerblue3", "cornflowerblue", "steelblue", "darkblue",
@@ -20,7 +19,9 @@ clr.edge <- list("off", "black", "gray50", "gray75", "white", "ivory",
   "darkblue", "darkred", "darkgreen", "rosybrown2", "bisque", 
   "slategray2", "aliceblue", "thistle1", "coral", "gold")
 
-clr.qual <- list("reds", "rusts", "browns", "olives", "greens",
+clr.qual <- c("hues", "Okabe-Ito", "viridis")
+
+clr.seq <- list("reds", "rusts", "browns", "olives", "greens",
   "emeralds", "turquoises", "aquas", "blues", "purples", "violets",
   "magentas", "grays")
 
@@ -87,7 +88,7 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
           conditionalPanel(condition="input.do_by == true",
             selectInput("by.col", "by Variable", "", selected=""),
             selectInput("myFill_by", "fill",
-              choices=list("Qualitative"=list("hues"), "Sequential"=clr.qual)),
+              choices=list("Qualitative"=clr.qual, "Sequential"=clr.seq)),
           ),
 
           checkboxInput("do_size", div("size variable", class="view"), FALSE),
@@ -383,8 +384,11 @@ server <- function(input, output, session) {
     shiny::req(y.name)
     y <- data()[, y.name]
 
-    in.fill <- ifelse (nchar(input$by.col)==0, input$myFill, input$myFill_by)
+    in.fill <- input$myFill
+    in.shp  <- input$myShape
 
+    # shiny only plots shapes 21:25, everything else blank
+    # so if more than 5 levels, then shiny plots different shapes
     by <- NULL
     lt <- NULL  # legend_title
     if (input$do_by) {  # a by variable
@@ -392,6 +396,9 @@ server <- function(input, output, session) {
       shiny::req(by.name)
       by <- data()[, by.name]
       in.fill <- input$myFill_by  # color range selection
+      shapes <-  c(24,25,21,22,23,24,25,21,22,23,24,25,21,22,23)
+      by.unq <- length(unique(by))
+      in.shp  <- shapes[1:by.unq]  # with shiny, input$myShape never missing 
       lt <- by.name
     }
 
@@ -429,9 +436,9 @@ server <- function(input, output, session) {
 
      v$p <- Plot(x, y, data=NULL, by=by,
           fill=in.fill, color=input$myColor, transparency=input$myTrans,
-          size=in.size, shape=input$myShape, plot_errors=input$myErrors,
+          size=in.size, shape=in.shp, plot_errors=input$myErrors,
           fit=in.fit, fit_color=input$myFitClr, fit_se=input$myFitSE, 
-          ellipse=in.elp, MD_cut=in.MD, ID=in.ID, add=in.add,
+          ellipse=in.elp, MD_cut=in.MD, ID=in.ID, add=in.add, 
           enhance=input$myEnhance, jitter_x=input$myJitx, jitter_y=input$myJity,
           rotate_x=input$myRttx, rotate_y=input$myRtty, offset=input$myOff,  
           xlab=x.name, ylab=y.name, legend_title=lt, quiet=FALSE)
@@ -564,6 +571,10 @@ server <- function(input, output, session) {
         in.ID <- row.names(data())
     }
 
+    # styles before re-set in interact() were saved
+    style(lab_cex=getOption("l.cex"))
+    style(axis_cex=getOption("l.axc"))
+
     Plot(x, y, data=NULL, by=by,
          fill=in.fill, color=input$myColor, transparency=input$myTrans,
          size=in.size, shape=input$myShape, plot_errors=input$myErrors,
@@ -574,6 +585,9 @@ server <- function(input, output, session) {
          xlab=x.name, ylab=y.name, legend_title=lt, quiet=TRUE,
          pdf_file=pdf.path,
          width=as.numeric(input$w), height=as.numeric(input$h))
+
+    # reset back to shiny setting
+    style(lab_cex=1.201, axis_cex=1.011, suggest=FALSE)
 
     # R code
     r.fname <- paste("plot_", x.name, y.name, ".r", sep="")
@@ -598,13 +612,13 @@ server <- function(input, output, session) {
     is.local <- !grepl("http://", read.path, fixed=TRUE)
 
     if (input$do_cmt)
-      cat("# The pound sign, #, indicates a comment, not part of R coding\n\n",
-          "# Begin a R/lessR session by loading the lessR functions ",
+      cat("# The # symbol indicates a comment rather than an R instruction\n\n",
+          "# Begin the R session by loading the lessR functions ",
           "from the library\n", sep="", file=r.path)
       cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt) {
-      cat("# Now read your data into an R data table, the data frame, here d",
+      cat("# Read your data into an R data table, the data frame, here d",
           "\n", sep="", file=r.path, append=TRUE)
       if (is.local)
         cat("# To browse for the data file, include nothing between the quotes",
@@ -614,8 +628,8 @@ server <- function(input, output, session) {
       cat("d <- Read(\"\")\n\n", file=r.path, append=TRUE)
 
     if (is.local && input$do_cmt) {
-      cat("# For security, the path to your data file is not made available\n",
-          "# Another option replaces PATHtoFILE in the following with the path\n",
+      cat("# For security, the path to your data file is not available\n",
+          "# Can replace PATHtoFILE in the following with the path\n",
           "# Remove the # sign in the first column and delete the previous ",
           "Read()\n", sep="", file=r.path, append=TRUE)
       read.path <- file.path("PATHtoFILE", read.path) 
@@ -624,7 +638,8 @@ server <- function(input, output, session) {
     cat(read.code, "\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt)
-      cat("# Create the scatterplot and accompanying statistical analysis\n",
+      cat("# When you have your data table, do the scatterplot analysis of\n",
+          "#   two variables in the data table\n",
           "# d is the default data frame name, so no need to specify\n",
           sep="", file=r.path, append=TRUE)
     cat(code, "\n\n", file=r.path, append=TRUE)

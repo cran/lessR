@@ -4,7 +4,6 @@
 
 library(shiny)
 library(lessR)
-style(lab_cex=1.2, axis_cex=1, suggest=FALSE)
 
 clr.one <- list(
   "slategray3", "dodgerblue3", "cornflowerblue", "steelblue", "darkblue",
@@ -20,7 +19,9 @@ clr.edge <- list("off", "black", "gray50", "gray75", "white", "ivory",
   "darkblue", "darkred", "darkgreen", "rosybrown2", "bisque", 
   "slategray2", "aliceblue", "thistle1", "coral", "gold")
 
-clr.qual <- list("reds", "rusts", "browns", "olives", "greens",
+clr.qual <- c("hues", "Okabe-Ito", "viridis")
+
+clr.seq <- list("reds", "rusts", "browns", "olives", "greens",
   "emeralds", "turquoises", "aquas", "blues", "purples", "violets",
   "magentas", "grays")
 
@@ -84,7 +85,7 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
           conditionalPanel(condition="input.do_by == true",
             selectInput('by.col', 'by Variable', "", selected=""),
             selectInput("myFill2", "fill",
-              choices=list("Qualitative"=list("hues"), "Sequential"=clr.qual)),
+              choices=list("Qualitative"=clr.qual, "Sequential"=clr.seq)),
             checkboxInput("myBeside", "beside", value = FALSE),
             checkboxInput("my100", "stack100", value = FALSE),
           ),
@@ -93,7 +94,7 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
           checkboxInput("do_y", div("y variable", class="view"), FALSE),
           conditionalPanel(condition="input.do_y == true",
             selectInput('y.col', 'y Variable', "", selected=""),
-            uiOutput("radio_stats")
+            uiOutput("radio_stats")  # only if not a summary table
           ),
 
           tags$hr(),
@@ -101,8 +102,8 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
           conditionalPanel(condition="input.do_geom == true",
             conditionalPanel(condition="input.do_by == false",
               selectInput("myFill", "fill",
-                choices=list("Qualitative"=list("hues"), "Constant"=clr.one,
-                             "Sequential"=clr.qual))),
+                choices=list("Qualitative"=clr.qual,
+                             "Constant"=clr.one, "Sequential"=clr.seq))),
             selectInput("myColor", label="color", choices=clr.edge),
             sliderInput("myTrans", label="transparency", min=0, max=1, value=0),
             selectInput("mySort", "sort", choices=list("0", "+", "-")),
@@ -487,6 +488,10 @@ server <- function(input, output, session) {
     pdf.fname <- paste("bc_", x.name, by.name, ".pdf", sep="")
     pdf.path <- file.path(path.expand("~"), pdf.fname)
 
+    # styles before re-set in interact() were saved
+    style(lab_cex=getOption("l.cex"))
+    style(axis_cex=getOption("l.axc"))
+
     BarChart(x, y, by=by, data=NULL, stat=in.stat,
             fill=in.fill, color=input$myColor, transparency=input$myTrans,
             sort=input$mySort, horiz=input$myHoriz,
@@ -496,6 +501,9 @@ server <- function(input, output, session) {
             xlab=x.name, ylab=axis.name, legend_title=lt, quiet=TRUE,
             pdf_file=pdf.path,
             width=as.numeric(input$w), height=as.numeric(input$h))
+
+    # reset back to shiny setting
+    style(lab_cex=1.201, axis_cex=1.011, suggest=FALSE)
 
     # R code
     r.fname <- paste("bc_", x.name, by.name, ".r", sep="")
@@ -520,13 +528,13 @@ server <- function(input, output, session) {
     is.local <- !grepl("http://", read.path, fixed=TRUE)
 
     if (input$do_cmt)
-      cat("# The pound sign, #, indicates a comment, not part of R coding\n\n",
-          "# Begin a R/lessR session by loading the lessR functions ",
+      cat("# The # symbol indicates a comment rather than an R instruction\n\n",
+          "# Begin the R session by loading the lessR functions ",
           "from the library\n", sep="", file=r.path)
       cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt) {
-      cat("# Now read your data into an R data table, the data frame, here d",
+      cat("# Read your data into an R data table, the data frame, here d",
           "\n", sep="", file=r.path, append=TRUE)
       if (is.local)
         cat("# To browse for the data file, include nothing between the quotes",
@@ -536,8 +544,8 @@ server <- function(input, output, session) {
       cat("d <- Read(\"\")\n\n", file=r.path, append=TRUE)
 
     if (is.local && input$do_cmt) {
-      cat("# For security, the path to your data file is not made available\n",
-          "# Another option replaces PATHtoFILE in the following with the path\n",
+      cat("# For security, the path to your data file is not available\n",
+          "# Can replace PATHtoFILE in the following with the path\n",
           "# Remove the # sign in the first column and delete the previous ",
           "Read()\n", sep="", file=r.path, append=TRUE)
       read.path <- file.path("PATHtoFILE", read.path) 
@@ -546,7 +554,8 @@ server <- function(input, output, session) {
     cat(read.code, "\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt)
-      cat("# Create the bar chart and accompanying statistical analysis\n",
+      cat("# When you have your data table, do the bar chart analysis of a\n",
+          "#   categorical variable in the data table\n",
           "# d is the default data frame name, so no need to specify\n",
           sep="", file=r.path, append=TRUE)
     cat(code, "\n\n", file=r.path, append=TRUE)

@@ -12,7 +12,7 @@ function(x=NULL, y=NULL, data=d, rows=NULL, paired=FALSE,
 
          show_title=TRUE, bw1="bcv", bw2="bcv",
 
-         graph=TRUE, line_chart=FALSE,
+         graph=TRUE, line_chart=FALSE, quiet=getOption("quiet"),
          width=5, height=5, pdf_file=NULL, ...)  {       
 
 
@@ -74,8 +74,7 @@ function(x, y=NULL, ...) {
         plt2 <- .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits_d, 
           conf_level, alternative, mmd, msmd, Edesired, bw1, bw2,
-          graph, xlab,
-          line_chart, show_title, pdf_file, width, height)
+          graph, xlab, line_chart, show_title, quiet, pdf_file, width, height)
       else {  # switch
         Xtmp <- X2nm
         X2nm <- X1nm
@@ -83,8 +82,8 @@ function(x, y=NULL, ...) {
         plt2 <- .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
           Ynm, Xnm, X1nm, X2nm, brief, digits_d, 
           conf_level, alternative, mmd, msmd, Edesired, bw1, bw2, 
-          graph, xlab,
-          line_chart, show_title, pdf_file, width, height)
+          graph, xlab, line_chart, show_title,
+          quiet, pdf_file, width, height)
       }
 
       for (i in (plot.i+1):(plot.i+plt2$i))
@@ -99,7 +98,7 @@ function(x, y=NULL, ...) {
          n1, n2, m1, m2, s1, s2, from.data,
          Ynm, Xnm, X1nm, X2nm, brief, digits_d, conf_level,
          alternative, mmd, msmd, Edesired, bw1, bw2,
-         graph=FALSE, xlab=NULL, line_chart=FALSE)
+         graph=FALSE, xlab=NULL, line_chart=FALSE, quiet=quiet)
     }
   #if (!brief) {
     #txt <- "Kelley and Lai's MBESS package]"
@@ -122,7 +121,7 @@ function(x, y=NULL, ...) {
       options(yname=x.name)
       plt1 <- .OneGroup(x, Ynm, mu, n=NULL, m=NULL, s=NULL, brief, bw1,
          from.data, conf_level, alternative, digits_d, mmd, msmd,
-         Edesired, paired, graph, xlab, line_chart, show_title,
+         Edesired, paired, graph, xlab, line_chart, show_title, quiet,
          pdf_file, width, height, ...)
 
     if (!is.null(plt1$i)) {
@@ -135,7 +134,7 @@ function(x, y=NULL, ...) {
     else  # from stats
        .OneGroup(x, Ynm, mu, n, m, s, brief, bw1,
          from.data, conf_level, alternative, digits_d, mmd, msmd,
-         Edesired, paired, graph, xlab, line_chart, show_title,
+         Edesired, paired, graph, xlab, line_chart, show_title, quiet,
          pdf_file, width, height, ...)
   }  # end one group
 
@@ -248,13 +247,10 @@ function(x, y=NULL, ...) {
   # get conditions and check for data existing
   if (!is.null(x.name)) {
  
-    # if a tibble convert to data frame
-    if (!is.null(dfs)) {
-      if (df.name %in% dfs) {  # tibble to df
-        if (any(grepl("tbl", class(data), fixed=TRUE))) {
-          data <- data.frame(data, stringsAsFactors=FALSE)
-        }
-      }
+    # if a tibble, convert to data frame
+    if (exists(df.name, envir=parent.frame())) {
+      if (any(grepl("tbl", class(data), fixed=TRUE)))
+        data <- data.frame(data)
     }
 
     is.frml <- ifelse (grepl("~", x.name), TRUE, FALSE)

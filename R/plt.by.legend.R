@@ -56,7 +56,6 @@ function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
   }
 
   legend_size <- 1.1 * legend_size
-
   # fill=length(legend_labels):1  puts the legend labels in the correct
   #   order, but only for inflexible boxes that cannot be resized with pt.cex
   legend(xleft+legend_adj, ytop, legend=legend_labels, title=legend_title, 

@@ -336,14 +336,13 @@ vp(\dots)
         or a matrix of these plots, sets a color gradient of the fill color
         ending with this color.}\cr
   
-  \item{smooth}{\bold{Smoothed density plot} for two numerical variables. By 
-        default, set to \code{TRUE} for 2500 or more rows of data.}
+  \item{smooth}{\bold{Smoothed density plot} for two numerical variables.} 
   \item{smooth_points}{Number of points superimposed on the density plot in the
         areas of the lowest density to help identify outliers, which controls
         how dark are the smoothed points.}
   \item{smooth_size}{Size of points superimposed on the density plot.}
   \item{smooth_exp}{Exponent of the function that maps the density scale to
-        the color scale.}
+        the color scale. Smaller than default of 0.25 yields darker plots.}
   \item{smooth_bins}{Number of bins in both directions for the density
         estimation.}\cr
 
@@ -550,7 +549,7 @@ For numeric primary variables, a single panel may also contain multiple plots of
 
 Or, obtain multiple scatterplots on the same panel with multiple numeric \code{x}-variables, or multiple \code{y}-variables. To obtain this graph, specify one of the primary variables as a vector of multiple variables. 
 
-Trellis graphics (facets), from Deepayan Sarkar's (2009) \code{\link{lattice}} package, may be implemented in which multiple panels for one numeric \code{x}-variable and one numeric \code{y}-variable are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by} is a conditioning variable that results in a Trellis plot, the scatterplot of \code{x} and \code{y} produced at \emph{each} level of the \code{by1} variable. The inclusion of a second conditioning variable, \code{by2}, results in a separate scatterplot panel for \emph{each} combination of cross-classified values of both \code{by1} and \code{by2}. A grouping variable according to \code{by} may also be specified, which is then applied to each panel.
+Trellis graphics (facets), from Deepayan Sarkar's (2009) \code{\link{lattice}} package, may be implemented in which multiple panels for one numeric \code{x}-variable and one numeric \code{y}-variable are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by} is a conditioning variable that results in a Trellis plot, the scatterplot of \code{x} and \code{y} produced at \emph{each} level of the \code{by1} variable. The inclusion of a second conditioning variable, \code{by2}, results in a separate scatterplot panel for \emph{each} combination of cross-classified values of both \code{by1} and \code{by2}. A grouping variable according to \code{by} may also be specified, which is then applied to each panel. If there are 1000 or less unique values of \code{x}, an analysis of the maximum number of repetitions for each value of \code{by1} is provided. 
 
 Control the panel dimensions and the overall size of the Trellis plot with the following parameters: \code{width} and \code{height} for the physical dimensions of the plot window, \code{n_row} and \code{n_col} for the number of rows and columns of panels, and \code{aspect} for the ratio of the height to the width of each panel. The plot window is the standard graphics window that displays on the screen, or it can be specified as a pdf file with the \code{pdf_file} parameter. 
 

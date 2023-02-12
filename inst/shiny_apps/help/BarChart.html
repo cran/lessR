@@ -5,9 +5,21 @@
 <title>Bar Charts with lessR</title>
 <link rel="stylesheet" href="help.css">
 </head>
+
 <body>
 
 <h2>The Bar Chart</h2>
+
+<p>
+For a general presentation of using <code>R</code> and <code>lessR</code>, including examples of bar charts, access the following sources.
+</p>
+
+<ul>
+	<li>online <a href="https://dgerbing.github.io/R_lessR_Intro/" target="_blank" rel="noopener">book chapter</a></li>
+	<li>within a working <code>R</code> session, enter <code>browseVignettes("lessR")</code>, then select the <code>Bar Chart, Pie Chart</code> vignette</li>
+	<li>within a working <code>R</code> session, enter <code>?BarChart</code> to access the manual that describes the <code>BarChart()</code> function</li>
+</ul>
+
 
 <h3>Categorical Variables</h3>
 
@@ -20,29 +32,44 @@ The <em>bar chart</em> associates a number with each level of a categorical vari
 </p>
 
 
-<h3>Count the Values for Each Level</h3>
+<h3>Types of Bar Charts</h3>
+
+<p>
+There are three possibilities for the source of the number associated with each level or category of the categorical variable of interest.
+</p>
+
+
+<h4>Count the Values for Each Level</h4>
 
 <p>
 Probably the most common type of bar chart calculates the number associated with each level as the count of the number of values for the corresponding level of the categorical variable. This bar chart answers the question: How often did the values of each level of the categorical variable occur in the data? For example, how many students in the classroom term for homework assignment in on time, and how many turned in the assignment late? The only needed information for which to compute this type of bar chart are the values of the categorical variable. 
 </p>
 
 
-<h3>The Two-Variable Bar Chart</h3>
-
-<p>
-The two variable bar chart visualizes the relationship between two categorical variables. The corresponding cross tabulation table shows that same relationship in tabular form from which the bar chart visualization is derived.
-</p>
-
-<h3>Calculate a Statistic for a Numerical Variable</h3>
+<h4>Calculate a Statistic for a Numerical Variable</h4>
 
 <p>
 The number associated with each category or level of a categorical variable can also be computed as a statistic from the analysis of a numerical variable at each level or category. For example, calculate the average salary for for the people each department of a company, such as accounting, sales, etc.
 </p>
 
+
+<h4>Read the Summary Table Directly</h4>
+
 <p>
 The possibility of reading a numerical variable also allows for the possibility reading the summary table from which the bar chart is constructed as the data for the analysis. As discussed, every bar chart is constructed from a summary table that associates each level of the categorical terrible with a number. Usually that number is calculated as either the counted values of a categorical variable for each level, or the calculation of a statistic for a numerical variable. Or, just enter that summary table directly as the given data, select the categorical variable, then select the corresponding numerical variable. This way the numerical variable can be anything at all, including constructing a bar chart for a published table without having access to the original data.
 </p>
 
+
+<h3>The Two-Variable Bar Chart</h3>
+
+<p>
+The two variable bar chart visualizes the relationship between two categorical variables. The corresponding cross-tabulation table shows that same relationship in tabular form from which the bar chart visualization is derived.
+</p>
+
+
+<h3>Palettes Addressed to Color-Blindness</h3>
+
+Typical color palettes are not designed to account for color-blindness. Two palettes included in <code>lessR</code> do permit more sensitivity to differentiate among objects with various types of color blindness: <code>Okabe-Ito</code> and <code>viridis</code>. These are qualitative palettes, which means that the hue varies across the plotted objects, here bars. Specify these, or other palettes, as the value for the <code>fill</code> parameter, available both by entering a function call in the R console or via the interactive analysis.
 
 
 <h3>Parameters</h3>
@@ -50,7 +77,6 @@ The possibility of reading a numerical variable also allows for the possibility 
 <p>
 For the full list of <code>BarChart()</code> parameters, see the manual obtained by entering <code>?BarChart</code>. These listed parameters are those provided in the interactive session from <code>interact("BarChart")</code>.
 </p>
-
 
  
 <h4><code>x</code>-variable</h4>
@@ -67,20 +93,21 @@ For the full list of <code>BarChart()</code> parameters, see the manual obtained
 	<dt>fill</dt>
 		<dd>interior color of a bar for each level of the <code>by</code>-variable</dd>
 		<dt>beside</dt>
-			<dd>Define a separate, adjacent bar for each level of the <code>by</code>-variable within the corresponding level of the <code>x</code>-variable </dd>
+			<dd>define a separate, adjacent bar for each level of the <code>by</code>-variable within the corresponding level of the <code>x</code>-variable </dd>
 	<dt>stack100</dt>
-		<dd>Create a 100% stacked bar chart in which each bar shows the relative percentage of items within each level or category</dd>
+		<dd>create a 100% stacked bar chart in which each bar shows the relative percentage of items within each level or category</dd>
 </dl>
 
 
 <h4>y-variable</h4>
 <dl>
-	<dd>Optional numerical variable to compute a statistic across the levels of the categorical variable, such as the mean</dd>
+	<dd>optional numerical variable to compute a statistic across the levels of the categorical variable, such as the mean</dd>
 	</dl>
 <dl>
 	<dt>stat</dt>
-		<dd>The statistic computed across the levels of the categorical variable from which to compute the height of the bars</dd>
+		<dd>statistic computed across the levels of the categorical variable from which to compute the height of the bars</dd>
 </dl>
+
 
 <h4>Bars</h4>
 <dl>
@@ -93,7 +120,7 @@ For the full list of <code>BarChart()</code> parameters, see the manual obtained
 	<dt>sort</dt>
 		<dd>sort the levels of the x-variable, "0" for none, "+" for ascending, and "-" for descending</dd>
 	<dt>horiz</dt>
-		<dd>If <code>TRUE</code>, the box is checked, then the bars become horizontal</dd>		
+		<dd>display the bars horizontal</dd>		
 </dl>
 
 

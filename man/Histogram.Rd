@@ -310,7 +310,7 @@ STATISTICS\cr
 }
 
 \references{
-Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 5, NY: Routledge.
+Gerbing, D. W. (2023). \emph{R Data Analysis without Programming: Explanation and Interpretation}, 2nd edition, Chapter 5, NY: Routledge.
 
 Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 4, NY: CRC Press.
 

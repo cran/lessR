@@ -6,6 +6,9 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
   # graph.win=FALSE turns off call to par, so blank window in R not produced
   gl <- .getlabels(graph.win=FALSE)
 
+  if (!is.null(gl$yn))  # from Plot(Salary, stat="count")
+    y.name <- ifelse (is.null(y.name), gl$yn, y.name)  # sometimes need by1.name
+
   if (is.null(x.name)) {
     x.name <- gl$xn
     x.lbl <- gl$xl
@@ -14,7 +17,6 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     x.lbl <- NULL
 
   if (by1.nm) {
-    y.name <- ifelse (is.null(y.name), gl$yn, y.name)  # sometimes need by1.name
     gl <- .getlabels(graph.win=FALSE, by1.nm=TRUE)
   }
   y.lbl <- gl$yl
@@ -141,9 +143,9 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
     if (i == 1) { # heading labels 
       if (max.ln < 4) max.ln <- max.ln + 2
       if (max.ln < 8) max.ln <- max.ln + 1
-      nbuf <- ifelse (n.lines == 1, 3, 5)
+      nbuf <- ifelse (n.lines==1, 3, 5)
 
-      n.lbl <- .fmtc("n", nchar(as.character(n))+nbuf+max.lv-1)
+      n.lbl <- .fmtc("n", nchar(as.character(n))+nbuf+max.lv-2)
       miss_lbl <- .fmtc("miss", nchar(as.character(n.miss))+5)
       m.lbl <- .fmtc("mean", max.ln)
       s.lbl <- .fmtc("sd", max.ln)

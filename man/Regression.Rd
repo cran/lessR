@@ -33,7 +33,7 @@ Regression(my_formula, data=d, rows=NULL,
          n_pred_rows=NULL, pred_sort=c("predint", "off"),
          subsets=NULL, best_sub=c("adjr2", "Cp"), cooks_cut=1,
 
-         scatter_coef=TRUE, mod=NULL, 
+         scatter_coef=TRUE, mod=NULL, mod_transf=c("center", "z", "none"), 
 
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL,
          X5_new=NULL, X6_new=NULL,
@@ -145,8 +145,11 @@ reg_brief(\dots, brief=TRUE)
 
   \item{scatter_coef}{Display the correlation coefficients in the upper triangle
         of the scatterplot matrix.}
-  \item{mod}{Declare a predictor variable a moderator variable in a two
-       predictor model. [Not yet implemented.]}\cr
+  \item{mod}{Declare one continuous (numeric) predictor variable a
+       moderator variable in a two predictor model.}
+  \item{mod_transf}{Applies when \code{mod} specified, rescales the
+        predictor variables, with default \code{"center"}, and options of
+        \code{"z"} for standardize and \code{"none"}.}\cr
 
   \item{X1_new}{Values of the first listed numeric predictor variable for
         which forecasted values
@@ -265,6 +268,16 @@ If there are two predictor variables, one categorical and one continuous, an ana
 
 A categorical variable is defined as either an R \code{factor} or a non-numeric variable. If numeric and categorical, then explicitly define the categorical variable as a factor. 
 
+MODERATOR VARIABLE\cr
+For two predictor models, one of the predictor variables can be entered into the analysis as a moderator variable with the \code{mod} parameter. By default the two predictor variables are centered, so their means become zero. Then a third variable is entered into the model, the interaction of the two centered variables, computed by multiplication of their respective values, row by row. The potential interaction is visually displayed by plotting response Y against predictor X, at three different values of continuous W: the mean and 1 standard deviation above and below the mean.
+
+For predictor variable, X, second predictor as a potential moderator, W, and response Y, enter the following R input.\cr
+\code{reg(Y ~ X + W, mod=W)}\cr
+From this, with now centered variables X and Y, the following multiple regression model is automatically defined.\cr
+\code{Y^ = b0 + bx(X) + bw(W) + bxw(XW)}\cr
+From that model, set the moderator variable W to a constant value, \code{Wc} and solve for the given value of W to visually plot the potential interaction. 
+
+
 
 INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text_width} option.  After \code{Regression} is finished with a normal termination, the options are re-set to their values before the \code{Regression} function began executing.
@@ -343,7 +356,7 @@ Although not typically needed for analysis, if the regression output is assigned
 \references{
 Lumley, T., \code{leaps} function from the \code{leaps} package.\cr
 
-Gerbing, D. W. (2014). R Data Analysis without Programming, Chapters 9 and 10, NY: Routledge.
+Gerbing, D. W. (2023). \emph{R Data Analysis without Programming: Explanation and Interpretation}, 2nd edition, Chapters 11-13, NY: Routledge.
 
 Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871. 
 

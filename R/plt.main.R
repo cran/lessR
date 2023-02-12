@@ -426,8 +426,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       else {
         if (is.null(scale_x))
           axT1 <- pretty(c(origin_x, x))  # else numeric, so all the ticks
-        else
-          axT1 <- axTicks(1, axp=scale_x)
+        else {
+          if (!run)
+            axT1 <- axTicks(1, axp=scale_x)
+          else
+            axT1 <- seq(scale_x[1], scale_x[2], by=scale_x[3])
+        }
       }
     }
     else  # is date.ts
@@ -492,7 +496,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   ltype <- character(length=n.clrs)
   for (i in 1:length(ltype)) ltype[i] <- "solid"
-
 
   # plot lines (and area_fill)
   # --------------------------
@@ -784,7 +787,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         if (n.by <= 5)  # R presents only five filled points
           shape.dft <- c(21,23,22,24,25)  # shape defaults
         else
-          shape.dft <- c(1,0,5,2,6,7:14)  # shape defaults
+          shape.dft <- c(1,0,5,2,6,8,7,9,10,12:14,11)  # shape defaults
         if (length(color)==1 && length(fill)==1 && length(shape)==1)
           for (i in 1:n.by) shp[i] <- shape.dft[i]  #  default shapes
 
@@ -792,10 +795,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           x.lv <- subset(x, by==levels(by)[i])
           y.lv <- subset(y, by==levels(by)[i])
 
-          if (!by.bub) { 
+          if (!by.bub) 
             points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i],
                    cex=size.pt, lwd=0.75, ...)
-          }
           else {  # size is a variable
             size.lv <- subset(size, by==levels(by)[i])
             fill[i] <- .maketrans(fill[i], (1-pts_trans)*256)
@@ -822,6 +824,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                          legend_title=legend_title)
         }
         else
+          if (length(size) > 1) 
+            for (i in 1:length(shp)) shp[i] <- 21
           .plt.by.legend(levels(by), color, fill, shp, pts_trans,
                          fill_bg, usr, legend_title=legend_title)
 

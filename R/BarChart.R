@@ -69,7 +69,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
   horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
   by.miss <- ifelse (missing(by), TRUE, FALSE)
   by1.miss <- ifelse (missing(by1), TRUE, FALSE)
-  if (color == "off") color <- "transparent"
+  for (i in 1:length(color)) if (color[i] == "off") color[i] <- "transparent"
 
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
   sort <- match.arg(sort)
@@ -193,13 +193,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
     options(dname = df.name)
   }
  
-  # if a tibble convert to data frame
-  if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {  # tibble to df
-        data <- data.frame(data)
-      }
-    }
+  # if a tibble, convert to data frame
+  if (exists(df.name, envir=parent.frame())) {
+    if (any(grepl("tbl", class(data), fixed=TRUE)))
+      data <- data.frame(data)
   }
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
@@ -216,6 +213,16 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
       if (data.miss) {
         if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
         data <- eval(substitute(data), envir=parent.frame())
+        # the 1.201 comes from Shiny, need to reset
+        # l.cex and l.axc are set in interact() before shiny run
+        if (getOption("lab_cex") == 1.201) {
+         if (getOption("l.cex") != 1.201) {
+            style(lab_cex=getOption("l.cex"))
+            style(axis_cex=getOption("l.axc"))
+          }
+          else
+            style()
+        }
       }
     }
     else # df.name is NULL
@@ -454,7 +461,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
   # -----------  x, y, and by variables established ------------
   # ------------------------------------------------------------
 
-  n.x <- length(unique(x.call))
+  n.x <- length(unique(na.omit(x.call)))
   n.by <- ifelse (!by.miss, length(unique(by.call)), 0)
   n.levels <- ifelse (by.miss || is.null(by.call), n.x, n.by)
 

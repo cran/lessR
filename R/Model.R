@@ -109,7 +109,7 @@ function(my_formula, data=d, brief=getOption("brief"), xlab=NULL, ...) {
             conf_level=0.95, alternative="two_sided",
             mmd=NULL, msmd=NULL, Edesired=NULL, 
             bw1="nrd", bw2="nrd", graph=TRUE, xlab=xlab,
-            line_chart=FALSE, show_title=TRUE,
+            line_chart=FALSE, show_title=TRUE, quiet=FALSE,
             pdf_file=NULL, width=5, height=5, ...)
         else {  # switch
           Xtmp <- X2nm

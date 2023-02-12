@@ -308,6 +308,7 @@ function(x, y, values, object, cat.x,  cat.y,
                                   format="f", digits=digits_d)
               b0.pn <- .fmt(b0[i], digits_d)
               b1.pn <- .fmt(b1[i], digits_d)
+
               Rsq.pn <- .fmt(Rsq[i], 3)
               if (!is.na(b1[i])) {  # linear function
                 tx[i] <- paste(tx[i], 
@@ -326,7 +327,8 @@ function(x, y, values, object, cat.x,  cat.y,
             }  # end for n.by
           }  # end n.by > 0
 
-          else {  # no by vars
+          # no by vars
+          else {
             if (length(b1) == 1) {  # > 1 if y=c(y1, y2, ...)
               if (mse[1] > 10000)
                 mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
@@ -338,13 +340,11 @@ function(x, y, values, object, cat.x,  cat.y,
                 n_digs <- ifelse(b0[1] > 10000, 2, digits_d)
                 if (n_digs == 1) n_digs <- 2
                 b0.pn <- .fmt(b0[1], n_digs)
-                if (abs(b0[1]) < 1) n_digs <- 4
               }
 
               if (!is.na(b1[1])) {
                 n_digs <- ifelse(b1[1] > 10000, 2, digits_d)
                 if (n_digs == 1) n_digs <- 2
-                if (abs(b1[1]) < 1) n_digs <- 4
                 b1.pn <- .fmt(b1[1], n_digs)
               }
 

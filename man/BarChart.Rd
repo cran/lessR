@@ -152,8 +152,7 @@ bc(\dots)
         gradients such as \code{"virdis"}. Or
         set to the name of \code{y} to map the values of bar fill into the
         fill colors. Specified the name of \code{y} 
-        as \code{(count)} if tabulated from the data, or \code{(count.v)} for 
-        viridis palette. Not applicable if \code{fill_split}
+        as \code{(count)} if tabulated from the data. Not applicable if \code{fill_split}
         is activated.}
   \item{color}{Border color of the bars, can be a vector
         to customize the color for each bar. Default is
@@ -451,7 +450,7 @@ Numerical variable y read from data\cr
 
 
 \references{
-Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 4, NY: Routledge.
+Gerbing, D. W. (2023). \emph{R Data Analysis without Programming: Explanation and Interpretation}, 2nd edition, Chapter 4, NY: Routledge.
 
 Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 3, NY: CRC Press.
 
@@ -522,8 +521,6 @@ BarChart(Gender, stat="proportion")
 
 # map value of tabulated count to bar fill
 BarChart(Dept, fill=(count))
-# viridis palette
-BarChart(Dept, fill=(count.v))
 
 # data with many values of categorical variable Make and large labels
 myd <- Read("Cars93")

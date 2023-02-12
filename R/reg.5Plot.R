@@ -107,7 +107,6 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
 
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
-
     margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
     lm <- margs$lm
     tm <- margs$tm

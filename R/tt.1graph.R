@@ -1,11 +1,12 @@
 .OneGraph <-
 function(YA, bw1, Ynm, digits_d, brief,
          n1, m1, mu, mdiff, sw, smd, mmd, msmd,
-         clpct, tvalue,  pvalue, ub, lb, x.lab, alt, show_title) {
+         clpct, tvalue, pvalue, ub, lb, x.lab, alt, show_title,
+         quiet=FALSE) {
 
   dYA <- suppressWarnings(density(YA, bw1))
 
-  if (!brief) {
+  if (!brief && !quiet) {
     cat("\n\n------ Graphics Smoothing Parameter ------\n\n")
     mytitle <- "Density bandwidth for "
     cat(mytitle, .fmt(dYA$bw,digits_d), sep="", "\n")

@@ -16,16 +16,10 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   count_n <- function(x) sum(!is.na(x))
   count_NA <- function(x) sum(is.na(x))
  
-  # if a tibble convert to data frame
-  dfs <- .getdfs() 
+  # if a tibble, convert to data frame
   df.name <- deparse(substitute(data))  # get name of data table
-  if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  # tibble to df
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data)
-      }
-    }
-  }
+  if (any(grepl("tbl", class(data), fixed=TRUE)))
+    data <- data.frame(data)
 
   # subset any specified rows of input data frame
   if (!missing(rows)) {  # subset rows

@@ -1,3 +1,51 @@
+# lessR version 4.2.6, Feb 12, 2023
+
+
+## Updates
+
+* `ANOVA()`, `BarChart()`, `Histogram()`, `Plot()`, `Regression()`, `ttest()`: A tibble that is not in the user workspace, instead in a package, is now properly converted to a standard R data frame upon which the internal function's code depends, which also permits more flexibility in the packaging of data in general to these functions, such as with the pipe operator 
+
+* `ANOVA()`: Overall p-value now available for the one-way ANOVA as the statistic in an output object, called `p_value`, such as output object `a$p_value` in `a <- ANOVA( ... )`
+
+* `getColors()`: To address color blindness, the `Okabe-Ito` color palette was added, and available as a `fill` parameter in `Plot()` and `BarChart()`
+
+* `interact()`: To address color blindness, the `viridis` and `Okabe-Ito` were added as qualitative palettes, such as for the bars of a bar chart
+
+* `sort_by()`: New name for the `Sort()` function, now deprecated, to maintain consistency of lower-case functions being utility functions. 
+
+* `Plot()`: For Trellis plots, indicated with `by1` and `by2` parameters, assessment of replications of unique values is done only if 1000 or fewer unique values to save both space and compute time for information that is not of such value anyhow
+
+* `Plot()`: For a run chart, parameter `run=TRUE`, the successive points in the plot are now by default joined with line segments, which can be stopped by setting parameter `segments=FALSE`
+
+* `Plot()`: Parameters `lab_cex` and `axis_cex` for size of value labels and axis labels, scaled smaller for visualizations in R run alone, without RStudio
+
+* `Plot()`: To address color blindness, when there is a `by` grouping, default is now to not only vary the fill color but also the shape of the plotted points  
+
+* `Regression()`: Parameter `mod` for moderation analysis in a two-predictor model added
+
+* `ttest()`: Parameter `quiet` added to turn off text display at the console if set to `TRUE`
+
+
+## Bug Fixes
+
+* `ANOVA()`: One-way ANOVA with parameter `graphics=FALSE` now works
+
+* `BarChart()`, `Plot()`: Qualitative color palette `hues` was the default for the default color theme, `colors`, but now also works explicitly when specified as the value for the `fill` parameter
+
+* `BarChart()`: Now works for `color` parameter specified as a vector
+
+* `interact()`: Interactive analyses resets label and axis plot sizes to larger, now set back when saving the pdf and also when re-plotting
+
+* `PieChart()`: Suggestions for alternative analyses had wrong lowercase expression `piechart()` instead of `PieChart()`
+
+* `Plot()`: With a linear fit line, b0 and b1 now reflect the specified number of digits according to parameter `digits_d`
+
+* `Plot()`: For  plotting a continuous and a categorical variable scatterplot, when listing the continuous variable first, the name of the categorical variable is now listed in the title of the text output
+ 
+* `Plot()`: For a run chart with parameter `run=TRUE`, parameter `scale_x` now properly allows for a custom set of ticks for the `Index` on the x-axis
+
+
+
 # lessR version 4.2.5, Jan 5, 2023
 
 ## Primary Update
@@ -28,7 +76,7 @@
 
 ## Bug Fixes
 
-* `BarChart()`: When plotting a statistics for a numerical variable, `y`, each plotted values are now displayed at the console with sufficient width
+* `BarChart()`: When plotting a statistics for a numerical variable, `y`, the plotted values are now displayed at the console with sufficient width
 
 * `interact("ScatterPlot")`: Parameter `enhance` now works
 
@@ -102,7 +150,7 @@
 
 * `Plot()`: For numbers < 10000, more decimal digits for stat outcomes of `fit` parameter, such as MSE
 
-* `Plot()`: With a by variable a named, sequential color range such as "reds" can now be specified in addition to the qualitative range of "hues"
+* `Plot()`: With a `by` variable a named, sequential color range such as "reds" can now be specified in addition to the qualitative range of "hues"
 
 * `tt.brief()` removed, long since replaced by `tt_brief()`
 

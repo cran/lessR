@@ -1,12 +1,12 @@
 .TwoGraph <-
 function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits_d, brief,
          n1, m1, s1, n2, m2, s2, df, mdiff, sw, smd, mmd, msmd,
-         clpct, tvalue, pvalue, ub, lb, x.lab, alt, show_title) {
+         clpct, tvalue, pvalue, ub, lb, x.lab, alt, show_title, quiet=FALSE) {
 
   dYA <- suppressWarnings(density(YA, bw1))
   dYB <- suppressWarnings(density(YB, bw2))
 
-  if (!brief) {
+  if (!brief  && !quiet) {
     cat("\n\n------ Graphics Smoothing Parameter ------\n\n")
     mytitle <- "Density bandwidth for "
     cat(mytitle, Xnm, " ", X1nm, ": ", .fmt(dYA$bw,digits_d), sep="", "\n")

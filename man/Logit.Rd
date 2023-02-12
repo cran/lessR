@@ -129,6 +129,10 @@ The default color theme is \code{"colors"}, but a gray scale is available with \
 Following the standard \code{R} function \code{\link{glm}}, invisibly returns an object of \code{\link{class}} inheriting from "glm" which inherits from the \code{\link{class}} "lm". Particularly useful for comparing nested models. Assign the output of \code{Logit} for a model to an object. Then for a nested model. Then use the \code{\link{anova}} function to compare the models as shown in the examples below.
 }
 
+\references{
+Gerbing, D. W. (2023). \emph{R Data Analysis without Programming: Explanation and Interpretation}, 2nd edition, Chapter 13, NY: Routledge.
+}
+
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
 
 \seealso{

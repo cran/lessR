@@ -12,7 +12,7 @@ In terms of workflow, use the function to select a set of colors from the result
 
 \usage{
   getColors(pal=NULL, end_pal=NULL,
-         n=12, h=0, h2=NULL, c=NULL, l=NULL, trans=0,
+         n=12, h=0, h2=NULL, c=NULL, l=NULL, transparency=0,
          in_order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
          main=NULL, labels=NULL, labels_cex=0.8, lty="solid",
@@ -39,8 +39,8 @@ In terms of workflow, use the function to select a set of colors from the result
        Respective default values
        for qualitative, sequential, and divergent scales are
        50, c(80,25), and c(40,70).}
-  \item{trans}{Transparency factor of the area of each slice from 0, no
-        transparency to 1, full transparency.}
+  \item{transparency}{Transparency factor of the area of each slice from 0,
+        no transparency to 1, full transparency.}
   \item{in_order}{If \code{TRUE}, orders the colors in order of their
         HCL hue values, the default for a "wheel". Otherwise maximizes
         the difference between adjacent colors hues to prepare for
@@ -114,7 +114,7 @@ III. SPECIFIED COLORS\cr
 The third possibility is to generate a color wheel from a specified set of color values. Set the value of \code{pal} according to the vector of these values_ Specify the values with R color names (see the lessR function \code{\link{showColors}}), RGB values according to the \code{rgb} function or from related R color space functions such as \code{hcl}, or as hexadecimal codes.\cr
 
 IV. OTHER INCLUDED COLOR PALETTES\cr
-The following palettes are from the viridis package: "viridis", "cividis", "magma", "inferno", "plasma".
+The following palettes are based on those from the viridis package: \code{"viridis"}, \code{"cividis"}, \code{"plasma"}, and \code{"spectral"}, though the palettes here are generated from the base R function \code{\link{hcl.colors}}. These palettes were developed to be more useable for varying types of color-blindness, as is the included palette \code{"Okabe-Ito"}. 
 
 Movie director Wes Anderson is known for is innovative color themes in his movies, which feature a combination of pastel colors and bold primary colors. The following palettes are from the wesanderson package, based the colors from his movies: "BottleRocket1", "BottleRocket2", "Rushmore1", "Rushmore", "Royal1", "Royal2", "Zissou1", "Darjeeling1", "Darjeeling2 ", "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2", "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2", "IsleofDogs1", "IsleofDogs2". The generation of the corresponding palettes are with \code{type} set to \code{"continuous"} to generalize to palettes of any length. Note that this package is suggested, which means to use the package for the first time you will be prompted to install the package.
 
@@ -133,7 +133,7 @@ Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 10, N
 }
 
 \seealso{
-\code{\link{hcl}}, \code{\link{showColors}}
+\code{\link{hcl}}, \code{\link{palette.colors}}, \code{\link{hcl.colors}}, \code{\link{showColors}}
 }
 
 

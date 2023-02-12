@@ -171,6 +171,15 @@ The ANCOVA displays the appropriate Type II Sum of Squares in its ANOVA table fo
 reg_brief(Salary ~ Dept + Years)
 ```
 
+## Moderation Analysis
+
+To do a moderation analysis, specify one of (only) two predictor variables with the parameter `mod`.
+
+```{r mod, fig.width=4.5, fig.height=4.5}
+reg_brief(Salary ~ Years + Pre, mod=Pre)
+```
+
+In this analysis, Pre is _not_ a moderator of the impact of Years on Salary. There is a tendency expressed by the non-parallel lines in the visualization, and an almost significant interaction, but the interaction was not detected at the $\alpha=0.5$ level. 
 
 
 ## Logistic Regression

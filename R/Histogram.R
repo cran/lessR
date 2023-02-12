@@ -72,14 +72,6 @@ function(x=NULL, data=d, rows=NULL,
   proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
   histogram <- ifelse (density, FALSE, TRUE)
 
-  # let deprecated mydata work as default
-  dfs <- .getdfs() 
-  mydata.ok <- FALSE
-  if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
-    d <- mydata 
-    mydata.ok <- TRUE
-  }
-
   if (theme != getOption("theme")) {
     sty <- style(theme, reset=FALSE)
     fill <- sty$bar$bar_fill_cont
@@ -147,13 +139,10 @@ function(x=NULL, data=d, rows=NULL,
     options(dname = df.name)
   }
  
-  # if a tibble convert to data frame
-  if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {  # tibble to df
-        data <- data.frame(data)
-      }
-    }
+  # if a tibble, convert to data frame
+  if (exists(df.name, envir=parent.frame())) {
+    if (any(grepl("tbl", class(data), fixed=TRUE)))
+      data <- data.frame(data)
   }
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
@@ -170,6 +159,16 @@ function(x=NULL, data=d, rows=NULL,
       if (data.miss) {
         if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
         data <- eval(substitute(data), envir=parent.frame())
+        # the 1.201 comes from Shiny, need to reset
+        # l.cex and l.axc are set in interact() before shiny run
+        if (getOption("lab_cex") == 1.201) {
+         if (getOption("l.cex") != 1.201) {
+            style(lab_cex=getOption("l.cex"))
+            style(axis_cex=getOption("l.axc"))
+          }
+          else
+            style()
+        }
       }
     }
     else # df.name is NULL

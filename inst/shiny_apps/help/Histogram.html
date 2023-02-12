@@ -10,6 +10,16 @@
 
 <h2>The Histogram</h2>
 
+<p>
+For a general presentation of using <code>R</code> and <code>lessR</code>, including examples of bar charts, select one or both of the following sources.
+</p>
+
+<ul>
+	<li>online <a href="https://dgerbing.github.io/R_lessR_Intro/" target="_blank" rel="noopener">book chapter</a></li>
+	<li>within a working <code>R</code> session, enter <code>browseVignettes("lessR")</code>, then select the <code>Histogram</code> vignette</li>
+		<li>within a working <code>R</code> session, enter <code>?Histogram</code> to access the manual that describes the <code>Histogram()</code> function</li>
+</ul>
+
 <h3>Bins</h3>
 
 <p>
@@ -34,6 +44,11 @@ Select a bin width to display as much detail as possible for the sample size wit
 <p>
 The <em>bin width artifact</em> occurs when the change in the bin width of a histogram changes the shape of the histogram. The <em>bin shift artifact</em> occurs when the starting point of a histogram changes, and the shape of the histogram also changes.
 </p>
+
+
+<h3>Palettes Addressed to Color-Blindness</h3>
+
+Typical color palettes are not designed to account for color-blindness. Two palettes included in <code>lessR</code> do permit more sensitivity to differentiate among objects with various types of color blindness: <code>Okabe-Ito</code> and <code>viridis</code>. These are qualitative palettes, which means that the hue varies across the plotted objects, here bars. Specify these, or other palettes, as the value for the <code>fill</code> parameter, available both by entering a function call in the R console or via the interactive analysis.
 
 
 <h3>Parameters</h3>

@@ -40,8 +40,8 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
        the default, display missing levels of the grouping variables with
        \code{n} set to 0.}
   \item{na_remove}{Sets base R parameter \code{na.rm}. If \code{TRUE},
-       the default, removes missing values from the \code{value} variables 
-       and then reports how many values were missing. Otherwise, the 
+       the default, removes missing values from the \code{variable}(s),
+       then reports how many values were missing. Otherwise, the 
        aggregation statistic for a cell with any missing data returns \code{NA}.}
   \item{na_group_show}{If \code{TRUE}, the default, display NA for missing
        data of a grouping variable as a level for that variable.}

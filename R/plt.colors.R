@@ -78,9 +78,14 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
     }
   }
 
-  nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",
-          "turquoises", "aquas", "blues", "purples", "violets", "magentas",
-          "grays", "hues")
+  nmC <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",  
+          "turquoises", "aquas", "blues", "purples", "violets",
+          "magentas", "grays")
+  nmR <- c("rainbow", "heat", "terrain")
+  nmV<- c("viridis", "cividis", "plasma", "spectral")
+  nmO<- c("Okabe-Ito")
+  nmD<- c("distinct")
+  nm <- c(nmC, nmR, nmV, nmO, nmD)
 
   # set pt_fill
   color_done <- FALSE
@@ -91,7 +96,7 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
       pt_fill <- .color_range(.get_fill(), n.clrs) 
   }
   else {
-    if (!(fill[1] %in% nm))  # if a by var, then length(fill) > 1
+    if (!(fill[1] %in% c("hues", nm)))  # if a by var, then length(fill) > 1
       pt_fill <- fill
     else {
       pt_fill <- .color_range(fill, n.clrs)  

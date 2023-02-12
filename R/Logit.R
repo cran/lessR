@@ -54,14 +54,9 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
     options(dname = df.name)
   }
  
-  # if a tibble convert to data frame
-  if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  # tibble to df
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {
-        data <- data.frame(data, stringsAsFactors=FALSE)
-      }
-    }
-  }
+  # if a tibble, convert to data frame
+  if (any(grepl("tbl", class(data), fixed=TRUE)))
+    data <- data.frame(data)
 
   max_new <- 6
 
