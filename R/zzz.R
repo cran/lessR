@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.2.6                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.2.8                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -20,7 +20,7 @@ function(...) {
       "  Enter:  browseVignettes(\"lessR\")\n\n",
       "View changes in this and recent versions of lessR.\n",
       "  Enter: news(package=\"lessR\")\n\n",
-      "**Newly Revised**: Interactive data analysis.\n",
+      "Interactive data analysis.\n",
       "  Enter: interact()\n")
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed
@@ -80,8 +80,7 @@ function(...) {
   options(lab_color = "gray15")
   options(lab_x_color = NULL)
   options(lab_y_color = NULL)
-  lcx <- ifelse (options("device")=="RStudioGD", .88, .60)
-  options(lab_cex = lcx)
+  options(lab_cex = .98)
   options(lab_x_cex = NULL)
   options(lab_y_cex = NULL)
 
@@ -94,8 +93,7 @@ function(...) {
   options(axis_lty = "solid")
   options(axis_x_lty = NULL)
   options(axis_y_lty = NULL)
-  acx <- ifelse (options("device")=="RStudioGD", .75, .50)
-  options(axis_cex = acx)
+  options(axis_cex = .75)
   options(axis_x_cex = NULL)
   options(axis_y_cex = NULL)
   options(axis_text_color = "gray20")

@@ -275,7 +275,7 @@ For predictor variable, X, second predictor as a potential moderator, W, and res
 \code{reg(Y ~ X + W, mod=W)}\cr
 From this, with now centered variables X and Y, the following multiple regression model is automatically defined.\cr
 \code{Y^ = b0 + bx(X) + bw(W) + bxw(XW)}\cr
-From that model, set the moderator variable W to a constant value, \code{Wc} and solve for the given value of W to visually plot the potential interaction. 
+From that model, the functions sets the moderator variable W to each of the three constant values, \code{Wc}, and solves for the given value \code{Wc} to visually plot the potential interaction. 
 
 
 

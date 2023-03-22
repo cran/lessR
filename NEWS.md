@@ -1,5 +1,11 @@
-# lessR version 4.2.6, Feb 12, 2023
+# lessR version 4.2.8, March 21, 2023
 
+## Updates
+
+Variable and axis value labels increased in size for R Markdown and R by itself analyses.
+
+
+# lessR version 4.2.6, Feb 13, 2023
 
 ## Updates
 

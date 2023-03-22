@@ -270,12 +270,21 @@ function(my_formula, data=d, rows=NULL,
 
   # moderator variable option
   if (!mod.mis) {
+
     if (n.pred > 2) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Parameter  mod  currently only works with 2 predictor variables.\n\n")
     }
 
-    data <- na.omit(data)  # lm() default
+    w.nm <- deparse(substitute(mod))
+    w.ind <- which(names(data) == w.nm)
+
+    if (!is.numeric(data[,w.ind])) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "Variable for parameter  mod  must be numeric.\n\n")
+    }
+
+    data <- na.omit(data)  # lm() default, process data here that lm processes
 
     # scale the two predictor variables
     if (mod_transf != "none") { 
@@ -284,22 +293,21 @@ function(my_formula, data=d, rows=NULL,
         data[,nm[1+i]] <- scale(data[,nm[1+i]], center=TRUE, scale=is.z)
      }
 
-      # name the new interaction variable
-      w.nm <- deparse(substitute(mod))
-      x.nm <- ifelse (nm[2]==w.nm, nm[3], nm[2])
-      mod.int <- paste(w.nm, ".", x.nm, sep="")
-      nm <- c(nm, mod.int)
+    # name the new interaction variable
+    x.nm <- ifelse (nm[2]==w.nm, nm[3], nm[2])
+    xy.nm <- paste(w.nm, ".", x.nm, sep="")
+    nm <- c(nm, xy.nm)
 
-      # create new interaction variable
-      new.col <- ncol(data) + 1
-      data[, new.col] <- data[,nm[2]] * data[,nm[3]]
-      names(data)[new.col] <- mod.int
+    # create new interaction variable
+    new.col <- ncol(data) + 1
+    data[, new.col] <- data[,nm[2]] * data[,nm[3]]
+    names(data)[new.col] <- xy.nm
 
-      # create the new regression model with the added interaction term
-      my_formula <- as.formula(paste(nm[1], "~", paste(nm[2:4], collapse="+")))
+    # create the new regression model with the added interaction term
+    my_formula <- as.formula(paste(nm[1], "~", paste(nm[2:4], collapse="+")))
+    n.vars <- length(nm)
+    n.pred <- n.vars - 1L 
 
-      n.vars <- length(nm)
-      n.pred <- n.vars - 1L 
   }  # end mod
 
 
