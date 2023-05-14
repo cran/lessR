@@ -19,6 +19,13 @@ function(lo=NULL, hi=NULL, mu=0, sigma=1, nrm_color="black",
     }
   }
 
+  if (!is.null(lo) & !is.null(hi)) { 
+    if (lo > hi) { 
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "lo = ", lo, " cannot be larger than hi= ", hi, ".", "\n\n")
+    }
+  }
+
   if (sigma <= 0) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
     "Sigma, the population standard deviation, must be larger than zero.\n\n")

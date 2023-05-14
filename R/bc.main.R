@@ -23,7 +23,7 @@ function(x, y, by, stack100,
 
   if (is.null(values_digits)) {
     if (y.given) {
-      if (max(abs(y)) > 9999)
+      if (max(abs(y), na.rm=TRUE) > 9999)
         values_digits <- 0
       else {
         if (!is.null(y))
@@ -346,11 +346,13 @@ function(x, y, by, stack100,
   if (length(values_pos > 0))
     if (values_pos == "out") add_top <- add_top + .06
   # a 2-D table is an instance of a matrix, a 1-D table is not
-  max.y <- ifelse (is.matrix(x) && !beside, max(colSums(x)), max(x))
+  max.y <- ifelse (is.matrix(x) && !beside, 
+                   max(colSums(x), na.rm=TRUE), max(x, na.rm=TRUE))
   max.y <- max.y + (add_top * max.y)
 
   if (any(x < 0, na.rm = TRUE)) {
-    min.y <- ifelse (is.matrix(x) && !beside, min(colSums(x)), min(x))
+    min.y <- ifelse (is.matrix(x) && !beside,
+                     min(colSums(x), na.rm=TRUE), min(x, na.rm=TRUE))
     min.y <- min.y - abs(add_top * min.y)
   }
   else

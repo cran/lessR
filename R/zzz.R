@@ -9,18 +9,18 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.2.8                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.2.9                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
       "\n",
       "Learn about reading, writing, and manipulating data, graphics,\n",
       "testing means and proportions, regression, factor analysis,\n",
-      "customization, and descriptive statistics from pivot tables.\n",
+      "customization, and descriptive statistics from pivot tables\n",
       "  Enter:  browseVignettes(\"lessR\")\n\n",
-      "View changes in this and recent versions of lessR.\n",
+      "View changes in this and recent versions of lessR\n",
       "  Enter: news(package=\"lessR\")\n\n",
-      "Interactive data analysis.\n",
+      "Interactive data analysis\n",
       "  Enter: interact()\n")
 
   options(warn = -1)  # suppress warnings while bin.width, etc., allowed

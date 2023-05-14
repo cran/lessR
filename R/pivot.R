@@ -9,7 +9,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   # ---- preliminaries
 
   table_prop <- match.arg(table_prop)
-  out.nm.miss <- missing(out_names)
 
   # define functions
   # length(x) is count_n(x) + count_NA(x)
@@ -503,6 +502,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
   # table computation
   if (tflag) {
+    out_names <- NULL  # does not apply to a table where the names are levels
 
     # get _n and _na variables
     a1 <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=count_n)
@@ -521,11 +521,12 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
         by.v <- list(dtmp[,ind.by])
       names(by.v) <- nm.row.by
       a2 <- aggregate(dtmp[,ind.var.d], by=by.v, drop=FALSE, FUN=count_n)
+      names(a2)[ncol(a2)] <- lvl[i]
       for (j in 1:nrow(a2))
         if (is.na(a2[j,ncol(a2)])) a2[j,ncol(a2)] <- 0
       amd <- merge(amd, a2, by=names(by.vars), sort=FALSE)
-      if (out.nm.miss)
-        l.nm <-lvl[i]
+      if (is.null(out_names))
+        l.nm <- lvl[i]
       else
         l.nm <- out_names[i]
       names(amd)[ncol(amd)] <- l.nm # lvl[i]
@@ -847,8 +848,9 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
   # if just one variable, drop the redundant variable names
   if (length(nm.var.d) == 1) {
-    names(a) <- gsub(nm.var.d, "", names(a), fixed=TRUE)
-    names(a) <- gsub("_", "", names(a), fixed=TRUE)
+    names(a)[3:4] <- gsub(nm.var.d, "", names(a)[3:4], fixed=TRUE)
+    names(a)[3:4] <- gsub("_", "", names(a)[3:4], fixed=TRUE)
   }
+
   return(a)
 }

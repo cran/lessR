@@ -248,6 +248,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (seg.miss) segments=TRUE
   }
 
+  # default point size for a stacked time series
+  if (stack) {
+    if (size.miss) size <- 0
+    size.miss <- FALSE
+  }
 
   # presume text output to the console, could turn off at end of function
   outp <- TRUE
@@ -1404,6 +1409,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         if (df.name == "NULL"  &&  jitter_y == 0.01) j.y.miss <- TRUE
 
         # get some VBS parameters
+        # ss.numeric called there
         if (df.name == "NULL"  &&  out_size == 1) out_size.miss <- TRUE
         VBS <- .param.VBS(x.call[,1], ID.call, by1.call, by1.miss, by.call,
                 by.miss, bw, bw.miss, bw_iter, iter.details,
@@ -1865,7 +1871,8 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
               if (!is.null(outlpts)) class(outlpts) <- "out"  # MD outliers
 
-              output <- list(out_stats=o$out_stats)
+#             if (nchar(o$out_stats) == 0)
+                output <- list(out_stats=o$out_stats)
 
               if (length(o$out_reg) == 1) {
                 if (nzchar(o$out_reg))

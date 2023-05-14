@@ -9,7 +9,7 @@ Abbreviation: \code{bc}
 
 Plots a bar chart, one categorical variable, \code{x} against one numeric variable \code{y}, as well as an optional second categorical variable \code{by} with a provided legend. One option is to enter the reduced data table, which consists of each level of \code{x} paired with the corresponding numerical value of \code{y}, with the number of rows the number of levels. Or, transform the full data table of original measurements. If no value of \code{y} is specified, by default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables, which can be replaced with custom color scales. Or, if a \code{y} variable is specified, obtain the reduced data table from which the bar chart is computed by summarizing the value of \code{y} at each level of \code{x}, such as the mean or a variety of other summary statistics.
 
-Also displays the frequency table for one or two variables, Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. To activate Trellis graphics specify a \code{by1} variable. If the provided object to analyze is a set of multiple variables, including an entire data frame, then a bar chart is calculated for each non-numeric variable in the data frame.
+Also displays the frequency table for one or two variables, Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. To activate Trellis graphics, a multi-panel display, sometimes called facets, specify a \code{by1} variable. If the provided object to analyze is a set of multiple variables, including an entire data frame, then a bar chart is calculated for each non-numeric variable in the data frame.
 }
 
 \usage{
@@ -58,7 +58,8 @@ bc(\dots)
 }
 
 \arguments{
-  \item{x}{Variable(s) to analyze.  Can be a single variable, either
+  \item{x}{Categorical \bold{variable(s)} to analyze.  Can be a single
+        variable, either
         within a data frame or as a vector in the users workspace,
         or multiple variables in a data frame such as designated with the
         \code{\link{c}} function, or an entire data frame. If not specified,
@@ -75,12 +76,12 @@ bc(\dots)
         corresponding bar. If specified for the original data table, then
         the corresponding
         \code{stat} parameter also must be set. If not specified, then 
-        its value is automatically tabulated as the frequency of each
+        its value is by default tabulated as the frequency of each
         category or joint category.}
   \item{by}{A categorical variable to create a two-variable a bar chart for
-        each level of the numeric primary variables \code{x} and
+        each level of the numeric primary variable
         \code{y} on the \emph{same} plot, which applies to the panels of
-        a Trellis plot if \code{by1} is specified.}
+        a Trellis (facet) plot if \code{by1} is specified.}
   \item{data}{Optional data frame that contains the variables of interest.
        Can contain data from which frequencies or other statistics for a
        \code{y}-variable are computed, or can be a summary table that consists
@@ -105,26 +106,28 @@ bc(\dots)
        set to \code{TRUE}, otherwise \code{FALSE}.}\cr
 
   \item{by1}{A categorical variable called a conditioning variable that
-        activates \bold{Trellis graphics}, from the lattice package, to provide
+        activates \bold{Trellis graphics} (facets), from the \code{lattice}
+        package, to provide
         a separate bar chart (panel) of numeric primary variables \code{x}
         and \code{y} for each level of the variable.}
   \item{n_row}{Optional specification for the number of rows in the layout
-        of a multi-panel display with Trellis graphics. Need not specify
+        of a multi-panel display with Trellis graphics (facets). Need not specify
         \code{n_col}.}
   \item{n_col}{Optional specification for the number of columns in the
         layout of a multi-panel display with
-        Trellis graphics. Need not specify \code{n_row}. If set to 1, then
+        Trellis graphics (facets). Need not specify \code{n_row}. If set to 1, then
         the strip that labels each group locates to the left of each plot
         instead of the top.}
   \item{aspect}{Lattice parameter for the aspect ratio of the panels in
-        a Trellis plot (multi-panel display), defined as height divided by
+        a Trellis plot (multi-panel display or facets), defined as height divided by
         width. The default value is \code{"fill"} to have the panels
         expand to occupy as much space as possible. Set to 1 for square panels.
         Set to \code{"xy"} to specify a ratio calculated
         to "bank" to 45 degrees, that is, with the line slope approximately
         45 degrees.}\cr
 
-  \item{horiz}{By default the value is \code{FALSE} so bars are vertical,
+  \item{horiz}{\bold{Bar orientation.} By default the value is
+      \code{FALSE} so bars are vertical,
        unless \code{one_plot} is \code{TRUE}.}
   \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
        first variable to be plotted as adjacent bars instead of stacked on each
@@ -142,18 +145,20 @@ bc(\dots)
 
   \item{theme}{Theme for the \bold{colors} for this analysis. Make persistent
         across analyses with \code{\link{style}}.}
-  \item{fill}{Fill color of the bars. Default is \code{"hues"} from default
-        theme \code{"colors"} unless categorical variable(s) is(are) ordinal
+  \item{fill}{Fill color of the bars. Default is the qualitative palette
+        \code{"hues"} from default
+        theme \code{"colors"}, unless the categorical variable(s) is(are) ordinal
         where the default is the \code{"blues"} sequential gradient. For any
         other color theme the default is the corresponding color gradient,
         such as \code{"reds"} for theme \code{"darkred"}. Can also specify
         any vector of colors to fill the bars, such as generated by 
         \code{\link{getColors}}, or access more pre-defined
-        gradients such as \code{"virdis"}. Or
+        gradients such as palettes that address color-blindness such as
+        \code{"virdis"}. Or
         set to the name of \code{y} to map the values of bar fill into the
         fill colors. Specified the name of \code{y} 
-        as \code{(count)} if tabulated from the data. Not applicable if \code{fill_split}
-        is activated.}
+        as \code{(count)} if tabulated from the data. Not applicable if
+        \code{fill_split} is activated.}
   \item{color}{Border color of the bars, can be a vector
         to customize the color for each bar. Default is
         \code{bar_color_discrete} from the lessR \code{\link{style}} function.}
@@ -367,7 +372,7 @@ For the pre-defined color scales can obtain more control over the obtained color
 
 The values of another variable can be mapped into the fill color of the bars. To do so, set \code{fill} to the value of the variable, which would usually be the name of the \code{y} variable if explicitly given. Or, if \code{y} is tabulated, refer to the variable name as \code{(count)}. The larger the count for a level of \code{x}, the darker the bar. 
 
-Also available are the pre-specified R color palettes \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. The pre-defined palette \code{"distinct"} maximally separates colors by hue. The family of color-blind family of viridis palettes are available as \code{"viridis"}, \code{"cividis"}, \code{"magma"}, \code{"inferno"}, and \code{"plasma"}. Pre-defined color palettes are available from many of Wes Anderson's movies such as \code{"Moonrise1"}, \code{"Royal1"}, \code{"GrandBudapest1"}, \code{"Darjeeling1"} and \code{"BottleRocket1"}. Can substitute a \code{2} for a \code{1} in the preceding references, and sometimes a \code{3}. 
+Also available are the pre-specified R color palettes \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. The pre-defined palette \code{"distinct"} maximally separates colors by hue. The family of color-blind family of viridis palettes are available as \code{"viridis"}, \code{"cividis"}, \code{"magma"}, \code{"inferno"}, and \code{"plasma"}, as well as the \code{"Okabe-Ito"} palette. Pre-defined color palettes are available from many of Wes Anderson's movies such as \code{"Moonrise1"}, \code{"Royal1"}, \code{"GrandBudapest1"}, \code{"Darjeeling1"} and \code{"BottleRocket1"}. Can substitute a \code{2} for a \code{1} in the preceding references, and sometimes a \code{3}. 
 
 LEGEND\cr
 When two variables are plotted, a legend is produced, with values for each level of the second or \code{by} variable.  By default, the location is placed in the right margin of the plot. This position can be changed with the \code{legend_position} option, which, in addition to the \code{lessR} option of \code{right_margin}, accepts any valid value consistent with the standard R \code{\link{legend}} function, used to generate the legend.
@@ -649,7 +654,7 @@ BarChart(Dept, Salary)
 #   so set na_show_group to FALSE
 d <- Read("Employee")
 a <- pivot(d, mean, Salary, c(Dept,Gender), na_group_show=FALSE)
-BarChart(Dept, mean, by=Gender, data=a)
+BarChart(Dept, Salary_mean, by=Gender, data=a)
 # do so just with BarChart, display bars in grayscale
 # How does average salary vary by gender across the various departments?
 BarChart(Dept, Salary, by=Gender, stat="mean", data=d, fill="grays")

@@ -89,9 +89,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
   if (theme != getOption("theme")) {  # given theme not the current theme
     sty <- style(theme, reset=FALSE)
-    fill <- sty$bar$bar.fill.discrete
+    fill <- sty$bar$bar_fill_discrete
     color <- sty$bar$color
-    trans <- sty$bar$trans.fill
+    trans <- sty$bar$trans_fill
     if (is.null(trans)) trans <- 0.1  # kludge, should not be NULL
   }
 
@@ -471,7 +471,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
 
   is.ord <- ifelse (is.ordered(x.call) || is.ordered(by.call), TRUE, FALSE)
 
-  if (fill.miss) {
+  # if theme changed, then fill already set
+  if (fill.miss  &&  theme == getOption("theme")) {
     if (is.ord || !is.null(by.call))
       fill <- .color_range(.get_fill(theme, is.ord), n.levels)  # default range
     else {

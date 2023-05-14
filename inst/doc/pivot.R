@@ -80,7 +80,7 @@ pivot(d, c(mean, median), Salary, c(Gender,Dept), out_names=c("MeanSalary", "Med
 
 ## ---------------------------------------------------------------------------------------------------------------------
 a <- pivot(d, mean, Salary, c(Dept, Gender))
-sort_by(a, by=mean, direction="-")
+sort_by(a, by=Salary_mean, direction="-")
 
 ## ---------------------------------------------------------------------------------------------------------------------
 #d |> pivot(mean, Salary, c(Dept, Gender)) -> a

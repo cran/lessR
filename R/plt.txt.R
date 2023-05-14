@@ -485,7 +485,6 @@ function(x, y, values, object, cat.x,  cat.y,
 
           stats <- .ss.factor(x.by, by=NULL, brief=TRUE, digits_d=NULL,
                               x.name, y.name, x.lbl, y.lbl)
-
           txttl <- stats$title
           counts <- stats$count
           chi <- stats$chi
@@ -559,7 +558,7 @@ function(x, y, values, object, cat.x,  cat.y,
       # categorical x and y vars
       # ------------------------
 
-      else if (cat.x  &&  cat.y) {
+      else if (cat.x && cat.y) {
         txsug <- ""
         if (getOption("suggest")) {
           txsug <- ">>> Suggestions"
@@ -613,7 +612,7 @@ function(x, y, values, object, cat.x,  cat.y,
 
         stats <- .ss.factor(x.fac, y.fac, digits_d=3, brief=FALSE,
                             x.name, y.name, x.lbl, y.lbl)
-
+ 
         txttl <- stats$txttl
         txfrq <- stats$txfrq
         txXV <- stats$txXV

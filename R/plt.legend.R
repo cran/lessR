@@ -12,10 +12,11 @@ function(colnms, horiz, color, fill, shape, box.bg, usr, lab_cex=0.8,
     text.cex <- ifelse(is.null(getOption("axis_x_cex")),
         getOption("axis_cex"), getOption("axis_x_cex"))
     text.cex <- 1.1 * text.cex
-    if (text.cex > 0.99) text.cex <- .95 * text.cex
   }
   else
     text.cex <- lab_cex
+  text.cex <- .85 * text.cex
+  if (text.cex < getOption("axis_cex")) text.cex <- getOption("axis_cex")
 
   if (horiz) {
 
@@ -45,6 +46,7 @@ function(colnms, horiz, color, fill, shape, box.bg, usr, lab_cex=0.8,
     size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates 
     #dv <- ifelse (options("device") == "RStudioGD", 1, 3)
     epsilon <- (size[1] - ll$rect$w) / 2
+    epsilon <- epsilon * .75
 
     axis_vert <- usr[4] - usr[3]
     xleft <- usr[2] + epsilon   # usr[2] user coordinate of right axis

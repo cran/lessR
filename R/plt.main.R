@@ -763,7 +763,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           }
         }  # end segments
 
-      }  # end is null by
+      }  # end is.null by
 
 
       # by grouping variable
@@ -791,13 +791,15 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         if (length(color)==1 && length(fill)==1 && length(shape)==1)
           for (i in 1:n.by) shp[i] <- shape.dft[i]  #  default shapes
 
+        # plot points and segments for each group
         for (i in 1:n.by) {
           x.lv <- subset(x, by==levels(by)[i])
           y.lv <- subset(y, by==levels(by)[i])
-
-          if (!by.bub) 
-            points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i],
-                   cex=size.pt, lwd=0.75, ...)
+          if (!by.bub)  {
+            if (size.pt > 0)
+              points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i],
+                     cex=size.pt, lwd=0.75, ...)
+          }
           else {  # size is a variable
             size.lv <- subset(size, by==levels(by)[i])
             fill[i] <- .maketrans(fill[i], (1-pts_trans)*256)
@@ -816,18 +818,21 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
         }  # end 1:n.by
 
+        # legend
         if (fill[1] == "transparent") fill <- color
-        if (stack) {
-          point.size <- 2.5 * axis_x_cex
+        if (stack) {  # default pt.size is 0
+          point.size <- ifelse (size > 0, 2.5 * axis_x_cex, 0)
           .plt.by.legend(levels(by), color, area_fill, shp=22, pts_trans,
-                         fill_bg, usr, pt.size=point.size,
+                         fill_bg, usr, pt.size=point.size,  # 22 is a rectangle
                          legend_title=legend_title)
         }
-        else
-          if (length(size) > 1) 
-            for (i in 1:length(shp)) shp[i] <- 21
-          .plt.by.legend(levels(by), color, fill, shp, pts_trans,
-                         fill_bg, usr, legend_title=legend_title)
+        else {  # not stack
+          if (n.by > 1) { 
+#           for (i in 1:length(shp)) shp[i] <- 21  # circle
+            .plt.by.legend(levels(by), color, fill, shp, pts_trans,
+                           fill_bg, usr, legend_title=legend_title)
+          }
+        }
 
       }  # end by
 

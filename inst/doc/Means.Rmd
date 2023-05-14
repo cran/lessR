@@ -127,7 +127,8 @@ dm
 Store the aggregated data in the data frame named _dm_, so explicitly identify with the `data` parameter. The computed mean of _breaks_ variable in the _dm_ data frame from the previous call to `pivot()` is named _mean_ by default.
 
 ```{r fig.width=5}
-Plot(tension, mean, by=wool, segments=TRUE, size=2, data=dm, main="Cell Means")
+Plot(tension, breaks_mean, by=wool, segments=TRUE, size=2, data=dm,
+     main="Cell Means")
 ```
 
 

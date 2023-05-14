@@ -1,8 +1,36 @@
+# lessR version 4.2.9, May 14, 2023
+
+## Updates
+
+* `BarChart()`: Missing data is now permitted for the numerical or `y` variable
+
+* `pivot()`: Aggregated variables are named the original name of the aggregated variable concatenated with an underscore and the name of the operation.
+    
+* `Plot()`: For plots of two or more variables, the right-margin legend is displayed with a smaller font size and centered more effectively
+
+* `prob_norm()`: Function terminates if value of `lo` is greater than `hi` instead of returning a meaningless result
+
+* `getColors()`: Default for parameter `output` is `TRUE` only for a direct call from the console. If embedded in a function call such as for the `fill` parameter, or even if directly called in R Markdown, then set `output=TRUE` to view the calculated palette
+
+
+## Bug Fixes
+
+* `BarChart()`: Parameter `theme` now works
+
+* `getColors()`: Now can be called directly in R Markdown documents though specify `output=TRUE` for output to be displayed
+
+* `pivot()`: Parameter `out_names` now works if the assigned name for a single variable analysis contains the name of the variable analyzed from the input data frame
+
+* `Plot()`: For stacked time series plots, default for `size` of points is now 0
+
+* `Plot()`: For lattice plots, if there is only a single point to plot in a panel, just the point is plotted instead of also attempting to plot a violin and a box plot, which necessarily fails
+
+
 # lessR version 4.2.8, March 21, 2023
 
 ## Updates
 
-Variable and axis value labels increased in size for R Markdown and R by itself analyses.
+`Plot()`: Variable and axis value labels increased in size for R Markdown and R by itself analyses
 
 
 # lessR version 4.2.6, Feb 13, 2023
@@ -17,7 +45,7 @@ Variable and axis value labels increased in size for R Markdown and R by itself 
 
 * `interact()`: To address color blindness, the `viridis` and `Okabe-Ito` were added as qualitative palettes, such as for the bars of a bar chart
 
-* `sort_by()`: New name for the `Sort()` function, now deprecated, to maintain consistency of lower-case functions being utility functions. 
+* `sort_by()`: New name for the `Sort()` function, now deprecated, to maintain consistency of lower-case functions being utility functions 
 
 * `Plot()`: For Trellis plots, indicated with `by1` and `by2` parameters, assessment of replications of unique values is done only if 1000 or fewer unique values to save both space and compute time for information that is not of such value anyhow
 

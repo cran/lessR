@@ -415,14 +415,14 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
 
     p <- update(p,
 
-       par.settings=list(  # col option does not work directly on panel.bwplot
-         box.rectangle=list(fill=box_fill, lwd=2,
-                            col=getOption("box_color")),
-         box.umbrella=list(col=getOption("box_color"), lty="solid")
-       ),
+        par.settings=list(  # col option does not work directly on panel.bwplot
+          box.rectangle=list(fill=box_fill, lwd=2,
+                             col=getOption("box_color")),
+          box.umbrella=list(col=getOption("box_color"), lty="solid")
+        ),
 
-       panel=function(x=x, box.ratio, wID=ID, ...,
-                      groups=groups, subscripts=subscripts) {
+        panel=function(x=x, box.ratio, wID=ID, ...,
+                       groups=groups, subscripts=subscripts) {
 
           panel.grid(h=0, v=-1, col=g.x_color, lwd=grid_x_lwd, lty=grid_x_lty)
 
@@ -452,7 +452,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               fnc.out[2] <- q3 + (2 * k.iqr * exp(-a*m.c) * iqr)
             } 
 
-            if (violin) {
+            if (violin && length(x)>1) {
               # to get a violin plot, cannot have y and by1
               # just Plot(x) gives a VBS plot with no groups and only 1 panel
               # a giant do loop that iterates over groups, i.e., panel.number()
@@ -464,7 +464,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
                     varwidth=vw, box.width=vbs_size, bw=bw)
             }
 
-            if (box || size.pt>0) {
+            if ((box || size.pt>0) && length(x)>1) {
 
               n.lvl <- ifelse (is.null(by1), 1, nlevels(by1))
               n <- adj.bx.ht

@@ -4,7 +4,7 @@ function(pal=NULL, end_pal=NULL,
          in_order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
          main=NULL, labels=NULL, labels_cex=0.8, lty="solid",
-         output=TRUE, quiet=getOption("quiet"), ...) {
+         output=NULL, quiet=getOption("quiet"), ...) {
 
 
   # a dot in a parameter name to an underscore
@@ -27,6 +27,11 @@ function(pal=NULL, end_pal=NULL,
   c.miss <- ifelse (missing(c), TRUE, FALSE)
 
   output.miss <- ifelse (missing(output), TRUE, FALSE)
+
+  # default output is FALSE unless a direct manual call from the console
+  # for Markdown files, need to set OUTPUT=TRUE if a direct call
+  if (output.miss)
+    output <- ifelse(sys.nframe() == 1, TRUE, FALSE)
 
   if (!is.null(end_pal) && length(pal) > 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -255,7 +260,7 @@ function(pal=NULL, end_pal=NULL,
     pal <- hcl.colors(n, palette = pal[1])
   }
 
-# Okabe-Ito colors
+  # Okabe-Ito colors
   else if (kind == "oi") {
     ttl <- paste("Okabe-Ito Colors Palette", pal[1], "\n") 
     pal <- pal <- palette.colors(n=9, palette="Okabe-Ito", alpha=1)[2:9]
@@ -345,11 +350,6 @@ function(pal=NULL, end_pal=NULL,
 
   # --------------------
   # plot and text output
-
-  # sys.nframe(): depth of function call
-  if (sys.nframe() > 1) if (output.miss)
-    output <- FALSE  # output only for a direct call
-
   if (output) { 
 
     # ----

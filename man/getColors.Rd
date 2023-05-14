@@ -16,7 +16,7 @@ In terms of workflow, use the function to select a set of colors from the result
          in_order=NULL, fixup=TRUE, power=NULL,
          shape=c("rectangle", "wheel"), radius=0.9, border="lightgray",
          main=NULL, labels=NULL, labels_cex=0.8, lty="solid",
-         output=TRUE, quiet=getOption("quiet"), \dots)
+         output=NULL, quiet=getOption("quiet"), \dots)
 }
 
 \arguments{
@@ -65,7 +65,9 @@ In terms of workflow, use the function to select a set of colors from the result
   \item{lty}{Line type of the border.}\cr
 
   \item{output}{Default to produce text and graphics output when called
-       directly but not when called from a visualization function.}
+       directly from the console but not when called from a visualization
+       function or a direct call in R Markdown, which requires
+       \code{output=TRUE}.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default with
        \code{\link{style}} function.}
   \item{\dots}{Other parameter values_}

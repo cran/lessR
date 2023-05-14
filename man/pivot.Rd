@@ -46,7 +46,9 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   \item{na_group_show}{If \code{TRUE}, the default, display NA for missing
        data of a grouping variable as a level for that variable.}
   \item{out_names}{Custom names for the aggregated variables. If more than one,
-        list in the same order as specified in \code{variable}.}\cr
+        list in the same order as specified in \code{variable}. Does not apply
+        to the \code{table} option where the column names are the levels of
+        the \code{by} variable(s).}\cr
 
   \item{sort}{Set to \code{"+"} for an ascending sort or \code{"-"} for
        a descending sort according to the last variable in the output data
@@ -155,7 +157,7 @@ pivot(data=d, compute=mean, variable=Salary, by=c(Dept, Gender))
 #   with missing data so do not show groups that are missing as
 #   another level
 a <- pivot(d, mean, Salary, c(Dept, Gender), na_group_show=FALSE)
-BarChart(Dept, mean, by=Gender, data=a)
+BarChart(Dept, Salary_mean, by=Gender, data=a)
 
 # calculate mean of Years and Salary for each combination of Dept and Gender
 # parameter values by position
