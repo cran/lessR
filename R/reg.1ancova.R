@@ -1,7 +1,8 @@
-.reg1anvBasic <-
-function(lm.out, digits_d=NULL, show_R=FALSE) {
+.reg1ancova <-
+function(lm.out, d.ancova, digits_d=NULL, show_R=FALSE) {
 
   nm <- all.vars(lm.out$terms)  # names of vars in the model
+  nm.a <- names(d.ancova)
   n.vars <- length(nm)
   n.pred <- n.vars - 1L
   n.obs <- nrow(lm.out$model)
@@ -9,18 +10,22 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
 
   x.cat <- 0
   x.cont <- 0
-  balance <- TRUE
+  # identify the grouping variable and the covariate
+  if (is.numeric(d.ancova[,nm.a[2]]) && is.factor(d.ancova[,nm.a[3]])) {
+    x.cat <- 3
+    x.cont <- 2
+  }
+  if (is.numeric(d.ancova[,nm.a[3]]) && is.factor(d.ancova[,nm.a[2]])) {
+    x.cat <- 2
+    x.cont <- 3
+  }
+  lvl <- levels(d.ancova[,nm.a[x.cat]])
+  tbl <- table(d.ancova[,nm.a[x.cat]])
 
   # ANOVA 
   smc <- anova(lm.out)
   n.terms <- nrow(smc) - 1
   nt1 <- n.terms + 1
-
-# kable experimentation
-# k <- kable(smc, digits=digits_d)
-# k <- gsub("|", " ", k, fixed=TRUE)
-# k[1] <- gsub("Pr(>F)", "p-value", k[1], fixed=TRUE)
-# k[length(k)] <- gsub("NA", "  ", k[length(k)], fixed=TRUE)
 
   SSE <- smc[nt1,2]
 
@@ -30,6 +35,10 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
   }
 
   tx[length(tx)+1] <- "-- Analysis of Variance"
+  tx[length(tx)] <-  paste(tx[length(tx)],
+                          "from Type II Sums of Squares")
+  lm2.out <- lm(d.ancova[,1] ~ d.ancova[,3] + d.ancova[,2])
+  smc[1,] <- anova(lm2.out)[2,]  # replace original first line of ANOVA table
   tx[length(tx)+1] <- ""
 
   if (show_R) {
@@ -80,37 +89,7 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
       tx[length(tx)+1] <- paste(rlb, df, SS, MS, fv, pv)
     } 
   }
-  if (n.pred > 1) tx[length(tx)+1] <- ""
 
-
-  # Model term in ANOVA table 
-  mdl <- NA
-  if (n.pred > 0) {
-    rlb <- .fmtc("Model", max.c1, j="left")
-
-    mod.df <- 0
-    for (i in 1:n.terms) mod.df <- mod.df + smc[i,1]
-    md <- .fmti(mod.df, max.ln[1]-5) 
-
-    mod.ss <- 0 
-    for (i in 1:n.terms) mod.ss <- mod.ss + smc[i,2]
-    ms <- .fmt(mod.ss, digits_d, max.ln[2])
-
-    mod.ms <- mod.ss/mod.df
-    mm <- .fmt(mod.ms, digits_d, max.ln[3])
-
-    mod.f <- mod.ms/smc[nt1, 3]
-    mf <- .fmt(mod.f, digits_d, max.ln[4])
-
-    mod.p <- pf(mod.f, mod.df, smc[nt1,1], lower.tail=FALSE)
-    mp <- .fmt(mod.p, 3, 9) 
-
-    tx[length(tx)+1] <- paste(rlb, md, ms, mm, mf, mp)
-#   if (n.pred > 1) tx[length(tx)+1] <- ""
-
-    mdl <- c(mod.df, mod.ss, mod.ms, mod.f, mod.p)
-    names(mdl) <- c("df", "ss", "ms", "fvalue", "pvalue")
-  }
 
   # Residuals
   rlb <- .fmtc(rownames(smc)[nt1], max.c1, j="left")
@@ -125,24 +104,7 @@ function(lm.out, digits_d=NULL, show_R=FALSE) {
 
   # Total
   tot <- NA
-  if (n.pred > 0) {
-    rlb <- .fmtc(nm[1], max.c1, j="left")
 
-    tot.df <- mod.df + smc[nt1,1]
-    td <- .fmti(tot.df, max.ln[1]-5) 
-
-    tot.ss <- mod.ss + smc[nt1,2]
-    ts <- .fmt(tot.ss, digits_d, max.ln[2])
-
-    tot.ms <- tot.ss/tot.df
-    tm <- .fmt(tot.ms, digits_d, max.ln[3])
-
-    tx[length(tx)+1] <- paste(rlb, td, ts, tm) 
-
-    tot <- c(tot.df, tot.ss, tot.ms)
-    names(tot) <- c("df", "ss", "ms")
-  }
-
-  return(list(out_anova=tx, mdl=mdl, rsd=rsd, tot=tot, MSW=MSW))
+  return(list(out_anova=tx, mdl="", rsd=rsd, tot=tot, MSW=MSW))
 
 }

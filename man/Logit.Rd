@@ -158,9 +158,10 @@ Logit(Gender ~ Years)
 # just for employees who have worked more than 5 years at the firm
 Logit(Gender ~ Years + Salary, prob_cut=c(.4, .7), rows=(Years > 3))
 
-# Custom contrasts for categorical predictor with glm parameter contrasts
-cnt <- contr.treatment(n=3, base=2)
-Logit(Gender ~ JobSat, contrasts=list(JobSat=cnt))
+# Custom contrasts for categorical predictor
+d$JobSat <- factor(d$JobSat, levels=c("low", "med", "high"))
+contrasts(d$JobSat) <- contr.sum(n=3)
+Logit(Gender ~ JobSat)
 
 
 # Compare nested models

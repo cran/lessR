@@ -1,7 +1,7 @@
 .reg.Rmd <-
-function(nm, dname, fun_call, n_res_rows, n_pred_rows, res_sort, ancova=FALSE,
+function(nm, dname, fun_call, n_res_rows, n_pred_rows, res_sort, d.ancova,
          digits_d, results, explain, interpret, code,
-         pvalues, tolerances, resid.max, numeric.all, X1_new,
+         pvalues, tolerances, resid.max, X1_new,
          new.val=matrix(nrow=n.vars-1, ncol=2, byrow=TRUE),
          Rmd_data, Rmd_custom, Rmd_dir, Rmd_labels) {
 
@@ -112,28 +112,28 @@ out.estimates <- function() {
 plot.scatter <- function() {
   out <- "\n"
   out <- paste(out, "```{r echo=FALSE}\n", sep="")
-  out <- paste(out, "regPlot(r, 1, ancova, pred.intervals=FALSE)\n", sep="")
+  out <- paste(out, "regPlot(r, 1, d.ancova, pred.intervals=FALSE)\n", sep="")
   out <- paste(out, "```", "\n", sep="")
 }
 
 plot.sp_pred <- function() {
   out <- "\n"
   out <- paste(out, "```{r echo=FALSE}\n", sep="")
-  out <- paste(out, "regPlot(r, 1, ancova, pred.intervals=TRUE)\n", sep="")
+  out <- paste(out, "regPlot(r, 1, d.ancova, pred.intervals=TRUE)\n", sep="")
   out <- paste(out, "```", "\n", sep="")
 }
 
 plot.resids_dist <- function() {
   out <- "\n"
   out <- paste(out, "```{r echo=FALSE}\n", sep="")
-  out <- paste(out, "regPlot(r, 2, ancova)\n", sep="")
+  out <- paste(out, "regPlot(r, 2, d.ancova)\n", sep="")
   out <- paste(out, "```", "\n", sep="")
 }
 
 plot.fitted_resids <- function() {
   out <- "\n"
   out <- paste(out, "```{r echo=FALSE}\n", sep="")
-  out <- paste(out, "regPlot(r, 3, ancova)\n", sep="")
+  out <- paste(out, "regPlot(r, 3, d.ancova)\n", sep="")
   out <- paste(out, "```", "\n", sep="")
 }
 
@@ -772,8 +772,6 @@ sep="")
 # 5 - Relations
 # -------------
 
-  if (numeric.all) {      
-
   if (nchar(uYq) == 0) uYq <- NULL
 
   tx[length(tx)+1] <- paste("`r d_d <-", d_d, "`")
@@ -799,16 +797,6 @@ sep="")
       tx[length(tx)+1] <- .RmdParse("5RelationsM.txt", Rmd_dir, n.pred,
                                  explain, results, interpret)
   }
-
-  }  # end numeric.all
-
-  else {
-   tx[length(tx)+1] <- "## Relations"
-   tx[length(tx)+1] <- 
-       "No analysis due to non-numeric variables."
-  }
-
-
 
   
   if (n_res_rows > 0) {
@@ -836,13 +824,12 @@ sep="")
 
 
 
-
 #7 - Prediction
 # -------------
 
   if (!is.null(uYq)) if (nchar(uYq) == 0) uYq <- NULL
 
-  if (n_pred_rows > 0  && n.pred <= 6  &&  numeric.all  &&  is.null(X1_new)) {
+  if (n_pred_rows > 0  && n.pred <= 6  &&  is.null(X1_new)) {
     tx[length(tx)+1] <- paste("`r uYq <- ", paste("\"", uYq, "\"`", sep=""), sep="")
 
     if (Rmd_labels) tx[length(tx)+1] <- lbls("7Prediction.txt")

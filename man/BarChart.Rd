@@ -286,7 +286,7 @@ bc(\dots)
        Possible values are any text to be written, the first argument, which is
        \code{"text"}, or, to indicate a figure,
        \code{"rect"} (rectangle), \code{"line"}, \code{"arrow"},
-       \code{"v.line"} (vertical line), and \code{"h.line"} (horizontal line).
+       \code{"v_line"} (vertical line), and \code{"h_line"} (horizontal line).
        The value \code{"means"} is short-hand for vertical and horizontal lines
        at the respective means. Does not apply to Trellis graphics.
        Customize with parameters such as \code{add_fill} and \code{add_color}
@@ -326,7 +326,7 @@ bc(\dots)
 
 \details{
 OVERVIEW\cr
-Plot a bar chart with default colors for one or two categorical variables, that is, with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}},  \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accommodate both the value labels and the variable label.
+Plot a bar chart with default colors for one or two categorical variables, that is, with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}}, \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accommodate both the value labels and the variable label.
 
 
 DATA\cr

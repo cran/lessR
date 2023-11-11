@@ -57,7 +57,7 @@ READABLE OUTPUT\cr
 STATISTICS\cr
 \code{Rmd}: Instructions to run through \code{knitr}, such as copy and paste, to obtain output in the form of a web file, pdf document or Word document. Can also obtain these instructions with the \code{Rmd} option, which writes them directly to the specified text file. Obtain a less detailed \code{Rmd} file by setting \code{explain=FALSE}. 
 
-Although not typically needed for analysis, if the output is assigned to an object named, for example, \code{fa}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(fa)}. Invoking the \code{\link{class}} function on the saved object reveals a class of {out_all}. The class of each of the text pieces of output is {out}.
+Although not typically needed for analysis, if the output is assigned to an object named, for example, \code{fa}, then the complete contents of the object can be viewed directly with the \code{\link{unclass}} function, here as \code{unclass(fa)}. Invoking the \code{\link{class}} function on the saved object reveals a class of \code{out_all}. The class of each of the text pieces of output is \code{out}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

@@ -1,6 +1,8 @@
 .plt.fit <- 
 function(x.lv, y.lv, fit.line, fit_power) {
 
+# Need to implement  xlog  and xylog
+
   b00 <- NULL
   b11 <- NULL
   Rsqq <- NULL

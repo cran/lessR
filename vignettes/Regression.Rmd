@@ -115,18 +115,18 @@ dp[.(row.names(dp) == "Pham,Scott"),]
 
 ## Contrasts
 
-Because `reg()` accomplishes its computations with base R function `lm()`, `lm()` parameters can be passed to `reg()`, which then passes the values to `lm()`. Here, first use base R function `contr.sum()` to calculate an effect coding contrast matrix for a categorical variable with three levels, such as the variable _Plan_ in the _Employee_ data set.
+Because `reg()` accomplishes its computations with base R function `lm()`, `lm()` parameters can be passed to `reg()`, which then passes the values to `lm()` to define the corresponding indicator variables. Here, first use base R function `contr.sum()` to calculate an effect coding contrast matrix for a categorical variable with three levels, such as the variable _Plan_ in the _Employee_ data set.
 
 ```{r}
 cnt <- contr.sum(n=3)
 cnt
 ```
 
-Now use the `lm()` parameter `contrasts` to define the effect coding for _Plan_, passed to `reg_brief()`. Contrasts only apply to factors, so convert _Plan_ to an R factor before the regression analysis.
+Now use the `lm()` parameter `contrasts` to define the effect coding for _JobSat_, passed to `reg_brief()`. Contrasts only apply to factors, so convert _JobSat_ to an R factor before the regression analysis, a task that should generally be done for all categorical variables in an analysis. Here, designate the order of the levels on output displays such as a bar graph.
 
 ```{r fig.width=4.5, fig.height=4}
-d$Plan <- factor(d$Plan)
-reg_brief(Salary ~ Plan, contrasts=list(Plan=cnt))
+d$JobSat <- factor(d$JobSat, levels=c("low", "med", "high"))
+reg_brief(Salary ~ JobSat, contrasts=list(JobSat=cnt))
 ```
 
 

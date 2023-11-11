@@ -72,6 +72,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     message("parameter value  root  replaced with  power  for consistency\n")
   }
 
+  if (fit %in% c("xlog", "xylog")) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Parameters  xlog  and  xylog  not yet implemented.\n\n")
+  }
+
   # a dot in a parameter name to an underscore and more
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {

@@ -157,7 +157,7 @@ function(data, my_formula, kfold, new_scale, scale_response, nm,
   k_MSE.lbl <- .fmtc("MSE", max.num[5]+1)
   k_Rsq.lbl <- .fmtc("Rsq", max.num[6]+1)
   tx[length(tx)+1] <- paste("fold",
-           "    n", t_se.lbl, t_MSE.lbl, t_Rsq.lbl,
+           "   n", t_se.lbl, t_MSE.lbl, t_Rsq.lbl,
            "     n", k_se.lbl, k_MSE.lbl, k_Rsq.lbl, sep="")
 
   # indices for the different folds
@@ -185,7 +185,7 @@ function(data, my_formula, kfold, new_scale, scale_response, nm,
   tx[length(tx)+1] <- paste("     ", dash, "  ", dash)
   buf1 <- " "
   for (ic in 1:(mx.nch)) buf1 = paste(buf1, " ", sep="")
-  buf2 <- paste(buf1, " ", sep="")
+  buf2 <- paste(buf1, "  ", sep="")
   tx[length(tx)+1] <- paste("Mean", buf1,
       .fmt(tm_se, digits_d, max.num[4]),
       .fmt(tm_MSE, digits_d, max.num[5]),

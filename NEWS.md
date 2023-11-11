@@ -1,82 +1,99 @@
-# lessR version 4.2.9, May 14, 2023
+# lessR version 4.3.0, Nov 11, 2023
 
 ## Updates
 
-* `BarChart()`: Missing data is now permitted for the numerical or `y` variable
+* `Logit(), Regression()`: For categorical predictor variables, the conversion to indicator variables now happens before the analysis. All analyses are now only of numeric variables so that the correlation matrix, scatterplot matrix, tolerance, and best subset analyses are now conducted.
 
-* `pivot()`: Aggregated variables are named the original name of the aggregated variable concatenated with an underscore and the name of the operation.
-    
-* `Plot()`: For plots of two or more variables, the right-margin legend is displayed with a smaller font size and centered more effectively
-
-* `prob_norm()`: Function terminates if value of `lo` is greater than `hi` instead of returning a meaningless result
-
-* `getColors()`: Default for parameter `output` is `TRUE` only for a direct call from the console. If embedded in a function call such as for the `fill` parameter, or even if directly called in R Markdown, then set `output=TRUE` to view the calculated palette
+* `Logit(), Regression()`: Redundant predictor variables that lead to a singularity is now detected and noted instead of the function crashing.
 
 
 ## Bug Fixes
 
-* `BarChart()`: Parameter `theme` now works
+* `Logit()`: For sigmoid function plot for a single predictor model, right-hand margin adjusted to better display labels of the target variable of varying lengths.
 
-* `getColors()`: Now can be called directly in R Markdown documents though specify `output=TRUE` for output to be displayed
+* `Regression()`: For the model fit section, the displayed standard deviation of the response variable is now computed from the same data from which the model was estimated, which can differ depending on missing data.
 
-* `pivot()`: Parameter `out_names` now works if the assigned name for a single variable analysis contains the name of the variable analyzed from the input data frame
 
-* `Plot()`: For stacked time series plots, default for `size` of points is now 0
 
-* `Plot()`: For lattice plots, if there is only a single point to plot in a panel, just the point is plotted instead of also attempting to plot a violin and a box plot, which necessarily fails
+# lessR version 4.2.9, May 14, 2023
+
+## Updates
+
+* `BarChart()`: Missing data is now permitted for the numerical or `y` variable.
+
+* `pivot()`: Aggregated variables are named the original name of the aggregated variable concatenated with an underscore and the name of the operation.
+    
+* `Plot()`: For plots of two or more variables, the right-margin legend is displayed with a smaller font size and centered more effectively.
+
+* `prob_norm()`: Function terminates if value of `lo` is greater than `hi` instead of returning a meaningless result.
+
+* `getColors()`: Default for parameter `output` is `TRUE` only for a direct call from the console. If embedded in a function call such as for the `fill` parameter, or even if directly called in R Markdown, then set `output=TRUE` to view the calculated. palette
+
+
+## Bug Fixes
+
+* `BarChart()`: Parameter `theme` now works.
+
+* `getColors()`: Now can be called directly in R Markdown documents though specify `output=TRUE` for output to be displayed.
+
+* `pivot()`: Parameter `out_names` now works if the assigned name for a single variable analysis contains the name of the variable analyzed from the input data frame.
+
+* `Plot()`: For stacked time series plots, default for `size` of points is now 0.
+
+* `Plot()`: For lattice plots, if there is only a single point to plot in a panel, just the point is plotted instead of also attempting to plot a violin and a box plot, which necessarily fails.
 
 
 # lessR version 4.2.8, March 21, 2023
 
 ## Updates
 
-`Plot()`: Variable and axis value labels increased in size for R Markdown and R by itself analyses
+`Plot()`: Variable and axis value labels increased in size for R Markdown and R by itself analyses.
 
 
 # lessR version 4.2.6, Feb 13, 2023
 
 ## Updates
 
-* `ANOVA()`, `BarChart()`, `Histogram()`, `Plot()`, `Regression()`, `ttest()`: A tibble that is not in the user workspace, instead in a package, is now properly converted to a standard R data frame upon which the internal function's code depends, which also permits more flexibility in the packaging of data in general to these functions, such as with the pipe operator 
+* `ANOVA()`, `BarChart()`, `Histogram()`, `Plot()`, `Regression()`, `ttest()`: A tibble that is not in the user workspace, instead in a package, is now properly converted to a standard R data frame upon which the internal function's code depends, which also permits more flexibility in the packaging of data in general to these functions, such as with the pipe operator.
 
-* `ANOVA()`: Overall p-value now available for the one-way ANOVA as the statistic in an output object, called `p_value`, such as output object `a$p_value` in `a <- ANOVA( ... )`
+* `ANOVA()`: Overall p-value now available for the one-way ANOVA as the statistic in an output object, called `p_value`, such as output object `a$p_value` in `a <- ANOVA( ... )`.
 
-* `getColors()`: To address color blindness, the `Okabe-Ito` color palette was added, and available as a `fill` parameter in `Plot()` and `BarChart()`
+* `getColors()`: To address color blindness, the `Okabe-Ito` color palette was added, and available as a `fill` parameter in `Plot()` and `BarChart()`.
 
-* `interact()`: To address color blindness, the `viridis` and `Okabe-Ito` were added as qualitative palettes, such as for the bars of a bar chart
+* `interact()`: To address color blindness, the `viridis` and `Okabe-Ito` were added as qualitative palettes, such as for the bars of a bar chart.
 
-* `sort_by()`: New name for the `Sort()` function, now deprecated, to maintain consistency of lower-case functions being utility functions 
+* `sort_by()`: New name for the `Sort()` function, now deprecated, to maintain consistency of lower-case functions being utility functions.
 
-* `Plot()`: For Trellis plots, indicated with `by1` and `by2` parameters, assessment of replications of unique values is done only if 1000 or fewer unique values to save both space and compute time for information that is not of such value anyhow
+* `Plot()`: For Trellis plots, indicated with `by1` and `by2` parameters, assessment of replications of unique values is done only if 1000 or fewer unique values to save both space and compute time for information that is not of such value anyhow.
 
-* `Plot()`: For a run chart, parameter `run=TRUE`, the successive points in the plot are now by default joined with line segments, which can be stopped by setting parameter `segments=FALSE`
+* `Plot()`: For a run chart, parameter `run=TRUE`, the successive points in the plot are now by default joined with line segments, which can be stopped by setting parameter `segments=FALSE`.
 
-* `Plot()`: Parameters `lab_cex` and `axis_cex` for size of value labels and axis labels, scaled smaller for visualizations in R run alone, without RStudio
+* `Plot()`: Parameters `lab_cex` and `axis_cex` for size of value labels and axis labels, scaled smaller for visualizations in R run alone, without RStudio.
 
-* `Plot()`: To address color blindness, when there is a `by` grouping, default is now to not only vary the fill color but also the shape of the plotted points  
+* `Plot()`: To address color blindness, when there is a `by` grouping, default is now to not only vary the fill color but also the shape of the plotted points. 
 
-* `Regression()`: Parameter `mod` for moderation analysis in a two-predictor model added
+* `Regression()`: Parameter `mod` for moderation analysis in a two-predictor model added.
 
-* `ttest()`: Parameter `quiet` added to turn off text display at the console if set to `TRUE`
+* `ttest()`: Parameter `quiet` added to turn off text display at the console if set to `TRUE`.
 
 
 ## Bug Fixes
 
-* `ANOVA()`: One-way ANOVA with parameter `graphics=FALSE` now works
+* `ANOVA()`: One-way ANOVA with parameter `graphics=FALSE` now works.
 
-* `BarChart()`, `Plot()`: Qualitative color palette `hues` was the default for the default color theme, `colors`, but now also works explicitly when specified as the value for the `fill` parameter
+* `BarChart()`, `Plot()`: Qualitative color palette `hues` was the default for the default color theme, `colors`, but now also works explicitly when specified as the value for the `fill` parameter.
 
-* `BarChart()`: Now works for `color` parameter specified as a vector
+* `BarChart()`: Now works for `color` parameter specified as a vector.
 
-* `interact()`: Interactive analyses resets label and axis plot sizes to larger, now set back when saving the pdf and also when re-plotting
+* `interact()`: Interactive analyses resets label and axis plot sizes to larger, now set back when saving the pdf and also when re-plotting.
 
-* `PieChart()`: Suggestions for alternative analyses had wrong lowercase expression `piechart()` instead of `PieChart()`
+* `PieChart()`: Suggestions for alternative analyses had wrong lowercase expression `piechart()` instead of `PieChart()`.
 
-* `Plot()`: With a linear fit line, b0 and b1 now reflect the specified number of digits according to parameter `digits_d`
+* `Plot()`: With a linear fit line, b0 and b1 now reflect the specified number of digits according to parameter `digits_d`.
 
-* `Plot()`: For  plotting a continuous and a categorical variable scatterplot, when listing the continuous variable first, the name of the categorical variable is now listed in the title of the text output
+* `Plot()`: For  plotting a continuous and a categorical variable scatterplot, when listing the continuous variable first, the name of the categorical variable is now listed in the title of the text output.
  
-* `Plot()`: For a run chart with parameter `run=TRUE`, parameter `scale_x` now properly allows for a custom set of ticks for the `Index` on the x-axis
+* `Plot()`: For a run chart with parameter `run=TRUE`, parameter `scale_x` now properly allows for a custom set of ticks for the `Index` on the x-axis.
 
 
 
@@ -84,128 +101,128 @@
 
 ## Primary Update
  
-* `Histogram()`, `Plot()`, `Correlation()`, `ttest()`: Vastly speeded up for data sets much over 500 data values, substantial improvement on large data sets
+* `Histogram()`, `Plot()`, `Correlation()`, `ttest()`: Vastly speeded up for data sets much over 500 data values, substantial improvement on large data sets.
 
 
 ## Updates
 
-* `Plot()`: Parameters `jitter_x` and `jitter_y` are reset for the scatterplot (not VBS plot) to explicitly set the amount of jitter within the negative and positive values of their assigned values, or, set to `NULL` to activate the default value of the range of the variable divided by 50
+* `Plot()`: Parameters `jitter_x` and `jitter_y` are reset for the scatterplot (not VBS plot) to explicitly set the amount of jitter within the negative and positive values of their assigned values, or, set to `NULL` to activate the default value of the range of the variable divided by 50.
 
 * `Plot()`: Text output for Mahalanobis distance more nicely formatted.
 
-* `interact()`: Reading of text files was not detecting blank data values for variables of type `character` as missing, which now it does
+* `interact()`: Reading of text files was not detecting blank data values for variables of type `character` as missing, which now it does.
 
-* `interact()`: Various revisions of the interface styles and efficiency increases
+* `interact()`: Various revisions of the interface styles and efficiency increases.
 
-* `interact()`: A `Help` option added for each analysis, which, when clicked, displays a web page of explanation of the analysis and listing and definition of each presented parameter
+* `interact()`: A `Help` option added for each analysis, which, when clicked, displays a web page of explanation of the analysis and listing and definition of each presented parameter.
 
-* `interact("BarChart")`: Numerical `y` variable and associated `stat` parameter added for analysis of means and related statistics across the levels of the categorical variable `x`
+* `interact("BarChart")`: Numerical `y` variable and associated `stat` parameter added for analysis of means and related statistics across the levels of the categorical variable `x`.
 
-* `interact("BarChart")`: The summary table of each category level paired with a number, to translate into bar height, can now be read as the input data table
+* `interact("BarChart")`: The summary table of each category level paired with a number, to translate into bar height, can now be read as the input data table.
 
-* `interact("Plot"): ID lableing of outliers added
+* `interact("Plot"): ID lableing of outliers added.
 
-* `pivot()`: For a single `variable` to process, the variable name no longer repeated for each column of the output, one column per statistic computed
+* `pivot()`: For a single `variable` to process, the variable name no longer repeated for each column of the output, one column per statistic computed.
 
 
 ## Bug Fixes
 
-* `BarChart()`: When plotting a statistics for a numerical variable, `y`, the plotted values are now displayed at the console with sufficient width
+* `BarChart()`: When plotting a statistics for a numerical variable, `y`, the plotted values are now displayed at the console with sufficient width.
 
-* `interact("ScatterPlot")`: Parameter `enhance` now works
+* `interact("ScatterPlot")`: Parameter `enhance` now works.
 
-* `interact("ScatterPlot")`: Choose parameter `enhance` then parameter `by` now works
+* `interact("ScatterPlot")`: Choose parameter `enhance` then parameter `by` now works.
 
-* `interact("ScatterPlot")`: Parameters `by` and `size` now work together and properly written to the R code file
+* `interact("ScatterPlot")`: Parameters `by` and `size` now work together and properly written to the R code file.
 
-* `interact("Trellis")`: Single VBS now plotted without a `by1` variable for Trellis plots per se
+* `interact("Trellis")`: Single VBS now plotted without a `by1` variable for Trellis plots per se.
 
-* `Regression()`: For parameter `Rmd`, collinearity issue fixed
+* `Regression()`: For parameter `Rmd`, collinearity issue fixed.
 
 
 # lessR version 4.2.4, Dec 07, 2022
 
 ## Updates
 
-* `ref_group` for `Logit()`, new, more explanatory name for `ref`, the level of the binary target variable explicitly defined as the reference group instead of relying on the default
+* `ref_group` for `Logit()`, new, more explanatory name for `ref`, the level of the binary target variable explicitly defined as the reference group instead of relying on the default.
 
-* `train_test()` has new parameter `matrix_out` which outputs the data structures as matrices instead of as data frames 
+* `train_test()` has new parameter `matrix_out` which outputs the data structures as matrices instead of as data frames.
 
-* `Regression()`: For automatically generating and processing R markdown files, users can now 100% customize the output directly by creating their own input files, just one or all eight of the files
+* `Regression()`: For automatically generating and processing R markdown files, users can now 100% customize the output directly by creating their own input files, just one or all eight of the files.
 
-* `Regression()`: Added parameters `Rmd_custom` to specify one or more custom input files and `Rmd_dir` to specify a custom directory where the files are stored
+* `Regression()`: Added parameters `Rmd_custom` to specify one or more custom input files and `Rmd_dir` to specify a custom directory where the files are stored.
 
-* `Regression()`: For output, `vars` component added that is a vector of the variable names in the model beginning with the response variable
+* `Regression()`: For output, `vars` component added that is a vector of the variable names in the model beginning with the response variable.
 
-* `Regression()`: Parameters `res_rows` and `pred_rows` changed to the more descriptive `n_res_rows` and `n_pred_rows`  
+* `Regression()`: Parameters `res_rows` and `pred_rows` changed to the more descriptive `n_res_rows` and `n_pred_rows`.
 
 
 ## Bug Fixes
 
-* `interact("Histogram")`: The `bandwidth` slider for the `density` option now re-adjusts if a new variable is selected from the same data set
+* `interact("Histogram")`: The `bandwidth` slider for the `density` option now re-adjusts if a new variable is selected from the same data set.
 
-* `interact("Plot")`: Points now plotted properly
+* `interact("Plot")`: Points now plotted properly.
 
-* `interact("Plot")`: Fill color properly set if a `by` variable is selected
+* `interact("Plot")`: Fill color properly set if a `by` variable is selected.
 
-* `Plot()`: Transparency (trans parameter) now works when size as a variable and by are activated
+* `Plot()`: Transparency (trans parameter) now works when size as a variable and by are activated.
 
-* `Plot()`: for a `fit` function, mse now properly computed
+* `Plot()`: for a `fit` function, mse now properly computed.
  
-* `recode()`: Entire data frame now not written to the console
+* `recode()`: Entire data frame now not written to the console.
 
-* `Regression()`: Text enlarged for scatterplot matrix
+* `Regression()`: Text enlarged for scatterplot matrix.
 
-* `Regression()`: Number of allowable terms in the model definition now greatly expanded
+* `Regression()`: Number of allowable terms in the model definition now greatly expanded.
 
-* `Regression()`: When generating a markdown file with parameter `Rmd`, if reading a label file included with `lessR`, the correct data file is now properly listed instead of the label file
+* `Regression()`: When generating a markdown file with parameter `Rmd`, if reading a label file included with `lessR`, the correct data file is now properly listed instead of the label file.
 
 
 # lessR version 4.2.3, Sept 11, 2022
 
 ## Primary Update
 
-* `interact()`: lessR data analysis is now interactive, with each interactive analysis now displayed for analyzing the user's own data, which also includes summary statistics as output with the option to save the plot to a pdf file plus the corresponding R code
+* `interact()`: lessR data analysis is now interactive, with each interactive analysis now displayed for analyzing the user's own data, which also includes summary statistics as output with the option to save the plot to a pdf file plus the corresponding R code.
 
 
 ## Updates
 
-* `BarChart()`: Parameter `do_plot` added for the option of computing summary statistics but not plotting
+* `BarChart()`: Parameter `do_plot` added for the option of computing summary statistics but not plotting.
 
-* `Histogram()`: Underlying algorithm more efficient
+* `Histogram()`: Underlying algorithm more efficient.
 
-* `Histogram(..., density=TRUE)`: `fill_gen` and `color_gen` revised to `fill_general` and` color_general`, and `fill_nrm` and `color_nrm` to `fill_normal` and `color_normal` though the old names still accepted, as with `bandwidth` in place of `bw` and `include_histogram` in place of `dn.hist`
+* `Histogram(..., density=TRUE)`: `fill_gen` and `color_gen` revised to `fill_general` and` color_general`, and `fill_nrm` and `color_nrm` to `fill_normal` and `color_normal` though the old names still accepted, as with `bandwidth` in place of `bw` and `include_histogram` in place of `dn.hist`.
 
-* `Histogram()`: for density curve, provided values for `fill_general` and `fill_normal` that are color names now are converted to the same transparency level as their default colors
+* `Histogram()`: for density curve, provided values for `fill_general` and `fill_normal` that are color names now are converted to the same transparency level as their default colors.
 
-* `PieChart()`: value labels now separated from the category label so that size can be set independently 
+* `PieChart()`: value labels now separated from the category label so that size can be set independently.
 
-* `pivot()`: Long labels now abbreviated to stay within column widths
+* `pivot()`: Long labels now abbreviated to stay within column widths.
 
-* `Plot()`: For numbers < 10000, more decimal digits for stat outcomes of `fit` parameter, such as MSE
+* `Plot()`: For numbers < 10000, more decimal digits for stat outcomes of `fit` parameter, such as MSE.
 
-* `Plot()`: With a `by` variable a named, sequential color range such as "reds" can now be specified in addition to the qualitative range of "hues"
+* `Plot()`: With a `by` variable a named, sequential color range such as "reds" can now be specified in addition to the qualitative range of "hues".
 
-* `tt.brief()` removed, long since replaced by `tt_brief()`
+* `tt.brief()` removed, long since replaced by `tt_brief()`.
 
 
 ## Bug Fixes
 
-* `loading lessR`: Now lessR loads properly if another previously loaded package had loaded shiny
+* `loading lessR`: Now lessR loads properly if another previously loaded package had loaded shiny.
 
-* `Histogram()`: Returns in list structure, such as `h`, saved output from `h <- Histogram(...)`
+* `Histogram()`: Returns in list structure, such as `h`, saved output from `h <- Histogram(...)`.
 
-* `Histogram()`: When `bin_start` was < 0 the number of displayed digits for the mid point of each bin could be excessive, now fixed 
+* `Histogram()`: When `bin_start` was < 0 the number of displayed digits for the mid point of each bin could be excessive, now fixed.
 
-* `Histogram()`: spelling error of out_suggewt to `out_suggest` fixed for output names
+* `Histogram()`: spelling error of out_suggewt to `out_suggest` fixed for output name.s
 
-* `pivot()`: When constructing a table (instead of a dataframe), `NA`'s now properly displayed
+* `pivot()`: When constructing a table (instead of a dataframe), `NA`'s now properly displayed.
 
-* `Plot()`: Restored title that indicates scaling of bubble plot
+* `Plot()`: Restored title that indicates scaling of bubble plot.
 
-* `Plot()`: Transparency on bubble plots now works
+* `Plot()`: Transparency on bubble plots now works.
 
-* `Read2()`: Now works properly
+* `Read2()`: Now works properly.
 
 
 
@@ -213,61 +230,62 @@
 
 ## Updates
 
-* `BoxPlot()`, `Histogram()`: Recent message from outlier check from package `robustbase` removed
+* `BoxPlot()`, `Histogram()`: Recent message from outlier check from package `robustbase` removed.
 
-* `Logit()`: Confusion matrix now displayed even if all predictions are for a single outcome category
+* `Logit()`: Confusion matrix now displayed even if all predictions are for a single outcome category.
 
-* `pivot()`: If not specified, output defaults to 3 decimal digits, otherwise displays the needed number of decimal digits to avoid rounding to 0.000  
+* `pivot()`: If not specified, output defaults to 3 decimal digits, otherwise displays the needed number of decimal digits to avoid rounding to 0.000.  
 
-* `pivot()`: For consistency, parameter `n_show_group` changed to `n_group_show`  
+* `pivot()`: For consistency, parameter `n_show_group` changed to `n_group_show`.  
 
-* `Plot()`: New parameter `n_bins` > 1 indicates to bin the numeric x-variable and plot the mean or median of the numeric y-variable for each bin, with each point size dependent on the corresponding bin sample size
+* `Plot()`: New parameter `n_bins` > 1 indicates to bin the numeric x-variable and plot the mean or median of the numeric y-variable for each bin, with each point size dependent on the corresponding bin sample size.
 
-* `Plot()`: More stats displayed regarding each panel when doing a fit line
+* `Plot()`: More stats displayed regarding each panel when doing a fit line.
 
-* `Read()`: Browsing for data file in RStudio, message about hidden window removed
+* `Read()`: Browsing for data file in RStudio, message about hidden window removed.
 
 
 
 ## Bug Fixes
 
-* `pivot()`: If `na_remove` is `FALSE`, the missing data value for the aggregated statistic was reported as 0 instead of `NA`
+* `pivot()`: If `na_remove` is `FALSE`, the missing data value for the aggregated statistic was reported as 0 instead of `NA`.
 
-* `Plot()`: y-axis label now evaluated on all axis values instead of only the maximum value, which, if 1.0, rounds to 1, only a single digit
+* `Plot()`: y-axis label now evaluated on all axis values instead of only the maximum value, which, if 1.0, rounds to 1, only a single digit.
 
-* `Plot()`: `segments=TRUE` now applies to all scatter plots, not just with `by=`
+* `Plot()`: `segments=TRUE` now applies to all scatter plots, not just with `by=`.
 
 
 
 # lessR version 4.2.0, June 3, 2022
+
 ## Updates
 
-* `interact()`: Each interactive display now shows the underlying function call 
+* `interact()`: Each interactive display now shows the underlying function call. 
 
-* `Plot()`: If `x` is equally spaced, a line chart not default if a `fit` line
+* `Plot()`: If `x` is equally spaced, a line chart not default if a `fit` line.
 
-* `Plot()`: Parameter `sqrt`  deprecated for  `quat`
+* `Plot()`: Parameter `sqrt`  deprecated for  `quat`.
 
-* `Plot()`: Parameter `root`  deprecated for  `power`
+* `Plot()`: Parameter `root`  deprecated for  `power`.
 
-* `Plot()`: `fit_color` parameter added to set directly, not just with `style()` function
+* `Plot()`: `fit_color` parameter added to set directly, not just with `style()` function.
 
-* `Plot()`: When curve fitting with `fit` parameter, `b0` and `b1` given for the linearized line from nonlinear functions
+* `Plot()`: When curve fitting with `fit` parameter, `b0` and `b1` given for the linearized line from nonlinear functions.
 
-* `Prop_test()`: If the hypothesis test of a proportion is one-sided, the `alternative` hypothesis is now provided
+* `Prop_test()`: If the hypothesis test of a proportion is one-sided, the `alternative` hypothesis is now provided.
 
 
 ## Bug Fixes
 
-*  `Histogram()`: `density=TRUE` properly generates console output
+*  `Histogram()`: `density=TRUE` properly generates console output.
 
-*  `Plot()`: For `fit` parameter, `"reciprocal"` option removed as better covered with `"exp"` which also does exponential decay in place of `"reciprocal"` if no `by` variable
+*  `Plot()`: For `fit` parameter, `"reciprocal"` option removed as better covered with `"exp"` which also does exponential decay in place of `"reciprocal"` if no `by` variable.
 
-*  `Plot()`: `fit_color` now works for a `fit` line
+*  `Plot()`: `fit_color` now works for a `fit` line.
 
-*  `Prop_test()`: parameters such as `alternative` properly passed to R functions `binom.test()`, `prop.test()`, and `chisq.test()`
+*  `Prop_test()`: parameters such as `alternative` properly passed to R functions `binom.test()`, `prop.test()`, and `chisq.test()`.
 
-*  `ttest()`: One-tailed alternatives `less` and `greater` options work
+*  `ttest()`: One-tailed alternatives `less` and `greater` options work.
 
 
 

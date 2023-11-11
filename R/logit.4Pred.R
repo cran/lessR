@@ -2,7 +2,7 @@
 function(lm.out, nm, d, my_formula, brief, res_rows,
          n.vars, n.pred, n.obs, n.keep, digits_d, pre, line,
          new.data, pred, pred_all, prob_cut, 
-         numeric.all, in.data.frame, X1_new, 
+         in.data.frame, X1_new, 
          X2_new, X3_new, X4_new, X5_new, X6_new,
          pdf_file, width, height, ...) {
 
@@ -153,17 +153,10 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
     
     margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
-    lm <- margs$lm + 0.2
-    tm <- margs$tm
-    rm <- margs$rm
-    bm <- margs$bm
+    lm <- margs$lm + 0.2;  tm <- margs$tm;  rm <- margs$rm;  bm <- margs$bm
 
-    nc <- nchar(levels(lm.out$model[,nm[1]]))
-
-    buf <- ifelse (max(nc)==1, 0.06*nc, 0.10*nc)
-    rm <- rm + max(buf) + .3
-    rm <- rm - .05*max(nc)
-    if (max(nc) > 10) buf <- buf + 0.1
+    nc <- max(nchar(levels(lm.out$model[,nm[1]])))
+    rm <- rm + .076*nc + 0.18
 
     par(bg=getOption("window_fill"))
     orig.params <- par(no.readonly=TRUE)
@@ -178,14 +171,13 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     min.x <- min(x.values, na.rm=TRUE)
     max.x <- max(x.values, na.rm=TRUE)
     .plt.bck(usr, pretty(c(min.x, max.x)), seq(0,1,.2))
-
     .axes(NULL, NULL, axTicks(1), axTicks(2))
 
     # right axis, two values of response variable
     ax <- .axes_dim()
     axis(4, at=c(0,1), labels=FALSE,
-        col=ax$axis_y_color, lwd=ax$axis_y_lwd, lty=ax$axis_y_lty) 
-    text(x=usr[2]+.45+buf/1.15, y=c(0,1), labels=levels(lm.out$model[,nm[1]]),
+         col=ax$axis_y_color, lwd=ax$axis_y_lwd, lty=ax$axis_y_lty) 
+    text(x=usr[2]+0.07, y=c(0,1), labels=levels(lm.out$model[,nm[1]]),
          pos=4, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color)
 
     .axlabs(nm[2], y.label, labels=FALSE, main.lab=NULL, sub.lab=NULL, 
@@ -211,7 +203,7 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
   }
 
   else {  # scatterplot matrix for multiple regression
-    if (numeric.all && in.data.frame) {
+    if (in.data.frame) {
 
       .opendev(pdf_file, width, height)
 
@@ -238,7 +230,6 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     else {
       cat("\n\n>>> No scatterplot matrix reported because not all variables are ")
       if (!in.data.frame) cat("in the data frame.\n")
-      if (!numeric.all) cat("numeric.\n")
     }
   }
 

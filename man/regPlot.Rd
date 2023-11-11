@@ -8,7 +8,7 @@ Following a call to the \code{lessR} function \code{\link{Regression}}, in which
 }
 
 \usage{
-regPlot(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
+regPlot(out, type, d.ancova, digits_d=NULL, pred.intervals=TRUE,
          res_sort=c("cooks","rstudent","dffits","off"),
          n_res_rows=NULL, cooks_cut=1, scatter_coef=NULL, 
          pdf=FALSE, width=5, height=5, manage.gr=FALSE, \dots)
@@ -22,8 +22,8 @@ regPlot(out, type, ancova=FALSE, digits_d=NULL, pred.intervals=TRUE,
         scatter plot, then the confidence and prediction intervals are included. 2
         plots the density and histogram of residuals and 3 plots a scatter plot of
         the residuals with the fitted values_}
-  \item{ancova}{If \code{TRUE}, then an ANCOVA design with 1 grouping variable
-       and 1 covariate.}
+  \item{d.ancova}{If not \code{NULL}, then an ANCOVA design with 1 grouping variable
+       and 1 covariate, which contains the original data.}
   \item{digits_d}{For the Basic Analysis, the number of decimal digits,
         set by default to at least 3 or the largest number of digits in the values 
         of the response variable plus 1.}
@@ -83,11 +83,11 @@ reg.out
 #   separately from the full output
 # Get the scatter plot of the data with the regression line
 #   and prediction and confidence intervals 
-regPlot(reg.out, 1)
+regPlot(reg.out, 1, NULL)
 
 # Can use with multiple regression for the scatter plot matrix
 r <- reg(Reading ~ Verbal + Absent + Income)
-regPlot(r, 1, scatter_coef=TRUE)
+regPlot(r, 1, NULL, scatter_coef=TRUE)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

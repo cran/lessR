@@ -468,7 +468,7 @@ column expressions with the <strong>lessR</strong> function call
 <code>.()</code>.</p>
 <p>To illustrate, use the Employee data set contained in
 <strong>lessR</strong>, here read into the <em>d</em> data frame.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Suggestions
 ## Details about your data, Enter:  details()  for d, or  details(name)
@@ -498,7 +498,7 @@ list columns for the variables in the range from <em>Years</em> to
 <em>Salary</em>, and <em>Post</em>. Referring back to the output of
 <code>Read()</code>, the variable range includes <em>Years</em>,
 <em>Gender</em>, <em>Dept</em>, and <em>Salary</em>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>d[.(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Post<span class="sc">&gt;</span><span class="dv">90</span>), .(Years<span class="sc">:</span>Salary, Post)]</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>d[.(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Post<span class="sc">&gt;</span><span class="dv">90</span>), .(Years<span class="sc">:</span>Salary, Post)]</span></code></pre></div>
 <pre><code>##                   Years Gender Dept    Salary Post
 ## Ritchie, Darnell      7      M ADMN  53788.26   92
 ## Hoang, Binh          15      M SALE 111074.86   97
@@ -508,7 +508,7 @@ list columns for the variables in the range from <em>Years</em> to
 ## Anderson, David       9      M ACCT  69547.60   91</code></pre>
 <p>Following is the traditional R call to <code>Extract[]</code> to
 obtain the same subsetting.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>d[d<span class="sc">$</span>Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> d<span class="sc">$</span>Post<span class="sc">&gt;</span><span class="dv">90</span>, <span class="fu">c</span>(<span class="st">&quot;Years&quot;</span>, <span class="st">&quot;Gender&quot;</span>, <span class="st">&quot;Dept&quot;</span>, <span class="st">&quot;Salary&quot;</span>, <span class="st">&quot;Post&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>d[d<span class="sc">$</span>Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> d<span class="sc">$</span>Post<span class="sc">&gt;</span><span class="dv">90</span>, <span class="fu">c</span>(<span class="st">&quot;Years&quot;</span>, <span class="st">&quot;Gender&quot;</span>, <span class="st">&quot;Dept&quot;</span>, <span class="st">&quot;Salary&quot;</span>, <span class="st">&quot;Post&quot;</span>)]</span></code></pre></div>
 <pre><code>##                   Years Gender Dept    Salary Post
 ## Ritchie, Darnell      7      M ADMN  53788.26   92
 ## Hoang, Binh          15      M SALE 111074.86   97
@@ -521,7 +521,7 @@ add a <code>!</code> to the beginning of the condition passed to
 <code>.()</code>, within the call to <code>.()</code>. To exclude the
 specified variables, place a <code>-</code>, in front of the call to
 <code>.()</code>.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="sc">!</span>(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Post<span class="sc">&gt;</span><span class="dv">90</span>)), <span class="sc">-</span>.(Dept<span class="sc">:</span>Plan, Pre)]</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>d[.(<span class="sc">!</span>(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Post<span class="sc">&gt;</span><span class="dv">90</span>)), <span class="sc">-</span>.(Dept<span class="sc">:</span>Plan, Pre)]</span></code></pre></div>
 <pre><code>##                     Years Gender Post
 ## Wu, James              NA      M   74
 ## Downs, Deborah          7      W   86
@@ -561,12 +561,12 @@ simply to return the row or column row indices to identify specific rows
 or columns of the specified data frame. You can either specify the
 indices directory for the rows or columns, or let <code>.()</code>
 identify them for you.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>d[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, .(Years<span class="sc">:</span>Salary, Post)]</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>d[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, .(Years<span class="sc">:</span>Salary, Post)]</span></code></pre></div>
 <pre><code>##                  Years Gender Dept   Salary Post
 ## Ritchie, Darnell     7      M ADMN 53788.26   92
 ## Wu, James           NA      M SALE 94494.58   74
 ## Downs, Deborah       7      W FINC 57139.90   86</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>d[.(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Post<span class="sc">&gt;</span><span class="dv">90</span>), <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>d[.(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Post<span class="sc">&gt;</span><span class="dv">90</span>), <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div>
 <pre><code>##                   Years Gender Dept
 ## Ritchie, Darnell      7      M ADMN
 ## Hoang, Binh          15      M SALE
@@ -581,11 +581,11 @@ or <code>cols</code>. Because the entire expression for
 differentiate between single and double quotes as needed. For example,
 use single quotes within the string and double quotes to define the
 entire string, illustrated here.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rows <span class="ot">&lt;-</span> <span class="st">&quot;Gender==&#39;M&#39; &amp; Post&gt;93&quot;</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="st">&quot;Gender:Salary, Post&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>rows <span class="ot">&lt;-</span> <span class="st">&quot;Gender==&#39;M&#39; &amp; Post&gt;93&quot;</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="st">&quot;Gender:Salary, Post&quot;</span></span></code></pre></div>
 <p>To subset, pass the respective character strings, <code>rows</code>
 and <code>cols</code>, to <code>.()</code>, respectively.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>d[.(rows), .(cols)]</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>d[.(rows), .(cols)]</span></code></pre></div>
 <pre><code>##                 Gender Dept    Salary Post
 ## Hoang, Binh          M SALE 111074.86   97
 ## Pham, Scott          M SALE  81871.05   94
@@ -595,7 +595,7 @@ the logical expression that defines the rows and <code>-</code> for the
 columns. Notice their placement, where the <code>!</code> is inside the
 call to <code>.()</code>, and the <code>-</code> is outside the
 call.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="sc">!</span>rows), <span class="sc">-</span>.(cols)]</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>d[.(<span class="sc">!</span>rows), <span class="sc">-</span>.(cols)]</span></code></pre></div>
 <pre><code>##                     Years JobSat Plan Pre
 ## Ritchie, Darnell        7    med    1  82
 ## Wu, James              NA    low    1  62
@@ -635,7 +635,7 @@ call.</p>
 <div id="missing-data" class="section level2">
 <h2>Missing Data</h2>
 <p>The variable <em>Dept</em> is missing for the fourth row of data.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>d[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,]</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>d[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,]</span></code></pre></div>
 <pre><code>##                  Years Gender Dept    Salary JobSat Plan Pre Post
 ## Ritchie, Darnell     7      M ADMN  53788.26    med    1  82   92
 ## Wu, James           NA      M SALE  94494.58    low    1  62   74
@@ -644,7 +644,7 @@ call.</p>
 ## Jones, Alissa        5      W &lt;NA&gt;  53772.58   &lt;NA&gt;    1  65   62</code></pre>
 <p>Here with the traditional use of <code>Extract[]</code>, specify rows
 of data only when the value of <em>Dept</em> is <em>ADMN</em>.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>d[d<span class="sc">$</span>Dept<span class="sc">==</span><span class="st">&quot;ADMN&quot;</span>, <span class="fu">c</span>(<span class="st">&#39;Gender&#39;</span>, <span class="st">&#39;Dept&#39;</span>, <span class="st">&#39;Salary&#39;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>d[d<span class="sc">$</span>Dept<span class="sc">==</span><span class="st">&quot;ADMN&quot;</span>, <span class="fu">c</span>(<span class="st">&#39;Gender&#39;</span>, <span class="st">&#39;Dept&#39;</span>, <span class="st">&#39;Salary&#39;</span>)]</span></code></pre></div>
 <pre><code>##                  Gender Dept    Salary
 ## Ritchie, Darnell      M ADMN  53788.26
 ## NA                 &lt;NA&gt; &lt;NA&gt;        NA
@@ -658,7 +658,7 @@ of data only when the value of <em>Dept</em> is <em>ADMN</em>.</p>
 <em>ADMN</em> is not the same as <code>&lt;NA&gt;</code>.</p>
 <p>Use the <code>.()</code> function to obtain what is requested, rows
 of data in which the value of <em>Dept</em> is <em>ADMN</em>.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>d[.(Dept<span class="sc">==</span><span class="st">&quot;ADMN&quot;</span>), .(Gender<span class="sc">:</span>Salary)]</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>d[.(Dept<span class="sc">==</span><span class="st">&quot;ADMN&quot;</span>), .(Gender<span class="sc">:</span>Salary)]</span></code></pre></div>
 <pre><code>##                  Gender Dept    Salary
 ## Ritchie, Darnell      M ADMN  53788.26
 ## Afshari, Anbar        W ADMN  69441.93
@@ -677,20 +677,20 @@ logical criterion of the <code>rows</code>. The value passed to
 or the proportion of rows to select.</p>
 <p>Here randomly select five rows of data from the <em>d</em> data
 frame.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="dv">5</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="dv">5</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
 <pre><code>##                  Years Gender Dept   Salary
-## Sheppard, Cory      14      M FINC 95027.55
-## Ritchie, Darnell     7      M ADMN 53788.26
-## Fulton, Scott       13      M SALE 87785.51
-## Hamide, Bita         1      W MKTG 51036.85
-## Cooper, Lindsay      4      W MKTG 56772.95</code></pre>
+## Stanley, Emma        3      W ACCT 46124.97
+## Anderson, David      9      M ACCT 69547.60
+## Afshari, Anbar       6      W ADMN 69441.93
+## Singh, Niral         2      W ADMN 61055.44
+## Ritchie, Darnell     7      M ADMN 53788.26</code></pre>
 <p>Here specify a proportion of rows to select.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="fl">0.1</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
-<pre><code>##                  Years Gender Dept   Salary
-## Stanley, Grayson     9      M SALE 69624.87
-## LaRoe, Maria        10      W MKTG 61961.29
-## Knox, Michael       18      M MKTG 99062.66
-## Campagna, Justin     8      M SALE 72321.36</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>d[.(<span class="fu">random</span>(<span class="fl">0.1</span>)), .(Years<span class="sc">:</span>Salary)]</span></code></pre></div>
+<pre><code>##                 Years Gender Dept    Salary
+## Fulton, Scott      13      M SALE  87785.51
+## Wu, James          NA      M SALE  94494.58
+## Jones, Alissa       5      W &lt;NA&gt;  53772.58
+## Correll, Trevon    21      M SALE 134419.23</code></pre>
 </div>
 
 

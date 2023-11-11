@@ -36,7 +36,6 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
       "Specify a model by listing it first or set according to:  my_formula\n\n")
   }
 
-
   # let deprecated mydata work as default
   dfs <- .getdfs() 
   mydata.ok <- FALSE
@@ -122,7 +121,7 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
   if (is.factor(data[,nm[1]])) { 
      if (nlevels(data[,nm[1]]) != 2) is.bin  <- FALSE
   }
-  else {  # numeric y
+  else {  # numeric y with values 0 and 1
     for (i in 1:n.obs)
       if (!is.na(data[i,nm[1]]))
         if (data[i,nm[1]]!=0 && data[i,nm[1]]!=1) is.bin <- FALSE
@@ -140,14 +139,52 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
           "predictor variables.\n\n")
   }
 
+  in.data.frame <- TRUE
+  for (i in 1:n.vars) {
+    if (!(nm[i] %in% names(data))) {
+      cat("\n\n\n>>> Note: ", nm[i], "is not in the data frame.\n")
+      in.data.frame <- FALSE
+    }
+  }
+
+  # reduce data to just model variables with no missing data
+  data <- data[, c(nm), drop=FALSE]
+  data <- data[complete.cases(data), , drop=FALSE]
+  n.keep <- nrow(data)
+
+  # check for all numeric vars (except Y)  in.data.frame <- TRUE
+  numeric.all <- TRUE
+  for (i in 2:n.vars) {
+    if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
+      cat("\n>>> Note: ", nm[i], "is not a numeric variable.\n")
+      cat("           Indicator variables are created and analyzed.\n")
+      numeric.all <- FALSE
+    }
+  }
+
+  # if not all numeric, construct the indicator variables
+  if (!numeric.all) {
+    md <- data.frame(model.matrix(my_formula, data=data))
+    md[,1] <- data[,nm[1]]
+    names(md)[1] <- nm[1]
+    data <- md
+    rm(md)
+    nm <- names(data)
+    n.vars <- ncol(data)
+    n.pred <- n.vars - 1
+    my_formula <- DF2formula(data)
+
+    # if true integer, then convert from type double to integer
+    rows <- min(50, nrow(data))  # save some time scanning
+    fnu.col <- logical(length=ncol(data))
+    for (i in 1:ncol(data))
+      if (.is.integer(data[1:rows,i]))
+        fnu.col[i] <- TRUE
+     data[fnu.col] <- lapply(data[fnu.col], as.integer) # move to integer
+  }
+
   # if a single pred, make sure to have a + slope
   if (is.bin) {
-#   x.values <- data[,nm[2:n.vars]]
-#   if (!is.factor(data[,nm[1]])) {
-#     y.values <- data[,nm[1]] 
-#     y.label <- nm[1]
-#   }
-#   else if (n.pred==1) {
 
     lv1 <- levels(data[,nm[1]])[1]
     lv2 <- levels(data[,nm[1]])[2]
@@ -161,7 +198,7 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
     }  # end n.pred=1
   }
 
-  # second level of Y, nm[1], is the reference group
+  # second level of Y, nm[1], is the default reference group
   if (!is.null(ref_group)) {
     if (lv1 != ref_group  &&  lv2 != ref_group)  {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -198,13 +235,6 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
     data <- data[o,]
   }
 
-  in.data.frame <- TRUE
-  for (i in 1:n.vars) {
-    if (!(nm[i] %in% names(data))) {
-      cat("\n\n\n>>> Note: ", nm[i], "is not in the data frame.\n")
-      in.data.frame <- FALSE
-    }
-  }
 
   # -----------------------------------------------------------
   # logit analysis
@@ -213,7 +243,7 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
   lm.out <- glm(my_formula, data=data, family="binomial", ...)
   # -----------------------------------------------------------
 
-  n.keep <- nrow(lm.out$model)
+# n.keep <- nrow(lm.out$model)
     
   if (is.null(res_rows)) if (n.keep < 20) res_rows <- n.keep else res_rows <- 20 
   if (res_rows == "all")
@@ -232,7 +262,18 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
   
   cat( "\n\n", "  BASIC ANALYSIS", "\n\n")
 
-  cat("Estimated Model for the Logit of Reference Group Membership\n")
+  cat("-- Estimated Model of", nm[1], "for",
+      "the Logit of Reference Group Membership\n")
+
+  # singularity check
+  coef <- lm.out$coefficients
+  if (anyNA(coef)) {
+    bad <- names(coef)[which(is.na(coef))]
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Variable redundant with a prior predictor in the model: ", bad, "\n\n",
+      "Delete that variable, or corresponding prior redundant variables,\n",
+      "  from the model.\n\n")
+  }
 
   sm <- summary(lm.out)
   sm1 <- sm$coefficients
@@ -279,7 +320,8 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
   # odds ratios and 95% CI
   OR <- coef(lm.out)
   orci <- exp(cbind(OR, ci))
-  cat("\n\nOdds Ratios and Confidence Intervals\n\n")
+  cat("\n\n")
+  cat("-- Odds Ratios and Confidence Intervals\n\n")
   max.num <- 9
   OR.lbl <- .fmtc("Odds Ratio", max.num+1)
   lb.lbl <- .fmtc("Lower 95%", max.num+3)
@@ -295,7 +337,7 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
 
   # model fit
   cat("\n\n")
-  cat("Model Fit\n")
+  cat("-- Model Fit\n")
   cat("\n")
   cat("    Null deviance:", .fmt(sm$null.deviance,3), "on",
       .fmti(sm$df.null), "degrees of freedom\n")
@@ -303,55 +345,41 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
       .fmti(sm$df.residual), "degrees of freedom\n\n")
   cat("AIC:", sm$aic, "\n\n") 
   cat("Number of iterations to convergence:", sm$iter, "\n\n")
-
-  # check for all numeric vars (except Y)  in.data.frame <- TRUE
-  numeric.all <- TRUE
-  for (i in 2:n.vars) {
-    if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
-      cat("\n>>> Note: ", nm[i], "is not a numeric variable.\n")
-      numeric.all <- FALSE
-    }
-  }
  
   # collinearity    
   if (collinear) {
     cat( "\n", "Collinearity", "\n", sep="")
     cat("\n")
-    if (numeric.all) {
 
     # need to run logistic reg on a numeric of Y to get usual 
-      if (is.factor(data[,nm[1]]))  {
-        Y <- as.numeric(data[,nm[1]])
-        m.f <- paste("Y ~", nm[2])
-        if (n.pred > 1)
-          for (i in 2:n.pred) m.f <- paste(m.f, "+", nm[i+1])
-        m.d <- data.frame(Y, data, stringsAsFactors=TRUE)
-      }
-      else {
-        m.f <- my_formula
-        m.d <- data
-      }
-
-      r.out <- lm(as.formula(m.f), data=m.d)
-      MSW <- anova(r.out)[n.vars,3]
-      sterrs <- summary(r.out)$coefficients[,2]
-
-      vif <- numeric(length = 0)
-      tol <- numeric(length = 0)
-      for (i in 1:n.pred) {
-        v <- var(r.out$model[i+1])
-        vif[i] <- (v * (n.keep-1) * sterrs[i+1]^2) / MSW
-        tol[i] <- 1 / vif[i]
-      }
-
-      out <- cbind(tol, vif)
-      colnames(out) <- c("Tolerance", "      VIF")
-      rownames(out) <- nm[2:length(nm)]
-      print(round(out,3))
- 
+    if (is.factor(data[,nm[1]]))  {
+      Y <- as.numeric(data[,nm[1]])
+      m.f <- paste("Y ~", nm[2])
+      if (n.pred > 1)
+        for (i in 2:n.pred) m.f <- paste(m.f, "+", nm[i+1])
+      m.d <- data.frame(Y, data, stringsAsFactors=TRUE)
     }
-    else cat("\n>>> No collinearity analysis\n",
-                   "Not all variables are numeric.\n")
+    else {
+      m.f <- my_formula
+      m.d <- data
+    }
+
+    r.out <- lm(as.formula(m.f), data=m.d)
+    MSW <- anova(r.out)[n.vars,3]
+    sterrs <- summary(r.out)$coefficients[,2]
+
+    vif <- numeric(length = 0)
+    tol <- numeric(length = 0)
+    for (i in 1:n.pred) {
+      v <- var(r.out$model[i+1])
+      vif[i] <- (v * (n.keep-1) * sterrs[i+1]^2) / MSW
+      tol[i] <- 1 / vif[i]
+    }
+
+    out <- cbind(tol, vif)
+    colnames(out) <- c("Tolerance", "      VIF")
+    rownames(out) <- nm[2:length(nm)]
+    print(round(out,3))
   }
  
   if (res_rows > 0)
@@ -363,7 +391,7 @@ function(my_formula, data=d, rows=NULL, ref_group=NULL,
     .logit4Pred(lm.out, nm, df.name, my_formula, brief, res_rows,
          n.vars, n.pred, n.obs, n.keep, digits_d, pre, line,
          new.data, pred, pred_all, prob_cut, 
-         numeric.all, in.data.frame, X1_new, 
+         in.data.frame, X1_new, 
          X2_new, X3_new, X4_new, X5_new, X6_new,
          pdf_file, width, height)
   # Also calls .logit5Confuse.R

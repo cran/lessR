@@ -1,7 +1,7 @@
 .reg5Plot <-
 function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
-         scatter_coef=FALSE, X1_new=NULL, ancova,
-         numeric.all, in.data.frame, c.int, p.int, plot_errors=FALSE,
+         scatter_coef=FALSE, X1_new=NULL, 
+         in.data.frame, c.int, p.int, plot_errors=FALSE,
          digits_d, n_cat, pdf=FALSE, width=5, height=5, manage.gr=FALSE,
          quiet, ...) {
          
@@ -26,35 +26,15 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
   plt.i <- 0L
   plt.title  <- character(length=0)
 
-  x.cat <- 0
-  x.cont <- 0
   do.sp <- ifelse (n.pred < 2, TRUE, FALSE) 
-  if (ancova) {
-    if (is.numeric(lm.out$model[,nm[2]]) && is.factor(lm.out$model[,nm[3]])) {
-      x.cat <- 3
-      x.cont <- 2
-      do.sp <- TRUE
-    }
-    if (is.numeric(lm.out$model[,nm[3]]) && is.factor(lm.out$model[,nm[2]])) {
-      x.cat <- 2
-      x.cont <- 3
-      do.sp <- TRUE
-    }
-    plot_errors <- FALSE
-    lvl <- levels(lm.out$model[,nm[x.cat]])
-  }
 
-  txeqs <- NULL
 
   # ----------------------------------------------------
-  # scatterplot, if one (or no) pred variables or ancova
+  # scatterplot, if one (or no) pred variables
   if (do.sp) {
 
     if (n.pred %in% 1:2) {
-      if (!ancova)
-        x.values <- lm.out$model[,nm[2]]
-      else
-        x.values <- lm.out$model[,nm[x.cont]]
+      x.values <- lm.out$model[,nm[2]]
     }
     else if (n.pred == 0) {  # null model
       x.values <- 1:n.obs
@@ -63,8 +43,8 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
     }
     y.values <- lm.out$model[,nm[1]]
 
-    do.predint <- ifelse (n_pred_rows==0 || !is.null(X1_new) || is.null(p.int)
-      || ancova, FALSE, TRUE) 
+    do.predint <-
+      ifelse (n_pred_rows==0 || !is.null(X1_new) || is.null(p.int), FALSE, TRUE) 
     if (n.pred > 0)
       if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
  
@@ -76,8 +56,6 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
           ctitle <- paste(ctitle, "and Null Model")
         else
           ctitle <- paste(ctitle, "and Least-Squares Line")
-        if (ancova)
-          ctitle <- paste(ctitle, "s", sep="")
       }
       else if (is.factor(x.values) && n.pred==1 && nlevels(x.values)==2) {
         ctitle <- paste(ctitle, "and Least-Squares Line")
@@ -108,17 +86,8 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
     margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
-    lm <- margs$lm
-    tm <- margs$tm
-    rm <- margs$rm
-    bm <- margs$bm
+    lm <- margs$lm;  tm <- margs$tm;  rm <- margs$rm;  bm <- margs$bm
     
-    if (ancova) {
-      big.nm <- max(nchar(lvl))
-      if (big.nm > 6) rm <- rm + (.05 * (big.nm - 6))
-      rm <- rm + .30  + (.65 * getOption("axis_cex"))  # better if axis_y_cex
-    }
-
     par(bg=getOption("window_fill"))
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
@@ -137,31 +106,13 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
     }
 
     .plt.bck(usr, axT1, axTicks(2))
-      
     .axes(x.lvl, NULL, axT1, axTicks(2))
 
     theme <- getOption("theme")
-    if (!ancova) {
       .axlabs(x.lab=nm[2], y.lab=nm[1], main.lab=NULL, sub.lab=NULL)
       fill <- getOption("pt_fill")
       color <- getOption("pt_color")
-    }
-    else {
-      .axlabs(x.lab=nm[x.cont], y.lab=nm[1], main.lab=NULL, sub.lab=NULL)
-      clr <- .get_fill(theme)
-      fill <- getColors(clr, n=length(lvl))
-      color <- getColors(clr, n=length(lvl))
-    }
 
-    # Plot legend for ancova
-    if (ancova) {
-      pts_trans <- 0
-      shp <- 21
-      fill_bg <- "transparent"
-      options(byname = nm[x.cat])
-      .plt.by.legend(lvl, color, fill, shp, pts_trans, fill_bg, usr)
-    }
-    
     # Plot points
     # -----------
     ux <- length(unique(x.values))
@@ -171,13 +122,10 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
                         !.is.integer(y.values), FALSE, TRUE)
 
     if (!discrete)  {
-      n.iter <- ifelse(ancova, nlevels(lm.out$model[,nm[x.cat]]), 1)
+      n.iter <-  1
 
-      for (i in 1:n.iter) {  # iter > 1 only for ancova, levels of cat var
-        if (!ancova)
-          ind <- 1:length(x.values)
-        else
-          ind <- which(lm.out$model[,nm[x.cat]] == lvl[i])
+      for (i in 1:n.iter) { 
+        ind <- 1:length(x.values)
 
         points(x.values[ind], y.values[ind],
                pch=21, col=color[i], bg=fill[i], cex=size.pt)
@@ -185,7 +133,7 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
 
     }  # end !discrete
 
-    if (discrete) {  # bubble plot, not for ancova
+    if (discrete) {  # bubble plot
       mytbl <- table(x.values, y.values)  # get the counts, all x-y combinations
       n.count <- nrow(mytbl) * ncol(mytbl)
       count <- integer(length=n.count)
@@ -243,29 +191,6 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
       }
     }
 
-    else if (ancova) {
-      coefs <- lm.out$coefficients
-      n.lvl <- nlevels(lm.out$model[,nm[x.cat]])
-      b.cont <- ifelse (x.cont == 2, coefs[2], coefs[1+n.lvl])
-      if (x.cat == 2)
-        b.cat <- coefs[2:n.lvl] 
-      else
-        b.cat <- coefs[3:(1+(n.lvl))] 
-
-      tx <- character(length = 0)
-      for (i.coef in 0:length(b.cat)) {
-        if (i.coef == 0)
-          b00 <- b0
-        else
-          b00 <- b0 + b.cat[i.coef] 
-        abline(b00, b.cont, col=fill[i.coef+1], lwd=1.5)
-        tx[length(tx)+1] <- paste("Level ",lvl[i.coef+1], ": y^_", nm[1],
-            " = ", .fmt(b00, digits_d), " + ", .fmt(b.cont, digits_d),
-            "(x_", nm[x.cont], ")", sep="")
-      }
-      txeqs <- tx
-    }
-
     # Plot Errors
     # -----------
     if (plot_errors)  {
@@ -303,7 +228,7 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
   }  # end do.sp, a single scatterplot
 
   else {  # scatterplot matrix for multiple regression
-    if (numeric.all && in.data.frame) {
+    if (in.data.frame) {
       plt.i <- plt.i + 1L
       plt.title[plt.i] <- "ScatterPlot Matrix"
 
@@ -315,8 +240,7 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
     }
     else if (!quiet) {
       cat("\n>>> No scatterplot matrix reported because not all variables are ")
-      if (!in.data.frame) cat("in the data frame.\n")
-      if (!numeric.all) cat("numeric.\n")
+      cat("in the data frame.\n")
       if (dev.cur() > 1) dev.off()  # 1 is the null device
     }
   }
@@ -324,7 +248,7 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
   if (pdf) {
     if (dev.cur() > 1) {
       dev.off()
-      if (n.pred==1 || ancova)
+      if (n.pred==1)
         .showfile(pdf_file, "scatterplot")
       else
         .showfile(pdf_file, "scatterplot matrix")
@@ -333,7 +257,5 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
   }
 
   # just generated plot
-  return(invisible(list(i=plt.i, ttl=plt.title, txeqs=txeqs,
-                        cat=nm[x.cat], cont=nm[x.cont])))
-
+  return(invisible(list(i=plt.i, ttl=plt.title)))
 }

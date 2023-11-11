@@ -185,6 +185,10 @@ function(my_formula, data=d, rows=NULL,
     subsets <- FALSE
   }
 
+  # set digits_d
+  if (is.null(digits_d)) digits_d <- .getdigits(data[,nm[1]], 3)
+  options(digits_d=digits_d) 
+
   in.data.frame <- TRUE
   for (i in 1:n.vars) {
     if (!(nm[i] %in% names(data))) {
@@ -192,15 +196,69 @@ function(my_formula, data=d, rows=NULL,
       in.data.frame <- FALSE
     }
   }
+ 
+  # sort values of the one predictor variable for scatterplot
+  #   so that the prediction/confidence intervals can be drawn
+  if (n.pred == 1)
+    data <- data[order(data[,nm[2]], decreasing=FALSE), ]
+
+  # reduce data to just model variables with no missing data
+  data <- data[, c(nm), drop=FALSE]
+  data <- data[complete.cases(data), , drop=FALSE]
+  n.keep <- nrow(data)
+  
+  # for ancova to work, the variable must be non-numeric or a factor
+  ancova <- FALSE  # ancova for one cont and one cat predictors
+  if (n.pred == 2) {
+  # non-numeric, non-factor concert to factor
+    for (i.pred in 2:3) {
+      if (!is.numeric(data[,nm[i.pred]])) {
+        if (!is.factor(data[,nm[i.pred]])) 
+          data[,nm[i.pred]] <- as.factor(data[,nm[i.pred]])
+      }
+    }
+    if (is.numeric(data[,nm[2]]) && is.factor(data[,nm[3]]))
+      ancova <- TRUE
+    if (is.numeric(data[,nm[3]]) && is.factor(data[,nm[2]]))
+      ancova <- TRUE
+  }
+  if (ancova)
+    d.ancova <- data  # save original 3 cols of data for ancova
+  else
+    d.ancova <- NULL
 
   # check for all numeric vars in data.frame <- TRUE
   numeric.all <- TRUE
   for (i in 1:n.vars) {
-    if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])]))
+    if (in.data.frame && !is.numeric(data[1,which(names(data) == nm[i])])) {
+      cat("\n>>> ", nm[i], "is not numeric.",
+                 "Converted to indicator variables.\n")
       numeric.all <- FALSE
+    }
+  }
+
+  # if not all numeric, construct the indicator variables
+  if (!numeric.all) {
+    md <- data.frame(model.matrix(my_formula, data=data))
+    md[,1] <- data[,nm[1]]
+    names(md)[1] <- nm[1]
+    data <- md
+    rm(md)
+    nm <- names(data)
+    n.vars <- ncol(data)
+    n.pred <- n.vars - 1
+    my_formula <- DF2formula(data)
+
+    # if true integer, then convert from type double to integer
+    rows <- min(50, nrow(data))  # save some time scanning
+    fnu.col <- logical(length=ncol(data))
+    for (i in 1:ncol(data))
+      if (.is.integer(data[1:rows,i]))
+        fnu.col[i] <- TRUE
+     data[fnu.col] <- lapply(data[fnu.col], as.integer) # move to integer
   }
     
-  if (nrow(data) < 3) {
+  if (nrow(data) < n.pred + 2) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Need more than ", nrow(data), " rows of data.\n\n", sep="")
   } 
@@ -214,11 +272,6 @@ function(my_formula, data=d, rows=NULL,
   if (!is.numeric(data[,nm[1]])) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Response variable, ", nm[1], ", must be numeric.\n\n", sep="")
-  }
- 
-  if (!is.null(X1_new) && !numeric.all) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "All variables must be numeric to use new data for prediction.\n\n")
   }
 
   # check new.data option for consistency  
@@ -237,17 +290,8 @@ function(my_formula, data=d, rows=NULL,
       }
     }
   }
- 
-  # sort values of the one predictor variable for scatterplot
-  #   so that the prediction/confidence intervals can be drawn
-  if (n.pred == 1)
-    data <- data[order(data[,nm[2]], decreasing=FALSE), ]
 
-  if (is.null(digits_d)) digits_d <- .getdigits(data[,nm[1]], 3)
-  options(digits_d=digits_d) 
-
-
-  # rescale option (if not K-Fold, then do in reg.zKfold.R)
+  # rescale option (if not K-Fold, do in reg.zKfold.R)
   transf <- NULL  # string to label output in .reg1bckBasic
   if (new_scale != "none") {
     if (new_scale == "z") transf <- "Standardized"
@@ -318,16 +362,6 @@ function(my_formula, data=d, rows=NULL,
     manage.gr <- .graphman()
   }
 
-  # non-numeric, non-factor concert to factor
-  # not needed for lm(), but elsewhere
-  if (n.pred > 0) {
-    for (i.pred in 2:n.vars) {
-      if (!is.numeric(data[,nm[i.pred]])) {
-        if (!is.factor(data[,nm[i.pred]])) 
-          data[,nm[i.pred]] <- as.factor(data[,nm[i.pred]])
-      }
-    }
-  }
 
 
   # --------------------------------------------------------
@@ -335,8 +369,6 @@ function(my_formula, data=d, rows=NULL,
   # --------------------------------------------------------
   #   lmo: lm out
   #   all analysis done on data in model construct lmo$model
-  #   this model construct contains only model vars, with Y listed first
-  #assign("lmo", lm(my_formula, data=data), pos=.GlobalEnv)
   lmo <- lm(my_formula, data=data, ...)
   # --------------------------------------------------------
 
@@ -345,26 +377,20 @@ function(my_formula, data=d, rows=NULL,
        "The attempted solution is singular. Too much linear dependence.\n\n")
   }
 
-  n.keep <- nrow(lmo$model)  # lmo$model is the data with deleted
- 
-  # replace a factor with indicator variables in data frame
-  #mm <- model.matrix(my_formula, data=data)
-  #mf.out <- data.frame(lmo$model[,1], mm[,2:ncol(mm)])
-  #names(mf.out)[1] <- nm[1]
+  # singularity check
+  coef <- lmo$coefficients
+  if (anyNA(coef)) {
+    bad <- names(coef)[which(is.na(coef))]
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Variable redundant with a prior predictor in the model: ", bad, "\n\n",
+      "Delete that variable, or corresponding prior redundant variables,\n",
+      "  from the model.\n\n")
+  }
 
 
   # -----------------------------------
   if (kfold == 0) {
     i.which <- 3
-  
-    # for ancova to work, the variable must be non-numeric or a factor
-    ancova <- FALSE  # ancova for one cont and one cat predictors
-    if (n.pred == 2) {
-      if (is.numeric(data[,nm[2]]) && is.factor(data[,nm[3]]))
-        ancova <- TRUE
-      if (is.numeric(data[,nm[3]]) && is.factor(data[,nm[2]]))
-        ancova <- TRUE
-    }
 
     title_bck <- "\n  BACKGROUND"
     bck <- .reg1bckBasic(lmo, df.name, digits_d, show_R, n.obs, n.keep,
@@ -373,7 +399,10 @@ function(my_formula, data=d, rows=NULL,
     title_basic <- "\n  BASIC ANALYSIS"
     est <- .reg1modelBasic(lmo, digits_d, show_R)
 
-    anv <- .reg1anvBasic(lmo, ancova, digits_d, show_R)
+    if (!ancova)
+      anv <- .reg1anvBasic(lmo, digits_d, show_R)
+    else
+      anv <- .reg1ancova(lmo, d.ancova, digits_d, show_R)
 
     sy <- sd(data[,nm[1]], na.rm=TRUE)
     fit <- .reg1fitBasic(lmo, anv$tot["ss"], sy, digits_d, show_R)
@@ -393,7 +422,7 @@ function(my_formula, data=d, rows=NULL,
       else
         rel$out_subsets <- ""
       rel <- .reg2Relations(lmo, df.name, n.keep, show_R,
-           cor, collinear, subsets, best_sub, max.sublns, numeric.all,
+           cor, collinear, subsets, best_sub, max.sublns, 
            in.data.frame, est$sterrs, anv$MSW)
       if (is.matrix(rel$crs)) crs <- round(rel$crs,3) else crs <- NA
       if (is.vector(rel$tol)) tol <- round(rel$tol,3) else tol <- NA
@@ -417,7 +446,7 @@ function(my_formula, data=d, rows=NULL,
 
       if (graphics  &&  n.pred > 0) {
         if (!pdf && manage.gr) {  # set up graphics system outside of RStudio
-          if (numeric.all || n.pred==1)
+          if (n.pred==1)
             .graphwin(3, width, height) 
           else
             .graphwin(2, width, height)  # no sp matrix if not all numeric
@@ -488,12 +517,11 @@ function(my_formula, data=d, rows=NULL,
   }
 
   # Plot scatterplot, maybe ANCOVA info
-  title_eqs <- ""
-  txeqs <- ""
+  txmdl <- ""
   if (graphics) {
     if (manage.gr && !pdf) {
       if (n_res_rows > 0  &&  n.pred > 0)
-        i.wh <- 5# already did two plots 
+        i.wh <- 5  # already did two plots 
       else {
         .graphwin(1, width, height)  #  only plot is a scatterplot
         i.wh <- 3
@@ -501,64 +529,30 @@ function(my_formula, data=d, rows=NULL,
       dev.set(which=i.wh)
     }
  
-    ancovaOut <- .reg5Plot(lmo, n_res_rows, n_pred_rows, scatter_coef, 
-       X1_new, ancova, numeric.all, in.data.frame, prd$cint, prd$pint,
-       plot_errors, digits_d, n_cat, pdf, width, height, manage.gr,
-       quiet, ...)
-
-    tx <- ""
-    if (!is.null(ancovaOut$txeqs)) {
-      title_eqs <- paste("\n  MODELS OF", nm[1], "FOR LEVELS OF", ancovaOut$cat)
-
-      # test interaction
-      tx[1] <- "-- Test of Interaction"
-      tx[length(tx)+1] <- " "
-
-      lm2.out <- lm(lmo$model[,nm[1]] ~ 
-                    lmo$model[,nm[2]] * lmo$model[,nm[3]])
-      a.tbl <- anova(lm2.out)
-      a <- round(a.tbl[3,], 3)  # 3rd row is interaction row
-      a.int <- paste(nm[2], ":", nm[3],
-                     "  df: ", a[1,1], "  df resid: ", a.tbl[nrow(a.tbl),1],
-                     "  SS: ", a[1,2], "  F: ",  a[1,4], "  p-value: ", a[1,5],
-                     sep="") 
-
-      tx[length(tx)+1] <- a.int 
-      tx[length(tx)+1] <- " "
-      tx[length(tx)+1] <- paste(
-          "-- Assume parallel lines, no interaction of", ancovaOut$cat, "with",
-          ancovaOut$cont, "\n")
-      n.levels <- length(unique(na.omit(data[,ancovaOut$cat])))
-      for (i.level in 1:n.levels)
-        tx[length(tx)+1] <- ancovaOut$txeqs[i.level]
-
-      tx[length(tx)+1] <- paste("\n", 
-        "-- Visualize Separately Computed Regression Lines")
-      tx[length(tx)+1] <- paste("\n", "Plot(", ancovaOut$cont, ", ", nm[1],
-           ", by=", ancovaOut$cat, ", fit=\"lm\")", sep="")   
-    }  # end ancova 
-    txeqs <- tx
-
-    if (ancovaOut$i > 0) {
+    if (!ancova) {
+      ancovaOut <- .reg5Plot(lmo, n_res_rows, n_pred_rows, scatter_coef, 
+         X1_new, in.data.frame, prd$cint, prd$pint,
+         plot_errors, digits_d, n_cat, pdf, width, height, manage.gr,
+         quiet, ...)
+    }
+    else {
+      ancovaOut <- .reg5ancova(lmo, d.ancova, digits_d,
+                               pdf, width, height, manage.gr, quiet, ...)
+      txmdl <- ancovaOut$txmdl
       for (i in (plot.i+1):(plot.i+ancovaOut$i))
         plot.title[i] <- ancovaOut$ttl[i-plot.i]
       plot.i <- plot.i + ancovaOut$i
-    } 
+    }
   }  # end graphics
-
 
   title_mod <- ""
   out_mod <- ""
   if (!mod.mis && graphics) {
 
     if (graphics) {
-      if (manage.gr && !pdf) {  # set up graphics system
-        if (numeric.all)
+      if (manage.gr && !pdf)  # set up graphics system
           .graphwin(4, width, height) 
-        else
-          .graphwin(3, width, height)  # no sp matrix if not all numeric
-      }
-
+      
       title_mod <- "\n  MODERATION ANALYSIS"
 
       mo <- .reg6mod(lmo, w.nm, x.nm, digits_d, pdf, width, height, manage.gr)
@@ -611,7 +605,7 @@ function(my_formula, data=d, rows=NULL,
 
     # get some (generally) unique values for each pred to demo X1_new ...
     new.val <- matrix(nrow=n.pred, ncol=2, byrow=TRUE)
-    if (n.pred <= max_new  &&  numeric.all  &&  is.null(X1_new)) {
+    if (n.pred <= max_new  &&  is.null(X1_new)) {
       for (i in 1:n.pred) {
         v <- sort(data[,nm[i+1]])
 
@@ -639,8 +633,8 @@ function(my_formula, data=d, rows=NULL,
 #   r$vars <- vars
 
     txknt <- .reg.Rmd(nm, df.name, fun_call, n_res_rows, n_pred_rows,
-        res_sort, ancova, digits_d, results, explain, interpret, code,
-        est$pvalues, tol, resid.max, numeric.all, X1_new, new.val,
+        res_sort, d.ancova, digits_d, results, explain, interpret, code,
+        est$pvalues, tol, resid.max, X1_new, new.val,
         Rmd_data, Rmd_custom, Rmd_dir, Rmd_labels)
     if (!grepl(".Rmd", Rmd)) Rmd <- paste(Rmd, ".Rmd", sep="")
     cat(txknt, file=Rmd, sep="\n")  # Rmd is now file of markdown instructions
@@ -749,8 +743,7 @@ function(my_formula, data=d, rows=NULL,
     class(title_pred) <- "out"
     class(prd$out_predict) <- "out"
     class(txplt) <- "out"
-    class(title_eqs) <- "out"
-    class(txeqs) <- "out"
+    class(txmdl) <- "out"
     class(txref) <- "out"
     class(txRmd) <- "out"
     class(txWrd) <- "out"
@@ -770,7 +763,7 @@ function(my_formula, data=d, rows=NULL,
 
       out_title_mod=title_mod, out_mod=mo$out_mod,
 
-      out_title_eqs=title_eqs, out_eqs=txeqs,
+      out_mdls=txmdl,
 
       out_title_kfold=title_kfold, out_kfold=txkfl,
 
