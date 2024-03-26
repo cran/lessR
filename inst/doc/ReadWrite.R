@@ -7,6 +7,9 @@ knitr::include_graphics(system.file("img", "DataTable.png", package="lessR"))
 ## ----rline, fig.align='center', fig.cap="Output of Read()."-----------------------------------------------------------
 d <- Read("Employee")
 
+## ----brief, fig.align='center', fig.cap="Output of Read()."-----------------------------------------------------------
+d <- Read("Employee", brief=FALSE)
+
 ## ---------------------------------------------------------------------------------------------------------------------
 l <- Read("Employee_lbl", var_labels=TRUE)
 

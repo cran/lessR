@@ -458,10 +458,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               # a giant do loop that iterates over groups, i.e., panel.number()
               vw <- ifelse (!is.null(y) && !is.null(by1), FALSE, TRUE) 
               vf <- ifelse (n.panels>1, violin_fill[panel.number()], violin_fill)
-                panel.violin(x=x, ...,
-                    col=vf,
-                    border=getOption("violin_color"),
-                    varwidth=vw, box.width=vbs_size, bw=bw)
+              panel.violin(x=x, ...,
+                  col=vf,
+                  border=getOption("violin_color"),
+                  varwidth=vw, box.width=vbs_size, bw=bw)
             }
 
             if ((box || size.pt>0) && length(x)>1) {
@@ -564,7 +564,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               else  # all pts
                 x.out <- 1:length(x)
 
-              .panel.stripplot(x=x[x.out], 
+              .panel.stripplot(x=x[x.out],   # in plt.panel.R
                  cex=s.pt, pch=shape, col=pt.color, fill=pt.fill,
                  jitter_data=jitter_data, factor=jitter, ...)
             }

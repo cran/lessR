@@ -9,11 +9,14 @@
 \description{
 Abbreviation: \code{wrt}, \code{wrt_r}, \code{wrt_x}
 
-Writes the contents of the specified data frame, such as with the default \code{d}, to the current working directory as either the default \code{csv} data file, an Excel data table, an OpenDocument Spreadsheet file, or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels and variable units are automatically included in a native R data file.
+Writes the contents of the specified data frame, such as with the default \code{d}, to the current working directory as either the default \code{csv} data file, an Excel data table, an OpenDocument Spreadsheet file, an arrow \code{feather} or \code{parquet} file, or a native R data file of the specified data frame. If the write is for a \code{csv} file, then any variable labels are written to a second \code{csv} file with "_lbl" appended to the file name. Any variable labels and variable units are automatically included in a native R data file.
 }
 
 \usage{
-Write(data=d, to=NULL, format=c("csv", "R", "Excel", "ODS", "SPSS"),
+Write(data=d, to=NULL, 
+
+         format=c("csv", "R", "Excel", "ODS", "SPSS", "feather", "parquet"),
+
          rowNames=NULL,
 
          ExcelTable=FALSE, ExcelColWidth=TRUE,

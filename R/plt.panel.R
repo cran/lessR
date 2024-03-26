@@ -130,7 +130,7 @@ function (x, y, box.ratio=1, vbs_size=box.ratio/(1 + box.ratio),
 # cannot call panel.xyplot directly because formal arg y has mult args
 .panel.stripplot <-
 function (x, y, jitter_data=FALSE, factor=0.5, amount=NULL, 
-    horizontal=TRUE, groups=NULL, ..., identifier="stripplot") {
+    horizontal=TRUE, groups=NULL,  ..., identifier="stripplot") {
 
     panel.xyplot(x=x, y=y[1:length(x)], jitter.x=jitter_data && !horizontal, 
         jitter.y=jitter_data && horizontal, factor=factor, 

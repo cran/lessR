@@ -11,7 +11,7 @@ Provides feedback regarding a data frame which includes the variable names, the 
 }
 
 \usage{
-details(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
+details(data=d, n_mcut=1, max_lines=30,
          miss_show=30, miss_matrix=FALSE, var_labels=FALSE,
          brief=getOption("brief"))
 
@@ -23,9 +23,6 @@ db(\dots, brief=TRUE)
   \item{n_mcut}{For the missing value analysis, list the row name and number
         of missing values if the number of missing exceeds or equals this
         cutoff.}
-  \item{miss_zero}{For the missing value analysis, list the variable name
-       or the row name even for values of 0. By default only variables and
-       rows with missing data are listed.}
   \item{max_lines}{Maximum number of lines to list of the data and labels.}
   \item{miss_show}{For the missing value analysis, the number of rows, one
        row per observation, that has as many or missing values as \code{n_mcut}.}
@@ -43,7 +40,7 @@ db(\dots, brief=TRUE)
 
 \details{
 MISSING DATA\cr
-By default, \code{details} provides a list of each variable and each row with the display of the number of associated missing values, indicated by the standard R missing value code NA. To not list the variable name or row name of variables or rows without missing data, invoke the \code{miss_zero=FALSE} option, which can appreciably reduce the amount of output for large data sets. To view the entire data table in terms of 0's and 1's for non-missing and missing data, respectively, invoke the \code{miss_matrix=TRUE} option. 
+When \code{brief} is set to \code{FALSE}, \code{details} provides a list the row of data with missing values, indicated by the standard R missing value code NA. To view the entire data table in terms of 0's and 1's for non-missing and missing data, respectively, invoke the \code{miss_matrix=TRUE} option. 
 
 VARIABLE LABELS\cr
 Standard R does not provide for variable labels, but \code{lessR} does. Variable labels can be provided for some or all of the variables in the data frames.  One way to enter the variable labels is to read them from their own file with \code{details} with \code{labels} set to the full path name or \code{URL} of the labels file, or just the file name if the labels file is in the same directory as the data file.  Another method is to include the labels directly in the data file.  To to this, specify the file of variable labels with the \code{label="row2"} option. The web survey application Qualtrics downloads \code{csv} files in this format.

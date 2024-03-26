@@ -154,6 +154,13 @@ Control the choice of the three superimposed plots -- violin, box, and scatter -
 Plot(Salary, vbs_plot="b")
 ```
 
+Do a frequency distribution by specifying the value of parameter `stat_x`, either `"count"` or if the y-axis is proportion, then `"proportion"` or `"%"`. Can specify a custom bin width if desired with the parameter `bin_width`.
+
+```{r, fig.height=2.75}
+
+```{r, fig.height=2.75}
+Plot(Salary, stat_x="%", bin_width=13000)
+```
 
 
 ### Cleveland Dot Plot
@@ -201,6 +208,13 @@ Plot(Years, Salary, by=Gender, size=2, fit="lm",
 ```
 
 Change the plotted shapes with the `shape` parameter. The default value is `"circle"` with both an exterior color and filled interior, specified with `"color"` and `"fill"`. Other possible values, with fillable interiors,  are `"circle"`, `"square"`, `"diamond"`, `"triup"` (triangle up), and `"tridown"` (triangle down). Other possible values include all uppercase and lowercase letters, all digits, and most punctuation characters. The numbers 0 through 25 defined by the R `points()` function also apply. If plotting levels according to `by`, then list one shape for each level to be plotted.
+
+Or, request default shapes across the different `by` groups by setting parameter `shapes` to `"vary"`.
+
+```{r varfy, fig.width=6}
+Plot(Years, Salary, by=Gender, shape="vary")
+```
+
 
 A Trellis (facet) plot creates a separate panel for the plot of each level of the categorical variable. Generate Trellis plots with the `by1` parameter. In this example, plot the best-fit linear model for the data in each panel according to the `fit` parameter. By default, the 95% confidence interval for each line is also displayed. 
 

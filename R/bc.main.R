@@ -1,7 +1,7 @@
 .bc.main <-
 function(x, y, by, stack100,
          fill, color, col.trans, fill_split, theme,
-         horiz, gap, prop, scale_y,
+         horiz, gap, prop, scale_y, top,
          xlab, ylab, main,
          value_labels, label_max, beside,
          rotate_x, offset, break_x, sort_x,
@@ -11,8 +11,8 @@ function(x, y, by, stack100,
          pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
          legend_horiz, legend_size, legend_abbrev, legend_adj,
-         add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet, ...) {
-
+         add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet, 
+         shiny, ...) {
 
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
   y.given <- ifelse (!is.null(y), TRUE, FALSE)
@@ -62,6 +62,13 @@ function(x, y, by, stack100,
   lab_y_cex <- ifelse(is.null(lab_y_cex), lab_cex, lab_y_cex)
 # adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
 # adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
+# if (shiny) {  # only current use of arg: shiny
+#   axis_x_cex <- 1.08 * axis_x_cex
+#   axis_y_cex <- 1.08 * axis_y_cex
+#   lab_x_cex <- 1.15 * lab_x_cex
+#   lab_y_cex <- 1.15 * lab_y_cex
+# }
+
   gl <- .getlabels(xlab, ylab, main, by.nm=TRUE, lab_x_cex=lab_x_cex,
                    lab_y_cex=lab_y_cex, flip=horiz)
   x.name <- gl$xn;  x.lbl <- gl$xl;  y.lbl <- gl$yl
@@ -332,9 +339,37 @@ function(x, y, by, stack100,
     else {
       x.df <- as.data.frame.matrix(x, nrow=2)
       x.df <- x.df[order(apply(x.df, 2, sum), decreasing=srt.dwn)]
+      if (!is.null(top)) {
+        keep <- min(top, ncol(x))
+        if (!horiz)
+          x.df <- x.df[,1:keep]
+        else
+          x.df <- x.df[,(ncol(x)-keep+1):length(x.df)]
+      }
       x <- as.table(as.matrix(x.df))
     }
-  }
+  }  # end sort
+
+  # retain only the x's with the specified number of top values of y
+  # makes the most sense when x is sorted by y
+  if (!is.null(top)) {
+    if (!is.matrix(x)) {
+        keep <- min(top, length(x))
+        if (!horiz)
+          x <- x[1:keep]
+        else
+          x <- x[(length(x)-keep+1):length(x)]
+    }
+    else {
+      keep <- min(top, ncol(x))
+      x.df <- as.data.frame.matrix(x, nrow=2)
+      if (!horiz)
+        x.df <- x.df[,1:keep]
+      else
+        x.df <- x.df[,(ncol(x)-keep+1):length(x.df)]
+      x <- as.table(as.matrix(x.df))
+    }
+  }  # end top
 
   n.levels <- ifelse (is.matrix(x), nrow(x), length(x))
 

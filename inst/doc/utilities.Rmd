@@ -242,7 +242,7 @@ Get the data, the Employee data set.
 d <- Read("Employee", quiet=TRUE)
 ```
 
-Create four component data frames: out$train_x, out$train_y, out$test_x, and out$test_y. Specify the response variable as Salary.
+Create four component data frames: out\$train_x, out\$train_y, out\$test_x, and out\$test_y. Specify the response variable as Salary.
 
 ```{r}
 out <- train_test(d, Salary)

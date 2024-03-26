@@ -22,7 +22,7 @@ function(lm.out, nm, d,
     out <- cbind(fit, res, rstudent(lm.out), dffits(lm.out), cook)
     out <- cbind(lm.out$model[c(nm[seq(2,n.vars)],nm[1])],out)
     out <- data.frame(out, stringsAsFactors=TRUE)
-    names(out)[n.vars+1] <- "fitted"
+    names(out)[n.vars+1] <- "P(Y=1)"
     names(out)[n.vars+2] <- "residual"
     names(out)[n.vars+3] <- "rstudent"
     names(out)[n.vars+4] <- "dffits"

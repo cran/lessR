@@ -41,7 +41,8 @@ ss(\dots)
        to analyze.}
   \item{n_cat}{Specifies the largest number of unique values of variable of a numeric
        data type for which the variable will be analyzed as a categorical. Default is
-       off, set to 0.}
+       off, set to 0.
+       \emph{[deprecated]}: Best to convert a categorical integer variable to a factor.}
   \item{digits_d}{Specifies the number of decimal digits to display in the output.}
   \item{brief}{If set to \code{TRUE}, reduced text output. Can change system default
        with \code{\link{style}} function.}

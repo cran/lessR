@@ -7,7 +7,7 @@
 \description{
 Abbreviation: \code{hs}
 
-From the standard R function \code{\link{hist}}, plots a frequency histogram with default colors, including background color and grid lines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width and/or the bin start. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
+From the standard R function \code{\link{hist}}, the function plots a frequency histogram with default colors, including background color and grid lines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width and/or the bin start. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
 
 If a set of multiple variables is provided, including an entire data frame, then each numeric variable in that set of variables is analyzed, with the option to write the resulting histograms to separate pdf files. The related \code{\link{CountAll}} function does the same for all variables in the set of variables, histograms for continuous variables and bar charts for categorical variables. Specifying a \code{by1} or \code{by2} variable implements Trellis graphics.
 
@@ -15,30 +15,37 @@ When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, c
 }
 
 \usage{
-Histogram(x=NULL, data=d, rows=NULL,
-          stat_x=c("count", "proportion"),
-          n_cat=getOption("n_cat"), Rmd=NULL,
+Histogram(
 
+    # ------------------------------------------
+    # Data from which to construct the histogram
+    x=NULL, data=d, rows=NULL,
+    stat_x=c("count", "proportion"),
+
+    # --------------------
+    # Trellis (facet) plot
     by1=NULL, by2=NULL,
     n_row=NULL, n_col=NULL, aspect="fill",
 
-    bin_start=NULL, bin_width=NULL, bin_end=NULL, breaks="Sturges",
-
+    # -----------------------------------------------------------------
+    # Analogy of physical Marks on paper that create the bars and labels
     theme=getOption("theme"),
     fill=getOption("bar_fill_cont"),
     color=getOption("bar_color_cont"),
     transparency=getOption("trans_bar_fill"),
 
-    values=FALSE,
-    reg="snow2", cumulate=c("off", "on", "both"),
+    values=FALSE, 
 
-    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    lab_adj=c(0,0), margin_adj=c(0,0,0,0),
+    # ---------------------------------------
+    # Form of the histogram
+    # ---------------------------------------
+    # Binning the continuous variable x
+    bin_start=NULL, bin_width=NULL, bin_end=NULL, breaks="Sturges",
 
-    rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
-    offset=getOption("offset"),
-    scale_x=NULL, scale_y=NULL,
+    # Cumulative histogram
+    cumulate=c("off", "on", "both"), reg="snow2",
 
+    # Density (smooth curve) plot
     density=FALSE, show_histogram=TRUE,
     bandwidth=NULL, type=c("general", "normal", "both"),
     fill_general=NULL, fill_normal=NULL, fill_hist=getOption("se_fill"), 
@@ -46,11 +53,34 @@ Histogram(x=NULL, data=d, rows=NULL,
     x.pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
 
+    # -----------------------------------------------------------------
+    # Labels for axes, values, and legend if x and by variables, margins
+    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+    lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
+
+    rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
+    offset=getOption("offset"),
+    scale_x=NULL, scale_y=NULL,
+
+    # ----------------------------------------------------------------------
+    # Draw one or more objects, text, or geometric figures, on the histogram
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-    eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"), do_plot=TRUE,
-    width=6, height=6, pdf_file=NULL, 
-    fun_call=NULL, \dots)
+    # ---------------------------------------
+    # Output: turn off, chart to PDF file, decimal digits, markdown file
+    quiet=getOption("quiet"), do_plot=TRUE,
+    pdf_file=NULL, width=6.5, height=6, 
+    digits_d=NULL,
+    Rmd=NULL,
+
+    # --------------------------------------
+    # Deprecated, removed in future versions
+    n_cat=getOption("n_cat"),
+
+    # ---------------------------------
+    # Miscellaneous
+    eval_df=NULL, fun_call=NULL, \dots)
+
 
 hs(\dots)
 }
@@ -69,14 +99,6 @@ hs(\dots)
   \item{stat_x}{Bin and transform values of variable \code{x} into
        \code{"counts"} by default or \code{"proportion"} if specified,
        that is, frequencies or relative frequencies.}
-  \item{n_cat}{For the analysis of multiple variables, such as a data frame,
-        specifies the largest number of unique values of variable of a numeric
-        data type
-        for which the variable will be analyzed as a categorical. Default is 0.}
-  \item{Rmd}{File name for the file of R markdown to be written, if specified.
-        The file type is .Rmd, which automatically opens in RStudio, but it is
-        a simple
-        text file that can be edited with any text editor, including RStudio.}\cr
 
   \item{by1}{A categorical variable called a conditioning variable that
         activates \bold{Trellis graphics}, from the lattice package, to provide
@@ -103,18 +125,7 @@ hs(\dots)
         to "bank" to 45 degrees, that is, with the line slope approximately
         45 degrees.}\cr
 
-  \item{bin_start}{Optional specified starting value of the bins.}
-  \item{bin_width}{Optional specified bin width, which can be specified with or
-        without a \code{bin_start} value.}
-  \item{bin_end}{Optional specified value that is within the last bin, so the
-        actual endpoint of the last bin may be larger than the specified value.}
-  \item{breaks}{The method for calculating the bins, or an explicit specification
-       of the bins, such as with the standard R \code{\link{seq}} function or
-       other options provided by the \code{\link{hist}} function that include
-       the default \code{"Sturges"} plus \code{"Scott"} and \code{"FD"}. Not
-       applicable and so not allowed if \code{density} is \code{TRUE}.}\cr
-
-  \item{theme}{Color theme for this analysis. Make persistent across analyses
+  \item{theme}{\bold{Color} theme for this analysis. Make persistent across analyses
         with \code{\link{style}}.}
   \item{fill}{Fill color of the bars. 
         Can explicitly choose \code{"grays"}
@@ -133,44 +144,25 @@ hs(\dots)
         \code{trans_bar_fill} from the lessR \code{\link{style}} function.}\cr
 
   \item{values}{Replaces standard R \code{labels} options, which has multiple
-       definitions in R. Specifies to display the count of each bin.}
-  \item{reg}{The color of the superimposed, regular histogram when
-        \code{cumulate="both"}.}
-  \item{cumulate}{Specify a cumulative histogram. The value of \code{"on"}
+       definitions in R. Specifies to display the count of each bin.}\cr
+
+  \item{bin_start}{Optional specified starting value of the bins.}
+  \item{bin_width}{Optional specified bin width, which can be specified with or
+        without a \code{bin_start} value.}
+  \item{bin_end}{Optional specified value that is within the last bin, so the
+        actual endpoint of the last bin may be larger than the specified value.}
+  \item{breaks}{The method for calculating the bins, or an explicit specification
+       of the bins, such as with the standard R \code{\link{seq}} function or
+       other options provided by the \code{\link{hist}} function that include
+       the default \code{"Sturges"} plus \code{"Scott"} and \code{"FD"}. Not
+       applicable and so not allowed if \code{density} is \code{TRUE}.}\cr
+
+  \item{cumulate}{Specify a \bold{cumulative histogram}. The value of \code{"on"}
         displays the 
         cumulative histogram, with default of \code{"off"}. The value of
-        \code{"both"} superimposes the regular histogram.}\cr
-
-  \item{xlab}{Label for x-axis_ Defaults to variable name unless variable labels
-        are present, the defaults to also include the corresponding variable
-        label. Can style with the lessR \code{\link{style}} function}
-  \item{ylab}{Label for y-axis_ Defaults to Frequency or Proportion.
-       Can style with the lessR \code{\link{style}} function.}
-  \item{main}{Label for the title of the graph.
-       Can set size with \code{main_cex} and color with \code{main_color} from the
-       lessR \code{\link{style}} function.}
-  \item{sub}{Sub-title of graph, below xlab. Not yet implemented.}
-  \item{lab_adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
-       the position of the axis labels in approximate inches. + values move
-       the labels away from plot edge. Not applicable to Trellis graphics.}
-  \item{margin_adj}{Four-element vector -- top, right, bottom and left --
-       adjusts the margins of the plotted figure in approximate inches.
-       + values move the corresponding margin away from plot edge. 
-       Not applicable to Trellis graphics.}\cr
-
-  \item{rotate_x}{Degrees that the \code{x}-axis values are rotated, usually to
-        accommodate longer values, typically used in conjunction with \code{offset}.
-        Can set persistently with the lessR \code{\link{style}} function.}
-  \item{rotate_y}{Degrees that the \code{y}-axis values are rotated.
-        Can set persistently with the lessR \code{\link{style}} function.}
-  \item{offset}{The amount of spacing between the axis values and the axis_ Default
-        is 0.5. Larger values such as 1.0 are used to create space for the label when
-        longer axis value names are rotated.
-        Can set persistently with the lessR \code{\link{style}} function.}
-  \item{scale_x}{If specified, a vector of three values that define the
-        numerical values of the x-axis: starting, ending and
-        number of intervals, within the bounds of plot region.}
-  \item{scale_y}{Applies to the y-axis_ See \code{scale_x}.}\cr
+        \code{"both"} superimposes the regular histogram.}
+  \item{reg}{The color of the superimposed, regular histogram when
+        \code{cumulate="both"}.}\cr
 
   \item{density}{If \code{TRUE}, plot the smoothed \bold{kernel density}
         estimate.}
@@ -203,6 +195,36 @@ hs(\dots)
   \item{color_rug}{Color of the rug ticks.}
   \item{size_rug}{Line width of the rug ticks.}\cr
 
+  \item{xlab}{Label for x-axis_ Defaults to variable name unless variable labels
+        are present, the defaults to also include the corresponding variable
+        label. Can style with the lessR \code{\link{style}} function}
+  \item{ylab}{Label for y-axis_ Defaults to Frequency or Proportion.
+       Can style with the lessR \code{\link{style}} function.}
+  \item{main}{Label for the title of the graph.
+       Can set size with \code{main_cex} and color with \code{main_color} from the
+       lessR \code{\link{style}} function.}
+  \item{sub}{Sub-title of graph, below xlab. Not yet implemented.}
+  \item{lab_adjust}{Two-element vector -- x-axis label, y-axis label -- adjusts
+       the position of the axis labels in approximate inches. + values move
+       the labels away from plot edge. Not applicable to Trellis graphics.}
+  \item{margin_adjust}{Four-element vector -- top, right, bottom and left --
+       adjusts the margins of the plotted figure in approximate inches.
+       + values move the corresponding margin away from plot edge. 
+       Not applicable to Trellis graphics.}\cr
+
+  \item{rotate_x}{Degrees that the \code{x}-\bold{axis values} are rotated, usually to
+        accommodate longer values, typically used in conjunction with \code{offset}.
+        Can set persistently with the lessR \code{\link{style}} function.}
+  \item{rotate_y}{Degrees that the \code{y}-axis values are rotated.
+        Can set persistently with the lessR \code{\link{style}} function.}
+  \item{offset}{The amount of spacing between the axis values and the axis_ Default
+        is 0.5. Larger values such as 1.0 are used to create space for the label when
+        longer axis value names are rotated.
+        Can set persistently with the lessR \code{\link{style}} function.}
+  \item{scale_x}{If specified, a vector of three values that define the
+        numerical values of the x-axis: starting, ending and
+        number of intervals, within the bounds of plot region.}
+  \item{scale_y}{Applies to the y-axis_ See \code{scale_x}.}\cr
 
   \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
        on the plot.
@@ -222,20 +244,32 @@ hs(\dots)
   \item{y2}{Second y coordinate to be considered for each object.
         Only used for \code{"rect"}, \code{"line"} and \code{arrow}.}\cr
 
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+        with \code{\link{style}} function.}
+  \item{do_plot}{If \code{TRUE}, the default, then generate the plot.}
+  \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
+        the pdf file.}
+  \item{width}{Width of the plot window in inches, defaults to 4.5.}
+  \item{height}{Height of the plot window in inches, defaults to 4.5.}
+  \item{digits_d}{Number of significant digits for each of the displayed summary
+        statistics.}
+  \item{Rmd}{File name for the file of R markdown to be written, if specified.
+        The file type is .Rmd, which automatically opens in RStudio, but it is
+        a simple
+        text file that can be edited with any text editor, including RStudio.}\cr
+
+  \item{n_cat}{For the analysis of multiple variables, such as a data frame,
+        specifies the largest number of unique values of variable of a numeric
+        data type for which the variable will be analyzed as a categorical.
+        Default is 0. 
+        \emph{[deprecated]}: Best to convert a categorical integer variable 
+        to a factor.}\cr
+
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE} 
         unless the \code{shiny} package is loaded then set to \code{FALSE} so
         that Shiny will run. Needs to be set to \code{FALSE} if using
         the pipe \code{\%\>\%} notation.}
-  \item{digits_d}{Number of significant digits for each of the displayed summary
-        statistics.}
-  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-        with \code{\link{style}} function.}
-  \item{do_plot}{If \code{TRUE}, the default, then generate the plot.}
-  \item{width}{Width of the plot window in inches, defaults to 4.5.}
-  \item{height}{Height of the plot window in inches, defaults to 4.5.}
-  \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
-        the pdf file.}
   \item{fun_call}{Function call. Used with \code{knitr} to pass the function call
         when obtained from the abbreviated function call \code{hs}.}\cr
 

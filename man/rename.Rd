@@ -1,10 +1,10 @@
 \name{rename}
 \alias{rename}
 
-\title{Rename a Variable in a Data Frame}
+\title{Rename One or More Variables in a Data Frame}
 
 \description{
-\code{rename} renames the specified variable in a data frame.
+\code{rename} renames a single variable or a vector of variables in a data frame.
 }
 
 \usage{
@@ -12,17 +12,13 @@ rename(data, from, to)
 }
 
 \arguments{
-  \item{data}{Data frame that contains the variable to rename}
-  \item{from}{Variable to be renamed.}
-  \item{to}{New variable name.}
+  \item{data}{Data frame that contains the relevant variables.}
+  \item{from}{One or more variables to rename.}
+  \item{to}{Corresponding list of new variable names.}
 }
 
 \details{
-A simple wrapper for R code:\cr
-
-    names(data)[which(names(data) == from)] <- to
-
-Exists to save the extra complexity and typing when renaming a variable in a data frame.
+Assign the result to the data frame of interest, which can be the same data frame that contains the variables to rename.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -32,11 +28,18 @@ Exists to save the extra complexity and typing when renaming a variable in a dat
 }
 
 \examples{
-d <- Read("Mach4", quiet=TRUE)
 
+d <- Read("Mach4", quiet=TRUE)
 names(d)
+
+# single name change
 d <- rename(d, m03, third)
 names(d)
+
+# vector of name changes
+d <- rename(d, c(m01, m19), c(first, nineteen))
+names(d)
+
 }
 
 

@@ -35,63 +35,112 @@ For a third variable, which is continuous, specify \code{size} for a bubble plot
 }
 
 \usage{
-Plot(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
-         stat="data", n_cat=getOption("n_cat"), n_bins=1,
+Plot(
 
-         by=NULL, by1=NULL, by2=NULL,
-         n_row=NULL, n_col=NULL, aspect="fill",
+    # -------------------------------------
+    # Data from which to construct the plot
+    x, y=NULL, data=d, rows=NULL,
 
-         theme=getOption("theme"),
-         fill=NULL,
-         color=NULL,
-         transparency=getOption("trans_pt_fill"),
+    # -----------------------------------
+    # Lollipop chart from aggregated data
+    stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
+    stat_x=c("count", "proportion", "\%"),
 
-         size=NULL, size_cut=NULL, shape="circle", means=TRUE,
-         sort_yx=c("0", "-", "+"), 
-         segments=FALSE, segments_y=FALSE, segments_x=FALSE,
-         jitter_x=0, jitter_y=0,
+    # --------------------
+    # Trellis (facet) plot
+    by=NULL, by1=NULL, by2=NULL,
+    n_row=NULL, n_col=NULL, aspect="fill",
 
-         ID="row.name", ID_size=0.60,
-         MD_cut=0, out_cut=0, out_shape="circle", out_size=1,
+    # ------------------------------------------------------------------
+    # Analogy of physical Marks on paper that create the bars and labels
+    theme=getOption("theme"),
+    fill=NULL,
+    color=NULL,
+    transparency=getOption("trans_pt_fill"),
 
-         vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
-         violin_fill=getOption("violin_fill"), 
-         box_fill=getOption("box_fill"), 
-         vbs_pt_fill="black",
-         vbs_mean=FALSE, fences=FALSE,
-         k=1.5, box_adj=FALSE, a=-4, b=3,
+    enhance=FALSE,
+    size=NULL, size_cut=NULL, shape="circle", means=TRUE,
+    segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
-         radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
+    # ----------------------
+    # Sort and jitter points
+    sort_yx=c("0", "-", "+"),
+    jitter_x=0, jitter_y=0, 
 
-         smooth=FALSE, smooth_points=100, smooth_size=1,
-         smooth_exp=0.25, smooth_bins=128,
+    # ----------------
+    # Outlier analysis
+    ID="row.name", ID_size=0.60,
+    MD_cut=0, out_cut=0, out_shape="circle", out_size=1,
 
-         fit="off", fit_power=1, fit_se=0.95,
-         fit_color=getOption("fit_color"),
-         plot_errors=FALSE, ellipse=0, 
+    # ----------------------------------
+    # Integrated violin/box/scatter plot
+    vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
+    violin_fill=getOption("violin_fill"), 
+    box_fill=getOption("box_fill"), 
+    vbs_pt_fill="black",
+    vbs_mean=FALSE, fences=FALSE,
+    k=1.5, box_adj=FALSE, a=-4, b=3,
 
-         bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
-         breaks="Sturges", cumulate=FALSE,
+    # -----------
+    # Bubble plot
+    radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
 
-         run=FALSE, lwd=1.5, area_fill="transparent", area_origin=0, 
-         center_line=c("off", "mean", "median", "zero"),
-         show_runs=FALSE, stack=FALSE,
-         
-         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-         lab_adj=c(0,0), margin_adj=c(0,0,0,0),
+    # --------------------------------------
+    # Large data sets, smoothing and binning
+    smooth=FALSE, smooth_points=100, smooth_size=1,
+    smooth_exp=0.25, smooth_bins=128,
+    n_bins=1,
+     
+    # -------------------------------------------------
+    # Fit line, confidence interval, confidence ellipse
+        fit=c("off","loess", "lm", "ls", "null", "exp", "quad",
+              "power", "log"),
+    fit_power=1, fit_se=0.95,
+    fit_color=getOption("fit_color"),
+    plot_errors=FALSE, ellipse=0, 
 
-         rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
-         offset=getOption("offset"),
+    # ------------------------------------------------------
+    # Bins for frequency polygon or text output of VBS plots
+    bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
+    breaks="Sturges", cumulate=FALSE, 
 
-         xy_ticks=TRUE, value_labels=NULL, origin_x=NULL,
-         scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
-         legend_title=NULL,
+    # -----------------------------------------------------
+    # Time series and run chart, plot x values sequentially
+    run=FALSE, lwd=1.5, area_fill="transparent", area_origin=0, 
+    center_line=c("off", "mean", "median", "zero"),
+    show_runs=FALSE, stack=FALSE,
 
-         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
+    # ------------------------------------------------------------------
+    # Labels for axes, values, and legend if x and by variables, margins
+    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+    lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
 
-         eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
-         do_plot=TRUE, width=NULL, height=NULL, pdf_file=NULL, 
-         fun_call=NULL, \dots)
+    rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
+    offset=getOption("offset"),
+
+    xy_ticks=TRUE, origin_x=NULL,
+    scale_x=NULL, scale_y=NULL,
+    pad_x=c(0,0), pad_y=c(0,0),
+    legend_title=NULL,
+
+    # ----------------------------------------------------
+    # Draw one or more objects, text, or geometric figures
+    add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
+
+    # ------------------------------------------------------------------
+    # Output: turn off, chart to PDF file, decimal digits, markdown file
+    quiet=getOption("quiet"), do_plot=TRUE,
+    pdf_file=NULL, width=6.5, height=6, 
+    digits_d=NULL,
+
+    # --------------------------------------
+    # Deprecated, removed in future versions
+    n_cat=getOption("n_cat"), value_labels=NULL,
+
+    # -------------
+    # Miscellaneous
+    eval_df=NULL, fun_call=NULL, \dots)
+
 
 ScatterPlot(\dots)
 sp(\dots)
@@ -119,33 +168,20 @@ vp(\dots)
   \item{data}{Optional data frame that contains one or both of \code{x} and
         \code{y}. Default data frame is \code{d}.}
   \item{rows}{A logical expression that specifies a subset of rows of the data frame
-       to analyze.}
-  \item{enhance}{For a two-variable scatterplot, if \code{TRUE},
-        automatically add the 0.95 data ellipse, 
-        labeling of outliers beyond a Mahalanobis distance of 6 from the 
-        ellipse center, the best-fitting least squares line of all the data,
-        the best-fitting least squares line of the regular data without the
-        outliers, and a horizontal and vertical line to represent the mean of
-        each of the two variables.}
+       to analyze.}\cr
+
   \item{stat}{Transform data for categorical variable \code{x}
        into a simple table of paired levels of
        \code{x} with numerical values of \code{y}.
-       Apply specified transformation such as \code{"count"}
+       Apply specified aggregation such as \code{"mean"}
        to each of the levels of \code{x}, and, for a provided numerical
-       variable $y$, transformations such as \code{"mean"}, \code{sd}, etc.
+       variable \code{y}, transformations such as \code{"mean"}, \code{"sd"}, etc.
        The resulting dot plot is analogous to a bar chart.}
-  \item{n_cat}{Number of categories, specifies the largest number of
-        unique, equally spaced integer values of a variable for which
-        the variable will be analyzed as categorical instead of continuous.
-        Default is 0. Use to specify that such variables are to be analyzed
-        as categorical, a kind of informal R factor.}
-  \item{n_bins}{Specify the number of bins to bin a single numeric 
-       \code{x}-variable from which to compute the mean or median for a
-       numeric \code{y}-variable for each bin of \code{x}. Points are plotted
-       with the size dependent on the sample size for the bin, unless \code{size}
-       is specified at a constant value. Default value is 1 for no binning.
-       Available parameters include fill, color, transparency, segments, scale_x, and
-       scale_y.}\cr
+  \item{stat_x}{If no \code{y} variable is specified, for constructing a
+        frequency polygon, with access to the \code{bin_width} parameter. 
+        Either do the
+        default \code{count} for each bin or the \code{proportion}, also
+        indicated by \code{\%}.}\cr
 
   \item{by}{A categorical variable to provide a scatterplot for
         each level of the numeric primary variables \code{x} and
@@ -196,6 +232,13 @@ vp(\dots)
         Default is
         \code{trans_pt_fill} from the lessR \code{\link{style}} function.}\cr
 
+  \item{enhance}{For a two-variable scatterplot, if \code{TRUE},
+        automatically add the 0.95 data ellipse, 
+        labeling of outliers beyond a Mahalanobis distance of 6 from the 
+        ellipse center, the best-fitting least squares line of all the data,
+        the best-fitting least squares line of the regular data without the
+        outliers, and a horizontal and vertical line to represent the mean of
+        each of the two variables.}
   \item{size}{When set to a constant, the scaling factor for \bold{standard points}
       (not bubbles) or a line, with default of 1.0 for points and 2.0 for a line.
        Set to 0 to not plot the points or lines. If \code{area_fill} for a line
@@ -216,23 +259,21 @@ vp(\dots)
        variable.  Color of the displayed text set by \code{bubble_text} from
        the \code{\link{style}} function.}
   \item{shape}{The plot character(s). The default value is \code{"circle"}
-       with both an exterior
-       color and filled interior, specified with \code{"color"} and \code{"fill"}.
+       with both a default exterior
+       color and filled interior, explicitly specified with 
+       \code{"color"} and \code{"fill"}.
        Other possible values, with fillable interiors, 
        are \code{"circle"}, \code{"square"}, \code{"diamond"},
-       \code{"triup"} (triangle up), and \code{"tridown"} (triangle down). Other
-       possible values include all
+       \code{"triup"} (triangle up), and \code{"tridown"} (triangle down), all
        uppercase and lowercase letters, all digits, and most punctuation characters.
        The numbers 0 through 25 as defined by the R \code{\link{points}} function
-       also apply. If plotting levels
-       according to \code{by}, then list one shape for each level to be plotted.}
+       also apply. If plotting levels for different groups
+       according to \code{by}, then list as a vector with with one shape for each
+       level to be plotted or set to \code{"vary"} to have shapes selected by
+       default across the \code{by} groups.}
   \item{means}{If the one variable is categorical, expressed as a factor, and
        the other variable continuous, then if \code{TRUE}, by default,
        plot means with the scatterplot. Also applies to a 1-D scatterplot.}
-  \item{sort_yx}{Sort the values of \code{y} by the values of \code{x}, such as
-        for a Cleveland dot plot, that is, a numeric \code{x}-variable paired
-        with a categorical \code{y}-variable with unique values. If a \code{x}
-        is a vector of two variables, sort by their difference.}
   \item{segments}{Designed for interaction plots of means, connects each pair of
         successive points with a line segment. Pass a data frame of the means,
         such as from \code{\link{pivot}}. To turn off connecting line segments
@@ -243,7 +284,12 @@ vp(\dots)
         each plotted point, such as for the Cleveland dot plot. For two
         \code{x}-variables, the line segments connect the two points.}
   \item{segments_x}{Draw a line segment from the \code{x}-axis for each
-        plotted point.}
+        plotted point.}\cr
+
+  \item{sort_yx}{Sort the values of \code{y} by the values of \code{x}, such as
+        for a Cleveland dot plot, that is, a numeric \code{x}-variable paired
+        with a categorical \code{y}-variable with unique values. If a \code{x}
+        is a vector of two variables, sort by their difference.}
   \item{jitter_x}{Randomly perturbs the plotted points of a scatterplot
        horizontally within the limits of the explicitly specified value, or
        set to \code{NULL} to rely upon the default value of the range of 
@@ -344,7 +390,14 @@ vp(\dots)
   \item{smooth_exp}{Exponent of the function that maps the density scale to
         the color scale. Smaller than default of 0.25 yields darker plots.}
   \item{smooth_bins}{Number of bins in both directions for the density
-        estimation.}\cr
+        estimation.}
+  \item{n_bins}{Specify the number of bins to bin a single numeric 
+       \code{x}-variable from which to compute the mean or median for a
+       numeric \code{y}-variable for each bin of \code{x}. Points are plotted
+       with the size dependent on the sample size for the bin, unless \code{size}
+       is specified at a constant value. Default value is 1 for no binning.
+       Available parameters include fill, color, transparency, segments, scale_x, and
+       scale_y.}\cr
 
   \item{fit}{The \bold{best fit line}. Default value is \code{"off"}, with
         options \code{"loess"} for non-linear fit, \code{"lm"} for linear model 
@@ -355,9 +408,7 @@ vp(\dots)
         the specific power value of 2. If
         potential outliers are identified according to \code{out_cut},
         a second (dashed) fit line is displayed calculated \emph{without}
-        the outliers. Modify the line color from with the 
-        \code{\link{style}} function parameter \code{fit_color}, and the
-        line width with \code{fit_lwd}.}
+        the outliers.}
   \item{fit_power}{Power that describes response Y as a power function of the
        predictor variable X, required for \code{"power"} .
        Optionally, and experimentally, applies to \code{fit} values \code{"exp"}.} 
@@ -437,10 +488,10 @@ vp(\dots)
        labels exist,
        then the title is set by default from the corresponding variable labels.}
   \item{sub}{Sub-title of graph, below \code{xlab}. Not yet implemented.}
-  \item{lab_adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
+  \item{lab_adjust}{Two-element vector -- x-axis label, y-axis label -- adjusts
        the position of the axis labels in approximate inches. + values move
        the labels away from plot edge. Not applicable to Trellis graphics.}
-  \item{margin_adj}{Four-element vector -- top, right, bottom and left --
+  \item{margin_adjust}{Four-element vector -- top, right, bottom and left --
        adjusts the margins of the plotted figure in approximate inches.
        + values move the corresponding margin away from plot edge. 
        Not applicable to Trellis graphics.}\cr
@@ -461,13 +512,6 @@ vp(\dots)
         labels} on the axes are to be displayed. To rotate the axis values, use
         \code{rotate_x}, \code{rotate_y}, and \code{offset} from the
         \code{\link{style}} function.}
-  \item{value_labels}{Labels for the \code{x}-axis on the graph to override 
-        existing data values, including factor levels. If the variable is a 
-        factor and \code{value_labels} is not specified (is \code{NULL}), then the
-        value_labels are set to the factor levels with each space replaced by
-        a new line character. If \code{x} and \code{y}-axes have the same scale,
-        they also apply to the \code{y}-axis. No need to use if categorical
-        variables are declared as factors.}
   \item{origin_x}{Origin of \code{x}-axis. Starting value of \code{x}, by
        default the minimum value of \code{x}, except when \code{stat}
        is set to \code{"count"} or related  where the origin is zero
@@ -511,22 +555,43 @@ vp(\dots)
        \code{"mean_y"}.  Only used for \code{"rect"}, \code{"line"} and
        \code{arrow}.}\cr
 
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{style}} function.}
+  \item{do_plot}{If \code{TRUE}, the default, then generate the plot.}
+  \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
+        the pdf file.}
+  \item{width}{Width of the plot window in inches, defaults to 5 except in RStudio
+        to maintain an approximate square plotting area.}
+  \item{height}{Height of the plot window in inches, defaults to 4.5 except for
+        1-D scatterplots and when in RStudio.}
+  \item{digits_d}{Number of significant digits for each of the displayed summary
+        statistics.}\cr
+
+  \item{n_cat}{Number of categories, specifies the largest number of
+        unique, equally spaced integer values of a variable for which
+        the variable will be analyzed as categorical instead of continuous.
+        Default is 0. Use to specify that such variables are to be analyzed
+        as categorical, a kind of informal R factor.
+        \emph{[deprecated]}: Best to convert a categorical integer variable 
+        to a factor.}
+  \item{value_labels}{For factors, default is the factor labels, and for
+        character variables, default is the character values.
+        Or, provide labels for the \code{x}-axis on the graph to override
+        these values. If the variable is a
+        factor and \code{value_labels} is not specified (is \code{NULL}), then the
+        value_labels are set to the factor levels with each space replaced by
+        a new line character. If \code{x} and \code{y}-axes have the same scale,
+        they also apply to the \code{y}-axis. Control the plotted size
+        with \code{axis_cex} and \code{axis_x_cex} from the lessR
+        \code{\link{style} function.}
+        \emph{[deprecated]}: Better to convert a categorical integer variable to
+        a factor.}\cr
+
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE} 
         unless the \code{shiny} package is loaded then set to \code{FALSE} so
         that Shiny will run. Needs to be set to \code{FALSE} if using
         the pipe \code{\%\>\%} notation.}
-  \item{digits_d}{Number of significant digits for each of the displayed summary
-        statistics.}
-  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-       with \code{\link{style}} function.}
-  \item{do_plot}{If \code{TRUE}, the default, then generate the plot.}
-  \item{width}{Width of the plot window in inches, defaults to 5 except in RStudio
-        to maintain an approximate square plotting area.}
-  \item{height}{Height of the plot window in inches, defaults to 4.5 except for
-        1-D scatterplots and when in RStudio.}
-  \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
-        the pdf file.}
   \item{fun_call}{Function call. Used with \code{knitr} to pass the function
         call when
         obtained from the abbreviated function call \code{sp}.}\cr
@@ -881,7 +946,7 @@ BoxPlot(Salary, by1=Dept)
 # ----------------------------
 # bin the values of Salary to plot counts as a frequency polygon
 # the counts are plotted as points instead of the data
-Plot(Salary, stat="count")  # bin the values
+Plot(Salary, stat_x="count")  # bin the values
 
 # time charts
 #------------
@@ -936,7 +1001,7 @@ Plot(Dept)
 \donttest{
 
 # plot of frequencies for each category (level), replaces bar chart 
-Plot(Dept, stat="count")
+Plot(Dept, stat_x="count")
 
 
 #----------------------------------------------------
@@ -1022,9 +1087,6 @@ style()  # reset theme
 
 \donttest{
 
-# proportions within each level of the other variable
-Plot(m06, m07, stat="proportion", n_cat=6)
-
 # get correlation analysis instead of cross-tab analysis
 # rely upon the default value of n_cat=0 so that integer
 #   valued variables are analyzed as numerical
@@ -1033,11 +1095,6 @@ Plot(m06, m07)
 #-----------------------------
 # Bubble Plot Frequency Matrix
 #-----------------------------
-# applies to categorical variables, since Mach IV Likert items
-#   are 0 to 5 integer values, set n_cat to indicate the
-#   numeric values represent categories
-Plot(c(m06,m07,m09,m10), value_labels=LikertCats, n_cat=6)
-
 
 #---------------
 # function curve

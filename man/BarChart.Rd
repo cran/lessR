@@ -7,52 +7,87 @@
 \description{
 Abbreviation: \code{bc}
 
-Plots a bar chart, one categorical variable, \code{x} against one numeric variable \code{y}, as well as an optional second categorical variable \code{by} with a provided legend. One option is to enter the reduced data table, which consists of each level of \code{x} paired with the corresponding numerical value of \code{y}, with the number of rows the number of levels. Or, transform the full data table of original measurements. If no value of \code{y} is specified, by default the numeric variable is the computed frequency of values in each category, with default colors for one or two variables, which can be replaced with custom color scales. Or, if a \code{y} variable is specified, obtain the reduced data table from which the bar chart is computed by summarizing the value of \code{y} at each level of \code{x}, such as the mean or a variety of other summary statistics.
+The function plots a bar chart, one categorical variable, \code{x}, against one numeric variable, \code{y}, possibly including an optional second categorical variable, \code{by}. The bar chart is constructed from the usually relatively brief table that pairs each level of the categorical variables with the corresponding numerical value of \code{y}. Usually, this table is a summary (pivot) table calculated as a data aggregation from the original data table of measurements, such as average salary of the employees in each department.  
 
-Also displays the frequency table for one or two variables, Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. To activate Trellis graphics, a multi-panel display, sometimes called facets, specify a \code{by1} variable. If the provided object to analyze is a set of multiple variables, including an entire data frame, then a bar chart is calculated for each non-numeric variable in the data frame.
+The calculation of this foundational summary table from which the bar chart is created can occur outside of the function. Or, probably the more usual situation, the table is implicitly calculated by the function in one of two ways. Accordingly, obtain the summary table from one of three possibilities. 
+\enumerate{
+\item Enter the summary table obtained from an external source directly as the value of the \code{data} parameter, indicated by specifying categorical variables \code{x} and possibly \code{by} with the numerical variable \code{y}.
+\item Have the function implicitly summarize the entire data table. If only categorical variable \code{x}, and possibly categorical variable \code{by}, are specified without a value of numerical \code{y}, the entire data table must be input as the value of \code{data}. The function then computes numeric variable \code{y} as the computed frequency of values in each category or level of the specified categorical variables.
+\item Have the function implicitly summarize the entire data table entered as the value of \code{data} by specifying a \code{y} variable. Obtain the summary table from which the bar chart is computed by summarizing (aggregating) the value of \code{y} at each level of \code{x}, and possibly \code{by}, with the chosen statistic specified by the \code{stat} parameter. The function will assess if the input data is a summary table or the entire data table. If the entire data table is entered, and the \code{stat} parameter is not entered, the value of \code{stat} defaults to the mean.
+}
+
+The function also displays the foundational summary table, such as frequency table for one or two variables. If a frequency table, also displayed are Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. To activate Trellis graphics or facets, a multi-panel display, specify a \code{by1} variable in place of \code{by} for the second categorical variable. If the provided object to analyze is a set of multiple variables, including the name of an entire data frame, then a bar chart is calculated for \emph{each} non-numeric variable in the data frame.
 }
 
 \usage{
-BarChart(x=NULL, y=NULL, by=NULL, data=d, rows=NULL, digits_d=NULL,
-        stat=NULL, n_cat=getOption("n_cat"), one_plot=NULL,
+BarChart(
 
+        # ------------------------------------------
+        # Data from which to construct the bar chart
+        x=NULL, y=NULL, by=NULL, data=d,
+        rows=NULL, top=NULL,
+
+        # ------------------------------------------------------
+        # Bar chart from aggregated data of numerical variable y
+        stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
+        stat_x=c("count", "proportion"),
+
+        # --------------------
+        # Trellis (facet) plot
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
 
-        horiz=FALSE, beside=FALSE, stack100=FALSE,
-        gap=NULL, scale_y=NULL,
-
+        # ----------------------------------------------------------------
+        # Analogy of physical Marks on paper to create the bars and labels
         theme=getOption("theme"),
         fill=NULL,
         color=getOption("bar_color_discrete"),
         transparency=getOption("trans_bar_fill"),
         fill_split=NULL,
 
-        legend_title=NULL, legend_position="right_margin",
-        legend_labels=NULL, legend_horiz=FALSE,
-        legend_size=NULL, legend_abbrev=NULL, legend_adj=0,
-
-        value_labels=NULL,
-        rotate_x=getOption("rotate_x"),
-        offset=getOption("offset"),
-        break_x=NULL, sort=c("0", "-", "+"),
-
-        label_max=100, out_size=80,
-
-        values=NULL,
+        values=c("\%", "input", "off"),
         values_color=getOption("values_color"),
         values_size=getOption("values_size"),
         values_digits=getOption("values_digits"),
         values_position=getOption("values_position"),
         values_cut=NULL,
+        
+        # -------------------------------
+        # Layout and ordering of the bars
+        horiz=FALSE, sort=c("0", "-", "+"),
+        beside=FALSE, stack100=FALSE,
+        gap=NULL, scale_y=NULL, one_plot=NULL,
 
+        # ------------------------------------------------------------------
+        # Labels for axes, values, and legend if x and by variables, margins
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-        lab_adj=c(0,0), margin_adj=c(0,0,0,0),
+        lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
         pad_y_min=0, pad_y_max=0,
 
+        rotate_x=getOption("rotate_x"), break_x=NULL,    
+        offset=getOption("offset"),
+        label_max=100,
+
+        legend_title=NULL, legend_position="right_margin",
+        legend_labels=NULL, legend_horiz=FALSE,
+        legend_size=NULL, legend_abbrev=NULL, legend_adjust=0,
+
+        # ----------------------------------------------------
+        # Draw one or more objects, text, or geometric figures
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-        eval_df=NULL, quiet=getOption("quiet"), do_plot=TRUE,
-        width=6.5, height=6, pdf_file=NULL, \dots)
+        # --------------------------------------------------------------------
+        # Output: text or chart turned off, to PDF file, number decimal digits
+        quiet=getOption("quiet"), do_plot=TRUE,
+        pdf_file=NULL, width=6.5, height=6, 
+        digits_d=NULL, out_size=80, 
+
+        # --------------------------------------
+        # Deprecated, removed in future versions
+        n_cat=getOption("n_cat"), value_labels=NULL, 
+
+        # -------------
+        # Miscellaneous
+        eval_df=NULL, \dots)
 
 bc(\dots)
 }
@@ -78,10 +113,10 @@ bc(\dots)
         \code{stat} parameter also must be set. If not specified, then 
         its value is by default tabulated as the frequency of each
         category or joint category.}
-  \item{by}{A categorical variable to create a two-variable a bar chart for
+  \item{by}{A second categorical variable to create a two-variable bar chart for
         each level of the numeric primary variable
-        \code{y} on the \emph{same} plot, which applies to the panels of
-        a Trellis (facet) plot if \code{by1} is specified.}
+        \code{y} on the \emph{same} plot. A similar concept applies to the
+        panels of a Trellis (facet) plot if \code{by1} is specified.}
   \item{data}{Optional data frame that contains the variables of interest.
        Can contain data from which frequencies or other statistics for a
        \code{y}-variable are computed, or can be a summary table that consists
@@ -89,27 +124,23 @@ bc(\dots)
        numeric value that determines the height of the corresponding bar.}
   \item{rows}{A logical expression that specifies a subset of rows of the
        data frame to analyze.}
-  \item{digits_d}{Provides the number of decimal digits,
-        set by default to at least 2 or the largest number of digits in the values
-        of the response variable plus 1.} 
-  \item{stat}{Statistical transformation of the data. If no \code{y} variable,
-       then \code{"count"} or \code{"proportion"}, otherwise 
-       \code{"mean"}, \code{"sd"}, etc.}
-  \item{n_cat}{When analyzing all the variables in a data frame, specifies the largest
-       number of unique values of variable of a numeric data type for which the
-       variable will be analyzed as a categorical. Default is 0.}
-  \item{one_plot}{For bar charts of multiple x-variables, indicates
-       if a bar plot is produced for each x-variable, or all are combined
-       into a single plot, such as for items that all share common responses
-       such as survey data with a common Likert scale across variables.
-       Default is if variables share a common response scale
-       set to \code{TRUE}, otherwise \code{FALSE}.}\cr
+  \item{top}{Retain only the specified first number of \code{x} values.
+       Usually, applied to sorted output according to the value of the \code{sort} 
+       parameter, to retain either the specified largest or smallest values of
+       the \code{x}
+       categorical variable. If \code{by} is active, then the retention
+       is based on the sum of the \code{by} variable for each level of \code{x}}.
+  \item{stat}{Statistical transformation of the data for the y-axis across
+       groups defined by the categorical variable(s), the data aggregation. 
+       Values include \code{"mean"}, \code{"sd"}, etc.}
+  \item{stat_x}{When no \code{y} variable is specified, either do the
+        default \code{count} of each group or the \code{proportion}.}\cr
 
   \item{by1}{A categorical variable called a conditioning variable that
-        activates \bold{Trellis graphics} (facets), from the \code{lattice}
-        package, to provide
-        a separate bar chart (panel) of numeric primary variables \code{x}
-        and \code{y} for each level of the variable.}
+        activates \bold{Trellis graphics (facets)}, from the \code{lattice}
+        package, to create
+        a bar chart on a separate panel for each level of the variable.
+        Contrast to the \code{by} parameter that plots on the same panel.}
   \item{n_row}{Optional specification for the number of rows in the layout
         of a multi-panel display with Trellis graphics (facets). Need not specify
         \code{n_col}.}
@@ -125,23 +156,6 @@ bc(\dots)
         Set to \code{"xy"} to specify a ratio calculated
         to "bank" to 45 degrees, that is, with the line slope approximately
         45 degrees.}\cr
-
-  \item{horiz}{\bold{Bar orientation.} By default the value is
-      \code{FALSE} so bars are vertical,
-       unless \code{one_plot} is \code{TRUE}.}
-  \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
-       first variable to be plotted as adjacent bars instead of stacked on each
-       other.}
-  \item{stack100}{100\% stacked bar chart when a \code{by} variable is present,
-       also activated by setting \code{stat} to \code{"proportion"} with a
-       \code{by} variable.}
-  \item{gap}{Gap between bars. Provides the value of the \code{space} option from
-       the standard R \code{\link{barplot}} function with a default of 0.2 unless two
-       variables are plotted and beside=\code{TRUE}, in which case the default is
-       c(.1,1).}
-  \item{scale_y}{If specified, a vector of three values that define the
-        numerical values of the y-axis, the numerical axis, within the bounds of
-        plot region: starting value, ending value, and number of intervals.}\cr
 
   \item{theme}{Theme for the \bold{colors} for this analysis. Make persistent
         across analyses with \code{\link{style}}.}
@@ -171,62 +185,6 @@ bc(\dots)
         in the second \code{fill} color, or as specified by a vector of
         exactly two fill colors.}\cr
 
-  \item{legend_title}{Title of the \bold{legend}, which is usually set 
-        by default except when raw counts are entered as a matrix.  Then
-        a title must be specified to generate a legend.}
-  \item{legend_position}{When plotting two variables, location of the legend, with the
-        default in the right margin. Additional options from standard R are
-        "topleft", "top", "topright" and others as shown in the help for the
-        \code{\link{legend}} function.}
-  \item{legend_labels}{When plotting two variables, labels for the legend, which by
-       default are the levels for the second or \code{by} variable.}
-  \item{legend_horiz}{By default the legend is vertical, but can be changed to
-       horizontal.}
-  \item{legend_size}{Size of legend text.}
-  \item{legend_abbrev}{If specified, abbreviate legend title and legend labels
-        to the specified number of the maximum number of characters.}
-  \item{legend_adj}{Shift legend for a two-categorical bar chart. A positive
-        number shifts the legend to the right from its default placement.}\cr
-
-  \item{value_labels}{For factors, default is the factor labels, and for
-        character variables, default is the character values.
-        Or, provide labels for the \code{x}-axis on the graph to override
-        these values. If the variable is a
-        factor and \code{value_labels} is not specified (is \code{NULL}), then the
-        value_labels are set to the factor levels with each space replaced by
-        a new line character. If \code{x} and \code{y}-axes have the same scale,
-        they also apply to the \code{y}-axis. Control the plotted size
-        with \code{axis_cex} and \code{axis_x_cex} from the lessR
-        \code{\link{style} function.}}
-  \item{rotate_x}{Degrees that the axis values for the category values
-        axis are rotated, usually to accommodate longer values,
-        typically used in conjunction with \code{offset}. When equal 90
-        the value labels are perpendicular to the x-axis and a different
-        algorithm places the labels so that \code{offset} is not needed.}
-  \item{offset}{The amount of spacing between the axis values and the axis. Default
-        is 0.5. Larger values such as 1.0 create space for the label when
-        longer axis value names are rotated.}
-  \item{break_x}{Replace spaces in the category values with a new line
-       and replace tildes with a blank so that there is no separate of words
-       joined by a tilde. By default, \code{TRUE} for 
-       vertical bar charts with \code{rotate_x} set to \code{0},
-       and \code{FALSE} otherwise.}
-  \item{sort}{Sort the categories by their frequency for one variable and by
-        the column sums if a \code{by} variable. Not applicable to Trellis plots.
-        By default \code{"0"} for no sort, or sort descending \code{"-"} or
-        ascending \code{"+"}, unless \code{one_plot} is \code{TRUE}, then is
-        set to \code{"+"}.}\cr
-
-  \item{label_max}{To improve readability of text output, the maximum size
-        of the value labels before the labels are abbreviated for
-        text output only. Not a literal maximum as preserving unique
-        values may require a larger number of characters than specified.}
-  \item{out_size}{To improve the readability of the frequency distribution
-       of a single variable displayed at the console,
-       the maximum number of characters on a
-       line of output at the console for one variable before the frequency
-       distribution is written vertically.}\cr
-
   \item{values}{If not \code{"off"}, adds the
         numerical results to the plot according to the default \code{"\%"}
         for tabulated counts and \code{"input"} for the input values for
@@ -255,8 +213,36 @@ bc(\dots)
        \code{by} variable or multiple x-variables on the same plot, then
        default is 0.040}\cr
 
-  \item{xlab}{Label for \code{x}-axis. If \code{xlab} is not specified, then
-       the label becomes
+  \item{horiz}{\bold{Bar orientation.} By default the value is
+      \code{FALSE} so bars are vertical,
+       unless \code{one_plot} is \code{TRUE}.}
+  \item{sort}{Sort the categories by their frequency for one variable and by
+        the column sums if a \code{by} variable. Not applicable to Trellis plots.
+        By default \code{"0"} for no sort, or sort descending \code{"-"} or
+        ascending \code{"+"}, unless \code{one_plot} is \code{TRUE}, then is
+        set to \code{"+"}.}
+  \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
+       first variable to be plotted as adjacent bars instead of stacked on each
+       other.}
+  \item{stack100}{100\% stacked bar chart when a \code{by} variable is present,
+       also activated by setting \code{stat_x} to \code{"proportion"} with a
+       \code{by} variable.}
+  \item{gap}{Gap between bars. Provides the value of the \code{space} option from
+       the standard R \code{\link{barplot}} function with a default of 0.2 unless two
+       variables are plotted and beside=\code{TRUE}, in which case the default is
+       c(.1,1).}
+  \item{scale_y}{If specified, a vector of three values that define the
+        numerical values of the y-axis, the numerical axis, within the bounds of
+        plot region: starting value, ending value, and number of intervals.}
+  \item{one_plot}{For bar charts of multiple x-variables, indicates
+       if a bar plot is produced for each x-variable, or all are combined
+       into a single plot, such as for items that all share common responses
+       such as survey data with a common Likert scale across variables.
+       Default is if variables share a common response scale
+       set to \code{TRUE}, otherwise \code{FALSE}.}\cr
+
+  \item{xlab}{\bold{Axis label} for \code{x}-axis. 
+       If \code{xlab} is not specified, then the label becomes
        the name of the corresponding variable label if it exists, or, if not, the
        variable name. If \code{xy_ticks} is \code{FALSE}, then no label is displayed.
        If no y variable is specified, then \code{xlab} is set to Index unless
@@ -269,10 +255,10 @@ bc(\dots)
        Can set size with \code{main_cex} and color with \code{main_color} from the
        lessR \code{\link{style}} function.}
   \item{sub}{Sub-title of graph, below \code{xlab}. Not yet implemented.}
-  \item{lab_adj}{Two-element vector -- x-axis label, y-axis label -- adjusts
+  \item{lab_adjust}{Two-element vector -- x-axis label, y-axis label -- adjusts
        the position of the axis labels in approximate inches. + values move
        the labels away from plot edge. Not applicable to Trellis graphics.}
-  \item{margin_adj}{Four-element vector -- top, right, bottom and left --
+  \item{margin_adjust}{Four-element vector -- top, right, bottom and left --
        adjusts the margins of the plotted figure in approximate inches.
        + values move the corresponding margin away from plot edge. 
        Not applicable to Trellis graphics.}
@@ -281,7 +267,42 @@ bc(\dots)
   \item{pad_y_max}{Proportion of padding added to the right side of
        the \code{y}-axis. Value from 0 to 1.}\cr
 
-  \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
+  \item{rotate_x}{Degrees that the \bold{axis values for the category values}
+        axis are rotated, usually to accommodate longer values,
+        typically used in conjunction with \code{offset}. When equal 90
+        the value labels are perpendicular to the x-axis and a different
+        algorithm places the labels so that \code{offset} is not needed.}
+  \item{break_x}{Replace spaces in the category values with a new line
+       and replace tildes with a blank so that there is no separation of words
+       joined by a tilde. By default, \code{TRUE} for 
+       vertical bar charts with \code{rotate_x} set to \code{0},
+       and \code{FALSE} otherwise.}
+  \item{offset}{The amount of spacing between the axis values and the axis. Default
+        is 0.5. Larger values such as 1.0 create space for the label when
+        longer axis value names are rotated.}
+  \item{label_max}{To \bold{improve readability} of text output, the maximum size
+        of the value labels before the labels are abbreviated for
+        text output only. Not a literal maximum as preserving unique
+        values may require a larger number of characters than specified.}\cr
+
+  \item{legend_title}{Title of the \bold{legend}, which is usually set 
+        by default except when raw counts are entered as a matrix.  Then
+        a title must be specified to generate a legend.}
+  \item{legend_position}{When plotting two variables, location of the legend, with the
+        default in the right margin. Additional options from standard R are
+        "topleft", "top", "topright" and others as shown in the help for the
+        \code{\link{legend}} function.}
+  \item{legend_labels}{When plotting two variables, labels for the legend, which by
+       default are the levels for the second or \code{by} variable.}
+  \item{legend_horiz}{By default the legend is vertical, but can be changed to
+       horizontal.}
+  \item{legend_size}{Size of legend text.}
+  \item{legend_abbrev}{If specified, abbreviate legend title and legend labels
+        to the specified number of the maximum number of characters.}
+  \item{legend_adjust}{Shift legend for a two-categorical bar chart. A positive
+        number shifts the legend to the right from its default placement.}\cr
+
+  \item{add}{\bold{Draw one or more objects}, text, or geometric figures,
        on the plot.
        Possible values are any text to be written, the first argument, which is
        \code{"text"}, or, to indicate a figure,
@@ -299,21 +320,49 @@ bc(\dots)
   \item{y2}{Second y coordinate to be considered for each object.
         Only used for \code{"rect"}, \code{"line"} and \code{arrow}.}\cr
 
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+        with \code{\link{style}} function.}
+  \item{do_plot}{If \code{TRUE}, the default, then generate the plot.}
+  \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
+        the pdf file.}
+  \item{width}{Width of the plot window in inches, defaults to 4.5.}
+  \item{height}{Height of the plot window in inches, defaults to 4.5.}
+  \item{digits_d}{Provides the number of decimal digits,
+        set by default to at least 2 or the largest number of digits in the values
+        of the response variable plus 1.} 
+  \item{out_size}{To improve the readability of the frequency distribution
+       of a single variable displayed at the console,
+       the maximum number of characters on a
+       line of output at the console for one variable before the frequency
+       distribution is written vertically.}\cr
+
+  \item{n_cat}{When analyzing all the variables in a data frame, specifies the largest
+       number of unique values of variable of a numeric data type for which the
+       variable will be analyzed as a categorical. Default is 0.
+       \emph{[deprecated]}: Better to convert a categorical integer variable to
+        a factor.}
+  \item{value_labels}{For factors, default is the factor labels, and for
+        character variables, default is the character values.
+        Or, provide labels for the \code{x}-axis on the graph to override
+        these values. If the variable is a
+        factor and \code{value_labels} is not specified (is \code{NULL}), then the
+        value_labels are set to the factor levels with each space replaced by
+        a new line character. If \code{x} and \code{y}-axes have the same scale,
+        they also apply to the \code{y}-axis. Control the plotted size
+        with \code{axis_cex} and \code{axis_x_cex} from the lessR
+        \code{\link{style} function.}
+        \emph{[deprecated]}: Better to convert a categorical integer variable to
+        a factor.}\cr
+
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE}
         unless the \code{shiny} package is loaded then set to \code{FALSE} so
         that Shiny will run. Needs to be set to \code{FALSE} if using
         the pipe \code{\%\>\%} notation.}
-  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
-        with \code{\link{style}} function.}
-  \item{do_plot}{If \code{TRUE}, the default, then generate the plot.}
-  \item{width}{Width of the plot window in inches, defaults to 4.5.}
-  \item{height}{Height of the plot window in inches, defaults to 4.5.}
-  \item{pdf_file}{Indicate to direct pdf graphics to the specified name of
-        the pdf file.}\cr
 
   \item{\dots}{Other parameter values for graphics as defined
-      by \code{\link{barplot}}, \code{\link{legend}}, and \code{\link{par}} including
+      by Base R \code{\link{barplot}}, \code{\link{legend}}, 
+      and \code{\link{par}} including
       \code{xlim} and \code{ylim} for setting the range of the x and y-axes\cr
       \code{cex.main} for the size of the title\cr
       \code{col.main} for the color of the title\cr
@@ -330,9 +379,9 @@ Plot a bar chart with default colors for one or two categorical variables, that 
 
 
 DATA\cr
-Ultimately the bar chart is constructed from a simple table in which each row consists of a level of the categorical variable \code{x} paired with the corresponding value of the numerical variable, \code{y}, with as many rows as the number of levels of \code{x}. A data table of this form can be read by specifying the variable \code{x} and the variable \code{y}. Alternatively, read a data table in the form in which the data are typically gathered, with many replications of the levels of the categorical variable \code{x}. In this situation, with just the specification of the variable \code{x}, the corresponding numerical variable is the tabulation of the counts of the number of occurrences for each level of \code{x}. Or, specify a numerical variable from a data table of this form and reduce to the smaller data table via statistical transformation of the values of \code{y} for each level of \code{x}, such as the mean. 
+Ultimately the bar chart is constructed from a simple summary table in which each row consists of a level of the categorical variable \code{x} paired with the corresponding value of the numerical variable, \code{y}, with as many rows as the number of levels of \code{x}. Provide these values of \code{x} and \code{y} directly, or just provide \code{x} for the original data of measurements to compute the counts of each category or provide \code{x} and \code{y} with a value of \code{stat} to define the statistic for which to aggregate the values of \code{y} over the levels of \code{x}. Also can have a second categorical variable, \code{by}.
 
-The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{d}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names.
+The data may either be vectors from the global environment, the user's workspace, as illustrated in the examples below, or a variable in a data frame. The default input data frame is \code{d}.  Specify a different data frame name with the \code{data} option.  Regardless of its name, the variables in the data frame are referenced directly by their names.
 
 If the name of the vector is in the global environment and of a variable in the input data frame has the same name, the vector from the global environment is analyzed, unless the data name frame is explicitly provided, not relying upon the default \code{d}. If two variables are specified, both variables should be in the data frame, or one of the variables is in the data frame and the other in the global environment.
 
@@ -398,7 +447,7 @@ Regardless, the \code{one_plot} parameter can be set to either \code{TRUE} or \c
 
 ENTER NUMERIC VARIABLE DIRECTLY\cr
 Instead of calculating the counts from the data, the values of any numerical variable, including
-the counts, can be entered directly as the \code{y}-variable, in addition to the categorical \code{x}-variable, and perhaps a categorical \code{by}-variable. See the examples below, under "bar chart directly from data".
+the counts, can be entered directly as the \code{y}-variable, in addition to the categorical \code{x}-variable, and perhaps a categorical \code{by}-variable. See the examples below.
 
 Or, include the already tabulated counts as the data which is read into R, either as a matrix or a data frame.
 
@@ -522,7 +571,7 @@ BarChart(Gender, fill=c("palegreen3","tan"))
 BarChart(Dept, fill=getColors(l=25), transparency=0.4)
 
 # column proportions instead of frequencies
-BarChart(Gender, stat="proportion")
+BarChart(Gender, stat_x="proportion")
 
 # map value of tabulated count to bar fill
 BarChart(Dept, fill=(count))

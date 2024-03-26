@@ -69,7 +69,9 @@ reg_brief(\dots, brief=TRUE)
         unique, equally spaced integer values of a variable for which
         the variable will be analyzed as categorical instead of continuous.
         Default is 0. Use to specify that such variables are to be analyzed
-        as categorical, a kind of informal R factor.}\cr
+        as categorical, a kind of informal R factor.
+        \emph{[deprecate]}: Best to convert a categorical integer variable
+         to a factor.}\cr
 
   \item{Rmd}{File name for the automatically generated R Markdown file, if specified.
         The file type is .Rmd, a simple text file that can be edited with

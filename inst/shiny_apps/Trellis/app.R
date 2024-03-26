@@ -413,7 +413,7 @@ server <- function(input, output, session) {
 
     if (is.local && input$do_cmt) {
       cat("# For security, the path to your data file is not available\n",
-          "# Can replace PATHtoFILE in the following with the path\n",
+          "# You can replace PATHtoFILE in the following with the path\n",
           "# Remove the # sign in the first column and delete the previous ",
           "Read()\n", sep="", file=r.path, append=TRUE)
       read.path <- file.path("PATHtoFILE", read.path) 

@@ -395,10 +395,15 @@ server <- function(input, output, session) {
       by.name <- input$by.col
       shiny::req(by.name)
       by <- data()[, by.name]
-      in.fill <- input$myFill_by  # color range selection
-      shapes <-  c(24,25,21,22,23,24,25,21,22,23,24,25,21,22,23)
       by.unq <- length(unique(by))
-      in.shp  <- shapes[1:by.unq]  # with shiny, input$myShape never missing 
+      in.fill <- input$myFill_by  # color range selection
+#     shapes <-  c(24,25,21,22,23,24,25,21,22,23,24,25,21,22,23)
+#     in.shp  <- shapes[1:by.unq]  # with shiny, input$myShape never missing 
+      if (in.shp == "circle") in.shp=21
+      if (in.shp == "square") in.shp=22
+      if (in.shp == "diamond") in.shp=23
+      if (in.shp == "triup") in.shp=24
+      if (in.shp == "tridown") in.shp=25
       lt <- by.name
     }
 
@@ -629,7 +634,7 @@ server <- function(input, output, session) {
 
     if (is.local && input$do_cmt) {
       cat("# For security, the path to your data file is not available\n",
-          "# Can replace PATHtoFILE in the following with the path\n",
+          "# You can replace PATHtoFILE in the following with the path\n",
           "# Remove the # sign in the first column and delete the previous ",
           "Read()\n", sep="", file=r.path, append=TRUE)
       read.path <- file.path("PATHtoFILE", read.path) 

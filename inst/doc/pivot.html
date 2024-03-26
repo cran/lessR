@@ -748,11 +748,19 @@ for <em>all</em> the data. To compute over all the rows of data, do not
 specify groups, that is, drop the <code>by</code> parameter.</p>
 <p>Get the grand mean of Years, that is, for all the data.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years)</span></code></pre></div>
+<pre><code>## 
+##  &quot;1&quot;: 1 
+##   Years_n Years_na Years_mean
+## 1      36        1   9.388889</code></pre>
 <pre><code>##   n na  mean
 ##  36  1 9.389</code></pre>
 <p>Get the grand mean of Years and Salary. Specify custom names for the
 results.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, <span class="fu">c</span>(Years, Salary), <span class="at">digits_d=</span><span class="dv">2</span>, <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanYear&quot;</span>, <span class="st">&quot;MeanSalary&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, <span class="fu">c</span>(Years, Salary), <span class="at">digits_d=</span><span class="dv">2</span>, <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanYear&quot;</span>, <span class="st">&quot;MeanSalary&quot;</span>))</span></code></pre></div>
+<pre><code>## 
+##  &quot;1&quot;: 1 
+##   Years_n Years_na MeanYear Salary_n Salary_na MeanSalary
+## 1      36        1 9.388889       37         0   73795.56</code></pre>
 <pre><code>##  Years_n Years_na MeanYear Salary_n Salary_na MeanSalary
 ##       36        1     9.39       37         0   73795.56</code></pre>
 <p>Consider an example with more variables. Analyze the 6-pt Likert
@@ -761,13 +769,283 @@ Items are scored from 0 to 5, Strongly Disagree to Strongly Agree. The
 data are included with <strong>lessR</strong> as the <em>Mach4</em> data
 file. Suppress output when reading by setting <code>quiet</code> to
 <code>TRUE</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Mach4&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Mach4&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Calculate the mean, standard deviation, skew, and kurtosis for all of
 the data for each of the 20 items on the scale. With this specification,
 the form of a data frame is statistics in the columns and the variables
 in the rows. The result are the specified summary statistics for the
 specified variables over the entire data set.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,skew,kurtosis), m01<span class="sc">:</span>m20)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,skew,kurtosis), m01<span class="sc">:</span>m20)</span></code></pre></div>
+<pre><code>## 
+##  &quot;2&quot;: 2 
+##    X1 X2       X3       X4        X5        X6
+## 1 351  0 1.279202 1.285788 0.9836736 0.3563117
+## 
+##  &quot;2&quot;: 2 
+##    X1 X2       X3       X4        X5         X6
+## 1 351  0 1.279202 1.285788 0.9836736  0.3563117
+## 2 351  0 1.746439 1.479800 0.4750667 -0.7836618
+## 
+##  &quot;2&quot;: 2 
+##    X1 X2       X3       X4         X5         X6
+## 1 351  0 1.279202 1.285788  0.9836736  0.3563117
+## 2 351  0 1.746439 1.479800  0.4750667 -0.7836618
+## 3 351  0 2.900285 1.449640 -0.3628051 -0.8291409
+## 
+##  &quot;2&quot;: 2 
+##    X1 X2       X3       X4         X5         X6
+## 1 351  0 1.279202 1.285788  0.9836736  0.3563117
+## 2 351  0 1.746439 1.479800  0.4750667 -0.7836618
+## 3 351  0 2.900285 1.449640 -0.3628051 -0.8291409
+## 4 351  0 3.339031 1.174315 -0.8545394  0.4567202
+## 
+##  &quot;2&quot;: 2 
+##    X1 X2       X3       X4          X5         X6
+## 1 351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2 351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3 351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4 351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5 351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 
+##  &quot;2&quot;: 2 
+##    X1 X2       X3       X4          X5         X6
+## 1 351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2 351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3 351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4 351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5 351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6 351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 
+##  &quot;2&quot;: 2 
+##    X1 X2       X3       X4          X5         X6
+## 1 351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2 351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3 351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4 351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5 351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6 351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7 351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 
+##  &quot;2&quot;: 2 
+##    X1 X2       X3       X4          X5         X6
+## 1 351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2 351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3 351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4 351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5 351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6 351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7 351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8 351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 
+##  &quot;2&quot;: 2 
+##    X1 X2       X3       X4          X5         X6
+## 1 351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2 351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3 351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4 351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5 351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6 351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7 351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8 351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9 351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.641026 1.394652  0.64126675 -0.3929747
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.641026 1.394652  0.64126675 -0.3929747
+## 12 351  0 1.800570 1.624843  0.42175863 -1.1163775
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.641026 1.394652  0.64126675 -0.3929747
+## 12 351  0 1.800570 1.624843  0.42175863 -1.1163775
+## 13 351  0 1.384615 1.368082  0.83624504 -0.1256438
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.641026 1.394652  0.64126675 -0.3929747
+## 12 351  0 1.800570 1.624843  0.42175863 -1.1163775
+## 13 351  0 1.384615 1.368082  0.83624504 -0.1256438
+## 14 351  0 1.954416 1.304137  0.20137270 -0.9228997
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.641026 1.394652  0.64126675 -0.3929747
+## 12 351  0 1.800570 1.624843  0.42175863 -1.1163775
+## 13 351  0 1.384615 1.368082  0.83624504 -0.1256438
+## 14 351  0 1.954416 1.304137  0.20137270 -0.9228997
+## 15 351  0 2.122507 1.366677 -0.08769730 -0.9945214
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.641026 1.394652  0.64126675 -0.3929747
+## 12 351  0 1.800570 1.624843  0.42175863 -1.1163775
+## 13 351  0 1.384615 1.368082  0.83624504 -0.1256438
+## 14 351  0 1.954416 1.304137  0.20137270 -0.9228997
+## 15 351  0 2.122507 1.366677 -0.08769730 -0.9945214
+## 16 351  0 2.176638 1.781691  0.23741956 -1.3554221
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.641026 1.394652  0.64126675 -0.3929747
+## 12 351  0 1.800570 1.624843  0.42175863 -1.1163775
+## 13 351  0 1.384615 1.368082  0.83624504 -0.1256438
+## 14 351  0 1.954416 1.304137  0.20137270 -0.9228997
+## 15 351  0 2.122507 1.366677 -0.08769730 -0.9945214
+## 16 351  0 2.176638 1.781691  0.23741956 -1.3554221
+## 17 351  0 2.407407 1.604227  0.08516347 -1.1419607
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.641026 1.394652  0.64126675 -0.3929747
+## 12 351  0 1.800570 1.624843  0.42175863 -1.1163775
+## 13 351  0 1.384615 1.368082  0.83624504 -0.1256438
+## 14 351  0 1.954416 1.304137  0.20137270 -0.9228997
+## 15 351  0 2.122507 1.366677 -0.08769730 -0.9945214
+## 16 351  0 2.176638 1.781691  0.23741956 -1.3554221
+## 17 351  0 2.407407 1.604227  0.08516347 -1.1419607
+## 18 351  0 2.914530 1.326042 -0.55946781 -0.3262722
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2       X3       X4          X5         X6
+## 1  351  0 1.279202 1.285788  0.98367363  0.3563117
+## 2  351  0 1.746439 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.900285 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.339031 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.233618 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.074074 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.774929 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.099715 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.225071 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.991453 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.641026 1.394652  0.64126675 -0.3929747
+## 12 351  0 1.800570 1.624843  0.42175863 -1.1163775
+## 13 351  0 1.384615 1.368082  0.83624504 -0.1256438
+## 14 351  0 1.954416 1.304137  0.20137270 -0.9228997
+## 15 351  0 2.122507 1.366677 -0.08769730 -0.9945214
+## 16 351  0 2.176638 1.781691  0.23741956 -1.3554221
+## 17 351  0 2.407407 1.604227  0.08516347 -1.1419607
+## 18 351  0 2.914530 1.326042 -0.55946781 -0.3262722
+## 19 351  0 1.156695 1.424662  1.28960129  0.8721203
+## 
+##  &quot;2&quot;: 2 
+##     X1 X2        X3       X4          X5         X6
+## 1  351  0 1.2792023 1.285788  0.98367363  0.3563117
+## 2  351  0 1.7464387 1.479800  0.47506674 -0.7836618
+## 3  351  0 2.9002849 1.449640 -0.36280508 -0.8291409
+## 4  351  0 3.3390313 1.174315 -0.85453943  0.4567202
+## 5  351  0 2.2336182 1.582803  0.07607808 -1.0949174
+## 6  351  0 3.0740741 1.477521 -0.45428558 -0.9230754
+## 7  351  0 2.7749288 1.472820 -0.06508488 -1.1504259
+## 8  351  0 2.0997151 1.455541  0.13309694 -1.0781871
+## 9  351  0 4.2250712 1.155384 -1.74473933  2.7434956
+## 10 351  0 3.9914530 1.137635 -1.15418554  0.9315304
+## 11 351  0 1.6410256 1.394652  0.64126675 -0.3929747
+## 12 351  0 1.8005698 1.624843  0.42175863 -1.1163775
+## 13 351  0 1.3846154 1.368082  0.83624504 -0.1256438
+## 14 351  0 1.9544160 1.304137  0.20137270 -0.9228997
+## 15 351  0 2.1225071 1.366677 -0.08769730 -0.9945214
+## 16 351  0 2.1766382 1.781691  0.23741956 -1.3554221
+## 17 351  0 2.4074074 1.604227  0.08516347 -1.1419607
+## 18 351  0 2.9145299 1.326042 -0.55946781 -0.3262722
+## 19 351  0 1.1566952 1.424662  1.28960129  0.8721203
+## 20 351  0 0.8945869 1.351295  1.49939695  1.2239402</code></pre>
 <pre><code>##       n na  mean    sd  skew kurtosis
 ## m01 351  0 1.279 1.286  0.98     0.36
 ## m02 351  0 1.746 1.480  0.48    -0.78
@@ -807,25 +1085,25 @@ parameter. Missing values for each combination of the levels of the
 grouping variables are displayed.</p>
 <p>Begin with a one-way frequency table computed over the entire data
 set.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06)</span></code></pre></div>
-<pre><code>##   m06 Freq Prop
-## 1   0   18 0.05
-## 2   1   47 0.13
-## 3   2   63 0.18
-## 4   3   44 0.13
-## 5   4  121 0.34
-## 6   5   58 0.17</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06)</span></code></pre></div>
+<pre><code>##   m06   n Prop
+## 1   0  18 0.05
+## 2   1  47 0.13
+## 3   2  63 0.18
+## 4   3  44 0.13
+## 5   4 121 0.34
+## 6   5  58 0.17</code></pre>
 <p>In this example, compute a two-way cross-tabulation table with the
 levels of <code>variable</code> <em>m06</em> as columns and the levels
 of the <code>by</code> categorical variable <em>m07</em> as rows.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06, m07)</span></code></pre></div>
-<pre><code>##   m07 m06_n na 0  1  2  3  4  5
-## 1   0    17  0 4  3  2  3  3  2
-## 2   1    64  0 7 24  7  6 18  2
-## 3   2    87  0 4 14 30 13 24  2
-## 4   3    43  0 2  1 10 16 12  2
-## 5   4    93  0 0  3 13  5 56 16
-## 6   5    47  0 1  2  1  1  8 34</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06, m07)</span></code></pre></div>
+<pre><code>##   m07 0  1  2  3  4  5  n _na
+## 1   0 4  3  2  3  3  2 17   0
+## 2   1 7 24  7  6 18  2 64   0
+## 3   2 4 14 30 13 24  2 87   0
+## 4   3 2  1 10 16 12  2 43   0
+## 5   4 0  3 13  5 56 16 93   0
+## 6   5 1  2  1  1  8 34 47   0</code></pre>
 <p>To output the data in long form, one tabulation per row, set the
 <code>table_long</code> parameter to TRUE.</p>
 <p>If interested in the inferential analysis of the cross-tabulation
@@ -834,7 +1112,7 @@ table, access the <strong>lessR</strong> function
 results, though limited to a one- or two-way table.</p>
 <p>The default data table is <em>d</em>, but included explicitly in the
 following example to illustrate the <code>data</code> parameter.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">Prop_test</span>(m06, <span class="at">by=</span>m07, <span class="at">data=</span>d)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">Prop_test</span>(m06, <span class="at">by=</span>m07, <span class="at">data=</span>d)</span></code></pre></div>
 <pre><code>## variable: m06 
 ## by: m07 
 ## 
@@ -904,44 +1182,44 @@ responses to <code>variable</code> <em>m06</em> in the column and
 responses to <code>by</code> variables <em>m07</em> and <em>m10</em> in
 the rows, plus the mean and standard deviation of each combination of
 <em>m07</em> and <em>m10</em> across levels of <em>m06</em>.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,table), m06, <span class="fu">c</span>(m07, m10))</span></code></pre></div>
-<pre><code>##    m07 m10  n na m06_mean m06_sd 0 1 2 3  4  5
-## 1    0   0  1  0    0.000     NA 1 0 0 0  0  0
-## 2    1   0  1  0    1.000     NA 0 1 0 0  0  0
-## 3    2   0  0  0       NA     NA 0 0 0 0  0  0
-## 4    3   0  1  0    2.000     NA 0 0 1 0  0  0
-## 5    4   0  1  0    2.000     NA 0 0 1 0  0  0
-## 6    5   0  0  0       NA     NA 0 0 0 0  0  0
-## 7    0   1  0  0       NA     NA 0 0 0 0  0  0
-## 8    1   1  4  0    0.750  0.500 1 3 0 0  0  0
-## 9    2   1  2  0    1.500  0.707 0 1 1 0  0  0
-## 10   3   1  1  0    2.000     NA 0 0 1 0  0  0
-## 11   4   1  0  0       NA     NA 0 0 0 0  0  0
-## 12   5   1  0  0       NA     NA 0 0 0 0  0  0
-## 13   0   2  2  0    2.000  1.414 0 1 0 1  0  0
-## 14   1   2  9  0    1.222  1.202 2 5 1 0  1  0
-## 15   2   2 15  0    2.000  0.845 0 4 8 2  1  0
-## 16   3   2  3  0    3.000  0.000 0 0 0 3  0  0
-## 17   4   2  3  0    3.333  1.155 0 0 1 0  2  0
-## 18   5   2  0  0       NA     NA 0 0 0 0  0  0
-## 19   0   3  5  0    1.200  1.304 2 1 1 1  0  0
-## 20   1   3 16  0    2.250  1.390 2 3 4 3  4  0
-## 21   2   3 13  0    2.769  0.832 0 0 6 4  3  0
-## 22   3   3  7  0    2.000  1.528 2 0 2 2  1  0
-## 23   4   3  9  0    3.333  1.323 0 1 2 0  5  1
-## 24   5   3  0  0       NA     NA 0 0 0 0  0  0
-## 25   0   4  7  0    2.714  1.799 1 1 1 1  2  1
-## 26   1   4 19  0    2.895  1.449 0 6 1 2  9  1
-## 27   2   4 29  0    2.690  1.417 2 4 8 4  9  2
-## 28   3   4 18  0    3.278  1.074 0 1 3 6  6  2
-## 29   4   4 32  0    3.781  1.008 0 0 6 2 17  7
-## 30   5   4  5  0    4.400  0.548 0 0 0 0  3  2
-## 31   0   5  2  0    4.500  0.707 0 0 0 0  1  1
-## 32   1   5 15  0    2.133  1.685 2 6 1 1  4  1
-## 33   2   5 28  0    2.571  1.372 2 5 7 3 11  0
-## 34   3   5 13  0    3.154  0.801 0 0 3 5  5  0
-## 35   4   5 48  0    3.854  0.922 0 2 3 3 32  8
-## 36   5   5 42  0    4.452  1.234 1 2 1 1  5 32</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,table), m06, <span class="fu">c</span>(m07, m10))</span></code></pre></div>
+<pre><code>##    m07 m10  n na m06_mean m06_sd 2 3  4  5  n _na
+## 1    0   0  1  0    0.000     NA 0 0  0  0  1   0
+## 2    1   0  1  0    1.000     NA 0 0  0  0  1   0
+## 3    2   0 NA  0       NA     NA 0 0  0  0  0   0
+## 4    3   0  1  0    2.000     NA 1 0  0  0  1   0
+## 5    4   0  1  0    2.000     NA 1 0  0  0  1   0
+## 6    5   0 NA  0       NA     NA 0 0  0  0  0   0
+## 7    0   1 NA  0       NA     NA 0 0  0  0  0   0
+## 8    1   1  4  0    0.750  0.500 0 0  0  0  4   0
+## 9    2   1  2  0    1.500  0.707 1 0  0  0  2   0
+## 10   3   1  1  0    2.000     NA 1 0  0  0  1   0
+## 11   4   1 NA  0       NA     NA 0 0  0  0  0   0
+## 12   5   1 NA  0       NA     NA 0 0  0  0  0   0
+## 13   0   2  2  0    2.000  1.414 0 1  0  0  2   0
+## 14   1   2  9  0    1.222  1.202 1 0  1  0  9   0
+## 15   2   2 15  0    2.000  0.845 8 2  1  0 15   0
+## 16   3   2  3  0    3.000  0.000 0 3  0  0  3   0
+## 17   4   2  3  0    3.333  1.155 1 0  2  0  3   0
+## 18   5   2 NA  0       NA     NA 0 0  0  0  0   0
+## 19   0   3  5  0    1.200  1.304 1 1  0  0  5   0
+## 20   1   3 16  0    2.250  1.390 4 3  4  0 16   0
+## 21   2   3 13  0    2.769  0.832 6 4  3  0 13   0
+## 22   3   3  7  0    2.000  1.528 2 2  1  0  7   0
+## 23   4   3  9  0    3.333  1.323 2 0  5  1  9   0
+## 24   5   3 NA  0       NA     NA 0 0  0  0  0   0
+## 25   0   4  7  0    2.714  1.799 1 1  2  1  7   0
+## 26   1   4 19  0    2.895  1.449 1 2  9  1 19   0
+## 27   2   4 29  0    2.690  1.417 8 4  9  2 29   0
+## 28   3   4 18  0    3.278  1.074 3 6  6  2 18   0
+## 29   4   4 32  0    3.781  1.008 6 2 17  7 32   0
+## 30   5   4  5  0    4.400  0.548 0 0  3  2  5   0
+## 31   0   5  2  0    4.500  0.707 0 0  1  1  2   0
+## 32   1   5 15  0    2.133  1.685 1 1  4  1 15   0
+## 33   2   5 28  0    2.571  1.372 7 3 11  0 28   0
+## 34   3   5 13  0    3.154  0.801 3 5  5  0 13   0
+## 35   4   5 48  0    3.854  0.922 3 3 32  8 48   0
+## 36   5   5 42  0    4.452  1.234 1 1  5 32 42   0</code></pre>
 <p>Can also express the frequencies as proportions. To convert the
 frequencies into proportions, invoke the <code>table_prop</code>
 parameter. The value of <code>&quot;all&quot;</code> computes cell frequencies
@@ -952,17 +1230,17 @@ column sums.</p>
 table counts to row proportions, that is, the proportion of each level
 of <em>m06</em> for each combination of levels for <em>m07</em>. The sum
 of the proportions in each row is 1.0.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06, m07, <span class="at">table_prop=</span><span class="st">&quot;row&quot;</span>)</span></code></pre></div>
-<pre><code>##   m07 m06_n na    0    1    2    3     4    5
-## 1   0    17  0 0.24 0.18 0.12 0.18 0.176 0.12
-## 2   1    64  0 0.11 0.38 0.11 0.09 0.281 0.03
-## 3   2    87  0 0.05 0.16 0.34 0.15 0.276 0.02
-## 4   3    43  0 0.05 0.02 0.23 0.37 0.279 0.05
-## 5   4    93  0 0.00 0.03 0.14 0.05 0.602 0.17
-## 6   5    47  0 0.02 0.04 0.02 0.02 0.170 0.72</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="fu">pivot</span>(d, table, m06, m07, <span class="at">table_prop=</span><span class="st">&quot;row&quot;</span>)</span></code></pre></div>
+<pre><code>##   m07 0  1    2    3    4    5     n _na
+## 1   0 4  3 0.07 0.11 0.11 0.07 0.630   0
+## 2   1 7 24 0.07 0.06 0.19 0.02 0.660   0
+## 3   2 4 14 0.19 0.08 0.15 0.01 0.558   0
+## 4   3 2  1 0.12 0.19 0.14 0.02 0.518   0
+## 5   4 0  3 0.07 0.03 0.31 0.09 0.508   0
+## 6   5 1  2 0.01 0.01 0.09 0.37 0.516   0</code></pre>
 <p>Return to the <em>Employee</em> data set for the remaining
 examples.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="quantiles" class="section level3">
 <h3>Quantiles</h3>
@@ -981,7 +1259,7 @@ equal size.</p>
 <p>By default, calling the quantile function computes quartiles. Here
 calculate the quartiles for <em>Years</em> aggregated across levels of
 <em>Dept</em> and <em>Gender</em>.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="fu">pivot</span>(d, quantile, Years, <span class="fu">c</span>(Dept, Gender))</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="fu">pivot</span>(d, quantile, Years, <span class="fu">c</span>(Dept, Gender))</span></code></pre></div>
 <pre><code>##    Dept Gender n na p0   p25  p50   p75 p100
 ## 1  ACCT      M 2  0  5  6.00  7.0  8.00    9
 ## 2  ADMN      M 2  0  7 11.25 15.5 19.75   24
@@ -1002,7 +1280,16 @@ quintiles for <em>Years</em> and <em>Salary</em>, plus the mean and
 standard deviation. No specification of <code>by</code>, so these
 descriptive statistics are computed over the entire data set for both
 specified variables.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,quantile), <span class="fu">c</span>(Years,Salary), <span class="at">q_num=</span><span class="dv">5</span>, <span class="at">digits_d=</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,sd,quantile), <span class="fu">c</span>(Years,Salary), <span class="at">q_num=</span><span class="dv">5</span>, <span class="at">digits_d=</span><span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## 
+##  &quot;2&quot;: 2 
+##   X1 X2       X3       X4
+## 1 36  1 9.388889 5.723524
+## 
+##  &quot;2&quot;: 2 
+##   X1 X2           X3           X4
+## 1 36  1     9.388889     5.723524
+## 2 37  0 73795.556757 21799.533464</code></pre>
 <pre><code>##         n na     mean       sd       p0      p20      p40      p60      p80     p100
 ## Years  36  1     9.39     5.72     1.00     4.00     8.00    10.00    14.00     24.0
 ## Salary 37  0 73795.56 21799.53 46124.97 55737.86 63701.93 72430.04 92415.42 134419.2</code></pre>
@@ -1030,7 +1317,7 @@ condition for which to subset rows of the data frame for analysis.</p>
 <p>In this example, compute the mean of <em>Salary</em> for each level
 of <em>Dept</em> for just those rows of data with the value of
 <em>Gender</em> equal to “W”.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, <span class="at">rows=</span>(Gender<span class="sc">==</span><span class="st">&quot;W&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, <span class="at">rows=</span>(Gender<span class="sc">==</span><span class="st">&quot;W&quot;</span>))</span></code></pre></div>
 <pre><code>## Gender: W</code></pre>
 <pre><code>##   Dept Salary_n na     mean
 ## 1 ACCT        3  0 63237.16
@@ -1052,7 +1339,7 @@ the columns to extract after the comma. Here select only those rows of
 data with <em>Gender</em> declared as Female. There is no information
 after the comma, so no columns are specified, which means to retain all
 columns, the variables in the data frame.</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a><span class="fu">pivot</span>(d[.(Gender<span class="sc">==</span><span class="st">&quot;W&quot;</span>),], mean, Salary, Dept)</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a><span class="fu">pivot</span>(d[.(Gender<span class="sc">==</span><span class="st">&quot;W&quot;</span>),], mean, Salary, Dept)</span></code></pre></div>
 <pre><code>## Gender: W</code></pre>
 <pre><code>##   Dept Salary_n na     mean
 ## 1 ACCT        3  0 63237.16
@@ -1069,7 +1356,7 @@ parameter <code>sort</code>. This internal sort works for a single
 <code>value</code> variable, by default the last column in the output
 data frame. Set to <code>&quot;-&quot;</code> for a descending sort. Set to
 <code>&quot;+&quot;</code> for an ascending sort.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">sort=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">sort=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender  n na Salary_mean
 ## 4  MKTG      M  1  0    99062.66
 ## 5  SALE      M 10  0    86150.97
@@ -1085,8 +1372,8 @@ data frame. Set to <code>&quot;-&quot;</code> for a descending sort. Set to
 ## 6  &lt;NA&gt;      M  0  0          NA</code></pre>
 <p>Specify the <code>sort_var</code> parameter to specify the name or
 the column number of the variable to sort.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median), Salary, <span class="fu">c</span>(Gender,Dept), <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanSalary&quot;</span>, <span class="st">&quot;MedianSalary&quot;</span>),</span>
-<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>      <span class="at">sort=</span><span class="st">&quot;-&quot;</span>, <span class="at">sort_var=</span><span class="st">&quot;MeanSalary&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median), Salary, <span class="fu">c</span>(Gender,Dept), <span class="at">out_names=</span><span class="fu">c</span>(<span class="st">&quot;MeanSalary&quot;</span>, <span class="st">&quot;MedianSalary&quot;</span>),</span>
+<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a>      <span class="at">sort=</span><span class="st">&quot;-&quot;</span>, <span class="at">sort_var=</span><span class="st">&quot;MeanSalary&quot;</span>)</span></code></pre></div>
 <pre><code>##    Gender Dept  n na MeanSalary MedianSalary
 ## 7       M MKTG  1  0   99062.66     99062.66
 ## 9       M SALE 10  0   86150.97     82442.74
@@ -1102,11 +1389,11 @@ the column number of the variable to sort.</p>
 ## 11      M &lt;NA&gt;  0  0         NA           NA</code></pre>
 <p>Because the output of <code>pivot()</code> with no
 <code>by_cols</code> variables is a standard R data frame, the external
-call to the <strong>lessR</strong> function <code>Sort()</code> is
+call to the <strong>lessR</strong> function <code>sort_by()</code> is
 available for custom sorting by one or more variables. Sort in the
 specified direction with the <code>direction</code> parameter.</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">pivot</span>(d, mean, Salary, <span class="fu">c</span>(Dept, Gender))</span>
-<span id="cb47-2"><a href="#cb47-2" tabindex="-1"></a><span class="fu">sort_by</span>(a, <span class="at">by=</span>Salary_mean, <span class="at">direction=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">pivot</span>(d, mean, Salary, <span class="fu">c</span>(Dept, Gender))</span>
+<span id="cb51-2"><a href="#cb51-2" tabindex="-1"></a><span class="fu">sort_by</span>(a, <span class="at">by=</span>Salary_mean, <span class="at">direction=</span><span class="st">&quot;-&quot;</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender  n na Salary_mean
 ## 4  MKTG      M  1  0    99062.66
 ## 5  SALE      M 10  0    86150.97
@@ -1138,8 +1425,8 @@ the expression.</p>
 <p>To avoid problems installing this version of <strong>lessR</strong>
 from source with a previous version of R, the code is commented out with
 a <code>#</code> sign in the first column.</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="co">#d |&gt; pivot(mean, Salary, c(Dept, Gender)) -&gt; a</span></span>
-<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a><span class="co">#a</span></span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a><span class="co">#d |&gt; pivot(mean, Salary, c(Dept, Gender)) -&gt; a</span></span>
+<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a><span class="co">#a</span></span></code></pre></div>
 </div>
 </div>
 <div id="output-as-a-2-d-table" class="section level2">
@@ -1152,7 +1439,7 @@ changes the output structure from a long-form data frame to a table with
 categorical variables in the rows and columns.</p>
 <p>In this example, specify <em>Gender</em> as the <code>by_cols</code>
 variable.</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, <span class="at">by=</span>Dept, <span class="at">by_cols=</span>Gender)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, <span class="at">by=</span>Dept, <span class="at">by_cols=</span>Gender)</span></code></pre></div>
 <pre><code>Table: mean of Salary 
 
  Gender  M          W               
@@ -1167,7 +1454,7 @@ variable.</p>
 <p>Here two <code>by_cols</code> variables, specified as a vector. There
 is much missing data for this three-way classification as there is not
 much data in each group, with many groups having no data.</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, <span class="fu">c</span>(Gender, Plan))</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Salary, Dept, <span class="fu">c</span>(Gender, Plan))</span></code></pre></div>
 <pre><code>Table: mean of Salary 
 
  Gender  M                                 W                                     
@@ -1221,7 +1508,7 @@ statistic displayed.</p>
 which occurs in the Sales department. That value is dropped from the
 computation of the mean of Years, which is based on the 14 non-missing
 values.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years, Dept)</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years, Dept)</span></code></pre></div>
 <pre><code>##   Dept Years_n na   mean
 ## 1 ACCT       5  0  5.600
 ## 2 ADMN       6  0 10.167
@@ -1234,7 +1521,7 @@ remove any missing data in a cell with values to be aggregated.
 According to the way in which R functions process the data with missing
 values entered into the function, one missing value implies that the
 computed statistic has a missing value.</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years, Dept, <span class="at">na_remove=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" tabindex="-1"></a><span class="fu">pivot</span>(d, mean, Years, Dept, <span class="at">na_remove=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>##   Dept Years_n na   mean
 ## 1 ACCT       5  0  5.600
 ## 2 ADMN       6  0 10.167
@@ -1254,10 +1541,10 @@ aggregation. Use base R <code>Extract[]</code> with
 <strong>lessR</strong> <code>.()</code> to drop the one male in the
 Sales department, leaving no data values for that group. Save the result
 into the <em>dd</em> data frame.</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a>dd <span class="ot">&lt;-</span> d[.(<span class="sc">!</span>(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Dept<span class="sc">==</span><span class="st">&quot;SALE&quot;</span>)), ]</span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a>dd <span class="ot">&lt;-</span> d[.(<span class="sc">!</span>(Gender<span class="sc">==</span><span class="st">&quot;M&quot;</span> <span class="sc">&amp;</span> Dept<span class="sc">==</span><span class="st">&quot;SALE&quot;</span>)), ]</span></code></pre></div>
 <p>Also, to focus only on this type of missing data, remove the row of
 data that has a missing value for Dept, which is the third row.</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a><span class="fu">head</span>(dd)</span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a><span class="fu">head</span>(dd)</span></code></pre></div>
 <pre><code>##                  Years Gender Dept   Salary JobSat Plan Pre Post
 ## Ritchie, Darnell     7      M ADMN 53788.26    med    1  82   92
 ## Downs, Deborah       7      W FINC 57139.90   high    2  90   86
@@ -1265,13 +1552,13 @@ data that has a missing value for Dept, which is the third row.</p>
 ## Afshari, Anbar       6      W ADMN 69441.93   high    2 100  100
 ## Knox, Michael       18      M MKTG 99062.66    med    3  81   84
 ## Kimball, Claire      8      W MKTG 61356.69   high    2  93   92</code></pre>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" tabindex="-1"></a>dd <span class="ot">&lt;-</span> dd[<span class="sc">-</span><span class="dv">3</span>,]</span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" tabindex="-1"></a>dd <span class="ot">&lt;-</span> dd[<span class="sc">-</span><span class="dv">3</span>,]</span></code></pre></div>
 <p>Here, explicitly set <code>na_by_show</code> to <code>TRUE</code>,
 the default value. The group for male sales employees is shown with the
 values of the computed variables <em>n_</em> and <em>na_</em> set to 0
 and the values of the computed statistics necessarily missing for this
 row of the output data frame.</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a><span class="fu">pivot</span>(dd, <span class="fu">c</span>(mean,median), Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">na_by_show=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" tabindex="-1"></a><span class="fu">pivot</span>(dd, <span class="fu">c</span>(mean,median), Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">na_by_show=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender n na Salary_mean Salary_mdn
 ## 1  ACCT      M 2  0    59626.19   59626.19
 ## 2  ADMN      M 2  0    80963.35   80963.35
@@ -1287,7 +1574,7 @@ row of the output data frame.</p>
 <code>by</code> variable. To do so, set <code>na_by_show</code> to
 <code>FALSE</code>. Now the group for the non-existent male sales
 employee does not display.</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" tabindex="-1"></a><span class="fu">pivot</span>(dd, <span class="fu">c</span>(mean,median), Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">na_by_show=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" tabindex="-1"></a><span class="fu">pivot</span>(dd, <span class="fu">c</span>(mean,median), Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">na_by_show=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender n na Salary_mean Salary_mdn
 ## 1  ACCT      M 2  0    59626.19   59626.19
 ## 2  ADMN      M 2  0    80963.35   80963.35
@@ -1306,7 +1593,7 @@ grouping variable itself should be displayed as level
 <code>&lt;NA&gt;</code>. By default, the <code>&lt;NA&gt;</code> levels
 are displayed but the <code>na_group_show</code> is explicitly included
 in the following.</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,median), Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">na_group_show=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,median), Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">na_group_show=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender  n na Salary_mean Salary_mdn
 ## 1  ACCT      M  2  0    59626.19   59626.19
 ## 2  ADMN      M  2  0    80963.35   80963.35
@@ -1322,7 +1609,7 @@ in the following.</p>
 ## 12 &lt;NA&gt;      W  1  0    53772.58   53772.58</code></pre>
 <p>Set <code>na_group_show</code> to <code>FALSE</code> to not display
 as levels when a value of the <code>by</code> variable is missing.</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,median), Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">na_group_show=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean,median), Salary, <span class="fu">c</span>(Dept, Gender), <span class="at">na_group_show=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>##    Dept Gender  n na Salary_mean Salary_mdn
 ## 1  ACCT      M  2  0    59626.19   59626.19
 ## 2  ADMN      M  2  0    80963.35   80963.35
@@ -1349,11 +1636,11 @@ the function definition if there is any missing data. If missing data
 values are to be dropped in internal function calls, then set the base R
 parameter <code>na.rm</code> to <code>TRUE</code> for each component
 function as well.</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" tabindex="-1"></a>mnmd <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">na.rm=</span><span class="cn">TRUE</span>)  <span class="fu">mean</span>(x, <span class="at">na.rm=</span>na.rm) <span class="sc">-</span> <span class="fu">median</span>(x, <span class="at">na.rm=</span>na.rm)</span></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" tabindex="-1"></a>mnmd <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">na.rm=</span><span class="cn">TRUE</span>)  <span class="fu">mean</span>(x, <span class="at">na.rm=</span>na.rm) <span class="sc">-</span> <span class="fu">median</span>(x, <span class="at">na.rm=</span>na.rm)</span></code></pre></div>
 <p>Invoke <code>pivot()</code> to compute the mean, the median, and
 their difference for each group in the aggregation of the variable
 <em>Years</em>.</p>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median, mnmd), Years, <span class="at">by=</span>Dept)</span></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" tabindex="-1"></a><span class="fu">pivot</span>(d, <span class="fu">c</span>(mean, median, mnmd), Years, <span class="at">by=</span>Dept)</span></code></pre></div>
 <pre><code>##   Dept Years_n na   mean Years_mdn Years_mnmd
 ## 1 ACCT       5  0  5.600       5.0      0.600
 ## 2 ADMN       6  0 10.167       6.5      3.667

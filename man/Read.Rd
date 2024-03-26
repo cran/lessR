@@ -46,11 +46,14 @@ Read2(\dots, sep=";", dec=",")
         file type of the file to read: \code{.csv}, \code{.tsv} or \code{.txt}
         read as a text file, \code{.xls}, \code{.xlsx} read as an Excel file, or
         \code{.ods} as an OpenDocument Spreadsheet file.
+        \code{.feather} and \code{.parquet} for the \code{arrow} formats for
+          feather and parquet dat files.
         \code{.sav} reads as an SPSS file, which also reads the variable labels
         if present, \code{.sas7bdat} reads as a SAS file, and \code{.rda} reads as a
         native R data file. If the data file is not identified by one of these
         file types, then explicitly set by setting to one of the following values:
-        \code{"csv"}, \code{"tsv"}, \code{"Excel"}, \code{"R"}, \code{"SPSS"},
+        \code{"csv"}, \code{"tsv"}, \code{"Excel"}, \code{"feather"}, 
+        \code{"parquet"}, \code{"R"}, \code{"SPSS"},
         or \code{"SAS"}.}
   \item{var_labels}{Set \code{TRUE} if reading a csv or Excel file of 
        variable labels into the data frame \code{l} in which each
@@ -64,12 +67,15 @@ Read2(\dots, sep=";", dec=",")
   \item{missing}{Missing value code, which by default is literally a missing data
         value in the data table.}
   \item{n_mcut}{For the missing value analysis, list the row name and number of
-        missing values if the number of missing exceeds or equals this cutoff.}
+        missing values if the number of missing exceeds or equals this cutoff.
+        Requires \code{brief=FALSE}.}
   \item{miss_show}{For the missing value analysis, the number of rows, one row per
-        observation, that has as many or missing values as \code{n_mcut}.}
+        observation, that has as many or missing values as \code{n_mcut}. 
+        Requires \code{brief=FALSE}.}
   \item{miss_zero}{For the missing value analysis, list the variable name or the
         row name even for values of 0, that is rows with no missing data.
-        By default only variables and rows with missing data are listed.}
+        By default only variables and rows with missing data are listed.
+        Requires \code{brief=FALSE}.}
   \item{miss_matrix}{For the missing value analysis, if there is any missing data, 
         list a version of the complete data table with a 0 for a non-missing value
         and a 1 for a missing value.}\cr

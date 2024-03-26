@@ -1,7 +1,7 @@
 bc.data.frame <-
 function(x, n_cat, stack100,
          col_fill, col_color, col.trans, fill_spit, theme,
-         horiz, gap, prop, scale_y,
+         horiz, gap, prop, scale_y, top,
          xlab, ylab, main,
          labels, label.size, beside,
          rotate_x, offset, break_x, sort_x,
@@ -11,7 +11,7 @@ function(x, n_cat, stack100,
          pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
          legend_horiz, legend_size, legend_abbrev, legend_adj,
-         out_size, do_plot, quiet, width, height, pdf_file, ...)  {
+         out_size, do_plot, quiet, width, height, pdf_file, shiny, ...)  {
 
   sug.keep <- getOption("suggest")
   options(suggest = FALSE)
@@ -65,7 +65,7 @@ function(x, n_cat, stack100,
 
         .bc.main(x[,i], y=NULL, by=NULL, stack100,
           col_fill, col_color, col.trans, fill_spit, theme,
-          horiz, gap, prop, scale_y,
+          horiz, gap, prop, scale_y, top,
           xlab, ylab, main,
           value_labels=NULL, label.size, beside,
           rotate_x, offset, break_x, sort_x,
@@ -76,7 +76,7 @@ function(x, n_cat, stack100,
           legend_title, legend_position, legend_labels,
           legend_horiz, legend_size, legend_abbrev, legend_adj,
           add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out_size,
-          digits_d=3, do_plot, quiet, ...)
+          digits_d=3, do_plot, quiet, shiny, ...)
 
         if (!is.null(pdf_file)) {
           dev.off()

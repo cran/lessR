@@ -572,7 +572,9 @@ new name, in that order.</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">names</span>(d)</span></code></pre></div>
 <pre><code>## [1] &quot;Years&quot;  &quot;Gender&quot; &quot;Dept&quot;   &quot;Salary&quot; &quot;JobSat&quot; &quot;Plan&quot;   &quot;Pre&quot;    &quot;Post&quot;</code></pre>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">rename</span>(d, Salary, AnnualSalary)</span></code></pre></div>
-<pre><code>## Change name of variable Salary to AnnualSalary in data frame d</code></pre>
+<pre><code>## Change the following variable names for data frame d :
+## 
+## Salary --&gt; AnnualSalary</code></pre>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a><span class="fu">names</span>(d)</span></code></pre></div>
 <pre><code>## [1] &quot;Years&quot;        &quot;Gender&quot;       &quot;Dept&quot;         &quot;AnnualSalary&quot; &quot;JobSat&quot;       &quot;Plan&quot;         &quot;Pre&quot;         
 ## [8] &quot;Post&quot;</code></pre>
@@ -723,8 +725,8 @@ names.</p>
 <h3>Create Training and Testing Data</h3>
 <p>Get the data, the Employee data set.</p>
 <div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>, <span class="at">quiet=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p>Create four component data frames: out<span class="math inline">\(train_x, out\)</span>train_y, out<span class="math inline">\(test_x, and out\)</span>test_y. Specify the
-response variable as Salary.</p>
+<p>Create four component data frames: out$train_x, out$train_y,
+out$test_x, and out$test_y. Specify the response variable as Salary.</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">train_test</span>(d, Salary)</span>
 <span id="cb65-2"><a href="#cb65-2" tabindex="-1"></a><span class="fu">names</span>(out)</span></code></pre></div>
 <pre><code>## [1] &quot;train_x&quot; &quot;train_y&quot; &quot;test_x&quot;  &quot;test_y&quot;</code></pre>

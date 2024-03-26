@@ -1,27 +1,20 @@
 Histogram <-
 function(x=NULL, data=d, rows=NULL,
-         stat_x=c("count", "proportion"),
-         n_cat=getOption("n_cat"), Rmd=NULL,
+    stat_x=c("count", "proportion"),
 
     by1=NULL, by2=NULL,
     n_row=NULL, n_col=NULL, aspect="fill",
-
-    bin_start=NULL, bin_width=NULL, bin_end=NULL, breaks="Sturges",
 
     theme=getOption("theme"),
     fill=getOption("bar_fill_cont"),
     color=getOption("bar_color_cont"),
     transparency=getOption("trans_bar_fill"),
 
-    values=FALSE,
-    reg="snow2", cumulate=c("off", "on", "both"),
+    values=FALSE, 
 
-    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    lab_adj=c(0,0), margin_adj=c(0,0,0,0),
+    bin_start=NULL, bin_width=NULL, bin_end=NULL, breaks="Sturges",
 
-    rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
-    offset=getOption("offset"),
-    scale_x=NULL, scale_y=NULL,
+    cumulate=c("off", "on", "both"), reg="snow2",
 
     density=FALSE, show_histogram=TRUE,
     bandwidth=NULL, type=c("general", "normal", "both"),
@@ -30,11 +23,23 @@ function(x=NULL, data=d, rows=NULL,
     x.pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
 
+    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+    lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
+
+    rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
+    offset=getOption("offset"),
+    scale_x=NULL, scale_y=NULL,
+
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-    eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"), do_plot=TRUE,
-    width=6, height=6, pdf_file=NULL, 
-    fun_call=NULL, ...) {
+    quiet=getOption("quiet"), do_plot=TRUE,
+    pdf_file=NULL, width=6.5, height=6, 
+    digits_d=NULL,
+    Rmd=NULL,
+
+    n_cat=getOption("n_cat"),
+
+    eval_df=NULL, fun_call=NULL, ...) {
 
 
   if (missing(fill))
@@ -109,9 +114,9 @@ function(x=NULL, data=d, rows=NULL,
 
   Trellis <- ifelse(!missing(by1), TRUE, FALSE)
   
-  xlab_adj <- lab_adj[1];   ylab_adj <- lab_adj[2]
-  tm.adj <- margin_adj[1];  rm.adj <- margin_adj[2]
-  bm.adj <- margin_adj[3];  lm.adj <- margin_adj[4]
+  xlab_adj <- lab_adjust[1];   ylab_adj <- lab_adjust[2]
+  tm.adj <- margin_adjust[1];  rm.adj <- margin_adjust[2]
+  bm.adj <- margin_adjust[3];  lm.adj <- margin_adjust[4]
 
   .param.old(...)
 

@@ -1,5 +1,8 @@
 Write <- 
-function(data=d, to=NULL, format=c("csv", "R", "Excel", "ODS", "SPSS"),
+function(data=d, to=NULL, 
+
+         format=c("csv", "R", "Excel", "ODS", "SPSS", "feather", "parquet"),
+
          rowNames=NULL,
 
          ExcelTable=FALSE, ExcelColWidth=TRUE,
@@ -50,6 +53,42 @@ function(data=d, to=NULL, format=c("csv", "R", "Excel", "ODS", "SPSS"),
     }
   }
   
+  else if (format == "feather") {
+    if (is.null(to))
+      file.data <- paste(df.name, ".feather", sep="")
+    else {
+      txt <- ifelse (grepl(".feather", to), "", ".feather")
+      file.data <- paste(to, txt, sep="")
+    }
+
+    arrow::write_feather(data, file.data)
+
+    txt <- "Richardson's et al. arrow package]"
+    if (!quiet)
+      cat("[with the write_feather() function from", txt, "\n")
+    cat("\n")
+    .showfile(file.data, c(df.name, "data values"))
+    cat("\n")
+  }  
+  
+  else if (format == "parquet") {
+    if (is.null(to))
+      file.data <- paste(df.name, ".parquet", sep="")
+    else {
+      txt <- ifelse (grepl(".parquet", to), "", ".parquet")
+      file.data <- paste(to, txt, sep="")
+    }
+
+    arrow::write_parquet(data, file.data)
+
+    txt <- "Richardson's et al. arrow package]"
+    if (!quiet)
+      cat("[with the write_parquet() function from", txt, "\n")
+    cat("\n")
+    .showfile(file.data, c(df.name, "data values"))
+    cat("\n")
+  }  
+
   else if (format == "SPSS") {
     if (is.null(to))
       file.data <- paste(df.name, ".sav", sep="")

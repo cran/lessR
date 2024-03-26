@@ -36,15 +36,18 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   \item{show_n}{By default, display the sample size and number missing for each
         computed summary statistic. If \code{FALSE}, delete all variables
         from the output data frame that end with \code{n_} or \code{na_}.}
-  \item{na_by_show}{Applicable to one or more grouping variables. If \code{TRUE},
-       the default, display missing levels of the grouping variables with
-       \code{n} set to 0.}
+  \item{na_by_show}{If \code{TRUE},
+       the default, if all values of `variable` are missing for a group
+       so that the entire level of the `by` variables is missing, show those
+       missing cells with a reported value of computed variable \code{n} as 0.
+        Otherwise delete the row from the output.}
   \item{na_remove}{Sets base R parameter \code{na.rm}. If \code{TRUE},
        the default, removes missing values from the \code{variable}(s),
        then reports how many values were missing. Otherwise, the 
        aggregation statistic for a cell with any missing data returns \code{NA}.}
-  \item{na_group_show}{If \code{TRUE}, the default, display NA for missing
-       data of a grouping variable as a level for that variable.}
+  \item{na_group_show}{If \code{TRUE}, the default, display \code{<NA>} for missing
+       data of a grouping variable as a level for that variable. Otherwise, do
+       not treat a missing value of a group as a level for which to aggregate.}
   \item{out_names}{Custom names for the aggregated variables. If more than one,
         list in the same order as specified in \code{variable}. Does not apply
         to the \code{table} option where the column names are the levels of

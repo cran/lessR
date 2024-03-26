@@ -104,7 +104,7 @@ d <- Transform(Gender=as.numeric(Gender))
 d <- recode(Gender, old=c(1,2), new=c(0,1))
 
 # recode integer values to levels of a factor with value labels
-#   with the Transform function instead of recode()
+#   instead of recode()
 # here Gender has values 0 and 1 in the data
 d <- Read("Mach4")
 d <- Transform(

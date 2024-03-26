@@ -312,7 +312,7 @@ pivot(d, c(mean, median), Salary, c(Gender,Dept), out_names=c("MeanSalary", "Med
       sort="-", sort_var="MeanSalary")
 ```
 
-Because the output of `pivot()` with no `by_cols` variables is a standard R data frame, the external call to the __lessR__ function `Sort()` is available for custom sorting by one or more variables. Sort in the specified direction with the `direction` parameter. 
+Because the output of `pivot()` with no `by_cols` variables is a standard R data frame, the external call to the __lessR__ function `sort_by()` is available for custom sorting by one or more variables. Sort in the specified direction with the `direction` parameter. 
 
 ```{r}
 a <- pivot(d, mean, Salary, c(Dept, Gender))

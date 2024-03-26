@@ -252,7 +252,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     tbl <- table(data[,ind.var.d], useNA=exc)
     a <- data.frame(tbl)
     names(a)[1] <- nm.var.d[1]
-    prp <- a$Freq / sum(tbl)
+    names(a)[which(names(a) == "Freq")] <- "n"
+    prp <- a$n / sum(tbl)
     a$Prop <- .decdig(prp, digits_d)
     return(a) 
   }
@@ -288,6 +289,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
         a <- as.matrix(a)  # turn vector a into a data frame
         a <- data.frame(t(a))
+pn("1")
+print(a)
         txt <- ifelse (n.cmp == 1, nm.cmpt[1], "Stat")
         if (!(txt %in% c("Stat", "sd")))
           substr(txt,1,1) <- toupper(substr(txt,1,1))
@@ -305,6 +308,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
             out[j] <- eval(parse(text=f.call))  # evaluate compute function
           }  # end j
             a <- data.frame(rbind(a, c(n, na, out)))  # a has multiple rows
+pn("2")
+print(a)
         }  # end i
 
         names(a) <- c("n", "na", nm.cmpt)
@@ -387,6 +392,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       }
       else
         a <- as.data.frame(a)
+pn("4")
+print(a)
       if (n.by == 1) names(a)[1] <- deparse(substitute(variable))
       names(a)[ncol(a)] <- "n"
 
@@ -507,9 +514,11 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     # get _n and _na variables
     a1 <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=count_n)
     a2 <- aggregate(data[,ind.var.d], by=by.vars, drop=FALSE, FUN=count_NA)
-    amd <- merge(a1, a2, by=names(by.vars), sort=FALSE)
-    names(amd)[n.by+1] <- paste(nm.var.d[1], "_n", sep="")
-    names(amd)[n.by+2] <- paste(nm.var.d[1], "_na", sep="")
+    amd1 <- merge(a1, a2, by=names(by.vars), sort=FALSE)
+#   names(amd)[n.by+1] <- paste(nm.var.d[1], "_n", sep="")
+#   names(amd)[n.by+2] <- paste(nm.var.d[1], "_na", sep="")
+    names(amd1)[n.by+1] <- "n"
+    names(amd1)[n.by+2] <- "_na"
 
     # calculate the freqs level by level of the aggregation variable
     lvl <- sort(unique(data[,ind.var.d]))
@@ -524,14 +533,18 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
       names(a2)[ncol(a2)] <- lvl[i]
       for (j in 1:nrow(a2))
         if (is.na(a2[j,ncol(a2)])) a2[j,ncol(a2)] <- 0
-      amd <- merge(amd, a2, by=names(by.vars), sort=FALSE)
+      if (i == 1)
+        amd2 <- a2  # 1st level of by variable
+      else
+        amd2 <- merge(amd2, a2, by=names(by.vars), sort=FALSE)
       if (is.null(out_names))
         l.nm <- lvl[i]
       else
         l.nm <- out_names[i]
-      names(amd)[ncol(amd)] <- l.nm # lvl[i]
+      names(amd2)[ncol(amd2)] <- l.nm # lvl[i]
     }
-
+    amd <- merge(amd2, amd1, by=names(by.vars), sort=FALSE) 
+    
     if (table_prop %in% c("all", "row", "col")) {
       nca <- ncol(amd)
       ll <- length(lvl)
@@ -597,7 +610,10 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   # ---------------------------------------
 
   # missing by variables data: set NA for _n, _na to 0 or remove if specified
-  n_ind <- which(grepl("_n$", names(a)))
+  if (length(which(names(a) == "n")) == 0)  # if tflag, then only n
+    n_ind <- which(grepl("_n$", names(a)))
+  else
+    n_ind <- which(names(a) == "n")
   na_ind <- which(grepl("_na$", names(a)))
   ind0 <- logical(nrow(a))  # initializes to FALSE
   for (i in 1:nrow(a)) {

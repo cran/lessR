@@ -554,7 +554,9 @@ because you may not have web access when this file is generated.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Suggestions
-## Details about your data, Enter:  details()  for d, or  details(name)
+## Recommended binary format for data files: feather
+##   Create with Write(d, &quot;your_file&quot;, format=&quot;feather&quot;)
+## More details about your data, Enter:  details()  for d, or  details(name)
 ## 
 ## Data Types
 ## ------------------------------------------------------------
@@ -578,6 +580,60 @@ because you may not have web access when this file is generated.</p>
 <p>To allow for many variables, <code>Read()</code> lists the
 information for each variable in a row. Note that the data file
 organizes the variables by column.</p>
+<p>Get more information from <code>Read()</code>, especially regarding
+missing data, by setting <code>brief</code> to <code>FALSE</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee&quot;</span>, <span class="at">brief=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>## 
+## &gt;&gt;&gt; Suggestions
+## Recommended binary format for data files: feather
+##   Create with Write(d, &quot;your_file&quot;, format=&quot;feather&quot;)
+## 
+## 
+## ----------------------------------------------------------
+## Dimensions: 8 variables over 37 rows of data
+## 
+## First two row names: Ritchie, Darnell     Wu, James 
+## Last two row names:  Anastasiou, Crystal     Cassinelli, Anastis 
+## ----------------------------------------------------------
+## Data Types
+## ------------------------------------------------------------
+## character: Non-numeric data values
+## integer: Numeric data values, integers only
+## double: Numeric data values with decimal digits
+## ------------------------------------------------------------
+## 
+## 
+##     Variable                  Missing  Unique 
+##         Name     Type  Values  Values  Values   First and last values
+## ------------------------------------------------------------------------------------------
+##  1     Years   integer     36       1      16   7  NA  7 ... 1  2  10
+##  2    Gender character     37       0       2   M  M  W ... W  W  M
+##  3      Dept character     36       1       5   ADMN  SALE  FINC ... MKTG  SALE  FINC
+##  4    Salary    double     37       0      37   53788.26  94494.58 ... 56508.32  57562.36
+##  5    JobSat character     35       2       3   med  low  high ... high  low  high
+##  6      Plan   integer     37       0       3   1  1  2 ... 2  2  1
+##  7       Pre   integer     37       0      27   82  62  90 ... 83  59  80
+##  8      Post   integer     37       0      22   92  74  86 ... 90  71  87
+## ------------------------------------------------------------------------------------------
+## 
+## 
+## Missing Data Analysis
+## ------------------------------------------------------------
+## Number of cells in the data table:  296 
+## Number of missing data values:  4 
+## Proportion of missing data values:  0.014 
+## Number of rows of data with missing values:  3 
+## ------------------------------------------------------------
+## 
+##                    Years Gender Dept   Salary JobSat Plan Pre Post
+## Wu, James             NA      M SALE 94494.58    low    1  62   74
+## Jones, Alissa          5      W &lt;NA&gt; 53772.58   &lt;NA&gt;    1  65   62
+## Korhalkar, Jessica     2      W ACCT 72502.50   &lt;NA&gt;    2  74   87
+## ------------------------------------------------------------</code></pre>
+<p>Obtain this same information at any time during an R analysis by
+calling the function <code>details()</code>. <code>Read()</code> calls
+this same function after reading the data, with <code>brief</code> set
+to <code>TRUE</code> by default.</p>
 </div>
 <div id="two-types-of-variables" class="section level3">
 <h3>Two types of variables</h3>
@@ -623,10 +679,12 @@ example.</p>
 Specify the <code>var_labels</code> parameter as <code>TRUE</code> to
 instruct the <code>Read()</code> function to read variable labels
 instead of data.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee_lbl&quot;</span>, <span class="at">var_labels=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">Read</span>(<span class="st">&quot;Employee_lbl&quot;</span>, <span class="at">var_labels=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## 
 ## &gt;&gt;&gt; Suggestions
-## Details about your data, Enter:  details()  for d, or  details(name)
+## Recommended binary format for data files: feather
+##   Create with Write(d, &quot;your_file&quot;, format=&quot;feather&quot;)
+## More details about your data, Enter:  details()  for d, or  details(name)
 ## 
 ## Data Types
 ## ------------------------------------------------------------

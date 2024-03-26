@@ -129,6 +129,13 @@ d <- Read("Employee")
 
 To allow for many variables, `Read()` lists the information for each variable in a row. Note that the data file organizes the variables by column.
 
+Get more information from `Read()`, especially regarding missing data, by setting `brief` to `FALSE`.
+
+```{r brief, fig.align='center', fig.cap="Output of Read()."}
+d <- Read("Employee", brief=FALSE)
+```
+
+Obtain this same information at any time during an R analysis by calling the function `details()`. `Read()` calls this same function after reading the data, with `brief` set to `TRUE` by default.
 
 
 ### Two types of variables

@@ -1,8 +1,7 @@
 .plt.shapes <-
-function(shape, out_shape, lvl=NULL) {
+function(shape, out_shape, n.by=NULL) {
 
-  # first call from Plot(), #303, there is no level, just check for bad shapes
-  # second call there is a level if a by variable
+  # there is a level if a by variable
 
   bad.shape <- NULL
 
@@ -12,18 +11,21 @@ function(shape, out_shape, lvl=NULL) {
   shapes.dgt <- as.character(0:9)
   shapes.all <- c(shapes.nm, 0:19, letters, LETTERS, shapes.pnt, shapes.dgt)
 
-  if (!is.null(lvl)) {
+  if (!is.null(n.by)) {
     # shiny does not get here, shape is never missing, from Plot #771
-    if (unique(lvl) > length(shapes.all)) {
+    if (unique(n.by) > length(shapes.all)) {
       cat("\n")
       stop(call.=FALSE, "\n","------\n",
       "Only ", length(shapes.all), " unique shapes to display\n",
-      "You specified a  by  variable with ", unique(lvl), " levels\n\n")
+      "You specified a  by  variable with ", unique(n.by), " levels\n\n")
     }
 
-    more <- c(8, 7, 9, 10, 12:14, 11, letters, LETTERS, shapes.pnt)
-    shapes.by <-  c("triup", "tridown", "circle", "square", "diamond", more)
-    shape <- shapes.by[1:lvl]
+    if (shape[1] == "vary") {
+      more <- c(8, 7, 9, 10, 12:14, 11, letters, LETTERS, shapes.pnt)
+      shapes.by <-  c("triup", "tridown", "circle", "square", "diamond", more)
+      shape <- integer(length(n.by))
+      shape <- shapes.by[1:n.by]
+    }
   }
 
   # convert named shape to its numeric code

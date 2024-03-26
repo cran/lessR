@@ -297,7 +297,7 @@ server <- function(input, output, session) {
 
     shiny::req(!smry.tbl)  # stat makes no sense for summary table data
     radioButtons("statType", "stat", 
-               c("sum"="sum", "mean"="mean", "deviation"="dev",
+               c("sum"="sum", "mean"="mean", "deviation"="deviation",
                  "sd"="sd", "min"="min", "median"="median",
                  "max"="max"), select="mean")
     })
@@ -367,7 +367,7 @@ server <- function(input, output, session) {
     }
     v$by.name <- by.name
      
-    # analysis has variables in global env, not a data frame
+    # analysis has variables in global env, not in a data frame
     v$b <- BarChart(x, y, by=by, data=NULL, stat=in.stat,
              fill=in.fill, color=input$myColor, transparency=input$myTrans,
              sort=input$mySort, horiz=input$myHoriz,
@@ -545,7 +545,7 @@ server <- function(input, output, session) {
 
     if (is.local && input$do_cmt) {
       cat("# For security, the path to your data file is not available\n",
-          "# Can replace PATHtoFILE in the following with the path\n",
+          "# You can replace PATHtoFILE in the following with the path\n",
           "# Remove the # sign in the first column and delete the previous ",
           "Read()\n", sep="", file=r.path, append=TRUE)
       read.path <- file.path("PATHtoFILE", read.path) 

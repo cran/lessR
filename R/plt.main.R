@@ -655,7 +655,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             }
           }
 
-          # plot segments
+          # plot segments to axis
           if (segments_y) {
             if (n.xcol == 1) # line segments from points to axis
               segments(x0=0, y0=y, x1=x, y1=y,
@@ -755,11 +755,13 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           m.y <- median(y[,1], na.rm=TRUE)
         }
 
-        if (segments) {  # designed for interaction plot of means
+        if (segments) {  # interaction means plot, ts with non-Date x var 
+          if (!is.null(ylab))  # thin line for ANOVA interaction plot
+            if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75 
           for (j in 1:(nrow(x)-1)) {
             segments(x0=x[j,1], y0=y[j,1],
                      x1=x[j+1,1], y1=y[j+1,1],
-                     lty="solid", lwd=.75, col=fill[i])
+                     lty="solid", lwd=ln.width, col=fill[i])
           }
         }  # end segments
 
@@ -784,13 +786,13 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           for (i in 1:n.by) shp[i] <- shape
         else
           shp <- shape
-        if (n.by <= 5)  # R presents only five filled points
-          shape.dft <- c(21,23,22,24,25)  # shape defaults
-        else
-          shape.dft <- c(1,0,5,2,6,8,7,9,10,12:14,11)  # shape defaults
-        if (length(color)==1 && length(fill)==1 && length(shape)==1)
-          for (i in 1:n.by) shp[i] <- shape.dft[i]  #  default shapes
-
+#       if (length(color)==1 && length(fill)==1 && length(shape)==1) {
+#         if (n.by <= 5)  # R presents only five filled points
+#           shape.dft <- c(21,23,22,24,25)  # shape defaults
+#         else
+#           shape.dft <- c(1,0,5,2,6,8,7,9,10,12:14,11)  # shape defaults
+#         for (i in 1:n.by) shp[i] <- shape.dft[i]  #  default shapes
+#       }
         # plot points and segments for each group
         for (i in 1:n.by) {
           x.lv <- subset(x, by==levels(by)[i])
@@ -808,11 +810,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                         size_cut, prop, bubble_text, object)
           }      
 
-          if (segments) {  # designed for interaction plot of means
+          # interaction means plot, ts without a date var and segments=TRUE
+          if (segments) {
+            if (!is.null(ylab))  # thin line for ANOVA interaction plot
+              if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75 
             for (j in 1:(nrow(x.lv)-1)) {
               segments(x0=x.lv[j,1], y0=y.lv[j,1],
                        x1=x.lv[j+1,1], y1=y.lv[j+1,1],
-                       lty="solid", lwd=.75, col=fill[i])
+                       lty="solid", lwd=ln.width, col=fill[i])
             }
           }  # end segments
 

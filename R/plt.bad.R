@@ -19,7 +19,7 @@ function (x.miss, y.miss, stat, breaks, bin_start, n_row, n_col,
       "fit_se now specified as the confidence level, between 0 and 1\n\n")
   }
   
-  if (stat %in% c("mean", "sd", "dev", "min", "median", "max") && y.miss) {
+  if (stat %in% c("mean","sd","deviation", "min","median","max") && y.miss) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Must specify a numeric y-variable from which to compute the\n ",
       " ", stat, " for each level of ", deparse(substitute(x)), "\n\n")

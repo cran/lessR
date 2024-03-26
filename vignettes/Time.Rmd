@@ -76,6 +76,14 @@ d[1:5,]
 
 Activate a time series plot by setting the $x$-variable to a variable of R type `Date`, which is true of the variable _date_ in this data set. Can also plot a time series by passing a time series object, created with the base R function `ts()` as the variable to plot.
 
+If the $x$-variable is a four-digit integer year, then the resulting plot will be of points without connecting line segments. To covert a four-digit integer year, here named Year, to type `Date`, do the following transformation:
+
+```
+d$Year_date <- as.Date(ISOdate(d$Year, 1, 1)) 
+``` 
+
+Or, to plot as a time series, add `segments=TRUE` to the `Plot()` statement. To plot only the connecting line segments but not the points, also add `size=0`.
+
 Here plot just for _Apple_, with the two variables _date_ and _Price_, stock price. The parameter `rows` specifies what rows of the input data frame to retain for the analysis.
 
 ```{r}

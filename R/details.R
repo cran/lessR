@@ -1,5 +1,5 @@
 details <-
-function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
+function(data=d, n_mcut=1, max_lines=30,
          miss_show=30, miss_matrix=FALSE, var_labels=FALSE,
          brief=getOption("brief")) {
 
@@ -153,8 +153,8 @@ function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
       cat("Each of these variables has numeric values, but has less than ",
           n_cat.temp, "\n",
           "unique values_ Perhaps these variables are categorical. Consider\n",
-          "to transform each variable into a factor with the Transform and\n",
-          "factor functions. To see examples enter:  > ?Transform\n", 
+          "to transform each variable into a factor with the\n",
+          "factor() function.j\n", 
           "Or, specify a value for n_cat, ",
           "such as:  > style(n_cat=4)\n", sep="")
       .dash(63)
@@ -167,33 +167,43 @@ function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
 
     n.miss_tot <- sum(is.na(data))
     
-    if (n.miss_tot > 0) {
+    if (n.miss_tot > 0) {  # missing data exists
       cat("Missing Data Analysis\n")
-      .dash(52)
+      .dash(60)
       
-      cat("n.miss ", "Observation\n")
+#     cat("n.miss ", "Observation\n")
+      bad <- integer(length=n.var)
       n.lines <- 0
       i <- 0
       while ( i<n.obs && n.lines>=0 ) {
         i <- i + 1
         n.miss <- sum(is.na((data)[i, ]))
-        if ( (n.miss >= n_mcut  || miss_zero) && (n.lines < miss_show) ) {
+        if ( (n.miss >= n_mcut) && (n.lines < miss_show) ) {
           n.lines <- n.lines + 1
-          cat(n.miss, "     ", row.names((data)[i, ]), "\n")
+#         cat(n.miss, "     ", row.names(data[i, ]), "\n")
+          bad[n.lines] <- i 
         }
         if (n.lines == miss_show) {
           n.lines <- -1
           cat("\nMore data rows have at least this many missing values: ",
               n_mcut, "\n",
-            "Specify n_mcut=2 to see those lines with 2 missing values, etc,",
-            "Or increase the default value of miss_show=30 to show more.\n")
+            " Specify n_mcut=2 to see those lines with at least",
+            "2 missing values, etc.\n",
+            " Or increase the default value of miss_show=30 to show more",
+            "rows of data with missing values.\n")
         }
-      }
-      cat("\n")
+      }  # end while
 
-      cat("Total number of cells in data table: ", n.var*n.obs,"\n")
-      cat("Total number of cells with the value missing: ", n.miss_tot,"\n")
-      .dash(52)
+      cat("Number of cells in the data table: ", n.var*n.obs,"\n")
+      cat("Number of missing data values: ", n.miss_tot,"\n")
+      cat("Proportion of missing data values: ",
+           round(n.miss_tot/(n.var*n.obs), 3), "\n")
+      if (n.lines > -1)
+        cat("Number of rows of data with missing values: ", n.lines,"\n")
+      .dash(60)
+      cat("\n")
+      print(data[bad, ])
+      .dash(60)
       cat("\n")
 
       if (miss_matrix && n.miss_tot>0) {
@@ -202,7 +212,7 @@ function(data=d, n_mcut=1, miss_zero=FALSE, max_lines=30,
         dimnames = list(row.names(data), as.character(1:n.var)) ))
       }
           
-    }
+    }  # end missing data processing
 
     else cat("No missing data\n\n")
   }

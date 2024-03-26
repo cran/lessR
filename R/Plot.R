@@ -1,6 +1,8 @@
 Plot <-
-function(x, y=NULL, data=d, rows=NULL, enhance=FALSE, 
-       stat="data", n_cat=getOption("n_cat"), n_bins=1,
+function(x, y=NULL, data=d, rows=NULL, 
+
+         stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
+         stat_x=c("count", "proportion", "%"),
 
          by=NULL, by1=NULL, by2=NULL,
          n_row=NULL, n_col=NULL, aspect="fill",
@@ -10,9 +12,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          color=NULL,
          transparency=getOption("trans_pt_fill"),
 
+         enhance=FALSE,
          size=NULL, size_cut=NULL, shape="circle", means=TRUE,
-         sort_yx=c("0", "-", "+"), 
          segments=FALSE, segments_y=FALSE, segments_x=FALSE,
+
+         sort_yx=c("0", "-", "+"), 
          jitter_x=0, jitter_y=0,
 
          ID="row.name", ID_size=0.60,
@@ -29,8 +33,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
          smooth=FALSE, smooth_points=100, smooth_size=1,
          smooth_exp=0.25, smooth_bins=128,
+         n_bins=1,
 
-         fit="off", fit_power=1, fit_se=0.95,
+         fit=c("off","loess", "lm", "ls", "null", "exp", "quad",
+               "power", "log"),
+         fit_power=1, fit_se=0.95,
          fit_color=getOption("fit_color"),
          plot_errors=FALSE, ellipse=0, 
 
@@ -42,46 +49,65 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
          show_runs=FALSE, stack=FALSE,
 
          xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-         lab_adj=c(0,0), margin_adj=c(0,0,0,0),
+         lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
 
          rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
          offset=getOption("offset"),
 
-         xy_ticks=TRUE, value_labels=NULL, origin_x=NULL,
-         scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
+         xy_ticks=TRUE, origin_x=NULL,
+         scale_x=NULL, scale_y=NULL,
+         pad_x=c(0,0), pad_y=c(0,0),
          legend_title=NULL,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-         eval_df=NULL, digits_d=NULL, quiet=getOption("quiet"),
-         do_plot=TRUE, width=NULL, height=NULL, pdf_file=NULL, 
-         fun_call=NULL, ...) {
+         quiet=getOption("quiet"), do_plot=TRUE,
+         pdf_file=NULL, width=6.5, height=6, 
+         digits_d=NULL,
+
+         n_cat=getOption("n_cat"), value_labels=NULL,
+
+         eval_df=NULL, fun_call=NULL, ...) {
+
 
   if (is.null(fun_call)) fun_call <- match.call()
 
-  if (fit == "sqrt") {
-    fit <- "quad"  # new value
-    message("parameter value  sqrt  replaced with  quad  for consistency\n")
+  stat.miss <- ifelse (missing(stat), TRUE, FALSE)
+  stat_x.miss <- ifelse (missing(stat_x), TRUE, FALSE)
+  if (stat[1] != "data") stat <- match.arg(stat)  # if condition for shiny
+  stat_x <- match.arg(stat_x)
+
+  if (!stat.miss && !stat_x.miss ) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Cannot specify both parameters:  stat  and  stat_x\n\n")
   }
-  if (fit == "reciprocal") {
-    fit <- "exp"  # new value
-    message("parameter value  reciprocal  replaced with  exp\n")
+  y.miss <- ifelse (missing(y), TRUE, FALSE)
+  if (!stat_x.miss && !y.miss ) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Use parameter  stat to aggregate numerical variable y.\n",
+      "Parameter  stat_x  is only for the categorical variable x.\n\n")
   }
-  if (fit == "root") {
-    fit <- "power"  # new value
-    message("parameter value  root  replaced with  power  for consistency\n")
+  if (stat_x.miss) stat_x <- "count"
+  if (stat.miss) stat <- "data"  # no aggregation
+  if (stat.miss  &&  !stat_x.miss) stat <- stat_x
+
+  if (is.logical(fit[1])) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Now specify a value for  fit  such as \"loess\" or \"lm\".\n\n")
   }
 
-  if (fit %in% c("xlog", "xylog")) {
+  if (fit[1] %in% c("xlog", "xylog")) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Parameters  xlog  and  xylog  not yet implemented.\n\n")
   }
+
+  fit.ln <- ifelse (!missing(fit), match.arg(fit), "off") 
 
   # a dot in a parameter name to an underscore and more
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      if (names(dots)[i] == "stat_x") stat <- dots[[i]]
+#     if (names(dots)[i] == "stat_x") stat <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
       if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
@@ -107,13 +133,13 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   cl.miss <- ifelse (missing(center_line), TRUE, FALSE)
   center_line <- match.arg(center_line)
 
-  data.do <- ifelse ((stat == "data"), TRUE, FALSE)
+  data.do <- ifelse (stat == "data", TRUE, FALSE)
 
   proportion <- FALSE  # old signal, adjusted below if needed
   if (stat == "proportion") proportion <- TRUE
 
   if (plot_errors)
-    if (fit == "off") fit <- "lm"
+    if (fit.ln == "off") fit <- "lm"
 
   if (length(pad_x) == 1) {  # only the first element of pad_x specified
     temp <- pad_x
@@ -150,7 +176,6 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   ellipse_color <- getOption("ellipse_color")
   ellipse_lwd <- getOption("ellipse_lwd")
 
-  if (fit == "ls") fit <- "lm"  # new value
   fit_lwd <- getOption("fit_lwd")
   se_fill <- getOption("se_fill")
 
@@ -187,12 +212,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   # missing function only reliable if arg not modified, so capture 
   x.miss <- ifelse (missing(x), TRUE, FALSE)
-  y.miss <- ifelse (missing(y), TRUE, FALSE)
   by.miss <- ifelse (missing(by), TRUE, FALSE)  # interact sets
   by1.miss <- ifelse (missing(by1), TRUE, FALSE)
   by2.miss <- ifelse (missing(by2), TRUE, FALSE)
   size.miss <- ifelse (missing(size), TRUE, FALSE)
-  stat.miss <- ifelse (missing(stat), TRUE, FALSE)
   radius.miss <- ifelse (missing(radius), TRUE, FALSE)
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   if (is.null(fill)) fill.miss <- TRUE  # shiny sets fill at NULL if by var
@@ -239,7 +262,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     if (ellipse.miss) ellipse <- 0.95
     if (MD.miss) MD_cut <- 6
     if (add_miss) add <- "means"
-    if (fit.miss) fit <- "lm"
+    if (fit.miss) fit.ln <- "lm"
   }
 
   # run chart settings
@@ -264,28 +287,16 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   txdif <- ""  # used to transfer output for diffs of two vars Cleveland sp
   
-  xlab_adj <- lab_adj[1];   ylab_adj <- lab_adj[2]
-  tm.adj <- margin_adj[1];  rm.adj <- margin_adj[2]
-  bm.adj <- margin_adj[3];  lm.adj <- margin_adj[4]
+  xlab_adj <- lab_adjust[1];   ylab_adj <- lab_adjust[2]
+  tm.adj <- margin_adjust[1];  rm.adj <- margin_adjust[2]
+  bm.adj <- margin_adjust[3];  lm.adj <- margin_adjust[4]
   
   date.ts <- FALSE  # default is not a time series
   freq.poly <- FALSE  # default is not a frequency polygon
 
-  if (!fit_se.miss) if (missing(fit))  fit <- "loess"
+  if (!fit_se.miss) if (missing(fit))  fit.ln <- "loess"
   if (fit_se.miss && plot_errors) fit_se <- 0  # default for plot_errors
-  if (!by.miss && fit_se.miss && fit!="off") fit_se <- 0  # default for by 
-
-  if (is.logical(fit))
-    fit.ln <- ifelse (fit, "loess", "off")
-  if (is.character(fit)) {
-    if (!(fit %in% c("loess", "lm", "off", "ls", "null", "exp", "quad",
-                     "power", "log"))) { 
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "fit only for loess (non-linear), lm (linear), or null (null model),\n",
-        "exp (exponential), log (log), quad (quadratic), power (any power)\n\n")
-    }
-    fit.ln <- fit  # fit.ln passed to .plt.main
-  }
+  if (!by.miss && fit_se.miss && fit.ln!="off") fit_se <- 0  # default for by 
 
   # any bin parameter activates bins for VBS plot, or freq.poly=TRUE
   if (!missing(breaks)  ||  !missing(bin_start)  ||  !missing(bin_width)  ||
@@ -778,9 +789,9 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
    # .plt.by.legend, plt.main #818, needs levels(by)
     if (!is.factor(by.call)) by.call <- factor(by.call) 
 
-    if (shape.miss) {
+    if (shape.miss || shape[1]=="vary") {
       by.unq <- length(unique(by.call))
-      shp <- .plt.shapes(shape, out_shape, lvl=by.unq)
+      shp <- .plt.shapes(shape, out_shape, n.by=by.unq)
       shape <- shp$shape
     }
   }
@@ -1257,17 +1268,11 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   # object now determined: "both", "point", "bubble", or "sunflower"
 
   # bubble size
-  if (radius.miss) {
+  if (radius.miss)
     radius <- ifelse (length(size) > 1, .12, .22)
-  }
 
   # size of lines for line chart
-  if (object == "both") {
     size.ln <- lwd  # size of lines
-    if (lwd.miss && Trellis) size.ln <- 1.5  # smaller default for Trellis
-  }
-  else
-    size.ln <- 1  # could be NULL?
   
   # size of fit line
   # windows line too thin at 1, but no increments allowed, and 2 is too thick
@@ -1298,19 +1303,10 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
     }  # end both
   }
 
-  # get fill and color
-# if (!is.null(clr.org))  # reset for shiny (clr.org <- color)
-#   if (df.name == "NULL"  &&  clr.org == "off") {
-#     fill.miss <- TRUE
-#     color.miss <- TRUE
-#     color <- NULL
-#     pt.size <- 0
-#     size.ln <- 2
-#   }
   ord.by.call <- is.ordered(by.call)
   fc <- .plt.colors(object, nn_col, n.by, theme, fill, fill.miss,
-            color, color.miss, area_fill, area_fill.miss, trans, stack,
-            n.ycol, n.y_var, ord.by.call, run, pt.size)
+          color, color.miss, area_fill, area_fill.miss, trans, stack,
+          n.ycol, n.y_var, ord.by.call, run, pt.size)
 
   pt.fill <- fc$pt_fill
   pt.color <- fc$pt_col
@@ -1522,7 +1518,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
   else if (spmat && do_plot) {
     bckg <- ifelse(panel_fill=="transparent",
                    getOption("window_fill"), panel_fill)
-    .plt.mat(data.x, fit=fit, col_fill=pt.fill, col_color=pt.color,
+    .plt.mat(data.x, fit=fit.ln, col_fill=pt.fill, col_color=pt.color,
                      col.bg=bckg, col_trans=pt.trans,
                      pt.size=pt.size, size.miss=size.miss)
   }
@@ -1547,7 +1543,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
 
   else { 
 
-    if (stat %in% c("sum", "mean", "sd", "dev", "min", "median", "max")) {
+    if (stat %in% c("sum", "mean", "sd", "deviation", "min", "median", "max")) {
 
       n_cat <- 0
       means <- FALSE
@@ -1595,7 +1591,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
         ylab <- paste("Standard Deviation of", y.name)
         out <- tapply(y.call[,1], x.call[,1], sd, na.rm=TRUE)
       }
-      if (stat == "dev") {
+      if (stat == "deviation") {
         ylab <- paste("Mean Deviations of", y.name)
         out <- tapply(y.call[,1], x.call[,1], mean, na.rm=TRUE)
         out <- out - mean(out, na.rm=TRUE)
@@ -1866,7 +1862,7 @@ function(x, y=NULL, data=d, rows=NULL, enhance=FALSE,
           if (n_bins == 1) {  # if binning, .plt.bins does its own output
 
             o <- .plt.txt(x.call, y.call, stat, object, cat.x, cat.y,
-              xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat,
+              xlab, ylab, fit.ln, n.by, mse, b0, b1, Rsq, by.cat,
               center_line, run, show_runs,
               proportion, size, radius, digits_d, fun_call, txdif)
 

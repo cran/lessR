@@ -7,7 +7,7 @@
 \description{
 Deprecated Names: \code{set}, \code{theme}
 
-The color and style attributes of each plot can be set as a general theme, or individually set from the following list of attributes. For convenience, groups of these attributes are specified to define color themes, plus style sub-themes that apply to any theme, with default values:  \code{theme="lightbronze"} and \code{sub_theme="default"}. To reset to the default theme: \code{style()}. 
+The color and style attributes of each plot can be set as a general theme, or individually set from the following list of attributes. For convenience, groups of these attributes are specified to define color themes, plus style sub-themes that apply to any theme, with default values:  \code{theme="colors"} and \code{sub_theme="default"}. To reset to the default theme: \code{style()}. 
 }
 
 \usage{
@@ -296,10 +296,9 @@ set(\dots)
 
   \item{n_cat}{Number of categories that specifies the largest number of unique
         equally-spaced values of variable of a numeric data type for which the
-        variable will be analyzed as categorical. Applies to
-        \code{\link{ScatterPlot}} and 
-        \code{\link{SummaryStats}}, and also to the functions such as 
-        \code{\link{Histogram}} when processing multiple graphs.}
+        variable will be analyzed as categorical. Default value is 0.
+        \emph{[deprecated]}: Best to convert a categorical integer variable
+        to a factor.}
   \item{suggest}{If \code{TRUE}, then provide suggestions for alternative analyses.}
   \item{notes}{If \code{TRUE}, then provide notes.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change system default

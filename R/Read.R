@@ -41,12 +41,14 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
   .param.old(...)
 
   miss.format <- ifelse (missing(format), TRUE, FALSE)
-  fmts <- c("text", "csv", "tsv", "Excel", "ODS", "R", "SPSS", "SAS", "Stata")
+  fmts <- c("text", "csv", "tsv", "Excel", "ODS", "R", "SPSS", "SAS", "Stata",
+            "feather", "parquet")
   if (!is.null(format)) {
     if (!(format %in% c(fmts, "lessR"))) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
           ">>> Specified format must be one of:\n",
-               "\"text\", \"Excel\", \"R\", \"SPSS\", \"SAS\",\n\n")
+               "\"text\", \"Excel\", \"R\", \"feather\", \"parquet\",
+                \"SPSS\", \"SAS\",\n\n")
     }
     if (format %in% c("text", "tsv")) format <- "csv"
 
@@ -87,6 +89,8 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
     else if (grepl(".sas7bdat$", from)) format <- "SAS"
     else if (grepl(".ods", from)) format <- "ODS"
     else if (grepl(".xls$", from) || grepl(".xlsx$", from)) format <- "Excel"
+    else if (grepl(".feather", from)) format <- "feather"
+    else if (grepl(".parquet", from)) format <- "parquet"
 
     if (is.null(format)) {
       df <- list.files(system.file("data", package="lessR"))
@@ -123,6 +127,14 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
       txt <- "Schutten and Chan's readODS package]"
       cat("[with the read_ods() function from", txt, "\n")
     }
+    if (format == "feather") {
+      txt <- "Richardson's et al. arrow package]"
+      cat("[with the read_feather() function from", txt, "\n")
+    }
+    if (format == "parquet") {
+      txt <- "Richardson's et al. arrow package]"
+      cat("[with the read_parquet() function from", txt, "\n")
+    }
 
     if (browse) {
       cat("\n")
@@ -149,6 +161,15 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
            call. = FALSE)
     }
   }
+
+  if (format %in% c("feather", "parquet")) {
+    if (!requireNamespace("arrow", quietly=TRUE)) {
+      stop("Package \"arrow\" needed to read this file\n",
+           "Please install:  install.packages(\"arrow\")\n\n",
+           call. = FALSE)
+    }
+  }
+
 
   if (format %in% c("fwd", "csv")) {  # text file
 
@@ -195,6 +216,17 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
 
  }  # end text file
 
+
+  if (format %in% c("feather", "parquet")) {  # arrow file
+
+    if (format=="feather")
+      d <- arrow::read_feather(file=from, ...)
+
+    else if (format=="parquet") 
+      d <- arrow::read_parquet(file=from, ...)
+  }
+
+
   else if (format == "ODS") {
 
     if (!var_labels) {
@@ -209,6 +241,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
         d <- readODS::read_ods(from, sheet=sheet, row_names=FALSE, ...)
     }
 
+
     else {
       d <- readODS::read_ods(from, sheet=sheet,
                                col_names=FALSE, row_names=TRUE)
@@ -221,6 +254,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
       }
     }
   }   # end (format == "ODS")
+
 
   else if (format == "Excel") {
 
@@ -254,6 +288,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
      d[fnu.col] <- lapply(d[fnu.col], as.integer) # move to integer
 
   }  # end (format == "Excel")
+
 
   else if (format == "SPSS") {  # data and any labels
     cat("[with read_spss() from the haven package]\n")
@@ -310,6 +345,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
     d <- get(dname, pos=x.env)
   }
 
+
   else if (format == "lessR") {  # data and any labels
     txt <- ifelse (substr(from,1,4) == "data", "", "data")
     file.name <- paste(txt, from, ".rda", sep="")
@@ -338,7 +374,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
     d <- get(dname, pos=x.env)
   }  # end (format == "lessR")
 
-  # check for valid characters in the variable names
+  # check for valid characters in the variable names for text files
   if (format %in% c("csv", "Excel")) {
     dg <- character(length=10)
     for (i in 0:9) dg[i+1] <- as.character(i)
@@ -381,12 +417,15 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
     if (getOption("suggest")) {
       if (brief || !grepl("var_labels", fncl))
         cat("\n>>> Suggestions\n")
-      if (!grepl("var_labels", fncl)  &&  format != "lessR")
-        cat("To read a csv or Excel file of variable labels, var_labels=TRUE\n",
-            "  Each row of the file:  Variable Name, Variable Label\n",
-            "Read into a data frame named l  (the letter el)\n\n", sep="")
+        cat("Recommended binary format for data files: feather\n",
+            " Create with Write(d, \"your_file\", format=\"feather\")\n")
+        if (!grepl("var_labels", fncl)  &&  format != "lessR")
+          cat("To read a csv or Excel file of variable labels",
+              "var_labels=TRUE\n",
+              "  Each row of the file:  Variable Name, Variable Label\n",
+              "Read into a data frame named l  (the letter el)\n\n", sep="")
       if (brief) {
-        cat("Details about your data, Enter:  details()  for d, or",
+        cat("More details about your data, Enter:  details()  for d, or",
            " details(name)\n")
       }
       cat("\n")
@@ -397,7 +436,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
   # feedback
   # --------
   if (!quiet  &&  is.data.frame(d))
-    details(d, n_mcut, miss_zero, max_lines, miss_show,
+    details(d, n_mcut, max_lines, miss_show,
                       miss_matrix, var_labels, brief)
   else
     cat("\n")

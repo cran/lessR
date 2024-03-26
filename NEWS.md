@@ -1,8 +1,40 @@
+# lessR version 4.3.1, Mar 26, 2024
+
+## Updates
+
+* `BarChart()`: Parameter `top` added to retain only the specified number of levels of the `x` categorical variable, the first variable listed in the function call, generally applied to a sorted distribution with `sort="+"` or `sort="-"` to retain the first minimum or maximum values of the numerical value `y` to plot for a large number of categories.
+
+* `BarChart()`: Parameter `stat_x` added to specify how to plot the `y`-axis if there is no `y` variable specified, with default value of `counts` and option `proportion` or `%`. These values are separated from the `stat` parameter which now exclusively pertains to the transformation of a specified `y` numerical variable.
+
+* `BarChart()`, `Histogram()`, `Plot()`: Parameters `lab_adj`, `margin_adj`, and `legend_adj` renamed for clarity to `lab_adjust`, `margin_adjust`, and `legend_adjust`.
+
+* `pivot()`: When pivot table is of counts, using function `table`, the values of `n` and `na` are now listed last in the resulting pivot table.
+
+* `Plot()`: `shape` parameter default for multiple groups according to parameter `by` returns to `"circle"` with the new `shape` value `"vary"` if desired to retain a sequence of default shapes across the different groups.
+
+* `Plot()`: `fit` parameter now set only to the values that it can analyze such as `lm`, so no longer can be set to TRUE or FALSE.
+
+* `Read()` and `Write()`: Support the modern, fast, and efficient data file formats from the `arrow` package, `feather` and `parquet`.
+
+* `details()`: Shows the proportion of all missing data values in addition to the total, and displays each row of data with missing data, also obtained with `Read()` when `brief=FALSE`.
+
+* `details()`: `miss_zero` parameter removed.
+
+* `rename()`: Parameter `to` can now specify a vector of names to change, with the corresponding `from` vector of new names.
+
+
+## Bug Fixes
+
+* `BarChart()`: If a numerical y variable is specified for analysis of the original,raw data, then if a value of the `stat` parameter is not specified its value now defaults to `"mean"`.
+
+* `Plot()`: If a time series is plotted from a x-axis variable that is not of type `Date`, then, setting `segments=TRUE` connects the points (which can vanish if `size=0`), but the line width parameter `lwd` was previously not responsive in this context.
+
+
 # lessR version 4.3.0, Nov 11, 2023
 
 ## Updates
 
-* `Logit(), Regression()`: For categorical predictor variables, the conversion to indicator variables now happens before the analysis. All analyses are now only of numeric variables so that the correlation matrix, scatterplot matrix, tolerance, and best subset analyses are now conducted.
+* `Logit(), Regression()`: For categorical predictor variables, the conversion to indicator variables now happens before the analysis. All analyses are now only of numeric variables so that the correlation matrix, scatterplot matrix, tolerance, and best subset analyses are now conducted for categorical predictor variables.
 
 * `Logit(), Regression()`: Redundant predictor variables that lead to a singularity is now detected and noted instead of the function crashing.
 
@@ -22,7 +54,7 @@
 * `BarChart()`: Missing data is now permitted for the numerical or `y` variable.
 
 * `pivot()`: Aggregated variables are named the original name of the aggregated variable concatenated with an underscore and the name of the operation.
-    
+
 * `Plot()`: For plots of two or more variables, the right-margin legend is displayed with a smaller font size and centered more effectively.
 
 * `prob_norm()`: Function terminates if value of `lo` is greater than `hi` instead of returning a meaningless result.
@@ -70,7 +102,7 @@
 
 * `Plot()`: Parameters `lab_cex` and `axis_cex` for size of value labels and axis labels, scaled smaller for visualizations in R run alone, without RStudio.
 
-* `Plot()`: To address color blindness, when there is a `by` grouping, default is now to not only vary the fill color but also the shape of the plotted points. 
+* `Plot()`: To address color blindness, when there is a `by` grouping, default is now to not only vary the fill color but also the shape of the plotted points.
 
 * `Regression()`: Parameter `mod` for moderation analysis in a two-predictor model added.
 
@@ -92,7 +124,7 @@
 * `Plot()`: With a linear fit line, b0 and b1 now reflect the specified number of digits according to parameter `digits_d`.
 
 * `Plot()`: For  plotting a continuous and a categorical variable scatterplot, when listing the continuous variable first, the name of the categorical variable is now listed in the title of the text output.
- 
+
 * `Plot()`: For a run chart with parameter `run=TRUE`, parameter `scale_x` now properly allows for a custom set of ticks for the `Index` on the x-axis.
 
 
@@ -100,7 +132,7 @@
 # lessR version 4.2.5, Jan 5, 2023
 
 ## Primary Update
- 
+
 * `Histogram()`, `Plot()`, `Correlation()`, `ttest()`: Vastly speeded up for data sets much over 500 data values, substantial improvement on large data sets.
 
 
@@ -168,7 +200,7 @@
 * `Plot()`: Transparency (trans parameter) now works when size as a variable and by are activated.
 
 * `Plot()`: for a `fit` function, mse now properly computed.
- 
+
 * `recode()`: Entire data frame now not written to the console.
 
 * `Regression()`: Text enlarged for scatterplot matrix.
@@ -234,9 +266,9 @@
 
 * `Logit()`: Confusion matrix now displayed even if all predictions are for a single outcome category.
 
-* `pivot()`: If not specified, output defaults to 3 decimal digits, otherwise displays the needed number of decimal digits to avoid rounding to 0.000.  
+* `pivot()`: If not specified, output defaults to 3 decimal digits, otherwise displays the needed number of decimal digits to avoid rounding to 0.000.
 
-* `pivot()`: For consistency, parameter `n_show_group` changed to `n_group_show`.  
+* `pivot()`: For consistency, parameter `n_show_group` changed to `n_group_show`.
 
 * `Plot()`: New parameter `n_bins` > 1 indicates to bin the numeric x-variable and plot the mean or median of the numeric y-variable for each bin, with each point size dependent on the corresponding bin sample size.
 
@@ -260,7 +292,7 @@
 
 ## Updates
 
-* `interact()`: Each interactive display now shows the underlying function call. 
+* `interact()`: Each interactive display now shows the underlying function call.
 
 * `Plot()`: If `x` is equally spaced, a line chart not default if a `fit` line.
 
@@ -309,7 +341,7 @@
 ## Bug Fixes
 
   * `Plot()`: a `--run-donttest` test example was improperly configured, now works
-  * `Plot()`: Plotting a vector for `x` or `y` with `fit` now works 
+  * `Plot()`: Plotting a vector for `x` or `y` with `fit` now works
 
 
 # lessR version 4.1.8, April 27, 2022
@@ -326,7 +358,7 @@
 
 * `data set`:  `dataAnova_sp` data set for split-plot design ANOVA added
 
-* `interact()`: More colors added 
+* `interact()`: More colors added
 
 * `interact()`: Trellis plot has added `violin_fill` and `box_fill` parameters
 
@@ -355,7 +387,7 @@
 
 * `Plot()`: Bubble plot transparency option now works with parameter `trans`
 
-* `Plot()`: Bubble plot `fill` and `color` now properly specified 
+* `Plot()`: Bubble plot `fill` and `color` now properly specified
 
 
 # lessR version 4.1.7, March 30, 2022
@@ -464,7 +496,7 @@ threshold, the `x`-cutoff value now provided
 
 * `Logit()`: For a single predictor variable, if the response `y` is non-numeric, then the value set at 1 has the highest mean, for a positive difference
 
-* `Logit()`: For a single predictor variable, logistic curve better labeled 
+* `Logit()`: For a single predictor variable, logistic curve better labeled
 
 * `Nest()`: If response variable is a character variable, automatically converted to a `factor` to allow to run without an error
 
@@ -659,9 +691,9 @@ threshold, the `x`-cutoff value now provided
 * `ANOVA()`: Scatterplot for 1-way ANOVA now has means plotted in a dark red instead of a dark gray
 
 * `BarChart()`: Tilde removed from each label if for a `by` variable in the legend where it is nonfunctional
- 
+
 * `pivot()`: User defined functions accounted for and named in the output
- 
+
 * `pivot()`: When analysis of all data values, dropped the `Grand_Stat` label
 
 * `Plot()`: Point color and fit line now a little darker and complements of each other, `plot_errors` segments a little darker as well
@@ -680,7 +712,7 @@ threshold, the `x`-cutoff value now provided
 ## Bug Fixes
 
 * `BarChart()`: Two variable chart with parameters `x` and `by` specified now correctly displays a color range when the style is not the default theme
- 
+
 * `BarChart()`: Base R `text()` function misleadingly displays text at size 1 if a value of 0 is entered, lessR functions that rely on the R text function now fixed by changing an input value of 0 to 0.01
 
 * `pivot()`: Output variables now properly named
@@ -719,7 +751,7 @@ threshold, the `x`-cutoff value now provided
 
 * `Plot()`: Parameter `by` works again for VBS plots, multiple plots on same panel
 
-* `Plot()`: Parameter `color` now works in conjunction with the `by` parameter 
+* `Plot()`: Parameter `color` now works in conjunction with the `by` parameter
 
 * `Plot()`: Applied to a scatterplot of two continuous variables:\cr
   if `color` is set to `"off"` (or `"transparent"`), a requested `fit line` still displays\cr
@@ -728,14 +760,14 @@ threshold, the `x`-cutoff value now provided
   default outlier shape in gray scale changes to diamond as documented
 
 
-# lessR version 4.0.2, August 5, 2021 
+# lessR version 4.0.2, August 5, 2021
 
 ## Updates
 
 * `BarChart()`: For a two categorical variable bar chart, the `legend` labels are by default no longer abbreviated, instead sufficient room is generated by the plot
- 
+
 * `BarChart()`: New parameter `legend_abbrev` allows for the specification of the maximum number of characters to display for the `legend` labels
- 
+
 * `BarChart()`: For a two categorical variable bar chart, better default placement of the `legend` new parameter `legend_adj` allows for horizontal adjustment of the `legend`
 
 
@@ -749,7 +781,7 @@ threshold, the `x`-cutoff value now provided
 
 
 
-# lessR version 4.0.1, June 6, 2021 
+# lessR version 4.0.1, June 6, 2021
 
 ## Updates
 
@@ -789,7 +821,7 @@ threshold, the `x`-cutoff value now provided
 
 * `pivot()`: Parameter `na_by` renamed to `na_by_show` to better communicate its meaning skew and kurtosis added to the list of available descriptive statistics
 
-* `pivot()`: Parameter `q_num` specifies number of intervals for quantiles 
+* `pivot()`: Parameter `q_num` specifies number of intervals for quantiles
 
 * `pivot()`: Parameter `rows` subsets rows of the data frame for analysis
 
@@ -801,7 +833,7 @@ threshold, the `x`-cutoff value now provided
 
 * `Plot()`: If multiple `x` or `y` variables, text correlation analysis displayed for each combination
 
-* `Plot()`: If a `by` variable, then text correlation for each level not yet available, so not displayed 
+* `Plot()`: If a `by` variable, then text correlation for each level not yet available, so not displayed
 
 * `Plot()`: Default for plotting a fit line with by groups is to not plot the standard errors because the plot becomes overcrowded
 
@@ -819,11 +851,11 @@ threshold, the `x`-cutoff value now provided
 
 * `prob_tcut()`: Cutoff is returned as the value of the function, not just printed
 
-* `Prop_test()`: New function for the analysis of proportions: test of homogeneity for one or more samples based on the proportion of successes for a specific value of a variable, and for a single sample, goodness-of-fit for a single categorical variable and test of independence for two categorical variables 
+* `Prop_test()`: New function for the analysis of proportions: test of homogeneity for one or more samples based on the proportion of successes for a specific value of a variable, and for a single sample, goodness-of-fit for a single categorical variable and test of independence for two categorical variables
 
 * `Prop_test()`: `prop` is alias
-  
-* `recode()`: Changed to lower case function name 
+
+* `recode()`: Changed to lower case function name
 
 * `rescale()`: Changed to lower case function name
 
@@ -859,7 +891,7 @@ threshold, the `x`-cutoff value now provided
 * `Plot()`: Bubble plot frequency matrix plot `x`-axis works with binary response
 
 * `Plot()`: `area_fill` works correctly
- 
+
 * `ttest()`: For paired analysis, `x`-axis properly labeled Difference
 
 `
