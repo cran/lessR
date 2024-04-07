@@ -289,8 +289,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
 
         a <- as.matrix(a)  # turn vector a into a data frame
         a <- data.frame(t(a))
-pn("1")
-print(a)
         txt <- ifelse (n.cmp == 1, nm.cmpt[1], "Stat")
         if (!(txt %in% c("Stat", "sd")))
           substr(txt,1,1) <- toupper(substr(txt,1,1))
@@ -308,8 +306,6 @@ print(a)
             out[j] <- eval(parse(text=f.call))  # evaluate compute function
           }  # end j
             a <- data.frame(rbind(a, c(n, na, out)))  # a has multiple rows
-pn("2")
-print(a)
         }  # end i
 
         names(a) <- c("n", "na", nm.cmpt)
@@ -392,8 +388,6 @@ print(a)
       }
       else
         a <- as.data.frame(a)
-pn("4")
-print(a)
       if (n.by == 1) names(a)[1] <- deparse(substitute(variable))
       names(a)[ncol(a)] <- "n"
 

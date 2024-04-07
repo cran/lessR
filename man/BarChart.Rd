@@ -32,9 +32,15 @@ BarChart(
         stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
         stat_x=c("count", "proportion"),
 
-        # --------------------
-        # Trellis (facet) plot
+        # --------------------------------------------------
+        # Trellis (facet) plot, plotting on different panels
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
+        
+        # -------------------------------
+        # Layout and ordering of the bars
+        horiz=FALSE, sort=c("0", "-", "+"),
+        beside=FALSE, stack100=FALSE,
+        gap=NULL, scale_y=NULL, one_plot=NULL,
 
         # ----------------------------------------------------------------
         # Analogy of physical Marks on paper to create the bars and labels
@@ -50,12 +56,6 @@ BarChart(
         values_digits=getOption("values_digits"),
         values_position=getOption("values_position"),
         values_cut=NULL,
-        
-        # -------------------------------
-        # Layout and ordering of the bars
-        horiz=FALSE, sort=c("0", "-", "+"),
-        beside=FALSE, stack100=FALSE,
-        gap=NULL, scale_y=NULL, one_plot=NULL,
 
         # ------------------------------------------------------------------
         # Labels for axes, values, and legend if x and by variables, margins
@@ -129,10 +129,11 @@ bc(\dots)
        parameter, to retain either the specified largest or smallest values of
        the \code{x}
        categorical variable. If \code{by} is active, then the retention
-       is based on the sum of the \code{by} variable for each level of \code{x}}.
+       is based on the sum of the \code{by} variable for each level of \code{x}.}
   \item{stat}{Statistical transformation of the data for the y-axis across
        groups defined by the categorical variable(s), the data aggregation. 
-       Values include \code{"mean"}, \code{"sd"}, etc.}
+       Applicable values: \code{"sum"}, \code{"mean"}, \code{"sd"}, \code{"dev"}
+       for mean deviations, \code{"min"}, \code{"median"}, and \code{"max"}.}
   \item{stat_x}{When no \code{y} variable is specified, either do the
         default \code{count} of each group or the \code{proportion}.}\cr
 
@@ -156,6 +157,34 @@ bc(\dots)
         Set to \code{"xy"} to specify a ratio calculated
         to "bank" to 45 degrees, that is, with the line slope approximately
         45 degrees.}\cr
+
+  \item{horiz}{\bold{Bar orientation.} By default the value is
+      \code{FALSE} so bars are vertical,
+       unless \code{one_plot} is \code{TRUE}.}
+  \item{sort}{Sort the categories by their frequency for one variable and by
+        the column sums if a \code{by} variable. Not applicable to Trellis plots.
+        By default \code{"0"} for no sort, or sort descending \code{"-"} or
+        ascending \code{"+"}, unless \code{one_plot} is \code{TRUE}, then is
+        set to \code{"+"}.}
+  \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
+       first variable to be plotted as adjacent bars instead of stacked on each
+       other.}
+  \item{stack100}{100\% stacked bar chart when a \code{by} variable is present,
+       also activated by setting \code{stat_x} to \code{"proportion"} with a
+       \code{by} variable.}
+  \item{gap}{Gap between bars. Provides the value of the \code{space} option from
+       the standard R \code{\link{barplot}} function with a default of 0.2 unless two
+       variables are plotted and beside=\code{TRUE}, in which case the default is
+       c(.1,1).}
+  \item{scale_y}{If specified, a vector of three values that define the
+        numerical values of the y-axis, the numerical axis, within the bounds of
+        plot region: starting value, ending value, and number of intervals.}
+  \item{one_plot}{For bar charts of multiple x-variables, indicates
+       if a bar plot is produced for each x-variable, or all are combined
+       into a single plot, such as for items that all share common responses
+       such as survey data with a common Likert scale across variables.
+       Default is if variables share a common response scale
+       set to \code{TRUE}, otherwise \code{FALSE}.}\cr
 
   \item{theme}{Theme for the \bold{colors} for this analysis. Make persistent
         across analyses with \code{\link{style}}.}
@@ -212,34 +241,6 @@ bc(\dots)
        equals \code{"out"}, then default is 0.028 unless there is a
        \code{by} variable or multiple x-variables on the same plot, then
        default is 0.040}\cr
-
-  \item{horiz}{\bold{Bar orientation.} By default the value is
-      \code{FALSE} so bars are vertical,
-       unless \code{one_plot} is \code{TRUE}.}
-  \item{sort}{Sort the categories by their frequency for one variable and by
-        the column sums if a \code{by} variable. Not applicable to Trellis plots.
-        By default \code{"0"} for no sort, or sort descending \code{"-"} or
-        ascending \code{"+"}, unless \code{one_plot} is \code{TRUE}, then is
-        set to \code{"+"}.}
-  \item{beside}{For a two variable plot, set to \code{TRUE} for the levels of the
-       first variable to be plotted as adjacent bars instead of stacked on each
-       other.}
-  \item{stack100}{100\% stacked bar chart when a \code{by} variable is present,
-       also activated by setting \code{stat_x} to \code{"proportion"} with a
-       \code{by} variable.}
-  \item{gap}{Gap between bars. Provides the value of the \code{space} option from
-       the standard R \code{\link{barplot}} function with a default of 0.2 unless two
-       variables are plotted and beside=\code{TRUE}, in which case the default is
-       c(.1,1).}
-  \item{scale_y}{If specified, a vector of three values that define the
-        numerical values of the y-axis, the numerical axis, within the bounds of
-        plot region: starting value, ending value, and number of intervals.}
-  \item{one_plot}{For bar charts of multiple x-variables, indicates
-       if a bar plot is produced for each x-variable, or all are combined
-       into a single plot, such as for items that all share common responses
-       such as survey data with a common Likert scale across variables.
-       Default is if variables share a common response scale
-       set to \code{TRUE}, otherwise \code{FALSE}.}\cr
 
   \item{xlab}{\bold{Axis label} for \code{x}-axis. 
        If \code{xlab} is not specified, then the label becomes

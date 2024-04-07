@@ -1,3 +1,12 @@
+# lessR version 4.3.2, Apr 07, 2024
+
+## Updates
+
+## Bug Fixes
+
+* `pivot()`: Fixed a bug on the output. The results were correct but not formatted correctly.
+
+
 # lessR version 4.3.1, Mar 26, 2024
 
 ## Updates

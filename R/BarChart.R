@@ -1,10 +1,15 @@
 BarChart <-
 function(x=NULL, y=NULL, by=NULL, data=d,
         rows=NULL, top=NULL,
+
         stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
         stat_x=c("count", "proportion"),
 
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
+
+        horiz=FALSE, sort=c("0", "-", "+"),
+        beside=FALSE, stack100=FALSE,
+        gap=NULL, scale_y=NULL, one_plot=NULL,
 
         theme=getOption("theme"),
         fill=NULL,
@@ -18,10 +23,6 @@ function(x=NULL, y=NULL, by=NULL, data=d,
         values_digits=getOption("values_digits"),
         values_position=getOption("values_position"),
         values_cut=NULL,
-
-        horiz=FALSE, sort=c("0", "-", "+"),
-        beside=FALSE, stack100=FALSE,
-        gap=NULL, scale_y=NULL, one_plot=NULL,
 
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
         lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),

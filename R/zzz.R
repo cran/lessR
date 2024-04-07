@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.3.1                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.3.2                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
