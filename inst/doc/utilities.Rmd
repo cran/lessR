@@ -223,13 +223,13 @@ dl <- reshape_long(d, sup1:sup4)  # convert to long-form
 Convert back to wide form. 
 
 ```{r}
-reshape_wide(dl, group="Group", response="Value", ID="Person")
+reshape_wide(dl, group="Group", response="Response", ID="Person")
 ```
 
 Here covert with the name of the response prefixed to the column names.
 
 ```{r}
-reshape_wide(dl, group="Group", response="Value", ID="Person",
+reshape_wide(dl, group="Group", response="Response", ID="Person",
              prefix=TRUE, sep=".")
 ```
 

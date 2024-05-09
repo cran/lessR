@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.3.2                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.3.3                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -40,18 +40,18 @@ function(...) {
            "#9A84D6", "#00A898", "#C97E5B", "#909711", "#00A3BA", "#D26FAF",
            "#00A76F", "#BD76CB" ))  # getColors("hues")
   options(bar_fill_cont = rgb(150,170,195, maxColorValue=255))
-  options(trans_bar_fill = 0.0)
+  options(trans_bar_fill = 0.10)
   options(bar_color = rgb(132,150,175, maxColorValue=255))
   options(bar_color_discrete = "transparent")
   options(bar_color_cont = rgb(132,150,175, maxColorValue=255))
-  options(values = "%")
-  options(values_color = "white")
-  options(values_size = 0.75)
-  options(values_digits = NULL)
-  options(values_position = "in")
+  options(labels = "%")
+  options(labels_color = "white")
+  options(labels_size = 0.75)
+  options(labels_digits = NULL)
+  options(labels_position = "in")
 
   options(pt_fill = rgb(50,78,92, maxColorValue=255))  #  #324E5C
-  options(trans_pt_fill = 0.00)
+  options(trans_pt_fill = 0.10)
   options(pt_color = rgb(50,78,92, maxColorValue=255))  # old 70 80 90
   options(out_fill = "firebrick4")
   options(out_color = "firebrick4")
@@ -373,6 +373,20 @@ function(...) {
   return(result.flg)
 }
 
+# function to process filter param values, especially categorical
+.filter <- function(txt) {
+
+  if (substr(txt, 1, 1) == "\"") {  # parameter value is in quotes
+    txt <- sub("include", "%in%", txt, fixed=TRUE)
+    if (grepl(" exclude ", txt, fixed=TRUE))
+      txt <- paste("!(", txt, ")", sep="") 
+    txt <- sub("exclude", "%in%", txt, fixed=TRUE)
+    txt <- gsub("\"", "", txt, fixed=TRUE)  # remove the quotes
+  }  # end expression in quotes 
+
+  return(txt)
+}
+
 
 .in.global <- function(var.name, quiet) {
 
@@ -463,7 +477,7 @@ function(...) {
 
     if ("D" %in% dfs)
       txtM <- paste("Because you have a data table called D,\n",
-        " perhaps you meant to call it d, if so just re-read \n",
+        " perhaps you meant to call it d, if so, just re-read \n",
         " into d instead of D")
     else
       txtM <- paste(

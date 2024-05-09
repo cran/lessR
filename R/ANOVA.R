@@ -1,5 +1,5 @@
 ANOVA <-
-function(my_formula, data=d, rows=NULL,
+function(my_formula, data=d, filter=NULL,
          brief=getOption("brief"), digits_d=NULL, 
          Rmd=NULL, jitter_x=0.4,
          res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
@@ -77,15 +77,16 @@ function(my_formula, data=d, rows=NULL,
   n.vars <- length(nm)
   n.pred <- n.vars - 1
   
-  if (!missing(rows)) {  # subset rows
-    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+  if (!missing(filter)) {  # subset rows
+    r <- eval(substitute(filter), envir=data, enclos=parent.frame())
     if (!any(r)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "No rows of data with the specified value of\n",
-        "rows = ", deparse(substitute(rows)), "\n\n")
+        "No filter of data with the specified value of\n",
+        "filter = ", deparse(substitute(filter)), "\n\n")
     }
     r <- r & !is.na(r)  # set missing for a row to FALSE
-    data <- data[r,,drop=FALSE]
+    if (any(r))
+      data <- data[r,,drop=FALSE]
   }
   n.obs <- nrow(data)
 

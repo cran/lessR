@@ -84,42 +84,42 @@ d$Year_date <- as.Date(ISOdate(d$Year, 1, 1))
 
 Or, to plot as a time series, add `segments=TRUE` to the `Plot()` statement. To plot only the connecting line segments but not the points, also add `size=0`.
 
-Here plot just for _Apple_, with the two variables _date_ and _Price_, stock price. The parameter `rows` specifies what rows of the input data frame to retain for the analysis.
+Here plot just for _Apple_, with the two variables _date_ and _Price_, stock price. The parameter `filter` specifies what rows of the input data frame to retain for the analysis.
 
 ```{r}
-Plot(date, Price, rows=(Company=="Apple"))
+Plot(Month, Price, filter=(Company=="Apple"))
 ```
 
 Here, add the default fill color by setting the `area_fill` parameter to `"on"`. Can also specify a custom color.
 
 ```{r}
-Plot(date, Price, rows=(Company=="Apple"), area_fill="on")
+Plot(Month, Price, filter=(Company=="Apple"), area_fill="on")
 ```
 
 With the `by` parameter, plot all three companies on the same panel.
 
 ```{r, fig.width=5}
-Plot(date, Price, by=Company)
+Plot(Month, Price, by=Company)
 ```
 
 Stack the plots by setting the parameter `stack` to `TRUE`.
 
 ```{r, fig.width=5}
-Plot(date, Price, by=Company, stack=TRUE)
+Plot(Month, Price, by=Company, stack=TRUE)
 ```
 
 
 With the `by1` parameter, plot all three companies on the different panels, a Trellis plot.
 
 ```{r, fig.width=5}
-Plot(date, Price, by1=Company)
+Plot(Month, Price, by1=Company)
 ```
 
 Do the Trellis plot with some color. Learn more about customizing visualizations in the vignette `utlities`. 
 
 ```{r, fig.width=5}
 style(sub_theme="black", window_fill="gray10")
-Plot(date, Price, by1=Company, n_col=1, fill="darkred", color="red", trans=.55)
+Plot(Month, Price, by1=Company, n_col=1, fill="darkred", color="red", trans=.55)
 ```
 
 Return to the default style, then turn off text output for subsequent analyses.
@@ -132,19 +132,19 @@ style(quiet=TRUE)
 Set a baseline of 25 with the `area_origin` parameter for a Trellis plot, with default fill color.
 
 ```{r, fig.width=5}
-Plot(date, Price, by1=Company, xlab="", area_fill="on", area_origin=25)
+Plot(Month, Price, by1=Company, xlab="", area_fill="on", area_origin=25)
 ```
 
 Change the aspect ratio with the `aspect` parameter defined as height divided by width.
 
 ```{r, fig.width=5}
-Plot(date, Price, by1=Company, aspect=.5, area_fill="slategray3")
+Plot(Month, Price, by1=Company, aspect=.5, area_fill="slategray3")
 ```
 
 Stack the three time series, fill under each curve with a version of the __lessR__ sequential range `"emeralds"`.
 
 ```{r, fig.width=6}
-Plot(date, Price, by=Company, trans=0.4, stack=TRUE, area_fill="emeralds")
+Plot(Month, Price, by=Company, trans=0.4, stack=TRUE, area_fill="emeralds")
 ```
 
 ### Wide-Format Data
@@ -152,14 +152,14 @@ Plot(date, Price, by=Company, trans=0.4, stack=TRUE, area_fill="emeralds")
 `Plot()` also reads wide-format data. We have no available wide form time data with __lessR__, so first convert the long form as read to the wide form. In the wide form, the three companies each have their own column of data, repeated for each date. Use the __lessR__ function `reshape_wide()` to do the conversion.
 
 ```{r}
-dw <- reshape_wide(d, group="Company", response="Price", ID="date")
+dw <- reshape_wide(d, group="Company", response="Price", ID="Month")
 head(dw)
 ```
 
 Now the analysis, which repeats a previous analysis, but with wide-form data. Because the data frame is not the default _d_, explicitly indicate with the `data` parameter.
 
 ```{r, fig.width=6}
-Plot(date, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
+Plot(Month, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
 ```
 
 ### Time-Series Object Data
@@ -185,7 +185,7 @@ The annotations in the following visualization consist of the text field "iPhone
 
 ```{r fig.width=4.5}
 x <- as.Date("2007-06-01")
-Plot(date, Price, rows=(Company == "Apple"), fill="on",
+Plot(Month, Price, filter=(Company == "Apple"), fill="on",
             add=c("iPhone", "arrow"), 
             x1=c(x,x), y1=c(100,90), x2=x, y2=30)
 ```

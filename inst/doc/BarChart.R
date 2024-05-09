@@ -19,10 +19,10 @@ style(quiet=TRUE)
 
 ## ----fig.width=4, fig.height=3.75, fig.align='center'-----------------------------------------------------------------
 BarChart(Dept, fill="darkred", color="black", transparency=.8,
-         values_color="black")
+         labels_color="black")
 
 ## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
-BarChart(Dept, theme="gray", values="off", horiz=TRUE)
+BarChart(Dept, theme="gray", labels="off", horiz=TRUE)
 
 ## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
 BarChart(Dept, fill="reds")
@@ -47,7 +47,7 @@ a
 knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
 
 ## ----xy, fig.width=4, fig.height=3.5, fig.align='center'--------------------------------------------------------------
-BarChart(Dept, mean, data=a)
+BarChart(Dept, Salary_mean, data=a)
 
 ## ----fig.width=4, fig.height=3.5, fig.align='center'------------------------------------------------------------------
 BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
@@ -76,7 +76,7 @@ BarChart(Dept, by=Gender)
 BarChart(Dept, by=Gender, fill=c("deepskyblue", "black"))
 
 ## ----fig.width=5, fig.align='center'----------------------------------------------------------------------------------
-BarChart(Dept, by=Gender, beside=TRUE, values_position="out")
+BarChart(Dept, by=Gender, beside=TRUE, labels_position="out")
 
 ## ----fig.width=6------------------------------------------------------------------------------------------------------
 BarChart(Gender, by=Dept, horiz=TRUE)

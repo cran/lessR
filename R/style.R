@@ -22,11 +22,11 @@ function(
   bar_color=getOption("bar_color"),
   bar_color_cont=getOption("bar_color_cont"),
   bar_color_discrete=getOption("bar_color_discrete"),
-  values=getOption("values"),
-  values_color=getOption("values_color"), 
-  values_size=getOption("values_size"),
-  values_digits=getOption("values_digits"),
-  values_position=getOption("values_position"),
+  labels=getOption("labels"),
+  labels_color=getOption("labels_color"), 
+  labels_size=getOption("labels_size"),
+  labels_digits=getOption("labels_digits"),
+  labels_position=getOption("labels_position"),
  
   pt_fill=getOption("pt_fill"),
   trans_pt_fill=getOption("trans_pt_fill"),
@@ -113,7 +113,7 @@ function(
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      if (names(dots)[i] == "values.cex")  values_size <- dots[[i]]
+      if (names(dots)[i] == "values.cex")  labels_size <- dots[[i]]
       if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
@@ -185,11 +185,11 @@ function(
     trans_bar_fill <- set$bar$trans_fill
     bar_color <- set$bar$color
 
-    values <- set$bar$values
-    values_color <- set$bar$values_color
-    values_size <- set$bar$values_size
-    values_digits <- set$bar$values_digits
-    values_position <- set$bar$values_position
+    labels <- set$bar$labels
+    labels_color <- set$bar$labels_color
+    labels_size <- set$bar$labels_size
+    labels_digits <- set$bar$labels_digits
+    labels_position <- set$bar$labels_position
  
     pt_fill <- set$pt$fill
     trans_pt_fill <- set$pt$trans_fill
@@ -442,11 +442,11 @@ function(
     options(bar_color_cont = bar_color_cont) 
     options(pt_color = pt_color) 
     
-    options(values=values)
-    options(values_color=values_color)
-    options(values_size=values_size)
-    options(values_digits=values_digits)
-    options(values_position=values_position)
+    options(labels=labels)
+    options(labels_color=labels_color)
+    options(labels_size=labels_size)
+    options(labels_digits=labels_digits)
+    options(labels_position=labels_position)
     
     options(window_fill=window_fill)
     options(panel_fill=panel_fill)
@@ -582,7 +582,7 @@ function(
       grid_color = rgb(222,217,205, maxColorValue=255)
       ID_color = "gray50"
       fit_color = rgb(92,64,50, maxColorValue = 255)
-      values = "%"
+      labels = "%"
     }
 
     else if (theme == "white") {
@@ -593,7 +593,7 @@ function(
       bar_fill_discrete = "white"
       bar_color_discrete = "black"
       bar_color_cont = "black"      
-      values_color = "black"
+      labels_color = "black"
       pt_fill = "white"
       pt_color = "black"
       bubble_text_color = "black"
@@ -787,7 +787,7 @@ function(
       axis_text_color = "gray85"
       grid_color = "gray25"
       add_color = "gray55"
-      values_color = "gray85"
+      labels_color = "gray85"
       clr1 <- "gray55"
     }
   
@@ -807,7 +807,7 @@ function(
       axis_y_color = "gray85"
       axis_text_color = "gray85"
       add_color = "gray55"
-      values_color = "gray85"
+      labels_color = "gray85"
       strip_text_color = "white"
       fit_color <- ifelse (theme == "light", "gray40", "gray75")
 
@@ -864,11 +864,11 @@ function(
     options(trans_bar_fill = trans_bar_fill)
     options(trans_pt_fill = trans_pt_fill)
     
-    options(values=values)
-    options(values_color=values_color)
-    options(values_size=values_size)
-    options(values_digits=values_digits)
-    options(values_position=values_position)
+    options(labels=labels)
+    options(labels_color=labels_color)
+    options(labels_size=labels_size)
+    options(labels_digits=labels_digits)
+    options(labels_position=labels_position)
     
     options(window_fill=window_fill)
     options(panel_fill=panel_fill)
@@ -975,11 +975,11 @@ function(
       bar_fill_cont = getOption("bar_fill_cont"),
       trans_fill = getOption("trans_bar_fill"),
       color = getOption("bar_color"),
-      values = getOption("values"),
-      values_color = getOption("values_color"),
-      values_size = getOption("values_size"),
-      values_digits = getOption("values_digits"),
-      values_position = getOption("values_position")
+      labels = getOption("labels"),
+      labels_color = getOption("labels_color"),
+      labels_size = getOption("labels_size"),
+      labels_digits = getOption("labels_digits"),
+      labels_position = getOption("labels_position")
     )
 
     pt <- list(
@@ -1109,11 +1109,11 @@ function(
     bar_fill_cont = bar_fill_cont,
     trans_fill = trans_bar_fill,
     color = bar_color,
-    values = values,
-    values_color = values_color,
-    values_size = values_size,
-    values_digits = values_digits,
-    values_position = values_position
+    labels = labels,
+    labels_color = labels_color,
+    labels_size = labels_size,
+    labels_digits = labels_digits,
+    labels_position = labels_position
   )
 
   pt <- list(

@@ -8,6 +8,7 @@ reshape_wide <-
       data <- data.frame(data)
   }
 
+  data <- data[, c(ID, group, response)]
   dw <- reshape(data, direction="wide",
                idvar=ID, timevar=group, v.names=response,
                sep=sep)

@@ -147,7 +147,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   else
     main.lab <- NULL
 
-  # get lab_x_cex  lab_y_cex
+  # get lab_x_cex  lab_y_cex   # Synchronize with Plot() code, put in own sub
   lab_cex <- getOption("lab_cex")
   lab_x_cex <- getOption("lab_x_cex")
   lab_y_cex <- getOption("lab_y_cex")
@@ -497,11 +497,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   ltype <- character(length=n.clrs)
   for (i in 1:length(ltype)) ltype[i] <- "solid"
 
+
   # plot lines (and area_fill)
   # --------------------------
 
   if (object %in% c("point", "both")) {
-
 
     if (object == "both") {
 
@@ -514,7 +514,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           }
 
           if (area_fill[1] != "transparent") # fill area
-            polygon(c(x[1],x,x[length(x)]), c(min(y[,1]),y[,1],min(y[,1])),
+            polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
                 col=area_fill, border="transparent")
         }  # n.by is 1
 
@@ -557,8 +557,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           if (stack) {
             if (i == 1) {
               xx <- c(x[1],x,x[length(x)])
-              yy <- c(min(y[,1]),y[,1],min(y[,1]))
-              if (fill[1] != "transparent")
+              yy <- c(mn.y,y[,1],mn.y)  # starts at the scale_y setting
+              if (fill[1] != "transparent") 
                 polygon(xx, yy, col=area_fill[1], border="transparent")
             }
             if (i > 1) {

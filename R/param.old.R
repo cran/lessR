@@ -112,7 +112,7 @@ function (...) {
 
       if (names(dots)[i] == "values_cex") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "option  values_cex  renamed  values_size\n\n")
+          "option  values_cex  renamed  labels_size\n\n")
       }
 
       if (names(dots)[i] == "sort_x") {

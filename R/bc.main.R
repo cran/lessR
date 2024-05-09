@@ -1,12 +1,12 @@
 .bc.main <-
 function(x, y, by, stack100,
          fill, color, col.trans, fill_split, theme,
-         horiz, gap, prop, scale_y, top,
+         horiz, gap, prop, scale_y, 
          xlab, ylab, main,
          value_labels, label_max, beside,
          rotate_x, offset, break_x, sort_x,
-         values, values_color, values_size, values_digits,
-         values_pos, values_cut,
+         labels, labels_color, labels_size, labels_digits,
+         labels_pos, labels_cut,
          xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
          pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
@@ -14,25 +14,12 @@ function(x, y, by, stack100,
          add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet, 
          shiny, ...) {
 
+
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
-  y.given <- ifelse (!is.null(y), TRUE, FALSE)
   is.ord <- ifelse (is.ordered(x) || is.ordered(by), TRUE, FALSE)
 
   if (stack100) prop <- TRUE
   if (!is.null(by)  &&  prop) stack100 <- TRUE  # prop deprecated
-
-  if (is.null(values_digits)) {
-    if (y.given) {
-      if (max(abs(y), na.rm=TRUE) > 9999)
-        values_digits <- 0
-      else {
-        if (!is.null(y))
-          values_digits <- .getdigits(y,0) - 1
-        else
-          values_digits <- 0
-      }
-    }
-  }
 
   # if x is integer, not labeled correctly, set to factor
   if (!is.data.frame(x))
@@ -339,37 +326,9 @@ function(x, y, by, stack100,
     else {
       x.df <- as.data.frame.matrix(x, nrow=2)
       x.df <- x.df[order(apply(x.df, 2, sum), decreasing=srt.dwn)]
-      if (!is.null(top)) {
-        keep <- min(top, ncol(x))
-        if (!horiz)
-          x.df <- x.df[,1:keep]
-        else
-          x.df <- x.df[,(ncol(x)-keep+1):length(x.df)]
-      }
       x <- as.table(as.matrix(x.df))
     }
   }  # end sort
-
-  # retain only the x's with the specified number of top values of y
-  # makes the most sense when x is sorted by y
-  if (!is.null(top)) {
-    if (!is.matrix(x)) {
-        keep <- min(top, length(x))
-        if (!horiz)
-          x <- x[1:keep]
-        else
-          x <- x[(length(x)-keep+1):length(x)]
-    }
-    else {
-      keep <- min(top, ncol(x))
-      x.df <- as.data.frame.matrix(x, nrow=2)
-      if (!horiz)
-        x.df <- x.df[,1:keep]
-      else
-        x.df <- x.df[,(ncol(x)-keep+1):length(x.df)]
-      x <- as.table(as.matrix(x.df))
-    }
-  }  # end top
 
   n.levels <- ifelse (is.matrix(x), nrow(x), length(x))
 
@@ -378,8 +337,8 @@ function(x, y, by, stack100,
   # preliminaries
 
   add_top <- 0.05  # old version of pad_y_max, no longer a parameter
-  if (length(values_pos > 0))
-    if (values_pos == "out") add_top <- add_top + .06
+  if (length(labels_pos > 0))
+    if (labels_pos == "out") add_top <- add_top + .06
   # a 2-D table is an instance of a matrix, a 1-D table is not
   max.y <- ifelse (is.matrix(x) && !beside, 
                    max(colSums(x), na.rm=TRUE), max(x, na.rm=TRUE))
@@ -547,19 +506,19 @@ function(x, y, by, stack100,
   par(mai=c(bm, lm, tm, rm))
 
 #p(par("din")[1]-par("pin")[1])
-  # new_scale to control bar width for small number of bars
-  # set new_scale
+  # new.scale to control bar width for small number of bars
+  # set new.scale
   if ("numeric" %in% class(x)  &&  entered) x <- as.table(x)
-  new_scale <- 0
-  if (is.null(by)) if (nrow(x) <= 4) new_scale <- nrow(x)
-  if (is.matrix(x)  &&  !beside) if (ncol(x) <= 4) new_scale <- ncol(x)
-  if ("matrix" %in% class(x)  &&  entered) new_scale <- 0  # turned off for now
+  new.scale <- 0
+  if (is.null(by)) if (nrow(x) <= 4) new.scale <- nrow(x)
+  if (is.matrix(x)  &&  !beside) if (ncol(x) <= 4) new.scale <- ncol(x)
+  if ("matrix" %in% class(x)  &&  entered) new.scale <- 0  # turned off for now
   # set width.bars, gap
-  if (new_scale == 4) width.bars <- .17
-  if (new_scale == 3) width.bars <- .22
-  if (new_scale == 2) width.bars <- .28
-  if (new_scale == 1) width.bars <- .30  # for only one category
-  if (new_scale > 0) gap <- 0.246 + (0.687 * width.bars)
+  if (new.scale == 4) width.bars <- .17
+  if (new.scale == 3) width.bars <- .22
+  if (new.scale == 2) width.bars <- .28
+  if (new.scale == 1) width.bars <- .30  # for only one category
+  if (new.scale > 0) gap <- 0.246 + (0.687 * width.bars)
 
   yp <- pretty(c(min.y, max.y))
   y.adj_min <- pad_y_min * (yp[length(yp)] - yp[1])
@@ -570,7 +529,7 @@ function(x, y, by, stack100,
   # barplot run here only to establish usr coordinates, axTick values
   #  otherwise usr is just 0,1 for both axes
   # the barplot itself is not retained
-  if (new_scale == 0) {
+  if (new.scale == 0) {
     if (!horiz)
       barplot(x, col="transparent", border="transparent",
         ylim=c(min.y,max.y), axisnames=FALSE,
@@ -580,7 +539,7 @@ function(x, y, by, stack100,
         axisnames=FALSE,
         beside=beside, space=gap, axes=FALSE, xlim=c(min.y, max.y), ...)
   }
-  else { # new_scale, need (0,1) limit on_cat axis for re-scale to work
+  else { # new.scale, need (0,1) limit on_cat axis for re-scale to work
     if (!horiz)
       barplot(x, col="transparent", border="transparent",
         ylim=c(min.y,max.y), axisnames=FALSE,
@@ -611,7 +570,7 @@ function(x, y, by, stack100,
   .plt.bck(usr, y.coords, y.coords, do.v=horiz, do.h=!horiz)
 
   # the bars
-  if (new_scale == 0)
+  if (new.scale == 0)
     x.coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=color, las=las.value,
           space=gap, axisnames=FALSE, ...)
@@ -623,122 +582,125 @@ function(x, y, by, stack100,
   # display text labels of values on or above the bars
   # --------------------------------------------------
 
+  if (is.null(labels_digits)) {  # if too large for "input", get in bc.main
+    if (labels == "%") labels_digits <- 0
+    else 
+      if (labels == "proportion") labels_digits <- 2
+    else
+      if (labels == "input") 
+        labels_digits <- ifelse(is.null(y), 0, 2)
+  }
+
   # need n.levels for this evaluation
-  if (values == "eval.later") {  # values not user-specified
+  if (labels == "eval.later") {  # labels not user-specified
     is.int <- TRUE
     if (!is.null(y)) if (!.is.integer(y)) is.int <- FALSE
     if (n.levels > 14  || !is.int)
-      values <- "off"
+      labels <- "off"
     else {
-      values <- getOption("values")
-      if (values != "off") if (y.given) values <- "input"
+      labels <- getOption("values")
+      if (labels != "off") if (!is.null(y)) labels <- "input"
     }
   }
 
   if (beside) {
-     values_size <- .75 * values_size
-     values_cut <- 0.01
+     labels_size <- .75 * labels_size
+     labels_cut <- 0.01
   }
 
-    if (values != "off") {
-      if (is.null(values_cut)) {
-        values_cut <- 0.028
-        if ((prop && is.matrix(x)) || multi) values_cut <- 0.040
+    if (labels != "off") {
+      if (is.null(labels_cut)) {
+        labels_cut <- 0.028
+        if ((prop && is.matrix(x)) || multi) labels_cut <- 0.040
       }
 
-      if (is.null(values_digits)) {  # if too large for "input", get in bc.main
-        if (values == "%") values_digits <- 0
-        else if (values == "proportion") values_digits <- 2
-        else if (values == "input") values_digits <- 0
-      }
-
-      # set type of the values to display, x.txt
+      # set type of the labels to display, x.txt
 
       if (!prop) {
         if (!multi)
           x.prop <- x/sum(x)
         else
           x.prop <- x/colSums(x)
-        if (values == "input")
-          x.txt <- .fmt(x, values_digits)   # as.char not accurate for dec dig
-        else if (values == "%")
-          x.txt <- paste(.fmt(x.prop * 100, values_digits), "%", sep="")
-        else if (values == "proportion")
-          x.txt <- .fmt(x.prop, values_digits)
+        if (labels == "input")
+          x.txt <- .fmt(x, labels_digits)   # as.char not accurate for dec dig
+        else if (labels == "%")
+          x.txt <- paste(.fmt(x.prop * 100, labels_digits), "%", sep="")
+        else if (labels == "proportion")
+          x.txt <- .fmt(x.prop, labels_digits)
 
         if (is.matrix(x))
             x.txt <- matrix(x.txt, nrow=nrow(x))
 
-        if (values_pos != "out") {
+        if (labels_pos != "out") {
           if (is.null(by)) {
-            if (!y.given) {
+            if (is.null(y)) {
               for (i in 1:length(x.prop))
-                x.txt[i] <- ifelse (x.prop[i] >= values_cut, x.txt[i], "")
+                x.txt[i] <- ifelse (x.prop[i] >= labels_cut, x.txt[i], "")
             }
           }
           else {  # by variable
             for (i in 1:nrow(x.prop)) for (j in 1:ncol(x.prop))
-              x.txt[i,j] <- ifelse (x.prop[i,j] >= values_cut, x.txt[i,j], "")
+              x.txt[i,j] <- ifelse (x.prop[i,j] >= labels_cut, x.txt[i,j], "")
           }
         }
       }
 
       else {  # prop
-        if (values == "input")
+        if (labels == "input")
           x.txt <- as.character(x.count)
-        else if (values == "%")
-          x.txt <- paste(.fmt(x * 100, values_digits), "%", sep="")
-        else if (values == "prop")
-          x.txt <- .fmt(x, values_digits)
+        else if (labels == "%")
+          x.txt <- paste(.fmt(x * 100, labels_digits), "%", sep="")
+        else if (labels == "prop")
+          x.txt <- .fmt(x, labels_digits)
 
         if (is.matrix(x))
             x.txt <- matrix(x.txt, nrow=nrow(x))
 
-        if (values_pos != "out") {
+        if (labels_pos != "out") {
           if (is.null(by)) {
             for (i in 1:length(x))
-              x.txt[i] <- ifelse (x[i] >= values_cut, x.txt[i], "")
+              x.txt[i] <- ifelse (x[i] >= labels_cut, x.txt[i], "")
           }
           else {  # by variable
             # as.numeric & as.character convert table to vector: re-convert
             for (i in 1:nrow(x)) for (j in 1:ncol(x))
-              x.txt[i,j] <- ifelse (x[i,j] >= values_cut, x.txt[i,j], "")
+              x.txt[i,j] <- ifelse (x[i,j] >= labels_cut, x.txt[i,j], "")
           }
         }
       }
 
       # R text function sets cex at 1 if input value is 0
-      if (values_size == 0) values_size <- 0.01
+      if (labels_size == 0) labels_size <- 0.01
 
       # vertical bars
       if (!horiz) {
         if (!is.matrix(x)) { # 1 variable
           usr.y.inch <- diff(grconvertY(0:1, 'inches', 'user'))
-          if (values_pos == "in")
+          if (labels_pos == "in")
             ycrd <- x/2
           else {
-            slope <- 0.0 + (0.15*values_size)
+            slope <- 0.0 + (0.15*labels_size)
             ycrd <- ifelse(x > 0, x + slope*usr.y.inch, x - slope*usr.y.inch)
           }
-          text(x.coords, ycrd, labels=x.txt, col=values_color, cex=values_size)
+          text(x.coords, ycrd, labels=x.txt, col=labels_color, cex=labels_size)
         }  # no by
         else {  # 2 variables
           if (!beside) {
             for (i in 1:ncol(x)) {
               ycrd <- cumsum(x[,i]) - (x[,i] / 2)
               text(x.coords[i], ycrd, labels=x.txt[,i],
-                   col=values_color, cex=values_size)
+                   col=labels_color, cex=labels_size)
             }
           }  # end !beside
           else {  # beside
             usr.y.inch <- diff(grconvertY(0:1, 'inches', 'user'))
-            if (values_pos == "in")
+            if (labels_pos == "in")
               ycrd <- x/2
             else  # value.pos == "out"
               ycrd <- x + 0.10*usr.y.inch
             for (i in 1:ncol(x)) {
               text(x.coords[,i], ycrd[,i], labels=x.txt[,i],
-                   col=values_color, cex=values_size)
+                   col=labels_color, cex=labels_size)
             }
           }  # end beside
         }  # end 2 variables
@@ -748,37 +710,37 @@ function(x, y, by, stack100,
       else {
         if (!is.matrix(x)) {  # 1 variable
           usr.x.inch <- diff(grconvertX(0:1, 'inches', 'user'))
-          if (values_pos == "in")
+          if (labels_pos == "in")
             ycrd <- x/2
           else { # out, adjust for label font size
-            slope <- 0.024 + (0.192*values_size)
+            slope <- 0.024 + (0.192*labels_size)
             ycrd <- ifelse(x > 0, x + slope*usr.x.inch, x - slope*usr.x.inch)
           }
-          text(ycrd, x.coords, labels=x.txt, col=values_color, cex=values_size)
+          text(ycrd, x.coords, labels=x.txt, col=labels_color, cex=labels_size)
         }  # end no by
         else {  # by variable
           if (!beside) {  # stacked chart
           for (i in 1:ncol(x)) {  # each level of by
             ycrd <- cumsum(x[,i]) - (x[,i] / 2)
             text(ycrd, x.coords[i], labels=x.txt[,i],
-               col=values_color, cex=values_size)
+               col=labels_color, cex=labels_size)
           }
         }
         else {  # beside chart
           usr.x.inch <- diff(grconvertX(0:1, 'inches', 'user'))
-          if (values_pos == "in")
+          if (labels_pos == "in")
             ycrd <- x/2
           else  # value.pos == "out"
             ycrd <- x + 0.17*usr.x.inch
             for (i in 1:ncol(x)) {
               text(ycrd[,i], x.coords[,i], labels=x.txt[,i],
-                   col=values_color, cex=values_size)
+                   col=labels_color, cex=labels_size)
             }
           }  # end beside
         }  # end by
       }  # end horiz bars
 
-    }  # end display values
+    }  # end display labels
 
 
     # y-axis is the numerical axis
@@ -850,7 +812,7 @@ function(x, y, by, stack100,
 
     # ylab positioning (based on .axlabs function)
     lab_y_color <- ifelse(is.null(getOption("lab_y_color")),
-    getOption("lab_color"), getOption("lab_y_color"))
+                          getOption("lab_color"), getOption("lab_y_color"))
     ln.ht.y <- par('cin')[2] * lab_y_cex * par('lheight')  # line ht inches
     ylab_adj <- ylab_adj / ln.ht.y
     lm <- par("mar")[2]  # get current left margin in lines

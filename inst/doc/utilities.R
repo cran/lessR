@@ -97,10 +97,10 @@ d
 dl <- reshape_long(d, sup1:sup4)  # convert to long-form
 
 ## ---------------------------------------------------------------------------------------------------------------------
-reshape_wide(dl, group="Group", response="Value", ID="Person")
+reshape_wide(dl, group="Group", response="Response", ID="Person")
 
 ## ---------------------------------------------------------------------------------------------------------------------
-reshape_wide(dl, group="Group", response="Value", ID="Person",
+reshape_wide(dl, group="Group", response="Response", ID="Person",
              prefix=TRUE, sep=".")
 
 ## ---------------------------------------------------------------------------------------------------------------------

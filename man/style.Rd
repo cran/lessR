@@ -35,11 +35,11 @@ style(
   bar_color_cont=getOption("bar_color_cont"),
   bar_color_discrete=getOption("bar_color_discrete"),
   
-  values=getOption("values"),
-  values_color=getOption("values_color"), 
-  values_size=getOption("values_size"),
-  values_digits=getOption("values_digits"),
-  values_position=getOption("values_position"),
+  labels=getOption("labels"),
+  labels_color=getOption("labels_color"), 
+  labels_size=getOption("labels_size"),
+  labels_digits=getOption("labels_digits"),
+  labels_position=getOption("labels_position"),
 		 
   pt_fill=getOption("pt_fill"),
   trans_pt_fill=getOption("trans_pt_fill"),
@@ -132,7 +132,7 @@ set(\dots)
   \item{sub_theme}{Further modification of the main themes.}
   \item{set}{A list of parameter values, a theme, that was previously
        saved, and now is read back to become the current set of parameter
-       values_ See the examples.}
+       values. See the examples.}
   \item{get}{Save the current list of parameter values, a theme, into
        an R object.}
   \item{reset}{Change one or more settings or the entire theme.}\cr
@@ -176,23 +176,23 @@ set(\dots)
   \item{bar_color_cont}{Color of the border of a filled region for
        values on a quantitative scale, such as a histogram bar.}\cr
 
-  \item{values}{If not the default value of \code{"off"}, adds the
+  \item{labels}{If not the default value of \code{"off"}, adds the
         numerical results to the plot according to \code{"\%"}, 
         \code{"prop"} or \code{"input"}, that is, percentages,
          proportions, or the value from which the slices are plotted,
          such as tabulated counts if \code{y} is not specified,
          or the value of \code{y} if the plotted values are provided. If
-         any other \code{values} parameter is specified, default is set
+         any other \code{labels} parameter is specified, default is set
          to \code{"\%"}.}
-  \item{values_color}{Color of the plotted text. Could be a vector to specify
+  \item{labels_color}{Color of the plotted text. Could be a vector to specify
         a unique color for each value. If fewer colors are specified than
         the number of categories, the colors are recycled.}
-  \item{values_size}{Character expansion factor, the size, of the plotted text, 
+  \item{labels_size}{Character expansion factor, the size, of the plotted text, 
         for which the default value is 0.95.}
-  \item{values_digits}{Number of decimal digits for which to display the values_
+  \item{labels_digits}{Number of decimal digits for which to display the labels.
         Default is 0, round to the nearest integer, for \code{"\%"}
         and 2 for \code{"prop"}.}
-  \item{values_position}{Position of the plotted text. Default is inside the pie,
+  \item{labels_position}{Position of the plotted text. Default is inside the pie,
         or, if \code{"label"}, as part of the label for each value
         outside of the pie.}\cr
 
@@ -243,9 +243,9 @@ set(\dots)
         and can be replaced by, the standard R \code{cex.axis}.}
   \item{axis_x_cex}{Scale magnification factor for the \code{x}-axis_}
   \item{axis_y_cex}{Scale magnification factor for the \code{y}-axis_}
-  \item{axis_text_color}{Color of the font used to label the axis values_}
-  \item{axis_x_text_color}{Color of the font used to label the \code{x}-axis values_}
-  \item{axis_y_text_color}{Color of the font used to label the \code{y}-axis values_}
+  \item{axis_text_color}{Color of the font used to label the axis values.}
+  \item{axis_x_text_color}{Color of the font used to label the \code{x}-axis values.}
+  \item{axis_y_text_color}{Color of the font used to label the \code{y}-axis values.}
   \item{rotate_x}{Degrees that the \code{x}-axis values are rotated, usually to
         accommodate longer values, typically used in conjunction with \code{offset}.}
   \item{rotate_y}{Degrees that the \code{y}-axis values are rotated.}
@@ -319,13 +319,13 @@ set(\dots)
   \item{width}{Maximum width of each line displayed at the console, just accesses
         the standard R options function for width.}
   \item{show}{Option for showing all settings.}
-  \item{\dots}{Parameter values_}
+  \item{\dots}{Parameter values.}
 }
 
 
 \details{
 OVERVIEW\cr
-Sets the default color palette via the R \code{\link{options}} statement, as well as the transparency of plotted bars and points and other non-color characteristics such as the color of the grid lines. For convenience, groups of attributes are organized into themes and sub-themes. When the \code{theme} is specified, \emph{all} options are reset to their default values_ All other modifications, with individual parameters or grouped parameters as a sub-theme, are cumulative. For example, one sub-theme can be followed by another, as well as the specifications of individual attributes. Calling the function with no arguments sets to the default style.
+Sets the default color palette via the R \code{\link{options}} statement, as well as the transparency of plotted bars and points and other non-color characteristics such as the color of the grid lines. For convenience, groups of attributes are organized into themes and sub-themes. When the \code{theme} is specified, \emph{all} options are reset to their default values. All other modifications, with individual parameters or grouped parameters as a sub-theme, are cumulative. For example, one sub-theme can be followed by another, as well as the specifications of individual attributes. Calling the function with no arguments sets to the default style.
 
 Available themes:\cr
 "lightbronze" [default]\cr

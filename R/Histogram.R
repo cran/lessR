@@ -1,5 +1,5 @@
 Histogram <-
-function(x=NULL, data=d, rows=NULL,
+function(x=NULL, data=d, filter=NULL,
     stat_x=c("count", "proportion"),
 
     by1=NULL, by2=NULL,
@@ -37,7 +37,7 @@ function(x=NULL, data=d, rows=NULL,
     digits_d=NULL,
     Rmd=NULL,
 
-    n_cat=getOption("n_cat"),
+    n_cat=getOption("n_cat"), rows=NULL,
 
     eval_df=NULL, fun_call=NULL, ...) {
 
@@ -47,6 +47,17 @@ function(x=NULL, data=d, rows=NULL,
       getOption("bar_fill"), getOption("bar_fill_cont"))
   breaks.miss <- ifelse (missing(breaks), TRUE, FALSE)
   bw.miss <- ifelse (missing(bandwidth), TRUE, FALSE)
+
+  # ------------ Old Stuff ----------------------------------
+  if (!missing(rows)) 
+    message(">>> Parameter  rows  renamed to:  filter.\n",
+            "    Change to  filter,  rows  will stop working in the future.\n")
+
+  if(!missing(n_cat)) {
+    message(">>> Parameter  n_cat  will no longer work in the future.\n",
+             "    Better to convert a categorical integer variable to ",
+             "a factor.\n")
+  }
 
   # a dot in a parameter name to an underscore and more
   dots <- list(...)
@@ -143,27 +154,39 @@ function(x=NULL, data=d, rows=NULL,
     df.name <- deparse(substitute(data))
     options(dname = df.name)
   }
+
+  shiny <- FALSE
+  if (!is.null(sys.call(-1)))  # is NULL when called directly from R console
+    if (sys.call(-1) == "renderPlot()") {  # from shiny, user or interact()
+      shiny <- TRUE
+      data <- eval(substitute(data), envir=parent.frame())
+    }
  
   # if a tibble, convert to data frame
-  if (exists(df.name, envir=parent.frame())) {
+  if (!shiny) {
+    if (exists(df.name, envir=.GlobalEnv)) {
+      if (any(grepl("tbl", class(data), fixed=TRUE)))
+        data <- data.frame(data)
+    }
+  }
+  else  # no check for existence of df.name
     if (any(grepl("tbl", class(data), fixed=TRUE)))
       data <- data.frame(data)
-  }
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
 
-    if (!is.null(x.name))
-      x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
-    else
-      x.in.global <- FALSE
+  if (!is.null(x.name))
+    x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
+  else
+    x.in.global <- FALSE
 
   if (!x.in.global)  {
     if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
       # force evaluation (not lazy) if data not specified, relies on default d
       if (data.miss) {
         if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
-        data <- eval(substitute(data), envir=parent.frame())
+#       data <- eval(substitute(data), envir=parent.frame())
         # the 1.201 comes from Shiny, need to reset
         # l.cex and l.axc are set in interact() before shiny run
         if (getOption("lab_cex") == 1.201) {
@@ -198,16 +221,26 @@ function(x=NULL, data=d, rows=NULL,
       }
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
-      if (!missing(rows)) {  # subset rows
-        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
-        if (!any(r)) {
-          cat("\n"); stop(call.=FALSE, "\n","------\n",
-            "No rows of data with the specified value of\n",
-            "rows = ", deparse(substitute(rows)), "\n\n")
-        }
+
+      # subset filter (with deprecated rows parameter also)
+      if (!missing(filter) || !missing(rows)) {
+        txt <- .filter(deparse(substitute(filter)))
+        if (!missing(filter))  # subset filter
+          r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
+        if (!missing(rows))
+          r <- eval(substitute(rows), envir=data, enclos=parent.frame())
         r <- r & !is.na(r)  # set missing for a row to FALSE
-        data <- data[r,,drop=FALSE]
-      }
+        nr.before <- nrow(data)
+        if (any(r))
+          data <- data[r,,drop=FALSE]
+        if (!quiet) {
+          if (!missing(filter))  # filter parameter present 
+            cat("\nfilter: ",  txt, "\n-----\n")
+          cat("Rows of data before filtering: ", nr.before, "\n")
+          cat("Rows of data after filtering:  ", nrow(data), "\n\n")
+        }
+      }  # end filter
+
       ind <- eval(substitute(x), envir=data.vars)  # col num of each var     
       if (!("list" %in% class(data))) {
         data.x <- data[, ind]

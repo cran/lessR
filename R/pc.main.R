@@ -4,7 +4,7 @@ function(x, y,
         radius, hole, hole_fill, edges, 
         clockwise, init_angle, 
         density, angle, lty, lwd,
-        values, values_position, values_color, values_cex, values_digits,
+        labels, labels_position, labels_color, labels_size, labels_digits,
         labels_cex, main_cex, main, main.miss,
         add, x1, x2, y1, y2,
         quiet, pdf_file, width, height, ...)  {
@@ -100,15 +100,15 @@ function(x, y,
 
   x.tbl <- x  # save tabled values for text output
 
-  labels <- names(x)
+  nms.x <- names(x)
   x <- as.numeric(x)
-  if (values != "off") {
-    if (values == "input")
+  if (labels != "off") {
+    if (labels == "input")
       x.txt <- as.character(x)
-    else if (values == "%")
-      x.txt <- paste(.fmt(x/sum(x) * 100, values_digits), "%", sep="")
-    else if (values == "prop")
-      x.txt <- .fmt(x/sum(x), values_digits)
+    else if (labels == "%")
+      x.txt <- paste(.fmt(x/sum(x) * 100, labels_digits), "%", sep="")
+    else if (labels == "prop")
+      x.txt <- .fmt(x/sum(x), labels_digits)
   }
 
 
@@ -139,10 +139,10 @@ function(x, y,
   plot.window(xlim, ylim, "", asp=1)
 
   # set labels
-  if (is.null(labels)) 
-    labels <- as.character(seq_along(x))
+  if (is.null(nms.x)) 
+    nms.x <- as.character(seq_along(x))
   else
-    labels <- as.graphicsAnnot(labels)
+    nms.x <- as.graphicsAnnot(nms.x)
 
   x <- c(0, cumsum(x)/sum(x))
   dx <- diff(x)
@@ -162,17 +162,17 @@ function(x, y,
   }
 
   # construct plot slice by slice
-  values_cl <- character(length=nx)
-  if (length(values_color) == 1)
-    for (i in 1:nx) values_cl[i] <- values_color[1]
-  if (length(values_color) == nx)
-    values_cl <- values_color
+  labels_cl <- character(length=nx)
+  if (length(labels_color) == 1)
+    for (i in 1:nx) labels_cl[i] <- labels_color[1]
+  if (length(labels_color) == nx)
+    labels_cl <- labels_color
   else {  # recycle
     j <- 0
     for (i in 1:nx) {
       j <- j + 1
-      if (j > length(values_color)) j <- 1
-      values_cl[i] <- values_color[j]
+      if (j > length(labels_color)) j <- 1
+      labels_cl[i] <- labels_color[j]
     }
   }
 
@@ -183,23 +183,23 @@ function(x, y,
     polygon(c(p$x, 0), c(p$y, 0), density=density[i], angle=angle[i], 
         border=color[i], col=clr[i], lty=lty[i], lwd=lwd)
 
-    # plot values if "out"
+    # plot labels if "out"
     p <- t2xy(mean(x[i + 0:1]), radius)
-    lab <- as.character(labels[i])
+    lab <- as.character(nms.x[i])
     if (labels_cex > 0)
       if (nzchar(lab)) {
         lines(c(1, 1.05)*p$x, c(1, 1.05)*p$y)  # tick marks
-      if (values != "off") if (values_position == "out") {
+      if (labels != "off") if (labels_position == "out") {
         if (labels_cex > 0) {
           cx <- 1.1;  cy <- 1.175
-          text(cx*p$x, (cy*p$y-.1), x.txt[i], xpd=TRUE, col=values_cl[i],
-               adj=ifelse(p$x < 0, 1, -.25), cex=values_cex, ...)
+          text(cx*p$x, (cy*p$y-.1), x.txt[i], xpd=TRUE, col=labels_cl[i],
+               adj=ifelse(p$x < 0, 1, -.25), cex=labels_size, ...)
         }
       }  # end out
 
 
-      # plot the values if "in"
-      if (values != "off") if (values_position == "in") {
+      # plot the labels if "in"
+      if (labels != "off") if (labels_position == "in") {
         cx <- 0.82;  cy <- 0.86  # scale factors to position labels
         if (hole < 0.65) {  # scale factor to slide text down for small hole
           cx <- cx * (1 - (.16 * (1-hole)))  # max slide is 0.84
@@ -213,13 +213,13 @@ function(x, y,
           cx <- cx * (1 - (-.62 * (1-hole)))  # max slide is 0.84
           cy <- cy * (1 - (-.62 * (1-hole)))
         }
-        text(cx*p$x, cy*p$y, x.txt[i], xpd=TRUE, col=values_cl[i],
-             cex=values_cex, ...)
+        text(cx*p$x, cy*p$y, x.txt[i], xpd=TRUE, col=labels_cl[i],
+             cex=labels_size, ...)
       }  # end "in"
 
       # plot the labels
       cx <- 1.1;  cy <- 1.175
-      text(cx * p$x, cy * p$y, labels[i], xpd=TRUE, 
+      text(cx * p$x, cy * p$y, nms.x[i], xpd=TRUE, 
         adj=ifelse(p$x < 0, 1, 0), cex=labels_cex, ...)  # labels
     }
   }  # end slice by slice
@@ -245,14 +245,14 @@ function(x, y,
                     ", hole=0)  # traditional pie chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("PieChart(", x.name,
-                    ", values=\"%\")  # display %'s on the chart", sep="")
+                    ", labels=\"%\")  # display %'s on the chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("PieChart(", x.name, ")  # bar chart", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
         fc <- paste("Plot(", x.name,
-                    ", values=\"count\")  # lollipop plot", sep="")
+                    ", labels=\"count\")  # lollipop plot", sep="")
         txsug <- paste(txsug, "\n", fc, sep="")
     }
     class(txsug) <- "out"

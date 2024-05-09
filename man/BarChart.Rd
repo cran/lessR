@@ -24,16 +24,15 @@ BarChart(
 
         # ------------------------------------------
         # Data from which to construct the bar chart
-        x=NULL, y=NULL, by=NULL, data=d,
-        rows=NULL, top=NULL,
+        x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
-        # ------------------------------------------------------
-        # Bar chart from aggregated data of numerical variable y
+        # ------------------------------
+        # Bar chart from aggregated data
         stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
         stat_x=c("count", "proportion"),
 
         # --------------------------------------------------
-        # Trellis (facet) plot, plotting on different panels
+        # Trellis (facet) plot, stratify on different panels
         by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
         
         # -------------------------------
@@ -50,12 +49,12 @@ BarChart(
         transparency=getOption("trans_bar_fill"),
         fill_split=NULL,
 
-        values=c("\%", "input", "off"),
-        values_color=getOption("values_color"),
-        values_size=getOption("values_size"),
-        values_digits=getOption("values_digits"),
-        values_position=getOption("values_position"),
-        values_cut=NULL,
+        labels=c("\%", "input", "off"),
+        labels_color=getOption("labels_color"),
+        labels_size=getOption("labels_size"),
+        labels_decimals=getOption("labels_decimals"),
+        labels_position=getOption("labels_position"),
+        labels_cut=NULL,
 
         # ------------------------------------------------------------------
         # Labels for axes, values, and legend if x and by variables, margins
@@ -83,7 +82,7 @@ BarChart(
 
         # --------------------------------------
         # Deprecated, removed in future versions
-        n_cat=getOption("n_cat"), value_labels=NULL, 
+        n_cat=getOption("n_cat"), value_labels=NULL, rows=NULL, 
 
         # -------------
         # Miscellaneous
@@ -122,14 +121,8 @@ bc(\dots)
        \code{y}-variable are computed, or can be a summary table that consists
        of two columns: the level of a categorical variable paired with the
        numeric value that determines the height of the corresponding bar.}
-  \item{rows}{A logical expression that specifies a subset of rows of the
+  \item{filter}{A logical expression that specifies a subset of rows of the
        data frame to analyze.}
-  \item{top}{Retain only the specified first number of \code{x} values.
-       Usually, applied to sorted output according to the value of the \code{sort} 
-       parameter, to retain either the specified largest or smallest values of
-       the \code{x}
-       categorical variable. If \code{by} is active, then the retention
-       is based on the sum of the \code{by} variable for each level of \code{x}.}
   \item{stat}{Statistical transformation of the data for the y-axis across
        groups defined by the categorical variable(s), the data aggregation. 
        Applicable values: \code{"sum"}, \code{"mean"}, \code{"sd"}, \code{"dev"}
@@ -214,7 +207,7 @@ bc(\dots)
         in the second \code{fill} color, or as specified by a vector of
         exactly two fill colors.}\cr
 
-  \item{values}{If not \code{"off"}, adds the
+  \item{labels}{If not \code{"off"}, adds the
         numerical results to the plot according to the default \code{"\%"}
         for tabulated counts and \code{"input"} for the input values for
         a \code{y}-variable explicitly provided, unless there are more than
@@ -222,22 +215,22 @@ bc(\dots)
         the default is \code{"off"}. For tabulated
         counts, \code{"prop"} is also available for proportions, as well as
         \code{"input"} to show the computed values such as counts.}
-  \item{values_color}{Color of the plotted text. Could be a vector to specify
+  \item{labels_color}{Color of the plotted text. Could be a vector to specify
         a unique color for each value. If fewer colors are specified than
         the number of categories, the colors are recycled.}
-  \item{values_size}{Character expansion factor, the size, of the plotted text,
+  \item{labels_size}{Character expansion factor, the size, of the plotted text,
         for which the default value is 0.95, or 0.9 of value if \code{beside}
-        is \code{TRUE} and \code{values_position} is \code{"in"} because bars are
+        is \code{TRUE} and \code{labels_position} is \code{"in"} because bars are
         narrower.}
-  \item{values_digits}{Number of decimal digits for which to display the values.
+  \item{labels_decimals}{Number of decimal digits for which to display the values.
         Default is 0, round to the nearest integer for \code{"\%"},
         2 for \code{"prop"}, and if \code{"input"} and \code{y} is entered
         directly, display the literal value unless > 9999, in which case
         set to 0.}
-  \item{values_position}{Position of the plotted text. Default is \code{"in"} for
+  \item{labels_position}{Position of the plotted text. Default is \code{"in"} for
         inside the bar, or, if \code{"out"}, the label for each value is placed
         outside of the bar, on top.}
-  \item{values_cut}{Threshold for displaying the value. If \code{values_position}
+  \item{labels_cut}{Threshold for displaying the value. If \code{labels_position}
        equals \code{"out"}, then default is 0.028 unless there is a
        \code{by} variable or multiple x-variables on the same plot, then
        default is 0.040}\cr
@@ -353,7 +346,8 @@ bc(\dots)
         with \code{axis_cex} and \code{axis_x_cex} from the lessR
         \code{\link{style} function.}
         \emph{[deprecated]}: Better to convert a categorical integer variable to
-        a factor.}\cr
+        a factor.}
+  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}\cr
 
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE}
@@ -376,7 +370,7 @@ bc(\dots)
 
 \details{
 OVERVIEW\cr
-Plot a bar chart with default colors for one or two categorical variables, that is, with a relatively small number of values for each variable.  By default, colors are selected for the bars, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}}, \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accommodate both the value labels and the variable label.
+Plot a bar chart with default colors for one or two categorical variables, that is, with a relatively small number of labels for each variable.  By default, colors are selected for the bars, background and grid lines, all of which can be customized. The basic computations of the chart are provided with the standard R functions \code{\link{barplot}}, \code{\link{chisq.test}} and, for two variables, \code{\link{legend}}. Horizontal bar charts, specified by \code{horiz=TRUE}, list the value labels horizontally and automatically extend the left margin to accommodate both the value labels and the variable label.
 
 
 DATA\cr
@@ -606,7 +600,7 @@ BarChart(Dept, by=Gender, stack100=TRUE)
 
 # at each level of Gender, show the frequencies of the Dept levels
 # do not display percentages directly on the bars
-BarChart(Gender, by=JobSat, fill="reds", values="off")
+BarChart(Gender, by=JobSat, fill="reds", labels="off")
 
 # specify two fill colors for Gender
 BarChart(Dept, by=Gender, fill=c("deepskyblue", "black"))
@@ -615,7 +609,7 @@ BarChart(Dept, by=Gender, fill=c("deepskyblue", "black"))
 # the levels of Dept are included within each respective bar
 # plot horizontally, display the value for each bar at the
 #   top of each bar
-BarChart(Gender, by=Dept, beside=TRUE, horiz=TRUE, values_position="out")
+BarChart(Gender, by=Dept, beside=TRUE, horiz=TRUE, labels_position="out")
 
 # horizontal bar chart of two variables, put legend on the top
 BarChart(Gender, by=Dept, horiz=TRUE, legend_position="top")
@@ -645,18 +639,18 @@ d <- rd("Mach4", quiet=TRUE)
 
 # all on the same plot, bar charts for 20 6-pt Likert scale items
 # default scale is divergent from "browns" to "blues"
-BarChart(m01:m20, horiz=TRUE, values="off", sort="+")
+BarChart(m01:m20, horiz=TRUE, labels="off", sort="+")
 
 
 \donttest{
 
 # custom scale with explicit call to getColors, HCL chroma at 50
 clrs <- getColors("greens", "purples", c=50)
-BarChart(m01:m20, horiz=TRUE, values="off", sort="+", fill=clrs)
+BarChart(m01:m20, horiz=TRUE, labels="off", sort="+", fill=clrs)
 
 # custom divergent scale with pre-defined color palettes
 #  with implicit call to getColors
-BarChart(m01:m20, horiz=TRUE, values="off", fill=c("aquas", "rusts"))
+BarChart(m01:m20, horiz=TRUE, labels="off", fill=c("aquas", "rusts"))
 
 
 # ----------------------------

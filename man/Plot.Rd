@@ -39,7 +39,7 @@ Plot(
 
     # -------------------------------------
     # Data from which to construct the plot
-    x, y=NULL, data=d, rows=NULL,
+    x, y=NULL, data=d, filter=NULL,
 
     # -----------------------------------
     # Lollipop chart from aggregated data
@@ -135,7 +135,7 @@ Plot(
 
     # --------------------------------------
     # Deprecated, removed in future versions
-    n_cat=getOption("n_cat"), value_labels=NULL,
+    n_cat=getOption("n_cat"), value_labels=NULL, rows=NULL,
 
     # -------------
     # Miscellaneous
@@ -167,8 +167,8 @@ vp(\dots)
         Can be in a data frame or defined in the global environment.} 
   \item{data}{Optional data frame that contains one or both of \code{x} and
         \code{y}. Default data frame is \code{d}.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
-       to analyze.}\cr
+  \item{filter}{A logical expression that specifies a subset of rows of
+        the data frame to analyze.}\cr
 
   \item{stat}{Transform data for categorical variable \code{x}
        into a simple table of paired levels of
@@ -585,7 +585,8 @@ vp(\dots)
         with \code{axis_cex} and \code{axis_x_cex} from the lessR
         \code{\link{style} function.}
         \emph{[deprecated]}: Better to convert a categorical integer variable to
-        a factor.}\cr
+        a factor.}
+  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}\cr
 
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE} 
@@ -815,7 +816,7 @@ d <- dd
 \donttest{
 
 # just males employed more than 5 years
-Plot(Years, Salary, rows=(Gender=="M" & Years > 5))
+Plot(Years, Salary, filter=(Gender=="M" & Years > 5))
 
 # plot 0.95 data ellipse with the points identified that represent
 #   outliers defined by a Mahalanobis Distance larger than 6 
@@ -982,11 +983,11 @@ style()
 # stock prices for three companies by month:  Apple, IBM, Intel
 d <- rd("StockPrice")
 # only plot Apple
-Plot(date, Price, rows=(Company=="Apple"))
+Plot(Month, Price, filter=(Company=="Apple"))
 # Trellis plots, one for each company
-Plot(date, Price, by1=Company, n_col=1)
+Plot(Month, Price, by1=Company, n_col=1)
 # all three plots on the same panel, three shades of blue
-Plot(date, Price, by=Company, color="blues")
+Plot(Month, Price, by=Company, color="blues")
 }
 
 #------------------------------------------

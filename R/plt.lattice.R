@@ -11,7 +11,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
          out_shape, out_size,
          out_fill, out_color, out2_fill, out2_color,
          ID, out_cut, ID_color, ID_size,
-         rotate_x, rotate_y, width, height, pdf_file, T.type, ...) {
+         rotate_x, rotate_y, width, height, pdf_file, T.type, quiet, ...) {
 
   date.ts <- FALSE
   if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
@@ -326,16 +326,18 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
               Rsq.pn <- .fmt(Rsq, 3)
               b0.pn <- .fmt(b0, 3)
               b1.pn <- .fmt(b1, 3)
-              cat("\n") 
-              if (panel.number() == 1) {
-                cat("Regression analysis of linearized", y.name, "values\n")
-                msg <- paste("Need back transformation of regression model",
-                            "to compute predicted values\n\n")
-                cat(msg)
+              if (!quiet) {
+                cat("\n") 
+                if (panel.number() == 1) {
+                  cat("Regression analysis of linearized", y.name, "values\n")
+                  msg <- paste("Need back transformation of regression model",
+                              "to compute predicted values\n\n")
+                  cat(msg)
+                }
               }
               by1.name <- getOption("by1name")
               panel.n <- panel.number()
-              cat(by1.name, " ", panel.n, "  ",
+              if (!quiet) cat(by1.name, " ", panel.n, "  ",
                   "Line: b0 = ", b0.pn, "  b1 = ", b1.pn, "   ",
                   "Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
                   sep="", "\n")

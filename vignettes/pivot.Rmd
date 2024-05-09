@@ -284,7 +284,7 @@ One data analysis strategy examines the values of a variable, such as Sales for 
 In this example, compute the mean of _Salary_ for each level of _Dept_ for just those rows of data with the value of _Gender_ equal to "W".
 
 ```{r}
-pivot(d, mean, Salary, Dept, rows=(Gender=="W"))
+pivot(d, mean, Salary, Dept, filter=(Gender=="W"))
 ```
 
 The parentheses for the `rows` parameter are not necessary, but do enhance readability.

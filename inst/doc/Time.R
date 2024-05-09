@@ -18,43 +18,43 @@ d <- Read("StockPrice")
 d[1:5,]
 
 ## ---------------------------------------------------------------------------------------------------------------------
-Plot(date, Price, rows=(Company=="Apple"))
+Plot(Month, Price, filter=(Company=="Apple"))
 
 ## ---------------------------------------------------------------------------------------------------------------------
-Plot(date, Price, rows=(Company=="Apple"), area_fill="on")
+Plot(Month, Price, filter=(Company=="Apple"), area_fill="on")
 
 ## ----fig.width=5------------------------------------------------------------------------------------------------------
-Plot(date, Price, by=Company)
+Plot(Month, Price, by=Company)
 
 ## ----fig.width=5------------------------------------------------------------------------------------------------------
-Plot(date, Price, by=Company, stack=TRUE)
+Plot(Month, Price, by=Company, stack=TRUE)
 
 ## ----fig.width=5------------------------------------------------------------------------------------------------------
-Plot(date, Price, by1=Company)
+Plot(Month, Price, by1=Company)
 
 ## ----fig.width=5------------------------------------------------------------------------------------------------------
 style(sub_theme="black", window_fill="gray10")
-Plot(date, Price, by1=Company, n_col=1, fill="darkred", color="red", trans=.55)
+Plot(Month, Price, by1=Company, n_col=1, fill="darkred", color="red", trans=.55)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 style()
 style(quiet=TRUE)
 
 ## ----fig.width=5------------------------------------------------------------------------------------------------------
-Plot(date, Price, by1=Company, xlab="", area_fill="on", area_origin=25)
+Plot(Month, Price, by1=Company, xlab="", area_fill="on", area_origin=25)
 
 ## ----fig.width=5------------------------------------------------------------------------------------------------------
-Plot(date, Price, by1=Company, aspect=.5, area_fill="slategray3")
+Plot(Month, Price, by1=Company, aspect=.5, area_fill="slategray3")
 
 ## ----fig.width=6------------------------------------------------------------------------------------------------------
-Plot(date, Price, by=Company, trans=0.4, stack=TRUE, area_fill="emeralds")
+Plot(Month, Price, by=Company, trans=0.4, stack=TRUE, area_fill="emeralds")
 
 ## ---------------------------------------------------------------------------------------------------------------------
-dw <- reshape_wide(d, group="Company", response="Price", ID="date")
+dw <- reshape_wide(d, group="Company", response="Price", ID="Month")
 head(dw)
 
 ## ----fig.width=6------------------------------------------------------------------------------------------------------
-Plot(date, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
+Plot(Month, c(Intel, Apple, IBM), area_fill="blues", stack=TRUE, trans=.4, data=dw)
 
 ## ----fig.wdith=6------------------------------------------------------------------------------------------------------
 a1.ts <- ts(dw$Apple, frequency=12, start=c(1980, 12))
@@ -65,7 +65,7 @@ style()
 
 ## ----fig.width=4.5----------------------------------------------------------------------------------------------------
 x <- as.Date("2007-06-01")
-Plot(date, Price, rows=(Company == "Apple"), fill="on",
+Plot(Month, Price, filter=(Company == "Apple"), fill="on",
             add=c("iPhone", "arrow"), 
             x1=c(x,x), y1=c(100,90), x2=x, y2=30)
 

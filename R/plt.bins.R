@@ -70,8 +70,8 @@ function(x, y, nm.x, nm.y, stat, n_bins=6,
   d.x <- dbin[,1, drop=FALSE]  # midpt
   d.y <- dbin[,2, drop=FALSE]  # mean or median
   if (is.null(size)) {
-    den <- max(n, na.rm=TRUE) / 4  # scaling factor so max pt.size is around 4
-    size <- (n/den)^.5
+    den <- max(n, na.rm=TRUE) / 10  # scaling factor so max pt.size is around 10
+    size <- (n/den)^.6
   }
   .plt.main(d.x, d.y, xlab=nm.x, ylab=paste(stat, "of", nm.y), 
             segments=segments, fill=fill, color=color, size=size, 

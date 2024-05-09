@@ -56,7 +56,7 @@ getColors("browns", c=c(20,90), l=60, output=TRUE)
 
 ## ----fig.width=6------------------------------------------------------------------------------------------------------
 d2 <- Read("StockPrice", quiet=TRUE)
-Plot(date, Price, by=Company, stack=TRUE, area_fill="reds", trans=0.4, data=d2)
+Plot(Month, Price, by=Company, stack=TRUE, area_fill="reds", trans=0.4, data=d2)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 getColors("rusts", "blues")

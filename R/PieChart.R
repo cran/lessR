@@ -1,5 +1,5 @@
 PieChart <-
-function(x, y=NULL, data=d, rows=NULL,
+function(x, y=NULL, data=d, filter=NULL,
 
          radius=1, hole=0.65, hole_fill=getOption("panel_fill"),
 
@@ -13,20 +13,27 @@ function(x, y=NULL, data=d, rows=NULL,
 
          clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0), 
 
-         values=getOption("values"),
-         values_color=getOption("values_color"), 
-         values_size=getOption("values_size"),
-         values_digits=getOption("values_digits"),
-         values_position=getOption("values_position"),
+         labels=getOption("labels"),
+         labels_color=getOption("labels_color"), 
+         labels_size=getOption("labels_size"),
+         labels_digits=getOption("labels_digits"),
+         labels_position=getOption("labels_position"),
 
          main=NULL, main_cex=getOption("main_cex")*1.2,
          labels_cex=getOption("lab_cex"), cex,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
+         rows=NULL,
+
          eval_df=NULL, quiet=getOption("quiet"),
          width=6.5, height=6, pdf_file=NULL, ...) {
 
+
+  # ------------ Old Stuff ----------------------------------
+  if (!missing(rows)) 
+    message(">>> Parameter  rows  renamed to:  filter.\n",
+            "    Change to  filter,  rows  will stop working in the future.\n")
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
@@ -43,7 +50,7 @@ function(x, y=NULL, data=d, rows=NULL,
   if (!missing(cex)) {
     main_cex <- cex * main_cex
     labels_cex <- cex * labels_cex
-    values_size <- cex * values_size
+    labels_size <- cex * labels_size
   }
 
   trans <- transparency
@@ -62,23 +69,23 @@ function(x, y=NULL, data=d, rows=NULL,
     if (trans.miss) trans <- sty$bar$trans.fill
   }
 
-  if (is.null(values_digits)) {
-    if (values == "%") values_digits <- 0
-    if (values == "prop") values_digits <- 2
+  if (is.null(labels_digits)) {
+    if (labels == "%") labels_digits <- 0
+    if (labels == "prop") labels_digits <- 2
   }
 
-  if (missing(values) && (!missing(values_color) || !missing(values_size)
-      || !missing(values_digits) || !missing(values_position)))
-    values <- "%"
+  if (missing(labels) && (!missing(labels_color) || !missing(labels_size)
+      || !missing(labels_digits) || !missing(labels_position)))
+    labels <- "%"
 
-  if (is.null(values_digits)) {
-    if (values == "%") values_digits <- 0
-    if (values == "prop") values_digits <- 2
+  if (is.null(labels_digits)) {
+    if (labels == "%") labels_digits <- 0
+    if (labels == "prop") labels_digits <- 2
   }
 
-  if (missing(values_color)) {
-    values_color <- "white" 
-    if (values_position == "out") values_color <- getOption("axis_text_color")
+  if (missing(labels_color)) {
+    labels_color <- "white" 
+    if (labels_position == "out") labels_color <- getOption("axis_text_color")
   }
 
   if (missing(x)) {
@@ -91,9 +98,9 @@ function(x, y=NULL, data=d, rows=NULL,
       "Size of hole is a proportion, so must be between 0 and 1\n\n")
   }
 
-  if (!(values %in% c("off", "%", "prop", "input"))) {
+  if (!(labels %in% c("off", "%", "prop", "input"))) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Valid values of values: \"off\",  \"%\", \"prop\", and \"input\"\n\n")
+      "Valid labels of labels: \"off\",  \"%\", \"prop\", and \"input\"\n\n")
   }
 
   .param.old(...)
@@ -121,15 +128,24 @@ function(x, y=NULL, data=d, rows=NULL,
     df.name <- deparse(substitute(data))
     options(dname = df.name)
   }
+
+  shiny <- FALSE
+  if (!is.null(sys.call(-1)))  # is NULL when called directly from R console
+    if (sys.call(-1) == "renderPlot()") {  # from shiny, user or interact()
+      shiny <- TRUE
+      data <- eval(substitute(data), envir=parent.frame())
+    }
  
-  # if a tibble convert to data frame
-  if (!is.null(dfs)) {
-    if (df.name %in% dfs) {  
-      if (any(grepl("tbl", class(data), fixed=TRUE))) {  # tibble to df
+  # if a tibble, convert to data frame
+  if (!shiny) {
+    if (exists(df.name, envir=.GlobalEnv)) {
+      if (any(grepl("tbl", class(data), fixed=TRUE)))
         data <- data.frame(data)
-      }
     }
   }
+  else  # no check for existence of df.name
+    if (any(grepl("tbl", class(data), fixed=TRUE)))
+      data <- data.frame(data)
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
@@ -142,7 +158,7 @@ function(x, y=NULL, data=d, rows=NULL,
   if (!x.in.global)  {
     if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
     # force evaluation (not lazy) if data not specified but relies on default d
-    if (data.miss)
+    if (data.miss) {
       data <- eval(substitute(data), envir=parent.frame())
       # the 1.201 comes from Shiny, need to reset
       # l.cex and l.axc are set in interact() before shiny run
@@ -153,6 +169,7 @@ function(x, y=NULL, data=d, rows=NULL,
         }
         else
           style()
+        }
       }
     }
     else # df.name is NULL
@@ -170,16 +187,31 @@ function(x, y=NULL, data=d, rows=NULL,
       if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
       .xcheck(x.name, df.name, names(data))  # x-var in df?
     }
+
+    # subset filter (with deprecated rows parameter also)
+    if (!missing(filter) || !missing(rows)) {
+      txt <- .filter(deparse(substitute(filter)))
+      if (!missing(filter))  # subset filter
+        r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
+      if (!missing(rows))
+        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+      r <- r & !is.na(r)  # set missing for a row to FALSE
+      nr.before <- nrow(data)
+      if (any(r))
+        data <- data[r,,drop=FALSE]
+      if (!quiet) {
+        if (!missing(filter))  # filter parameter present 
+          cat("\nfilter: ",  txt, "\n-----\n")
+        cat("Rows of data before filtering: ", nr.before, "\n")
+        cat("Rows of data after filtering:  ", nrow(data), "\n\n")
+      }
+    }  # end filter
+
     data.vars <- as.list(seq_along(data))
     names(data.vars) <- names(data)
     ind <- eval(substitute(x), envir=data.vars)  # col num of each var
-    if (!missing(rows)) {  # subset rows
-      r <- eval(substitute(rows), envir=data, enclos=parent.frame())
-      r <- r & !is.na(r)  # set missing for a row to FALSE
-      data <- data[r,,drop=FALSE]
-    }
-  if (length(ind) > 1) data <- data[, ind]  # x is a vars list
-  if (length(ind) == 1) x.call <- eval(substitute(data$x))  # x is 1 var
+    if (length(ind) > 1) data <- data[, ind]  # x is a vars list
+    if (length(ind) == 1) x.call <- eval(substitute(data$x))  # x is 1 var
   }
   else {  # x is in the global environment (vector, matrix or data frame)
     if (is.data.frame(x))  # x a data frame
@@ -274,7 +306,7 @@ function(x, y=NULL, data=d, rows=NULL,
         radius, hole, hole_fill, edges, 
         clockwise, init_angle, 
         density, angle, lty, lwd,
-        values, values_position, values_color, values_size, values_digits,
+        labels, labels_position, labels_color, labels_size, labels_digits,
         labels_cex, main_cex, main, main.miss,
         add, x1, x2, y1, y2,
         quiet, pdf_file, width, height, ...)

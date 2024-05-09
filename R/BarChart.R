@@ -1,6 +1,5 @@
 BarChart <-
-function(x=NULL, y=NULL, by=NULL, data=d,
-        rows=NULL, top=NULL,
+function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL, 
 
         stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
         stat_x=c("count", "proportion"),
@@ -17,12 +16,12 @@ function(x=NULL, y=NULL, by=NULL, data=d,
         transparency=getOption("trans_bar_fill"),
         fill_split=NULL,
 
-        values=c("%", "input", "off"),
-        values_color=getOption("values_color"),
-        values_size=getOption("values_size"),
-        values_digits=getOption("values_digits"),
-        values_position=getOption("values_position"),
-        values_cut=NULL,
+        labels=c("%", "input", "off"),
+        labels_color=getOption("labels_color"),
+        labels_size=getOption("labels_size"),
+        labels_decimals=getOption("labels_decimals"),
+        labels_position=getOption("labels_position"),
+        labels_cut=NULL,
 
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
         lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
@@ -42,7 +41,7 @@ function(x=NULL, y=NULL, by=NULL, data=d,
         pdf_file=NULL, width=6.5, height=6, 
         digits_d=NULL, out_size=80, 
 
-        n_cat=getOption("n_cat"), value_labels=NULL, 
+        n_cat=getOption("n_cat"), value_labels=NULL, rows=NULL, 
 
         eval_df=NULL, ...) {
 
@@ -64,17 +63,42 @@ function(x=NULL, y=NULL, by=NULL, data=d,
   }
 
   # ------------ Old Stuff ----------------------------------
+  if (!missing(rows)) 
+    message(">>> Parameter  rows  renamed to:  filter.\n",
+            "    Change to  filter,  rows  will stop working in the future.\n")
+
+  if(!missing(n_cat) || !missing(value_labels)) {
+    message(">>> Parameters  n_cat  and  value_labels  will no longer ",
+            "work in the future.\n",
+             "    Better to convert a categorical integer variable to ",
+             "a factor.\n")
+  }
+
   dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
+  n.values <- 0
+  if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]] 
-      if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]] 
-      if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
-      if (grepl(".", names(dots)[i], fixed=TRUE)) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)  # dot to _
-        assign(nm, dots[[i]])
-        get(nm)
+      if (grepl("values", names(dots)[i], fixed=TRUE)) {
+        n.values <- n.values + 1
+        if (n.values == 1) 
+          message(">>> Parameters  values, values_color, etc. now ",
+                  "renamed to:  labels, labels_color, etc.\n",
+                  "    Old parameter names will stop working in the future.\n")
+        if (names(dots)[i] == "values") labels <- dots[[i]]
+        if (names(dots)[i] == "values_color") labels_color <- dots[[i]]
+        if (names(dots)[i] == "values_size") labels_size <- dots[[i]]
+        if (names(dots)[i] == "values_digits") labels_decimals <- dots[[i]]
+        if (names(dots)[i] == "values_position") labels_position <- dots[[i]]
+        if (names(dots)[i] == "values_cut") labels_cut <- dots[[i]]
       }
+    }
+    if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]] 
+    if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]] 
+    if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
+    if (grepl(".", names(dots)[i], fixed=TRUE)) {
+      nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)  # dot to _
+      assign(nm, dots[[i]])
+      get(nm)
     }
   }
 
@@ -97,7 +121,8 @@ function(x=NULL, y=NULL, by=NULL, data=d,
 
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
   sort <- match.arg(sort)
-  values <- match.arg(values)
+  labels.miss <- ifelse (missing(labels), TRUE, FALSE)
+  labels <- match.arg(labels)
 
   stat.miss <- ifelse (missing(stat), TRUE, FALSE)
   if (stat.miss) stat <- NULL
@@ -133,14 +158,9 @@ function(x=NULL, y=NULL, by=NULL, data=d,
   lm.adj <- lm.adj + .1  # pull these margins back a bit for bc
   bm.adj <- bm.adj + .1
 
-  if (missing(values_color)) {
-    values_color <- "white"
-    if (values_position == "out") values_color <- getOption("axis.text.color")
-  }
-
-  if (is.null(values_digits)) {
-    if (values == "%") values_digits <- 0
-    if (values == "proportion") values_digits <- 2
+  if (missing(labels_color)) {
+    labels_color <- "white"
+    if (labels_position == "out") labels_color <- getOption("axis.text.color")
   }
 
   Trellis <- ifelse (!missing(by1), TRUE, FALSE)
@@ -165,9 +185,9 @@ function(x=NULL, y=NULL, by=NULL, data=d,
       "  either drop  fill_split  or drop  fill  parameter values\n\n")
   }
 
-  if (!(values_position %in% c("in", "out"))) {
+  if (!(labels_position %in% c("in", "out"))) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "values_position  must be set to \"in\", \"out\"\n\n")
+      "labels_position  must be set to \"in\", \"out\"\n\n")
   }
 
   if (!is.null(stat)) if (!stat.miss && y.miss) {
@@ -195,17 +215,29 @@ function(x=NULL, y=NULL, by=NULL, data=d,
   }
 
   # get name of data table
+  # df.name is NULL if from shiny interact(), not from user-written shiny code
   if (!mydata.ok) {
-    df.name <- deparse(substitute(data))  # is NULL if from shiny
+    df.name <- deparse(substitute(data))
     options(dname = df.name)
   }
-  shiny <- ifelse (df.name == "NULL", TRUE, FALSE)  # call from shiny?
+
+  shiny <- FALSE
+  if (!is.null(sys.call(-1)))  # is NULL when called directly from R console
+    if (sys.call(-1) == "renderPlot()") {  # from shiny, user or interact()
+      shiny <- TRUE
+      data <- eval(substitute(data), envir=parent.frame())
+    }
  
   # if a tibble, convert to data frame
-  if (exists(df.name, envir=parent.frame())) {
+  if (!shiny) {
+    if (exists(df.name, envir=.GlobalEnv)) {
+      if (any(grepl("tbl", class(data), fixed=TRUE)))
+        data <- data.frame(data)
+    }
+  }
+  else  # no check for existence of df.name
     if (any(grepl("tbl", class(data), fixed=TRUE)))
       data <- data.frame(data)
-  }
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
@@ -220,7 +252,6 @@ function(x=NULL, y=NULL, by=NULL, data=d,
       # force evaluation (not lazy) if data not specified, relies on default d
       if (data.miss) {
         if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
-        data <- eval(substitute(data), envir=parent.frame())
         # the 1.201 comes from Shiny, need to reset
         # l.cex and l.axc are set in interact() before shiny run
         if (getOption("lab_cex") == 1.201) {
@@ -258,25 +289,36 @@ function(x=NULL, y=NULL, by=NULL, data=d,
 
     if (!x.in.global) {
       if (eval_df) {
-        if (!mydata.ok) .nodf(df.name)  # check to see if df exists
+        if (!mydata.ok) if (!shiny) .nodf(df.name)  # check to see if df exists
         .xcheck(x.name, df.name, names(data))  # x-vars in df?
       }
+
+      # subset filter (with deprecated rows parameter also)
+      if (!missing(filter) || !missing(rows)) {
+        txt <- .filter(deparse(substitute(filter)))
+        if (!missing(filter))  # subset filter
+          r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
+        if (!missing(rows))
+          r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+        r <- r & !is.na(r)  # set missing for a row to FALSE
+        nr.before <- nrow(data)
+        if (any(r))
+          data <- data[r,,drop=FALSE]
+        if (!quiet) {
+          if (!missing(filter))  # filter parameter present 
+            cat("\nfilter: ",  txt, "\n-----\n")
+          cat("Rows of data before filtering: ", nr.before, "\n")
+          cat("Rows of data after filtering:  ", nrow(data), "\n\n")
+        }
+      }  # end filter
+
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
       ind <- eval(substitute(x), envir=data.vars)  # col num of each var
-      if (!missing(rows)) {  # subset rows
-        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
-        if (!any(r)) {
-          cat("\n"); stop(call.=FALSE, "\n","------\n",
-            "No rows of data with the specified value of\n",
-            "rows = ", deparse(substitute(rows)), "\n\n")
-        }
-        r <- r & !is.na(r)  # set missing for a row to FALSE
-        data <- data[r,,drop=FALSE]
-      }
       if (length(ind) > 1) data <- data[, ind]  # x a vars list, no by vars
       if (length(ind) == 1) x.call <- eval(substitute(data$x))  # x is 1 var
     }
+
     else {  # x is in the global environment (vector, matrix or data frame)
       if (is.data.frame(x))  # x a data frame
         data <- x
@@ -333,9 +375,9 @@ function(x=NULL, y=NULL, by=NULL, data=d,
     else
       by.call <- NULL
 
-    if (values_position == "out"  &&  !is.null(by.call)  &&  !beside) {
+    if (labels_position == "out"  &&  !is.null(by.call)  &&  !beside) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "values_position=\"out\" not meaningful for a  by  variable\n",
+        "labels_position=\"out\" not meaningful for a  by  variable\n",
         "  without beside=TRUE\n\n")
     }
 
@@ -405,7 +447,7 @@ function(x=NULL, y=NULL, by=NULL, data=d,
       by1.call <- NULL
 
 
-  # evaluate fill (NULL, numeric constant or a variable)
+  # evaluate specified fill (NULL, numeric constant, or a variable)
   #--------------
 
   if (!fill.miss) {
@@ -419,9 +461,11 @@ function(x=NULL, y=NULL, by=NULL, data=d,
       else in.df <- FALSE
 
     # only works for y given, not tabulated
-    if (in.df) {
-      fill.val <- eval(substitute(data$fill))
-      fill <- .getColC(fill.val)
+    if (in.df) {  # fill is a variable
+# need to aggregate cat var x and set fill.val to those limited values
+# currently, fill.val consists of all data values of variable fill
+      fill.val <- eval(substitute(data$fill))  # fill is a variable in data
+      fill <- .getColC(fill.val, fill_name=fill.name)
       if (sort != "0") {
         srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
         fill <- fill[order(fill.val, decreasing=srt.dwn)]
@@ -464,8 +508,9 @@ function(x=NULL, y=NULL, by=NULL, data=d,
   # -----------  x, y, and by variables established ------------
   # ------------------------------------------------------------
 
+  # no missing data in the analysis, using na.omit
   n.x <- length(unique(na.omit(x.call)))
-  n.by <- ifelse (!by.miss, length(unique(by.call)), 0)
+  n.by <- ifelse (!by.miss, length(unique(na.omit(by.call))), 0)
   n.levels <- ifelse (by.miss || is.null(by.call), n.x, n.by)
 
   # -------------
@@ -502,7 +547,28 @@ function(x=NULL, y=NULL, by=NULL, data=d,
   # process stat parameter
 
   lx.u <- length(unique(x.call))  # includes NA values
-  is.smry_tbl <- ifelse (lx.u < length(x.call), FALSE, TRUE)
+  if (is.null(by.call))
+    is.smry_tbl <- ifelse (lx.u < (length(x.call)), FALSE, TRUE)
+  else {
+    lby.u <- length(unique(by.call))  # includes NA values
+    is.smry_tbl <- ifelse (lx.u*lby.u < length(by.call), FALSE, TRUE)
+  }
+
+  if (labels.miss) {
+    if (!stat.miss || is.smry_tbl) # set default
+      labels <- "input"
+    else
+      labels <- "%"
+  }
+
+  if (!is.smry_tbl && !is.null(y.call) && stat.miss) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "The data are not a summary table, and you have a ",
+      "numerical variable,\n",
+      "    y = ", y.name, "\n",
+      "so need to specify a value of  stat  to define the aggregation of\n",
+      y.name, ", such as stat=\"mean\".\n\n")
+  }      
 
   if (!is.null(y.call)) {  # a y variable present
 
@@ -511,7 +577,7 @@ function(x=NULL, y=NULL, by=NULL, data=d,
       if (!stat.miss  &&  is.smry_tbl) { # y and a summary table, then no stat
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "The data are a summary table, so do not specify a value of\n",
-          "  stat  as the data transformation has already been done\n\n")
+          "  stat  as the data aggregation has already been done\n\n")
       }      
 
      if (sum(is.na(x.call)) > 0 ||
@@ -609,12 +675,12 @@ function(x=NULL, y=NULL, by=NULL, data=d,
 
     bc <- .bc.main(x.call, y.call, by.call, stack100,
           fill, color, trans, fill_split, theme,
-          horiz, gap, proportion, scale_y, top,
+          horiz, gap, proportion, scale_y, 
           xlab, ylab, main,
           value_labels, label_max, beside,
           rotate_x, offset, break_x, sort,
-          values, values_color, values_size, values_digits,
-          values_position, values_cut,
+          labels, labels_color, labels_size, labels_decimals,
+          labels_position, labels_cut,
           xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
           pad_y_min, pad_y_max,
           legend_title, legend_position, legend_labels,
@@ -641,10 +707,10 @@ function(x=NULL, y=NULL, by=NULL, data=d,
         "by and by1 variables not available for multiple x variables\n\n")
     }
 
-    # if values not assigned, do default
-    if (is.null(values)) { 
-        values <- getOption("values")
-        if (values != "off") if (missing(y)) values <- "input"
+    # if labels not assigned, do default
+    if (is.null(labels)) { 
+        labels <- getOption("labels")
+        if (labels != "off") if (missing(y)) labels <- "input"
     }
 
     if (is.null(one_plot) || one_plot) {  # see if one_plot was specified
@@ -677,7 +743,7 @@ function(x=NULL, y=NULL, by=NULL, data=d,
       options(byname = "Responses")
       if (is.null(xlab)) xlab <- ""
       if (is.null(ylab)) ylab <- ""
-      if (missing(values_size)) values_size <- 0.8 - (0.008 * ncol(data))
+      if (missing(labels_size)) labels_size <- 0.8 - (0.008 * ncol(data))
       if (sort.miss) sort <- "+"
       if (horiz.miss) horiz <- TRUE
 
@@ -711,12 +777,12 @@ function(x=NULL, y=NULL, by=NULL, data=d,
       
       bc <- .bc.main(data, y.call, by.call, stack100,
             fill, color, trans, fill_split, theme,
-            horiz, gap, proportion, scale_y, top,
+            horiz, gap, proportion, scale_y, 
             xlab, ylab, main,
             value_labels, label_max, beside,
             rotate_x, offset, break_x, sort,
-            values, values_color, values_size, values_digits,
-            values_position, values_cut,
+            labels, labels_color, labels_size, labels_decimals,
+            labels_position, labels_cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
             pad_y_min, pad_y_max,
             legend_title, legend_position, legend_labels,
@@ -737,12 +803,12 @@ function(x=NULL, y=NULL, by=NULL, data=d,
     else {
       bc.data.frame(data, n_cat, stack100,
         fill, color, trans, fill_split, theme,
-        horiz, gap, proportion, scale_y, top,
+        horiz, gap, proportion, scale_y, 
         xlab, ylab, main,
         value_labels, label_max, beside,
         rotate_x, offset, break_x, sort,
-        values, values_color, values_size, values_digits,
-        values_position, values_cut,
+        labels, labels_color, labels_size, labels_decimals,
+        labels_position, labels_cut,
         xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
         pad_y_min, pad_y_max,
         legend_title, legend_position, legend_labels,

@@ -1,5 +1,5 @@
 pivot <-
-function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
+function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
          show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, na_group_show=TRUE,
          out_names=NULL, sort=NULL, sort_var=NULL,  
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
@@ -21,15 +21,16 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     data <- data.frame(data)
 
   # subset any specified rows of input data frame
-  if (!missing(rows)) {  # subset rows
-    r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+  if (!missing(filter)) {  # subset rows
+    r <- eval(substitute(filter), envir=data, enclos=parent.frame())
     if (!any(r)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "No rows of data with the specified value of\n",
-        "rows = ", deparse(substitute(rows)), "\n\n")
+        "filter = ", deparse(substitute(filter)), "\n\n")
     }
     r <- r & !is.na(r)  # set missing for a row to FALSE
-    data <- data[r,,drop=FALSE]
+    if (any(r))
+      data <- data[r,,drop=FALSE]
   }
 
   # -----------------------------------------------------------
@@ -261,7 +262,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   if (missing(by) && nm.cmpt[1] != "tabulate") {
     a <- NULL
     out <- double(length=n.cmp)
-
     if (n.cmp > 0) {
       # one of compute or variable, output same format as with by vars, 1-line
 
@@ -653,7 +653,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
     a <- a[order(a[[s.col]], decreasing=direction), ]
   }
 
-
   # --- option to reshape long form a to wide form ---
   # --------------------------------------------------
 
@@ -828,7 +827,6 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   }  # end n.c.by > 0
   # ------------------------------------------
 
-
   # display all unique non-numeric vars, data drilled down to specific cases
   # data <- na.omit(data)  # remove missing data for comparison of values
   nm <- character(length=ncol(data))
@@ -857,10 +855,10 @@ function(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
   }
 
   # if just one variable, drop the redundant variable names
-  if (length(nm.var.d) == 1) {
-    names(a)[3:4] <- gsub(nm.var.d, "", names(a)[3:4], fixed=TRUE)
-    names(a)[3:4] <- gsub("_", "", names(a)[3:4], fixed=TRUE)
-  }
+# if (length(nm.var.d) == 1) {
+#   names(a)[3:4] <- gsub(nm.var.d, "", names(a)[3:4], fixed=TRUE)
+#   names(a)[3:4] <- gsub("_", "", names(a)[3:4], fixed=TRUE)
+# }
 
   return(a)
 }

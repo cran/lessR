@@ -1,5 +1,5 @@
 Plot <-
-function(x, y=NULL, data=d, rows=NULL, 
+function(x, y=NULL, data=d, filter=NULL, 
 
          stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
          stat_x=c("count", "proportion", "%"),
@@ -65,7 +65,7 @@ function(x, y=NULL, data=d, rows=NULL,
          pdf_file=NULL, width=6.5, height=6, 
          digits_d=NULL,
 
-         n_cat=getOption("n_cat"), value_labels=NULL,
+         n_cat=getOption("n_cat"), value_labels=NULL, rows=NULL,
 
          eval_df=NULL, fun_call=NULL, ...) {
 
@@ -102,6 +102,18 @@ function(x, y=NULL, data=d, rows=NULL,
   }
 
   fit.ln <- ifelse (!missing(fit), match.arg(fit), "off") 
+
+  # ------------ Old Stuff ----------------------------------
+  if (!missing(rows)) 
+    message(">>> Parameter  rows  renamed to:  filter.\n",
+            "    Change to  filter,  rows  will stop working in the future.\n")
+
+  if(!missing(n_cat) || !missing(value_labels)) {
+    message(">>> Parameters  n_cat  and  value_labels  will no longer ",
+            "work in the future.\n",
+             "    Better to convert a categorical integer variable to ",
+             "a factor.\n")
+  }
 
   # a dot in a parameter name to an underscore and more
   dots <- list(...)
@@ -188,7 +200,7 @@ function(x, y=NULL, data=d, rows=NULL,
   panel_color <- getOption("panel_color") 
   grid_color <- getOption("grid_color")
 
-  lab_cex <- getOption("lab_cex")
+  lab_cex <- getOption("lab_cex")  # NOT passed to .plt.main
   axis_cex <- getOption("axis_cex")
   main_cex <- getOption("main_cex")
 
@@ -348,11 +360,24 @@ function(x, y=NULL, data=d, rows=NULL,
     options(dname = df.name)
   }
  
+  shiny <- FALSE
+  if (!is.null(sys.call(-1)))  # is NULL when called directly from R console
+    if (sys.call(-1) == "renderPlot()") {  # from shiny, user or interact()
+      shiny <- TRUE
+      data <- eval(substitute(data), envir=parent.frame())
+    }
+ 
   # if a tibble, convert to data frame
-  if (exists(df.name, envir=parent.frame())) {
+  if (!shiny) {
+    if (exists(df.name, envir=.GlobalEnv)) {
+      if (any(grepl("tbl", class(data), fixed=TRUE)))
+        data <- data.frame(data)
+    }
+  }
+  else  # no check for existence of df.name
     if (any(grepl("tbl", class(data), fixed=TRUE)))
       data <- data.frame(data)
-  }
+
 
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
@@ -367,7 +392,6 @@ function(x, y=NULL, data=d, rows=NULL,
       # force evaluation (not lazy) if data not specified, relies on default d
       if (data.miss) {
         if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
-        data <- eval(substitute(data), envir=parent.frame())
         # the 1.201 comes from Shiny, need to reset
         # l.cex and l.axc are set in interact() before shiny run
         if (getOption("lab_cex") == 1.201) {
@@ -404,20 +428,30 @@ function(x, y=NULL, data=d, rows=NULL,
       if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
       .xcheck(x.name, df.name, names(data))  # stop if x an expression
     }
+    
+    # subset filter (with deprecated rows parameter also)
+    if (!missing(filter) || !missing(rows)) {
+      txt <- .filter(deparse(substitute(filter)))
+      if (!missing(filter))  # subset filter
+        r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
+      if (!missing(rows))
+        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+      r <- r & !is.na(r)  # set missing for a row to FALSE
+      nr.before <- nrow(data)
+      if (any(r))
+        data <- data[r,,drop=FALSE]
+      if (!quiet) {
+        if (!missing(filter))  # filter parameter present 
+          cat("\nfilter: ",  txt, "\n-----\n")
+        cat("Rows of data before filtering: ", nr.before, "\n")
+        cat("Rows of data after filtering:  ", nrow(data), "\n\n")
+      }
+    }  # end filter
+
     data.vars <- as.list(seq_along(data))
     names(data.vars) <- names(data)
     x.col <- eval(substitute(x), envir=data.vars)  # col num of each var
-    
-    if (!missing(rows)) {  # subset rows
-      r <- eval(substitute(rows), envir=data, enclos=parent.frame())
-      if (!any(r)) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "No rows of data with the specified value of\n",
-          "rows = ", deparse(substitute(rows)), "\n\n")
-      }
-      r <- r & !is.na(r)  # set missing for a row to FALSE
-      data <- data[r,,drop=FALSE]
-    }
+
     if (!("list" %in% class(data))) {
       data.x <- data[, x.col]  # need stringsAsFactors
       data.x <- data.frame(data.x, stringsAsFactors=TRUE)
@@ -767,7 +801,7 @@ function(x, y=NULL, data=d, rows=NULL,
       do.by <- FALSE
   }
 
-  if (do.by)  {
+  if (do.by)  {  # a by var
     options(byname = by.name)
   
     # see if var exists in data frame, if x not in global Env or function call
@@ -789,17 +823,12 @@ function(x, y=NULL, data=d, rows=NULL,
    # .plt.by.legend, plt.main #818, needs levels(by)
     if (!is.factor(by.call)) by.call <- factor(by.call) 
 
-    if (shape.miss || shape[1]=="vary") {
-      by.unq <- length(unique(by.call))
-      shp <- .plt.shapes(shape, out_shape, n.by=by.unq)
-      shape <- shp$shape
-    }
+    by.unq <- length(unique(by.call))
+    shp <- .plt.shapes(shape, out_shape, n.by=by.unq)
+    shape <- shp$shape
   }
 
-  else {
-
-  # --------------
-    # process shapes (without a by var)
+  else {   # process shapes (without a by var)
     if (shape[1] == "sunflower")
       object <- "sunflower"
     else {  # get numeric code, check for bad shapes, maybe modify outlier shape 
@@ -1461,7 +1490,7 @@ function(x, y=NULL, data=d, rows=NULL,
                    out_fill, out_color, out2_fill, out2_color,
                    ID.call, out_cut, ID_color, ID_size,
                    rotate_x, rotate_y, width, height, pdf_file,
-                   T.type, ...)
+                   T.type, quiet, ...)
 
     }  # end T.type != "dot"
 

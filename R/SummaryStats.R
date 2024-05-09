@@ -14,7 +14,7 @@ function(x=NULL, by=NULL, data=d, rows=NULL, n_cat=getOption("n_cat"),
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      if (names(dots)[i] == "values.cex")  values_size <- dots[[i]]
+      if (names(dots)[i] == "values.cex")  labels_size <- dots[[i]]
       if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])

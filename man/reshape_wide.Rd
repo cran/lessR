@@ -29,7 +29,7 @@ reshape_wide(data, group, response, ID, prefix=NULL, sep="_")
 }
 
 \details{
-\code{reshape_wide} takes the variables in the long-form  \code{group}, \code{response}, and \code{ID} and transforms to wide form.
+\code{reshape_wide} takes the variables in the long-form  \code{group}, \code{response}, and \code{ID} and transforms to wide form. All other variables are deleted in the transformed data frame.
 
 Here is the correspondence between the original \code{\link{reshape}} parameter names and the \code{reshape_wide} parameter names.
 

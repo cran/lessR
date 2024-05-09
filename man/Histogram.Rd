@@ -19,7 +19,7 @@ Histogram(
 
     # ------------------------------------------
     # Data from which to construct the histogram
-    x=NULL, data=d, rows=NULL,
+    x=NULL, data=d, filter=NULL,
     stat_x=c("count", "proportion"),
 
     # --------------------
@@ -75,7 +75,7 @@ Histogram(
 
     # --------------------------------------
     # Deprecated, removed in future versions
-    n_cat=getOption("n_cat"),
+    n_cat=getOption("n_cat"), rows=NULL,
 
     # ---------------------------------
     # Miscellaneous
@@ -86,7 +86,7 @@ hs(\dots)
 }
 
 \arguments{
-  \item{x}{Variable(s) to analyze.  Can be a single numerical variable, 
+  \item{x}{Variable(s) to analyze. Can be a single numerical variable, 
         either within a data frame or as a vector in the users workspace,
         or multiple variables in a data frame such as designated with the
         \code{\link{c}} function, or an entire data frame. If not specified,
@@ -94,11 +94,11 @@ hs(\dots)
         frame, \code{d} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{d}.}
-  \item{rows}{A logical expression that specifies a subset of rows of
-       the data frame to analyze.}
+  \item{filter}{A logical expression that specifies a subset of rows of
+        the data frame to analyze.}
   \item{stat_x}{Bin and transform values of variable \code{x} into
        \code{"counts"} by default or \code{"proportion"} if specified,
-       that is, frequencies or relative frequencies.}
+       that is, frequencies or relative frequencies.}\cr
 
   \item{by1}{A categorical variable called a conditioning variable that
         activates \bold{Trellis graphics}, from the lattice package, to provide
@@ -263,7 +263,8 @@ hs(\dots)
         data type for which the variable will be analyzed as a categorical.
         Default is 0. 
         \emph{[deprecated]}: Best to convert a categorical integer variable 
-        to a factor.}\cr
+        to a factor.}
+  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}\cr
 
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE} 

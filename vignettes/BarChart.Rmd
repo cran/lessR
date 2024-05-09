@@ -73,17 +73,17 @@ style(quiet=TRUE)
 
 ### Custom Colors
 
-Specify a single fill color with the `fill` parameter, the edge color of the bars with `color`. Set the transparency level with `transparency`. Against a lighter background, display the value for each bar with a darker color using the `values_color` parameter. To specify a color, use color names, specify a color with either its `rgb()` or `hcl()` color space coordinates, or use the __lessR__ custom color palette function `getColors()`.
+Specify a single fill color with the `fill` parameter, the edge color of the bars with `color`. Set the transparency level with `transparency`. Against a lighter background, display the value for each bar with a darker color using the `labels_color` parameter. To specify a color, use color names, specify a color with either its `rgb()` or `hcl()` color space coordinates, or use the __lessR__ custom color palette function `getColors()`.
 
 ```{r fig.width=4, fig.height=3.75, fig.align='center'}
 BarChart(Dept, fill="darkred", color="black", transparency=.8,
-         values_color="black")
+         labels_color="black")
 ```
 
-Use the `theme` parameter to change the entire color theme: "colors", "lightbronze", "dodgerblue", "slatered", "darkred", "gray", "gold", "darkgreen", "blue", "red", "rose", "green", "purple", "sienna", "brown", "orange", "white", and "light". In this example, changing the full theme accomplishes the same as changing the fill color. Turn off the displayed value on each bar with the parameter `values` set to `off`. Specify a horizontal bar chart with base R parameter `horiz`.
+Use the `theme` parameter to change the entire color theme: "colors", "lightbronze", "dodgerblue", "slatered", "darkred", "gray", "gold", "darkgreen", "blue", "red", "rose", "green", "purple", "sienna", "brown", "orange", "white", and "light". In this example, changing the full theme accomplishes the same as changing the fill color. Turn off the displayed value on each bar with the parameter `labels` set to `off`. Specify a horizontal bar chart with base R parameter `horiz`.
 
 ```{r fig.width=4, fig.height=3.5, fig.align='center'}
-BarChart(Dept, theme="gray", values="off", horiz=TRUE)
+BarChart(Dept, theme="gray", labels="off", horiz=TRUE)
 ```
 
 Or, can use `style()` to change the theme for subsequent visualizations as well. See the `Customize` vignette.
@@ -145,7 +145,7 @@ knitr::include_graphics(system.file("img", "bcXYExplain.png", package="lessR"))
 The bar chart follows, with the aggregated data stored in the data frame named _a_, so explicitly identify with the `data` parameter. For only one variable analyzed, the computed mean of the _Salary_ variable in the _a_ data frame from the previous call to `pivot()` is named _mean_ by default. 
 
 ```{r xy, fig.width=4, fig.height=3.5, fig.align='center'}
-BarChart(Dept, mean, data=a)
+BarChart(Dept, Salary_mean, data=a)
 ```
 
 ### Statistical Transformation of $y$
@@ -224,10 +224,10 @@ Specify two custom fill colors for _Gender_.
 BarChart(Dept, by=Gender, fill=c("deepskyblue", "black"))
 ```
 
-The stacked version is default, but the values of the second categorical variable can also be represented with bars, more helpful to compare the values with each other. Here, put the legend on the top with the `values_position` parameter set to `"out"`.
+The stacked version is default, but the values of the second categorical variable can also be represented with bars, more helpful to compare the values with each other. Here, put the legend on the top with the `labels_position` parameter set to `"out"`.
 
 ```{r, fig.width=5, fig.align='center'}
-BarChart(Dept, by=Gender, beside=TRUE, values_position="out")
+BarChart(Dept, by=Gender, beside=TRUE, labels_position="out")
 ```
 
 

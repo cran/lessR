@@ -11,7 +11,7 @@ Plots a pie chart of a categorical variable (\code{x}). The default chart is a d
 }
 
 \usage{
-PieChart(x, y=NULL, data=d, rows=NULL,
+PieChart(x, y=NULL, data=d, filter=NULL,
 
          radius=1, hole=0.65, hole_fill=getOption("panel_fill"),
 
@@ -25,16 +25,18 @@ PieChart(x, y=NULL, data=d, rows=NULL,
 
          clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0), 
 
-         values=getOption("values"),
-         values_color=getOption("values_color"),
-         values_size=getOption("values_size"),
-         values_digits=getOption("values_digits"),
-         values_position=getOption("values_position"),
+         labels=getOption("labels"),
+         labels_color=getOption("labels_color"),
+         labels_size=getOption("labels_size"),
+         labels_digits=getOption("labels_digits"),
+         labels_position=getOption("labels_position"),
 
          main=NULL, main_cex=getOption("main_cex")*1.2,
          labels_cex=getOption("lab_cex"), cex,
 
          add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
+
+         rows=NULL,
 
          eval_df=NULL, quiet=getOption("quiet"),
          width=6.5, height=6, pdf_file=NULL,
@@ -47,13 +49,13 @@ pc(\dots)
   \item{x}{For each level of this categorical variable, x, display the
         frequencies as slices of a pie.}
   \item{y}{Numeric variable that sets the area of each slice of the pie.
-        If not specified,
-        then its value is the frequency of each category of \code{x},
-        automatically tabulated.}
+        If not specified, then its value is the frequency of each category
+        of \code{x}, automatically tabulated. Applied to reading the summary
+        table of the already aggregated data as the data for the pie chart.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{d}.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
-       to analyze.}\cr
+  \item{filter}{A logical expression that specifies a subset of rows of
+        the data frame to analyze.}\cr
 
   \item{radius}{The pie is drawn in a box with sides that range from -1 to 1,
         so the maximum value of the radius without truncating the pie is 1.}
@@ -106,23 +108,23 @@ pc(\dots)
        the default value is 0 (3 o'clock), otherwise 90 (12 o'clock).}\cr
 
 
-  \item{values}{If not the default value of \code{"off"}, adds the
+  \item{labels}{If not the default value of \code{"off"}, adds the
         numerical results to the plot according to \code{"\%"}, 
         \code{"prop"} or \code{"input"}, that is, percentages,
          proportions, or the value from which the slices are plotted,
          such as tabulated counts if \code{y} is not specified,
          or the value of \code{y} if the plotted values are provided. If
-         any other \code{values} parameter is specified, default is set
+         any other \code{labels} parameter is specified, default is set
          to \code{"\%"}.}
-  \item{values_color}{Color of the plotted text. Could be a vector to specify
+  \item{labels_color}{Color of the plotted text. Could be a vector to specify
         a unique color for each value. If fewer colors are specified than
         the number of categories, the colors are recycled.}
-  \item{values_size}{Character expansion factor, the size, of the plotted text, 
+  \item{labels_size}{Character expansion factor, the size, of the plotted text, 
         for which the default value is 0.95.}
-  \item{values_digits}{Number of decimal digits for which to display the values_
+  \item{labels_digits}{Number of decimal digits for which to display the values_
         Default is 0, round to the nearest integer, for \code{"\%"}
         and 2 for \code{"prop"}.}
-  \item{values_position}{Position of the plotted text. Default is inside the pie,
+  \item{labels_position}{Position of the plotted text. Default is inside the pie,
         or, if \code{"label"}, as part of the label for each value
         outside of the pie.}\cr
 
@@ -154,6 +156,8 @@ pc(\dots)
         Only used for \code{"rect"}, \code{"line"} and \code{arrow}.}
   \item{y2}{Second y coordinate to be considered for each object.
         Only used for \code{"rect"}, \code{"line"} and \code{arrow}.}\cr
+
+  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}\cr
 
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE} 
@@ -279,16 +283,16 @@ PieChart(Dept, fill="viridis")
 
 # display the percentage inside each slice of the pie
 # provide a unique color for each displayed value
-PieChart(Dept, values="\%",
-         values_color=c("yellow", "pink", "blue", "purple", "brown"))
+PieChart(Dept, labels="\%",
+         labels_color=c("yellow", "pink", "blue", "purple", "brown"))
 
 # display the counts inside each slice of the pie
 # reduce size of displayed counts to 0.75
-PieChart(Dept, values="input", values_size=0.75,
-         values_color=getOption("window_fill"))
+PieChart(Dept, labels="input", labels_size=0.75,
+         labels_color=getOption("window_fill"))
 
 # add transparency and custom color for the displayed values
-PieChart(Dept, transparency=.6, values="\%", values_color=rgb(.3,.3,.3))
+PieChart(Dept, transparency=.6, labels="\%", labels_color=rgb(.3,.3,.3))
 
 # map counts of each level to the fill color of the corresponding slice
 PieChart(JobSat, fill=(count))

@@ -66,7 +66,7 @@ pivot(d, quantile, Years, c(Dept, Gender))
 pivot(d, c(mean,sd,quantile), c(Years,Salary), q_num=5, digits_d=2)
 
 ## ---------------------------------------------------------------------------------------------------------------------
-pivot(d, mean, Salary, Dept, rows=(Gender=="W"))
+pivot(d, mean, Salary, Dept, filter=(Gender=="W"))
 
 ## ---------------------------------------------------------------------------------------------------------------------
 pivot(d[.(Gender=="W"),], mean, Salary, Dept)

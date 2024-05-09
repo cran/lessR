@@ -14,7 +14,7 @@ Output is generated into distinct segments by topic, organized and displayed in 
 }
 
 \usage{
-ANOVA(my_formula, data=d, rows=NULL,
+ANOVA(my_formula, data=d, filter=NULL,
          brief=getOption("brief"), digits_d=NULL, 
          Rmd=NULL, jitter_x=0.4,
          res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
@@ -34,7 +34,7 @@ av_brief(\dots, brief=TRUE)
        with the blocking factor listed second.}
   \item{data}{The default name of the data frame that contains the data for analysis 
        is \code{d}, otherwise explicitly specify.}
-  \item{rows}{A logical expression that specifies a subset of rows of the data frame
+  \item{filter}{A logical expression that specifies a subset of rows of the data frame
        to analyze.}
   \item{brief}{If set to \code{TRUE}, reduced text output with no Tukey multiple 
        comparison of means and no residuals. Can change system default
@@ -72,7 +72,7 @@ av_brief(\dots, brief=TRUE)
 OVERVIEW\cr
 The one-way ANOVA with Tukey HSD and corresponding plot is based on the R functions \code{\link{aov}}, \code{\link{TukeyHSD}}, and provides summary statistics for each level. Two-factor ANOVA also provides an interaction plot of the means with \code{\link{interaction.plot}} as well as a table of means and other summary statistics. The two-factor analysis can be between groups or a randomized blocked design. Residuals are displayed by default. Tukey HSD comparisons and residuals are not displayed if \code{brief=TRUE}.
        
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 MODEL SPECIFICATION\cr
 In the following specifications, Y is the response variable, X is a treatment variable and Blocks is the blocking variable. The distinction between the one-way randomized blocks and the two-way between groups models is not the variable names, but rather the delimiter between the variable names. Use \code{*} to indicate a two-way crossed between groups design and \code{+} for a randomized blocks design.\cr
@@ -148,7 +148,7 @@ ANOVA(weight ~ group, data=PlantGrowth)
 av_brief(weight ~ group, data=PlantGrowth)
 
 # drop the second treatment, just control and 1 treatment
-ANOVA(weight ~ group, data=PlantGrowth, rows=(group != "trt2"))
+ANOVA(weight ~ group, data=PlantGrowth, filter=(group != "trt2"))
 
 # variables of interest in a data frame that is not the default d
 # two-factor between-groups ANOVA with replications and interaction

@@ -111,17 +111,17 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
           ),
 
           tags$hr(),
-          checkboxInput("do_values", div("Values", class="view"), FALSE),
-          conditionalPanel(condition="input.do_values == true",
-            selectInput("myValues", "values", choices=list("%","input","off")),
-            selectInput("myValuesColor", "values_color",
+          checkboxInput("do_labels", div("Labels", class="view"), FALSE),
+          conditionalPanel(condition="input.do_labels == true",
+            selectInput("myLabels", "labels", choices=list("%","input","off")),
+            selectInput("myLabelsColor", "labels_color",
                choices=list("white", "gray", "darkgray", "black",
                             "red", "green3")),
             conditionalPanel(condition="input.do_by == false",
-              selectInput("myValuesPos", "values_position",
+              selectInput("myLabelsPos", "labels_position",
                  choices=list("in", "out")),
             ),
-            sliderInput("myValuesSize", "values_size",
+            sliderInput("myLabelsSize", "labels_size",
                         min=0, max=2, value=0.9, step=0.1),
           ),
 
@@ -372,8 +372,8 @@ server <- function(input, output, session) {
              fill=in.fill, color=input$myColor, transparency=input$myTrans,
              sort=input$mySort, horiz=input$myHoriz,
              stack100=input$my100, beside=input$myBeside,
-             values=input$myValues, values_color=input$myValuesColor,
-             values_size=input$myValuesSize, values_position=input$myValuesPos,
+             labels=input$myLabels, labels_color=input$myLabelsColor,
+             labels_size=input$myLabelsSize, labels_position=input$myLabelsPos,
              xlab=x.name, ylab=axis.name, legend_title=lt, quiet=TRUE)
 
       p_fill <- in.fill == "hues"
@@ -383,10 +383,10 @@ server <- function(input, output, session) {
       p_sort <- input$mySort == "0"
       p_100 <- input$my100 == FALSE
       p_beside <- input$myBeside == FALSE
-      p_values <- input$myValues == "%"
-      p_values_color <- input$myValuesColor == "white"
-      p_values_position <- input$myValuesPos == "in"
-      p_values_size <- input$myValuesSize == 0.9
+      p_labels <- input$myLabels == "%"
+      p_labels_color <- input$myLabelsColor == "white"
+      p_labels_position <- input$myLabelsPos == "in"
+      p_labels_size <- input$myLabelsSize == 0.9
       p_stat <- is.null(in.stat)
       
       txt <- ifelse (input$do_y, ", y=", "")
@@ -402,14 +402,14 @@ server <- function(input, output, session) {
       if (!p_sort) out <- paste(out, ", sort=\"", input$mySort, "\"", sep="")
       if (!p_100) out <- paste(out, ", stack100=", input$my100, sep="")
       if (!p_beside) out <- paste(out, ", beside=", input$myBeside, sep="")
-      if (!p_values) out <- paste(out, ", values=\"", input$myValues, "\"",
+      if (!p_labels) out <- paste(out, ", labels=\"", input$myLabels, "\"",
                                   sep="")
-      if (!p_values_color) out <- paste(out, ", values_color=\"", 
-                                        input$myValuesColor, "\"", sep="")
-      if (!p_values_position) out <- paste(out, ", values_position=\"", 
-                                        input$myValuesPos, "\"", sep="")
-      if (!p_values_size) out <- paste(out, ", value_size=", 
-                                       input$myValuesSize, sep="")
+      if (!p_labels_color) out <- paste(out, ", labels_color=\"", 
+                                        input$myLabelsColor, "\"", sep="")
+      if (!p_labels_position) out <- paste(out, ", labels_position=\"", 
+                                        input$myLabelsPos, "\"", sep="")
+      if (!p_labels_size) out <- paste(out, ", labels_size=", 
+                                       input$myLabelsSize, sep="")
       if (!p_stat) out <- paste(out, ", stat=\"", in.stat, "\"", sep="")
 
       out <- paste(out, ")", sep="")
@@ -496,8 +496,8 @@ server <- function(input, output, session) {
             fill=in.fill, color=input$myColor, transparency=input$myTrans,
             sort=input$mySort, horiz=input$myHoriz,
             stack100=input$my100, beside=input$myBeside,
-            values=input$myValues, values_color=input$myValuesColor,
-            values_size=input$myValuesSize, values_position=input$myValuesPos,
+            labels=input$myLabels, labels_color=input$myLabelsColor,
+            labels_size=input$myLabelsSize, labels_position=input$myLabelsPos,
             xlab=x.name, ylab=axis.name, legend_title=lt, quiet=TRUE,
             pdf_file=pdf.path,
             width=as.numeric(input$w), height=as.numeric(input$h))

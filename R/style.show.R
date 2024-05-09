@@ -36,16 +36,16 @@ function() {
         .fmt(getOption("trans_bar_fill"), 2), "\n")
     cat("bar_color ........ Bar border color ..........",
         .to_rgb(getOption("bar_color")), "\n")
-    cat("values ........... Form of bar or pie values .",
-        .to_str(getOption("values")), "\n")
-    cat("values_color ..... Color of bar or pie values .",
-        .to_rgb(getOption("values_color")), "\n")
-    cat("values_size ..... Size of values on bars, pie ",
-        .to_num(getOption("values_cex")), "\n")
-    cat("values_digits .... Decimal digits on bars, pie ",
-        .to_num(getOption("values_digits")), "\n")
-    cat("values_position .... Position of values ...... ..",
-        .to_str(getOption("values_position")), "\n")
+    cat("labels ........... Form of bar or pie labels .",
+        .to_str(getOption("labels")), "\n")
+    cat("labels_color ..... Color of bar or pie labels .",
+        .to_rgb(getOption("labels_color")), "\n")
+    cat("labels_size ..... Size of labels on bars, pie ",
+        .to_num(getOption("labels_cex")), "\n")
+    cat("labels_digits .... Decimal digits on bars, pie ",
+        .to_num(getOption("labels_digits")), "\n")
+    cat("labels_position .... Position of labels ...... ..",
+        .to_str(getOption("labels_position")), "\n")
 
     cat("\n")
     cat("pt_fill .......... Point fill color ..........",

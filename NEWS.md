@@ -1,3 +1,47 @@
+# lessR version 4.3.3, May 9, 2024
+
+## Updates
+
+* `all visualizations`: Default colors softened a bit with default `transparency` level moved from 0 to 0.10.
+
+* `ANOVA()`, `BarChart()`, `Histogram()`, `PieChart()`, `pivot()`, `Plot()`, `Regression()`, `ttest()`: Parameter `rows`, for subsetting data, deprecated, now named `filter` to be more consistent with other systems, although `rows` parameter removed entirely for `ANOVA()`, `pivot()`, Regression()`, and `ttest()` to avoid needing the `rows` parameter as part of the function definition in addition to `filter`.
+
+* `BarChart()`, `Histogram()`, `PieChart()`, `Plot()`: Parameter `filter` (formerly `rows`), now reports the number of rows of data before and after the filtering along with the logical statement that defines the filter. 
+
+* `BarChart()`: Default family of `values` parameters now called `labels`, such as `labels_color`, to be more consistent with other systems.
+
+* `BarChart()`: `values_digits` now `labels_decimals` though old value still works.
+
+* `BarChart()`: Default `labels` (formerly `values`) that are labeled on each bar now set at `input` except when aggregating counts, where it remains at `%`.
+
+* `BarChart()`: When `labels` is set to `input`, default decimal digits is now 2, which can be customized with `labels_digits`.
+
+* `BarChart()`: Default `labels` (formerly `values`) that are labeled on each bar now set at `input` except when aggregating counts, where it remains at `%`.
+
+* `Plot()`: Parameter `area_fill` on time series plots now extends down to the level of the y-variable specified with `scale_y` instead of the minimum value of y.
+
+* `Plot()`: Binning large data sets now results in larger bubbles.
+
+* `reshape_wide()`: After the transformation, all other variables except those specified as the group, response, or ID are deleted as their values are not evenly distributed over the new wide format variables.
+
+* `dataStockPrice`: Data table updated with stock prices through May 2024, and trading volume added as the fourth variable. 
+
+
+## Bug Fixes
+
+* `BarChart()`: For an unstacked or grouped bar chart, `beside=TRUE`, if there is missing data for the `by` variable, the color distribution across the bars is now consistent across levels and with the legend. 
+
+* `BarChart()`: For two categorical variables, `x` and `by`, evaluation if input data is a summary (pivot) table of a prior aggregation is now correctly computed.
+
+* `interact()`: User-written functions are able to again use `BarChart()`, `Histogram()`, `PieChart()`, and `Plot()`.
+
+* `pivot()`: Output variable names now consistently labeled: variable_stat, e.g., Salary\_mean.
+
+* `Plot()`: Shapes now properly plot with a `by` parameter stratifying according to the specified categorical variable.
+
+* `Plot()`: `by1` parameter for Trellis (facet) plot with `fit` line specified now properly does not display text output when `quiet=TRUE`.
+
+ 
 # lessR version 4.3.2, Apr 07, 2024
 
 ## Updates
@@ -10,8 +54,6 @@
 # lessR version 4.3.1, Mar 26, 2024
 
 ## Updates
-
-* `BarChart()`: Parameter `top` added to retain only the specified number of levels of the `x` categorical variable, the first variable listed in the function call, generally applied to a sorted distribution with `sort="+"` or `sort="-"` to retain the first minimum or maximum values of the numerical value `y` to plot for a large number of categories.
 
 * `BarChart()`: Parameter `stat_x` added to specify how to plot the `y`-axis if there is no `y` variable specified, with default value of `counts` and option `proportion` or `%`. These values are separated from the `stat` parameter which now exclusively pertains to the transformation of a specified `y` numerical variable.
 

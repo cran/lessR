@@ -10,7 +10,7 @@ Compute one or more designated descriptive statistics (\code{compute} over one o
 }
 
 \usage{
-pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
+pivot(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
          show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, na_group_show=TRUE,
          out_names=NULL, sort=NULL, sort_var=NULL,  
          table_prop=c("none", "all", "row", "col"), table_long=FALSE,
@@ -31,7 +31,8 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, rows=NULL,
        for all the data, e.g., the grand mean.}
   \item{by_cols}{Up to two categorical variables that define the groups
        displayed as columns in a two dimensional table.} 
-  \item{rows}{Subset, i.e., filter, rows of the input data frame for analysis.}\cr
+  \item{filter}{Subset, i.e., filter, rows of the input data frame for
+        analysis.}\cr
 
   \item{show_n}{By default, display the sample size and number missing for each
         computed summary statistic. If \code{FALSE}, delete all variables
