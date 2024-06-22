@@ -396,16 +396,17 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
               txt <- "Removed the blank space,"
             else
               txt <- paste("Removed character, ", substr(cc,j,j), ",", sep="")
-            cat(txt, "new variable name: ", names(d)[i], "\n")
+            if (!quiet) cat(txt, "new variable name: ", names(d)[i], "\n")
           }  # char not legal
         }  # sequence through characters of ith name
       }  # cc cannot be missing
       if (substr(cc,1,1) == ".") {  # remove any beginning .
          while(substr(cc,1,1) == ".") cc <- substr(cc, 2, nchar(cc))
-         cat("\nRemoved leading dots of variable name:", names(d)[i], "\n")
+         if (!quiet) 
+           cat("\nRemoved leading dots of variable name:", names(d)[i], "\n")
       }
     }
-    if (badchar)
+    if (badchar && !quiet)
       cat("\nR only allows letters, digits and . or  _ in variable names\n\n")
   }
 

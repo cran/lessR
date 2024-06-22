@@ -1,73 +1,73 @@
 Plot <-
 function(x, y=NULL, data=d, filter=NULL, 
 
-         stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
-         stat_x=c("count", "proportion", "%"),
+    theme=getOption("theme"),
+    fill=NULL, color=NULL,
+    transparency=getOption("trans_pt_fill"),
 
-         by=NULL, by1=NULL, by2=NULL,
-         n_row=NULL, n_col=NULL, aspect="fill",
+    enhance=FALSE,
+    size=NULL, size_cut=NULL, shape="circle", means=TRUE,
+    segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
-         theme=getOption("theme"),
-         fill=NULL,
-         color=NULL,
-         transparency=getOption("trans_pt_fill"),
+    sort_yx=c("0", "-", "+"),
+    jitter_x=0, jitter_y=0, 
 
-         enhance=FALSE,
-         size=NULL, size_cut=NULL, shape="circle", means=TRUE,
-         segments=FALSE, segments_y=FALSE, segments_x=FALSE,
+    ID="row.name", ID_size=0.60,
+    MD_cut=0, out_cut=0, out_shape="circle", out_size=1,
 
-         sort_yx=c("0", "-", "+"), 
-         jitter_x=0, jitter_y=0,
+    fit=c("off","loess", "lm", "ls", "null", "exp", "quad",
+          "power", "log"),
+    fit_power=1, fit_se=0.95,
+    fit_color=getOption("fit_color"),
+    plot_errors=FALSE, ellipse=0, 
 
-         ID="row.name", ID_size=0.60,
-         MD_cut=0, out_cut=0, out_shape="circle", out_size=1,
+    by=NULL, by1=NULL, by2=NULL,
+    n_row=NULL, n_col=NULL, aspect="fill",
 
-         vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
-         violin_fill=getOption("violin_fill"), 
-         box_fill=getOption("box_fill"), 
-         vbs_pt_fill="black",
-         vbs_mean=FALSE, fences=FALSE,
-         k=1.5, box_adj=FALSE, a=-4, b=3,
+    time_unit=NULL, time_agg=c("sum","mean"), stack=FALSE, lwd=1.5, 
+    area_fill="transparent", area_split=0,
+    run=FALSE, show_runs=FALSE, 
+    center_line=c("off", "mean", "median", "zero"),
 
-         radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
+    stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
+    stat_x=c("count", "proportion", "%"),
 
-         smooth=FALSE, smooth_points=100, smooth_size=1,
-         smooth_exp=0.25, smooth_bins=128,
-         n_bins=1,
+    vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
+    violin_fill=getOption("violin_fill"), 
+    box_fill=getOption("box_fill"), 
+    vbs_pt_fill="black",
+    vbs_mean=FALSE, fences=FALSE,
+    k=1.5, box_adj=FALSE, a=-4, b=3,
 
-         fit=c("off","loess", "lm", "ls", "null", "exp", "quad",
-               "power", "log"),
-         fit_power=1, fit_se=0.95,
-         fit_color=getOption("fit_color"),
-         plot_errors=FALSE, ellipse=0, 
+    radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
 
-         bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
-         breaks="Sturges", cumulate=FALSE, 
+    smooth=FALSE, smooth_points=100, smooth_size=1,
+    smooth_exp=0.25, smooth_bins=128,
+    n_bins=1,
 
-         run=FALSE, lwd=1.5, area_fill="transparent", area_origin=0, 
-         center_line=c("off", "mean", "median", "zero"),
-         show_runs=FALSE, stack=FALSE,
+    bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
+    breaks="Sturges", cumulate=FALSE, 
 
-         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-         lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
+    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+    lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
 
-         rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
-         offset=getOption("offset"),
+    rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
+    offset=getOption("offset"),
 
-         xy_ticks=TRUE, origin_x=NULL,
-         scale_x=NULL, scale_y=NULL,
-         pad_x=c(0,0), pad_y=c(0,0),
-         legend_title=NULL,
+    xy_ticks=TRUE, origin_x=NULL,
+    scale_x=NULL, scale_y=NULL,
+    pad_x=c(0,0), pad_y=c(0,0),
+    legend_title=NULL,
 
-         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
+    add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-         quiet=getOption("quiet"), do_plot=TRUE,
-         pdf_file=NULL, width=6.5, height=6, 
-         digits_d=NULL,
+    quiet=getOption("quiet"), do_plot=TRUE,
+    pdf_file=NULL, width=6.5, height=6, 
+    digits_d=NULL,
 
-         n_cat=getOption("n_cat"), value_labels=NULL, rows=NULL,
+    n_cat=getOption("n_cat"), value_labels=NULL, rows=NULL,
 
-         eval_df=NULL, fun_call=NULL, ...) {
+    eval_df=NULL, fun_call=NULL, ...) {
 
 
   if (is.null(fun_call)) fun_call <- match.call()
@@ -121,6 +121,7 @@ function(x, y=NULL, data=d, filter=NULL,
     for (i in 1:length(dots)) {
 #     if (names(dots)[i] == "stat_x") stat <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
+      if (names(dots)[i] == "area_origin") area_split <- dots[[i]]
       if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
@@ -303,7 +304,7 @@ function(x, y=NULL, data=d, filter=NULL,
   tm.adj <- margin_adjust[1];  rm.adj <- margin_adjust[2]
   bm.adj <- margin_adjust[3];  lm.adj <- margin_adjust[4]
   
-  date.ts <- FALSE  # default is not a time series
+  date.var <- FALSE  # default is not a date variable for x
   freq.poly <- FALSE  # default is not a frequency polygon
 
   if (!fit_se.miss) if (missing(fit))  fit.ln <- "loess"
@@ -477,7 +478,7 @@ function(x, y=NULL, data=d, filter=NULL,
   else if (is.ts(x)) { 
     data.x <- data.frame(.ts.dates(x))
     names(data.x) <- "date"
-    date.ts <- TRUE
+    date.var <- TRUE
     if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
 
     # flip x to y
@@ -523,17 +524,16 @@ function(x, y=NULL, data=d, filter=NULL,
 
   # just one x variable for now, a vector of cat or num values
   if (n.x_var == 1) {
-    if (!is.ts(date.ts)) {
-      date.ts <- ifelse (.is.date(x.call[,1]), TRUE, FALSE) 
-      if (grepl("POSIX",  class(x.call[,1]), fixed=TRUE)[1])
-        x.call[,1] <- as.Date(x.call[,1])
-    }
-    if (!date.ts) {
+    if (grepl("POSIX",  class(x.call[,1]), fixed=TRUE)[1])
+      x.call[,1] <- as.Date(x.call[,1])
+    date.var <- ifelse (.is.date(x.call[,1]), TRUE, FALSE) 
+
+    if (!date.var) {
       nu <- length(unique(na.omit(x.call[,1])))
       num.cat.x <- .is.num.cat(x.call[,1], n_cat)  # small num of int values
       if (!is.null(jitter_x)) if (jitter_x > 0) num.cat.x <- FALSE
     }
-    else {  # process ts
+    else {  # process as a date
       nu <- length(unique(x.call[,1]))
       num.cat.x <- FALSE
     }
@@ -547,7 +547,7 @@ function(x, y=NULL, data=d, filter=NULL,
           if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
 
         if (!num.cat.x && is.integer(x.call[,1]) &&
-            !date.ts && nu <= n_cat && eq.int) {
+            !date.var && nu <= n_cat && eq.int) {
           cat("\n")
           cat(">>> ", x.name, " has only only ", nu, " unique ",
               "integer values, but not equally spaced,\n",
@@ -592,9 +592,9 @@ function(x, y=NULL, data=d, filter=NULL,
         spmat <- FALSE
       }
       else if (all(is.nmb)) {
-        spmat <- TRUE
-        cat.x <- FALSE
         BPFM <- FALSE
+        cat.x <- FALSE
+        spmat <- TRUE
       }
 
       else {
@@ -618,7 +618,7 @@ function(x, y=NULL, data=d, filter=NULL,
   else
     nrows <- nrow(data.x)
 
-  if (date.ts) object <- "both"
+  if (date.var) object <- "both"
 
 
   #-----------
@@ -706,7 +706,7 @@ function(x, y=NULL, data=d, filter=NULL,
   }  # end y not missing
   
   else { # missing y
-    if (!date.ts) y.call <- NULL
+    if (!date.var) y.call <- NULL
   }  # end missing y
 
   if (!is.numeric(x.call[,1]) && run) {
@@ -731,7 +731,7 @@ function(x, y=NULL, data=d, filter=NULL,
     }
   }
   
-  if (y.miss  &&  (fit.ln != "off")  &&  n.x_var == 1  &&  (!date.ts && !run)) {
+  if (y.miss  &&  (fit.ln != "off")  &&  n.x_var == 1  &&  (!date.var && !run)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Fit line only applicable if only one x variable, if y is present\n\n")
   }
@@ -763,7 +763,7 @@ function(x, y=NULL, data=d, filter=NULL,
   }
 
   # get Trellis and T.type
-  fnl <- .plt.funnel(data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts,
+  fnl <- .plt.funnel(data.do, n.x_var, y.miss, cat.x, cat.y, run, date.var,
                      by1.miss, y.unique)
   Trellis <- fnl$Trellis 
   T.type <- fnl$T.type  # needed only for Trellis
@@ -1004,7 +1004,7 @@ function(x, y=NULL, data=d, filter=NULL,
   # -----------------------------------------------------------------
 
   # If plotting a time plot with a Date, make sure x is sorted
-  if (date.ts) {
+  if (date.var) {
     b.name <- NULL
     sort_flag <- NULL
     if (!is.null(by.call)) if (!is.null(by.name)) {
@@ -1146,7 +1146,7 @@ function(x, y=NULL, data=d, filter=NULL,
     }
   }
 
-  if (y.miss  &&  !date.ts  &&  object != "bubble") {  
+  if (y.miss  &&  !date.var  &&  object != "bubble") {  
 
     if (!cat.x) { 
 
@@ -1483,7 +1483,7 @@ function(x, y=NULL, data=d, filter=NULL,
                    xlab, ylab, main, shape, lab_cex, axis_cex,
                    max(ellipse), ellipse_color, ellipse_lwd,
                    fit.ln, fit_power, fit_color, fit_lwd, fit_se,
-                   plot_errors, area_origin, jitter_y,
+                   plot_errors, area_split, jitter_y,
                    violin, violin_fill, box, box_fill, 
                    bw, vbs_size, box_adj, a, b, k.iqr, fences, vbs_mean,
                    out_shape, pt.out_size,
@@ -1660,11 +1660,13 @@ function(x, y=NULL, data=d, filter=NULL,
     }  # sum, mean, sd, min, median, max
 
 
+    # ----------------------------------------------------
+    # ----------------------------------------------------
     # 2-variable scatter plot
     # bubble plot for 1-variable (y.call=0) and 2-variable
     # line chart
 
-    if ((!is.null(y.call) || date.ts) &&
+    if ((!is.null(y.call) || date.var) &&
         object %in% c("point", "bubble", "both", "sunflower")) {
 
       if (object == "point"  &&  data.do){  # for Cleveland dot plot
@@ -1744,7 +1746,6 @@ function(x, y=NULL, data=d, filter=NULL,
             outlpts <- otl$outlpts  # the outliers
       }
 
-
       if (do_plot) {
 
         if (nrow(x.call) != nrow(y.call))  {
@@ -1813,6 +1814,34 @@ function(x, y=NULL, data=d, filter=NULL,
             if (jitter_y > 1) jitter_y <- 1
           }
         }
+
+        # aggregate date variable according to parameter: time_unit
+        if (!is.null(time_unit)) {
+          if (!requireNamespace("xts", quietly=TRUE)) {
+            stop("Package \"xts\" needed for parameter  time_unit\n",
+                 "Please install it:  install.packages(\"xts\")\n\n",
+                 call. = FALSE)
+          }
+          txt <- "Ryan, Ulrich, Bennett, and Joy's xts package]"
+          cat("[with functions from", txt, "\n\n")
+
+          if (time_agg[1] == "sum")
+            aggfun <- function(x) colSums(x, na.rm=TRUE) 
+          else if (time_agg[1] == "mean")
+            aggfun <- function(x) colMeans(x, na.rm=TRUE) 
+
+          # create xts time series, then get time_unit endpoints, aggregate y
+          d_xts <- xts::xts(y.call[,1:ncol(y.call)], order.by=x.call[,1])
+          names(d_xts) <- names(y.call)
+          ep <- xts::endpoints(d_xts, on=time_unit)
+          da_xts <- xts::period.apply(d_xts[,], INDEX=ep, FUN=aggfun)
+
+          # return to x.call and y.call by extracting from xts time series
+          x.call <- data.frame(zoo::index(da_xts))
+          names(x.call)[1] <- x.name
+          y.call <- data.frame(zoo::coredata(da_xts))
+        }
+
 
         reg <- .plt.main(x.call, y.call, by.call, n_cat,
           cat.x, num.cat.x, cat.y, num.cat.y,
@@ -1891,7 +1920,7 @@ function(x, y=NULL, data=d, filter=NULL,
           if (n_bins == 1) {  # if binning, .plt.bins does its own output
 
             o <- .plt.txt(x.call, y.call, stat, object, cat.x, cat.y,
-              xlab, ylab, fit.ln, n.by, mse, b0, b1, Rsq, by.cat,
+              date.var, xlab, ylab, fit.ln, n.by, mse, b0, b1, Rsq, by.cat,
               center_line, run, show_runs,
               proportion, size, radius, digits_d, fun_call, txdif)
 

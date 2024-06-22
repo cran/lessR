@@ -166,35 +166,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   Trellis <- ifelse (!missing(by1), TRUE, FALSE)
   do.plot <- TRUE
 
-
-  #------------- Ensure Valid Parameter Values ---------------------
-
-  if (!by.miss  &&  !by1.miss) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "by  and  by1  parameters not currently available at the same time.\n\n")
-  }
-
-  if (Trellis  &&  sort != "0") {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Sort not applicable to Trellis plots\n\n")
-  }
-
-  if (!is.null(fill_split)  &&  !fill.miss) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "fill_split assigns its own color based on the theme\n",
-      "  either drop  fill_split  or drop  fill  parameter values\n\n")
-  }
-
-  if (!(labels_position %in% c("in", "out"))) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "labels_position  must be set to \"in\", \"out\"\n\n")
-  }
-
-  if (!is.null(stat)) if (!stat.miss && y.miss) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "parameter  stat  is meaningless if no y-variable to transform\n\n")
-  }
-  #-----------------------------------------------------------------
+  # ensure valid parameter values
+  .bcParamValid(y.miss, by.miss, by1.miss, Trellis, sort, fill_split, fill.miss,
+                labels_position, stat.miss)
 
  
   # --------- data frame stuff -------------------------------------
@@ -341,11 +315,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         levels(x.call) <- trimws(levels(x.call), which="left")
     else if (is.character(x.call))
       if (nchar(x.call[1]) > 5) x.call <- trimws(x.call, which="left")
-    }  # !missing x
+  }  # !missing x
 
-    # x is a single var, not a data frame or a var list
-    if (!is.null(x.call)) {
 
+  # -------------------------------------------------
+  # -------------------------------------------------
+  # x is a single var, not a data frame or a var list
+  if (!is.null(x.call)) {
+    lx.u <- length(unique(x.call))  # includes NA values
 
     # evaluate by
     #------------
@@ -358,7 +335,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       by.name <- deparse(substitute(by))
       options(byname = by.name)
       # get conditions and check for data existing
-      by.in.global <- ifelse (df.name!="NULL", .in.global(by.name, quiet), TRUE)
+      by.in.global <- ifelse (df.name!="NULL", 
+                              .in.global(by.name, quiet), TRUE)
 
       if (!by.in.global) {
         if (eval_df)
@@ -387,7 +365,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     options(yname = y.name)
 
     if (!is.null(y.name))
-      y.in.global <- .in.global(y.name, quiet)  # in global?, includes vars list
+      y.in.global <- .in.global(y.name, quiet)  # in global?, also vars list
     else
       y.in.global <- FALSE
 
@@ -399,11 +377,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       
     eval_df <- !y.in.global 
 
-    # if not missing, then must be aggregate data
+    # if not missing, then must be aggregated data
     #-------------
     if (!missing(y)) {  # assign y.call from data or from global
 
-      # see if var exists in data frame, if y not in global Env or function call
+      # see if var exists in data frame, if y not in global Env or fun call
       if (eval_df)
         if (!y.in.global) .xcheck(y.name, df.name, names(data))
       if (!y.in.global)
@@ -412,7 +390,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         y.call <- y
         if (is.function(y.call)) y.call <- eval(substitute(data$y))
       }
-
     }  # end !missing(y)
     else
       y.call <- NULL
@@ -429,9 +406,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       # get conditions and check for data existing
       in.global <- .in.global(by1.name, quiet)
 
-      # see if var exists in data frame, if x not in global Env or function call
+      # see if var exists in data frame, if x not in global Env or fun call
       if (!missing(x) && !in.global)
-        .xcheck(by1.name, df.name, names(data))
+          .xcheck(by1.name, df.name, names(data))
 
       if (!in.global)
         by1.call <- eval(substitute(data$by1))
@@ -447,258 +424,248 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       by1.call <- NULL
 
 
-  # evaluate specified fill (NULL, numeric constant, or a variable)
-  #--------------
+    # evaluate specified fill (NULL, numeric constant, or a variable)
+    #--------------
 
-  if (!fill.miss) {
-    fill.name <- deparse(substitute(fill))
-    if (length(fill.name) == 1) {
-      if (exists(df.name, where=.GlobalEnv))
-        in.df <- ifelse (exists(fill.name, where=data), TRUE, FALSE)
-      else
-        in.df <- FALSE
-    }
-      else in.df <- FALSE
-
-    # only works for y given, not tabulated
-    if (in.df) {  # fill is a variable
+    if (!fill.miss) {
+      fill.name <- deparse(substitute(fill))
+      if (length(fill.name) == 1) {
+        if (exists(df.name, where=.GlobalEnv))
+          in.df <- ifelse (exists(fill.name, where=data), TRUE, FALSE)
+        else
+          in.df <- FALSE
+      }
+        else in.df <- FALSE
+      # only works for y given, not tabulated
+      if (in.df) {  # fill is a variable
 # need to aggregate cat var x and set fill.val to those limited values
 # currently, fill.val consists of all data values of variable fill
-      fill.val <- eval(substitute(data$fill))  # fill is a variable in data
-      fill <- .getColC(fill.val, fill_name=fill.name)
-      if (sort != "0") {
-        srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
-        fill <- fill[order(fill.val, decreasing=srt.dwn)]
+        fill.val <- eval(substitute(data$fill))  # fill is a variable in data
+        fill <- .getColC(fill.val, fill_name=fill.name)
+        if (sort != "0") {
+          srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
+          fill <- fill[order(fill.val, decreasing=srt.dwn)]
+        }
       }
-    }
-    else if (substr(fill.name, 1, 6) != "(count") {
-      if (length(which(fill == "off")) > 0)
-        fill[which(fill == "off")] <- "transparent"
-      if (length(which(color == "off")) > 0)
-        color[which(color == "off")] <- "transparent"
-    }
-
-    # or do a tabulation to get value of y for (count)
-    if (substr(fill.name, 1, 6) == "(count") {
-      xtb <- table(x.call)
-      if (sort != "0") {
-        srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
-        xtb <- xtb[order(xtb, decreasing=srt.dwn)]
+      else if (substr(fill.name, 1, 6) != "(count") {
+        if (length(which(fill == "off")) > 0)
+          fill[which(fill == "off")] <- "transparent"
+        if (length(which(color == "off")) > 0)
+          color[which(color == "off")] <- "transparent"
       }
-      fill <- .getColC(xtb, fill_name=fill.name)
-    }  # end .count 
 
-    # add the n= to a getColors call
-    # evaluate getColors at the time of the function call
-    # re-evaluate here by setting fill with the specified value of n
-    if (substr(fill.name, 1, 9) == "getColors") {
-      if (!grepl("output", fill.name, fixed=TRUE)) {  # "output" does not exist
-        lx.u <- length(na.omit(unique(x.call)))  # do not include NA's
-        gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
-        txt <- paste("fill <- getColors(", gc.args, ", n=", lx.u,
-                     ", output=FALSE)", sep="")
-        pp <- parse(text=txt)
-        eval(pp)
+      # or do a tabulation to get value of y for (count)
+      if (substr(fill.name, 1, 6) == "(count") {
+        xtb <- table(x.call)
+        if (sort != "0") {
+          srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
+          xtb <- xtb[order(xtb, decreasing=srt.dwn)]
+        }
+        fill <- .getColC(xtb, fill_name=fill.name)
+      }  # end .count 
+
+      # evaluate getColors at the time of the function call
+      # re-evaluate here by setting fill with the specified value of n
+      if (substr(fill.name, 1, 9) == "getColors")
+        fill <- .do_getColors(fill.name, lx.u)
+    }  # end !fill.miss
+
+
+    # ------------------------------------------------------------
+    # -----------  x, y, and by variables established ------------
+    # ------------------------------------------------------------
+
+    # no missing data in the analysis, using na.omit
+    n.x <- length(unique(na.omit(x.call)))
+    n.by <- ifelse (!by.miss, length(unique(na.omit(by.call))), 0)
+    n.levels <- ifelse (by.miss || is.null(by.call), n.x, n.by)
+
+    # -------------
+    # assign colors
+    # fill_split in sub call
+
+    is.ord <- ifelse (is.ordered(x.call) || is.ordered(by.call), TRUE, FALSE)
+    # confusing, fill is fill.name, fill can start from the function call
+    #   with a name such as "rainbow" instead of colors
+    # fill should be converted to colors earlier if needed
+
+    # if theme changed, then fill already set
+    # .get_fill returns a sequential or hues color name for the theme
+    if (fill.miss  &&  theme == getOption("theme")) {
+      if (is.ord || !is.null(by.call))   # default range
+        fill <- .color_range(.get_fill(theme, is.ord), n.levels) 
+      else {
+        fill <- getOption("bar_fill_discrete")  # to begin, have "hues" colors
+        if (fill[1] == "hues")  # if invoke style(), then colors are "hues"
+          fill <- .color_range("hues", n.levels)  # convert to actual colors
       }
-    }
-  }  # end !fill.miss
+    }  # end missing fill
 
+    else  # fill.name does not work, need fill from function call
+      fill <- .color_range(fill, n.levels)  # get actual colors from fill
 
-  # ------------------------------------------------------------
-  # -----------  x, y, and by variables established ------------
-  # ------------------------------------------------------------
+    if (trans > 0)
+     for (i in 1:length(fill)) fill[i] <- .maketrans(fill[i], (1-trans)*256)
 
-  # no missing data in the analysis, using na.omit
-  n.x <- length(unique(na.omit(x.call)))
-  n.by <- ifelse (!by.miss, length(unique(na.omit(by.call))), 0)
-  n.levels <- ifelse (by.miss || is.null(by.call), n.x, n.by)
+    # by default, no color borders if a range
+    if (identical(color, getOption("bar_color_discrete")))
+      color <- "transparent"
+    # see if apply a pre-defined color range to **color**
+    col.clr <- .color_range(color, n.levels)  # see if range, NULL if not
+    if (!is.null(col.clr)) color <- col.clr
 
-  # -------------
-  # assign colors
-  # fill_split done in sub call
+    # -----------------------
+    # process stat parameter
 
-  is.ord <- ifelse (is.ordered(x.call) || is.ordered(by.call), TRUE, FALSE)
-
-  # if theme changed, then fill already set
-  if (fill.miss  &&  theme == getOption("theme")) {
-    if (is.ord || !is.null(by.call))
-      fill <- .color_range(.get_fill(theme, is.ord), n.levels)  # default range
+    if (is.null(by.call))
+      is.smry_tbl <- ifelse (lx.u < (length(x.call)), FALSE, TRUE)
     else {
-      fill <- getOption("bar_fill_discrete")  # to begin, already "hues" colors
-      if (fill[1] == "hues")  # if invoke style(), then colors are "hues"
-        fill <- .color_range("hues", n.levels)  # convert to actual colors
-    }
-  }  # end missing fill
-  else
-    fill <- .color_range(fill, n.levels)  # get actual colors
-
-  if (trans > 0)
-   for (i in 1:length(fill)) fill[i] <- .maketrans(fill[i], (1-trans)*256)
-
-  # by default, no color borders if a range
-  if (identical(color, getOption("bar_color_discrete")))
-    color <- "transparent"
-  # see if apply a pre-defined color range to **color**
-  col.clr <- .color_range(color, n.levels)  # see if range, NULL if not
-  if (!is.null(col.clr)) color <- col.clr
-
-
-  # -----------------------
-  # process stat parameter
-
-  lx.u <- length(unique(x.call))  # includes NA values
-  if (is.null(by.call))
-    is.smry_tbl <- ifelse (lx.u < (length(x.call)), FALSE, TRUE)
-  else {
-    lby.u <- length(unique(by.call))  # includes NA values
-    is.smry_tbl <- ifelse (lx.u*lby.u < length(by.call), FALSE, TRUE)
-  }
-
-  if (labels.miss) {
-    if (!stat.miss || is.smry_tbl) # set default
-      labels <- "input"
-    else
-      labels <- "%"
-  }
-
-  if (!is.smry_tbl && !is.null(y.call) && stat.miss) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "The data are not a summary table, and you have a ",
-      "numerical variable,\n",
-      "    y = ", y.name, "\n",
-      "so need to specify a value of  stat  to define the aggregation of\n",
-      y.name, ", such as stat=\"mean\".\n\n")
-  }      
-
-  if (!is.null(y.call)) {  # a y variable present
-
-    if (is.smry_tbl) {  # a summary table
-
-      if (!stat.miss  &&  is.smry_tbl) { # y and a summary table, then no stat
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "The data are a summary table, so do not specify a value of\n",
-          "  stat  as the data aggregation has already been done\n\n")
-      }      
-
-     if (sum(is.na(x.call)) > 0 ||
-          sum(is.na(by.call)) > 0 ||
-          sum(is.na(y.call)) > 0)   {
-          ok <- is.finite(x.call) & is.finite(by.call) & is.finite(y.call)
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "When reading a summary table, missing data not allowed.\n\n")
-      }
-    }  # end is summary table
-  }  # a y variable
-
-  # -----------------------
-  if (Trellis && do.plot) {
-
-  if (!stat.miss) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Only the original data work with Trellis plots,",
-      " no data transformations. Use  by  instead of  by1.\n\n")
-  }
-
-  # by2 not currently available
-  .bar.lattice(x.call, by1.call, by2=NULL, n_row, n_col, aspect,
-               proportion, 
-               fill, color, trans, size.pt=NULL, xlab, ylab, main,
-               rotate_x, offset,
-               width, height, pdf_file,
-               segments_x=NULL, breaks=NULL, T.type="bar", quiet)
-  }
-
-  # -----------------------
-  else {  # not Trellis
-
-    # set up pdf_file if needed
-    if (!is.null(pdf_file)) {
-      if (!grepl(".pdf", pdf_file))
-        pdf_file <- paste(pdf_file, ".pdf", sep="")
-      pdf(file=pdf_file, width=width, height=height, onefile=FALSE)
-    }
-    else {
-      if (df.name != "NULL")  # not dev.new for shiny
-          .opendev(pdf_file, width, height)
+      lby.u <- length(unique(by.call))  # includes NA values
+      is.smry_tbl <- ifelse (lx.u*lby.u < length(by.call), FALSE, TRUE)
     }
 
-    # y is present with raw data and stat not null
-    if (!is.null(stat) && !is.null(y.call) && !is.smry_tbl) { 
-      n_cat <- 0
+    if (labels.miss) {
+      if (!stat.miss || is.smry_tbl) # set default
+        labels <- "input"
+      else
+        labels <- "%"
+    }
 
-      # do stats here to the console output before reducing data
-      if (!quiet) {
-        digits.d <- getOption("digits.d")
+    if (!is.smry_tbl && !is.null(y.call) && stat.miss) {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "The data are not a summary table, and you have a ",
+        "numerical variable,\n",
+        "    y = ", y.name, "\n",
+        "so need to specify a value of  stat  to define the aggregation of\n",
+        y.name, ", such as stat=\"mean\".\n\n")
+    }      
 
-          txout <- ""
-          if (missing(by)) {  # do not show stats for one var when a by var
-            options(yname = x.name)  # reverse x and y names for .ss.numeric
-            options(xname = y.name)
+    if (!is.null(y.call)) {  # a y variable present
+      if (is.smry_tbl) {  # a summary table
 
-            stats <- .ss.numeric(y.call, by=x.call,
-                               digits_d=digits_d, brief=TRUE, y.name=x.name)
-            txout <- stats$tx
-            options(xname = x.name)  # reverse back
-            options(yname = y.name)
-          }
+        if (!stat.miss  &&  is.smry_tbl) { # y and a summary table, no stat
+          cat("\n"); stop(call.=FALSE, "\n","------\n",
+            "The data are a summary table, so do not specify a value of\n",
+            "  stat  as the data aggregation has already been done\n\n")
+        }      
 
-        class(txout) <- "out"
+        if (sum(is.na(x.call)) > 0 ||
+              sum(is.na(by.call)) > 0 ||
+              sum(is.na(y.call)) > 0)   {
+              ok <- is.finite(x.call) & is.finite(by.call) & is.finite(y.call)
+            cat("\n"); stop(call.=FALSE, "\n","------\n",
+              "When reading a summary table, missing data not allowed.\n\n")
+        }
+      }  # end is summary table
+    }  # a y variable
 
-        output <- list(out_txt=txout)
-        class(output) <- "out_all"
-        print(output)
-      }
+    # -----------------------
+    if (Trellis && do.plot) {
 
-      # get summary table from the data according to the stats parameter
-      stat_out <- .bc.stat(x.call, y.call, by.call, stat, y.name)
-      out <- stat_out$out
-      if (is.null(ylab)) ylab <- stat_out$ylab
+      # by2 not currently available
+      .bar.lattice(x.call, by1.call, by2=NULL, n_row, n_col, aspect,
+                   proportion, 
+                   fill, color, trans, size.pt=NULL, xlab, ylab, main,
+                   rotate_x, offset,
+                   width, height, pdf_file,
+                   segments_x=NULL, breaks=NULL, T.type="bar", quiet)
+    }
 
-      if (is.null(by.call)) {
-        x.call <- factor(names(out))
-        y.call <- as.vector(out)
+    # -----------------------
+    else {  # not Trellis
+
+      # set up pdf_file if needed
+      if (!is.null(pdf_file)) {
+        if (!grepl(".pdf", pdf_file))
+          pdf_file <- paste(pdf_file, ".pdf", sep="")
+        pdf(file=pdf_file, width=width, height=height, onefile=FALSE)
       }
       else {
-        x.call <- out[,1]
-        by.call <- out[,2]
-        y.call <- out[,3]
+        if (df.name != "NULL")  # not dev.new for shiny
+            .opendev(pdf_file, width, height)
       }
 
-    }  # end y is present for original data and stats not NULL
+      # y is present with raw data and stat not null
+      if (!is.null(stat) && !is.null(y.call) && !is.smry_tbl) { 
+        n_cat <- 0
 
-    is.range.nm <- ifelse (length(.color_range(fill, n.clr=5)) > 1, TRUE, FALSE)
-    if (!is.range.nm && !by.miss && !fill.miss && !is.null(by.call)) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "For custom fill for a two-variable bar chart,\n",
-        " must specify a color range such as \"colors\" or \"grays\", \n\n")
-    }
+        # do stats here to the console output before reducing data
+        if (!quiet) {
+          digits.d <- getOption("digits.d")
 
-    bc <- .bc.main(x.call, y.call, by.call, stack100,
-          fill, color, trans, fill_split, theme,
-          horiz, gap, proportion, scale_y, 
-          xlab, ylab, main,
-          value_labels, label_max, beside,
-          rotate_x, offset, break_x, sort,
-          labels, labels_color, labels_size, labels_decimals,
-          labels_position, labels_cut,
-          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-          pad_y_min, pad_y_max,
-          legend_title, legend_position, legend_labels,
-          legend_horiz, legend_size, legend_abbrev, legend_adjust,
-          add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet, 
-          shiny, ...)
+            txout <- ""
+            if (missing(by)) {  # no show stats for one var when a by var
+              options(yname = x.name)  # reverse x and y names, .ss.numeric
+              options(xname = y.name)
 
-  if (!is.null(pdf_file)) {
-    dev.off()
-    if (!quiet) .showfile(pdf_file, "BarChart")
-  }
-        
+              stats <- .ss.numeric(y.call, by=x.call, digits_d=digits_d,
+                                   brief=TRUE, y.name=x.name)
+              txout <- stats$tx
+              options(xname = x.name)  # reverse back
+              options(yname = y.name)
+            }
+
+          class(txout) <- "out"
+
+          output <- list(out_txt=txout)
+          class(output) <- "out_all"
+          print(output)
+        }  # end !quiet
+
+        # get summary table from the data according to the stats parameter
+        stat_out <- .bc.stat(x.call, y.call, by.call, stat, y.name)
+        out <- stat_out$out
+        if (is.null(ylab)) ylab <- stat_out$ylab
+
+        if (is.null(by.call)) {
+          x.call <- factor(names(out))
+          y.call <- as.vector(out)
+        }
+        else {
+          x.call <- out[,1]
+          by.call <- out[,2]
+          y.call <- out[,3]
+        }
+
+      }  # end y is present for original data and stats not NULL
+
+      is.range.nm <- ifelse (length(.color_range(fill, n.clr=5)) > 1,
+                             TRUE, FALSE)
+      if (!is.range.nm && !by.miss && !fill.miss && !is.null(by.call)) {
+        cat("\n"); stop(call.=FALSE, "\n","------\n",
+          "For custom fill for a two-variable bar chart,\n",
+          " must specify a color range such as \"colors\" or \"grays\", \n\n")
+      }
+
+      bc <- .bc.main(x.call, y.call, by.call, stack100,
+            fill, color, trans, fill_split, theme,
+            horiz, gap, proportion, scale_y, 
+            xlab, ylab, main,
+            value_labels, label_max, beside,
+            rotate_x, offset, break_x, sort,
+            labels, labels_color, labels_size, labels_decimals,
+            labels_position, labels_cut,
+            xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
+            pad_y_min, pad_y_max,
+            legend_title, legend_position, legend_labels,
+            legend_horiz, legend_size, legend_abbrev, legend_adjust,
+            add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet, 
+            shiny, ...)
+
+      if (!is.null(pdf_file)) {
+        dev.off()
+        if (!quiet) .showfile(pdf_file, "BarChart")
+      }
+          
       return(invisible(bc))
     }  # not Trellis
 
   }  # end x is a single var
+  # ------------------------
+  # ------------------------
 
 
+  # ---------------------------------------------------
   # x is a data frame or var list of multiple variables
   # ---------------------------------------------------
   else {
@@ -748,22 +715,20 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       if (horiz.miss) horiz <- TRUE
 
       if (color.miss) color <- "transparent"
-      if (fill.miss) {  # define divergent palette
-        if ((theme %in% c("gray", "white"))) {
-          fill <- c("grays", "grays")
-          color <- c("gray50")
-        }
-        else if ((theme %in% c("hues", "lightbronze", "dodgerblue", "blue",
-                                "gold", "brown", "sienna", "orange")))
-          fill <- c("browns", "blues")
-        else if ((theme %in% c("darkred", "red", "rose", "slatered")))
-          fill <- c("turquoises", "reds")
-        else if ((theme %in% c("darkgreen", "green", "purple")))
-          fill <- c("violets", "greens")
-        else
-          fill <- c("browns", "blues")
+
+      # if fill not specified, define divergent palette and get colors 
+      if (fill.miss) {
+        fill <- .get_fill(theme, diverge=TRUE)  # get divergent color names
+        fill <-.color_range(fill, uq.ln)  # translate color names to colors       
       }  # end fill.miss
-      fill <-.color_range(fill, uq.ln)  # translate color names to colors       
+
+      # evaluate getColors at the time of the function call
+      # re-evaluate here by setting fill with the specified value of n
+      else if (substr(fill.name, 1, 9) == "getColors") 
+        fill <- .do_getColors(fill.name, uq.ln)
+
+      else  # not fill=getColors(...) but color names were specified
+        fill <-.color_range(fill, uq.ln)  # translate color names to colors       
 
       if (!is.null(pdf_file)) {
         if (!grepl(".pdf", pdf_file))

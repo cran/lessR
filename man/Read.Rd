@@ -9,7 +9,7 @@
 \description{
 Abbreviation: \code{rd}, \code{rd_lbl}, \code{Read2}
 
-Reads the contents of the specified data file into an R data table, what R calls a data frame.  By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls}, \code{.xlsx} using Alexander Walker's \code{\link{openxlsx}} package, or \code{.ods} using Gerrit-Jan Schutten and Chung-hong Chan plus other contributor's \code{readODS} package. Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL (except for .Rda files which must be on the local computer system).
+Reads the contents of the specified data file into an R data table, what R calls a data frame.  By default the format of the file is detected from its filetype: comma or tab separated value text file from \code{.csv}, SPSS data file from \code{.sav}, SAS data from from \code{.sas7bdat}, or R data file from \code{.rda}, and Excel file from \code{.xls}, \code{.xlsx} using Alexander Walker's \code{openxlsx} package, or \code{.ods} using Gerrit-Jan Schutten and Chung-hong Chan plus other contributor's \code{readODS} package. Specify a fixed width formatted text data file to be read with the required R \code{widths} option. Identify the data file by either browsing for the file on the local computer system with \code{Read()}, or identify the file with the first argument a character string in the form of a path name or a web URL (except for .Rda files which must be on the local computer system).
 
 Any variable labels in a native SPSS are automatically included in the data file. See the \code{details} section below for more information. Variable labels can also be added and modified individually with the \code{lessR} function \code{\link{label}}, and more comprehensively with the \code{\link{VariableLabels}} function.
 
@@ -122,7 +122,7 @@ R DATA\cr
 Relies upon the standard R function \code{load}. By convention only, data files in native R format have a file type of \code{.rda}. To read a native R data file, if the file type is \code{.rda}, the \code{format} is automatically set to \code{"R"}. To invoke this option for a relevant data file of any file type, explicitly specify \code{format="R"}. Create a native R data file by saving the current data frame, usually \code{d}, with the \code{lessR} function \code{\link{Write}}.
 
 Excel DATA\cr
-Relies upon the function \code{\link{read.xlsx}} from Alexander Walker's \code{openxlsx} package. Files with a file type of \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The \code{read.xlsx} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file, with a default value of 1. The \code{row.names} parameter can only have a value of 1. Dates stored in Excel as an Excel date type are automatically read as an R Date type. See the help file for \code{\link{read.xlsx}} for additional parameters, such as \code{sheet} for the name or number of the worksheet to read and \code{startRow} for the row number for which to start reading data.  
+Relies upon the function \code{read.xlsx} from Alexander Walker's \code{openxlsx} package. Files with a file type of \code{.xlsx} are assigned a \code{format} of \code{"Excel"}. The \code{read.xlsx} parameter \code{sheet} specifies the ordinal position of the worksheet in the Excel file, with a default value of 1. The \code{row.names} parameter can only have a value of 1. Dates stored in Excel as an Excel date type are automatically read as an R Date type. See the help file for \code{read.xlsx} for additional parameters, such as \code{sheet} for the name or number of the worksheet to read and \code{startRow} for the row number for which to start reading data.  
 
 lessR DATA\cr
 \code{lessR} has some data sets included with the package: "BodyMeas", "Cars93", "Employee", "Jackets", "Learn", "Mach4", "Reading", and "StockPrice".  \code{Read} reads each such data set by specifying its name, such as \code{Read("Employee")}. No specificaiton of \code{format} and no provided filetype, just enter the name of the data set. 
@@ -159,7 +159,7 @@ Alexander Walker (2018). openxlsx: Read, Write and Edit XLSX Files. R package ve
 
 
 \seealso{
-\code{\link{read.csv}}, \code{\link{read.xlsx}},  
+\code{\link{read.csv}},
 \code{\link{read.fwf}}, \code{\link{corRead}}, \code{\link{label}},
  \code{\link{details}}, \code{\link{VariableLabels}}.
 }

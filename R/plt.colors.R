@@ -44,6 +44,7 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
           area_fill <- .color_range(area_fill, n.clrs)  # interpret blues, etc
       }
 
+
       color <- .plt.fill(color, color.miss, ord.by.call, n.clrs, n.clrs, theme)
 
       if (object=="both"  &&  color.miss  &&  all(area_fill!="transparent")) {
@@ -52,8 +53,10 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
       }
     }  # end n.clrs > 1
 
-    if (trans > 0)
-      area_fill <- .maketrans(area_fill, (1-trans)*256)
+    if ((trans > 0)) {  # default fill trans is 0.1
+       if (area_fill[1] != "transparent")
+         area_fill <- .maketrans(area_fill, (1-trans)*256)
+    }
 
   }  # end object %in% c("line", "both")  --- area_fill
 
@@ -85,7 +88,8 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
   nmV<- c("viridis", "cividis", "plasma", "spectral")
   nmO<- c("Okabe-Ito")
   nmD<- c("distinct")
-  nm <- c(nmC, nmR, nmV, nmO, nmD)
+  nmT <- c("Tableau")
+  nm <- c(nmC, nmR, nmV, nmO, nmD, nmT)
 
   # set pt_fill
   color_done <- FALSE
@@ -105,7 +109,7 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
     }
   }
 
-  if (trans > 0)
+  if (trans > 0)  # default fill trans is 0.1
     pt_fill <- .maketrans(pt_fill, (1-trans)*256)
 
   # set pt_color, could also be line color if time series

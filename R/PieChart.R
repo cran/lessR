@@ -37,13 +37,30 @@ function(x, y=NULL, data=d, filter=NULL,
 
   # a dot in a parameter name to an underscore
   dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
+  n.values <- 0
+  if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      if (length(grep(".", names(dots)[i], fixed=TRUE)) > 0) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-        assign(nm, dots[[i]])
-        get(nm)
+      if (grepl("values", names(dots)[i], fixed=TRUE)) {
+        n.values <- n.values + 1
+        if (n.values == 1) 
+          message(">>> Parameters  values, values_color, etc. now ",
+                  "renamed to:  labels, labels_color, etc.\n",
+                  "    Old parameter names will stop working in the future.\n")
+        if (names(dots)[i] == "values") labels <- dots[[i]]
+        if (names(dots)[i] == "values_color") labels_color <- dots[[i]]
+        if (names(dots)[i] == "values_size") labels_size <- dots[[i]]
+        if (names(dots)[i] == "values_digits") labels_decimals <- dots[[i]]
+        if (names(dots)[i] == "values_position") labels_position <- dots[[i]]
+        if (names(dots)[i] == "values_cut") labels_cut <- dots[[i]]
       }
+    }
+    if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]] 
+    if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]] 
+    if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
+    if (grepl(".", names(dots)[i], fixed=TRUE)) {
+      nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)  # dot to _
+      assign(nm, dots[[i]])
+      get(nm)
     }
   }
 

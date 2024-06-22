@@ -1,3 +1,33 @@
+# lessR version 4.3.6, June 22, 2024
+
+## Updates
+
+* `vignettes`: These extensive examples are moved to the web to save space as the installed lessR was exceeding the accepted maximum limit. The web address is given from `library(lessR)`.
+
+* `BarChart()`: When doing a composite plot, if calling `fill=getColors(...)` for a divergent palette, such as for one bar for all items on an attitude survey, no longer need to explicitly add `n=` for the number of levels. 
+
+* `getColors()`: Added three pre-defined palettes from the `colorpace` package: `rainbow_hcl`, `terrain_hcl`, and `heat_hcl`, e.g., `getColors("rainbow_hcl")`.
+
+* `getColors()`: Adjusted the margins to better fit the plot window when the color wheel or rectangle is displayed.
+
+* `getColors()`: Default Tableau qualitative palette added as a name to recognize and translate to the colors, also for visualization functions, such as `fill="Tableau"`.
+
+* `Plot()`: New parameter `time_unit` for when the x-variable is a `Date` variable and a time series is plotted with automatic aggregation of the time unit according to the specified value, such as `"years"` plotted from daily dates.
+
+* `Plot()`: New parameter `time_agg` for when the x-variable is a `Date` variable and a time series is plotted with automatic aggregation to specify the type of aggregation with `"sum"` the default.
+
+* `Plot()`: Pearson correlation analysis no longer displayed if the x-variable is a date, that is, if a time series is plotted.
+ 
+
+## Bug Fixes
+
+* `all visualizations`: Grid lines not affected in some plots that would add some unintended transparency to the visualizations.
+
+* `PieChart()`: User now warned that the `values` family of parameters is changed to `labels`, though the old reference still will work.
+
+* `Read()`: If `quiet=TRUE`, automatically modified variable names to legal R names are not reported.
+ 
+
 # lessR version 4.3.3, May 9, 2024
 
 ## Updates
@@ -22,8 +52,6 @@
 
 * `Plot()`: Binning large data sets now results in larger bubbles.
 
-* `reshape_wide()`: After the transformation, all other variables except those specified as the group, response, or ID are deleted as their values are not evenly distributed over the new wide format variables.
-
 * `dataStockPrice`: Data table updated with stock prices through May 2024, and trading volume added as the fourth variable. 
 
 
@@ -40,6 +68,8 @@
 * `Plot()`: Shapes now properly plot with a `by` parameter stratifying according to the specified categorical variable.
 
 * `Plot()`: `by1` parameter for Trellis (facet) plot with `fit` line specified now properly does not display text output when `quiet=TRUE`.
+
+* `reshape_wide()`: After the transformation, all other variables except those specified as the group, response, or ID are deleted as their values are not evenly distributed over the new wide format variables.
 
  
 # lessR version 4.3.2, Apr 07, 2024

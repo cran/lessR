@@ -56,7 +56,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # -------------------------
 
   fill_bg <- getOption("panel_fill")
-  date.ts <- ifelse (.is.date(x[,1]), TRUE, FALSE)
+  date.var <- ifelse (.is.date(x[,1]), TRUE, FALSE)
   if (is.null(size)) size <- 1
   size.pt <- size * .9  # size is set in Plot.R, reduce a bit for here
   theme <- getOption("theme")
@@ -94,7 +94,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       value_labels <- gsub(" ", "\n", x.lvl)
     x <- as.matrix(as.integer(unclass(x[,1])))
   }
-  else if (!date.ts) {
+  else if (!date.var) {
     x <- as.matrix(x)
     colnames(x) <- nm.x
   }
@@ -104,7 +104,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     y.lvl <- levels(y[,1])  #  put into alphabetical order
     y <- as.matrix(as.integer(unclass(y[,1])))
   }
-  else if (!date.ts) {
+  else if (!date.var) {
     nm.y <- names(y)
     y <- as.matrix(y)
     colnames(y) <- nm.y
@@ -116,7 +116,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   n_col <- max(n.xcol, n.ycol)
   nrows <- nrow(x)
 
-  if (date.ts) {
+  if (date.var) {
     x.val <- x[,1]
     x <- as.matrix(x.val, ncol=1)
   }
@@ -157,7 +157,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
 
   # get x.lab and y.lab
-  if (date.ts) xx.lab <- xlab
+  if (date.var) xx.lab <- xlab
   if (want.labels) {
     gl <- .getlabels(xlab, ylab, main, lab_x_cex=lab_x_cex,
                      lab_y_cex=lab_y_cex)
@@ -176,7 +176,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
   if (!is.null(x.lab)) if (n.xcol > 1  &&  substr(x.lab, 1, 2) == "c(")
       x.lab <- NULL  # e.g., get rid of == "c(Female,Male)"
-  if (date.ts && is.null(xx.lab)) x.lab <- ""
+  if (date.var && is.null(xx.lab)) x.lab <- ""
 
   if (!is.null(x.name)) if (x.name == "Index") {
     if (n.ycol > 1) y.lab <- ""
@@ -196,7 +196,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # x.val is either any value_labels or x.lvl, or NULL if x is numeric
   mx.x.val.ln <- 1
   mx.y.val.ln <- 1
-  if (!date.ts) {
+  if (!date.var) {
     x.val <- NULL
     y.val <- y.lvl  # if not reset to x value labels
     max.lbl.y <- NULL
@@ -212,7 +212,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
       }
     }
-    else {  # is date.ts, null value_labels
+    else {  # is date.var, null value_labels
       x.val <- x.lvl  # x.val is NULL if x is numeric, ignored
       y.val <- y.lvl  # y.val ignored if y is numeric
     }
@@ -413,7 +413,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     if (num.cat.x) axT1 <- sort(unique(x))  # x.lvl or x.val are NULL
   }
   else {
-    if (!date.ts) {
+    if (!date.var) {
       if (stat == "count") {
         if (mx.x <= 3)  # just want integers for count axis
           n.best <- 3
@@ -434,7 +434,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
       }
     }
-    else  # is date.ts
+    else  # is date.var
       axT1 <-axTicks(1)
   }
 
@@ -459,12 +459,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   # axes value labels
   if (xy_ticks) {
-    if (!date.ts) {  # get ticks for both axes
+    if (!date.var) {  # get ticks for both axes
       .axes(x.val, y.val, axT1, axT2,
             rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
     }
-    else {  # date.ts
-      # y-axis
+    else {  # date.var, y-axis
       .axes(NULL, y.val, axT1, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
             offset=offset, y.only=TRUE, ...)  # y-axis
       # x-axis, use base R axis.Date
@@ -476,7 +475,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       axis.Date(1, x.val, col=ax$axis_x_color, cex.axis=axis_x_cex,
                 col.axis=ax$axis_x_text_color, tck=-.02, ...)  # x-axis
       par(mgp = my.mgp)  # restore back to previous value
-    }  # end date.ts
+    }  # end date.var
   }  # end xy_ticks
 
   .axlabs(x.lab, y.lab, main.lab, sub.lab,
@@ -509,7 +508,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         if (n.by <= 1) {  # pure single panel, data in wide format
 
           if (ln.width > 0) {  # plot line(s)
-            if (date.ts || freq.poly)  # object == "both"
+            if (date.var || freq.poly)  # object == "both"
               lines(as.numeric(x[,1]), y[,1], col=color[1], lwd=ln.width, ...)
           }
 
@@ -1028,11 +1027,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       for (i.clr in 1:n.clrs) {  # note: double looping with i.remv and i
 
         if (n.clrs == 1) {  # one plot, all the data
-          if (!date.ts) {
+          if (!date.var) {
             x.lv <- x[,1]
             y.lv <- y[,1]
           }
-          else {  # date.ts
+          else {  # date.var
             x.lv <- as.numeric(x.val)
             y.lv <- as.numeric(y[,i.clr])
           }
@@ -1138,7 +1137,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
 
   if (!is.null(x1)) {
-    if (date.ts) x1 <- julian(x1)  # dates to date serial numbers
+    if (date.var) x1 <- julian(x1)  # dates to date serial numbers
     if (length(which(x1 == "mean_x")) > 0) {
       x1[which(x1 == "mean_x")] <- mean(x, na.rm=TRUE)
       x1 <- as.numeric(x1)

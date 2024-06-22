@@ -26,6 +26,9 @@ function(pal=NULL, end_pal=NULL,
   l.miss <- ifelse (missing(l), TRUE, FALSE)
   c.miss <- ifelse (missing(c), TRUE, FALSE)
 
+  main.miss <- ifelse (missing(main), TRUE, FALSE)
+  if (!is.null(main)) if (!main.miss) if (main=="" || main==" ") main <- NULL
+
   output.miss <- ifelse (missing(output), TRUE, FALSE)
 
   # default output is FALSE unless a direct manual call from the console
@@ -69,7 +72,6 @@ function(pal=NULL, end_pal=NULL,
   nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",  
           "turquoises", "aquas", "blues", "purples", "violets",
           "magentas", "grays")
-  nmR <- c("rainbow", "heat", "terrain")
   nmV<- c("viridis", "cividis", "plasma", "spectral")
   nmO<- c("Okabe-Ito")
   nmD<- c("distinct")
@@ -78,16 +80,20 @@ function(pal=NULL, end_pal=NULL,
           "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2",
           "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2",
           "IsleofDogs1", "IsleofDogs2")
+  nmR <- c("rainbow", "heat", "terrain",
+           "rainbow_hcl", "heat_hcl", "terrain_hcl")
+  nmT <- c("Tableau")
 
 
   # set kind of analysis: qualitative, sequential, divergent, or manual
   # -------------------------------------------------------------------
 
   if (!is.null(pal)) {  # at least one color specified
-      if (pal[1] %in% nm) {
-        kind <- "sequential"
-      if (!is.null(end_pal[1])) if (end_pal[1] %in% nm)
-        kind <- "divergent"
+
+    if (pal[1] %in% nm) {
+      kind <- "sequential"
+    if (!is.null(end_pal[1])) if (end_pal[1] %in% nm)
+      kind <- "divergent"
     }
     else if (pal[1] %in% nmR)
       kind <- "seq.R"
@@ -101,6 +107,8 @@ function(pal=NULL, end_pal=NULL,
       kind <- "wes"
     else if (pal[1] %in% nmD)
       kind <- "distinct"
+    else if (pal[1] %in% nmT)
+      kind <- "Tableau"
 
     else {  # pal[1] not in any nm vector
       if (is.null(end_pal))  # no ending color specified
@@ -263,7 +271,7 @@ function(pal=NULL, end_pal=NULL,
   # Okabe-Ito colors
   else if (kind == "oi") {
     ttl <- paste("Okabe-Ito Colors Palette", pal[1], "\n") 
-    pal <- pal <- palette.colors(n=9, palette="Okabe-Ito", alpha=1)[2:9]
+    pal <- palette.colors(n=9, palette="Okabe-Ito", alpha=1)[2:9]
     pal[9] <- "#000000FF"  # put black at the end
     if (missing(n)) n <- 9
     if (n <= 9)
@@ -273,6 +281,22 @@ function(pal=NULL, end_pal=NULL,
       cat("\n"); stop(call.=FALSE, "\n","------\n",
          "Only 9 Okabe-Ito colors available.\n",
          "Can start with a vector of the above 9 colors, then add more.\n\n")
+    }
+  }
+
+ # Tableau colors
+  else if (kind == "Tableau") {
+    ttl <- paste("Tableau Qualitative Colors Palette", pal[1], "\n") 
+    pal <- c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F", 
+             "#EDC949", "#AF7AA1", "#FF9DA7", "#9C755F", "#BAB0AC") 
+    if (missing(n)) n <- 10
+    if (n <= 10)
+      pal <- pal[1:n]
+    else {
+      print(pal[1:10])
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+         "Only 10 Tableau colors available.\n",
+         "Can start with a vector of the above 10 colors, then add more.\n\n")
     }
   }
 
@@ -290,7 +314,8 @@ function(pal=NULL, end_pal=NULL,
 # pre-specified distinct colors
   else if (kind == "distinct") {
     ttl <- paste("Colors Palette", pal[1], "\n") 
-    pal <- c(getColors(c=90, l=50, n=5),
+#   pal <- c(getColors(c=90, l=50, n=5),
+    pal <- c(
              "goldenrod2", "gray45", "yellowgreen", "orchid3", "skyblue",
              "darkgray", "lightcoral", "navajowhite4", "cyan3", "darkorange3",
              "maroon3", "mediumaquamarine", "royalblue1", "mistyrose4",
@@ -325,20 +350,32 @@ function(pal=NULL, end_pal=NULL,
   } 
 
   else if (kind == "seq.R") {
+    if (is.null(l)) l <- 60
+    if (is.null(c)) c <- 65
 
     if (pal == "rainbow") {
       pal <- rainbow(n)
       ttl <- "Rainbow Colors"
     }
-
     else if (pal == "terrain") {
       pal <- terrain.colors(n)
       ttl <- "Terrain Colors"
     }
-
     else if (pal == "heat") {
       pal <- heat.colors(n)
       ttl <- "Heat Colors"
+    }
+    else if (pal == "rainbow_hcl") {
+      pal <- colorspace::rainbow_hcl(n, l=l, c=c)
+      ttl <- "Rainbow HCL Colors"
+    }
+    else if (pal == "terrain_hcl") {
+      pal <- colorspace::terrain_hcl(n, l=l, c.=c)
+      ttl <- "Terrain HCL Colors"
+    }
+    else if (pal == "heat_hcl") {
+      pal <- colorspace::heat_hcl(n, l=l, c.=c)
+      ttl <- "Heat HCL Colors"
     }
   }
 
@@ -355,12 +392,19 @@ function(pal=NULL, end_pal=NULL,
     # ----
     # plot
 
+    # ttl is constructed, the default title if main not specified
+    if (main.miss)
+      main.lab <-  ttl
+    else
+      main.lab <- main  # could be NULL
+
     if (!labels) lbl <- NA
 
     par(bg=getOption("panel_fill"))
 
     if (shape == "wheel") {
-      par(mai=c(.4, .5, .8, .5))
+      top <- ifelse(is.null(main.lab), 0.2, 0.7)
+      par(mai=c(.1, 0, top, 0))
 
       pin <- par("pin")  # plot dimensions in inches
       xlim <- c(-1, 1)
@@ -376,6 +420,8 @@ function(pal=NULL, end_pal=NULL,
     }  # end wheel
 
     else if (shape == "rectangle")  {
+      top <- ifelse(is.null(main.lab), 0.2, 0.5)
+      par(mai=c(.1, .1, top, .1))
       if (labels) {
         if (kind == "qualitative") {
           rotate_x <- 0
@@ -401,15 +447,16 @@ function(pal=NULL, end_pal=NULL,
            cex=labels_cex)
     }  # end rectangle
 
-    main.lab <- ifelse (is.null(main), ttl, main)
-    title(main=main.lab, cex.main= getOption("main_cex"),
-        col.main=getOption("main_color"), ...)
+    if (!is.null(main.lab))
+      title(main=main.lab, cex.main=getOption("main_cex"),
+            col.main=getOption("main_color"), ...)
+
 
     # -----------
     # text output
 
     if (!quiet) {
-      mc <- max(nchar(pal))
+      mc <- max(nchar(na.omit(pal)))
       cat("\n")
       if (kind %in% c("qualitative", "sequential")) {  # HCL colors
         if (kind == "sequential") {
@@ -426,7 +473,7 @@ function(pal=NULL, end_pal=NULL,
                   .fmt(col2rgb(pal[i])[3],0,w=4),"\n")
       }
 
-      else {
+      else {  # qualitative 
         cat("  color    r    g    b\n")
         cat("----------------------\n")
           for (i in 1:length(pal))

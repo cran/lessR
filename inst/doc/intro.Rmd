@@ -1,0 +1,23 @@
+---
+title: "intro"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{intro}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(lessR)
+```
+
+The vignette examples of using **lessR** are so extensive that the package exceeded the maximum installation size. Instead, find the many vignette examples at:
+
+https://web.pdx.edu/~gerbing/lessR/examples/

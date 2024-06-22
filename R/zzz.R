@@ -9,15 +9,15 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.3.3                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.3.6                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
       "\n",
-      "Learn about reading, writing, and manipulating data, graphics,\n",
-      "testing means and proportions, regression, factor analysis,\n",
+      "Many examples of reading, writing, and manipulating data, \n",
+      "graphics, testing means and proportions, regression, factor analysis,\n",
       "customization, and descriptive statistics from pivot tables\n",
-      "  Enter:  browseVignettes(\"lessR\")\n\n",
+      "  Go to:  https://web.pdx.edu/~gerbing/lessR/examples\n\n",
       "View changes in this and recent versions of lessR\n",
       "  Enter: news(package=\"lessR\")\n\n",
       "Interactive data analysis\n",
@@ -37,8 +37,8 @@ function(...) {
   # .maketrans("gray50", .to256("trans_bar_fill"))
   options(bar_fill = NULL)
   options(bar_fill_discrete = c("#4398D0", "#B28B2A", "#5FA140", "#D57388",
-           "#9A84D6", "#00A898", "#C97E5B", "#909711", "#00A3BA", "#D26FAF",
-           "#00A76F", "#BD76CB" ))  # getColors("hues")
+          "#9A84D6", "#00A898", "#C97E5B", "#909711", "#00A3BA", "#D26FAF",
+          "#00A76F", "#BD76CB" ))  # getColors("hues")
   options(bar_fill_cont = rgb(150,170,195, maxColorValue=255))
   options(trans_bar_fill = 0.10)
   options(bar_color = rgb(132,150,175, maxColorValue=255))
@@ -297,10 +297,11 @@ function(...) {
 
 # is date function
 .is.date <- function(x) {
+# check:  isdate <- class(x) %in% c("Date", "POSIXct", "POSIXlt")
 
   isdate <- ifelse("Date" %in% class(x), TRUE, FALSE)
 
-  if (!isdate[1])  # ordered factor has more than 1 class
+  if (!isdate[1])  # an ordered factor has more than 1 class
     isdate <- ifelse(grepl("POSIX",  class(x), fixed=TRUE)[1], TRUE, FALSE)
 
   return(isdate)
@@ -311,11 +312,9 @@ function(...) {
 # extract sequence of dates from time series y
 .ts.dates <- function(y) {
 
-  date_num <- as.numeric(time(y))
+  date_num <- as.numeric(time(y))  # time creates vector of ts times
   year <- floor(date_num)
-# year_beg <- as.POSIXct(paste0(year, '-01-01'))  # not work for "1986-01-01"
   year_beg <- as.POSIXlt.character(paste0(year, '-01-01 01:01:01'))
-# year_end <- as.POSIXct(paste0(year+1, '-01-01'))
   year_end <- as.POSIXlt.character(paste0(year+1, '-01-01 01:01:01'))
   diff.yr <- year_end - year_beg
   dates <- year_beg + ((date_num %% 1) * diff.yr)
@@ -1477,33 +1476,65 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
 
 # from the theme, get the sequential or hues palette name for each color theme
-.get_fill <- function(theme=getOption("theme"), seq.pal=FALSE) {
+.get_fill <- function(theme=getOption("theme"), seq.pal=FALSE, diverge=FALSE) {
 
-  # for ordinal variables, or color theme not default, get sequential palette
-  # for not ordinal and default color theme, qualitative palette
-  if (theme == "colors" ) {
-    if (seq.pal)
-      clrs <- "blues"
-    else
-      clrs <- "hues"
+  if (!diverge) {
+    # for ordinal variables, or color theme not default, get sequential palette
+    # for not ordinal and default color theme, qualitative palette
+    if (theme == "colors" ) {
+      clrs <- ifelse (seq.pal, "blues", "hues")
+    }
+    else if (theme %in% c("gray", "white")) clrs <- "grays"
+    else if (theme %in% c("lightbronze", "dodgerblue", "blue")) clrs <- "blues"
+    else if (theme %in% c("gold", "brown", "sienna")) clrs <- "browns"
+    else if (theme == "orange") clrs <- "rusts"
+    else if (theme %in% c("darkred", "red", "rose", "slatered")) clrs <- "reds"
+    else if (theme %in% c("darkgreen", "green")) clrs <- "greens"
+    else if (theme == "purple") clrs <- "violets"
+    else clrs <- "blues"
   }
-  else if (theme %in% c("gray", "white")) clrs <- "grays"
-  else if (theme %in% c("lightbronze", "dodgerblue", "blue")) clrs <- "blues"
-  else if (theme %in% c("gold", "brown", "sienna")) clrs <- "browns"
-  else if (theme == "orange") clrs <- "rusts"
-  else if (theme %in% c("darkred", "red", "rose", "slatered")) clrs <- "reds"
-  else if (theme %in% c("darkgreen", "green")) clrs <- "greens"
-  else if (theme == "purple") clrs <- "violets"
-  else clrs <- "blues"
+
+  else {  # divergent palette
+    if ((theme %in% c("gray", "white"))) {
+      clrs <- c("grays", "grays")
+      color <- c("gray50")
+    }
+    else if ((theme %in% c("hues", "lightbronze", "dodgerblue", "blue",
+                            "gold", "brown", "sienna", "orange")))
+      clrs <- c("browns", "blues")
+    else if ((theme %in% c("darkred", "red", "rose", "slatered")))
+      clrs <- c("turquoises", "reds")
+    else if ((theme %in% c("darkgreen", "green", "purple")))
+      clrs <- c("violets", "greens")
+    else
+      clrs <- c("browns", "blues")
+  }
 
   return(clrs)
 
 }
 
 
+# from explicit getColors() call in fill parameter, get the colors
+# get args and add n=
+.do_getColors <- function(fill.name, n.clr) {
+        
+    gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
+  if (!grepl("output", fill.name, fixed=TRUE))   # "output" not exist
+    txt <- paste("fill <- getColors(", gc.args, ", n=", n.clr,
+                 ", output=FALSE)", sep="")  # default is FALSE 
+  else
+    txt <- paste("fill <- getColors(", gc.args, ", n=", n.clr,
+                 ")", sep="")  # output specified
+  pp <- parse(text=txt)
+
+  return(eval(pp))   # get fill
+}
+
+
 # from a pre-defined color palette name, generate the palette
 # if not a palette name, then return the name, i.e., do nothing
-# typically used to convert color name from get_fill() to a color
+# typically used to convert color name to a color, such as from from get_fill()
 .color_range <- function(fill, n.clr) {
   if (fill[1] == "magma") fill[1] <- "plasma"
 
@@ -1520,7 +1551,8 @@ function(lab, labcex, cut, nm, var.nm, units) {
           "Chevalier1", "FantasticFox1", "Moonrise1", "Moonrise2",
           "Moonrise3", "Cavalcanti1", "GrandBudapest1", "GrandBudapest2",
           "IsleofDogs1", "IsleofDogs2")
-  nm <- c(nmC, nmR, nmV, nmO, nmD, nmW)
+  nmT <- c("Tableau")
+  nm <- c(nmC, nmR, nmV, nmO, nmD, nmW, nmT)
 
   # fill is a function such as hcl or is a named vector
   if (is.call(fill) || is.name(fill)) {

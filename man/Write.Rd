@@ -56,7 +56,7 @@ wrt_x(\dots, format="Excel")
 \details{
 Can specify the file name without the file type, which \code{Write} adds automatically, \code{.csv} for a comma separated values data file and \code{.rda} for a native R data file. The default file name is the name of the data frame to be written. The name of the file that is written, as well as the name of the working directory into which the file was written, are displayed at the console. 
 
-An Excel file is written using functions from Alexander Walker's \code{\link{openxlsx}} package.
+An Excel file is written using functions from Alexander Walker's \code{openxlsx} package.
 
 \code{Write} is designed to work in conjunction with the function \code{\link{Read}} from this package, which reads a csv, fixed width format, or native SPSS or R data files into the data frame \code{d}. \code{Write} relies upon the R functions \code{\link{write.csv}} and \code{\link{save}}.
 

@@ -5,7 +5,7 @@ function() {
     cat("----------------\n")
     cat("colors", "lightbronze",  "dodgerblue", "darkred", "gray", "gold",
         "darkgreen", "blue", "red", "rose", "slatered", "green", "purple",
-        "sienna", "brown", "orange", "white", "light", "\n")
+        "sienna", "brown", "orange", "white", "light", "\n", fill=60)
 
     cat("\nAvailable Sub-themes\n")
     cat("--------------------\n")

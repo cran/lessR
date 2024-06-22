@@ -1,5 +1,5 @@
 .plt.txt <- 
-function(x, y, values, object, cat.x,  cat.y,
+function(x, y, values, object, cat.x,  cat.y, date.var,
        xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat, 
        center_line, run, show_runs, prop, size, radius, digits_d, 
        fun_call=NULL, txdif=NULL) {
@@ -230,10 +230,10 @@ function(x, y, values, object, cat.x,  cat.y,
         txreg <- ""
         txcor <- ""
 
-        # output correlation info if no fit line or lm fit only
-        # -----------------------------------------------------
+        # output cor info if no fit line or lm fit only, no dates
+        # -------------------------------------------------------
 
-        if (fit %in% c("off", "lm")) {
+        if (fit %in% c("off", "lm") && !date.var) {
 
           for (i in 1:n_col) {
             class(txsug) <- "out"
