@@ -1,13 +1,14 @@
 .bar.lattice <- 
-function(x, by1, by2, nrows, ncols, asp, prop,
+function(x, facet1, facet2, nrows, ncols, asp, prop,
          fill, color,
          trans, size.pt, xlab, ylab, main,
          rotate_x, offset,
          width, height, pdf_file,
          segments_x, breaks, T.type, quiet) {
 
+
   if (!quiet)
-    cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n")
+    cat("[Trellis graphics from Deepayan Sarkar's lattice package]\n\n")
 
   panel_fill <- getOption("panel_fill")
   panel_color <- getOption("panel_color")
@@ -106,33 +107,27 @@ function(x, by1, by2, nrows, ncols, asp, prop,
     if (is.null(trans)) trans <- getOption("trans_pt_fill")
   }
 
-  # move strip to left for a single column
-  strp <- TRUE;  strp.lft <- FALSE
-  if (!is.null(ncols)) if (ncols == 1) {
-    strp <- FALSE;  strp.lft <- TRUE
-  }
-
   # ------------------------------------------------
   # calculate the histogram or bar chart or dot plot
-  # set conditioning variables, by1 and by2
+  # set conditioning variables, facet1 and facet2
 
   h.type <- ifelse(prop, "percent", "count")  # histogram type
   #h.type <- "density"   # need to integrate density as a 3rd option
   if (T.type == "hist") {
-    if (is.null(by2))
-      p <- lattice::histogram(~ x | by1, type=h.type)
+    if (is.null(facet2))
+      p <- lattice::histogram(~ x | facet1, type=h.type)
     else
-      p <- lattice::histogram(~ x | by1 * by2, type=h.type)
+      p <- lattice::histogram(~ x | facet1 * facet2, type=h.type)
     # see if there is a color range for fill, if so then get the colors
     # if breaks were possible, use unlist(p)$panel.args.common.breaks
     n.bar <- unlist(p)$panel.args.common.nint
   }
 
   else if (T.type %in% c("bar", "dot")) {
-    mytab <- table(x, by1)
+    mytab <- table(x, facet1)
     if (prop) mytab <- prop.table(mytab, margin=2)
     mytabDF <- as.data.frame.table(mytab, responseName="Count")
-    p <- lattice::barchart(x ~ Count | by1, data=mytabDF)
+    p <- lattice::barchart(x ~ Count | facet1, data=mytabDF)
     n.bar <- nrow(mytab)
   }
 
@@ -145,15 +140,16 @@ function(x, by1, by2, nrows, ncols, asp, prop,
 
   # customize layout cols and rows, need only specify one
   if (!is.null(nrows) ||  !is.null(ncols)) {
-    n.panels <- ifelse (is.null(by2), nlevels(by1), nlevels(by1)*nlevels(by2))
+    n.panels <- ifelse (is.null(facet2), nlevels(facet1),
+                                         nlevels(facet1)*nlevels(facet2))
     if (is.null(ncols)) ncols <- (n.panels %/% nrows) + (n.panels %% nrows > 0)
     if (is.null(nrows)) nrows <- (n.panels %/% ncols) + (n.panels %% ncols > 0)
     p <- update(p, layout=c(ncols, nrows))
   } 
 
   # scale down the point size, grid line width for the multi-panel dot plots
-  n.pnl <-  length(levels(by1))
-  if (!is.null(by2)) n.pnl <- n.pnl + length(levels(by2))
+  n.pnl <-  length(levels(facet1))
+  if (!is.null(facet2)) n.pnl <- n.pnl + length(levels(facet2))
   size.mult <- ifelse (n.pnl > 3, 0.70, 0.833)
   size.pt <- size.pt * size.mult
   if (n.pnl > 3 &&  grid_y_lwd > 0.99) grid_y_lwd <- .5 * grid_y_lwd
@@ -189,14 +185,31 @@ function(x, by1, by2, nrows, ncols, asp, prop,
   }
 
   top.pad <- ifelse (is.null(main), 0, 1)
-  if (!is.null(by1)) top.pad <- 1
+  if (!is.null(facet1)) top.pad <- 1
   axs.top <- ifelse (is.null(main), .5, 1)
 
+  # move strip to left for a single column
+  show_strip <- TRUE;  strip.lft <- FALSE
+  if (!is.null(ncols)) if (ncols == 1)
+    strip.lft <- TRUE
 
-  # specify plot attributes
+  # specify strip attributes
+  strip = if (show_strip) {
+    p <- update(p,
+         strip = lattice::strip.custom( 
+           par.strip.text = list(
+             cex=axis_x_cex,
+             col=getOption("strip_text_color"),
+             bg=list(col=getOption("strip_fill")),
+             strip.border=list(col=getOption("strip_color"), lwd=0.5),
+             strip.left=strip.lft 
+      )))}
+  else
+    FALSE
+             
+  # specify general plot attributes
   p <- update(p,
-         strip=strp, strip.left=strp.lft, aspect=asp,
-         par.strip_text=list(cex=axis_x_cex, col=getOption("strip_text_color")),
+         aspect=asp,
          xlab=list(label=x.lab, cex=lab_x_cex, col=l.x_color),
          ylab=list(label=y.lab, cex=lab_y_cex, col=l.y_color),
          main=list(label=main.lab, col=getOption("lab_color")), 
@@ -205,14 +218,13 @@ function(x, by1, by2, nrows, ncols, asp, prop,
            panel.background=list(col=panel_fill),
            layout_heights=list(top.padding=top.pad, axis_top=axs.top),
            axis_line=list(col=panel_frame_color,
-             lty=getOption("axis_lty"), lwd=getOption("axis_lwd")), 
-           strip.border=list(col=getOption("strip_color"), lwd=0.5),
-           strip.background=list(col=getOption("strip_fill"))),
+             lty=getOption("axis_lty"), lwd=getOption("axis_lwd"))),
          scales=list(
            x = list(cex=axis_x_cex, rot=rotate_x,
                     col=a.x.text_color),
            y = list(cex=axis_y_cex, rot=getOption("rotate_y"),
                     col=a.y.text_color)),
+
          panel = function(x, y, ...) {
             panel.grid(h=0, v=-1, col=g.x_color,
                         lwd=grid_x_lwd, lty=grid_x_lty)
@@ -225,7 +237,7 @@ function(x, by1, by2, nrows, ncols, asp, prop,
               #panel.mathdensity(dmath = dnorm, col.line = "grey60",
                            #args = list(mean=mean(x),sd=sd(x)), ...)
             }
-            if (T.type == "dot") {
+            else if (T.type == "dot") {
               if (segments_x) {
                 panel.points(x, y, pch=21, cex=size.pt,
                    col=getOption("pt_fill"), fill=getOption("pt_fill"), ...)
@@ -257,9 +269,9 @@ function(x, by1, by2, nrows, ncols, asp, prop,
   # text output
   if (!quiet) {
 
-    if (T.type == "hist"  &&  is.null(by2)) {
-      stuff <- .ss.numeric(x, by1, digits_d=getOption("digits_d"), 
-                           brief=TRUE, y.name=getOption("by1name"))
+    if (T.type == "hist"  &&  is.null(facet2)) {
+      stuff <- .ss.numeric(x, facet1, digits_d=getOption("digits_d"), 
+                           brief=TRUE, y.name=getOption("facet1name"))
       txsts <- stuff$tx
       class(txsts) <- "out"
       output <- list(out_stats=txsts)
@@ -267,9 +279,9 @@ function(x, by1, by2, nrows, ncols, asp, prop,
       print(output)
     }
 
-    else if (T.type == "bar"  &&  is.null(by2)) {
-        stats <- .ss.factor(x, by=by1, brief=TRUE, digits_d=getOption("digits_d"),
-                            x.name=x.name, y.name=getOption("by1name"),
+    else if (T.type == "bar"  &&  is.null(facet2)) {
+        stats <- .ss.factor(x, by=facet1, brief=TRUE, digits_d=getOption("digits_d"),
+                            x.name=x.name, y.name=getOption("facet1name"),
                             x.lbl=x.lbl, y.lbl=y.lbl)
         if (!is.null(stats)) {
           txttl <- stats$txttl

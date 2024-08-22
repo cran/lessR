@@ -1,10 +1,10 @@
 .bcParamValid <- 
-function (y.miss, by.miss, by1.miss, Trellis, sort, fill_split, fill.miss,
+function (y.miss, by.miss, facet1.miss, Trellis, sort, fill_split, fill.miss,
                 labels_position, stat.miss) {
 
-  if (!by.miss  &&  !by1.miss) {
+  if (!by.miss  &&  !facet1.miss) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "by  and  by1  parameters not currently available at the same time.\n\n")
+      "by  and  facet1  parameters not currently available at the same time.\n\n")
   }
 
   if (Trellis  &&  sort != "0") {
@@ -32,7 +32,7 @@ function (y.miss, by.miss, by1.miss, Trellis, sort, fill_split, fill.miss,
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Only the original data work with Trellis plots,",
       " no data aggregation with parameter stat.",
-      " Use  by  instead of  by1.\n\n")
+      " Use  by  instead of  facet1.\n\n")
   }
 
 }

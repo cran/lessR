@@ -1,11 +1,11 @@
 .param.VBS <-
-function(x, ID, by1, by1.miss, by0, by.miss,
+function(x, ID, facet1, facet1.miss, by0, by.miss,
          bw, bw.miss, bw_iter, iter.details, lx, n.ux, 
          k.iqr, box_adj, a, b,
-         x.name, by1.name, by.name, vbs_plot,
+         x.name, facet1.name, by.name, vbs_plot,
          n_col.miss, n_row.miss,
          size, out_size, out_size.miss,
-         j.x.miss, jitter_x, j.y.miss, jitter_y,
+         jitter_x, jitter_y,
          bin=FALSE, breaks=NULL, bin_start=NULL, bin_width=NULL,
          bin_end=NULL, proportion=NULL, 
          digits_d, quiet, fun_call=NULL, ...) {
@@ -26,7 +26,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     tx[length(tx)+1] <- .dash2(30)    
 
     # display repetitions
-    for (i in 1:ncol(frq)) {  # frq is the freq table, x (rows) with by1 (cols)
+    for (i in 1:ncol(frq)) {  # frq is the freq table, x (rows) with facet1 (cols)
       max_f.col <- max(frq[,i])
 #     x.val <- rownames(frq)[which(frq[,i]==max_f.col) %% nrow(frq)]
       x.val <- rownames(frq)[which(frq[,i]==max_f.col)]
@@ -81,7 +81,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
   ceil.n <- 1001  # ceiling of unique x's to look for replicated values
 
   if (is.null(by0)) by.name <- ""
-  if (is.null(by1)) by1.name <- ""
+  if (is.null(facet1)) facet1.name <- ""
 
   # suggestions
   if (getOption("suggest") && !quiet) {
@@ -117,15 +117,15 @@ function(x, ID, by1, by1.miss, by0, by.miss,
       txsug <- paste(txsug, "\n", fc, txt, sep="")
     }
 
-    if (nlevels(by1) == 2  ||  nlevels(by0) == 2) {
-      nm <- ifelse (nlevels(by1) == 2, by1.name, by.name)
+    if (nlevels(facet1) == 2  ||  nlevels(by0) == 2) {
+      nm <- ifelse (nlevels(facet1) == 2, facet1.name, by.name)
       txt1 <- paste("ttest(", x.name, " ~ ", nm, ")", sep="") 
       txt2 <- "  # Add the data parameter if not the d data frame"
       txsug <- paste(txsug, "\n", txt1, txt2, sep="")
     }
 
-    if (nlevels(by1) > 2  ||  nlevels(by0) > 2) {
-      nm <- ifelse (nlevels(by1) > 2, by1.name, by.name)
+    if (nlevels(facet1) > 2  ||  nlevels(by0) > 2) {
+      nm <- ifelse (nlevels(facet1) > 2, facet1.name, by.name)
       txt1 <- paste("ANOVA(", x.name, " ~ ", nm, ")", sep="") 
       txt2 <- "  # Add the data parameter if not the d data frame"
       txsug <- paste(txsug, "\n", txt1, txt2, sep="")
@@ -151,8 +151,8 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
 
   # -------
-  # ONE VAR VBS plot: # no by1, so x by itself
-  if (by1.miss && by.miss) { 
+  # ONE VAR VBS plot: # no facet1, so x by itself
+  if (facet1.miss && by.miss) { 
     # box plot outliers, stats
     bx <- .bx.stats(x, ID, k.iqr, box_adj, a, b, digits_d)
     txbox <- bx$txstat
@@ -198,8 +198,8 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
     if (out_size.miss) out_size <- 0.58 + 0.40*pt.size
 
-    if (j.x.miss) jitter_x <- 1.1 * (1-exp(-0.03*mx.c))
-    if (j.y.miss) {
+    if (is.null(jitter_x)) jitter_x <- 1.1 * (1-exp(-0.03*mx.c))
+    if (is.null(jitter_y)) {
       if (!reps) 
          jitter_y <- ifelse (lx <= 10000,
                          -1.644 + 0.579*log(lx), -16.567 + 2.163*log(lx))
@@ -249,12 +249,12 @@ function(x, ID, by1, by1.miss, by0, by.miss,
   }  # end one var
 
   # -------
-  # TWO VAR: x-variable with a Y categorical variable, by1
+  # TWO VAR: x-variable with a Y categorical variable, facet1
   else {
-    if (by1.miss && !by.miss) by1 <- by0
-    frq <- table(x, by1)
-    n.lvl <- nlevels(by1)
-    lvl <- levels(by1)
+    if (facet1.miss && !by.miss) facet1 <- by0
+    frq <- table(x, facet1)
+    n.lvl <- nlevels(facet1)
+    lvl <- levels(facet1)
 
     # max number of repetitions for a value of x within a Ycat category
     # more jitter_x?
@@ -271,13 +271,13 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     else
       txrep <- ""
 
-    b.name <- ifelse(by.miss, by1.name, by.name)
-    ssstuff <- .ss.numeric(x, by=by1, y.name=b.name,
-                           digits_d=digits_d, brief=TRUE, by1.nm=TRUE)
+    b.name <- ifelse(by.miss, facet1.name, by.name)
+    ssstuff <- .ss.numeric(x, by=facet1, y.name=b.name,
+                           digits_d=digits_d, brief=TRUE, facet1.nm=TRUE)
     txgrp <- ssstuff$tx
     class(txgrp) <- "out"
 
-    mx.c <- max(tapply(x, by1, length))
+    mx.c <- max(tapply(x, facet1, length))
     if (rep.prop > 0.15  &&  mc.w > (.05 * lx))  # many reps?
       reps <- TRUE
     else
@@ -293,7 +293,7 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
       if (out_size.miss) out_size <- 0.58 + 0.40*pt.size
 
-      if (j.y.miss) {
+      if (is.null(jitter_y)) {
         jitter_y <-  -1.221 + 0.576*log(mx.c) + 0.032*n.lvl
         if (jitter_y < 0.5) jitter_y <- 0.5
       }
@@ -305,9 +305,9 @@ function(x, ID, by1, by1.miss, by0, by.miss,
     }  # end !reps
 
     # discrete, numerical variable with a categorical variable
-    else {  # discrete-cat, by1, yields the same
-      if (!by1.miss) {
-        mx.c <- max(table(x, by1))
+    else {  # discrete-cat, facet1, yields the same
+      if (!facet1.miss) {
+        mx.c <- max(table(x, facet1))
       }
 
       if (is.null(size))
@@ -318,11 +318,11 @@ function(x, ID, by1, by1.miss, by0, by.miss,
 
       if (out_size.miss) out_size <- 0.58 + 0.40*pt.size
 
-      if (j.y.miss) {
+      if (is.null(jitter_y)) {
         jitter_y <-  -8 + 2.012*log(rep.max) + 0.9*n.lvl
         if (jitter_y < 1.0) jitter_y <- 1.0
       }
-      if (j.x.miss) jitter_x <- 0.086 + 0.141*log(mx.c)
+      if (is.null(jitter_x)) jitter_x <- 0.086 + 0.141*log(mx.c)
       if (jitter_x < 0) jitter_x <- 0
       if (grepl("v", vbs_plot) || grepl("s", vbs_plot)) 
         txprm <- .get.param(size, jitter_y, jitter_x, bw)
@@ -330,8 +330,8 @@ function(x, ID, by1, by1.miss, by0, by.miss,
         txprm <- ""
 
       if (n.ux < 9) {  # get x stats before jitter
-        ssstuff <- .ss.factor(x, by=by1,
-                              x.name=x.name, y.name=by1.name, ...)
+        ssstuff <- .ss.factor(x, by=facet1,
+                              x.name=x.name, y.name=facet1.name, ...)
         txfrq <- ssstuff$txfrq
         txXV <- ssstuff$txXV
         class(txfrq) <- "out"

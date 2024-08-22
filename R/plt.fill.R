@@ -1,7 +1,7 @@
 .plt.fill <-
-function(geom_clr, geom_clr.miss, ord.by.call, n.by1, n.lvl, theme) {
+function(geom_clr, geom_clr.miss, ord.by.call, n.facet1, n.lvl, theme) {
 
-  n.gen <- ifelse (n.by1 < n.lvl, n.by1, n.lvl)
+  n.gen <- ifelse (n.facet1 < n.lvl, n.facet1, n.lvl)
   if (n.gen == 0) n.gen <- 1
 
   if (geom_clr.miss) {  
@@ -17,7 +17,7 @@ function(geom_clr, geom_clr.miss, ord.by.call, n.by1, n.lvl, theme) {
     geom_clr.miss <- FALSE
   } 
 
-  if (n.lvl == 0) n.lvl <- 1  # bit of a hack, better if n.by1==1 is no levels 
+  if (n.lvl == 0) n.lvl <- 1  # bit of a hack, better if n.facet1==1 is no levels 
   if (!geom_clr.miss  &&  n.lvl > 0)  { # n.lvl = 0 means no Trellis
     if (length(geom_clr) == 1)
        geom_clr <- .color_range(geom_clr, n.lvl)  # from "blues", etc.

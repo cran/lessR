@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.3.6                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.3.7                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -146,6 +146,19 @@ function(...) {
 }
 
 
+.newparam <- function(miss.old, nm.old, str.old, miss.new, nm.new, str.new) {
+  if (!miss.old) {
+    message(">>> Parameter  ",  str.old,
+            "  will soon stop working. New name: ", str.new, "'\n")
+    return(nm.old)  # return symbol for old param variable, do not eval
+  } 
+  else if (!miss.new)
+    return(nm.new)  # return symbol for new param variable, do not eval
+  else
+    return(NULL)  # neither old nor new param were specified in function call
+}
+
+
 # get maximum number of 0's to right of decimal point for variable x
 #   that is less than 1, locate the significant digits
 #   called only by .decdig
@@ -171,6 +184,7 @@ function(...) {
   }
   return(n.max.z)
 }
+
 
 # get decimal digits to display for variable x, then apply
 .decdig <- function(x, digits_d) {
@@ -788,7 +802,7 @@ function(...) {
 
 # get variable labels if they exist
 .getlabels <- function(xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-                       y.nm=FALSE, by.nm=FALSE, by1.nm=FALSE,
+                       y.nm=FALSE, by.nm=FALSE, facet1.nm=FALSE,
                        lab_x_cex=NULL, lab_y_cex=NULL, labels=l,
                        graph.win=TRUE, flip=FALSE, ...) {
 
@@ -817,12 +831,12 @@ function(...) {
   x.name <- getOption("xname")
   if (y.nm)
     y.name <- getOption("yname")  # y.name is specified
-  else if (!by.nm && !by1.nm)
+  else if (!by.nm && !facet1.nm)
     y.name <- getOption("yname")  # y.name by default
-  else if (by.nm && !by1.nm)
+  else if (by.nm && !facet1.nm)
     y.name <- getOption("byname")
-  else if (!by.nm && by1.nm)
-    y.name <- getOption("by1name")
+  else if (!by.nm && facet1.nm)
+    y.name <- getOption("facet1name")
 
   x.lbl <- NULL
   y.lbl <- NULL
@@ -1047,12 +1061,13 @@ function(lab, labcex, cut, nm, var.nm, units) {
 }
 
 
+# get axis() and text()
 .axes <- function(x.lvl, y.lvl, axT1, axT2,
          rotate_x=0, rotate_y=0, offset=0.5, y.only=FALSE, ...) {
 
   fnt <- ifelse (getOption("sub_theme") == "wsj", 2, 1) # bold
   usr <- par("usr")
-  ax <- .axes_dim()  # get axis values parameters
+  ax <- .axes_dim()  # get axis values parameters: color, lwd, lty, cex
 
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
     if (!y.only) {  # do x axis in calling routine for time series

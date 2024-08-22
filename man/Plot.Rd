@@ -47,8 +47,8 @@ A scatterplot displays the values of a distribution, or the relationship between
 \strong{Three, four, or more variables}\cr
 \code{Plot(x,y, size=z)}: \code{x} and \code{y} continuous yields a bubble of two continuous variables with \code{z} setting the size of the corresponding plotted point, i.e., bubble\cr
 \code{Plot(x,y, by=zCat)}: plots a different scatterplot of \code{x} and \code{y} for each level of \code{zCat} on the same panel\cr
-\code{Plot(x,y, by1=zCat)}: plots a different scatterplot of \code{x} and \code{y} for each level of \code{zCat} on separate panels, i.e., Trellis or facet plots\cr
-\code{Plot(x,y, by1=z1Cat, by2=z2Cat)}: plots a different scatterplot of \code{x} and \code{y} for each combination of levels of \code{zCat1} and \code{zCat2} on separate panels, i.e., Trellis or facet plots\cr
+\code{Plot(x,y, facet1=zCat)}: plots a different scatterplot of \code{x} and \code{y} for each level of \code{zCat} on separate panels, i.e., Trellis or facet plots\cr
+\code{Plot(x,y, facet1=z1Cat, facet2=z2Cat)}: plots a different scatterplot of \code{x} and \code{y} for each combination of levels of \code{zCat1} and \code{zCat2} on separate panels, i.e., Trellis or facet plots\cr
 \code{Plot(X,y)} or \code{Plot(x,Y)}: one vector variable of several continuous variables, paired with another single continuous variable, yields multiple scatterplots on the same graph\cr
 \code{Plot(Y,xUnique)}: one categorical with unique (ID) values, such as \code{row.names} and the other variable a vector of continuous variables yields a Cleveland dot plot of all the continuous variables, usually two\cr
 
@@ -83,7 +83,7 @@ Plot(
     # ----------------------
     # Sort and jitter points
     sort_yx=c("0", "-", "+"),
-    jitter_x=0, jitter_y=0, 
+    jitter_x=NULL, jitter_y=NULL, 
 
     # ----------------
     # Outlier analysis
@@ -105,13 +105,13 @@ Plot(
 
     # --------------------------------------------------
     # Stratification: Same panel or Trellis (facet) plot [x, or x and y]
-    by=NULL, by1=NULL, by2=NULL,
+    by=NULL, facet1=NULL, facet2=NULL,
     n_row=NULL, n_col=NULL, aspect="fill",
 
     # -----------------------------------------------------
-    # Time series, plot x values sequentially [xDate, y or Y]
+    # Time series, plot x values sequentially [xDate, y, or Y]
     time_unit=NULL, time_agg=c("sum","mean"), stack=FALSE, lwd=1.5, 
-    area_fill="transparent", area_split=0,
+    area_fill="transparent", area_split=0, n_date_tics=NULL,
     # Run chart
     run=FALSE, show_runs=FALSE, 
     center_line=c("off", "mean", "median", "zero"),
@@ -122,7 +122,7 @@ Plot(
     stat_x=c("count", "proportion", "\%"),
 
     # ----------------------------------
-    # Integrated violin/box/scatter plot  [x]
+    # Integrated violin/box/scatter plot  [x only]
     vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
     violin_fill=getOption("violin_fill"), 
     box_fill=getOption("box_fill"), 
@@ -174,8 +174,9 @@ Plot(
     digits_d=NULL,
 
     # -------------------------------------------------------------
-    # Deprecated, removed in future versions, use R factors instead
-    n_cat=getOption("n_cat"), value_labels=NULL, rows=NULL,
+    # Deprecated, removed in future versions
+    n_cat=getOption("n_cat"), value_labels=NULL,  # use R factors instead
+    rows=NULL, by1=NULL, by2=NULL,
 
     # -----
     # Other
@@ -352,19 +353,19 @@ vp(\dots)
         each level of the numeric primary variables \code{x} and
         \code{y} on the \emph{same} plot, a \emph{grouping variable}.
         For two-variable plots, applies to the panels of a
-        \bold{Trellis graphic} if \code{by1} is specified.}
-  \item{by1}{A categorical variable called a \emph{conditioning variable} that
-        activates Trellis graphics, provided by Deepayan Sarkar's (2007) lattice
-        package, to provide
+        \bold{Trellis graphic} if \code{facet1} is specified.}
+  \item{facet1}{A categorical variable, the \emph{conditioning variable},
+        which activates Trellis (facet) graphics, provided by Deepayan 
+        Sarkar's (2007) lattice package, to provide
         a \emph{separate} panel of numeric primary variables \code{x}
-        and \code{y} for each level of the variable. Re-order the levels by
-        first converting to a factor variable with \code{\link{factor}} or
-        lessR \code{\link{factors}}.}
-  \item{by2}{A second \emph{conditioning variable} to generate Trellis
-        plots jointly conditioned on both the \code{by1} and \code{by2} variables,
-        with \code{by2} as the row variable, which yields a scatterplot (panel)
-        for \emph{each} cross-classification of the levels of numeric \code{x} and
-        \code{y} variables.}
+        and \code{y} for each level of the \code{facet1} variable.
+        Re-order the levels by first converting to a factor variable with
+        \code{\link{factor}} or lessR \code{\link{factors}}.}
+  \item{facet2}{A second \emph{conditioning variable} to generate Trellis (facet)
+        plots jointly conditioned on both the \code{facet1} and \code{facet2}
+        variables, with \code{facet2} as the row variable, which yields a 
+        scatterplot (panel) for \emph{each} cross-classification of the levels
+        of numeric \code{x} and \code{y} variables.}
   \item{n_row}{Optional specification for the number of rows and columns
         in the layout of a multi-panel display with Trellis graphics. Specify
         \code{n_col} or \code{n_row}, but not both.}
@@ -384,7 +385,8 @@ vp(\dots)
 
         
   \item{time_unit}{Specify the time unit from which to plot a time series. 
-        Aggregation according to the time unit will occur as needed, such as
+        Default value is the time unit that describes the data.
+        Aggregation according to the time unit will occur as specified, such as
         a daily time series aggregated to \code{"years"}, \code{"quarters"}
         or \code{"months"}. See \code{details} below for all possible values.}
   \item{time_agg}{Function by which to aggregate according to \code{time_unit}.
@@ -400,10 +402,12 @@ vp(\dots)
        and \code{area_fill} is not specified,,
        then \code{fill} generally specifies the area under the line segments.}
   \item{area_split}{[Applies only to a Trellis plot activated with parameter
-       \code{by1}.] Value of \code{y} that defines a reference line that splits
+       \code{facet1}.] Value of \code{y} that defines a reference line that splits
        the filled area under the time series line. Values of \code{y}
        less than this value are below the corresponding reference line, values
        larger are above the line.}
+  \item{n_date_tics}{Suggested number of ticks for the dates on the \code{x}-axis 
+       to override the default of approximately 7.}
   \item{run}{If set to \code{TRUE}, generate a \bold{run chart}, i.e., line chart,
         in which
         points are plotted in the sequential order of occurrence in the data table.
@@ -444,7 +448,7 @@ vp(\dots)
         indicates a 1-variable scatterplot. Default value is \code{"vbs"}. 
         The characters can be in any order and upper- or lower-case.
         Generalize to Trellis plots with the 
-        \code{by1} and \code{by2} parameters, but currently only applies
+        \code{facet1} and \code{facet2} parameters, but currently only applies
         to horizontal displays.
         Modify fill and border colors from the current \code{theme} with
         the \code{\link{style}} function parameters \code{violin_fill},
@@ -484,9 +488,8 @@ vp(\dots)
         sets the radius of the largest displayed bubble in inches. To
         activate, either set the value of \code{size} to
         a third variable where the default is 0.10,
-        or for categorical variables, either a
-        factor or an integer variable with the number of unique values less than
-        \code{n_cat}, the size of the bubbles represents
+        or for categorical variables, a
+        factor, the size of the bubbles represents
         frequency, with a default of 0.22.} 
   \item{power}{Relative size of the scaling of the bubbles to each other.
         Default value of 0.5 scales the bubbles so that the area of each
@@ -650,7 +653,11 @@ vp(\dots)
         \code{\link{style} function.}
         \emph{[deprecated]}: Better to convert a categorical integer variable to
         a factor.}
-  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}\cr
+  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}
+  \item{by1}{Deprecated old parameter name, replaced with the more descriptive
+        \code{facet1}.}
+  \item{by2}{Deprecated old parameter name, replaced with the more descriptive
+        \code{facet2}.}\cr
 
 
   \item{eval_df}{Determines if to check for existing data frame and
@@ -680,14 +687,12 @@ For numeric primary variables, a single panel may also contain multiple plots of
 
 Or, obtain multiple scatterplots on the same panel with multiple numeric \code{x}-variables, or multiple \code{y}-variables. To obtain this graph, specify one of the primary variables as a vector of multiple variables. 
 
-Trellis graphics (facets), from Deepayan Sarkar's (2009) \code{lattice} package, may be implemented in which multiple panels for one numeric \code{x}-variable and one numeric \code{y}-variable are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by} is a conditioning variable that results in a Trellis plot, the scatterplot of \code{x} and \code{y} produced at \emph{each} level of the \code{by1} variable. The inclusion of a second conditioning variable, \code{by2}, results in a separate scatterplot panel for \emph{each} combination of cross-classified values of both \code{by1} and \code{by2}. A grouping variable according to \code{by} may also be specified, which is then applied to each panel. If there are 1000 or less unique values of \code{x}, an analysis of the maximum number of repetitions for each value of \code{by1} is provided. 
+Trellis graphics (facets), from Deepayan Sarkar's (2009) \code{lattice} package, may be implemented in which multiple panels for one numeric \code{x}-variable and one numeric \code{y}-variable are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by} is a conditioning variable that results in a Trellis plot, the scatterplot of \code{x} and \code{y} produced at \emph{each} level of the \code{facet1} variable. The inclusion of a second conditioning variable, \code{facet2}, results in a separate scatterplot panel for \emph{each} combination of cross-classified values of both \code{facet1} and \code{facet2}. A grouping variable according to \code{by} may also be specified, which is then applied to each panel. If there are 1000 or less unique values of \code{x}, an analysis of the maximum number of repetitions for each value of \code{facet1} is provided. 
 
 Control the panel dimensions and the overall size of the Trellis plot with the following parameters: \code{width} and \code{height} for the physical dimensions of the plot window, \code{n_row} and \code{n_col} for the number of rows and columns of panels, and \code{aspect} for the ratio of the height to the width of each panel. The plot window is the standard graphics window that displays on the screen, or it can be specified as a pdf file with the \code{pdf_file} parameter. 
 
 CATEGORICAL VARIABLES\cr
-Conceptually, there are continuous variables and categorical variables. Categorical variables have relatively few unique data values. However, categorical variables can be defined with non-numeric values, but also with numeric values, such as responses to a five-point Likert scale from Strongly Disagree to Strongly Agree, with responses coded 1 to 5. The three \code{by} --variables -- \code{by1}, \code{by2} and \code{by} -- only apply to graphs created with numeric \code{x} and/or \code{y} variables, continuous or categorical.
-
-The standard and most general way to define a categorical variable is as an R factor, such as created with the lessR \code{\link{factors}} function. \code{lessR} provides the option to define an integer variable with equally spaced values as categorical based on the value of \code{n_cat}, which can be set locally or globally with the \code{\link{style}} function. For example, for a variable with data values from 5-point Likert scale, a value of \code{n_cat} of 5 will define the define the variable as categorical. The default value is 0. To explicitly analyze the values as categorical, set \code{n_cat} to a value larger than 0, at least the size of the number of unique integer values. Can also annotate a graph of the values of an integer categorical variable with \code{value_labels} option.  
+Conceptually, there are continuous variables and categorical variables. Categorical variables have relatively few unique data values. However, categorical variables can be defined with non-numeric values, but also with numeric values, such as responses to a five-point Likert scale from Strongly Disagree to Strongly Agree, with responses coded 1 to 5. The three \code{by} --variables -- \code{facet1}, \code{facet2} and \code{by} -- only apply to graphs created with numeric \code{x} and/or \code{y} variables, continuous or categorical.
 
 A scatterplot of Likert type data is problematic because there are so few possibilities for points in the scatterplot. For example, for a scatterplot of two five-point Likert response data, there are only 26 possible paired values to plot, so most of the plotted points overlap with others. In this situation, that is, when a single variable or two variables with Likert response scales are specified, a bubble plot is automatically provided, with the size of each point relative to the joint frequency of the paired data values. To request a sunflower plot in lieu of the bubble plot, set the \code{shape} to \code{"sunflower"}.
 
@@ -718,10 +723,10 @@ When two variables are specified to plot, by default if the values of the first 
 Specifying multiple, continuous \code{x}-variables against a single y variable, or vice versa, results in multiple plots on the same graph. The color of the points of the second variable is the same as that of the first variable, but with a transparent fill. For more than two \code{x}-variables, multiple colors are displayed, one for each \code{x}-variable.
 
 BUBBLE PLOT FREQUENCY MATRIX (BPFM)\cr
-Multiple categorical variables for \code{x} may be specified in the absence of a \code{y} variable. (A categorical variable is either a \code{factor} variable or an integer variable with \code{n_cat} set at least at the number of unique values.) A bubble plot results that illustrates the frequency of each response for each of the variables in a common figure in which the \code{x}-axis contains all of the unique labels for all of the variables plotted. Each line of information, the bubbles and counts for a single variable, replaces the standard bar chart in a more compact display. Usually the most meaningful when each variable in the matrix has the same response categories, that is, levels, such as for a set of shared Likert scales. The BPFM is considerably condensed presentation of frequencies for a set of variables than are the corresponding bar charts.
+Multiple categorical variables for \code{x} may be specified in the absence of a \code{y} variable. A bubble plot results that illustrates the frequency of each response for each of the variables in a common figure in which the \code{x}-axis contains all of the unique labels for all of the variables plotted. Each line of information, the bubbles and counts for a single variable, replaces the standard bar chart in a more compact display. Usually the most meaningful when each variable in the matrix has the same response categories, that is, levels, such as for a set of shared Likert scales. The BPFM is considerably condensed presentation of frequencies for a set of variables than are the corresponding bar charts.
 
 SCATTERPLOT MATRIX\cr
-A single vector of continuous variables specified as \code{x}, with no \code{y}-variable, generates a scatterplot matrix of the specified variable. A continuous variable is defined as a numeric variable with more than n_cat unique responses. To force an item with a small number of unique responses, such as from a 5-pt Likert scale, to be treated as continuous, set \code{n_cat} to a number lower than 5, such as \code{n_cat=0} in the function call. 
+A single vector of continuous variables specified as \code{x}, with no \code{y}-variable, generates a scatterplot matrix of the specified variable.  
 
 The scatterplot matrix is displayed according to the current color theme. Specific colors such as \code{fill}, \code{color}, etc. can also be provided. The upper triangle shows the correlation coefficient, and the lower triangle each corresponding scatterplot, with, by default, the non-linear loess best fit line. The \code{code} fit option can be used to provide the linear least squares line instead, along with the corresponding \code{fit_color} for the color of the fit line.   
 
@@ -738,20 +743,20 @@ For a scatterplot of two numeric variables, the \code{ellipse=TRUE} option draws
 BOXPLOTS\cr
 For a single variable the preferred plot is the integrated violin/box/scatter plot or VBS plot. Only the violin or box plot can be obtained with the corresponding aliases \code{\link{ViolinPlot}} and \code{\link{BoxPlot}}, or by setting \code{vbs_plot} to \code{"v"} or \code{"b"}. To view a box plot of a continuous variable (Y) across the levels of a categorical variable (X), either as part of the full VBS plot, or by itself, there are two possibilities:\cr
 1. Plot(Y,X) or BoxPlot(Y, X)\cr
-2. Plot(Y, by1=X) or BoxPlot(Y, by1=X)\cr
+2. Plot(Y, facet1=X) or BoxPlot(Y, facet1=X)\cr
 Both styles produce the same information. What differs is the color scheme.
 
 The first possibility places the multiple box plots on a single pane and also, for the default color scheme \code{"colors"}, displays the sequence of box plots with the default qualitative color palette from the lessR function \code{\link{getColors}}.
 All colors are displayed at the same level of gray-scale saturation and brightness to avoid perceptual bias. \code{\link{BarChart}} and \code{\link{PieChart}} use the same default colors as well.
 
-The second possibility with \code{by1} produces the different box plots on a separate panel, that is, a Trellis chart. These box plots are displayed with a single hue, the first color, blue, in the default qualitative sequence.
+The second possibility with \code{facet1} produces the different box plots on a separate panel, that is, a Trellis chart. These box plots are displayed with a single hue, the first color, blue, in the default qualitative sequence.
 
 TIME CHARTS\cr
 Specifying one or more \code{x}-variables with no \code{y}-variables, and \code{run=TRUE} plots the \code{x}-variables in a run chart. The values of the specified \code{x}-variable are plotted on the \code{y}-axis, with Index on the \code{x}-axis. Index is the ordinal position of each data value, from 1 to the number of values. 
 
 If the specified \code{x}-variable is of type \code{Date}, or is an R time series, a time series plot is generated for each specified variable. If a formal R time-series, univariate or multivariate, specify as the \code{x}-variable. Or, specify the \code{x}-variable of type \code{Date}, and then specify the  \code{y}-variable as one or more time series to plot. The \code{y}-variable can be formatted as tidy data with all the values in a single column, or as wide-formatted data with the time-series variables in separate columns. 
 
-The parameter \code{time_unit} aggregates the date variable according to its specified value. The aggregation is based on two functions from the \code{xts} package, \code{endpoints()} and \code{period.apply()}. For example, a data variable has daily values but is plotted with aggregated quarterly values. From the  \code{endpoints()} documentation: Valid values include: \code{"us"} (microseconds), \code{"microseconds"}, \code{"ms"} (milliseconds), \code{"milliseconds"}, \code{"secs"} (seconds), \code{"seconds"}, \code{"mins"} (minutes), \code{"minutes"}, \code{"hours"}, \code{"days"}, \code{"weeks"}, \code{"months"}, \code{"quarters"}, and \code{"years"}.
+The parameter \code{time_unit} aggregates the date variable according to its specified value. The aggregation is based on two functions from the \code{xts} package, \code{endpoints()} and \code{period.apply()}. For example, a data variable has daily values but is plotted with aggregated quarterly values. Dates are currently stored as variable type \code{as.Date()}, so fractions of a day are not processed. Valid values include: \code{"days"}, \code{"weeks"}, \code{"months"}, \code{"quarters"}, and \code{"years"}.
 
 Specify the function by which to aggregate with the parameter \code{time_agg}. The default is \code{"sum"}.
 
@@ -879,7 +884,7 @@ Plot(Years, Salary, add="Hi", x1=c(12, 16, 18), y1=c(80000, 100000, 60000))
 Plot(Salary, row_names)
 
 d <- factors(Gender, levels=c("M", "F"))
-Plot(Years, Salary, by1=Gender)
+Plot(Years, Salary, facet1=Gender)
 d <- dd
 
 \donttest{
@@ -953,20 +958,20 @@ Plot(c(Salary, Years, Pre), fit="lm")
 #   to a factor with lessR factors (which also does multiple variables)
 # always save to the full data frame with factors
 d <- factors(Gender, levels=c("M", "W"))
-Plot(Years, Salary, by1=Gender)
+Plot(Years, Salary, facet1=Gender)
 d <- Read("Employee", quiet=TRUE)
 
 \donttest{
 
 # two Trellis classification variables with a single continuous
-Plot(Salary, by1=Dept, by2=Gender)
+Plot(Salary, facet1=Dept, facet2=Gender)
 
 # all three by (categorical) variables
-Plot(Years, Salary, by1=Dept, by2=Gender, by=Plan)
+Plot(Years, Salary, facet1=Dept, facet2=Gender, by=Plan)
 
 # vary both shape and color with a least-squares fit line for each group
 style(color=c("darkgreen", "brown"))
-Plot(Years, Salary, by1=Gender, fit="lm", shape=c("F","M"), size=.8)
+Plot(Years, Salary, facet1=Gender, fit="lm", shape=c("F","M"), size=.8)
 style("gray")
 
 # compare the men and women Salary according to Years worked
@@ -991,7 +996,7 @@ Plot(Years, Salary, by=Gender, size=2, fit="lm",
 
 # by variable, different colors for different values of the variable
 # two panels
-Plot(Salary, by1=Dept)
+Plot(Salary, facet1=Dept)
 
 # large sample size
 x <- rnorm(10000)
@@ -1009,7 +1014,7 @@ BoxPlot(Salary)
 
 # two related displays of box plots for different levels of a
 #   categorical variable
-BoxPlot(Salary, by1=Dept)
+BoxPlot(Salary, facet1=Dept)
 
 
 # binned values to plot counts
@@ -1028,7 +1033,7 @@ Plot(Salary, run=TRUE, area_fill="on")
 Plot(c(Pre, Post), run=TRUE)
 
 # Trellis graphics run chart with custom line width, no points
-Plot(Salary, run=TRUE, by1=Gender, lwd=3, size=0)
+Plot(Salary, run=TRUE, facet1=Gender, lwd=3, size=0)
 
 # daily time series plot
 # create the daily time series from R built-in data set airquality
@@ -1061,7 +1066,7 @@ d <- rd("StockPrice")
 # only plot Apple
 Plot(Month, Price, filter=(Company=="Apple"))
 # Trellis plots, one for each company
-Plot(Month, Price, by1=Company, n_col=1)
+Plot(Month, Price, facet1=Company, n_col=1)
 # all three plots on the same panel, three shades of blue
 Plot(Month, Price, by=Company, color="blues")
 }
@@ -1147,13 +1152,6 @@ Plot(Years, Salary, add=c("rect", "rect"),
 
 d <- rd("Mach4", quiet=TRUE)  # Likert data, 0 to 5
 
-# size of each plotted point (bubble) depends on its joint frequency
-# triggered by default when replication of joint values and
-#   less than 9 unique data values for each 
-# n_cat=6 means treat responses as categorical for up to 6 equally-spaced
-#   integer values
-Plot(m06, m07, n_cat=6)
-
 # use value labels for the integer values, modify color options
 LikertCats <- c("Strongly Disagree", "Disagree", "Slightly Disagree",
    "Slightly Agree", "Agree", "Strongly Agree")
@@ -1164,9 +1162,6 @@ style()  # reset theme
 
 \donttest{
 
-# get correlation analysis instead of cross-tab analysis
-# rely upon the default value of n_cat=0 so that integer
-#   valued variables are analyzed as numerical
 Plot(m06, m07)
 
 #-----------------------------
@@ -1209,7 +1204,7 @@ color2 <- clr[sample(1:length(clr), size=1)]
 style(window_fill=color0, color=color2)
 Plot(x, y, run=TRUE, area_fill="on",
   xy_ticks=FALSE, main="Modern Art", xlab="", ylab="",
-  cex.main=2, col.main="lightsteelblue", n_cat=0, center_line="off")
+  cex.main=2, col.main="lightsteelblue", center_line="off")
 style() # reset style to default
 }
 }

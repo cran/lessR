@@ -1,10 +1,30 @@
+# lessR version 4.3.7, August 21, 2024
+
+## Updates
+
+* `BarChart()`, `Histogram()`, `Plot()`: Parameter names `by1` and, where applicable, `by2`, deprecated, replaced with more descriptive new names `facet1` and `facet2`.
+
+* `Plot()`: Using functions from the xts package, when plotting a time series dates are now formatted according to their natural unit. For example, when plotting by years, just years are listed without the month and the day. 
+
+* `Plot()`: When plotting a times series and requesting a level of time aggregation with the `time_unit` parameter that is more detailed than the available data, the analysis appropriately terminates with an error message. For example, if the time series data is monthly and an aggregation of `weeks` is requested, the analysis stops.
+
+* `Plot()`: For plotting time series data, new parameter `n_date_ticks` added to override the default number of ticks on the `x` axis, the date axis.
+
+
+## Bug Fixes
+
+* `Plot()`: Plotting multiple time series on the same panel with the `by` parameter now works with the correctly formatted dates.
+
+* `Plot()`: For Trellis (facet or lattice) plots of bar charts and histograms, each panel is labeled with the proper size of text in the corresponding panel strip.
+
+
 # lessR version 4.3.6, June 22, 2024
 
 ## Updates
 
 * `vignettes`: These extensive examples are moved to the web to save space as the installed lessR was exceeding the accepted maximum limit. The web address is given from `library(lessR)`.
 
-* `BarChart()`: When doing a composite plot, if calling `fill=getColors(...)` for a divergent palette, such as for one bar for all items on an attitude survey, no longer need to explicitly add `n=` for the number of levels. 
+* `BarChart()`: When doing a composite plot, if calling `fill=getColors(...)` for a divergent palette, such as for one bar for all items on an attitude survey, no longer need to explicitly add `n=` for the number of levels.
 
 * `getColors()`: Added three pre-defined palettes from the `colorpace` package: `rainbow_hcl`, `terrain_hcl`, and `heat_hcl`, e.g., `getColors("rainbow_hcl")`.
 
@@ -17,7 +37,7 @@
 * `Plot()`: New parameter `time_agg` for when the x-variable is a `Date` variable and a time series is plotted with automatic aggregation to specify the type of aggregation with `"sum"` the default.
 
 * `Plot()`: Pearson correlation analysis no longer displayed if the x-variable is a date, that is, if a time series is plotted.
- 
+
 
 ## Bug Fixes
 
@@ -26,7 +46,7 @@
 * `PieChart()`: User now warned that the `values` family of parameters is changed to `labels`, though the old reference still will work.
 
 * `Read()`: If `quiet=TRUE`, automatically modified variable names to legal R names are not reported.
- 
+
 
 # lessR version 4.3.3, May 9, 2024
 
@@ -36,7 +56,7 @@
 
 * `ANOVA()`, `BarChart()`, `Histogram()`, `PieChart()`, `pivot()`, `Plot()`, `Regression()`, `ttest()`: Parameter `rows`, for subsetting data, deprecated, now named `filter` to be more consistent with other systems, although `rows` parameter removed entirely for `ANOVA()`, `pivot()`, Regression()`, and `ttest()` to avoid needing the `rows` parameter as part of the function definition in addition to `filter`.
 
-* `BarChart()`, `Histogram()`, `PieChart()`, `Plot()`: Parameter `filter` (formerly `rows`), now reports the number of rows of data before and after the filtering along with the logical statement that defines the filter. 
+* `BarChart()`, `Histogram()`, `PieChart()`, `Plot()`: Parameter `filter` (formerly `rows`), now reports the number of rows of data before and after the filtering along with the logical statement that defines the filter.
 
 * `BarChart()`: Default family of `values` parameters now called `labels`, such as `labels_color`, to be more consistent with other systems.
 
@@ -52,12 +72,12 @@
 
 * `Plot()`: Binning large data sets now results in larger bubbles.
 
-* `dataStockPrice`: Data table updated with stock prices through May 2024, and trading volume added as the fourth variable. 
+* `dataStockPrice`: Data table updated with stock prices through May 2024, and trading volume added as the fourth variable.
 
 
 ## Bug Fixes
 
-* `BarChart()`: For an unstacked or grouped bar chart, `beside=TRUE`, if there is missing data for the `by` variable, the color distribution across the bars is now consistent across levels and with the legend. 
+* `BarChart()`: For an unstacked or grouped bar chart, `beside=TRUE`, if there is missing data for the `by` variable, the color distribution across the bars is now consistent across levels and with the legend.
 
 * `BarChart()`: For two categorical variables, `x` and `by`, evaluation if input data is a summary (pivot) table of a prior aggregation is now correctly computed.
 
@@ -71,7 +91,7 @@
 
 * `reshape_wide()`: After the transformation, all other variables except those specified as the group, response, or ID are deleted as their values are not evenly distributed over the new wide format variables.
 
- 
+
 # lessR version 4.3.2, Apr 07, 2024
 
 ## Updates

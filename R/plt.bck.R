@@ -1,5 +1,5 @@
 .plt.bck <-
-function(usr, axT1, axT2, do.v=TRUE, do.h=TRUE) {
+function(usr, axV, axT2, do.v=TRUE, do.h=TRUE) {
 
   # background color
   rect(usr[1], usr[3], usr[2], usr[4],
@@ -22,7 +22,8 @@ function(usr, axT1, axT2, do.v=TRUE, do.h=TRUE) {
     getOption("grid_lty"), getOption("grid_y_lty"))
 
   if (do.v) if (grid_x_lwd > 0)
-    abline(v=axT1, col=grid_x_color, lwd=grid_x_lwd, lty=grid_x_lty)
+    abline(v=axV, col=grid_x_color, lwd=grid_x_lwd, lty=grid_x_lty)
+
   if (do.h) if (grid_y_lwd > 0)
     abline(h=axT2, col=grid_y_color, lwd=grid_y_lwd, lty=grid_y_lty)
 
@@ -30,5 +31,4 @@ function(usr, axT1, axT2, do.v=TRUE, do.h=TRUE) {
   rect(usr[1], usr[3], usr[2], usr[4],
     col="transparent", border=getOption("panel_color"),
     lwd=getOption("panel_lwd"), lty=getOption("panel_lty"))
-
 }

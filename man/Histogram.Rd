@@ -9,7 +9,7 @@ Abbreviation: \code{hs}
 
 From the standard R function \code{\link{hist}}, the function plots a frequency histogram with default colors, including background color and grid lines plus an option for a relative frequency and/or cumulative histogram, as well as summary statistics and a table that provides the bins, midpoints, counts, proportions, cumulative counts and cumulative proportions. Bins can be selected several different ways besides the default, including specifying just the bin width and/or the bin start. Also provides improved error diagnostics and feedback for the user on how to correct the problem when the bins do not contain all of the specified data.
 
-If a set of multiple variables is provided, including an entire data frame, then each numeric variable in that set of variables is analyzed, with the option to write the resulting histograms to separate pdf files. The related \code{\link{CountAll}} function does the same for all variables in the set of variables, histograms for continuous variables and bar charts for categorical variables. Specifying a \code{by1} or \code{by2} variable implements Trellis graphics.
+If a set of multiple variables is provided, including an entire data frame, then each numeric variable in that set of variables is analyzed, with the option to write the resulting histograms to separate pdf files. The related \code{\link{CountAll}} function does the same for all variables in the set of variables, histograms for continuous variables and bar charts for categorical variables. Specifying a \code{facet1} or \code{facet2} variable implements Trellis graphics.
 
 When output is assigned into an object, such as \code{h} in \code{h <- hs(Y)}, can assess the pieces of output for later analysis. A primary such analysis is \code{knitr} for dynamic report generation from a generated R markdown file according to the \code{Rmd} option in which interpretative R output is embedded in documents. See \code{value} below.
 }
@@ -24,7 +24,7 @@ Histogram(
 
     # --------------------
     # Trellis (facet) plot
-    by1=NULL, by2=NULL,
+    facet1=NULL, facet2=NULL,
     n_row=NULL, n_col=NULL, aspect="fill",
 
     # -----------------------------------------------------------------
@@ -75,7 +75,8 @@ Histogram(
 
     # --------------------------------------
     # Deprecated, removed in future versions
-    n_cat=getOption("n_cat"), rows=NULL,
+    n_cat=getOption("n_cat"), 
+    rows=NULL, by1=NULL, by2=NULL,
 
     # ---------------------------------
     # Miscellaneous
@@ -100,13 +101,13 @@ hs(\dots)
        \code{"counts"} by default or \code{"proportion"} if specified,
        that is, frequencies or relative frequencies.}\cr
 
-  \item{by1}{A categorical variable called a conditioning variable that
+  \item{facet1}{A categorical variable called a conditioning variable that
         activates \bold{Trellis graphics}, from the lattice package, to provide
         a separate scatterplot (panel) of numeric primary variables \code{x}
         and \code{y} for each level of the variable.}
-  \item{by2}{A second conditioning variable to generate Trellis
-        plots jointly conditioned on both the \code{by1} and \code{by2} variables,
-        with \code{by2} as the row variable, which yields a scatterplot (panel)
+  \item{facet2}{A second conditioning variable to generate Trellis
+        plots jointly conditioned on both the \code{facet1} and \code{facet2} variables,
+        with \code{facet2} as the row variable, which yields a scatterplot (panel)
         for each cross-classification of the levels of numeric \code{x} and
         \code{y} variables.}
   \item{n_row}{Optional specification for the number of rows in the layout
@@ -264,7 +265,11 @@ hs(\dots)
         Default is 0. 
         \emph{[deprecated]}: Best to convert a categorical integer variable 
         to a factor.}
-  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}\cr
+  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}
+  \item{by1}{Deprecated old parameter name, replaced with the more descriptive
+        \code{facet1}.}
+  \item{by2}{Deprecated old parameter name, replaced with the more descriptive
+        \code{facet2}.}\cr
 
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE} 
@@ -289,7 +294,7 @@ OVERVIEW\cr
 Results are based on the standard R \code{\link{hist}} function to calculate and plot a histogram, or a multi-panel display of histograms with Trellis graphics, plus the additional provided color capabilities, a relative frequency histogram, summary statistics and outlier analysis. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}. To plot densities, set the parameter \code{density} to \code{TRUE}.
 
 VARIABLES and TRELLIS PLOTS\cr
-At a minimum there is one primary variable, \code{x}, which results in a single histogram. Trellis graphics, from Deepayan Sarkar's \code{lattice} package, may be implemented in which multiple panels are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by1} is a conditioning variable that results in a Trellis plot, the histogram of \code{x} produced at \emph{each} level of the \code{by1} variable. Inclusion of a second conditioning variable, \code{by2}, results in a separate histogram for \emph{each} combination of cross-classified values of both \code{by1} and \code{by2}. 
+At a minimum there is one primary variable, \code{x}, which results in a single histogram. Trellis graphics, from Deepayan Sarkar's \code{lattice} package, may be implemented in which multiple panels are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{facet1} is a conditioning variable that results in a Trellis plot, the histogram of \code{x} produced at \emph{each} level of the \code{facet1} variable. Inclusion of a second conditioning variable, \code{facet2}, results in a separate histogram for \emph{each} combination of cross-classified values of both \code{facet1} and \code{facet2}. 
 
 DATA\cr
 The data may either be a vector from the global environment, the user's workspace, as illustrated in the examples below, or one or more variable's in a data frame, or a complete data frame. The default input data frame is \code{d}. Can specify the source data frame name with the \code{data} option.  If multiple variables are specified, only the numerical variables in the list of variables are analyzed. The variables in the data frame are referenced directly by their names, that is, no need to invoke the standard \code{R} mechanisms of the \code{d$name} notation, the \code{\link{with}} function or the  \code{\link{attach}} function. If the name of the vector in the global environment and of a variable in the input data frame are the same, the vector is analyzed.
@@ -436,7 +441,7 @@ Histogram(Salary, scale_x=c(30000,130000,5), scale_y=c(0,9.5,5))
 # ----------------
 # Trellis graphics
 # ----------------
-Histogram(Salary, by1=Dept)
+Histogram(Salary, facet1=Dept)
 
 
 # ---------------------

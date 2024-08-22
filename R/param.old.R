@@ -138,7 +138,7 @@ function (...) {
       if (grepl("by.group", names(dots)[i], fixed=TRUE)) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "by.group option is now just  by, its original meaning\n",
-          "use  by1  and  by2  for 1 and 2 variable Trellis graphics\n\n")
+          "use  facet1  and  facet2  for 1 and 2 variable Trellis graphics\n\n")
       }
       if (names(dots)[i] %in% c("x.start","x.end","y.start","y.end")) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",

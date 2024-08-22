@@ -1,5 +1,5 @@
 .ss.numeric <-
-function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
+function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, facet1.nm=FALSE,
          x.name=NULL, ...) {
 
   # get variable labels if exist
@@ -7,7 +7,7 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
   gl <- .getlabels(graph.win=FALSE)
 
   if (!is.null(gl$yn))  # from Plot(Salary, stat="count")
-    y.name <- ifelse (is.null(y.name), gl$yn, y.name)  # sometimes need by1.name
+    y.name <- ifelse (is.null(y.name), gl$yn, y.name)  # sometimes need facet1.name
 
   if (is.null(x.name)) {
     x.name <- gl$xn
@@ -16,8 +16,8 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, by1.nm=FALSE,
   else  # option just for pc.main
     x.lbl <- NULL
 
-  if (by1.nm) {
-    gl <- .getlabels(graph.win=FALSE, by1.nm=TRUE)
+  if (facet1.nm) {
+    gl <- .getlabels(graph.win=FALSE, facet1.nm=TRUE)
   }
   y.lbl <- gl$yl
 

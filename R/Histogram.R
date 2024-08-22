@@ -2,7 +2,7 @@ Histogram <-
 function(x=NULL, data=d, filter=NULL,
     stat_x=c("count", "proportion"),
 
-    by1=NULL, by2=NULL,
+    facet1=NULL, facet2=NULL,
     n_row=NULL, n_col=NULL, aspect="fill",
 
     theme=getOption("theme"),
@@ -37,7 +37,8 @@ function(x=NULL, data=d, filter=NULL,
     digits_d=NULL,
     Rmd=NULL,
 
-    n_cat=getOption("n_cat"), rows=NULL,
+    n_cat=getOption("n_cat"), 
+    rows=NULL, by1=NULL, by2=NULL,
 
     eval_df=NULL, fun_call=NULL, ...) {
 
@@ -47,17 +48,6 @@ function(x=NULL, data=d, filter=NULL,
       getOption("bar_fill"), getOption("bar_fill_cont"))
   breaks.miss <- ifelse (missing(breaks), TRUE, FALSE)
   bw.miss <- ifelse (missing(bandwidth), TRUE, FALSE)
-
-  # ------------ Old Stuff ----------------------------------
-  if (!missing(rows)) 
-    message(">>> Parameter  rows  renamed to:  filter.\n",
-            "    Change to  filter,  rows  will stop working in the future.\n")
-
-  if(!missing(n_cat)) {
-    message(">>> Parameter  n_cat  will no longer work in the future.\n",
-             "    Better to convert a categorical integer variable to ",
-             "a factor.\n")
-  }
 
   # a dot in a parameter name to an underscore and more
   dots <- list(...)
@@ -76,6 +66,31 @@ function(x=NULL, data=d, filter=NULL,
       }
     }
   }
+
+  # ------------ Old Stuff ----------------------------------
+
+  facet1 <- .newparam(missing(by1), substitute(by1), "by1",
+                      missing(facet1), substitute(facet1), "facet1")
+  if (!is.null(facet1)) data[[as.character(facet1)]]  # extract facet1 from data
+
+  facet2 <- .newparam(missing(by2), substitute(by2), "by2",
+                      missing(facet2), substitute(facet2), "facet2")
+  if (!is.null(facet2)) data[[as.character(facet2)]]  # extract facet2 from data
+
+  if (!missing(rows)) 
+    message(">>> Parameter  rows  renamed to:  filter.\n",
+            "    Change to  filter,  rows  will stop working in the future.\n")
+
+  if(!missing(n_cat)) {
+    message(">>> Parameter  n_cat  will no longer work in the future.\n",
+             "    Better to convert a categorical integer variable to ",
+             "a factor.\n")
+  }
+
+  facet1.miss <- ifelse (is.null(facet1), TRUE, FALSE)
+  facet2.miss <- ifelse (is.null(facet2), TRUE, FALSE)
+
+  Trellis <- ifelse(!facet1.miss, TRUE, FALSE)
 
   if (is.null(fun_call)) fun_call <- match.call()
 
@@ -122,8 +137,6 @@ function(x=NULL, data=d, filter=NULL,
 
   fill[which(fill == "off")] <- "transparent"
   color[which(color == "off")] <- "transparent"
-
-  Trellis <- ifelse(!missing(by1), TRUE, FALSE)
   
   xlab_adj <- lab_adjust[1];   ylab_adj <- lab_adjust[2]
   tm.adj <- margin_adjust[1];  rm.adj <- margin_adjust[2]
@@ -278,61 +291,61 @@ function(x=NULL, data=d, filter=NULL,
     }  # x is in global
   }
 
-  # evaluate by1
+  # evaluate facet1
   #-------------
-  if (!missing(by1)) {
+  if (!facet1.miss) {
 
     # get actual variable name before potential call of data$x
-    by1.name <- deparse(substitute(by1))
-    options(by1name = by1.name)
+    facet1.name <- deparse(substitute(facet1))
+    options(facet1name = facet1.name)
 
     # get conditions and check for data existing
-    in.global <- .in.global(by1.name, quiet)
+    in.global <- .in.global(facet1.name, quiet)
 
     # see if var exists in df, if x not in global Env or function call
     if (!missing(x) && !in.global)
-      .xcheck(by1.name, df.name, names(data))
+      .xcheck(facet1.name, df.name, names(data))
 
     if (!in.global)
-      by1.call <- eval(substitute(data$by1))
+      facet1.call <- eval(substitute(data$facet1))
     else {  # vars that are function names get assigned to global
-      by1.call <- by1
-      if (is.function(by1.call)) by1.call <- eval(substitute(data$by1))
+      facet1.call <- facet1
+      if (is.function(facet1.call)) facet1.call <- eval(substitute(data$facet1))
     }
 
-    if (!is.factor(by1.call)) by1.call <- factor(by1.call)
+    if (!is.factor(facet1.call)) facet1.call <- factor(facet1.call)
   }
 
   else
-    by1.call <- NULL
+    facet1.call <- NULL
 
-  # evaluate by2
+  # evaluate facet2
   #-------------
-  if (!missing(by2)) {
+  if (!facet2.miss) {
 
     # get actual variable name before potential call of data$x
-    by2.name <- deparse(substitute(by2))
-    options(by2name = by2.name)
+    facet2.name <- deparse(substitute(facet2))
+    options(facet2name = facet2.name)
 
     # get conditions and check for data existing
-    in.global <- .in.global(by2.name, quiet)
+    in.global <- .in.global(facet2.name, quiet)
 
     # var in data frame? if x not in global Env or function call
     if (!missing(x) && !in.global)
-      .xcheck(by2.name, df.name, names(data))
+      .xcheck(facet2.name, df.name, names(data))
 
     if (!in.global)
-      by2.call <- eval(substitute(data$by2))
+      facet2.call <- eval(substitute(data$facet2))
     else {  # vars that are function names get assigned to global
-      by2.call <- by2
-      if (is.function(by2.call)) by2.call <- eval(substitute(data$by2))
+      facet2.call <- facet2
+      if (is.function(facet2.call)) facet2.call <- eval(substitute(data$facet2))
     }
 
-    if (!is.factor(by2.call)) by2.call <- factor(by2.call)
+    if (!is.factor(facet2.call)) facet2.call <- factor(facet2.call)
   }
 
   else
-   by2.call <- NULL
+   facet2.call <- NULL
 
 
   # ---------------
@@ -340,7 +353,7 @@ function(x=NULL, data=d, filter=NULL,
 
   if (Trellis && do_plot) {
 
-    .bar.lattice(data.x[,1], by1.call, by2.call, n_row, n_col, aspect, 
+    .bar.lattice(data.x[,1], facet1.call, facet2.call, n_row, n_col, aspect, 
            proportion, fill, color, trans, size.pt=NULL,
            xlab, ylab, main, rotate_x, offset, width, height, pdf_file,
            segments_x=NULL, breaks, T.type="hist", quiet)

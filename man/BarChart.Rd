@@ -16,7 +16,7 @@ The calculation of this foundational summary table from which the bar chart is c
 \item Have the function implicitly summarize the entire data table entered as the value of \code{data} by specifying a \code{y} variable. Obtain the summary table from which the bar chart is computed by summarizing (aggregating) the value of \code{y} at each level of \code{x}, and possibly \code{by}, with the chosen statistic specified by the \code{stat} parameter. The function will assess if the input data is a summary table or the entire data table. If the entire data table is entered, and the \code{stat} parameter is not entered, the value of \code{stat} defaults to the mean.
 }
 
-The function also displays the foundational summary table, such as frequency table for one or two variables. If a frequency table, also displayed are Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. To activate Trellis graphics or facets, a multi-panel display, specify a \code{by1} variable in place of \code{by} for the second categorical variable. If the provided object to analyze is a set of multiple variables, including the name of an entire data frame, then a bar chart is calculated for \emph{each} non-numeric variable in the data frame.
+The function also displays the foundational summary table, such as frequency table for one or two variables. If a frequency table, also displayed are Cramer's V association, and the corresponding chi-square inferential analysis. For two variables, the frequencies include the joint and marginal frequencies. To activate Trellis graphics or facets, a multi-panel display, specify a \code{facet1} variable in place of \code{by} for the second categorical variable. If the provided object to analyze is a set of multiple variables, including the name of an entire data frame, then a bar chart is calculated for \emph{each} non-numeric variable in the data frame.
 }
 
 \usage{
@@ -33,7 +33,7 @@ BarChart(
 
         # --------------------------------------------------
         # Trellis (facet) plot, stratify on different panels
-        by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
+        facet1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
         
         # -------------------------------
         # Layout and ordering of the bars
@@ -82,7 +82,8 @@ BarChart(
 
         # --------------------------------------
         # Deprecated, removed in future versions
-        n_cat=getOption("n_cat"), value_labels=NULL, rows=NULL, 
+        n_cat=getOption("n_cat"), value_labels=NULL,
+        rows=NULL, by1=NULL,
 
         # -------------
         # Miscellaneous
@@ -115,7 +116,7 @@ bc(\dots)
   \item{by}{A second categorical variable to create a two-variable bar chart for
         each level of the numeric primary variable
         \code{y} on the \emph{same} plot. A similar concept applies to the
-        panels of a Trellis (facet) plot if \code{by1} is specified.}
+        panels of a Trellis (facet) plot if \code{facet1} is specified.}
   \item{data}{Optional data frame that contains the variables of interest.
        Can contain data from which frequencies or other statistics for a
        \code{y}-variable are computed, or can be a summary table that consists
@@ -130,7 +131,7 @@ bc(\dots)
   \item{stat_x}{When no \code{y} variable is specified, either do the
         default \code{count} of each group or the \code{proportion}.}\cr
 
-  \item{by1}{A categorical variable called a conditioning variable that
+  \item{facet1}{A categorical variable called a conditioning variable that
         activates \bold{Trellis graphics (facets)}, from the \code{lattice}
         package, to create
         a bar chart on a separate panel for each level of the variable.
@@ -347,7 +348,9 @@ bc(\dots)
         \code{\link{style} function.}
         \emph{[deprecated]}: Better to convert a categorical integer variable to
         a factor.}
-  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}\cr
+  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}
+  \item{by1}{Deprecated old parameter name, replaced with the more descriptive
+        \code{facet1}.}\cr
 
   \item{eval_df}{Determines if to check for existing data frame and
         specified variables. By default is \code{TRUE}
@@ -592,7 +595,7 @@ BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
 BarChart(Dept, by=Gender)
 
 # Trellis (facet) plot
-BarChart(Dept, by1=Gender)
+BarChart(Dept, facet1=Gender)
 
 # at each level of Dept, show the row proportions of the Gender levels
 #   i.e., 100% stacked bar graph

@@ -1,5 +1,5 @@
 .plt.lattice <- 
-function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
+function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          fill, area_fill, color, panel_fill, panel_color,
          trans, size.pt, size.ln,
          xlab, ylab, main, shape, lab_cex, axis_cex,
@@ -13,9 +13,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
          ID, out_cut, ID_color, ID_size,
          rotate_x, rotate_y, width, height, pdf_file, T.type, quiet, ...) {
 
-  date.ts <- FALSE
+  date.ts <- FALSE  # currently does nothing
   if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
   if (date.ts) xx.lab <- xlab
+  if (date.ts  &&  is.null(xx.lab)) x.lab <- NULL
   
   if (size.pt == 0) object <- "line"
   size.ln <- size.ln + 0.5  # Trellis plot lines are narrower
@@ -72,7 +73,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   is.y <- ifelse (!is.null(y), TRUE, FALSE)
   gl <- .getlabels(xlab, ylab, main, y.nm=is.y, lab_x_cex=lab_x_cex, 
-                     lab_y_cex=lab_y_cex, by1.nm=TRUE)
+                     lab_y_cex=lab_y_cex, facet1.nm=TRUE)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   y.name <- gl$yn; y.lbl <- gl$yl; 
   if (!is.null(gl$yb))
@@ -81,11 +82,6 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
     y.lab <- ifelse(is.null(ylab), "", ylab)
   main.lab <- gl$mb
   sub.lab <- gl$sb
-
-  # if xlab not specified and if time series, then no x.lab
-  date.ts <- FALSE
-  if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
-  if (date.ts  &&  is.null(xx.lab)) x.lab <- NULL
 
   col.bg <- ifelse(sum(col2rgb(panel_fill)) < 370, "transparent", panel_fill)
 
@@ -100,18 +96,18 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   leg.cex.title <- 0.85  # abbreviate only returns of type character
 # BAD if (!is.null(by)) by <- factor(abbreviate(by, 5), levels(by)) 
 
-  if (is.null(by1) && is.null(by2))
+  if (is.null(facet1) && is.null(facet2))
     n.panels <- 1
   else {
-    n.panels <- ifelse (is.null(by2), nlevels(by1), nlevels(by1)*nlevels(by2))
+    n.panels <- ifelse (is.null(facet2), nlevels(facet1), nlevels(facet1)*nlevels(facet2))
     if (n.panels == 0) n.panels <- 1
 
     if (T.type %in% c("cont", "cont_cont")) {
       if (is.null(n_col) && is.null(n_row)) {
         n_col <- ifelse (n.panels < 5, 1, 2)
-        if ((T.type == "cont")  &&  !is.null(by2)) {
-          n_col <- length(unique(na.omit(by1)))
-          n_row <- length(unique(na.omit(by2)))
+        if ((T.type == "cont")  &&  !is.null(facet2)) {
+          n_col <- length(unique(na.omit(facet1)))
+          n_row <- length(unique(na.omit(facet2)))
         }
       }
     }
@@ -133,44 +129,44 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
       strp <- FALSE;  strp.lft <- TRUE
     }
   }
-  if (is.null(by1)) strp <- FALSE
+  if (is.null(facet1)) strp <- FALSE
 
   # ---------------------------------
   if (T.type == "cont_cont") {  # cont - cont
     # set 1 or 2 conditioning variables
-    if (is.null(by2)) {
-      p <- lattice::xyplot(y ~ x | by1, groups=by, ...)
+    if (is.null(facet2)) {
+      p <- lattice::xyplot(y ~ x | facet1, groups=by, ...)
     }
-    else {  # by2 is present
-      p <- lattice::xyplot(y ~ x | by1 * by2, groups=by, ...)
+    else {  # facet2 is present
+      p <- lattice::xyplot(y ~ x | facet1 * facet2, groups=by, ...)
     }
   }
 
   else if (T.type == "con_cat") {  # cont - cat
       jitter <- .4 * jitter
-      if (is.null(by1)  &&  is.null(by2)) {
+      if (is.null(facet1)  &&  is.null(facet2)) {
         p <- lattice::bwplot(y ~ x, groups=by, ...)
       }
-      else if (is.null(by2)) {
-        p <- lattice::bwplot(y ~ x | by1, groups=by, ...)
+      else if (is.null(facet2)) {
+        p <- lattice::bwplot(y ~ x | facet1, groups=by, ...)
       }
-      else {  # by2 is present
-        p <- lattice::bwplot(y ~ x | by1 * by2, groups=by, ...)
+      else {  # facet2 is present
+        p <- lattice::bwplot(y ~ x | facet1 * facet2, groups=by, ...)
       }
   }  # end con_cat
 
   else if (T.type == "cont") {  # cont
     # set 0, 1 or 2 conditioning variables
-    if (is.null(by1)  &&  is.null(by2)) {  # 0 cond var
+    if (is.null(facet1)  &&  is.null(facet2)) {  # 0 cond var
       p <- lattice::stripplot(~ x, groups=by, subscripts=TRUE, ...)
       y.lab <- ""
     }
-    else if (is.null(by2)) {  # 1 cond var
-      p <- lattice::stripplot(~ x | by1, groups=by, subscripts=TRUE, ...)
-      y.lab <- ifelse (is.null(ylab), getOption("by1name"), ylab)
+    else if (is.null(facet2)) {  # 1 cond var
+      p <- lattice::stripplot(~ x | facet1, groups=by, subscripts=TRUE, ...)
+      y.lab <- ifelse (is.null(ylab), getOption("facet1name"), ylab)
     }
     else  {  # 2 cond var
-      p <- lattice::stripplot(~ x | by1 * by2, groups=by, subscripts=TRUE, ...)
+      p <- lattice::stripplot(~ x | facet1 * facet2, groups=by, subscripts=TRUE, ...)
       y.lab <- ""
     }
   }  # end cont
@@ -179,13 +175,13 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   if (xor(is.null(n_col), is.null(n_row))) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "If you specify  n_col  or  n_row  then \n",
-      "  specify parameter  by1  not parameter  by.\n\n")
+      "  specify parameter  facet1  not parameter  by.\n\n")
   }
 
 
   # scale down the point size, grid line width for the multi-panel dot plots
-  n.pnl <- length(levels(by1))
-  if (!is.null(by2)) n.pnl <- n.pnl + length(levels(by2))
+  n.pnl <- length(levels(facet1))
+  if (!is.null(facet2)) n.pnl <- n.pnl + length(levels(facet2))
   if (n.pnl > 3  &&  grid_x_lwd > 0.99) grid_x_lwd <- .5 * grid_x_lwd
   if (n.pnl > 3  &&  grid_y_lwd > 0.99) grid_y_lwd <- .5 * grid_y_lwd
 
@@ -224,7 +220,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
   }
 
   top.pad <- ifelse (is.null(main), 0, 1)
-  if (!is.null(by1)) top.pad <- 1
+  if (!is.null(facet1)) top.pad <- 1
   axs.top <- ifelse (is.null(main), 0, 1)  # old: .5, 1
 
   # get full list of lattice parameters: trellis.par.get()
@@ -335,9 +331,9 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
                   cat(msg)
                 }
               }
-              by1.name <- getOption("by1name")
+              facet1.name <- getOption("facet1name")
               panel.n <- panel.number()
-              if (!quiet) cat(by1.name, " ", panel.n, "  ",
+              if (!quiet) cat(facet1.name, " ", panel.n, "  ",
                   "Line: b0 = ", b0.pn, "  b1 = ", b1.pn, "   ",
                   "Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
                   sep="", "\n")
@@ -455,10 +451,10 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
             } 
 
             if (violin && length(x)>1) {
-              # to get a violin plot, cannot have y and by1
+              # to get a violin plot, cannot have y and facet1
               # just Plot(x) gives a VBS plot with no groups and only 1 panel
               # a giant do loop that iterates over groups, i.e., panel.number()
-              vw <- ifelse (!is.null(y) && !is.null(by1), FALSE, TRUE) 
+              vw <- ifelse (!is.null(y) && !is.null(facet1), FALSE, TRUE) 
               vf <- ifelse (n.panels>1, violin_fill[panel.number()], violin_fill)
               panel.violin(x=x, ...,
                   col=vf,
@@ -468,7 +464,7 @@ function(x, y, by1, by2, by, adj.bx.ht, object, n_row, n_col, asp,
 
             if ((box || size.pt>0) && length(x)>1) {
 
-              n.lvl <- ifelse (is.null(by1), 1, nlevels(by1))
+              n.lvl <- ifelse (is.null(facet1), 1, nlevels(facet1))
               n <- adj.bx.ht
               int <- ifelse (n <= 25000, 4.10 - 0.000065*n, 3.25 - 0.00003*n)
               denom <- int - 0.5*n.lvl

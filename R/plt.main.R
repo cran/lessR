@@ -1,6 +1,6 @@
 .plt.main <-
 function(x, y, by=NULL, n_cat=getOption("n_cat"),
-         cat.x=FALSE, num.cat.x=FALSE, cat.y=FALSE, num.cat.y=FALSE,
+         cat.x=FALSE, cat.y=FALSE,
          object="point", stat="data",
 
          fill=getOption("pt_fill"),
@@ -10,9 +10,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       #  if NULL, set default values
          pts_trans=0, col.segment=getOption("segment_color"),
 
-         xy_ticks=TRUE,
+         xy_tics=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, main_cex=NULL, sub=NULL,
-         value_labels=NULL,
          rotate_x=0, rotate_y=0, offset=0.5, prop=FALSE, origin_x=NULL,
 
          size=NULL, ln.width=1, shape=21, means=TRUE,
@@ -36,9 +35,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          ellipse_fill="off", ellipse_lwd,
 
          run=FALSE, center_line="off", show_runs=FALSE, stack=FALSE,
-         freq.poly=FALSE,
+         time_unit=NULL, n_date_tics=NULL, freq.poly=FALSE,
 
-         jitter_x=0, j.x.miss=TRUE, jitter_y=0, j.y.miss=TRUE,
+         jitter_x=NULL, jitter_y=NULL,
 
          xlab_adj=0, ylab_adj=0, bm.adj=0, lm.adj=0,
          tm.adj=0, rm.adj=0,
@@ -52,6 +51,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          quiet=FALSE, want.labels=TRUE, bubble.title=TRUE, ...)  {
 
  
+  # -------------------------
   # preliminaries
   # -------------------------
 
@@ -70,37 +70,43 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     by.bub <- FALSE
 
 
+  # ---------------------------
+  # data structures to matrices
+  # ---------------------------
+
   # x and y come across here in their natural state, within each data frame
   # a time series has dates for x and numeric for y, factors are factors, etc
 
   # want labels set just for ttestPower, which provides its own labels
   # both x and y are plotted, even if only a single variable
-  # for a 1-D bubble plot of a single factor var, y.call was set to 0's
+  # for a 1-D bubble plot of a single factor var, y was set to 0's
   bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
 
-  unique.x <- ifelse(length(unique(x[,1])) == length(x[,1]), TRUE, FALSE)
-  unique.y <- ifelse(length(unique(y[,1])) == length(y[,1]), TRUE, FALSE)
+  unique.x <- ifelse (length(unique(x[,1])) == length(x[,1]), TRUE, FALSE)
+  unique.y <- ifelse (length(unique(y[,1])) == length(y[,1]), TRUE, FALSE)
 
-  do.ellipse <- ifelse(ellipse[1] > 0, TRUE, FALSE)
+  do.ellipse <- ifelse (ellipse[1] > 0, TRUE, FALSE)
 
   # all processing in terms of numeric variables
   # convert factors to numeric, save levels, so x and y are always numeric
   # x will always be a matrix
   x.lvl <- NULL; y.lvl <- NULL  # if remain null, then not factors
   nm.x <- names(x)
-  if (is.factor(x[,1])) {
+  if (cat.x) {
     x.lvl <- levels(x[,1])
-    if (!is.null(value_labels))
-      value_labels <- gsub(" ", "\n", x.lvl)
     x <- as.matrix(as.integer(unclass(x[,1])))
   }
   else if (!date.var) {
     x <- as.matrix(x)
     colnames(x) <- nm.x
   }
+  else {
+    x.tics <- x[,1]  # save actual dates for later
+    x <- as.matrix(x[,1], ncol=1)
+  }
 
   nm.y <- names(y)
-  if (is.factor(y[,1])) {
+  if (cat.y) {
     y.lvl <- levels(y[,1])  #  put into alphabetical order
     y <- as.matrix(as.integer(unclass(y[,1])))
   }
@@ -109,26 +115,29 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     y <- as.matrix(y)
     colnames(y) <- nm.y
   }
+  else {
+    y <- as.matrix(y)
+  }
+
+  # y decimal digits
+  digits_d <- .max.dd(y[,1]) + 1
+  options(digits_d=digits_d)
 
   # dimensions
   n.xcol <- ncol(x)
   n.ycol <- ncol(y)
-  n_col <- max(n.xcol, n.ycol)
+  n.col <- max(n.xcol, n.ycol)
   nrows <- nrow(x)
 
-  if (date.var) {
-    x.val <- x[,1]
-    x <- as.matrix(x.val, ncol=1)
-  }
+  if (n.col > 1) center_line <- "off"   # no center_line for multiple plots
 
-  if (n_col > 1) center_line <- "off"   # no center_line for multiple plots
-
-  if (is.null(x.lvl) && !is.null(y.lvl) && unique.y ||
-      is.null(y.lvl) && !is.null(x.lvl) && unique.x) {
+  cleveland <- FALSE
+  if (!cat.x && cat.y && unique.y  ||  !cat.y && cat.x && unique.x)
     cleveland <- TRUE
-  }
-  else
-    cleveland <- FALSE
+
+  # ---------------------
+  # axis labels and title
+  # ---------------------
 
   # set title for bubble plot if proportions
   if (object == "bubble"  &&  prop  &&  is.null(main)  &&  cat.y) {
@@ -151,10 +160,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   lab_cex <- getOption("lab_cex")
   lab_x_cex <- getOption("lab_x_cex")
   lab_y_cex <- getOption("lab_y_cex")
-  lab_x_cex <- ifelse(is.null(lab_x_cex), lab_cex, lab_x_cex)
-  # adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
-  lab_y_cex <- ifelse(is.null(lab_y_cex), lab_cex, lab_y_cex)
-  # adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
+  lab_x_cex <- ifelse (is.null(lab_x_cex), lab_cex, lab_x_cex)
+  lab_y_cex <- ifelse (is.null(lab_y_cex), lab_cex, lab_y_cex)
 
   # get x.lab and y.lab
   if (date.var) xx.lab <- xlab
@@ -182,10 +189,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     if (n.ycol > 1) y.lab <- ""
     if (!is.null(x.lbl)) y.lab <- paste(x.name, ": ", x.lbl, sep="")
   }
-
-  # decimal digits
-  digits_d <- .max.dd(y[,1]) + 1
-  options(digits_d=digits_d)
+  # ---------------------
 
 
   # -------------------------
@@ -193,66 +197,52 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # -------------------------
 
   # graphic system parameters
-  # x.val is either any value_labels or x.lvl, or NULL if x is numeric
+  # x.val is either x.lvl, or NULL if x is numeric
   mx.x.val.ln <- 1
   mx.y.val.ln <- 1
+  max.lbl.y <- NULL
   if (!date.var) {
-    x.val <- NULL
-    y.val <- y.lvl  # if not reset to x value labels
-    max.lbl.y <- NULL
-    if (!is.null(value_labels)) {
-      x.val <- value_labels
-      if (length(unique(y[,1])) > 1) {  # see if set y axis values to those of x
-        if (length(unique(na.omit(x[,1]))) == length(unique(na.omit(y[,1])))) {
-          if (all(sort(unique(x[,1])) == sort(unique(y[,1])))) {
-            y.val <- value_labels
-            v <- unlist(strsplit(value_labels, "\n", fixed=TRUE))
-            max.lbl.y <- max(nchar(v))
-          }
-        }
-      }
-    }
-    else {  # is date.var, null value_labels
-      x.val <- x.lvl  # x.val is NULL if x is numeric, ignored
-      y.val <- y.lvl  # y.val ignored if y is numeric
-    }
+    x.val <- x.lvl  # x.val is NULL if x is numeric, ignored
+    y.val <- y.lvl  # y.val ignored if y is numeric
   }
-  else {  # time series
-    max.lbl.y <- NULL
+  else {
+    x.val <- x[,1]
     y.val <- NULL
   }
 
+  mn.x <- ifelse (cat.x, 1, min(x, na.rm=TRUE))
+  mx.x <- ifelse (cat.x, length(x.lvl), max(x, na.rm=TRUE))
+  mn.y <- ifelse (cat.y, 1, min(y, na.rm=TRUE))
+  mx.y <- ifelse (cat.y, length(y.lvl), max(y, na.rm=TRUE))
 
-  # set margins
+
+
   # -----------
+  # set margins
 
   # get max number of lines in x value labels
-  if (!is.null(x.val)) {
-    stuff <- .get.val.ln(x.val, x.name)
-    x.val <- stuff$val.lab
-    mx.x.val.ln <- stuff$mx.val.ln
+  if (cat.x) {
+    stuff <- .get.val.ln(x.lvl, x.name)
+    mx.x.val.ln <- stuff$mx.val.ln 
   }
 
   # get max number of lines in y value labels
-  if (!is.null(y.val)  &&  y.name != "row.names"  && !cleveland) {
+  if (cat.y  &&  y.name != "row.names"  && !cleveland) {
     stuff <- .get.val.ln(y.val, y.name)
-    y.val <- stuff$val.lab
     mx.y.val.ln <- stuff$mx.val.ln
   }
 
   # --------- get size of y-axis labels
-  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
+  axis_y_cex <- ifelse (is.null(getOption("axis_y_cex")),
     getOption("axis_cex"), getOption("axis_y_cex"))
 
-  if (!is.null(y.val)) {  # y-axis labels are characters
+  if (cat.y) {  # y-axis labels are characters
     yv <- unlist(strsplit(y.val, "\n", fixed=TRUE))
     max.y.width <- max(strwidth(yv, units="inches", cex=axis_y_cex))
     if (options("device") != "RStudioGD")  # not work in R, only RStudio
       max.y.width <- .09 * axis_y_cex * max(nchar(yv))
   }
   else {  # y-axis labels are numeric
-    mn.y <- min(y, na.rm=TRUE)
-    mx.y <- max(y, na.rm=TRUE)
     prety <- pretty(c(mn.y, mx.y))
     ind <- which(nchar(prety) == max(nchar(prety)))[1]  # get largest nchar
     mx.num <-  ifelse (!prop, as.character(prety[ind]), .fmt(prety, 2))
@@ -300,14 +290,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   par(mai=c(bm, mm, tm, rm))
 
 
-  # setup coordinate system only with plot and type="n"
-  # non-graphical parameters in ... Generate warnings when no plot
   # -----------------------
-
-  mn.x <- ifelse(is.null(x.lvl), min(x, na.rm=TRUE), 1)
-  mx.x <- ifelse(is.null(x.lvl), max(x, na.rm=TRUE), length(x.lvl))
-  mn.y <- ifelse(is.null(y.lvl), min(y, na.rm=TRUE), 1)
-  mx.y <- ifelse(is.null(y.lvl), max(y, na.rm=TRUE), length(y.lvl))
+  # setup region for coordinate system only with plot and type="n"
+  # non-graphical parameters in ... Generate warnings when no plot
 
   # re-calibrate y-axis if stacking
   n.by <- ifelse (is.null(by), 0, nlevels(by))
@@ -333,16 +318,15 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
 
   if (!do.ellipse) {
-
     if (cat.x) {
       mn.x <- mn.x - .2
       mx.x <- mx.x + .2
     }
+ 
     if (cat.y) {
       mn.y <- mn.y - .2
       mx.y <- mx.y + .2
     }
-
     if (is.null(origin_x)) {  # set default for minimum x-value displayed
       if (stat %in% c("count", "proportion", "%"))
         origin_x <- 0
@@ -350,9 +334,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         origin_x <- mn.x
     }
     if (stat != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
-
     region <- matrix(c(origin_x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
-
   }  # end no ellipse
 
   else {  # set plot with sufficient room for ellipse and data
@@ -378,9 +360,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # add padding to x and y axes
   add.pad_lab <- FALSE
   if (all(pad_x == 0)) {  # pad extra for labels in 2-D plot
-    if (!is.null(add)) {
+    if (!is.null(add))
       add.pad_lab <- ifelse ("labels" %in% add, TRUE, FALSE)
-    }
     if (add.pad_lab || (length(out_ind) > 0)) {
       if (all(pad_x == 0)) pad_x <- c(0.05, 0.05)
       if (all(pad_y == 0)) pad_y <- c(0.03, 0.03)
@@ -402,17 +383,16 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   rm(region)
 
   usr <- par("usr")
-
-
-  # set up plot background
   # ----------------------
 
-  # axis ticks and values
-  if (cat.x) {
-    if (!is.null(x.lvl)) axT1 <- 1:length(x.lvl)   # mark category values
-    if (num.cat.x) axT1 <- sort(unique(x))  # x.lvl or x.val are NULL
-  }
-  else {
+
+  # ----------------------
+  # set up plot background
+
+  # set axT1: x-axis tics and values
+  if (cat.x)
+    axT1 <- 1:length(x.lvl)   # mark category values
+  else {  # numerical
     if (!date.var) {
       if (stat == "count") {
         if (mx.x <= 3)  # just want integers for count axis
@@ -423,9 +403,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           n.best <- 5
         axT1 <- pretty(origin_x:mx.x, n=n.best)
       }
-      else {
+      else {  # stat != "count"
         if (is.null(scale_x))
-          axT1 <- pretty(c(origin_x, x))  # else numeric, so all the ticks
+          axT1 <- pretty(c(origin_x, x))  # else numeric, so all the tics
         else {
           if (!run)
             axT1 <- axTicks(1, axp=scale_x)
@@ -435,13 +415,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       }
     }
     else  # is date.var
-      axT1 <-axTicks(1)
+      axT1 <- as.integer(x.tics)
   }
 
-  if (cat.y) {
-    if (!is.null(y.lvl)) axT2 <- 1:length(y.lvl)
-    if (num.cat.y) axT2 <- sort(unique(y))
-  }
+  # set axT2: y-axis tics and values
+  if (cat.y)
+    axT2 <- 1:length(y.lvl)
   else {
     if (is.null(scale_y))
       axT2 <- pretty(c(mn.y, mx.y))  # more extreme values than axTicks
@@ -455,31 +434,82 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     y.lab <- ""
   }
 
-  .plt.bck(usr, axT1, axT2, do.h=!bubble1)
-
   # axes value labels
-  if (xy_ticks) {
-    if (!date.var) {  # get ticks for both axes
-      .axes(x.val, y.val, axT1, axT2,
+  if (xy_tics) {
+
+    if (!date.var) {  # get tics for both axes
+      .axes(x.lvl, y.lvl, axT1, axT2,
             rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
     }
+
     else {  # date.var, y-axis
       .axes(NULL, y.val, axT1, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
-            offset=offset, y.only=TRUE, ...)  # y-axis
-      # x-axis, use base R axis.Date
+            offset=offset, y.only=TRUE, ...)  # y-axis values
+
       my.mgp <- par("mgp")  # save to restore
       ax <- .axes_dim()  # get axis value parameters
       mgp2 <- -0.275 + (0.9 * ax$axis_x_cex)  # adjust label to axis distance
       par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
       adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
-      axis.Date(1, x.val, col=ax$axis_x_color, cex.axis=axis_x_cex,
+
+      len.xtics <- length(x.tics)
+      indices <- 1:length(x.tics)  # retain if num of data pts < n.tics
+      n.tics <- ifelse (is.null(n_date_tics), 7, n_date_tics)
+      step_range <- integer (length(50))
+
+      if (time_unit == "years") {
+        axT1date <- format(x.tics, "%Y")
+        n.tics <- ifelse (is.null(n_date_tics), 10, n_date_tics)
+      }
+      else if (time_unit == "quarters") {
+        axT1date <- as.character(zoo::as.yearqtr(x.tics)) 
+        if (len.xtics >= 4*n.tics) {
+        n.tics <- ifelse (is.null(n_date_tics), 9, n_date_tics)
+          for (i in 1:50) step_range[i] <- 4*i
+          tics_range <- ceiling(len.xtics / step_range)
+          step = step_range[which.min(abs(tics_range-n.tics))]
+          indices <- seq(1, len.xtics, by=step)
+        }
+      }
+
+      else if (time_unit %in% c("weeks", "months")) {
+        axT1date <- as.character(zoo::as.yearmon(x.tics)) 
+        if (len.xtics >= 12*n.tics) {
+          for (i in 1:50) step_range[i] <- 12*i
+          tics_range <- ceiling(len.xtics / step_range)
+          step = step_range[which.min(abs(tics_range-n.tics))]
+          indices <- seq(1, length(x.tics), by=step)
+        }
+      }
+
+      else  # e.g., days
+         axT1date <- as.character(x.tics)
+
+        if (len.xtics >= n.tics) {
+          step <- ceiling(len.xtics / n.tics)
+          indices <- seq(1, len.xtics, by=step)
+        }
+
+      axis(1, axT1date, at=x.tics[indices], labels=axT1date[indices],
+                col=ax$axis_x_color, cex.axis=axis_x_cex,
                 col.axis=ax$axis_x_text_color, tck=-.02, ...)  # x-axis
       par(mgp = my.mgp)  # restore back to previous value
     }  # end date.var
-  }  # end xy_ticks
+  }  # end xy_tics
+
+  if (date.var) {  # create y.lab
+    if (time_unit != "unknown") {
+      tu <- gsub("s$", "", time_unit)
+      substr(tu, 1, 1) <- toupper(substr(tu, 1, 1))
+      y.lab <- paste(y.lab, "by", tu)
+    }
+    .plt.bck(usr, x.tics[indices], axT2, do.h=!bubble1)
+  }
+  else
+    .plt.bck(usr, axT1, axT2, do.h=!bubble1)
 
   .axlabs(x.lab, y.lab, main.lab, sub.lab,
-          x.val, xy_ticks, offset=offset,
+          x.val, xy_tics, offset=offset,
           lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex,
           n.lab_x.ln, n.lab_y.ln, xlab_adj, ylab_adj, ...)
 
@@ -491,7 +521,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # colors
   # ------
 
-  n.clrs <- max(n_col, n.by)
+  n.clrs <- max(n.col, n.by)
 
   ltype <- character(length=n.clrs)
   for (i in 1:length(ltype)) ltype[i] <- "solid"
@@ -519,9 +549,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
         else {  # n.by > 1,  tidy format, all y data in same column
           for (i in 1:n.by) {  # only stack=TRUE makes sense
-            xl <- subset(x, by==levels(by)[i])
+            xl <- x[by==levels(by)[i], , drop=FALSE] 
             if (i > 1) yo <- yl
-            yl <- subset(y, by==levels(by)[i])
+            yl <- y[by==levels(by)[i], , drop=FALSE] 
 
             if (stack) {
               if (i == 1) {
@@ -539,7 +569,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                 if (fill[1] != "transparent")
                  polygon(xx, yy, col=area_fill[i], border="transparent")
               }
-            }
+            }  # end stack
 
             if (ln.width > 0) {
               if (stack)  # set line properties here, no option for user
@@ -547,7 +577,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
               lines(xl, yl[,1], col=color[i], lty=ltype[i], lwd=ln.width, ...)
             }  # end ln.width > 0
           }
-        }
+        }  # end n.by > 1
       }  # end n.xcol and n.ycol = 1
 
       if (n.ycol > 1) {
@@ -575,7 +605,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           }  # end ln.width > 0
 
         }  # end i loop
-
       }  # end n.ycol > 1
 
       if (n.xcol > 1) {
@@ -588,23 +617,52 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
     # -----------
     # plot points
+
     if (object %in% c("point", "both")) {
 
-      # --- process jitter, NULL implies set default values ---
-     if (is.null(jitter_x)) jitter_x <- (diff(range(x[,1], na.rm=TRUE)) / 50)
-     if (is.null(jitter_y)) jitter_y <- (diff(range(y[,1], na.rm=TRUE)) / 50)
+       # -----------------------------------
+       # jitter for scatterplot with num.cat
 
-      if (jitter_x > 0) {
+        num.c.x <- FALSE
+        num.c.y <- FALSE
+        if (size[1]>0 && n.xcol==1 && stat!="mean") {  # mult sizes if n_bin>0
+
+          if (cat.x)  # ifelse() does not work
+            unq.x <- levels(x[,1])
+          else
+            unq.x <- unique(x[,1])
+          nx.unq <- length(unq.x)
+          if (nx.unq <= 12) num.c.x <- TRUE
+                
+          if (cat.y)
+            unq.y <- levels(y[,1])
+          else
+            unq.y <- unique(y[,1])
+          ny.unq <- length(unq.y)
+          if (ny.unq <= 12) num.c.y <- TRUE
+        }
+
+      # --- process jitter ---
+     do.jit.x <- ifelse (!cleveland && !date.var && num.c.x, TRUE, FALSE) 
+     do.jit.y <- ifelse (!cleveland && !date.var && num.c.y, TRUE, FALSE) 
+     if (is.null(jitter_x)) if (do.jit.x)
+       jitter_x <- (diff(range(x[,1], na.rm=TRUE))) / 32
+     if (is.null(jitter_y)) if (do.jit.y)
+       jitter_y <- (diff(range(y[,1], na.rm=TRUE))) / 32
+
+      if (do.jit.x && jitter_x > 0) {
         x.temp <- x[,1]
         x[,1] <- x + runif(length(x[,1]), -jitter_x, jitter_x)
       }
-      if (jitter_y > 0) {
+      if (do.jit.y && jitter_y > 0) {
         y.temp <- y[,1]
         y[,1] <- y + runif(length(y[,1]), -jitter_y, jitter_y)
       }
       # ----------------------
 
+
       # no grouping variable
+      # --------------------
       if (is.null(by)) {
 
         if (smooth) {  # 2-D kernel density plot
@@ -691,11 +749,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
               bck.g <- "gray85"
 
             # restore un-jittered data
-            if (jitter_x > 0) {
+            if (do.jit.x  &&  jitter_x > 0) {
               x[,1] <- x.temp
               rm(x.temp)
             }
-            if (jitter_y > 0) {
+            if (do.jit.y  &&  jitter_y > 0) {
               y[,1] <- y.temp
               rm(y.temp)
             }
@@ -703,7 +761,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             m.lvl <- numeric(length = 0)
 
             # plot means for num y across levels of factor x
-            if (!is.null(x.lvl) && is.null(y.lvl) && !unique.x) {
+            if (cat.x && !cat.y && !unique.x) {
               for (i in (1:length(x.lvl)))
                 m.lvl[i] <- mean(y[x==i], na.rm=TRUE)
               abline(h=m.lvl, col="gray50", lwd=.5)
@@ -711,7 +769,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             }
 
             # plot means for num x across levels of factor y
-            if (is.null(x.lvl) && !is.null(y.lvl) && !unique.y) {
+            if (!cat.x && cat.y && !unique.y) {
               for (i in (1:length(y.lvl)))
                 m.lvl[i] <- mean(x[y==i], na.rm=TRUE)
               abline(v=m.lvl, col="gray50", lwd=.5)
@@ -724,6 +782,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         # -----------------------------------------
 
         # plot center line
+        # ----------------
 
         if (center_line != "off") {
           if (center_line == "mean") {
@@ -767,8 +826,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       }  # end is.null by
 
 
-      # by grouping variable
       # --------------------
+      # by grouping variable
 
       else {
 
@@ -839,7 +898,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
 
       }  # end by
-
     }  # end plot points object is point or both
 
 
@@ -864,8 +922,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }  # object is point, line, both
 
 
-  # --- bubble or sunflower plot -  no by var
   # ----------------------------
+  # --- bubble or sunflower plot -  no by var
 
 # else if ((object %in% c("bubble", "sunflower"))  &&  length(size)==1) {
   else if ((object %in% c("bubble", "sunflower"))) {
@@ -897,7 +955,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       n.count <- nrow(mytbl) * ncol(mytbl)
       if (prop) {
         count <- numeric(length=n.count)
-        if (!is.null(y.lvl))
+        if (cat.y)
           mytbl <- prop.table(mytbl, 1)
         else
           mytbl <- mytbl / sum(mytbl)
@@ -945,8 +1003,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # -----------------------
 
 
-  # ellipse option
   # --------------
+  # ellipse option
 
   if (do.ellipse) {
 
@@ -967,7 +1025,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           y.lv <- y[ind]
         }
 
-        if (n_col > 1) {  # multiple variable plots
+        if (n.col > 1) {  # multiple variable plots
           if (n.xcol > 1) {
             x.lv <- x[,i]
             y.lv <- y[,1]
@@ -1001,8 +1059,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }  # do.ellipse
 
 
-  # fit line option
   # ---------------
+  # fit line option
 
   if (fit.line != "off") {
 
@@ -1045,7 +1103,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             y.lv <- subset(y, by==levels(by)[i.clr])
           }
 
-          if (n_col > 1) {  # multiple variable plots
+          if (n.col > 1) {  # multiple variable plots
             if (n.xcol > 1) {
               x.lv <- x[,i.clr]
               y.lv <- y[,1]
@@ -1067,7 +1125,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           ln.type <- ifelse (ln.type != "dashed", "dashed", "solid")
         }
 
-        col.ln <- ifelse (n.clrs == 1, fit_color, fill[i.clr]) 
+        col.ln <- ifelse (n.clrs==1, fit_color, fill[i.clr]) 
+
         pf <- .plt.fit (x.lv, y.lv, fit.line, fit_power)
 
         x.lv <- pf$x.lv  # x and y get reduced in .plt.fit if NA
@@ -1126,8 +1185,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }  # fit.line
 
 
-  # annotations
   # -----------
+  # annotations
 
   if (!is.null(add)) if (add[1] == "means") {
     add[1] <- "v_line"
@@ -1161,7 +1220,10 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # end annotations
 
   if (fit.line != "off"  &&  !quiet) 
-    return(list(mse=mse, b0=b0, b1=b1, Rsq=Rsq, by.cat=by.cat))
+    return(list(mse=mse, b0=b0, b1=b1, Rsq=Rsq, by.cat=by.cat,
+                jitter_x, jitter_y))
+  else
+    return(list(jitter_x=jitter_x, jitter_y=jitter_y))
 
 }  # end plt.main
 

@@ -4,7 +4,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
         stat_x=c("count", "proportion"),
 
-        by1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
+        facet1=NULL, n_row=NULL, n_col=NULL, aspect="fill",
 
         horiz=FALSE, sort=c("0", "-", "+"),
         beside=FALSE, stack100=FALSE,
@@ -41,7 +41,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         pdf_file=NULL, width=6.5, height=6, 
         digits_d=NULL, out_size=80, 
 
-        n_cat=getOption("n_cat"), value_labels=NULL, rows=NULL, 
+        n_cat=getOption("n_cat"), value_labels=NULL,
+        rows=NULL, by1=NULL,
 
         eval_df=NULL, ...) {
 
@@ -56,9 +57,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   # get parameter names passed in function call, does not evaluate the arg
   nms <- names(as.list(match.call()))
   if (!is.null(nms)) {
-    if ("by2" %in% nms) {
+    if ("facet2" %in% nms) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "parameter  by2  not applicable to BarChart\n\n")
+        "parameter  facet2  not applicable to BarChart\n\n")
     }
   }
 
@@ -107,6 +108,17 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       "now use parameter  stat_x  for \"proportion\" \n",
       "  \"proportion\" only applies when there is no y numeric variable\n\n")
   }
+
+  do.plot <- TRUE
+
+  facet1 <- .newparam(missing(by1), substitute(by1), "by1",
+                      missing(facet1), substitute(facet1), "facet1")
+  if (!is.null(facet1)) data[[as.character(facet1)]]  # extract facet1 from data
+
+  facet1.miss <- ifelse (is.null(facet1), TRUE, FALSE)
+
+  Trellis <- ifelse(!facet1.miss, TRUE, FALSE)
+
   # ---------------------------------------------------------
 
   trans <- transparency
@@ -116,7 +128,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   horiz.miss <- ifelse (missing(horiz), TRUE, FALSE)
   y.miss <- ifelse (missing(y), TRUE, FALSE)
   by.miss <- ifelse (missing(by), TRUE, FALSE)
-  by1.miss <- ifelse (missing(by1), TRUE, FALSE)
   for (i in 1:length(color)) if (color[i] == "off") color[i] <- "transparent"
 
   sort.miss <- ifelse (missing(sort), TRUE, FALSE)
@@ -163,11 +174,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     if (labels_position == "out") labels_color <- getOption("axis.text.color")
   }
 
-  Trellis <- ifelse (!missing(by1), TRUE, FALSE)
-  do.plot <- TRUE
-
   # ensure valid parameter values
-  .bcParamValid(y.miss, by.miss, by1.miss, Trellis, sort, fill_split, fill.miss,
+  .bcParamValid(y.miss, by.miss, facet1.miss, Trellis, sort, fill_split, fill.miss,
                 labels_position, stat.miss)
 
  
@@ -395,33 +403,33 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       y.call <- NULL
 
 
-    # evaluate by1
+    # evaluate facet1
     #-------------
-    if (!missing(by1)) {
+    if (!missing(facet1)) {
 
       # get actual variable name before potential call of data$x
-      by1.name <- deparse(substitute(by1))
-      options(by1name = by1.name)
+      facet1.name <- deparse(substitute(facet1))
+      options(facet1name = facet1.name)
 
       # get conditions and check for data existing
-      in.global <- .in.global(by1.name, quiet)
+      in.global <- .in.global(facet1.name, quiet)
 
       # see if var exists in data frame, if x not in global Env or fun call
       if (!missing(x) && !in.global)
-          .xcheck(by1.name, df.name, names(data))
+          .xcheck(facet1.name, df.name, names(data))
 
       if (!in.global)
-        by1.call <- eval(substitute(data$by1))
+        facet1.call <- eval(substitute(data$facet1))
       else {  # vars that are function names get assigned to global
-        by1.call <- by1
-        if (is.function(by1.call)) by1.call <- eval(substitute(data$by1))
+        facet1.call <- facet1
+        if (is.function(facet1.call)) facet1.call <- eval(substitute(data$facet1))
       }
 
-      if (!is.factor(by1.call)) by1.call <- factor(by1.call)
+      if (!is.factor(facet1.call)) facet1.call <- factor(facet1.call)
     }
 
     else
-      by1.call <- NULL
+      facet1.call <- NULL
 
 
     # evaluate specified fill (NULL, numeric constant, or a variable)
@@ -562,8 +570,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     # -----------------------
     if (Trellis && do.plot) {
 
-      # by2 not currently available
-      .bar.lattice(x.call, by1.call, by2=NULL, n_row, n_col, aspect,
+      # facet2 not currently available
+      .bar.lattice(x.call, facet1.call, facet2=NULL, n_row, n_col, aspect,
                    proportion, 
                    fill, color, trans, size.pt=NULL, xlab, ylab, main,
                    rotate_x, offset,
@@ -669,9 +677,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   # x is a data frame or var list of multiple variables
   # ---------------------------------------------------
   else {
-    if (!is.null(by) || !is.null(by1)) {
+    if (!is.null(by) || !is.null(facet1)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "by and by1 variables not available for multiple x variables\n\n")
+        "by and facet1 variables not available for multiple x variables\n\n")
     }
 
     # if labels not assigned, do default

@@ -18,6 +18,6 @@ knitr::opts_chunk$set(
 library(lessR)
 ```
 
-The vignette examples of using **lessR** are so extensive that the package exceeded the maximum installation size. Instead, find the many vignette examples at:
+The vignette examples of using **lessR** are so extensive that the resulting package exceed the maximum installation size. Instead, find the many vignette examples at:
 
 https://web.pdx.edu/~gerbing/lessR/examples/

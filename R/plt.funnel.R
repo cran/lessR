@@ -1,5 +1,5 @@
 .plt.funnel <-
-function (data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts, by1.miss,
+function (data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts, facet1.miss,
           y.unique) {
 
   # T.type specifies type of Trellis plot
@@ -13,19 +13,19 @@ function (data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts, by1.miss,
         T.type <- "cont"
        }
        else {  # run chart
-          if (by1.miss) {  # single panel
+          if (facet1.miss) {  # single panel
             Trellis <- FALSE
           }
-          else {  # by1 present
+          else {  # facet1 present
             Trellis <- TRUE
             T.type <- "cont_cont"  
           }
         }
       }  # end !cat.x
       else {  # single cat variable
-        if (by1.miss)
+        if (facet1.miss)
           Trellis <- FALSE
-        else {  # by1 activated
+        else {  # facet1 activated
           Trellis <- TRUE
           T.type <- "dot"
         }
@@ -35,16 +35,16 @@ function (data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts, by1.miss,
     else {  # y present
       if (!cat.x) {
         if (!cat.y) {  # two continuous vars
-          if (by1.miss)
+          if (facet1.miss)
             Trellis <- FALSE
-          else {  # by1 is set
+          else {  # facet1 is set
             Trellis <- TRUE
             T.type <- "cont_cont"
           }
         }  # end !cat.y
         else {  # y is cat
           if (y.unique) {  # Cleveland
-            if (by1.miss)
+            if (facet1.miss)
               Trellis <- FALSE
             else {
               cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -53,7 +53,7 @@ function (data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts, by1.miss,
             }
           }
           else {
-            if (!by1.miss) {
+            if (!facet1.miss) {
               Trellis <- TRUE  # cat-cont
               T.type <- "cont_cat"
             }
@@ -64,7 +64,7 @@ function (data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts, by1.miss,
       }
       else  {  # x is cat
         if (!cat.y) {  # y is num
-          if (by1.miss) {
+          if (facet1.miss) {
             Trellis <- FALSE
           }
           else {
@@ -87,7 +87,7 @@ function (data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts, by1.miss,
         Trellis <- FALSE
       }
       else {  # is cat.x
-        if (by1.miss) {
+        if (facet1.miss) {
           Trellis <- FALSE
         }
         else {
