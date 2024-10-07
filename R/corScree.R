@@ -48,20 +48,10 @@ function (R=mycor,
   # ---------------
 
   # scree plot
-  .lc.main(ev, type=NULL, 
-         col.line=col.ln,
-         col.area=NULL, col.box="black",
-         col_color=getOption("pt_color"),
-         col_fill=getOption("pt_fill"),
-         shape_pts=21,
-         col.bg=getOption("panel_fill"),
-         lab_cex=getOption("lab_cex"), axis_cex=.85, col.axis="gray30",
-         rotate_x=0, rotate_y=0, offset=0.5,
-         xy_ticks=TRUE, line_width=1.1,
-         xlab=NULL, ylab="Eigenvalues", main=main, sub=NULL, cex=NULL,
-         x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-         time_start=NULL, time_by=NULL, time_reverse=FALSE,
-         center_line="off", quiet=TRUE, ...)
+  ev.df = data.frame(ev)
+  x.df <- data.frame(1:nrow(ev.df))
+  .plt.main(x.df, ev.df, segments=TRUE, size=.9,
+            xlab="Index", ylab="Eigenvalues", main=main)
 
   # manage graphics
   # ---------------
@@ -86,22 +76,11 @@ function (R=mycor,
 
   # differences scree plot
   ev.diff <- -diff(ev)
-
-  .lc.main(ev.diff, type=NULL, 
-         col.line=col.ln,
-         col.area=NULL, col.box="black",
-         col_color=getOption("pt_color"),
-         col_fill=getOption("pt_fill"),
-         shape_pts=21,
-         col.bg=getOption("panel_fill"),
-         lab_cex=getOption("lab_cex"), axis_cex=.85, col.axis="gray30",
-         rotate_x=0, rotate_y=0, offset=0.5,
-         xy_ticks=TRUE, line_width=1.1,
-         xlab=NULL, ylab="Differences of Successive Eigenvalues",
-         main=main, sub=NULL, cex=NULL,
-         x.start=NULL, x.end=NULL, y.start=NULL, y.end=NULL,
-         time_start=NULL, time_by=NULL, time_reverse=FALSE,
-         center_line="off", quiet=TRUE, ...)
+  ev.diff.df = data.frame(ev.diff)
+  x.df <- data.frame(1:nrow(ev.diff.df))
+  .plt.main(x.df, ev.diff.df, segments=TRUE, size=.9,
+            xlab="Index", ylab="Differences of Successive Eigenvalues",
+             main=main)
 
 # does not work, maybe because using .lc.main instead of .plt.main
 #  n.dregs <- 5

@@ -7,7 +7,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          area_fill="transparent",
          color=getOption("pt_color"),
 
-      #  if NULL, set default values
          pts_trans=0, col.segment=getOption("segment_color"),
 
          xy_tics=TRUE,
@@ -34,8 +33,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          ellipse=FALSE, ellipse_color="lightslategray",
          ellipse_fill="off", ellipse_lwd,
 
-         run=FALSE, center_line="off", show_runs=FALSE, stack=FALSE,
-         time_unit=NULL, n_date_tics=NULL, freq.poly=FALSE,
+         run=FALSE, center_line="off", stack=FALSE,
+         time_unit=NULL, agg, do.agg, time_ahead=0,
+         time_fit=FALSE, n_date_tics=NULL,
+         es_level=NULL, es_trend=NULL, es_seasons=NULL,
+         es_type="additive", es_levelCI=0.95,
+         freq.poly=FALSE,
 
          jitter_x=NULL, jitter_y=NULL,
 
@@ -50,7 +53,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
          quiet=FALSE, want.labels=TRUE, bubble.title=TRUE, ...)  {
 
- 
+
   # -------------------------
   # preliminaries
   # -------------------------
@@ -62,7 +65,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   theme <- getOption("theme")
 
   # by.bub means that size is a variable to be plotted in by levels
-  if(length(size) > 1  &&  !is.null(by)) {
+  if (length(size) > 1  &&  !is.null(by)) {
     by.bub <- TRUE
     object <- "point"  # change from bubble to plot to get to by code
   }
@@ -70,9 +73,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     by.bub <- FALSE
 
 
-  # ---------------------------
-  # data structures to matrices
-  # ---------------------------
+  # --------------------------
+  # data structures dimensions
+  # --------------------------
 
   # x and y come across here in their natural state, within each data frame
   # a time series has dates for x and numeric for y, factors are factors, etc
@@ -84,56 +87,15 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   unique.x <- ifelse (length(unique(x[,1])) == length(x[,1]), TRUE, FALSE)
   unique.y <- ifelse (length(unique(y[,1])) == length(y[,1]), TRUE, FALSE)
+  n.by <- ifelse (is.null(by), 0, nlevels(by))
 
   do.ellipse <- ifelse (ellipse[1] > 0, TRUE, FALSE)
-
-  # all processing in terms of numeric variables
-  # convert factors to numeric, save levels, so x and y are always numeric
-  # x will always be a matrix
-  x.lvl <- NULL; y.lvl <- NULL  # if remain null, then not factors
-  nm.x <- names(x)
-  if (cat.x) {
-    x.lvl <- levels(x[,1])
-    x <- as.matrix(as.integer(unclass(x[,1])))
-  }
-  else if (!date.var) {
-    x <- as.matrix(x)
-    colnames(x) <- nm.x
-  }
-  else {
-    x.tics <- x[,1]  # save actual dates for later
-    x <- as.matrix(x[,1], ncol=1)
-  }
-
-  nm.y <- names(y)
-  if (cat.y) {
-    y.lvl <- levels(y[,1])  #  put into alphabetical order
-    y <- as.matrix(as.integer(unclass(y[,1])))
-  }
-  else if (!date.var) {
-    nm.y <- names(y)
-    y <- as.matrix(y)
-    colnames(y) <- nm.y
-  }
-  else {
-    y <- as.matrix(y)
-  }
-
-  # y decimal digits
-  digits_d <- .max.dd(y[,1]) + 1
-  options(digits_d=digits_d)
 
   # dimensions
   n.xcol <- ncol(x)
   n.ycol <- ncol(y)
   n.col <- max(n.xcol, n.ycol)
   nrows <- nrow(x)
-
-  if (n.col > 1) center_line <- "off"   # no center_line for multiple plots
-
-  cleveland <- FALSE
-  if (!cat.x && cat.y && unique.y  ||  !cat.y && cat.x && unique.x)
-    cleveland <- TRUE
 
   # ---------------------
   # axis labels and title
@@ -156,7 +118,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   else
     main.lab <- NULL
 
-  # get lab_x_cex  lab_y_cex   # Synchronize with Plot() code, put in own sub
+  # get lab_x_cex  lab_y_cex    Synchronize with Plot() code, put in own sub
   lab_cex <- getOption("lab_cex")
   lab_x_cex <- getOption("lab_x_cex")
   lab_y_cex <- getOption("lab_y_cex")
@@ -169,7 +131,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     gl <- .getlabels(xlab, ylab, main, lab_x_cex=lab_x_cex,
                      lab_y_cex=lab_y_cex)
     x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
-    y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
+    y.name <- gl$yn; y.lab <- gl$yb
+
     if (is.null(main.lab)) main.lab <- gl$mb
     sub.lab <- gl$sb
     by.name <- getOption("byname")
@@ -192,6 +155,110 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # ---------------------
 
 
+  # all processing in terms of numeric variables
+  # categorical variables x and/or y are converted to factors in Plot()
+  # convert factors to numeric, save levels, so x and y are always numeric
+  # x will always be a matrix
+  x.lvl <- NULL; y.lvl <- NULL  # if remain null, then not factors
+  nm.x <- names(x)
+  if (cat.x) {
+    x.lvl <- levels(x[,1])
+    x <- as.matrix(as.integer(unclass(x[,1])))
+  }
+  else if (!date.var) {
+    x <- as.matrix(x)
+    colnames(x) <- nm.x
+  }
+  else {  # date.var
+    if (n.by == 0)
+      x.tics <- x[,1]  # save actual dates for later
+    else {  # x-axis tics just for one level of by
+      cnt <- sum(by == levels(by)[1])
+      x.tics <- x[1:cnt,1]  # assumes by is sorted by level
+    }
+
+    # forecast
+    if (time_ahead > 0) {
+      # extend x through forecasted values
+      # when computing x.hat, need the +1 and [-1] to not duplicate last x value
+      xorig.len <- nrow(x)
+      mx.d <- x[nrow(x),1]  # numeric form
+      x.hat <- seq.Date(mx.d, by=time_unit, length.out=time_ahead+1)[-1]
+      x.tics <- c(x[,1], x.hat)
+
+      # fit: fit$fitted is mts, a multivariate time series
+      x.orig <- x.tics[1:xorig.len]
+      y.ts <- .tsMake(x.orig, y)  # convert data to ts form
+      if (time_unit == "years") es_seasons <- FALSE  # no seasons in annual data
+      fit <- HoltWinters(y.ts, alpha=es_level, beta=es_trend,
+                         gamma=es_seasons)
+      colnames(fit$fitted)[1] <- "fitted"
+
+      SSE <- fit$SSE
+
+      # predict with prediction intervals
+      yf <- .tsExtract(fit$fitted[,1], x.name)
+      x.fit <- yf$x.dates
+      y.fit <- yf$y
+      y.fcrst <- predict(fit, n.ahead=time_ahead,
+                     prediction.interval=TRUE, level=es_levelCI)
+      colnames(y.fcrst)[1] <- "predicted"
+
+      # get predicted values and PI
+      y.ahead <- .tsExtract(y.fcrst[,"predicted"], x.name)
+      x.prd <- y.ahead$x.dates
+      y.prd <- y.ahead$y
+      y.ahead <- .tsExtract(y.fcrst[,"upr"], x.name)
+      x.upr <- y.ahead$x.dates
+      y.upr <- y.ahead$y
+      y.ahead <- .tsExtract(y.fcrst[,"lwr"], x.name)
+      x.lwr <- y.ahead$x.dates
+      y.lwr <- y.ahead$y
+
+      # adjust forecasted values to match the date format of the data values
+      if (time_unit %in% c("weeks", "months")) {
+        x.prd[,1] <- zoo::as.Date(zoo::as.yearmon(x.prd[,1]), frac=1)
+        x.upr[,1] <- zoo::as.Date(zoo::as.yearmon(x.upr[,1]), frac=1)
+        x.lwr[,1] <- zoo::as.Date(zoo::as.yearmon(x.lwr[,1]), frac=1)
+      }
+      else if (time_unit == "quarters") {
+        x.prd[,1] <- zoo::as.Date(zoo::as.yearqtr(x.prd[,1]), frac=1)
+        x.upr[,1] <- zoo::as.Date(zoo::as.yearqtr(x.upr[,1]), frac=1)
+        x.lwr[,1] <- zoo::as.Date(zoo::as.yearqtr(x.lwr[,1]), frac=1)
+      }
+
+    rm.adj <- rm.adj + .75  # make room for legend
+    }  # end time_ahead forecast
+
+    x <- as.matrix(x[,1], ncol=1)  # x to numeric version of dates
+  }  # end if date.var
+
+  # y to a matrix
+  nm.y <- names(y)
+  if (cat.y) {
+    y.lvl <- levels(y[,1])  #  put into alphabetical order
+    y <- as.matrix(as.integer(unclass(y[,1])))
+  }
+  else if (!date.var) {
+    nm.y <- names(y)
+    y <- as.matrix(y)
+    colnames(y) <- nm.y
+  }
+  else {
+    y <- as.matrix(y)
+  }
+
+  # y decimal digits
+  digits_d <- .max.dd(y[,1]) + 1
+  options(digits_d=digits_d)
+
+  if (n.col > 1) center_line <- "off"   # no center_line for multiple plots
+
+  cleveland <- FALSE
+  if (!cat.x && cat.y && unique.y  ||  !cat.y && cat.x && unique.x)
+    cleveland <- TRUE
+
+
   # -------------------------
   # plot
   # -------------------------
@@ -200,21 +267,26 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # x.val is either x.lvl, or NULL if x is numeric
   mx.x.val.ln <- 1
   mx.y.val.ln <- 1
-  max.lbl.y <- NULL
   if (!date.var) {
     x.val <- x.lvl  # x.val is NULL if x is numeric, ignored
     y.val <- y.lvl  # y.val ignored if y is numeric
   }
-  else {
+  else {  # date.var
     x.val <- x[,1]
     y.val <- NULL
   }
 
   mn.x <- ifelse (cat.x, 1, min(x, na.rm=TRUE))
-  mx.x <- ifelse (cat.x, length(x.lvl), max(x, na.rm=TRUE))
-  mn.y <- ifelse (cat.y, 1, min(y, na.rm=TRUE))
-  mx.y <- ifelse (cat.y, length(y.lvl), max(y, na.rm=TRUE))
-
+  if (time_ahead > 0) {  # forecast margin adjustments
+    mx.x <- as.numeric(x.hat[length(x.hat)])
+    mx.y <- max(max(y), max(y.fit), max(y.upr))
+    mn.y <- min(min(y), min(y.fit), min(y.lwr))
+  }
+  else {
+    mx.x <- ifelse (cat.x, length(x.lvl), max(x, na.rm=TRUE))
+    mn.y <- ifelse (cat.y, 1, min(y, na.rm=TRUE))
+    mx.y <- ifelse (cat.y, length(y.lvl), max(y, na.rm=TRUE))
+  }
 
 
   # -----------
@@ -223,7 +295,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # get max number of lines in x value labels
   if (cat.x) {
     stuff <- .get.val.ln(x.lvl, x.name)
-    mx.x.val.ln <- stuff$mx.val.ln 
+    mx.x.val.ln <- stuff$mx.val.ln
   }
 
   # get max number of lines in y value labels
@@ -295,7 +367,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # non-graphical parameters in ... Generate warnings when no plot
 
   # re-calibrate y-axis if stacking
-  n.by <- ifelse (is.null(by), 0, nlevels(by))
   if (stack  &&  n.ycol > 1) {  # data in wide format, one col for each y
     y.tot <- apply(y, 1, sum, na.rm=TRUE)
     mx.y <- max(y.tot)
@@ -308,6 +379,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     }
     mx.y <- max(yl)
   }
+
   if (!is.null(scale_x)) {
      mn.x <- min(mn.x, scale_x[1])
      mx.x <- max(mx.x, scale_x[2])
@@ -322,11 +394,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       mn.x <- mn.x - .2
       mx.x <- mx.x + .2
     }
- 
     if (cat.y) {
       mn.y <- mn.y - .2
       mx.y <- mx.y + .2
     }
+
     if (is.null(origin_x)) {  # set default for minimum x-value displayed
       if (stat %in% c("count", "proportion", "%"))
         origin_x <- 0
@@ -370,7 +442,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   # get plot region
   xp <- pretty(c(mn.x, mx.x))
-  yp <- pretty(c(mn.y, mx.y))
   xP <- pad_x[2] * (xp[length(xp)] - xp[1])
   yp <- pretty(c(mn.y, mx.y))
   xN <- pad_x[1] * (xp[length(xp)] - xp[1])
@@ -389,9 +460,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # ----------------------
   # set up plot background
 
-  # set axT1: x-axis tics and values
+  # set axT1: x-axis tics and values, Date var uses axT1date, defined later
   if (cat.x)
-    axT1 <- 1:length(x.lvl)   # mark category values
+    axT1 <- seq_along(x.lvl)   # mark category values
   else {  # numerical
     if (!date.var) {
       if (stat == "count") {
@@ -414,13 +485,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
       }
     }
-    else  # is date.var
-      axT1 <- as.integer(x.tics)
   }
 
   # set axT2: y-axis tics and values
   if (cat.y)
-    axT2 <- 1:length(y.lvl)
+    axT2 <- seq_along(y.lvl)
   else {
     if (is.null(scale_y))
       axT2 <- pretty(c(mn.y, mx.y))  # more extreme values than axTicks
@@ -443,7 +512,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     }
 
     else {  # date.var, y-axis
-      .axes(NULL, y.val, axT1, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
+      .axes(NULL, y.val, NULL, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
             offset=offset, y.only=TRUE, ...)  # y-axis values
 
       my.mgp <- par("mgp")  # save to restore
@@ -453,46 +522,50 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
 
       len.xtics <- length(x.tics)
-      indices <- 1:length(x.tics)  # retain if num of data pts < n.tics
-      n.tics <- ifelse (is.null(n_date_tics), 7, n_date_tics)
-      step_range <- integer (length(50))
+      indices <- seq_along(x.tics)  # retain if num of data pts < n.tics
+      step_range <- integer(length(50))
 
       if (time_unit == "years") {
         axT1date <- format(x.tics, "%Y")
         n.tics <- ifelse (is.null(n_date_tics), 10, n_date_tics)
       }
       else if (time_unit == "quarters") {
-        axT1date <- as.character(zoo::as.yearqtr(x.tics)) 
-        if (len.xtics >= 4*n.tics) {
+        axT1date <- as.character(zoo::as.yearqtr(x.tics))
         n.tics <- ifelse (is.null(n_date_tics), 9, n_date_tics)
+        if (len.xtics >= 4*n.tics) {
           for (i in 1:50) step_range[i] <- 4*i
           tics_range <- ceiling(len.xtics / step_range)
-          step = step_range[which.min(abs(tics_range-n.tics))]
+          step <- step_range[which.min(abs(tics_range-n.tics))]
           indices <- seq(1, len.xtics, by=step)
         }
       }
-
       else if (time_unit %in% c("weeks", "months")) {
-        axT1date <- as.character(zoo::as.yearmon(x.tics)) 
+        axT1date <- as.character(zoo::as.yearmon(x.tics))
+        n.tics <- ifelse (is.null(n_date_tics), 7, n_date_tics)
         if (len.xtics >= 12*n.tics) {
           for (i in 1:50) step_range[i] <- 12*i
           tics_range <- ceiling(len.xtics / step_range)
-          step = step_range[which.min(abs(tics_range-n.tics))]
+          step <- step_range[which.min(abs(tics_range-n.tics))]
           indices <- seq(1, length(x.tics), by=step)
         }
       }
-
-      else  # e.g., days
+      else {  # e.g., days
          axT1date <- as.character(x.tics)
+         n.tics <- ifelse (is.null(n_date_tics), 7, n_date_tics)
+      }
 
-        if (len.xtics >= n.tics) {
-          step <- ceiling(len.xtics / n.tics)
-          indices <- seq(1, len.xtics, by=step)
-        }
+      # subset the indices to display if needed
+      if (len.xtics >= n.tics) {
+        step <- ceiling(len.xtics / n.tics)
+        indices <- seq(1, len.xtics, by=step)
+      }
 
+      # axT1date is the xts customized for char time_unit date, e.g., Aug 2023
+      # x.tics are the dates in Date format, e.g., 2023-08-01
       axis(1, axT1date, at=x.tics[indices], labels=axT1date[indices],
                 col=ax$axis_x_color, cex.axis=axis_x_cex,
                 col.axis=ax$axis_x_text_color, tck=-.02, ...)  # x-axis
+
       par(mgp = my.mgp)  # restore back to previous value
     }  # end date.var
   }  # end xy_tics
@@ -501,13 +574,21 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     if (time_unit != "unknown") {
       tu <- gsub("s$", "", time_unit)
       substr(tu, 1, 1) <- toupper(substr(tu, 1, 1))
-      y.lab <- paste(y.lab, "by", tu)
+      if (do.agg) {
+        if (agg == "sum") show.agg <- "Total"
+        if (agg == "mean") show.agg <-agg <- "Mean"
+      }
+      else
+        show.agg <- ""
+      y.lab <- paste(show.agg, y.name, "by", tu)
     }
+
     .plt.bck(usr, x.tics[indices], axT2, do.h=!bubble1)
   }
   else
     .plt.bck(usr, axT1, axT2, do.h=!bubble1)
 
+  # axes labels
   .axlabs(x.lab, y.lab, main.lab, sub.lab,
           x.val, xy_tics, offset=offset,
           lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex,
@@ -524,7 +605,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   n.clrs <- max(n.col, n.by)
 
   ltype <- character(length=n.clrs)
-  for (i in 1:length(ltype)) ltype[i] <- "solid"
+  for (i in seq_along(ltype)) ltype[i] <- "solid"
 
 
   # plot lines (and area_fill)
@@ -537,21 +618,42 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       if (n.xcol == 1  &&  n.ycol == 1) {
         if (n.by <= 1) {  # pure single panel, data in wide format
 
-          if (ln.width > 0) {  # plot line(s)
+          if (ln.width > 0) {  # plot data line segments
             if (date.var || freq.poly)  # object == "both"
-              lines(as.numeric(x[,1]), y[,1], col=color[1], lwd=ln.width, ...)
+              lines(x[,1], y[,1], col=color[1], lwd=ln.width, ...)
           }
 
           if (area_fill[1] != "transparent") # fill area
             polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
                 col=area_fill, border="transparent")
+
+          if (time_ahead > 0) {
+            trns.red <- .maketrans("darkred", .16*256)
+            lines(x.fit[,1], y.fit[,1], col=trns.red, lwd=ln.width)
+            lines(c(x.fit[nrow(x.fit),1],x.prd[1,1]),
+                  c(y.fit[nrow(y.fit),1],y.prd[1,1]),
+                  col=trns.red, lwd=ln.width)
+            points(x.prd[,1], y.prd[,1], pch=shape, bg="darkred", cex=.65)
+            lines(x.prd[,1], y.prd[,1], col="darkred", lwd=ln.width)
+            lines(x.upr[,1], y.upr[,1], col=trns.red, lwd=ln.width)
+            lines(x.lwr[,1], y.lwr[,1], col=trns.red, lwd=ln.width)
+            xx <- c(x.prd[,1], rev(x.prd[,1]))
+            yy <- c(y.fcrst[,"upr"], rev(y.fcrst[,"lwr"]))
+            polygon(xx, yy, border=NA, col=rgb(.6,0,0,.15))
+
+            lgn.clr <- c("black", trns.red, "darkred")
+            lgn.nm <- ifelse (nchar(y.name) < 6, y.name, "data")
+            .plt.by.legend(c(lgn.nm, "model\nfit", "fore-\ncast"),
+                           lgn.clr, lgn.clr, shp="lines", pts_trans, fill_bg,
+                           usr, pt.size=size, legend_title=legend_title)
+          }
         }  # n.by is 1
 
         else {  # n.by > 1,  tidy format, all y data in same column
           for (i in 1:n.by) {  # only stack=TRUE makes sense
-            xl <- x[by==levels(by)[i], , drop=FALSE] 
+            xl <- x[by==levels(by)[i], , drop=FALSE]
             if (i > 1) yo <- yl
-            yl <- y[by==levels(by)[i], , drop=FALSE] 
+            yl <- y[by==levels(by)[i], , drop=FALSE]
 
             if (stack) {
               if (i == 1) {
@@ -587,14 +689,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             if (i == 1) {
               xx <- c(x[1],x,x[length(x)])
               yy <- c(mn.y,y[,1],mn.y)  # starts at the scale_y setting
-              if (fill[1] != "transparent") 
+              if (fill[1] != "transparent")
                 polygon(xx, yy, col=area_fill[1], border="transparent")
             }
             if (i > 1) {
               y[,i] <- apply(y[,(i-1):i], 1, sum, na.rm=TRUE)  # sum to stack
-              xx <- c( c(x[1],x,x[length(x)]), rev(c(x[1],x,x[length(x)])) )
-              yy <- c( c(min(y[,i]),y[,i],min(y[,i])),
-                         rev(c(min(y[,i-1]),y[,i-1],min(y[,i-1]))) )
+              xx <- c(c(x[1],x,x[length(x)]), rev(c(x[1],x,x[length(x)])))
+              yy <- c(c(min(y[,i]),y[,i],min(y[,i])),
+                         rev(c(min(y[,i-1]),y[,i-1],min(y[,i-1]))))
               if (fill[1] != "transparent")
                 polygon(xx, yy, col=area_fill[i], border="transparent")
             }
@@ -633,7 +735,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             unq.x <- unique(x[,1])
           nx.unq <- length(unq.x)
           if (nx.unq <= 12) num.c.x <- TRUE
-                
+
           if (cat.y)
             unq.y <- levels(y[,1])
           else
@@ -643,8 +745,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
 
       # --- process jitter ---
-     do.jit.x <- ifelse (!cleveland && !date.var && num.c.x, TRUE, FALSE) 
-     do.jit.y <- ifelse (!cleveland && !date.var && num.c.y, TRUE, FALSE) 
+     do.jit.x <- ifelse (!cleveland && !date.var && num.c.x, TRUE, FALSE)
+     do.jit.y <- ifelse (!cleveland && !date.var && num.c.y, TRUE, FALSE)
      if (is.null(jitter_x)) if (do.jit.x)
        jitter_x <- (diff(range(x[,1], na.rm=TRUE))) / 32
      if (is.null(jitter_y)) if (do.jit.y)
@@ -674,7 +776,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                         colramp=clr.den, cex=smooth_size, add=TRUE)
         }
 
-        else if (size.pt[1] > 0) {  # plot points, plus means, segments, etc.
+        else if (size.pt[1] > 0) {  # plot points, and means, segments, etc.
 
           # --- plot points, segments, means with no by ---
           # -----------------------------------------------
@@ -762,7 +864,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
             # plot means for num y across levels of factor x
             if (cat.x && !cat.y && !unique.x) {
-              for (i in (1:length(x.lvl)))
+              for (i in seq_along(x.lvl))
                 m.lvl[i] <- mean(y[x==i], na.rm=TRUE)
               abline(h=m.lvl, col="gray50", lwd=.5)
               points(m.lvl, pch=pch.avg, bg=bck.g, col=bck.g, cex=size.pt*1.5)
@@ -770,11 +872,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
             # plot means for num x across levels of factor y
             if (!cat.x && cat.y && !unique.y) {
-              for (i in (1:length(y.lvl)))
+              for (i in seq_along(y.lvl))
                 m.lvl[i] <- mean(x[y==i], na.rm=TRUE)
               abline(v=m.lvl, col="gray50", lwd=.5)
-              points(m.lvl, 1:length(y.lvl), pch=pch.avg, bg=bck.g, col=bck.g,
-                     cex=size.pt*1.5)
+              points(m.lvl, seq_len(length(y.lvl)), pch=pch.avg, bg=bck.g,
+                     col=bck.g, cex=size.pt*1.5)
             }
           }  # end means
 
@@ -788,17 +890,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           if (center_line == "mean") {
             m.y <- mean(y[,1], na.rm=TRUE)
             lbl <- " mean"
-            lbl.cat <- "mean:"
           }
           else if (center_line == "median") {
             m.y <- median(y[,1], na.rm=TRUE)
             lbl <- " medn"
-            lbl.cat <- "median:"
           }
           else if (center_line == "zero") {
             m.y <- 0
             lbl <- ""
-            lbl.cat <- "zero:"
           }
 
           abline(h=m.y, col="gray50", lty="dashed")  # draw center line
@@ -808,14 +907,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
         }  # end center_line
 
-        else {
-          lbl.cat <- "median: "
+        else
           m.y <- median(y[,1], na.rm=TRUE)
-        }
 
-        if (segments) {  # interaction means plot, ts with non-Date x var 
+        if (segments) {  # interaction means plot, ts with non-Date x var
           if (!is.null(ylab))  # thin line for ANOVA interaction plot
-            if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75 
+            if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75
           for (j in 1:(nrow(x)-1)) {
             segments(x0=x[j,1], y0=y[j,1],
                      x1=x[j+1,1], y1=y[j+1,1],
@@ -830,9 +927,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       # by grouping variable
 
       else {
-
         clr <- character(length(n.by))
-        clr.tr <- character(length(n.by))  # translucent version of clr
 
         if (length(color) == 1)
           for (i in 1:n.by) clr[i] <- color  # all levels get same color
@@ -866,12 +961,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             # size is a var and a by var
             .plt.bubble(x.lv, y.lv, size.lv, radius, power, fill[i], clr[i],
                         size_cut, prop, bubble_text, object)
-          }      
+          }
 
           # interaction means plot, ts without a date var and segments=TRUE
           if (segments) {
             if (!is.null(ylab))  # thin line for ANOVA interaction plot
-              if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75 
+              if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75
             for (j in 1:(nrow(x.lv)-1)) {
               segments(x0=x.lv[j,1], y0=y.lv[j,1],
                        x1=x.lv[j+1,1], y1=y.lv[j+1,1],
@@ -890,9 +985,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                          legend_title=legend_title)
         }
         else {  # not stack
-          if (n.by > 1) { 
+          if (n.by > 1) {
 #           for (i in 1:length(shp)) shp[i] <- 21  # circle
-            .plt.by.legend(levels(by), color, fill, shp, pts_trans,
+            .plt.by.legend(levels(by), color, fill, shp[1], pts_trans,
                            fill_bg, usr, legend_title=legend_title)
           }
         }
@@ -911,12 +1006,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
                   lab_cex=lab_x_cex, pt.size=1.25, legend_title)
 
     if (n.ycol > 1) {  # vertical legend, on y-axis
-      if (stack) 
-        .plt.legend(colnames(y), FALSE, color, area_fill, shape, fill_bg, usr,
-                    lab_cex=lab_y_cex, pt.size=1.25, legend_title)
-      else
-        .plt.legend(colnames(y), FALSE, color, fill, shape, fill_bg, usr,
-                    lab_cex=lab_y_cex, pt.size=1.25, legend_title)
+      the.fill <- ifelse (stack, area_fill, fill)
+      .plt.legend(colnames(y), FALSE, color, the.fill, shape, fill_bg, usr,
+                  lab_cex=lab_y_cex, pt.size=1.25, legend_title)
     }
 
   }  # object is point, line, both
@@ -925,10 +1017,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # ----------------------------
   # --- bubble or sunflower plot -  no by var
 
-# else if ((object %in% c("bubble", "sunflower"))  &&  length(size)==1) {
   else if ((object %in% c("bubble", "sunflower"))) {
     if (!is.null(by)) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
         "Parameter  by  not valid for bubble plot\n\n")
     }
 
@@ -967,8 +1058,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       xx <- integer(length=n.count)
       yy <- integer(length=n.count)
       k <- 0
-      for (i in 1:nrow(mytbl)) {
-        for (j in 1:ncol(mytbl)) {
+      for (i in seq_len(nrow(mytbl))) {
+        for (j in seq_len(ncol(mytbl))) {
           k <- k + 1
           count[k] <- mytbl[i,j]
           if (count[k] == 0) count[k] <- NA  # 0 count not plotted
@@ -994,7 +1085,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     }  # end length(size) == 1
 
     # size is a variable (unless size is constant and bubble specified)
-    # no by var 
+    # no by var
     else {
       .plt.bubble(x, y, size, radius, power, clr, clr_color,
                   size_cut, prop, bubble_text, object)
@@ -1047,7 +1138,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       s.x <- sd(x.lv, na.rm=TRUE)
       s.y <- sd(y.lv, na.rm=TRUE)
 
-      for (j in 1:length(ellipse)) { # for each ellipse for this by group 
+      for (j in seq_along(ellipse)) { # for each ellipse for this by group
         e <- ellipse::ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y),
                      level=ellipse[j])
         ln.type <- "solid"
@@ -1067,7 +1158,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
     # if outliers noted then also do line w/o outliers
     fit.remove <- ifelse (length(out_ind) > 0, TRUE, FALSE)
     do.remove <- FALSE
-    n.loops <- ifelse (n.clrs > 1, 1, as.numeric(fit.remove)+1) 
+    n.loops <- ifelse (n.clrs > 1, 1, as.numeric(fit.remove)+1)
     for (i.remv in 1:n.loops) {
       if (fit.remove) {
         fit_se[1] <- 0  # for line w/o outliers, no se band
@@ -1075,7 +1166,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         if (i.remv == 2) do.remove <- TRUE  # 2nd pass
       }
 
-      sse <- double(length=n.clrs)
+#     sse <- double(length=n.clrs)
       mse <- double(length=n.clrs)
       b0 <- double(length=n.clrs)
       b1 <- double(length=n.clrs)
@@ -1125,7 +1216,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
           ln.type <- ifelse (ln.type != "dashed", "dashed", "solid")
         }
 
-        col.ln <- ifelse (n.clrs==1, fit_color, fill[i.clr]) 
+        col.ln <- ifelse (n.clrs==1, fit_color, fill[i.clr])
 
         pf <- .plt.fit (x.lv, y.lv, fit.line, fit_power)
 
@@ -1148,7 +1239,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
         # se bands about each eligible fit line
         if (fit_se[1] != 0) {
-          for (j in 1:length(fit_se)) {
+          for (j in seq_along(fit_se)) {
             p.ln <- predict(l.ln, se=TRUE)
             prb <- (1 - fit_se[j]) / 2
             nrows <- length(y.lv)
@@ -1156,7 +1247,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
             polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
                     col=se_fill, border="transparent")
-     
+
           }  # end for each se plot
         }
 
@@ -1171,11 +1262,11 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
 
         # plot residuals option
-        if (plot_errors) { 
-          red <- rgb(130,40,35, maxColorValue=255) 
+        if (plot_errors) {
+          red <- rgb(130,40,35, maxColorValue=255)
           pe.clr <- ifelse (theme %in% c("gray", "white"), "gray58", red)
-          segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv, 
-                   col=pe.clr, lwd=1) 
+          segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv,
+                   col=pe.clr, lwd=1)
         }
 
       }  # ith pattern (clr)
@@ -1219,11 +1310,24 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
   # end annotations
 
-  if (fit.line != "off"  &&  !quiet) 
-    return(list(mse=mse, b0=b0, b1=b1, Rsq=Rsq, by.cat=by.cat,
-                jitter_x, jitter_y))
-  else
-    return(list(jitter_x=jitter_x, jitter_y=jitter_y))
+  # -----------
+  # end, return
+  SSE.fit <- NULL;  fit.frcst <- NULL;  y.frcst <- NULL
+  if (time_ahead > 0) {
+    SSE.fit <- paste("Sum of squared fit errors:", .fmt_cm(SSE, 3))
+    if (time_fit) fit.frcst <- fit$fitted
+    y.frcst <- y.fcrst
+  }
+
+  if (fit.line != "off") {
+    mse <- mse;  b0 <- b0;  b1 <- b1;  Rsq <- Rsq;  by.cat <- by.cat
+  }
+  else {
+    mse <- NULL;  b0 <- NULL;  b1 <- NULL;  Rsq <- NULL;  by.cat <- NULL
+  }
+
+  return(list(mse=mse, b0=b0, b1=b1, Rsq=Rsq, by.cat=by.cat,
+              SSE.fit=SSE.fit, fit.frcst=fit.frcst, y.frcst=y.frcst, 
+              jitter_x=jitter_x, jitter_y=jitter_y))
 
 }  # end plt.main
-

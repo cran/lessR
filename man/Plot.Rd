@@ -34,15 +34,20 @@ A scatterplot displays the values of a distribution, or the relationship between
 
 \strong{Two variables}\cr
 \code{Plot(x,y)}: traditional scatterplot of two continuous variables\cr
-\code{Plot(xDate,y)}:  a Date variable and a continuous yields a time-series plot\cr
+\code{Plot(xDate,y)}:  a variable of type Date paired with a continuous variable yields a time-series plot\cr
 \code{Plot(xCat,yCat)}: to solve the over-plot problem, plot a scatterplot of two categorical variables as a bubble scatterplot, the size of each bubble based on the corresponding joint frequency\cr
 \code{Plot(xCat,y)} or \code{Plot(x,yCat)}: one variable categorical and the other variable continuous, yields a scatterplot with means at each level of the categorical variable\cr
 \code{Plot(xCat,y, stat="mean")} or \code{Plot(x,yCat, stat="mean")}: one variable categorical and the other variable continuous, yields a Cleveland dot plot with a specified statistic such as the \code{"mean"} of the continuous variable at each level of the categorical variable\cr
 \code{Plot(xUnique,y)} or \code{Plot(x,yUnique)}: one categorical with unique (ID) values and the other variable continuous, yields a Cleveland dot (lollipop) plot, where the unique values can be variable \code{row.names}\cr
 
 \strong{One variable}\cr
-\code{Plot(x)}: one continuous variable generates either a violin/box/scatterplot (VBS plot), named here, or a run chart with \code{run=TRUE}, or \code{x} can be an R time series object created with \code{ts()} for a time series visualization\cr
-\code{Plot(xCat)}: one categorical variable yields a 1-dimensional bubble plot to solve the over-plot problem for a more compact replacement of the traditional bar chart\cr
+\code{Plot(x)}: one continuous variable generates either a violin/box/scatterplot
+    (VBS plot), named here, or a run chart, generated from the $x$-variable named 
+    \code{.Index}. Or \code{x} can be an R time series object created with
+    \code{ts()} for a time series visualization\cr
+\code{Plot(xCat)}: one categorical variable yields a 1-dimensional bubble plot to
+    solve the over-plot problem for a more compact replacement of the traditional
+    bar chart\cr
 
 \strong{Three, four, or more variables}\cr
 \code{Plot(x,y, size=z)}: \code{x} and \code{y} continuous yields a bubble of two continuous variables with \code{z} setting the size of the corresponding plotted point, i.e., bubble\cr
@@ -70,6 +75,11 @@ Plot(
     # Enhancements and customizations
     # -------------------------------
 
+    # --------------------------------------------------
+    # Stratification: Same panel or Trellis (facet) plot [x, or x and y]
+    by=NULL, facet1=NULL, facet2=NULL,
+    n_row=NULL, n_col=NULL, aspect="fill",
+
     # ------------------------------------------------------------------
     # Analogy of physical Marks on paper that create the bars and labels
     theme=getOption("theme"),
@@ -92,7 +102,7 @@ Plot(
      
     # -------------------------------------------------
     # Fit line, confidence interval, confidence ellipse
-    fit=c("off","loess", "lm", "ls", "null", "exp", "quad",
+    fit=c("off", "loess", "lm", "ls", "null", "exp", "quad",
           "power", "log"),
     fit_power=1, fit_se=0.95,
     fit_color=getOption("fit_color"),
@@ -100,24 +110,21 @@ Plot(
 
 
     # ----------------------------------------------------------
-    # Types of plots beyond default scatterplots (x, or x and y)
+    # Types of plots 
     # ----------------------------------------------------------
 
-    # --------------------------------------------------
-    # Stratification: Same panel or Trellis (facet) plot [x, or x and y]
-    by=NULL, facet1=NULL, facet2=NULL,
-    n_row=NULL, n_col=NULL, aspect="fill",
-
     # -----------------------------------------------------
-    # Time series, plot x values sequentially [xDate, y, or Y]
-    time_unit=NULL, time_agg=c("sum","mean"), stack=FALSE, lwd=1.5, 
+    # Time series, plot x values sequentially [xDate, y or Y]
+    time_unit=NULL, time_agg=c("sum", "mean"), time_ahead=0, time_format=NULL,
+    time_fit=FALSE, es_level=NULL, es_trend=NULL, es_seasons=NULL,
+    es_type=c("additive", "multiplicative"), es_PIlevel=0.95,
+    stack=FALSE, lwd=1.5,
     area_fill="transparent", area_split=0, n_date_tics=NULL,
-    # Run chart
-    run=FALSE, show_runs=FALSE, 
-    center_line=c("off", "mean", "median", "zero"),
+    # Run chart (also by indicating .Index for the name of the x-variable)
+    show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
 
     # -----------------------------------
-    # Lollipop chart from aggregated data [x and y]
+    # Lollipop chart from aggregated data [xCategorical and y]
     stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
     stat_x=c("count", "proportion", "\%"),
 
@@ -131,7 +138,7 @@ Plot(
     k=1.5, box_adj=FALSE, a=-4, b=3,
 
     # -----------
-    # Bubble plot [xCat, or xCat and yCat]
+    # Bubble plot [xCatorical, or xCatorical and yCatorical]
     radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
 
     # --------------------------------------
@@ -170,7 +177,7 @@ Plot(
     # ------------------------------------------------------------------
     # Output: turn off, chart to PDF file, decimal digits, markdown file
     quiet=getOption("quiet"), do_plot=TRUE,
-    pdf_file=NULL, width=6.5, height=6, 
+    pdf_file=NULL, width=6.5, height=6,
     digits_d=NULL,
 
     # -------------------------------------------------------------
@@ -198,7 +205,9 @@ vp(\dots)
         continuous or categorical, cross-sectional or a time series.
         If \code{x} is sorted, with equal intervals
         separating the values, or is a time series, then by default
-        plots the points sequentially, joined by line segments.
+        plots the points sequentially, joined by line segments. If named 
+        \code{.Index}, then a run chart is generated from the corresponding 
+        \code{y} variable.
         Can specify multiple \code{x}-variables or multiple \code{y}-variables
         as vectors, but not both. Can be in a data frame or defined
         in the global environment.}
@@ -210,6 +219,41 @@ vp(\dots)
         \code{y}. Default data frame is \code{d}.}
   \item{filter}{A logical expression that specifies a subset of rows of
         the data frame to analyze.}\cr
+
+
+  \item{by}{A categorical variable to provide a scatterplot for
+        each level of the numeric primary variables \code{x} and
+        \code{y} on the \emph{same} plot, a \emph{grouping variable}.
+        For two-variable plots, applies to the panels of a
+        \bold{Trellis graphic} if \code{facet1} is specified.}
+  \item{facet1}{A categorical variable, the \emph{conditioning variable},
+        which activates Trellis (facet) graphics, provided by Deepayan 
+        Sarkar's (2007) lattice package, to provide
+        a \emph{separate} panel of numeric primary variables \code{x}
+        and \code{y} for each level of the \code{facet1} variable.
+        Re-order the levels by first converting to a factor variable with
+        \code{\link{factor}} or lessR \code{\link{factors}}.}
+  \item{facet2}{A second \emph{conditioning variable} to generate Trellis (facet)
+        plots jointly conditioned on both the \code{facet1} and \code{facet2}
+        variables, with \code{facet2} as the row variable, which yields a 
+        scatterplot (panel) for \emph{each} cross-classification of the levels
+        of numeric \code{x} and \code{y} variables.}
+  \item{n_row}{Optional specification for the number of rows and columns
+        in the layout of a multi-panel display with Trellis graphics. Specify
+        \code{n_col} or \code{n_row}, but not both.}
+  \item{n_col}{Optional specification for the number of columns in the
+        layout of a multi-panel display with
+        Trellis graphics. Specify \code{n_col} or \code{n_row}, but 
+        not both. If set to 1, the default, then
+        the strip that labels each group locates to the left of each plot
+        instead of the top.}
+  \item{aspect}{Lattice parameter for the aspect ratio of the panels,
+        defined as height divided by width.
+        The default value is \code{"fill"} to have the panels
+        expand to occupy as much space as possible. Set to 1 for square panels.
+        Set to \code{"xy"} to specify a ratio calculated
+        to display at 45 degrees, that is, with the line slope approximately
+        45 degrees.}\cr
 
 
   \item{theme}{Color theme for this analysis. Make persistent across analyses
@@ -348,49 +392,43 @@ vp(\dots)
         Modify fill and border colors with the \code{\link{style}} function 
         parameters \code{ellipse_fill} and \code{ellipse_color}.}\cr
 
-
-  \item{by}{A categorical variable to provide a scatterplot for
-        each level of the numeric primary variables \code{x} and
-        \code{y} on the \emph{same} plot, a \emph{grouping variable}.
-        For two-variable plots, applies to the panels of a
-        \bold{Trellis graphic} if \code{facet1} is specified.}
-  \item{facet1}{A categorical variable, the \emph{conditioning variable},
-        which activates Trellis (facet) graphics, provided by Deepayan 
-        Sarkar's (2007) lattice package, to provide
-        a \emph{separate} panel of numeric primary variables \code{x}
-        and \code{y} for each level of the \code{facet1} variable.
-        Re-order the levels by first converting to a factor variable with
-        \code{\link{factor}} or lessR \code{\link{factors}}.}
-  \item{facet2}{A second \emph{conditioning variable} to generate Trellis (facet)
-        plots jointly conditioned on both the \code{facet1} and \code{facet2}
-        variables, with \code{facet2} as the row variable, which yields a 
-        scatterplot (panel) for \emph{each} cross-classification of the levels
-        of numeric \code{x} and \code{y} variables.}
-  \item{n_row}{Optional specification for the number of rows and columns
-        in the layout of a multi-panel display with Trellis graphics. Specify
-        \code{n_col} or \code{n_row}, but not both.}
-  \item{n_col}{Optional specification for the number of columns in the
-        layout of a multi-panel display with
-        Trellis graphics. Specify \code{n_col} or \code{n_row}, but 
-        not both. If set to 1, the default, then
-        the strip that labels each group locates to the left of each plot
-        instead of the top.}
-  \item{aspect}{Lattice parameter for the aspect ratio of the panels,
-        defined as height divided by width.
-        The default value is \code{"fill"} to have the panels
-        expand to occupy as much space as possible. Set to 1 for square panels.
-        Set to \code{"xy"} to specify a ratio calculated
-        to "bank" to 45 degrees, that is, with the line slope approximately
-        45 degrees.}\cr
-
         
-  \item{time_unit}{Specify the time unit from which to plot a time series. 
-        Default value is the time unit that describes the data.
+  \item{time_unit}{Specify the time unit from which to plot a time series,
+        plotted when the $x$-variable is of type \code{Date}. 
+        Default value is the time unit that describes the time intervals as
+        they occur in the data.
         Aggregation according to the time unit will occur as specified, such as
-        a daily time series aggregated to \code{"years"}, \code{"quarters"}
-        or \code{"months"}. See \code{details} below for all possible values.}
-  \item{time_agg}{Function by which to aggregate according to \code{time_unit}.
-       Default is \code{"sum"}.}
+        a daily time series aggregated to \code{"months"}. Dates are currently
+        stored as variable type \code{Date()}, so fractions of a day are
+        not processed. Valid values include: \code{"days"}, \code{"weeks"},
+        \code{"months"}, \code{"quarters"}, and \code{"years"}.}
+  \item{time_agg}{Function by which to aggregate over time according to
+        \code{time_unit}. Default is \code{"sum"} with an option for
+        \code{"means"}.}
+  \item{time_ahead}{Holt-Winters exponential smoothing forecast for the 
+        specified number of \code{time_units} ahead of the last time period
+        in the data.}
+  \item{time_format}{A specified format (for R function \code{as.Date()})
+    that describes the values of the date variable on the x-axis, 
+    needed if the function cannot identify the date format to properly
+    decode the given date values. For example, describe a character string
+    date such as \code{"09/01/2024"} by the format \code{"\%m/\%d/\%Y"}.
+    See \code{details} for more information.}
+  \item{time_fit}{If \code{TRUE}, for each data value display the fitted value,
+        level, trend, and seasonal component.}
+  \item{es_level}{Holt-Winters exponential smoothing level parameter, 
+       \code{alpha}, numerical values from 0 to 1 to preset.}
+  \item{es_trend}{Holt-Winters exponential smoothing trend parameter,
+       \code{beta}, numerical values from 0 to 1 to preset or \code{FALSE}
+       to remove the effect.}
+  \item{es_seasons}{Holt-Winters exponential smoothing seasonal parameter,
+       \code{gamma}, numerical values from 0 to 1 to preset or \code{FALSE}
+       to remove the effect. Defaults to \code{FALSE} for annual data, which
+       cannot exhibit intra-annual seasonality.}
+  \item{es_type}{Type of seasonal model, default is \code{"additive"} with
+       a \code{"multiplicative"} option. Can also specify the value.}
+  \item{es_PIlevel}{Level of the prediction interval about the forecasted 
+       Holt-Winters values with a default of \code{0.95}.}
   \item{stack}{If \code{TRUE}, multiple time plots are stacked on each other, with
        \code{area} set to \code{TRUE} by default.}
   \item{lwd}{Width of the line segments. Set to zero to remove the line
@@ -408,18 +446,9 @@ vp(\dots)
        larger are above the line.}
   \item{n_date_tics}{Suggested number of ticks for the dates on the \code{x}-axis 
        to override the default of approximately 7.}
-  \item{run}{If set to \code{TRUE}, generate a \bold{run chart}, i.e., line chart,
-        in which
-        points are plotted in the sequential order of occurrence in the data table.
-        By default, the points are connected by line. Set by default when the
-        \code{x}-values
-        are sorted with equal intervals or a single variable is a time series.
-        To turn off connecting line segments for sorted, equal intervals data, set
-        to \code{FALSE}.
-        Customize the color of the line segments with \code{segments_color}
-        with function \code{\link{style}}.}
   \item{show_runs}{If \code{TRUE}, display the individual runs in the run analysis.
-        Also, sets \code{run} to \code{TRUE}.}
+        Also, sets \code{run} to \code{TRUE}. Customize the color of the line
+        segments with \code{segments_color} with function \code{\link{style}}.}
   \item{center_line}{Plots a dashed line through the middle of a run chart.
         Provides a center line for the \code{"median"} by default, when the values
         randomly vary about the mean. \code{"mean"} and \code{"zero"} specify that
@@ -427,13 +456,10 @@ vp(\dots)
         Currently does not apply to Trellis plots.} \cr
 
 
-  \item{stat}{Transform data for categorical variable \code{x}
-       into a simple table of paired levels of
-       \code{x} with numerical values of \code{y}.
-       Apply specified aggregation such as \code{"mean"}
-       to each of the levels of \code{x}, and, for a provided numerical
-       variable \code{y}, transformations such as \code{"mean"}, \code{"sd"}, etc.
-       The resulting dot plot is analogous to a bar chart.}
+  \item{stat}{Apply \bold{specified aggregation} such as \code{"mean"} for the
+       numerical \code{y} variable to each of the levels of categorical
+       variable \code{x}.
+       The resulting dot plot, or Cleveland plot, is analogous to a bar chart.}
   \item{stat_x}{If no \code{y} variable is specified, for constructing a
         frequency polygon, with access to the \code{bin_width} parameter. 
         Either do the
@@ -639,7 +665,7 @@ vp(\dots)
         the variable will be analyzed as categorical instead of continuous.
         Default is 0. Use to specify that such variables are to be analyzed
         as categorical, a kind of informal R factor.
-        \emph{[deprecated]}: Best to convert a categorical integer variable 
+        \bold{[deprecated]}: Best to convert a categorical integer variable 
         to a factor.}
   \item{value_labels}{For factors, default is the factor labels, and for
         character variables, default is the character values.
@@ -651,12 +677,12 @@ vp(\dots)
         they also apply to the \code{y}-axis. Control the plotted size
         with \code{axis_cex} and \code{axis_x_cex} from the lessR
         \code{\link{style} function.}
-        \emph{[deprecated]}: Better to convert a categorical integer variable to
+        \bold{[deprecated]}: Better to convert a categorical integer variable to
         a factor.}
-  \item{rows}{Deprecated old parameter name that is now called \code{filter}.}
-  \item{by1}{Deprecated old parameter name, replaced with the more descriptive
+  \item{rows}{\bold{Deprecated} old parameter name that is now called \code{filter}.}
+  \item{by1}{\bold{Deprecated} old parameter name, replaced with the more descriptive
         \code{facet1}.}
-  \item{by2}{Deprecated old parameter name, replaced with the more descriptive
+  \item{by2}{\bold{Deprecated} old parameter name, replaced with the more descriptive
         \code{facet2}.}\cr
 
 
@@ -712,7 +738,7 @@ VARIABLE LABELS\cr
 Although standard R does not provide for variable labels, \code{lessR} can store the labels in the data frame with the data, obtained from the \code{\link{Read}} function or \code{\link{VariableLabels}}.  If variable labels exist, then the corresponding variable label is by default listed as the label for the corresponding axis and on the text output. 
 
 ONE VARIABLE PLOT\cr
-The one variable plot of one continuous variable generates either a violin/box/scatterplot (VBS plot), or a run chart with \code{run=TRUE}, or \code{x} can be an R time series variable for a time series chart. For the box plot,
+The one variable plot of one continuous variable generates either a violin/box/scatterplot (VBS plot), or a run chart with if \code{.Index} appears as the name of the first variable listed, or \code{x} can be an R time series variable for a time series chart. For the box plot,
 for gray scale output potential outliers are plotted with squares and outliers are plotted with diamonds, otherwise shades of red are used to highlight outliers. The default definition of outliers is based on the standard boxplot rule of values more than 1.5 IQR's from the box. The definition of outliers may be adjusted (Hubert and Vandervieren, 2008), such that the whiskers are computed from the medcouple index of skewness (Brys, Hubert, & Struyf, 2004).
 
 The plot can also be obtained as a bubble plot of frequencies for a categorical variable.
@@ -752,11 +778,30 @@ All colors are displayed at the same level of gray-scale saturation and brightne
 The second possibility with \code{facet1} produces the different box plots on a separate panel, that is, a Trellis chart. These box plots are displayed with a single hue, the first color, blue, in the default qualitative sequence.
 
 TIME CHARTS\cr
-Specifying one or more \code{x}-variables with no \code{y}-variables, and \code{run=TRUE} plots the \code{x}-variables in a run chart. The values of the specified \code{x}-variable are plotted on the \code{y}-axis, with Index on the \code{x}-axis. Index is the ordinal position of each data value, from 1 to the number of values. 
+Specifying one or more \code{x}-variables with no \code{y}-variables, and \code{.Index} appears as the name of the \code{x}-variables in a run chart. The values of the specified \code{x}-variable are plotted on the \code{y}-axis, with Index on the \code{x}-axis. Index is the ordinal position of each data value, from 1 to the number of values. 
 
-If the specified \code{x}-variable is of type \code{Date}, or is an R time series, a time series plot is generated for each specified variable. If a formal R time-series, univariate or multivariate, specify as the \code{x}-variable. Or, specify the \code{x}-variable of type \code{Date}, and then specify the  \code{y}-variable as one or more time series to plot. The \code{y}-variable can be formatted as tidy data with all the values in a single column, or as wide-formatted data with the time-series variables in separate columns. 
+If the specified \code{x}-variable is of type \code{Date}, or is an R time series, a time series plot is generated for each specified variable. If a formal R time-series, univariate or multivariate, specify as the \code{x}-variable. Or, specify the \code{x}-variable of type \code{Date}, and then specify the  \code{y}-variable as one or more time series to plot. The \code{y}-variable can be formatted as tidy data with all the values in a single column, or as wide-formatted data with the time-series variables in separate columns.
 
-The parameter \code{time_unit} aggregates the date variable according to its specified value. The aggregation is based on two functions from the \code{xts} package, \code{endpoints()} and \code{period.apply()}. For example, a data variable has daily values but is plotted with aggregated quarterly values. Dates are currently stored as variable type \code{as.Date()}, so fractions of a day are not processed. Valid values include: \code{"days"}, \code{"weeks"}, \code{"months"}, \code{"quarters"}, and \code{"years"}.
+\code{Plot()} makes a reasonable attempt to decode a character string date value as the \code{x}-axis variable as read from a text data file such as a \code{csv} file. However, some date formats are not available for conversion by default, such as date values that include the name of the month instead of its number. And, in general, there can be no guarantee that a date format is not miss-inferred as they can be inherently ambiguous. 
+
+If the default date conversion is not working or is not available, then manually supply the date format following one of the format examples in the following table according to the parameter \code{time_format}.
+
+\tabular{ll}{
+Example Date \tab Format\cr
+--------------------------- \tab ----------------- \cr
+\code{"2022-09-01"} \tab \code{"\%Y-\%m-\%d"}\cr 
+\code{"2022/9/1"} \tab \code{"\%Y/\%m/\%d"}\cr
+\code{"2022.09.01"} \tab \code{"\%Y.\%m.\%d"}\cr
+\code{"09/01/2022"} \tab \code{"\%m/\%d/\%Y"}\cr
+\code{"9/1/22"} \tab \code{"\%m/\%d/\%y"}\cr
+\code{"September 1, 2022"} \tab \code{"\%B \%d, \%Y"}\cr
+\code{"Sep 1, 2022"} \tab \code{"\%b \%d, \%Y"}\cr
+\code{"20220901"} \tab \code{"\%Y\%m\%d"}\cr
+--------------------------- \tab ----------------- \cr
+}
+
+
+The parameter \code{time_unit} aggregates the date variable according to its specified value. The aggregation is based on two functions from the \code{xts} package, \code{endpoints()} and \code{period.apply()}. For example, a data variable has daily values but is plotted with aggregated quarterly values.
 
 Specify the function by which to aggregate with the parameter \code{time_agg}. The default is \code{"sum"}.
 
@@ -1026,14 +1071,14 @@ Plot(Salary, stat_x="count")  # bin the values
 # time charts
 #------------
 # run chart, with default fill area
-Plot(Salary, run=TRUE, area_fill="on")
+Plot(.Index, Salary, area_fill="on")
 
-# two run charts in same plot
+# two run charts in same panel 
 # or could do a multivariate time series
-Plot(c(Pre, Post), run=TRUE)
+Plot(.Index, c(Pre, Post))
 
 # Trellis graphics run chart with custom line width, no points
-Plot(Salary, run=TRUE, facet1=Gender, lwd=3, size=0)
+Plot(.Index, Salary, facet1=Gender, lwd=3, size=0)
 
 # daily time series plot
 # create the daily time series from R built-in data set airquality
@@ -1186,26 +1231,6 @@ d <- data.frame(x, y1, y2)
 #   which do not work with vectors of variables, so remove
 rm(x); rm(y1); rm(y2)
 Plot(x, c(y1, y2))
-
-
-#-----------
-# modern art
-#-----------
-clr <- colors()  # get list of color names
-color0 <- clr[sample(1:length(clr), size=1)]
-clr <- clr[-(153:353)]  # get rid of most of the grays
-
-n <- sample(5:30, size=1)
-x <- rnorm(n)
-y <- rnorm(n)
-color1 <- clr[sample(1:length(clr), size=1)]
-color2 <- clr[sample(1:length(clr), size=1)]
-
-style(window_fill=color0, color=color2)
-Plot(x, y, run=TRUE, area_fill="on",
-  xy_ticks=FALSE, main="Modern Art", xlab="", ylab="",
-  cex.main=2, col.main="lightsteelblue", center_line="off")
-style() # reset style to default
 }
 }
 

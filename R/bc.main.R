@@ -756,10 +756,14 @@ function(x, y, by, stack100,
       else
         lblval.y <- .fmt(y.coords,2)
     }
-    axis(ax.num, col=axis_y_color,   # maybe split off the text like with x axis?
-         col.axis=axis_y_text_color, cex.axis=axis_y_cex, las=las.value,
-         tck=-.02, padj=adj1,  at=y.coords, labels=lblval.y, ...)
+#   axis(ax.num, col=axis_y_color,   # maybe split off the text like with x axis?
+#        col.axis=axis_y_text_color, cex.axis=axis_y_cex, las=las.value,
+#        tck=-.02, padj=adj1,  at=y.coords, labels=lblval.y, ...)
          #tck=-.03, padj=adj1,  at=axTicks(ax.num, axp=scale_y), ...)
+    if(!horiz)
+        .axes(NULL, NULL, NULL, axT2=y.coords) 
+    else
+        .axes(NULL, NULL, axT1=y.coords, NULL) 
 
     # x-axis is the category value axis
     axis_x_color <- ifelse(is.null(getOption("axis_x_color")),

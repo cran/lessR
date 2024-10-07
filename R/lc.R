@@ -1,5 +1,0 @@
-lc <-
-function(...)
-
-  LineChart(...)
-

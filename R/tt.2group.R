@@ -33,11 +33,15 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
     cat("Compare", Ynm, "across", Xnm, "with levels", X1nm, "and", X2nm, "\n")
   # cat("--------------------------------------------------------------\n\n")
 
-    if ( (!is.null(x.lbl)) || (!is.null(y.lbl)) ) {
-      cat("Response Variable:  ", Ynm, ", ", as.character(y.lbl), sep="", "\n")
+    if (!is.null(x.lbl))
       cat("Grouping Variable:  ", Xnm, ", ", as.character(x.lbl), sep="", "\n")
-      cat("\n")
-    }
+    else
+      cat("Grouping Variable:  ", Xnm, sep="", "\n")
+    if (Ynm != as.character(y.lbl))
+      cat("Response Variable:  ", Ynm, ", ", as.character(y.lbl), sep="", "\n")
+    else 
+      cat("Response Variable:  ", Ynm, sep="", "\n")
+    cat("\n")
 
     if (!brief)
        cat("\n------ Describe ------\n\n")
@@ -420,19 +424,13 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       plt.i <- plt.i + 1
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X1nm))
 
-      .lc.main(YA, type=NULL,
-        col.line=getOption("pt_color"), col.area=NULL,
-        col.box=getOption("panel_color"),
-        col_color=getOption("pt_color"), 
-        col_fill=getOption("bar_fill_cont"), shape_pts=21,
-        col.bg=getOption("panel_fill"), lab_cex=getOption("lab_cex"),
-        axis_cex=0.75, col.axis="gray30", rotate_x=0, rotate_y=0, offset=.5,
-        xy_ticks=TRUE, line_width=1.1,
-        xlab=NULL, ylab=paste(Ynm,": ",X1nm, sep=""),
-        main=plt.title[plt.i], sub=NULL,
-        cex=NULL, time_start=NULL, time_by=NULL, time_reverse=FALSE,
-        center_line="default", quiet=TRUE)
-        
+      YA.df <- data.frame(YA)
+      x.df <- data.frame(1:nrow(YA.df))
+      .plt.main(x.df, YA.df, segments=TRUE, size=.85,
+                center_line="median", fill=getOption("pt_fill"),
+                xlab="Index", ylab=paste(Ynm,": ",X1nm, sep=""),
+                main=plt.title[plt.i])
+
       if (!is.null(pdf_file)) {
         dev.off()
         .showfile(paste("LineChart_", X1nm, ".pdf", sep=""),
@@ -446,20 +444,14 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
 
       plt.i <- plt.i + 1
       plt.title[plt.i] <- paste("Sequentially Ordered Data:", paste(Xnm, X2nm))
- 
-     .lc.main(YB, type=NULL,
-       col.line=getOption("pt_color"), col.area=NULL,
-       col.box=getOption("panel_color"),
-       col_color=getOption("pt_color"), 
-       col_fill=getOption("bar_fill_cont"), shape_pts=21,
-       col.bg=getOption("panel_fill"), lab_cex=getOption("lab_cex"),
-       axis_cex=0.85, col.axis="gray30", rotate_x=0, rotate_y=0, offset=.5,
-       xy_ticks=TRUE, line_width=1.1,
-       xlab=NULL, ylab=paste(Ynm,": ",X2nm, sep=""),
-       main=plt.title[plt.i], sub=NULL,
-       cex=NULL, time_start=NULL, time_by=NULL, time_reverse=FALSE,
-       center_line="default", quiet=TRUE)
 
+      YB.df <- data.frame(YB)
+      x.df <- data.frame(1:nrow(YB.df))
+      .plt.main(x.df, YB.df, segments=TRUE, size=.85,
+                center_line="median", fill=getOption("pt_fill"),
+                xlab="Index", ylab=paste(Ynm,": ",X2nm, sep=""),
+                main=plt.title[plt.i])
+ 
       if (!is.null(pdf_file)) {
         dev.off()
         .showfile(paste("LineChart_", X2nm, ".pdf", sep=""),

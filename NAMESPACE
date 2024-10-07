@@ -22,7 +22,7 @@ importFrom("graphics", abline, arrows, axis, axis.Date, barplot, box, boxplot, g
 
 importFrom("grDevices", boxplot.stats, col2rgb, colorRampPalette, colors, dev.cur, dev.list, dev.new, dev.off, dev.set, gray, heat.colors, hcl, palette, pdf, rainbow, rgb, terrain.colors, as.graphicsAnnot, hcl.colors, palette.colors)
 
-importFrom("stats", binom.test, confint.default, IQR, TukeyHSD, addmargins, anova, aov, as.formula, bw.nrd0, chisq.test, coef, complete.cases, confint, contrasts, cooks.distance, cor, cor.test, cov, density, dffits, dlnorm, dnorm, dt, dunif, factanal, fitted, frequency, glm, heatmap, interaction.plot, lm, lm.influence, loadings, loess, lowess, median, mahalanobis, na.omit, pf, pnorm, prop.test, power.t.test, predict, promax, pt, qnorm, qt, quantile, rbinom, replications, residuals, rlnorm, rnorm, reshape, rstandard, rstudent, runif, sd, shapiro.test, start, t.test, terms.formula, update, var, varimax, is.ts, time,  weighted.mean, fivenum, as.dist, hclust, cutree, aggregate, "DF2formula", "model.matrix")
+importFrom("stats", binom.test, confint.default, IQR, TukeyHSD, addmargins, anova, aov, as.formula, bw.nrd0, chisq.test, coef, complete.cases, confint, contrasts, cooks.distance, cor, cor.test, cov, density, dffits, dlnorm, dnorm, dt, dunif, factanal, fitted, frequency, glm, heatmap, interaction.plot, lm, lm.influence, loadings, loess, lowess, median, mahalanobis, na.omit, pf, pnorm, prop.test, power.t.test, predict, promax, pt, qnorm, qt, quantile, rbinom, replications, residuals, rlnorm, rnorm, reshape, rstandard, rstudent, runif, sd, shapiro.test, start, stl, t.test, terms.formula, update, var, varimax, is.ts, time,  weighted.mean, fivenum, as.dist, hclust, cutree, aggregate, "DF2formula", "model.matrix", "HoltWinters", "ts")
 
 importFrom("utils", head, help, packageVersion, read.csv, read.fwf, read.table, type.convert, write.csv, write.table, browseURL)
 
@@ -68,7 +68,6 @@ export (
   interact,
   kurtosis,
   label,
-  LineChart, lc,
   Logit, lr,
   Merge, mrg,
   Model, model, model_brief,
@@ -91,6 +90,7 @@ export (
   sort_by, Sort,
   Subset,
   SummaryStats, ss, ss_brief,
+  STL,
   style,
   to,
   train_test,

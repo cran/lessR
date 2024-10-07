@@ -213,16 +213,10 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
       plt.i <- plt.i + 1
       plt.title[plt.i] <- paste("Sequentially Plotted Data for", Ynm)
 
-      .lc.main(Y, type=NULL,
-        col.line=getOption("pt_color"), col.area=NULL, col.box="black",
-        col_color=getOption("pt_color"), 
-        col_fill=getOption("bar_fill_cont"), shape_pts=21,
-        col.bg=getOption("panel_fill"), lab_cex=getOption("lab_cex"),
-        axis_cex=0.75, col.axis="gray30", rotate_x=0, rotate_y=0, offset=.5,
-        xy_ticks=TRUE, line_width=1.1,
-        xlab=NULL, ylab=NULL, main=plt.title[plt.i], sub=NULL, cex=NULL,
-        time_start=NULL, time_by=NULL, time_reverse=FALSE,
-        center_line="default", quiet=TRUE)
+      Y.df = data.frame(Y)
+      x.df <- data.frame(1:nrow(Y.df))
+      .plt.main(x.df, Y.df, segments=TRUE, size=.9,
+                xlab="Index", ylab=NULL, main=plt.title[plt.i])
 
       if (!is.null(pdf_file)) {
         dev.off()

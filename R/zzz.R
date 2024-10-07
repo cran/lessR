@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.3.7                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.3.8                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -17,8 +17,8 @@ function(...) {
       "Many examples of reading, writing, and manipulating data, \n",
       "graphics, testing means and proportions, regression, factor analysis,\n",
       "customization, and descriptive statistics from pivot tables\n",
-      "  Go to:  https://web.pdx.edu/~gerbing/lessR/examples\n\n",
-      "View changes in this and recent versions of lessR\n",
+      "  Enter: browseVignettes(\"lessR\")\n\n",
+      "View lessR updates, now including time series forecasting\n",
       "  Enter: news(package=\"lessR\")\n\n",
       "Interactive data analysis\n",
       "  Enter: interact()\n")
@@ -38,7 +38,7 @@ function(...) {
   options(bar_fill = NULL)
   options(bar_fill_discrete = c("#4398D0", "#B28B2A", "#5FA140", "#D57388",
           "#9A84D6", "#00A898", "#C97E5B", "#909711", "#00A3BA", "#D26FAF",
-          "#00A76F", "#BD76CB" ))  # getColors("hues")
+          "#00A76F", "#BD76CB"))  # getColors("hues")
   options(bar_fill_cont = rgb(150,170,195, maxColorValue=255))
   options(trans_bar_fill = 0.10)
   options(bar_color = rgb(132,150,175, maxColorValue=255))
@@ -151,7 +151,7 @@ function(...) {
     message(">>> Parameter  ",  str.old,
             "  will soon stop working. New name: ", str.new, "'\n")
     return(nm.old)  # return symbol for old param variable, do not eval
-  } 
+  }
   else if (!miss.new)
     return(nm.new)  # return symbol for new param variable, do not eval
   else
@@ -165,7 +165,7 @@ function(...) {
 .lead0 <- function(x) {
   n.max.z <- 0
   dec.pt <- getOption("OutDec")
-  
+
   for (i in 1:length(x)) {
     fx <- format(x[i])
     nc <- nchar(fx)
@@ -195,7 +195,7 @@ function(...) {
 
   if (is.null(digits_d)) {
     if (all(loc.d == -1))  # no ., so integer with no decimal digits
-       dgs <- 0 
+       dgs <- 0
     else {
       lead0 <- .lead0(x.var)  # n of 0's to right of . for x < 1
       dgs <- ifelse (lead0>0, lead0+1, 3)  # 0's to right of .
@@ -206,7 +206,7 @@ function(...) {
 
   else {  # digits_d has been set
     dgs <- ifelse (all(loc.d == -1), 0, digits_d)
-    x <- round(x, dgs) 
+    x <- round(x, dgs)
   }
 
   return(x)
@@ -218,7 +218,7 @@ function(...) {
 .max.dd <- function(x) {
 
   max.dd <- 0
-  n.reps <- min(500, length(x))
+  n.reps <- min(250, length(x))
   for (i in 1:n.reps) {  # length(x) is number of data values
     if (!is.na(x[i])) {
       xc <- format(x[i])  # as.character(51.45-48.98) does not work
@@ -250,6 +250,7 @@ function(...) {
    return(0)
 }
 
+# round with specified number of digits present
 .fmt <- function(k, d=getOption("digits_d"), w=0, j="right") {
   format(sprintf("%.*f", d, k), width=w, justify=j, scientific=FALSE)
 }
@@ -277,7 +278,7 @@ function(...) {
 
 
 .fmtNS <- function(k) {
-  format(k, scientific=FALSE )
+  format(k, scientific=FALSE)
 }
 
 
@@ -323,19 +324,53 @@ function(...) {
 }
 
 
-# extract sequence of dates from time series y
-.ts.dates <- function(y) {
+.charToDate <- function(char, punct, n.ch) {
 
-  date_num <- as.numeric(time(y))  # time creates vector of ts times
-  year <- floor(date_num)
-  year_beg <- as.POSIXlt.character(paste0(year, '-01-01 01:01:01'))
-  year_end <- as.POSIXlt.character(paste0(year+1, '-01-01 01:01:01'))
-  diff.yr <- year_end - year_beg
-  dates <- year_beg + ((date_num %% 1) * diff.yr)
-  dates <- as.Date(format(dates, format='%Y-%m-%d')) # from POSIX to Date
-  x <- dates  # dates to be on x-axis
+  # date.fmts are the date formats to process
+  if (n.ch == 8) {
+    if (punct=="/") date.fmts <- c("%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y")
+    if (punct=="-") date.fmts <- c("%Y-%m-%d", "%d-%m-%Y", "%m-%d-%Y")
+    if (punct==".") date.fmts <- c("%Y.%m.%d", "%d.%m.%Y", "%m.%d.%Y")
+  }
+  if (n.ch == 6) {
+    if (punct=="/") date.fmts <- c("%d/%m/%y", "%m/%d/%y")
+    if (punct=="-") date.fmts <- c("%d-%m-%y", "%m-%d-%y")
+    if (punct==".") date.fmts <- c("%d.%m.%y", "%m.%d.%y")
+  }
 
-  return(x)
+  for (fmt in date.fmts) {
+    # obtain only valid dates
+    dates <- try(as.Date(char, format=fmt), silent=FALSE)
+
+    # process valid dates further to obtain the likely correct valid date
+    if (!inherits(dates, "try-error") && all(!is.na(dates))) {  # no errors
+      year.n <- as.numeric(format(dates[1], "%Y"))
+      y.valid <- ifelse (year.n > 1000, TRUE, FALSE)
+      months <- as.numeric(format(dates, "%m"))
+      m.unq <- length(unique(months))
+      days <- as.numeric(format(dates, "%d"))
+      d.unq <- length(unique(days))
+      m.valid <- ifelse (d.unq == 12, FALSE, TRUE)
+      d.valid <- ifelse (m.unq == 12, TRUE, FALSE)
+
+      if (y.valid  &&  m.valid  && d.valid) {
+        cat("\nBest guess for the date format:", fmt, "\n\n")
+        if (getOption("suggest")) 
+          cat(" If this format is not correct, specify precisely with the\n",
+              " parameter: time_format. To see all formats, enter: ?strptime\n",
+              " Examples:  \"08/18/2024\" format is \"%m/%d/%Y\"\n",
+              "            \"18-08-24\"   format is \"%d-%m-%y\"\n",
+              "            \"August 18, 2024\", format is \"%B %d, %Y\"\n\n")
+        return(dates)  # Return converted dates
+      }
+      else
+        next
+    }  # dates converted
+
+    # date not recognized
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Date not recognized. Specify format with:  time_format\n\n")
+  }  # end fmt in
 }
 
 
@@ -392,10 +427,10 @@ function(...) {
   if (substr(txt, 1, 1) == "\"") {  # parameter value is in quotes
     txt <- sub("include", "%in%", txt, fixed=TRUE)
     if (grepl(" exclude ", txt, fixed=TRUE))
-      txt <- paste("!(", txt, ")", sep="") 
+      txt <- paste("!(", txt, ")", sep="")
     txt <- sub("exclude", "%in%", txt, fixed=TRUE)
     txt <- gsub("\"", "", txt, fixed=TRUE)  # remove the quotes
-  }  # end expression in quotes 
+  }  # end expression in quotes
 
   return(txt)
 }
@@ -406,18 +441,17 @@ function(...) {
   # if "variable" is really an expression, then stop
   if ((grepl("(", var.name, fixed=TRUE) ||
       grepl("[", var.name, fixed=TRUE) ||
-      grepl("$", var.name, fixed=TRUE)) && substr(var.name, 1, 1) != "c")  {
+      grepl("$", var.name, fixed=TRUE))
+      && substr(var.name, 1, 1) != "c")  {
     txtA <- paste("A referenced variable in a lessR function can only be\n",
             "a variable name.\n\n", sep="")
     txtB <- "For example, this does not work:\n  > Histogram(rnorm(50))\n\n"
     txtC <- "Instead do this:\n  > Y <- rnorm(50)\n  > Histogram(Y)"
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-        txtA, txtB, txtC, "\n")
+    cat("\n"); stop(call.=FALSE, "\n------\n", txtA, txtB, txtC, "\n")
   }
 
   expr <- parse(text=var.name)  # convert char string to expression
   var.nm <- all.vars(expr)  # get >= 1 variable names, 1st and last for :
-  ge <- (ls(name=.GlobalEnv))
 
   if (length(var.nm) > 0) {
     in.global <- logical(length=length(var.nm))
@@ -442,7 +476,7 @@ function(...) {
     in.global <- TRUE
 
   if (any(in.global) && !all(in.global)) {  # eval $ in .xcheck
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    cat("\n"); stop(call.=FALSE, "\n------\n",
       "Some variables are in a data frame,\n",
       "  and other variables are not. All must exist and\n",
       "  be in a data frame or not.\n\n")
@@ -458,8 +492,6 @@ function(...) {
 # include both R data frames and tidyverse tibbles
 .getdfs <- function() {
 
-  objs <- function(x) class(get(x))
-
   inGlb <- ls(name=.GlobalEnv)
   if (length(inGlb) > 0) {
     dfs <- character(length=0)
@@ -470,9 +502,6 @@ function(...) {
         dfs[k] <- inGlb[i]
       }
     }
-
-#   mylbl <- which(dfs == "l")
-#   if (length(mylbl) > 0) dfs <- dfs[-mylbl]
   }
   else
     dfs <- NULL
@@ -503,7 +532,7 @@ function(...) {
         "Or, just re-read the data into the d data table\n\n", sep="")
 
     if (length(dfs) == 0) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
         "An analysis is of data values for one or more variables found\n",
         "  in a rectangular data table, with the data values for a \n",
         "  variable located in a column.\n\n",
@@ -528,7 +557,7 @@ function(...) {
       nm <- parse(text=paste("names(", dfs[1],")"))
       nm <- eval(nm)
       for (i in 1:length(nm)) nm[i] <- paste(nm[i], " ")
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
         "Data table ", dname, txtA, "does not exist\n\n",
         "You have read data into one data table, ", dfs[1], ", but that\n",
         "  is not the data table ", dname, " that was to be analyzed\n\n",
@@ -542,7 +571,7 @@ function(...) {
       dts <- ""
       for (i in 1:length(dfs)) dts <- paste(dts, dfs[i])
       if (dname == "d") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        cat("\n"); stop(call.=FALSE, "\n------\n",
           "Data table ", dname, txtA, "does not exist\n\n",
           "Data tables you read and/or created: ", dts, "\n\n",
           "Perhaps you have a data table that contains the variables\n",
@@ -553,7 +582,7 @@ function(...) {
           "Or, just re-read the data into the d data table\n\n")
         }
       else {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        cat("\n"); stop(call.=FALSE, "\n------\n",
           "Data table ", dname, txtA, "does not exist\n\n",
           "Perhaps you have a data table that contains the variables\n",
           "  of interest to be analyzed, but it is not named ", dname, "\n\n",
@@ -603,7 +632,7 @@ function(...) {
         txtDef <- ""
 
       if (length(dfs) == 1) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        cat("\n"); stop(call.=FALSE, "\n------\n",
           "You are attempting to analyze the variable ", var.nm[i], " in the\n",
           "  data table called ", dname, txtDef, "\n",
           "Unfortunately, variable ", var.nm[i], " does not exist in ", dname,
@@ -617,7 +646,7 @@ function(...) {
         nm2 <- parse(text=paste("names(", dfs[1],")"))
         nm2 <- eval(nm2)
         nm2 <- paste(nm2, " ")
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        cat("\n"); stop(call.=FALSE, "\n------\n",
           "You are attempting to analyze the variable ", var.nm[i], " in the\n",
           "  data table called ", dname, txtDef, "\n",
           "Unfortunately, variable ", var.nm[i], " does not exist in ",
@@ -872,7 +901,7 @@ function(...) {
     if (!is.null(dname)) {
       if (dname %in% ls(name=.GlobalEnv)) {
         l <- attr(get(dname, pos=.GlobalEnv), which="variable.labels")
-        myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
+#       myunits <- attr(get(dname, pos=.GlobalEnv), which="variable.units")
       }
       else
         l <- NULL
@@ -903,8 +932,9 @@ function(...) {
   if (is.null(xlab)) if (st.nya) x.lab <- ""
 
   # get y.lab
-  if (is.null(y.lbl) && is.null(ylab))
+  if (is.null(y.lbl) && is.null(ylab)) {
       y.lab <- y.name
+  }
   else {
     if (!is.null(ylab))
       y.lab <- ylab  # ylab specified
@@ -979,8 +1009,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
   if (grepl("Alternative", lab, fixed=TRUE)) var.nm <- FALSE
   if (var.nm) {
     lab <- paste(nm, ": ", lab, sep="")
-#   if (!grepl("\n", lab, fixed=TRUE))  # bquote removes the \n
-#     lab <- bquote(paste(italic(.(nm)), ": ", .(lab)))
   }
   strw <- strwidth(lab, units=units, cex=labcex)
   n.lab_ln <- (strw %/% cut) + 1
@@ -1001,17 +1029,17 @@ function(lab, labcex, cut, nm, var.nm, units) {
     # trim a possible trailing blank line
     if (line[n.lab_ln] == "") line <- line[1:(n.lab_ln-1)]
 
-    if (length(line) == 1 ) {
+    if (length(line) == 1) {
       lab <- line
     }
-    else if (length(line) == 2 ) {  # break label down the middle
+    else if (length(line) == 2) {  # break label down the middle
       brk <- nchar(lab) %/% 2
       while (substr(lab,brk,brk) != " ") brk <- brk-1  # break at word boundary
       line1 <- substr(lab, 1, brk)
       line2 <- substr(lab, brk+1, nchar(lab))
       lab <- paste(line1, "\n",  line2)
     }
-    else if (length(line) > 2 ) {  # use re-constructed lines
+    else if (length(line) > 2) {  # use re-constructed lines
       lab <- ""
       for (i in 1:length(line)) {
         lab <- paste(lab, line[i])
@@ -1075,7 +1103,11 @@ function(lab, labcex, cut, nm, var.nm, units) {
         lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
       dec.d <- .getdigits(round(axT1,6),1) - 1
       axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
-      text(x=axT, y=usr[3], labels=.fmt(axT,dec.d),
+    if (all(axT %% 1000 == 0)  &&  all(abs(axT)[abs(axT)>0] > 1000))
+      lbl <- paste0(axT %/% 1000, "K")
+    else
+      lbl <- .fmt(axT,dec.d)
+      text(x=axT, y=usr[3], labels=lbl,
            pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
            srt=rotate_x, offset=offset, font=fnt, ...)
     }
@@ -1094,10 +1126,15 @@ function(lab, labcex, cut, nm, var.nm, units) {
         lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
     dec.d <- .getdigits(round(axT2,6),1) - 1
     axT <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
-    text(x=usr[1], y=axT, labels=.fmt(axT,dec.d),
+    if (all(axT %% 1000 == 0)  &&  all(abs(axT)[abs(axT)>0] > 1000))
+      lbl <- paste0(axT %/% 1000, "K")
+    else
+      lbl <- .fmt(axT,dec.d)
+    text(x=usr[1], y=axT, labels=lbl,
          pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
          srt=rotate_y, font=fnt, ...)
   }
+
   else if (!is.null(y.lvl)) {
     axis(2, at=axT2, labels=FALSE, tck=-.01, col=ax$axis_y_color,
         lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
@@ -1136,7 +1173,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
   # xlab_adj <- xlab_adj / ln.ht.x
   # ylab positioning
-  ln.ht.y <- par('cin')[2] * lab_y_cex * par('lheight')  # line ht inches
+  ln.ht.y <- par("cin")[2] * lab_y_cex * par("lheight")  # line ht inches
   lby <- (.9*ln.ht.y) / 0.19
   lbly.lns <- par("mar")[2] - (0.3 + 1*n.lab_y.ln) * lby  # mar 2: lm lines
   ylab_adj <- ylab_adj / ln.ht.y
@@ -1273,7 +1310,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
         cat(irep, "  flips:", .fmti(flip,3), "  bw: ", .fmt(bw,4), "\n", sep="")
     }
     else
-      break;
+      break
   }  # end repeat
 
   return(bw)
@@ -1390,7 +1427,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
   cat("\n")
   cat(">>> ", x.name, " has only only ", nu, " equally spaced unique ",
       "integer values <= n_cat=", n_cat, "\n",
-      "    so treat as categorical, and perhaps convert to an R factor\n", sep="")
+      "    so treat as categorical, convert to an R factor\n", sep="")
 
   if (!brief)
     cat("    For numeric, set n_cat smaller than ", nu,
@@ -1496,7 +1533,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
   if (!diverge) {
     # for ordinal variables, or color theme not default, get sequential palette
     # for not ordinal and default color theme, qualitative palette
-    if (theme == "colors" ) {
+    if (theme == "colors") {
       clrs <- ifelse (seq.pal, "blues", "hues")
     }
     else if (theme %in% c("gray", "white")) clrs <- "grays"
@@ -1512,7 +1549,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
   else {  # divergent palette
     if ((theme %in% c("gray", "white"))) {
       clrs <- c("grays", "grays")
-      color <- c("gray50")
     }
     else if ((theme %in% c("hues", "lightbronze", "dodgerblue", "blue",
                             "gold", "brown", "sienna", "orange")))
@@ -1533,11 +1569,11 @@ function(lab, labcex, cut, nm, var.nm, units) {
 # from explicit getColors() call in fill parameter, get the colors
 # get args and add n=
 .do_getColors <- function(fill.name, n.clr) {
-        
+
     gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
   if (!grepl("output", fill.name, fixed=TRUE))   # "output" not exist
     txt <- paste("fill <- getColors(", gc.args, ", n=", n.clr,
-                 ", output=FALSE)", sep="")  # default is FALSE 
+                 ", output=FALSE)", sep="")  # default is FALSE
   else
     txt <- paste("fill <- getColors(", gc.args, ", n=", n.clr,
                  ")", sep="")  # output specified
@@ -1582,7 +1618,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
       if (fill[1] %in% nm)
         clrs <- getColors(fill[1], n=n.clr, output=FALSE)  # sequential palette
-      else 
+      else
         clrs <- fill  # not an identified name of a color range
 
       if (length(fill == 2)) {  # divergent
@@ -1602,7 +1638,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
 # match a hue to the color theme
 .get.h <- function(theme=getOption("theme")) {
 
-       if (theme %in% c("gray", "white")) h=0  # any value for h works
+       if (theme %in% c("gray", "white")) h <- 0  # any value for h works
   else if (theme %in% c("colors", "lightbronze", "dodgerblue", "blue")) h <- 240
   else if (theme %in% c("gold", "brown", "sienna")) h <- 60
   else if (theme == "orange") h <- 30
@@ -1710,10 +1746,10 @@ function(lab, labcex, cut, nm, var.nm, units) {
   strt1 <- loc[[1]]  # beginning of argument
   if (strt1 > 0) {
     j <- strt1
-    while(substr(fc, start=j, stop=j) != "\"") j <- j + 1
+    while (substr(fc, start=j, stop=j) != "\"") j <- j + 1
     strt <- j
     j <- j + 1  # first " after ,
-    while(substr(fc, start=j, stop=j) != "\"") j <- j + 1
+    while (substr(fc, start=j, stop=j) != "\"") j <- j + 1
     stp <- j  # second " after ,
     value <- substr(fc, start=strt, stop=stp)
   }
@@ -1735,12 +1771,12 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
     j <- loc
     if (!first.arg)  # is not first argument, start at preceding comma
-      while(substr(fc, start=j, stop=j) != ",") if (j > 0) j <- j - 1
+      while (substr(fc, start=j, stop=j) != ",") if (j > 0) j <- j - 1
     strt <- j  #  closing parentheses or comma before argument
 
-    while(substr(fc, start=j, stop=j) != "\"") if (j < 1000) j <- j + 1
+    while (substr(fc, start=j, stop=j) != "\"") if (j < 1000) j <- j + 1
     j <- j + 1  # first " after ,
-    while(substr(fc, start=j, stop=j) != "\"") if (j < 1000) j <- j + 1
+    while (substr(fc, start=j, stop=j) != "\"") if (j < 1000) j <- j + 1
     stp <- j  # second " after ,
 
     if (first.arg) stp <- stp + 2  # remove trailing comma and space
@@ -1765,7 +1801,8 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
     j <- loc
     if (!first.arg)  # is not first argument, start at preceding comma
-      while(substr(fc, start=j, stop=j) != "," &&  substr(fc, start=j, stop=j) != "")
+      while (substr(fc, start=j, stop=j) != "," &&
+             substr(fc, start=j, stop=j) != "")
          if (j < 1000) j <- j + 1
     stp <- j  #  closing parentheses or comma before argument
     if (first.arg) stp <- stp + 2  # remove trailing comma and space
@@ -1810,13 +1847,13 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
     j <- loc
     if (!first.arg)  # is not first argument, start at preceding comma
-      while(substr(fc, start=j, stop=j) != ",") if (j > 0) j <- j - 1
+      while (substr(fc, start=j, stop=j) != ",") if (j > 0) j <- j - 1
     strt <- j  #  closing parentheses or comma before argument
 
     dlm <- c(",", ")")
 
     j <- j + 1
-    while(!(substr(fc, start=j, stop=j) %in% dlm))
+    while (!(substr(fc, start=j, stop=j) %in% dlm))
       if (j < 1000) j <- j + 1
 
     stp <- j  # got a "," or a ")"
@@ -1876,7 +1913,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
         if (i.val > c.val) c.val <- i.val
       }
     }
-      #c.val <- 4
     if (!cors)
       max.ln[j] <- max(colnm.w[j], c.val) + 1
     else {
@@ -1964,7 +2000,8 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
     for (j in 1:ncol(x)) {
       if (is.integer(x[i,j]))
-        tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j], w=max.ln[j]), sep="")
+        tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j],
+                                w=max.ln[j]), sep="")
 
       else if (is.numeric(x[i,j])) {
         wd <- max.ln[j]
@@ -2012,4 +2049,3 @@ pn <- function(x) {
   cat("\n", paste(xstr,":", sep=""), x, "\n")
 
 }
-

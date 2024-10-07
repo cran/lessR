@@ -36,8 +36,6 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, facet1.nm=FALSE,
     digits_d <- .max.dd(x) + 1
     if (digits_d == 1) digits_d <- 2
   }
-  else
-    digits_d <- digits_d
   options(digits_d=digits_d)
   if (digits_d > 10  && is.null(digits_d)) {
     cat("\nThese data values contain ", digits_d, " decimal digits. To enhance\n",

@@ -1,5 +1,5 @@
 BarChart <-
-function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL, 
+function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
         stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
         stat_x=c("count", "proportion"),
@@ -27,7 +27,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
         pad_y_min=0, pad_y_max=0,
 
-        rotate_x=getOption("rotate_x"), break_x=NULL,    
+        rotate_x=getOption("rotate_x"), break_x=NULL,
         offset=getOption("offset"),
         label_max=100,
 
@@ -38,8 +38,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
         quiet=getOption("quiet"), do_plot=TRUE,
-        pdf_file=NULL, width=6.5, height=6, 
-        digits_d=NULL, out_size=80, 
+        pdf_file=NULL, width=6.5, height=6,
+        digits_d=NULL, out_size=80,
 
         n_cat=getOption("n_cat"), value_labels=NULL,
         rows=NULL, by1=NULL,
@@ -58,17 +58,17 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   nms <- names(as.list(match.call()))
   if (!is.null(nms)) {
     if ("facet2" %in% nms) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
         "parameter  facet2  not applicable to BarChart\n\n")
     }
   }
 
   # ------------ Old Stuff ----------------------------------
-  if (!missing(rows)) 
+  if (!missing(rows))
     message(">>> Parameter  rows  renamed to:  filter.\n",
             "    Change to  filter,  rows  will stop working in the future.\n")
 
-  if(!missing(n_cat) || !missing(value_labels)) {
+  if (!missing(n_cat) || !missing(value_labels)) {
     message(">>> Parameters  n_cat  and  value_labels  will no longer ",
             "work in the future.\n",
              "    Better to convert a categorical integer variable to ",
@@ -81,7 +81,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     for (i in 1:length(dots)) {
       if (grepl("values", names(dots)[i], fixed=TRUE)) {
         n.values <- n.values + 1
-        if (n.values == 1) 
+        if (n.values == 1)
           message(">>> Parameters  values, values_color, etc. now ",
                   "renamed to:  labels, labels_color, etc.\n",
                   "    Old parameter names will stop working in the future.\n")
@@ -93,8 +93,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         if (names(dots)[i] == "values_cut") labels_cut <- dots[[i]]
       }
     }
-    if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]] 
-    if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]] 
+    if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]]
+    if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]]
     if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
     if (grepl(".", names(dots)[i], fixed=TRUE)) {
       nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)  # dot to _
@@ -104,7 +104,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   }
 
   if (!is.null(stat)) if (stat[1] == "proportion") {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    cat("\n"); stop(call.=FALSE, "\n------\n",
       "now use parameter  stat_x  for \"proportion\" \n",
       "  \"proportion\" only applies when there is no y numeric variable\n\n")
   }
@@ -139,16 +139,16 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   if (stat.miss) stat <- NULL
   if (!is.null(stat[1])) stat <- match.arg(stat)  # if condition for shiny
   stat_x <- match.arg(stat_x)
-  
+
 
   #------------- Set Some Parameter Values --------------------------
 
   proportion <- ifelse (stat_x[1] == "proportion", TRUE, FALSE)  # make stat_x
 
   if (horiz) {
-    if (sort == "+") sort <- "x" 
-    if (sort == "-") sort <- "+" 
-    if (sort == "x") sort <- "-" 
+    if (sort == "+") sort <- "x"
+    if (sort == "-") sort <- "+"
+    if (sort == "x") sort <- "-"
   }
 
   if (theme != getOption("theme")) {  # given theme not the current theme
@@ -159,7 +159,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     if (is.null(trans)) trans <- 0.1  # kludge, should not be NULL
   }
 
-  if (missing(break_x)) 
+  if (missing(break_x))
     break_x <- ifelse (!horiz && rotate_x==0, TRUE, FALSE)
 
   xlab.adj <- lab_adjust[1];   ylab.adj <- lab_adjust[2]
@@ -175,16 +175,16 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   }
 
   # ensure valid parameter values
-  .bcParamValid(y.miss, by.miss, facet1.miss, Trellis, sort, fill_split, fill.miss,
-                labels_position, stat.miss)
+  .bcParamValid(y.miss, by.miss, facet1.miss, Trellis, sort, fill_split,
+                fill.miss, labels_position, stat.miss)
 
- 
+
   # --------- data frame stuff -------------------------------------
   
-  data.miss <- ifelse (missing(data), TRUE, FALSE) 
+  data.miss <- ifelse (missing(data), TRUE, FALSE)
 
   # let deprecated mydata work as default
-  dfs <- .getdfs() 
+  dfs <- .getdfs()
   mydata.ok <- FALSE
   if (!is.null(dfs)) {
     if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
@@ -209,7 +209,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       shiny <- TRUE
       data <- eval(substitute(data), envir=parent.frame())
     }
- 
+
   # if a tibble, convert to data frame
   if (!shiny) {
     if (exists(df.name, envir=.GlobalEnv)) {
@@ -233,7 +233,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
       # force evaluation (not lazy) if data not specified, relies on default d
       if (data.miss) {
-        if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
+        if (!mydata.ok) .nodf(df.name)  # check to see if df exists
         # the 1.201 comes from Shiny, need to reset
         # l.cex and l.axc are set in interact() before shiny run
         if (getOption("lab_cex") == 1.201) {
@@ -249,9 +249,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     else # df.name is NULL
       x.in.global <- TRUE
   }
-    
-  eval_df <- !x.in.global 
- 
+
+  eval_df <- !x.in.global
+
 
   # -----------------------------------------------------------
   # establish if a data frame, if not then identify variable(s)
@@ -287,7 +287,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         if (any(r))
           data <- data[r,,drop=FALSE]
         if (!quiet) {
-          if (!missing(filter))  # filter parameter present 
+          if (!missing(filter))  # filter parameter present
             cat("\nfilter: ",  txt, "\n-----\n")
           cat("Rows of data before filtering: ", nr.before, "\n")
           cat("Rows of data after filtering:  ", nrow(data), "\n\n")
@@ -343,7 +343,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       by.name <- deparse(substitute(by))
       options(byname = by.name)
       # get conditions and check for data existing
-      by.in.global <- ifelse (df.name!="NULL", 
+      by.in.global <- ifelse (df.name!="NULL",
                               .in.global(by.name, quiet), TRUE)
 
       if (!by.in.global) {
@@ -362,7 +362,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       by.call <- NULL
 
     if (labels_position == "out"  &&  !is.null(by.call)  &&  !beside) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
         "labels_position=\"out\" not meaningful for a  by  variable\n",
         "  without beside=TRUE\n\n")
     }
@@ -382,8 +382,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         y.in.global <- TRUE
       }
     }
-      
-    eval_df <- !y.in.global 
+
+    eval_df <- !y.in.global
 
     # if not missing, then must be aggregated data
     #-------------
@@ -422,7 +422,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         facet1.call <- eval(substitute(data$facet1))
       else {  # vars that are function names get assigned to global
         facet1.call <- facet1
-        if (is.function(facet1.call)) facet1.call <- eval(substitute(data$facet1))
+        if (is.function(facet1.call))
+          facet1.call <- eval(substitute(data$facet1))
       }
 
       if (!is.factor(facet1.call)) facet1.call <- factor(facet1.call)
@@ -470,7 +471,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
           xtb <- xtb[order(xtb, decreasing=srt.dwn)]
         }
         fill <- .getColC(xtb, fill_name=fill.name)
-      }  # end .count 
+      }  # end .count
 
       # evaluate getColors at the time of the function call
       # re-evaluate here by setting fill with the specified value of n
@@ -501,7 +502,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     # .get_fill returns a sequential or hues color name for the theme
     if (fill.miss  &&  theme == getOption("theme")) {
       if (is.ord || !is.null(by.call))   # default range
-        fill <- .color_range(.get_fill(theme, is.ord), n.levels) 
+        fill <- .color_range(.get_fill(theme, is.ord), n.levels)
       else {
         fill <- getOption("bar_fill_discrete")  # to begin, have "hues" colors
         if (fill[1] == "hues")  # if invoke style(), then colors are "hues"
@@ -540,28 +541,28 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     }
 
     if (!is.smry_tbl && !is.null(y.call) && stat.miss) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
         "The data are not a summary table, and you have a ",
         "numerical variable,\n",
         "    y = ", y.name, "\n",
         "so need to specify a value of  stat  to define the aggregation of\n",
         y.name, ", such as stat=\"mean\".\n\n")
-    }      
+    }
 
     if (!is.null(y.call)) {  # a y variable present
       if (is.smry_tbl) {  # a summary table
 
         if (!stat.miss  &&  is.smry_tbl) { # y and a summary table, no stat
-          cat("\n"); stop(call.=FALSE, "\n","------\n",
+          cat("\n"); stop(call.=FALSE, "\n------\n",
             "The data are a summary table, so do not specify a value of\n",
             "  stat  as the data aggregation has already been done\n\n")
-        }      
+        }
 
         if (sum(is.na(x.call)) > 0 ||
               sum(is.na(by.call)) > 0 ||
               sum(is.na(y.call)) > 0)   {
-              ok <- is.finite(x.call) & is.finite(by.call) & is.finite(y.call)
-            cat("\n"); stop(call.=FALSE, "\n","------\n",
+#             ok <- is.finite(x.call) & is.finite(by.call) & is.finite(y.call)
+            cat("\n"); stop(call.=FALSE, "\n------\n",
               "When reading a summary table, missing data not allowed.\n\n")
         }
       }  # end is summary table
@@ -572,7 +573,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
       # facet2 not currently available
       .bar.lattice(x.call, facet1.call, facet2=NULL, n_row, n_col, aspect,
-                   proportion, 
+                   proportion,
                    fill, color, trans, size.pt=NULL, xlab, ylab, main,
                    rotate_x, offset,
                    width, height, pdf_file,
@@ -594,12 +595,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       }
 
       # y is present with raw data and stat not null
-      if (!is.null(stat) && !is.null(y.call) && !is.smry_tbl) { 
+      if (!is.null(stat) && !is.null(y.call) && !is.smry_tbl) {
         n_cat <- 0
 
         # do stats here to the console output before reducing data
         if (!quiet) {
-          digits.d <- getOption("digits.d")
 
             txout <- ""
             if (missing(by)) {  # no show stats for one var when a by var
@@ -640,14 +640,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       is.range.nm <- ifelse (length(.color_range(fill, n.clr=5)) > 1,
                              TRUE, FALSE)
       if (!is.range.nm && !by.miss && !fill.miss && !is.null(by.call)) {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
+        cat("\n"); stop(call.=FALSE, "\n------\n",
           "For custom fill for a two-variable bar chart,\n",
           " must specify a color range such as \"colors\" or \"grays\", \n\n")
       }
 
       bc <- .bc.main(x.call, y.call, by.call, stack100,
             fill, color, trans, fill_split, theme,
-            horiz, gap, proportion, scale_y, 
+            horiz, gap, proportion, scale_y,
             xlab, ylab, main,
             value_labels, label_max, beside,
             rotate_x, offset, break_x, sort,
@@ -657,14 +657,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
             pad_y_min, pad_y_max,
             legend_title, legend_position, legend_labels,
             legend_horiz, legend_size, legend_abbrev, legend_adjust,
-            add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet, 
+            add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet,
             shiny, ...)
 
       if (!is.null(pdf_file)) {
         dev.off()
         if (!quiet) .showfile(pdf_file, "BarChart")
       }
-          
+
       return(invisible(bc))
     }  # not Trellis
 
@@ -678,12 +678,12 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   # ---------------------------------------------------
   else {
     if (!is.null(by) || !is.null(facet1)) {
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
         "by and facet1 variables not available for multiple x variables\n\n")
     }
 
     # if labels not assigned, do default
-    if (is.null(labels)) { 
+    if (is.null(labels)) {
         labels <- getOption("labels")
         if (labels != "off") if (missing(y)) labels <- "input"
     }
@@ -724,19 +724,19 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
       if (color.miss) color <- "transparent"
 
-      # if fill not specified, define divergent palette and get colors 
+      # if fill not specified, define divergent palette and get colors
       if (fill.miss) {
         fill <- .get_fill(theme, diverge=TRUE)  # get divergent color names
-        fill <-.color_range(fill, uq.ln)  # translate color names to colors       
+        fill <-.color_range(fill, uq.ln)  # translate color names to colors
       }  # end fill.miss
 
       # evaluate getColors at the time of the function call
       # re-evaluate here by setting fill with the specified value of n
-      else if (substr(fill.name, 1, 9) == "getColors") 
+      else if (substr(fill.name, 1, 9) == "getColors")
         fill <- .do_getColors(fill.name, uq.ln)
 
       else  # not fill=getColors(...) but color names were specified
-        fill <-.color_range(fill, uq.ln)  # translate color names to colors       
+        fill <-.color_range(fill, uq.ln)  # translate color names to colors
 
       if (!is.null(pdf_file)) {
         if (!grepl(".pdf", pdf_file))
@@ -747,10 +747,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         if (df.name != "NULL")  # not dev.new for shiny
             .opendev(pdf_file, width, height)
       }
-      
+
       bc <- .bc.main(data, y.call, by.call, stack100,
             fill, color, trans, fill_split, theme,
-            horiz, gap, proportion, scale_y, 
+            horiz, gap, proportion, scale_y,
             xlab, ylab, main,
             value_labels, label_max, beside,
             rotate_x, offset, break_x, sort,
@@ -762,7 +762,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
             legend_horiz, legend_size, legend_abbrev, legend_adjust,
             add, x1, x2, y1, y2, out_size, digits_d, do_plot,  quiet,
             shiny, ...)
-      
+
       if (!is.null(pdf_file)) {
         dev.off()
         if (!quiet) .showfile(pdf_file, "BarChart")
@@ -776,7 +776,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     else {
       bc.data.frame(data, n_cat, stack100,
         fill, color, trans, fill_split, theme,
-        horiz, gap, proportion, scale_y, 
+        horiz, gap, proportion, scale_y,
         xlab, ylab, main,
         value_labels, label_max, beside,
         rotate_x, offset, break_x, sort,

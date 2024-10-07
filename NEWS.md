@@ -1,3 +1,34 @@
+# lessR version 4.3.8, October 7, 2024
+
+## Major Updates
+
+* `Plot()`: Exponential smoothing forecasting implemented with accompanying visualization. New parameters include `time_ahead` for the number of `time_units` to forecast into the future, and `time_format` to provide a specific format for the date variable if not detected correctly by default. Control aspects of the exponential smoothing estimation and prediction algorithms with parameters `es_level` (alpha), `es_trend` (beta), `es_seasons` (gamma), `es_type` for additive or multiplicative seasonality, and `es_PIlevel` for the level of the prediction intervals. 
+
+* `Plot()`: Character string versions of a date as in a variety of forms as digits, such as "08/18/2024", are now by default converted to variable type of `Date`. However, this conversion is inherently ambiguous, so the `time_format` parameter is provided as a means to provide the precise format if needed, including other formats such as "August 18, 2024". Also, a sequence of four-digit integers within the usual range of dates will also convert automatically to a variable of type `Dates.
+
+* `STL()`: A wrapper for Base R `stl()` that provides additional information and utility: 
+- allows input data as two columns, a variable of type `Date` as the `x`-variable and the time series values as the `y`-variable instead of an R time series. 
+- If the dates are character string digits (see above), they are automatically converted to a variable of type `Date`. 
+- The function also assists in comparing the magnitude of each extracted effect by showing the proportion of variance explained for the trend, seasonal effect, and error.
+
+ 
+## Updates
+
+* `BarChart()`, `Histogram()`, `Plot()`: If the `x`- or `y`- axis values in the resulting plots all end in 000, then the 000 is replaced with a K, such as `120000` plotted as an axis value of `120K`. 
+
+* `LineChart()`: Deprecated for years, now removed as its functionality has been incorporated into `Plot()` and extended with the `x`-variable of type `Date`.
+
+* `Plot()`: Parameter `run` dropped. Instead, to maintain the position of the variable of interest to be plotted, as the `y`-variable, indicate a run chart by specifying `.Index` as the `x`-variable, that is, the first variable listed. That name, beginning with a period, `.`, indicates data values for the variable Will be created automatically.
+
+* `Plot()`: Increase the default size of the dot in the Cleveland dot plot and related.
+
+## Bug Fixes
+
+* `Plot()`: When parameter `time_unit` is explicitly set, proper dates are now displayed on the x-axis when there is a `by` variable.
+
+* `Plot()`: Suggestions are working. To turn off: `style(suggest=FALSE)`.
+
+
 # lessR version 4.3.7, August 21, 2024
 
 ## Updates
@@ -6,14 +37,11 @@
 
 * `Plot()`: Using functions from the xts package, when plotting a time series dates are now formatted according to their natural unit. For example, when plotting by years, just years are listed without the month and the day. 
 
-* `Plot()`: When plotting a times series and requesting a level of time aggregation with the `time_unit` parameter that is more detailed than the available data, the analysis appropriately terminates with an error message. For example, if the time series data is monthly and an aggregation of `weeks` is requested, the analysis stops.
+* `Plot()`: When plotting a times series and requesting a level of time aggregation with the `time_unit` parameter that is more detailed than the available data, the analysis appropriately terminates with an error message. For example, if the time series data is monthly and an aggregation of `weeks` is requested, no analysis is done.
 
 * `Plot()`: For plotting time series data, new parameter `n_date_ticks` added to override the default number of ticks on the `x` axis, the date axis.
 
-
 ## Bug Fixes
-
-* `Plot()`: Plotting multiple time series on the same panel with the `by` parameter now works with the correctly formatted dates.
 
 * `Plot()`: For Trellis (facet or lattice) plots of bar charts and histograms, each panel is labeled with the proper size of text in the corresponding panel strip.
 
@@ -37,7 +65,6 @@
 * `Plot()`: New parameter `time_agg` for when the x-variable is a `Date` variable and a time series is plotted with automatic aggregation to specify the type of aggregation with `"sum"` the default.
 
 * `Plot()`: Pearson correlation analysis no longer displayed if the x-variable is a date, that is, if a time series is plotted.
-
 
 ## Bug Fixes
 
@@ -73,7 +100,6 @@
 * `Plot()`: Binning large data sets now results in larger bubbles.
 
 * `dataStockPrice`: Data table updated with stock prices through May 2024, and trading volume added as the fourth variable.
-
 
 ## Bug Fixes
 
@@ -123,7 +149,6 @@
 
 * `rename()`: Parameter `to` can now specify a vector of names to change, with the corresponding `from` vector of new names.
 
-
 ## Bug Fixes
 
 * `BarChart()`: If a numerical y variable is specified for analysis of the original,raw data, then if a value of the `stat` parameter is not specified its value now defaults to `"mean"`.
@@ -138,7 +163,6 @@
 * `Logit(), Regression()`: For categorical predictor variables, the conversion to indicator variables now happens before the analysis. All analyses are now only of numeric variables so that the correlation matrix, scatterplot matrix, tolerance, and best subset analyses are now conducted for categorical predictor variables.
 
 * `Logit(), Regression()`: Redundant predictor variables that lead to a singularity is now detected and noted instead of the function crashing.
-
 
 ## Bug Fixes
 
@@ -161,7 +185,6 @@
 * `prob_norm()`: Function terminates if value of `lo` is greater than `hi` instead of returning a meaningless result.
 
 * `getColors()`: Default for parameter `output` is `TRUE` only for a direct call from the console. If embedded in a function call such as for the `fill` parameter, or even if directly called in R Markdown, then set `output=TRUE` to view the calculated. palette
-
 
 ## Bug Fixes
 
@@ -208,7 +231,6 @@
 * `Regression()`: Parameter `mod` for moderation analysis in a two-predictor model added.
 
 * `ttest()`: Parameter `quiet` added to turn off text display at the console if set to `TRUE`.
-
 
 ## Bug Fixes
 

@@ -37,7 +37,7 @@ function(pal=NULL, end_pal=NULL,
     output <- ifelse(sys.nframe() == 1, TRUE, FALSE)
 
   if (!is.null(end_pal) && length(pal) > 1) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    cat("\n"); stop(call.=FALSE, "\n------\n",
       "To specify a sequence of colors, only specify one beginning color\n\n")
   }
 
@@ -45,7 +45,7 @@ function(pal=NULL, end_pal=NULL,
     in_order <- ifelse (shape == "wheel", TRUE, FALSE)  # for a wheel do in order
 
   if (!missing(h2)  &&  in_order == FALSE) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    cat("\n"); stop(call.=FALSE, "\n------\n",
        "h2 only applies to generate a straight sequence of HCL colors\n",
        "  so in_order must be TRUE\n\n")
   }
@@ -69,7 +69,7 @@ function(pal=NULL, end_pal=NULL,
 
   if (!missing(pal)) if (pal[1] == "magma") pal[1] <- "plasma"  # approx magma
 
-  nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",  
+  nm <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",
           "turquoises", "aquas", "blues", "purples", "violets",
           "magentas", "grays")
   nmV<- c("viridis", "cividis", "plasma", "spectral")
@@ -120,9 +120,9 @@ function(pal=NULL, end_pal=NULL,
 
   else {  # is.null pal -- defaults
     if (length(c) > 1  ||  length(l) > 1)  # multiple chroma or luminance
-      kind <- "sequential" 
+      kind <- "sequential"
     else
-      kind <- "qualitative" 
+      kind <- "qualitative"
   }
 
 
@@ -132,7 +132,7 @@ function(pal=NULL, end_pal=NULL,
   # set default value of labels
   if (is.null(labels))
     labels <- ifelse (kind == "qualitative", TRUE, FALSE)
-    
+
   # set hcl hue for pre-defined color sequence
   if (!is.null(pal)) {
     if (pal[1] %in% nm  &&  !(pal[1] %in% nmR)) {
@@ -177,7 +177,7 @@ function(pal=NULL, end_pal=NULL,
     }
   }
 
-  
+
   # -----------------
   # set color palette
 
@@ -193,7 +193,7 @@ function(pal=NULL, end_pal=NULL,
         h <- c(h, h+15)  # can do 12+15=27 unique colors
       }
       else  # in_order
-        h <- seq(h, h2, length=n)  # vary hue systematically 
+        h <- seq(h, h2, length=n)  # vary hue systematically
     }
     else {  # n too big
       h <- seq(h, h2, length=n)  # the hcl hues
@@ -202,7 +202,7 @@ function(pal=NULL, end_pal=NULL,
          h <- h[o]
       }
     }
-    
+
     h[which(h >= 360)] <- h[which(h >= 360)] - 360
     h[which(h < 0)] <- h[which(h < 0)] + 360
 
@@ -243,13 +243,13 @@ function(pal=NULL, end_pal=NULL,
     h <- c(h, h2)
     txt.h <- .fmt(h[1],0)
     if (length(h) > 1)
-      txt.h <- paste(txt.h, " to ", .fmt(h[2],0), sep="") 
+      txt.h <- paste(txt.h, " to ", .fmt(h[2],0), sep="")
 
     if (c.miss) c <- 50
     txt.c <- .fmt(c,0)
     if (length(c) > 1)
       txt.c <- paste(txt.c, " to ", .fmt(c[2],0), sep="")
-      
+
     if (l.miss) l <- c(30,80)
     txt.l <- .fmt(l[1],0)
     if (length(l) > 1)
@@ -264,13 +264,13 @@ function(pal=NULL, end_pal=NULL,
 
   # viridis sequence
   else if (kind == "viridis") {
-    ttl <- paste("Viridis Style Color Palette for:", pal[1], "\n") 
+    ttl <- paste("Viridis Style Color Palette for:", pal[1], "\n")
     pal <- hcl.colors(n, palette = pal[1])
   }
 
   # Okabe-Ito colors
   else if (kind == "oi") {
-    ttl <- paste("Okabe-Ito Colors Palette", pal[1], "\n") 
+    ttl <- paste("Okabe-Ito Colors Palette", pal[1], "\n")
     pal <- palette.colors(n=9, palette="Okabe-Ito", alpha=1)[2:9]
     pal[9] <- "#000000FF"  # put black at the end
     if (missing(n)) n <- 9
@@ -278,7 +278,7 @@ function(pal=NULL, end_pal=NULL,
       pal <- pal[1:n]
     else {
       print(pal[1:9])
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
          "Only 9 Okabe-Ito colors available.\n",
          "Can start with a vector of the above 9 colors, then add more.\n\n")
     }
@@ -286,15 +286,15 @@ function(pal=NULL, end_pal=NULL,
 
  # Tableau colors
   else if (kind == "Tableau") {
-    ttl <- paste("Tableau Qualitative Colors Palette", pal[1], "\n") 
-    pal <- c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F", 
-             "#EDC949", "#AF7AA1", "#FF9DA7", "#9C755F", "#BAB0AC") 
+    ttl <- paste("Tableau Qualitative Colors Palette", pal[1], "\n")
+    pal <- c("#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F",
+             "#EDC949", "#AF7AA1", "#FF9DA7", "#9C755F", "#BAB0AC")
     if (missing(n)) n <- 10
     if (n <= 10)
       pal <- pal[1:n]
     else {
       print(pal[1:10])
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
          "Only 10 Tableau colors available.\n",
          "Can start with a vector of the above 10 colors, then add more.\n\n")
     }
@@ -307,13 +307,13 @@ function(pal=NULL, end_pal=NULL,
            "Please install it:  install.packages(\"wesanderson\")\n\n",
            call. = FALSE)
     }
-    ttl <- paste("A Wes Anderson Color Palette for:", pal[1], "\n") 
+    ttl <- paste("A Wes Anderson Color Palette for:", pal[1], "\n")
     pal <- wesanderson::wes_palette(pal[1], n, type="continuous")
   }
 
 # pre-specified distinct colors
   else if (kind == "distinct") {
-    ttl <- paste("Colors Palette", pal[1], "\n") 
+    ttl <- paste("Colors Palette", pal[1], "\n")
 #   pal <- c(getColors(c=90, l=50, n=5),
     pal <- c(
              "goldenrod2", "gray45", "yellowgreen", "orchid3", "skyblue",
@@ -324,7 +324,7 @@ function(pal=NULL, end_pal=NULL,
       pal <- pal[1:n]
     else {
       print(pal[1:20])
-      cat("\n"); stop(call.=FALSE, "\n","------\n",
+      cat("\n"); stop(call.=FALSE, "\n------\n",
          "Only 20 distinct colors available.\n",
          "Can start with a vector of the above 20 colors, then add more.\n\n")
     }
@@ -347,7 +347,7 @@ function(pal=NULL, end_pal=NULL,
       pal[i] <- pal[j]
     }
     ttl <- ""
-  } 
+  }
 
   else if (kind == "seq.R") {
     if (is.null(l)) l <- 60
@@ -382,12 +382,12 @@ function(pal=NULL, end_pal=NULL,
   # set lbl except for hcl which provides the hues
   if (lbl[1] == "") lbl <- pal
 
-  if (transparency > 0) 
-   for (i in 1:length(pal)) pal[i] <- .maketrans(pal[i], (1-transparency)*256) 
+  if (transparency > 0)
+   for (i in 1:length(pal)) pal[i] <- .maketrans(pal[i], (1-transparency)*256)
 
   # --------------------
   # plot and text output
-  if (output) { 
+  if (output) {
 
     # ----
     # plot
@@ -462,18 +462,18 @@ function(pal=NULL, end_pal=NULL,
         if (kind == "sequential") {
           hh <- h[1]  # h a scaler here (except for grays)
           h <- integer(length(n))
-          for (i in 1:n) h[i] <- hh 
+          for (i in 1:n) h[i] <- hh
         }
         cat("      h    hex      r    g    b\n")
         cat("-------------------------------\n")
         for (i in 1:length(pal))
               cat(.fmt(i,0,w=2), " ", .fmt(h[i],0, w=3), pal[i],
-                  .fmt(col2rgb(pal[i])[1],0,w=4), 
+                  .fmt(col2rgb(pal[i])[1],0,w=4),
                   .fmt(col2rgb(pal[i])[2],0,w=4),
                   .fmt(col2rgb(pal[i])[3],0,w=4),"\n")
       }
 
-      else {  # qualitative 
+      else {  # qualitative
         cat("  color    r    g    b\n")
         cat("----------------------\n")
           for (i in 1:length(pal))
@@ -487,4 +487,3 @@ function(pal=NULL, end_pal=NULL,
 
   return(invisible(pal))
 }
-

@@ -10,7 +10,7 @@ function(x=NULL, data=d, filter=NULL,
     color=getOption("bar_color_cont"),
     transparency=getOption("trans_bar_fill"),
 
-    values=FALSE, 
+    values=FALSE,
 
     bin_start=NULL, bin_width=NULL, bin_end=NULL, breaks="Sturges",
 
@@ -18,7 +18,7 @@ function(x=NULL, data=d, filter=NULL,
 
     density=FALSE, show_histogram=TRUE,
     bandwidth=NULL, type=c("general", "normal", "both"),
-    fill_general=NULL, fill_normal=NULL, fill_hist=getOption("se_fill"), 
+    fill_general=NULL, fill_normal=NULL, fill_hist=getOption("se_fill"),
     color_general="gray20", color_normal="gray20",
     x.pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
@@ -33,18 +33,18 @@ function(x=NULL, data=d, filter=NULL,
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
     quiet=getOption("quiet"), do_plot=TRUE,
-    pdf_file=NULL, width=6.5, height=6, 
+    pdf_file=NULL, width=6.5, height=6,
     digits_d=NULL,
     Rmd=NULL,
 
-    n_cat=getOption("n_cat"), 
+    n_cat=getOption("n_cat"),
     rows=NULL, by1=NULL, by2=NULL,
 
     eval_df=NULL, fun_call=NULL, ...) {
 
 
   if (missing(fill))
-    fill <- ifelse (is.null(getOption("bar_fill_cont")), 
+    fill <- ifelse (is.null(getOption("bar_fill_cont")),
       getOption("bar_fill"), getOption("bar_fill_cont"))
   breaks.miss <- ifelse (missing(breaks), TRUE, FALSE)
   bw.miss <- ifelse (missing(bandwidth), TRUE, FALSE)
@@ -77,11 +77,11 @@ function(x=NULL, data=d, filter=NULL,
                       missing(facet2), substitute(facet2), "facet2")
   if (!is.null(facet2)) data[[as.character(facet2)]]  # extract facet2 from data
 
-  if (!missing(rows)) 
+  if (!missing(rows))
     message(">>> Parameter  rows  renamed to:  filter.\n",
             "    Change to  filter,  rows  will stop working in the future.\n")
 
-  if(!missing(n_cat)) {
+  if (!missing(n_cat)) {
     message(">>> Parameter  n_cat  will no longer work in the future.\n",
              "    Better to convert a categorical integer variable to ",
              "a factor.\n")
@@ -111,33 +111,26 @@ function(x=NULL, data=d, filter=NULL,
   }
 
   if (!breaks.miss && density)  {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    cat("\n"); stop(call.=FALSE, "\n------\n",
       "When plotting density, parameter  breaks  is ignored.\n",
       "Bins must be equal width, but can use bin_start and bin_width.\n\n")
   }
 
   if (!is.null(scale_x)) if (length(scale_x) != 3)  {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    cat("\n"); stop(call.=FALSE, "\n------\n",
       "Starting value, ending value, and number of intervals\n",
       "  must all be specified as a vector, e.g., scale_x=c(0, 9 , 5)\n\n")
   }
 
   if (!is.null(scale_y)) if (length(scale_y) != 3)  {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
+    cat("\n"); stop(call.=FALSE, "\n------\n",
       "Starting value, ending value, and number of intervals\n",
       "  must all be specified as a vector, e.g., scale_y=c(0, 9 , 5)\n\n")
   }
 
-  panel_fill <- getOption("panel_fill")
-  panel_color <- getOption("panel_color")
-  grid_color <- getOption("grid_color")
-  lab_color <- getOption("lab_color")
-  lab_cex <- getOption("lab_cex")
-  axis_cex <- getOption("axis_cex") 
-
   fill[which(fill == "off")] <- "transparent"
   color[which(color == "off")] <- "transparent"
-  
+
   xlab_adj <- lab_adjust[1];   ylab_adj <- lab_adjust[2]
   tm.adj <- margin_adjust[1];  rm.adj <- margin_adjust[2]
   bm.adj <- margin_adjust[3];  lm.adj <- margin_adjust[4]
@@ -146,11 +139,11 @@ function(x=NULL, data=d, filter=NULL,
 
 
   # --------- data frame stuff
-  
-  data.miss <- ifelse (missing(data), TRUE, FALSE) 
+
+  data.miss <- ifelse (missing(data), TRUE, FALSE)
 
   # let deprecated mydata work as default
-  dfs <- .getdfs() 
+  dfs <- .getdfs()
   mydata.ok <- FALSE
   if (!is.null(dfs)) {
     if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
@@ -174,7 +167,7 @@ function(x=NULL, data=d, filter=NULL,
       shiny <- TRUE
       data <- eval(substitute(data), envir=parent.frame())
     }
- 
+
   # if a tibble, convert to data frame
   if (!shiny) {
     if (exists(df.name, envir=.GlobalEnv)) {
@@ -198,7 +191,7 @@ function(x=NULL, data=d, filter=NULL,
     if (df.name != "NULL") {  # if NULL, force global (shiny, from interact() )
       # force evaluation (not lazy) if data not specified, relies on default d
       if (data.miss) {
-        if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
+        if (!mydata.ok) .nodf(df.name)  # check to see if df exists
 #       data <- eval(substitute(data), envir=parent.frame())
         # the 1.201 comes from Shiny, need to reset
         # l.cex and l.axc are set in interact() before shiny run
@@ -215,10 +208,10 @@ function(x=NULL, data=d, filter=NULL,
     else # df.name is NULL
       x.in.global <- TRUE
   }
-    
-  eval_df <- !x.in.global 
 
-    
+  eval_df <- !x.in.global
+
+
   # -----------------------------------------------------------
   # establish if a data frame, if not then identify variable(s)
   # x can be missing entirely, with a data frame passed instead
@@ -229,7 +222,7 @@ function(x=NULL, data=d, filter=NULL,
     # x not in global env, in df, specify data= forces to data frame
     if (!x.in.global) {
       if (eval_df) {
-        if(!mydata.ok) .nodf(df.name)  # check to see if data frame container exists 
+        if (!mydata.ok) .nodf(df.name)  # does data frame container exist?
         .xcheck(x.name, df.name, names(data))  # x-vars in df?
       }
       data.vars <- as.list(seq_along(data))
@@ -247,19 +240,19 @@ function(x=NULL, data=d, filter=NULL,
         if (any(r))
           data <- data[r,,drop=FALSE]
         if (!quiet) {
-          if (!missing(filter))  # filter parameter present 
+          if (!missing(filter))  # filter parameter present
             cat("\nfilter: ",  txt, "\n-----\n")
           cat("Rows of data before filtering: ", nr.before, "\n")
           cat("Rows of data after filtering:  ", nrow(data), "\n\n")
         }
       }  # end filter
 
-      ind <- eval(substitute(x), envir=data.vars)  # col num of each var     
+      ind <- eval(substitute(x), envir=data.vars)  # col num of each var
       if (!("list" %in% class(data))) {
         data.x <- data[, ind]
         if (length(ind) == 1) {  # x is 1 var
-          if (!is.numeric(data.x)) { 
-            cat("\n"); stop(call.=FALSE, "\n","------\n",
+          if (!is.numeric(data.x)) {
+            cat("\n"); stop(call.=FALSE, "\n------\n",
               "A histogram is only computed from a numeric variable\n",
               "To tabulate the values of a categorical variable:\n\n",
               "  Plot(", x.name, ", stat=\"count\")\n",
@@ -353,7 +346,7 @@ function(x=NULL, data=d, filter=NULL,
 
   if (Trellis && do_plot) {
 
-    .bar.lattice(data.x[,1], facet1.call, facet2.call, n_row, n_col, aspect, 
+    .bar.lattice(data.x[,1], facet1.call, facet2.call, n_row, n_col, aspect,
            proportion, fill, color, trans, size.pt=NULL,
            xlab, ylab, main, rotate_x, offset, width, height, pdf_file,
            segments_x=NULL, breaks, T.type="hist", quiet)
@@ -368,7 +361,7 @@ function(x=NULL, data=d, filter=NULL,
     if (manage.gr) {
       i.win <- 0
       for (i in 1:ncol(data)) {
-        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n_cat)) 
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n_cat))
           i.win <- i.win + 1
       }
       .graphwin(i.win, d.w=width, d.h=height)
@@ -413,7 +406,7 @@ function(x=NULL, data=d, filter=NULL,
           stuff <- .hst.main(data[,i], fill, color, trans, reg,
               rotate_x, rotate_y, offset,
               breaks, bin_start, bin_width,
-              bin_end, proportion, values, cumulate, xlab, ylab, main, sub, 
+              bin_end, proportion, values, cumulate, xlab, ylab, main, sub,
               xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
               add, x1, x2, y1, y2,
               scale_x, scale_y,
@@ -455,7 +448,7 @@ function(x=NULL, data=d, filter=NULL,
           }
           else {  # add some transparency to a named color
             if (fill_general %in% colors()) {
-              fg.rgb <- col2rgb(fill_general) 
+              fg.rgb <- col2rgb(fill_general)
               fill_general <- rgb(fg.rgb[1], fg.rgb[2], fg.rgb[3],
                                   alpha=80, maxColorValue=255)
             }
@@ -470,8 +463,8 @@ function(x=NULL, data=d, filter=NULL,
             }
           }
           else {  # add some transparency to a named color
-            if (fill_normal %in% colors()) { 
-              fg.rgb <- col2rgb(fill_normal) 
+            if (fill_normal %in% colors()) {
+              fg.rgb <- col2rgb(fill_normal)
               fill_normal <- rgb(fg.rgb[1], fg.rgb[2], fg.rgb[3],
                                   alpha=80, maxColorValue=255)
             }
@@ -523,9 +516,9 @@ function(x=NULL, data=d, filter=NULL,
           if (!quiet) .showfile(pdf_file, "Histogram")
         }
 
-      }  # end ncol(data) == 1 ... 
+      }  # end ncol(data) == 1 ...
 
-      else { 
+      else {
         if (ncol(data) > 1) {
           plot.i <- plot.i + 1
           plot.title[plot.i] <- paste("Histogram of ", x.name, sep="")
@@ -567,10 +560,10 @@ function(x=NULL, data=d, filter=NULL,
       class(txotl) <- "out"
       class(txkfl) <- "out"
 
-      if (histogram) {   
+      if (histogram) {
 
         output <- list(type="Histogram",
-          call=fun_call, 
+          call=fun_call,
           out_suggest=txsug, out_ss=txss, out_outliers=txotl, out_freq=txdst,
           out_file=txkfl,
           bin_width=stuff$bin_width, n_bins=stuff$n.bins,
@@ -613,4 +606,3 @@ function(x=NULL, data=d, filter=NULL,
   }  # else not Trellis
 
 }
-

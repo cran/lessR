@@ -1,5 +1,5 @@
 ---
-title: "intro"
+title: "Introduction to lessR"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{intro}
@@ -9,6 +9,7 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  fig.width=5.5, fig.height=3,
   collapse = TRUE,
   comment = "#>"
 )
@@ -18,6 +19,159 @@ knitr::opts_chunk$set(
 library(lessR)
 ```
 
-The vignette examples of using **lessR** are so extensive that the resulting package exceed the maximum installation size. Instead, find the many vignette examples at:
+The vignette examples of using **lessR** became so extensive that **lessR** exceeded the maximum R package installation size. Find some examples below and many more vignette examples at:
 
-https://web.pdx.edu/~gerbing/lessR/examples/
+[lessR examples](https://web.pdx.edu/~gerbing/lessR/examples/)
+
+
+## Read Data
+
+Many of the following examples analyze data in the _Employee_ data set, included with **lessR**. To read an internal **lessR** data set, just pass the name of the data set to the **lessR** function `Read()`. Read the _Employee_ data into the data frame _d_. For data sets other than those provided by **lessR**, enter the path name or URL between the quotes, or leave the quotes empty to browse for the data file on your computer system. See the `Read and Write` vignette for more details.
+
+```{r read}
+d <- Read("Employee")
+```
+
+_d_ is the default name of the data frame for the **lessR** data analysis functions. Explicitly access the data frame with the `data` parameter in the analysis functions. 
+
+As an option, also read the table of variable labels. Create the table formatted as two columns. The first column is the variable name and the second column is the corresponding variable label. Not all variables need be entered into the table. The table can be a `csv` file or an Excel file.
+
+Read the file of variable labels into the _l_ data frame, currently the only permitted name. The labels will be displayed on both the text and visualization output. Each displayed label is the variable name juxtaposed with the corresponding label, as shown in the following output.
+
+```{r labels}
+l <- rd("Employee_lbl")
+l
+```
+
+## Bar Chart
+
+Consider the categorical variable Dept in the Employee data table.  Use `BarChart()` to tabulate and display the visualization of the number of employees in each department, here relying upon the default data frame (table) named _d_. Otherwise add the `data=` option for a data frame with another name.
+
+```{r bcEx, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Bar chart of tablulated counts of employees in each department."}
+BarChart(Dept)
+```
+
+Specify a single fill color with the `fill` parameter, the edge color of the bars with `color`. Set the transparency level with `transparency`. Against a lighter background, display the value for each bar with a darker color using the `labels_color` parameter. To specify a color, use color names, specify a color with either its `rgb()` or `hcl()` color space coordinates, or use the **lessR** custom color palette function `getColors()`.
+
+```{r fig.width=4, fig.height=3.75, fig.align='center'}
+BarChart(Dept, fill="darkred", color="black", transparency=.8,
+         labels_color="black")
+```
+
+Use the `theme` parameter to change the entire color theme: "colors", "lightbronze", "dodgerblue", "slatered", "darkred", "gray", "gold", "darkgreen", "blue", "red", "rose", "green", "purple", "sienna", "brown", "orange", "white", and "light". In this example, changing the full theme accomplishes the same as changing the fill color. Turn off the displayed value on each bar with the parameter `labels` set to `off`. Specify a horizontal bar chart with base R parameter `horiz`.
+
+```{r fig.width=4, fig.height=3.5, fig.align='center'}
+BarChart(Dept, theme="gray", labels="off", horiz=TRUE)
+```
+
+## Histogram
+
+Consider the continuous variable _Salary_ in the Employee data table.  Use `Histogram()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_, so the `data=` parameter is not needed.
+
+```{r hs, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Histogram of tablulated counts for the bins of Salary."}
+Histogram(Salary)
+```
+
+By default, the `Histogram()` function provides a color theme according to the current, active theme. The function also provides the corresponding frequency distribution, summary statistics, the table that lists the count of each category, from which the histogram is constructed, as well as an outlier analysis based on Tukey's outlier detection rules for box plots.
+
+Use the parameters `bin_start`, `bin_width`, and `bin_end` to customize the histogram.
+
+Easy to change the color, either by changing the color theme with `style()`, or just change the fill color with `fill`. Can refer to standard R colors, as shown with **lessR** function `showColors()`, or implicitly invoke the **lessR** color palette generating function `getColors()`. Each 30 degrees of the color wheel is named, such as `"greens"`, `"rusts"`, etc, and implements a sequential color palette.
+
+```{r binwidth, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Customized histogram."}
+Histogram(Salary, bin_start=35000, bin_width=14000, fill="reds")
+```
+
+## Scatterplot
+
+Specify an X and Y variable with the plot function to obtain A scatter plot. In this example, both variables are continuous though any combination of continuous or categorical variables is possible, including specifying only one variable.
+
+```{r sp, fig.width=4}
+Plot(Years, Salary)
+```
+
+Enhance the default scatterplot with parameter `enhance`. The visualization includes the mean of each variable indicated by the respective line through the scatterplot, the 95% confidence ellipse, labeled outliers, least-squares regression line with 95% confidence interval, and the corresponding regression line with the outliers removed. 
+
+```{r spEnhance, fig.width=4}
+Plot(Years, Salary, enhance=TRUE)
+```
+
+The default plot for a single continuous variable includes not only the scatterplot, but also the superimposed violin plot and box plot, with outliers identified. Call this plot the VBS plot.
+
+```{r x1, fig.height=3}
+Plot(Salary)
+```
+
+
+## Regression Analysis
+
+
+The full output is extensive: Summary of the analysis, estimated model, fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals. The motivation is to provide virtually all of the information needed for a proper regression analysis.
+
+```{r}
+reg(Salary ~ Years + Pre)
+```
+
+
+
+## Time Series
+
+The time series plot, plotting the values of a variable cross time, is a special case of a scatterplot, potentially with the points of size 0 with adjacent points connected by a line segment. Indicate a time series by specifying the `x`-variable, the first variable listed, as a variable of type `Date`. This conversion to `Date` data values occurs automatically for dates specified in a digital format, such as `18/8/2024`.
+
+
+```{r}
+d <- Read("StockPrice")
+head(d)
+```
+
+We have the date as _Month_, and also _Company_ and stock _Price_.
+
+```{r}
+d <- Read("StockPrice")
+Plot(Month, Price, filter=(Company=="Apple"), area_fill="on")
+```
+
+
+With the `by` parameter, plot all three companies on the same panel.
+
+```{r}
+Plot(Month, Price, by=Company)
+```
+
+Here, aggregate the mean by time, from months to quarters.
+
+
+```{r}
+Plot(Month, Price, time_unit="quarters", time_agg="mean")
+```
+
+`Plot()` implements exponential smoothing forecasting with accompanying visualization. New parameters include `time_ahead` for the number of `time_units` to forecast into the future, and `time_format` to provide a specific format for the date variable if not detected correctly by default. Control aspects of the exponential smoothing estimation and prediction algorithms with parameters `es_level` (alpha), `es_trend` (beta), `es_seasons` (gamma), `es_type` for additive or multiplicative seasonality, and `es_PIlevel` for the level of the prediction intervals.
+
+To forecast Apple's stock price, focus here on the last several years of the data, beginning with Row 400 through Row 473, the last row of data for apple. In this example, forecast ahead 24 months.
+
+
+```{r}
+d <- d[400:473,]
+Plot(Month, Price, time_unit="months", time_agg="mean", time_ahead=24)
+```
+
+
+## Pivot Tables
+
+Aggregate with `pivot()`. Any function that processes a single vector of data, such as a column of data values for a variable in a data frame, and outputs a single computed value, the statistic, can be passed to `pivot()`. Functions can be user-defined or built-in. 
+
+Here, compute the mean and standard deviation of each company in the StockPrice data set download it with **lessR**.
+
+```{r}
+d <- Read("StockPrice", quiet=TRUE)
+pivot(d, c(mean, sd), Price, by=Company)
+```
+
+Interpret this call to `pivot()` as
+
+- for data set _d_
+- compute the mean and standard deviation 
+- of variable _Price_ 
+- for each _Company_
+
+Select any two of the three possibilities for multiple parameter values: Multiple compute functions, multiple variables over which to compute, and multiple categorical variables by which to define groups for aggregation.
