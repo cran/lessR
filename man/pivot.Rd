@@ -4,9 +4,7 @@
 \title{Create a Pivot (Summary) Table}
 
 \description{
-
 Compute one or more designated descriptive statistics (\code{compute} over one or more numerical variables (\code{variable}) either for all the data or aggregated over one or more categorical variables (\code{by}). Because the output is a two-dimensional table, select any two of the three possibilities: Multiple compute functions for the descriptive statistics, multiple continuous variables over which to compute, and multiple categorical variables by which to define groups for aggregation. Displays the sample size for each group. Uses the base R function \code{\link{aggregate}} for which to perform the aggregation.
-
 }
 
 \usage{

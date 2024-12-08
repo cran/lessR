@@ -9,7 +9,7 @@ function(x, y=NULL, data=d, filter=NULL,
     transparency=getOption("trans_pt_fill"),
 
     enhance=FALSE,
-    size=NULL, size_cut=NULL, shape="circle", means=TRUE,
+    size=NULL, size_cut=NULL, shape="circle", lwd=1.5, means=TRUE,
     segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
     sort_yx=c("0", "-", "+"),
@@ -27,8 +27,7 @@ function(x, y=NULL, data=d, filter=NULL,
     time_unit=NULL, time_agg=c("sum","mean"), time_ahead=0, time_format=NULL,
     time_fit=FALSE, es_level=NULL, es_trend=NULL, es_seasons=NULL,
     es_type=c("additive", "multiplicative"), es_PIlevel=0.95,
-    stack=FALSE, lwd=1.5,
-    area_fill="transparent", area_split=0, n_date_tics=NULL,
+    stack=FALSE, area_fill="transparent", area_split=0, n_date_tics=NULL,
     show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
 
     stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
@@ -44,8 +43,7 @@ function(x, y=NULL, data=d, filter=NULL,
     radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
 
     smooth=FALSE, smooth_points=100, smooth_size=1,
-    smooth_exp=0.25, smooth_bins=128,
-    n_bins=1,
+    smooth_exp=0.25, smooth_bins=128, n_bins=1,
 
     bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
     breaks="Sturges", cumulate=FALSE,
@@ -81,6 +79,10 @@ function(x, y=NULL, data=d, filter=NULL,
   if (stat[1] != "data") stat <- match.arg(stat)  # if condition for shiny
   stat_x.miss <- ifelse (missing(stat_x), TRUE, FALSE)
   stat_x <- match.arg(stat_x)
+
+  output <- NULL
+  out_fitted <- NULL
+  out_y.frcst <- NULL
 
   if (!stat.miss && !stat_x.miss) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
@@ -527,7 +529,7 @@ function(x, y=NULL, data=d, filter=NULL,
   spmat <- FALSE
 
   # just one x variable for now, a vector of cat or num values
-  # see if convert to variable of type Date
+  # see if convert to variable of -- type Date --
   if (n.x_var == 1) {
 
     if (grepl("POSIX",  class(x.call[,1]), fixed=TRUE)[1])
@@ -536,45 +538,65 @@ function(x, y=NULL, data=d, filter=NULL,
 
     # if sequence of integer years, then convert to type Date
     if (.is.integer(x.call[,1])  &&  !run) {
-      diff1 <- all(diff(x.call[,1]) == 1)  # consecutive years?
-      yr.range <- all(x.call[,1] >= 10 & x.call[,1] <= 9999)  # range for yrs?
+      diff1 <- all(diff(x.call[,1]) == 1)  # see if consecutive years
+      yr.range <- all(x.call[,1] >= 10 & x.call[,1] <= 9999)  # range for yrs
       if (diff1 && yr.range) {
-        x.call[,1] <- as.Date(paste0(x.call[,1], "-01-01"))
+        x.call[,1] <- as.Date(paste0(x.call[,1], "-01-01"))  # to Date
         date.var <- TRUE
         if (!quiet)
-          cat("\n>>> Note: Variable ", x.name, "  assumed to be years\n",
-                          "Converted to a type Date variable\n\n")
+          message("\n>>> Note: Variable ", x.name, "  assumed to be years\n",
+                  "Converted to a type Date variable\n",
+                  "If forecasting there will be no seasonality.\n\n")
       }
     }
 
-    # see if x.call[,1] has char string values to convert to type Date
-    if (is.character(x.call[1,1])) {
+    # if x.call[,1] has char string values, see if to convert to type Date
+    x11 <- x.call[1,1]
+    if (is.character(x11)) {
       if (!is.null(time_format))  # specify the date format
         x.call[,1] <- as.Date(x.call[,1], format=time_format)
-      else {  # guess the date format
-        n.ch <- nchar(x.call[1,1])
-        n.valid <- ifelse (n.ch %in% c(6,8), TRUE, FALSE)
-        punct <- " "
-        if ((grepl("/", x.call[1,1], fixed=TRUE) && n.valid)) punct <- "/"
-        if ((grepl("-", x.call[1,1], fixed=TRUE) && n.valid)) punct <- "-"
-        if ((grepl(".", x.call[1,1], fixed=TRUE) && n.valid)) punct <- "."
-        if (punct %in% c("/", "-", ".")) {  # only evaluate probable dates
-          dates <- .charToDate(x.call[,1], punct, n.ch)
-          x.call[,1] <- dates
-        }  # end do best guess
-      }  # end time_format is NULL
 
-    if (.is.date(x.call[,1])) date.var <- TRUE
-    }  # end is.char x.call[,1]
+      else {  # guess the date format
+        n.ch <- nchar(x11)
+        if (n.ch %in% 6:10) {
+          isQ <- grepl("Q1|Q2|Q3|Q4", x11)
+          isM <- grepl("Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec", x11)
+          if (isM) {
+            x.call[,1] <- gsub(" ", "", x.call[,1])  # remove all spaces
+            year <- substr(x.call[,1], 1, 4)
+            monthNm <- substr(x.call[,1], 5, 7)
+            x.call[,1] <- as.Date(paste(year, monthNm, "01", sep="-"),
+                                   format="%Y-%b-%d")
+          }
+          else if (isQ) {  # convert dates entered as 2024 Q3 to R Date
+            parts <- strsplit(gsub("\\s+", "", x.call[,1]), "Q")  # remove Q
+            # Extract quarter, `[` is R extraction operator
+            year <- as.numeric(sapply(parts, `[`, 1))  # 1st list element (year)
+            quarter <- as.numeric(sapply(parts, `[`, 2))  # 2nd list element 
+            month <- 1 + (quarter - 1) * 3  # get month Q1=1, Q2=4, Q3=7, Q4=10
+            x.call[,1] <- as.Date(paste(year, month, "01", sep="-"))  #to Date
+          }  # end quarter
+          else {  # see if numeric numeric date format
+            punct <- " "  # see if there are two punctuation delimiters
+            if (length(gregexpr("/", x11, fixed=TRUE)[[1]]) == 2) punct <- "/"
+            if (length(gregexpr("-", x11, fixed=TRUE)[[1]]) == 2) punct <- "-"
+            if (length(gregexpr(".", x11, fixed=TRUE)[[1]]) == 2) punct <- "."
+            if (punct %in% c("/", "-", "."))   # only evaluate probable dates
+              x.call[,1] <- .charToDate(x.call[,1], punct)
+          }  # numeric date format
+        }  # end n.ch is 6, 7, 8
+      }  # end do best guess
+    }  # is.char x.call[1,1]
 
     cat.x <- ifelse (is.character(x.call[,1]) || is.factor(x.call[,1]),
                      TRUE, FALSE)
-
     if (cat.x  &&  object == "both") {
       cat("\n"); stop(call.=FALSE, "\n------\n",
         "A run chart applies only to continuous variables\n",
         x.name, " is a categorical variable\n\n")
     }
+
+    if (.is.date(x.call[,1])) date.var <- TRUE
   }  # end n.x_var == 1
 
   # more than one x-variable
@@ -617,7 +639,7 @@ function(x, y=NULL, data=d, filter=NULL,
   else
     nrows <- nrow(data.x)
 
-  if (date.var) object <- "both"
+  if (date.var || run) object <- "both"
 
 
   #-----------
@@ -692,6 +714,11 @@ function(x, y=NULL, data=d, filter=NULL,
   else { # missing y
     if (!date.var) y.call <- NULL
   }  # end missing y
+
+  if (time_ahead > 0 && n.y_var > 1) {
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Can only do a forecast for a single y-variable\n\n")
+  }
 
   if (!is.numeric(y.call[,1]) && run) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
@@ -1155,7 +1182,7 @@ function(x, y=NULL, data=d, filter=NULL,
           class(txotl) <- "out"
           output <- list(out_suggest=txsug, out_ss=txss, out_freq=txdst,
                          out_outliers=txotl)
-          class(output) <- "out_all"
+          if (!is.null(output)) class(output) <- "out_all"
           print(output)  # OUTPUT, move to end
         }
 
@@ -1273,14 +1300,13 @@ function(x, y=NULL, data=d, filter=NULL,
     }
     pt.size <- size * scale.pt
   }
-
   if (size.miss) {  # pt.size is a scaler
-    if (object == "both") {
-      pt.size <- 0.77 * pt.size  # default pt size for lines
+    if (object == "both") {  # pts and lines specified
+      pt.size <- 0.85 * pt.size  # default pt size when lines specified
       if (!("transparent" %in% area_fill))
         pt.size[1] <- 0  # default no points if area shown
       else if (nrows > 50) {
-        pt.size <- .9 - 0.002*nrows
+        pt.size <- .75 - 0.002*nrows
         if (pt.size < 0.10) pt.size <- 0
       }
     }  # end both
@@ -1518,17 +1544,17 @@ function(x, y=NULL, data=d, filter=NULL,
 
   else if (n_bins > 1) {  # bin the x-axis, compute mean or median of y by bin
 
-   if (stat.miss) stat <- "mean"
-   if (seg.miss) segments <- TRUE
-   if (size.miss) pt.size <- 1.1
-   if (is.null(digits_d)) digits_d <- 3
-   nm.x <- x.name
-   nm.y <- y.name
-   # size is NULL if not specified
-   .plt.bins(x.call[,1], y.call[,1], nm.x, nm.y, stat, n_bins,
-             segments=segments, size=size, digits_d, scale_x, scale_y,
-             fill=pt.fill, color=pt.color, trans=pt.trans,
-             quiet=quiet)
+    if (stat.miss) stat <- "mean"
+    if (seg.miss) segments <- TRUE
+    if (size.miss) pt.size <- 1.1
+    if (is.null(digits_d)) digits_d <- 3
+    nm.x <- x.name
+    nm.y <- y.name
+    # size is NULL if not specified
+    .plt.bins(x.call[,1], y.call[,1], nm.x, nm.y, stat, n_bins,
+              segments=segments, size=size, digits_d, scale_x, scale_y,
+              fill=pt.fill, color=pt.color, trans=pt.trans,
+              quiet=quiet)
   }
 
   # all the other analyses
@@ -1622,7 +1648,7 @@ function(x, y=NULL, data=d, filter=NULL,
         }
       }
 
-     # sort y by x option (intended for Cleveland dot plot)
+      # sort y by x option (intended for Cleveland dot plot)
       tx <- character(length=0)
       if (sort_yx != "0") {
         srt.dwn <- ifelse (sort_yx == "-", FALSE, TRUE)
@@ -1685,24 +1711,22 @@ function(x, y=NULL, data=d, filter=NULL,
       if (!y.miss && !Trellis)
         if (n.x_var==1 && n.y_var==1
              && is.numeric(x.call[,1]) && is.numeric(y.call[,1]))
-          if (MD_cut > 0  ||  out_cut > 0) {
-            otl <- .plt.MD(x.call[,1], y.call[,1], ID.call, MD_cut, out_cut)
-            out_outliers <- otl$tx  # descriptive text
-            outlpts <- otl$outlpts  # the outliers
+        if (MD_cut > 0  ||  out_cut > 0) {
+          otl <- .plt.MD(x.call[,1], y.call[,1], ID.call, MD_cut, out_cut)
+          out_outliers <- otl$tx  # descriptive text
+          outlpts <- otl$outlpts  # the outliers
       }
 
-      if (do_plot) {
-
-        if (!is.ts(y.call)) {
-          if (nrow(x.call) != nrow(y.call))  {
-            cat("\n"); stop(call.=FALSE, "\n-----\n",
-              "number of elements in x: ", nrow(x.call), "\n",
-              "number of elements in y: ", nrow(y.call), "\n\n",
-              "The number of elements must be equal, probably\n",
-              "  have variables from user workspace so maybe\n",
-              "  use the  remove function, e.g., remove(x)\n\n")
-          }
+      if (!is.ts(y.call)) {
+        if (nrow(x.call) != nrow(y.call))  {
+          cat("\n"); stop(call.=FALSE, "\n-----\n",
+            "number of elements in x: ", nrow(x.call), "\n",
+            "number of elements in y: ", nrow(y.call), "\n\n",
+            "The number of elements must be equal, probably\n",
+            "  have variables from user workspace so maybe\n",
+            "  use the  remove function, e.g., remove(x)\n\n")
         }
+      }
 
         if (object == "both"  &&  nn_col > 1) {
            # change to multi later
@@ -1741,8 +1765,37 @@ function(x, y=NULL, data=d, filter=NULL,
             "Cannot forecast without a known time unit.\n\n")
         }
 
+        # forecast
+        if (time_ahead > 0) {
+          f.out <- .plt.forecast(x.call, y.call, by.call,
+            time_unit, time_ahead, time_fit, n_date_tics,
+            es_level, es_trend, es_seasons, es_type, es_PIlevel,
+            digits_d)  
+          y.fit <- f.out$y.fit;  y.hat <- f.out$y.hat
+          x.fit <- f.out$x.fit;  x.hat <- f.out$x.hat 
+          y.upr <- f.out$y.upr;  y.lwr <- f.out$y.lwr 
+          mx.x <- f.out$mx.x;  mn.y <- f.out$mn.y;  mx.y <- f.out$mx.y
+          out_y.frcst <- f.out$y.frcst
+          out_frcst <- f.out$out_frcst
+          out_fitted <- f.out$out_fitted         
+          out_err <- f.out$out_err         
+          out_coefs <- f.out$out_coefs
+          out_smooth <- f.out$out_params
+        }
+        else {  # no forecast
+          y.fit <- NULL;  y.hat <- NULL
+          x.fit <- NULL;  x.hat <- NULL
+          y.upr <- NULL;  y.lwr <- NULL
+          mx.x <- NULL;  mn.y <- NULL;  mx.y <- NULL
+          out_y.frcst <- NULL;  out_frcst <- NULL
+          out_fitted <- NULL; out_err <- NULL
+          out_coefs <- NULL; out_smooth <- NULL
+        }
+
+      j_y <- NULL;  j_x <- NULL
+      if (do_plot) {
         # main out, mostly the visualization, sometimes some stats
-        m.out <- .plt.main(x.call, y.call, by.call, n_cat,
+        m.out <- .plt.main(x.call, y.call, by.call,
           cat.x, cat.y, object, stat,
           pt.fill, area_fill, pt.color, pt.trans, segment_color,
           xy_ticks, xlab, ylab, main, main_cex, sub,
@@ -1758,7 +1811,8 @@ function(x, y=NULL, data=d, filter=NULL,
           ellipse, ellipse_color, ellipse_fill, ellipse_lwd,
           run, center_line, stack,
           time_unit, time_agg, do.agg, time_ahead, time_fit, n_date_tics,
-          es_level, es_trend, es_seasons, es_type, es_PIlevel,
+          y.fit, y.hat, x.fit, x.hat, y.upr, y.lwr,
+          mx.x, mn.y, mx.y, 
           freq.poly, jitter_x, jitter_y,
           xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
           scale_x, scale_y, pad_x, pad_y, legend_title,
@@ -1775,27 +1829,34 @@ function(x, y=NULL, data=d, filter=NULL,
           by.cat <- NULL
         }
 
+        if (!is.null(jitter_y)) if (jitter_y != 0) j.y <- m.out$jitter_y
+        if (!is.null(jitter_x)) if (jitter_x != 0) j.x <- m.out$jitter_x
+
+    }  # end do_plot
+
         if (outp && !quiet) {  # text output
 
-          txprm <- ""
-
+          txjit <- NULL
 #         if (xor(cat.x, cat.y) || xor(num.c.x, num.c.y)) {  # show jitter
-          if (!is.null(jitter_x) &&  !is.null(jitter_y)) {
+          if (!is.null(jitter_x) && !is.null(jitter_y)) {
             if (jitter_x != 0  ||  jitter_y != 0) {  # show jitter
               tx <- character(length = 0)
               tx[length(tx)+1] <- "Some Parameter values (can be manually set)"
               tx[length(tx)+1] <- .dash2(55)
               tx[length(tx)+1] <- paste("size:", .fmt(pt.size,2),
                   " size of plotted points")
-              tx[length(tx)+1] <- paste("jitter_y:", .fmt(m.out$jitter_y,2),
+              if (!is.null(jitter_y)) if (jitter_y != 0) 
+                tx[length(tx)+1] <- paste("jitter_y:", .fmt(j_y,2),
                   " random vertical movement of points")
-              tx[length(tx)+1] <- paste("jitter_x:", .fmt(m.out$jitter_x,2),
+              if (!is.null(jitter_x)) if (jitter_x != 0) 
+                tx[length(tx)+1] <- paste("jitter_x:", .fmt(j_x,2),
                   " random horizontal movement of points")
-              txprm <- tx
+              txjit <- tx
             }
           }
 
           #  radius, power values in the analysis
+          txbub <- NULL
           if (object == "bubble") {   # move to .plt.txt
             tx <- character(length = 0)
             tx[length(tx)+1] <- "Some Parameter values (can be manually set)"
@@ -1804,7 +1865,7 @@ function(x, y=NULL, data=d, filter=NULL,
                 "   size of largest bubble")
             tx[length(tx)+1] <- paste("power:", .fmt(power,2),
                 "    relative bubble sizes")
-            txprm <- tx
+            txbub <- tx
           }
 
           if (n_bins == 1) {  # if binning, .plt.bins does its own output
@@ -1822,18 +1883,12 @@ function(x, y=NULL, data=d, filter=NULL,
 
             if (!is.null(outlpts)) {
               class(outlpts) <- "out"  # MD outliers
-            output$outlpts <- outlpts
+              output$outlpts <- outlpts
             }
-
-            # process separately at the end of file
-            # need to take mts structures output and convert to char
-            # see file covert_mtsTochar.r in New Features folder
-            out_SSE.fit <- NULL
-            if (!is.null(m.out$SSE.fit)) {  # i.e., time_ahead > 0
-              out_SSE.fit <- m.out$SSE.fit
-              out_fit.frcst <- m.out$fit.frcst
-              out_y.frcst <- m.out$y.frcst
-            }
+            if (length(out_outliers) > 1)  # source is here
+              output$out_outliers <- out_outliers
+            if (length(o$out_outliers) > 1)  # source is .plt.txt
+              output$out_outliers <- o$out_outliers
 
             if (!is.null(o$out_stats))
               output$out_stats <- o$out_stats
@@ -1851,21 +1906,40 @@ function(x, y=NULL, data=d, filter=NULL,
             if (!is.null(o$out_XV)) if (length(o$out_XV) > 1)
               output$out_XV <- o$out_XV
 
-            if (length(out_outliers) > 1)  # source is here
-              output$out_outliers <- out_outliers
-            if (length(o$out_outliers) > 1)  # source is .plt.txt
-              output$out_outliers <- o$out_outliers
 
-            class(txprm) <- "out"  # parameter values
-            if (length(txprm) > 1)
-              output$out_parm <- txprm
+            if (!is.null(txjit))
+              class(txjit) <- "out"  # jitter parameter
+              output$out_jitter <- txjit
 
-            class(output) <- "out_all"
+            if (!is.null(txbub))
+              class(txbub) <- "out"  # bubble plot parameters
+              output$out_bubble <- txbub
+
+            if (!is.null(out_err)) {
+              class(out_err) <- "out"
+              output$out_err <- out_err
+            }
+
+            if (!is.null(out_coefs)) {
+              class(out_coefs) <- "out"
+              output$out_coefs <- out_coefs
+            }
+
+            if (!is.null(out_smooth)) {
+              class(out_smooth) <- "out"
+              output$out_smooth <- out_smooth
+            }
+
+            if (!is.null(output)) class(output) <- "out_all"
           }  # end n_bins==1
         }  #  end text output
 
       }  #  end do_plot
-    }  # end 2-variable scatter plot, line plot, bubble plot
+
+      else {
+        output <- NULL
+      }
+
   }  # end all other analyses
   # -------------------------
 
@@ -1884,25 +1958,32 @@ function(x, y=NULL, data=d, filter=NULL,
   options(byname=NULL)
 
   # display text output from Plot() unless turned off
-  # outp generally set TRUE when here, but not always
   # T.type is the type of Trellis plot, otherwise is NULL
   if (!quiet && n_bins==1) {
     if (Trellis) {  # only VBS plots have output processed here
       if (!(T.type %in% c("cont", "cont_cat"))) outp <- FALSE
     }
     if (n.x_var > 1  &&  y.miss) outp <- FALSE  # scatterplot matrix
-    if (outp && !quiet) {
-      if (time_ahead > 0) {
-        print(output)
-        cat(out_SSE.fit, "\n\n") 
-        if (!is.null(out_fit.frcst)) {
-          print(out_fit.frcst)
+
+    if (outp) {
+      if (!is.null(output)) print(output)
+
+      # out_y.frcst is a multi times series, cannot display with class out
+      if (time_ahead > 0) {  # did a forecast
+        if (!is.null(out_fitted)) {
+          print(out_fitted)
           cat("\n")
         }
-        print(out_y.frcst) 
-      }
-      else
-        return(output)  # "prints"
-    }
+        if (!is.null(out_y.frcst)) print(out_y.frcst) 
+      }  # end time_ahead > 0
+    }  # end outp
   }
+
+  if (!is.null(out_fitted)) output$out_fitted <- out_fitted
+  if (!is.null(out_y.frcst)) {
+    output$out_y.frcst <- out_y.frcst
+    cat("\n")
+  }
+
+  if (!is.null(output)) return(invisible(output))
 }

@@ -4,12 +4,12 @@
 \title{Seasonal and Trend Decomposition of a Time series via Loess}
 
 \description{
-Decompose a time series into seasonal, trend and irregular components using loess, a simple wrapper for the Base R \code{stl} function that provides additional information. Accepts a Base R time series from the global environment as input, required by \code{stl}, but also accepts data in the traditional x,y format where $x$ is a variable of type \code{Date}, which is also guessed from character string inputs.
+Decompose a time series into seasonal, trend and irregular components using loess, a simple wrapper for the Base R \code{stl} function that provides additional information. Accepts a Base R time series from the global environment as input, required by \code{stl}, but also accepts data in the traditional \code{x},\code{y} format where \code{x} is a variable of type \code{Date}, which is also inferred from character string inputs.
 }
 
 \usage{
-STL(x, y=NULL, data=d, filter=NULL,
-    time_format=NULL, robust=FALSE)
+STL(x, y=NULL, data=d, filter=NULL, time_format=NULL,
+    show_range=FALSE, robust=FALSE, quiet=FALSE, do_plot=TRUE)
 }
 
 \arguments{
@@ -26,8 +26,11 @@ STL(x, y=NULL, data=d, filter=NULL,
     needed if the function cannot identify the date format to properly
     decode the given date values. For example, describe a character string
     date such as \code{"09/01/2024"} by the format \code{"\%m/\%d/\%Y"}.
-    See \code{details} for more information.}\
+    See \code{details} for more information.}
+  \item{show_range}{Display the range for each component.}
   \item{robust}{\code{stl()} parameter for a more robust solution.}
+  \item{quiet}{If \code{TRUE}, no text output to the console.}
+  \item{do_plot}{If \code{FALSE}, no plot.}
 }
 
 \details{

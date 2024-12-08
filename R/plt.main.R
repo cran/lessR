@@ -1,5 +1,5 @@
 .plt.main <-
-function(x, y, by=NULL, n_cat=getOption("n_cat"),
+function(x, y, by=NULL,
          cat.x=FALSE, cat.y=FALSE,
          object="point", stat="data",
 
@@ -34,13 +34,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
          ellipse_fill="off", ellipse_lwd,
 
          run=FALSE, center_line="off", stack=FALSE,
-         time_unit=NULL, agg, do.agg, time_ahead=0,
+         time_unit=NULL, agg=FALSE, do.agg="sum", time_ahead=0,
          time_fit=FALSE, n_date_tics=NULL,
-         es_level=NULL, es_trend=NULL, es_seasons=NULL,
-         es_type="additive", es_levelCI=0.95,
-         freq.poly=FALSE,
+         y.fit, y.hat, x.fit, x.hat, y.upr, y.lwr,
+         mxf.x, mnf.y, mxf.y,
 
-         jitter_x=NULL, jitter_y=NULL,
+         freq.poly=FALSE, jitter_x=NULL, jitter_y=NULL,
 
          xlab_adj=0, ylab_adj=0, bm.adj=0, lm.adj=0,
          tm.adj=0, rm.adj=0,
@@ -101,12 +100,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # axis labels and title
   # ---------------------
 
-  # set title for bubble plot if proportions
-  if (object == "bubble"  &&  prop  &&  is.null(main)  &&  cat.y) {
-    main.lab <- paste("Percentage of", y.name, "\nwithin each level of", x.name)
-    main <- "not null"
-  }
-
   # size is a variable, these values passed to .plt.main
   # bubble.title=FALSE passed from .plt.bins to suppress title
   # bubble plot can be directly from object="point"
@@ -148,6 +141,12 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       x.lab <- NULL  # e.g., get rid of == "c(Female,Male)"
   if (date.var && is.null(xx.lab)) x.lab <- ""
 
+  # set title for bubble plot if proportions
+  if (object == "bubble"  &&  prop  &&  is.null(main)  &&  cat.y) {
+    main.lab <- paste("Percentage of", y.name, "\nwithin each level of", x.name)
+    main <- "not null"
+  }
+
   if (!is.null(x.name)) if (x.name == "Index") {
     if (n.ycol > 1) y.lab <- ""
     if (!is.null(x.lbl)) y.lab <- paste(x.name, ": ", x.lbl, sep="")
@@ -160,6 +159,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # convert factors to numeric, save levels, so x and y are always numeric
   # x will always be a matrix
   x.lvl <- NULL; y.lvl <- NULL  # if remain null, then not factors
+  y.frcst <- NULL
   nm.x <- names(x)
   if (cat.x) {
     x.lvl <- levels(x[,1])
@@ -171,66 +171,14 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
   else {  # date.var
     if (n.by == 0)
-      x.tics <- x[,1]  # save actual dates for later
+      x.dates <- x[,1]  # save actual dates for later
     else {  # x-axis tics just for one level of by
       cnt <- sum(by == levels(by)[1])
-      x.tics <- x[1:cnt,1]  # assumes by is sorted by level
+      x.dates <- x[1:cnt,1]  # assumes by is sorted by level
     }
+  if (time_ahead > 0) x.dates <- c(x.dates, x.hat[,1]) 
 
-    # forecast
-    if (time_ahead > 0) {
-      # extend x through forecasted values
-      # when computing x.hat, need the +1 and [-1] to not duplicate last x value
-      xorig.len <- nrow(x)
-      mx.d <- x[nrow(x),1]  # numeric form
-      x.hat <- seq.Date(mx.d, by=time_unit, length.out=time_ahead+1)[-1]
-      x.tics <- c(x[,1], x.hat)
-
-      # fit: fit$fitted is mts, a multivariate time series
-      x.orig <- x.tics[1:xorig.len]
-      y.ts <- .tsMake(x.orig, y)  # convert data to ts form
-      if (time_unit == "years") es_seasons <- FALSE  # no seasons in annual data
-      fit <- HoltWinters(y.ts, alpha=es_level, beta=es_trend,
-                         gamma=es_seasons)
-      colnames(fit$fitted)[1] <- "fitted"
-
-      SSE <- fit$SSE
-
-      # predict with prediction intervals
-      yf <- .tsExtract(fit$fitted[,1], x.name)
-      x.fit <- yf$x.dates
-      y.fit <- yf$y
-      y.fcrst <- predict(fit, n.ahead=time_ahead,
-                     prediction.interval=TRUE, level=es_levelCI)
-      colnames(y.fcrst)[1] <- "predicted"
-
-      # get predicted values and PI
-      y.ahead <- .tsExtract(y.fcrst[,"predicted"], x.name)
-      x.prd <- y.ahead$x.dates
-      y.prd <- y.ahead$y
-      y.ahead <- .tsExtract(y.fcrst[,"upr"], x.name)
-      x.upr <- y.ahead$x.dates
-      y.upr <- y.ahead$y
-      y.ahead <- .tsExtract(y.fcrst[,"lwr"], x.name)
-      x.lwr <- y.ahead$x.dates
-      y.lwr <- y.ahead$y
-
-      # adjust forecasted values to match the date format of the data values
-      if (time_unit %in% c("weeks", "months")) {
-        x.prd[,1] <- zoo::as.Date(zoo::as.yearmon(x.prd[,1]), frac=1)
-        x.upr[,1] <- zoo::as.Date(zoo::as.yearmon(x.upr[,1]), frac=1)
-        x.lwr[,1] <- zoo::as.Date(zoo::as.yearmon(x.lwr[,1]), frac=1)
-      }
-      else if (time_unit == "quarters") {
-        x.prd[,1] <- zoo::as.Date(zoo::as.yearqtr(x.prd[,1]), frac=1)
-        x.upr[,1] <- zoo::as.Date(zoo::as.yearqtr(x.upr[,1]), frac=1)
-        x.lwr[,1] <- zoo::as.Date(zoo::as.yearqtr(x.lwr[,1]), frac=1)
-      }
-
-    rm.adj <- rm.adj + .75  # make room for legend
-    }  # end time_ahead forecast
-
-    x <- as.matrix(x[,1], ncol=1)  # x to numeric version of dates
+   x <- as.matrix(x[,1], ncol=1)  # x to numeric version of dates
   }  # end if date.var
 
   # y to a matrix
@@ -278,9 +226,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   mn.x <- ifelse (cat.x, 1, min(x, na.rm=TRUE))
   if (time_ahead > 0) {  # forecast margin adjustments
-    mx.x <- as.numeric(x.hat[length(x.hat)])
-    mx.y <- max(max(y), max(y.fit), max(y.upr))
-    mn.y <- min(min(y), min(y.fit), min(y.lwr))
+    mx.x <- mxf.x
+    mx.y <- mxf.y
+    mn.y <- mnf.y
   }
   else {
     mx.x <- ifelse (cat.x, length(x.lvl), max(x, na.rm=TRUE))
@@ -348,6 +296,8 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   if ((options("device") != "RStudioGD")  &&  !is.null(by)) rm <- rm + .3
 
   if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
+
+  if (time_ahead > 0) rm <- rm + 0.75
 
   # user manual adjustment
   bm <- bm + bm.adj
@@ -460,7 +410,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   # ----------------------
   # set up plot background
 
-  # set axT1: x-axis tics and values, Date var uses axT1date, defined later
+  # set axT1: x-axis tics and values, Date var uses x.zoo.dates, defined later
   if (cat.x)
     axT1 <- seq_along(x.lvl)   # mark category values
   else {  # numerical
@@ -521,16 +471,16 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
       adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
 
-      len.xtics <- length(x.tics)
-      indices <- seq_along(x.tics)  # retain if num of data pts < n.tics
+      len.xtics <- length(x.dates)
+      indices <- seq_along(x.dates)  # retain if num of data pts < n.tics
       step_range <- integer(length(50))
 
       if (time_unit == "years") {
-        axT1date <- format(x.tics, "%Y")
+        x.zoo.dates <- format(x.dates, "%Y")
         n.tics <- ifelse (is.null(n_date_tics), 10, n_date_tics)
       }
       else if (time_unit == "quarters") {
-        axT1date <- as.character(zoo::as.yearqtr(x.tics))
+        x.zoo.dates <- as.character(zoo::as.yearqtr(x.dates))
         n.tics <- ifelse (is.null(n_date_tics), 9, n_date_tics)
         if (len.xtics >= 4*n.tics) {
           for (i in 1:50) step_range[i] <- 4*i
@@ -540,17 +490,17 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         }
       }
       else if (time_unit %in% c("weeks", "months")) {
-        axT1date <- as.character(zoo::as.yearmon(x.tics))
+        x.zoo.dates <- as.character(zoo::as.yearmon(x.dates))
         n.tics <- ifelse (is.null(n_date_tics), 7, n_date_tics)
         if (len.xtics >= 12*n.tics) {
           for (i in 1:50) step_range[i] <- 12*i
           tics_range <- ceiling(len.xtics / step_range)
           step <- step_range[which.min(abs(tics_range-n.tics))]
-          indices <- seq(1, length(x.tics), by=step)
+          indices <- seq(1, length(x.dates), by=step)
         }
       }
       else {  # e.g., days
-         axT1date <- as.character(x.tics)
+         x.zoo.dates <- as.character(x.dates)
          n.tics <- ifelse (is.null(n_date_tics), 7, n_date_tics)
       }
 
@@ -560,9 +510,9 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
         indices <- seq(1, len.xtics, by=step)
       }
 
-      # axT1date is the xts customized for char time_unit date, e.g., Aug 2023
-      # x.tics are the dates in Date format, e.g., 2023-08-01
-      axis(1, axT1date, at=x.tics[indices], labels=axT1date[indices],
+      # x.zoo.dates is the xts customized for char time_unit date, Aug 2023
+      # x.dates are the dates in Date format, e.g., 2023-08-01
+      axis(1, x.zoo.dates, at=x.dates[indices], labels=x.zoo.dates[indices],
                 col=ax$axis_x_color, cex.axis=axis_x_cex,
                 col.axis=ax$axis_x_text_color, tck=-.02, ...)  # x-axis
 
@@ -583,7 +533,7 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
       y.lab <- paste(show.agg, y.name, "by", tu)
     }
 
-    .plt.bck(usr, x.tics[indices], axT2, do.h=!bubble1)
+    .plt.bck(usr, x.dates[indices], axT2, do.h=!bubble1)
   }
   else
     .plt.bck(usr, axT1, axT2, do.h=!bubble1)
@@ -627,18 +577,19 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
             polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
                 col=area_fill, border="transparent")
 
-          if (time_ahead > 0) {
-            trns.red <- .maketrans("darkred", .16*256)
+          if (time_ahead > 0) {  # forecast
+            trns.red <- .maketrans("darkred", 0.25*256)
             lines(x.fit[,1], y.fit[,1], col=trns.red, lwd=ln.width)
-            lines(c(x.fit[nrow(x.fit),1],x.prd[1,1]),
-                  c(y.fit[nrow(y.fit),1],y.prd[1,1]),
+            lines(c(x.fit[nrow(x.fit),1], x.hat[1,1]),  # connect fit with hat
+                  c(y.fit[nrow(y.fit),1], y.hat[1,1]),
                   col=trns.red, lwd=ln.width)
-            points(x.prd[,1], y.prd[,1], pch=shape, bg="darkred", cex=.65)
-            lines(x.prd[,1], y.prd[,1], col="darkred", lwd=ln.width)
-            lines(x.upr[,1], y.upr[,1], col=trns.red, lwd=ln.width)
-            lines(x.lwr[,1], y.lwr[,1], col=trns.red, lwd=ln.width)
-            xx <- c(x.prd[,1], rev(x.prd[,1]))
-            yy <- c(y.fcrst[,"upr"], rev(y.fcrst[,"lwr"]))
+            f.size.pt <- ifelse (size.pt<0.5, .65, size.pt)
+            points(x.hat[,1], y.hat[,1], pch=shape, bg="darkred", cex=f.size.pt)
+            lines(x.hat[,1], y.hat[,1], col="darkred", lwd=ln.width)
+            lines(x.hat[,1], y.upr[,1], col=trns.red, lwd=ln.width)
+            lines(x.hat[,1], y.lwr[,1], col=trns.red, lwd=ln.width)
+            xx <- c(x.hat[,1], rev(x.hat[,1]))
+            yy <- c(y.upr[,1], rev(y.lwr[,1]))
             polygon(xx, yy, border=NA, col=rgb(.6,0,0,.15))
 
             lgn.clr <- c("black", trns.red, "darkred")
@@ -1312,12 +1263,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
 
   # -----------
   # end, return
-  SSE.fit <- NULL;  fit.frcst <- NULL;  y.frcst <- NULL
-  if (time_ahead > 0) {
-    SSE.fit <- paste("Sum of squared fit errors:", .fmt_cm(SSE, 3))
-    if (time_fit) fit.frcst <- fit$fitted
-    y.frcst <- y.fcrst
-  }
 
   if (fit.line != "off") {
     mse <- mse;  b0 <- b0;  b1 <- b1;  Rsq <- Rsq;  by.cat <- by.cat
@@ -1327,7 +1272,6 @@ function(x, y, by=NULL, n_cat=getOption("n_cat"),
   }
 
   return(list(mse=mse, b0=b0, b1=b1, Rsq=Rsq, by.cat=by.cat,
-              SSE.fit=SSE.fit, fit.frcst=fit.frcst, y.frcst=y.frcst, 
               jitter_x=jitter_x, jitter_y=jitter_y))
 
 }  # end plt.main

@@ -22,7 +22,7 @@ reshape_long(data, transform, group="Group", response="Response", ID="ID",
         long-form column.}
   \item{ID}{Name of the newly created ID field in the new long-form
         column, the original row number from the wide-form. If \code{NULL},
-        the default value, then not created.}
+        then not created.}
   \item{prefix}{The prefix added to the value of ID for each row of data.}
   \item{sep}{Any potential separator of the ID prefix from the given value
        of the ID.}

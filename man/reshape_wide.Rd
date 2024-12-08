@@ -1,7 +1,7 @@
 \name{reshape_wide}
 \alias{reshape_wide}
 
-\title{Reshape a Wide-Form Data Frame to Wide-Form}
+\title{Reshape a Long-Form Data Frame to Wide-Form}
 
 \description{
 A simple wrapper for Base R \code{\link{reshape}} with sensible parameter names and sensible defaults, and able to specify a range of variables to transform.

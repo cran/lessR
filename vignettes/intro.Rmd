@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 library(lessR)
 ```
 
-The vignette examples of using **lessR** became so extensive that **lessR** exceeded the maximum R package installation size. Find some examples below and many more vignette examples at:
+The vignette examples of using **lessR** became so extensive that the maximum R package installation size was exceeded. Find a limited number of examples below. Find many more vignette examples at:
 
 [lessR examples](https://web.pdx.edu/~gerbing/lessR/examples/)
 
@@ -84,7 +84,7 @@ Histogram(Salary, bin_start=35000, bin_width=14000, fill="reds")
 
 ## Scatterplot
 
-Specify an X and Y variable with the plot function to obtain A scatter plot. In this example, both variables are continuous though any combination of continuous or categorical variables is possible, including specifying only one variable.
+Specify an X and Y variable with the plot function to obtain a scatter plot. For two variables, both variables can be any combination of continuous or categorical. One variable can also be specified. A scatterplot of two categorical variables yields a bubble plot. Below is a scatterplot of two continuous variables. 
 
 ```{r sp, fig.width=4}
 Plot(Years, Salary)
@@ -102,6 +102,13 @@ The default plot for a single continuous variable includes not only the scatterp
 Plot(Salary)
 ```
 
+Following is a scatterplot in the form of a bubble plot for two categorical variables.
+
+```{r spBubble, fig.width=4}
+Plot(JobSat, Gender)
+```
+
+
 
 ## Regression Analysis
 
@@ -116,7 +123,9 @@ reg(Salary ~ Years + Pre)
 
 ## Time Series
 
-The time series plot, plotting the values of a variable cross time, is a special case of a scatterplot, potentially with the points of size 0 with adjacent points connected by a line segment. Indicate a time series by specifying the `x`-variable, the first variable listed, as a variable of type `Date`. This conversion to `Date` data values occurs automatically for dates specified in a digital format, such as `18/8/2024`.
+The time series plot, plotting the values of a variable cross time, is a special case of a scatterplot, potentially with the points of size 0 with adjacent points connected by a line segment. Indicate a time series by specifying the `x`-variable, the first variable listed, as a variable of type `Date`. This conversion to `Date` data values occurs automatically for dates specified in a digital format, such as `18/8/2024` or related formats plus examples such as `2024 Q3` or `2024 Aug`. Otherwise, explicitly use the R function `as.Date()` or pass the date format directly with the `time_format` parameter.
+
+In this `StockPrice` data file, the date conversion as already been done.
 
 
 ```{r}
@@ -124,7 +133,7 @@ d <- Read("StockPrice")
 head(d)
 ```
 
-We have the date as _Month_, and also _Company_ and stock _Price_.
+We have the date as _Month_, and also have variables _Company_ and stock _Price_.
 
 ```{r}
 d <- Read("StockPrice")
@@ -145,7 +154,7 @@ Here, aggregate the mean by time, from months to quarters.
 Plot(Month, Price, time_unit="quarters", time_agg="mean")
 ```
 
-`Plot()` implements exponential smoothing forecasting with accompanying visualization. New parameters include `time_ahead` for the number of `time_units` to forecast into the future, and `time_format` to provide a specific format for the date variable if not detected correctly by default. Control aspects of the exponential smoothing estimation and prediction algorithms with parameters `es_level` (alpha), `es_trend` (beta), `es_seasons` (gamma), `es_type` for additive or multiplicative seasonality, and `es_PIlevel` for the level of the prediction intervals.
+`Plot()` implements exponential smoothing forecasting with accompanying visualization. Parameters include `time_ahead` for the number of `time_units` to forecast into the future, and `time_format` to provide a specific format for the date variable if not detected correctly by default. Control aspects of the exponential smoothing estimation and prediction algorithms with parameters `es_level` (alpha), `es_trend` (beta), `es_seasons` (gamma), `es_type` for additive or multiplicative seasonality, and `es_PIlevel` for the level of the prediction intervals.
 
 To forecast Apple's stock price, focus here on the last several years of the data, beginning with Row 400 through Row 473, the last row of data for apple. In this example, forecast ahead 24 months.
 

@@ -1,3 +1,35 @@
+# lessR version 4.3.9, December 8, 2024
+
+## Updates
+
+* `Plot()`: For a time series exponential smoothing forecast, now display SSE and MSE fit indices, the linear trend and seasonal coefficients, and the obtained smoothing parameter values. 
+
+* `Plot()`: Improved conversion of character string numeric dates to R type Date.
+
+* `Plot()`: Read dates entered as character strings formatted as:
+  + "year quarter" where quarter is "Q1" through "Q4", e.g., "2024 Q3"
+  + "year month" where "month" is a three-letter abbreviation, e.g., "2024 Apr".
+
+* `Plot()`: Forecasting output now written to an output list object such as `p <- Plot(...)` with names out_frcst, out_fitted, out_coefs, and out_params. This output is accessible for showing just part of the output, such as `p$out_frcst` when writing R Markdown documents from the results.
+
+* `STL()`: Set parameter `show_range` to `TRUE` to show the range of each component. Before `TRUE` was the default.
+
+* `STL()`: Parameter `quiet` added to suppress text output and parameter `do_plot` added to suppress the visualization.
+
+
+## Bug Fixes
+
+* `Plot()`: Exponential smoothing of multiplicative models now working, indicated by `es_type="multiplicative"`.
+
+* `Plot()`: Can set `style(suggest=FALSE)` for a time series plot.
+
+* `Plot()`: If missing data for a run chart, a proper error message is now displayed if attempting to show the runs, for which missing data does not work.
+
+* `Plot()`: Turn off the plot with `do_plot=FALSE`, leaving only text output, now works.
+
+* `Plot()`: If plotting a run chart with multiple `y` variables, adjacent points are now connected with line segments for each of the `y` variables. Example: `Plot(.Index, c(y1,y2,y3))`.
+
+
 # lessR version 4.3.8, October 7, 2024
 
 ## Major Updates
@@ -7,9 +39,9 @@
 * `Plot()`: Character string versions of a date as in a variety of forms as digits, such as "08/18/2024", are now by default converted to variable type of `Date`. However, this conversion is inherently ambiguous, so the `time_format` parameter is provided as a means to provide the precise format if needed, including other formats such as "August 18, 2024". Also, a sequence of four-digit integers within the usual range of dates will also convert automatically to a variable of type `Dates.
 
 * `STL()`: A wrapper for Base R `stl()` that provides additional information and utility: 
-- allows input data as two columns, a variable of type `Date` as the `x`-variable and the time series values as the `y`-variable instead of an R time series. 
-- If the dates are character string digits (see above), they are automatically converted to a variable of type `Date`. 
-- The function also assists in comparing the magnitude of each extracted effect by showing the proportion of variance explained for the trend, seasonal effect, and error.
+  + allows input data as two columns, a variable of type `Date` as the `x`-variable and the time series values as the `y`-variable instead of an R time series. 
+  + If the dates are character string digits (see above), they are automatically converted to a variable of type `Date`. 
+  + The function also assists in comparing the magnitude of each extracted effect by showing the proportion of variance explained for the trend, seasonal effect, and error.
 
  
 ## Updates
@@ -40,6 +72,7 @@
 * `Plot()`: When plotting a times series and requesting a level of time aggregation with the `time_unit` parameter that is more detailed than the available data, the analysis appropriately terminates with an error message. For example, if the time series data is monthly and an aggregation of `weeks` is requested, no analysis is done.
 
 * `Plot()`: For plotting time series data, new parameter `n_date_ticks` added to override the default number of ticks on the `x` axis, the date axis.
+
 
 ## Bug Fixes
 

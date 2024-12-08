@@ -1,5 +1,5 @@
 .plt.txt <-
-function(x, y, stat, object, cat.x,  cat.y, date.var,
+function(x, y, stat, object, cat.x, cat.y, date.var,
        xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat,
        center_line, run, show_runs, prop, size, radius, digits_d,
        fun_call=NULL, txdif=NULL) {
@@ -61,7 +61,6 @@ function(x, y, stat, object, cat.x,  cat.y, date.var,
   else
     cleveland <- FALSE
 
-
   gl <- .getlabels(xlab, ylab)  # this redoes if already a plot
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   y.name <- gl$yn; y.lbl <- gl$yl; y.lab <- gl$yb
@@ -75,8 +74,9 @@ function(x, y, stat, object, cat.x,  cat.y, date.var,
 
   if (n_col > 1) center_line <- "off"   # no center_line for multiple plots
 
+  m.y <- mean(y[,1], na.rm=TRUE)
+
   if (center_line == "mean") {
-    m.y <- mean(y[,1], na.rm=TRUE)
     lbl <- " mean"
     lbl.cat <- "mean:"
   }
@@ -720,6 +720,12 @@ function(x, y, stat, object, cat.x,  cat.y, date.var,
         class(output) <- "out_all"
         print(output)
 
+        # if any missing data, then run analysis not possible
+        if (any(is.na(y))) {
+          cat("\n"); stop(call.=FALSE, "\n------\n",
+            "Analysis of runs not possible with missing data\n\n")
+        }
+
         .dash(12); cat("Run Analysis\n"); .dash(12)
         run <- integer(length=0)  # length of ith run in run[i]
         n.runs <- 1  # total number of runs
@@ -738,7 +744,7 @@ function(x, y, stat, object, cat.x,  cat.y, date.var,
               line.out <- ""
               n.runs <- n.runs + 1
               run[n.runs] <- 0
-            }
+            }  # end new run
           }
           run[n.runs] <- run[n.runs] + 1
           buf <- ifelse (i < 10, "  ", " ")

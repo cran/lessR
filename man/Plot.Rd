@@ -24,7 +24,7 @@ A scatterplot displays the values of a distribution, or the relationship between
 \strong{Variable Type}     \tab  \strong{Meaning}\cr
 -------------------------- \tab --------------------------------------\cr
 \code{x}, \code{y}, or \code{z} \tab single continuous variable\cr
-\code{xDate} \tab date variable, defined as a R Date type\cr
+\code{xDate} \tab date variable, defined as a R Date type, which can be implicitly created from entered numeric dates\cr
 \code{xCat}, \code{yCat}, or \code{zCat} \tab categorical variable, typically defined as an R factor\cr
 \code{xUnique} or \code{yUnique} \tab categorical variable with all values unique\cr
 \code{X} or \code{Y} \tab vector of continuous variables\cr
@@ -42,7 +42,7 @@ A scatterplot displays the values of a distribution, or the relationship between
 
 \strong{One variable}\cr
 \code{Plot(x)}: one continuous variable generates either a violin/box/scatterplot
-    (VBS plot), named here, or a run chart, generated from the $x$-variable named 
+    (VBS plot), named here, or a run chart, generated from the \code{x}-variable named 
     \code{.Index}. Or \code{x} can be an R time series object created with
     \code{ts()} for a time series visualization\cr
 \code{Plot(xCat)}: one categorical variable yields a 1-dimensional bubble plot to
@@ -87,7 +87,7 @@ Plot(
     transparency=getOption("trans_pt_fill"),
 
     enhance=FALSE,
-    size=NULL, size_cut=NULL, shape="circle", means=TRUE,
+    size=NULL, size_cut=NULL, shape="circle", lwd=1.5, means=TRUE,
     segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
     # ----------------------
@@ -118,8 +118,7 @@ Plot(
     time_unit=NULL, time_agg=c("sum", "mean"), time_ahead=0, time_format=NULL,
     time_fit=FALSE, es_level=NULL, es_trend=NULL, es_seasons=NULL,
     es_type=c("additive", "multiplicative"), es_PIlevel=0.95,
-    stack=FALSE, lwd=1.5,
-    area_fill="transparent", area_split=0, n_date_tics=NULL,
+    stack=FALSE, area_fill="transparent", area_split=0, n_date_tics=NULL,
     # Run chart (also by indicating .Index for the name of the x-variable)
     show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
 
@@ -311,6 +310,8 @@ vp(\dots)
        according to \code{by}, then list as a vector with with one shape for each
        level to be plotted or set to \code{"vary"} to have shapes selected by
        default across the \code{by} groups.}
+  \item{lwd}{Width of the line segments. Set to zero to remove the line
+        segments.}       
   \item{means}{If the one variable is categorical, expressed as a factor, and
        the other variable continuous, then if \code{TRUE}, by default,
        plot means with the scatterplot. Also applies to a 1-D scatterplot.}
@@ -394,7 +395,7 @@ vp(\dots)
 
         
   \item{time_unit}{Specify the time unit from which to plot a time series,
-        plotted when the $x$-variable is of type \code{Date}. 
+        plotted when the \code{x}-variable is of type \code{Date}. 
         Default value is the time unit that describes the time intervals as
         they occur in the data.
         Aggregation according to the time unit will occur as specified, such as
@@ -416,23 +417,24 @@ vp(\dots)
     See \code{details} for more information.}
   \item{time_fit}{If \code{TRUE}, for each data value display the fitted value,
         level, trend, and seasonal component.}
-  \item{es_level}{Holt-Winters exponential smoothing level parameter, 
-       \code{alpha}, numerical values from 0 to 1 to preset.}
-  \item{es_trend}{Holt-Winters exponential smoothing trend parameter,
-       \code{beta}, numerical values from 0 to 1 to preset or \code{FALSE}
+  \item{es_level}{Holt-Winters exponential smoothing level parameter,
+       \code{alpha}. By default, the algorithm chooses an optimal numerical
+       value from 0 to 1, or user specify. Or set to \code{FALSE}
        to remove the effect.}
+  \item{es_trend}{Holt-Winters exponential smoothing trend parameter,
+       \code{beta}. By default, the algorithm chooses an optimal numerical
+       value from 0 to 1, or user specify.}
   \item{es_seasons}{Holt-Winters exponential smoothing seasonal parameter,
-       \code{gamma}, numerical values from 0 to 1 to preset or \code{FALSE}
+       \code{gamma}. By default, the algorithm chooses an optimal numerical
+       value from 0 to 1, or user specify. Or set to \code{FALSE}
        to remove the effect. Defaults to \code{FALSE} for annual data, which
        cannot exhibit intra-annual seasonality.}
   \item{es_type}{Type of seasonal model, default is \code{"additive"} with
-       a \code{"multiplicative"} option. Can also specify the value.}
+       a \code{"multiplicative"} option.}
   \item{es_PIlevel}{Level of the prediction interval about the forecasted 
        Holt-Winters values with a default of \code{0.95}.}
   \item{stack}{If \code{TRUE}, multiple time plots are stacked on each other, with
        \code{area} set to \code{TRUE} by default.}
-  \item{lwd}{Width of the line segments. Set to zero to remove the line
-        segments.}       
   \item{area_fill}{Specifies the area under the line segments, if present.
        If \code{stack} is \code{TRUE}, then
        default is gradation from default color range, e.g., \code{"blues"}.
@@ -778,11 +780,13 @@ All colors are displayed at the same level of gray-scale saturation and brightne
 The second possibility with \code{facet1} produces the different box plots on a separate panel, that is, a Trellis chart. These box plots are displayed with a single hue, the first color, blue, in the default qualitative sequence.
 
 TIME CHARTS\cr
+See \url{https://web.pdx.edu/~gerbing/lessR/examples/Time.html} for more explanation and examples.
+
 Specifying one or more \code{x}-variables with no \code{y}-variables, and \code{.Index} appears as the name of the \code{x}-variables in a run chart. The values of the specified \code{x}-variable are plotted on the \code{y}-axis, with Index on the \code{x}-axis. Index is the ordinal position of each data value, from 1 to the number of values. 
 
-If the specified \code{x}-variable is of type \code{Date}, or is an R time series, a time series plot is generated for each specified variable. If a formal R time-series, univariate or multivariate, specify as the \code{x}-variable. Or, specify the \code{x}-variable of type \code{Date}, and then specify the  \code{y}-variable as one or more time series to plot. The \code{y}-variable can be formatted as tidy data with all the values in a single column, or as wide-formatted data with the time-series variables in separate columns.
+If the specified \code{x}-variable is of type \code{Date}, or is an R time series, a time series plot is generated for each specified variable. If data are represented as a formal R time-series, univariate or multivariate, specify as the \code{x}-variable. One possibility is to specify the \code{x}-variable of type \code{Date}, or, have \code{Plot} do the conversion implicitly from entered character-string numerical dates such as "08/18/1952". Then specify the  \code{y}-variable as one or more time series to plot. The \code{y}-variable can be formatted as long-form data with all the values in a single column, or as wide-formatted data with the time-series variables in separate columns.
 
-\code{Plot()} makes a reasonable attempt to decode a character string date value as the \code{x}-axis variable as read from a text data file such as a \code{csv} file. However, some date formats are not available for conversion by default, such as date values that include the name of the month instead of its number. And, in general, there can be no guarantee that a date format is not miss-inferred as they can be inherently ambiguous. 
+\code{Plot()} makes a reasonable attempt to decode a character string date value as the \code{x}-axis variable as read from a text data file such as a \code{csv} file. However, some date formats are not available for conversion by default, such as date values that include the name of the month instead of its number. In general, there can be no guarantee that a date format is not miss-inferred as they can be inherently ambiguous. 
 
 If the default date conversion is not working or is not available, then manually supply the date format following one of the format examples in the following table according to the parameter \code{time_format}.
 
@@ -799,7 +803,6 @@ Example Date \tab Format\cr
 \code{"20220901"} \tab \code{"\%Y\%m\%d"}\cr
 --------------------------- \tab ----------------- \cr
 }
-
 
 The parameter \code{time_unit} aggregates the date variable according to its specified value. The aggregation is based on two functions from the \code{xts} package, \code{endpoints()} and \code{period.apply()}. For example, a data variable has daily values but is plotted with aggregated quarterly values.
 
@@ -869,6 +872,12 @@ The output can optionally be saved into an \code{R} object, otherwise it simply 
 READABLE OUTPUT\cr
 \code{out_stats}: Correlational analysis.\cr
 \code{out_outliers}: Mahalanobis Distance of each outlier.\cr
+\code{out_frcst}: Forecasted values.\cr
+\code{out_fitted}: Fitted values to data.\cr
+\code{out_coefs}: Linear and seasonal coefficients from forecasting.\cr
+\code{out_smooth}: Smoothing parameters from exponential smoothing forecasting.\cr.
+\code{out_bubble}: Bubble plot parameters, \code{radius} and \code{power}.\cr.
+\code{out_reg}: Regression statistics from setting the \code{fit parameter}.\cr.
 
 STATISTICS\cr
 \code{outliers}: Row numbers that contain the outliers.\cr
@@ -880,7 +889,7 @@ Brys, G., Hubert, M., & Struyf, A. (2004). A robust measure of skewness. Journal
 
 Murdoch, D, and  Chow, E. D. (2013).  \code{ellipse} function from the \code{ellipse} package package. 
 
-Gerbing, D. W. (2014). R Data Analysis without Programming, Chapter 8, NY: Routledge.
+Gerbing, D. W. (2023). R Data Analysis without Programming, 2nd edition, Chapter 10, NY: Routledge.
 
 Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 5, NY: CRC Press.
 

@@ -147,11 +147,11 @@ function(data=d, to=NULL,
     }
 
     openxlsx::saveWorkbook(wb, file=file.data, overwrite=TRUE)
-    txt <- "Schauberger and  Walker's openxlsx package]"
+    txt <- "Schauberger and Walker's openxlsx package]"
     if (ExcelTable  &&  !quiet)
-      cat("[with the writeDataTable function from", txt, "\n")
+      cat("[with the writeDataTable() function from", txt, "\n")
     else
-      cat("[with the writeData function from", txt, "\n")
+      cat("[with the writeData() function from", txt, "\n")
     cat("\n")
     .showfile(file.data, c(df.name, "data values"))
     cat("\n")

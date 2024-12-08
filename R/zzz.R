@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.3.8                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.3.9                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -324,53 +324,68 @@ function(...) {
 }
 
 
-.charToDate <- function(char, punct, n.ch) {
+.charToDate <- function(char, punct) {
 
-  # date.fmts are the date formats to process
-  if (n.ch == 8) {
-    if (punct=="/") date.fmts <- c("%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y")
-    if (punct=="-") date.fmts <- c("%Y-%m-%d", "%d-%m-%Y", "%m-%d-%Y")
-    if (punct==".") date.fmts <- c("%Y.%m.%d", "%d.%m.%Y", "%m.%d.%Y")
-  }
-  if (n.ch == 6) {
-    if (punct=="/") date.fmts <- c("%d/%m/%y", "%m/%d/%y")
-    if (punct=="-") date.fmts <- c("%d-%m-%y", "%m-%d-%y")
-    if (punct==".") date.fmts <- c("%d.%m.%y", "%m.%d.%y")
-  }
+  txt <- character(length=4)
+  txt[1] <- "\nTo see all possible formats, enter: ?strptime\n"
+  txt[2] <- "Examples:  \"08/18/2024\" format is \"%m/%d/%Y\"\n"
+  txt[3] <- "           \"18-08-24\"   format is \"%d-%m-%y\"\n"
+  txt[4] <- "           \"August 18, 2024\" format is \"%B %d, %Y\"\n\n"
 
-  for (fmt in date.fmts) {
+  dc <- strsplit(char, punct)  # Extract dc, date components 
+  c1 <- as.numeric(sapply(dc, function(x) x[1]))
+  c2 <- as.numeric(sapply(dc, function(x) x[2]))
+  c3 <- as.numeric(sapply(dc, function(x) x[3]))
+  mx1 <- max(c1);  mx2 <- max(c2);  mx3 <- max(c3)
+  unq1 <- length(unique(c1)); unq2 <- length(unique(c2))
+
+  if (!is.na(mx1) && !is.na(mx2)) {  # non-numeric chars entered for a date
+    fmt <- NULL
+
+    # date format is correctly inferred if proper dates
+    if (mx1 > 31)
+      fmt <- paste("%Y", punct, "%m", punct, "%d", sep="")
+    else if (mx1 > 12)
+      fmt <- paste("%d", punct, "%m", punct, "%Y", sep="")
+    else if (mx2 > 12)
+      fmt <- paste("%m", punct, "%d", punct, "%Y", sep="")
+
+    # guess at date format
+    else if (unq2<=12 && (unq2 %in% c(2,4,12)))
+      fmt <- paste("%d", punct, "%m", punct, "%Y", sep="")
+    else if (unq1<=12 && (unq1 %in% c(2,4,12)))
+      fmt <- paste("%m", punct, "%d", punct, "%Y", sep="")
+
+    # allow for 2-digit year, is positioned  at 3rd component
+    if (!is.null(fmt)) {
+      if (substr(fmt,2,2) != "Y") {
+        if (mx3 <= 99) fmt <- sub("Y", "y", fmt, fixed=TRUE)
+       }
+    }
+
     # obtain only valid dates
     dates <- try(as.Date(char, format=fmt), silent=FALSE)
 
     # process valid dates further to obtain the likely correct valid date
     if (!inherits(dates, "try-error") && all(!is.na(dates))) {  # no errors
-      year.n <- as.numeric(format(dates[1], "%Y"))
-      y.valid <- ifelse (year.n > 1000, TRUE, FALSE)
-      months <- as.numeric(format(dates, "%m"))
-      m.unq <- length(unique(months))
-      days <- as.numeric(format(dates, "%d"))
-      d.unq <- length(unique(days))
-      m.valid <- ifelse (d.unq == 12, FALSE, TRUE)
-      d.valid <- ifelse (m.unq == 12, TRUE, FALSE)
-
-      if (y.valid  &&  m.valid  && d.valid) {
-        cat("\nBest guess for the date format:", fmt, "\n\n")
-        if (getOption("suggest")) 
-          cat(" If this format is not correct, specify precisely with the\n",
-              " parameter: time_format. To see all formats, enter: ?strptime\n",
-              " Examples:  \"08/18/2024\" format is \"%m/%d/%Y\"\n",
-              "            \"18-08-24\"   format is \"%d-%m-%y\"\n",
-              "            \"August 18, 2024\", format is \"%B %d, %Y\"\n\n")
+        message("\nBest guess for the date format: ", fmt, "\n")
+        message("If this format is wrong, specify with",
+            " parameter: time_format", txt, "\n")
         return(dates)  # Return converted dates
-      }
-      else
-        next
-    }  # dates converted
+    }
+  }  # all chars numeric
 
-    # date not recognized
-    cat("\n"); stop(call.=FALSE, "\n------\n",
-      "Date not recognized. Specify format with:  time_format\n\n")
-  }  # end fmt in
+  else {  # some non-numeric chars in at least one date
+    message("\n"); stop(call.=FALSE, "\n------\n",
+      "At least one date contains non-numeric characters\n",
+      "  where there should be a number.\n")
+  }
+
+  # date not recognized
+  # only way to get here is if date did not work
+  message("\n"); stop(call.=FALSE, "\n------\n",
+    "The date format could not be properly inferred.\n\n",
+    "Specify the date format with:  time_format", txt, "\n")
 }
 
 
