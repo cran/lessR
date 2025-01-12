@@ -1,13 +1,13 @@
 .param.VBS <-
 function(x, ID, facet1, facet1.miss, by0, by.miss,
-         bw, bw.miss, bw_iter, iter.details, lx, n.ux, 
+         bw, bw.miss, bw_iter, iter.details, lx, n.ux,
          k.iqr, box_adj, a, b,
          x.name, facet1.name, by.name, vbs_plot,
          n_col.miss, n_row.miss,
          size, out_size, out_size.miss,
          jitter_x, jitter_y,
          bin=FALSE, breaks=NULL, bin_start=NULL, bin_width=NULL,
-         bin_end=NULL, proportion=NULL, 
+         bin_end=NULL, proportion=NULL,
          digits_d, quiet, fun_call=NULL, ...) {
 
 
@@ -23,7 +23,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
     h0 <- gsub("Level", "    ", h1, fixed=TRUE)
     tx[length(tx)+1] <- paste(h0, "Max Dupli-")
     tx[length(tx)+1] <- paste(h1, "cations   Values")
-    tx[length(tx)+1] <- .dash2(30)    
+    tx[length(tx)+1] <- .dash2(30)
 
     # display repetitions
     for (i in 1:ncol(frq)) {  # frq is the freq table, x (rows) with facet1 (cols)
@@ -40,11 +40,11 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
       if (max_f.col > 1)  # replications
         tx[length(tx)+1] <- paste(lvl.c, "    ",  .fmti(max_f.col,3),
           "     ", x.val, txt, sep="")
-      else 
+      else
         tx[length(tx)+1] <- paste(lvl.c, "     0" )  # no reps
     }
 
-    txrep <- tx 
+    txrep <- tx
     class(txrep) <- "out"
     return(txrep)
   }
@@ -86,8 +86,8 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
   # suggestions
   if (getOption("suggest") && !quiet) {
     # function call for suggestions
-    fncl <- .fun_call.deparse(fun_call) 
-    fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
+    fncl <- .fun_call.deparse(fun_call)
+    fncl <- gsub(")$", "", fncl)  # get function call less closing )
     fncl <- gsub(" = ", "=", fncl)
 
     txsug <- ">>> Suggestions"
@@ -119,21 +119,21 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
 
     if (nlevels(facet1) == 2  ||  nlevels(by0) == 2) {
       nm <- ifelse (nlevels(facet1) == 2, facet1.name, by.name)
-      txt1 <- paste("ttest(", x.name, " ~ ", nm, ")", sep="") 
+      txt1 <- paste("ttest(", x.name, " ~ ", nm, ")", sep="")
       txt2 <- "  # Add the data parameter if not the d data frame"
       txsug <- paste(txsug, "\n", txt1, txt2, sep="")
     }
 
     if (nlevels(facet1) > 2  ||  nlevels(by0) > 2) {
       nm <- ifelse (nlevels(facet1) > 2, facet1.name, by.name)
-      txt1 <- paste("ANOVA(", x.name, " ~ ", nm, ")", sep="") 
+      txt1 <- paste("ANOVA(", x.name, " ~ ", nm, ")", sep="")
       txt2 <- "  # Add the data parameter if not the d data frame"
       txsug <- paste(txsug, "\n", txt1, txt2, sep="")
     }
 
-    txsug <- .rm.arg.2(" x=", txsug) 
+    txsug <- .rm.arg.2(" x=", txsug)
     txsug <- .rm.arg.2("(x=", txsug)
-    txsug <- .rm.arg.2(" y=", txsug) 
+    txsug <- .rm.arg.2(" y=", txsug)
 
     class(txsug) <- "out"
 
@@ -152,7 +152,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
 
   # -------
   # ONE VAR VBS plot: # no facet1, so x by itself
-  if (facet1.miss && by.miss) { 
+  if (facet1.miss && by.miss) {
     # box plot outliers, stats
     bx <- .bx.stats(x, ID, k.iqr, box_adj, a, b, digits_d)
     txbox <- bx$txstat
@@ -165,7 +165,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
     # mx.c, max category, is max number of values of a value of x
     if (length(unique(x)) < ceil.n) {
       frq <- as.matrix(table(x))
-      mx.c <- ifelse (n.ux == lx, 0, max(table(x))) 
+      mx.c <- ifelse (n.ux == lx, 0, max(table(x)))
       if (mx.c > 1)
         txrep <- .get.dup(mx.c, x.name, lvl=x.name)
       else
@@ -190,7 +190,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
           1.096 - 0.134*log(lx), 0.226 - 0.023*log(lx))
       else
         pt.size <- 0.842 - 0.109*log(mx.c)
-      if (pt.size < 0.01) pt.size <- ifelse (lx < 25000, 0.015, 0.006) 
+      if (pt.size < 0.01) pt.size <- ifelse (lx < 25000, 0.015, 0.006)
       if (rt < 0.18) pt.size <- (0.147 + 4.490*rt) * pt.size  # decrease size
     }
     else
@@ -200,16 +200,16 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
 
     if (is.null(jitter_x)) jitter_x <- 1.1 * (1-exp(-0.03*mx.c))
     if (is.null(jitter_y)) {
-      if (!reps) 
+      if (!reps)
          jitter_y <- ifelse (lx <= 10000,
                          -1.644 + 0.579*log(lx), -16.567 + 2.163*log(lx))
       else
          jitter_y <- -0.722 + 0.845*log(mx.c)
       jy.adj <- ifelse (rt < 0.18, 0.882 - 4.864*rt, 0)
       jitter_y <- jitter_y + (jy.adj * jitter_y)   # increases jitter
-    } 
+    }
 
-    if (grepl("v", vbs_plot) || grepl("s", vbs_plot)) 
+    if (grepl("v", vbs_plot) || grepl("s", vbs_plot))
       txprm <- .get.param(size, jitter_y, jitter_x, bw)
     else
       txprm <- ""
@@ -218,13 +218,13 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
     txdst <- ""
     if (bin) {
       h <- .hst.main(x, breaks=breaks, bin_start=bin_start,
-         bin_width=bin_width, bin_end=bin_end, prop=proportion, 
-         quite=quiet, fun_call=NULL, do_plot=FALSE, ...) 
+         bin_width=bin_width, bin_end=bin_end, prop=proportion,
+         quite=quiet, fun_call=NULL, do_plot=FALSE, ...)
       txdst <- h$ttx
       class(txdst) <- "out"
     }
 
-    if (n.ux < 9  &&  n.ux < length(x)) {  # x is discrete 
+    if (n.ux < 9  &&  n.ux < length(x)) {  # x is discrete
       ssstuff <- .ss.factor(x, x.name=x.name, digits_d=digits_d, ...)
       txttl <- ssstuff$title
       txfrq <- ssstuff$counts
@@ -241,7 +241,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
     if (!bin) txdst <- ""  # no freq distribution from histogram
 
     output <- list(type="Violin/Box/ScatterPlot",
-      call=fun_call,  
+      call=fun_call,
       out_tx=txbox, out_outliers=txotl, out_freq=txdst,
       out_rep=txrep, out_parm=txprm)
     }
@@ -266,7 +266,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
         if (frq[j,i] > 1) rep.t[i] <- rep.t[i] + (frq[j,i] - 1)
     }
     rep.max <- max(rep.t)
-    if (length(unique(x)) < ceil.n) 
+    if (length(unique(x)) < ceil.n)
       txrep <- .get.dup(mc.w, x.name, lvl)
     else
       txrep <- ""
@@ -281,7 +281,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
     if (rep.prop > 0.15  &&  mc.w > (.05 * lx))  # many reps?
       reps <- TRUE
     else
-      reps <- FALSE 
+      reps <- FALSE
 
     # continuous variable with a categorical variable
     if (!reps) {  # reps-cat
@@ -297,7 +297,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
         jitter_y <-  -1.221 + 0.576*log(mx.c) + 0.032*n.lvl
         if (jitter_y < 0.5) jitter_y <- 0.5
       }
-      if (grepl("v", vbs_plot) || grepl("s", vbs_plot)) 
+      if (grepl("v", vbs_plot) || grepl("s", vbs_plot))
         txprm <- .get.param(size, jitter_y, jitter_x, bw)
       else
         txprm <- ""
@@ -324,7 +324,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
       }
       if (is.null(jitter_x)) jitter_x <- 0.086 + 0.141*log(mx.c)
       if (jitter_x < 0) jitter_x <- 0
-      if (grepl("v", vbs_plot) || grepl("s", vbs_plot)) 
+      if (grepl("v", vbs_plot) || grepl("s", vbs_plot))
         txprm <- .get.param(size, jitter_y, jitter_x, bw)
       else
         txprm <- ""

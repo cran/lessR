@@ -332,6 +332,10 @@ To obtain pdf output, use the \code{pdf_file} option, perhaps with the optional 
 \value{
 The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Two different types of components are provided: the pieces of readable output, and a variety of statistics. The readable output are character strings such as tables amenable for display. The statistics are numerical values amenable for further analysis. The motivation of these types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object and a \code{$}, can be inserted into the R~Markdown document (see \code{examples}), interspersed with explanation and interpretation.
 
+Each value in the output will only appear if activated in the analysis. For example, the analysis must be of two categorical variables for the cell proportions to appear in \code{out_prop}.
+
+Here is an example of saving the output to an R object with any valid R name, such as \code{h}: \code{h <- Histogram(Salary)}. To see the names of the output objects for that specific analysis, enter \code{names(h)}. To display any of the objects, precede the name with \code{h$}, such as to view the saved frequency distribution with \code{h$out_freq}. View the output at the R console or within a markdown document that displays your results.
+
 READABLE OUTPUT\cr
 \code{out_suggest}: Suggestions for other similar analyses\cr
 \code{out_summary}: Summary statistics\cr

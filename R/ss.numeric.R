@@ -66,20 +66,20 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, facet1.nm=FALSE,
 
   # get max.ln, maximum length of the individual fields
   # (this computes the mean and sd twice for each line, also for output)
-  max.ln <- 0  
+  max.ln <- 0
   for (i in 1:n.lines) {
     if (n.lines == 1)
       xx <- x
     else {
       lv <- levels(as.factor(by))[i]
       xx <- vectors[[i]]
-    } 
+    }
     m <- mean(xx, na.rm=TRUE)
     s <- sd(xx, na.rm=TRUE)
     if (is.na(s) || is.null(s))
       n.ln <- nchar(as.character(round(m, digits_d))) + digits_d
     else
-      n.ln <- max(nchar(as.character(round(m, digits_d))), 
+      n.ln <- max(nchar(as.character(round(m, digits_d))),
                   nchar(as.character(round(s, digits_d)))) + digits_d
     if (n.ln > max.ln) max.ln <- n.ln
   }
@@ -95,7 +95,7 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, facet1.nm=FALSE,
   txlbl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by))
   if (length(txlbl) > 1) if (substr(txlbl[2],1,1) ==  "\n")
     txlbl[2] <- sub("\n", "", txlbl[2])
-  txlbl[length(txlbl)+1] <- ""
+# txlbl[length(txlbl)+1] <- ""
   tx <- txlbl
   advance <- ifelse (x.name != "*NONE*", 1, 0)
   if (x.name == "*NONE*") tx <- ""
@@ -138,7 +138,7 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, facet1.nm=FALSE,
     }
 
 
-    if (i == 1) { # heading labels 
+    if (i == 1) { # heading labels
       if (max.ln < 4) max.ln <- max.ln + 2
       if (max.ln < 8) max.ln <- max.ln + 1
       nbuf <- ifelse (n.lines==1, 3, 5)
@@ -151,9 +151,10 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, facet1.nm=FALSE,
       md.lbl <- .fmtc("mdn", max.ln)
       mx.lbl <- .fmtc("max", max.ln)
 
+      tx[length(tx)+1] <- ""
       if (brief)
         tx[length(tx)+advance] <- paste(n.lbl, miss_lbl, m.lbl, s.lbl, mn.lbl,
-                                        md.lbl, mx.lbl) 
+                                        md.lbl, mx.lbl)
       else {
         sk.lbl <- .fmtc("skew", max.ln)
         kt.lbl <- .fmtc("krts", max.ln)
@@ -170,7 +171,7 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, facet1.nm=FALSE,
     n.c <- .fmti(n, max.n+1)
     miss_c <- .fmti(n.miss, max.nm+5)
 
-    if (n == 0) 
+    if (n == 0)
       tx[length(tx)+1] <- paste(lvl, n.c, miss_c)
 
     else if (n == 1) {
@@ -198,6 +199,7 @@ function(x, by=NULL, digits_d=NULL, brief, y.name=NULL, facet1.nm=FALSE,
     }
 
   }  # for each line
+  tx[length(tx)+1] <- ""
 
   if (n.lines == 1)
     return(list(txlbl=txlbl, tx=tx, n=n, n.miss=n.miss, m=m, s=s, sk=sk,

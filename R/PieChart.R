@@ -4,17 +4,17 @@ function(x, y=NULL, data=d, filter=NULL,
          radius=1, hole=0.65, hole_fill=getOption("panel_fill"),
 
          theme=getOption("theme"),
-         fill=NULL, 
+         fill=NULL,
          color="lightgray",
          transparency=getOption("trans_bar_fill"),
 
          density=NULL, angle=45,
          lty="solid", lwd=1, edges=200,
 
-         clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0), 
+         clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0),
 
          labels=getOption("labels"),
-         labels_color=getOption("labels_color"), 
+         labels_color=getOption("labels_color"),
          labels_size=getOption("labels_size"),
          labels_digits=getOption("labels_digits"),
          labels_position=getOption("labels_position"),
@@ -31,7 +31,7 @@ function(x, y=NULL, data=d, filter=NULL,
 
 
   # ------------ Old Stuff ----------------------------------
-  if (!missing(rows)) 
+  if (!missing(rows))
     message(">>> Parameter  rows  renamed to:  filter.\n",
             "    Change to  filter,  rows  will stop working in the future.\n")
 
@@ -42,7 +42,7 @@ function(x, y=NULL, data=d, filter=NULL,
     for (i in 1:length(dots)) {
       if (grepl("values", names(dots)[i], fixed=TRUE)) {
         n.values <- n.values + 1
-        if (n.values == 1) 
+        if (n.values == 1)
           message(">>> Parameters  values, values_color, etc. now ",
                   "renamed to:  labels, labels_color, etc.\n",
                   "    Old parameter names will stop working in the future.\n")
@@ -54,8 +54,8 @@ function(x, y=NULL, data=d, filter=NULL,
         if (names(dots)[i] == "values_cut") labels_cut <- dots[[i]]
       }
     }
-    if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]] 
-    if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]] 
+    if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]]
+    if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]]
     if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
     if (grepl(".", names(dots)[i], fixed=TRUE)) {
       nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)  # dot to _
@@ -101,7 +101,7 @@ function(x, y=NULL, data=d, filter=NULL,
   }
 
   if (missing(labels_color)) {
-    labels_color <- "white" 
+    labels_color <- "white"
     if (labels_position == "out") labels_color <- getOption("axis_text_color")
   }
 
@@ -124,11 +124,11 @@ function(x, y=NULL, data=d, filter=NULL,
 
 
   # --------- data frame stuff
-  
-  data.miss <- ifelse (missing(data), TRUE, FALSE) 
+
+  data.miss <- ifelse (missing(data), TRUE, FALSE)
 
   # let deprecated mydata work as default
-  dfs <- .getdfs() 
+  dfs <- .getdfs()
   mydata.ok <- FALSE
   if (!is.null(dfs)) {
     if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
@@ -152,7 +152,7 @@ function(x, y=NULL, data=d, filter=NULL,
       shiny <- TRUE
       data <- eval(substitute(data), envir=parent.frame())
     }
- 
+
   # if a tibble, convert to data frame
   if (!shiny) {
     if (exists(df.name, envir=.GlobalEnv)) {
@@ -192,16 +192,16 @@ function(x, y=NULL, data=d, filter=NULL,
     else # df.name is NULL
       x.in.global <- TRUE
   }
-    
-  eval_df <- !x.in.global 
-    
+
+  eval_df <- !x.in.global
+
 
   # -----------------------------------------------------------
   # establish if a data frame, if not then identify variable(s)
 
   if (!x.in.global) {
     if (eval_df) {
-      if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
+      if (!mydata.ok) .nodf(df.name)  # check to see if df exists
       .xcheck(x.name, df.name, names(data))  # x-var in df?
     }
 
@@ -217,7 +217,7 @@ function(x, y=NULL, data=d, filter=NULL,
       if (any(r))
         data <- data[r,,drop=FALSE]
       if (!quiet) {
-        if (!missing(filter))  # filter parameter present 
+        if (!missing(filter))  # filter parameter present
           cat("\nfilter: ",  txt, "\n-----\n")
         cat("Rows of data before filtering: ", nr.before, "\n")
         cat("Rows of data after filtering:  ", nrow(data), "\n\n")
@@ -235,7 +235,7 @@ function(x, y=NULL, data=d, filter=NULL,
       data <- x
     else {  # x a vector or matrix in global
       .in.global(x.name, quiet)  # x.name an expression?
-      if (exists(x.name, where=.GlobalEnv)) if (is.matrix(x)) { 
+      if (exists(x.name, where=.GlobalEnv)) if (is.matrix(x)) {
         x.name <- xlab
         xlab <- NULL
         options(xname = x.name)
@@ -251,13 +251,13 @@ function(x, y=NULL, data=d, filter=NULL,
   if (!missing(y)) {
 
     # get actual variable name before potential call of data$x
-    y.name <- deparse(substitute(y)) 
+    y.name <- deparse(substitute(y))
     options(yname = y.name)
 
     # get conditions and check for data existing
     in.global <- .in.global(y.name, quiet)
 
-    # see if var exists in data frame, if y not in global Env or function call 
+    # see if var exists in data frame, if y not in global Env or function call
       if (!in.global) {
         if (eval_df)
           .xcheck(y.name, df.name, names(data))
@@ -290,7 +290,7 @@ function(x, y=NULL, data=d, filter=NULL,
     if (substr(fill_name, 1, 6) == "(count") {
       xtb <- table(x.call)
       fill <- .getColC(xtb, fill_name=fill_name)
-    }  # end .count 
+    }  # end .count
   }  # end !fill.miss
 
 
@@ -318,10 +318,10 @@ function(x, y=NULL, data=d, filter=NULL,
   #   dev.set(which=2)  # reset graphics window for standard R functions
 
   hole <- hole * radius
-  pc <- .pc.main(x.call, y.call, 
-        fill, color, trans, 
-        radius, hole, hole_fill, edges, 
-        clockwise, init_angle, 
+  pc <- .pc.main(x.call, y.call,
+        fill, color, trans,
+        radius, hole, hole_fill, edges,
+        clockwise, init_angle,
         density, angle, lty, lwd,
         labels, labels_position, labels_color, labels_size, labels_digits,
         labels_cex, main_cex, main, main.miss,

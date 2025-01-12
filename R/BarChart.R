@@ -180,7 +180,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
 
   # --------- data frame stuff -------------------------------------
-  
+
   data.miss <- ifelse (missing(data), TRUE, FALSE)
 
   # let deprecated mydata work as default

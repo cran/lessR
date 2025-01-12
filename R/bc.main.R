@@ -1,7 +1,7 @@
 .bc.main <-
 function(x, y, by, stack100,
          fill, color, col.trans, fill_split, theme,
-         horiz, gap, prop, scale_y, 
+         horiz, gap, prop, scale_y,
          xlab, ylab, main,
          value_labels, label_max, beside,
          rotate_x, offset, break_x, sort_x,
@@ -11,7 +11,7 @@ function(x, y, by, stack100,
          pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
          legend_horiz, legend_size, legend_abbrev, legend_adj,
-         add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet, 
+         add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet,
          shiny, ...) {
 
 
@@ -340,7 +340,7 @@ function(x, y, by, stack100,
   if (length(labels_pos > 0))
     if (labels_pos == "out") add_top <- add_top + .06
   # a 2-D table is an instance of a matrix, a 1-D table is not
-  max.y <- ifelse (is.matrix(x) && !beside, 
+  max.y <- ifelse (is.matrix(x) && !beside,
                    max(colSums(x), na.rm=TRUE), max(x, na.rm=TRUE))
   max.y <- max.y + (add_top * max.y)
 
@@ -584,10 +584,10 @@ function(x, y, by, stack100,
 
   if (is.null(labels_digits)) {  # if too large for "input", get in bc.main
     if (labels == "%") labels_digits <- 0
-    else 
+    else
       if (labels == "proportion") labels_digits <- 2
     else
-      if (labels == "input") 
+      if (labels == "input")
         labels_digits <- ifelse(is.null(y), 0, 2)
   }
 
@@ -761,9 +761,9 @@ function(x, y, by, stack100,
 #        tck=-.02, padj=adj1,  at=y.coords, labels=lblval.y, ...)
          #tck=-.03, padj=adj1,  at=axTicks(ax.num, axp=scale_y), ...)
     if(!horiz)
-        .axes(NULL, NULL, NULL, axT2=y.coords) 
+        .axes(NULL, NULL, NULL, axT2=y.coords)
     else
-        .axes(NULL, NULL, axT1=y.coords, NULL) 
+        .axes(NULL, NULL, axT1=y.coords, NULL)
 
     # x-axis is the category value axis
     axis_x_color <- ifelse(is.null(getOption("axis_x_color")),

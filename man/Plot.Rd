@@ -15,9 +15,9 @@ Abbreviation:\cr
 \verb{  }Box Plot only: \code{bx}, \code{BoxPlot}\cr
 \verb{  }Scatter Plot only: \code{sp}, \code{ScatterPlot}\cr
 
-A scatterplot displays the values of a distribution, or the relationship between the two distributions in terms of their joint values, as a set of points in an \emph{n}-dimensional coordinate system, in which the coordinates of each point are the values of \emph{n} variables for a single observation (row of data). From the identical syntax, from any combination of continuous or categorical variables variables \code{x} and \code{y}, \code{Plot(x)} or \code{Plot(x,y)}, where \code{x} or \code{y} can be a vector, by default generates a family of related 1- or 2-variable scatterplots, possibly enhanced, as well as related statistical analyses. Define a categorical variable as an R factor. If \code{x} is a Date variable, then a time series is plotted. 
+A scatterplot displays the values of a distribution, or the relationship between the two distributions, in terms of their joint values, as a set of points in an \emph{n}-dimensional coordinate system, in which the coordinates of each point are the values of \emph{n} variables for a single observation (row of data). From the identical syntax, from any combination of continuous or categorical variables variables \code{x} and \code{y}, \code{Plot(x)} or \code{Plot(x,y)}, where \code{x} or \code{y} can be a vector, by default generates a family of related 1- or 2-dimensional scatterplots, possibly enhanced, plus related statistical analyses. Define a categorical variable as an R factor. If \code{x} is a Date variable, then a time series is plotted.
 
-\code{Plot} produces a wide variety of scatterplots as outlined in the following list. 
+\code{Plot()} produces a wide variety of scatterplots as outlined in the following list.
 
 
 \tabular{ll}{
@@ -42,7 +42,7 @@ A scatterplot displays the values of a distribution, or the relationship between
 
 \strong{One variable}\cr
 \code{Plot(x)}: one continuous variable generates either a violin/box/scatterplot
-    (VBS plot), named here, or a run chart, generated from the \code{x}-variable named 
+    (VBS plot), named here, or a run chart, generated from the \code{x}-variable named
     \code{.Index}. Or \code{x} can be an R time series object created with
     \code{ts()} for a time series visualization\cr
 \code{Plot(xCat)}: one categorical variable yields a 1-dimensional bubble plot to
@@ -93,33 +93,34 @@ Plot(
     # ----------------------
     # Sort and jitter points
     sort_yx=c("0", "-", "+"),
-    jitter_x=NULL, jitter_y=NULL, 
+    jitter_x=NULL, jitter_y=NULL,
 
     # ----------------
     # Outlier analysis
     ID="row.name", ID_size=0.60,
     MD_cut=0, out_cut=0, out_shape="circle", out_size=1,
-     
+
     # -------------------------------------------------
     # Fit line, confidence interval, confidence ellipse
     fit=c("off", "loess", "lm", "ls", "null", "exp", "quad",
           "power", "log"),
     fit_power=1, fit_se=0.95,
     fit_color=getOption("fit_color"),
-    plot_errors=FALSE, ellipse=0, 
+    plot_errors=FALSE, ellipse=0,
 
 
     # ----------------------------------------------------------
-    # Types of plots 
+    # Types of plots
     # ----------------------------------------------------------
 
-    # -----------------------------------------------------
-    # Time series, plot x values sequentially [xDate, y or Y]
-    time_unit=NULL, time_agg=c("sum", "mean"), time_ahead=0, time_format=NULL,
-    time_fit=FALSE, es_level=NULL, es_trend=NULL, es_seasons=NULL,
-    es_type=c("additive", "multiplicative"), es_PIlevel=0.95,
+    # -----------------------------------------------------------------------
+    # Time series and forecasting, plot x values sequentially [xDate, y or Y]
+    ts_unit=NULL, ts_agg=c("sum", "mean"), ts_NA=NULL,
+    ts_ahead=0, ts_method=c("es", "lm"), ts_format=NULL,
+    ts_fitted=FALSE, ts_level=NULL, ts_trend=NULL, ts_seasons=NULL,
+    ts_type=c("additive", "multiplicative"), ts_PIlevel=0.95,
     stack=FALSE, area_fill="transparent", area_split=0, n_date_tics=NULL,
-    # Run chart (also by indicating .Index for the name of the x-variable)
+    # Run chart (indicate with .Index for the name of the x-variable)
     show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
 
     # -----------------------------------
@@ -130,26 +131,25 @@ Plot(
     # ----------------------------------
     # Integrated violin/box/scatter plot  [x only]
     vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
-    violin_fill=getOption("violin_fill"), 
-    box_fill=getOption("box_fill"), 
+    violin_fill=getOption("violin_fill"),
+    box_fill=getOption("box_fill"),
     vbs_pt_fill="black",
     vbs_mean=FALSE, fences=FALSE,
     k=1.5, box_adj=FALSE, a=-4, b=3,
 
     # -----------
-    # Bubble plot [xCatorical, or xCatorical and yCatorical]
+    # Bubble plot [xCategorical, or xCategorical and yCategorical]
     radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
 
     # --------------------------------------
     # Large data sets, smoothing and binning  [x and y]
     smooth=FALSE, smooth_points=100, smooth_size=1,
-    smooth_exp=0.25, smooth_bins=128,
-    n_bins=1,
+    smooth_exp=0.25, smooth_bins=128, n_bins=1,
 
     # ------------------------------------------------------
     # Bins for frequency polygon or text output of VBS plots
     bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
-    breaks="Sturges", cumulate=FALSE, 
+    breaks="Sturges", cumulate=FALSE,
 
 
     # -------------
@@ -164,7 +164,7 @@ Plot(
     rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
 
-    xy_ticks=TRUE, origin_x=NULL,
+    xy_ticks=TRUE, origin_x=NULL, origin_y=NULL,
     scale_x=NULL, scale_y=NULL,
     pad_x=c(0,0), pad_y=c(0,0),
     legend_title=NULL,
@@ -173,14 +173,14 @@ Plot(
     # Add one or more objects, text, or geometric figures
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
-    # ------------------------------------------------------------------
-    # Output: turn off, chart to PDF file, decimal digits, markdown file
+    # ---------------------------------------------
+    # Output: turn off, to PDF file, decimal digits
     quiet=getOption("quiet"), do_plot=TRUE,
     pdf_file=NULL, width=6.5, height=6,
     digits_d=NULL,
 
     # -------------------------------------------------------------
-    # Deprecated, removed in future versions
+    # Deprecated, to be removed in future versions
     n_cat=getOption("n_cat"), value_labels=NULL,  # use R factors instead
     rows=NULL, by1=NULL, by2=NULL,
 
@@ -204,8 +204,8 @@ vp(\dots)
         continuous or categorical, cross-sectional or a time series.
         If \code{x} is sorted, with equal intervals
         separating the values, or is a time series, then by default
-        plots the points sequentially, joined by line segments. If named 
-        \code{.Index}, then a run chart is generated from the corresponding 
+        plots the points sequentially, joined by line segments. If named
+        \code{.Index}, then a run chart is generated from the corresponding
         \code{y} variable.
         Can specify multiple \code{x}-variables or multiple \code{y}-variables
         as vectors, but not both. Can be in a data frame or defined
@@ -213,7 +213,7 @@ vp(\dots)
   \item{y}{An optional second \emph{primary variable.} Variable with values
         to be mapped to coordinates of points in
         the plot on the vertical axis. Can be continuous or categorical.
-        Can be in a data frame or defined in the global environment.} 
+        Can be in a data frame or defined in the global environment.}
   \item{data}{Optional data frame that contains one or both of \code{x} and
         \code{y}. Default data frame is \code{d}.}
   \item{filter}{A logical expression that specifies a subset of rows of
@@ -226,7 +226,7 @@ vp(\dots)
         For two-variable plots, applies to the panels of a
         \bold{Trellis graphic} if \code{facet1} is specified.}
   \item{facet1}{A categorical variable, the \emph{conditioning variable},
-        which activates Trellis (facet) graphics, provided by Deepayan 
+        which activates Trellis (facet) graphics, provided by Deepayan
         Sarkar's (2007) lattice package, to provide
         a \emph{separate} panel of numeric primary variables \code{x}
         and \code{y} for each level of the \code{facet1} variable.
@@ -234,7 +234,7 @@ vp(\dots)
         \code{\link{factor}} or lessR \code{\link{factors}}.}
   \item{facet2}{A second \emph{conditioning variable} to generate Trellis (facet)
         plots jointly conditioned on both the \code{facet1} and \code{facet2}
-        variables, with \code{facet2} as the row variable, which yields a 
+        variables, with \code{facet2} as the row variable, which yields a
         scatterplot (panel) for \emph{each} cross-classification of the levels
         of numeric \code{x} and \code{y} variables.}
   \item{n_row}{Optional specification for the number of rows and columns
@@ -242,7 +242,7 @@ vp(\dots)
         \code{n_col} or \code{n_row}, but not both.}
   \item{n_col}{Optional specification for the number of columns in the
         layout of a multi-panel display with
-        Trellis graphics. Specify \code{n_col} or \code{n_row}, but 
+        Trellis graphics. Specify \code{n_col} or \code{n_row}, but
         not both. If set to 1, the default, then
         the strip that labels each group locates to the left of each plot
         instead of the top.}
@@ -272,8 +272,8 @@ vp(\dots)
 
 
   \item{enhance}{For a two-variable scatterplot, if \code{TRUE},
-        automatically add the 0.95 data ellipse, 
-        labeling of outliers beyond a Mahalanobis distance of 6 from the 
+        automatically add the 0.95 data ellipse,
+        labeling of outliers beyond a Mahalanobis distance of 6 from the
         ellipse center, the best-fitting least squares line of all the data,
         the best-fitting least squares line of the regular data without the
         outliers, and a horizontal and vertical line to represent the mean of
@@ -281,7 +281,7 @@ vp(\dots)
   \item{size}{When set to a constant, the scaling factor for \bold{standard points}
       (not bubbles) or a line, with default of 1.0 for points and 2.0 for a line.
        Set to 0 to not plot the points or lines. If \code{area_fill} for a line
-       chart, then default is 0. When set to a variable, activates a 
+       chart, then default is 0. When set to a variable, activates a
        bubble plot with the size of each bubble further determined
        by the value of \code{radius}. Applies to the standard two-variable
        scatterplot as well as to the scatterplot component of the
@@ -299,9 +299,9 @@ vp(\dots)
        the \code{\link{style}} function.}
   \item{shape}{The plot character(s). The default value is \code{"circle"}
        with both a default exterior
-       color and filled interior, explicitly specified with 
+       color and filled interior, explicitly specified with
        \code{"color"} and \code{"fill"}.
-       Other possible values, with fillable interiors, 
+       Other possible values, with fillable interiors,
        are \code{"circle"}, \code{"square"}, \code{"diamond"},
        \code{"triup"} (triangle up), and \code{"tridown"} (triangle down), all
        uppercase and lowercase letters, all digits, and most punctuation characters.
@@ -311,7 +311,7 @@ vp(\dots)
        level to be plotted or set to \code{"vary"} to have shapes selected by
        default across the \code{by} groups.}
   \item{lwd}{Width of the line segments. Set to zero to remove the line
-        segments.}       
+        segments.}
   \item{means}{If the one variable is categorical, expressed as a factor, and
        the other variable continuous, then if \code{TRUE}, by default,
        plot means with the scatterplot. Also applies to a 1-D scatterplot.}
@@ -334,7 +334,7 @@ vp(\dots)
         is a vector of two variables, sort by their difference.}
   \item{jitter_x}{Randomly perturbs the plotted points of a scatterplot
        horizontally within the limits of the explicitly specified value, or
-       set to \code{NULL} to rely upon the default value of the range of 
+       set to \code{NULL} to rely upon the default value of the range of
        \code{x} divided by 50.}
   \item{jitter_y}{Same as \code{jitter_x} except vertical jitter.}\cr
 
@@ -344,11 +344,11 @@ vp(\dots)
        by default. To label all
        the points use the \code{add} parameter described later.}
   \item{ID_size}{Size of the plotted labels.
-        Modify text color of the labels with the \code{\link{style}} function 
+        Modify text color of the labels with the \code{\link{style}} function
         parameter \code{ID_color}.}
   \item{MD_cut}{Mahalanobis distance cutoff to define an outlier in a 2-variable
        scatterplot.}
-  \item{out_cut}{Count or proportion of plotted points to label, in order of their 
+  \item{out_cut}{Count or proportion of plotted points to label, in order of their
        distance from the scatterplot center (means), counting down from
        the more extreme point. For two-variable plots, assess distance
        from the center with Mahalanobis distance. For VBS plots of a single
@@ -362,8 +362,8 @@ vp(\dots)
         or VBS plot.}\cr
 
   \item{fit}{The \bold{best fit line}. Default value is \code{"off"}, with
-        options \code{"loess"} for non-linear fit, \code{"lm"} for linear model 
-        least squares, \code{"null"} for the null model, \code{"exp"} for 
+        options \code{"loess"} for non-linear fit, \code{"lm"} for linear model
+        least squares, \code{"null"} for the null model, \code{"exp"} for
         exponential growth or decay, \code{"power"} for the general
         power model in conjunction with \code{fit_power}, and
         \code{"quad"} for an increasing or decreasing function for
@@ -373,16 +373,16 @@ vp(\dots)
         the outliers.}
   \item{fit_power}{Power that describes response Y as a power function of the
        predictor variable X, required for \code{"power"} .
-       Optionally, and experimentally, applies to \code{fit} values \code{"exp"}.} 
+       Optionally, and experimentally, applies to \code{fit} values \code{"exp"}.}
   \item{fit_se}{Confidence level for the error band displayed around the
-       line of best fit. On by default at 0.95 if a fit line is specified, 
+       line of best fit. On by default at 0.95 if a fit line is specified,
        but turned off if \code{plot_errors=TRUE}.
        Can be a vector to display multiple ranges. Set to 0 to turn off.}
   \item{fit_color}{Color of the fit line.}
-  \item{plot_errors}{Plot the line segment that joins each point to the 
+  \item{plot_errors}{Plot the line segment that joins each point to the
         regression line, "loess" or "lm", illustrating the size of the
         residuals.}
-  \item{ellipse}{Confidence level of a data ellipse for a scatterplot 
+  \item{ellipse}{Confidence level of a data ellipse for a scatterplot
         of only a single
         \code{x}-variable and a single \code{y}-variable according to the
         contours of the corresponding bivariate normal density function. Can
@@ -390,48 +390,61 @@ vp(\dots)
         numeric values from 0 to 1,
         to plot one or more specified ellipses. For Trellis graphics, only the
         maximum level applies with only one ellipse per panel.
-        Modify fill and border colors with the \code{\link{style}} function 
+        Modify fill and border colors with the \code{\link{style}} function
         parameters \code{ellipse_fill} and \code{ellipse_color}.}\cr
 
-        
-  \item{time_unit}{Specify the time unit from which to plot a time series,
-        plotted when the \code{x}-variable is of type \code{Date}. 
+
+  \item{ts_unit}{Specify the time unit from which to plot a time series,
+        plotted when the \code{x}-variable is of type \code{Date}.
         Default value is the time unit that describes the time intervals as
         they occur in the data.
         Aggregation according to the time unit will occur as specified, such as
         a daily time series aggregated to \code{"months"}. Dates are currently
-        stored as variable type \code{Date()}, so fractions of a day are
-        not processed. Valid values include: \code{"days"}, \code{"weeks"},
-        \code{"months"}, \code{"quarters"}, and \code{"years"}.}
-  \item{time_agg}{Function by which to aggregate over time according to
-        \code{time_unit}. Default is \code{"sum"} with an option for
+        stored as variable type \code{Date()} which stores information as
+        calendar dates without times of the day.
+        Valid values include: \code{"days"}, \code{"weeks"},
+        \code{"months"}, \code{"quarters"}, and \code{"years"}, as well as 
+        \code{"days7"} to provide seasonality for daily data on a weekly instead
+        of annual basis.
+        Otherwise, for forecasting, the time unit for detecting seasonality
+        will usually be `"months"` or `"quarters"`. }
+  \item{ts_agg}{Function by which to aggregate over time according to
+        \code{ts_unit}. Default is \code{"sum"} with an option for
         \code{"means"}.}
-  \item{time_ahead}{Holt-Winters exponential smoothing forecast for the 
-        specified number of \code{time_units} ahead of the last time period
-        in the data.}
-  \item{time_format}{A specified format (for R function \code{as.Date()})
-    that describes the values of the date variable on the x-axis, 
+  \item{ts_NA}{By default, \code{y} missing values, those with value \code{NA},
+    do not plot, leaving a blank space. Or, specify a value, usually 0,
+    to replace the \code{NA} to plot a y-value such as 0 for the corresponding
+    date on the x-axis. However, forecasting with missing data does not work.}  \item{ts_ahead}{Forecast this specified number of \code{ts_units} ahead
+        of the last time period in the time series data.}
+  \item{ts_method}{Default is \code{"es"} for exponential smoothing forecasting.
+       Or, choose \code{"lm"} for at least squares linear regression model.}
+  \item{ts_format}{A specified format for R function \code{as.Date()}
+    that describes the values of the date variable on the x-axis,
     needed if the function cannot identify the date format to properly
     decode the given date values. For example, describe a character string
     date such as \code{"09/01/2024"} by the format \code{"\%m/\%d/\%Y"}.
     See \code{details} for more information.}
-  \item{time_fit}{If \code{TRUE}, for each data value display the fitted value,
-        level, trend, and seasonal component.}
-  \item{es_level}{Holt-Winters exponential smoothing level parameter,
+  \item{ts_fitted}{If \code{TRUE}, for each data value display the fitted value,
+        ts_level, trend, and seasonal component.}
+  \item{ts_level}{Holt-Winters exponential smoothing level parameter,
        \code{alpha}. By default, the algorithm chooses an optimal numerical
-       value from 0 to 1, or user specify. Or set to \code{FALSE}
-       to remove the effect.}
-  \item{es_trend}{Holt-Winters exponential smoothing trend parameter,
+       value from 0 to 1, or user specify.}
+  \item{ts_trend}{Trend parameter. If \code{FALSE}, then no trend in the
+       model estimation. For Holt-Winters exponential smoothing, the trend parameter,
        \code{beta}. By default, the algorithm chooses an optimal numerical
        value from 0 to 1, or user specify.}
-  \item{es_seasons}{Holt-Winters exponential smoothing seasonal parameter,
-       \code{gamma}. By default, the algorithm chooses an optimal numerical
-       value from 0 to 1, or user specify. Or set to \code{FALSE}
-       to remove the effect. Defaults to \code{FALSE} for annual data, which
-       cannot exhibit intra-annual seasonality.}
-  \item{es_type}{Type of seasonal model, default is \code{"additive"} with
-       a \code{"multiplicative"} option.}
-  \item{es_PIlevel}{Level of the prediction interval about the forecasted 
+  \item{ts_seasons}{The seasonality parameter, which applies to both
+      exponential smoothing, \code{gamma}, and de-seasonalized
+      regression forecasting.
+      For exponential smoothing, by default, the algorithm chooses an optimal
+      numerical value from 0 to 1, or user specify. Or set to \code{FALSE}
+      to remove the effect. Defaults to \code{FALSE} for annual data, which
+      cannot exhibit intra-annual seasonality. For linear
+      regression time series forecasting, set to \code{FALSE} to not
+      de-seasonalize.}
+  \item{ts_type}{Type of seasonal model for exponential smoothing forecasting.
+      Default is \code{"additive"} with a \code{"multiplicative"} option.}
+  \item{ts_PIlevel}{Level of the prediction interval about the forecasted
        Holt-Winters values with a default of \code{0.95}.}
   \item{stack}{If \code{TRUE}, multiple time plots are stacked on each other, with
        \code{area} set to \code{TRUE} by default.}
@@ -463,19 +476,19 @@ vp(\dots)
        variable \code{x}.
        The resulting dot plot, or Cleveland plot, is analogous to a bar chart.}
   \item{stat_x}{If no \code{y} variable is specified, for constructing a
-        frequency polygon, with access to the \code{bin_width} parameter. 
+        frequency polygon, with access to the \code{bin_width} parameter.
         Either do the
         default \code{count} for each bin or the \code{proportion}, also
         indicated by \code{\%}.}\cr
 
 
-  \item{vbs_plot}{A character string that specifies the components of the 
+  \item{vbs_plot}{A character string that specifies the components of the
         \bold{integrated Violin-Box-Scatterplot (VBS) of a continuous variable}.
         A \code{"v"} in the string indicates a violin plot, a \code{"b"}
         indicates a box plot with flagged outliers, and a \code{"s"}
-        indicates a 1-variable scatterplot. Default value is \code{"vbs"}. 
+        indicates a 1-variable scatterplot. Default value is \code{"vbs"}.
         The characters can be in any order and upper- or lower-case.
-        Generalize to Trellis plots with the 
+        Generalize to Trellis plots with the
         \code{facet1} and \code{facet2} parameters, but currently only applies
         to horizontal displays.
         Modify fill and border colors from the current \code{theme} with
@@ -484,7 +497,7 @@ vp(\dots)
   \item{vbs_size}{Width of the violin plot to the plot area. Make the
         violin (and also the accompanying box plot) larger or smaller by
         making the plot area and/or this value larger or smaller.}
-  \item{bw}{Bandwidth for the smoothness of the violin plot. Higher values 
+  \item{bw}{Bandwidth for the smoothness of the violin plot. Higher values
         for smoother plots. Default is to calculate a bandwidth that provides
         a relative smooth density plot.}
   \item{bw_iter}{Number of iterations used to modify default R bandwidth
@@ -494,15 +507,15 @@ vp(\dots)
   \item{box_fill}{Fill color for a box plot.}
   \item{vbs_pt_fill}{Points in a VBS scatterplot are black by default because
         the background is the violin, which is based on the current theme
-        color. To use the values for \code{pt_fill} and \code{pt_color} 
+        color. To use the values for \code{pt_fill} and \code{pt_color}
         specified by the \code{\link{style}} function, set to \code{"default"}.
         Or set to any desired color.}
   \item{vbs_mean}{Show the mean on the box plot with a strip the color
-        of \code{out_fill}, which can be changed with the 
+        of \code{out_fill}, which can be changed with the
         \code{\link{style}} function.}
   \item{fences}{If \code{TRUE}, draw the inner upper and lower fences as
         dotted line segments.}
-  \item{k}{IQR multiplier for the basis of calculating the distance of the 
+  \item{k}{IQR multiplier for the basis of calculating the distance of the
         whiskers of the box plot from the box. Default is Tukey's setting
         of 1.5.}
   \item{box_adj}{Adjust the box and whiskers, and thus outlier detection,
@@ -518,11 +531,11 @@ vp(\dots)
         a third variable where the default is 0.10,
         or for categorical variables, a
         factor, the size of the bubbles represents
-        frequency, with a default of 0.22.} 
+        frequency, with a default of 0.22.}
   \item{power}{Relative size of the scaling of the bubbles to each other.
         Default value of 0.5 scales the bubbles so that the area of each
         bubble is the value of the corresponding sizing variable. Value of 1
-        scales so the radius of the bubble 
+        scales so the radius of the bubble
         is the value of the sizing variable, increasing the discrepancy of size
         between the variables.}
   \item{low_fill}{For a categorical variable and the resulting bubble plot,
@@ -531,9 +544,9 @@ vp(\dots)
   \item{hi_fill}{For a categorical variable and the resulting bubble plot,
         or a matrix of these plots, sets a color gradient of the fill color
         ending with this color.}\cr
-  
 
-  \item{smooth}{\bold{Smoothed density plot} for two numerical variables.} 
+
+  \item{smooth}{\bold{Smoothed density plot} for two numerical variables.}
   \item{smooth_points}{Number of points superimposed on the density plot in the
         areas of the lowest density to help identify outliers, which controls
         how dark are the smoothed points.}
@@ -542,7 +555,7 @@ vp(\dots)
         the color scale. Smaller than default of 0.25 yields darker plots.}
   \item{smooth_bins}{Number of bins in both directions for the density
         estimation.}
-  \item{n_bins}{Specify the number of bins to bin a single numeric 
+  \item{n_bins}{Specify the number of bins to bin a single numeric
        \code{x}-variable from which to compute the mean or median for a
        numeric \code{y}-variable for each bin of \code{x}. Points are plotted
        with the size dependent on the sample size for the bin, unless \code{size}
@@ -563,7 +576,7 @@ vp(\dots)
         actual endpoint of the last bin may be larger than the specified value.}
   \item{breaks}{The method for calculating the bins, or an explicit
         specification of the bins, such as with the standard R
-        \code{\link{seq}} function or other options provided by the 
+        \code{\link{seq}} function or other options provided by the
         \code{\link{hist}} function.  Also, sets \code{bin} to \code{TRUE}.}
   \item{cumulate}{Specify a cumulative frequency polygon.}\cr
 
@@ -583,7 +596,7 @@ vp(\dots)
        the labels away from plot edge. Not applicable to Trellis graphics.}
   \item{margin_adjust}{Four-element vector -- top, right, bottom and left --
        adjusts the margins of the plotted figure in approximate inches.
-       + values move the corresponding margin away from plot edge. 
+       + values move the corresponding margin away from plot edge.
        Not applicable to Trellis graphics.}\cr
 
 
@@ -605,9 +618,15 @@ vp(\dots)
         \code{rotate_x}, \code{rotate_y}, and \code{offset} from the
         \code{\link{style}} function.}
   \item{origin_x}{Origin of \code{x}-axis. Starting value of \code{x}, by
-       default the minimum value of \code{x}, except when \code{stat}
+       default the minimum value of \code{x}, except for time series plots
+       and when \code{stat}
        is set to \code{"count"} or related  where the origin is zero
-       by default, but can be modified.}
+       by default.}
+  \item{origin_y}{Origin of \code{y}-axis. Starting value of \code{y}, by
+       default the minimum value of \code{x}, except for time series plots
+       and when \code{stat}
+       is set to \code{"count"} or related  where the origin is zero
+       by default.}
   \item{scale_x}{If specified, a vector of three values that define the
         x-axis with numerical values: starting value, ending value, and number
         of intervals.}
@@ -615,11 +634,11 @@ vp(\dots)
         y-axis with numerical values: starting value, ending value, and number
         of intervals.}
   \item{pad_x}{Proportion of padding added to left and right sides of the
-       \code{x}-axis, respectively. Value from 0 to 1 for each of the two 
+       \code{x}-axis, respectively. Value from 0 to 1 for each of the two
        elements. If only one element specified, value is applied to both
        sides.}
   \item{pad_y}{Proportion of padding added to bottom and top sides of the
-       \code{y}-axis, respectively. Value from 0 to 1 for each of the two 
+       \code{y}-axis, respectively. Value from 0 to 1 for each of the two
        elements. If only one element specified, value is applied to both
        sides.}
   \item{legend_title}{Title of the legend for a multiple-variable \code{x}
@@ -630,7 +649,7 @@ vp(\dots)
        on the plot.
        Possible values are any text to be written, the first argument, which is
        \code{"text"}, or,
-       \code{"labels"} to label each point with the row name, or, 
+       \code{"labels"} to label each point with the row name, or,
        \code{"rect"} (rectangle), \code{"line"}, \code{"arrow"},
        \code{"v_line"} (vertical line), and \code{"h_line"} (horizontal line).
        The value \code{"means"} is short-hand for vertical and horizontal lines
@@ -667,7 +686,7 @@ vp(\dots)
         the variable will be analyzed as categorical instead of continuous.
         Default is 0. Use to specify that such variables are to be analyzed
         as categorical, a kind of informal R factor.
-        \bold{[deprecated]}: Best to convert a categorical integer variable 
+        \bold{[deprecated]}: Best to convert a categorical integer variable
         to a factor.}
   \item{value_labels}{For factors, default is the factor labels, and for
         character variables, default is the character values.
@@ -689,7 +708,7 @@ vp(\dots)
 
 
   \item{eval_df}{Determines if to check for existing data frame and
-        specified variables. By default is \code{TRUE} 
+        specified variables. By default is \code{TRUE}
         unless the \code{shiny} package is loaded then set to \code{FALSE} so
         that Shiny will run. Needs to be set to \code{FALSE} if using
         the pipe \code{\%\>\%} notation.}
@@ -711,13 +730,13 @@ vp(\dots)
 VARIABLES and TRELLIS PLOTS\cr
 There is at least one primary variable, \code{x}, which defines the coordinate system for plotting in terms of the \code{x}-axis, the horizontal axis. Plots may also specify a second primary variable, \code{y}, which defines the \code{y}-axis of the coordinate system. One of these primary variables may be a vector. The simplest plot is from the specification of only one or two primary variables, each as a single variable, which generates a single scatterplot of either one or two variables, necessarily on a single plot, called a panel, defined by a single \code{x}-axis and usually a single \code{y}-axis_
 
-For numeric primary variables, a single panel may also contain multiple plots of two types. Form the first type from subsets of observations (rows of data) based on values of a categorical variable. Specify this plot with the \code{by} parameter, which identifies the grouping variable to generate a scatterplot of the primary variables for each of its levels. The points for each group are plotted with a different shape and/or color. By default, the colors vary, though to maintain the color scheme, if there are only two levels of the grouping variable, the points for one level are filled with the current theme color and the points for the second level are plotted with transparent interiors. 
+For numeric primary variables, a single panel may also contain multiple plots of two types. Form the first type from subsets of observations (rows of data) based on values of a categorical variable. Specify this plot with the \code{by} parameter, which identifies the grouping variable to generate a scatterplot of the primary variables for each of its levels. The points for each group are plotted with a different shape and/or color. By default, the colors vary, though to maintain the color scheme, if there are only two levels of the grouping variable, the points for one level are filled with the current theme color and the points for the second level are plotted with transparent interiors.
 
-Or, obtain multiple scatterplots on the same panel with multiple numeric \code{x}-variables, or multiple \code{y}-variables. To obtain this graph, specify one of the primary variables as a vector of multiple variables. 
+Or, obtain multiple scatterplots on the same panel with multiple numeric \code{x}-variables, or multiple \code{y}-variables. To obtain this graph, specify one of the primary variables as a vector of multiple variables.
 
-Trellis graphics (facets), from Deepayan Sarkar's (2009) \code{lattice} package, may be implemented in which multiple panels for one numeric \code{x}-variable and one numeric \code{y}-variable are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by} is a conditioning variable that results in a Trellis plot, the scatterplot of \code{x} and \code{y} produced at \emph{each} level of the \code{facet1} variable. The inclusion of a second conditioning variable, \code{facet2}, results in a separate scatterplot panel for \emph{each} combination of cross-classified values of both \code{facet1} and \code{facet2}. A grouping variable according to \code{by} may also be specified, which is then applied to each panel. If there are 1000 or less unique values of \code{x}, an analysis of the maximum number of repetitions for each value of \code{facet1} is provided. 
+Trellis graphics (facets), from Deepayan Sarkar's (2009) \code{lattice} package, may be implemented in which multiple panels for one numeric \code{x}-variable and one numeric \code{y}-variable are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{by} is a conditioning variable that results in a Trellis plot, the scatterplot of \code{x} and \code{y} produced at \emph{each} level of the \code{facet1} variable. The inclusion of a second conditioning variable, \code{facet2}, results in a separate scatterplot panel for \emph{each} combination of cross-classified values of both \code{facet1} and \code{facet2}. A grouping variable according to \code{by} may also be specified, which is then applied to each panel. If there are 1000 or less unique values of \code{x}, an analysis of the maximum number of repetitions for each value of \code{facet1} is provided.
 
-Control the panel dimensions and the overall size of the Trellis plot with the following parameters: \code{width} and \code{height} for the physical dimensions of the plot window, \code{n_row} and \code{n_col} for the number of rows and columns of panels, and \code{aspect} for the ratio of the height to the width of each panel. The plot window is the standard graphics window that displays on the screen, or it can be specified as a pdf file with the \code{pdf_file} parameter. 
+Control the panel dimensions and the overall size of the Trellis plot with the following parameters: \code{width} and \code{height} for the physical dimensions of the plot window, \code{n_row} and \code{n_col} for the number of rows and columns of panels, and \code{aspect} for the ratio of the height to the width of each panel. The plot window is the standard graphics window that displays on the screen, or it can be specified as a pdf file with the \code{pdf_file} parameter.
 
 CATEGORICAL VARIABLES\cr
 Conceptually, there are continuous variables and categorical variables. Categorical variables have relatively few unique data values. However, categorical variables can be defined with non-numeric values, but also with numeric values, such as responses to a five-point Likert scale from Strongly Disagree to Strongly Agree, with responses coded 1 to 5. The three \code{by} --variables -- \code{facet1}, \code{facet2} and \code{by} -- only apply to graphs created with numeric \code{x} and/or \code{y} variables, continuous or categorical.
@@ -728,16 +747,16 @@ DATA\cr
 The default input data frame is \code{d}. Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{d$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment.
 
 The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin_width}, to override default values. The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
-       
+
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 VALUE LABELS\cr
-[DEPRECATED. Use \code{factor()} instead.] The value labels for each axis can be over-ridden from their values in the data to user supplied values with the \code{value_labels} option. This option is particularly useful for Likert-style data coded as integers. Then, for example, a 0 in the data can be mapped into a "Strongly Disagree" on the plot. These value labels apply to integer categorical variables, and also to factor variables. To enhance the readability of the labels on the graph, any blanks in a value label translate into a new line in the resulting plot. Blanks are also transformed as such for the labels of factor variables. 
+[DEPRECATED. Use \code{factor()} instead.] The value labels for each axis can be over-ridden from their values in the data to user supplied values with the \code{value_labels} option. This option is particularly useful for Likert-style data coded as integers. Then, for example, a 0 in the data can be mapped into a "Strongly Disagree" on the plot. These value labels apply to integer categorical variables, and also to factor variables. To enhance the readability of the labels on the graph, any blanks in a value label translate into a new line in the resulting plot. Blanks are also transformed as such for the labels of factor variables.
 
 However, the lessR function \code{\link{factors}} allows for the easy creation of factors, one variable or a vector of variables, in a single statement, and is generally recommended as the method for providing value labels for the variables.
 
 VARIABLE LABELS\cr
-Although standard R does not provide for variable labels, \code{lessR} can store the labels in the data frame with the data, obtained from the \code{\link{Read}} function or \code{\link{VariableLabels}}.  If variable labels exist, then the corresponding variable label is by default listed as the label for the corresponding axis and on the text output. 
+Although standard R does not provide for variable labels, \code{lessR} can store the labels in the data frame with the data, obtained from the \code{\link{Read}} function or \code{\link{VariableLabels}}.  If variable labels exist, then the corresponding variable label is by default listed as the label for the corresponding axis and on the text output.
 
 ONE VARIABLE PLOT\cr
 The one variable plot of one continuous variable generates either a violin/box/scatterplot (VBS plot), or a run chart with if \code{.Index} appears as the name of the first variable listed, or \code{x} can be an R time series variable for a time series chart. For the box plot,
@@ -746,7 +765,7 @@ for gray scale output potential outliers are plotted with squares and outliers a
 The plot can also be obtained as a bubble plot of frequencies for a categorical variable.
 
 TWO VARIABLE PLOT\cr
-When two variables are specified to plot, by default if the values of the first variable, \code{x}, are unsorted, or if there are unequal intervals between adjacent values, or if there is missing data for either variable, a scatterplot is produced from a call to the standard R \code{\link{plot}} function. By default, sorted values with equal intervals between adjacent values of the first of the two specified variables yields a function plot if there is no missing data for either variable, that is, a call to the standard R \code{\link{plot}} function with \code{type="l"}, which connects each adjacent pair of points with a line segment.
+When two variables are specified to plot, by default if the values of the first variable, \code{x}, are unsorted, or if there are unequal intervals between adjacent values, or if there is missing data for either variable, a scatterplot is produced from a call to the Base R \code{\link{plot}} function. By default, sorted values with equal intervals between adjacent values of the first of the two specified variables yields a function plot if there is no missing data for either variable, that is, a call to the standard R \code{\link{plot}} function with \code{segments=TRUE}, which connects each adjacent pair of points with a line segment.
 
 Specifying multiple, continuous \code{x}-variables against a single y variable, or vice versa, results in multiple plots on the same graph. The color of the points of the second variable is the same as that of the first variable, but with a transparent fill. For more than two \code{x}-variables, multiple colors are displayed, one for each \code{x}-variable.
 
@@ -754,19 +773,19 @@ BUBBLE PLOT FREQUENCY MATRIX (BPFM)\cr
 Multiple categorical variables for \code{x} may be specified in the absence of a \code{y} variable. A bubble plot results that illustrates the frequency of each response for each of the variables in a common figure in which the \code{x}-axis contains all of the unique labels for all of the variables plotted. Each line of information, the bubbles and counts for a single variable, replaces the standard bar chart in a more compact display. Usually the most meaningful when each variable in the matrix has the same response categories, that is, levels, such as for a set of shared Likert scales. The BPFM is considerably condensed presentation of frequencies for a set of variables than are the corresponding bar charts.
 
 SCATTERPLOT MATRIX\cr
-A single vector of continuous variables specified as \code{x}, with no \code{y}-variable, generates a scatterplot matrix of the specified variable.  
+A single vector of continuous variables specified as \code{x}, with no \code{y}-variable, generates a scatterplot matrix of the specified variable.
 
-The scatterplot matrix is displayed according to the current color theme. Specific colors such as \code{fill}, \code{color}, etc. can also be provided. The upper triangle shows the correlation coefficient, and the lower triangle each corresponding scatterplot, with, by default, the non-linear loess best fit line. The \code{code} fit option can be used to provide the linear least squares line instead, along with the corresponding \code{fit_color} for the color of the fit line.   
+The scatterplot matrix is displayed according to the current color theme. Specific colors such as \code{fill}, \code{color}, etc. can also be provided. The upper triangle shows the correlation coefficient, and the lower triangle each corresponding scatterplot, with, by default, the non-linear loess best fit line. The \code{code} fit option can be used to provide the linear least squares line instead, along with the corresponding \code{fit_color} for the color of the fit line.
 
 SIZE VARIABLE\cr
 A variable specified with \code{size=} is a numerical variable that activates a bubble plot in which the size of each bubble is determined by the value of the corresponding value of \code{size}, which can be a variable or a constant.
 
-To explicitly vary the shapes, use \code{shape} and a list of shape values in the standard R form with the \code{\link{c}} function to combine a list of values, one specified shape for each group, as shown in the examples. To explicitly vary the colors, use \code{fill}, such as with R standard color names. If \code{fill} is specified without \code{shape}, then colors are varied, but not shapes.  To vary both shapes and colors, specify values for both options, always with one shape or color specified for each level of the \code{by} variable. 
+To explicitly vary the shapes, use \code{shape} and a list of shape values in the standard R form with the \code{\link{c}} function to combine a list of values, one specified shape for each group, as shown in the examples. To explicitly vary the colors, use \code{fill}, such as with R standard color names. If \code{fill} is specified without \code{shape}, then colors are varied, but not shapes.  To vary both shapes and colors, specify values for both options, always with one shape or color specified for each level of the \code{by} variable.
 
 Shapes beyond the standard list of named shapes, such as \code{"circle"}, are also available as single characters.  Any single letter, uppercase or lowercase, any single digit, and the characters \code{"+"}, \code{"*"} and \code{"#"} are available, as illustrated in the examples. In the use of \code{shape}, either use standard named shapes, or individual characters, but not both in a single specification.
 
 SCATTERPLOT ELLIPSE\cr
-For a scatterplot of two numeric variables, the \code{ellipse=TRUE} option draws the .95 data ellipse as computed by the \code{ellipse} function, written by Duncan Murdoch and E. D. Chow, from the \code{ellipse} package. The axes are automatically lengthened to provide space for the entire ellipse that extends beyond the maximum and minimum data values. The specific level of the ellipse can be specified with a numerical value in the form of a proportion. Multiple numerical values of \code{ellipse} may also be specified to obtain multiple ellipses. 
+For a scatterplot of two numeric variables, the \code{ellipse=TRUE} option draws the .95 data ellipse as computed by the \code{ellipse} function, written by Duncan Murdoch and E. D. Chow, from the \code{ellipse} package. The axes are automatically lengthened to provide space for the entire ellipse that extends beyond the maximum and minimum data values. The specific level of the ellipse can be specified with a numerical value in the form of a proportion. Multiple numerical values of \code{ellipse} may also be specified to obtain multiple ellipses.
 
 BOXPLOTS\cr
 For a single variable the preferred plot is the integrated violin/box/scatter plot or VBS plot. Only the violin or box plot can be obtained with the corresponding aliases \code{\link{ViolinPlot}} and \code{\link{BoxPlot}}, or by setting \code{vbs_plot} to \code{"v"} or \code{"b"}. To view a box plot of a continuous variable (Y) across the levels of a categorical variable (X), either as part of the full VBS plot, or by itself, there are two possibilities:\cr
@@ -782,18 +801,18 @@ The second possibility with \code{facet1} produces the different box plots on a 
 TIME CHARTS\cr
 See \url{https://web.pdx.edu/~gerbing/lessR/examples/Time.html} for more explanation and examples.
 
-Specifying one or more \code{x}-variables with no \code{y}-variables, and \code{.Index} appears as the name of the \code{x}-variables in a run chart. The values of the specified \code{x}-variable are plotted on the \code{y}-axis, with Index on the \code{x}-axis. Index is the ordinal position of each data value, from 1 to the number of values. 
+Specify \code{.Index} as the name of the \code{x}-variable. The \code{y} variable is then plotted as a run chart. The values of the specified \code{x}-variable are plotted on the \code{y}-axis, with Index on the \code{x}-axis. Index is the ordinal position of each data value, from 1 to the number of values.
 
-If the specified \code{x}-variable is of type \code{Date}, or is an R time series, a time series plot is generated for each specified variable. If data are represented as a formal R time-series, univariate or multivariate, specify as the \code{x}-variable. One possibility is to specify the \code{x}-variable of type \code{Date}, or, have \code{Plot} do the conversion implicitly from entered character-string numerical dates such as "08/18/1952". Then specify the  \code{y}-variable as one or more time series to plot. The \code{y}-variable can be formatted as long-form data with all the values in a single column, or as wide-formatted data with the time-series variables in separate columns.
+If the specified \code{x}-variable is of type \code{Date}, or is an R time series, a time series plot is generated for each specified variable. If data are represented as a formal R time-series, univariate or multivariate, specify as the \code{x}-variable. One possibility is to specify the \code{x}-variable of type \code{Date}, or, have \code{Plot} do the \code{as.Date()} conversion implicitly from entered character-string numerical dates such as "08/18/1952". Then specify the  \code{y}-variable as one or more time series to plot. The \code{y}-variable can be formatted as long-form data with all the values in a single column, or as wide-formatted data with the time-series variables in separate columns.
 
-\code{Plot()} makes a reasonable attempt to decode a character string date value as the \code{x}-axis variable as read from a text data file such as a \code{csv} file. However, some date formats are not available for conversion by default, such as date values that include the name of the month instead of its number. In general, there can be no guarantee that a date format is not miss-inferred as they can be inherently ambiguous. 
+\code{Plot()} makes a reasonable attempt to decode a character string decimal date value as the \code{x}-axis variable as read from a text data file such as a \code{csv} file. However, some date formats are not available for conversion by default, such as date values that include the name of the month instead of its number. In general, there can be no guarantee that a date format is not miss-inferred as they can be inherently ambiguous.
 
-If the default date conversion is not working or is not available, then manually supply the date format following one of the format examples in the following table according to the parameter \code{time_format}.
+If the default date conversion is not working or is not available, then manually supply the date format following one of the format examples in the following table according to the parameter \code{ts_format}.
 
 \tabular{ll}{
 Example Date \tab Format\cr
 --------------------------- \tab ----------------- \cr
-\code{"2022-09-01"} \tab \code{"\%Y-\%m-\%d"}\cr 
+\code{"2022-09-01"} \tab \code{"\%Y-\%m-\%d"}\cr
 \code{"2022/9/1"} \tab \code{"\%Y/\%m/\%d"}\cr
 \code{"2022.09.01"} \tab \code{"\%Y.\%m.\%d"}\cr
 \code{"09/01/2022"} \tab \code{"\%m/\%d/\%Y"}\cr
@@ -804,18 +823,23 @@ Example Date \tab Format\cr
 --------------------------- \tab ----------------- \cr
 }
 
-The parameter \code{time_unit} aggregates the date variable according to its specified value. The aggregation is based on two functions from the \code{xts} package, \code{endpoints()} and \code{period.apply()}. For example, a data variable has daily values but is plotted with aggregated quarterly values.
+Also, \code{Plot()} will convert character string dates such as \code{2024 Aug} and \code{2024 Q1}. Use three-letter abbreviations for the months or use Q1, Q2, Q3, or Q4 for the quarter.
 
-Specify the function by which to aggregate with the parameter \code{time_agg}. The default is \code{"sum"}.
+The parameter \code{ts_unit} aggregates the date variable according to its specified value. The aggregation is based on two functions from the \code{xts} package, \code{endpoints()} and \code{period.apply()}. For example, a data variable has daily values but is plotted with aggregated quarterly values.
+
+Specify the function by which to aggregate with the parameter \code{ts_agg}. The default is \code{"sum"}.
+
+In terms of missing data, if the date value exists and the corresponding y-value is missing, with value \code{NA}, then the visualization leaves a corresponding y-value blank. If the date value is also missing, then the nearest adjacent points are connected by line segment which runs over the missing data value. For example, consider a daily time series such that "2021-01-07" and "2021-01-09" are both present with their corresponding y values, but there is no date value or y value for January 8, that is, "2021-01-08". The entire row of data is missing. The resulting visualization plot the y-value for January 7 and also for January 9, with a line segment connecting those two points. There is no corresponding label on the x-axis for the missing data value but the January 9 value is appropriately placed two days after the January 7 value on the visualization.
+
 
 2-D KERNEL DENSITY\cr
 With \code{smooth=TRUE}, the R function \code{\link{smoothScatter}} is invoked according to the current color theme. Useful for very large data sets. The \code{smooth_points} parameter plots points from the regions of the lowest density. The \code{smooth_bins} parameter specifies the number of bins in both directions for the density estimation. The \code{smooth_exp} parameter specifies the exponent in the function that maps the density scale to the color scale to allow customization of the intensity of the plotted gradient colors. Higher values result in less color saturation, de-emphasizing points from regions of lessor density. These parameters are respectively passed directly to the \code{\link{smoothScatter}} \code{nrpoints}, \code{nbin} and \code{transformation} parameters. Grid lines are turned off,
 by default, but can be displayed by setting the \code{grid_color} parameter.
 
 COLORS\cr
-A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{"lightbronze"}. A gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"sienna"} and \code{"darkred"}. Use the option \code{style(sub_theme="black")} for a black background and partial transparency of plotted colors. 
+A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{"lightbronze"}. A gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"sienna"} and \code{"darkred"}. Use the option \code{style(sub_theme="black")} for a black background and partial transparency of plotted colors.
 
-Colors can also be changed for individual aspects of a scatterplot as well with the \code{\link{style}} function. To provide a warmer tone by slightly enhancing red, try a background color such as \code{panel_fill="snow"}. Obtain a very light gray with \code{panel_fill="gray99"}.  To darken the background gray, try \code{panel_fill="gray97"} or lower numbers. See the \code{lessR} function \code{\link{showColors}}, which provides an example of all available named R colors with their RGB values_
+Colors can also be changed for individual aspects of a scatterplot as well with the \code{\link{style}} function. To provide a warmer tone by slightly enhancing red, try a background color such as \code{panel_fill="snow"}. Obtain a very light gray with \code{panel_fill="gray99"}.  To darken the background gray, try \code{panel_fill="gray97"} or lower numbers. See the \code{lessR} function \code{\link{showColors}}, which provides an example of all available named R colors with their RGB valu
 
 For the color options, such as \code{violin_color}, the value of \code{"off"} is the same as \code{"transparent"}.
 \cr
@@ -837,7 +861,7 @@ Value \tab Object \tab Required Coordinates\cr
 ----------- \tab ------------------- \tab -----------------------\cr
 }
 
-The value of \code{add} specifies the object. For a single object, enter a single value. Then specify the value of the needed corresponding coordinates, as specified in the above table. For multiple placements of that object, specify vectors of corresponding coordinates. To annotate multiple objects, specify multiple values for \code{add} as a vector. Then list the corresponding coordinates, for up to each of four coordinates, in the order of the objects listed in \code{add}. 
+The value of \code{add} specifies the object. For a single object, enter a single value. Then specify the value of the needed corresponding coordinates, as specified in the above table. For multiple placements of that object, specify vectors of corresponding coordinates. To annotate multiple objects, specify multiple values for \code{add} as a vector. Then list the corresponding coordinates, for up to each of four coordinates, in the order of the objects listed in \code{add}.
 
 Can also specify vectors of different properties, such as \code{add_color}. That is, different objects can be different colors, different transparency levels, etc.
 
@@ -867,7 +891,9 @@ Instead, do the following:
 
 
 \value{
-The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. The output here is just for the outlier analysis of the two-variable scatterplot with continuous variables. The outlier identification must be activated for the analysis, such as from parameter \code{MD_cut}.
+The output can optionally be saved into an \code{R} object, otherwise it simply appears in the console. Each value in the output will only appear if activated in the analysis. For example, the outlier identification must be activated for the analysis, such as from parameter \code{MD_cut}, for \code{out_outliers} to appear in the output.
+
+Here is an example of saving the output to an R object with any valid R name, such as \code{p}: \code{p <- Plot(Years, Salary)}. To see the names of the output objects for that specific analysis, enter \code{names(p)}. To display any of the objects, precede the name with \code{p$}, such as \code{p$out_stats}. View the output at the R console or within a markdown document that displays your results.
 
 READABLE OUTPUT\cr
 \code{out_stats}: Correlational analysis.\cr
@@ -887,13 +913,13 @@ STATISTICS\cr
 \references{
 Brys, G., Hubert, M., & Struyf, A. (2004). A robust measure of skewness. Journal of Computational and Graphical Statistics, 13(4), 996-1017.
 
-Murdoch, D, and  Chow, E. D. (2013).  \code{ellipse} function from the \code{ellipse} package package. 
+Murdoch, D, and  Chow, E. D. (2013).  \code{ellipse} function from the \code{ellipse} package package.
 
 Gerbing, D. W. (2023). R Data Analysis without Programming, 2nd edition, Chapter 10, NY: Routledge.
 
 Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 5, NY: CRC Press.
 
-Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871. 
+Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871.
 
 Hubert, M. and Vandervieren, E. (2008). An adjusted boxplot for skewed distributions, Computational Statistics and Data Analysis 52, 51865201.
 
@@ -918,7 +944,7 @@ dd=d
 #---------------------------------------------------
 
 Plot(Years, Salary, by=Gender, size=2, fit="lm",
-     fill=c("olivedrab3", "gold1"), 
+     fill=c("olivedrab3", "gold1"),
      color=c("darkgreen", "gold4"))
 
 # scatterplot with all defaults
@@ -947,7 +973,7 @@ d <- dd
 Plot(Years, Salary, filter=(Gender=="M" & Years > 5))
 
 # plot 0.95 data ellipse with the points identified that represent
-#   outliers defined by a Mahalanobis Distance larger than 6 
+#   outliers defined by a Mahalanobis Distance larger than 6
 # save outliers into R object out
 d[1, "Salary"] <- 200000
 out <- Plot(Years, Salary, ellipse=0.95, MD_cut=6)
@@ -991,7 +1017,7 @@ style()
 #   0.95 confidence level
 Plot(Years, Salary, fit="loess", span=1.25)
 
-# 2-D kernel density (more useful for larger sample sizes) 
+# 2-D kernel density (more useful for larger sample sizes)
 Plot(Years, Salary, smooth=TRUE)
 }
 
@@ -1043,7 +1069,7 @@ Plot(Years, Salary, by=Gender, ellipse=.50)
 Plot(Salary)
 
 Plot(Years, Salary, by=Gender, size=2, fit="lm",
-     fill=c("olivedrab3", "gold1"), 
+     fill=c("olivedrab3", "gold1"),
      color=c("darkgreen", "gold4"))
 
 \donttest{
@@ -1082,7 +1108,7 @@ Plot(Salary, stat_x="count")  # bin the values
 # run chart, with default fill area
 Plot(.Index, Salary, area_fill="on")
 
-# two run charts in same panel 
+# two run charts in same panel
 # or could do a multivariate time series
 Plot(.Index, c(Pre, Post))
 
@@ -1096,7 +1122,7 @@ Plot(oz.ts)
 
 # multiple time series plotted from dates and stacked
 # black background with translucent areas, then reset theme to default
-style(sub_theme="black", color="steelblue2", transparency=.55, 
+style(sub_theme="black", color="steelblue2", transparency=.55,
   window_fill="gray10", grid_color="gray25")
 date <- seq(as.Date("2013/1/1"), as.Date("2016/1/1"), by="quarter")
 x1 <- rnorm(13, 100, 15)
@@ -1111,7 +1137,7 @@ style()
 n.q <- 42
 month <- seq(as.Date("2013/1/1"), length=n.q, by="months")
 x <- rnorm(n.q, 100, 15)
-Plot(month, x, time_unit="quarters")
+Plot(month, x, ts_unit="quarters")
 
 
 # trigger a time series with a Date variable specified first
@@ -1123,6 +1149,9 @@ Plot(Month, Price, filter=(Company=="Apple"))
 Plot(Month, Price, facet1=Company, n_col=1)
 # all three plots on the same panel, three shades of blue
 Plot(Month, Price, by=Company, color="blues")
+# exponential smoothing forecast for next 12 months, 
+#   aggregate monthly data by mean over quarters
+Plot(Month, Price, ts_ahead=12, ts_unit="quarters")
 }
 
 #------------------------------------------
@@ -1131,17 +1160,17 @@ Plot(Month, Price, by=Company, color="blues")
 d <- rd("Employee")
 
 # default 1-D bubble plot
-# frequency plot, replaces bar chart 
+# frequency plot, replaces bar chart
 Plot(Dept)
 
 \donttest{
 
-# plot of frequencies for each category (level), replaces bar chart 
+# plot of frequencies for each category (level), replaces bar chart
 Plot(Dept, stat_x="count")
 
 
 #----------------------------------------------------
-# scatterplot of numeric against categorical variable 
+# scatterplot of numeric against categorical variable
 #----------------------------------------------------
 
 # generate a chart with the plotted mean of each level
@@ -1152,7 +1181,7 @@ style()
 
 
 #-------------------
-# Cleveland dot plot 
+# Cleveland dot plot
 #-------------------
 
 # row.names on the y-axis
@@ -1171,7 +1200,7 @@ Plot(c(Pre, Post), row_names)
 
 # add text at the one location specified by x1 and x2
 Plot(Years, Salary, add="Hi There", x1=12, y1=80000)
-# add text at three different specified locations 
+# add text at three different specified locations
 Plot(Years, Salary, add="Hi", x1=c(12, 16, 18), y1=c(80000, 100000, 60000))
 
 # add three different text blocks at three different specified locations
@@ -1184,19 +1213,19 @@ Plot(Years, Salary, ellipse=0.95, add=c("v_line", "h_line"),
   x1="mean_x", y1="mean_y")
 # can be done also with the following short-hand
 Plot(Years, Salary, ellipse=0.95, add="means")
- 
+
 # a rectangle requires two points, four coordinates, <x1,y1> and <x2,y2>
 style(add_trans=.8, add_fill="gold", add_color="gold4", add_lwd=0.5)
 Plot(Years, Salary, add="rect", x1=12, y1=80000, x2=16, y2=115000)
 
 # the first object, a rectangle, requires all four coordinates
-# the vertical line at x=2 requires only an x1 coordinate, listed 2nd 
+# the vertical line at x=2 requires only an x1 coordinate, listed 2nd
 Plot(Years, Salary, add=c("rect", "v_line"), x1=c(10, 2),
   y1=80000, x2=12, y2=115000)
 
 # two different rectangles with different locations, fill colors and translucence
 style(add_fill=c("gold3", "green"), add_trans=c(.8,.4))
-Plot(Years, Salary, add=c("rect", "rect"), 
+Plot(Years, Salary, add=c("rect", "rect"),
   x1=c(10, 2), y1=c(60000, 45000), x2=c(12, 75000), y2=c(80000, 55000))
 }
 
@@ -1226,7 +1255,7 @@ Plot(m06, m07)
 # function curve
 #---------------
 
-x <- seq(10,50,by=2) 
+x <- seq(10,50,by=2)
 y1 <- sqrt(x)
 y2 <- x**.33
 # x is sorted with equal intervals so run chart by default

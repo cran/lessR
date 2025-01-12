@@ -23,11 +23,11 @@ function(
   bar_color_cont=getOption("bar_color_cont"),
   bar_color_discrete=getOption("bar_color_discrete"),
   labels=getOption("labels"),
-  labels_color=getOption("labels_color"), 
+  labels_color=getOption("labels_color"),
   labels_size=getOption("labels_size"),
   labels_digits=getOption("labels_digits"),
   labels_position=getOption("labels_position"),
- 
+
   pt_fill=getOption("pt_fill"),
   trans_pt_fill=getOption("trans_pt_fill"),
   pt_color=getOption("pt_color"),
@@ -104,7 +104,7 @@ function(
   quiet=getOption("quiet"), brief=getOption("brief"),
 
   results=getOption("results"), explain=getOption("explain"),
-  interpret=getOption("interpret"), document=getOption("document"), 
+  interpret=getOption("interpret"), document=getOption("document"),
   code=getOption("code"),
 
   width=120, show=FALSE, ...) {
@@ -124,7 +124,7 @@ function(
 
   if (nargs() == 0) {
      theme <- "colors"
-     miss_theme <- FALSE    
+     miss_theme <- FALSE
      if (!quiet) cat("theme set to \"colors\"\n\n")
   }
   else {
@@ -140,7 +140,7 @@ function(
   if (show || get) reset <- FALSE
 
 
-  miss_set <- ifelse (missing(set), TRUE, FALSE) 
+  miss_set <- ifelse (missing(set), TRUE, FALSE)
   miss_tr.bar_fill <- ifelse (missing(trans_bar_fill), TRUE, FALSE)
 
   miss_sub_theme <- ifelse (missing(sub_theme), TRUE, FALSE)
@@ -149,7 +149,7 @@ function(
       "\"colors\" now a theme, the default theme\n\n")
   }
   sub_theme <- match.arg(sub_theme)
-  
+
   dots <- list(...)  # check for deprecated parameters
   if (length(dots) > 0) {
     for (i in 1:length(dots)) {
@@ -190,7 +190,7 @@ function(
     labels_size <- set$bar$labels_size
     labels_digits <- set$bar$labels_digits
     labels_position <- set$bar$labels_position
- 
+
     pt_fill <- set$pt$fill
     trans_pt_fill <- set$pt$trans_fill
     pt_color <- set$pt$color
@@ -273,21 +273,21 @@ function(
     results <- set$output$results
     explain <- set$output$explain
     interpret <- set$output$interpret
-    document <- set$output$document 
+    document <- set$output$document
     code <- set$output$code
   }  # end not null set
 
-        
+
   # reset all parameters to start-up condition for new theme
-  if (reset) { 
+  if (reset) {
     if (!miss_theme) {
       suppressPackageStartupMessages(.onAttach())
       bar_fill <- getOption("bar_fill")
       miss_theme <- FALSE
-      theme <- match.arg(theme) 
+      theme <- match.arg(theme)
       options(theme=theme)
       options(trans_bar_fill=0.10)
-      options(trans_pt_fill=0.00) 
+      options(trans_pt_fill=0.00)
     }
     else if (miss_set)
       theme <- getOption("theme")
@@ -405,23 +405,23 @@ function(
     if (!is.null(trans_bar_fill)) {
       options(trans_bar_fill=trans_bar_fill)
       if (!is.null(bar_fill))
-        options(bar_fill = .maketrans(bar_fill, 
-                .to256("trans_bar_fill")))
+        options(bar_fill = .maketrans(bar_fill, .to256("trans_bar_fill")))
     }
     if (!is.null(trans_pt_fill)) {
       options(trans_pt_fill=trans_pt_fill)
-      options(pt_fill = .maketrans(getOption("pt_fill"), .to256("trans_pt_fill")))
+      options(pt_fill = .maketrans(getOption("pt_fill"),
+                        .to256("trans_pt_fill")))
     }
 
     if (!is.null(bar_fill)) {
       if (bar_fill[1] == "transparent")
-        options(bar_fill = bar_fill) 
+        options(bar_fill = bar_fill)
       else
         options(bar_fill = .maketrans(bar_fill, .to256("trans_bar_fill")))
     }
     if (!is.null(pt_fill)) {
       if (pt_fill[1] == "transparent")
-        options(pt_fill = pt_fill) 
+        options(pt_fill = pt_fill)
       else
         options(pt_fill = .maketrans(pt_fill, .to256("trans_pt_fill")))
     }
@@ -435,19 +435,19 @@ function(
     options(theme = theme)
     options(sub_theme = sub_theme)
 
-    options(bar_fill = bar_fill) 
-    options(bar_fill_discrete = bar_fill_discrete) 
-    options(bar_fill_cont = bar_fill_cont) 
-    options(bar_color_discrete = bar_color_discrete) 
-    options(bar_color_cont = bar_color_cont) 
-    options(pt_color = pt_color) 
-    
+    options(bar_fill = bar_fill)
+    options(bar_fill_discrete = bar_fill_discrete)
+    options(bar_fill_cont = bar_fill_cont)
+    options(bar_color_discrete = bar_color_discrete)
+    options(bar_color_cont = bar_color_cont)
+    options(pt_color = pt_color)
+
     options(labels=labels)
     options(labels_color=labels_color)
     options(labels_size=labels_size)
     options(labels_digits=labels_digits)
     options(labels_position=labels_position)
-    
+
     options(window_fill=window_fill)
     options(panel_fill=panel_fill)
     options(panel_color=panel_color)
@@ -535,7 +535,7 @@ function(
     options(document=document)
     options(code=code)
   }
- 
+
 
   # only run if theme is specified, resets all parameters
 
@@ -592,7 +592,7 @@ function(
       bar_fill_cont = "white"
       bar_fill_discrete = "white"
       bar_color_discrete = "black"
-      bar_color_cont = "black"      
+      bar_color_cont = "black"
       labels_color = "black"
       pt_fill = "white"
       pt_color = "black"
@@ -625,12 +625,12 @@ function(
       trans_pt_fill = 0.00
       pt_color = "gray42"
       violin_fill=.maketrans("gray50", 40)
-      violin_color = "gray15" 
+      violin_color = "gray15"
       box_fill="gray65"
-      box_color = "gray15" 
+      box_color = "gray15"
       ellipse_fill = .maketrans("gray35", 15)
       fit_color = "black"
-      se_fill = .maketrans("gray10", 40) 
+      se_fill = .maketrans("gray10", 40)
       segment_color = "gray20"
       grid_color = "gray85"
       ID_color = "black"
@@ -646,21 +646,21 @@ function(
       #panel_fill = "transparent"
       panel_color = rgb(222,217,205, maxColorValue=255)
       #bar_fill = .maketrans("gray50", .to256("trans_bar_fill")))  # 230
-      bar_fill = rgb(123,140,150, maxColorValue=255)  
-      bar_fill_cont = rgb(123,140,150, maxColorValue=255)  
-      bar_fill_discrete = rgb(123,140,150, maxColorValue=255)  
+      bar_fill = rgb(123,140,150, maxColorValue=255)
+      bar_fill_cont = rgb(123,140,150, maxColorValue=255)
+      bar_fill_discrete = rgb(123,140,150, maxColorValue=255)
       bar_color_discrete = "transparent"
       bar_color_cont = rgb(126,144,168, maxColorValue=255)
       pt_fill = rgb(70,80,90, maxColorValue=255)
       trans_pt_fill = 0.00
       pt_color = rgb(70,80,90, maxColorValue=255)
       ellipse_color = "gray20"
-      se_fill = .maketrans("gray10", 40) 
+      se_fill = .maketrans("gray10", 40)
       violin_fill = "#7485975A"
 #     violin_fill = rgb(144,165,175, maxColorValue=255)
-      violin_color = "gray15" 
-      box_fill = .maketrans("gray15", 170) 
-      box_color = "gray15" 
+      violin_color = "gray15"
+      box_fill = .maketrans("gray15", 170)
+      box_color = "gray15"
       ellipse_fill = .maketrans("gray50", 50)
       strip_fill = .maketrans("gray55")
       fit_color = "gray15"
@@ -668,9 +668,9 @@ function(
       lab_color = "gray15"
       axis_color = "gray15"
       axis_text_color = "gray15"
-      segment_color = "gray50" 
-      strip_color = "gray55" 
-      strip_text_color = "gray15" 
+      segment_color = "gray50"
+      strip_color = "gray55"
+      strip_text_color = "gray15"
       ellipse_color = "gray15"
       bubble_text_color = rgb(247,242,230, maxColorValue=255)
       grid_color = rgb(222,217,205, maxColorValue=255)
@@ -714,12 +714,12 @@ function(
         ellipse_color = .maketrans(clr1, 200)
       segment_color = clr1
       bubble_text_color = "black"
-      strip_fill = .maketrans(clr1, 55) 
-      strip_color = clr2 
-      strip_text_color = clr2 
+      strip_fill = .maketrans(clr1, 55)
+      strip_color = clr2
+      strip_text_color = clr2
       ID_color = "gray50"
     }
-  }  # not miss theme 
+  }  # not miss theme
 
 
   # sub_theme
@@ -753,7 +753,7 @@ function(
       grid_lty = "dotted"
       grid_lwd = 1
     }
-   
+
     else if (!miss_theme  &&  theme == "gray"  &&  sub_theme == "black") {
       window_fill = "gray10"
       panel_fill = "gray10"
@@ -790,7 +790,7 @@ function(
       labels_color = "gray85"
       clr1 <- "gray55"
     }
-  
+
     else if (sub_theme == "black") {
 
       window_fill = rgb(.015,.015,.015)
@@ -854,22 +854,22 @@ function(
     options(theme = theme)
     options(sub_theme = sub_theme)
 
-    options(bar_fill = bar_fill) 
-    options(bar_fill_discrete = bar_fill_discrete) 
-    options(bar_fill_cont = bar_fill_cont) 
-    options(bar_color_discrete = bar_color_discrete) 
-    options(bar_color_cont = bar_color_cont) 
-    options(pt_fill = pt_fill) 
-    options(pt_color = pt_color) 
+    options(bar_fill = bar_fill)
+    options(bar_fill_discrete = bar_fill_discrete)
+    options(bar_fill_cont = bar_fill_cont)
+    options(bar_color_discrete = bar_color_discrete)
+    options(bar_color_cont = bar_color_cont)
+    options(pt_fill = pt_fill)
+    options(pt_color = pt_color)
     options(trans_bar_fill = trans_bar_fill)
     options(trans_pt_fill = trans_pt_fill)
-    
+
     options(labels=labels)
     options(labels_color=labels_color)
     options(labels_size=labels_size)
     options(labels_digits=labels_digits)
     options(labels_position=labels_position)
-    
+
     options(window_fill=window_fill)
     options(panel_fill=panel_fill)
     options(panel_color=panel_color)
@@ -956,7 +956,7 @@ function(
     options(document=document)
     options(code=code)
   }
-  
+
   # ---------------------------------------
   # get current parameter values
   # create a list of sub-lists
@@ -1089,7 +1089,7 @@ function(
       code = getOption("code")
     )
   }
-  
+
 
   # ---------------------------------------
   # create list of current parameter values
@@ -1270,7 +1270,7 @@ function(
     brief = getOption("brief"),
 
     output = output
-    
+
   )
 
   return(invisible(gp))

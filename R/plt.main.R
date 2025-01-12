@@ -11,7 +11,8 @@ function(x, y, by=NULL,
 
          xy_tics=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, main_cex=NULL, sub=NULL,
-         rotate_x=0, rotate_y=0, offset=0.5, prop=FALSE, origin_x=NULL,
+         rotate_x=0, rotate_y=0, offset=0.5, prop=FALSE,
+         origin_x=NULL, origin_y=NULL,
 
          size=NULL, ln.width=1, shape=21, means=TRUE,
          segments=FALSE, segments_y=FALSE, segments_x=FALSE,
@@ -34,8 +35,8 @@ function(x, y, by=NULL,
          ellipse_fill="off", ellipse_lwd,
 
          run=FALSE, center_line="off", stack=FALSE,
-         time_unit=NULL, agg=FALSE, do.agg="sum", time_ahead=0,
-         time_fit=FALSE, n_date_tics=NULL,
+         ts_unit=NULL, ts_agg=FALSE, do.agg="sum", ts_ahead=0,
+         ts_fit=FALSE, n_date_tics=NULL,
          y.fit, y.hat, x.fit, x.hat, y.upr, y.lwr,
          mxf.x, mnf.y, mxf.y,
 
@@ -51,7 +52,6 @@ function(x, y, by=NULL,
          add_color=NULL, add_fill=NULL, add_trans=NULL,
 
          quiet=FALSE, want.labels=TRUE, bubble.title=TRUE, ...)  {
-
 
   # -------------------------
   # preliminaries
@@ -138,7 +138,7 @@ function(x, y, by=NULL,
     x.name <- NULL
   }
   if (!is.null(x.lab)) if (n.xcol > 1  &&  substr(x.lab, 1, 2) == "c(")
-      x.lab <- NULL  # e.g., get rid of == "c(Female,Male)"
+      x.lab <- NULL  # e.g., get rid of == "c(Female, Male)"
   if (date.var && is.null(xx.lab)) x.lab <- ""
 
   # set title for bubble plot if proportions
@@ -148,7 +148,7 @@ function(x, y, by=NULL,
   }
 
   if (!is.null(x.name)) if (x.name == "Index") {
-    if (n.ycol > 1) y.lab <- ""
+    if (n.ycol > 1) y.lab <- ""  # labels are on the legend
     if (!is.null(x.lbl)) y.lab <- paste(x.name, ": ", x.lbl, sep="")
   }
   # ---------------------
@@ -176,7 +176,7 @@ function(x, y, by=NULL,
       cnt <- sum(by == levels(by)[1])
       x.dates <- x[1:cnt,1]  # assumes by is sorted by level
     }
-  if (time_ahead > 0) x.dates <- c(x.dates, x.hat[,1]) 
+  if (ts_ahead > 0) x.dates <- c(x.dates, x.hat[,1])
 
    x <- as.matrix(x[,1], ncol=1)  # x to numeric version of dates
   }  # end if date.var
@@ -207,9 +207,9 @@ function(x, y, by=NULL,
     cleveland <- TRUE
 
 
-  # -------------------------
-  # plot
-  # -------------------------
+  # ----------------------
+  # set up the plot region
+  # ----------------------
 
   # graphic system parameters
   # x.val is either x.lvl, or NULL if x is numeric
@@ -225,7 +225,7 @@ function(x, y, by=NULL,
   }
 
   mn.x <- ifelse (cat.x, 1, min(x, na.rm=TRUE))
-  if (time_ahead > 0) {  # forecast margin adjustments
+  if (ts_ahead > 0) {  # forecast margin adjustments
     mx.x <- mxf.x
     mx.y <- mxf.y
     mn.y <- mnf.y
@@ -287,7 +287,7 @@ function(x, y, by=NULL,
     if (!is.null(by)) nm.v <- by.name
     big.nm <- max(nchar(nm.v))
     if (big.nm > 6) rm <- rm + (.05 * (big.nm - 6))
-    rm <- rm + .25  + (.65 * axis_y_cex)
+    if (n.ycol == 1) rm <- rm + .30  + (.65 * axis_y_cex)
     if (axis_y_cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
   }
 
@@ -297,7 +297,21 @@ function(x, y, by=NULL,
 
   if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
-  if (time_ahead > 0) rm <- rm + 0.75
+  if (ts_ahead > 0) rm <- rm + 0.75  # make room for vertical legend
+
+  if (date.var && n.by>1) rm <- rm - 0.05
+
+  if (n.ycol>1 && date.var) {  # if not a time series, then no y label
+    mm <- mm + 0.25  # reduce size of plot in the left to make room for label
+    ylab_adj <- ylab_adj + 0.2  # move label right when calling .axlabs()
+  }
+  if (n.ycol > 1)
+    rm <- rm + 0.80  # add right margin for legend
+
+  if (n.xcol>1  && !date.var) {
+    bm <- bm + 0.20  # allow for the bottom legend
+    rm <- rm - 0.60  # remove superfluous right margin
+  }
 
   # user manual adjustment
   bm <- bm + bm.adj
@@ -310,13 +324,13 @@ function(x, y, by=NULL,
 
   par(bg=getOption("window_fill"))
   par(mai=c(bm, mm, tm, rm))
-
+  par(tcl=-0.28)  # axis tick length
 
   # -----------------------
   # setup region for coordinate system only with plot and type="n"
   # non-graphical parameters in ... Generate warnings when no plot
 
-  # re-calibrate y-axis if stacking
+  # re-calibrate maximum of y-axis if stacking
   if (stack  &&  n.ycol > 1) {  # data in wide format, one col for each y
     y.tot <- apply(y, 1, sum, na.rm=TRUE)
     mx.y <- max(y.tot)
@@ -374,9 +388,12 @@ function(x, y, by=NULL,
   mx.y <- max(region[,2])
   mn.y <- min(region[,2])
 
-  if (is.null(origin_x)) {
-    origin_x <- mn.x
-    if (stat %in% c("count", "proportion", "%")) origin_x <- 0
+  # set origin for numeric variables
+  if (!cat.y) {
+    if (!is.null(origin_y)) {
+      if (all(y, na.rm=TRUE) > 0) mn.y <- origin_y
+      if (all(y, na.rm=TRUE) < 0) mx.y <- origin_y
+    }
   }
 
   # add padding to x and y axes
@@ -399,10 +416,12 @@ function(x, y, by=NULL,
   yN <- pad_y[1] * (yp[length(yp)] - yp[1])
   region <- rbind(region, c(mn.x-xN, mn.y-yN), c(mx.x+xP, mx.y+yP))
 
+
   # plot: setup the coordinate system
+  # ---------------------------------
+  # ---------------------------------
   plot(region, type="n", axes=FALSE, ann=FALSE, ...)
   rm(region)
-
   usr <- par("usr")
   # ----------------------
 
@@ -434,8 +453,8 @@ function(x, y, by=NULL,
             axT1 <- seq(scale_x[1], scale_x[2], by=scale_x[3])
         }
       }
-    }
-  }
+    }  # end !date.var
+  }  # end numerical
 
   # set axT2: y-axis tics and values
   if (cat.y)
@@ -456,7 +475,15 @@ function(x, y, by=NULL,
   # axes value labels
   if (xy_tics) {
 
-    if (!date.var) {  # get tics for both axes
+    # adjust axis label from tick with mgp[2]
+    # mgp does not work with rotate_x, see .axes()
+    my.mgp <- par("mgp")  # save to restore
+    ax <- .axes_dim()  # get axis value parameters
+    mgp2 <- -0.350 + (0.9 * ax$axis_x_cex)
+    par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
+    adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
+
+    if (!date.var) {  # call axis() for both axes
       .axes(x.lvl, y.lvl, axT1, axT2,
             rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
     }
@@ -465,21 +492,16 @@ function(x, y, by=NULL,
       .axes(NULL, y.val, NULL, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
             offset=offset, y.only=TRUE, ...)  # y-axis values
 
-      my.mgp <- par("mgp")  # save to restore
-      ax <- .axes_dim()  # get axis value parameters
-      mgp2 <- -0.275 + (0.9 * ax$axis_x_cex)  # adjust label to axis distance
-      par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
-      adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
-
+      # date.var, x-axis
       len.xtics <- length(x.dates)
       indices <- seq_along(x.dates)  # retain if num of data pts < n.tics
       step_range <- integer(length(50))
 
-      if (time_unit == "years") {
+      if (ts_unit == "years") {
         x.zoo.dates <- format(x.dates, "%Y")
         n.tics <- ifelse (is.null(n_date_tics), 10, n_date_tics)
       }
-      else if (time_unit == "quarters") {
+      else if (ts_unit == "quarters") {
         x.zoo.dates <- as.character(zoo::as.yearqtr(x.dates))
         n.tics <- ifelse (is.null(n_date_tics), 9, n_date_tics)
         if (len.xtics >= 4*n.tics) {
@@ -489,7 +511,7 @@ function(x, y, by=NULL,
           indices <- seq(1, len.xtics, by=step)
         }
       }
-      else if (time_unit %in% c("weeks", "months")) {
+      else if (ts_unit == "months") {
         x.zoo.dates <- as.character(zoo::as.yearmon(x.dates))
         n.tics <- ifelse (is.null(n_date_tics), 7, n_date_tics)
         if (len.xtics >= 12*n.tics) {
@@ -510,27 +532,30 @@ function(x, y, by=NULL,
         indices <- seq(1, len.xtics, by=step)
       }
 
-      # x.zoo.dates is the xts customized for char time_unit date, Aug 2023
+      # x.zoo.dates is the xts customized for char ts_unit date, Aug 2023
       # x.dates are the dates in Date format, e.g., 2023-08-01
       axis(1, x.zoo.dates, at=x.dates[indices], labels=x.zoo.dates[indices],
                 col=ax$axis_x_color, cex.axis=axis_x_cex,
-                col.axis=ax$axis_x_text_color, tck=-.02, ...)  # x-axis
+                col.axis=ax$axis_x_text_color, ...)  # x-axis
 
-      par(mgp = my.mgp)  # restore back to previous value
     }  # end date.var
+
+    par(mgp = my.mgp)  # restore back to previous value
   }  # end xy_tics
 
   if (date.var) {  # create y.lab
-    if (time_unit != "unknown") {
-      tu <- gsub("s$", "", time_unit)
+    if (ts_unit != "unknown") {
+      tu <- gsub("s$", "", ts_unit)
+      if (tu == "days7") tu <- "days"
       substr(tu, 1, 1) <- toupper(substr(tu, 1, 1))
       if (do.agg) {
-        if (agg == "sum") show.agg <- "Total"
-        if (agg == "mean") show.agg <-agg <- "Mean"
+        if (ts_agg == "sum") show.agg <- "Total"
+        if (ts_agg == "mean") show.agg <- "Mean"
       }
       else
         show.agg <- ""
-      y.lab <- paste(show.agg, y.name, "by", tu)
+      ynm <- ifelse (n.ycol==1, y.name, "")  # get rid of c("Sales", "Profit")
+      y.lab <- paste(show.agg, ynm, "by", tu)
     }
 
     .plt.bck(usr, x.dates[indices], axT2, do.h=!bubble1)
@@ -577,7 +602,7 @@ function(x, y, by=NULL,
             polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
                 col=area_fill, border="transparent")
 
-          if (time_ahead > 0) {  # forecast
+          if (ts_ahead > 0) {  # forecast
             trns.red <- .maketrans("darkred", 0.25*256)
             lines(x.fit[,1], y.fit[,1], col=trns.red, lwd=ln.width)
             lines(c(x.fit[nrow(x.fit),1], x.hat[1,1]),  # connect fit with hat
@@ -637,6 +662,7 @@ function(x, y, by=NULL,
         for (i in 1:n.ycol) {
 
           if (stack) {
+            # polygons
             if (i == 1) {
               xx <- c(x[1],x,x[length(x)])
               yy <- c(mn.y,y[,1],mn.y)  # starts at the scale_y setting
@@ -651,9 +677,9 @@ function(x, y, by=NULL,
               if (fill[1] != "transparent")
                 polygon(xx, yy, col=area_fill[i], border="transparent")
             }
-          }
+          }  # end stack polygons
 
-          if (ln.width > 0) {
+          if (ln.width > 0) {  # lines
             lines(x[,1], y[,i], col=color[i], lty=ltype[i], lwd=ln.width, ...)
           }  # end ln.width > 0
 
@@ -844,7 +870,7 @@ function(x, y, by=NULL,
           }
           else if (center_line == "median") {
             m.y <- median(y[,1], na.rm=TRUE)
-            lbl <- " medn"
+            lbl <- " median"
           }
           else if (center_line == "zero") {
             m.y <- 0
@@ -852,7 +878,7 @@ function(x, y, by=NULL,
           }
 
           abline(h=m.y, col="gray50", lty="dashed")  # draw center line
-          mtext(lbl, side=4, cex=.9, col="gray50", las=2, at=m.y, line=0.1)
+          mtext(lbl, side=4, cex=.7, col="gray50", las=2, at=m.y, line=0.1)
 
           if (center_line == "zero") m.y <- median(y[,1], na.rm=TRUE)  # runs
 
@@ -953,12 +979,17 @@ function(x, y, by=NULL,
     if (fill[1] == "transparent") fill <- color
 
     if (n.xcol > 1)  # horizontal legend, on x-axis
-      .plt.legend(colnames(x), FALSE, color, fill, shape, fill_bg, usr,
+      .plt.legend(colnms=colnames(x), horiz=TRUE,
+                  color, fill, shape, fill_bg, usr,
                   lab_cex=lab_x_cex, pt.size=1.25, legend_title)
 
     if (n.ycol > 1) {  # vertical legend, on y-axis
-      the.fill <- ifelse (stack, area_fill, fill)
-      .plt.legend(colnames(y), FALSE, color, the.fill, shape, fill_bg, usr,
+      if (stack)  # ifelse form only returns the first value of the vector
+        the.fill <- area_fill
+      else
+        the.fill <- fill
+      .plt.legend(colnms=colnames(y), horiz=FALSE,
+                  color, the.fill, shape, fill_bg, usr,
                   lab_cex=lab_y_cex, pt.size=1.25, legend_title)
     }
 

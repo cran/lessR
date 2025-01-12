@@ -54,7 +54,7 @@ function(shape, out_shape, n.by=NULL) {
   # convert named out_shape to its numeric code
   num.flag <- FALSE
   if (!(out_shape %in% shapes.all))
-    bad.shape <- out_shape 
+    bad.shape <- out_shape
   else {
     if (out_shape %in% shapes.nm) {  # outlier point
       out_shape <- which(out_shape == shapes.nm) + 20

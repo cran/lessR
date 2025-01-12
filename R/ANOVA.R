@@ -1,10 +1,10 @@
 ANOVA <-
 function(my_formula, data=d, filter=NULL,
-         brief=getOption("brief"), digits_d=NULL, 
+         brief=getOption("brief"), digits_d=NULL,
          Rmd=NULL, jitter_x=0.4,
          res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
          graphics=TRUE, pdf=FALSE, width=5, height=5,
-         fun_call=NULL, ...) {  
+         fun_call=NULL, ...) {
 
 
   # a dot in a parameter name to an underscore
@@ -40,7 +40,7 @@ function(my_formula, data=d, filter=NULL,
   }
 
   # let deprecated mydata work as default
-  dfs <- .getdfs() 
+  dfs <- .getdfs()
   mydata.ok <- FALSE
   if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
     d <- mydata
@@ -53,18 +53,18 @@ function(my_formula, data=d, filter=NULL,
     df.name <- deparse(substitute(data))  # get name of data table
     options(dname = df.name)
   }
- 
+
   # if a tibble, convert to data frame
   if (exists(df.name, envir=parent.frame())) {
     if (any(grepl("tbl", class(data), fixed=TRUE)))
       data <- data.frame(data)
   }
- 
+
   op <- options()  # save current options to reset at end
 
   if (!exists(df.name)) {
     txtC <- "Function ANOVA requires the data exist in a data frame\n"
-    if (df.name == "d") 
+    if (df.name == "d")
       txtA <- ", the default data frame name, " else txtA <- " "
     txtB1 <- "Either create the data frame, such as with data.frame function, or\n"
     txtB2 <- "  specify the actual data frame with the parameter: data\n"
@@ -76,7 +76,7 @@ function(my_formula, data=d, filter=NULL,
   nm <- all.vars(my_formula)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1
-  
+
   if (!missing(filter)) {  # subset rows
     r <- eval(substitute(filter), envir=data, enclos=parent.frame())
     if (!any(r)) {
@@ -103,7 +103,7 @@ function(my_formula, data=d, filter=NULL,
       if (in.data.frame && !is.factor(data[ , nms])) {
         data[ ,nms] <- as.factor(data[ ,nms])
       }
-    }  
+    }
 
   # ANOVA
   #   all analysis done on data in model construct av.out$model
@@ -115,7 +115,7 @@ function(my_formula, data=d, filter=NULL,
   n.keep <- nrow(av.out$model)
 
   if (is.null(digits_d)) digits_d <- .getdigits(data[,nm[1]], 2)
-    
+
 
 # ----------
 # Background
@@ -129,7 +129,7 @@ function(my_formula, data=d, filter=NULL,
     tx[length(tx)+1] <- paste("Data Frame: ", df.name)
     tx[length(tx)+1] <- ""
   }
-  
+
   for (i in 1:n.vars) {
     ind <- i
     tx2 <- .varlist2(n.pred, ind, nm[i], "Factor", n.obs,
@@ -198,22 +198,22 @@ function(my_formula, data=d, filter=NULL,
 
   # residuals
   txres <- ""
-  title_res <- "\n  RESIDUALS" 
+  title_res <- "\n  RESIDUALS"
   res <- ""
   fit <- ""
   if (!brief) {
     tx <- character(length=0)
 
     n.keep <- nrow(av.out$model)
-    if (is.null(res_rows)) 
-      if (n.keep < 20) res_rows <- n.keep else res_rows <- 20 
+    if (is.null(res_rows))
+      if (n.keep < 20) res_rows <- n.keep else res_rows <- 20
     if (res_rows == "all") res_rows <- n.keep  # turn off resids with res_rows=0
 
     tx[length(tx)+1] <- "Fitted Values, Residuals, Standardized Residuals"
     if (res_sort == "zresid")
-      tx[length(tx)+1] <- 
+      tx[length(tx)+1] <-
         "   [sorted by Standardized Residuals, ignoring + or - sign]"
-    if (res_sort == "fitted")  
+    if (res_sort == "fitted")
       tx[length(tx)+1] <- "   [sorted by Fitted Value, ignoring + or - sign]"
     if (res_rows < n.keep)
       txt <- "cases (rows) of data, or res_rows=\"all\"]"
@@ -264,7 +264,7 @@ function(my_formula, data=d, filter=NULL,
   txkfl <- ""
   if (!is.null(Rmd)) {
     txt <- ifelse (grepl(".Rmd", Rmd), "", ".Rmd")
-    Rmd <- paste(Rmd, txt, sep="") 
+    Rmd <- paste(Rmd, txt, sep="")
     txknt <- .av.Rmd(nm, df.name, fun_call, digits_d)
     cat(txknt, file=Rmd, sep="\n")
     txkfl <- .showfile2(Rmd, "R Markdown instructions")
@@ -289,7 +289,7 @@ function(my_formula, data=d, filter=NULL,
   class(title_res) <- "out"
   class(txres) <- "out"
   class(txplt) <- "out"
-  
+
 
   if (n.pred == 1)  {
     output <- list(
@@ -304,7 +304,7 @@ function(my_formula, data=d, filter=NULL,
       out_anova=txanv, out_effects=txeft,
 
       out_title_tukey=title_tukey,
-      out_hsd=txhsd, 
+      out_hsd=txhsd,
 
       out_title_res=title_res, out_res=txres,
 
@@ -329,7 +329,7 @@ function(my_formula, data=d, filter=NULL,
       out_anova=txanv, out_effects=txeft,
 
       out_title_tukey=title_tukey,
-      out_hsd=txhsd, 
+      out_hsd=txhsd,
 
       out_title_res=title_res, out_res=txres,
 

@@ -21,6 +21,6 @@ print.out_all <- function(x, ...) {
     }  # end out_ condition
   }  # end ilist loop
 
-  cat("\n")
+# cat("\n")
 
 }

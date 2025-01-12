@@ -24,9 +24,10 @@ function(x, y=NULL, data=d, filter=NULL,
     fit_color=getOption("fit_color"),
     plot_errors=FALSE, ellipse=0,
 
-    time_unit=NULL, time_agg=c("sum","mean"), time_ahead=0, time_format=NULL,
-    time_fit=FALSE, es_level=NULL, es_trend=NULL, es_seasons=NULL,
-    es_type=c("additive", "multiplicative"), es_PIlevel=0.95,
+    ts_unit=NULL, ts_agg=c("sum", "mean"), ts_NA=NULL,
+    ts_ahead=0, ts_method=c("es", "lm"), ts_format=NULL,
+    ts_fitted=FALSE, ts_level=NULL, ts_trend=NULL, ts_seasons=NULL,
+    ts_type=c("additive", "multiplicative"), ts_PIlevel=0.95,
     stack=FALSE, area_fill="transparent", area_split=0, n_date_tics=NULL,
     show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
 
@@ -54,7 +55,7 @@ function(x, y=NULL, data=d, filter=NULL,
     rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
 
-    xy_ticks=TRUE, origin_x=NULL,
+    xy_ticks=TRUE, origin_x=NULL, origin_y=NULL,
     scale_x=NULL, scale_y=NULL,
     pad_x=c(0,0), pad_y=c(0,0),
     legend_title=NULL,
@@ -73,7 +74,8 @@ function(x, y=NULL, data=d, filter=NULL,
 
   if (is.null(fun_call)) fun_call <- match.call()
 
-  time_agg <-  match.arg(time_agg)
+  ts_agg <-  match.arg(ts_agg)
+  ts_method <-  match.arg(ts_method)
 
   stat.miss <- ifelse (missing(stat), TRUE, FALSE)
   if (stat[1] != "data") stat <- match.arg(stat)  # if condition for shiny
@@ -102,9 +104,9 @@ function(x, y=NULL, data=d, filter=NULL,
       "Now specify a value for  fit  such as \"loess\" or \"lm\".\n\n")
   }
 
-  if (!is.null(time_unit)  &&  !is.null(substitute(facet1))) {
+  if (!is.null(ts_unit)  &&  !is.null(substitute(facet1))) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
-      "Parameter  time_unit  does not yet apply to facet plots.\n\n")
+      "Parameter  ts_unit  does not yet apply to facet plots.\n\n")
   }
 
   if (fit[1] %in% c("xlog", "xylog")) {
@@ -118,6 +120,15 @@ function(x, y=NULL, data=d, filter=NULL,
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in seq_along(dots)) {
+      if (substr(names(dots)[i], 1, 5) == "time_") {
+        cat("\n"); stop(call.=FALSE, "\n------\n",
+          "Parameters that begin with \"time_\" now begin with \"ts_\"\n\n")
+      }
+      if (substr(names(dots)[i], 1, 3) == "es_") {
+        cat("\n"); stop(call.=FALSE, "\n------\n",
+          "Parameters that begin with \"es_\" now begin with \"ts_\"\n\n")
+      }
+      if (names(dots)[i] == "type") ts_type <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
       if (names(dots)[i] == "area_origin") area_split <- dots[[i]]
       if (names(dots)[i] == "run") {
@@ -483,13 +494,13 @@ function(x, y=NULL, data=d, filter=NULL,
         names(data.x) <- names(data.vars)[x.col]
       else
         names(data.x) <- x.col  # if x a vector, x.col can return names
-    } 
-    else {  # run chart, create x as sequence of integers from 1 
+    }
+    else {  # run chart, create x as sequence of integers from 1
       data.x <- data.frame(seq_len(nrow(data)))
       names(data.x) <- "Index"
       options(xname="Index")
     }
-    
+
   }  # end x in df
 
   # x is in the global environment (vector or data frame)
@@ -544,17 +555,18 @@ function(x, y=NULL, data=d, filter=NULL,
         x.call[,1] <- as.Date(paste0(x.call[,1], "-01-01"))  # to Date
         date.var <- TRUE
         if (!quiet)
-          message("\n>>> Note: Variable ", x.name, "  assumed to be years\n",
+          message("\n>>> Note: Variable ", x.name, " assumed ",
+                  "to be annual years\n",
                   "Converted to a type Date variable\n",
-                  "If forecasting there will be no seasonality.\n\n")
+                  "If forecasting, there will be no seasonality.\n\n")
       }
     }
 
     # if x.call[,1] has char string values, see if to convert to type Date
     x11 <- x.call[1,1]
     if (is.character(x11)) {
-      if (!is.null(time_format))  # specify the date format
-        x.call[,1] <- as.Date(x.call[,1], format=time_format)
+      if (!is.null(ts_format))  # specify the date format
+        x.call[,1] <- as.Date(x.call[,1], format=ts_format)
 
       else {  # guess the date format
         n.ch <- nchar(x11)
@@ -572,7 +584,7 @@ function(x, y=NULL, data=d, filter=NULL,
             parts <- strsplit(gsub("\\s+", "", x.call[,1]), "Q")  # remove Q
             # Extract quarter, `[` is R extraction operator
             year <- as.numeric(sapply(parts, `[`, 1))  # 1st list element (year)
-            quarter <- as.numeric(sapply(parts, `[`, 2))  # 2nd list element 
+            quarter <- as.numeric(sapply(parts, `[`, 2))  # 2nd list element
             month <- 1 + (quarter - 1) * 3  # get month Q1=1, Q2=4, Q3=7, Q4=10
             x.call[,1] <- as.Date(paste(year, month, "01", sep="-"))  #to Date
           }  # end quarter
@@ -707,15 +719,19 @@ function(x, y=NULL, data=d, filter=NULL,
       cat.y <- FALSE  #  multiple y-vars must be numerical
       if (ylab.miss) ylab <- ""  # use legend instead
       y.call <- data.frame(data.y)
-      # y.call <- data.matrix(data.y, rownames.force=FALSE)
     }
+
+    # if specified, change y NA's to 0 or other specified numerical value
+    if (!is.null(ts_NA))
+      y.call[is.na(y.call)] <- ts_NA  # reference entire data frame
+
   }  # end y not missing
 
   else { # missing y
     if (!date.var) y.call <- NULL
   }  # end missing y
 
-  if (time_ahead > 0 && n.y_var > 1) {
+  if (ts_ahead > 0 && n.y_var > 1) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
       "Can only do a forecast for a single y-variable\n\n")
   }
@@ -754,8 +770,8 @@ function(x, y=NULL, data=d, filter=NULL,
   # ---------------------------------------
   lx <- length(x.call[,1])
   n.ux <- length(unique(x.call[,1]))
-    ly <- length(y.call[,1])
-    n.uy <- length(unique(y.call[,1]))
+  ly <- length(y.call[,1])
+  n.uy <- length(unique(y.call[,1]))
   x.unique <- ifelse (n.ux == lx, TRUE, FALSE)
   y.unique <- ifelse (n.uy == ly, TRUE, FALSE)
 
@@ -776,7 +792,7 @@ function(x, y=NULL, data=d, filter=NULL,
     ellipse <- ifelse (ellipse, 0.95, 0.00)
   if (ellipse[1] > 0  &&  !Trellis  &&  !quiet  &&  df.name != "NULL") {
     txt <- "[Ellipse with Murdoch and Chow's function ellipse"
-    cat(txt, "from their ellipse package]\n")
+    cat(txt, "from their ellipse package]")
   }
 
 
@@ -1018,7 +1034,7 @@ function(x, y=NULL, data=d, filter=NULL,
 
 
   # --------
-    # adjust by, manage regular-R or PDF graphics
+  # adjust by, manage regular-R or PDF graphics
   if (!Trellis) {
     if (!is.null(pdf_file)) {
       if (!grepl(".pdf", pdf_file))
@@ -1728,69 +1744,110 @@ function(x, y=NULL, data=d, filter=NULL,
         }
       }
 
-        if (object == "both"  &&  nn_col > 1) {
-           # change to multi later
-           if ("on" %in% area_fill) fill <- getOption("violin_fill")
-        }
+      if (object == "both"  &&  nn_col > 1) {
+         # change to multi later
+         if ("on" %in% area_fill) fill <- getOption("violin_fill")
+      }
 
-        # by default display center_line only if runs about a mean
-        if (run  &&  center_line == "default") {
-          y.clean <- y.call[complete.cases(y.call), 1]  # converts df to vector
-          m <- mean(y.clean)
-          n.change <- 0
-          for (i in 1:(length(y.clean)-1))
-            if ((y.clean[i+1] > m) != (y.clean[i] > m)) n.change <- n.change+1
-          if (n.change/(length(y.clean)-1) < .15)
-            center_line <- "off"
-          else
-            center_line <- "median"
-        }
+      # by default display center_line only if runs about a mean
+      if (run  &&  center_line == "default") {
+        y.clean <- y.call[complete.cases(y.call), 1]  # converts df to vector
+        m <- mean(y.clean)
+        n.change <- 0
+        for (i in 1:(length(y.clean)-1))
+          if ((y.clean[i+1] > m) != (y.clean[i] > m)) n.change <- n.change+1
+        if (n.change/(length(y.clean)-1) < .15)
+          center_line <- "off"
+        else
+          center_line <- "median"
+      }
 
-        # if x is a Date variable
-        #   if not specified, get the existing time_unit
-        #   if specified, aggregate the values of y.call over x.call
-        if (date.var) {
-          tsdata <- .plt.time(x.call, y.call, by.call, x.name, n.by,
-                              time_unit, time_agg)
-          time_unit <- tsdata$time_unit
-          x.call <- tsdata$x.call
-          y.call <- tsdata$y.call
-          by.call <- tsdata$by.call
-          do.agg <- tsdata$do.agg
-        }
+#     # minimum value of y across all of y.call without aggregation
+      if (is.numeric(y.call[,1]))
+        min.y <- min(as.matrix(y.call[sapply(y.call, is.numeric)]),
+                       na.rm=TRUE)  # select only numeric vars
+      else
+        min.y <- NULL
 
-        if (time_unit=="unknown"  &&  time_ahead>0) {
+      # if x is a Date variable
+      #   if not specified, get the existing ts_unit
+      #   if specified, aggregate the values of y.call over x.call
+      if (date.var) {
+        tsdata <- .plt.time(x.call, y.call, by.call, x.name, n.by,
+                            ts_unit, ts_agg)
+        ts_unit <- tsdata$ts_unit
+        x.call <- tsdata$x.call
+        y.call <- tsdata$y.call
+        by.call <- tsdata$by.call
+        do.agg <- tsdata$do.agg
+      }
+
+      # forecast
+      if (ts_ahead > 0) {
+
+        if (ts_unit=="unknown") {
           cat("\n"); stop(call.=FALSE, "\n------\n",
-            "time_unit: ", time_unit, "\n",
-            "Cannot forecast without a known time unit.\n\n")
+            "ts_unit: ", ts_unit, "\n",
+            "Cannot forecast without a consistent time unit.\n\n")
         }
+        if (any(is.na(y.call))) {
+          cat("\n"); stop(call.=FALSE, "\n------\n",
+            "Missing values not allowed for a variable for which\n",
+            "  to forecast future values.\n\n")
+        }
+        f.out <- .plt.forecast(x.call, y.call, by.call,
+          ts_unit, ts_ahead, ts_method, ts_fitted, n_date_tics,
+          ts_level, ts_trend, ts_seasons, ts_type, ts_PIlevel,
+          digits_d)
+        y.fit <- f.out$y.fit;  y.hat <- f.out$y.hat
+        x.fit <- f.out$x.fit;  x.hat <- f.out$x.hat
+        y.upr <- f.out$y.upr;  y.lwr <- f.out$y.lwr
+        mx.x <- f.out$mx.x;  mn.y <- f.out$mn.y;  mx.y <- f.out$mx.y
+        out_y.frcst <- f.out$y.frcst
+        out_fitted <- f.out$out_fitted
+        out_err <- f.out$out_err
+        out_coefs <- f.out$out_coefs
+        out_smooth <- f.out$out_params
+        y.all <- rbind(y.call, y.upr, y.lwr)  # data + PI
+        y.all <- unlist(y.all)  # flatten the data frame
+      }
+      else {  # no forecast
+        y.fit <- NULL;  y.hat <- NULL
+        x.fit <- NULL;  x.hat <- NULL
+        y.upr <- NULL;  y.lwr <- NULL
+        mx.x <- NULL;  mn.y <- NULL;  mx.y <- NULL
+        out_y.frcst <- NULL
+        out_fitted <- NULL; out_err <- NULL
+        out_coefs <- NULL; out_smooth <- NULL
+        y.all <- unlist(y.call)
+      }
 
-        # forecast
-        if (time_ahead > 0) {
-          f.out <- .plt.forecast(x.call, y.call, by.call,
-            time_unit, time_ahead, time_fit, n_date_tics,
-            es_level, es_trend, es_seasons, es_type, es_PIlevel,
-            digits_d)  
-          y.fit <- f.out$y.fit;  y.hat <- f.out$y.hat
-          x.fit <- f.out$x.fit;  x.hat <- f.out$x.hat 
-          y.upr <- f.out$y.upr;  y.lwr <- f.out$y.lwr 
-          mx.x <- f.out$mx.x;  mn.y <- f.out$mn.y;  mx.y <- f.out$mx.y
-          out_y.frcst <- f.out$y.frcst
-          out_frcst <- f.out$out_frcst
-          out_fitted <- f.out$out_fitted         
-          out_err <- f.out$out_err         
-          out_coefs <- f.out$out_coefs
-          out_smooth <- f.out$out_params
+      # see if set origin of y-axes to 0
+      min.y <- NULL
+      numr <- all(is.numeric(y.all))
+      if (numr) {
+        if (all(y.all < 0)) y.all <- -y.all  # account for - values
+        if (is.null(origin_y)) {  # get min, max of entire numeric y.call
+          min.y <- min(y.all, na.rm=TRUE)
+          max.y <- max(y.all, na.rm=TRUE)
+          remove(y.all)
+
+          if (min.y > 0) {  # all + or all - which were converted to +
+            rng <- max.y - min.y
+            prp <- rng / min.y
+            if (prp > 2.30) origin_y <- 0  # 2.30 cutoff is a heuristic
+          }
+        }  # end is.null(origin_y)
+      }  # end numr
+
+      if (!is.null(origin_y)  &&  !is.null(min.y)) {
+        if (origin_y > min.y) {
+          cat("\n"); stop(call.=FALSE, "\n------\n",
+            "Minimum value of y: ", min.y, "\n",
+            "Value you set for origin_y:", origin_y, "\n",
+            "origin_y cannot be larger than the minimum y data value.\n\n")
         }
-        else {  # no forecast
-          y.fit <- NULL;  y.hat <- NULL
-          x.fit <- NULL;  x.hat <- NULL
-          y.upr <- NULL;  y.lwr <- NULL
-          mx.x <- NULL;  mn.y <- NULL;  mx.y <- NULL
-          out_y.frcst <- NULL;  out_frcst <- NULL
-          out_fitted <- NULL; out_err <- NULL
-          out_coefs <- NULL; out_smooth <- NULL
-        }
+      }
 
       j_y <- NULL;  j_x <- NULL
       if (do_plot) {
@@ -1799,7 +1856,7 @@ function(x, y=NULL, data=d, filter=NULL,
           cat.x, cat.y, object, stat,
           pt.fill, area_fill, pt.color, pt.trans, segment_color,
           xy_ticks, xlab, ylab, main, main_cex, sub,
-          rotate_x, rotate_y, offset, proportion, origin_x,
+          rotate_x, rotate_y, offset, proportion, origin_x, origin_y,
           pt.size, size.ln, shape, means,
           segments, segments_y, segments_x,
           smooth, smooth_points, smooth_size, smooth_exp, smooth_bins,
@@ -1810,9 +1867,9 @@ function(x, y=NULL, data=d, filter=NULL,
           fit_se, se_fill, plot_errors,
           ellipse, ellipse_color, ellipse_fill, ellipse_lwd,
           run, center_line, stack,
-          time_unit, time_agg, do.agg, time_ahead, time_fit, n_date_tics,
+          ts_unit, ts_agg, do.agg, ts_ahead, ts_fitted, n_date_tics,
           y.fit, y.hat, x.fit, x.hat, y.upr, y.lwr,
-          mx.x, mn.y, mx.y, 
+          mx.x, mn.y, mx.y,
           freq.poly, jitter_x, jitter_y,
           xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
           scale_x, scale_y, pad_x, pad_y, legend_title,
@@ -1829,8 +1886,8 @@ function(x, y=NULL, data=d, filter=NULL,
           by.cat <- NULL
         }
 
-        if (!is.null(jitter_y)) if (jitter_y != 0) j.y <- m.out$jitter_y
-        if (!is.null(jitter_x)) if (jitter_x != 0) j.x <- m.out$jitter_x
+#       if (!is.null(jitter_y)) if (jitter_y != 0) j.y <- m.out$jitter_y
+#       if (!is.null(jitter_x)) if (jitter_x != 0) j.x <- m.out$jitter_x
 
     }  # end do_plot
 
@@ -1845,10 +1902,10 @@ function(x, y=NULL, data=d, filter=NULL,
               tx[length(tx)+1] <- .dash2(55)
               tx[length(tx)+1] <- paste("size:", .fmt(pt.size,2),
                   " size of plotted points")
-              if (!is.null(jitter_y)) if (jitter_y != 0) 
+              if (!is.null(jitter_y)) if (jitter_y != 0)
                 tx[length(tx)+1] <- paste("jitter_y:", .fmt(j_y,2),
                   " random vertical movement of points")
-              if (!is.null(jitter_x)) if (jitter_x != 0) 
+              if (!is.null(jitter_x)) if (jitter_x != 0)
                 tx[length(tx)+1] <- paste("jitter_x:", .fmt(j_x,2),
                   " random horizontal movement of points")
               txjit <- tx
@@ -1969,13 +2026,13 @@ function(x, y=NULL, data=d, filter=NULL,
       if (!is.null(output)) print(output)
 
       # out_y.frcst is a multi times series, cannot display with class out
-      if (time_ahead > 0) {  # did a forecast
+      if (ts_ahead > 0) {  # did a forecast
         if (!is.null(out_fitted)) {
           print(out_fitted)
           cat("\n")
         }
-        if (!is.null(out_y.frcst)) print(out_y.frcst) 
-      }  # end time_ahead > 0
+        if (!is.null(out_y.frcst)) print(out_y.frcst)
+      }  # end ts_ahead > 0
     }  # end outp
   }
 

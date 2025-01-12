@@ -30,12 +30,12 @@ rename <-
     nm.to <- nm.new[1]
 
   if (length(ind.fr) > 0) {
-  for(i in 1:length(ind.fr)) 
+  for(i in 1:length(ind.fr))
     names(data)[names(data) == nm.fr[i]] = nm.to[i]
 
   }
 
-  cat("Change the following variable names for data frame", df.name, ":\n\n") 
+  cat("Change the following variable names for data frame", df.name, ":\n\n")
   for (i in 1:length(nm.fr))
     cat(nm.fr[i], "-->", nm.to[i], "\n")
   cat("\n")

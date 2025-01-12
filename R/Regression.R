@@ -2,23 +2,23 @@ Regression <-
 function(my_formula, data=d, filter=NULL,
          digits_d=NULL, n_cat=getOption("n_cat"),
 
-         Rmd=NULL, Rmd_browser=TRUE, 
+         Rmd=NULL, Rmd_browser=TRUE,
          Rmd_format=c("html", "word", "pdf", "odt", "none"),
          Rmd_data=NULL, Rmd_custom=NULL, Rmd_dir=path.expand("~/reg"),
          Rmd_labels=FALSE,
          results=getOption("results"), explain=getOption("explain"),
-         interpret=getOption("interpret"), code=getOption("code"), 
+         interpret=getOption("interpret"), code=getOption("code"),
 
          text_width=120, brief=getOption("brief"), show_R=FALSE,
          plot_errors=FALSE,
 
-         n_res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"), 
+         n_res_rows=NULL, res_sort=c("cooks","rstudent","dffits","off"),
          n_pred_rows=NULL, pred_sort=c("predint", "off"),
-         subsets=NULL, best_sub=c("adjr2", "Cp"), cooks_cut=1, 
+         subsets=NULL, best_sub=c("adjr2", "Cp"), cooks_cut=1,
 
          scatter_coef=TRUE, mod=NULL, mod_transf=c("center", "z", "none"),
 
-         X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL, 
+         X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL,
          X5_new=NULL, X6_new=NULL,
 
          kfold=0, seed=NULL,
@@ -63,8 +63,8 @@ function(my_formula, data=d, filter=NULL,
   dots <- list(...)  # check for deprecated parameters
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
-      if (names(dots)[i] == "res_rows") n_res_rows <- dots[[i]] 
-      if (names(dots)[i] == "pred_rows") n_pred_rows <- dots[[i]] 
+      if (names(dots)[i] == "res_rows") n_res_rows <- dots[[i]]
+      if (names(dots)[i] == "pred_rows") n_pred_rows <- dots[[i]]
       if (names(dots)[i] == "standardize") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "standardized  parameter  no longer used\n\n",
@@ -97,7 +97,7 @@ function(my_formula, data=d, filter=NULL,
   }
 
   # let deprecated mydata work as default
-  dfs <- .getdfs() 
+  dfs <- .getdfs()
   mydata.ok <- FALSE
   if (!is.null(dfs)) {
     if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
@@ -112,7 +112,7 @@ function(my_formula, data=d, filter=NULL,
     df.name <- deparse(substitute(data))  # get name of data table
     options(dname = df.name)
   }
- 
+
   # if a tibble, convert to data frame
   if (any(grepl("tbl", class(data), fixed=TRUE)))
     data <- data.frame(data)
@@ -130,7 +130,7 @@ function(my_formula, data=d, filter=NULL,
 
   if (kfold > 0) {
     graphics <- FALSE
-    relate <- FALSE 
+    relate <- FALSE
     n_res_rows <- 0
     n_pred_rows <- 0
   }
@@ -158,7 +158,7 @@ function(my_formula, data=d, filter=NULL,
   for (i in 2:n.vars) predictors[i-1] <- nm[i]
 
   # do variables nm exist in df.name?
-  .xcheck(nm, df.name, names(data)) 
+  .xcheck(nm, df.name, names(data))
 
   # check that variables are not function calls
   v.str <- deparse(attr(terms.formula(my_formula), which="variables"),
@@ -188,7 +188,7 @@ function(my_formula, data=d, filter=NULL,
 
   # set digits_d
   if (is.null(digits_d)) digits_d <- .getdigits(data[,nm[1]], 3)
-  options(digits_d=digits_d) 
+  options(digits_d=digits_d)
 
   in.data.frame <- TRUE
   for (i in 1:n.vars) {
@@ -197,7 +197,7 @@ function(my_formula, data=d, filter=NULL,
       in.data.frame <- FALSE
     }
   }
- 
+
   # sort values of the one predictor variable for scatterplot
   #   so that the prediction/confidence intervals can be drawn
   if (n.pred == 1)
@@ -207,14 +207,14 @@ function(my_formula, data=d, filter=NULL,
   data <- data[, c(nm), drop=FALSE]
   data <- data[complete.cases(data), , drop=FALSE]
   n.keep <- nrow(data)
-  
+
   # for ancova to work, the variable must be non-numeric or a factor
   ancova <- FALSE  # ancova for one cont and one cat predictors
   if (n.pred == 2) {
   # non-numeric, non-factor concert to factor
     for (i.pred in 2:3) {
       if (!is.numeric(data[,nm[i.pred]])) {
-        if (!is.factor(data[,nm[i.pred]])) 
+        if (!is.factor(data[,nm[i.pred]]))
           data[,nm[i.pred]] <- as.factor(data[,nm[i.pred]])
       }
     }
@@ -258,26 +258,26 @@ function(my_formula, data=d, filter=NULL,
         fnu.col[i] <- TRUE
      data[fnu.col] <- lapply(data[fnu.col], as.integer) # move to integer
   }
-    
+
   if (nrow(data) < n.pred + 2) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Need more than ", nrow(data), " rows of data.\n\n", sep="")
-  } 
+  }
 
   if (!is.null(X1_new)  &&  (n.pred > max_new)) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "No new data for prediction if more than", max_new,
           "predictor variables.\n\n")
   }
-   
+
   if (!is.numeric(data[,nm[1]])) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "Response variable, ", nm[1], ", must be numeric.\n\n", sep="")
   }
 
-  # check new.data option for consistency  
+  # check new.data option for consistency
   new.data <- FALSE
-  if (n.pred > 0  &&  n.pred <= max_new) { 
+  if (n.pred > 0  &&  n.pred <= max_new) {
     for (i in 1:(n.pred)) {
       pp <- eval(parse(text=paste("X", toString(i), "_new", sep="")))
       if (!is.null(pp)) new.data <- TRUE
@@ -302,7 +302,7 @@ function(my_formula, data=d, filter=NULL,
       if (kfold == 0) {
         i.start <- ifelse (scale_response, 1, 2)
         for (i in i.start:n.vars)  {  # do not rescale y
-          unq.x <- length(unique(data[,nm[i]])) 
+          unq.x <- length(unique(data[,nm[i]]))
           if (unq.x > 2  &&  is.numeric(data[,nm[i]]))
             data[,nm[i]] <- rescale(data[,nm[i]], data=NULL,
                                     kind=new_scale, digits_d)
@@ -332,7 +332,7 @@ function(my_formula, data=d, filter=NULL,
     data <- na.omit(data)  # lm() default, process data here that lm processes
 
     # scale the two predictor variables
-    if (mod_transf != "none") { 
+    if (mod_transf != "none") {
       is.z <- ifelse (mod_transf == "z", TRUE, FALSE)
       for (i in 1:2)
         data[,nm[1+i]] <- scale(data[,nm[1+i]], center=TRUE, scale=is.z)
@@ -351,7 +351,7 @@ function(my_formula, data=d, filter=NULL,
     # create the new regression model with the added interaction term
     my_formula <- as.formula(paste(nm[1], "~", paste(nm[2:4], collapse="+")))
     n.vars <- length(nm)
-    n.pred <- n.vars - 1L 
+    n.pred <- n.vars - 1L
 
   }  # end mod
 
@@ -423,7 +423,7 @@ function(my_formula, data=d, filter=NULL,
       else
         rel$out_subsets <- ""
       rel <- .reg2Relations(lmo, df.name, n.keep, show_R,
-           cor, collinear, subsets, best_sub, max.sublns, 
+           cor, collinear, subsets, best_sub, max.sublns,
            in.data.frame, est$sterrs, anv$MSW)
       if (is.matrix(rel$crs)) crs <- round(rel$crs,3) else crs <- NA
       if (is.vector(rel$tol)) tol <- round(rel$tol,3) else tol <- NA
@@ -433,9 +433,9 @@ function(my_formula, data=d, filter=NULL,
       rel$out_cor <- ""; rel$out_collinear <- "";  rel$out_subsets <- ""
       rel$crs <- NA_real_; rel$tol <- NA; rel$vif <- NA
     }
-  
+
     title_res <- "\n  RESIDUALS AND INFLUENCE"
-    if (is.null(n_res_rows)) n_res_rows <- ifelse (n.keep < 20, n.keep, 20) 
+    if (is.null(n_res_rows)) n_res_rows <- ifelse (n.keep < 20, n.keep, 20)
     if (n_res_rows == "all") n_res_rows <- n.keep  # turn off resids if no res
 
     if (n_res_rows > 0) {
@@ -448,7 +448,7 @@ function(my_formula, data=d, filter=NULL,
       if (graphics  &&  n.pred > 0) {
         if (!pdf && manage.gr) {  # set up graphics system outside of RStudio
           if (n.pred==1)
-            .graphwin(3, width, height) 
+            .graphwin(3, width, height)
           else
             .graphwin(2, width, height)  # no sp matrix if not all numeric
         }
@@ -456,9 +456,9 @@ function(my_formula, data=d, filter=NULL,
         if (manage.gr && !pdf) dev.set(which=i.which)
         plt <- .reg3dnResidual(lmo, pdf, width, height, manage.gr, ...)
         for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
-        plot.i <- plot.i + plt$i 
+        plot.i <- plot.i + plt$i
 
-      
+
         i.which <- i.which + 1
         if (manage.gr && !pdf) dev.set(which=i.which)
         fr <- .reg3resfitResidual(lmo, cook, cooks_cut,
@@ -476,7 +476,7 @@ function(my_formula, data=d, filter=NULL,
       cook <- NA
     }
 
-    if (is.null(n_pred_rows)) n_pred_rows <- ifelse (n.keep < 25, n.keep, 10) 
+    if (is.null(n_pred_rows)) n_pred_rows <- ifelse (n.keep < 25, n.keep, 10)
     if (n_pred_rows == "all") n_pred_rows <- n.keep  # no preds if n_pred_rows=0
 
     a <- "\n  PREDICTION ERROR"
@@ -484,7 +484,7 @@ function(my_formula, data=d, filter=NULL,
       a <- paste(a, "\n\n-- Data, Predicted, Standard Error of Prediction,",
                           "95% Prediction Intervals")
       a <- paste(a, "\n   [sorted by lower bound of prediction interval]")
-      if (n_pred_rows < n.keep  &&  !new.data) 
+      if (n_pred_rows < n.keep  &&  !new.data)
         a <- paste(a, "\n   [to see all intervals add n_pred_rows=\"all\"]")
       a <- paste(a, "\n", .dash2(46))
     }
@@ -522,16 +522,16 @@ function(my_formula, data=d, filter=NULL,
   if (graphics) {
     if (manage.gr && !pdf) {
       if (n_res_rows > 0  &&  n.pred > 0)
-        i.wh <- 5  # already did two plots 
+        i.wh <- 5  # already did two plots
       else {
         .graphwin(1, width, height)  #  only plot is a scatterplot
         i.wh <- 3
       }
       dev.set(which=i.wh)
     }
- 
+
     if (!ancova) {
-      ancovaOut <- .reg5Plot(lmo, n_res_rows, n_pred_rows, scatter_coef, 
+      ancovaOut <- .reg5Plot(lmo, n_res_rows, n_pred_rows, scatter_coef,
          X1_new, in.data.frame, prd$cint, prd$pint,
          plot_errors, digits_d, n_cat, pdf, width, height, manage.gr,
          quiet, ...)
@@ -552,8 +552,8 @@ function(my_formula, data=d, filter=NULL,
 
     if (graphics) {
       if (manage.gr && !pdf)  # set up graphics system
-          .graphwin(4, width, height) 
-      
+          .graphwin(4, width, height)
+
       title_mod <- "\n  MODERATION ANALYSIS"
 
       mo <- .reg6mod(lmo, w.nm, x.nm, digits_d, pdf, width, height, manage.gr)
@@ -614,19 +614,19 @@ function(my_formula, data=d, filter=NULL,
         min_v <- min(v, na.rm=TRUE)
         test.v <- round(quantile(v, prob=.25)[1])
         while(test.v %in% v)
-          if (test.v > min_v) test.v <- test.v - 1 else break 
+          if (test.v > min_v) test.v <- test.v - 1 else break
         new.val[i,1] <- ifelse (test.v == min_v, round(test.v-1), round(test.v))
         if (min_v==0  &&  test.v==0) new.val[i,1] <- 0  # don't go neg here
-      
+
         # get new upper value
         max.v <- max(v, na.rm=TRUE)
         test.v <- round(quantile(v, prob=.75)[1])
-        while(test.v %in% v) 
-          if (test.v < max.v) test.v <- test.v + 1 else break 
+        while(test.v %in% v)
+          if (test.v < max.v) test.v <- test.v + 1 else break
         new.val[i,2] <- ifelse (test.v == max.v, round(test.v+1), round(test.v))
       }
     }  # new.val
-    
+
     # generate and write Rmd file
 # in case want to move an r output structure to .reg.Rmd
 #   r <- c(bck, anv, est, fit, rel, res, prd)
@@ -699,31 +699,31 @@ function(my_formula, data=d, filter=NULL,
     if (plot.i > 1) txplt <- .plotList2(plot.i, plot.title)
     if (n.pred > 0) dev.set(which=2)  # reset graphics for standard R functions
   }
-  
+
   # suggestion for Rmd option
   txsug <- ""
   if (getOption("suggest")) {
     # function call for suggestions
-    fncl <- .fun_call.deparse(fun_call) 
-    fncl <- gsub(")$", "", fncl)  # get function call less closing ) 
+    fncl <- .fun_call.deparse(fun_call)
+    fncl <- gsub(")$", "", fncl)  # get function call less closing )
     fncl <- gsub(" = ", "=", fncl)
     fncl <- gsub("reg.brief", "reg", fncl)
-    
+
     fc <- ""
     if (!grepl("Rmd", fncl)) {
       txsug <- ">>> Suggestion\n"
       fc <- paste(fc, ", Rmd=\"eg\"", sep="")
       if (nzchar(fc)) {
         fc <- paste(fncl, fc, ") ", sep="")
-        txsug <- paste(txsug, 
+        txsug <- paste(txsug,
            "# Create an R markdown file for interpretative output ",
            "with  Rmd = \"file_name\"\n", sep="")
         txsug <- paste(txsug, fc, sep="")
       }
     }
   }
-  
-  if (kfold == 0) { 
+
+  if (kfold == 0) {
     class(txsug) <- "out"
     class(title_bck) <- "out"
     class(bck$out_background) <- "out"
@@ -754,7 +754,7 @@ function(my_formula, data=d, filter=NULL,
 
     output <- list(
       out_suggest=txsug,
-      
+
       call=fun_call, formula=my_formula, vars=all.vars(my_formula),
 
       out_title_bck=title_bck, out_background=bck$out_background,
@@ -776,16 +776,16 @@ function(my_formula, data=d, filter=NULL,
 
       out_ref=txref, out_Rmd=txRmd, out_Word=txWrd, out_pdf=txpdf,
                      out_odt=txodt, out_rtf=txrtf, out_plots=txplt,
-      n.vars=bck$n.vars, n.obs=bck$n.obs, n.keep=n.keep, 
+      n.vars=bck$n.vars, n.obs=bck$n.obs, n.keep=n.keep,
       coefficients=est$estimates, sterrs=est$sterrs, tvalues=est$tvalues,
       pvalues=est$pvalues, cilb=est$cilb, ciub=est$ciub,
-      anova_model=anv$mdl, anova_residual=anv$rsd, anova_total=anv$tot, 
+      anova_model=anv$mdl, anova_residual=anv$rsd, anova_total=anv$tot,
       se=fit$se, resid_range=fit$range,
       Rsq=fit$Rsq, Rsqadj=fit$Rsqadj, PRESS=fit$PRESS, RsqPRESS=fit$RsqPRESS,
       m_se=m_se, m_MSE=m_MSE, m_Rsq=m_Rsq,
       cor=rel$crs, tolerances=rel$tol, vif=rel$vif,
-      resid.max=resid.max, pred_min_max=prd$predmm, 
-      residuals=lmo$residuals, fitted=lmo$fitted, 
+      resid.max=resid.max, pred_min_max=prd$predmm,
+      residuals=lmo$residuals, fitted=lmo$fitted,
       cooks.distance=cook, model=lmo$model, terms=lmo$terms
     )
   }
@@ -802,7 +802,7 @@ function(my_formula, data=d, filter=NULL,
 
   in.knitr <- ifelse (is.null(options()$knitr.in.progress), FALSE, TRUE)
   if (in.knitr)
-    return(output)    
+    return(output)
   else
     if (!quiet) return(output)
 

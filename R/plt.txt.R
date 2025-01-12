@@ -10,7 +10,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
   # x and y come across here in their natural state, within each data frame
   # a time series has dates for x and numeric for y, factors are factors, etc
 
-  bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
+  bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)  # 1-D bubble plot
 
   unique.x <- ifelse (length(unique(x[,1])) == length(x[,1]), TRUE, FALSE)
   unique.y <- ifelse (length(unique(y[,1])) == length(y[,1]), TRUE, FALSE)
@@ -67,7 +67,10 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
   #by.name <- getOption("byname")
 
   # decimal digits
-  if (is.null(digits_d)) digits_d <- .max.dd(y[,1]) + 1
+  if (is.null(digits_d)) {  # cat vars are only integers
+    digits_d <- .max.dd(y[,1]) + 1
+    if (!cat.x && cat.y) digits_d <- .max.dd(x[,1]) + 1 
+  }
   options(digits_d=digits_d)
 
   size.pt <- ifelse (is.null(size), 1, size)  # dummy non-zero value
@@ -103,56 +106,186 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
     fncl <- gsub(" = ", "=", fncl)
   }
 
-
-  # comment after the suggestion?
-# cmt <- function(ct, mx.ch=88) {
-#   fc <- gsub(" = ", "=", fc)
-#   nch <- nzchar(paste(fncl, fc, ct))
-#   if (nch > mx.ch) ct <- ""
-#   fc <- paste(fncl, fc, ")  ", ct, sep="")
-#   txsug <- paste(txsug, "\n", fc, sep="")
-# }
-
   if (stat == "data") {
+      txsug <- ""
 
     if (date.var) {
       if (getOption("suggest")) {
-        txsug <- ">>> Suggestions  or  enter: style(suggest=FALSE)"
+        txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
 
         if (x.name != y.name)
           fc <- paste("Plot(", x.name, ", ", y.name, sep="")
         else
           fc <- paste("Plot(", x.name, sep="")
 
-        if (!grepl("time_ahead", fncl)) {
-          txt <- ", time_ahead=4)"
+        if (!grepl("ts_ahead", fncl)) {
+          txt <- ", ts_ahead=4)"
           cmnt <- "  # exponential smoothing forecast 4 time units"
           txsug <- paste(txsug, "\n", fc, txt, cmnt, sep="")
         }
 
-        if (!grepl("time_unit", fncl)) {
-          txt <- ", time_unit=\"years\")  # aggregate time by yearly sum"
+        if (!grepl("ts_unit", fncl)) {
+          txt <- ", ts_unit=\"years\")  # aggregate time by yearly sum"
           txsug <- paste(txsug, "\n", fc, txt, sep="")
         }
 
-        if (!grepl("time_agg", fncl)) {
-          txt <- ", time_unit=\"years\", time_agg=\"mean\")"
+        if (!grepl("ts_agg", fncl)) {
+          txt <- ", ts_unit=\"years\", ts_agg=\"mean\")"
           cmnt <- "  # aggregate by yearly mean"
           txsug <- paste(txsug, "\n", fc, txt, cmnt, sep="")
         }
 
-        if (grepl("time_ahead", fncl)  &&  !grepl("es_seasons", fncl)) {
-          txt <- ", time_ahead=4, es_seasons=FALSE)"
+        if (grepl("ts_ahead", fncl)  &&  !grepl("ts_seasons", fncl)) {
+          txt <- ", ts_ahead=4, ts_seasons=FALSE)"
           cmnt <- "  # turn off exponential smoothing seasonal effect"
           txsug <- paste(txsug, "\n", fc, txt, cmnt, sep="")
         }
+      }
+    }  # end date.var
+
+
+    if (object == "bubble") {
+      if (getOption("suggest")) {
+        txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
+        fc <- ""
+        smaller <- as.character(.fmt(radius / 1.5, 2))
+        larger <- as.character(.fmt(radius * 1.5, 2))
+        if (!grepl("bubble", fncl)) {
+          if (!is.null(radius)) {
+            if (radius >= 0.22) {
+              fc <- paste(fc, ", radius=", smaller, sep="")
+              txt <- "# smaller bubbles"
+            }
+            else {
+              fc <- paste(fc, ", radius=", larger, sep="")
+              txt <- "# larger bubbles"
+            }
+            if (nzchar(fc)) {
+              fc <- paste(fncl, fc, ") ", sep="")
+              fc <- paste(fc, txt, sep="")
+              txsug <- paste(txsug, "\n", fc, sep="")
+#               class(txsug) <- "out"
+#               return(list(out_suggest=txsug))
+            }
+          }
+        }
+      }  # if suggest
+    }  # end bubble
+
+    if (object == "both") {  # line, run chart (object is "both")
+
+      if (getOption("suggest")) {
+        if (txsug == "")
+          txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
+
+        fc <- ""
+        if (!grepl("size", fncl)  &&  size.pt > 0)
+          fc <- paste(fc, ", size=0", sep="")
+        if (nzchar(fc)) {
+          fc <- gsub(" = ", "=", fc)
+          fc <- paste(fncl, fc, ")   # just line segments, no points", sep="")
+          txsug <- paste(txsug, "\n", fc, sep="")
+        }
+
+        fc <- ""
+        if (!grepl("lwd", fncl))
+          fc <- paste(fc, ", lwd=0", sep="")
+        if (nzchar(fc)) {
+          fc <- gsub(" = ", "=", fc)
+          if (size.pt > 0)
+            txt <- "just points, no line segments"
+          else {
+            fc <- paste(fc, ", fill=\"on\"", sep="")
+            txt <- "just area"
+          }
+          fc <- paste(fncl, fc, ")   # ", txt, sep="")
+          txsug <- paste(txsug, "\n", fc, sep="")
+        }
+
+        fc <- ""
+        if (!grepl("area_fill", fncl)  &&  (!grepl("stack", fncl)))
+          fc <- paste(fc, ", area_fill=\"on\"", sep="")
+        if (nzchar(fc)) {
+          fc <- gsub(" = ", "=", fc)
+          fc <- paste(fncl, fc, ")   # default color fill", sep="")
+          txsug <- paste(txsug, "\n", fc, sep="")
+        }
+
+        txsug <- .rm.arg.2(" x=", txsug)
+        txsug <- .rm.arg.2("(x=", txsug)
+        txsug <- .rm.arg.2(" y=", txsug)
+#for(i in 1:length(txsug)) cat(txsug[i], "\n")  # even here blank lines at end
 
         class(txsug) <- "out"
-        return(list(out_suggest=txsug))
-      }
-    }
+        output <- list(out_suggest=txsug)
+        class(output) <- "out_all"
+        print(output)
+      }  # end getOption suggest
 
-    else if (object != "line"  &&  !run) {
+      # analyze runs if a singly y
+      if (run && n.ycol==1) {
+
+        txss <- ""
+        ssstuff <- .ss.numeric(y, digits_d=digits_d, x.name="*NONE*",
+                               brief=TRUE)
+        txss <- ssstuff$tx
+        class(txss) <- "out"
+        output <- list(out_ss=txss)
+        class(output) <- "out_all"
+        print(output)
+
+        .dash(12); cat("Run Analysis\n"); .dash(12)
+        run <- integer(length=0)  # length of ith run in run[i]
+        n.runs <- 1  # total number of runs
+        run[n.runs] <- 1
+        line.out <- "    1"
+        for (i in 2:length(y)) {  # find the runs
+          if (y[i] != m.y) {  # throw out values that equal m.y
+            if (sign(y[i]-m.y) != sign(y[i-1]-m.y)) {  # new run
+              if (show_runs) {
+                if (i == 2) cat("\n")
+                buf <- ifelse (n.runs < 10,  "  ", " ")
+                  if (run[n.runs] > 1)  # print only if run of size 2 or more
+                    cat("size=", run[n.runs], "  Run", buf, n.runs, ":",
+                      line.out, "\n", sep="")
+              }
+              line.out <- ""
+              n.runs <- n.runs + 1
+              run[n.runs] <- 0
+            }
+          }
+          run[n.runs] <- run[n.runs] + 1
+          buf <- ifelse (i < 10, "  ", " ")
+          line.out <- paste(line.out, buf, i)
+        }  # end find the runs
+        if (run[n.runs] > 1)  # print only if run has at least 2 elements
+          if (show_runs)
+            cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out,
+                "\n", sep="")
+        eq.ctr <- which(y==m.y)
+        cat("\nTotal number of runs:", n.runs, "\n")
+        txt <- "Total number of values that do not equal the "
+        cat(txt, lbl.cat, " ", length(y)-length(eq.ctr), "\n", sep="")
+        if (length(eq.ctr) != 0) {
+          if (show_runs) {
+            cat("\nValues ignored that equal the", lbl.cat, "\n")
+            for (i in 1:length(eq.ctr))
+              cat("    #", eq.ctr[i], " ", y[eq.ctr[i]], sep="", "\n")
+            cat("Total number of values ignored:", length(eq.ctr), "\n")
+          }
+        }
+        else {
+          cat("Total number of values ignored that equal the", lbl.cat,
+              length(eq.ctr), "\n")
+        }
+
+      }  # end analyze runs
+
+      return()  # already did print(output) and cat()
+    }  # end object is both
+
+
+#   else if (object != "line"  &&  !run) {
         # ---------------------------
         # contcont 2-way scatter plot
         # ---------------------------
@@ -164,7 +297,217 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
         # suggestions
         # -----------
         if (getOption("suggest")) {
-          txsug <- ">>> Suggestions  or  enter: style(suggest=FALSE)"
+          txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
+
+          fc <- paste("Plot(", x.name, ", ", y.name, sep="")
+
+          if (!grepl("enhance", fncl)) {
+            txt <- ", enhance=TRUE)  # many options"
+            txsug <- paste(txsug, "\n", fc, txt, sep="")
+          }
+
+          if (runif(1) > 0.5) {
+            if (!grepl("fill", fncl)) {
+              txt <- ", fill=\"skyblue\")  # interior fill color of points"
+              txsug <- paste(txsug, "\n", fc, txt, sep="")
+            }
+          }
+          else {
+            if (!grepl("color", fncl)) {
+              txt <- ", color=\"red\")  # exterior edge color of points"
+              txsug <- paste(txsug, "\n", fc, txt, sep="")
+            }
+          }
+
+          if (!grepl("fit", fncl)) {
+            txt <- ", fit=\"lm\", fit_se=c(.90,.99))  # fit line, stnd errors"
+            txsug <- paste(txsug, "\n", fc, txt, sep="")
+          }
+
+          if (runif(1) > 0.5) {
+            if (!grepl("out_cut", fncl)) {
+              txt <- ", out_cut=.10)  # label top 10% from center as outliers"
+              txsug <- paste(txsug, "\n", fc, txt, sep="")
+            }
+          }
+          else {
+            if (!grepl("MD_cut", fncl)) {
+              txt <- ", MD_cut=6)"
+              cmt <- "  # Mahalanobis distance from center > 6 is an outlier"
+              txsug <- paste(txsug, "\n", fc, txt, cmt, sep="")
+            }
+          }
+
+ #        if (!grepl("ellipse", fncl)) {
+ #          txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
+ #          txsug <- paste(txsug, "\n", fc, txt, sep="")
+ #        }
+
+#         if (!grepl("smooth", fncl)) {
+#           txt <- ", shape=\"diamond\")  # change plot character"
+#           txsug <- paste(txsug, "\n", fc, txt, sep="")
+#         }
+        }  # end suggest
+
+        blank <- ""
+        class(blank) <- "out"  # a blank line when needed
+
+        txreg <- ""
+        txcor <- ""
+
+        # output cor info if no fit line or lm fit only
+        # ---------------------------------------------
+
+        if (fit %in% c("off", "lm")) {
+
+          for (i in 1:n_col) {
+            class(txsug) <- "out"
+
+            #  no output correlation if a by variable
+            if (n.by == 0) {
+              if (n.xcol > 1) {
+                x.nm <- colnames(x)[i]
+                x.nm <- paste("\nVariable:", x.nm, "with",  colnames(y)[1])
+                class(x.nm) <- "out"
+                if (exists("output"))
+                  output <- c(output, list(out_name=x.nm))
+                else
+                  output <- list(out_name=x.nm)
+                options(xname = colnames(x)[i])
+                stuff <- .cr.main(x[,i], y[,1], brief=TRUE)
+              }
+              else {
+                options(yname = colnames(y)[i])
+                stuff <- .cr.main(x[,1], y[,i], brief=TRUE)
+              }
+
+              txbck <- stuff$txb
+              txdsc <- stuff$txd
+              txinf <- stuff$txi
+
+              # txcor contains the basic correlational text output
+              txcor <- c(txbck, txdsc, " ", txinf, " ")
+            }  # end n.by is 0
+
+          }  # end for i through n_col
+        }  # end output cor info
+
+
+        # output mse, triggered by a non-lm fit line
+        # ------------------------------------------
+        if (!is.null(mse)  &&  n.xcol == 1) {  # mse not reported for all
+          if (fit == "quad") {
+            op1 <- "sqrt()"
+            op2 <- "square"
+          }
+          if (fit == "power") {
+            op1 <- "the root of the\n   reciprocal of the power"
+            op2 <- "of the power"
+          }
+          if (fit == "exp") {
+            op1 <- "log()"
+            op2 <- "exp()"
+          }
+          if (fit == "log") {
+            op1 <- "exp()"
+            op2 <- "log()"
+          }
+          if (fit %in% c("quad", "power", "exp", "log")) {
+            msg <- paste(" Regressed linearized data of transformed",
+                        "data values of", nm.y, "with", op1, "\n")
+            msg <- paste(msg, "For predicted values, back transform with",
+                         op2, "of regression model\n\n")
+          }
+          else
+            msg <- ""
+
+          if (n.by > 0) {
+            tx <- character(length=n.by)
+
+            for (i in 1:n.by) {
+              by.name <- getOption("byname")
+              if (i > 1) msg <- ""
+              tx[i] <- paste(msg, by.name, ": ", by.cat[i], "  ", sep="")
+              mse.pn <- prettyNum(mse[i], big.mark=",", scientific=FALSE,
+                                  format="f", digits=digits_d)
+              b0.pn <- .fmt(b0[i], digits_d)
+              b1.pn <- .fmt(b1[i], digits_d)
+
+              Rsq.pn <- .fmt(Rsq[i], 3)
+              if (!is.na(b1[i])) {  # linear function
+                tx[i] <- paste(tx[i],
+                  "Line: b0 =", b0.pn, "   b1 =", b1.pn,
+                  "   Fit: MSE =", mse.pn)
+                  rsqu <- ifelse (is.na(Rsq[i]), "", paste("   Rsq =", Rsq.pn))
+                  tx[i] <- paste(tx[i], rsqu, "\n", sep="")
+              }
+              else {
+                tx[i] <- paste(tx[i],
+                  " Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
+              }
+
+              # kludge, if removing outliers reg line info not correct,remove
+              if (b0[i]==0 && b1[i]==0 && mse[i]==0) tx <- ""
+            }  # end for n.by
+          }  # end n.by > 0
+
+          # no by vars
+          else {
+            if (length(b1) == 1) {  # > 1 if y=c(y1, y2, ...)
+              if (mse[1] > 10000)
+                mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
+                                    format="f", digits=2)  # digits does not work
+              else
+                mse.pn <- .fmt(mse[1], 3)  # 3 dec digits for smaller numbers
+
+              if (!is.na(b0[1])) {  # missing in loess
+                n_digs <- ifelse(b0[1] > 10000, 2, digits_d)
+                if (n_digs == 1) n_digs <- 2
+                b0.pn <- .fmt(b0[1], n_digs)
+              }
+
+              if (!is.na(b1[1])) {
+                n_digs <- ifelse(b1[1] > 10000, 2, digits_d)
+                if (n_digs == 1) n_digs <- 2
+                b1.pn <- .fmt(b1[1], n_digs)
+              }
+
+              Rsq.pn <- .fmt(Rsq[1], 3)
+
+              if (!is.na(b1)) {  # linear function
+                tx = paste(msg,
+                      "Line: b0 =", b0.pn, "  b1 =", b1.pn,
+                      "   Fit: MSE =", mse.pn)
+                rsqu <- ifelse (is.na(Rsq[1]), "", paste("   Rsq =", Rsq.pn))
+                tx <- paste(tx, rsqu, "\n", sep="")
+
+              }
+              else {
+                tx = paste(
+                  "Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
+              }
+              # kludge, if removing outliers reg line info not correct,remove
+              if (b0[1]==0 && b1[1]==0 && mse[1]==0) tx <- ""
+            }
+            else
+              tx <- ""  # currently no reg output if length(b1) > 0
+          }
+
+          txreg <- tx
+        }  # end !is.null(mse)
+
+          class(txsug) <- "out"
+          class(txcor) <- "out"
+          class(txreg) <- "out"
+          return(list(tipe="contcont", out_suggest=txsug,
+                      out_stats=txcor, out_reg=txreg))
+
+        txsug <- ""
+
+        # suggestions
+        # -----------
+        if (getOption("suggest")) {
+          txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
 
           fc <- paste("Plot(", x.name, ", ", y.name, sep="")
 
@@ -371,33 +714,6 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
 
       }  # end traditional 2-way scatter plot
 
-      else if (object == "bubble") {
-        if (getOption("suggest")) {
-          txsug <- ">>> Suggestions  or  enter: style(suggest=FALSE)"
-          fc <- ""
-          smaller <- as.character(.fmt(radius / 1.5, 2))
-          larger <- as.character(.fmt(radius * 1.5, 2))
-          if (!grepl("bubble", fncl)) {
-            if (!is.null(radius)) {
-              if (radius >= 0.22) {
-                fc <- paste(fc, ", radius=", smaller, sep="")
-                txt <- "# smaller bubbles"
-              }
-              else {
-                fc <- paste(fc, ", radius=", larger, sep="")
-                txt <- "# larger bubbles"
-              }
-              if (nzchar(fc)) {
-                fc <- paste(fncl, fc, ") ", sep="")
-                fc <- paste(fc, txt, sep="")
-                txsug <- paste(txsug, "\n", fc, sep="")
-                class(txsug) <- "out"
-                return(list(out_suggest=txsug))
-              }
-            }
-          }
-        }  # if suggest
-      }  # end bubble
 
 
       # --------------------------------
@@ -410,7 +726,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
 
           txsug <- ""
           if (getOption("suggest")) {
-            txsug <- ">>> Suggestions  or  enter: style(suggest=FALSE)"
+            txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
 
             fc <- ""
             if (!grepl("means", fncl))
@@ -459,7 +775,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
               x.by <- x
             options(yname = x.name)  # reverse order x and y for .ss.numeric()
             options(xname = y.name)
-            stats <- .ss.numeric(y, by=x.by, digits_d=digits_d,
+           stats <- .ss.numeric(y, by=x.by, digits_d=digits_d,
                                  brief=TRUE, y.name=x.name)
           }
           else if (!cat.x && cat.y) {
@@ -478,7 +794,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
 
           txsug <- ""
           if (getOption("suggest")) {
-            txsug <- ">>> Suggestions  or  enter: style(suggest=FALSE)"
+            txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
 
             fc <- ""
             if (!grepl("color_low", fncl))
@@ -525,7 +841,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
       else if (cleveland) {
         txsug <- ""
         if (getOption("suggest")) {
-          txsug <- ">>> Suggestions  or  enter: style(suggest=FALSE)"
+          txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
           fc <- ""
           if (!grepl("sort_yx", fncl)) {
             cmt <- "  # do not sort y-axis variable by x-axis variable"
@@ -575,13 +891,13 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
         txotl <- .bx.stats(x)$txotl
         if (txotl[1] == "") txotl <- "No (Box plot) outliers"
 
-          class(txsug) <- "out"
-          class(txstats) <- "out"
-          class(txotl) <- "out"
-          class(txdif) <- "out"
+        class(txsug) <- "out"
+        class(txstats) <- "out"
+        class(txotl) <- "out"
+        class(txdif) <- "out"
 
-            return(list(out_suggest=txsug, out_stats=txstats, out_outliers=txotl,
-                           out_diff=txdif))
+          return(list(out_suggest=txsug, out_stats=txstats, out_outliers=txotl,
+                         out_diff=txdif))
       }  # end Cleveland
 
 
@@ -592,7 +908,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
       else if (cat.x && cat.y) {
         txsug <- ""
         if (getOption("suggest")) {
-          txsug <- ">>> Suggestions  or  enter: style(suggest=FALSE)"
+          txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
 
           fc <- ""
           if (!grepl("size_cut", fncl))
@@ -652,134 +968,19 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
         class(txttl) <- "out"
         class(txfrq) <- "out"
         class(txXV) <- "out"
-
         return(list(tipe="catcat",
-                    out_title=txttl, out_stats=txfrq, out_XV=txXV))
-
+                    out_title=txttl, out_suggest=txsug,
+                    out_stats=txfrq, out_XV=txXV))
       }  # end catcat
-    }  # end object != "line"  &&  !run
-
-    else {  # line, run chart (object is "both")
-
-      txsug <- ""
-      if (getOption("suggest")) {
-        txsug <- ">>> Suggestions  or  enter: style(suggest=FALSE)"
-
-        fc <- ""
-        if (!grepl("size", fncl)  &&  size.pt > 0)
-          fc <- paste(fc, ", size=0", sep="")
-        if (nzchar(fc)) {
-          fc <- gsub(" = ", "=", fc)
-          fc <- paste(fncl, fc, ")   # just line segments, no points", sep="")
-          txsug <- paste(txsug, "\n", fc, sep="")
-        }
-
-        fc <- ""
-        if (!grepl("lwd", fncl))
-          fc <- paste(fc, ", lwd=0", sep="")
-        if (nzchar(fc)) {
-          fc <- gsub(" = ", "=", fc)
-          if (size.pt > 0)
-            txt <- "just points, no line segments"
-          else {
-            fc <- paste(fc, ", fill=\"on\"", sep="")
-            txt <- "just area"
-          }
-          fc <- paste(fncl, fc, ")   # ", txt, sep="")
-          txsug <- paste(txsug, "\n", fc, sep="")
-        }
-
-        fc <- ""
-        if (!grepl("fill", fncl)  &&  (!grepl("stack", fncl)))
-          fc <- paste(fc, ", fill=\"on\"", sep="")
-        if (nzchar(fc)) {
-          fc <- gsub(" = ", "=", fc)
-          fc <- paste(fncl, fc, ")   # default color fill", sep="")
-          txsug <- paste(txsug, "\n", fc, sep="")
-        }
-
-        txsug <- .rm.arg.2(" x=", txsug)
-        txsug <- .rm.arg.2("(x=", txsug)
-        txsug <- .rm.arg.2(" y=", txsug)
-      }
-
-      class(txsug) <- "out"
-      output <- list(out_suggest=txsug)
-      class(output) <- "out_all"
-      print(output)
-
-      # analyze runs if a singly y
-      if (run && n.ycol==1) {
-
-        txss <- ""
-        ssstuff <- .ss.numeric(y, digits_d=digits_d, x.name="*NONE*",
-                               brief=TRUE)
-        txss <- ssstuff$tx
-        class(txss) <- "out"
-        output <- list(out_ss=txss)
-        class(output) <- "out_all"
-        print(output)
-
-        # if any missing data, then run analysis not possible
-        if (any(is.na(y))) {
-          cat("\n"); stop(call.=FALSE, "\n------\n",
-            "Analysis of runs not possible with missing data\n\n")
-        }
-
-        .dash(12); cat("Run Analysis\n"); .dash(12)
-        run <- integer(length=0)  # length of ith run in run[i]
-        n.runs <- 1  # total number of runs
-        run[n.runs] <- 1
-        line.out <- "    1"
-        for (i in 2:length(y)) {  # find the runs
-          if (y[i] != m.y) {  # throw out values that equal m.y
-            if (sign(y[i]-m.y) != sign(y[i-1]-m.y)) {  # new run
-              if (show_runs) {
-                if (i == 2) cat("\n")
-                buf <- ifelse (n.runs < 10,  "  ", " ")
-                  if (run[n.runs] > 1)  # print only if run of size 2 or more
-                    cat("size=", run[n.runs], "  Run", buf, n.runs, ":",
-                      line.out, "\n", sep="")
-              }
-              line.out <- ""
-              n.runs <- n.runs + 1
-              run[n.runs] <- 0
-            }  # end new run
-          }
-          run[n.runs] <- run[n.runs] + 1
-          buf <- ifelse (i < 10, "  ", " ")
-          line.out <- paste(line.out, buf, i)
-        }  # end find the runs
-        if (run[n.runs] > 1)  # print only if run has at least 2 elements
-          if (show_runs)
-            cat("size=", run[n.runs], "  Run", buf, n.runs, ":", line.out,
-                "\n", sep="")
-        eq.ctr <- which(y==m.y)
-        cat("\nTotal number of runs:", n.runs, "\n")
-        txt <- "Total number of values that do not equal the "
-        cat(txt, lbl.cat, " ", length(y)-length(eq.ctr), "\n", sep="")
-        if (length(eq.ctr) != 0) {
-          if (show_runs) {
-            cat("\nValues ignored that equal the", lbl.cat, "\n")
-            for (i in 1:length(eq.ctr))
-              cat("    #", eq.ctr[i], " ", y[eq.ctr[i]], sep="", "\n")
-            cat("Total number of values ignored:", length(eq.ctr), "\n")
-          }
-        }
-        else {
-          cat("Total number of values ignored that equal the", lbl.cat,
-              length(eq.ctr), "\n")
-        }
-      }  # end analyze runs
-    }  # end line chart
-  }  # end if (stat == "data")
+#   }  # end object != "line"  &&  !run
+  }  # end stat is data
 
 
   else {  # stat not data
     if (cat.x  &&  !cat.y  &&  object %in% c("point", "bubble")) {
       txsug <- ""
       if (getOption("suggest")) {
-        txsug <- ">>> Suggestions  or  enter: style(suggest=FALSE)"
+        txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
 
         fc <- ""
         if (!grepl("segments_x", fncl))

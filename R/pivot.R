@@ -112,6 +112,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
     ind.var.d <- which(names(data) == ind.var.d)
   n.var <- length(ind.var.d)  # n of variables
   nm.var.d <- names(data)[ind.var.d]
+  if (is.factor(data[,nm.var.d]))  # factors listed first can crash analysis
+    data[,nm.var.d] <- as.character(data[,nm.var.d])
   if (is.null(out_names)) {
     out_names <- character(length=length(nm.var.d))
     k <- 0

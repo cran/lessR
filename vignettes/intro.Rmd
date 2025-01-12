@@ -26,6 +26,8 @@ The vignette examples of using **lessR** became so extensive that the maximum R 
 
 ## Read Data
 
+[more examples of reading and writing data files](https://web.pdx.edu/~gerbing/lessR/examples/ReadWrite.html)
+
 Many of the following examples analyze data in the _Employee_ data set, included with **lessR**. To read an internal **lessR** data set, just pass the name of the data set to the **lessR** function `Read()`. Read the _Employee_ data into the data frame _d_. For data sets other than those provided by **lessR**, enter the path name or URL between the quotes, or leave the quotes empty to browse for the data file on your computer system. See the `Read and Write` vignette for more details.
 
 ```{r read}
@@ -44,6 +46,8 @@ l
 ```
 
 ## Bar Chart
+
+[more examples of bar charts and pie charts](https://web.pdx.edu/~gerbing/lessR/examples/BarChart.html)
 
 Consider the categorical variable Dept in the Employee data table.  Use `BarChart()` to tabulate and display the visualization of the number of employees in each department, here relying upon the default data frame (table) named _d_. Otherwise add the `data=` option for a data frame with another name.
 
@@ -66,6 +70,8 @@ BarChart(Dept, theme="gray", labels="off", horiz=TRUE)
 
 ## Histogram
 
+[more examples of histograms](https://web.pdx.edu/~gerbing/lessR/examples/Histogram.html)
+
 Consider the continuous variable _Salary_ in the Employee data table.  Use `Histogram()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_, so the `data=` parameter is not needed.
 
 ```{r hs, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Histogram of tablulated counts for the bins of Salary."}
@@ -83,6 +89,8 @@ Histogram(Salary, bin_start=35000, bin_width=14000, fill="reds")
 ```
 
 ## Scatterplot
+
+[more examples of scatter plots and related](https://web.pdx.edu/~gerbing/lessR/examples/Plot.html)
 
 Specify an X and Y variable with the plot function to obtain a scatter plot. For two variables, both variables can be any combination of continuous or categorical. One variable can also be specified. A scatterplot of two categorical variables yields a bubble plot. Below is a scatterplot of two continuous variables. 
 
@@ -108,22 +116,86 @@ Following is a scatterplot in the form of a bubble plot for two categorical vari
 Plot(JobSat, Gender)
 ```
 
+## Means and Proportions
 
+### Means
+[more examples of t-tests and ANOVA](https://web.pdx.edu/~gerbing/lessR/examples/Means.html)
+
+For the independent-groups t-test, specify the response variable to the left of the tilde, `~`, and the categorical variable with two groups, the grouping variable, to the right of the tilde.
+
+```{r, fig.height=4.25, fig.width=5}
+ttest(Salary ~ Gender)
+```
+
+Next, to analyze the operational efficiency of a weeping device, do the two way independent groups ANOVA analyzing the variable _breaks_ across levels of _tension_ and _wool_. Specify the second independent variable preceded by a `*` sign.
+
+```{r fig.width=5}
+ANOVA(breaks ~ tension * wool, data=warpbreaks)
+```
+
+For a one-way ANOVA, just include one independent variable. A randomized block design is also available.
+
+### Proportions
+
+[more examples of analyzing proportions](https://web.pdx.edu/~gerbing/lessR/examples/Proportions.html)
+
+The analysis of proportions is of two primary types. 
+
+- Focus on a single value of a categorical variable, termed a "success" when it occurs, for one or more samples of data. Analyze the resulting proportion of occurrence for a single sample, or for a test of _homogeneity_, compare proportions of successes across distinct data samples for a single variable.
+- Compare the obtained proportions across the values of one or more categorical variables for a single sample. Applied to a single variable, the analysis is a _goodness-of-fit_. Or, evaluate a potential relationship between two categorical variables, a test of _independence_.
+
+Here, just analyze the $\chi^2$ test of independence, which applies to two categorical variables. The first categorical variable listed in this example is the value of the parameter `variable`, the first parameter in the function definition, so does not need the parameter name. The second categorical variable listed must include the parameter name `by`. 
+
+The question for the analysis is if the observed frequencies of _Jacket_ thickness and _Bike_ ownership sufficiently differ from the frequencies expected by the null hypothesis that we conclude the variables are related.
+
+```{r}
+d <- Read("Jackets")
+Prop_test(Jacket, by=Bike)
+```
 
 ## Regression Analysis
 
+[more examples of regression and logistic regression](https://web.pdx.edu/~gerbing/lessR/examples/Regression.html)
 
 The full output is extensive: Summary of the analysis, estimated model, fit indices, ANOVA, correlation matrix, collinearity analysis, best subset regression, residuals and influence statistics, and prediction intervals. The motivation is to provide virtually all of the information needed for a proper regression analysis.
 
 ```{r}
+d <- Read("Employee", quiet=TRUE)
 reg(Salary ~ Years + Pre)
 ```
 
+As with several other **lessR** functions, save the output to an object with the name of your choosing, such as `r`, and then reference desired pieces of the output. View the names of those pieces from the manual, here obtained with `?reg`, or use the R names function, such as in the following example.
 
+```{r}
+r <- reg(Salary ~ Years + Pre)
+names(r)
+```
 
-## Time Series
+View any piece of output with the name of the output file, a dollar sign, and the specific name of that piece. Here, examine the fit indices.
 
-The time series plot, plotting the values of a variable cross time, is a special case of a scatterplot, potentially with the points of size 0 with adjacent points connected by a line segment. Indicate a time series by specifying the `x`-variable, the first variable listed, as a variable of type `Date`. This conversion to `Date` data values occurs automatically for dates specified in a digital format, such as `18/8/2024` or related formats plus examples such as `2024 Q3` or `2024 Aug`. Otherwise, explicitly use the R function `as.Date()` or pass the date format directly with the `time_format` parameter.
+```{r}
+r$out_fit
+```
+
+These expressions could also be included in a markdown document that systematically reviews each desired piece of the output.
+
+## Time Series and Forecasting
+
+[more examples of run charts, time series charts, and forecasting](https://web.pdx.edu/~gerbing/lessR/examples/Time.html)
+
+The time series plot, plotting the values of a variable cross time, is a special case of a scatterplot, potentially with the points of size 0 with adjacent points connected by a line segment. Indicate a time series by specifying the `x`-variable, the first variable listed, as a variable of type `Date`. Unlike Base R functions, `Plot()` automatically converts to `Date` data values as dates specified in a digital format, such as `18/8/2024` or related formats plus examples such as `2024 Q3` or `2024 Aug`. Otherwise, explicitly use the R function `as.Date()` to convert to this format before calling `Plot()` or pass the date format directly with the `ts_format` parameter.
+
+`Plot()` implements time series forecasting based on trend and seasonality with either exponential smoothing or regression analysis, including the accompanying visualization. Time series parameters include:
+
+- `ts_method`: Set at `"es"` for exponential smoothing, the default, or `"lm"` for linear model regression.
+- `ts_unit`: The time unit, either as the natural occurring interval between dates in the data, the default, or aggregated to a wider time interval.
+- `ts_ahead`: The number of time units to forecast into the future
+- `ts_agg`: If aggregating the time unit, aggregate as the `"sum"`, the default, or as the `"mean"`. 
+- `ts_PIlevel`: The confidence level of the prediction intervals, with 0.95 the default.
+- `ts_format`: Provides a specific format for the date variable if not detected correctly by default. 
+- `ts_seasons`: Set to `FALSE` to turn off seasonality in the estimated model.
+- `ts_trend`: Set to `FALSE` to turn off trend in the estimated model.
+- `ts_type`: Applies to exponential smoothing to specify additive or multiplicative seasonality, with additive the default.
 
 In this `StockPrice` data file, the date conversion as already been done.
 
@@ -151,21 +223,65 @@ Here, aggregate the mean by time, from months to quarters.
 
 
 ```{r}
-Plot(Month, Price, time_unit="quarters", time_agg="mean")
+Plot(Month, Price, ts_unit="quarters", ts_agg="mean")
 ```
 
-`Plot()` implements exponential smoothing forecasting with accompanying visualization. Parameters include `time_ahead` for the number of `time_units` to forecast into the future, and `time_format` to provide a specific format for the date variable if not detected correctly by default. Control aspects of the exponential smoothing estimation and prediction algorithms with parameters `es_level` (alpha), `es_trend` (beta), `es_seasons` (gamma), `es_type` for additive or multiplicative seasonality, and `es_PIlevel` for the level of the prediction intervals.
+`Plot()` implements exponential smoothing or linear regression with seasonality forecasting with accompanying visualization. Parameters include `ts_ahead` for the number of `ts_units` to forecast into the future, and `ts_format` to provide a specific format for the date variable if not detected correctly by default. Parameter `ts_method` defaults to `es` for exponential smoothing, or set to `lm` for linear regression. Control aspects of the exponential smoothing estimation and prediction algorithms with parameters `ts_level` (alpha), `ts_trend` (beta), `ts_seasons` (gamma), `ts_type` for additive or multiplicative seasonality, and `ts_PIlevel` for the level of the prediction intervals.
 
 To forecast Apple's stock price, focus here on the last several years of the data, beginning with Row 400 through Row 473, the last row of data for apple. In this example, forecast ahead 24 months.
 
 
 ```{r}
 d <- d[400:473,]
-Plot(Month, Price, time_unit="months", time_agg="mean", time_ahead=24)
+Plot(Month, Price, ts_unit="months", ts_agg="mean", ts_ahead=24)
+```
+
+
+## Factor Analysis
+
+[more examples of exploratory and confirmatory factor analysis](https://web.pdx.edu/~gerbing/lessR/examples/FactorAnalysis.html)
+
+Access the lessR data set called `datMach4` for the analysis of 351 people to the Mach IV scale. Read the optional variable labels. Including the item contents as variable labels means that the output of the confirmatory factor analysis contains the item content grouped by factor.
+
+```{r}
+d <- Read("Mach4", quiet=TRUE)
+l <- Read("Mach4_lbl", var_labels=TRUE)
+```
+
+Calculate the correlations and store in here in *mycor*, a data structure that contains the computed correlation matrix with the name R. Extract R from *mycor*.
+
+```{r fig.width=3.5, fig.height=3.5}
+mycor <- cr(m01:m20)
+R <- mycor$R
+```
+
+The correlation matrix for analysis is named R. The item (observed variable) correlation matrix is the numerical input into the confirmatory factor analysis.
+
+Here, do the default two-factor solution with `"promax"` rotation. The default correlation matrix is *mycor*. The abbreviation for `corEFA()` is `efa()`.
+
+``` {r}
+efa(R, n_factors=4)
+```
+
+
+The confirmatory factor analysis is of multiple-indicator measurement scales, that is, each item (observed variable) is assigned to only one factor. Solution method is centroid factor analysis.
+
+Specify the measurement model for the analysis in Lavaan notation. Define four factors: Deceit, Trust, Cynicism, and Flattery.
+
+```{r}
+MeasModel <- 
+" 
+   Deceit =~ m07 + m06 + m10 + m09 
+   Trust =~ m12 + m05 + m13 + m01 
+   Cynicism =~ m11 + m16 + m04 
+   Flattery =~ m15 + m02 
+"
 ```
 
 
 ## Pivot Tables
+
+[more examples of pivot tables](https://web.pdx.edu/~gerbing/lessR/examples/pivot.html)
 
 Aggregate with `pivot()`. Any function that processes a single vector of data, such as a column of data values for a variable in a data frame, and outputs a single computed value, the statistic, can be passed to `pivot()`. Functions can be user-defined or built-in. 
 
@@ -184,3 +300,50 @@ Interpret this call to `pivot()` as
 - for each _Company_
 
 Select any two of the three possibilities for multiple parameter values: Multiple compute functions, multiple variables over which to compute, and multiple categorical variables by which to define groups for aggregation.
+
+
+## Color Scales
+
+[more examples of color scales](https://web.pdx.edu/~gerbing/lessR/examples/Customize.html)
+
+
+Generate color scales with `getColors()`. The default output of `getColors()` is a color spectrum of 12 `hcl` colors presented in the order in which they are assigned to discrete levels of a categorical variable. For clarity in the following function call, the default value of the `pal` or _palette_ parameter is explicitly set to its name, `"hues"`.
+
+
+```{r}
+getColors("hues")
+```
+
+```{r echo=FALSE}
+getColors("hues", output=TRUE)
+```
+
+
+
+__lessR__ provides pre-defined sequential color scales across the range of hues around the color wheel in 30 degree increments: `"reds"`, `"rusts"`, `"browns"`, `"olives"`, `"greens"`, `"emeralds"`, `"turqoises"`, `"aquas"`, `"blues"`, `"purples"`, `"biolets"`, `"magentas"`, and `"grays"`.
+
+
+```{r}
+getColors("blues")
+```
+
+```{r echo=FALSE}
+getColors("blues", output=TRUE)
+```
+
+
+To create a divergent color palette, specify beginning and an ending color palettes, which provide values for the  parameters `pal` and `end_pal`, where `pal` abbreviates palette. Here, generate colors from rust to blue.
+
+```{r}
+getColors("rusts", "blues")
+
+
+```{r echo=FALSE}
+getColors("rusts", "blues", output=TRUE)
+```
+
+## Utilities
+
+[examples of utility functions](https://web.pdx.edu/~gerbing/lessR/examples/utilities.html)
+
+**lessR** provides several utility functions for recoding, reshaping, and rescaling data.

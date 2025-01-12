@@ -1,4 +1,4 @@
-.plt.lattice <- 
+.plt.lattice <-
 function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          fill, area_fill, color, panel_fill, panel_color,
          trans, size.pt, size.ln,
@@ -6,7 +6,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          lvl=0, ellipse_color=NULL, ellipse_lwd=NULL,
          fit="off", fit_power=1, fit_color=NULL, fit_lwd=NULL, fit_se,
          plot_errors=FALSE, origin=NULL, jitter,
-         violin, violin_fill, box, box_fill, 
+         violin, violin_fill, box, box_fill,
          bw, vbs_size, box_adj, a, b, k.iqr, fences, vbs_mean,
          out_shape, out_size,
          out_fill, out_color, out2_fill, out2_color,
@@ -17,7 +17,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
   if (date.ts) xx.lab <- xlab
   if (date.ts  &&  is.null(xx.lab)) x.lab <- NULL
-  
+
   if (size.pt == 0) object <- "line"
   size.ln <- size.ln + 0.5  # Trellis plot lines are narrower
 
@@ -29,37 +29,37 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   in.knitr <- ifelse (is.null(options()$knitr.in.progress), FALSE, TRUE)
   if (!in.RStudio && !in.knitr) dev.new(width=width, height=height)
 
-  grid_x_color <- ifelse(is.null(getOption("grid_x_color")), 
+  grid_x_color <- ifelse(is.null(getOption("grid_x_color")),
     getOption("grid_color"), getOption("grid_x_color"))
-  grid_y_color <- ifelse(is.null(getOption("grid_y_color")), 
+  grid_y_color <- ifelse(is.null(getOption("grid_y_color")),
     getOption("grid_color"), getOption("grid_y_color"))
- 
-  grid_x_lwd <- ifelse(is.null(getOption("grid_x_lwd")), 
+
+  grid_x_lwd <- ifelse(is.null(getOption("grid_x_lwd")),
     getOption("grid_lwd"), getOption("grid_x_lwd"))
-  grid_y_lwd <- ifelse(is.null(getOption("grid_y_lwd")), 
+  grid_y_lwd <- ifelse(is.null(getOption("grid_y_lwd")),
     getOption("grid_lwd"), getOption("grid_y_lwd"))
 
-  grid_x_lty <- ifelse(is.null(getOption("grid_x_lty")), 
+  grid_x_lty <- ifelse(is.null(getOption("grid_x_lty")),
     getOption("grid_lty"), getOption("grid_x_lty"))
-  grid_y_lty <- ifelse(is.null(getOption("grid_y_lty")), 
+  grid_y_lty <- ifelse(is.null(getOption("grid_y_lty")),
     getOption("grid_lty"), getOption("grid_y_lty"))
 
-  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")), 
+  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
     getOption("axis_text_color"), getOption("axis_x_text_color"))
-  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")), 
+  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")),
     getOption("axis_text_color"), getOption("axis_y_text_color"))
 
-  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")), 
+  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
     getOption("axis_cex"), getOption("axis_x_cex"))
   adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
 
-  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")), 
+  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
     getOption("axis_cex"), getOption("axis_y_cex"))
   adj <- .RSadj(axis_cex=axis_y_cex); axis_y_cex <- adj$axis_cex
 
-  lab_x_color <- ifelse(is.null(getOption("lab_x_color")), 
+  lab_x_color <- ifelse(is.null(getOption("lab_x_color")),
     getOption("lab_color"), getOption("lab_x_color"))
-  lab_y_color <- ifelse(is.null(getOption("lab_y_color")), 
+  lab_y_color <- ifelse(is.null(getOption("lab_y_color")),
     getOption("lab_color"), getOption("lab_y_color"))
 
   # get lab_x_cex  lab_y_cex
@@ -72,10 +72,10 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
 
   is.y <- ifelse (!is.null(y), TRUE, FALSE)
-  gl <- .getlabels(xlab, ylab, main, y.nm=is.y, lab_x_cex=lab_x_cex, 
+  gl <- .getlabels(xlab, ylab, main, y.nm=is.y, lab_x_cex=lab_x_cex,
                      lab_y_cex=lab_y_cex, facet1.nm=TRUE)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
-  y.name <- gl$yn; y.lbl <- gl$yl; 
+  y.name <- gl$yn; y.lbl <- gl$yl;
   if (!is.null(gl$yb))
     y.lab <- ifelse (is.null(ylab), gl$yb, "")
   else
@@ -94,7 +94,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   legend_title <- abbreviate(getOption("byname"), 7)
   leg.cex.title <- 0.85  # abbreviate only returns of type character
-# BAD if (!is.null(by)) by <- factor(abbreviate(by, 5), levels(by)) 
+# BAD if (!is.null(by)) by <- factor(abbreviate(by, 5), levels(by))
 
   if (is.null(facet1) && is.null(facet2))
     n.panels <- 1
@@ -212,7 +212,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   # separate the axis from the axis labels unless too many rows
   if (is.null(n_row)) n_row <- 1
-  if (n_row < 7) { 
+  if (n_row < 7) {
     pad <- 2.08 - 0.56*log(n_row)
     p <- update(p,
          par.settings=list(
@@ -230,17 +230,17 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          par.strip.text=list(cex=axis_x_cex, col=getOption("strip_text_color")),
          xlab=list(label=x.lab, cex=lab_x_cex, col=l.x_color),
          ylab=list(label=y.lab, cex=lab_y_cex, col=l.y_color),
-         main=list(label=main.lab, col=getOption("lab_color")), 
+         main=list(label=main.lab, col=getOption("lab_color")),
          par.settings=list(
            background=list(col=getOption("window_fill")),
            panel.background=list(col=panel_fill),
            layout.heights=list(top.padding=top.pad, axis.top=axs.top),
            axis.line=list(col=panel_frame_color,
-             lty=getOption("axis_lty"), lwd=getOption("axis_lwd")), 
+             lty=getOption("axis_lty"), lwd=getOption("axis_lwd")),
            strip.border=list(col=getOption("strip_color"), lwd=1),
            strip.background=list(col=getOption("strip_fill")),
            strip.color=list(col=getOption("strip_color")),  # ???
-           plot.polygon=list(col=getOption("violin_color"), 
+           plot.polygon=list(col=getOption("violin_color"),
              fill=violin_fill, lty="solid", lwd=1),
            plot.line=list(col=pt.color, lty="solid", lwd=1),
            plot.symbol=list(pch=shape, cex=size.pt, col=pt.color,
@@ -262,7 +262,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
              key=list(
                cex=0.85, space="right",
                text=list(levels(by)),  # by is always a factor at this point
-               border="gray80", background=col.bg, 
+               border="gray80", background=col.bg,
                points=list(cex=.80, pch=21, fill=fill, col=fill),
                title=legend_title, cex.title=leg.cex.title))
       }
@@ -271,7 +271,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
              key=list(
                cex=0.85, space="right",
                text=list(levels(by)),  # by is always a factor at this point
-               border="gray80", background=col.bg, 
+               border="gray80", background=col.bg,
                lines=list(lwd=size.ln, col=fill),
                title=legend_title, cex.title=leg.cex.title))
       }
@@ -297,7 +297,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
               panel.xyarea(x, y, origin=origin, col=area_fill)
 
             if (object == "point")
-              tp <- "p" 
+              tp <- "p"
             else if (object == "both")
               tp <- "b"
             else if (object == "line")
@@ -323,7 +323,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
               b0.pn <- .fmt(b0, 3)
               b1.pn <- .fmt(b1, 3)
               if (!quiet) {
-                cat("\n") 
+                cat("\n")
                 if (panel.number() == 1) {
                   cat("Regression analysis of linearized", y.name, "values\n")
                   msg <- paste("Need back transformation of regression model",
@@ -351,11 +351,11 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
                 panel.polygon(c(x, rev(x)), c(up.ln, rev(dn.ln)),
                               col=se_fill, border="transparent")
               }  # end fit_se
-   
+
               panel.lines(x, f.ln, col=fit_color, lwd=fit_lwd)
 
               if (plot_errors)
-                panel.segments(y0=f.ln, y1=y, x0=x, x1=x, col="darkred", lwd=1) 
+                panel.segments(y0=f.ln, y1=y, x0=x, x1=x, col="darkred", lwd=1)
 
             }  # end fit != "off"
 
@@ -363,16 +363,16 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
               panel.ellipse(x, y, center.cex=0,
                             level=lvl, col=ellipse_color, lwd=ellipse_lwd)
 
-          }  # end length > 0 
+          }  # end length > 0
         }  # end panel function
       )  # end update
 
-  }  # end cont_cont 
+  }  # end cont_cont
 
 
   else if (T.type %in% c("con_cat", "cont")) {
 
-    #myboxStats <- function(...) 
+    #myboxStats <- function(...)
       #if (!box_adj)
         #return(boxplot.stats(x))
       #else
@@ -393,9 +393,9 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
            else {  # m.c < 0
              fnc.lwr <- q1 - (k.iqr * exp(-b*m.c) * iqr)
              fnc.upr <- q3 + (k.iqr * exp(-a*m.c) * iqr)
-           } 
+           }
 
-           min_x <- min(x, fnc.lwr) 
+           min_x <- min(x, fnc.lwr)
            max.x <- max(x, fnc.upr)
 
            list(xlim=c(min_x, max.x))
@@ -404,9 +404,9 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
     }  # end fences
 
     if (n.groups > 1) {
-      legend_lbl.cex <- ifelse (in.RStudio, .75, .66) 
+      legend_lbl.cex <- ifelse (in.RStudio, .75, .66)
       p <- update(p, key=list(space="top", columns=n.groups,
-             text=list(levels(by), cex=legend_lbl.cex), 
+             text=list(levels(by), cex=legend_lbl.cex),
              points=list(pch=21, fill=pt.fill, col=pt.color, cex=1),
              border="gray80", background=col.bg, padding.text=2))
     }
@@ -448,13 +448,13 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
               fnc.in[2] <- q3 + (k.iqr * exp(-a*m.c) * iqr)
               fnc.out[1] <- q1 - (2 * k.iqr * exp(-b*m.c) * iqr)
               fnc.out[2] <- q3 + (2 * k.iqr * exp(-a*m.c) * iqr)
-            } 
+            }
 
             if (violin && length(x)>1) {
               # to get a violin plot, cannot have y and facet1
               # just Plot(x) gives a VBS plot with no groups and only 1 panel
               # a giant do loop that iterates over groups, i.e., panel.number()
-              vw <- ifelse (!is.null(y) && !is.null(facet1), FALSE, TRUE) 
+              vw <- ifelse (!is.null(y) && !is.null(facet1), FALSE, TRUE)
               vf <- ifelse (n.panels>1, violin_fill[panel.number()], violin_fill)
               panel.violin(x=x, ...,
                   col=vf,
@@ -474,13 +474,13 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
                 if (!box_adj)  # did the panel.number() access in .panel.bwplot()
                   .panel.bwplot(x=x, ..., pch="|", vbs_mean=vbs_mean,
                       fences=fences,
-                      box.ratio=vbs_size/denom, mean_color=out_fill, 
-                      stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE) 
+                      box.ratio=vbs_size/denom, mean_color=out_fill,
+                      stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE)
                 else
                   .panel.bwplot(x=x, ...,  pch="|", vbs_mean=vbs_mean,
                       fences=fences,
-                      box.ratio=vbs_size/denom, mean_color=out_fill, 
-                      stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE) 
+                      box.ratio=vbs_size/denom, mean_color=out_fill,
+                      stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE)
              }
 
               # plotting a subset of x requires adjusting y, in .panel.strip
@@ -525,17 +525,17 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
                 ord <- order(x.lo, decreasing=FALSE)
                 x.lo <- x.lo[ord]
                 x.lo <- na.omit(x.lo[1:min(length(x.lo),out_cut)])
-                ID.lo <- ID.lo[ord] 
-                ID.lo <- na.omit(ID.lo[1:min(length(ID.lo),out_cut)]) 
-                
+                ID.lo <- ID.lo[ord]
+                ID.lo <- na.omit(ID.lo[1:min(length(ID.lo),out_cut)])
+
                 ind.hi <- which(x > fnc.in[2])
                 x.hi <- x[ind.hi]
                 ID.hi <- wwID[ind.hi]
                 ord <- order(x.hi, decreasing=TRUE)
                 x.hi <- x.hi[ord]
                 x.hi <- na.omit(x.hi[1:min(length(x.hi),out_cut)])
-                ID.hi <- ID.hi[ord] 
-                ID.hi <- na.omit(ID.hi[1:min(length(ID.hi),out_cut)]) 
+                ID.hi <- ID.hi[ord]
+                ID.hi <- na.omit(ID.hi[1:min(length(ID.hi),out_cut)])
 
                 x.out <- c(x.lo, x.hi)
                 ID.lbl <- union(ID.lo, ID.hi)  # combine factors
@@ -567,7 +567,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
                  jitter_data=jitter_data, factor=jitter, ...)
             }
 
-          }  # end length(x) > 0 
+          }  # end length(x) > 0
         }  # end panel function
       )  # end update
   }

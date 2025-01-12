@@ -1,4 +1,4 @@
-.bcParamValid <- 
+.bcParamValid <-
 function (y.miss, by.miss, facet1.miss, Trellis, sort, fill_split, fill.miss,
                 labels_position, stat.miss) {
 
@@ -36,4 +36,4 @@ function (y.miss, by.miss, facet1.miss, Trellis, sort, fill_split, fill.miss,
   }
 
 }
-      
+

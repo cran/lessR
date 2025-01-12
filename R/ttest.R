@@ -1,19 +1,19 @@
 ttest <-
 function(x=NULL, y=NULL, data=d, filter=NULL, paired=FALSE,
 
-         n=NULL, m=NULL, s=NULL, mu=NULL, 
-         n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL, 
+         n=NULL, m=NULL, s=NULL, mu=NULL,
+         n1=NULL, n2=NULL, m1=NULL, m2=NULL, s1=NULL, s2=NULL,
 
-         Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", xlab=NULL, 
+         Ynm="Y", Xnm="X", X1nm="Group1", X2nm="Group2", xlab=NULL,
 
          brief=getOption("brief"), digits_d=NULL, conf_level=0.95,
          alternative=c("two_sided", "less", "greater"),
-         mmd=NULL, msmd=NULL, Edesired=NULL, 
+         mmd=NULL, msmd=NULL, Edesired=NULL,
 
          show_title=TRUE, bw1="bcv", bw2="bcv",
 
          graph=TRUE, line_chart=FALSE, quiet=getOption("quiet"),
-         width=5, height=5, pdf_file=NULL, ...)  {       
+         width=5, height=5, pdf_file=NULL, ...)  {
 
 
 tt.setup <-
@@ -26,7 +26,7 @@ function(x, y=NULL, ...) {
   cat("\n")
   if (missing(y))
     no.y <- TRUE
-  else 
+  else
     if (is.null(y)) no.y <- TRUE else no.y  <- FALSE
   if (is.null(n1) && no.y) two.gp <- FALSE else two.gp <- TRUE
   if (is.null(n) && is.null(n1)) from.data <- TRUE else from.data <- FALSE
@@ -37,12 +37,12 @@ function(x, y=NULL, ...) {
     if (from.data) digits_d <- .max.dd(x)
     else {
       digits_d <- 0
-      if (!is.null(m)) if (.max.dd(m) > digits_d) digits_d <- .max.dd(m)   
-      if (!is.null(s)) if (.max.dd(s) > digits_d) digits_d <- .max.dd(s)   
-      if (!is.null(m1)) if (.max.dd(m1) > digits_d) digits_d <- .max.dd(m1)   
-      if (!is.null(m2)) if (.max.dd(m2) > digits_d) digits_d <- .max.dd(m2)   
-      if (!is.null(s1)) if (.max.dd(s1) > digits_d) digits_d <- .max.dd(s1)   
-      if (!is.null(s2)) if (.max.dd(s2) > digits_d) digits_d <- .max.dd(s2)   
+      if (!is.null(m)) if (.max.dd(m) > digits_d) digits_d <- .max.dd(m)
+      if (!is.null(s)) if (.max.dd(s) > digits_d) digits_d <- .max.dd(s)
+      if (!is.null(m1)) if (.max.dd(m1) > digits_d) digits_d <- .max.dd(m1)
+      if (!is.null(m2)) if (.max.dd(m2) > digits_d) digits_d <- .max.dd(m2)
+      if (!is.null(s1)) if (.max.dd(s1) > digits_d) digits_d <- .max.dd(s1)
+      if (!is.null(s2)) if (.max.dd(s2) > digits_d) digits_d <- .max.dd(s2)
     }
     digits_d <- digits_d + 1
     if (digits_d < 3) digits_d <- 3
@@ -57,13 +57,13 @@ function(x, y=NULL, ...) {
   if (two.gp) {
     options(yname=Ynm)
 
-    if (from.data) { 
+    if (from.data) {
 
       if ( (length(x) < 2) || (length(y) < 2) )  {
        cat("\n"); stop(call.=FALSE, "\n","------\n",
          "Need at least two cases (observations) per sample.\n\n")
       }
-     
+
       if ( !is.null(mmd) && !is.null(msmd) )  {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
          "Specify only one of mmd and msmd as one implies the other.\n\n")
@@ -72,7 +72,7 @@ function(x, y=NULL, ...) {
       # Always put the group with the largest mean first
       if (mean(x, na.rm=TRUE) > mean(y, na.rm=TRUE))
         plt2 <- .TwoGroup(x, y, n1, n2, m1, m2, s1, s2, from.data,
-          Ynm, Xnm, X1nm, X2nm, brief, digits_d, 
+          Ynm, Xnm, X1nm, X2nm, brief, digits_d,
           conf_level, alternative, mmd, msmd, Edesired, bw1, bw2,
           graph, xlab, line_chart, show_title, quiet, pdf_file, width, height)
       else {  # switch
@@ -80,8 +80,8 @@ function(x, y=NULL, ...) {
         X2nm <- X1nm
         X1nm <- Xtmp
         plt2 <- .TwoGroup(y, x, n1, n2, m1, m2, s1, s2, from.data,
-          Ynm, Xnm, X1nm, X2nm, brief, digits_d, 
-          conf_level, alternative, mmd, msmd, Edesired, bw1, bw2, 
+          Ynm, Xnm, X1nm, X2nm, brief, digits_d,
+          conf_level, alternative, mmd, msmd, Edesired, bw1, bw2,
           graph, xlab, line_chart, show_title,
           quiet, pdf_file, width, height)
       }
@@ -102,7 +102,7 @@ function(x, y=NULL, ...) {
     }
   #if (!brief) {
     #txt <- "Kelley and Lai's MBESS package]"
-    #cat("\n[smd CI with Ken Kelley's ci.smd function from", txt, "\n") 
+    #cat("\n[smd CI with Ken Kelley's ci.smd function from", txt, "\n")
   #}
 
   }  # end two group
@@ -164,19 +164,19 @@ function(x, y=NULL, ...) {
   }
 
   # let deprecated mydata work as default
-  dfs <- .getdfs() 
+  dfs <- .getdfs()
   mydata.ok <- FALSE
   if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
-    d <- mydata 
+    d <- mydata
     mydata.ok <- TRUE
   }
- 
-  if (missing(x)  &&  missing(n)  &&  missing(n1)) { 
+
+  if (missing(x)  &&  missing(n)  &&  missing(n1)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Must specify a variable to analyze, or provide summary stats.\n\n")
   }
-        
-  if (!is.null(Edesired) && conf_level != 0.95) { 
+
+  if (!is.null(Edesired) && conf_level != 0.95) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Edesired calculation only applies to 95% confidence level.\n\n")
   }
@@ -194,13 +194,13 @@ function(x, y=NULL, ...) {
 
   # get actual variable name before potential call of data$x, could be NULL
   if (!missing(x))
-    x.name <- deparse(substitute(x)) 
+    x.name <- deparse(substitute(x))
   else
     x.name <- NULL
-  if (!missing(y)) y.name <- deparse(substitute(y)) 
+  if (!missing(y)) y.name <- deparse(substitute(y))
 
   if (!is.null(x.name)) {
-    dfs <- .getdfs() 
+    dfs <- .getdfs()
     mydata.ok <- FALSE
     if (!is.null(dfs)) {
       if ("mydata" %in% dfs  &&  !("d" %in% dfs)) {
@@ -217,12 +217,12 @@ function(x, y=NULL, ...) {
   }
   else
     df.name <- NULL
- 
+
   if (!is.null(x.name)) if (exists(x.name, where=.GlobalEnv)) {
     if (is.data.frame(x)) {
       nm <- names((eval(substitute(x))))
       txt <- ifelse(length(nm)>1, "one of those variables", "that variable")
-      nm2 <- "" 
+      nm2 <- ""
       for (j in 1:length(nm)) nm2 <- paste(nm2, nm[j])
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "The argument to the ttest function you specified, ", df.name, ", is\n",
@@ -247,7 +247,7 @@ function(x, y=NULL, ...) {
 
   # get conditions and check for data existing
   if (!is.null(x.name)) {
- 
+
     # if a tibble, convert to data frame
     if (exists(df.name, envir=parent.frame())) {
       if (any(grepl("tbl", class(data), fixed=TRUE)))
@@ -255,10 +255,10 @@ function(x, y=NULL, ...) {
     }
 
     is.frml <- ifelse (grepl("~", x.name), TRUE, FALSE)
-    if (is.frml) if (!mydata.ok) .nodf(df.name)  # check to see if df exists 
+    if (is.frml) if (!mydata.ok) .nodf(df.name)  # check to see if df exists
     from.data <- ifelse (x.name == "NULL", FALSE, TRUE)
-    in.style <- .in.global(x.name, quiet=TRUE) 
-    if (!missing(y)) .in.global(y.name, quiet=TRUE)  # y.name an expression? 
+    in.style <- .in.global(x.name, quiet=TRUE)
+    if (!missing(y)) .in.global(y.name, quiet=TRUE)  # y.name an expression?
 
     # see if the variable exists in the data frame
     if (from.data && !in.style && !is.frml) .xcheck(x.name, df.name, names(data))
@@ -273,12 +273,12 @@ function(x, y=NULL, ...) {
 
   # --------------------------
   # do analysis with  tt.setup
-  # plt is the returned number of plots generated 
+  # plt is the returned number of plots generated
 
   if (in.style || is.frml || from.data) {
 
     if (in.style) {
-      if (is.function(x))  # var names that are R functions get assigned to style 
+      if (is.function(x))  # var names that are R functions get assigned to style
         plt <- tt.setup(eval(substitute(data$x)), Ynm=x.name, ...)  # 1-group
       else {  # not a function name
         if (!missing(y))
@@ -309,14 +309,14 @@ function(x, y=NULL, ...) {
     else if (is.frml) {
       f <- .tt.formula(x, y, data, ...)  # formula
       x <- f$x;  y <- f$y;  Ynm <- f$Ynm;  Xnm <- f$Xnm
-      X1nm <- f$X1nm;  X2nm <- f$X2nm 
+      X1nm <- f$X1nm;  X2nm <- f$X2nm
       plt <- tt.setup(x, y, ...)
     }
 
     else if (from.data) {
-      if (!is.numeric((eval(substitute(data$x))))) { 
+      if (!is.numeric((eval(substitute(data$x))))) {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "The variable to analyze must be numeric\n\n", 
+          "The variable to analyze must be numeric\n\n",
           "The problem is that ", x.name, " does not have numeric values\n",
           "The first value of  ", x.name, "  is ", data[1,x.name],
           ", which is not numeric\n\n")
@@ -324,7 +324,7 @@ function(x, y=NULL, ...) {
       }
       if (!missing(y)) {
         y.l <- length(eval(substitute(data$y)))
-        if (!is.numeric((eval(substitute(data$y))))) { 
+        if (!is.numeric((eval(substitute(data$y))))) {
           cat("\n"); stop(call.=FALSE, "\n","------\n",
             "Variables separated by a comma must both be numeric\n\n",
             "Perhaps use a tilde, ~, instead of a comma with a\n",
@@ -341,7 +341,7 @@ function(x, y=NULL, ...) {
           plt <- tt.setup(eval(substitute(data$x)), eval(substitute(data$y)),
                           ...)
       }
-      else {   # paired 
+      else {   # paired
         diff <- eval(substitute(data$y)) - eval(substitute(data$x))
         plt <- tt.setup(diff, ...)
       }
@@ -351,7 +351,7 @@ function(x, y=NULL, ...) {
       for (i in (plot.i+1):(plot.i+plt$i)) plot.title[i] <- plt$ttl[i-plot.i]
       plot.i <- plot.i + plt$i
     }
-  }  # in.style || is.frml || from.data 
+  }  # in.style || is.frml || from.data
 
   else
     tt.setup(...)  # analysis from stats

@@ -1,8 +1,8 @@
-.pc.main <- 
+.pc.main <-
 function(x, y,
-        fill, color, trans, 
-        radius, hole, hole_fill, edges, 
-        clockwise, init_angle, 
+        fill, color, trans,
+        radius, hole, hole_fill, edges,
+        clockwise, init_angle,
         density, angle, lty, lwd,
         labels, labels_position, labels_color, labels_size, labels_digits,
         labels_cex, main_cex, main, main.miss,
@@ -18,7 +18,7 @@ function(x, y,
   if (!is.null(main))
     main.lbl <- main
   else {
-    if (main.miss)  # main was not explicitly set to NULL 
+    if (main.miss)  # main was not explicitly set to NULL
       main.lbl <- ifelse (is.null(x.lbl), x.name, x.lbl)
     else
       main.lbl <- NULL
@@ -28,7 +28,7 @@ function(x, y,
 # if (strwidth(main.lbl, units="figure", cex=main_cex) > .85) {
 #   brk <- nchar(main.lbl)
 #   while (strwidth(substr(main.lbl,1,brk), units="figure", cex=main_cex) > .85)
-#     brk <- brk-1 
+#     brk <- brk-1
 #   while (substr(main.lbl,brk,brk) != " ") brk <- brk-1
 #   main.lbl <- paste(substr(main.lbl,1,brk), "\n",
 #                     substr(main.lbl,brk+1,nchar(main.lbl)))
@@ -60,18 +60,18 @@ function(x, y,
   }
   else {  # length(fill) == 0
     if (is.null(fill)) {  # fill not specified
-      if (!is.ord) {  # hues for nominal 
+      if (!is.ord) {  # hues for nominal
         clr <- getColors(n=n_cat, output=FALSE)
-        if (!is.null(.color_range(clr, n_cat)))  
+        if (!is.null(.color_range(clr, n_cat)))
           clr <- .color_range(clr, n_cat)
       }
       else  # sequential palette for ordinal based on theme
-        clr <- .color_range(.get_fill(seq.pal=TRUE), n_cat) 
+        clr <- .color_range(.get_fill(seq.pal=TRUE), n_cat)
     }
     else {  # fill specified by user
       if (is.null(.color_range(fill, n_cat)))
         clr <- fill  # user assigned
-      else 
+      else
         clr <- .color_range(fill, n_cat)  # do default range, or user assigned
     }
   }
@@ -80,8 +80,8 @@ function(x, y,
 # if (is.null(clr)) {
 # } # end fill is multiple values
 
-  if (!is.null(trans)) 
-    for (i in 1:n_cat) clr[i] <- .maketrans(clr[i], (1-trans)*256) 
+  if (!is.null(trans))
+    for (i in 1:n_cat) clr[i] <- .maketrans(clr[i], (1-trans)*256)
 
 
   # ----------------
@@ -95,7 +95,7 @@ function(x, y,
     x.cat <- x
     x <- y
     x <- as.table(x)
-    names(x) <- x.cat 
+    names(x) <- x.cat
   }
 
   x.tbl <- x  # save tabled values for text output
@@ -117,13 +117,13 @@ function(x, y,
   # ------------------
 
   # modified R pie function to add inner hole at the end, plot a radius for each
-  if (!is.numeric(x) || any(is.na(x) | x < 0)) 
+  if (!is.numeric(x) || any(is.na(x) | x < 0))
       stop("'x' values must be positive.")
-  
+
   # set up and open plot window
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-  
+
   par(bg=getOption("panel_fill"))
   tm <- ifelse (is.null(main.lbl), .6, .8)
   par(mai=c(.4, .5, tm, .5))
@@ -132,14 +132,14 @@ function(x, y,
   pin <- par("pin")  # plot dimensions in inches
   xlim <- c(-1, 1)
   ylim <- c(-1, 1)
-  if (pin[1] > pin[2]) 
+  if (pin[1] > pin[2])
     xlim <- (pin[1]/pin[2]) * xlim
   else
     ylim <- (pin[2]/pin[1]) * ylim
   plot.window(xlim, ylim, "", asp=1)
 
   # set labels
-  if (is.null(nms.x)) 
+  if (is.null(nms.x))
     nms.x <- as.character(seq_along(x))
   else
     nms.x <- as.graphicsAnnot(nms.x)
@@ -176,11 +176,11 @@ function(x, y,
     }
   }
 
-  for (i in 1:nx) { # slice by slice 
+  for (i in 1:nx) { # slice by slice
     # plot slice
     n <- max(2, floor(edges * dx[i]))
     p <- t2xy(seq.int(x[i], x[i + 1], length.out=n), radius)
-    polygon(c(p$x, 0), c(p$y, 0), density=density[i], angle=angle[i], 
+    polygon(c(p$x, 0), c(p$y, 0), density=density[i], angle=angle[i],
         border=color[i], col=clr[i], lty=lty[i], lwd=lwd)
 
     # plot labels if "out"
@@ -219,7 +219,7 @@ function(x, y,
 
       # plot the labels
       cx <- 1.1;  cy <- 1.175
-      text(cx * p$x, cy * p$y, nms.x[i], xpd=TRUE, 
+      text(cx * p$x, cy * p$y, nms.x[i], xpd=TRUE,
         adj=ifelse(p$x < 0, 1, 0), cex=labels_cex, ...)  # labels
     }
   }  # end slice by slice
@@ -236,7 +236,7 @@ function(x, y,
   # -----------
 
   #if (length(dim(x)) == 1  && !quiet) {  # one variable
-# if (!quiet) { 
+# if (!quiet) {
 
     txsug <- ""
     if (getOption("suggest")) {
@@ -275,7 +275,7 @@ function(x, y,
     }
 
     class(output) <- "out_all"
-    if (!quiet) print(output)      
+    if (!quiet) print(output)
 # }
 
   if (!is.null(add)) {
@@ -288,7 +288,7 @@ function(x, y,
     add_trans <- getOption("add_trans")
 
     .plt.add (add, x1, x2, y1, y2,
-              add_cex, add_lwd, add_lty, add_color, add_fill, add_trans) 
+              add_cex, add_lwd, add_lty, add_color, add_fill, add_trans)
   }
 
   cat("\n")

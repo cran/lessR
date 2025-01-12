@@ -18,7 +18,7 @@ function (data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts, facet1.miss,
           }
           else {  # facet1 present
             Trellis <- TRUE
-            T.type <- "cont_cont"  
+            T.type <- "cont_cont"
           }
         }
       }  # end !cat.x
@@ -30,7 +30,7 @@ function (data.do, n.x_var, y.miss, cat.x, cat.y, run, date.ts, facet1.miss,
           T.type <- "dot"
         }
       }
-    }  # end y.miss 
+    }  # end y.miss
 
     else {  # y present
       if (!cat.x) {

@@ -19,8 +19,8 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
     }
 
     if (area_fill[1] == "on") {  # "on" only applies to one value
-      if (n.y_var == 1) 
-        area_fill <- getOption("violin_fill") 
+      if (n.y_var == 1)
+        area_fill <- getOption("violin_fill")
       else
         area_fill <- .get_fill()
     }
@@ -81,7 +81,7 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
     }
   }
 
-  nmC <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",  
+  nmC <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",
           "turquoises", "aquas", "blues", "purples", "violets",
           "magentas", "grays")
   nmR <- c("rainbow", "heat", "terrain")
@@ -96,14 +96,14 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
   if (fill.miss) {
     if (n.clrs == 1)
       pt_fill <- getOption("pt_fill")
-    else 
-      pt_fill <- .color_range(.get_fill(), n.clrs) 
+    else
+      pt_fill <- .color_range(.get_fill(), n.clrs)
   }
   else {
     if (!(fill[1] %in% c("hues", nm)))  # if a by var, then length(fill) > 1
       pt_fill <- fill
     else {
-      pt_fill <- .color_range(fill, n.clrs)  
+      pt_fill <- .color_range(fill, n.clrs)
       pt_color <- rep("transparent", n.clrs)
       color_done <- TRUE
     }

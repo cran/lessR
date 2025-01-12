@@ -1,4 +1,4 @@
-.bar.lattice <- 
+.bar.lattice <-
 function(x, facet1, facet2, nrows, ncols, asp, prop,
          fill, color,
          trans, size.pt, xlab, ylab, main,
@@ -13,29 +13,29 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
   panel_fill <- getOption("panel_fill")
   panel_color <- getOption("panel_color")
 
-  grid_x_color <- ifelse(is.null(getOption("grid_x_color")), 
+  grid_x_color <- ifelse(is.null(getOption("grid_x_color")),
     getOption("grid_color"), getOption("grid_x_color"))
-  grid_y_color <- ifelse(is.null(getOption("grid_y_color")), 
+  grid_y_color <- ifelse(is.null(getOption("grid_y_color")),
     getOption("grid_color"), getOption("grid_y_color"))
- 
-  grid_x_lwd <- ifelse(is.null(getOption("grid_x_lwd")), 
+
+  grid_x_lwd <- ifelse(is.null(getOption("grid_x_lwd")),
     getOption("grid_lwd"), getOption("grid_x_lwd"))
-  grid_y_lwd <- ifelse(is.null(getOption("grid_y_lwd")), 
+  grid_y_lwd <- ifelse(is.null(getOption("grid_y_lwd")),
     getOption("grid_lwd"), getOption("grid_y_lwd"))
 
-  grid_x_lty <- ifelse(is.null(getOption("grid_x_lty")), 
+  grid_x_lty <- ifelse(is.null(getOption("grid_x_lty")),
     getOption("grid_lty"), getOption("grid_x_lty"))
-  grid_y_lty <- ifelse(is.null(getOption("grid_y_lty")), 
+  grid_y_lty <- ifelse(is.null(getOption("grid_y_lty")),
     getOption("grid_lty"), getOption("grid_y_lty"))
 
-  axis_x_color <- ifelse(is.null(getOption("axis_x_color")), 
+  axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
     getOption("axis_color"), getOption("axis_x_color"))
-  axis_y_color <- ifelse(is.null(getOption("axis_y_color")), 
+  axis_y_color <- ifelse(is.null(getOption("axis_y_color")),
     getOption("axis_color"), getOption("axis_y_color"))
   # axis color is panel_color unless axis_color is changed from default
   theme <- getOption("theme")
   sub_theme <- getOption("sub_theme")
-  if (sub_theme != "black")  {  
+  if (sub_theme != "black")  {
      panel_color <- ifelse (axis_x_color != "gray15", axis_x_color, "#DED9CD")
      if (panel_color == "#DED9CD")
        panel_color <- ifelse (axis_y_color != "gray15", axis_y_color, "#DED9CD")
@@ -46,22 +46,22 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
        panel_color <- ifelse (axis_y_color != "gray55", axis_y_color, "gray55")
   }
 
-  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")), 
+  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
     getOption("axis_text_color"), getOption("axis_x_text_color"))
-  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")), 
+  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")),
     getOption("axis_text_color"), getOption("axis_y_text_color"))
 
-  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")), 
+  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
     getOption("axis_cex"), getOption("axis_x_cex"))
   adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
 
-  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")), 
+  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
     getOption("axis_cex"), getOption("axis_y_cex"))
   adj <- .RSadj(axis_cex=axis_y_cex); axis_y_cex <- adj$axis_cex
 
-  lab_x_color <- ifelse(is.null(getOption("lab_x_color")), 
+  lab_x_color <- ifelse(is.null(getOption("lab_x_color")),
     getOption("lab_color"), getOption("lab_x_color"))
-  lab_y_color <- ifelse(is.null(getOption("lab_y_color")), 
+  lab_y_color <- ifelse(is.null(getOption("lab_y_color")),
     getOption("lab_color"), getOption("lab_y_color"))
 
 
@@ -86,7 +86,7 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
   adj <- .RSadj(lab_cex=lab_x_cex); lab_x_cex <- adj$lab_cex
   lab_y_cex <- ifelse(is.null(lab_y_cex), lab_cex, lab_y_cex)
   adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
-  gl <- .getlabels(xlab, ylab, main, lab_x_cex=lab_x_cex, 
+  gl <- .getlabels(xlab, ylab, main, lab_x_cex=lab_x_cex,
                    lab_y_cex=lab_y_cex)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   y.name <- gl$yn; y.lbl <- gl$yl
@@ -145,7 +145,7 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
     if (is.null(ncols)) ncols <- (n.panels %/% nrows) + (n.panels %% nrows > 0)
     if (is.null(nrows)) nrows <- (n.panels %/% ncols) + (n.panels %% ncols > 0)
     p <- update(p, layout=c(ncols, nrows))
-  } 
+  }
 
   # scale down the point size, grid line width for the multi-panel dot plots
   n.pnl <-  length(levels(facet1))
@@ -177,7 +177,7 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
 
   # more physical space of the axis from the axis labels unless too many rows
   if (is.null(nrows)) nrows <- 1
-  if (nrows < 7) { 
+  if (nrows < 7) {
     pad <- 2.08 - 0.56*log(nrows)
     p <- update(p,
          par.settings=list(
@@ -196,23 +196,23 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
   # specify strip attributes
   strip = if (show_strip) {
     p <- update(p,
-         strip = lattice::strip.custom( 
+         strip = lattice::strip.custom(
            par.strip.text = list(
              cex=axis_x_cex,
              col=getOption("strip_text_color"),
              bg=list(col=getOption("strip_fill")),
              strip.border=list(col=getOption("strip_color"), lwd=0.5),
-             strip.left=strip.lft 
+             strip.left=strip.lft
       )))}
   else
     FALSE
-             
+
   # specify general plot attributes
   p <- update(p,
          aspect=asp,
          xlab=list(label=x.lab, cex=lab_x_cex, col=l.x_color),
          ylab=list(label=y.lab, cex=lab_y_cex, col=l.y_color),
-         main=list(label=main.lab, col=getOption("lab_color")), 
+         main=list(label=main.lab, col=getOption("lab_color")),
          par.settings=list(
            background=list(col=getOption("window_fill")),
            panel.background=list(col=panel_fill),
@@ -245,14 +245,14 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
               }
               else {
                 panel.dotplot(x, y, type="p", col=color, fill=fill,
-                   col.line=fill, ...)  # called from Plot 
+                   col.line=fill, ...)  # called from Plot
               }
             }
             else if (T.type == "bar")
               panel.barchart(x, y, col=fill, border=color, ...)
           }
         )
-        
+
 
   # display
 # if (is.null(pdf_file)) pdf_file <- FALSE
@@ -270,7 +270,7 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
   if (!quiet) {
 
     if (T.type == "hist"  &&  is.null(facet2)) {
-      stuff <- .ss.numeric(x, facet1, digits_d=getOption("digits_d"), 
+      stuff <- .ss.numeric(x, facet1, digits_d=getOption("digits_d"),
                            brief=TRUE, y.name=getOption("facet1name"))
       txsts <- stuff$tx
       class(txsts) <- "out"
@@ -292,7 +292,7 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
           class(txXV) <- "out"
           output <- list(out_frq=txfrq, out_chi=txXV)
           class(output) <- "out_all"
-          print(output)      
+          print(output)
       }
 
     }

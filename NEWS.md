@@ -1,3 +1,40 @@
+# lessR version 4.4.0, January 12, 2025
+
+## Major Update
+
+* `Plot()`: New parameter `ts_method` to specify the estimation method for generating a forecast. The default is `"es"` for exponential smoothing, the only available previous method. Can now also implement `"lm"` for least squares linear regression model with seasonality, which de-seasonalizes the data and then adds seasonality back to the estimated regression line.
+
+
+## Updates
+
+* `Plot()`: To generalize parameter names for multiple estimation methods, all parameters that began with `time_` and `es_` now begin with `ts_`. For example, `time_unit` is now `ts_unit`, and `es_seasons` becomes `ts_seasons`. 
+
+* `Plot()`: New parameter value `days7` for `ts_unit`. All other time units are based on the 365 or 366 day year, the interval over which seasons are assessed. Seasonality for `days` is not generally meaningful assessed over the entire year instead of days of the week. So the time unit of `days7` assesses seasonality of days over the 7-day week, such as, for example, more sales on Monday than on Sunday.
+
+* `Plot()`: New parameter `origin_y` to set the minimum value of the `y` axis, though the data will not be truncated if the value is larger than the smallest `y` value, triggering an error. This parameter compliments existing parameters `origin_x`, and also `scale_y`, which sets the minimum, maximum, and interval for scaling the `y` axis. Its value is set to 0 by default in relevant situations.
+
+* `Plot()`: New parameter `ts_NA` to specify treatment of missing values for the `y`-variable. By default, `y` missing values, those with value `NA`, do not plot, leaving a blank space. Or, specify a value such as 0 to replace the `NA` to plot that `y`-value for the corresponding date on the `x`-axis. 
+
+* `STL()`: Output data structure provided that consists of four variables: date according to the named date variable and the extracted trend, season, and error components. Example: s <- STL(Qtr, Sales) outputs to the data frame `s`.
+
+
+## Bug Fixes
+
+* `pivot()`: When computing a cross-tab table, if the first variable was a factor the analysis would crash. Now fixed.
+
+* `Plot()`: When plotting a time series, x-axis tic lengths and the margin for value labels is refined.
+
+* `Plot()`: Refined the extraction of the date variable and the `y` variable from a time series used in internal processing, such as identifying leap years to provide more generally accurate dates.
+
+* `Plot()`: When plotting a time series with multiple `y` values, the `y`-axis label now properly displays. 
+
+* `Plot()`: When plotting a stacked time series, the vertical legend now displays with the proper colors and in the same order as the display of the stacked variables. 
+
+* `Plot()`: If plotting daily data with a time unit of `"weeks"`, then dates are plotted as individual dates by days instead of months.
+
+* `Plot()`: If plotting a `y` categorical variable and an `x` continuous variable, the number of decimal digits for the displayed statistics is now based on the decimal digits inherent in the continuous variable instead of set at 1. 
+
+
 # lessR version 4.3.9, December 8, 2024
 
 ## Updates
@@ -264,6 +301,8 @@
 * `Regression()`: Parameter `mod` for moderation analysis in a two-predictor model added.
 
 * `ttest()`: Parameter `quiet` added to turn off text display at the console if set to `TRUE`.
+
+* `order_by()`: Old function name was `sort_by()`. However, Base R now has a function with that name, so to avoid confusion, the `lessR` function was renamed to `order_by()`.
 
 ## Bug Fixes
 

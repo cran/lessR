@@ -20,7 +20,7 @@ function(geom_clr, geom_clr.miss, ord.by.call, n.facet1, n.lvl, theme) {
   }
 
   if (n.lvl == 0) n.lvl <- 1  # a hack, n.lvl==0 if no levels
-  if (!geom_clr.miss  &&  n.lvl > 0)  { 
+  if (!geom_clr.miss  &&  n.lvl > 0)  {
     if (length(geom_clr) == 1)
        geom_clr <- .color_range(geom_clr, n.lvl)  # from "blues", etc.
     if (length(geom_clr) != n.lvl) {  # repeat facet1 fill for each facet2

@@ -59,10 +59,11 @@ function(colnms, horiz, color, fill, shape, box.bg, usr, lab_cex=0.8,
 
     # display legend
     # lwd needed to draw a line
-    legend(xleft, ytop, legend=colnms, horiz=FALSE, lwd=1.5, lty=line_type,
+    # rev() function lists the stacked plots in the order they are plotted
+    legend(xleft, ytop, legend=rev(colnms), horiz=FALSE, lwd=1.5, lty=line_type,
            box.lwd=.5, box.col="transparent", cex=text.cex, pt.cex=pt.size,
-           pt.bg=fill, bg=box.bg,
-           col=color, pch=shape, text.col=the.clr,
+           pt.bg=rev(fill), bg=box.bg,
+           col=rev(color), pch=shape, text.col=the.clr,
            x.intersp=1, y.intersp=1, title=legend_title) 
   }
 

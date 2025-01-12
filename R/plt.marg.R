@@ -32,7 +32,7 @@
     bm <- ((n.lab_x.ln + mx.x.val.ln) * .70 * ln.ht) + 0.30  # inches
   else
     bm <- max.x.width + (ln.ht * n.lab_x.ln) + 0.28
-  bm <- bm + (-0.065 +(.055* n.lab_x.ln))
+  bm <- bm + (-0.035 +(.055* n.lab_x.ln))
   tm <- ifelse (is.null(main), tm+.05, tm+.25)  #  adjust tm for increased bm
   if (rotate_x != 0) bm <- bm + .15
   if (lab_x_cex > 1.1) bm <- bm + .04  # actually should be axis_cex

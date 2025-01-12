@@ -1,10 +1,10 @@
 Read <-
-function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL, 
+function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
 
          missing="", n_mcut=1,
          miss_show=30, miss_zero=FALSE, miss_matrix=FALSE,
 
-         max_lines=30, sheet=1, row_names=NULL, 
+         max_lines=30, sheet=1, row_names=NULL,
 
          brief=TRUE, quiet=getOption("quiet"),
 
@@ -24,7 +24,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
       }
     }
   }
-  
+
   if (is.null(fun_call)) fun_call <- match.call()
 
   if (!is.null(from))
@@ -75,7 +75,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
   # save only data file for knitr run
   # reading from "Employee_lbl" does not require var_labels
   if (!var_labels && !grepl("_lbl", from, fixed=TRUE))
-    options(read.call=fncl) 
+    options(read.call=fncl)
 
   if (miss.format) {
          if (!is.null(widths)) format <- "fwd"
@@ -191,7 +191,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
       if (!var_labels) {
         if (missing(row_names)) {
           row.names <- NULL
-          if (!tab) 
+          if (!tab)
             d <- read.csv(file=from, na.strings=missing, ...)
           else
             d <- read.csv(file=from, na.strings=missing, sep="\t", ...)
@@ -222,7 +222,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
     if (format=="feather")
       d <- arrow::read_feather(file=from, ...)
 
-    else if (format=="parquet") 
+    else if (format=="parquet")
       d <- arrow::read_parquet(file=from, ...)
   }
 
@@ -233,7 +233,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
       if (missing(row_names))
         row_names <- FALSE
       else {
-        if (row_names == 1) row_names <- TRUE 
+        if (row_names == 1) row_names <- TRUE
       }
       if (row_names)
         d <- readODS::read_ods(from, sheet=sheet, row_names=TRUE, ...)
@@ -260,7 +260,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
 
     if (!var_labels) {
       row.names <- ifelse (missing(row_names), FALSE, TRUE)
-      d <- openxlsx::read.xlsx(from, sheet=sheet, detectDates=TRUE, 
+      d <- openxlsx::read.xlsx(from, sheet=sheet, detectDates=TRUE,
               rowNames=row.names, ...)
     }
 
@@ -402,7 +402,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
       }  # cc cannot be missing
       if (substr(cc,1,1) == ".") {  # remove any beginning .
          while(substr(cc,1,1) == ".") cc <- substr(cc, 2, nchar(cc))
-         if (!quiet) 
+         if (!quiet)
            cat("\nRemoved leading dots of variable name:", names(d)[i], "\n")
       }
     }

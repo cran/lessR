@@ -9,14 +9,14 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.3.9                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.4.0                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
       "  d is default data frame, data= in analysis routines optional\n",
       "\n",
       "Many examples of reading, writing, and manipulating data, \n",
       "graphics, testing means and proportions, regression, factor analysis,\n",
-      "customization, and descriptive statistics from pivot tables\n",
+      "customization, forecasting, and aggregation from pivot tables\n",
       "  Enter: browseVignettes(\"lessR\")\n\n",
       "View lessR updates, now including time series forecasting\n",
       "  Enter: news(package=\"lessR\")\n\n",
@@ -332,7 +332,7 @@ function(...) {
   txt[3] <- "           \"18-08-24\"   format is \"%d-%m-%y\"\n"
   txt[4] <- "           \"August 18, 2024\" format is \"%B %d, %Y\"\n\n"
 
-  dc <- strsplit(char, punct)  # Extract dc, date components 
+  dc <- strsplit(char, punct)  # Extract dc, date components
   c1 <- as.numeric(sapply(dc, function(x) x[1]))
   c2 <- as.numeric(sapply(dc, function(x) x[2]))
   c3 <- as.numeric(sapply(dc, function(x) x[3]))
@@ -370,7 +370,7 @@ function(...) {
     if (!inherits(dates, "try-error") && all(!is.na(dates))) {  # no errors
         message("\nBest guess for the date format: ", fmt, "\n")
         message("If this format is wrong, specify with",
-            " parameter: time_format", txt, "\n")
+            " parameter: ts_format", txt, "\n")
         return(dates)  # Return converted dates
     }
   }  # all chars numeric
@@ -385,7 +385,7 @@ function(...) {
   # only way to get here is if date did not work
   message("\n"); stop(call.=FALSE, "\n------\n",
     "The date format could not be properly inferred.\n\n",
-    "Specify the date format with:  time_format", txt, "\n")
+    "Specify the date format with:  ts_format", txt, "\n")
 }
 
 
@@ -827,18 +827,16 @@ function(...) {
     if (new.ln) txt1 <- paste(txt1, "\n", sep="")
   }
   else {
-    txt2 <- paste(y.name, sep="")
+    txt2 <- y.name
     if (!is.null(y.lbl)) txt2 <- paste(txt2, ": ", y.lbl, sep="")
   }
 
-  tx <- character(length = 0)
-
+  tx <- character(length=0)
   tx[length(tx)+1] <- txt1
   if (!isnullby) {
     tx[length(tx)+1] <- "\n  - by levels of - \n"
     tx[length(tx)] <- paste(tx[length(tx)], txt2, sep="")  # no leading blank
   }
-
   return(tx)
 
 }
@@ -1114,30 +1112,47 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
     if (!y.only) {  # do x axis in calling routine for time series
-      axis(1, at=axT1, labels=FALSE, tck=-.01, col=ax$axis_x_color,
-        lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
       dec.d <- .getdigits(round(axT1,6),1) - 1
       axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
     if (all(axT %% 1000 == 0)  &&  all(abs(axT)[abs(axT)>0] > 1000))
       lbl <- paste0(axT %/% 1000, "K")
     else
       lbl <- .fmt(axT,dec.d)
-      text(x=axT, y=usr[3], labels=lbl,
+    if (rotate_x==0) {  # mgp[2] for tic marks and value label separation active
+      axis(1, at=axT, labels=lbl,
+           col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
+           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
+    }
+    else {
+      # text() for labels to achieve rotation with srt and offset
+      # so par$mgp[2] does not work, instead adjust text(... y= ...)
+      axis(1, at=axT, labels=FALSE,
+           col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
+           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
+      text(x=axT, y=usr[3]- par("cxy")[2]/4.5, labels=lbl,
+           pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
+           srt=rotate_x, offset=offset, font=fnt, ...)
+      }  # end axis(), text()
+    }
+  }
+
+  else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
+    if (rotate_x==0) {  # mgp[2] for tic marks and value label separation active
+      axis(1, at=axT1, labels=x.lvl,
+           col=ax$axis_x_color, col.axis=ax$axis_x_color,
+           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
+    }
+    else {
+      axis(1, at=axT1, labels=FALSE, col=ax$axis_x_color,
+          lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
+      text(x=axT1, y=usr[3]- par("cxy")[2]/4.5, labels=x.lvl,
            pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
            srt=rotate_x, offset=offset, font=fnt, ...)
     }
   }
 
-  else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
-    axis(1, at=axT1, labels=FALSE, tck=-.01, col=ax$axis_x_color,
-        lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
-    text(x=axT1, y=usr[3], labels=x.lvl,
-         pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
-         srt=rotate_x, offset=offset, font=fnt, ...)
-  }
-
   if (is.null(y.lvl)  &&  !is.null(axT2)) {
-    axis(2, at=axT2, labels=FALSE, tck=-.01, col=ax$axis_y_color,
+    axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
         lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
     dec.d <- .getdigits(round(axT2,6),1) - 1
     axT <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
@@ -1151,7 +1166,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
   }
 
   else if (!is.null(y.lvl)) {
-    axis(2, at=axT2, labels=FALSE, tck=-.01, col=ax$axis_y_color,
+    axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
         lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
     text(x=usr[1], y=axT2, labels=y.lvl,
          pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
@@ -1204,6 +1219,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
   if (!is.null(sub.lab))
     title(sub=sub.lab, line=lblx.lns+1-xlab_adj, cex.sub=0.75,
           col.lab=lab_x_color, ...)
+# title(ylab=y.lab, line=lbly.lns-ylab_adj-.8,
   title(ylab=y.lab, line=lbly.lns-ylab_adj+.1,
         col.lab=lab_y_color, cex.lab=lab_y_cex)
   if (!is.null(main.lab))
