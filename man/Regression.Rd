@@ -17,7 +17,7 @@ Output is generated into distinct segments by topic, organized and displayed in 
 
 \usage{
 Regression(my_formula, data=d, filter=NULL,
-         digits_d=NULL, n_cat=getOption("n_cat"),
+         digits_d=NULL,
 
          Rmd=NULL, Rmd_browser=TRUE, 
          Rmd_format=c("html", "word", "pdf", "odt", "none"),
@@ -42,8 +42,12 @@ Regression(my_formula, data=d, filter=NULL,
          new_scale=c("none", "z", "center", "0to1", "robust"),
          scale_response=FALSE,
 
-         quiet=getOption("quiet"),
-         graphics=TRUE, pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
+         quiet=getOption("quiet"), bubble_plot=NULL,
+         graphics=TRUE, size=NULL, pdf=FALSE, width=6.5, height=6.5,
+         refs=FALSE,
+
+         n_cat=getOption("n_cat"),
+
          fun_call=NULL, \dots)
 
 reg(\dots)
@@ -64,14 +68,7 @@ reg_brief(\dots, brief=TRUE)
        to analyze.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal digits,
         set by default to at least 2 or the largest number of digits in the values
-        of the response variable plus 1.} 
-  \item{n_cat}{Number of categories, specifies the largest number of
-        unique, equally spaced integer values of a variable for which
-        the variable will be analyzed as categorical instead of continuous.
-        Default is 0. Use to specify that such variables are to be analyzed
-        as categorical, a kind of informal R factor.
-        \emph{[deprecate]}: Best to convert a categorical integer variable
-         to a factor.}\cr
+        of the response variable plus 1.}\cr 
 
   \item{Rmd}{File name for the automatically generated R Markdown file, if specified.
         The file type is .Rmd, a simple text file that can be edited with
@@ -129,8 +126,8 @@ reg_brief(\dots, brief=TRUE)
   \item{n_pred_rows}{Default is 3, which lists prediction intervals only for the
        first, middle and last 3 rows of data, unless there are 25 or less
        rows of data when all rows are displayed.  To disable prediction intervals,
-       specify a value of 0.  To see the output for rows of data, specify a value of
-       \code{"all"}.}
+       specify a value of 0.  To see the output for all rows of data,
+       specify a value of \code{"all"}.}
   \item{pred_sort}{Default is \code{"predint"}, which sorts the rows of data
         and associated intervals by the lower bound of each prediction interval.
         Turn off this sort by specifying a value of \code{"off"}.}
@@ -191,11 +188,23 @@ reg_brief(\dots, brief=TRUE)
   \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{knitr}
        can be useful to set to \code{FALSE} so that \code{\link{regPlot}}
        can be used to place the graphics within the output file.}
+  \item{size}{Size of plotted points.}
   \item{pdf}{If \code{TRUE}, then graphics are written to pdf files.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}
+  \item{bubble_plot}{For a single predictor variable, by default, plot
+       as bubbles only when the single predictive variable and the
+       target variable have less than or equal to 12 unique values. Otherwise,
+       set \code{TRUE} or \code{FALSE}.}
   \item{refs}{If \code{TRUE}, then list the references for R and the packages
         used from which functions were used to generate the output.}
+  \item{n_cat}{Number of categories, specifies the largest number of
+        unique, equally spaced integer values of a variable for which
+        the variable will be analyzed as categorical instead of continuous.
+        Default is 0. Use to specify that such variables are to be analyzed
+        as categorical, a kind of informal R factor.
+        \bold{[deprecated]}: Best to convert a categorical integer variable
+         to a factor.}
   \item{fun_call}{Function call. Used internally with \code{knitr} to pass the
         function call when obtained from the abbreviated function call \code{reg}.
         Not usually invoked by the user.}

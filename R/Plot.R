@@ -8,8 +8,8 @@ function(x, y=NULL, data=d, filter=NULL,
     fill=NULL, color=NULL,
     transparency=getOption("trans_pt_fill"),
 
-    enhance=FALSE,
-    size=NULL, size_cut=NULL, shape="circle", lwd=1.5, means=TRUE,
+    enhance=FALSE, means=TRUE,
+    size=NULL, size_cut=NULL, shape="circle", line_width=1.5,
     segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
     sort_yx=c("0", "-", "+"),
@@ -20,14 +20,13 @@ function(x, y=NULL, data=d, filter=NULL,
 
     fit=c("off","loess", "lm", "ls", "null", "exp", "quad",
           "power", "log"),
-    fit_power=1, fit_se=0.95,
-    fit_color=getOption("fit_color"),
-    plot_errors=FALSE, ellipse=0,
+    fit_power=1, fit_se=0.95, fit_color=getOption("fit_color"),
+    fit_new=NULL, plot_errors=FALSE, ellipse=0,
 
     ts_unit=NULL, ts_agg=c("sum", "mean"), ts_NA=NULL,
     ts_ahead=0, ts_method=c("es", "lm"), ts_format=NULL,
     ts_fitted=FALSE, ts_level=NULL, ts_trend=NULL, ts_seasons=NULL,
-    ts_type=c("additive", "multiplicative"), ts_PIlevel=0.95,
+    ts_type=c("additive", "multiplicative"), ts_PI=0.95,
     stack=FALSE, area_fill="transparent", area_split=0, n_date_tics=NULL,
     show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
 
@@ -116,6 +115,9 @@ function(x, y=NULL, data=d, filter=NULL,
 
   fit.ln <- ifelse (!missing(fit), match.arg(fit), "off")
 
+  if (!is.null(fit_new))
+    fit_new <- sort(fit_new)  # ensure ascending order of fit_new
+
   # a dot in a parameter name to an underscore and more
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
@@ -128,14 +130,28 @@ function(x, y=NULL, data=d, filter=NULL,
         cat("\n"); stop(call.=FALSE, "\n------\n",
           "Parameters that begin with \"es_\" now begin with \"ts_\"\n\n")
       }
+      if (names(dots)[i] == "lty") {
+        line_type <- dots[[i]]
+        cat("\n"); stop(call.=FALSE, "\n------\n",
+          "Parameter  lty  renamed to  line_type\n\n")  # lty still valid R
+      }
+      if (names(dots)[i] == "lwd") {
+        line_width <- dots[[i]]
+        cat("\n"); stop(call.=FALSE, "\n------\n",
+          "Parameter  lwd  renamed to  line_width\n\n")  # lwd still valid R
+      }
+      if (names(dots)[i] == "ts_PIlevel") {
+        ts_PI <- dots[[i]]
+        message("\nParameter  ts_PIlevel  is now named  ts_PI\n")
+      }
       if (names(dots)[i] == "type") ts_type <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
       if (names(dots)[i] == "area_origin") area_split <- dots[[i]]
       if (names(dots)[i] == "run") {
-      cat("\n"); stop(call.=FALSE, "\n------\n",
-        "Parameter  run  dropped. Now, specify the first variable, the\n",
-        "  x-variable, as .Index to automatically create the index variable.\n",
-        "  e.g., Plot(.Index, Y), where Y is the variable to plot\n\n")
+        cat("\n"); stop(call.=FALSE, "\n------\n",
+          "Parameter  run  dropped. Now, specify the first variable, the\n",
+          "  x-variable, as .Index automatically creates the index variable.\n",
+          "  e.g., Plot(.Index, Y), where Y is the variable to plot\n\n")
       }
       if (grepl(".", names(dots)[i], fixed=TRUE)) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
@@ -146,6 +162,7 @@ function(x, y=NULL, data=d, filter=NULL,
   }
 
   # ------------ Old Stuff ----------------------------------
+  # replace by1 with facet1, needed because the value is a variable
   facet1 <- .newparam(missing(by1), substitute(by1), "by1",
                       missing(facet1), substitute(facet1), "facet1")
   if (!is.null(facet1)) data[[as.character(facet1)]]  # extract facet1 from data
@@ -763,6 +780,12 @@ function(x, y=NULL, data=d, filter=NULL,
       "Fit line only applicable if only one x variable, if y is present\n\n")
   }
 
+  if (!is.null(facet1) && cat.x && cat.y) {
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Parameters  facet1  and  facet2  do not work with bubble plots,\n",
+      "  that is, with non-numeric categorical variables for  x  and  y.\n\n")
+  }
+
 
   # ---------------------------------------
   # ---------------------------------------
@@ -1051,12 +1074,14 @@ function(x, y=NULL, data=d, filter=NULL,
   # ------------------------------------------------
   # set object and values where needed
 
-  # prep 1-variable bubble plot to call regular scatter plot function
+  # prep 1-variable bubble plot
   # y.call to 0
   if (is.null(y.call)  &&  cat.x  &&  n.x_var == 1  &&  data.do) {
     y.call <- data.frame(rep(0, nrow(x.call)), stringsAsFactors=TRUE)
     cat.y <- FALSE
     if (object == "default") object <- "bubble"
+    if (is.null(low_fill)) low_fill <- "gray20"
+    if (is.null(hi_fill)) hi_fill <- "gray20"
   }
 
   # if numeric x is sorted with equal intervals, set as line chart
@@ -1275,7 +1300,7 @@ function(x, y=NULL, data=d, filter=NULL,
           message(">>> Warning\n",
             "The  Date  variable is not sorted in Increasing Order.\n\n",
             "For a data frame named d, enter: \n    ",
-             paste("d <- sort_by(d, ", x.name, ")", sep=""), "\n",
+             paste("d <- order_by(d, ", x.name, ")", sep=""), "\n",
             "Maybe you have a  by  variable with repeating Date values?\n",
           "Enter  ?sort_by  for more information and examples.\n\n")
         }
@@ -1296,9 +1321,6 @@ function(x, y=NULL, data=d, filter=NULL,
   # bubble size
   if (radius.miss)
     radius <- ifelse (length(size) > 1, .12, .22)
-
-  # size of lines for line chart
-    size.ln <- lwd  # size of lines
 
   # size of fit line
   # windows line too thin at 1, but no increments allowed, and 2 is too thick
@@ -1348,7 +1370,6 @@ function(x, y=NULL, data=d, filter=NULL,
   # ------------
 
   if (Trellis && do_plot) {
-
     if (T.type %in% c("cont", "cont_cont", "cont_cat")) {
 
       # VBS plot
@@ -1444,7 +1465,7 @@ function(x, y=NULL, data=d, filter=NULL,
         # j.y.miss NOT USED
         # if (df.name == "NULL"  &&  jitter_y == 0.01) j.y.miss <- TRUE
 
-        # get some VBS parameters
+        # get some VBS parameters, including: pt.size, jitter, bw
         # ss.numeric called there
         if (df.name == "NULL"  &&  out_size == 1) out_size.miss <- TRUE
         VBS <- .param.VBS(x.call[,1], ID.call, facet1.call, facet1.miss,
@@ -1485,7 +1506,7 @@ function(x, y=NULL, data=d, filter=NULL,
       .plt.lattice(x.call[,1], y.call[,1], facet1.call, facet2.call, by.call,
                    adj.bx.ht, object, n_row, n_col, aspect,
                    pt.fill, area_fill, pt.color, panel_fill, panel_color,
-                   pt.trans, pt.size, size.ln,
+                   pt.trans, pt.size, line_width,
                    xlab, ylab, main, shape, lab_cex, axis_cex,
                    max(ellipse), ellipse_color, ellipse_lwd,
                    fit.ln, fit_power, fit_color, fit_lwd, fit_se,
@@ -1517,7 +1538,8 @@ function(x, y=NULL, data=d, filter=NULL,
   # -----------------------------------
   # bubble plot frequency matrix (BPFM)
 
-  else if (ncol(data.x) > 1  &&  y.miss  &&  object == "bubble") {
+  else if (y.miss  &&  object == "bubble") {  # no y variable
+
     # get labels just for subset data matrix
     l <- attr(data, which="variable.labels")
     nm <- names(data.x)
@@ -1536,7 +1558,7 @@ function(x, y=NULL, data=d, filter=NULL,
 
     if (is.null(xlab)) xlab <- ""  # suppress x-axis label if not specified
 
-    .dpmat.main(data[,x.col], mylabs, sort_yx,
+    .dpmat.main(data[,x.col, drop=FALSE], mylabs, sort_yx,
       getOption("bar_fill_cont"), pt.color, panel_fill,
       pt.trans, shape, panel_color,
       low_fill, hi_fill,
@@ -1797,7 +1819,7 @@ function(x, y=NULL, data=d, filter=NULL,
         }
         f.out <- .plt.forecast(x.call, y.call, by.call,
           ts_unit, ts_ahead, ts_method, ts_fitted, n_date_tics,
-          ts_level, ts_trend, ts_seasons, ts_type, ts_PIlevel,
+          ts_level, ts_trend, ts_seasons, ts_type, ts_PI,
           digits_d)
         y.fit <- f.out$y.fit;  y.hat <- f.out$y.hat
         x.fit <- f.out$x.fit;  x.hat <- f.out$x.hat
@@ -1819,7 +1841,7 @@ function(x, y=NULL, data=d, filter=NULL,
         out_y.frcst <- NULL
         out_fitted <- NULL; out_err <- NULL
         out_coefs <- NULL; out_smooth <- NULL
-        y.all <- unlist(y.call)
+        y.all <- unlist(y.call)  # convert data frame to a vector
       }
 
       # see if set origin of y-axes to 0
@@ -1849,7 +1871,36 @@ function(x, y=NULL, data=d, filter=NULL,
         }
       }
 
-      j_y <- NULL;  j_x <- NULL
+      # see if set origin of x-axes to 0
+      x.all <- unlist(x.call)
+      min.x <- NULL
+      numr <- all(is.numeric(x.all))
+      if (numr) {
+        if (all(x.all < 0)) x.all <- -x.all  # account for - values
+        if (is.null(origin_x)) {  # get min, max of entire numeric x.call
+          min.x <- min(x.all, na.rm=TRUE)
+          max.x <- max(x.all, na.rm=TRUE)
+          remove(x.all)
+
+          if (!date.var) {
+            if (min.x > 0) {  # all + or all - which were converted to +
+              rng <- max.x - min.x
+              prp <- rng / min.x
+              if (prp > 2.30) origin_x <- 0  # 2.30 cutoff is a heuristic
+            }
+          }
+        }  # end is.null(origin_x)
+      }  # end numr
+
+      if (!is.null(origin_x)  &&  !is.null(min.x)) {
+        if (origin_x > min.x) {
+          cat("\n"); stop(call.=FALSE, "\n------\n",
+            "Minimum value of x: ", min.x, "\n",
+            "Value you set for origin_x:", origin_x, "\n",
+            "origin_x cannot be larger than the minimum x data value.\n\n")
+        }
+      }
+
       if (do_plot) {
         # main out, mostly the visualization, sometimes some stats
         m.out <- .plt.main(x.call, y.call, by.call,
@@ -1857,13 +1908,13 @@ function(x, y=NULL, data=d, filter=NULL,
           pt.fill, area_fill, pt.color, pt.trans, segment_color,
           xy_ticks, xlab, ylab, main, main_cex, sub,
           rotate_x, rotate_y, offset, proportion, origin_x, origin_y,
-          pt.size, size.ln, shape, means,
+          pt.size, line_width, shape, means,
           segments, segments_y, segments_x,
           smooth, smooth_points, smooth_size, smooth_exp, smooth_bins,
           radius, power, size_cut, bubble_text, low_fill, hi_fill,
           ID.call, ID_color, ID_size, outlpts,
           out_fill, out_color, out_shape, out_shape.miss,
-          fit.ln, fit_power, fit_color, fit_lwd,
+          fit.ln, fit_power, fit_color, fit_lwd, fit_new,
           fit_se, se_fill, plot_errors,
           ellipse, ellipse_color, ellipse_fill, ellipse_lwd,
           run, center_line, stack,
@@ -1878,124 +1929,130 @@ function(x, y=NULL, data=d, filter=NULL,
 
         if (fit.ln != "off") {
           b0 <- m.out$b0;  b1 <- m.out$b1
-          mse <- m.out$mse;  Rsq <- m.out$Rsq
+          mse.ln <- m.out$mse.ln;  Rsq <- m.out$Rsq;  mse.nl <- m.out$mse.nl
           by.cat <- m.out$by.cat
+          y.new <- m.out$y.new
         }
         else {
-          mse <- NULL
+          mse.ln <- NULL;  mse.nl <- NULL
           by.cat <- NULL
+          y.new <- NULL
         }
+      }  # end do_plot
 
-#       if (!is.null(jitter_y)) if (jitter_y != 0) j.y <- m.out$jitter_y
-#       if (!is.null(jitter_x)) if (jitter_x != 0) j.x <- m.out$jitter_x
+      if (outp && !quiet) {  # text output
 
-    }  # end do_plot
-
-        if (outp && !quiet) {  # text output
-
-          txjit <- NULL
-#         if (xor(cat.x, cat.y) || xor(num.c.x, num.c.y)) {  # show jitter
-          if (!is.null(jitter_x) && !is.null(jitter_y)) {
-            if (jitter_x != 0  ||  jitter_y != 0) {  # show jitter
-              tx <- character(length = 0)
-              tx[length(tx)+1] <- "Some Parameter values (can be manually set)"
-              tx[length(tx)+1] <- .dash2(55)
-              tx[length(tx)+1] <- paste("size:", .fmt(pt.size,2),
-                  " size of plotted points")
-              if (!is.null(jitter_y)) if (jitter_y != 0)
-                tx[length(tx)+1] <- paste("jitter_y:", .fmt(j_y,2),
-                  " random vertical movement of points")
-              if (!is.null(jitter_x)) if (jitter_x != 0)
-                tx[length(tx)+1] <- paste("jitter_x:", .fmt(j_x,2),
-                  " random horizontal movement of points")
-              txjit <- tx
-            }
-          }
-
-          #  radius, power values in the analysis
-          txbub <- NULL
-          if (object == "bubble") {   # move to .plt.txt
+        txjit <- NULL
+        if (!is.null(jitter_x) && !is.null(jitter_y)) {
+          if (jitter_x != 0  ||  jitter_y != 0) {  # show jitter
             tx <- character(length = 0)
             tx[length(tx)+1] <- "Some Parameter values (can be manually set)"
             tx[length(tx)+1] <- .dash2(55)
-            tx[length(tx)+1] <- paste("radius:", .fmt(radius,2),
-                "   size of largest bubble")
-            tx[length(tx)+1] <- paste("power:", .fmt(power,2),
-                "    relative bubble sizes")
-            txbub <- tx
+            tx[length(tx)+1] <- paste("size:", .fmt(pt.size,2),
+                " size of plotted points")
+            if (!is.null(jitter_y)) if (jitter_y != 0)
+              tx[length(tx)+1] <- paste("jitter_y:", .fmt(jitter_y,2),
+                " random vertical movement of points")
+            if (!is.null(jitter_x)) if (jitter_x != 0)
+              tx[length(tx)+1] <- paste("jitter_x:", .fmt(jitter_x,2),
+                " random horizontal movement of points")
+            txjit <- tx
+          }
+        }
+
+        #  radius, power values in the analysis
+        txbub <- NULL
+        if (object == "bubble") {   # move to .plt.txt
+          tx <- character(length = 0)
+          tx[length(tx)+1] <- "Some Parameter values (can be manually set)"
+          tx[length(tx)+1] <- .dash2(55)
+          tx[length(tx)+1] <- paste("radius:", .fmt(radius,2),
+              "   size of largest bubble")
+          tx[length(tx)+1] <- paste("power:", .fmt(power,2),
+              "    relative bubble sizes")
+          txbub <- tx
+        }
+
+        if (n_bins == 1) {  # if binning, .plt.bins does its own output
+
+          o <- .plt.txt(x.call, y.call, stat, object, cat.x, cat.y,
+            date.var, xlab, ylab, fit.ln, n.by, mse.ln, mse.nl,
+            b0, b1, Rsq, fit_new, y.new, by.cat,
+            center_line, run, show_runs,
+            proportion, size, radius, digits_d, fun_call, txdif)
+
+          # cumulate existing output pieces from o into final output
+          output <- NULL
+
+          if (getOption("suggest"))
+            output <- list(out_suggest=o$out_suggest)
+
+          if (!is.null(outlpts)) {
+            class(outlpts) <- "out"  # MD outliers
+            output$outlpts <- outlpts
+          }
+          if (length(out_outliers) > 1)  # source is here
+            output$out_outliers <- out_outliers
+          if (length(o$out_outliers) > 1)  # source is .plt.txt
+            output$out_outliers <- o$out_outliers
+
+          if (!is.null(o$out_stats))
+            output$out_stats <- o$out_stats
+
+          if (!is.null(txstats))  # from stat option earlier in this file
+            output$out_txt <- txstats
+
+          if (!is.null(o$out_y.new)) {  # a data frame, not the usual tx
+            if (all(nzchar(o$out_y.new))) {
+              output$out_y.new <- o$out_y.new  # leave a df for print.out_all()
+            }
           }
 
-          if (n_bins == 1) {  # if binning, .plt.bins does its own output
-
-            o <- .plt.txt(x.call, y.call, stat, object, cat.x, cat.y,
-              date.var, xlab, ylab, fit.ln, n.by, mse, b0, b1, Rsq, by.cat,
-              center_line, run, show_runs,
-              proportion, size, radius, digits_d, fun_call, txdif)
-
-           # cumulate existing output pieces from o into final output
-            output <- NULL
-
-            if (getOption("suggest"))
-              output <- list(out_suggest=o$out_suggest)
-
-            if (!is.null(outlpts)) {
-              class(outlpts) <- "out"  # MD outliers
-              output$outlpts <- outlpts
-            }
-            if (length(out_outliers) > 1)  # source is here
-              output$out_outliers <- out_outliers
-            if (length(o$out_outliers) > 1)  # source is .plt.txt
-              output$out_outliers <- o$out_outliers
-
-            if (!is.null(o$out_stats))
-              output$out_stats <- o$out_stats
-
-            if (!is.null(txstats))  # from stat option earlier in this file
-              output$out_txt <- txstats
-
-            if (length(o$out_reg) == 1) {
-              if (nzchar(o$out_reg))
-                output$out_reg <- o$out_reg
-            }
-            else if (length(o$out_reg) > 1)  # by activated
+          if (length(o$out_reg) == 1) {
+            if (nzchar(o$out_reg))
               output$out_reg <- o$out_reg
+          }
+          else if (length(o$out_reg) > 1)  # by activated
+            output$out_reg <- o$out_reg
 
-            if (!is.null(o$out_XV)) if (length(o$out_XV) > 1)
-              output$out_XV <- o$out_XV
+          if (!is.null(o$out_XV)) if (length(o$out_XV) > 1)
+            output$out_XV <- o$out_XV
 
 
-            if (!is.null(txjit))
-              class(txjit) <- "out"  # jitter parameter
-              output$out_jitter <- txjit
+          if (!is.null(txjit)) {
+            class(txjit) <- "out"  # jitter parameter
+            output$out_jitter <- txjit
+          }
 
-            if (!is.null(txbub))
-              class(txbub) <- "out"  # bubble plot parameters
-              output$out_bubble <- txbub
+          if (!is.null(txbub)) {
+            class(txbub) <- "out"  # bubble plot parameters
+            output$out_bubble <- txbub
+          }
 
-            if (!is.null(out_err)) {
-              class(out_err) <- "out"
-              output$out_err <- out_err
-            }
+          if (!is.null(out_err)) {
+            class(out_err) <- "out"
+            output$out_err <- out_err
+          }
 
-            if (!is.null(out_coefs)) {
-              class(out_coefs) <- "out"
-              output$out_coefs <- out_coefs
-            }
+          if (!is.null(out_coefs)) {
+            class(out_coefs) <- "out"
+            output$out_coefs <- out_coefs
+          }
 
-            if (!is.null(out_smooth)) {
-              class(out_smooth) <- "out"
-              output$out_smooth <- out_smooth
-            }
+          if (!is.null(out_smooth)) {
+            class(out_smooth) <- "out"
+            output$out_smooth <- out_smooth
+          }
 
-            if (!is.null(output)) class(output) <- "out_all"
-          }  # end n_bins==1
-        }  #  end text output
+          if (!is.null(output)) class(output) <- "out_all"
+        }  # end n_bins==1
+      }  #  end text output
 
-      }  #  end do_plot
+    }  #  end do_plot
 
-      else {
-        output <- NULL
-      }
+    else {  # no plot
+      output <- NULL
+    }
 
   }  # end all other analyses
   # -------------------------
@@ -2007,7 +2064,7 @@ function(x, y=NULL, data=d, filter=NULL,
     if (!quiet && df.name!="NULL") .showfile(pdf_file, "Plot")
   }
 
-  # reset
+  # reset for next analysis
   options(xname=NULL)
   options(yname=NULL)
   options(facet1name=NULL)

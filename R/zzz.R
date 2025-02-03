@@ -9,9 +9,9 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.4.0                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.4.1                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
-      "> d <- Read(\"\")   Read text, Excel, SPSS, SAS, or R data file\n",
+      "> d <- Read(\"\")  Read data file, many formats available, e.g., Excel\n",
       "  d is default data frame, data= in analysis routines optional\n",
       "\n",
       "Many examples of reading, writing, and manipulating data, \n",
@@ -119,7 +119,7 @@ function(...) {
 
   #Plot(Years, Salary, bg="grey85", grid="grey77") on cheap Dell monitor
 
-  options(add_fill = "gray20")
+  options(add_fill = "#D9D9D920")
   options(add_trans = 0.0)
   options(add_color = "gray30")
   options(add_cex = 0.75)
@@ -142,7 +142,6 @@ function(...) {
   options(scipen = 30)
 
   options(mc_doScale_quiet=TRUE)  # for mc() function in robustbase
-
 }
 
 
@@ -218,18 +217,28 @@ function(...) {
 .max.dd <- function(x) {
 
   max.dd <- 0
-  n.reps <- min(250, length(x))
+  n.reps <- min(200, length(x))
   for (i in 1:n.reps) {  # length(x) is number of data values
     if (!is.na(x[i])) {
       xc <- format(x[i])  # as.character(51.45-48.98) does not work
-      ipos <- 0
+      ipos <- 0  # position of decimal point
       for (i in 1:nchar(xc)) if (substr(xc,i,i)==".") ipos <- i
-      n.dec <- ifelse (ipos > 0, nchar(xc)-ipos, 0)
+      n.dec <- ifelse (ipos > 0, nchar(xc)-ipos, 0)  # n chars to right of .
       if (n.dec > max.dd) max.dd <- n.dec
     }
   }
 
   return(max.dd)
+}
+
+
+# get number of decimal digits of a scalar, trailing and leading 0's deleted
+# called by bc.main()
+.num.dec <- function(x) {
+ if (abs(x - round(x)) > .Machine$double.eps^0.5)
+   nchar(strsplit(as.character(x), ".", fixed=TRUE)[[1]][[2]])
+ else
+   return(0)
 }
 
 
@@ -240,45 +249,68 @@ function(...) {
   return(digits_d)
 }
 
-# get number of decimal digits, trailing and leading 0's deleted
-# x a scalar
-# called by bc.main(), others???
-.num.dec <- function(x) {
- if (abs(x - round(x)) > .Machine$double.eps^0.5)
-   nchar(strsplit(as.character(x), ".", fixed=TRUE)[[1]][[2]])
- else
-   return(0)
-}
-
-# round with specified number of digits present
+# round to specified number of digits, include trailing zeros
 .fmt <- function(k, d=getOption("digits_d"), w=0, j="right") {
   format(sprintf("%.*f", d, k), width=w, justify=j, scientific=FALSE)
 }
 
-# display large number with separating commas
-.fmt_cm <- function(k, d=getOption("digits_d")) {
-  formatC(k, big.mark=",", format="f", digits=d)
+
+# prettyNum(): display large number with separating commas, rounding to d
+# digits: Total number of significant digits, affects rounding for large numbers
+# nsmall: From format(), ensures at least this many decimal places in the output
+.fmt_pn <- function(k, d=getOption("digits_d")) {
+  prettyNum(k, big.mark=",", nsmall=d, format="f", scientific=FALSE)
 }
 
 
+# format(): display large number with separating commas, rounding to d
+# provides consistent formatting for a vector of numbers
+.fmt_cm <- function(k, d=getOption("digits_d")) {
+  format(round(k, d+1), big.mark=",", nsmall=d, scientific=FALSE)
+}
+
+
+# truncate 1st character of number, rounding to d
 .fmt0 <- function(k, d=getOption("digits_d"), w=0) {
   a <- format(sprintf("%.*f", d, k), width=w, justify="right", scientific=FALSE)
   a <- substr(a,2,nchar(a))
+  return(a)  # needed to return a without assigning, such as xx = .fmt0(x,3)
 }
 
 
+# right-adjust an integer, padded on the left with spaces according to w`
 .fmti <- function(k, w=0) {
   format(sprintf("%i", k), width=w, justify="right")
 }
 
 
+# right-adjust a real number, padded on the left with spaces according to w`
 .fmtc <- function(k, w=0, j="right") {
   format(sprintf("%s", k), width=w, justify=j)
 }
 
 
+# convert a scientific notation number to decimal number
 .fmtNS <- function(k) {
   format(k, scientific=FALSE)
+}
+
+
+# Format axis labels using "K" notation
+.roundK <- function(axT) {
+  axT <- na.omit(axT)  # Remove NA values
+
+  if (all(axT %% 1000 == 0) && all(abs(axT)[abs(axT) > 0] > 1000)) {
+    lbls <- paste0(axT %/% 1000, "K")  # Convert to K format, int division op
+  } 
+  else {
+#   dec.d <- .getdigits(round(axT,6),1) - 1
+#   lbls <- .fmt(axT, dec.d)
+    # nsmall=0: no additional added decimal places if not already present
+     lbls <- format(axT, nsmall=0, big.mark=",")  # Default formatting
+  }
+
+  return(lbls)
 }
 
 
@@ -320,7 +352,6 @@ function(...) {
     isdate <- ifelse(grepl("POSIX",  class(x), fixed=TRUE)[1], TRUE, FALSE)
 
   return(isdate)
-
 }
 
 
@@ -423,7 +454,6 @@ function(...) {
 
 
 .is.integer <- function(x, tol= .Machine$double.eps^0.5) {
-  #if (is.integer(type.convert(as.character(d[1:rows,i]))))
 
   if (is.numeric(x)) {
     x <- na.omit(x)
@@ -435,6 +465,7 @@ function(...) {
 
   return(result.flg)
 }
+
 
 # function to process filter param values, especially categorical
 .filter <- function(txt) {
@@ -1112,12 +1143,8 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
   if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
     if (!y.only) {  # do x axis in calling routine for time series
-      dec.d <- .getdigits(round(axT1,6),1) - 1
       axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
-    if (all(axT %% 1000 == 0)  &&  all(abs(axT)[abs(axT)>0] > 1000))
-      lbl <- paste0(axT %/% 1000, "K")
-    else
-      lbl <- .fmt(axT,dec.d)
+    lbl <- .roundK(axT)  # if applicable, round x-axis values to "K"
     if (rotate_x==0) {  # mgp[2] for tic marks and value label separation active
       axis(1, at=axT, labels=lbl,
            col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
@@ -1154,12 +1181,8 @@ function(lab, labcex, cut, nm, var.nm, units) {
   if (is.null(y.lvl)  &&  !is.null(axT2)) {
     axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
         lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
-    dec.d <- .getdigits(round(axT2,6),1) - 1
     axT <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
-    if (all(axT %% 1000 == 0)  &&  all(abs(axT)[abs(axT)>0] > 1000))
-      lbl <- paste0(axT %/% 1000, "K")
-    else
-      lbl <- .fmt(axT,dec.d)
+    lbl <- .roundK(axT)  # if applicable, round x-axis values to "K"
     text(x=usr[1], y=axT, labels=lbl,
          pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
          srt=rotate_y, font=fnt, ...)

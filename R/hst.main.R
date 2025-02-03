@@ -1,4 +1,4 @@
-.hst.main <- 
+.hst.main <-
 function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
        rotate_x=NULL, rotate_y=NULL, offset=NULL,
        breaks, bin_start, bin_width, bin_end,
@@ -29,7 +29,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
   adj <- .RSadj(lab_cex=lab_y_cex); lab_y_cex <- adj$lab_cex
 
 
-  gl <- .getlabels(xlab, ylab, main, lab_x_cex=lab_x_cex, 
+  gl <- .getlabels(xlab, ylab, main, lab_x_cex=lab_x_cex,
                    lab_y_cex=lab_y_cex)
   x.name <- gl$xn; x.lbl <- gl$xl
   x.lab <- gl$xb
@@ -37,15 +37,15 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
   main.lab <- gl$mb
   sub.lab <- gl$sb
 
-  num.cat.x <- .is.num.cat(x, n_cat=getOption("n_cat"))
+  num.cat.x <- .is.num.cat(x, 7)
   if (num.cat.x) {
     if (is.null(bin_width)) bin_width <- 1
-    if (is.null(bin_start)) bin_start <- min(x, na.rm=TRUE) - .5 
-  } 
+    if (is.null(bin_start)) bin_start <- min(x, na.rm=TRUE) - .5
+  }
 
   # get breaks from user supplied bin width and/or supplied start value
   if (!is.null(bin_width)  || !is.null(bin_start) || !is.null(bin_end)) {
-    if (is.null(bin_start)) 
+    if (is.null(bin_start))
       bin_start <- pretty(c(min(x, na.rm = TRUE), max(x, na.rm = TRUE)))[1]
     if (is.null(bin_width)) {
       h <- suppressWarnings(hist(x, plot=FALSE, breaks="Sturges"))
@@ -53,7 +53,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     }
     max.x <- max(x, na.rm=TRUE)
     if (is.null(bin_end)) bin_end <- max.x
-    if (bin_end < bin_start) { 
+    if (bin_end < bin_start) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "bin_start: ", bin_start, "\n",
         "bin_end: ", bin_end, "\n",
@@ -66,8 +66,8 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
       breaks <- seq(bin_start, seq.end, bin_width)
     }
   }
-  
-  # for user supplied bins, from seq function or bin_start, 
+
+  # for user supplied bins, from seq function or bin_start,
   #   make sure entire data range is spanned
   if (is.numeric(breaks)) {
     cc <- cut(x, breaks, dig.lab=6, ...)   # replace each data value with its bin
@@ -81,12 +81,12 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     if (n.under+n.over > 0) {
       txt.u <- "";  txt.o <- "";  txt.nu <- "";  txt.no <- ""
       if (length(breaks) > 3)
-        txt.c <- paste("Specified bin cut-points: ", bin_min, breaks[2], "...", 
+        txt.c <- paste("Specified bin cut-points: ", bin_min, breaks[2], "...",
           breaks[length(breaks)-1], bin_max, "\n\n")
       else
         txt.c <- paste("Range of the specified bins: ", bin_min,
           " to ", bin_max, "\n", sep="")
-      if (n.under > 0) 
+      if (n.under > 0)
         txt.u <- paste("Data values too small to fit in the bins: ",
           x[which(x<bin_min)], "\n\n")
       if (n.over > 0)
@@ -117,18 +117,18 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 
   # relative frequency histogram option
   if (prop) h$counts <- h$counts/length(x)
-    
+
   # cumulative histogram option
   if (cumulate != "off") {
     old.counts <- h$counts
     h$counts <- cumsum(h$counts)
   }
-  
+
   if (do_plot) {
 
     # set margins
     max.width <- strwidth(as.character(max(pretty(h$counts))), units="inches")
-    
+
     margs <- .plt.marg(max.width, y.lab, x.lab, main.lab, sub.lab, rotate_x)
     lm <- margs$lm
     tm <- margs$tm
@@ -147,14 +147,14 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     lm <- lm + lm.adj
     tm <- tm + tm.adj
     rm <- rm + rm.adj
-   
+
     orig.params <- par(no.readonly=TRUE)
-    on.exit(par(orig.params))  
-    
+    on.exit(par(orig.params))
+
     par(bg=getOption("window_fill"))
     par(mai=c(bm, lm, tm, rm))
 
-    # set up plot 
+    # set up plot
     plot(h, freq=TRUE, axes=FALSE, ann=FALSE, ...)
 
     # plot background
@@ -172,25 +172,36 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     axT2 <- seq(vy[1], vy[length(vy)], vy[2]-vy[1])
     .plt.bck(par("usr"), NULL, axT2, do.v=FALSE)
 
+    # adjust axis label from tick with mgp[2]
+    # mgp does not work with rotate_x, see .axes()
+    my.mgp <- par("mgp")  # save to restore
+    ax <- .axes_dim()  # get axis value parameters
+    mgp2 <- -0.350 + (0.9 * ax$axis_x_cex)
+    par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
+    adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
+
     # axis, axis ticks
+    par(tcl=-0.28)  # axis tick length
     .axes(x.lvl=NULL, y.lvl=NULL,
           axTicks(1, axp=scale_x), axTicks(2, axp=scale_y),
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
 
+#   par(mgp = my.mgp)  # restore back to previous value
+
     # axis labels
-    .axlabs(x.lab, y.lab, main.lab, sub.lab, 
-            xy_ticks=TRUE, offset=offset, 
+    .axlabs(x.lab, y.lab, main.lab, sub.lab,
+            xy_ticks=TRUE, offset=offset,
             lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex=NULL,
             n.lab_x.ln=n.lab_x.ln, n.lab_y.ln=n.lab_y.ln,
-            xlab_adj=xlab_adj, ylab_adj=ylab_adj, ...) 
+            xlab_adj=xlab_adj, ylab_adj=ylab_adj, ...)
 
     # see if apply a pre-defined color range
     n.bins <- length(h$counts)
     clr <- NULL
     clr <- .color_range(fill, n.bins)
-      
+
     # not a color range such as "hues" or "blues", so assign clr here
-    if (is.null(clr)) 
+    if (is.null(clr))
         clr <- fill  # user provided the colors
 
     # bar transparency
@@ -217,10 +228,10 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
       add_trans <- getOption("add_trans")
 
       .plt.add (add, x1, x2, y1, y2,
-                add_cex, add_lwd, add_lty, add_color, add_fill, add_trans) 
+                add_cex, add_lwd, add_lty, add_color, add_fill, add_trans)
     }
   }  # end do plot
- 
+
 
 #------------
 # text output

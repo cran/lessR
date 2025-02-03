@@ -1,10 +1,11 @@
 .reg5Plot <-
 function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
-         scatter_coef=FALSE, X1_new=NULL, 
+         scatter_coef=FALSE, X1_new=NULL,
          in.data.frame, c.int, p.int, plot_errors=FALSE,
-         digits_d, n_cat, pdf=FALSE, width=5, height=5, manage.gr=FALSE,
-         quiet, ...) {
-         
+         digits_d, size=NULL, pdf=FALSE, width=5, height=5,
+         bubble_plot=NULL, manage.gr=FALSE, quiet, ...) {
+
+
   nm <- all.vars(lm.out$terms)  # names of vars in the model
   n.vars <- length(nm)
   n.pred <- n.vars - 1L
@@ -12,12 +13,14 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
   n.keep <- nrow(lm.out$model)
   b0 <- lm.out$coefficients[1]
   b1 <- lm.out$coefficients[2]
+
   if (is.null(n_pred_rows))
     n_pred_rows <- ifelse (n.keep < 25, n.keep, 4)
   if (n_pred_rows == "all") n_pred_rows <- n.keep  # no preds with n_pred_rows=0
 
+
   # pdf graphics option
-  if (pdf) { 
+  if (pdf) {
     pdf_file <- "RegScatterplot.pdf"
     if (n.pred > 1) pdf_file <- "RegScatterMatrix.pdf"
     pdf(file=pdf_file, width=width, height=height)
@@ -26,7 +29,7 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
   plt.i <- 0L
   plt.title  <- character(length=0)
 
-  do.sp <- ifelse (n.pred < 2, TRUE, FALSE) 
+  do.sp <- ifelse (n.pred < 2, TRUE, FALSE)
 
 
   # ----------------------------------------------------
@@ -39,15 +42,15 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
     else if (n.pred == 0) {  # null model
       x.values <- 1:n.obs
       nm[2] <- "Index"
-      x.lab <- nm[2] 
+      x.lab <- nm[2]
     }
     y.values <- lm.out$model[,nm[1]]
 
     do.predint <-
-      ifelse (n_pred_rows==0 || !is.null(X1_new) || is.null(p.int), FALSE, TRUE) 
+      ifelse (n_pred_rows==0 || !is.null(X1_new) || is.null(p.int), FALSE, TRUE)
     if (n.pred > 0)
       if (is.factor(lm.out$model[,nm[2]])) do.predint <- FALSE
- 
+
     # title
     if (!do.predint || !is.numeric(x.values)) {
       ctitle <- "Scatterplot"
@@ -71,7 +74,7 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
 
     plt.i <- plt.i + 1L
     plt.title[plt.i] <- gsub(pattern="\n", replacement=" ", x=ctitle)
-               
+
     # scale for regular R or RStudio
     axis_cex <- 0.76
     radius <- 0.22
@@ -79,15 +82,18 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
     radius <- adj$radius
     size.lab <- getOption("lab_cex")
     cex.txt <- getOption("axis_cex")
-    
+
     # size of points
-    size.pt <- ifelse (.Platform$OS == "windows", 0.85, 0.70)
+    if (is.null(size))
+      size.pt <- ifelse (.Platform$OS == "windows", 0.85, 0.70)
+    else
+      size.pt <- size
 
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
     margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
     lm <- margs$lm;  tm <- margs$tm;  rm <- margs$rm;  bm <- margs$bm
-    
+
     par(bg=getOption("window_fill"))
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
@@ -117,23 +123,16 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
     # -----------
     ux <- length(unique(x.values))
     uy <- length(unique(y.values))
-    n_cat <- 10
-    discrete <- ifelse (ux>n_cat && uy>n_cat || !.is.integer(x.values) ||
-                        !.is.integer(y.values), FALSE, TRUE)
+    if (is.null(bubble_plot))
+      bubble_plot <- ifelse (ux<13 && uy<13, TRUE, FALSE)
 
-    if (!discrete)  {
-      n.iter <-  1
-
-      for (i in 1:n.iter) { 
+    if (!bubble_plot)  {
         ind <- 1:length(x.values)
-
         points(x.values[ind], y.values[ind],
-               pch=21, col=color[i], bg=fill[i], cex=size.pt)
-      }  # end 1:n.iter
+               pch=21, col=color[1], bg=fill[1], cex=size.pt)
+    }  # end !bubble_plot
 
-    }  # end !discrete
-
-    if (discrete) {  # bubble plot
+    else {  # bubble plot, which would be unusual, x is cat
       mytbl <- table(x.values, y.values)  # get the counts, all x-y combinations
       n.count <- nrow(mytbl) * ncol(mytbl)
       count <- integer(length=n.count)
@@ -155,13 +154,13 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
       cords <- data.frame(xx, yy, count)
 
       power <- 0.6
-      sz <- cords[,3]**power  # radius unscaled 
+      sz <- cords[,3]**power  # radius unscaled
       radius <- 0.18
       symbols(cords$xx, cords$yy, circles=sz, inches=radius,
           bg=.maketrans(fill, 110), fg=color, add=TRUE, ...)
 
       q.ind <- 1:nrow(cords)  # all bubbles get text
-      for (i in 1:nrow(cords)) if (cords[i,3] < 5) cords[i,3] <- NA 
+      for (i in 1:nrow(cords)) if (cords[i,3] < 5) cords[i,3] <- NA
       text(cords[q.ind,1], cords[q.ind,2], cords[q.ind,3], cex=0.8)
     }  # end bubble plot
 
@@ -183,11 +182,11 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
       else if (nlevels(x.values)==2) {
         y0 <- b0 + (b1*0)
         y1 <- b0 + (b1*1)
-        abline(v=1, col="gray60", lwd=.5) 
-        abline(v=2, col="gray60", lwd=.5) 
-        abline(h=y0, col="gray60", lwd=.5) 
-        abline(h=y1, col="gray60", lwd=.5) 
-        segments(y0=y0, y1=y1, x0=1, x1=2, col="black", lwd=1.5) 
+        abline(v=1, col="gray60", lwd=.5)
+        abline(v=2, col="gray60", lwd=.5)
+        abline(h=y0, col="gray60", lwd=.5)
+        abline(h=y1, col="gray60", lwd=.5)
+        segments(y0=y0, y1=y1, x0=1, x1=2, col="black", lwd=1.5)
       }
     }
 
@@ -195,10 +194,10 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
     # -----------
     if (plot_errors)  {
       theme <- getOption("theme")
-      red <- rgb(130,40,35, maxColorValue=255) 
+      red <- rgb(130,40,35, maxColorValue=255)
       pe.clr <- ifelse (theme %in% c("gray", "white"), "gray58", red)
       segments(y0=lm.out$fitted.values, y1=lm.out$model[,1],
-               x0=x.values, x1=x.values, col=pe.clr, lwd=1) 
+               x0=x.values, x1=x.values, col=pe.clr, lwd=1)
     }
 
     # Plot Intervals
@@ -232,10 +231,10 @@ function(lm.out, n_res_rows=NULL, n_pred_rows=NULL,
       plt.i <- plt.i + 1L
       plt.title[plt.i] <- "ScatterPlot Matrix"
 
-      panel_fill <- getOption("panel_fill")  
-      window_fill <- getOption("window_fill")  
+      panel_fill <- getOption("panel_fill")
+      window_fill <- getOption("window_fill")
       bckg <- ifelse(panel_fill=="transparent", window_fill, panel_fill)
-      .plt.mat(lm.out$model[c(nm)], fit="lm", col.bg=bckg, 
+      .plt.mat(lm.out$model[c(nm)], fit="lm", col.bg=bckg,
                pt.size=TRUE, size.miss=TRUE)
     }
     else if (!quiet) {

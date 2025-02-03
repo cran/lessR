@@ -1,3 +1,40 @@
+# lessR version 4.4.1, February 3, 2025
+
+## Updates
+
+* `BarChart()`, `Histogram()`, `Plot()` for facet plots: Axis tick lengths are now smaller, to match the lengths for non-facet `Plot()` visualizations.
+
+* `Plot()`: Parameter `lwd` renamed `line_width`. Parameter `ts_PIlevel` renamed `ts_PI`.
+
+* `PieChart()`: Parameter `lwd` renamed `line_width`. Parameter `lty` renamed `line_type`.
+ 
+* `Plot()`: To jitter either axis coordinate, set to a specific value of `jitter_x` and/or `jitter_y` or have the value set by `Plot()`, indicated by setting the corresponding jitter parameter to `NULL`. Applying jitter to both the `x`-axis and `y`-axis was by design occurring by default for all analyses, probably too aggressive. Now, the default values for a scatterplot of continuous variables is 0. For discrete variables or a VBS plot (violin-box-scatter plot), different formulas provide default jitter values greater than 0, easily overridden by providing specific values.
+
+* `Plot()`: For non-linear values of parameter `fit`, now provide the MSE of the model fit to the original, non-linear data. Can compare this MSE to that of the linear model by running another analysis, setting `fit` to `"lm"`.
+
+* `Plot()`: New parameter `fit_new` to provide values of the `x`-variable from which to compute (predict) values of the `y`-variable for linear and non-linear forms specified by the `fit` parameter, except for `"loess"`.
+
+* `Plot()`: As with `origin_y` from the previous `lessR` version, the default value of `origin_x` favors 0 if there is not too much resulting blank space in the corresponding visualization. Or, manually specify the desired parameter value.
+
+* `Plot()`: For Trellis (facet) plots, axis values in the even hundred thousands are now expressed in `K` notation, such as 100K instead of 100000, a feature previously added to non-facet plots.
+
+* `Regression()`: The criteria for plotting points as bubbles for a single predictor model was deemed too encompassing. The new criteria are to plot as bubbles by default only when the single predictive variable and the target variable have less than or equal to 12 unique values. Boolean parameter `bubble_plot` added to override default for displaying the scatterplot of the one predictor variable with the target variable as a bubble plot.
+
+* `Regression()`: Parameter `size` added to override default for the size of plotted points.
+
+
+## Bug Fixes
+
+`Histogram()`: Axis labels were written too far from the corresponding tick marks.
+
+`Plot()`: A one-variable categorical variable coded as a factor can now be plotted as a bubble plot. If the categorical variable is numerical, add a value of the `radius` parameter to force as a bubble plot instead of a VBS plot.
+
+`style()`: Transparency now properly recognized with `add_fill` colors with specified transparency from `add_trans` parameter.
+
+`style()`: Default fill for a superimposed rectangle on a visualization with `style(add="rect")` changed to light gray with light transparency to allow content within the rectangle to be viewed, `"#D9D9D920"`. 
+
+
+
 # lessR version 4.4.0, January 12, 2025
 
 ## Major Update
@@ -7,13 +44,13 @@
 
 ## Updates
 
-* `Plot()`: To generalize parameter names for multiple estimation methods, all parameters that began with `time_` and `es_` now begin with `ts_`. For example, `time_unit` is now `ts_unit`, and `es_seasons` becomes `ts_seasons`. 
+* `Plot()`: To generalize parameter names for multiple estimation methods, all parameters that began with `time_` and `es_` now begin with `ts_`. For example, `time_unit` is now `ts_unit`, and `es_seasons` becomes `ts_seasons`.
 
-* `Plot()`: New parameter value `days7` for `ts_unit`. All other time units are based on the 365 or 366 day year, the interval over which seasons are assessed. Seasonality for `days` is not generally meaningful assessed over the entire year instead of days of the week. So the time unit of `days7` assesses seasonality of days over the 7-day week, such as, for example, more sales on Monday than on Sunday.
+* `Plot()`: New parameter value `days7` for `ts_unit`. All other time units are based on the 365 or 366 day year, the interval over which seasons are assessed. Seasonality for `days` is not generally meaningful assessed over the entire year but can be for days of the week. The time unit of `days7` assesses seasonality of days over the 7-day week, such as, for example, more sales on Monday than on Sunday.
 
-* `Plot()`: New parameter `origin_y` to set the minimum value of the `y` axis, though the data will not be truncated if the value is larger than the smallest `y` value, triggering an error. This parameter compliments existing parameters `origin_x`, and also `scale_y`, which sets the minimum, maximum, and interval for scaling the `y` axis. Its value is set to 0 by default in relevant situations.
+* `Plot()`: New parameter `origin_y` to set the minimum value of the `y` axis, though the data will not be truncated if the value is larger than the smallest `y` value, instead triggering an error. This parameter compliments existing parameters `origin_x`, and also `scale_y`, which sets the minimum, maximum, and interval for scaling the `y` axis. Its value is set to 0 by default in relevant situations.
 
-* `Plot()`: New parameter `ts_NA` to specify treatment of missing values for the `y`-variable. By default, `y` missing values, those with value `NA`, do not plot, leaving a blank space. Or, specify a value such as 0 to replace the `NA` to plot that `y`-value for the corresponding date on the `x`-axis. 
+* `Plot()`: New parameter `ts_NA` to specify treatment of missing values for the `y`-variable. By default, `y` missing values, those with value `NA`, do not plot, leaving a blank space. Or, specify a value such as 0 to replace the `NA` to plot that `y`-value for the corresponding date on the `x`-axis.
 
 * `STL()`: Output data structure provided that consists of four variables: date according to the named date variable and the extracted trend, season, and error components. Example: s <- STL(Qtr, Sales) outputs to the data frame `s`.
 
@@ -26,20 +63,20 @@
 
 * `Plot()`: Refined the extraction of the date variable and the `y` variable from a time series used in internal processing, such as identifying leap years to provide more generally accurate dates.
 
-* `Plot()`: When plotting a time series with multiple `y` values, the `y`-axis label now properly displays. 
+* `Plot()`: When plotting a time series with multiple `y` values, the `y`-axis label now properly displays.
 
-* `Plot()`: When plotting a stacked time series, the vertical legend now displays with the proper colors and in the same order as the display of the stacked variables. 
+* `Plot()`: When plotting a stacked time series, the vertical legend now displays with the proper colors and in the same order as the display of the stacked variables.
 
 * `Plot()`: If plotting daily data with a time unit of `"weeks"`, then dates are plotted as individual dates by days instead of months.
 
-* `Plot()`: If plotting a `y` categorical variable and an `x` continuous variable, the number of decimal digits for the displayed statistics is now based on the decimal digits inherent in the continuous variable instead of set at 1. 
+* `Plot()`: If plotting a `y` categorical variable and an `x` continuous variable, the number of decimal digits for the displayed statistics is now based on the decimal digits inherent in the continuous variable instead of set at 1.
 
 
 # lessR version 4.3.9, December 8, 2024
 
 ## Updates
 
-* `Plot()`: For a time series exponential smoothing forecast, now display SSE and MSE fit indices, the linear trend and seasonal coefficients, and the obtained smoothing parameter values. 
+* `Plot()`: For a time series exponential smoothing forecast, now display SSE and MSE fit indices, the linear trend and seasonal coefficients, and the obtained smoothing parameter values.
 
 * `Plot()`: Improved conversion of character string numeric dates to R type Date.
 
@@ -71,19 +108,19 @@
 
 ## Major Updates
 
-* `Plot()`: Exponential smoothing forecasting implemented with accompanying visualization. New parameters include `time_ahead` for the number of `time_units` to forecast into the future, and `time_format` to provide a specific format for the date variable if not detected correctly by default. Control aspects of the exponential smoothing estimation and prediction algorithms with parameters `es_level` (alpha), `es_trend` (beta), `es_seasons` (gamma), `es_type` for additive or multiplicative seasonality, and `es_PIlevel` for the level of the prediction intervals. 
+* `Plot()`: Exponential smoothing forecasting implemented with accompanying visualization. New parameters include `time_ahead` for the number of `time_units` to forecast into the future, and `time_format` to provide a specific format for the date variable if not detected correctly by default. Control aspects of the exponential smoothing estimation and prediction algorithms with parameters `es_level` (alpha), `es_trend` (beta), `es_seasons` (gamma), `es_type` for additive or multiplicative seasonality, and `es_PIlevel` for the level of the prediction intervals.
 
 * `Plot()`: Character string versions of a date as in a variety of forms as digits, such as "08/18/2024", are now by default converted to variable type of `Date`. However, this conversion is inherently ambiguous, so the `time_format` parameter is provided as a means to provide the precise format if needed, including other formats such as "August 18, 2024". Also, a sequence of four-digit integers within the usual range of dates will also convert automatically to a variable of type `Dates.
 
-* `STL()`: A wrapper for Base R `stl()` that provides additional information and utility: 
-  + allows input data as two columns, a variable of type `Date` as the `x`-variable and the time series values as the `y`-variable instead of an R time series. 
-  + If the dates are character string digits (see above), they are automatically converted to a variable of type `Date`. 
+* `STL()`: A wrapper for Base R `stl()` that provides additional information and utility:
+  + allows input data as two columns, a variable of type `Date` as the `x`-variable and the time series values as the `y`-variable instead of an R time series.
+  + If the dates are character string digits (see above), they are automatically converted to a variable of type `Date`.
   + The function also assists in comparing the magnitude of each extracted effect by showing the proportion of variance explained for the trend, seasonal effect, and error.
 
- 
+
 ## Updates
 
-* `BarChart()`, `Histogram()`, `Plot()`: If the `x`- or `y`- axis values in the resulting plots all end in 000, then the 000 is replaced with a K, such as `120000` plotted as an axis value of `120K`. 
+* `BarChart()`, `Histogram()`, `Plot()`: If the `x`- or `y`- axis values in the resulting plots all end in 000, then the 000 is replaced with a K, such as `120000` plotted as an axis value of `120K`.
 
 * `LineChart()`: Deprecated for years, now removed as its functionality has been incorporated into `Plot()` and extended with the `x`-variable of type `Date`.
 
@@ -104,7 +141,7 @@
 
 * `BarChart()`, `Histogram()`, `Plot()`: Parameter names `by1` and, where applicable, `by2`, deprecated, replaced with more descriptive new names `facet1` and `facet2`.
 
-* `Plot()`: Using functions from the xts package, when plotting a time series dates are now formatted according to their natural unit. For example, when plotting by years, just years are listed without the month and the day. 
+* `Plot()`: Using functions from the xts package, when plotting a time series dates are now formatted according to their natural unit. For example, when plotting by years, just years are listed without the month and the day.
 
 * `Plot()`: When plotting a times series and requesting a level of time aggregation with the `time_unit` parameter that is more detailed than the available data, the analysis appropriately terminates with an error message. For example, if the time series data is monthly and an aggregation of `weeks` is requested, no analysis is done.
 

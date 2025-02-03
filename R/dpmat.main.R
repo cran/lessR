@@ -1,7 +1,7 @@
 .dpmat.main <-   # BPFM
-function(x, l, sort_yx,
-         col_fill, col_color, col.bg,
-         col.trans, shape_pts, col.box, 
+function(x, l, sort_yx,  # no y variable
+         fill, color, col.bg,
+         trans, shape_pts, col.box, 
          col.low, col.hi,
          xy_ticks, xlab, ylab, main, sub, cex,
          radius, size_cut, txt_color="black", power,
@@ -9,7 +9,7 @@ function(x, l, sort_yx,
          value_labels, rotate_x, rotate_y, offset, quiet,
          do_plot, fun_call=NULL, ...)  {
 
-  col.area <- col_fill  # kludge
+  col.area <- fill  # kludge
   size.txt <- ifelse (options("device") == "RStudioGD", 0.8, 0.7)
 
   if (!is.null(value_labels)) value_labels <- gsub(" ", "\n", value_labels) 
@@ -116,13 +116,17 @@ function(x, l, sort_yx,
     tm <- tm + tm.adj
     rm <- rm + rm.adj
 
+    bm <- bm + 0.15
+    if (rotate_x > 0) bm <- bm + 0.15
    
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
     
     par(bg=getOption("window_fill"))
     par(mai=c(bm, lm, tm, rm))
+    par(tcl=-0.28)  # axis tic length
 
+    # set up plot area
     plot(cords$xx, cords$yy, type="n", axes=FALSE, ann=FALSE, 
          xlim=c(.5, n.resp+.5), ylim=c(.5, n.var+.5))
 
@@ -145,33 +149,31 @@ function(x, l, sort_yx,
 
     # colors
     if (is.null(col.low) || is.null(col.hi))
-      clr <- col_fill
+      clr <- fill
     else {
       color_palette <- colorRampPalette(c(col.low, col.hi))
       clr <- color_palette(n.resp)
     }
 
     # bubbles
-    # KLUDGE, default can be 0, so add some, really need a lighter gray instead
-    col.trans <- col.trans + .2
-    if (!is.null(col.trans)) {
-      trans_pts <- col.trans
+    # KLUDGE, trans default can be 0, so add some, need a lighter gray instead
+    if (!is.null(trans)) {
+      if (trans < 0.1) trans <- trans + .2
+      trans_pts <- trans
       for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans_pts)*256)
     }
 
-  # scale for regular R or RStudio
-  nch <- nchar(as.character(max(cords)))
-  if (is.null(radius)) {
-    radius <- -.35 + (.2*nch)
-    if (radius < .22) radius <- .22
-  }
-  adj <- .RSadj(radius)
-  radius <- adj$radius
-  if (!quiet) cat("Adjust bubble size with parameter: radius.",
-                  "Current value: radius =", radius, "\n")
+    # scale for regular R or RStudio
+    nch <- nchar(as.character(max(cords)))
+    if (is.null(radius)) {
+      radius <- -.35 + (.2*nch)
+      if (radius < .22) radius <- .22
+    }
+    adj <- .RSadj(radius)
+    radius <- adj$radius
 
     symbols(cords$xx, cords$yy, circles=c, bg=clr, 
-            fg=col_color, inches=radius, add=TRUE, ...)
+            fg=color, inches=radius, add=TRUE, ...)
 
     # counts
     if (size_cut) { 

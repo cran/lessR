@@ -1,10 +1,11 @@
 .plt.txt <-
 function(x, y, stat, object, cat.x, cat.y, date.var,
-       xlab, ylab, fit, n.by, mse, b0, b1, Rsq, by.cat,
+       xlab, ylab, fit, n.by, mse.ln, mse.nl, b0, b1, Rsq, 
+       fit_new, y.new, by.cat,
        center_line, run, show_runs, prop, size, radius, digits_d,
        fun_call=NULL, txdif=NULL) {
 
-
+  if (n.by == 0) n.by <- 1
   if (date.var) center_line <- "off"
 
   # x and y come across here in their natural state, within each data frame
@@ -71,6 +72,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
     digits_d <- .max.dd(y[,1]) + 1
     if (!cat.x && cat.y) digits_d <- .max.dd(x[,1]) + 1 
   }
+  if (digits_d < 3) digits_d <- 3
   options(digits_d=digits_d)
 
   size.pt <- ifelse (is.null(size), 1, size)  # dummy non-zero value
@@ -285,434 +287,326 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
     }  # end object is both
 
 
-#   else if (object != "line"  &&  !run) {
-        # ---------------------------
-        # contcont 2-way scatter plot
-        # ---------------------------
+    # ---------------------------
+    # contcont 2-way scatter plot
+    # ---------------------------
 
-      if (!cat.x  &&  !cat.y  &&
-          object %in% c("point", "both")  && !run) {
-        txsug <- ""
+    if (!cat.x  &&  !cat.y  &&
+      object %in% c("point", "both")  && !run) {
 
-        # suggestions
-        # -----------
-        if (getOption("suggest")) {
-          txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
+      # suggestions
+      # -----------
+      txsug <- ""
+      if (getOption("suggest")) {
+        txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
 
-          fc <- paste("Plot(", x.name, ", ", y.name, sep="")
+        fc <- paste("Plot(", x.name, ", ", y.name, sep="")
 
-          if (!grepl("enhance", fncl)) {
-            txt <- ", enhance=TRUE)  # many options"
+        if (!grepl("enhance", fncl)) {
+          txt <- ", enhance=TRUE)  # many options"
+          txsug <- paste(txsug, "\n", fc, txt, sep="")
+        }
+
+        if (runif(1) > 0.5) {
+          if (!grepl("fill", fncl)) {
+            txt <- ", fill=\"skyblue\")  # interior fill color of points"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
-
-          if (runif(1) > 0.5) {
-            if (!grepl("fill", fncl)) {
-              txt <- ", fill=\"skyblue\")  # interior fill color of points"
-              txsug <- paste(txsug, "\n", fc, txt, sep="")
-            }
-          }
-          else {
-            if (!grepl("color", fncl)) {
-              txt <- ", color=\"red\")  # exterior edge color of points"
-              txsug <- paste(txsug, "\n", fc, txt, sep="")
-            }
-          }
-
-          if (!grepl("fit", fncl)) {
-            txt <- ", fit=\"lm\", fit_se=c(.90,.99))  # fit line, stnd errors"
+        }
+        else {
+          if (!grepl("color", fncl)) {
+            txt <- ", color=\"red\")  # exterior edge color of points"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
+        }
 
-          if (runif(1) > 0.5) {
-            if (!grepl("out_cut", fncl)) {
-              txt <- ", out_cut=.10)  # label top 10% from center as outliers"
-              txsug <- paste(txsug, "\n", fc, txt, sep="")
-            }
-          }
-          else {
-            if (!grepl("MD_cut", fncl)) {
-              txt <- ", MD_cut=6)"
-              cmt <- "  # Mahalanobis distance from center > 6 is an outlier"
-              txsug <- paste(txsug, "\n", fc, txt, cmt, sep="")
-            }
-          }
+        if (!grepl("fit", fncl)) {
+          txt <- ", fit=\"lm\", fit_se=c(.90,.99))  # fit line, stnd errors"
+          txsug <- paste(txsug, "\n", fc, txt, sep="")
+        }
 
- #        if (!grepl("ellipse", fncl)) {
- #          txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
- #          txsug <- paste(txsug, "\n", fc, txt, sep="")
- #        }
+        if (runif(1) > 0.5) {
+          if (!grepl("out_cut", fncl)) {
+            txt <- ", out_cut=.10)  # label top 10% from center as outliers"
+            txsug <- paste(txsug, "\n", fc, txt, sep="")
+          }
+        }
+        else {
+          if (!grepl("MD_cut", fncl)) {
+            txt <- ", MD_cut=6)"
+            cmt <- "  # Mahalanobis distance from center > 6 is an outlier"
+            txsug <- paste(txsug, "\n", fc, txt, cmt, sep="")
+          }
+        }
+
+#        if (!grepl("ellipse", fncl)) {
+#          txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
+#          txsug <- paste(txsug, "\n", fc, txt, sep="")
+#        }
 
 #         if (!grepl("smooth", fncl)) {
 #           txt <- ", shape=\"diamond\")  # change plot character"
 #           txsug <- paste(txsug, "\n", fc, txt, sep="")
 #         }
-        }  # end suggest
+      }  # end suggest
 
-        blank <- ""
-        class(blank) <- "out"  # a blank line when needed
+      blank <- ""
+      class(blank) <- "out"  # a blank line when needed
 
-        txreg <- ""
-        txcor <- ""
+      txreg <- ""
+      txcor <- ""
 
-        # output cor info if no fit line or lm fit only
-        # ---------------------------------------------
+      # output cor info if no fit line or lm fit only
+      # ---------------------------------------------
 
-        if (fit %in% c("off", "lm")) {
+      # Linear correlation for a linear analysis
+      if (fit %in% c("off", "lm")) {
 
-          for (i in 1:n_col) {
-            class(txsug) <- "out"
+        for (i in 1:n_col) {
+          class(txsug) <- "out"
 
-            #  no output correlation if a by variable
-            if (n.by == 0) {
-              if (n.xcol > 1) {
-                x.nm <- colnames(x)[i]
-                x.nm <- paste("\nVariable:", x.nm, "with",  colnames(y)[1])
-                class(x.nm) <- "out"
-                if (exists("output"))
-                  output <- c(output, list(out_name=x.nm))
-                else
-                  output <- list(out_name=x.nm)
-                options(xname = colnames(x)[i])
-                stuff <- .cr.main(x[,i], y[,1], brief=TRUE)
-              }
-              else {
-                options(yname = colnames(y)[i])
-                stuff <- .cr.main(x[,1], y[,i], brief=TRUE)
-              }
+          #  no output correlation if a by variable
+          if (n.by == 1) {
+            if (n.xcol > 1) {
+              x.nm <- colnames(x)[i]
+              x.nm <- paste("\nVariable:", x.nm, "with",  colnames(y)[1])
+              class(x.nm) <- "out"
+              if (exists("output"))
+                output <- c(output, list(out_name=x.nm))
+              else
+                output <- list(out_name=x.nm)
+              options(xname = colnames(x)[i])
+              stuff <- .cr.main(x[,i], y[,1], brief=TRUE)
+            }
+            else {
+              options(yname = colnames(y)[i])
+              stuff <- .cr.main(x[,1], y[,i], brief=TRUE)
+            }
 
-              txbck <- stuff$txb
-              txdsc <- stuff$txd
-              txinf <- stuff$txi
+            txbck <- stuff$txb
+            txdsc <- stuff$txd
+            txinf <- stuff$txi
 
-              # txcor contains the basic correlational text output
-              txcor <- c(txbck, txdsc, " ", txinf, " ")
-            }  # end n.by is 0
+            # txcor contains the basic correlational text output
+            txcor <- c(txbck, txdsc, " ", txinf, " ")
+          }  # end n.by is 1
 
-          }  # end for i through n_col
-        }  # end output cor info
+        }  # end for i through n_col
+      }  # end output cor info
 
 
-        # output mse, triggered by a non-lm fit line
-        # ------------------------------------------
-        if (!is.null(mse)  &&  n.xcol == 1) {  # mse not reported for all
-          if (fit == "quad") {
-            op1 <- "sqrt()"
-            op2 <- "square"
-          }
-          if (fit == "power") {
-            op1 <- "the root of the\n   reciprocal of the power"
-            op2 <- "of the power"
-          }
-          if (fit == "exp") {
-            op1 <- "log()"
-            op2 <- "exp()"
-          }
-          if (fit == "log") {
-            op1 <- "exp()"
-            op2 <- "log()"
-          }
-          if (fit %in% c("quad", "power", "exp", "log")) {
-            msg <- paste(" Regressed linearized data of transformed",
-                        "data values of", nm.y, "with", op1, "\n")
-            msg <- paste(msg, "For predicted values, back transform with",
-                         op2, "of regression model\n\n")
+
+      # output mse.ln, triggered by a non-lm fit line
+      # ------------------------------------------
+
+      # Create a y.new data frame with formatted numbers
+      if (!is.null(y.new)) {
+        if (.is.integer(fit_new))
+          x1 <- format(fit_new, trim=TRUE) 
+        else
+          x1 <- format(fit_new, nsmall=digits_d, trim=TRUE) 
+        x2 <- format(y.new, nsmall=digits_d, trim=TRUE)
+        mx.x <- max(x[,1], na.rm=TRUE)
+        txt <- "Prediction from beyond the data range"
+        x3 <- ifelse(fit_new > mx.x, txt, " ")   
+        tx <- data.frame(x1,x2,x3)
+        names(tx) <- c(nm.x, paste(nm.y, "_Fit", sep=""), " ")
+        dfnew <- tx
+      }
+      else
+       dfnew <- NULL
+
+      if (!is.null(mse.ln)  &&  n.xcol == 1) {  # mse.ln not reported for all
+
+        if (fit == "lm") {
+          op1 <- ""
+          op2 <- ""
+        }
+
+        if (fit == "quad") {
+          op1 <- "sqrt()"
+          op2 <- "square"
+
+        }
+        if (fit == "power") {
+          op1 <- "the root of the\n   reciprocal of the power"
+          op2 <- "of the power"
+        }
+
+        if (fit == "exp") {
+          op1 <- "log()"
+          op2 <- "exp()"
+        }
+
+        if (fit == "log") {
+          op1 <- "exp()"
+          op2 <- "log()"
+        }
+
+        if (fit %in% c("quad", "power", "exp", "log")) {
+          msg <- paste("Regressed linearized data of transformed",
+                      "data values of", nm.y, "with", op1, "\n")
+        }
+        else
+          msg <- ""
+
+        tx <- character(length=n.by)
+        for (i in 1:n.by) {
+          by.name <- getOption("byname")
+          if (i > 1) msg <- ""  # display title only at beginning
+          if (n.by > 1) {
+            if (fit %in% c("quad", "power", "exp", "log")) {
+              msg <- paste("Regressed linearized data of transformed",
+                          "data values of", nm.y, "with", op1, "\n")
+            }
+            tx[i] <- paste(msg, by.name, ": ", by.cat[i], "  ", sep="")
           }
           else
-            msg <- ""
-
-          if (n.by > 0) {
-            tx <- character(length=n.by)
-
-            for (i in 1:n.by) {
-              by.name <- getOption("byname")
-              if (i > 1) msg <- ""
-              tx[i] <- paste(msg, by.name, ": ", by.cat[i], "  ", sep="")
-              mse.pn <- prettyNum(mse[i], big.mark=",", scientific=FALSE,
-                                  format="f", digits=digits_d)
-              b0.pn <- .fmt(b0[i], digits_d)
-              b1.pn <- .fmt(b1[i], digits_d)
-
-              Rsq.pn <- .fmt(Rsq[i], 3)
-              if (!is.na(b1[i])) {  # linear function
-                tx[i] <- paste(tx[i],
-                  "Line: b0 =", b0.pn, "   b1 =", b1.pn,
-                  "   Fit: MSE =", mse.pn)
-                  rsqu <- ifelse (is.na(Rsq[i]), "", paste("   Rsq =", Rsq.pn))
-                  tx[i] <- paste(tx[i], rsqu, "\n", sep="")
-              }
-              else {
-                tx[i] <- paste(tx[i],
-                  " Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
-              }
-
-              # kludge, if removing outliers reg line info not correct,remove
-              if (b0[i]==0 && b1[i]==0 && mse[i]==0) tx <- ""
-            }  # end for n.by
-          }  # end n.by > 0
-
-          # no by vars
+            tx[i] <- paste(msg, by.cat[i], "  ", sep="")
+          mse.out <- .fmt_cm(mse.ln[i], d=digits_d)
+          b0.pn <- .fmt(b0[i], digits_d)
+          b1.pn <- .fmt(b1[i], digits_d)
+          Rsq.pn <- .fmt(Rsq[i], 3)
+          md.type <- ifelse (fit=="loess", "Loess", "Linear")
+          if (!is.na(b1[i])) {  # linear function
+            tx[i] <- paste(tx[i],
+              "Line: b0 = ", b0.pn, "    b1 = ", b1.pn,
+              "    ", md.type,  " Model MSE = ", mse.out, sep="")
+              rsqu <- ifelse (is.na(Rsq[i]), "", paste("   Rsq =", Rsq.pn))
+              tx[i] <- paste(tx[i], rsqu, "\n", sep="")
+          }
           else {
-            if (length(b1) == 1) {  # > 1 if y=c(y1, y2, ...)
-              if (mse[1] > 10000)
-                mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
-                                    format="f", digits=2)  # digits does not work
-              else
-                mse.pn <- .fmt(mse[1], 3)  # 3 dec digits for smaller numbers
-
-              if (!is.na(b0[1])) {  # missing in loess
-                n_digs <- ifelse(b0[1] > 10000, 2, digits_d)
-                if (n_digs == 1) n_digs <- 2
-                b0.pn <- .fmt(b0[1], n_digs)
-              }
-
-              if (!is.na(b1[1])) {
-                n_digs <- ifelse(b1[1] > 10000, 2, digits_d)
-                if (n_digs == 1) n_digs <- 2
-                b1.pn <- .fmt(b1[1], n_digs)
-              }
-
-              Rsq.pn <- .fmt(Rsq[1], 3)
-
-              if (!is.na(b1)) {  # linear function
-                tx = paste(msg,
-                      "Line: b0 =", b0.pn, "  b1 =", b1.pn,
-                      "   Fit: MSE =", mse.pn)
-                rsqu <- ifelse (is.na(Rsq[1]), "", paste("   Rsq =", Rsq.pn))
-                tx <- paste(tx, rsqu, "\n", sep="")
-
-              }
-              else {
-                tx = paste(
-                  "Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
-              }
-              # kludge, if removing outliers reg line info not correct,remove
-              if (b0[1]==0 && b1[1]==0 && mse[1]==0) tx <- ""
-            }
-            else
-              tx <- ""  # currently no reg output if length(b1) > 0
+            tx[i] <- paste(tx[i],
+              " ", md.type, " Model MSE = ", mse.out, "\n", sep="")
           }
 
-          txreg <- tx
-        }  # end !is.null(mse)
+          if (!(fit %in% c("loess", "lm", "null"))) {
+            msg <- paste("\nFit to the data with back transform",
+                         op2, "of linear regression model")
+            mse.out <- .fmt_pn(mse.nl[i], d=digits_d)
+            tx[i] <- paste(tx[i], msg, "\n", "Model MSE =", mse.out, "\n\n")
+          }
 
-          class(txsug) <- "out"
-          class(txcor) <- "out"
-          class(txreg) <- "out"
-          return(list(tipe="contcont", out_suggest=txsug,
-                      out_stats=txcor, out_reg=txreg))
+          # kludge, if removing outliers reg line info not correct,remove
+          if (b0[i]==0 && b1[i]==0 && mse.ln[i]==0) tx <- ""
+        }  # end for n.by
 
-        txsug <- ""
+        txreg <- tx
+      }  # end !is.null(mse.ln)
 
-        # suggestions
-        # -----------
-        if (getOption("suggest")) {
-          txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
+      class(txsug) <- "out"
+      class(txcor) <- "out"
+      class(txreg) <- "out"
+      return(list(tipe="contcont", out_suggest=txsug,
+                  out_stats=txcor, out_y.new=dfnew, out_reg=txreg))
 
-          fc <- paste("Plot(", x.name, ", ", y.name, sep="")
+      txsug <- ""
 
-          if (!grepl("enhance", fncl)) {
-            txt <- ", enhance=TRUE)  # many options"
+      # suggestions
+      # -----------
+      if (getOption("suggest")) {
+        txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
+
+        fc <- paste("Plot(", x.name, ", ", y.name, sep="")
+
+        if (!grepl("enhance", fncl)) {
+          txt <- ", enhance=TRUE)  # many options"
+          txsug <- paste(txsug, "\n", fc, txt, sep="")
+        }
+
+        if (runif(1) > 0.5) {
+          if (!grepl("fill", fncl)) {
+            txt <- ", fill=\"skyblue\")  # interior fill color of points"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
-
-          if (runif(1) > 0.5) {
-            if (!grepl("fill", fncl)) {
-              txt <- ", fill=\"skyblue\")  # interior fill color of points"
-              txsug <- paste(txsug, "\n", fc, txt, sep="")
-            }
-          }
-          else {
-            if (!grepl("color", fncl)) {
-              txt <- ", color=\"red\")  # exterior edge color of points"
-              txsug <- paste(txsug, "\n", fc, txt, sep="")
-            }
-          }
-
-          if (!grepl("fit", fncl)) {
-            txt <- ", fit=\"lm\", fit_se=c(.90,.99))  # fit line, stnd errors"
+        }
+        else {
+          if (!grepl("color", fncl)) {
+            txt <- ", color=\"red\")  # exterior edge color of points"
             txsug <- paste(txsug, "\n", fc, txt, sep="")
           }
+        }
 
-          if (runif(1) > 0.5) {
-            if (!grepl("out_cut", fncl)) {
-              txt <- ", out_cut=.10)  # label top 10% from center as outliers"
-              txsug <- paste(txsug, "\n", fc, txt, sep="")
-            }
-          }
-          else {
-            if (!grepl("MD_cut", fncl)) {
-              txt <- ", MD_cut=6)"
-              cmt <- "  # Mahalanobis distance from center > 6 is an outlier"
-              txsug <- paste(txsug, "\n", fc, txt, cmt, sep="")
-            }
-          }
+        if (!grepl("fit", fncl)) {
+          txt <- ", fit=\"lm\", fit_se=c(.90,.99))  # fit line, stnd errors"
+          txsug <- paste(txsug, "\n", fc, txt, sep="")
+        }
 
- #        if (!grepl("ellipse", fncl)) {
- #          txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
- #          txsug <- paste(txsug, "\n", fc, txt, sep="")
- #        }
+        if (runif(1) > 0.5) {
+          if (!grepl("out_cut", fncl)) {
+            txt <- ", out_cut=.10)  # label top 10% from center as outliers"
+            txsug <- paste(txsug, "\n", fc, txt, sep="")
+          }
+        }
+        else {
+          if (!grepl("MD_cut", fncl)) {
+            txt <- ", MD_cut=6)"
+            cmt <- "  # Mahalanobis distance from center > 6 is an outlier"
+            txsug <- paste(txsug, "\n", fc, txt, cmt, sep="")
+          }
+        }
+
+#        if (!grepl("ellipse", fncl)) {
+#          txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
+#          txsug <- paste(txsug, "\n", fc, txt, sep="")
+#        }
 
 #         if (!grepl("smooth", fncl)) {
 #           txt <- ", shape=\"diamond\")  # change plot character"
 #           txsug <- paste(txsug, "\n", fc, txt, sep="")
 #         }
-        }  # end suggest
+      }  # end suggest
 
-        blank <- ""
-        class(blank) <- "out"  # a blank line when needed
+      blank <- ""
+      class(blank) <- "out"  # a blank line when needed
 
-        txreg <- ""
-        txcor <- ""
+      txreg <- ""
+      txcor <- ""
 
-        # output cor info if no fit line or lm fit only
-        # ---------------------------------------------
+      # output cor info if no fit line or lm fit only
+      # ---------------------------------------------
 
-        if (fit %in% c("off", "lm")) {
+      if (fit %in% c("off", "lm")) {
 
-          for (i in 1:n_col) {
-            class(txsug) <- "out"
-
-            #  no output correlation if a by variable
-            if (n.by == 0) {
-              if (n.xcol > 1) {
-                x.nm <- colnames(x)[i]
-                x.nm <- paste("\nVariable:", x.nm, "with",  colnames(y)[1])
-                class(x.nm) <- "out"
-                if (exists("output"))
-                  output <- c(output, list(out_name=x.nm))
-                else
-                  output <- list(out_name=x.nm)
-                options(xname = colnames(x)[i])
-                stuff <- .cr.main(x[,i], y[,1], brief=TRUE)
-              }
-              else {
-                options(yname = colnames(y)[i])
-                stuff <- .cr.main(x[,1], y[,i], brief=TRUE)
-              }
-
-              txbck <- stuff$txb
-              txdsc <- stuff$txd
-              txinf <- stuff$txi
-
-              # txcor contains the basic correlational text output
-              txcor <- c(txbck, txdsc, " ", txinf, " ")
-            }  # end n.by is 0
-
-          }  # end for i through n_col
-        }  # end output cor info
-
-
-        # output mse, triggered by a non-lm fit line
-        # ------------------------------------------
-        if (!is.null(mse)  &&  n.xcol == 1) {  # mse not reported for all
-          if (fit == "quad") {
-            op1 <- "sqrt()"
-            op2 <- "square"
-          }
-          if (fit == "power") {
-            op1 <- "the root of the\n   reciprocal of the power"
-            op2 <- "of the power"
-          }
-          if (fit == "exp") {
-            op1 <- "log()"
-            op2 <- "exp()"
-          }
-          if (fit == "log") {
-            op1 <- "exp()"
-            op2 <- "log()"
-          }
-          if (fit %in% c("quad", "power", "exp", "log")) {
-            msg <- paste(" Regressed linearized data of transformed",
-                        "data values of", nm.y, "with", op1, "\n")
-            msg <- paste(msg, "For predicted values, back transform with",
-                         op2, "of regression model\n\n")
-          }
-          else
-            msg <- ""
-
-          if (n.by > 0) {
-            tx <- character(length=n.by)
-
-            for (i in 1:n.by) {
-              by.name <- getOption("byname")
-              if (i > 1) msg <- ""
-              tx[i] <- paste(msg, by.name, ": ", by.cat[i], "  ", sep="")
-              mse.pn <- prettyNum(mse[i], big.mark=",", scientific=FALSE,
-                                  format="f", digits=digits_d)
-              b0.pn <- .fmt(b0[i], digits_d)
-              b1.pn <- .fmt(b1[i], digits_d)
-
-              Rsq.pn <- .fmt(Rsq[i], 3)
-              if (!is.na(b1[i])) {  # linear function
-                tx[i] <- paste(tx[i],
-                  "Line: b0 =", b0.pn, "   b1 =", b1.pn,
-                  "   Fit: MSE =", mse.pn)
-                  rsqu <- ifelse (is.na(Rsq[i]), "", paste("   Rsq =", Rsq.pn))
-                  tx[i] <- paste(tx[i], rsqu, "\n", sep="")
-              }
-              else {
-                tx[i] <- paste(tx[i],
-                  " Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
-              }
-
-              # kludge, if removing outliers reg line info not correct,remove
-              if (b0[i]==0 && b1[i]==0 && mse[i]==0) tx <- ""
-            }  # end for n.by
-          }  # end n.by > 0
-
-          # no by vars
-          else {
-            if (length(b1) == 1) {  # > 1 if y=c(y1, y2, ...)
-              if (mse[1] > 10000)
-                mse.pn <- prettyNum(mse[1], big.mark=",", scientific=FALSE,
-                                    format="f", digits=2)  # digits does not work
-              else
-                mse.pn <- .fmt(mse[1], 3)  # 3 dec digits for smaller numbers
-
-              if (!is.na(b0[1])) {  # missing in loess
-                n_digs <- ifelse(b0[1] > 10000, 2, digits_d)
-                if (n_digs == 1) n_digs <- 2
-                b0.pn <- .fmt(b0[1], n_digs)
-              }
-
-              if (!is.na(b1[1])) {
-                n_digs <- ifelse(b1[1] > 10000, 2, digits_d)
-                if (n_digs == 1) n_digs <- 2
-                b1.pn <- .fmt(b1[1], n_digs)
-              }
-
-              Rsq.pn <- .fmt(Rsq[1], 3)
-
-              if (!is.na(b1)) {  # linear function
-                tx = paste(msg,
-                      "Line: b0 =", b0.pn, "  b1 =", b1.pn,
-                      "   Fit: MSE =", mse.pn)
-                rsqu <- ifelse (is.na(Rsq[1]), "", paste("   Rsq =", Rsq.pn))
-                tx <- paste(tx, rsqu, "\n", sep="")
-
-              }
-              else {
-                tx = paste(
-                  "Fit: Mean Squared Error, MSE = ", mse.pn, "\n", sep="")
-              }
-              # kludge, if removing outliers reg line info not correct,remove
-              if (b0[1]==0 && b1[1]==0 && mse[1]==0) tx <- ""
-            }
-            else
-              tx <- ""  # currently no reg output if length(b1) > 0
-          }
-
-          txreg <- tx
-        }  # end !is.null(mse)
-
+        for (i in 1:n_col) {
           class(txsug) <- "out"
-          class(txcor) <- "out"
-          class(txreg) <- "out"
-          return(list(tipe="contcont", out_suggest=txsug,
-                      out_stats=txcor, out_reg=txreg))
 
-      }  # end traditional 2-way scatter plot
+          #  no output correlation if a by variable
+          if (n.by == 1) {
+            if (n.xcol > 1) {
+              x.nm <- colnames(x)[i]
+              x.nm <- paste("\nVariable:", x.nm, "with",  colnames(y)[1])
+              class(x.nm) <- "out"
+              if (exists("output"))
+                output <- c(output, list(out_name=x.nm))
+              else
+                output <- list(out_name=x.nm)
+              options(xname = colnames(x)[i])
+              stuff <- .cr.main(x[,i], y[,1], brief=TRUE)
+            }
+            else {
+              options(yname = colnames(y)[i])
+              stuff <- .cr.main(x[,1], y[,i], brief=TRUE)
+            }
+
+            txbck <- stuff$txb
+            txdsc <- stuff$txd
+            txinf <- stuff$txi
+
+            # txcor contains the basic correlational text output
+            txcor <- c(txbck, txdsc, " ", txinf, " ")
+          }  # end n.by is 1
+
+        }  # end for i through n_col
+      }  # end output cor info
+
+      class(txsug) <- "out"
+      class(txcor) <- "out"
+      class(txreg) <- "out"
+      return(list(tipe="contcont", out_suggest=txsug,
+                  out_stats=txcor, out_reg=txreg))
+
+    }  # end traditional 2-way scatter plot
 
 
 

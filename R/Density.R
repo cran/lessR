@@ -163,7 +163,6 @@ function(x, data=d, rows=NULL,
         names(data) <- x.name
       }
     }
-
   }
 
 

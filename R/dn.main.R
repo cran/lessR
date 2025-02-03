@@ -103,21 +103,30 @@ function(x,
   tm <- margs$tm
   rm <- margs$rm
   bm <- margs$bm
+ 
+  if (y_axis) lm <- lm + 0.6  # allow extra room for densities
 
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))  
- 
-  if (y_axis) lm <- lm + 0.6  # allow extra room for densities
+
   par(bg=getOption("window_fill"))
   par(mai=c(bm, lm, tm, rm))
-
   
   # set up plot area
   plot(h, border="transparent", freq=FALSE,
      xlim=c(x.min,x.max), ylim=c(0,max.y),
      axes=FALSE, ann=FALSE, xlab=NULL, ylab=NULL, main=NULL, ...)
 
+  # adjust axis label from tick with mgp[2]
+  # mgp does not work with rotate_x, see .axes()
+  my.mgp <- par("mgp")  # save to restore
+  ax <- .axes_dim()  # get axis value parameters
+  mgp2 <- -0.350 + (0.9 * ax$axis_x_cex)
+  par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
+  adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
+
   # axis, axis ticks
+  par(tcl=-0.28)  # axis tic length
   if (!y_axis)
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)

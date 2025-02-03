@@ -57,17 +57,17 @@ A scatterplot displays the values of a distribution, or the relationship between
 \code{Plot(X,y)} or \code{Plot(x,Y)}: one vector variable of several continuous variables, paired with another single continuous variable, yields multiple scatterplots on the same graph\cr
 \code{Plot(Y,xUnique)}: one categorical with unique (ID) values, such as \code{row.names} and the other variable a vector of continuous variables yields a Cleveland dot plot of all the continuous variables, usually two\cr
 
-\strong{One vector}\cr
-\code{Plot(X)}: one vector of variables, with no \code{y}-variable, results in a scatterplot matrix of the variables\cr
-\code{Plot(Xcat)}: one vector of categorical \code{x}-variables, with no \code{y}-variable, generalizes to a matrix of 1-dimensional bubble plots, here called the bubble plot frequency matrix, to replace a series of bar charts
+\strong{One vector of variables}\cr
+\code{Plot(X)}: one vector of numerical variables, with no \code{y}-variable, results in a scatterplot matrix of the variables\cr
+\code{Plot(Xcat)}: one vector of categorical \code{x}-variables coded as character or factor variables, with no \code{y}-variable, generalizes to a matrix of 1-dimensional bubble plots, here called the bubble plot frequency matrix, to replace a series of bar charts
 }
 
 
 \usage{
 Plot(
 
-    # -------------------------------------
-    # Data from which to construct the plot
+    # -------------------------------------------------------
+    # Data from which to construct the plot for x- and y-axis
     x, y=NULL, data=d, filter=NULL,
 
 
@@ -80,14 +80,15 @@ Plot(
     by=NULL, facet1=NULL, facet2=NULL,
     n_row=NULL, n_col=NULL, aspect="fill",
 
-    # ------------------------------------------------------------------
-    # Analogy of physical Marks on paper that create the bars and labels
+    # --------------------------------------------------------------------
+    # Analogy of physical Marks on paper that create the points and labels
+    # See  ?style  for more options with the  style()  function
     theme=getOption("theme"),
     fill=NULL, color=NULL,
     transparency=getOption("trans_pt_fill"),
 
-    enhance=FALSE,
-    size=NULL, size_cut=NULL, shape="circle", lwd=1.5, means=TRUE,
+    enhance=FALSE, means=TRUE,
+    size=NULL, size_cut=NULL, shape="circle", line_width=1.5,
     segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
     # ----------------------
@@ -105,7 +106,7 @@ Plot(
     fit=c("off", "loess", "lm", "ls", "null", "exp", "quad",
           "power", "log"),
     fit_power=1, fit_se=0.95,
-    fit_color=getOption("fit_color"),
+    fit_color=getOption("fit_color"), fit_new=NULL, 
     plot_errors=FALSE, ellipse=0,
 
 
@@ -118,7 +119,7 @@ Plot(
     ts_unit=NULL, ts_agg=c("sum", "mean"), ts_NA=NULL,
     ts_ahead=0, ts_method=c("es", "lm"), ts_format=NULL,
     ts_fitted=FALSE, ts_level=NULL, ts_trend=NULL, ts_seasons=NULL,
-    ts_type=c("additive", "multiplicative"), ts_PIlevel=0.95,
+    ts_type=c("additive", "multiplicative"), ts_PI=0.95,
     stack=FALSE, area_fill="transparent", area_split=0, n_date_tics=NULL,
     # Run chart (indicate with .Index for the name of the x-variable)
     show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
@@ -278,6 +279,9 @@ vp(\dots)
         the best-fitting least squares line of the regular data without the
         outliers, and a horizontal and vertical line to represent the mean of
         each of the two variables.}
+  \item{means}{If the one variable is categorical, expressed as a factor, and
+       the other variable continuous, then if \code{TRUE}, by default,
+       plot means with the scatterplot. Also applies to a 1-D scatterplot.}
   \item{size}{When set to a constant, the scaling factor for \bold{standard points}
       (not bubbles) or a line, with default of 1.0 for points and 2.0 for a line.
        Set to 0 to not plot the points or lines. If \code{area_fill} for a line
@@ -310,11 +314,8 @@ vp(\dots)
        according to \code{by}, then list as a vector with with one shape for each
        level to be plotted or set to \code{"vary"} to have shapes selected by
        default across the \code{by} groups.}
-  \item{lwd}{Width of the line segments. Set to zero to remove the line
-        segments.}
-  \item{means}{If the one variable is categorical, expressed as a factor, and
-       the other variable continuous, then if \code{TRUE}, by default,
-       plot means with the scatterplot. Also applies to a 1-D scatterplot.}
+  \item{line_width}{Width of the line segments that connect adjacent points,
+        such as plotting time series data. Set to zero to remove the line segments.}
   \item{segments}{Designed for interaction plots of means, connects each pair of
         successive points with a line segment. Pass a data frame of the means,
         such as from \code{\link{pivot}}. To turn off connecting line segments
@@ -332,11 +333,12 @@ vp(\dots)
         for a Cleveland dot plot, that is, a numeric \code{x}-variable paired
         with a categorical \code{y}-variable with unique values. If a \code{x}
         is a vector of two variables, sort by their difference.}
-  \item{jitter_x}{Randomly perturbs the plotted points of a scatterplot
+  \item{jitter_x}{Randomly perturbs the plotted points of
+       a scatterplot
        horizontally within the limits of the explicitly specified value, or
-       set to \code{NULL} to rely upon the default value of the range of
-       \code{x} divided by 50.}
-  \item{jitter_y}{Same as \code{jitter_x} except vertical jitter.}\cr
+       set to \code{NULL} to rely upon the computed default value.}
+  \item{jitter_y}{Defaults to 0. Same as \code{jitter_x} except
+        vertical jitter.}\cr
 
 
   \item{ID}{Name of variable to provide the \bold{labels for the selected
@@ -372,13 +374,15 @@ vp(\dots)
         a second (dashed) fit line is displayed calculated \emph{without}
         the outliers.}
   \item{fit_power}{Power that describes response Y as a power function of the
-       predictor variable X, required for \code{"power"} .
+       predictor variable X, required for the value of \code{fit} of \code{"power"}.
        Optionally, and experimentally, applies to \code{fit} values \code{"exp"}.}
   \item{fit_se}{Confidence level for the error band displayed around the
        line of best fit. On by default at 0.95 if a fit line is specified,
        but turned off if \code{plot_errors=TRUE}.
        Can be a vector to display multiple ranges. Set to 0 to turn off.}
   \item{fit_color}{Color of the fit line.}
+  \item{fit_new}{When parameter \code{fit} is set to \code{"quad"}, 
+        values computed from the quadratic function fit.}
   \item{plot_errors}{Plot the line segment that joins each point to the
         regression line, "loess" or "lm", illustrating the size of the
         residuals.}
@@ -394,7 +398,8 @@ vp(\dots)
         parameters \code{ellipse_fill} and \code{ellipse_color}.}\cr
 
 
-  \item{ts_unit}{Specify the time unit from which to plot a time series,
+  \item{ts_unit}{Specify the time unit from which to plot 
+       \bold{time series data},
         plotted when the \code{x}-variable is of type \code{Date}.
         Default value is the time unit that describes the time intervals as
         they occur in the data.
@@ -414,7 +419,8 @@ vp(\dots)
   \item{ts_NA}{By default, \code{y} missing values, those with value \code{NA},
     do not plot, leaving a blank space. Or, specify a value, usually 0,
     to replace the \code{NA} to plot a y-value such as 0 for the corresponding
-    date on the x-axis. However, forecasting with missing data does not work.}  \item{ts_ahead}{Forecast this specified number of \code{ts_units} ahead
+    date on the x-axis. However, forecasting with missing data does not work.}
+  \item{ts_ahead}{Forecast this specified number of \code{ts_units} ahead
         of the last time period in the time series data.}
   \item{ts_method}{Default is \code{"es"} for exponential smoothing forecasting.
        Or, choose \code{"lm"} for at least squares linear regression model.}
@@ -444,7 +450,7 @@ vp(\dots)
       de-seasonalize.}
   \item{ts_type}{Type of seasonal model for exponential smoothing forecasting.
       Default is \code{"additive"} with a \code{"multiplicative"} option.}
-  \item{ts_PIlevel}{Level of the prediction interval about the forecasted
+  \item{ts_PI}{Level of the prediction interval about the forecasted
        Holt-Winters values with a default of \code{0.95}.}
   \item{stack}{If \code{TRUE}, multiple time plots are stacked on each other, with
        \code{area} set to \code{TRUE} by default.}
@@ -746,7 +752,7 @@ A scatterplot of Likert type data is problematic because there are so few possib
 DATA\cr
 The default input data frame is \code{d}. Specify another name with the \code{data} option.  Regardless of its name, the data frame need not be attached to reference the variables directly by its name, that is, no need to invoke the \code{d$name} notation. The referenced variables can be in the data frame and/or the user's workspace, the global environment.
 
-The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin_width}, to override default values. The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the lines by setting \code{lwd=0}.
+The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin_width}, to override default values. The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the line segments by setting \code{line_width=0}.
 
 The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
@@ -1113,7 +1119,7 @@ Plot(.Index, Salary, area_fill="on")
 Plot(.Index, c(Pre, Post))
 
 # Trellis graphics run chart with custom line width, no points
-Plot(.Index, Salary, facet1=Gender, lwd=3, size=0)
+Plot(.Index, Salary, facet1=Gender, line_width=3, size=0)
 
 # daily time series plot
 # create the daily time series from R built-in data set airquality

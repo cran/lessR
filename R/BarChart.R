@@ -774,7 +774,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     # analyze each x column separately
 
     else {
-      bc.data.frame(data, n_cat, stack100,
+      bc.data.frame(data, stack100,
         fill, color, trans, fill_split, theme,
         horiz, gap, proportion, scale_y,
         xlab, ylab, main,

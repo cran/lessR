@@ -9,7 +9,7 @@ function(x, y=NULL, data=d, filter=NULL,
          transparency=getOption("trans_bar_fill"),
 
          density=NULL, angle=45,
-         lty="solid", lwd=1, edges=200,
+         line_type="solid", line_width=1, edges=200,
 
          clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0),
 
@@ -54,6 +54,14 @@ function(x, y=NULL, data=d, filter=NULL,
         if (names(dots)[i] == "values_cut") labels_cut <- dots[[i]]
       }
     }
+    if (names(dots)[i] == "lwd") {
+      line_width <- dots[[i]]
+      message("\nParameter  lwd  is now named  line_width\n")
+    }
+      if (names(dots)[i] == "lty") {
+        line_width <- dots[[i]]
+        message("\nParameter  lty  is now named  line_type\n")
+      }
     if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]]
     if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]]
     if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
@@ -322,7 +330,7 @@ function(x, y=NULL, data=d, filter=NULL,
         fill, color, trans,
         radius, hole, hole_fill, edges,
         clockwise, init_angle,
-        density, angle, lty, lwd,
+        density, angle, line_type, line_width,
         labels, labels_position, labels_color, labels_size, labels_digits,
         labels_cex, main_cex, main, main.miss,
         add, x1, x2, y1, y2,

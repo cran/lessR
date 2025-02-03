@@ -1,6 +1,6 @@
 Regression <-
 function(my_formula, data=d, filter=NULL,
-         digits_d=NULL, n_cat=getOption("n_cat"),
+         digits_d=NULL,
 
          Rmd=NULL, Rmd_browser=TRUE,
          Rmd_format=c("html", "word", "pdf", "odt", "none"),
@@ -25,10 +25,22 @@ function(my_formula, data=d, filter=NULL,
          new_scale=c("none", "z", "center", "0to1", "robust"),
          scale_response=FALSE,
 
-         quiet=getOption("quiet"),
-         graphics=TRUE, pdf=FALSE, width=6.5, height=6.5, refs=FALSE,
+         quiet=getOption("quiet"), bubble_plot=NULL,
+         graphics=TRUE, size=NULL, pdf=FALSE, width=6.5, height=6.5,
+         refs=FALSE,
+
+         n_cat=getOption("n_cat"), # old
+
          fun_call=NULL, ...) {
 
+
+  if (!missing(n_cat)) {
+    message(">>> Parameter  n_cat  will no longer work in the future.\n",
+             "    Better to convert a categorical integer variable to ",
+             "an R factor.\n\n",
+             "Eg: d$Item1 <- factor(d$Item1, levels=1:3,",
+                 "labels=c(\"Disagree\", \"Neutral\", \"Agree\", \n")
+  }
 
   # produce actual argument, such as from an abbreviation, flag if not exist
   res_sort <- match.arg(res_sort)
@@ -533,8 +545,8 @@ function(my_formula, data=d, filter=NULL,
     if (!ancova) {
       ancovaOut <- .reg5Plot(lmo, n_res_rows, n_pred_rows, scatter_coef,
          X1_new, in.data.frame, prd$cint, prd$pint,
-         plot_errors, digits_d, n_cat, pdf, width, height, manage.gr,
-         quiet, ...)
+         plot_errors, digits_d, size, pdf, width, height, bubble_plot,
+         manage.gr, quiet, ...)
     }
     else {
       ancovaOut <- .reg5ancova(lmo, d.ancova, digits_d,

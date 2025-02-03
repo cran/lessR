@@ -13,12 +13,12 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          ID, out_cut, ID_color, ID_size,
          rotate_x, rotate_y, width, height, pdf_file, T.type, quiet, ...) {
 
-  date.ts <- FALSE  # currently does nothing
-  if (is.null(dim(x))) if (.is.date(x)) date.ts <- TRUE
-  if (date.ts) xx.lab <- xlab
-  if (date.ts  &&  is.null(xx.lab)) x.lab <- NULL
+  date.var <- FALSE  # currently does nothing
+  if (is.null(dim(x))) if (.is.date(x)) date.var <- TRUE
+  if (date.var) xx.lab <- xlab
+  if (date.var  &&  is.null(xx.lab)) x.lab <- NULL
 
-  if (size.pt == 0) object <- "line"
+  if (size.pt[1] == 0) object <- "line"
   size.ln <- size.ln + 0.5  # Trellis plot lines are narrower
 
   if (!is.null(area_fill)) if (area_fill == "on")
@@ -99,7 +99,8 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   if (is.null(facet1) && is.null(facet2))
     n.panels <- 1
   else {
-    n.panels <- ifelse (is.null(facet2), nlevels(facet1), nlevels(facet1)*nlevels(facet2))
+    n.panels <- ifelse (is.null(facet2), nlevels(facet1),
+                        nlevels(facet1)*nlevels(facet2))
     if (n.panels == 0) n.panels <- 1
 
     if (T.type %in% c("cont", "cont_cont")) {
@@ -131,47 +132,122 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   }
   if (is.null(facet1)) strp <- FALSE
 
-  # ---------------------------------
-  if (T.type == "cont_cont") {  # cont - cont
-    # set 1 or 2 conditioning variables
-    if (is.null(facet2)) {
-      p <- lattice::xyplot(y ~ x | facet1, groups=by, ...)
-    }
-    else {  # facet2 is present
-      p <- lattice::xyplot(y ~ x | facet1 * facet2, groups=by, ...)
-    }
-  }
 
-  else if (T.type == "con_cat") {  # cont - cat
-      jitter <- .4 * jitter
-      if (is.null(facet1)  &&  is.null(facet2)) {
-        p <- lattice::bwplot(y ~ x, groups=by, ...)
-      }
-      else if (is.null(facet2)) {
-        p <- lattice::bwplot(y ~ x | facet1, groups=by, ...)
+  # ---------------------------------
+  if (!date.var) {
+    if (T.type == "cont_cont") {  # cont - cont
+      # set 1 or 2 conditioning variables
+      if (is.null(facet2)) {
+        p <- lattice::xyplot(y ~ x | facet1, groups=by,
+          scales=list(
+            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8),
+            y=list(labels=.roundK(pretty(y)), at=pretty(y), tck=.8)
+          ), ...)
       }
       else {  # facet2 is present
-        p <- lattice::bwplot(y ~ x | facet1 * facet2, groups=by, ...)
+        p <- lattice::xyplot(y ~ x | facet1 * facet2, groups=by,
+          scales=list(
+            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8),
+            y=list(labels=.roundK(pretty(y)), at=pretty(y, tck=.8))
+          ), ...)
       }
-  }  # end con_cat
+    }
+    else if (T.type == "con_cat") {  # cont - cat
+        jitter <- .4 * jitter
+        if (is.null(facet1)  &&  is.null(facet2)) {
+          p <- lattice::bwplot(y ~ x, groups=by,
+          scales=list(
+            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+          ), ...)
+        }
+        else if (is.null(facet2)) {
+          p <- lattice::bwplot(y ~ x | facet1, groups=by,
+          scales=list(
+            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+          ), ...)
+        }
+        else {  # facet2 is present
+          p <- lattice::bwplot(y ~ x | facet1 * facet2, groups=by,
+          scales=list(
+            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+          ), ...)
+        }
+    }  # end con_cat
+    else if (T.type == "cont") {  # cont, VBS plots, possibly over facets
+      # set 0, 1 or 2 conditioning variables
+      if (is.null(facet1)  &&  is.null(facet2)) {  # 0 cond var
+        p <- lattice::stripplot(~ x, groups=by, subscripts=TRUE,
+          scales=list(
+            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+          ), ...)
+        y.lab <- ""
+      }
+      else if (is.null(facet2)) {  # 1 cond var
+        p <- lattice::stripplot(~ x | facet1, groups=by, subscripts=TRUE,
+          scales=list(
+            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+          ), ...)
+        y.lab <- ifelse (is.null(ylab), getOption("facet1name"), ylab)
+      }
+      else  {  # 2 cond var
+        p <- lattice::stripplot(~ x | facet1*facet2, groups=by, subscripts=TRUE,
+          scales=list(
+            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+          ), ...)
+        y.lab <- ""
+      }
+    }  # end cont
+  } # end not date.var
 
-  else if (T.type == "cont") {  # cont
-    # set 0, 1 or 2 conditioning variables
-    if (is.null(facet1)  &&  is.null(facet2)) {  # 0 cond var
-      p <- lattice::stripplot(~ x, groups=by, subscripts=TRUE, ...)
-      y.lab <- ""
+  else {  # x-variable is a Date
+    if (T.type == "cont_cont") {  # cont - cont
+      # set 1 or 2 conditioning variables
+      if (is.null(facet2)) {
+        p <- lattice::xyplot(y ~ x | facet1, groups=by, ...)
+      }
+      else {  # facet2 is present
+        p <- lattice::xyplot(y ~ x | facet1 * facet2, groups=by, ...)
+      }
     }
-    else if (is.null(facet2)) {  # 1 cond var
-      p <- lattice::stripplot(~ x | facet1, groups=by, subscripts=TRUE, ...)
-      y.lab <- ifelse (is.null(ylab), getOption("facet1name"), ylab)
-    }
-    else  {  # 2 cond var
-      p <- lattice::stripplot(~ x | facet1 * facet2, groups=by, subscripts=TRUE, ...)
-      y.lab <- ""
-    }
-  }  # end cont
+
+    else if (T.type == "con_cat") {  # cont - cat
+        jitter <- .4 * jitter
+        if (is.null(facet1)  &&  is.null(facet2)) {
+          p <- lattice::bwplot(y ~ x, groups=by, ...)
+        }
+        else if (is.null(facet2)) {
+          p <- lattice::bwplot(y ~ x | facet1, groups=by, ...)
+        }
+        else {  # facet2 is present
+          p <- lattice::bwplot(y ~ x | facet1 * facet2, groups=by, ...)
+        }
+    }  # end con_cat
+
+    else if (T.type == "cont") {  # cont
+      # set 0, 1 or 2 conditioning variables
+      if (is.null(facet1)  &&  is.null(facet2)) {  # 0 cond var
+        p <- lattice::stripplot(~ x, groups=by, subscripts=TRUE, ...)
+        y.lab <- ""
+      }
+      else if (is.null(facet2)) {  # 1 cond var
+        p <- lattice::stripplot(~ x | facet1, groups=by, subscripts=TRUE, ...)
+        y.lab <- ifelse (is.null(ylab), getOption("facet1name"), ylab)
+      }
+      else  {  # 2 cond var
+        p <- lattice::stripplot(~ x | facet1 * facet2, groups=by,
+                                subscripts=TRUE, ...)
+        y.lab <- ""
+      }
+    }  # end cont
+  } # end is date.var
 
   p <- update(p, layout=c(n_col, n_row))
+
+  if (length(levels(facet1)) == 1) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "Need more than just one unique value for  facet1\n",
+      "Unique values of facet1: ", levels(facet1),"\n\n")
+  }
   if (xor(is.null(n_col), is.null(n_row))) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "If you specify  n_col  or  n_row  then \n",
@@ -307,7 +383,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
 
             if (fit != "off"  &&  n.groups == 1) {
 
-              pf <- .plt.fit (x, y, fit, fit_power)
+              pf <- .plt.fit (x, y, fit, fit_power, fit_new=NULL)
 
               x <- pf$x.lv  # x and y get reduced in .plt.fit if NA
               y <- pf$y.lv

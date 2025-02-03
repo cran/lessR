@@ -1,5 +1,5 @@
 bc.data.frame <-
-function(x, n_cat, stack100,
+function(x, stack100,
          col_fill, col_color, col.trans, fill_spit, theme,
          horiz, gap, prop, scale_y, 
          xlab, ylab, main,
@@ -20,7 +20,7 @@ function(x, n_cat, stack100,
   if (manage.gr && is.null(pdf_file)) {
     i.win <- 0
     for (i in 1:ncol(x)) {
-      if (is.numeric(x[,i])  &&  !.is.num.cat(x[,i], n_cat)) 
+      if (is.numeric(x[,i])  &&  !.is.num.cat(x[,i], 0)) 
         i.win <- i.win + 1
     }
     .graphwin(i.win, width, height)
@@ -34,7 +34,7 @@ function(x, n_cat, stack100,
 
     nu <- length(unique(na.omit(x[,i])))
 
-    if (!is.numeric(x[,i]) || .is.num.cat(x[,i],n_cat)) {
+    if (!is.numeric(x[,i]) || .is.num.cat(x[,i], 0)) {
  
       if (nlevels(factor(x[,i])) < length(x[,i])) {
 
@@ -83,8 +83,8 @@ function(x, n_cat, stack100,
           if (!quiet) .showfile(pdf_file, "bar chart")
         }
 
-        if (.is.integer(x[,i]) && nu <= n_cat && !quiet)
-          .ncat("bar chart", x.name, nu, n_cat)
+        if (.is.integer(x[,i]) && nu <= 0 && !quiet)
+          .ncat("bar chart", x.name, nu, 0)
 
         }  # end else
       }
@@ -107,9 +107,7 @@ function(x, n_cat, stack100,
     else {
       cat("No categorical variables, so no bar charts.\n\n",
           "If you have integer variables that are categorical,\n",
-          "  then set the n_cat parameter to the maximum\n",
-          "  number of integer values (categories),\n",
-          "  or convert them to R factors.\n\n", sep="")
+          "   convert them to R factors.\n\n", sep="")
     }
   }
 

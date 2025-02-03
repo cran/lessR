@@ -361,7 +361,7 @@ function(x=NULL, data=d, filter=NULL,
     if (manage.gr) {
       i.win <- 0
       for (i in 1:ncol(data)) {
-        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], n_cat))
+        if (is.numeric(data[,i])  &&  !.is.num.cat(data[,i], 0))
           i.win <- i.win + 1
       }
       .graphwin(i.win, d.w=width, d.h=height)
@@ -384,7 +384,7 @@ function(x=NULL, data=d, filter=NULL,
 
       if (is.numeric(data[,i])) {
         # let 1 variable go through, even if num.cat
-        if (ncol(data) == 1  ||  !.is.num.cat(data[,i], n_cat)) {
+        if (ncol(data) == 1  ||  !.is.num.cat(data[,i], 0)) {
 
         if (!is.null(pdf_file)) {
           if (!grepl(".pdf", pdf_file))
@@ -527,7 +527,7 @@ function(x=NULL, data=d, filter=NULL,
             dev.set(which = open.win)
           }
         }
-        if (!quiet) .ncat("Histogram", x.name, nu, n_cat)
+        if (!quiet) .ncat("Histogram", x.name, nu, 0)
       }
 
       }  # is.numeric(data[,i])

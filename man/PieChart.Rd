@@ -21,7 +21,7 @@ PieChart(x, y=NULL, data=d, filter=NULL,
          transparency=getOption("trans_bar_fill"),
 
          density=NULL, angle=45,
-         lty="solid", lwd=1, edges=200,
+         line_type="solid", line_width=1, edges=200,
 
          clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0), 
 
@@ -93,10 +93,10 @@ pc(\dots)
        \code{NULL}, that is, no shading lines.}
   \item{angle}{Angle of shading lines in degrees.}
 
-  \item{lty}{Type of line that borders each slice, such as "solid", the default.
+  \item{line_type}{Type of line that borders each slice, such as "solid", the default.
         Can be a vector. Acceptable values are \code{"blank"}, \code{"solid"},
         \code{"dashed"}, \code{"dotted"}, \code{"dotdash"}, and \code{"longdash"}.}
-  \item{lwd}{Width of line that borders each slice.}
+  \item{line_width}{Width of line that borders each slice.}
   \item{edges}{Approximation of a circle with a polygon drawn with the 
        number of specified edges.}\cr
 
@@ -263,7 +263,7 @@ pc(Dept, hole=0)
 
 # specify a unique slice color for each of the two slices
 # turn off borders
-PieChart(Gender, fill=c("pink","lightblue"), lty="blank")
+PieChart(Gender, fill=c("pink","lightblue"), line_type="blank")
 
 # just males with a salary larger than 75000 USD
 PieChart(Dept, rows=(Gender=="M" & Salary > 75000))

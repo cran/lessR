@@ -1,11 +1,11 @@
-regPlot <- 
+regPlot <-
 function(out, type, d.ancova, digits_d=NULL, pred.intervals=TRUE,
          res_sort=c("cooks","rstudent","dffits","off"),
          n_res_rows=NULL, cooks_cut=1, scatter_coef=NULL,
          pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
 
 
-  if (options("device") != "RStudioGD"  &&  is.null(options()$knitr.in.progress)) 
+  if (options("device") != "RStudioGD"  &&  is.null(options()$knitr.in.progress))
     .graphwin(1)
 
 
@@ -32,11 +32,11 @@ function(out, type, d.ancova, digits_d=NULL, pred.intervals=TRUE,
         in.data.frame <- FALSE
       }
     }
-    
+
     # check for all numeric vars  in.data.frame <- TRUE
     numeric.all <- TRUE
     for (i in 1:n.vars) {
-      if (in.data.frame && 
+      if (in.data.frame &&
         !is.numeric(out$model[1,which(names(out$model) == nm[i])])) {
           cat("\n\n\n>>> Note: ", nm[i], "is not a numeric variable.\n")
           numeric.all <- FALSE
@@ -69,9 +69,9 @@ function(out, type, d.ancova, digits_d=NULL, pred.intervals=TRUE,
 
     if (is.null(d.ancova))
       .reg5Plot(out, n_res_rows=NULL, n_pred_rows=NULL,
-           scatter_coef=s.c, X1_new=NULL, 
+           scatter_coef=s.c, X1_new=NULL,
            in.data.frame, c.int, p.int,
-           digits_d=getOption("digits_d"), n_cat=getOption("n_cat"),
+           digits_d=getOption("digits_d"),
            pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...)
     else
       .reg5ancova(out, d.ancova, digits_d=getOption("digits_d"),

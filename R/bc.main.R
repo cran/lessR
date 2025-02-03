@@ -756,10 +756,16 @@ function(x, y, by, stack100,
       else
         lblval.y <- .fmt(y.coords,2)
     }
-#   axis(ax.num, col=axis_y_color,   # maybe split off the text like with x axis?
-#        col.axis=axis_y_text_color, cex.axis=axis_y_cex, las=las.value,
-#        tck=-.02, padj=adj1,  at=y.coords, labels=lblval.y, ...)
-         #tck=-.03, padj=adj1,  at=axTicks(ax.num, axp=scale_y), ...)
+
+    # adjust axis label from tick with mgp[2]
+    # mgp does not work with rotate_x, see .axes()
+    my.mgp <- par("mgp")  # save to restore
+    ax <- .axes_dim()  # get axis value parameters
+    mgp2 <- -0.350 + (0.9 * ax$axis_x_cex)
+    par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
+    adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
+
+    par(tcl=-0.28)  # axis tick length
     if(!horiz)
         .axes(NULL, NULL, NULL, axT2=y.coords)
     else
@@ -784,18 +790,18 @@ function(x, y, by, stack100,
     adj.x <- ifelse(!horiz, 0.5, 1.0)
     adj.y <- ifelse(!horiz, 1.0, 0.5)
     if (rotate_x == 0) {
-      axis(ax.value, at=x.coords, labels=FALSE, tck=-.02, col=axis_x_color, ...)
+      axis(ax.value, at=x.coords, labels=FALSE, col=axis_x_color, ...)
       text(x=xx, y=yy, labels=val.lab, adj=c(adj.x,adj.y),
            xpd=TRUE, cex=axis_x_cex, col=axis_x_text_color, ...)
     }
     else if (rotate_x > 0  && rotate_x < 90) {
-      axis(ax.value, at=x.coords, labels=FALSE, tck=-.02, col=axis_x_color, ...)
+      axis(ax.value, at=x.coords, labels=FALSE, col=axis_x_color, ...)
       text(x=xx, y=yy, labels=val.lab, pos=1,  # pos needed for offset
            xpd=TRUE, cex=axis_x_cex, col=axis_x_text_color,
            srt=rotate_x, offset=offset, ...)
     }
     else if (rotate_x == 90)  # 90 degrees rotate
-      axis(ax.value, at=x.coords, labels=val.lab, tck=-.02, col=axis_x_color,
+      axis(ax.value, at=x.coords, labels=val.lab, col=axis_x_color,
            cex.axis=axis_x_cex, las=2, ...)
 
     # title

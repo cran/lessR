@@ -28,7 +28,7 @@ function(x, y, by=NULL,
          out_fill, out_color, out_shape, out_shape.miss,
 
          fit.line="off", fit_power=1, fit_color="gray55",
-         fit_lwd=getOption("fit.lw"),
+         fit_lwd=getOption("fit.lw"), fit_new=NULL,
          fit_se=1, se_fill="gray80", plot_errors=FALSE,
 
          ellipse=FALSE, ellipse_color="lightslategray",
@@ -52,6 +52,7 @@ function(x, y, by=NULL,
          add_color=NULL, add_fill=NULL, add_trans=NULL,
 
          quiet=FALSE, want.labels=TRUE, bubble.title=TRUE, ...)  {
+
 
   # -------------------------
   # preliminaries
@@ -324,7 +325,7 @@ function(x, y, by=NULL,
 
   par(bg=getOption("window_fill"))
   par(mai=c(bm, mm, tm, rm))
-  par(tcl=-0.28)  # axis tick length
+  par(tcl=-0.28)  # axis tic length
 
   # -----------------------
   # setup region for coordinate system only with plot and type="n"
@@ -388,7 +389,7 @@ function(x, y, by=NULL,
   mx.y <- max(region[,2])
   mn.y <- min(region[,2])
 
-  # set origin for numeric variables
+  # set y-axis origin for numeric variables
   if (!cat.y) {
     if (!is.null(origin_y)) {
       if (all(y, na.rm=TRUE) > 0) mn.y <- origin_y
@@ -419,7 +420,6 @@ function(x, y, by=NULL,
 
   # plot: setup the coordinate system
   # ---------------------------------
-  # ---------------------------------
   plot(region, type="n", axes=FALSE, ann=FALSE, ...)
   rm(region)
   usr <- par("usr")
@@ -445,7 +445,7 @@ function(x, y, by=NULL,
       }
       else {  # stat != "count"
         if (is.null(scale_x))
-          axT1 <- pretty(c(origin_x, x))  # else numeric, so all the tics
+          axT1 <- pretty(c(origin_x, x), eps.correct=0)  # numeric, so all tics
         else {
           if (!run)
             axT1 <- axTicks(1, axp=scale_x)
@@ -487,7 +487,6 @@ function(x, y, by=NULL,
       .axes(x.lvl, y.lvl, axT1, axT2,
             rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
     }
-
     else {  # date.var, y-axis
       .axes(NULL, y.val, NULL, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
             offset=offset, y.only=TRUE, ...)  # y-axis values
@@ -537,7 +536,6 @@ function(x, y, by=NULL,
       axis(1, x.zoo.dates, at=x.dates[indices], labels=x.zoo.dates[indices],
                 col=ax$axis_x_color, cex.axis=axis_x_cex,
                 col.axis=ax$axis_x_text_color, ...)  # x-axis
-
     }  # end date.var
 
     par(mgp = my.mgp)  # restore back to previous value
@@ -699,41 +697,35 @@ function(x, y, by=NULL,
 
     if (object %in% c("point", "both")) {
 
-       # -----------------------------------
-       # jitter for scatterplot with num.cat
+      # -----------------------------------
+      # set jitter for scatterplot with discrete levels
+#     do.jit <- FALSE
+#     if (nrows < 100) {
+#       if (max(table(x,y) > 1)) do.jit <- TRUE  # duplication
+#     }
 
-        num.c.x <- FALSE
-        num.c.y <- FALSE
-        if (size[1]>0 && n.xcol==1 && stat!="mean") {  # mult sizes if n_bin>0
-
-          if (cat.x)  # ifelse() does not work
-            unq.x <- levels(x[,1])
-          else
-            unq.x <- unique(x[,1])
-          nx.unq <- length(unq.x)
-          if (nx.unq <= 12) num.c.x <- TRUE
-
-          if (cat.y)
-            unq.y <- levels(y[,1])
-          else
-            unq.y <- unique(y[,1])
-          ny.unq <- length(unq.y)
-          if (ny.unq <= 12) num.c.y <- TRUE
+      # multiple sizes if n_bin>0
+      if (size[1]>0 && n.xcol==1 && stat=="data") {
+        if (is.null(jitter_x))  {  # ifelse() does not work
+          if (length(unique(x[,1])) <= 14  &&  nrows > 14)
+            jitter_x <- (diff(range(x[,1], na.rm=TRUE))) / 32
         }
+        if (is.null(jitter_y))  {  # ifelse() does not work
+          if (length(unique(y[,1])) <= 14  &&  nrows > 14)
+            jitter_y <- (diff(range(y[,1], na.rm=TRUE))) / 32
+        }
+      }
+
+      # for VBS need to set jitter, here only set if jitter is NULL
+      if (is.null(jitter_x)) jitter_x <- 0
+      if (is.null(jitter_y)) jitter_y <- 0
 
       # --- process jitter ---
-     do.jit.x <- ifelse (!cleveland && !date.var && num.c.x, TRUE, FALSE)
-     do.jit.y <- ifelse (!cleveland && !date.var && num.c.y, TRUE, FALSE)
-     if (is.null(jitter_x)) if (do.jit.x)
-       jitter_x <- (diff(range(x[,1], na.rm=TRUE))) / 32
-     if (is.null(jitter_y)) if (do.jit.y)
-       jitter_y <- (diff(range(y[,1], na.rm=TRUE))) / 32
-
-      if (do.jit.x && jitter_x > 0) {
+      if (jitter_x > 0) {
         x.temp <- x[,1]
         x[,1] <- x + runif(length(x[,1]), -jitter_x, jitter_x)
       }
-      if (do.jit.y && jitter_y > 0) {
+      if (jitter_y > 0) {
         y.temp <- y[,1]
         y[,1] <- y + runif(length(y[,1]), -jitter_y, jitter_y)
       }
@@ -828,11 +820,11 @@ function(x, y, by=NULL,
               bck.g <- "gray85"
 
             # restore un-jittered data
-            if (do.jit.x  &&  jitter_x > 0) {
+            if (jitter_x > 0) {
               x[,1] <- x.temp
               rm(x.temp)
             }
-            if (do.jit.y  &&  jitter_y > 0) {
+            if (jitter_y > 0) {
               y[,1] <- y.temp
               rm(y.temp)
             }
@@ -1091,8 +1083,6 @@ function(x, y, by=NULL,
       else {  # multiple, pull out subset
 
         if (!is.null(by)) {  # multiple by plots
-#         x.lv <- subset(x, by==levels(by)[i])
-#         y.lv <- subset(y, by==levels(by)[i])
           ind <- which(by == levels(by)[i])
           x.lv <- x[ind]
           y.lv <- y[ind]
@@ -1148,8 +1138,8 @@ function(x, y, by=NULL,
         if (i.remv == 2) do.remove <- TRUE  # 2nd pass
       }
 
-#     sse <- double(length=n.clrs)
-      mse <- double(length=n.clrs)
+      mse.ln <- double(length=n.clrs)  # .ln is linear
+      mse.nl <- double(length=n.clrs)  # .nl is nonlinear
       b0 <- double(length=n.clrs)
       b1 <- double(length=n.clrs)
       Rsq <- double(length=n.clrs)
@@ -1200,14 +1190,17 @@ function(x, y, by=NULL,
 
         col.ln <- ifelse (n.clrs==1, fit_color, fill[i.clr])
 
-        pf <- .plt.fit (x.lv, y.lv, fit.line, fit_power)
+        pf <- .plt.fit(x.lv, y.lv, fit.line, fit_power, fit_new)  # fit line
 
         x.lv <- pf$x.lv  # x and y get reduced in .plt.fit if NA
         y.lv <- pf$y.lv
-        f.ln <- pf$f.ln
-        l.ln <- pf$l.ln
+        f.ln <- pf$f.ln  # fitted
+        l.ln <- pf$l.ln  # linearized
+        y.new <- pf$y.new  # computed from fitted function 
+
         if (i.remv == 1) {  # if outlier removal, only outlier line reported
-          mse[i.clr] <- pf$mse
+          mse.ln[i.clr] <- pf$mse.ln
+          mse.nl[i.clr] <- pf$mse.nl
           b0[i.clr] <- pf$b0
           b1[i.clr] <- pf$b1
           Rsq[i.clr] <- pf$Rsq
@@ -1250,12 +1243,13 @@ function(x, y, by=NULL,
           segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv,
                    col=pe.clr, lwd=1)
         }
-
       }  # ith pattern (clr)
     }  # fit.remove
 
     if (!quiet) cat ("\n")
-  }  # fit.line
+  }  # end fit.line
+  else
+    y.new <- NULL
 
 
   # -----------
@@ -1292,17 +1286,17 @@ function(x, y, by=NULL,
   }
   # end annotations
 
+
   # -----------
   # end, return
 
-  if (fit.line != "off") {
-    mse <- mse;  b0 <- b0;  b1 <- b1;  Rsq <- Rsq;  by.cat <- by.cat
-  }
-  else {
-    mse <- NULL;  b0 <- NULL;  b1 <- NULL;  Rsq <- NULL;  by.cat <- NULL
+  if (fit.line == "off") {
+    mse.ln <- NULL;  mse.nl <- NULL;  b0 <- NULL;  b1 <- NULL;  Rsq <- NULL
+    by.cat <- NULL
   }
 
-  return(list(mse=mse, b0=b0, b1=b1, Rsq=Rsq, by.cat=by.cat,
-              jitter_x=jitter_x, jitter_y=jitter_y))
+  return(list(mse.ln=mse.ln, mse.nl=mse.nl, b0=b0, b1=b1, Rsq=Rsq,
+              by.cat=by.cat, jitter_x=jitter_x, jitter_y=jitter_y,
+              y.new=y.new))
 
 }  # end plt.main
