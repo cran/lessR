@@ -1,5 +1,5 @@
 .plt.colors <-
-function(object, nn_col, n.by, theme, fill, fill.miss,
+function(object, nn_col, n.by, segments, theme, fill, fill.miss,
             color, color.miss, area_fill, area_fill.miss, trans, stack,
             n.ycol, n.y_var, ord.by.call, run, size.pt) {
 
@@ -9,7 +9,7 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
   ### area fill
   ### ---------
 
-  if (object %in% c("line", "both")) {
+  if (segments) {
 
     # fill can substitute for area_fill if no points
     if (!fill.miss && area_fill.miss && all(size.pt==0)) {
@@ -58,7 +58,7 @@ function(object, nn_col, n.by, theme, fill, fill.miss,
          area_fill <- .maketrans(area_fill, (1-trans)*256)
     }
 
-  }  # end object %in% c("line", "both")  --- area_fill
+  }  # end segments  --- area_fill
 
 
   ### fill and color

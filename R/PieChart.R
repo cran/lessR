@@ -13,11 +13,11 @@ function(x, y=NULL, data=d, filter=NULL,
 
          clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0),
 
-         labels=getOption("labels"),
-         labels_color=getOption("labels_color"),
-         labels_size=getOption("labels_size"),
-         labels_digits=getOption("labels_digits"),
-         labels_position=getOption("labels_position"),
+         labels=c("%", "input", "prop", "off"),
+         labels_position=c("in","out"),
+         labels_color="white",
+         labels_size=0.75,
+         labels_decimals=NULL,
 
          main=NULL, main_cex=getOption("main_cex")*1.2,
          labels_cex=getOption("lab_cex"), cex,
@@ -29,6 +29,9 @@ function(x, y=NULL, data=d, filter=NULL,
          eval_df=NULL, quiet=getOption("quiet"),
          width=6.5, height=6, pdf_file=NULL, ...) {
 
+
+  labels <- match.arg(labels)
+  labels_position <- match.arg(labels_position)
 
   # ------------ Old Stuff ----------------------------------
   if (!missing(rows))
@@ -49,14 +52,18 @@ function(x, y=NULL, data=d, filter=NULL,
         if (names(dots)[i] == "values") labels <- dots[[i]]
         if (names(dots)[i] == "values_color") labels_color <- dots[[i]]
         if (names(dots)[i] == "values_size") labels_size <- dots[[i]]
-        if (names(dots)[i] == "values_digits") labels_decimals <- dots[[i]]
+        if (names(dots)[i] == "values_decimals") labels_decimals <- dots[[i]]
         if (names(dots)[i] == "values_position") labels_position <- dots[[i]]
         if (names(dots)[i] == "values_cut") labels_cut <- dots[[i]]
       }
     }
-    if (names(dots)[i] == "lwd") {
+    if (names(dots)[i] == "labels_digits") {
       line_width <- dots[[i]]
       message("\nParameter  lwd  is now named  line_width\n")
+    }
+    if (names(dots)[i] == "labels_digits") {
+      labels_decimals <- dots[[i]]
+      message("\nParameter  labels_digits  is now named  labels_decimals\n")
     }
       if (names(dots)[i] == "lty") {
         line_width <- dots[[i]]
@@ -94,20 +101,6 @@ function(x, y=NULL, data=d, filter=NULL,
     if (trans.miss) trans <- sty$bar$trans.fill
   }
 
-  if (is.null(labels_digits)) {
-    if (labels == "%") labels_digits <- 0
-    if (labels == "prop") labels_digits <- 2
-  }
-
-  if (missing(labels) && (!missing(labels_color) || !missing(labels_size)
-      || !missing(labels_digits) || !missing(labels_position)))
-    labels <- "%"
-
-  if (is.null(labels_digits)) {
-    if (labels == "%") labels_digits <- 0
-    if (labels == "prop") labels_digits <- 2
-  }
-
   if (missing(labels_color)) {
     labels_color <- "white"
     if (labels_position == "out") labels_color <- getOption("axis_text_color")
@@ -121,11 +114,6 @@ function(x, y=NULL, data=d, filter=NULL,
   if (hole < 0  ||  hole >= 1) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Size of hole is a proportion, so must be between 0 and 1\n\n")
-  }
-
-  if (!(labels %in% c("off", "%", "prop", "input"))) {
-    cat("\n"); stop(call.=FALSE, "\n","------\n",
-      "Valid labels of labels: \"off\",  \"%\", \"prop\", and \"input\"\n\n")
   }
 
   .param.old(...)
@@ -331,7 +319,7 @@ function(x, y=NULL, data=d, filter=NULL,
         radius, hole, hole_fill, edges,
         clockwise, init_angle,
         density, angle, line_type, line_width,
-        labels, labels_position, labels_color, labels_size, labels_digits,
+        labels, labels_position, labels_color, labels_size, labels_decimals,
         labels_cex, main_cex, main, main.miss,
         add, x1, x2, y1, y2,
         quiet, pdf_file, width, height, ...)

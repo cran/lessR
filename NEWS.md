@@ -1,3 +1,63 @@
+# lessR version 4.4.2, March 16, 2025
+
+## Updates
+
+* `BarChart()`: Parameter `legend_abbrev` changed from default of no abbreviation to 10 characters for each line of the legend.
+
+* `BarChart()`: The size of the legend title font is now 10\% larger than the font for the legend items.
+
+* `BarChart()`: Parameter `legend_abbrev` changed from default of no abbreviation to 10 characters for each line of the legend.
+
+* `BarChart()`, `PieChart()`: Parameter `labels_decimal` standardized across the two charting functions, now defaults to 0 if only integer labels are to be displayed or percentages, 0 if input values are to be displayed, and 2 for proportions.
+
+* `Read()`: Added the `.prn` format for "print", a space-delimited text file, with each data value separated from adjacent data values by one or more spaces.
+
+* `Read()`: Default missing value parameter `missing`, which applies to text files, changed from `""` to a blank space, `" "` for `.csv` and `.tsv` files and `NA` for `.prn` files.
+
+* `Read()`: Reading data files in `feather` or `parquet` format now returns an R data frame instead of a tibble.
+
+* `Plot()`: For facet plots of a time series, the label for the x-axis is deliberately not displayed, consistent with the non-facet time series plots. The label is not needed with the descriptive access labels provided, such as `Aug 2024`.
+
+* `Plot()`: Scale the bubble size according to the power of 0.55 by default for BPFM, bubble plot frequency matrix, which yields a bubble plot of counts for one to the specified number of categorical variables. 
+
+* `Plot()`: For a BPFM, and a bit more space between the axis-value labels and each axis.
+
+* `Plot()`: When plotting two `x`-variables for individual rows of the data table, the differences between the corresponding values row-by-row are now displayed.
+
+* `Plot()`: Parameter `lab_adjust` for overwriting the default position of an axis label is now named the more descriptive `label_adjust`. 
+
+* `Write()`: Added parameters:
+  + `missing` added to specify missing data value, with default a blank space for `.csv` and `.tsv` files and `NA` for `.prn` files.
+  + `dec` added to specify the character for the decimal point, defaults to a period. 
+  + `sep` added to define the  character that separates adjacent data values, which defaults to the character consistent with the corresponding file type.
+  + `quote` added to specify if character data values should be quoted. Extending the Base R function `write.table()`, the default value is `if_needed` so that character strings that consist of a single word with no spaces, tabs, and related are not quoted because the quotes are not needed, simplifying the output file.
+  + existing `readNames` parameter added to `write_ods` internal call for ODS files.
+
+* `Write()`: Added formats:
+  + `.prn` "print" or space-delimited text file
+  + `.tsv` tab delimited text files.
+  + `.txt` the new default, permits the user to specify the `sep` parameter (as well as `dec`) to provide a more flexible write format, which respectively default to `"` and `"."`, that is, standard North American `csv` format.
+
+* `Write()`: Required to specify either the file type or the format. The following two statements are equivalent: `Write(d, "GoodData.xlsx")` and `Write(d, "GoodData", format="Excel")`. `Write(d, "GoodData")`  defaults to `GoodData.csv` and `Write(d)` defaults to `d.csv`.
+
+* `Write()`: For consistency with `Read()`, parameter `rowNames` change to `row_names`.
+
+* `Write()`: Row names are now preserved for `.feather`, `parquet`, and `.sav` files where otherwise these formats loose the row names when the data file is written. The strategy is to move the real names into a variable in the first column named `RowName`. Also, when read back into R with `Read()`, if the first column has that name, then it is shifted into the row names. 
+
+
+## Bug Fixes
+
+* `Plot()`: A minor issue, but when plotting a line chart for multiple levels of a categorical variable, the legend displayed the levels as points instead of lines. Now lines are displayed. 
+
+* `Plot()`: With a `by` variable, the `shape` specification `shape="vary"` to automatically vary the shape of the point for each group did not display the additional shapes in the legend. Now all shapes are properly displayed.
+
+* `Plot()`: For some two-dimensional scatter plots with a fit line, the axes did not accommodate the full fit line. Now they are expanded to do so.
+
+* `Plot()`: When plotting a BPFM, bubble plot frequency matrix, which yields a bubble plot of counts for one to the specified number of categorical variables, the text plotted in each bubble could not be changed in size. Now the `labels_size` properly provides that control.
+
+* `Plot()`: When the `x`-axis variable was sorted with equal intervals between adjacent points, sometimes neither points nor connecting line segments plotted by default, so needed to manually set the `size` parameter for the size of the plotted points or `line_width` for the width of the plot line segments. Now fixed.
+
+
 # lessR version 4.4.1, February 3, 2025
 
 ## Updates
@@ -7,7 +67,6 @@
 * `Plot()`: Parameter `lwd` renamed `line_width`. Parameter `ts_PIlevel` renamed `ts_PI`.
 
 * `PieChart()`: Parameter `lwd` renamed `line_width`. Parameter `lty` renamed `line_type`.
- 
 * `Plot()`: To jitter either axis coordinate, set to a specific value of `jitter_x` and/or `jitter_y` or have the value set by `Plot()`, indicated by setting the corresponding jitter parameter to `NULL`. Applying jitter to both the `x`-axis and `y`-axis was by design occurring by default for all analyses, probably too aggressive. Now, the default values for a scatterplot of continuous variables is 0. For discrete variables or a VBS plot (violin-box-scatter plot), different formulas provide default jitter values greater than 0, easily overridden by providing specific values.
 
 * `Plot()`: For non-linear values of parameter `fit`, now provide the MSE of the model fit to the original, non-linear data. Can compare this MSE to that of the linear model by running another analysis, setting `fit` to `"lm"`.
@@ -31,8 +90,7 @@
 
 `style()`: Transparency now properly recognized with `add_fill` colors with specified transparency from `add_trans` parameter.
 
-`style()`: Default fill for a superimposed rectangle on a visualization with `style(add="rect")` changed to light gray with light transparency to allow content within the rectangle to be viewed, `"#D9D9D920"`. 
-
+`style()`: Default fill for a superimposed rectangle on a visualization with `style(add="rect")` changed to light gray with light transparency to allow content within the rectangle to be viewed, `"#D9D9D920"`.
 
 
 # lessR version 4.4.0, January 12, 2025

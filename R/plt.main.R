@@ -1,5 +1,5 @@
 .plt.main <-
-function(x, y, by=NULL,
+function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call 
          cat.x=FALSE, cat.y=FALSE,
          object="point", stat="data",
 
@@ -21,7 +21,7 @@ function(x, y, by=NULL,
          smooth_exp=0.25, smooth_bins=128,
 
          radius=0.15, power=0.6, size_cut=TRUE,
-         bubble_text=getOption("bubble_text_color"),
+         bbl.txt.col=getOption("bubble_text_color"),
          col.low=NULL, col.hi=NULL,
 
          ID=NULL, ID_color="gray50", ID_size=0.60, out_ind=NULL,
@@ -154,7 +154,6 @@ function(x, y, by=NULL,
   }
   # ---------------------
 
-
   # all processing in terms of numeric variables
   # categorical variables x and/or y are converted to factors in Plot()
   # convert factors to numeric, save levels, so x and y are always numeric
@@ -169,7 +168,8 @@ function(x, y, by=NULL,
   else if (!date.var) {
     x <- as.matrix(x)
     colnames(x) <- nm.x
-  }
+
+   }
   else {  # date.var
     if (n.by == 0)
       x.dates <- x[,1]  # save actual dates for later
@@ -182,7 +182,7 @@ function(x, y, by=NULL,
    x <- as.matrix(x[,1], ncol=1)  # x to numeric version of dates
   }  # end if date.var
 
-  # y to a matrix
+  # y to a matrix with 3 possibilities for y: cat.y, not date.var, date.var
   nm.y <- names(y)
   if (cat.y) {
     y.lvl <- levels(y[,1])  #  put into alphabetical order
@@ -193,7 +193,7 @@ function(x, y, by=NULL,
     y <- as.matrix(y)
     colnames(y) <- nm.y
   }
-  else {
+  else {  # data.var
     y <- as.matrix(y)
   }
 
@@ -327,6 +327,7 @@ function(x, y, by=NULL,
   par(mai=c(bm, mm, tm, rm))
   par(tcl=-0.28)  # axis tic length
 
+
   # -----------------------
   # setup region for coordinate system only with plot and type="n"
   # non-graphical parameters in ... Generate warnings when no plot
@@ -352,6 +353,17 @@ function(x, y, by=NULL,
   if (!is.null(scale_y)) {
      mn.y <- min(mn.y, scale_y[1])
      mx.y <- max(mx.y, scale_y[2])
+  }
+
+  # adjust margins for fit line, will be computing fit lines twice
+  # more efficient to do all computations here, then plot fit line later
+  # if multiple x or y variables, just first variable is checked
+  if (fit.line!="off" && is.null(scale_y) && !cat.y && !date.var) {
+    pf <- .plt.fit(x[,1], y[,1], fit.line, fit_power, fit_new)  # fit line
+    mn.yf <- min(pf$f.ln, na.rm=TRUE)  # f.ln are the fitted values
+    mx.yf <- max(pf$f.ln, na.rm=TRUE)
+    mn.y <- min(mn.y, mn.yf)
+    mx.y <- max(mx.y, mx.yf)
   }
 
   if (!do.ellipse) {
@@ -425,7 +437,6 @@ function(x, y, by=NULL,
   usr <- par("usr")
   # ----------------------
 
-
   # ----------------------
   # set up plot background
 
@@ -489,7 +500,7 @@ function(x, y, by=NULL,
     }
     else {  # date.var, y-axis
       .axes(NULL, y.val, NULL, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
-            offset=offset, y.only=TRUE, ...)  # y-axis values
+            offset=offset, y.only=TRUE, ...)  # y-axis
 
       # date.var, x-axis
       len.xtics <- length(x.dates)
@@ -568,6 +579,42 @@ function(x, y, by=NULL,
           n.lab_x.ln, n.lab_y.ln, xlab_adj, ylab_adj, ...)
 
 
+    # -----------------------------------
+    # set jitter for scatterplot with discrete levels
+#     do.jit <- FALSE
+#     if (nrows < 100) {
+#       if (max(table(x,y) > 1)) do.jit <- TRUE  # duplication
+#     }
+
+  if (object == "point") {
+    # multiple sizes if n_bin>0
+    if (size[1]>0 && n.xcol==1 && stat=="data") {
+      if (is.null(jitter_x))  {  # ifelse() does not work
+        if (length(unique(x[,1])) <= 14  &&  nrows > 14)
+          jitter_x <- (diff(range(x[,1], na.rm=TRUE))) / 32
+      }
+      if (is.null(jitter_y))  {  # ifelse() does not work
+        if (length(unique(y[,1])) <= 14  &&  nrows > 14)
+          jitter_y <- (diff(range(y[,1], na.rm=TRUE))) / 32
+      }
+    }
+
+    # for VBS need to set jitter, here only set if jitter is NULL
+    if (is.null(jitter_x)) jitter_x <- 0
+    if (is.null(jitter_y)) jitter_y <- 0
+
+    # --- process jitter ---
+    if (jitter_x > 0) {
+      x.temp <- x[,1]
+      x[,1] <- x + runif(length(x[,1]), -jitter_x, jitter_x)
+    }
+    if (jitter_y > 0) {
+      y.temp <- y[,1]
+      y[,1] <- y + runif(length(y[,1]), -jitter_y, jitter_y)
+    }
+  }
+
+
   # ---------------
   # plot the values
   # ---------------
@@ -581,333 +628,288 @@ function(x, y, by=NULL,
   for (i in seq_along(ltype)) ltype[i] <- "solid"
 
 
-  # plot lines (and area_fill)
-  # --------------------------
+  # plot points, lines (and area_fill)
+  # ----------------------------------
 
-  if (object %in% c("point", "both")) {
+  if (object == "point") {  # is point even if size=0, plotting just lines
 
-    if (object == "both") {
+    if (n.xcol == 1  &&  n.ycol == 1) {
+      if (n.by <= 1) {  # pure single panel, data in wide format
 
-      if (n.xcol == 1  &&  n.ycol == 1) {
-        if (n.by <= 1) {  # pure single panel, data in wide format
+        if (segments && ln.width>0)  # plot data line segments
+            lines(x[,1], y[,1], col=color[1], lwd=ln.width, ...)
 
-          if (ln.width > 0) {  # plot data line segments
-            if (date.var || freq.poly)  # object == "both"
-              lines(x[,1], y[,1], col=color[1], lwd=ln.width, ...)
-          }
+        if (area_fill[1] != "transparent") # fill area
+          polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
+              col=area_fill, border="transparent")
 
-          if (area_fill[1] != "transparent") # fill area
-            polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
-                col=area_fill, border="transparent")
+        if (ts_ahead > 0) {  # forecast
+          trns.red <- .maketrans("darkred", 0.25*256)
+          lines(x.fit[,1], y.fit[,1], col=trns.red, lwd=ln.width)
+          lines(c(x.fit[nrow(x.fit),1], x.hat[1,1]),  # connect fit with hat
+                c(y.fit[nrow(y.fit),1], y.hat[1,1]),
+                col=trns.red, lwd=ln.width)
+          f.size.pt <- ifelse (size.pt<0.5, .65, size.pt)
+          points(x.hat[,1], y.hat[,1], pch=shape, bg="darkred", cex=f.size.pt)
+          lines(x.hat[,1], y.hat[,1], col="darkred", lwd=ln.width)
+          lines(x.hat[,1], y.upr[,1], col=trns.red, lwd=ln.width)
+          lines(x.hat[,1], y.lwr[,1], col=trns.red, lwd=ln.width)
+          xx <- c(x.hat[,1], rev(x.hat[,1]))
+          yy <- c(y.upr[,1], rev(y.lwr[,1]))
+          polygon(xx, yy, border=NA, col=rgb(.6,0,0,.15))
 
-          if (ts_ahead > 0) {  # forecast
-            trns.red <- .maketrans("darkred", 0.25*256)
-            lines(x.fit[,1], y.fit[,1], col=trns.red, lwd=ln.width)
-            lines(c(x.fit[nrow(x.fit),1], x.hat[1,1]),  # connect fit with hat
-                  c(y.fit[nrow(y.fit),1], y.hat[1,1]),
-                  col=trns.red, lwd=ln.width)
-            f.size.pt <- ifelse (size.pt<0.5, .65, size.pt)
-            points(x.hat[,1], y.hat[,1], pch=shape, bg="darkred", cex=f.size.pt)
-            lines(x.hat[,1], y.hat[,1], col="darkred", lwd=ln.width)
-            lines(x.hat[,1], y.upr[,1], col=trns.red, lwd=ln.width)
-            lines(x.hat[,1], y.lwr[,1], col=trns.red, lwd=ln.width)
-            xx <- c(x.hat[,1], rev(x.hat[,1]))
-            yy <- c(y.upr[,1], rev(y.lwr[,1]))
-            polygon(xx, yy, border=NA, col=rgb(.6,0,0,.15))
+          lgn.clr <- c("black", trns.red, "darkred")
+          lgn.nm <- ifelse (nchar(y.name) < 6, y.name, "data")
+          .plt.by.legend(c(lgn.nm, "model\nfit", "fore-\ncast"),
+                         lgn.clr, lgn.clr, shp="lines", pts_trans, fill_bg,
+                         usr, pt.size=size, legend_title=legend_title)
+        }  # end forecast
+      }  # n.by is 1
 
-            lgn.clr <- c("black", trns.red, "darkred")
-            lgn.nm <- ifelse (nchar(y.name) < 6, y.name, "data")
-            .plt.by.legend(c(lgn.nm, "model\nfit", "fore-\ncast"),
-                           lgn.clr, lgn.clr, shp="lines", pts_trans, fill_bg,
-                           usr, pt.size=size, legend_title=legend_title)
-          }
-        }  # n.by is 1
-
-        else {  # n.by > 1,  tidy format, all y data in same column
-          for (i in 1:n.by) {  # only stack=TRUE makes sense
-            xl <- x[by==levels(by)[i], , drop=FALSE]
-            if (i > 1) yo <- yl
-            yl <- y[by==levels(by)[i], , drop=FALSE]
-
-            if (stack) {
-              if (i == 1) {
-                xx <- c(xl[1],xl,xl[length(xl)])
-                yy <- c(min(yl[,1]),yl[,1],min(yl[,1]))
-                if (fill[1] != "transparent")
-                  polygon(xx, yy, col=area_fill[1], border="transparent")
-              }
-              if (i > 1) {
-                yl[,1] <- yl[,1] + yo[,1]
-                xx <- c(c(xl[1],xl,xl[length(xl)]),
-                      rev(c(xl[1],xl,xl[length(xl)])))
-                yy <- c(c(min(yl[,1]),yl[,1],min(yl[,1])),
-                           rev(c(min(yo[,1]),yo[,1],min(yo[,1]))))
-                if (fill[1] != "transparent")
-                 polygon(xx, yy, col=area_fill[i], border="transparent")
-              }
-            }  # end stack
-
-            if (ln.width > 0) {
-              if (stack)  # set line properties here, no option for user
-                ln.width <- 1
-              lines(xl, yl[,1], col=color[i], lty=ltype[i], lwd=ln.width, ...)
-            }  # end ln.width > 0
-          }
-        }  # end n.by > 1
-      }  # end n.xcol and n.ycol = 1
-
-      if (n.ycol > 1) {
-        for (i in 1:n.ycol) {
+      else {  # n.by > 1,  tidy format, all y data in same column
+        for (i in 1:n.by) {  # only stack=TRUE makes sense
+          xl <- x[by==levels(by)[i], , drop=FALSE]
+          if (i > 1) yo <- yl
+          yl <- y[by==levels(by)[i], , drop=FALSE]
 
           if (stack) {
-            # polygons
             if (i == 1) {
-              xx <- c(x[1],x,x[length(x)])
-              yy <- c(mn.y,y[,1],mn.y)  # starts at the scale_y setting
+              xx <- c(xl[1],xl,xl[length(xl)])
+              yy <- c(min(yl[,1]),yl[,1],min(yl[,1]))
               if (fill[1] != "transparent")
                 polygon(xx, yy, col=area_fill[1], border="transparent")
             }
             if (i > 1) {
-              y[,i] <- apply(y[,(i-1):i], 1, sum, na.rm=TRUE)  # sum to stack
-              xx <- c(c(x[1],x,x[length(x)]), rev(c(x[1],x,x[length(x)])))
-              yy <- c(c(min(y[,i]),y[,i],min(y[,i])),
-                         rev(c(min(y[,i-1]),y[,i-1],min(y[,i-1]))))
+              yl[,1] <- yl[,1] + yo[,1]
+              xx <- c(c(xl[1],xl,xl[length(xl)]),
+                    rev(c(xl[1],xl,xl[length(xl)])))
+              yy <- c(c(min(yl[,1]),yl[,1],min(yl[,1])),
+                         rev(c(min(yo[,1]),yo[,1],min(yo[,1]))))
               if (fill[1] != "transparent")
-                polygon(xx, yy, col=area_fill[i], border="transparent")
+               polygon(xx, yy, col=area_fill[i], border="transparent")
             }
-          }  # end stack polygons
+          }  # end stack
 
-          if (ln.width > 0) {  # lines
-            lines(x[,1], y[,i], col=color[i], lty=ltype[i], lwd=ln.width, ...)
+          if (segments && ln.width>0) {
+            if (stack) ln.width <- 1  # no user option
+            lines(xl, yl[,1], col=color[i], lty=ltype[i], lwd=ln.width, ...)
           }  # end ln.width > 0
-
-        }  # end i loop
-      }  # end n.ycol > 1
-
-      if (n.xcol > 1) {
-        if (ln.width > 0) for (i in 1:n.xcol)
-          lines(as.numeric(x.val),y[,1], col=fill[i], lwd=ln.width, ...)
-      }
-
-    }  # end both
-
-
-    # -----------
-    # plot points
-
-    if (object %in% c("point", "both")) {
-
-      # -----------------------------------
-      # set jitter for scatterplot with discrete levels
-#     do.jit <- FALSE
-#     if (nrows < 100) {
-#       if (max(table(x,y) > 1)) do.jit <- TRUE  # duplication
-#     }
-
-      # multiple sizes if n_bin>0
-      if (size[1]>0 && n.xcol==1 && stat=="data") {
-        if (is.null(jitter_x))  {  # ifelse() does not work
-          if (length(unique(x[,1])) <= 14  &&  nrows > 14)
-            jitter_x <- (diff(range(x[,1], na.rm=TRUE))) / 32
         }
-        if (is.null(jitter_y))  {  # ifelse() does not work
-          if (length(unique(y[,1])) <= 14  &&  nrows > 14)
-            jitter_y <- (diff(range(y[,1], na.rm=TRUE))) / 32
+      }  # end n.by > 1
+    }  # end n.xcol and n.ycol = 1
+
+    if (n.ycol > 1) {
+      for (i in 1:n.ycol) {
+        if (stack) {  # polygons
+          if (i == 1) { 
+            xx <- c(x[1],x,x[length(x)])
+            yy <- c(mn.y,y[,1],mn.y)  # starts at the scale_y setting
+            if (fill[1] != "transparent")
+              polygon(xx, yy, col=area_fill[1], border="transparent")
+          }
+          if (i > 1) {
+            y[,i] <- apply(y[,(i-1):i], 1, sum, na.rm=TRUE)  # sum to stack
+            xx <- c(c(x[1],x,x[length(x)]), rev(c(x[1],x,x[length(x)])))
+            yy <- c(c(min(y[,i]),y[,i],min(y[,i])),
+                       rev(c(min(y[,i-1]),y[,i-1],min(y[,i-1]))))
+            if (fill[1] != "transparent")
+              polygon(xx, yy, col=area_fill[i], border="transparent")
+          }
+        }  # end stack polygons
+
+        if (segments && ln.width>0) {  # lines
+          lines(x[,1], y[,i], col=color[i], lty=ltype[i], lwd=ln.width, ...)
+        }  # end ln.width > 0
+
+      }  # end i loop
+    }  # end n.ycol > 1
+
+    if (n.xcol > 1) {
+      if (segments && ln.width>0) for (i in 1:n.xcol)
+        lines(as.numeric(x.val),y[,1], col=fill[i], lwd=ln.width, ...)
+    }
+
+
+    # no grouping variable
+    # --------------------
+    if (is.null(by)) {
+
+      if (smooth) {  # 2-D kernel density plot
+        # grid lines only plot after the sp
+        clr.den <- colorRampPalette(c(getOption("window_fill"),
+                                       getOption("bar_fill_cont")))
+        smoothScatter(x, y, nrpoints=smooth_points, nbin=smooth_bins,
+                      transformation=function(x) x^(smooth_exp),
+                      colramp=clr.den, cex=smooth_size, add=TRUE)
+      }
+
+      else if (size.pt[1] > 0) {  # plot points, and means, segments, etc.
+
+        # --- plot points, segments, means with no by ---
+        # -----------------------------------------------
+
+        # plot points
+        if (n.xcol == 1  &&  n.ycol == 1) {  # one x and one y variable
+          if (length(out_ind) == 0)  # no outliers
+            points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
+                     cex=size.pt, ...)
+          else {  # display outliers separately
+            points(x[-out_ind,1], y[-out_ind,1],
+               pch=shape, col=color[1], bg=fill[1], cex=size.pt, ...)
+            points(x[out_ind,1], y[out_ind,1],
+               pch=out_shape, col=out_color, bg=out_fill, cex=size.pt, ...)
+            text(x[out_ind], y[out_ind], labels=ID[out_ind],
+               pos=1, offset=0.4, col=ID_color, cex=ID_size)
+          }
         }
-      }
 
-      # for VBS need to set jitter, here only set if jitter is NULL
-      if (is.null(jitter_x)) jitter_x <- 0
-      if (is.null(jitter_y)) jitter_y <- 0
-
-      # --- process jitter ---
-      if (jitter_x > 0) {
-        x.temp <- x[,1]
-        x[,1] <- x + runif(length(x[,1]), -jitter_x, jitter_x)
-      }
-      if (jitter_y > 0) {
-        y.temp <- y[,1]
-        y[,1] <- y + runif(length(y[,1]), -jitter_y, jitter_y)
-      }
-      # ----------------------
-
-
-      # no grouping variable
-      # --------------------
-      if (is.null(by)) {
-
-        if (smooth) {  # 2-D kernel density plot
-          # grid lines only plot after the sp
-          clr.den <- colorRampPalette(c(getOption("window_fill"),
-                                         getOption("bar_fill_cont")))
-          smoothScatter(x, y, nrpoints=smooth_points, nbin=smooth_bins,
-                        transformation=function(x) x^(smooth_exp),
-                        colramp=clr.den, cex=smooth_size, add=TRUE)
+        else if (n.ycol == 1) {  # one y
+          for (i in 1:n.xcol) {  # one to many x's
+              if (theme %in% c("gray", "white"))
+                if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
+              points(x[,i], y[,1], pch=shape, col=color[i], bg=fill[i],
+                     cex=size.pt, ...)
+          }
         }
 
-        else if (size.pt[1] > 0) {  # plot points, and means, segments, etc.
-
-          # --- plot points, segments, means with no by ---
-          # -----------------------------------------------
-
-          # plot points
-          if (n.xcol == 1  &&  n.ycol == 1) {  # one x and one y variable
-            if (length(out_ind) == 0)  # no outliers
-              points(x[,1], y[,1], pch=shape, col=color[1], bg=fill[1],
-                       cex=size.pt, ...)
-            else {  # display outliers separately
-              points(x[-out_ind,1], y[-out_ind,1],
-                 pch=shape, col=color[1], bg=fill[1], cex=size.pt, ...)
-              points(x[out_ind,1], y[out_ind,1],
-                 pch=out_shape, col=out_color, bg=out_fill, cex=size.pt, ...)
-              text(x[out_ind], y[out_ind], labels=ID[out_ind],
-                 pos=1, offset=0.4, col=ID_color, cex=ID_size)
-            }
+        else  if (n.xcol == 1) {  # one x
+          for (i in 1:n.ycol) {  # one to many y's
+              if (theme %in% c("gray", "white"))
+                if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
+              points(x[,1],y[,i], pch=shape, col=color[i], bg=fill[i],
+                     cex=size.pt, ...)  # one x
           }
+        }
 
-          else if (n.ycol == 1) {  # one y
-            for (i in 1:n.xcol) {  # one to many x's
-                if (theme %in% c("gray", "white"))
-                  if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
-                points(x[,i], y[,1], pch=shape, col=color[i], bg=fill[i],
-                       cex=size.pt, ...)
-            }
-          }
+        # plot segments to axis
+        if (segments_y) {
+          if (n.xcol == 1) # line segments from points to axis
+            segments(x0=0, y0=y, x1=x, y1=y,
+                     lty=1, lwd=.75, col=col.segment)
+          else if (n.xcol == 2)  # line segments between points
+            segments(x0=x[,1], y0=y[,1], x1=x[,2], y1=y[,1],
+                     lty=1, lwd=.75, col=col.segment)
+        }
 
-          else  if (n.xcol == 1) {  # one x
-            for (i in 1:n.ycol) {  # one to many y's
-                if (theme %in% c("gray", "white"))
-                  if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
-                points(x[,1],y[,i], pch=shape, col=color[i], bg=fill[i],
-                       cex=size.pt, ...)  # one x
-            }
-          }
-
-          # plot segments to axis
-          if (segments_y) {
-            if (n.xcol == 1) # line segments from points to axis
-              segments(x0=0, y0=y, x1=x, y1=y,
-                       lty=1, lwd=.75, col=col.segment)
-              #segments(x0=min(pretty(x)), y0=y, x1=x, y1=y,
-                       #lty=1, lwd=.75, col=color)
-            else if (n.xcol == 2)  # line segments between points
-              segments(x0=x[,1], y0=y[,1], x1=x[,2], y1=y[,1],
-                       lty=1, lwd=.75, col=col.segment)
-          }
-
-          if (!(stat %in% c("count", "prop", "%"))) {
-            if (segments_x)
+        if (!(stat %in% c("count", "prop", "%"))) {
+          if (segments_x) {
+            if (n.ycol == 1) # line segments from points to axis
               segments(y0=par("usr")[3], x0=x, y1=y, x1=x, lty=1, lwd=.75,
                        col=col.segment)
+            else if (n.ycol == 2)  # line segments between points
+              segments(y0=y[,1], x0=x[,1], y1=y[,2], x1=x[,1],
+                       lty=1, lwd=.75, col=col.segment)
           }
-          else {
-            if (segments_x)
-              if (n.xcol == 1)
-                segments(y0=0, x0=x, y1=y, x1=x, lty=1, lwd=1, col=col.segment)
+        }
+        else {  # stat is "count", etc.
+          if (segments_x)
+            if (n.xcol == 1)
+              segments(y0=0, x0=x, y1=y, x1=x, lty=1, lwd=1, col=col.segment)
+        }
+
+
+        # plot means
+        # ---------
+
+        if (means  &&  stat == "data") {
+
+        # get colors
+          pch.avg <- ifelse (theme!="gray", 21, 23)
+          bck.g <- ifelse (theme!="gray", rgb(130,90,70,
+                          maxColorValue=255), "gray40")
+          if (grepl(".black", theme, fixed=TRUE))
+            bck.g <- "gray85"
+
+          # restore un-jittered data
+          if (jitter_x > 0) {
+            x[,1] <- x.temp
+            rm(x.temp)
           }
-
-
-          # plot means
-          # ---------
-
-          if (means  &&  stat == "data") {
-
-          # get colors
-            pch.avg <- ifelse (theme!="gray", 21, 23)
-            bck.g <- ifelse (theme!="gray", rgb(130,90,70,
-                            maxColorValue=255), "gray40")
-            if (grepl(".black", theme, fixed=TRUE))
-              bck.g <- "gray85"
-
-            # restore un-jittered data
-            if (jitter_x > 0) {
-              x[,1] <- x.temp
-              rm(x.temp)
-            }
-            if (jitter_y > 0) {
-              y[,1] <- y.temp
-              rm(y.temp)
-            }
-
-            m.lvl <- numeric(length = 0)
-
-            # plot means for num y across levels of factor x
-            if (cat.x && !cat.y && !unique.x) {
-              for (i in seq_along(x.lvl))
-                m.lvl[i] <- mean(y[x==i], na.rm=TRUE)
-              abline(h=m.lvl, col="gray50", lwd=.5)
-              points(m.lvl, pch=pch.avg, bg=bck.g, col=bck.g, cex=size.pt*1.5)
-            }
-
-            # plot means for num x across levels of factor y
-            if (!cat.x && cat.y && !unique.y) {
-              for (i in seq_along(y.lvl))
-                m.lvl[i] <- mean(x[y==i], na.rm=TRUE)
-              abline(v=m.lvl, col="gray50", lwd=.5)
-              points(m.lvl, seq_len(length(y.lvl)), pch=pch.avg, bg=bck.g,
-                     col=bck.g, cex=size.pt*1.5)
-            }
-          }  # end means
-
-        }  # end not smooth, plot points with no by
-        # -----------------------------------------
-
-        # plot center line
-        # ----------------
-
-        if (center_line != "off") {
-          if (center_line == "mean") {
-            m.y <- mean(y[,1], na.rm=TRUE)
-            lbl <- " mean"
-          }
-          else if (center_line == "median") {
-            m.y <- median(y[,1], na.rm=TRUE)
-            lbl <- " median"
-          }
-          else if (center_line == "zero") {
-            m.y <- 0
-            lbl <- ""
+          if (jitter_y > 0) {
+            y[,1] <- y.temp
+            rm(y.temp)
           }
 
-          abline(h=m.y, col="gray50", lty="dashed")  # draw center line
-          mtext(lbl, side=4, cex=.7, col="gray50", las=2, at=m.y, line=0.1)
+          m.lvl <- numeric(length = 0)
 
-          if (center_line == "zero") m.y <- median(y[,1], na.rm=TRUE)  # runs
+          # plot means for num y across levels of factor x
+          if (cat.x && !cat.y && !unique.x) {
+            for (i in seq_along(x.lvl))
+              m.lvl[i] <- mean(y[x==i], na.rm=TRUE)
+            abline(h=m.lvl, col="gray50", lwd=.5)
+            points(m.lvl, pch=pch.avg, bg=bck.g, col=bck.g, cex=size.pt*1.5)
+          }
 
-        }  # end center_line
+          # plot means for num x across levels of factor y
+          if (!cat.x && cat.y && !unique.y) {
+            for (i in seq_along(y.lvl))
+              m.lvl[i] <- mean(x[y==i], na.rm=TRUE)
+            abline(v=m.lvl, col="gray50", lwd=.5)
+            points(m.lvl, seq_len(length(y.lvl)), pch=pch.avg, bg=bck.g,
+                   col=bck.g, cex=size.pt*1.5)
+          }
+        }  # end means
 
-        else
+      }  # end not smooth, plot points with no by
+      # -----------------------------------------
+
+      # plot center line
+      # ----------------
+
+      if (center_line != "off") {
+        if (center_line == "mean") {
+          m.y <- mean(y[,1], na.rm=TRUE)
+          lbl <- " mean"
+        }
+        else if (center_line == "median") {
           m.y <- median(y[,1], na.rm=TRUE)
+          lbl <- " median"
+        }
+        else if (center_line == "zero") {
+          m.y <- 0
+          lbl <- ""
+        }
 
-        if (segments) {  # interaction means plot, ts with non-Date x var
-          if (!is.null(ylab))  # thin line for ANOVA interaction plot
-            if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75
-          for (j in 1:(nrow(x)-1)) {
-            segments(x0=x[j,1], y0=y[j,1],
-                     x1=x[j+1,1], y1=y[j+1,1],
-                     lty="solid", lwd=ln.width, col=fill[i])
-          }
-        }  # end segments
+        abline(h=m.y, col="gray50", lty="dashed")  # draw center line
+        mtext(lbl, side=4, cex=.7, col="gray50", las=2, at=m.y, line=0.1)
 
-      }  # end is.null by
+        if (center_line == "zero") m.y <- median(y[,1], na.rm=TRUE)  # runs
+
+      }  # end center_line
+
+      else
+        m.y <- median(y[,1], na.rm=TRUE)
+
+      # interaction means plot, ts with non-Date x var
+      if (segments && n.xcol==1  && n.ycol==1) {
+        if (!is.null(ylab))  # thin line for ANOVA interaction plot
+          if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75
+        for (j in 1:(nrow(x)-1)) {
+          segments(x0=x[j,1], y0=y[j,1],
+                   x1=x[j+1,1], y1=y[j+1,1],
+                   lty="solid", lwd=ln.width, col=fill[i])
+        }
+      }  # end segments
+
+    }  # end is.null by
 
 
-      # --------------------
-      # by grouping variable
+    # --------------------
+    # by grouping variable
 
-      else {
-        clr <- character(length(n.by))
+    else {
+      clr <- character(length(n.by))
 
-        if (length(color) == 1)
-          for (i in 1:n.by) clr[i] <- color  # all levels get same color
-        else
-          clr <- color
+      if (length(color) == 1)
+        for (i in 1:n.by) clr[i] <- color  # all levels get same color
+      else
+        clr <- color
 
-        shp <- integer(length(n.by))
-        if (length(shape) == 1)
-          for (i in 1:n.by) shp[i] <- shape
-        else
-          shp <- shape
+      shp <- integer(length(n.by))
+      if (length(shape) == 1)
+        for (i in 1:n.by) shp[i] <- shape
+      else
+        shp <- shape
 #       if (length(color)==1 && length(fill)==1 && length(shape)==1) {
 #         if (n.by <= 5)  # R presents only five filled points
 #           shape.dft <- c(21,23,22,24,25)  # shape defaults
@@ -915,57 +917,54 @@ function(x, y, by=NULL,
 #           shape.dft <- c(1,0,5,2,6,8,7,9,10,12:14,11)  # shape defaults
 #         for (i in 1:n.by) shp[i] <- shape.dft[i]  #  default shapes
 #       }
-        # plot points and segments for each group
-        for (i in 1:n.by) {
-          x.lv <- subset(x, by==levels(by)[i])
-          y.lv <- subset(y, by==levels(by)[i])
-          if (!by.bub)  {
-            if (size.pt > 0)
-              points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i],
-                     cex=size.pt, lwd=0.75, ...)
-          }
-          else {  # size is a variable
-            size.lv <- subset(size, by==levels(by)[i])
-            fill[i] <- .maketrans(fill[i], (1-pts_trans)*256)
-            # size is a var and a by var
-            .plt.bubble(x.lv, y.lv, size.lv, radius, power, fill[i], clr[i],
-                        size_cut, prop, bubble_text, object)
-          }
-
-          # interaction means plot, ts without a date var and segments=TRUE
-          if (segments) {
-            if (!is.null(ylab))  # thin line for ANOVA interaction plot
-              if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75
-            for (j in 1:(nrow(x.lv)-1)) {
-              segments(x0=x.lv[j,1], y0=y.lv[j,1],
-                       x1=x.lv[j+1,1], y1=y.lv[j+1,1],
-                       lty="solid", lwd=ln.width, col=fill[i])
-            }
-          }  # end segments
-
-        }  # end 1:n.by
-
-        # legend
-        if (fill[1] == "transparent") fill <- color
-        if (stack) {  # default pt.size is 0
-          point.size <- ifelse (size > 0, 2.5 * axis_x_cex, 0)
-          .plt.by.legend(levels(by), color, area_fill, shp=22, pts_trans,
-                         fill_bg, usr, pt.size=point.size,  # 22 is a rectangle
-                         legend_title=legend_title)
+      # plot points and segments for each group
+      for (i in 1:n.by) {
+        x.lv <- subset(x, by==levels(by)[i])
+        y.lv <- subset(y, by==levels(by)[i])
+        if (!by.bub)  {
+          if (size.pt > 0)
+            points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i],
+                   cex=size.pt, lwd=0.75, ...)
         }
-        else {  # not stack
-          if (n.by > 1) {
-#           for (i in 1:length(shp)) shp[i] <- 21  # circle
-            .plt.by.legend(levels(by), color, fill, shp[1], pts_trans,
-                           fill_bg, usr, legend_title=legend_title)
-          }
+        else {  # size is a variable (not for BPFM, which does .dpmat() )
+          size.lv <- subset(size, by==levels(by)[i])
+          fill[i] <- .maketrans(fill[i], (1-pts_trans)*256)
+          # size is a var and a by var
+          .plt.bubble(x.lv, y.lv, size.lv, radius, power, fill[i], clr[i],
+                      size_cut, prop, bbl.txt.col, object)
         }
 
-      }  # end by
-    }  # end plot points object is point or both
+        # interaction means plot, ts without a date var and segments=TRUE
+        if (segments && !stack) {
+          if (!is.null(ylab))  # thin line for ANOVA interaction plot
+            if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75
+          for (j in 1:(nrow(x.lv)-1)) {
+            segments(x0=x.lv[j,1], y0=y.lv[j,1],
+                     x1=x.lv[j+1,1], y1=y.lv[j+1,1],
+                     lty="solid", lwd=ln.width, col=fill[i])
+          }
+        }  # end segments
 
+      }  # end 1:n.by
 
-    # legend
+      # by legend
+      if (size == 0) shape <- "lines"
+      if (fill[1] == "transparent") fill <- color
+      if (stack) {  # default pt.size is 0
+        point.size <- ifelse (size > 0, 2.5 * axis_x_cex, 0)
+        .plt.by.legend(levels(by), color, area_fill, shp=shape[1], pts_trans,
+                       fill_bg, usr, pt.size=point.size,  # 22 is a rectangle
+                       legend_title=legend_title)
+      }
+      else {  # not stack
+        if (n.by > 1)
+          .plt.by.legend(levels(by), color, fill, shape, pts_trans,
+                         fill_bg, usr, legend_title=legend_title)
+      }
+
+    }  # end by
+
+    # legend (more than 1 x or y
     # ------
 
     if (fill[1] == "transparent") fill <- color
@@ -985,7 +984,7 @@ function(x, y, by=NULL,
                   lab_cex=lab_y_cex, pt.size=1.25, legend_title)
     }
 
-  }  # object is point, line, both
+  }  # object is point
 
 
   # ----------------------------
@@ -1005,12 +1004,12 @@ function(x, y, by=NULL,
         clr <- fill
       else
         clr <- getOption("bar_fill_cont")
-      clr_color <- color
+      clr.color <- color
     }
     else {  # 1-var bubble plot and BPFM can have a color gradient
       color_palette <- colorRampPalette(c(col.low, col.hi))
       clr <- color_palette(length(unique(x)))
-      clr_color <- "gray70"
+      clr.color <- "gray70"
     }
 
     # no value for size specified, do counts
@@ -1045,14 +1044,14 @@ function(x, y, by=NULL,
 
       # for categorical vars, size not a var
       if (object == "bubble") {
-        .plt.bubble(xx, yy, count, radius, power, clr, clr_color,
-                    size_cut, prop, bubble_text, object)
+        .plt.bubble(xx, yy, count, radius, power, clr, clr.color,
+                    size_cut, prop, bbl.txt.col, object)
       }
       else if (object == "sunflower") {
         cords <- data.frame(xx, yy, count, stringsAsFactors=TRUE)
         cords <- na.omit(cords)
         sunflowerplot(cords$xx, cords$yy, number=cords$count,
-            seg.col=clr_color, col=clr,
+            seg.col=clr.color, col=clr,
             col.axis=getOption("axis_x_color"), add=TRUE)
       }
 
@@ -1061,8 +1060,8 @@ function(x, y, by=NULL,
     # size is a variable (unless size is constant and bubble specified)
     # no by var
     else {
-      .plt.bubble(x, y, size, radius, power, clr, clr_color,
-                  size_cut, prop, bubble_text, object)
+      .plt.bubble(x, y, size, radius, power, clr, clr.color,
+                  size_cut, prop, bbl.txt.col, object)
     }
   }  # end bubble/sunflower
   # -----------------------
@@ -1145,7 +1144,7 @@ function(x, y, by=NULL,
       Rsq <- double(length=n.clrs)
       by.cat <- character(length=n.clrs)
 
-      for (i.clr in 1:n.clrs) {  # note: double looping with i.remv and i
+      for (i.clr in 1:n.clrs) {  # double looping with i.remv and i
 
         if (n.clrs == 1) {  # one plot, all the data
           if (!date.var) {

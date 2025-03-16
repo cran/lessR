@@ -16,6 +16,7 @@ function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
     if (!is.null(mylevels))
       legend_labels <- abbreviate(mylevels, legend_abbrev)
   }
+  legend_title_size <- 1.1 * legend_size
 
   # abbreviate title if too large
   if (!is.null(legend_abbrev))
@@ -54,23 +55,26 @@ function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
     adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
     legend_size <- axis_x_cex
   }
-
   legend_size <- 1.1 * legend_size
+  legend_title_size <- 1.1 * legend_size
+
   # fill=length(legend_labels):1  puts the legend labels in the correct
   #   order, but only for inflexible boxes that cannot be resized with pt.cex
   if (pt.size == 0) pt.size <- 1.2
-  if (shp != "lines")
+  if (shp[1] != "lines")
     legend(xleft+legend_adj, ytop, legend=legend_labels, title=legend_title,
            pch=shp, horiz=FALSE, cex=legend_size, pt.cex=pt.size, pt.lwd=pt.lwd,
+           title.cex=legend_title_size,
            bg=col.bg, col=color, pt.bg=fill,
            text.col=the.clr, y.intersp=yi, bty="n")
   else {  # for plotting data and forecast
     xleft <- usr[2] + epsilon/4
     legend(xleft+legend_adj, ytop, legend=legend_labels, title=legend_title,
            cex=legend_size, pt.cex=pt.size, pt.lwd=pt.lwd,
+           title.cex=legend_title_size,
            bg=col.bg, col=color, pt.bg=fill,
            text.col=the.clr, bty="n",
-           lty=c("solid", "solid", "solid"), lwd=c(2,2,2), y.intersp=1.6)
+           lty="solid", lwd=2.5, y.intersp=1.1, seg.len=1.25)
     }
 
   par(xpd=FALSE)  # cancel drawing outside of plot region (need for RStudio)

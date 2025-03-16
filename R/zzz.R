@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.4.1                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.4.2                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")  Read data file, many formats available, e.g., Excel\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -44,11 +44,6 @@ function(...) {
   options(bar_color = rgb(132,150,175, maxColorValue=255))
   options(bar_color_discrete = "transparent")
   options(bar_color_cont = rgb(132,150,175, maxColorValue=255))
-  options(labels = "%")
-  options(labels_color = "white")
-  options(labels_size = 0.75)
-  options(labels_digits = NULL)
-  options(labels_position = "in")
 
   options(pt_fill = rgb(50,78,92, maxColorValue=255))  #  #324E5C
   options(trans_pt_fill = 0.10)
@@ -1169,14 +1164,14 @@ function(lab, labcex, cut, nm, var.nm, units) {
            col=ax$axis_x_color, col.axis=ax$axis_x_color,
            lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
     }
-    else {
+    else {  # rotate_x
       axis(1, at=axT1, labels=FALSE, col=ax$axis_x_color,
           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
       text(x=axT1, y=usr[3]- par("cxy")[2]/4.5, labels=x.lvl,
            pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
            srt=rotate_x, offset=offset, font=fnt, ...)
     }
-  }
+  }  # end categorical x
 
   if (is.null(y.lvl)  &&  !is.null(axT2)) {
     axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
@@ -1188,7 +1183,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
          srt=rotate_y, font=fnt, ...)
   }
 
-  else if (!is.null(y.lvl)) {
+  else if (!is.null(y.lvl)) {  # categorical
     axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
         lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
     text(x=usr[1], y=axT2, labels=y.lvl,

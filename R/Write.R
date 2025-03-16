@@ -1,172 +1,184 @@
 Write <- 
 function(data=d, to=NULL, 
 
-         format=c("csv", "R", "Excel", "ODS", "SPSS", "feather", "parquet"),
+         format=c("csv", "txt", "tsv", "prn",
+                  "Excel", "ODS", "R", "SPSS", "feather", "parquet"),
 
-         rowNames=NULL,
+         row_names=NULL, quote="if_needed", missing=NULL, dec=".", sep=NULL,  
 
          ExcelTable=FALSE, ExcelColWidth=TRUE,
 
          quiet=getOption("quiet"), ...) {
 
-  message(">>> Note:  data  is now the first parameter,  to  is second\n")
 
+  format.miss <- ifelse (missing(format), TRUE, FALSE)
   format <- match.arg(format)
 
-  df.name <- deparse(substitute(data))
+  in.df <- deparse(substitute(data))
+
+  dots <- list(...)
+  n.values <- 0
+  if (length(dots) > 0) {
+    for (i in seq_along(dots)) {
+      if (names(dots)[i] == "rowNames") row_names <- dots[[i]]
+    }
+  }
 
   .param.old(...)
 
-  if (!exists(df.name, where=.GlobalEnv)) {
+  if (!exists(in.df, where=.GlobalEnv)) {
     cat("\n");
-    if (grepl('"', df.name))
-      cat(">>> Do NOT have quotes around the data frame name.\n\n")
+    if (grepl('"', in.df))
+      cat(">>> Do NOT place quotes around the data frame name.\n\n")
     stop(call.=FALSE, "\n","------\n",
-         "Data frame ", df.name, " does not exist.\n")
+         "Data frame ", in.df, " does not exist.\n")
     cat("\n")
   }
 
-  if (is.null(rowNames)) {  # if just consecutive integers, ignore row names
-    if (format %in% c("csv", "Excel", "ODS")) {
-      rn <- length(setdiff(row.names(data), as.character(1:nrow(data))))
-      rowNames <- ifelse (rn == 0, FALSE, TRUE) 
-    } 
+  if (is.null(row_names)) {  # if just consecutive integers, ignore row names
+    is.seq <- identical(rownames(data), seq_len(length(nrow(data))))
+    row_names <- ifelse (is.seq, FALSE, TRUE) 
   }
 
-  if (format == "csv") {
-    if (is.null(to))
-      file.data <- paste(df.name, ".csv", sep="")
-    else {
-       txt <- ifelse (grepl(".csv", to), "", ".csv")
-       file.data <- paste(to, txt, sep="")
+  # check if a filename has a target ext or set ext from format
+  fmt_to_ext <- c(csv="csv", txt="txt", tsv="tsv", prn="prn", 
+                  R="rda", Excel="xlsx", ODS="ods", SPSS="sav",
+                  feather="feather", parquet="parquet")
+  if (!is.null(to)) {
+    ext <- tolower(tools::file_ext(to))
+    if (nzchar(ext)) {  # non-empty string, file extension exists
+      ext_to_fmt <- c(csv="csv", txt="txt", tsv="tsv", prn="prn", 
+                      rda="R", xlsx="Excel", ods="ODS", sav="SPSS",
+                      feather="feather", parquet="parquet")
+      format <- ext_to_fmt[ext]  # is NA if file type not recognized
+      if (is.na(format) && format.miss) {
+        cat("\n"); stop(call.=FALSE, "\n------\n",
+          "File type ", ext, " not recognized. Specify  format  parameter\n",
+          "such as format=\"Excel\" or format=\"csv\".\n\n")
+      }
+      out.df <- to
+    }  # end extension exists
+    else {  # assign extension from format
+      out.df <- paste(to, ".", fmt_to_ext[format], sep="")
     }
-    write.csv(data, file=file.data, row.names=rowNames, ...)
-    .showfile(file.data, c(df.name, "data values"))
+  }  # end !is.null(to)
+  else {  # create the output df name and ext
+    out.df <- paste(in.df, ".", fmt_to_ext[format], sep="")
+  }
 
-    l <- attr(data, which="variable.labels") # save variable labels
-    if (!is.null(l)) {
-      l <- data.frame(l, stringsAsFactors=TRUE)
-      file.lbl <- substr(file.data,1,nchar(file.data)-4)
-      file.lbl <- paste(paste(file.lbl,"_lbl",sep=""), ".csv" ,sep="")
-      write.table(l, file=file.lbl, col.names=FALSE, dec=".", sep=",")
-      .showfile(file.lbl, c(df.name, "variable labels"))
+
+  if (format %in% c("feather", "parquet", "SPSS")) {  # save the row names
+    if (row_names) {
+      data <- cbind(RowName = rownames(data), data)
+      rownames(data) <- NULL
     }
   }
   
-  else if (format == "feather") {
-    if (is.null(to))
-      file.data <- paste(df.name, ".feather", sep="")
-    else {
-      txt <- ifelse (grepl(".feather", to), "", ".feather")
-      file.data <- paste(to, txt, sep="")
+
+  if (format %in% c("csv", "txt", "tsv", "prn")) {  # text file, txt is default
+
+    if (format %in% c("csv", "tsv", "txt"))
+      if (is.null(missing)) missing <- " "
+    else if (format == "prn")
+      if (is.null(missing)) missing <- "NA"
+    if (format == "csv") sep <- ","
+    if (format == "tsv") sep <- "\t"
+    if (format == "prn") sep <- " "
+    if (format == "txt") if (is.null(sep)) sep <- ","
+
+    # Add quotes to data values that match the pattern
+    if (grepl("needed", quote, fixed=TRUE)) {
+      data[] <- lapply(data, function(col) {
+        if (is.character(col)) {
+          return(sapply(col, function(x) {
+            if (grepl("[[:space:],;]", x)) {
+              return(paste0('"', x, '"'))
+            } 
+            else {
+              return(x)
+            }
+          }))
+        }  # end is a character variable
+        else {
+          return(col)
+        }
+      })  # end lapply()
+
+      # Add quotes to row names that match the pattern
+      if (is.character(rownames(data))) {
+        row.nms <- rownames(data)
+        rownames(data) <- ifelse(grepl("[[:space:],;]", row.nms),
+                                 paste0('"', row.nms, '"'), row.nms)
+        rm(row.nms)
+      }
+    }  # end "if_needed"
+
+    write.table(data, file=out.df, row.names=row_names, ...,
+                sep=sep, dec=dec, na=missing, quote=FALSE)
+
+    # write variable labels if they exist as data frame l
+    if ("l" %in% .getdfs()) {
+      file.lbl <- substr(out.df,1,nchar(out.df)-4)
+      file.lbl <- paste(paste(file.lbl,"_lbl",sep=""), ".csv" ,sep="")
+      write.table(l, file=file.lbl, col.names=FALSE, dec=".", sep=",")
+      .showfile(file.lbl, c(in.df, "variable labels"))
     }
-
-    arrow::write_feather(data, file.data)
-
-    txt <- "Richardson's et al. arrow package]"
+  }  # end text file
+  
+  else if (format == "feather") {
+    arrow::write_feather(data, out.df)
     if (!quiet)
-      cat("[with the write_feather() function from", txt, "\n")
-    cat("\n")
-    .showfile(file.data, c(df.name, "data values"))
-    cat("\n")
+      cat("[with the write_feather() function from",
+          "Richardson's et al. arrow package]\n")
   }  
   
   else if (format == "parquet") {
-    if (is.null(to))
-      file.data <- paste(df.name, ".parquet", sep="")
-    else {
-      txt <- ifelse (grepl(".parquet", to), "", ".parquet")
-      file.data <- paste(to, txt, sep="")
-    }
-
-    arrow::write_parquet(data, file.data)
-
-    txt <- "Richardson's et al. arrow package]"
+    arrow::write_parquet(data, out.df)
     if (!quiet)
-      cat("[with the write_parquet() function from", txt, "\n")
-    cat("\n")
-    .showfile(file.data, c(df.name, "data values"))
-    cat("\n")
+      cat("[with the write_parquet() function from",
+          "Richardson's et al. arrow package]\n")
   }  
 
   else if (format == "SPSS") {
-    if (is.null(to))
-      file.data <- paste(df.name, ".sav", sep="")
-    else {
-      txt <- ifelse (grepl(".sav", to), "", ".sav")
-      file.data <- paste(to, txt, sep="")
-    }
-
-    haven::write_sav(data, file.data)
-
-    txt <- "Wickham and Miller's haven package]"
+    haven::write_sav(data, out.df)
     if (!quiet)
-      cat("[with the write_sav() function from", txt, "\n")
-    cat("\n")
-    .showfile(file.data, c(df.name, "data values"))
-    cat("\n")
+      cat("[with the write_sav() function from",
+      "Wickham and Miller's haven package]\n")
   }
   
   else if (format == "ODS") {
-    if (is.null(to))
-      file.data <- paste(df.name, ".ods", sep="")
-    else {
-      txt <- ifelse (grepl(".ods", to), "", ".ods")
-      file.data <- paste(to, txt, sep="")
-    }
-
-    readODS::write_ods(data, file.data)
-
-    txt <- "Schutten and Chan's readODS package]"
+    readODS::write_ods(data, out.df, row_names=row_names)
     if (!quiet)
-      cat("[with the write_ods() function from", txt, "\n")
-    cat("\n")
-    .showfile(file.data, c(df.name, "data values"))
-    cat("\n")
+      cat("[with the write_ods() function from",
+          "Schutten and Chan's readODS package]\n")
   }
 
   else if (format == "Excel") {
-    if (is.null(to))
-      file.data <- paste(df.name, ".xlsx", sep="")
-    else {
-      txt <- ifelse (grepl(".xlsx", to), "", ".xlsx")
-      file.data <- paste(to, txt, sep="")
-    }
-
     wb <- createWorkbook()
-    openxlsx::addWorksheet(wb, df.name)
+    openxlsx::addWorksheet(wb, in.df)
     if (ExcelColWidth)
       openxlsx::setColWidths(wb, sheet=1, cols=1:ncol(data), widths="auto") 
     if (ExcelTable)
-      openxlsx::writeDataTable(wb, df.name, x=data, colNames=TRUE,
-           xy=c("A",1), rowNames=rowNames, tableStyle="TableStyleLight9")
+      openxlsx::writeDataTable(wb, in.df, x=data, colNames=TRUE,
+           xy=c("A",1), rowNames=row_names, tableStyle="TableStyleLight9")
     else {
       hsl <- openxlsx::createStyle(fgFill="gray85", border="bottom")
-      openxlsx::writeData(wb, df.name, x=data, colNames=TRUE, xy=c("A",1),
-                rowNames=rowNames, headerStyle=hsl)
+      openxlsx::writeData(wb, in.df, x=data, colNames=TRUE, xy=c("A",1),
+                rowNames=row_names, headerStyle=hsl)
     }
 
-    openxlsx::saveWorkbook(wb, file=file.data, overwrite=TRUE)
+    openxlsx::saveWorkbook(wb, file=out.df, overwrite=TRUE)
     txt <- "Schauberger and Walker's openxlsx package]"
     if (ExcelTable  &&  !quiet)
       cat("[with the writeDataTable() function from", txt, "\n")
     else
       cat("[with the writeData() function from", txt, "\n")
-    cat("\n")
-    .showfile(file.data, c(df.name, "data values"))
-    cat("\n")
 
   }
   
   else if (format == "R") {
-    if (is.null(to))
-      file.data <- paste(df.name, ".rda", sep="")
-    else {
-      txt <- ifelse (grepl(".rda", to), "", ".rda")
-      file.data <- paste(to, txt, sep="")
-    }
-    save(list=df.name, file=file.data, ...)
-    .showfile(file.data, c(df.name, "data frame contents"))
+    save(list=in.df, file=out.df, ...)
   }
 
+  if (!quiet) .showfile(out.df, c(in.df, "data values"))
 }

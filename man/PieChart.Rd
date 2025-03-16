@@ -25,11 +25,11 @@ PieChart(x, y=NULL, data=d, filter=NULL,
 
          clockwise=FALSE, init_angle=ifelse (clockwise, 90, 0), 
 
-         labels=getOption("labels"),
-         labels_color=getOption("labels_color"),
-         labels_size=getOption("labels_size"),
-         labels_digits=getOption("labels_digits"),
-         labels_position=getOption("labels_position"),
+         labels=c("\%", "input", "prop", "off"),
+         labels_position=c("in","out"),
+         labels_color="white",
+         labels_size=0.75,
+         labels_decimals=NULL,
 
          main=NULL, main_cex=getOption("main_cex")*1.2,
          labels_cex=getOption("lab_cex"), cex,
@@ -108,25 +108,22 @@ pc(\dots)
        the default value is 0 (3 o'clock), otherwise 90 (12 o'clock).}\cr
 
 
-  \item{labels}{If not the default value of \code{"off"}, adds the
-        numerical results to the plot according to \code{"\%"}, 
-        \code{"prop"} or \code{"input"}, that is, percentages,
-         proportions, or the value from which the slices are plotted,
-         such as tabulated counts if \code{y} is not specified,
-         or the value of \code{y} if the plotted values are provided. If
-         any other \code{labels} parameter is specified, default is set
-         to \code{"\%"}.}
+  \item{labels}{Adds the numerical results to the plot. 
+         The default value is \code{"\%"} for percentages, with
+        \code{"prop"} for proportions or \code{"input"} for the numerical
+         y-values as input. The numerical results are
+         the tabulated counts if \code{y} is not specified,
+         or the value of \code{y} if provided.}
+  \item{labels_position}{Position of the plotted text. Default is \code{"in"}
+        for inside the pie, or set to \code{"out"} for outside.}
   \item{labels_color}{Color of the plotted text. Could be a vector to specify
         a unique color for each value. If fewer colors are specified than
         the number of categories, the colors are recycled.}
   \item{labels_size}{Character expansion factor, the size, of the plotted text, 
         for which the default value is 0.95.}
-  \item{labels_digits}{Number of decimal digits for which to display the values_
-        Default is 0, round to the nearest integer, for \code{"\%"}
-        and 2 for \code{"prop"}.}
-  \item{labels_position}{Position of the plotted text. Default is inside the pie,
-        or, if \code{"label"}, as part of the label for each value
-        outside of the pie.}\cr
+  \item{labels_decimals}{Number of decimal digits for which to display the values_
+        Default is 0 if all numerical y-values are integer, 1 for \code{"\%"},
+        and 2 for \code{"prop"}.}\cr
 
 
   \item{main}{Title of graph. Set the color with \code{main_color} with

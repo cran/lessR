@@ -17,6 +17,7 @@ function(colnms, horiz, color, fill, shape, box.bg, usr, lab_cex=0.8,
     text.cex <- lab_cex
   text.cex <- .85 * text.cex
   if (text.cex < getOption("axis_cex")) text.cex <- getOption("axis_cex")
+  legend_title_size <- 1.1 * text.cex
 
   if (horiz) {
 
@@ -35,6 +36,7 @@ function(colnms, horiz, color, fill, shape, box.bg, usr, lab_cex=0.8,
 
     legend(xleft, ytop, legend=colnms, horiz=TRUE, box.lwd=.5, 
            box.col="transparent", cex=text.cex, pt.cex=pt.size,
+           title.cex=legend_title_size,
            pt.bg=fill, bg=box.bg,
            col=color, pch=shape, text.col=the.clr, title=legend_title) 
   }
@@ -62,6 +64,7 @@ function(colnms, horiz, color, fill, shape, box.bg, usr, lab_cex=0.8,
     # rev() function lists the stacked plots in the order they are plotted
     legend(xleft, ytop, legend=rev(colnms), horiz=FALSE, lwd=1.5, lty=line_type,
            box.lwd=.5, box.col="transparent", cex=text.cex, pt.cex=pt.size,
+           title.cex=legend_title_size,
            pt.bg=rev(fill), bg=box.bg,
            col=rev(color), pch=shape, text.col=the.clr,
            x.intersp=1, y.intersp=1, title=legend_title) 

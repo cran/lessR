@@ -4,7 +4,7 @@ function(x, y,
         radius, hole, hole_fill, edges,
         clockwise, init_angle,
         density, angle, lty, lwd,
-        labels, labels_position, labels_color, labels_size, labels_digits,
+        labels, labels_position, labels_color, labels_size, labels_decimals,
         labels_cex, main_cex, main, main.miss,
         add, x1, x2, y1, y2,
         quiet, pdf_file, width, height, ...)  {
@@ -103,12 +103,18 @@ function(x, y,
   nms.x <- names(x)
   x <- as.numeric(x)
   if (labels != "off") {
-    if (labels == "input")
-      x.txt <- as.character(x)
+    if (is.null(labels_decimals)) {  # set labels_decimals
+      if (labels == "input") labels_decimals <- 0
+      if (.is.integer(x)) labels_decimals <- 0
+      if (labels == "%") labels_decimals <- 0
+      if (labels == "prop") labels_decimals <- 2
+    }
+    if (labels == "input")  # generate label
+      x.txt <- paste(.fmt(x, labels_decimals))
     else if (labels == "%")
-      x.txt <- paste(.fmt(x/sum(x) * 100, labels_digits), "%", sep="")
+      x.txt <- paste(.fmt(x/sum(x) * 100, labels_decimals), "%", sep="")
     else if (labels == "prop")
-      x.txt <- .fmt(x/sum(x), labels_digits)
+      x.txt <- .fmt(x/sum(x), labels_decimals)
   }
 
 

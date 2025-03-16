@@ -429,8 +429,8 @@ style(rotate_x=45, offset=1)
 Histogram(Salary, quiet=TRUE)
 style()
 
-# histogram with specified bins and grid lines displayed over the histogram
-Histogram(Salary, breaks=seq(0,150000,20000), xlab="My Variable")
+# histogram with specified bin width
+Histogram(Salary, bin_width=20000, xlab="My Variable")
 
 # histogram with bins calculated with the Scott method and values displayed
 Histogram(Salary, breaks="Scott", values=TRUE, quiet=TRUE)
@@ -440,7 +440,7 @@ Histogram(Salary, breaks=15, stat_x="proportion")
 
 # histogram with non-default values for x- and y-axes
 d[2,4] <- 45000
-Histogram(Salary, scale_x=c(30000,130000,5), scale_y=c(0,9.5,5))
+Histogram(Salary, scale_x=c(20000,160000,8), scale_y=c(0,9.5,5))
 
 # ----------------
 # Trellis graphics

@@ -49,11 +49,11 @@ BarChart(
         transparency=getOption("trans_bar_fill"),
         fill_split=NULL,
 
-        labels=c("\%", "input", "off"),
-        labels_color=getOption("labels_color"),
-        labels_size=getOption("labels_size"),
-        labels_decimals=getOption("labels_decimals"),
-        labels_position=getOption("labels_position"),
+        labels=c("\%", "input", "prop", "off"),
+        labels_position=c("in", "out"),
+        labels_color="white",
+        labels_size=0.75,
+        labels_decimals=NULL,
         labels_cut=NULL,
 
         # ------------------------------------------------------------------
@@ -68,7 +68,7 @@ BarChart(
 
         legend_title=NULL, legend_position="right_margin",
         legend_labels=NULL, legend_horiz=FALSE,
-        legend_size=NULL, legend_abbrev=NULL, legend_adjust=0,
+        legend_size=NULL, legend_abbrev=10, legend_adjust=0,
 
         # ----------------------------------------------------
         # Draw one or more objects, text, or geometric figures
@@ -208,14 +208,14 @@ bc(\dots)
         in the second \code{fill} color, or as specified by a vector of
         exactly two fill colors.}\cr
 
-  \item{labels}{If not \code{"off"}, adds the
-        numerical results to the plot according to the default \code{"\%"}
-        for tabulated counts and \code{"input"} for the input values for
-        a \code{y}-variable explicitly provided, unless there are more than
-        15 levels or \code{y} is present and non-integer in which case
-        the default is \code{"off"}. For tabulated
-        counts, \code{"prop"} is also available for proportions, as well as
-        \code{"input"} to show the computed values such as counts.}
+  \item{labels}{Adds the numerical results to the plot. 
+         The default value is \code{"\%"} for percentages, with
+        \code{"prop"} for proportions or \code{"input"} for the numerical
+         y-values as input. The numerical results are
+         the tabulated counts if \code{y} is not specified,
+         or the value of \code{y} if provided.}
+  \item{labels_position}{Position of the plotted text. Default is \code{"in"}
+        for inside the pie, or set to \code{"out"} for outside.}
   \item{labels_color}{Color of the plotted text. Could be a vector to specify
         a unique color for each value. If fewer colors are specified than
         the number of categories, the colors are recycled.}
@@ -224,17 +224,12 @@ bc(\dots)
         is \code{TRUE} and \code{labels_position} is \code{"in"} because bars are
         narrower.}
   \item{labels_decimals}{Number of decimal digits for which to display the values.
-        Default is 0, round to the nearest integer for \code{"\%"},
-        2 for \code{"prop"}, and if \code{"input"} and \code{y} is entered
-        directly, display the literal value unless > 9999, in which case
-        set to 0.}
-  \item{labels_position}{Position of the plotted text. Default is \code{"in"} for
-        inside the bar, or, if \code{"out"}, the label for each value is placed
-        outside of the bar, on top.}
+        Default is 0 if all numerical y-values are integer, 0 for \code{"\%"} 
+        \code{"input"}, and 2 for \code{"prop"}.}
   \item{labels_cut}{Threshold for displaying the value. If \code{labels_position}
        equals \code{"out"}, then default is 0.028 unless there is a
        \code{by} variable or multiple x-variables on the same plot, then
-       default is 0.040}\cr
+       default is 0.040.}\cr
 
   \item{xlab}{\bold{Axis label} for \code{x}-axis. 
        If \code{xlab} is not specified, then the label becomes

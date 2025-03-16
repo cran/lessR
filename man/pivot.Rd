@@ -46,7 +46,8 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
        aggregation statistic for a cell with any missing data returns \code{NA}.}
   \item{na_group_show}{If \code{TRUE}, the default, display \code{<NA>} for missing
        data of a grouping variable as a level for that variable. Otherwise, do
-       not treat a missing value of a group as a level for which to aggregate.}
+       not treat a missing value of a group as a level for which to aggregate,
+       deleting the level from the analysis.}
   \item{out_names}{Custom names for the aggregated variables. If more than one,
         list in the same order as specified in \code{variable}. Does not apply
         to the \code{table} option where the column names are the levels of

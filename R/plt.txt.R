@@ -3,7 +3,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
        xlab, ylab, fit, n.by, mse.ln, mse.nl, b0, b1, Rsq, 
        fit_new, y.new, by.cat,
        center_line, run, show_runs, prop, size, radius, digits_d,
-       fun_call=NULL, txdif=NULL) {
+       fun_call=NULL) {
 
   if (n.by == 0) n.by <- 1
   if (date.var) center_line <- "off"
@@ -360,7 +360,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
       # ---------------------------------------------
 
       # Linear correlation for a linear analysis
-      if (fit %in% c("off", "lm")) {
+      if (fit %in% c("off", "lm") && !date.var) {
 
         for (i in 1:n_col) {
           class(txsug) <- "out"
@@ -499,112 +499,6 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
       class(txreg) <- "out"
       return(list(tipe="contcont", out_suggest=txsug,
                   out_stats=txcor, out_y.new=dfnew, out_reg=txreg))
-
-      txsug <- ""
-
-      # suggestions
-      # -----------
-      if (getOption("suggest")) {
-        txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
-
-        fc <- paste("Plot(", x.name, ", ", y.name, sep="")
-
-        if (!grepl("enhance", fncl)) {
-          txt <- ", enhance=TRUE)  # many options"
-          txsug <- paste(txsug, "\n", fc, txt, sep="")
-        }
-
-        if (runif(1) > 0.5) {
-          if (!grepl("fill", fncl)) {
-            txt <- ", fill=\"skyblue\")  # interior fill color of points"
-            txsug <- paste(txsug, "\n", fc, txt, sep="")
-          }
-        }
-        else {
-          if (!grepl("color", fncl)) {
-            txt <- ", color=\"red\")  # exterior edge color of points"
-            txsug <- paste(txsug, "\n", fc, txt, sep="")
-          }
-        }
-
-        if (!grepl("fit", fncl)) {
-          txt <- ", fit=\"lm\", fit_se=c(.90,.99))  # fit line, stnd errors"
-          txsug <- paste(txsug, "\n", fc, txt, sep="")
-        }
-
-        if (runif(1) > 0.5) {
-          if (!grepl("out_cut", fncl)) {
-            txt <- ", out_cut=.10)  # label top 10% from center as outliers"
-            txsug <- paste(txsug, "\n", fc, txt, sep="")
-          }
-        }
-        else {
-          if (!grepl("MD_cut", fncl)) {
-            txt <- ", MD_cut=6)"
-            cmt <- "  # Mahalanobis distance from center > 6 is an outlier"
-            txsug <- paste(txsug, "\n", fc, txt, cmt, sep="")
-          }
-        }
-
-#        if (!grepl("ellipse", fncl)) {
-#          txt <- ", ellipse=0.95, add=\"means\")  # 0.95 ellipse with means"
-#          txsug <- paste(txsug, "\n", fc, txt, sep="")
-#        }
-
-#         if (!grepl("smooth", fncl)) {
-#           txt <- ", shape=\"diamond\")  # change plot character"
-#           txsug <- paste(txsug, "\n", fc, txt, sep="")
-#         }
-      }  # end suggest
-
-      blank <- ""
-      class(blank) <- "out"  # a blank line when needed
-
-      txreg <- ""
-      txcor <- ""
-
-      # output cor info if no fit line or lm fit only
-      # ---------------------------------------------
-
-      if (fit %in% c("off", "lm")) {
-
-        for (i in 1:n_col) {
-          class(txsug) <- "out"
-
-          #  no output correlation if a by variable
-          if (n.by == 1) {
-            if (n.xcol > 1) {
-              x.nm <- colnames(x)[i]
-              x.nm <- paste("\nVariable:", x.nm, "with",  colnames(y)[1])
-              class(x.nm) <- "out"
-              if (exists("output"))
-                output <- c(output, list(out_name=x.nm))
-              else
-                output <- list(out_name=x.nm)
-              options(xname = colnames(x)[i])
-              stuff <- .cr.main(x[,i], y[,1], brief=TRUE)
-            }
-            else {
-              options(yname = colnames(y)[i])
-              stuff <- .cr.main(x[,1], y[,i], brief=TRUE)
-            }
-
-            txbck <- stuff$txb
-            txdsc <- stuff$txd
-            txinf <- stuff$txi
-
-            # txcor contains the basic correlational text output
-            txcor <- c(txbck, txdsc, " ", txinf, " ")
-          }  # end n.by is 1
-
-        }  # end for i through n_col
-      }  # end output cor info
-
-      class(txsug) <- "out"
-      class(txcor) <- "out"
-      class(txreg) <- "out"
-      return(list(tipe="contcont", out_suggest=txsug,
-                  out_stats=txcor, out_reg=txreg))
 
     }  # end traditional 2-way scatter plot
 
@@ -788,10 +682,8 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
         class(txsug) <- "out"
         class(txstats) <- "out"
         class(txotl) <- "out"
-        class(txdif) <- "out"
 
-          return(list(out_suggest=txsug, out_stats=txstats, out_outliers=txotl,
-                         out_diff=txdif))
+        return(list(out_suggest=txsug, out_stats=txstats, out_outliers=txotl))
       }  # end Cleveland
 
 

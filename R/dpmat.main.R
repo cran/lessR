@@ -1,4 +1,4 @@
-.dpmat.main <-   # BPFM
+.dpmat.main <-   # BPFM (even for just 1 row)
 function(x, l, sort_yx,  # no y variable
          fill, color, col.bg,
          trans, shape_pts, col.box, 
@@ -10,7 +10,7 @@ function(x, l, sort_yx,  # no y variable
          do_plot, fun_call=NULL, ...)  {
 
   col.area <- fill  # kludge
-  size.txt <- ifelse (options("device") == "RStudioGD", 0.8, 0.7)
+  size.txt <- getOption("axis_cex")
 
   if (!is.null(value_labels)) value_labels <- gsub(" ", "\n", value_labels) 
 
@@ -141,6 +141,14 @@ function(x, l, sort_yx,  # no y variable
 
     .plt.bck(par("usr"), axTicks(1), 1:n.var)
 
+    # adjust axis label from tick with mgp[2]
+    # mgp does not work with rotate_x, see .axes()
+    my.mgp <- par("mgp")  # save to restore
+    ax <- .axes_dim()  # get axis value parameters
+    mgp2 <- 0.250 + (1.05 * ax$axis_x_cex)
+    par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
+    adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
+
     .axes(x.lvl, y.lvl, 1:length(x.lvl), 1:n.var,
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
 
@@ -172,13 +180,13 @@ function(x, l, sort_yx,  # no y variable
     adj <- .RSadj(radius)
     radius <- adj$radius
 
-    symbols(cords$xx, cords$yy, circles=c, bg=clr, 
+    sz <- c**power 
+    symbols(cords$xx, cords$yy, circles=sz, bg=clr, 
             fg=color, inches=radius, add=TRUE, ...)
 
     # counts
     if (size_cut) { 
       max.c <- max(c, na.rm=TRUE)  # do not display count if bubble is too small
-      #min_bubble <- (.5 - (0.9*radius)) * max.c 
       min_bubble <- (power/2.5) * max.c
       for (i in 1:length(c))
         if (!is.na(c[i])) if (c[i] <= min_bubble) c[i] <- NA

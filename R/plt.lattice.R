@@ -13,10 +13,6 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          ID, out_cut, ID_color, ID_size,
          rotate_x, rotate_y, width, height, pdf_file, T.type, quiet, ...) {
 
-  date.var <- FALSE  # currently does nothing
-  if (is.null(dim(x))) if (.is.date(x)) date.var <- TRUE
-  if (date.var) xx.lab <- xlab
-  if (date.var  &&  is.null(xx.lab)) x.lab <- NULL
 
   if (size.pt[1] == 0) object <- "line"
   size.ln <- size.ln + 0.5  # Trellis plot lines are narrower
@@ -75,6 +71,9 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   gl <- .getlabels(xlab, ylab, main, y.nm=is.y, lab_x_cex=lab_x_cex,
                      lab_y_cex=lab_y_cex, facet1.nm=TRUE)
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
+  date.var <- FALSE
+  if (is.null(dim(x))) if (.is.date(x)) date.var <- TRUE
+  if (date.var) x.lab <- NULL
   y.name <- gl$yn; y.lbl <- gl$yl;
   if (!is.null(gl$yb))
     y.lab <- ifelse (is.null(ylab), gl$yb, "")

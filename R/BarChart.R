@@ -16,11 +16,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         transparency=getOption("trans_bar_fill"),
         fill_split=NULL,
 
-        labels=c("%", "input", "off"),
-        labels_color=getOption("labels_color"),
-        labels_size=getOption("labels_size"),
-        labels_decimals=getOption("labels_decimals"),
-        labels_position=getOption("labels_position"),
+        labels=c("%", "input", "prop", "off"),
+        labels_position=c("in","out"),
+        labels_color="white",
+        labels_size=0.75,
+        labels_decimals=NULL,
         labels_cut=NULL,
 
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -33,7 +33,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
         legend_title=NULL, legend_position="right_margin",
         legend_labels=NULL, legend_horiz=FALSE,
-        legend_size=NULL, legend_abbrev=NULL, legend_adjust=0,
+        legend_size=NULL, legend_abbrev=10, legend_adjust=0,
 
         add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
@@ -46,6 +46,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
         eval_df=NULL, ...) {
 
+
+  labels_position <- match.arg(labels_position)
 
   # Note: if fill contains getColors() call, fill already evaluated
   fill.name <- deparse(substitute(fill))
@@ -78,7 +80,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   dots <- list(...)
   n.values <- 0
   if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
+    for (i in seq_along(dots)) {
       if (grepl("values", names(dots)[i], fixed=TRUE)) {
         n.values <- n.values + 1
         if (n.values == 1)
@@ -92,14 +94,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         if (names(dots)[i] == "values_position") labels_position <- dots[[i]]
         if (names(dots)[i] == "values_cut") labels_cut <- dots[[i]]
       }
-    }
-    if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]]
-    if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]]
-    if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
-    if (grepl(".", names(dots)[i], fixed=TRUE)) {
-      nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)  # dot to _
-      assign(nm, dots[[i]])
-      get(nm)
+      if (names(dots)[i] == "addtop") pad_y_max <- dots[[i]]
+      if (names(dots)[i] == "add_top") pad_y_max <- dots[[i]]
+      if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
+      if (grepl(".", names(dots)[i], fixed=TRUE)) {
+        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)  # dot to _
+        assign(nm, dots[[i]])
+        get(nm)
+      }
     }
   }
 
@@ -398,6 +400,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         y.call <- y
         if (is.function(y.call)) y.call <- eval(substitute(data$y))
       }
+
     }  # end !missing(y)
     else
       y.call <- NULL
@@ -533,11 +536,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       is.smry_tbl <- ifelse (lx.u*lby.u < length(by.call), FALSE, TRUE)
     }
 
+    # set labels default for aggregated data 
     if (labels.miss) {
-      if (!stat.miss || is.smry_tbl) # set default
+      if (!stat.miss || is.smry_tbl)
         labels <- "input"
-      else
-        labels <- "%"
     }
 
     if (!is.smry_tbl && !is.null(y.call) && stat.miss) {
@@ -711,10 +713,11 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       }
     }  # end determine one_plot
 
-    if (one_plot) {  # one_plot all x's into a single plot, BPFM for bars
+    # one_plot all x's stacked on a single plot, BPFM for bars
+    if (one_plot) {
       y.call <- NULL
       by.call <- NULL
-      legend_title <- "Title"
+      if (is.null(legend_title)) legend_title <- "Responses"
       options(byname = "Responses")
       if (is.null(xlab)) xlab <- ""
       if (is.null(ylab)) ylab <- ""

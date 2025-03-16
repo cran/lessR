@@ -54,8 +54,8 @@ function(x, y, size, radius, power, fill, color,
     # write bubble text
     if (!prop) {
       if (bubble_text != "transparent")
-        text(cords[q.ind,1], cords[q.ind,2], cords[q.ind,3],
-          cex=sz.cex[q.ind], col=bubble_text)
+        text(cords[q.ind,1], cords[q.ind,2], labels=cords[q.ind,3],
+            cex=sz.cex[q.ind], col=bubble_text)
     }
     else {
       crd <- .fmt0(cords[,3],2)

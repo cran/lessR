@@ -40,7 +40,7 @@ function(x, y=NULL, data=d, filter=NULL,
     vbs_mean=FALSE, fences=FALSE,
     k=1.5, box_adj=FALSE, a=-4, b=3,
 
-    radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
+    radius=NULL, power=0.55, low_fill=NULL, hi_fill=NULL,
 
     smooth=FALSE, smooth_points=100, smooth_size=1,
     smooth_exp=0.25, smooth_bins=128, n_bins=1,
@@ -49,7 +49,7 @@ function(x, y=NULL, data=d, filter=NULL,
     breaks="Sturges", cumulate=FALSE,
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
+    label_adjust=c(0,0), margin_adjust=c(0,0,0,0),
 
     rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
@@ -73,8 +73,8 @@ function(x, y=NULL, data=d, filter=NULL,
 
   if (is.null(fun_call)) fun_call <- match.call()
 
-  ts_agg <-  match.arg(ts_agg)
-  ts_method <-  match.arg(ts_method)
+  ts_agg <- match.arg(ts_agg)
+  ts_method <- match.arg(ts_method)
 
   stat.miss <- ifelse (missing(stat), TRUE, FALSE)
   if (stat[1] != "data") stat <- match.arg(stat)  # if condition for shiny
@@ -144,6 +144,10 @@ function(x, y=NULL, data=d, filter=NULL,
         ts_PI <- dots[[i]]
         message("\nParameter  ts_PIlevel  is now named  ts_PI\n")
       }
+      if (names(dots)[i] == "lab_adjust") {
+        label_adjust <- dots[[i]]
+        message("\nParameter  lab_adjust  is now named  label_adjust\n")
+      }
       if (names(dots)[i] == "type") ts_type <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
       if (names(dots)[i] == "area_origin") area_split <- dots[[i]]
@@ -191,6 +195,9 @@ function(x, y=NULL, data=d, filter=NULL,
 
   trans <- transparency
 
+  if ("on" %in% fill) fill <- getOption("violin_fill")
+  if ("on" %in% area_fill) area_fill <- getOption("violin_fill")
+
   # Note: stat is both object (dot plot) and statistic
 
   # limit actual argument to alternatives, perhaps abbreviated
@@ -234,7 +241,7 @@ function(x, y=NULL, data=d, filter=NULL,
   pt.fill <- fill
   pt.color <- color
   pt.trans <- trans
-  bubble_text <- getOption("bubble_text_color")
+  bbl.txt.col <- getOption("bubble_text_color")
   segment_color <- getOption("segment_color")
   ID_color <- getOption("ID_color")
 
@@ -324,20 +331,6 @@ function(x, y=NULL, data=d, filter=NULL,
     if (fit.miss) fit.ln <- "lm"
   }
 
-  # run chart settings
-  run <- ifelse (substitute(x) == ".Index", TRUE, FALSE)
-  if (show_runs) run <- TRUE
-  if (run) {
-    object <- "both"
-    n.y_var <- 1
-    if (cl.miss) center_line <- "default"
-    if (seg.miss) segments <- TRUE
-    if (fill.miss) {
-      fill <- "gray20"
-      color <- "gray60"
-   }
-  }  # end run
-
   # default point size for a stacked time series
   if (stack) {
     if (size.miss) size <- 0
@@ -347,9 +340,7 @@ function(x, y=NULL, data=d, filter=NULL,
   # presume text output to the console, could turn off at end of function
   outp <- TRUE
 
-  txdif <- ""  # used to transfer output for diffs of two vars Cleveland sp
-
-  xlab_adj <- lab_adjust[1];   ylab_adj <- lab_adjust[2]
+  xlab.adj <- label_adjust[1];   ylab.adj <- label_adjust[2]
   tm.adj <- margin_adjust[1];  rm.adj <- margin_adjust[2]
   bm.adj <- margin_adjust[3];  lm.adj <- margin_adjust[4]
 
@@ -372,7 +363,7 @@ function(x, y=NULL, data=d, filter=NULL,
     object <- "bubble"  # any bubble parameter activates a bubble plot
   }
   else
-    object <- "default"
+    object <- "point"
 
   # ------
   # see if dated or inconsistent parameter values
@@ -428,6 +419,14 @@ function(x, y=NULL, data=d, filter=NULL,
   x.name <- deparse(substitute(x), width.cutoff = 120L)
   options(xname = x.name)
 
+  if (x.name != ".Index") {  # not a run chart
+    run <- FALSE
+  }
+  else {  # run chart, create x as sequence of integers from 1
+    run <- TRUE
+    options(xname="Index")
+  }
+
   if (!is.null(x.name))
     x.in.global <- .in.global(x.name, quiet)  # in global?, includes vars list
   else
@@ -456,33 +455,33 @@ function(x, y=NULL, data=d, filter=NULL,
 
   eval_df <- !x.in.global
 
+
   # ---------------
+  #  evaluate x: get data to be analyzed into x.call data frame
 
-  #  get data to be analyzed into data.x data frame
-
-    # subset filter (with deprecated rows parameter also)
-    if (!missing(filter) || !missing(rows)) {
-      txt <- .filter(deparse(substitute(filter)))
-      if (!missing(filter))  # subset filter
-        r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
-      if (!missing(rows))
-        r <- eval(substitute(rows), envir=data, enclos=parent.frame())
-      r <- r & !is.na(r)  # set missing for a row to FALSE
-      nr.before <- nrow(data)
-      if (any(r))
-        data <- data[r,,drop=FALSE]
-      if (!quiet) {
-        if (!missing(filter))  # filter parameter present
-          cat("\nfilter: ",  txt, "\n-----\n")
-        cat("Rows of data before filtering: ", nr.before, "\n")
-        cat("Rows of data after filtering:  ", nrow(data), "\n\n")
-      }
-    }  # end filter
+  # subset filter (with deprecated rows parameter also)
+  if (!missing(filter) || !missing(rows)) {
+    txt <- .filter(deparse(substitute(filter)))
+    if (!missing(filter))  # subset filter
+      r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
+    if (!missing(rows))
+      r <- eval(substitute(rows), envir=data, enclos=parent.frame())
+    r <- r & !is.na(r)  # set missing for a row to FALSE
+    nr.before <- nrow(data)
+    if (any(r))
+      data <- data[r,,drop=FALSE]
+    if (!quiet) {
+      if (!missing(filter))  # filter parameter present
+        cat("\nfilter: ",  txt, "\n-----\n")
+      cat("Rows of data before filtering: ", nr.before, "\n")
+      cat("Rows of data after filtering:  ", nrow(data), "\n\n")
+    }
+  }  # end filter
 
   # process row.names if specified
   if (x.name %in% c("row_names", "row.names")) {
     # retain order of row names, otherwise will be alphabetical
-    data.x <- data.frame(factor(row.names(data), levels=row.names(data)))
+    x.call <- data.frame(factor(row.names(data), levels=row.names(data)))
     if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
     cat.x <- TRUE
   }
@@ -495,29 +494,27 @@ function(x, y=NULL, data=d, filter=NULL,
         .xcheck(x.name, df.name, names(data))  # stop if x an expression
     }
 
-    if (x.name != ".Index") {  # not a run chart
+    if (!run) {  # not a run chart
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
       x.col <- eval(substitute(x), envir=data.vars)  # col num of each var
 
       if (!("list" %in% class(data))) {
-        data.x <- data[, x.col]  # need stringsAsFactors
-        data.x <- data.frame(data.x)
+        x.call <- data[, x.col]
+        x.call <- data.frame(x.call)
       }
       else {  # class of data is "list"
-         data.x <- data.frame(data[[x.col]])
+         x.call <- data.frame(data[[x.col]])
       }
       if (is.numeric(x.col))
-        names(data.x) <- names(data.vars)[x.col]
+        names(x.call) <- names(data.vars)[x.col]
       else
-        names(data.x) <- x.col  # if x a vector, x.col can return names
+        names(x.call) <- x.col  # if x a vector, x.col can return names
     }
     else {  # run chart, create x as sequence of integers from 1
-      data.x <- data.frame(seq_len(nrow(data)))
-      names(data.x) <- "Index"
-      options(xname="Index")
+      x.call <- data.frame(seq_len(nrow(data)))
+      names(x.call) <- "Index"
     }
-
   }  # end x in df
 
   # x is in the global environment (vector or data frame)
@@ -536,29 +533,31 @@ function(x, y=NULL, data=d, filter=NULL,
     date.var <- TRUE
     if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
     tsPull <- .tsExtract(x, x.name)
-    data.x <- tsPull$x.dates
+    x.call <- tsPull$x.dates
     y.call <- tsPull$y
-    n.y_var <- 1
+    n.yvar <- 1
   }  # end is.ts()
 
   else {  # x is a not ts vector in global
     if (!is.function(x))
-      data.x <- data.frame(x)  # x is 1 var
+      x.call <- data.frame(x)  # x is 1 var
     else  # x is 1 var
-      data.x <- data.frame(eval(substitute(data$x)))
-    names(data.x) <- x.name
+      x.call <- data.frame(eval(substitute(data$x)))
+    names(x.call) <- x.name
   }
 
-  n.x_var <- ncol(data.x)  # number of x-variables
-  x.call <- data.x  # x.call is the primary x-variable
+  n.xvar <- ncol(x.call)  # number of x-variables
 
-  # get data.x data to be analyzed into x.call, except for BPFM
+  cat.x <- ifelse (is.character(x.call[,1]) || is.factor(x.call[,1]),
+                   TRUE, FALSE)
+
+  # get x.call data to be analyzed into x.call, except for BPFM
   BPFM <- FALSE
   spmat <- FALSE
 
   # just one x variable for now, a vector of cat or num values
   # see if convert to variable of -- type Date --
-  if (n.x_var == 1) {
+  if (n.xvar == 1) {
 
     if (grepl("POSIX",  class(x.call[,1]), fixed=TRUE)[1])
       x.call[,1] <- as.Date(x.call[,1])
@@ -615,60 +614,67 @@ function(x, y=NULL, data=d, filter=NULL,
           }  # numeric date format
         }  # end n.ch is 6, 7, 8
       }  # end do best guess
+      if (.is.date(x.call[1,1])) cat.x <- FALSE
     }  # is.char x.call[1,1]
 
-    cat.x <- ifelse (is.character(x.call[,1]) || is.factor(x.call[,1]),
-                     TRUE, FALSE)
-    if (cat.x  &&  object == "both") {
+    if (cat.x && run) {
       cat("\n"); stop(call.=FALSE, "\n------\n",
         "A run chart applies only to continuous variables\n",
         x.name, " is a categorical variable\n\n")
     }
 
     if (.is.date(x.call[,1])) date.var <- TRUE
-  }  # end n.x_var == 1
+  }  # end n.xvar == 1
 
   # more than one x-variable
   else {
     # no y, see if eligible for BPFM where all selected vars are cat
     # multiple lines of a continuous x-variable also can occur
-    if (y.miss  &&  object != "both") {
       is.cat <- logical(length=length(x.col))
       is.nmb <- logical(length=length(x.col))
       for (i in seq_along(x.col)) {  # see if variables are all categorical
-        is.string <- is.factor(data.x[,i]) || is.character(data.x[,i])
+        is.string <- is.factor(x.call[,i]) || is.character(x.call[,i])
         is.cat[i] <- ifelse (is.string, TRUE, FALSE)
-        is.nmb[i] <- ifelse (is.numeric(data.x[,i]), TRUE, FALSE)
+        is.nmb[i] <- ifelse (is.numeric(x.call[,i]), TRUE, FALSE)
       }  # end for
 
       if (all(is.cat)) {
         BPFM <- TRUE
         cat.x <- TRUE
-        spmat <- FALSE
       }
       else if (all(is.nmb)) {
         BPFM <- FALSE
         cat.x <- FALSE
-        spmat <- TRUE
       }
-
       else {
         cat("\n"); stop(call.=FALSE, "\n------\n",
           "Multiple x-variables must all be numeric or all R factors\n\n")
       }
-    }  # y is missing and not a line graph
-    else
-      cat.x <- FALSE
+
+      spmat <- FALSE
+      if (y.miss && all(is.nmb)) spmat <- TRUE
   }  # end more than 1 x-variable
 
-   if (!is.factor(x.call[,1])) if (cat.x) x.call[,1] <- factor(x.call[,1])
+  if (!is.factor(x.call[,1])) if (cat.x) x.call[,1] <- factor(x.call[,1])
 
   if (!BPFM)
     nrows <- ifelse(is.matrix(x.call[,1]), nrow(x.call[,1]), length(x.call[,1]))
   else
-    nrows <- nrow(data.x)
+    nrows <- nrow(x.call)
 
-  if (date.var || run) object <- "both"
+  # date and run chart settings
+  if (date.var || run) {  # points and line segments
+    object <- "point"
+    if (seg.miss) segments <- TRUE
+    n.yvar <- 1
+  }
+  if (run) {
+    if (cl.miss) center_line <- "default"
+    if (fill.miss) {
+      fill <- "gray20"
+      color <- "gray60"
+   }
+  }  # end run
 
 
   #-----------
@@ -725,7 +731,7 @@ function(x, y=NULL, data=d, filter=NULL,
       names(data.y) <- y.name
     }
 
-    n.y_var <- ncol(data.y)  # number of y-variables
+    n.yvar <- ncol(data.y)  # number of y-variables
     y.call <- data.y
 
     if (ncol(y.call) == 1) {  # y is one variable
@@ -746,9 +752,10 @@ function(x, y=NULL, data=d, filter=NULL,
 
   else { # missing y
     if (!date.var) y.call <- NULL
+    n.yvar <- 0
   }  # end missing y
 
-  if (ts_ahead > 0 && n.y_var > 1) {
+  if (ts_ahead > 0 && n.yvar > 1) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
       "Can only do a forecast for a single y-variable\n\n")
   }
@@ -764,7 +771,7 @@ function(x, y=NULL, data=d, filter=NULL,
   if (ellipse[1] > 0) {
     many.y <- FALSE
     if (!y.miss) if (is.matrix(y.call)) many.y <- TRUE
-    if ((ncol(data.x)>1 || many.y)  ||  cat.x  ||  cat.y) {
+    if ((ncol(x.call)>1 || many.y)  ||  cat.x  ||  cat.y) {
       cat("\n"); stop(call.=FALSE, "\n------\n",
         "An ellipse only applies to a scatterplot of two, ",
         "continuous variable\n\n")
@@ -775,7 +782,7 @@ function(x, y=NULL, data=d, filter=NULL,
     }
   }
 
-  if (y.miss && (fit.ln != "off") && n.x_var == 1 && (!date.var && !run)) {
+  if (y.miss && (fit.ln != "off") && n.xvar == 1 && (!date.var && !run)) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
       "Fit line only applicable if only one x variable, if y is present\n\n")
   }
@@ -799,12 +806,12 @@ function(x, y=NULL, data=d, filter=NULL,
   y.unique <- ifelse (n.uy == ly, TRUE, FALSE)
 
   # get Trellis and T.type
-  fnl <- .plt.funnel(data.do, n.x_var, y.miss, cat.x, cat.y, run, date.var,
+  fnl <- .plt.funnel(data.do, n.xvar, y.miss, cat.x, cat.y, run, date.var,
                      facet1.miss, y.unique)
   Trellis <- fnl$Trellis
   T.type <- fnl$T.type  # needed only for Trellis
 
-  if (!data.do  &&  n.x_var == 1)
+  if (!data.do  &&  n.xvar == 1)
     if (!cat.x) violin <- FALSE
 
   # end master control funnel
@@ -953,9 +960,6 @@ function(x, y=NULL, data=d, filter=NULL,
   if (!size.miss) {
     size.name <- deparse(substitute(size))
     if (size.name == "NULL") size.miss <-TRUE
-  }
-
-  if (!size.miss) {
     suppressWarnings(size.num <- as.numeric(size.name))  # number or variable?
 
   if (is.na(size.num)) {  # size a variable (did not resolve to a number)
@@ -1034,22 +1038,15 @@ function(x, y=NULL, data=d, filter=NULL,
   # -----------  x, y, by, size, and ID variables established -------
   # -----------------------------------------------------------------
 
-  if (!run)
-    n.xcol <- ifelse (y.miss, 1, ncol(x.call))  # sp matrix means only 1 xcol
-  else
-    n.xcol <- ncol(x.call)
-  n.ycol <- ifelse (y.miss, 0, ncol(y.call))
-  nn_col <- max(n.xcol, n.ycol)  # n_col goes into lattice, do not change
-
   if (is.null(height)) {
     if (is.null(y.call)  &&  !BPFM
-        &&  data.do  &&  object != "both"  &&  !.is.date(x.call))
+        &&  data.do  &&  object != "point"  &&  !.is.date(x.call))
       height <- ifelse (is.null(main), 4, 4.6)  # narrow for 1-D dot plot
     else
       height <- 6
 
     if (BPFM)  # more than 7 variables, make plot extra long
-      height <- height + ((ncol(data.x) - 7) * 0.5)
+      height <- height + ((ncol(x.call) - 7) * 0.5)
   }
 
   if (is.null(width)) width <- 6
@@ -1076,10 +1073,10 @@ function(x, y=NULL, data=d, filter=NULL,
 
   # prep 1-variable bubble plot
   # y.call to 0
-  if (is.null(y.call)  &&  cat.x  &&  n.x_var == 1  &&  data.do) {
+  if (is.null(y.call)  &&  cat.x  &&  n.xvar == 1  &&  data.do) {
     y.call <- data.frame(rep(0, nrow(x.call)), stringsAsFactors=TRUE)
     cat.y <- FALSE
-    if (object == "default") object <- "bubble"
+    object <- "bubble"
     if (is.null(low_fill)) low_fill <- "gray20"
     if (is.null(hi_fill)) hi_fill <- "gray20"
   }
@@ -1087,60 +1084,38 @@ function(x, y=NULL, data=d, filter=NULL,
   # if numeric x is sorted with equal intervals, set as line chart
   #   unless doing a fit line as only want one line
   # x.call does not exist for BPFM
-  if (!cat.x && fit.ln=="off") if (is.numeric(x.call[,1])  &&  nrows > 2) {
-    if (object == "default") {
-      eq.int <- ifelse (any(is.na(x.call[,1])), FALSE, TRUE)
-      if (eq.int) {
-        d.x <- diff(x.call[,1])  # only look at first x-variable
-        for (i in 2:(length(d.x)))
-          if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) eq.int <- FALSE
-        rm(d.x)
-      }  # also no y missing
-
-      if (!is.unsorted(x.call) && eq.int && sum(is.na(y.call))==0) {
-        object <- "both"
-        if (!seg.miss && !segments) object <- "point"
-        if (is.null(size)) size <- 0  # by default, just plot line w/o points
+  if (!cat.x && fit.ln=="off") {
+    if (is.numeric(x.call[,1]) && nrows>2) {
+      if (object == "point") {
+        eq.int <- ifelse (any(is.na(x.call[,1])), FALSE, TRUE)
+        if (eq.int) {
+          d.x <- diff(x.call[,1])  # only look at first x-variable
+          for (i in 2:(length(d.x)))
+            if ((abs(d.x[i-1] - d.x[i]) > 0.0000000001)) {
+              eq.int <- FALSE
+              break
+            }
+          rm(d.x)
+        }  # also no y missing
+        if (!is.unsorted(x.call) && eq.int && sum(is.na(y.call))==0) {
+          if (is.null(size)) size <- 0  # by default, just plot line w/o points
+          if (seg.miss) segments <- TRUE
+        }
       }
     }
   }
 
-  # if numeric y is sorted with equal intervals, line chart
-  if (fit.ln == "off") if (is.numeric(y.call)  &&  nrows > 2) {
-    if (object == "default") {
-      if (sum(is.na(y.call)) > 0)
-        eq.int <- FALSE  # missing data in x present
-      else {
-        eq.int <- TRUE
-        if (is.matrix(y.call))
-          d.y <- diff(y.call[,1])  # only look at first x-variable
-        else
-          d.y <- diff(y.call)
-        for (i in 2:(length(d.y)))
-          if ((abs(d.y[i-1] - d.y[i]) > 0.0000000001)) eq.int <- FALSE
-        rm(d.y)
-      }  # also no y missing
-
-      if (!is.unsorted(y.call) && eq.int && sum(is.na(x))==0)
-        object <- "both"
-    }
-  }
-
-  # set point or bubble plot
-  if (object == "default") {  # set default
+  if (object == "point") {  # see if bubble plot, already set if size a var 
     if (!y.miss) {
-      object <- "point"
       if (data.do) if (cat.x && cat.y) object <- "bubble"
-    }
-    else if (stat %in% c("count", "proportion", "%")) {
-      object <- "point"
-      n.y_var <- 1
     }
     else {
       if (data.do) object <- ifelse (cat.x, "bubble", "point")
       if (BPFM) object <- "bubble"  # BPFM
     }
   }
+
+  if (stat %in% c("count", "proportion", "%")) n.yvar <- 1
 
   if (y.miss  &&  !date.var  &&  object != "bubble") {
     if (!cat.x) {
@@ -1170,7 +1145,8 @@ function(x, y=NULL, data=d, filter=NULL,
         }
 
         # last assignment of object, now determined
-        object <- "both"  # do freq poly as a line chart
+        object <- "point"  # do freq poly as a line chart
+        segments <- TRUE
         freq.poly <- TRUE  # need to indicate fill possibility
         center_line <- "off"  # not meaningful here
 
@@ -1277,7 +1253,7 @@ function(x, y=NULL, data=d, filter=NULL,
 
 
   # ----------------------------------------------------------------
-  # object now determined: "both", "point", "bubble", or "sunflower"
+  # object now determined: "point", "bubble", or "sunflower"
 
   # flag unsorted data for time series
   if (date.var) {
@@ -1338,22 +1314,28 @@ function(x, y=NULL, data=d, filter=NULL,
     }
     pt.size <- size * scale.pt
   }
+
   if (size.miss) {  # pt.size is a scaler
-    if (object == "both") {  # pts and lines specified
-      pt.size <- 0.85 * pt.size  # default pt size when lines specified
+    if (object=="point" && segments) {  # pts and lines specified
+      pt.size <- 0.85 * pt.size  # default pt size when segments specified
       if (!("transparent" %in% area_fill))
         pt.size[1] <- 0  # default no points if area shown
       else if (nrows > 50) {
         pt.size <- .75 - 0.002*nrows
         if (pt.size < 0.10) pt.size <- 0
       }
-    }  # end both
+    }  # end point and segments
   }
 
+  n.xcol <- ncol(x.call)
+  if (y.miss && !run) n.xcol <- 1
+  n.ycol <- ifelse (y.miss, 0, ncol(y.call))
+  nn.col <- max(n.xcol, n.ycol)  # n_col goes into lattice, do not change
+
   ord.by.call <- is.ordered(by.call)
-  fc <- .plt.colors(object, nn_col, n.by, theme, fill, fill.miss,
+  fc <- .plt.colors(object, nn.col, n.by, segments, theme, fill, fill.miss,
           color, color.miss, area_fill, area_fill.miss, trans, stack,
-          n.ycol, n.y_var, ord.by.call, run, pt.size)
+          n.ycol, n.yvar, ord.by.call, run, pt.size)
 
   pt.fill <- fc$pt_fill
   pt.color <- fc$pt_col
@@ -1535,14 +1517,14 @@ function(x, y=NULL, data=d, filter=NULL,
   }  # end Trellis && do_plot
 
 
-  # -----------------------------------
-  # bubble plot frequency matrix (BPFM)
+  # ----------------------------------------------------
+  # bubble plot frequency matrix (BPFM, even just 1 row)
 
   else if (y.miss  &&  object == "bubble") {  # no y variable
 
     # get labels just for subset data matrix
     l <- attr(data, which="variable.labels")
-    nm <- names(data.x)
+    nm <- names(x.call)
     mylabs <- character(length=length(nm))
     for (i in seq_along(nm)) {
       if (!(nm[i] %in% names(l)))
@@ -1563,7 +1545,7 @@ function(x, y=NULL, data=d, filter=NULL,
       pt.trans, shape, panel_color,
       low_fill, hi_fill,
       xy_ticks, xlab, ylab, main, sub, size,
-      radius, size_cut, bubble_text, power,
+      radius, size_cut, bbl.txt.col, power,
       bm.adj, lm.adj, tm.adj, rm.adj,
       value_labels, rotate_x, rotate_y, offset, quiet, do_plot, fun_call, ...)
   }
@@ -1575,7 +1557,7 @@ function(x, y=NULL, data=d, filter=NULL,
   else if (spmat && do_plot) {
     bckg <- ifelse(panel_fill=="transparent",
                    getOption("window_fill"), panel_fill)
-    .plt.mat(data.x, fit=fit.ln, col_fill=pt.fill, col_color=pt.color,
+    .plt.mat(x.call, fit=fit.ln, col_fill=pt.fill, col_color=pt.color,
                      col.bg=bckg, col_trans=pt.trans,
                      pt.size=pt.size, size.miss=size.miss)
   }
@@ -1620,14 +1602,14 @@ function(x, y=NULL, data=d, filter=NULL,
           options(xname = x.name)  # reverse back
           options(yname = y.name)
         }
-        else  {
+        else  {  # y is missing, so counts
           stats <- .ss.factor(x.call, digits_d=digits_d, x.name=x.name,
                               brief=TRUE)
           txstats <- stats$counts
         }
 
         class(txstats) <- "out"
-      }
+      }  # end !quiet
 
     # set up new x.call and y.call for stats
     # only does overall stat, so not applicable if a by parameter
@@ -1662,11 +1644,10 @@ function(x, y=NULL, data=d, filter=NULL,
       }
 
       x.call <- factor(names(out))
-      y.call <- as.vector(out)
-
       x.call <- data.frame(x.call, stringsAsFactors=TRUE)
-      y.call <- data.frame(y.call, stringsAsFactors=TRUE)
-    }  # sum, mean, sd, min, median, max
+      y.call <- as.vector(out)
+      y.call <- data.frame(y.call)
+    }  # end stat transform
 
 
     # ----------------------------------------------------
@@ -1676,46 +1657,58 @@ function(x, y=NULL, data=d, filter=NULL,
     # line chart
 
     if ((!is.null(y.call) || date.var) &&
-        object %in% c("point", "bubble", "both", "sunflower")) {
+        object %in% c("point", "bubble", "sunflower")) {
 
-      if (object == "point"  &&  data.do) {  # for Cleveland dot plot
-        if (!cat.x && cat.y && y.unique) {  # no sort_xy option
+      # Cleveland dot plot
+      if (object == "point"  &&  data.do) {
+        if (sort_yx.miss) if (n.xvar <= 2) sort_yx <- "-"
+        if (!cat.x && cat.y && y.unique) {
           if (seg.y.miss) if (y.unique && cat.y) segments_y <- TRUE
+          origin_x <- 0
+        }
+        if (cat.x && !cat.y && x.unique) {
           if (seg.x.miss) if (x.unique && cat.x) segments_x <- TRUE
-          if (sort_yx.miss) if (n.x_var <= 2) sort_yx <- "+"
+          origin_y <- 0
         }
       }
 
       # sort y by x option (intended for Cleveland dot plot)
-      tx <- character(length=0)
+      srt.dwn <- ifelse (sort_yx == "-", FALSE, TRUE)
       if (sort_yx != "0") {
-        srt.dwn <- ifelse (sort_yx == "-", FALSE, TRUE)
-        if (n.x_var == 1) {  # one x-variable
-          ord <- order(x.call[,1], decreasing=srt.dwn)
+        if (n.xvar == 1) {  # one x-variable
+          if (cat.x && !cat.y && x.unique) {
+            x.vals <- as.character(x.call[,1])  # factor to char vec
+            y.vals <- y.call[,1]  # Extract numeric vector from df 
+            ord <- order(y.vals, decreasing=srt.dwn)
+            x.sort <- x.vals[ord]
+            x.call[,1] <- factor(x.sort, levels=x.sort)
+            y.call[,1] <- y.vals[ord]
+          }
+          if (!cat.x && cat.y && y.unique) {
+            y.vals <- as.character(y.call[,1])  # factor to char vec
+            x.vals <- x.call[,1]  # Extract numeric vector from df 
+            ord <- order(x.vals, decreasing=srt.dwn)
+            y.sort <- y.vals[ord]
+            y.call[,1] <- factor(y.sort, levels=y.sort)
+            x.call[,1] <- x.vals[ord]
+          }
         }
-        else if (n.x_var == 2) {  # two x-vars, sort on diffs
-          difs <- x.call[,2] - x.call[,1]
-          ord <- order(difs, decreasing=srt.dwn)
+        else if (n.xvar == 2) {  # two x-vars, sort on diffs
+          if (!cat.x && cat.y) {
+            x.call <- x.call[order(x.call[,2]-x.call[,1], decreasing = TRUE), ]
+          }
+          if (cat.x && !cat.y) {
+            y.call <- y.call[order(y.call[,2]-y.call[,1], decreasing = TRUE), ]
+          }
         }
-        else {
-          cat("\n"); stop(call.=FALSE, "\n------\n",
-          "Sorting not meaningful for more than two x-variables\n\n")
-        }
-
-        y.c <- y.call[,1]
-        y.c <- factor(y.c, levels=y.c[ord])
-        y.call[,1] <- y.c
-
       }  # end sort_yx
-      else { # sort_yx==0
-        if (n.x_var == 2  &&  ncol(x.call) == 2) {  # run==TRUE only 1-col
-          ord <- seq_len(nrow(x.call))
-          difs <- x.call[,2] - x.call[,1]
-        }
-      }
 
       # for Cleveland dot plot of two vars, print difference by level
-      if (n.x_var == 2  &&  ncol(x.call) == 2  &&  !quiet) {
+      txdif <- NULL
+      if (n.xvar==2  &&  ncol(x.call)==2  &&  !quiet) {
+        tx <- character(length=0)
+        difs <- x.call[,2] - x.call[,1]
+        ord <- order(difs, decreasing=srt.dwn)
         dd <- .max.dd(c(x.call[1], x.call[2])) + 1
         if (dd > getOption("digits")) dd <- getOption("digits")
         ny <- nrow(y.call)
@@ -1747,7 +1740,7 @@ function(x, y=NULL, data=d, filter=NULL,
       outlpts <- NULL
       out_outliers <- ""
       if (!y.miss && !Trellis)
-        if (n.x_var==1 && n.y_var==1
+        if (n.xvar==1 && n.yvar==1
              && is.numeric(x.call[,1]) && is.numeric(y.call[,1]))
         if (MD_cut > 0  ||  out_cut > 0) {
           otl <- .plt.MD(x.call[,1], y.call[,1], ID.call, MD_cut, out_cut)
@@ -1766,11 +1759,6 @@ function(x, y=NULL, data=d, filter=NULL,
         }
       }
 
-      if (object == "both"  &&  nn_col > 1) {
-         # change to multi later
-         if ("on" %in% area_fill) fill <- getOption("violin_fill")
-      }
-
       # by default display center_line only if runs about a mean
       if (run  &&  center_line == "default") {
         y.clean <- y.call[complete.cases(y.call), 1]  # converts df to vector
@@ -1784,7 +1772,7 @@ function(x, y=NULL, data=d, filter=NULL,
           center_line <- "median"
       }
 
-#     # minimum value of y across all of y.call without aggregation
+      # minimum value of y across all of y.call without aggregation
       if (is.numeric(y.call[,1]))
         min.y <- min(as.matrix(y.call[sapply(y.call, is.numeric)]),
                        na.rm=TRUE)  # select only numeric vars
@@ -1901,6 +1889,7 @@ function(x, y=NULL, data=d, filter=NULL,
         }
       }
 
+      mse.ln <- NULL;  mse.nl <- NULL;  by.cat <- NULL;  y.new <- NULL
       if (do_plot) {
         # main out, mostly the visualization, sometimes some stats
         m.out <- .plt.main(x.call, y.call, by.call,
@@ -1911,7 +1900,7 @@ function(x, y=NULL, data=d, filter=NULL,
           pt.size, line_width, shape, means,
           segments, segments_y, segments_x,
           smooth, smooth_points, smooth_size, smooth_exp, smooth_bins,
-          radius, power, size_cut, bubble_text, low_fill, hi_fill,
+          radius, power, size_cut, bbl.txt.col, low_fill, hi_fill,
           ID.call, ID_color, ID_size, outlpts,
           out_fill, out_color, out_shape, out_shape.miss,
           fit.ln, fit_power, fit_color, fit_lwd, fit_new,
@@ -1922,7 +1911,7 @@ function(x, y=NULL, data=d, filter=NULL,
           y.fit, y.hat, x.fit, x.hat, y.upr, y.lwr,
           mx.x, mn.y, mx.y,
           freq.poly, jitter_x, jitter_y,
-          xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
+          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
           scale_x, scale_y, pad_x, pad_y, legend_title,
           add, x1, x2, y1, y2, add_cex, add_lwd, add_lty,
           add_color, add_fill, add_trans, quiet, ...)
@@ -1932,11 +1921,6 @@ function(x, y=NULL, data=d, filter=NULL,
           mse.ln <- m.out$mse.ln;  Rsq <- m.out$Rsq;  mse.nl <- m.out$mse.nl
           by.cat <- m.out$by.cat
           y.new <- m.out$y.new
-        }
-        else {
-          mse.ln <- NULL;  mse.nl <- NULL
-          by.cat <- NULL
-          y.new <- NULL
         }
       }  # end do_plot
 
@@ -1969,7 +1953,7 @@ function(x, y=NULL, data=d, filter=NULL,
           tx[length(tx)+1] <- paste("radius:", .fmt(radius,2),
               "   size of largest bubble")
           tx[length(tx)+1] <- paste("power:", .fmt(power,2),
-              "    relative bubble sizes")
+              "    relative bubble t's going onsizes")
           txbub <- tx
         }
 
@@ -1979,13 +1963,16 @@ function(x, y=NULL, data=d, filter=NULL,
             date.var, xlab, ylab, fit.ln, n.by, mse.ln, mse.nl,
             b0, b1, Rsq, fit_new, y.new, by.cat,
             center_line, run, show_runs,
-            proportion, size, radius, digits_d, fun_call, txdif)
+            proportion, size, radius, digits_d, fun_call)
 
           # cumulate existing output pieces from o into final output
           output <- NULL
 
           if (getOption("suggest"))
             output <- list(out_suggest=o$out_suggest)
+
+          if (!is.null(txdif))
+            output$out_dif <- txdif
 
           if (!is.null(outlpts)) {
             class(outlpts) <- "out"  # MD outliers
@@ -2077,7 +2064,7 @@ function(x, y=NULL, data=d, filter=NULL,
     if (Trellis) {  # only VBS plots have output processed here
       if (!(T.type %in% c("cont", "cont_cat"))) outp <- FALSE
     }
-    if (n.x_var > 1  &&  y.miss) outp <- FALSE  # scatterplot matrix
+    if (n.xvar > 1  &&  y.miss) outp <- FALSE  # scatterplot matrix
 
     if (outp) {
       if (!is.null(output)) print(output)

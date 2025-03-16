@@ -140,7 +140,7 @@ Plot(
 
     # -----------
     # Bubble plot [xCategorical, or xCategorical and yCategorical]
-    radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
+    radius=NULL, power=0.55, low_fill=NULL, hi_fill=NULL,
 
     # --------------------------------------
     # Large data sets, smoothing and binning  [x and y]
@@ -157,10 +157,9 @@ Plot(
     # Miscellaneous
     # -------------
 
-    # ------------------------------------------------------------------
-    # Labels for axes, values, and legend if x and by variables, margins
+    # Labels for axes, values, legend if x and by variables, margins
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
+    label_adjust=c(0,0), margin_adjust=c(0,0,0,0),  # top, right, bottom, left
 
     rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
@@ -238,17 +237,15 @@ vp(\dots)
         variables, with \code{facet2} as the row variable, which yields a
         scatterplot (panel) for \emph{each} cross-classification of the levels
         of numeric \code{x} and \code{y} variables.}
-  \item{n_row}{Optional specification for the number of rows and columns
+  \item{n_row}{Optional specification for the number of rows 
         in the layout of a multi-panel display with Trellis graphics. Specify
         \code{n_col} or \code{n_row}, but not both.}
   \item{n_col}{Optional specification for the number of columns in the
         layout of a multi-panel display with
-        Trellis graphics. Specify \code{n_col} or \code{n_row}, but
-        not both. If set to 1, the default, then
-        the strip that labels each group locates to the left of each plot
-        instead of the top.}
-  \item{aspect}{Lattice parameter for the aspect ratio of the panels,
-        defined as height divided by width.
+        Trellis (facet) graphics. Specify \code{n_col} or \code{n_row}, but
+        not both. The default sets to 1.}
+  \item{aspect}{Lattice parameter for the aspect ratio of the Trellis panels
+        or facets, defined as height divided by width.
         The default value is \code{"fill"} to have the panels
         expand to occupy as much space as possible. Set to 1 for square panels.
         Set to \code{"xy"} to specify a ratio calculated
@@ -381,8 +378,9 @@ vp(\dots)
        but turned off if \code{plot_errors=TRUE}.
        Can be a vector to display multiple ranges. Set to 0 to turn off.}
   \item{fit_color}{Color of the fit line.}
-  \item{fit_new}{When parameter \code{fit} is set to \code{"quad"}, 
-        values computed from the quadratic function fit.}
+  \item{fit_new}{When parameter \code{fit} is set to a fit curve such as
+       \code{"lm"} or \code{"quad"}, then predicted values from the model
+       are predicted for these specified values.}
   \item{plot_errors}{Plot the line segment that joins each point to the
         regression line, "loess" or "lm", illustrating the size of the
         residuals.}
@@ -539,11 +537,12 @@ vp(\dots)
         factor, the size of the bubbles represents
         frequency, with a default of 0.22.}
   \item{power}{Relative size of the scaling of the bubbles to each other.
-        Default value of 0.5 scales the bubbles so that the area of each
-        bubble is the value of the corresponding sizing variable. Value of 1
-        scales so the radius of the bubble
-        is the value of the sizing variable, increasing the discrepancy of size
-        between the variables.}
+        Value of 0.5 scales the bubbles so that the area of each
+        bubble is the value of the corresponding sizing variable. Default
+        value is 0.55, a  slight emphasis toward emphasizing differences
+        in bubble area beyond area. Value of 1 scales so the radius of 
+        the bubble is the value of the sizing variable, increasing
+        the discrepancy of size between the variables.}
   \item{low_fill}{For a categorical variable and the resulting bubble plot,
         or a matrix of these plots, sets a color gradient of the fill color
         beginning with this color.}
@@ -587,7 +586,7 @@ vp(\dots)
   \item{cumulate}{Specify a cumulative frequency polygon.}\cr
 
 
-  \item{xlab, ylab}{\bold{Axis label} for \code{x}-axis or \code{y}-axis_
+  \item{xlab, ylab}{\bold{Axis label} for \code{x}-axis or \code{y}-axis.
        If not specified, then the label becomes
        the name of the corresponding variable label if it exists, or, if not, the
        variable name. If \code{xy_ticks} is \code{FALSE}, no \code{ylab}
@@ -597,13 +596,14 @@ vp(\dots)
        labels exist,
        then the title is set by default from the corresponding variable labels.}
   \item{sub}{Sub-title of graph, below \code{xlab}. Not yet implemented.}
-  \item{lab_adjust}{Two-element vector -- x-axis label, y-axis label -- adjusts
+  \item{label_adjust}{Two-element vector -- x-axis label, y-axis label -- adjusts
        the position of the axis labels in approximate inches. + values move
        the labels away from plot edge. Not applicable to Trellis graphics.}
   \item{margin_adjust}{Four-element vector -- top, right, bottom and left --
        adjusts the margins of the plotted figure in approximate inches.
        + values move the corresponding margin away from plot edge.
-       Not applicable to Trellis graphics.}\cr
+       Can use in conjunction with \code{offset} that can move axis values
+       into a larger margin space. Not applicable to Trellis graphics.}\cr
 
 
   \item{rotate_x}{\bold{Rotation in degrees of the value labels} on
@@ -615,8 +615,10 @@ vp(\dots)
         the \code{y}-axis are rotated, usually to accommodate longer values,
         typically used in conjunction with \code{offset}.}
   \item{offset}{The amount of spacing between the axis values and the axis. Default
-        is 0.5. Larger values such as 1.0 are used to create space for the label when
-        longer axis value names are rotated.}\cr
+        is 0.5. Larger values such as 1.0 create additional space for the label when
+        longer axis value names are rotated. Can use in conjunction with
+        \code{margin_adjust} to create space in the margin to accommodate 
+        the axis values.}\cr
 
 
   \item{xy_ticks}{Flag that indicates if tick marks and associated \bold{value

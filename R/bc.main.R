@@ -5,7 +5,7 @@ function(x, y, by, stack100,
          xlab, ylab, main,
          value_labels, label_max, beside,
          rotate_x, offset, break_x, sort_x,
-         labels, labels_color, labels_size, labels_digits,
+         labels, labels_color, labels_size, labels_decimals,
          labels_pos, labels_cut,
          xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
          pad_y_min, pad_y_max,
@@ -565,6 +565,7 @@ function(x, y, by, stack100,
 
   ## ----
   ## PLOT
+  ## does stacked bar charts automatically if x is a 2-D matrix
 
    usr <- par("usr")  # used elsewhere as well
   .plt.bck(usr, y.coords, y.coords, do.v=horiz, do.h=!horiz)
@@ -579,16 +580,17 @@ function(x, y, by, stack100,
           axes=FALSE, ann=FALSE, border=color, las=las.value,
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
 
-  # display text labels of values on or above the bars
-  # --------------------------------------------------
 
-  if (is.null(labels_digits)) {  # if too large for "input", get in bc.main
-    if (labels == "%") labels_digits <- 0
-    else
-      if (labels == "proportion") labels_digits <- 2
-    else
-      if (labels == "input")
-        labels_digits <- ifelse(is.null(y), 0, 2)
+  # display text labels of y-values on or above the bars
+  # ----------------------------------------------------
+
+  if (labels != "off") {
+    if (is.null(labels_decimals)) {  # set labels_decimals
+      if (labels == "input") labels_decimals <- 0
+      if (labels == "%") labels_decimals <- 0
+      if (labels == "prop") labels_decimals <- 2
+      if (.is.integer(y)) labels_decimals <- 0
+    }
   }
 
   # need n.levels for this evaluation
@@ -622,11 +624,11 @@ function(x, y, by, stack100,
         else
           x.prop <- x/colSums(x)
         if (labels == "input")
-          x.txt <- .fmt(x, labels_digits)   # as.char not accurate for dec dig
+          x.txt <- .fmt(x, labels_decimals)   # as.char not accurate for dec dig
         else if (labels == "%")
-          x.txt <- paste(.fmt(x.prop * 100, labels_digits), "%", sep="")
+          x.txt <- paste(.fmt(x.prop * 100, labels_decimals), "%", sep="")
         else if (labels == "proportion")
-          x.txt <- .fmt(x.prop, labels_digits)
+          x.txt <- .fmt(x.prop, labels_decimals)
 
         if (is.matrix(x))
             x.txt <- matrix(x.txt, nrow=nrow(x))
@@ -649,9 +651,9 @@ function(x, y, by, stack100,
         if (labels == "input")
           x.txt <- as.character(x.count)
         else if (labels == "%")
-          x.txt <- paste(.fmt(x * 100, labels_digits), "%", sep="")
+          x.txt <- paste(.fmt(x * 100, labels_decimals), "%", sep="")
         else if (labels == "prop")
-          x.txt <- .fmt(x, labels_digits)
+          x.txt <- .fmt(x, labels_decimals)
 
         if (is.matrix(x))
             x.txt <- matrix(x.txt, nrow=nrow(x))

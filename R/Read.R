@@ -1,14 +1,18 @@
 Read <-
 function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
 
-         missing="", n_mcut=1,
+         missing=NULL, n_mcut=1,
          miss_show=30, miss_zero=FALSE, miss_matrix=FALSE,
 
-         max_lines=30, sheet=1, row_names=NULL,
+         max_lines=30, sheet=1, row_names=NULL, header=TRUE,
 
          brief=TRUE, quiet=getOption("quiet"),
 
          fun_call=NULL, ...) {
+
+
+  miss.format <- ifelse (missing(format), TRUE, FALSE)
+  miss.header <- ifelse (missing(header), TRUE, FALSE)
 
 
   # a dot in a parameter name to an underscore
@@ -40,15 +44,14 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
 
   .param.old(...)
 
-  miss.format <- ifelse (missing(format), TRUE, FALSE)
   fmts <- c("text", "csv", "tsv", "Excel", "ODS", "R", "SPSS", "SAS", "Stata",
             "feather", "parquet")
   if (!is.null(format)) {
     if (!(format %in% c(fmts, "lessR"))) {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
           ">>> Specified format must be one of:\n",
-               "\"text\", \"Excel\", \"R\", \"feather\", \"parquet\",
-                \"SPSS\", \"SAS\",\n\n")
+               "\"text\", \"Excel\", \"ODS\", \"R\", \"feather\", \"parquet\",
+                \"SPSS\", \"SAS\"\n\n")
     }
     if (format %in% c("text", "tsv")) format <- "csv"
 
@@ -62,8 +65,6 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
   # option to browse for data file, and then display file name
   browse <- FALSE
   if (is.null(from)) {
-#   if (options("device") == "RStudioGD")
-#     cat(">>> Browse window may be hidden behind RStudio window\n")
     browse <- TRUE
     from <- file.choose()
     fncl <- paste("Read(", "from = \"", from,  "\", quiet = TRUE)", sep="")
@@ -80,8 +81,9 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
   if (miss.format) {
          if (!is.null(widths)) format <- "fwd"
     else if (grepl(".csv$", from)) format <- "csv"
-    else if (grepl(".tsv$", from)) format <- "csv"
-    else if (grepl(".txt$", from)) format <- "csv"
+    else if (grepl(".tsv$", from)) format <- "tsv"
+    else if (grepl(".prn$", from)) format <- "prn"
+    else if (grepl(".txt$", from)) format <- "txt"  # comma or tab separated
     else if (grepl(".sav$", from)) format <- "SPSS"
     else if (grepl(".zsav$", from)) format <- "SPSS"
     else if (grepl(".dta$", from)) format <- "Stata"
@@ -118,6 +120,9 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
         "Or add them manually with the lessR function: label\n\n")
   }
 
+  # give credit
+  # -----------
+
   if (!quiet) {
     if (format == "Excel") {
       txt <- "Schauberger and Walker's openxlsx package]"
@@ -143,8 +148,8 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
   }
 
 
-  # read the data (into object d)
-  # -----------------------------
+  # see if needed package is installed
+  # ----------------------------------
 
   if (format %in% c("SPSS", "SAS", "Stata")) {
     if (!requireNamespace("haven", quietly=TRUE)) {
@@ -171,59 +176,77 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
   }
 
 
-  if (format %in% c("fwd", "csv")) {  # text file
+  # get type of txt file
+  # --------------------
+  if (format == "txt") {  # see if tab delimiter
+    line1 <- scan(from, what="character", nlines=1, sep="\t", quiet=TRUE)
+    format <- "csv"
+    if (length(line1) > 1) {
+      message(">>> A tab character detected in the first row of the\n",
+          "     data file. Presume tab delimited data.\n", sep="")
+      format <- "tsv"
+    }
+  }
 
-    if (format=="fwd")
-      d <- read.fwf(file=from, widths=widths, ...)
 
-    else if (format=="csv") {
+  # read the data (into object d)
+  # -----------------------------
 
-      # get delimiter
-      line1 <- scan(from, what="character", nlines=1, sep="\t", quiet=TRUE)
-      tab <- FALSE
-      if (length(line1) > 1) {
-        message(">>> A tab character detected in the first row of the\n",
-            "     data file. Presume tab delimited data.\n", sep="")
-        tab <- TRUE
+  if (format=="fwd")
+    d <- read.fwf(file=from, widths=widths, ...)
+
+
+  else if (format %in% c("csv", "tsv", "prn")) {
+
+    if (is.null(missing)) {
+      if (format %in% c("csv", "tsv")) missing <- " "
+    }
+    else if (missing == "prn") missing <- "NA"
+
+    # read data or labels/units
+    if (!var_labels) {
+      if (missing(row_names)) {
+        row.names <- NULL
+        if (format == "csv")
+          d <- read.csv(file=from, na.strings=missing, header=header,...)
+        else if (format == "tsv")
+          d <- read.delim(file=from, na.strings=missing, header=header, ...)
+        else if (format == "prn")
+          d <- read.table(file=from, na.strings=missing, header=header, ...)
       }
-
-      # read data or labels/units
-      if (!var_labels) {
-        if (missing(row_names)) {
-          row.names <- NULL
-          if (!tab)
-            d <- read.csv(file=from, na.strings=missing, ...)
-          else
-            d <- read.csv(file=from, na.strings=missing, sep="\t", ...)
+      else {  # row names
+        if (is.logical(row_names)) {  # can specify as TRUE
+          if (row_names) row.names <- 1
         }
-        else {
-          if (is.logical(row_names)) {  # can specify as TRUE
-            if (row_names) row.names <- 1
-          }
-          else
-            row.names <- row_names
-          d <- read.csv(file=from, na.strings=missing,
-                        row.names=row.names, ...)
-        }
-      }
+        else
+          row.names <- row_names
+        if (format == "csv")
+          d <- read.csv(file=from, na.strings=missing, row.names=row.names, ...)
+        else if (format == "tsv")
+          d <- read.delim(file=from, na.strings=missing,
+                          row.names=row.names, ...)
+      }  # end row names
+    }  # not reading var labels
 
-      else {  # var_labels
-        d <- read.csv(file=from, header=FALSE, row.names=1, ...)
-        names(d)[1] <- "label"
-        if (ncol(d) == 2) names(d)[2] <- "unit"
-      }
-   }  # end csv
-
- }  # end text file
+    else {  # read var_labels
+      d <- read.csv(file=from, header=FALSE, row.names=1, ...)
+      names(d)[1] <- "label"
+      if (ncol(d) == 2) names(d)[2] <- "unit"
+    }
+  }  # end csv etc.
 
 
-  if (format %in% c("feather", "parquet")) {  # arrow file
+  else if (format %in% c("feather", "parquet")) {  # arrow file
 
     if (format=="feather")
       d <- arrow::read_feather(file=from, ...)
-
     else if (format=="parquet")
       d <- arrow::read_parquet(file=from, ...)
+    d <- data.frame(d)  # default is a tibble
+    if (names(d)[1] == "RowName") {  # when created with Write()
+      rownames(d) <- d$RowName
+      d$RowName <- NULL
+    }
   }
 
 
@@ -236,9 +259,11 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
         if (row_names == 1) row_names <- TRUE
       }
       if (row_names)
-        d <- readODS::read_ods(from, sheet=sheet, row_names=TRUE, ...)
+        d <- readODS::read_ods(from, sheet=sheet, row_names=TRUE,
+                               as_tibble=FALSE, ...)
       else
         d <- readODS::read_ods(from, sheet=sheet, row_names=FALSE, ...)
+      d <- data.frame(d)  # default is a tibble
     }
 
 
@@ -293,25 +318,33 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
   else if (format == "SPSS") {  # data and any labels
     cat("[with read_spss() from the haven package]\n")
     dt <- haven::read_spss(file=from, ...)  # a tibble with label attribute
-    d <- data.frame(row.names=1:nrow(dt))
-    d <- d[1:nrow(dt), ]
+    d <- data.frame(dt)
     i.new <- 0
     for (i in 1:ncol(dt)) {
       i.new <- i.new + 1
       d[[i.new]] <- dt[[i]]
       names(d)[i.new] <- names(dt)[i]
       if ("haven_labelled" %in% class(dt[[i]])) {
-        if (.is.integer(d[[i.new]]))
-          d[[i.new]] <- as.integer(d[[i.new]])  # to standard R integer var
-        else
-          d[[i.new]] <- as.numeric(d[[i.new]])
         i.new <- i.new + 1
         d[[i.new]] <- haven::as_factor(dt[[i]])   # labels to a factor var
         names(d)[i.new] <- paste(names(dt)[i], "_f", sep="")
       }
+    }  # end col by col 
+    if (names(d)[1] == "RowName") {  # when created with Write()
+      rownames(d) <- d$RowName
+      d$RowName <- NULL
     }
+    d[] <- lapply(d, function(col) {
+      if (is.character(col)) col[col == ""] <- NA
+      col
+    })
+    d[] <- lapply(d, function(col) {
+      if (.is.integer(col)) col <- as.integer(col)
+      col
+    })
+
     haven <- FALSE
-    for (i in 1:ncol(dt)) if  ("haven_labelled" %in% class(dt[[i]]))
+    for (i in 1:ncol(dt)) if ("haven_labelled" %in% class(dt[[i]]))
       haven <- TRUE
     if (haven) {
       cat("\nVariable and Variable Label  --> See vignette(\"Read\"),",
@@ -345,7 +378,6 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
     d <- get(dname, pos=x.env)
   }
 
-
   else if (format == "lessR") {  # data and any labels
     txt <- ifelse (substr(from,1,4) == "data", "", "data")
     file.name <- paste(txt, from, ".rda", sep="")
@@ -374,7 +406,11 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
     d <- get(dname, pos=x.env)
   }  # end (format == "lessR")
 
+
+
   # check for valid characters in the variable names for text files
+  # ---------------------------------------------------------------
+
   if (format %in% c("csv", "Excel")) {
     dg <- character(length=10)
     for (i in 0:9) dg[i+1] <- as.character(i)
@@ -412,6 +448,7 @@ function(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
 
 
   # function call for suggestions
+  # -----------------------------
   fncl <- .fun_call.deparse(fun_call)
 
   if (!quiet) {

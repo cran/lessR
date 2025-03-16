@@ -24,7 +24,7 @@ Read(from=NULL, format=NULL, var_labels=FALSE, widths=NULL,
          missing="", n_mcut=1,
          miss_show=30, miss_zero=FALSE, miss_matrix=FALSE, 
       
-         max_lines=30, sheet=1, row_names=NULL,
+         max_lines=30, sheet=1, row_names=NULL, header=TRUE,
 
          brief=TRUE, quiet=getOption("quiet"),
 
@@ -64,8 +64,9 @@ Read2(\dots, sep=";", dec=",")
   \item{widths}{Specifies the width of the successive columns for fixed width
        formatted data.}\cr
 
-  \item{missing}{Missing value code, which by default is literally a missing data
-        value in the data table.}
+  \item{missing}{Missing value code, which by default specifies one or
+        missing data values in the data table. Can combine numerical
+        and character codes, such as \code{missing=c(-99, "xxxx")}.}
   \item{n_mcut}{For the missing value analysis, list the row name and number of
         missing values if the number of missing exceeds or equals this cutoff.
         Requires \code{brief=FALSE}.}
@@ -91,6 +92,8 @@ Read2(\dots, sep=";", dec=",")
        For reading \code{.csv} files, can also set to the integer number of the
        column to convert to row names. For Excel and ODS files, only acceptable
        value is 1 for the first column.}
+  \item{header}{If \code{TRUE}, the default, then the first row of the data table
+        contains the variable names.}
   \item{brief}{If \code{TRUE}, display only variable names table plus any variable
        labels.}
   \item{quiet}{If set to \code{TRUE}, no text output. Can change the corresponding
@@ -103,7 +106,25 @@ Read2(\dots, sep=";", dec=",")
 
 
 \details{
-By default \code{Read} reads text data files which are either comma delimited, \code{csv}, or tab-delimited data files, native Excel files of type \code{.xls} or \code{.xlsx}, native ODS files of type \code{.ods}, native R files with file type of \code{.rda}, native SAS files with file type \code{.sas7bdat}, and native SPSS files with file type \code{.sav}. Invoke the \code{widths} option to allow for the reading of fixed width formatted data. Calls the \code{lessR} function \code{\link{details}} to provide feedback regarding details of the data frame that was read. By default, variables defined by non-numeric variables are read as character strings. To read as \code{factors} specify \code{stringsAsFactors} as \code{FALSE}, unless all the values of a variable a non-numeric and unique, in which case the variable is classified as a character string.
+The following table lists various file formats along with the associated R packages and functions for reading them.
+
+\tabular{llll}{
+  \strong{Extension}  \tab \strong{Format} \tab \strong{Package} \tab \strong{Function} \cr
+  .csv     \tab Text, comma-separated values  \tab R utils  \tab \code{read.csv()} \cr
+  .tsv     \tab Text, tab-separated values  \tab R utils  \tab \code{read.delim()} \cr
+  .prn     \tab Text, space-separated values  \tab R utils  \tab \code{read.table()} \cr
+  .txt     \tab Text, comma or tab-separated  \tab R utils  \tab \code{read.table()} \cr
+  .xls     \tab Excel  \tab openxlsx  \tab \code{read.xlsx()} \cr
+  .xlsx    \tab Excel  \tab openxlsx  \tab \code{read.xlsx()} \cr
+  .ods     \tab ODS  \tab readODS  \tab \code{read_ODS()} \cr
+  .feather \tab Feather  \tab arrow  \tab \code{read_feather()} \cr
+  .parquet \tab Parquet  \tab arrow  \tab \code{read_parquet()} \cr
+  .rda     \tab R data  \tab R base  \tab \code{load()} \cr
+  .sav     \tab SPSS  \tab haven  \tab \code{read_spss()} \cr
+  .zsav    \tab SPSS  \tab haven  \tab \code{read_spss()} \cr
+  .dta     \tab Stata  \tab haven  \tab \code{read_dta()} \cr
+  .sas7bdat \tab SAS  \tab haven  \tab \code{read_sas()} \cr
+}
 
 CREATE csv FILE\cr
 One way to create a csv data file is to enter the data into a text editor. A more structured method is to use a worksheet application such as MS Excel, LibreOffice Calc, or Apple Numbers.  Place the variable names in the first row of the worksheet. Each column of the worksheet contains the data for the corresponding variable. Each subsequent row contains the data for a specific observation, such as for a person or a company.  
