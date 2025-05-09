@@ -36,7 +36,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits_d, brief,
   }
 
   # values needed for graph
-  min_x <- min(min(dYA$x),min(dYB$x))  # min x coordinate for graph
+  min.x <- min(min(dYA$x),min(dYB$x))  # min x coordinate for graph
   max.x <- max(max(dYA$x),max(dYB$x))  # max x coordinate for graph
   max.y <- max(max(dYA$y),max(dYB$y))  # max y coordinate
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
@@ -53,12 +53,16 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits_d, brief,
   par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1.1, cex.lab=1.35)
 
   plot.new()
-  plot.window(xlim=c(min_x,max.x), ylim=c(0,max.y))
-
-  axis(1, col=getOption("axis_x_color"), col.axis=getOption("lab_color"))
+  plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
+  ax <- .axes_dim()  # get axis value parameters
+  adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex * 1.2
+  axT1 <- pretty(c(min.x, max.x))
+  .axes(NULL, NULL, axT1, NULL)
+#       axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre,
+#       ...)
   box(col=getOption("panel_color"))
   if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
-  title(xlab=x.lab, col.lab=col.tx)
+  title(xlab=x.lab, col.lab=col.tx, cex.lab=axis_x_cex*1.1)
 
   xleft <- par("usr")[1]  # left side of graph
   xright <- par("usr")[2]  # right side of graph
@@ -116,7 +120,7 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits_d, brief,
   col.lgnd <- getOption("lab_color")
   cex.lgnd <- 1.1
 
-  radj <- xleft + .02*(max.x-min_x)
+  radj <- xleft + .02*(max.x-min.x)
   # legend("topleft", legend = textL, fill=col.L, density=20, angle=aL, bty="n",
       # text.col=col.lgnd, cex=cex.lgnd)
   text(radj, ytop-.05*max.y, label=c(paste(Xnm,X2nm)),

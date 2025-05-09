@@ -17,8 +17,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          size=NULL, ln.width=1, shape=21, means=TRUE,
          segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
-         smooth=FALSE, smooth_points=100, smooth_size=1,
+         type="regular", smooth_points=100, smooth_size=1,
          smooth_exp=0.25, smooth_bins=128,
+         contour_n=8, contour_nbins=50,
 
          radius=0.15, power=0.6, size_cut=TRUE,
          bbl.txt.col=getOption("bubble_text_color"),
@@ -42,9 +43,10 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
          freq.poly=FALSE, jitter_x=NULL, jitter_y=NULL,
 
-         xlab_adj=0, ylab_adj=0, bm.adj=0, lm.adj=0,
+         xlab.adj=0, ylab.adj=0, bm.adj=0, lm.adj=0,
          tm.adj=0, rm.adj=0,
          scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
+         axis_fmt="K", axis_x_pre="", axis_y_pre="",
          legend_title=NULL,
 
          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
@@ -54,9 +56,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          quiet=FALSE, want.labels=TRUE, bubble.title=TRUE, ...)  {
 
 
-  # -------------------------
-  # preliminaries
-  # -------------------------
+# preliminaries -----------------------------------------------------------
 
   fill_bg <- getOption("panel_fill")
   date.var <- ifelse (.is.date(x[,1]), TRUE, FALSE)
@@ -73,9 +73,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     by.bub <- FALSE
 
 
-  # --------------------------
-  # data structures dimensions
-  # --------------------------
+# data structures dimensions ----------------------------------------------
 
   # x and y come across here in their natural state, within each data frame
   # a time series has dates for x and numeric for y, factors are factors, etc
@@ -97,9 +95,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   n.col <- max(n.xcol, n.ycol)
   nrows <- nrow(x)
 
-  # ---------------------
-  # axis labels and title
-  # ---------------------
+
+# axis labels and title ---------------------------------------------------
 
   # size is a variable, these values passed to .plt.main
   # bubble.title=FALSE passed from .plt.bins to suppress title
@@ -152,9 +149,10 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     if (n.ycol > 1) y.lab <- ""  # labels are on the legend
     if (!is.null(x.lbl)) y.lab <- paste(x.name, ": ", x.lbl, sep="")
   }
-  # ---------------------
 
-  # all processing in terms of numeric variables
+  
+# all processing in terms of numeric variables ----------------------------
+
   # categorical variables x and/or y are converted to factors in Plot()
   # convert factors to numeric, save levels, so x and y are always numeric
   # x will always be a matrix
@@ -208,12 +206,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     cleveland <- TRUE
 
 
-  # ----------------------
-  # set up the plot region
-  # ----------------------
+# get minimum and maximum values of x and y -------------------------------
 
-  # graphic system parameters
-  # x.val is either x.lvl, or NULL if x is numeric
   mx.x.val.ln <- 1
   mx.y.val.ln <- 1
   if (!date.var) {
@@ -238,8 +232,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   }
 
 
-  # -----------
-  # set margins
+# set margins -------------------------------------------------------------
 
   # get max number of lines in x value labels
   if (cat.x) {
@@ -269,11 +262,12 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     mx.num <-  ifelse (!prop, as.character(prety[ind]), .fmt(prety, 2))
     max.y.width <- max(strwidth(mx.num, cex=axis_y_cex, units="inches"))
   }
-  # ---------
+  # --------
 
   margs <- .plt.marg(max.y.width, y.lab, x.lab, main.lab, sub.lab,
                 rotate_x, mx.x.val.ln, mx.y.val.ln,
-                lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex)
+                lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, 
+                axis_y_pre=axis_y_pre)
   mm <- margs$lm  # left margin, lm is linear model
   tm <- margs$tm
   rm <- margs$rm
@@ -281,7 +275,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   n.lab_x.ln <- margs$n.lab_x.ln
   n.lab_y.ln <- margs$n.lab_y.ln
 
-  # room in rm for the vertical legend
+  # room in right margin for the vertical legend
   if (n.xcol > 1  ||  n.ycol > 1  ||  !is.null(by)) {
     if (n.xcol > 1) nm.v <- nm.x
     if (n.ycol > 1) nm.v <- nm.y
@@ -292,26 +286,31 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     if (axis_y_cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
   }
 
+  if (ts_ahead > 0) rm <- rm + 0.75  # make room for vertical legend
+
   if (center_line != "off") rm <- rm + .4  # room for center_line label
   rm <- rm + 0.10  # make room when the last axis date > last data value
   if ((options("device") != "RStudioGD")  &&  !is.null(by)) rm <- rm + .3
-
-  if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
-
-  if (ts_ahead > 0) rm <- rm + 0.75  # make room for vertical legend
 
   if (date.var && n.by>1) rm <- rm - 0.05
 
   if (n.ycol>1 && date.var) {  # if not a time series, then no y label
     mm <- mm + 0.25  # reduce size of plot in the left to make room for label
-    ylab_adj <- ylab_adj + 0.2  # move label right when calling .axlabs()
+    ylab.adj <- ylab.adj + 0.2  # move label right when calling .axlabs()
   }
   if (n.ycol > 1)
     rm <- rm + 0.80  # add right margin for legend
 
+  if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
+
   if (n.xcol>1  && !date.var) {
     bm <- bm + 0.20  # allow for the bottom legend
     rm <- rm - 0.60  # remove superfluous right margin
+  }
+
+  if (type == "contour") {
+    bm <- bm + .2
+    mm <- mm + .2
   }
 
   # user manual adjustment
@@ -322,14 +321,15 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
-
   par(bg=getOption("window_fill"))
   par(mai=c(bm, mm, tm, rm))
   par(tcl=-0.28)  # axis tic length
 
 
+# set-up region for coordinate system -------------------------------------
+
   # -----------------------
-  # setup region for coordinate system only with plot and type="n"
+  # only with plot and type="n"
   # non-graphical parameters in ... Generate warnings when no plot
 
   # re-calibrate maximum of y-axis if stacking
@@ -346,11 +346,14 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     mx.y <- max(yl)
   }
 
+  # get min and max of x and y
   if (!is.null(scale_x)) {
+     if (length(scale_x) == 2) scale_x[3] <- par("xaxp")[3]
      mn.x <- min(mn.x, scale_x[1])
      mx.x <- max(mx.x, scale_x[2])
   }
   if (!is.null(scale_y)) {
+     if (length(scale_y) == 2) scale_y[3] <- par("yaxp")[3]
      mn.y <- min(mn.y, scale_y[1])
      mx.y <- max(mx.y, scale_y[2])
   }
@@ -377,9 +380,6 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     }
 
     if (is.null(origin_x)) {  # set default for minimum x-value displayed
-      if (stat %in% c("count", "proportion", "%"))
-        origin_x <- 0
-      else
         origin_x <- mn.x
     }
     if (stat != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
@@ -400,7 +400,6 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   mn.x <- min(region[,1])
   mx.y <- max(region[,2])
   mn.y <- min(region[,2])
-
   # set y-axis origin for numeric variables
   if (!cat.y) {
     if (!is.null(origin_y)) {
@@ -430,15 +429,15 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   region <- rbind(region, c(mn.x-xN, mn.y-yN), c(mx.x+xP, mx.y+yP))
 
 
-  # plot: setup the coordinate system
-  # ---------------------------------
-  plot(region, type="n", axes=FALSE, ann=FALSE, ...)
+# set-up the coordinate system --------------------------------------------
+
+  if (type != "contour")  # filled.contour does its own plot window
+    plot(region, type="n", axes=FALSE, ann=FALSE, ...)
   rm(region)
   usr <- par("usr")
-  # ----------------------
 
-  # ----------------------
-  # set up plot background
+  
+# axes ticks and labels axT1 and axT2--------------------------------------
 
   # set axT1: x-axis tics and values, Date var uses x.zoo.dates, defined later
   if (cat.x)
@@ -463,7 +462,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
           else
             axT1 <- seq(scale_x[1], scale_x[2], by=scale_x[3])
         }
-      }
+      }  # stat not "count"
     }  # end !date.var
   }  # end numerical
 
@@ -488,19 +487,26 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
     # adjust axis label from tick with mgp[2]
     # mgp does not work with rotate_x, see .axes()
-    my.mgp <- par("mgp")  # save to restore
     ax <- .axes_dim()  # get axis value parameters
     mgp2 <- -0.350 + (0.9 * ax$axis_x_cex)
-    par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
-    adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
 
-    if (!date.var) {  # call axis() for both axes
-      .axes(x.lvl, y.lvl, axT1, axT2,
-            rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
-    }
-    else {  # date.var, y-axis
+    if (type != "contour") {
+      my.mgp <- par("mgp")  # save to restore
+      par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
+      adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
+
+      if (!date.var) {  # call axis() for both axes
+        .axes(x.lvl, y.lvl, axT1, axT2,
+              rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, 
+              axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre,
+              ...)
+      }
+    }  # end not contour
+
+    if (date.var) {  # date.var, y-axis
       .axes(NULL, y.val, NULL, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
-            offset=offset, y.only=TRUE, ...)  # y-axis
+            offset=offset, y.only=TRUE,  # y-axis
+            axis_fmt=axis_fmt, axis_x_pre="no", axis_y_pre=axis_y_pre, ...)
 
       # date.var, x-axis
       len.xtics <- length(x.dates)
@@ -549,7 +555,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
                 col.axis=ax$axis_x_text_color, ...)  # x-axis
     }  # end date.var
 
-    par(mgp = my.mgp)  # restore back to previous value
+    if (type != "contour") par(mgp = my.mgp)  # restore back to previous value
   }  # end xy_tics
 
   if (date.var) {  # create y.lab
@@ -566,21 +572,28 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       ynm <- ifelse (n.ycol==1, y.name, "")  # get rid of c("Sales", "Profit")
       y.lab <- paste(show.agg, ynm, "by", tu)
     }
-
-    .plt.bck(usr, x.dates[indices], axT2, do.h=!bubble1)
-  }
-  else
-    .plt.bck(usr, axT1, axT2, do.h=!bubble1)
+  }  # end date.var
 
   # axes labels
-  .axlabs(x.lab, y.lab, main.lab, sub.lab,
-          x.val, xy_tics, offset=offset,
-          lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex,
-          n.lab_x.ln, n.lab_y.ln, xlab_adj, ylab_adj, ...)
+  if (type != "contour")
+    .axlabs(x.lab, y.lab, main.lab, sub.lab,
+           x.val, xy_tics, offset=offset,
+           lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex,
+           n.lab_x.ln, n.lab_y.ln, xlab.adj, ylab.adj, ...)
 
 
-    # -----------------------------------
-    # set jitter for scatterplot with discrete levels
+# set-up plot background --------------------------------------------------
+
+  if (date.var)
+    .plt.bck(usr, x.dates[indices], axT2, do.h=!bubble1)
+  else {
+    if (type != "contour")
+      .plt.bck(usr, axT1, axT2, do.h=!bubble1)
+  }
+
+
+# set jitter for scatterplot with discrete levels -------------------------
+
 #     do.jit <- FALSE
 #     if (nrows < 100) {
 #       if (max(table(x,y) > 1)) do.jit <- TRUE  # duplication
@@ -615,21 +628,14 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   }
 
 
-  # ---------------
-  # plot the values
-  # ---------------
+# plot points, lines (and area_fill) --------------------------------------
 
   # colors
-  # ------
-
   n.clrs <- max(n.col, n.by)
 
   ltype <- character(length=n.clrs)
   for (i in seq_along(ltype)) ltype[i] <- "solid"
 
-
-  # plot points, lines (and area_fill)
-  # ----------------------------------
 
   if (object == "point") {  # is point even if size=0, plotting just lines
 
@@ -638,7 +644,6 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
         if (segments && ln.width>0)  # plot data line segments
             lines(x[,1], y[,1], col=color[1], lwd=ln.width, ...)
-
         if (area_fill[1] != "transparent") # fill area
           polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
               col=area_fill, border="transparent")
@@ -730,23 +735,36 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     }
 
 
-    # no grouping variable
-    # --------------------
     if (is.null(by)) {
 
-      if (smooth) {  # 2-D kernel density plot
+
+# smooth or contour plot --------------------------------------------------
+
+      if (type == "smooth") {  # 2-D kernel density plot
         # grid lines only plot after the sp
         clr.den <- colorRampPalette(c(getOption("window_fill"),
                                        getOption("bar_fill_cont")))
+        if (!requireNamespace("KernSmooth", quietly=TRUE)) {
+          stop("Package \"KernSmooth\" needed for this visualization\n",
+               "Please install it:  install.packages(\"KernSmooth\")\n\n",
+               call. = FALSE)
+        }
         smoothScatter(x, y, nrpoints=smooth_points, nbin=smooth_bins,
                       transformation=function(x) x^(smooth_exp),
                       colramp=clr.den, cex=smooth_size, add=TRUE)
       }
+ 
+      else if (type == "contour")
+        .plt.contour(x, y, contour_n, contour_nbins,
+           theme, scale_x, scale_y, pad_x, pad_y, x.lab, y.lab, 
+           ellipse, ellipse_color, ellipse_lwd, fit.line, fit_color, fit_lwd,
+           axis_x_pre, axis_y_pre, axis_fmt, xlab.adj, ylab.adj) 
 
-      else if (size.pt[1] > 0) {  # plot points, and means, segments, etc.
 
-        # --- plot points, segments, means with no by ---
-        # -----------------------------------------------
+
+# plot points, segments, means with no by --------------------------------- 
+
+      else if (size.pt[1] > 0) {
 
         # plot points
         if (n.xcol == 1  &&  n.ycol == 1) {  # one x and one y variable
@@ -806,11 +824,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
             if (n.xcol == 1)
               segments(y0=0, x0=x, y1=y, x1=x, lty=1, lwd=1, col=col.segment)
         }
+        
 
-
-        # plot means
-        # ---------
-
+# plot means --------------------------------------------------------------
         if (means  &&  stat == "data") {
 
         # get colors
@@ -853,9 +869,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       }  # end not smooth, plot points with no by
       # -----------------------------------------
 
-      # plot center line
-      # ----------------
 
+# plot center line --------------------------------------------------------
       if (center_line != "off") {
         if (center_line == "mean") {
           m.y <- mean(y[,1], na.rm=TRUE)
@@ -880,22 +895,18 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       else
         m.y <- median(y[,1], na.rm=TRUE)
 
-      # interaction means plot, ts with non-Date x var
-      if (segments && n.xcol==1  && n.ycol==1) {
-        if (!is.null(ylab))  # thin line for ANOVA interaction plot
-          if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75
+      # run chart (and attempted interaction chart)
+      if (segments && n.xcol==1 && n.ycol==1 && !date.var) {
         for (j in 1:(nrow(x)-1)) {
           segments(x0=x[j,1], y0=y[j,1],
                    x1=x[j+1,1], y1=y[j+1,1],
-                   lty="solid", lwd=ln.width, col=fill[i])
+                   lty="solid", lwd=ln.width, col=color[i])
         }
       }  # end segments
-
     }  # end is.null by
 
 
-    # --------------------
-    # by grouping variable
+# by grouping variable ----------------------------------------------------
 
     else {
       clr <- character(length(n.by))
@@ -941,10 +952,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
           for (j in 1:(nrow(x.lv)-1)) {
             segments(x0=x.lv[j,1], y0=y.lv[j,1],
                      x1=x.lv[j+1,1], y1=y.lv[j+1,1],
-                     lty="solid", lwd=ln.width, col=fill[i])
+                     lty="solid", lwd=ln.width, col=fill[i])  # not color[i]
           }
         }  # end segments
-
       }  # end 1:n.by
 
       # by legend
@@ -961,11 +971,10 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
           .plt.by.legend(levels(by), color, fill, shape, pts_trans,
                          fill_bg, usr, legend_title=legend_title)
       }
-
     }  # end by
 
-    # legend (more than 1 x or y
-    # ------
+    
+# legend (more than 1 x or y) ---------------------------------------------
 
     if (fill[1] == "transparent") fill <- color
 
@@ -987,8 +996,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   }  # object is point
 
 
-  # ----------------------------
-  # --- bubble or sunflower plot -  no by var
+# bubble or sunflower plot  -----------------------------------------------
 
   else if ((object %in% c("bubble", "sunflower"))) {
     if (!is.null(by)) {
@@ -1064,12 +1072,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
                   size_cut, prop, bbl.txt.col, object)
     }
   }  # end bubble/sunflower
-  # -----------------------
 
 
-  # --------------
-  # ellipse option
-
+# ellipse option ----------------------------------------------------------
   if (do.ellipse) {
 
     for (i in 1:n.clrs) {
@@ -1121,8 +1126,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   }  # do.ellipse
 
 
-  # ---------------
-  # fit line option
+# fit line option ---------------------------------------------------------
 
   if (fit.line != "off") {
 
@@ -1251,43 +1255,43 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     y.new <- NULL
 
 
-  # -----------
-  # annotations
-
-  if (!is.null(add)) if (add[1] == "means") {
-    add[1] <- "v_line"
-    add[2] <- "h_line"
-    x1 <- "mean_x"
-    y1 <- "mean_y"
-  }
-
-  if (!is.null(x1)) {
-    if (date.var) x1 <- julian(x1)  # dates to date serial numbers
-    if (length(which(x1 == "mean_x")) > 0) {
-      x1[which(x1 == "mean_x")] <- mean(x, na.rm=TRUE)
-      x1 <- as.numeric(x1)
-    }
-  }
-  if (!is.null(y1)) {
-    if (length(which(y1 == "mean_y")) > 0) {
-      y1[which(y1 == "mean_y")] <- mean(y, na.rm=TRUE)
-      y1 <- as.numeric(y1)
-    }
-  }
+# annotations -------------------------------------------------------------
 
   if (!is.null(add)) {
-      if (add[1] == "labels")
-        text(x, y, labels=ID, pos=1, offset=0.4,
-           pch=shape, col=getOption("add_color"), cex=getOption("add_cex"))
-      else
-        .plt.add(add, x1, x2, y1, y2,
-             add_cex, add_lwd, add_lty, add_color, add_fill, add_trans)
-  }
-  # end annotations
 
+    if (add[1] == "means") {
+      add[1] <- "v_line"
+      add[2] <- "h_line"
+      x1 <- "mean_x"
+      y1 <- "mean_y"
+    }
 
-  # -----------
-  # end, return
+    if (!is.null(x1)) {
+      if (date.var) x1 <- julian(x1)  # dates to date serial numbers
+      if (length(which(x1 == "mean_x")) > 0) {  # get mean of x if needed
+        x1[which(x1 == "mean_x")] <- mean(x, na.rm=TRUE)
+        x1 <- as.numeric(x1)
+      }
+    }
+    if (!is.null(y1)) {
+      if (length(which(y1 == "mean_y")) > 0) {  # get mean of y if needed
+        y1[which(y1 == "mean_y")] <- mean(y, na.rm=TRUE)
+        y1 <- as.numeric(y1)
+      }
+    }
+
+    if (!is.null(add)) {
+        if (add[1] == "labels")
+          text(x, y, labels=ID, pos=1, offset=0.4,
+             pch=shape, col=getOption("add_color"), cex=getOption("add_cex"))
+        else
+          .plt.add(add, x1, x2, y1, y2,
+               add_cex, add_lwd, add_lty, add_color, add_fill, add_trans)
+    }
+  }  # end annotations
+  
+
+# end, return -------------------------------------------------------------
 
   if (fit.line == "off") {
     mse.ln <- NULL;  mse.nl <- NULL;  b0 <- NULL;  b1 <- NULL;  Rsq <- NULL

@@ -4,6 +4,7 @@ function(x,
          histo=TRUE, bin_start=NULL, bin_width=NULL,
          fill_hist, col.nrm, col.gen, fill_nrm, fill_gen,
          rotate_x=0, rotate_y=0, offset=0.5, 
+         axis_fmt="K", axis_x_pre="", axis_y_pre="",
          x.pt=NULL, xlab=NULL, main=NULL, sub=NULL,
          y_axis=FALSE, x.min=NULL, x.max=NULL,
          band=FALSE, color_rug="gray40", size_rug=0.5, quiet,
@@ -50,7 +51,6 @@ function(x,
       seq.end <- seq.end + bin_width
       breaks <- seq(bin_start, seq.end, bin_width)
     }
-
   }
   else
     breaks="Sturges"
@@ -95,9 +95,13 @@ function(x,
   d.nrm <- dnorm(xx,mean(x),sd(x))
 
   # max y coordinate for graph
-  max.y <- max(max(d.nrm), max(d.gen$y), max(h$density))
+  y.max <- max(max(d.nrm), max(d.gen$y), max(h$density))
 
   # set margins
+  if (band)  # rug, allow for more rug room
+    y.min <- -0.02 * max(d.gen$y)  # make room for the rug
+  else
+    y.min <- 0
   margs <- .plt.marg(0, y.lab=NULL, x.lab, main, sub, lab_x_cex=lab_x_cex)
   lm <- margs$lm
   tm <- margs$tm
@@ -114,7 +118,7 @@ function(x,
   
   # set up plot area
   plot(h, border="transparent", freq=FALSE,
-     xlim=c(x.min,x.max), ylim=c(0,max.y),
+     xlim=c(x.min,x.max), ylim=c(y.min,y.max),
      axes=FALSE, ann=FALSE, xlab=NULL, ylab=NULL, main=NULL, ...)
 
   # adjust axis label from tick with mgp[2]
@@ -129,10 +133,12 @@ function(x,
   par(tcl=-0.28)  # axis tic length
   if (!y_axis)
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
-          rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
+          rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
+          axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre="no", ...)
   else
     .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
-          rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
+          rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
+          axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre, ...)
 
   # axis value labels
   if (!y_axis) y.lab="" else y.lab="Density"
@@ -161,7 +167,7 @@ function(x,
     polygon(d.gen, col=fill_gen, border=col.gen, lwd=lw)
   }
 
-  if (band) rug(x, col=color_rug, lwd=size_rug)
+  if (band) rug(x, col=color_rug, lwd=size_rug, ticksize=0.05)
  
   # plot the optional bar about a chosen point for general curve only
   if (!is.null(x.pt)  &&  type == "general") {

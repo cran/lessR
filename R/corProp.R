@@ -95,7 +95,7 @@ function (R=mycor,
   if (heat_map) {
     if (is.null(main)) main <- "Item Proportionalities"
     .opendev(pdf_file, width, height)  # set up graphics
-    .corcolors(R, NVOld, main, bottom, right, diag=0,
+    .heatmap(R, NVOld, main, bottom, right, diag=0,
                pdf_file, width, height)
   }
 

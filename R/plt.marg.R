@@ -1,6 +1,7 @@
 .plt.marg <- function(max.y.width, y.lab, x.lab, main, sub,
                   rotate_x=0, mx.x.val.ln=1, mx.y.val.ln=1,
-                  lab_x_cex=0.95, lab_y_cex=0.95, max.x.width=NULL) {
+                  lab_x_cex=0.95, lab_y_cex=0.95, max.x.width=NULL,
+                  axis_y_pre="") {
 # not processing sub at this time
 
   # top margin
@@ -38,7 +39,7 @@
   if (lab_x_cex > 1.1) bm <- bm + .04  # actually should be axis_cex
 
   # left margin
-  n.lab_y.ln <- 0  # in case x.lab is null
+  n.lab_y.ln <- 0  # in case y.lab is null
   if (!is.null(y.lab)) {
     if (y.lab != "") {
       strn <- unlist(gregexpr("\n", y.lab, fixed=TRUE))
@@ -49,6 +50,7 @@
   mm <- max.y.width + 0.27
   if (max.y.width < .10) mm <- mm + .02
   if (lab_y_cex > 1) mm <- mm + .10
+  if (nzchar(axis_y_pre)) mm <- mm + .14*length(axis_y_pre)
   if (!is.null(y.lab)) mm <- mm + (n.lab_y.ln * .20)
 
   return(list(lm=mm, tm=tm, rm=rm, bm=bm,

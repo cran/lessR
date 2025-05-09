@@ -1,10 +1,13 @@
 .bc.main <-
 function(x, y, by, stack100,
-         fill, color, col.trans, fill_split, theme,
+         fill, color, trans,
+         fill_split, fill_scaled, fill_chroma, theme,
          horiz, gap, prop, scale_y,
          xlab, ylab, main,
          value_labels, label_max, beside,
-         rotate_x, offset, break_x, sort_x,
+         rotate_x, offset,
+         axis_fmt, axis_x_pre, axis_y_pre,
+         break_x, sort,
          labels, labels_color, labels_size, labels_decimals,
          labels_pos, labels_cut,
          xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
@@ -13,7 +16,6 @@ function(x, y, by, stack100,
          legend_horiz, legend_size, legend_abbrev, legend_adj,
          add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet,
          shiny, ...) {
-
 
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
   is.ord <- ifelse (is.ordered(x) || is.ordered(by), TRUE, FALSE)
@@ -282,8 +284,8 @@ function(x, y, by, stack100,
       wm <- double(length=ncol(x))
       for (i in 1:ncol(x)) wm[i] <- weighted.mean(wt, x[,i])
 
-      if (sort_x != "0") {
-        srt.dwn <- ifelse (sort_x == "-", TRUE, FALSE)
+      if (sort != "0") {
+        srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
         m.o <- order(wm, decreasing=srt.dwn)
         x <- x[,m.o]
         wm <- wm[m.o]
@@ -301,25 +303,10 @@ function(x, y, by, stack100,
     }
   }
 
-  if (!is.null(fill_split)) {
-    if (sort_x != "0") {
-      srt.dwn <- ifelse (sort_x == "-", TRUE, FALSE)
-      x <- x[order(x, decreasing=srt.dwn)]
-    }
-    fill <- character(length=length(x))  # fill starts over
-    f.c <- character(length=2)
-    chroma <- ifelse (theme %in% c("gray", "white"), 0, 55)
-    hue <- .get.h(theme)
-    f.c[1] <- hcl(hue, chroma, l=30)
-    f.c[2] <- hcl(hue, chroma, l=70)
-    for (i in 1:length(x))
-      fill[i] <- ifelse (x[i] <= fill_split, f.c[1], f.c[2])
-  }
-
   # ------------
-  # sort options
-  if (sort_x != "0") {
-    srt.dwn <- ifelse (sort_x == "-", TRUE, FALSE)
+  # sort options (x is numeric y)
+  if (sort != "0") {
+    srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
     if (!is.matrix(x)) {
       x <- x[order(x, decreasing=srt.dwn)]
     }
@@ -333,8 +320,64 @@ function(x, y, by, stack100,
   n.levels <- ifelse (is.matrix(x), nrow(x), length(x))
 
 
-  # -------------
-  # preliminaries
+# assign fill and color (edge) --------------------------------------------
+  # assign fill
+  if (!fill_scaled) {
+
+    if (!is.null(fill_split)) {
+      fill <- character(length=length(x))  # fill starts over
+      f.c <- character(length=2)
+      chroma <- ifelse (theme %in% c("gray", "white"), 0, 55)
+      hue <- .get.h(theme)
+      f.c[1] <- hcl(hue, chroma, l=30)
+      f.c[2] <- hcl(hue, chroma, l=70)
+      for (i in 1:length(x))
+        fill[i] <- ifelse (x[i] <= fill_split, f.c[1], f.c[2])
+    }
+
+    if (is.null(fill)) {
+      if (!is.null(by))   # need a sequential range if a by variable
+        fill <- .color_range(.get_fill(theme), n.levels)
+      else {
+        if (theme == getOption("theme"))
+          fill <- getOption("bar_fill_discrete")
+        else {  # theme parameter invoked, adjust fill accordingly
+          h <- .get.h(theme)
+          fill <- hcl(h, c=80, l=60) 
+        }
+      }  # end no by
+    }  # end missing fill
+
+    # if specified fill is a sequence name like "reds", not a valid color name
+    # so get convert the name to a sequential color palette
+    fill <- .color_range(fill, n.levels)
+  }  # end no fill_scaled
+
+  else  # scale
+    fill <- .scale.clr(x, fill, fill_split, fill_chroma, theme)
+
+  # transparency, need a valid color name here
+  if (trans > 0)
+    for (i in 1:length(fill)) fill[i] <- .maketrans(fill[i], (1-trans)*256)
+
+  # assign color (edges)
+  # by default, no color borders if a range
+  if (identical(color, getOption("bar_color_discrete")))
+    color <- "transparent"
+  # see if apply a pre-defined color range to **color**
+  col.clr <- .color_range(color, n.levels)  # see if range, NULL if not
+  if (!is.null(col.clr)) color <- col.clr
+
+# is.range.nm <- ifelse (length(.color_range(fill, n.clr=5)) > 1,
+#                        TRUE, FALSE)
+# if (!is.range.nm && !is.null(by) && !is.null(fill)) {
+#   cat("\n"); stop(call.=FALSE, "\n------\n",
+#     "For custom fill for a two-variable bar chart,\n",
+#     " must specify a color range such as \"colors\" or \"grays\", \n\n")
+# }
+
+
+# preliminaries -----------------------------------------------------------
 
   add_top <- 0.05  # old version of pad_y_max, no longer a parameter
   if (length(labels_pos > 0))
@@ -381,8 +424,7 @@ function(x, y, by, stack100,
   if (horiz  &&  max(nchar(the.names), na.rm=TRUE) > 5) las.value <- 0
 
 
-  # ------------
-  # value labels
+# value labels -----------------------------------------------------------
 
   # set val.lab as the working value_labels vector
   if (!is.null(value_labels)) {
@@ -454,6 +496,7 @@ function(x, y, by, stack100,
         max.x.width <- max(nchar(val.split)) / (11 / axis_x_cex)
     }
   }
+
 
   if (do_plot) {
 
@@ -571,6 +614,7 @@ function(x, y, by, stack100,
   .plt.bck(usr, y.coords, y.coords, do.v=horiz, do.h=!horiz)
 
   # the bars
+  # here plot only the bars and the background; x is the y-numbers here
   if (new.scale == 0)
     x.coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=color, las=las.value,
@@ -579,7 +623,6 @@ function(x, y, by, stack100,
     x.coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
           axes=FALSE, ann=FALSE, border=color, las=las.value,
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
-
 
   # display text labels of y-values on or above the bars
   # ----------------------------------------------------
@@ -606,11 +649,12 @@ function(x, y, by, stack100,
   }
 
   if (beside) {
-     labels_size <- .75 * labels_size
+     labels_size <- 0.75 * labels_size
      labels_cut <- 0.01
   }
 
     if (labels != "off") {
+
       if (is.null(labels_cut)) {
         labels_cut <- 0.028
         if ((prop && is.matrix(x)) || multi) labels_cut <- 0.040
@@ -768,10 +812,17 @@ function(x, y, by, stack100,
     adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
 
     par(tcl=-0.28)  # axis tick length
+
+    # numerical axis
     if(!horiz)
-        .axes(NULL, NULL, NULL, axT2=y.coords)
+        .axes(NULL, NULL, NULL, axT2=y.coords,
+              rotate_x=rotate_x, offset=offset,
+              axis_fmt=axis_fmt, axis_x_pre="no", axis_y_pre=axis_y_pre, ...)
+
     else
-        .axes(NULL, NULL, axT1=y.coords, NULL)
+        .axes(NULL, NULL, axT1=y.coords, NULL,
+              rotate_x=rotate_x, offset=offset,
+              axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre="no", ...)
 
     # x-axis is the category value axis
     axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
@@ -829,6 +880,13 @@ function(x, y, by, stack100,
     ylab_adj <- ylab_adj / ln.ht.y
     lm <- par("mar")[2]  # get current left margin in lines
     lbly.lns <- lm - (0.3 + 0.9*n.lab_y.ln)
+    if (!horiz) {  # y-axis labels
+      lbl <- .axis.format(y.coords, axis_fmt, axis_x_pre, axis_y_pre="no")
+      mx.ch <- max(nchar(lbl))  # move ylab closer
+      if (mx.ch == 3) lbly.lns <- lbly.lns - 0.5  # would also prefer less lm
+      if (mx.ch == 4) lbly.lns <- lbly.lns - 0.25
+      if (mx.ch == 5) lbly.lns <- lbly.lns - 0.1
+    }
     title(ylab=y.lab, line=lbly.lns-ylab_adj,
           cex.lab=lab_y_cex, col.lab=lab_y_color)
 
@@ -896,6 +954,7 @@ function(x, y, by, stack100,
     }
 
   }  # end do_plot
+
 
   # -----------------------------------------------------------------------
   # -----------------------------------------------------------------------

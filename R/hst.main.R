@@ -7,7 +7,7 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
        xlab_adj=NULL, ylab_adj=NULL,
        bm.adj=NULL, lm.adj=NULL, tm.adj=NULL, rm.adj=NULL,
        add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
-       scale_x=NULL, scale_y=NULL,
+       scale_x=NULL, axis_fmt="K", axis_x_pre="", axis_y_pre="",
        quiet=FALSE, do_plot=TRUE, fun_call=NULL, ...) {
 
 
@@ -150,27 +150,27 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 
     orig.params <- par(no.readonly=TRUE)
     on.exit(par(orig.params))
-
     par(bg=getOption("window_fill"))
     par(mai=c(bm, lm, tm, rm))
+    par(tcl=-0.28)  # axis tick length
 
     # set up plot
     plot(h, freq=TRUE, axes=FALSE, ann=FALSE, ...)
 
-    # plot background
+    # get axT1 and axT2 - axis tick marks
     if (is.null(scale_x))
       vx <- h$breaks
-    else
+    else {
+      if (length(scale_x) == 2) scale_x[3] <- par("xaxp")[3]
       vx <- axTicks(1, axp=scale_x)
+    }
     axT1 <- seq(vx[1], vx[length(vx)], vx[2]-vx[1])
-    .plt.bck(par("usr"), axT1, NULL, do.h=FALSE)
 
-    if (is.null(scale_y))
-      vy <- pretty(h$counts)
-    else
-      vy <- axTicks(2, axp=scale_y)
+    vy <- pretty(h$counts)
     axT2 <- seq(vy[1], vy[length(vy)], vy[2]-vy[1])
-    .plt.bck(par("usr"), NULL, axT2, do.v=FALSE)
+
+    # plot background, axT1 and axT2 for grid lines
+    .plt.bck(par("usr"), axT1, axT2)
 
     # adjust axis label from tick with mgp[2]
     # mgp does not work with rotate_x, see .axes()
@@ -181,12 +181,10 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
 
     # axis, axis ticks
-    par(tcl=-0.28)  # axis tick length
     .axes(x.lvl=NULL, y.lvl=NULL,
-          axTicks(1, axp=scale_x), axTicks(2, axp=scale_y),
-          rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, ...)
-
-#   par(mgp = my.mgp)  # restore back to previous value
+          axTicks(1, axp=scale_x), axTicks(2),
+          rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
+          axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre, ...)
 
     # axis labels
     .axlabs(x.lab, y.lab, main.lab, sub.lab,

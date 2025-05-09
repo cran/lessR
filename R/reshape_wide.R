@@ -1,5 +1,12 @@
 reshape_wide <-
-  function(data, group, response, ID, prefix=NULL, sep="_") {
+  function(data, widen, response, ID, prefix=NULL, sep="_", ...) {
+
+  dots <- list(...)
+  if (length(dots) > 0) {
+    for (i in seq_along(dots)) {
+      if (names(dots)[i] == "group") widen <- dots[[i]]
+    }
+  }
  
   # if a tibble, convert to data frame
   df.name <- deparse(substitute(data))  # is NULL if from shiny
@@ -8,16 +15,21 @@ reshape_wide <-
       data <- data.frame(data)
   }
 
-  data <- data[, c(ID, group, response)]
+  # parameter variable names not quoted, so convert to char strings
+  ID <- deparse(substitute(ID))
+  widen <- deparse(substitute(widen))
+  response <- deparse(substitute(response))
+    
+  data <- data[, c(ID, widen, response)]
   dw <- reshape(data, direction="wide",
-               idvar=ID, timevar=group, v.names=response,
+               idvar=ID, timevar=widen, v.names=response,
                sep=sep)
 
   sep.nm <- sep
   pattern <- paste(response, sep.nm, sep="")
 
   if (is.null(prefix)) {
-    if (!is.numeric(data[, group]))
+    if (!is.numeric(data[, widen]))
       prefix <- FALSE
     else
       prefix <- TRUE
@@ -27,6 +39,5 @@ reshape_wide <-
     names(dw) <- gsub(pattern, "", names(dw), fixed=TRUE)
 
   return(dw)
-
 }
 

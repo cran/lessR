@@ -1,14 +1,48 @@
 pivot <-
 function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
-         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, na_group_show=TRUE,
+         show_n=TRUE, na_by_show=TRUE, na_group_show=TRUE, na_remove=TRUE,
          out_names=NULL, sort=NULL, sort_var=NULL,  
-         table_prop=c("none", "all", "row", "col"), table_long=FALSE,
+         table_prop=c("none", "all", "row", "col"), table_long=TRUE,
          factors=TRUE, q_num=4, digits_d=NULL, quiet=getOption("quiet")) {
 
   # -----------------------------------------------------------
   # ---- preliminaries
 
   table_prop <- match.arg(table_prop)
+
+  if (missing(table_long)) table_long <- NULL
+
+  by.miss <- missing(by)
+  if (missing(variable)) {  # variable not present as a parameter value
+    by.expr <- substitute(by)
+
+    if (is.call(by.expr) && identical(by.expr[[1]], as.name("c"))) { # by=c(...)
+      by.vars <- as.list(by.expr)[-1L]
+      variable <- deparse(by.vars[[1]])
+      by <- as.call(c(as.name("c"), by.vars[-1]))
+      if (is.null(table_long)) table_long <- TRUE
+    }
+    else {  # by is a single name
+      table_long <- FALSE
+      variable <- deparse(by.expr)
+      by <- NULL
+    }
+    by.miss <- is.null(by)
+  }
+
+  else {  # variable is present as a parameter value
+    var.nm <- deparse(substitute(variable))
+    if (substr(var.nm, 1,2) != "c("  &&  !grepl(":", var.nm)) {  # only do 1 var
+      if (!is.numeric(data[[var.nm]])) {
+        stop("The variable to aggregate (pivot) must now be numeric.\n\n",
+             "All categorical variables such as ", var.nm, " now should be\n",
+             "  specified as part of parameter by: by=", var.nm,"\n",
+             "If there is no numeric variable to aggregate, then ignore.\n\n")
+      }
+    }
+  }
+
+  if (is.null(table_long)) table_long <- TRUE
 
   # define functions
   # length(x) is count_n(x) + count_NA(x)
@@ -131,7 +165,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
   # ------- 
   # by vars
 
-  if (!missing(by) || nm.cmpt[1] == "tabulate") {
+  if (!by.miss || nm.cmpt[1] == "tabulate") {
     # get indices of by variable(s)
     x <- str2lang(deparse(substitute(by)))  # char string to type calls
     ind.r.by <- eval(substitute(x), envir=data.vars, parent.frame())
@@ -139,7 +173,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
       ind.r.by <- which(names(data) == ind.r.by)
     nm.row.by <- names(data)[ind.r.by]
 
-    if (missing(by))
+    if (by.miss)
       ind.r.by <- ind.var.d  # for tabulate, do not have variables
 
     # save original variable types of by vars because aggregate makes factors
@@ -210,7 +244,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
       "Specified computations: ", nm.cmpt, "\n",
       "Not all specified variables are numeric: ", nm.var.d, "\n\n")
   }
-  if (tflag && n.cmp > 0 && missing(by))  {
+  if (tflag && n.cmp > 0 && by.miss)  {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Cannot have more than one statistic specified\n",
       "  when computing a frequency table over all the data.\n\n")
@@ -250,7 +284,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
   # ------- no aggregation, all the data ------
 
   # if table over all the data, then a single freq dist
-  if (missing(by) && nm.cmpt[1] == "table") {
+  if (by.miss && nm.cmpt[1] == "table") {
     exc <- ifelse (na_group_show, "ifany", "no")
     tbl <- table(data[,ind.var.d], useNA=exc)
     a <- data.frame(tbl)
@@ -261,7 +295,7 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
     return(a) 
   }
 
-  if (missing(by) && nm.cmpt[1] != "tabulate") {
+  if (by.miss && nm.cmpt[1] != "tabulate") {
     a <- NULL
     out <- double(length=n.cmp)
     if (n.cmp > 0) {

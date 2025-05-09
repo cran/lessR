@@ -1,6 +1,7 @@
 .bcParamValid <-
-function (y.miss, by.miss, facet1.miss, Trellis, sort, fill_split, fill.miss,
-                labels_position, stat.miss) {
+function (y.miss, by.miss, facet1.miss, Trellis, sort,
+          fill_split, fill_scaled, fill_chroma, theme,
+          fill.miss, labels_position, stat.miss) {
 
   if (!by.miss  &&  !facet1.miss) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -12,10 +13,15 @@ function (y.miss, by.miss, facet1.miss, Trellis, sort, fill_split, fill.miss,
       "Sort not applicable to Trellis plots\n\n")
   }
 
-  if (!is.null(fill_split)  &&  !fill.miss) {
+  if (!fill_scaled  &&  !is.null(fill_split)  &&  !fill.miss) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "fill_split assigns its own color based on the theme\n",
       "  either drop  fill_split  or drop  fill  parameter values\n\n")
+  }
+
+  if (fill_scaled  &&  !by.miss) {
+    cat("\n"); stop(call.=FALSE, "\n","------\n",
+      "fill_scaled only applies if no  by  variable\n\n")
   }
 
   if (!(labels_position %in% c("in", "out"))) {

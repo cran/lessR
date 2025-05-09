@@ -321,7 +321,7 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
   if (heat_map) {
     if (is.null(main)) main <- ""
     .opendev(pdf_file, width, height)  # set up graphics
-    .corcolors(out$R, NItems, main, bottom, right, diag=NULL,
+    .heatmap(out$R, NItems, main, bottom, right, diag=NULL,
                pdf_file, width, height)
   }
 
@@ -470,16 +470,18 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
       tx[length(tx)+1] <- "Item-Scale and Scale-Scale Correlations\n"
 
   # print the solution
-  if(grid) boundary <- LblCut[,2] else boundary <-  NULL
+  if(grid)
+    boundary <- LblCut[,2]
+   else
+    boundary <-  NULL
   if (item_cor)
     txcrs <- .prntbl(out$R, 2, cut=min_cor, cc=NULL, cors=TRUE, bnd=boundary)
   else
     txcrs <- .prntbl(out$R[1:NVTot,(NItems+1):NVTot], 2, cut=min_cor,
                      cc=NULL, cors=TRUE, bnd=boundary)
+
   for (i in 1:length(txcrs)) tx[length(tx)+1] <- txcrs[i]
-
   txsol <- tx
-
 
 
 
@@ -488,8 +490,8 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
   txres <- ""
   txrst <- ""
   if (resid) {
-    tx <- character(length = 0)
 
+    # get lambdas
     phi <- out$R[(NItems+1):(NItems+NF), (NItems+1):(NItems+NF)]
     lambda <- matrix(0, nrow=NItems, ncol=NF)
     iFac <- 1
@@ -497,22 +499,26 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
       if (i > LblCut[iFac,2]) iFac <- iFac + 1 
       lambda[i, iFac] <- out$R[i, NItems+iFac]
     }
-    est <- lambda %*% phi %*% t(lambda)
-    diag(est) <- 1.0
-    est <- round(est, 5)
-    colnames(est) <- row.names(out$R[1:NItems,1:NItems])
-    rownames(est) <- colnames(est)
 
-    res <- out$R[1:NItems,1:NItems] - est
-    diag(res) <- 0
-    res <- round(res, 5)
+    # get predicted correlations
+    estR <- lambda %*% phi %*% t(lambda)
+    diag(estR) <- 1.0
+    estR <- round(estR, 5)
+    colnames(estR) <- row.names(out$R[1:NItems,1:NItems])
+    rownames(estR) <- colnames(estR)
 
+    # compute residuals
+    resR <- out$R[1:NItems,1:NItems] - estR
+    diag(resR) <- 0
+    resR <- round(resR, 5)
+
+    # get residuals matrix
+    tx <- character(length=0)
     if (is.null(options()$knitr.in.progress))
       tx[length(tx)+1] <- "Item residuals\n"
+    txcrs <- .prntbl(resR, 2, cut=min_res, cc=NULL, cors=TRUE, bnd=boundary)
 
-    txcrs <- .prntbl(res, 2, cut=min_res, cc=NULL, cors=TRUE, bnd=boundary)
     for (i in 1:length(txcrs)) tx[length(tx)+1] <- txcrs[i]
-
     txres <- tx
 
 
@@ -526,7 +532,7 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
         .fmtc(" ", max.chr+2), "Squares   Abs Value", "\n",
         .fmtc(" ", max.chr+2), "-------   ---------", sep="")
 
-    cc <- as.character(dimnames(res)[[1]])
+    cc <- as.character(dimnames(resR)[[1]])
     res_avg <- double(length=NItems)
 
     ssq.tot <- 0
@@ -536,9 +542,9 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
       ssq <- 0
       abv <- 0
       for (j in 1:NItems) {
-        ssq <- ssq + res[i,j]^2
-        abv <- abv + abs(res[i,j])
-        abv.all <- abv.all + abs(res[i,j])
+        ssq <- ssq + resR[i,j]^2
+        abv <- abv + abs(resR[i,j])
+        abv.all <- abv.all + abs(resR[i,j])
       }
       ssq.tot <- ssq.tot + ssq
       res_avg[i] <- abv / (NItems - 1)
@@ -557,11 +563,9 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
     txrst <- tx
   }
   else { # no residuals
-    res <- NULL
-    est <- NULL
+    resR <- NULL
+    estR <- NULL
   }
-
-
 
 
 
@@ -648,8 +652,8 @@ function(mimm=NULL, R=mycor, data=d, fac.names=NULL,
     diag.cor=diag(out$R[1:NItems,1:NItems]),
     alpha=out$Alpha,
     omega=out$Omega,
-    pred=est,
-    resid=res
+    pred=estR,
+    resid=resR
     )
 
   }  # proceed with analysis

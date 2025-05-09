@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.4.2                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.4.3                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")  Read data file, many formats available, e.g., Excel\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -116,7 +116,7 @@ function(...) {
 
   options(add_fill = "#D9D9D920")
   options(add_trans = 0.0)
-  options(add_color = "gray30")
+  options(add_color = "gray50")
   options(add_cex = 0.75)
   options(add_lwd = 0.5)
   options(add_lty = "solid")
@@ -237,13 +237,6 @@ function(...) {
 }
 
 
-# used only in .axes
-.getdigits <- function(x, min_digits) {
-  digits_d <- .max.dd(x) + 1
-  if (digits_d < min_digits) digits_d <- min_digits
-  return(digits_d)
-}
-
 # round to specified number of digits, include trailing zeros
 .fmt <- function(k, d=getOption("digits_d"), w=0, j="right") {
   format(sprintf("%.*f", d, k), width=w, justify=j, scientific=FALSE)
@@ -288,24 +281,6 @@ function(...) {
 # convert a scientific notation number to decimal number
 .fmtNS <- function(k) {
   format(k, scientific=FALSE)
-}
-
-
-# Format axis labels using "K" notation
-.roundK <- function(axT) {
-  axT <- na.omit(axT)  # Remove NA values
-
-  if (all(axT %% 1000 == 0) && all(abs(axT)[abs(axT) > 0] > 1000)) {
-    lbls <- paste0(axT %/% 1000, "K")  # Convert to K format, int division op
-  } 
-  else {
-#   dec.d <- .getdigits(round(axT,6),1) - 1
-#   lbls <- .fmt(axT, dec.d)
-    # nsmall=0: no additional added decimal places if not already present
-     lbls <- format(axT, nsmall=0, big.mark=",")  # Default formatting
-  }
-
-  return(lbls)
 }
 
 
@@ -1091,108 +1066,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
 }
 
 
-.axes_dim <- function() {
-
-  axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
-    getOption("axis_color"), getOption("axis_x_color"))
-  axis_y_color <- ifelse(is.null(getOption("axis_y_color")),
-    getOption("axis_color"), getOption("axis_y_color"))
-
-  axis_x_lwd <- ifelse(is.null(getOption("axis_x_lwd")),
-    getOption("axis_lwd"), getOption("axis_x_lwd"))
-  axis_y_lwd <- ifelse(is.null(getOption("axis_y_lwd")),
-    getOption("axis_lwd"), getOption("axis_y_lwd"))
-
-  axis_x_lty <- ifelse(is.null(getOption("axis_x_lty")),
-    getOption("axis_lty"), getOption("axis_x_lty"))
-  axis_y_lty <- ifelse(is.null(getOption("axis_y_lty")),
-    getOption("axis_lty"), getOption("axis_y_lty"))
-
-  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
-    getOption("axis_cex"), getOption("axis_x_cex"))
-  adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
-  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
-    getOption("axis_cex"), getOption("axis_y_cex"))
-  adj <- .RSadj(axis_cex=axis_y_cex); axis_y_cex <- adj$axis_cex
-
-  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
-    getOption("axis_text_color"), getOption("axis_x_text_color"))
-  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")),
-    getOption("axis_text_color"), getOption("axis_y_text_color"))
-
-  return(list(axis_x_color=axis_x_color, axis_y_color=axis_y_color,
-              axis_x_lwd=axis_x_lwd, axis_y_lwd=axis_y_lwd,
-              axis_x_lty=axis_x_lty, axis_y_lty=axis_y_lty,
-              axis_x_cex=axis_x_cex, axis_y_cex=axis_y_cex,
-              axis_x_text_color=axis_x_color, axis_y_text_color=axis_y_color))
-}
-
-
-# get axis() and text()
-.axes <- function(x.lvl, y.lvl, axT1, axT2,
-         rotate_x=0, rotate_y=0, offset=0.5, y.only=FALSE, ...) {
-
-  fnt <- ifelse (getOption("sub_theme") == "wsj", 2, 1) # bold
-  usr <- par("usr")
-  ax <- .axes_dim()  # get axis values parameters: color, lwd, lty, cex
-
-  if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
-    if (!y.only) {  # do x axis in calling routine for time series
-      axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
-    lbl <- .roundK(axT)  # if applicable, round x-axis values to "K"
-    if (rotate_x==0) {  # mgp[2] for tic marks and value label separation active
-      axis(1, at=axT, labels=lbl,
-           col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
-           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
-    }
-    else {
-      # text() for labels to achieve rotation with srt and offset
-      # so par$mgp[2] does not work, instead adjust text(... y= ...)
-      axis(1, at=axT, labels=FALSE,
-           col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
-           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
-      text(x=axT, y=usr[3]- par("cxy")[2]/4.5, labels=lbl,
-           pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
-           srt=rotate_x, offset=offset, font=fnt, ...)
-      }  # end axis(), text()
-    }
-  }
-
-  else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
-    if (rotate_x==0) {  # mgp[2] for tic marks and value label separation active
-      axis(1, at=axT1, labels=x.lvl,
-           col=ax$axis_x_color, col.axis=ax$axis_x_color,
-           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
-    }
-    else {  # rotate_x
-      axis(1, at=axT1, labels=FALSE, col=ax$axis_x_color,
-          lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
-      text(x=axT1, y=usr[3]- par("cxy")[2]/4.5, labels=x.lvl,
-           pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
-           srt=rotate_x, offset=offset, font=fnt, ...)
-    }
-  }  # end categorical x
-
-  if (is.null(y.lvl)  &&  !is.null(axT2)) {
-    axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
-        lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
-    axT <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
-    lbl <- .roundK(axT)  # if applicable, round x-axis values to "K"
-    text(x=usr[1], y=axT, labels=lbl,
-         pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
-         srt=rotate_y, font=fnt, ...)
-  }
-
-  else if (!is.null(y.lvl)) {  # categorical
-    axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
-        lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
-    text(x=usr[1], y=axT2, labels=y.lvl,
-         pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
-         srt=rotate_y, font=fnt, ...)
-  }
-}
-
-
 # axis labels
 .axlabs <- function(x.lab, y.lab, main.lab, sub.lab,
                     x.val=NULL, xy_ticks=TRUE, offset=0.5,
@@ -1237,11 +1110,10 @@ function(lab, labcex, cut, nm, var.nm, units) {
   if (!is.null(sub.lab))
     title(sub=sub.lab, line=lblx.lns+1-xlab_adj, cex.sub=0.75,
           col.lab=lab_x_color, ...)
-# title(ylab=y.lab, line=lbly.lns-ylab_adj-.8,
   title(ylab=y.lab, line=lbly.lns-ylab_adj+.1,
         col.lab=lab_y_color, cex.lab=lab_y_cex)
   if (!is.null(main.lab))
-    title(main=main.lab, cex.main= getOption("main_cex"),
+    title(main=main.lab, cex.main=lab_x_cex,
           col.main=getOption("main_color"), ...)
 }
 
@@ -1271,6 +1143,154 @@ function(lab, labcex, cut, nm, var.nm, units) {
   }
 
   return(list(val.lab=val.lab, mx.val.ln=mx.val.ln))
+}
+
+
+.axes_dim <- function() {
+
+  axis_x_color <- ifelse(is.null(getOption("axis_x_color")),
+    getOption("axis_color"), getOption("axis_x_color"))
+  axis_y_color <- ifelse(is.null(getOption("axis_y_color")),
+    getOption("axis_color"), getOption("axis_y_color"))
+
+  axis_x_lwd <- ifelse(is.null(getOption("axis_x_lwd")),
+    getOption("axis_lwd"), getOption("axis_x_lwd"))
+  axis_y_lwd <- ifelse(is.null(getOption("axis_y_lwd")),
+    getOption("axis_lwd"), getOption("axis_y_lwd"))
+
+  axis_x_lty <- ifelse(is.null(getOption("axis_x_lty")),
+    getOption("axis_lty"), getOption("axis_x_lty"))
+  axis_y_lty <- ifelse(is.null(getOption("axis_y_lty")),
+    getOption("axis_lty"), getOption("axis_y_lty"))
+
+  axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
+    getOption("axis_cex"), getOption("axis_x_cex"))
+  adj <- .RSadj(axis_cex=axis_x_cex); axis_x_cex <- adj$axis_cex
+  axis_y_cex <- ifelse(is.null(getOption("axis_y_cex")),
+    getOption("axis_cex"), getOption("axis_y_cex"))
+  adj <- .RSadj(axis_cex=axis_y_cex); axis_y_cex <- adj$axis_cex
+
+  axis_x_text_color <- ifelse(is.null(getOption("axis_x_text_color")),
+    getOption("axis_text_color"), getOption("axis_x_text_color"))
+  axis_y_text_color <- ifelse(is.null(getOption("axis_y_text_color")),
+    getOption("axis_text_color"), getOption("axis_y_text_color"))
+
+  return(list(axis_x_color=axis_x_color, axis_y_color=axis_y_color,
+              axis_x_lwd=axis_x_lwd, axis_y_lwd=axis_y_lwd,
+              axis_x_lty=axis_x_lty, axis_y_lty=axis_y_lty,
+              axis_x_cex=axis_x_cex, axis_y_cex=axis_y_cex,
+              axis_x_text_color=axis_x_color, axis_y_text_color=axis_y_color))
+}
+
+
+# Format axis labels, such as using "K" notation
+.axis.format <- function(axT, axis_fmt, axis_x_pre, axis_y_pre) {
+  lbls <- na.omit(axT)  # Remove NA values
+
+  if ("K" %in% axis_fmt) {
+    if (all(axT %% 1000 == 0) && all(abs(axT)[abs(axT) > 0] > 1000))
+      lbls <- trimws(paste0(lbls %/% 1000, "K"))
+    else
+      lbls <- trimws(format(lbls, nsmall=0, big.mark=",", decimal.mark="."))
+  }
+
+  if ("," %in% axis_fmt)
+    lbls <- trimws(format(lbls, nsmall=0, big.mark=",", decimal.mark="."))
+
+  if ("." %in% axis_fmt)
+    lbls <- trimws(format(lbls, nsmall=0, big.mark=".", decimal.mark=","))
+
+  if (axis_y_pre == "no") {
+    if (nzchar(axis_x_pre)) 
+      lbls=paste(axis_x_pre, lbls, sep="")
+  }
+
+  if (axis_x_pre == "no") {
+    if (nzchar(axis_y_pre)) 
+      lbls=paste(axis_y_pre, lbls, sep="")
+  }
+
+#if (!(any(c("K", "$") %in% axis_fmt)))  {
+#   dec.d <- .getdigits(round(axT,6),1) - 1
+#   lbls <- .fmt(axT, dec.d)
+    # nsmall=0: no additional added decimal places if not already present
+#}
+  return(lbls)
+}
+
+
+# used only in .axis.format, and now not used at all
+.getdigits <- function(x, min_digits) {
+  digits_d <- .max.dd(x) + 1
+  if (digits_d < min_digits) digits_d <- min_digits
+  return(digits_d)
+}
+
+
+# get axis() and text()
+.axes <- function(x.lvl, y.lvl, axT1, axT2,
+         rotate_x=0, rotate_y=0, offset=0.5, 
+         axis_fmt="K", axis_x_pre="", axis_y_pre="",
+         y.only=FALSE, ...) {
+
+  fnt <- ifelse (getOption("sub_theme") == "wsj", 2, 1) # bold
+  usr <- par("usr")
+  ax <- .axes_dim()  # get axis values parameters: color, lwd, lty, cex
+
+  if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
+    if (!y.only) {  # do x axis in calling routine for time series
+      axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
+      lbl <- .axis.format(axT, axis_fmt, axis_x_pre, axis_y_pre="no")
+      if (rotate_x==0) {  # mgp[2] for tic marks and value label separation
+      axis(1, at=axT, labels=lbl,
+           col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
+           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
+    }
+    else {
+      # text() for labels to achieve rotation with srt and offset
+      # so par$mgp[2] does not work, instead adjust text(... y= ...)
+      axis(1, at=axT, labels=FALSE,
+           col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
+           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
+      text(x=axT, y=usr[3]- par("cxy")[2]/4.5, labels=lbl,
+           pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
+           srt=rotate_x, offset=offset, font=fnt, ...)
+      }  # end axis(), text()
+    }
+  }
+
+  else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
+    if (rotate_x==0) {  # mgp[2] for tic marks and value label separation active
+      axis(1, at=axT1, labels=x.lvl,
+           col=ax$axis_x_color, col.axis=ax$axis_x_color,
+           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
+    }
+    else {  # rotate_x
+      axis(1, at=axT1, labels=FALSE, col=ax$axis_x_color,
+          lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
+      text(x=axT1, y=usr[3]- par("cxy")[2]/4.5, labels=x.lvl,
+           pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
+           srt=rotate_x, offset=offset, font=fnt, ...)
+    }
+  }  # end categorical x
+
+  if (is.null(y.lvl)  &&  !is.null(axT2)) {
+    axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
+        lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
+    axT <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
+    lbl <- .axis.format(axT, axis_fmt, axis_x_pre="no", axis_y_pre)
+    text(x=usr[1], y=axT, labels=lbl,
+         pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
+         srt=rotate_y, font=fnt, ...)
+  }
+
+  else if (!is.null(y.lvl)) {  # categorical
+    axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
+        lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
+    text(x=usr[1], y=axT2, labels=y.lvl,
+         pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
+         srt=rotate_y, font=fnt, ...)
+  }
 }
 
 
@@ -1487,24 +1507,21 @@ function(lab, labcex, cut, nm, var.nm, units) {
 }
 
 
-.corcolors <- function(R, NItems, main, bm=NULL, rm=NULL, diag=NULL,
-                       pdf_file, width, height) {
-
-  if (!is.null(diag)) {
-    for (i in 1:NItems) R[i,i] <- diag
-    cat("\nNote: To provide more color separation for off-diagonal\n",
-        "      elements, the diagonal elements of the matrix for\n",
-        "      computing the heat map are set to 0.\n", sep="")
-  }
+.corcolors <- function() {
 
   fill_low <- NULL
   fill_hi <- NULL
 
   thm <- (getOption("theme"))
   if (is.null(fill_low) && is.null(fill_hi)) {
-    if (thm %in% c("colors", "dodgerblue", "blue", "lightbronze")) {
-      fill_low <- "rusts"
+    if (thm %in% c("colors", "dodgerblue", "blue", "lightbronze", "purple")) {
+      fill_low <- "browns"
       fill_hi <- "blues"
+      hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
+    }
+    if (thm %in% c("purple")) {
+      fill_low <- "olives"
+      fill_hi <- "purples"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
     else if (thm %in% c("darkred", "red", "rose", "slatered")) {
@@ -1517,12 +1534,12 @@ function(lab, labcex, cut, nm, var.nm, units) {
       fill_hi <- "greens"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
-    else if (thm %in% c("gold", "brown", "sienna")) {
+    else if (thm %in% c("gold", "brown", "sienna", "orange")) {
       fill_low <- "blues"
       fill_hi <- "browns"
       hmcols <- getColors(fill_low, fill_hi, l=c(10,90), n=100, output=FALSE)
     }
-    else if (thm %in% c("gray", "white")) {
+    else if (thm %in% c("gray", "white", "light")) {
       fill_low <- "white"
       fill_hi <- "black"
       hmcols <- colorRampPalette(c("white", "gray75", "black"))(100)
@@ -1534,7 +1551,19 @@ function(lab, labcex, cut, nm, var.nm, units) {
     hmcols <- colorRampPalette(c("white", "gray75", "black"))(100)
   }
 
-  # fill_low and fill_hi "blues", etc, then divergent, else sequential`
+  return(list(fill_low=fill_low, fill_hi=fill_hi, hmcols=hmcols))
+}
+
+
+.heatmap <- function(R, NItems, main, bm=NULL, rm=NULL, diag=NULL,
+                     pdf_file=NULL, width=NULL, height=NULL) {
+
+  if (!is.null(diag)) {
+    for (i in 1:NItems) R[i,i] <- diag
+    cat("\nNote: To provide more color separation for off-diagonal\n",
+        "      elements, the diagonal elements of the matrix for\n",
+        "      computing the heat map are set to 0.\n", sep="")
+  }
 
   axis_x_cex <- ifelse(is.null(getOption("axis_x_cex")),
       getOption("axis_cex"), getOption("axis_x_cex"))
@@ -1549,18 +1578,25 @@ function(lab, labcex, cut, nm, var.nm, units) {
   if (axis_x_cex > 1) bm <- bm + .5  # hack
   if (axis_y_cex > 1) rm <- rm + .5
 
+  cc <- .corcolors()  # get divergent color scale from color theme
+
+  if (!is.null(pdf_file))
+    pdf(file=pdf_file, width=width, height=height)
+
   heatmap(R[1:NItems,1:NItems], Rowv=NA, Colv="Rowv", symm=TRUE,
-    col=hmcols, margins=c(bm,rm), main=main,
+    col=cc$hmcols, margins=c(bm,rm), main=main,
     cexRow=axis_x_cex+.2, cexCol=axis_y_cex+.2)
 
   if (!is.null(pdf_file)) {  # terminate pdf graphics
     dev.off()
-    .showfile(pdf_file, "plot")
+    .showfile(pdf_file, "heat map")
+    cat("\n\n")
   }
 }
 
 
-.maketrans <- function(col.name, trans_level) {
+# get rgb color from a color name with specified transparency
+.maketrans <- function(col.name, trans.level) {
 
   col.trans <- numeric(length(col.name))
 
@@ -1569,14 +1605,14 @@ function(lab, labcex, cut, nm, var.nm, units) {
     g.tr <- col2rgb(col.name[i])[2]
     b.tr <- col2rgb(col.name[i])[3]
 
-    col.trans[i] <- rgb(r.tr, g.tr, b.tr, alpha=trans_level, maxColorValue=256)
+    col.trans[i] <- rgb(r.tr, g.tr, b.tr, alpha=trans.level, maxColorValue=256)
   }
 
   return(col.trans)
 }
 
 
-# from the theme, get the sequential or hues palette name for each color theme
+# from theme, get the associated sequential, divergent or hues palette name
 .get_fill <- function(theme=getOption("theme"), seq.pal=FALSE, diverge=FALSE) {
 
   if (!diverge) {
@@ -1611,28 +1647,10 @@ function(lab, labcex, cut, nm, var.nm, units) {
   }
 
   return(clrs)
-
 }
 
 
-# from explicit getColors() call in fill parameter, get the colors
-# get args and add n=
-.do_getColors <- function(fill.name, n.clr) {
-
-    gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
-  if (!grepl("output", fill.name, fixed=TRUE))   # "output" not exist
-    txt <- paste("fill <- getColors(", gc.args, ", n=", n.clr,
-                 ", output=FALSE)", sep="")  # default is FALSE
-  else
-    txt <- paste("fill <- getColors(", gc.args, ", n=", n.clr,
-                 ")", sep="")  # output specified
-  pp <- parse(text=txt)
-
-  return(eval(pp))   # get fill
-}
-
-
-# from a pre-defined color palette name, generate the palette
+# from a pre-defined color palette name, generate the palette without scaling
 # if not a palette name, then return the name, i.e., do nothing
 # typically used to convert color name to a color, such as from from get_fill()
 .color_range <- function(fill, n.clr) {
@@ -1684,7 +1702,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
 }
 
 
-# match a hue to the color theme
+# get the hue according to the color theme
 .get.h <- function(theme=getOption("theme")) {
 
        if (theme %in% c("gray", "white")) h <- 0  # any value for h works
@@ -1697,11 +1715,40 @@ function(lab, labcex, cut, nm, var.nm, units) {
   else h <- 240
 
   return(h)
+}
 
+# get hue and chroma from an R rgb color name
+.getHC <- function(rgb.nm) {
+  rgb1 <- t(grDevices::col2rgb(rgb.nm) / 255)  # rgb color from R color name
+  luv  <- grDevices::convertColor(rgb1, from="sRGB", to="Luv")
+# L <- luv[,"L"]
+  u <- luv[,"u"]
+  v <- luv[,"v"]
+  c <- sqrt(u^2 + v^2)
+  h <- (atan2(v, u) * 180 / pi) %% 360
+  setNames(c(hue=h, chroma=c), c("hue","chroma"))
 }
 
 
-# continuous color scale
+# get rgb color from R color name
+.to_rgb <- function(color) {
+
+  clr <- color[1]  # box_fill is qualitative color scale
+
+  if (is.null(color))
+    rgb_color <- "NULL"
+  else {  # preserve color name if it exists
+    if (!(color[1] %in% colors()))
+      rgb_color <- col2rgb(clr, alpha=TRUE)
+    else
+      rgb_color <- clr
+  }
+  return(rgb_color)
+}
+
+
+# called by BarChart() and PieChart()
+# initial attempt at sequential scaling of fill color
 .getColC <- function(x, chroma=55, fill_name) {
 
   if (getOption("theme") %in% c("gray", "white")) chroma <- 0
@@ -1721,27 +1768,83 @@ function(lab, labcex, cut, nm, var.nm, units) {
     cc <- hcl(h=.get.h(), c=chroma, l=lum)
     clr <- cc
   }
-
   return(clr)
-
 }
 
+# better, more general scaling function
+.scale.clr <- function(x, fill, fill_split, fill_chroma, theme) {
 
-.to_rgb <- function(color) {
+    fill.n <- ifelse (is.null(fill), 0, length(fill))
 
-  clr <- color[1]  # box_fill is qualitative color scale
+    # rescale absolute distance from midpoint
+    x.dist <- abs(x - fill_split)
+    mx.xd <- max(x.dist)
+    x.normed <- x.dist / mx.xd  # scaled between 0 and 1
+    lum.range <- 30 + ((1-x.normed)*70)  # 100 (light) down to 30 (dark)
 
-  if (is.null(color))
-    rgb_color <- "NULL"
-  else {  # preserve color name if it exists
-    if (!(color[1] %in% colors()))
-      rgb_color <- col2rgb(clr, alpha=TRUE)
-    else
-      rgb_color <- clr
-  }
+    if (fill.n == 0) {  # hue and chroma by defaulting to theme
+      if (theme %in% c("gray", "white")) {
+        chroma <- 0
+        hue <- 0  # arbitrary
+      }
+      else {
+        chroma <- fill_chroma
+        hue <- .get.h(theme)  # get the hue for the current theme
+      }
+    }  # end not fill
 
-  return(rgb_color)
+    else if (fill.n == 1) {  # hue and chroma from fill name
+      hc <- .getHC(fill)
+      hue <- hc[1]
+      chroma <- hc[2]
+    }
 
+    if (fill.n < 2)
+      fill <- hcl(h=hue, c=chroma, l=lum.range)
+
+    else if (fill.n == 2) {  # length of fill is 2, so divergent scale
+      hc <- .getHC(fill[1])
+      hue1 <- hc[1]
+      chroma1 <- ifelse (hue1=="black", 0, hc[2])
+      if (chroma1 > 100) chroma1 <- 100
+      hc <- .getHC(fill[2])
+      hue2 <- hc[1]
+      chroma2 <- ifelse (hue2=="black", 0, hc[2])
+      if (chroma2 > 100) chroma2 <- 100
+
+      # need a sequential scale if only one who is black, chroma=0
+      if ((chroma1!=0 && chroma2!=0) || (chroma1==0 && chroma2==0))
+        fill <- colorspace::diverging_hcl(n=length(lum.range),
+           h=c(hue1, hue2), c=c(chroma1,chroma2), l=lum.range, fixup=TRUE)
+      else
+        fill <- colorspace::sequential_hcl(
+          n=length(lum.range), h=hue2, c=c(chroma1, chroma2), l=lum.range)
+    }
+
+    else {
+      cat("\n"); stop(call.=FALSE, "\n","------\n",
+        "With  fill_scaled  specify only one or two fill colors,\n",
+        "  for either a sequential or a divergent color palette.\n\n")
+    }
+
+    return(fill)
+}  # end scale.clrs()
+
+
+# from explicit getColors() call in fill parameter, get the colors
+# get args and add n=
+.do_getColors <- function(fill.name, n.clr) {
+
+  gc.args <- substr(fill.name, 11, nchar(fill.name)-1)
+  if (!grepl("output", fill.name, fixed=TRUE))   # "output" not exist
+    txt <- paste("fill <- getColors(", gc.args, ", n=", n.clr,
+                 ", output=FALSE)", sep="")  # default is FALSE
+  else
+    txt <- paste("fill <- getColors(", gc.args, ", n=", n.clr,
+                 ")", sep="")  # output specified
+  pp <- parse(text=txt)
+
+  return(eval(pp))   # get fill
 }
 
 
@@ -1917,171 +2020,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
   }
 }
 
-
-
-
-.prntbl <- function(x, digits_d=2, cut=0, cc="-", cors=FALSE,
-                    brk=NULL, bnd=NULL, v1.nm=NULL, v2.nm=NULL,
-                    from_efa=FALSE) {
-
-# brk: ... replaces rows not printed
-# bnd: boundary between groups
-
-  tx <- character(length = 0)
-
-  max.ch <- ifelse (cors, 3, 0)  # max char per column, 0 is not applicable
-
-  # width of column 1
-  max.c1 <- 0
-  for (i in 1:nrow(x)) {
-    c1 <- nchar(rownames(x)[i])
-    if (c1 > max.c1) max.c1 <- c1
-  }
-  if (!is.null(v2.nm)) if (nchar(v2.nm) > max.c1) max.c1 <- nchar(v2.nm)
-  max.c1 <- max.c1 + 2
-
-  # widths of variable names
-  colnm.w <- integer(length=ncol(x))
-  for (i in 1:ncol(x))
-    colnm.w[i] <- nchar(colnames(x)[i])
-
-  # width of columns
-  max.ln <- integer(length=ncol(x))
-  for (j in 1:ncol(x)) {
-    if (is.numeric(x[,j])) {
-      c.val <- 0
-      for (i in 1:nrow(x)) {
-        i.val <- nchar(formatC(x[i,j], digits=digits_d, format="f"))
-        if (i.val > c.val) c.val <- i.val
-      }
-    }
-    else {
-      c.val <- 0
-      for (i in 1:nrow(x)) {
-        i.val <- nchar(as.character(x[i,j]))
-        if (i.val > c.val) c.val <- i.val
-      }
-    }
-    if (!cors)
-      max.ln[j] <- max(colnm.w[j], c.val) + 1
-    else {
-      max.ln[j] <- max(colnm.w[j], 4)
-      if (max.ch > 0) max.ln[j] <- max.ch
-      if (max.ln[j] > 4) max.ln[j] <- max.ln[j] + 1
-    }
-    if (max.ln[j] < 4) max.ln[j] <- 4
-  }
-
-  if (!is.null(cc))
-    tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1, cc=cc)
-
-  # matrix for potentially multi-row column names
-  if (max.ch > 0) {
-    nr.ind.lbl <- integer(length=ncol(x))
-    for (i in 1:ncol(x))
-      nr.ind.lbl[i] <- ((nchar(colnames(x)[i]) + (max.ch-1)) %/% max.ch)
-
-    nr.lbl <- max(nr.ind.lbl)  # n_row of labels
-    col.nm <- matrix(nrow=nr.lbl, ncol=ncol(x))
-    for (i in 1:nrow(col.nm)) {
-      for (j in 1:ncol(col.nm)) {
-        srt <- ((i-1)*max.ch) + 1
-        stp <- srt + (max.ch - 1)
-        col.nm[i,j] <- substr(colnames(x)[j], srt, stp)
-      }
-    }
-  }
-  else {
-    nr.lbl <- 1
-    col.nm <- matrix(nrow=1, ncol=ncol(x))
-    for (j in 1:ncol(col.nm)) col.nm[1,j] <- colnames(x)[j]
-  }
-  # for each row, shift down value if next row is "", repeat
-  if (nr.lbl > 1) {
-    for (k in 2:nrow(col.nm)) {  # repeat for each row
-      for (i in 2:nrow(col.nm)) {
-        for (j in 1:ncol(col.nm)) {
-          if (nchar(col.nm[i,j]) == 0) {
-            col.nm[i,j] <- col.nm[i-1,j]
-            col.nm[i-1,j] <- ""
-          }
-        }
-      }
-    }
-  }
-
-  blnk <- format("", width=max.c1-1)
-  if (!is.null(v1.nm)) tx[length(tx)+1] <- paste(blnk, v1.nm)
-  # write col labels
-  for (i in 1:nr.lbl) {  # for each row of column labels
-    if (is.null(v2.nm))
-      tx[length(tx)+1] <- format("", width=max.c1)
-    else
-      tx[length(tx)+1] <- paste(" ", v2.nm,
-           format("", width=max.c1-nchar(v2.nm)-2), sep="")
-    for (j in 1:ncol(x)) {
-      wd <- max.ln[j]
-      tx[length(tx)] <- paste(tx[length(tx)], .fmtc(col.nm[i,j], w=wd), sep="")
-      if (!is.null(bnd)) if (j %in% bnd)
-        if (i == nr.lbl)
-          tx[length(tx)] <- paste(tx[length(tx)], "|", sep="")
-        else
-          tx[length(tx)] <- paste(tx[length(tx)], " ", sep="")
-    }
-  }
-  if (!is.null(bnd))
-    tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1+length(bnd), cc=" ")
-
-  # factor vars to char vars
-  if (is.data.frame(x)) {
-    i.col <- sapply(x, is.factor)
-    x[i.col] <- lapply(x[i.col], as.character)
-  }
-
-  # write values
-  for (i in 1:nrow(x)) {
-    if (i %in% brk) tx[length(tx)+1] <- "..."
-    rwnm <- paste(" ", rownames(x)[i])
-    if (is.null(v2.nm))
-      tx[length(tx)+1] <- format(rwnm, width=max.c1, justify="right")
-    else
-      tx[length(tx)+1] <- format(rwnm, width=max.c1-1, justify="right")
-
-    for (j in 1:ncol(x)) {
-      if (is.integer(x[i,j]))
-        tx[length(tx)] <- paste(tx[length(tx)], .fmti(x[i,j],
-                                w=max.ln[j]), sep="")
-
-      else if (is.numeric(x[i,j])) {
-        wd <- max.ln[j]
-        if (cors) {
-          if (max.ln[j] > 5) wd <- max(6, max.ln[j]+1) + 1
-          else wd <- max(6, max.ln[j]+1)
-          cs <- .fmt(x[i,j], d=digits_d, w=wd)
-          cs <- sub("0.", "", cs, fixed=TRUE)
-          cs <- sub(" 1.00", "100", cs, fixed=TRUE)
-        }
-        else
-          cs <- .fmt(x[i,j], d=digits_d, w=wd)
-        wd2 <- ifelse (!from_efa, wd-2, wd)
-        if (abs(x[i,j]) < cut) cs <- paste(rep(" ", wd2), collapse="")
-        tx[length(tx)] <- paste(tx[length(tx)], cs, sep="")
-        if (!is.null(bnd)) if (j %in% bnd)
-          tx[length(tx)] <- paste(tx[length(tx)], "|", sep="")
-      }
-
-      else if (is.character(x[i,j]))
-        tx[length(tx)] <- paste(tx[length(tx)], .fmtc(x[i,j], w=max.ln[j]),
-                                sep="")
-    }
-
-    if (!is.null(bnd)) if (i %in% bnd)
-      tx[length(tx)+1] <- .dash2(sum(max.ln)+max.c1+length(bnd), cc="-")
-  }
-
-  return(tx)
-
-}  # end .prntbl
 
 
 # debug cat

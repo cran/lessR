@@ -9,7 +9,7 @@ A simple wrapper for Base R \code{\link{reshape}} with sensible parameter names 
 
 \usage{
 reshape_long(data, transform, group="Group", response="Response", ID="ID",
-           prefix=ID, sep="")
+           prefix=ID, sep="", shape=c("rect", "square"))
 }
 
 \arguments{
@@ -26,6 +26,9 @@ reshape_long(data, transform, group="Group", response="Response", ID="ID",
   \item{prefix}{The prefix added to the value of ID for each row of data.}
   \item{sep}{Any potential separator of the ID prefix from the given value
        of the ID.}
+  \item{shape}{In general, the input data is a rectangular, wide-form data frame.
+       However, it can also be a symmetric, square correlation or 
+       covariance matrix.}
 }
 
 \details{
@@ -44,6 +47,10 @@ reshape \tab reshape_long\cr
 \code{idvar} \tab \code{ID}\cr
 ----------- \tab ----------------\cr
 }
+
+For a correlation or related symmetric, square input matrix, the applicable parameters are the \code{data} parameter to specify the input matrix, \code{group} to name the two columns that contain the variable names, and \code{response} to specify the name of the variable with data values that are the input correlations or related. 
+
+The name entered for \code{group} is repeat it for the first two columns output with a suffix of 1 and 2, respectively. For example, \code{group="Item"} becomes \code{"Item1"} and \code{"Item2"}. If not name for \code{group} is entered, the default variable names are \code{Col} and \code{Row}.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}
@@ -60,9 +67,19 @@ reshape_long(d, c("sup1", "sup2", "sup3", "sup4"))
 
 # with a variable range and custom variable names in the long-form
 reshape_long(d, sup1:sup4, group="Supplement", response="Reps", ID="Person")
+
+# input correlation matrix
+R <- matrix(nrow=3, ncol=3, byrow=TRUE,
+c(1.000,0.480,0.320,
+  0.480,1.000,0.240,
+  0.320,0.240,1.000))
+colnames(R) <- c("X1", "X2", "X3")
+rownames(R) <- colnames(R)
+# reshape to long
+dl <- reshape_long(R, shape="square", group="Item", response="Cor")
+dl
+
 }
-
-
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ reshape }

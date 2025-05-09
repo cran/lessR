@@ -93,7 +93,7 @@ Plot(
 
     # ----------------------
     # Sort and jitter points
-    sort_yx=c("0", "-", "+"),
+    sort=c("0", "-", "+"),
     jitter_x=NULL, jitter_y=NULL,
 
     # ----------------
@@ -142,10 +142,12 @@ Plot(
     # Bubble plot [xCategorical, or xCategorical and yCategorical]
     radius=NULL, power=0.55, low_fill=NULL, hi_fill=NULL,
 
-    # --------------------------------------
-    # Large data sets, smoothing and binning  [x and y]
-    smooth=FALSE, smooth_points=100, smooth_size=1,
+    # -----------------------------------------------------------
+    # Large data sets, smoothing, contours and binning  [x and y]
+    type=c("regular", "smooth", "contour"),
+    smooth_points=100, smooth_size=1,
     smooth_exp=0.25, smooth_bins=128, n_bins=1,
+    contour_n=10, contour_nbins=50,
 
     # ------------------------------------------------------
     # Bins for frequency polygon or text output of VBS plots
@@ -153,21 +155,35 @@ Plot(
     breaks="Sturges", cumulate=FALSE,
 
 
+    # ----------------------
+    # Axes labels and values
+    # ----------------------
+
+    # -----------------------
+    # Axis labels and spacing
+    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
+    label_adjust=c(0,0), margin_adjust=c(0,0,0,0),  # top, right, bottom, left
+    pad_x=c(0,0), pad_y=c(0,0),
+
+    # ---------------------
+    # Axis values specified
+    scale_x=NULL, scale_y=NULL, origin_x=NULL, origin_y=NULL,
+
+    # ---------------------
+    # Axis values formatted
+    rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
+    offset=getOption("offset"),
+    axis_fmt=c("K", ",", ".", ""), axis_x_prefix="", axis_y_prefix="",
+    xy_ticks=TRUE, 
+
+    # ------
+    # legend
+    legend_title=NULL,
+
+
     # -------------
     # Miscellaneous
     # -------------
-
-    # Labels for axes, values, legend if x and by variables, margins
-    xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
-    label_adjust=c(0,0), margin_adjust=c(0,0,0,0),  # top, right, bottom, left
-
-    rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
-    offset=getOption("offset"),
-
-    xy_ticks=TRUE, origin_x=NULL, origin_y=NULL,
-    scale_x=NULL, scale_y=NULL,
-    pad_x=c(0,0), pad_y=c(0,0),
-    legend_title=NULL,
 
     # ----------------------------------------------------
     # Add one or more objects, text, or geometric figures
@@ -182,7 +198,7 @@ Plot(
     # -------------------------------------------------------------
     # Deprecated, to be removed in future versions
     n_cat=getOption("n_cat"), value_labels=NULL,  # use R factors instead
-    rows=NULL, by1=NULL, by2=NULL,
+    rows=NULL, by1=NULL, by2=NULL, smooth=FALSE,
 
     # -----
     # Other
@@ -216,7 +232,8 @@ vp(\dots)
         Can be in a data frame or defined in the global environment.}
   \item{data}{Optional data frame that contains one or both of \code{x} and
         \code{y}. Default data frame is \code{d}.}
-  \item{filter}{A logical expression that specifies a subset of rows of
+  \item{filter}{A logical expression or a vector of integers that specify the
+        row numbers of the rows to retain to define a subset of rows of
         the data frame to analyze.}\cr
 
 
@@ -326,7 +343,7 @@ vp(\dots)
         plotted point.}\cr
 
 
-  \item{sort_yx}{Sort the values of \code{y} by the values of \code{x}, such as
+  \item{sort}{Sort the values of \code{y} by the values of \code{x}, such as
         for a Cleveland dot plot, that is, a numeric \code{x}-variable paired
         with a categorical \code{y}-variable with unique values. If a \code{x}
         is a vector of two variables, sort by their difference.}
@@ -551,7 +568,8 @@ vp(\dots)
         ending with this color.}\cr
 
 
-  \item{smooth}{\bold{Smoothed density plot} for two numerical variables.}
+  \item{type}{Set to \code{"smooth"} for a \bold{smoothed density plot}
+        for two numerical variables or \code{"contour"} for a \bold{contour plot}.}
   \item{smooth_points}{Number of points superimposed on the density plot in the
         areas of the lowest density to help identify outliers, which controls
         how dark are the smoothed points.}
@@ -560,13 +578,17 @@ vp(\dots)
         the color scale. Smaller than default of 0.25 yields darker plots.}
   \item{smooth_bins}{Number of bins in both directions for the density
         estimation.}
-  \item{n_bins}{Specify the number of bins to bin a single numeric
-       \code{x}-variable from which to compute the mean or median for a
-       numeric \code{y}-variable for each bin of \code{x}. Points are plotted
-       with the size dependent on the sample size for the bin, unless \code{size}
-       is specified at a constant value. Default value is 1 for no binning.
-       Available parameters include fill, color, transparency, segments, scale_x, and
-       scale_y.}\cr
+  \item{n_bins}{Specify the number of bins for a single numeric
+       \code{x}-variable from which to visualize the mean or median of a
+       numeric \code{y}-variable for each bin. Points are plotted
+       as bubbles, the size dependent on the sample size for the bin,
+       unless \code{size} is specified at a constant value. Default value
+       is 1 for no binning.}
+   \item{contour_n}{Number of contour levels in a contour plot, with the
+       default value of 10.}
+   \item{contour_nbins}{Number of bins constructed for each \code{x} and
+        \code{y} variables from which the form the 2D grid of 
+        estimated densities.}\cr
 
 
   \item{bin}{If \code{TRUE}, display the default frequency distribution
@@ -603,8 +625,32 @@ vp(\dots)
        adjusts the margins of the plotted figure in approximate inches.
        + values move the corresponding margin away from plot edge.
        Can use in conjunction with \code{offset} that can move axis values
-       into a larger margin space. Not applicable to Trellis graphics.}\cr
+       into a larger margin space. Not applicable to Trellis graphics.}
+  \item{pad_x}{Proportion of padding added to left and right sides of the
+       \code{x}-axis, respectively. Value from 0 to 1 for each of the two 
+       elements. If only one element specified, value is applied to both
+       sides.}
+  \item{pad_y}{Proportion of padding added to bottom and top sides of the
+       \code{y}-axis, respectively. Value from 0 to 1 for each of the two 
+       elements. If only one element specified, value is applied to both
+       sides.}\cr
 
+  \item{scale_x}{If specified, a vector of three values that define the
+        x-axis with numerical values: starting value, ending value, and number
+        of intervals.}
+  \item{scale_y}{If specified, a vector of three values that define the
+        y-axis with numerical values: starting value, ending value, and number
+        of intervals.}
+  \item{origin_x}{Origin of \code{x}-axis. Starting value of \code{x}, by
+       default the minimum value of \code{x}, except for time series plots
+       and when \code{stat}
+       is set to \code{"count"} or related  where the origin is zero
+       by default.}
+  \item{origin_y}{Origin of \code{y}-axis. Starting value of \code{y}, by
+       default the minimum value of \code{x}, except for time series plots
+       and when \code{stat}
+       is set to \code{"count"} or related  where the origin is zero
+       by default.}\cr
 
   \item{rotate_x}{\bold{Rotation in degrees of the value labels} on
         the \code{x}-axis, usually to accommodate longer values,
@@ -619,36 +665,20 @@ vp(\dots)
         longer axis value names are rotated. Can use in conjunction with
         \code{margin_adjust} to create space in the margin to accommodate 
         the axis values.}\cr
-
-
+  \item{axis_fmt}{Numeric format of the axis labels for both axes. Default is to
+        round thousands to \code{"K"}, such as 100000 to 100K. Also can
+        specify \code{","} to insert commas in large numbers with a 
+        decimal point or \code{"."} to insert periods, or \code{""}
+        to turn off formatting.}
+  \item{axis_x_prefix}{Prefix for axis labels on the \code{x}-axis,
+        such as \code{"$"}.}
+  \item{axis_y_prefix}{Prefix for axis labels on the \code{y}-axis,
+        such as \code{"$"}.}
   \item{xy_ticks}{Flag that indicates if tick marks and associated \bold{value
         labels} on the axes are to be displayed. To rotate the axis values, use
         \code{rotate_x}, \code{rotate_y}, and \code{offset} from the
-        \code{\link{style}} function.}
-  \item{origin_x}{Origin of \code{x}-axis. Starting value of \code{x}, by
-       default the minimum value of \code{x}, except for time series plots
-       and when \code{stat}
-       is set to \code{"count"} or related  where the origin is zero
-       by default.}
-  \item{origin_y}{Origin of \code{y}-axis. Starting value of \code{y}, by
-       default the minimum value of \code{x}, except for time series plots
-       and when \code{stat}
-       is set to \code{"count"} or related  where the origin is zero
-       by default.}
-  \item{scale_x}{If specified, a vector of three values that define the
-        x-axis with numerical values: starting value, ending value, and number
-        of intervals.}
-  \item{scale_y}{If specified, a vector of three values that define the
-        y-axis with numerical values: starting value, ending value, and number
-        of intervals.}
-  \item{pad_x}{Proportion of padding added to left and right sides of the
-       \code{x}-axis, respectively. Value from 0 to 1 for each of the two
-       elements. If only one element specified, value is applied to both
-       sides.}
-  \item{pad_y}{Proportion of padding added to bottom and top sides of the
-       \code{y}-axis, respectively. Value from 0 to 1 for each of the two
-       elements. If only one element specified, value is applied to both
-       sides.}
+        \code{\link{style}} function.}\cr
+
   \item{legend_title}{Title of the legend for a multiple-variable \code{x}
        or \code{y} plot.}\cr
 
@@ -713,6 +743,8 @@ vp(\dots)
         \code{facet1}.}
   \item{by2}{\bold{Deprecated} old parameter name, replaced with the more descriptive
         \code{facet2}.}\cr
+  \item{smooth}{\bold{Deprecated} old parameter name, replaced with 
+       \code{type="smooth"} to also allow for \code{type="contour"}.}\cr
 
 
   \item{eval_df}{Determines if to check for existing data frame and
@@ -756,7 +788,7 @@ The default input data frame is \code{d}. Specify another name with the \code{da
 
 The data values themselves can be plotted, or for a single variable, counts or proportions can be plotted on the \code{y}-axis. For a categorical \code{x}-variable paired with a continuous variable, means and other statistics can be plotted  at each level of the \code{x}-variable. If \code{x} is continuous, it is binned first, with the standard \code{\link{Histogram}} binning parameters available, such as \code{bin_width}, to override default values. The \code{stat} parameter sets the values to plot, with \code{data} the default. By default, the connecting line segments are provided, so a frequency polygon results. Turn off the line segments by setting \code{line_width=0}.
 
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression or a set of integers that specify the row numbers of the rows to retain. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. Or, to specify vector of integers that correspond to row numbers, define a vector using standard R notation. See the Examples.
 
 VALUE LABELS\cr
 [DEPRECATED. Use \code{factor()} instead.] The value labels for each axis can be over-ridden from their values in the data to user supplied values with the \code{value_labels} option. This option is particularly useful for Likert-style data coded as integers. Then, for example, a 0 in the data can be mapped into a "Strongly Disagree" on the plot. These value labels apply to integer categorical variables, and also to factor variables. To enhance the readability of the labels on the graph, any blanks in a value label translate into a new line in the resulting plot. Blanks are also transformed as such for the labels of factor variables.
@@ -1026,7 +1058,7 @@ style()
 Plot(Years, Salary, fit="loess", span=1.25)
 
 # 2-D kernel density (more useful for larger sample sizes)
-Plot(Years, Salary, smooth=TRUE)
+Plot(Years, Salary, type="smooth")
 }
 
 #------------------------------------------------------
@@ -1110,6 +1142,7 @@ BoxPlot(Salary, facet1=Dept)
 # bin the values of Salary to plot counts as a frequency polygon
 # the counts are plotted as points instead of the data
 Plot(Salary, stat_x="count")  # bin the values
+
 
 # time charts
 #------------
@@ -1196,7 +1229,7 @@ style()
 Plot(Salary, row_names)
 
 # standard scatterplot
-Plot(Salary, row_names, sort_yx="0", segments_y=FALSE)
+Plot(Salary, row_names, segments_y=FALSE)
 
 # Cleveland dot plot with two x-variables
 Plot(c(Pre, Post), row_names)

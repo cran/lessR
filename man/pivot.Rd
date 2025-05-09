@@ -9,9 +9,9 @@ Compute one or more designated descriptive statistics (\code{compute} over one o
 
 \usage{
 pivot(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
-         show_n=TRUE, na_by_show=TRUE, na_remove=TRUE, na_group_show=TRUE,
+         show_n=TRUE, na_by_show=TRUE, na_group_show=TRUE, na_remove=TRUE,
          out_names=NULL, sort=NULL, sort_var=NULL,  
-         table_prop=c("none", "all", "row", "col"), table_long=FALSE,
+         table_prop=c("none", "all", "row", "col"), table_long=TRUE,
          factors=TRUE, q_num=4, digits_d=NULL, quiet=getOption("quiet"))
 }
 
@@ -19,7 +19,7 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
   \item{data}{Data frame that contains the variables.}
   \item{compute}{One or more statistics, defined as one or more functions,
        to aggregate over the combinations of the values of the categorical
-       variables.}
+       variables. If no numerical variable, then ignore.}
   \item{variable}{One or more numeric response variables for which to
        \code{compute} the specified statistics, perhaps aggregated,
        i.e., summarized across the groups.}
@@ -39,15 +39,16 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
        the default, if all values of `variable` are missing for a group
        so that the entire level of the `by` variables is missing, show those
        missing cells with a reported value of computed variable \code{n} as 0.
-        Otherwise delete the row from the output.}
-  \item{na_remove}{Sets base R parameter \code{na.rm}. If \code{TRUE},
-       the default, removes missing values from the \code{variable}(s),
-       then reports how many values were missing. Otherwise, the 
-       aggregation statistic for a cell with any missing data returns \code{NA}.}
+       Otherwise delete the row from the output.}
   \item{na_group_show}{If \code{TRUE}, the default, display \code{<NA>} for missing
        data of a grouping variable as a level for that variable. Otherwise, do
        not treat a missing value of a group as a level for which to aggregate,
        deleting the level from the analysis.}
+  \item{na_remove}{Sets base R parameter \code{na.rm}. If \code{TRUE},
+       the default, removes missing values from the \code{variable}(s),
+       which are aggregated,
+       then reports how many values were missing. Otherwise, the 
+       aggregation statistic for a cell with any missing data returns \code{NA}.}
   \item{out_names}{Custom names for the aggregated variables. If more than one,
         list in the same order as specified in \code{variable}. Does not apply
         to the \code{table} option where the column names are the levels of
@@ -65,7 +66,7 @@ pivot(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
         grand total. Values of \code{"row"} and \code{"col"} provide
         proportions based on row and column sums.}
   \item{table_long}{Applies to the value of \code{compute} of \code{table}.
-        If set to \code{TRUE}, then the cross-tabs table is output in
+        When \code{TRUE}, the cross-tabs table is output in
         long form, one count per row.}\cr
 
   \item{factors}{For \code{by} variables of type
@@ -170,12 +171,12 @@ pivot(d, mean, c(Years, Salary), c(Dept, Gender))
 pivot(d, mean, Salary, Dept, Gender)
 
 # cross-tabulation table
-pivot(d, table, Dept, Gender)
-# long form
-pivot(d, table, Dept, Gender, table_long=TRUE)
+pivot(d, table, by=c(Dept, Gender))
+# short form
+pivot(d, table, by=c(Dept, Gender), table_long=TRUE)
 
 # multiple functions for which to aggregate
-pivot(d, c(mean,sd,median,IQR), Years, c(Gender,Dept), digits_d=2)
+pivot(d, c(mean,sd,median,IQR), Years, by=c(Gender,Dept), digits_d=2)
 
 # A variety of statistics computed for several variables over the
 #  entire data set without aggregation

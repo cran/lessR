@@ -47,7 +47,7 @@ BarChart(
         fill=NULL,
         color=getOption("bar_color_discrete"),
         transparency=getOption("trans_bar_fill"),
-        fill_split=NULL,
+        fill_split=NULL, fill_scaled=FALSE, fill_chroma=75,
 
         labels=c("\%", "input", "prop", "off"),
         labels_position=c("in", "out"),
@@ -61,9 +61,10 @@ BarChart(
         xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
         lab_adjust=c(0,0), margin_adjust=c(0,0,0,0),
         pad_y_min=0, pad_y_max=0,
-
+    
         rotate_x=getOption("rotate_x"), break_x=NULL,    
         offset=getOption("offset"),
+        axis_fmt=c("K", ",", ".", ""), axis_x_pre="", axis_y_pre="",
         label_max=100,
 
         legend_title=NULL, legend_position="right_margin",
@@ -122,8 +123,9 @@ bc(\dots)
        \code{y}-variable are computed, or can be a summary table that consists
        of two columns: the level of a categorical variable paired with the
        numeric value that determines the height of the corresponding bar.}
-  \item{filter}{A logical expression that specifies a subset of rows of the
-       data frame to analyze.}
+  \item{filter}{A logical expression or a vector of integers that specify the
+        row numbers of the rows to retain to define a subset of rows of
+        the data frame to analyze.}
   \item{stat}{Statistical transformation of the data for the y-axis across
        groups defined by the categorical variable(s), the data aggregation. 
        Applicable values: \code{"sum"}, \code{"mean"}, \code{"sd"}, \code{"dev"}
@@ -206,7 +208,18 @@ bc(\dots)
         bars that correspond to values of \code{y} <= \code{fill_split} are
         displayed in the first \code{fill} color and other values displayed
         in the second \code{fill} color, or as specified by a vector of
-        exactly two fill colors.}\cr
+        exactly two fill colors.}
+  \item{fill_scaled}{If \code{TRUE}, the luminous (lightness) of each bar
+        along a sequential scale is scaled according to its height,
+        the value of numerical \code{y}. Larger values of \code{y} lead to
+        darker colors. Or, specify the color of the sequential scale with
+        parameter \code{fill} set to a single R color name, or a
+        divergent scale with parameter \code{fill} set to two
+        R color names. Only applies if no \code{by} variable.}
+  \item{fill_chroma}{Saturation level of fill colors for \code{fill_scaled}.
+        Full saturation 100. Values closer to 0 lose saturation to
+        become closer to grayscale. Does not apply to the `"gray"` theme
+        that has chroma of 0 by definition.}\cr
 
   \item{labels}{Adds the numerical results to the plot. 
          The default value is \code{"\%"} for percentages, with
@@ -270,6 +283,15 @@ bc(\dots)
   \item{offset}{The amount of spacing between the axis values and the axis. Default
         is 0.5. Larger values such as 1.0 create space for the label when
         longer axis value names are rotated.}
+  \item{axis_fmt}{Format of the axis labels for both axes. Default is to
+        round thousands to \code{"K"}, such as 100000 to 100K. Also can
+        specify \code{","} to insert commas in large numbers with a 
+        decimal point or \code{"."} to insert periods, or \code{""}
+        to turn off formatting.}
+  \item{axis_x_pre}{Prefix for axis labels on the \code{x}-axis,
+        such as \code{"$"}.}
+  \item{axis_y_pre}{Prefix for axis labels on the \code{y}-axis,
+        such as \code{"$"}.}
   \item{label_max}{To \bold{improve readability} of text output, the maximum size
         of the value labels before the labels are abbreviated for
         text output only. Not a literal maximum as preserving unique
@@ -356,7 +378,6 @@ bc(\dots)
   \item{\dots}{Other parameter values for graphics as defined
       by Base R \code{\link{barplot}}, \code{\link{legend}}, 
       and \code{\link{par}} including
-      \code{xlim} and \code{ylim} for setting the range of the x and y-axes\cr
       \code{cex.main} for the size of the title\cr
       \code{col.main} for the color of the title\cr
       \code{"dotted"}, \code{"dotdash"}\cr
@@ -380,7 +401,7 @@ If the name of the vector is in the global environment and of a variable in the 
 
 To obtain a bar chart of each categorical variable in the \code{d} data frame, invoke \code{BarChart()}.  Or, for a data frame with a different name, insert the data frame name between the parentheses as the first listed parameter value. To analyze a subset of the variables in a data frame, specify the variable list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not. Use the standard R relational operators as described in \code{\link{Comparison}}. Examples include \code{==} for logical equality, \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression or a set of integers that specify the row numbers of the rows to retain. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. Or, to specify vector of integers that correspond to row numbers, define a vector using standard R notation. See the Examples.
 
 The form of the entered data, the first variable, categorical \code{x}, and optionally a second variable, numerical \code{y}, is flexible.  The data may be entered as factors, numeric values, characters, or a matrix. The data may be entered and the resulting frequencies computed, or the frequencies can be entered directly.  The most natural type of data to enter, when entering the variables, is to enter factors.
 
@@ -537,7 +558,7 @@ myOutput <- BarChart(Dept)
 myOutput
 
 # just males with salaries larger than 75,000 USD
-BarChart(Dept, rows=(Gender=="M" & Salary > 85000))
+BarChart(Dept, filter=(Gender=="M" & Salary > 85000))
 
 # rotate and offset the axis labels, sort categories by frequencies
 BarChart(Dept, rotate_x=45, offset=1, sort="-")
@@ -584,6 +605,12 @@ bc(Make, horiz=TRUE, label_max=4, data=myd)
 #  than values above
 BarChart(Dept, Salary, stat="dev", sort="+", fill_split=0)
 
+# scale the luminosity of the bars with the sequential scale
+BarChart(Dept, Salary, stat="deviation", sort="+", fill_scaled=TRUE)
+
+# scale the luminosity of the bars with a divergent scale
+BarChart(Dept, Salary, stat="deviation", sort="+", fill_scaled=TRUE,
+         fill=c("red", "blue"))
 
 # ----------------------------------------------------
 # bar chart from tabulating the data for two variables

@@ -4,32 +4,32 @@
 \title{Reshape a Long-Form Data Frame to Wide-Form}
 
 \description{
-A simple wrapper for Base R \code{\link{reshape}} with sensible parameter names and sensible defaults, and able to specify a range of variables to transform.
+Takes the variables in a long-form data frame, \code{widen}, \code{response}, and \code{ID}, and transforms to a wide form data frame. All other variables are deleted in the transformed data frame. A simple wrapper for Base R \code{\link{reshape}} with sensible parameter names and sensible defaults, and able to specify a range of variables to transform. Conversion currently limited to converting based on a single grouping variable.
 }
 
 \usage{
-reshape_wide(data, group, response, ID, prefix=NULL, sep="_")
+reshape_wide(data, widen, response, ID, prefix=NULL, sep="_", ...)
 }
 
 \arguments{
-  \item{data}{Data frame that contains the variables to analyze
+  \item{data}{Data frame that contains the variables to analyze as a
         wide-form single column.}
-  \item{group}{Name of the grouping variable in the input long-form column.}
+  \item{widen}{Name of the (single) grouping variable in the input long-form column.}
   \item{response}{Name of the variable of the response values in the input
         long-form column.}
   \item{ID}{Name of the ID field in the long-form column.}
   \item{prefix}{If \code{TRUE}, prefix the column names in the wide form
         of each corresponding level of the  
-        \code{group} variable with the name of the \code{response}. Unless
-        the values of \code{group} are numeric, the default is \code{FALSE},
+        \code{widen} variable with the name of the \code{response}. Unless
+        the values of \code{widen} are numeric, the default is \code{FALSE},
         just using the level names as the column names.}
   \item{sep}{If \code{prefix} is \code{TRUE}, the separator between the
         name of the level and the name of the \code{response} variable, with
         default \code{"_"}.}
+  \item{\dots}{Older parameter values to be converted internally.}
 }
 
 \details{
-\code{reshape_wide} takes the variables in the long-form  \code{group}, \code{response}, and \code{ID} and transforms to wide form. All other variables are deleted in the transformed data frame.
 
 Here is the correspondence between the original \code{\link{reshape}} parameter names and the \code{reshape_wide} parameter names.
 
@@ -37,7 +37,7 @@ Here is the correspondence between the original \code{\link{reshape}} parameter 
 reshape \tab reshape_wide\cr
 ----------- \tab ----------------\cr
 \code{v.names} \tab \code{response}\cr
-\code{timevar} \tab \code{group}\cr
+\code{timevar} \tab \code{widen}\cr
 \code{idvar} \tab \code{ID}\cr
 ----------- \tab ----------------\cr
 }
@@ -54,10 +54,10 @@ d <- Read("Anova_rb")  # already in wide-form
 dl <- reshape_long(d, sup1:sup4)  # convert to long-form
 
 # convert back to wide form 
-reshape_wide(dl, group="Group", response="Response", ID="Person")
+reshape_wide(dl, widen=Group, response=Response, ID=Person)
 
 # with the name of the response prefixed to the column names
-reshape_wide(dl, group="Group", response="Response", ID="Person",
+reshape_wide(dl, widen=Group, response=Response, ID=Person,
              prefix=TRUE, sep=".")
 }
 

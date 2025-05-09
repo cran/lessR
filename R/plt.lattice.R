@@ -11,6 +11,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          out_shape, out_size,
          out_fill, out_color, out2_fill, out2_color,
          ID, out_cut, ID_color, ID_size,
+         axis_fmt="K", axis_x_pre="", axis_y_pre="",
          rotate_x, rotate_y, width, height, pdf_file, T.type, quiet, ...) {
 
 
@@ -92,7 +93,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   for (j in 1:n.groups) ltype[j] <- "solid"
 
   legend_title <- abbreviate(getOption("byname"), 7)
-  leg.cex.title <- 0.85  # abbreviate only returns of type character
+  leg.cex.title <- axis_x_cex * 1.1  # abbreviate only returns of type character
 # BAD if (!is.null(by)) by <- factor(abbreviate(by, 5), levels(by))
 
   if (is.null(facet1) && is.null(facet2))
@@ -139,15 +140,19 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
       if (is.null(facet2)) {
         p <- lattice::xyplot(y ~ x | facet1, groups=by,
           scales=list(
-            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8),
-            y=list(labels=.roundK(pretty(y)), at=pretty(y), tck=.8)
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8),
+            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                   at=pretty(y), tck=.8)
           ), ...)
       }
       else {  # facet2 is present
         p <- lattice::xyplot(y ~ x | facet1 * facet2, groups=by,
           scales=list(
-            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8),
-            y=list(labels=.roundK(pretty(y)), at=pretty(y, tck=.8))
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8),
+            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                   at=pretty(y), tck=.8)
           ), ...)
       }
     }
@@ -156,19 +161,28 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
         if (is.null(facet1)  &&  is.null(facet2)) {
           p <- lattice::bwplot(y ~ x, groups=by,
           scales=list(
-            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8),
+            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                   at=pretty(y), tck=.8)
           ), ...)
         }
         else if (is.null(facet2)) {
           p <- lattice::bwplot(y ~ x | facet1, groups=by,
           scales=list(
-            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8),
+            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                   at=pretty(y), tck=.8)
           ), ...)
         }
         else {  # facet2 is present
           p <- lattice::bwplot(y ~ x | facet1 * facet2, groups=by,
           scales=list(
-            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8),
+            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                   at=pretty(y), tck=.8)
           ), ...)
         }
     }  # end con_cat
@@ -177,21 +191,24 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
       if (is.null(facet1)  &&  is.null(facet2)) {  # 0 cond var
         p <- lattice::stripplot(~ x, groups=by, subscripts=TRUE,
           scales=list(
-            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8)
           ), ...)
         y.lab <- ""
       }
       else if (is.null(facet2)) {  # 1 cond var
         p <- lattice::stripplot(~ x | facet1, groups=by, subscripts=TRUE,
           scales=list(
-            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8)
           ), ...)
         y.lab <- ifelse (is.null(ylab), getOption("facet1name"), ylab)
       }
       else  {  # 2 cond var
         p <- lattice::stripplot(~ x | facet1*facet2, groups=by, subscripts=TRUE,
           scales=list(
-            x=list(labels=.roundK(pretty(x)), at=pretty(x), tck=.8)
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8)
           ), ...)
         y.lab <- ""
       }
@@ -202,39 +219,71 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
     if (T.type == "cont_cont") {  # cont - cont
       # set 1 or 2 conditioning variables
       if (is.null(facet2)) {
-        p <- lattice::xyplot(y ~ x | facet1, groups=by, ...)
+        p <- lattice::xyplot(y ~ x | facet1, groups=by,
+          scales=list(
+            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                   at=pretty(y), tck=.8)
+          ), ...)
       }
       else {  # facet2 is present
-        p <- lattice::xyplot(y ~ x | facet1 * facet2, groups=by, ...)
+        p <- lattice::xyplot(y ~ x | facet1 * facet2, groups=by,
+          scales=list(
+            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                   at=pretty(y), tck=.8)
+          ), ...)
       }
     }
 
     else if (T.type == "con_cat") {  # cont - cat
         jitter <- .4 * jitter
         if (is.null(facet1)  &&  is.null(facet2)) {
-          p <- lattice::bwplot(y ~ x, groups=by, ...)
+          p <- lattice::bwplot(y ~ x, groups=by,
+            scales=list(
+              y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                     at=pretty(y), tck=.8)
+          ), ...)
         }
         else if (is.null(facet2)) {
-          p <- lattice::bwplot(y ~ x | facet1, groups=by, ...)
+          p <- lattice::bwplot(y ~ x | facet1, groups=by,
+            scales=list(
+              y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                     at=pretty(y), tck=.8)
+            ), ...)
         }
         else {  # facet2 is present
-          p <- lattice::bwplot(y ~ x | facet1 * facet2, groups=by, ...)
+          p <- lattice::bwplot(y ~ x | facet1 * facet2, groups=by,
+          scales=list(
+            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+                   at=pretty(y), tck=.8)
+            ), ...)
         }
     }  # end con_cat
 
     else if (T.type == "cont") {  # cont
       # set 0, 1 or 2 conditioning variables
       if (is.null(facet1)  &&  is.null(facet2)) {  # 0 cond var
-        p <- lattice::stripplot(~ x, groups=by, subscripts=TRUE, ...)
+        p <- lattice::stripplot(~ x, groups=by, subscripts=TRUE,
+          scales=list(
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8)
+          ), ...)
         y.lab <- ""
       }
       else if (is.null(facet2)) {  # 1 cond var
-        p <- lattice::stripplot(~ x | facet1, groups=by, subscripts=TRUE, ...)
+        p <- lattice::stripplot(~ x | facet1, groups=by, subscripts=TRUE,
+          scales=list(
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8)
+          ), ...)
         y.lab <- ifelse (is.null(ylab), getOption("facet1name"), ylab)
       }
       else  {  # 2 cond var
         p <- lattice::stripplot(~ x | facet1 * facet2, groups=by,
-                                subscripts=TRUE, ...)
+                                subscripts=TRUE,
+          scales=list(
+            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
+                   at=pretty(x), tck=.8)
+          ), ...)
         y.lab <- ""
       }
     }  # end cont
@@ -335,16 +384,16 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
       if (object %in% c("point", "both")) {
         p <- update(p,
              key=list(
-               cex=0.85, space="right",
+               cex=axis_x_cex, space="right",
                text=list(levels(by)),  # by is always a factor at this point
                border="gray80", background=col.bg,
-               points=list(cex=.80, pch=21, fill=fill, col=fill),
+               points=list(cex=axis_x_cex, pch=21, fill=fill, col=fill),
                title=legend_title, cex.title=leg.cex.title))
       }
       else {  # lines
         p <- update(p,
              key=list(
-               cex=0.85, space="right",
+               cex=axis_x_cex, space="right",
                text=list(levels(by)),  # by is always a factor at this point
                border="gray80", background=col.bg,
                lines=list(lwd=size.ln, col=fill),

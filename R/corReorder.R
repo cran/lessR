@@ -5,7 +5,7 @@ function (R=mycor, order=c("hclust", "chain", "manual", "as_is"),
           dist_type=c("R", "dist"),
           n_clusters=NULL, vars=NULL, chain_first=0,
           heat_map=TRUE, dendrogram=TRUE, diagonal_new=TRUE,
-          main=NULL, bottom=NULL, right=NULL,
+          main=NULL, bottom=NULL, right=NULL, quiet=getOption("quiet"),
           pdf=FALSE, width=5, height=5, ...) {
 
 
@@ -159,6 +159,7 @@ function (R=mycor, order=c("hclust", "chain", "manual", "as_is"),
 
   # -----------------------------
   # re-order R matrix
+1
   R <- R[Label,Label]
   nv <- ncol(R)
 
@@ -182,7 +183,9 @@ function (R=mycor, order=c("hclust", "chain", "manual", "as_is"),
   }
 
 
+  # --------
   # graphics
+
   if (order == "hclust") {
     if (dendrogram) {
       if (pdf) {
@@ -205,21 +208,19 @@ function (R=mycor, order=c("hclust", "chain", "manual", "as_is"),
         dev.set(which=4) 
       }
     }
-    else { 
-      pdf(file="Reordered.pdf", width=width, height=height)
-    }
 
     plot.i <- plot.i + 1
     plot.title[plot.i] <- "Reordered Matrix" 
     if (pdf)
-      pdf_file <- "Reordered Matrix"
+      pdf_file <- "ReorderedMatrix.pdf"
     else
       pdf_file <- NULL
-    .corcolors(R, nrow(R), main, bottom, right, diag=NULL,
+
+    .heatmap(R, nrow(R), main, bottom, right, diag=NULL,
                pdf_file, width, height)
   }  # end heat map
 
-  if (is.null(options()$knitr.in.progress))
+  if (is.null(options()$knitr.in.progress)  &&  !pdf)
     .plotList(plot.i, plot.title)
 
 
@@ -230,7 +231,11 @@ function (R=mycor, order=c("hclust", "chain", "manual", "as_is"),
 
   # finish
   cat("\n")
-  return(invisible(R))
+
+  if (!quiet)
+    return(R)
+  else
+    invisible(R)
 
 }
 

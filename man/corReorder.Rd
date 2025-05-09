@@ -17,7 +17,7 @@ corReorder(R=mycor, order=c("hclust", "chain", "manual", "as_is"),
           dist_type=c("R", "dist"),
           n_clusters=NULL, vars=NULL, chain_first=0,
           heat_map=TRUE, dendrogram=TRUE, diagonal_new=TRUE,
-          main=NULL, bottom=NULL, right=NULL,
+          main=NULL, bottom=NULL, right=NULL, quiet=getOption("quiet"),
           pdf=FALSE, width=5, height=5, \ldots)
 
 reord(\ldots)
@@ -49,11 +49,13 @@ reord(\ldots)
        adjacent items.}
   \item{bottom}{Number of lines of bottom margin.}
   \item{right}{Number of lines of right margin.}
-  \item{pdf}{Set to \code{TRUE} if graphics files written to pdf, the heat map
-        of the re-ordered matrix, and, if an hierarchical cluster analysis, the
-        dendrogram.}
-  \item{width}{Width of the pdf file in inches.}
-  \item{height}{Height of the pdf file in inches.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+        with \code{\link{style}} function.}
+  \item{pdf}{if \code{TRUE}, create possibly two PDF files: the hierarchical
+       cluster analysis dendrogram if requested and the heat map of the reordered
+       correlation matrix.}
+  \item{width}{Width of a pdf file in inches.}
+  \item{height}{Height of a pdf file in inches.}
   \item{\dots}{Parameter values_}
 }
 

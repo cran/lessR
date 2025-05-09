@@ -14,7 +14,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         fill=NULL,
         color=getOption("bar_color_discrete"),
         transparency=getOption("trans_bar_fill"),
-        fill_split=NULL,
+        fill_split=NULL, fill_scaled=FALSE, fill_chroma=75,
 
         labels=c("%", "input", "prop", "off"),
         labels_position=c("in","out"),
@@ -29,6 +29,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
         rotate_x=getOption("rotate_x"), break_x=NULL,
         offset=getOption("offset"),
+        axis_fmt=c("K", ",", ".", ""), axis_x_pre="", axis_y_pre="",
         label_max=100,
 
         legend_title=NULL, legend_position="right_margin",
@@ -65,7 +66,9 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     }
   }
 
-  # ------------ Old Stuff ----------------------------------
+
+# old stuff ---------------------------------------------------------------
+
   if (!missing(rows))
     message(">>> Parameter  rows  renamed to:  filter.\n",
             "    Change to  filter,  rows  will stop working in the future.\n")
@@ -76,6 +79,12 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
              "    Better to convert a categorical integer variable to ",
              "a factor.\n")
   }
+
+  if (deparse(substitute(fill)) == "(count)") {
+    message(">>> Now set to TRUE the more general parameter:  fill_scale.\n\n")
+    fill <- NULL
+  }
+
 
   dots <- list(...)
   n.values <- 0
@@ -111,8 +120,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       "  \"proportion\" only applies when there is no y numeric variable\n\n")
   }
 
-  do.plot <- TRUE
-
   facet1 <- .newparam(missing(by1), substitute(by1), "by1",
                       missing(facet1), substitute(facet1), "facet1")
   if (!is.null(facet1)) data[[as.character(facet1)]]  # extract facet1 from data
@@ -121,9 +128,16 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
   Trellis <- ifelse(!facet1.miss, TRUE, FALSE)
 
-  # ---------------------------------------------------------
+
+# set variables -----------------------------------------------------------
+
+  do.plot <- TRUE
 
   trans <- transparency
+
+  if (fill_scaled  &&  is.null(fill_split)) fill_split <- 0
+
+  if (nzchar(axis_fmt[1])) axis_fmt <- match.arg(axis_fmt)
 
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   color.miss <- ifelse (missing(color), TRUE, FALSE)
@@ -143,7 +157,8 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   stat_x <- match.arg(stat_x)
 
 
-  #------------- Set Some Parameter Values --------------------------
+
+# set some parameter values -----------------------------------------------
 
   proportion <- ifelse (stat_x[1] == "proportion", TRUE, FALSE)  # make stat_x
 
@@ -151,14 +166,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     if (sort == "+") sort <- "x"
     if (sort == "-") sort <- "+"
     if (sort == "x") sort <- "-"
-  }
-
-  if (theme != getOption("theme")) {  # given theme not the current theme
-    sty <- style(theme, reset=FALSE)
-    fill <- sty$bar$bar_fill_discrete
-    color <- sty$bar$color
-    trans <- sty$bar$trans_fill
-    if (is.null(trans)) trans <- 0.1  # kludge, should not be NULL
   }
 
   if (missing(break_x))
@@ -177,11 +184,13 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   }
 
   # ensure valid parameter values
-  .bcParamValid(y.miss, by.miss, facet1.miss, Trellis, sort, fill_split,
+  .bcParamValid(y.miss, by.miss, facet1.miss, Trellis, sort,
+                fill_split, fill_scaled, fill_chroma, theme,
                 fill.miss, labels_position, stat.miss)
 
 
-  # --------- data frame stuff -------------------------------------
+
+# data frame stuff --------------------------------------------------------
 
   data.miss <- ifelse (missing(data), TRUE, FALSE)
 
@@ -255,10 +264,47 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
   eval_df <- !x.in.global
 
 
-  # -----------------------------------------------------------
-  # establish if a data frame, if not then identify variable(s)
+# subset filter (with deprecated rows parameter) --------------------------
+
+  if (!missing(filter) || !missing(rows)) {
+
+    if (x.in.global) {
+      cat("\n"); stop(call.=FALSE, "\n------\n",
+        "Parameter  filter  not applicable if no data frame\n\n")
+    }
+
+    txt <- .filter(deparse(substitute(filter)))
+
+    # get r, label each row as TRUE or FALSE
+    intYN <- try(eval(parse(text = txt)), silent = TRUE)
+    if (is.numeric(intYN)) {
+      r <- rep(FALSE, nrow(data))
+      r[intYN] <- TRUE
+    }
+    else {
+      if (!missing(filter))  # subset filter
+        r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
+      if (!missing(rows))  # tag each row as TRUE or FALSE
+        R <- eval(substitute(rows), envir=data, enclos=parent.frame())
+      r <- r & !is.na(r)  # set missing for a row to FALSE
+    }
+
+    nr.before <- nrow(data)
+    if (any(r))
+      data <- data[r,,drop=FALSE]
+    if (!quiet) {
+      if (!missing(filter))  # filter parameter present
+        cat("\nfilter: ",  txt, "\n-----\n")
+      cat("Rows of data before filtering: ", nr.before, "\n")
+      cat("Rows of data after filtering:  ", nrow(data), "\n\n")
+    }
+  }  # end filter
+
+
+# establish if a data frame, otherwise identify variable(s)----------------
   # x can be missing entirely, with a data frame passed instead
   # if x a vector, then x.name not in data, but also not in global
+
 
   x.call <- NULL
 
@@ -276,25 +322,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         if (!mydata.ok) if (!shiny) .nodf(df.name)  # check to see if df exists
         .xcheck(x.name, df.name, names(data))  # x-vars in df?
       }
-
-      # subset filter (with deprecated rows parameter also)
-      if (!missing(filter) || !missing(rows)) {
-        txt <- .filter(deparse(substitute(filter)))
-        if (!missing(filter))  # subset filter
-          r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
-        if (!missing(rows))
-          r <- eval(substitute(rows), envir=data, enclos=parent.frame())
-        r <- r & !is.na(r)  # set missing for a row to FALSE
-        nr.before <- nrow(data)
-        if (any(r))
-          data <- data[r,,drop=FALSE]
-        if (!quiet) {
-          if (!missing(filter))  # filter parameter present
-            cat("\nfilter: ",  txt, "\n-----\n")
-          cat("Rows of data before filtering: ", nr.before, "\n")
-          cat("Rows of data after filtering:  ", nrow(data), "\n\n")
-        }
-      }  # end filter
 
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
@@ -459,22 +486,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
           fill <- fill[order(fill.val, decreasing=srt.dwn)]
         }
       }
-      else if (substr(fill.name, 1, 6) != "(count") {
-        if (length(which(fill == "off")) > 0)
-          fill[which(fill == "off")] <- "transparent"
-        if (length(which(color == "off")) > 0)
-          color[which(color == "off")] <- "transparent"
-      }
-
-      # or do a tabulation to get value of y for (count)
-      if (substr(fill.name, 1, 6) == "(count") {
-        xtb <- table(x.call)
-        if (sort != "0") {
-          srt.dwn <- ifelse (sort == "-", TRUE, FALSE)
-          xtb <- xtb[order(xtb, decreasing=srt.dwn)]
-        }
-        fill <- .getColC(xtb, fill_name=fill.name)
-      }  # end .count
 
       # evaluate getColors at the time of the function call
       # re-evaluate here by setting fill with the specified value of n
@@ -491,40 +502,6 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
     n.x <- length(unique(na.omit(x.call)))
     n.by <- ifelse (!by.miss, length(unique(na.omit(by.call))), 0)
     n.levels <- ifelse (by.miss || is.null(by.call), n.x, n.by)
-
-    # -------------
-    # assign colors
-    # fill_split in sub call
-
-    is.ord <- ifelse (is.ordered(x.call) || is.ordered(by.call), TRUE, FALSE)
-    # confusing, fill is fill.name, fill can start from the function call
-    #   with a name such as "rainbow" instead of colors
-    # fill should be converted to colors earlier if needed
-
-    # if theme changed, then fill already set
-    # .get_fill returns a sequential or hues color name for the theme
-    if (fill.miss  &&  theme == getOption("theme")) {
-      if (is.ord || !is.null(by.call))   # default range
-        fill <- .color_range(.get_fill(theme, is.ord), n.levels)
-      else {
-        fill <- getOption("bar_fill_discrete")  # to begin, have "hues" colors
-        if (fill[1] == "hues")  # if invoke style(), then colors are "hues"
-          fill <- .color_range("hues", n.levels)  # convert to actual colors
-      }
-    }  # end missing fill
-
-    else  # fill.name does not work, need fill from function call
-      fill <- .color_range(fill, n.levels)  # get actual colors from fill
-
-    if (trans > 0)
-     for (i in 1:length(fill)) fill[i] <- .maketrans(fill[i], (1-trans)*256)
-
-    # by default, no color borders if a range
-    if (identical(color, getOption("bar_color_discrete")))
-      color <- "transparent"
-    # see if apply a pre-defined color range to **color**
-    col.clr <- .color_range(color, n.levels)  # see if range, NULL if not
-    if (!is.null(col.clr)) color <- col.clr
 
     # -----------------------
     # process stat parameter
@@ -568,7 +545,10 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
               "When reading a summary table, missing data not allowed.\n\n")
         }
       }  # end is summary table
+
     }  # a y variable
+
+
 
     # -----------------------
     if (Trellis && do.plot) {
@@ -578,6 +558,7 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
                    proportion,
                    fill, color, trans, size.pt=NULL, xlab, ylab, main,
                    rotate_x, offset,
+                   axis_fmt, axis_x_pre, axis_y_pre,
                    width, height, pdf_file,
                    segments_x=NULL, breaks=NULL, T.type="bar", quiet)
     }
@@ -623,6 +604,20 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
         }  # end !quiet
 
         # get summary table from the data according to the stats parameter
+        # Logical vector: TRUE where neither x.call nor y.call is NA
+        n.xbefore <- length(x.call)
+        if (is.null(by.call))
+          keep <- !is.na(x.call) & !is.na(y.call)
+        else
+          keep <- !is.na(x.call) & !is.na(y.call) & !is.na(by.call)
+        x.call <- x.call[keep]
+        y.call <- y.call[keep]
+        if (!is.null(by.call)) by.call <- by.call[keep]
+        n.xafter <- length(x.call)
+        n.m <- n.xbefore - n.xafter
+        if (n.m > 0) cat("\nRows of data removed due to missing data:",
+                         n.m, "\n\n")
+
         stat_out <- .bc.stat(x.call, y.call, by.call, stat, y.name)
         out <- stat_out$out
         if (is.null(ylab)) ylab <- stat_out$ylab
@@ -636,23 +631,18 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
           by.call <- out[,2]
           y.call <- out[,3]
         }
-
       }  # end y is present for original data and stats not NULL
 
-      is.range.nm <- ifelse (length(.color_range(fill, n.clr=5)) > 1,
-                             TRUE, FALSE)
-      if (!is.range.nm && !by.miss && !fill.miss && !is.null(by.call)) {
-        cat("\n"); stop(call.=FALSE, "\n------\n",
-          "For custom fill for a two-variable bar chart,\n",
-          " must specify a color range such as \"colors\" or \"grays\", \n\n")
-      }
 
       bc <- .bc.main(x.call, y.call, by.call, stack100,
-            fill, color, trans, fill_split, theme,
+            fill, color, trans,
+            fill_split, fill_scaled, fill_chroma, theme,
             horiz, gap, proportion, scale_y,
             xlab, ylab, main,
             value_labels, label_max, beside,
-            rotate_x, offset, break_x, sort,
+            rotate_x, offset, 
+            axis_fmt, axis_x_pre, axis_y_pre,
+            break_x, sort,
             labels, labels_color, labels_size, labels_decimals,
             labels_position, labels_cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
@@ -752,11 +742,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
       }
 
       bc <- .bc.main(data, y.call, by.call, stack100,
-            fill, color, trans, fill_split, theme,
+            fill, color, trans,
+            fill_split, fill_scaled, fill_chroma, theme,
             horiz, gap, proportion, scale_y,
             xlab, ylab, main,
             value_labels, label_max, beside,
-            rotate_x, offset, break_x, sort,
+            rotate_x, offset,
+            axis_fmt, axis_x_pre, axis_y_pre,
+            break_x, sort,
             labels, labels_color, labels_size, labels_decimals,
             labels_position, labels_cut,
             xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
@@ -778,11 +771,14 @@ function(x=NULL, y=NULL, by=NULL, data=d, filter=NULL,
 
     else {
       bc.data.frame(data, stack100,
-        fill, color, trans, fill_split, theme,
+        fill, color, trans, fill_split,
+        fill_scaled, fill_chroma, theme,
         horiz, gap, proportion, scale_y,
         xlab, ylab, main,
         value_labels, label_max, beside,
-        rotate_x, offset, break_x, sort,
+        rotate_x, offset, 
+        axis_fmt, axis_x_pre, axis_y_pre,
+        break_x, sort,
         labels, labels_color, labels_size, labels_decimals,
         labels_position, labels_cut,
         xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,

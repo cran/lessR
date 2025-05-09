@@ -10,7 +10,7 @@ function(x=NULL, y=NULL, data=d, filter=NULL, paired=FALSE,
          alternative=c("two_sided", "less", "greater"),
          mmd=NULL, msmd=NULL, Edesired=NULL,
 
-         show_title=TRUE, bw1="bcv", bw2="bcv",
+         show_title=TRUE, bw1="bcv", bw2="bcv", pt_size=0.8,
 
          graph=TRUE, line_chart=FALSE, quiet=getOption("quiet"),
          width=5, height=5, pdf_file=NULL, ...)  {
@@ -413,7 +413,7 @@ function(x, y=NULL, ...) {
     .plt.main(data.frame(x.call, stringsAsFactors=TRUE),
               data.frame(y.call, stringsAsFactors=TRUE), cat.y=TRUE,
               fill=pt_fill, color=pt_color,
-              shape=21, size=.8, ylab="", segments_y=TRUE)
+              shape=21, size=pt_size, ylab="", segments_y=TRUE)
 
     if (!is.null(pdf_file)) {
       dev.off()

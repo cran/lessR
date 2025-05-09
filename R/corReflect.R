@@ -46,7 +46,7 @@ function (R=mycor, vars,
   if (heat_map) {
     if (is.null(main)) main <- "With Reflected Item Coefficients"
     .opendev(pdf_file, width, height)  # set up graphics
-    .corcolors(R, NVOld, main, bottom, right, diag=0,
+    .heatmap(R, NVOld, main, bottom, right, diag=0,
                pdf_file, width, height)
   }
 

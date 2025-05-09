@@ -219,6 +219,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
     if (bin) {
       h <- .hst.main(x, breaks=breaks, bin_start=bin_start,
          bin_width=bin_width, bin_end=bin_end, prop=proportion,
+         axis_fmt="K", axis_x_pre="", axis_y_pre="",
          quite=quiet, fun_call=NULL, do_plot=FALSE, ...)
       txdst <- h$ttx
       class(txdst) <- "out"

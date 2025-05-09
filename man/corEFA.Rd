@@ -39,8 +39,7 @@ Only the loadings from the exploratory factor analysis are provided, with either
 
 Also provides the associated multiple indicator measurement model suggested by the exploratory factor analysis. Each MIMM factor is defined by the items that have the highest loading on the corresponding exploratory factor.
 
-For versions of \code{lessR} after 3.3, the correlation matrix computed by \code{\link{Correlation}} is now a list element called \code{R} within the returned list. For example, \code{mycor$R} from \code{mycor <- cr(d)}. The function \code{corEFA} automatically finds this correlation matrix from just entering the entire list name of the returned list, \code{mycor}, or the specific location, \code{mycor$R}, or as a stand-alone numerical matrix as done in versions of \code{lessR} previous to 3.3. 
-}
+For versions of \code{lessR} including and after 4.4.3, the correlation matrix computed by \code{\link{Correlation}} is now the object returned if \code{show} is equal to \code{"cor"}, the default, or a missing data analysis if equal to \code{"missing"}.}
 
 \value{
 The output can optionally be returned and saved into an \code{R} object, otherwise it simply appears at the console. The components of this object are redesigned in \code{lessR} version 3.3 into three different types: pieces of text that form the readable output, a variety of statistics, and R markdown instructions. The readable output are character strings such as tables amenable for viewing and interpretation. The statistics are numerical values amenable for further analysis, such as to be referenced in a subsequent R markdown document. The R~Markdown input is available for entry direct into \code{knitr}, such as in RStudio. The motivation of these three types of output is to facilitate R markdown documents, as the name of each piece, preceded by the name of the saved object followed by a dollar sign, can be inserted into the R markdown document (see \code{examples}).

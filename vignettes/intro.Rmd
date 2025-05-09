@@ -248,11 +248,10 @@ d <- Read("Mach4", quiet=TRUE)
 l <- Read("Mach4_lbl", var_labels=TRUE)
 ```
 
-Calculate the correlations and store in here in *mycor*, a data structure that contains the computed correlation matrix with the name R. Extract R from *mycor*.
+Calculate the correlations and store in *R*.
 
 ```{r fig.width=3.5, fig.height=3.5}
-mycor <- cr(m01:m20)
-R <- mycor$R
+R <- cr(m01:m20)
 ```
 
 The correlation matrix for analysis is named R. The item (observed variable) correlation matrix is the numerical input into the confirmatory factor analysis.

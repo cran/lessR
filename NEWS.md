@@ -1,3 +1,74 @@
+# lessR version 4.4.3, May 8, 2025
+
+## Major Update
+
+* `Plot()`: Contour plots now available. Older logical parameter `smooth` for smoothed scatterplots now replaced with parameter `type`, now can set to `"smooth"` or `"contour"`. Fit line and ellipse are also available.
+
+* `Plot()`: Two new parameters:
+  + `contour_n` specifies the number of levels or contours for a specific contour plot. The default value is 10. 
+  + `contour_nbins`: Specifies the number of bins constructed for the \code{x} and \code{y} variables from which to form the 2D grid of estimated densities.
+
+
+## Updates
+
+* `BarChart()`, `Histogram()`, `Plot()`: New parameters for formatting axis values, which can be combined.
+  + `axis_fmt`:  default is `K`, which rounds 100000 to 100K, also can specify `,` for standard USA format of numbers or `.` for the format used in many other parts of the world. 
+  + `axis_x_pre`: specify a prefix to add to each displayed number on the `x`-axis, such as `$`.
+  + `axis_y_pre`: specify a prefix to add to each displayed number on the `y`-axis, such as `$`.
+
+* `BarChart()`, `Histogram()`, `Plot()`: Parameter `filter` now works, in addition to the existing logical selection, by specifying a vector of integers that correspond to the row numbers of the input data frame to be retained. 
+
+* `BarChart()`: New parameter `fill_scaled` by default sets the luminous (lightness) of each bar along a sequential scale scaled according to the value of numerical `y`. Larger values of `y` lead to darker colors. Only applies if no`by` variable. Or, specify the color of the sequential scale with parameter `fill` set to a single R color name, or a divergent scale with parameter `fill` set to two R color names.
+
+* `BarChart()`: New parameter `fill_chroma` sets the saturation level of fill colors for parameter `fill_scaled`. Default is full saturation 100. Values closer to 0 lose saturation to he come closer to grayscale.
+
+* `Correlation()`: Parameter `show_n` dropped and replaced with parameter `show`, which has a different meaning. For a data frame, the default value is `cor` to compute correlations. The other possible value is `missing` to compute the missing data matrix for pair wise deletion or general information for the other forms of deletion. No longer extract the correlation matrix or the missing matrix from the output as a list value, e.g., R <- mycor$R.
+
+* `Correlation()`: To be consistent with other lessR functions, logical parameter `pdf` changed to `pdf_file`, where the name of the PDF file is specified.
+
+* `corPrint()`: New function to display a correlation matrix in readable, compact form. Drop the `0.` characters of each correlation coefficient. For example, display 0.42 as 42. Parameter `min_value` specifies the minimal magnitude for which to display a correlation. 
+
+* `corReorder()`: Do not write the output correlation matrix to the console if new parameter `quiet` is TRUE.
+
+* `reshape_long()`: New parameter `shape` that when set to `square` transforms a symmetric, square matrix such as a correlation or covariance matrix into a long-form data frame.
+
+* `reshape_wide()`: No longer use quotes around the variable names.
+
+* `reshape_wide()`: Change parameter name `group` to the more descriptive `widen`, the categorical variable for which the levels are displayed as columns.
+
+* `Histogram()`: When a density rug in specified with parameter `rug`, the tick marks that define the rug are now longer with the entire density curved moved upwards to accommodate. 
+
+* `pivot()`: All categorical variables to define groups over which to aggregate now should be specified as part of parameter `by`. For example: `pivot(d, table, by=Dept)`.  
+
+* `pivot()`: Parameter `table_long` now defaults to `TRUE`.
+
+* `Plot()`: Parameters `scale_x` and `scale_y` can now be specified with just two values, the respective minimum and maximum values of the corresponding axis. If the third value, the number of intervals on the axis, is not specified, the default value is accepted. 
+
+* `Plot()`: Parameter `sort_yx` renamed `sort`, though the old name still works. 
+
+* `ttest()`: Parameter `pt_size` added to specify the size of plotted points for the dependent-groups t-test of paired differences Cleveland dot plot. 
+
+
+## Bug Fixes
+
+* `BarChart()`, `Histogram()`, `Plot()`: Setting `x` as `row_names` now works with parameter `filter`.
+
+* `Histogram()`: Vertical grid lines restored to the histogram plot.
+
+* `Plot()`: Violin plot fill color now appropriately reflects the underlying style from `style()`.
+
+* `Plot()`: For facet plots with a `by` variable, the legend text now scales according to the size of the text of the axis values.
+
+* `Plot()`: `add="labels"` now working to use row names by default to label the points in a scatter plot.
+
+* `Plot()`: Run chart, indicated by `.Index` for the `x`-variable, now properly responds to the `color` parameter set for the line color and point border. 
+
+* `Plot()`: `ID` parameter now working correctly to identify the variable from which to label plotted points. 
+
+* `ttest()`: Visualization for the resulting density plots now responsive to changes in axis and labels text per `style()` function.
+
+
+
 # lessR version 4.4.2, March 16, 2025
 
 ## Updates
@@ -67,6 +138,7 @@
 * `Plot()`: Parameter `lwd` renamed `line_width`. Parameter `ts_PIlevel` renamed `ts_PI`.
 
 * `PieChart()`: Parameter `lwd` renamed `line_width`. Parameter `lty` renamed `line_type`.
+
 * `Plot()`: To jitter either axis coordinate, set to a specific value of `jitter_x` and/or `jitter_y` or have the value set by `Plot()`, indicated by setting the corresponding jitter parameter to `NULL`. Applying jitter to both the `x`-axis and `y`-axis was by design occurring by default for all analyses, probably too aggressive. Now, the default values for a scatterplot of continuous variables is 0. For discrete variables or a VBS plot (violin-box-scatter plot), different formulas provide default jitter values greater than 0, easily overridden by providing specific values.
 
 * `Plot()`: For non-linear values of parameter `fit`, now provide the MSE of the model fit to the original, non-linear data. Can compare this MSE to that of the linear model by running another analysis, setting `fit` to `"lm"`.

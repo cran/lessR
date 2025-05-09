@@ -28,7 +28,8 @@ function(x=NULL, data=d, filter=NULL,
 
     rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
-    scale_x=NULL, scale_y=NULL,
+    scale_x=NULL,
+    axis_fmt=c("K", ",", ".", ""), axis_x_pre="", axis_y_pre="",
 
     add=NULL, x1=NULL, y1=NULL, x2=NULL, y2=NULL,
 
@@ -43,11 +44,34 @@ function(x=NULL, data=d, filter=NULL,
     eval_df=NULL, fun_call=NULL, ...) {
 
 
+  # limit actual argument to alternatives, perhaps abbreviated
+  cumulate <- match.arg(cumulate)
+  type <- match.arg(type)
+  stat_x <- match.arg(stat_x)
+  if (is.null(fun_call)) fun_call <- match.call()
+  if (nzchar(axis_fmt[1])) axis_fmt <- match.arg(axis_fmt)
+
+  proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
+  histogram <- ifelse (density, FALSE, TRUE)
+  trans <- transparency
+
+  if (rug) density <- TRUE
+
+  if (theme != getOption("theme")) {
+    sty <- style(theme, reset=FALSE)
+    fill <- sty$bar$bar_fill_cont
+    color <- sty$bar$color_ordered
+    trans <- sty$bar$trans_fill
+  }
+
   if (missing(fill))
     fill <- ifelse (is.null(getOption("bar_fill_cont")),
       getOption("bar_fill"), getOption("bar_fill_cont"))
   breaks.miss <- ifelse (missing(breaks), TRUE, FALSE)
   bw.miss <- ifelse (missing(bandwidth), TRUE, FALSE)
+
+
+  # ------------ Old Stuff ----------------------------------
 
   # a dot in a parameter name to an underscore and more
   dots <- list(...)
@@ -67,8 +91,6 @@ function(x=NULL, data=d, filter=NULL,
     }
   }
 
-  # ------------ Old Stuff ----------------------------------
-
   facet1 <- .newparam(missing(by1), substitute(by1), "by1",
                       missing(facet1), substitute(facet1), "facet1")
   if (!is.null(facet1)) data[[as.character(facet1)]]  # extract facet1 from data
@@ -86,29 +108,11 @@ function(x=NULL, data=d, filter=NULL,
              "    Better to convert a categorical integer variable to ",
              "a factor.\n")
   }
+  # ---------------------------------------------------------
 
   facet1.miss <- ifelse (is.null(facet1), TRUE, FALSE)
   facet2.miss <- ifelse (is.null(facet2), TRUE, FALSE)
-
   Trellis <- ifelse(!facet1.miss, TRUE, FALSE)
-
-  if (is.null(fun_call)) fun_call <- match.call()
-
-  trans <- transparency
-
-  # limit actual argument to alternatives, perhaps abbreviated
-  cumulate <- match.arg(cumulate)
-  type <- match.arg(type)
-  stat_x <- match.arg(stat_x)
-  proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
-  histogram <- ifelse (density, FALSE, TRUE)
-
-  if (theme != getOption("theme")) {
-    sty <- style(theme, reset=FALSE)
-    fill <- sty$bar$bar_fill_cont
-    color <- sty$bar$color_ordered
-    trans <- sty$bar$trans_fill
-  }
 
   if (!breaks.miss && density)  {
     cat("\n"); stop(call.=FALSE, "\n------\n",
@@ -116,16 +120,9 @@ function(x=NULL, data=d, filter=NULL,
       "Bins must be equal width, but can use bin_start and bin_width.\n\n")
   }
 
-  if (!is.null(scale_x)) if (length(scale_x) != 3)  {
+  if (density &&  !is.null(facet1)) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
-      "Starting value, ending value, and number of intervals\n",
-      "  must all be specified as a vector, e.g., scale_x=c(0, 9 , 5)\n\n")
-  }
-
-  if (!is.null(scale_y)) if (length(scale_y) != 3)  {
-    cat("\n"); stop(call.=FALSE, "\n------\n",
-      "Starting value, ending value, and number of intervals\n",
-      "  must all be specified as a vector, e.g., scale_y=c(0, 9 , 5)\n\n")
+      "Facets not yet working with density visualizations.\n\n")
   }
 
   fill[which(fill == "off")] <- "transparent"
@@ -212,6 +209,43 @@ function(x=NULL, data=d, filter=NULL,
   eval_df <- !x.in.global
 
 
+# subset filter (with deprecated rows parameter) --------------------------
+
+  if (!missing(filter) || !missing(rows)) {
+
+    if (x.in.global) {
+      cat("\n"); stop(call.=FALSE, "\n------\n",
+        "Parameter  filter  not applicable if no data frame\n\n")
+    }
+
+    txt <- .filter(deparse(substitute(filter)))
+
+    # get r, label each row as TRUE or FALSE
+    intYN <- try(eval(parse(text = txt)), silent = TRUE)
+    if (is.numeric(intYN)) {
+      r <- rep(FALSE, nrow(data))
+      r[intYN] <- TRUE
+    }
+    else {
+      if (!missing(filter))  # subset filter
+        r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
+      if (!missing(rows))  # tag each row as TRUE or FALSE
+        R <- eval(substitute(rows), envir=data, enclos=parent.frame())
+      r <- r & !is.na(r)  # set missing for a row to FALSE
+    }
+
+    nr.before <- nrow(data)
+    if (any(r))
+      data <- data[r,,drop=FALSE]
+    if (!quiet) {
+      if (!missing(filter))  # filter parameter present
+        cat("\nfilter: ",  txt, "\n-----\n")
+      cat("Rows of data before filtering: ", nr.before, "\n")
+      cat("Rows of data after filtering:  ", nrow(data), "\n\n")
+    }
+  }  # end filter
+
+
   # -----------------------------------------------------------
   # establish if a data frame, if not then identify variable(s)
   # x can be missing entirely, with a data frame passed instead
@@ -227,25 +261,6 @@ function(x=NULL, data=d, filter=NULL,
       }
       data.vars <- as.list(seq_along(data))
       names(data.vars) <- names(data)
-
-      # subset filter (with deprecated rows parameter also)
-      if (!missing(filter) || !missing(rows)) {
-        txt <- .filter(deparse(substitute(filter)))
-        if (!missing(filter))  # subset filter
-          r <- eval(str2expression(txt), envir=data, enclos=parent.frame())
-        if (!missing(rows))
-          r <- eval(substitute(rows), envir=data, enclos=parent.frame())
-        r <- r & !is.na(r)  # set missing for a row to FALSE
-        nr.before <- nrow(data)
-        if (any(r))
-          data <- data[r,,drop=FALSE]
-        if (!quiet) {
-          if (!missing(filter))  # filter parameter present
-            cat("\nfilter: ",  txt, "\n-----\n")
-          cat("Rows of data before filtering: ", nr.before, "\n")
-          cat("Rows of data after filtering:  ", nrow(data), "\n\n")
-        }
-      }  # end filter
 
       ind <- eval(substitute(x), envir=data.vars)  # col num of each var
       if (!("list" %in% class(data))) {
@@ -348,7 +363,9 @@ function(x=NULL, data=d, filter=NULL,
 
     .bar.lattice(data.x[,1], facet1.call, facet2.call, n_row, n_col, aspect,
            proportion, fill, color, trans, size.pt=NULL,
-           xlab, ylab, main, rotate_x, offset, width, height, pdf_file,
+           xlab, ylab, main, rotate_x, offset,
+           axis_fmt, axis_x_pre, axis_y_pre,
+           width, height, pdf_file,
            segments_x=NULL, breaks, T.type="hist", quiet)
   }
 
@@ -409,7 +426,7 @@ function(x=NULL, data=d, filter=NULL,
               bin_end, proportion, values, cumulate, xlab, ylab, main, sub,
               xlab_adj, ylab_adj, bm.adj, lm.adj, tm.adj, rm.adj,
               add, x1, x2, y1, y2,
-              scale_x, scale_y,
+              scale_x, axis_fmt, axis_x_pre, axis_y_pre,
               quiet, do_plot, fun_call=fun_call, ...)
 
           txsug <- stuff$txsug
@@ -482,6 +499,7 @@ function(x=NULL, data=d, filter=NULL,
                 fill_hist, color_normal, color_general,
                 fill_normal, fill_general,
                 rotate_x, rotate_y, offset,
+                axis_fmt, axis_x_pre, axis_y_pre,
                 x.pt, xlab, main, sub, y_axis, x.min, x.max,
                 rug, color_rug, size_rug, quiet, fncl=fun_call, ...)
 

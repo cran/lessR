@@ -3,6 +3,7 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
          fill, color,
          trans, size.pt, xlab, ylab, main,
          rotate_x, offset,
+         axis_fmt, axis_x_pre, axis_y_pre,
          width, height, pdf_file,
          segments_x, breaks, T.type, quiet) {
 
@@ -115,9 +116,19 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
   #h.type <- "density"   # need to integrate density as a 3rd option
   if (T.type == "hist") {
     if (is.null(facet2))
-      p <- lattice::histogram(~ x | facet1, type=h.type)
+      p <- lattice::histogram(~ x | facet1, type=h.type,
+          scales=list(
+            x = list(labels=.axis.format(pretty(x),
+                                         axis_fmt, axis_x_pre, "no"),
+                     at=pretty(x), tck=.8)
+          ))
     else
-      p <- lattice::histogram(~ x | facet1 * facet2, type=h.type)
+      p <- lattice::histogram(~ x | facet1 * facet2, type=h.type,
+          scales=list(
+            x = list(labels=.axis.format(pretty(x),
+                                         axis_fmt, axis_x_pre, "no"),
+                     at=pretty(x), tck=.8)
+          ))
     # see if there is a color range for fill, if so then get the colors
     # if breaks were possible, use unlist(p)$panel.args.common.breaks
     n.bar <- unlist(p)$panel.args.common.nint
@@ -127,7 +138,12 @@ function(x, facet1, facet2, nrows, ncols, asp, prop,
     mytab <- table(x, facet1)
     if (prop) mytab <- prop.table(mytab, margin=2)
     mytabDF <- as.data.frame.table(mytab, responseName="Count")
-    p <- lattice::barchart(x ~ Count | facet1, data=mytabDF)
+    p <- lattice::barchart(x ~ Count | facet1, data = mytabDF,
+          scales = list(
+            x = list(labels=.axis.format(pretty(mytabDF$Count),
+                                         axis_fmt, axis_x_pre, "no"),
+                     at=pretty(mytabDF$Count), tck=.8)
+          ))
     n.bar <- nrow(mytab)
   }
 

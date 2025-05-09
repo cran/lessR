@@ -60,7 +60,8 @@ Histogram(
 
     rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
-    scale_x=NULL, scale_y=NULL,
+    scale_x=NULL,
+    axis_fmt=c("K", ",", ".", ""), axis_x_pre="", axis_y_pre="",
 
     # ----------------------------------------------------------------------
     # Draw one or more objects, text, or geometric figures, on the histogram
@@ -95,7 +96,8 @@ hs(\dots)
         frame, \code{d} by default.}
   \item{data}{Optional data frame that contains the variable(s) of interest,
         default is \code{d}.}
-  \item{filter}{A logical expression that specifies a subset of rows of
+  \item{filter}{A logical expression or a vector of integers that specify the
+        row numbers of the rows to retain to define a subset of rows of
         the data frame to analyze.}
   \item{stat_x}{Bin and transform values of variable \code{x} into
        \code{"counts"} by default or \code{"proportion"} if specified,
@@ -225,7 +227,15 @@ hs(\dots)
   \item{scale_x}{If specified, a vector of three values that define the
         numerical values of the x-axis: starting, ending and
         number of intervals, within the bounds of plot region.}
-  \item{scale_y}{Applies to the y-axis_ See \code{scale_x}.}\cr
+  \item{axis_fmt}{Format of the axis labels for both axes. Default is to
+        round thousands to \code{"K"}, such as 100000 to 100K. Also can
+        specify \code{","} to insert commas in large numbers with a 
+        decimal point or \code{"."} to insert periods, or \code{""}
+        to turn off formatting.}
+  \item{axis_x_pre}{Prefix for axis labels on the \code{x}-axis,
+        such as \code{"$"}.}
+  \item{axis_y_pre}{Prefix for axis labels on the \code{y}-axis,
+        such as \code{"$"}.}\cr
 
   \item{add}{\bold{Draw one or more objects}, text or a geometric figures,
        on the plot.
@@ -301,7 +311,7 @@ The data may either be a vector from the global environment, the user's workspac
 
 To obtain a histogram of each numerical variable in the \code{d} data frame, use \code{Histogram()}.  Or, for a data frame with a different name, insert the name between the parentheses. To analyze a subset of the variables in a data frame, specify the list with either a : or the \code{\link{c}} function, such as m01:m03 or c(m01,m02,m03).
 
-The \code{rows} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
+The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression or a set of integers that specify the row numbers of the rows to retain. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. Or, to specify vector of integers that correspond to row numbers, define a vector using standard R notation. See the Examples.
 
 COLORS\cr
 Individual colors in the plot can be manipulated with options such as \code{color_bars} for the color of the histogram bars. A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{lightbronze}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub_theme="black")} for a black background and partial transparency of plotted colors. 
@@ -404,7 +414,7 @@ Histogram(Salary, color="off")
 #Histogram(Salary, pdf=TRUE)
 
 # just males employed more than 5 years
-Histogram(Salary, rows=(Gender=="M" & Years > 5))
+Histogram(Salary, filter=(Gender=="M" & Years > 5))
 
 # histogram with red bars, black background, and black border
 style(panel_fill="black", fill="red", panel_color="black")
@@ -440,7 +450,7 @@ Histogram(Salary, breaks=15, stat_x="proportion")
 
 # histogram with non-default values for x- and y-axes
 d[2,4] <- 45000
-Histogram(Salary, scale_x=c(20000,160000,8), scale_y=c(0,9.5,5))
+Histogram(Salary, scale_x=c(20000,160000,8))
 
 # ----------------
 # Trellis graphics

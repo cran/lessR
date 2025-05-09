@@ -27,7 +27,7 @@ ttest(x=NULL, y=NULL, data=d, filter=NULL, paired=FALSE,
          alternative=c("two_sided", "less", "greater"),
          mmd=NULL, msmd=NULL, Edesired=NULL, 
 
-         show_title=TRUE, bw1="bcv", bw2="bcv",
+         show_title=TRUE, bw1="bcv", bw2="bcv", pt_size=0.8,
 
          graph=TRUE, line_chart=FALSE, quiet=getOption("quiet"),
          width=5, height=5, pdf_file=NULL, \dots)       
@@ -84,6 +84,8 @@ tt(\dots)
        two groups.}
   \item{bw1}{Bandwidth for the computation of the densities for the first group.}
   \item{bw2}{Bandwidth for the computation of the densities for the second group.}
+  \item{pt_size}{Size of plotted points for the paired t-test Cleveland dot plot of 
+       differences.}
   \item{graph}{If \code{TRUE}, then display the graph of the overlapping density distributions.}
   \item{line_chart}{Plot the run chart for the response variable for each group
         in the analysis.}

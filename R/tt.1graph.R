@@ -13,7 +13,7 @@ function(YA, bw1, Ynm, digits_d, brief,
   }
 
   # values needed for graph
-  min_x <- min(min(dYA$x), mu)  # min x coordinate for graph
+  min.x <- min(min(dYA$x), mu)  # min x coordinate for graph
   max.x <- max(max(dYA$x), mu)  # max x coordinate for graph
   max.y <- max(dYA$y)  # max y coordinate
   max.y <- max.y+.1*max.y  # allow room in graph region for d info
@@ -43,19 +43,24 @@ function(YA, bw1, Ynm, digits_d, brief,
   orig.params <- par(no.readonly=TRUE)
   on.exit(par(orig.params))
   par(bg=getOption("window_fill"))
-  par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.axis=1, cex.lab=1.2)
+  par(mar=c(4.1,1.5,8,.4), mgp=c(3,.6,0), cex=.8, cex.lab=1.2)
 
   plot.new()
-  plot.window(xlim=c(min_x,max.x), ylim=c(0,max.y))
+  plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
 
-  axis(1, col=getOption("axis_x_color"), col.axis=getOption("lab_color"))
+  ax <- .axes_dim()  # get axis value parameters
+  adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex * 1.2
+  axT1 <- pretty(c(min.x, max.x))
+  .axes(NULL, NULL, axT1, NULL)
+# axis(1, col=getOption("axis_x_color"), col.axis=getOption("lab_color"),
+#             cex.axis=axis_x_cex)
   box(col=getOption("panel_color"))
   if (length(x.lab) == 1)
     xl <- x.lab
   else
     xl <- x.lab[4]  # variable labels have italics, multiple entries
   if (nchar(xl) > 52) xl <- paste(substr(xl,1,50), "...")
-  title(xlab=x.lab, col.lab=col.tx)
+  title(xlab=x.lab, col.lab=col.tx, cex.lab=axis_x_cex*1.2)
 
   ybot <- par("usr")[3]  # bottom of graph
   ytop <- par("usr")[4]  # height of graph

@@ -87,8 +87,7 @@ d <- Read("Mach4", quiet=TRUE)
 l <- Read("Mach4_lbl", var_labels=TRUE)
 
 ## ----fig.width=3.5, fig.height=3.5--------------------------------------------
-mycor <- cr(m01:m20)
-R <- mycor$R
+R <- cr(m01:m20)
 
 ## -----------------------------------------------------------------------------
 efa(R, n_factors=4)

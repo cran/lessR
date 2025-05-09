@@ -125,7 +125,7 @@ A multiple indicator measurement model defines one or more latent variables, cal
 INPUT\cr
 Unless \code{labels="only"}, the analysis requires the correlation matrix of the indicators and the specification of the groups of indicators, each of which defines a factor in the multiple indicator measurement model.  The default name for the indicator correlation matrix is \code{mycor}, which is also the default name of the matrix produced by the \code{lessR} function \code{\link{Correlation}} that computes the correlations from the data, as well as the name of the matrix read by the \code{lessR} function \code{\link{corRead}} that reads the already computed correlation matrix from an external file.
 
-For versions of \code{lessR} after 3.3, the correlation matrix computed by \code{\link{Correlation}} is now a list element called \code{R} within the returned list. For example, \code{mycor$R} from \code{mycor <- cr(d)}. The function \code{corCFA} automatically finds this correlation matrix from just entering the entire list name of the returned list, \code{mycor}, or the specific location, \code{mycor$R}, or as a stand-alone numerical matrix as done in versions of \code{lessR} previous to 3.3. 
+For versions of \code{lessR} including and after 4.4.3, the correlation matrix computed by \code{\link{Correlation}} is now the object returned if \code{show} is equal to \code{"cor"}, the default, or a missing data analysis if equal to \code{"missing"}.
 
 The data frame from which the correlation matrix was computed is required only if any associated variable labels are listed, organized by the items within each factor. By default, \code{labels="include"}, these labels are listed as part of the analysis if they are available.
 
@@ -249,7 +249,7 @@ d <- Read("Mach4", quiet=TRUE)
 l <- Read("Mach4_lbl", var_labels=TRUE)
 # calculate the correlations and store in mycor
 mycor <- cr(m01:m20)
-R <- mycor$R
+R <- mycor
 # specify measurement model in Lavaan notation
 MeasModel <- 
 " 

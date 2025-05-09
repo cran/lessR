@@ -237,7 +237,7 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
       plt.i <- plt.i + 1
       plt.title[plt.i] <- "One-Group Plot"
 
-      if (paired) x.lab <- "Difference"
+      if (paired) x.lab <- "Differences of Matched Pairs"
 
       if (!is.null(pdf_file)) {
         if (!grepl(".pdf", pdf_file))

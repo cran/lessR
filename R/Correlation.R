@@ -1,11 +1,11 @@
 Correlation <-
 function(x, y, data=d, # x can be a data frame, or variables in a data frame
          miss=c("pairwise", "listwise", "everything"),
+         show=c("cor", "missing"),
          fill_low=NULL, fill_hi=NULL,
-         show_n=NULL, brief=FALSE, 
-         digits_d=NULL, heat_map=TRUE,
-         main=NULL, bottom=3, right=3,
-         pdf=FALSE, width=5, height=5, ...) {
+         brief=FALSE, digits_d=NULL, heat_map=TRUE,
+         main=NULL, bottom=3, right=3, quiet=getOption("quiet"),
+         pdf_file=NULL, width=5, height=5, ...) {
 
 
   # a dot in a parameter name to an underscore
@@ -21,12 +21,18 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
   }
 
   miss <- match.arg(miss)
+  show <- match.arg(show)
 
-  # replaced older names with current name
+  # replace older names with current name
   dots <- list(...)
   if (!is.null(dots)) if (length(dots) > 0) {
     for (i in 1:length(dots)) {
       if (names(dots)[i] == "graphics")  heat_map <- dots[[i]]
+      if (names(dots)[i] == "show_n") {
+      cat("\n"); stop(call.=FALSE, "\n------\n",
+        "New parameter  show  replaces  show_n.\n",
+        "Obtain pairwise missing value counts with  show=\"missing\", \n\n")
+    }
     }
   }
   
@@ -36,29 +42,22 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
   is.df <- FALSE  # is data frame
 
   if (missing(y)) {  # is a data frame or a list of variables
-
+    is.df <- TRUE
     if (missing(x)) {
       x.name <- "$"  # in case x is missing, i.e., data frame d
-      is.df <- TRUE
       if (missing(data)) data <- eval(substitute(d))
     }
-
     else if ( (!grepl(":", x.name) && !grepl(",", x.name)) ) {
       if (is.data.frame(x)) {  # specified data name
-        if (exists(x.name, where=.GlobalEnv)) {
-          data <- x
-          is.df <- TRUE
-        }
+        if (exists(x.name, where=.GlobalEnv)) data <- x
       }
     } 
 
-    else {
-
+    else {  # two variables
       all.vars <- as.list(seq_along(data))
       names(all.vars) <- names(data)
-
       # proceed here only if x.name is in data or is a list
-      if ( (x.name %in% names(all.vars)) || grepl(":", x.name)
+      if ((x.name %in% names(all.vars)) || grepl(":", x.name)
             || grepl(",", x.name) ) {
         x.col <- eval(substitute(x), envir=all.vars, enclos=parent.frame())
 
@@ -72,7 +71,7 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
   }  # end missing y
 
 
-  if (!is.df) {
+  if (!is.df) {  # pairwise
 
     dname <- deparse(substitute(data))
     options(dname = dname)
@@ -118,31 +117,29 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
 
 
   if (is.df) { 
-    if (is.null(show_n))
-      if (nrow(data) <= 15) show_n <- TRUE else show_n <- FALSE
-    stuff <- .cr.data.frame(data, miss, show_n, digits_d,
-                   heat_map, fill_low, fill_hi, main, bottom, right, 
-                   pdf, width, height, ...) 
+    stuff <- .cr.data.frame(data, miss, show, digits_d,
+                   heat_map, fill_low, fill_hi, main, bottom, right, quiet, 
+                   pdf_file, width, height, ...) 
 
-    txbck <- stuff$txb
     txmis <- stuff$txm
-    txcor <- stuff$txc
 
-    class(txbck) <- "out"
     class(txmis) <- "out"
-    class(txcor) <- "out"
 
-    output <- list(
-      out_background=txbck, out_missing=txmis, out_cor=txcor,
-      R=stuff$R)
+    if (show == "cor") {
+      if (!quiet)
+        return(stuff$R)
+      else
+        invisible(stuff$R)
+      }
+    else if (show == "missing") return(txmis)
   }
 
-  else {
+  else {  # pairwise
   
-    if (pdf) {
+    if (!is.null(pdf_file)) {
       cat("\n");   warning(call.=FALSE, "\n","------\n",
         " To produce a scatter plot, pass a vector to:  Plot\n",
-        " No heat map produced here and yet pdf is specified.\n\n",
+        " No heat map produced here and yet a pdf file is specified.\n\n",
          sep="")
      }
 
@@ -158,8 +155,9 @@ function(x, y, data=d, # x can be a data frame, or variables in a data frame
     output <- list(out_background=txbck, out_describe=txdsc, out_inference=txinf,
       r=stuff$r, tvalue=stuff$tvalue, df=stuff$df, pvalue=stuff$pvalue,
       lb=stuff$lb, ub=stuff$ub)
-  }
 
     class(output) <- "out_all"
     return(output)
+  }  # end pairwise
+
 }
